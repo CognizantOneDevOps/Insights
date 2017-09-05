@@ -1,0 +1,35 @@
+{
+  "mqConfig": {
+    "user": "iSight",
+    "password": "iSight",
+    "host": "127.0.0.1",
+    "exchange": "iSight"
+  },
+  "subscribe": {
+    "config": "ALM.HP.config"
+  },
+  "publish": {
+    "data": "ALM.HP.DATA",
+    "health": "ALM.HP.HEALTH"
+  },
+  "communication": {
+    "type": "REST"
+  },
+  "almEntities" : {
+  	"requirements" : ["parent-id", "id", "name", "creation-time", "last-modified", "req-reviewed", "req-priority", "father-name"],
+  	"defects" : ["id", "priority", "name", "creation-time", "last-modified", "status", "severity", "detected-by", "owner"]
+  },
+  "auth": "base64",
+  "runSchedule": 5,
+  "userid": "userid",
+  "passwd": "password",
+  "baseEndPoint": "http://hostname",
+  "startFrom": "2015-11-29 12:17:45",
+  "toolsTimeZone" : "Asia/Kolkata",
+  "timeStampField":"last-modified",
+  "timeStampFormat":"%Y-%m-%d %H:%M:%S",
+  "isDebugAllowed" : true,
+  	"loggingSetting" : {
+		"logLevel" : "WARN"
+	}
+}

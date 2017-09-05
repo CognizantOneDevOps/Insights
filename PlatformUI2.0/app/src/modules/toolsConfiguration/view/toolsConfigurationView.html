@@ -1,0 +1,62 @@
+<!--
+ *******************************************************************************
+ * Copyright 2017 Cognizant Technology Solutions
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License.  You may obtain a copy
+ * of the License at
+ * 
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ ******************************************************************************
+ -->
+
+<throbber ng-if="!toolsConfigurationController.showTemplateAfterLoad" layout="column" flex= "100" >
+</throbber>
+<div ng-if="toolsConfigurationController.showTemplateAfterLoad" layout="column" flex class="contentCss">
+    <div layout class="buttMar">
+        <div layout class="selectToolTxt">Please select a tool to configure</div>
+        <div layout layout-align="end end" flex style="margin-right: -7px;">
+            <md-button ng-click="toolsConfigurationController.toToolsConfiguredpage()" class="md-raised md-primary configureBut" ng-disabled="toolsConfigurationController.configuredToolsList.length  == 0"
+                ng-style="{ 'background-color' : (toolsConfigurationController.configuredToolsList.length == 0) ? '#7fb8c7' : '#00728f',
+                                                                       'color' : (toolsConfigurationController.configuredToolsList.length == 0) ? '#c6dde4' : 'white' }">
+                Configured Tools
+            </md-button>
+        </div>
+    </div>
+    <div layout layout-align="center center">
+        <table class="md-api-table-landing" style="border: 1px solid #a5d28b;width:100%">
+            <thead class="theadCss">
+                <tr layout="row" layout-align="start center">
+                    <th flex="20" class="tableHeader">
+                        <span>Functional Block</span>
+                    </th>
+                    <th flex="80" class="tableHeader">
+                        <span>Select Tool (</span><span style="color: rgb(0, 114, 143);">Configured tool(s)</span><span> are in blue)</span>
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="toolsCategory in toolsConfigurationController.toolsData" layout="row" layout-align="start none">
+                    <td class="funcCss" flex="20"><span>{{toolsCategory.categoryDisplayName}}
+                        <md-tooltip style="font-size:12px; font-family: proxima_novasemibold;" ng-if="toolsCategory.toolTipName !== ''" md-direction="right">
+                            {{toolsCategory.toolTipName}}
+                        </md-tooltip></span>
+                    </td>
+                    <td class="selTool" flex="80" style="padding-top:18px;">
+                        <md-radio-group ng-model="data.group1" layout="row" layout-wrap>
+                            <md-radio-button flex="15" style="padding-bottom:18px;outline:none" ng-value="{category : '{{toolsCategory.category}}',
+                                                                            toolName : '{{tools.toolName}}' }" ng-click='toolsConfigurationController.openToolUrl(toolsCategory.category,tools.toolName)'
+                                layout value="{{tools.toolName}}" ng-repeat="tools in toolsCategory.tools" ng-style="{ 'color' : (toolsConfigurationController.configuredToolsList.includes(tools.toolName)) ? '#00728f' : '#666666'}">{{tools.toolDisplayName}}</md-radio-button>
+                        </md-radio-group>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>

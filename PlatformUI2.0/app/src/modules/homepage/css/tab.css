@@ -1,0 +1,107 @@
+/*******************************************************************************
+ * Copyright 2017 Cognizant Technology Solutions
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License.  You may obtain a copy
+ * of the License at
+ * 
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ ******************************************************************************/
+
+.md-tab {
+    font-size: 14px;
+    text-align: center;
+    line-height: 24px;
+    padding: 12px 24px;
+    transition: background-color 0.35s cubic-bezier(0.35, 0, 0.25, 1);
+    cursor: pointer;
+    white-space: nowrap;
+    position: relative;
+    text-transform: initial !important;
+    float: left;
+    font-weight: 500;
+    box-sizing: border-box;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-family: proxima_novasemibold !important;
+}
+md-tabs.md-default-theme .md-tab.md-active, md-tabs .md-tab.md-active, md-tabs.md-default-theme .md-tab.md-active md-icon, md-tabs .md-tab.md-active md-icon, md-tabs.md-default-theme .md-tab.md-focused, md-tabs .md-tab.md-focused, md-tabs.md-default-theme .md-tab.md-focused md-icon, md-tabs .md-tab.md-focused md-icon {
+    color: #00728f !important;
+    background:#dff1f6;
+}
+md-tabs.md-default-theme md-ink-bar, md-tabs md-ink-bar {
+    color: #ffffff !important;
+    background: #ffffff !important;
+}
+md-ink-bar {
+    height: 0px;
+}
+.subTabCss{
+    margin-left: -20px;
+        margin-top: -1px;
+}
+.iconLablCss{
+    font-family: proxima_novasemibold !important;
+    font-size: 14px !important;
+    /*color: #666666 !important;*/
+}
+ md-tabs .md-tab {
+    color: #666666 !important;
+}
+.iconMrgn{
+    margin-left: 5px;
+    margin-top: 30px;
+}
+md-pagination-wrapper {
+    height: 48px;
+    display: block;
+    transition: -webkit-transform 0.5s cubic-bezier(0.35, 0, 0.25, 1);
+    transition: transform 0.5s cubic-bezier(0.35, 0, 0.25, 1);
+    position: absolute;
+    width: 999999px !important;
+    left: 30px;
+    -webkit-transform: translate3d(0, 0, 0);
+    transform: translate3d(0, 0, 0);
+}
+md-tabs-canvas {
+    position: relative;
+    overflow: hidden;
+    display: block;
+}
+#subtab md-tabs-canvas {
+background-color: #dff1f6 !important;
+}
+md-tabs-wrapper {
+    display: block;
+    position: relative;
+    -webkit-transform: translate3d(0, 0, 0);
+    transform: translate3d(0, 0, 0);
+    max-height: 48px;
+}
+md-tabs.mainTabBorder .md-tab.md-active{
+  border: #addbe8 1px solid;
+  border-bottom: none;
+}
+.setSubTabBorder md-tabs-wrapper {
+    border: #addbe8 1px solid;
+    border-left: none;
+    border-right: none;
+}
+md-tabs.subTabCss.setSubTabBorder .md-tab.md-active{
+  border: none;
+}
+.mainTabBorder md-tabs-wrapper {
+    border: #addbe8 1px solid;
+    border-left: none;
+    border-right: none;
+    border-top: none;
+}
+#maintab md-tabs-canvas{
+    padding-bottom: 1px;
+}

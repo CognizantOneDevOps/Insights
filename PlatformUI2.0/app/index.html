@@ -1,0 +1,235 @@
+<!--
+ *******************************************************************************
+ * Copyright 2017 Cognizant Technology Solutions
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License.  You may obtain a copy
+ * of the License at
+ * 
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ ******************************************************************************
+ -->
+ 
+<!DOCTYPE html>
+<html lang="en" ng-app="iSightApp">
+
+<head>
+    <title>InSights</title>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="description" content="">
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no" />
+    <link rel="icon" type="image/x-icon" href="dist/icons/others/Insights_Fevicon.png" />
+	<link rel="stylesheet" href="./bower_components/angular-material/angular-material.css" />
+	<link rel="stylesheet" href="./bower_components/angular-material-icons/angular-material-icons.css" />
+    <!--<link rel='stylesheet' href='http://fonts.googleapis.com/css?family=Roboto:400,500,700,400italic'>
+    <link rel="stylesheet" href="./dist/modules/pipeline/css/toolbar.css" />
+    <link rel="stylesheet" href="./dist/modules/pipeline/css/whiteframe.css" />
+    <link rel="stylesheet" href="./dist/modules/pipeline/css/button.css" />
+    <link rel="stylesheet" href="./dist/modules/pipeline/css/icon.css" />
+    <link rel="stylesheet" href="./dist/modules/pipeline/css/table.css" />
+    <!--<link rel="stylesheet" href="./dist/modules/login/css/login-whiteframe.css"/>
+    <link rel="stylesheet" href="./dist/modules/login/css/inputContainer.css"/>-->
+
+    <!--new css entry-->
+    <!-- <link rel="stylesheet" href="./dist/modules/toolsConfiguration/css/tab.css"/>
+    <link rel="stylesheet" href="./dist/modules/toolsConfiguration/css/table.css"/>
+    <link rel="stylesheet" href="./dist/modules/toolsConfiguration/css/radioButton.css"/>
+	<link rel="stylesheet" href="./dist/modules/oneToolConfig/css/dialog.css">-->
+
+    <!-- <link rel="stylesheet" href="./dist/modules/login/css/login.css" />
+    <link rel="stylesheet" href="./dist/modules/homepage/css/homePage.css" />
+    <link rel="stylesheet" href="./dist/modules/homepage/css/tab.css" />
+    <link rel="stylesheet" href="./dist/modules/homepage/css/footer.css" />
+    <link rel="stylesheet" href="./dist/modules/homepage/css/dialog.css" />
+    <link rel="stylesheet" href="./dist/modules/homepage/css/table.css" />
+    <link rel="stylesheet" href="./dist/modules/homepage/css/radioButton.css" />
+    <link rel="stylesheet" href="./dist/modules/homepage/css/button.css" />
+    <link rel="stylesheet" href="./dist/modules/toolsConfiguration/css/toolsConfiguration.css" />
+    <link rel="stylesheet" href="./dist/modules/oneToolConfig/css/onetoolConfiguration.css" />
+    <link rel="stylesheet" href="./dist/modules/applicationManagement/css/applicationManagement.css" />
+    <link rel="stylesheet" href="./dist/modules/dataOnBoarding/css/dataOnBoarding.css" />
+
+    <!--new css entry end-->
+
+    <!-- <link rel="stylesheet" href="./dist/modules/tools/css/toolsPage.css" />
+    <link rel="stylesheet" href="./dist/modules/toolsConfig/css/toolsConfig.css" />
+    <link rel="stylesheet" href="./dist/modules/dashboards/css/dashboard.css" />
+    <link rel="stylesheet" href="./dist/components/header/css/header.css" />
+    <link rel="stylesheet" href="./dist/modules/agent/css/agent.css" />
+    <link rel="stylesheet" href="./dist/modules/userProfile/css/userProfile.css" />
+    <link rel="stylesheet" href="./dist/modules/queryBuilder/css/querybuilder.css" />
+    <link rel="stylesheet" href="./dist/modules/rolesManagement/css/roles.css" />
+    <link rel="stylesheet" href="./dist/modules/userOnboarding/css/userOnboarding.css" />
+    <link rel="stylesheet" href="./dist/modules/onboardProject/css/onboardProject.css" />
+    <link rel="stylesheet" href="./dist/modules/allConfig/jenkinsConfig/css/jenkinsConfig.css" />
+    <link rel="stylesheet" href="./dist/modules/allConfig/nexusConfig/css/NexusConfig.css" />
+    <link rel="stylesheet" href="./dist/modules/allConfig/gitConfig/css/GitConfig.css" />
+    <link rel="stylesheet" href="./dist/modules/allConfig/bitbucketConfig/css/BitbucketConfig.css" />
+    <link rel="stylesheet" href="./dist/modules/allConfig/rundeckConfig/css/RundeckConfig.css" />
+    <link rel="stylesheet" href="./dist/modules/allConfig/xldeployConfig/css/XldeployConfig.css" />
+    <link rel="stylesheet" href="./dist/modules/allConfig/sonarConfig/css/SonarConfig.css" />
+    <link rel="stylesheet" href="./dist/modules/oneToolConfig/css/toolsConfigCss.css" />
+    <link rel="stylesheet" href="./dist/modules/homepage/css/aboutInsights.css" />
+    <link rel="stylesheet" href="./dist/modules/singleToolConfiguration/css/singletoolConfiguration.css" />
+    <link rel="stylesheet" href="./dist/modules/singleToolConfiguration/css/toolsConfig.css" />
+    <link rel="stylesheet" href="./dist/modules/singleToolConfiguration/css/toolsConfigCss.css" />
+    <link rel="stylesheet" href="./dist/modules/dataTagging/css/dataTagging.css" />
+    <!--<link rel="stylesheet" href="./dist/modules/oneToolConfig/css/toolsConfig.css">-->
+    <link rel="stylesheet" href="./dist/css/insights.min.css" />
+    <link href="https://netdna.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+    <style type="text/css">
+        [ng\:cloak],
+        [ng-cloak],
+        [data-ng-cloak],
+        [x-ng-cloak],
+        .ng-cloak,
+        .x-ng-cloak {
+            display: none !important;
+        }
+
+        iframe {
+            overflow: hidden;
+        }
+    </style>
+</head>
+
+<body ng-cloak layout>
+    <div ng-view layout flex>
+    </div>
+
+    <script src="./bower_components/angular/angular.js"></script>
+    <script src="./bower_components/angular-animate/angular-animate.js"></script>
+    <script src="./bower_components/angular-aria/angular-aria.js"></script>
+    <script src="./bower_components/angular-material/angular-material.js"></script>
+    <script src="./bower_components/angular-messages/angular-messages.js"></script>
+    <script src="./bower_components/angular-material-icons/angular-material-icons.js"></script>
+    <script src="./bower_components/angular-route/angular-route.js"></script>
+    <script src="./bower_components/angular-resource/angular-resource.js"></script>
+    <script src="./bower_components/angular-cookies/angular-cookies.js"></script>
+    <script src="./bower_components/angular-bootstrap/ui-bootstrap-tpls.js"></script>
+
+
+    <!--<script src="./dist/models.js"></script>
+    <script src="./dist/services/userService.js"></script>
+    <script src="./dist/controllers/addUserDialogController.js"></script>
+    <script src="./dist/controllers/contactPanelController.js"></script>
+    <script src="./dist/controllers/mainController.js"></script>-->
+
+    <!--<script src="./dist/modules/login/controller/loginController.js"></script>
+    <script src="./dist/modules/login/service/loginService.js"></script>
+    <script src="./dist/modules/homepage/controller/homePageController.js"></script>
+    <script src="./dist/modules/pipeline/models/pipelineModels.js"></script>
+    <script src="./dist/modules/graph/service/graphService.js"></script>
+    <script src="./dist/modules/pipeline/service/pipelineService.js"></script>
+    <script src="./dist/modules/pipeline/controller/pipelineController.js"></script>
+    <script src="./dist/modules/pipeline/controller/tabDialogController.js"></script>
+    <script src="./dist/modules/kibana/models/kibanaModels.js"></script>
+    <script src="./dist/modules/elasticsearch/service/elasticSearchService.js"></script>
+    <script src="./dist/modules/kibana/controller/kibanaDashboardController.js"></script>
+    <script src="./dist/modules/dashboards/models/dashboardModels.js"></script>
+    <script src="./dist/modules/dashboards/controller/dashboardController.js"></script>
+    <script src="./dist/modules/dashboards/service/dashboardService.js"></script>
+    <script src="./dist/modules/tools/controller/toolsController.js"></script>
+    <script src="./dist/modules/toolsConfig/controller/toolsConfigController.js"></script>
+    <script src="./dist/modules/queryBuilder/models/queryBuilderModel.js"></script>
+    <script src="./dist/modules/queryBuilder/controller/queryBuilderController.js"></script>
+    <script src="./dist/modules/queryBuilder/controller/intrestingFieldsDialogController.js"></script>
+    <script src="./dist/modules/agent/controller/agentController.js"></script>
+    <script src="./dist/modules/agent/controller/agentDialogController.js"></script>
+    <script src="./dist/modules/agent/service/agentService.js"></script>
+    <script src="./dist/components/footer/controller/footerController.js"></script>
+    <script src="./dist/components/header/controller/headerController.js"></script>
+    <script src="./dist/modules/userProfile/controller/userProfileController.js"></script>
+    <script src="./dist/modules/userProfile/service/userProfileService.js"></script>
+    <script src="./dist/modules/rolesManagement/controller/rolesController.js"></script>
+    <script src="./dist/modules/rolesManagement/controller/userOnboardDialogController.js"></script>
+    <script src="./dist/modules/rolesManagement/controller/addOrgDialogController.js"></script>
+    <script src="./dist/modules/rolesManagement/controller/editUserDialogController.js"></script>
+    <script src="./dist/modules/rolesManagement/controller/deleteUserDialogController.js"></script>
+    <script src="./dist/modules/rolesManagement/model/roleModel.js"></script>
+    <script src="./dist/modules/rolesManagement/controller/addUserDialogController.js"></script>
+    <script src="./dist/modules/rolesManagement/service/roleService.js"></script>
+    <script src="./dist/modules/iconService/service/isightIconService.js"></script>
+    <script src="./dist/modules/config/service/restEndpointService.js"></script>
+    <script src="./dist/modules/userOnboarding/controller/userOnboardingController.js"></script>
+    <script src="./dist/modules/authenticationService/service/authenticationService.js"></script>
+    <script src="./dist/modules/allConfig/jenkinsConfig/controller/JenkinsConfigController.js"></script>
+    <script src="./dist/modules/allConfig/jenkinsConfig/service/jenkinsConfigService.js"></script>
+    <script src="./dist/modules/allConfig/jenkinsConfig/model/JenkinsModel.js"></script>
+    <script src="./dist/modules/allConfig/jenkinsConfig/controller/ShowJenkinsTemplateResponseDialogController.js"></script>
+    <script src="./dist/modules/allConfig/nexusConfig/controller/NexusConfigController.js"></script>
+    <script src="./dist/modules/allConfig/nexusConfig/controller/ShowNexusTemplateResponseDialogController.js"></script>
+    <script src="./dist/modules/allConfig/nexusConfig/service/NexusConfigService.js"></script>
+    <script src="./dist/modules/allConfig/nexusConfig/model/NexusModel.js"></script>
+    <script src="./dist/modules/allConfig/gitConfig/controller/GitConfigController.js"></script>
+    <script src="./dist/modules/allConfig/gitConfig/controller/ShowGitTemplateResponseDialogController.js"></script>
+    <script src="./dist/modules/allConfig/gitConfig/service/GitConfigService.js"></script>
+    <script src="./dist/modules/allConfig/gitConfig/model/GitModel.js"></script>
+    <script src="./dist/modules/allConfig/bitbucketConfig/controller/BitbucketConfigController.js"></script>
+    <script src="./dist/modules/allConfig/bitbucketConfig/controller/ShowBitbucketTemplateResponseDialogController.js"></script>
+    <script src="./dist/modules/allConfig/bitbucketConfig/service/BitbucketConfigService.js"></script>
+    <script src="./dist/modules/allConfig/bitbucketConfig/model/BitbucketModel.js"></script>
+    <script src="./dist/modules/allConfig/rundeckConfig/controller/RundeckConfigController.js"></script>
+    <script src="./dist/modules/allConfig/rundeckConfig/controller/ShowRundeckTemplateResponseDialogController.js"></script>
+    <script src="./dist/modules/allConfig/rundeckConfig/service/RundeckConfigService.js"></script>
+    <script src="./dist/modules/allConfig/rundeckConfig/model/RundeckModel.js"></script>
+    <script src="./dist/modules/allConfig/xldeployConfig/controller/XldeployConfigController.js"></script>
+    <script src="./dist/modules/allConfig/xldeployConfig/controller/ShowXldeployTemplateResponseDialogController.js"></script>
+    <script src="./dist/modules/allConfig/xldeployConfig/service/XldeployConfigService.js"></script>
+    <script src="./dist/modules/allConfig/xldeployConfig/model/XldeployModel.js"></script>
+    <script src="./dist/modules/allConfig/sonarConfig/controller/SonarConfigController.js"></script>
+    <script src="./dist/modules/allConfig/sonarConfig/controller/ShowSonarTemplateResponseDialogController.js"></script>
+    <script src="./dist/modules/allConfig/sonarConfig/service/SonarConfigService.js"></script>
+    <script src="./dist/modules/allConfig/sonarConfig/model/SonarModel.js"></script>
+    <script src="./dist/modules/toolsConfig/controller/toolsConfigController.js"></script>
+    <script src="./dist/modules/oneToolConfig/controller/oneToolDialogController.js"></script>
+    <script src="./dist/modules/oneToolConfig/model/oneToolConfigModel.js"></script>
+    <script src="./dist/modules/oneToolConfig/service/oneToolConfigService.js"></script>
+    <script src="./dist/modules/onboardProject/controller/onboardProjectController.js"></script>
+    <script src="./dist/modules/onboardProject/models/onboardProjectModel.js"></script>
+    <script src="./dist/modules/onboardProject/service/onboardProjectService.js"></script>
+    <script src="./dist/modules/about/service/AboutInsightsService.js"></script> 
+
+    <!--new js entry-->
+    <!--<script src="./dist/modules/userOnboarding/service/userOnboardingService.js"></script>
+    <script src="./dist/modules/userOnboarding/controller/userOnboardingController.js"></script>
+    <script src="./dist/modules/toolsConfiguration/controller/toolsConfigLandingController.js"></script>
+    <script src="./dist/modules/toolsConfiguration/service/toolsConfigurationService.js"></script>
+    <script src="./dist/modules/oneToolConfig/controller/oneToolConfigurationController.js"></script>
+    <script src="./dist/modules/configuredTools/controller/configuredToolsController.js"></script>
+    <script src="./dist/modules/applicationManagement/controller/applicationManagementLandingController.js"></script>
+    <script src="./dist/modules/applicationManagement/controller/conformApplicationAddDialogController.js"></script>
+    <script src="./dist/modules/dataOnBoarding/controller/dataOnBoardingController.js"></script>
+    <script src="./dist/modules/userOnboarding/controller/deleteDialogController.js"></script>
+    <script src="./dist/modules/userOnboarding/controller/saveDialogController.js"></script>
+    <script src="./dist/modules/userOnboarding/controller/editDialogController.js"></script>
+    <script src="./dist/modules/userOnboarding/models/userOnboardingModel.js"></script>
+    <script src="./dist/modules/oneToolConfig/controller/showConfirmationDialogController.js"></script>
+    <script src="./dist/modules/homepage/controller/aboutDialogeController.js"></script>
+
+    <script src="./dist/modules/singleToolConfiguration/controller/singleToolConfigurationController.js"></script>
+    <script src="./dist/modules/singleToolConfiguration/controller/showSingleConfirmationDialogController.js"></script>
+    <script src="./dist/modules/singleToolConfiguration/controller/editSingleToolConfigurationController.js"></script>
+    <script src="./dist/modules/singleToolConfiguration/model/singleToolConfigurationModel.js"></script>
+    <script src="./dist/modules/singleToolConfiguration/service/singleToolConfigurationService.js"></script>
+    
+    <script src="./dist/modules/dataTagging/controller/addEntityDialogController.js"></script>
+    <script src="./dist/modules/dataTagging/controller/dataTaggingController.js"></script>
+    <script src="./dist/modules/dataTagging/models/dataTaggingModel.js"></script>
+    <script src="./dist/modules/dataTagging/service/dataTaggingService.js"></script>
+    <script src="./dist/modules/dataOnBoarding/controller/dataMappingController.js"></script>
+
+    <!--new js end-->
+	<script src="./dist/js/insights.js"></script>
+    <script src="./dist/boot.js"></script>
+
+</body>
+
+</html>

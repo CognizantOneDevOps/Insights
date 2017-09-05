@@ -1,0 +1,110 @@
+<!--
+ *******************************************************************************
+ * Copyright 2017 Cognizant Technology Solutions
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License.  You may obtain a copy
+ * of the License at
+ * 
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ ******************************************************************************
+ -->
+
+<div flex>
+    <div layout>
+        <md-icon style="margin-left:30px" layout md-svg-src="dist/icons/svg/landingPage/Insights_logo.svg" ng-style="{height: '90px', width: '280px'}"></md-icon>
+        <md-icon style="margin-right:30px" layout md-svg-src="dist/icons/svg/landingPage/Cognizant_logo.svg" ng-style="{height: '74px', width: '136px'}"></md-icon>
+    </div>
+    <div>
+        <md-dialog-content style="max-width:800px;max-height:810px; ">
+            <md-tabs md-dynamic-height md-stretch-tabs>
+                <md-tab>
+                    <md-tab-label>
+                        <md-icon style="margin-top: -7px;" md-svg-src="dist/icons/svg/landingPage/Admin_icon_selected.svg" ng-style="{height: '20px', width: '20px'}"></md-icon>
+                        <span class="iconMrgn">Admin</span>
+                    </md-tab-label>
+                    <md-tab-body>
+                        <md-tabs md-dynamic-height class="subTabCss">
+                            <md-tab label="Tools Configuration">
+                                <md-content>
+                                    <div layout layout-align="center center">
+                                        <table class="md-api-table-role" style="border: 1px solid #a5d28b;width: 1286px;margin-left: 20px;">
+                                            <thead style="background-color:#d3e9c7">
+                                                <tr class="borderBottom">
+                                                    <th style="width: 20%;">
+                                                        <span>Functional Block</span>
+                                                    </th>
+                                                    <th>
+                                                        <span>Select Tool</span>
+                                                    </th>
+                                                </tr>
+                                            </thead>
+
+                                            <tbody>
+                                                <tr style="border-top:1px solid #bcbcbc" class="textFormatTable borderBottom hoverme">
+                                                    <td style="width: 550px">ALM</td>
+                                                    <td style="width: 550px;">JIRA</td>
+                                                </tr>
+                                                <tr style="border-top:1px solid #bcbcbc" class="textFormatTable borderBottom hoverme">
+                                                    <td style="width: 550px">SCM</td>
+                                                    <td style="width: 550px;">GIT</td>
+                                                </tr>
+                                                <tr style="border-top:1px solid #bcbcbc" class="textFormatTable borderBottom hoverme">
+                                                    <td style="width: 550px">CI</td>
+                                                    <td style="width: 550px;">JENKINS</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </md-content>
+                            </md-tab>
+                            <md-tab label="Application Management">
+                            </md-tab>
+                        </md-tabs>
+                    </md-tab-body>
+                </md-tab>
+                <md-tab ng-click="homePageController.selectAct(true)">
+                    <md-tab-label>
+                        <md-icon md-svg-src="dist/icons/svg/landingPage/Dashboard_icon_normal.svg" ng-style="{height: '20px', width: '20px'}"></md-icon>
+                        <span class="iconLablCss iconMrgn">Dashboards</span>
+                    </md-tab-label>
+                    <md-tab-body>
+                        <p class="md-padding">
+                            Lorem
+                        </p>
+                    </md-tab-body>
+                </md-tab>
+                <md-tab ng-click="homePageController.selectAct(true)">
+                    <md-tab-label>
+                        <md-icon md-svg-src="dist/icons/svg/landingPage/Healthcheck_icon_normal.svg" ng-style="{height: '20px', width: '20px'}"></md-icon>
+                        <span class="iconLablCss iconMrgn">Health Check</span>
+                    </md-tab-label>
+                    <md-tab-body>
+                        <p class="md-padding">
+                            Lorem1
+                        </p>
+                    </md-tab-body>
+                </md-tab>
+                <md-tab ng-click="homePageController.selectAct(true)">
+                    <md-tab-label>
+                        <md-icon ng-if="!homePageController.isTabSeleted" md-svg-src="dist/icons/svg/landingPage/Help_icon_normal.svg" ng-style="{height: '20px', width: '20px'}"></md-icon>
+                        <md-icon ng-if="homePageController.isTabSeleted" md-svg-src="dist/icons/svg/landingPage/Help_icon_selected.svg" ng-style="{height: '20px', width: '20px'}"></md-icon>
+                        <span class="iconLablCss iconMrgn">Help</span>
+                    </md-tab-label>
+                    <md-tab-body>
+                        <p class="md-padding">
+                            Lorem1
+                        </p>
+                    </md-tab-body>
+                </md-tab>
+            </md-tabs>
+
+        </md-dialog-content>
+    </div>
+</div>

@@ -1,0 +1,67 @@
+<!--
+ *******************************************************************************
+ * Copyright 2017 Cognizant Technology Solutions
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License.  You may obtain a copy
+ * of the License at
+ * 
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ ******************************************************************************
+ -->
+
+<md-dialog class="md-dialog-reponseTemplate aboutSize">
+<md-dialog-content>
+    <div layout="column">
+        <md-toolbar class="toolbarHt">
+            <div layout class="md-toolbar-tools">
+                <div flex="20" layout layout-align="center">
+                </div>
+                <div flex="20" layout layout-align="end end" style="margin-top:8px;padding-right: 5px" >
+                    <img class="png-icon imgFeviconHeader"  src="dist/icons/others/Insights_Fevicon.png">
+                </div>
+                <div flex="50" layout layout-align="left">
+                     <h2 class="toolBarText aboutHeader">About InSights</h2>
+                 </div>
+    <md-button flex ="10" layout layout-align="end end" class="md-icon-button" style="margin-top:0px;padding-left: 15px"  ng-click="aboutDialogeController.closeDialog()">
+        <md-icon md-svg-src="dist/icons/svg/ic_clear_24px.svg" aria-label="Close dialog" style="fill: #666666" ng-style="{height: '20px', width: '150px'}"></md-icon>
+    </md-button>
+</div>
+</md-toolbar>
+<div layout layout-align="center center">
+<table class="md-api-table-landing-about tableLayout">
+<tbody>
+    <tr class="layout-align-start-stretch" ng-repeat= "(key,val) in aboutDialogeController.data" | filter:query" layout="row" layout-align="start center">
+                    <td flex="50" class="tableFontColoumnStart" layout layout-align="left" style="padding-left: 120px" >
+                        {{key}}
+                    </td>
+                    <td flex="5" class="tableFontColoumnStart" layout layout-align="end end" >
+                     :
+                    </td>
+                    <td flex="45" class="tableFontColoumnEnd" >
+                        {{val}}
+                    </td>                    
+                </tr>
+                
+   <tr layout="row" layout-align="start center">
+        <td flex="100" class="tableFontColoumnEnd" layout layout-align="center">
+            <span>
+                <a class="fontLink" style=" word-wrap:break-word;padding-right: 15px" href="https://onedevops.atlassian.net/wiki/display/OI/About+InSights" target="blank">Release Notes</a>
+            </span>
+        </td>
+    </tr>
+</tbody>
+</table>
+</div>
+
+</md-dialog-content>
+<div layout layout-align="end end" class="footerLogo">
+<md-icon layout md-svg-src="dist/icons/svg/landingPage/Insights_logo.svg" ng-style="{height: '50px', width: '165px'}"></md-icon>
+</div>
+</md-dialog>

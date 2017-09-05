@@ -1,0 +1,148 @@
+<!--
+ *******************************************************************************
+ * Copyright 2017 Cognizant Technology Solutions
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License.  You may obtain a copy
+ * of the License at
+ * 
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ ******************************************************************************
+ -->
+
+<throbber ng-if="!applicationManagementController.showTemplateAfterLoad" layout="column" flex= "100" >
+</throbber>
+<div ng-if="applicationManagementController.showTemplateAfterLoad" layout="column" flex>
+    <div layout class="applicationButtMar">
+        <div layout="row" class="applicationContentCss" style="width: 100%;">
+            <div layout layout-align="end center">
+                <md-button ng-click="applicationManagementController.showAddApplicationBox()" class="md-raised md-primary configureBut">
+                    Add New Access Group
+                </md-button>
+                <md-input-container layout class="md-block inputContainerDivNewApplication" md-no-float>
+                    <input class="inputBoxContNewApplication" type="text" required md-no-asterisk name="newApplication" ng-model="applicationManagementController.addNewApplicationName"
+                        placeholder="Please input an Access Group Name" ng-if="applicationManagementController.showAddApplication" />
+                </md-input-container>
+                <md-button ng-click="applicationManagementController.addApplication($event,applicationManagementController.addNewApplicationName)"
+                    class="md-raised md-primary goButton applicationManagement addApplication" ng-if="applicationManagementController.showAddApplication">
+                    Go
+                </md-button>
+            </div>
+            <span ng-if="applicationManagementController.showApplicationAddedMessage" class="applicationAddedMessage">New application added successfully</span>
+            <div layout layout-align="end center" flex style="margin-right: -7px;">
+                <md-button ng-click="applicationManagementController.goToUserOnBoard()" class="md-raised md-primary configureBut" style="margin-left: 2px;"
+                    ng-disabled="applicationManagementController.applicationsDetails.length  == 0" ng-style="{ 'background-color' : (applicationManagementController.applicationsDetails.length == 0) ? '#9bbd95' : '#387c2c',
+                            'color' : (applicationManagementController.applicationsDetails.length == 0) ? '#c6dde4' : 'white' }">
+                    User Onboarding
+                </md-button>
+                <md-button ng-click="applicationManagementController.goToDataOnBoard()" class="md-raised md-primary configureBut" ng-disabled="applicationManagementController.applicationsDetails.length  == 0"
+                    ng-style="{ 'background-color' : (applicationManagementController.applicationsDetails.length == 0) ? '#7fb8c7' : '#00728f',
+                            'color' : (applicationManagementController.applicationsDetails.length == 0) ? '#c6dde4' : 'white' }">
+                    Data Onboarding
+                </md-button>
+            </div>
+        </div>
+    </div>
+    <div class="contentCss" ng-if="applicationManagementController.applicationConfigured ==true">
+        <div layout style="margin-right: -7px;margin-top: -20px;">
+            <div layout class="onboardStyle" style="margin-top: 39px;">Access Group Details</div>
+            <div layout layout-align="end end" flex style="margin-top: 9px;margin-bottom: 15px;">
+
+                <md-autocomplete class="autocompleteSearchApplication" md-search-text="applicationManagementController.searchapp" md-items="app in applicationManagementController.applicationsDetails| filter:applicationManagementController.searchapp"
+                    md-item-text="app.name" md-min-length="3" placeholder="Search Access Group">
+                    <md-item-template>
+                        <span md-highlight-text="applicationManagementController.searchapp" md-highlight-flags="^i">{{app.name}}</span>
+                    </md-item-template>
+                    <md-not-found>
+                        No results found for "{{applicationManagementController.searchapp}}"
+                    </md-not-found>
+                </md-autocomplete>
+                <md-button ng-click="applicationManagementController.filterSearchValue(applicationManagementController.searchapp)" class="md-raised md-primary goButton applicationManagement">
+                    Go
+                </md-button>
+            </div>
+        </div>
+        <div layout layout-align="center center">
+            <table ng-if="applicationManagementController.showTable" class="md-api-table-landing" style="border: 1px solid #a5d28b;width:100%">
+                <thead class="theadCss">
+                    <tr layout="row" layout-align="start center" style="height:54px">
+                        <th flex="25" class="tableHeader headingInnerSeparator">
+                            <span class="tableHeadingStyle">Access Group Name</span>
+                        </th>
+                        <th flex="25" class="tableHeader headingInnerSeparator">
+                            <span class="tableHeadingStyle">User Onboarded</span>
+                        </th>
+                        <th flex="50" class="tableHeader headingInnerSeparator">
+                            <span class="tableHeadingStyle">Data Onboarded</span>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr ng-repeat="app in applicationManagementController.applicationsDetails| filter:applicationManagementController.searchApplicationResult"
+                        layout="row" layout-align="start start">
+                        <td class="tableContentStyle" flex="25">{{app.name}}</td>
+                        <td class="tableContentStyle" flex="25">{{app.totalusers}}</td>
+                        <td class="tableContentStyle" flex="50">{{app.dataOnboarded}}</td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="addApplicationNotification">{{applicationManagementController.displayMessage}}</div>
+        </div>
+        <div ng-if="applicationManagementController.showPaginationBar" class="paginationClass" flex="100" layout="row" layout-align="end">
+            <ul uib-pagination total-items="applicationManagementController.totalItems" ng-model="applicationManagementController.currentPage"
+                max-size="applicationManagementController.maxSize" class="pagination-sm" boundary-links="true" num-pages="applicationManagementController.numPages"
+                items-per-page="applicationManagementController.totalRows" ng-change="applicationManagementController.updateResult()"
+                first-text="<<" last-text=">>" next-text=">" previous-text="<"></ul>
+        </div>
+
+
+    </div>
+    <div ng-if="applicationManagementController.showTemplateAfterLoad && applicationManagementController.applicationConfigured==false"
+        layout="column" flex>
+        <div class="stepsAddressingHeading">Steps for Access Group Management</div>
+        <div class="stepsAddressingContentBody" layout="row">
+
+            <div flex="30" layout="row">
+                <div class="stepsAddressingCircle">1</div>
+                <div layout="column " style="margin-left:20px">
+                    <div class="stepsAddressingSubHeading"> Add New Access Group</div>
+                    <ul class="stepsAddressingSubContent">
+                        <li>Please click on Add New Access Group</li>
+                        <li>To save the Access Group name,click on "Go"</li>
+                    </ul>
+                </div>
+                <div class="verticalLine">
+                </div>
+            </div>
+            <div flex="35" layout="row">
+                <div class="stepsAddressingCircle">2</div>
+                <div layout="column" style="margin-left:20px">
+                    <div class="stepsAddressingSubHeading">User Onboarding</div>
+                    <ul class="stepsAddressingSubContent">
+                        <li>After saving the Access Group name the user will be directed to User Onboarding</li>
+                        <li>Follow the on screen instruction to add users</li>
+                        <li>Save and Proceed</li>
+                    </ul>
+                </div>
+                <div class="verticalLine">
+                </div>
+            </div>
+            <div flex="35" layout="row" style="margin-left: 25px;">
+                <div class="stepsAddressingCircle">3</div>
+                <div layout="column" style="margin-left:20px">
+                    <div class="stepsAddressingSubHeading">Data Onboarding</div>
+                    <ul class="stepsAddressingSubContent">
+                        <li>Once the user(s) have been added,the user will be directed to "DataOnboarding"</li>
+                        <li>Follow the on screen instruction to onboard data</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,17 @@
+{
+  "type": "panel",
+  "name": "Insights Sample Panel",
+  "id": "insightssamplepanel",
+
+  "info": {
+    "author": {
+      "name": "Vishal Ganjare",
+      "url": "https://github.com/vganjare"
+},
+    "logos": {
+      "small": "img/icn-table-panel.svg",
+      "large": "img/icn-table-panel.svg"
+    }
+  }
+}
+

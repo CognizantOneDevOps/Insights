@@ -1,0 +1,47 @@
+{
+  "mqConfig": {
+    "user": "iSight",
+    "password": "iSight",
+    "host": "127.0.0.1",
+    "exchange": "iSight"
+  },
+  "subscribe": {
+    "config": "SCM.TFS.config"
+  },
+  "publish": {
+    "data": "SCM.TFS.DATA",
+    "health": "SCM.TFS.HEALTH"
+  },
+  "communication": {
+    "type": "REST"
+  },
+  "responseTemplate": {
+    "changesetId": "changesetId",
+    "createdDate": "commitDate",
+    "comment": "comment",
+    "checkedInBy": {
+      "displayName": "scmAuthorName",
+      "uniqueName": "scmAuthor"
+    },
+    "author": {
+      "displayName": "creatorName",
+       "uniqueName": "creator"
+    }
+},
+"auth": "NTLM",
+"toolsTimeZone" : "Asia/Kolkata",
+"insightsTimeZone" : "Asia/Kolkata",
+"useResponseTemplate" : true,
+"runSchedule": 2,
+"UserID": "tfs",
+"Passwd": "tfs",
+"BaseUrl": "http://hostname/tfs",
+"timeStampField":"commitDate",
+"timeStampFormat":"%Y-%m-%dT%H:%M:%S",
+"isEpochTimeFormat" : false,
+"StartFrom" : "2017-01-01 01:01:01",
+"isDebugAllowed" : false,
+"loggingSetting" : {
+		"logLevel" : "WARN"
+	}
+}

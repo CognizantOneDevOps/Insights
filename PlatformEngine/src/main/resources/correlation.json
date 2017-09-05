@@ -1,0 +1,9 @@
+{
+	correlations : [
+		'MATCH (a:GIT),(b:JENKINS) WHERE b.scmCommitId CONTAINS a.commitId AND b.scmCommitId <> ""  CREATE UNIQUE (a)-[r:JENKINS_TRG_BY_GIT]->(b)',
+		'MATCH (a:BITBUCKET),(b:JENKINS) WHERE b.scmCommitId CONTAINS a.commitId AND b.scmCommitId <> ""  CREATE UNIQUE (a)-[r:JENKINS_TRG_BY_BITBUCKET]->(b)',
+		'MATCH (a:BITBUCKET),(b:JIRA) WHERE (a.jiraKey = b.key) CREATE UNIQUE (a)-[r:JIRA_UPT_BY_BITBUCKET]->(b)',
+		'MATCH (n:JENKINS),(m:RUNDECK) where (m.unixTimestampStart >= n.buildTimestamp AND m.unixTimestampStart <= n.timestampEnd) AND n.rundeckJobId = m.jobId CREATE UNIQUE (n)-[r:RUNDECK_TRG_BY_JENKINS]->(m)',
+		'MATCH (a:JENKINS),(b:SONAR) WHERE (b.unixtime >= a.buildTimestamp AND b.unixtime <= a.timestampEnd) AND a.groupId+":"+a.artifactId= b.resourcekey CREATE UNIQUE (a)-[r:SONAR_TRG_BY_JENKINS]->(b)'
+	]
+}

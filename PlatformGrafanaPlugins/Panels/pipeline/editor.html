@@ -1,0 +1,247 @@
+<html>
+
+<head>
+	<style>
+		.pipelnHeading {
+			text-decoration: underline;
+			font-weight: bold;
+			margin-bottom: 20px;
+		}
+		
+		.clearProp {
+			clear: both;
+		}
+		
+		.floatLfProp {
+			float: left;
+		}
+		
+		.pipelnDtlDiv_1 {
+			border-bottom: 1px solid #cccccc;
+			width: 100%;
+			margin-bottom: 20px;
+		}
+		
+		.pipelnDtlDiv_2 {
+			width: 100%;
+			margin-bottom: -18px;
+		}
+		
+		.pipelnNmWdt {
+			width: 540px
+		}
+		
+		.pipelnNmSpn {
+			font-size: 15px;
+			color: gray;
+			font-style: italic;
+			background-color: #e0e0ff;
+			width: 140px;
+			height: 42px;
+			text-align: left;
+			padding: 12px 1.78rem;
+			border-radius: 2px;
+			margin-right: 25px;
+		}
+		
+		.pipelnNmInput {
+			outline: none;
+			width: 350px;
+			height: 42px;
+			padding: 12px 1.78rem;
+			background-color: #e9e9e9;
+			font-style: italic;
+		}
+		
+		.pipelinCusNmDiv {
+			height: 70px;
+			margin-right: 60px;
+		}
+		
+		.pipelnCusNmInput {
+			outline: none;
+			width: 205px;
+			height: 42px;
+			padding: 12px 1.78rem;
+			background-color: #e9e9e9;
+			font-style: italic;
+		}
+		
+		.pipelincolorDiv {
+			margin-bottom: 40px;
+		}
+		
+		.pipelnColorInput {
+			outline: none;
+			width: 90px;
+			height: 35px;
+			text-transform: initial;
+			text-decoration: none ! important;
+			margin-top: 6px;
+			color: rgba(255, 255, 255, 0.87);
+			background-color: rgb(63, 81, 181);
+			border-radius: 2px;
+			text-align: center
+		}
+		
+		.toolDtlDiv {
+			margin-top: 20px;
+		}
+		
+		.toolDtlHdg {
+			margin-top: 20px;
+			margin-bottom: 15px;
+			text-decoration: underline;
+			font-weight: bold
+		}
+		
+		.toolInfo {
+			margin-bottom: 10px
+		}
+		
+		.toolNmDiv {
+			margin-right: 20px;
+		}
+		
+		.toolInput {
+			outline: none;
+			width: 205px;
+			height: 42px;
+			padding: 12px 1.78rem;
+			background-color: #e9e9e9;
+			font-style: italic;
+		}
+		
+		.fldDbNm {
+			margin-top: 3px;
+			margin-bottom: 8px;
+			background-color: #e0e0ff;
+			font-family: Open Sans, Helvetica, Arial, sans-serif !important;
+		}
+		
+		.selectFieldDv {
+			font-family: Open Sans, Helvetica, Arial, sans-serif !important;
+			margin-top: 3px
+		}
+		
+		.selFldTxt {
+			background-color: #f6f6f6;
+			height: 38px;
+			width: 95px;
+			text-align: center;
+			padding-top: 8px;
+			font-size: .875rem;
+		}
+		
+		.brdDiv {
+			border-bottom: 1px solid #cccccc;
+			margin-top: 15px;
+		}
+		
+		.fldMappingHdg {
+			margin-top: 20px;
+			margin-bottom: 15px;
+			text-decoration: underline;
+			font-weight: bold
+		}
+		
+		.fldMap_1 {
+			margin-bottom: 5px;
+		}
+		
+		.fldMap_2 {
+			background-color: #e0e0ff;
+		}
+		
+		.fldDBNameSpan {
+			float: left;
+			font-family: Open Sans, Helvetica, Arial, sans-serif;
+			padding: .6rem .75rem;
+			background-color: #f4f5f8;
+			display: block;
+			font-size: .875rem;
+			border: 1px solid transparent;
+			border-radius: .1rem 0 0 .1rem;
+			margin-right: .25rem;
+			width: 9.8rem!important;
+		}
+	</style>
+</head>
+
+<body>
+	<div class="editor-row" ng-if="pipelinePanelEditorCtrl.dataSourceResponse != 'undefined'">
+		<div>
+			<h3 class="section-heading pipelnHeading">Pipeline Details</h3>
+			<div>
+				<div class="floatLfProp pipelnDtlDiv_1">
+					<div class="floatLfProp pipelnDtlDiv_2" ng-repeat="pipeline in pipelinePanelEditorCtrl.pipelineDataModel track by $index">
+						<div class="floatLfProp pipelnNmWdt">
+							<span class="floatLfProp pipelnNmSpn">{{pipeline.pipelineRefId}}</span>
+							<input class="pipelnNmInput" type="text" ng-model="pipeline.pipelineName " ng-blur="pipelinePanelEditorCtrl.getPipelineName()"
+								placeholder="User Given Pipeline Name">
+						</div>
+						<div class="floatLfProp pipelinCusNmDiv">
+							<input class="pipelnCusNmInput" type="text" ng-model="pipeline.pipelineColor " ng-blur="pipelinePanelEditorCtrl.getPipelineColor()"
+								placeholder="Pipeline Color">
+						</div>
+						<div class="floatLfProp pipelincolorDiv" ng-if="pipelinePanelEditorCtrl.pipelineDataModel.length -1===$index">
+							<input class="pipelnColorInput" ng-click="pipelinePanelEditorCtrl.onAddCategory()" type="submit" value="Add Tools">
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="toolDtlDiv clearProp">
+			<h3 ng-if="pipelinePanelEditorCtrl.getObjectLength(pipelinePanelEditorCtrl.toolsMetaData)
+								!=0 " class="section-heading toolDtlHdg">Tools Details</h3>
+			<div>
+				<div class="section">
+					<div class="toolInfo" ng-repeat="category in pipelinePanelEditorCtrl.toolsMetaData ">
+						<div class="toolNmDiv floatLfProp">
+							<input class="toolInput" type="text" ng-model="category.toolCategoryName" ng-blur="pipelinePanelEditorCtrl.render() " placeholder="Tool Name">
+						</div>
+						<div class="toolNmDiv floatLfProp">
+							<input class="toolInput" type="text" ng-model="category.toolCategoryIcon " ng-blur="pipelinePanelEditorCtrl.render()" placeholder="Tool Icon">
+						</div>
+						<div style="float:left;margin-top: 8px;">
+							<span><button ng-click="pipelinePanelEditorCtrl.onRemoveCategory(category) "><i class="fa fa-remove pointer "></i></button></span>
+							<span><button ng-click="pipelinePanelEditorCtrl.onAddCategory() "><i class="fa fa-plus "></i></button></span>
+						</div>
+						<div class="clearProp"></div>
+					</div>
+				</div>
+				<div class="section">
+					<div ng-repeat="category in pipelinePanelEditorCtrl.toolsMetaData track by $index " ng-if="category.toolCategoryName
+								!='' " class="clearProp">
+						<div class="fldDbNm floatLfProp" ng-repeat="field in category.fieldList ">
+							<label class="gf-form-label ">
+							<i class="pointer fa fa-remove " ng-click="pipelinePanelEditorCtrl.removeField(field,$parent.$index) "></i>
+							<span>{{field.dbName}}</span>
+						</label>
+						</div>
+						<div class="selectFieldDv floatLfProp">
+							<span class="selFldTxt floatLfProp">Select Fields</span>
+							<metric-segment segment="pipelinePanelEditorCtrl.addColumnSegment " get-options="pipelinePanelEditorCtrl.getFieldOptions() "
+								on-change="pipelinePanelEditorCtrl.addField($index)" class="floatLfProp"></metric-segment>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div ng-if="pipelinePanelEditorCtrl.getObjectLength(pipelinePanelEditorCtrl.toolsMetaData) !=0 " class="brdDiv"></div>
+		</div>
+		<div class="section">
+			<h3 ng-if="pipelinePanelEditorCtrl.checkFieldMapping() " class="section-heading fldMappingHdg">Field Mapping</h3>
+			<div class="clearProp floatLfProp fldMap_1" ng-repeat="category in pipelinePanelEditorCtrl.toolsMetaData track by $index "
+				ng-if="category.toolCategoryName !='' ">
+				<div class="fldMap_2 floatLfProp" ng-repeat="field in category.fieldList " ng-if="field.dbName
+								!='' ">
+					<span class="fldDBNameSpan">{{field.dbName}}</span>
+					<input type="text " class="gf-form-input max-width-10" ng-model="field.displayName " ng-blur="pipelinePanelEditorCtrl.render()">
+				</div>
+			</div>
+			<!--<div ng-if="pipelinePanelEditorCtrl.checkFieldMapping() " style="margin-bottom: 20px;clear:both;border-bottom:1px solid #cccccc;width:100%"></div>-->
+		</div>
+	</div>
+</body>
+
+</html>

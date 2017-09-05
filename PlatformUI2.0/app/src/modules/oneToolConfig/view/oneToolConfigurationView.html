@@ -1,0 +1,127 @@
+<!--
+ *******************************************************************************
+ * Copyright 2017 Cognizant Technology Solutions
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License.  You may obtain a copy
+ * of the License at
+ * 
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ ******************************************************************************
+ -->
+
+<throbber ng-if="!oneToolConfigurationController.showTemplateAfterLoad" layout="column" flex="100">
+</throbber>
+<div ng-if="oneToolConfigurationController.showTemplateAfterLoad" layout="column" class="contentCss" style="margin-top:49px"
+    flex>
+    <div layout class="buttMar">
+        <div layout class="selectToolTxt" style="margin-top: -6px">Please add details for<b>&nbsp{{oneToolConfigurationController.toolName}}</b></div>
+        <div layout layout-align="end end" flex style="margin-right: -7px;">
+            <md-button ng-click="oneToolConfigurationController.toToolsConfiguredpage()" class="md-raised md-primary configureBut" ng-disabled="oneToolConfigurationController.configuredToolsList.length  == 0"
+                ng-style="{ 'background-color' : (oneToolConfigurationController.configuredToolsList.length == 0) ? '#7fb8c7' : '#00728f',
+                                                                       'color' : (oneToolConfigurationController.configuredToolsList.length == 0) ? '#c6dde4' : 'white' }">
+                Configured Tools</md-button>
+            <md-button ng-click="oneToolConfigurationController.toToolsConfigurationLandingPage()" class="md-raised md-primary configureBut"
+                style="background-color:#387c2c;margin-left: 2px;">
+                Back to Tools
+            </md-button>
+        </div>
+    </div>
+    <md-divider layout flex="100" class="configsSeparationLine" style="margin-top: 0px;margin-bottom: -49px;"></md-divider>
+    <div ng-if="oneToolConfigurationController.showTemplate == false" class="templatePresentStatus">Template not configured</div>
+
+    <!--start code for butttons-->
+    <div ng-if="oneToolConfigurationController.showTemplate == true" layout="row" layout-align="end end">
+        <div class="confirmationMessage" layout="row" layout-align="end end" style="margin-right: 7px;">
+            {{oneToolConfigurationController.saveMsg}} </div>
+        <md-icon class="ForActionsIcons" ng-style="{height: '20px', width: '20px'}" ng-click="oneToolConfigurationController.buttonDisableStatus||oneToolConfigurationController.openDialog($event,'save')"
+            md-svg-src="{{oneToolConfigurationController.saveButtonUrl}}">
+            <md-tooltip md-direction="Bottom">
+                Save
+            </md-tooltip>
+        </md-icon>
+        <md-icon class="ForActionsIcons" ng-style="{height: '20px', width: '20px'}" ng-click="oneToolConfigurationController.buttonDisableStatus||oneToolConfigurationController.openDialog($event,'delete')"
+            md-svg-src="{{oneToolConfigurationController.removeButtonUrl}}">
+            <md-tooltip md-direction="Bottom">
+                Delete
+            </md-tooltip>
+        </md-icon>
+        <a class="anchorText" target="_self" href={{oneToolConfigurationController.downloadURL}} download="config.json">
+            <md-icon class="ForActionsIcons" ng-style="{height: '20px', width: '20px'}" ng-click="oneToolConfigurationController.buttonDisableStatus||oneToolConfigurationController.downloadConfig()"
+                md-svg-src="{{oneToolConfigurationController.downloadButtonUrl}}">
+                <md-tooltip md-direction="Bottom">
+                    Download
+                </md-tooltip>
+            </md-icon>
+        </a>
+        <md-icon class="ForActionsIcons" ng-style="{height: '20px', width: '20px'}" ng-click="oneToolConfigurationController.addAction()"
+            md-svg-src="{{oneToolConfigurationController.addRowButtonUrl}}">
+            <md-tooltip md-direction="Bottom" style="padding-right:10px">
+                Add
+            </md-tooltip>
+        </md-icon>
+    </div>
+    <!--end code for buttons-->
+    <!--start code for grey-->
+    <md-radio-group>
+        <div ng-if="oneToolConfigurationController.showTemplate == true" ng-repeat="toolRow in oneToolConfigurationController.ToolRows.toolsConfigRows track by $index"
+            style="margin-bottom:20px">
+            <form name="" novalidate>
+                <div layout layout-align="start center" flex="100" layout-wrap class="oneToolConfigurationBlock">
+                    <div ng-style="{'display':block.authentication && toolRow.selectedAuthMtd  &&
+                                                              block.authentication !== toolRow.selectedAuthMtd ? 'none' : 'block',
+                                                                  'margin-left': block.name == 'uniqueKey' ? '-33px' : ''}"
+                        flex="{{block.flex}}" ng-repeat="block in oneToolConfigurationController.toolsLayout.jsonLayout.uiConfig">
+                        <md-radio-button ng-if="block.element === 'radiobutton'" style="background-color: white;outline:none" ; ng-value="{agentId: '{{toolRow.agentId}}' } "
+                            ng-click="oneToolConfigurationController.toggleSelectRow(toolRow.agentId)" class="md-primary radioButtonTop">
+                        </md-radio-button>
+                        <md-input-container ng-if="block.element!=='dialog' && block.element!=='autocomplete'" layout class="md-block inputContainerDiv"
+                            md-no-float>
+                            <label class="labelCss" ng-style="{'margin-bottom': (block.element !='dropdown') ? '5px' : '30px'}">{{block.label}}</label>
+                            <input class="inputContTextCss inputBoxCont textBox" ng-if="block.element ==='input' && block.authentication === undefined && block.name !== 'uniqueKey'"
+                                type={{block.type}} required md-no-asterisk name="host" ng-model="toolRow[block.name]" placeholder="{{block.placeholder}}"
+                            />
+                            <md-select ng-if="block.element =='dropdown'" class="inputContTextCss inputBoxCont select" md-no-asterisk="true" ng-model="toolRow[block.name]"
+                                placeholder="{{block.placeholder}}" ng-change=" oneToolConfigurationController.onAuthenticationChange(toolRow[block.name])">
+                                <md-option ng-repeat="authMtd in block.authMtd" value="{{authMtd}}">
+                                    {{authMtd}}
+                                </md-option>
+                            </md-select>
+                            <input class="inputContTextCss inputBoxCont" ng-if="block.element ==='input' && block.authentication === toolRow.selectedAuthMtd"
+                                type={{block.type}} required md-no-asterisk name="host" ng-model="toolRow[block.name]" placeholder="{{block.placeholder}}"
+                            />
+                            <input class="inputContTextCss inputBoxCont" ng-if="block.element ==='input' && block.authentication === undefined && block.name === 'uniqueKey'"
+                                ng-disabled="toolRow.dataUpdateSupported == false" type={{block.type}} required md-no-asterisk
+                                name="host" ng-model="toolRow[block.name]" placeholder="{{block.placeholder}}" />
+                        </md-input-container>
+                        <div  style="margin-left: 31px;" layout ng-if="block.element=='checkBox'" flex-gt-sm="50">
+                            <md-checkbox  class="bgColor" md-no-ink = "true"  aria-label="Checkbox No Ink" ng-model="toolRow[block.name]" class="md-primary">
+                            </md-checkbox>
+                        </div>
+                        <div ng-if="block.element=='autocomplete'" class="autoCompleteDiv">
+                            <label class="labelCss autocompleteLable">{{block.label}}</label>
+                            <md-autocomplete class="inputContTextCss inputBoxCont autoComplete" md-search-text="toolRow[block.name]" md-items="actualtimezone in oneToolConfigurationController.timezoneList.timeZone| filter:toolRow[block.name]"
+                                md-item-text="actualtimezone" placeholder="{{block.placeholder}}">
+                                <md-item-template>
+                                    <span class="ToolsConfigPageTimeZoneDropdown" md-highlight-text="toolRow[block.name]" md-highlight-flags="^i">{{actualtimezone}}</span>
+                                </md-item-template>
+                                <md-not-found>
+                                    No records found
+                                </md-not-found>
+                            </md-autocomplete>
+                        </div>
+                        <div layout ng-if="block.element=='dialog'" class="templateCss" ng-class="{templateAddFieldsCss: oneToolConfigurationController.toolsLayout.jsonLayout.uiConfig.length == 13,responseTemplatePosition:oneToolConfigurationController.toolCategory == 'ALM'}">
+                            <md-button class="md-raised setResponseTemplateButtonCss" ng-click="oneToolConfigurationController.addResponseTemplate($event,toolRow.agentId)">Add Response Template</md-button>
+                        </div>
+                    </div>
+                </div>
+        </div>
+    </md-radio-group>
+    </form>
+</div>

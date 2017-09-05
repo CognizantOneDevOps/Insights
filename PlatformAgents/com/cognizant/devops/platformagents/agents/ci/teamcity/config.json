@@ -1,0 +1,63 @@
+{
+  "mqConfig": {
+    "user": "iSight",
+    "password": "iSight",
+    "host": "127.0.0.1",
+    "exchange": "iSight"
+  },
+  "subscribe": {
+    "config": "CI.TEAMCITY.config"
+  },
+  "publish": {
+    "data": "CI.TEAMCITY.DATA",
+    "health": "CI.TEAMCITY.HEALTH"
+  },
+  "communication": {
+    "type": "REST"
+  },
+  "responseTemplate": {
+	"status": "status",
+	"buildType": {
+		"name": "buildTypeName",
+		"projectId": "projectId",
+		"projectName": "projectName",
+		"id": "buildTypeId"
+	},
+	"queuedDate": "queuedDate",
+	"triggered": {
+		"date": "triggeredDate",
+		"type": "triggeredType",
+		"user": {
+			"username": "ciAuthor",
+			"name": "ciAuthorName"
+		}
+	},
+	"startDate": "startDate",
+	"agent": {
+		"name": "agentName"
+	},
+	"state": "state",
+	"href": "buildUrl",
+	"finishDate": "finishDate",
+	"id": "buildId",
+	"revisions": {
+		"revision": [{
+			"vcs-root-instance": {
+				"name": "scmUrl"
+			}
+		}]
+	}
+},
+"auth": "base64",
+"toolsTimeZone" : "Asia/Kolkata",
+"insightsTimeZone" : "Asia/Kolkata",
+"useResponseTemplate" : true,
+"runSchedule": 2,
+"UserID": "userid",
+"Passwd": "passwd",
+"BaseUrl": "http://hostname",
+"timeStampField":"startDate",
+"timeStampFormat":"%Y%m%dT%H%M%S+0000",
+"isEpochTimeFormat" : false,
+"StartFrom" : "2017-01-01 01:01:01"
+}

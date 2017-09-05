@@ -1,0 +1,35 @@
+<!--
+ *******************************************************************************
+ * Copyright 2017 Cognizant Technology Solutions
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License.  You may obtain a copy
+ * of the License at
+ * 
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ ******************************************************************************
+ -->
+
+<div layout style="margin-right: 8px;" class="outlineNone">
+    <md-menu md-offset="2 35" style="margin-top: -3px;">
+        <div aria-label="Open menu with custom trigger" ng-mouseenter="$mdMenu.open()" style="margin-top: 32px;">
+            <div class="outlineNone"  layout aria-label="Open dashboard side nav">
+                <md-icon style="margin-right: 9px;margin-top: -1px;" layout class="icon-textDecoration" md-svg-src="dist/icons/svg/ic_menu_36px.svg" ng-style="{height: '20px', width: '20px'}"></md-icon>
+                <span layout class="appSelCss">Switch Access Group</span>
+            </div>
+        </div>
+        <md-menu-content width="3" ng-mouseleave="$mdMenu.close()">
+            <md-menu-item ng-repeat="org in dashboardController.orgList" ng-class="{'defaultOrgSelection' : dashboardController.defaultOrg == org.orgId }">
+                <md-button  class="appSelCss" ng-class="{'defaultOrgSelection' : dashboardController.defaultOrg == org.orgId }" ng-click="dashboardController.switchOrganizations(org.orgId)">
+                    {{org.name}}
+                </md-button>
+            </md-menu-item>
+    </md-menu>
+    <div class="swichAppDivider"></div>
+</div>

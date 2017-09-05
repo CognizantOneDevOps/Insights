@@ -1,0 +1,31 @@
+# Set to true to log user information returned from LDAP
+verbose_logging = true
+
+[[servers]]
+# Ldap server host
+host = 
+# Default port is 389 or 636 if use_ssl = true
+port = 
+# Set to true if ldap server supports TLS
+use_ssl = false
+# set to true if you want to skip ssl cert validation
+ssl_skip_verify = true
+
+# Search user bind dn
+bind_dn = 
+# Search user bind password
+bind_password = 
+
+# Search filter, for example "(cn=%s)" or "(sAMAccountName=%s)"
+search_filter = "(samaccountname=%s)"
+# An array of base dns to search through
+search_base_dns = ["dc=cts,dc=com"]
+
+# Specify names of the ldap attributes your ldap uses
+[servers.attributes]
+name = "name"
+#surname = "sn"
+member_of = "memberOf"
+email =  "mail"
+username = "sAMAccountName"
+# Map ldap groups to grafana org roles

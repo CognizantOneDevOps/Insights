@@ -1,0 +1,77 @@
+/*******************************************************************************
+ * Copyright 2017 Cognizant Technology Solutions
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License.  You may obtain a copy
+ * of the License at
+ * 
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ ******************************************************************************/
+
+.searchApplicationBoxContData {
+    border: 1px solid #d8d8d8;
+    background-color: white !important;
+    text-align: left !important;
+    height: 40px !important;
+    margin-right: 5px;
+    margin-bottom: 0px;
+    width: 195px;
+     font-family: proxima_novasemibold !important;
+    font-size: 14px !important;
+    color: #00728f !important;
+    padding-left: 10px;
+    padding-top: 0px !important;
+}
+.dataBoardingToolName{
+    background-color: #d3e9c7;
+    border: 1px solid #d8d8d8;
+    height: 40px;
+    font-family: proxima_novasemibold;
+    font-size: 14px;
+    color: #00728f !important;
+    text-align: start;
+    padding-left: 20px;
+    padding-top: 10px;
+    margin-top: 2px;
+    margin-left: 10px;
+    word-wrap: break-word;
+}
+.dataBoardingFieldName{
+    margin-left: 10px;
+    background-color: #d3e9c7;
+    border: 1px solid #d8d8d8;
+    height: 40px;
+    font-family: proxima_novasemibold;
+    font-size: 14px;
+    color: #666666;
+    text-align: start;
+  padding-left: 10px;
+    padding-top: 10px;
+    margin-top: 2px;
+}
+
+.confirmationMessage{
+ margin-right: 7px;
+    font-family: proxima_novaregular;
+    font-size: 14px;
+    color: #00728f !important;
+    margin-bottom: 10px;
+}
+
+.mapDataMargin{
+    margin-left: 0px !important;
+}
+
+.autocompleteSearchData{
+    border: 1px solid #d8d8d8;
+    width:300px;
+    font-family:proxima_novaregular;
+    font-size: 14px;
+    color: #298700 !important;
+}
