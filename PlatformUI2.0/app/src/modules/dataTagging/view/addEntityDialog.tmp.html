@@ -1,0 +1,72 @@
+<!--
+ *******************************************************************************
+ * Copyright 2017 Cognizant Technology Solutions
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License.  You may obtain a copy
+ * of the License at
+ * 
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ ******************************************************************************
+ -->
+
+<md-dialog class="md-dialog-reponseTemplate" style="width: 45%;">
+    <form>
+        <md-toolbar class="toolbarHt">
+            <div layout layout-align="center center" class="md-toolbar-tools">
+                <h2 flex="90" layout layout-align="center center" class="toolBar" style="margin-left: 60px;">Add Entity</h2>
+                <md-button flex="10" layout layout-align="end end" class="md-icon-button" style="margin-top:0px;padding-left: 25px; margin-left: 17px;" ng-click="addEntityDialogController.cancel()">
+                    <md-icon md-svg-src="dist/icons/svg/ic_clear_24px.svg" aria-label="Close dialog" style="fill: #666666;margin-left:7px" ng-style="{height: '20px', width: '150px'}"></md-icon>
+                </md-button>
+            </div>
+        </md-toolbar>
+        <div>
+            <md-dialog-content ng-if ="!addEntityDialogController.shuldAddEntity" layout="column" layout-align="start left" class="dialogMargin" style="width: 95%; height: 100%; overflow: hidden">
+                <div layout style="margin-top: 10px; margin-left: 20px;" ng-repeat="rowData in addEntityDialogController.entityDefModel.entityDefinitionRows track by $index">
+                    <!--<div layout flex="20" class="dataTaggingLevelName" name="newLevel" ng-model="rowData.levelName">
+                        Level {{rowData.rowId}}</div>-->
+                    <md-input-container ng-if="rowData.levelName === undefined " layout class="md-block inputContainerDivNewApplication" md-no-float>
+                        <input class="inputBoxContNewApplication" type="text" required md-no-asterisk name="newEntity" ng-model="rowData.levelName"
+                            placeholder="Level Name"/>
+                    </md-input-container>
+                    <div flex="30" ng-if="rowData.levelName != undefined " class="dataTaggingLevelName">{{rowData.levelName}}</div>
+                    <div ng-if="rowData.isEntityDefSaved" class="dataTaggingLevelNameEntity">{{rowData.entityName}}</div>
+                    <md-input-container ng-if="!rowData.isEntityDefSaved" layout class="md-block inputContainerDivNewApplication" md-no-float>
+                        <input class="inputBoxContNewApplication" type="text" required md-no-asterisk name="newEntity" ng-model="rowData.entityName"
+                            placeholder="Add Entity Name" ng-change="addEntityDialogController.changeButtonstatus()" />
+                    </md-input-container>
+                    <md-icon ng-if="addEntityDialogController.entityDefModel.entityDefinitionRows.levelName !== 'level1'" layout class="ForActionsIcons"
+                     ng-style="{height: '20px', width: '20px'}" ng-click="!addEntityDialogController.showActions ||addEntityDialogController.deleteAction(rowData.levelName, rowData.entityName, rowData.rowId, rowData.isEntityDefSaved)" md-svg-src="{{addEntityDialogController.deleteButtIcon}}">
+                        <md-tooltip md-direction="Bottom">
+                            Delete Entity
+                        </md-tooltip>
+                    </md-icon>
+                    <md-icon ng-if="addEntityDialogController.entityDefModel.entityDefinitionRows[addEntityDialogController.entityDefModel.entityDefinitionRows.length-1].rowId == rowData.rowId"
+                        layout ng-click="!addEntityDialogController.showActions || addEntityDialogController.addAction()" class="ForActionsIcons" ng-style="{height: '20px', width: '20px'}"
+                        md-svg-src="{{addEntityDialogController.addButtIcon}}">
+                        <md-tooltip md-direction="Bottom">
+                            Add Entity
+                        </md-tooltip>
+                    </md-icon>
+                </div>
+            </md-dialog-content>
+            <md-dialog-content ng-if ="addEntityDialogController.shuldAddEntity" layout="column" layout-align="center center" class="dialogMargin" style="width: 95%; height: 100%; overflow: hidden">
+                <div layout style="margin-top: 20px; margin-bottom: 15px;">
+                   Are you sure you want to save this entity definition?
+                </div>
+            </md-dialog-content>
+
+            <md-dialog-actions style="margin-bottom: 22px;margin-top: 0px;" layout="row" layout-align="center center" class="dialogAct">
+                <md-button layout type="submit" ng-if ="!addEntityDialogController.shuldAddEntity" class="md-raised md-primary saveButt" ng-click="addEntityDialogController.addEntity()">Save</md-button>
+                <md-button layout type="submit" ng-if ="addEntityDialogController.shuldAddEntity" ng-click="addEntityDialogController.addEntityDefinition()" class="md-raised md-primary saveButt">Yes</md-button>
+                <md-button layout class="cancelButt" ng-click="addEntityDialogController.cancel()">Cancel</md-button>
+            </md-dialog-actions>
+    </form>
+</md-dialog>
+</div>

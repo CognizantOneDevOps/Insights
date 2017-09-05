@@ -1,0 +1,50 @@
+<div layout="column" class="editor-row" ng-if="pipelinePanelEditorCtrl.receivedDataStatus === true"
+                                        ng-repeat="pipeline in pipelinePanelEditorCtrl.pipelinesList">
+		<div layout="row" flex="60" style="margin-top: 20px;margin-bottom:10px" >
+				<div layout-align="start start" style="margin-top:1%">
+					<span style="margin-right: 35px;font-size: 15px;color: gray;font-style: italic;background-color:#e0e0ff"
+					 class="gf-form-label width-10">{{pipeline.pipelineRefId}}</span>
+				</div>
+                 <div layout="column" flex="100">
+				     <div layout="row" flex ="60"  ng-repeat="field in pipeline.fieldsList">
+
+							<div layout  flex="20" style="margin-left: 5%;width: 100%;">
+
+								<md-input-container style="width: 100%;height: 100%">
+									<label>Select Fields</label>
+									<md-select  ng-model="field.fieldName">
+									<md-option
+									ng-repeat="fieldsOption in pipelinePanelEditorCtrl.pipelineFieldsDropdownMenu[$parent.$index]"
+									value="{{fieldsOption}}">{{fieldsOption}}</md-option>
+									</md-select>
+								</md-input-container>
+							</div>
+
+							<div layout  flex="20"   style="margin-left: 5%;">
+								<md-input-container class="md-block" style="width: 100%;height: 100%">
+									<label style="color: black;font-style: italic;">Field Name</label>
+									<input ng-model="field.fieldMapName"  ng-blur="pipelinePanelEditorCtrl.render()">
+								</md-input-container>
+							</div>
+
+							<div layout  flex="20"  style="margin-left: 5%;">
+								<md-input-container class="md-block" style="width: 100%;height: 100%">
+									<label style="color: black;font-style: italic;">Field Color</label>
+									<input ng-model="field.fieldColor"  ng-blur="pipelinePanelEditorCtrl.render()">
+								</md-input-container>
+							</div>
+
+							<div layout="row"  flex="10"  style="margin-left: 5%;margin-top: 3%;" >
+								<span><button ng-click="pipelinePanelEditorCtrl.onRemoveField(pipeline.pipelineRefId,field.fieldPosition)"><i class="fa fa-remove pointer"></i></button></span>
+								<span><button ng-click="pipelinePanelEditorCtrl.onAddField(pipeline.pipelineRefId)"><i class="fa fa-plus"></i></button></span>
+							</div>
+				      </div>
+		         </div>
+	    </div>
+		<div flex layout="column" style="border-bottom:1px solid #cccccc">
+		</div>
+</div>
+<div layout="column" class="editor-row" style="color: red;font-size: 15px;    margin-top: 100px;align-items: center;"
+      ng-if="pipelinePanelEditorCtrl.receivedDataStatus === false" >
+Please go back to Metrics Tab
+</div>

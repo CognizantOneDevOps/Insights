@@ -1,0 +1,35 @@
+go get github.com/grafana/grafana
+set GRFANA_DEV_PATH=%GOPATH%\src\github.com\grafana\grafana
+pushd %GRFANA_DEV_PATH%
+git reset
+git checkout .
+git clean -fdx
+git checkout tags/v4.2.0
+go run build.go setup
+go run build.go build
+set GRAFANA_CUSTOMIZATION_PATH=%INSIGHTS_REPO_PATH%\PlatformGrafanaPlugins\GrafanaCustomization\v4.2.0
+set GRAFANA_APPS_PATH=%INSIGHTS_REPO_PATH%\PlatformGrafanaPlugins
+copy /y %GRAFANA_CUSTOMIZATION_PATH%\app.ts %GRFANA_DEV_PATH%\public\app\app.ts
+copy /y %GRAFANA_CUSTOMIZATION_PATH%\system.conf.js %GRFANA_DEV_PATH%\public\app\system.conf.js
+copy /y %GRAFANA_CUSTOMIZATION_PATH%\test-main.js %GRFANA_DEV_PATH%\public\test\test-main.js
+copy /y %GRAFANA_CUSTOMIZATION_PATH%\index.html %GRFANA_DEV_PATH%\public\views\index.html
+copy /y %GRAFANA_CUSTOMIZATION_PATH%\default_task.js %GRFANA_DEV_PATH%\tasks\default_task.js
+copy /y %GRAFANA_CUSTOMIZATION_PATH%\concat.js %GRFANA_DEV_PATH%\tasks\options\concat.js
+copy /y %GRAFANA_CUSTOMIZATION_PATH%\tslint.json %GRFANA_DEV_PATH%\tslint.json
+copy /y %GRAFANA_APPS_PATH%\ScriptedDashboard\iSight.js %GRFANA_DEV_PATH%\public\dashboards\iSight.js
+
+Xcopy /S /I /E /Y %GRAFANA_APPS_PATH%\Panels\insightscharts %GRFANA_DEV_PATH%\public\app\plugins\panel\insightscharts
+Xcopy /S /I /E /Y %GRAFANA_APPS_PATH%\Panels\insightsCore %GRFANA_DEV_PATH%\public\app\plugins\panel\insightsCore
+Xcopy /S /I /E /Y %GRAFANA_APPS_PATH%\Panels\pipeline %GRFANA_DEV_PATH%\public\app\plugins\panel\pipeline
+Xcopy /S /I /E /Y %GRAFANA_APPS_PATH%\Panels\toolsinsights %GRFANA_DEV_PATH%\public\app\plugins\panel\toolsinsights
+
+Xcopy /S /I /E /Y %GRAFANA_APPS_PATH%\DataSources\neo4j %GRFANA_DEV_PATH%\public\app\plugins\datasource\neo4j
+
+call bower install angular-animate#1.6.1 --save
+call bower install angular-aria#1.6.1 --save
+call bower install angular-messages#1.6.1 --save
+call bower install angular-material#1.1.1 --save
+
+call npm install -g yarn
+call yarn install --pure-lockfile
+call grunt

@@ -1,0 +1,86 @@
+<!--
+ *******************************************************************************
+ * Copyright 2017 Cognizant Technology Solutions
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License.  You may obtain a copy
+ * of the License at
+ * 
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ ******************************************************************************
+ -->
+
+<div class="gradBackground" flex>
+    <div layout="column" layout-align="center center" class="wfTopAlign">
+        <div>
+            <md-whiteframe class="md-whiteframe-3dp whiteframeCss" layout>
+                <div class="textPad">
+                    <md-icon layout layout-align="center center" md-svg-src="dist/icons/svg/login/Logo.svg" ng-style="{height: '120px', width: '300px'}"></md-icon>
+                    <div class="topTxtCss" layout>
+                        <div layout class="bulletCss"></div>
+                        <div layout class="textCss">
+                            <p>Leverage real-time <span class="middleTextColr">Dashboards</span> for the DevOps Journey</p>
+                        </div>
+                    </div>
+                    <div layout>
+                        <div layout class="bulletCss"></div>
+                        <div layout class="textCss">
+                            <p>Achieve end-to-end <span class="middleTextColr">Traceability</span> across the DevOps Lifecycle</p>
+                        </div>
+                    </div>
+                </div>
+                <md-icon layout md-svg-src="dist/icons/svg/login/vertical_separator_bar.svg" ng-style="{height: '422px', width: '1px'}"></md-icon>
+                <div layout="column" layout-align="center center" class="rgtPnlCss">
+                    <form novalidate name="loginForm">
+                        <div layout>
+                            <md-icon layout layout-align="center center" md-svg-src="dist/icons/svg/login/Cognizant_logo.svg" ng-style="{height: '130px', width: '140px'}"></md-icon>
+                        </div>
+                        <div class="validCredTextCss" layout>Sign in with valid credentials</div>
+                        <div layout="column" style="width: 360px;">
+                            <md-input-container layout md-no-float class="md-block containerMargin">
+                                <md-icon class="actvIcoCss disableIcon" layout md-svg-src="dist/icons/svg/login/user_icon.svg" ng-style="{height: '17px', width: '17px'}"></md-icon>
+                                <md-icon class="actvIcoCss" ng-if="username" layout md-svg-src="dist/icons/svg/login/user_icon_active.svg" ng-style="{height: '17px', width: '17px'}"></md-icon>
+                                <input class="inputGreyTextCss" ng-class="{'activeCss': username != '', 'inactiveCss': username == null}" ng-model="username"
+                                    type="text" name="username" value="username" required placeholder="User Name">
+                                <md-icon class="tckCss" ng-if="username" layout md-svg-src="dist/icons/svg/login/tick_icon.svg" ng-style="{height: '20px', width: '20px'}"></md-icon>
+                                <div ng-messages="loginForm.username.$error">
+                                    <div class="wrnTxt" ng-message="required">Please enter a valid username.</div>
+                                </div>
+                            </md-input-container>
+                            <md-input-container md-no-float class="md-block">
+                                <md-icon class="disableIcon" md-svg-src="dist/icons/svg/login/password_icon.svg" ng-style="{height: '20px', width: '16px'}"></md-icon>
+                                <md-icon class="actvIcoCss" ng-if="password" md-svg-src="dist/icons/svg/login/password_icon_active.svg" ng-style="{height: '20px', width: '16px'}"></md-icon>
+                                <input ng-class="{'activeCss': password != '', 'inactiveCss': password == null}" class="inputGreyTextCss" ng-model="password"
+                                    type="password" name="password" value="password" placeholder="Password" required>
+                                <md-icon class="tckCss" ng-if="password" layout md-svg-src="dist/icons/svg/login/tick_icon.svg" ng-style="{height: '20px', width: '20px'}"></md-icon>
+                                <div ng-messages="loginForm.password.$error">
+                                    <div class="wrnTxt" ng-message="required">Please enter a valid password.</div>
+                                </div>
+                            </md-input-container>
+                            <div id="invalidMsg" class="errTxt" ng-if="loginController.isLoginError">
+                                {{loginController.logMsg}}
+                            </div>
+                        </div>
+                        <md-dialog-actions layout="row" class="buttomMar" layout-align="center center">
+                            <div flex="60" flex-offset="15">
+                                <md-button md-no-ink type="submit" ng-click="loginController.userAuthentication(username , password)" class="md-raised md-primary sigBtnCss"
+                                    ng-disabled="loginController.isDisabled">Sign In</md-button>
+                                <span ng-show="loginController.showThrobber" style = "vertical-align: super;"><md-progress-circular style="display: inline;" md-diameter="30" md-mode="indeterminate"></md-progress-circular></span>
+                            </div>
+                        </md-dialog-actions>
+                        <div layout layout-align="center center">
+                            <md-icon layout md-svg-src="dist/icons/svg/login/Bottom_Logo.svg" ng-style="{height: '50px', width: '280px'}"></md-icon>
+                        </div>
+                    </form>
+                </div>
+            </md-whiteframe>
+        </div>
+        <div class="blueStripCss"></div>
+    </div>
+</div>

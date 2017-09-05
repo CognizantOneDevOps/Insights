@@ -1,0 +1,111 @@
+ {
+        category: 'SCM',
+        toolName: 'GIT',
+        uiConfig: [
+          {
+            element: 'radiobutton',
+            flex: 0
+          },
+          {
+            element: 'input',
+            type: 'text',
+            label: 'Start From',
+            name: 'startFromDate',
+            placeholder: 'YYYY-MM-DD HH:MM',
+            flex: 15
+          },
+          {
+            element: 'input',
+            type: 'text',
+            label: 'Tool Url',
+            name: 'toolUrl',
+            placeholder: 'http://baserURl',
+            flex: 25
+          },
+          {
+            element: 'input',
+            type: 'text',
+            label: 'Run Schedule',
+            name: 'runSchedule',
+            placeholder: '30',
+            flex: 15
+          },
+          {
+            element: 'dropdown',
+            type: 'text',
+            label: 'Authentication Type',
+            authMtd: [
+              'UserId/Password',
+              'Access Token'
+            ],
+            name: 'selectedAuthMtd',
+            placeholder: 'Select Authentication',
+            flex: 15
+          },
+          {
+            element: 'input',
+            type: 'text',
+            label: 'Access Token',
+            authentication: 'Access Token',
+            name: 'authToken',
+            placeholder: 'Access Token',
+            flex: 30
+          },
+          {
+            element: 'input',
+            type: 'text',
+            label: 'UserId',
+            authentication: 'UserId/Password',
+            name: 'userId',
+            placeholder: 'User Id',
+            flex: 15
+          },
+          {
+            element: 'input',
+            type: 'password',
+            label: 'password',
+            authentication: 'UserId/Password',
+            name: 'password',
+            placeholder: 'Password',
+            flex: 15
+          },
+          {
+            element: 'autocomplete',
+            type: 'text',
+            label: 'Time Zone',
+            name: 'toolsTimeZone',
+            placeholder: 'Time Zone',
+            flex: 15
+          },
+          {
+            element: 'input',
+            type: 'text',
+            label: 'Time Field',
+            placeholder: 'Date_Started Field',
+            name: 'timeStampField',
+            flex: 15
+          },
+          {
+            element: 'input',
+            type: 'text',
+            label: 'Time Format',
+            name: 'timeStampFormat',
+            placeholder: '%Y-%m-%dT%H:%M:%SZ',
+            flex: 25
+          },
+		   {
+            element: 'input',
+            type: 'text',
+            label: 'GitHub Account',
+            name: 'gitHubAccount',
+            placeholder: '',
+            flex: 25
+          },
+          {
+            element: 'dialog',
+            name: 'responseTemplate',
+            placeholder: 'Response Template',
+            flex: 20
+          }
+        ]
+      }

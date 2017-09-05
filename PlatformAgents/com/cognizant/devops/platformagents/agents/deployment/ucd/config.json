@@ -1,0 +1,42 @@
+{
+  "mqConfig": {
+    "user": "iSight",
+    "password": "iSight",
+    "host": "127.0.0.1",
+    "exchange": "iSight"
+  },
+  "subscribe": {
+    "config": "DEPLOYMENT.UCD.config"
+  },
+  "publish": {
+    "data": "DEPLOYMENT.UCD.DATA",
+    "health": "DEPLOYMENT.UCD.HEALTH"
+  },
+  "communication": {
+    "type": "REST"
+  },
+  "responseTemplate": {
+    "status": "status",
+	"date": "date",
+	"duration": "duration",
+	"environment": "environment",
+	"application": "application",
+	"applicationRequestId": "applicationRequestId",
+	"user": "user"
+  },
+  "runSchedule": 30,
+  "userid": "userId",
+  "passwd": "Passwd",
+  "reportType": "com.urbancode.ds.subsys.report.domain.deployment_report.DeploymentReport",
+  "baseUrl": "http://hostname:8080",
+  "startFrom": "2017-01-01",
+  "toolsTimeZone" : "GMT",
+  "insightsTimeZone" : "GMT",
+  "useResponseTemplate" : true,
+  "timeStampField": "date",
+  "isEpochTimeFormat": true,
+  "isDebugAllowed" : false,
+  "loggingSetting" : {
+		"logLevel" : "WARN"
+	}
+}

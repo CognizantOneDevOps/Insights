@@ -1,0 +1,180 @@
+/*******************************************************************************
+ * Copyright 2017 Cognizant Technology Solutions
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License.  You may obtain a copy
+ * of the License at
+ * 
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ ******************************************************************************/
+
+.gradBackground{
+  background: -webkit-linear-gradient(#51b2ce, #66b25a);
+  background: -o-linear-gradient(#51b2ce, #66b25a);
+  background: -moz-linear-gradient(#51b2ce, #66b25a);
+  background: linear-gradient(#51b2ce, #66b25a);
+}
+.whiteframeCss {
+    background-color: white;
+    width: 985px;
+    height: 480px;
+}
+.blueStripCss {
+    background-color: #00728f;
+    width: 985px;
+    height: 4px;
+}
+.verticalBorder {
+  border-left: solid 1px #cfcfcf;
+  margin-top: 60px;
+  margin-bottom: 60px;
+}
+.bulletCss{
+  width:8px;
+  height: 8px;
+  background-color: #a5a5a5;
+  border-radius: 50%;
+  margin-top: 8px;
+  margin-right: 14px;
+}
+.textCss{
+  color: #5f5f5f;
+  font-size: 22px;
+  width: 400px;
+  font-family: proxima_novalight;
+  margin-top:-22px
+}
+.middleTextColr{
+  color: #11a44e;
+  font-size: 22px;
+  font-family: proxima_novaregular;
+}
+.inputGreyTextCss{
+  font-size: 17px;
+  font-family: proxima_novaregular;
+}
+.validCredTextCss{
+  font-family: proxima_novalight;
+  font-size: 16px;
+  color: #afafaf;
+  margin-bottom: 20px;
+  margin-left: 5px;
+}
+.containerMargin {
+    margin: 0px 0 !important;
+}
+.sigBtnCss{
+  min-height: 38px !important;
+  min-width: 138px !important;
+  font-size: 18px !important;
+  font-family: proxima_novaregular !important;
+  border-radius: 0px !important;
+  text-transform: initial !important;
+  color: white !important;
+  background-color: #00728f !important;
+}
+.pipeCss{
+  border-right: 1px solid #c7c7c7;
+  height: 14px;
+  margin: -2px;
+}
+.buttomMar{
+      margin-bottom: 25px;
+}
+.activeCss {
+    color: #00728f !important;
+    border-color: #51b2ce !important;
+    border-width: 0px 0px 1px 0px !important;
+}
+.inactiveCss {
+    color: #afafaf !important;
+    border-color: #bdbdbd !important;
+    border-width: 0px 0px 1px 0px !important;
+}
+.progressBarCss{
+  color: #00728f !important;
+}
+.wfTopAlign{
+  margin-top: 95px;
+}
+.textPad{
+  padding-left:50px;
+  padding-top:70px;
+  padding-right: 30px;
+}
+.topTxtCss{
+  margin-bottom:24px;
+  margin-top:25px
+}
+.md-button.md-raised:not([disabled]) {
+    box-shadow: 0 0px 0px 0 rgba(0, 0, 0, 0);
+}
+.rgtPnlCss{
+  width:482px;
+  padding-left: 25px;
+  padding-right: 40px;
+}
+.tckCss{
+  margin-top: 2px;
+  margin-left: 335px;
+
+}
+
+.actvIcoCss{
+  margin-left: -2px;
+}
+
+.iconCSS{
+    min-height: 0px !important;
+    min-width: 0px !important;
+}
+.disableIcon {
+    margin: 0 !important;
+    right: 0px !important;
+    left: 0px !important;
+}
+
+md-icon {
+    margin: auto;
+    background-repeat: no-repeat no-repeat;
+    display: inline-block;
+    vertical-align: middle;
+    fill: currentColor;
+    height: 0px;
+    width: 0px;
+    min-height: 0px;
+    min-width: 0px;
+}
+.wrnTxt{
+  color: #df7a1c !important;
+  font-size: 12px !important;
+  font-family: proxima_novaregular !important
+}
+.errTxt{
+    color: #df7a1c !important;
+    font-size: 16px !important;
+    font-family: proxima_novaregular !important;
+    padding-left: 36px;
+    padding-bottom: 16px;
+    margin-top: -20px;
+}
+.bottom-to-top {
+    border-width: 1px;
+    border-style: solid;
+    -webkit-border-image:
+      -webkit-gradient(linear, 0 100%, 0 0, from(#bdbdbd), to(rgba(0, 0, 0, 0))) 1 100%;
+    -webkit-border-image:
+      -webkit-linear-gradient(bottom, #bdbdbd, rgba(0, 0, 0, 0)) 1 100%;
+    -moz-border-image:
+      -moz-linear-gradient(bottom, #bdbdbd, rgba(0, 0, 0, 0)) 1 100%;
+    -o-border-image:
+      -o-linear-gradient(bottom, #bdbdbd, rgba(0, 0, 0, 0)) 1 100%;
+    border-image:
+      linear-gradient(to top, #bdbdbd, rgba(0, 0, 0, 0)) 1 100%;
+}

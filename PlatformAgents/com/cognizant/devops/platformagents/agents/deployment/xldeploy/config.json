@@ -1,0 +1,43 @@
+{
+  "mqConfig": {
+    "user": "iSight",
+    "password": "iSight",
+    "host": "localhost",
+    "exchange": "iSight"
+  },
+  "subscribe": {
+    "config": "DEPLOYMENT.XLDEPLOY.config"
+  },
+  "publish": {
+    "data": "DEPLOYMENT.XLDEPLOY.DATA",
+    "health": "DEPLOYMENT.XLDEPLOY.HEALTH"
+  },
+  "communication": {
+    "type": "REST"
+  },
+	"responseTemplate" : {
+		"sha": "git_commitId",
+		"commit" : {
+			"author" : {
+				"name": "git_authorName",
+				"date": "git_commiTime"
+			}
+		}
+	},
+  "auth": "base64",
+  "clientConfig": {
+    "runSchedule": {
+      "userInput": true,
+      "label": "Schedule interval in minutes",
+      "type": "input",
+      "value": 30,
+      "errorMessage": "Please specify schedule interval",
+      "required": true
+    }
+  },
+ "runSchedule": 5,
+ "UserID": "userdi",
+ "Passwd": "passwd",
+  "BaseEndPoint": "http://127.0.0.1:4516/deployit",
+  "isDebugAllowed" : false,
+}

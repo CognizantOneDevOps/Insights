@@ -1,0 +1,66 @@
+<html>
+
+<head>
+    <style>
+        .toolListText {
+            font-size: 15px;
+            font-family: "Lucida Sans Unicode", "Lucida Grande", Sans-Serif;
+            color: #555;
+            margin-top: -4px;
+            margin-left: 6px;
+        }
+        
+        .seqToolsList {
+            font-size: 15px;
+            font-family: "Lucida Sans Unicode", "Lucida Grande", Sans-Serif;
+            color: #555;
+            padding: 2px;
+        }
+    </style>
+</head>
+
+<body>
+    <div layout="column">
+        <div flex layout="column" style="border-bottom: 1px solid #cccccc;">
+            <h3 style="margin-top: 20px;margin-bottom: 15px;text-decoration:underline;font-weight:bold" layout class="section-heading">Select Tools Sequence</h3>
+            <div layout class="gf-form-group">
+                <div layout class="gf-form" ng-repeat="toolSeq in toolsInsightEditorCtrl.selectedToolSeq" style="margin-top: 16px;background-color:#e0e0ff">
+                    <label class="gf-form-label">
+							<i class="pointer fa fa-remove" ng-click="toolsInsightEditorCtrl.removeTool(toolSeq)"></i>
+							<span>{{toolSeq}}</span>
+						</label>
+                </div>
+                <div layout class="gf-form" style="margin-top: 16px;">
+                    <span style="background-color: #f6f6f6;height: 37px;width: 95px;text-align: center;padding-top: 8px;">Select Tool</span>
+                    <metric-segment segment="toolsInsightEditorCtrl.addColumnSegment" get-options="toolsInsightEditorCtrl.getToolOptions()"
+                        on-change="toolsInsightEditorCtrl.addTool()"></metric-segment>
+                </div>
+            </div>
+            <div layout style="margin-top: -8px;margin-bottom: 25px;">
+                <button layout type="button" ng-click="toolsInsightEditorCtrl.onSubmitAction()">Submit</button>
+            </div>
+        </div>
+        <!--<div flex layout="column" style="border-bottom: 1px solid #cccccc;">
+            <h3 style="margin-top: 20px;margin-bottom: 15px;text-decoration:underline;font-weight:bold" layout class="section-heading">Select Required Fields</h3>
+            <div layout="column" class="gf-form-group">
+                <div layout class="gf-form" style="margin-top: 16px;">
+                    <span style="background-color: #f6f6f6;height: 37px;width: 95px;text-align: center;padding-top: 8px;">Select Fields</span>
+                    <metric-segment segment="toolsInsightEditorCtrl.addColumnSegment" get-options="toolsInsightEditorCtrl.getFieldOptions()"
+                        on-change="toolsInsightEditorCtrl.addFields()"></metric-segment>
+                </div>
+                <div layout class="gf-form" ng-repeat="field in toolsInsightEditorCtrl.selectedFieldList" style="margin-top: 16px;background-color:#e0e0ff">
+                    <label class="gf-form-label">
+							<i class="pointer fa fa-remove" ng-click="toolsInsightEditorCtrl.removeTool(field)"></i>
+							<span>{{field}}</span>
+                            <input type="text" class="gf-form-input max-width-10"  ng-model="field.displayName"  ng-blur=toolsInsightEditorCtrl.render()>
+						</label>
+                </div>
+            </div>
+            <div layout style="margin-top: -8px;margin-bottom: 25px;">
+                <button layout type="button" ng-click="toolsInsightEditorCtrl.onSubmitAction()">Submit</button>
+            </div>
+        </div>-->
+    </div>
+</body>
+
+</html>

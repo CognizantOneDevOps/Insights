@@ -1,0 +1,114 @@
+<!--
+ *******************************************************************************
+ * Copyright 2017 Cognizant Technology Solutions
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License.  You may obtain a copy
+ * of the License at
+ * 
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ ******************************************************************************
+ -->
+
+<div flex>
+    <header title="{{oneToolConfigController.toolName}} Configurations" nav="true"></header>
+    <form name="" novalidate>
+        <md-radio-group>
+        <div layout layout-align="start center" flex="100" ng-repeat="toolRow in oneToolConfigController.ToolRows.toolsConfigRows track by $index" >
+            <div id="mainDiv" layout="column" class ="configScreen" flex="95">
+                <div layout flex="95"
+                 ng-repeat="tool in oneToolConfigController.toolsLayout.jsonLayout.uiConfig[0].rows">
+
+                   <div  flex="{{block.flex}}" ng-repeat="block in tool.Row"
+                   ng-style="{'display':block.authentication && toolRow.selectedAuthMtd  && block.authentication !== toolRow.selectedAuthMtd ? 'none' : 'block',
+                   'margin-left': block.label === 'Time Zone' ? '14px': '0px',
+                   'margin-right': block.element === 'radiobutton' ? '15px': '0px',
+                   'margin-top': block.element === 'radiobutton' ? '30px': '0px'}">
+
+                     <md-radio-button  ng-if="block.element === 'radiobutton'" ng-value="{agentId: '{{toolRow.agentId}}' } "
+                       ng-click="oneToolConfigController.toggleSelectRow(toolRow.agentId)" class="md-primary">
+                     </md-radio-button>
+
+                     <md-input-container flex-gt-sm layout class="md-block configElements" ng-if="block.element!=='dialog' && block.element!=='autocomplete'" style="margin-bottom:0px">
+                        <label>{{block.label}}</label>
+                        <input style="font-style:italic;font-size:14px;color:grey"  type={{block.type}} required md-no-asterisk name="host" ng-model="toolRow[block.name]"
+                                    ng-if="block.element ==='input' && block.authentication === undefined"/>
+                        <md-select style="font-style:italic;font-size:15px;color:#a8a8a8"  md-no-asterisk="true" ng-model="toolRow[block.name]"
+                                    placeholder="Authentication Type"  ng-if="block.element =='dropdown'" ng-change="oneToolConfigController.onAuthenticationChange(toolRow[block.name])">
+                                    <md-option ng-repeat="authMtd in block.authMtd" value="{{authMtd}}">
+                                    {{authMtd}}
+                                    </md-option>
+                        </md-select>
+                        <input style="font-style:italic;font-size:14px;color:grey"  type={{block.type}} required md-no-asterisk name="host" ng-model="toolRow[block.name]"
+                                ng-if="block.element ==='input' && block.authentication === toolRow.selectedAuthMtd"/>
+
+
+                        <div class="HostExpl" >{{block.hint}}</div>
+                     </md-input-container>
+
+                     <div flex="{{block.flex}}" ng-if="block.element=='autocomplete'" class ="toolsAutocomplete" style="font-style:italic;font-size:14px;color:grey">
+                         <md-autocomplete  class ="toolsConfigPageTimeZone"
+                        md-search-text="toolRow[block.name]"
+                        md-items="actualtimezone in oneToolConfigController.timezoneList.timeZone| filter:toolRow[block.name]"
+                        md-item-text="actualtimezone"
+                        md-floating-label="{{block.label}}">
+                        <md-item-template>
+                            <span class="ToolsConfigPageTimeZoneDropdown" md-highlight-text="toolRow[block.name]"  md-highlight-flags="^i">{{actualtimezone}}</span>
+                        </md-item-template>
+                        <md-not-found>
+                            No records found
+                        </md-not-found>
+                    </md-autocomplete>
+
+                     </div>
+
+                     <div  class="responseDiv" flex="{{block.flex}}" ng-if="block.element=='dialog'">
+                            <md-button  class="md-fab responsetemplateBtn" >
+                                <md-icon   md-svg-src="dist/icons/svg/ic_edit_24px.svg" ng-style="{height: '20px', width: '20px'}"
+                                        ng-click="oneToolConfigController.addResponseTemplate($event,toolRow.agentId)"></md-icon>
+                                <md-tooltip md-visible="false" class="responseTooltip" >
+                                Click to add Response Template
+                                </md-tooltip>
+                            </md-button>
+                        </div>
+                    </div>
+
+                </div>
+             <md-divider layout layout-align="center center" flex="100" class="configsSeparationLine"></md-divider>
+            </div>
+        </div>
+</md-radio-group>
+         <div class="lock-size speeddialMargin" layout="row" layout-align="end center">
+                      <md-fab-speed-dial md-open="oneToolConfigController.isOpen" md-direction="{{oneToolConfigController.selectedDirection}}"
+                       ng-class="oneToolConfigController.selectedMode">
+                            <md-fab-trigger>
+                                <md-button aria-label="Save" class="md-fab md-primary">
+                                    <md-icon md-svg-src="dist/icons/svg/ic_menu_36px.svg"></md-icon>
+                                </md-button>
+                            </md-fab-trigger>
+                            <md-fab-actions>
+                              <md-button aria-label="save" class="md-fab md-primary speeddialIcons" ng-click="oneToolConfigController.formSubmit()">
+                                  <md-icon md-svg-src="dist/icons/svg/ic_save_24px.svg"></md-icon>
+                              </md-button>
+                                <md-button aria-label="Delete" class="md-fab md-primary speeddialIcons"  ng-click="oneToolConfigController.removeAction()">
+                                    <md-icon md-svg-src="dist/icons/svg/ic_delete_24px.svg"></md-icon>
+                                </md-button>
+                                <md-button aria-label="Download" class="md-fab md-primary speeddialIcons"   ng-click="oneToolConfigController.downloadConfig()">
+                                    <a class="anchorText" target="_self" href={{oneToolConfigController.downloadURL}} download="config.json">
+                                        <md-icon md-svg-src="dist/icons/svg/ic_file_download_24px.svg"></md-icon>
+                                        </a>
+                                </md-button>
+                                <md-button aria-label="Add" class="md-fab md-primary speeddialIcons"   ng-click="oneToolConfigController.addAction()">
+                                    <md-icon md-svg-src="dist/icons/svg/ic_add_24px.svg"></md-icon>
+                                </md-button>
+                            </md-fab-actions>
+                        </md-fab-speed-dial>
+         </div>
+    </form>
+</div>

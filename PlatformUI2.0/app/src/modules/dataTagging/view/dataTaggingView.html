@@ -1,0 +1,119 @@
+<!--
+ *******************************************************************************
+ * Copyright 2017 Cognizant Technology Solutions
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License.  You may obtain a copy
+ * of the License at
+ * 
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ ******************************************************************************
+ -->
+
+<div layout="column" flex>
+    <div layout class="applicationButtMar">
+        <div layout="row" class="applicationContentCss" style="width: 100%;">
+            <div layout layout-align="end center">
+                <!--<md-button ng-click="dataTaggingController.showAddApplicationBox()" class="md-raised md-primary configureBut">
+                    Add New Application
+                </md-button>-->
+                <md-button ng-click="dataTaggingController.addEntity($event)" class="md-raised md-primary goButton applicationManagement" style="max-height:40px;margin-top:0px">
+                    Create Entity
+                </md-button>
+                <md-input-container layout class="md-block inputContainerDivNewApplication" md-no-float ng-if="dataTaggingController.showAddApplication">
+                    <input class="inputBoxContNewApplication" type="text" required md-no-asterisk name="newApplication" ng-model="dataTaggingController.addNewApplicationName"
+                        placeholder="Please input an Application Name" />
+                </md-input-container>
+                <md-button ng-click="dataTaggingController.addApplication($event,dataTaggingController.addNewApplicationName)" class="md-raised md-primary goButton applicationManagement addApplication"
+                    ng-if="dataTaggingController.showAddApplication">
+                    Go
+                </md-button>
+                <span ng-if="dataTaggingController.showApplicationAddedMessage" class="applicationAddedMessage">New application added successfully</span>
+            </div>
+            <div layout layout-align="end center" flex style="margin-right: -7px;">
+                <md-button class="md-raised md-primary configureBut" style="background-color:#387c2c;margin-left: 2px;" ng-click="dataTaggingController. goToUserOnBoard()">
+                    User Onboarding
+                </md-button>
+                <md-button ng-click="dataTaggingController. goToDataOnBoard()" class="md-raised md-primary configureBut">
+                    Data Onboarding
+                </md-button>
+            </div>
+        </div>
+    </div>
+    <div class="contentCss">
+        <div layout layout-align="start end" style="margin-right: -7px;margin-top: -20px;">
+            <div layout layout-align="start end" flex style="margin-top: 9px;">
+                <!--<md-button ng-click="dataTaggingController.addEntity($event)" class="md-raised md-primary goButton applicationManagement">
+                    Create Entity
+                </md-button>-->
+            </div>
+            <div class="saveMsg" layout="row" layout-align="end end" style="margin-right: 7px;margin-bottom: 4px;">
+                {{dataTaggingController.saveMsg}} </div>
+            <div layout="row" layout-align="end end" style="margin-right: 11px" ng-if = "dataTaggingController.noEntityAddedMsg.msg === ''">
+                <md-icon layout-align="end end" class="ForActionsIcons" ng-style="{height: '20px', width: '20px'}" ng-click="dataTaggingController.openDialog($event,'save')"
+                    md-svg-src="{{dataTaggingController.saveButtonIcon}}">
+                    <md-tooltip md-direction="top">
+                        Save
+                    </md-tooltip>
+                </md-icon>
+            </div>
+        </div>
+        <!--<md-divider layout flex="100" class="configsSeparationLine" style="margin-top: 16px;margin-bottom: 10px;"></md-divider>-->
+        
+        <div ng-if="dataTaggingController.showThrobber" layout-sm="column" layout-align="center center" style="margin-left: 46%;margin-top: 46px;">
+            <md-progress-circular md-mode="indeterminate" md-diameter="50"></md-progress-circular>
+        </div>
+        <div id="dataTaggingTable" layout layout-align="center center" ng-if = "dataTaggingController.noEntityAddedMsg.msg === '' && !dataTaggingController.showThrobber">
+            <table class="md-api-table-landing" style="border: 1px solid #a5d28b;width:100%;table-layout:fixed">
+                <thead class="theadCss" >
+                    <tr layout="row" layout-align="start start">
+                        <th flex="22.5" class="tableHeader" ng-repeat="header in dataTaggingController.headerData['headers']" style="min-width:285px;max-width:22.5%;padding-left:22px">
+                            <span class="tableHeadingStyle">{{header}}</span>
+                        </th>
+
+                        <th layout flex="10" class="tableHeader" style="margin-left:20px;max-width:10%">
+                            <span class="tableHeadingStyle">Actions</span>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody layout="column" ng-repeat="rowData in dataTaggingController.entityModel.entityRows.entityInfo track by $index" flex>
+                    <tr layout="row" layout-align="start start" style="height:60px;width:100%; background-color: white !important;margin-bottom: 5px !important">
+                        <td flex="22.5" layout ng-repeat="entity in rowData.levels track by $index" style="height:56px;max-width:22.5% !important">
+                            <md-autocomplete class="autocompleteEntityCss" md-search-text="rowData.levels[$index]" md-items="entity"
+                                md-item-text="entity" md-min-length="2" placeholder="Search/Add Entity Value" md-selected-item-change="dataTaggingController.changeButtonstatus()"
+                                md-search-text-change = "dataTaggingController.changeButtonstatus()">
+                                <md-item-template>
+                                    <span md-highlight-text="rowData.levels[$index]" md-highlight-flags="^i">{{entity}}</span>
+                                </md-item-template>
+                            </md-autocomplete>
+                        </td>
+                        <td flex="10" layout style="height:56px;max-width:10%">
+                            <md-icon class="ForActionsIcons" ng-style="{height: '20px', width: '20px'}" md-svg-src="{{dataTaggingController.deleteButtIcon}}"
+                            ng-click="!dataTaggingController.showActions||dataTaggingController.openDialog($event,'delete',rowData.rowId, rowData.levels, rowData.isEntitySaved)">
+                                <md-tooltip md-direction="Bottom">
+                                    Delete Details
+                                </md-tooltip>
+                            </md-icon>
+                            <md-icon ng-if="dataTaggingController.entityModel.entityRows.entityInfo[dataTaggingController.entityModel.entityRows.entityInfo.length-1].rowId == rowData.rowId"
+                                ng-click="!dataTaggingController.showActions||dataTaggingController.addAction()" class="ForActionsIcons"
+                                ng-style="{height: '20px', width: '20px'}" md-svg-src="{{dataTaggingController.addButtIcon}}">
+                                <md-tooltip md-direction="Bottom">
+                                    Add
+                                </md-tooltip>
+                            </md-icon>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="noEntityAddedMsg" ng-if = "dataTaggingController.noEntityAddedMsg.msg" layout layout-align="center center">
+            {{dataTaggingController.noEntityAddedMsg.msg}}
+        </div>
+    </div>
+</div>

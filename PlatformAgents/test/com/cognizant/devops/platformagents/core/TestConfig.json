@@ -1,0 +1,19 @@
+{
+	"mqConfig" : {
+		"user" : "iSight", 
+		"password" : "iSight", 
+		"host" : "localhost", 
+		"exchange" : "iSight"
+	},
+	"subscribe" : {
+		"config" : "SCM.GIT.config"
+	},
+	"publish" : {
+		"data" : "SCM.GIT.DATA",
+		"health" : "SCM.GIT.HEALTH"
+	},
+	"runSchedule" : 0.1,
+	"AccessToken": "authtoken",
+	"GetRepos":"https://api.github.com/users/username/repos",
+	"CommitsBaseEndPoint":"https://api.github.com/repos/username/"
+}

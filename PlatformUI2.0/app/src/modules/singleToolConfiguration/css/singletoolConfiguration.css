@@ -1,0 +1,193 @@
+/*******************************************************************************
+ * Copyright 2017 Cognizant Technology Solutions
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License.  You may obtain a copy
+ * of the License at
+ * 
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ ******************************************************************************/
+
+.contentCss{
+    margin-left:50px;
+    margin-top:10px;
+    margin-right:32px
+}
+.buttMar{
+    margin-bottom: 6px;
+}
+button.md-raised.setResponseTemplateButtonCss.md-button.md-ink-ripple{
+    color: #00728f;
+    font-family: proxima_novasemibold;
+    font-size: 14px;
+    border: 1px solid #00728f;
+    height: 39px;
+    background-color: white;
+    border-radius: 0px !important;
+    text-transform: initial !important;
+}
+.oneToolConfigurationBlock{
+        margin-top: 0px;
+    border: 1px solid black;
+    padding-left: 20px;
+    padding-right: 20px;
+    padding-top: 10px;
+        border: 1px solid #efefef;
+    background-color: #efefef;
+        border-bottom-color: #cecece;
+            padding-bottom: 20px;
+}
+md-icon.ForActionsIcons{
+min-height: 0px;
+min-width: 0px;
+margin:0px;
+margin-left: 20px;
+margin-top: 15px;
+margin-bottom: 10px;
+outline: none;
+}
+.HostExpl {
+    position: absolute;
+    left: 2px;
+    right: auto;
+    bottom: 7px;
+    font-size: 12px;
+    line-height: 14px;
+    transition: all 0.3s cubic-bezier(0.55, 0, 0.55, 0.2);
+    font-family:proxima Nova Semibold;
+    color:grey
+}
+.configElements label {
+    font-size: 14px;
+}
+.toolsAutocomplete input#fl-input-11 {
+    font-style: italic;
+    font-size: 14px;
+    color: grey;
+}
+md-autocomplete.toolsConfigPageTimeZone.ng-isolate-scope {
+    min-width: 537%;
+    padding-left: 70%;
+}
+.ToolsConfigPageTimeZoneDropdown{
+    font-style: italic;
+    font-size: 14px;
+    color: grey;
+}
+/*new css*/
+.labelCss{
+    font-family: proxima_novasemibold !important;
+    font-size:16px !important;
+    color:#666666 !important;
+}
+.inputContainerDiv{
+    margin-right: 0px;
+    margin-left: 27px;
+    margin-top: 25px;
+    margin-bottom: -6px;
+}
+.radioButtonTop{
+    margin-top:-10px;
+}
+.inputContTextCss{
+    font-family: proxima_novaregular !important;
+    font-size:14px !important;
+    color:#666666 !important;
+    padding-left: 7px !important;
+}
+.inputBoxCont{
+    border: 1px !important;
+    border-style: solid !important;
+    border-color: #b7b7b7 !important;
+    border-bottom-color: #cecece !important;
+    background-color: white !important;
+    text-align: left !important;
+    height: 36px !important;
+    box-sizing: initial !important;
+}
+.textBox{
+    padding-right: 10px !important;
+}
+.select{
+    margin-top: -23px;
+    padding-top: 1px;
+    padding-bottom: 1px;
+    margin-right: -17px;
+}
+
+.autoComplete{
+    min-width: 165px !important;
+    margin-top: 5px;
+    height: 40px !important;
+}
+md-select.md-default-theme .md-select-value, md-select .md-select-value {
+    border-bottom-color: white;
+}
+
+.autocompleteLable{
+    font-size:12px !important;
+}
+.md-whiteframe-1dp, .md-whiteframe-z1 {
+    box-shadow: 0px 0px 0px 0px white, 0px 0px 0px 0px white, 0px 0px 0px 0px white;
+}
+md-autocomplete input:not(.md-input) {
+    font-size: 14px;
+    box-sizing: border-box;
+    border: none;
+    box-shadow: none;
+    outline: none;
+    background: transparent;
+    width: 100%;
+    padding: 0 15px;
+    line-height: 40px;
+    height: 40px;
+    color: #666666 !important;
+    padding-left: 4px !important;
+}
+
+.templateButt{
+    margin-right: -370px;
+    width: 230px;
+    height: 41px !important;
+    transition: none !important;
+}
+
+.autoCompleteDiv{
+    margin-top: -19px;
+    margin-left: 30px;
+}
+
+.templateCss{
+    margin-top: 4px;
+    margin-left: 388px;
+    width: 190px !important;
+    text-transform: initial !important;
+}
+.templateAddFieldsCss{
+    margin-top: 4px;
+    margin-left: 62px;
+    width: 240px !important;
+    text-transform: initial !important;
+}
+.templatePresentStatus{
+
+    font-family: proxima_novabold;
+    margin-top: 60px;
+    font-size: 17px;
+    color: #00728f !important;
+}
+.inputContTextCss .md-select-value > span:not(.md-select-icon) .md-text {
+    color: #666666 !important;
+}
+.responseTemplatePosition{
+    margin-left: 114px;
+}
+md-checkbox.md-checked.bgColor .md-icon {
+ background-color: #00728f ;
+}

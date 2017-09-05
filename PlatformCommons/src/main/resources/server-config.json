@@ -1,0 +1,50 @@
+{
+  "endpointData": {
+    "elasticSearchEndpoint": "http://localhost:9200"
+  },
+  "ldapConfiguration": {
+	"ldapUrl" : "ldap://ldaphost:389",
+    "bindDN": "BindDN",
+    "bindPassword": "Passwd",
+    "searchBaseDN": "DC=XX,DC=XX",
+    "searchFilter": "(sAMAccountName={0})",
+    "ldapAttributes": {
+      "name": "givenname",
+      "surname": "sn",
+      "memberOf": "",
+      "email": "mail",
+      "username": "sAMAccountName"
+    }
+  },
+  "graph": {
+    "endpoint": "http://localhost:7474",
+    "authToken": "bmVvNGo6QzBnbml6YW50QDE="
+  },
+  "grafana": {
+    "grafanaEndpoint": "https://localhost:3000",
+    "grafanaDBEndpoint": "jdbc:postgresql://localhost:5432/grafana",
+    "adminUserName": "admin",
+    "adminUserPassword": "admin",
+    "dbUserName": "grafana",
+    "dbPassword": "C0gnizant@1"
+  },
+  "postgre": {
+	"userName" : "grafana",
+	"password" : "C0gnizant@1",
+	"insightsDBUrl": "jdbc:postgresql://127.0.0.1:5432/insight",
+	"grafanaDBUrl": "jdbc:postgresql://127.0.0.1:5432/grafana"
+  },
+  "messageQueue": {
+    "host": "localhost",
+    "user": "iSight",
+    "password": "iSight"
+  },
+  "disableAuth": true,
+  "insightsTimeZone": "Asia/Kolkata",
+  "userId": "UserID",
+  "password": "Passwd",
+  "refreshTime": "Jan 22, 2017 5:04:25 PM",
+  "trustedHosts": [
+    "localhost"
+  ]
+}

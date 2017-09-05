@@ -1,0 +1,147 @@
+<!--
+ *******************************************************************************
+ * Copyright 2017 Cognizant Technology Solutions
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License.  You may obtain a copy
+ * of the License at
+ * 
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ ******************************************************************************
+ -->
+
+<throbber ng-if="!dataOnBoardingController.showTemplateAfterLoad" layout="column" flex="100">
+</throbber>
+<div ng-if="dataOnBoardingController.showTemplateAfterLoad" layout="column" flex>
+    <div layout class="applicationButtMar">
+        <div layout="row" class="applicationContentCss" style="width: 100%;">
+            <div layout layout-align="end center">
+                <!--<md-button ng-click="dataOnBoardingController.showAddApplicationBox()" class="md-raised md-primary configureBut">
+                    Add New Application
+                </md-button>-->
+                <md-select class="searchApplicationBoxContData inputApplicationBox" style="margin-left:10px;margin-top: 0px;" ng-change="dataOnBoardingController.onSelectionOfHierarchy(dataOnBoardingController.selectedHierarchy)"
+                    placeholder="Select Hierarchy" ng-model="dataOnBoardingController.selectedHierarchy" md-on-close="clearSearchTerm()"
+                    data-md-container-class="selectdemoSelectHeader">
+                    <md-optgroup label="Hierarchy">
+                        <md-option ng-value="hierarchy" ng-repeat="hierarchy in dataOnBoardingController.hierarchyList">{{hierarchy}}</md-option>
+                    </md-optgroup>
+                </md-select>
+                <md-autocomplete class="autocompleteSearchData" md-search-text="dataOnBoardingController.searchToolData" md-items="tooldata in dataOnBoardingController.toolCategoryArray  | filter:dataOnBoardingController.searchToolData"
+                    md-item-text="tooldata.selectedTool" md-min-length="3" placeholder="Search Tool">
+                    <md-item-template>
+                        <span md-highlight-text="dataOnBoardingController.searchToolData" md-highlight-flags="^i">{{tooldata}}</span>
+                    </md-item-template>
+                    <md-not-found>
+                        No matching record for "{{dataOnBoardingController.searchToolData}}" were found.
+                    </md-not-found>
+                </md-autocomplete>
+                <md-button style="max-height:40px;margin-top:0px" ng-click="dataOnBoardingController.searchtool()" class="md-raised md-primary goButton applicationManagement">
+                    Go
+                </md-button>
+                
+                <md-button ng-click="dataOnBoardingController.goToDataTagging()" class="md-raised md-primary configureBut">
+                    Data Tagging
+                </md-button>
+               <!-- <md-input-container layout class="md-block inputContainerDivNewApplication" md-no-float ng-if="dataOnBoardingController.showAddApplication">
+                    <input class="inputBoxContNewApplication" type="text" required md-no-asterisk name="newApplication" ng-model="dataOnBoardingController.addNewApplicationName"
+                        placeholder="Please input an Application Name" />
+                </md-input-container>
+                <md-button ng-click="dataOnBoardingController.addApplication($event,dataOnBoardingController.addNewApplicationName)" class="md-raised md-primary goButton applicationManagement addApplication"
+                    ng-if="dataOnBoardingController.showAddApplication">
+                    Go
+                </md-button>
+                <span ng-if="dataOnBoardingController.showApplicationAddedMessage" class="applicationAddedMessage">New application added successfully</span>-->
+            </div>
+            <div layout layout-align="end center" flex style="margin-right: -7px;">
+                <md-button ng-click="dataOnBoardingController.goToOnBoard()" class="md-raised md-primary configureBut" style="background-color:#387c2c;margin-left: 2px;">
+                    User Onboarding
+                </md-button>
+                <md-button ng-click="" class="md-raised md-primary configureBut">
+                    Data Onboarding
+                </md-button>
+            </div>
+        </div>
+    </div>
+    <div class="contentCss">
+        <div layout style="margin-right: -7px;margin-top: -20px;">
+            <div layout layout-align="start end" flex style="margin-top: 9px;margin-bottom: 15px;margin-left: 10px;">
+            </div>
+            <div class="confirmationMessage" layout="row" layout-align="end end" style="margin-right: 7px;">
+                {{dataOnBoardingController.saveMsg}} </div>
+            <!--start code for butttons-->
+            <div layout="row" layout-align="end end" style="margin-right: 7px;" ng-if="dataOnBoardingController.noHierarchyMsg === ''">
+                <md-icon class="ForActionsIcons" ng-style="{height: '20px', width: '20px'}" ng-click="dataOnBoardingController.disableSaveButtonStatus||dataOnBoardingController.openDialog($event,'save')"
+                    md-svg-src="{{dataOnBoardingController.saveButtonIcon}}">
+                    <md-tooltip md-direction="top">
+                        Save
+                    </md-tooltip>
+                </md-icon>
+            </div>
+            <!--end code for buttons-->
+        </div>
+        
+        <md-divider ng-if="dataOnBoardingController.noHierarchyMsg === ''" layout flex="100" class="configsSeparationLine" style="margin-top: 0px;margin-bottom: 10px;"></md-divider>
+        <!--<div ng-if="dataOnBoardingController.showThrobber" layout-sm="column" layout-align="center center" style="margin-left: 46%;margin-top: 46px;">
+            <md-progress-circular md-mode="indeterminate" md-diameter="50"></md-progress-circular>
+        </div>-->
+        <div layout="column" layout-align="" ng-if=" !dataOnBoardingController.showThrobber || dataOnBoardingController.noHierarchyMsg === ''">
+            <div layout style="min-width:100%;margin-top: 10px;" ng-repeat="tooldata in dataOnBoardingController.paginatedDataOnboardedArray  | filter:dataOnBoardingController.searchSelectedToolData track by $index">
+                <md-select ng-if="tooldata.selectedTool == undefined" flex="30" class="searchApplicationBoxContData inputApplicationBox dataBoardingFieldName"
+                    ng-change="dataOnBoardingController.fieldSelection(tooldata.selectedTool,tooldata.toolId)" placeholder="Select Tool"
+                    ng-model="tooldata.selectedTool" data-md-container-class="selectdemoSelectHeader">
+                    <md-optgroup label="Tools">
+                        <md-option ng-value="tool" ng-repeat="tool in dataOnBoardingController.toolsList[1] track by $index">{{tool}}</md-option>
+                    </md-optgroup>
+                </md-select>
+                <div flex="30" ng-if="tooldata.selectedTool != undefined " class="dataBoardingToolName">{{tooldata.selectedTool}}</div>
+                <md-select flex="30" ng-if="tooldata.isSaved == false" class="searchApplicationBoxContData inputApplicationBox dataBoardingFieldName"
+                    ng-disabled="tooldata.selectedTool == undefined" ng-change="dataOnBoardingController.fieldValueSelection(tooldata.selectedTool,tooldata.selectedFieldName,tooldata.toolId)"
+                    placeholder="Select Field" ng-model="tooldata.selectedFieldName">
+                    <md-optgroup label="Fields">
+                        <md-option ng-value="value" ng-repeat="(key, value) in dataOnBoardingController.toolsFieldsArrayJson[tooldata.selectedTool]  track by $index"
+                            ng-selected="value=== tooldata.selectedFieldName">{{value}}</md-option>
+                    </md-optgroup>
+                </md-select>
+                <div flex="30" ng-if="tooldata.isSaved == true" class="dataBoardingToolName">{{tooldata.selectedFieldName}}</div>
+                <md-select flex="30" ng-if="tooldata.isSaved == false" class="searchApplicationBoxContData inputApplicationBox dataBoardingFieldName"
+                    ng-disabled="tooldata.selectedFieldName == undefined" placeholder="Select Field Values" ng-model="tooldata.selectedFieldValues"
+                    ng-change="dataOnBoardingController.changeButtonstatus()">
+                    <md-optgroup label="Project">
+                        <md-option ng-value="fieldVal" ng-repeat="fieldVal in dataOnBoardingController.toolsFieldsValueArrayJson[tooldata.selectedTool+'_'+tooldata.toolId] track by $index"
+                            ng-selected="fieldVal === tooldata.selectedFieldValues">{{fieldVal}}</md-option>
+                    </md-optgroup>
+                </md-select>
+                <div flex="30" ng-if="tooldata.isSaved == true" class="dataBoardingToolName">{{tooldata.selectedFieldValues}}</div>
+                <div flex="10" style="padding-left: 41px;">
+                    <md-icon class="ForActionsIcons" ng-style="{height: '20px', width: '20px'}" ng-click="dataOnBoardingController.disableDeleteButtonStatus||dataOnBoardingController.openDialog($event,'delete',tooldata.selectedTool, tooldata.toolCategory, tooldata.toolId,tooldata.isSaved)"
+                        md-svg-src="{{dataOnBoardingController.deleteButtonIcon}}">
+                        <md-tooltip md-direction="Bottom">
+                            Delete Tool Details
+                        </md-tooltip>
+                    </md-icon>
+                    <md-icon class="ForActionsIcons" ng-style="{height: '20px', width: '20px'}" ng-if="dataOnBoardingController.toolsRowModel.toolRows[dataOnBoardingController.toolsRowModel.toolRows.length-1].toolId == tooldata.toolId"
+                        ng-click="dataOnBoardingController.disableAddButtonStatus||dataOnBoardingController.addAction(tooldata.selectedTool, tooldata.toolId)"
+                        md-svg-src="{{dataOnBoardingController.addButtonIcon}}">
+                        <md-tooltip md-direction="Bottom">
+                            Add
+                        </md-tooltip>
+                    </md-icon>
+                </div>
+            </div>
+            <div ng-show="dataOnBoardingController.showPaginationBar" class="paginationClass" flex="100" layout="row" layout-align="end">
+                <ul uib-pagination total-items="dataOnBoardingController.totalItems" ng-model="dataOnBoardingController.currentPage" max-size="dataOnBoardingController.maxSize"
+                    class="pagination-sm" boundary-links="true" num-pages="dataOnBoardingController.numPages" items-per-page="dataOnBoardingController.totalRows"
+                    ng-change="dataOnBoardingController.updateResult()" first-text="<<" last-text=">>" next-text=">" previous-text="<"></ul>
+            </div>
+        </div>
+        <div class="noEntityAddedMsg" ng-if = "dataOnBoardingController.noHierarchyMsg" layout layout-align="center center">
+            {{dataOnBoardingController.noHierarchyMsg}}
+        </div>
+    </div>
+</div>

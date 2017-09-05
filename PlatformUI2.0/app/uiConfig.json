@@ -1,0 +1,8 @@
+{
+"serviceHost" : "https://localhost",
+"elasticSearchServiceHost" : "http://localhost:9200",
+"neo4jServiceHost" : "http://localhost:7474",
+"grafanaHost" : "http://localhost:3000"
+
+}
+

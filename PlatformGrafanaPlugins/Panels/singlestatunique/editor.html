@@ -1,0 +1,48 @@
+<div class="editor-row">
+	<div class="section tight-form-container" style="margin-bottom: 20px">
+		<h5 class="section-heading">Font Options</h5>
+		<div class="tight-form">
+			<ul class="tight-form-list">
+				<li class="tight-form-item" style="width: 80px">
+					<strong>Font size</strong>
+				</li>
+
+				<li class="tight-form-item">
+					Value
+				</li>
+				<li>
+				<input type="text" class="input-small tight-form-input" ng-model = "pipelinePanelEditorCtrl.fontsize" ng-blur="pipelinePanelEditorCtrl.setFontSizeValue()"></input>
+				</li>
+				<li class="tight-form-item" style="width: 15.25%;">
+					px
+				</li>
+			</ul>
+			<div class="clearfix"></div>
+		</div>
+		<div class="tight-form">
+			<ul class="tight-form-list">
+				<li class="tight-form-item" style="width: 80px">
+					<strong>Font Color</strong>
+				</li>
+
+				<li class="tight-form-item">
+					Value
+				</li>
+				<li>
+				<input type="text" class="input-medium tight-form-input" ng-model="pipelinePanelEditorCtrl.uniqueSingleStatPanelMetaData.inputProperties.color" ng-blur="pipelinePanelEditorCtrl.render()"></input>
+			</ul>
+			<div class="clearfix"></div>
+		</div>
+	</div>
+	<div class="section gf-form-group" ng-if="pipelinePanelEditorCtrl.neo4jDataStatus">
+		<h5 class="section-heading">Select Field</h5>
+		<div class="gf-form">
+			<label class="gf-form-label width-8">Field</label>
+			<div class="gf-form-select-wrapper width-10">
+				<select class="gf-form-input" style="color:black" ng-model="pipelinePanelEditorCtrl.selectedfield" ng-options="f for f in pipelinePanelEditorCtrl.fieldsStatArray" ng-change="pipelinePanelEditorCtrl.setSelectedField()"></select>
+			</div>
+		</div>
+	</div>
+</div>
+
+

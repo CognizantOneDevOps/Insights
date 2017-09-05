@@ -1,0 +1,60 @@
+<!--
+ *******************************************************************************
+ * Copyright 2017 Cognizant Technology Solutions
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License.  You may obtain a copy
+ * of the License at
+ * 
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ ******************************************************************************
+ -->
+
+<throbber ng-if="!configuredToolsController.showTemplateAfterLoad" layout="column" flex= "100" >
+</throbber>
+<div ng-if="configuredToolsController.showTemplateAfterLoad" layout="column" flex class="contentCss">
+    <div layout class="buttMar">
+        <div layout class="selectToolTxt">Configured Tools: {{configuredToolsController.totalConfiguredTools}}</div>
+        <div layout layout-align="end end" flex style="margin-right: -7px;">
+            <md-button ng-click="configuredToolsController.toToolsConfigurationLandingPage()" class="md-raised md-primary backToTools"
+                style="background-color:#387c2c;margin-left: 2px;">
+                Back to Tools
+            </md-button>
+        </div>
+    </div>
+    <div layout layout-align="center center">
+        <table class="md-api-table-landing" style="border: 1px solid #a5d28b;width:100%">
+            <thead class="theadCss">
+                <tr layout="row" layout-align="start center">
+                    <th flex="20" class="tableHeader">
+                        <span>Functional Block</span>
+                    </th>
+                    <th flex="80" class="tableHeader">
+                        <span>Configured Tools</span>
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr layout="row" layout-align="start none" ng-repeat="category in configuredToolsController.configuredToolsCategoryList">
+                    <td class="funcCss" flex="20"><span>{{configuredToolsController.toolConfigService.getCategoryName(category)}}
+                         <md-tooltip style="font-size:12px; font-family: proxima_novasemibold;"  md-direction="right">
+                            {{configuredToolsController.toolConfigService.getCategoryAbbreviatedName(category)}}
+                        </md-tooltip></span>
+                    </td>
+                    <td class="selTool" flex="80" style="padding-top:18px;">
+                        <md-radio-group ng-model="data.group1" layout="row" layout-wrap>
+                            <md-radio-button flex="15" ng-repeat="(key, value) in configuredToolsController.configuredToolsCount" ng-if='configuredToolsController.getCategory(key) == category'
+                                ng-click='configuredToolsController.openToolUrl(category,key)' ng-value="{{value}}" style="padding-bottom:18px;outline:none;color: rgb(0, 114, 143)">{{configuredToolsController.toolConfigService.getToolName(category,key)}} --> ({{value}})</md-radio-button>
+                        </md-radio-group>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>

@@ -1,0 +1,42 @@
+{
+	"mqConfig" : {
+		"user" : "iSight", 
+		"password" : "iSight", 
+		"host" : "127.0.0.1", 
+		"exchange" : "iSight"
+	},
+	"subscribe" : {
+		"config" : "SCM.GIT.config"
+	},
+	"publish" : {
+		"data" : "SCM.GIT.DATA",
+		"health" : "SCM.GIT.HEALTH"
+	},
+	"communication":{
+		"type" : "REST" 
+	},
+	"responseTemplate" : {
+		"sha": "commitId",
+		"commit" : {
+			"author" : {
+				"name": "authorName",
+				"date": "commitTime"
+			}
+		}
+	},
+	"toolsTimeZone" : "GMT",
+	"insightsTimeZone" : "Asia/Kolkata",
+	"useResponseTemplate" : true,
+	"auth" : "base64",
+	"runSchedule" : 2,
+	"timeStampField":"commitTime",
+	"timeStampFormat":"%Y-%m-%dT%H:%M:%SZ",
+	"StartFrom" : "2016-10-10 15:46:33",
+	"AccessToken": "accesstoken",
+	"GetRepos":"https://api.github.com/users/username/repos",
+	"CommitsBaseEndPoint":"https://api.github.com/repos/reponame/",
+	"isDebugAllowed" : false,
+	"loggingSetting" : {
+		"logLevel" : "WARN"
+	}
+}

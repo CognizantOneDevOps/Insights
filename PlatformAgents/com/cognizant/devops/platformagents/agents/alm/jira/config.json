@@ -1,0 +1,67 @@
+{
+  "mqConfig": {
+    "user": "iSight",
+    "password": "iSight",
+    "host": "127.0.0.1",
+    "exchange": "iSight"
+  },
+  "subscribe": {
+    "config": "ALM.JIRA.config"
+  },
+  "publish": {
+    "data": "ALM.JIRA.DATA",
+    "health": "ALM.JIRA.HEALTH"
+  },
+  "communication": {
+    "type": "REST"
+  },
+  "responseTemplate": {
+    "key": "key",
+    "fields": {
+      "issuetype": {
+        "name": "issueType"
+      },
+      "updated": "lastUpdated",
+      "project": {
+        "name": "projectName"
+      },
+      "creator": {
+        "name": "creator"
+      },
+      "priority": {
+        "name": "priority"
+      },
+      "assignee": {
+        "name": "assignee"
+      },
+      "status": {
+        "name": "status"
+      },      
+      "issuelinks": [
+        {
+          "outwardIssue": {
+            "key": "outwardIssue"
+          }
+        },
+        {
+          "inwardIssue": {
+            "key": "inwardIssue"
+          }
+        }
+      ]
+    }
+  },
+  "runSchedule": 30,
+  "userid": "userid",
+  "passwd": "password",
+  "baseUrl": "https://127.0.0.1/rest/api/2/search",
+  "startFrom": "2016-10-10 00:01",
+  "toolsTimeZone" : "Asia/Kolkata",
+  "insightsTimeZone" : "Asia/Kolkata",
+  "useResponseTemplate" : true,
+  "timeStampField":"lastUpdated",
+  "timeStampFormat":"%Y-%m-%dT%H:%M:%S",
+  "loggingSetting" : {
+		"logLevel" : "WARN"
+	}
+}

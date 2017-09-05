@@ -1,0 +1,104 @@
+/*******************************************************************************
+ * Copyright 2017 Cognizant Technology Solutions
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License.  You may obtain a copy
+ * of the License at
+ * 
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ ******************************************************************************/
+
+.textFormatTools {
+    font-size: 15px;
+    font-weight: 500;
+    color: #7e7e7e;
+}
+.list-padding {
+    padding-bottom: 10px !important;
+    padding-top: 10px !important;
+}
+.list-side-nav {
+    padding: 0px !important;
+}
+.icon-margin {
+    margin-left: 15px;
+}
+.toolbar-alignment {
+    margin-left: 39pc !important;
+}
+.tools-whiteframe-top {
+    background-color: #F2FCE2;
+    border-radius: 10px;
+    margin-left: 28%;
+    margin-top: -90px
+}
+.whiteframe-icon-margin {
+    margin-left: -27px;
+}
+.icon-textDecoration {
+    outline: none;
+    border: 0;
+}
+.whiteframe-form {
+    background-color: #F2FCE2;
+    border-radius: 20px;
+    padding: 20px;
+}
+.container-margin {
+    margin: 9px !important;
+}
+.form-alignment {
+    margin-left: 16px;
+    margin-top: 10px;
+}
+.formTextFormat {
+    color: #a8a8a8;
+    font-size: 12px;
+    font-style: italic;
+    margin-left: 10px;
+    margin-top: -8px;
+    margin-bottom: 11px;
+}
+
+.selectedToolBorder{
+  border: 2px solid #939393;
+  border-radius: 5px;
+}
+
+#textAreaId
+ {
+  font-size: 14px !important; }
+
+.whiteFrameHeight{
+  height:90%;
+  overflow-y:scroll;
+  margin-top: -40px;
+  }
+
+.formHeight{
+  overflow-y:scroll;
+  min-height:35%;
+}
+
+.formMargin{
+  margin-top:10px;
+}
+
+.formTitle{
+  margin-left: -280px;
+    font-size: 16px;
+    color: gray;
+}
+.textTransform{
+  text-transform: initial;
+}
+.anchorText{
+  text-decoration: none;
+    color: white;
+}

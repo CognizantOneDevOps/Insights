@@ -1,0 +1,76 @@
+{
+  "mqConfig": {
+    "user": "iSight",
+    "password": "iSight",
+    "host": "127.0.0.1",
+    "exchange": "iSight"
+  },
+  "subscribe": {
+    "config": "SCM.BITBUCKET.config"
+  },
+  "publish": {
+    "data": "SCM.BITBUCKET.DATA",
+    "health": "SCM.BITBUCKET.HEALTH"
+  },
+  "communication": {
+    "type": "REST"
+  },
+  "responseTemplate": {
+  "hash": "commitId",
+  "author": {
+    "user": {
+      "username": "authorName"
+    }
+  },
+  "date": "commitTime",
+  "message": "commitMessage",
+  "properties": {
+    "jira-key": [
+      "jiraKey"
+    ]
+  }
+}, 
+"userInputBranches" : {
+  "TES": {
+    "OnlineBanking": [
+      "master",
+      "OnlineBankingBranch1"
+    ]
+  },
+  "DD": {
+    "devopsdigitalsolution": [
+      "master",
+      "sonar",
+      "DockerJenkins"
+    ]
+  },
+    "DOC": {
+    "dockerfile-generator": [
+      "master"
+    ]
+  },
+    "DEV": {
+    "PCF": [
+      "ElasticSearch0.5",
+      "ElasticSearch0.4"
+    ],
+    "SCALR" : ["master"]
+  }
+ },
+  "auth": "base64",
+  "runSchedule": 5,
+  "toolsTimeZone" : "Asia/Kolkata",
+  "insightsTimeZone" : "Asia/Kolkata",
+  "StartFrom" : "2016-10-10 15:46:33",
+  "useResponseTemplate" : true,
+  "UserID": "userID",
+  "Passwd": "passwd",
+  "timeStampField":"commitTime",
+  "timeStampFormat": "%Y-%m-%dT%H:%M:%S",
+  "isEpochTimeFormat" : false,
+  "BaseEndPoint": "https://api.bitbucket.org/2.0/repositories/repoid",
+  "isDebugAllowed" : false,
+  "loggingSetting" : {
+  "logLevel" : "WARN"
+}
+}

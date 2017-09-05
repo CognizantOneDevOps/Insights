@@ -1,0 +1,136 @@
+/*******************************************************************************
+ * Copyright 2017 Cognizant Technology Solutions
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License.  You may obtain a copy
+ * of the License at
+ * 
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ ******************************************************************************/
+
+.searchApplicationBoxCont {
+    border: 1px solid #d8d8d8;
+    background-color: white !important;
+    text-align: left !important;
+    height: 40px !important;
+    margin-right: 5px;
+    margin-bottom: 0px;
+    width: 195px;
+     font-family: proxima_novabold !important;
+    font-size: 14px !important;
+    color: #00728f !important;
+    padding-left: 10px;
+}
+.dropdownInTable{
+    margin-right: 0px;
+    height: 32px !important;
+    margin-top: -10px;
+    margin-bottom: -12px;
+
+}
+.onBoardingTableRadioButton{
+        margin-top: 8px;
+}
+
+.saveMsg{
+    font-family: proxima_novaregular !important;
+    font-size: 14px !important;
+    color: #00728f !important;
+    margin-bottom:10px
+}
+.cancelTd{
+    font-family: proxima_novaregular !important;
+    font-size: 13px !important;
+    color: #00728f !important;
+    padding-top: 19px;
+    outline: none;
+    cursor: pointer;
+}
+
+/*.md-select-menu-container {
+    position: fixed;
+    display: block !important;
+    left: 30px !important;
+    top: 310px !important;
+    min-width: 205px !important;
+    font-size: 14px !important;
+    z-index: 90;
+    opacity: 0;
+    -webkit-transform: translateY(-1px);
+    transform: translateY(-1px);
+}*/
+md-select.md-default-theme:not([disabled]):focus .md-select-value, md-select:not([disabled]):focus .md-select-value {
+    border-bottom-color: white;
+    color: rgba(0,0,0,0.87);
+}
+
+.md-select-value > span:not(.md-select-icon) .md-text {
+    color: #00728f !important;
+}
+
+button.md-raised.md-primary.buttCss.md-button.md-ink-ripple{
+    min-width: 49px;
+    font-size: 14px;
+    font-family: proxima_novasemibold;
+    border-radius: 0px;
+    text-transform: initial;
+    color: white;
+    background-color: #00728f;
+    padding-right: 12px;
+    height: 40px;
+    margin-bottom: 2px;
+}
+
+.inputSearchDiv{
+    margin-top: 0px;
+    margin-bottom: -23px;
+    padding: 0px;
+    margin-left: 4px;
+    width: 350px;
+    margin-right: 12px;
+}
+
+.inputSearchBox{
+        border: 1px solid #b7b7b7!important;
+    background-color: white !important;
+    text-align: left !important;
+    height: 36px !important;
+    box-sizing: initial !important;
+    font-family: proxima_novaregular !important;
+    font-size: 14px !important;
+    color: #666666 !important;
+    padding-left: 7px !important;
+}
+
+.appdropDown{
+    left: 30px !important;
+    top: 310px !important;
+    min-width: 205px !important;
+}
+
+.roleDropDown{
+    left: 866px !important;
+    top: 510px !important;
+    min-width: 205px !important;
+}
+
+md-tooltip.md-show {
+    border: 1px solid #aeaeae;
+}
+.md-tooltip {
+    color: #666666 !important;
+    background-color: #efefef !important;
+}
+.md-tooltip {
+    border-radius: 0px;
+}
+.md-panel.md-tooltip.md-default-theme, .md-panel.md-tooltip {
+    color: rgba(255,255,255,0.87);
+    background-color: rgb(97,97,97);
+}
