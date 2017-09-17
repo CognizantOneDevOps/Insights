@@ -12,11 +12,9 @@ echo "1)insights_first
 7)insights_python
 8)insights_rabbitmq
 9)insights_tomcat7
-10)inisghts_war
-11)insights_enginejar
-12)insights_ui
-13)insights_initscripts
-14)insights_all"
+10)insights_enginejar
+11)insights_initscripts
+12)insights_all"
 read input
 for package in ${input[@]}
 do
@@ -38,10 +36,6 @@ case $package in
    "insights_rabbitmq") wget http://platform.cogdevops.com/InSightsV1.0/scripts/insights_rabbitmq.sh -O insights_rabbitmq.sh && sh insights_rabbitmq.sh
    ;;
    "insights_rabbitmq") wget http://platform.cogdevops.com/InSightsV1.0/scripts/insights_tomcat7.sh -O insights_tomcat7.sh && sh insights_tomcat7.sh 
-   ;;
-   "insights_war") wget http://platform.cogdevops.com/InSightsV1.0/scripts/insights_war.sh -O insights_war.sh && sh insights_war.sh
-   ;;
-   "insights_ui") wget http://platform.cogdevops.com/InSightsV1.0/scripts/insights_ui.sh -O insights_ui.sh  && sh insights_ui.sh
    ;;
    "insights_enginejar") wget http://platform.cogdevops.com/InSightsV1.0/scripts/insights_enginejar.sh -O insights_enginejar.sh && sh insights_enginejar.sh
    ;;
