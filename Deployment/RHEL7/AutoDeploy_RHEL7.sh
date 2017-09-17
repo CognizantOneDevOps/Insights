@@ -1,3 +1,6 @@
+# Lets make sure we have wget on the server
+sudo yum install wget -y
+sudo yum install unzip -y
 #sample scripts like sciprt1 , script2 needs to be at same path as orchestartion script
 echo "Enter comma seperated software package names from the below list you want to install on this machine. Please make sure you type in exact name as in list. Please type ALL if you want to setup all at once on a Single Machine"
 echo "1)insights_first
