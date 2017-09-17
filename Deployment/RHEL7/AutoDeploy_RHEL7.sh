@@ -23,7 +23,7 @@ case $package in
    ;;
    "insights_java") wget http://platform.cogdevops.com/InSightsV1.0/scripts/insights_java.sh -O insights_java.sh && sh insights_java.sh
    ;;
-   "insights_es") wget http://platform.cogdevops.com/InSightsV1.0/scripts/insights_es.sh -O insights_rabbitmq.sh  && sh insights_es.sh
+   "insights_es") wget http://platform.cogdevops.com/InSightsV1.0/scripts/insights_es.sh -O insights_es.sh  && sh insights_es.sh
    ;;
    "insights_neo4j") wget http://platform.cogdevops.com/InSightsV1.0/scripts/insights_neo4j.sh -O insights_neo4j.sh && sh insights_neo4j.sh
    ;;
@@ -35,7 +35,7 @@ case $package in
    ;;
    "insights_rabbitmq") wget http://platform.cogdevops.com/InSightsV1.0/scripts/insights_rabbitmq.sh -O insights_rabbitmq.sh && sh insights_rabbitmq.sh
    ;;
-   "insights_rabbitmq") wget http://platform.cogdevops.com/InSightsV1.0/scripts/insights_tomcat7.sh -O insights_tomcat7.sh && sh insights_tomcat7.sh 
+   "insights_tomcat7") wget http://platform.cogdevops.com/InSightsV1.0/scripts/insights_tomcat7.sh -O insights_tomcat7.sh && sh insights_tomcat7.sh 
    ;;
    "insights_enginejar") wget http://platform.cogdevops.com/InSightsV1.0/scripts/insights_enginejar.sh -O insights_enginejar.sh && sh insights_enginejar.sh
    ;;
