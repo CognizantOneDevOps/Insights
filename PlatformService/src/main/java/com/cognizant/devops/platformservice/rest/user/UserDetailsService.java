@@ -317,15 +317,4 @@ public class UserDetailsService {
 		ClientResponse grafanaLoginResponse = RestHandler.doPost(loginApiUrl, loginRequestParams, null);
 		return grafanaLoginResponse.getCookies();
 	}
-
-	public static void main(String[] args) {
-		WebResource resource = Client.create().resource("http://localhost:3000/login");
-		ClientResponse response = resource.accept(javax.ws.rs.core.MediaType.APPLICATION_JSON)
-				.type(javax.ws.rs.core.MediaType.APPLICATION_JSON)
-				.entity("{\"user\":\"vishal.ganjare@cognizant.com\",\"email\":\"\",\"password\":\"vishal\"}")
-				.post(ClientResponse.class);
-		MultivaluedMap<String, String> headers = response.getHeaders();
-		System.out.println(headers);
-		System.out.println(response.getEntity(String.class));
-	}
 }
