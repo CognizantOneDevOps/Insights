@@ -1,5 +1,5 @@
 pushd PlatformUI2.0
-bower install --config.strict-ssl=false --config.proxy="http://proxy.cognizant.com:6050" --config.https-proxy="http://proxy.cognizant.com:6050" --force
+bower install --config.strict-ssl=false --config.proxy= --config.https-proxy= --force
 npm install
 pushd PlatformUI2.0
 grunt
