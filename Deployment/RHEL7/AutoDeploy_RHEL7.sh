@@ -13,8 +13,7 @@ echo "1)insights_first
 8)insights_rabbitmq
 9)insights_tomcat7
 10)insights_enginejar
-11)insights_initscripts
-12)insights_all"
+11)insights_all"
 read input
 for package in ${input[@]}
 do
@@ -39,8 +38,8 @@ case $package in
    ;;
    "insights_enginejar") wget http://platform.cogdevops.com/InSightsV1.0/scripts/insights_enginejar.sh -O insights_enginejar.sh && sh insights_enginejar.sh
    ;;
-   "insights_initscripts") wget http://platform.cogdevops.com/InSightsV1.0/scripts/insights_initscripts.sh -O insights_initscripts.sh && sh insights_initscripts.sh
-   ;;   
+   #"insights_initscripts") wget http://platform.cogdevops.com/InSightsV1.0/scripts/insights_initscripts.sh -O insights_initscripts.sh && sh insights_initscripts.sh
+   #;;   
    "insights_all") wget http://platform.cogdevops.com/InSightsV1.0/scripts/insights_all.sh -O insights_all.sh && sh insights_all.sh
    ;;
    *) echo "$package Not present"
