@@ -87,7 +87,7 @@ module ISightApp {
           this.addEndPoint("ALL_TOOLS_CONFIGURATION_READ",'/PlatformService/admin/toolsConfig/readAll');
 
           this.addEndPoint("ORG_USERS_GET",'/PlatformService/admin/userMgmt/getOrgUsers');
-          this.addEndPoint("USER_ADD",'PlatformService/admin/userMgmt/addUser');
+          this.addEndPoint("USER_ADD",'/PlatformService/admin/userMgmt/addUser');
           this.addEndPoint("ALL_USERS",'/PlatformService/admin/userMgmt/getAllUsers');
           this.addEndPoint("USER_TO_ORG_ADD",'/PlatformService/admin/userMgmt/addUserToOrg');
           this.addEndPoint("ORG_CREATE",'/PlatformService/admin/userMgmt/createOrg');
