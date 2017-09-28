@@ -38,15 +38,18 @@ public class GrafanaUserDetailsUtil {
 			}
 		}
 		String userName = null;
+		String credential = null;
 		//Validate if the Logged in user is same as that of grafana logged in user
 		try {
 			String decodedAuthHeader = new String(Base64.getDecoder().decode(authHeader.split(" ")[1]), "UTF-8");
 			String[] authTokens = decodedAuthHeader.split(":");
 			userName = authTokens[0];
+			credential = authTokens[1];
 			String grafanaUser = cookieMap.get("grafana_user");
 			if(userName.equals(grafanaUser)){
 				grafanaResponseCookies.putAll(cookieMap);
-				if(grafanaResponseCookies.get("grafanaOrg") == null && grafanaResponseCookies.get("grafanaRole") == null){
+				if((grafanaResponseCookies.get("grafanaOrg") == null || grafanaResponseCookies.get("grafanaOrg").isEmpty() )
+						&& (grafanaResponseCookies.get("grafanaRole") == null || grafanaResponseCookies.get("grafanaRole").isEmpty())){
 					Map<String, String> headers = new HashMap<String, String>();
 					StringBuffer grafanaCookie = new StringBuffer();
 					for(Map.Entry<String, String> cookie : grafanaResponseCookies.entrySet()){
@@ -84,7 +87,11 @@ public class GrafanaUserDetailsUtil {
 		}
 		
 		httpRequest.setAttribute("responseHeaders", grafanaResponseCookies);
-		return new User(userName, "", true, true, true, true, mappedAuthorities);
+		if(ApplicationConfigProvider.getInstance().isEnableNativeUsers()) {
+			return new User(userName, credential, true, true, true, true, mappedAuthorities);
+		} else {
+			return new User(userName, "", true, true, true, true, mappedAuthorities);
+		}
 	}
 
 	private static String getCurrentOrgRole(Map<String, String> headers, String grafanaCurrentOrg) {
