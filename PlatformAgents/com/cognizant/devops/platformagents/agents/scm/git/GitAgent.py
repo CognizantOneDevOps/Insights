@@ -21,6 +21,7 @@ Created on Jun 16, 2016
 from dateutil import parser
 import datetime
 from com.cognizant.devops.platformagents.core.BaseAgent import BaseAgent
+import logging.handlers
 
 class GitAgent(BaseAgent):
     def process(self):
@@ -43,12 +44,15 @@ class GitAgent(BaseAgent):
                 since = self.tracking.get(repoName,None)
                 if since != None:
                     getCommitDetailsUrl += '&since='+since
-                commits = self.getResponse(getCommitDetailsUrl, 'GET', None, None, None)
-                i = 0
-                for commit in commits:
-                    if startFrom < commits[i]["commit"]["author"]["date"]:
-                        data += self.parseResponse(responseTemplate, commit, injectData)
-                    i = i + 1
+                try:
+                    commits = self.getResponse(getCommitDetailsUrl, 'GET', None, None, None)
+                    i = 0
+                    for commit in commits:
+                        if startFrom < commits[i]["commit"]["author"]["date"]:
+                            data += self.parseResponse(responseTemplate, commit, injectData)
+                        i = i + 1
+                except Exception as ex:
+                    logging.error(ex)
             if len(commits) > 0:
                 updatetimestamp = commits[0]["commit"]["author"]["date"]
                 dt = parser.parse(updatetimestamp)
