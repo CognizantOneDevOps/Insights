@@ -1,0 +1,731 @@
+{
+  "__inputs": [
+    {
+      "name": "DS_ELATICSEARCH_DS",
+      "label": "ElaticSearch_DS",
+      "description": "",
+      "type": "datasource",
+      "pluginId": "elasticsearch",
+      "pluginName": "Elasticsearch"
+    },
+    {
+      "name": "DS_NEO4J_DS",
+      "label": "Neo4j_DS",
+      "description": "",
+      "type": "datasource",
+      "pluginId": "neo4j",
+      "pluginName": "Neo4j"
+    }
+  ],
+  "__requires": [
+    {
+      "type": "panel",
+      "id": "grafana-singlestat-uniquecount",
+      "name": "SingleStat-unique",
+      "version": "1.0.0"
+    },
+    {
+      "type": "panel",
+      "id": "grafana-singlestat-totalcount",
+      "name": "SingleStat-total",
+      "version": "1.0.0"
+    },
+    {
+      "type": "panel",
+      "id": "insightscharts",
+      "name": "Insights Charts",
+      "version": ""
+    },
+    {
+      "type": "panel",
+      "id": "singlestatneo",
+      "name": "SingleStat-Neo4j",
+      "version": ""
+    },
+    {
+      "type": "panel",
+      "id": "graph",
+      "name": "Graph",
+      "version": ""
+    },
+    {
+      "type": "grafana",
+      "id": "grafana",
+      "name": "Grafana",
+      "version": "4.0.2"
+    },
+    {
+      "type": "datasource",
+      "id": "elasticsearch",
+      "name": "Elasticsearch",
+      "version": "3.0.0"
+    },
+    {
+      "type": "datasource",
+      "id": "neo4j",
+      "name": "Neo4j",
+      "version": "1.0.0"
+    }
+  ],
+  "id": null,
+  "title": "Deployment Dashboard",
+  "tags": [],
+  "style": "dark",
+  "timezone": "browser",
+  "editable": true,
+  "sharedCrosshair": false,
+  "hideControls": false,
+  "time": {
+    "from": "now-1y",
+    "to": "now"
+  },
+  "timepicker": {
+    "refresh_intervals": [
+      "5s",
+      "10s",
+      "30s",
+      "1m",
+      "5m",
+      "15m",
+      "30m",
+      "1h",
+      "2h",
+      "1d"
+    ],
+    "time_options": [
+      "5m",
+      "15m",
+      "1h",
+      "6h",
+      "12h",
+      "24h",
+      "2d",
+      "7d",
+      "30d"
+    ]
+  },
+  "templating": {
+    "list": []
+  },
+  "annotations": {
+    "list": []
+  },
+  "refresh": false,
+  "schemaVersion": 13,
+  "version": 0,
+  "links": [],
+  "gnetId": null,
+  "rows": [
+    {
+      "title": "Row",
+      "panels": [
+        {
+          "aliasColors": {},
+          "cacheTimeout": null,
+          "datasource": "${DS_ELATICSEARCH_DS}",
+          "editable": true,
+          "error": false,
+          "fontSize": "80%",
+          "format": "short",
+          "id": 8,
+          "interval": null,
+          "legend": {
+            "show": true,
+            "values": true
+          },
+          "legendType": "Under graph",
+          "links": [],
+          "maxDataPoints": 3,
+          "nullPointMode": "connected",
+          "pieType": "pie",
+          "span": 1,
+          "strokeWidth": 1,
+          "targets": [
+            {
+              "bucketAggs": [
+                {
+                  "fake": true,
+                  "field": "ProjectID",
+                  "id": "3",
+                  "settings": {
+                    "order": "asc",
+                    "orderBy": "_term",
+                    "size": "10"
+                  },
+                  "type": "terms"
+                },
+                {
+                  "field": "inSightsTimeX",
+                  "id": "2",
+                  "settings": {
+                    "interval": "auto",
+                    "min_doc_count": 0,
+                    "trimEdges": 0
+                  },
+                  "type": "date_histogram"
+                }
+              ],
+              "dsType": "elasticsearch",
+              "metrics": [
+                {
+                  "field": "select field",
+                  "id": "1",
+                  "type": "count"
+                }
+              ],
+              "query": "_type:DEPLOYMENT",
+              "refId": "A",
+              "timeField": "inSightsTimeX"
+            }
+          ],
+          "title": "Deployment Projects",
+          "type": "grafana-singlestat-uniquecount",
+          "valueName": "current"
+        },
+        {
+          "aliasColors": {},
+          "cacheTimeout": null,
+          "datasource": "${DS_ELATICSEARCH_DS}",
+          "editable": true,
+          "error": false,
+          "fontSize": "80%",
+          "format": "short",
+          "id": 9,
+          "interval": null,
+          "legend": {
+            "show": true,
+            "values": true
+          },
+          "legendType": "Under graph",
+          "links": [],
+          "maxDataPoints": 3,
+          "nullPointMode": "connected",
+          "pieType": "pie",
+          "span": 2,
+          "strokeWidth": 1,
+          "targets": [
+            {
+              "bucketAggs": [
+                {
+                  "field": "inSightsTimeX",
+                  "id": "2",
+                  "settings": {
+                    "interval": "auto",
+                    "min_doc_count": 0,
+                    "trimEdges": 0
+                  },
+                  "type": "date_histogram"
+                }
+              ],
+              "dsType": "elasticsearch",
+              "metrics": [
+                {
+                  "field": "select field",
+                  "id": "1",
+                  "type": "count"
+                }
+              ],
+              "query": "_type:DEPLOYMENT",
+              "refId": "A",
+              "timeField": "inSightsTimeX"
+            }
+          ],
+          "title": "Total Deployment Executions",
+          "type": "grafana-singlestat-totalcount",
+          "valueName": "current"
+        },
+        {
+          "aliasColors": {},
+          "cacheTimeout": null,
+          "datasource": "${DS_ELATICSEARCH_DS}",
+          "editable": true,
+          "error": false,
+          "fontSize": "80%",
+          "format": "short",
+          "id": 14,
+          "interval": null,
+          "legend": {
+            "show": true,
+            "values": true
+          },
+          "legendType": "Under graph",
+          "links": [],
+          "maxDataPoints": 3,
+          "nullPointMode": "connected",
+          "span": 2,
+          "strokeWidth": 1,
+          "targets": [
+            {
+              "bucketAggs": [
+                {
+                  "field": "inSightsTimeX",
+                  "id": "2",
+                  "settings": {
+                    "interval": "auto",
+                    "min_doc_count": 0,
+                    "trimEdges": 0
+                  },
+                  "type": "date_histogram"
+                }
+              ],
+              "dsType": "elasticsearch",
+              "metrics": [
+                {
+                  "field": "select field",
+                  "id": "1",
+                  "type": "count"
+                }
+              ],
+              "query": "_type:DEPLOYMENT AND JobStatus:Success",
+              "refId": "A",
+              "timeField": "inSightsTimeX"
+            }
+          ],
+          "title": "Deployment Success",
+          "type": "grafana-singlestat-totalcount",
+          "valueName": "current"
+        },
+        {
+          "aliasColors": {},
+          "cacheTimeout": null,
+          "datasource": "${DS_ELATICSEARCH_DS}",
+          "editable": true,
+          "error": false,
+          "fontSize": "80%",
+          "format": "short",
+          "id": 15,
+          "interval": null,
+          "legend": {
+            "show": true,
+            "values": true
+          },
+          "legendType": "Under graph",
+          "links": [],
+          "maxDataPoints": 3,
+          "nullPointMode": "connected",
+          "span": 1,
+          "strokeWidth": 1,
+          "targets": [
+            {
+              "bucketAggs": [
+                {
+                  "field": "inSightsTimeX",
+                  "id": "2",
+                  "settings": {
+                    "interval": "auto",
+                    "min_doc_count": 0,
+                    "trimEdges": 0
+                  },
+                  "type": "date_histogram"
+                }
+              ],
+              "dsType": "elasticsearch",
+              "metrics": [
+                {
+                  "field": "select field",
+                  "id": "1",
+                  "type": "count"
+                }
+              ],
+              "query": "_type:DEPLOYMENT AND JobStatus:Failed",
+              "refId": "A",
+              "timeField": "inSightsTimeX"
+            }
+          ],
+          "title": "Deployment Failed",
+          "type": "grafana-singlestat-totalcount",
+          "valueName": "current"
+        },
+        {
+          "datasource": "${DS_NEO4J_DS}",
+          "editable": true,
+          "error": false,
+          "id": 17,
+          "insightsPanelData": {
+            "chartOptions": {
+              "backgroundColor": {
+                "fill": "#fbfbfb"
+              },
+              "booleanRole": "certainty",
+              "hAxis": {
+                "maxValue": null,
+                "minValue": null,
+                "useFormatFromData": true,
+                "viewWindow": {
+                  "max": null,
+                  "min": null
+                }
+              },
+              "height": 221,
+              "is3D": true,
+              "legacyScatterChartLabels": true,
+              "legend": "right",
+              "pieHole": 0.5,
+              "slices": {
+                "0": {
+                  "color": "#cc0000"
+                },
+                "1": {
+                  "color": "#6aa84f"
+                }
+              },
+              "theme": "maximized",
+              "title": "",
+              "vAxes": [
+                {
+                  "maxValue": null,
+                  "minValue": null,
+                  "useFormatFromData": true,
+                  "viewWindow": {
+                    "max": null,
+                    "min": null
+                  }
+                },
+                {
+                  "maxValue": null,
+                  "minValue": null,
+                  "useFormatFromData": true,
+                  "viewWindow": {
+                    "max": null,
+                    "min": null
+                  }
+                }
+              ],
+              "width": "100%"
+            },
+            "chartType": "PieChart",
+            "insightsChartEditorModel": {
+              "targets": [
+                {
+                  "columnModel": [
+                    {
+                      "name": "Status",
+                      "type": "string"
+                    },
+                    {
+                      "name": "Count",
+                      "type": "number"
+                    }
+                  ],
+                  "id": "A"
+                }
+              ]
+            }
+          },
+          "links": [],
+          "span": 2,
+          "targets": [
+            {
+              "rawQuery": true,
+              "refId": "A",
+              "target": "match (n:DEPLOYMENT) return DISTINCT n.JobStatus as Status,count(n) as Count"
+            }
+          ],
+          "title": "Success vs Failed",
+          "type": "insightscharts"
+        },
+        {
+          "datasource": "${DS_NEO4J_DS}",
+          "editable": true,
+          "error": false,
+          "id": 18,
+          "links": [],
+          "span": 2,
+          "targets": [
+            {
+              "rawQuery": true,
+              "refId": "A",
+              "target": "match (n:DEPLOYMENT) return ceil(avg(toInt(n.JobDurationX))) as AvgTimeInSecs"
+            }
+          ],
+          "title": "Avg. Time In Secs",
+          "type": "singlestatneo",
+          "uniqueSingleStatPanelMetaData": {
+            "inputProperties": {
+              "color": "blue",
+              "font-size": "30px"
+            },
+            "selectedfield": "AvgTimeInSecs"
+          }
+        },
+        {
+          "datasource": "${DS_NEO4J_DS}",
+          "editable": true,
+          "error": false,
+          "id": 19,
+          "links": [],
+          "span": 2,
+          "targets": [
+            {
+              "rawQuery": true,
+              "refId": "A",
+              "target": "match (n:DEPLOYMENT) return ceil(max(toInt(n.JobDurationX))) as MaxTimeInSecs"
+            }
+          ],
+          "title": "Max. Time In Secs",
+          "type": "singlestatneo",
+          "uniqueSingleStatPanelMetaData": {
+            "inputProperties": {
+              "color": "Red",
+              "font-size": "30px"
+            },
+            "selectedfield": "MaxTimeInSecs"
+          }
+        }
+      ],
+      "showTitle": false,
+      "titleSize": "h6",
+      "height": 253,
+      "repeat": null,
+      "repeatRowId": null,
+      "repeatIteration": null,
+      "collapse": false
+    },
+    {
+      "title": "New row",
+      "panels": [
+        {
+          "aliasColors": {},
+          "bars": false,
+          "datasource": "${DS_ELATICSEARCH_DS}",
+          "editable": true,
+          "error": false,
+          "fill": 1,
+          "grid": {},
+          "height": "300px",
+          "id": 3,
+          "legend": {
+            "alignAsTable": true,
+            "avg": false,
+            "current": false,
+            "max": false,
+            "min": false,
+            "rightSide": true,
+            "show": true,
+            "total": true,
+            "values": true
+          },
+          "lines": true,
+          "linewidth": 2,
+          "links": [],
+          "nullPointMode": "connected",
+          "percentage": false,
+          "pointradius": 5,
+          "points": false,
+          "renderer": "flot",
+          "seriesOverrides": [
+            {
+              "alias": "failed",
+              "color": "#EA6460"
+            },
+            {
+              "alias": "success",
+              "color": "#7EB26D"
+            }
+          ],
+          "span": 12,
+          "stack": false,
+          "steppedLine": false,
+          "targets": [
+            {
+              "bucketAggs": [
+                {
+                  "fake": true,
+                  "field": "JobStatus",
+                  "id": "3",
+                  "settings": {
+                    "order": "asc",
+                    "orderBy": "_term",
+                    "size": "10"
+                  },
+                  "type": "terms"
+                },
+                {
+                  "field": "inSightsTimeX",
+                  "id": "2",
+                  "settings": {
+                    "interval": "1d",
+                    "min_doc_count": 0,
+                    "trimEdges": 0
+                  },
+                  "type": "date_histogram"
+                }
+              ],
+              "dsType": "elasticsearch",
+              "metrics": [
+                {
+                  "field": "select field",
+                  "id": "1",
+                  "type": "count"
+                }
+              ],
+              "query": "_type:DEPLOYMENT",
+              "refId": "A",
+              "timeField": "inSightsTimeX"
+            }
+          ],
+          "thresholds": [],
+          "timeFrom": null,
+          "timeShift": null,
+          "title": "Deployment by Status",
+          "tooltip": {
+            "msResolution": true,
+            "shared": true,
+            "sort": 0,
+            "value_type": "cumulative"
+          },
+          "type": "graph",
+          "xaxis": {
+            "mode": "time",
+            "name": null,
+            "show": true,
+            "values": []
+          },
+          "yaxes": [
+            {
+              "format": "short",
+              "label": null,
+              "logBase": 1,
+              "max": null,
+              "min": null,
+              "show": true
+            },
+            {
+              "format": "short",
+              "label": null,
+              "logBase": 1,
+              "max": null,
+              "min": null,
+              "show": true
+            }
+          ]
+        }
+      ],
+      "showTitle": false,
+      "titleSize": "h6",
+      "height": -346.75,
+      "repeat": null,
+      "repeatRowId": null,
+      "repeatIteration": null,
+      "collapse": false
+    },
+    {
+      "title": "New row",
+      "panels": [
+        {
+          "aliasColors": {},
+          "bars": false,
+          "datasource": "${DS_ELATICSEARCH_DS}",
+          "editable": true,
+          "error": false,
+          "fill": 1,
+          "grid": {},
+          "id": 13,
+          "legend": {
+            "alignAsTable": true,
+            "avg": false,
+            "current": false,
+            "max": false,
+            "min": false,
+            "rightSide": true,
+            "show": true,
+            "total": true,
+            "values": true
+          },
+          "lines": true,
+          "linewidth": 2,
+          "links": [],
+          "nullPointMode": "connected",
+          "percentage": false,
+          "pointradius": 5,
+          "points": false,
+          "renderer": "flot",
+          "seriesOverrides": [],
+          "span": 12,
+          "stack": false,
+          "steppedLine": false,
+          "targets": [
+            {
+              "bucketAggs": [
+                {
+                  "fake": true,
+                  "field": "SprintID",
+                  "id": "3",
+                  "settings": {
+                    "order": "asc",
+                    "orderBy": "_term",
+                    "size": "10"
+                  },
+                  "type": "terms"
+                },
+                {
+                  "field": "inSightsTimeX",
+                  "id": "2",
+                  "settings": {
+                    "interval": "1d",
+                    "min_doc_count": 0,
+                    "trimEdges": 0
+                  },
+                  "type": "date_histogram"
+                }
+              ],
+              "dsType": "elasticsearch",
+              "metrics": [
+                {
+                  "field": "select field",
+                  "id": "1",
+                  "type": "count"
+                }
+              ],
+              "query": "_type:DEPLOYMENT",
+              "refId": "A",
+              "timeField": "inSightsTimeX"
+            }
+          ],
+          "thresholds": [],
+          "timeFrom": null,
+          "timeShift": null,
+          "title": "Deployment by Sprint",
+          "tooltip": {
+            "msResolution": true,
+            "shared": true,
+            "sort": 0,
+            "value_type": "cumulative"
+          },
+          "type": "graph",
+          "xaxis": {
+            "mode": "time",
+            "name": null,
+            "show": true,
+            "values": []
+          },
+          "yaxes": [
+            {
+              "format": "short",
+              "label": null,
+              "logBase": 1,
+              "max": null,
+              "min": null,
+              "show": true
+            },
+            {
+              "format": "short",
+              "label": null,
+              "logBase": 1,
+              "max": null,
+              "min": null,
+              "show": true
+            }
+          ]
+        }
+      ],
+      "showTitle": false,
+      "titleSize": "h6",
+      "height": "250px",
+      "repeat": null,
+      "repeatRowId": null,
+      "repeatIteration": null,
+      "collapse": false
+    }
+  ]
+}
