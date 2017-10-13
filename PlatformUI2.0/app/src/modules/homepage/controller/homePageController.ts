@@ -40,6 +40,17 @@ module ISightApp {
                     } else {
                         self.showAdminTab = false;
                     }
+                    self.$cookies.put('grafanaRole', data.grafanaCurrentOrgRole);
+                    self.$cookies.put('grafanaOrg', data.grafanaCurrentOrg);
+                    self.userName = data.userName.replace(/['"]+/g, '');
+                    self.userRole = data.grafanaCurrentOrgRole;
+                    self.userCurrentOrg = data.grafanaCurrentOrg;
+                    self.authenticationService.getCurrentUserOrgs()
+                    .then(function (orgdata){
+                         self.userCurrentOrgName = orgdata.data.filter(function(i) {
+                            return i.orgId == self.userCurrentOrg;
+                        });
+                    });
                 });
         }
         isValidUser: boolean = false;
@@ -68,6 +79,11 @@ module ISightApp {
         aboutMeContent = {};
         showAdminTab: boolean = false;
         showThrobber: boolean;
+        
+        userName: string = '';
+        userRole: string = '';
+        userCurrentOrg: string = '';
+        userCurrentOrgName: string = '';
 
         public redirect(iconId: string): void {
             if (iconId == 'dashboard') {
