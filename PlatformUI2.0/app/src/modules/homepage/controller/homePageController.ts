@@ -206,7 +206,24 @@ module ISightApp {
             //this.$cookies.remove('grafanaOrg');
             this.authenticationService.logout()
                 .then(function (data) {
+					//this.doGrafanaLogout = true;
+					//this.logOutUrlGrafana = this.restEndpointService.getGrafanaHost()+"/logout";
                     //console.log(data);
+                           	var uniqueString = "grfanaLoginIframe";
+                            var iframe = document.createElement("iframe");
+                            iframe.id = uniqueString;
+                            document.body.appendChild(iframe);
+                            iframe.style.display = "none";
+                            iframe.contentWindow.name = uniqueString;
+                            // construct a form with hidden inputs, targeting the iframe
+                            var form = document.createElement("form");
+                            form.target = uniqueString;
+                            //form.action = "http://localhost:3000/logout";
+                            form.action = self.restEndpointService.getGrafanaHost() + '/logout';
+                            //console.log(form.action);
+                            form.method = "GET";
+							document.body.appendChild(form);
+							form.submit();					
                 });
             var cookieVal = this.$cookies.getAll();
             for (var key in cookieVal) {
