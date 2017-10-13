@@ -275,9 +275,13 @@ public class UserDetailsService {
 			Map<String, String> headers = new HashMap<String, String>();
 			headers.put("Cookie", grafanaCookie.toString());
 			String grafanaCurrentOrg = getGrafanaCurrentOrg(headers);
+			JsonObject response = getGrafanaUserResponse(headers);   
+			String grafanaCurrentOrg = response.get("orgId").toString();
+			String grafanaUserName = response.get("name").toString();
 			String grafanaCurrentOrgRole = getCurrentOrgRole(headers, grafanaCurrentOrg);
 			grafanaOrgRoleDataJsonObj.addProperty("grafanaCurrentOrg", grafanaCurrentOrg);
 			grafanaOrgRoleDataJsonObj.addProperty("grafanaCurrentOrgRole", grafanaCurrentOrgRole);
+			grafanaOrgRoleDataJsonObj.addProperty("userName", grafanaUserName);
 		} catch (Exception e) {
 			log.error("Unable to get the User Role for current org.", e);
 		}
@@ -307,6 +311,15 @@ public class UserDetailsService {
 				.getAsJsonObject();
 		String grafanaCurrentOrg = responseJson.get("orgId").toString();
 		return grafanaCurrentOrg;
+	}
+
+	private JsonObject getGrafanaUserResponse(Map<String, String> headers) {
+		String loginApiUrl = ApplicationConfigProvider.getInstance().getGrafana().getGrafanaEndpoint() + "/api/user";
+		ClientResponse grafanaCurrentOrgResponse = RestHandler.doGet(loginApiUrl, null, headers);
+		JsonObject responseJson = new JsonParser().parse(grafanaCurrentOrgResponse.getEntity(String.class))
+				.getAsJsonObject();
+		return responseJson;
+		
 	}
 
 	private List<NewCookie> getValidGrafanaSession(String userName, String password) {
