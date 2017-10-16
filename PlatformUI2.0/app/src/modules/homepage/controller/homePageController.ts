@@ -40,6 +40,17 @@ module ISightApp {
                     } else {
                         self.showAdminTab = false;
                     }
+                    self.$cookies.put('grafanaRole', data.grafanaCurrentOrgRole);
+                    self.$cookies.put('grafanaOrg', data.grafanaCurrentOrg);
+                    self.userName = data.userName.replace(/['"]+/g, '');
+                    self.userRole = data.grafanaCurrentOrgRole;
+                    self.userCurrentOrg = data.grafanaCurrentOrg;
+                    self.authenticationService.getCurrentUserOrgs()
+                    .then(function (orgdata){
+                         self.userCurrentOrgName = orgdata.data.filter(function(i) {
+                            return i.orgId == self.userCurrentOrg;
+                        });
+                    });
                 });
         }
         isValidUser: boolean = false;
@@ -68,6 +79,11 @@ module ISightApp {
         aboutMeContent = {};
         showAdminTab: boolean = false;
         showThrobber: boolean;
+        
+        userName: string = '';
+        userRole: string = '';
+        userCurrentOrg: string = '';
+        userCurrentOrgName: string = '';
 
         public redirect(iconId: string): void {
             if (iconId == 'dashboard') {
@@ -188,9 +204,27 @@ module ISightApp {
         logout(): void {
             //this.$cookies.remove('Authorization');
             //this.$cookies.remove('grafanaOrg');
+			var self = this;
             this.authenticationService.logout()
                 .then(function (data) {
+					//this.doGrafanaLogout = true;
+					//this.logOutUrlGrafana = this.restEndpointService.getGrafanaHost()+"/logout";
                     //console.log(data);
+                           	var uniqueString = "grfanaLoginIframe";
+                            var iframe = document.createElement("iframe");
+                            iframe.id = uniqueString;
+                            document.body.appendChild(iframe);
+                            iframe.style.display = "none";
+                            iframe.contentWindow.name = uniqueString;
+                            // construct a form with hidden inputs, targeting the iframe
+                            var form = document.createElement("form");
+                            form.target = uniqueString;
+                            //form.action = "http://localhost:3000/logout";
+                            form.action = self.restEndpointService.getGrafanaHost() + '/logout';
+                            //console.log(form.action);
+                            form.method = "GET";
+							document.body.appendChild(form);
+							form.submit();					
                 });
             var cookieVal = this.$cookies.getAll();
             for (var key in cookieVal) {

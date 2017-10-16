@@ -21,7 +21,8 @@ module ISightApp {
       getAuthentication(authToken: string,msg: string): void;
       validateSession(): void;
       logout(): ng.IPromise<any>;
-      getGrafanaCurrentOrgAndRole(): ng.IPromise<any>
+      getGrafanaCurrentOrgAndRole(): ng.IPromise<any>;
+      getCurrentUserOrgs(): ng.IPromise<any>
     }
 
     export class AuthenticationService implements IAuthenticationService {
@@ -63,6 +64,11 @@ module ISightApp {
         getGrafanaCurrentOrgAndRole(): ng.IPromise<any> { 
             var restHandler = this.restCallHandlerService;
             return restHandler.get("GRAPANA_CURRENT_ROLE_ORG");
+        }
+
+        getCurrentUserOrgs(): ng.IPromise<any> {
+            var restHandler = this.restCallHandlerService;
+            return restHandler.get("ACCESS_GROUP_MANAGEMENT_GET_CURRENT_USER_ORGS");
         }
     }
 }

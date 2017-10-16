@@ -1,0 +1,1031 @@
+{
+  "__inputs": [
+    {
+      "name": "DS_NEO4J_DS",
+      "label": "Neo4j_DS",
+      "description": "",
+      "type": "datasource",
+      "pluginId": "neo4j",
+      "pluginName": "Neo4j"
+    }
+  ],
+  "__requires": [
+    {
+      "type": "panel",
+      "id": "singlestatneo",
+      "name": "SingleStat-Neo4j",
+      "version": ""
+    },
+    {
+      "type": "panel",
+      "id": "insightscharts",
+      "name": "Insights Charts",
+      "version": ""
+    },
+    {
+      "type": "grafana",
+      "id": "grafana",
+      "name": "Grafana",
+      "version": "4.0.2"
+    },
+    {
+      "type": "datasource",
+      "id": "neo4j",
+      "name": "Neo4j",
+      "version": "1.0.0"
+    }
+  ],
+  "id": null,
+  "title": "Executive View",
+  "tags": [],
+  "style": "dark",
+  "timezone": "browser",
+  "editable": true,
+  "sharedCrosshair": false,
+  "hideControls": false,
+  "time": {
+    "from": "now-1y",
+    "to": "now"
+  },
+  "timepicker": {
+    "refresh_intervals": [
+      "5s",
+      "10s",
+      "30s",
+      "1m",
+      "5m",
+      "15m",
+      "30m",
+      "1h",
+      "2h",
+      "1d"
+    ],
+    "time_options": [
+      "5m",
+      "15m",
+      "1h",
+      "6h",
+      "12h",
+      "24h",
+      "2d",
+      "7d",
+      "30d"
+    ]
+  },
+  "templating": {
+    "list": [
+      {
+        "allValue": null,
+        "current": {
+          "text": "",
+          "value": ""
+        },
+        "hide": 0,
+        "includeAll": false,
+        "label": null,
+        "multi": true,
+        "name": "SprintId",
+        "options": [
+          {
+            "selected": true,
+            "text": "",
+            "value": ""
+          }
+        ],
+        "query": "",
+        "type": "custom"
+      }
+    ]
+  },
+  "annotations": {
+    "list": []
+  },
+  "refresh": false,
+  "schemaVersion": 13,
+  "version": 10,
+  "links": [],
+  "gnetId": null,
+  "rows": [
+    {
+      "title": "New row",
+      "panels": [
+        {
+          "datasource": "${DS_NEO4J_DS}",
+          "editable": true,
+          "error": false,
+          "id": 12,
+          "links": [],
+          "span": 2,
+          "targets": [
+            {
+              "hide": true,
+              "rawQuery": true,
+              "refId": "A",
+              "target": "match (n:JIRA:DATA) where n.sprintName in $SprintId return distinct n.sprintName as sprint"
+            }
+          ],
+          "title": "SprintID",
+          "type": "singlestatneo",
+          "uniqueSingleStatPanelMetaData": {
+            "inputProperties": {
+              "color": "black",
+              "font-size": "15px"
+            },
+            "selectedfield": "sprint"
+          }
+        },
+        {
+          "datasource": "${DS_NEO4J_DS}",
+          "editable": true,
+          "error": false,
+          "id": 9,
+          "links": [],
+          "span": 1,
+          "targets": [
+            {
+              "rawQuery": true,
+              "refId": "A",
+              "target": "match (n:JIRA:DATA) where n.sprintName in $SprintId return count(n) as Count"
+            }
+          ],
+          "title": "UserStory",
+          "type": "singlestatneo",
+          "uniqueSingleStatPanelMetaData": {
+            "inputProperties": {
+              "color": "GREEN",
+              "font-size": "20px"
+            },
+            "selectedfield": "Count"
+          }
+        },
+        {
+          "datasource": "${DS_NEO4J_DS}",
+          "editable": true,
+          "error": false,
+          "id": 18,
+          "links": [],
+          "span": 1,
+          "targets": [
+            {
+              "rawQuery": true,
+              "refId": "A",
+              "target": "match (a:ALM)<-[r:ALM_UPT_BY_SCM]-(b:SCM) where a.SprintID in $SprintID with count(DISTINCT b.TFSChangeSetID) as Count match (a:DEFECTS)<-[r:DEF_UPT_BY_SCM]-(b:SCM) where a.SprintID in $SprintID return count(DISTINCT b.TFSChangeSetID)+Count as Total"
+            }
+          ],
+          "title": "SCM Commits",
+          "type": "singlestatneo",
+          "uniqueSingleStatPanelMetaData": {
+            "inputProperties": {
+              "color": "black",
+              "font-size": "30px"
+            },
+            "selectedfield": "Total"
+          }
+        },
+        {
+          "datasource": "${DS_NEO4J_DS}",
+          "editable": true,
+          "error": false,
+          "id": 14,
+          "links": [],
+          "span": 2,
+          "targets": [
+            {
+              "bucketAggs": [
+                {
+                  "id": "2",
+                  "settings": {
+                    "interval": "auto"
+                  },
+                  "type": "date_histogram"
+                }
+              ],
+              "dsType": "elasticsearch",
+              "metrics": [
+                {
+                  "id": "1",
+                  "type": "count"
+                }
+              ],
+              "rawQuery": true,
+              "refId": "A",
+              "target": "match (a:ALM)<-[r:ALM_UPT_BY_SCM]-(b:SCM) where a.SprintID in $SprintID with count(b) as Count match (a:ALM)<-[r:ALM_UPT_BY_SCM]-(b:SCM) where a.SprintID in $SprintID return count(b)+Count as Total",
+              "timeField": "inSightsTimeX"
+            }
+          ],
+          "title": "Files Commited",
+          "type": "singlestatneo",
+          "uniqueSingleStatPanelMetaData": {
+            "inputProperties": {
+              "color": "black",
+              "font-size": "30px"
+            },
+            "selectedfield": "Total"
+          }
+        },
+        {
+          "datasource": "${DS_NEO4J_DS}",
+          "editable": true,
+          "error": false,
+          "id": 10,
+          "links": [
+            {
+              "dashUri": "db/ci-dashboard",
+              "dashboard": "CI Dashboard",
+              "title": "CI Dashboard",
+              "type": "dashboard"
+            }
+          ],
+          "span": 2,
+          "targets": [
+            {
+              "rawQuery": true,
+              "refId": "A",
+              "target": "match (n:CI) where n.SprintID in $SprintID return count(n) as Count"
+            }
+          ],
+          "title": "CI Builds",
+          "type": "singlestatneo",
+          "uniqueSingleStatPanelMetaData": {
+            "inputProperties": {
+              "color": "blue",
+              "font-size": "30px"
+            },
+            "selectedfield": "Count"
+          }
+        },
+        {
+          "datasource": "${DS_NEO4J_DS}",
+          "editable": true,
+          "error": false,
+          "id": 11,
+          "links": [],
+          "span": 2,
+          "targets": [
+            {
+              "rawQuery": true,
+              "refId": "A",
+              "target": "match (n:DEPLOYMENT) where n.SprintID in $SprintID return count(n) as Count"
+            }
+          ],
+          "title": "Deployment",
+          "type": "singlestatneo",
+          "uniqueSingleStatPanelMetaData": {
+            "inputProperties": {
+              "color": "blue",
+              "font-size": "30px"
+            },
+            "selectedfield": "Count"
+          }
+        },
+        {
+          "datasource": "${DS_NEO4J_DS}",
+          "editable": true,
+          "error": false,
+          "id": 15,
+          "links": [],
+          "span": 2,
+          "targets": [
+            {
+              "rawQuery": true,
+              "refId": "A",
+              "target": "match (a:ALM)<-[r:ALM_UPT_BY_SCM]-(b:SCM) where a.SprintID in $SprintID return count(DISTINCT b.CommitUserID) as Count"
+            }
+          ],
+          "title": "Developers",
+          "type": "singlestatneo",
+          "uniqueSingleStatPanelMetaData": {
+            "inputProperties": {
+              "color": "black",
+              "font-size": "30px"
+            },
+            "selectedfield": "Count"
+          }
+        }
+      ],
+      "showTitle": false,
+      "titleSize": "h6",
+      "height": 137,
+      "repeat": null,
+      "repeatRowId": null,
+      "repeatIteration": null,
+      "collapse": false
+    },
+    {
+      "title": "New row",
+      "panels": [
+        {
+          "datasource": "${DS_NEO4J_DS}",
+          "editable": true,
+          "error": false,
+          "id": 13,
+          "links": [
+            {
+              "dashUri": "db/defects-dashboard",
+              "dashboard": "Defects Dashboard",
+              "targetBlank": false,
+              "title": "Defects Dashboard",
+              "type": "dashboard"
+            }
+          ],
+          "span": 1,
+          "targets": [
+            {
+              "rawQuery": true,
+              "refId": "A",
+              "target": "match (n:DEFECTS) where n.SprintID in $SprintID return count(n) as Count"
+            }
+          ],
+          "title": "Defects",
+          "type": "singlestatneo",
+          "uniqueSingleStatPanelMetaData": {
+            "inputProperties": {
+              "color": "red",
+              "font-size": "30px"
+            },
+            "selectedfield": "Count"
+          }
+        },
+        {
+          "datasource": "${DS_NEO4J_DS}",
+          "editable": true,
+          "error": false,
+          "id": 24,
+          "insightsPanelData": {
+            "chartOptions": {
+              "backgroundColor": "#fbfbfb",
+              "booleanRole": "certainty",
+              "hAxis": {
+                "maxValue": null,
+                "minValue": null,
+                "useFormatFromData": true,
+                "viewWindow": {
+                  "max": null,
+                  "min": null
+                }
+              },
+              "height": 177,
+              "legacyScatterChartLabels": true,
+              "vAxes": [
+                {
+                  "maxValue": null,
+                  "minValue": null,
+                  "useFormatFromData": true,
+                  "viewWindow": {
+                    "max": null,
+                    "min": null
+                  }
+                },
+                {
+                  "maxValue": null,
+                  "minValue": null,
+                  "useFormatFromData": true,
+                  "viewWindow": {
+                    "max": null,
+                    "min": null
+                  }
+                }
+              ],
+              "width": "100%"
+            },
+            "chartType": "Table",
+            "insightsChartEditorModel": {
+              "targets": [
+                {
+                  "columnModel": [
+                    {
+                      "name": "Type",
+                      "type": "string"
+                    },
+                    {
+                      "name": "Count",
+                      "type": "number"
+                    }
+                  ],
+                  "id": "A"
+                }
+              ]
+            }
+          },
+          "links": [],
+          "span": 3,
+          "targets": [
+            {
+              "rawQuery": true,
+              "refId": "A",
+              "target": "match (n:DEFECTS) where n.SprintID in $SprintID return DISTINCT n.DefectDuring as Type, count(n) as Count order by Count desc"
+            }
+          ],
+          "title": "Defects Type",
+          "type": "insightscharts"
+        },
+        {
+          "datasource": "${DS_NEO4J_DS}",
+          "editable": true,
+          "error": false,
+          "id": 16,
+          "insightsPanelData": {
+            "chartOptions": {
+              "backgroundColor": {
+                "fill": "#fbfbfb"
+              },
+              "booleanRole": "certainty",
+              "domainAxis": {
+                "direction": 1
+              },
+              "hAxis": {
+                "logScale": false,
+                "maxValue": null,
+                "minValue": null,
+                "useFormatFromData": true,
+                "viewWindow": {
+                  "max": null,
+                  "min": null
+                }
+              },
+              "height": 177,
+              "isStacked": false,
+              "legacyScatterChartLabels": true,
+              "legend": "none",
+              "vAxes": [
+                {
+                  "maxValue": null,
+                  "minValue": null,
+                  "useFormatFromData": true,
+                  "viewWindow": null,
+                  "viewWindowMode": null
+                },
+                {
+                  "useFormatFromData": true
+                }
+              ],
+              "width": "100%"
+            },
+            "chartType": "BarChart",
+            "insightsChartEditorModel": {
+              "targets": [
+                {
+                  "columnModel": [
+                    {
+                      "name": "Developer",
+                      "type": "string"
+                    },
+                    {
+                      "name": "Count",
+                      "type": "number"
+                    }
+                  ],
+                  "id": "A"
+                }
+              ]
+            }
+          },
+          "links": [],
+          "span": 5,
+          "targets": [
+            {
+              "rawQuery": true,
+              "refId": "A",
+              "target": "match (a:ALM)<-[r:ALM_UPT_BY_SCM]-(b:SCM) where a.SprintID in $SprintID return DISTINCT b.CommitUserName as Developer, count(DISTINCT b.TFSChangeSetID) as Count order by Count desc limit 5"
+            }
+          ],
+          "title": "Top Commit Users",
+          "type": "insightscharts"
+        },
+        {
+          "datasource": "${DS_NEO4J_DS}",
+          "editable": true,
+          "error": false,
+          "id": 21,
+          "insightsPanelData": {
+            "chartOptions": {
+              "backgroundColor": {
+                "fill": "#fbfbfb"
+              },
+              "booleanRole": "certainty",
+              "hAxis": {
+                "logScale": false,
+                "maxValue": null,
+                "minValue": null,
+                "useFormatFromData": true,
+                "viewWindow": {
+                  "max": null,
+                  "min": null
+                }
+              },
+              "height": 177,
+              "isStacked": true,
+              "legacyScatterChartLabels": true,
+              "legend": "none",
+              "vAxes": [
+                {
+                  "maxValue": null,
+                  "minValue": null,
+                  "useFormatFromData": true,
+                  "viewWindow": null,
+                  "viewWindowMode": null
+                },
+                {
+                  "useFormatFromData": true
+                }
+              ],
+              "width": "100%"
+            },
+            "chartType": "BarChart",
+            "insightsChartEditorModel": {
+              "targets": [
+                {
+                  "columnModel": [
+                    {
+                      "name": "Developer",
+                      "type": "string"
+                    },
+                    {
+                      "name": "Count",
+                      "type": "number"
+                    }
+                  ],
+                  "id": "A"
+                }
+              ]
+            }
+          },
+          "links": [],
+          "span": 3,
+          "targets": [
+            {
+              "rawQuery": true,
+              "refId": "A",
+              "target": "match (a:DEFECTS) where a.SprintID in $SprintID return DISTINCT a.AssignedTo as Developer, count(a.DefectID) as Count order by Count desc limit 5"
+            }
+          ],
+          "title": "Defect Assignees",
+          "type": "insightscharts"
+        }
+      ],
+      "showTitle": false,
+      "titleSize": "h6",
+      "height": 209,
+      "repeat": null,
+      "repeatRowId": null,
+      "repeatIteration": null,
+      "collapse": false
+    },
+    {
+      "title": "New row",
+      "panels": [
+        {
+          "datasource": "${DS_NEO4J_DS}",
+          "editable": true,
+          "error": false,
+          "id": 19,
+          "links": [],
+          "span": 2,
+          "targets": [
+            {
+              "rawQuery": true,
+              "refId": "A",
+              "target": "match (n:CI) where n.SprintID in $SprintID return ceil(avg(toInt(n.JobDurationX))) as AvgTimeInSecs"
+            }
+          ],
+          "title": "Build Avg. Time in Secs",
+          "type": "singlestatneo",
+          "uniqueSingleStatPanelMetaData": {
+            "inputProperties": {
+              "color": "black",
+              "font-size": "30px"
+            },
+            "selectedfield": "AvgTimeInSecs"
+          }
+        },
+        {
+          "datasource": "${DS_NEO4J_DS}",
+          "editable": true,
+          "error": false,
+          "id": 28,
+          "insightsPanelData": {
+            "chartOptions": {
+              "backgroundColor": "#fbfbfb",
+              "booleanRole": "certainty",
+              "greenFrom": 0,
+              "greenTo": 60,
+              "hAxis": {
+                "maxValue": null,
+                "minValue": null,
+                "useFormatFromData": true,
+                "viewWindow": {
+                  "max": null,
+                  "min": null
+                }
+              },
+              "height": 218,
+              "legacyScatterChartLabels": true,
+              "max": 300,
+              "min": 0,
+              "redFrom": 200,
+              "redTo": 300,
+              "vAxes": [
+                {
+                  "maxValue": null,
+                  "minValue": null,
+                  "useFormatFromData": true,
+                  "viewWindow": {
+                    "max": null,
+                    "min": null
+                  }
+                },
+                {
+                  "maxValue": null,
+                  "minValue": null,
+                  "useFormatFromData": true,
+                  "viewWindow": {
+                    "max": null,
+                    "min": null
+                  }
+                }
+              ],
+              "width": "100%",
+              "yellowFrom": 60,
+              "yellowTo": 200
+            },
+            "chartType": "Gauge",
+            "insightsChartEditorModel": {
+              "targets": [
+                {
+                  "columnModel": [
+                    {
+                      "name": "Build",
+                      "type": "number"
+                    }
+                  ],
+                  "id": "A"
+                }
+              ]
+            }
+          },
+          "links": [],
+          "span": 2,
+          "targets": [
+            {
+              "rawQuery": true,
+              "refId": "A",
+              "target": "match (n:CI) where n.SprintID in $SprintID return ceil(max(toInt(n.JobDurationX))) as Build"
+            }
+          ],
+          "title": "Max. Build Time in Secs",
+          "type": "insightscharts"
+        },
+        {
+          "datasource": "${DS_NEO4J_DS}",
+          "editable": true,
+          "error": false,
+          "id": 26,
+          "insightsPanelData": {
+            "chartOptions": {
+              "backgroundColor": {
+                "fill": "#fbfbfb"
+              },
+              "booleanRole": "certainty",
+              "hAxis": {
+                "maxValue": null,
+                "minValue": null,
+                "useFormatFromData": true,
+                "viewWindow": null,
+                "viewWindowMode": null
+              },
+              "height": 218,
+              "isStacked": true,
+              "legacyScatterChartLabels": true,
+              "legend": "right",
+              "series": {
+                "0": {
+                  "color": "#cc0000"
+                },
+                "1": {
+                  "color": "#6aa84f"
+                }
+              },
+              "vAxes": [
+                {
+                  "logScale": false,
+                  "maxValue": null,
+                  "minValue": null,
+                  "useFormatFromData": true,
+                  "viewWindow": {
+                    "max": null,
+                    "min": null
+                  }
+                },
+                {
+                  "logScale": false,
+                  "maxValue": null,
+                  "minValue": null,
+                  "useFormatFromData": true,
+                  "viewWindow": {
+                    "max": null,
+                    "min": null
+                  }
+                }
+              ],
+              "width": "100%"
+            },
+            "chartType": "ColumnChart",
+            "insightsChartEditorModel": {
+              "joinInstructions": "return google.visualization.data.join(dataTables[0], dataTables[1], 'full', [[0, 0]], [1], [1]);",
+              "targets": [
+                {
+                  "columnModel": [
+                    {
+                      "name": "inSightsTimeX",
+                      "type": "date"
+                    },
+                    {
+                      "name": "Failed",
+                      "type": "number"
+                    }
+                  ],
+                  "id": "B"
+                },
+                {
+                  "columnModel": [
+                    {
+                      "name": "inSightsTimeX",
+                      "type": "date"
+                    },
+                    {
+                      "name": "Success",
+                      "type": "number"
+                    }
+                  ],
+                  "id": "C"
+                }
+              ],
+              "transformInstrctions": "var formatter3 = new google.visualization.DateFormat({ pattern: \"dd-MMM-yy\" });\nvar testFunction = function (val) {\n        return new Date(formatter3.formatValue(val));\n};\nvar result = google.visualization.data.group(data,\n        [{ column: 0, modifier: testFunction, type: 'date' }],\n        [{ 'column': 1, 'aggregation': google.visualization.data.sum, 'type': 'number' },\n        { 'column': 2, 'aggregation': google.visualization.data.sum, 'type': 'number' }]);\nreturn result;"
+            }
+          },
+          "links": [],
+          "span": 8,
+          "targets": [
+            {
+              "rawQuery": true,
+              "refId": "B",
+              "target": "match (n:CI) where n.JobStatus='Failed' AND n.SprintID in $SprintID return n.inSightsTimeX as inSightsTimeX, count(n) as Failed order by inSightsTimeX"
+            },
+            {
+              "rawQuery": true,
+              "refId": "C",
+              "target": "match (n:CI) where n.JobStatus='Success' AND n.SprintID in $SprintID return n.inSightsTimeX as inSightsTimeX, count(n) as Success order by inSightsTimeX"
+            }
+          ],
+          "title": "CI Build Trend by Status",
+          "type": "insightscharts"
+        }
+      ],
+      "showTitle": false,
+      "titleSize": "h6",
+      "height": "250px",
+      "repeat": null,
+      "repeatRowId": null,
+      "repeatIteration": null,
+      "collapse": false
+    },
+    {
+      "title": "New row",
+      "panels": [
+        {
+          "datasource": "${DS_NEO4J_DS}",
+          "editable": true,
+          "error": false,
+          "id": 22,
+          "links": [],
+          "span": 2,
+          "targets": [
+            {
+              "bucketAggs": [
+                {
+                  "id": "2",
+                  "settings": {
+                    "interval": "auto"
+                  },
+                  "type": "date_histogram"
+                }
+              ],
+              "dsType": "elasticsearch",
+              "metrics": [
+                {
+                  "id": "1",
+                  "type": "count"
+                }
+              ],
+              "rawQuery": true,
+              "refId": "A",
+              "target": "match (n:DEPLOYMENT) where n.SprintID in $SprintID return ceil(avg(toInt(n.JobDurationX))) as AvgTimeInSecs",
+              "timeField": "inSightsTimeX"
+            }
+          ],
+          "title": "Deploy Avg. Time in Secs",
+          "type": "singlestatneo",
+          "uniqueSingleStatPanelMetaData": {
+            "inputProperties": {
+              "color": "black",
+              "font-size": "30px"
+            },
+            "selectedfield": "AvgTimeInSecs"
+          }
+        },
+        {
+          "datasource": "${DS_NEO4J_DS}",
+          "editable": true,
+          "error": false,
+          "id": 29,
+          "insightsPanelData": {
+            "chartOptions": {
+              "backgroundColor": "#fbfbfb",
+              "booleanRole": "certainty",
+              "greenFrom": 0,
+              "greenTo": 60,
+              "hAxis": {
+                "maxValue": null,
+                "minValue": null,
+                "useFormatFromData": true,
+                "viewWindow": {
+                  "max": null,
+                  "min": null
+                }
+              },
+              "height": 218,
+              "legacyScatterChartLabels": true,
+              "max": 300,
+              "min": 0,
+              "redFrom": 200,
+              "redTo": 300,
+              "vAxes": [
+                {
+                  "maxValue": null,
+                  "minValue": null,
+                  "useFormatFromData": true,
+                  "viewWindow": {
+                    "max": null,
+                    "min": null
+                  }
+                },
+                {
+                  "maxValue": null,
+                  "minValue": null,
+                  "useFormatFromData": true,
+                  "viewWindow": {
+                    "max": null,
+                    "min": null
+                  }
+                }
+              ],
+              "width": "100%",
+              "yellowFrom": 60,
+              "yellowTo": 200
+            },
+            "chartType": "Gauge",
+            "insightsChartEditorModel": {
+              "targets": [
+                {
+                  "columnModel": [
+                    {
+                      "name": "Deploy",
+                      "type": "number"
+                    }
+                  ],
+                  "id": "A"
+                }
+              ]
+            }
+          },
+          "links": [],
+          "span": 2,
+          "targets": [
+            {
+              "rawQuery": true,
+              "refId": "A",
+              "target": "match (n:DEPLOYMENT) where n.SprintID in $SprintID return ceil(max(toInt(n.JobDurationX))) as Deploy"
+            }
+          ],
+          "title": "Max. Deploy Time in Secs",
+          "type": "insightscharts"
+        },
+        {
+          "datasource": "${DS_NEO4J_DS}",
+          "editable": true,
+          "error": false,
+          "id": 27,
+          "insightsPanelData": {
+            "chartOptions": {
+              "backgroundColor": {
+                "fill": "#fbfbfb"
+              },
+              "booleanRole": "certainty",
+              "domainAxis": {
+                "direction": 1
+              },
+              "hAxis": {
+                "maxValue": null,
+                "minValue": null,
+                "useFormatFromData": true,
+                "viewWindow": null,
+                "viewWindowMode": null
+              },
+              "height": 218,
+              "isStacked": true,
+              "legacyScatterChartLabels": true,
+              "legend": "right",
+              "series": {
+                "0": {
+                  "color": "#cc0000"
+                },
+                "1": {
+                  "color": "#6aa84f"
+                }
+              },
+              "vAxes": [
+                {
+                  "logScale": false,
+                  "maxValue": null,
+                  "minValue": null,
+                  "useFormatFromData": true,
+                  "viewWindow": {
+                    "max": null,
+                    "min": null
+                  }
+                },
+                {
+                  "logScale": false,
+                  "maxValue": null,
+                  "minValue": null,
+                  "useFormatFromData": true,
+                  "viewWindow": {
+                    "max": null,
+                    "min": null
+                  }
+                }
+              ],
+              "width": "100%"
+            },
+            "chartType": "ColumnChart",
+            "insightsChartEditorModel": {
+              "joinInstructions": "return google.visualization.data.join(dataTables[0], dataTables[1], 'full', [[0, 0]], [1], [1]);",
+              "targets": [
+                {
+                  "columnModel": [
+                    {
+                      "name": "inSightsTimeX",
+                      "type": "date"
+                    },
+                    {
+                      "name": "Failed",
+                      "type": "number"
+                    }
+                  ],
+                  "id": "A"
+                },
+                {
+                  "columnModel": [
+                    {
+                      "name": "inSightsTimeX",
+                      "type": "date"
+                    },
+                    {
+                      "name": "Success",
+                      "type": "number"
+                    }
+                  ],
+                  "id": "B"
+                }
+              ],
+              "transformInstrctions": "var formatter3 = new google.visualization.DateFormat({ pattern: \"dd-MMM-yy\" });\nvar testFunction = function (val) {\n        return new Date(formatter3.formatValue(val));\n};\nvar result = google.visualization.data.group(data,\n        [{ column: 0, modifier: testFunction, type: 'date' }],\n        [{ 'column': 1, 'aggregation': google.visualization.data.sum, 'type': 'number' },\n        { 'column': 2, 'aggregation': google.visualization.data.sum, 'type': 'number' }]);\nreturn result;"
+            }
+          },
+          "links": [],
+          "span": 8,
+          "targets": [
+            {
+              "rawQuery": true,
+              "refId": "A",
+              "target": "match (n:DEPLOYMENT) where n.JobStatus='Failed' AND n.SprintID in $SprintID return n.inSightsTimeX as inSightsTimeX, count(n) as Failed order by inSightsTimeX"
+            },
+            {
+              "rawQuery": true,
+              "refId": "B",
+              "target": "match (n:DEPLOYMENT) where n.JobStatus='Success' AND n.SprintID in $SprintID return n.inSightsTimeX as inSightsTimeX, count(n) as Success order by inSightsTimeX"
+            }
+          ],
+          "title": "Deployment Trend by Status",
+          "type": "insightscharts"
+        }
+      ],
+      "showTitle": false,
+      "titleSize": "h6",
+      "height": "250px",
+      "repeat": null,
+      "repeatRowId": null,
+      "repeatIteration": null,
+      "collapse": false
+    }
+  ]
+}
