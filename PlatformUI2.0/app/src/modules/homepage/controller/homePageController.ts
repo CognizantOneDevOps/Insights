@@ -204,6 +204,7 @@ module ISightApp {
         logout(): void {
             //this.$cookies.remove('Authorization');
             //this.$cookies.remove('grafanaOrg');
+			var self = this;
             this.authenticationService.logout()
                 .then(function (data) {
 					//this.doGrafanaLogout = true;
