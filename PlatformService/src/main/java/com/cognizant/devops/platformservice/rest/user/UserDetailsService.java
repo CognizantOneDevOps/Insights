@@ -274,7 +274,7 @@ public class UserDetailsService {
 			}
 			Map<String, String> headers = new HashMap<String, String>();
 			headers.put("Cookie", grafanaCookie.toString());
-			String grafanaCurrentOrg = getGrafanaCurrentOrg(headers);
+			//String grafanaCurrentOrg = getGrafanaCurrentOrg(headers);
 			JsonObject response = getGrafanaUserResponse(headers);   
 			String grafanaCurrentOrg = response.get("orgId").toString();
 			String grafanaUserName = response.get("name").toString();
