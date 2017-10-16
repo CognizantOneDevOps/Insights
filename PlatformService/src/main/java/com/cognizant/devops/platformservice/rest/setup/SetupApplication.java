@@ -110,4 +110,11 @@ public class SetupApplication {
 		}*/
 		return jsonObj;
 	}
+	
+	@RequestMapping(value = "/grafanaEndPoint", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+	public @ResponseBody String grafanaEndPoint(){
+		ApplicationConfigProvider applicationConfig = ApplicationConfigProvider.getInstance();
+		return applicationConfig.getGrafana().getGrafanaEndpoint();
+	}
+	
 }
