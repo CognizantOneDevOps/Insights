@@ -26,6 +26,106 @@
     cursor:pointer;
 }
 
+ul, li {
+    list-style:none;
+    padding:0;
+    margin:0;
+}
+a {text-decoration:none;}
+
+.profile-wrapper {
+    width:200px;
+    position:relative;
+    margin:20px auto;
+}
+.profile-wrapper::after {
+    content: '';
+    position: absolute;
+    top: 20px;
+    right: 10px;
+    border-color: #666 transparent transparent;
+    border-width: 6px;
+    border-style: solid;
+}
+.profile-wrapper::before {
+    content: '';
+    position: absolute;
+    top: 20px;
+    right: 10px;
+    border-color: #333 transparent transparent;
+    border-width: 6px;
+    border-style: solid;
+}
+.profile-wrapper:hover::after {
+    border-color: #111 transparent transparent; 
+}
+
+.profile {
+    padding:10px;
+    
+       background:#efefef;
+}
+.profile:hover {
+    cursor:pointer;
+    background:#eee;
+}
+.profile .name {
+    font-size:14px;
+    font-family:proxima_novasemibold !important;
+    color:#666;
+    line-height:26px;
+    margin-left:10px;
+}
+.profile .name:hover {
+    color:#0088cc;
+}
+.profile img {
+    width:25px;
+    display:inline;
+    float:left;
+    border:1px solid #111;
+    border-radius:3px;
+    box-shadow:0 0 3px rgba(0, 0, 0, 0.5) inset;
+}
+
+/* hide menu */
+.menu {
+    display:none;
+    clear:both;
+    margin:20px 0 0 0;
+    width:100%;
+    position:absolute;
+    margin:0px;
+    z-index:100;
+    left:0px;top:45px;
+    box-shadow:0px 2px 4px -1px rgba(0, 0, 0, 0.2), 0px 4px 5px 0px rgba(0, 0, 0, 0.14), 0px 1px 10px 0px rgba(0, 0, 0, 0.12);
+    background-color:#ffffff;
+}
+.menu li {
+    font-size:14px;
+    font-family:proxima_novasemibold !important;
+    color:#666;
+    margin:0;
+  padding: 10px 4px;
+}
+.menu li a {
+    color:#555;
+}
+.menu li:hover > a{
+    color:#333;
+}
+
+.menu li:hover{
+    
+  background:#e3e3e3;
+}
+
+/* hover profile show menu */
+.profile:hover .menu {
+    display:block;
+}
+
+
 .md-tooltip {
         color: white !important;
 }

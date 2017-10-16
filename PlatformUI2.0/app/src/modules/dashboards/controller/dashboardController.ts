@@ -127,11 +127,21 @@ module ISightApp {
                 .then(function (data) {
                     if (data.grafanaCurrentOrgRole === 'Admin') {
                         self.homeController.showAdminTab = true;
-                        self.$cookies.put('grafanaRole', data.grafanaCurrentOrgRole);
-                        self.$cookies.put('grafanaOrg', data.grafanaCurrentOrg);
+                       
                     } else {
                         self.homeController.showAdminTab = false;
                     }
+                    self.$cookies.put('grafanaRole', data.grafanaCurrentOrgRole);
+                    self.$cookies.put('grafanaOrg', data.grafanaCurrentOrg);
+                    self.homeController.userName = data.userName.replace(/['"]+/g, '');
+                    self.homeController.userRole = data.grafanaCurrentOrgRole;
+                    self.homeController.userCurrentOrg = data.grafanaCurrentOrg;
+                    self.authenticationService.getCurrentUserOrgs()
+                    .then(function (orgdata){
+                         self.homeController.userCurrentOrgName = orgdata.data.filter(function(i) {
+                            return i.orgId == self.homeController.userCurrentOrg;
+                        });
+                    });
                 });
             self.defaultOrg = orgId;
             self.checkStyle(orgId);
