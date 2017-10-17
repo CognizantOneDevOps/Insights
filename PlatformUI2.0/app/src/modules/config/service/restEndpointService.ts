@@ -80,9 +80,27 @@ module ISightApp {
 		}
 
 		public getGrafanaHost(): String {
+			var self = this;
 			if (!this.grafanaHost) {
-				this.grafanaHost = this.$location.protocol() + "://" + this.$location.host() + ":3000";
-			}
+				var authToken = this.$cookies.get('Authorization');
+	            var defaultHeader = {
+	                                    'Authorization': authToken
+	                                };
+	           
+	            var restcallUrl = self.getServiceHost() + "/PlatformService/configure/grafanaEndPoint"
+	            var resource = this.$resource(restcallUrl,
+	                {},
+	                {
+	                    allData: {
+	                        method: 'GET',
+	                        headers: defaultHeader
+	                    }
+	                });
+	            resource.allData().$promise.then(function(response){
+                  self.grafanaHost = response;
+	            });
+            }
+
 			return this.grafanaHost;
 		}
 	}
