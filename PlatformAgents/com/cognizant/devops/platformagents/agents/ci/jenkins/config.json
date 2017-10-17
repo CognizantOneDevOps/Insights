@@ -63,6 +63,10 @@
 "useAllBuildsApi" : false,
 "runSchedule": 30,
 "BaseUrl": "http://127.0.0.1:8080/",
+"jenkinsMasters" : {
+  	"master1" : "http://127.0.0.1:8080/",
+  	"master2" : "http://127.0.0.1:8080/"
+  },
 "timeStampField":"buildTimestamp",
 "timeStampFormat":"epoch",
 "isEpochTimeFormat" : true,
