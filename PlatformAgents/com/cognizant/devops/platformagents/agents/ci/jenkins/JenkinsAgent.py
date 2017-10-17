@@ -40,7 +40,14 @@ class JenkinsAgent(BaseAgent):
         if self.useAllBuildsApi:
             self.buildAttrName = "allBuilds"
         self.data = []
-        self.processFolder(self.BaseUrl)
+        jenkinsMasters = self.config.get("jenkinsMasters", None)
+        if jenkinsMasters:
+            for jenkinsMaster in jenkinsMasters:
+                self.currentJenkinsMaster = jenkinsMaster
+                self.processFolder(jenkinsMasters[jenkinsMaster])
+        else:
+            self.currentJenkinsMaster = 'master'
+            self.processFolder(self.BaseUrl)
         #self.publishToolsData(self.data)
         self.updateTrackingJson(self.tracking)
 
@@ -69,12 +76,12 @@ class JenkinsAgent(BaseAgent):
 
     def getJobDetails(self, url, lastBuild):
         tillJobCount = 0
-        startindex = 0
         buildsIdentified = False
         nextBatch = 0
         injectData = self.getJobLevelConfig(url)
         if injectData['disabled'] == 'true':
             return;
+        injectData['master'] = self.currentJenkinsMaster
         if self.tracking.get(url,None):
             trackingNum = self.tracking.get(url,None)
             tillJobCount = lastBuild - trackingNum
@@ -123,7 +130,11 @@ class JenkinsAgent(BaseAgent):
                     buildDetails = self.parseResponse(self.responseTemplate, completedBuilds, injectData)
                     self.publishToolsData(buildDetails)
                     if not trackingUpdated:
-                        self.tracking[url] = completedBuilds[0]["number"]
+                        currentMasterTracking = self.tracking.get(self.currentJenkinsMaster, None)
+                        if currentMasterTracking is None:
+                            currentMasterTracking = {}
+                            self.tracking[self.currentJenkinsMaster] = currentMasterTracking
+                        currentMasterTracking[url] = completedBuilds[0]["number"]
                         self.updateTrackingJson(self.tracking)
                         trackingUpdated = True
                 start = start + 100
