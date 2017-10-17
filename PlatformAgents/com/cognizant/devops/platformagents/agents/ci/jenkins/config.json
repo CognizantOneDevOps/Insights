@@ -60,6 +60,7 @@
 },
 "toolsTimeZone" : "Asia/Kolkata",
 "useResponseTemplate" : true,
+"useAllBuildsApi" : false,
 "runSchedule": 30,
 "BaseUrl": "http://127.0.0.1:8080/",
 "timeStampField":"buildTimestamp",

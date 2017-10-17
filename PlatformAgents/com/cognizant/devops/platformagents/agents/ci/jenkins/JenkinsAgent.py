@@ -35,6 +35,10 @@ class JenkinsAgent(BaseAgent):
         startFrom = mktime(startFrom.timetuple()) + startFrom.microsecond/1000000.0
         self.startFrom = long(startFrom * 1000)
         self.responseTemplate = self.getResponseTemplate()
+        self.useAllBuildsApi = self.config.get("useAllBuildsApi", False)
+        self.buildAttrName = "builds"
+        if self.useAllBuildsApi:
+            self.buildAttrName = "allBuilds"
         self.data = []
         self.processFolder(self.BaseUrl)
         #self.publishToolsData(self.data)
@@ -76,9 +80,12 @@ class JenkinsAgent(BaseAgent):
             tillJobCount = lastBuild - trackingNum
         else:
             while not buildsIdentified:
-                restUrl = url+'api/json?tree=allBuilds[number,timestamp,duration]{'+str(nextBatch)+','+str(nextBatch+100)+'},name'
+                if self.useAllBuildsApi:
+                    restUrl = url+'api/json?tree=allBuilds[number,timestamp,duration]{'+str(nextBatch)+','+str(nextBatch+100)+'},name'
+                else:
+                    restUrl = url+'api/json?tree=builds[number,timestamp,duration]{'+str(nextBatch)+','+str(nextBatch+100)+'},name'
                 jobDetails = self.getResponse(restUrl, 'GET', self.userid, self.passwd, None)
-                builds = jobDetails["allBuilds"]
+                builds = jobDetails[self.buildAttrName]
                 for build in builds:
                     if self.startFrom < build["timestamp"]:
                         tillJobCount+=1
@@ -99,10 +106,13 @@ class JenkinsAgent(BaseAgent):
                 end = end + 100
                 if end > tillJobCount:
                     end = tillJobCount + 1
-                restUrl = url+'api/json?tree=allBuilds[number,actions[causes[shortDescription],remoteUrls[scmUrl],url],changeSet[items[commitId,date],kind],duration,id,result,timestamp,url,name]{'+str(start)+','+str(end)+'},name'
+                if self.useAllBuildsApi:
+                    restUrl = url+'api/json?tree=allBuilds[number,actions[causes[shortDescription],remoteUrls[scmUrl],url],changeSet[items[commitId,date],kind],duration,id,result,timestamp,url,name,nextBuild]{'+str(start)+','+str(end)+'},name'
+                else:
+                    restUrl = url+'api/json?tree=builds[number,actions[causes[shortDescription],remoteUrls[scmUrl],url],changeSet[items[commitId,date],kind],duration,id,result,timestamp,url,name,nextBuild]{'+str(start)+','+str(end)+'},name'
                 jobDetails = self.getResponse(restUrl, 'GET', self.userid, self.passwd, None)
                 injectData['jobName'] = jobDetails["name"]
-                builds = jobDetails["allBuilds"]
+                builds = jobDetails[self.buildAttrName]
                 #add filter logic
                 startIndex = 0
                 for build in builds:
@@ -119,15 +129,21 @@ class JenkinsAgent(BaseAgent):
                 start = start + 100
 
     def getJobLevelConfig(self,url):
+        jobDetails = self.config.get('jobDetails',{});
+        injectData = {
+            'disabled' : 'false'
+        }
+        if len(jobDetails) == 0:
+            return injectData
         configXmlUrl = url+"config.xml"
         auth = HTTPBasicAuth(self.userid, self.passwd)
         xmlResponse = requests.get(configXmlUrl, auth=auth)
         root = ET.fromstring(xmlResponse.text.encode('UTF-8').strip())
         rootTag = root.tag
         rootTagLen = len(rootTag) + 1
-        jobDetails = self.config.get('jobDetails',{});
-        injectData = {}
-        injectData['disabled'] = root.find('disabled').text
+        disabledNode = root.find('disabled')
+        if disabledNode:
+            injectData['disabled'] = disabledNode.text
         if injectData['disabled'] == 'true':
             return injectData
         for key in jobDetails:
