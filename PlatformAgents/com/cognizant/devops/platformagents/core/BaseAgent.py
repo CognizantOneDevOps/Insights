@@ -203,7 +203,7 @@ class BaseAgent(object):
     def generateHealthData(self, ex=None, systemFailure=False):
         data = []
         currentTime = self.getRemoteDateTime(datetime.now())
-        health = { 'inSightsTimeX' : currentTime['time'], 'inSightsTime' : currentTime['epochTime']}
+        health = { 'inSightsTimeX' : currentTime['time'], 'inSightsTime' : currentTime['epochTime'], 'executionTime' : self.executionTime}
         if systemFailure:
             health['status'] = 'failure'
             health['message'] = 'Agent is shutting down'
@@ -246,7 +246,9 @@ class BaseAgent(object):
         try:
             self.logIndicator(self.EXECUTION_START, self.config.get('isDebugAllowed', False))
             self.executionId = str(uuid.uuid1())
+            startTime = datetime.now()
             self.process()
+            self.executionTime = int((datetime.now() - startTime).total_seconds() * 1000)
             self.publishHealthData(self.generateHealthData())
         except Exception as ex:
             self.publishHealthData(self.generateHealthData(ex=ex))
