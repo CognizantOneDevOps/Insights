@@ -28,7 +28,7 @@ class JiraAgent(BaseAgent):
         baseUrl = self.config.get("baseUrl", '')
         startFrom = self.config.get("startFrom", '')
         lastUpdated = self.tracking.get("lastupdated", startFrom)
-        jiraIssuesUrl = baseUrl+"?jql=updated>='"+lastUpdated+"' ORDER BY updated ASC&maxResults=1000"
+        jiraIssuesUrl = baseUrl+"?jql=updated>='"+lastUpdated+"' ORDER BY updated ASC&maxResults="+str(self.config.get("dataFetchCount", 1000))
         responseTemplate = self.getResponseTemplate()
         total = 1
         maxResults = 0
