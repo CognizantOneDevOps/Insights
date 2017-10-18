@@ -16,6 +16,7 @@
 package com.cognizant.devops.platformservice.rest.AccessGroupManagement;
 
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
@@ -28,6 +29,10 @@ import javax.ws.rs.core.NewCookie;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -37,6 +42,9 @@ import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.config.GrafanaData;
 import com.cognizant.devops.platformcommons.dal.rest.RestHandler;
 import com.cognizant.devops.platformservice.rest.util.PlatformServiceUtil;
+import com.cognizant.devops.platformservice.security.config.SpringAuthority;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.sun.jersey.api.client.ClientResponse;
@@ -62,7 +70,25 @@ public class AccessGroupManagement {
 	@RequestMapping(value = "/switchUserOrg", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 	public JsonObject switchUserOrg(@RequestParam int orgId){
 		Map<String, String> headers = new HashMap<String, String>();
-		headers.put("Cookie", getUserCookies());
+		String grafanaCookie = getUserCookies();
+		headers.put("Cookie", grafanaCookie);
+		
+		//Since Access group has changed, need to check and update user role to new Access group
+		//Update cookies and SpringAuthorities accordingly
+		Map<String, String> grafanaResponseCookies = new HashMap<String, String>();
+		String grafanaCurrentOrg = getGrafanaCurrentOrg(headers);
+		grafanaResponseCookies.put("grafanaOrg", grafanaCurrentOrg);
+		String grafanaCurrentOrgRole = getCurrentOrgRole(headers, grafanaCurrentOrg);
+		grafanaResponseCookies.put("grafanaRole", grafanaCurrentOrgRole);
+		
+		httpRequest.setAttribute("responseHeaders", grafanaResponseCookies);
+		
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		List<GrantedAuthority> updatedAuthorities = new ArrayList<>(auth.getAuthorities());
+		updatedAuthorities.add(SpringAuthority.valueOf(grafanaCurrentOrgRole)); 
+		Authentication newAuth = new UsernamePasswordAuthenticationToken(auth.getPrincipal(), auth.getCredentials(), updatedAuthorities);
+		SecurityContextHolder.getContext().setAuthentication(newAuth);
+		
 		String apiUrl = ApplicationConfigProvider.getInstance().getGrafana().getGrafanaEndpoint()+"/api/user/using/"+orgId;
 		ClientResponse response = RestHandler.doPost(apiUrl, null, headers);
 		return PlatformServiceUtil.buildSuccessResponseWithData(new JsonParser().parse(response.getEntity(String.class)));
@@ -71,7 +97,11 @@ public class AccessGroupManagement {
 	@RequestMapping(value = "/getCurrentUserOrgs", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 	public JsonObject getCurrentUserOrgs(){
 		Map<String, String> headers = new HashMap<String, String>();
-		headers.put("Cookie", getUserCookies());
+		String cookies = getUserCookies();
+		headers.put("Cookie", cookies);
+		
+		log.debug("Inside getCurrentUserOrgs() - Cookies -- "+cookies);
+		
 		String apiUrl = ApplicationConfigProvider.getInstance().getGrafana().getGrafanaEndpoint()+"/api/user/orgs";
 		ClientResponse response = RestHandler.doGet(apiUrl, null, headers);
 		return PlatformServiceUtil.buildSuccessResponseWithData(new JsonParser().parse(response.getEntity(String.class)));
@@ -131,6 +161,28 @@ public class AccessGroupManagement {
 		}
 		
 		return grafanaCookie.toString();
+	}
+
+	private String getCurrentOrgRole(Map<String, String> headers, String grafanaCurrentOrg) {
+		String userOrgsApiUrl = ApplicationConfigProvider.getInstance().getGrafana().getGrafanaEndpoint()+"/api/user/orgs";
+		ClientResponse grafanaCurrentOrgResponse = RestHandler.doGet(userOrgsApiUrl, null, headers);
+		JsonArray grafanaOrgs = new JsonParser().parse(grafanaCurrentOrgResponse.getEntity(String.class)).getAsJsonArray();
+		String grafanaCurrentOrgRole = null;
+		for(JsonElement org : grafanaOrgs){
+			if(grafanaCurrentOrg.equals(org.getAsJsonObject().get("orgId").toString())){
+				grafanaCurrentOrgRole = org.getAsJsonObject().get("role").getAsString();
+				break;
+			}
+		}
+		return grafanaCurrentOrgRole;
+	}
+
+	private String getGrafanaCurrentOrg(Map<String, String> headers) {
+		String loginApiUrl = ApplicationConfigProvider.getInstance().getGrafana().getGrafanaEndpoint()+"/api/user";
+		ClientResponse grafanaCurrentOrgResponse = RestHandler.doGet(loginApiUrl, null, headers);
+		JsonObject responseJson = new JsonParser().parse(grafanaCurrentOrgResponse.getEntity(String.class)).getAsJsonObject();
+		String grafanaCurrentOrg = responseJson.get("orgId").toString();
+		return grafanaCurrentOrg;
 	}
 	
 	private List<NewCookie> getValidGrafanaSession(String userName, String password) {
