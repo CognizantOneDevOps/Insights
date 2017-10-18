@@ -52,6 +52,7 @@
     }
   },
   "runSchedule": 30,
+  "dataFetchCount": 1000,
   "userid": "userid",
   "passwd": "password",
   "baseUrl": "https://127.0.0.1/rest/api/2/search",
