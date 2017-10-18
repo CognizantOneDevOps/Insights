@@ -40,6 +40,7 @@ class JenkinsAgent(BaseAgent):
         if self.useAllBuildsApi:
             self.buildsApiName = "allBuilds"
         self.data = []
+        self.treeApiParams = self.buildApiParameters('', self.responseTemplate)
         jenkinsMasters = self.config.get("jenkinsMasters", None)
         if jenkinsMasters:
             for jenkinsMaster in jenkinsMasters:
@@ -111,7 +112,7 @@ class JenkinsAgent(BaseAgent):
                 end = end + 100
                 if end > tillJobCount:
                     end = tillJobCount
-                restUrl = url+'api/json?tree='+self.buildsApiName+'[number,actions[causes[shortDescription],remoteUrls[scmUrl],url],changeSet[items[commitId,date],kind],duration,id,result,timestamp,url,name,nextBuild]{'+str(start)+','+str(end)+'},name'
+                restUrl = url+'api/json?tree=' + self.buildsApiName + self.treeApiParams +'{'+str(start)+','+str(end)+'},name'
                 jobDetails = self.getResponse(restUrl, 'GET', self.userid, self.passwd, None)
                 injectData['jobName'] = jobDetails["name"]
                 builds = jobDetails[self.buildsApiName]
@@ -136,7 +137,22 @@ class JenkinsAgent(BaseAgent):
             self.tracking[self.currentJenkinsMaster] = currentMasterTracking
         currentMasterTracking[buildUrl] = buildNumber
         self.updateTrackingJson(self.tracking)
-        
+    
+    
+    def buildApiParameters(self, keyName, valueObject):
+        valueType = type(valueObject)
+        urlToken = None;
+        if valueType is dict:
+            urlToken = keyName + '['
+            for key in valueObject:
+                urlToken += self.buildApiParameters(key, valueObject[key]) + ','
+            urlToken = urlToken[:-1] + ']'
+        elif valueType is list:
+            urlToken = self.buildApiParameters(keyName, valueObject[0])
+        elif valueType is unicode or valueType is str:
+            urlToken = keyName
+        return urlToken
+    
     def getJobLevelConfig(self,url):
         jobDetails = self.config.get('jobDetails',{});
         injectData = {
