@@ -72,7 +72,7 @@ class HpAlmAgent(BaseAgent):
             projectEndPoint += '&query={'+trackingFieldName+'[>"'+startFrom+'"]}&order-by={'+trackingFieldName+'[ASC]}'
         else:
             projectEndPoint += '&query={'+trackingFieldName+'[>"'+entityTracking+'"]}&order-by={'+trackingFieldName+'[ASC]}'
-        
+        entityMetaDetails = self.config.get("almEntities").get(entityName)
         dataList = []
         startIndex = 1
         totalResults = 1
@@ -94,14 +94,14 @@ class HpAlmAgent(BaseAgent):
                         for field in fields:
                             fieldName = field.attrib['Name']
                             fieldValue = self.extractValueWithType(field.find('Value').text)
-                            data[fieldName] = fieldValue
+                            data[entityMetaDetails[fieldName]] = fieldValue
                         dataList.append(data)
                 startIndex += self.dataFetchCount
                 if totalResults < startIndex:
                     loadNextPageResult = False
             if len(dataList) > 0:
                 latestRecord = dataList[len(dataList) - 1]
-                projectTracking[entityName] = latestRecord[trackingFieldName]
+                projectTracking[entityName] = latestRecord[entityMetaDetails[trackingFieldName]]
         else:
             while loadNextPageResult:
                 restUrl = projectEndPoint + '&page-size='+str(self.dataFetchCount)+'&start-index='+str(startIndex)
@@ -119,14 +119,14 @@ class HpAlmAgent(BaseAgent):
                             values = field['values']
                             for value in values:
                                 fieldValue = value.get('value', '')
-                                data[field['Name']] = fieldValue
+                                data[entityMetaDetails[field['Name']]] = fieldValue
                         dataList.append(data)
                 startIndex += self.dataFetchCount
                 if totalResults < startIndex:
                     loadNextPageResult = False
             if len(dataList) > 0:
                 latestRecord = dataList[len(dataList) - 1]
-                projectTracking[entityName] = latestRecord[trackingFieldName]
+                projectTracking[entityName] = latestRecord[entityMetaDetails[trackingFieldName]]
         return dataList
     
     def extractValueWithType(self, value):
