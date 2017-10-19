@@ -1,0 +1,5 @@
+*.project
+*.prefs
+*.pydevproject
+*.classpath
+*.log
