@@ -21,14 +21,12 @@ Created on Jun 15, 2016
 from requests.auth import HTTPBasicAuth
 from requests_ntlm import HttpNtlmAuth
 import requests
-from __builtin__ import str
-import json
 
 class RestCommunicationFacade(object):
     headers = {"Accept":"application/json"}
     
-    def __init__(self):
-        pass
+    def __init__(self, sslVerify):
+        self.sslVerify = sslVerify
         
     def communicate(self, url, method, userName, password, data, authType='BASIC', reqHeaders=None, responseTupple=None):
         auth = None
@@ -43,9 +41,9 @@ class RestCommunicationFacade(object):
                    
         response = None
         if('GET' == method):
-            response = requests.get(url, auth=auth, headers=reqHeaders, data=data)
+            response = requests.get(url, auth=auth, headers=reqHeaders, data=data, verify=self.sslVerify)
         elif('POST' == method):
-            response = requests.post(url, auth=auth, headers=reqHeaders, data=data)
+            response = requests.post(url, auth=auth, headers=reqHeaders, data=data, verify=self.sslVerify)
         else:
             raise ValueError('RestFacade: Unsupported HTTP Method '+method)
             
