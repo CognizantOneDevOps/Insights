@@ -16,11 +16,31 @@
     "type": "REST"
   },
   "almEntities" : {
-  	"requirements" : ["parent-id", "id", "name", "creation-time", "last-modified", "req-reviewed", "req-priority", "father-name"],
-  	"defects" : ["id", "priority", "name", "creation-time", "last-modified", "status", "severity", "detected-by", "owner"]
+  	"requirements" : {
+		"parent-id" : "parentId", 
+		"id"		: "id", 
+		"name"		: "name", 
+		"creation-time" : "creationTime", 
+		"last-modified" : "lastModified", 
+		"req-reviewed"  : "reqReviewed", 
+		"req-priority"  : "priority", 
+		"father-name"   : "fatherName"
+	},
+	"defects" : {
+		"id" : "id", 
+		"priority" : "priority", 
+		"name" : "name", 
+		"creation-time" : "creationTime", 
+		"last-modified" : "lastModified", 
+		"status" : "status", 
+		"severity" : "severity", 
+		"detected-by" : "detectedBy", 
+		"owner" : "owner"
+	}
   },
+  "dataFetchCount" : 200,
   "auth": "base64",
-  "runSchedule": 5,
+  "runSchedule": 30,
   "userid": "userid",
   "passwd": "password",
   "baseEndPoint": "http://hostname",
