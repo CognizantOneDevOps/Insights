@@ -19,7 +19,8 @@ Created on Jun 22, 2016
 @author: 463188
 '''
 from com.cognizant.devops.platformagents.core.BaseAgent import BaseAgent
-import time
+import xml.etree.ElementTree as ET
+
 class HpAlmAgent(BaseAgent):
     def getHpAlmSSOHeader(self, baseEndPoint):
         userid = self.config.get('userid')
@@ -47,96 +48,104 @@ class HpAlmAgent(BaseAgent):
         self.getResponse(signOutEndPoint, 'GET', None, None, None, reqHeaders={})
     
     def getDomains(self, baseEndPoint, cookieHeader):
-        projectsEndPoint = baseEndPoint + '/qcbin/rest/domains?alt=application/json&include-projects-info=y'
+        projectsEndPoint = baseEndPoint + '/qcbin/rest/domains?include-projects-info=y&alt=application/'+self.responseType.lower()
         projectResponse = self.getResponse(projectsEndPoint, 'GET', None, None, None, reqHeaders=cookieHeader)
         return projectResponse
-    
+           
     def getProjectDetails(self, baseEndPoint, reqHeaders, domain, project, entityName, fields, startFrom):
-
         domainTracking = self.tracking.get(domain, None)
         if domainTracking == None:
             domainTracking = {}
             self.tracking[domain] = domainTracking
-
         projectTracking = domainTracking.get(project, None)
-       
         if projectTracking == None:
             projectTracking = {}
             domainTracking[project] = projectTracking
-
         entityTracking = projectTracking.get(entityName, None)
-
-        projectEndPoint = baseEndPoint + '/qcbin/rest/domains/' + domain + '/projects/' + project + '/' + entityName + '?alt=application/json&'+fields
-        if entityTracking == None:
-            if(entityName == "releases"):
-                projectEndPoint += '&query={start-date[>"'+startFrom+'"]}&order-by={start-date[ASC]}'
-            else:
-                projectEndPoint += '&query={last-modified[>"'+startFrom+'"]}&order-by={last-modified[ASC]}'
-        else:
-           
-            if(entityName == "releases"):
-                projectEndPoint += '&query={start-date[>"'+entityTracking+'"]}&order-by={start-date[ASC]}'
-            else:
-                projectEndPoint += '&query={last-modified[>"'+entityTracking+'"]}&order-by={last-modified[ASC]}'
-
-        projectResponse = self.getResponse(projectEndPoint, 'GET', None, None, None, reqHeaders=reqHeaders)
+        projectEndPoint = baseEndPoint + '/qcbin/rest/domains/' + domain + '/projects/' + project + '/' + entityName + '?alt=application/'+self.responseType.lower()+'&'+fields
+        trackingFieldName = 'last-modified'
         
-        totalResults = projectResponse.get("TotalResults",0)
+        if entityName == 'releases':
+            trackingFieldName = 'start-date'
+        
+        if entityTracking == None:
+            projectEndPoint += '&query={'+trackingFieldName+'[>"'+startFrom+'"]}&order-by={'+trackingFieldName+'[ASC]}'
+        else:
+            projectEndPoint += '&query={'+trackingFieldName+'[>"'+entityTracking+'"]}&order-by={'+trackingFieldName+'[ASC]}'
         
         dataList = []
-
-        totalLoopInit = totalResults/200
-       
-        excessCount = totalResults-(totalLoopInit*200)
-        
-        totalLoop = totalLoopInit+1
-        for i in range(totalLoop):
-            startIndexInit = i
-            i= i+1
-            if i > totalLoopInit:
-                page_size = excessCount
-            else:
-                page_size = 200
-            
-            startIndex=(startIndexInit*200)+1
-            projectEndPointLoop = projectEndPoint+'&page-size='+str(page_size)+'&start-index='+str(startIndex)
-
-
-            projectResponse = self.getResponse(projectEndPointLoop, 'GET', None, None, None, reqHeaders=reqHeaders)
-           
-            if totalResults > 0:
-                entities = projectResponse.get("entities", [])
-                for entity in entities:
-                    data = {}
-                    data['domain'] = domain
-                    data['project'] = project
-                    data['type'] = entity['Type']
-                    fields = entity['Fields']
-                    
-                    
-                    for field in fields:
-                        values = field['values']
-                        for value in values:
-                            
-                            fieldValue = value.get('value', '')
-                           
-                            data[field['Name']] = fieldValue
-                    dataList.append(data)
-                                   
+        startIndex = 1
+        totalResults = 1
+        loadNextPageResult = True
+        if self.responseType == 'XML':
+            while loadNextPageResult:
+                restUrl = projectEndPoint + '&page-size='+str(self.dataFetchCount)+'&start-index='+str(startIndex)
+                projectResponse = self.getResponse(restUrl, 'GET', None, None, None, reqHeaders=reqHeaders)
+                entities = ET.fromstring(projectResponse)
+                totalResults = int(entities.attrib['TotalResults'])
+                if totalResults > 0:
+                    entities = list(entities.iter('Entity'))
+                    for entity in entities:
+                        data = {}
+                        data['domain'] = domain
+                        data['project'] = project
+                        data['type'] = entity.attrib['Type']
+                        fields = list(entity.iter('Field'))
+                        for field in fields:
+                            fieldName = field.attrib['Name']
+                            fieldValue = self.extractValueWithType(field.find('Value').text)
+                            data[fieldName] = fieldValue
+                        dataList.append(data)
+                startIndex += self.dataFetchCount
+                if totalResults < startIndex:
+                    loadNextPageResult = False
             if len(dataList) > 0:
                 latestRecord = dataList[len(dataList) - 1]
-                if(entityName=="releases"):
-                    projectTracking[entityName] = latestRecord['start-date']
-                else:
-                    projectTracking[entityName] = latestRecord['last-modified']
-        
+                projectTracking[entityName] = latestRecord[trackingFieldName]
+        else:
+            while loadNextPageResult:
+                restUrl = projectEndPoint + '&page-size='+str(self.dataFetchCount)+'&start-index='+str(startIndex)
+                projectResponse = self.getResponse(restUrl, 'GET', None, None, None, reqHeaders=reqHeaders)
+                totalResults = projectResponse.get("TotalResults",0)
+                if totalResults > 0:
+                    entities = projectResponse.get("entities", [])
+                    for entity in entities:
+                        data = {}
+                        data['domain'] = domain
+                        data['project'] = project
+                        data['type'] = entity['Type']
+                        fields = entity['Fields']
+                        for field in fields:
+                            values = field['values']
+                            for value in values:
+                                fieldValue = value.get('value', '')
+                                data[field['Name']] = fieldValue
+                        dataList.append(data)
+                startIndex += self.dataFetchCount
+                if totalResults < startIndex:
+                    loadNextPageResult = False
+            if len(dataList) > 0:
+                latestRecord = dataList[len(dataList) - 1]
+                projectTracking[entityName] = latestRecord[trackingFieldName]
         return dataList
-        
+    
+    def extractValueWithType(self, value):
+        if value is None:
+            return ''
+        elif value.lower() == 'true':
+            return True
+        elif value.lower() == 'false':
+            return False
+        try:
+            return int(value)
+        except ValueError:
+            return value
+       
     def process(self):
         baseEndPoint = self.config.get('baseEndPoint')
+        self.dataFetchCount = self.config.get('dataFetchCount', 200)
         cookieHeader = self.getHpAlmSSOHeader(baseEndPoint)
         domainResponse = self.getDomains(baseEndPoint, cookieHeader)
-        dataList = []
         startFrom = self.config.get("startFrom", '')
         almEntities = self.config.get("almEntities")
         if almEntities:
@@ -146,17 +155,29 @@ class HpAlmAgent(BaseAgent):
                     fields = 'fields='
                     for field in fieldsList:
                         fields += field + ','
-                    domains = domainResponse.get('Domain')
-                    for domain in domains:
-                        domainName = domain['Name']
-                        projects = domain['Projects']['Project']
-                        for project in projects:
-                            
-                            projectName = project['Name']
-                            dataList += self.getProjectDetails(baseEndPoint, cookieHeader, domainName, projectName, almEntity, fields, startFrom)
-        if len(dataList) > 0 :
-            self.publishToolsData(dataList)
-            self.updateTrackingJson(self.tracking)
+                    if self.responseType == 'XML':
+                        tree = ET.fromstring(domainResponse)
+                        domains = list(tree.iter('Domain'))
+                        for domain in domains:
+                            domainName = domain.attrib['Name']
+                            projects = list(domain.iter('Project'))
+                            for project in projects:
+                                projectName = project.attrib['Name']
+                                dataList = self.getProjectDetails(baseEndPoint, cookieHeader, domainName, projectName, almEntity, fields, startFrom)
+                                if len(dataList) > 0 :
+                                    self.publishToolsData(dataList)
+                                    self.updateTrackingJson(self.tracking)
+                    else:
+                        domains = domainResponse.get('Domain')
+                        for domain in domains:
+                            domainName = domain['Name']
+                            projects = domain['Projects']['Project']
+                            for project in projects:
+                                projectName = project['Name']
+                                dataList = self.getProjectDetails(baseEndPoint, cookieHeader, domainName, projectName, almEntity, fields, startFrom)
+                                if len(dataList) > 0 :
+                                    self.publishToolsData(dataList)
+                                    self.updateTrackingJson(self.tracking)
         self.signOut(baseEndPoint)
 if __name__ == "__main__":
     HpAlmAgent()        
