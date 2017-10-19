@@ -110,7 +110,10 @@ class BaseAgent(object):
         
     def loadCommunicationFacade(self):
         communicationFacade = CommunicationFacade();
-        self.communicationFacade = communicationFacade.getCommunicationFacade(self.config.get('communication',{}).get('type', None))
+        config = self.config.get('communication',{})
+        facadeType = config.get('type', None)
+        sslVerify = config.get('sslVerify', True)
+        self.communicationFacade = communicationFacade.getCommunicationFacade(facadeType, sslVerify)
         
     def initializeMQ(self):
         mqConfig = self.config.get('mqConfig', None)
