@@ -25,8 +25,9 @@ import requests
 class RestCommunicationFacade(object):
     headers = {"Accept":"application/json"}
     
-    def __init__(self, sslVerify):
+    def __init__(self, sslVerify, responseType):
         self.sslVerify = sslVerify
+        self.responseType = responseType
         
     def communicate(self, url, method, userName, password, data, authType='BASIC', reqHeaders=None, responseTupple=None):
         auth = None
@@ -56,7 +57,10 @@ class RestCommunicationFacade(object):
             responseTupple['headers'] = response.headers
             responseTupple['cookies'] = response.cookies
         if len(response.content) > 0:
-            return response.json()
+            if self.responseType == 'JSON':
+                return response.json()
+            elif self.responseType == 'XML':
+                return response.content
         else:
             return {}        
     

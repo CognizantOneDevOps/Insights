@@ -23,8 +23,8 @@ class CommunicationFacade(object):
     def __init__(self):
         self = self
         
-    def getCommunicationFacade(self, facadeType, sslVerify):
+    def getCommunicationFacade(self, facadeType, sslVerify, responseType):
         if 'REST' == facadeType:
-            return RestCommunicationFacade(sslVerify);
+            return RestCommunicationFacade(sslVerify, responseType);
         else:
             raise ValueError('CommunicationFacade: Unsupported Facade Type '+facadeType)
