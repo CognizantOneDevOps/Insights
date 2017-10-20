@@ -93,8 +93,12 @@ class HpAlmAgent(BaseAgent):
                         fields = list(entity.iter('Field'))
                         for field in fields:
                             fieldName = field.attrib['Name']
-                            fieldValue = self.extractValueWithType(field.find('Value').text)
-                            data[entityMetaDetails[fieldName]] = fieldValue
+                            propertyName = entityMetaDetails.get(fieldName, None)
+                            if propertyName:
+                                fieldTag = field.find('Value')
+                                if fieldTag is not None:
+                                    fieldValue = self.extractValueWithType(fieldTag.text)
+                                    data[propertyName] = fieldValue
                         dataList.append(data)
                 startIndex += self.dataFetchCount
                 if totalResults < startIndex:
@@ -118,8 +122,10 @@ class HpAlmAgent(BaseAgent):
                         for field in fields:
                             values = field['values']
                             for value in values:
-                                fieldValue = value.get('value', '')
-                                data[entityMetaDetails[field['Name']]] = fieldValue
+                                propertyName = entityMetaDetails.get(field['Name'], None)
+                                if propertyName:
+                                    fieldValue = value.get('value', '')
+                                    data[entityMetaDetails[propertyName]] = fieldValue
                         dataList.append(data)
                 startIndex += self.dataFetchCount
                 if totalResults < startIndex:
