@@ -31,8 +31,8 @@ module ISightApp {
     }
 
     export class RoleService implements IRoleService {
-        static $inject = ['$q', '$resource', '$cookies', 'restCallHandlerService'];
-        constructor(private $q: ng.IQService, private $resource, private $cookies, private restCallHandlerService: IRestCallHandlerService) {
+        static $inject = ['$q', '$resource', '$cookies', 'restCallHandlerService', 'restEndpointService'];
+        constructor(private $q: ng.IQService, private $resource, private $cookies, private restCallHandlerService: IRestCallHandlerService,, private restEndpointService ) {
         }
 
         getAllOrg(): ng.IPromise<any> {
