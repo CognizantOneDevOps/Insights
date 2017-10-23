@@ -31,8 +31,8 @@ module ISightApp {
     }
 
     export class RoleService implements IRoleService {
-        static $inject = ['$q', '$resource', '$cookies', 'restCallHandlerService'];
-        constructor(private $q: ng.IQService, private $resource, private $cookies, private restCallHandlerService: IRestCallHandlerService) {
+        static $inject = ['$q', '$resource', '$cookies', 'restCallHandlerService', 'restEndpointService'];
+        constructor(private $q: ng.IQService, private $resource, private $cookies, private restCallHandlerService: IRestCallHandlerService, private restEndpointService ) {
         }
 
         getAllOrg(): ng.IPromise<any> {
@@ -51,10 +51,26 @@ module ISightApp {
             return restHandler.get("USER_SEARCH",{'query':input});
        }
 
-       createUser(userName:string, userEmail:string, userLogin:string): ng.IPromise<any> {
-    
-            var restHandler = this.restCallHandlerService;
-            return restHandler.post("USER_ADD",{"orgId":1},{'Content-Type': 'application/x-www-form-urlencoded'});
+      createUser(userName:string, userEmail:string, userLogin:string): ng.IPromise<any> {
+           var authToken = this.$cookies.get('Authorization');
+           var orgUserData = this.$resource(this.restEndpointService.getServiceHost() + 'PlatformService/userMgmt/addUser',
+               {},
+               {
+                   allOrgUserData: {
+                       method: 'POST',
+                       headers: {
+                           'Authorization': authToken,
+                           'Content-Type': 'application/x-www-form-urlencoded'
+                       },
+                       transformRequest: function(data) {
+                         if (data && data.userName) {
+                           return 'orgId='+data.orgId;
+                         }
+                         return;
+                       }
+                   }
+               });
+           return orgUserData.allOrgUserData({"orgId":1}).$promise;
        }
 
        getAllUsers(): ng.IPromise<any> {
