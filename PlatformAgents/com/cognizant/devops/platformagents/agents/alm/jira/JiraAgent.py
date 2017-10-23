@@ -28,8 +28,9 @@ class JiraAgent(BaseAgent):
         baseUrl = self.config.get("baseUrl", '')
         startFrom = self.config.get("startFrom", '')
         lastUpdated = self.tracking.get("lastupdated", startFrom)
-        jiraIssuesUrl = baseUrl+"?jql=updated>='"+lastUpdated+"' ORDER BY updated ASC&maxResults="+str(self.config.get("dataFetchCount", 1000))
         responseTemplate = self.getResponseTemplate()
+        fields = self.extractFields(responseTemplate)
+        jiraIssuesUrl = baseUrl+"?jql=updated>='"+lastUpdated+"' ORDER BY updated ASC&maxResults="+str(self.config.get("dataFetchCount", 1000))+'&fields='+fields
         total = 1
         maxResults = 0
         startAt = 0
@@ -44,7 +45,12 @@ class JiraAgent(BaseAgent):
                 if sprintField:
                     sprintDetails = issue.get("fields", {}).get(sprintField, None)
                     if sprintDetails:
-                        parsedSprintDetails = []
+                        sprintName = []
+                        sprintState = []
+                        sprintStartDate = []
+                        sprintEndDate = []
+                        sprintCompletedDate = []
+                        activeSprint = []
                         for sprint in sprintDetails:
                             sprintData = {}
                             sprintDetail = sprint.split("[")[1][:-1]
@@ -52,8 +58,19 @@ class JiraAgent(BaseAgent):
                             for propertyToken in sprintPropertieTokens:
                                 propertyKeyValToken = propertyToken.split("=")
                                 sprintData[propertyKeyValToken[0]] = propertyKeyValToken[1]
-                            parsedSprintDetails.append(sprintData.get('name'))
-                        parsedIssue[0]['sprintName'] = parsedSprintDetails
+                            sprintName.append(sprintData.get('name'))
+                            sprintState.append(sprintData.get('state'))
+                            sprintStartDate.append(sprintData.get('startDate'))
+                            sprintEndDate.append(sprintData.get('endDate'))
+                            sprintCompletedDate.append(sprintData.get('completeDate'))
+                            if sprintData.get('state') == 'ACTIVE':
+                                activeSprint.append(sprintData.get('name'))
+                        parsedIssue[0]['activeSprint'] = activeSprint
+                        parsedIssue[0]['sprintName'] = sprintName
+                        parsedIssue[0]['sprintState'] = sprintState
+                        parsedIssue[0]['sprintStartDate'] = sprintStartDate
+                        parsedIssue[0]['sprintEndDate'] = sprintEndDate
+                        parsedIssue[0]['sprintCompletedDate'] = sprintCompletedDate
                 data += parsedIssue
             maxResults = response['maxResults']
             total = response['total']
@@ -69,5 +86,17 @@ class JiraAgent(BaseAgent):
             self.tracking["lastupdated"] = fromDateTime
             self.publishToolsData(data)
             self.updateTrackingJson(self.tracking)
+    
+    def extractFields(self, responseTemplate):
+        fieldsJson = responseTemplate.get("fields", None)
+        fieldsParam = ''
+        if fieldsJson:
+            for field in fieldsJson:
+                fieldsParam += field + ','
+        fieldsParam = fieldsParam[:-1]
+        if self.config.get("sprintField", None):
+            fieldsParam += ','+ self.config.get("sprintField")
+        return fieldsParam
+            
 if __name__ == "__main__":
     JiraAgent()        
