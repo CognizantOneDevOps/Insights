@@ -25,6 +25,12 @@ sudo echo "export" JRE_HOME=/opt/jdk1.8.0_151/jre | sudo tee -a /etc/profile
 export PATH=$PATH:/opt/jdk1.8.0_151/bin:/opt/jdk1.8.0_151/jre/bin
 sudo echo PATH=$PATH:/opt/jdk1.8.0_151/bin:/opt/jdk1.8.0_151/jre/bin | sudo tee -a /etc/environment
 sudo alternatives --install /usr/bin/java java /opt/jdk1.8.0_151/bin/java 20000
+sudo update-alternatives --install "/usr/bin/java" "java" "/opt/jdk1.8.0_151/bin/java" 1
+sudo update-alternatives --install "/usr/bin/javac" "javac" "/opt/jdk1.8.0_151/bin/javac" 1
+sudo update-alternatives --install "/usr/bin/javaws" "javaws" "/opt/jdk1.8.0_151/bin/javaws" 1
+sudo update-alternatives --set java /opt/jdk1.8.0_151/bin/java
+sudo update-alternatives --set javac /opt/jdk1.8.0_151/bin/javac
+sudo update-alternatives --set javaws /opt/jdk1.8.0_151/bin/javaws
 source /etc/environment
 source /etc/profile
 
