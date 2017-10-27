@@ -41,6 +41,7 @@ class JenkinsAgent(BaseAgent):
             self.buildsApiName = "allBuilds"
         self.data = []
         self.treeApiParams = self.buildApiParameters('', self.responseTemplate)
+        self.validateAndCorrectTrackingFormat()
         jenkinsMasters = self.config.get("jenkinsMasters", None)
         if jenkinsMasters:
             for jenkinsMaster in jenkinsMasters:
@@ -51,6 +52,18 @@ class JenkinsAgent(BaseAgent):
             self.processFolder(self.BaseUrl)
         #self.publishToolsData(self.data)
         self.updateTrackingJson(self.tracking)
+
+    def validateAndCorrectTrackingFormat(self):
+        tracking = self.tracking
+        correctionRequired = False
+        for master in tracking:
+            keyType = type(tracking[master])
+            if keyType is int:
+                correctionRequired = True
+            break
+        if correctionRequired:
+            self.tracking = {'master' : self.tracking}
+            self.updateTrackingJson(self.tracking)
 
     def processFolder(self,url):
         restUrl = url + 'api/json?tree=jobs[name,url,buildable,lastBuild[number]]'
