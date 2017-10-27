@@ -31,7 +31,8 @@ class JenkinsLogParserAgent(JenkinsAgent):
         jobDetails = self.getResponse(restUrl, 'GET', self.userid, self.passwd, None)
         builds = jobDetails[self.buildsApiName]
         injectData['url'] = url
-        injectData['fullDisplayName'] = builds['fullDisplayName']
+        injectData['fullDisplayName'] = jobDetails['fullDisplayName']
+        injectData['jobName'] = jobDetails['name']
         parsedBuilds = []
         try:
             for build in builds:
