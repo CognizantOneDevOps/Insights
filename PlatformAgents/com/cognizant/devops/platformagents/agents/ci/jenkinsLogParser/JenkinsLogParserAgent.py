@@ -27,7 +27,7 @@ from com.cognizant.devops.platformagents.agents.ci.jenkins.JenkinsAgent import J
 class JenkinsLogParserAgent(JenkinsAgent):
     
     def processBuildExecutions(self, url, tillJobCount, lastBuild, injectData):
-        restUrl = url+'api/json?tree=builds[number]{0,100},name,fullDisplayName'
+        restUrl = url+'api/json?tree=builds[number,result]{0,100},name,fullDisplayName'
         jobDetails = self.getResponse(restUrl, 'GET', self.userid, self.passwd, None)
         builds = jobDetails[self.buildsApiName]
         injectData['url'] = url
@@ -37,6 +37,7 @@ class JenkinsLogParserAgent(JenkinsAgent):
         try:
             for build in builds:
                 buildNumber = build['number']
+                result = build['result']
                 logUrl = url + str(buildNumber) + "/console"
                 logResponse = self.getBuildLog(logUrl)
                 logTokens = logResponse.split('****Start of Json Output****')
@@ -46,6 +47,7 @@ class JenkinsLogParserAgent(JenkinsAgent):
                         deploymentJsonStr = '{' + deploymentTokens[0].split('{')[1].split('}')[0] + '}'
                         buildJson = json.loads(deploymentJsonStr)
                         buildJson['buildId'] = buildNumber
+                        buildJson['result'] = result
                         parsedBuilds.append(buildJson)
                 tillJobCount = tillJobCount - 1
                 if tillJobCount <= 0:
