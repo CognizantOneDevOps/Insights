@@ -87,9 +87,9 @@ class HpAlmAgent(BaseAgent):
                     entities = list(entities.iter('Entity'))
                     for entity in entities:
                         data = {}
-                        data['domain'] = domain
-                        data['project'] = project
-                        data['type'] = entity.attrib['Type']
+                        data['almDomain'] = domain
+                        data['almProject'] = project
+                        data['almType'] = entity.attrib['Type']
                         fields = list(entity.iter('Field'))
                         for field in fields:
                             fieldName = field.attrib['Name']
