@@ -133,6 +133,7 @@ export default class Neo4jDatasource {
     var statements = [];
     cypherQuery['statements'] = statements;
     query = this.addTimestampToQuery(query, null);
+    query = this.templateSrv.replace(query, {}, this.applyTemplateVariables);
     var resultDataContents = ["row"];
     var statement = {
       "statement": query,

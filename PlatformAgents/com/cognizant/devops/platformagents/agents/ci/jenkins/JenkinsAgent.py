@@ -41,6 +41,7 @@ class JenkinsAgent(BaseAgent):
             self.buildsApiName = "allBuilds"
         self.data = []
         self.treeApiParams = self.buildApiParameters('', self.responseTemplate)
+        self.validateAndCorrectTrackingFormat()
         jenkinsMasters = self.config.get("jenkinsMasters", None)
         if jenkinsMasters:
             for jenkinsMaster in jenkinsMasters:
@@ -51,6 +52,18 @@ class JenkinsAgent(BaseAgent):
             self.processFolder(self.BaseUrl)
         #self.publishToolsData(self.data)
         self.updateTrackingJson(self.tracking)
+
+    def validateAndCorrectTrackingFormat(self):
+        tracking = self.tracking
+        correctionRequired = False
+        for master in tracking:
+            keyType = type(tracking[master])
+            if keyType is int:
+                correctionRequired = True
+            break
+        if correctionRequired:
+            self.tracking = {'master' : self.tracking}
+            self.updateTrackingJson(self.tracking)
 
     def processFolder(self,url):
         restUrl = url + 'api/json?tree=jobs[name,url,buildable,lastBuild[number]]'
@@ -90,6 +103,7 @@ class JenkinsAgent(BaseAgent):
             while not buildsIdentified:
                 restUrl = url+'api/json?tree='+self.buildsApiName+'[number,timestamp,duration]{'+str(nextBatch)+','+str(nextBatch+100)+'},name'
                 jobDetails = self.getResponse(restUrl, 'GET', self.userid, self.passwd, None)
+                injectData['jobName'] = jobDetails["name"]
                 builds = jobDetails[self.buildsApiName]
                 for build in builds:
                     if self.startFrom < build["timestamp"]:
@@ -105,30 +119,32 @@ class JenkinsAgent(BaseAgent):
                 if not buildsIdentified:
                     nextBatch = nextBatch + 100
         if tillJobCount > 0:
-            start = 0
-            end = 0
-            trackingUpdated = False
-            while start <= tillJobCount:
-                end = end + 100
-                if end > tillJobCount:
-                    end = tillJobCount
-                restUrl = url+'api/json?tree=' + self.buildsApiName + self.treeApiParams +'{'+str(start)+','+str(end)+'},name'
-                jobDetails = self.getResponse(restUrl, 'GET', self.userid, self.passwd, None)
-                injectData['jobName'] = jobDetails["name"]
-                builds = jobDetails[self.buildsApiName]
-                #add filter logic
-                startIndex = 0
-                for build in builds:
-                    if not build["duration"] > 0:
-                        startIndex+=1
-                completedBuilds = builds[startIndex:len(builds)]
-                if len(completedBuilds)>0:
-                    buildDetails = self.parseResponse(self.responseTemplate, completedBuilds, injectData)
-                    self.publishToolsData(buildDetails)
-                    if not trackingUpdated:
-                        self.updateTrackingDetails(url, completedBuilds[0]["number"])
-                        trackingUpdated = True
-                start = start + 100
+            self.processBuildExecutions(url, tillJobCount, lastBuild, injectData)
+    
+    def processBuildExecutions(self, url, tillJobCount, lastBuild, injectData):
+        start = 0
+        end = 0
+        trackingUpdated = False
+        while start <= tillJobCount:
+            end = end + 100
+            if end > tillJobCount:
+                end = tillJobCount
+            restUrl = url+'api/json?tree=' + self.buildsApiName + self.treeApiParams +'{'+str(start)+','+str(end)+'},name'
+            jobDetails = self.getResponse(restUrl, 'GET', self.userid, self.passwd, None)
+            builds = jobDetails[self.buildsApiName]
+            #add filter logic
+            startIndex = 0
+            for build in builds:
+                if not build["duration"] > 0:
+                    startIndex+=1
+            completedBuilds = builds[startIndex:len(builds)]
+            if len(completedBuilds)>0:
+                buildDetails = self.parseResponse(self.responseTemplate, completedBuilds, injectData)
+                self.publishToolsData(buildDetails)
+                if not trackingUpdated:
+                    self.updateTrackingDetails(url, completedBuilds[0]["number"])
+                    trackingUpdated = True
+            start = start + 100
     
     def updateTrackingDetails(self, buildUrl, buildNumber):
         currentMasterTracking = self.tracking.get(self.currentJenkinsMaster, None)
