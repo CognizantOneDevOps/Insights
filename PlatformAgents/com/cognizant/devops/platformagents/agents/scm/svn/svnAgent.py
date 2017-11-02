@@ -29,19 +29,23 @@ from com.cognizant.devops.platformagents.core.BaseAgent import BaseAgent
 import logging.handlers
 
 class svnAgent(BaseAgent):
+    def get_login(self, realm, username, may_save ):
+        username = self.config.get("username", '')
+        password = self.config.get("password", '')
+        return True, username, password, False
+
     def process(self):
         self.repoList = []
         self.data = []
         self.trackingdata = {}
         self.json = self.tracking.get("1", '')
         self.client = pysvn.Client()
+        self.client.callback_get_login = self.get_login
         self.head_rev = pysvn.Revision(pysvn.opt_revision_kind.head) 
         try:
-            BaseUrl = self.config.get("BaseUrl", '')
-            repo1 = BaseUrl + "Insights"
-            repo2 = BaseUrl + "git"
-            self.repoList.append(repo1)
-            self.repoList.append(repo2)
+            self.repoList = self.config.get("BaseUrl", '')
+            self.date_time = self.config.get("StartFrom", '')
+            self.pattern = self.config.get("timeStampFormat", '')
             logging.info('List of Repositories : %s ' % self.repoList)
             self.publishData()
         except Exception as e:
@@ -51,8 +55,6 @@ class svnAgent(BaseAgent):
         if self.json == '':
             self.urlno = 1
             try:
-                self.date_time = self.config.get("StartFrom", '')
-                self.pattern = self.config.get("timeStampFormat", '')
                 epoch = int(time.mktime(time.strptime(self.date_time, self.pattern)))
             except Exception as e:
                 logging.error(e)

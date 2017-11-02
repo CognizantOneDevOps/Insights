@@ -6,11 +6,11 @@
 		"exchange" : "iSight"
 	},
 	"subscribe" : {
-		"config" : "SCM.SVN.config"
+		"config" : "ENVIRONMENT.AWS.config"
 	},
 	"publish" : {
-		"data" : "SCM.SVN.DATA",
-		"health" : "SCM.SVN.HEALTH"
+		"data" : "ENVIRONMENT.AWS.DATA",
+		"health" : "ENVIRONMENT.AWS.HEALTH"
 	},
 	"communication":{
 		"type" : "REST" 
@@ -21,11 +21,11 @@
 	"auth" : "base64",
 	"runSchedule" : 2,
 	"timeStampField":"commitTime",
-	"timeStampFormat":"%Y-%m-%d %H:%M:%S",
-	"StartFrom" : "2017-07-18 14:19:51",
-	"BaseUrl": ["http://localhost:18080/svn/Insights","http://localhost:18080/svn/git"],
-	"username": "username",
-	"password": "password",
+	"timeStampFormat":"epoch",
+	"pattern" : "%Y-%m-%dT%H:%M:%S.%fZ",
+	"vpc_id": ["vpc-id1","vpc-id2"],
+	"access_key_id": "#Access_Key_ID#",
+	"secret_access_key": "#secret_key#",
 	"isDebugAllowed" : false,
 	"loggingSetting" : {
 		"logLevel" : "WARN"
