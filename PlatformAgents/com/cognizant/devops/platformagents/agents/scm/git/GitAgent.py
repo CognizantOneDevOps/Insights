@@ -30,52 +30,65 @@ class GitAgent(BaseAgent):
         commitsBaseEndPoint = self.config.get("CommitsBaseEndPoint", '')
         startFrom = self.config.get("StartFrom", '')
         startFrom = parser.parse(startFrom)
-        startFrom = startFrom.strftime('%Y-%m-%dT%H:%M:%SZ')
+        #startFrom = startFrom.strftime('%Y-%m-%dT%H:%M:%SZ')
         getReposUrl = getRepos+"?access_token="+accessToken
         enableBranches = self.config.get("enableBranches", False)
-        repos = self.getResponse(getReposUrl, 'GET', None, None, None)
+        repos = self.getResponse(getReposUrl+'&per_page=100&sort=created&page=1', 'GET', None, None, None)
         responseTemplate = self.getResponseTemplate()
-        data = []
-        for repo in repos:
-            repoName = repo.get('name', None)
-            branches = ['master']
-            if repoName != None:
-                if enableBranches:
-                    getBranchesRestUrl = commitsBaseEndPoint+repoName+'/branches?access_token='+accessToken
-                    branchDetails = self.getResponse(getBranchesRestUrl, 'GET', None, None, None)
-                    branches = []
-                    for branch in branchDetails:
-                        branches.append(branch['name'])
-                for branch in branches:
-                    commits = []
-                    injectData = {}
-                    injectData['repoName'] = repoName
-                    injectData['branchName'] = branch
-                    getCommitDetailsUrl = commitsBaseEndPoint+repoName+'/commits?sha='+branch+'&access_token='+accessToken
-                    trackingDetails = self.tracking.get(repoName,None)
-                    if trackingDetails is None:
-                        trackingDetails = {}
-                        self.tracking[repoName] = trackingDetails
-                    since = trackingDetails.get(branch, None)
-                    if since != None:
-                        getCommitDetailsUrl += '&since='+since
-                    try:
-                        commits = self.getResponse(getCommitDetailsUrl, 'GET', None, None, None)
-                        i = 0
-                        for commit in commits:
-                            if startFrom < commits[i]["commit"]["author"]["date"]:
-                                data += self.parseResponse(responseTemplate, commit, injectData)
-                            i = i + 1
-                    except Exception as ex:
-                        logging.error(ex)
-                    if len(commits) > 0:
-                        updatetimestamp = commits[0]["commit"]["author"]["date"]
-                        dt = parser.parse(updatetimestamp)
-                        fromDateTime = dt + datetime.timedelta(seconds=01)
-                        fromDateTime = fromDateTime.strftime('%Y-%m-%dT%H:%M:%SZ')    
-                        trackingDetails[branch] = fromDateTime
-                        self.publishToolsData(data)
-                        self.updateTrackingJson(self.tracking)
+        repoPageNum = 1
+        fetchNextPage = True
+        while fetchNextPage:
+            if len(repos) == 0:
+                fetchNextPage = False
+                break;
+            for repo in repos:
+                repoName = repo.get('name', None)
+                trackingDetails = self.tracking.get(repoName,None)
+                if trackingDetails is None:
+                    trackingDetails = {}
+                    self.tracking[repoName] = trackingDetails
+                repoModificationTime = trackingDetails.get('repoModificationTime', None)
+                if repoModificationTime is None:
+                    repoModificationTime = startFrom
+                updated_at = parser.parse(repo.get('updated_at')[:-1])
+                if startFrom < updated_at:
+                    branches = ['master']
+                    if repoName != None:
+                        if enableBranches:
+                            getBranchesRestUrl = commitsBaseEndPoint+repoName+'/branches?access_token='+accessToken
+                            branchDetails = self.getResponse(getBranchesRestUrl, 'GET', None, None, None)
+                            branches = []
+                            for branch in branchDetails:
+                                branches.append(branch['name'])
+                        for branch in branches:
+                            commits = []
+                            data = []
+                            injectData = {}
+                            injectData['repoName'] = repoName
+                            injectData['branchName'] = branch
+                            getCommitDetailsUrl = commitsBaseEndPoint+repoName+'/commits?sha='+branch+'&access_token='+accessToken
+                            since = trackingDetails.get(branch, None)
+                            if since != None:
+                                getCommitDetailsUrl += '&since='+since
+                            try:
+                                commits = self.getResponse(getCommitDetailsUrl, 'GET', None, None, None)
+                                i = 0
+                                for commit in commits:
+                                    if startFrom < parser.parse(commits[i]["commit"]["author"]["date"]):
+                                        data += self.parseResponse(responseTemplate, commit, injectData)
+                                    i = i + 1
+                            except Exception as ex:
+                                logging.error(ex)
+                            if len(commits) > 0:
+                                updatetimestamp = commits[0]["commit"]["author"]["date"]
+                                dt = parser.parse(updatetimestamp)
+                                fromDateTime = dt + datetime.timedelta(seconds=01)
+                                fromDateTime = fromDateTime.strftime('%Y-%m-%dT%H:%M:%SZ')    
+                                trackingDetails[branch] = fromDateTime
+                                self.publishToolsData(data)
+                                self.updateTrackingJson(self.tracking)
+            repoPageNum = repoPageNum + 1
+            repos = self.getResponse(getReposUrl+'&per_page=100&sort=created&page='+str(repoPageNum), 'GET', None, None, None)
     
 if __name__ == "__main__":
     GitAgent()       
