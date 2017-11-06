@@ -50,8 +50,9 @@ class GitAgent(BaseAgent):
                 repoModificationTime = trackingDetails.get('repoModificationTime', None)
                 if repoModificationTime is None:
                     repoModificationTime = startFrom
-                updated_at = parser.parse(repo.get('updated_at')[:-1])
-                if startFrom < updated_at:
+                repoUpdatedAt = parser.parse(repo.get('updated_at'), ignoretz=True)
+                if startFrom < repoUpdatedAt:
+                    trackingDetails['repoModificationTime'] = repo.get('updated_at')
                     branches = ['master']
                     if repoName != None:
                         if enableBranches:
@@ -61,7 +62,6 @@ class GitAgent(BaseAgent):
                             for branch in branchDetails:
                                 branches.append(branch['name'])
                         for branch in branches:
-                            commits = []
                             data = []
                             injectData = {}
                             injectData['repoName'] = repoName
@@ -72,14 +72,14 @@ class GitAgent(BaseAgent):
                                 getCommitDetailsUrl += '&since='+since
                             try:
                                 commits = self.getResponse(getCommitDetailsUrl, 'GET', None, None, None)
-                                i = 0
                                 for commit in commits:
-                                    if startFrom < parser.parse(commits[i]["commit"]["author"]["date"]):
+                                    if since is not None or startFrom < parser.parse(commit["commit"]["author"]["date"], ignoretz=True):
                                         data += self.parseResponse(responseTemplate, commit, injectData)
-                                    i = i + 1
+                                    else:
+                                        break
                             except Exception as ex:
                                 logging.error(ex)
-                            if len(commits) > 0:
+                            if len(data) > 0:
                                 updatetimestamp = commits[0]["commit"]["author"]["date"]
                                 dt = parser.parse(updatetimestamp)
                                 fromDateTime = dt + datetime.timedelta(seconds=01)
