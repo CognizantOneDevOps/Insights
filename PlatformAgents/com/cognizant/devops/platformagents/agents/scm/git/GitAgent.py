@@ -66,19 +66,26 @@ class GitAgent(BaseAgent):
                             injectData = {}
                             injectData['repoName'] = repoName
                             injectData['branchName'] = branch
-                            getCommitDetailsUrl = commitsBaseEndPoint+repoName+'/commits?sha='+branch+'&access_token='+accessToken
+                            fetchNextCommitsPage = True
+                            getCommitDetailsUrl = commitsBaseEndPoint+repoName+'/commits?sha='+branch+'&access_token='+accessToken+'&per_page=100'
                             since = trackingDetails.get(branch, None)
                             if since != None:
                                 getCommitDetailsUrl += '&since='+since
-                            try:
-                                commits = self.getResponse(getCommitDetailsUrl, 'GET', None, None, None)
-                                for commit in commits:
-                                    if since is not None or startFrom < parser.parse(commit["commit"]["author"]["date"], ignoretz=True):
-                                        data += self.parseResponse(responseTemplate, commit, injectData)
-                                    else:
+                            commitsPageNum = 1
+                            while fetchNextCommitsPage:
+                                try:
+                                    commits = self.getResponse(getCommitDetailsUrl + '&page='+str(commitsPageNum), 'GET', None, None, None)
+                                    for commit in commits:
+                                        if since is not None or startFrom < parser.parse(commit["commit"]["author"]["date"], ignoretz=True):
+                                            data += self.parseResponse(responseTemplate, commit, injectData)
+                                        else:
+                                            break
+                                    if len(commits) == 0 or len(data) == 0:
+                                        fetchNextCommitsPage = False
                                         break
-                            except Exception as ex:
-                                logging.error(ex)
+                                except Exception as ex:
+                                    logging.error(ex)
+                                commitsPageNum = commitsPageNum + 1
                             if len(data) > 0:
                                 updatetimestamp = commits[0]["commit"]["author"]["date"]
                                 dt = parser.parse(updatetimestamp)
