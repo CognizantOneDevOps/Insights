@@ -72,9 +72,12 @@ class GitAgent(BaseAgent):
                             if since != None:
                                 getCommitDetailsUrl += '&since='+since
                             commitsPageNum = 1
+                            latestCommit = None
                             while fetchNextCommitsPage:
                                 try:
                                     commits = self.getResponse(getCommitDetailsUrl + '&page='+str(commitsPageNum), 'GET', None, None, None)
+                                    if latestCommit is None and len(commits) > 0:
+                                        latestCommit = commits[0]
                                     for commit in commits:
                                         if since is not None or startFrom < parser.parse(commit["commit"]["author"]["date"], ignoretz=True):
                                             data += self.parseResponse(responseTemplate, commit, injectData)
@@ -87,7 +90,7 @@ class GitAgent(BaseAgent):
                                     logging.error(ex)
                                 commitsPageNum = commitsPageNum + 1
                             if len(data) > 0:
-                                updatetimestamp = commits[0]["commit"]["author"]["date"]
+                                updatetimestamp = latestCommit["commit"]["author"]["date"]
                                 dt = parser.parse(updatetimestamp)
                                 fromDateTime = dt + datetime.timedelta(seconds=01)
                                 fromDateTime = fromDateTime.strftime('%Y-%m-%dT%H:%M:%SZ')    
