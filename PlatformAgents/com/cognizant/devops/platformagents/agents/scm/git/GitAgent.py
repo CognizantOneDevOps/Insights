@@ -83,7 +83,7 @@ class GitAgent(BaseAgent):
                                             data += self.parseResponse(responseTemplate, commit, injectData)
                                         else:
                                             break
-                                    if len(commits) == 0 or len(data) == 0:
+                                    if len(commits) == 0 or len(data) == 0 or len(commits) < 100:
                                         fetchNextCommitsPage = False
                                         break
                                 except Exception as ex:
