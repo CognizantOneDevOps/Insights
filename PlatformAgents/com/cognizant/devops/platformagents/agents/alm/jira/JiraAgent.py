@@ -77,15 +77,14 @@ class JiraAgent(BaseAgent):
             startAt = response['startAt']
             if len(jiraIssues) > 0:
                 updatetimestamp = jiraIssues[len(jiraIssues) - 1]["fields"]["updated"]
+                dt = parser.parse(updatetimestamp)
+                fromDateTime = dt + datetime.timedelta(minutes=01)
+                fromDateTime = fromDateTime.strftime('%Y-%m-%d %H:%M')
+                self.tracking["lastupdated"] = fromDateTime
+                self.publishToolsData(data)
+                self.updateTrackingJson(self.tracking)
             else:
-                break
-        if updatetimestamp:
-            dt = parser.parse(updatetimestamp)
-            fromDateTime = dt + datetime.timedelta(minutes=01)
-            fromDateTime = fromDateTime.strftime('%Y-%m-%d %H:%M')
-            self.tracking["lastupdated"] = fromDateTime
-            self.publishToolsData(data)
-            self.updateTrackingJson(self.tracking)
+                break            
     
     def extractFields(self, responseTemplate):
         fieldsJson = responseTemplate.get("fields", None)
