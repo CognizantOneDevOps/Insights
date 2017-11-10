@@ -51,7 +51,7 @@ class RestCommunicationFacade(object):
         if None == response:
             raise ValueError('RestFacade: Null response')
         elif 200 != response.status_code and 201 != response.status_code:
-            raise ValueError('RestFacade: Unsupported response code '+str(response.status_code)+', response received: '+response.content)    
+            raise ValueError('RestFacade: Unsupported response code '+str(response.status_code)+', url: '+url+', response received: '+response.content)    
 
         if responseTupple != None:
             responseTupple['headers'] = response.headers
