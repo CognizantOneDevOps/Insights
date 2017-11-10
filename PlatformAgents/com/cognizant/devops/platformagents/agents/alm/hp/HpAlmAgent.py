@@ -20,6 +20,7 @@ Created on Jun 22, 2016
 '''
 from com.cognizant.devops.platformagents.core.BaseAgent import BaseAgent
 import xml.etree.ElementTree as ET
+import logging
 
 class HpAlmAgent(BaseAgent):
     def getHpAlmSSOHeader(self, baseEndPoint):
@@ -169,7 +170,11 @@ class HpAlmAgent(BaseAgent):
                             projects = list(domain.iter('Project'))
                             for project in projects:
                                 projectName = project.attrib['Name']
-                                dataList = self.getProjectDetails(baseEndPoint, cookieHeader, domainName, projectName, almEntity, fields, startFrom)
+                                dataList = []
+                                try:
+                                    dataList = self.getProjectDetails(baseEndPoint, cookieHeader, domainName, projectName, almEntity, fields, startFrom)
+                                except Exception as ex:
+                                    logging.error(ex)
                                 if len(dataList) > 0 :
                                     self.publishToolsData(dataList)
                                     self.updateTrackingJson(self.tracking)
@@ -180,7 +185,11 @@ class HpAlmAgent(BaseAgent):
                             projects = domain['Projects']['Project']
                             for project in projects:
                                 projectName = project['Name']
-                                dataList = self.getProjectDetails(baseEndPoint, cookieHeader, domainName, projectName, almEntity, fields, startFrom)
+                                dataList = []
+                                try:
+                                    dataList = self.getProjectDetails(baseEndPoint, cookieHeader, domainName, projectName, almEntity, fields, startFrom)
+                                except Exception as ex:
+                                    logging.error(ex)
                                 if len(dataList) > 0 :
                                     self.publishToolsData(dataList)
                                     self.updateTrackingJson(self.tracking)
