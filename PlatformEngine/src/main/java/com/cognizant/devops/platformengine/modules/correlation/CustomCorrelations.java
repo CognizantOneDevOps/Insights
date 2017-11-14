@@ -51,8 +51,11 @@ public class CustomCorrelations {
 								String[] subTokens = token.split("-");
 								if(subTokens.length > 1) {
 									try {
-										int numPart = Integer.valueOf(subTokens[1]);
-										jiraKeys.add(subTokens[0].trim()+"-"+numPart);
+										String projectKey = subTokens[0].trim();
+										String jiraIssueNumber = subTokens[1].trim();
+										if(projectKey.toUpperCase() != projectKey.toLowerCase() && jiraIssueNumber.toUpperCase() == jiraIssueNumber.toLowerCase()) {
+											jiraKeys.add(projectKey+"-"+jiraIssueNumber);
+										}
 									}catch(Exception e) {
 										log.warn("Unable to parse the message", e);
 									}
