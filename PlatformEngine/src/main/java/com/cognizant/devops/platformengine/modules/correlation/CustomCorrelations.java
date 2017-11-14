@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 
+import com.cognizant.devops.platformcommons.config.ApplicationConfigCache;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBException;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphResponse;
 import com.cognizant.devops.platformcommons.dal.neo4j.Neo4jDBHandler;
@@ -27,7 +28,7 @@ public class CustomCorrelations {
 			int resultCount = paginationResponse.getJson().get("results").getAsJsonArray().get(0).getAsJsonObject().get("data")
 					.getAsJsonArray().get(0).getAsJsonObject().get("row").getAsJsonArray().get(0).getAsInt();
 			while(resultCount > 0) {
-				resultCount = resultCount - 500;
+				System.out.println("Result count: "+resultCount);
 				String gitDataFetchCypher = "MATCH (source:DATA:GIT) where not ((source) -[:GIT_COMMIT_WITH_JIRA_KEY]-> (:JIRA:DATA)) WITH { uuid: source.uuid, commitId: source.commitId, message: source.message} as data limit 500 return collect(data)";
 				GraphResponse response = dbHandler.executeCypherQuery(gitDataFetchCypher);
 				JsonArray rows = response.getJson().get("results").getAsJsonArray().get(0).getAsJsonObject().get("data")
@@ -52,7 +53,15 @@ public class CustomCorrelations {
 								if(subTokens.length > 1) {
 									try {
 										String projectKey = subTokens[0].trim();
-										String jiraIssueNumber = subTokens[1].trim();
+										char[] jiraIssueNumberChars = subTokens[1].trim().toCharArray();
+										StringBuffer jiraIssueNumberBuf = new StringBuffer();
+										for(char c : jiraIssueNumberChars) {
+											if(c >= 48 && c<=57) {
+												jiraIssueNumberBuf.append(c);
+											}
+										}
+										String jiraIssueNumber = jiraIssueNumberBuf.toString();
+										System.out.println(projectKey+"-"+jiraIssueNumber);
 										if(projectKey.toUpperCase() != projectKey.toLowerCase() && jiraIssueNumber.toUpperCase() == jiraIssueNumber.toLowerCase()) {
 											jiraKeys.add(projectKey+"-"+jiraIssueNumber);
 										}
@@ -79,10 +88,19 @@ public class CustomCorrelations {
 				}
 				if(correlationCyphers.size() > 0) {
 					dbHandler.bulkCreateCorrelations(correlationCyphers);
+					System.out.println("Executed Correlations: "+correlationCyphers.size());
 				}
+				resultCount = resultCount - 500;
 			}
 		} catch (GraphDBException e) {
 			log.error(e);
 		}
 	}
+	
+	public static void main(String[] args) {
+		ApplicationConfigCache.loadConfigCache();
+		CustomCorrelations cor = new CustomCorrelations();
+		cor.executeCorrelations();
+	}
 }
+ 
