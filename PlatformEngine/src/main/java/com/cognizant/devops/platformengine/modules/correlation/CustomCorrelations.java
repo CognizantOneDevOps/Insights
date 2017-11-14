@@ -97,10 +97,10 @@ public class CustomCorrelations {
 		}
 	}
 	
-	public static void main(String[] args) {
+	/*public static void main(String[] args) {
 		ApplicationConfigCache.loadConfigCache();
 		CustomCorrelations cor = new CustomCorrelations();
 		cor.executeCorrelations();
-	}
+	}*/
 }
  
