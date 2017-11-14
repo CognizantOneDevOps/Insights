@@ -44,6 +44,7 @@ public class ApplicationConfigProvider implements Serializable{
 	private Date refreshTime;
 	private List<String> trustedHosts = new ArrayList<String>(3);	
 	private boolean enableNativeUsers;
+	private boolean enableNativeCorrelations;
 
 	private ApplicationConfigProvider(){
 		this.refreshTime = new Date(new Date().getTime() - 86400000);
@@ -181,5 +182,13 @@ public class ApplicationConfigProvider implements Serializable{
 
 	public void setTrustedHosts(List<String> trustedHosts) {
 		this.trustedHosts = trustedHosts;
+	}
+
+	public boolean isEnableNativeCorrelations() {
+		return enableNativeCorrelations;
+	}
+
+	public void setEnableNativeCorrelations(boolean enableNativeCorrelations) {
+		this.enableNativeCorrelations = enableNativeCorrelations;
 	}
 }
