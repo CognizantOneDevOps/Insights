@@ -82,7 +82,9 @@ public class DocumentParser {
 	public GraphResponse processGraphDBNode(String jsonData){
 		GraphResponse response = new GraphResponse();
 		List<NodeData> nodeDataList = response.getNodes();
-		processGraphDBJson(new JsonParser().parse(jsonData), nodeDataList, null, "");
+		JsonElement parsedJson = new JsonParser().parse(jsonData);
+		response.setJson(parsedJson.getAsJsonObject());
+		processGraphDBJson(parsedJson, nodeDataList, null, "");
 		return response;
 	}
 	
