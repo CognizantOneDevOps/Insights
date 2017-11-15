@@ -25,7 +25,7 @@ import sys
 import os
 from dateutil import parser
 import datetime, time
-from com.cognizant.devops.platformagents.core.BaseAgent import BaseAgent
+from core.BaseAgent import BaseAgent
 import logging.handlers
 
 class svnAgent(BaseAgent):
@@ -36,8 +36,6 @@ class svnAgent(BaseAgent):
 
     def process(self):
         self.repoList = []
-        self.data = []
-        self.trackingdata = {}
         self.json = self.tracking.get("1", '')
         self.client = pysvn.Client()
         self.client.callback_get_login = self.get_login
@@ -47,43 +45,64 @@ class svnAgent(BaseAgent):
             self.date_time = self.config.get("StartFrom", '')
             self.pattern = self.config.get("timeStampFormat", '')
             logging.info('List of Repositories : %s ' % self.repoList)
+            self.trackingData()
             self.publishData()
         except Exception as e:
             logging.error(e)
 
+    def trackingData(self):
+        i=1
+        url=0
+        self.tracklist=[]
+        self.newurl=[]
+        self.oldurl=[]
+        while url!='':
+            url=self.tracking.get(str(i), '')
+            if url!='':
+                url=url.get("url", '')
+                self.tracklist.append(url)
+            i=i+1
+        for i in self.repoList:
+            if i in self.tracklist:
+                self.oldurl.append(i)
+            else:
+                self.newurl.append(i)
+
     def publishData(self):
-        if self.json == '':
-            self.urlno = 1
+        self.urlno = 1
+        self.trackingdata = {}
+        self.data = []
+        for repo in self.newurl:
+            print "new data"
             try:
                 epoch = int(time.mktime(time.strptime(self.date_time, self.pattern)))
             except Exception as e:
                 logging.error(e)
             self.end_rev=pysvn.Revision(pysvn.opt_revision_kind.date, epoch)
-            for repo in self.repoList:
-                self.retrieveData(repo)
-                self.printdata(repo)
-            if self.data != []:
-                self.publishToolsData(self.data)
-            self.updateTrackingJson(self.trackingdata)
+            self.retrieveData(repo)
+            self.printdata(repo)
             
-        else:
-            revcount = 1
-            while self.json!='':
-                self.urlno = 1
-                self.trackingdata = {}
-                self.data = []
-                rev=self.tracking.get(str(revcount), '')
-                revNo=rev.get("rev", '')+1
-                repourl=rev.get("url", '')
-                self.end_rev = pysvn.Revision(pysvn.opt_revision_kind.number, revNo)
-                self.printdata(repourl)
-                revcount = revcount + 1
-                for repo in self.repoList:
-                    self.retrieveData(repo)
-                if self.data != []:
-                    self.publishToolsData(self.data)
-                self.updateTrackingJson(self.trackingdata)
-               
+        for repo in self.oldurl:
+            print "old data"
+            r = 1
+            rev=0
+            while rev!='':
+                rev=self.tracking.get(str(r), '')
+                if rev!='':
+                    revNo=rev.get("rev", '')+1
+                    print revNo
+                    repourl=rev.get("url", '')
+                    print repourl
+                    self.end_rev = pysvn.Revision(pysvn.opt_revision_kind.number, revNo)
+                    if repourl == repo:
+                        self.printdata(repo)
+                        self.retrieveData(repo)
+                    r = r + 1
+        
+        print self.data
+        #if self.data != []:
+            #self.publishToolsData(self.data)
+        self.updateTrackingJson(self.trackingdata)               
 
     def retrieveData(self,reposURL):
         tracklist = {}

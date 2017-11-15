@@ -1,8 +1,8 @@
 {
 	"mqConfig" : {
-		"user" : "iSight",
-		"password" : "iSight",
-		"host" : "127.0.0.1",
+		"user" : "iSight", 
+		"password" : "iSight", 
+		"host" : "127.0.0.1", 
 		"exchange" : "iSight"
 	},
 	"subscribe" : {
@@ -13,7 +13,16 @@
 		"health" : "ITSM.SNOW.HEALTH"
 	},
 	"communication":{
-		"type" : "REST"
+		"type" : "REST" 
+	},
+	"responseTemplate" : {
+		"sha": "commitId",
+		"commit" : {
+			"author" : {
+				"name": "authorName",
+				"date": "commitTime"
+			}
+		}
 	},
 	"toolsTimeZone" : "GMT",
 	"insightsTimeZone" : "Asia/Kolkata",
@@ -23,12 +32,15 @@
 	"timeStampField":"commitTime",
 	"timeStampFormat":"%Y-%m-%d %H:%M:%S",
 	"StartFrom" : "2017-07-23 15:00:25",
-	"BaseUrl": "https://prod.service-now.com",
+	"CR_Url": "/api/now/table/change_request?sysparm_display_value=true&sysparm_exclude_reference_link=true&sysparm_fields=number%2Capproval%2Crisk%2Ccategory%2Csys_id%2Copened_at%2Csys_updated_by%2Csys_updated_on%2Ccmdb_ci%2Crequested_by_date%2Copened_by%2Cassigned_to%2Cpriority%2Cimpact%2Csys_created_by%2Csys_mod_count%2Ctype%2Creason%2Cassignment_group%2Cdue_date%2Curgency%2Ccorrelation_id%2Creview_status%2Cshort_description%2Cphase%2Cstate&sysparm_query=sys_id%3D",
+	"CR_Approval_Url":	"/api/now/table/sysapproval_approver?sysparm_display_value=true&sysparm_fields=sysapproval%2Csys_updated_by%2Csys_id%2Cstate%2Cdue_date%2Csys_updated_on%2Csys_created_on&sysparm_query=sysapproval%3D",
+	"CR_sysid_url": "/api/now/table/change_request?sysparm_display_value=true&sysparm_exclude_reference_link=true&sysparm_fields=sys_id&sysparm_query=active%3Dtrue%5Esys_updated_onBETWEENjavascript%3Ags.dateGenerate(",
+	"IN_Url":"/api/now/table/incident?sysparm_display_value=true&sysparm_exclude_reference_link=true&sysparm_fields=number%2Ccaller_id%2Ccontact_type%2Cstate%2Clocation%2Cassignment_group%2Ccategory%2Cassigned_to%2Csubcategory%2Creassignment_count%2Cimpact%2Curgency%2Cpriority%2Cshort_description%2Cdescription%2Cu_duplicate_ticket_number%2Cproblem_id%2Crfc%2Ccaused_by&sysparm_query=sys_id%3D",
+	"IN_Approval_Url":"/api/now/table/sysapproval_group?sysparm_display_value=true&sysparm_exclude_reference_link=true&sysparm_fields=sys_updated_by%2Csys_created_by%2Csys_id%2Cstate%2Cdue_date%2Csys_updated_on%2Csys_created_on&sysparm_query=parent%3D",
+	"IN_sysid_url":"/api/now/table/incident?sysparm_display_value=true&sysparm_exclude_reference_link=true&sysparm_fields=sys_id&sysparm_query=active%3Dtrue%5Esys_updated_onBETWEENjavascript%3Ags.dateGenerate(",
+	"BaseUrl": "https://dev12236.service-now.com",
 	"username": "username",
 	"password": "password",
-	"CR_Url": "/api/now/table/change_request?sysparm_display_value=true&sysparm_exclude_reference_link=true&sysparm_fields=number%2Capproval%2Crisk%2Ccategory%2Csys_id%2Copened_at%2Csys_updated_by%2Csys_updated_on%2Ccmdb_ci%2Crequested_by_date%2Copened_by%2Cassigned_to%2Cpriority%2Cimpact%2Csys_created_by%2Csys_mod_count%2Ctype%2Creason%2Cassignment_group%2Cdue_date%2Curgency%2Ccorrelation_id%2Creview_status%2Cshort_description%2Cphase%2Cstate&sysparm_query=sys_id=",
-	"Approval_Url": "/api/now/table/sysapproval_approver?sysparm_display_value=true&sysparm_fields=sysapproval%2Csys_updated_by%2Csys_id%2Cstate%2Cdue_date%2Csys_updated_on%2Csys_created_on&sysparm_query=sysapproval%3D",
-	"Start_url": "/api/now/table/change_request?sysparm_display_value=true&sysparm_exclude_reference_link=true&sysparm_fields=sys_id&sysparm_query=active%3Dtrue%5Esys_updated_onBETWEENjavascript%3Ags.dateGenerate(",
 	"isDebugAllowed" : false,
 	"loggingSetting" : {
 		"logLevel" : "INFO"

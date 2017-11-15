@@ -15,6 +15,15 @@
 	"communication":{
 		"type" : "REST" 
 	},
+	"responseTemplate" : {
+		"sha": "commitId",
+		"commit" : {
+			"author" : {
+				"name": "authorName",
+				"date": "commitTime"
+			}
+		}
+	},
 	"toolsTimeZone" : "GMT",
 	"insightsTimeZone" : "Asia/Kolkata",
 	"useResponseTemplate" : false,
@@ -23,7 +32,7 @@
 	"timeStampField":"commitTime",
 	"timeStampFormat":"%Y-%m-%d %H:%M:%S",
 	"StartFrom" : "2017-07-18 14:19:51",
-	"BaseUrl": ["http://localhost:18080/svn/Insights","http://localhost:18080/svn/git"],
+	"BaseUrl": ["http://localhost:18080/svn/insights", "http://localhost:18080/svn/git", "http://localhost:18080/svn/svn"],
 	"username": "username",
 	"password": "password",
 	"isDebugAllowed" : false,
