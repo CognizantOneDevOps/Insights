@@ -18,8 +18,11 @@ package com.cognizant.devops.platformcommons.dal.neo4j;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.google.gson.JsonObject;
+
 public class GraphResponse {
 	private List<NodeData> nodes = new ArrayList<NodeData>();
+	private JsonObject json;
 	
 	public boolean addNode(NodeData data){
 		return nodes.add(data);
@@ -31,5 +34,13 @@ public class GraphResponse {
 
 	public List<NodeData> getNodes() {
 		return nodes;
+	}
+
+	public JsonObject getJson() {
+		return json;
+	}
+
+	public void setJson(JsonObject json) {
+		this.json = json;
 	}
 }
