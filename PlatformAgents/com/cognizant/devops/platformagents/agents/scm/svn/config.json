@@ -37,6 +37,6 @@
 	"password": "password",
 	"isDebugAllowed" : false,
 	"loggingSetting" : {
-		"logLevel" : "WARN"
+		"logLevel" : "INFO"
 	}
 }
