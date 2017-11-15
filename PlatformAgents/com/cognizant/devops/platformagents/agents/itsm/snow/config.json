@@ -38,7 +38,7 @@
 	"IN_Url":"/api/now/table/incident?sysparm_display_value=true&sysparm_exclude_reference_link=true&sysparm_fields=number%2Ccaller_id%2Ccontact_type%2Cstate%2Clocation%2Cassignment_group%2Ccategory%2Cassigned_to%2Csubcategory%2Creassignment_count%2Cimpact%2Curgency%2Cpriority%2Cshort_description%2Cdescription%2Cu_duplicate_ticket_number%2Cproblem_id%2Crfc%2Ccaused_by&sysparm_query=sys_id%3D",
 	"IN_Approval_Url":"/api/now/table/sysapproval_group?sysparm_display_value=true&sysparm_exclude_reference_link=true&sysparm_fields=sys_updated_by%2Csys_created_by%2Csys_id%2Cstate%2Cdue_date%2Csys_updated_on%2Csys_created_on&sysparm_query=parent%3D",
 	"IN_sysid_url":"/api/now/table/incident?sysparm_display_value=true&sysparm_exclude_reference_link=true&sysparm_fields=sys_id&sysparm_query=active%3Dtrue%5Esys_updated_onBETWEENjavascript%3Ags.dateGenerate(",
-	"BaseUrl": "https://dev12236.service-now.com",
+	"BaseUrl": "#service-now.com",
 	"username": "username",
 	"password": "password",
 	"isDebugAllowed" : false,
