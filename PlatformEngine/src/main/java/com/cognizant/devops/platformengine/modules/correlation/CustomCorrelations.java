@@ -2,6 +2,8 @@ package com.cognizant.devops.platformengine.modules.correlation;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
 
@@ -15,6 +17,7 @@ import com.google.gson.JsonObject;
 
 public class CustomCorrelations {
 	private static Logger log = Logger.getLogger(CustomCorrelations.class);
+	private static final Pattern p = Pattern.compile("((?<!([A-Z]{1,10})-?)[A-Z]+-\\d+)");
 	
 	public void executeCorrelations() {
 		correlateGitAndJira();
@@ -28,7 +31,6 @@ public class CustomCorrelations {
 			int resultCount = paginationResponse.getJson().get("results").getAsJsonArray().get(0).getAsJsonObject().get("data")
 					.getAsJsonArray().get(0).getAsJsonObject().get("row").getAsJsonArray().get(0).getAsInt();
 			while(resultCount > 0) {
-				System.out.println("Result count: "+resultCount);
 				String gitDataFetchCypher = "MATCH (source:DATA:GIT) where not ((source) -[:GIT_COMMIT_WITH_JIRA_KEY]-> (:JIRA:DATA)) WITH { uuid: source.uuid, commitId: source.commitId, message: source.message} as data limit 500 return collect(data)";
 				GraphResponse response = dbHandler.executeCypherQuery(gitDataFetchCypher);
 				JsonArray rows = response.getJson().get("results").getAsJsonArray().get(0).getAsJsonObject().get("data")
@@ -43,32 +45,14 @@ public class CustomCorrelations {
 					JsonElement messageElem = dataJson.get("message");
 					if(messageElem.isJsonPrimitive()) {
 						String message = messageElem.getAsString();
-						message = message.replaceAll("- ", "-");
-						message = message.replaceAll(" -", "-");
-						String[] tokens = message.split(" ");
 						List<String> jiraKeys = new ArrayList<String>();
-						for(String token : tokens) {
-							if(token.contains("-")) {
-								String[] subTokens = token.split("-");
-								if(subTokens.length > 1) {
-									try {
-										String projectKey = subTokens[0].trim();
-										char[] jiraIssueNumberChars = subTokens[1].trim().toCharArray();
-										StringBuffer jiraIssueNumberBuf = new StringBuffer();
-										for(char c : jiraIssueNumberChars) {
-											if(c >= 48 && c<=57) {
-												jiraIssueNumberBuf.append(c);
-											}
-										}
-										String jiraIssueNumber = jiraIssueNumberBuf.toString();
-										System.out.println(projectKey+"-"+jiraIssueNumber);
-										if(projectKey.toUpperCase() != projectKey.toLowerCase() && jiraIssueNumber.toUpperCase() == jiraIssueNumber.toLowerCase()) {
-											jiraKeys.add(projectKey+"-"+jiraIssueNumber);
-										}
-									}catch(Exception e) {
-										log.warn("Unable to parse the message", e);
-									}
-								}
+						while(message.contains("-")) {
+							Matcher m = p.matcher(message);
+							if(m.find()) {
+								jiraKeys.add(m.group());
+								message = message.replaceAll(m.group(), "");
+							}else {
+								break;
 							}
 						}
 						if(jiraKeys.size() > 0) {
@@ -88,7 +72,7 @@ public class CustomCorrelations {
 				}
 				if(correlationCyphers.size() > 0) {
 					dbHandler.bulkCreateCorrelations(correlationCyphers);
-					System.out.println("Executed Correlations: "+correlationCyphers.size());
+					log.debug("GIT-JIRA correlations executed: "+correlationCyphers.size());
 				}
 				resultCount = resultCount - 500;
 			}
@@ -96,11 +80,5 @@ public class CustomCorrelations {
 			log.error(e);
 		}
 	}
-	
-	/*public static void main(String[] args) {
-		ApplicationConfigCache.loadConfigCache();
-		CustomCorrelations cor = new CustomCorrelations();
-		cor.executeCorrelations();
-	}*/
 }
  
