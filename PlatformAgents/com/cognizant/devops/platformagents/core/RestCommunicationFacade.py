@@ -21,6 +21,9 @@ Created on Jun 15, 2016
 from requests.auth import HTTPBasicAuth
 from requests_ntlm import HttpNtlmAuth
 import requests
+import logging
+import json
+import sys
 
 class RestCommunicationFacade(object):
     headers = {"Accept":"application/json"}
@@ -149,7 +152,15 @@ class RestCommunicationFacade(object):
                         else:
                             data[secKey] = secData[secKey]
         elif keyType is unicode or keyType is str:
-            data[templateObj] = responseObj
+            responseObjType = type(responseObj)
+            if responseObjType is dict:
+                logging.error('Dict object assignment to graph property is not allowed.')
+                logging.error('Graph Property Name: '+templateObj)
+                logging.error('Graph property value: '+json.dumps(responseObj))
+                sys.exit() 
+            else:
+                data[templateObj] = responseObj
+            
         else:
             raise ValueError('RestFacade: Unsupported data type found '+str(keyType))
         
