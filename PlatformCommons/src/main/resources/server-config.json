@@ -2,6 +2,17 @@
   "endpointData": {
     "elasticSearchEndpoint": "http://localhost:9200"
   },
+  "sparkConfigurations": {
+    "appName" : "inSights",
+	"master" : "local[*]",
+	"sparkExecutorMemory" : "8g",
+	"sparkElasticSearchHost": "http://localhost",
+	"sparkElasticSearchPort": "9200",
+	"sparkElasticSearchConfigIndex": "",
+	"sparkElasticSearchResultIndex": "",
+	"kpiSize": "30",
+	"sparkResultSince": 5
+  },
   "ldapConfiguration": {
 	"ldapUrl" : "ldap://ldaphost:389",
     "bindDN": "BindDN",

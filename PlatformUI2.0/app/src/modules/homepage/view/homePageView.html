@@ -1,5 +1,5 @@
 <!--
- *******************************************************************************
+*******************************************************************************
  * Copyright 2017 Cognizant Technology Solutions
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
@@ -13,9 +13,9 @@
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
  * License for the specific language governing permissions and limitations under
  * the License.
- ******************************************************************************
+ *******************************************************************************
  -->
-
+ 
 <div ng-if="homePageController.isValidUser" flex>
     <div layout style="height:77px;margin-bottom:20px">
         <md-icon style="margin-left:30px" layout md-svg-src="dist/icons/svg/landingPage/Cognizant_Insights.svg" ng-style="{height: '78px', width: '252px'}"></md-icon>
@@ -60,15 +60,26 @@
              <div layout>
               
 
-                 </div>
+            <!--div layout>Hi {{homePageController.userName}}!</div>
+            <div class="verticallineHelp" style="margin-top:0px"></div>
+            <div layout>{{homePageController.userRole}}</div>
+            <div class="verticallineHelp" style="margin-top:0px"></div>
+            <div layout>{{homePageController.userCurrentOrgName[0].name}}</div>
+            <div class="verticallineHelp" style="margin-top:0px"></div>
+            <div layout class="logout" id="logoutHover" ng-click="homePageController.logout()" ng-mouseover="homePageController.addHoverImage('Logout')"
+                ng-mouseleave="homePageController.removeHoverImage('Logout')">
+                <md-icon layout md-svg-src="{{homePageController.imageurl6}}" ng-style="{height: '17px', width: '17px'}"></md-icon>
+                <span layout class="iconLablCss" id="logoutHover">Logout</span>
+            </div-->
+       </div>
             
         </div>
        
     </div>
 
     <div id="homePageTemplateContainer" style="{{homePageController.footerMinHeight}}">
-        <md-dialog-content style="max-width:800px;max-height:810px; ">
-            <md-tabs ng-if="homePageController.showAdminTab" md-selected="0" id="maintab" md-dynamic-height md-stretch-tabs class="mainTabBorder">
+        <md-dialog-content style="max-width:800px;max-height:810px; " >
+            <md-tabs ng-if="homePageController.showAdminTab" md-selected="homePageController.selectedIndex" id="maintab" md-dynamic-height md-stretch-tabs class="mainTabBorder">
                 <md-tab ng-click="homePageController.selectAct('toolsConfiguration')" md-on-select="homePageController.addSelectedImage('Admin')"
                     md-on-deselect="homePageController.removeSelectedImage('Admin')">
                     <md-tab-label>
@@ -77,7 +88,7 @@
                     </md-tab-label>
                     <md-tab-body>
                         <md-tabs id="subtab" md-dynamic-height class="subTabCss setSubTabBorder">
-                            <md-tab label="Tools Configuration" ng-click="homePageController.selectAct('toolsConfiguration')" md-active="homePageController.templateName == 'toolsConfiguration'">
+                            <md-tab label="Tools Configuration" ng-click="homePageController.selectAct('toolsConfiguration')" >
                                 <md-content style="{{homePageController.mainContentMinHeight}}">
                                     <div ng-if="homePageController.templateName == 'toolsConfiguration'" ng-include="'dist/modules/toolsConfiguration/view/toolsConfigurationView.html'"
                                         ng-controller="toolsConfigurationController as toolsConfigurationController" layout="vertical"></div>
@@ -88,7 +99,7 @@
                                         layout="vertical"></div>
                                 </md-content>
                             </md-tab>
-                            <md-tab label="Access Group Management" ng-click="homePageController.selectAct('applicationManagement')" md-active="homePageController.templateName == 'applicationManagement'">
+                            <md-tab label="Access Group Management" ng-click="homePageController.selectAct('applicationManagement')">
                                 <md-content style="{{homePageController.mainContentMinHeight}}">
                                     <div ng-if="homePageController.templateName == 'applicationManagement'" ng-include="'dist/modules/applicationManagement/view/applicationManagementView.html'"
                                         ng-controller="applicationManagementController as applicationManagementController" layout="vertical"></div>
@@ -103,16 +114,29 @@
                         </md-tabs>
                     </md-tab-body>
                 </md-tab>
-                <md-tab md-active="homePageController.showAdminTab" ng-click="homePageController.selectAct('dashboards')" md-on-select="homePageController.addSelectedImage('Dashboards')"
-                    md-on-deselect="homePageController.removeSelectedImage('Dashboards')">
+                <md-tab ng-if="homePageController.showInsightsTab" ng-click="homePageController.selectAct('insights')" md-on-select="homePageController.addSelectedImage('HealthCheck')"
+                    md-on-deselect="homePageController.removeSelectedImage('HealthCheck')">
+                    <md-tab-label>
+                        <md-icon md-svg-src="{{homePageController.imageurl7}}" ng-style="{height: '20px', width: '20px'}"></md-icon>
+                        <span class="iconLablCss iconMrgn">Insights</span>
+                    </md-tab-label>
+                    <md-tab-body>
+                        <md-content style="{{homePageController.mainContentMinHeightWoSbTab}}">
+                            <div ng-if="homePageController.templateName == 'insights'" ng-include="'dist/modules/insights/view/insightsView.html'" ng-controller="insightsController as insightsController"
+                                layout="vertical"></div>
+                        </md-content>
+                    </md-tab-body>
+                </md-tab>
+                <md-tab  ng-click="homePageController.selectAct('dashboards')" md-on-select="homePageController.addSelectedImage('Dashboards')"
+                    md-on-deselect="homePageController.removeSelectedImage('Dashboards')" id="dashboardTab">
                     <md-tab-label>
                         <md-icon md-svg-src="{{homePageController.imageurl2}}" ng-style="{height: '20px', width: '20px'}"></md-icon>
                         <span class="iconLablCss iconMrgn">Dashboards</span>
                     </md-tab-label>
                     <md-tab-body>
                         <md-content style="{{homePageController.mainContentMinHeightWoSbTab}}">
-                            <div ng-if="homePageController.templateName == 'dashboards'" ng-include="'dist/modules/dashboards/view/dashboardView.html'"
-                                ng-controller="dashboardController as dashboardController" layout="vertical"></div>
+                            <div ng-if="homePageController.templateName == 'dashboards'" ng-include="'dist/modules/dashboards/view/dashboardView.html'" ng-controller="dashboardController as dashboardController"
+                                layout="vertical"></div>
                         </md-content>
                     </md-tab-body>
                 </md-tab>
@@ -124,8 +148,8 @@
                     </md-tab-label>
                     <md-tab-body>
                         <md-content style="{{homePageController.mainContentMinHeightWoSbTab}}">
-                            <iframe src="{{homePageController.playListUrl}}" frameBorder="0" style="{{homePageController.iframeStyle}}" hspace="0" vspace="0"
-                                scrolling="no"></iframe>
+                            <iframe src="{{homePageController.playListUrl}}" frameBorder="0" style="{{dashboardController.iframeStyle}}" hspace="0" vspace="0"
+                                scrolling="no" width="{{homePageController.iframeWidth}}" height="{{homePageController.iframeHeight}}"></iframe>
                         </md-content>
                     </md-tab-body>
                 </md-tab>
@@ -144,17 +168,30 @@
                 </md-tab>
             </md-tabs>
 
-            <md-tabs ng-if="!homePageController.showAdminTab" md-selected="1" id="maintab" md-dynamic-height md-stretch-tabs class="mainTabBorder">
-                <md-tab md-active="!homePageController.showAdminTab" ng-click="homePageController.selectAct('dashboards')" md-on-select="homePageController.addSelectedImage('Dashboards')"
-                    md-on-deselect="homePageController.removeSelectedImage('Dashboards')">
+            <md-tabs ng-if="!homePageController.showAdminTab" md-selected="homePageController.selectedIndex" id="maintab" md-dynamic-height md-stretch-tabs class="mainTabBorder">
+                <md-tab ng-if="homePageController.showInsightsTab" ng-click="homePageController.selectAct('insights')" md-on-select="homePageController.addSelectedImage('HealthCheck')"
+                    md-on-deselect="homePageController.removeSelectedImage('HealthCheck')">
+                    <md-tab-label>
+                        <md-icon md-svg-src="{{homePageController.imageurl7}}" ng-style="{height: '20px', width: '20px'}"></md-icon>
+                        <span class="iconLablCss iconMrgn">Insights</span>
+                    </md-tab-label>
+                    <md-tab-body>
+                        <md-content style="{{homePageController.mainContentMinHeightWoSbTab}}">
+                            <div ng-if="homePageController.templateName == 'insights'" ng-include="'dist/modules/insights/view/insightsView.html'" ng-controller="insightsController as insightsController"
+                                layout="vertical"></div>
+                        </md-content>
+                    </md-tab-body>
+                </md-tab>
+                <md-tab  ng-click="homePageController.selectAct('dashboards')" md-on-select="homePageController.addSelectedImage('Dashboards')"
+                    md-on-deselect="homePageController.removeSelectedImage('Dashboards')" id="dashboardTab">
                     <md-tab-label>
                         <md-icon md-svg-src="{{homePageController.imageurl2}}" ng-style="{height: '20px', width: '20px'}"></md-icon>
                         <span class="iconLablCss iconMrgn">Dashboards</span>
                     </md-tab-label>
                     <md-tab-body>
                         <md-content style="{{homePageController.mainContentMinHeightWoSbTab}}">
-                            <div ng-if="homePageController.templateName == 'dashboards'" ng-include="'dist/modules/dashboards/view/dashboardView.html'"
-                                ng-controller="dashboardController as dashboardController" layout="vertical"></div>
+                            <div ng-if="homePageController.templateName == 'dashboards'" ng-include="'dist/modules/dashboards/view/dashboardView.html'" ng-controller="dashboardController as dashboardController"
+                                layout="vertical"></div>
                         </md-content>
                     </md-tab-body>
                 </md-tab>
@@ -176,7 +213,7 @@
     </div>
     <div layout="column">
         <div layout="column" layout-align="end end" style="margin-left: 82%;">
-            <md-icon layout md-svg-src="dist/icons/svg/landingPage/Footer_logo.svg" ng-style="{height: '59px', width: '183px'}"></md-icon>
+
         </div>
         <div layout class="gradStrip" flex></div>
     </div>

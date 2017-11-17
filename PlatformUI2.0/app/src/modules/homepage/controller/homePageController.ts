@@ -13,13 +13,13 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  ******************************************************************************/
-
+ 
 /// <reference path="../../../_all.ts" />
 
 module ISightApp {
     export class HomePageController {
-        static $inject = ['$location', '$window', '$cookies', '$rootScope', 'authenticationService', 'restEndpointService', '$sce', '$timeout', '$mdDialog', 'aboutService'];
-        constructor(private $location, private $window, private $cookies, private $rootScope, private authenticationService: IAuthenticationService, private restEndpointService: IRestEndpointService, private $sce, private $timeout, private $mdDialog, private aboutService: IAboutService) {
+        static $inject = ['$location', '$window', '$cookies', '$rootScope', 'authenticationService', 'restEndpointService', '$sce', '$timeout', '$mdDialog', 'aboutService', '$resource'];
+        constructor(private $location, private $window, private $cookies, private $rootScope, private authenticationService: IAuthenticationService, private restEndpointService: IRestEndpointService, private $sce, private $timeout, private $mdDialog, private aboutService: IAboutService, private $resource) {
             var self = this;
             this.authenticationService.validateSession();
             this.isValidUser = true;
@@ -52,6 +52,30 @@ module ISightApp {
                         });
                     });
                 });
+
+                self.selectedIndex = 2;
+                self.templateName = 'dashboards';
+            
+            
+                let location = this.$location;
+                let uiConfigJsonUrl: string = location.absUrl().replace(location.path(), "");
+                if (uiConfigJsonUrl.length > uiConfigJsonUrl.lastIndexOf('/')) {
+                    uiConfigJsonUrl = uiConfigJsonUrl.substr(0, uiConfigJsonUrl.lastIndexOf('/'));
+                }
+                uiConfigJsonUrl += "/uiConfig.json"
+                var configResource = this.$resource(uiConfigJsonUrl);
+                var data = configResource.get().$promise.then(function (data) {
+                    self.showInsightsTab = data.showInsightsTab;
+                    if(self.showInsightsTab){
+                        self.selectedIndex = 1;
+                        self.templateName = 'insights';
+                    }else{
+                         self.selectedIndex = 2;
+                         self.templateName = 'dashboards';
+            
+                    }
+                });
+              
         }
         isValidUser: boolean = false;
         /*start for common code */
@@ -62,10 +86,12 @@ module ISightApp {
         imageurl4: string = "dist/icons/svg/landingPage/Help_icon_normal.svg";
         imageurl5: string = "dist/icons/svg/landingPage/playlist_normal.svg";
         imageurl6: string = "dist/icons/svg/landingPage/logout_normal.svg";
-        aboutImg: string = "dist/icons/svg/landingPage/about_normal.svg";
+        imageurl7: string = "dist/icons/svg/landingPage/magnifying_glass.svg";
+        aboutImg: string = "dist/icons/svg/login/about_normal.svg";
         grafanaHost: String = this.restEndpointService.getGrafanaHost();
         playListUrl: String = '';
         templateName: string = 'toolsConfiguration';
+        showInsightsTab: boolean;
         shouldReload: boolean;
         selectedToolName: string;
         selectedToolCategory: string;
@@ -79,7 +105,9 @@ module ISightApp {
         aboutMeContent = {};
         showAdminTab: boolean = false;
         showThrobber: boolean;
-        
+        selectDashboard: boolean = false;
+        selectedIndex = 2;
+        selectedDashboardUrl: string = '';
         userName: string = '';
         userRole: string = '';
         userCurrentOrg: string = '';
@@ -87,7 +115,7 @@ module ISightApp {
 
         public redirect(iconId: string): void {
             if (iconId == 'dashboard') {
-                this.$location.path('/InSights/dashboard');
+                this.$location.path('/InSights/dashboard/');
             } else if (iconId == 'settings') {
                 this.$location.path('/InSights/toolsConfig');
             } else if (iconId == 'graphview') {
@@ -131,7 +159,9 @@ module ISightApp {
             this.templateName = tabName;
 
             if ('playlist' === tabName) {
-                this.playListUrl = this.$sce.trustAsResourceUrl(this.grafanaHost + '/dashboard/script/iSight.js?url=' + this.grafanaHost + '/playlists');
+				var self = this;
+                //this.playListUrl = this.$sce.trustAsResourceUrl(this.grafanaHost + '/dashboard/script/iSight.js?url=' + this.grafanaHost + '/playlists');
+				this.playListUrl = self.restEndpointService.getGrafanaHost() + '/dashboard/script/iSight.js?url=' + self.restEndpointService.getGrafanaHost() + '/playlists';
             } else {
                 this.playListUrl = '';
             }
@@ -204,11 +234,9 @@ module ISightApp {
         logout(): void {
             //this.$cookies.remove('Authorization');
             //this.$cookies.remove('grafanaOrg');
-			var self = this;
+            var self = this;
             this.authenticationService.logout()
                 .then(function (data) {
-					//this.doGrafanaLogout = true;
-					//this.logOutUrlGrafana = this.restEndpointService.getGrafanaHost()+"/logout";
                     //console.log(data);
                            	var uniqueString = "grfanaLoginIframe";
                             var iframe = document.createElement("iframe");

@@ -57,6 +57,7 @@ module ISightApp {
             this.homeController = homePageController;
             this.homeController.templateName = 'dashboards';
             this.homeController.imageurl5 = "dist/icons/svg/landingPage/playlist_normal.svg"; 
+
         }
 
         //new DashboardModel('Continuous Delivery Measurement Dashboard', 'Pipeline_Dashboard', null, "./dist/modules/pipeline/view/pipelineView.html", 'Pipeline Dashboard', false)
@@ -127,12 +128,12 @@ module ISightApp {
                 .then(function (data) {
                     if (data.grafanaCurrentOrgRole === 'Admin') {
                         self.homeController.showAdminTab = true;
-                       
+                        
                     } else {
                         self.homeController.showAdminTab = false;
                     }
                     self.$cookies.put('grafanaRole', data.grafanaCurrentOrgRole);
-                    self.$cookies.put('grafanaOrg', data.grafanaCurrentOrg);
+                        self.$cookies.put('grafanaOrg', data.grafanaCurrentOrg);
                     self.homeController.userName = data.userName.replace(/['"]+/g, '');
                     self.homeController.userRole = data.grafanaCurrentOrgRole;
                     self.homeController.userCurrentOrg = data.grafanaCurrentOrg;
@@ -175,6 +176,10 @@ module ISightApp {
                     });
                     self.dashboards = model;
                     self.setSelectedDashboard(model[0]);
+                    if(self.homeController.selectedDashboardUrl && self.homeController.selectedDashboardUrl.trim().length != 0){
+                        var dashbmodel =  new DashboardModel(null,null,self.homeController.selectedDashboardUrl,null,null,false);
+                        self.setSelectedDashboard(dashbmodel);
+                    }
                     if (self.selectedDashboard) {
                         self.dashboardTitle = self.selectedDashboard.title;
                     }
