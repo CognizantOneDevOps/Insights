@@ -1,0 +1,30 @@
+{
+"kpiDefinition": {
+"kpiID": "144",
+"expectedTrend": "DOWNWARDS",
+"name": "Minimum Deployment Time",
+"action": "MINMAX",
+"schedule": "DAILY",
+"vector": "DEPLOYMENT",
+"toolName": "RUNDECK",
+"isGroupBy": "false",
+"groupByFieldName": "",
+"groupByField": "",
+"averageField": "",
+"startTimeField": "SPKstartTime",
+"endTimeField": "SPKendTime",
+"resultOutPutType": "time",
+"isComparisionKpi": "true",
+"esquery": "{\"size\":0,  \"query\": {    \"bool\": {      \"must\": [        {          \"match\": {            \"SPKvector\": \"DEPLOYMENT\"          }        },        {          \"match\": {            \"SPKtoolName\": \"RUNDECK\"          }        },        {          \"match\": {            \"SPKstatus\": \"Success\"          }         },        {          \"bool\": {            \"must\": [              {                \"range\": {                  \"SPKstartTime\": {                    \"gte\": \"__dataFromTime__\",                    \"lte\": \"__dataToTime__\",                    \"format\": \"epoch_millis\"                  }                }              }            ]          }        }      ]    }  },\"aggs\" : {\"minMaxOutput\" : { \"min\" : { \"field\" : \"SPKduration\" } }} }",
+"timeFormat": "YYYY-MM-DD HH:MM",
+"esresource": "neo4j-index-node/SPKDATA",
+"es-index-read-missing-as-empty": "true"
+},
+"name": "Minimum Deployment Time",
+"nextRun": "1510770660000",
+"lastRunTime": 1510684260000,
+"isActive": true,
+"schedule": "DAILY",
+"active": true,
+"id": "AV8AAJD0E0kJfL7tgkW5"
+}

@@ -30,6 +30,7 @@ import java.util.List;
 public class ApplicationConfigProvider implements Serializable{
 	private static ApplicationConfigProvider instance = new ApplicationConfigProvider();
 	private EndpointData endpointData = new EndpointData();
+	private SparkConfigurations sparkConfigurations = new SparkConfigurations();
 	private LDAPConfiguration ldapConfiguration = new LDAPConfiguration();
 	private GraphData graph = new GraphData();
 	private GrafanaData grafana = new GrafanaData();
@@ -44,7 +45,7 @@ public class ApplicationConfigProvider implements Serializable{
 	private Date refreshTime;
 	private List<String> trustedHosts = new ArrayList<String>(3);	
 	private boolean enableNativeUsers;
-	private boolean enableNativeCorrelations;
+    private boolean enableNativeCorrelations;
 
 	private ApplicationConfigProvider(){
 		this.refreshTime = new Date(new Date().getTime() - 86400000);
@@ -70,6 +71,14 @@ public class ApplicationConfigProvider implements Serializable{
 
 	public void setEndpointData(EndpointData endpointData) {
 		this.endpointData = endpointData;
+	}
+		
+	public SparkConfigurations getSparkConfigurations() {
+		return sparkConfigurations;
+	}
+
+	public void setSparkConfigurations(SparkConfigurations sparkConfigurations) {
+		this.sparkConfigurations = sparkConfigurations;
 	}
 
 	public LDAPConfiguration getLdapConfiguration() {
@@ -183,12 +192,13 @@ public class ApplicationConfigProvider implements Serializable{
 	public void setTrustedHosts(List<String> trustedHosts) {
 		this.trustedHosts = trustedHosts;
 	}
+	
+    public boolean isEnableNativeCorrelations() {
+        return enableNativeCorrelations;
+    }
 
-	public boolean isEnableNativeCorrelations() {
-		return enableNativeCorrelations;
-	}
+    public void setEnableNativeCorrelations(boolean enableNativeCorrelations) {
+        this.enableNativeCorrelations = enableNativeCorrelations;
+    }
 
-	public void setEnableNativeCorrelations(boolean enableNativeCorrelations) {
-		this.enableNativeCorrelations = enableNativeCorrelations;
-	}
 }

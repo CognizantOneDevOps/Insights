@@ -1,0 +1,7 @@
+{
+  "appName" : "inSights",
+  "master" : "local[1]",
+  "spark.executor.memory" : "8g",
+  "es.nodes" : "127.0.0.1",
+  "es.port" : "9200"
+}
