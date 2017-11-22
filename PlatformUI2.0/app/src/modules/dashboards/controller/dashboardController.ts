@@ -19,7 +19,7 @@
 module ISightApp {
     export class DashboardController {
         static $inject = ['elasticSearchService', 'dashboardService', '$sce',
-            '$mdSidenav', '$location', '$timeout', 'restEndpointService', '$rootScope', '$cookies', 'authenticationService'];
+            '$mdSidenav', '$location', '$timeout', 'restEndpointService', '$rootScope', '$cookies', 'authenticationService','$resource'];
 
         constructor(
             private elasticSearchService: IElasticSearchService,
@@ -31,7 +31,8 @@ module ISightApp {
             private restEndpointService: IRestEndpointService,
             private $rootScope,
             private $cookies,
-            private authenticationService: IAuthenticationService
+            private authenticationService: IAuthenticationService,
+            private $resource
         ) {
             var self = this;
             $rootScope.$watch('refreshDashboard', function () {
@@ -124,17 +125,32 @@ module ISightApp {
 
         switchOrganizations(orgId): void {
             var self = this;
-            self.authenticationService.getGrafanaCurrentOrgAndRole()
+            
+                    self.defaultOrg = orgId;
+                    self.checkStyle(orgId);
+                self.dashboardService
+                .switchUserOrg(orgId)
+                .then(function (selOrgStatus) {
+                    self.$rootScope.refreshDashboard = new Date();
+                    if (selOrgStatus.status === 'success') {
+                        self.getDashboards();
+                    }
+                    self.authenticationService.getGrafanaCurrentOrgAndRole()
                 .then(function (data) {
                     if (data.grafanaCurrentOrgRole === 'Admin') {
                         self.homeController.showAdminTab = true;
+                        self.homeController.selectedIndex = 2;
                         
                     } else {
                         self.homeController.showAdminTab = false;
+                        self.homeController.selectedIndex = 1;
                     }
+
                     self.$cookies.put('grafanaRole', data.grafanaCurrentOrgRole);
                         self.$cookies.put('grafanaOrg', data.grafanaCurrentOrg);
-                    self.homeController.userName = data.userName.replace(/['"]+/g, '');
+                    if( data.userName != undefined){
+                        self.homeController.userName = data.userName.replace(/['"]+/g, '');
+                    }
                     self.homeController.userRole = data.grafanaCurrentOrgRole;
                     self.homeController.userCurrentOrg = data.grafanaCurrentOrg;
                     self.authenticationService.getCurrentUserOrgs()
@@ -144,16 +160,11 @@ module ISightApp {
                         });
                     });
                 });
-            self.defaultOrg = orgId;
-            self.checkStyle(orgId);
-            self.dashboardService
-                .switchUserOrg(orgId)
-                .then(function (selOrgStatus) {
-                    self.$rootScope.refreshDashboard = new Date();
-                    if (selOrgStatus.status === 'success') {
-                        self.getDashboards();
-                    }
+
+                    
+                    
                 });
+            
         }
 
         checkStyle(orgId: number): string {
