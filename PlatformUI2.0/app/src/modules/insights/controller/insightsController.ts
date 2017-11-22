@@ -25,7 +25,7 @@
               var homePageControllerScope = angular.element(elem).scope();
               var homePageController = homePageControllerScope['homePageController'];
               this.homeController = homePageController;
-              //this.homeController.templateName = 'insights';
+              this.homeController.templateName = 'insights';
               //this.$timeout = $timeout;
               this.showThrobber = true;
 
