@@ -17,7 +17,7 @@
 /// <reference path="_all.ts" />
 
 module ISightApp {
-    angular.module('iSightApp', ['ngMaterial', 'ngRoute', 'ngResource', 'ngMessages', 'ngCookies','ngAnimate','ui.bootstrap'])
+    angular.module('iSightApp', ['ngMaterial', 'ngRoute', 'ngResource', 'ngMessages', 'ngCookies','ngAnimate','ui.bootstrap','googlechart'])
         .service('pipelineService', PipelineService)
         .service('graphService', GraphService)
         .service('elasticSearchService', ElasticSearchService)
@@ -36,6 +36,7 @@ module ISightApp {
         .service('restCallHandlerService', RestCallHandlerService)
         .service('dataTaggingService', DataTaggingService)
         .service('singleToolConfigService', SingleToolConfigService)
+        .service('insightsService', InsightsService)
         .controller('pipelineController', PipelineController)
         .controller('homePageController', HomePageController)
         .controller('toolsConfigurationController', ToolsConfigurationController)
@@ -48,6 +49,7 @@ module ISightApp {
         .controller('agentController', AgentController)
         .controller('singleToolConfigurationController', SingleToolConfigurationController)
         .controller('dataTaggingController', DataTaggingController)
+        .controller('insightsController', InsightsController)
         .component('footer', {
             templateUrl: './dist/components/footer/view/footerView.html',
             controller: FooterController,
@@ -139,6 +141,11 @@ module ISightApp {
                          templateUrl: './dist/modules/dataTagging/view/dataTaggingView.html',
                          controller: DataTaggingController,
                          controllerAs: 'dataTaggingController'
+                     }).
+                     when('/InSights/insights', {
+                         templateUrl: './dist/modules/insights/view/insightsView.html',
+                         controller: InsightsController,
+                         controllerAs: 'insightsController'
                      }).
 
                     otherwise({
