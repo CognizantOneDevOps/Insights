@@ -19,6 +19,8 @@
         "LastUpdateDate": "LastUpdateDate",
         "Name": "StoryName"
   },
+  "proxy": "proxy.companyname.com:8080/",
+  "accesstoken":"_2skCGY7Qm27OhmYNrLQu2jhXcW",
   "runSchedule": 30,
   "userid": "userid",
   "passwd": "passwd",
