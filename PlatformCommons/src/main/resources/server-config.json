@@ -37,11 +37,11 @@
     "adminUserName": "admin",
     "adminUserPassword": "admin",
     "dbUserName": "grafana",
-    "dbPassword": "C0gnizant@1"
+    "dbPassword": "pass"
   },
   "postgre": {
 	"userName" : "grafana",
-	"password" : "C0gnizant@1",
+	"password" : "pass",
 	"insightsDBUrl": "jdbc:postgresql://127.0.0.1:5432/insight",
 	"grafanaDBUrl": "jdbc:postgresql://127.0.0.1:5432/grafana"
   },
@@ -51,9 +51,9 @@
     "password": "iSight"
   },
    "emailConfiguration": {
-    "smtpHostServer" : "ctsinckcvada.cts.com",
-	"restUserName" : "SDevOpsJIRA",
-	"restPassword" : "D111111#",
+    "smtpHostServer" : "",
+	"restUserName" : "restuser",
+	"restPassword" : "pass",
 	"restUrl": "http://localhost:7080",
 	"mailFrom": " ",
 	"mailTo": " "
