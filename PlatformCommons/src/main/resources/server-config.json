@@ -50,6 +50,14 @@
     "user": "iSight",
     "password": "iSight"
   },
+   "emailConfiguration": {
+    "smtpHostServer" : "ctsinckcvada.cts.com",
+	"restUserName" : "SDevOpsJIRA",
+	"restPassword" : "D111111#",
+	"restUrl": "http://localhost:7080",
+	"mailFrom": " ",
+	"mailTo": " "
+  },
   "disableAuth": true,
   "insightsTimeZone": "Asia/Kolkata",
   "userId": "UserID",

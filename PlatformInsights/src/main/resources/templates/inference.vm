@@ -1,0 +1,67 @@
+<html>
+	<head>
+		<style>
+			ul.outer {
+			    list-style-type: none;
+			    margin: 0;
+			    padding: 0;
+			    overflow: hidden;
+			    background-color: #e6ffe6;
+				font-family:proxima_novasemibold ;
+				font-size: 14px;
+				color:#757575 !important;
+			}
+			li.outer-list {
+			    float: center;
+			}
+			ul.inner {
+			    list-style-type: none;
+			    margin: 0;
+			    padding: 25px;
+			    overflow: hidden;
+				background-color: #fff;
+			    font-family: proxima_novaregular;
+			    font-size: 15px;
+			   color: #666666 !important;
+			}
+			li.inner-list {
+			    float: center;
+			}
+			.border{
+				border:1px solid;
+			}
+		</style>
+	</head>	
+	<body>	
+	#foreach ($data in $accordianData)
+		<div class="border">
+			<ul  class="outer">
+				<li class="outer-list">
+					<h2>
+						<span>$data.heading </span>
+						<span > Observations:- (Positives:$data.noOfPositives, Negatives: $data.noOfNegatives, Neutral: $data.noOfNeutral)</span>
+					</h2>
+				</li>
+			</ul>
+		 	<span style="font-weight:bold;padding:25px; color: #666666">Daily Observations: (Last run:->$data.inferenceDetails[0].lastRun)</span>
+			
+			#if ($!data.inferenceDetails)
+			
+				#foreach ($content in $data.inferenceDetails)
+			
+						<ul class="inner">
+							<li class="inner-list">
+								$content.inference
+							</li>
+						</ul>
+					
+				#end
+				
+			#end
+				
+			
+		 </div> 
+	 
+	#end
+	</body>
+</html>
