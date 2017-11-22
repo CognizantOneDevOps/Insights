@@ -46,6 +46,7 @@ public class ApplicationConfigProvider implements Serializable{
 	private List<String> trustedHosts = new ArrayList<String>(3);	
 	private boolean enableNativeUsers;
     private boolean enableNativeCorrelations;
+    private EmailConfiguration emailConfiguration=new EmailConfiguration();
 
 	private ApplicationConfigProvider(){
 		this.refreshTime = new Date(new Date().getTime() - 86400000);
@@ -163,6 +164,14 @@ public class ApplicationConfigProvider implements Serializable{
 
 	public String getProxyHost() {
 		return proxyHost;
+	}
+
+	public EmailConfiguration getEmailConfiguration() {
+		return emailConfiguration;
+	}
+
+	public void setEmailConfiguration(EmailConfiguration emailConfiguration) {
+		this.emailConfiguration = emailConfiguration;
 	}
 
 	public void setProxyHost(String proxyHost) {
