@@ -176,8 +176,8 @@ module ISightApp {
 
             if ('playlist' === tabName) {
 				var self = this;
-                //this.playListUrl = this.$sce.trustAsResourceUrl(this.grafanaHost + '/dashboard/script/iSight.js?url=' + this.grafanaHost + '/playlists');
-				this.playListUrl = self.restEndpointService.getGrafanaHost() + '/dashboard/script/iSight.js?url=' + self.restEndpointService.getGrafanaHost() + '/playlists';
+                this.playListUrl = this.$sce.trustAsResourceUrl(self.restEndpointService.getGrafanaHost()  + '/dashboard/script/iSight.js?url=' + self.restEndpointService.getGrafanaHost() + '/playlists');
+				//this.playListUrl = self.restEndpointService.getGrafanaHost() + '/dashboard/script/iSight.js?url=' + self.restEndpointService.getGrafanaHost() + '/playlists';
             } else {
                 this.playListUrl = '';
             }
