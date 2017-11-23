@@ -140,11 +140,15 @@ class JenkinsAgent(BaseAgent):
             completedBuilds = builds[startIndex:len(builds)]
             if len(completedBuilds)>0:
                 buildDetails = self.parseResponse(self.responseTemplate, completedBuilds, injectData)
+                buildDetails = self.processLogParsing(buildDetails)
                 self.publishToolsData(buildDetails)
                 if not trackingUpdated:
                     self.updateTrackingDetails(url, completedBuilds[0]["number"])
                     trackingUpdated = True
             start = start + 100
+    
+    def processLogParsing(self, buildDetails):
+        return buildDetails
     
     def updateTrackingDetails(self, buildUrl, buildNumber):
         currentMasterTracking = self.tracking.get(self.currentJenkinsMaster, None)

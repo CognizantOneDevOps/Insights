@@ -21,40 +21,34 @@ Created on Oct 26, 2017
 import requests
 from requests.auth import HTTPBasicAuth
 import json
-import logging
+import copy
 from com.cognizant.devops.platformagents.agents.ci.jenkins.JenkinsAgent import JenkinsAgent
 
-class JenkinsLogParserAgent(JenkinsAgent):
+
+class JenkinsLogParserAgent(JenkinsAgent):         
     
-    def processBuildExecutions(self, url, tillJobCount, lastBuild, injectData):
-        restUrl = url+'api/json?tree=builds[number,result,fullDisplayName]{0,100},name,fullDisplayName'
-        jobDetails = self.getResponse(restUrl, 'GET', self.userid, self.passwd, None)
-        builds = jobDetails[self.buildsApiName]
-        injectData['url'] = url
-        injectData['jobName'] = jobDetails['name']
-        parsedBuilds = []
-        try:
-            for build in builds:
-                logUrl = url + str(build['number']) + "/console"
-                logResponse = self.getBuildLog(logUrl)
-                logTokens = logResponse.split('****Start of Json Output****')
-                for logToken in logTokens:
-                    deploymentTokens = logToken.split('****End of Json Output****')
-                    if len(deploymentTokens) > 1:
-                        deploymentJsonStr = '{' + deploymentTokens[0].split('{')[1].split('}')[0] + '}'
-                        buildJson = json.loads(deploymentJsonStr)
-                        buildJson['buildNumber'] = build['number']
-                        buildJson['result'] = build['result']
-                        buildJson['fullDisplayName'] = build['fullDisplayName']
-                        parsedBuilds.append(buildJson)
-                tillJobCount = tillJobCount - 1
-                if tillJobCount <= 0:
-                    break
-        except Exception as ex:
-            logging.error(ex)
-        buildDetails = self.parseResponse(self.responseTemplate, parsedBuilds, injectData)
-        self.publishToolsData(buildDetails)
-        self.updateTrackingDetails(url, lastBuild)           
+    def processLogParsing(self, buildDetails):
+        dataList = []
+        for build in buildDetails:
+            buildUrl = build['buildUrl']
+            logUrl = buildUrl + "console"
+            logResponse = self.getBuildLog(logUrl)
+            logTokens = logResponse.split('****Start of Json Output****')
+            buildAdded = False
+            for logToken in logTokens:
+                deploymentTokens = logToken.split('****End of Json Output****')
+                if len(deploymentTokens) > 1:
+                    data = copy.deepcopy(build)
+                    dataList.append(data)
+                    buildAdded = True
+                    deploymentJsonStr = '{' + deploymentTokens[0].split('{')[1].split('}')[0] + '}'
+                    buildJson = json.loads(deploymentJsonStr)
+                    for attr in buildJson:
+                        if data.get(attr, None) is None:
+                            data[attr] = buildJson[attr]
+            if not buildAdded:
+                dataList.append(build)
+        return dataList
     
     def getBuildLog(self,url):
         auth = HTTPBasicAuth(self.userid, self.passwd)
