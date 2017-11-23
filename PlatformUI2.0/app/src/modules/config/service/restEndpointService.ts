@@ -48,8 +48,9 @@ module ISightApp {
 					self.serviceHost = data.serviceHost;
 					self.elasticSearchServiceHost = data.elasticSearchServiceHost;
 					self.neo4jServiceHost = data.neo4jServiceHost;
-					self.grafanaHost = data.grafanaHost;
+					//self.grafanaHost = data.grafanaHost;
 				});
+				self.grafanaHost = self.getGrafanaHost();
 			}
 		}
 
@@ -85,6 +86,7 @@ module ISightApp {
 				var authToken = this.$cookies.get('Authorization');
 	            var defaultHeader = {
 	                                    'Authorization': authToken
+	                                  	                                    
 	                                };
 	           
 	            var restcallUrl = self.getServiceHost() + "/PlatformService/configure/grafanaEndPoint"
@@ -96,12 +98,17 @@ module ISightApp {
 	                        headers: defaultHeader
 	                    }
 	                });
-	            resource.allData().$promise.then(function(response){
-                  self.grafanaHost = response;
+	           resource.allData().$promise.then(function(response){
+                  self.grafanaHost = response.grafanaEndPoint;
+                  console.log(self.grafanaHost);
 	            });
+
+	            
+
             }
 
-			return this.grafanaHost;
+			//return self.grafanaHost ;
+			return "http://10.155.143.184:3000";
 		}
 	}
 }
