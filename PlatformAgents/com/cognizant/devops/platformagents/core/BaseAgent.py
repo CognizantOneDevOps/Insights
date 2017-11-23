@@ -194,10 +194,10 @@ class BaseAgent(object):
     def updateJsonFile(self, jsonFile, data):
         with open(jsonFile, 'w') as outfile:
             json.dump(data, outfile, indent=4, sort_keys=True)
-            
-    def getResponse(self, url, method, userName, password, data, authType='BASIC', reqHeaders=None, responseTupple=None):
-        return self.communicationFacade.communicate(url, method, userName, password, data, authType, reqHeaders, responseTupple)
-    
+        
+    def getResponse(self, url, method, userName, password, data, authType='BASIC', reqHeaders=None, responseTupple=None,proxies=None):
+        return self.communicationFacade.communicate(url, method, userName, password, data, authType, reqHeaders, responseTupple,proxies)        
+   
     def parseResponse(self, template, response, injectData={}):
         return self.communicationFacade.processResponse(template, response, injectData, self.config.get('useResponseTemplate',False))
     
