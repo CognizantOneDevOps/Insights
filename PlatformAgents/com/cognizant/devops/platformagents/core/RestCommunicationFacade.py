@@ -32,7 +32,7 @@ class RestCommunicationFacade(object):
         self.sslVerify = sslVerify
         self.responseType = responseType
         
-    def communicate(self, url, method, userName, password, data, authType='BASIC', reqHeaders=None, responseTupple=None):
+    def communicate(self, url, method, userName, password, data, authType='BASIC', reqHeaders=None, responseTupple=None, proxies=None):
         auth = None
         if(userName != None and password != None):
             if(authType == 'NTLM'):
@@ -45,9 +45,9 @@ class RestCommunicationFacade(object):
                    
         response = None
         if('GET' == method):
-            response = requests.get(url, auth=auth, headers=reqHeaders, data=data, verify=self.sslVerify)
+            response = requests.get(url, auth=auth, headers=reqHeaders, data=data,proxies=proxies, verify=self.sslVerify)
         elif('POST' == method):
-            response = requests.post(url, auth=auth, headers=reqHeaders, data=data, verify=self.sslVerify)
+            response = requests.post(url, auth=auth, headers=reqHeaders, data=data,proxies=proxies, verify=self.sslVerify)
         else:
             raise ValueError('RestFacade: Unsupported HTTP Method '+method)
             
