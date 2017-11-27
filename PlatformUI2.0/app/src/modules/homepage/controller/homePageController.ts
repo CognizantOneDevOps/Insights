@@ -104,7 +104,6 @@ module ISightApp {
         imageurl6: string = "dist/icons/svg/landingPage/logout_normal.svg";
         imageurl7: string = "dist/icons/svg/landingPage/magnifying_glass.svg";
         aboutImg: string = "dist/icons/svg/login/about_normal.svg";
-        grafanaHost: String = this.restEndpointService.getGrafanaHost();
         playListUrl: String = '';
         templateName: string = 'insights';
         showInsightsTab: boolean;
@@ -174,10 +173,14 @@ module ISightApp {
             this.authenticationService.validateSession();
             this.templateName = tabName;
 
-            if ('playlist' === tabName) {
-				var self = this;
-                this.playListUrl = this.$sce.trustAsResourceUrl(self.restEndpointService.getGrafanaHost()  + '/dashboard/script/iSight.js?url=' + self.restEndpointService.getGrafanaHost() + '/playlists');
-				//this.playListUrl = self.restEndpointService.getGrafanaHost() + '/dashboard/script/iSight.js?url=' + self.restEndpointService.getGrafanaHost() + '/playlists';
+             if ('playlist' === tabName) {
+                var self = this;
+                self.restEndpointService.getGrafanaHost1().then(function(response){
+                    var grafanaEndPoint =  response.grafanaEndPoint;
+                    self.playListUrl = self.$sce.trustAsResourceUrl(grafanaEndPoint + '/dashboard/script/iSight.js?url=' + grafanaEndPoint + '/playlists');
+                });  
+               // this.playListUrl = this.$sce.trustAsResourceUrl(self.restEndpointService.getGrafanaHost()  + '/dashboard/script/iSight.js?url=' + self.restEndpointService.getGrafanaHost() + '/playlists');
+               //this.playListUrl = self.restEndpointService.getGrafanaHost() + '/dashboard/script/iSight.js?url=' + self.restEndpointService.getGrafanaHost() + '/playlists';
             } else {
                 this.playListUrl = '';
             }
@@ -263,12 +266,14 @@ module ISightApp {
                             // construct a form with hidden inputs, targeting the iframe
                             var form = document.createElement("form");
                             form.target = uniqueString;
-                            //form.action = "http://localhost:3000/logout";
-                            form.action = self.restEndpointService.getGrafanaHost() + '/logout';
-                            //console.log(form.action);
-                            form.method = "GET";
-							document.body.appendChild(form);
-							form.submit();					
+                            self.restEndpointService.getGrafanaHost1().then(function(response){
+                                form.action = response.grafanaEndPoint + "/login";
+                                console.log("form action "+form.action);
+                                form.method = "GET";
+                                document.body.appendChild(form);
+                                form.submit();
+                            });
+									
                 });
             var cookieVal = this.$cookies.getAll();
             for (var key in cookieVal) {
