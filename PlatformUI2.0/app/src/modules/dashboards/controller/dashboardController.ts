@@ -139,11 +139,19 @@ module ISightApp {
                 .then(function (data) {
                     if (data.grafanaCurrentOrgRole === 'Admin') {
                         self.homeController.showAdminTab = true;
-                        self.homeController.selectedIndex = 2;
+                        if(self.homeController.showInsightsTab){
+                            self.homeController.selectedIndex = 2;
+                        }else{
+                            self.homeController.selectedIndex = 1;
+                        }
                         
                     } else {
                         self.homeController.showAdminTab = false;
-                        self.homeController.selectedIndex = 1;
+                        if(self.homeController.showInsightsTab){
+                            self.homeController.selectedIndex = 1;
+                        }else{
+                            self.homeController.selectedIndex = 0;
+                        }
                     }
 
                     self.$cookies.put('grafanaRole', data.grafanaCurrentOrgRole);

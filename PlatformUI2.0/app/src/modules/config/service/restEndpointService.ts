@@ -22,6 +22,8 @@ module ISightApp {
 		getelasticSearchServiceHost(): String;
 		getNeo4jServiceHost(): String;
 		getGrafanaHost(): String;
+		getGrafanaHost1(): ng.IPromise<any>;
+		
 	}
 
 	export class RestEndpointService implements IRestEndpointService {
@@ -29,6 +31,7 @@ module ISightApp {
 
 		constructor(private $location, private $http, private $cookies, private $resource) {
 			this.loadUiServiceLocation();
+	
 		}
 
 		private loadUiServiceLocation(): void {
@@ -50,7 +53,7 @@ module ISightApp {
 					self.neo4jServiceHost = data.neo4jServiceHost;
 					//self.grafanaHost = data.grafanaHost;
 				});
-				self.grafanaHost = self.getGrafanaHost();
+				//self.grafanaHost = self.getGrafanaHost();
 			}
 		}
 
@@ -58,7 +61,7 @@ module ISightApp {
 		elasticSearchServiceHost: String;
 		neo4jServiceHost: String;
 		grafanaHost: String;
-
+		
 		public getServiceHost(): String {
 			if (!this.serviceHost) {
 				this.serviceHost = this.$location.protocol() + "://" + this.$location.host() + ":" + this.$location.port();
@@ -80,35 +83,37 @@ module ISightApp {
 			return this.neo4jServiceHost;
 		}
 
-		public getGrafanaHost(): String {
+		public getGrafanaHost() : String {
+            if (!this.grafanaHost) {
+                this.grafanaHost = this.$location.protocol() + "://" + this.$location.host() + ":3000";
+            }
+            return this.grafanaHost;
+        };
+
+		public getGrafanaHost1(): ng.IPromise<any> {
 			var self = this;
-			if (!this.grafanaHost) {
+			
 				var authToken = this.$cookies.get('Authorization');
 	            var defaultHeader = {
 	                                    'Authorization': authToken
 	                                  	                                    
 	                                };
-	           
-	            var restcallUrl = self.getServiceHost() + "/PlatformService/configure/grafanaEndPoint"
-	            var resource = this.$resource(restcallUrl,
-	                {},
-	                {
-	                    allData: {
-	                        method: 'GET',
-	                        headers: defaultHeader
-	                    }
-	                });
-	           resource.allData().$promise.then(function(response){
-                  self.grafanaHost = response.grafanaEndPoint;
-                  console.log(self.grafanaHost);
-	            });
-
 	            
-
-            }
-
-			//return self.grafanaHost ;
-			return "http://10.155.143.184:3000";
+				
+       
+			var restcallUrl = "http://127.0.0.1:8090/" + "PlatformService/configure/grafanaEndPoint";
+					  
+			            var resource = self.$resource(restcallUrl,
+			                {},
+			                {
+			                    allData: {
+			                        method: 'GET',
+			                        headers: defaultHeader
+			                    }
+			                });
+			          return resource.allData().$promise;
+			
+			
 		}
 	}
 }
