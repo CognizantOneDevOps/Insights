@@ -67,7 +67,7 @@ module ISightApp {
                             self.selectedIndex = 1;
                            self.templateName = 'insights';
                         }else{
-                             self.selectedIndex = 2;
+                             self.selectedIndex = 1;
                             self.templateName = 'dashboards';
                 
                         }
@@ -76,7 +76,7 @@ module ISightApp {
                             self.selectedIndex = 0;
                             self.templateName = 'insights';
                         }else{
-                             self.selectedIndex = 1;
+                             self.selectedIndex = 0;
                              self.templateName = 'dashboards';
                 
                         }
