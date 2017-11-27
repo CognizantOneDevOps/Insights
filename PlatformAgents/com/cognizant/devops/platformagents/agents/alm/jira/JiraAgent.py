@@ -35,9 +35,9 @@ class JiraAgent(BaseAgent):
         maxResults = 0
         startAt = 0
         updatetimestamp = None
-        data = []
         sprintField = self.config.get("sprintField", None)
         while (startAt + maxResults) < total:
+            data = []
             response = self.getResponse(jiraIssuesUrl+'&startAt='+str(startAt + maxResults), 'GET', userid, passwd, None)
             jiraIssues = response["issues"]
             for issue in jiraIssues:
