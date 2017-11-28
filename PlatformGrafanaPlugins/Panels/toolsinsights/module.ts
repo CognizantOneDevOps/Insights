@@ -724,8 +724,12 @@ class PipelinePanelCtrl extends MetricsPanelCtrl {
             var selectedToolArr = seleToolData[key];
             selectedToolArr["position"] = count++;
 
-            var newSelectedToolArr = this.toolsDetailJson[toolName];
-
+            for (var i in this.toolDetailMappingJson) {
+                if (toolName === this.toolDetailMappingJson[i].toolName) {
+                    var newSelectedToolArr = this.toolDetailMappingJson[i].fields;
+                }
+            }
+            
             this.tableHeader.push("Sr.No");
             for (key in newSelectedToolArr) {
 

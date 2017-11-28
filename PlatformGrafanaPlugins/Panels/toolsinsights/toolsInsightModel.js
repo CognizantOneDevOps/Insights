@@ -6,14 +6,14 @@ System.register([], function (exports_1, context_1) {
     return {
         setters: [],
         execute: function () {///<reference path="../../../headers/common.d.ts" />
-            ToolsInsightModel = /** @class */ (function () {
+            ToolsInsightModel = (function () {
                 function ToolsInsightModel(toolsDetails) {
                     this.toolsDetails = toolsDetails;
                 }
                 return ToolsInsightModel;
             }());
             exports_1("ToolsInsightModel", ToolsInsightModel);
-            Tools = /** @class */ (function () {
+            Tools = (function () {
                 function Tools(toolName, fields) {
                     this.toolName = toolName;
                     this.fields = fields;
@@ -21,7 +21,7 @@ System.register([], function (exports_1, context_1) {
                 return Tools;
             }());
             exports_1("Tools", Tools);
-            Fields = /** @class */ (function () {
+            Fields = (function () {
                 function Fields(fieldName, headerName) {
                     this.fieldName = fieldName;
                     this.headerName = headerName;

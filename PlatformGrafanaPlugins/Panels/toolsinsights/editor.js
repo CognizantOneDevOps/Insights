@@ -25,7 +25,7 @@ System.register(["lodash", "./toolsInsightModel"], function (exports_1, context_
             }
         ],
         execute: function () {///<reference path="../../../headers/common.d.ts" />
-            ToolsInsightEditorCtrl = /** @class */ (function () {
+            ToolsInsightEditorCtrl = (function () {
                 /** @ngInject */
                 function ToolsInsightEditorCtrl($scope, $q, uiSegmentSrv) {
                     this.$q = $q;

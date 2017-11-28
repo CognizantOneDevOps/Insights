@@ -1,16 +1,11 @@
 ///<reference path="../../../headers/common.d.ts" />
 System.register(["lodash", "jquery", "app/plugins/sdk", "./editor"], function (exports_1, context_1) {
     "use strict";
-    var __extends = (this && this.__extends) || (function () {
-        var extendStatics = Object.setPrototypeOf ||
-            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-        return function (d, b) {
-            extendStatics(d, b);
-            function __() { this.constructor = d; }
-            d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-        };
-    })();
+    var __extends = (this && this.__extends) || function (d, b) {
+        for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
     var __moduleName = context_1 && context_1.id;
     var lodash_1, jquery_1, sdk_1, editor_1, PipelinePanelCtrl;
     return {
@@ -29,7 +24,7 @@ System.register(["lodash", "jquery", "app/plugins/sdk", "./editor"], function (e
             }
         ],
         execute: function () {///<reference path="../../../headers/common.d.ts" />
-            PipelinePanelCtrl = /** @class */ (function (_super) {
+            PipelinePanelCtrl = (function (_super) {
                 __extends(PipelinePanelCtrl, _super);
                 /** @ngInject */
                 function PipelinePanelCtrl($scope, $injector, annotationsSrv, $sanitize, $window, $rootScope) {
@@ -669,7 +664,6 @@ System.register(["lodash", "jquery", "app/plugins/sdk", "./editor"], function (e
                                 this.toolsRelationDataArray.push(this.toolDataMap[toolNam]);
                             }
                         }
-                        //}
                     }
                     this.showAdvanceView = true;
                     //console.log(this.toolDataMap);
@@ -690,7 +684,11 @@ System.register(["lodash", "jquery", "app/plugins/sdk", "./editor"], function (e
                         this.tableHeader = [];
                         var selectedToolArr = seleToolData[key];
                         selectedToolArr["position"] = count++;
-                        var newSelectedToolArr = this.toolsDetailJson[toolName];
+                        for (var i in this.toolDetailMappingJson) {
+                            if (toolName === this.toolDetailMappingJson[i].toolName) {
+                                var newSelectedToolArr = this.toolDetailMappingJson[i].fields;
+                            }
+                        }
                         this.tableHeader.push("Sr.No");
                         for (key in newSelectedToolArr) {
                             var headVal = newSelectedToolArr[key]["headerName"];
@@ -811,9 +809,9 @@ System.register(["lodash", "jquery", "app/plugins/sdk", "./editor"], function (e
                         ctrl.renderingCompleted();
                     });
                 };
-                PipelinePanelCtrl.templateUrl = 'module.html';
                 return PipelinePanelCtrl;
             }(sdk_1.MetricsPanelCtrl));
+            PipelinePanelCtrl.templateUrl = 'module.html';
             exports_1("PipelinePanelCtrl", PipelinePanelCtrl);
             exports_1("PanelCtrl", PipelinePanelCtrl);
         }

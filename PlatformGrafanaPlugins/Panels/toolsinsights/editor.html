@@ -152,9 +152,10 @@
 
     <!--Test with Model-->
     <div ng-if="toolsInsightEditorCtrl.checkFieldMapping()">
-        <md-divider layout class="divider" flex="100" style="border-top-color: #b7b7cc;margin-top:15px;" ng-if="toolsInsightEditorCtrl.checkFieldMapping()"></md-divider>
-        <div class="section">
-            <h3 class="section-heading fldMappingHdg">Field Mapping</h3>
+        <hr class="divider">
+        <!--<md-divider layout class="divider" flex="100" style="border-top-color: #b7b7cc;margin-top:15px;" ng-if="toolsInsightEditorCtrl.checkFieldMapping()"></md-divider>-->
+        <div class="sectionCustom">
+            <h3 class="section-heading fldMappingHdg" style="margin-top: 25px !important">Field Mapping</h3>
             <div class="clearProp" ng-repeat="key in toolsInsightEditorCtrl.toolMappingJson track by $index">
                 <div class="fldDbNm floatLfProp" ng-repeat="field in key.fields" ng-if="field.fieldName
 								!=''" style="margin-top: 16px;background-color:#e0e0ff">
@@ -178,7 +179,8 @@
 
     <!--Test With Model-->
     <div ng-if="toolsInsightEditorCtrl.checkValueMapping()">
-        <md-divider layout class="divider" flex="100"></md-divider>
+        <hr class="divider">
+        <!--<md-divider layout class="divider" flex="100"></md-divider>-->
         <div class="sectionCustom">
             <h3 class="section-heading fldMappingHdg">Advanced View Settings</h3>
 
