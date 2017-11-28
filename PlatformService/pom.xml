@@ -49,6 +49,8 @@
 				    <include>**/*.md</include>
 				    <include>**/*.json</include>
 					<include>version.properties</include>
+					<include>*.properties</include>
+					<include>**/*.properties</include>
 					<include>PlatformServiceVersion.json</include>
 				</includes>
 				<filtering>true</filtering>
