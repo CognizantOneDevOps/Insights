@@ -5,7 +5,7 @@ node {
    //git url:'http://IP/root/insights.git'       
    
     checkout scm
-    sh 'mvn clean package -DskipTests=True'
+    sh 'mn clean package -DskipTests=True'
     buildSuccess=true
     }
     stage ('CodeMerge') {
