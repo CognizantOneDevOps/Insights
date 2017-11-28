@@ -103,7 +103,7 @@ module ISightApp {
         imageurl5: string = "dist/icons/svg/landingPage/playlist_normal.svg";
         imageurl6: string = "dist/icons/svg/landingPage/logout_normal.svg";
         imageurl7: string = "dist/icons/svg/landingPage/magnifying_glass.svg";
-        aboutImg: string = "dist/icons/svg/login/about_normal.svg";
+        aboutImg: string = "dist/icons/svg/landingPage/about_normal.svg";
         playListUrl: String = '';
         templateName: string = 'insights';
         showInsightsTab: boolean;
@@ -267,8 +267,8 @@ module ISightApp {
                             var form = document.createElement("form");
                             form.target = uniqueString;
                             self.restEndpointService.getGrafanaHost1().then(function(response){
-                                form.action = response.grafanaEndPoint + "/login";
-                                console.log("form action "+form.action);
+                                form.action = response.grafanaEndPoint + "/logout";
+                               // console.log("form action "+form.action);
                                 form.method = "GET";
                                 document.body.appendChild(form);
                                 form.submit();
