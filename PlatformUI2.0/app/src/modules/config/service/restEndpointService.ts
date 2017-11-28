@@ -101,7 +101,7 @@ module ISightApp {
 	            
 				
        
-			var restcallUrl = this.$location.protocol() + "://" + this.$location.host() + ":" + this.$location.port() + "PlatformService/configure/grafanaEndPoint";
+			var restcallUrl = this.$location.protocol() + "://" + this.$location.host() + ":" + this.$location.port() + "/PlatformService/configure/grafanaEndPoint";
 					  
 			            var resource = self.$resource(restcallUrl,
 			                {},
