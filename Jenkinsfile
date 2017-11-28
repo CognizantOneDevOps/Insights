@@ -10,6 +10,7 @@ node {
     }
     stage ('CodeMerge') {
     //Merge code only if Build succeeds.
+    //
     if (buildSuccess == true)
     {
     sh 'git config --global user.email sowmiya.ranganathan@cognizant.com'
