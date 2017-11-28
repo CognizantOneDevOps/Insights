@@ -20,6 +20,7 @@ node {
     //Takes current pull request branchName to merge
     sh 'git merge origin/$branchName'
     sh 'git push origin master'
+    echo 'test'
     }
   }
    //stage ('Insight_CodeAnalysis') {
