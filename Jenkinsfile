@@ -2,13 +2,14 @@ env.dockerimagename="devopsbasservice/buildonframework:insights-buildon"
 node {
    stage ('Insight_Build') {
    //If some other Repository is to be given apart from current repo, provide git  URL as below.. 
-   //git url:'http://IP/root/insights.git'       
+   //git url:'http://IP/user/repoName.git'       
    
     checkout scm
-    sh 'mn clean package -DskipTests=True'
+    sh 'mvn clean package -DskipTests=True'
     buildSuccess=true
     }
     stage ('CodeMerge') {
+    //Merge code only if Build succeeds.
     if (buildSuccess == true)
     {
     sh 'git config --global user.email sowmiya.ranganathan@cognizant.com'
