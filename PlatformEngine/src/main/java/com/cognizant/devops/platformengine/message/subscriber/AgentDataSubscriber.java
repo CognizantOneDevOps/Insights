@@ -114,26 +114,21 @@ public class AgentDataSubscriber extends EngineSubscriberResponseHandler{
 	
 	private String buildCypherQuery(String labels, String fieldName, String relation){
 		StringBuffer query = new StringBuffer();
-		query.append("UNWIND {props} AS properties CREATE (new:LATEST) set new=properties ").append(" ");
-		query.append("WITH new,").append(" ");
+		query.append("UNWIND {props} AS properties MERGE (node:").append(labels).append(" { ");
 		if(fieldName.contains(",")){
 			String[] fields = fieldName.split(",");
 			JsonObject searchCriteria = new JsonObject();
 			for(String field : fields){
 				searchCriteria.addProperty(field, field);
-				query.append("new.").append(field).append(" as ").append(field).append(",");
+				query.append(field).append(" : properties.").append(field).append(",");
 			}
 			query.delete(query.length()-1, query.length());
 			query.append(" ");
-			query.append("OPTIONAL match (old:LATEST:").append(labels).append(searchCriteria.toString().replace("\"", "")).append(")").append(" ");
-		}else{
-			query.append("new.").append(fieldName).append(" as key").append(" ");
-			query.append("OPTIONAL match (old:LATEST:").append(labels).append("{").append(fieldName).append(":key})").append(" ");
+		}else {
+			query.append(fieldName).append(" : ").append("properties.").append(fieldName);
 		}
-		query.append("with new, collect(old) as oldNodes").append(" ");
-		query.append("set new:").append(labels).append(" ");
-		query.append("foreach (old in oldNodes | remove old:LATEST ").append(" CREATE (old) -[r:").append(relation).append("]-> (new))").append(" ");
-		query.append("return count(new), count(oldNodes)").append(" ");
+		query.append(" }) set node+=properties ").append(" ");
+		query.append("return count(node)").append(" ");
 		return query.toString();
 	}
 }
