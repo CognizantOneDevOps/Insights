@@ -2,7 +2,7 @@ env.dockerimagename="devopsbasservice/buildonframework:boins"
 node {
    stage ('Insight_Build') {
         checkout scm
-		sh 'mvn clean install –DskipTests'
+		sh 'mvn clean install -DskipTests'
 		buildSuccess=true
     }
 	
