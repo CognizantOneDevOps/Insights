@@ -55,11 +55,6 @@
 			<version>2.2.0</version>
 		</dependency>
 		<dependency>
-		    <groupId>javax.mail</groupId>
-		    <artifactId>mail</artifactId>
-		    <version>1.4.7</version>
-		</dependency>
-		<dependency>
 		    <groupId>org.apache.velocity</groupId>
 		    <artifactId>velocity</artifactId>
 		    <version>1.7</version>
@@ -115,7 +110,7 @@
        <resource>
 				<directory>src/main/resources</directory>
 				<includes>
-				     <include>**/*.vm</include>
+				     <include>**/*.*</include>
 				</includes>
 				<filtering>true</filtering>
 		</resource>

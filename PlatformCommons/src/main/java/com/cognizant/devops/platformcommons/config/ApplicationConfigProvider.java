@@ -35,6 +35,7 @@ public class ApplicationConfigProvider implements Serializable{
 	private GraphData graph = new GraphData();
 	private GrafanaData grafana = new GrafanaData();
 	private MessageQueueDataModel messageQueue = new MessageQueueDataModel();
+	private String insightsServiceURL;
 	private boolean disableAuth = false;
 	private String insightsTimeZone = "US/Central";
 	private PostgreData postgre;
@@ -44,6 +45,7 @@ public class ApplicationConfigProvider implements Serializable{
 	private int proxyPort;
 	private Date refreshTime;
 	private List<String> trustedHosts = new ArrayList<String>(3);	
+
 	private boolean enableNativeUsers;
     private boolean enableNativeCorrelations;
     private EmailConfiguration emailConfiguration=new EmailConfiguration();
@@ -210,4 +212,11 @@ public class ApplicationConfigProvider implements Serializable{
         this.enableNativeCorrelations = enableNativeCorrelations;
     }
 
+	public String getInsightsServiceURL() {
+		return insightsServiceURL;
+	}
+
+	public void setInsightsServiceURL(String insightsServiceURL) {
+		this.insightsServiceURL = insightsServiceURL;
+	}
 }

@@ -1,65 +1,81 @@
+/*******************************************************************************
+ * Copyright 2017 Cognizant Technology Solutions
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License.  You may obtain a copy
+ * of the License at
+ * 
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ ******************************************************************************/
+
 package com.cognizant.devops.insightsemail.core;
 
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
-import java.util.Date;
-import java.util.Properties;
+import java.security.KeyManagementException;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.cert.X509Certificate;
 
-import javax.mail.Message;
 import javax.mail.MessagingException;
-import javax.mail.Session;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeMessage;
+import javax.net.ssl.SSLContext;
 
 import org.apache.commons.codec.binary.Base64;
-import org.apache.velocity.Template;
-import org.apache.velocity.VelocityContext;
-import org.apache.velocity.app.VelocityEngine;
-import org.apache.velocity.runtime.RuntimeConstants;
-import org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader;
+import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
+import org.apache.http.conn.ssl.SSLContexts;
+import org.apache.http.conn.ssl.TrustStrategy;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.log4j.Logger;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
+import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.web.client.RestTemplate;
 
-
-import com.cognizant.devops.insightsemail.configs.EmailConstants;
-import com.cognizant.devops.platformcommons.config.ApplicationConfigCache;
+import com.cognizant.devops.insightsemail.core.util.EmailFormatter;
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.config.EmailConfiguration;
+import com.cognizant.devops.platformcommons.core.email.EmailConstants;
+import com.cognizant.devops.platformcommons.core.email.EmailUtil;
+import com.cognizant.devops.platformcommons.core.email.Mail;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
 public class InsightsEmailService {
-	EmailConfiguration emailConfiguration=ApplicationConfigProvider.getInstance().getEmailConfiguration();
+	
+	private static final Logger LOG = Logger.getLogger(InsightsEmailService.class);
+	EmailConfiguration emailConfiguration = ApplicationConfigProvider.getInstance().getEmailConfiguration();
 
 	public void sendEmail(Mail mail) throws MessagingException, UnsupportedEncodingException {
-		String smtpHostServer=emailConfiguration.getSmtpHostServer();
-		JsonObject json=getInferenceDetails();
-		StringWriter writer = populateTemplate(json); 
-		Properties props = System.getProperties();
-		props.put(EmailConstants.SMTPHOST, smtpHostServer);
-		Session session = Session.getInstance(props, null);
-			MimeMessage msg = new MimeMessage(session);
-			msg.addHeader(EmailConstants.CONTENTTYPE, EmailConstants.CHARSET);
-			msg.addHeader(EmailConstants.FORMAT, EmailConstants.FLOWED);
-			msg.addHeader(EmailConstants.ENCODING, EmailConstants.BIT);
-			msg.setFrom(new InternetAddress(mail.getMailFrom(),EmailConstants.NOREPLY));
-			msg.setReplyTo(InternetAddress.parse(mail.getMailTo(), false));
-			msg.setSubject(mail.getSubject(), EmailConstants.UTF);
-			msg.setContent(writer.toString(), EmailConstants.HTML);
-			msg.setSentDate(new Date());
-			msg.setRecipients(Message.RecipientType.TO, InternetAddress.parse(mail.getMailTo(), false));
-			//	Transport.send(msg);
+		
+		LOG.debug("Inside sendEmail method");
+		try {
+			JsonObject json = getInferenceDetails();
+			
+			String emailTemplate = emailConfiguration.getEmailVelocityTemplate();
+			String emailBody = getFormattedEmailContent(json,emailTemplate); 
+			EmailUtil.getInstance().sendEmail(mail, emailConfiguration,emailBody);
+			
+		} catch (Exception e) {
+			LOG.error("Error sending email", e);
+		}
 	}
 
-	private JsonObject getInferenceDetails() {
-		RestTemplate restTemplate = new RestTemplate();
-		String credential = emailConfiguration.getRestUserName()+":"+
-							emailConfiguration.getRestPassword();
+	private JsonObject getInferenceDetails() throws KeyManagementException, KeyStoreException, NoSuchAlgorithmException {
+		//RestTemplate restTemplate = new RestTemplate();
+		RestTemplate restTemplate = restTemplate();
+		String credential = ApplicationConfigProvider.getInstance().getUserId()+":"+
+				ApplicationConfigProvider.getInstance().getPassword();
 		byte[] credsBytes = credential.getBytes();
 		byte[] base64CredsBytes = Base64.encodeBase64(credsBytes);
 		String base64Creds = new String(base64CredsBytes);
@@ -67,17 +83,17 @@ public class InsightsEmailService {
 		headers.set(EmailConstants.ACCEPT, MediaType.APPLICATION_JSON_UTF8_VALUE);
 		headers.add(EmailConstants.AUTHORIZATION, "Basic "+base64Creds);
 		HttpEntity<?> entity = new HttpEntity<>(headers);
-		String restUrl=emailConfiguration.getRestUrl()+"/PlatformService/insights/inferences";
+		String restUrl = ApplicationConfigProvider.getInstance().getInsightsServiceURL()+"/PlatformService/insights/inferences";
 		HttpEntity<String> response = restTemplate.exchange(restUrl,HttpMethod.GET,entity,String.class);
 		JsonParser parser = new JsonParser(); 
 		JsonObject resultJson=new JsonObject();
 		resultJson= (JsonObject) parser.parse(response.getBody()).getAsJsonObject();
-
+		LOG.debug("Insights inference details received from service");
 		return resultJson;
 	}
 	
-	private StringWriter populateTemplate(JsonObject json) {
-		StringWriter stringWriter = new StringWriter();
+	private String getFormattedEmailContent(JsonObject json, String emailTemplate) {
+		
 		JsonArray array = json.get(EmailConstants.DATA).getAsJsonArray();
 		for(JsonElement element : array){
 			
@@ -104,22 +120,32 @@ public class InsightsEmailService {
 			 element.getAsJsonObject().addProperty(EmailConstants.NOOFPOSITIVE,noOfPositives);
 			 element.getAsJsonObject().addProperty(EmailConstants.NOOFNEGATIVE,noOfNegatives);
 		}
-		Template template = initializeTemplate();
-		VelocityContext context = new VelocityContext(); 
-		context.put(EmailConstants.ACCORDIANDATA,array);
-		template.merge(context,stringWriter);
+		
+		StringWriter stringWriter = EmailFormatter.getInstance().populateTemplate(array, emailTemplate);
 		System.out.println(stringWriter.toString());
-		return stringWriter;
+		return stringWriter.toString();
 	}
 
-	private Template initializeTemplate() {
-		VelocityEngine velocityEngine=new VelocityEngine();
-		velocityEngine.setProperty(RuntimeConstants.RESOURCE_LOADER,EmailConstants.CLASSPATH);
-		velocityEngine.setProperty(EmailConstants.LOADER,ClasspathResourceLoader.class.getName());
-		velocityEngine.init();      
-		Template template = velocityEngine.getTemplate("templates/inference.vm");
-		return template;
-	}
+	public RestTemplate restTemplate() throws KeyStoreException, NoSuchAlgorithmException, KeyManagementException {
+	    TrustStrategy acceptingTrustStrategy = (X509Certificate[] chain, String authType) -> true;
+
+	    SSLContext sslContext = SSLContexts.custom()
+	                    .loadTrustMaterial(null, acceptingTrustStrategy)
+	                    .build();
+
+	    SSLConnectionSocketFactory csf = new SSLConnectionSocketFactory(sslContext,SSLConnectionSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
+
+	    CloseableHttpClient httpClient = HttpClients.custom()
+	                    .setSSLSocketFactory(csf)
+	                    .build();
+
+	    HttpComponentsClientHttpRequestFactory requestFactory =
+	                    new HttpComponentsClientHttpRequestFactory();
+
+	    requestFactory.setHttpClient(httpClient);
+	    RestTemplate restTemplate = new RestTemplate(requestFactory);
+	    return restTemplate;
+	 }
 	
 	public static void main(String[] args)
 	{	

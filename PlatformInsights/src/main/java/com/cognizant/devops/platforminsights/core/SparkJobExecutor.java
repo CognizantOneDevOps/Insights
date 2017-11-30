@@ -24,7 +24,9 @@ import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 
+import com.cognizant.devops.insightsemail.job.AlertEmailJobExecutor;
 import com.cognizant.devops.platformcommons.config.ApplicationConfigCache;
+import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.core.enums.ExecutionActions;
 import com.cognizant.devops.platformcommons.core.util.InsightsUtils;
 import com.cognizant.devops.platforminsights.core.avg.AverageActionImpl;
@@ -53,7 +55,7 @@ public class SparkJobExecutor implements Job,Serializable{
 	
 	private void startExecution() {
 		log.debug("Starting Spark Jobs Execution");
-		ApplicationConfigCache.loadConfigCache();
+		//ApplicationConfigCache.loadConfigCache();
 		SparkJobConfigHandler configHandler = new SparkJobConfigHandler();
 		List<SparkJobConfiguration> jobs = configHandler.loadJobsFromES();
 		
@@ -76,8 +78,17 @@ public class SparkJobExecutor implements Job,Serializable{
 			if(updatedJobs.size() > 0) {
 				configHandler.updateJobsInES(jobs);
 			}
+			
+			if(ApplicationConfigProvider.getInstance().getEmailConfiguration().getSendEmailEnabled()) {
+				sendEmail();
+			}
 	}
 	
+	private void sendEmail() {
+		AlertEmailJobExecutor exe=new AlertEmailJobExecutor();
+		exe.sendMail();
+	}
+
 	private void executeJob(SparkJobConfiguration job)  throws InsightsSparkJobFailedException{
 		
 		KPIDefinition kpiDefinition = job.getKpiDefinition(job.getKpiDefinition());
