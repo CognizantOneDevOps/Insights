@@ -70,19 +70,19 @@
 				</plugin>
       		</plugins>
 		</build>
-    <scm>
+   <!-- <scm>
         <connection>scm:git:http://localhost:7990/scm/dev/devopsplatform.git</connection>
         <developerConnection>scm:git:http://localhost:7990/scm/dev/devopsplatform.git</developerConnection>
         <url>https://bitbucket.org/atlassian/stash-auto-unapprove-plugin</url>
         <tag>InSights-2.11.0.0</tag>
-    </scm>
+    </scm> -->
 	
-<distributionManagement>
+<!-- <distributionManagement>
 	<repository>
 		<id>InSightsArtifactsREL</id>
 		<name>InSightsArtifactsREL</name>
 		<url>http://localhost:9005/nexus/content/repositories/InSightsArtifactsREL/</url>
-	</repository>
+	</repository> 
 	
    <snapshotRepository>
         <id>InSightsArtifacts</id>
@@ -90,7 +90,13 @@
         <url>http://localhost:9005/nexus/content/repositories/InSightsArtifacts/</url>
     </snapshotRepository>
 	
-</distributionManagement>
+</distributionManagement> --> 
+	<distributionManagement>
+		   <snapshotRepository>
+			  <id>nexus</id>
+			  <url>http://54.209.104.148:8081/nexus/content/repositories/buildonInsights/</url>
+		   </snapshotRepository>
+		</distributionManagement>
 	
 	<profiles>
 	   <profile>
