@@ -25,7 +25,7 @@ node {
 	stage ('CodeMerge') {
     //Merge code only if Build succeeds..
     
-    if (buildSuccess == true && codeQualitySuccess == true && nexusSuccess == true && deploymentSucess == true)
+    if (buildSuccess == true && codeQualitySuccess == true && nexusSuccess == true && deploymentSuccess == true)
     {
     echo 'CodeMerge can be done'
     }
