@@ -18,7 +18,7 @@ node {
 	}
 	
 	stage ('Deployment_SparkServer_QA') {
-		sh 'scp /var/jenkins/jobs/$commitID/workspace/PlatformInsights/target/PlatformInsights-0.0.1-SNAPSHOT-jar-with-dependencies.jar ubuntu@54.87.224.77:/tmp/'
+		sh 'scp -o "StrictHostKeyChecking no" /var/jenkins/jobs/$commitID/workspace/PlatformInsights/target/PlatformInsights-0.0.1-SNAPSHOT-jar-with-dependencies.jar ubuntu@54.87.224.77:/tmp/'
 		sh 'nohup java -jar /tmp/PlatformInsights-0.0.1-SNAPSHOT-jar-with-dependencies.jar &'
 		deploymentSuccess=true
 	}
