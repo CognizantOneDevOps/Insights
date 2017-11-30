@@ -17,8 +17,8 @@ node {
 	}
 	
 	stage ('Deployment_QA') {
-		sh 'mvn tomcat7:undeploy -DskipTests'
-		sh 'mvn tomcat7:redeploy -DskipTests'
+		sh 'cd /var/jenkins/jobs/$commitID/workspace/PlatformService && mvn tomcat7:undeploy -DskipTests'
+		sh 'cd /var/jenkins/jobs/$commitID/workspace/PlatformService && mvn tomcat7:redeploy -DskipTests'
 		deploymentSuccess=true
 	}
 	
