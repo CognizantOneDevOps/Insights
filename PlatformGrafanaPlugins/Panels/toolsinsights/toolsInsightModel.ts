@@ -9,13 +9,13 @@ export class ToolsInsightModel {
 export class Tools {
     constructor(
         public toolName: string,
-        public selectedFieldMapping: Fields[]
+        public fields: Fields[]
     ) { }
 }
 
 export class Fields {
     constructor(
-        public dbName: string,
-        public displayName: string
+        public fieldName: string,
+        public headerName: string
     ) { }
 }
