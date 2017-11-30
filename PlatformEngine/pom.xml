@@ -128,7 +128,7 @@
 			</resource>
 		</resources>
 	</build>
-
+<!--
 	<distributionManagement>
 		<repository>
 			<id>InSightsArtifactsREL</id>
@@ -141,5 +141,5 @@
 			<name>InSightsArtifacts</name>
 			<url>http://localhost:9005/nexus/content/repositories/InSightsArtifacts/</url>
 		</snapshotRepository>
-	</distributionManagement>
+	</distributionManagement> -->
 </project>
