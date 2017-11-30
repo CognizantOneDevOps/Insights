@@ -9,7 +9,7 @@ import _ from 'lodash';
 import $ from 'jquery';
 import moment from 'moment';
 import angular from 'angular';
-import { ToolsInsightModel, Fields } from './toolsInsightModel';
+import { ToolsInsightModel, Tools, Fields } from './toolsInsightModel';
 
 export class ToolsInsightEditorCtrl {
   toolsInsightsPanel: any;
@@ -20,17 +20,12 @@ export class ToolsInsightEditorCtrl {
   addColumnSegment: any;
   fieldList = [];
   selectedFieldList = [];
-  toolsInsightModel: ToolsInsightModel[];
   toolDataJson = {};
   selectedToolsDetailJson = {};
-  defaultJson = {};
   showFieldDetails: boolean = false;
   fieldVal: Fields[];
-  defaultToolSequence = [];
-  lastSelectedToolSequence = [];
-  lastSelectedToolsJson = {};
-  isDefaultValue: number = 1;
-  isCustomValue: number;
+  toolMappingJson = [];
+  defaultMappingJson = [];
 
   /** @ngInject */
   constructor($scope, private $q, private uiSegmentSrv) {
@@ -46,20 +41,15 @@ export class ToolsInsightEditorCtrl {
       self.getToolListOptions(toolDataArray);
     }
     self.selectedToolSeq = self.toolsInsightsPanelCtrl.pipelineToolsArray;
-    self.defaultJson = self.toolsInsightsPanelCtrl.defaultMapping;
-    self.defaultToolSequence = self.toolsInsightsPanelCtrl.pipelineToolsArrayDefault;
     if (self.toolsInsightsPanelCtrl.lastSelectedDetailJson !== undefined) {
-      self.lastSelectedToolSequence = self.toolsInsightsPanelCtrl.lastSelectedSeq;
-      self.lastSelectedToolsJson = self.toolsInsightsPanelCtrl.lastSelectedDetailJson;
     }
     if (self.selectedToolSeq === undefined) {
       self.selectedToolSeq = [];
     }
     if (self.toolsInsightsPanelCtrl.toolsDetailJson !== undefined) {
       self.selectedToolsDetailJson = self.toolsInsightsPanelCtrl.toolsDetailJson;
+      self.toolMappingJson = self.toolsInsightsPanelCtrl.toolDetailMappingJson;
       self.selectedToolSeq = self.toolsInsightsPanelCtrl.selectedSeq;
-      self.isCustomValue = self.toolsInsightsPanelCtrl.lastCustomValue;
-      self.isDefaultValue = self.toolsInsightsPanelCtrl.lastDefaultValue;
     }
     self.checkEmptyToolList();
     self.fieldList = self.toolsInsightsPanelCtrl.toolDetails;
@@ -75,8 +65,10 @@ export class ToolsInsightEditorCtrl {
 
   getToolListOptions(toolDataArray) {
     this.toolDataJson = toolDataArray;
+    let toolData = new Tools('', []);
+    var keysMap = Object.keys(toolDataArray[0]);
     for (var i in toolDataArray) {
-      var toolListRow = toolDataArray[i]['toolName'];
+      var toolListRow = toolDataArray[i][keysMap[0]];
       if (this.toolListData.indexOf(toolListRow[i]) === -1) {
         this.toolListData.push(toolListRow);
       }
@@ -91,33 +83,45 @@ export class ToolsInsightEditorCtrl {
 
   addTool() {
     let toolName = this.addColumnSegment.value;
+    let toolData = new Tools('', []);
     var idx = this.selectedToolSeq.indexOf(toolName);
     if (idx === -1) {
       this.selectedToolSeq.push(toolName);
       this.selectedToolsDetailJson[toolName] = [];
+      this.toolMappingJson.push(toolData);
+      toolData.toolName = toolName;
     }
+    //console.log(this.toolMappingJson);
     let plusButton = this.uiSegmentSrv.newPlusButton();
     this.addColumnSegment.html = plusButton.html;
     this.addColumnSegment.value = plusButton.value;
+    this.onSubmitAction();
     this.render();
   }
 
-  removeTool(tool) {
+  removeTool(tool, index) {
     this.selectedToolSeq = _.without(this.selectedToolSeq, tool);
     delete this.selectedToolsDetailJson[tool];
+    for (var i in this.toolMappingJson) {
+      if (this.toolMappingJson[i].toolName === tool)
+        /*delete this.toolMappingJson[i];*/
+        this.toolMappingJson.splice(index, 1);
+    }
+    //console.log(this.toolMappingJson);
     if (this.selectedToolSeq.length === 0) {
-      this.toolsInsightsPanel["lastSelectedSeq"] = [];
       this.toolsInsightsPanel["selectedSeq"] = [];
     }
+    this.onSubmitAction();
     this.render();
   }
 
   getFieldOptions(selectedTool) {
     this.fieldList = [];
+    var keysMap = Object.keys(this.toolDataJson[0]);
     for (var i in this.toolDataJson) {
-      var toolName = this.toolDataJson[i]['toolName'];
+      var toolName = this.toolDataJson[i][keysMap[0]];
       if (toolName === selectedTool) {
-        this.fieldList = this.toolDataJson[i]['keys'];
+        this.fieldList = this.toolDataJson[i][keysMap[1]];
         break;
       }
     }
@@ -128,18 +132,25 @@ export class ToolsInsightEditorCtrl {
 
   addFields(selectedToolNm) {
     let field = new Fields('', '');
+    let toolField = new Tools('', []);
     let fieldVal = this.addColumnSegment.value;
-    var data = this.selectedToolsDetailJson[selectedToolNm];
     var index;
-    if (data.length === 0) {
+    var toolMappingJsonData;
+
+    for (var i in this.toolMappingJson) {
+      if (selectedToolNm === this.toolMappingJson[i].toolName) {
+        toolMappingJsonData = this.toolMappingJson[i].fields;
+      }
+    }
+    if (toolMappingJsonData !== undefined && toolMappingJsonData.length === 0) {
       index = -1;
     }
-    if (data.length !== 0) {
-      for (var i in data) {
-        var inside = data[i];
+    if (toolMappingJsonData !== undefined && toolMappingJsonData.length !== 0) {
+      for (var i in toolMappingJsonData) {
+        var inside = toolMappingJsonData[i];
         for (var j in inside) {
-          index = inside.dbName.indexOf(fieldVal);
-          if (inside.dbName === fieldVal) {
+          index = inside.fieldName.indexOf(fieldVal);
+          if (inside.fieldName === fieldVal) {
             index = 0;
             break;
           }
@@ -149,48 +160,58 @@ export class ToolsInsightEditorCtrl {
         }
       }
     }
+
     if (index === -1) {
       this.selectedFieldList.push(fieldVal);
       this.selectedToolsDetailJson[selectedToolNm].push(field);
+      for (var i in this.toolMappingJson) {
+        if (this.toolMappingJson[i].toolName === selectedToolNm) {
+          this.toolMappingJson[i].fields.push(field);
+        }
+      }
     }
     if (fieldVal) {
       this.showFieldDetails = true;
-      field.dbName = fieldVal;
+      field.fieldName = fieldVal;
       this.selectedFieldList.push(fieldVal);
     }
+    //console.log(this.toolMappingJson);
     let plusButton = this.uiSegmentSrv.newPlusButton();
     this.addColumnSegment.html = plusButton.html;
     this.addColumnSegment.value = plusButton.value;
+    this.onSubmitAction();
     this.render();
   }
 
   removeField(key, field, indexValue) {
     this.selectedFieldList = _.without(this.selectedFieldList, field);
     this.selectedToolsDetailJson[key].splice(indexValue, 1);
+    for (var i in this.toolMappingJson) {
+      if (this.toolMappingJson[i].toolName === key)
+        this.toolMappingJson[i].fields.splice(indexValue, 1);
+    }
+    //console.log(this.toolMappingJson);
+    this.onSubmitAction();
     this.render();
   }
 
   onSubmitAction(): void {
     this.toolsInsightsPanel["selectedToolsSeq"] = this.selectedToolSeq;
-    this.toolsInsightsPanel["selectedSeq"] = [];
-    this.render();
+    this.toolsInsightsPanel["selectedSeq"] = this.selectedToolSeq;
     var self = this;
-    setTimeout(function () {
-      self.toolsInsightsPanel["selectedSeq"] = self.selectedToolSeq;
-      self.render();
-    }, 200);
-    this.toolsInsightsPanel["lastSelectedSeq"] = this.selectedToolSeq;
+    self.toolsInsightsPanel["toolDetailMappingJson"] = self.toolMappingJson;
+    /* self.toolsInsightsPanel["toolDetailMappingJson"] = [];
+     setTimeout(function () {
+       self.toolsInsightsPanel["toolDetailMappingJson"] = self.toolMappingJson;
+       self.render();
+     }, 200);*/
+    //this.toolsInsightsPanel["toolDetailMappingJson"] = this.toolMappingJson;
     this.toolsInsightsPanel["toolsDetailJson"] = this.selectedToolsDetailJson;
-    this.toolsInsightsPanel["lastSelectedDetailJson"] = this.selectedToolsDetailJson;
     this.render();
   }
 
   checkFieldMapping() {
-    var result = this.selectedToolsDetailJson;
-    var length = 0;
-    for (var i in result) {
-      length++;
-    }
+    var length = this.toolMappingJson.length;
     var toolListDataLen = this.toolListData.length;
     if (length !== 0 && toolListDataLen !== 0) {
       return true;
@@ -200,11 +221,11 @@ export class ToolsInsightEditorCtrl {
   }
 
   checkValueMapping() {
-    var data = this.selectedToolsDetailJson;
+    var data = this.toolMappingJson;
     var toolListDataLen = this.toolListData.length;
     var count = 0;
     for (var i in data) {
-      if (data[i].length > 0) {
+      if (data[i].fields.length > 0) {
         count = 1;
       }
     }
@@ -224,58 +245,6 @@ export class ToolsInsightEditorCtrl {
       if (DsResponseLen <= 1) {
         return true;
       }
-    } else {
-      return false;
-    }
-  }
-
-  defaultValueAction() {
-    var self = this;
-    self.toolsInsightsPanel["selectedSeq"] = [];
-    setTimeout(function () {
-      self.toolsInsightsPanel["selectedSeq"] = self.defaultToolSequence;
-      self.render();
-    }, 200);
-    self.selectedToolSeq = self.defaultToolSequence;
-    self.selectedToolsDetailJson = self.defaultJson;
-    //console.log(this.selectedToolsDetailJson);
-    self.toolsInsightsPanel["toolsDetailJson"] = self.defaultJson;
-    self.render();
-    self.isDefaultValue = 0;
-    self.isCustomValue = 1;
-    self.toolsInsightsPanel["lastCustomValue"] = self.isCustomValue;
-    self.toolsInsightsPanel["lastDefaultValue"] = self.isDefaultValue;
-  }
-
-  customValueAction() {
-    var self = this;
-    self.toolsInsightsPanel["selectedSeq"] = [];
-    setTimeout(function () {
-      self.toolsInsightsPanel["selectedSeq"] = self.lastSelectedToolSequence;
-      self.render();
-    }, 200);
-    self.selectedToolSeq = self.lastSelectedToolSequence;
-    self.selectedToolsDetailJson = self.lastSelectedToolsJson;
-    //console.log(this.selectedToolsDetailJson);
-    self.toolsInsightsPanel["toolsDetailJson"] = self.lastSelectedToolsJson;
-    self.render();
-    self.isCustomValue = 0;
-    self.isDefaultValue = 1;
-    self.toolsInsightsPanel["lastCustomValue"] = self.isCustomValue;
-    self.toolsInsightsPanel["lastDefaultValue"] = self.isDefaultValue;
-  }
-
-  checkDefaultButtonActionValue() {
-    if (this.isDefaultValue === 1) {
-      return true;
-    } else {
-      return false;
-    }
-  }
-
-  checkCustomButtonActionValue() {
-    if (this.isCustomValue === 1) {
-      return true;
     } else {
       return false;
     }
