@@ -1,3 +1,19 @@
+/*******************************************************************************
+ * Copyright 2017 Cognizant Technology Solutions
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License.  You may obtain a copy
+ * of the License at
+ * 
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ ******************************************************************************/
+
 package com.cognizant.devops.platformcommons.config;
 
 import java.io.Serializable;
@@ -8,36 +24,64 @@ public class EmailConfiguration implements Serializable {
 	 * 
 	 */
 	private static final long serialVersionUID = 1942949927527968050L;
+	private Boolean sendEmailEnabled;
 	private String smtpHostServer;
-	private String restUserName;
-	private String restPassword;
-	private String restUrl;
+	private String smtpPort;
+	private String smtpUserName;
+	private String smtpPassword;
+	private Boolean isAuthRequired;
+	private Boolean smtpStarttlsEnable;
+	private String emailVelocityTemplate;
 	private String mailFrom;
 	private String mailTo;
 	
+	public Boolean getSendEmailEnabled() {
+		return sendEmailEnabled;
+	}
+	public void setSendEmailEnabled(Boolean sendEmailEnabled) {
+		this.sendEmailEnabled = sendEmailEnabled;
+	}
 	public String getSmtpHostServer() {
 		return smtpHostServer;
 	}
 	public void setSmtpHostServer(String smtpHostServer) {
 		this.smtpHostServer = smtpHostServer;
 	}
-	public String getRestUserName() {
-		return restUserName;
+	public String getSmtpPort() {
+		return smtpPort;
 	}
-	public void setRestUserName(String restUserName) {
-		this.restUserName = restUserName;
+	public void setSmtpPort(String smtpPort) {
+		this.smtpPort = smtpPort;
 	}
-	public String getRestPassword() {
-		return restPassword;
+	public String getSmtpUserName() {
+		return smtpUserName;
 	}
-	public void setRestPassword(String restPassword) {
-		this.restPassword = restPassword;
+	public void setSmtpUserName(String smtpUserName) {
+		this.smtpUserName = smtpUserName;
 	}
-	public String getRestUrl() {
-		return restUrl;
+	public String getSmtpPassword() {
+		return smtpPassword;
 	}
-	public void setRestUrl(String restUrl) {
-		this.restUrl = restUrl;
+	public void setSmtpPassword(String smtpPassword) {
+		this.smtpPassword = smtpPassword;
+	}
+	public Boolean getIsAuthRequired() {
+		return isAuthRequired;
+	}
+	public void setIsAuthRequired(Boolean isAuthRequired) {
+		this.isAuthRequired = isAuthRequired;
+	}
+	public Boolean getSmtpStarttlsEnable() {
+		return smtpStarttlsEnable;
+	}
+	public void setSmtpStarttlsEnable(Boolean smtpStarttlsEnable) {
+		this.smtpStarttlsEnable = smtpStarttlsEnable;
+	}
+	public String getEmailVelocityTemplate() {
+		return emailVelocityTemplate;
+	}
+	public void setEmailVelocityTemplate(String emailVelocityTemplate) {
+		this.emailVelocityTemplate = emailVelocityTemplate;
 	}
 	public String getMailFrom() {
 		return mailFrom;

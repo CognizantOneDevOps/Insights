@@ -51,13 +51,18 @@
     "password": "iSight"
   },
    "emailConfiguration": {
+   "sendEmailEnabled" : true,
     "smtpHostServer" : "",
-	"restUserName" : "restuser",
-	"restPassword" : "pass",
-	"restUrl": "http://localhost:7080",
+    "smtpPort" : "",
+    "smtpUserName" : "",
+    "smtpPassword" : "",
+    "isAuthRequired" : true,
+    "smtpStarttlsEnable" : true,
+    "emailVelocityTemplate" : "",
 	"mailFrom": " ",
 	"mailTo": " "
   },
+  "insightsServiceURL" : "",
   "disableAuth": true,
   "insightsTimeZone": "Asia/Kolkata",
   "userId": "UserID",
