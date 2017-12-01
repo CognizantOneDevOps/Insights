@@ -7,30 +7,29 @@ node {
 		buildSuccess=true
     }
 	
-	//stage ('Insight_CodeAnalysis') {
-	//	sh 'mvn sonar:sonar -Dmaven.test.failure.ignore=true -DskipTests=true -Dsonar.sources=src/main/java'
-	//	codeQualitySuccess=true
-    //}
+	stage ('Insight_CodeAnalysis') {
+		sh 'mvn sonar:sonar -Dmaven.test.failure.ignore=true -DskipTests=true -Dsonar.sources=src/main/java'
+		codeQualitySuccess=true
+    }
 	
-	//stage ('Insight_NexusUpload') {
-	//	sh 'mvn deploy -Dfile=/var/jenkins/jobs/$commitID/workspace/PlatformInsights/target/PlatformInsights-0.0.1-SNAPSHOT-jar-with-dependencies.jar -DskipTests=true'
-	//	nexusSuccess=true
-	//}
+	stage ('Insight_NexusUpload') {
+		sh 'mvn deploy -Dfile=/var/jenkins/jobs/$commitID/workspace/PlatformInsights/target/PlatformInsights-0.0.1-SNAPSHOT-jar-with-dependencies.jar -DskipTests=true'
+		nexusSuccess=true
+	}
 	
 	stage ('Deployment_SparkServer_QA') {
 		sh 'chmod +x /var/jenkins/jobs/$commitID/workspace/PlatformInsights/target/PlatformInsights-0.0.1-SNAPSHOT-jar-with-dependencies.jar && scp -o "StrictHostKeyChecking no" -i /var/jenkins/insights.pem /var/jenkins/jobs/$commitID/workspace/PlatformInsights/target/PlatformInsights-0.0.1-SNAPSHOT-jar-with-dependencies.jar ubuntu@54.87.224.77:/tmp/'
-		//sh 'kill $(ps aux | grep PlatformInsights-0.0.1-SNAPSHOT-jar-with-dependencies.jar | awk '{print $2}')'
-		//sh 'nohup java -jar /tmp/PlatformInsights-0.0.1-SNAPSHOT-jar-with-dependencies.jar &'
+		//sh 'kill $(ps aux | grep PlatformInsights-0.0.1-SNAPSHOT-jar-with-dependencies.jar | awk '{print $2}')'		
 		sh 'ssh -f -i  /var/jenkins/insights.pem ubuntu@54.87.224.77  "nohup java -jar /tmp/PlatformInsights-0.0.1-SNAPSHOT-jar-with-dependencies.jar &" '
 		deploymentSuccess=true
 	}
 	
 	stage ('CodeMerge') {
-    //Merge code only if Build succeeds..
-    
-    if (buildSuccess == true && codeQualitySuccess == true && nexusSuccess == true && deploymentSuccess == true)
-    {
-    echo 'CodeMerge can be done'
-    }
-    }
+	    //Merge code only if Build succeeds..
+
+	    if (buildSuccess == true && codeQualitySuccess == true && nexusSuccess == true && deploymentSuccess == true)
+	    {
+	    echo 'CodeMerge can be done'
+	    }
+	    }
 }
