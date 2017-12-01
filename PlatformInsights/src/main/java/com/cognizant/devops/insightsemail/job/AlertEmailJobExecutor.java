@@ -54,7 +54,7 @@ public class AlertEmailJobExecutor implements Job,Serializable {
 		Mail mail=new Mail();
 		mail.setMailTo(emailConfiguration.getMailTo());
 		mail.setMailFrom(emailConfiguration.getMailFrom());
-		mail.setSubject(EmailConstants.SUBJECT);
+		mail.setSubject(emailConfiguration.getSubject());
 		try {
 			service.sendEmail(mail);
 		} catch (UnsupportedEncodingException e) {

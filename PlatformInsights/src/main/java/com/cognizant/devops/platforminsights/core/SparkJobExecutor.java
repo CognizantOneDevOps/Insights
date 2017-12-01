@@ -25,7 +25,6 @@ import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 
 import com.cognizant.devops.insightsemail.job.AlertEmailJobExecutor;
-import com.cognizant.devops.platformcommons.config.ApplicationConfigCache;
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.core.enums.ExecutionActions;
 import com.cognizant.devops.platformcommons.core.util.InsightsUtils;
@@ -76,11 +75,10 @@ public class SparkJobExecutor implements Job,Serializable{
 				}
 			}
 			if(updatedJobs.size() > 0) {
+				if(ApplicationConfigProvider.getInstance().getEmailConfiguration().getSendEmailEnabled()) {
+					sendEmail();
+				}
 				configHandler.updateJobsInES(jobs);
-			}
-			
-			if(ApplicationConfigProvider.getInstance().getEmailConfiguration().getSendEmailEnabled()) {
-				sendEmail();
 			}
 	}
 	
@@ -115,8 +113,4 @@ public class SparkJobExecutor implements Job,Serializable{
 		return InsightsUtils.isAfterRange(jobSchedule, lastRunSinceDays);
 	}
 
-	public static void main(String[] args) {
-		SparkJobExecutor ex = new SparkJobExecutor();
-		ex.startExecution();
-	}
 }

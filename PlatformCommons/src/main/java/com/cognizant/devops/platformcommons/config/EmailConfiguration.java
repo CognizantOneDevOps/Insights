@@ -34,6 +34,7 @@ public class EmailConfiguration implements Serializable {
 	private String emailVelocityTemplate;
 	private String mailFrom;
 	private String mailTo;
+	private String subject;
 	
 	public Boolean getSendEmailEnabled() {
 		return sendEmailEnabled;
@@ -94,6 +95,12 @@ public class EmailConfiguration implements Serializable {
 	}
 	public void setMailTo(String mailTo) {
 		this.mailTo = mailTo;
+	}
+	public String getSubject() {
+		return subject;
+	}
+	public void setSubject(String subject) {
+		this.subject = subject;
 	}
 
 }
