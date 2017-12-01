@@ -128,7 +128,15 @@ public class AccessGroupManagement {
 	}
 
 	private String getUserCookies(){
-		Cookie[] cookies = httpRequest.getCookies();
+		Map<String, String> responseHeaders = (Map)httpRequest.getAttribute("responseHeaders");
+		StringBuffer grafanaCookies = new StringBuffer();
+		if(responseHeaders != null && responseHeaders.size() > 0) {
+			for(Map.Entry<String, String> entry : responseHeaders.entrySet()) {
+				grafanaCookies.append(entry.getKey()).append("=").append(entry.getValue()).append(";");
+			}
+		}
+		return grafanaCookies.toString();
+		/*Cookie[] cookies = httpRequest.getCookies();
 		StringBuffer grafanaCookie = new StringBuffer();
 		if(cookies != null){
 			for(Cookie cookie : cookies){
@@ -158,9 +166,6 @@ public class AccessGroupManagement {
 					grafanaCookie.append(entry.getKey()).append("=").append(entry.getValue()).append(";");
 				}
 			}*/
-		}
-		
-		return grafanaCookie.toString();
 	}
 
 	private String getCurrentOrgRole(Map<String, String> headers, String grafanaCurrentOrg) {
