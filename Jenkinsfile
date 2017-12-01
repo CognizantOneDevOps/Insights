@@ -1,8 +1,7 @@
-env.dockerimagename="devopsbasservice/buildonframework:boins1"
+env.dockerimagename="devopsbasservice/buildonframework:boins2"
 node {
    stage ('Insight_Build') {
-        	checkout scm
-	   	sh 'mvn clean install -DskipTests'
+        checkout scm
 		sh 'cd /var/jenkins/jobs/$commitID/workspace/PlatformInsights && mvn clean install -DskipTests'
 		buildSuccess=true
     }
@@ -18,17 +17,17 @@ node {
 	}
 	
 	stage ('Deployment_SparkServer_QA') {
-		sh 'scp -o "StrictHostKeyChecking no" /var/jenkins/jobs/$commitID/workspace/PlatformInsights/target/PlatformInsights-0.0.1-SNAPSHOT-jar-with-dependencies.jar ubuntu@54.87.224.77:/tmp/'
+		sh 'scp -o "StrictHostKeyChecking no" -i /var/jenkins/insights.pem /var/jenkins/jobs/$commitID/workspace/PlatformInsights/target/PlatformInsights-0.0.1-SNAPSHOT-jar-with-dependencies.jar ubuntu@54.87.224.77:/tmp/'
 		sh 'nohup java -jar /tmp/PlatformInsights-0.0.1-SNAPSHOT-jar-with-dependencies.jar &'
 		deploymentSuccess=true
 	}
 	
 	stage ('CodeMerge') {
-	    //Merge code only if Build succeeds.. 
-
-	    if (buildSuccess == true && codeQualitySuccess == true && nexusSuccess == true && deploymentSuccess == true)
-	    {
-	    echo 'CodeMerge can be done'
-	    }
+    //Merge code only if Build succeeds..
+    
+    if (buildSuccess == true && codeQualitySuccess == true && nexusSuccess == true && deploymentSuccess == true)
+    {
+    echo 'CodeMerge can be done'
+    }
     }
 }
