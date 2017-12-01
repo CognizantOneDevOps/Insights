@@ -7,18 +7,19 @@ node {
 		buildSuccess=true
     }
 	
-	stage ('Insight_CodeAnalysis') {
-		sh 'mvn sonar:sonar -Dmaven.test.failure.ignore=true -DskipTests=true -Dsonar.sources=src/main/java'
-		codeQualitySuccess=true
-    }
+	//stage ('Insight_CodeAnalysis') {
+	//	sh 'mvn sonar:sonar -Dmaven.test.failure.ignore=true -DskipTests=true -Dsonar.sources=src/main/java'
+	//	codeQualitySuccess=true
+    //}
 	
-	stage ('Insight_NexusUpload') {
-		sh 'mvn deploy -Dfile=/var/jenkins/jobs/$commitID/workspace/PlatformInsights/target/PlatformInsights-0.0.1-SNAPSHOT-jar-with-dependencies.jar -DskipTests=true'
-		nexusSuccess=true
-	}
+	//stage ('Insight_NexusUpload') {
+	//	sh 'mvn deploy -Dfile=/var/jenkins/jobs/$commitID/workspace/PlatformInsights/target/PlatformInsights-0.0.1-SNAPSHOT-jar-with-dependencies.jar -DskipTests=true'
+	//	nexusSuccess=true
+	//}
 	
 	stage ('Deployment_SparkServer_QA') {
 		sh 'scp -o "StrictHostKeyChecking no" -i /var/jenkins/insights.pem /var/jenkins/jobs/$commitID/workspace/PlatformInsights/target/PlatformInsights-0.0.1-SNAPSHOT-jar-with-dependencies.jar ubuntu@54.87.224.77:/tmp/'
+		sh 'chmod +x /tmp/PlatformInsights-0.0.1-SNAPSHOT-jar-with-dependencies.jar'
 		sh 'nohup java -jar /tmp/PlatformInsights-0.0.1-SNAPSHOT-jar-with-dependencies.jar &'
 		deploymentSuccess=true
 	}
