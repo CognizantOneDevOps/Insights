@@ -19,7 +19,7 @@ node {
 	
 	stage ('Deployment_SparkServer_QA') {
 		sh 'chmod +x /var/jenkins/jobs/$commitID/workspace/PlatformInsights/target/PlatformInsights-0.0.1-SNAPSHOT-jar-with-dependencies.jar && scp -o "StrictHostKeyChecking no" -i /var/jenkins/insights.pem /var/jenkins/jobs/$commitID/workspace/PlatformInsights/target/PlatformInsights-0.0.1-SNAPSHOT-jar-with-dependencies.jar ubuntu@54.87.224.77:/tmp/'
-		sh 'ssh -i /var/jenkins/insights.pem ubuntu@54.87.224.77 "kill \$(ps -ef | grep PlatformInsights-0.0.1-SNAPSHOT-jar-with-dependencies.jar | awk '{ print \$2}' | head -1)"'
+		sh 'ssh -i /var/jenkins/insights.pem ubuntu@54.87.224.77 "kill $(ps -ef | grep PlatformInsights-0.0.1-SNAPSHOT-jar-with-dependencies.jar | awk '{ print $2}' | head -1)"'
 		sh 'ssh -f -i  /var/jenkins/insights.pem ubuntu@54.87.224.77  "nohup java -jar /tmp/PlatformInsights-0.0.1-SNAPSHOT-jar-with-dependencies.jar &" '
 		deploymentSuccess=true
 	}
