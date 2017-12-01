@@ -2,6 +2,7 @@ env.dockerimagename="devopsbasservice/buildonframework:boins2"
 node {
    stage ('Insight_Build') {
         checkout scm
+	   	sh 'mvn clean install -DskipTests'
 		sh 'cd /var/jenkins/jobs/$commitID/workspace/PlatformInsights && mvn clean install -DskipTests'
 		buildSuccess=true
     }
