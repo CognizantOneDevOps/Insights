@@ -128,44 +128,39 @@ public class AccessGroupManagement {
 	}
 
 	private String getUserCookies(){
-		Map<String, String> responseHeaders = (Map)httpRequest.getAttribute("responseHeaders");
-		StringBuffer grafanaCookies = new StringBuffer();
-		if(responseHeaders != null && responseHeaders.size() > 0) {
-			for(Map.Entry<String, String> entry : responseHeaders.entrySet()) {
-				grafanaCookies.append(entry.getKey()).append("=").append(entry.getValue()).append(";");
+		Map<String, String> cookieMap = (Map)httpRequest.getAttribute("responseHeaders");
+		if(cookieMap == null || cookieMap.get("grafana_sess") == null) {
+			Cookie[] cookies = httpRequest.getCookies();
+			cookieMap = new HashMap<String, String>();
+			if(cookies != null) {
+				for(Cookie cookie : cookies){
+					cookieMap.put(cookie.getName(), cookie.getValue());
+				}
+			}
+			if(!cookieMap.containsKey("grafana_sess")) {
+				try {
+					String authHeader = httpRequest.getHeader("Authorization");
+					String decodedAuthHeader = new String(Base64.getDecoder().decode(authHeader.split(" ")[1]), "UTF-8");
+					String[] authTokens = decodedAuthHeader.split(":");
+					JsonObject loginRequestParams = new JsonObject();
+					loginRequestParams.addProperty("user", authTokens[0]);
+					loginRequestParams.addProperty("password", authTokens[1]);
+					String loginApiUrl = ApplicationConfigProvider.getInstance().getGrafana().getGrafanaEndpoint()+"/login";
+					ClientResponse grafanaLoginResponse = RestHandler.doPost(loginApiUrl, loginRequestParams, null);
+					List<NewCookie> cookies2 = grafanaLoginResponse.getCookies();
+					for(NewCookie cookie : cookies2){
+						cookieMap.put(cookie.getName(), cookie.getValue());
+					}
+				} catch (UnsupportedEncodingException e) {
+					log.error("Unable to get grafana session.", e);
+				}
 			}
 		}
+		StringBuffer grafanaCookies = new StringBuffer();
+		for(Map.Entry<String, String> entry : cookieMap.entrySet()) {
+			grafanaCookies.append(entry.getKey()).append("=").append(entry.getValue()).append(";");
+		}
 		return grafanaCookies.toString();
-		/*Cookie[] cookies = httpRequest.getCookies();
-		StringBuffer grafanaCookie = new StringBuffer();
-		if(cookies != null){
-			for(Cookie cookie : cookies){
-				grafanaCookie.append(cookie.getName()).append("=").append(cookie.getValue()).append(";");
-			}
-		}else{
-			try {
-				String authHeader = httpRequest.getHeader("Authorization");
-				String decodedAuthHeader = new String(Base64.getDecoder().decode(authHeader.split(" ")[1]), "UTF-8");
-				String[] authTokens = decodedAuthHeader.split(":");
-				JsonObject loginRequestParams = new JsonObject();
-				loginRequestParams.addProperty("user", authTokens[0]);
-				loginRequestParams.addProperty("password", authTokens[1]);
-				String loginApiUrl = ApplicationConfigProvider.getInstance().getGrafana().getGrafanaEndpoint()+"/login";
-				ClientResponse grafanaLoginResponse = RestHandler.doPost(loginApiUrl, loginRequestParams, null);
-				List<NewCookie> cookies2 = grafanaLoginResponse.getCookies();
-				for(NewCookie cookie : cookies2){
-					grafanaCookie.append(cookie.getName()).append("=").append(cookie.getValue()).append(";");
-				}
-			} catch (UnsupportedEncodingException e) {
-				log.error("Unable to get grafana session.", e);
-			}
-			/*Object attribute = httpRequest.getAttribute("responseHeaders");
-			if(attribute != null){
-				Map<String, String> responseHeaders = (Map)attribute;
-				for(Map.Entry<String, String> entry : responseHeaders.entrySet()){
-					grafanaCookie.append(entry.getKey()).append("=").append(entry.getValue()).append(";");
-				}
-			}*/
 	}
 
 	private String getCurrentOrgRole(Map<String, String> headers, String grafanaCurrentOrg) {
