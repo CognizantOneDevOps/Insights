@@ -7,6 +7,7 @@ import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
 
+import com.cognizant.devops.platformcommons.config.ApplicationConfigCache;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBException;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphResponse;
 import com.cognizant.devops.platformcommons.dal.neo4j.Neo4jDBHandler;
@@ -19,19 +20,20 @@ public class CustomCorrelations {
 	private static final Pattern p = Pattern.compile("((?<!([A-Z]{1,10})-?)[A-Z]+-\\d+)");
 	
 	public void executeCorrelations() {
+		updateGitNodesWithJiraKey();
 		correlateGitAndJira();
 		correlateGitAndJenkins();
 	}
 	
-	private void correlateGitAndJira() {
+	private void updateGitNodesWithJiraKey() {
 		Neo4jDBHandler dbHandler = new Neo4jDBHandler();
 		try {
-			String paginationCypher = "MATCH (source:DATA:GIT) where not ((source) -[:GIT_COMMIT_WITH_JIRA_KEY]-> (:JIRA:DATA)) return count(source) as count";
+			String paginationCypher = "MATCH (n:DATA:GIT:RAW) return count(n) as count";
 			GraphResponse paginationResponse = dbHandler.executeCypherQuery(paginationCypher);
 			int resultCount = paginationResponse.getJson().get("results").getAsJsonArray().get(0).getAsJsonObject().get("data")
 					.getAsJsonArray().get(0).getAsJsonObject().get("row").getAsJsonArray().get(0).getAsInt();
 			while(resultCount > 0) {
-				String gitDataFetchCypher = "MATCH (source:DATA:GIT) where not ((source) -[:GIT_COMMIT_WITH_JIRA_KEY]-> (:JIRA:DATA)) WITH { uuid: source.uuid, commitId: source.commitId, message: source.message} as data limit 500 return collect(data)";
+				String gitDataFetchCypher = "MATCH (source:DATA:GIT:RAW) WITH { uuid: source.uuid, commitId: source.commitId, message: source.message} as data limit 2000 return collect(data)";
 				GraphResponse response = dbHandler.executeCypherQuery(gitDataFetchCypher);
 				JsonArray rows = response.getJson().get("results").getAsJsonArray().get(0).getAsJsonObject().get("data")
 						.getAsJsonArray().get(0).getAsJsonObject().get("row").getAsJsonArray();
@@ -39,13 +41,18 @@ public class CustomCorrelations {
 					return;
 				}
 				JsonArray dataList = rows.get(0).getAsJsonArray();
-				List<String> correlationCyphers = new ArrayList<String>();
+				String addJiraKeysCypher = "UNWIND {props} as properties MATCH (source:GIT:DATA:RAW {uuid : properties.uuid, commitId: properties.commitId}) "
+						+ "set source.jiraKeys = properties.jiraKeys set source.jiraRelAdded = false return count(source)";
+				String updateRawLabelCypher = "UNWIND {props} as properties MATCH (source:GIT:DATA:RAW {uuid : properties.uuid, commitId: properties.commitId}) "
+						+ "remove source:RAW return count(source)";
+				List<JsonObject> jiraKeysCypherProps = new ArrayList<JsonObject>();
+				List<JsonObject> updateRawLabelCypherProps = new ArrayList<JsonObject>();
 				for(JsonElement dataElem : dataList) {
 					JsonObject dataJson = dataElem.getAsJsonObject();
 					JsonElement messageElem = dataJson.get("message");
 					if(messageElem.isJsonPrimitive()) {
 						String message = messageElem.getAsString();
-						List<String> jiraKeys = new ArrayList<String>();
+						JsonArray jiraKeys = new JsonArray();
 						while(message.contains("-")) {
 							Matcher m = p.matcher(message);
 							if(m.find()) {
@@ -55,25 +62,64 @@ public class CustomCorrelations {
 								break;
 							}
 						}
+						StringBuffer gitUpdateCypher = new StringBuffer();
+						gitUpdateCypher.append("MATCH (source:DATA:GIT:RAW { uuid:").append(dataJson.get("uuid").getAsString())
+						.append(", commitId:").append(dataJson.get("commitId").getAsString()).append("})").append("\n");
+						JsonObject data = new JsonObject();
+						data.addProperty("uuid", dataJson.get("uuid").getAsString());
+						data.addProperty("commitId", dataJson.get("commitId").getAsString());
 						if(jiraKeys.size() > 0) {
-							JsonArray jiraKeyJson = new JsonArray();
-							for(String key : jiraKeys) {
-								jiraKeyJson.add(key);
-							}
-							//We need to add a time filter as well.
-							StringBuffer correlationCypher = new StringBuffer();
-							correlationCypher.append("MATCH (source:DATA:GIT { uuid:").append(dataJson.get("uuid").toString())
-							.append(", commitId:").append(dataJson.get("commitId").toString()).append("})").append("\n");
-							correlationCypher.append("MATCH (destination:JIRA:DATA) where destination.key IN ").append(jiraKeyJson.toString()).append("\n");
-							correlationCypher.append("CREATE (source) -[r:GIT_COMMIT_WITH_JIRA_KEY]-> (destination)");
-							correlationCyphers.add(correlationCypher.toString());
+							data.add("jiraKeys", jiraKeys);
+							jiraKeysCypherProps.add(data);
+						}else {
+							updateRawLabelCypherProps.add(data);
 						}
 					}
 				}
-				if(correlationCyphers.size() > 0) {
-					dbHandler.bulkCreateCorrelations(correlationCyphers);
-					log.debug("GIT-JIRA correlations executed: "+correlationCyphers.size());
+				if(updateRawLabelCypherProps.size() > 0) {
+					JsonObject bulkCreateNodes = dbHandler.bulkCreateNodes(updateRawLabelCypherProps, null, updateRawLabelCypher);
+					log.debug(bulkCreateNodes);
 				}
+				if(jiraKeysCypherProps.size() > 0) {
+					JsonObject bulkCreateNodes = dbHandler.bulkCreateNodes(jiraKeysCypherProps, null, addJiraKeysCypher);
+					log.debug(bulkCreateNodes);
+				}
+				resultCount = resultCount - 500;
+			}
+		} catch (GraphDBException e) {
+			log.error(e);
+		}
+	}
+	
+	private void correlateGitAndJira() {
+		Neo4jDBHandler dbHandler = new Neo4jDBHandler();
+		try {
+			String paginationCypher = "MATCH (source:DATA:GIT:RAW) where exists(source.jiraKeys) return count(source) as count";
+			GraphResponse paginationResponse = dbHandler.executeCypherQuery(paginationCypher);
+			int resultCount = paginationResponse.getJson().get("results").getAsJsonArray().get(0).getAsJsonObject().get("data")
+					.getAsJsonArray().get(0).getAsJsonObject().get("row").getAsJsonArray().get(0).getAsInt();
+			while(resultCount > 0) {
+				String gitDataFetchCypher = "MATCH (source:DATA:GIT:RAW) where exists(source.jiraKeys) "
+						+ "WITH { uuid: source.uuid, commitId: source.commitId, jiraKeys: source.jiraKeys} as data limit 500 return collect(data)";
+				GraphResponse response = dbHandler.executeCypherQuery(gitDataFetchCypher);
+				JsonArray rows = response.getJson().get("results").getAsJsonArray().get(0).getAsJsonObject().get("data")
+						.getAsJsonArray().get(0).getAsJsonObject().get("row").getAsJsonArray();
+				if(rows.isJsonNull() || rows.size() == 0) {
+					return;
+				}
+				JsonArray dataJsonArray = rows.get(0).getAsJsonArray();
+				String gitToJiraCorrelationCypher = "UNWIND {props} as properties "
+						+ "MATCH (source:DATA:GIT:RAW { uuid: properties.uuid, commitId: properties.commitId}) "
+						+ "MATCH (destination:JIRA:DATA) where destination.key IN properties.jiraKeys "
+						+ "CREATE (source) -[r:GIT_COMMIT_WITH_JIRA_KEY]-> (destination) "
+						+ "remove source:RAW ";
+				List<JsonObject> dataList = new ArrayList<JsonObject>();
+				for(JsonElement data : dataJsonArray) {
+					dataList.add(data.getAsJsonObject());
+				}
+
+				JsonObject bulkCreateNodesResponse = dbHandler.bulkCreateNodes(dataList, null, gitToJiraCorrelationCypher);
+				log.debug("GIT-JIRA correlations executed. "+bulkCreateNodesResponse);
 				resultCount = resultCount - 500;
 			}
 		} catch (GraphDBException e) {
@@ -124,6 +170,12 @@ public class CustomCorrelations {
 		} catch (GraphDBException e) {
 			log.error(e);
 		}
+	}
+	
+	public static void main(String[] args) {
+		ApplicationConfigCache.loadConfigCache();
+		CustomCorrelations cor = new CustomCorrelations();
+		cor.correlateGitAndJira();
 	}
 }
  
