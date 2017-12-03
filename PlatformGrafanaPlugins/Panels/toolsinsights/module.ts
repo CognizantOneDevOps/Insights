@@ -67,39 +67,6 @@ class PipelinePanelCtrl extends MetricsPanelCtrl {
         'LOADRUNNER': ['Sr.No', 'Job Name', 'Build Number', 'Transaction Name', 'Virtual Users', 'SLA Violation Count']
     };
 
-    defaultMapping = {
-        'JIRA': [{ 'dbName': 'jir_jirakey', 'displayName': '' },
-        { 'dbName': 'jir_projectname', 'displayName': '' },
-        { 'dbName': 'jir_priority', 'displayName': '' }, { 'dbName': 'jir_status', 'displayName': '' },
-        { 'dbName': 'inSightsTimeX', 'displayName': '' }],
-        'BITBUCKET': [{ 'dbName': 'bit_Jira_Key', 'displayName': '' },
-        { 'dbName': 'bit_commitId', 'displayName': '' },
-        { 'dbName': 'bit_reponame', 'displayName': '' }, { 'dbName': 'bit_authorName', 'displayName': '' },
-        { 'dbName': 'bit_authorEmail', 'displayName': '' }, { 'dbName': 'inSightsTimeX', 'displayName': '' }],
-        'JENKINS': [{ 'dbName': 'jen_BuildNumber', 'displayName': '' },
-        { 'dbName': 'jen_SCMCommitId', 'displayName': '' },
-        { 'dbName': 'jen_RundeckJobId', 'displayName': '' }, { 'dbName': 'jen_ProjectName', 'displayName': '' },
-        { 'dbName': 'jen_Result', 'displayName': '' }, { 'dbName': 'inSightsTimeX', 'displayName': '' }],
-        'SONAR': [{ 'dbName': 'resourcekey', 'displayName': '' },
-        { 'dbName': 'complexity', 'displayName': '' },
-        { 'dbName': 'coverage', 'displayName': '' }, { 'dbName': 'duplicated_blocks', 'displayName': '' },
-        { 'dbName': 'new_violations', 'displayName': '' }, { 'dbName': 'inSightsTimeX', 'displayName': '' }],
-        'RUNDECK': [{ 'dbName': 'run_ExecutionId', 'displayName': '' },
-        { 'dbName': 'run_JobId', 'displayName': '' },
-        { 'dbName': 'run_JobName', 'displayName': '' }, { 'dbName': 'run_ProjectName', 'displayName': '' },
-        { 'dbName': 'run_Status', 'displayName': '' }, { 'dbName': 'inSightsTimeX', 'displayName': '' }],
-        'TESTING': [{ 'dbName': 'Requirement_ID', 'displayName': '' },
-        { 'dbName': 'Enviornment', 'displayName': '' },
-        { 'dbName': 'Test_Cases', 'displayName': '' }, { 'dbName': 'Defects', 'displayName': '' },
-        { 'dbName': 'Test_Case_Status', 'displayName': '' }],
-        'LOADRUNNER': [{ 'dbName': 'jobName', 'displayName': '' },
-        { 'dbName': 'buildNumber', 'displayName': '' },
-        { 'dbName': 'transactionName', 'displayName': '' }, { 'dbName': 'virtualUsers', 'displayName': '' },
-        { 'dbName': 'slaViolationCount', 'displayName': '' }]
-    };
-
-    pipelineToolsArrayDefault = ['JIRA', 'BITBUCKET', 'JENKINS', 'SONAR', 'RUNDECK', 'TESTING', 'LOADRUNNER'];
-
     toolsList = [];
     selectedTool: string;
     selectedField: string;
@@ -131,6 +98,8 @@ class PipelinePanelCtrl extends MetricsPanelCtrl {
     toolListData = [];
     toolDataMap = {};
     showThrobber: boolean = false;
+    toolDetailMappingJson = [];
+    advColumnMsg: string;
 
     /** @ngInject */
     constructor($scope, $injector, private annotationsSrv, private $sanitize, private $window, private $rootScope) {
@@ -146,12 +115,12 @@ class PipelinePanelCtrl extends MetricsPanelCtrl {
         if (this.panel.toolsInsightsPanelCtrl.selectedToolsSeq === undefined) {
             this.selectOptionsMsg = "Please set required options by clicking options tab";
         }
-        console.log(this.toolsDetailJson);
+        //console.log(this.toolsDetailJson);
     }
 
     loadGoogleCharts() {
         let self = this;
-        if ($('#googleChartLoaderScript').length === 0) {
+        /*if ($('#googleChartLoaderScript').length === 0) {
             google = {};
             $('<script>', {
                 src: 'https://www.gstatic.com/charts/loader.js',
@@ -166,7 +135,11 @@ class PipelinePanelCtrl extends MetricsPanelCtrl {
             }, 100);
         } else {
             google.charts.load('current', { 'packages': ['gantt'] });
-        }
+        }*/
+
+        $.getScript('https://www.gstatic.com/charts/loader.js', function () {
+            google.charts.load('current', { 'packages': ['gantt'] });
+        });
     }
 
     loadGoogleChart(input) {
@@ -245,23 +218,18 @@ class PipelinePanelCtrl extends MetricsPanelCtrl {
     }
 
     toolsDetailJson = {};
-    lastSelectedDetailJson = {};
     selectedSeq = [];
-    lastSelectedSeq = [];
-    lastDefaultValue: number;
-    lastCustomValue: number;
+
     render() {
         this.pipelineToolsArray = [];
         this.toolsDetailJson = this.panel.toolsInsightsPanelCtrl.toolsDetailJson;
-        this.lastSelectedDetailJson = this.panel.toolsInsightsPanelCtrl.lastSelectedDetailJson;
-        this.lastSelectedSeq = this.panel.toolsInsightsPanelCtrl.lastSelectedSeq;
-        this.lastDefaultValue = this.panel.toolsInsightsPanelCtrl.lastDefaultValue;
-        this.lastCustomValue = this.panel.toolsInsightsPanelCtrl.lastCustomValue;
-        console.log(this.toolsDetailJson);
-        for (var key in this.toolsDetailJson) {
-            var idx = this.pipelineToolsArray.indexOf(key);
+        this.toolDetailMappingJson = this.panel.toolsInsightsPanelCtrl.toolDetailMappingJson;
+        //console.log(this.toolDetailMappingJson);
+        for (var key in this.toolDetailMappingJson) {
+            var keyName = this.toolDetailMappingJson[key].toolName;
+            var idx = this.pipelineToolsArray.indexOf(keyName);
             if (idx === -1) {
-                this.pipelineToolsArray.push(key);
+                this.pipelineToolsArray.push(keyName);
             }
         }
         this.selectedSeq = this.panel.toolsInsightsPanelCtrl.selectedSeq;
@@ -715,22 +683,22 @@ class PipelinePanelCtrl extends MetricsPanelCtrl {
                 };
                 this.toolDataMap[toolData.name] = toolData;
             }
-            if (this.selectedSeq.length < this.pipelineToolsArrayDefault.length) {
+            /*if (this.selectedSeq.length < this.pipelineToolsArrayDefault.length) {
                 for (var toolNm of this.pipelineToolsArrayDefault) {
                     if (this.toolDataMap[toolNm] !== undefined) {
                         this.toolsRelationDataArray.push(this.toolDataMap[toolNm]);
                     }
                 }
-            } else {
-                for (var toolNam of this.selectedSeq) {
-                    if (this.toolDataMap[toolNam] !== undefined) {
-                        this.toolsRelationDataArray.push(this.toolDataMap[toolNam]);
-                    }
+            } else {*/
+            for (var toolNam of this.selectedSeq) {
+                if (this.toolDataMap[toolNam] !== undefined) {
+                    this.toolsRelationDataArray.push(this.toolDataMap[toolNam]);
                 }
             }
+            //}
         }
         this.showAdvanceView = true;
-        console.log(this.toolDataMap);
+        //console.log(this.toolDataMap);
     }
 
     paginationArray = [];
@@ -740,6 +708,7 @@ class PipelinePanelCtrl extends MetricsPanelCtrl {
     pagecount: number;
     showScroll: boolean = false;
     showToolsDetail(toolName, data): void {
+        this.advColumnMsg = "";
         this.showToolDetails = true;
         this.showScroll = false;
         this.selectedToolVal = toolName;
@@ -754,7 +723,30 @@ class PipelinePanelCtrl extends MetricsPanelCtrl {
             this.tableHeader = [];
             var selectedToolArr = seleToolData[key];
             selectedToolArr["position"] = count++;
-            for (var key in this.tableMapping) {
+
+            for (var i in this.toolDetailMappingJson) {
+                if (toolName === this.toolDetailMappingJson[i].toolName) {
+                    var newSelectedToolArr = this.toolDetailMappingJson[i].fields;
+                }
+            }
+            
+            this.tableHeader.push("Sr.No");
+            for (key in newSelectedToolArr) {
+
+                var headVal = newSelectedToolArr[key]["headerName"];
+                var fieldVal = newSelectedToolArr[key]["fieldName"];
+
+                if (headVal === "") {
+                    this.tableHeader.push(fieldVal);
+                } else {
+                    this.tableHeader.push(headVal);
+                }
+                selToolDataArray["position"] = selectedToolArr["position"];
+                selToolDataArray[fieldVal] = selectedToolArr[fieldVal];
+
+            }
+            toolsDataArray.push(selToolDataArray);
+            /*for (var key in this.tableMapping) {
                 if (key === selectedToolArr['toolName']) {
                     var nodeField = this.tableMapping[key];
                     this.tableHeader = this.tableMappingHeader[key];
@@ -764,9 +756,14 @@ class PipelinePanelCtrl extends MetricsPanelCtrl {
                     toolsDataArray.push(selToolDataArray);
                     break;
                 }
-            }
+            }*/
             this.selectedToolName = selectedToolArr['toolName'];
         }
+
+        if (this.tableHeader.length === 1) {
+            this.advColumnMsg = "Please set required columns from Field Mapping.";
+        }
+
         this.selectedToolData = toolsDataArray;
         var selectedToolLength = this.selectedToolData.length;
         if (selectedToolLength > 10) {
@@ -817,6 +814,7 @@ class PipelinePanelCtrl extends MetricsPanelCtrl {
     }
 
     showAdvanceTableView(): void {
+        this.advColumnMsg = "";
         $("#advanceViewTableId").show();
         $("#chart_div").show();
         $("#basicViewTableId").hide();
