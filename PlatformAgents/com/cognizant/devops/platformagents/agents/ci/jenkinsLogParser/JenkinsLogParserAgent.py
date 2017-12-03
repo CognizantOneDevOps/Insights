@@ -35,6 +35,29 @@ class JenkinsLogParserAgent(JenkinsAgent):
             logResponse = self.getBuildLog(logUrl)
             logTokens = logResponse.split('****Start of Json Output****')
             buildAdded = False
+            buildStageDetails = {}
+            deployStageToEnvMap = {}
+            if '[Pipeline]' in logResponse:
+                stageUrl = buildUrl + 'wfapi/describe'
+                stageResponse = self.getResponse(stageUrl, 'GET', self.userid, self.passwd, None)
+                if stageResponse:
+                    stages = stageResponse.get('stages', None)
+                    if stages:
+                        for stage in stages:
+                            stageName = stage.get('name', '')
+                            if 'Build and Nexus Deploy' in stageName:                                
+                                buildStageDetails['buildStageStatus'] = stage.get('status', '')
+                                buildStageDetails['buildStageStartTimeMS'] = stage.get('startTimeMillis', '')
+                                buildStageDetails['buildStageDurationMS'] = stage.get('durationMillis', '')
+                            elif 'Deploy to ' in stageName:
+                                envName = stageName.replace('Deploy to ', '')
+                                deployStageData = {}
+                                deployStageData['deployStageStatus'] = stage.get('status', '')
+                                deployStageData['deployStageStartTimeMS'] = stage.get('startTimeMillis', '')
+                                deployStageData['deployStageDurationMS'] = stage.get('durationMillis', '')
+                                deployStageToEnvMap[envName] = deployStageData
+            for buildStagePropery in buildStageDetails:
+                build[buildStagePropery] = buildStageDetails[buildStagePropery]
             for logToken in logTokens:
                 deploymentTokens = logToken.split('****End of Json Output****')
                 if len(deploymentTokens) > 1:
@@ -46,22 +69,9 @@ class JenkinsLogParserAgent(JenkinsAgent):
                     for attr in buildJson:
                         if data.get(attr, None) is None:
                             data[attr] = buildJson[attr]
-            
-            if '[Pipeline]' in logResponse:
-                stageUrl = buildUrl + 'wfapi/describe'
-                stageResponse = self.getResponse(stageUrl, 'GET', self.userid, self.passwd, None)
-                if stageResponse:
-                    stages = stageResponse.get('stages', None)
-                    if stages:
-                        for stage in stages:
-                            stageData = copy.deepcopy(build)
-                            buildAdded = True
-                            stageData['stageName'] = stage.get('name', '')
-                            stageData['stageStatus'] = stage.get('status', '')
-                            stageData['stageStartTime'] = stage.get('name', '')
-                            stageData['stageDuration'] = stage.get('name', '')
-                            stageData['stagePauseDuration'] = stage.get('name', '')
-                            dataList.append(stageData)
+                    deployStageDetails = deployStageToEnvMap.get(data['envDetail'], {})
+                    for deploymentStagePropery in deployStageDetails:
+                        data[deploymentStagePropery] = deployStageDetails[deploymentStagePropery]
             if not buildAdded:
                 dataList.append(build)
         return dataList
