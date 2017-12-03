@@ -86,12 +86,12 @@ public class AgentDataSubscriber extends EngineSubscriberResponseHandler{
 					JsonObject graphResponse = dbHandler.bulkCreateNodes(chunk, labels, cypherQuery);
 					if(graphResponse.get("response").getAsJsonObject().get("errors").getAsJsonArray().size() > 0){
 						log.error("Unable to insert nodes for routing key: "+routingKey+", error occured: "+graphResponse);
-						log.error(chunk);
+						//log.error(chunk);
 					}
 				}
 				getChannel().basicAck(envelope.getDeliveryTag(), false);
 			} catch (GraphDBException e) {
-				log.error(e);
+				log.error("GraphDBException occured.", e);
 			}
 		}
 	}
