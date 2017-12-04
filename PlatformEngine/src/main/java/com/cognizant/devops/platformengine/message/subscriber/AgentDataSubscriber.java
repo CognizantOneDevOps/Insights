@@ -114,7 +114,7 @@ public class AgentDataSubscriber extends EngineSubscriberResponseHandler{
 	
 	private String buildCypherQuery(String labels, String fieldName, String relation){
 		StringBuffer query = new StringBuffer();
-		query.append("UNWIND {props} AS properties MERGE (node:").append(labels).append(" { ");
+		query.append("UNWIND {props} AS properties MERGE (node:LATEST:").append(labels).append(" { ");
 		if(fieldName.contains(",")){
 			String[] fields = fieldName.split(",");
 			JsonObject searchCriteria = new JsonObject();
