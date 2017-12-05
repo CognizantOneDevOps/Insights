@@ -15,7 +15,9 @@
  ******************************************************************************/
 package com.cognizant.devops.insightsemail.core.util;
 
+import java.awt.Image;
 import java.io.StringWriter;
+import java.net.URL;
 
 import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
@@ -37,13 +39,12 @@ public class EmailFormatter {
 		return emailFormatter;
 	}
 
-	public StringWriter populateTemplate(JsonArray array,String templateName) {
+	public StringWriter populateTemplate(JsonArray array,String templateName,Image cid) {
 		StringWriter stringWriter = new StringWriter();
-		
 		Template template = initializeTemplate(templateName);
-		
 		VelocityContext context = new VelocityContext(); 
 		context.put(EmailConstants.ACCORDIANDATA,array);
+		context.put("cid",cid);
 		template.merge(context,stringWriter);
 		System.out.println(stringWriter.toString());
 		return stringWriter;
