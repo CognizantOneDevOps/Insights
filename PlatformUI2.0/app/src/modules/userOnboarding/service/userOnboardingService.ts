@@ -81,10 +81,10 @@ module ISightApp {
            return restHandler.post("USER_ORG_DELETE",{"userId":userId, "orgId":orgId },{'Content-Type': 'application/x-www-form-urlencoded'});
        }
 
-       addUser(userName: string, email: string, login:string): ng.IPromise<any> {
+       addUser(name: string, email: string, login:string): ng.IPromise<any> {
     
            var restHandler = this.restCallHandlerService;
-           return restHandler.post("USER_ADD",{"userName":userName, "email":email, "login":login},{'Content-Type': 'application/x-www-form-urlencoded'});
+           return restHandler.post("USER_ADD",{"name":name, "email":email, "login":login},{'Content-Type': 'application/x-www-form-urlencoded'});
        }
 
        updateUserRoleOrg(orgId: number, userId: number, role:string): ng.IPromise<any> {
