@@ -16,13 +16,16 @@
 
 package com.cognizant.devops.insightsemail.core;
 
+import java.awt.Image;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
+import java.net.URL;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.X509Certificate;
 
+import javax.imageio.ImageIO;
 import javax.mail.MessagingException;
 import javax.net.ssl.SSLContext;
 
@@ -41,6 +44,7 @@ import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.web.client.RestTemplate;
 
 import com.cognizant.devops.insightsemail.core.util.EmailFormatter;
+import com.cognizant.devops.platformcommons.config.ApplicationConfigCache;
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.config.EmailConfiguration;
 import com.cognizant.devops.platformcommons.core.email.EmailConstants;
@@ -61,9 +65,10 @@ public class InsightsEmailService {
 		LOG.debug("Inside sendEmail method");
 		try {
 			JsonObject json = getInferenceDetails();
-			
+			String logo= emailConfiguration.getLogo();
+			Image image = ImageIO.read(ClassLoader.getSystemResource(logo));
 			String emailTemplate = emailConfiguration.getEmailVelocityTemplate();
-			String emailBody = getFormattedEmailContent(json,emailTemplate); 
+			String emailBody = getFormattedEmailContent(json,emailTemplate,image); 
 			EmailUtil.getInstance().sendEmail(mail, emailConfiguration,emailBody);
 			
 		} catch (Exception e) {
@@ -92,7 +97,7 @@ public class InsightsEmailService {
 		return resultJson;
 	}
 	
-	private String getFormattedEmailContent(JsonObject json, String emailTemplate) {
+	private String getFormattedEmailContent(JsonObject json, String emailTemplate,Image image) {
 		
 		JsonArray array = json.get(EmailConstants.DATA).getAsJsonArray();
 		for(JsonElement element : array){
@@ -121,8 +126,9 @@ public class InsightsEmailService {
 			 element.getAsJsonObject().addProperty(EmailConstants.NOOFNEGATIVE,noOfNegatives);
 		}
 		
-		StringWriter stringWriter = EmailFormatter.getInstance().populateTemplate(array, emailTemplate);
-		System.out.println(stringWriter.toString());
+		
+		StringWriter stringWriter = EmailFormatter.getInstance().populateTemplate(array,emailTemplate,image);
+	//	System.out.println(stringWriter.toString());
 		return stringWriter.toString();
 	}
 
@@ -149,7 +155,7 @@ public class InsightsEmailService {
 	
 	public static void main(String[] args)
 	{	
-		/**ApplicationConfigCache.loadConfigCache();
+		/*ApplicationConfigCache.loadConfigCache();
 		InsightsEmailService services=new InsightsEmailService();
 		Mail mail=new Mail();
 		mail.setMailTo("");
@@ -163,7 +169,7 @@ public class InsightsEmailService {
 		} catch (MessagingException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}**/
+		}*/
 
 	}
 
