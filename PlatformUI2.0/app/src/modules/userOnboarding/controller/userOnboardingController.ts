@@ -169,7 +169,7 @@ module ISightApp {
                             self.newUserArray.push(selectedUser);
                             self.selectedUser = newUserArray["employeeId"];
                             //self.addAction();
-                            self.radioSelection(searchStrng, true);
+                            self.radioSelection(selectedUser['login'], true);
                             self.updateResult();
                         } else if (data.error) {
                             self.invalidUserMsg = 'Invalid User';
