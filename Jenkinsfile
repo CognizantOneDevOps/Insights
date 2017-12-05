@@ -1,4 +1,4 @@
-env.dockerimagename="devopsbasservice/buildonframework:boins2"
+env.dockerimagename="devopsbasservice/buildonframework:boins3"
 node {
    stage ('Insight_Build') {
         checkout scm
