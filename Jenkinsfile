@@ -2,7 +2,7 @@ env.dockerimagename="devopsbasservice/buildonframework:boins3"
 node {
    stage ('Insight_Build') {
         checkout scm
-		sh 'cd /var/jenkins/jobs/$commitID/workspace/PlatformUI2.0 && bower install && tsd install && npm install && grunt'
+		sh 'cd /var/jenkins/jobs/$commitID/workspace/PlatformUI2.0 && bower install --allow-root && tsd install && npm install && grunt'
 		buildSuccess=true
     }
 	
