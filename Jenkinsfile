@@ -2,8 +2,7 @@ env.dockerimagename="devopsbasservice/buildonframework:boins2"
 node {
    stage ('Insight_Build') {
         checkout scm
-	   	sh 'mvn clean install -DskipTests'
-		sh 'cd /var/jenkins/jobs/$commitID/workspace/PlatformInsights && mvn clean install -DskipTests'
+		sh 'cd /var/jenkins/jobs/$commitID/workspace/PlatformUI2.0 && bower install && tsd install && npm install && grunt'
 		buildSuccess=true
     }
 	
@@ -12,24 +11,20 @@ node {
 		codeQualitySuccess=true
     }
 	
-	stage ('Insight_NexusUpload') {
-		sh 'mvn deploy -Dfile=/var/jenkins/jobs/$commitID/workspace/PlatformInsights/target/PlatformInsights-0.0.1-SNAPSHOT-jar-with-dependencies.jar -DskipTests=true'
-		nexusSuccess=true
-	}
 	
-	stage ('Deployment_SparkServer_QA') {
-		sh 'chmod +x /var/jenkins/jobs/$commitID/workspace/PlatformInsights/target/PlatformInsights-0.0.1-SNAPSHOT-jar-with-dependencies.jar && scp -o "StrictHostKeyChecking no" -i /var/jenkins/insights.pem /var/jenkins/jobs/$commitID/workspace/PlatformInsights/target/PlatformInsights-0.0.1-SNAPSHOT-jar-with-dependencies.jar ubuntu@54.87.224.77:/tmp/'
-		sh 'ssh -f -i /var/jenkins/insights.pem ubuntu@54.87.224.77 "ps -ef | grep /tmp/PlatformInsights-0.0.1-SNAPSHOT-jar-with-dependencies.jar | cut -c 10-15 | xargs kill -9 | exit 0"'
-		sh 'ssh -f -i  /var/jenkins/insights.pem ubuntu@54.87.224.77  "nohup java -jar /tmp/PlatformInsights-0.0.1-SNAPSHOT-jar-with-dependencies.jar &" '
+	stage ('Deployment_App_Tomcat') {
+		sh 'ssh -f -i  /var/jenkins/insights.pem ec2-user@35.153.180.19  "systemctl stop tomcat"'
+		sh 'scp -o "StrictHostKeyChecking no" -i /var/jenkins/insights.pem /var/jenkins/jobs/$commitID/workspace/PlatformUI2.0/app ec2-user@35.153.180.19:/var/lib/tomcat/webapps/app'
+		sh 'ssh -f -i  /var/jenkins/insights.pem ec2-user@35.153.180.19  "systemctl start tomcat"'
 		deploymentSuccess=true
 	}
 	
 	stage ('CodeMerge') {
-	    //Merge code only if Build succeeds..
-
-	    if (buildSuccess == true && codeQualitySuccess == true && nexusSuccess == true && deploymentSuccess == true)
-	    {
-	    echo 'CodeMerge can be done'
-	    }
-	    }
+    //Merge code only if Build succeeds..
+    
+    if (buildSuccess == true && codeQualitySuccess == true && nexusSuccess == true && deploymentSuccess == true)
+    {
+    echo 'CodeMerge can be done'
+    }
+    }
 }
