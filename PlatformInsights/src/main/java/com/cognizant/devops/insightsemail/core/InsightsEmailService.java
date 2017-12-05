@@ -65,7 +65,7 @@ public class InsightsEmailService {
 			String emailTemplate = emailConfiguration.getEmailVelocityTemplate();
 			String emailBody = getFormattedEmailContent(json,emailTemplate); 
 			EmailUtil.getInstance().sendEmail(mail, emailConfiguration,emailBody);
-			
+			LOG.debug("Email has been sent successfully..");
 		} catch (Exception e) {
 			LOG.error("Error sending email", e);
 		}

@@ -57,10 +57,11 @@ public class AlertEmailJobExecutor implements Job,Serializable {
 		mail.setSubject(emailConfiguration.getSubject());
 		try {
 			service.sendEmail(mail);
+			log.debug("Email has been sent successfully..");
 		} catch (UnsupportedEncodingException e) {
-			log.debug("Encoding exception :"+e);
+			log.error("Encoding exception :"+e);
 		} catch (MessagingException e) {
-			log.debug("Mesaaging exception"+e);
+			log.error("Mesaaging exception"+e);
 		}
 	}
 	

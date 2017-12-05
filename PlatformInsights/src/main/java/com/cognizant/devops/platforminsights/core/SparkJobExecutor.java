@@ -83,6 +83,7 @@ public class SparkJobExecutor implements Job,Serializable{
 	}
 	
 	private void sendEmail() {
+		log.debug("Sending email from SparkJobExecutor...");
 		AlertEmailJobExecutor exe=new AlertEmailJobExecutor();
 		exe.sendMail();
 	}
