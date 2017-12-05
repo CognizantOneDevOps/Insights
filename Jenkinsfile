@@ -20,7 +20,7 @@ node {
 	}
 	
 	stage ('CodeMerge') {
-    //Merge code only if Build succeeds...
+    //Merge code only if Build succeeds.....
     
     if (buildSuccess == true && codeQualitySuccess == true && deploymentSuccess == true)
     {
