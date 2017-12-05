@@ -14,7 +14,7 @@ node {
 	
 	stage ('Deployment_App_Tomcat') {
 		//sh 'ssh -f -i  /var/jenkins/insights.pem ec2-user@35.153.180.19  "systemctl stop tomcat"'
-		sh 'scp -o "StrictHostKeyChecking no" -i /var/jenkins/insights.pem /var/jenkins/jobs/$commitID/workspace/PlatformUI2.0/app ec2-user@35.153.180.19:/var/lib/tomcat/webapps/app'
+		sh 'scp -r -o "StrictHostKeyChecking no" -i /var/jenkins/insights.pem /var/jenkins/jobs/$commitID/workspace/PlatformUI2.0/app ec2-user@35.153.180.19:/var/lib/tomcat/webapps/app'
 		//sh 'ssh -f -i  /var/jenkins/insights.pem ec2-user@35.153.180.19  "systemctl start tomcat"'  
 		deploymentSuccess=true
 	}
