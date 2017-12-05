@@ -35,6 +35,7 @@ public class EmailConfiguration implements Serializable {
 	private String mailFrom;
 	private String mailTo;
 	private String subject;
+	private String logo;
 	
 	public Boolean getSendEmailEnabled() {
 		return sendEmailEnabled;
@@ -101,6 +102,12 @@ public class EmailConfiguration implements Serializable {
 	}
 	public void setSubject(String subject) {
 		this.subject = subject;
+	}
+	public String getLogo() {
+		return logo;
+	}
+	public void setLogo(String logo) {
+		this.logo = logo;
 	}
 
 }
