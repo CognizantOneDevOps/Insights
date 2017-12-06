@@ -33,7 +33,6 @@ class JenkinsLogParserAgent(JenkinsAgent):
             buildUrl = build['buildUrl']
             logUrl = buildUrl + "console"
             logResponse = self.getBuildLog(logUrl)
-            logTokens = logResponse.split('****Start of Json Output****')
             buildAdded = False
             buildStageDetails = {}
             deployStageToEnvMap = {}
@@ -58,20 +57,29 @@ class JenkinsLogParserAgent(JenkinsAgent):
                                 deployStageToEnvMap[envName] = deployStageData
             for buildStagePropery in buildStageDetails:
                 build[buildStagePropery] = buildStageDetails[buildStagePropery]
-            for logToken in logTokens:
-                deploymentTokens = logToken.split('****End of Json Output****')
-                if len(deploymentTokens) > 1:
-                    data = copy.deepcopy(build)
-                    dataList.append(data)
-                    buildAdded = True
-                    deploymentJsonStr = '{' + deploymentTokens[0].split('{')[1].split('}')[0] + '}'
-                    buildJson = json.loads(deploymentJsonStr)
-                    for attr in buildJson:
-                        if data.get(attr, None) is None:
-                            data[attr] = buildJson[attr]
-                    deployStageDetails = deployStageToEnvMap.get(data['envDetail'], {})
-                    for deploymentStagePropery in deployStageDetails:
-                        data[deploymentStagePropery] = deployStageDetails[deploymentStagePropery]
+            
+            try:
+                logTokens = logResponse.split('****Start of Json Output****')
+                for logToken in logTokens:
+                    deploymentTokens = logToken.split('****End of Json Output****')
+                    if len(deploymentTokens) > 1:
+                        data = copy.deepcopy(build)
+                        dataList.append(data)
+                        buildAdded = True
+                        deploymentJsonTokens = deploymentTokens[0].split('{')
+                        if len(deploymentJsonTokens) > 1:
+                            deploymentJsonStr = '{' + deploymentJsonTokens[1].split('}')[0] + '}'
+                            buildJson = json.loads(deploymentJsonStr)
+                            for attr in buildJson:
+                                if data.get(attr, None) is None:
+                                    data[attr] = buildJson[attr]
+                            envDetails = data.get('envDetail', None)
+                            if envDetails:
+                                deployStageDetails = deployStageToEnvMap.get(envDetails, {})
+                                for deploymentStagePropery in deployStageDetails:
+                                    data[deploymentStagePropery] = deployStageDetails[deploymentStagePropery]
+            except Exception as ex:
+                pass
             if not buildAdded:
                 dataList.append(build)
         return dataList
