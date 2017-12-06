@@ -58,7 +58,10 @@ node {
 		codeQualitySuccessUI=true
     }
 	
-	
+	stage ('Insight_PUI2.0_NexusUpload') {
+		sh 'mvn deploy -Dfile=/var/jenkins/jobs/$commitID/workspace/PlatformUI2.0/app -DskipTests=true'
+		nexusSuccessPUI2=true
+	}
 	stage ('Deployment_PUI2.0_App_QA_Tomcat') {
 		sh 'scp -r -o "StrictHostKeyChecking no" -i /var/jenkins/insights.pem /var/jenkins/jobs/$commitID/workspace/PlatformUI2.0/app ec2-user@35.153.180.19:/var/lib/tomcat/webapps/'
 		deploymentSuccessUI=true
@@ -67,7 +70,7 @@ node {
 	stage ('CodeMerge') {
     	//Merge code only if Build succeeds...
     
-	    if (buildSuccessPS == true && codeQualitySuccessPS == true && nexusSuccessPS == true && deploymentSuccessPS == true && buildSuccessPI == true && codeQualitySuccessPI == true && nexusSuccessPI == true && deploymentSuccessPI == true && buildSuccessUI == true && codeQualitySuccessUI == true && deploymentSuccessUI == true) 
+	    if (buildSuccessPS == true && codeQualitySuccessPS == true && nexusSuccessPS == true && deploymentSuccessPS == true && buildSuccessPI == true && codeQualitySuccessPI == true && nexusSuccessPI == true && deploymentSuccessPI == true && buildSuccessUI == true && codeQualitySuccessUI == true && nexusSuccessPUI2 ==true && deploymentSuccessUI == true) 
 	    {
 	    //need to create service account and replace the following git config to docker image
 		sh 'git config --global user.email sowmiya.ranganathan@cognizant.com'
