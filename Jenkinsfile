@@ -1,5 +1,6 @@
 env.dockerimagename="devopsbasservice/buildonframework:boins3"
 node {
+   // Platform Service Starts
    stage ('Insight_PS_Build') {
         checkout scm
 		sh 'mvn clean install -DskipTests'
@@ -21,8 +22,9 @@ node {
 		sh 'cd /var/jenkins/jobs/$commitID/workspace/PlatformService && mvn tomcat7:redeploy -DskipTests'
 		deploymentSuccessPS=true
 	}
+	// Platform Service Ends
 	
-	
+	// Platform Insights Starts
 	stage ('Insight_PI_Build') {
         checkout scm
 	   	sh 'mvn clean install -DskipTests'
@@ -46,7 +48,9 @@ node {
 		sh 'ssh -f -i  /var/jenkins/insights.pem ubuntu@54.87.224.77  "nohup java -jar /tmp/PlatformInsights-0.0.1-SNAPSHOT-jar-with-dependencies.jar &" '
 		deploymentSuccessPI=true
 	}
+	// Platform Insights Ends
 	
+	// Platform UI2.0 Starts
 	stage ('Insight_PUI2.0_Build') {
         checkout scm
 		sh 'cd /var/jenkins/jobs/$commitID/workspace/PlatformUI2.0 && bower install --allow-root && tsd install && npm install && grunt'
@@ -66,13 +70,13 @@ node {
 		sh 'scp -r -o "StrictHostKeyChecking no" -i /var/jenkins/insights.pem /var/jenkins/jobs/$commitID/workspace/PlatformUI2.0/app ec2-user@35.153.180.19:/var/lib/tomcat/webapps/'
 		deploymentSuccessUI=true
 	}
-	
+	// Platform UI2.0 Ends
 	stage ('CodeMerge') {
     	//Merge code only if Build succeeds...
     
 	    if (buildSuccessPS == true && codeQualitySuccessPS == true && nexusSuccessPS == true && deploymentSuccessPS == true && buildSuccessPI == true && codeQualitySuccessPI == true && nexusSuccessPI == true && deploymentSuccessPI == true && buildSuccessUI == true && codeQualitySuccessUI == true && nexusSuccessPUI2 ==true && deploymentSuccessUI == true) 
 	    {
-	    //need to create service account and replace the following git config to docker image
+	    	//need to create service account and replace the following git config to docker image
 		sh 'git config --global user.email sowmiya.ranganathan@cognizant.com'
 		sh 'git config --global user.name SowmiyaRanganathan'
 
