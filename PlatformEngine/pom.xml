@@ -115,6 +115,19 @@
 					<argLine>-Xms512m -Xmx1024m</argLine>
 				</configuration>
 			</plugin>
+			<plugin>
+		   <artifactId>maven-deploy-plugin</artifactId>
+		   <version>2.8.1</version>
+		   <executions>
+			  <execution>
+				 <id>default-deploy</id>
+				 <phase>deploy</phase>
+				 <goals>
+					<goal>deploy</goal>
+				 </goals>
+			  </execution>
+		   </executions>
+		</plugin>
 			
 		</plugins>
 		
@@ -129,7 +142,7 @@
 		</resources>
 	</build>
 
-	<distributionManagement>
+	<!-- <distributionManagement>
 		<repository>
 			<id>InSightsArtifactsREL</id>
 			<name>InSightsArtifactsREL</name>
@@ -141,5 +154,11 @@
 			<name>InSightsArtifacts</name>
 			<url>http://localhost:9005/nexus/content/repositories/InSightsArtifacts/</url>
 		</snapshotRepository>
-	</distributionManagement>
+ </distributionManagement> -->
+	<distributionManagement>
+		   <snapshotRepository>
+			  <id>nexus</id>
+			  <url>http://54.209.104.148:8081/nexus/content/repositories/buildonInsights/</url>
+		   </snapshotRepository>
+		</distributionManagement>
 </project>
