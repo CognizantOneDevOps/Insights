@@ -61,7 +61,8 @@
 		"emailVelocityTemplate": "",
 		"mailFrom": " ",
 		"mailTo": " ",
-		"subject": "QA - Insights inference details"
+		"subject": "QA - Insights inference details",
+		"logo" :"img/Cognizant_Insights.svg"
 	},
 	"insightsServiceURL": "",
 	"disableAuth": true,
