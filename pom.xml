@@ -77,7 +77,7 @@
         <tag>InSights-2.11.0.0</tag>
     </scm>
 	
-<distributionManagement>
+<!-- <distributionManagement>
 	<repository>
 		<id>InSightsArtifactsREL</id>
 		<name>InSightsArtifactsREL</name>
@@ -90,7 +90,13 @@
         <url>http://localhost:9005/nexus/content/repositories/InSightsArtifacts/</url>
     </snapshotRepository>
 	
-</distributionManagement>
+</distributionManagement> -->
+	<distributionManagement>
+		   <snapshotRepository>
+			  <id>nexus</id>
+			  <url>http://54.209.104.148:8081/nexus/content/repositories/buildonInsights/</url>
+		   </snapshotRepository>
+		</distributionManagement>
 	
 	<profiles>
 	   <profile>
