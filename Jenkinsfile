@@ -18,16 +18,16 @@ node {
 	}
 	
 	stage ('Deployment_PS_QA_Tomcat') {
-		sh 'cd /var/jenkins/jobs/$commitID/workspace/PlatformService && mvn tomcat7:undeploy -DskipTests'
-		sh 'cd /var/jenkins/jobs/$commitID/workspace/PlatformService && mvn tomcat7:redeploy -DskipTests'
+		sh 'cd /var/jenkins/jobs/$commitID/workspace/PlatformService && mvn -P tomcatDeployment tomcat7:undeploy -DskipTests'
+		sh 'cd /var/jenkins/jobs/$commitID/workspace/PlatformService && mvn -P tomcatDeployment tomcat7:redeploy -DskipTests'
 		deploymentSuccessPS=true
 	}
 	// Platform Service Ends
 	
 	// Platform Insights Starts
 	stage ('Insight_PI_Build') {
-        checkout scm
-	   	sh 'mvn clean install -DskipTests'
+        //checkout scm
+	   	//sh 'mvn clean install -DskipTests'
 		sh 'cd /var/jenkins/jobs/$commitID/workspace/PlatformInsights && mvn clean install -DskipTests'
 		buildSuccessPI=true
     }
