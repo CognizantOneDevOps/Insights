@@ -51,7 +51,7 @@ node {
 	
 	// Platform UI2.0 Starts
 	stage ('Insight_PUI2.0_Build') {
-        checkout scm
+        
 		sh 'cd /var/jenkins/jobs/$commitID/workspace/PlatformUI2.0 && bower install --allow-root && tsd install && npm install && grunt'
 		buildSuccessUI=true
     }
