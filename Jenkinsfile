@@ -88,7 +88,7 @@ node {
 		//Takes current pull request branchName to merge
 		//sh 'git merge origin/$branchName'
 		//sh 'git push origin finalTest'
-		echo 'Merge can be done'
+		echo 'Merge can be done.'
 	    //}
     }
 	
