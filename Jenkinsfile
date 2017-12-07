@@ -39,7 +39,7 @@ node {
 	
 	stage ('Insight_PI_NexusUpload') {
 		//sh 'mvn deploy -Dfile=/var/jenkins/jobs/$commitID/workspace/PlatformInsights/target/PlatformInsights-0.0.1-SNAPSHOT-jar-with-dependencies.jar -DskipTests=true'
-		sh 'mvn -P NexusUpload deploy -Dfile=/var/jenkins/jobs/$commitID/workspace/PlatformInsights/target/PlatformInsights-0.0.1-SNAPSHOT-jar-with-dependencies.jar -DskipTests=true
+		sh 'mvn -P NexusUpload deploy -Dfile=/var/jenkins/jobs/$commitID/workspace/PlatformInsights/target/PlatformInsights-0.0.1-SNAPSHOT-jar-with-dependencies.jar -DskipTests=true'
 		nexusSuccessPI=true
 	}
 	
@@ -66,7 +66,7 @@ node {
 	stage ('Insight_PUI2.0_NexusUpload') {
 		//sh 'mvn deploy -Dfile=/var/jenkins/jobs/$commitID/workspace/PlatformUI2.0/app -DskipTests=true'
 		sh 'cd /var/jenkins/jobs/$commitID/workspace/PlatformUI2.0 && zip app.zip app'
-		sh 'mvn -P NexusUpload deploy:deploy-file -Dfile=/var/jenkins/jobs/$commitID/workspace/PlatformUI2.0/app.zip -DgroupId="com.cognizant.devops" -DartifactId="PlatformUI2.0" -Dpackaging=zip -Dversion=1.0.0.1-SNAPSHOT -DrepositoryId=nexus -Durl=http://54.209.104.148:8081/nexus/content/repositories/buildonInsights -DskipTests=true
+		sh 'mvn -P NexusUpload deploy:deploy-file -Dfile=/var/jenkins/jobs/$commitID/workspace/PlatformUI2.0/app.zip -DgroupId="com.cognizant.devops" -DartifactId="PlatformUI2.0" -Dpackaging=zip -Dversion=1.0.0.1-SNAPSHOT -DrepositoryId=nexus -Durl=http://54.209.104.148:8081/nexus/content/repositories/buildonInsights -DskipTests=true'
 		nexusSuccessPUI2=true
 	}
 	stage ('Deployment_PUI2.0_App_QA_Tomcat') {
