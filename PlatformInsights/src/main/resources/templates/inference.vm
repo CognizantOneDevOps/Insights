@@ -4,68 +4,74 @@
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8"> 
 <title></title> 
 </head> 
-<body style="font-family:Arial,sans-serif;margin-top:0;margin-bottom:0;margin-right:0;margin-left:0;padding-top:0;padding-bottom:0;padding-right:0;padding-left:0;background-color:#ffffff;"> 
-	<table width="100%" cellpadding="0" cellspacing="0" align="center" border="0" class="wrapper" style="margin-top:0;margin-bottom:0;margin-right:auto;margin-left:auto;font-family:Arial,sans-serif;table-layout:fixed;width:100%;-webkit-text-size-adjust:100%;-ms-text-size-adjust:100%;background-color:#ffffff;"> 
+<body style="margin-top:0;margin-bottom:0;margin-right:0;margin-left:0;padding-top:0;padding-bottom:0;padding-right:0;padding-left:0;background-color:#ffffff;"> 
+	<table width="100%" cellpadding="0" cellspacing="0" align="center" border="0"
+		   style="margin-top:0;margin-bottom:0;margin-right:auto;margin-left:auto;table-layout:fixed;width:100%;-webkit-text-size-adjust:100%;-ms-text-size-adjust:100%;background-color:#ffffff;"> 
 		<tbody> 
 			<tr> 
 				<td align="center"> 
 					<center> 
-					<div class="webkit" style="margin-top:0;margin-bottom:0;margin-right:auto;margin-left:auto;width:100%;max-width:600px;"> 
+					<div  style="margin-top:0;margin-bottom:0;margin-right:auto;margin-left:auto;width:100%;max-width:600px;
+								border-right: 1px solid rgb(51, 51, 51); border-left: 1px solid rgb(51, 51, 51); 
+								border-bottom: 1px solid rgb(51, 51, 51);border-top: 1px solid rgb(51, 51, 51);"> 
 
-					<table width="100%" cellpadding="0" cellspacing="0" border="0" class="outer" style="margin-top:0;margin-bottom:0;margin-right:auto;margin-left:auto;width:100%;max-width:600px;"> 
+					<table width="100%" cellpadding="0" cellspacing="0" border="0"  style="margin-top:0;margin-bottom:0;margin-right:auto;margin-left:auto;width:100%;max-width:600px;"> 
 						<tbody> 
-						<tr class="hide"> 
+			<!--			<tr > 
 						<td style="font-size:20px;line-height:20px;">&nbsp;</td> 
 						</tr> 
+			-->		
 						<tr> 
 						<td bgcolor="#ffffff"> 
-				<!-- Two Columns --> 
-						<table width="100%" cellpadding="0" cellspacing="0" border="0" class="section-masthead topbar" style="border-top-width:4px;border-top-style:solid;border-top-color:#dff1f6;"> 
+			 
+			<!--
+						<table width="100%" cellpadding="0" cellspacing="0" border="0" > 
 						<tbody> 
-						<tr class="one-col"> 
-						<!--logo-->
-							<td class="inner msoinner" style="padding-right:7%;padding-left:7%;padding-top:30px;padding-bottom:22px;"> 
-								<table width="100%" border="0" cellpadding="0" cellspacing="0" class="contents" style="text-align:left;font-size:15px;line-height:16px;color:#999999;"> 
+						<tr > 
+					
+							<td  style="padding-right:7%;padding-left:7%;padding-top:30px;padding-bottom:22px;"> 
+								<table width="100%" border="0" cellpadding="0" cellspacing="0" style="text-align:left;font-size:15px;line-height:16px;color:#999999;"> 
 									<tbody> 
 									<tr> 
-									<th class="type" width="30%" style="padding-right:10px;font-weight:normal;font-family:Arial,sans-serif;vertical-align:bottom;"> 
-									<div class="mktEditable" id="logo">
+									<th  width="30%" style="padding-right:10px;font-weight:normal;font-family:proxima_novasemibold;vertical-align:bottom;"> 
+									<div  id="logo">
 									<p style="margin-top:0;margin-right:0;margin-left:0;margin-bottom:8px;">
 									<img src="cid:${cid}" alt="logo" width="140" style="border-width:0;height:auto;-ms-interpolation-mode:bicubic;max-width:100%;"></p> 
 									</div> </th> 
-									<th width="70%" align="right" class="type" style="font-weight:normal;font-family:Arial,sans-serif;vertical-align:bottom;"> 
-									<div class="mktEditable" id="Preheader">
+									<th width="70%" align="right"  style="font-weight:normal;font-family:Proxima Nova;vertical-align:bottom;"> 
+									<div >
 									<p style="margin-top:0;margin-right:0;margin-left:0;margin-bottom:8px;">Insights Inference</p>
 									</div> </th> 
 									</tr> 
 									</tbody> 
 								</table> 
 							</td> 
-							<!--logo end-->
+							
 						</tr> 
+			
 						</tbody> 
 						</table> 
 						
-
-							<table width="100%" cellpadding="0" cellspacing="0" border="0" class="section-main contents" style="font-size:14px;line-height:22px;text-align:left;color:#333333;"> 
+	-->		
+							<table width="100%" cellpadding="0" cellspacing="0" border="0"  style="font-size:14px;line-height:22px;text-align:left;color:#333333;"> 
 							#foreach ($data in $accordianData)
 
 							<tbody> 
 
-							<tr class="one-col"> 
-							<td class="inner type msoinner" style="font-family:Arial,sans-serif;padding-top:30px;padding-right:7%;padding-left:7%;"> 
+							<tr> 
+							<td  style="padding-bottom:10px;"> 
 						
-							<p class="h2" style="font-size: 16px; line-height: 25px; margin: 0 0 8px 0;background-color:#dff1f6;    padding: 10px;"><b>$data.heading.getAsString()<br>
-							<span style="font-size: 14px;">Observations:- (Positives:$data.noOfPositives, Negatives: $data.noOfNegatives, Neutral: $data.noOfNeutral) </span></b></p> 
-							<p><span style="font-size: 12px;"><b>Daily Observations: (Last run: $data.inferenceDetails[0].lastRun.getAsString())</b></span> </p>
-							<p style="margin: 0 0 8px 0;">
+							<p  style="font-size: 16px; line-height: 25px; margin: 0 0 8px 0;background-color:#d3e9c7;font-family: proxima_novasemibold;padding-left:50px;padding-top:10px;padding-bottom:10px;"><b>$data.heading.getAsString()
+							<span style="font-size: 14px;font-family: proxima_novasemibold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Observations:- (Positives:$data.noOfPositives, Negatives: $data.noOfNegatives, Neutral: $data.noOfNeutral) </span></b></p> 
+							 <p><span style="font-size: 14px; margin-left:50px;font-family:Proxima Nova;"><b>Daily Observations: (Last run: $data.inferenceDetails[0].lastRun.getAsString())</b></span> </p> 
+							<p style="margin: 0 0 8px 0;font-size: 12px;font-family:Proxima Nova;">
 
 								#if ($!data.inferenceDetails)
-									<ul >
+									<ul style=" margin-left: 25px; " >
 									#foreach ($content in $data.inferenceDetails)
 										
 										#if ($content.get("schedule").getAsString()=="DAILY")
-										<li >
+										<li  >
 										$content.inference.getAsString()
 										</li>
 										#end
