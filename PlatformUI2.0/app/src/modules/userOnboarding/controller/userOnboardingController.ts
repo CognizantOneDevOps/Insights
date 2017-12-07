@@ -163,6 +163,7 @@ module ISightApp {
                             selectedUser['email'] = newUserArray["emailAddress"];
                             selectedUser['login'] = newUserArray["employeeId"];
                             selectedUser['familyName'] = newUserArray["familyName"];
+                            selectedUser['userName'] = newUserArray["givenName"] + " " + newUserArray["familyName"];
                             selectedUser['newUser'] = true;
                             self.appData['appInfo'].push(selectedUser);
                             self.paginatedUserOnboardedArray['paginatedArr'].push(self.appData['appInfo']);
@@ -198,6 +199,7 @@ module ISightApp {
                     selectedUserData.selectedEmailAdd = selectedUserDtl['email'];
                     selectedUserData.selectedRole = selectedUserDtl['role'];
                     selectedUserData.familyName = selectedUserDtl['familyName'];
+                    selectedUserData.userName = selectedUserDtl['userName'];
                     selectedUserData.selectedUserId = selectedUserDtl["userId"]
                     selectedUserData.editRole = false;
                     selectedUserData.newUser = newUser;
@@ -262,7 +264,7 @@ module ISightApp {
                                 }
                                 else if (!self.isUserAlreadyAdded) {
                                     self.userOnboardingService
-                                        .addUser(self.selectedUserRowsModel.selectedUserRow[0].familyName,
+                                        .addUser(self.selectedUserRowsModel.selectedUserRow[0].userName,
                                         self.selectedUserRowsModel.selectedUserRow[0].selectedEmailAdd,
                                         self.selectedUserRowsModel.selectedUserRow[0].selectedLoginName)
                                         .then(function (addUserdata) {
@@ -469,10 +471,10 @@ module ISightApp {
         begin = 0;
         end = 10;
         paginatedUserOnboardedArray = [];
-        showPaginationJson ={
-            'showPaginationBar' : false,
+        showPaginationJson = {
+            'showPaginationBar': false,
         }
-        
+
         setPage(pageNo) {
             this.currentPage = pageNo;
         };
