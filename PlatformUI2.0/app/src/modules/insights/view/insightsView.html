@@ -14,124 +14,152 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  ******************************************************************************
- -->
+-->
+<div ng-controller="insightsController" class="toolbardemoBasicUsage" style="width: 95%;margin:auto;margin-bottom:50px">
+	<!-- Use any element to open the sidenav -->
+	<!--span ng-click="insightsController.openNav()">Settings</span-->
 
-<div ng-controller="insightsController" class="toolbardemoBasicUsage" style="width: 80%;margin:auto;margin-bottom:50px">
-<div id="mySidenav" class="sidenav">
-  <a href="javascript:void(0)" class="closebtn" ng-click="insightsController.closeNav()">&times;</a>
-  <div>
-  <form ng-submit="insightsController.submit()" name="insightsController.myForm">
-  <p style="background-color:#eee">Chart type: </p>
-   <div style="margin-left:20px">
-    <md-radio-group>
-
-      <md-radio-button value="bar" class="md-primary">Bar Chart</md-radio-button>
-      <md-radio-button value="time">Time Series</md-radio-button>
-      <md-radio-button value="line">Line Chart</md-radio-button>
-
-    </md-radio-group>
-   </div>
-   <p style="background-color:#eee">Number of KPI's to display: </p>
-   <div style="margin-left:20px"><input type="text" name="kpinumber"></div>
-   <p style="background-color:#eee;margin-top:15px">Observation Schedule: </p>
-   <div style="margin-left:20px">
-    <md-radio-group>
-
-      <md-radio-button value="daily" class="md-primary">Daily</md-radio-button>
-      <md-radio-button value="weekly">Weekly</md-radio-button>
-      
-    </md-radio-group>
-
-   </div>
-   <p style="background-color:#eee;margin-top:15px">Type of KPI: </p>
-   
-   <fieldset style="margin-left:10px">
-   <div ng-repeat="vector in insightsController.vectorList">
-     <md-checkbox ng-model="vector.checked" ng-click="">
-               {{vector.name}}
-     </md-checkbox>
-
-    </div>
-   <p style="background-color:#eee;margin-top:15px">Type of observations: </p>
-   
-   <fieldset style="margin-left:10px">
-   <div ng-repeat="type in insightsController.typeList">
-     <md-checkbox ng-model="type.checked" ng-click="">
-               {{type.name}}
-     </md-checkbox>
-
-    </div>
-              
-   <button class="md-raised md-primary configureBut md-button md-ink-ripple" type="submit" ng-click="" style="background-color: #00728f; color: white;margin-left:60px">Apply Settings</button>
-  </form>
-  </div>
-</div>
-
-<!-- Use any element to open the sidenav -->
-<!--span ng-click="insightsController.openNav()">Settings</span-->
-
-	    <div class="contentCss">
-		    <div ng-if="insightsController.showThrobber" layout-sm="column" layout-align="center center" style="margin-left: 46%;margin-top: 200px;">
-	            <md-progress-circular md-mode="indeterminate" md-diameter="50"></md-progress-circular>
-	        </div>
-        </div>
-        <md-content id="accrdion"> <br>
-        
-        <a ng-show="!insightsController.expandedAll && !insightsController.showThrobber" ng-click="insightsController.expandAll()" style="margin-left: 2px; color: #337ab7;float:right;cursor:pointer">
-        <md-tooltip>Expand All</md-tooltip><md-icon md-svg-src="dist/icons/svg/insightsPage/Expand.svg" ng-style="{height: '25px', width: '25px'}"></md-icon></a>
-        <a ng-show="insightsController.expandedAll && !insightsController.showThrobber" ng-click="insightsController.collapseAll()" style="margin-left: 2px;color: #337ab7;float:right;cursor:pointer">
-        <md-tooltip>Collapse All</md-tooltip><md-icon md-svg-src="dist/icons/svg/insightsPage/Collapse.svg" ng-style="{height: '25px', width: '25px'}"></md-icon></a>
-        <a ng-show="!insightsController.showThrobber && insightsController.showOptionsPanel" ng-click="insightsController.openNav()" style="margin-left: 2px; color: #337ab7;float:right;cursor:pointer"><md-tooltip>Filter</md-tooltip><md-icon md-svg-src="dist/icons/svg/insightsPage/Filter.svg" ng-style="{height: '30px', width: '30px'}"></md-icon></a>
-
-		<div class="md-accordion" ng-repeat="data in insightsController.accordianData" >
-			<md-toolbar ng-init="$index == 0 ? data.expanded = true : data.expanded = false" ng-click="insightsController.collapse(data)" style="font-size: 15px;font-weight: 500;color: #757575;font-family: proxima_novasemibold !important; background:#d3e9c7;">
-				<div class="md-toolbar-tools">
-					<h2>
-					    <md-icon style="margin-top: -7px;" md-svg-src="{{insightsController.getIconUrl(data.heading,data.expanded)}}" ng-style="{color:'white',fill:'white',height: '40px', width: '40px'}"></md-icon>
-						<span>{{data.heading}} </span>
-						<span style="font-weight:normal;margin-left:10px"> Observations:- (Positives: {{data.noOfPositives}}, Negatives: {{data.noOfNegatives}}, Neutral: {{data.noOfNeutral}})</span>
-					</h2>
-					<span flex=""></span>
-					<span ng-class="{expandCollapse:!data.expanded, active:data.expanded}"></span> 
-				</div>
-			</md-toolbar>
-			<div ng-class="{dataContent:true, activeContent:data.expanded}" style="border-right:1px solid #333;border-left:1px solid #333;border-bottom:1px solid #333;">
-			<div layout>
-			    <div class="outerdiv">
-					<div class="textst" >
-						<span class="fnt-bld">Daily Observations: (Last run:-{{data.inferenceDetails[0].lastRun}})</span>
-					    <ul>
-						<li ng-repeat="content in data.inferenceDetails | filter: {'schedule': 'DAILY'}" ng-mouseenter="insightsController.viewData($event,content.currentResult,content.lastResult,content.sentiment,content.inference,$parent.$index,content.resultSet)" style="margin-top:10px">
-						<md-icon ng-if="content.sentiment ==='POSITIVE'" md-svg-src="dist/icons/svg/insightsPage/happy.svg" ng-style="{height: '20px', width: '20px', fill:'green',color:'green'}"></md-icon>
-	                    <md-icon ng-if="content.sentiment ==='NEGATIVE'" md-svg-src="dist/icons/svg/insightsPage/sadface.svg" ng-style="{height: '20px', width: '20px',fill:'red',color:'red'}"></md-icon>
-	                    <md-icon ng-if="content.sentiment ==='NEUTRAL'" md-svg-src="dist/icons/svg/insightsPage/neutral.svg" ng-style="{height: '20px', width: '20px',fill:'blue',color:'blue'}"></md-icon>
-						<a ng-class="{textst:true, txthover:hovering}" ng-mouseenter="hovering=true"  ng-mouseleave="hovering=false"></a><span  ng-bind-html="insightsController.highlight(content.inference, content.kpi)"></span></li>
-						</ul>
-						<p ng-show="!(data.inferenceDetails | filter: {'schedule': 'DAILY'}).length">No observations this time.</p>
-
-
-					</div>
-                    
-					<div class="textst" >
-					</div>
-
-					
-				</div>
-				
-				<div style="width:50%">
-				 <div  google-chart chart="insightsController.getChartObjJson($index)" chart-legend="false" style="height:200px; width:100%;" id="graphdiv">
-				</div>
-				<div style="font-size:10px;text-align:center">Note:Please hover on the KPIs to see the corresponding graph.</div>
-				</div>
-				</div>
-
-				
-				<div style="clear:both"></div>
-
-			</div >
-			
+	<div class="contentCss">
+		<div ng-if="insightsController.showThrobber" layout-sm="column" layout-align="center center" style="margin-left: 46%;margin-top: 200px;">
+			<md-progress-circular md-mode="indeterminate" md-diameter="50"></md-progress-circular>
 		</div>
-	</md-content>
-	
+	</div>
+	<div style="width: 22%;float:left" ng-if="!insightsController.showThrobber">
+
+		<div style="padding:20px;font-family:proxima_novaregular;color:#333;background-color:#fff;margin-right:10px;box-shadow:0 1px 3px -1px rgba(0, 0, 0, .4)">
+			
+			<div style="color:#666;font-size:16px;font-weight:bold"> Filter the result </div>
+
+			<div id="selectedValues">
+		   			<span ng-repeat="selectedText in insightsController.allSelectedValues"  style="background-color:#eee;margin-right:10px;padding:5px;margin-top:10px;display:inline-block">
+									{{selectedText}}
+					</span>
+		    </div>
+			
+			<form >
+			    <div class="flthd" ng-click="insightsController.showHide('chartTypesHld')">
+					<div style="width:90%;display:inline-block">CHART TYPE: </div>
+					<md-icon md-svg-src="dist/icons/svg/insightsPage/down-arrow.svg" ng-style="{height: '15px', width: '15px', fill:'#333',color:'#333'}"></md-icon>
+				</div>
+				<div class="flthld" id="chartTypesHld">
+					<md-radio-group ng-model="insightsController.selectedChartType" ng-change="insightsController.onChangeRadio()">
+						<md-radio-button value="BarChart" class="md-primary">Bar Chart</md-radio-button><br/>
+						<md-radio-button value="ColumnChart">Column Chart</md-radio-button><br/>
+						<md-radio-button value="LineChart">Line Chart</md-radio-button><br/>
+					</md-radio-group>
+				</div>
+				<div class="flthd" style="background-color:#eee" ng-click="insightsController.showHide('kpiNumberHld')">
+					<div style="width:90%;display:inline-block;">NUMBER OF KPI's TO DISPLAY: </div>
+					<md-icon md-svg-src="dist/icons/svg/insightsPage/down-arrow.svg" ng-style="{height: '15px', width: '15px', fill:'#333',color:'#333'}"></md-icon>
+				</div>
+				<div class="flthld" id="kpiNumberHld">
+					<input type="text" name="kpinumber" id="kpinumber" ng-model="insightsController.numberofkpi">
+				</div>
+				<div class="flthd" ng-click="insightsController.showHide('obsHld')">
+					<div style="width:90%;display:inline-block">OBSERVATION SCHEDULE: </div>
+					<md-icon md-svg-src="dist/icons/svg/insightsPage/down-arrow.svg" ng-style="{height: '15px', width: '15px', fill:'#333',color:'#333'}"></md-icon>
+				</div>
+				<div class="flthld" id="obsHld" >
+					<md-radio-group ng-model="insightsController.selectedSchedule" ng-change="insightsController.onChangeRadio()">
+						<md-radio-button value="DAILY" class="md-primary">Daily</md-radio-button><br/>
+						<md-radio-button value="WEEKLY">Weekly</md-radio-button><br/>
+					</md-radio-group>
+				</div>
+				<div class="flthd" style="background-color:#eee" ng-click="insightsController.showHide('vectorNameHld')">
+					<div style="width:90%;display:inline-block">TYPE OF KPI: </div>
+					<md-icon md-svg-src="dist/icons/svg/insightsPage/down-arrow.svg" ng-style="{height: '15px', width: '15px', fill:'#333',color:'#333'}"></md-icon>
+				</div>
+				
+						<div id="vectorNameHld" class="flthld" ng-click="insightsController.onChangeRadio()" >
+							<md-checkbox   ng-repeat="vector in insightsController.vectorList" ng-model="vector.checked"  layout="row">
+								{{vector.name}}
+							</md-checkbox><br/>
+						</div>
+				
+				<div class="flthd" ng-click="insightsController.showHide('typeNameHld')">
+					<div style="width:90%;display:inline-block">TYPE OF OBSERVATIONS: </div>
+					<md-icon md-svg-src="dist/icons/svg/insightsPage/down-arrow.svg" ng-style="{height: '15px', width: '15px', fill:'#333',color:'#333'}"></md-icon>
+				</div>
+						
+				<div id="typeNameHld" class="flthld" ng-click="insightsController.onChangeRadio()">
+								<md-checkbox ng-repeat="type in insightsController.typeList" ng-model="type.checked"  layout="row">
+									{{type.name}}
+								</md-checkbox><br/>
+				</div>
+						
+					</form>
+					
+					<md-content layout="row" layout-align="center center">
+					<md-button class="md-raised md-primary configureBut md-button md-ink-ripple"  ng-click="insightsController.submit(false)" style="background-color: #00728f; color: white;min-width:130px">Apply</md-button>
+					<md-button  layout class="cancelButt" ng-click="insightsController.submit(true)">Clear All</md-button>
+					</md-content>
+				</div>
+				</div>
+			    <div style="margin-left:22%" ng-if="!insightsController.showThrobber">
+				<md-content id="accrdion" style="background-color:#fff;box-shadow:0 1px 3px -1px rgba(0, 0, 0, .4);padding-top:0px"> 
+					<div>
+		<a ng-show="!insightsController.expandedAll && !insightsController.showThrobber" ng-click="insightsController.expandAll()" style="margin-left: 2px; color: #337ab7;float:right;cursor:pointer">
+						Expand All Observations</a>
+			<a ng-show="insightsController.expandedAll && !insightsController.showThrobber" ng-click="insightsController.collapseAll()" style="margin-left: 2px;color: #337ab7;float:right;cursor:pointer">
+							Collapse All Observations</a></div>
+					<!--a ng-show="!insightsController.expandedAll && !insightsController.showThrobber" ng-click="insightsController.expandAll()" style="margin-left: 2px; color: #337ab7;float:right;cursor:pointer">
+						<md-tooltip>Expand All</md-tooltip><md-icon md-svg-src="dist/icons/svg/insightsPage/Expand.svg" ng-style="{height: '25px', width: '25px'}"></md-icon></a>
+						<a ng-show="insightsController.expandedAll && !insightsController.showThrobber" ng-click="insightsController.collapseAll()" style="margin-left: 2px;color: #337ab7;float:right;cursor:pointer">
+							<md-tooltip>Collapse All</md-tooltip><md-icon md-svg-src="dist/icons/svg/insightsPage/Collapse.svg" ng-style="{height: '25px', width: '25px'}"></md-icon></a>
+							<a ng-show="!insightsController.showThrobber && insightsController.showOptionsPanel" ng-click="insightsController.showAboutInsights($event)" style="margin-left: 2px; color: #337ab7;float:right;cursor:pointer"><md-tooltip>Filter</md-tooltip><md-icon md-svg-src="dist/icons/svg/insightsPage/Icons8_flat_filled_filter.svg" ng-style="{height: '30px', width: '30px'}"></md-icon></a-->
+
+							<div class="md-accordion" ng-repeat="data in insightsController.accordianData" ng-if="insightsController.accordianData.length > 0 && !insightsController.showThrobber">
+								<md-toolbar ng-init="$index == 0 ? data.expanded = true : data.expanded = false" ng-click="insightsController.collapse(data)" style="font-size: 15px;font-weight: 500;color: #757575;font-family: proxima_novasemibold !important; background:#d3e9c7;">
+									<div class="md-toolbar-tools">
+										<h2>
+											<md-icon style="margin-top: -7px;" md-svg-src="{{insightsController.getIconUrl(data.heading,data.expanded)}}" ng-style="{color:'white',fill:'white',height: '40px', width: '40px'}"></md-icon>
+											<span>{{data.heading}} </span>
+											<span style="font-weight:normal;margin-left:10px"> Observations:- (Positives: {{data.noOfPositives}}, Negatives: {{data.noOfNegatives}}, Neutral: {{data.noOfNeutral}})</span>
+										</h2>
+										<span flex=""></span>
+										<span ng-class="{expandCollapse:!data.expanded, active:data.expanded}"></span> 
+									</div>
+								</md-toolbar>
+								<div ng-class="{dataContent:true, activeContent:data.expanded}" style="border-right:1px solid #333;border-left:1px solid #333;border-bottom:1px solid #333;">
+									<div layout>
+										<div class="outerdiv">
+											<div class="textst" >
+												<span class="fnt-bld">Daily Observations: (Last run:-{{data.inferenceDetails[0].lastRun}})</span>
+												<ul>
+													<li ng-repeat="content in data.inferenceDetails | filter: {'schedule': 'DAILY'}" ng-mouseenter="insightsController.viewData($event,content.currentResult,content.lastResult,content.sentiment,content.inference,$parent.$index,content.resultSet,insightsController.chartType)" style="margin-top:10px">
+														<md-icon ng-if="content.sentiment ==='POSITIVE'" md-svg-src="dist/icons/svg/insightsPage/happy.svg" ng-style="{height: '20px', width: '20px', fill:'green',color:'green'}"></md-icon>
+														<md-icon ng-if="content.sentiment ==='NEGATIVE'" md-svg-src="dist/icons/svg/insightsPage/sadface.svg" ng-style="{height: '20px', width: '20px',fill:'red',color:'red'}"></md-icon>
+														<md-icon ng-if="content.sentiment ==='NEUTRAL'" md-svg-src="dist/icons/svg/insightsPage/neutral.svg" ng-style="{height: '20px', width: '20px',fill:'blue',color:'blue'}"></md-icon>
+														<a ng-class="{textst:true, txthover:hovering}" ng-mouseenter="hovering=true"  ng-mouseleave="hovering=false"></a><span  ng-bind-html="insightsController.highlight(content.inference, content.kpi)"></span></li>
+													</ul>
+													<p ng-show="!(data.inferenceDetails | filter: {'schedule': 'DAILY'}).length">No observations this time.</p>
+
+
+												</div>
+
+												<div class="textst" >
+												</div>
+
+
+											</div>
+
+											<div style="width:50%">
+												<div  google-chart chart="insightsController.getChartObjJson($index)" chart-legend="false" style="height:200px; width:100%;" id="graphdiv">
+												</div>
+												<div style="font-size:10px;text-align:center">Note:Please hover on the KPIs to see the corresponding graph.</div>
+											</div>
+										</div>
+
+
+										<div style="clear:both"></div>
+
+									</div >
+
+								</div>
+				</md-content>
+				</div>
+			<div ng-if="insightsController.accordianData.length == 0 && !insightsController.showThrobber" style="margin:auto;text-align:center"> No data found at this time.</div>
+			<div style="clear:both"></div>
+
 </div>
 

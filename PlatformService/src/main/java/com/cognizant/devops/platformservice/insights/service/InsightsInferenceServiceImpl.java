@@ -53,8 +53,8 @@ public class InsightsInferenceServiceImpl implements InsightsInferenceService {
 		this.messageSource = messageSource;
 	}
 
-	public List<InsightsInference> getInferenceDetails() {
-		List<InsightsInference> inferences = getInferences("DAILY");
+	public List<InsightsInference> getInferenceDetails(String schedule) {
+		List<InsightsInference> inferences = getInferences(schedule);
 
 		return inferences;
 	}

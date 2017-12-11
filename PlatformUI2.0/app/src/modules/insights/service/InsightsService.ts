@@ -18,7 +18,7 @@
 
 module ISightApp {
     export interface IInsightsService {
-        getInsightsDetails(): ng.IPromise<any>;
+        getInsightsDetails(schedule : string): ng.IPromise<any>;
     }
 
     export class InsightsService implements IInsightsService {
@@ -28,9 +28,9 @@ module ISightApp {
          constructor(private $resource, private $q, private $cookies, private restCallHandlerService: IRestCallHandlerService) {
         }
 
-        getInsightsDetails(): ng.IPromise<any> {
+        getInsightsDetails(schedule : string): ng.IPromise<any> {
             var restHandler = this.restCallHandlerService;
-            return restHandler.get("INSIGHTS_GET");
+            return restHandler.get("INSIGHTS_GET",{'schedule':schedule});
         }
     }
 }

@@ -25,7 +25,8 @@ module ISightApp {
             public inference: string,
             public sentiment: string,
             public graphColor: string,
-            public resultSet: any[] 
+            public resultSet: any[],
+            public chartType: string
            ) { }
     }
 }
