@@ -6,7 +6,8 @@
 </head> 
 <body style="margin-top:0;margin-bottom:0;margin-right:0;margin-left:0;padding-top:0;padding-bottom:0;padding-right:0;padding-left:0;background-color:#ffffff;"> 
 	<table width="100%" cellpadding="0" cellspacing="0" align="center" border="0"
-		   style="margin-top:0;margin-bottom:0;margin-right:auto;margin-left:auto;table-layout:fixed;width:100%;-webkit-text-size-adjust:100%;-ms-text-size-adjust:100%;background-color:#ffffff;"> 
+		   style="margin-top:0;margin-bottom:0;margin-right:auto;margin-left:auto;table-layout:fixed;width:100%;-webkit-text-size-adjust:100%;-ms-text-size-adjust:100%;background-color:#ffffff;
+		   margin-top:2cm;margin-bottom:2cm;"> 
 		<tbody> 
 			<tr> 
 				<td align="center"> 
@@ -24,7 +25,7 @@
 						<tr> 
 						<td bgcolor="#ffffff"> 
 			 
-			<!--
+			<!--	
 						<table width="100%" cellpadding="0" cellspacing="0" border="0" > 
 						<tbody> 
 						<tr > 
@@ -33,11 +34,14 @@
 								<table width="100%" border="0" cellpadding="0" cellspacing="0" style="text-align:left;font-size:15px;line-height:16px;color:#999999;"> 
 									<tbody> 
 									<tr> 
+									
+									
 									<th  width="30%" style="padding-right:10px;font-weight:normal;font-family:proxima_novasemibold;vertical-align:bottom;"> 
 									<div  id="logo">
 									<p style="margin-top:0;margin-right:0;margin-left:0;margin-bottom:8px;">
 									<img src="cid:${cid}" alt="logo" width="140" style="border-width:0;height:auto;-ms-interpolation-mode:bicubic;max-width:100%;"></p> 
 									</div> </th> 
+									
 									<th width="70%" align="right"  style="font-weight:normal;font-family:Proxima Nova;vertical-align:bottom;"> 
 									<div >
 									<p style="margin-top:0;margin-right:0;margin-left:0;margin-bottom:8px;">Insights Inference</p>
@@ -51,8 +55,8 @@
 			
 						</tbody> 
 						</table> 
-						
-	-->		
+				-->			
+		
 							<table width="100%" cellpadding="0" cellspacing="0" border="0"  style="font-size:14px;line-height:22px;text-align:left;color:#333333;"> 
 							#foreach ($data in $accordianData)
 
@@ -71,9 +75,25 @@
 									#foreach ($content in $data.inferenceDetails)
 										
 										#if ($content.get("schedule").getAsString()=="DAILY")
-										<li  >
-										$content.inference.getAsString()
-										</li>
+										
+										
+										
+											#if ($content.get("sentiment").getAsString()=="POSITIVE")
+											<li   style="color: green;">
+											$content.inference.getAsString()
+											</li>
+											#elseif($content.get("sentiment").getAsString()=="NEGATIVE" )
+											<li   style="color: red;">
+											$content.inference.getAsString()
+											</li>
+											#elseif($content.get("sentiment").getAsString()=="NEUTRAL" )
+											<li   style="color: blue;">
+											$content.inference.getAsString()
+											</li>
+											#end
+										
+										
+										
 										#end
 										
 									#end
