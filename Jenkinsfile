@@ -24,7 +24,7 @@ node {
 	}
 	// Platform Service Ends
 	
-	// Platform Insights Starts
+	// Platform Insights Starts 
 	stage ('Insight_PI_Build') {
       sh 'cd /var/jenkins/jobs/$commitID/workspace/PlatformInsights && mvn clean install -DskipTests'
 		buildSuccessPI=true
