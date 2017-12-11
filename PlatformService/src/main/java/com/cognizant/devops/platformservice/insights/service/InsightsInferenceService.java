@@ -19,5 +19,5 @@ import java.util.List;
 
 public interface InsightsInferenceService {
 
-	public List<InsightsInference> getInferenceDetails();
+	public List<InsightsInference> getInferenceDetails(String schedule);
 }
