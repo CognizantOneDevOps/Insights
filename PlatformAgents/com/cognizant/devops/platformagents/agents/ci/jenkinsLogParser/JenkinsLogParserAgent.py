@@ -33,20 +33,9 @@ class JenkinsLogParserAgent(JenkinsAgent):
             buildUrl = build['buildUrl']
             logUrl = buildUrl + "console"
             logResponse = self.getBuildLog(logUrl)
-            logTokens = logResponse.split('****Start of Json Output****')
             buildAdded = False
-            for logToken in logTokens:
-                deploymentTokens = logToken.split('****End of Json Output****')
-                if len(deploymentTokens) > 1:
-                    data = copy.deepcopy(build)
-                    dataList.append(data)
-                    buildAdded = True
-                    deploymentJsonStr = '{' + deploymentTokens[0].split('{')[1].split('}')[0] + '}'
-                    buildJson = json.loads(deploymentJsonStr)
-                    for attr in buildJson:
-                        if data.get(attr, None) is None:
-                            data[attr] = buildJson[attr]
-            
+            buildStageDetails = {}
+            deployStageToEnvMap = {}
             if '[Pipeline]' in logResponse:
                 stageUrl = buildUrl + 'wfapi/describe'
                 stageResponse = self.getResponse(stageUrl, 'GET', self.userid, self.passwd, None)
@@ -54,14 +43,43 @@ class JenkinsLogParserAgent(JenkinsAgent):
                     stages = stageResponse.get('stages', None)
                     if stages:
                         for stage in stages:
-                            stageData = copy.deepcopy(build)
-                            buildAdded = True
-                            stageData['stageName'] = stage.get('name', '')
-                            stageData['stageStatus'] = stage.get('status', '')
-                            stageData['stageStartTime'] = stage.get('name', '')
-                            stageData['stageDuration'] = stage.get('name', '')
-                            stageData['stagePauseDuration'] = stage.get('name', '')
-                            dataList.append(stageData)
+                            stageName = stage.get('name', '')
+                            if 'Build and Nexus Deploy' in stageName:                                
+                                buildStageDetails['buildStageStatus'] = stage.get('status', '')
+                                buildStageDetails['buildStageStartTimeMS'] = stage.get('startTimeMillis', '')
+                                buildStageDetails['buildStageDurationMS'] = stage.get('durationMillis', '')
+                            elif 'Deploy to ' in stageName:
+                                envName = stageName.replace('Deploy to ', '')
+                                deployStageData = {}
+                                deployStageData['deployStageStatus'] = stage.get('status', '')
+                                deployStageData['deployStageStartTimeMS'] = stage.get('startTimeMillis', '')
+                                deployStageData['deployStageDurationMS'] = stage.get('durationMillis', '')
+                                deployStageToEnvMap[envName] = deployStageData
+            for buildStagePropery in buildStageDetails:
+                build[buildStagePropery] = buildStageDetails[buildStagePropery]
+            
+            try:
+                logTokens = logResponse.split('****Start of Json Output****')
+                for logToken in logTokens:
+                    deploymentTokens = logToken.split('****End of Json Output****')
+                    if len(deploymentTokens) > 1:
+                        data = copy.deepcopy(build)
+                        dataList.append(data)
+                        buildAdded = True
+                        deploymentJsonTokens = deploymentTokens[0].split('{')
+                        if len(deploymentJsonTokens) > 1:
+                            deploymentJsonStr = '{' + deploymentJsonTokens[1].split('}')[0] + '}'
+                            buildJson = json.loads(deploymentJsonStr)
+                            for attr in buildJson:
+                                if data.get(attr, None) is None:
+                                    data[attr] = buildJson[attr]
+                            envDetails = data.get('envDetail', None)
+                            if envDetails:
+                                deployStageDetails = deployStageToEnvMap.get(envDetails, {})
+                                for deploymentStagePropery in deployStageDetails:
+                                    data[deploymentStagePropery] = deployStageDetails[deploymentStagePropery]
+            except Exception as ex:
+                pass
             if not buildAdded:
                 dataList.append(build)
         return dataList
