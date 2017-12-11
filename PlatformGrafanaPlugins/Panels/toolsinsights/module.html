@@ -184,7 +184,7 @@
 		
 		#toolData {
 			font: 600 13px/36px 'Arial', Helvetica, Clean, sans-serif;
-			width: 1300px;
+			/*width: 1300px;*/
 			text-align: left;
 			border-collapse: collapse;
 			border-spacing: 0;
@@ -450,6 +450,8 @@
 		
 		.basicTblMrgDv {
 			margin-top: 30px;
+			text-align: -webkit-center;
+			overflow-x: scroll;
 		}
 		
 		.basicTblBrdDv {
@@ -774,6 +776,15 @@
 			}
 			/*Code for Throbber ends here*/
 		}
+		
+		.noimgToolname {
+			text-align: center;
+			margin-top: 40px;
+			word-wrap: break-word;
+			font-size: 14px;
+			padding-left: 3px;
+			padding-right: 3px;
+		}
 	</style>
 </head>
 
@@ -783,20 +794,20 @@
 			<div class="toolNmDv">
 				<select class="toolNmSelect toolNmWd" ng-change="ctrl.onToolSelectAction()" ng-click="ctrl.toolSelection()" ng-model="ctrl.selectedTool">
 						<option value="" selected="" disabled="">Select Tool</option>
-						<option ng-repeat="key in ctrl.selectedSeq" value="{{key}}" >{{key}}</option>
+						<option ng-repeat="key in ctrl.toolDetailMappingJson" value="{{key.toolName}}" >{{key.toolName}}</option>
 					</select>
 			</div>
 			<div class="fldNmDv" ng-if="ctrl.toolsDetailJson[ctrl.selectedTool]">
 				<select class="toolNmSelect fldNmWdt" ng-change="ctrl.onFieldSelectAction()" ng-click="ctrl.toolSelection()" ng-model="ctrl.selectedField">
 						<option value="" selected="" disabled="">Select Field</option>
-						<option ng-if="fields !== 'position'" ng-repeat="fields in ctrl.toolsDetailJson[ctrl.selectedTool]" value="{{fields.dbName}}">{{fields.dbName}}</option>
+						<option ng-if="fields !== 'position'" ng-repeat="fields in ctrl.toolsDetailJson[ctrl.selectedTool]" value="{{fields.fieldName}}">{{fields.fieldName}}</option>
 					</select>
 			</div>
 			<div class="fldValDv" ng-if="ctrl.selectedField">
 				<input class="fldValInp" type="text" ng-model="ctrl.inputVal" ng-change="ctrl.onInputValChangeAction() " placeholder="{{ctrl.selectedField}}_value">
 			</div>
 			<input class="submitBut subButtCss" ng-if="ctrl.inputVal " ng-click="ctrl.onSubmitAction(ctrl.selectedField, ctrl.inputVal) "
-			 type="submit" value="Submit">
+				type="submit" value="Submit">
 		</div>
 
 		<div class="sk-fading-circle" ng-if="ctrl.showThrobber">
@@ -823,7 +834,9 @@
 								<md-icon md-svg-src="{{ctrl.labelIcons[data.name]}}" ng-style="{height: '80px', width: '80px'} "></md-icon>
 							</md-whiteframe>-->
 					<div class="circle textDecoration" ng-click="ctrl.showToolsDetail(data.name,data.data)">
-						<img class="toolImg" src="{{ctrl.labelIcons[data.name]}}" ng-style="{height: '68px', width: '72px'}">
+						<!--<img class="toolImg" src="{{ctrl.labelIcons[data.name]}}" ng-style="{height: '68px', width: '72px'}">-->
+						<img class="toolImg" ng-if="ctrl.labelIcons[data.name]" src="{{ctrl.labelIcons[data.name]}}" ng-style="{height: '68px', width: '72px'}">
+						<label ng-if="!ctrl.labelIcons[data.name]" class="textDecoration noimgToolname">{{data.name}}</label>
 					</div>
 					<div class="toolIconMsg">{{data.count}} {{ctrl.nodeNameMapping[data.name]}}</div>
 				</div>
@@ -845,7 +858,7 @@
 			Advanced View
 		</div>
 
-		<div class="advViewTableDv" ng-if="ctrl.showAdvanceView && ctrl.msg=== ''" id="advanceViewTableId">
+		<div class="advViewTableDv" ng-if="ctrl.showAdvanceView && (ctrl.msg === undefined || ctrl.msg == '')" id="advanceViewTableId">
 			<table class="advanceToolDataTbl" id="advanceToolData">
 				<tbody>
 					<tr class="borderBottom floatLfProp">
@@ -866,7 +879,7 @@
 					</tr>
 				</tbody>
 			</table>
-			<table class="advTableDv" id="advanceToolData" ng-if="ctrl.showAdvanceView && ctrl.msg=== ''">
+			<table class="advTableDv" id="advanceToolData" ng-if="ctrl.showAdvanceView && (ctrl.msg === undefined || ctrl.msg == '')">
 				<tbody>
 					<tr class="borderBottom floatLfProp">
 						<th class="advToolDataTh_1">
@@ -883,10 +896,10 @@
 			</table>
 		</div>
 
-		<div class="showAdvDas" ng-if="ctrl.showAdvanceView && ctrl.msg=== ''" ng-if="ctrl.showAdvanceView && ctrl.msg=== ''" id="chart_div"></div>
+		<div class="showAdvDas" ng-if="ctrl.showAdvanceView && (ctrl.msg === undefined || ctrl.msg == '')" id="chart_div"></div>
 
-		<div id="basicViewTableId" ng-if="ctrl.showToolDetails" class="basicTblMrgDv">
-			<table id="toolData" class="basicTblBrdDv">
+		<div id="basicViewTableId" ng-if="ctrl.showToolDetails && ctrl.tableHeader.length > 1" class="basicTblMrgDv">
+			<table id="toolData" class="basicTblBrdDv" style="margin-bottom: 10px">
 				<tbody>
 					<tr class="borderBottom floatLfProp">
 						<th class="basicTblTr" ng-repeat="(key, value) in ctrl.tableHeader track by $index">{{value}}</th>
@@ -918,6 +931,7 @@
 				</ul>
 			</div>
 		</div>
+		<div ng-if="ctrl.advColumnMsg" class="noDataMsg">{{ctrl.advColumnMsg}}</div>
 	</div>
 	<div ng-if="ctrl.selectOptionsMsg" class="noDataMsg">{{ctrl.selectOptionsMsg}}</div>
 </body>
