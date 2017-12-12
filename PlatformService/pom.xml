@@ -197,7 +197,7 @@
 		<mockito.version>1.10.19</mockito.version>
 		<junit.version>4.12</junit.version>
 	</properties>
-	<profiles>
+	<!-- <profiles>
         <profile>
                 <id>tomcatDeployment</id>
                 <activation>
@@ -211,7 +211,7 @@
                 <artifactId>tomcat7-maven-plugin</artifactId>
                 <version>2.2</version>
                 <configuration>
-                        <url>http://35.153.180.19:8080/manager/text</url>
+                        <url>http://xxxxxxx:8080/manager/text</url>
                         <server>tomcat</server>
                         <path>/PlatformService</path>
 
@@ -220,5 +220,5 @@
                 </plugins>
                 </build>
         </profile>
-        </profiles>
+        </profiles> -->
 </project>
