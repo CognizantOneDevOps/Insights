@@ -246,7 +246,7 @@
 
           showHide = function(eleId) {
              var x = document.getElementById(eleId);
-              if (x.style.display === "none") {
+              if (x.style.display === "none" || x.style.display === "") {
                   x.style.display = "block";
               } else {
                   x.style.display = "none";
@@ -351,7 +351,7 @@
               this.selectedSchedule = schedule;
           }
            self.showThrobber = true;
-          self.insightsService.getInsightsDetails(schedule).then(function(response) {
+          self.insightsService.getInsightsDetails(this.selectedSchedule).then(function(response) {
                  self.showThrobber = false;
                   self.accordianData = response.data;
                   

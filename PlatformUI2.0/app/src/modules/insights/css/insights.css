@@ -12,6 +12,10 @@
     border-style: solid;
 }
 
+.capitalize :first-letter{
+   text-transform: uppercase;
+}
+
 .outerdiv{
     width:50%;
 
@@ -169,7 +173,7 @@ md-radio-button {
   padding-top: 10px;
   padding-bottom: 10px;
   border-bottom:1px solid #eee;
-  font-size:13px;
+  font-size:14px;
 }
 
 .flthld {

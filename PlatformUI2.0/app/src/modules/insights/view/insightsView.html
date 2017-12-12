@@ -38,7 +38,7 @@
 			
 			<form >
 			    <div class="flthd" ng-click="insightsController.showHide('chartTypesHld')">
-					<div style="width:90%;display:inline-block">CHART TYPE: </div>
+					<div style="width:90%;display:inline-block">Chart Type: </div>
 					<md-icon md-svg-src="dist/icons/svg/insightsPage/down-arrow.svg" ng-style="{height: '15px', width: '15px', fill:'#333',color:'#333'}"></md-icon>
 				</div>
 				<div class="flthld" id="chartTypesHld">
@@ -49,14 +49,14 @@
 					</md-radio-group>
 				</div>
 				<div class="flthd" style="background-color:#eee" ng-click="insightsController.showHide('kpiNumberHld')">
-					<div style="width:90%;display:inline-block;">NUMBER OF KPI's TO DISPLAY: </div>
+					<div style="width:90%;display:inline-block;">Number of KPI's to display: </div>
 					<md-icon md-svg-src="dist/icons/svg/insightsPage/down-arrow.svg" ng-style="{height: '15px', width: '15px', fill:'#333',color:'#333'}"></md-icon>
 				</div>
 				<div class="flthld" id="kpiNumberHld">
 					<input type="text" name="kpinumber" id="kpinumber" ng-model="insightsController.numberofkpi">
 				</div>
 				<div class="flthd" ng-click="insightsController.showHide('obsHld')">
-					<div style="width:90%;display:inline-block">OBSERVATION SCHEDULE: </div>
+					<div style="width:90%;display:inline-block">Observation Schedule: </div>
 					<md-icon md-svg-src="dist/icons/svg/insightsPage/down-arrow.svg" ng-style="{height: '15px', width: '15px', fill:'#333',color:'#333'}"></md-icon>
 				</div>
 				<div class="flthld" id="obsHld" >
@@ -66,7 +66,7 @@
 					</md-radio-group>
 				</div>
 				<div class="flthd" style="background-color:#eee" ng-click="insightsController.showHide('vectorNameHld')">
-					<div style="width:90%;display:inline-block">TYPE OF KPI: </div>
+					<div style="width:90%;display:inline-block">Type of KPI: </div>
 					<md-icon md-svg-src="dist/icons/svg/insightsPage/down-arrow.svg" ng-style="{height: '15px', width: '15px', fill:'#333',color:'#333'}"></md-icon>
 				</div>
 				
@@ -77,21 +77,21 @@
 						</div>
 				
 				<div class="flthd" ng-click="insightsController.showHide('typeNameHld')">
-					<div style="width:90%;display:inline-block">TYPE OF OBSERVATIONS: </div>
+					<div style="width:90%;display:inline-block">Type of Observations: </div>
 					<md-icon md-svg-src="dist/icons/svg/insightsPage/down-arrow.svg" ng-style="{height: '15px', width: '15px', fill:'#333',color:'#333'}"></md-icon>
 				</div>
 						
 				<div id="typeNameHld" class="flthld" ng-click="insightsController.onChangeRadio()">
-								<md-checkbox ng-repeat="type in insightsController.typeList" ng-model="type.checked"  layout="row">
-									{{type.name}}
+								<md-checkbox ng-repeat="type in insightsController.typeList" class="capitalize" ng-model="type.checked"  layout="row">
+									{{type.name | lowercase}}
 								</md-checkbox><br/>
 				</div>
 						
 					</form>
 					
-					<md-content layout="row" layout-align="center center">
-					<md-button class="md-raised md-primary configureBut md-button md-ink-ripple"  ng-click="insightsController.submit(false)" style="background-color: #00728f; color: white;min-width:130px">Apply</md-button>
-					<md-button  layout class="cancelButt" ng-click="insightsController.submit(true)">Clear All</md-button>
+					<md-content layout="row" layout-align="center center" style="width:100%">
+					<md-button class="md-raised md-primary configureBut md-button md-ink-ripple"  ng-click="insightsController.submit(false)" style="background-color: #00728f; color: white;min-width:30%">Apply</md-button>
+					<md-button  layout class="cancelButt" ng-click="insightsController.submit(true)" style="width:30%">Clear All</md-button>
 					</md-content>
 				</div>
 				</div>
