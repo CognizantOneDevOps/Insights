@@ -20,10 +20,60 @@ public class CustomCorrelations {
 	private int dataBatchSize = 2000;
 	
 	public void executeCorrelations() {
+		enrichJiraData();
 		updateGitNodesWithJiraKey();
 		correlateGitAndJira();
 		updateJenkinsDataWihoutCommits();
 		correlateGitAndJenkins();
+	}
+	
+	private void enrichJiraData() {
+		Neo4jDBHandler dbHandler = new Neo4jDBHandler();
+		try {
+			String jiraProjectCypher = "match (n:JIRA:DATA) where not exists(n._PORTFOLIO_) WITH distinct n.projectKey as projectKey, count(n) as count " + 
+						"OPTIONAL MATCH(m:JIRA:METADATA) where m.pkey=projectKey "
+						+ "WITH {projectKey: projectKey , count: count, portfolio: m.PORTFOLIO, product: m.PRODUCT} as data "
+						+ "return collect(data) as data";
+			GraphResponse paginationResponse = dbHandler.executeCypherQuery(jiraProjectCypher);
+			JsonArray data = paginationResponse.getJson().get("results").getAsJsonArray().get(0).getAsJsonObject().get("data")
+					.getAsJsonArray().get(0).getAsJsonObject().get("row").getAsJsonArray().get(0).getAsJsonArray();
+			String jiraDataEnrichmentCypher = "UNWIND {props} as properties MATCH(n:JIRA {projectKey: properties.projectKey}) where not exists(n._PORTFOLIO_) "
+					+ "set n._PORTFOLIO_ = properties.portfolio, n._PRODUCT_ = properties.product return count(n)";
+			List<JsonObject> projectList = new ArrayList<JsonObject>();
+			List<List<JsonObject>> projectProcessingBatches = new ArrayList<List<JsonObject>>();
+			int projectIssueSize = 0;
+			for(JsonElement projectDataElement : data) {
+				JsonObject projectData = projectDataElement.getAsJsonObject();
+				JsonElement portfolio = projectData.get("portfolio");
+				JsonElement product = projectData.get("product");
+				if(!portfolio.isJsonNull() || !product.isJsonNull()) {
+					projectList.add(projectData);
+					projectIssueSize += projectData.get("count").getAsInt();
+				}
+				if(!projectProcessingBatches.contains(projectList) && projectList.size() > 0) {
+					projectProcessingBatches.add(projectList);
+				}
+				if(projectIssueSize >= dataBatchSize) {
+					projectList = new ArrayList<JsonObject>();
+					projectIssueSize = 0;
+				}
+			}
+			if(projectProcessingBatches.size() > 0) {
+				for(List<JsonObject> batch : projectProcessingBatches) {
+					long st = System.currentTimeMillis();
+					int processedRecords = 0;
+					for(JsonObject obj : batch) {
+						processedRecords += obj.get("count").getAsInt();
+					}
+					JsonObject jiraEnrichmentResponse = dbHandler.bulkCreateNodes(batch, null, jiraDataEnrichmentCypher);
+					log.debug("Processed/Enriched "+processedRecords+" JIRA records, time taken: "+(System.currentTimeMillis() - st) + " ms");
+					System.out.println("Processed/Enriched "+processedRecords+" JIRA records, time taken: "+(System.currentTimeMillis() - st) + " ms");
+					log.debug(jiraEnrichmentResponse);
+				}
+			}
+		} catch (GraphDBException e) {
+			log.error(e);
+		}
 	}
 	
 	private void updateGitNodesWithJiraKey() {
