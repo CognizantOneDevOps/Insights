@@ -91,7 +91,7 @@
 			</plugin>			
 		</plugins>
 	</build>
-	 <profiles>
+	<!-- <profiles>
         <profile>
                 <id>NexusUpload</id>
                 <activation>
@@ -100,7 +100,7 @@
                 <distributionManagement>
                    <snapshotRepository>
                           <id>nexus</id>
-                          <url>http://54.209.104.148:8081/nexus/content/repositories/buildonInsights/</url>
+                          <url>http://xxxx:8081/nexus/content/repositories/buildonInsights/</url>
                    </snapshotRepository>
                 </distributionManagement>
 
@@ -123,5 +123,5 @@
                 </plugins>
                 </build>
         </profile>
-        </profiles>
+        </profiles> -->
 </project>
