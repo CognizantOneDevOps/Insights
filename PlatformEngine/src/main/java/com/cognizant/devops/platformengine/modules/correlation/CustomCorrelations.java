@@ -67,7 +67,6 @@ public class CustomCorrelations {
 					}
 					JsonObject jiraEnrichmentResponse = dbHandler.bulkCreateNodes(batch, null, jiraDataEnrichmentCypher);
 					log.debug("Processed/Enriched "+processedRecords+" JIRA records, time taken: "+(System.currentTimeMillis() - st) + " ms");
-					System.out.println("Processed/Enriched "+processedRecords+" JIRA records, time taken: "+(System.currentTimeMillis() - st) + " ms");
 					log.debug(jiraEnrichmentResponse);
 				}
 			}
