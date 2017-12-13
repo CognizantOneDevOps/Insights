@@ -83,7 +83,7 @@ node {
 
 		  sh 'git checkout master'
 		  sh 'git pull origin master'
-		  //Takes current pull request branchName to merge
+		  //Takes current pull request branchName to mergee
 		  sh 'git merge origin/$branchName'
 		  sh 'git push origin master'
 		
