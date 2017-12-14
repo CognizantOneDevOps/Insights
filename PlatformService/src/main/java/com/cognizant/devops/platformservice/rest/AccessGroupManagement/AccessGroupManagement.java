@@ -85,7 +85,7 @@ public class AccessGroupManagement {
 		
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		List<GrantedAuthority> updatedAuthorities = new ArrayList<>(auth.getAuthorities());
-		updatedAuthorities.add(SpringAuthority.valueOf(grafanaCurrentOrgRole)); 
+		updatedAuthorities.add(SpringAuthority.valueOf(grafanaCurrentOrgRole.replaceAll("\\s", "_"))); 
 		Authentication newAuth = new UsernamePasswordAuthenticationToken(auth.getPrincipal(), auth.getCredentials(), updatedAuthorities);
 		SecurityContextHolder.getContext().setAuthentication(newAuth);
 		
