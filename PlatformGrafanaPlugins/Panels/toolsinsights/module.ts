@@ -98,8 +98,8 @@ class PipelinePanelCtrl extends MetricsPanelCtrl {
     toolListData = [];
     toolDataMap = {};
     showThrobber: boolean = false;
-    toolDetailMappingJson = [];
     advColumnMsg: string;
+    fieldOptions = [];
 
     /** @ngInject */
     constructor($scope, $injector, private annotationsSrv, private $sanitize, private $window, private $rootScope) {
@@ -217,12 +217,11 @@ class PipelinePanelCtrl extends MetricsPanelCtrl {
         this.render();
     }
 
-    toolsDetailJson = {};
     selectedSeq = [];
+    toolDetailMappingJson = [];
 
     render() {
         this.pipelineToolsArray = [];
-        this.toolsDetailJson = this.panel.toolsInsightsPanelCtrl.toolsDetailJson;
         this.toolDetailMappingJson = this.panel.toolsInsightsPanelCtrl.toolDetailMappingJson;
         //console.log(this.toolDetailMappingJson);
         for (var key in this.toolDetailMappingJson) {
@@ -232,13 +231,30 @@ class PipelinePanelCtrl extends MetricsPanelCtrl {
                 this.pipelineToolsArray.push(keyName);
             }
         }
-        this.selectedSeq = this.panel.toolsInsightsPanelCtrl.selectedSeq;
-        //console.log(this.pipelineToolsArray);
-        this.msg = this.panel.toolsInsightsPanelCtrl.message;
-        if (this.toolsDetailJson) {
-            this.selectOptionsMsg = "";
+        for (var i in this.toolDetailMappingJson) {
+            this.selectedSeq[i] = this.toolDetailMappingJson[i].toolName;
         }
+        //console.log(this.pipelineToolsArray);
+        this.checkToolSelection();
         return super.render(this.dataSourceResponse);
+    }
+
+    checkToolSelection() {
+        if (this.toolDetailMappingJson === undefined) {
+            this.toolDetailMappingJson = [];
+        }
+        if (this.toolDetailMappingJson.length === 0) {
+            this.selectedSeq = [];
+        }
+        this.msg = this.panel.toolsInsightsPanelCtrl.message;
+        if (this.selectedSeq.length !== 0) {
+            this.selectOptionsMsg = "";
+            return true;
+        }
+        if (this.selectedSeq.length === 0) {
+            this.selectOptionsMsg = "Please set required options by clicking options tab";
+            return false;
+        }
     }
 
     inputQuery = {
@@ -490,7 +506,7 @@ class PipelinePanelCtrl extends MetricsPanelCtrl {
 
     /*toolSequencing and fieldSelection externalization changes end*/
 
-    toolSelection(): void {
+    toolSelection(tool): void {
         /*var result = this.datasourceDtl.query(this.toolListQuery);
         var self = this;
         result.then(function (data) {
@@ -505,6 +521,15 @@ class PipelinePanelCtrl extends MetricsPanelCtrl {
           }
         });*/
         this.toolsList = this.toolListData;
+        this.fieldOptions = [];
+        for (var i in this.toolDetailMappingJson) {
+            if (this.toolDetailMappingJson[i].toolName === tool) {
+                for (var field in this.toolDetailMappingJson[i].fields) {
+                    this.fieldOptions[field] = this.toolDetailMappingJson[i].fields[field].fieldName;
+                }
+                break;
+            }
+        }
     }
 
     onToolSelectAction(): void {
@@ -729,7 +754,7 @@ class PipelinePanelCtrl extends MetricsPanelCtrl {
                     var newSelectedToolArr = this.toolDetailMappingJson[i].fields;
                 }
             }
-            
+
             this.tableHeader.push("Sr.No");
             for (key in newSelectedToolArr) {
 

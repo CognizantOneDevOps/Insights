@@ -43,7 +43,7 @@
             border: 1px solid transparent;
             border-radius: .1rem 0 0 .1rem;
             margin-right: .25rem;
-            width: 9.8rem!important;
+            min-width: 9.8rem!important;
             padding-top: 9px;
         }
         
@@ -120,6 +120,7 @@
             padding-left: 10px;
         }
     </style>
+
 </head>
 
 <body>
@@ -130,56 +131,55 @@
         <!--{{toolsInsightEditorCtrl.checkDefaultValue()}}-->
         <div ng-if="!toolsInsightEditorCtrl.checkEmptyToolList()">
             <h3 style="margin-bottom: 15px;text-decoration:underline;font-weight:bold" class="section-heading">Select Tools Sequence</h3>
-            <!--<button class="defaultDisplayButton" layout layout-align="left" flex="20" type="button" ng-if="toolsInsightEditorCtrl.checkDefaultButtonActionValue()"
+            <button class="defaultDisplayButton" layout layout-align="left" flex="20" type="button" ng-if="toolsInsightEditorCtrl.checkButtonForMapping()"
                 style="margin-top:10px;margin-left:85%" ng-click="toolsInsightEditorCtrl.defaultValueAction()">Set default mapping</button>
-                <button class="defaultDisplayButton" layout layout-align="left" flex="20" type="button" ng-if="toolsInsightEditorCtrl.checkCustomButtonActionValue()"
-                    style="margin-top:10px;margin-left:85%" ng-click="toolsInsightEditorCtrl.customValueAction()">Set custom mapping</button>-->
-            <div class="gf-form-group" /*style="margin-top: -25px;width:80%" */>
-            <span class="fldMap_2 floatLfProp fldMap_1 advanceSettingSpan" style="margin-top: 0px">Select Tool</span>
-            <div class="floatLfProp" ng-repeat="key in toolsInsightEditorCtrl.toolMappingJson track by $index" style="background-color:#e0e0ff">
-                <label class="gf-form-label">
+                <button class="defaultDisplayButton" layout layout-align="left" flex="20" type="button" ng-if="!toolsInsightEditorCtrl.checkButtonForMapping()"
+                    style="margin-top:10px;margin-left:85%" ng-click="toolsInsightEditorCtrl.customValueAction()">Set custom mapping</button>
+
+                    <div class="gf-form-group" style="margin-top: -25px;width:80%">
+                        <span class="fldMap_2 floatLfProp fldMap_1 advanceSettingSpan" style="margin-top: 0px">Select Tool</span>
+                        <div class="floatLfProp" ng-repeat="key in toolsInsightEditorCtrl.toolMappingJson track by $index" style="background-color:#e0e0ff">
+                            <label class="gf-form-label">
             			<i class="pointer fa fa-remove" ng-click="toolsInsightEditorCtrl.removeTool(key.toolName,$index)"></i>
 							<span>{{key.toolName}}</span>
 					</label>
-            </div>
-            <div class="fldMap_2 floatLfProp">
-                <!--<span class="fldfieldNameSpan">Select Tool</span>-->
-                <metric-segment class="floatLfProp" segment="toolsInsightEditorCtrl.addColumnSegment" get-options="toolsInsightEditorCtrl.getToolOptions()"
-                    on-change="toolsInsightEditorCtrl.addTool()"></metric-segment>
-            </div>
-            <div style="clear:both"></div>
+                        </div>
+                        <div class="fldMap_2 floatLfProp">
+                            <!--<span class="fldfieldNameSpan">Select Tool</span>-->
+                            <metric-segment class="floatLfProp" segment="toolsInsightEditorCtrl.addColumnSegment" get-options="toolsInsightEditorCtrl.getToolOptions()"
+                                on-change="toolsInsightEditorCtrl.addTool()"></metric-segment>
+                        </div>
+                        <div style="clear:both"></div>
+                    </div>
         </div>
-    </div>
 
-    <!--Test with Model-->
-    <div ng-if="toolsInsightEditorCtrl.checkFieldMapping()">
-        <hr class="divider">
-        <!--<md-divider layout class="divider" flex="100" style="border-top-color: #b7b7cc;margin-top:15px;" ng-if="toolsInsightEditorCtrl.checkFieldMapping()"></md-divider>-->
-        <div class="sectionCustom">
-            <h3 class="section-heading fldMappingHdg" style="margin-top: 25px !important">Field Mapping</h3>
-            <div class="clearProp" ng-repeat="key in toolsInsightEditorCtrl.toolMappingJson track by $index">
-                <span class="fldMap_2 floatLfProp fldMap_1 advanceSettingSpan">{{key.toolName}}</span>
-                <div class="fldDbNm floatLfProp" ng-repeat="field in key.fields" ng-if="field.fieldName
+        <!--Test with Model-->
+        <div ng-if="toolsInsightEditorCtrl.checkFieldMapping()">
+            <hr class="divider">
+            <!--<md-divider layout class="divider" flex="100" style="border-top-color: #b7b7cc;margin-top:15px;" ng-if="toolsInsightEditorCtrl.checkFieldMapping()"></md-divider>-->
+            <div class="sectionCustom">
+                <h3 class="section-heading fldMappingHdg" style="margin-top: 25px !important">Field Mapping</h3>
+                <div class="clearProp" ng-repeat="key in toolsInsightEditorCtrl.toolMappingJson track by $index">
+                    <span class="fldMap_2 floatLfProp fldMap_1 advanceSettingSpan">{{key.toolName}}</span>
+                    <div class="fldDbNm floatLfProp fldMap_1" ng-repeat="field in key.fields" ng-if="field.fieldName
 								!=''" style="margin-top: 16px;background-color:#e0e0ff">
-                    <label class="gf-form-label">
+                        <label class="gf-form-label">
 							<i class="pointer fa fa-remove" ng-click="toolsInsightEditorCtrl.removeField(key.toolName,field,$parent.$index)"></i>
 							<span>{{field.fieldName}}</span>
 						</label>
-            </div>
-            <div class="floatLfProp fldMap_1">
-                <div class="fldMap_2 floatLfProp">
-                    <!--<span class="fldfieldNameSpan">{{key.toolName}}</span>-->
-                    <metric-segment class="floatLfProp" segment="toolsInsightEditorCtrl.addColumnSegment" get-options="toolsInsightEditorCtrl.getFieldOptions(key.toolName)"
-                        on-change="toolsInsightEditorCtrl.addFields(key.toolName)"></metric-segment>
                 </div>
+                <div class="floatLfProp fldMap_1">
+                    <div class="fldMap_2 floatLfProp">
+                        <!--<span class="fldfieldNameSpan">{{key.toolName}}</span>-->
+                        <metric-segment class="floatLfProp" segment="toolsInsightEditorCtrl.addColumnSegment" get-options="toolsInsightEditorCtrl.getFieldOptions(key.toolName)"
+                            on-change="toolsInsightEditorCtrl.addFields(key.toolName)"></metric-segment>
+                    </div>
+                </div>
+                <div style="clear:both"></div>
             </div>
-            <div style="clear:both"></div>
         </div>
     </div>
-    </div>
-    <!--End Test with Model-->
 
-    <!--Test With Model-->
     <div ng-if="toolsInsightEditorCtrl.checkValueMapping()">
         <hr class="divider">
         <!--<md-divider layout class="divider" flex="100"></md-divider>-->
@@ -193,14 +193,15 @@
                     <input type="text " class="gf-form-input max-width-10" ng-model="field.headerName" placeholder="Header Name" ng-blur="toolsInsightEditorCtrl.render()">
                 </div>
             </div>
+
             <div ng-if="pipelinePanelEditorCtrl.checkFieldMapping() " style="margin-bottom: 20px;clear:both;border-bottom:1px solid #cccccc;width:100%"></div>
         </div>
     </div>
-    <!--Test with Model End-->
 
     <div class="clearProp" layout style="margin-top: 25px;margin-bottom: 25px" ng-if="toolsInsightEditorCtrl.checkFieldMapping()">
         <button class="defaultDisplayButton" layout type="button" style="margin-top:25px;min-width:auto" ng-click="toolsInsightEditorCtrl.onSubmitAction()">Save Mapping</button>
     </div>
+
     </div>
 
 </body>

@@ -98,9 +98,9 @@ System.register(["lodash", "jquery", "app/plugins/sdk", "./editor"], function (e
                     _this.toolListData = [];
                     _this.toolDataMap = {};
                     _this.showThrobber = false;
-                    _this.toolDetailMappingJson = [];
-                    _this.toolsDetailJson = {};
+                    _this.fieldOptions = [];
                     _this.selectedSeq = [];
+                    _this.toolDetailMappingJson = [];
                     _this.inputQuery = {
                         "targets": [
                             {
@@ -283,7 +283,6 @@ System.register(["lodash", "jquery", "app/plugins/sdk", "./editor"], function (e
                 };
                 PipelinePanelCtrl.prototype.render = function () {
                     this.pipelineToolsArray = [];
-                    this.toolsDetailJson = this.panel.toolsInsightsPanelCtrl.toolsDetailJson;
                     this.toolDetailMappingJson = this.panel.toolsInsightsPanelCtrl.toolDetailMappingJson;
                     //console.log(this.toolDetailMappingJson);
                     for (var key in this.toolDetailMappingJson) {
@@ -293,13 +292,29 @@ System.register(["lodash", "jquery", "app/plugins/sdk", "./editor"], function (e
                             this.pipelineToolsArray.push(keyName);
                         }
                     }
-                    this.selectedSeq = this.panel.toolsInsightsPanelCtrl.selectedSeq;
-                    //console.log(this.pipelineToolsArray);
-                    this.msg = this.panel.toolsInsightsPanelCtrl.message;
-                    if (this.toolsDetailJson) {
-                        this.selectOptionsMsg = "";
+                    for (var i in this.toolDetailMappingJson) {
+                        this.selectedSeq[i] = this.toolDetailMappingJson[i].toolName;
                     }
+                    //console.log(this.pipelineToolsArray);
+                    this.checkToolSelection();
                     return _super.prototype.render.call(this, this.dataSourceResponse);
+                };
+                PipelinePanelCtrl.prototype.checkToolSelection = function () {
+                    if (this.toolDetailMappingJson === undefined) {
+                        this.toolDetailMappingJson = [];
+                    }
+                    if (this.toolDetailMappingJson.length === 0) {
+                        this.selectedSeq = [];
+                    }
+                    this.msg = this.panel.toolsInsightsPanelCtrl.message;
+                    if (this.selectedSeq.length !== 0) {
+                        this.selectOptionsMsg = "";
+                        return true;
+                    }
+                    if (this.selectedSeq.length === 0) {
+                        this.selectOptionsMsg = "Please set required options by clicking options tab";
+                        return false;
+                    }
                 };
                 /*timelag traceability changes start*/
                 PipelinePanelCtrl.prototype.toolsRelationQueryOutput = function () {
@@ -469,7 +484,7 @@ System.register(["lodash", "jquery", "app/plugins/sdk", "./editor"], function (e
                     });
                 };
                 /*toolSequencing and fieldSelection externalization changes end*/
-                PipelinePanelCtrl.prototype.toolSelection = function () {
+                PipelinePanelCtrl.prototype.toolSelection = function (tool) {
                     /*var result = this.datasourceDtl.query(this.toolListQuery);
                     var self = this;
                     result.then(function (data) {
@@ -484,6 +499,15 @@ System.register(["lodash", "jquery", "app/plugins/sdk", "./editor"], function (e
                       }
                     });*/
                     this.toolsList = this.toolListData;
+                    this.fieldOptions = [];
+                    for (var i in this.toolDetailMappingJson) {
+                        if (this.toolDetailMappingJson[i].toolName === tool) {
+                            for (var field in this.toolDetailMappingJson[i].fields) {
+                                this.fieldOptions[field] = this.toolDetailMappingJson[i].fields[field].fieldName;
+                            }
+                            break;
+                        }
+                    }
                 };
                 PipelinePanelCtrl.prototype.onToolSelectAction = function () {
                     this.isToolChange = true;

@@ -31,7 +31,6 @@ System.register(["lodash", "./toolsInsightModel"], function (exports_1, context_
                     this.$q = $q;
                     this.uiSegmentSrv = uiSegmentSrv;
                     this.toolListData = [];
-                    this.selectedToolSeq = [];
                     this.fieldList = [];
                     this.selectedFieldList = [];
                     this.toolDataJson = {};
@@ -39,10 +38,10 @@ System.register(["lodash", "./toolsInsightModel"], function (exports_1, context_
                     this.showFieldDetails = false;
                     this.toolMappingJson = [];
                     this.defaultMappingJson = [];
+                    this.defaultButtonOption = 1;
                     //super($scope, $q, uiSegmentSrv);
                     var self = this;
                     self.toolsInsightsPanelCtrl = $scope.ctrl;
-                    //console.log(self.toolsInsightsPanelCtrl.dataSourceResponse);
                     if (self.toolsInsightsPanelCtrl.dataSourceResponse === undefined) {
                         self.toolsInsightsPanelCtrl.dataSourceResponse = [];
                     }
@@ -50,16 +49,8 @@ System.register(["lodash", "./toolsInsightModel"], function (exports_1, context_
                         var toolDataArray = self.toolsInsightsPanelCtrl.dataSourceResponse.results[0].data[0].row[0];
                         self.getToolListOptions(toolDataArray);
                     }
-                    self.selectedToolSeq = self.toolsInsightsPanelCtrl.pipelineToolsArray;
-                    if (self.toolsInsightsPanelCtrl.lastSelectedDetailJson !== undefined) {
-                    }
-                    if (self.selectedToolSeq === undefined) {
-                        self.selectedToolSeq = [];
-                    }
-                    if (self.toolsInsightsPanelCtrl.toolsDetailJson !== undefined) {
-                        self.selectedToolsDetailJson = self.toolsInsightsPanelCtrl.toolsDetailJson;
+                    if (self.toolsInsightsPanelCtrl.toolDetailMappingJson !== undefined) {
                         self.toolMappingJson = self.toolsInsightsPanelCtrl.toolDetailMappingJson;
-                        self.selectedToolSeq = self.toolsInsightsPanelCtrl.selectedSeq;
                     }
                     self.checkEmptyToolList();
                     self.fieldList = self.toolsInsightsPanelCtrl.toolDetails;
@@ -79,6 +70,8 @@ System.register(["lodash", "./toolsInsightModel"], function (exports_1, context_
                         var toolListRow = toolDataArray[i][keysMap[0]];
                         if (this.toolListData.indexOf(toolListRow[i]) === -1) {
                             this.toolListData.push(toolListRow);
+                            this.getDefaultTools(toolListRow);
+                            this.getDefaultFieldMapping(toolListRow);
                         }
                     }
                 };
@@ -91,14 +84,22 @@ System.register(["lodash", "./toolsInsightModel"], function (exports_1, context_
                 ToolsInsightEditorCtrl.prototype.addTool = function () {
                     var toolName = this.addColumnSegment.value;
                     var toolData = new toolsInsightModel_1.Tools('', []);
-                    var idx = this.selectedToolSeq.indexOf(toolName);
+                    var idx;
+                    if (this.toolMappingJson.length === 0) {
+                        idx = -1;
+                    }
+                    for (var i in this.toolMappingJson) {
+                        if (this.toolMappingJson[i].toolName === toolName) {
+                            idx = 0;
+                        }
+                        else {
+                            idx = -1;
+                        }
+                    }
                     if (idx === -1) {
-                        this.selectedToolSeq.push(toolName);
-                        this.selectedToolsDetailJson[toolName] = [];
                         this.toolMappingJson.push(toolData);
                         toolData.toolName = toolName;
                     }
-                    //console.log(this.toolMappingJson);
                     var plusButton = this.uiSegmentSrv.newPlusButton();
                     this.addColumnSegment.html = plusButton.html;
                     this.addColumnSegment.value = plusButton.value;
@@ -106,19 +107,18 @@ System.register(["lodash", "./toolsInsightModel"], function (exports_1, context_
                     this.render();
                 };
                 ToolsInsightEditorCtrl.prototype.removeTool = function (tool, index) {
-                    this.selectedToolSeq = lodash_1.default.without(this.selectedToolSeq, tool);
-                    delete this.selectedToolsDetailJson[tool];
                     for (var i in this.toolMappingJson) {
                         if (this.toolMappingJson[i].toolName === tool)
                             /*delete this.toolMappingJson[i];*/
                             this.toolMappingJson.splice(index, 1);
                     }
-                    //console.log(this.toolMappingJson);
-                    if (this.selectedToolSeq.length === 0) {
-                        this.toolsInsightsPanel["selectedSeq"] = [];
-                    }
                     this.onSubmitAction();
                     this.render();
+                };
+                ToolsInsightEditorCtrl.prototype.getDefaultTools = function (tool) {
+                    var toolData = new toolsInsightModel_1.Tools('', []);
+                    this.defaultMappingJson.push(toolData);
+                    toolData.toolName = tool;
                 };
                 ToolsInsightEditorCtrl.prototype.getFieldOptions = function (selectedTool) {
                     var _this = this;
@@ -134,6 +134,30 @@ System.register(["lodash", "./toolsInsightModel"], function (exports_1, context_
                     var fieldList = this.fieldList;
                     var segments = lodash_1.default.map(fieldList, function (c) { return _this.uiSegmentSrv.newSegment({ value: c }); });
                     return this.$q.when(segments);
+                };
+                ToolsInsightEditorCtrl.prototype.getDefaultFieldMapping = function (tool) {
+                    var fieldList = [];
+                    var keysMap = Object.keys(this.toolDataJson[0]);
+                    for (var i in this.toolDataJson) {
+                        var toolName = this.toolDataJson[i][keysMap[0]];
+                        if (toolName === tool) {
+                            fieldList = this.toolDataJson[i][keysMap[1]];
+                            for (var fields in fieldList) {
+                                var option = fieldList[fields];
+                                this.addDefaultFieldOption(tool, option);
+                            }
+                            break;
+                        }
+                    }
+                };
+                ToolsInsightEditorCtrl.prototype.addDefaultFieldOption = function (tool, option) {
+                    var field = new toolsInsightModel_1.Fields('', '');
+                    for (var i in this.defaultMappingJson) {
+                        if (this.defaultMappingJson[i].toolName === tool) {
+                            this.defaultMappingJson[i].fields.push(field);
+                            field.fieldName = option;
+                        }
+                    }
                 };
                 ToolsInsightEditorCtrl.prototype.addFields = function (selectedToolNm) {
                     var field = new toolsInsightModel_1.Fields('', '');
@@ -166,7 +190,6 @@ System.register(["lodash", "./toolsInsightModel"], function (exports_1, context_
                     }
                     if (index === -1) {
                         this.selectedFieldList.push(fieldVal);
-                        this.selectedToolsDetailJson[selectedToolNm].push(field);
                         for (var i in this.toolMappingJson) {
                             if (this.toolMappingJson[i].toolName === selectedToolNm) {
                                 this.toolMappingJson[i].fields.push(field);
@@ -178,7 +201,6 @@ System.register(["lodash", "./toolsInsightModel"], function (exports_1, context_
                         field.fieldName = fieldVal;
                         this.selectedFieldList.push(fieldVal);
                     }
-                    //console.log(this.toolMappingJson);
                     var plusButton = this.uiSegmentSrv.newPlusButton();
                     this.addColumnSegment.html = plusButton.html;
                     this.addColumnSegment.value = plusButton.value;
@@ -187,28 +209,39 @@ System.register(["lodash", "./toolsInsightModel"], function (exports_1, context_
                 };
                 ToolsInsightEditorCtrl.prototype.removeField = function (key, field, indexValue) {
                     this.selectedFieldList = lodash_1.default.without(this.selectedFieldList, field);
-                    this.selectedToolsDetailJson[key].splice(indexValue, 1);
                     for (var i in this.toolMappingJson) {
                         if (this.toolMappingJson[i].toolName === key)
                             this.toolMappingJson[i].fields.splice(indexValue, 1);
                     }
-                    //console.log(this.toolMappingJson);
                     this.onSubmitAction();
                     this.render();
                 };
                 ToolsInsightEditorCtrl.prototype.onSubmitAction = function () {
-                    this.toolsInsightsPanel["selectedToolsSeq"] = this.selectedToolSeq;
-                    this.toolsInsightsPanel["selectedSeq"] = this.selectedToolSeq;
                     var self = this;
                     self.toolsInsightsPanel["toolDetailMappingJson"] = self.toolMappingJson;
-                    /* self.toolsInsightsPanel["toolDetailMappingJson"] = [];
-                     setTimeout(function () {
-                       self.toolsInsightsPanel["toolDetailMappingJson"] = self.toolMappingJson;
-                       self.render();
-                     }, 200);*/
-                    //this.toolsInsightsPanel["toolDetailMappingJson"] = this.toolMappingJson;
-                    this.toolsInsightsPanel["toolsDetailJson"] = this.selectedToolsDetailJson;
                     this.render();
+                };
+                ToolsInsightEditorCtrl.prototype.defaultValueAction = function () {
+                    var self = this;
+                    self.toolMappingJson = self.defaultMappingJson;
+                    this.defaultButtonOption = 0;
+                    self.onSubmitAction();
+                    self.render();
+                };
+                ToolsInsightEditorCtrl.prototype.customValueAction = function () {
+                    var self = this;
+                    self.toolMappingJson = [];
+                    this.defaultButtonOption = 1;
+                    self.onSubmitAction();
+                    self.render();
+                };
+                ToolsInsightEditorCtrl.prototype.checkButtonForMapping = function () {
+                    if (this.defaultButtonOption === 1) {
+                        return true;
+                    }
+                    else if (this.defaultButtonOption === 0) {
+                        return false;
+                    }
                 };
                 ToolsInsightEditorCtrl.prototype.checkFieldMapping = function () {
                     var length = this.toolMappingJson.length;
@@ -238,9 +271,7 @@ System.register(["lodash", "./toolsInsightModel"], function (exports_1, context_
                 };
                 ToolsInsightEditorCtrl.prototype.checkEmptyToolList = function () {
                     var DsResponse = this.toolsInsightsPanelCtrl.dataSourceResponse;
-                    //console.log(DsResponse);
                     var DsResponseLen = this.toolsInsightsPanelCtrl.dataSourceResponse.length;
-                    //console.log(DsResponseLen);
                     if (DsResponse !== undefined) {
                         if (DsResponseLen <= 1) {
                             return true;

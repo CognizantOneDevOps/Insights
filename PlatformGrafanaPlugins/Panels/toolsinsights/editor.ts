@@ -16,7 +16,6 @@ export class ToolsInsightEditorCtrl {
   toolsInsightsPanelCtrl: any;
   dataSourceResponse: any;
   toolListData = [];
-  selectedToolSeq = [];
   addColumnSegment: any;
   fieldList = [];
   selectedFieldList = [];
@@ -26,13 +25,13 @@ export class ToolsInsightEditorCtrl {
   fieldVal: Fields[];
   toolMappingJson = [];
   defaultMappingJson = [];
+  defaultButtonOption = 1;
 
   /** @ngInject */
   constructor($scope, private $q, private uiSegmentSrv) {
     //super($scope, $q, uiSegmentSrv);
     var self = this;
     self.toolsInsightsPanelCtrl = $scope.ctrl;
-    //console.log(self.toolsInsightsPanelCtrl.dataSourceResponse);
     if (self.toolsInsightsPanelCtrl.dataSourceResponse === undefined) {
       self.toolsInsightsPanelCtrl.dataSourceResponse = [];
     }
@@ -40,16 +39,9 @@ export class ToolsInsightEditorCtrl {
       var toolDataArray = self.toolsInsightsPanelCtrl.dataSourceResponse.results[0].data[0].row[0];
       self.getToolListOptions(toolDataArray);
     }
-    self.selectedToolSeq = self.toolsInsightsPanelCtrl.pipelineToolsArray;
-    if (self.toolsInsightsPanelCtrl.lastSelectedDetailJson !== undefined) {
-    }
-    if (self.selectedToolSeq === undefined) {
-      self.selectedToolSeq = [];
-    }
-    if (self.toolsInsightsPanelCtrl.toolsDetailJson !== undefined) {
-      self.selectedToolsDetailJson = self.toolsInsightsPanelCtrl.toolsDetailJson;
+
+    if (self.toolsInsightsPanelCtrl.toolDetailMappingJson !== undefined) {
       self.toolMappingJson = self.toolsInsightsPanelCtrl.toolDetailMappingJson;
-      self.selectedToolSeq = self.toolsInsightsPanelCtrl.selectedSeq;
     }
     self.checkEmptyToolList();
     self.fieldList = self.toolsInsightsPanelCtrl.toolDetails;
@@ -71,6 +63,8 @@ export class ToolsInsightEditorCtrl {
       var toolListRow = toolDataArray[i][keysMap[0]];
       if (this.toolListData.indexOf(toolListRow[i]) === -1) {
         this.toolListData.push(toolListRow);
+        this.getDefaultTools(toolListRow);
+        this.getDefaultFieldMapping(toolListRow);
       }
     }
   }
@@ -84,14 +78,22 @@ export class ToolsInsightEditorCtrl {
   addTool() {
     let toolName = this.addColumnSegment.value;
     let toolData = new Tools('', []);
-    var idx = this.selectedToolSeq.indexOf(toolName);
+    var idx;
+    if (this.toolMappingJson.length === 0) {
+      idx = -1;
+    }
+    for (var i in this.toolMappingJson) {
+      if (this.toolMappingJson[i].toolName === toolName) {
+        idx = 0;
+      }
+      else {
+        idx = -1;
+      }
+    }
     if (idx === -1) {
-      this.selectedToolSeq.push(toolName);
-      this.selectedToolsDetailJson[toolName] = [];
       this.toolMappingJson.push(toolData);
       toolData.toolName = toolName;
     }
-    //console.log(this.toolMappingJson);
     let plusButton = this.uiSegmentSrv.newPlusButton();
     this.addColumnSegment.html = plusButton.html;
     this.addColumnSegment.value = plusButton.value;
@@ -100,19 +102,19 @@ export class ToolsInsightEditorCtrl {
   }
 
   removeTool(tool, index) {
-    this.selectedToolSeq = _.without(this.selectedToolSeq, tool);
-    delete this.selectedToolsDetailJson[tool];
     for (var i in this.toolMappingJson) {
       if (this.toolMappingJson[i].toolName === tool)
         /*delete this.toolMappingJson[i];*/
         this.toolMappingJson.splice(index, 1);
     }
-    //console.log(this.toolMappingJson);
-    if (this.selectedToolSeq.length === 0) {
-      this.toolsInsightsPanel["selectedSeq"] = [];
-    }
     this.onSubmitAction();
     this.render();
+  }
+
+  getDefaultTools(tool) {
+    let toolData = new Tools('', []);
+    this.defaultMappingJson.push(toolData);
+    toolData.toolName = tool;
   }
 
   getFieldOptions(selectedTool) {
@@ -128,6 +130,32 @@ export class ToolsInsightEditorCtrl {
     let fieldList = this.fieldList;
     let segments = _.map(fieldList, (c) => this.uiSegmentSrv.newSegment({ value: c }));
     return this.$q.when(segments);
+  }
+
+  getDefaultFieldMapping(tool) {
+    var fieldList = [];
+    var keysMap = Object.keys(this.toolDataJson[0]);
+    for (var i in this.toolDataJson) {
+      var toolName = this.toolDataJson[i][keysMap[0]];
+      if (toolName === tool) {
+        fieldList = this.toolDataJson[i][keysMap[1]];
+        for (var fields in fieldList) {
+          var option = fieldList[fields];
+          this.addDefaultFieldOption(tool, option);
+        }
+        break;
+      }
+    }
+  }
+
+  addDefaultFieldOption(tool, option) {
+    let field = new Fields('', '');
+    for (var i in this.defaultMappingJson) {
+      if (this.defaultMappingJson[i].toolName === tool) {
+        this.defaultMappingJson[i].fields.push(field);
+        field.fieldName = option;
+      }
+    }
   }
 
   addFields(selectedToolNm) {
@@ -163,7 +191,6 @@ export class ToolsInsightEditorCtrl {
 
     if (index === -1) {
       this.selectedFieldList.push(fieldVal);
-      this.selectedToolsDetailJson[selectedToolNm].push(field);
       for (var i in this.toolMappingJson) {
         if (this.toolMappingJson[i].toolName === selectedToolNm) {
           this.toolMappingJson[i].fields.push(field);
@@ -175,7 +202,6 @@ export class ToolsInsightEditorCtrl {
       field.fieldName = fieldVal;
       this.selectedFieldList.push(fieldVal);
     }
-    //console.log(this.toolMappingJson);
     let plusButton = this.uiSegmentSrv.newPlusButton();
     this.addColumnSegment.html = plusButton.html;
     this.addColumnSegment.value = plusButton.value;
@@ -185,29 +211,43 @@ export class ToolsInsightEditorCtrl {
 
   removeField(key, field, indexValue) {
     this.selectedFieldList = _.without(this.selectedFieldList, field);
-    this.selectedToolsDetailJson[key].splice(indexValue, 1);
     for (var i in this.toolMappingJson) {
       if (this.toolMappingJson[i].toolName === key)
         this.toolMappingJson[i].fields.splice(indexValue, 1);
     }
-    //console.log(this.toolMappingJson);
     this.onSubmitAction();
     this.render();
   }
 
   onSubmitAction(): void {
-    this.toolsInsightsPanel["selectedToolsSeq"] = this.selectedToolSeq;
-    this.toolsInsightsPanel["selectedSeq"] = this.selectedToolSeq;
     var self = this;
     self.toolsInsightsPanel["toolDetailMappingJson"] = self.toolMappingJson;
-    /* self.toolsInsightsPanel["toolDetailMappingJson"] = [];
-     setTimeout(function () {
-       self.toolsInsightsPanel["toolDetailMappingJson"] = self.toolMappingJson;
-       self.render();
-     }, 200);*/
-    //this.toolsInsightsPanel["toolDetailMappingJson"] = this.toolMappingJson;
-    this.toolsInsightsPanel["toolsDetailJson"] = this.selectedToolsDetailJson;
     this.render();
+  }
+
+  defaultValueAction() {
+    var self = this;
+    self.toolMappingJson = self.defaultMappingJson;
+    this.defaultButtonOption = 0;
+    self.onSubmitAction();
+    self.render();
+  }
+
+  customValueAction() {
+    var self = this;
+    self.toolMappingJson = [];
+    this.defaultButtonOption = 1;
+    self.onSubmitAction();
+    self.render();
+  }
+
+  checkButtonForMapping() {
+    if (this.defaultButtonOption === 1) {
+      return true;
+    }
+    else if (this.defaultButtonOption === 0) {
+      return false;
+    }
   }
 
   checkFieldMapping() {
@@ -238,9 +278,7 @@ export class ToolsInsightEditorCtrl {
 
   checkEmptyToolList() {
     var DsResponse = this.toolsInsightsPanelCtrl.dataSourceResponse;
-    //console.log(DsResponse);
     var DsResponseLen = this.toolsInsightsPanelCtrl.dataSourceResponse.length;
-    //console.log(DsResponseLen);
     if (DsResponse !== undefined) {
       if (DsResponseLen <= 1) {
         return true;
