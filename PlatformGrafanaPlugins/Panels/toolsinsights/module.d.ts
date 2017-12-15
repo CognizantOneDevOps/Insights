@@ -83,8 +83,8 @@ declare class PipelinePanelCtrl extends MetricsPanelCtrl {
     toolListData: any[];
     toolDataMap: {};
     showThrobber: boolean;
-    toolDetailMappingJson: any[];
     advColumnMsg: string;
+    fieldOptions: any[];
     /** @ngInject */
     constructor($scope: any, $injector: any, annotationsSrv: any, $sanitize: any, $window: any, $rootScope: any);
     loadGoogleCharts(): void;
@@ -94,9 +94,10 @@ declare class PipelinePanelCtrl extends MetricsPanelCtrl {
     issueQueries(datasource: any): any;
     onDataError(err: any): void;
     onDataReceived(dataList: any): void;
-    toolsDetailJson: {};
     selectedSeq: any[];
+    toolDetailMappingJson: any[];
     render(): void;
+    checkToolSelection(): boolean;
     inputQuery: {
         "targets": {
             "rawQuery": boolean;
@@ -152,7 +153,7 @@ declare class PipelinePanelCtrl extends MetricsPanelCtrl {
     formatDate(dateVal: any): any;
     timeLagDifference(dateVal: any): string;
     toolsFieldDetails(): void;
-    toolSelection(): void;
+    toolSelection(tool: any): void;
     onToolSelectAction(): void;
     onFieldSelectAction(): void;
     onInputValChangeAction(): void;
