@@ -7,7 +7,6 @@ export declare class ToolsInsightEditorCtrl {
     toolsInsightsPanelCtrl: any;
     dataSourceResponse: any;
     toolListData: any[];
-    selectedToolSeq: any[];
     addColumnSegment: any;
     fieldList: any[];
     selectedFieldList: any[];
@@ -17,6 +16,7 @@ export declare class ToolsInsightEditorCtrl {
     fieldVal: Fields[];
     toolMappingJson: any[];
     defaultMappingJson: any[];
+    defaultButtonOption: number;
     /** @ngInject */
     constructor($scope: any, $q: any, uiSegmentSrv: any);
     render(): void;
@@ -24,10 +24,16 @@ export declare class ToolsInsightEditorCtrl {
     getToolOptions(): any;
     addTool(): void;
     removeTool(tool: any, index: any): void;
+    getDefaultTools(tool: any): void;
     getFieldOptions(selectedTool: any): any;
+    getDefaultFieldMapping(tool: any): void;
+    addDefaultFieldOption(tool: any, option: any): void;
     addFields(selectedToolNm: any): void;
     removeField(key: any, field: any, indexValue: any): void;
     onSubmitAction(): void;
+    defaultValueAction(): void;
+    customValueAction(): void;
+    checkButtonForMapping(): boolean;
     checkFieldMapping(): boolean;
     checkValueMapping(): boolean;
     checkEmptyToolList(): boolean;
