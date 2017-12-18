@@ -29,7 +29,9 @@
   },
   "graph": {
     "endpoint": "http://localhost:7474",
-    "authToken": "bmVvNGo6QzBnbml6YW50QDE="
+    "authToken": "bmVvNGo6QzBnbml6YW50QDE=",
+		"boltEndPoint" : "bolt://localhost:7687",
+		"maxIdleConnections":25
   },
   "grafana": {
     "grafanaEndpoint": "https://localhost:3000",
