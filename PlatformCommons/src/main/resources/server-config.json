@@ -62,7 +62,9 @@
 		"mailFrom": " ",
 		"mailTo": " ",
 		"subject": "QA - Insights inference details",
-		"logo" :"img/Cognizant_Insights.svg"
+		"logo" :"img/Insight.svg",
+		"line" :"img/Line.svg",
+		"footerLogo" :"img/FooterLogo.svg"
 	},
 	"insightsServiceURL": "",
 	"disableAuth": true,

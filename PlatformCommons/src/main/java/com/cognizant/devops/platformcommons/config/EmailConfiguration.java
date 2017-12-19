@@ -36,6 +36,9 @@ public class EmailConfiguration implements Serializable {
 	private String mailTo;
 	private String subject;
 	private String logo;
+	private String line;
+	private String footerLogo;
+	
 	
 	public Boolean getSendEmailEnabled() {
 		return sendEmailEnabled;
@@ -108,6 +111,18 @@ public class EmailConfiguration implements Serializable {
 	}
 	public void setLogo(String logo) {
 		this.logo = logo;
+	}
+	public String getLine() {
+		return line;
+	}
+	public void setLine(String line) {
+		this.line = line;
+	}
+	public String getFooterLogo() {
+		return footerLogo;
+	}
+	public void setFooterLogo(String footerLogo) {
+		this.footerLogo = footerLogo;
 	}
 
 }
