@@ -65,11 +65,11 @@ public class AlertEmailJobExecutor implements Job,Serializable {
 		}
 	}
 	
-	public static void main(String[] a){
+	/*public static void main(String[] a){
 		
-		/*AlertEmailJobExecutor exe=new AlertEmailJobExecutor();
-		exe.sendMail();*/
+		AlertEmailJobExecutor exe=new AlertEmailJobExecutor();
+		exe.sendMail();
 		
-	}
+	}*/
 
 }
