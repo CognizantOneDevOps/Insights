@@ -9,13 +9,17 @@
 
 <body style="margin-top:0;margin-bottom:0;margin-right:0;margin-left:0;padding-top:0;padding-bottom:0;padding-right:0;padding-left:0;background-color:#ffffff;">
 
-    <div style="margin-top:0;margin-bottom:0;margin-right:auto;margin-left:auto;width:80%;max-width:100%;margin:auto;">
+    <div style="margin-top:0;margin-bottom:0;margin-right:auto;margin-left:auto;width:80%;max-width:100%;margin:auto;border:1px solid;border-color:#009933;">
     
     	<table width="100%" cellpadding="0" cellspacing="0" border="0" > 
 						<tbody> 
-						<tr > 
+						<tr> 
+							<td align="center" style="background-color:#000000;">
+								
+							<img  src = "cid:${cidlogo}"  alt="logo" width="100%">
+							</td>
 					
-							<td  style="padding-right:7%;padding-left:7%;padding-top:30px;padding-bottom:22px;"> 
+						<!--	<td  style="padding-right:7%;padding-left:7%;padding-top:30px;padding-bottom:22px;"> 
 								<table width="100%" border="0" cellpadding="0" cellspacing="0" style="text-align:left;font-size:15px;line-height:16px;color:#999999;"> 
 									<tbody> 
 									<tr> 
@@ -34,10 +38,11 @@
 								</table> 
 						
 							</td> 
+					-->		
 							
 						</tr> 
 			
-						</tbody> 
+					</tbody> 
 		</table> 
 						
 
@@ -47,15 +52,15 @@
                 <tr>
                     #if ($!$accordianData) #foreach ($data in $accordianData) #if( !$foreach.hasNext && (($accordianData.size() % 2) > 0))
 
-                    <td style="padding-bottom:10px;width:50%;padding-left: 25%;padding-right:25%;height:100%" colspan="2">
+                    <td style="padding-bottom:10px;width:50%;padding-left: 20%;padding-right:25%;height:100%" colspan="2">
                         #else
                         <td style="padding-bottom:10px;width:50%;vertical-align:top;height:100%">
                             #end
 
                             <div style="border:1px solid #666;height:100%;">
 
-                                <p style="font-size: 16px; line-height: 25px; margin: 0 0 8px 0;background-color:#d3e9c7;font-family: proxima_novasemibold;padding-left:50px;padding-top:10px;padding-bottom:10px;"><b>$data.heading.getAsString()
-															<span style="font-size: 14px;font-family: proxima_novasemibold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Observations:- (Positives:$data.noOfPositives, Negatives: $data.noOfNegatives, Neutral: $data.noOfNeutral) </span></b></p>
+                                <p style="font-size: 16px; line-height: 25px; margin: 0 0 8px 0;background-color:#d3e9c7;font-family: proxima_novasemibold;padding-left:20px;padding-top:10px;padding-bottom:10px;"><b>$data.heading.getAsString()
+								<span style="font-size: 14px;font-family: proxima_novasemibold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Observations:- (Positives:$data.noOfPositives, Negatives: $data.noOfNegatives, Neutral: $data.noOfNeutral) </span></b></p>
                                 <p><span style="font-size: 14px; margin-left:50px;font-family:Proxima Nova;"><b>Daily Observations: (Last run: $data.inferenceDetails[0].lastRun.getAsString())</b></span> </p>
                                 <p style="margin: 0 0 8px 0;font-size: 12px;font-family:Proxima Nova;">
                                     <ul style=" margin-left: 25px; ">
@@ -89,8 +94,33 @@
                     #end
 
                 </tr>
+                
+                	
+              
             </tbody>
 
+        </table>
+        <table width="100%" cellpadding="0" cellspacing="0" border="0">
+          <tr>
+                	<td align="center">
+								
+							<img  src = "cid:${cidLine}"  alt="logo" width="100%">
+					</td>
+          </tr>
+          <tr>
+          		<td style=" text-align:left;padding-left:15px;"> 
+          		
+          				© 2017 Cognizant Technology Solutions, Inc., All rights reserved
+          			
+          		</td>
+          		<td align="right">
+          		
+          			<img src = "cid:${cidFooter}"  alt="logo" width="100%">
+          		
+          				
+          		</td>
+          </tr>
+          
         </table>
         
        
