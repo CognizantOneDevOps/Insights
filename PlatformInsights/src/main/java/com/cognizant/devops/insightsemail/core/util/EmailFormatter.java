@@ -17,7 +17,8 @@ package com.cognizant.devops.insightsemail.core.util;
 
 import java.awt.Image;
 import java.io.StringWriter;
-import java.net.URL;
+
+import javax.swing.ImageIcon;
 
 import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
@@ -39,12 +40,15 @@ public class EmailFormatter {
 		return emailFormatter;
 	}
 
-	public StringWriter populateTemplate(JsonArray array,String templateName,Image cid) {
+	public StringWriter populateTemplate(JsonArray array,String templateName, Image image, Image imageLine, Image imagefooterLogo) {
+		
 		StringWriter stringWriter = new StringWriter();
 		Template template = initializeTemplate(templateName);
 		VelocityContext context = new VelocityContext(); 
 		context.put(EmailConstants.ACCORDIANDATA,array);
-		context.put("cid",cid);
+		context.put("cidlogo",image);
+		context.put("cidLine",imageLine);
+		context.put("cidFooter",imagefooterLogo);
 		template.merge(context,stringWriter);
 		System.out.println(stringWriter.toString());
 		return stringWriter;
@@ -54,7 +58,7 @@ public class EmailFormatter {
 		VelocityEngine velocityEngine=new VelocityEngine();
 		velocityEngine.setProperty(RuntimeConstants.RESOURCE_LOADER,EmailConstants.CLASSPATH);
 		velocityEngine.setProperty(EmailConstants.LOADER,ClasspathResourceLoader.class.getName());
-		velocityEngine.init();      
+		velocityEngine.init(); 
 		Template template = velocityEngine.getTemplate(templateName);
 		return template;
 	}
