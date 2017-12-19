@@ -19,15 +19,18 @@ package com.cognizant.devops.insightsemail.core;
 import java.awt.Image;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
-import java.net.URL;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.X509Certificate;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 
 import javax.imageio.ImageIO;
 import javax.mail.MessagingException;
 import javax.net.ssl.SSLContext;
+import javax.swing.ImageIcon;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
@@ -62,13 +65,18 @@ public class InsightsEmailService {
 
 	public void sendEmail(Mail mail) throws MessagingException, UnsupportedEncodingException {
 		
-		LOG.debug("Inside sendEmail method");
+		//LOG.debug("Inside sendEmail method");
 		try {
+			
 			JsonObject json = getInferenceDetails();
 			String logo= emailConfiguration.getLogo();
-			Image image = ImageIO.read(ClassLoader.getSystemResource(logo));
+			String line= emailConfiguration.getLine();
+			String footerLogo= emailConfiguration.getFooterLogo();
+			Image imageLogo = ImageIO.read(ClassLoader.getSystemResource(logo));
+			Image imageLine = ImageIO.read(ClassLoader.getSystemResource(line));
+			Image imagefooterLogo = ImageIO.read(ClassLoader.getSystemResource(footerLogo));
 			String emailTemplate = emailConfiguration.getEmailVelocityTemplate();
-			String emailBody = getFormattedEmailContent(json,emailTemplate,image); 
+			String emailBody = getFormattedEmailContent(json,emailTemplate,imageLogo,imageLine,imagefooterLogo); 
 			EmailUtil.getInstance().sendEmail(mail, emailConfiguration,emailBody);
 			LOG.debug("Email has been sent successfully..");
 		} catch (Exception e) {
@@ -89,6 +97,7 @@ public class InsightsEmailService {
 		headers.add(EmailConstants.AUTHORIZATION, "Basic "+base64Creds);
 		HttpEntity<?> entity = new HttpEntity<>(headers);
 		String restUrl = ApplicationConfigProvider.getInstance().getInsightsServiceURL()+"/PlatformService/insights/inferences";
+	//	String restUrl = "http://localhost:7080"+"/PlatformService/insights/inferences";
 		HttpEntity<String> response = restTemplate.exchange(restUrl,HttpMethod.GET,entity,String.class);
 		JsonParser parser = new JsonParser(); 
 		JsonObject resultJson=new JsonObject();
@@ -97,38 +106,46 @@ public class InsightsEmailService {
 		return resultJson;
 	}
 	
-	private String getFormattedEmailContent(JsonObject json, String emailTemplate,Image image) {
-		
+	private String getFormattedEmailContent(JsonObject json, String emailTemplate, Image image, Image imageLine, Image imagefooterLogo) {
+	
 		JsonArray array = json.get(EmailConstants.DATA).getAsJsonArray();
 		for(JsonElement element : array){
 			
 			int noOfPositives = 0;
 			int noOfNegatives =0;
 			int noOfNeutral= 0;
+			ArrayList<String> positive=new ArrayList<>();
+			ArrayList<String> negative=new ArrayList<>();
+			ArrayList<String> neutral=new ArrayList<>();
 			JsonObject output = element.getAsJsonObject();
 			JsonArray arrayinfer = output.get(EmailConstants.INFERENCEDETAILS).getAsJsonArray();
 			for(JsonElement elementinfer : arrayinfer){
-				
 				JsonObject outputinfer = elementinfer.getAsJsonObject();
 				String sentiment=outputinfer.get(EmailConstants.SENTIMENT).getAsString() ;
+				String inference=outputinfer.get("inference").getAsString() ;
 				 if(EmailConstants.NEUTRAL.equals(sentiment)){
 	            	 noOfNeutral=noOfNeutral+1;
+	            	 neutral.add(inference);
+	            	
 	             }else if(EmailConstants.POSITIVE.equals(sentiment)){
 	            	 noOfPositives=noOfPositives+1;
+	            	 positive.add(inference);
+	            	
 	            	 
 	             }else if(EmailConstants.NEGATIVE.equals(sentiment)){
 	            	 noOfNegatives=noOfNegatives+1;
+	            	 negative.add(inference);
+	            	
 	             }
-				
 			}
+
 			 element.getAsJsonObject().addProperty(EmailConstants.NOOFNEUTRAL,noOfNeutral);
 			 element.getAsJsonObject().addProperty(EmailConstants.NOOFPOSITIVE,noOfPositives);
 			 element.getAsJsonObject().addProperty(EmailConstants.NOOFNEGATIVE,noOfNegatives);
 		}
 		
-		
-		StringWriter stringWriter = EmailFormatter.getInstance().populateTemplate(array,emailTemplate,image);
-	//	System.out.println(stringWriter.toString());
+
+		StringWriter stringWriter = EmailFormatter.getInstance().populateTemplate(array,emailTemplate,image,imageLine,imagefooterLogo);
 		return stringWriter.toString();
 	}
 
@@ -155,7 +172,7 @@ public class InsightsEmailService {
 	
 	public static void main(String[] args)
 	{	
-		/*ApplicationConfigCache.loadConfigCache();
+		/**ApplicationConfigCache.loadConfigCache();
 		InsightsEmailService services=new InsightsEmailService();
 		Mail mail=new Mail();
 		mail.setMailTo("");
@@ -164,14 +181,15 @@ public class InsightsEmailService {
 		try {
 			services.sendEmail(mail);
 		} catch (UnsupportedEncodingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			System.out.println(e.toString());
 		} catch (MessagingException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}*/
+		}**/
 
 	}
 
 
 }
+
+
