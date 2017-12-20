@@ -80,7 +80,7 @@ public class GrafanaUserDetailsUtil {
 			if(grafanaRole == null || grafanaRole.trim().length() == 0){
 				mappedAuthorities.add(SpringAuthority.valueOf("INVALID"));
 			}else{
-				mappedAuthorities.add(SpringAuthority.valueOf(grafanaRole.replaceAll("\\s", "_")));
+				mappedAuthorities.add(SpringAuthorityUtil.getSpringAuthorityRole(grafanaRole));
 			}
 			
 			httpRequest.setAttribute("responseHeaders", grafanaResponseCookies);
@@ -95,6 +95,7 @@ public class GrafanaUserDetailsUtil {
 		return null;
 	}
 
+	
 	private static String getCurrentOrgRole(Map<String, String> headers, String grafanaCurrentOrg) {
 		String userOrgsApiUrl = ApplicationConfigProvider.getInstance().getGrafana().getGrafanaEndpoint()+"/api/user/orgs";
 		ClientResponse grafanaCurrentOrgResponse = RestHandler.doGet(userOrgsApiUrl, null, headers);
