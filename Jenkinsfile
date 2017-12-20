@@ -1,4 +1,4 @@
-env.dockerimagename="devopsbasservice/buildonframework:insights"
+env.dockerimagename="devopsbasservice/buildonframework:insights1.0"
 node {
    // Platform Service Starts
    stage ('Insight_PS_Build') {
@@ -58,5 +58,8 @@ node {
 	}
 	
 	// Platform UI2.0 Ends
-		
+	stage ('SlackNotificationn') {
+   	    slackSend channel: '#insightsjenkins', color: 'good', message: 'From Insights GitHub', teamDomain: 'ctsdevopsbot', token: slackToken
+  	}
+
 }
