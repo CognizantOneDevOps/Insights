@@ -43,6 +43,7 @@ import com.cognizant.devops.platformcommons.config.GrafanaData;
 import com.cognizant.devops.platformcommons.dal.rest.RestHandler;
 import com.cognizant.devops.platformservice.rest.util.PlatformServiceUtil;
 import com.cognizant.devops.platformservice.security.config.SpringAuthority;
+import com.cognizant.devops.platformservice.security.config.SpringAuthorityUtil;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -85,7 +86,7 @@ public class AccessGroupManagement {
 		
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		List<GrantedAuthority> updatedAuthorities = new ArrayList<>(auth.getAuthorities());
-		updatedAuthorities.add(SpringAuthority.valueOf(grafanaCurrentOrgRole.replaceAll("\\s", "_"))); 
+		updatedAuthorities.add(SpringAuthorityUtil.getSpringAuthorityRole(grafanaCurrentOrgRole)); 
 		Authentication newAuth = new UsernamePasswordAuthenticationToken(auth.getPrincipal(), auth.getCredentials(), updatedAuthorities);
 		SecurityContextHolder.getContext().setAuthentication(newAuth);
 		
