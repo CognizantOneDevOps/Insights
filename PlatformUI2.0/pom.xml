@@ -76,7 +76,7 @@
                 <distributionManagement>
                    <snapshotRepository>
                           <id>nexus</id>
-                          <url>http://insightsplatformnexusrepo.cogdevops.com:8001/nexus/content/repositories/buildonInsights</url>
+                          <url>http://54.172.37.182:8081/nexus/content/repositories/buildonInsights</url>
                    </snapshotRepository>
                 </distributionManagement>
 
