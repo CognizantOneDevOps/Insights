@@ -47,26 +47,6 @@ class PipelinePanelCtrl extends MetricsPanelCtrl {
         'LOADRUNNER': 'public/app/plugins/panel/toolsinsights/img/LoadRunner.svg'
     };
 
-    tableMapping = {
-        'JIRA': ['position', 'jir_jirakey', 'jir_projectname', 'jir_priority', 'jir_status', 'inSightsTimeX'],
-        'BITBUCKET': ['position', 'bit_Jira_Key', 'bit_commitId', 'bit_reponame', 'bit_authorName', 'bit_authorEmail', 'inSightsTimeX'],
-        'JENKINS': ['position', 'jen_BuildNumber', 'jen_SCMCommitId', 'jen_RundeckJobId', 'jen_ProjectName', 'jen_Result', 'inSightsTimeX'],
-        'SONAR': ['position', 'resourcekey', 'complexity', 'coverage', 'duplicated_blocks', 'new_violations', 'inSightsTimeX'],
-        'RUNDECK': ['position', 'run_ExecutionId', 'run_JobId', 'run_JobName', 'run_ProjectName', 'run_Status', 'inSightsTimeX'],
-        'TESTING': ['position', 'Requirement_ID', 'Enviornment', 'Test_Cases', 'Defects', 'Test_Case_Status'],
-        'LOADRUNNER': ['position', 'jobName', 'buildNumber', 'transactionName', 'virtualUsers', 'slaViolationCount']
-    };
-
-    tableMappingHeader = {
-        'JIRA': ['Sr.No', 'Key', 'Project Name', 'Priority', 'Status', 'Updated Date'],
-        'BITBUCKET': ['Sr.No', 'JIRA Key', 'Commit Id', 'Repository Name', 'Author Name', 'Author Email', 'Commit Time'],
-        'JENKINS': ['Sr.No', 'Build Number', 'SCM CommitId', 'Rundeck Job', 'Project Name', 'Result', 'Job Time'],
-        'SONAR': ['Sr.No', 'Resource key', 'Complexity', 'Coverage', 'Duplicated Blocks', 'Violations', 'Metrics Date'],
-        'RUNDECK': ['Sr.No', 'Execution Id', 'Job Id', 'Job Name', 'Project Name', 'Status', 'Deployment Date'],
-        'TESTING': ['Sr.No', 'Requirement ID', 'Enviornment', 'Test Cases', 'Defects', 'Test Case Status'],
-        'LOADRUNNER': ['Sr.No', 'Job Name', 'Build Number', 'Transaction Name', 'Virtual Users', 'SLA Violation Count']
-    };
-
     toolsList = [];
     selectedTool: string;
     selectedField: string;
@@ -231,9 +211,11 @@ class PipelinePanelCtrl extends MetricsPanelCtrl {
                 this.pipelineToolsArray.push(keyName);
             }
         }
+        this.selectedSeq = [];
         for (var i in this.toolDetailMappingJson) {
             this.selectedSeq[i] = this.toolDetailMappingJson[i].toolName;
         }
+        console.log(this.selectedSeq);
         //console.log(this.pipelineToolsArray);
         this.checkToolSelection();
         return super.render(this.dataSourceResponse);
@@ -309,8 +291,8 @@ class PipelinePanelCtrl extends MetricsPanelCtrl {
             {
                 "rawQuery": true,
                 "refId": "A",
-                "target": "match (n) -[rMap]-> (m) where exists(n.ToolName) AND exists(m.ToolName)  WITH distinct " +
-                "n.ToolName as start, m.ToolName as end,  type(rMap) as rel WITH {start:start, end:end, rel:rel} as row " +
+                "target": "match (n) -[rMap]-> (m) where exists(n.toolName) AND exists(m.toolName)  WITH distinct " +
+                "n.toolName as start, m.toolName as end,  type(rMap) as rel WITH {start:start, end:end, rel:rel} as row " +
                 "return collect(row) as rows",
                 "$$hashKey": "object:190"
             }
@@ -591,7 +573,7 @@ class PipelinePanelCtrl extends MetricsPanelCtrl {
         }
         query += 'with a, b, collect(distinct a.uuid) as uuids ';
         query += 'WHERE NOT (b.uuid IN uuids) ';
-        query += 'return  b.ToolName as toolName, collect(distinct b.uuid) as uuids';
+        query += 'return  b.toolName as toolName, collect(distinct b.uuid) as uuids';
         return query;
     }
 
@@ -606,6 +588,7 @@ class PipelinePanelCtrl extends MetricsPanelCtrl {
         query += 'WITH distinct node as a ';
         query += 'WITH a.toolName as toolName, collect(distinct a) as nodes ';
         query += 'RETURN toolName, size(nodes) as count, nodes ';
+        console.log(query);
         return query;
     }
 
