@@ -16,7 +16,7 @@
 						<tr> 
 							<td align="center" style="background-color:#000000;">
 								
-							<img  src = "cid:${cidlogo}"  alt="logo" width="100%">
+							<embed  src="cid:${cidlogo}">
 							</td>
 					
 						<!--	<td  style="padding-right:7%;padding-left:7%;padding-top:30px;padding-bottom:22px;"> 
@@ -110,12 +110,12 @@
           <tr>
           		<td style=" text-align:left;padding-left:15px;"> 
           		
-          				© 2017 Cognizant Technology Solutions, Inc., All rights reserved
+          				Â© 2017 Cognizant Technology Solutions, Inc., All rights reserved
           			
           		</td>
           		<td align="right">
           		
-          			<img src = "cid:${cidFooter}"  alt="logo" width="100%">
+          			<embed  src ="cid:${cidFooter}">
           		
           				
           		</td>
