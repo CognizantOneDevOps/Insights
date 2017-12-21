@@ -15,8 +15,8 @@
 						<tbody> 
 						<tr> 
 							<td align="center" style="background-color:#000000;">
-								
-							<img  src = "cid:${cidlogo}"  alt="logo" width="100%">
+							
+							<embed  src="cid:${cidlogo}">
 							</td>
 					
 						<!--	<td  style="padding-right:7%;padding-left:7%;padding-top:30px;padding-bottom:22px;"> 
@@ -46,7 +46,7 @@
 		</table> 
 						
 
-        <table width="100%" cellpadding="10" cellspacing="0" border="0" style="font-size:14px;line-height:22px;text-align:left;color:#333333;">
+        <table width="100%" cellpadding="10" cellspacing="0" border="0" style="border-bottom:1px solid #009933 ;font-size:14px;line-height:22px;text-align:left;color:#333333;">
             <tbody>
 
                 <tr>
@@ -102,21 +102,14 @@
         </table>
         <table width="100%" cellpadding="0" cellspacing="0" border="0">
           <tr>
-                	<td align="center">
-								
-							<img  src = "cid:${cidLine}"  alt="logo" width="100%">
-					</td>
-          </tr>
-          <tr>
           		<td style=" text-align:left;padding-left:15px;"> 
           		
           				© 2017 Cognizant Technology Solutions, Inc., All rights reserved
           			
           		</td>
           		<td align="right">
-          		
-          			<img src = "cid:${cidFooter}"  alt="logo" width="100%">
-          		
+
+          			<embed  src ="cid:${cidFooter}">
           				
           		</td>
           </tr>
