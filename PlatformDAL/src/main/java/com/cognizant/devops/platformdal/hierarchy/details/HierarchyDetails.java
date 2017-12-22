@@ -57,6 +57,12 @@ public class HierarchyDetails {
 	@Column(name = "LABELS")
 	private String labels;
 
+	@Column(name = "PROPERTY")
+	private String property;
+	
+	@Column(name = "VALUE")
+	private String value;
+	
 	public int getId() {
 		return id;
 	}
@@ -135,5 +141,21 @@ public class HierarchyDetails {
 
 	public void setLabels(String labels) {
 		this.labels = labels;
+	}
+
+	public String getProperty() {
+		return property;
+	}
+
+	public void setProperty(String property) {
+		this.property = property;
+	}
+
+	public String getValue() {
+		return value;
+	}
+
+	public void setValue(String value) {
+		this.value = value;
 	}
 }
