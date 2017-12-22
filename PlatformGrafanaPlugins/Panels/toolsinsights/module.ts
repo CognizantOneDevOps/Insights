@@ -559,7 +559,7 @@ class PipelinePanelCtrl extends MetricsPanelCtrl {
     }
 
     buildNextHopQuery(label: string, queryField: string, fieldValues: any[], excludeLabels: string[]): string {
-        let query = 'MATCH (a:' + label + ') -[*0..1]- (b) WHERE ';
+        let query = 'MATCH (a:DATA:' + label + ') -[*0..1]- (b:DATA) WHERE ';
         if (queryField) {
             query += 'a.' + queryField + ' IN ' + JSON.stringify(fieldValues) + ' ';
         }
@@ -573,12 +573,12 @@ class PipelinePanelCtrl extends MetricsPanelCtrl {
         }
         query += 'with a, b, collect(distinct a.uuid) as uuids ';
         query += 'WHERE NOT (b.uuid IN uuids) ';
-        query += 'return  b.toolName as toolName, collect(distinct b.uuid) as uuids';
+        query += 'return  b.toolName as toolName, collect(distinct b.uuid) as uuids, collect(distinct a.uuid) as sourceUuids';
         return query;
     }
 
     buildTraceabilityQuery(label: string, queryField: string, fieldValues: any[], uuidCollected: string[]) {
-        let query = 'MATCH (b:' + label + ') WHERE ';
+        /*let query = 'MATCH (b:' + label + ') WHERE ';
         if (queryField) {
             query += 'b.' + queryField + ' IN ' + JSON.stringify(fieldValues) + ' ';
         }
@@ -587,7 +587,9 @@ class PipelinePanelCtrl extends MetricsPanelCtrl {
         query += 'UNWIND nodes as node ';
         query += 'WITH distinct node as a ';
         query += 'WITH a.toolName as toolName, collect(distinct a) as nodes ';
-        query += 'RETURN toolName, size(nodes) as count, nodes ';
+        query += 'RETURN toolName, size(nodes) as count, nodes ';*/
+        let query = 'MATCH (a:DATA) WHERE a.uuid IN ' + JSON.stringify(uuidCollected) + ' ';
+        query += ' WITH distinct a.toolName as toolName, collect(distinct a) as nodes Return toolName, size(nodes) as count, nodes';
         console.log(query);
         return query;
     }
@@ -617,6 +619,9 @@ class PipelinePanelCtrl extends MetricsPanelCtrl {
                     uuidCollected = [];
                 }
                 if (result.uuids && result.uuids.length > 0) {
+                    if(hopLevel == 1){
+                        resultContainer['0'] = uuidCollected.concat(result.sourceUuids);    
+                    }
                     resultContainer['' + hopLevel] = uuidCollected.concat(result.uuids);
                     self.processHop(result.toolName, 'uuid', result.uuids, localExcludeLabels, resultContainer, (hopLevel + 1));
                 } else {
@@ -635,7 +640,8 @@ class PipelinePanelCtrl extends MetricsPanelCtrl {
                 var rowObj = hopResultSet[i]['row'];
                 let toolData = {
                     toolName: rowObj[0],
-                    uuids: rowObj[1]
+                    uuids: rowObj[1],
+                    sourceUuids: rowObj[2]
                 };
                 dataArray.push(toolData);
             }
