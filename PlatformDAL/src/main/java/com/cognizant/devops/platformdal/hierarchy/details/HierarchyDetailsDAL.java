@@ -80,4 +80,17 @@ public class HierarchyDetailsDAL extends BaseDAL {
 		terminateSessionFactory();
 		return true;
 	}
+	
+	public boolean addHierarchyDetailsList(List<HierarchyDetails> hiearchyList) {
+		getSession().beginTransaction();
+		System.out.println( "list of hiearchy detials");
+		for(HierarchyDetails details:hiearchyList){
+		getSession().save(details);
+		}
+		
+		getSession().getTransaction().commit();
+		terminateSession();
+		terminateSessionFactory();
+		return true;
+	}
 }
