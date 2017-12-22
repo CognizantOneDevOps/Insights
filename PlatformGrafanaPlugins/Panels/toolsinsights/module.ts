@@ -322,7 +322,7 @@ class PipelinePanelCtrl extends MetricsPanelCtrl {
             let traceTimelagToolsRelArray = data.data.results[0].data[0].row[0];
             self.sortResult(traceTimelagToolsRelArray, self.selectedTool);
         });
-        self.toolsFieldDetails();
+        //self.toolsFieldDetails();
     }
 
     sortResult(records, userSelectedToolName): void {
