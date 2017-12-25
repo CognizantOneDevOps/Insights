@@ -40,10 +40,11 @@ class BitBucketAgentAllBranches(BaseAgent):
         while fetchNextPage:
             # get all bitbucket projects
             bitBucketProjects = self.getResponse(getProjectsUrl+'?limit='+str(limit)+'&start='+str(start), 'GET', UserId, Passwd, None)
-            if len(bitBucketProjects["values"]) == 0:
+            numProjects = len(bitBucketProjects["values"])
+            if numProjects == 0:
                 fetchNextPage = False
                 break;
-            for projects in range(len(bitBucketProjects["values"])):
+            for projects in range(numProjects):
                 ProjKey = bitBucketProjects["values"][projects]["key"]
                 trackingProject = self.tracking.get(ProjKey,None)
                 if trackingProject is None:
@@ -55,10 +56,11 @@ class BitBucketAgentAllBranches(BaseAgent):
                 while fetchNextRepoPage:
                     # get all repos under a project
                     bitBicketRepos = self.getResponse(bitBicketReposUrl+'?limit='+str(limit)+'&start='+str(repoStart), 'GET', UserId, Passwd, None)
-                    if len(bitBicketRepos["values"]) == 0:
+                    numRepos = len(bitBicketRepos["values"])
+                    if numRepos == 0:
                         fetchNextRepoPage = False
                         break;
-                    for repos in range(len(bitBicketRepos["values"])):
+                    for repos in range(numRepos):
                         repoName = bitBicketRepos["values"][repos]["slug"]
                         repoTracking = trackingProject.get(repoName, None)
                         if repoTracking is None:
@@ -70,10 +72,11 @@ class BitBucketAgentAllBranches(BaseAgent):
                         fetchNextBranchPage = True
                         while fetchNextBranchPage:
                             bitBicketBranches = self.getResponse(bitBicketBranchessUrl+'?limit='+str(limit)+'&start='+str(branchStart), 'GET', UserId, Passwd, None)
-                            if len(bitBicketBranches["values"]) == 0:
+                            numBranches = len(bitBicketBranches["values"])
+                            if numBranches == 0:
                                 fetchNextBranchPage = False
                                 break;
-                            for branches in range(len(bitBicketBranches["values"])):
+                            for branches in range(numBranches):
                                 data = []
                                 branchName = bitBicketBranches["values"][branches]["displayId"]
                                 branchTracking = repoTracking.get(branchName, None)
