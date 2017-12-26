@@ -228,7 +228,9 @@ class PipelinePanelCtrl extends MetricsPanelCtrl {
         if (this.toolDetailMappingJson.length === 0) {
             this.selectedSeq = [];
         }
-        this.msg = this.panel.toolsInsightsPanelCtrl.message;
+        if(this.panel.toolsInsightsPanelCtrl.message){
+            this.msg = this.panel.toolsInsightsPanelCtrl.message;
+        }
         if (this.selectedSeq.length !== 0) {
             this.selectOptionsMsg = "";
             return true;
@@ -654,6 +656,8 @@ class PipelinePanelCtrl extends MetricsPanelCtrl {
         if (this.pipelineToolsArray === undefined) {
             this.msg = "Please select valid tools sequence from options tab";
         }
+        this.resultContainer = {};
+        this.toolDataMap = {};
         this.processHop(this.selectedTool, selectedField, [inputVal], [], this.resultContainer, 1);
         let self = this;
         let validateResults = function () {
@@ -671,7 +675,14 @@ class PipelinePanelCtrl extends MetricsPanelCtrl {
                     self.totalNodes = data.data.results[0].data.length;
                     var queryData = data.data;
                     self.parseQueryResult(queryData);
-                    self.toolsRelationQueryOutput();
+                    if(self.totalNodes > 0){
+                        self.toolsRelationQueryOutput();
+                    }else{
+                        self.showAdvanceView = false;
+                        self.showThrobber = false;
+                        self.showToolDetails = false;
+                        self.msg = "No results found";
+                    }
                 });
             }
         };
