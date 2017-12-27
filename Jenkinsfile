@@ -51,7 +51,7 @@ node {
 	
 	// Platform UI2.0 Ends
 	stage ('SlackNotification') {
-   	    slackSend channel: '#insightsjenkins', color: 'good', message: 'New Artifacts for Insights are uploaded to Nexus!!!', teamDomain: 'ctsdevopsbot', token: slackToken
+   	    slackSend channel: '#insightsjenkins', color: 'good', message: "New Insights artifacts are uploaded to Nexus for commitID ${env.commitID}", teamDomain: 'ctsdevopsbot', token: slackToken
   	}
 
 }
