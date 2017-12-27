@@ -25,7 +25,8 @@ export class ToolsInsightEditorCtrl {
   fieldVal: Fields[];
   toolMappingJson = [];
   defaultMappingJson = [];
-  defaultButtonOption = 1;
+  defaultButtonOption: number;
+  advanceSettingOption = 0;
 
   /** @ngInject */
   constructor($scope, private $q, private uiSegmentSrv) {
@@ -42,6 +43,9 @@ export class ToolsInsightEditorCtrl {
 
     if (self.toolsInsightsPanelCtrl.toolDetailMappingJson !== undefined) {
       self.toolMappingJson = self.toolsInsightsPanelCtrl.toolDetailMappingJson;
+    }
+    if (self.defaultButtonOption === undefined) {
+      self.defaultButtonOption = 1;
     }
     self.checkEmptyToolList();
     self.fieldList = self.toolsInsightsPanelCtrl.toolDetails;
@@ -286,6 +290,14 @@ export class ToolsInsightEditorCtrl {
     } else {
       return false;
     }
+  }
+
+  advanceViewAccordian() {
+    this.advanceSettingOption = 1;
+  }
+
+  advanceViewAccordianHide() {
+    this.advanceSettingOption = 0;
   }
 
 }
