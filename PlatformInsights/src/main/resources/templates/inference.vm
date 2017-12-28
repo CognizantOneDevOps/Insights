@@ -16,7 +16,8 @@
 						<tr> 
 							<td align="center" style="background-color:#000000;">
 							
-							<embed  src="cid:${cidlogo}">
+							<embed  src="cid:cid">
+							<embed  src="cid:${cid}">
 							</td>
 					
 						<!--	<td  style="padding-right:7%;padding-left:7%;padding-top:30px;padding-bottom:22px;"> 
@@ -87,10 +88,15 @@
 
                         #if(($foreach.index+1) % 2 ==0)
 
-                </tr>
-                <tr>
-                    #end #end #else
-                    <p></p>
+                		 </tr>
+               			 <tr>
+                   		#end 
+                    #end 
+                    #else
+                    <p><span style="font-size: 14px; margin-left:50px;font-family:Proxima Nova;">
+                    No Data Found
+                    </span>
+                    </p>
                     #end
 
                 </tr>
