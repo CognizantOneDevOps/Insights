@@ -15,10 +15,7 @@
  ******************************************************************************/
 package com.cognizant.devops.insightsemail.core.util;
 
-import java.awt.Image;
 import java.io.StringWriter;
-
-import javax.swing.ImageIcon;
 
 import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
@@ -26,13 +23,15 @@ import org.apache.velocity.app.VelocityEngine;
 import org.apache.velocity.runtime.RuntimeConstants;
 import org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader;
 
+import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
+import com.cognizant.devops.platformcommons.config.EmailConfiguration;
 import com.cognizant.devops.platformcommons.core.email.EmailConstants;
 import com.google.gson.JsonArray;
 
 public class EmailFormatter {
 	
 	private final static EmailFormatter emailFormatter = new EmailFormatter();
-	
+	EmailConfiguration emailConfiguration = ApplicationConfigProvider.getInstance().getEmailConfiguration();
 	private EmailFormatter() {
 	}
 	
@@ -40,17 +39,19 @@ public class EmailFormatter {
 		return emailFormatter;
 	}
 
-	public StringWriter populateTemplate(JsonArray array,String templateName, Image image, Image imageLine, Image imagefooterLogo) {
-		
+	public StringWriter populateTemplate(JsonArray array,String templateName) {
+		/*String logo= emailConfiguration.getLogo();
+		String line= emailConfiguration.getLine();
+		String footerLogo= emailConfiguration.getFooterLogo();*/
 		StringWriter stringWriter = new StringWriter();
 		Template template = initializeTemplate(templateName);
 		VelocityContext context = new VelocityContext(); 
-		context.put(EmailConstants.ACCORDIANDATA,array);
-		context.put("cidlogo",image);
+				context.put(EmailConstants.ACCORDIANDATA,array);
+/*		context.put("cidlogo",imageLogo);
 		context.put("cidLine",imageLine);
 		context.put("cidFooter",imagefooterLogo);
+*/		
 		template.merge(context,stringWriter);
-		System.out.println(stringWriter.toString());
 		return stringWriter;
 	}
 
