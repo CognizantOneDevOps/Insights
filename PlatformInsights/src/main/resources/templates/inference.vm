@@ -16,30 +16,11 @@
 						<tr> 
 							<td align="center" style="background-color:#000000;">
 							
-							<embed  src="cid:cid">
-							<embed  src="cid:${cid}">
+							
+							<embed  src="cid:${logoImage}">
 							</td>
 					
-						<!--	<td  style="padding-right:7%;padding-left:7%;padding-top:30px;padding-bottom:22px;"> 
-								<table width="100%" border="0" cellpadding="0" cellspacing="0" style="text-align:left;font-size:15px;line-height:16px;color:#999999;"> 
-									<tbody> 
-									<tr> 
-									<th  width="30%" style="padding-right:10px;font-weight:normal;font-family:proxima_novasemibold;vertical-align:bottom;"> 
-									<div  id="logo">
-									<p style="margin-top:0;margin-right:0;margin-left:0;margin-bottom:8px;">
-									<img src="http://localhost:7080/PlatformInsights/img/Cognizant_Insights.svg" alt="logo" width="140" style="border-width:0;height:auto;-ms-interpolation-mode:bicubic;max-width:100%;"></p> 
-									</div> </th> 
-									
-									<th width="70%" align="right"  style="font-weight:normal;font-family:Proxima Nova;vertical-align:bottom;"> 
-									<div >
-									<p style="margin-top:0;margin-right:0;margin-left:0;margin-bottom:8px;font-size:14px;">Insights Inference</p>
-									</div> </th> 
-									</tr> 
-									</tbody> 
-								</table> 
 						
-							</td> 
-					-->		
 							
 						</tr> 
 			
@@ -108,6 +89,7 @@
         </table>
         <table width="100%" cellpadding="0" cellspacing="0" border="0">
           <tr>
+          		<!--
           		<td style=" text-align:left;padding-left:15px;"> 
           		
           				© 2017 Cognizant Technology Solutions, Inc., All rights reserved
@@ -115,9 +97,16 @@
           		</td>
           		<td align="right">
 
-          			<embed  src ="cid:${cidFooter}">
+          			<embed  src ="cid:${footerImage}">
           				
           		</td>
+          		-->
+          		<td>
+          			
+          			<embed  src ="cid:${footerImage}"  width="100%">
+          			
+          		</td>
+          		
           </tr>
           
         </table>
