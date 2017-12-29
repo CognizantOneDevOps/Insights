@@ -17,10 +17,13 @@
 package com.cognizant.devops.platformcommons.core.email;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.Date;
 import java.util.Properties;
 
+import javax.activation.DataHandler;
+import javax.activation.DataSource;
 import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.Multipart;
@@ -30,6 +33,7 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
+import javax.mail.util.ByteArrayDataSource;
 
 import org.apache.log4j.Logger;
 
@@ -37,20 +41,20 @@ import com.cognizant.devops.platformcommons.config.EmailConfiguration;
 
 public class EmailUtil {
 	private static final Logger LOG = Logger.getLogger(EmailUtil.class);
-	
+
 	private static final EmailUtil emailUtil = new EmailUtil();
-	
+
 	private EmailUtil() {
-		
+
 	}
-	
+
 	public static EmailUtil getInstance() {
 		return emailUtil;
 	}
-	
-	public void sendEmail(Mail mail,EmailConfiguration emailConf, String emailBody) throws MessagingException, UnsupportedEncodingException {
 
-		
+	public void sendEmail(Mail mail,EmailConfiguration emailConf, String emailBody) throws MessagingException,
+																					IOException,UnsupportedEncodingException {
+
 		Properties props = System.getProperties();
 		props.put(EmailConstants.SMTPHOST, emailConf.getSmtpHostServer());
 		props.put(EmailConstants.SMTPPORT, emailConf.getSmtpPort());
@@ -60,7 +64,6 @@ public class EmailUtil {
 		// Create a Session object to represent a mail session with the specified
 		// properties.
 		Session session = Session.getDefaultInstance(props);
-
 		MimeMessage msg = new MimeMessage(session);
 		msg.addHeader(EmailConstants.CONTENTTYPE, EmailConstants.CHARSET);
 		msg.addHeader(EmailConstants.FORMAT, EmailConstants.FLOWED);
@@ -68,33 +71,26 @@ public class EmailUtil {
 		msg.setFrom(new InternetAddress(mail.getMailFrom(), EmailConstants.NOREPLY));
 		msg.setReplyTo(InternetAddress.parse(mail.getMailTo(), false));
 		msg.setSubject(mail.getSubject(), EmailConstants.UTF);
-		msg.setContent(emailBody, EmailConstants.HTML);
 		msg.setSentDate(new Date());
 		msg.setRecipients(Message.RecipientType.TO, InternetAddress.parse(mail.getMailTo(), false));
-		
-/*		URL url =getClass().getClassLoader().getResource("img/Insight.svg");
- 		Image imageLine  = null;
-		Image imagefooterLogo  = null;
-		new ImageIcon(getClass().getClassLoader().getResource(logo));
-		try {
-			imageLine = ImageIO.read(ClassLoader.getSystemResource(line));
-			imagefooterLogo = ImageIO.read(ClassLoader.getSystemResource("img/FooterLogo.svg"));
-		} catch (IOException e) {
-			LOG.debug(e);
-		}*/
+		MimeBodyPart contentPart = new MimeBodyPart();
+		contentPart.setContent(emailBody, EmailConstants.HTML);
+
 		Multipart multipart = new MimeMultipart();
-		MimeBodyPart imagePart = new MimeBodyPart();
-		try {
-			
-			imagePart.setHeader("Content-ID", "<cid>");
-			imagePart.attachFile("img/Insight.svg");
-		} catch (IOException e) {
-			LOG.debug(e);
-		}
+		multipart.addBodyPart(contentPart);
+
+		String imageId="logoImage";
+		String imagePath="/img/masthead.jpg";
+		MimeBodyPart imagePart = generateContentId(imageId, imagePath);
 		multipart.addBodyPart(imagePart);
+
+		imageId="footerImage";
+		imagePath="/img/footer.jpg";
+		MimeBodyPart imagePart_1 = generateContentId(imageId, imagePath);
+		multipart.addBodyPart(imagePart_1);
+
 		msg.setContent(multipart);
-		
-		
+
 		try (Transport transport = session.getTransport();) {
 			LOG.debug("Sending email...");
 
@@ -108,6 +104,27 @@ public class EmailUtil {
 			throw ex;
 		} 
 
+	}
+
+	private MimeBodyPart generateContentId(String imageId, String path) throws IOException, MessagingException
+	{
+		MimeBodyPart imagePart = new MimeBodyPart();
+		InputStream stream = getClass().getResourceAsStream(path);
+		DataSource fds = null;
+		try {
+			fds = new ByteArrayDataSource(stream,"image/jpg");
+			imagePart.setDataHandler(new DataHandler(fds));
+			imagePart.setContentID("<"+ imageId +">");
+			imagePart.setHeader("Content-Type", "image/jpg");
+		} catch (IOException ex) {
+			LOG.debug(ex);
+			throw ex;
+		} catch (MessagingException ex) {
+			LOG.debug(ex);
+			throw ex;
+		}
+
+		return imagePart;
 	}
 
 }
