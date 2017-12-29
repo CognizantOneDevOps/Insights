@@ -40,18 +40,12 @@ public class EmailFormatter {
 	}
 
 	public StringWriter populateTemplate(JsonArray array,String templateName) {
-		/*String logo= emailConfiguration.getLogo();
-		String line= emailConfiguration.getLine();
-		String footerLogo= emailConfiguration.getFooterLogo();*/
 		StringWriter stringWriter = new StringWriter();
 		Template template = initializeTemplate(templateName);
 		VelocityContext context = new VelocityContext(); 
-				context.put(EmailConstants.ACCORDIANDATA,array);
-/*		context.put("cidlogo",imageLogo);
-		context.put("cidLine",imageLine);
-		context.put("cidFooter",imagefooterLogo);
-*/		
+		context.put(EmailConstants.ACCORDIANDATA,array);
 		template.merge(context,stringWriter);
+		System.out.println(stringWriter);
 		return stringWriter;
 	}
 
