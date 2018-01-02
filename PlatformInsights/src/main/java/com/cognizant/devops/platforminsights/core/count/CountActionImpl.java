@@ -77,7 +77,7 @@ public class CountActionImpl extends BaseActionImpl {
 				saveResult(resultList);
 			} else {
 				log.debug("GroupBy found False. Counting KPI result -  Query - "+esQuery);
-				JsonObject jsonObj = esDBHandler.queryES(ConfigConstants.SPARK_ES_HOST+":"+ConfigConstants.SPARK_ES_PORT+"/"+kpiDefinition.getEsResource()+"/_count?size=0", esQuery);
+				JsonObject jsonObj = esDBHandler.queryES(ConfigConstants.SPARK_ES_HOST+":"+ConfigConstants.SPARK_ES_PORT+"/"+kpiDefinition.getEsResource()+"/_count", esQuery);
 				JsonElement jsonElement = jsonObj.get("count");
 				resultMap = getResultMap(jsonElement.getAsLong(),null);
 				saveResult(resultMap);
