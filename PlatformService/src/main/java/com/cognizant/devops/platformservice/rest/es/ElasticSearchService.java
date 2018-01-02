@@ -74,7 +74,7 @@ public class ElasticSearchService {
 			ClientResponse grafanaResponse = RestHandler.doGet(dashboardApiUrl, null, headers);
 			JsonElement response = new JsonParser().parse(grafanaResponse.getEntity(String.class));
 			JsonArray dashboardsJsonArray = response.getAsJsonArray();
-			String grafanaBaseUrl = ApplicationConfigProvider.getInstance().getGrafana().getGrafanaDashboardEndPoint();
+			String grafanaBaseUrl = ApplicationConfigProvider.getInstance().getGrafana().getGrafanaExternalEndPoint();
 			if(grafanaBaseUrl == null) {
 				grafanaBaseUrl = ApplicationConfigProvider.getInstance().getGrafana().getGrafanaEndpoint();
 			}
