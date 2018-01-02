@@ -27,6 +27,25 @@
       "jira-key": [
         "jiraKey"
       ]
+    },
+    "pullRequests": {
+      "id" : "pullReqId",
+      "state" : "pullReqState",
+      "createdDate" : "createdDate",
+      "updatedDate" : "updatedDate",
+      "closedDate" : "closedDate",
+      "fromRef" : {
+        "displayId" : "fromBranch"
+      },
+      "toRef" : {
+        "displayId" : "toBranch"
+      },
+      "author": {
+        "user": {
+          "name": "authorName",
+          "emailAddress": "authorEmail"
+        }
+      }
     }
   },
   "runSchedule": 30,
@@ -35,6 +54,7 @@
   "StartFrom" : "2017-07-01 00:00:00",
   "useResponseTemplate" : true,
   "scanAllBranches" : false,
+  "scanPullRequests": true,
   "auth": "base64",
   "UserID": "",
   "Passwd": "",
