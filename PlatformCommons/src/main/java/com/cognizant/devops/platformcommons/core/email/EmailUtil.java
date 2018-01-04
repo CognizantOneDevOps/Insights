@@ -85,7 +85,7 @@ public class EmailUtil {
 		multipart.addBodyPart(imagePart);
 
 		imageId="footerImage";
-		imagePath="/img/Footer.jpg";
+		imagePath="/img/FooterImg.jpg";
 		MimeBodyPart imagePart_1 = generateContentId(imageId, imagePath);
 		multipart.addBodyPart(imagePart_1);
 
