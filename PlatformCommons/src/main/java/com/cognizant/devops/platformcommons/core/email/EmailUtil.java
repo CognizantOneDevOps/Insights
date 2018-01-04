@@ -80,12 +80,12 @@ public class EmailUtil {
 		multipart.addBodyPart(contentPart);
 
 		String imageId="logoImage";
-		String imagePath="/img/masthead.jpg";
+		String imagePath="/img/Insights.jpg";
 		MimeBodyPart imagePart = generateContentId(imageId, imagePath);
 		multipart.addBodyPart(imagePart);
 
 		imageId="footerImage";
-		imagePath="/img/footer.jpg";
+		imagePath="/img/Footer.jpg";
 		MimeBodyPart imagePart_1 = generateContentId(imageId, imagePath);
 		multipart.addBodyPart(imagePart_1);
 
