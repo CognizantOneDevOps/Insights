@@ -25,11 +25,13 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.cognizant.devops.platformdal.entity.definition.EntityDefinition;
 import com.cognizant.devops.platformdal.entity.definition.EntityDefinitionDAL;
 import com.cognizant.devops.platformdal.hierarchy.details.HierarchyDetails;
 import com.cognizant.devops.platformdal.hierarchy.details.HierarchyDetailsDAL;
+import com.cognizant.devops.platformservice.rest.dataTagging.util.DataProcessorUtil;
 import com.cognizant.devops.platformservice.rest.neo4j.GraphDBService;
 import com.cognizant.devops.platformservice.rest.util.PlatformServiceUtil;
 import com.google.gson.Gson;
@@ -187,4 +189,32 @@ public class HierarchyDetailsService {
 		List<String> hierarchyList = hierarchyDetailsDAL.fetchDistinctHierarchyName();
 		return PlatformServiceUtil.buildSuccessResponseWithData(hierarchyList);
 	}
+
+	@RequestMapping(value = "/uploadHierarchyDetails", headers=("content-type=multipart/*"), method = RequestMethod.POST,
+			produces = MediaType.APPLICATION_JSON_UTF8_VALUE,consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+	public @ResponseBody JsonObject uploadHierarchyDetails(@RequestParam("file") MultipartFile file) {
+		boolean status =false;
+		if (!file.isEmpty()) {
+			status=DataProcessorUtil.getInstance().readData(file);
+		}
+		if (status) {
+			return PlatformServiceUtil.buildSuccessResponse();
+		} else {
+			return PlatformServiceUtil.buildFailureResponse("Failed to upload data");
+		}
+
+
+	}
+
+	@RequestMapping(value = "/getAllHierarchyDetails", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+	public @ResponseBody JsonObject getAllHierarchyDetails() {
+		Gson gson = new Gson();
+		HierarchyDetailsDAL hierarchyDetailsDAL = new HierarchyDetailsDAL();
+		List<HierarchyDetails> hierarchyDetailsList = hierarchyDetailsDAL.fetchAllEntityData();
+		JsonObject hierarchyDetailsJsonObj = new JsonObject();
+		hierarchyDetailsJsonObj.add("details", gson.toJsonTree(hierarchyDetailsList));		
+		return hierarchyDetailsJsonObj;
+
+	}
+
 }
