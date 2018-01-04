@@ -89,8 +89,7 @@
         </table>
         <table width="100%" cellpadding="0" cellspacing="0" border="0">
           <tr>
-          		<!--
-          		<td style=" text-align:left;padding-left:15px;"> 
+                <td style=" text-align:left;padding-left:15px;"> 
           		
           				© 2017 Cognizant Technology Solutions, Inc., All rights reserved
           			
@@ -100,12 +99,14 @@
           			<embed  src ="cid:${footerImage}">
           				
           		</td>
-          		-->
+          		
+          		<!--
           		<td>
           			
           			<embed  src ="cid:${footerImage}"  width="100%">
           			
           		</td>
+          		-->
           		
           </tr>
           
