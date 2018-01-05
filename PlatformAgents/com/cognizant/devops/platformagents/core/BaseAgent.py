@@ -150,14 +150,14 @@ class BaseAgent(object):
             uniqeKey: String --> comma separated node properties
         }
     '''
-    def publishToolsData(self, data, metadata=None, timeStampField=None, timeStampFormat=None, isEpochTimeFormat=False):
+    def publishToolsData(self, data, metadata=None, timeStampField=None, timeStampFormat=None, isEpochTime=False):
         if metadata:
             metadataType = type(metadata)
             if metadataType is not dict:
                 raise ValueError('BaseAgent: Dict metadata object is expected')
         if data:
             self.addExecutionId(data, self.executionId)
-            self.addTimeStampField(data, timeStampField, timeStampFormat, isEpochTimeFormat)
+            self.addTimeStampField(data, timeStampField, timeStampFormat, isEpochTime)
             self.messageFactory.publish(self.dataRoutingKey, data, self.config.get('dataBatchSize', None), metadata)
             self.logIndicator(self.PUBLISH_START, self.config.get('isDebugAllowed', False))
 
@@ -165,12 +165,12 @@ class BaseAgent(object):
         self.addExecutionId(data, self.executionId)
         self.messageFactory.publish(self.healthRoutingKey, data)
     
-    def addTimeStampField(self, data, timeStampField=None, timeStampFormat=None, isEpochTimeFormat=False):
+    def addTimeStampField(self, data, timeStampField=None, timeStampFormat=None, isEpochTime=False):
         if timeStampField is None:
             timeStampField = self.config.get('timeStampField')
         if timeStampFormat is None:
             timeStampFormat = self.config.get('timeStampFormat')
-        if isEpochTimeFormat is None:
+        if isEpochTime is None:
             isEpochTime = self.config.get('isEpochTimeFormat', False)
         for d in data:
             eventTime = d.get(timeStampField, None)
