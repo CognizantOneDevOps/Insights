@@ -96,8 +96,8 @@ public class AgentDataSubscriber extends EngineSubscriberResponseHandler{
 				}
 			}
 			try {
-				String cypherQuery = null;
-				String queryLabel = null;
+				String cypherQuery = "";
+				String queryLabel = "";
 				for(String label : labels){
 					if(label != null && label.trim().length() > 0) {
 						queryLabel += ":"+label;
