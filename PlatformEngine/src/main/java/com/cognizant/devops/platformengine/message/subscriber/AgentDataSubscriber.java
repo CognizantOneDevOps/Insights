@@ -68,11 +68,14 @@ public class AgentDataSubscriber extends EngineSubscriberResponseHandler{
 			json = messageObject.get("data");
 			if(messageObject.has("metadata")) {
 				JsonObject metadata = messageObject.get("metadata").getAsJsonObject();
+				log.error(metadata.toString());
 				if(metadata.has("labels")) {
 					JsonArray additionalLabels = metadata.get("labels").getAsJsonArray();
 					for(JsonElement additionalLabel : additionalLabels) {
-						if(!labels.contains(additionalLabel.getAsString())) {
-							labels.add(additionalLabel.getAsString());
+						String label = additionalLabel.getAsString();
+						if(!labels.contains(label)) {
+							labels.add(label);
+							log.error(label);
 						}
 					}
 				}
@@ -96,7 +99,9 @@ public class AgentDataSubscriber extends EngineSubscriberResponseHandler{
 				String cypherQuery = null;
 				String queryLabel = null;
 				for(String label : labels){
-					queryLabel += ":"+label;
+					if(label != null && label.trim().length() > 0) {
+						queryLabel += ":"+label;
+					}
 				}
 				if(dataUpdateSupported){
 					cypherQuery = buildCypherQuery(queryLabel, uniqueKey);
