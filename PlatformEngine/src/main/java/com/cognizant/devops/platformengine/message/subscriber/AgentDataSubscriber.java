@@ -68,14 +68,12 @@ public class AgentDataSubscriber extends EngineSubscriberResponseHandler{
 			json = messageObject.get("data");
 			if(messageObject.has("metadata")) {
 				JsonObject metadata = messageObject.get("metadata").getAsJsonObject();
-				log.error(metadata.toString());
 				if(metadata.has("labels")) {
 					JsonArray additionalLabels = metadata.get("labels").getAsJsonArray();
 					for(JsonElement additionalLabel : additionalLabels) {
 						String label = additionalLabel.getAsString();
 						if(!labels.contains(label)) {
 							labels.add(label);
-							log.error(label);
 						}
 					}
 				}
