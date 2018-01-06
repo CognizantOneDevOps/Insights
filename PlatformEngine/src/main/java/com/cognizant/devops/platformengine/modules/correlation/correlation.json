@@ -1,0 +1,16 @@
+[
+  {
+    "source": {
+      "toolName": "JENKINS",
+      "fields": [
+        "scmCommitId", "lastBuiltRevision"
+      ]
+    },
+    "destination": {
+      "toolName" : "GIT",
+      "fields": [
+        "commitId"
+      ]
+    }
+  }
+]
