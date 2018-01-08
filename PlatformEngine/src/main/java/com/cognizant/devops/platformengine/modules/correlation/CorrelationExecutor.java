@@ -35,7 +35,7 @@ public class CorrelationExecutor {
 	private long minPreviousCorrelationTime;
 	private long currentCorrelationTime;
 	
-	private int dataBatchSize = 20;
+	private int dataBatchSize = 2000;
 	
 	/**
 	 * Correlation execution starting point.
@@ -50,8 +50,12 @@ public class CorrelationExecutor {
 		Map<String, List<String>> sourceCorrelationMapping = buildSourceCorrelationMapping(correlations);
 		for(Correlation correlation: correlations) {
 			String relationName = buildRelationName(correlation);
-			List<JsonObject> sourceDataList = loadSourceData(correlation.getSource(), relationName);
-			executeCorrelations(correlation, sourceDataList, sourceCorrelationMapping.get(correlation.getSource().getToolName()).size());
+			int processedRecords = 1;
+			while(processedRecords > 0) {
+				List<JsonObject> sourceDataList = loadSourceData(correlation.getSource(), relationName);
+				processedRecords = executeCorrelations(correlation, sourceDataList, sourceCorrelationMapping.get(correlation.getSource().getToolName()).size());
+				//remove RAW labels
+			}
 		}
 	}
 	
@@ -67,14 +71,14 @@ public class CorrelationExecutor {
 		List<String> fields = source.getFields();
 		StringBuffer cypher = new StringBuffer();
 		cypher.append("MATCH (source:DATA:RAW:").append(sourceToolName).append(") ");
-		cypher.append("where (not exists(n.rels) OR not \"").append(relName).append("\" in n.rels) ");
+		cypher.append("where (not exists(source.rels) OR not \"").append(relName).append("\" in source.rels) ");
 		cypher.append("OR (not exists(source.correlationTime) OR ");
 		cypher.append("( source.correlationTime <= ").append(maxPreviousCorrelationTime).append(" ");
 		cypher.append("AND source.correlationTime > ").append(minPreviousCorrelationTime).append(")) ");
 		cypher.append("WITH source limit ").append(dataBatchSize).append(" ");
 		cypher.append("WITH source, [] ");
 		for(String field : fields) {
-			cypher.append("+ coalesce(source.").append(field).append(", \"\") ");
+			cypher.append("+ split(coalesce(source.").append(field).append(", \"\"),\",\") ");
 		}
 		cypher.append("as values WITH source.uuid as uuid, values UNWIND values as value WITH uuid, value where value <> \"\" ");
 		cypher.append("WITH distinct uuid, collect(distinct value) as values WITH { uuid : uuid, values : values} as data ");
@@ -104,29 +108,38 @@ public class CorrelationExecutor {
 	 * @param dataList
 	 * @param allowedSourceRelationCount
 	 */
-	private void executeCorrelations(Correlation correlation, List<JsonObject> dataList, int allowedSourceRelationCount) {
+	private int executeCorrelations(Correlation correlation, List<JsonObject> dataList, int allowedSourceRelationCount) {
 		CorrelationNode source = correlation.getSource(); 
 		CorrelationNode destination = correlation.getDestination();
 		StringBuffer correlationCypher = new StringBuffer();
 		String destinationField = destination.getFields().get(0); //currently, we will support only one destination field.
-		String relName = "FROM_"+source.getToolName()+"_TO_"+destination.getToolName();
+		String relName = buildRelationName(correlation);
 		correlationCypher.append("UNWIND {props} as properties ");
 		correlationCypher.append("MATCH (source:DATA:RAW:").append(source.getToolName()).append(" {uuid: properties.uuid}) ");
 		correlationCypher.append("set source.correlationTime=").append(currentCorrelationTime).append(" WITH source, properties ");
 		correlationCypher.append("MATCH (destination:DATA:").append(destination.getToolName()).append(") ");
-		correlationCypher.append("WHERE destination.").append(destinationField).append(" IN properties.value ");
+		correlationCypher.append("WHERE destination.").append(destinationField).append(" IN properties.values ");
 		correlationCypher.append("CREATE (source) -[r:").append(relName).append("]-> (destination) ");
-		correlationCypher.append("set source.rels = coalesce(n.rels, []) + ").append(relName).append(" ");
+		correlationCypher.append("set source.rels = coalesce(source.rels, []) + \"").append(relName).append("\" ");
 		correlationCypher.append("WITH source where size(source.rels) >= ").append(allowedSourceRelationCount).append(" ");
 		correlationCypher.append("REMOVE source:RAW RETURN count(distinct source) as count");
 		Neo4jDBHandler dbHandler = new Neo4jDBHandler();
 		JsonObject correlationExecutionResponse;
+		int processedRecords = 0;
 		try {
+			long st = System.currentTimeMillis();
 			correlationExecutionResponse = dbHandler.bulkCreateNodes(dataList, null, correlationCypher.toString());
 			log.debug(correlationExecutionResponse);
+			processedRecords = correlationExecutionResponse.get("response").getAsJsonObject()
+					.get("results").getAsJsonArray().get(0).getAsJsonObject()
+					.get("data").getAsJsonArray().get(0).getAsJsonObject()
+					.get("row").getAsInt();
+			log.debug("Processed "+processedRecords+" records in "+(System.currentTimeMillis() - st) + " ms");
+			System.out.println("Processed "+processedRecords+" records in "+(System.currentTimeMillis() - st) + " ms");
 		} catch (GraphDBException e) {
 			log.error("Error occured while executing correlations for relation "+relName+".", e);
 		}
+		return processedRecords;
 	}
 	
 	/**
