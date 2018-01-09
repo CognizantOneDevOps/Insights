@@ -21,7 +21,7 @@
       "name": "authorName",
       "emailAddress": "authorEmail"
     },
-    "authorTimestamp": "commitTime",
+    "authorTimestamp": "createdTime",
     "message": "commitMessage",
     "properties": {
       "jira-key": [
@@ -31,9 +31,9 @@
     "pullRequests": {
       "id" : "pullReqId",
       "state" : "pullReqState",
-      "createdDate" : "createdDate",
-      "updatedDate" : "updatedDate",
-      "closedDate" : "closedDate",
+      "createdDate" : "createdTime",
+      "updatedDate" : "updatedTime",
+      "closedDate" : "closedTime",
       "fromRef" : {
         "displayId" : "fromBranch"
       },
@@ -58,7 +58,7 @@
   "auth": "base64",
   "UserID": "",
   "Passwd": "",
-  "timeStampField":"commitTime",
+  "timeStampField":"createdTime",
   "isEpochTimeFormat" : true,
   "BaseEndPoint": "http://127.0.0.1:7990/rest/api/1.0/projects/",
   "isDebugAllowed" : false,
