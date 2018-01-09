@@ -6,19 +6,20 @@ import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.cognizant.devops.platformdal.hierarchy.details.HierarchyDetails;
-import com.cognizant.devops.platformdal.hierarchy.details.HierarchyDetailsDAL;
+import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBException;
+import com.cognizant.devops.platformcommons.dal.neo4j.Neo4jDBHandler;
 import com.cognizant.devops.platformservice.rest.dataTagging.Constants.DatataggingConstants;
+import com.google.gson.JsonObject;
 
 
 
@@ -34,7 +35,7 @@ public class DataProcessorUtil  {
 		return dataProcessorUtil;
 	}
 
-	
+
 	private File convertToFile(MultipartFile multipartFile) throws IOException, FileNotFoundException {
 		File file = new File(multipartFile.getOriginalFilename());
 		file.createNewFile(); 
@@ -51,7 +52,7 @@ public class DataProcessorUtil  {
 		} catch (IOException ex) {
 			LOG.debug(ex);
 		}
-		HierarchyDetailsDAL hierarchyDetailsDAL = new HierarchyDetailsDAL();
+		
 		boolean status = false;
 		try (	Reader reader = new FileReader(csvfile);  
 				CSVParser csvParser = new CSVParser(reader, CSVFormat.DEFAULT
@@ -66,8 +67,9 @@ public class DataProcessorUtil  {
 						.withSkipHeaderRecord()
 						);
 				){
+			/*HierarchyDetailsDAL hierarchyDetailsDAL = new HierarchyDetailsDAL();
 			List<HierarchyDetails> details = new ArrayList<HierarchyDetails>();
-			for (CSVRecord csvRecord : csvParser.getRecords()) {
+						for (CSVRecord csvRecord : csvParser.getRecords()) {
 				HierarchyDetails heirarchyDetails=new HierarchyDetails();
 				heirarchyDetails.setId(Integer.parseInt(csvRecord.get(DatataggingConstants.ID)));
 				heirarchyDetails.setLevel_1(csvRecord.get(DatataggingConstants.LEVEL1));
@@ -77,7 +79,7 @@ public class DataProcessorUtil  {
 				heirarchyDetails.setToolName(csvRecord.get(DatataggingConstants.TOOL_NAME));
 				heirarchyDetails.setToolProperty(csvRecord.get(DatataggingConstants.TOOL_PROPERTY));
 				heirarchyDetails.setPropertyValue(csvRecord.get(DatataggingConstants.PROPERTY_VALUE));
-				
+
 				StringBuilder hiearchyData= new StringBuilder();
 				String appenddata="";
 				if(!StringUtils.isBlank(csvRecord.get(DatataggingConstants.LEVEL1))){
@@ -107,13 +109,48 @@ public class DataProcessorUtil  {
 				heirarchyDetails.setHierarchyName(StringUtils.removeEnd(hiearchyData.toString() ,DatataggingConstants.COLON));
 				details.add(heirarchyDetails);
 			}
-			System.out.println(details);
-			hierarchyDetailsDAL.addHierarchyDetailsList(details);
-			status=true;	 
+			//hierarchyDetailsDAL.addHierarchyDetailsList(details);
+			 */			
+
+			List<JsonObject> gitProperties = new ArrayList<>();
+			String query = "UNWIND {props} AS properties " +
+					"CREATE (n:DATATAGGING) " +
+					"SET n = properties";
+			Neo4jDBHandler dbHandler = new Neo4jDBHandler();
+			int sleepTime=500;
+			int totalRecords=0;
+			for (CSVRecord csvRecord : csvParser.getRecords()) { 
+				totalRecords++;
+				JsonObject values1 = new JsonObject();
+				values1.addProperty(DatataggingConstants.LEVEL1, csvRecord.get(DatataggingConstants.LEVEL1));
+				values1.addProperty(DatataggingConstants.LEVEL2, csvRecord.get(DatataggingConstants.LEVEL2));
+				values1.addProperty(DatataggingConstants.LEVEL3, csvRecord.get(DatataggingConstants.LEVEL3));
+				values1.addProperty(DatataggingConstants.LEVEL4, csvRecord.get(DatataggingConstants.LEVEL4));
+				values1.addProperty(DatataggingConstants.TOOL_NAME,csvRecord.get(DatataggingConstants.TOOL_NAME));
+				values1.addProperty(DatataggingConstants.TOOL_PROPERTY, csvRecord.get(DatataggingConstants.TOOL_PROPERTY));
+				values1.addProperty(DatataggingConstants.PROPERTY_VALUE, csvRecord.get(DatataggingConstants.PROPERTY_VALUE));
+				values1.addProperty("creationDate", Instant.now().toEpochMilli() );
+				gitProperties.add(values1);
+				
+				if(totalRecords == 5) {
+					dbHandler.bulkCreateNodes(gitProperties, null, query);
+					Thread.sleep(sleepTime);
+					gitProperties = new ArrayList<>();
+				}
+				status=true;	
+			}
+
+
 		} catch (FileNotFoundException e) {
 			status=false;
 			LOG.debug(e);
 		} catch (IOException e) {
+			status=false;
+			LOG.debug(e);
+		} catch (GraphDBException e) {
+			status=false;
+			LOG.debug(e);
+		} catch (InterruptedException e) {
 			status=false;
 			LOG.debug(e);
 		}
