@@ -209,11 +209,8 @@ public class HierarchyDetailsService {
 		if (status) {
 			return PlatformServiceUtil.buildSuccessResponse();
 		} else {
-			return PlatformServiceUtil.buildFailureResponse("Failed to upload data");
+			return PlatformServiceUtil.buildFailureResponse(ErrorMessage.DB_INSERTION_FAILED);
 		}
-		
-		
-	
 
 	}
 
@@ -226,7 +223,7 @@ public class HierarchyDetailsService {
 			 response = dbHandler.executeCypherQuery(query);
 		} catch (GraphDBException e) {
 			log.debug(e);
-			return PlatformServiceUtil.buildFailureResponse("no records");
+			return PlatformServiceUtil.buildFailureResponse(ErrorMessage.DB_INSERTION_FAILED);
 		}
 		return PlatformServiceUtil.buildSuccessResponseWithData(response.getNodes());
 
