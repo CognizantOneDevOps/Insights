@@ -15,6 +15,7 @@
  ******************************************************************************/
 package com.cognizant.devops.platformservice.rest.dataTagging;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,6 +28,12 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.cognizant.devops.platformcommons.constants.ErrorMessage;
+import com.cognizant.devops.platformcommons.constants.NamedNodeAttribute;
+import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBException;
+import com.cognizant.devops.platformcommons.dal.neo4j.GraphResponse;
+import com.cognizant.devops.platformcommons.dal.neo4j.Neo4jDBHandler;
+import com.cognizant.devops.platformcommons.dal.neo4j.NodeData;
 import com.cognizant.devops.platformdal.entity.definition.EntityDefinition;
 import com.cognizant.devops.platformdal.entity.definition.EntityDefinitionDAL;
 import com.cognizant.devops.platformdal.hierarchy.details.HierarchyDetails;
@@ -36,7 +43,9 @@ import com.cognizant.devops.platformservice.rest.neo4j.GraphDBService;
 import com.cognizant.devops.platformservice.rest.util.PlatformServiceUtil;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 
 @RestController
 @RequestMapping("/admin/hierarchyDetails")
@@ -202,18 +211,24 @@ public class HierarchyDetailsService {
 		} else {
 			return PlatformServiceUtil.buildFailureResponse("Failed to upload data");
 		}
-
+		
+		
+	
 
 	}
 
 	@RequestMapping(value = "/getAllHierarchyDetails", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 	public @ResponseBody JsonObject getAllHierarchyDetails() {
-		Gson gson = new Gson();
-		HierarchyDetailsDAL hierarchyDetailsDAL = new HierarchyDetailsDAL();
-		List<HierarchyDetails> hierarchyDetailsList = hierarchyDetailsDAL.fetchAllEntityData();
-		JsonObject hierarchyDetailsJsonObj = new JsonObject();
-		hierarchyDetailsJsonObj.add("details", gson.toJsonTree(hierarchyDetailsList));		
-		return hierarchyDetailsJsonObj;
+		Neo4jDBHandler dbHandler = new Neo4jDBHandler();
+		String query = "MATCH (n:DATATAGGING) return n";
+		GraphResponse response;
+		try {
+			 response = dbHandler.executeCypherQuery(query);
+		} catch (GraphDBException e) {
+			log.debug(e);
+			return PlatformServiceUtil.buildFailureResponse("no records");
+		}
+		return PlatformServiceUtil.buildSuccessResponseWithData(response.getNodes());
 
 	}
 
