@@ -217,7 +217,7 @@ public class HierarchyDetailsService {
 	@RequestMapping(value = "/getAllHierarchyDetails", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 	public @ResponseBody JsonObject getAllHierarchyDetails() {
 		Neo4jDBHandler dbHandler = new Neo4jDBHandler();
-		String query = "MATCH (n:DATATAGGING) return n";
+		String query = "MATCH (n:METADATA:DATATAGGING) return n";
 		GraphResponse response;
 		try {
 			 response = dbHandler.executeCypherQuery(query);
