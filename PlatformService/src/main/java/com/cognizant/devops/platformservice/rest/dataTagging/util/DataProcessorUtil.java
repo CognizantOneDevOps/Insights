@@ -13,6 +13,7 @@ import java.util.List;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -120,6 +121,34 @@ public class DataProcessorUtil  {
 			int totalRecords=0;
 			for (CSVRecord csvRecord : csvParser.getRecords()) { 
 				totalRecords++;
+				
+				StringBuilder hiearchyData= new StringBuilder();
+				String appenddata="";
+				if(!StringUtils.isBlank(csvRecord.get(DatataggingConstants.LEVEL1))){
+					hiearchyData.append(appenddata);
+					hiearchyData.append(csvRecord.get(DatataggingConstants.LEVEL1));
+					hiearchyData.append(DatataggingConstants.COLON);
+
+				}
+				if(!StringUtils.isBlank(csvRecord.get(DatataggingConstants.LEVEL2))){
+					hiearchyData.append(appenddata);
+					hiearchyData.append(csvRecord.get(DatataggingConstants.LEVEL2));
+					hiearchyData.append(DatataggingConstants.COLON);
+
+				}
+				if(!StringUtils.isBlank(csvRecord.get(DatataggingConstants.LEVEL3))){
+					hiearchyData.append(appenddata);
+					hiearchyData.append(csvRecord.get(DatataggingConstants.LEVEL3));
+					hiearchyData.append(DatataggingConstants.COLON);
+
+				}
+				if(!StringUtils.isBlank(csvRecord.get(DatataggingConstants.LEVEL4))){
+					hiearchyData.append(appenddata);
+					hiearchyData.append(csvRecord.get(DatataggingConstants.LEVEL4));
+					hiearchyData.append(DatataggingConstants.COLON);
+
+				}
+				
 				JsonObject values1 = new JsonObject();
 				values1.addProperty(DatataggingConstants.ID, csvRecord.get(DatataggingConstants.ID));
 				values1.addProperty(DatataggingConstants.LEVEL1, csvRecord.get(DatataggingConstants.LEVEL1));
@@ -129,6 +158,7 @@ public class DataProcessorUtil  {
 				values1.addProperty(DatataggingConstants.TOOL_NAME,csvRecord.get(DatataggingConstants.TOOL_NAME));
 				values1.addProperty(DatataggingConstants.TOOL_PROPERTY, csvRecord.get(DatataggingConstants.TOOL_PROPERTY));
 				values1.addProperty(DatataggingConstants.PROPERTY_VALUE, csvRecord.get(DatataggingConstants.PROPERTY_VALUE));
+				values1.addProperty(DatataggingConstants.HIEARCHYNAME, StringUtils.removeEnd(hiearchyData.toString() ,DatataggingConstants.COLON));
 				values1.addProperty("creationDate", Instant.now().toEpochMilli() );
 				gitProperties.add(values1);
 
