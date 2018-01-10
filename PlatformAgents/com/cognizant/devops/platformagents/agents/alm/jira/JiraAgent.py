@@ -125,7 +125,10 @@ class JiraAgent(BaseAgent):
                 sprintStartAt = 0
                 while True:
                     boardSprintRestUrl = boardApiUrl+'/'+str(board['id'])+'/sprint?startAt='+str(sprintStartAt)+'&maxResults='+str(maxResults)
-                    boardSprintResponse = self.getResponse(boardSprintRestUrl, 'GET', userId, password, None)
+                    try:
+                        boardSprintResponse = self.getResponse(boardSprintRestUrl, 'GET', userId, password, None)
+                    except Exception as ex:
+                        break
                     sprintValues = boardSprintResponse.get('values', [])
                     for sprintValue in sprintValues:
                         sprintCompletedDateStr = sprintValue.get('completeDate', None)
