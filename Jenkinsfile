@@ -17,6 +17,7 @@ node {
 		//Framing Nexus URL for artifact uploaded to Nexus with unique timestamp
 	       sh "cd /var/jenkins/jobs/$commitID/workspace/PlatformService && mvn help:evaluate -Dexpression=project.version | grep -e '^[^[]' > /var/jenkins/jobs/$commitID/workspace/PlatformService/version"
 	       pomversion=readFile("/var/jenkins/jobs/$commitID/workspace/PlatformService/version").trim()  //Get version from pom.xml to form the nexus repo URL
+		sh 'sleep 3m'
 		//get artifact info (artifactID,classifier,timestamp, buildnumber,version) from maven-metadata.xml
 		echo "******************** printing pomversion ${pomversion} ************************"
 		echo "******************printing curl command http://insightsplatformnexusrepo.cogdevops.com:8001/nexus/content/repositories/buildonInsights/com/cognizant/devops/PlatformService/${pomversion}/maven-metadata.xml ******"
