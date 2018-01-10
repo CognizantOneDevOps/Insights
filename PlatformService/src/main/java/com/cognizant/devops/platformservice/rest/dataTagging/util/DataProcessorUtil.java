@@ -115,7 +115,7 @@ public class DataProcessorUtil  {
 			String query = "UNWIND {props} AS properties " +
 					"CREATE (n:METADATA:DATATAGGING) " +
 					"SET n = properties";
-			dbHandler.executeCypherQuery("CREATE CONSTRAINT ON (n:METADATA:DATATAGGING) ASSERT n.id  IS UNIQUE");
+			dbHandler.executeCypherQuery("CREATE CONSTRAINT ON (n:METADATA) ASSERT n.id  IS UNIQUE");
 			int sleepTime=500;
 			int totalRecords=0;
 			for (CSVRecord csvRecord : csvParser.getRecords()) { 
