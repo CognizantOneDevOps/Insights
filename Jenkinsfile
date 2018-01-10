@@ -15,7 +15,7 @@ node {
 		sh 'mvn deploy -Dfile=/var/jenkins/jobs/$commitID/workspace/PlatformService/target/PlatformService.war -DskipTests=true'
 		
 		//Framing Nexus URL for artifact uploaded to Nexus with unique timestamp
-	       sh "cd /var/jenkins/jobs/$commitID/workspace/PlatformService && mvn help:evaluate -Dexpression=project.version | grep -e '^[^[]' > version"
+	       sh "cd /var/jenkins/jobs/$commitID/workspace/PlatformService && mvn help:evaluate -Dexpression=project.version | grep -e '^[^[]' > /var/jenkins/jobs/$commitID/workspace/PlatformService/version"
 	       pomversion=readFile('/var/jenkins/jobs/$commitID/workspace/PlatformService/version').trim()  //Get version from pom.xml to form the nexus repo URL
 		//get artifact info (artifactID,classifier,timestamp, buildnumber,version) from maven-metadata.xml
 		sh "curl -s http://insightsplatformnexusrepo.cogdevops.com:8001/nexus/content/repositories/buildonInsights/com/cognizant/devops/PlatformService/${pomversion}/maven-metadata.xml  | grep -oP '(?<=<artifactId>).*?(?=</artifactId>)|(?<=<version>).*?(?=</version>)|(?<=<timestamp>).*?(?=</timestamp>)|(?<=<buildNumber>).*?(?=</buildNumber>)|(?<=<classifier>).*?(?=</classifier>)' | paste -sd- - | sed 's/-SNAPSHOT//g' | sed 's/--/-/g' | sed 's/\$/.war/' > /var/jenkins/jobs/$commitID/workspace/PlatformService/PS_artifact"
@@ -38,7 +38,7 @@ node {
 		sh 'cd /var/jenkins/jobs/$commitID/workspace/PlatformInsights && mvn -P NexusUpload deploy -Dfile=/var/jenkins/jobs/$commitID/workspace/PlatformInsights/target/PlatformInsights-0.0.1-SNAPSHOT-jar-with-dependencies.jar -DskipTests=true'
 	
 		//Framing Nexus URL for artifact uploaded to Nexus with unique timestamp
-		sh "cd /var/jenkins/jobs/$commitID/workspace/PlatformInsights && mvn help:evaluate -Dexpression=project.version | grep -e '^[^[]' > version"
+		sh "cd /var/jenkins/jobs/$commitID/workspace/PlatformInsights && mvn help:evaluate -Dexpression=project.version | grep -e '^[^[]' > /var/jenkins/jobs/$commitID/workspace/PlatformInsights/version"
        		pomversion=readFile('/var/jenkins/jobs/$commitID/workspace/PlatformInsights/version').trim()  //Get version from pom.xml to form the nexus repo URL
 	   
 	   	//get artifact info (artifactID,classifier,timestamp, buildnumber,version) from maven-metadata.xml
@@ -64,7 +64,7 @@ node {
 		sh 'mvn -P NexusUpload deploy:deploy-file -Dfile=/var/jenkins/jobs/$commitID/workspace/PlatformUI2.0/app.zip -DgroupId="com.cognizant.devops" -DartifactId="PlatformUI2.0" -Dpackaging=zip -Dversion=${pomversion} -DrepositoryId=nexus -Durl=http://insightsplatformnexusrepo.cogdevops.com:8001/nexus/content/repositories/buildonInsights -DskipTests=true'
 		
 		//Framing Nexus URL for artifact uploaded to Nexus with unique timestamp													
-		sh "cd /var/jenkins/jobs/$commitID/workspace/PlatformUI2.0 && mvn help:evaluate -Dexpression=project.version | grep -e '^[^[]' > version"
+		sh "cd /var/jenkins/jobs/$commitID/workspace/PlatformUI2.0 && mvn help:evaluate -Dexpression=project.version | grep -e '^[^[]' > /var/jenkins/jobs/$commitID/workspace/PlatformUI2.0/version"
        		pomversion=readFile('/var/jenkins/jobs/$commitID/workspace/PlatformUI2.0/version').trim()   //Get version from pom.xml to form the nexus repo URL
        		
 		//get artifact info (artifactID,classifier,timestamp, buildnumber,version) from maven-metadata.xml
