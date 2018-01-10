@@ -59,7 +59,7 @@ node {
 	
 	stage ('Insight_PUI2.0_NexusUpload') {
 	        
-		sh 'cd /var/jenkins/jobs/$commitID/workspace/PlatformUI2.0 && mvn help:evaluate -Dexpression=project.version | grep -e '^[^[]' > version && zip -r app.zip app'
+		sh 'cd /var/jenkins/jobs/$commitID/workspace/PlatformUI2.0 && mvn help:evaluate -Dexpression=project.version | grep -e "^[^[]" > version && zip -r app.zip app'
 	        pomversion = readFile 'version'
 		sh 'mvn -P NexusUpload deploy:deploy-file -Dfile=/var/jenkins/jobs/$commitID/workspace/PlatformUI2.0/app.zip -DgroupId="com.cognizant.devops" -DartifactId="PlatformUI2.0" -Dpackaging=zip -Dversion=${pomversion} -DrepositoryId=nexus -Durl=http://insightsplatformnexusrepo.cogdevops.com:8001/nexus/content/repositories/buildonInsights -DskipTests=true'
 		
