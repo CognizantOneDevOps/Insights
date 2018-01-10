@@ -49,7 +49,7 @@ node {
 		PI_artifact="http://insightsplatformnexusrepo.cogdevops.com:8001/nexus/content/repositories/buildonInsights/com/cognizant/devops/PlatformInsights/${pomversion}/${PI_artifactName}"
     	} // Platform Insights Ends
 	
-	// Platform UI2.0 Starts
+	// Platform UI2.0 Starts 
 	stage ('Insight_PUI2.0_Build') {
         
 		sh 'cd /var/jenkins/jobs/$commitID/workspace/PlatformUI2.0 && bower install --allow-root && tsd install && npm install && grunt'
