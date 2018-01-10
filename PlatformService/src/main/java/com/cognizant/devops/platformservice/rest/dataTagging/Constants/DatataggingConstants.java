@@ -14,5 +14,5 @@ public interface DatataggingConstants {
 	String TOOL_NAME="toolName";
 	String TOOL_PROPERTY="toolProperty";
 	String PROPERTY_VALUE="propertyValue";
-
+	String HIEARCHYNAME="hiearchyName";
 }
