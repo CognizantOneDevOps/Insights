@@ -15,7 +15,7 @@ node {
 		sh 'mvn deploy -Dfile=/var/jenkins/jobs/$commitID/workspace/PlatformService/target/PlatformService.war -DskipTests=true'
 		
 		//Framing Nexus URL for artifact uploaded to Nexus with unique timestamp
-	       sh "cd /var/jenkins/jobs/$commitID/workspace/PlatformService && mvn help:evaluate -Dexpression=project.version | grep -e '^[^[]' > /var/jenkins/jobs/$commitID/workspace/PlatformService/version"
+	       sh "cd /var/jenkins/jobs/$commitID/workspace/PlatformService && mvn -B help:evaluate -Dexpression=project.version | grep -e '^[^[]' > /var/jenkins/jobs/$commitID/workspace/PlatformService/version"
 	       pomversion=readFile("/var/jenkins/jobs/$commitID/workspace/PlatformService/version").trim()  //Get version from pom.xml to form the nexus repo URL
 		sh 'sleep 3m'
 		//get artifact info (artifactID,classifier,timestamp, buildnumber,version) from maven-metadata.xml
