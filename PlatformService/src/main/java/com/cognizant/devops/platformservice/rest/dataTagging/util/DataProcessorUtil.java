@@ -52,7 +52,6 @@ public class DataProcessorUtil  {
 		} catch (IOException ex) {
 			LOG.debug(ex);
 		}
-		
 		boolean status = false;
 		try (	Reader reader = new FileReader(csvfile);  
 				CSVParser csvParser = new CSVParser(reader, CSVFormat.DEFAULT
@@ -109,19 +108,20 @@ public class DataProcessorUtil  {
 				heirarchyDetails.setHierarchyName(StringUtils.removeEnd(hiearchyData.toString() ,DatataggingConstants.COLON));
 				details.add(heirarchyDetails);
 			}
-			//hierarchyDetailsDAL.addHierarchyDetailsList(details);
+			hierarchyDetailsDAL.addHierarchyDetailsList(details);
 			 */			
-
+			Neo4jDBHandler dbHandler = new Neo4jDBHandler();
 			List<JsonObject> gitProperties = new ArrayList<>();
 			String query = "UNWIND {props} AS properties " +
-					"CREATE (n:DATATAGGING) " +
+					"CREATE (n:METADATA:DATATAGGING) " +
 					"SET n = properties";
-			Neo4jDBHandler dbHandler = new Neo4jDBHandler();
+			dbHandler.executeCypherQuery("CREATE CONSTRAINT ON (n:METADATA:DATATAGGING) ASSERT n.id  IS UNIQUE");
 			int sleepTime=500;
 			int totalRecords=0;
 			for (CSVRecord csvRecord : csvParser.getRecords()) { 
 				totalRecords++;
 				JsonObject values1 = new JsonObject();
+				values1.addProperty(DatataggingConstants.ID, csvRecord.get(DatataggingConstants.ID));
 				values1.addProperty(DatataggingConstants.LEVEL1, csvRecord.get(DatataggingConstants.LEVEL1));
 				values1.addProperty(DatataggingConstants.LEVEL2, csvRecord.get(DatataggingConstants.LEVEL2));
 				values1.addProperty(DatataggingConstants.LEVEL3, csvRecord.get(DatataggingConstants.LEVEL3));
@@ -131,8 +131,8 @@ public class DataProcessorUtil  {
 				values1.addProperty(DatataggingConstants.PROPERTY_VALUE, csvRecord.get(DatataggingConstants.PROPERTY_VALUE));
 				values1.addProperty("creationDate", Instant.now().toEpochMilli() );
 				gitProperties.add(values1);
-				
-				if(totalRecords == 5) {
+
+				if(totalRecords > 5) {
 					dbHandler.bulkCreateNodes(gitProperties, null, query);
 					Thread.sleep(sleepTime);
 					gitProperties = new ArrayList<>();
@@ -157,12 +157,5 @@ public class DataProcessorUtil  {
 		return status;
 
 	}
-
-	/*	public static void main(String[] a) throws IOException{
-		DataProcessorUtil processor=new DataProcessorUtil();
-		processor.readData();
-
-	}
-	 */
 
 }
