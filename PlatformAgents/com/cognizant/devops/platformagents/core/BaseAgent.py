@@ -170,7 +170,7 @@ class BaseAgent(object):
             timeStampField = self.config.get('timeStampField')
         if timeStampFormat is None:
             timeStampFormat = self.config.get('timeStampFormat')
-        if isEpochTime is None:
+        if not isEpochTime:
             isEpochTime = self.config.get('isEpochTimeFormat', False)
         for d in data:
             eventTime = d.get(timeStampField, None)
