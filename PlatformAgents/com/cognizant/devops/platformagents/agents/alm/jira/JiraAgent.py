@@ -114,7 +114,7 @@ class JiraAgent(BaseAgent):
         metadata = {
                 'labels' : ['METADATA'],
                 'dataUpdateSupported' : True,
-                'uniqeKey' : 'boardId,sprintId,key'
+                'uniqueKey' : 'boardId,sprintId,key'
             }
         while True:
             boardApiRestUrl = boardApiUrl+'?maxResults='+str(maxResults)+'&startAt='+str(boardStartAt)
@@ -178,6 +178,9 @@ class JiraAgent(BaseAgent):
                             data += self.addSprintDetails(responseTemplate, content, 'issuesCompletedInAnotherSprint', injectData)
                             if len(data) > 0:
                                 self.publishToolsData(data, metadata)
+                                #Need to add tracking
+                                #Do not retrieve the sprints which are already completed.
+                                #for tracking, store the sprints which are yet to be completed.
                     if boardSprintResponse.get('isLast', True):
                         break
                     else:
