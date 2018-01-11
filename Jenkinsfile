@@ -77,6 +77,6 @@ node {
 
         //Send Notification Slack Channel
 	stage ('SlackNotification') {
-   	    slackSend channel: '#insightsjenkins', color: 'good', message: "New Insights artifacts are uploaded to Nexus for commitID ${env.commitID} - ${PS_artifact} , ${PI_artifact} , ${PUI_artifact}", teamDomain: 'ctsdevopsbot', token: slackToken
+   	    slackSend channel: '#insightsjenkins', color: 'good', message: "New Insights artifacts are uploaded to Nexus for commitID ${env.commitID} \n PlatformService -  ${PS_artifact} \n PlatformInsights -  ${PI_artifact} \n PlatformUI2.0 ${PUI_artifact}", teamDomain: 'ctsdevopsbot', token: slackToken
   	}
 }
