@@ -70,25 +70,37 @@ class JenkinsAgent(BaseAgent):
         jenkinsProjects = self.getResponse(restUrl, 'GET', self.userid, self.passwd, None)
         jobs = jenkinsProjects.get('jobs', None);
         if jobs:
-            for projects in range(len(jenkinsProjects["jobs"])):
-                if "buildable" in jenkinsProjects["jobs"][projects]:
-                    jobUrl = jenkinsProjects["jobs"][projects]["url"]
-                    if "lastBuild" in jenkinsProjects["jobs"][projects] and jenkinsProjects["jobs"][projects]["lastBuild"] is not None:
-                        lastBuild = jenkinsProjects["jobs"][projects]["lastBuild"]["number"]
-                        self.getJobDetails(jobUrl, lastBuild)
+            for job in jobs:
+                url = job.get('url')
+                if job.get('buildable', False):
+                    lastBuild = job.get('lastBuild', None)
+                    if lastBuild:
+                        jobName = job.get('name', None)
+                        lastBuildNumber = lastBuild.get('number')
+                        self.getJobDetails(url, lastBuildNumber, jobName)
                 else:
-                    folderUrl = jenkinsProjects["jobs"][projects]["url"]
-                    self.processFolder(folderUrl)
+                    self.processFolder(url)
+            #for projects in range(len(jenkinsProjects["jobs"])):
+            #   if "buildable" in jenkinsProjects["jobs"][projects]:
+            #        jobUrl = jenkinsProjects["jobs"][projects]["url"]
+            #        if "lastBuild" in jenkinsProjects["jobs"][projects] and jenkinsProjects["jobs"][projects]["lastBuild"] is not None:
+            #            lastBuild = jenkinsProjects["jobs"][projects]["lastBuild"]["number"]
+            #            jobName = jenkinsProjects["jobs"][projects].get('name', None)
+            #            self.getJobDetails(jobUrl, lastBuild, jobName)
+            #    else:
+            #        folderUrl = jenkinsProjects["jobs"][projects]["url"]
+            #        self.processFolder(folderUrl)
         else:
-            restUrl = url + 'api/json?tree=lastBuild[number],url'
+            restUrl = url + 'api/json?tree=lastBuild[number],url,name'
             jenkinsProjects = self.getResponse(restUrl, 'GET', self.userid, self.passwd, None)
-            jobUrl = jenkinsProjects["url"]
-            lastBuild = jenkinsProjects.get("lastBuild", {}).get("number", None)
+            jobUrl = jenkinsProjects['url']
+            jobName = jenkinsProjects.get('name', None)
+            lastBuild = jenkinsProjects.get('lastBuild', {}).get('number', None)
             if lastBuild is not None:
-                self.getJobDetails(jobUrl, lastBuild)
+                self.getJobDetails(jobUrl, lastBuild, jobName)
 
 
-    def getJobDetails(self, url, lastBuild):
+    def getJobDetails(self, url, lastBuild, jobName):
         tillJobCount = 0
         buildsIdentified = False
         nextBatch = 0
@@ -96,6 +108,7 @@ class JenkinsAgent(BaseAgent):
         if injectData['disabled'] == 'true':
             return;
         injectData['master'] = self.currentJenkinsMaster
+        injectData['jobName'] = jobName
         if self.tracking.get(self.currentJenkinsMaster, {}).get(url,None):
             trackingNum = self.tracking.get(self.currentJenkinsMaster).get(url)
             tillJobCount = lastBuild - trackingNum
@@ -103,7 +116,6 @@ class JenkinsAgent(BaseAgent):
             while not buildsIdentified:
                 restUrl = url+'api/json?tree='+self.buildsApiName+'[number,timestamp,duration]{'+str(nextBatch)+','+str(nextBatch+100)+'},name'
                 jobDetails = self.getResponse(restUrl, 'GET', self.userid, self.passwd, None)
-                injectData['jobName'] = jobDetails["name"]
                 builds = jobDetails[self.buildsApiName]
                 for build in builds:
                     if self.startFrom < build["timestamp"]:
