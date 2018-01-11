@@ -18,7 +18,8 @@ Created on Jun 22, 2016
 
 @author: 463188
 '''
-from datetime import datetime
+from datetime import datetime as dateTime2
+import datetime
 from dateutil import parser
 from com.cognizant.devops.platformagents.core.BaseAgent import BaseAgent
 
@@ -139,15 +140,15 @@ class JiraAgent(BaseAgent):
                                 continue
                         sprintStartTimeStr = sprintValue.get('startDate', None)
                         if sprintStartTimeStr:
-                            sprintStartTime = datetime.strptime(sprintStartTimeStr.split('T')[0], timeStampFormat)
+                            sprintStartTime = dateTime2.strptime(sprintStartTimeStr.split('T')[0], timeStampFormat)
                         else:
                             continue
                         sprintEndTimeStr = sprintValue.get('endDate', None)
                         if sprintEndTimeStr:
-                            sprintEndTime = datetime.strptime(sprintEndTimeStr.split('T')[0], timeStampFormat)
+                            sprintEndTime = dateTime2.strptime(sprintEndTimeStr.split('T')[0], timeStampFormat)
                         sprintCompletedTimeStr = sprintValue.get('completeDate', None)
                         if sprintCompletedTimeStr:
-                            sprintCompletedTime = datetime.strptime(sprintCompletedTimeStr.split('T')[0], timeStampFormat)
+                            sprintCompletedTime = dateTime2.strptime(sprintCompletedTimeStr.split('T')[0], timeStampFormat)
                         injectData = {
                                 'boardId' : boardId,
                                 'boardName' : board['name'],
