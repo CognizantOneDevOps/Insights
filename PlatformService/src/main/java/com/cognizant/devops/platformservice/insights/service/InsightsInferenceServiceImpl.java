@@ -207,6 +207,7 @@ public class InsightsInferenceServiceImpl implements InsightsInferenceService {
 		boolean zeroVal = false;
 		String messageId = "";
 		String zeroValCode = "";
+		String msgZeroCode = "";
 		if (isComparison) {
 			for (int i = 0; i < values.length; i++) {
 				if (resultOutputType.toLowerCase().contains(ResultOutputType.TIMERESULTOUTPUT.toString())) {
@@ -234,9 +235,12 @@ public class InsightsInferenceServiceImpl implements InsightsInferenceService {
 					+ schedule.toLowerCase();
 		}
 
-		if (zeroVal) {
+		if (zeroVal && !zeroValCode.equals(InsightsMessageEnum.NEUTRALVALZERO.toString()) && !zeroValCode.equals(InsightsMessageEnum.PREVIOUSVALZERO.toString())) {
+			if( zeroValCode.equals(InsightsMessageEnum.CURRENTVALZERO.toString())){
+				msgZeroCode = InsightsMessageEnum.ZEROVALMSG.toString();
+			}
 			messageId = vector.toLowerCase() + "." + kpiId + "." + sentiment.toString() + "."
-							+ schedule.toLowerCase() + "." + zeroValCode;
+							+ schedule.toLowerCase() + "." + msgZeroCode;
 
 		} else {
 			messageId = vector.toLowerCase() + "." + kpiId + "." + sentiment.toString() + "." + schedule.toLowerCase();
