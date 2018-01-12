@@ -69,9 +69,10 @@ public class DataProcessorUtil  {
 			int sleepTime=500;
 			int totalRecords=0;
 			for (CSVRecord csvRecord : csvParser.getRecords()) {
+				totalRecords++;
 				JsonObject json = new JsonObject();
 				for(Map.Entry<String, Integer> header : headerMap.entrySet()){
-					totalRecords++;
+					
 					json.addProperty(header.getKey(), csvRecord.get(header.getValue()));
 				}			
 				json.addProperty(DatataggingConstants.CREATIONDATE, Instant.now().toEpochMilli() );
