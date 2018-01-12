@@ -76,8 +76,9 @@ class JenkinsAgent(BaseAgent):
                     lastBuild = job.get('lastBuild', None)
                     if lastBuild:
                         jobName = job.get('name', None)
-                        lastBuildNumber = lastBuild.get('number')
-                        self.getJobDetails(url, lastBuildNumber, jobName)
+                        lastBuildNumber = lastBuild.get('number', None)
+                        if lastBuildNumber:
+                            self.getJobDetails(url, lastBuildNumber, jobName)
                 else:
                     self.processFolder(url)
             #for projects in range(len(jenkinsProjects["jobs"])):
@@ -95,9 +96,11 @@ class JenkinsAgent(BaseAgent):
             jenkinsProjects = self.getResponse(restUrl, 'GET', self.userid, self.passwd, None)
             jobUrl = jenkinsProjects['url']
             jobName = jenkinsProjects.get('name', None)
-            lastBuild = jenkinsProjects.get('lastBuild', {}).get('number', None)
+            lastBuild = jenkinsProjects.get('lastBuild', None)
             if lastBuild is not None:
-                self.getJobDetails(jobUrl, lastBuild, jobName)
+                lastBuildNumber = lastBuild.get('number', None)
+                if lastBuildNumber:
+                    self.getJobDetails(jobUrl, lastBuildNumber, jobName)
 
 
     def getJobDetails(self, url, lastBuild, jobName):
