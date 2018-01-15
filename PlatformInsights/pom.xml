@@ -23,6 +23,7 @@
 	<name>PlatformInsights</name>
 	<description>PlatformInsights</description>
 	<dependencies>
+	
 		<dependency>
 			<groupId>com.google.code.gson</groupId>
 			<artifactId>gson</artifactId>
@@ -31,7 +32,7 @@
 		<dependency>
 			<groupId>org.elasticsearch</groupId>
 			<artifactId>elasticsearch-spark-20_2.11</artifactId>
-			<version>5.4.0</version>
+			<version>5.6.4</version>
 		</dependency>
 		<dependency>
 			<groupId>org.quartz-scheduler</groupId>
@@ -53,6 +54,7 @@
 			<artifactId>spark-streaming_2.10</artifactId>
 			<!--<version>1.5.1</version>-->
 			<version>2.2.0</version>
+
 			
 		</dependency>
 			<dependency>
@@ -73,6 +75,24 @@
 		    <version>1.10.19</version>
 		    <scope>test</scope>
 		</dependency>		
+
+		</dependency>
+		<dependency>
+		    <groupId>org.apache.velocity</groupId>
+		    <artifactId>velocity</artifactId>
+		    <version>1.7</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-web</artifactId>
+			<version>${spring.version}</version>
+		</dependency>	
+		<dependency>
+	        <groupId>net.java.dev.jets3t</groupId>
+	        <artifactId>jets3t</artifactId>
+	        <version>0.7.1</version>
+      	</dependency>		
+
 	</dependencies>
 	<build>
 		<plugins>
@@ -109,7 +129,20 @@
 				</executions>
 			</plugin>			
 		</plugins>
+		
+	  <resources>
+       <resource>
+				<directory>src/main/resources</directory>
+				<includes>
+				     <include>**/*.*</include>
+				</includes>
+				<filtering>true</filtering>
+		</resource>
+    </resources>
 	</build>
+	<properties>
+		<spring.version>4.2.6.RELEASE</spring.version>
+	</properties>
 	 <profiles>
         <profile>
                 <id>NexusUpload</id>
