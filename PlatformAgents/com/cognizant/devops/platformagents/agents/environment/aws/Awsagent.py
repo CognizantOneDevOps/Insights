@@ -18,45 +18,63 @@ Created on Sep 19, 2017
 
 @author: 476693 & 513585
 '''
-import boto.ec2.connection
-import boto.ec2
+from boto.ec2.connection import EC2Connection
+from boto.utils import get_instance_metadata
 import time
 import sys
 import os
 from datetime import datetime, timedelta
 from com.cognizant.devops.platformagents.core.BaseAgent import BaseAgent
+#from core.BaseAgent import BaseAgent
 import logging.handlers
 
-class awsAgent(BaseAgent):
+class AwsAgent(BaseAgent):
     def process(self):
         try:
-            self.id = self.config.get("access_key_id", '')
-            self.key = self.config.get("secret_access_key", '')
-            self.vpcid = self.config.get("vpc_id", '')
-            #print self.vpcid
+            self.id = self.config.get("access_key_id", None)
+            self.key = self.config.get("secret_access_key", None)
+            self.vpcid = self.config.get("vpc_id", None)
         except Exception as e:
             logging.error(e)
             
         tracking_data = []
-        ec2conn = boto.ec2.connection.EC2Connection(self.id, self.key)
+        ec2conn = EC2Connection(self.id, self.key)
         reservations = ec2conn.get_all_instances()
+        volumes=ec2conn.get_all_volumes()
         instances = [i for r in reservations for i in r.instances]
         for i in instances:
             for value in self.vpcid:
                 if i.vpc_id == value:
+                    r = ec2conn.get_all_instances(i.id)
+                    size=[]
+                    Volume_ID=None
+                    for vol in volumes:
+                        if vol.attach_data.instance_id == i.id:
+                            size.append(vol.size)
                     ltime=i.launch_time
-                    privateIP=i.private_ip_address
-                    pattern='%Y-%m-%dT%H:%M:%S.%fZ'
-                    run_sec = time.time() - int(time.mktime(time.strptime(ltime, pattern))) 
-                    ctime = datetime(100,1,1) + timedelta(seconds=int(run_sec))
+                    pattern=self.config.get("timeStampFormat", None)
+                    seconds = time.time() - int(time.mktime(time.strptime(ltime, pattern)))
+                    years, seconds = divmod(seconds, 12 *30 *24 * 60 * 60)
+                    months, seconds = divmod(seconds, 30 *24 * 60 * 60)
+                    days, seconds = divmod(seconds, 24 * 60 * 60)
+                    hours, seconds = divmod(seconds, 60 * 60)
+                    minutes, seconds = divmod(seconds, 60)
                     tracklist={}
-                    tracklist["vpc_id"]=value
-                    tracklist["Instance_id"]=i.id
-                    tracklist["Private_ip"]=privateIP
-                    tracklist["State"]=i.state 
-                    tracklist["Runtime"]=("%d days %d hours" % (ctime.day-1, ctime.hour))
+                    tracklist["instanceName"]= r[0].instances[0].tags['Name']
+                    tracklist["vpcId"]=value
+                    tracklist["instanceId"]=i.id
+                    tracklist["instanceType"]=i.instance_type
+                    tracklist["privateIp"]=i.private_ip_address
+                    tracklist["size"]=size
+                    tracklist["launchTime"]=i.launch_time
+                    tracklist["state"]=i.state
+		    if i.state == "running":
+		        tracklist["runTime"]=("%d years %d months %d days %d hours" % (years, months, days, hours))
+		    else:
+			pass
                     tracking_data.append(tracklist)
-        #print tracking_data
+        if tracking_data!=[]:
+            self.publishToolsData(tracking_data)
         
 if __name__ == "__main__":
-    awsAgent()
+    AwsAgent()
