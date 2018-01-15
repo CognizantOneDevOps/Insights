@@ -115,9 +115,6 @@ public class AgentDataSubscriber extends EngineSubscriberResponseHandler{
 				List<List<JsonObject>> partitionList = partitionList(dataList, 1000);
 				for(List<JsonObject> chunk : partitionList){
 					JsonObject graphResponse = dbHandler.bulkCreateNodes(chunk, labels, cypherQuery);
-					if(relationMetadata != null) {
-						System.out.println(graphResponse);
-					}
 					if(graphResponse.get("response").getAsJsonObject().get("errors").getAsJsonArray().size() > 0){
 						log.error("Unable to insert nodes for routing key: "+routingKey+", error occured: "+graphResponse);
 						//log.error(chunk);
