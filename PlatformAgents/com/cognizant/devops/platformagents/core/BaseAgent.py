@@ -142,22 +142,36 @@ class BaseAgent(object):
             ch.basic_ack(delivery_tag = method.delivery_tag)
         self.messageFactory.subscribe(routingKey, callback)
                 
-    
-    def publishToolsData(self, data):
+    '''
+        Supported metadata attributes:
+        {
+            labels : [] --> Array of additional labels to applied to data
+            dataUpdateSupported: true/false --> if the existing data node is supposed to be updated
+            uniqeKey: String --> comma separated node properties
+        }
+    '''
+    def publishToolsData(self, data, metadata=None, timeStampField=None, timeStampFormat=None, isEpochTime=False):
+        if metadata:
+            metadataType = type(metadata)
+            if metadataType is not dict:
+                raise ValueError('BaseAgent: Dict metadata object is expected')
         if data:
             self.addExecutionId(data, self.executionId)
-            self.addTimeStampField(data)
-            self.messageFactory.publish(self.dataRoutingKey, data, self.config.get('dataBatchSize', None))
+            self.addTimeStampField(data, timeStampField, timeStampFormat, isEpochTime)
+            self.messageFactory.publish(self.dataRoutingKey, data, self.config.get('dataBatchSize', None), metadata)
             self.logIndicator(self.PUBLISH_START, self.config.get('isDebugAllowed', False))
 
     def publishHealthData(self, data):
         self.addExecutionId(data, self.executionId)
         self.messageFactory.publish(self.healthRoutingKey, data)
     
-    def addTimeStampField(self, data):
-        timeStampField = self.config.get('timeStampField')
-        timeStampFormat = self.config.get('timeStampFormat')
-        isEpochTime = self.config.get('isEpochTimeFormat', False)
+    def addTimeStampField(self, data, timeStampField=None, timeStampFormat=None, isEpochTime=False):
+        if timeStampField is None:
+            timeStampField = self.config.get('timeStampField')
+        if timeStampFormat is None:
+            timeStampFormat = self.config.get('timeStampFormat')
+        if not isEpochTime:
+            isEpochTime = self.config.get('isEpochTimeFormat', False)
         for d in data:
             eventTime = d.get(timeStampField, None)
             if eventTime != None:
@@ -171,8 +185,8 @@ class BaseAgent(object):
                     timeResponse = self.getRemoteDateTime(datetime.strptime(eventTime, timeStampFormat))
                 d['inSightsTime'] = timeResponse['epochTime']
                 d['inSightsTimeX'] = timeResponse['time']
-                d['toolName'] = self.toolName;
-                d['categoryName'] = self.categoryName; 
+            d['toolName'] = self.toolName;
+            d['categoryName'] = self.categoryName; 
                         
     def getRemoteDateTime(self, time):
         localDateTime = self.toolsTimeZone.localize(time)

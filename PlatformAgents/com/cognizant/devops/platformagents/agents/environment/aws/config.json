@@ -20,7 +20,7 @@
 	"useResponseTemplate" : false,
 	"auth" : "base64",
 	"runSchedule" : 2,
-	"timeStampField":"commitTime",
+	"timeStampField":"launchTime",
 	"timeStampFormat":"epoch",
 	"pattern" : "%Y-%m-%dT%H:%M:%S.%fZ",
 	"vpc_id": ["vpc-id1","vpc-id2"],

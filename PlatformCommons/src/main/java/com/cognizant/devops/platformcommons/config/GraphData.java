@@ -20,6 +20,8 @@ import java.io.Serializable;
 public class GraphData implements Serializable{
 	private String endpoint;
 	private String authToken;
+	private String boltEndPoint;
+	private Integer maxIdleConnections;
 	
 	public String getEndpoint() {
 		return endpoint;
@@ -32,5 +34,17 @@ public class GraphData implements Serializable{
 	}
 	public void setAuthToken(String authToken) {
 		this.authToken = authToken;
+	}
+	public String getBoltEndPoint() {
+		return boltEndPoint;
+	}
+	public void setBoltEndPoint(String boltEndPoint) {
+		this.boltEndPoint = boltEndPoint;
+	}
+	public Integer getMaxIdleConnections() {
+		return maxIdleConnections;
+	}
+	public void setMaxIdleConnections(Integer maxIdleConnections) {
+		this.maxIdleConnections = maxIdleConnections;
 	}
 }

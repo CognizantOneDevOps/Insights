@@ -789,18 +789,19 @@
 </head>
 
 <body>
-	<div ng-if="ctrl.selectOptionsMsg === ''">
+	<div ng-if="ctrl.checkToolSelection()">
 		<div class="mainDiv">
 			<div class="toolNmDv">
-				<select class="toolNmSelect toolNmWd" ng-change="ctrl.onToolSelectAction()" ng-click="ctrl.toolSelection()" ng-model="ctrl.selectedTool">
+				<select class="toolNmSelect toolNmWd" ng-change="ctrl.onToolSelectAction()" ng-model="ctrl.selectedTool" ng-click="ctrl.toolSelection(ctrl.selectedTool)">
 						<option value="" selected="" disabled="">Select Tool</option>
 						<option ng-repeat="key in ctrl.toolDetailMappingJson" value="{{key.toolName}}" >{{key.toolName}}</option>
 					</select>
 			</div>
-			<div class="fldNmDv" ng-if="ctrl.toolsDetailJson[ctrl.selectedTool]">
-				<select class="toolNmSelect fldNmWdt" ng-change="ctrl.onFieldSelectAction()" ng-click="ctrl.toolSelection()" ng-model="ctrl.selectedField">
-						<option value="" selected="" disabled="">Select Field</option>
-						<option ng-if="fields !== 'position'" ng-repeat="fields in ctrl.toolsDetailJson[ctrl.selectedTool]" value="{{fields.fieldName}}">{{fields.fieldName}}</option>
+			<div class="fldNmDv" ng-if="ctrl.selectedTool">
+				<select class="toolNmSelect fldNmWdt" ng-change="ctrl.onFieldSelectAction()" ng-click="ctrl.toolSelection(ctrl.selectedTool)"
+					ng-model="ctrl.selectedField">
+					<option value="" selected="" disabled="">Select Field</option>
+					<option ng-if="fields !== 'position'" ng-repeat="fields in ctrl.fieldOptions" value="{{fields}}">{{fields}}</option>
 					</select>
 			</div>
 			<div class="fldValDv" ng-if="ctrl.selectedField">
@@ -933,7 +934,7 @@
 		</div>
 		<div ng-if="ctrl.advColumnMsg" class="noDataMsg">{{ctrl.advColumnMsg}}</div>
 	</div>
-	<div ng-if="ctrl.selectOptionsMsg" class="noDataMsg">{{ctrl.selectOptionsMsg}}</div>
+	<div ng-if="!ctrl.checkToolSelection()" class="noDataMsg">{{ctrl.selectOptionsMsg}}</div>
 </body>
 
 </html>
