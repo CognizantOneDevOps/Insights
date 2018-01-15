@@ -177,9 +177,16 @@ public class AgentDataSubscriber extends EngineSubscriberResponseHandler{
 		cypherQuery.append("MERGE (destination").append(labels);
 		cypherQuery.append(buildPropertyConstraintQueryPart(destination, "constraints"));
 		cypherQuery.append(")");
-		cypherQuery.append(" MERGE (source)-[r:").append(relationName);
-		cypherQuery.append(buildPropertyConstraintQueryPart(relationMetadata, "properties"));
-		cypherQuery.append("]->(destination)");
+		cypherQuery.append(" MERGE (source)-[r:").append(relationName).append("]->(destination) ");
+		if(relationMetadata.has("properties")) {
+			cypherQuery.append(" set ");
+			JsonArray properties = relationMetadata.getAsJsonArray("properties");
+			for(JsonElement property : properties) {
+				cypherQuery.append("r.").append(property.getAsString()).append(" = properties").append(property.getAsString()).append(",");
+			}
+			cypherQuery.delete(cypherQuery.length()-1, cypherQuery.length());
+		}
+		//cypherQuery.append(buildPropertyConstraintQueryPart(relationMetadata, "properties"));
 		return cypherQuery.toString();
 	}
 	
