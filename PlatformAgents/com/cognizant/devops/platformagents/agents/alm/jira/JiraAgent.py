@@ -150,7 +150,7 @@ class JiraAgent(BaseAgent):
             relationMetadata = {
                     'relation' : {
                             'properties' : ['addedDuringSprint', 'sprintIssueRegion', 'committedEstimate'],
-                            'name' : 'SPRINT_CONTAINS',
+                            'name' : 'HAS_ISSUES',
                             'source' : {
                                     'constraints' : ["sprintId", "boardId"]
                                 },
@@ -204,11 +204,11 @@ class JiraAgent(BaseAgent):
                             data += self.addSprintDetails(responseTemplate, content, 'puntedIssues', injectData)
                             data += self.addSprintDetails(responseTemplate, content, 'issuesCompletedInAnotherSprint', injectData)
                             if len(data) > 0:
-                                self.publishToolsData(self.getSprintInformation(sprintReportResponse, boardId, sprintId), sprintMetadata)
+                                self.publishToolsData(self.getSprintInformation(sprintReportResponse, boardId, sprintId, board['name']), sprintMetadata)
                                 self.publishToolsData(data, relationMetadata)
                                 self.updateTrackingJson(self.tracking)
     
-    def getSprintInformation(self, content, boardId, sprintId):
+    def getSprintInformation(self, content, boardId, sprintId, boardName):
         data = []
         sprint = content.get('sprint')
         sprint.pop('linkedPagesCount', None)
@@ -217,6 +217,7 @@ class JiraAgent(BaseAgent):
         sprint.pop('id', None)
         sprint['boardId'] = boardId
         sprint['sprintId'] = sprintId
+        sprint['boardName'] = boardName
         data.append(sprint)
         return data
         
