@@ -209,6 +209,7 @@ class JiraAgent(BaseAgent):
                                 self.updateTrackingJson(self.tracking)
     
     def getSprintInformation(self, content, boardId, sprintId):
+        data = []
         sprint = content.get('sprint')
         sprint.pop('linkedPagesCount', None)
         sprint.pop('remoteLinks', None)
@@ -216,7 +217,8 @@ class JiraAgent(BaseAgent):
         sprint.pop('id', None)
         sprint['boardId'] = boardId
         sprint['sprintId'] = sprintId
-        return [] + sprint
+        data.append(sprint)
+        return data
         
     def captureSprintReports(self, userId, password):
         startFromDate = parser.parse(self.config.get("startFrom", ''))
