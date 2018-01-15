@@ -1,4 +1,81 @@
 {
+	"endpointData": {
+		"elasticSearchEndpoint": "http://localhost:9200"
+	},
+	"sparkConfigurations": {
+		"appName": "inSights",
+		"master": "local[*]",
+		"sparkExecutorMemory": "8g",
+		"sparkElasticSearchHost": "http://localhost",
+		"sparkElasticSearchPort": "9200",
+		"sparkElasticSearchConfigIndex": "",
+		"sparkElasticSearchResultIndex": "",
+		"kpiSize": "30",
+		"sparkResultSince": 5
+	},
+	"ldapConfiguration": {
+		"ldapUrl": "ldap://ldaphost:389",
+		"bindDN": "BindDN",
+		"bindPassword": "Passwd",
+		"searchBaseDN": "DC=XX,DC=XX",
+		"searchFilter": "(sAMAccountName={0})",
+		"ldapAttributes": {
+			"name": "givenname",
+			"surname": "sn",
+			"memberOf": "",
+			"email": "mail",
+			"username": "sAMAccountName"
+		}
+	},
+	"graph": {
+		"endpoint": "http://localhost:7474",
+		"authToken": "bmVvNGo6QzBnbml6YW50QDE="
+	},
+	"grafana": {
+		"grafanaEndpoint": "https://localhost:3000",
+		"grafanaDBEndpoint": "jdbc:postgresql://localhost:5432/grafana",
+		"adminUserName": "admin",
+		"adminUserPassword": "admin",
+		"dbUserName": "grafana",
+		"dbPassword": "pass"
+	},
+	"postgre": {
+		"userName": "grafana",
+		"password": "pass",
+		"insightsDBUrl": "jdbc:postgresql://127.0.0.1:5432/insight",
+		"grafanaDBUrl": "jdbc:postgresql://127.0.0.1:5432/grafana"
+	},
+	"messageQueue": {
+		"host": "localhost",
+		"user": "iSight",
+		"password": "iSight"
+	},
+	"emailConfiguration": {
+		"sendEmailEnabled": true,
+		"smtpHostServer": "",
+		"smtpPort": "",
+		"smtpUserName": "",
+		"smtpPassword": "",
+		"isAuthRequired": true,
+		"smtpStarttlsEnable": true,
+		"emailVelocityTemplate": "",
+		"mailFrom": " ",
+		"mailTo": " ",
+		"subject": "QA - Insights inference details",
+		"logo" :"img/Insight.svg",
+		"line" :"img/Line.svg",
+		"footerLogo" :"img/FooterLogo.svg"
+	},
+	"insightsServiceURL": "",
+	"disableAuth": true,
+	"insightsTimeZone": "Asia/Kolkata",
+	"userId": "UserID",
+	"password": "Passwd",
+	"refreshTime": "Jan 22, 2017 5:04:25 PM",
+	"trustedHosts": [
+		"localhost"
+	]
+=======
   "endpointData": {
     "elasticSearchEndpoint": "http://localhost:9200"
   },
