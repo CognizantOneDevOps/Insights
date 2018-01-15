@@ -63,6 +63,7 @@ public class AgentDataSubscriber extends EngineSubscriberResponseHandler{
 		JsonElement json = new JsonParser().parse(message);
 		boolean dataUpdateSupported = this.dataUpdateSupported;
 		String uniqueKey = this.uniqueKey;
+		JsonObject relationMetadata = null;
 		if(json.isJsonObject()) {
 			JsonObject messageObject = json.getAsJsonObject();
 			json = messageObject.get("data");
@@ -83,6 +84,9 @@ public class AgentDataSubscriber extends EngineSubscriberResponseHandler{
 				if(metadata.has("uniqueKey")) {
 					uniqueKey = metadata.get("uniqueKey").getAsString();
 				}
+				if(metadata.has("relation")) {
+					relationMetadata = metadata.get("relation").getAsJsonObject();
+				}
 			}
 		}
 		
@@ -101,7 +105,9 @@ public class AgentDataSubscriber extends EngineSubscriberResponseHandler{
 						queryLabel += ":"+label;
 					}
 				}
-				if(dataUpdateSupported){
+				if(relationMetadata != null) {
+					cypherQuery = buildRelationCypherQuery(relationMetadata, queryLabel);
+				}else if(dataUpdateSupported){
 					cypherQuery = buildCypherQuery(queryLabel, uniqueKey);
 				}else{
 					cypherQuery = "UNWIND {props} AS properties CREATE (n"+queryLabel+") set n=properties return count(n)";
@@ -109,6 +115,9 @@ public class AgentDataSubscriber extends EngineSubscriberResponseHandler{
 				List<List<JsonObject>> partitionList = partitionList(dataList, 1000);
 				for(List<JsonObject> chunk : partitionList){
 					JsonObject graphResponse = dbHandler.bulkCreateNodes(chunk, labels, cypherQuery);
+					if(relationMetadata != null) {
+						System.out.println(graphResponse);
+					}
 					if(graphResponse.get("response").getAsJsonObject().get("errors").getAsJsonArray().size() > 0){
 						log.error("Unable to insert nodes for routing key: "+routingKey+", error occured: "+graphResponse);
 						//log.error(chunk);
@@ -155,5 +164,36 @@ public class AgentDataSubscriber extends EngineSubscriberResponseHandler{
 		query.append(" }) set node+=properties ").append(" ");
 		query.append("return count(node)").append(" ");
 		return query.toString();
+	}
+	
+	private static String buildRelationCypherQuery(JsonObject relationMetadata, String labels) {
+		JsonObject source = relationMetadata.getAsJsonObject("source");
+		JsonObject destination = relationMetadata.getAsJsonObject("destination");
+		String relationName = relationMetadata.get("name").getAsString();
+		StringBuffer cypherQuery = new StringBuffer();
+		cypherQuery.append("UNWIND {props} AS properties MERGE (source").append(labels);
+		cypherQuery.append(buildPropertyConstraintQueryPart(source, "constraints"));
+		cypherQuery.append(") WITH source ");
+		cypherQuery.append("MERGE (destination").append(labels);
+		cypherQuery.append(buildPropertyConstraintQueryPart(destination, "constraints"));
+		cypherQuery.append(")");
+		cypherQuery.append(" MERGE (source)-[r:").append(relationName);
+		cypherQuery.append(buildPropertyConstraintQueryPart(relationMetadata, "properties"));
+		cypherQuery.append("]->(destination)");
+		return cypherQuery.toString();
+	}
+	
+	private static String buildPropertyConstraintQueryPart(JsonObject json, String memberName) {
+		StringBuffer cypherQuery = new StringBuffer();
+		if(json.has(memberName)) {
+			JsonArray properties = json.getAsJsonArray(memberName);
+			cypherQuery.append("{");
+			for(JsonElement constraint : properties) {
+				cypherQuery.append(constraint.getAsString()).append(" : properties.").append(constraint.getAsString()).append(",");
+			}
+			cypherQuery.delete(cypherQuery.length()-1, cypherQuery.length());
+			cypherQuery.append(" }");
+		}
+		return cypherQuery.toString();
 	}
 }
