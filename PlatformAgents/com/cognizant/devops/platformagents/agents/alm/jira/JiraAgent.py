@@ -45,6 +45,8 @@ class JiraAgent(BaseAgent):
             for issue in jiraIssues:
                 parsedIssue = self.parseResponse(responseTemplate, issue)
                 if sprintField:
+                    self.processSprintInformation(parsedIssue, issue, sprintField, self.tracking)
+                    '''
                     sprintDetails = issue.get("fields", {}).get(sprintField, None)
                     if sprintDetails:
                         sprintName = []
@@ -73,6 +75,7 @@ class JiraAgent(BaseAgent):
                         parsedIssue[0]['sprintStartDate'] = sprintStartDate
                         parsedIssue[0]['sprintEndDate'] = sprintEndDate
                         parsedIssue[0]['sprintCompletedDate'] = sprintCompletedDate
+                    '''
                 data += parsedIssue
             maxResults = response['maxResults']
             total = response['total']
@@ -86,7 +89,8 @@ class JiraAgent(BaseAgent):
                 self.publishToolsData(data)
                 self.updateTrackingJson(self.tracking)
             else:
-                break            
+                break
+        self.retrieveSprintReports(userid, passwd, self.tracking)            
     
     def extractFields(self, responseTemplate):
         fieldsJson = responseTemplate.get("fields", None)
@@ -98,7 +102,122 @@ class JiraAgent(BaseAgent):
         if self.config.get("sprintField", None):
             fieldsParam += ','+ self.config.get("sprintField")
         return fieldsParam
+
+    def processSprintInformation(self, parsedIssue, issue, sprintField, tracking):
+        if sprintField:
+            boardsTracking = tracking.get('boards', None)
+            if boardsTracking is None:
+                boardsTracking = {}
+                tracking['boards'] = boardsTracking
+            sprintDetails = issue.get("fields", {}).get(sprintField, None)
+            if sprintDetails:
+                sprints = []
+                boards = []
+                for sprint in sprintDetails:
+                    sprintData = {}
+                    sprintDetail = sprint.split("[")[1][:-1]
+                    sprintPropertieTokens = sprintDetail.split(",")
+                    for propertyToken in sprintPropertieTokens:
+                        propertyKeyValToken = propertyToken.split("=")
+                        sprintData[propertyKeyValToken[0]] = propertyKeyValToken[1]
+                    boardId = sprintData.get('rapidViewId')
+                    sprintId = sprintData.get('id')
+                    boardTracking = boardsTracking.get(boardId, None)
+                    if boardTracking is None:
+                        boardTracking = {}
+                        boardsTracking[boardId] = boardTracking
+                    sprintTracking = boardTracking.get('sprints', None)
+                    if sprintTracking is None:
+                        sprintTracking = {}
+                        boardTracking['sprints'] = sprintTracking
+                    if sprintTracking.get(sprintId, None) is None:
+                        sprintTracking[sprintId] = {}
+                    if boardId not in boards:
+                        boards.append(boardId)
+                    if sprintId not in sprints:
+                        sprints.append(sprintId)
+                parsedIssue[0]['sprints'] = sprints
+                parsedIssue[0]['boards'] = boards
+     
+    def retrieveSprintReports(self, userId, password, tracking):
+        sprintDetails = self.config.get('sprintDetails', None)
+        boardApiUrl = sprintDetails.get('boardApiUrl')
+        boards = tracking.get('boards', None)
+        if sprintDetails and boards:
+            currentDateTime = self.getRemoteDateTime(dateTime2.now()).get('epochTime')
+            sprintReportUrl = sprintDetails.get('sprintReportUrl', None)
+            responseTemplate = sprintDetails.get('sprintReportResponseTemplate', None)
+            relationMetadata = {
+                    'relation' : {
+                            'properties' : ['addedDuringSprint', 'sprintIssueRegion', 'committedEstimate'],
+                            'name' : 'SPRINT_CONTAINS',
+                            'source' : {
+                                    'constraints' : ["sprintId", "boardId"]
+                                },
+                            'destination' : {
+                                    'constraints' : ["key"]
+                                },
+                        }
+                }
+            sprintMetadata = {
+                    'labels' : ['METADATA'],
+                    'dataUpdateSupported' : True,
+                    'uniqueKey' : 'boardId,sprintId'
+                }
+            for boardId in boards:
+                board = boards[boardId]
+                boardName = board.get('name', None)
+                if boardName is None:
+                    boardRestUrl = boardApiUrl + '/' + str(boardId)
+                    try:
+                        boardResponse = self.getResponse(boardRestUrl, 'GET', userId, password, None)
+                        board['name'] = boardResponse.get('name')
+                        board['type'] = boardResponse.get('type')
+                        board.pop('error', None)
+                    except Exception as ex:
+                        board['error'] = str(ex)
+                        continue
+                sprints = board['sprints']
+                for sprintId in sprints:
+                    sprint = sprints[sprintId]
+                    #For velocity, only the completed sprints are considered
+                    lastFetch = sprint.get('lastFetch', 0)
+                    sprintClosed = sprint.get('closed', False)
+                    if not sprintClosed and (currentDateTime - lastFetch) >= 86400:
+                        sprintReportRestUrl = sprintReportUrl + '?rapidViewId='+str(boardId)+'&sprintId='+str(sprintId)
+                        try:
+                            sprintReportResponse = self.getResponse(sprintReportRestUrl, 'GET', userId, password, None)
+                        except Exception as ex:
+                            sprint['error'] = str(ex)
+                        if sprintReportResponse:
+                            content = sprintReportResponse.get('contents', None)
+                            sprint['lastFetch'] = currentDateTime
+                            if sprintReportResponse.get('sprint', {}).get('state', 'OPEN') == 'CLOSED':
+                                sprint['closed'] = True
+                            injectData = {
+                                    'boardId' : boardId,
+                                    'sprintId' : sprintId
+                                }
+                            data = []
+                            data += self.addSprintDetails(responseTemplate, content, 'completedIssues', injectData)
+                            data += self.addSprintDetails(responseTemplate, content, 'issuesNotCompletedInCurrentSprint', injectData)
+                            data += self.addSprintDetails(responseTemplate, content, 'puntedIssues', injectData)
+                            data += self.addSprintDetails(responseTemplate, content, 'issuesCompletedInAnotherSprint', injectData)
+                            if len(data) > 0:
+                                self.publishToolsData(self.getSprintInformation(sprintReportResponse, boardId, sprintId), sprintMetadata)
+                                self.publishToolsData(data, relationMetadata)
+                                self.updateTrackingJson(self.tracking)
     
+    def getSprintInformation(self, content, boardId, sprintId):
+        sprint = content.get('sprint')
+        sprint.pop('linkedPagesCount', None)
+        sprint.pop('remoteLinks', None)
+        sprint.pop('sequence', None)
+        sprint.pop('id', None)
+        sprint['boardId'] = boardId
+        sprint['sprintId'] = sprintId
+        return [] + sprint
+        
     def captureSprintReports(self, userId, password):
         startFromDate = parser.parse(self.config.get("startFrom", ''))
         timeStampFormat = '%Y-%m-%d'
