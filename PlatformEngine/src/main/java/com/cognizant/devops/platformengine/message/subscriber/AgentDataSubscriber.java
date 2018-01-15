@@ -182,7 +182,7 @@ public class AgentDataSubscriber extends EngineSubscriberResponseHandler{
 			cypherQuery.append(" set ");
 			JsonArray properties = relationMetadata.getAsJsonArray("properties");
 			for(JsonElement property : properties) {
-				cypherQuery.append("r.").append(property.getAsString()).append(" = properties").append(property.getAsString()).append(",");
+				cypherQuery.append("r.").append(property.getAsString()).append(" = properties.").append(property.getAsString()).append(",");
 			}
 			cypherQuery.delete(cypherQuery.length()-1, cypherQuery.length());
 		}
