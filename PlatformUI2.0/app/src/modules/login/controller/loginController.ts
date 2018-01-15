@@ -20,6 +20,8 @@ module ISightApp {
     export class LoginController {
         static $inject = ['loginService', 'restEndpointService', '$location', '$document', '$cookies'];
         constructor(private loginService: ILoginService, private restEndpointService: IRestEndpointService, private $location, private $document, private $cookies) {
+
+
         }
         self;
         logMsg: string;
@@ -29,6 +31,7 @@ module ISightApp {
         cookies: string;
         usernameVal: string;
         passwordVal: string;
+        
 
         userAuthentication(username: string, password: string): void {
             if (username === '' || username === undefined || password === '' || password === undefined) {
@@ -66,11 +69,8 @@ module ISightApp {
                             var form = document.createElement("form");
                             form.target = uniqueString;
                             //form.action = "http://localhost:3000/login";
-                            form.action = self.restEndpointService.getGrafanaHost() + '/login';
-                            //console.log(form.action);
-                            form.method = "POST";
-
-                            // repeat for each parameter
+                            
+                            // repeat for each parametergetGrafanaHost()
                             var input = document.createElement("input");
                             input.type = "hidden";
                             input.name = "user";
@@ -88,9 +88,13 @@ module ISightApp {
                             input2.name = "email";
                             input2.value = '';
                             form.appendChild(input2);
-
-                            document.body.appendChild(form);
-                            form.submit();
+                            self.restEndpointService.getGrafanaHost1().then(function(response){
+                                form.action = response.grafanaEndPoint + "/login";
+                                console.log("form action "+form.action);
+                                form.method = "POST";
+                                document.body.appendChild(form);
+                                form.submit();
+                            });
                         } else if (data.error.message) {
                             self.showThrobber = false;
                             self.isLoginError = true;

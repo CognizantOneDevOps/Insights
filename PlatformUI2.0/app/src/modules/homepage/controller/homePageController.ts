@@ -40,9 +40,11 @@ module ISightApp {
                     } else {
                         self.showAdminTab = false;
                     }
-                    self.$cookies.put('grafanaRole', data.grafanaCurrentOrgRole);
+                     self.$cookies.put('grafanaRole', data.grafanaCurrentOrgRole);
                     self.$cookies.put('grafanaOrg', data.grafanaCurrentOrg);
-                    self.userName = data.userName.replace(/['"]+/g, '');
+                    if(data.userName != undefined){
+                        self.userName = data.userName.replace(/['"]+/g, '');
+                    }
                     self.userRole = data.grafanaCurrentOrgRole;
                     self.userCurrentOrg = data.grafanaCurrentOrg;
                     self.authenticationService.getCurrentUserOrgs()
@@ -51,30 +53,44 @@ module ISightApp {
                             return i.orgId == self.userCurrentOrg;
                         });
                     });
+                    let location = self.$location;
+                    let uiConfigJsonUrl: string = location.absUrl().replace(location.path(), "");
+                    if (uiConfigJsonUrl.length > uiConfigJsonUrl.lastIndexOf('/')) {
+                        uiConfigJsonUrl = uiConfigJsonUrl.substr(0, uiConfigJsonUrl.lastIndexOf('/'));
+                    }
+                    uiConfigJsonUrl += "/uiConfig.json"
+                    var configResource = self.$resource(uiConfigJsonUrl);
+                    var data = configResource.get().$promise.then(function (data) {
+                    self.showInsightsTab = data.showInsightsTab;
+                    if(self.showAdminTab){
+                        if(self.showInsightsTab){
+                            self.selectedIndex = 1;
+                           self.templateName = 'insights';
+                        }else{
+                             self.selectedIndex = 1;
+                            self.templateName = 'dashboards';
+                
+                        }
+                    }else{
+                        if(self.showInsightsTab){
+                            self.selectedIndex = 0;
+                            self.templateName = 'insights';
+                        }else{
+                             self.selectedIndex = 0;
+                             self.templateName = 'dashboards';
+                
+                        }
+                    }
+                    });
+                   
                 });
 
-                self.selectedIndex = 2;
-                self.templateName = 'dashboards';
+               // self.selectedIndex = 2;
+                //self.templateName = 'dashboards';
             
-            
-                let location = this.$location;
-                let uiConfigJsonUrl: string = location.absUrl().replace(location.path(), "");
-                if (uiConfigJsonUrl.length > uiConfigJsonUrl.lastIndexOf('/')) {
-                    uiConfigJsonUrl = uiConfigJsonUrl.substr(0, uiConfigJsonUrl.lastIndexOf('/'));
-                }
-                uiConfigJsonUrl += "/uiConfig.json"
-                var configResource = this.$resource(uiConfigJsonUrl);
-                var data = configResource.get().$promise.then(function (data) {
-                    self.showInsightsTab = data.showInsightsTab;
-                    if(self.showInsightsTab){
-                        self.selectedIndex = 1;
-                        self.templateName = 'insights';
-                    }else{
-                         self.selectedIndex = 2;
-                         self.templateName = 'dashboards';
-            
-                    }
-                });
+            console.log(self.templateName);
+            console.log(self.selectedIndex);
+
               
         }
         isValidUser: boolean = false;
@@ -87,10 +103,9 @@ module ISightApp {
         imageurl5: string = "dist/icons/svg/landingPage/playlist_normal.svg";
         imageurl6: string = "dist/icons/svg/landingPage/logout_normal.svg";
         imageurl7: string = "dist/icons/svg/landingPage/magnifying_glass.svg";
-        aboutImg: string = "dist/icons/svg/login/about_normal.svg";
-        grafanaHost: String = this.restEndpointService.getGrafanaHost();
+        aboutImg: string = "dist/icons/svg/landingPage/about_normal.svg";
         playListUrl: String = '';
-        templateName: string = 'toolsConfiguration';
+        templateName: string = 'insights';
         showInsightsTab: boolean;
         shouldReload: boolean;
         selectedToolName: string;
@@ -106,7 +121,7 @@ module ISightApp {
         showAdminTab: boolean = false;
         showThrobber: boolean;
         selectDashboard: boolean = false;
-        selectedIndex = 2;
+        selectedIndex: Number;
         selectedDashboardUrl: string = '';
         userName: string = '';
         userRole: string = '';
@@ -158,10 +173,14 @@ module ISightApp {
             this.authenticationService.validateSession();
             this.templateName = tabName;
 
-            if ('playlist' === tabName) {
-				var self = this;
-                //this.playListUrl = this.$sce.trustAsResourceUrl(this.grafanaHost + '/dashboard/script/iSight.js?url=' + this.grafanaHost + '/playlists');
-				this.playListUrl = self.restEndpointService.getGrafanaHost() + '/dashboard/script/iSight.js?url=' + self.restEndpointService.getGrafanaHost() + '/playlists';
+             if ('playlist' === tabName) {
+                var self = this;
+                self.restEndpointService.getGrafanaHost1().then(function(response){
+                    var grafanaEndPoint =  response.grafanaEndPoint;
+                    self.playListUrl = self.$sce.trustAsResourceUrl(grafanaEndPoint + '/dashboard/script/iSight.js?url=' + grafanaEndPoint + '/playlists');
+                });  
+               // this.playListUrl = this.$sce.trustAsResourceUrl(self.restEndpointService.getGrafanaHost()  + '/dashboard/script/iSight.js?url=' + self.restEndpointService.getGrafanaHost() + '/playlists');
+               //this.playListUrl = self.restEndpointService.getGrafanaHost() + '/dashboard/script/iSight.js?url=' + self.restEndpointService.getGrafanaHost() + '/playlists';
             } else {
                 this.playListUrl = '';
             }
@@ -247,12 +266,14 @@ module ISightApp {
                             // construct a form with hidden inputs, targeting the iframe
                             var form = document.createElement("form");
                             form.target = uniqueString;
-                            //form.action = "http://localhost:3000/logout";
-                            form.action = self.restEndpointService.getGrafanaHost() + '/logout';
-                            //console.log(form.action);
-                            form.method = "GET";
-							document.body.appendChild(form);
-							form.submit();					
+                            self.restEndpointService.getGrafanaHost1().then(function(response){
+                                form.action = response.grafanaEndPoint + "/logout";
+                               // console.log("form action "+form.action);
+                                form.method = "GET";
+                                document.body.appendChild(form);
+                                form.submit();
+                            });
+									
                 });
             var cookieVal = this.$cookies.getAll();
             for (var key in cookieVal) {

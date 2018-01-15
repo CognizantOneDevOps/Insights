@@ -25,9 +25,11 @@ from com.cognizant.devops.platformagents.core.BaseAgent import BaseAgent
 
 class RallyAgent(BaseAgent):
     def process(self):
+        accesstoken = self.config.get("accesstoken", '')
         userid = self.config.get("userid", '')
         passwd = self.config.get("passwd", '')
         baseUrl = self.config.get("baseUrl", '')
+        proxy = self.config.get("proxy", '')
         startFrom = self.config.get("startFrom", '')
         startFrom = parser.parse(startFrom)
         startFrom = startFrom.strftime('%Y-%m-%dT%H:%M:%S')
@@ -37,8 +39,16 @@ class RallyAgent(BaseAgent):
             lastUpdated = startFrom
         else:
             lastUpdated = since
+        headers = {
+            'zsessionid': accesstoken,
+            'content-type': "application/json"
+        }
+        proxies = {
+            "http": "http://"+userid+":"+passwd+"@"+ proxy,
+            "https": "http://"+userid+":"+passwd+"@"+ proxy
+        }
         hierachiesUrl = baseUrl+"hierarchicalrequirement?query=(LastUpdateDate > "+lastUpdated+")&fetch=LastUpdateDate,Name&order=LastUpdateDate desc"
-        hierachies = self.getResponse(hierachiesUrl, 'GET', userid, passwd, None)
+        hierachies = self.getResponse(hierachiesUrl, 'GET', userid, passwd, None, reqHeaders=headers, proxies=proxies)
         data = []
         for hierarchy in hierachies["QueryResult"]["Results"]:
             injectData = {}
