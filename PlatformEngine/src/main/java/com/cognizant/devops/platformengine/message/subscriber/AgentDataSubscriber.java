@@ -61,6 +61,31 @@ public class AgentDataSubscriber extends EngineSubscriberResponseHandler{
 		labels.addAll(Arrays.asList(routingKey.split(MessageConstants.ROUTING_KEY_SEPERATOR)));
 		List<JsonObject> dataList = new ArrayList<JsonObject>();
 		JsonElement json = new JsonParser().parse(message);
+		boolean dataUpdateSupported = this.dataUpdateSupported;
+		String uniqueKey = this.uniqueKey;
+		if(json.isJsonObject()) {
+			JsonObject messageObject = json.getAsJsonObject();
+			json = messageObject.get("data");
+			if(messageObject.has("metadata")) {
+				JsonObject metadata = messageObject.get("metadata").getAsJsonObject();
+				if(metadata.has("labels")) {
+					JsonArray additionalLabels = metadata.get("labels").getAsJsonArray();
+					for(JsonElement additionalLabel : additionalLabels) {
+						String label = additionalLabel.getAsString();
+						if(!labels.contains(label)) {
+							labels.add(label);
+						}
+					}
+				}
+				if(metadata.has("dataUpdateSupported")) {
+					dataUpdateSupported = metadata.get("dataUpdateSupported").getAsBoolean();
+				}
+				if(metadata.has("uniqueKey")) {
+					uniqueKey = metadata.get("uniqueKey").getAsString();
+				}
+			}
+		}
+		
 		if(json.isJsonArray()){
 			JsonArray asJsonArray = json.getAsJsonArray();
 			for(JsonElement e : asJsonArray){
@@ -69,16 +94,16 @@ public class AgentDataSubscriber extends EngineSubscriberResponseHandler{
 				}
 			}
 			try {
-				String cypherQuery = null;
-				if(dataUpdateSupported){
-					String labelsStr = routingKey.replace(".", ":");
-					String relation = category+"_UPDATED_TO";
-					cypherQuery = buildCypherQuery(labelsStr, uniqueKey, relation);
-				}else{
-					String queryLabel = "";
-					for(String label : labels){
+				String cypherQuery = "";
+				String queryLabel = "";
+				for(String label : labels){
+					if(label != null && label.trim().length() > 0) {
 						queryLabel += ":"+label;
 					}
+				}
+				if(dataUpdateSupported){
+					cypherQuery = buildCypherQuery(queryLabel, uniqueKey);
+				}else{
 					cypherQuery = "UNWIND {props} AS properties CREATE (n"+queryLabel+") set n=properties return count(n)";
 				}
 				List<List<JsonObject>> partitionList = partitionList(dataList, 1000);
@@ -86,12 +111,12 @@ public class AgentDataSubscriber extends EngineSubscriberResponseHandler{
 					JsonObject graphResponse = dbHandler.bulkCreateNodes(chunk, labels, cypherQuery);
 					if(graphResponse.get("response").getAsJsonObject().get("errors").getAsJsonArray().size() > 0){
 						log.error("Unable to insert nodes for routing key: "+routingKey+", error occured: "+graphResponse);
-						log.error(chunk);
+						//log.error(chunk);
 					}
 				}
 				getChannel().basicAck(envelope.getDeliveryTag(), false);
 			} catch (GraphDBException e) {
-				log.error(e);
+				log.error("GraphDBException occured.", e);
 			}
 		}
 	}
@@ -112,28 +137,23 @@ public class AgentDataSubscriber extends EngineSubscriberResponseHandler{
 		return new ArrayList<T>(list.subList(index, Math.min(N, index + size)));
 	}
 	
-	private String buildCypherQuery(String labels, String fieldName, String relation){
+	private static String buildCypherQuery(String labels, String fieldName){
 		StringBuffer query = new StringBuffer();
-		query.append("UNWIND {props} AS properties CREATE (new:LATEST) set new=properties ").append(" ");
-		query.append("WITH new,").append(" ");
+		query.append("UNWIND {props} AS properties MERGE (node:LATEST").append(labels).append(" { ");
 		if(fieldName.contains(",")){
 			String[] fields = fieldName.split(",");
 			JsonObject searchCriteria = new JsonObject();
 			for(String field : fields){
 				searchCriteria.addProperty(field, field);
-				query.append("new.").append(field).append(" as ").append(field).append(",");
+				query.append(field).append(" : properties.").append(field).append(",");
 			}
 			query.delete(query.length()-1, query.length());
 			query.append(" ");
-			query.append("OPTIONAL match (old:LATEST:").append(labels).append(searchCriteria.toString().replace("\"", "")).append(")").append(" ");
-		}else{
-			query.append("new.").append(fieldName).append(" as key").append(" ");
-			query.append("OPTIONAL match (old:LATEST:").append(labels).append("{").append(fieldName).append(":key})").append(" ");
+		}else {
+			query.append(fieldName).append(" : ").append("properties.").append(fieldName);
 		}
-		query.append("with new, collect(old) as oldNodes").append(" ");
-		query.append("set new:").append(labels).append(" ");
-		query.append("foreach (old in oldNodes | remove old:LATEST ").append(" CREATE (old) -[r:").append(relation).append("]-> (new))").append(" ");
-		query.append("return count(new), count(oldNodes)").append(" ");
+		query.append(" }) set node+=properties ").append(" ");
+		query.append("return count(node)").append(" ");
 		return query.toString();
 	}
 }
