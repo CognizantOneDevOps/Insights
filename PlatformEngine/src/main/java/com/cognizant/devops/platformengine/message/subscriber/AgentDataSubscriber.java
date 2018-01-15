@@ -173,7 +173,7 @@ public class AgentDataSubscriber extends EngineSubscriberResponseHandler{
 		StringBuffer cypherQuery = new StringBuffer();
 		cypherQuery.append("UNWIND {props} AS properties MERGE (source").append(labels);
 		cypherQuery.append(buildPropertyConstraintQueryPart(source, "constraints"));
-		cypherQuery.append(") WITH source ");
+		cypherQuery.append(") WITH source, properties ");
 		cypherQuery.append("MERGE (destination").append(labels);
 		cypherQuery.append(buildPropertyConstraintQueryPart(destination, "constraints"));
 		cypherQuery.append(")");
