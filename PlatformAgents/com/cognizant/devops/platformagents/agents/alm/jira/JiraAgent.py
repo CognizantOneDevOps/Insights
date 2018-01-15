@@ -218,6 +218,16 @@ class JiraAgent(BaseAgent):
         sprint['boardId'] = boardId
         sprint['sprintId'] = sprintId
         sprint['boardName'] = boardName
+        timeStampFormat = '%d/%b/%y'
+        startDate = sprint.get('startDate', None)
+        if startDate:
+            sprint['startDateEpoch'] = self.getRemoteDateTime(dateTime2.strptime(startDate.split(' ')[0], timeStampFormat)).get('epochTime')
+        endDate = sprint.get('endDate', None)
+        if endDate:
+            sprint['endDateEpoch'] = self.getRemoteDateTime(dateTime2.strptime(endDate.split(' ')[0], timeStampFormat)).get('epochTime')
+        completeDate = sprint.get('completeDate', None)
+        if completeDate:
+            sprint['completeDateEpoch'] = self.getRemoteDateTime(dateTime2.strptime(completeDate.split(' ')[0], timeStampFormat)).get('epochTime')
         data.append(sprint)
         return data
         
