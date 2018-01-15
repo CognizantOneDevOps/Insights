@@ -18,9 +18,11 @@ Created on Jun 22, 2016
 
 @author: 463188
 '''
-from dateutil import parser
+from datetime import datetime as dateTime2
 import datetime
+from dateutil import parser
 from com.cognizant.devops.platformagents.core.BaseAgent import BaseAgent
+
 class JiraAgent(BaseAgent):
     def process(self):
         userid = self.config.get("userid", '')
@@ -35,9 +37,9 @@ class JiraAgent(BaseAgent):
         maxResults = 0
         startAt = 0
         updatetimestamp = None
-        data = []
         sprintField = self.config.get("sprintField", None)
         while (startAt + maxResults) < total:
+            data = []
             response = self.getResponse(jiraIssuesUrl+'&startAt='+str(startAt + maxResults), 'GET', userid, passwd, None)
             jiraIssues = response["issues"]
             for issue in jiraIssues:
@@ -96,6 +98,109 @@ class JiraAgent(BaseAgent):
         if self.config.get("sprintField", None):
             fieldsParam += ','+ self.config.get("sprintField")
         return fieldsParam
-            
+    
+    def captureSprintReports(self, userId, password):
+        startFromDate = parser.parse(self.config.get("startFrom", ''))
+        timeStampFormat = '%Y-%m-%d'
+        boardStartAt = 0
+        maxResults = 50
+        sprintDetails = self.config.get('sprintDetails', None)
+        boardApiUrl = sprintDetails.get('boardApiUrl', None)
+        sprintReportUrl = sprintDetails.get('sprintReportUrl', None)
+        responseTemplate = sprintDetails.get('sprintReportResponseTemplate', None)
+        boardTracking = self.tracking.get('boardTracking', None);
+        if boardTracking is None:
+            boardTracking = {}
+            self.tracking['boardTracking'] = boardTracking
+        metadata = {
+                'labels' : ['METADATA'],
+                'dataUpdateSupported' : True,
+                'uniqueKey' : 'boardId,sprintId,key'
+            }
+        while True:
+            boardApiRestUrl = boardApiUrl+'?maxResults='+str(maxResults)+'&startAt='+str(boardStartAt)
+            boardResponse = self.getResponse(boardApiRestUrl, 'GET', userId, password, None)
+            boardValues = boardResponse.get('values', [])
+            for board in boardValues:
+                boardId = board['id']
+                sprintStartAt = 0
+                while True:
+                    boardSprintRestUrl = boardApiUrl+'/'+str(board['id'])+'/sprint?startAt='+str(sprintStartAt)+'&maxResults='+str(maxResults)
+                    try:
+                        boardSprintResponse = self.getResponse(boardSprintRestUrl, 'GET', userId, password, None)
+                    except Exception as ex:
+                        break
+                    sprintValues = boardSprintResponse.get('values', [])
+                    for sprintValue in sprintValues:
+                        sprintCompletedDateStr = sprintValue.get('completeDate', None)
+                        if sprintCompletedDateStr:
+                            sprintCompletedDateStr = sprintCompletedDateStr.split('T')[0]
+                            sprintCompleteDate = parser.parse(sprintCompletedDateStr)
+                            if sprintCompleteDate < startFromDate:
+                                continue
+                        sprintStartTimeStr = sprintValue.get('startDate', None)
+                        if sprintStartTimeStr:
+                            sprintStartTime = dateTime2.strptime(sprintStartTimeStr.split('T')[0], timeStampFormat)
+                        else:
+                            continue
+                        sprintEndTimeStr = sprintValue.get('endDate', None)
+                        if sprintEndTimeStr:
+                            sprintEndTime = dateTime2.strptime(sprintEndTimeStr.split('T')[0], timeStampFormat)
+                        sprintCompletedTimeStr = sprintValue.get('completeDate', None)
+                        if sprintCompletedTimeStr:
+                            sprintCompletedTime = dateTime2.strptime(sprintCompletedTimeStr.split('T')[0], timeStampFormat)
+                        injectData = {
+                                'boardId' : boardId,
+                                'boardName' : board['name'],
+                                'boardType' : board['type'],
+                                'sprintId' : sprintValue['id'],
+                                'sprintStartTime' : sprintStartTimeStr,
+                                'sprintStartEpochTime' : self.getRemoteDateTime(sprintStartTime).get('epochTime'),
+                                'sprintEndTime' : sprintEndTimeStr,
+                                'sprintEndEpochTime' : self.getRemoteDateTime(sprintEndTime).get('epochTime'),
+                                'sprintCompletedTime' : sprintCompletedTimeStr,
+                                'sprintCompletedEpochTime' : self.getRemoteDateTime(sprintCompletedTime).get('epochTime'),
+                                'originBoardId' : sprintValue['originBoardId'],
+                                'sprintState' : sprintValue['state'],
+                                'sprintName' : sprintValue['name'],
+                                'almType' : 'sprintReport'
+                            }
+                        sprintReportRestUrl = sprintReportUrl + '?rapidViewId='+str(boardId)+'&sprintId='+str(injectData['sprintId'])
+                        try:
+                            sprintReportResponse = self.getResponse(sprintReportRestUrl, 'GET', userId, password, None)
+                        except Exception as ex:
+                            continue
+                        if sprintReportResponse:
+                            content = sprintReportResponse.get('contents', None)
+                            data = []
+                            data += self.addSprintDetails(responseTemplate, content, 'completedIssues', injectData)
+                            data += self.addSprintDetails(responseTemplate, content, 'issuesNotCompletedInCurrentSprint', injectData)
+                            data += self.addSprintDetails(responseTemplate, content, 'puntedIssues', injectData)
+                            data += self.addSprintDetails(responseTemplate, content, 'issuesCompletedInAnotherSprint', injectData)
+                            if len(data) > 0:
+                                self.publishToolsData(data, metadata)
+                                #Need to add tracking
+                                #Do not retrieve the sprints which are already completed.
+                                #for tracking, store the sprints which are yet to be completed.
+                    if boardSprintResponse.get('isLast', True):
+                        break
+                    else:
+                        sprintStartAt = sprintStartAt + maxResults
+            if boardResponse.get('isLast', True):
+                break
+            else:
+                boardStartAt = boardStartAt + maxResults
+    
+    def addSprintDetails(self, responseTemplate, content, sprintIssueRegion, injectData):
+        issueKeysAddedDuringSprint = content.get('issueKeysAddedDuringSprint', {})
+        issues = content.get(sprintIssueRegion, None)
+        parsedIssues = []
+        if issues:
+            parsedIssues = self.parseResponse(responseTemplate, issues, injectData)
+            for issue in parsedIssues:
+                issue['addedDuringSprint'] = issueKeysAddedDuringSprint.get(issue['key'], False)
+                issue['sprintIssueRegion'] = sprintIssueRegion
+        return parsedIssues
+        
 if __name__ == "__main__":
     JiraAgent()        

@@ -31,6 +31,7 @@ import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -53,9 +54,9 @@ public class InsightsInferenceController{
 	InsightsInferenceService insightsInferenceService;
 
 	@RequestMapping(value = "/inferences", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public  JsonObject getInferences( String accessGroup) {
+	public  JsonObject getInferences( @RequestParam(value = "schedule", required = false, defaultValue = "DAILY")String schedule,String accessGroup) {
 		
-		List<InsightsInference> inferences = insightsInferenceService.getInferenceDetails();
+		List<InsightsInference> inferences = insightsInferenceService.getInferenceDetails(schedule);
 		return PlatformServiceUtil.buildSuccessResponseWithData(inferences);
 
 	}

@@ -31,6 +31,7 @@ import com.cognizant.devops.platformcommons.config.ApplicationConfigCache;
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.config.EndpointData;
 import com.cognizant.devops.platformcommons.config.LDAPConfiguration;
+import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -112,9 +113,12 @@ public class SetupApplication {
 	}
 	
 	@RequestMapping(value = "/grafanaEndPoint", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public @ResponseBody String grafanaEndPoint(){
+	public @ResponseBody JsonObject grafanaEndPoint(){
 		ApplicationConfigProvider applicationConfig = ApplicationConfigProvider.getInstance();
-		return applicationConfig.getGrafana().getGrafanaEndpoint();
+		JsonObject jsonResponse = new JsonObject();
+		jsonResponse.addProperty(PlatformServiceConstants.STATUS, PlatformServiceConstants.SUCCESS);
+		jsonResponse.addProperty("grafanaEndPoint", applicationConfig.getGrafana().getGrafanaEndpoint());
+		return jsonResponse;
+
 	}
-	
 }
