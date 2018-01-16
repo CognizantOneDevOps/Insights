@@ -51,7 +51,28 @@
       ]
     }
   },
+  "sprintDetails" : {
+  	"boardApiUrl" : "https://<JIRA_HOST_URL>/rest/agile/1.0/board",
+  	"sprintReportUrl" : "https://<JIRA_HOST_URL>/rest/greenhopper/1.0/rapid/charts/sprintreport",
+  	"sprintReportResponseTemplate" : {
+        "key": "key",
+        "typeName": "issueType",
+        "priorityName": "priority",
+        "currentEstimateStatistic": {
+          "statFieldValue": {
+            "value": "currentEstimate"
+          }
+        },
+        "estimateStatistic": {
+          "statFieldValue": {
+            "value": "committedEstimate"
+          }
+        },
+        "statusName": "status"
+      }
+  },
   "runSchedule": 30,
+  "sprintRetrivalSchedule" : 360,
   "dataFetchCount": 1000,
   "userid": "userid",
   "passwd": "password",
