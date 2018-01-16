@@ -64,36 +64,6 @@ class JiraAgent(BaseAgent):
                 parsedIssue = self.parseResponse(responseTemplate, issue)
                 if sprintField:
                     self.processSprintInformation(parsedIssue, issue, sprintField, self.tracking)
-                    '''
-                    sprintDetails = issue.get("fields", {}).get(sprintField, None)
-                    if sprintDetails:
-                        sprintName = []
-                        sprintState = []
-                        sprintStartDate = []
-                        sprintEndDate = []
-                        sprintCompletedDate = []
-                        activeSprint = []
-                        for sprint in sprintDetails:
-                            sprintData = {}
-                            sprintDetail = sprint.split("[")[1][:-1]
-                            sprintPropertieTokens = sprintDetail.split(",")
-                            for propertyToken in sprintPropertieTokens:
-                                propertyKeyValToken = propertyToken.split("=")
-                                sprintData[propertyKeyValToken[0]] = propertyKeyValToken[1]
-                            sprintName.append(sprintData.get('name'))
-                            sprintState.append(sprintData.get('state'))
-                            sprintStartDate.append(sprintData.get('startDate'))
-                            sprintEndDate.append(sprintData.get('endDate'))
-                            sprintCompletedDate.append(sprintData.get('completeDate'))
-                            if sprintData.get('state') == 'ACTIVE':
-                                activeSprint.append(sprintData.get('name'))
-                        parsedIssue[0]['activeSprint'] = activeSprint
-                        parsedIssue[0]['sprintName'] = sprintName
-                        parsedIssue[0]['sprintState'] = sprintState
-                        parsedIssue[0]['sprintStartDate'] = sprintStartDate
-                        parsedIssue[0]['sprintEndDate'] = sprintEndDate
-                        parsedIssue[0]['sprintCompletedDate'] = sprintCompletedDate
-                    '''
                 data += parsedIssue
             maxResults = response['maxResults']
             total = response['total']
@@ -165,6 +135,7 @@ class JiraAgent(BaseAgent):
             currentDateTime = dateTime2.now()
             sprintReportUrl = sprintDetails.get('sprintReportUrl', None)
             responseTemplate = sprintDetails.get('sprintReportResponseTemplate', None)
+            sprintRetrivalSchedule = self.config.get('sprintRetrivalSchedule', 1440) * 60
             for boardId in boards:
                 board = boards[boardId]
                 boardName = board.get('name', None)
@@ -186,7 +157,7 @@ class JiraAgent(BaseAgent):
                     if lastFetch:
                         lastFetch = parser.parse(lastFetch)
                     sprintClosed = sprint.get('closed', False)
-                    if not sprintClosed and (lastFetch is None or (currentDateTime - lastFetch).total_seconds() >= 86400):
+                    if not sprintClosed and (lastFetch is None or (currentDateTime - lastFetch).total_seconds() >= sprintRetrivalSchedule):
                         sprintReportRestUrl = sprintReportUrl + '?rapidViewId='+str(boardId)+'&sprintId='+str(sprintId)
                         try:
                             sprintReportResponse = self.getResponse(sprintReportRestUrl, 'GET', userId, password, None)
@@ -233,98 +204,6 @@ class JiraAgent(BaseAgent):
         data.append(sprint)
         return data
         
-    def captureSprintReports(self, userId, password):
-        startFromDate = parser.parse(self.config.get("startFrom", ''))
-        timeStampFormat = '%Y-%m-%d'
-        boardStartAt = 0
-        maxResults = 50
-        sprintDetails = self.config.get('sprintDetails', None)
-        boardApiUrl = sprintDetails.get('boardApiUrl', None)
-        sprintReportUrl = sprintDetails.get('sprintReportUrl', None)
-        responseTemplate = sprintDetails.get('sprintReportResponseTemplate', None)
-        boardTracking = self.tracking.get('boardTracking', None);
-        if boardTracking is None:
-            boardTracking = {}
-            self.tracking['boardTracking'] = boardTracking
-        metadata = {
-                'labels' : ['METADATA'],
-                'dataUpdateSupported' : True,
-                'uniqueKey' : 'boardId,sprintId,key'
-            }
-        while True:
-            boardApiRestUrl = boardApiUrl+'?maxResults='+str(maxResults)+'&startAt='+str(boardStartAt)
-            boardResponse = self.getResponse(boardApiRestUrl, 'GET', userId, password, None)
-            boardValues = boardResponse.get('values', [])
-            for board in boardValues:
-                boardId = board['id']
-                sprintStartAt = 0
-                while True:
-                    boardSprintRestUrl = boardApiUrl+'/'+str(board['id'])+'/sprint?startAt='+str(sprintStartAt)+'&maxResults='+str(maxResults)
-                    try:
-                        boardSprintResponse = self.getResponse(boardSprintRestUrl, 'GET', userId, password, None)
-                    except Exception as ex:
-                        break
-                    sprintValues = boardSprintResponse.get('values', [])
-                    for sprintValue in sprintValues:
-                        sprintCompletedDateStr = sprintValue.get('completeDate', None)
-                        if sprintCompletedDateStr:
-                            sprintCompletedDateStr = sprintCompletedDateStr.split('T')[0]
-                            sprintCompleteDate = parser.parse(sprintCompletedDateStr)
-                            if sprintCompleteDate < startFromDate:
-                                continue
-                        sprintStartTimeStr = sprintValue.get('startDate', None)
-                        if sprintStartTimeStr:
-                            sprintStartTime = dateTime2.strptime(sprintStartTimeStr.split('T')[0], timeStampFormat)
-                        else:
-                            continue
-                        sprintEndTimeStr = sprintValue.get('endDate', None)
-                        if sprintEndTimeStr:
-                            sprintEndTime = dateTime2.strptime(sprintEndTimeStr.split('T')[0], timeStampFormat)
-                        sprintCompletedTimeStr = sprintValue.get('completeDate', None)
-                        if sprintCompletedTimeStr:
-                            sprintCompletedTime = dateTime2.strptime(sprintCompletedTimeStr.split('T')[0], timeStampFormat)
-                        injectData = {
-                                'boardId' : boardId,
-                                'boardName' : board['name'],
-                                'boardType' : board['type'],
-                                'sprintId' : sprintValue['id'],
-                                'sprintStartTime' : sprintStartTimeStr,
-                                'sprintStartEpochTime' : self.getRemoteDateTime(sprintStartTime).get('epochTime'),
-                                'sprintEndTime' : sprintEndTimeStr,
-                                'sprintEndEpochTime' : self.getRemoteDateTime(sprintEndTime).get('epochTime'),
-                                'sprintCompletedTime' : sprintCompletedTimeStr,
-                                'sprintCompletedEpochTime' : self.getRemoteDateTime(sprintCompletedTime).get('epochTime'),
-                                'originBoardId' : sprintValue['originBoardId'],
-                                'sprintState' : sprintValue['state'],
-                                'sprintName' : sprintValue['name'],
-                                'almType' : 'sprintReport'
-                            }
-                        sprintReportRestUrl = sprintReportUrl + '?rapidViewId='+str(boardId)+'&sprintId='+str(injectData['sprintId'])
-                        try:
-                            sprintReportResponse = self.getResponse(sprintReportRestUrl, 'GET', userId, password, None)
-                        except Exception as ex:
-                            continue
-                        if sprintReportResponse:
-                            content = sprintReportResponse.get('contents', None)
-                            data = []
-                            data += self.addSprintDetails(responseTemplate, content, 'completedIssues', injectData)
-                            data += self.addSprintDetails(responseTemplate, content, 'issuesNotCompletedInCurrentSprint', injectData)
-                            data += self.addSprintDetails(responseTemplate, content, 'puntedIssues', injectData)
-                            data += self.addSprintDetails(responseTemplate, content, 'issuesCompletedInAnotherSprint', injectData)
-                            if len(data) > 0:
-                                self.publishToolsData(data, metadata)
-                                #Need to add tracking
-                                #Do not retrieve the sprints which are already completed.
-                                #for tracking, store the sprints which are yet to be completed.
-                    if boardSprintResponse.get('isLast', True):
-                        break
-                    else:
-                        sprintStartAt = sprintStartAt + maxResults
-            if boardResponse.get('isLast', True):
-                break
-            else:
-                boardStartAt = boardStartAt + maxResults
-    
     def addSprintDetails(self, responseTemplate, content, sprintIssueRegion, injectData):
         issueKeysAddedDuringSprint = content.get('issueKeysAddedDuringSprint', {})
         issues = content.get(sprintIssueRegion, None)
