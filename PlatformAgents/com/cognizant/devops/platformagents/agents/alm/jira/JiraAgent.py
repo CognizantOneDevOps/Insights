@@ -30,8 +30,7 @@ class JiraAgent(BaseAgent):
                 'properties' : ['addedDuringSprint', 'sprintIssueRegion', 'committedEstimate'],
                 'name' : 'HAS_ISSUES',
                 'source' : {
-                        'constraints' : ["sprintId", "boardId"],
-                        'labels' : ['METADATA']
+                        'constraints' : ["sprintId", "boardId"]
                     },
                 'destination' : {
                         'constraints' : ["key"]
@@ -126,8 +125,8 @@ class JiraAgent(BaseAgent):
                         boards.append(boardId)
                     if sprintId not in sprints:
                         sprints.append(sprintId)
-                parsedIssue[0]['sprints'] = sprints
-                parsedIssue[0]['boards'] = boards
+                parsedIssue[0]['sprints'] = int(sprints)
+                parsedIssue[0]['boards'] = int(boards)
      
     def retrieveSprintReports(self, userId, password, tracking):
         sprintDetails = self.config.get('sprintDetails', None)
