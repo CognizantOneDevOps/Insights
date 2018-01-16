@@ -30,7 +30,8 @@ class JiraAgent(BaseAgent):
                 'properties' : ['addedDuringSprint', 'sprintIssueRegion', 'committedEstimate'],
                 'name' : 'HAS_ISSUES',
                 'source' : {
-                        'constraints' : ["sprintId", "boardId"]
+                        'constraints' : ["sprintId", "boardId"],
+                        'labels' : ['METADATA']
                     },
                 'destination' : {
                         'constraints' : ["key"]
