@@ -176,20 +176,21 @@ class JiraAgent(BaseAgent):
                             data += self.addSprintDetails(responseTemplate, content, 'puntedIssues', injectData)
                             data += self.addSprintDetails(responseTemplate, content, 'issuesCompletedInAnotherSprint', injectData)
                             if len(data) > 0:
-                                self.publishToolsData(self.getSprintInformation(sprintReportResponse, boardId, sprintId, board['name']), self.sprintMetadata)
+                                self.publishToolsData(self.getSprintInformation(sprintReportResponse, boardId, sprintId, board['name'], board['type']), self.sprintMetadata)
                                 self.publishToolsData(data, self.relationMetadata)
                                 self.updateTrackingJson(self.tracking)
     
-    def getSprintInformation(self, content, boardId, sprintId, boardName):
+    def getSprintInformation(self, content, boardId, sprintId, boardName, boardType):
         data = []
         sprint = content.get('sprint')
         sprint.pop('linkedPagesCount', None)
         sprint.pop('remoteLinks', None)
         sprint.pop('sequence', None)
         sprint.pop('id', None)
-        sprint['boardId'] = boardId
-        sprint['sprintId'] = sprintId
+        sprint['boardId'] = int(boardId)
+        sprint['sprintId'] = int(sprintId)
         sprint['boardName'] = boardName
+        sprint['boardType'] = boardType
         sprint['sprintName'] = sprint.get('name')
         sprint.pop('name', None)
         timeStampFormat = '%d/%b/%y'
