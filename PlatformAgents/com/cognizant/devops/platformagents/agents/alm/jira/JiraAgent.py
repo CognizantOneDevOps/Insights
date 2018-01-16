@@ -25,6 +25,7 @@ from com.cognizant.devops.platformagents.core.BaseAgent import BaseAgent
 
 class JiraAgent(BaseAgent):
     relationMetadata = {
+        'labels' : ['LATEST'],
         'relation' : {
                 'properties' : ['addedDuringSprint', 'sprintIssueRegion', 'committedEstimate'],
                 'name' : 'HAS_ISSUES',
