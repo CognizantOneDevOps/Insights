@@ -15,6 +15,7 @@
  ******************************************************************************/
 package com.cognizant.devops.platformdal.hierarchy.details;
 
+import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.List;
 
 import org.hibernate.query.Query;
@@ -75,6 +76,17 @@ public class HierarchyDetailsDAL extends BaseDAL {
 		HierarchyDetails hierarchyDetails = createQuery.getSingleResult();
 		getSession().beginTransaction();
 		getSession().delete(hierarchyDetails);
+		getSession().getTransaction().commit();
+		terminateSession();
+		terminateSessionFactory();
+		return true;
+	}
+	
+	public boolean addHierarchyDetailsList(List<HierarchyDetails> hiearchyList) {
+		getSession().beginTransaction();
+		for(HierarchyDetails details:hiearchyList){
+			getSession().save(details);
+		}
 		getSession().getTransaction().commit();
 		terminateSession();
 		terminateSessionFactory();
