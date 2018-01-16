@@ -24,6 +24,24 @@ from dateutil import parser
 from com.cognizant.devops.platformagents.core.BaseAgent import BaseAgent
 
 class JiraAgent(BaseAgent):
+    relationMetadata = {
+        'relation' : {
+                'properties' : ['addedDuringSprint', 'sprintIssueRegion', 'committedEstimate'],
+                'name' : 'HAS_ISSUES',
+                'source' : {
+                        'constraints' : ["sprintId", "boardId"]
+                    },
+                'destination' : {
+                        'constraints' : ["key"]
+                    },
+            }
+    }
+    sprintMetadata = {
+        'labels' : ['METADATA'],
+        'dataUpdateSupported' : True,
+        'uniqueKey' : 'boardId,sprintId'
+    }
+    
     def process(self):
         userid = self.config.get("userid", '')
         passwd = self.config.get("passwd", '')
@@ -144,26 +162,9 @@ class JiraAgent(BaseAgent):
         boardApiUrl = sprintDetails.get('boardApiUrl')
         boards = tracking.get('boards', None)
         if sprintDetails and boards:
-            currentDateTime = self.getRemoteDateTime(dateTime2.now()).get('epochTime')
+            currentDateTime = dateTime2.now()
             sprintReportUrl = sprintDetails.get('sprintReportUrl', None)
             responseTemplate = sprintDetails.get('sprintReportResponseTemplate', None)
-            relationMetadata = {
-                    'relation' : {
-                            'properties' : ['addedDuringSprint', 'sprintIssueRegion', 'committedEstimate'],
-                            'name' : 'HAS_ISSUES',
-                            'source' : {
-                                    'constraints' : ["sprintId", "boardId"]
-                                },
-                            'destination' : {
-                                    'constraints' : ["key"]
-                                },
-                        }
-                }
-            sprintMetadata = {
-                    'labels' : ['METADATA'],
-                    'dataUpdateSupported' : True,
-                    'uniqueKey' : 'boardId,sprintId'
-                }
             for boardId in boards:
                 board = boards[boardId]
                 boardName = board.get('name', None)
@@ -181,9 +182,11 @@ class JiraAgent(BaseAgent):
                 for sprintId in sprints:
                     sprint = sprints[sprintId]
                     #For velocity, only the completed sprints are considered
-                    lastFetch = sprint.get('lastFetch', 0)
+                    lastFetch = sprint.get('lastFetch', None)
+                    if lastFetch:
+                        lastFetch = parser.parse(lastFetch)
                     sprintClosed = sprint.get('closed', False)
-                    if not sprintClosed and (currentDateTime - lastFetch) >= 86400:
+                    if not sprintClosed and (lastFetch is None or (currentDateTime - lastFetch).total_seconds() >= 86400):
                         sprintReportRestUrl = sprintReportUrl + '?rapidViewId='+str(boardId)+'&sprintId='+str(sprintId)
                         try:
                             sprintReportResponse = self.getResponse(sprintReportRestUrl, 'GET', userId, password, None)
@@ -191,21 +194,18 @@ class JiraAgent(BaseAgent):
                             sprint['error'] = str(ex)
                         if sprintReportResponse:
                             content = sprintReportResponse.get('contents', None)
-                            sprint['lastFetch'] = currentDateTime
+                            sprint['lastFetch'] = currentDateTime.strftime('%Y-%m-%d %H:%M')
                             if sprintReportResponse.get('sprint', {}).get('state', 'OPEN') == 'CLOSED':
                                 sprint['closed'] = True
-                            injectData = {
-                                    'boardId' : boardId,
-                                    'sprintId' : sprintId
-                                }
+                            injectData = { 'boardId' : boardId, 'sprintId' : sprintId }
                             data = []
                             data += self.addSprintDetails(responseTemplate, content, 'completedIssues', injectData)
                             data += self.addSprintDetails(responseTemplate, content, 'issuesNotCompletedInCurrentSprint', injectData)
                             data += self.addSprintDetails(responseTemplate, content, 'puntedIssues', injectData)
                             data += self.addSprintDetails(responseTemplate, content, 'issuesCompletedInAnotherSprint', injectData)
                             if len(data) > 0:
-                                self.publishToolsData(self.getSprintInformation(sprintReportResponse, boardId, sprintId, board['name']), sprintMetadata)
-                                self.publishToolsData(data, relationMetadata)
+                                self.publishToolsData(self.getSprintInformation(sprintReportResponse, boardId, sprintId, board['name']), self.sprintMetadata)
+                                self.publishToolsData(data, self.relationMetadata)
                                 self.updateTrackingJson(self.tracking)
     
     def getSprintInformation(self, content, boardId, sprintId, boardName):
@@ -218,6 +218,8 @@ class JiraAgent(BaseAgent):
         sprint['boardId'] = boardId
         sprint['sprintId'] = sprintId
         sprint['boardName'] = boardName
+        sprint['sprintName'] = sprint.get('name')
+        sprint.pop('name', None)
         timeStampFormat = '%d/%b/%y'
         startDate = sprint.get('startDate', None)
         if startDate and startDate != 'None':
