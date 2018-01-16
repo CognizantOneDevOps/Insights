@@ -125,8 +125,8 @@ class JiraAgent(BaseAgent):
                         boards.append(boardId)
                     if sprintId not in sprints:
                         sprints.append(sprintId)
-                parsedIssue[0]['sprints'] = int(sprints)
-                parsedIssue[0]['boards'] = int(boards)
+                parsedIssue[0]['sprints'] = sprints
+                parsedIssue[0]['boards'] = boards
      
     def retrieveSprintReports(self, userId, password, tracking):
         sprintDetails = self.config.get('sprintDetails', None)
@@ -187,8 +187,8 @@ class JiraAgent(BaseAgent):
         sprint.pop('remoteLinks', None)
         sprint.pop('sequence', None)
         sprint.pop('id', None)
-        sprint['boardId'] = int(boardId)
-        sprint['sprintId'] = int(sprintId)
+        sprint['boardId'] = boardId
+        sprint['sprintId'] = sprintId
         sprint['boardName'] = boardName
         sprint['boardType'] = boardType
         sprint['sprintName'] = sprint.get('name')
