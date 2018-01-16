@@ -27,7 +27,7 @@ import javax.persistence.Table;
 public class HierarchyDetails {
 	@Id
 	@Column(name = "ID", unique = true, nullable = false)
-	@GeneratedValue(strategy = GenerationType.AUTO)
+	//@GeneratedValue(strategy = GenerationType.AUTO)
 	private int id;
 	
 	@Column(name ="ROW_ID")
@@ -54,9 +54,19 @@ public class HierarchyDetails {
 	@Column(name = "HIERARCHY_NAME")
 	private String hierarchyName;
 	
+	@Column(name = "TOOLNAME")
+	private String toolName;
+	
 	@Column(name = "LABELS")
 	private String labels;
 
+	@Column(name = "PROPERTY")
+	private String toolProperty;
+	
+	@Column(name = "VALUE")
+	private String propertyValue;
+
+	
 	public int getId() {
 		return id;
 	}
@@ -136,4 +146,30 @@ public class HierarchyDetails {
 	public void setLabels(String labels) {
 		this.labels = labels;
 	}
+
+	public String getToolName() {
+		return toolName;
+	}
+
+	public void setToolName(String toolName) {
+		this.toolName = toolName;
+	}
+
+	public String getToolProperty() {
+		return toolProperty;
+	}
+
+	public void setToolProperty(String toolProperty) {
+		this.toolProperty = toolProperty;
+	}
+
+	public String getPropertyValue() {
+		return propertyValue;
+	}
+
+	public void setPropertyValue(String propertyValue) {
+		this.propertyValue = propertyValue;
+	}
+
+
 }
