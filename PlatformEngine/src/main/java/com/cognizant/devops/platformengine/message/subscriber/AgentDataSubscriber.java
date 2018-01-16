@@ -169,9 +169,27 @@ public class AgentDataSubscriber extends EngineSubscriberResponseHandler{
 		String relationName = relationMetadata.get("name").getAsString();
 		StringBuffer cypherQuery = new StringBuffer();
 		cypherQuery.append("UNWIND {props} AS properties MERGE (source").append(labels);
+		if(source.has("labels")) {
+			JsonArray sourceLabels = source.getAsJsonArray("labels");
+			for(JsonElement sourceLabel : sourceLabels) {
+				String label = sourceLabel.getAsString();
+				if(label != null && !labels.contains(label)) {
+					cypherQuery.append(":").append(label);
+				}
+			}
+		}
 		cypherQuery.append(buildPropertyConstraintQueryPart(source, "constraints"));
 		cypherQuery.append(") WITH source, properties ");
 		cypherQuery.append("MERGE (destination").append(labels);
+		if(destination.has("labels")) {
+			JsonArray destinationLabels = destination.getAsJsonArray("labels");
+			for(JsonElement destinationLabel : destinationLabels) {
+				String label = destinationLabel.getAsString();
+				if(label != null && !labels.contains(label)) {
+					cypherQuery.append(":").append(label);
+				}
+			}
+		}
 		cypherQuery.append(buildPropertyConstraintQueryPart(destination, "constraints"));
 		cypherQuery.append(")");
 		cypherQuery.append(" MERGE (source)-[r:").append(relationName).append("]->(destination) ");
