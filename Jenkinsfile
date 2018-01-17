@@ -1,7 +1,7 @@
-env.dockerimagename="devopsbasservice/buildonframework:insights1.0"
+env.dockerimagename="devopsbasservice/buildonframework:insights"
 node {
 
-// All single and double quotes in this file are used in a certain format.Do not alter in any step
+// All single and double quotes in this file are used in a certain format.Do not alter in any step 
 
    // Platform Service Starts 
    stage ('Insight_PS_Build') {
