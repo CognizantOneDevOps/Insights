@@ -37,14 +37,14 @@ class PipelinePanelCtrl extends MetricsPanelCtrl {
     };
 
     labelIcons = {
-        'GIT': 'public/app/plugins/panel/toolsinsights/img/GIT.svg',
-        'JENKINS': 'public/app/plugins/panel/toolsinsights/img/Jenkins.svg',
-        'SONAR': 'public/app/plugins/panel/toolsinsights/img/SONAR_new.svg',
-        'RUNDECK': 'public/app/plugins/panel/toolsinsights/img/RUNDECK_new.svg',
-        'JIRA': 'public/app/plugins/panel/toolsinsights/img/JIRA.svg',
-        'BITBUCKET': 'public/app/plugins/panel/toolsinsights/img/BitBucket.svg',
-        'TESTING': 'public/app/plugins/panel/toolsinsights/img/Testing_img.svg',
-        'LOADRUNNER': 'public/app/plugins/panel/toolsinsights/img/LoadRunner.svg'
+        'GIT': 'public/plugins/toolsinsights/img/GIT.svg',
+        'JENKINS': 'public/plugins/toolsinsights/img/Jenkins.svg',
+        'SONAR': 'public/plugins/toolsinsights/img/SONAR_new.svg',
+        'RUNDECK': 'public/plugins/toolsinsights/img/RUNDECK_new.svg',
+        'JIRA': 'public/plugins/toolsinsights/img/JIRA.svg',
+        'BITBUCKET': 'public/plugins/toolsinsights/img/BitBucket.svg',
+        'TESTING': 'public/plugins/toolsinsights/img/Testing_img.svg',
+        'LOADRUNNER': 'public/plugins/toolsinsights/img/LoadRunner.svg'
     };
 
     toolsList = [];
