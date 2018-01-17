@@ -99,7 +99,8 @@ module ISightApp {
 		  this.addEndPoint("ACCESS_GROUP_MANAGEMENT_SWITCH_ORGS",'/PlatformService/accessGrpMgmt/switchUserOrg');
 		  this.addEndPoint("ACCESS_GROUP_MANAGEMENT_GET_USERS",'/PlatformService/accessGrpMgmt/getUser');
 
-      this.addEndPoint("INSIGHTS_GET",'/PlatformService/insights/inferences');
+		  this.addEndPoint("INSIGHTS_GET",'/PlatformService/insights/inferences');
+		  this.addEndPoint("PLATFORM_SERVICE_STATUS",'/PlatformService/InsightsServiceStatus/getStatus');
         }
 
        addEndPoint(name:string, url:string){
