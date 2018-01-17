@@ -219,14 +219,48 @@ public class HierarchyDetailsService {
 		Neo4jDBHandler dbHandler = new Neo4jDBHandler();
 		String query = "MATCH (n:METADATA:DATATAGGING) return n";
 		GraphResponse response;
+		JsonArray parentArray=new JsonArray();
+		JsonObject hierarchyJsonObj = new JsonObject();
+		Gson gson = new Gson();
 		try {
-			 response = dbHandler.executeCypherQuery(query);
+			response = dbHandler.executeCypherQuery(query);
+			JsonArray rows = response.getJson().get("results").getAsJsonArray().get(0).getAsJsonObject().get("data").getAsJsonArray();
+			JsonArray asJsonArray = rows.getAsJsonArray();
+			for(JsonElement element : asJsonArray){
+				JsonObject childJson_1 = getHierarchyObject(element);
+				parentArray.add(childJson_1);
+			}
+			hierarchyJsonObj.add("data",gson.toJsonTree(parentArray));
+			//System.out.println(hierarchyJsonObj);
 		} catch (GraphDBException e) {
 			log.debug(e);
 			return PlatformServiceUtil.buildFailureResponse(ErrorMessage.DB_INSERTION_FAILED);
 		}
-		return PlatformServiceUtil.buildSuccessResponseWithData(response.getNodes());
+		return hierarchyJsonObj;
 
+	}
+
+	private JsonObject getHierarchyObject(JsonElement element) {
+		JsonArray firstChild=new JsonArray();
+		JsonArray secondChild=new JsonArray();
+		JsonArray thirdChild=new JsonArray();
+		JsonObject childJson_1=new JsonObject();
+		JsonObject childJson_2=new JsonObject();
+		JsonObject childJson_3=new JsonObject();
+		JsonObject childJson_4=new JsonObject();
+		JsonObject json=element.getAsJsonObject().get("row").getAsJsonArray().get(0).getAsJsonObject();
+
+		childJson_1.addProperty("name",json.get("level_1").getAsString());
+		childJson_2.addProperty("name" , json.get("level_2").getAsString());
+		childJson_3.addProperty("name" , json.get("level_3").getAsString());
+		childJson_4.addProperty("name", json.get("level_4").getAsString());
+		thirdChild.add(childJson_4);
+		childJson_3.add("children", thirdChild);
+		secondChild.add(childJson_3);
+		childJson_2.add("children", secondChild);
+		firstChild.add(childJson_2);
+		childJson_1.add("children", firstChild);
+		return childJson_1;
 	}
 
 }
