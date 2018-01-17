@@ -18,8 +18,15 @@ public class CustomCorrelations {
 	private static Logger log = Logger.getLogger(CustomCorrelations.class);
 	private static final Pattern p = Pattern.compile("((?<!([A-Z]{1,10})-?)[A-Z]+-\\d+)");
 	private int dataBatchSize = 2000;
+	private long currentCorrelationTime = 0;
+	private long maxPreviousCorrelationTime = 0;
+	private long minPreviousCorrelationTime = 0;
+	
 	
 	public void executeCorrelations() {
+		currentCorrelationTime = System.currentTimeMillis()/1000;
+		maxPreviousCorrelationTime = currentCorrelationTime - 1 * 60 * 60;
+		minPreviousCorrelationTime = currentCorrelationTime - 1 * 24 * 60 * 60;
 		enrichJiraData();
 		updateGitNodesWithJiraKey();
 		correlateGitAndJira();
@@ -213,27 +220,33 @@ public class CustomCorrelations {
 	private void correlateGitAndJenkins() {
 		Neo4jDBHandler dbHandler = new Neo4jDBHandler();
 		try {
-			String paginationCypher = "MATCH (source:RAW:JENKINS) return count(distinct source) as count";
+			String paginationCypher = "MATCH (source:RAW:JENKINS:DATA) where not exists(source.correlationTime) OR "
+					+ "( source.correlationTime <= "+maxPreviousCorrelationTime+" AND source.correlationTime >= "+minPreviousCorrelationTime+") "
+					+ "return count(distinct source) as count";
 			GraphResponse paginationResponse = dbHandler.executeCypherQuery(paginationCypher);
 			int resultCount = paginationResponse.getJson().get("results").getAsJsonArray().get(0).getAsJsonObject().get("data")
 					.getAsJsonArray().get(0).getAsJsonObject().get("row").getAsJsonArray().get(0).getAsInt();
 			while(resultCount > 0) {
 				long st = System.currentTimeMillis();
-				String gitDataFetchCypher = "MATCH (source:RAW:JENKINS) WITH source limit "+dataBatchSize+" "
+				String gitDataFetchCypher = "MATCH (source:RAW:JENKINS:DATA) where not exists(source.correlationTime) OR "
+						+ "( source.correlationTime <= "+maxPreviousCorrelationTime+" AND source.correlationTime > "+minPreviousCorrelationTime+") "
+						+ "WITH source limit "+dataBatchSize+" "
 						+ "WITH source, coalesce(source.lastBuiltRevision, \"\") + \",\" + coalesce(source.scmCommitId, \"\") as commitId  "
-						+ "WITH source.uuid as uuid, split(commitId, \",\") as commits unwind commits as commit WITH uuid, trim(commit) as commit where commit is not null "
+						+ "WITH source.uuid as uuid, split(commitId, \",\") as commits unwind commits as commit WITH uuid, trim(commit) as commit "
+						+ "where commit is not null AND size(commit) > 0 "
 						+ "WITH distinct uuid, collect(distinct commit) as commits WITH { uuid : uuid, commitId: commits} as data "
 						+ "return collect(data) as data";
 				GraphResponse response = dbHandler.executeCypherQuery(gitDataFetchCypher);
 				JsonArray rows = response.getJson().get("results").getAsJsonArray().get(0).getAsJsonObject().get("data")
 						.getAsJsonArray().get(0).getAsJsonObject().get("row").getAsJsonArray();
-				if(rows.isJsonNull() || rows.size() == 0) {
+				if(rows.isJsonNull() || rows.size() == 0 || rows.get(0).getAsJsonArray().size() == 0) {
 					return;
 				}
 				JsonArray dataArray = rows.get(0).getAsJsonArray();
 				String jenkinsGitCorrelationCypher = "UNWIND {props} as properties "
-						+ "MATCH (source:RAW:JENKINS { uuid: properties.uuid}) "
-						+ "MATCH (destination:GIT) where destination.commitId IN properties.commitId "
+						+ "MATCH (source:RAW:JENKINS:DATA { uuid: properties.uuid}) "
+						+ "set source.correlationTime="+currentCorrelationTime+" WITH source, properties "
+						+ "MATCH (destination:GIT:DATA) where destination.commitId IN properties.commitId "
 						+ "CREATE (source) <-[r:JENKINS_TRIGGERED_BY_GIT_COMMIT]- (destination) "
 						+ "remove source:RAW  return count(distinct source) as count";
 				List<JsonObject> dataList = new ArrayList<JsonObject>();
@@ -247,9 +260,8 @@ public class CustomCorrelations {
 											.get("data").getAsJsonArray().get(0).getAsJsonObject()
 											.get("row").getAsInt();
 				resultCount = resultCount - processedRecords;
-				log.debug("Processed "+processedRecords+" GIT records, time taken: "+(System.currentTimeMillis() - st) + " ms");
-				System.out.println("Processed "+processedRecords+" GIT records, time taken: "+(System.currentTimeMillis() - st) + " ms");
-				if(processedRecords == 0) {
+				log.debug("Processed "+processedRecords+" Jenkins records, time taken: "+(System.currentTimeMillis() - st) + " ms");
+				if(processedRecords == 0 && resultCount == 0) {
 					break;
 				}
 			}
