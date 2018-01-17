@@ -61,6 +61,31 @@ public class AgentDataSubscriber extends EngineSubscriberResponseHandler{
 		labels.addAll(Arrays.asList(routingKey.split(MessageConstants.ROUTING_KEY_SEPERATOR)));
 		List<JsonObject> dataList = new ArrayList<JsonObject>();
 		JsonElement json = new JsonParser().parse(message);
+		boolean dataUpdateSupported = this.dataUpdateSupported;
+		String uniqueKey = this.uniqueKey;
+		if(json.isJsonObject()) {
+			JsonObject messageObject = json.getAsJsonObject();
+			json = messageObject.get("data");
+			if(messageObject.has("metadata")) {
+				JsonObject metadata = messageObject.get("metadata").getAsJsonObject();
+				if(metadata.has("labels")) {
+					JsonArray additionalLabels = metadata.get("labels").getAsJsonArray();
+					for(JsonElement additionalLabel : additionalLabels) {
+						String label = additionalLabel.getAsString();
+						if(!labels.contains(label)) {
+							labels.add(label);
+						}
+					}
+				}
+				if(metadata.has("dataUpdateSupported")) {
+					dataUpdateSupported = metadata.get("dataUpdateSupported").getAsBoolean();
+				}
+				if(metadata.has("uniqueKey")) {
+					uniqueKey = metadata.get("uniqueKey").getAsString();
+				}
+			}
+		}
+		
 		if(json.isJsonArray()){
 			JsonArray asJsonArray = json.getAsJsonArray();
 			for(JsonElement e : asJsonArray){
@@ -69,16 +94,16 @@ public class AgentDataSubscriber extends EngineSubscriberResponseHandler{
 				}
 			}
 			try {
-				String cypherQuery = null;
-				if(dataUpdateSupported){
-					String labelsStr = routingKey.replace(".", ":");
-					String relation = category+"_UPDATED_TO";
-					cypherQuery = buildCypherQuery(labelsStr, uniqueKey, relation);
-				}else{
-					String queryLabel = "";
-					for(String label : labels){
+				String cypherQuery = "";
+				String queryLabel = "";
+				for(String label : labels){
+					if(label != null && label.trim().length() > 0) {
 						queryLabel += ":"+label;
 					}
+				}
+				if(dataUpdateSupported){
+					cypherQuery = buildCypherQuery(queryLabel, uniqueKey);
+				}else{
 					cypherQuery = "UNWIND {props} AS properties CREATE (n"+queryLabel+") set n=properties return count(n)";
 				}
 				List<List<JsonObject>> partitionList = partitionList(dataList, 1000);
@@ -112,9 +137,9 @@ public class AgentDataSubscriber extends EngineSubscriberResponseHandler{
 		return new ArrayList<T>(list.subList(index, Math.min(N, index + size)));
 	}
 	
-	private String buildCypherQuery(String labels, String fieldName, String relation){
+	private static String buildCypherQuery(String labels, String fieldName){
 		StringBuffer query = new StringBuffer();
-		query.append("UNWIND {props} AS properties MERGE (node:LATEST:").append(labels).append(" { ");
+		query.append("UNWIND {props} AS properties MERGE (node:LATEST").append(labels).append(" { ");
 		if(fieldName.contains(",")){
 			String[] fields = fieldName.split(",");
 			JsonObject searchCriteria = new JsonObject();

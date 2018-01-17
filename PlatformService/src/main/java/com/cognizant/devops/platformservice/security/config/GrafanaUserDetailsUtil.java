@@ -75,25 +75,27 @@ public class GrafanaUserDetailsUtil {
 				String grafanaCurrentOrgRole = getCurrentOrgRole(headers, grafanaCurrentOrg);
 				grafanaResponseCookies.put("grafanaRole", grafanaCurrentOrgRole);
 			}
+			List<GrantedAuthority> mappedAuthorities = new ArrayList<GrantedAuthority>();
+			String grafanaRole = grafanaResponseCookies.get("grafanaRole");
+			if(grafanaRole == null || grafanaRole.trim().length() == 0){
+				mappedAuthorities.add(SpringAuthority.valueOf("INVALID"));
+			}else{
+				mappedAuthorities.add(SpringAuthorityUtil.getSpringAuthorityRole(grafanaRole));
+			}
+			
+			httpRequest.setAttribute("responseHeaders", grafanaResponseCookies);
+			if(ApplicationConfigProvider.getInstance().isEnableNativeUsers()) {
+				return new User(userName, credential, true, true, true, true, mappedAuthorities);
+			} else {
+				return new User(userName, "", true, true, true, true, mappedAuthorities);
+			}
 		}catch(Exception e){
 			log.error(e);
 		}
-		List<GrantedAuthority> mappedAuthorities = new ArrayList<GrantedAuthority>();
-		String grafanaRole = grafanaResponseCookies.get("grafanaRole");
-		if(grafanaRole == null || grafanaRole.trim().length() == 0){
-			mappedAuthorities.add(SpringAuthority.valueOf("INVALID"));
-		}else{
-			mappedAuthorities.add(SpringAuthority.valueOf(grafanaRole));
-		}
-		
-		httpRequest.setAttribute("responseHeaders", grafanaResponseCookies);
-		if(ApplicationConfigProvider.getInstance().isEnableNativeUsers()) {
-			return new User(userName, credential, true, true, true, true, mappedAuthorities);
-		} else {
-			return new User(userName, "", true, true, true, true, mappedAuthorities);
-		}
+		return null;
 	}
 
+	
 	private static String getCurrentOrgRole(Map<String, String> headers, String grafanaCurrentOrg) {
 		String userOrgsApiUrl = ApplicationConfigProvider.getInstance().getGrafana().getGrafanaEndpoint()+"/api/user/orgs";
 		ClientResponse grafanaCurrentOrgResponse = RestHandler.doGet(userOrgsApiUrl, null, headers);

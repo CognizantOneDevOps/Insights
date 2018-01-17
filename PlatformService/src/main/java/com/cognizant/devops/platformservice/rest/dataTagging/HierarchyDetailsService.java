@@ -15,6 +15,7 @@
  ******************************************************************************/
 package com.cognizant.devops.platformservice.rest.dataTagging;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,16 +26,26 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
+import com.cognizant.devops.platformcommons.constants.ErrorMessage;
+import com.cognizant.devops.platformcommons.constants.NamedNodeAttribute;
+import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBException;
+import com.cognizant.devops.platformcommons.dal.neo4j.GraphResponse;
+import com.cognizant.devops.platformcommons.dal.neo4j.Neo4jDBHandler;
+import com.cognizant.devops.platformcommons.dal.neo4j.NodeData;
 import com.cognizant.devops.platformdal.entity.definition.EntityDefinition;
 import com.cognizant.devops.platformdal.entity.definition.EntityDefinitionDAL;
 import com.cognizant.devops.platformdal.hierarchy.details.HierarchyDetails;
 import com.cognizant.devops.platformdal.hierarchy.details.HierarchyDetailsDAL;
+import com.cognizant.devops.platformservice.rest.dataTagging.util.DataProcessorUtil;
 import com.cognizant.devops.platformservice.rest.neo4j.GraphDBService;
 import com.cognizant.devops.platformservice.rest.util.PlatformServiceUtil;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 
 @RestController
 @RequestMapping("/admin/hierarchyDetails")
@@ -187,4 +198,35 @@ public class HierarchyDetailsService {
 		List<String> hierarchyList = hierarchyDetailsDAL.fetchDistinctHierarchyName();
 		return PlatformServiceUtil.buildSuccessResponseWithData(hierarchyList);
 	}
+
+	@RequestMapping(value = "/uploadHierarchyDetails", headers=("content-type=multipart/*"), method = RequestMethod.POST,
+			produces = MediaType.APPLICATION_JSON_UTF8_VALUE,consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+	public @ResponseBody JsonObject uploadHierarchyDetails(@RequestParam("file") MultipartFile file) {
+		boolean status =false;
+		if (!file.isEmpty()) {
+			status=DataProcessorUtil.getInstance().readData(file);
+		}
+		if (status) {
+			return PlatformServiceUtil.buildSuccessResponse();
+		} else {
+			return PlatformServiceUtil.buildFailureResponse(ErrorMessage.DB_INSERTION_FAILED);
+		}
+
+	}
+
+	@RequestMapping(value = "/getAllHierarchyDetails", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+	public @ResponseBody JsonObject getAllHierarchyDetails() {
+		Neo4jDBHandler dbHandler = new Neo4jDBHandler();
+		String query = "MATCH (n:METADATA:DATATAGGING) return n";
+		GraphResponse response;
+		try {
+			 response = dbHandler.executeCypherQuery(query);
+		} catch (GraphDBException e) {
+			log.debug(e);
+			return PlatformServiceUtil.buildFailureResponse(ErrorMessage.DB_INSERTION_FAILED);
+		}
+		return PlatformServiceUtil.buildSuccessResponseWithData(response.getNodes());
+
+	}
+
 }
