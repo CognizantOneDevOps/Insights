@@ -46,7 +46,12 @@ public class MinMaxActionImpl extends BaseActionImpl {
 			JsonObject jsonObj = esDBHandler.queryES(ConfigConstants.SPARK_ES_HOST+":"+ConfigConstants.SPARK_ES_PORT+"/"+kpiDefinition.getEsResource()+"/_search?size=0&filter_path=aggregations", esQuery);
 			JsonObject aggObj = jsonObj.get("aggregations").getAsJsonObject().get("minMaxOutput").getAsJsonObject();
 			JsonElement jsonElement = aggObj.get("value");
-			resultMap = getResultMap(jsonElement.getAsLong(),null);
+			if ( jsonElement.isJsonNull()){
+				resultMap = getResultMap(0L,null);
+			}
+			else{
+				resultMap = getResultMap(jsonElement.getAsLong(),null);
+			}
 			saveResult(resultMap);
 		}catch (Exception e) {
 			log.error("Exception while running Minimum and Maximum operation -- "+ kpiDefinition.getKpiID()+": "+kpiDefinition.getName(), e);
