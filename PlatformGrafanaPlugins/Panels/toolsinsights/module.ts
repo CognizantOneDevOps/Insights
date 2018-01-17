@@ -37,34 +37,14 @@ class PipelinePanelCtrl extends MetricsPanelCtrl {
     };
 
     labelIcons = {
-        'GIT': 'public/app/plugins/panel/toolsinsights/img/GIT.svg',
-        'JENKINS': 'public/app/plugins/panel/toolsinsights/img/Jenkins.svg',
-        'SONAR': 'public/app/plugins/panel/toolsinsights/img/SONAR_new.svg',
-        'RUNDECK': 'public/app/plugins/panel/toolsinsights/img/RUNDECK_new.svg',
-        'JIRA': 'public/app/plugins/panel/toolsinsights/img/JIRA.svg',
-        'BITBUCKET': 'public/app/plugins/panel/toolsinsights/img/BitBucket.svg',
-        'TESTING': 'public/app/plugins/panel/toolsinsights/img/Testing_img.svg',
-        'LOADRUNNER': 'public/app/plugins/panel/toolsinsights/img/LoadRunner.svg'
-    };
-
-    tableMapping = {
-        'JIRA': ['position', 'jir_jirakey', 'jir_projectname', 'jir_priority', 'jir_status', 'inSightsTimeX'],
-        'BITBUCKET': ['position', 'bit_Jira_Key', 'bit_commitId', 'bit_reponame', 'bit_authorName', 'bit_authorEmail', 'inSightsTimeX'],
-        'JENKINS': ['position', 'jen_BuildNumber', 'jen_SCMCommitId', 'jen_RundeckJobId', 'jen_ProjectName', 'jen_Result', 'inSightsTimeX'],
-        'SONAR': ['position', 'resourcekey', 'complexity', 'coverage', 'duplicated_blocks', 'new_violations', 'inSightsTimeX'],
-        'RUNDECK': ['position', 'run_ExecutionId', 'run_JobId', 'run_JobName', 'run_ProjectName', 'run_Status', 'inSightsTimeX'],
-        'TESTING': ['position', 'Requirement_ID', 'Enviornment', 'Test_Cases', 'Defects', 'Test_Case_Status'],
-        'LOADRUNNER': ['position', 'jobName', 'buildNumber', 'transactionName', 'virtualUsers', 'slaViolationCount']
-    };
-
-    tableMappingHeader = {
-        'JIRA': ['Sr.No', 'Key', 'Project Name', 'Priority', 'Status', 'Updated Date'],
-        'BITBUCKET': ['Sr.No', 'JIRA Key', 'Commit Id', 'Repository Name', 'Author Name', 'Author Email', 'Commit Time'],
-        'JENKINS': ['Sr.No', 'Build Number', 'SCM CommitId', 'Rundeck Job', 'Project Name', 'Result', 'Job Time'],
-        'SONAR': ['Sr.No', 'Resource key', 'Complexity', 'Coverage', 'Duplicated Blocks', 'Violations', 'Metrics Date'],
-        'RUNDECK': ['Sr.No', 'Execution Id', 'Job Id', 'Job Name', 'Project Name', 'Status', 'Deployment Date'],
-        'TESTING': ['Sr.No', 'Requirement ID', 'Enviornment', 'Test Cases', 'Defects', 'Test Case Status'],
-        'LOADRUNNER': ['Sr.No', 'Job Name', 'Build Number', 'Transaction Name', 'Virtual Users', 'SLA Violation Count']
+        'GIT': 'public/plugins/toolsinsights/img/GIT.svg',
+        'JENKINS': 'public/plugins/toolsinsights/img/Jenkins.svg',
+        'SONAR': 'public/plugins/toolsinsights/img/SONAR_new.svg',
+        'RUNDECK': 'public/plugins/toolsinsights/img/RUNDECK_new.svg',
+        'JIRA': 'public/plugins/toolsinsights/img/JIRA.svg',
+        'BITBUCKET': 'public/plugins/toolsinsights/img/BitBucket.svg',
+        'TESTING': 'public/plugins/toolsinsights/img/Testing_img.svg',
+        'LOADRUNNER': 'public/plugins/toolsinsights/img/LoadRunner.svg'
     };
 
     toolsList = [];
@@ -98,8 +78,8 @@ class PipelinePanelCtrl extends MetricsPanelCtrl {
     toolListData = [];
     toolDataMap = {};
     showThrobber: boolean = false;
-    toolDetailMappingJson = [];
     advColumnMsg: string;
+    fieldOptions = [];
 
     /** @ngInject */
     constructor($scope, $injector, private annotationsSrv, private $sanitize, private $window, private $rootScope) {
@@ -217,12 +197,11 @@ class PipelinePanelCtrl extends MetricsPanelCtrl {
         this.render();
     }
 
-    toolsDetailJson = {};
     selectedSeq = [];
+    toolDetailMappingJson = [];
 
     render() {
         this.pipelineToolsArray = [];
-        this.toolsDetailJson = this.panel.toolsInsightsPanelCtrl.toolsDetailJson;
         this.toolDetailMappingJson = this.panel.toolsInsightsPanelCtrl.toolDetailMappingJson;
         //console.log(this.toolDetailMappingJson);
         for (var key in this.toolDetailMappingJson) {
@@ -232,13 +211,34 @@ class PipelinePanelCtrl extends MetricsPanelCtrl {
                 this.pipelineToolsArray.push(keyName);
             }
         }
-        this.selectedSeq = this.panel.toolsInsightsPanelCtrl.selectedSeq;
-        //console.log(this.pipelineToolsArray);
-        this.msg = this.panel.toolsInsightsPanelCtrl.message;
-        if (this.toolsDetailJson) {
-            this.selectOptionsMsg = "";
+        this.selectedSeq = [];
+        for (var i in this.toolDetailMappingJson) {
+            this.selectedSeq[i] = this.toolDetailMappingJson[i].toolName;
         }
+        console.log(this.selectedSeq);
+        //console.log(this.pipelineToolsArray);
+        this.checkToolSelection();
         return super.render(this.dataSourceResponse);
+    }
+
+    checkToolSelection() {
+        if (this.toolDetailMappingJson === undefined) {
+            this.toolDetailMappingJson = [];
+        }
+        if (this.toolDetailMappingJson.length === 0) {
+            this.selectedSeq = [];
+        }
+        if(this.panel.toolsInsightsPanelCtrl.message){
+            this.msg = this.panel.toolsInsightsPanelCtrl.message;
+        }
+        if (this.selectedSeq.length !== 0) {
+            this.selectOptionsMsg = "";
+            return true;
+        }
+        if (this.selectedSeq.length === 0) {
+            this.selectOptionsMsg = "Please set required options by clicking options tab";
+            return false;
+        }
     }
 
     inputQuery = {
@@ -293,8 +293,8 @@ class PipelinePanelCtrl extends MetricsPanelCtrl {
             {
                 "rawQuery": true,
                 "refId": "A",
-                "target": "match (n) -[rMap]-> (m) where exists(n.ToolName) AND exists(m.ToolName)  WITH distinct " +
-                "n.ToolName as start, m.ToolName as end,  type(rMap) as rel WITH {start:start, end:end, rel:rel} as row " +
+                "target": "match (n) -[rMap]-> (m) where exists(n.toolName) AND exists(m.toolName)  WITH distinct " +
+                "n.toolName as start, m.toolName as end,  type(rMap) as rel WITH {start:start, end:end, rel:rel} as row " +
                 "return collect(row) as rows",
                 "$$hashKey": "object:190"
             }
@@ -324,7 +324,7 @@ class PipelinePanelCtrl extends MetricsPanelCtrl {
             let traceTimelagToolsRelArray = data.data.results[0].data[0].row[0];
             self.sortResult(traceTimelagToolsRelArray, self.selectedTool);
         });
-        self.toolsFieldDetails();
+        //self.toolsFieldDetails();
     }
 
     sortResult(records, userSelectedToolName): void {
@@ -490,7 +490,7 @@ class PipelinePanelCtrl extends MetricsPanelCtrl {
 
     /*toolSequencing and fieldSelection externalization changes end*/
 
-    toolSelection(): void {
+    toolSelection(tool): void {
         /*var result = this.datasourceDtl.query(this.toolListQuery);
         var self = this;
         result.then(function (data) {
@@ -505,6 +505,15 @@ class PipelinePanelCtrl extends MetricsPanelCtrl {
           }
         });*/
         this.toolsList = this.toolListData;
+        this.fieldOptions = [];
+        for (var i in this.toolDetailMappingJson) {
+            if (this.toolDetailMappingJson[i].toolName === tool) {
+                for (var field in this.toolDetailMappingJson[i].fields) {
+                    this.fieldOptions[field] = this.toolDetailMappingJson[i].fields[field].fieldName;
+                }
+                break;
+            }
+        }
     }
 
     onToolSelectAction(): void {
@@ -552,7 +561,7 @@ class PipelinePanelCtrl extends MetricsPanelCtrl {
     }
 
     buildNextHopQuery(label: string, queryField: string, fieldValues: any[], excludeLabels: string[]): string {
-        let query = 'MATCH (a:' + label + ') -[*0..1]- (b) WHERE ';
+        let query = 'MATCH (a:DATA:' + label + ') -[*0..1]- (b:DATA) WHERE ';
         if (queryField) {
             query += 'a.' + queryField + ' IN ' + JSON.stringify(fieldValues) + ' ';
         }
@@ -566,12 +575,12 @@ class PipelinePanelCtrl extends MetricsPanelCtrl {
         }
         query += 'with a, b, collect(distinct a.uuid) as uuids ';
         query += 'WHERE NOT (b.uuid IN uuids) ';
-        query += 'return  b.ToolName as toolName, collect(distinct b.uuid) as uuids';
+        query += 'return  b.toolName as toolName, collect(distinct b.uuid) as uuids, collect(distinct a.uuid) as sourceUuids';
         return query;
     }
 
     buildTraceabilityQuery(label: string, queryField: string, fieldValues: any[], uuidCollected: string[]) {
-        let query = 'MATCH (b:' + label + ') WHERE ';
+        /*let query = 'MATCH (b:' + label + ') WHERE ';
         if (queryField) {
             query += 'b.' + queryField + ' IN ' + JSON.stringify(fieldValues) + ' ';
         }
@@ -580,7 +589,10 @@ class PipelinePanelCtrl extends MetricsPanelCtrl {
         query += 'UNWIND nodes as node ';
         query += 'WITH distinct node as a ';
         query += 'WITH a.toolName as toolName, collect(distinct a) as nodes ';
-        query += 'RETURN toolName, size(nodes) as count, nodes ';
+        query += 'RETURN toolName, size(nodes) as count, nodes ';*/
+        let query = 'MATCH (a:DATA) WHERE a.uuid IN ' + JSON.stringify(uuidCollected) + ' ';
+        query += ' WITH distinct a.toolName as toolName, collect(distinct a) as nodes Return toolName, size(nodes) as count, nodes';
+        console.log(query);
         return query;
     }
 
@@ -609,6 +621,9 @@ class PipelinePanelCtrl extends MetricsPanelCtrl {
                     uuidCollected = [];
                 }
                 if (result.uuids && result.uuids.length > 0) {
+                    if(hopLevel == 1){
+                        resultContainer['0'] = uuidCollected.concat(result.sourceUuids);    
+                    }
                     resultContainer['' + hopLevel] = uuidCollected.concat(result.uuids);
                     self.processHop(result.toolName, 'uuid', result.uuids, localExcludeLabels, resultContainer, (hopLevel + 1));
                 } else {
@@ -627,7 +642,8 @@ class PipelinePanelCtrl extends MetricsPanelCtrl {
                 var rowObj = hopResultSet[i]['row'];
                 let toolData = {
                     toolName: rowObj[0],
-                    uuids: rowObj[1]
+                    uuids: rowObj[1],
+                    sourceUuids: rowObj[2]
                 };
                 dataArray.push(toolData);
             }
@@ -640,6 +656,8 @@ class PipelinePanelCtrl extends MetricsPanelCtrl {
         if (this.pipelineToolsArray === undefined) {
             this.msg = "Please select valid tools sequence from options tab";
         }
+        this.resultContainer = {};
+        this.toolDataMap = {};
         this.processHop(this.selectedTool, selectedField, [inputVal], [], this.resultContainer, 1);
         let self = this;
         let validateResults = function () {
@@ -657,7 +675,14 @@ class PipelinePanelCtrl extends MetricsPanelCtrl {
                     self.totalNodes = data.data.results[0].data.length;
                     var queryData = data.data;
                     self.parseQueryResult(queryData);
-                    self.toolsRelationQueryOutput();
+                    if(self.totalNodes > 0){
+                        self.toolsRelationQueryOutput();
+                    }else{
+                        self.showAdvanceView = false;
+                        self.showThrobber = false;
+                        self.showToolDetails = false;
+                        self.msg = "No results found";
+                    }
                 });
             }
         };
@@ -729,7 +754,7 @@ class PipelinePanelCtrl extends MetricsPanelCtrl {
                     var newSelectedToolArr = this.toolDetailMappingJson[i].fields;
                 }
             }
-            
+
             this.tableHeader.push("Sr.No");
             for (key in newSelectedToolArr) {
 

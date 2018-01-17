@@ -1,0 +1,30 @@
+{
+  "responseTemplate": {
+    "sha": "dummyData"    
+  },
+  "insightsTimeZone": "Asia/Kolkata",
+  "communication": {
+    "type": "REST"
+  },
+  "loggingSetting": {
+    "logLevel": "WARN"
+  },
+  "mqConfig": {
+    "host": "127.0.0.1",
+    "password": "iSight",
+    "user": "iSight",
+    "exchange": "iSight"
+  },
+  "publish": {
+    "data": "DUMMY.DUMMYDATA.DATA",
+    "health": "DUMMY.DUMMYDATA.HEALTH"
+  },
+  "isDebugAllowed": false,
+  "subscribe": {
+    "config": "DUMMY.DUMMYDATA.config"
+  },
+  "enableBranches": false,
+  "timeStampFormat": "%Y-%m-%dT%H:%M:%SZ",
+  "toolsTimeZone": "GMT",
+  "useResponseTemplate": true
+}

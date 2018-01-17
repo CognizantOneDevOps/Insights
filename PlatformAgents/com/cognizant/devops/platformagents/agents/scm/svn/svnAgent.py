@@ -18,17 +18,17 @@ Created on Jul 19, 2017
 
 @author: 476693 & 513585
 '''
-
+import json
 import pysvn
 import time
 import sys
 import os
 from dateutil import parser
 import datetime, time
-from core.BaseAgent import BaseAgent
+from com.cognizant.devops.platformagents.core.BaseAgent import BaseAgent
 import logging.handlers
 
-class svnAgent(BaseAgent):
+class SvnAgent(BaseAgent):
     def get_login(self, realm, username, may_save ):
         username = self.config.get("username", '')
         password = self.config.get("password", '')
@@ -36,7 +36,8 @@ class svnAgent(BaseAgent):
 
     def process(self):
         self.repoList = []
-        self.json = self.tracking.get("1", '')
+        self.newrepo=[]
+        self.existingrepo=[]
         self.client = pysvn.Client()
         self.client.callback_get_login = self.get_login
         self.head_rev = pysvn.Revision(pysvn.opt_revision_kind.head) 
@@ -47,33 +48,30 @@ class svnAgent(BaseAgent):
             logging.info('List of Repositories : %s ' % self.repoList)
             self.trackingData()
             self.publishData()
+            if self.data != []:
+                print self.data
+                self.publishToolsData(self.data)
+            self.updateTrackingJson(self.trackingdata) 
         except Exception as e:
             logging.error(e)
-
+        
     def trackingData(self):
-        i=1
-        url=0
-        self.tracklist=[]
-        self.newurl=[]
-        self.oldurl=[]
-        while url!='':
-            url=self.tracking.get(str(i), '')
-            if url!='':
-                url=url.get("url", '')
-                self.tracklist.append(url)
-            i=i+1
+        with open(self.trackingFilePath, 'r') as config_file:    
+            self.tracking = json.load(config_file)
+        for k,v in self.tracking.items():
+            for i in self.repoList:
+                if i==k:
+                    self.existingrepo.append(i)
         for i in self.repoList:
-            if i in self.tracklist:
-                self.oldurl.append(i)
-            else:
-                self.newurl.append(i)
-
+            if i not in self.existingrepo:
+                self.newrepo.append(i)
+        print self.newrepo, self.existingrepo
+            
     def publishData(self):
-        self.urlno = 1
         self.trackingdata = {}
         self.data = []
-        for repo in self.newurl:
-            print "new data"
+            
+        for repo in self.newrepo:
             try:
                 epoch = int(time.mktime(time.strptime(self.date_time, self.pattern)))
             except Exception as e:
@@ -82,46 +80,28 @@ class svnAgent(BaseAgent):
             self.retrieveData(repo)
             self.printdata(repo)
             
-        for repo in self.oldurl:
-            print "old data"
-            r = 1
-            rev=0
-            while rev!='':
-                rev=self.tracking.get(str(r), '')
-                if rev!='':
-                    revNo=rev.get("rev", '')+1
-                    print revNo
-                    repourl=rev.get("url", '')
-                    print repourl
-                    self.end_rev = pysvn.Revision(pysvn.opt_revision_kind.number, revNo)
-                    if repourl == repo:
-                        self.printdata(repo)
-                        self.retrieveData(repo)
-                    r = r + 1
-        
-        print self.data
-        #if self.data != []:
-            #self.publishToolsData(self.data)
-        self.updateTrackingJson(self.trackingdata)               
+        for repo in self.existingrepo:
+            revNo=self.tracking.get(str(repo), '')+1
+            self.end_rev = pysvn.Revision(pysvn.opt_revision_kind.number, revNo)
+            self.printdata(repo)
+            self.retrieveData(repo)            
 
     def retrieveData(self,reposURL):
-        tracklist = {}
+        track={}
         entries = self.client.info2(reposURL, revision=self.head_rev, recurse=False)
         for reposURL, info in entries:
             repoUrl=info.URL
             repoRev=info.rev.number
-            tracklist["url"]=repoUrl
-            tracklist["rev"]=repoRev
-            self.trackingdata[self.urlno]=tracklist
-            self.urlno = self.urlno + 1
+            track[repoUrl]=repoRev
+            self.trackingdata.update(track)
 
     def printdata(self,reposURL):
         try:
             msgs = self.client.log(reposURL, revision_start=self.head_rev, revision_end=self.end_rev, discover_changed_paths=True)
             msgs.reverse()
             s = len(msgs)
-            loglimit = 200
-            while s > loglimit:
+            loglimit = 500
+            if s > loglimit:
                 log_message = log_message[:s]
                 s = len(log_message) - 1
             for m in msgs:
@@ -131,12 +111,12 @@ class svnAgent(BaseAgent):
                 if commit_time > self.date_time:
                     message = m.data['message']
                     paths = [p.path for p in m.data['changed_paths']]
-                    printdata["repo_url"]=reposURL
-                    printdata["rev_num"]=m.revision.number
-                    printdata["commit_time"]=str(datetime.datetime.fromtimestamp(date))
-                    printdata["commit_author"]=m.author
-                    printdata["change_filelist"]=paths
-                    printdata["commit_log"]=message
+                    printdata["repoUrl"]=reposURL
+                    printdata["revNum"]=m.revision.number
+                    printdata["commitTime"]=str(datetime.datetime.fromtimestamp(date))
+                    printdata["commitAuthor"]=m.author
+                    printdata["changeFilelist"]=paths
+                    printdata["commitLog"]=message
                     self.data.append(printdata)
                 else:
                     pass
@@ -144,4 +124,4 @@ class svnAgent(BaseAgent):
             pass
         
 if __name__ == "__main__":
-    svnAgent()
+    SvnAgent()
