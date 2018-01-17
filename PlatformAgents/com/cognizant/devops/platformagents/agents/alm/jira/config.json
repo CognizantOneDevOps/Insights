@@ -71,6 +71,7 @@
         "statusName": "status"
       }
   },
+  "enableSprintReport" : false,
   "runSchedule": 30,
   "sprintRetrivalSchedule" : 360,
   "dataFetchCount": 1000,

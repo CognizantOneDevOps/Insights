@@ -79,7 +79,8 @@ class JiraAgent(BaseAgent):
                 self.updateTrackingJson(self.tracking)
             else:
                 break
-        self.retrieveSprintReports(userid, passwd, self.tracking)            
+        if self.config.get('enableSprintReport', False):
+            self.retrieveSprintReports(userid, passwd, self.tracking)            
     
     def extractFields(self, responseTemplate):
         fieldsJson = responseTemplate.get("fields", None)
