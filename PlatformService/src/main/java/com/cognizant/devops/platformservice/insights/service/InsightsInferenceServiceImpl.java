@@ -205,29 +205,34 @@ public class InsightsInferenceServiceImpl implements InsightsInferenceService {
 	private String getInferenceText(String inferenceName, String vector, Long kpiId, KPISentiment sentiment,
 			String schedule, Object[] values, boolean isComparison, String resultOutputType) {
 		boolean zeroVal = false;
+		boolean currentZeroVal = false;
+		boolean previousZeroVal = false;
 		String messageId = "";
-		String zeroValCode = "";
+		String msgZeroCode = "";
 		if (isComparison) {
-			for (int i = 0; i < values.length; i++) {
-				if (resultOutputType.toLowerCase().contains(ResultOutputType.TIMERESULTOUTPUT.toString())) {
-					if (values[i] instanceof Long && (Long) values[i] > 0) {
-						Long result = (Long) values[i];
+			if(values[0] instanceof Long && values[1] instanceof Long){
+				if((Long)values[0] == 0 && (Long)values[1] > 0){
+						zeroVal = true;	
+						currentZeroVal = true;
+					}
+				else if((Long)values[0] > 0 && (Long)values[1] >= 0){
+					if (resultOutputType.toLowerCase().contains(ResultOutputType.TIMERESULTOUTPUT.toString())) {
+						Long result = (Long) values[0];
 						Long secVal = TimeUnit.MILLISECONDS.toSeconds(result.longValue());//(Long) values[i] / 1000.0f;
-						values[i] = secVal;
-						zeroValCode = zeroValCode + "1";
-					} else {
-						zeroVal = true;
-						zeroValCode = zeroValCode +"0";
-					}
-				} else if (values[i] instanceof Long ) {
-					if((Long) values[i] == 0){
-						zeroVal = true;
-						zeroValCode  = zeroValCode + "0";
-					}else{
-						zeroValCode  = zeroValCode + "1";
+						values[0] = secVal;
 						
+						result = (Long) values[1];
+						secVal = TimeUnit.MILLISECONDS.toSeconds(result.longValue());
+						values[1] = secVal;
 					}
-				}
+					if((Long)values[0] > 0 && (Long)values[1] == 0){
+						zeroVal = true;
+						previousZeroVal = true;
+					}
+					}
+				else if((Long)values[0] == 0 && (Long)values[1] == 0){
+					zeroVal =false;
+				}	
 			}
 		} else {
 			messageId = vector.toLowerCase() + "." + kpiId + "." + KPISentiment.NEUTRAL.toString() + "."
@@ -235,8 +240,16 @@ public class InsightsInferenceServiceImpl implements InsightsInferenceService {
 		}
 
 		if (zeroVal) {
+			if(currentZeroVal){
+			msgZeroCode = InsightsMessageEnum.CURRENTZEROVALMSG.toString();		
 			messageId = vector.toLowerCase() + "." + kpiId + "." + sentiment.toString() + "."
-							+ schedule.toLowerCase() + "." + zeroValCode;
+							+ schedule.toLowerCase() + "." + msgZeroCode;
+			}
+			else if(previousZeroVal){
+				msgZeroCode = InsightsMessageEnum.PREVIOUSVALZERO.toString();		
+				messageId = vector.toLowerCase() + "." + kpiId + "." + sentiment.toString() + "."
+								+ schedule.toLowerCase() + "." + msgZeroCode;
+				}			
 
 		} else {
 			messageId = vector.toLowerCase() + "." + kpiId + "." + sentiment.toString() + "." + schedule.toLowerCase();
