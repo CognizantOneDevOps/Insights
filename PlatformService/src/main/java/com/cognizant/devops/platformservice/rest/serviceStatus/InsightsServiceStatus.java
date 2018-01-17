@@ -68,10 +68,4 @@ private static String getVersionDetails(String fileName) throws IOException {
 	return "";
 }
 
-public static void main(String args[]) throws JsonSyntaxException, IOException{
-	InsightsServiceStatus status = new InsightsServiceStatus();
-	JsonObject obj = status.loadProperties();
-	System.out.println(obj);
-}
-
 }
