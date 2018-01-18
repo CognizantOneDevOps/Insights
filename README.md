@@ -1,4 +1,4 @@
-# Insights .
+# Insights
 
 Why do we need InSights?
 
