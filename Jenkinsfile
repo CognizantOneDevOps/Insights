@@ -3,7 +3,7 @@ node {
 
 // All single and double quotes in this file are used in a certain format.Do not alter in any step 
 
-   // Platform Service Starts 
+   // Platform Service Starts
    stage ('Insight_PS_Build') {
         checkout scm
 		sh 'mvn clean install -DskipTests'
