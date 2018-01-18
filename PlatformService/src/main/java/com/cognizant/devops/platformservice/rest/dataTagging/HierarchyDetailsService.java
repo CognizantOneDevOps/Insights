@@ -231,7 +231,6 @@ public class HierarchyDetailsService {
 				parentArray.add(childJson_1);
 			}
 			hierarchyJsonObj.add("data",gson.toJsonTree(parentArray));
-			//System.out.println(hierarchyJsonObj);
 		} catch (GraphDBException e) {
 			log.debug(e);
 			return PlatformServiceUtil.buildFailureResponse(ErrorMessage.DB_INSERTION_FAILED);
@@ -250,17 +249,49 @@ public class HierarchyDetailsService {
 		JsonObject childJson_4=new JsonObject();
 		JsonObject json=element.getAsJsonObject().get("row").getAsJsonArray().get(0).getAsJsonObject();
 
+		if(null!=json.get("level_1").getAsString() &&  !json.get("level_1").getAsString().isEmpty() ){
 		childJson_1.addProperty("name",json.get("level_1").getAsString());
+		}
+		if(null!=json.get("level_2").getAsString() && !json.get("level_2").getAsString().isEmpty() ){
 		childJson_2.addProperty("name" , json.get("level_2").getAsString());
+		}
+		if(null!=json.get("level_3").getAsString() &&  !json.get("level_3").getAsString().isEmpty() ){
 		childJson_3.addProperty("name" , json.get("level_3").getAsString());
+		}
+		if(null!=json.get("level_4").getAsString() &&  !json.get("level_4").getAsString().isEmpty() ){
 		childJson_4.addProperty("name", json.get("level_4").getAsString());
+		}
+		if(!childJson_4.isJsonNull()){
 		thirdChild.add(childJson_4);
+		}
+		if(null!=json.get("level_4").getAsString() &&  !json.get("level_4").getAsString().isEmpty() ){
 		childJson_3.add("children", thirdChild);
+		}
+		if(!childJson_3.isJsonNull()){
 		secondChild.add(childJson_3);
+		}
+		if(null!=json.get("level_3").getAsString() &&  !json.get("level_3").getAsString().isEmpty() ){
 		childJson_2.add("children", secondChild);
+		}
+		if(!childJson_2.isJsonNull()){
 		firstChild.add(childJson_2);
+		}
+		
+		if(null!=json.get("level_2").getAsString() && !json.get("level_2").getAsString().isEmpty() ){
 		childJson_1.add("children", firstChild);
+		}
 		return childJson_1;
+	}
+	
+	@RequestMapping(value = "/getHierarchyProperties", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+	public JsonObject getHierarchyProperties(@RequestParam String level1,@RequestParam String level2, @RequestParam String level3, 
+											 @RequestParam String level4) throws GraphDBException {
+		Neo4jDBHandler dbHandler = new Neo4jDBHandler();
+		String queryLabels=":METADATA:DATATAGGING";
+		String props="level_1:'"+ level1+"'," + "level_2:'"+level2+"',"+"level_3:'"+level3+"',"+"level_4:'"+level4+"'" ;
+		String query = "MATCH (n "+queryLabels+"{"+props+"}" + ") return n";
+		GraphResponse response=dbHandler.executeCypherQuery(query.toString());
+		return PlatformServiceUtil.buildSuccessResponseWithData(response.getNodes());
 	}
 
 }
