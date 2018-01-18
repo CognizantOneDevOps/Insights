@@ -105,4 +105,16 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 			.and().csrf().disable()
 			.headers().addHeaderWriter(springHeaderWriter);
 	}
+	
+	 @Bean
+	    public CommonsMultipartResolver multipartResolver() throws IOException{
+	        CommonsMultipartResolver resolver = new CommonsMultipartResolver();
+	         
+	        //Set the maximum allowed size (in bytes) for each individual file.
+	        resolver.setMaxUploadSizePerFile(5242880);//5MB
+	         
+	        //You may also set other available properties.
+	         
+	        return resolver;
+	    }	
 }
