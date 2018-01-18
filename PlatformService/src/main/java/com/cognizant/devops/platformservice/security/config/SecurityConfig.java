@@ -30,6 +30,7 @@ import org.springframework.security.ldap.authentication.BindAuthenticator;
 import org.springframework.security.ldap.authentication.LdapAuthenticationProvider;
 import org.springframework.security.ldap.search.FilterBasedLdapUserSearch;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
+import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.config.LDAPConfiguration;
