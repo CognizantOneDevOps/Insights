@@ -100,6 +100,7 @@ module ISightApp {
 		  this.addEndPoint("ACCESS_GROUP_MANAGEMENT_GET_USERS",'/PlatformService/accessGrpMgmt/getUser');
 
       this.addEndPoint("INSIGHTS_GET",'/PlatformService/insights/inferences');
+      this.addEndPoint("HIERARCHY_ALL_DETAILS_GET",'/PlatformService/admin/hierarchyDetails/getAllHierarchyDetails');
         }
 
        addEndPoint(name:string, url:string){
