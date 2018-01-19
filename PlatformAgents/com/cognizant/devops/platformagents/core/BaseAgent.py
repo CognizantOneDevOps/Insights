@@ -239,6 +239,7 @@ class BaseAgent(object):
             scheduler = BlockingScheduler()
             self.scheduler = scheduler
             self.scheduledJob = scheduler.add_job(self.execute,'interval', seconds=60*self.runSchedule)
+            self.scheduleExtensions(scheduler)
             try:
                 scheduler.start()
             except (KeyboardInterrupt, SystemExit):
@@ -259,6 +260,11 @@ class BaseAgent(object):
                 scheduler.start()
             else:
                 pass
+    
+    def scheduleExtensions(self, scheduler):
+        '''
+        Override in the Agent class for scheduling the extensions.
+        '''
     
     def execute(self):
         try:
