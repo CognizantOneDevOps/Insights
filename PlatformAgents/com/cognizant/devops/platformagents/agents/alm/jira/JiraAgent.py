@@ -24,33 +24,10 @@ from dateutil import parser
 from com.cognizant.devops.platformagents.core.BaseAgent import BaseAgent
 
 class JiraAgent(BaseAgent):
-    relationMetadata = {
-        'labels' : ['LATEST'],
-        'relation' : {
-                'properties' : ['addedDuringSprint', 'sprintIssueRegion', 'committedEstimate'],
-                'name' : 'HAS_ISSUES',
-                'source' : {
-                        'constraints' : ["sprintId", "boardId"]
-                    },
-                'destination' : {
-                        'constraints' : ["key"]
-                    },
-            }
-    }
-    sprintMetadata = {
-        'labels' : ['SPRINT'],
-        'dataUpdateSupported' : True,
-        'uniqueKey' : 'boardId,sprintId'
-    }
-    releaseVersionsMetadata = {
-        'labels' : ['RELEASE'],
-        'dataUpdateSupported' : True,
-        'uniqueKey' : 'projectKey,projectId'
-    }
         
     def process(self):
-        userid = self.config.get("userid", '')
-        passwd = self.config.get("passwd", '')
+        self.userid = self.config.get("userid", '')
+        self.passwd = self.config.get("passwd", '')
         baseUrl = self.config.get("baseUrl", '')
         startFrom = self.config.get("startFrom", '')
         lastUpdated = self.tracking.get("lastupdated", startFrom)
@@ -64,7 +41,7 @@ class JiraAgent(BaseAgent):
         sprintField = self.config.get("sprintField", None)
         while (startAt + maxResults) < total:
             data = []
-            response = self.getResponse(jiraIssuesUrl+'&startAt='+str(startAt + maxResults), 'GET', userid, passwd, None)
+            response = self.getResponse(jiraIssuesUrl+'&startAt='+str(startAt + maxResults), 'GET', self.userid, self.passwd, None)
             jiraIssues = response["issues"]
             for issue in jiraIssues:
                 parsedIssue = self.parseResponse(responseTemplate, issue)
@@ -84,8 +61,16 @@ class JiraAgent(BaseAgent):
                 self.updateTrackingJson(self.tracking)
             else:
                 break
-        if self.config.get('enableSprintReport', False):
-            self.retrieveSprintReports(userid, passwd, self.tracking)            
+    
+    def scheduleExtensions(self, scheduler):
+        extensions = self.config.get('extensions', None)
+        if extensions:
+            sprintReport = extensions.get('sprintReport', None)
+            #if sprintReport:
+            #    scheduler.add_job(self.retrieveSprintReports,'interval', seconds=60*sprintReport.get('runSchedule'))
+            releaseDetails = extensions.get('releaseDetails', None)
+            if releaseDetails:
+                scheduler.add_job(self.retrieveReleaseDetails,'interval', seconds=60*releaseDetails.get('runSchedule'))
     
     def extractFields(self, responseTemplate):
         fieldsJson = responseTemplate.get("fields", None)
@@ -134,22 +119,22 @@ class JiraAgent(BaseAgent):
                 parsedIssue[0]['sprints'] = sprints
                 parsedIssue[0]['boards'] = boards
      
-    def retrieveSprintReports(self, userId, password, tracking):
-        sprintDetails = self.config.get('sprintDetails', None)
+    def retrieveSprintReports(self):
+        sprintDetails = self.config.get('extensions', {}).get('sprintReport', None)
         boardApiUrl = sprintDetails.get('boardApiUrl')
-        boards = tracking.get('boards', None)
+        boards = self.tracking.get('boards', None)
         if sprintDetails and boards:
-            currentDateTime = dateTime2.now()
             sprintReportUrl = sprintDetails.get('sprintReportUrl', None)
             responseTemplate = sprintDetails.get('sprintReportResponseTemplate', None)
-            sprintRetrivalSchedule = self.config.get('sprintRetrivalSchedule', 1440) * 60
+            sprintMetadata = sprintDetails.get('sprintMetadata')
+            relationMetadata = sprintDetails.get('relationMetadata')
             for boardId in boards:
                 board = boards[boardId]
                 boardName = board.get('name', None)
                 if boardName is None:
                     boardRestUrl = boardApiUrl + '/' + str(boardId)
                     try:
-                        boardResponse = self.getResponse(boardRestUrl, 'GET', userId, password, None)
+                        boardResponse = self.getResponse(boardRestUrl, 'GET', self.userid, self.passwd, None)
                         board['name'] = boardResponse.get('name')
                         board['type'] = boardResponse.get('type')
                         board.pop('error', None)
@@ -160,19 +145,16 @@ class JiraAgent(BaseAgent):
                 for sprintId in sprints:
                     sprint = sprints[sprintId]
                     #For velocity, only the completed sprints are considered
-                    lastFetch = sprint.get('lastFetch', None)
-                    if lastFetch:
-                        lastFetch = parser.parse(lastFetch)
+                    #extract the project key from the sprint reports to allow the data tagging
                     sprintClosed = sprint.get('closed', False)
-                    if not sprintClosed and (lastFetch is None or (currentDateTime - lastFetch).total_seconds() >= sprintRetrivalSchedule):
+                    if not sprintClosed:
                         sprintReportRestUrl = sprintReportUrl + '?rapidViewId='+str(boardId)+'&sprintId='+str(sprintId)
                         try:
-                            sprintReportResponse = self.getResponse(sprintReportRestUrl, 'GET', userId, password, None)
+                            sprintReportResponse = self.getResponse(sprintReportRestUrl, 'GET', self.userid, self.passwd, None)
                         except Exception as ex:
                             sprint['error'] = str(ex)
                         if sprintReportResponse:
                             content = sprintReportResponse.get('contents', None)
-                            sprint['lastFetch'] = currentDateTime.strftime('%Y-%m-%d %H:%M')
                             if sprintReportResponse.get('sprint', {}).get('state', 'OPEN') == 'CLOSED':
                                 sprint['closed'] = True
                             injectData = { 'boardId' : boardId, 'sprintId' : sprintId }
@@ -182,8 +164,8 @@ class JiraAgent(BaseAgent):
                             data += self.addSprintDetails(responseTemplate, content, 'puntedIssues', injectData)
                             data += self.addSprintDetails(responseTemplate, content, 'issuesCompletedInAnotherSprint', injectData)
                             if len(data) > 0:
-                                self.publishToolsData(self.getSprintInformation(sprintReportResponse, boardId, sprintId, board['name'], board['type']), self.sprintMetadata)
-                                self.publishToolsData(data, self.relationMetadata)
+                                self.publishToolsData(self.getSprintInformation(sprintReportResponse, boardId, sprintId, board['name'], board['type']), sprintMetadata)
+                                self.publishToolsData(data, relationMetadata)
                                 self.updateTrackingJson(self.tracking)
     
     def getSprintInformation(self, content, boardId, sprintId, boardName, boardType):
@@ -223,25 +205,22 @@ class JiraAgent(BaseAgent):
                 issue['sprintIssueRegion'] = sprintIssueRegion
         return parsedIssues
      
-    def retrieveReleaseDetails(self, userId, password, tracking):
-        releaseDetails = self.config.get('releaseDetails', {})
-        jiraProjectApiUrl = releaseDetails.get('jiraProjectApiUrl', None)
-        jiraProjectResponseTemplate = releaseDetails.get('jiraProjectResponseTemplate', None)
-        jiraReleaseResponseTemplate = releaseDetails.get('jiraReleaseResponseTemplate', None)
-        if jiraProjectApiUrl and jiraProjectResponseTemplate and jiraReleaseResponseTemplate:
-            jiraProjects = self.getResponse(jiraProjectApiUrl, 'GET', userId, password, None)
-            parsedJiraProjects = self.parseResponse(jiraProjectResponseTemplate, jiraProjects)
-            for parsedJiraProject in parsedJiraProjects:
-                projectKey = parsedJiraProject['projectKey']
-                releaseApiUrl = jiraProjectApiUrl + '/' + projectKey + '/versions'
-                releaseVersionsResponse = self.getResponse(releaseApiUrl, 'GET', userId, password, None)
-                parsedReleaseVersions = self.parseResponse(jiraReleaseResponseTemplate, releaseVersionsResponse)
-                self.publishToolsData(parsedReleaseVersions, self.releaseVersionsMetadata)
-                #Add tracking
-                #Update the board tracking to include high level of last fetch logic
-                #extract the project key from the sprint reports
-                #update engine to include array of uniqueKey
-                #Update the rest communication facade. Remove option from communication. Add this options at config level (high level)
+    def retrieveReleaseDetails(self):
+        releaseDetails = self.config.get('extensions', {}).get('releaseDetails', None)
+        if releaseDetails:
+            jiraProjectApiUrl = releaseDetails.get('jiraProjectApiUrl', None)
+            jiraProjectResponseTemplate = releaseDetails.get('jiraProjectResponseTemplate', None)
+            jiraReleaseResponseTemplate = releaseDetails.get('jiraReleaseResponseTemplate', None)
+            releaseVersionsMetadata = releaseDetails.get('releaseVersionsMetadata')
+            if jiraProjectApiUrl and jiraProjectResponseTemplate and jiraReleaseResponseTemplate:
+                jiraProjects = self.getResponse(jiraProjectApiUrl, 'GET', self.userid, self.passwd, None)
+                parsedJiraProjects = self.parseResponse(jiraProjectResponseTemplate, jiraProjects)
+                for parsedJiraProject in parsedJiraProjects:
+                    projectKey = parsedJiraProject['projectKey']
+                    releaseApiUrl = jiraProjectApiUrl + '/' + projectKey + '/versions'
+                    releaseVersionsResponse = self.getResponse(releaseApiUrl, 'GET', self.userid, self.passwd, None)
+                    parsedReleaseVersions = self.parseResponse(jiraReleaseResponseTemplate, releaseVersionsResponse)
+                    self.publishToolsData(parsedReleaseVersions, releaseVersionsMetadata)
                     
 if __name__ == "__main__":
     JiraAgent()        
