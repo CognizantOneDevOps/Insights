@@ -82,7 +82,13 @@ public class AgentDataSubscriber extends EngineSubscriberResponseHandler{
 					dataUpdateSupported = metadata.get("dataUpdateSupported").getAsBoolean();
 				}
 				if(metadata.has("uniqueKey")) {
-					uniqueKey = metadata.get("uniqueKey").getAsString();
+					JsonArray uniqueKeyArray = metadata.getAsJsonArray("uniqueKey");
+					StringBuffer keys = new StringBuffer();
+					for(JsonElement key : uniqueKeyArray) {
+						keys.append(key.getAsString());
+					}
+					keys.delete(keys.length()-1, keys.length());
+					uniqueKey = keys.toString();
 				}
 				if(metadata.has("relation")) {
 					relationMetadata = metadata.get("relation").getAsJsonObject();
