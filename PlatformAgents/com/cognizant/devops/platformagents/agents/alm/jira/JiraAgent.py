@@ -66,8 +66,8 @@ class JiraAgent(BaseAgent):
         extensions = self.config.get('extensions', None)
         if extensions:
             sprintReport = extensions.get('sprintReport', None)
-            #if sprintReport:
-            #    scheduler.add_job(self.retrieveSprintReports,'interval', seconds=60*sprintReport.get('runSchedule'))
+            if sprintReport:
+                scheduler.add_job(self.retrieveSprintReports,'interval', seconds=60*sprintReport.get('runSchedule'))
             releaseDetails = extensions.get('releaseDetails', None)
             if releaseDetails:
                 scheduler.add_job(self.retrieveReleaseDetails,'interval', seconds=60*releaseDetails.get('runSchedule'))
