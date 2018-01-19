@@ -1,7 +1,7 @@
-env.dockerimagename="devopsbasservice/buildonframework:insights1.0"
+env.dockerimagename="devopsbasservice/buildonframework:insights"
 node {
 
-// All single and double quotes in this file are used in a certain format.Do not alter in any step
+// All single and double quotes in this file are used in a certain format.Do not alter in any step 
 
    // Platform Service Starts 
    stage ('Insight_PS_Build') {
@@ -88,6 +88,6 @@ node {
 
         //Send Notification to Slack Channel
 	stage ('SlackNotification') {
-   	    slackSend channel: '#insightsjenkins', color: 'good', message: "New Insights artifacts are uploaded to Nexus for commitID : *${env.commitID}* \n *PlatformService* ${PS_artifact} \n *PlatformEngine* ${PE_artifact} \n *PlatformInsights*  ${PI_artifact} \n *PlatformUI2.0* ${PUI_artifact}", teamDomain: 'ctsdevopsbot', token: slackToken // "*" is for making the text bold in slack notification
+   	    slackSend channel: '#insightsjenkins', color: 'good', message: "New Insights artifacts are uploaded to Nexus for commitID : *${env.commitID}* \n *PlatformService* ${PS_artifact} \n *PlatformEngine* ${PE_artifact} \n *PlatformInsights*  ${PI_artifact} \n *PlatformUI2.0* ${PUI_artifact}", teamDomain: 'insightscogdevops', token: slackToken // "*" is for making the text bold in slack notification
   	}
 }
