@@ -15,6 +15,7 @@
  ******************************************************************************/
 package com.cognizant.devops.platformservice.rest.dataTagging;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,6 +28,12 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.cognizant.devops.platformcommons.constants.ErrorMessage;
+import com.cognizant.devops.platformcommons.constants.NamedNodeAttribute;
+import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBException;
+import com.cognizant.devops.platformcommons.dal.neo4j.GraphResponse;
+import com.cognizant.devops.platformcommons.dal.neo4j.Neo4jDBHandler;
+import com.cognizant.devops.platformcommons.dal.neo4j.NodeData;
 import com.cognizant.devops.platformdal.entity.definition.EntityDefinition;
 import com.cognizant.devops.platformdal.entity.definition.EntityDefinitionDAL;
 import com.cognizant.devops.platformdal.hierarchy.details.HierarchyDetails;
@@ -36,7 +43,9 @@ import com.cognizant.devops.platformservice.rest.neo4j.GraphDBService;
 import com.cognizant.devops.platformservice.rest.util.PlatformServiceUtil;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 
 @RestController
 @RequestMapping("/admin/hierarchyDetails")
@@ -200,21 +209,89 @@ public class HierarchyDetailsService {
 		if (status) {
 			return PlatformServiceUtil.buildSuccessResponse();
 		} else {
-			return PlatformServiceUtil.buildFailureResponse("Failed to upload data");
+			return PlatformServiceUtil.buildFailureResponse(ErrorMessage.DB_INSERTION_FAILED);
 		}
-
 
 	}
 
 	@RequestMapping(value = "/getAllHierarchyDetails", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 	public @ResponseBody JsonObject getAllHierarchyDetails() {
+		Neo4jDBHandler dbHandler = new Neo4jDBHandler();
+		String query = "MATCH (n:METADATA:DATATAGGING) return n";
+		GraphResponse response;
+		JsonArray parentArray=new JsonArray();
+		JsonObject hierarchyJsonObj = new JsonObject();
 		Gson gson = new Gson();
-		HierarchyDetailsDAL hierarchyDetailsDAL = new HierarchyDetailsDAL();
-		List<HierarchyDetails> hierarchyDetailsList = hierarchyDetailsDAL.fetchAllEntityData();
-		JsonObject hierarchyDetailsJsonObj = new JsonObject();
-		hierarchyDetailsJsonObj.add("details", gson.toJsonTree(hierarchyDetailsList));		
-		return hierarchyDetailsJsonObj;
+		try {
+			response = dbHandler.executeCypherQuery(query);
+			JsonArray rows = response.getJson().get("results").getAsJsonArray().get(0).getAsJsonObject().get("data").getAsJsonArray();
+			JsonArray asJsonArray = rows.getAsJsonArray();
+			for(JsonElement element : asJsonArray){
+				JsonObject childJson_1 = getHierarchyObject(element);
+				parentArray.add(childJson_1);
+			}
+			hierarchyJsonObj.add("data",gson.toJsonTree(parentArray));
+		} catch (GraphDBException e) {
+			log.debug(e);
+			return PlatformServiceUtil.buildFailureResponse(ErrorMessage.DB_INSERTION_FAILED);
+		}
+		return hierarchyJsonObj;
 
+	}
+
+	private JsonObject getHierarchyObject(JsonElement element) {
+		JsonArray firstChild=new JsonArray();
+		JsonArray secondChild=new JsonArray();
+		JsonArray thirdChild=new JsonArray();
+		JsonObject childJson_1=new JsonObject();
+		JsonObject childJson_2=new JsonObject();
+		JsonObject childJson_3=new JsonObject();
+		JsonObject childJson_4=new JsonObject();
+		JsonObject json=element.getAsJsonObject().get("row").getAsJsonArray().get(0).getAsJsonObject();
+
+		if(null!=json.get("level_1").getAsString() &&  !json.get("level_1").getAsString().isEmpty() ){
+		childJson_1.addProperty("name",json.get("level_1").getAsString());
+		}
+		if(null!=json.get("level_2").getAsString() && !json.get("level_2").getAsString().isEmpty() ){
+		childJson_2.addProperty("name" , json.get("level_2").getAsString());
+		}
+		if(null!=json.get("level_3").getAsString() &&  !json.get("level_3").getAsString().isEmpty() ){
+		childJson_3.addProperty("name" , json.get("level_3").getAsString());
+		}
+		if(null!=json.get("level_4").getAsString() &&  !json.get("level_4").getAsString().isEmpty() ){
+		childJson_4.addProperty("name", json.get("level_4").getAsString());
+		}
+		if(!childJson_4.isJsonNull()){
+		thirdChild.add(childJson_4);
+		}
+		if(null!=json.get("level_4").getAsString() &&  !json.get("level_4").getAsString().isEmpty() ){
+		childJson_3.add("children", thirdChild);
+		}
+		if(!childJson_3.isJsonNull()){
+		secondChild.add(childJson_3);
+		}
+		if(null!=json.get("level_3").getAsString() &&  !json.get("level_3").getAsString().isEmpty() ){
+		childJson_2.add("children", secondChild);
+		}
+		if(!childJson_2.isJsonNull()){
+		firstChild.add(childJson_2);
+		}
+		
+		if(null!=json.get("level_2").getAsString() && !json.get("level_2").getAsString().isEmpty() ){
+		childJson_1.add("children", firstChild);
+		}
+		return childJson_1;
+	}
+	
+	@RequestMapping(value = "/getHierarchyProperties", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+	public JsonObject getHierarchyProperties(@RequestParam String level1,@RequestParam String level2, @RequestParam String level3, 
+											 @RequestParam String level4) throws GraphDBException {
+		Neo4jDBHandler dbHandler = new Neo4jDBHandler();
+		String queryLabels=":METADATA:DATATAGGING";
+		String props="level_1:'"+ level1+"'," + "level_2:'"+level2+"',"+"level_3:'"+level3+"',"+"level_4:'"+level4+"'" ;
+		String query = "MATCH (n "+queryLabels+"{"+props+"}" + ") return n";
+		GraphResponse response=dbHandler.executeCypherQuery(query.toString());
+		return PlatformServiceUtil.buildSuccessResponseWithData(response.getNodes());
 	}
 
 }
