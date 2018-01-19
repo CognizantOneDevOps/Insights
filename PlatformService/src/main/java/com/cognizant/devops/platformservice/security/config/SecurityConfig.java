@@ -15,6 +15,8 @@
  ******************************************************************************/
 package com.cognizant.devops.platformservice.security.config;
 
+import java.io.IOException;
+
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -30,6 +32,7 @@ import org.springframework.security.ldap.authentication.BindAuthenticator;
 import org.springframework.security.ldap.authentication.LdapAuthenticationProvider;
 import org.springframework.security.ldap.search.FilterBasedLdapUserSearch;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
+import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.config.LDAPConfiguration;
@@ -105,4 +108,16 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 			.and().csrf().disable()
 			.headers().addHeaderWriter(springHeaderWriter);
 	}
+	
+	 @Bean
+	    public CommonsMultipartResolver multipartResolver() throws IOException{
+	        CommonsMultipartResolver resolver = new CommonsMultipartResolver();
+	         
+	        //Set the maximum allowed size (in bytes) for each individual file.
+	        resolver.setMaxUploadSizePerFile(5242880);//5MB
+	         
+	        //You may also set other available properties.
+	         
+	        return resolver;
+	    }	
 }
