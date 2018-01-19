@@ -38,11 +38,16 @@ class JiraAgent(BaseAgent):
             }
     }
     sprintMetadata = {
-        'labels' : ['METADATA'],
+        'labels' : ['SPRINT'],
         'dataUpdateSupported' : True,
         'uniqueKey' : 'boardId,sprintId'
     }
-    
+    releaseVersionsMetadata = {
+        'labels' : ['RELEASE'],
+        'dataUpdateSupported' : True,
+        'uniqueKey' : 'projectKey,projectId'
+    }
+        
     def process(self):
         userid = self.config.get("userid", '')
         passwd = self.config.get("passwd", '')
@@ -217,6 +222,26 @@ class JiraAgent(BaseAgent):
                 issue['addedDuringSprint'] = issueKeysAddedDuringSprint.get(issue['key'], False)
                 issue['sprintIssueRegion'] = sprintIssueRegion
         return parsedIssues
-        
+     
+    def retrieveReleaseDetails(self, userId, password, tracking):
+        releaseDetails = self.config.get('releaseDetails', {})
+        jiraProjectApiUrl = releaseDetails.get('jiraProjectApiUrl', None)
+        jiraProjectResponseTemplate = releaseDetails.get('jiraProjectResponseTemplate', None)
+        jiraReleaseResponseTemplate = releaseDetails.get('jiraReleaseResponseTemplate', None)
+        if jiraProjectApiUrl and jiraProjectResponseTemplate and jiraReleaseResponseTemplate:
+            jiraProjects = self.getResponse(jiraProjectApiUrl, 'GET', userId, password, None)
+            parsedJiraProjects = self.parseResponse(jiraProjectResponseTemplate, jiraProjects)
+            for parsedJiraProject in parsedJiraProjects:
+                projectKey = parsedJiraProject['projectKey']
+                releaseApiUrl = jiraProjectApiUrl + '/' + projectKey + '/versions'
+                releaseVersionsResponse = self.getResponse(releaseApiUrl, 'GET', userId, password, None)
+                parsedReleaseVersions = self.parseResponse(jiraReleaseResponseTemplate, releaseVersionsResponse)
+                self.publishToolsData(parsedReleaseVersions, self.releaseVersionsMetadata)
+                #Add tracking
+                #Update the board tracking to include high level of last fetch logic
+                #extract the project key from the sprint reports
+                #update engine to include array of uniqueKey
+                #Update the rest communication facade. Remove option from communication. Add this options at config level (high level)
+                    
 if __name__ == "__main__":
     JiraAgent()        
