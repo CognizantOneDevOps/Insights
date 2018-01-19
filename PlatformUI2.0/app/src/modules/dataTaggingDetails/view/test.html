@@ -1,0 +1,8 @@
+<li ng-repeat="item in children">
+     
+            <label for="{{item.name}}" id="{{item.name}}" ng-click="clickHandler()">{{item.name}}</label>
+            <input type="checkbox" checked id="{{item.name}}" />
+            <ol ng-if="item.children && item.children.length > 0" class="tree child"  row children="item.children" click-handler="clickHandler()">
+            </ol>
+</li> 
+  
