@@ -48,7 +48,7 @@ gitCommitID = sh (
 	}
 	catch (err){
 		
-	slackSend channel: '#insightsjenkins', color: 'good', message: "BuildFailed for commitID - *$gitCommitID* \n Build Log can be found @ https://buildon.cogdevops.com/buildon/IndividualReportController?commitid=$gitCommitID", teamDomain: "ctsdevopsbot", token: 'BjsAT9g67XvUhCPMYvTU5NKB'
+	slackSend channel: '#insightsjenkins', color: 'good', message: "BuildFailed for commitID - *$gitCommitID* \n Build Log can be found @ https://buildon.cogdevops.com/buildon/HistoricCIWebController?commitid=$gitCommitID", teamDomain: "ctsdevopsbot", token: 'BjsAT9g67XvUhCPMYvTU5NKB'
 	
 	}
 	
@@ -80,7 +80,7 @@ gitCommitID = sh (
 	} //try ends
 	catch (err){
 		
-	slackSend channel: '#insightsjenkins', color: 'good', message: "BuildFailed for commitID - *$gitCommitID* \n Build Log can be found @ https://buildon.cogdevops.com/buildon/IndividualReportController?commitid=$gitCommitID", teamDomain: "ctsdevopsbot", token: 'BjsAT9g67XvUhCPMYvTU5NKB'
+	slackSend channel: '#insightsjenkins', color: 'good', message: "BuildFailed for commitID - *$gitCommitID* \n Build Log can be found @ https://buildon.cogdevops.com/buildon/HistoricCIWebController?commitId=$gitCommitID", teamDomain: "ctsdevopsbot", token: 'BjsAT9g67XvUhCPMYvTU5NKB'
 	
 	} //Platform Insights Ends
 	
@@ -112,7 +112,7 @@ gitCommitID = sh (
 	   }
 	 catch (err){
 		
-		slackSend channel: '#insightsjenkins', color: 'good', message: "BuildFailed for commitID - *$gitCommitID* \n Build Log can be found @ https://buildon.cogdevops.com/buildon/IndividualReportController?commitid=$gitCommitID", teamDomain: "ctsdevopsbot", token: 'BjsAT9g67XvUhCPMYvTU5NKB'
+		slackSend channel: '#insightsjenkins', color: 'good', message: "BuildFailed for commitID - *$gitCommitID* \n Build Log can be found @ https://buildon.cogdevops.com/buildon/HistoricCIWebController?commitId=$gitCommitID", teamDomain: "ctsdevopsbot", token: 'BjsAT9g67XvUhCPMYvTU5NKB'
 		
 		}
 	   
