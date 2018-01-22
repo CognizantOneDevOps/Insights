@@ -1,7 +1,7 @@
 env.dockerimagename="devopsbasservice/buildonframework:insights"
 node {
 
-//Parse commitID (E.g,from buildon-abc1234 to abc1234)
+//Parse commitID (E.g, buildon-abc1234 to abc1234)
 gitCommitID = sh (
     script: 'echo $commitID | cut -d "-" -f2',
     returnStdout: true
@@ -10,12 +10,12 @@ gitCommitID = sh (
 
 // All single and double quotes in this file are used in a certain format.Do not alter in any step 
 
-// Platform Service Starts
-try{
+   // Platform Service Starts
+	try{
 	
    stage ('Insight_PS_Build') {
         checkout scm
-		sh 'mvn cean install -DskipTests'
+		sh 'mvn clean install -DskipTests'
 	   }
 	
 	stage ('Insight_PS_CodeAnalysis') {
@@ -45,14 +45,17 @@ try{
 		PE_artifactName=readFile("/var/jenkins/jobs/$commitID/workspace/PlatformEngine/PE_artifact").trim()
 		PE_artifact="http://insightsplatformnexusrepo.cogdevops.com:8001/nexus/content/repositories/buildonInsights/com/cognizant/devops/PlatformEngine/${pomversionEngine}/${PE_artifactName}"
 	}
- }
-catch (err){
-	slackSend channel: '#insightsjenkins', color: 'good', message: "BuildFailed for commitID - *$gitCommitID* \n Build Log can be found @ https://buildon.cogdevops.com/buildon/IndividualReportController?commitid=$gitCommitID", teamDomain: "insightscogdevops", token: slackToken
+	}
+	catch (err){
+		
+	slackSend channel: '#insightsjenkins', color: 'good', message: "BuildFailed for commitID - *$gitCommitID* \n Build Log can be found @ https://buildon.cogdevops.com/buildon/IndividualReportController?commitid=$gitCommitID", teamDomain: "ctsdevopsbot", token: 'BjsAT9g67XvUhCPMYvTU5NKB'
 	
-	   } // Platform Service Ends
-
-// Platform Insights Starts 
-try {
+	}
+	
+	// Platform Service Ends
+	
+	// Platform Insights Starts 
+	try {
 	
 	stage ('Insight_PI_Build') {
       		sh 'cd /var/jenkins/jobs/$commitID/workspace/PlatformInsights && mvn clean install -DskipTests'
@@ -74,14 +77,15 @@ try {
 		PI_artifactName=readFile("/var/jenkins/jobs/$commitID/workspace/PlatformInsights/PI_artifact").trim()
 		PI_artifact="http://insightsplatformnexusrepo.cogdevops.com:8001/nexus/content/repositories/buildonInsights/com/cognizant/devops/PlatformInsights/${pomversion}/${PI_artifactName}"
     	}
-} //try ends
-catch (err){
-	slackSend channel: '#insightsjenkins', color: 'good', message: "BuildFailed for commitID - *$gitCommitID* \n Build Log can be found @ https://buildon.cogdevops.com/buildon/IndividualReportController?commitid=$gitCommitID", teamDomain: "insightscogdevops", token: slackToken
+	} //try ends
+	catch (err){
+		
+	slackSend channel: '#insightsjenkins', color: 'good', message: "BuildFailed for commitID - *$gitCommitID* \n Build Log can be found @ https://buildon.cogdevops.com/buildon/IndividualReportController?commitid=$gitCommitID", teamDomain: "ctsdevopsbot", token: 'BjsAT9g67XvUhCPMYvTU5NKB'
 	
 	} //Platform Insights Ends
 	
-// Platform UI2.0 Starts 
-try{
+	// Platform UI2.0 Starts 
+	try{
 	stage ('Insight_PUI2.0_Build') {
         
 		sh 'cd /var/jenkins/jobs/$commitID/workspace/PlatformUI2.0 && bower install --allow-root && tsd install && npm install && grunt'
@@ -105,14 +109,17 @@ try{
 		PUI_artifactName=readFile("/var/jenkins/jobs/$commitID/workspace/PlatformUI2.0/PUI_artifact").trim()
 		PUI_artifact="http://insightsplatformnexusrepo.cogdevops.com:8001/nexus/content/repositories/buildonInsights/com/cognizant/devops/PlatformUI2.0/${pomversion}/${PUI_artifactName}"
 	   } 
-} //try ends
-catch (err){
-	slackSend channel: '#insightsjenkins', color: 'good', message: "BuildFailed for commitID - *$gitCommitID* \n Build Log can be found @ https://buildon.cogdevops.com/buildon/IndividualReportController?commitid=$gitCommitID", teamDomain: "insightscogdevops", token: slackToken
+	   }
+	 catch (err){
 		
-} //Platform UI2.0 Ends
+		slackSend channel: '#insightsjenkins', color: 'good', message: "BuildFailed for commitID - *$gitCommitID* \n Build Log can be found @ https://buildon.cogdevops.com/buildon/IndividualReportController?commitid=$gitCommitID", teamDomain: "ctsdevopsbot", token: 'BjsAT9g67XvUhCPMYvTU5NKB'
+		
+		}
+	   
+	   // Platform UI2.0 Ends
 
-//Send Notification to Slack Channel
-stage ('SlackNotification') {
-    slackSend channel: '#insightsjenkins', color: 'good', message: "New Insights artifacts are uploaded to Nexus for commitID : *${env.commitID}* \n *PlatformService* ${PS_artifact} \n *PlatformEngine* ${PE_artifact} \n *PlatformInsights*  ${PI_artifact} \n *PlatformUI2.0* ${PUI_artifact}", teamDomain: 'insightscogdevops', token: slackToken // "*" is for making the text bold in slack notification
-}
+        //Send Notification to Slack Channel
+	stage ('SlackNotification') {
+   	    slackSend channel: '#insightsjenkins', color: 'good', message: "New Insights artifacts are uploaded to Nexus for commitID : *${env.commitID}* \n *PlatformService* ${PS_artifact} \n *PlatformEngine* ${PE_artifact} \n *PlatformInsights*  ${PI_artifact} \n *PlatformUI2.0* ${PUI_artifact}", teamDomain: 'ctsdevopsbot', token: 'BjsAT9g67XvUhCPMYvTU5NKB' // "*" is for making the text bold in slack notification
+  	}
 }
