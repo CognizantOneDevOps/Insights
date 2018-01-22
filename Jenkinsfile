@@ -1,9 +1,18 @@
 env.dockerimagename="devopsbasservice/buildonframework:insights"
 node {
 
+//Parse commitID (E.g,from buildon-abc1234 to abc1234)
+gitCommitID = sh (
+    script: 'echo $commitID | cut -d "-" -f2',
+    returnStdout: true
+).trim()
+
+
 // All single and double quotes in this file are used in a certain format.Do not alter in any step 
 
-   // Platform Service Starts 
+// Platform Service Starts
+try{
+	
    stage ('Insight_PS_Build') {
         checkout scm
 		sh 'mvn clean install -DskipTests'
@@ -36,10 +45,15 @@ node {
 		PE_artifactName=readFile("/var/jenkins/jobs/$commitID/workspace/PlatformEngine/PE_artifact").trim()
 		PE_artifact="http://insightsplatformnexusrepo.cogdevops.com:8001/nexus/content/repositories/buildonInsights/com/cognizant/devops/PlatformEngine/${pomversionEngine}/${PE_artifactName}"
 	}
+ }
+catch (err){
+	slackSend channel: '#insightsjenkins', color: 'good', message: "BuildFailed for commitID - *$gitCommitID* \n Build Log can be found @ https://buildon.cogdevops.com/buildon/IndividualReportController?commitid=$gitCommitID", teamDomain: "insightscogdevops", token: slackToken
 	
-	// Platform Service Ends
+	   } // Platform Service Ends
+
+// Platform Insights Starts 
+try {
 	
-	// Platform Insights Starts 
 	stage ('Insight_PI_Build') {
       		sh 'cd /var/jenkins/jobs/$commitID/workspace/PlatformInsights && mvn clean install -DskipTests'
 	}
@@ -59,9 +73,15 @@ node {
 		sh "curl -s http://insightsplatformnexusrepo.cogdevops.com:8001/nexus/content/repositories/buildonInsights/com/cognizant/devops/PlatformInsights/${pomversion}/maven-metadata.xml  | grep -oP '(?<=<artifactId>).*?(?=</artifactId>)|(?<=<version>).*?(?=</version>)|(?<=<timestamp>).*?(?=</timestamp>)|(?<=<buildNumber>).*?(?=</buildNumber>)|(?<=<classifier>).*?(?=</classifier>)' | paste -sd- - | sed 's/-SNAPSHOT//g' | sed 's/--/-/g' | sed 's/\$/.jar/' > /var/jenkins/jobs/$commitID/workspace/PlatformInsights/PI_artifact"
 		PI_artifactName=readFile("/var/jenkins/jobs/$commitID/workspace/PlatformInsights/PI_artifact").trim()
 		PI_artifact="http://insightsplatformnexusrepo.cogdevops.com:8001/nexus/content/repositories/buildonInsights/com/cognizant/devops/PlatformInsights/${pomversion}/${PI_artifactName}"
-    	} // Platform Insights Ends
+    	}
+} //try ends
+catch (err){
+	slackSend channel: '#insightsjenkins', color: 'good', message: "BuildFailed for commitID - *$gitCommitID* \n Build Log can be found @ https://buildon.cogdevops.com/buildon/IndividualReportController?commitid=$gitCommitID", teamDomain: "insightscogdevops", token: slackToken
 	
-	// Platform UI2.0 Starts 
+	} //Platform Insights Ends
+	
+// Platform UI2.0 Starts 
+try{
 	stage ('Insight_PUI2.0_Build') {
         
 		sh 'cd /var/jenkins/jobs/$commitID/workspace/PlatformUI2.0 && bower install --allow-root && tsd install && npm install && grunt'
@@ -84,10 +104,15 @@ node {
 	   	sh "curl -s http://insightsplatformnexusrepo.cogdevops.com:8001/nexus/content/repositories/buildonInsights/com/cognizant/devops/PlatformUI2.0/${pomversion}/maven-metadata.xml  | grep -oP '(?<=<artifactId>).*?(?=</artifactId>)|(?<=<version>).*?(?=</version>)|(?<=<timestamp>).*?(?=</timestamp>)|(?<=<buildNumber>).*?(?=</buildNumber>)|(?<=<classifier>).*?(?=</classifier>)' | paste -sd- - | sed 's/-SNAPSHOT//g' | sed 's/--/-/g' | sed 's/\$/.zip/' > /var/jenkins/jobs/$commitID/workspace/PlatformUI2.0/PUI_artifact"
 		PUI_artifactName=readFile("/var/jenkins/jobs/$commitID/workspace/PlatformUI2.0/PUI_artifact").trim()
 		PUI_artifact="http://insightsplatformnexusrepo.cogdevops.com:8001/nexus/content/repositories/buildonInsights/com/cognizant/devops/PlatformUI2.0/${pomversion}/${PUI_artifactName}"
-	   } // Platform UI2.0 Ends
+	   } 
+} //try ends
+catch (err){
+	slackSend channel: '#insightsjenkins', color: 'good', message: "BuildFailed for commitID - *$gitCommitID* \n Build Log can be found @ https://buildon.cogdevops.com/buildon/IndividualReportController?commitid=$gitCommitID", teamDomain: "insightscogdevops", token: slackToken
+		
+} //Platform UI2.0 Ends
 
-        //Send Notification to Slack Channel
-	stage ('SlackNotification') {
-   	    slackSend channel: '#insightsjenkins', color: 'good', message: "New Insights artifacts are uploaded to Nexus for commitID : *${env.commitID}* \n *PlatformService* ${PS_artifact} \n *PlatformEngine* ${PE_artifact} \n *PlatformInsights*  ${PI_artifact} \n *PlatformUI2.0* ${PUI_artifact}", teamDomain: 'insightscogdevops', token: slackToken // "*" is for making the text bold in slack notification
-  	}
+//Send Notification to Slack Channel
+stage ('SlackNotification') {
+    slackSend channel: '#insightsjenkins', color: 'good', message: "New Insights artifacts are uploaded to Nexus for commitID : *${env.commitID}* \n *PlatformService* ${PS_artifact} \n *PlatformEngine* ${PE_artifact} \n *PlatformInsights*  ${PI_artifact} \n *PlatformUI2.0* ${PUI_artifact}", teamDomain: 'insightscogdevops', token: slackToken // "*" is for making the text bold in slack notification
+}
 }
