@@ -85,7 +85,7 @@ gitCommitID = sh (
 	
 	} //Platform Insights Ends
 	
-	// Platform UI2.0 Starts 
+	// Platform UI2.0 Starts
 	try{
 	stage ('Insight_PUI2.0_Build') {
         
