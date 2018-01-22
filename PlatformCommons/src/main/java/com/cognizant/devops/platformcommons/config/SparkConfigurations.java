@@ -24,7 +24,9 @@ public class SparkConfigurations implements Serializable {
 	 */
 	private static final long serialVersionUID = 4137658777393986499L;
 	private String appName, master, sparkExecutorMemory, sparkElasticSearchHost,
-	sparkElasticSearchPort, sparkElasticSearchConfigIndex, sparkElasticSearchResultIndex, kpiSize;
+	sparkElasticSearchPort, sparkElasticSearchConfigIndex, sparkElasticSearchResultIndex, kpiSize, 
+	sparkMasterExecutionEndPoint;
+	
 	private Long sparkResultSince;
 	
 	public SparkConfigurations()
@@ -104,5 +106,12 @@ public class SparkConfigurations implements Serializable {
 		this.sparkResultSince = sparkResultSince;
 	}
 	
+	public String getSparkMasterExecutionEndPoint() {
+		return sparkMasterExecutionEndPoint;
+	}
+
+	public void setSparkEnvironmentEndPoint(String sparkMasterExecutionEndPoint) {
+		this.sparkMasterExecutionEndPoint = sparkMasterExecutionEndPoint;
+	}
 	
 }
