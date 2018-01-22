@@ -15,7 +15,7 @@ gitCommitID = sh (
 	
    stage ('Insight_PS_Build') {
         checkout scm
-		sh 'mvn clean install -DskipTests'
+		sh 'mvn cean install -DskipTests'
 	   }
 	
 	stage ('Insight_PS_CodeAnalysis') {
