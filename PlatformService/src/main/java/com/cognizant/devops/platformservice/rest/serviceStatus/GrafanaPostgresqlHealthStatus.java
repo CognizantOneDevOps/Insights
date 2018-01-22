@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  ******************************************************************************/
-package com.cognizant.devops.platformservice.rest.grafana;
+package com.cognizant.devops.platformservice.rest.serviceStatus;
 
 import org.apache.log4j.Logger;
 import org.springframework.http.MediaType;
