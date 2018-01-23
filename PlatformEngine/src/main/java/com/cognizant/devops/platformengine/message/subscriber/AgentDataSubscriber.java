@@ -85,7 +85,7 @@ public class AgentDataSubscriber extends EngineSubscriberResponseHandler{
 					JsonArray uniqueKeyArray = metadata.getAsJsonArray("uniqueKey");
 					StringBuffer keys = new StringBuffer();
 					for(JsonElement key : uniqueKeyArray) {
-						keys.append(key.getAsString());
+						keys.append(key.getAsString()).append(",");
 					}
 					keys.delete(keys.length()-1, keys.length());
 					uniqueKey = keys.toString();
