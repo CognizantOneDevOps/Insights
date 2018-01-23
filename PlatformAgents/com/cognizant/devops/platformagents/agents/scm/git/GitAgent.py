@@ -83,6 +83,8 @@ class GitAgent(BaseAgent):
                             parsedBranch = branch
                             if '+' in parsedBranch:
                                 parsedBranch = parsedBranch.replace('+', '%2B')
+                            if '&' in parsedBranch:
+                                parsedBranch = parsedBranch.replace('&', '%26')
                             fetchNextCommitsPage = True
                             getCommitDetailsUrl = commitsBaseEndPoint+repoName+'/commits?sha='+parsedBranch+'&access_token='+accessToken+'&per_page=100'
                             since = trackingDetails.get(branch, None)
