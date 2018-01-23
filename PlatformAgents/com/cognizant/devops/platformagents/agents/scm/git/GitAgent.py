@@ -56,11 +56,19 @@ class GitAgent(BaseAgent):
                     branches = ['master']
                     if repoName != None:
                         if enableBranches:
-                            getBranchesRestUrl = commitsBaseEndPoint+repoName+'/branches?access_token='+accessToken
-                            branchDetails = self.getResponse(getBranchesRestUrl, 'GET', None, None, None)
                             branches = []
-                            for branch in branchDetails:
-                                branches.append(branch['name'])
+                            branchPage = 1
+                            fetchNextBranchPage = True
+                            while fetchNextBranchPage:
+                                getBranchesRestUrl = commitsBaseEndPoint+repoName+'/branches?access_token='+accessToken+'&page='+str(branchPage)
+                                branchDetails = self.getResponse(getBranchesRestUrl, 'GET', None, None, None)
+                                for branch in branchDetails:
+                                    branches.append(branch['name'])
+                                if len(branchDetails) == 30:
+                                    branchPage = branchPage + 1
+                                else:
+                                    fetchNextBranchPage = False
+                                    break    
                             activeBranches = [{ 'repoName' : repoName, 'activeBranches' : branches, 'gitType' : 'metadata'}]
                             metadata = {
                                         "dataUpdateSupported" : True,
