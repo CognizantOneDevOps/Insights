@@ -80,8 +80,11 @@ class GitAgent(BaseAgent):
                             injectData = {}
                             injectData['repoName'] = repoName
                             injectData['branchName'] = branch
+                            parsedBranch = branch
+                            if '+' in parsedBranch:
+                                parsedBranch = parsedBranch.replace('+', '%2B')
                             fetchNextCommitsPage = True
-                            getCommitDetailsUrl = commitsBaseEndPoint+repoName+'/commits?sha='+branch+'&access_token='+accessToken+'&per_page=100'
+                            getCommitDetailsUrl = commitsBaseEndPoint+repoName+'/commits?sha='+parsedBranch+'&access_token='+accessToken+'&per_page=100'
                             since = trackingDetails.get(branch, None)
                             if since != None:
                                 getCommitDetailsUrl += '&since='+since
@@ -101,6 +104,7 @@ class GitAgent(BaseAgent):
                                         fetchNextCommitsPage = False
                                         break
                                 except Exception as ex:
+                                    fetchNextCommitsPage = False
                                     logging.error(ex)
                                 commitsPageNum = commitsPageNum + 1
                             if len(data) > 0:
