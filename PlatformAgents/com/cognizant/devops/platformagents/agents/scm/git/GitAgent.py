@@ -61,6 +61,12 @@ class GitAgent(BaseAgent):
                             branches = []
                             for branch in branchDetails:
                                 branches.append(branch['name'])
+                            activeBranches = [{ 'repoName' : repoName, 'activeBranches' : branches, 'gitType' : 'metadata'}]
+                            metadata = {
+                                        "dataUpdateSupported" : True,
+                                        "uniqueKey" : ["repoName", "gitType"]
+                                    }
+                            self.publishToolsData(activeBranches, metadata)
                         for branch in branches:
                             data = []
                             injectData = {}
