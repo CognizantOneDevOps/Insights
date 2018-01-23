@@ -11,7 +11,8 @@
 		"sparkElasticSearchConfigIndex": "",
 		"sparkElasticSearchResultIndex": "",
 		"kpiSize": "30",
-		"sparkResultSince": 5
+		"sparkResultSince": 5,		
+		"sparkMasterExecutionEndPoint":"http://localhost:4040"
 	},
 	"ldapConfiguration": {
 		"ldapUrl": "ldap://ldaphost:389",
@@ -75,66 +76,4 @@
 	"trustedHosts": [
 		"localhost"
 	]
-=======
-  "endpointData": {
-    "elasticSearchEndpoint": "http://localhost:9200"
-  },
-  "sparkConfigurations": {
-    "appName" : "inSights",
-	"master" : "local[*]",
-	"sparkExecutorMemory" : "8g",
-	"sparkElasticSearchHost": "http://localhost",
-	"sparkElasticSearchPort": "9200",
-	"sparkElasticSearchConfigIndex": "",
-	"sparkElasticSearchResultIndex": "",
-	"kpiSize": "30",
-	"sparkResultSince": 5
-  },
-  "ldapConfiguration": {
-	"ldapUrl" : "ldap://ldaphost:389",
-    "bindDN": "BindDN",
-    "bindPassword": "Passwd",
-    "searchBaseDN": "DC=XX,DC=XX",
-    "searchFilter": "(sAMAccountName={0})",
-    "ldapAttributes": {
-      "name": "givenname",
-      "surname": "sn",
-      "memberOf": "",
-      "email": "mail",
-      "username": "sAMAccountName"
-    }
-  },
-  "graph": {
-    "endpoint": "http://localhost:7474",
-    "authToken": "authtoken=",
-		"boltEndPoint" : "bolt://localhost:7687",
-		"maxIdleConnections":25
-  },
-  "grafana": {
-    "grafanaEndpoint": "https://localhost:3000",
-    "grafanaDBEndpoint": "jdbc:postgresql://localhost:5432/grafana",
-    "adminUserName": "username",
-    "adminUserPassword": "password",
-    "dbUserName": "username",
-    "dbPassword": "passwd"
-  },
-  "postgre": {
-	"userName" : "grafana",
-	"password" : "pass",
-	"insightsDBUrl": "jdbc:postgresql://127.0.0.1:5432/insight",
-	"grafanaDBUrl": "jdbc:postgresql://127.0.0.1:5432/grafana"
-  },
-  "messageQueue": {
-    "host": "localhost",
-    "user": "username",
-    "password": "pass"
-  },
-  "disableAuth": true,
-  "insightsTimeZone": "Asia/Kolkata",
-  "userId": "UserID",
-  "password": "Passwd",
-  "refreshTime": "Jan 22, 2017 5:04:25 PM",
-  "trustedHosts": [
-    "localhost"
-  ]
 }
