@@ -16,11 +16,10 @@
 
 module ISightApp {
     export class AgentController {
-        static $inject = ['agentService', 'iconService', '$sce', '$mdDialog', '$cookies', 'toolConfigService'];
-        constructor(			
+        static $inject = ['agentService', 'iconService', '$mdDialog', '$cookies', 'toolConfigService'];
+        constructor(
             private agentService: IAgentService,
             private iconService: IIconService,
-			private $sce,
             private $mdDialog, private $cookies, private toolConfigService: IToolConfigService) {
             var self = this;
             self.toolsData = self.toolConfigService.readToolsDataList();
@@ -53,62 +52,7 @@ module ISightApp {
             var homePageController = homePageControllerScope['homePageController'];
             this.homeController = homePageController;
             this.homeController.templateName = 'healthCheck';
-						
-			self.gfHost = this.agentService.getStatusCallHost("GF_HEALTH");			
-			self.elasticSearchIP = this.agentService.getStatusCallHost("ELASTICSEARCH");
-			self.neo4JIP = this.agentService.getStatusCallHost("NEO4J");
-			self.sparkIP = this.agentService.getStatusCallHost("SPARK_HEALTH");
-			self.pfIP = this.agentService.getStatusCallHost("PLATFORM_SERVICE_STATUS");
-			
-			 //ES
-			 this.agentService.loadServerHealthConfiguration("ELASTICSEARCH")
-			.then(function (data) {		
-				self.serverStatus.push({'server': "ELASTICSEARCH", 'status': "success", 'serverIP': self.elasticSearchIP});
-			})
-			.catch(function (data) {				
-				self.serverStatus.push({'server': "ELASTICSEARCH", 'status': "failure", 'serverIP': self.elasticSearchIP});
-			}); 
-
-			//NJ
-			this.agentService.loadServerHealthConfiguration("NEO4J")
-			.then(function (data) {								
-				self.serverStatus.push({'server': "NEO4J", 'status': "success", 'serverIP': self.neo4JIP});
-			})
-			.catch(function (data) {									
-				self.serverStatus.push({'server': "NEO4J", 'status': "failure", 'serverIP': self.neo4JIP});
-			});  
-						
-			//GRAFANA
-			this.agentService.loadServerHealthConfiguration("CURRENT_USER_ORG")
-			.then(function (data) {					
-				self.serverStatus.push({'server': "GRAFANA", 'status': "success", 'serverIP': self.gfHost});
-			})
-			.catch(function (data) {												
-				self.serverStatus.push({'server': "GRAFANA", 'status': "failure", 'serverIP': self.gfHost});
-			}); 
-			
-			//PlatformService
-			this.agentService.loadServerHealthConfiguration("PLATFORM_SERVICE_STATUS")
-			.then(function (data) {		
-				console.log(data);
-				self.serverStatus.push({'server': "PlatformService", 'status': "success", 'serverIP': self.pfIP});
-			})
-			.catch(function (data) {									
-			console.log(data);
-				self.serverStatus.push({'server': "PlatformService", 'status': "failure", 'serverIP': self.pfIP});
-			}); 
-			 
         }
-		pfIP: string;
-		sparkIP: string;
-		gfHost: any;
-		gfStatus: string;
-		elasticSearchIP: string;
-		neo4JIP: string;
-		serverName: string;
-		serverSt: string;
-		serverList = [];
-		serverStatus = [];					
         agentNodes = [];
         selectedTool: string;
         selectedCategory: string;

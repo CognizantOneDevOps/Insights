@@ -20,9 +20,6 @@ module ISightApp {
     export interface IAgentService {
         loadGlobalHealthConfigurations(): ng.IPromise<any>;
         loadHealthConfigurations(toolName: string, toolCategory:string ): ng.IPromise<any>;
-		loadServerHealthConfiguration(ServerName: string): ng.IPromise<any>;
-		getStatusCallHost(ServerName:string);
-		loadCORSServerHealthConfiguration(method: string, url: string);
     }
 
     export class AgentService implements IAgentService {
@@ -40,23 +37,5 @@ module ISightApp {
             return restHandler.get("HEALTH_TOOL",{'tool':toolName,'category':toolCategory});
            
         }
-		
-		loadServerHealthConfiguration(ServerName: string): ng.IPromise<any> {
-			var restHandler = this.restCallHandlerService;			
-			return restHandler.get(ServerName);			
-		}
-		
-		loadCORSServerHealthConfiguration(method: string, url: string){
-			var restHandler = this.restCallHandlerService;			
-			return restHandler.createCORSRequest(method, url);			
-		}
-		
-		
-		getStatusCallHost(ServerName: string){			
-			var hostIP = [];
-			var restHandler = this.restCallHandlerService;
-			hostIP = restHandler.constructGetUrl(ServerName, {}).split("/")['2'];				
-			return hostIP;
-		}
     }
 }
