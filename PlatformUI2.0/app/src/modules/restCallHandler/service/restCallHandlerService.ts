@@ -21,6 +21,8 @@ module ISightApp {
         
         get(url: string, requestParams?: Object, additionalheaders?: Object): ng.IPromise<any>;
         post(url: string, requestParams?: Object, additionalheaders?: Object): ng.IPromise<any>;
+		constructGetUrl(url : string, requestParams : Object);
+		createCORSRequest(method: string, url: string);
     }
 
     export class RestCallHandlerService implements IRestCallHandlerService {
@@ -29,15 +31,27 @@ module ISightApp {
         
         get(url: string, requestParams?: Object, additionalheaders?: Object): ng.IPromise<any> {
             var headers;
-            var authToken = this.$cookies.get('Authorization');
-            var defaultHeader = {
-                                    'Authorization': authToken
-                                };
-            if (this.checkValidObject(additionalheaders)) {
-                headers = this.extend(defaultHeader,additionalheaders);
-            }else {
-                headers = defaultHeader;
-            }
+			var authToken;
+			            
+			if(url == "NEO4J") {
+				authToken = 'Basic ' + btoa("neo4j" + ":" + "C0gnizant@1");
+			}
+			else {
+				authToken = this.$cookies.get('Authorization');					
+			}		
+			
+			var defaultHeader = {
+                                    'Authorization': authToken													
+                                };			
+			
+			if (this.checkValidObject(additionalheaders)) {
+				headers = this.extend(defaultHeader,additionalheaders);
+			}else if(url == "ELASTICSEARCH") {
+				headers = '';
+			}		
+			else {
+				headers = defaultHeader;
+			}		
             var restcallUrl = this.constructGetUrl(url,requestParams);
             var resource = this.$resource(restcallUrl,
                 {},
@@ -116,8 +130,22 @@ module ISightApp {
             }
             return selectedUrl;
         }
-
-
+		
+		createCORSRequest(method: string, url: string){
+			var XDomainRequest;
+			var xhr = new XMLHttpRequest();
+			
+			//xhr.open(method, url, true);
+			 if ("withCredentials" in xhr){
+				xhr.open(method, url, true	);
+			} else if (typeof XDomainRequest != "undefined"){
+				xhr = new XDomainRequest();				
+				xhr.open(method, url, true);
+			} else {
+				xhr = null;
+			} 						
+			return xhr;
+		}
 
     }
 }
