@@ -23,8 +23,6 @@ module ISightApp {
 		getNeo4jServiceHost(): String;
 		getGrafanaHost(): String;
 		getGrafanaHost1(): ng.IPromise<any>;
-		getsparkServiceHost(): String;
-		getplatformServiceHost(): String;
 		
 	}
 
@@ -53,9 +51,7 @@ module ISightApp {
 					self.serviceHost = data.serviceHost;
 					self.elasticSearchServiceHost = data.elasticSearchServiceHost;
 					self.neo4jServiceHost = data.neo4jServiceHost;
-					self.grafanaHost = data.grafanaHost;
-					self.sparkHost = data.sparkHost;
-					self.pfHost = data.pfHost;
+					self.grafanaHost = data.grafanaHost;					
 				});
 				//self.grafanaHost = self.getGrafanaHost();
 			}
@@ -65,9 +61,7 @@ module ISightApp {
 		elasticSearchServiceHost: String;
 		neo4jServiceHost: String;
 		grafanaHost: String;
-		sparkHost: String;
-		pfHost: String;
-		
+				
 		public getServiceHost(): String {
 			if (!this.serviceHost) {
 				this.serviceHost = this.$location.protocol() + "://" + this.$location.host() + ":" + this.$location.port();
@@ -75,19 +69,7 @@ module ISightApp {
 			return this.serviceHost;
 		}
 		
-		public getsparkServiceHost(): String {
-			if (!this.sparkHost) {
-				this.sparkHost = this.$location.protocol() + "://" + this.$location.host() + ":4040";
-			}
-			return this.sparkHost;
-		}
 		
-		public getplatformServiceHost(): String {
-			if (!this.pfHost) {
-				this.pfHost = this.$location.protocol() + "://" + this.$location.host() + ":4040";
-			}
-			return this.pfHost;
-		}
 
 		public getelasticSearchServiceHost(): String {
 			if (!this.elasticSearchServiceHost) {
@@ -108,7 +90,8 @@ module ISightApp {
                 this.grafanaHost = this.$location.protocol() + "://" + this.$location.host() + ":3000";
             }
             return this.grafanaHost;
-        };
+        };		
+		
 
 		public getGrafanaHost1(): ng.IPromise<any> {
 			var self = this;
