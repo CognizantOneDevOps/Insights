@@ -201,8 +201,10 @@ class JiraAgent(BaseAgent):
         if issues:
             parsedIssues = self.parseResponse(responseTemplate, issues, injectData)
             for issue in parsedIssues:
-                issue['addedDuringSprint'] = issueKeysAddedDuringSprint.get(issue['key'], False)
+                issueKey = issue['key']
+                issue['addedDuringSprint'] = issueKeysAddedDuringSprint.get(issueKey, False)
                 issue['sprintIssueRegion'] = sprintIssueRegion
+                issue['projectKey'] = issueKey.split('-')[0]
         return parsedIssues
      
     def retrieveReleaseDetails(self):
