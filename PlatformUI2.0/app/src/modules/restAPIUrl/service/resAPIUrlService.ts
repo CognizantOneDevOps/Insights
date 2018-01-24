@@ -98,13 +98,9 @@ module ISightApp {
 		  this.addEndPoint("ACCESS_GROUP_MANAGEMENT_GET_CURRENT_USER_ORGS",'/PlatformService/accessGrpMgmt/getCurrentUserOrgs');
 		  this.addEndPoint("ACCESS_GROUP_MANAGEMENT_SWITCH_ORGS",'/PlatformService/accessGrpMgmt/switchUserOrg');
 		  this.addEndPoint("ACCESS_GROUP_MANAGEMENT_GET_USERS",'/PlatformService/accessGrpMgmt/getUser');
-		  this.addEndPoint("ELASTICSEARCH",'/_cluster/health?pretty');
-		  this.addEndPoint("NEO4J",'/db/manage/server/version');		  
-		  this.addEndPoint("GF_HEALTH",'/api/health');
-		 this.addEndPoint("SPARK_HEALTH",'/jobs/');
-
+		 
 		  this.addEndPoint("INSIGHTS_GET",'/PlatformService/insights/inferences');
-		  this.addEndPoint("PLATFORM_SERVICE_STATUS",'/PlatformService/InsightsServiceStatus/getStatus');
+		  this.addEndPoint("INSIGHTS_COMP_STATUS",'/PlatformService/ServicesHealthStatus/getStatus');
         }
 
        addEndPoint(name:string, url:string){
@@ -119,27 +115,10 @@ module ISightApp {
         getRestCallUrl( moduleUrlKey:string ) {
                if(! this.urlMapping[moduleUrlKey]){
                     throw new Error("Url Mapping doesnt exist");
-               }
+               }			   
 			   
-			   if(moduleUrlKey == "ELASTICSEARCH") {
-			   return this.restEndpointService.getelasticSearchServiceHost() + this.urlMapping[moduleUrlKey];
-			   }
-			   else if(moduleUrlKey == "NEO4J") {
-			   return this.restEndpointService.getNeo4jServiceHost() + this.urlMapping[moduleUrlKey];
-			   }
-			   else if(moduleUrlKey == "GF_HEALTH"){
-			   return this.restEndpointService.getGrafanaHost() + this.urlMapping[moduleUrlKey];
-			   }
-			   else if(moduleUrlKey == "SPARK_HEALTH"){
-			   return this.restEndpointService.getsparkServiceHost() + this.urlMapping[moduleUrlKey];
-			   }
-			   else if(moduleUrlKey == "PLATFORM_SERVICE_STATUS"){
-			   return this.restEndpointService.getplatformServiceHost() + this.urlMapping[moduleUrlKey];
-			   }
-			   else {
-               return this.restEndpointService.getServiceHost() + this.urlMapping[moduleUrlKey];
-			   }
-        }      
+               return this.restEndpointService.getServiceHost() + this.urlMapping[moduleUrlKey];			   
+		}      
 
 
     }
