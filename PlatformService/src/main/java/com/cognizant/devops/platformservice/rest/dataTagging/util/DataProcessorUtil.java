@@ -77,7 +77,7 @@ public class DataProcessorUtil  {
 				}			
 				json.addProperty(DatataggingConstants.CREATIONDATE, Instant.now().toEpochMilli() );
 				gitProperties.add(json);
-				if(size == 50 ) {
+				if(size == 10 ) {
 					totalSize += size;
 					dbHandler.bulkCreateNodes(gitProperties, null, query);
 					Thread.sleep(sleepTime);
