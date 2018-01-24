@@ -62,15 +62,15 @@ class JiraAgent(BaseAgent):
             else:
                 break
     
-    def scheduleExtensions(self, scheduler):
+    def scheduleExtensions(self):
         extensions = self.config.get('extensions', None)
         if extensions:
             sprintReport = extensions.get('sprintReport', None)
             if sprintReport:
-                scheduler.add_job(self.retrieveSprintReports,'interval', seconds=60*sprintReport.get('runSchedule'))
+                self.registerExtension('sprintReport', self.retrieveSprintReports, sprintReport.get('runSchedule'))
             releaseDetails = extensions.get('releaseDetails', None)
             if releaseDetails:
-                scheduler.add_job(self.retrieveReleaseDetails,'interval', seconds=60*releaseDetails.get('runSchedule'))
+                self.registerExtension('releaseDetails', self.retrieveReleaseDetails, releaseDetails.get('runSchedule'))
     
     def extractFields(self, responseTemplate):
         fieldsJson = responseTemplate.get("fields", None)
