@@ -35,7 +35,9 @@ module ISightApp {
         .service('restAPIUrlService', RestAPIUrlService)
         .service('restCallHandlerService', RestCallHandlerService)
         .service('dataTaggingService', DataTaggingService)
+        .service('dataOnBoardingService', DataOnBoardingService)
         .service('singleToolConfigService', SingleToolConfigService)
+        .service('dataTaggingDetailsService', DataTaggingDetailsService)
         .controller('pipelineController', PipelineController)
         .controller('homePageController', HomePageController)
         .controller('toolsConfigurationController', ToolsConfigurationController)
@@ -48,6 +50,8 @@ module ISightApp {
         .controller('agentController', AgentController)
         .controller('singleToolConfigurationController', SingleToolConfigurationController)
         .controller('dataTaggingController', DataTaggingController)
+	.controller('dataTaggingDetailsController', DataTaggingDetailsController)
+        .controller('FileUploadController', FileUploadController)
         .component('footer', {
             templateUrl: './dist/components/footer/view/footerView.html',
             controller: FooterController,
@@ -67,6 +71,25 @@ module ISightApp {
             bindings:{}
 
         })
+        .directive('includeReplace', function () {
+            return {
+                require: 'ngInclude',
+                restrict: 'A',
+                link: function(scope, tElem, tAttrs) {
+
+                    tElem.replaceWith(tElem.children());
+                }
+            };
+        })
+        
+       .directive('row', function() {
+            return {
+                restrict: 'EA',
+                scope: { children:"=" , clickHandler:"&" },
+                templateUrl: './dist/modules/dataTaggingDetails/view/test.html'
+            };
+        })
+       
         .config(['$routeProvider', '$compileProvider',
             function($routeProvider, $compileProvider) {
                 $routeProvider.
