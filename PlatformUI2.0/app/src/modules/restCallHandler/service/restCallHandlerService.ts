@@ -21,8 +21,7 @@ module ISightApp {
         
         get(url: string, requestParams?: Object, additionalheaders?: Object): ng.IPromise<any>;
         post(url: string, requestParams?: Object, additionalheaders?: Object): ng.IPromise<any>;
-		constructGetUrl(url : string, requestParams : Object);
-		createCORSRequest(method: string, url: string);
+		constructGetUrl(url : string, requestParams : Object);		
     }
 
     export class RestCallHandlerService implements IRestCallHandlerService {
@@ -33,12 +32,8 @@ module ISightApp {
             var headers;
 			var authToken;
 			            
-			if(url == "NEO4J") {
-				authToken = 'Basic ' + btoa("neo4j" + ":" + "C0gnizant@1");
-			}
-			else {
-				authToken = this.$cookies.get('Authorization');					
-			}		
+			authToken = this.$cookies.get('Authorization');					
+					
 			
 			var defaultHeader = {
                                     'Authorization': authToken													
@@ -46,9 +41,7 @@ module ISightApp {
 			
 			if (this.checkValidObject(additionalheaders)) {
 				headers = this.extend(defaultHeader,additionalheaders);
-			}else if(url == "ELASTICSEARCH") {
-				headers = '';
-			}		
+			}				
 			else {
 				headers = defaultHeader;
 			}		
@@ -131,21 +124,6 @@ module ISightApp {
             return selectedUrl;
         }
 		
-		createCORSRequest(method: string, url: string){
-			var XDomainRequest;
-			var xhr = new XMLHttpRequest();
-			
-			//xhr.open(method, url, true);
-			 if ("withCredentials" in xhr){
-				xhr.open(method, url, true	);
-			} else if (typeof XDomainRequest != "undefined"){
-				xhr = new XDomainRequest();				
-				xhr.open(method, url, true);
-			} else {
-				xhr = null;
-			} 						
-			return xhr;
-		}
 
     }
 }
