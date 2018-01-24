@@ -18,15 +18,23 @@ package com.cognizant.devops.platformengine.message.subscriber;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.StringTokenizer;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBException;
+import com.cognizant.devops.platformcommons.dal.neo4j.GraphResponse;
 import com.cognizant.devops.platformcommons.dal.neo4j.Neo4jDBHandler;
+import com.cognizant.devops.platformcommons.dal.neo4j.NodeData;
+import com.cognizant.devops.platformengine.message.core.AgentDataConstants;
 import com.cognizant.devops.platformengine.message.core.MessageConstants;
 import com.cognizant.devops.platformengine.message.factory.EngineSubscriberResponseHandler;
+import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -36,14 +44,14 @@ import com.rabbitmq.client.Envelope;
 
 public class AgentDataSubscriber extends EngineSubscriberResponseHandler{
 	private static Logger log = Logger.getLogger(AgentDataSubscriber.class.getName());
-	
+
 	public AgentDataSubscriber(String routingKey) throws Exception {
 		super(routingKey);
 	}
 	private boolean dataUpdateSupported;
 	private String uniqueKey;
 	private String category;
-	
+
 	public AgentDataSubscriber(String routingKey, boolean dataUpdateSupported, String uniqueKey, String category) throws Exception {
 		super(routingKey);
 		this.dataUpdateSupported = dataUpdateSupported;
@@ -54,6 +62,10 @@ public class AgentDataSubscriber extends EngineSubscriberResponseHandler{
 	public void handleDelivery(String consumerTag, Envelope envelope, BasicProperties properties, byte[] body) throws IOException{
 		ApplicationConfigProvider.performSystemCheck();
 		Neo4jDBHandler dbHandler = new Neo4jDBHandler();
+		Map<String,Map<String,NodeData>> metaDataMap=new HashMap<String,Map<String,NodeData>>();
+		String nodeJsonStr =null;
+		Gson gson = new Gson();
+
 		String message = new String(body, MessageConstants.MESSAGE_ENCODING);
 		String routingKey = envelope.getRoutingKey();
 		List<String> labels = new ArrayList<String>();
@@ -61,14 +73,29 @@ public class AgentDataSubscriber extends EngineSubscriberResponseHandler{
 		labels.addAll(Arrays.asList(routingKey.split(MessageConstants.ROUTING_KEY_SEPERATOR)));
 		List<JsonObject> dataList = new ArrayList<JsonObject>();
 		JsonElement json = new JsonParser().parse(message);
+
+		//MetaData from neo4j as map
+		metaDataMap= getMetaData(dbHandler);
+
 		if(json.isJsonArray()){
 			JsonArray asJsonArray = json.getAsJsonArray();
 			for(JsonElement e : asJsonArray){
 				if(e.isJsonObject()){
-					dataList.add(e.getAsJsonObject());
+					//dataList.add(e.getAsJsonObject());
+
+					NodeData nodeData =new NodeData();
+
+					nodeData = applyDataTagging(e.getAsJsonObject(),metaDataMap);
+
+					nodeJsonStr = gson.toJson(nodeData.getPropertyMap());
+
+					JsonObject finalJson = mergeProperty(e,nodeJsonStr);
+
+					dataList.add(finalJson);
+
 				}
 			}
-			try {
+			/*	try {
 				String cypherQuery = null;
 				if(dataUpdateSupported){
 					String labelsStr = routingKey.replace(".", ":");
@@ -93,25 +120,154 @@ public class AgentDataSubscriber extends EngineSubscriberResponseHandler{
 			} catch (GraphDBException e) {
 				log.error(e);
 			}
+			 */			
+
 		}
 	}
-	
+
+
+/*	public static void dataTaggingCreation() throws InterruptedException{
+		ApplicationConfigProvider.performSystemCheck();
+		Neo4jDBHandler dbHandler = new Neo4jDBHandler();
+		Map<String,Map<String,NodeData>> metaDataMap=new HashMap<String,Map<String,NodeData>>();
+		String nodeJsonStr =null;
+		Gson gson = new Gson();
+		List<JsonObject> dataList = new ArrayList<JsonObject>();
+		//MetaData from neo4j as map
+		metaDataMap= getMetaData(dbHandler);
+		//AgentData as JsonArray 
+		JsonArray agentData = TestRESTPerformance.createNodes(5,500).getAsJsonArray();
+		for(JsonElement agentJsonElement : agentData){
+			NodeData nodeData =new NodeData();
+			if(agentJsonElement.isJsonObject()){
+				nodeData = applyDataTagging(agentJsonElement.getAsJsonObject(),metaDataMap);
+				nodeJsonStr = gson.toJson(nodeData.getPropertyMap());
+				JsonObject finalJson = mergeProperty(agentJsonElement, nodeJsonStr);
+				dataList.add(finalJson);
+			}
+		}
+		System.out.println("\n"+dataList);
+	}*/
+
+	private   JsonObject mergeProperty(JsonElement e, String jsonStr) {
+		JsonParser jsonParser = new JsonParser();
+		JsonObject jsonObj = (JsonObject)jsonParser.parse(jsonStr);
+		Map<String,String> metaDataJson = new Gson().fromJson(jsonObj, HashMap.class);
+		Map<String,String> agentJson = new Gson().fromJson(e.getAsJsonObject(), HashMap.class);
+		Map<String,String> finalobj = new HashMap<String,String>();
+		finalobj.putAll(metaDataJson);
+		finalobj.putAll(agentJson);
+		String resultJson = new Gson().toJson(finalobj);
+		JsonObject finalJson=(JsonObject)jsonParser.parse(resultJson);
+		return finalJson;
+	}
+
+
+	private  NodeData applyDataTagging(JsonObject asJsonObject, Map<String, Map<String, NodeData>> metaDataMap) {
+
+		NodeData nodeData = new NodeData() ;
+		StringBuilder sb=null;
+
+		for (String key : metaDataMap.keySet()){
+			StringTokenizer token = new StringTokenizer(key,AgentDataConstants.COLON);
+			sb= new StringBuilder();
+
+			while (token.hasMoreElements()) {
+				String agentJsonkey=token.nextElement().toString();
+
+				if(asJsonObject.has(agentJsonkey)){
+					sb.append(asJsonObject.get(agentJsonkey).getAsString());
+					sb.append(AgentDataConstants.COLON);
+				}
+			}  
+
+			Map<String ,NodeData> innerMap=metaDataMap.get(key);
+
+			String innerKey=StringUtils.stripEnd(sb.toString(),AgentDataConstants.COLON);
+			if(innerMap.containsKey(innerKey)){
+
+				nodeData = innerMap.get(innerKey);
+
+			}
+
+
+		}
+
+		return nodeData;
+	}
+
+	private  Map<String, Map<String, NodeData>> getMetaData(Neo4jDBHandler dbHandler) {
+		List<NodeData> nodes = null;
+		Map<String,NodeData> nodepropertyMap=null;
+		Map<String,Map<String,NodeData>> metaDataMap=new HashMap<String,Map<String,NodeData>>();
+		GraphResponse response=null;
+		try {
+			response = dbHandler.executeCypherQuery("MATCH (n:METADATA:DATATAGGING) return n");
+			nodes=response.getNodes();
+		} catch (GraphDBException e) {
+			log.error(e);
+		}
+		if(nodes.size() > 0){
+			for(NodeData node : nodes){
+				StringBuilder labelVal=new StringBuilder();
+				StringBuilder key=new StringBuilder();
+				nodepropertyMap=new HashMap<String,NodeData>();
+
+				if(!node.getProperty(AgentDataConstants.PROPERTY_1).isEmpty()){
+					key.append(node.getProperty(AgentDataConstants.PROPERTY_1));
+					key.append(AgentDataConstants.COLON);
+				}
+				if(!node.getProperty(AgentDataConstants.PROPERTY_2).isEmpty()){
+					key.append(node.getProperty(AgentDataConstants.PROPERTY_2));
+					key.append(AgentDataConstants.COLON);
+				}
+				if(!node.getProperty(AgentDataConstants.PROPERTY_3).isEmpty()){
+					key.append(node.getProperty(AgentDataConstants.PROPERTY_3));
+					key.append(AgentDataConstants.COLON);
+				}
+				if(!node.getProperty(AgentDataConstants.PROPERTY_4).isEmpty()){
+					key.append(node.getProperty(AgentDataConstants.PROPERTY_4));
+					key.append(AgentDataConstants.COLON);
+				}
+				if(!node.getProperty(AgentDataConstants.PROPERTYVALUE_1).isEmpty()){
+					labelVal.append(node.getProperty(AgentDataConstants.PROPERTYVALUE_1));
+					labelVal.append(AgentDataConstants.COLON);
+				}
+				if(!node.getProperty(AgentDataConstants.PROPERTYVALUE_2).isEmpty()){
+					labelVal.append(node.getProperty(AgentDataConstants.PROPERTYVALUE_2));
+					labelVal.append(AgentDataConstants.COLON);	 
+				}
+				if(!node.getProperty(AgentDataConstants.PROPERTYVALUE_3).isEmpty()){
+					labelVal.append(node.getProperty(AgentDataConstants.PROPERTYVALUE_3));
+					labelVal.append(AgentDataConstants.COLON);	 
+				}
+				if(!node.getProperty(AgentDataConstants.PROPERTYVALUE_4).isEmpty()){
+					labelVal.append(node.getProperty(AgentDataConstants.PROPERTYVALUE_4));
+				}
+
+				nodepropertyMap.put( StringUtils.stripEnd(labelVal.toString(),AgentDataConstants.COLON), node);
+				metaDataMap.put(StringUtils.stripEnd(key.toString(),AgentDataConstants.COLON), nodepropertyMap);
+			}
+		}
+		return metaDataMap;
+	}
+
 	private <T> List<List<T>> partitionList(List<T> list, final int size) {
-	    List<List<T>> parts = new ArrayList<List<T>>();
-	    final int N = list.size();
-	    for (int i = 0; i < N; i += size) {
-	       /* parts.add(new ArrayList<T>(
+		List<List<T>> parts = new ArrayList<List<T>>();
+		final int N = list.size();
+		for (int i = 0; i < N; i += size) {
+			/* parts.add(new ArrayList<T>(
 	            list.subList(i, Math.min(N, i + size)))
 	        );*/
-	    	parts.add(getPartitionSubList(list,i,size,N));                 
-	    }
-	    return parts;
+			parts.add(getPartitionSubList(list,i,size,N));                 
+		}
+		return parts;
 	}
-	
+
 	private <T> ArrayList<T> getPartitionSubList(List<T> list, int index,int size, final int N){
 		return new ArrayList<T>(list.subList(index, Math.min(N, index + size)));
 	}
-	
+
 	private String buildCypherQuery(String labels, String fieldName, String relation){
 		StringBuffer query = new StringBuffer();
 		query.append("UNWIND {props} AS properties CREATE (new:LATEST) set new=properties ").append(" ");
@@ -136,4 +292,6 @@ public class AgentDataSubscriber extends EngineSubscriberResponseHandler{
 		query.append("return count(new), count(oldNodes)").append(" ");
 		return query.toString();
 	}
+	
+	
 }
