@@ -50,6 +50,7 @@ class BaseAgent(object):
         #self.configUpdateSubscriber()
         self.setupLocalCache()
         self.extractToolName()
+        self.scheduleExtensions()
         self.execute()
         self.scheduleAgent()
         
@@ -239,7 +240,6 @@ class BaseAgent(object):
             scheduler = BlockingScheduler()
             self.scheduler = scheduler
             self.scheduledJob = scheduler.add_job(self.execute,'interval', seconds=60*self.runSchedule)
-            self.scheduleExtensions(scheduler)
             try:
                 scheduler.start()
             except (KeyboardInterrupt, SystemExit):
@@ -261,10 +261,17 @@ class BaseAgent(object):
             else:
                 pass
     
-    def scheduleExtensions(self, scheduler):
+    def scheduleExtensions(self):
         '''
-        Override in the Agent class for scheduling the extensions.
+        Schedule the extensions from here
         '''
+    '''
+    Register the agent extensions. All the extensions will be called after the time interval specified using duration (in minutes)
+    '''
+    def registerExtension(self, name, func, duration):
+        if not hasattr(self, 'extensions'):
+            self.extensions = {}
+        self.extensions[name] = {'func': func, 'duration': duration}
     
     def execute(self):
         try:
@@ -272,11 +279,40 @@ class BaseAgent(object):
             self.logIndicator(self.EXECUTION_START, self.config.get('isDebugAllowed', False))
             self.executionId = str(uuid.uuid1())
             self.process()
+            self.executeAgentExtensions()
             self.publishHealthData(self.generateHealthData())
         except Exception as ex:
             self.publishHealthData(self.generateHealthData(ex=ex))
             logging.error(ex)
             self.logIndicator(self.EXECUTION_ERROR, self.config.get('isDebugAllowed', False))
+    
+    def executeAgentExtensions(self):
+        if hasattr(self, 'extensions'):
+            extensions = self.extensions
+            agentExtensionsTracking = self.tracking.get('agentExtensions', None)
+            if agentExtensionsTracking is None:
+                agentExtensionsTracking = {}
+                self.tracking['agentExtensions'] = agentExtensionsTracking
+            for name in extensions:
+                extension = extensions[name]
+                duration = extension.get('duration') * 60
+                lastRunTime = agentExtensionsTracking.get(name, None)
+                executeExtension = False
+                if lastRunTime is None:
+                    executeExtension = True
+                else:
+                    currentEpochTime = self.getRemoteDateTime(datetime.now()).get('epochTime')
+                    lastRunEpochTime = self.getRemoteDateTime(datetime.strptime(lastRunTime, '%Y-%m-%d %H:%M:%S')).get('epochTime')
+                    if currentEpochTime >= (lastRunEpochTime + duration):
+                        executeExtension = True
+                    else:
+                        executeExtension = False
+                if executeExtension:
+                    func = extension.get('func')
+                    func()
+                    agentExtensionsTracking[name] = datetime.strftime(datetime.now(), '%Y-%m-%d %H:%M:%S')
+                    self.updateTrackingJson(self.tracking)
+                    
         
     def process(self):
         '''
