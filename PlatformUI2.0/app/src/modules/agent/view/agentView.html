@@ -20,7 +20,7 @@
 </throbber>
 <div ng-if="agentController.showTemplateAfterLoad" layout="column" class="contentCss" flex>
     <div layout class="buttMar">
-        <div layout class="selectToolTxt">Health Check details</div>
+        <div layout class="selectToolTxt">Insights Agents</div>
     </div>
     <div layout layout-align="center center">
         <table class="md-api-table-landing" style="border: 1px solid #a5d28b;width:100%">
@@ -61,6 +61,33 @@
                     <td flex="20" class="tableContentStyle" style="font-family: proxima_novasemibold;font-size: 16px;color: #00728f !important;">
                         <div class="icon-textDecoration" style="cursor: pointer" ng-click="agentController.showTabDialog($event,x.propertyMap.toolName,x.propertyMap.category)">Show Details</div>
                     </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+	<div layout layout-align="center center">
+        <table class="md-api-table-landing" style="border: 1px solid #a5d28b;width:100%">
+            <thead class="theadCss">
+                <tr layout="row" layout-align="start center">
+                    <th flex="50" class="tableHeader">
+                        <span>Server</span>
+                    </th>
+					<th flex="50" class="tableHeader">
+                        <span>IP Address:Port</span>
+                    </th>
+                    <th flex="50" class="tableHeader">
+                        <span>Status</span>
+                    </th>                    
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="y in agentController.serverStatus" layout="row" layout-align="start none">                   
+                    <td flex="50" class="tableContentStyle">{{y.server}}</td>
+					<td flex="50" class="tableContentStyle">{{y.serverIP}}</td>
+                    <td flex="50" class="tableContentStyle">
+					 <md-icon ng-if="y.status ==='success'" md-svg-src="dist/icons/svg/ic_check_circle_24px.svg" ng-style="{color: '#4ca64c', height: '25px', width: '25px'}"></md-icon>
+                        <md-icon ng-if="y.status ==='failure'" md-svg-src="dist/icons/svg/ic_report_problem_24px.svg" ng-style="{color: '#ff4c4c', height: '25px', width: '25px'}"></md-icon>
+					</td>                    
                 </tr>
             </tbody>
         </table>
