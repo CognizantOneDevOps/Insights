@@ -28,9 +28,10 @@ import sys
 class RestCommunicationFacade(object):
     headers = {"Accept":"application/json"}
     
-    def __init__(self, sslVerify, responseType):
+    def __init__(self, sslVerify, responseType, enableValueArray):
         self.sslVerify = sslVerify
         self.responseType = responseType
+        self.enableValueArray = enableValueArray
         
     def communicate(self, url, method, userName, password, data, authType='BASIC', reqHeaders=None, responseTupple=None, proxies=None):
         auth = None
@@ -147,10 +148,16 @@ class RestCommunicationFacade(object):
                 for secData in secDataArray:
                     for secKey in secData:
                         prevValue = data.get(secKey, None)
-                        if prevValue:
-                            data[secKey] = prevValue + "," + secData[secKey]
+                        if self.enableValueArray:
+                            if prevValue and secData[secKey] not in prevValue:
+                                prevValue.append(secData[secKey])
+                            else:
+                                data[secKey] = [secData[secKey]]
                         else:
-                            data[secKey] = secData[secKey]
+                            if prevValue:
+                                data[secKey] = prevValue + "," + secData[secKey]
+                            else:
+                                data[secKey] = secData[secKey]
         elif keyType is unicode or keyType is str:
             responseObjType = type(responseObj)
             if responseObjType is dict:

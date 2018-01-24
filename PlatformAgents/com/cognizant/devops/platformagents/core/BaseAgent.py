@@ -115,7 +115,8 @@ class BaseAgent(object):
         facadeType = config.get('type', None)
         sslVerify = config.get('sslVerify', True)
         self.responseType = config.get('responseType', 'JSON')
-        self.communicationFacade = communicationFacade.getCommunicationFacade(facadeType, sslVerify, self.responseType)
+        enableValueArray = self.config.get('enableValueArray', False)
+        self.communicationFacade = communicationFacade.getCommunicationFacade(facadeType, sslVerify, self.responseType, enableValueArray)
         
     def initializeMQ(self):
         mqConfig = self.config.get('mqConfig', None)
