@@ -23,11 +23,9 @@ import com.cognizant.devops.platformservice.rest.dataTagging.Constants.Datataggi
 import com.google.gson.JsonObject;
 
 
-
-
 public class DataProcessorUtil  {
 	private static final DataProcessorUtil dataProcessorUtil = new DataProcessorUtil();
-	private static final Logger LOG = Logger.getLogger(DataProcessorUtil.class);
+	private static final Logger log = Logger.getLogger(DataProcessorUtil.class);
 	private DataProcessorUtil() {
 
 	}
@@ -35,7 +33,6 @@ public class DataProcessorUtil  {
 	public static DataProcessorUtil getInstance() {
 		return dataProcessorUtil;
 	}
-
 
 	private File convertToFile(MultipartFile multipartFile) throws IOException, FileNotFoundException {
 		File file = new File(multipartFile.getOriginalFilename());
@@ -51,7 +48,7 @@ public class DataProcessorUtil  {
 		try {
 			csvfile = convertToFile(file);
 		} catch (IOException ex) {
-			LOG.debug(ex);
+			log.debug(ex);
 		}
 
 		CSVFormat format = CSVFormat.newFormat(',').withHeader();
@@ -68,20 +65,28 @@ public class DataProcessorUtil  {
 					"SET n = properties";
 			int sleepTime=500;
 			int totalRecords=0;
+            int size = 0;
+            int totalSize = 0;
+
 			for (CSVRecord csvRecord : csvParser.getRecords()) {
+				size += 1;
 				totalRecords++;
 				JsonObject json = new JsonObject();
 				for(Map.Entry<String, Integer> header : headerMap.entrySet()){
-					
 					json.addProperty(header.getKey(), csvRecord.get(header.getValue()));
 				}			
 				json.addProperty(DatataggingConstants.CREATIONDATE, Instant.now().toEpochMilli() );
 				gitProperties.add(json);
-				if(totalRecords > 5) {
+				if(size == 10 ) {
+					totalSize += size;
 					dbHandler.bulkCreateNodes(gitProperties, null, query);
 					Thread.sleep(sleepTime);
 					gitProperties = new ArrayList<>();
 				}
+				if(totalSize >= totalRecords) {
+                    break;
+				}
+
 				status=true;	
 
 			}
@@ -89,16 +94,16 @@ public class DataProcessorUtil  {
 
 		} catch (FileNotFoundException e) {
 			status=false;
-			LOG.debug(e);
+			log.debug(e);
 		} catch (IOException e) {
 			status=false;
-			LOG.debug(e);
+			log.debug(e);
 		} catch (GraphDBException e) {
 			status=false;
-			LOG.debug(e);
+			log.debug(e);
 		} catch (InterruptedException e) {
 			status=false;
-			LOG.debug(e);
+			log.debug(e);
 		}
 		return status;
 
