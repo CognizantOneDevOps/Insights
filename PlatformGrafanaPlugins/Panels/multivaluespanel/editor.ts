@@ -159,7 +159,7 @@ export function pipelinePanelEditor($q, uiSegmentSrv) {
   return {
     restrict: 'E',
     scope: true,
-    templateUrl: 'public/app/plugins/panel/multivaluespanel/editor.html',
+    templateUrl: 'public/plugins/multivaluespanel/editor.html',
     controller: PipelinePanelEditorCtrl,
     controllerAs: 'pipelinePanelEditorCtrl'
   };
