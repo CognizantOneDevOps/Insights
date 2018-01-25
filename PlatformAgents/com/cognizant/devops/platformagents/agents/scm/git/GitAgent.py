@@ -57,24 +57,30 @@ class GitAgent(BaseAgent):
                     if repoName != None:
                         if enableBranches:
                             branches = []
+                            allBranches = []
                             branchPage = 1
                             fetchNextBranchPage = True
                             while fetchNextBranchPage:
                                 getBranchesRestUrl = commitsBaseEndPoint+repoName+'/branches?access_token='+accessToken+'&page='+str(branchPage)
                                 branchDetails = self.getResponse(getBranchesRestUrl, 'GET', None, None, None)
                                 for branch in branchDetails:
-                                    branches.append(branch['name'])
+                                    branchName = branch['name']
+                                    branchTracking = trackingDetails.get(branchName, {}).get('lastCommit', None)
+                                    allBranches.append(branchName)
+                                    if branchTracking is None or branchTracking != branch.get('commit', {}).get('sha', None):
+                                        branches.append(branchName)
                                 if len(branchDetails) == 30:
                                     branchPage = branchPage + 1
                                 else:
                                     fetchNextBranchPage = False
                                     break    
-                            activeBranches = [{ 'repoName' : repoName, 'activeBranches' : branches, 'gitType' : 'metadata'}]
-                            metadata = {
+                            if len(branches) > 0 :
+                                activeBranches = [{ 'repoName' : repoName, 'activeBranches' : allBranches, 'gitType' : 'metadata'}]
+                                metadata = {
                                         "dataUpdateSupported" : True,
                                         "uniqueKey" : ["repoName", "gitType"]
                                     }
-                            self.publishToolsData(activeBranches, metadata)
+                                self.publishToolsData(activeBranches, metadata)
                         for branch in branches:
                             data = []
                             injectData = {}
@@ -87,7 +93,7 @@ class GitAgent(BaseAgent):
                                 parsedBranch = parsedBranch.replace('&', '%26')
                             fetchNextCommitsPage = True
                             getCommitDetailsUrl = commitsBaseEndPoint+repoName+'/commits?sha='+parsedBranch+'&access_token='+accessToken+'&per_page=100'
-                            since = trackingDetails.get(branch, None)
+                            since = trackingDetails.get(branch, {}).get('lastCommitDate', None)
                             if since != None:
                                 getCommitDetailsUrl += '&since='+since
                             commitsPageNum = 1
@@ -115,7 +121,7 @@ class GitAgent(BaseAgent):
                                 dt = parser.parse(updatetimestamp)
                                 fromDateTime = dt + datetime.timedelta(seconds=01)
                                 fromDateTime = fromDateTime.strftime('%Y-%m-%dT%H:%M:%SZ')    
-                                trackingDetails[branch] = fromDateTime
+                                trackingDetails[branch] = { 'lastCommitDate' : fromDateTime, 'lastCommit' : latestCommit["sha"]}
                                 self.publishToolsData(data)
                                 self.updateTrackingJson(self.tracking)
             repoPageNum = repoPageNum + 1
