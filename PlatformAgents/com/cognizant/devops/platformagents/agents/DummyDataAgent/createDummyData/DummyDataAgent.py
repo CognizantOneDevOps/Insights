@@ -103,9 +103,11 @@ class DummyDataAgent(BaseAgent):
         
         #To save the data count in tracking.json
         script_dir = os.path.dirname(__file__)
-        file_path = os.path.join(script_dir, '~/tracking.json') #Input your system path to tracking.json of DummyAgent        
+        file_path = os.path.join(script_dir, '~/tracking.json') #Input your system path to tracking.json of DummyAgent          
         with open(file_path, "r") as jsonFile: # Open the JSON file for reading
             data = json.load(jsonFile) # Read the JSON into the buffer
+            
+        print'Starting Agent!'
                 
         while flag == 1:
             jira_data = []
@@ -135,6 +137,7 @@ class DummyDataAgent(BaseAgent):
             jira_data.append(jiraSample)
             #print jira_data
             self.publishToolsData(jira_data)
+            
             
                         
             #GIT json configurations
