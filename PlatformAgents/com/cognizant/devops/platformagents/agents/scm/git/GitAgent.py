@@ -101,6 +101,7 @@ class GitAgent(BaseAgent):
                                         if since is not None or startFrom < parser.parse(commit["commit"]["author"]["date"], ignoretz=True):
                                             data += self.parseResponse(responseTemplate, commit, injectData)
                                         else:
+                                            fetchNextCommitsPage = False
                                             break
                                     if len(commits) == 0 or len(data) == 0 or len(commits) < 100:
                                         fetchNextCommitsPage = False
