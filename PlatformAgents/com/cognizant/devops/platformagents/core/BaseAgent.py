@@ -89,7 +89,16 @@ class BaseAgent(object):
         self.epochStartDateTime = datetime(1970, 1, 1, tzinfo=self.insightsTimeZone)
         isEpochTime = self.config.get('isEpochTimeFormat', False)
         if not isEpochTime:
-            self.dateTimeLength = len(self.epochStartDateTime.strftime(self.config.get('timeStampFormat', None)))        
+            self.dateTimeLength = len(self.epochStartDateTime.strftime(self.config.get('timeStampFormat', None)))
+        self.buildTimeFormatLengthMapping()      
+    
+    def buildTimeFormatLengthMapping(self):
+        self.timeFormatLengthMapping = {}
+        timeFieldMapping = self.config.get('timeFieldMapping', None)
+        if timeFieldMapping:
+            for field in timeFieldMapping:
+                self.timeFormatLengthMapping[field] = len(self.epochStartDateTime.strftime(timeFieldMapping[field]))
+        
     
     def extractToolName(self):
         tokens = self.dataRoutingKey.split('.')
@@ -174,6 +183,7 @@ class BaseAgent(object):
             timeStampFormat = self.config.get('timeStampFormat')
         if not isEpochTime:
             isEpochTime = self.config.get('isEpochTimeFormat', False)
+        timeFieldMapping = self.config.get('timeFieldMapping', None)
         for d in data:
             eventTime = d.get(timeStampField, None)
             if eventTime != None:
@@ -187,6 +197,19 @@ class BaseAgent(object):
                     timeResponse = self.getRemoteDateTime(datetime.strptime(eventTime, timeStampFormat))
                 d['inSightsTime'] = timeResponse['epochTime']
                 d['inSightsTimeX'] = timeResponse['time']
+            
+            if timeFieldMapping:
+                for field in timeFieldMapping:
+                    timeFormat = timeFieldMapping[field]
+                    outputField = field + 'Epoch'
+                    value = d.get(field, None)
+                    if value:
+                        try:
+                            value = value[:self.timeFormatLengthMapping[field]]
+                            d[outputField] = self.getRemoteDateTime(datetime.strptime(value, timeFormat)).get('epochTime')
+                        except Exception as ex:
+                            logging.error(ex)
+            
             d['toolName'] = self.toolName;
             d['categoryName'] = self.categoryName; 
                         
