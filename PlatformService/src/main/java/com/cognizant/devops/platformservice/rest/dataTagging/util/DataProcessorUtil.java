@@ -73,11 +73,13 @@ public class DataProcessorUtil  {
 				totalRecords++;
 				JsonObject json = new JsonObject();
 				for(Map.Entry<String, Integer> header : headerMap.entrySet()){
+					if(header.getKey()!= null){
 					json.addProperty(header.getKey(), csvRecord.get(header.getValue()));
+					}
 				}			
 				json.addProperty(DatataggingConstants.CREATIONDATE, Instant.now().toEpochMilli() );
 				gitProperties.add(json);
-				if(size == 10 ) {
+				if(totalRecords > 10 ) {
 					totalSize += size;
 					dbHandler.bulkCreateNodes(gitProperties, null, query);
 					Thread.sleep(sleepTime);
@@ -86,9 +88,11 @@ public class DataProcessorUtil  {
 				if(totalSize >= totalRecords) {
                     break;
 				}
-				status=true;	
+				status=true;
 			}
-
+				
+			dbHandler.bulkCreateNodes(gitProperties, null, query);
+			status=true;
 
 		} catch (FileNotFoundException e) {
 			status=false;
