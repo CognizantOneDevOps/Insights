@@ -95,7 +95,7 @@ public class AgentDataSubscriber extends EngineSubscriberResponseHandler{
 
 				}
 			}
-			/*	try {
+				try {
 				String cypherQuery = null;
 				if(dataUpdateSupported){
 					String labelsStr = routingKey.replace(".", ":");
@@ -120,8 +120,7 @@ public class AgentDataSubscriber extends EngineSubscriberResponseHandler{
 			} catch (GraphDBException e) {
 				log.error(e);
 			}
-			 */			
-
+			 
 		}
 	}
 
@@ -213,35 +212,35 @@ public class AgentDataSubscriber extends EngineSubscriberResponseHandler{
 				StringBuilder key=new StringBuilder();
 				nodepropertyMap=new HashMap<String,NodeData>();
 
-				if(!node.getProperty(AgentDataConstants.PROPERTY_1).isEmpty()){
+				if(null!=node.getProperty(AgentDataConstants.PROPERTY_1)  && !node.getProperty(AgentDataConstants.PROPERTY_1).isEmpty()){
 					key.append(node.getProperty(AgentDataConstants.PROPERTY_1));
 					key.append(AgentDataConstants.COLON);
 				}
-				if(!node.getProperty(AgentDataConstants.PROPERTY_2).isEmpty()){
+				if(null!=node.getProperty(AgentDataConstants.PROPERTY_2)  && !node.getProperty(AgentDataConstants.PROPERTY_2).isEmpty()){
 					key.append(node.getProperty(AgentDataConstants.PROPERTY_2));
 					key.append(AgentDataConstants.COLON);
 				}
-				if(!node.getProperty(AgentDataConstants.PROPERTY_3).isEmpty()){
+				if(null!=node.getProperty(AgentDataConstants.PROPERTY_3)  && !node.getProperty(AgentDataConstants.PROPERTY_3).isEmpty()){
 					key.append(node.getProperty(AgentDataConstants.PROPERTY_3));
 					key.append(AgentDataConstants.COLON);
 				}
-				if(!node.getProperty(AgentDataConstants.PROPERTY_4).isEmpty()){
+				if(null!=node.getProperty(AgentDataConstants.PROPERTY_4) && !node.getProperty(AgentDataConstants.PROPERTY_4).isEmpty()){
 					key.append(node.getProperty(AgentDataConstants.PROPERTY_4));
 					key.append(AgentDataConstants.COLON);
 				}
-				if(!node.getProperty(AgentDataConstants.PROPERTYVALUE_1).isEmpty()){
+				if(null!=node.getProperty(AgentDataConstants.PROPERTYVALUE_1) && !node.getProperty(AgentDataConstants.PROPERTYVALUE_1).isEmpty()){
 					labelVal.append(node.getProperty(AgentDataConstants.PROPERTYVALUE_1));
 					labelVal.append(AgentDataConstants.COLON);
 				}
-				if(!node.getProperty(AgentDataConstants.PROPERTYVALUE_2).isEmpty()){
+				if(null!=node.getProperty(AgentDataConstants.PROPERTYVALUE_2) && !node.getProperty(AgentDataConstants.PROPERTYVALUE_2).isEmpty()){
 					labelVal.append(node.getProperty(AgentDataConstants.PROPERTYVALUE_2));
 					labelVal.append(AgentDataConstants.COLON);	 
 				}
-				if(!node.getProperty(AgentDataConstants.PROPERTYVALUE_3).isEmpty()){
+				if(null!=node.getProperty(AgentDataConstants.PROPERTYVALUE_3) && !node.getProperty(AgentDataConstants.PROPERTYVALUE_3).isEmpty()){
 					labelVal.append(node.getProperty(AgentDataConstants.PROPERTYVALUE_3));
 					labelVal.append(AgentDataConstants.COLON);	 
 				}
-				if(!node.getProperty(AgentDataConstants.PROPERTYVALUE_4).isEmpty()){
+				if(null!=node.getProperty(AgentDataConstants.PROPERTYVALUE_4) && !node.getProperty(AgentDataConstants.PROPERTYVALUE_4).isEmpty()){
 					labelVal.append(node.getProperty(AgentDataConstants.PROPERTYVALUE_4));
 				}
 
