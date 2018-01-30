@@ -1,0 +1,12 @@
+id,level_1,level_2,level_3,level_4,toolName,toolProperty1,propertyValue1,toolProperty2,propertyValue2,toolProperty3,propertyValue3,toolProperty4,propertyValue4
+1,BU1,Account1,Dept1,project1,JIRA,Resolution,Unresolved,Assignee,Malar,Fix version,stage,DefectID,I123
+2,BU1,Account1,,,JIRA,jiraPriority,Medium,sprint,Sprint4,jiraStatus,Completed,jiraKey,KKT-3
+3,BU1,Account1,Dept1,project1,JIRA,jiraKey,IS-10,gitReponame,Insights,gitAuthorName,Akshay,DefectID,I123
+4,BU2,Account2,Dept2,project2,GIT ,Author,test,label,bug,projects,insights,Milesstones,open
+5,BU2,Account2,Dept2,project2,GIT ,gitReponame,Insights,gitAuthorName,Akshay,jiraKey,IS-10,CommitUserName,
+6,BU2,Account2,Dept2,project2,GIT ,CommitUserName,test,CommitMessage,Bug Fixing,CommitUserID,s123,DefectID,D123
+7,BU3,Account3,Dept3,project3,JENKINS,JobStatus,success,AuthorName,test,JobID,S74x3,ProjectName,Insights
+8,BU3,Account3,Dept3,project3,JENKINS,JobStatus,failed ,AuthorName,test,SprintID,S74,ProjectID,IS5
+9,BU3,Account3,Dept3,project3,JENKINS,JobStatus,success,JobID,S74x4,ProjectName,insights,,
+10,BU4,Account3,,,GIT ,UserStoryID,I547,Release,minor,ProjectName,insights,AuthorName,test
+11,BU11,Account3,,,GIT ,UserStoryID,I547,Release,minor,ProjectName,insights,AuthorName,test
