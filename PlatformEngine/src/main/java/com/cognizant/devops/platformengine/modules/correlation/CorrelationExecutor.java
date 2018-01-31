@@ -31,8 +31,8 @@ import com.google.gson.JsonObject;
  */
 public class CorrelationExecutor {
 	private static final Logger log = Logger.getLogger(CorrelationExecutor.class);
-	private long maxPreviousCorrelationTime;
-	private long minPreviousCorrelationTime;
+	private long maxCorrelationTime;
+	private long lastCorrelationTime;
 	private long currentCorrelationTime;
 	
 	private int dataBatchSize = 2000;
@@ -47,40 +47,90 @@ public class CorrelationExecutor {
 			log.error("Unable to load correlations");
 			return;
 		}
-		Map<String, List<String>> sourceCorrelationMapping = buildSourceCorrelationMapping(correlations);
 		for(Correlation correlation: correlations) {
-			String relationName = buildRelationName(correlation);
-			int processedRecords = 1;
-			while(processedRecords > 0) {
-				List<JsonObject> sourceDataList = loadSourceData(correlation.getSource(), relationName);
-				processedRecords = executeCorrelations(correlation, sourceDataList, sourceCorrelationMapping.get(correlation.getSource().getToolName()).size());
-				//remove RAW labels
+			int availableRecords = 1;
+			while(availableRecords > 0) {
+				updateNodesMissingCorrelationFields(correlation.getDestination());
+				List<JsonObject> sourceDataList = loadDestinationData(correlation.getDestination(), correlation.getSource(), correlation.getRelationName());
+				availableRecords = sourceDataList.size();
+				if(sourceDataList.size() > 0) {
+					executeCorrelations(correlation, sourceDataList, correlation.getRelationName());
+				}
 			}
+			removeRawLabel(correlation.getDestination());
 		}
 	}
 	
 	/**
-	 * Identify the source nodes which are available for building correlations and load the uuid for source nodes.
-	 * @param source
+	 * Update the destination node max time where the correlation fields are missing.
+	 * @param destination
+	 */
+	private void updateNodesMissingCorrelationFields(CorrelationNode destination) {
+		String destinationToolName = destination.getToolName();
+		List<String> fields = destination.getFields();
+		StringBuffer cypher = new StringBuffer();
+		cypher.append("MATCH (destination:RAW:DATA:").append(destinationToolName).append(") ");
+		cypher.append("where not exists(destination.maxCorrelationTime) AND ");
+		cypher.append(" NOT (");
+		for(String field : fields) {
+			cypher.append("exists(destination.").append(field).append(") OR ");
+		}
+		cypher.delete(cypher.length()-3, cypher.length());
+		cypher.append(") WITH distinct destination limit ").append(dataBatchSize).append(" ");
+		cypher.append("set destination.maxCorrelationTime=").append(maxCorrelationTime).append("), destination.correlationTime=").append(maxCorrelationTime).append(" ");
+		cypher.append("return count(distinct destination) as count");
+		Neo4jDBHandler dbHandler = new Neo4jDBHandler();
+		try {
+			int processedRecords = 1;
+			while(processedRecords > 0) {
+				long st = System.currentTimeMillis();
+				GraphResponse response = dbHandler.executeCypherQuery(cypher.toString());
+				processedRecords = response.getJson()
+						.get("results").getAsJsonArray().get(0).getAsJsonObject()
+						.get("data").getAsJsonArray().get(0).getAsJsonObject()
+						.get("row").getAsInt();
+				log.debug("Processed "+processedRecords+" records in "+(System.currentTimeMillis() - st) + " ms");
+			}
+		} catch (GraphDBException e) {
+			log.error("Error occured while loading the destination data for correlations.", e);
+		}
+	}
+	
+	/**
+	 * Identify the destination nodes which are available for building correlations and load the uuid for source nodes.
+	 * @param destination
 	 * @param relName
 	 * @return
 	 */
-	private List<JsonObject> loadSourceData(CorrelationNode source, String relName) {
-		List<JsonObject> sourceDataList = null;
-		String sourceToolName = source.getToolName();
-		List<String> fields = source.getFields();
+	private List<JsonObject> loadDestinationData(CorrelationNode destination, CorrelationNode source, String relName) {
+		//Add mechanism for adding maxCorrelationTime in nodes which do not have correlation data points.
+		List<JsonObject> destinationDataList = null;
+		String destinationToolName = destination.getToolName();
+		List<String> fields = destination.getFields();
 		StringBuffer cypher = new StringBuffer();
-		cypher.append("MATCH (source:DATA:RAW:").append(sourceToolName).append(") ");
-		cypher.append("where (not exists(source.rels) OR not \"").append(relName).append("\" in source.rels) ");
-		cypher.append("OR (not exists(source.correlationTime) OR ");
-		cypher.append("( source.correlationTime <= ").append(maxPreviousCorrelationTime).append(" ");
-		cypher.append("AND source.correlationTime > ").append(minPreviousCorrelationTime).append(")) ");
-		cypher.append("WITH source limit ").append(dataBatchSize).append(" ");
-		cypher.append("WITH source, [] ");
+		cypher.append("MATCH (destination:RAW:DATA:").append(destinationToolName).append(") ");
+		cypher.append("where not ((destination) <-[:").append(relName).append("]- (:DATA:").append(source.getToolName()).append(")) ");
+		cypher.append("AND (not exists(destination.correlationTime) OR ");
+		cypher.append("destination.correlationTime < ").append(lastCorrelationTime).append(" ) ");
+		cypher.append("AND (");
 		for(String field : fields) {
-			cypher.append("+ split(coalesce(source.").append(field).append(", \"\"),\",\") ");
+			cypher.append("exists(destination.").append(field).append(") OR ");
 		}
-		cypher.append("as values WITH source.uuid as uuid, values UNWIND values as value WITH uuid, value where value <> \"\" ");
+		cypher.delete(cypher.length()-3, cypher.length());
+		cypher.append(") ");
+		cypher.append("WITH distinct destination limit ").append(dataBatchSize).append(" ");
+		//cypher.append("WITH destination, [] ");
+		cypher.append("WITH destination, []  ");
+		for(String field : fields) {
+			//cypher.append("+ split(coalesce(destination.").append(field).append(", \"\"),\",\") ");
+			//cypher.append("+ destination.").append(field).append(" ");
+			cypher.append(" + CASE ");
+			cypher.append(" 	WHEN exists(destination.").append(field).append(") THEN destination.").append(field).append(" ");
+			cypher.append(" 	ELSE [] ");
+			cypher.append(" END ");
+		}
+		cypher.append("as values WITH destination.uuid as uuid, values UNWIND values as value WITH uuid, value where value <> \"\" ");
+		cypher.append("WITH uuid, split(value, \",\") as values UNWIND values as value WITH uuid, value where value <> \"\" ");
 		cypher.append("WITH distinct uuid, collect(distinct value) as values WITH { uuid : uuid, values : values} as data ");
 		cypher.append("RETURN collect(data) as data");
 		Neo4jDBHandler dbHandler = new Neo4jDBHandler();
@@ -88,18 +138,18 @@ public class CorrelationExecutor {
 			GraphResponse response = dbHandler.executeCypherQuery(cypher.toString());
 			JsonArray rows = response.getJson().get("results").getAsJsonArray().get(0).getAsJsonObject().get("data")
 					.getAsJsonArray().get(0).getAsJsonObject().get("row").getAsJsonArray();
+			destinationDataList = new ArrayList<JsonObject>();
 			if(rows.isJsonNull() || rows.size() == 0 || rows.get(0).getAsJsonArray().size() == 0) {
-				return null;
+				return destinationDataList;
 			}
 			JsonArray dataArray = rows.get(0).getAsJsonArray();
-			sourceDataList = new ArrayList<JsonObject>();
 			for(JsonElement data : dataArray) {
-				sourceDataList.add(data.getAsJsonObject());
+				destinationDataList.add(data.getAsJsonObject());
 			}
 		} catch (GraphDBException e) {
-			log.error("Error occured while loading the source data for correlations.", e);
+			log.error("Error occured while loading the destination data for correlations.", e);
 		}
-		return sourceDataList;
+		return destinationDataList;
 	}
 	
 	/**
@@ -108,21 +158,19 @@ public class CorrelationExecutor {
 	 * @param dataList
 	 * @param allowedSourceRelationCount
 	 */
-	private int executeCorrelations(Correlation correlation, List<JsonObject> dataList, int allowedSourceRelationCount) {
+	private int executeCorrelations(Correlation correlation, List<JsonObject> dataList, String relationName) {
 		CorrelationNode source = correlation.getSource(); 
 		CorrelationNode destination = correlation.getDestination();
 		StringBuffer correlationCypher = new StringBuffer();
-		String destinationField = destination.getFields().get(0); //currently, we will support only one destination field.
-		String relName = buildRelationName(correlation);
+		String sourceField = source.getFields().get(0); //currently, we will support only one source field.
 		correlationCypher.append("UNWIND {props} as properties ");
-		correlationCypher.append("MATCH (source:DATA:RAW:").append(source.getToolName()).append(" {uuid: properties.uuid}) ");
-		correlationCypher.append("set source.correlationTime=").append(currentCorrelationTime).append(" WITH source, properties ");
-		correlationCypher.append("MATCH (destination:DATA:").append(destination.getToolName()).append(") ");
-		correlationCypher.append("WHERE destination.").append(destinationField).append(" IN properties.values ");
-		correlationCypher.append("CREATE (source) -[r:").append(relName).append("]-> (destination) ");
-		correlationCypher.append("set source.rels = coalesce(source.rels, []) + \"").append(relName).append("\" ");
-		correlationCypher.append("WITH source where size(source.rels) >= ").append(allowedSourceRelationCount).append(" ");
-		correlationCypher.append("REMOVE source:RAW RETURN count(distinct source) as count");
+		correlationCypher.append("MATCH (destination:DATA:RAW:").append(destination.getToolName()).append(" {uuid: properties.uuid}) ");
+		correlationCypher.append("set destination.correlationTime=").append(currentCorrelationTime).append(", ");
+		correlationCypher.append("destination.maxCorrelationTime=coalesce(destination.maxCorrelationTime, ").append(maxCorrelationTime).append(") WITH destination, properties ");
+		correlationCypher.append("MATCH (source:DATA:").append(source.getToolName()).append(") ");
+		correlationCypher.append("WHERE source.").append(sourceField).append(" IN properties.values ");
+		correlationCypher.append("CREATE UNIQUE (source) -[r:").append(relationName).append("]-> (destination) ");
+		correlationCypher.append("RETURN count(distinct destination) as count");
 		Neo4jDBHandler dbHandler = new Neo4jDBHandler();
 		JsonObject correlationExecutionResponse;
 		int processedRecords = 0;
@@ -135,9 +183,35 @@ public class CorrelationExecutor {
 					.get("data").getAsJsonArray().get(0).getAsJsonObject()
 					.get("row").getAsInt();
 			log.debug("Processed "+processedRecords+" records in "+(System.currentTimeMillis() - st) + " ms");
-			System.out.println("Processed "+processedRecords+" records in "+(System.currentTimeMillis() - st) + " ms");
 		} catch (GraphDBException e) {
-			log.error("Error occured while executing correlations for relation "+relName+".", e);
+			log.error("Error occured while executing correlations for relation "+relationName+".", e);
+		}
+		return processedRecords;
+	}
+	
+	private int removeRawLabel(CorrelationNode destination) {
+		StringBuffer correlationCypher = new StringBuffer();
+		correlationCypher.append("MATCH (destination:DATA:RAW:").append(destination.getToolName()).append(") ");
+		correlationCypher.append("where destination.maxCorrelationTime < ").append(currentCorrelationTime).append(" ");
+		correlationCypher.append("WITH destination limit ").append(dataBatchSize).append(" ");
+		correlationCypher.append("remove destination.maxCorrelationTime, destination.correlationTime, destination:RAW ");
+		correlationCypher.append("return count(distinct destination) ");
+		Neo4jDBHandler dbHandler = new Neo4jDBHandler();
+		JsonObject correlationExecutionResponse;
+		int processedRecords = 1;
+		try {
+			while(processedRecords > 0) {
+				long st = System.currentTimeMillis();
+				correlationExecutionResponse = dbHandler.executeCypherQuery(correlationCypher.toString()).getJson();
+				log.debug(correlationExecutionResponse);
+				processedRecords = correlationExecutionResponse
+						.get("results").getAsJsonArray().get(0).getAsJsonObject()
+						.get("data").getAsJsonArray().get(0).getAsJsonObject()
+						.get("row").getAsInt();
+				log.debug("Processed "+processedRecords+" records in "+(System.currentTimeMillis() - st) + " ms");
+			}
+		} catch (GraphDBException e) {
+			log.error("Error occured while removing RAW label from tool: "+destination.getToolName()+".", e);
 		}
 		return processedRecords;
 	}
@@ -213,7 +287,13 @@ public class CorrelationExecutor {
 	 */
 	private void updateCorrelationTimeVars() {
 		currentCorrelationTime = System.currentTimeMillis()/1000;
-		maxPreviousCorrelationTime = currentCorrelationTime - 1 * 60 * 60;
-		minPreviousCorrelationTime = currentCorrelationTime - 1 * 24 * 60 * 60;
+		maxCorrelationTime = currentCorrelationTime + 1 * 24 * 60 * 60;
+		lastCorrelationTime = currentCorrelationTime - 3 * 60 * 60;
 	}
+	
+	/*public static void main(String[] args) {
+		ApplicationConfigCache.loadConfigCache();
+		CorrelationExecutor cor = new CorrelationExecutor();
+		cor.execute();
+	}*/
 }
