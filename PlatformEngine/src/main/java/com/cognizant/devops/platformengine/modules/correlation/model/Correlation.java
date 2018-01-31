@@ -6,6 +6,7 @@ package com.cognizant.devops.platformengine.modules.correlation.model;
 public class Correlation {
 	private CorrelationNode source;
 	private CorrelationNode destination;
+	private String relationName;
 	public CorrelationNode getSource() {
 		return source;
 	}
@@ -17,5 +18,11 @@ public class Correlation {
 	}
 	public void setDestination(CorrelationNode destination) {
 		this.destination = destination;
+	}
+	public String getRelationName() {
+		return relationName;
+	}
+	public void setRelationName(String relationName) {
+		this.relationName = relationName;
 	}
 }
