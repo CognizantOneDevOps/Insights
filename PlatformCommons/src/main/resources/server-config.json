@@ -50,7 +50,7 @@
 		"maxIdleConnections":25
   },
   "grafana": {
-    "grafanaEndpoint": "https://localhost:3000",
+    "grafanaEndpoint": "http://localhost:3000",
     "grafanaDBEndpoint": "jdbc:postgresql://localhost:5432/grafana",
     "adminUserName": "admin",
     "adminUserPassword": "admin",
@@ -68,7 +68,8 @@
     "user": "iSight",
     "password": "iSight"
   },
-  "disableAuth": true,
+  "disableAuth": false,
+  "enableNativeUsers": true,
   "insightsTimeZone": "Asia/Kolkata",
   "userId": "UserID",
   "password": "Passwd",
