@@ -50,7 +50,10 @@ class GitAgent(BaseAgent):
                 repoModificationTime = trackingDetails.get('repoModificationTime', None)
                 if repoModificationTime is None:
                     repoModificationTime = startFrom
-                repoUpdatedAt = parser.parse(repo.get('updated_at'), ignoretz=True)
+                repoUpdatedAt = repo.get('pushed_at', None)
+                if repoUpdatedAt is None:
+                    repoUpdatedAt = repo.get('updated_at')
+                repoUpdatedAt = parser.parse(repoUpdatedAt, ignoretz=True)
                 if startFrom < repoUpdatedAt:
                     trackingDetails['repoModificationTime'] = repo.get('updated_at')
                     branches = ['master']
