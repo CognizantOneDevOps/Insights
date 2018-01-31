@@ -31,7 +31,9 @@ class SonarAgent(BaseAgent):
         startFrom = parser.parse(startFrom)
         timeStampFormat = self.config.get('timeStampFormat')
         startFrom = startFrom.strftime(timeStampFormat)
-        sonarProjects = self.getResponse(projectsUrl, 'GET', None, None, None)
+		userId = self.config.get("UserId", '')
+		password = self.config.get("Password", '')
+        sonarProjects = self.getResponse(projectsUrl, 'GET', userId, password, None)
         metrics = self.config.get("metrics", '')
         metricsParam = ''
         if len(metrics) > 0:
@@ -43,7 +45,7 @@ class SonarAgent(BaseAgent):
             projectName = project["nm"]
             timestamp = self.tracking.get(projectKey, startFrom)
             sonarExecutionsUrl = baseUrl+"api/timemachine/index?metrics="+metricsParam+"&resource="+projectKey+"&fromDateTime="+timestamp+"&format=json"
-            sonarExecutions = self.getResponse(sonarExecutionsUrl, 'GET', None, None, None)
+            sonarExecutions = self.getResponse(sonarExecutionsUrl, 'GET', userId, password, None)
             lastUpdatedDate = None
             for sonarExecution in sonarExecutions:
                 metricsColumns = []
