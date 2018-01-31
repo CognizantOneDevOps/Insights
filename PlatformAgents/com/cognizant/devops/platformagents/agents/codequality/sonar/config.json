@@ -20,6 +20,8 @@
   "toolName": "SONAR",
   "runSchedule": 30,
   "timeStampField": "metricdate",
+  "UserId":"admin",
+  "Password":"admin",
   "timeStampFormat": "%Y-%m-%dT%H:%M:%S",
   "StartFrom": "2015-10-10 00:01:01",
   "toolsTimeZone": "Asia/Kolkata",
