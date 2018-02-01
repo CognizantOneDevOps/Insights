@@ -13,6 +13,8 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 
+import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
+import com.cognizant.devops.platformcommons.config.CorrelationData;
 import com.cognizant.devops.platformcommons.constants.ConfigOptions;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBException;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphResponse;
@@ -33,7 +35,7 @@ public class CorrelationExecutor {
 	private long lastCorrelationTime;
 	private long currentCorrelationTime;
 	
-	private int dataBatchSize = 2000;
+	private int dataBatchSize;
 	
 	/**
 	 * Correlation execution starting point.
@@ -249,9 +251,11 @@ public class CorrelationExecutor {
 	 * Update the correlation time variables.
 	 */
 	private void updateCorrelationTimeVars() {
+		CorrelationData correlations = ApplicationConfigProvider.getInstance().getCorrelations();
+		dataBatchSize = correlations.getBatchSize();
 		currentCorrelationTime = System.currentTimeMillis()/1000;
-		maxCorrelationTime = currentCorrelationTime + 1 * 24 * 60 * 60;
-		lastCorrelationTime = currentCorrelationTime - 3 * 60 * 60;
+		maxCorrelationTime = currentCorrelationTime + correlations.getCorrelationWindow() * 60 * 60;
+		lastCorrelationTime = currentCorrelationTime - correlations.getCorrelationFrequency() * 60 * 60;
 	}
 	
 	/*public static void main(String[] args) {
