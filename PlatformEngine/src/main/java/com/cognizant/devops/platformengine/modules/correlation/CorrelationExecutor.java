@@ -82,7 +82,7 @@ public class CorrelationExecutor {
 		}
 		cypher.delete(cypher.length()-3, cypher.length());
 		cypher.append(") WITH distinct destination limit ").append(dataBatchSize).append(" ");
-		cypher.append("set destination.maxCorrelationTime=").append(maxCorrelationTime).append("), destination.correlationTime=").append(maxCorrelationTime).append(" ");
+		cypher.append("set destination.maxCorrelationTime=").append(maxCorrelationTime).append(" , destination.correlationTime=").append(maxCorrelationTime).append(" ");
 		cypher.append("return count(distinct destination) as count");
 		Neo4jDBHandler dbHandler = new Neo4jDBHandler();
 		try {
