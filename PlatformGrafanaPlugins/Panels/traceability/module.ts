@@ -47,12 +47,12 @@ class PipelinePanelCtrl extends MetricsPanelCtrl {
   };
 
   labelIcons = {
-    'GIT': 'public/app/plugins/panel/toolsinsights/img/GIT.svg',
-    'JENKINS': 'public/app/plugins/panel/toolsinsights/img/Jenkins.svg',
-    'SONAR': 'public/app/plugins/panel/toolsinsights/img/SONAR.svg',
-    'RUNDECK': 'public/app/plugins/panel/toolsinsights/img/Rundeck.svg',
-    'JIRA': 'public/app/plugins/panel/toolsinsights/img/JIRA.svg',
-    'BITBUCKET': 'public/app/plugins/panel/toolsinsights/img/BitBucket.svg'
+    'GIT': 'public/plugins/toolsinsights/img/GIT.svg',
+    'JENKINS': 'public/plugins/toolsinsights/img/Jenkins.svg',
+    'SONAR': 'public/plugins/toolsinsights/img/SONAR.svg',
+    'RUNDECK': 'public/plugins/toolsinsights/img/Rundeck.svg',
+    'JIRA': 'public/plugins/toolsinsights/img/JIRA.svg',
+    'BITBUCKET': 'public/plugins/toolsinsights/img/BitBucket.svg'
   };
 
   uniqueFieldVal = ['jir_jirakey', 'bit_commitId', 'jen_BuildNumber'];
@@ -184,7 +184,7 @@ class PipelinePanelCtrl extends MetricsPanelCtrl {
     if ($('#dagreD3LoaderScript').length === 0) {
       dagreD3 = {};
       $('<script>', {
-        src: 'public/app/plugins/panel/toolsinsights/dagre-d3.js',
+        src: 'public/plugins/toolsinsights/dagre-d3.js',
         id: 'dagreD3LoaderScript',
         type: 'text/javascript'
       }).appendTo('body');
