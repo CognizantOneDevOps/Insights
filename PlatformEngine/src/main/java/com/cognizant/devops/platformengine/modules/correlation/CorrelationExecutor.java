@@ -9,9 +9,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.log4j.Logger;
 
@@ -103,7 +101,6 @@ public class CorrelationExecutor {
 	 * @return
 	 */
 	private List<JsonObject> loadDestinationData(CorrelationNode destination, CorrelationNode source, String relName) {
-		//Add mechanism for adding maxCorrelationTime in nodes which do not have correlation data points.
 		List<JsonObject> destinationDataList = null;
 		String destinationToolName = destination.getToolName();
 		List<String> fields = destination.getFields();
@@ -119,11 +116,8 @@ public class CorrelationExecutor {
 		cypher.delete(cypher.length()-3, cypher.length());
 		cypher.append(") ");
 		cypher.append("WITH distinct destination limit ").append(dataBatchSize).append(" ");
-		//cypher.append("WITH destination, [] ");
 		cypher.append("WITH destination, []  ");
 		for(String field : fields) {
-			//cypher.append("+ split(coalesce(destination.").append(field).append(", \"\"),\",\") ");
-			//cypher.append("+ destination.").append(field).append(" ");
 			cypher.append(" + CASE ");
 			cypher.append(" 	WHEN exists(destination.").append(field).append(") THEN destination.").append(field).append(" ");
 			cypher.append(" 	ELSE [] ");
@@ -249,37 +243,6 @@ public class CorrelationExecutor {
 			}
 		}
 		return correlations;
-	}
-
-	/**
-	 * Build the source correlation mapping i.e. all the possible outgoing relations from the source.
-	 * @param correlations
-	 * @return
-	 */
-	private Map<String, List<String>> buildSourceCorrelationMapping(List<Correlation> correlations){
-		Map<String, List<String>> sourceCorrelationMap = new HashMap<String, List<String>>();
-		for(Correlation correlation : correlations) {
-			String sourceToolName = correlation.getSource().getToolName();
-			List<String> relations = sourceCorrelationMap.get(sourceToolName);
-			if(relations == null) {
-				relations = new ArrayList<String>();
-				sourceCorrelationMap.put(sourceToolName, relations);
-			}
-			String relationName = buildRelationName(correlation);
-			if(!relations.contains(relationName)) {
-				relations.add(relationName);
-			}
-		}
-		return sourceCorrelationMap;
-	}
-	
-	/**
-	 * Build the name for the relation between source and destination.
-	 * @param correlation
-	 * @return
-	 */
-	private String buildRelationName(Correlation correlation) {
-		return "FROM_"+correlation.getSource().getToolName()+"_TO_"+correlation.getDestination().getToolName();
 	}
 	
 	/**
