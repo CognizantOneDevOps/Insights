@@ -33,13 +33,13 @@ public class EngineDataExtractorModule implements Job{
 	public void execute(JobExecutionContext context) throws JobExecutionException {
 		if(!isDataExtractionInProgress) {
 			isDataExtractionInProgress = true;
-			updateGitNodesWithJiraKey();
+			updateSCMNodesWithJiraKey();
 			cleanSCMNodes();
 			isDataExtractionInProgress = false;
 		}
 	}
 	
-	private void updateGitNodesWithJiraKey() {
+	private void updateSCMNodesWithJiraKey() {
 		Neo4jDBHandler dbHandler = new Neo4jDBHandler();
 		try {
 			String paginationCypher = "MATCH (n:SCM:DATA:RAW) where not exists(n.jiraKeyProcessed) and exists(n.commitId) return count(n) as count";
@@ -48,10 +48,10 @@ public class EngineDataExtractorModule implements Job{
 					.getAsJsonArray().get(0).getAsJsonObject().get("row").getAsJsonArray().get(0).getAsInt();
 			while(resultCount > 0) {
 				long st = System.currentTimeMillis();
-				String gitDataFetchCypher = "MATCH (source:SCM:DATA:RAW) where not exists(source.jiraKeyProcessed) and exists(source.commitId) "
+				String scmDataFetchCypher = "MATCH (source:SCM:DATA:RAW) where not exists(source.jiraKeyProcessed) and exists(source.commitId) "
 						+ "WITH { uuid: source.uuid, commitId: source.commitId, message: source.message} "
 						+ "as data limit "+dataBatchSize+" return collect(data)";
-				GraphResponse response = dbHandler.executeCypherQuery(gitDataFetchCypher);
+				GraphResponse response = dbHandler.executeCypherQuery(scmDataFetchCypher);
 				JsonArray rows = response.getJson().get("results").getAsJsonArray().get(0).getAsJsonObject().get("data")
 						.getAsJsonArray().get(0).getAsJsonObject().get("row").getAsJsonArray();
 				if(rows.isJsonNull() || rows.size() == 0) {
@@ -101,10 +101,10 @@ public class EngineDataExtractorModule implements Job{
 					log.debug(bulkCreateNodes);
 				}
 				resultCount = resultCount - dataBatchSize;
-				log.debug("Processed "+processedRecords+" GIT records, time taken: "+(System.currentTimeMillis() - st) + " ms");
+				log.debug("Processed "+processedRecords+" SCM records, time taken: "+(System.currentTimeMillis() - st) + " ms");
 			}
 		} catch (GraphDBException e) {
-			log.error("Unable to extract JIRA keys from Git Commit messages", e);
+			log.error("Unable to extract JIRA keys from SCM Commit messages", e);
 		}
 	}
 	
@@ -122,7 +122,7 @@ public class EngineDataExtractorModule implements Job{
 				log.debug("Processed "+processedRecords+" SCM records, time taken: "+(System.currentTimeMillis() - st) + " ms");
 			}
 		} catch (GraphDBException e) {
-			log.error("Unable to extract JIRA keys from Git Commit messages", e);
+			log.error("Unable to extract JIRA keys from SCM Commit messages", e);
 		}
 	}
 }
