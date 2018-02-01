@@ -54,7 +54,7 @@ export function insightsVizEditorCtrl($q, uiSegmentSrv) {
   return {
     restrict: 'E',
     scope: true,
-    templateUrl: 'public/app/plugins/panel/insightsviz/editor.html',
+    templateUrl: 'public/plugins/insightsviz/editor.html',
     controller: InsightsVizEditorCtrl,
     controllerAs : 'insightsVizEditorCtrl'
   };

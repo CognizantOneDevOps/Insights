@@ -33,7 +33,7 @@ export function pipelinePanelEditor($q, uiSegmentSrv) {
   return {
     restrict: 'E',
     scope: true,
-    templateUrl: 'public/app/plugins/panel/pipeline/editor.html',
+    templateUrl: 'public/plugins/pipeline/editor.html',
     controller: PipelinePanelEditorCtrl,
     controllerAs : 'pipelinePanelEditorCtrl'
   };
