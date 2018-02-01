@@ -15,41 +15,20 @@
  ******************************************************************************/
 package com.cognizant.devops.platformengine.modules.correlation;
 
-import java.util.List;
-
-import org.apache.log4j.Logger;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
-
-import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
-import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBException;
-import com.cognizant.devops.platformcommons.dal.neo4j.Neo4jDBHandler;
-import com.cognizant.devops.platformcommons.dal.neo4j.NodeData;
-
+/**
+ * 
+ * @author Vishal Ganjare (vganjare)
+ * 
+ * Entry point for correlation executor.
+ *
+ */
 public class EngineCorrelatorModule implements Job{
-	private static Logger log = Logger.getLogger(EngineCorrelatorModule.class.getName());
 	
 	public void execute(JobExecutionContext context) throws JobExecutionException {
-		executeCorrelationModule();
-	}
-	
-	private void executeCorrelationModule(){
-		if(ApplicationConfigProvider.getInstance().isEnableNativeCorrelations()) {
-			new CustomCorrelations().executeCorrelations();
-		}else {
-			Neo4jDBHandler graphDBHandler = new Neo4jDBHandler();
-			try {
-				List<NodeData> nodes = graphDBHandler.executeCypherQuery("MATCH (n:CORRELATION) return n").getNodes();
-				if(nodes.size() > 0){
-					for(NodeData node : nodes){
-						String correlationQuery = node.getProperty("query");
-						graphDBHandler.executeCypherQuery(correlationQuery);
-					}
-				}
-			} catch (GraphDBException e) {
-				log.error(e);
-			}
-		}
+		CorrelationExecutor correlationsExecutor = new CorrelationExecutor();
+		correlationsExecutor.execute();
 	}
 }
