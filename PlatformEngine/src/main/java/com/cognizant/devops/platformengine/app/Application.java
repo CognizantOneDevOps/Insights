@@ -28,8 +28,8 @@ import org.quartz.impl.StdSchedulerFactory;
 import com.cognizant.devops.platformcommons.config.ApplicationConfigCache;
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformengine.modules.aggregator.EngineAggregatorModule;
-import com.cognizant.devops.platformengine.modules.correlation.EngineCorrelationNodeBuilderModule;
 import com.cognizant.devops.platformengine.modules.correlation.EngineCorrelatorModule;
+import com.cognizant.devops.platformengine.modules.dataextractor.EngineDataExtractorModule;
 import com.cognizant.devops.platformengine.modules.mapper.ProjectMapperModule;
 
 /**
@@ -55,7 +55,7 @@ public class Application {
 		//new EngineUsersModule().onboardDefaultUsers();
 		ApplicationConfigProvider.performSystemCheck();
 		// Create correlation nodes
-		new EngineCorrelationNodeBuilderModule().initializeCorrelationNodes();
+		//new EngineCorrelationNodeBuilderModule().initializeCorrelationNodes();
 		
 		// Subscribe for desired events.
 		JobDetail aggrgatorJob = JobBuilder.newJob(EngineAggregatorModule.class)
@@ -95,6 +95,19 @@ public class Application {
 						.withIntervalInSeconds(defaultInterval)
 						.repeatForever())
 				.build();
+		
+		// Schedule the data extraction Module.
+		JobDetail dataExtractionJob = JobBuilder.newJob(EngineDataExtractorModule.class)
+				.withIdentity("EngineDataExtractorModule", "iSight")
+				.build();
+
+		Trigger dataExtractionTrigger = TriggerBuilder.newTrigger()
+				.withIdentity("EngineDataExtractorModuleTrigger", "iSight")
+				.startNow()
+				.withSchedule(SimpleScheduleBuilder.simpleSchedule()
+						.withIntervalInSeconds(defaultInterval)
+						.repeatForever())
+				.build();
 
 		// Tell quartz to schedule the job using our trigger
 		Scheduler scheduler;
@@ -104,6 +117,7 @@ public class Application {
 			scheduler.scheduleJob(aggrgatorJob, aggregatorTrigger);
 			scheduler.scheduleJob(correlationJob, correlationTrigger);
 			scheduler.scheduleJob(projectMappingJob, projectMappingTrigger);
+			scheduler.scheduleJob(dataExtractionJob, dataExtractionTrigger);
 		} catch (SchedulerException e) {
 			log.error(e);
 		}
