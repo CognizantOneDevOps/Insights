@@ -26,9 +26,14 @@ import org.quartz.JobExecutionException;
  *
  */
 public class EngineCorrelatorModule implements Job{
+	private static boolean isCorrelationExecutionInProgress = false;
 	
 	public void execute(JobExecutionContext context) throws JobExecutionException {
-		CorrelationExecutor correlationsExecutor = new CorrelationExecutor();
-		correlationsExecutor.execute();
+		if(!isCorrelationExecutionInProgress) {
+			isCorrelationExecutionInProgress = true;
+			CorrelationExecutor correlationsExecutor = new CorrelationExecutor();
+			correlationsExecutor.execute();
+			isCorrelationExecutionInProgress = false;
+		}
 	}
 }
