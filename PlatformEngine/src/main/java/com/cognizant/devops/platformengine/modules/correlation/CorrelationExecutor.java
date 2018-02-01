@@ -14,7 +14,7 @@ import java.util.List;
 import org.apache.log4j.Logger;
 
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
-import com.cognizant.devops.platformcommons.config.CorrelationData;
+import com.cognizant.devops.platformcommons.config.CorrelationConfig;
 import com.cognizant.devops.platformcommons.constants.ConfigOptions;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBException;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphResponse;
@@ -41,23 +41,28 @@ public class CorrelationExecutor {
 	 * Correlation execution starting point.
 	 */
 	public void execute() {
-		updateCorrelationTimeVars();
-		List<Correlation> correlations = loadCorrelations();
-		if(correlations == null) {
-			log.error("Unable to load correlations");
-			return;
-		}
-		for(Correlation correlation: correlations) {
-			int availableRecords = 1;
-			while(availableRecords > 0) {
-				updateNodesMissingCorrelationFields(correlation.getDestination());
-				List<JsonObject> sourceDataList = loadDestinationData(correlation.getDestination(), correlation.getSource(), correlation.getRelationName());
-				availableRecords = sourceDataList.size();
-				if(sourceDataList.size() > 0) {
-					executeCorrelations(correlation, sourceDataList, correlation.getRelationName());
-				}
+		CorrelationConfig correlationConfig = ApplicationConfigProvider.getInstance().getCorrelations();
+		if(correlationConfig != null) {
+			loadCorrelationConfiguration(correlationConfig);
+			List<Correlation> correlations = loadCorrelations();
+			if(correlations == null) {
+				log.error("Unable to load correlations");
+				return;
 			}
-			removeRawLabel(correlation.getDestination());
+			for(Correlation correlation: correlations) {
+				int availableRecords = 1;
+				while(availableRecords > 0) {
+					updateNodesMissingCorrelationFields(correlation.getDestination());
+					List<JsonObject> sourceDataList = loadDestinationData(correlation.getDestination(), correlation.getSource(), correlation.getRelationName());
+					availableRecords = sourceDataList.size();
+					if(sourceDataList.size() > 0) {
+						executeCorrelations(correlation, sourceDataList, correlation.getRelationName());
+					}
+				}
+				removeRawLabel(correlation.getDestination());
+			}
+		}else {
+			log.info("Correlation configuration is not provided.");
 		}
 	}
 	
@@ -250,8 +255,7 @@ public class CorrelationExecutor {
 	/**
 	 * Update the correlation time variables.
 	 */
-	private void updateCorrelationTimeVars() {
-		CorrelationData correlations = ApplicationConfigProvider.getInstance().getCorrelations();
+	private void loadCorrelationConfiguration(CorrelationConfig correlations) {
 		dataBatchSize = correlations.getBatchSize();
 		currentCorrelationTime = System.currentTimeMillis()/1000;
 		maxCorrelationTime = currentCorrelationTime + correlations.getCorrelationWindow() * 60 * 60;
