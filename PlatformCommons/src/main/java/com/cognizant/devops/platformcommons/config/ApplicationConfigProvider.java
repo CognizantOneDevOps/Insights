@@ -48,6 +48,7 @@ public class ApplicationConfigProvider implements Serializable{
 
 	private boolean enableNativeUsers;
     private boolean enableNativeCorrelations;
+    private CorrelationData correlations;
     private EmailConfiguration emailConfiguration=new EmailConfiguration();
 
 	private ApplicationConfigProvider(){
@@ -218,5 +219,13 @@ public class ApplicationConfigProvider implements Serializable{
 
 	public void setInsightsServiceURL(String insightsServiceURL) {
 		this.insightsServiceURL = insightsServiceURL;
+	}
+
+	public CorrelationData getCorrelations() {
+		return correlations;
+	}
+
+	public void setCorrelations(CorrelationData correlations) {
+		this.correlations = correlations;
 	}
 }
