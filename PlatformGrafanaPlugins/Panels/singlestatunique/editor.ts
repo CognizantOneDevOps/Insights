@@ -68,7 +68,7 @@ export function pipelinePanelEditor($q, uiSegmentSrv) {
   return {
     restrict: 'E',
     scope: true,
-    templateUrl: 'public/app/plugins/panel/singlestatunique/editor.html',
+    templateUrl: 'public/plugins/singlestatunique/editor.html',
     controller: PipelinePanelEditorCtrl,
     controllerAs: 'pipelinePanelEditorCtrl'
   };

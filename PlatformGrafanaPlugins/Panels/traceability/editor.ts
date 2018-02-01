@@ -58,7 +58,7 @@ export function toolsInsightEditor($q, uiSegmentSrv) {
   return {
     restrict: 'E',
     scope: true,
-    templateUrl: 'public/app/plugins/panel/toolsinsights/editor.html',
+    templateUrl: 'public/plugins/toolsinsights/editor.html',
     controller: ToolsInsightEditorCtrl,
     controllerAs: 'toolsInsightEditorCtrl'
   };
