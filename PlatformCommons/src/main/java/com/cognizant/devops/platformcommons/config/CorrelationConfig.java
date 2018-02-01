@@ -1,6 +1,6 @@
 package com.cognizant.devops.platformcommons.config;
 
-public class CorrelationData {
+public class CorrelationConfig {
 	private int correlationWindow = 48;
 	private int correlationFrequency = 4;
 	private int batchSize = 2000;
