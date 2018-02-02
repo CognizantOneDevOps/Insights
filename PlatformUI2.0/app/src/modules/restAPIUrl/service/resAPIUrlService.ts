@@ -101,6 +101,9 @@ module ISightApp {
 
       this.addEndPoint("INSIGHTS_GET",'/PlatformService/insights/inferences');
       this.addEndPoint("HIERARCHY_ALL_DETAILS_GET",'/PlatformService/admin/hierarchyDetails/getAllHierarchyDetails');
+      this.addEndPoint("UPLOAD_HIERARCHY_DETAILS",'/PlatformService/admin/hierarchyDetails/uploadHierarchyDetails');
+      
+       this.addEndPoint("GET_HIERARCHY_PROPERTIES",'/PlatformService/admin/hierarchyDetails/getHierarchyProperties');
         }
 
        addEndPoint(name:string, url:string){
@@ -116,6 +119,7 @@ module ISightApp {
                if(! this.urlMapping[moduleUrlKey]){
                     throw new Error("Url Mapping doesnt exist");
                }
+
                return this.restEndpointService.getServiceHost() + this.urlMapping[moduleUrlKey];
         }      
 

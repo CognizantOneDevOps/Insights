@@ -32,6 +32,10 @@ module ISightApp {
             return restHandler.get("HIERARCHY_ALL_DETAILS_GET");
         }
         
+        uploadHierarchyDetails(formData: FormData): ng.IPromise<any> {
+            var restHandler = this.restCallHandlerService;
+            return restHandler.post("UPLOAD_HIERARCHY_DETAILS",{ "file": formData },{'Content-Type': 'multipart/form-data'});
+        }
     
     }
 }
