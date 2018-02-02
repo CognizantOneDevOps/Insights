@@ -19,6 +19,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -38,6 +39,7 @@ import com.cognizant.devops.platformdal.entity.definition.EntityDefinition;
 import com.cognizant.devops.platformdal.entity.definition.EntityDefinitionDAL;
 import com.cognizant.devops.platformdal.hierarchy.details.HierarchyDetails;
 import com.cognizant.devops.platformdal.hierarchy.details.HierarchyDetailsDAL;
+import com.cognizant.devops.platformengine.message.core.AgentDataConstants;
 import com.cognizant.devops.platformservice.rest.dataTagging.util.DataProcessorUtil;
 import com.cognizant.devops.platformservice.rest.neo4j.GraphDBService;
 import com.cognizant.devops.platformservice.rest.util.PlatformServiceUtil;
@@ -288,7 +290,33 @@ public class HierarchyDetailsService {
 											 @RequestParam String level4) throws GraphDBException {
 		Neo4jDBHandler dbHandler = new Neo4jDBHandler();
 		String queryLabels=":METADATA:DATATAGGING";
-		String props="level_1:'"+ level1+"'," + "level_2:'"+level2+"',"+"level_3:'"+level3+"',"+"level_4:'"+level4+"'" ;
+		StringBuilder sb = new StringBuilder();
+		if(null!=level1 && !level1.isEmpty()){
+			sb.append("level_1:'");
+			sb.append(level1.trim());
+			sb.append("'");
+			sb.append(",");
+		}
+		if(null!=level2 && !level2.isEmpty()){
+			sb.append("level_2:'");
+			sb.append(level2.trim());
+			sb.append("'");
+			sb.append(",");
+		}
+		if(null!=level3 && !level3.isEmpty()){
+			sb.append("level_3:'");
+			sb.append(level3.trim());
+			sb.append("'");
+			sb.append(",");
+		}
+		if(null!=level4 && !level4.isEmpty()){
+			
+			sb.append("level_4:'");
+			sb.append(level4.trim());
+			sb.append("'");
+			
+		}
+		String props=StringUtils.stripEnd(sb.toString(),",");
 		String query = "MATCH (n "+queryLabels+"{"+props+"}" + ") return n";
 		GraphResponse response=dbHandler.executeCypherQuery(query.toString());
 		return PlatformServiceUtil.buildSuccessResponseWithData(response.getNodes());
