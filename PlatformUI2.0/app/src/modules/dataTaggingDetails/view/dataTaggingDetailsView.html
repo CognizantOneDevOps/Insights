@@ -15,94 +15,106 @@
  * the License.
  ******************************************************************************
  -->
-
 <div layout="row" flex>
-    <div layout style="width: 100%;">
-        <div  class="applicationContentCss" style="width: 100%;">
-            <div   layout="row" ng-controller="dataTaggingDetailsController" style="width: 100%;">
-              
-                    <div style="width:15%;height:500px;background-color:#fff;margin-right:20px" flex>
-                          
-                          <!--ol class="tree" data-keep-expanded="false" data-auto-scroll="true" data-slide-speed="200">
-                              <li ng-repeat="item in list">
-                                 <label for="{{item.name}}">{{item.name}}</label>
-
-                                 <input type="checkbox" ng-if="item.opened" checked id="{{item.name}}" />
-                                 <input type="checkbox" ng-if="!item.opened"  id="{{item.name}}" />
-                                          
-                                  <ol ng-if="item.children && item.children.length > 0" class="sub-menu child">
-
-                                      <li ng-repeat="item in item.children">
-                                           <!--a href="{{item.name}}">
-                                              <span class="title">{{item.name}}</span>
-                                          </a>
-                                         <label for="{{item.name}}">{{item.name}}</label>
-                                         <input type="checkbox" ng-if="item.opened" checked id="{{item.name}}" />
-                                         <input type="checkbox" ng-if="!item.opened"  id="{{item.name}}" />
-                                          
-                                           <!--div ng-switch on="item.children.length > 0">
-                                              <div ng-switch-when="true"-->
-                                                <!--div ng-init="children = item.children;" ng-if="item.children.length > 0" ng-include="'newpartial.html'" include-repl
-                                                ace></div>  
-                                               <blah children="item.children"></blah>
-                                              
-                                      </li>
-                                  </ol>
-                              </li>
-                          </ol-->
-
-
-                           <ol class="tree" data-keep-expanded="false" data-auto-scroll="true" data-slide-speed="200">
-                              <li ng-repeat="item in list">
-                                 <label for="{{item.name}}">{{item.name}}</label>
-
-                                 <input type="checkbox" ng-if="item.opened" checked id="{{item.name}}" />
-                                 <input type="checkbox" ng-if="!item.opened"  id="{{item.name}}" />
-                                 <ol ng-if="item.children && item.children.length > 0" class="tree child"  row children="item.children" click-handler="clickHandler()"></ol>
-                                              
-                                     
-                              </li>
-                          </ol>
-
-
-                        </div>
-                        <div style="width:80%;background-color:#fff">
-                            <ol class="rectangle-list" style="width:90%;margin:auto;background-color:#fff" flex>
-                              <li><a href="">Git</a>
-                                    <ol>
-                                        
-                                        <li ng-repeat
-                                         ><div flex="30" style="display:inline-block;width:30%" class="dataBoardingToolName">branchName</div><div flex="30" style="display:inline-block;width:30%" class="dataBoardingToolName">12312ssfdsfsfds</div><div flex="10" style="padding-left: 41px;display:inline-block">
-                                                <md-icon class="ForActionsIcons" ng-style="{height: '20px', width: '20px'}" ng-click="dataOnBoardingController.disableDeleteButtonStatus||dataOnBoardingController.openDialog($event,'delete',tooldata.selectedTool, tooldata.toolCategory, tooldata.toolId,tooldata.isSaved)"
+  <div layout style="width: 100%;">
+    <div  class="applicationContentCss" style="width: 100%;">
+      <div    ng-controller="dataTaggingDetailsController" style="width: 100%;">
+        <div class="contentCss">
+        <div ng-if="dataTaggingDetailsController.showThrobber" layout-sm="column" layout-align="center center" style="margin-left: 46%;margin-top: 200px;">
+              <md-progress-circular md-mode="indeterminate" md-diameter="50"></md-progress-circular>
+          </div>
+        </div>
+        <div>
+          <div layout="row" ng-if="!dataTaggingDetailsController.showThrobber">
+            <div flex="85" style="padding-top:20px" class="onboardStyle">Please select hierarchy to view associated tools and properties.</div>
+            <div flex="15">
+              <md-button ng-click="dataTaggingDetailsController.goToDataOnBoard()" style="margin-left:60px" class="md-raised md-primary configureBut" 
+                    >
+                    Onboard Data
+                </md-button>
+            </div>
+          </div>
+          <div style="clear:both"></div>
+        </div>
+        <div layout="row" ng-if="!dataTaggingDetailsController.showThrobber">
+          <div style="width:15%;min-height:500px;background-color:#fff;margin-right:10px" flex>
+            <div style="padding-bottom:10px;padding-top:10px;font-weight:normal;font-family:proxima_novaregular;color:#38840C" class="onboardStyle"> Bussiness Hierarchy </div>
+            <ol class="tree scrollbar" id="stylescroll" data-keep-expanded="false" data-auto-scroll="true" data-slide-speed="200" style="overflow-y:auto">
+              <li ng-repeat="item in list" data-val="{{item.name}}">
+                <label for="{{item.name}}">{{item.name}}</label>
+                <input type="checkbox" ng-if="item.opened" checked id="{{item.name}}" />
+                <input type="checkbox" ng-if="!item.opened"  id="{{item.name}}" />
+                <ol ng-if="item.children && item.children.length > 0" class="tree child"  row children="item.children"  my-var="myVar" click-handler="clickHandler($event)" test="test"></ol>
+              </li>
+            </ol>
+          </div>
+          <div style="width:80%;background-color:#fff">
+            <div style="padding:20px;font-weight:normal;font-family:proxima_novaregular;color:#38840C" class="onboardStyle"> List of tools and their properties</div>
+             <ol  class="rectangle-list" style="width:90%;margin:auto;background-color:#fff" flex>
+              <li  ng-repeat="propertyDetails in hierarchyProperties" ng-click="showHideProps('listDet_'+$index)">
+                <a href="">{{propertyDetails.propertyMap.toolName}}</a>
+                <ol id="listDet_{{$index}}" style="display:none">
+                  <li>
+                    <div flex="30" style="display:inline-block;width:30%" class="dataBoardingToolName">{{propertyDetails.propertyMap.toolProperty1}}</div>
+                    <div flex="30" style="display:inline-block;width:30%" class="dataBoardingToolName">{{propertyDetails.propertyMap.propertyValue1}}</div>
+                    <div flex="20" style="padding-left: 37px;display:inline-block">
+                      <md-icon class="ForActionsIcons" ng-style="{height: '20px', width: '20px'}" ng-click="dataOnBoardingController.disableDeleteButtonStatus||dataOnBoardingController.openDialog($event,'delete',tooldata.selectedTool, tooldata.toolCategory, tooldata.toolId,tooldata.isSaved)"
                                                     md-svg-src="dist/icons/svg/oneToolsConfigIcons/Delete_icon_disabled.svg">
-                                                    <md-tooltip md-direction="Bottom">
+                        <md-tooltip md-direction="Bottom">
                                                         Delete Tool Details
                                                     </md-tooltip>
-                                                </md-icon></div></li>
-                                        <li><div flex="30" style="display:inline-block;width:30%" class="dataBoardingToolName">scmcommitid</div><div flex="30" style="display:inline-block;width:30%" class="dataBoardingToolName">12312ssfdsfsfds</div>
-                                        <div flex="20" style="padding-left: 37px;display:inline-block">
-                                                <md-icon class="ForActionsIcons" ng-style="{height: '20px', width: '20px'}" ng-click="dataOnBoardingController.disableDeleteButtonStatus||dataOnBoardingController.openDialog($event,'delete',tooldata.selectedTool, tooldata.toolCategory, tooldata.toolId,tooldata.isSaved)"
+                      </md-icon>
+                    </div>
+                  </li>
+                  <li>
+                    <div flex="30" style="display:inline-block;width:30%" class="dataBoardingToolName">{{propertyDetails.propertyMap.toolProperty2}}</div>
+                    <div flex="30" style="display:inline-block;width:30%" class="dataBoardingToolName">{{propertyDetails.propertyMap.propertyValue2}}</div>
+                    <div flex="20" style="padding-left: 37px;display:inline-block">
+                      <md-icon class="ForActionsIcons" ng-style="{height: '20px', width: '20px'}" ng-click="dataOnBoardingController.disableDeleteButtonStatus||dataOnBoardingController.openDialog($event,'delete',tooldata.selectedTool, tooldata.toolCategory, tooldata.toolId,tooldata.isSaved)"
                                                     md-svg-src="dist/icons/svg/oneToolsConfigIcons/Delete_icon_disabled.svg">
-                                                    <md-tooltip md-direction="Bottom">
+                        <md-tooltip md-direction="Bottom">
                                                         Delete Tool Details
                                                     </md-tooltip>
-                                                </md-icon>
-                                                <md-icon class="ForActionsIcons" ng-style="{height: '20px', width: '20px'}" 
+                      </md-icon>
+                    </div>
+                  </li>
+                  <li>
+                    <div flex="30" style="display:inline-block;width:30%" class="dataBoardingToolName">{{propertyDetails.propertyMap.toolProperty3}}</div>
+                    <div flex="30" style="display:inline-block;width:30%" class="dataBoardingToolName">{{propertyDetails.propertyMap.propertyValue3}}</div>
+                    <div flex="20" style="padding-left: 37px;display:inline-block">
+                      <md-icon class="ForActionsIcons" ng-style="{height: '20px', width: '20px'}" ng-click="dataOnBoardingController.disableDeleteButtonStatus||dataOnBoardingController.openDialog($event,'delete',tooldata.selectedTool, tooldata.toolCategory, tooldata.toolId,tooldata.isSaved)"
+                                                    md-svg-src="dist/icons/svg/oneToolsConfigIcons/Delete_icon_disabled.svg">
+                        <md-tooltip md-direction="Bottom">
+                                                        Delete Tool Details
+                                                    </md-tooltip>
+                      </md-icon>
+                    </div>
+                  </li>
+                  <li>
+                    <div flex="30" style="display:inline-block;width:30%" class="dataBoardingToolName">{{propertyDetails.propertyMap.toolProperty4}}</div>
+                    <div flex="30" style="display:inline-block;width:30%" class="dataBoardingToolName">{{propertyDetails.propertyMap.propertyValue4}}</div>
+                    <div flex="20" style="padding-left: 37px;display:inline-block">
+                      <md-icon class="ForActionsIcons" ng-style="{height: '20px', width: '20px'}" ng-click="dataOnBoardingController.disableDeleteButtonStatus||dataOnBoardingController.openDialog($event,'delete',tooldata.selectedTool, tooldata.toolCategory, tooldata.toolId,tooldata.isSaved)"
+                                                    md-svg-src="dist/icons/svg/oneToolsConfigIcons/Delete_icon_disabled.svg">
+                        <md-tooltip md-direction="Bottom">
+                                                        Delete Tool Details
+                                                    </md-tooltip>
+                      </md-icon>
+                       <md-icon class="ForActionsIcons" ng-style="{height: '20px', width: '20px'}" 
                                                     ng-click="dataOnBoardingController.disableAddButtonStatus||dataOnBoardingController.addAction(tooldata.selectedTool, tooldata.toolId)"
                                                     md-svg-src="dist/icons/svg/oneToolsConfigIcons/Add_icon_disabled.svg">
-                                                    <md-tooltip md-direction="Bottom">
+                        <md-tooltip md-direction="Bottom">
                                                         Add
                                                     </md-tooltip>
-                                                </md-icon>
-                                            </div></li>
-                                    </ol>
-                                </li>
-      
-                            </ol>
-                        </div>
-                  </div>
-            </div>
+                      </md-icon>
+                    </div>
+                  </li>
+                </ol>
+              </li>
+            </ol>
+          </div>
         </div>
+      </div>
     </div>
-    
+  </div>
 </div>
