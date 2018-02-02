@@ -26,5 +26,8 @@
   "enableBranches": false,
   "timeStampFormat": "%Y-%m-%dT%H:%M:%SZ",
   "toolsTimeZone": "GMT",
-  "useResponseTemplate": true
+  "runSchedule": 30,
+  "useResponseTemplate": true,
+  "timeStampField":"lastUpdated",
+  "startFrom": "2016-10-10 00:01"
 }
