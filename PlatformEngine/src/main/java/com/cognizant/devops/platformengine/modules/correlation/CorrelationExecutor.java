@@ -43,6 +43,11 @@ public class CorrelationExecutor {
 	public void execute() {
 		CorrelationConfig correlationConfig = ApplicationConfigProvider.getInstance().getCorrelations();
 		if(correlationConfig != null) {
+			/*try {
+				new EngineDataExtractorModule().execute(null);
+			} catch (JobExecutionException e) {
+				e.printStackTrace();
+			}*/
 			loadCorrelationConfiguration(correlationConfig);
 			List<Correlation> correlations = loadCorrelations();
 			if(correlations == null) {
@@ -50,9 +55,9 @@ public class CorrelationExecutor {
 				return;
 			}
 			for(Correlation correlation: correlations) {
+				updateNodesMissingCorrelationFields(correlation.getDestination());
 				int availableRecords = 1;
 				while(availableRecords > 0) {
-					updateNodesMissingCorrelationFields(correlation.getDestination());
 					List<JsonObject> sourceDataList = loadDestinationData(correlation.getDestination(), correlation.getSource(), correlation.getRelationName());
 					availableRecords = sourceDataList.size();
 					if(sourceDataList.size() > 0) {
@@ -76,12 +81,12 @@ public class CorrelationExecutor {
 		StringBuffer cypher = new StringBuffer();
 		cypher.append("MATCH (destination:RAW:DATA:").append(destinationToolName).append(") ");
 		cypher.append("where not exists(destination.maxCorrelationTime) AND ");
-		cypher.append(" NOT (");
+		cypher.append(" ");
 		for(String field : fields) {
-			cypher.append("exists(destination.").append(field).append(") OR ");
+			cypher.append("coalesce(size(destination.").append(field).append("), 0) = 0 AND ");
 		}
-		cypher.delete(cypher.length()-3, cypher.length());
-		cypher.append(") WITH distinct destination limit ").append(dataBatchSize).append(" ");
+		cypher.delete(cypher.length()-4, cypher.length());
+		cypher.append(" WITH distinct destination limit ").append(dataBatchSize).append(" ");
 		cypher.append("set destination.maxCorrelationTime=").append(maxCorrelationTime).append(" , destination.correlationTime=").append(maxCorrelationTime).append(" ");
 		cypher.append("return count(distinct destination) as count");
 		Neo4jDBHandler dbHandler = new Neo4jDBHandler();
@@ -94,7 +99,8 @@ public class CorrelationExecutor {
 						.get("results").getAsJsonArray().get(0).getAsJsonObject()
 						.get("data").getAsJsonArray().get(0).getAsJsonObject()
 						.get("row").getAsInt();
-				log.debug("Processed "+processedRecords+" records in "+(System.currentTimeMillis() - st) + " ms");
+				log.debug("Pre Processed "+destinationToolName+" records: "+processedRecords+" in: "+(System.currentTimeMillis() - st) + " ms");
+				System.out.println("Pre Processed "+destinationToolName+" records: "+processedRecords+" in: "+(System.currentTimeMillis() - st) + " ms");
 			}
 		} catch (GraphDBException e) {
 			log.error("Error occured while loading the destination data for correlations.", e);
@@ -130,8 +136,14 @@ public class CorrelationExecutor {
 			cypher.append(" 	ELSE [] ");
 			cypher.append(" END ");
 		}
-		cypher.append("as values WITH destination.uuid as uuid, values UNWIND values as value WITH uuid, value where value <> \"\" ");
-		cypher.append("WITH uuid, split(value, \",\") as values UNWIND values as value WITH uuid, value where value <> \"\" ");
+		//cypher.append("as values WITH destination.uuid as uuid, values UNWIND values as value WITH uuid, value where value <> \"\" ");
+		//cypher.append("coalesce(size(destination.").append(field).append("), 0) = 0 AND ");
+		cypher.append("as values WITH destination.uuid as uuid, values UNWIND values as value WITH uuid, ");
+		cypher.append(" CASE ");
+		cypher.append(" 	WHEN (toString(value) contains \",\") THEN split(value, \",\") "); //If the value contains comma, the split the value
+		cypher.append(" 	ELSE value "); 
+		cypher.append(" END as values ");
+		cypher.append("UNWIND values as value WITH uuid, value where value <> \"\" ");
 		cypher.append("WITH distinct uuid, collect(distinct value) as values WITH { uuid : uuid, values : values} as data ");
 		cypher.append("RETURN collect(data) as data");
 		Neo4jDBHandler dbHandler = new Neo4jDBHandler();
@@ -183,7 +195,8 @@ public class CorrelationExecutor {
 					.get("results").getAsJsonArray().get(0).getAsJsonObject()
 					.get("data").getAsJsonArray().get(0).getAsJsonObject()
 					.get("row").getAsInt();
-			log.debug("Processed "+processedRecords+" records in "+(System.currentTimeMillis() - st) + " ms");
+			log.debug("Correlated "+destination.getToolName()+" records: "+processedRecords+" in: "+(System.currentTimeMillis() - st) + " ms");
+			System.out.println("Correlated "+destination.getToolName()+" records: "+processedRecords+" in: "+(System.currentTimeMillis() - st) + " ms");
 		} catch (GraphDBException e) {
 			log.error("Error occured while executing correlations for relation "+relationName+".", e);
 		}
