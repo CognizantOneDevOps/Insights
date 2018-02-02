@@ -19,7 +19,8 @@
 module ISightApp {
     export interface IDataTaggingDetailsService {
         
-        getHierarchyMapping(): ng.IPromise<any>
+        getHierarchyMapping(): ng.IPromise<any>;
+        getHierarchyProperties(level1:string,level2:string,level3:string,level4:string): ng.IPromise<any>;
     }
 
     export class DataTaggingDetailsService implements IDataTaggingDetailsService {
@@ -32,6 +33,12 @@ module ISightApp {
             var restHandler = this.restCallHandlerService;
             return restHandler.get("HIERARCHY_ALL_DETAILS_GET",{'Content-Type': 'application/x-www-form-urlencoded'});
         }
+
+        getHierarchyProperties(level1:string,level2:string,level3:string,level4:string): ng.IPromise<any> {
+            var restHandler = this.restCallHandlerService;
+            return restHandler.get("GET_HIERARCHY_PROPERTIES",{"level1":level1,"level2":level2,"level3":level3,"level4":level4},{'Content-Type': 'application/x-www-form-urlencoded'});
+        }
+
 
     }
 }
