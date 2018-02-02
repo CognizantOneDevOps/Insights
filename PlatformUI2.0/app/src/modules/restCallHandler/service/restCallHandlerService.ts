@@ -21,6 +21,7 @@ module ISightApp {
         
         get(url: string, requestParams?: Object, additionalheaders?: Object): ng.IPromise<any>;
         post(url: string, requestParams?: Object, additionalheaders?: Object): ng.IPromise<any>;
+		constructGetUrl(url : string, requestParams : Object);		
     }
 
     export class RestCallHandlerService implements IRestCallHandlerService {
@@ -29,15 +30,21 @@ module ISightApp {
         
         get(url: string, requestParams?: Object, additionalheaders?: Object): ng.IPromise<any> {
             var headers;
-            var authToken = this.$cookies.get('Authorization');
-            var defaultHeader = {
-                                    'Authorization': authToken
-                                };
-            if (this.checkValidObject(additionalheaders)) {
-                headers = this.extend(defaultHeader,additionalheaders);
-            }else {
-                headers = defaultHeader;
-            }
+			var authToken;
+			            
+			authToken = this.$cookies.get('Authorization');					
+					
+			
+			var defaultHeader = {
+                                    'Authorization': authToken													
+                                };			
+			
+			if (this.checkValidObject(additionalheaders)) {
+				headers = this.extend(defaultHeader,additionalheaders);
+			}				
+			else {
+				headers = defaultHeader;
+			}		
             var restcallUrl = this.constructGetUrl(url,requestParams);
             var resource = this.$resource(restcallUrl,
                 {},
@@ -116,8 +123,7 @@ module ISightApp {
             }
             return selectedUrl;
         }
-
-
+		
 
     }
 }

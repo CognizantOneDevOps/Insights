@@ -37,6 +37,7 @@ module ISightApp {
         .service('dataTaggingService', DataTaggingService)
         .service('singleToolConfigService', SingleToolConfigService)
         .service('insightsService', InsightsService)
+		.service('platformServiceStatusService', PlatformServiceStatusService)
         .controller('pipelineController', PipelineController)
         .controller('homePageController', HomePageController)
         .controller('toolsConfigurationController', ToolsConfigurationController)
