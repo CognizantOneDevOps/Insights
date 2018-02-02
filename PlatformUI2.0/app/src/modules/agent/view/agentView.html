@@ -19,8 +19,8 @@
 <throbber ng-if="!agentController.showTemplateAfterLoad" layout="column" flex= "100" >
 </throbber>
 <div ng-if="agentController.showTemplateAfterLoad" layout="column" class="contentCss" flex>
-    <div layout class="buttMar">
-        <div layout class="selectToolTxt">Health Check details</div>
+     <div layout layout-align="center center"  class="buttMar">
+        <div layout class="selectToolTxt">Insights Agents</div>
     </div>
     <div layout layout-align="center center">
         <table class="md-api-table-landing" style="border: 1px solid #a5d28b;width:100%">
@@ -65,4 +65,78 @@
             </tbody>
         </table>
     </div>
+	
+	<div layout layout-align="center center">
+        <table class="md-api-table-landing" style="border: 1px solid #a5d28b;width:100%">
+            <thead class="theadCss">
+				<tr layout="row" layout-align="center center" style="background-color:#f0f0f0;">
+					<th flex="150" class="tableHeader">Insights Component - Data Component</th>
+				</tr>
+                <tr layout="row" layout-align="start center">
+                    <th flex="50" class="tableHeader">
+                        <span>Server</span>
+                    </th>
+					<th flex="50" class="tableHeader">
+                        <span>IP Address:Port</span>
+                    </th>
+                    <th flex="50" class="tableHeader">
+                        <span>Status</span>
+                    </th>                    
+                </tr>
+            </thead>
+            <tbody>			 				
+                <tr ng-repeat="(key, val) in agentController.serverStatus"  ng-if="val.type == 'Database'" layout="row" layout-align="start none" ng-if="agentController.showcontent">                   
+                    <td flex="50" class="tableContentStyle">{{key}}</td>
+					<td flex="50" class="tableContentStyle">{{val.endPoint}}</td>
+                    <td flex="50" class="tableContentStyle">
+					 <md-icon ng-if="val.status ==='success'" md-svg-src="dist/icons/svg/ic_check_circle_24px.svg" ng-style="{color: '#4ca64c', height: '25px', width: '25px'}"></md-icon>
+                        <md-icon ng-if="val.status ==='failure'" md-svg-src="dist/icons/svg/ic_report_problem_24px.svg" ng-style="{color: '#ff4c4c', height: '25px', width: '25px'}"></md-icon>
+					</td>                    
+                </tr>
+				<tr layout="row" layout-align="start none">
+					<td flex="150" class="tableContentStyle" ng-if="!agentController.showcontent">
+					<md-icon md-svg-src="dist/icons/svg/ic_report_problem_24px.svg" ng-style="{color: '#ff4c4c', height: '25px', width: '25px'}"></md-icon> Data Component Service Failure. Please try again.</td>
+				</tr>
+				<tr layout="row" layout-align="center center" ng-show="agentController.showThrobber">
+					<td  style="background-color: #ffffff; margin:15px;">
+					<md-progress-circular style="display: inline;" md-diameter="30" md-mode="indeterminate"></md-progress-circular>
+					</td>
+				</tr>
+            </tbody>
+			<thead class="theadCss">
+				<tr layout="row" layout-align="center center" style="background-color:#f0f0f0;border-top: 1px solid #a5d28b;border-bottom: 1px solid #a5d28b;">
+					<th flex="150" class="tableHeader">Insights Component - Services</th>
+				</tr>                
+				<tr layout="row" layout-align="start center">
+                    <th flex="50" class="tableHeader">
+                        <span>Server</span>
+                    </th>
+					<th flex="50" class="tableHeader">
+                        <span>IP Address:Port</span>
+                    </th>
+                    <th flex="50" class="tableHeader">
+                        <span>Status</span>
+                    </th>                    
+                </tr>
+            </thead>
+            <tbody>			 				
+                <tr ng-repeat="(key, val) in agentController.serverStatus"  ng-if="val.type == 'Service'" layout="row" layout-align="start none" ng-if="agentController.showcontent">                   
+                    <td flex="50" class="tableContentStyle">{{key}}</td>
+					<td flex="50" class="tableContentStyle">{{val.endPoint}}</td>
+                    <td flex="50" class="tableContentStyle">
+					 <md-icon ng-if="val.status ==='success'" md-svg-src="dist/icons/svg/ic_check_circle_24px.svg" ng-style="{color: '#4ca64c', height: '25px', width: '25px'}"></md-icon>
+                        <md-icon ng-if="val.status ==='failure'" md-svg-src="dist/icons/svg/ic_report_problem_24px.svg" ng-style="{color: '#ff4c4c', height: '25px', width: '25px'}"></md-icon>
+					</td>                    
+                </tr>
+				<tr layout="row" layout-align="start none">
+					<td flex="50" class="tableContentStyle" ng-if="!agentController.showcontent">	<md-icon md-svg-src="dist/icons/svg/ic_report_problem_24px.svg" ng-style="{color: '#ff4c4c', height: '25px', width: '25px'}"></md-icon> Service Failure. Please try again.</td>
+				</tr>
+				<tr layout="row" layout-align="center center" ng-show="agentController.showThrobber">
+					<td  style="background-color: #ffffff; margin:15px;">
+					<md-progress-circular style="display: inline;" md-diameter="30" md-mode="indeterminate"></md-progress-circular>
+					</td>
+				</tr>
+            </tbody>			
+        </table>		
+    </div>		
 </div>
