@@ -98,8 +98,9 @@ module ISightApp {
 		  this.addEndPoint("ACCESS_GROUP_MANAGEMENT_GET_CURRENT_USER_ORGS",'/PlatformService/accessGrpMgmt/getCurrentUserOrgs');
 		  this.addEndPoint("ACCESS_GROUP_MANAGEMENT_SWITCH_ORGS",'/PlatformService/accessGrpMgmt/switchUserOrg');
 		  this.addEndPoint("ACCESS_GROUP_MANAGEMENT_GET_USERS",'/PlatformService/accessGrpMgmt/getUser');
-
-      this.addEndPoint("INSIGHTS_GET",'/PlatformService/insights/inferences');
+		 
+		  this.addEndPoint("INSIGHTS_GET",'/PlatformService/insights/inferences');
+		  this.addEndPoint("INSIGHTS_COMP_STATUS",'/PlatformService/ServicesHealthStatus/getStatus');
         }
 
        addEndPoint(name:string, url:string){
@@ -114,9 +115,10 @@ module ISightApp {
         getRestCallUrl( moduleUrlKey:string ) {
                if(! this.urlMapping[moduleUrlKey]){
                     throw new Error("Url Mapping doesnt exist");
-               }
-               return this.restEndpointService.getServiceHost() + this.urlMapping[moduleUrlKey];
-        }      
+               }			   
+			   
+               return this.restEndpointService.getServiceHost() + this.urlMapping[moduleUrlKey];			   
+		}      
 
 
     }
