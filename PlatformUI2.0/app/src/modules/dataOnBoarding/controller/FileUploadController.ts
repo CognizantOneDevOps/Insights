@@ -1,30 +1,37 @@
 /// <reference path="../../../_all.ts" />
-
 module ISightApp {
 
     export class FileUploadController {
 
-        static $inject = ['$scope','$cookies','$http','dataOnBoardingService']
-        constructor(private $scope, private $cookies,private $http, private dataOnBoardingService) {            
-        this.initApp(this.$scope,this.$cookies,this.$http,this.dataOnBoardingService);
+        static $inject = ['$scope', '$cookies', '$http', 'dataOnBoardingService', 'restAPIUrlService']
+        constructor(private $scope, private $cookies, private $http, private dataOnBoardingService, private restAPIUrlService:IRestAPIUrlService) {
+
+            var self = this;
+            var elem = document.querySelector('#homePageTemplateContainer');
+            var homePageControllerScope = angular.element(elem).scope();
+            var homePageController = homePageControllerScope['homePageController'];
+
+            this.initApp(this.$scope, this.$cookies, this.$http, this.dataOnBoardingService, homePageController,restAPIUrlService);
         }
 
-        initApp($scope,$cookies,$http,dataOnBoardingService) : void {
-          
+        initApp($scope, $cookies, $http, dataOnBoardingService, homePageController,restAPIUrlService): void {
+
             var dropbox = document.getElementById("dropbox")
             $scope.dropText = 'Drop files here...'
             $scope.tableData = [];
             $scope.lines = [];
-                  
+            $scope.headers = [];
 
             // init event handlers
             function dragEnterLeave(evt) {
                 evt.stopPropagation()
+
                 evt.preventDefault()
-                $scope.$apply(function(){
+                $scope.$apply(function() {
                     $scope.dropText = 'Drop files here...'
                     $scope.dropClass = ''
                 })
+
             }
             dropbox.addEventListener("dragenter", dragEnterLeave, false)
             dropbox.addEventListener("dragleave", dragEnterLeave, false)
@@ -33,7 +40,7 @@ module ISightApp {
                 evt.preventDefault()
                 var clazz = 'not-available'
                 var ok = evt.dataTransfer && evt.dataTransfer.types && evt.dataTransfer.types.indexOf('Files') >= 0
-                $scope.$apply(function(){
+                $scope.$apply(function() {
                     $scope.dropText = ok ? 'Drop files here...' : 'Only files are allowed!'
                     $scope.dropClass = ok ? 'over' : 'not-available'
                 })
@@ -42,13 +49,13 @@ module ISightApp {
                 console.log('drop evt:', JSON.parse(JSON.stringify(evt.dataTransfer)))
                 evt.stopPropagation()
                 evt.preventDefault()
-                $scope.$apply(function(){
+                $scope.$apply(function() {
                     $scope.dropText = 'Drop files here...'
                     $scope.dropClass = ''
                 })
                 var files = evt.dataTransfer.files
                 if (files.length > 0) {
-                    $scope.$apply(function(){
+                    $scope.$apply(function() {
                         $scope.files = []
                         for (var i = 0; i < files.length; i++) {
                             $scope.files.push(files[i])
@@ -59,86 +66,98 @@ module ISightApp {
             //============== DRAG & DROP =============
 
             $scope.setFiles = function(element) {
-            $scope.$apply(function($scope) {
-              console.log('files:', element.files);
-              // Turn the FileList object into an Array
-                $scope.files = []
-                for (var i = 0; i < element.files.length; i++) {
-                  $scope.files.push(element.files[i])
+                $scope.showUploadingThrobber = true;
+                $scope.isTypeError = false;
+               var testFileExt = checkFile(element.files[0],".csv");
+                $scope.showUploadingThrobber = false
+                if(testFileExt){
+                    $scope.$apply(function($scope) {
+                        
+                        // Turn the FileList object into an Array
+                        $scope.files = []
+                        for (var i = 0; i < element.files.length; i++) {
+                            $scope.files.push(element.files[i])
+                        }
+                        $scope.progressVisible = false;
+                        
+                    });
                 }
-              $scope.progressVisible = false
-              });
             };
-            
-            function csv2Array(fileInput){
-            //read file from input
-            let fileReaded = fileInput;
 
-            let reader: FileReader = new FileReader();
-            reader.readAsText(fileReaded);
+            function csv2Array(fileInput) {
+                //read file from input
+                let fileReaded = fileInput;
 
-            reader.onload = (e) => {
-              let csv: string = reader.result;
-              let allTextLines = csv.split(/\r|\n|\r/);
-              let headers = allTextLines[0].split(',');
-              
-              for (let i = 1; i < allTextLines.length; i++) {
-                // split content based on comma
-                let data = allTextLines[i].split(',');
-                if (data.length === headers.length) {
-                  let tarr = {};
-                  for (let j = 0; j < headers.length; j++) {
-                    tarr[headers[j]] = data[j];
-                  }
+                let reader: FileReader = new FileReader();
+                reader.readAsText(fileReaded);
 
-                  // log each row to see output 
-                  console.log(tarr);
-                  $scope.lines.push(tarr);
+                reader.onload = (e) => {
+                    let csv: string = reader.result;
+                    let allTextLines = csv.split(/\r|\n|\r/);
+                    allTextLines[0] = allTextLines[0].replace(/"/g, "");
+                    let headers = allTextLines[0].split(',');
+                    $scope.headers = headers;
+                    $scope.lines = [];
+                    for (let i = 1; i < allTextLines.length; i++) {
+                        // split content based on comma
+
+                        allTextLines[i] = allTextLines[i].replace(/"/g, "");
+                        let data = allTextLines[i].split(',');
+                        if (data.length === headers.length) {
+                            let tarr = {};
+                            for (let j = 0; j < headers.length; j++) {
+                                tarr[headers[j]] = data[j];
+                            }
+
+                            $scope.lines.push(tarr);
+                        }
+                    }
+                   
+                    $scope.$apply();
                 }
-              }
-              // all rows in the csv file 
-              console.log(">>>>>>>>>>>>>>>>>", $scope.lines);
-            } 
             }
 
 
             $scope.previewData = function() {
 
-                var fd = new FormData()
-                for (var i in $scope.files) {
-                    fd.append("file", $scope.files[i])
-                    csv2Array( $scope.files[i]);
-                }
-                var authToken = $cookies.get('Authorization');
-               
-               //dataOnBoardingService.getAllHierarchyDetails()
-               //.then(function (data) {
-                 //   $scope.tableData = data.data.details;
-                  // console.log($scope.tableData);
-                //});
-
-             };            
+                csv2Array($scope.files[0]);
+                
+            };
 
             $scope.uploadFile = function() {
 
-                var fd = new FormData()
+                var fd = new FormData();
                 for (var i in $scope.files) {
                     fd.append("file", $scope.files[i])
-                    csv2Array( $scope.files[i]);
                 }
+                $scope.showThrobber = true;
                 var authToken = $cookies.get('Authorization');
-               
-               $http.post("https://10.155.143.184/PlatformService/admin/hierarchyDetails/uploadHierarchyDetails", fd, {
-                  headers: { 'Content-Type': undefined,'Authorization': authToken },
-                  transformRequest: angular.identity
-                }).then(function (data, status, headers, config) {
+                var restCallUrl = restAPIUrlService.getRestCallUrl("UPLOAD_HIERARCHY_DETAILS");
+                $scope.showDisabled = true;
+                $http.post(restCallUrl, fd, {
+                    headers: {
+                        'Content-Type': undefined,
+                        'Authorization': authToken
+                    },
+                    transformRequest: angular.identity
+                }).then(function(data, status, headers, config) {
+                    $scope.showThrobber = false;
+                    $scope.showDisabled= false;
+                    homePageController.templateName = 'dataTaggingDetails';
 
-               });
+                },function(data){
+                    $scope.showThrobber = false;
+                    $scope.showDisabled= false;
+                    $scope.showError = true;
+                   
+                });
+
+
             };
 
-         
+
             function uploadProgress(evt) {
-                $scope.$apply(function(){
+                $scope.$apply(function() {
                     if (evt.lengthComputable) {
                         $scope.progress = Math.round(evt.loaded * 100 / evt.total)
                     } else {
@@ -157,16 +176,28 @@ module ISightApp {
             }
 
             function uploadCanceled(evt) {
-                $scope.$apply(function(){
+                $scope.$apply(function() {
                     $scope.progressVisible = false
                 })
                 alert("The upload has been canceled by the user or the browser dropped the connection.")
             }
 
-            
+            function checkFile(sender, validExts) {
+             if(sender){
+                var fileExt = sender.name;
+                fileExt = fileExt.substring(fileExt.lastIndexOf('.'));
+                if (validExts.indexOf(fileExt) < 0 && fileExt != "") {
+                    $scope.isTypeError = true;
+                    (<HTMLInputElement>document.getElementById("fileInp")).value = "";
+                    
+                    return false;
+                }
+                else return true;
+
+                }
+            }
 
 
         }
     }
 }
-

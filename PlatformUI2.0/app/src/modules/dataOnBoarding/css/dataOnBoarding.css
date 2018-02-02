@@ -228,3 +228,6 @@ table { border-collapse: collapse; }
   margin: 10px 5px 0 0;
 }
 
+.md-button[disabled] {
+  background-color: rgba(158, 158, 158, 0.2);
+}

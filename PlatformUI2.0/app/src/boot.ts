@@ -50,7 +50,7 @@ module ISightApp {
         .controller('agentController', AgentController)
         .controller('singleToolConfigurationController', SingleToolConfigurationController)
         .controller('dataTaggingController', DataTaggingController)
-	.controller('dataTaggingDetailsController', DataTaggingDetailsController)
+	    .controller('dataTaggingDetailsController', DataTaggingDetailsController)
         .controller('FileUploadController', FileUploadController)
         .component('footer', {
             templateUrl: './dist/components/footer/view/footerView.html',
@@ -85,8 +85,10 @@ module ISightApp {
        .directive('row', function() {
             return {
                 restrict: 'EA',
-                scope: { children:"=" , clickHandler:"&" },
+                scope: { children:"=" , myVar: '=' ,clickHandler:"&",  'test': '=test' },
+                controller: RecursiveLiController,
                 templateUrl: './dist/modules/dataTaggingDetails/view/test.html'
+
             };
         })
        
