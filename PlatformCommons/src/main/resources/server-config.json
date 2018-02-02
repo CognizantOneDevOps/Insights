@@ -4,14 +4,15 @@
   },
   "sparkConfigurations": {
     "appName" : "inSights",
-	"master" : "local[*]",
-	"sparkExecutorMemory" : "8g",
-	"sparkElasticSearchHost": "http://localhost",
-	"sparkElasticSearchPort": "9200",
-	"sparkElasticSearchConfigIndex": "",
-	"sparkElasticSearchResultIndex": "",
-	"kpiSize": "30",
-	"sparkResultSince": 5
+	  "master" : "local[*]",
+	  "sparkExecutorMemory" : "8g",
+	  "sparkElasticSearchHost": "http://localhost",
+	  "sparkElasticSearchPort": "9200",
+	  "sparkElasticSearchConfigIndex": "",
+	  "sparkElasticSearchResultIndex": "",
+	  "kpiSize": "30",
+	  "sparkResultSince": 5,		
+	  "sparkMasterExecutionEndPoint":"http://localhost:4040"
   },
   "emailConfiguration": {
 		"sendEmailEnabled": true,
@@ -46,7 +47,7 @@
   "graph": {
     "endpoint": "http://localhost:7474",
     "authToken": "bmVvNGo6QzBnbml6YW50QDE=",
-		"boltEndPoint" : "bolt://localhost:7687",
+	  "boltEndPoint" : "bolt://localhost:7687",
 		"maxIdleConnections":25
   },
   "grafana": {
@@ -58,16 +59,17 @@
     "dbPassword": "C0gnizant@1"
   },
   "postgre": {
-	"userName" : "grafana",
-	"password" : "C0gnizant@1",
-	"insightsDBUrl": "jdbc:postgresql://127.0.0.1:5432/insight",
-	"grafanaDBUrl": "jdbc:postgresql://127.0.0.1:5432/grafana"
+	  "userName" : "grafana",
+	  "password" : "C0gnizant@1",
+	  "insightsDBUrl": "jdbc:postgresql://127.0.0.1:5432/insight",
+	  "grafanaDBUrl": "jdbc:postgresql://127.0.0.1:5432/grafana"
   },
   "messageQueue": {
     "host": "localhost",
     "user": "iSight",
     "password": "iSight"
   },
+  "insightsServiceURL": "http://localhost:8080",
   "disableAuth": false,
   "enableNativeUsers": true,
   "insightsTimeZone": "Asia/Kolkata",
