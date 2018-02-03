@@ -43,11 +43,7 @@ public class CorrelationExecutor {
 	public void execute() {
 		CorrelationConfig correlationConfig = ApplicationConfigProvider.getInstance().getCorrelations();
 		if(correlationConfig != null) {
-			/*try {
-				new EngineDataExtractorModule().execute(null);
-			} catch (JobExecutionException e) {
-				e.printStackTrace();
-			}*/
+			new DataExtractor().execute();
 			loadCorrelationConfiguration(correlationConfig);
 			List<Correlation> correlations = loadCorrelations();
 			if(correlations == null) {

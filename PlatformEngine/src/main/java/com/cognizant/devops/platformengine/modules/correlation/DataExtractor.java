@@ -1,4 +1,4 @@
-package com.cognizant.devops.platformengine.modules.dataextractor;
+package com.cognizant.devops.platformengine.modules.correlation;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -6,9 +6,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
-import org.quartz.Job;
-import org.quartz.JobExecutionContext;
-import org.quartz.JobExecutionException;
 
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBException;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphResponse;
@@ -23,14 +20,14 @@ import com.google.gson.JsonObject;
  * Entry point for data extraction module.
  *
  */
-public class EngineDataExtractorModule implements Job{
-	private static Logger log = Logger.getLogger(EngineDataExtractorModule.class);
+public class DataExtractor{
+	private static Logger log = Logger.getLogger(DataExtractor.class);
 	
 	private static boolean isDataExtractionInProgress = false;
 	private static final Pattern p = Pattern.compile("((?<!([A-Z]{1,10})-?)[A-Z]+-\\d+)");
 	private int dataBatchSize = 2000;
 	
-	public void execute(JobExecutionContext context) throws JobExecutionException {
+	public void execute() {
 		if(!isDataExtractionInProgress) {
 			isDataExtractionInProgress = true;
 			updateSCMNodesWithJiraKey();
