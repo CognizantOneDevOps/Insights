@@ -142,15 +142,19 @@ public class AgentDataSubscriber extends EngineSubscriberResponseHandler{
 				if(e.isJsonObject()){
 					//dataList.add(e.getAsJsonObject());
 
-					NodeData nodeData =new NodeData();
+					NodeData nodeData =null;
 
 					nodeData = applyDataTagging(e.getAsJsonObject(),metaDataMap);
-
+					
+					if(nodeData!=null){
+					
 					nodeJsonStr = gson.toJson(nodeData.getPropertyMap());
 
 					JsonObject finalJson = mergeProperty(e,nodeJsonStr);
 
 					dataList.add(finalJson);
+					
+					}
 
 				}
 			}
@@ -199,7 +203,7 @@ public class AgentDataSubscriber extends EngineSubscriberResponseHandler{
 
 	private  NodeData applyDataTagging(JsonObject asJsonObject, Map<String, Map<String, NodeData>> metaDataMap) {
 
-		NodeData nodeData = new NodeData() ;
+		NodeData nodeData = null ;
 		StringBuilder sb=null;
 
 		for (String key : metaDataMap.keySet()){
