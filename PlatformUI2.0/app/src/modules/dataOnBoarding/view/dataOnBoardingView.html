@@ -71,10 +71,10 @@
       </div>
     </div>
     <div style="padding-top:10px;margin:auto;width:90%">
-      <table class="md-api-table-landing" style="border: 1px solid #a5d28b;width:100%" ng-if="lines.length > 0">
+      <table class="md-api-table-landing" style="border: 1px solid #a5d28b;" ng-if="lines.length > 0">
         <thead class="theadCss">
           <tr layout="row"  layout-align="start center" class="layout-align-start-center layout-row">
-            <th  style="width:8%px;word-wrap:break-word" class="tableHeader" ng-repeat = "tabheaders in headers">{{tabheaders}}</th>
+            <th  style="width:100px;word-wrap:break-word" class="tableHeader" ng-repeat = "tabheaders in headers">{{tabheaders}}</th>
           </tr>
         </thead>
         <tr ng-repeat = "tabData in lines" class="layout-align layout-row">
