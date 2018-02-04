@@ -105,12 +105,7 @@
                                         ng-controller="applicationManagementController as applicationManagementController" layout="vertical"></div>
                                     <div ng-if="homePageController.templateName == 'userOnboarding'" ng-include="'dist/modules/userOnboarding/view/userOnboardingView.html'"
                                         ng-controller="userOnboardingController as userOnboardingController" layout="vertical"></div>
-                                    <div ng-if="homePageController.templateName == 'dataOnboarding'" ng-include="'dist/modules/dataOnBoarding/view/dataOnBoardingView.html'"
-                                        ng-controller="dataOnBoardingController as dataOnBoardingController" layout="vertical"></div>
-                                    <div ng-if="homePageController.templateName == 'dataTaggingDetails'" ng-include="'dist/modules/dataTaggingDetails/view/dataTaggingDetailsView.html'"
-                                        ng-controller="dataTaggingDetailsController as dataTaggingDetailsController" layout="vertical"></div>
-                                    <div ng-if="homePageController.templateName == 'dataTagging'" ng-include="'dist/modules/dataTagging/view/dataTaggingView.html'"
-                                        ng-controller="dataTaggingController as dataTaggingController" layout="vertical"></div>
+                                    
                                 </md-content>
                             </md-tab>
                             <md-tab label="Business Mapping" ng-click="homePageController.selectAct('dataTaggingDetails')">
