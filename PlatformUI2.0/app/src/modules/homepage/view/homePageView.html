@@ -111,6 +111,13 @@
                                         ng-controller="dataTaggingController as dataTaggingController" layout="vertical"></div>
                                 </md-content>
                             </md-tab>
+							 <md-tab label="Agent Management" ng-click="homePageController.selectAct('agentManagement')">
+                                <md-content style="{{homePageController.mainContentMinHeight}}">
+                                    <div ng-if="homePageController.templateName == 'agentManagement'" ng-include="'dist/modules/agent/view/agentManagementView.html'" ng-controller="agentManagementController as agentManagementController"
+                                layout="vertical"></div>
+                                  
+                                </md-content>
+                            </md-tab>
                         </md-tabs>
                     </md-tab-body>
                 </md-tab>

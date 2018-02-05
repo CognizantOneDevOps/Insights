@@ -48,6 +48,7 @@ module ISightApp {
         .controller('dataOnBoardingController', DataOnBoardingController)
         .controller('oneToolConfigurationController', OneToolConfigurationController)
         .controller('agentController', AgentController)
+		.controller('agentManagementController', AgentManagementController)
         .controller('singleToolConfigurationController', SingleToolConfigurationController)
         .controller('dataTaggingController', DataTaggingController)
         .controller('insightsController', InsightsController)
@@ -147,6 +148,11 @@ module ISightApp {
                          templateUrl: './dist/modules/insights/view/insightsView.html',
                          controller: InsightsController,
                          controllerAs: 'insightsController'
+                     }).
+					 when('/InSights/agentManagement', {
+                         templateUrl: './dist/modules/agent/view/agentManagementView.html',
+                        controller: AgentManagementController,
+                        controllerAs: 'agentManagementController'
                      }).
 
                     otherwise({
