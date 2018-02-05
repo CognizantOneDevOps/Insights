@@ -1,0 +1,56 @@
+<!--
+ *******************************************************************************
+ * Copyright 2017 Cognizant Technology Solutions
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License.  You may obtain a copy
+ * of the License at
+ * 
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ ******************************************************************************
+ -->
+<div layout="column" class="contentCss" flex>
+	<div layout class="applicationButtMar">
+        <div layout="row" class="applicationContentCss" style="width: 100%;">
+            <div layout layout-align="end center">           
+                DROP DOWN 
+            </div>
+            <div layout layout-align="end center" flex style="margin-right: -7px;">
+                <md-button class="md-raised md-primary configureBut" style="background-color:#387c2c;margin-left: 2px;">
+                    START
+                </md-button>
+                <md-button style="background-color:red;margin-left: 2px;" class="md-raised md-primary configureBut">
+                    STOP
+                </md-button>
+				 <md-button class="md-raised md-primary configureBut">
+                    Register
+                </md-button>
+            </div>
+        </div>
+    </div>
+	<div id="agentConfigTable" layout layout-align="center center" ng-repeat="header in agentManagementController.headerData['headers']">
+            <table class="md-api-table-landing" style="border: 1px solid #a5d28b;width:100%;table-layout:fixed;">
+                <thead class="theadCss">
+                    <tr layout="row" layout-align="start start">
+                        <th flex="22.5" class="tableHeader" style="min-width:285px;max-width:22.5%;padding-left:22px">
+                            <span class="tableHeadingStyle">{{header}}</span>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody layout="column" flex>
+                    <tr layout="row" layout-align="start start" style="height:60px;width:100%; background-color: white !important;margin-bottom: 5px !important">
+                        <td flex="23" layout style="height:56px;max-width:22.5% !important">                         
+                        </td>
+                        <td flex="10" layout style="height:56px;max-width:10%">                           
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+	</div>
+</div>
