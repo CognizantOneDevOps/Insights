@@ -108,7 +108,7 @@
                                     
                                 </md-content>
                             </md-tab>
-                            <md-tab label="Business Mapping" ng-click="homePageController.selectAct('dataTaggingDetails')">
+                            <md-tab label="Business Mapping" ng-if="homePageController.showBusinessMapping" ng-click="homePageController.selectAct('dataTaggingDetails')">
                                 <md-content style="{{homePageController.mainContentMinHeight}}">
                                    <div ng-if="homePageController.templateName == 'dataOnboarding'" ng-include="'dist/modules/dataOnBoarding/view/dataOnBoardingView.html'"
                                         ng-controller="dataOnBoardingController as dataOnBoardingController" layout="vertical"></div>
