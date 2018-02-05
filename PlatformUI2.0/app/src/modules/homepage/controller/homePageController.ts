@@ -66,6 +66,7 @@ module ISightApp {
                 var configResource = this.$resource(uiConfigJsonUrl);
                 var data = configResource.get().$promise.then(function (data) {
                     self.showInsightsTab = data.showInsightsTab;
+                    self.showBusinessMapping = data.showBusinessMapping;
                     if(self.showInsightsTab){
                         self.selectedIndex = 1;
                         self.templateName = 'insights';
@@ -104,6 +105,7 @@ module ISightApp {
         iframeHeight = window.innerHeight;
         aboutMeContent = {};
         showAdminTab: boolean = false;
+        showBusinessMapping: boolean = false;
         showThrobber: boolean;
         selectDashboard: boolean = false;
         selectedIndex = 2;
