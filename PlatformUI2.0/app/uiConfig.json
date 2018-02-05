@@ -1,8 +1,4 @@
 {
-"serviceHost" : "https://10.155.143.184",
-"elasticSearchServiceHost" : "http://10.155.143.184:9200",
-"neo4jServiceHost" : "http://10.155.143.184:7474",
-"grafanaHost" : "http://10.155.143.184:3000",
 "showInsightsTab" : false,
 "showOptionsPanel" : false,
 "showBusinessMapping" : true
