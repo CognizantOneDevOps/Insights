@@ -45,11 +45,21 @@ public class ApplicationConfigProvider implements Serializable{
 	private int proxyPort;
 	private Date refreshTime;
 	private List<String> trustedHosts = new ArrayList<String>(3);	
-
+	private boolean enableOnlineDatatagging = true;
 	private boolean enableNativeUsers;
     private boolean enableNativeCorrelations;
+    
     private EmailConfiguration emailConfiguration=new EmailConfiguration();
 
+    public boolean isEnableOnlineDatatagging() {
+		return enableOnlineDatatagging;
+	}
+
+	public void setEnableOnlineDatatagging(boolean enableOnlineDatatagging) {
+		this.enableOnlineDatatagging = enableOnlineDatatagging;
+	}
+    
+    
 	private ApplicationConfigProvider(){
 		this.refreshTime = new Date(new Date().getTime() - 86400000);
 	}

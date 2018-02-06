@@ -15,7 +15,6 @@
  ******************************************************************************/
 package com.cognizant.devops.platformservice.rest.dataTagging;
 
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,16 +29,13 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.cognizant.devops.platformcommons.constants.ErrorMessage;
-import com.cognizant.devops.platformcommons.constants.NamedNodeAttribute;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBException;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphResponse;
 import com.cognizant.devops.platformcommons.dal.neo4j.Neo4jDBHandler;
-import com.cognizant.devops.platformcommons.dal.neo4j.NodeData;
 import com.cognizant.devops.platformdal.entity.definition.EntityDefinition;
 import com.cognizant.devops.platformdal.entity.definition.EntityDefinitionDAL;
 import com.cognizant.devops.platformdal.hierarchy.details.HierarchyDetails;
 import com.cognizant.devops.platformdal.hierarchy.details.HierarchyDetailsDAL;
-import com.cognizant.devops.platformengine.message.core.AgentDataConstants;
 import com.cognizant.devops.platformservice.rest.dataTagging.util.DataProcessorUtil;
 import com.cognizant.devops.platformservice.rest.neo4j.GraphDBService;
 import com.cognizant.devops.platformservice.rest.util.PlatformServiceUtil;
@@ -47,7 +43,6 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 
 @RestController
 @RequestMapping("/admin/hierarchyDetails")
