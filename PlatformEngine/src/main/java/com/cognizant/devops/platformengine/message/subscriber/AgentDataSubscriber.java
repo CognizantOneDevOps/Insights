@@ -60,8 +60,8 @@ public class AgentDataSubscriber extends EngineSubscriberResponseHandler{
 	}
 
 	public void handleDelivery(String consumerTag, Envelope envelope, BasicProperties properties, byte[] body) throws IOException{
-		boolean enableOnlineDatatagging = ApplicationConfigProvider.getInstance().isEnableOnlineDatatagging();
 		ApplicationConfigProvider.performSystemCheck();
+		boolean enableOnlineDatatagging = ApplicationConfigProvider.getInstance().isEnableOnlineDatatagging();
 		Neo4jDBHandler dbHandler = new Neo4jDBHandler();
 		String message = new String(body, MessageConstants.MESSAGE_ENCODING);
 		String routingKey = envelope.getRoutingKey();
@@ -72,7 +72,7 @@ public class AgentDataSubscriber extends EngineSubscriberResponseHandler{
 		JsonElement json = new JsonParser().parse(message);
 		boolean dataUpdateSupported = this.dataUpdateSupported;
 		String uniqueKey = this.uniqueKey;
-		/*		if(json.isJsonObject()) {
+		if(json.isJsonObject()) {
 			JsonObject messageObject = json.getAsJsonObject();
 			json = messageObject.get("data");
 			if(messageObject.has("metadata")) {
@@ -94,12 +94,30 @@ public class AgentDataSubscriber extends EngineSubscriberResponseHandler{
 				}
 			}
 		}
-
+		Map<String,Map<String,NodeData>> metaDataMap=new HashMap<String,Map<String,NodeData>>();
+		Gson gson = new Gson();
+		if(enableOnlineDatatagging){
+			metaDataMap= getMetaData(dbHandler);
+		}
 		if(json.isJsonArray()){
 			JsonArray asJsonArray = json.getAsJsonArray();
 			for(JsonElement e : asJsonArray){
 				if(e.isJsonObject()){
-					dataList.add(e.getAsJsonObject());
+					if(enableOnlineDatatagging){
+						NodeData nodeData = applyDataTagging(e.getAsJsonObject(),metaDataMap);
+
+						if(nodeData != null){
+							String nodeJsonStr = gson.toJson(nodeData.getPropertyMap());
+							JsonObject finalJson = mergeProperty(e,nodeJsonStr);
+							finalJson.remove("uuid"); 
+							dataList.add(finalJson);
+
+						} else {
+							dataList.add(e.getAsJsonObject());
+						}
+					} else{
+						dataList.add(e.getAsJsonObject());
+					}
 				}
 			}
 			try {
@@ -127,97 +145,7 @@ public class AgentDataSubscriber extends EngineSubscriberResponseHandler{
 			} catch (GraphDBException e) {
 				log.error("GraphDBException occured.", e);
 			}
-	}
-		 */	
-
-		if(enableOnlineDatatagging){
-
-			Map<String,Map<String,NodeData>> metaDataMap=new HashMap<String,Map<String,NodeData>>();
-			String nodeJsonStr =null;
-			Gson gson = new Gson();
-			metaDataMap= getMetaData(dbHandler);
-
-			if(json.isJsonArray()){
-				JsonArray asJsonArray = json.getAsJsonArray();
-
-				for(JsonElement e : asJsonArray){
-					if(e.isJsonObject()){
-						NodeData nodeData =null;
-						nodeData = applyDataTagging(e.getAsJsonObject(),metaDataMap);
-
-						if(nodeData!=null){
-							nodeJsonStr = gson.toJson(nodeData.getPropertyMap());
-							JsonObject finalJson = mergeProperty(e,nodeJsonStr);
-							finalJson.remove("uuid"); 
-							dataList.add(finalJson);
-
-						}
-					}
-				}
-
-			}
-		}else{
-
-			if(json.isJsonObject()) {
-				JsonObject messageObject = json.getAsJsonObject();
-				json = messageObject.get("data");
-				if(messageObject.has("metadata")) {
-					JsonObject metadata = messageObject.get("metadata").getAsJsonObject();
-					if(metadata.has("labels")) {
-						JsonArray additionalLabels = metadata.get("labels").getAsJsonArray();
-						for(JsonElement additionalLabel : additionalLabels) {
-							String label = additionalLabel.getAsString();
-							if(!labels.contains(label)) {
-								labels.add(label);
-							}
-						}
-					}
-					if(metadata.has("dataUpdateSupported")) {
-						dataUpdateSupported = metadata.get("dataUpdateSupported").getAsBoolean();
-					}
-					if(metadata.has("uniqueKey")) {
-						uniqueKey = metadata.get("uniqueKey").getAsString();
-					}
-				}
-			}
-
-			if(json.isJsonArray()){
-				JsonArray asJsonArray = json.getAsJsonArray();
-				for(JsonElement e : asJsonArray){
-					if(e.isJsonObject()){
-						dataList.add(e.getAsJsonObject());
-					}
-				}
-			}
-
 		}
-		try {
-			String cypherQuery = "";
-			String queryLabel = "";
-			for(String label : labels){
-				if(label != null && label.trim().length() > 0) {
-					queryLabel += ":"+label;
-				}
-			}
-			if(dataUpdateSupported){
-				cypherQuery = buildCypherQuery(queryLabel, uniqueKey);
-			}else{
-				cypherQuery = "UNWIND {props} AS properties CREATE (n"+queryLabel+") set n=properties return count(n)";
-			}
-			List<List<JsonObject>> partitionList = partitionList(dataList, 1000);
-			for(List<JsonObject> chunk : partitionList){
-				JsonObject graphResponse = dbHandler.bulkCreateNodes(chunk, labels, cypherQuery);
-				if(graphResponse.get("response").getAsJsonObject().get("errors").getAsJsonArray().size() > 0){
-					log.error("Unable to insert nodes for routing key: "+routingKey+", error occured: "+graphResponse);
-					//log.error(chunk);
-				}
-			}
-			getChannel().basicAck(envelope.getDeliveryTag(), false);
-		} catch (GraphDBException e) {
-			log.error("GraphDBException occured.", e);
-		}
-
-
 	}
 
 	private   JsonObject mergeProperty(JsonElement e, String jsonStr) {
@@ -229,7 +157,7 @@ public class AgentDataSubscriber extends EngineSubscriberResponseHandler{
 		finalobj.putAll(metaDataJson);
 		finalobj.putAll(agentJson);
 		String resultJson = new Gson().toJson(finalobj);
-		JsonObject finalJson=(JsonObject)jsonParser.parse(resultJson);
+		JsonObject finalJson = (JsonObject)jsonParser.parse(resultJson);
 		return finalJson;
 	}
 
@@ -252,7 +180,7 @@ public class AgentDataSubscriber extends EngineSubscriberResponseHandler{
 				}
 			}  
 
-			Map<String ,NodeData> innerMap=metaDataMap.get(key);
+			Map<String ,NodeData> innerMap = metaDataMap.get(key);
 
 			String innerKey=StringUtils.stripEnd(sb.toString(),AgentDataConstants.COLON);
 			if(innerMap.containsKey(innerKey)){
@@ -266,10 +194,9 @@ public class AgentDataSubscriber extends EngineSubscriberResponseHandler{
 	private  Map<String, Map<String, NodeData>> getMetaData(Neo4jDBHandler dbHandler) {
 		List<NodeData> nodes = null;
 		Map<String,NodeData> nodepropertyMap=null;
-		Map<String,Map<String,NodeData>> metaDataMap=new HashMap<String,Map<String,NodeData>>();
-		GraphResponse response=null;
+		Map<String,Map<String,NodeData>> metaDataMap = new HashMap<String,Map<String,NodeData>>();
 		try {
-			response = dbHandler.executeCypherQuery("MATCH (n:METADATA:DATATAGGING) return n");
+			GraphResponse response = dbHandler.executeCypherQuery("MATCH (n:METADATA:DATATAGGING) return n");
 			nodes=response.getNodes();
 		} catch (GraphDBException e) {
 			log.error(e);
