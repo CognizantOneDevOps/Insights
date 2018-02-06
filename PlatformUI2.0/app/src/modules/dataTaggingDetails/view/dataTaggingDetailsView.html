@@ -54,7 +54,14 @@
               <li  ng-repeat="propertyDetails in hierarchyProperties" ng-click="showHideProps('listDet_'+$index)">
                 <a href="">{{propertyDetails.propertyMap.toolName}}</a>
                 <ol id="listDet_{{$index}}" style="display:none">
-                  <li>
+                   <li>
+                    <div flex="30" style="display:inline-block;width:30%;height: 40px;font-family: proxima_novasemibold;font-size: 14px;color: #00728f !important;text-align: start;padding-left: 20px;padding-top: 10px;margin-top: 2px;margin-left: 10px;word-wrap: break-word;
+                      " >Property Name</div>
+                    <div flex="30" style="display:inline-block;width:30%;height: 40px;font-family: proxima_novasemibold;font-size: 14px;color: #00728f !important;text-align: start;padding-left: 20px;padding-top: 10px;margin-top: 2px;margin-left: 10px;word-wrap: break-word;
+                      " >Property Value</div>
+                    
+                  </li>
+                  <li ng-if="propertyDetails.propertyMap.toolProperty1">
                     <div flex="30" style="display:inline-block;width:30%" class="dataBoardingToolName">{{propertyDetails.propertyMap.toolProperty1}}</div>
                     <div flex="30" style="display:inline-block;width:30%" class="dataBoardingToolName">{{propertyDetails.propertyMap.propertyValue1}}</div>
                     <div flex="20" style="padding-left: 37px;display:inline-block">
@@ -66,7 +73,7 @@
                       </md-icon>
                     </div>
                   </li>
-                  <li>
+                  <li ng-if="propertyDetails.propertyMap.toolProperty2">
                     <div flex="30" style="display:inline-block;width:30%" class="dataBoardingToolName">{{propertyDetails.propertyMap.toolProperty2}}</div>
                     <div flex="30" style="display:inline-block;width:30%" class="dataBoardingToolName">{{propertyDetails.propertyMap.propertyValue2}}</div>
                     <div flex="20" style="padding-left: 37px;display:inline-block">
@@ -78,7 +85,7 @@
                       </md-icon>
                     </div>
                   </li>
-                  <li>
+                  <li ng-if="propertyDetails.propertyMap.toolProperty3">
                     <div flex="30" style="display:inline-block;width:30%" class="dataBoardingToolName">{{propertyDetails.propertyMap.toolProperty3}}</div>
                     <div flex="30" style="display:inline-block;width:30%" class="dataBoardingToolName">{{propertyDetails.propertyMap.propertyValue3}}</div>
                     <div flex="20" style="padding-left: 37px;display:inline-block">
@@ -90,7 +97,7 @@
                       </md-icon>
                     </div>
                   </li>
-                  <li>
+                  <li ng-if="propertyDetails.propertyMap.toolProperty4">
                     <div flex="30" style="display:inline-block;width:30%" class="dataBoardingToolName">{{propertyDetails.propertyMap.toolProperty4}}</div>
                     <div flex="30" style="display:inline-block;width:30%" class="dataBoardingToolName">{{propertyDetails.propertyMap.propertyValue4}}</div>
                     <div flex="20" style="padding-left: 37px;display:inline-block">
