@@ -45,14 +45,16 @@ public class DataProcessorUtil  {
 
 	public  boolean readData(MultipartFile file)   {
 		File csvfile =null;
+		boolean status = false;
 		try {
 			csvfile = convertToFile(file);
 		} catch (IOException ex) {
+			status=true;
 			log.debug(ex);
 		}
 
 		CSVFormat format = CSVFormat.newFormat(',').withHeader();
-		boolean status = false;
+		
 		try (Reader reader = new FileReader(csvfile); CSVParser csvParser = new CSVParser(reader, format);){
 			
 			Neo4jDBHandler dbHandler = new Neo4jDBHandler();
