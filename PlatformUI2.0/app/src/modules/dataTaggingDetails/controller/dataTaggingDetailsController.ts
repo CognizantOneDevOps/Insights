@@ -38,32 +38,15 @@ module ISightApp {
                   var level4 = $scope.list[0].children[0].children[0].children[0].name;
                  
                   self.showThrobber = false;
-                  //self.dataTaggingDetailsService.getHierarchyProperties(level1,level2,level3,level4)
-                  //      .then(function (data) {
-                  //       console.log(data);
-                  //       $scope.hierarchyProperties = data.data;
-                  //      });
+                  self.dataTaggingDetailsService.getHierarchyProperties(level1,level2,level3,level4)
+                        .then(function (data) {
+                         console.log(data);
+                         $scope.hierarchyProperties = data.data;
+                      });
                        
                 });
 
-              $scope.hierarchyProperties = [{
-  "creationDate": 1516984823685,
-  "toolProperty3": "",
-  "uuid": "9ba9d730-02b7-11e8-855b-005056b1008e",
-  "toolProperty4": "",
-  "toolProperty1": "GIT description1",
-  "toolProperty2": "GIT description2",
-  "level_3": "Dep1",
-  "level_4": "project1",
-  "propertyValue1": "NextGenBilling1",
-  "propertyValue4\"": "\"",
-  "propertyValue3": "",
-  "propertyValue2": "value2",
-  "\"id": "\"1",
-  "level_1": "Billing1",
-  "level_2": "Invoicebill",
-  "toolName": "GIT"
-}];
+             
             
               this.init($scope,$filter,dataTaggingDetailsService);
         }
