@@ -56,19 +56,19 @@ public class DataProcessorUtil  {
 		CSVFormat format = CSVFormat.newFormat(',').withHeader();
 		
 		try (Reader reader = new FileReader(csvfile); CSVParser csvParser = new CSVParser(reader, format);){
-			
+
 			Neo4jDBHandler dbHandler = new Neo4jDBHandler();
 			List<JsonObject> gitProperties = new ArrayList<>();
 			Map<String, Integer> headerMap = csvParser.getHeaderMap();
-			
+
 			dbHandler.executeCypherQuery("CREATE CONSTRAINT ON (n:METADATA) ASSERT n.id  IS UNIQUE");
 			String query =  "UNWIND {props} AS properties " +
 					"CREATE (n:METADATA:DATATAGGING) " +
 					"SET n = properties";
 			int sleepTime=500;
 			int totalRecords=0;
-            int size = 0;
-            int totalSize = 0;
+			int size = 0;
+			int totalSize = 0;
 
 			for (CSVRecord csvRecord : csvParser.getRecords()) {
 				size += 1;
@@ -76,25 +76,27 @@ public class DataProcessorUtil  {
 				JsonObject json = new JsonObject();
 				for(Map.Entry<String, Integer> header : headerMap.entrySet()){
 					if(header.getKey()!= null){
-					json.addProperty(header.getKey(), csvRecord.get(header.getValue()));
+						json.addProperty(header.getKey(), csvRecord.get(header.getValue()));
 					}
 				}			
 				json.addProperty(DatataggingConstants.CREATIONDATE, Instant.now().toEpochMilli() );
 				gitProperties.add(json);
 				if(totalRecords > 10 ) {
 					totalSize += size;
-					dbHandler.bulkCreateNodes(gitProperties, null, query);
+					JsonObject graphResponse = dbHandler.bulkCreateNodes(gitProperties, null, query);
+					if(graphResponse.get("response").getAsJsonObject().get("errors").getAsJsonArray().size() > 0){
+						log.error(graphResponse);
+						status=false;
+						break;
+					}
 					Thread.sleep(sleepTime);
 					gitProperties = new ArrayList<>();
 				}
-				if(totalSize >= totalRecords) {
-                    break;
+				if(totalSize >= csvRecord.size()) {
+					break;
 				}
 				status=true;
 			}
-				
-			dbHandler.bulkCreateNodes(gitProperties, null, query);
-			status=true;
 
 		} catch (FileNotFoundException e) {
 			status=false;
