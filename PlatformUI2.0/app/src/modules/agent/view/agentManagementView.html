@@ -17,11 +17,32 @@
  -->
 <div layout="column" class="contentCss" flex>
 	<div layout class="applicationButtMar">
-        <div layout="row" class="applicationContentCss" style="width: 100%;">
-            <div layout layout-align="end center">           
-                DROP DOWN 
+        <div layout layout="row" layout-align="center center" class="applicationContentCss">
+            <div layout >           
+                <md-select class="searchApplicationBoxContData inputApplicationBox dataBoardingFieldName"
+                     placeholder="Select Tool" ng-model="toolConfigdata.selectedTool" data-md-container-class="selectdemoSelectHeader">
+                    <md-optgroup label="Tools">
+                        <md-option ng-value="tool">Select OS</md-option>						
+                    </md-optgroup>
+                </md-select>
             </div>
-            <div layout layout-align="end center" flex style="margin-right: -7px;">
+			<div layout >           
+                <md-select class="searchApplicationBoxContData inputApplicationBox dataBoardingFieldName"
+                     placeholder="Select Tool" ng-model="toolConfigdata.selectedTool" data-md-container-class="selectdemoSelectHeader">
+                    <md-optgroup label="Tools">
+                        <md-option ng-value="tool">Select Tool</md-option>						
+                    </md-optgroup>
+                </md-select>
+            </div>
+			<div layout >           
+                <md-select class="searchApplicationBoxContData inputApplicationBox dataBoardingFieldName"
+                     placeholder="Select Tool" ng-model="toolConfigdata.selectedTool" data-md-container-class="selectdemoSelectHeader">
+                    <md-optgroup label="Tools">
+                        <md-option ng-value="tool">Select Version</md-option>						
+                    </md-optgroup>
+                </md-select>
+            </div>
+            <div layout style="margin-left: 100px;">
                 <md-button class="md-raised md-primary configureBut" style="background-color:#387c2c;margin-left: 2px;">
                     START
                 </md-button>
@@ -34,6 +55,41 @@
             </div>
         </div>
     </div>
+	<div class="agentConfigTable" layout layout-align="center center" ng-repeat="(key,value) in agentManagementController.defaultConfigdata">
+            <table class="md-api-table-landing">
+                <thead class="theadCss">
+                    <tr layout="row" layout-align="start start">
+                        <th flex="22.5" class="tableHeader">
+                            <span class="tableHeadingStyle">{{key}}</span>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody layout="column" flex>				
+                    <tr layout="row" layout-align="start start" ng-repeat="(x,y) in value[0]" >
+                        <td flex="30" layout>
+						<md-autocomplete class="autocompleteEntityCss"
+							md-selected-item="x"
+							md-search-text="muthu" 
+							md-items="item in items | filter: muthu" 							
+							md-item-text="item" 
+							md-min-length="2" 
+							placeholder="Add Value">
+							<md-item-template>
+								<span md-highlight-text="" md-highlight-flags="^i">{{item}}</span>
+							</md-item-template>
+                        </md-autocomplete></td>
+						<td flex="30" layout style="height:56px;max-width:22.5% !important;background-color: white !important;">
+						<md-autocomplete class="autocompleteEntityCss" md-search-text="y" md-items="y"
+                                md-item-text="y" md-min-length="2" placeholder="Add Value">
+                                <md-item-template>
+                                    <span md-highlight-text="" md-highlight-flags="^i">{{value[0]}}</span>
+                                </md-item-template>
+                            </md-autocomplete></td>     
+						
+                    </tr>						
+                </tbody>
+            </table>			
+	</div>
 	<div id="agentConfigTable" layout layout-align="center center" ng-repeat="header in agentManagementController.headerData['headers']">
             <table class="md-api-table-landing" style="border: 1px solid #a5d28b;width:100%;table-layout:fixed;">
                 <thead class="theadCss">
