@@ -3,24 +3,25 @@ module ISightApp {
 
     export class FileUploadController {
 
-        static $inject = ['$scope', '$cookies', '$http', 'dataOnBoardingService', 'restAPIUrlService']
-        constructor(private $scope, private $cookies, private $http, private dataOnBoardingService, private restAPIUrlService:IRestAPIUrlService) {
+        static $inject = ['$scope', '$cookies', '$http', 'dataOnBoardingService', 'restAPIUrlService','$window']
+        constructor(private $scope, private $cookies, private $http, private dataOnBoardingService, private restAPIUrlService:IRestAPIUrlService, private $window) {
 
             var self = this;
             var elem = document.querySelector('#homePageTemplateContainer');
             var homePageControllerScope = angular.element(elem).scope();
             var homePageController = homePageControllerScope['homePageController'];
 
-            this.initApp(this.$scope, this.$cookies, this.$http, this.dataOnBoardingService, homePageController,restAPIUrlService);
+            this.initApp(this.$scope, this.$cookies, this.$http, this.dataOnBoardingService, homePageController,restAPIUrlService, this.$window);
         }
 
-        initApp($scope, $cookies, $http, dataOnBoardingService, homePageController,restAPIUrlService): void {
+        initApp($scope, $cookies, $http, dataOnBoardingService, homePageController,restAPIUrlService, $window): void {
 
             var dropbox = document.getElementById("dropbox")
             $scope.dropText = 'Drop files here...'
             $scope.tableData = [];
             $scope.lines = [];
             $scope.headers = [];
+			$scope.showError = false;
 
             // init event handlers
             function dragEnterLeave(evt) {
@@ -143,7 +144,12 @@ module ISightApp {
                 }).then(function(data, status, headers, config) {
                     $scope.showThrobber = false;
                     $scope.showDisabled= false;
-                    homePageController.templateName = 'dataTaggingDetails';
+					if(data.data.status == "failure"){
+						$scope.showError = true;
+						$window.scrollTo(0, 0);
+					}else{
+						homePageController.templateName = 'dataTaggingDetails';
+					}
 
                 },function(data){
                     $scope.showThrobber = false;
