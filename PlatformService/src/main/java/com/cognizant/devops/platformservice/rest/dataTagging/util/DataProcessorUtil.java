@@ -81,8 +81,9 @@ public class DataProcessorUtil  {
 				}			
 				json.addProperty(DatataggingConstants.CREATIONDATE, Instant.now().toEpochMilli() );
 				gitProperties.add(json);
-				if(totalRecords > 10 ) {
+				if(size == 10 ) {
 					totalSize += size;
+					size = 0;
 					JsonObject graphResponse = dbHandler.bulkCreateNodes(gitProperties, null, query);
 					if(graphResponse.get("response").getAsJsonObject().get("errors").getAsJsonArray().size() > 0){
 						log.error(graphResponse);
@@ -92,7 +93,8 @@ public class DataProcessorUtil  {
 					Thread.sleep(sleepTime);
 					gitProperties = new ArrayList<>();
 				}
-				if(totalSize >= csvRecord.size()) {
+               if(totalSize > totalRecords) {
+					
 					break;
 				}
 				status=true;
