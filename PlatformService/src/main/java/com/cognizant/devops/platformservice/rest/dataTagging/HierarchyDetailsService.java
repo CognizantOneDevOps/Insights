@@ -280,7 +280,7 @@ public class HierarchyDetailsService {
 		return childJson_1;
 	}
 	
-	@RequestMapping(value = "/getHierarchyProperties", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+	@RequestMapping(value = "/getHierarchyProperties", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 	public JsonObject getHierarchyProperties(@RequestParam String level1,@RequestParam String level2, @RequestParam String level3, 
 											 @RequestParam String level4) throws GraphDBException {
 		Neo4jDBHandler dbHandler = new Neo4jDBHandler();
