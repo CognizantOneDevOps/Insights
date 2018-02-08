@@ -21,6 +21,7 @@ module ISightApp {
             $scope.tableData = [];
             $scope.lines = [];
             $scope.headers = [];
+			$scope.showError = false;
 
             // init event handlers
             function dragEnterLeave(evt) {
@@ -143,7 +144,12 @@ module ISightApp {
                 }).then(function(data, status, headers, config) {
                     $scope.showThrobber = false;
                     $scope.showDisabled= false;
-                    homePageController.templateName = 'dataTaggingDetails';
+					if(data.data.status == "failure"){
+						$scope.showError = true;
+
+					}else{
+						homePageController.templateName = 'dataTaggingDetails';
+					}
 
                 },function(data){
                     $scope.showThrobber = false;
