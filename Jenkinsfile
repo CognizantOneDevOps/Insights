@@ -6,16 +6,40 @@ gitCommitID = sh (
     script: 'echo $commitID | cut -d "-" -f2',
     returnStdout: true
 ).trim()
-
-
 // All single and double quotes in this file are used in a certain format.Do not alter in any step 
-
+	//ApacheLicense Check in java and Python files
+	stage ('LicenseCheck') {
+           checkout scm
+    	   def commit = sh (returnStdout: true, script: '''var=''
+	for file in $(find . -print | grep -i -e .*[.]java -e .*[.]py)
+	do
+   	    if grep -q "Apache License" $file; then
+        	updated="License is updated $file" ##Dummy line
+    	    else
+        	file_temp=`echo $file | cut -c 3-`
+        	fileName="$fileName,$file_temp"
+    	    fi
+	done
+	if [ ! -z $fileName ]; then
+    		echo $fileName > files.txt 
+	fi
+	echo " " ''').split()
+	if (fileExists('files.txt')) {
+		echo "**********************License is not updated in the following files**********************"
+    		sh 'cat files.txt'
+    		echo "*****************************************************************************************"
+    		slackSend channel: '#insightsjenkins', color: 'good', message: "BuildFailed for commitID - *$gitCommitID* , BanchName - *$branchName* because Apache License is not updated in few files. \n List of files be found at the bottom of the page @ https://buildon.cogdevops.com/buildon/HistoricCIWebController?commitId=$gitCommitID",  teamDomain: "insightscogdevops",  token: 'slackToken'
+    		sh 'rm -rf files.txt'
+    		sh 'exit 1'
+	} else {
+    		echo 'License is up to date'
+    		}
+  	} //License Check ends	
    // Platform Service Starts
 	try{
 	
    stage ('Insight_PS_Build') {
-        checkout scm
-		sh 'mvn clean install -DskipTests'
+        sh 'mvn clean install -DskipTests'
 	   }
 	
 	stage ('Insight_PS_CodeAnalysis') {
