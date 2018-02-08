@@ -76,3 +76,33 @@ background-color:#e9e9e9;
   height: 10px;
   overflow-y: scroll;
 }
+.agentConfigTable .md-api-table-landing tr:nth-child(even)
+{
+  background-color:#FFF;
+}
+.agentConfigTable  .md-api-table-landing tr:nth-child(even) td 
+{
+    background-color: #FFF;
+}
+.agentConfigTable table {
+	border: 1px solid #a5d28b;
+	width:100%;
+	table-layout:fixed;
+	margin-bottom:10px;
+}
+.agentConfigTable table tbody tr 
+{
+	height:60px;width:100%; 
+	background-color: white !important;
+	margin-bottom: 5px !important;
+}
+.agentConfigTable table tr th {
+	min-width:285px;
+	max-width:22.5%;
+	padding-left:22px;
+}
+.agentConfigTable table tr td {
+	height:56px;
+	max-width:22.5% !important;
+	background-color: white !important;
+}
