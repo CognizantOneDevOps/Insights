@@ -28,7 +28,7 @@ module ISightApp {
             var homePageControllerScope = angular.element(elem).scope();
             var homePageController = homePageControllerScope['homePageController'];
             self.homeController = homePageController;
-             self.dataTaggingDetailsService.getHierarchyMapping()
+            self.dataTaggingDetailsService.getHierarchyMapping()
                 .then(function (data) {
                     self.showThrobber = false;
                     $scope.list = data.data;
@@ -38,15 +38,17 @@ module ISightApp {
                   var level4 = $scope.list[0].children[0].children[0].children[0].name;
                  
                   self.showThrobber = false;
-                        self.dataTaggingDetailsService.getHierarchyProperties(level1,level2,level3,level4)
+                  self.dataTaggingDetailsService.getHierarchyProperties(level1,level2,level3,level4)
                         .then(function (data) {
                          console.log(data);
                          $scope.hierarchyProperties = data.data;
-                        });
+                      });
                        
                 });
+
+             
             
-           this.init($scope,$filter,dataTaggingDetailsService);
+              this.init($scope,$filter,dataTaggingDetailsService);
         }
     showThrobber:boolean = true;
      homeController: HomePageController;

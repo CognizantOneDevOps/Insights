@@ -17,6 +17,9 @@
  -->
 <div layout="column" class="layout" style="width: 100%;" >
   <div ng-controller="FileUploadController" style="min-height:450px">
+  <div  ng-if="showError" style="font-size:16px;margin:auto;border:1px solid #ccc" >
+  <md-icon  style="margin-right:10px" md-svg-src="dist/icons/svg/insightsPage/alert.svg" ng-style="{color:'red',fill:'red',height: '36px', width: '36px'}"></md-icon>Failed to upload data.</div>
+
     <div  style="width:100%;background-color:#f3f3f3;margin-top:10px;border-bottom:1px solid #d8d9da">
       <div class="contentCss fnt" style="padding:15px">
         <div layout flex="100">
