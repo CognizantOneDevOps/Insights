@@ -9,5 +9,3 @@ id,level_1,level_2,level_3,level_4,toolName,toolProperty1,propertyValue1,toolPro
 8,BU8,Account8,Dept3,project3,JENKINS,JobStatus,failed ,AuthorName,test,SprintID,S74,ProjectID,IS5
 9,BU9,Account9,Dept3,project3,JENKINS,JobStatus,success,JobID,S74x4,ProjectName,insights,,
 10,BU0,Account10,,,GIT ,UserStoryID,I547,Release,minor,ProjectName,insights,AuthorName,test
-11,BU11,Account11,,,GIT ,UserStoryID,I547,Release,minor,ProjectName,insights,AuthorName,test
-12,BU6,Account6,Dept2,project2,GIT ,CommitUserName,test,CommitMessage,Bug Fixing,CommitUserID,s123,DefectID,D123
