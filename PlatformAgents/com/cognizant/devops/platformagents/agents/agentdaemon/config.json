@@ -1,0 +1,23 @@
+{
+  "baseExtractionPath":"D:\\TEST\\",
+  "insightsTimeZone": "Asia/Kolkata",
+  "loggingSetting": {
+    "logLevel": "WARN"
+  },
+  "mqConfig": {
+    "host": "127.0.0.1",
+    "password": "guest",
+    "user": "guest",
+    "exchange": "iAgent"
+  },
+  "publish": {
+    "data": "DUMMY.DUMMYDATA.DATA",
+    "health": "DUMMY.DUMMYDATA.HEALTH"
+  },
+  "isDebugAllowed": false,
+  "subscribe": {
+    "agentPkgQueue": "INSIGHTS.AGENTS.PACKAGE"
+  },
+  "timeStampFormat": "%Y-%m-%dT%H:%M:%SZ",
+  "toolsTimeZone": "GMT"
+}
