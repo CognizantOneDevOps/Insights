@@ -55,42 +55,45 @@
             </div>
         </div>
     </div>
-	<div class="agentConfigTable" layout layout-align="center center" ng-repeat="(key,value) in agentManagementController.defaultConfigdata">
-            <table class="md-api-table-landing">
-                <thead class="theadCss">
-                    <tr layout="row" layout-align="start start">
-                        <th flex="22.5" class="tableHeader">
-                            <span class="tableHeadingStyle">{{key}}</span>
-                        </th>
-                    </tr>
-                </thead>
-                <tbody layout="column" flex>				
-                    <tr layout="row" layout-align="start start" ng-repeat="(x,y) in value[0]" >
-                        <td flex="30" layout>
-						<md-autocomplete class="autocompleteEntityCss"
-							md-selected-item="x"
-							md-search-text="muthu" 
-							md-items="item in items | filter: muthu" 							
-							md-item-text="item" 
-							md-min-length="2" 
-							placeholder="Add Value">
-							<md-item-template>
-								<span md-highlight-text="" md-highlight-flags="^i">{{item}}</span>
-							</md-item-template>
-                        </md-autocomplete></td>
-						<td flex="30" layout style="height:56px;max-width:22.5% !important;background-color: white !important;">
-						<md-autocomplete class="autocompleteEntityCss" md-search-text="y" md-items="y"
-                                md-item-text="y" md-min-length="2" placeholder="Add Value">
-                                <md-item-template>
-                                    <span md-highlight-text="" md-highlight-flags="^i">{{value[0]}}</span>
-                                </md-item-template>
-                            </md-autocomplete></td>     
-						
-                    </tr>						
-                </tbody>
-            </table>			
+	<div class="agentConfigTable" layout layout-align="start center" ng-repeat="(key,value) in agentManagementController.defaultConfigdata">
+			<table class="md-api-table-landing" ng-if="agentManagementController.findDataType(key,agentManagementController.defaultConfigdata) == 'object'">
+				<thead class="theadCss">
+					<tr layout="row" layout-align="start start">
+						<th flex="22.5" class="tableHeader">
+							<span class="tableHeadingStyle">{{key}}</span>
+						</th>
+					</tr>
+				</thead>
+				<tbody layout="column" flex>				
+					<tr layout="row" layout-align="start start" ng-repeat="(x,y) in value[0]">
+						<td flex="25" layout><span class="dataHead">{{x}}</span></td>
+						<td flex="25" layout style="height:56px;max-width:22.5% !important;background-color: white !important;">
+							<input class="inputBoxCont" ng-model="agentManagementController.defaultConfigdata[key][0][x]" required  placeholder="">
+						</td>								
+					</tr>						
+				</tbody>
+			</table>			
 	</div>
-	<div id="agentConfigTable" layout layout-align="center center" ng-repeat="header in agentManagementController.headerData['headers']">
+	<div class="agentConfigTable" layout layout-align="start center">
+		<table class="md-api-table-landing">        
+			<thead class="theadCss">
+				<tr layout="row" layout-align="start start">
+					<th flex="22.5" class="tableHeader">
+						<span class="tableHeadingStyle">Others</span>
+					</th>
+				</tr>
+			</thead>			
+			<tbody layout="column" flex ng-repeat="(key,value) in agentManagementController.defaultConfigdata track by $index" ng-if="agentManagementController.findDataType(key,agentManagementController.defaultConfigdata) != 'object'">				
+				<tr layout="row" layout-align="start start">
+					<td flex="25" layout><span class="dataHead">{{key}}</span></td>
+					<td flex="25" layout style="height:56px;max-width:22.5% !important;background-color: white !important;">
+						<input class="inputBoxCont" ng-model="agentManagementController.defaultConfigdata[key]" required  placeholder="">
+					</td>								
+				</tr>						
+			</tbody>
+		</table>		
+	</div>
+	<!-- <div id="agentConfigTable" layout layout-align="center center" ng-repeat="header in agentManagementController.headerData['headers']">
             <table class="md-api-table-landing" style="border: 1px solid #a5d28b;width:100%;table-layout:fixed;">
                 <thead class="theadCss">
                     <tr layout="row" layout-align="start start">
@@ -101,12 +104,11 @@
                 </thead>
                 <tbody layout="column" flex>
                     <tr layout="row" layout-align="start start" style="height:60px;width:100%; background-color: white !important;margin-bottom: 5px !important">
-                        <td flex="23" layout style="height:56px;max-width:22.5% !important">                         
-                        </td>
+                        <td flex="23" layout style="height:56px;max-width:22.5% !important"> </td>
                         <td flex="10" layout style="height:56px;max-width:10%">                           
                         </td>
                     </tr>
                 </tbody>
             </table>
-	</div>
+	</div> -->
 </div>
