@@ -6,16 +6,40 @@ gitCommitID = sh (
     script: 'echo $commitID | cut -d "-" -f2',
     returnStdout: true
 ).trim()
-
-
 // All single and double quotes in this file are used in a certain format.Do not alter in any step 
-
+	//ApacheLicense Check in java and Python files
+	stage ('LicenseCheck') {
+           checkout scm
+    	   def commit = sh (returnStdout: true, script: '''var=''
+	for file in $(find . -print | grep -i -e .*[.]java -e .*[.]py)
+	do
+   	    if grep -q "Apache License" $file; then
+        	updated="License is updated $file" ##Dummy line
+    	    else
+        	file_temp=`echo $file | cut -c 3-`
+        	fileName="$fileName,$file_temp"
+    	    fi
+	done
+	if [ ! -z $fileName ]; then
+    		echo $fileName > files.txt 
+	fi
+	echo " " ''').split()
+	if (fileExists('files.txt')) {
+		echo "**********************License is not updated in the following files**********************"
+    		sh 'cat files.txt'
+    		echo "*****************************************************************************************"
+    		slackSend channel: '#insightsjenkins', color: 'good', message: "BuildFailed for commitID - *$gitCommitID*, Branch - *$branchName* because Apache License is not updated in few files. \n List of files can be found at the bottom of the page @ https://buildon.cogdevops.com/buildon/HistoricCIWebController?commitId=$gitCommitID",  teamDomain: 'insightscogdevops',  token: slackToken
+    		sh 'rm -rf files.txt'
+    		sh 'exit 1'
+	} else {
+    		echo 'License is up to date'
+    		}
+  	} //License Check ends	
    // Platform Service Starts
 	try{
 	
    stage ('Insight_PS_Build') {
-        checkout scm
-		sh 'mvn clean install -DskipTests'
+        sh 'mvn clean install -DskipTests'
 	   }
 	
 	stage ('Insight_PS_CodeAnalysis') {
@@ -48,7 +72,7 @@ gitCommitID = sh (
 	}
 	catch (err){
 		
-	slackSend channel: '#insightsjenkins', color: 'good', message: "BuildFailed for commitID - *$gitCommitID* \n Build Log can be found @ https://buildon.cogdevops.com/buildon/HistoricCIWebController?commitId=$gitCommitID", teamDomain: "insightscogdevops", token: slackToken
+	slackSend channel: '#insightsjenkins', color: 'good', message: "BuildFailed for commitID - *$gitCommitID*, Branch - *$branchName* \n Build Log can be found @ https://buildon.cogdevops.com/buildon/HistoricCIWebController?commitId=$gitCommitID", teamDomain: "insightscogdevops", token: slackToken
 	sh 'exit 1'
 	}
 	
@@ -80,7 +104,7 @@ gitCommitID = sh (
 	} //try ends
 	catch (err){
 		
-	slackSend channel: '#insightsjenkins', color: 'good', message: "BuildFailed for commitID - *$gitCommitID* \n Build Log can be found @ https://buildon.cogdevops.com/buildon/HistoricCIWebController?commitId=$gitCommitID", teamDomain: "insightscogdevops", token: slackToken
+	slackSend channel: '#insightsjenkins', color: 'good', message: "BuildFailed for commitID - *$gitCommitID*, Branch - *$branchName* \n Build Log can be found @ https://buildon.cogdevops.com/buildon/HistoricCIWebController?commitId=$gitCommitID", teamDomain: "insightscogdevops", token: slackToken
 	sh 'exit 1'
 	
 	} //Platform Insights Ends
@@ -113,7 +137,7 @@ gitCommitID = sh (
 	   }
 	 catch (err){
 		
-		slackSend channel: '#insightsjenkins', color: 'good', message: "BuildFailed for commitID - *$gitCommitID* \n Build Log can be found @ https://buildon.cogdevops.com/buildon/HistoricCIWebController?commitId=$gitCommitID", teamDomain: "insightscogdevops", token: slackToken
+		slackSend channel: '#insightsjenkins', color: 'good', message: "BuildFailed for commitID - *$gitCommitID*,Branch - *$branchName* \n Build Log can be found @ https://buildon.cogdevops.com/buildon/HistoricCIWebController?commitId=$gitCommitID", teamDomain: "insightscogdevops", token: slackToken
 		sh 'exit 1'
 		}
 	   
@@ -121,6 +145,6 @@ gitCommitID = sh (
 
         //Send Notification to Slack Channel
 	stage ('SlackNotification') {
-   	    slackSend channel: '#insightsjenkins', color: 'good', message: "New Insights artifacts are uploaded to Nexus for commitID : *${env.commitID}* \n *PlatformService* ${PS_artifact} \n *PlatformEngine* ${PE_artifact} \n *PlatformInsights*  ${PI_artifact} \n *PlatformUI2.0* ${PUI_artifact}", teamDomain: 'insightscogdevops', token: slackToken // "*" is for making the text bold in slack notification
+   	    slackSend channel: '#insightsjenkins', color: 'good', message: "New Insights artifacts are uploaded to Nexus for commitID : *${env.commitID}* ,Branch - *${env.branchName}* \n *PlatformService* ${PS_artifact} \n *PlatformEngine* ${PE_artifact} \n *PlatformInsights*  ${PI_artifact} \n *PlatformUI2.0* ${PUI_artifact}", teamDomain: 'insightscogdevops', token: slackToken // "*" is for making the text bold in slack notification
   	}
 }
