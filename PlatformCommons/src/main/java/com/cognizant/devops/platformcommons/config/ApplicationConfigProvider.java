@@ -49,6 +49,7 @@ public class ApplicationConfigProvider implements Serializable{
 	private boolean enableNativeUsers;
     private boolean enableNativeCorrelations;
     private EmailConfiguration emailConfiguration=new EmailConfiguration();
+    private String docrootUrl;
 
 	private ApplicationConfigProvider(){
 		this.refreshTime = new Date(new Date().getTime() - 86400000);
@@ -218,5 +219,13 @@ public class ApplicationConfigProvider implements Serializable{
 
 	public void setInsightsServiceURL(String insightsServiceURL) {
 		this.insightsServiceURL = insightsServiceURL;
+	}
+
+	public String getDocrootUrl() {
+		return docrootUrl;
+	}
+
+	public void setDocrootUrl(String docrootUrl) {
+		this.docrootUrl = docrootUrl;
 	}
 }
