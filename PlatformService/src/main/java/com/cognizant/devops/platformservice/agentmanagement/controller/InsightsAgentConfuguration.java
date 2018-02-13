@@ -56,10 +56,18 @@ public class InsightsAgentConfuguration {
 		return PlatformServiceUtil.buildSuccessResponseWithData(message);
 	}
 	
-	@RequestMapping(value = "/installAgent", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+	@RequestMapping(value = "/startAgent", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 	public @ResponseBody JsonObject startStopAgent(@RequestParam String agentId,@RequestParam String action) {
 		String message = agentManagementService.startStopAgent(agentId,action);
 		return PlatformServiceUtil.buildSuccessResponseWithData(message);
+	}
+	
+	
+	@RequestMapping(value = "/getAgentDetails", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+	public @ResponseBody JsonObject getAgentDetails() {
+		JsonObject agentDetails = new JsonObject();
+		agentDetails = agentManagementService.getAgentDetails();
+		return PlatformServiceUtil.buildSuccessResponseWithData(agentDetails);
 	}
 	
 }
