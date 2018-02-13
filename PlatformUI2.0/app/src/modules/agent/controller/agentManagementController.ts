@@ -22,20 +22,8 @@ module ISightApp {
             private iconService: IIconService,
 			private $sce,
             private $mdDialog, private $cookies, private toolConfigService: IToolConfigService) {
-            var self = this;			
-			
-			var s = 'A';
-			console.log(s.charCodeAt(0));
-			
-			console.log(String.fromCharCode(65));
+            var self = this;	
 
-			self.headerData['headers'] = [
-			'responseTemplate', 'responseTemplate1'
-			];
-			
-			self.headerData['basicHeaders'] = [
-			'mqConfig', 'subscribe','publish','communication','others','loggingSetting'
-			];
 			
 			self.defaultConfigdata = {
 			 "mqConfig": [{
@@ -53,8 +41,7 @@ module ISightApp {
 			  }],
 			  "communication": [{
 				"type": "REST"
-			  }],
-			  "others" :[{
+			  }],			  
 			  "runSchedule": 30,
 			  "toolsTimeZone" : "GMT",
 			  "insightsTimeZone" : "GMT",
@@ -68,41 +55,27 @@ module ISightApp {
 			  "timeStampField":"createdTime",
 			  "isEpochTimeFormat" : true,
 			  "BaseEndPoint": "http://127.0.0.1:7990/rest/api/1.0/projects/",
-			  "isDebugAllowed" : false,
-			  }],
+			  "isDebugAllowed" : false,			  
 			  "loggingSetting" : [{
 					"logLevel" : "WARN"
 				}] 
-			};
+			};	
 			
-			self.items = ['user', 'krish'];
-		}					
-			
-		/* lowercaseQuery : any;
-		color: any;
-		results : any; */
+		} 
+		
 		headerData = [];
-		items = [];
 		defaultConfigdata = {};
 		addButtIcon: string = "dist/icons/svg/actionIcons/Add_icon_disabled.svg";
         deleteButtIcon: string = "dist/icons/svg/actionIcons/Delete_icon_disabled.svg";
         editButtIcon: string = "dist/icons/svg/actionIcons/Edit_icon_disabled.svg";
         saveButtonIcon: string = "dist/icons/svg/actionIcons/Save_icon_Disabled.svg";
+
 		
-		
-		
-		/* querySearchData(index, Arr): void {
-			
-				this.results = index ? Arr.filter( this.createFilterFor(index) ) : Arr;	
-				return this.results;
+		findDataType(key, arr) : string {				
+			return typeof(arr[key]);
 		}
-			
-		createFilterFor(index): void {
-			  this.lowercaseQuery = angular.lowercase(index);
-			  return function filterFn(this.color) {
-				return (this.color.value.indexOf(this.lowercaseQuery) === 0);
-			  };
-		} */
+		
+		
 	}
 	
 }
