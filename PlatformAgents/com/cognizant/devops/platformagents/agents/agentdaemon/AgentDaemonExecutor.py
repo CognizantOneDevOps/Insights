@@ -125,12 +125,11 @@ class AgentDaemonExecutor:
              if osType == "UNIX":
                 chmodPerm = 'chmod 777 '+scriptPath
                 p = subprocess.Popen(['chmod 777 '+scriptPath,scriptPath],shell=True)
-                p = subprocess.Popen(['cd '+basePath+agentToolName,basePath+agentToolName],shell=True)
-                p = subprocess.Popen([scriptPath],shell=True)
-                stdout, stderr = p.communicate()
+                p = subprocess.Popen([scriptPath],cwd=basePath+agentToolName,shell=True)
+                #stdout, stderr = p.communicate()
                 print('Process id - '+ str(p.returncode))
              
-             self.channel.close(0, 'File Received')
+             #self.channel.close(0, 'File Received')
         
         print('Inside subscribe method')    
         self.channel.basic_consume(callback,queue=routingKey)
