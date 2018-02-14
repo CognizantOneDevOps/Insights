@@ -26,4 +26,5 @@ public interface AgentManagementService {
 	public String startStopAgent(String agentId,String action);
 	public String updateAgent(String agentId, String configDetails);
 	public JsonObject getAgentDetails();
+	public JsonObject getConfigFile(String version, String tool);
 }
