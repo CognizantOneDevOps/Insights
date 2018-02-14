@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+
 @Service("agentManagementService")
 public class AgentManagementServiceImpl  implements AgentManagementService{
 	private static Logger log = Logger.getLogger(AgentManagementServiceImpl.class);
@@ -46,7 +47,7 @@ public class AgentManagementServiceImpl  implements AgentManagementService{
 
 	@Override
 	public JsonObject getAgentDetails() {
-
+		
 		Map<String,ArrayList<String>>  agentDetails = new HashMap<String,ArrayList<String>>();
 		String url = ApplicationConfigProvider.getInstance().getDocrootUrl();
 		JsonObject details = new JsonObject();
@@ -64,14 +65,12 @@ public class AgentManagementServiceImpl  implements AgentManagementService{
 		} catch (IOException e) {
 			log.debug(e);
 		}
-
 		details.add("details", new Gson().toJsonTree(agentDetails));
-
 		return details;
 	}
 
 	private ArrayList<String> getAgents(String string) {
-
+		
 		ArrayList<String> tools = new ArrayList<String>();
 		tools.add("GIT");
 		tools.add("JIRA");
