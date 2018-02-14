@@ -69,6 +69,10 @@
     "user": "iSight",
     "password": "iSight"
   },
+   "agentDetails": {
+   "docrootUrl":"http://platform.cogdevops.com/insights_install/release",
+   "unzipPath":"D://download"
+  },
   "insightsServiceURL": "http://localhost:8080",
   "disableAuth": false,
   "enableNativeUsers": true,
@@ -78,6 +82,5 @@
   "refreshTime": "Jan 22, 2017 5:04:25 PM",
   "trustedHosts": [
     "localhost"
-  ],
-  "docrootUrl":"http://platform.cogdevops.com/insights_install/release/"
+  ]
 }
