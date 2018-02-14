@@ -2,6 +2,8 @@ package com.cognizant.devops.platformservice.agentmanagement.service;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
@@ -44,40 +46,37 @@ public class AgentManagementServiceImpl  implements AgentManagementService{
 
 	@Override
 	public JsonObject getAgentDetails() {
-		
-		String url=ApplicationConfigProvider.getInstance().getDocrootUrl();
-		ArrayList<String> versions=new ArrayList<String>();
-		JsonObject details=new JsonObject();
+
+		Map<String,ArrayList<String>>  agentDetails = new HashMap<String,ArrayList<String>>();
+		String url = ApplicationConfigProvider.getInstance().getDocrootUrl();
+		JsonObject details = new JsonObject();
 		Document doc;
 		try {
 			doc = Jsoup.connect(url).get();
 			Elements rows = doc.getElementsByTag("a");
 			for (Element element : rows) {
 				if( element.text().startsWith("v")){
-					//System.out.println(element.text());
-					versions.add(StringUtils.stripEnd(element.text(),"/"));
+					String version = StringUtils.stripEnd(element.text(),"/");
+					ArrayList<String> toolJson = getAgents(version);
+					agentDetails.put(version, toolJson);
 				}
 			}
 		} catch (IOException e) {
 			log.debug(e);
 		}
-		String versionJson = new Gson().toJson(versions);
-		String toolJson = getAgents();
-		
-		details.add("versions", new Gson().toJsonTree(versionJson));
-		details.add("tools", new Gson().toJsonTree(toolJson));
-		
+
+		details.add("details", new Gson().toJsonTree(agentDetails));
+
 		return details;
 	}
 
-	private String getAgents() {
-		ArrayList<String> tools=new ArrayList<String>();
+	private ArrayList<String> getAgents(String string) {
+
+		ArrayList<String> tools = new ArrayList<String>();
 		tools.add("GIT");
 		tools.add("JIRA");
 		tools.add("JENKINS");
-		
-		String toolJson =new Gson().toJson(tools);
-		return toolJson;
+		return tools;
 	}
 
 }
