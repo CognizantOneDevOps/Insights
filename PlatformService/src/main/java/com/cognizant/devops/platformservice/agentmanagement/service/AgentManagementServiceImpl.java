@@ -15,7 +15,9 @@
  *******************************************************************************/
 package com.cognizant.devops.platformservice.agentmanagement.service;
 
+import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -29,6 +31,7 @@ import org.jsoup.select.Elements;
 import org.springframework.stereotype.Service;
 
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
+import com.cognizant.devops.platformservice.agentmanagement.util.AgentManagementUtil;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 
@@ -62,9 +65,10 @@ public class AgentManagementServiceImpl  implements AgentManagementService{
 
 	@Override
 	public JsonObject getAgentDetails() {
-		
+		/*System.setProperty("http.proxyHost", "proxy.cognizant.com");
+		System.setProperty("http.proxyPort","6050");*/
 		Map<String,ArrayList<String>>  agentDetails = new HashMap<String,ArrayList<String>>();
-		String url = ApplicationConfigProvider.getInstance().getDocrootUrl();
+		String url = ApplicationConfigProvider.getInstance().getAgentDetails().getDocrootUrl();
 		JsonObject details = new JsonObject();
 		Document doc;
 		try {
@@ -85,12 +89,27 @@ public class AgentManagementServiceImpl  implements AgentManagementService{
 	}
 
 	private ArrayList<String> getAgents(String string) {
-		
+
 		ArrayList<String> tools = new ArrayList<String>();
 		tools.add("GIT");
 		tools.add("JIRA");
 		tools.add("JENKINS");
 		return tools;
+	}
+
+	@Override
+	public JsonObject getConfigFile(String version, String tool) {
+
+		JsonObject configJson = null;
+		try {
+			String filePath=ApplicationConfigProvider.getInstance().getAgentDetails().getDocrootUrl()+"/v4.0/agents/PlatformAgents.zip";
+			URL url = new URL(filePath);
+			String targetDir =  ApplicationConfigProvider.getInstance().getAgentDetails().getUnzipPath();
+			configJson = AgentManagementUtil.getInstance().unZipArchive(url, new File(targetDir));
+		} catch (IOException e) {
+			log.debug(e);
+		}
+		return configJson;
 	}
 
 }
