@@ -24,45 +24,71 @@ module ISightApp {
             private $mdDialog, private $cookies, private toolConfigService: IToolConfigService) {
             var self = this;	
 
-			
-			self.defaultConfigdata = {
-			 "mqConfig": [{
+		self.response = {
+			"status": "success",
+			"data": {
+				"versions": {
+					"v4.0": [
+						"GIT",
+						"JIRA",
+						"JENKINS"
+					],
+					"v3.0": [
+						"GIT",
+						"JIRA",
+						"JENKINSss"
+					]
+				}
+			}
+		};
+		
+		for(var key in self.response['data']['versions']){
+			self.versionList.push(key);
+		}
+		
+		self.defaultConfigdata = {
+			  "mqConfig": {
 				"user": "iSight",
 				"password": "iSight",
 				"host": "127.0.0.1",
 				"exchange": "iSight"
-			  }],
-			   "subscribe": [{
-				"config": "ALM.HP.config"
-			  }],
-			  "publish": [{
-				"data": "ALM.HP.DATA",
-				"health": "ALM.HP.HEALTH"
-			  }],
-			  "communication": [{
+			  },
+			  "subscribe": {
+				"config": "ALM.RALLY.config"
+			  },
+			  "publish": {
+				"data": "ALM.RALLY.DATA",
+				"health": "ALM.RALLY.HEALTH"
+			  },
+			  "communication": {
 				"type": "REST"
-			  }],			  
+			  },
+			  "responseTemplate": {
+					"LastUpdateDate": "LastUpdateDate",
+					"Name": "StoryName"
+			  },
+			  "proxy": "proxy.companyname.com:8080/",
+			  "accesstoken":"token",
 			  "runSchedule": 30,
-			  "toolsTimeZone" : "GMT",
-			  "insightsTimeZone" : "GMT",
-			  "StartFrom" : "2017-07-01 00:00:00",
+			  "userid": "userid",
+			  "passwd": "passwd",
+			  "baseUrl": "https://rally1.rallydev.com/slm/webservice/v2.0/",
+			  "startFrom": "2016-10-10 00:01",
+			  "toolsTimeZone" : "Asia/Kolkata",
+			  "insightsTimeZone" : "Asia/Kolkata",
 			  "useResponseTemplate" : true,
-			  "scanAllBranches" : false,
-			  "scanPullRequests": true,
-			  "auth": "base64",
-			  "UserID": "",
-			  "Passwd": "",
-			  "timeStampField":"createdTime",
-			  "isEpochTimeFormat" : true,
-			  "BaseEndPoint": "http://127.0.0.1:7990/rest/api/1.0/projects/",
-			  "isDebugAllowed" : false,			  
-			  "loggingSetting" : [{
+			  "timeStampField":"LastUpdated",
+			  "timeStampFormat":"%Y-%m-%dT%H:%M:%S",
+			  "isDebugAllowed" : false,
+			  "loggingSetting" : {
 					"logLevel" : "WARN"
-				}] 
-			};	
-			
-		} 
+				}
+			};
+		}
 		
+		versionList = [];
+		toolsArr = [];
+		response = {};
 		headerData = [];
 		defaultConfigdata = {};
 		addButtIcon: string = "dist/icons/svg/actionIcons/Add_icon_disabled.svg";
@@ -71,9 +97,15 @@ module ISightApp {
         saveButtonIcon: string = "dist/icons/svg/actionIcons/Save_icon_Disabled.svg";
 
 		
-		findDataType(key, arr) : string {				
+		findDataType(key, arr) : string {			
 			return typeof(arr[key]);
 		}
+		
+		versionOnChange(key): void {								
+			for(var data in this.response['data']['versions'][key]){				
+				this.toolsArr[data] = this.response['data']['versions'][key][data];
+			}		
+		} 
 		
 		
 	}
