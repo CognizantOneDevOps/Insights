@@ -44,8 +44,7 @@ public class AgentManagementServiceImpl  implements AgentManagementService{
 
 	@Override
 	public JsonObject getAgentDetails() {
-		System.setProperty("http.proxyHost", "proxy.cognizant.com");
-        System.setProperty("http.proxyPort","6050");
+		
 		String url=ApplicationConfigProvider.getInstance().getDocrootUrl();
 		ArrayList<String> versions=new ArrayList<String>();
 		JsonObject details=new JsonObject();
