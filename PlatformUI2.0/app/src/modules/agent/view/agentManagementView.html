@@ -18,30 +18,29 @@
 <div layout="column" class="contentCss" flex>
 	<div layout class="applicationButtMar">
         <div layout layout="row" layout-align="center center" class="applicationContentCss">
-            <div layout >           
-                <md-select class="searchApplicationBoxContData inputApplicationBox dataBoardingFieldName"
-                     placeholder="Select Tool" ng-model="toolConfigdata.selectedTool" data-md-container-class="selectdemoSelectHeader">
-                    <md-optgroup label="Tools">
-                        <md-option ng-value="tool">Select OS</md-option>						
-                    </md-optgroup>
-                </md-select>
+            
+			<div layout>
+			<md-select ng-model="agentManagementController.selectedOS" class="searchApplicationBoxContData inputApplicationBox dataBoardingFieldName"
+                     placeholder="Select OS" data-md-container-class="selectdemoSelectHeader">
+						  <md-option value="windows">Windows</md-option>
+						  <md-option value="linux">Linux</md-option>
+			</md-select>
             </div>
-			<div layout >           
-                <md-select class="searchApplicationBoxContData inputApplicationBox dataBoardingFieldName"
-                     placeholder="Select Tool" ng-model="toolConfigdata.selectedTool" data-md-container-class="selectdemoSelectHeader">
-                    <md-optgroup label="Tools">
-                        <md-option ng-value="tool">Select Tool</md-option>						
-                    </md-optgroup>
-                </md-select>
+			<div layout>
+			<md-select ng-model="agentManagementController.selectedVersion" class="searchApplicationBoxContData inputApplicationBox dataBoardingFieldName"
+                     placeholder="Select Version" data-md-container-class="selectdemoSelectHeader" ng-change="agentManagementController.versionOnChange(agentManagementController.selectedVersion)">
+				<md-option  ng-repeat="key in agentManagementController.versionList track by $index" value="{{key}}">{{key}}</md-option>
+						  
+			</md-select>
             </div>
-			<div layout >           
-                <md-select class="searchApplicationBoxContData inputApplicationBox dataBoardingFieldName"
-                     placeholder="Select Tool" ng-model="toolConfigdata.selectedTool" data-md-container-class="selectdemoSelectHeader">
-                    <md-optgroup label="Tools">
-                        <md-option ng-value="tool">Select Version</md-option>						
-                    </md-optgroup>
-                </md-select>
+			
+			<div layout>
+			<md-select ng-model="agentManagementController.selectedTool" class="searchApplicationBoxContData inputApplicationBox dataBoardingFieldName"
+                     placeholder="Select Tool" data-md-container-class="selectdemoSelectHeader">
+				<md-option  ng-repeat="(key, value) in agentManagementController.toolsArr" value="{{value}}">{{value}}</md-option> 
+			</md-select>
             </div>
+			
             <div layout style="margin-left: 100px;">
                 <md-button class="md-raised md-primary configureBut" style="background-color:#387c2c;margin-left: 2px;">
                     START
@@ -64,11 +63,11 @@
 						</th>
 					</tr>
 				</thead>
-				<tbody layout="column" flex>				
-					<tr layout="row" layout-align="start start" ng-repeat="(x,y) in value[0]">
-						<td flex="25" layout><span class="dataHead">{{x}}</span></td>
-						<td flex="25" layout style="height:56px;max-width:22.5% !important;background-color: white !important;">
-							<input class="inputBoxCont" ng-model="agentManagementController.defaultConfigdata[key][0][x]" required  placeholder="">
+				<tbody layout="row" layout-wrap>			
+					<tr flex="50" layout="column" layout-align="start start" ng-repeat="(x,y) in value" style="display: inline-table;">
+						<td flex="15" layout><span class="dataHead">{{x}}</span></td>
+						<td  style="height:56px;background-color: white !important; width: 50% !important;">
+							<input class="inputBoxCont" ng-model="agentManagementController.defaultConfigdata[key][x]" required>
 						</td>								
 					</tr>						
 				</tbody>
@@ -83,15 +82,16 @@
 					</th>
 				</tr>
 			</thead>			
-			<tbody layout="column" flex ng-repeat="(key,value) in agentManagementController.defaultConfigdata track by $index" ng-if="agentManagementController.findDataType(key,agentManagementController.defaultConfigdata) != 'object'">				
-				<tr layout="row" layout-align="start start">
-					<td flex="25" layout><span class="dataHead">{{key}}</span></td>
-					<td flex="25" layout style="height:56px;max-width:22.5% !important;background-color: white !important;">
+			<tbody layout="row" layout-wrap>				
+				<tr flex="50" layout="column" layout-align="start start" ng-repeat="(key,value) in agentManagementController.defaultConfigdata" ng-if="agentManagementController.findDataType(key,agentManagementController.defaultConfigdata) != 'object'" style="display: inline-table;">
+					<td flex="15"><span class="dataHead">{{key}}</span></td>
+					<td  style="height:56px;background-color: white !important; width: 50% !important;">
 						<input class="inputBoxCont" ng-model="agentManagementController.defaultConfigdata[key]" required  placeholder="">
 					</td>								
 				</tr>						
 			</tbody>
-		</table>		
+		</table>				
+		
 	</div>
 	<!-- <div id="agentConfigTable" layout layout-align="center center" ng-repeat="header in agentManagementController.headerData['headers']">
             <table class="md-api-table-landing" style="border: 1px solid #a5d28b;width:100%;table-layout:fixed;">
