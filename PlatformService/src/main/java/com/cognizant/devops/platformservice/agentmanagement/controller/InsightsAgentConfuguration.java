@@ -70,4 +70,12 @@ public class InsightsAgentConfuguration {
 		return PlatformServiceUtil.buildSuccessResponseWithData(agentDetails);
 	}
 	
+	@RequestMapping(value = "/getConfigFile", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+	public @ResponseBody JsonObject getConfigFile(@RequestParam String version,@RequestParam String tool) {
+		JsonObject details = new JsonObject();
+		details = agentManagementService.getConfigFile(version,tool);
+		return PlatformServiceUtil.buildSuccessResponseWithData(details);
+	}
+	
+	
 }
