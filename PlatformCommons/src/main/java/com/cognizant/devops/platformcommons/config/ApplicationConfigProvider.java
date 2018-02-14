@@ -48,8 +48,8 @@ public class ApplicationConfigProvider implements Serializable{
 
 	private boolean enableNativeUsers;
     private boolean enableNativeCorrelations;
-    private EmailConfiguration emailConfiguration=new EmailConfiguration();
-    private String docrootUrl;
+    private EmailConfiguration emailConfiguration = new EmailConfiguration();
+    private AgentDetails agentDetails = new AgentDetails();
 
 	private ApplicationConfigProvider(){
 		this.refreshTime = new Date(new Date().getTime() - 86400000);
@@ -169,6 +169,14 @@ public class ApplicationConfigProvider implements Serializable{
 		return proxyHost;
 	}
 
+	public AgentDetails getAgentDetails() {
+		return agentDetails;
+	}
+
+	public void setAgentDetails(AgentDetails agentDetails) {
+		this.agentDetails = agentDetails;
+	}
+
 	public EmailConfiguration getEmailConfiguration() {
 		return emailConfiguration;
 	}
@@ -221,11 +229,5 @@ public class ApplicationConfigProvider implements Serializable{
 		this.insightsServiceURL = insightsServiceURL;
 	}
 
-	public String getDocrootUrl() {
-		return docrootUrl;
-	}
 
-	public void setDocrootUrl(String docrootUrl) {
-		this.docrootUrl = docrootUrl;
-	}
 }
