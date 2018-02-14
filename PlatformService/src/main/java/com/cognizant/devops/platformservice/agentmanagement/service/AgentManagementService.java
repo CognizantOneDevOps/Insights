@@ -16,8 +16,6 @@
 
 package com.cognizant.devops.platformservice.agentmanagement.service;
 
-import org.springframework.stereotype.Component;
-
 import com.google.gson.JsonObject;
 
 
