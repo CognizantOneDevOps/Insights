@@ -71,7 +71,9 @@
   },
    "agentDetails": {
    "docrootUrl":"http://platform.cogdevops.com/insights_install/release",
-   "unzipPath":"D://download"
+   "unzipPath":"D://download",
+   "agentExchange" : "iAgent",
+   "agentPkgQueue" : "INSIGHTS.AGENTS.PACKAGE"
   },
   "insightsServiceURL": "http://localhost:8080",
   "disableAuth": false,

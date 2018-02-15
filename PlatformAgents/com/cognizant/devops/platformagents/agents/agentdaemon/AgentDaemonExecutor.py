@@ -69,9 +69,6 @@ class AgentDaemonExecutor:
         password = mqConfig.get('password', None)
         host = mqConfig.get('host', None)
         exchangeName = mqConfig.get('exchange', None)
-        print(user)
-        print(host)
-        print(exchangeName)
         credentials = pika.PlainCredentials(user, password)
         self.connection = pika.BlockingConnection(pika.ConnectionParameters(credentials=credentials,host=host))
         self.channel = self.connection.channel()
@@ -91,7 +88,6 @@ class AgentDaemonExecutor:
         routingKey = self.config.get('subscribe').get('agentPkgQueue')
         def callback(ch, method, properties, body):
              h = properties.headers
-             filetype = h.get('fileType')
              fileName = h.get('fileName')
              osType = h.get('osType')
              agentToolName = h.get('agentToolName')
@@ -103,32 +99,27 @@ class AgentDaemonExecutor:
              f.write(body)
              f.close()
              
-             if filetype == "ZIP":
+             if osType == "WINDOWS":
                  zip_ref = zipfile.ZipFile(basePath + fileName, 'r')
                  zip_ref.extractall(basePath+agentToolName)
                  print('Zip File operation complete')
                  zip_ref.close()
-             if filetype == "TAR":
+             if osType == "UNIX":
                 tar_ref = tarfile.open(basePath + fileName, 'r:gz')
                 tar_ref.extractall(basePath+agentToolName)
                 print('Tar file operation completed')
                 tar_ref.close()
-
-             '''
-             Give execution permission and then execute the script. Script should have all steps to handle Agent execution.
-             ''' 
-             scriptPath = basePath + agentToolName + '/'+agentToolName+'.sh'
-             print(scriptPath)
-             
-             if osType == "WINDOWS":
-                 print('Window Specific')
-             if osType == "UNIX":
-                chmodPerm = 'chmod 777 '+scriptPath
+                
+                '''
+                 Give execution permission and then execute the script. Script should have all steps to handle Agent execution.
+                 ''' 
+                scriptPath = basePath + agentToolName + '/'+agentToolName+'.sh'
+                print(scriptPath)
                 p = subprocess.Popen(['chmod 777 '+scriptPath,scriptPath],shell=True)
                 p = subprocess.Popen([scriptPath],cwd=basePath+agentToolName,shell=True)
                 #stdout, stderr = p.communicate()
                 print('Process id - '+ str(p.returncode))
-             
+                
              #self.channel.close(0, 'File Received')
         
         print('Inside subscribe method')    
