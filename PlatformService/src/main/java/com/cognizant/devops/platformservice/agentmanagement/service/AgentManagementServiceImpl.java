@@ -58,7 +58,7 @@ public class AgentManagementServiceImpl  implements AgentManagementService{
 			String agentDaemonQueueName = ApplicationConfigProvider.getInstance().getAgentDetails().getAgentPkgQueue();
 			Path path = Paths.get(ApplicationConfigProvider.getInstance().getAgentDetails().getUnzipPath(),toolName,fileName);
 			byte[] data = Files.readAllBytes(path);
-			publishAgentPackage(agentDaemonQueueName,data,fileName,agentId,toolName,osversion);
+			sendAgentPackage(agentDaemonQueueName,data,fileName,agentId,toolName,osversion);
 		} catch (Exception e) {
 			LOG.error("Error while installing agent..", e);
 			return "Failure";
@@ -145,8 +145,12 @@ public class AgentManagementServiceImpl  implements AgentManagementService{
 		return configJson;
 	}
 	
-	private void publishAgentPackage(String routingKey, byte[] data, String fileName, String agentId, String toolName, String osversion) throws Exception {
-		
+	private void sendAgentPackage(String routingKey, byte[] data, String fileName, String agentId, String toolName, String osversion) throws Exception {
+		BasicProperties props = getBasicProperties(fileName, agentId, toolName, osversion);
+		publishAgentAction(routingKey, data, props);
+	}
+	
+	private void publishAgentAction(String routingKey, byte[] data, BasicProperties props) throws Exception {
 		String exchangeName = ApplicationConfigProvider.getInstance().getAgentDetails().getAgentExchange();
 		ConnectionFactory factory = new ConnectionFactory();
 		factory.setHost(ApplicationConfigProvider.getInstance().getMessageQueue().getHost());
@@ -157,7 +161,7 @@ public class AgentManagementServiceImpl  implements AgentManagementService{
         channel.exchangeDeclare(exchangeName, "topic",true);
         channel.queueDeclare(routingKey, true, false, false, null);
         channel.queueBind(routingKey, exchangeName, routingKey);
-        channel.basicPublish(exchangeName, routingKey, getBasicProperties(fileName,agentId,toolName,osversion), data);
+        channel.basicPublish(exchangeName, routingKey, props, data);
         
         channel.close();
         connection.close();
