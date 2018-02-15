@@ -23,28 +23,23 @@ module ISightApp {
 			private $sce,
             private $mdDialog, private $cookies, private toolConfigService: IToolConfigService) {
             var self = this;	
-
-		self.response = {
-			"status": "success",
-			"data": {
-				"versions": {
-					"v4.0": [
-						"GIT",
-						"JIRA",
-						"JENKINS"
-					],
-					"v3.0": [
-						"GIT",
-						"JIRA",
-						"JENKINSss"
-					]
-				}
-			}
-		};
 		
-		for(var key in self.response['data']['versions']){
-			self.versionList.push(key);
-		}
+			self.agentService.getAgentversionTools()
+			.then(function (data) {			
+			
+				self.response['versions'] = data.data.details;
+
+				for(var key in self.response['versions']){					
+					self.versionList.push(key);
+				}
+				
+			})			
+			.catch(function (data) {												
+				console.log(data);
+			}); 
+
+		
+		
 		
 		self.defaultConfigdata = {
 			  "mqConfig": {
@@ -84,6 +79,8 @@ module ISightApp {
 					"logLevel" : "WARN"
 				}
 			};
+			
+			
 		}
 		
 		versionList = [];
@@ -95,6 +92,7 @@ module ISightApp {
         deleteButtIcon: string = "dist/icons/svg/actionIcons/Delete_icon_disabled.svg";
         editButtIcon: string = "dist/icons/svg/actionIcons/Edit_icon_disabled.svg";
         saveButtonIcon: string = "dist/icons/svg/actionIcons/Save_icon_Disabled.svg";
+			
 
 		
 		findDataType(key, arr) : string {			
@@ -102,9 +100,10 @@ module ISightApp {
 		}
 		
 		versionOnChange(key): void {								
-			for(var data in this.response['data']['versions'][key]){				
-				this.toolsArr[data] = this.response['data']['versions'][key][data];
+			for(var data in this.response['versions'][key]){				
+				this.toolsArr[data] = this.response['versions'][key][data];
 			}		
+			console.log(this.toolsArr);
 		} 
 		
 		
