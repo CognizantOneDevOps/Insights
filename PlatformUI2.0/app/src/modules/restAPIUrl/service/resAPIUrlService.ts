@@ -101,6 +101,8 @@ module ISightApp {
 		 
 		  this.addEndPoint("INSIGHTS_GET",'/PlatformService/insights/inferences');
 		  this.addEndPoint("INSIGHTS_COMP_STATUS",'/PlatformService/ServicesHealthStatus/getStatus');
+		  
+		  this.addEndPoint("GET_AGENT_VERSION_TOOLS", '/PlatformService/admin/agentConfiguration/getAgentDetails');
         }
 
        addEndPoint(name:string, url:string){
