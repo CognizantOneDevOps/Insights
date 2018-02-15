@@ -23,7 +23,8 @@ module ISightApp {
 			private $sce,
             private $mdDialog, private $cookies, private toolConfigService: IToolConfigService) {
             var self = this;	
-		
+			self.showMessage = "Please select version & tools";
+			
 			self.agentService.getAgentversionTools()
 			.then(function (data) {			
 			
@@ -41,7 +42,7 @@ module ISightApp {
 		
 		
 		
-		self.defaultConfigdata = {
+		/* self.defaultConfigdata = {
 			  "mqConfig": {
 				"user": "iSight",
 				"password": "iSight",
@@ -78,11 +79,14 @@ module ISightApp {
 			  "loggingSetting" : {
 					"logLevel" : "WARN"
 				}
-			};
+			}; */
 			
 			
 		}
 		
+		showMessage:string;
+		showConfig: boolean = false;
+		showThrobber: boolean;
 		versionList = [];
 		toolsArr = [];
 		response = {};
@@ -92,19 +96,38 @@ module ISightApp {
         deleteButtIcon: string = "dist/icons/svg/actionIcons/Delete_icon_disabled.svg";
         editButtIcon: string = "dist/icons/svg/actionIcons/Edit_icon_disabled.svg";
         saveButtonIcon: string = "dist/icons/svg/actionIcons/Save_icon_Disabled.svg";
-			
-
-		
+				
 		findDataType(key, arr) : string {			
 			return typeof(arr[key]);
 		}
 		
-		versionOnChange(key): void {								
+		versionOnChange(key): void {	
+			this.toolsArr = [];
 			for(var data in this.response['versions'][key]){				
 				this.toolsArr[data] = this.response['versions'][key][data];
 			}		
 			console.log(this.toolsArr);
 		} 
+		
+		getAgenttoolConfig(version, toolName): void{
+			var self = this;			
+			self.showConfig = false;
+			self.showThrobber = true;	
+			self.showMessage = "";
+			self.agentService.getAgentToolConfig(version, toolName)
+			.then(function (data) {		
+				self.showConfig = true;
+				self.showThrobber = false;
+				self.defaultConfigdata  = data.data;
+				console.log(data);				
+			})			
+			.catch(function (data) {		
+				self.showThrobber = false;							
+				self.showMessage = "Problem with Platform Service, Please try again";
+				console.log(data);
+			}); 
+			
+		}
 		
 		
 	}

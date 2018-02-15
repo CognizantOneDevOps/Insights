@@ -128,3 +128,10 @@ background-color:#e9e9e9;
     font-size: 14px !important;
     color: #666666 !important;
 }
+.agentdefaultMessage{
+	color: green;
+    font-size: 25px;
+    font-style: italic;
+    margin-top: 70px;
+    text-align: center;
+}
