@@ -52,7 +52,8 @@ public class InsightsAgentConfuguration {
 	
 	@RequestMapping(value = "/installAgent", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 	public @ResponseBody JsonObject installAgent(@RequestParam String agentId,@RequestParam String configJson) {
-		String message = agentManagementService.installAgent(agentId,configJson);
+		//String message = agentManagementService.installAgent(agentId,configJson);
+		String message =null;
 		return PlatformServiceUtil.buildSuccessResponseWithData(message);
 	}
 	
