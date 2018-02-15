@@ -26,6 +26,8 @@ public class AgentDetails implements Serializable {
 	
 	private String docrootUrl;
 	private String unzipPath;
+	private String agentExchange;
+	private String agentPkgQueue;
 	
 	public String getDocrootUrl() {
 		return docrootUrl;
@@ -38,6 +40,18 @@ public class AgentDetails implements Serializable {
 	}
 	public void setUnzipPath(String unzipPath) {
 		this.unzipPath = unzipPath;
+	}
+	public String getAgentExchange() {
+		return agentExchange;
+	}
+	public void setAgentExchange(String agentExchange) {
+		this.agentExchange = agentExchange;
+	}
+	public String getAgentPkgQueue() {
+		return agentPkgQueue;
+	}
+	public void setAgentPkgQueue(String agentPkgQueue) {
+		this.agentPkgQueue = agentPkgQueue;
 	}
 
 }
