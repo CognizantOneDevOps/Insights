@@ -44,50 +44,56 @@ public class AgentManagementUtil {
 		return agentManagementUtil;
 	}
 
-	public  JsonObject unZipArchive(URL url, File targetDir) throws IOException {
-		/*System.setProperty("http.proxyHost", "proxy.cognizant.com");
+	public  JsonObject getAgentConfigZipfile(URL filePath, File targetDir) throws IOException  {
+
+		/*	System.setProperty("http.proxyHost", "proxy.cognizant.com");
 		System.setProperty("http.proxyPort","6050");*/
 		if (!targetDir.exists()) {
 			targetDir.mkdirs();
 		}
-		InputStream in = new BufferedInputStream(url.openStream(), 1024);
+		InputStream in = new BufferedInputStream(filePath.openStream(), 1024);
 		File zip = File.createTempFile("agent_", ".zip", targetDir);
 		OutputStream out = new BufferedOutputStream(new FileOutputStream(zip));
 		copyInputStream(in, out);
 		out.close();
-		return unpackArchive(zip, targetDir);
+		return getAgentConfigFile(zip, targetDir);
 	}
 
-	public  JsonObject unpackArchive(File zip, File targetDir) throws IOException {
+	public  JsonObject getAgentConfigFile(File zip, File targetDir) throws IOException {
+
 		if (!zip.exists()) {
 			throw new IOException(zip.getAbsolutePath() + " does not exist");
 		}
 		if (!buildDirectory(targetDir)) {
 			throw new IOException("Could not create directory: " + targetDir);
 		}
-		ZipFile zipFile = new ZipFile(zip);
 		String filePath=null;
-		for (Enumeration entries = zipFile.entries(); entries.hasMoreElements();) {
-			ZipEntry entry = (ZipEntry) entries.nextElement();
-			File file = new File(targetDir, File.separator + entry.getName());
 
-			if (!buildDirectory(file.getParentFile())) {
-				throw new IOException("Could not create directory: " + file.getParentFile());
-			}
+		System.out.println("before zip");
 
-			if (!entry.isDirectory()) {
-				copyInputStream(zipFile.getInputStream(entry), new BufferedOutputStream(new FileOutputStream(file)));
-				if(entry.getName().endsWith("config.json")){
-					filePath=entry.getName();
+		try(ZipFile zipFile = new ZipFile(zip);){
+
+			for (Enumeration entries = zipFile.entries(); entries.hasMoreElements();) {
+				ZipEntry entry = (ZipEntry) entries.nextElement();
+				File file = new File(targetDir, File.separator + entry.getName());
+
+				if (!buildDirectory(file.getParentFile())) {
+					throw new IOException("Could not create directory: " + file.getParentFile());
 				}
 
-			} else {
-				if (!buildDirectory(file)) {
-					throw new IOException("Could not create directory: " + file);
+				if (!entry.isDirectory()) {
+					copyInputStream(zipFile.getInputStream(entry), new BufferedOutputStream(new FileOutputStream(file)));
+					if(entry.getName().endsWith("config.json")){
+						filePath = entry.getName();
+					}
+
+				} else {
+					if (!buildDirectory(file)) {
+						throw new IOException("Could not create directory: " + file);
+					}
 				}
 			}
 		}
-		zipFile.close();
 		JsonObject jsonObject = readJsonFile(targetDir, filePath);
 		return jsonObject;
 	}
