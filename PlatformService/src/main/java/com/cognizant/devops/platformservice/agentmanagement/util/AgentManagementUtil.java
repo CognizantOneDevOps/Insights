@@ -69,8 +69,6 @@ public class AgentManagementUtil {
 		}
 		String filePath=null;
 
-		System.out.println("before zip");
-
 		try(ZipFile zipFile = new ZipFile(zip);){
 
 			for (Enumeration entries = zipFile.entries(); entries.hasMoreElements();) {

@@ -37,7 +37,6 @@ import com.google.gson.JsonObject;
 
 @Service("agentManagementService")
 public class AgentManagementServiceImpl  implements AgentManagementService{
-	private static Logger log = Logger.getLogger(AgentManagementServiceImpl.class);
 
 	@Override
 	public String registerAgent(String configDetails) {
