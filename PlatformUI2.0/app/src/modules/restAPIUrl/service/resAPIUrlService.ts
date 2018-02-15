@@ -103,6 +103,7 @@ module ISightApp {
 		  this.addEndPoint("INSIGHTS_COMP_STATUS",'/PlatformService/ServicesHealthStatus/getStatus');
 		  
 		  this.addEndPoint("GET_AGENT_VERSION_TOOLS", '/PlatformService/admin/agentConfiguration/getAgentDetails');
+		  this.addEndPoint("GET_AGENT_TOOL_CONFIG", '/PlatformService/admin/agentConfiguration/getConfigFile');
         }
 
        addEndPoint(name:string, url:string){

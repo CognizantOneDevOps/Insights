@@ -22,6 +22,7 @@ module ISightApp {
         loadHealthConfigurations(toolName: string, toolCategory:string ): ng.IPromise<any>;
 		loadServerHealthConfiguration(ServerName: string): ng.IPromise<any>;		
 		getAgentversionTools(): ng.IPromise<any>;
+		getAgentToolConfig(Version: string, toolName:string): ng.IPromise<any>;
     }
 
     export class AgentService implements IAgentService {
@@ -49,6 +50,12 @@ module ISightApp {
 			var restHandler = this.restCallHandlerService;			
 			return restHandler.get("GET_AGENT_VERSION_TOOLS");			
 		}
+		
+		getAgentToolConfig(Version: string, toolName:string): ng.IPromise<any> {
+            var restHandler = this.restCallHandlerService;
+            return restHandler.post("GET_AGENT_TOOL_CONFIG",{'version':Version,'tool':toolName},{'Content-Type': 'application/x-www-form-urlencoded'});
+           
+        }
 
 			
     }
