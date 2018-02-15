@@ -18,6 +18,9 @@ package com.cognizant.devops.platformservice.agentmanagement.service;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -34,10 +37,14 @@ import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformservice.agentmanagement.util.AgentManagementUtil;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import com.rabbitmq.client.AMQP.BasicProperties;
+import com.rabbitmq.client.Channel;
+import com.rabbitmq.client.Connection;
+import com.rabbitmq.client.ConnectionFactory;
 
 @Service("agentManagementService")
 public class AgentManagementServiceImpl  implements AgentManagementService{
-	private static Logger log = Logger.getLogger(AgentManagementServiceImpl.class);
+	private static Logger LOG = Logger.getLogger(AgentManagementServiceImpl.class);
 
 	@Override
 	public String registerAgent(String configDetails) {
@@ -46,9 +53,18 @@ public class AgentManagementServiceImpl  implements AgentManagementService{
 	}
 
 	@Override
-	public String installAgent(String agentId, String toolName) {
-		// TODO Auto-generated method stub
-		return null;
+	public String installAgent(String agentId,String toolName,String fileName,String osversion){
+		try {
+			String agentDaemonQueueName = ApplicationConfigProvider.getInstance().getAgentDetails().getAgentPkgQueue();
+			Path path = Paths.get(ApplicationConfigProvider.getInstance().getAgentDetails().getUnzipPath(),toolName,fileName);
+			byte[] data = Files.readAllBytes(path);
+			publishAgentPackage(agentDaemonQueueName,data,fileName,agentId,toolName,osversion);
+		} catch (Exception e) {
+			LOG.error("Error while installing agent..", e);
+			return "Failure";
+		}
+		
+		return "SUCCESS";
 	}
 
 	@Override
@@ -84,7 +100,7 @@ public class AgentManagementServiceImpl  implements AgentManagementService{
 				}
 			}
 		} catch (IOException e) {
-			log.debug(e);
+			LOG.debug(e);
 		}
 		details.add("details", new Gson().toJsonTree(agentDetails));
 		return details;
@@ -108,7 +124,7 @@ public class AgentManagementServiceImpl  implements AgentManagementService{
 
 			}
 		} catch (IOException e) {
-			log.debug(e);
+			LOG.debug(e);
 		}
 		return tools;
 	}
@@ -124,9 +140,42 @@ public class AgentManagementServiceImpl  implements AgentManagementService{
 			String targetDir =  ApplicationConfigProvider.getInstance().getAgentDetails().getUnzipPath();
 			configJson = AgentManagementUtil.getInstance().getAgentConfigZipfile(new URL(filePath), new File(targetDir));
 		} catch (IOException e) {
-			log.debug(e);
+			LOG.debug(e);
 		}
 		return configJson;
+	}
+	
+	private void publishAgentPackage(String routingKey, byte[] data, String fileName, String agentId, String toolName, String osversion) throws Exception {
+		
+		String exchangeName = ApplicationConfigProvider.getInstance().getAgentDetails().getAgentExchange();
+		ConnectionFactory factory = new ConnectionFactory();
+		factory.setHost(ApplicationConfigProvider.getInstance().getMessageQueue().getHost());
+        factory.setUsername(ApplicationConfigProvider.getInstance().getMessageQueue().getUser());
+		factory.setPassword(ApplicationConfigProvider.getInstance().getMessageQueue().getPassword());
+        Connection connection = factory.newConnection();
+        Channel channel = connection.createChannel();
+        channel.exchangeDeclare(exchangeName, "topic",true);
+        channel.queueDeclare(routingKey, true, false, false, null);
+        channel.queueBind(routingKey, exchangeName, routingKey);
+        channel.basicPublish(exchangeName, routingKey, getBasicProperties(fileName,agentId,toolName,osversion), data);
+        
+        channel.close();
+        connection.close();
+	}
+	
+	private BasicProperties getBasicProperties(String fileName,String agentId, String toolName, String osversion) {
+		
+		Map<String,Object> headers = new HashMap<String, Object>();
+		headers.put("fileName", fileName);
+		headers.put("osType",osversion);
+		headers.put("agentToolName", toolName);
+		headers.put("agentId", agentId);
+		
+		BasicProperties.Builder propertiesBuilder = new BasicProperties.Builder();
+		propertiesBuilder.headers(headers);
+		propertiesBuilder.contentEncoding("gzip");
+		
+		return propertiesBuilder.build();
 	}
 
 }
