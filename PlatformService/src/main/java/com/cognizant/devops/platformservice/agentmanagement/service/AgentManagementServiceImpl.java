@@ -65,6 +65,7 @@ public class AgentManagementServiceImpl  implements AgentManagementService{
 
 	@Override
 	public JsonObject getAgentDetails() {
+
 		/*System.setProperty("http.proxyHost", "proxy.cognizant.com");
 		System.setProperty("http.proxyPort","6050");*/
 		Map<String,ArrayList<String>>  agentDetails = new HashMap<String,ArrayList<String>>();
@@ -75,10 +76,11 @@ public class AgentManagementServiceImpl  implements AgentManagementService{
 			doc = Jsoup.connect(url).get();
 			Elements rows = doc.getElementsByTag("a");
 			for (Element element : rows) {
-				if( element.text().startsWith("v")){
+				if( null != element.text() && element.text().startsWith("v")){
 					String version = StringUtils.stripEnd(element.text(),"/");
 					ArrayList<String> toolJson = getAgents(version);
 					agentDetails.put(version, toolJson);
+
 				}
 			}
 		} catch (IOException e) {
@@ -88,12 +90,26 @@ public class AgentManagementServiceImpl  implements AgentManagementService{
 		return details;
 	}
 
-	private ArrayList<String> getAgents(String string) {
+	private ArrayList<String> getAgents(String version) {
 
+		/*System.setProperty("http.proxyHost", "proxy.cognizant.com");
+		System.setProperty("http.proxyPort","6050");*/
+		Document doc;
+		String url = ApplicationConfigProvider.getInstance().getAgentDetails().getDocrootUrl()+"/"+version+"/agents/testagents/";
 		ArrayList<String> tools = new ArrayList<String>();
-		tools.add("GIT");
-		tools.add("JIRA");
-		tools.add("JENKINS");
+		try {
+			doc = Jsoup.connect(url).get();
+			Elements rows = doc.getElementsByTag("a");
+			for (Element element : rows) {
+				if(null != element.text() && element.text().endsWith("/")){
+					tools.add( StringUtils.stripEnd(element.text(),"/"));
+
+				}
+
+			}
+		} catch (IOException e) {
+			log.debug(e);
+		}
 		return tools;
 	}
 
@@ -102,10 +118,11 @@ public class AgentManagementServiceImpl  implements AgentManagementService{
 
 		JsonObject configJson = null;
 		try {
-			String filePath=ApplicationConfigProvider.getInstance().getAgentDetails().getDocrootUrl()+"/v4.0/agents/PlatformAgents.zip";
-			URL url = new URL(filePath);
+			String filePath = ApplicationConfigProvider.getInstance().getAgentDetails().getDocrootUrl()
+					+"/"+version+"/agents/testagents/"+tool;
+			filePath=filePath.trim()+"/"+tool.trim()+".zip";
 			String targetDir =  ApplicationConfigProvider.getInstance().getAgentDetails().getUnzipPath();
-			configJson = AgentManagementUtil.getInstance().unZipArchive(url, new File(targetDir));
+			configJson = AgentManagementUtil.getInstance().getAgentConfigZipfile(new URL(filePath), new File(targetDir));
 		} catch (IOException e) {
 			log.debug(e);
 		}
