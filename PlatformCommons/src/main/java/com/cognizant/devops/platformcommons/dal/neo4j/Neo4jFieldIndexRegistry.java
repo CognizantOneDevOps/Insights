@@ -40,7 +40,6 @@ public class Neo4jFieldIndexRegistry {
 	private static Map<String, List<String>> indexedFieldsRegistry = new HashMap<String, List<String>>();
 	private static Queue<FieldIndexData> indexingRequiredFieldsQueue = new LinkedList<FieldIndexData>();
 	private static final Neo4jFieldIndexRegistry instance = new Neo4jFieldIndexRegistry();
-	private Thread fieldIndexCreatorThread = null;
 	
 	private Neo4jFieldIndexRegistry() {
 		loadFieldIndices();
@@ -60,9 +59,14 @@ public class Neo4jFieldIndexRegistry {
 		if(ApplicationConfigProvider.getInstance().isEnableFieldIndex()) {
 			List<String> indexedFields = indexedFieldsRegistry.get(label);
 			if(indexedFields == null || !indexedFields.contains(field)) {
-				indexingRequiredFieldsQueue.add(new FieldIndexData(label, field));
+				Neo4jDBHandler dbHandler = new Neo4jDBHandler();
+				//indexingRequiredFieldsQueue.add(new FieldIndexData(label, field));
+				JsonObject addFieldIndex = dbHandler.addFieldIndex(label, field);
+				System.out.println(addFieldIndex);
+				FieldIndexData data = indexingRequiredFieldsQueue.poll();
+				System.out.println("Peek---> L: "+label+", F: "+field+" ...... Poll---> L: "+data.getLabel()+", F: "+data.getField());
 			}
-			Neo4jDBHandler dbHandler = new Neo4jDBHandler();
+			/*Neo4jDBHandler dbHandler = new Neo4jDBHandler();
 			while(!indexingRequiredFieldsQueue.isEmpty()) {
 				FieldIndexData fieldData = indexingRequiredFieldsQueue.peek();
 				//createFieldIndex(label, field);
@@ -71,7 +75,7 @@ public class Neo4jFieldIndexRegistry {
 				FieldIndexData data = indexingRequiredFieldsQueue.poll();
 				System.out.println("Peek---> L: "+label+", F: "+field+" ...... Poll---> L: "+data.getLabel()+", F: "+data.getField());
 			}
-			/*if(fieldIndexCreatorThread == null || !fieldIndexCreatorThread.isAlive()) {
+			if(fieldIndexCreatorThread == null || !fieldIndexCreatorThread.isAlive()) {
 				fieldIndexCreatorThread = new Thread(new FieldIndexCreator());
 				fieldIndexCreatorThread.start();
 			}*/
