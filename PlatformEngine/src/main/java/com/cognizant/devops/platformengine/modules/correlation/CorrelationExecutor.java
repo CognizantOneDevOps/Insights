@@ -34,6 +34,7 @@ import com.cognizant.devops.platformcommons.constants.ConfigOptions;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBException;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphResponse;
 import com.cognizant.devops.platformcommons.dal.neo4j.Neo4jDBHandler;
+import com.cognizant.devops.platformcommons.dal.neo4j.Neo4jFieldIndexRegistry;
 import com.cognizant.devops.platformengine.modules.correlation.model.Correlation;
 import com.cognizant.devops.platformengine.modules.correlation.model.CorrelationNode;
 import com.google.gson.Gson;
@@ -66,6 +67,7 @@ public class CorrelationExecutor {
 				return;
 			}
 			for(Correlation correlation: correlations) {
+				applyFieldIndices(correlation);
 				updateNodesMissingCorrelationFields(correlation.getDestination());
 				int availableRecords = 1;
 				while(availableRecords > 0) {
@@ -79,6 +81,25 @@ public class CorrelationExecutor {
 			}
 		}else {
 			log.info("Correlation configuration is not provided.");
+		}
+	}
+	
+	/**
+	 * Identify the correlation fields and add index for these fields
+	 * @param correlation
+	 */
+	private void applyFieldIndices(Correlation correlation) {
+		CorrelationNode source = correlation.getSource();
+		String sourceToolName = source.getToolName();
+		List<String> sourceFields = source.getFields();
+		for(String sourceField : sourceFields) {
+			Neo4jFieldIndexRegistry.getInstance().syncFieldIndex(sourceToolName, sourceField);
+		}
+		CorrelationNode destination = correlation.getDestination();
+		String destinationToolName = destination.getToolName();
+		List<String> destinationFields = destination.getFields();
+		for(String destinationField : destinationFields) {
+			Neo4jFieldIndexRegistry.getInstance().syncFieldIndex(destinationToolName, destinationField);
 		}
 	}
 	

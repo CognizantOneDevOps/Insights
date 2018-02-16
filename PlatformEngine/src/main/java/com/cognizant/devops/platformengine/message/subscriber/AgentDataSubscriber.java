@@ -25,6 +25,7 @@ import org.apache.log4j.Logger;
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBException;
 import com.cognizant.devops.platformcommons.dal.neo4j.Neo4jDBHandler;
+import com.cognizant.devops.platformcommons.dal.neo4j.Neo4jFieldIndexRegistry;
 import com.cognizant.devops.platformengine.message.core.MessageConstants;
 import com.cognizant.devops.platformengine.message.factory.EngineSubscriberResponseHandler;
 import com.google.gson.JsonArray;
@@ -43,12 +44,14 @@ public class AgentDataSubscriber extends EngineSubscriberResponseHandler{
 	private boolean dataUpdateSupported;
 	private String uniqueKey;
 	private String category;
+	private String toolName;
 	
-	public AgentDataSubscriber(String routingKey, boolean dataUpdateSupported, String uniqueKey, String category) throws Exception {
+	public AgentDataSubscriber(String routingKey, boolean dataUpdateSupported, String uniqueKey, String category, String toolName) throws Exception {
 		super(routingKey);
 		this.dataUpdateSupported = dataUpdateSupported;
 		this.uniqueKey = uniqueKey;
 		this.category = category;
+		this.toolName = toolName;
 	}
 
 	public void handleDelivery(String consumerTag, Envelope envelope, BasicProperties properties, byte[] body) throws IOException{
@@ -149,7 +152,7 @@ public class AgentDataSubscriber extends EngineSubscriberResponseHandler{
 		return new ArrayList<T>(list.subList(index, Math.min(N, index + size)));
 	}
 	
-	private static String buildCypherQuery(String labels, String fieldName){
+	private String buildCypherQuery(String labels, String fieldName){
 		StringBuffer query = new StringBuffer();
 		query.append("UNWIND {props} AS properties MERGE (node:LATEST").append(labels).append(" { ");
 		if(fieldName.contains(",")){
@@ -158,18 +161,20 @@ public class AgentDataSubscriber extends EngineSubscriberResponseHandler{
 			for(String field : fields){
 				searchCriteria.addProperty(field, field);
 				query.append(field).append(" : properties.").append(field).append(",");
+				Neo4jFieldIndexRegistry.getInstance().syncFieldIndex(toolName, field);
 			}
 			query.delete(query.length()-1, query.length());
 			query.append(" ");
 		}else {
 			query.append(fieldName).append(" : ").append("properties.").append(fieldName);
+			Neo4jFieldIndexRegistry.getInstance().syncFieldIndex(toolName, fieldName);
 		}
 		query.append(" }) set node+=properties ").append(" ");
 		query.append("return count(node)").append(" ");
 		return query.toString();
 	}
 	
-	private static String buildRelationCypherQuery(JsonObject relationMetadata, String labels) {
+	private String buildRelationCypherQuery(JsonObject relationMetadata, String labels) {
 		JsonObject source = relationMetadata.getAsJsonObject("source");
 		JsonObject destination = relationMetadata.getAsJsonObject("destination");
 		String relationName = relationMetadata.get("name").getAsString();
@@ -211,13 +216,15 @@ public class AgentDataSubscriber extends EngineSubscriberResponseHandler{
 		return cypherQuery.toString();
 	}
 	
-	private static String buildPropertyConstraintQueryPart(JsonObject json, String memberName) {
+	private String buildPropertyConstraintQueryPart(JsonObject json, String memberName) {
 		StringBuffer cypherQuery = new StringBuffer();
 		if(json.has(memberName)) {
 			JsonArray properties = json.getAsJsonArray(memberName);
 			cypherQuery.append("{");
 			for(JsonElement constraint : properties) {
-				cypherQuery.append(constraint.getAsString()).append(" : properties.").append(constraint.getAsString()).append(",");
+				String fieldName = constraint.getAsString();
+				cypherQuery.append(fieldName).append(" : properties.").append(fieldName).append(",");
+				Neo4jFieldIndexRegistry.getInstance().syncFieldIndex(toolName, fieldName);
 			}
 			cypherQuery.delete(cypherQuery.length()-1, cypherQuery.length());
 			cypherQuery.append(" }");

@@ -25,6 +25,7 @@ import org.apache.log4j.Logger;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBException;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphResponse;
 import com.cognizant.devops.platformcommons.dal.neo4j.Neo4jDBHandler;
+import com.cognizant.devops.platformcommons.dal.neo4j.Neo4jFieldIndexRegistry;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -55,6 +56,8 @@ public class DataExtractor{
 	private void updateSCMNodesWithJiraKey() {
 		Neo4jDBHandler dbHandler = new Neo4jDBHandler();
 		try {
+			Neo4jFieldIndexRegistry.getInstance().syncFieldIndex("SCM", "jiraKeyProcessed");
+			Neo4jFieldIndexRegistry.getInstance().syncFieldIndex("SCM", "jiraKeys");
 			String paginationCypher = "MATCH (n:SCM:DATA:RAW) where not exists(n.jiraKeyProcessed) and exists(n.commitId) return count(n) as count";
 			GraphResponse paginationResponse = dbHandler.executeCypherQuery(paginationCypher);
 			int resultCount = paginationResponse.getJson().get("results").getAsJsonArray().get(0).getAsJsonObject().get("data")
@@ -142,6 +145,8 @@ public class DataExtractor{
 	private void enrichJiraData() {
 		Neo4jDBHandler dbHandler = new Neo4jDBHandler();
 		try {
+			Neo4jFieldIndexRegistry.getInstance().syncFieldIndex("JIRA", "_PORTFOLIO_");
+			Neo4jFieldIndexRegistry.getInstance().syncFieldIndex("JIRA", "_PRODUCT_");
 			String jiraProjectCypher = "match (n:JIRA:DATA) where not exists(n._PORTFOLIO_) WITH distinct n.projectKey as projectKey, count(n) as count " + 
 						"OPTIONAL MATCH(m:JIRA:METADATA) where m.pkey=projectKey "
 						+ "WITH {projectKey: projectKey , count: count, portfolio: m.PORTFOLIO, product: m.PRODUCT} as data "

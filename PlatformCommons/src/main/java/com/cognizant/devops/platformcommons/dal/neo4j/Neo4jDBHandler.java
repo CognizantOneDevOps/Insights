@@ -303,6 +303,19 @@ public class Neo4jDBHandler {
 				.post(ClientResponse.class);
 		return response;
 	}
+	
+	/**
+	 * Load the available field indices in Neo4J
+	 * @return
+	 */
+	public JsonArray loadFieldIndices() {
+		WebResource resource = Client.create()
+				.resource(ApplicationConfigProvider.getInstance().getGraph().getEndpoint()+"/db/data/schema/index");
+		ClientResponse response = resource.accept( MediaType.APPLICATION_JSON ).header("Authorization", ApplicationConfigProvider.getInstance().getGraph().getAuthToken())
+				.type(MediaType.APPLICATION_JSON)
+				.get(ClientResponse.class);
+		return new JsonParser().parse(response.getEntity(String.class)).getAsJsonArray();
+	}
 
 
 	/**
