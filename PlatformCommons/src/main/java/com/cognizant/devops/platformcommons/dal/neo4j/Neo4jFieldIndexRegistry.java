@@ -63,7 +63,6 @@ public class Neo4jFieldIndexRegistry {
 				Neo4jDBHandler dbHandler = new Neo4jDBHandler();
 				JsonObject addFieldIndex = dbHandler.addFieldIndex(label, field);
 				indexedFields.add(field);
-				System.out.println(addFieldIndex);
 				log.debug(addFieldIndex);
 			}
 		}
