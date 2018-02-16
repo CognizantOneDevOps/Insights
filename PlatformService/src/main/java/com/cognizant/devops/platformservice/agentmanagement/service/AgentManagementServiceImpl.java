@@ -58,10 +58,10 @@ public class AgentManagementServiceImpl  implements AgentManagementService{
 	@Override
 	public String installAgent(String agentId,String toolName,String fileName,String osversion){
 		try {
-			String agentDaemonQueueName = ApplicationConfigProvider.getInstance().getAgentDetails().getAgentPkgQueue();
+			
 			Path path = Paths.get(ApplicationConfigProvider.getInstance().getAgentDetails().getUnzipPath(),toolName,fileName);
 			byte[] data = Files.readAllBytes(path);
-			sendAgentPackage(agentDaemonQueueName,data,fileName,agentId,toolName,osversion);
+			sendAgentPackage(data,fileName,agentId,toolName,osversion);
 		} catch (Exception e) {
 			LOG.error("Error while installing agent..", e);
 			return "FAILED";
@@ -74,7 +74,7 @@ public class AgentManagementServiceImpl  implements AgentManagementService{
 	public String startStopAgent(String agentId, String action) {
 		try {
 			//Update status in DB and push message to MQ. If MQ fails, DB should be reverted.
-			performAgentAction(agentId,action.getBytes());
+			performAgentAction(agentId,action);
 		} catch (Exception e) {
 			LOG.error("Error while installing agent..", e);
 			return "FAILED";
@@ -155,14 +155,27 @@ public class AgentManagementServiceImpl  implements AgentManagementService{
 		return configJson;
 	}
 	
-	private void sendAgentPackage(String routingKey, byte[] data, String fileName, String agentId, String toolName, String osversion) throws Exception {
-		BasicProperties props = getBasicProperties(fileName, agentId, toolName, osversion);
-		publishAgentAction(routingKey, data, props);
+	private void sendAgentPackage(byte[] data, String fileName, String agentId, String toolName, String osversion) throws Exception {
+		Map<String,Object> headers = new HashMap<String, Object>();
+		headers.put("fileName", fileName);
+		headers.put("osType",osversion);
+		headers.put("agentToolName", toolName);
+		headers.put("agentId", agentId);
+		
+		BasicProperties props = getBasicProperties(headers);
+		
+		String agentDaemonQueueName = ApplicationConfigProvider.getInstance().getAgentDetails().getAgentPkgQueue();
+		
+		publishAgentAction(agentDaemonQueueName, data, props);
 	}
 	
-	private void performAgentAction(String agentId, byte[] action) throws Exception {
-		BasicProperties props = getBasicProperties(null, agentId, null, null);
-		publishAgentAction(agentId, action, props);
+	private void performAgentAction(String agentId, String action) throws Exception {
+		Map<String,Object> headers = new HashMap<String, Object>();
+		headers.put("agentId", agentId);
+		
+		BasicProperties props = getBasicProperties(headers);
+		//agentId will be queue id. Agent code will connect to MQ based on agentId present in config.json
+		publishAgentAction(agentId, action.getBytes(), props);
 	}
 	
 	private void publishAgentAction(String routingKey, byte[] data, BasicProperties props) throws Exception {
@@ -182,17 +195,10 @@ public class AgentManagementServiceImpl  implements AgentManagementService{
         connection.close();
 	}
 	
-	private BasicProperties getBasicProperties(String fileName,String agentId, String toolName, String osversion) {
-		
-		Map<String,Object> headers = new HashMap<String, Object>();
-		headers.put("fileName", fileName);
-		headers.put("osType",osversion);
-		headers.put("agentToolName", toolName);
-		headers.put("agentId", agentId);
+	private BasicProperties getBasicProperties(Map<String,Object> headers) {
 		
 		BasicProperties.Builder propertiesBuilder = new BasicProperties.Builder();
 		propertiesBuilder.headers(headers);
-		propertiesBuilder.contentEncoding("gzip");
 		
 		return propertiesBuilder.build();
 	}
