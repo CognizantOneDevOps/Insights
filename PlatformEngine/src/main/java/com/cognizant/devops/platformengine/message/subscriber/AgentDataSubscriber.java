@@ -89,6 +89,8 @@ public class AgentDataSubscriber extends EngineSubscriberResponseHandler{
 					StringBuffer keys = new StringBuffer();
 					for(JsonElement key : uniqueKeyArray) {
 						keys.append(key.getAsString()).append(",");
+						Neo4jFieldIndexRegistry.getInstance().syncFieldIndex(toolName, key.getAsString());
+						System.out.println("ADS : Attempted indexing field --> "+toolName+": "+key.getAsString());
 					}
 					keys.delete(keys.length()-1, keys.length());
 					uniqueKey = keys.toString();
@@ -162,12 +164,14 @@ public class AgentDataSubscriber extends EngineSubscriberResponseHandler{
 				searchCriteria.addProperty(field, field);
 				query.append(field).append(" : properties.").append(field).append(",");
 				Neo4jFieldIndexRegistry.getInstance().syncFieldIndex(toolName, field);
+				System.out.println("ADS : Attempted indexing field --> "+toolName+": "+field);
 			}
 			query.delete(query.length()-1, query.length());
 			query.append(" ");
 		}else {
 			query.append(fieldName).append(" : ").append("properties.").append(fieldName);
 			Neo4jFieldIndexRegistry.getInstance().syncFieldIndex(toolName, fieldName);
+			System.out.println("ADS : Attempted indexing field --> "+toolName+": "+fieldName);
 		}
 		query.append(" }) set node+=properties ").append(" ");
 		query.append("return count(node)").append(" ");
@@ -224,7 +228,6 @@ public class AgentDataSubscriber extends EngineSubscriberResponseHandler{
 			for(JsonElement constraint : properties) {
 				String fieldName = constraint.getAsString();
 				cypherQuery.append(fieldName).append(" : properties.").append(fieldName).append(",");
-				Neo4jFieldIndexRegistry.getInstance().syncFieldIndex(toolName, fieldName);
 			}
 			cypherQuery.delete(cypherQuery.length()-1, cypherQuery.length());
 			cypherQuery.append(" }");
