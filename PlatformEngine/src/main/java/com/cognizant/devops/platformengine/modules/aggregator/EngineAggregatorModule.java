@@ -74,7 +74,8 @@ public class EngineAggregatorModule implements Job{
 				registry.put(dataRoutingKey, new AgentDataSubscriber(dataRoutingKey, 
 													agentConfig.isDataUpdateSupported(), 
 													agentConfig.getUniqueKey(),
-													agentConfig.getToolCategory()));
+													agentConfig.getToolCategory(),
+													agentConfig.getToolName()));
 			} catch (Exception e) {
 				log.error("Unable to add subscriber for routing key: "+dataRoutingKey,e);
 			}

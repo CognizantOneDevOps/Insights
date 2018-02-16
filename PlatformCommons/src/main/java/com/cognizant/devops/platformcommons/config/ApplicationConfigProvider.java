@@ -48,6 +48,7 @@ public class ApplicationConfigProvider implements Serializable{
 	private boolean enableNativeUsers;
     private CorrelationConfig correlations;
     private EmailConfiguration emailConfiguration=new EmailConfiguration();
+    private boolean enableFieldIndex;
 
 	private ApplicationConfigProvider(){
 		this.refreshTime = new Date(new Date().getTime() - 86400000);
@@ -217,5 +218,13 @@ public class ApplicationConfigProvider implements Serializable{
 
 	public void setCorrelations(CorrelationConfig correlations) {
 		this.correlations = correlations;
+	}
+
+	public boolean isEnableFieldIndex() {
+		return enableFieldIndex;
+	}
+
+	public void setEnableFieldIndex(boolean enableFieldIndex) {
+		this.enableFieldIndex = enableFieldIndex;
 	}
 }
