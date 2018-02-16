@@ -34,6 +34,7 @@ import org.jsoup.select.Elements;
 import org.springframework.stereotype.Service;
 
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
+import com.cognizant.devops.platformengine.message.core.MessageConstants;
 import com.cognizant.devops.platformservice.agentmanagement.util.AgentManagementUtil;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
@@ -47,8 +48,10 @@ public class AgentManagementServiceImpl  implements AgentManagementService{
 	private static Logger LOG = Logger.getLogger(AgentManagementServiceImpl.class);
 
 	@Override
-	public String registerAgent(String configDetails) {
-		// TODO Auto-generated method stub
+	public String registerAgent(String toolName,String agentVersion,String osversion,String configDetails) {
+		// register agent in DB
+		//Create zip/tar file with updated config.json
+		//call installAgent method
 		return null;
 	}
 
@@ -61,7 +64,7 @@ public class AgentManagementServiceImpl  implements AgentManagementService{
 			sendAgentPackage(agentDaemonQueueName,data,fileName,agentId,toolName,osversion);
 		} catch (Exception e) {
 			LOG.error("Error while installing agent..", e);
-			return "Failure";
+			return "FAILED";
 		}
 		
 		return "SUCCESS";
@@ -69,13 +72,20 @@ public class AgentManagementServiceImpl  implements AgentManagementService{
 
 	@Override
 	public String startStopAgent(String agentId, String action) {
-		// TODO Auto-generated method stub
-		return null;
+		try {
+			//Update status in DB and push message to MQ. If MQ fails, DB should be reverted.
+			performAgentAction(agentId,action.getBytes());
+		} catch (Exception e) {
+			LOG.error("Error while installing agent..", e);
+			return "FAILED";
+		}
+		return "SUCCESS";
 	}
 
 	@Override
 	public String updateAgent(String agentId, String configDetails) {
-		// TODO Auto-generated method stub
+		// Code to update DB
+		// Call installAgent method and pass all required values
 		return null;
 	}
 
@@ -138,7 +148,7 @@ public class AgentManagementServiceImpl  implements AgentManagementService{
 					+"/"+version+"/agents/testagents/"+tool;
 			filePath=filePath.trim()+"/"+tool.trim()+".zip";
 			String targetDir =  ApplicationConfigProvider.getInstance().getAgentDetails().getUnzipPath();
-			configJson = AgentManagementUtil.getInstance().getAgentConfigZipfile(new URL(filePath), new File(targetDir));
+			configJson = AgentManagementUtil.getInstance().getAgentConfigfile(new URL(filePath), new File(targetDir));
 		} catch (IOException e) {
 			LOG.debug(e);
 		}
@@ -150,6 +160,11 @@ public class AgentManagementServiceImpl  implements AgentManagementService{
 		publishAgentAction(routingKey, data, props);
 	}
 	
+	private void performAgentAction(String agentId, byte[] action) throws Exception {
+		BasicProperties props = getBasicProperties(null, agentId, null, null);
+		publishAgentAction(agentId, action, props);
+	}
+	
 	private void publishAgentAction(String routingKey, byte[] data, BasicProperties props) throws Exception {
 		String exchangeName = ApplicationConfigProvider.getInstance().getAgentDetails().getAgentExchange();
 		ConnectionFactory factory = new ConnectionFactory();
@@ -158,7 +173,7 @@ public class AgentManagementServiceImpl  implements AgentManagementService{
 		factory.setPassword(ApplicationConfigProvider.getInstance().getMessageQueue().getPassword());
         Connection connection = factory.newConnection();
         Channel channel = connection.createChannel();
-        channel.exchangeDeclare(exchangeName, "topic",true);
+        channel.exchangeDeclare(exchangeName, MessageConstants.EXCHANGE_TYPE,true);
         channel.queueDeclare(routingKey, true, false, false, null);
         channel.queueBind(routingKey, exchangeName, routingKey);
         channel.basicPublish(exchangeName, routingKey, props, data);
