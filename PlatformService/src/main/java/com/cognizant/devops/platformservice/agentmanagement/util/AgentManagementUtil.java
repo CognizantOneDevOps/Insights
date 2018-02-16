@@ -44,7 +44,7 @@ public class AgentManagementUtil {
 		return agentManagementUtil;
 	}
 
-	public  JsonObject getAgentConfigZipfile(URL filePath, File targetDir) throws IOException  {
+	public  JsonObject getAgentConfigfile(URL filePath, File targetDir) throws IOException  {
 
 		/*	System.setProperty("http.proxyHost", "proxy.cognizant.com");
 		System.setProperty("http.proxyPort","6050");*/

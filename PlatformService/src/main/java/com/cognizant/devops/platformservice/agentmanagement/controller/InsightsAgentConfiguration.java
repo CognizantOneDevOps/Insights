@@ -31,16 +31,17 @@ import com.google.gson.JsonObject;
 
 @RestController
 @RequestMapping("/admin/agentConfiguration")
-public class InsightsAgentConfuguration {
+public class InsightsAgentConfiguration {
 	
-	private static final Logger LOG = Logger.getLogger(InsightsAgentConfuguration.class);
+	private static final Logger LOG = Logger.getLogger(InsightsAgentConfiguration.class);
 	
 	@Autowired
 	AgentManagementService agentManagementService;
 	
 	@RequestMapping(value = "/registerAgent", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public @ResponseBody JsonObject registerAgent(@RequestParam String configJson) {
-		String message = agentManagementService.registerAgent(configJson);
+	public @ResponseBody JsonObject registerAgent(@RequestParam String toolName,@RequestParam String agentVersion,
+												  @RequestParam String osversion,@RequestParam String configDetails) {
+		String message = agentManagementService.registerAgent(toolName, agentVersion, osversion, configDetails);
 		return PlatformServiceUtil.buildSuccessResponseWithData(message);
 	}
 	

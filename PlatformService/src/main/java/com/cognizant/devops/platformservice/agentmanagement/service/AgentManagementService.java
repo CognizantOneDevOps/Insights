@@ -21,7 +21,7 @@ import com.google.gson.JsonObject;
 
 public interface AgentManagementService {
 
-	public String registerAgent(String configDetails);
+	public String registerAgent(String toolName,String agentVersion,String osversion,String configDetails);
 	public String installAgent(String agentId,String toolName,String fileName,String osversion);
 	public String startStopAgent(String agentId,String action);
 	public String updateAgent(String agentId, String configDetails);
