@@ -17,10 +17,8 @@ package com.cognizant.devops.platformcommons.dal.neo4j;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Queue;
 
 import org.apache.log4j.Logger;
 
@@ -38,7 +36,6 @@ import com.google.gson.JsonObject;
 public class Neo4jFieldIndexRegistry {
 	private static final Logger log = Logger.getLogger(Neo4jFieldIndexRegistry.class);
 	private static Map<String, List<String>> indexedFieldsRegistry = new HashMap<String, List<String>>();
-	private static Queue<FieldIndexData> indexingRequiredFieldsQueue = new LinkedList<FieldIndexData>();
 	private static final Neo4jFieldIndexRegistry instance = new Neo4jFieldIndexRegistry();
 	
 	private Neo4jFieldIndexRegistry() {
@@ -55,30 +52,20 @@ public class Neo4jFieldIndexRegistry {
 	 * @param label
 	 * @param field
 	 */
-	public void syncFieldIndex(String label, String field) {
+	public synchronized void syncFieldIndex(String label, String field) {
 		if(ApplicationConfigProvider.getInstance().isEnableFieldIndex()) {
 			List<String> indexedFields = indexedFieldsRegistry.get(label);
-			if(indexedFields == null || !indexedFields.contains(field)) {
+			if(indexedFields == null) {
+				indexedFields = new ArrayList<String>();
+				indexedFieldsRegistry.put(label, indexedFields);
+			}
+			if(!indexedFields.contains(field)) {
 				Neo4jDBHandler dbHandler = new Neo4jDBHandler();
-				//indexingRequiredFieldsQueue.add(new FieldIndexData(label, field));
 				JsonObject addFieldIndex = dbHandler.addFieldIndex(label, field);
+				indexedFields.add(field);
 				System.out.println(addFieldIndex);
-				FieldIndexData data = indexingRequiredFieldsQueue.poll();
-				System.out.println("Peek---> L: "+label+", F: "+field+" ...... Poll---> L: "+data.getLabel()+", F: "+data.getField());
+				log.debug(addFieldIndex);
 			}
-			/*Neo4jDBHandler dbHandler = new Neo4jDBHandler();
-			while(!indexingRequiredFieldsQueue.isEmpty()) {
-				FieldIndexData fieldData = indexingRequiredFieldsQueue.peek();
-				//createFieldIndex(label, field);
-				JsonObject addFieldIndex = dbHandler.addFieldIndex(fieldData.getLabel(), fieldData.getField());
-				System.out.println(addFieldIndex);
-				FieldIndexData data = indexingRequiredFieldsQueue.poll();
-				System.out.println("Peek---> L: "+label+", F: "+field+" ...... Poll---> L: "+data.getLabel()+", F: "+data.getField());
-			}
-			if(fieldIndexCreatorThread == null || !fieldIndexCreatorThread.isAlive()) {
-				fieldIndexCreatorThread = new Thread(new FieldIndexCreator());
-				fieldIndexCreatorThread.start();
-			}*/
 		}
 	}
 	
@@ -112,66 +99,5 @@ public class Neo4jFieldIndexRegistry {
 		syncFieldIndex("DATA", "maxCorrelationTime");
 		syncFieldIndex("DATA", "inSightsTime");
 		syncFieldIndex("DATA", "inSightsTimeX");
-	}
-	
-	
-	class FieldIndexCreator implements Runnable {		
-		/**
-		 * Execute the index creation in parallel. 
-		 */
-		@Override
-		public void run() {
-			Neo4jDBHandler dbHandler = new Neo4jDBHandler();
-			while(!indexingRequiredFieldsQueue.isEmpty()) {
-				FieldIndexData fieldData = indexingRequiredFieldsQueue.peek();
-				String label = fieldData.getLabel();
-				String field = fieldData.getField();
-				//createFieldIndex(label, field);
-				JsonObject addFieldIndex = dbHandler.addFieldIndex(label, field);
-				System.out.println(addFieldIndex);
-				FieldIndexData data = indexingRequiredFieldsQueue.poll();
-				System.out.println("Peek---> L: "+label+", F: "+field+" ...... Poll---> L: "+data.getLabel()+", F: "+data.getField());
-				/*int totalSleepTime = 5 * 60; //Total wait time in seconds
-				while(true) {
-					loadFieldIndices();
-					List<String> indexedFields = indexedFieldsRegistry.get(label);
-					if(indexedFields == null || !indexedFields.contains(field)) {
-						try {
-							System.out.println("Thread sleeping for 10 secs");
-							Thread.sleep(10 * 1000); //Wait till the index is online.
-							System.out.println("Thread woke up after 10 secs");
-							totalSleepTime = totalSleepTime - 10;
-							if(totalSleepTime < 0) {
-								break;
-							}
-						} catch (InterruptedException e) {
-							log.error("Index creator thread interrupted.", e);
-						}
-					}else {
-						FieldIndexData data = indexingRequiredFieldsQueue.poll();
-						System.out.println("Peek---> L: "+label+", F: "+field+" ...... Poll---> L: "+data.getLabel()+", F: "+data.getField());
-						break;
-					}
-				}*/
-			}
-		}
-		
-		/**
-		 * For give label and field, create index in Neo4j
-		 * @param label
-		 * @param field
-		 */
-		private void createFieldIndex(String label, String field) {
-			String query = "CREATE INDEX ON :"+label+"("+field+")";
-			Neo4jDBHandler dbHandler = new Neo4jDBHandler();
-			try {
-				System.out.println(query);
-				GraphResponse executeCypherQuery = dbHandler.executeCypherQuery(query);
-				log.debug(executeCypherQuery.getJson());
-				System.out.println(executeCypherQuery.getJson());
-			} catch (GraphDBException e) {
-				log.error("Unable to add field index with query: "+query, e);
-			}
-		}
 	}
 }
