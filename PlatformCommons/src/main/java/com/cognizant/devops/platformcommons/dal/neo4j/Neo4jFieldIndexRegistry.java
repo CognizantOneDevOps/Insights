@@ -62,10 +62,19 @@ public class Neo4jFieldIndexRegistry {
 			if(indexedFields == null || !indexedFields.contains(field)) {
 				indexingRequiredFieldsQueue.add(new FieldIndexData(label, field));
 			}
-			if(fieldIndexCreatorThread == null || !fieldIndexCreatorThread.isAlive()) {
+			Neo4jDBHandler dbHandler = new Neo4jDBHandler();
+			while(!indexingRequiredFieldsQueue.isEmpty()) {
+				FieldIndexData fieldData = indexingRequiredFieldsQueue.peek();
+				//createFieldIndex(label, field);
+				JsonObject addFieldIndex = dbHandler.addFieldIndex(fieldData.getLabel(), fieldData.getField());
+				System.out.println(addFieldIndex);
+				FieldIndexData data = indexingRequiredFieldsQueue.poll();
+				System.out.println("Peek---> L: "+label+", F: "+field+" ...... Poll---> L: "+data.getLabel()+", F: "+data.getField());
+			}
+			/*if(fieldIndexCreatorThread == null || !fieldIndexCreatorThread.isAlive()) {
 				fieldIndexCreatorThread = new Thread(new FieldIndexCreator());
 				fieldIndexCreatorThread.start();
-			}
+			}*/
 		}
 	}
 	
@@ -108,12 +117,17 @@ public class Neo4jFieldIndexRegistry {
 		 */
 		@Override
 		public void run() {
+			Neo4jDBHandler dbHandler = new Neo4jDBHandler();
 			while(!indexingRequiredFieldsQueue.isEmpty()) {
 				FieldIndexData fieldData = indexingRequiredFieldsQueue.peek();
 				String label = fieldData.getLabel();
 				String field = fieldData.getField();
-				createFieldIndex(label, field);
-				int totalSleepTime = 5 * 60; //Total wait time in seconds
+				//createFieldIndex(label, field);
+				JsonObject addFieldIndex = dbHandler.addFieldIndex(label, field);
+				System.out.println(addFieldIndex);
+				FieldIndexData data = indexingRequiredFieldsQueue.poll();
+				System.out.println("Peek---> L: "+label+", F: "+field+" ...... Poll---> L: "+data.getLabel()+", F: "+data.getField());
+				/*int totalSleepTime = 5 * 60; //Total wait time in seconds
 				while(true) {
 					loadFieldIndices();
 					List<String> indexedFields = indexedFieldsRegistry.get(label);
@@ -134,7 +148,7 @@ public class Neo4jFieldIndexRegistry {
 						System.out.println("Peek---> L: "+label+", F: "+field+" ...... Poll---> L: "+data.getLabel()+", F: "+data.getField());
 						break;
 					}
-				}
+				}*/
 			}
 		}
 		
