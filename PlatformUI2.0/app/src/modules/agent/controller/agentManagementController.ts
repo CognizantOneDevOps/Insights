@@ -37,53 +37,11 @@ module ISightApp {
 			})			
 			.catch(function (data) {												
 				console.log(data);
-			}); 
-
-		
-		
-		
-		/* self.defaultConfigdata = {
-			  "mqConfig": {
-				"user": "iSight",
-				"password": "iSight",
-				"host": "127.0.0.1",
-				"exchange": "iSight"
-			  },
-			  "subscribe": {
-				"config": "ALM.RALLY.config"
-			  },
-			  "publish": {
-				"data": "ALM.RALLY.DATA",
-				"health": "ALM.RALLY.HEALTH"
-			  },
-			  "communication": {
-				"type": "REST"
-			  },
-			  "responseTemplate": {
-					"LastUpdateDate": "LastUpdateDate",
-					"Name": "StoryName"
-			  },
-			  "proxy": "proxy.companyname.com:8080/",
-			  "accesstoken":"token",
-			  "runSchedule": 30,
-			  "userid": "userid",
-			  "passwd": "passwd",
-			  "baseUrl": "https://rally1.rallydev.com/slm/webservice/v2.0/",
-			  "startFrom": "2016-10-10 00:01",
-			  "toolsTimeZone" : "Asia/Kolkata",
-			  "insightsTimeZone" : "Asia/Kolkata",
-			  "useResponseTemplate" : true,
-			  "timeStampField":"LastUpdated",
-			  "timeStampFormat":"%Y-%m-%dT%H:%M:%S",
-			  "isDebugAllowed" : false,
-			  "loggingSetting" : {
-					"logLevel" : "WARN"
-				}
-			}; */
-			
+			}); 			
 			
 		}
 		
+		selectedTool: string;
 		showMessage:string;
 		showConfig: boolean = false;
 		showThrobber: boolean;
@@ -101,12 +59,13 @@ module ISightApp {
 			return typeof(arr[key]);
 		}
 		
-		versionOnChange(key): void {	
+		
+		versionOnChange(key): void {				
+			this.selectedTool = "";			
 			this.toolsArr = [];
 			for(var data in this.response['versions'][key]){				
 				this.toolsArr[data] = this.response['versions'][key][data];
-			}		
-			console.log(this.toolsArr);
+			}					
 		} 
 		
 		getAgenttoolConfig(version, toolName): void{
@@ -119,7 +78,6 @@ module ISightApp {
 				self.showConfig = true;
 				self.showThrobber = false;
 				self.defaultConfigdata  = data.data;
-				console.log(data);				
 			})			
 			.catch(function (data) {		
 				self.showThrobber = false;							
