@@ -99,6 +99,12 @@ class AgentDaemonExecutor:
              f.write(body)
              f.close()
              
+             zip_ref = zipfile.ZipFile(basePath + fileName, 'r')
+             zip_ref.extractall(basePath+agentToolName)
+             print('Zip File operation complete')
+             zip_ref.close()
+             
+             '''    
              if osType == "WINDOWS":
                  zip_ref = zipfile.ZipFile(basePath + fileName, 'r')
                  zip_ref.extractall(basePath+agentToolName)
@@ -109,18 +115,21 @@ class AgentDaemonExecutor:
                 tar_ref.extractall(basePath+agentToolName)
                 print('Tar file operation completed')
                 tar_ref.close()
+             '''
+             '''
+             Give execution permission and then execute the script. Script should have all steps to handle Agent execution.
+             ''' 
+             if osType == "WINDOWS":
+                 scriptPath = basePath + agentToolName + '\\'+agentToolName+'.cmd'
+                 p = subprocess.Popen([scriptPath],cwd=basePath+agentToolName,shell=True)
+             if osType == "UNIX":   
+                 scriptPath = basePath + agentToolName + '/'+agentToolName+'.sh'
+                 p = subprocess.Popen(['chmod 777 '+scriptPath,scriptPath],shell=True)
+                 p = subprocess.Popen([scriptPath],cwd=basePath+agentToolName,shell=True)
+                 #stdout, stderr = p.communicate()
+                 print('Process id - '+ str(p.returncode))
                 
-                '''
-                 Give execution permission and then execute the script. Script should have all steps to handle Agent execution.
-                 ''' 
-                scriptPath = basePath + agentToolName + '/'+agentToolName+'.sh'
-                print(scriptPath)
-                p = subprocess.Popen(['chmod 777 '+scriptPath,scriptPath],shell=True)
-                p = subprocess.Popen([scriptPath],cwd=basePath+agentToolName,shell=True)
-                #stdout, stderr = p.communicate()
-                print('Process id - '+ str(p.returncode))
-                
-             #self.channel.close(0, 'File Received')
+             self.channel.close(0, 'File Received')
         
         print('Inside subscribe method')    
         self.channel.basic_consume(callback,queue=routingKey)
