@@ -48,6 +48,7 @@ class SonarAgent(BaseAgent):
             if timeMachineapi == "yes":
                 sonarExecutionsUrl = baseUrl+"api/timemachine/index?metrics="+metricsParam+"&resource="+projectKey+"&fromDateTime="+timestamp+"&format=json"
             else:
+                timestamp=timestamp.replace("+","%2B")
                 sonarExecutionsUrl = baseUrl+"api/measures/search_history?metrics="+metricsParam+"&component="+projectKey+"&from="+timestamp+"&format=json"
             sonarExecutions = self.getResponse(sonarExecutionsUrl, 'GET', userId, password, None)
             lastUpdatedDate = None
