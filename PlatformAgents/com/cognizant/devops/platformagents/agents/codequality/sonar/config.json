@@ -16,15 +16,15 @@
   "subscribe": {
     "config": "CODEQUALITY.SONAR.config"
   },
-  "metrics" : ["alert_status", "complexity", "coverage", "new_coverage", "duplicated_blocks", "duplicated_files", "duplicated_line", "new_violations", "sqale_index", "sqale_debt_ratio", "new_sqale_debt_ratio"],
+  "metrics" : ["alert_status", "complexity", "coverage", "new_coverage", "duplicated_blocks", "duplicated_files", "duplicated_lines", "new_violations", "sqale_index", "sqale_debt_ratio", "new_sqale_debt_ratio"],
   "toolName": "SONAR",
   "runSchedule": 30,
   "timeStampField": "metricdate",
   "UserId":"admin",
   "Password":"admin",
-  "timeMachineapi": "yes",
+  "timeMachineapi": "no",
   "timeStampFormat": "%Y-%m-%dT%H:%M:%S",
-  "StartFrom": "2015-10-10 00:01:01",
+  "StartFrom": "2018-01-01 00:01:01",
   "toolsTimeZone": "Asia/Kolkata",
   "useResponseTemplate": false,
   "isDebugAllowed": false,
