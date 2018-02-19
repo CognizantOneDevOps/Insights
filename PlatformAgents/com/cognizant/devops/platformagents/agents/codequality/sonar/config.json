@@ -22,6 +22,7 @@
   "timeStampField": "metricdate",
   "UserId":"admin",
   "Password":"admin",
+  "timeMachineapi": "yes",
   "timeStampFormat": "%Y-%m-%dT%H:%M:%S",
   "StartFrom": "2015-10-10 00:01:01",
   "toolsTimeZone": "Asia/Kolkata",
