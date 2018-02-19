@@ -33,6 +33,7 @@ class SonarAgent(BaseAgent):
         startFrom = startFrom.strftime(timeStampFormat)
         userId = self.config.get("UserId", '')
         password = self.config.get("Password", '')
+        timeMachineapi = self.config.get("timeMachineapi", '')
         sonarProjects = self.getResponse(projectsUrl, 'GET', userId, password, None)
         metrics = self.config.get("metrics", '')
         metricsParam = ''
@@ -44,25 +45,41 @@ class SonarAgent(BaseAgent):
             projectKey = project["k"]
             projectName = project["nm"]
             timestamp = self.tracking.get(projectKey, startFrom)
-            sonarExecutionsUrl = baseUrl+"api/timemachine/index?metrics="+metricsParam+"&resource="+projectKey+"&fromDateTime="+timestamp+"&format=json"
+            if timeMachineapi == "yes":
+                sonarExecutionsUrl = baseUrl+"api/timemachine/index?metrics="+metricsParam+"&resource="+projectKey+"&fromDateTime="+timestamp+"&format=json"
+            else:
+                timestamp=timestamp.replace("+","%2B")
+                sonarExecutionsUrl = baseUrl+"api/measures/search_history?metrics="+metricsParam+"&component="+projectKey+"&from="+timestamp+"&format=json"
             sonarExecutions = self.getResponse(sonarExecutionsUrl, 'GET', userId, password, None)
             lastUpdatedDate = None
-            for sonarExecution in sonarExecutions:
-                metricsColumns = []
-                cols = sonarExecution['cols']
-                for col in cols:
-                    metricsColumns.append(col['metric'])
-                cells = sonarExecution['cells']
-                for cell in cells:
-                    executionData = {}
-                    executionData['metricdate'] = cell['d']
-                    executionData["resourcekey"] = projectKey
-                    executionData["projectName"] = projectName
-                    metricValues = cell['v']
-                    for i in range(len(metricValues)):
-                        executionData[metricsColumns[i]] = metricValues[i]
-                    data.append(executionData)
-                    lastUpdatedDate = executionData['metricdate']
+            if timeMachineapi =="yes":
+                for sonarExecution in sonarExecutions:
+                    metricsColumns = []
+                    cols = sonarExecution['cols']
+                    for col in cols:
+                        metricsColumns.append(col['metric'])
+                    cells = sonarExecution['cells']
+                    for cell in cells:
+                        executionData = {}
+                        executionData['metricdate'] = cell['d']
+                        executionData["resourcekey"] = projectKey
+                        executionData["projectName"] = projectName
+                        metricValues = cell['v']
+                        for i in range(len(metricValues)):
+                            executionData[metricsColumns[i]] = metricValues[i]
+                        data.append(executionData)
+                        lastUpdatedDate = executionData['metricdate']
+            else:
+                for historydata in range(0,len(sonarExecutions['measures'][0]['history'])):
+                    executionData={}                              
+                    for i_metric_length in range(0,len(sonarExecutions['measures'])):                    
+                        if 'value' in sonarExecutions['measures'][i_metric_length]['history'][historydata]:
+                            executionData['resourcekey']=projectKey
+                            executionData["projectName"] = projectName
+                            executionData['metricdate']=sonarExecutions['measures'][i_metric_length]['history'][historydata]['date']
+                            executionData[sonarExecutions['measures'][i_metric_length]['metric']]=sonarExecutions['measures'][i_metric_length]['history'][historydata]['value']                                     
+                    data.append(executionData)            
+                    lastUpdatedDate = executionData['metricdate']                
             if lastUpdatedDate:
                 lastUpdatedDate = lastUpdatedDate[:self.dateTimeLength]
                 dt = datetime.strptime(lastUpdatedDate, timeStampFormat)
