@@ -21,6 +21,7 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -49,6 +50,7 @@ public class AgentManagementServiceImpl  implements AgentManagementService{
 
 	@Override
 	public String registerAgent(String toolName,String agentVersion,String osversion,String configDetails) {
+		String agentId = getAgentkey(toolName);
 		// register agent in DB
 		//Create zip/tar file with updated config.json
 		//call installAgent method
@@ -201,6 +203,10 @@ public class AgentManagementServiceImpl  implements AgentManagementService{
 		propertiesBuilder.headers(headers);
 		
 		return propertiesBuilder.build();
+	}
+	
+	private String getAgentkey(String toolName) {
+		return toolName + "-"+ Instant.now().toEpochMilli();
 	}
 
 }

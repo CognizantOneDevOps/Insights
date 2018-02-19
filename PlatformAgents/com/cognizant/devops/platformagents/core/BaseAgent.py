@@ -34,6 +34,7 @@ class BaseAgent(object):
        
     def __init__(self):
         try:
+            self.shouldAgentRun = True;
             self.setupAgent()
         except Exception as ex:
             self.publishHealthData(self.generateHealthData(ex=ex))
@@ -121,13 +122,34 @@ class BaseAgent(object):
         if mqConfig == None:
             raise ValueError('BaseAgent: unable to initialize MQ. mqConfig is not found')
         
-        self.messageFactory = MessageFactory(mqConfig.get('user', None), 
-                                             mqConfig.get('password', None), 
-                                             mqConfig.get('host', None), 
-                                             mqConfig.get('exchange', None))
+        user = mqConfig.get('user', None)
+        mqPass =  mqConfig.get('password', None)
+        host = mqConfig.get('host', None)
+        exchange = mqConfig.get('exchange', None)
+        agentCtrlXchg  = mqConfig.get('agentControlXchg', None)
+        
+        self.messageFactory = MessageFactory(user,mqPass,host,exchange)
         if self.messageFactory == None:
             raise ValueError('BaseAgent: unable to initialize MQ. messageFactory is Null')
         
+        self.agentCtrlMessageFactory = MessageFactory(user,mqPass,host,agentCtrlXchg)
+
+    '''
+    Subscribe for Agent START/STOP exchange and queue
+    '''
+    def subscriberForAgentControl(self):
+        routingKey = self.config.get('subscribe').get('agentCtrlQueue')
+        def callback(ch, method, properties, data):
+            #Update the config file and cache.
+            action = data
+            if "START_AGENT" == action:
+                self.shouldAgentRun = True
+            if "STOP_AGENT" == action:
+                self.shouldAgentRun = False
+                self.publishHealthData(self.generateHealthData("Agent is in STOP mode"))
+            ch.basic_ack(delivery_tag = method.delivery_tag)
+        self.agentCtrlMessageFactory.subscribe(routingKey, callback)
+           
     '''
     Subscribe for Engine Config Changes. Any changes to respective agent will be consumed and processed here.
     '''
@@ -261,16 +283,21 @@ class BaseAgent(object):
                 pass
     
     def execute(self):
-        try:
-            self.executionStartTime = datetime.now()
-            self.logIndicator(self.EXECUTION_START, self.config.get('isDebugAllowed', False))
-            self.executionId = str(uuid.uuid1())
-            self.process()
-            self.publishHealthData(self.generateHealthData())
-        except Exception as ex:
-            self.publishHealthData(self.generateHealthData(ex=ex))
-            logging.error(ex)
-            self.logIndicator(self.EXECUTION_ERROR, self.config.get('isDebugAllowed', False))
+        
+        if self.shouldAgentRun == True:
+            print('Agent is in START mode')
+            try:
+                self.executionStartTime = datetime.now()
+                self.logIndicator(self.EXECUTION_START, self.config.get('isDebugAllowed', False))
+                self.executionId = str(uuid.uuid1())
+                self.process()
+                self.publishHealthData(self.generateHealthData())
+            except Exception as ex:
+                self.publishHealthData(self.generateHealthData(ex=ex))
+                logging.error(ex)
+                self.logIndicator(self.EXECUTION_ERROR, self.config.get('isDebugAllowed', False))
+        if self.shouldAgentRun == False:
+            print('Agent is in STOP mode')
         
     def process(self):
         '''
