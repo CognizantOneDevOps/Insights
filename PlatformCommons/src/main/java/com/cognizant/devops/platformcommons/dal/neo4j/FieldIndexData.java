@@ -13,27 +13,33 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  ******************************************************************************/
-package com.cognizant.devops.platformengine.modules.correlation.model;
+package com.cognizant.devops.platformcommons.dal.neo4j;
 
-import java.util.List;
 /**
+ * 
  * @author Vishal Ganjare (vganjare)
+ * Data model to hold the field index attributes
  *
  */
-public class CorrelationNode {
-	private String toolName;
-	private List<String> fields;
+public class FieldIndexData {
+	private String label;
+	private String field;
 	
-	public String getToolName() {
-		return toolName;
+	public FieldIndexData(String label, String field) {
+		this.label = label;
+		this.field = field;
 	}
-	public void setToolName(String toolName) {
-		this.toolName = toolName;
+	
+	public String getLabel() {
+		return label;
 	}
-	public List<String> getFields() {
-		return fields;
+	public void setLabel(String label) {
+		this.label = label;
 	}
-	public void setFields(List<String> fields) {
-		this.fields = fields;
+	public String getField() {
+		return field;
+	}
+	public void setField(String field) {
+		this.field = field;
 	}
 }
