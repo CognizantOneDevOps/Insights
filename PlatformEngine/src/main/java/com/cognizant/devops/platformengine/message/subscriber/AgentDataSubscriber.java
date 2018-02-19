@@ -25,6 +25,7 @@ import org.apache.log4j.Logger;
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBException;
 import com.cognizant.devops.platformcommons.dal.neo4j.Neo4jDBHandler;
+import com.cognizant.devops.platformcommons.dal.neo4j.Neo4jFieldIndexRegistry;
 import com.cognizant.devops.platformengine.message.core.MessageConstants;
 import com.cognizant.devops.platformengine.message.factory.EngineSubscriberResponseHandler;
 import com.google.gson.JsonArray;
@@ -43,12 +44,14 @@ public class AgentDataSubscriber extends EngineSubscriberResponseHandler{
 	private boolean dataUpdateSupported;
 	private String uniqueKey;
 	private String category;
+	private String toolName;
 	
-	public AgentDataSubscriber(String routingKey, boolean dataUpdateSupported, String uniqueKey, String category) throws Exception {
+	public AgentDataSubscriber(String routingKey, boolean dataUpdateSupported, String uniqueKey, String category, String toolName) throws Exception {
 		super(routingKey);
 		this.dataUpdateSupported = dataUpdateSupported;
 		this.uniqueKey = uniqueKey;
 		this.category = category;
+		this.toolName = toolName;
 	}
 
 	public void handleDelivery(String consumerTag, Envelope envelope, BasicProperties properties, byte[] body) throws IOException{
@@ -63,6 +66,7 @@ public class AgentDataSubscriber extends EngineSubscriberResponseHandler{
 		JsonElement json = new JsonParser().parse(message);
 		boolean dataUpdateSupported = this.dataUpdateSupported;
 		String uniqueKey = this.uniqueKey;
+		JsonObject relationMetadata = null;
 		if(json.isJsonObject()) {
 			JsonObject messageObject = json.getAsJsonObject();
 			json = messageObject.get("data");
@@ -81,7 +85,17 @@ public class AgentDataSubscriber extends EngineSubscriberResponseHandler{
 					dataUpdateSupported = metadata.get("dataUpdateSupported").getAsBoolean();
 				}
 				if(metadata.has("uniqueKey")) {
-					uniqueKey = metadata.get("uniqueKey").getAsString();
+					JsonArray uniqueKeyArray = metadata.getAsJsonArray("uniqueKey");
+					StringBuffer keys = new StringBuffer();
+					for(JsonElement key : uniqueKeyArray) {
+						keys.append(key.getAsString()).append(",");
+						Neo4jFieldIndexRegistry.getInstance().syncFieldIndex(toolName, key.getAsString());
+					}
+					keys.delete(keys.length()-1, keys.length());
+					uniqueKey = keys.toString();
+				}
+				if(metadata.has("relation")) {
+					relationMetadata = metadata.get("relation").getAsJsonObject();
 				}
 			}
 		}
@@ -101,7 +115,9 @@ public class AgentDataSubscriber extends EngineSubscriberResponseHandler{
 						queryLabel += ":"+label;
 					}
 				}
-				if(dataUpdateSupported){
+				if(relationMetadata != null) {
+					cypherQuery = buildRelationCypherQuery(relationMetadata, queryLabel);
+				}else if(dataUpdateSupported){
 					cypherQuery = buildCypherQuery(queryLabel, uniqueKey);
 				}else{
 					cypherQuery = "UNWIND {props} AS properties CREATE (n"+queryLabel+") set n=properties return count(n)";
@@ -137,7 +153,7 @@ public class AgentDataSubscriber extends EngineSubscriberResponseHandler{
 		return new ArrayList<T>(list.subList(index, Math.min(N, index + size)));
 	}
 	
-	private static String buildCypherQuery(String labels, String fieldName){
+	private String buildCypherQuery(String labels, String fieldName){
 		StringBuffer query = new StringBuffer();
 		query.append("UNWIND {props} AS properties MERGE (node:LATEST").append(labels).append(" { ");
 		if(fieldName.contains(",")){
@@ -146,14 +162,73 @@ public class AgentDataSubscriber extends EngineSubscriberResponseHandler{
 			for(String field : fields){
 				searchCriteria.addProperty(field, field);
 				query.append(field).append(" : properties.").append(field).append(",");
+				Neo4jFieldIndexRegistry.getInstance().syncFieldIndex(toolName, field);
 			}
 			query.delete(query.length()-1, query.length());
 			query.append(" ");
 		}else {
 			query.append(fieldName).append(" : ").append("properties.").append(fieldName);
+			Neo4jFieldIndexRegistry.getInstance().syncFieldIndex(toolName, fieldName);
 		}
 		query.append(" }) set node+=properties ").append(" ");
 		query.append("return count(node)").append(" ");
 		return query.toString();
+	}
+	
+	private String buildRelationCypherQuery(JsonObject relationMetadata, String labels) {
+		JsonObject source = relationMetadata.getAsJsonObject("source");
+		JsonObject destination = relationMetadata.getAsJsonObject("destination");
+		String relationName = relationMetadata.get("name").getAsString();
+		StringBuffer cypherQuery = new StringBuffer();
+		cypherQuery.append("UNWIND {props} AS properties MERGE (source").append(labels);
+		if(source.has("labels")) {
+			JsonArray sourceLabels = source.getAsJsonArray("labels");
+			for(JsonElement sourceLabel : sourceLabels) {
+				String label = sourceLabel.getAsString();
+				if(label != null && !labels.contains(label)) {
+					cypherQuery.append(":").append(label);
+				}
+			}
+		}
+		cypherQuery.append(buildPropertyConstraintQueryPart(source, "constraints"));
+		cypherQuery.append(") WITH source, properties ");
+		cypherQuery.append("MERGE (destination").append(labels);
+		if(destination.has("labels")) {
+			JsonArray destinationLabels = destination.getAsJsonArray("labels");
+			for(JsonElement destinationLabel : destinationLabels) {
+				String label = destinationLabel.getAsString();
+				if(label != null && !labels.contains(label)) {
+					cypherQuery.append(":").append(label);
+				}
+			}
+		}
+		cypherQuery.append(buildPropertyConstraintQueryPart(destination, "constraints"));
+		cypherQuery.append(")");
+		cypherQuery.append(" MERGE (source)-[r:").append(relationName).append("]->(destination) ");
+		if(relationMetadata.has("properties")) {
+			cypherQuery.append(" set ");
+			JsonArray properties = relationMetadata.getAsJsonArray("properties");
+			for(JsonElement property : properties) {
+				cypherQuery.append("r.").append(property.getAsString()).append(" = properties.").append(property.getAsString()).append(",");
+			}
+			cypherQuery.delete(cypherQuery.length()-1, cypherQuery.length());
+		}
+		//cypherQuery.append(buildPropertyConstraintQueryPart(relationMetadata, "properties"));
+		return cypherQuery.toString();
+	}
+	
+	private String buildPropertyConstraintQueryPart(JsonObject json, String memberName) {
+		StringBuffer cypherQuery = new StringBuffer();
+		if(json.has(memberName)) {
+			JsonArray properties = json.getAsJsonArray(memberName);
+			cypherQuery.append("{");
+			for(JsonElement constraint : properties) {
+				String fieldName = constraint.getAsString();
+				cypherQuery.append(fieldName).append(" : properties.").append(fieldName).append(",");
+			}
+			cypherQuery.delete(cypherQuery.length()-1, cypherQuery.length());
+			cypherQuery.append(" }");
+		}
+		return cypherQuery.toString();
 	}
 }

@@ -45,10 +45,10 @@ public class ApplicationConfigProvider implements Serializable{
 	private int proxyPort;
 	private Date refreshTime;
 	private List<String> trustedHosts = new ArrayList<String>(3);	
-
 	private boolean enableNativeUsers;
-    private boolean enableNativeCorrelations;
+    private CorrelationConfig correlations;
     private EmailConfiguration emailConfiguration=new EmailConfiguration();
+    private boolean enableFieldIndex;
 
 	private ApplicationConfigProvider(){
 		this.refreshTime = new Date(new Date().getTime() - 86400000);
@@ -203,14 +203,6 @@ public class ApplicationConfigProvider implements Serializable{
 	public void setTrustedHosts(List<String> trustedHosts) {
 		this.trustedHosts = trustedHosts;
 	}
-	
-    public boolean isEnableNativeCorrelations() {
-        return enableNativeCorrelations;
-    }
-
-    public void setEnableNativeCorrelations(boolean enableNativeCorrelations) {
-        this.enableNativeCorrelations = enableNativeCorrelations;
-    }
 
 	public String getInsightsServiceURL() {
 		return insightsServiceURL;
@@ -218,5 +210,21 @@ public class ApplicationConfigProvider implements Serializable{
 
 	public void setInsightsServiceURL(String insightsServiceURL) {
 		this.insightsServiceURL = insightsServiceURL;
+	}
+
+	public CorrelationConfig getCorrelations() {
+		return correlations;
+	}
+
+	public void setCorrelations(CorrelationConfig correlations) {
+		this.correlations = correlations;
+	}
+
+	public boolean isEnableFieldIndex() {
+		return enableFieldIndex;
+	}
+
+	public void setEnableFieldIndex(boolean enableFieldIndex) {
+		this.enableFieldIndex = enableFieldIndex;
 	}
 }
