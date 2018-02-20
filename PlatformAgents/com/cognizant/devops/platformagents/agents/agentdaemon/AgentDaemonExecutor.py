@@ -68,68 +68,81 @@ class AgentDaemonExecutor:
         user = mqConfig.get('user', None)
         password = mqConfig.get('password', None)
         host = mqConfig.get('host', None)
-        exchangeName = mqConfig.get('exchange', None)
+        agentCtrlXchg  = mqConfig.get('agentExchange', None)
+        
         credentials = pika.PlainCredentials(user, password)
         self.connection = pika.BlockingConnection(pika.ConnectionParameters(credentials=credentials,host=host))
         self.channel = self.connection.channel()
-        self.channel.exchange_declare(exchange=exchangeName, exchange_type='topic', durable=True)
+        self.channel.exchange_declare(exchange=agentCtrlXchg, exchange_type='topic', durable=True)
                
-    def publish(self):
-        jsonData = "abcdtest"
-        self.channel.basic_publish(exchange='iAgent',
-                              routing_key='Test_MQ_1',
-                              body=jsonData,
-         properties=pika.BasicProperties(
-           delivery_mode=2 #make message persistent
-         ))
-        #self.connection.close() 
+    def publishDaemonHealthData(self, ex=None):
+        
+        health = {}
+        
+        health['status'] = 'failure'
+        health['message'] = 'Agent Daemon has errors: '+str(ex)
+        data = json.dumps(health)
+        
+        mqConfig = self.config.get('mqConfig', None)
+        
+        healthExchange = mqConfig.get('exchange', None)
+        healthQueue = self.config.get('publish').get('health')
+        credentials = pika.PlainCredentials(mqConfig.get('user', None), 
+                                            mqConfig.get('password', None))
+        connection = pika.BlockingConnection(pika.ConnectionParameters(credentials=credentials,host=mqConfig.get('host', None)))
+        channel = connection.channel()
+        channel.exchange_declare(exchange=healthExchange, exchange_type='topic', durable=True)
+        channel.queue_declare(queue=healthQueue, passive=False, durable=True, exclusive=False, auto_delete=False, arguments=None)
+        channel.queue_bind(queue=healthQueue, exchange=healthExchange, routing_key=healthQueue, arguments=None)
+        channel.basic_publish(exchange=healthExchange,routing_key=healthQueue,body=data,properties=pika.BasicProperties(
+                                        delivery_mode=2 #make message persistent
+                                    ))
+        connection.close() 
         
     def subscribe(self):
         routingKey = self.config.get('subscribe').get('agentPkgQueue')
         def callback(ch, method, properties, body):
-             h = properties.headers
-             fileName = h.get('fileName')
-             osType = h.get('osType')
-             agentToolName = h.get('agentToolName')
-             #Code for handling subscribed messages
-             ch.basic_ack(delivery_tag = method.delivery_tag)
-             
-             basePath = self.config.get('baseExtractionPath')
-             f = open(basePath + fileName, 'wb')
-             f.write(body)
-             f.close()
-             
-             zip_ref = zipfile.ZipFile(basePath + fileName, 'r')
-             zip_ref.extractall(basePath+agentToolName)
-             print('Zip File operation complete')
-             zip_ref.close()
-             
-             '''    
-             if osType == "WINDOWS":
-                 zip_ref = zipfile.ZipFile(basePath + fileName, 'r')
-                 zip_ref.extractall(basePath+agentToolName)
+            
+            try:
+                 h = properties.headers
+                 pkgFileName = h.get('fileName')
+                 osType = h.get('osType')
+                 agentToolName = h.get('agentToolName')
+                 agentId = h.get('agentId')
+                 #Code for handling subscribed messages
+                 ch.basic_ack(delivery_tag = method.delivery_tag)
+                 
+                 basePath = self.config.get('baseExtractionPath')
+                 f = open(basePath + os.path.sep + pkgFileName, 'wb')
+                 f.write(body)
+                 f.close()
+                 
+                 scriptPath = basePath + os.path.sep + agentToolName +os.path.sep + agentId
+                 
+                 zip_ref = zipfile.ZipFile(basePath + os.path.sep + pkgFileName, 'r')
+                 zip_ref.extractall(scriptPath)
                  print('Zip File operation complete')
                  zip_ref.close()
-             if osType == "UNIX":
-                tar_ref = tarfile.open(basePath + fileName, 'r:gz')
-                tar_ref.extractall(basePath+agentToolName)
-                print('Tar file operation completed')
-                tar_ref.close()
-             '''
-             '''
-             Give execution permission and then execute the script. Script should have all steps to handle Agent execution.
-             ''' 
-             if osType == "WINDOWS":
-                 scriptPath = basePath + agentToolName + '\\'+agentToolName+'.cmd'
-                 p = subprocess.Popen([scriptPath],cwd=basePath+agentToolName,shell=True)
-             if osType == "UNIX":   
-                 scriptPath = basePath + agentToolName + '/'+agentToolName+'.sh'
-                 p = subprocess.Popen(['chmod 777 '+scriptPath,scriptPath],shell=True)
-                 p = subprocess.Popen([scriptPath],cwd=basePath+agentToolName,shell=True)
-                 #stdout, stderr = p.communicate()
-                 print('Process id - '+ str(p.returncode))
+                 
+                 '''
+                 Give execution permission and then execute the script. Script should have all steps to handle Agent execution.
+                 ''' 
+                 if osType == "WINDOWS":
+                     scriptFile = scriptPath + os.path.sep +'installagent.cmd'
+                     p = subprocess.Popen([scriptFile],cwd=scriptPath,shell=True)
+                 if osType == "UNIX":   
+                     scriptFile = scriptPath + os.path.sep +'installagent.sh'
+                     p = subprocess.Popen(['chmod 777 '+scriptFile,scriptFile],shell=True)
+                     p = subprocess.Popen([scriptFile],cwd=scriptPath,shell=True)
+                     #stdout, stderr = p.communicate()
+                     print('Process id - '+ str(p.returncode))
+            except Exception as ex:
+                print('There is exception')
+                self.publishDaemonHealthData(ex)
+                logging.error(ex)
+                #self.logIndicator(self.EXECUTION_ERROR, self.config.get('isDebugAllowed', False)) 
                 
-             self.channel.close(0, 'File Received')
+            self.channel.close(0, 'File Received')
         
         print('Inside subscribe method')    
         self.channel.basic_consume(callback,queue=routingKey)
