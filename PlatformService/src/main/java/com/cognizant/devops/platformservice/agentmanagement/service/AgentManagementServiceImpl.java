@@ -35,7 +35,6 @@ import org.jsoup.select.Elements;
 import org.springframework.stereotype.Service;
 
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
-import com.cognizant.devops.platformengine.message.core.MessageConstants;
 import com.cognizant.devops.platformservice.agentmanagement.util.AgentManagementUtil;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
@@ -43,6 +42,8 @@ import com.rabbitmq.client.AMQP.BasicProperties;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
+import com.cognizant.devops.platformcommons.constants.MessageConstants;
+
 
 @Service("agentManagementService")
 public class AgentManagementServiceImpl  implements AgentManagementService{
