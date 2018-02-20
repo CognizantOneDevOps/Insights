@@ -17,7 +17,7 @@
 /// <reference path="_all.ts" />
 
 module ISightApp {
-    angular.module('iSightApp', ['ngMaterial', 'ngRoute', 'ngResource', 'ngMessages', 'ngCookies','ngAnimate','ui.bootstrap','googlechart'])
+    angular.module('iSightApp', ['ngMaterial', 'ngRoute', 'ngResource', 'ngMessages', 'ngCookies','ngAnimate','ui.bootstrap','googlechart','ngTable'])
         .service('pipelineService', PipelineService)
         .service('graphService', GraphService)
         .service('elasticSearchService', ElasticSearchService)
@@ -49,6 +49,7 @@ module ISightApp {
         .controller('oneToolConfigurationController', OneToolConfigurationController)
         .controller('agentController', AgentController)
 		.controller('agentManagementController', AgentManagementController)
+		.controller('agentListController', AgentListController)
         .controller('singleToolConfigurationController', SingleToolConfigurationController)
         .controller('dataTaggingController', DataTaggingController)
         .controller('insightsController', InsightsController)
@@ -153,6 +154,11 @@ module ISightApp {
                          templateUrl: './dist/modules/agent/view/agentManagementView.html',
                         controller: AgentManagementController,
                         controllerAs: 'agentManagementController'
+                     }).
+					  when('/InSights/agentList', {
+                         templateUrl: './dist/modules/agent/view/agentListView.html',
+                        controller: AgentListController,
+                        controllerAs: 'agentListController'
                      }).
 
                     otherwise({
