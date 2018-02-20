@@ -32,10 +32,10 @@ module ISightApp {
                 .then(function (data) {
                     self.showThrobber = false;
                     $scope.list = data.data;
-                    var level1 = $scope.list[0].name;
-                  var level2 = $scope.list[0].children[0].name;
-                  var level3 = $scope.list[0].children[0].children[0].name;
-                  var level4 = $scope.list[0].children[0].children[0].children[0].name;
+                    var level1 = $scope.list[0].name || '';
+                  var level2 = $scope.list[0].children[0].name || '';
+                  var level3 = $scope.list[0].children[0].children[0].name || '';
+                  var level4 = $scope.list[0].children[0].children[0].children[0].name || '';
                  
                   self.showThrobber = false;
                   self.dataTaggingDetailsService.getHierarchyProperties(level1,level2,level3,level4)
@@ -76,6 +76,7 @@ module ISightApp {
      $scope.test = function(value) {
          
         var a = document.getElementById(value);
+        document.getElementById(value).style.backgroundColor = "#eee";
                         var els = [];
                         while(a.parentElement) {
                           
@@ -86,10 +87,10 @@ module ISightApp {
                            a = a.parentElement;
                         }
                         console.log(els);  
-                         var level1 = els[0];
-                        var level2 = els[1];
-                        var level3 = els[2];
-                        var level4 = els[3];
+                         var level1 = els[0] || '';
+                        var level2 = els[1] || '';
+                        var level3 = els[2] || '';
+                        var level4 = els[3] || '';
                         dataTaggingDetailsService.getHierarchyProperties(level1,level2,level3,level4)
                         .then(function (data) {
                          console.log(data);
