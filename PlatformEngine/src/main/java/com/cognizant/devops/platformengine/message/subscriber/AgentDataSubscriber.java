@@ -25,7 +25,7 @@ import org.apache.log4j.Logger;
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBException;
 import com.cognizant.devops.platformcommons.dal.neo4j.Neo4jDBHandler;
-import com.cognizant.devops.platformengine.message.core.MessageConstants;
+import com.cognizant.devops.platformcommons.constants.MessageConstants;
 import com.cognizant.devops.platformengine.message.factory.EngineSubscriberResponseHandler;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
