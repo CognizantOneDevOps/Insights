@@ -22,25 +22,31 @@ module ISightApp {
             private iconService: IIconService,
 			private $sce,
             private $mdDialog, private $cookies, private toolConfigService: IToolConfigService) {
+			var elem = document.querySelector('#homePageTemplateContainer');
+            var homePageControllerScope = angular.element(elem).scope();
+            var homePageController = homePageControllerScope['homePageController'];
+            this.homeController = homePageController;
             var self = this;	
+			self.getSelectedAgentDetails();
 			self.showMessage = "Please select version & tools";
+			self.homeController.templateName = 'agentManagement';
 			
 			self.agentService.getAgentversionTools()
-			.then(function (data) {			
-			
+			.then(function (data) {	
 				self.response['versions'] = data.data.details;
-
 				for(var key in self.response['versions']){					
 					self.versionList.push(key);
-				}
-				
+				}				
 			})			
 			.catch(function (data) {												
-				console.log(data);
+				self.showMessage = "Problem with Platform Service, Please try again";	
 			}); 			
+			
+			self.getAgenttoolConfig(self.editAgentDetails['toolname'], self.editAgentDetails['version']);
 			
 		}
 		
+		homeController: HomePageController;
 		selectedTool: string;
 		showMessage:string;
 		showConfig: boolean = false;
@@ -48,6 +54,7 @@ module ISightApp {
 		versionList = [];
 		toolsArr = [];
 		response = {};
+		editAgentDetails = {};
 		headerData = [];
 		defaultConfigdata = {};
 		addButtIcon: string = "dist/icons/svg/actionIcons/Add_icon_disabled.svg";
@@ -59,6 +66,9 @@ module ISightApp {
 			return typeof(arr[key]);
 		}
 		
+		getSelectedAgentDetails(): void {
+            this.editAgentDetails = this.homeController.selectedAgentTooldetails;            
+        }
 		
 		versionOnChange(key): void {				
 			this.selectedTool = "";			
@@ -75,14 +85,14 @@ module ISightApp {
 			self.showMessage = "";
 			self.agentService.getAgentToolConfig(version, toolName)
 			.then(function (data) {		
+				console.log(data);
 				self.showConfig = true;
 				self.showThrobber = false;
 				self.defaultConfigdata  = data.data;
 			})			
 			.catch(function (data) {		
 				self.showThrobber = false;							
-				self.showMessage = "Problem with Platform Service, Please try again";
-				console.log(data);
+				self.showMessage = "Problem with Platform Service, Please try again";				
 			}); 
 			
 		}
