@@ -109,6 +109,7 @@ module ISightApp {
         showInsightsTab: boolean;
         shouldReload: boolean;
         selectedToolName: string;
+	selectedAgentTooldetails = {};
         selectedToolCategory: string;
         footerMinHeight: string = 'min-height:' + (window.innerHeight - 146) + 'px;';
         footerHeight: string = '';

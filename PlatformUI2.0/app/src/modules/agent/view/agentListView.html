@@ -1,0 +1,41 @@
+<!--
+ *******************************************************************************
+ * Copyright 2017 Cognizant Technology Solutions
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License.  You may obtain a copy
+ * of the License at
+ * 
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ ******************************************************************************
+ -->
+<div layout="column" class="contentCss" flex>	
+<div layout class="selectToolTxt">Please select a tool to configure</div>		
+	 <div class="confirmationMessage" layout="row" layout-align="end end" style="margin-right: 7px;">
+	 <md-icon class="ForActionsIcons" ng-style="{height: '20px', width: '20px'}" md-svg-src="{{agentListController.editIconSrc}}" ng-click="agentListController.buttonDisableStatus||agentListController.editAgentConfigurations(agentListController.SelectedToolDetails)">
+            <md-tooltip md-direction="Bottom">
+                Edit
+            </md-tooltip>
+	 </div>
+	<div class="agentlistTable" layout-align="center center">
+		<table ng-table="agentListController.tableParams" class="table md-api-table-landing table-condensed table-bordered table-striped textst" show-filter="true">
+			<tr ng-repeat="agentList in $data">
+			<td title="'Select'" header-class="'theadCss'" style="width: 5%;">
+			<md-radio-group ng-model="agentListController.SelectedToolDetails">
+			  <md-radio-button ng-value="{os: '{{agentList.os}}', toolname: '{{agentList.toolName}}', version: '{{agentList.Version}}'} " class="md-primary" ng-click="agentListController.enableActions()"></md-radio-button>			  
+			</md-radio-group>
+			</td>				
+			<td title="'OS'" filter="{ os: 'text'}" sortable="'os'" header-class="'theadCss'">{{agentList.os}}</td>	
+			<td title="'ToolName'" filter="{ toolName: 'text'}" sortable="'toolName'" header-class="'theadCss'">{{agentList.toolName}}</td>				
+			<td title="'Version'" filter="{ Version: 'text'}" sortable="'Version'" header-class="'theadCss'">{{agentList.Version}}</td>				
+			<td title="'Status'" header-class="'theadCss'">{{agentList.Status}}</td>			
+			</tr>
+		</table>
+	</div>
+</div>
