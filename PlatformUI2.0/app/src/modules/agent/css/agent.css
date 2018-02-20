@@ -135,3 +135,13 @@ background-color:#e9e9e9;
     margin-top: 70px;
     text-align: center;
 }
+.agentlistTable .table-bordered>thead>tr>td, .table-bordered>thead>tr>th {
+	border-bottom-width: 1px !important;
+}
+
+.agentlistTable  .table-bordered>thead>tr>th {
+	text-align : center !important;
+}
+.agentlistTable  .md-api-table-landing td{
+	vertical-align: middle !important;
+}

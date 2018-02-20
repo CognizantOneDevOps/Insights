@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  ******************************************************************************/
-package com.cognizant.devops.platformengine.message.core;
+package com.cognizant.devops.platformcommons.constants;
 
 public interface MessageConstants {
 	String EXCHANGE_NAME = "iSight";
