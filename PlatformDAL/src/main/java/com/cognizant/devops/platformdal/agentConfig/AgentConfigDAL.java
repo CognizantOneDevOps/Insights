@@ -41,7 +41,7 @@ public class AgentConfigDAL extends BaseDAL {
 		if(resultList.size()>0){
 			agentConfig = resultList.get(0);
 		}
-		//getSession().beginTransaction();
+		getSession().beginTransaction();
 		if (agentConfig != null) {
 			agentConfig.setAgentJson(agentJson.toString());
 			agentConfig.setDataUpdateSupported(isDataUpdateSupported);
@@ -60,7 +60,7 @@ public class AgentConfigDAL extends BaseDAL {
 			
 			getSession().save(agentConfig);
 		}
-		//getSession().getTransaction().commit();
+		getSession().getTransaction().commit();
 		terminateSession();
 		terminateSessionFactory();
 		return true;

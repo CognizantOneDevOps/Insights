@@ -52,8 +52,6 @@ public class AgentManagementUtil {
 
 	public  JsonObject getAgentConfigfile(URL filePath, File targetDir) throws IOException  {
 
-		/*System.setProperty("http.proxyHost", "proxy.cognizant.com");
-		System.setProperty("http.proxyPort","6050");*/
 		if (!targetDir.exists()) {
 			targetDir.mkdirs();
 		}
