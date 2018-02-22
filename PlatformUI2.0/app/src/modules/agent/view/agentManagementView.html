@@ -16,6 +16,7 @@
  ******************************************************************************
  -->
 <div layout="column" class="contentCss" flex>
+<form name="agentMgment" id="agentMgment">
 	<div layout class="applicationButtMar">
         <div layout layout="row" layout-align="center center" class="applicationContentCss">
             
@@ -28,94 +29,76 @@
             </div>
 			<div layout>
 			<md-select ng-model="agentManagementController.selectedVersion" class="searchApplicationBoxContData inputApplicationBox dataBoardingFieldName"
-                     placeholder="Select Version" data-md-container-class="selectdemoSelectHeader" ng-change="agentManagementController.versionOnChange(agentManagementController.selectedVersion)">
-				<md-option  ng-repeat="key in agentManagementController.versionList | orderBy" value="{{key}}">{{key}}</md-option>
+                     placeholder="Select Version" data-md-container-class="selectdemoSelectHeader" ng-change="agentManagementController.versionOnChange(agentManagementController.selectedVersion)">				
+				<md-option  ng-repeat="key in agentManagementController.versionList | orderBy" value="{{key}}"
+					ng-selected="{{agentManagementController.editAgentDetails['version'] == key}}">{{key}}</md-option>
 						  
 			</md-select>
             </div>
 			
 			<div layout>
 			<md-select ng-model="agentManagementController.selectedTool" class="searchApplicationBoxContData inputApplicationBox dataBoardingFieldName"
-                     placeholder="Select Tool" data-md-container-class="selectdemoSelectHeader" ng-change="agentManagementController.getAgenttoolConfig(agentManagementController.selectedVersion, agentManagementController.selectedTool)">
-				<md-option  ng-repeat="(key, value) in agentManagementController.toolsArr" value="{{value}}">{{value}}</md-option> 
+                     placeholder="Select Tool" data-md-container-class="selectdemoSelectHeader" ng-change="agentManagementController.getAgenttoolConfig(agentManagementController.selectedVersion, agentManagementController.selectedTool)">				
+				<md-option  ng-repeat="(key, value) in agentManagementController.toolsArr" value="{{value}}" ng-selected="{{agentManagementController.editAgentDetails['toolname'] == value}}">{{value}}</md-option> 
 			</md-select>
             </div>
 			
-            <div layout style="margin-left: 100px;">
-               <!--  <md-button class="md-raised md-primary configureBut" style="background-color:#387c2c;margin-left: 2px;">
-                    START
-                </md-button>
-                <md-button style="background-color:red;margin-left: 2px;" class="md-raised md-primary configureBut">
-                    STOP
-                </md-button> -->
-				 <md-button class="md-raised md-primary configureBut">
+            <div layout style="margin-left: 100px;">               
+				 <md-button class="md-raised md-primary configureBut" ng-click="agentManagementController.getUpdatedConfigData()" ng-disabled="agentMgment.$invalid">
                     Register
                 </md-button>
             </div>
         </div>
     </div>
 	
-	<div class="agentConfigTable" layout layout-align="center center" ng-if="!agentManagementController.showConfig"> 		
-		<h3 class="agentdefaultMessage">{{agentManagementController.showMessage}} </span>
-	</div>
-	<div ng-if="agentManagementController.showThrobber" layout-sm="column" layout-align="center center" style="margin-left: 46%;margin-top: 46px;">
-            <md-progress-circular md-mode="indeterminate" md-diameter="50"></md-progress-circular>
-    </div>	
-	<div class="agentConfigTable" layout layout-align="start center" ng-if="agentManagementController.showConfig" ng-repeat="(key,value) in agentManagementController.defaultConfigdata">
-			<table class="md-api-table-landing" ng-if="agentManagementController.findDataType(key,agentManagementController.defaultConfigdata) == 'object'">
+		<div class="agentConfigTable" layout layout-align="center center" ng-if="!agentManagementController.showConfig"> 		
+			<h3 class="agentdefaultMessage">{{agentManagementController.showMessage}} </span>
+		</div>
+		<div ng-if="agentManagementController.showThrobber" layout-sm="column" layout-align="center center" style="margin-left: 46%;margin-top: 46px;">
+				<md-progress-circular md-mode="indeterminate" md-diameter="50"></md-progress-circular>
+		</div>	
+	
+		<div class="agentConfigTable" layout layout-align="start center" ng-if="agentManagementController.showConfig" ng-repeat="(key,value) in agentManagementController.defaultConfigdata">	
+				<table class="md-api-table-landing" ng-if="key != 'dynamic' && agentManagementController.findDataType(key,agentManagementController.defaultConfigdata) == 'object'">
+					<thead class="theadCss">
+						<tr layout="row" layout-align="start start">
+							<th flex="22.5" class="tableHeader">
+								<span class="tableHeadingStyle">{{key}}</span>
+							</th>
+						</tr>
+					</thead>
+					<tbody layout="row" layout-wrap>			
+						<tr flex="50" layout="column" layout-align="start start" ng-repeat="(x,y) in value" style="display: inline-table;">
+							<td flex="15" layout><span class="dataHead">{{x}}</span></td>
+							<td  style="height:56px;background-color: white !important; width: 50% !important;">
+								<input class="inputBoxCont" ng-model="agentManagementController.defaultConfigdata[key][x]" required>
+							</td>								
+						</tr>						
+					</tbody>
+				</table>			
+		</div>
+		<div class="agentConfigTable" layout layout-align="start center" ng-if="agentManagementController.showConfig">
+			<table class="md-api-table-landing">        
 				<thead class="theadCss">
 					<tr layout="row" layout-align="start start">
 						<th flex="22.5" class="tableHeader">
-							<span class="tableHeadingStyle">{{key}}</span>
+							<span class="tableHeadingStyle">Others</span>
 						</th>
 					</tr>
-				</thead>
-				<tbody layout="row" layout-wrap>			
-					<tr flex="50" layout="column" layout-align="start start" ng-repeat="(x,y) in value" style="display: inline-table;">
-						<td flex="15" layout><span class="dataHead">{{x}}</span></td>
+				</thead>			
+				<tbody layout="row" layout-wrap>				
+					<tr flex="50" layout="column" layout-align="start start" ng-repeat="(key,value) in agentManagementController.defaultConfigdata" ng-if="agentManagementController.findDataType(key,agentManagementController.defaultConfigdata) != 'object'" style="display: inline-table;">
+						<td flex="15"><span class="dataHead">{{key}}</span></td>
 						<td  style="height:56px;background-color: white !important; width: 50% !important;">
-							<input class="inputBoxCont" ng-model="agentManagementController.defaultConfigdata[key][x]" required>
+							<input class="inputBoxCont" ng-model="agentManagementController.defaultConfigdata[key]" required  placeholder="">
 						</td>								
 					</tr>						
 				</tbody>
-			</table>			
-	</div>
-	<div class="agentConfigTable" layout layout-align="start center" ng-if="agentManagementController.showConfig">
-		<table class="md-api-table-landing">        
-			<thead class="theadCss">
-				<tr layout="row" layout-align="start start">
-					<th flex="22.5" class="tableHeader">
-						<span class="tableHeadingStyle">Others</span>
-					</th>
-				</tr>
-			</thead>			
-			<tbody layout="row" layout-wrap>				
-				<tr flex="50" layout="column" layout-align="start start" ng-repeat="(key,value) in agentManagementController.defaultConfigdata" ng-if="agentManagementController.findDataType(key,agentManagementController.defaultConfigdata) != 'object'" style="display: inline-table;">
-					<td flex="15"><span class="dataHead">{{key}}</span></td>
-					<td  style="height:56px;background-color: white !important; width: 50% !important;">
-						<input class="inputBoxCont" ng-model="agentManagementController.defaultConfigdata[key]" required  placeholder="">
-					</td>								
-				</tr>						
-			</tbody>
-		</table>				
+			</table>
+		</div>
 		
-	</div>
-	<!-- <div id="agentConfigTable" layout layout-align="center center" ng-repeat="header in agentManagementController.headerData['headers']">
-            <table class="md-api-table-landing" style="border: 1px solid #a5d28b;width:100%;table-layout:fixed;">
-                <thead class="theadCss">
-                    <tr layout="row" layout-align="start start">
-                        <th flex="22.5" class="tableHeader" style="min-width:285px;max-width:22.5%;padding-left:22px">
-                            <span class="tableHeadingStyle">{{header}}</span>
-                        </th>
-                    </tr>
-                </thead>
-                <tbody layout="column" flex>
-                    <tr layout="row" layout-align="start start" style="height:60px;width:100%; background-color: white !important;margin-bottom: 5px !important">
-                        <td flex="23" layout style="height:56px;max-width:22.5% !important"> </td>
-                        <td flex="10" layout style="height:56px;max-width:10%">                           
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-	</div> -->
+		<div class="agentConfigTable" layout layout-align="start center" ng-if="agentManagementController.showConfig">			
+			<textarea ng-model="agentManagementController.dynamicData" rows="5" class="frmTxtarea" required></textarea>
+		</div>
+	</form>
 </div>

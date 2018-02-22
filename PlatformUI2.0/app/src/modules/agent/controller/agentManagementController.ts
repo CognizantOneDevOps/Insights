@@ -46,6 +46,7 @@ module ISightApp {
 			
 		}
 		
+		dynamicData: string;
 		homeController: HomePageController;
 		selectedTool: string;
 		showMessage:string;
@@ -56,6 +57,10 @@ module ISightApp {
 		response = {};
 		editAgentDetails = {};
 		headerData = [];
+		updatedConfigdata = {};
+		selectedOS: string;		
+		item = {};
+		datait = {};
 		defaultConfigdata = {};
 		addButtIcon: string = "dist/icons/svg/actionIcons/Add_icon_disabled.svg";
         deleteButtIcon: string = "dist/icons/svg/actionIcons/Delete_icon_disabled.svg";
@@ -89,6 +94,7 @@ module ISightApp {
 				self.showConfig = true;
 				self.showThrobber = false;
 				self.defaultConfigdata  = data.data;
+				self.dynamicData = JSON.stringify(self.defaultConfigdata['dynamic'], undefined, 4);
 			})			
 			.catch(function (data) {		
 				self.showThrobber = false;							
@@ -97,6 +103,30 @@ module ISightApp {
 			
 		}
 		
+		getUpdatedConfigData(): void{			
+			
+			for(var key in this.defaultConfigdata) {
+			
+				if(key != "dynamic" && this.findDataType(key, this.defaultConfigdata) == "object"){
+					
+					this.item = {};
+					
+					for(var value in this.defaultConfigdata[key]){				
+						this.item[value] = this.defaultConfigdata[key][value];						
+					}					
+					
+					this.updatedConfigdata[key] = this.item;
+					
+				}else if(key != "dynamic") {	
+						this.updatedConfigdata[key] = this.defaultConfigdata[key];						
+				}				
+			}	
+			
+			this.updatedConfigdata["OS"] = this.selectedOS;
+			this.updatedConfigdata["dynamic"] = JSON.parse(this.dynamicData);
+			
+			console.log(this.updatedConfigdata);
+		}
 		
 	}
 	
