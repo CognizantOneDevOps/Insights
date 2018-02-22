@@ -25,9 +25,15 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
+import java.nio.file.FileVisitResult;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Enumeration;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
+import java.util.zip.ZipOutputStream;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -46,7 +52,7 @@ public class AgentManagementUtil {
 
 	public  JsonObject getAgentConfigfile(URL filePath, File targetDir) throws IOException  {
 
-		/*	System.setProperty("http.proxyHost", "proxy.cognizant.com");
+		/*System.setProperty("http.proxyHost", "proxy.cognizant.com");
 		System.setProperty("http.proxyPort","6050");*/
 		if (!targetDir.exists()) {
 			targetDir.mkdirs();
@@ -118,6 +124,20 @@ public class AgentManagementUtil {
 		return file.exists() || file.mkdirs();
 	}
 
+	public   Path getAgentZipFolder(final Path sourceFolderPath, Path zipPath) throws Exception {
+		final ZipOutputStream zos = new ZipOutputStream(new FileOutputStream(zipPath.toFile()));
+		Files.walkFileTree(sourceFolderPath, new SimpleFileVisitor<Path>() {
+			public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+				zos.putNextEntry(new ZipEntry(sourceFolderPath.relativize(file).toString()));
+				Files.copy(file, zos);
+				zos.closeEntry();
+				return FileVisitResult.CONTINUE;
+			}
+		});
+		zos.close();
+		return zipPath;
+	}
 
+	
 
 }
