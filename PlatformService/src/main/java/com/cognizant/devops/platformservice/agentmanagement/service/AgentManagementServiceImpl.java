@@ -19,6 +19,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URL;
+import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -28,10 +29,10 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.stream.Stream;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.jsoup.Jsoup;
@@ -39,7 +40,6 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.constants.MessageConstants;
@@ -58,15 +58,18 @@ import com.rabbitmq.client.ConnectionFactory;
 public class AgentManagementServiceImpl  implements AgentManagementService{
 	private static Logger LOG = Logger.getLogger(AgentManagementServiceImpl.class);
 
-	@Transactional
 	@Override
 	public String registerAgent(String toolName,String agentVersion,String osversion,String configDetails) {
+		
+		try {
 		String agentId = getAgentkey(toolName);
 
 		Gson gson = new Gson();
 		JsonElement jelement = gson.fromJson(configDetails.trim(),JsonElement.class);
 		JsonObject  json = jelement.getAsJsonObject();
 		json.addProperty("agentId",agentId);
+		json.addProperty("osversion",osversion);
+		json.addProperty("agentVersion",agentVersion);
 		json.get("subscribe").getAsJsonObject().addProperty("agentCtrlQueue" ,agentId);
 
 		boolean isDataUpdateSupported = false;
@@ -78,33 +81,56 @@ public class AgentManagementServiceImpl  implements AgentManagementService{
 		boolean updateStatus = agentConfigDAL.saveAgentConfigFromUI(agentId , toolName,json, isDataUpdateSupported, uniqueKey,agentVersion,osversion,updateDate);
 
 		//Create zip/tar file with updated config.json
-		Path agentZipPath =updateAgentConfig(toolName,agentId,json);
+		
+			Path agentZipPath =updateAgentConfig(toolName,agentId,json);
+			byte[] data = Files.readAllBytes(agentZipPath);
+			sendAgentPackage(data,agentId,agentId,toolName,osversion);
+		} catch (Exception e) {
+			LOG.error("Error while registering agent "+toolName, e);
+			return "FAILED";
+		}
 
 		//call installAgent method
-		String status = installAgent(agentId, toolName,agentZipPath.getFileName().toString(), osversion);
-		return status;
+		//String status = installAgent(agentId, toolName,agentZipPath.getFileName().toString(), osversion);
+		//return status;
+		return "Success";
 	}
 
-	private Path updateAgentConfig( String toolName,String agentId,JsonObject json) {
+	private Path updateAgentConfig( String toolName,String agentId,JsonObject json) throws Exception {
 		String filePath = ApplicationConfigProvider.getInstance().getAgentDetails().getUnzipPath();
 		filePath = filePath+"/"+toolName+"/com/cognizant/devops/platformagents/agents/";
 
-		//Find config.json
-		File dir = new File(filePath);
-		String[] extensions = new String[] { "json" };
-		List<File> f1 = (List<File>) FileUtils.listFiles(dir,extensions, true);
-		String fileName=null;
-		for (File file : f1) {
-			fileName=file.getPath();
+		DirectoryStream<Path> paths = Files.newDirectoryStream(Paths.get(filePath));
+		Iterator<Path> pathIterator = paths.iterator();
+		while(pathIterator.hasNext()) {
+			Path path = pathIterator.next();
+			if(path.toString().endsWith(".json")) {
+				System.out.println(path.toFile().getAbsolutePath());
+			}
 		}
-
+		
+		File configFile = null;
+		try(Stream<Path> all =  Files.walk(Paths.get(filePath));){
+		
+			pathIterator = all.iterator();
+			while(pathIterator.hasNext()) {
+				Path path = pathIterator.next();
+				if(path.toString().endsWith(".json")) {
+					configFile = path.toFile();
+				}
+			}
+		}catch(IOException e) {
+			LOG.error("Error finding json file", e);
+			throw e;
+		}
 		//Writing json to file
-		try (FileWriter file = new FileWriter(fileName)) {
+		try (FileWriter file = new FileWriter(configFile)) {
 			file.write(json.toString());
 			file.flush();
-
+			file.close();
 		} catch (IOException e) {
-			LOG.debug(e);
+			LOG.error("Error writing modified json file", e);
+			throw e;
 		}
 		Path sourceFolderPath = Paths.get(ApplicationConfigProvider.getInstance().getAgentDetails().getUnzipPath(),toolName);
 		Path zipPath = Paths.get(ApplicationConfigProvider.getInstance().getAgentDetails().getUnzipPath(),toolName+".zip");
@@ -112,7 +138,8 @@ public class AgentManagementServiceImpl  implements AgentManagementService{
 		try {
 			agentZipPath = AgentManagementUtil.getInstance().getAgentZipFolder(sourceFolderPath, zipPath);
 		} catch (Exception e) {
-			LOG.debug(e);
+			LOG.error("Error creatig final zip file with modified json file", e);
+			throw e;
 		}
 		return agentZipPath;
 
@@ -155,8 +182,6 @@ public class AgentManagementServiceImpl  implements AgentManagementService{
 	@Override
 	public JsonObject getAgentDetails() {
 
-		/*System.setProperty("http.proxyHost", "proxy.cognizant.com");
-		System.setProperty("http.proxyPort","6050");*/
 		Map<String,ArrayList<String>>  agentDetails = new HashMap<String,ArrayList<String>>();
 		String url = ApplicationConfigProvider.getInstance().getAgentDetails().getDocrootUrl();
 		JsonObject details = new JsonObject();
@@ -181,8 +206,6 @@ public class AgentManagementServiceImpl  implements AgentManagementService{
 
 	private ArrayList<String> getAgents(String version) {
 
-		/*System.setProperty("http.proxyHost", "proxy.cognizant.com");
-		System.setProperty("http.proxyPort","6050");*/
 		Document doc;
 		String url = ApplicationConfigProvider.getInstance().getAgentDetails().getDocrootUrl()+"/"+version+"/agents/testagents/";
 		ArrayList<String> tools = new ArrayList<String>();
@@ -207,6 +230,7 @@ public class AgentManagementServiceImpl  implements AgentManagementService{
 
 		JsonObject configJson = null;
 		try {
+			
 			String filePath = ApplicationConfigProvider.getInstance().getAgentDetails().getDocrootUrl()
 					+"/"+version+"/agents/testagents/"+tool;
 			filePath=filePath.trim()+"/"+tool.trim()+".zip";
@@ -269,7 +293,4 @@ public class AgentManagementServiceImpl  implements AgentManagementService{
 	private String getAgentkey(String toolName) {
 		return toolName + "-"+ Instant.now().toEpochMilli();
 	}
-
-
-
 }
