@@ -53,6 +53,20 @@ public class AgentConfig {
 	@Column(name = "UNIQUE_KEY")
 	private String uniqueKey;
 	
+	@Column(name = "OS_VERSION")
+	private String osVersion;
+	
+	@Column(name = "AGENT_VERSION")
+	private String agentVersion;
+	
+	@Column(name = "AGENT_STATUS")
+	private String agentStatus;
+	
+	@Column(name = "AGENT_KEY", unique = true, nullable = false)
+	private String agentKey;
+	
+	
+	
 	public int getId() {
 		return id;
 	}
@@ -115,5 +129,37 @@ public class AgentConfig {
 
 	public void setUniqueKey(String uniqueKey) {
 		this.uniqueKey = uniqueKey;
+	}
+
+	public String getOsVersion() {
+		return osVersion;
+	}
+
+	public void setOsVersion(String osVersion) {
+		this.osVersion = osVersion;
+	}
+
+	public String getAgentVersion() {
+		return agentVersion;
+	}
+
+	public void setAgentVersion(String agentVersion) {
+		this.agentVersion = agentVersion;
+	}
+
+	public String getAgentStatus() {
+		return agentStatus;
+	}
+
+	public void setAgentStatus(String agentStatus) {
+		this.agentStatus = agentStatus;
+	}
+
+	public String getAgentKey() {
+		return agentKey;
+	}
+
+	public void setAgentKey(String agentKey) {
+		this.agentKey = agentKey;
 	}
 }
