@@ -62,7 +62,7 @@ public class AgentConfig {
 	@Column(name = "AGENT_STATUS")
 	private String agentStatus;
 	
-	@Column(name = "AGENT_KEY", unique = true, nullable = false)
+	@Column(name = "AGENT_KEY")
 	private String agentKey;
 	
 	
