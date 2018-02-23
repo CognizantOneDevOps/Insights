@@ -69,7 +69,6 @@ public class DataProcessorUtil  {
 			int size = 0;
 			int totalSize = 0;
 			int bulkRecordCnt=10;
-
 			for (CSVRecord csvRecord : csvParser.getRecords()) {
 				size += 1;
 				//totalRecords++;
@@ -88,7 +87,7 @@ public class DataProcessorUtil  {
 					if(graphResponse.get("response").getAsJsonObject().get("errors").getAsJsonArray().size() > 0){
 						log.error(graphResponse);
 						status=false;
-						if(totalSize >= csvRecord.size()) {
+						if(totalSize >= csvParser.getRecords().size()) {
 							break;
 						}
 					}
