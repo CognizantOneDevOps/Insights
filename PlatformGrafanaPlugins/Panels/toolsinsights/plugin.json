@@ -1,0 +1,17 @@
+{
+  "type": "panel",
+  "name": "ToolsInsight",
+  "id": "toolsinsights",
+
+  "info": {
+    "author": {
+      "name": "Grafana Project",
+      "url": "http://grafana.org"
+},
+    "logos": {
+      "small": "img/Traceability.svg",
+      "large": "img/Traceability.svg"
+    }
+  }
+}
+

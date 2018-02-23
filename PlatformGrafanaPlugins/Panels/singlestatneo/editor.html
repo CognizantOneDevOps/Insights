@@ -1,0 +1,25 @@
+<div class="editor-row">
+	<div class="section gf-form-group">
+		<h5 class="section-heading">Font Options</h5>
+		<div class="gf-form">
+			<label class="gf-form-label width-8"><strong>Font Size</strong></label>
+			<input type="text" class="gf-form-input max-width-8" ng-model="pipelinePanelEditorCtrl.fontsize" ng-blur="pipelinePanelEditorCtrl.setFontSizeValue()">
+			<span class="gf-form-input max-width-3">px</span>
+		</div>
+		<div class="gf-form">
+			<label class="gf-form-label width-8"><strong>Font Color</strong></label>
+			<input type="text" class="gf-form-input max-width-11" ng-model="pipelinePanelEditorCtrl.uniqueSingleStatPanelMetaData.inputProperties.color"
+				ng-blur="pipelinePanelEditorCtrl.render()">
+		</div>
+	</div>
+	<div class="section gf-form-group" ng-if="pipelinePanelEditorCtrl.neo4jDataStatus">
+		<h5 class="section-heading">Select Field</h5>
+		<div class="gf-form">
+			<label class="gf-form-label width-8">Field</label>
+			<div class="gf-form-select-wrapper width-10">
+				<select class="gf-form-input" style="color:black" ng-model="pipelinePanelEditorCtrl.selectedfield" ng-options="f for f in pipelinePanelEditorCtrl.fieldsStatArray"
+					ng-change="pipelinePanelEditorCtrl.setSelectedField()"></select>
+			</div>
+		</div>
+	</div>
+</div>
