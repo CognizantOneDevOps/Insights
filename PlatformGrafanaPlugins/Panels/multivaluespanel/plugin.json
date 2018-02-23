@@ -1,0 +1,17 @@
+{
+  "type": "panel",
+  "name": "MultiValueStat",
+  "id": "multivaluespanel",
+
+  "info": {
+    "author": {
+      "name": "Grafana Project",
+      "url": "http://grafana.org"
+},
+    "logos": {
+      "small": "img/icn-table-panel.svg",
+      "large": "img/icn-table-panel.svg"
+    }
+  }
+}
+

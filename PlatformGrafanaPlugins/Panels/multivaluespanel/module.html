@@ -1,0 +1,14 @@
+<md-content>
+	<div layout="column" layout-align="center center" layout-margin layout-padding layout-fill
+	     style="padding-bottom: 32px; width:70%;padding-left: 30%;margin-top:10px" ng-cloak>
+
+			<md-whiteframe class="md-whiteframe-1dp"
+			               ng-repeat="field in ctrl.cloneUiArray" flex="100" layout-padding  layout-fill layout = "row" layout-align ="space-between end"
+			              style="margin-bottom:12px;padding:5px;{{field.fieldColor}}">
+
+				<div><b>{{field.fieldMapName}}</b></div>
+				<div><b style="word-wrap:break-word">{{field.fieldValue}}</b></div>
+			</md-whiteframe>
+
+	</div>
+</md-content>
