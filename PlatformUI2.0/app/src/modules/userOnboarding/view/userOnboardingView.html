@@ -17,7 +17,24 @@
  -->
 
 
-<div flex layout="column">
-    <iframe src="{{userOnboardingController.userListUrl}}" id="iSightIframe"
-        frameBorder="0" scrolling="no" style="{{userOnboardingController.userIframeStyle}}"></iframe>
+<div layout="column" flex>
+    <div layout class="applicationButtMar">
+        <div layout="row" class="applicationContentCss" style="width: 100%;margin-top: 6px">
+            <div layout layout-align="end center">
+
+                <md-select class="searchApplicationBoxCont" md-no-asterisk="true" ng-model="userOnboardingController.selectedApp" ng-change="userOnboardingController.selectApp()"
+                    style="margin-top: 0px; width:230px" placeholder="{{userOnboardingController.userCurrentOrgName}}">
+                    <md-option ng-repeat="org in userOnboardingController.adminOrgDataArray" value="{{org.name}}" ng-click="userOnboardingController.switchAccessGroup(org.orgId)">
+                        {{org.name}}
+                    </md-option>
+                </md-select>
+
+            </div>
+
+        </div>
+    </div>
+
+    <div id="iframeDiv" flex layout="column">
+        <iframe src="{{userOnboardingController.userListUrl}}" id="iSightIframe" frameBorder="0" scrolling="no" style="{{userOnboardingController.userIframeStyle}}"></iframe>
+    </div>
 </div>

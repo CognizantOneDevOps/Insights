@@ -18,15 +18,26 @@
 
 module ISightApp {
     export class UserOnboardingController {
-        static $inject = ['$location', '$window', '$mdDialog', 'userOnboardingService', 'roleService', 'restEndpointService', '$sce', '$timeout'];
-        constructor(private $location, private $window, private $mdDialog, private userOnboardingService: IUserOnboardingService, private roleService: IRoleService, private restEndpointService: IRestEndpointService, private $sce, private $timeout) {
+        static $inject = ['$route', '$location', '$window', '$mdDialog', 'userOnboardingService', 'roleService',
+            'restEndpointService', '$sce', '$timeout', '$rootScope', 'authenticationService', '$cookies'];
+        constructor(private $route, private $location, private $window, private $mdDialog, private userOnboardingService: IUserOnboardingService, private roleService: IRoleService,
+            private restEndpointService: IRestEndpointService, private $sce,
+            private $timeout, private $rootScope, private authenticationService: IAuthenticationService, private $cookies) {
             var elem = document.querySelector('#homePageTemplateContainer');
             var homePageControllerScope = angular.element(elem).scope();
             var homePageController = homePageControllerScope['homePageController'];
             this.homeController = homePageController;
             var self = this;
             self.getHost();
-
+            self.userOnboardingService.getCurrentUserOrgs().
+                then(function (orgData) {
+                    var orgDataArray = orgData.data;
+                    self.getUserAdminOrgs(orgDataArray);
+                    self.authenticationService.getGrafanaCurrentOrgAndRole()
+                        .then(function (data) {
+                            self.getCurrentOrgName(data, orgDataArray);
+                        });
+                });
             self.userIframeStyle = 'width:100%; height:1600px;';
             var receiveMessage = function (evt) {
                 var height = parseInt(evt.data);
@@ -43,6 +54,56 @@ module ISightApp {
         iframeWidth = window.innerWidth;
         iframeHeight = window.innerHeight;
         iframeStyle: String = '';
+        allOrgDataArray = [];
+        adminOrgDataArray = [];
+        userCurrentOrgName: String = '';
+
+        getUserAdminOrgs(orgDataArray) {
+            var self = this;
+            self.allOrgDataArray = orgDataArray
+            console.log(self.allOrgDataArray);
+            for (var org in self.allOrgDataArray) {
+                if ((self.allOrgDataArray[org].role) === 'Admin') {
+                    self.adminOrgDataArray.push(self.allOrgDataArray[org]);
+                }
+                //console.log(self.adminOrgDataArray);
+            }
+        }
+
+        getCurrentOrgName(currentOrgData, orgDataArray) {
+            var self = this;
+            var userCurrentOrgData = currentOrgData;
+            var allOrgData = orgDataArray;
+            var currentOrgId = currentOrgData.grafanaCurrentOrg;
+            for (var i in allOrgData) {
+                if (allOrgData[i].orgId == currentOrgId) {
+                    self.userCurrentOrgName = allOrgData[i].name;
+                }
+            }
+            //console.log(self.userCurrentOrgName);
+        }
+
+        switchAccessGroup(orgId) {
+            var self = this;
+            self.userOnboardingService.switchUserOrg(orgId)
+                .then(function (selOrgStatus) {
+                    console.log(self.$rootScope);
+                });
+            self.authenticationService.getGrafanaCurrentOrgAndRole()
+                .then(function (data) {
+                    self.$cookies.put('grafanaRole', data.grafanaCurrentOrgRole);
+                    self.$cookies.put('grafanaOrg', data.grafanaCurrentOrg);
+                });
+
+            this.$route.reload();
+            //(<HTMLDivElement>document.getElementById('iframeDiv')).window.location.reload(true);
+            //var destinationUrl = '/dist/modules/dashboards/view/dashboardView.html';
+            //this.$window.location.href = destinationUrl;
+            //(<HTMLIFrameElement>document.getElementById('iSightIframe')).contentWindow.location.reload(true);
+            //window.location.reload();
+            //self.getHost();
+            //DashboardController.switchOrganizations(orgId);
+        }
 
         getHost() {
             var self = this;
