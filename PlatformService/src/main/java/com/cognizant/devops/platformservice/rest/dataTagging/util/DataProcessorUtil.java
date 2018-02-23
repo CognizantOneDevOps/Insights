@@ -54,7 +54,7 @@ public class DataProcessorUtil  {
 		}
 
 		CSVFormat format = CSVFormat.newFormat(',').withHeader();
-		
+
 		try (Reader reader = new FileReader(csvfile); CSVParser csvParser = new CSVParser(reader, format);){
 
 			Neo4jDBHandler dbHandler = new Neo4jDBHandler();
@@ -66,13 +66,13 @@ public class DataProcessorUtil  {
 					"CREATE (n:METADATA:DATATAGGING) " +
 					"SET n = properties";
 			int sleepTime=500;
-			int totalRecords=0;
 			int size = 0;
 			int totalSize = 0;
+			int bulkRecordCnt=10;
 
 			for (CSVRecord csvRecord : csvParser.getRecords()) {
 				size += 1;
-				totalRecords++;
+				//totalRecords++;
 				JsonObject json = new JsonObject();
 				for(Map.Entry<String, Integer> header : headerMap.entrySet()){
 					if(header.getKey()!= null){
@@ -81,22 +81,24 @@ public class DataProcessorUtil  {
 				}			
 				json.addProperty(DatataggingConstants.CREATIONDATE, Instant.now().toEpochMilli() );
 				gitProperties.add(json);
-				if(size == 10 ) {
+				if(size == bulkRecordCnt ) {
 					totalSize += size;
 					size = 0;
 					JsonObject graphResponse = dbHandler.bulkCreateNodes(gitProperties, null, query);
 					if(graphResponse.get("response").getAsJsonObject().get("errors").getAsJsonArray().size() > 0){
 						log.error(graphResponse);
 						status=false;
-						break;
+						if(totalSize >= csvRecord.size()) {
+							break;
+						}
 					}
 					Thread.sleep(sleepTime);
 					gitProperties = new ArrayList<>();
 				}
-               if(totalSize > totalRecords) {
-					
+				/*if(totalSize >= totalRecords) {
+
 					break;
-				}
+				}*/
 				status=true;
 			}
 
