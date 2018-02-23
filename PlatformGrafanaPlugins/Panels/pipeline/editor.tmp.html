@@ -1,0 +1,48 @@
+<div class="editor-row" ng-if="pipelinePanelEditorCtrl.dataSourceResponse != 'undefined'">
+	<div class="section gf-form-group">
+		<h5 class="section-heading">Tools Name</h5>
+			<div class="gf-form" ng-repeat="category in pipelinePanelEditorCtrl.toolsMetaData">
+				<input type="text" class="gf-form-input max-width-10" ng-model="category.toolCategoryName" ng-blur="pipelinePanelEditorCtrl.render()">
+				<input type="text" class="gf-form-input max-width-10" ng-model="category.toolCategoryIcon" ng-blur="pipelinePanelEditorCtrl.render()">
+			    <span><button ng-click="pipelinePanelEditorCtrl.onRemoveCategory(category)"><i class="fa fa-remove pointer"></i></button></span>
+			</div>
+		    <span><button ng-click="pipelinePanelEditorCtrl.onAddCategory()"><i class="fa fa-plus"></i></button></span>
+    </div>
+
+	<div class="section gf-form-group">
+		<h5 class="section-heading">Select Fields</h5>
+		<div class="gf-form" ng-repeat="category in pipelinePanelEditorCtrl.toolsMetaData track by $index" ng-if="category.toolCategoryName != ''">
+			<div style ="margin-bottom:70px">
+				{{category.toolCategoryName}}
+			</div>
+			<br><br>
+			<div class="gf-form" ng-repeat="field in category.fieldList">
+				<label class="gf-form-label">
+					<i class="pointer fa fa-remove" ng-click="pipelinePanelEditorCtrl.removeField(field,$parent.$index)"></i>
+					<span>{{field.dbName}}</span>
+				</label>
+			</div>
+			<div class="gf-form">
+				<metric-segment segment="pipelinePanelEditorCtrl.addColumnSegment" get-options="pipelinePanelEditorCtrl.getFieldOptions()" on-change="pipelinePanelEditorCtrl.addField($index)"></metric-segment>
+			</div>
+		</div>
+    </div>
+
+	<div class="section gf-form-group">
+		<h5 class="section-heading">Field Mapping</h5>
+		<div  ng-repeat="category in pipelinePanelEditorCtrl.toolsMetaData track by $index" ng-if="category.toolCategoryName != ''">
+			<div class="gf-form" ng-repeat="field in category.fieldList"  ng-if="field.dbName != ''">
+				<span class="gf-form-label width-10">{{field.dbName}}</span>
+				<input type="text" class="gf-form-input max-width-10"  ng-model="field.displayName"  ng-blur=pipelinePanelEditorCtrl.render()>
+			</div>
+		</div>
+	 </div>
+
+	 <div class="section gf-form-group">
+		<h5 class="section-heading">Pipeline Name</h5>
+			<div class="gf-form" ng-repeat="pipeline in pipelinePanelEditorCtrl.pipelineDataModel">
+				<span class="gf-form-label width-10">{{pipeline.pipelineRefId}}</span>
+				<input type="text" class="gf-form-input max-width-10" ng-model="pipeline.pipelineName"  ng-blur="pipelinePanelEditorCtrl.getPipelineName()">
+			</div>
+    </div>
+</div>
