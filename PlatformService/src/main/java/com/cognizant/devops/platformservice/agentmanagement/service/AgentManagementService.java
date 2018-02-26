@@ -27,9 +27,15 @@ public interface AgentManagementService {
 	public String installAgent(String agentId,String toolName,String fileName,String osversion);
 	public String startStopAgent(String agentId,String action);
 	public String updateAgent(String agentId, String configDetails, String toolName, String agentVersion, String osversion);
+	
+	//This is used during Agent registration, provide list of Agents, with version from docroot.
 	public JsonObject getAgentDetails();
+	//For agent registration, gives you RAW config.json from docroot
 	public JsonObject getConfigFile(String version, String tool);
+	
+	//Provides currently registered Agents in DB
 	public List<AgentConfigTO> getRegisteredAgents();
+	//Returns config.json for request AgentId from Db
 	public AgentConfigTO getAgentDetails(String agentId);
 }
  
