@@ -76,8 +76,10 @@ public class AgentManagementServiceImpl  implements AgentManagementService{
 		json.addProperty("osversion",osversion);
 		json.addProperty("agentVersion",agentVersion);
 		json.get("subscribe").getAsJsonObject().addProperty("agentCtrlQueue" ,agentId);
-
-		boolean isDataUpdateSupported = json.get("isDataUpdateSupported").isJsonNull()? false:json.get("isDataUpdateSupported").getAsBoolean();
+		boolean isDataUpdateSupported = false;
+		if(json.get("isDataUpdateSupported") != null && !json.get("isDataUpdateSupported").isJsonNull()) {
+			isDataUpdateSupported = json.get("isDataUpdateSupported").getAsBoolean();
+		}  
 		String uniqueKey = agentId;
 		Date updateDate= Timestamp.valueOf(LocalDateTime.now());
 
@@ -141,7 +143,10 @@ public class AgentManagementServiceImpl  implements AgentManagementService{
 			JsonElement jelement = gson.fromJson(configDetails.trim(),JsonElement.class);
 			JsonObject  json = jelement.getAsJsonObject();
 			
-			boolean isDataUpdateSupported = json.get("isDataUpdateSupported").isJsonNull()? false:json.get("isDataUpdateSupported").getAsBoolean();
+			boolean isDataUpdateSupported = false;
+			if(json.get("isDataUpdateSupported") != null && !json.get("isDataUpdateSupported").isJsonNull()) {
+				isDataUpdateSupported = json.get("isDataUpdateSupported").getAsBoolean();
+			}
 			String uniqueKey = agentId;
 			Date updateDate= Timestamp.valueOf(LocalDateTime.now());
 			
@@ -172,6 +177,7 @@ public class AgentManagementServiceImpl  implements AgentManagementService{
 			BeanUtils.copyProperties(agentConfig, to);
 			agentList.add(to);
 		}
+		System.out.println("Agent list -- "+agentList);
 		return agentList;
 	}
 
@@ -353,14 +359,14 @@ public class AgentManagementServiceImpl  implements AgentManagementService{
 	   public static void main(String... args) {
 		   ApplicationConfigCache.loadConfigCache();
 		   AgentManagementServiceImpl impl = new AgentManagementServiceImpl();
-		   /*JsonObject json = impl.getConfigFile("v3.0", "bitbucket");
+		   JsonObject json = impl.getConfigFile("v3.0", "bitbucket");
 		   System.out.println(json);
 		   String status = impl.registerAgent("bitbucket", "3.0", "WINDOWS", testConfig());
-		   System.out.println(status);*/
+		   System.out.println(status);
 		   
-		   //impl.getRegisteredAgents();
-		   //impl.getAgentDetails("bitbucket-1519302061371");
-		   impl.startStopAgent("bitbucket-1519302061371", "RUNNING");
+		   impl.getRegisteredAgents();
+		   //System.out.println(impl.getAgentDetails("bitbucket-1519302061371"));
+		   //impl.startStopAgent("bitbucket-1519302061371", "RUNNING");
 		   System.exit(0);
 	   }
 	   
