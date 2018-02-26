@@ -20,13 +20,15 @@
     <div layout class="applicationButtMar">
         <div layout="row" class="applicationContentCss" style="width: 100%;margin-top: 6px">
             <div layout layout-align="end center">
-                <md-button class="md-raised md-primary configureBut" style="background-color:#387c2c;padding-left: 15px;padding-right:15px"
+                <md-label style="font-size: 14px; margin-right: 10px; color: #00728f; font-family: proxima_novasemibold;"> Switch Access Group</md-label>
+
+                <!--<md-button class="md-raised md-primary configureBut" style="background-color:#387c2c;padding-left: 15px;padding-right:15px"
                     ng-click="userOnboardingController.showAccessGroupOptions()">
                     Switch Access Group
-                </md-button>
+                </md-button>-->
 
-                <md-select class="searchApplicationBoxCont" ng-if="userOnboardingController.showSwitchOptions" md-no-asterisk="true" ng-model="userOnboardingController.selectedApp"
-                    ng-change="userOnboardingController.selectApp()" style="margin-top: 0px; width:230px" placeholder="{{userOnboardingController.userCurrentOrgName}}">
+                <md-select class="searchApplicationBoxCont" md-no-asterisk="true" ng-model="userOnboardingController.selectedApp" ng-change="userOnboardingController.selectApp()"
+                    style="margin-top: 0px; width:230px" placeholder="{{userOnboardingController.userCurrentOrgName}}">
                     <md-option ng-repeat="org in userOnboardingController.adminOrgDataArray" value="{{org.name}}" ng-click="userOnboardingController.switchAccessGroup(org.orgId)">
                         {{org.name}}
                     </md-option>

@@ -62,7 +62,7 @@ module ISightApp {
         getUserAdminOrgs(orgDataArray) {
             var self = this;
             self.allOrgDataArray = orgDataArray
-            console.log(self.allOrgDataArray);
+            //console.log(self.allOrgDataArray);
             for (var org in self.allOrgDataArray) {
                 if ((self.allOrgDataArray[org].role) === 'Admin') {
                     self.adminOrgDataArray.push(self.allOrgDataArray[org]);
@@ -88,7 +88,6 @@ module ISightApp {
             var self = this;
             self.userOnboardingService.switchUserOrg(orgId)
                 .then(function (selOrgStatus) {
-                    console.log(self.$rootScope);
                 });
             self.authenticationService.getGrafanaCurrentOrgAndRole()
                 .then(function (data) {
@@ -106,17 +105,17 @@ module ISightApp {
             }, 500);
         }
 
-        showAccessGroupOptions() {
+        /*showAccessGroupOptions() {
             var self = this;
             self.showSwitchOptions = true;
-        }
+        }*/
 
         getHost() {
             var self = this;
             /*self.userListUrl = self.$sce.trustAsResourceUrl('http://localhost:3000/dashboard/script/CustomiSight.js?url=http://localhost:3000/org/users');*/
             self.restEndpointService.getGrafanaHost1().then(function (response) {
                 var grafanaEndPoint = response.grafanaEndPoint;
-                console.log(grafanaEndPoint);
+                //console.log(grafanaEndPoint);
                 self.userListUrl = self.$sce.trustAsResourceUrl(grafanaEndPoint + '/dashboard/script/CustomiSight.js?url=' + grafanaEndPoint + '/org/users');
             });
             //console.log(this.userListUrl);
