@@ -27,7 +27,8 @@
                     Switch Access Group
                 </md-button>-->
 
-                <md-select class="searchApplicationBoxCont" md-no-asterisk="true" style="margin-top: 0px; width:230px" placeholder="{{userOnboardingController.userCurrentOrgName}}">
+                <md-select class="searchApplicationBoxCont" md-no-asterisk="true" ng-model="userOnboardingController.selectedApp" style="margin-top: 0px; width:230px"
+                    placeholder="{{userOnboardingController.userCurrentOrgName}}">
                     <md-option ng-repeat="org in userOnboardingController.adminOrgDataArray" value="{{org.name}}" ng-click="userOnboardingController.switchAccessGroup(org.orgId)">
                         {{org.name}}
                     </md-option>
