@@ -46,8 +46,10 @@ public class InsightsAgentConfiguration {
 	}
 	
 	@RequestMapping(value = "/updateAgent", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public @ResponseBody JsonObject updateAgent(@RequestParam String agentId,@RequestParam String configJson) {
-		String message = agentManagementService.updateAgent(agentId,configJson);
+	public @ResponseBody JsonObject updateAgent(@RequestParam String agentId,@RequestParam String configJson,
+												@RequestParam String toolName,@RequestParam String agentVersion,
+			  									@RequestParam String osversion) {
+		String message = agentManagementService.updateAgent(agentId,configJson, toolName, agentVersion, osversion);
 		return PlatformServiceUtil.buildSuccessResponseWithData(message);
 	}
 	
