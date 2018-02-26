@@ -16,6 +16,8 @@
 
 package com.cognizant.devops.platformservice.agentmanagement.controller;
 
+import java.util.List;
+
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -25,6 +27,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.cognizant.devops.platformservice.agentmanagement.service.AgentConfigTO;
 import com.cognizant.devops.platformservice.agentmanagement.service.AgentManagementService;
 import com.cognizant.devops.platformservice.rest.util.PlatformServiceUtil;
 import com.google.gson.JsonObject;
@@ -53,13 +56,6 @@ public class InsightsAgentConfiguration {
 		return PlatformServiceUtil.buildSuccessResponseWithData(message);
 	}
 	
-	@RequestMapping(value = "/installAgent", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public @ResponseBody JsonObject installAgent(@RequestParam String agentId,@RequestParam String configJson) {
-		//String message = agentManagementService.installAgent(agentId,configJson);
-		String message =null;
-		return PlatformServiceUtil.buildSuccessResponseWithData(message);
-	}
-	
 	@RequestMapping(value = "/startStopAgent", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 	public @ResponseBody JsonObject startStopAgent(@RequestParam String agentId,@RequestParam String action) {
 		String message = agentManagementService.startStopAgent(agentId,action);
@@ -74,11 +70,23 @@ public class InsightsAgentConfiguration {
 		return PlatformServiceUtil.buildSuccessResponseWithData(agentDetails);
 	}
 	
-	@RequestMapping(value = "/getConfigFile", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+	@RequestMapping(value = "/getConfigFile", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 	public @ResponseBody JsonObject getConfigFile(@RequestParam String version,@RequestParam String tool) {
 		JsonObject details = new JsonObject();
 		details = agentManagementService.getConfigFile(version,tool);
 		return PlatformServiceUtil.buildSuccessResponseWithData(details);
+	}
+	
+	@RequestMapping(value = "/getRegisteredAgents", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+	public @ResponseBody JsonObject getRegisteredAgents(){
+		List<AgentConfigTO>  agentList = agentManagementService.getRegisteredAgents();
+		return PlatformServiceUtil.buildSuccessResponseWithData(agentList);
+	}
+
+	@RequestMapping(value = "/getRegisteredAgentDetail", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+	public @ResponseBody JsonObject getAgentDetails(@RequestParam String agentId) {
+		AgentConfigTO  agentDetails = agentManagementService.getAgentDetails(agentId);
+		return PlatformServiceUtil.buildSuccessResponseWithData(agentDetails);
 	}
 	
 	
