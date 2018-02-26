@@ -60,7 +60,7 @@ public class InsightsAgentConfiguration {
 		return PlatformServiceUtil.buildSuccessResponseWithData(message);
 	}
 	
-	@RequestMapping(value = "/startAgent", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+	@RequestMapping(value = "/startStopAgent", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 	public @ResponseBody JsonObject startStopAgent(@RequestParam String agentId,@RequestParam String action) {
 		String message = agentManagementService.startStopAgent(agentId,action);
 		return PlatformServiceUtil.buildSuccessResponseWithData(message);
