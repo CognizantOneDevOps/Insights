@@ -98,7 +98,7 @@ public class AgentManagementServiceImpl  implements AgentManagementService{
 		//call installAgent method
 		//String status = installAgent(agentId, toolName,agentZipPath.getFileName().toString(), osversion);
 		//return status;
-		return "Success";
+		return "SUCCESS";
 	}
 
 
