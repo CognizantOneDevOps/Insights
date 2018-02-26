@@ -30,6 +30,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
@@ -39,10 +40,14 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
+import com.cognizant.devops.platformcommons.config.ApplicationConfigCache;
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.constants.MessageConstants;
+import com.cognizant.devops.platformcommons.core.enums.AGENTSTATUS;
+import com.cognizant.devops.platformdal.agentConfig.AgentConfig;
 import com.cognizant.devops.platformdal.agentConfig.AgentConfigDAL;
 import com.cognizant.devops.platformservice.agentmanagement.util.AgentManagementUtil;
 import com.google.gson.Gson;
@@ -72,7 +77,7 @@ public class AgentManagementServiceImpl  implements AgentManagementService{
 		json.addProperty("agentVersion",agentVersion);
 		json.get("subscribe").getAsJsonObject().addProperty("agentCtrlQueue" ,agentId);
 
-		boolean isDataUpdateSupported = false;
+		boolean isDataUpdateSupported = json.get("isDataUpdateSupported").isJsonNull()? false:json.get("isDataUpdateSupported").getAsBoolean();
 		String uniqueKey = agentId;
 		Date updateDate= Timestamp.valueOf(LocalDateTime.now());
 
@@ -94,6 +99,154 @@ public class AgentManagementServiceImpl  implements AgentManagementService{
 		//String status = installAgent(agentId, toolName,agentZipPath.getFileName().toString(), osversion);
 		//return status;
 		return "Success";
+	}
+
+
+	@Override
+	public String installAgent(String agentId,String toolName,String fileName,String osversion){
+		try {
+
+			Path path = Paths.get(ApplicationConfigProvider.getInstance().getAgentDetails().getUnzipPath(),toolName,fileName);
+			byte[] data = Files.readAllBytes(path);
+			sendAgentPackage(data,fileName,agentId,toolName,osversion);
+		} catch (Exception e) {
+			LOG.error("Error while installing agent..", e);
+			return "FAILED";
+		}
+
+		return "SUCCESS";
+	}
+
+	@Override
+	public String startStopAgent(String agentId, String action) {
+		try {
+			AgentConfigDAL agentConfigDAL = new AgentConfigDAL();
+			agentConfigDAL.updateAgentRunningStatus(agentId,AGENTSTATUS.valueOf(action));
+			performAgentAction(agentId,action);
+		} catch (Exception e) {
+			LOG.error("Error while installing agent..", e);
+			return "FAILED";
+		}
+		return "SUCCESS";
+	}
+
+	@Override
+	public String updateAgent(String agentId, String configDetails, String toolName, String agentVersion, String osversion) {
+		
+		try {
+			//Get latest agent code
+			getConfigFile(agentVersion,toolName);
+			
+			Gson gson = new Gson();
+			JsonElement jelement = gson.fromJson(configDetails.trim(),JsonElement.class);
+			JsonObject  json = jelement.getAsJsonObject();
+			
+			boolean isDataUpdateSupported = json.get("isDataUpdateSupported").isJsonNull()? false:json.get("isDataUpdateSupported").getAsBoolean();
+			String uniqueKey = agentId;
+			Date updateDate= Timestamp.valueOf(LocalDateTime.now());
+			
+			AgentConfigDAL agentConfigDAL = new AgentConfigDAL();
+			boolean updateStatus = agentConfigDAL.saveAgentConfigFromUI(agentId , toolName, json, isDataUpdateSupported, uniqueKey, agentVersion,osversion,updateDate);
+			
+			Path agentZipPath = updateAgentConfig(toolName,agentId,json);
+			
+			byte[] data = Files.readAllBytes(agentZipPath);
+			sendAgentPackage(data,agentId,agentId,toolName,osversion);
+			
+		} catch (Exception e) {
+			LOG.error("Error updating and installing agent", e);
+			return "FAILED";
+		}
+		
+		return "SUCCESS";
+	}
+
+	@Override
+	public List<AgentConfigTO> getRegisteredAgents() {
+		AgentConfigDAL agentConfigDAL = new AgentConfigDAL();
+		
+		List<AgentConfig> agentConfigList = agentConfigDAL.getAllAgentConfigurations();
+		List<AgentConfigTO> agentList = new ArrayList<>(agentConfigList.size());
+		for(AgentConfig agentConfig : agentConfigList) {
+			AgentConfigTO to = new AgentConfigTO();
+			BeanUtils.copyProperties(agentConfig, to);
+			agentList.add(to);
+		}
+		return agentList;
+	}
+
+	@Override
+	public AgentConfigTO getAgentDetails(String agentId) {
+		AgentConfigDAL agentConfigDAL = new AgentConfigDAL();
+		
+		AgentConfigTO agentConfig = new AgentConfigTO(); 
+		BeanUtils.copyProperties(agentConfigDAL.getAgentConfigurations(agentId), agentConfig);
+		return agentConfig;
+	}
+
+	@Override
+	public JsonObject getAgentDetails() {
+
+		Map<String,ArrayList<String>>  agentDetails = new HashMap<String,ArrayList<String>>();
+		String url = ApplicationConfigProvider.getInstance().getAgentDetails().getDocrootUrl();
+		JsonObject details = new JsonObject();
+		Document doc;
+		try {
+			doc = Jsoup.connect(url).get();
+			Elements rows = doc.getElementsByTag("a");
+			for (Element element : rows) {
+				if( null != element.text() && element.text().startsWith("v")){
+					String version = StringUtils.stripEnd(element.text(),"/");
+					ArrayList<String> toolJson = getAgents(version);
+					agentDetails.put(version, toolJson);
+
+				}
+			}
+		} catch (IOException e) {
+			LOG.debug(e);
+		}
+		details.add("details", new Gson().toJsonTree(agentDetails));
+		return details;
+	}
+
+	@Override
+	public JsonObject getConfigFile(String version, String tool) {
+
+		JsonObject configJson = null;
+		try {
+			System.setProperty("http.proxyHost", "proxy.cognizant.com");
+			System.setProperty("http.proxyPort","6050");
+			
+			String filePath = ApplicationConfigProvider.getInstance().getAgentDetails().getDocrootUrl()
+					+"/"+version+"/agents/testagents/"+tool;
+			filePath=filePath.trim()+"/"+tool.trim()+".zip";
+			String targetDir =  ApplicationConfigProvider.getInstance().getAgentDetails().getUnzipPath();
+			configJson = AgentManagementUtil.getInstance().getAgentConfigfile(new URL(filePath), new File(targetDir));
+		} catch (IOException e) {
+			LOG.debug(e);
+		}
+		return configJson;
+	}
+
+	private ArrayList<String> getAgents(String version) {
+
+		Document doc;
+		String url = ApplicationConfigProvider.getInstance().getAgentDetails().getDocrootUrl()+"/"+version+"/agents/testagents/";
+		ArrayList<String> tools = new ArrayList<String>();
+		try {
+			doc = Jsoup.connect(url).get();
+			Elements rows = doc.getElementsByTag("a");
+			for (Element element : rows) {
+				if(null != element.text() && element.text().endsWith("/")){
+					tools.add( StringUtils.stripEnd(element.text(),"/"));
+
+				}
+
+			}
+		} catch (IOException e) {
+			LOG.debug(e);
+		}
+		return tools;
 	}
 
 	private Path updateAgentConfig( String toolName,String agentId,JsonObject json) throws Exception {
@@ -143,103 +296,6 @@ public class AgentManagementServiceImpl  implements AgentManagementService{
 		}
 		return agentZipPath;
 
-	}
-
-	@Override
-	public String installAgent(String agentId,String toolName,String fileName,String osversion){
-		try {
-
-			Path path = Paths.get(ApplicationConfigProvider.getInstance().getAgentDetails().getUnzipPath(),toolName,fileName);
-			byte[] data = Files.readAllBytes(path);
-			sendAgentPackage(data,fileName,agentId,toolName,osversion);
-		} catch (Exception e) {
-			LOG.error("Error while installing agent..", e);
-			return "FAILED";
-		}
-
-		return "SUCCESS";
-	}
-
-	@Override
-	public String startStopAgent(String agentId, String action) {
-		try {
-			//Update status in DB and push message to MQ. If MQ fails, DB should be reverted.
-			performAgentAction(agentId,action);
-		} catch (Exception e) {
-			LOG.error("Error while installing agent..", e);
-			return "FAILED";
-		}
-		return "SUCCESS";
-	}
-
-	@Override
-	public String updateAgent(String agentId, String configDetails) {
-		// Code to update DB
-		// Call installAgent method and pass all required values
-		return null;
-	}
-
-	@Override
-	public JsonObject getAgentDetails() {
-
-		Map<String,ArrayList<String>>  agentDetails = new HashMap<String,ArrayList<String>>();
-		String url = ApplicationConfigProvider.getInstance().getAgentDetails().getDocrootUrl();
-		JsonObject details = new JsonObject();
-		Document doc;
-		try {
-			doc = Jsoup.connect(url).get();
-			Elements rows = doc.getElementsByTag("a");
-			for (Element element : rows) {
-				if( null != element.text() && element.text().startsWith("v")){
-					String version = StringUtils.stripEnd(element.text(),"/");
-					ArrayList<String> toolJson = getAgents(version);
-					agentDetails.put(version, toolJson);
-
-				}
-			}
-		} catch (IOException e) {
-			LOG.debug(e);
-		}
-		details.add("details", new Gson().toJsonTree(agentDetails));
-		return details;
-	}
-
-	private ArrayList<String> getAgents(String version) {
-
-		Document doc;
-		String url = ApplicationConfigProvider.getInstance().getAgentDetails().getDocrootUrl()+"/"+version+"/agents/testagents/";
-		ArrayList<String> tools = new ArrayList<String>();
-		try {
-			doc = Jsoup.connect(url).get();
-			Elements rows = doc.getElementsByTag("a");
-			for (Element element : rows) {
-				if(null != element.text() && element.text().endsWith("/")){
-					tools.add( StringUtils.stripEnd(element.text(),"/"));
-
-				}
-
-			}
-		} catch (IOException e) {
-			LOG.debug(e);
-		}
-		return tools;
-	}
-
-	@Override
-	public JsonObject getConfigFile(String version, String tool) {
-
-		JsonObject configJson = null;
-		try {
-			
-			String filePath = ApplicationConfigProvider.getInstance().getAgentDetails().getDocrootUrl()
-					+"/"+version+"/agents/testagents/"+tool;
-			filePath=filePath.trim()+"/"+tool.trim()+".zip";
-			String targetDir =  ApplicationConfigProvider.getInstance().getAgentDetails().getUnzipPath();
-			configJson = AgentManagementUtil.getInstance().getAgentConfigfile(new URL(filePath), new File(targetDir));
-		} catch (IOException e) {
-			LOG.debug(e);
-		}
-		return configJson;
 	}
 
 	private void sendAgentPackage(byte[] data, String fileName, String agentId, String toolName, String osversion) throws Exception {
@@ -293,4 +349,66 @@ public class AgentManagementServiceImpl  implements AgentManagementService{
 	private String getAgentkey(String toolName) {
 		return toolName + "-"+ Instant.now().toEpochMilli();
 	}
+	
+	   public static void main(String... args) {
+		   ApplicationConfigCache.loadConfigCache();
+		   AgentManagementServiceImpl impl = new AgentManagementServiceImpl();
+		   /*JsonObject json = impl.getConfigFile("v3.0", "bitbucket");
+		   System.out.println(json);
+		   String status = impl.registerAgent("bitbucket", "3.0", "WINDOWS", testConfig());
+		   System.out.println(status);*/
+		   
+		   //impl.getRegisteredAgents();
+		   //impl.getAgentDetails("bitbucket-1519302061371");
+		   impl.startStopAgent("bitbucket-1519302061371", "RUNNING");
+		   System.exit(0);
+	   }
+	   
+	   public static String testConfig() {
+		   
+		  return "{\r\n" + 
+		  		"	\"mqConfig\" : {\r\n" + 
+		  		"		\"user\" : \"iSight\", \r\n" + 
+		  		"		\"password\" : \"iSight\", \r\n" + 
+		  		"		\"host\" : \"127.0.0.1\", \r\n" + 
+		  		"		\"exchange\" : \"iSight\"\r\n" + 
+		  		"	},\r\n" + 
+		  		"	\"subscribe\" : {\r\n" + 
+		  		"		\"config\" : \"SCM.GIT.config\"\r\n" + 
+		  		"	},\r\n" + 
+		  		"	\"publish\" : {\r\n" + 
+		  		"		\"data\" : \"SCM.GIT.DATA\",\r\n" + 
+		  		"		\"health\" : \"SCM.GIT.HEALTH\"\r\n" + 
+		  		"	},\r\n" + 
+		  		"	\"communication\":{\r\n" + 
+		  		"		\"type\" : \"REST\" \r\n" + 
+		  		"	},\r\n" + 
+		  		"	\"responseTemplate\" : {\r\n" + 
+		  		"		\"sha\": \"commitId\",\r\n" + 
+		  		"		\"commit\" : {\r\n" + 
+		  		"			\"author\" : {\r\n" + 
+		  		"				\"name\": \"authorName\",\r\n" + 
+		  		"				\"date\": \"commitTime\"\r\n" + 
+		  		"			}\r\n" + 
+		  		"		}\r\n" + 
+		  		"	},\r\n" + 
+		  		"	\"enableBranches\" : false,\r\n" + 
+		  		"	\"toolsTimeZone\" : \"GMT\",\r\n" + 
+		  		"	\"insightsTimeZone\" : \"Asia/Kolkata\",\r\n" + 
+		  		"	\"useResponseTemplate\" : true,\r\n" + 
+		  		"	\"auth\" : \"base64\",\r\n" + 
+		  		"	\"runSchedule\" : 30,\r\n" + 
+		  		"	\"timeStampField\":\"commitTime\",\r\n" + 
+		  		"	\"timeStampFormat\":\"%Y-%m-%dT%H:%M:%SZ\",\r\n" + 
+		  		"	\"StartFrom\" : \"2016-10-10 15:46:33\",\r\n" + 
+		  		"	\"AccessToken\": \"accesstoken\",\r\n" + 
+		  		"	\"GetRepos\":\"https://api.github.com/users/<USER_NAME>/repos\",\r\n" + 
+		  		"	\"CommitsBaseEndPoint\":\"https://api.github.com/repos/<REPO_NAME>/\",\r\n" + 
+		  		"	\"isDebugAllowed\" : false,\r\n" + 
+		  		"	\"loggingSetting\" : {\r\n" + 
+		  		"		\"logLevel\" : \"WARN\"\r\n" + 
+		  		"	}\r\n" + 
+		  		"}";
+	   }
+
 }
