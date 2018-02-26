@@ -117,15 +117,19 @@ module ISightApp {
 					
 					this.updatedConfigdata[key] = this.item;
 					
+					if(key == "communication") {					
+						this.updatedConfigdata["dynamic"] = JSON.parse(this.dynamicData);
+					}
+					
 				}else if(key != "dynamic") {	
 						this.updatedConfigdata[key] = this.defaultConfigdata[key];						
 				}				
 			}	
 			
 			this.updatedConfigdata["OS"] = this.selectedOS;
-			this.updatedConfigdata["dynamic"] = JSON.parse(this.dynamicData);
 			
-			console.log(this.updatedConfigdata);
+			
+			console.log(JSON.stringify(this.updatedConfigdata));
 		}
 		
 	}
