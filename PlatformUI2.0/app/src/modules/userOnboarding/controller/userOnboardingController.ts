@@ -57,6 +57,7 @@ module ISightApp {
         allOrgDataArray = [];
         adminOrgDataArray = [];
         userCurrentOrgName: String = '';
+        showSwitchOptions: boolean = false;
 
         getUserAdminOrgs(orgDataArray) {
             var self = this;
@@ -95,14 +96,19 @@ module ISightApp {
                     self.$cookies.put('grafanaOrg', data.grafanaCurrentOrg);
                 });
 
-            this.$route.reload();
-            //(<HTMLDivElement>document.getElementById('iframeDiv')).window.location.reload(true);
-            //var destinationUrl = '/dist/modules/dashboards/view/dashboardView.html';
-            //this.$window.location.href = destinationUrl;
-            //(<HTMLIFrameElement>document.getElementById('iSightIframe')).contentWindow.location.reload(true);
-            //window.location.reload();
-            //self.getHost();
-            //DashboardController.switchOrganizations(orgId);
+            self.refreshIframe();
+        }
+
+        refreshIframe() {
+            var myIframe = (<HTMLIFrameElement>document.getElementById('iSightIframe'));
+            setTimeout(function () {
+                myIframe.src = myIframe.src;
+            }, 500);
+        }
+
+        showAccessGroupOptions() {
+            var self = this;
+            self.showSwitchOptions = true;
         }
 
         getHost() {
