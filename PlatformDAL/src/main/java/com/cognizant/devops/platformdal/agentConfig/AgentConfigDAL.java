@@ -20,6 +20,7 @@ import java.util.List;
 
 import org.hibernate.query.Query;
 
+import com.cognizant.devops.platformcommons.core.enums.AGENTSTATUS;
 import com.cognizant.devops.platformdal.core.BaseDAL;
 import com.google.gson.JsonObject;
 
@@ -43,27 +44,31 @@ public class AgentConfigDAL extends BaseDAL {
 		}
 		getSession().beginTransaction();
 		if (agentConfig != null) {
-			agentConfig.setAgentJson(agentJson.toString());
-			agentConfig.setDataUpdateSupported(isDataUpdateSupported);
-			agentConfig.setUniqueKey(uniqueKey);
+			setAgentConfigValues(agentConfig, agentId, toolName, agentJson, isDataUpdateSupported, uniqueKey, agentVersion, osversion, updateDate);
 			getSession().update(agentConfig);
 		} else {
 			agentConfig = new AgentConfig();
-			agentConfig.setAgentKey(agentId);
-			agentConfig.setToolName(toolName);
-			agentConfig.setAgentJson(agentJson.toString());
-			agentConfig.setDataUpdateSupported(isDataUpdateSupported);
-			agentConfig.setUniqueKey(uniqueKey);
-			agentConfig.setOsVersion(osversion);
-			agentConfig.setAgentVersion(agentVersion);
-			agentConfig.setUpdatedDate(updateDate);
-			
+			setAgentConfigValues(agentConfig, agentId, toolName, agentJson, isDataUpdateSupported, uniqueKey, agentVersion, osversion, updateDate);
 			getSession().save(agentConfig);
 		}
 		getSession().getTransaction().commit();
 		terminateSession();
 		terminateSessionFactory();
 		return true;
+	}
+	
+	private void setAgentConfigValues(AgentConfig agentConfig,String agentId, String toolName, JsonObject agentJson, 
+			boolean isDataUpdateSupported, String uniqueKey, String agentVersion, String osversion, Date updateDate) {
+		
+		agentConfig.setToolName(toolName);
+		agentConfig.setDataUpdateSupported(isDataUpdateSupported);
+		agentConfig.setAgentJson(agentJson.toString());
+		agentConfig.setOsVersion(osversion);
+		agentConfig.setAgentVersion(agentVersion);
+		agentConfig.setUpdatedDate(updateDate);
+		agentConfig.setUniqueKey(uniqueKey);
+		agentConfig.setAgentKey(agentId);
+		agentConfig.setAgentStatus(AGENTSTATUS.RUNNING.name());
 	}
 
 
@@ -111,6 +116,34 @@ public class AgentConfigDAL extends BaseDAL {
 		createQuery.setParameter("toolName", toolName);
 		createQuery.setParameter("toolCategory", toolCategory);
 		List<AgentConfig> result = createQuery.getResultList();
+		terminateSession();
+		terminateSessionFactory();
+		return result;
+	}
+	
+	public AgentConfig updateAgentRunningStatus(String agentId,AGENTSTATUS action) {
+		Query<AgentConfig> createQuery = getSession().createQuery(
+				"FROM AgentConfig AC WHERE AC.agentKey = :agentKey",
+				AgentConfig.class);
+		createQuery.setParameter("agentKey", agentId);
+		AgentConfig agentConfig = createQuery.getSingleResult();
+		getSession().beginTransaction();
+		if(agentConfig != null) {
+			agentConfig.setAgentStatus(action.name());
+			getSession().update(agentConfig);
+		}
+		getSession().getTransaction().commit();
+		terminateSession();
+		terminateSessionFactory();
+		return agentConfig;
+	}
+	
+	public AgentConfig getAgentConfigurations(String agentId) {
+		Query<AgentConfig> createQuery = getSession().createQuery(
+				"FROM AgentConfig AC WHERE AC.agentKey = :agentKey",
+				AgentConfig.class);
+		createQuery.setParameter("agentKey", agentId);
+		AgentConfig result = createQuery.getSingleResult();
 		terminateSession();
 		terminateSessionFactory();
 		return result;

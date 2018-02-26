@@ -16,6 +16,8 @@
 
 package com.cognizant.devops.platformservice.agentmanagement.service;
 
+import java.util.List;
+
 import com.google.gson.JsonObject;
 
 
@@ -24,8 +26,10 @@ public interface AgentManagementService {
 	public String registerAgent(String toolName,String agentVersion,String osversion,String configDetails);
 	public String installAgent(String agentId,String toolName,String fileName,String osversion);
 	public String startStopAgent(String agentId,String action);
-	public String updateAgent(String agentId, String configDetails);
+	public String updateAgent(String agentId, String configDetails, String toolName, String agentVersion, String osversion);
 	public JsonObject getAgentDetails();
 	public JsonObject getConfigFile(String version, String tool);
+	public List<AgentConfigTO> getRegisteredAgents();
+	public AgentConfigTO getAgentDetails(String agentId);
 }
  
