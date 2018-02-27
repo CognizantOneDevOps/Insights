@@ -199,10 +199,8 @@ public class HierarchyDetailsService {
 	@RequestMapping(value = "/uploadHierarchyDetails", headers=("content-type=multipart/*"), method = RequestMethod.POST,
 			produces = MediaType.APPLICATION_JSON_UTF8_VALUE,consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	public @ResponseBody JsonObject uploadHierarchyDetails(@RequestParam("file") MultipartFile file) {
-		boolean status =false;
-		if (!file.isEmpty()) {
-			status=DataProcessorUtil.getInstance().readData(file);
-		}
+
+		boolean status = DataProcessorUtil.getInstance().readData(file);
 		if (status) {
 			return PlatformServiceUtil.buildSuccessResponse();
 		} else {
@@ -247,42 +245,42 @@ public class HierarchyDetailsService {
 		JsonObject json=element.getAsJsonObject().get("row").getAsJsonArray().get(0).getAsJsonObject();
 
 		if(null!=json.get("level_1").getAsString() &&  !json.get("level_1").getAsString().isEmpty() ){
-		childJson_1.addProperty("name",json.get("level_1").getAsString());
+			childJson_1.addProperty("name",json.get("level_1").getAsString());
 		}
 		if(null!=json.get("level_2").getAsString() && !json.get("level_2").getAsString().isEmpty() ){
-		childJson_2.addProperty("name" , json.get("level_2").getAsString());
+			childJson_2.addProperty("name" , json.get("level_2").getAsString());
 		}
 		if(null!=json.get("level_3").getAsString() &&  !json.get("level_3").getAsString().isEmpty() ){
-		childJson_3.addProperty("name" , json.get("level_3").getAsString());
+			childJson_3.addProperty("name" , json.get("level_3").getAsString());
 		}
 		if(null!=json.get("level_4").getAsString() &&  !json.get("level_4").getAsString().isEmpty() ){
-		childJson_4.addProperty("name", json.get("level_4").getAsString());
+			childJson_4.addProperty("name", json.get("level_4").getAsString());
 		}
 		if(!childJson_4.isJsonNull()){
-		thirdChild.add(childJson_4);
+			thirdChild.add(childJson_4);
 		}
 		if(null!=json.get("level_4").getAsString() &&  !json.get("level_4").getAsString().isEmpty() ){
-		childJson_3.add("children", thirdChild);
+			childJson_3.add("children", thirdChild);
 		}
 		if(!childJson_3.isJsonNull()){
-		secondChild.add(childJson_3);
+			secondChild.add(childJson_3);
 		}
 		if(null!=json.get("level_3").getAsString() &&  !json.get("level_3").getAsString().isEmpty() ){
-		childJson_2.add("children", secondChild);
+			childJson_2.add("children", secondChild);
 		}
 		if(!childJson_2.isJsonNull()){
-		firstChild.add(childJson_2);
+			firstChild.add(childJson_2);
 		}
-		
+
 		if(null!=json.get("level_2").getAsString() && !json.get("level_2").getAsString().isEmpty() ){
-		childJson_1.add("children", firstChild);
+			childJson_1.add("children", firstChild);
 		}
 		return childJson_1;
 	}
-	
+
 	@RequestMapping(value = "/getHierarchyProperties", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 	public JsonObject getHierarchyProperties(@RequestParam String level1,@RequestParam String level2, @RequestParam String level3, 
-											 @RequestParam String level4) throws GraphDBException {
+			@RequestParam String level4) throws GraphDBException {
 		Neo4jDBHandler dbHandler = new Neo4jDBHandler();
 		String queryLabels=":METADATA:DATATAGGING";
 		StringBuilder sb = new StringBuilder();
@@ -305,16 +303,30 @@ public class HierarchyDetailsService {
 			sb.append(",");
 		}
 		if(null!=level4 && !level4.isEmpty()){
-			
+
 			sb.append("level_4:'");
 			sb.append(level4.trim());
 			sb.append("'");
-			
+
 		}
 		String props=StringUtils.stripEnd(sb.toString(),",");
 		String query = "MATCH (n "+queryLabels+"{"+props+"}" + ") return n";
 		GraphResponse response=dbHandler.executeCypherQuery(query.toString());
 		return PlatformServiceUtil.buildSuccessResponseWithData(response.getNodes());
 	}
+
+	@RequestMapping(value = "/updateHiearchyProperty", headers=("content-type=multipart/*"), method = RequestMethod.POST,
+					produces = MediaType.APPLICATION_JSON_UTF8_VALUE,consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+	public @ResponseBody JsonObject updateHiearchyProperty(@RequestParam("file") MultipartFile file) {
+
+		boolean status  = DataProcessorUtil.getInstance().updateHiearchyProperty(file);
+		if (status) {
+			return PlatformServiceUtil.buildSuccessResponse();
+		} else {
+			return PlatformServiceUtil.buildFailureResponse(ErrorMessage.DB_INSERTION_FAILED);
+		}
+
+	}
+
 
 }

@@ -72,7 +72,7 @@
 	"userId": "UserID",
 	"password": "Passwd",
 	"refreshTime": "Jan 22, 2017 5:04:25 PM",
-	 "enableOnlineDatatagging":true,
+	 "enableOnlineDatatagging":false,
 	"trustedHosts": [
 		"localhost"
 	]
