@@ -54,7 +54,7 @@ public class DataProcessorUtil  {
 		}
 
 		CSVFormat format = CSVFormat.newFormat(',').withHeader();
-		
+
 		try (Reader reader = new FileReader(csvfile); CSVParser csvParser = new CSVParser(reader, format);){
 
 			Neo4jDBHandler dbHandler = new Neo4jDBHandler();
@@ -66,13 +66,12 @@ public class DataProcessorUtil  {
 					"CREATE (n:METADATA:DATATAGGING) " +
 					"SET n = properties";
 			int sleepTime=500;
-			int totalRecords=0;
 			int size = 0;
 			int totalSize = 0;
-
+			int bulkRecordCnt=10;
 			for (CSVRecord csvRecord : csvParser.getRecords()) {
 				size += 1;
-				totalRecords++;
+				//totalRecords++;
 				JsonObject json = new JsonObject();
 				for(Map.Entry<String, Integer> header : headerMap.entrySet()){
 					if(header.getKey()!= null){
@@ -81,22 +80,24 @@ public class DataProcessorUtil  {
 				}			
 				json.addProperty(DatataggingConstants.CREATIONDATE, Instant.now().toEpochMilli() );
 				gitProperties.add(json);
-				if(size == 10 ) {
+				if(size == bulkRecordCnt ) {
 					totalSize += size;
 					size = 0;
 					JsonObject graphResponse = dbHandler.bulkCreateNodes(gitProperties, null, query);
 					if(graphResponse.get("response").getAsJsonObject().get("errors").getAsJsonArray().size() > 0){
 						log.error(graphResponse);
 						status=false;
-						break;
+						if(totalSize >= csvParser.getRecords().size()) {
+							break;
+						}
 					}
 					Thread.sleep(sleepTime);
 					gitProperties = new ArrayList<>();
 				}
-               if(totalSize > totalRecords) {
-					
+				/*if(totalSize >= totalRecords) {
+
 					break;
-				}
+				}*/
 				status=true;
 			}
 
@@ -115,6 +116,73 @@ public class DataProcessorUtil  {
 		}
 		return status;
 
+	}
+
+	public boolean updateHiearchyProperty(MultipartFile file) {
+		Neo4jDBHandler dbHandler = new Neo4jDBHandler();
+		File csvfile =null;
+		boolean status = false;
+		try {
+			csvfile = convertToFile(file);
+		} catch (IOException ex) {
+			status=true;
+			log.debug(ex);
+		}
+		String label = "METADATA:DATATAGGING";
+		CSVFormat format = CSVFormat.newFormat(',').withHeader();
+
+		try (Reader reader = new FileReader(csvfile); CSVParser csvParser = new CSVParser(reader, format);){
+			Map<String, Integer> headerMap = csvParser.getHeaderMap();
+			String cypherQuery = null;
+			for (CSVRecord record : csvParser) { 
+				JsonObject json = new JsonObject();
+				List<JsonObject>  list=new ArrayList<JsonObject>();
+
+				if( record.get("Action") != null &&  record.get("Action").equals("edit")){
+					
+					for(Map.Entry<String, Integer> header : headerMap.entrySet()){
+						if(header.getKey() != null){
+							json.addProperty(header.getKey(), record.get(header.getValue()));
+
+						}
+					}
+					list.add(json);
+					cypherQuery = "MATCH (n :"+label+"{id:'"+record.get("id")+"'}" + ")  SET n += {props} RETURN n ";
+					try {
+						JsonObject graphResponse = dbHandler.executeQueryWithData(cypherQuery,list);
+						if(graphResponse.get("response").getAsJsonObject().get("errors").getAsJsonArray().size() > 0){
+							status = false;
+							break;
+						}
+					} catch (GraphDBException e) {
+						status = false;
+						log.debug(e);
+					}
+					status = true;
+
+				}else if(record.get("Action") != null &&  record.get("Action").equals("delete") ){
+
+					cypherQuery = "MATCH (n :"+label+"{id:'"+record.get("id")+"'}" + ")   REMOVE n:"+label+"  SET n:METADATA_BACKUP  RETURN n ";
+					try {
+						dbHandler.executeCypherQuery(cypherQuery);
+						
+					} catch (GraphDBException e) {
+						status = false;
+						log.debug(e);
+					}
+
+					status = true;
+
+				}
+
+
+
+			}
+
+		} catch (IOException e) {
+			log.debug(e);
+		} 
+		return status;
 	}
 
 }
