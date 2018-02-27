@@ -47,7 +47,12 @@ public class InsightsAgentConfiguration {
 	@RequestMapping(value = "/registerAgent", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 	public @ResponseBody JsonObject registerAgent(@RequestParam String toolName,@RequestParam String agentVersion,
 			@RequestParam String osversion,@RequestParam String configDetails) {
-		String message = agentManagementService.registerAgent(toolName, agentVersion, osversion, configDetails);
+		String message =null;
+		try{
+			message = agentManagementService.registerAgent(toolName, agentVersion, osversion, configDetails);
+		}catch(InsightsCustomException e){
+			return PlatformServiceUtil.buildFailureResponse(e.toString());
+		}
 		return PlatformServiceUtil.buildSuccessResponseWithData(message);
 	}
 
@@ -55,26 +60,41 @@ public class InsightsAgentConfiguration {
 	public @ResponseBody JsonObject updateAgent(@RequestParam String agentId,@RequestParam String configJson,
 			@RequestParam String toolName,@RequestParam String agentVersion,
 			@RequestParam String osversion) {
-		String message = agentManagementService.updateAgent(agentId,configJson, toolName, agentVersion, osversion);
+		String message = null;
+		try{
+			message = agentManagementService.updateAgent(agentId,configJson, toolName, agentVersion, osversion);
+		}catch(InsightsCustomException e){
+			return PlatformServiceUtil.buildFailureResponse(e.toString());
+		}
 		return PlatformServiceUtil.buildSuccessResponseWithData(message);
 	}
 
 	@RequestMapping(value = "/startStopAgent", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 	public @ResponseBody JsonObject startStopAgent(@RequestParam String agentId,@RequestParam String action) {
-		String message = agentManagementService.startStopAgent(agentId,action);
+		String message = null;
+		try{
+			message = agentManagementService.startStopAgent(agentId,action);
+		}catch(InsightsCustomException e){
+			return PlatformServiceUtil.buildFailureResponse(e.toString());
+		}
 		return PlatformServiceUtil.buildSuccessResponseWithData(message);
 	}
 
 
 	@RequestMapping(value = "/getSystemAvailableAgentList", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 	public @ResponseBody JsonObject getSystemAvailableAgentList() {
-		Map<String, ArrayList<String>>  agentDetails = agentManagementService.getSystemAvailableAgentList();
+		Map<String, ArrayList<String>>  agentDetails;
+		try{
+			agentDetails = agentManagementService.getSystemAvailableAgentList();
+		}catch(InsightsCustomException e){
+			return PlatformServiceUtil.buildFailureResponse(e.toString());
+		}
 		return PlatformServiceUtil.buildSuccessResponseWithData(agentDetails);
 	}
 
 	@RequestMapping(value = "/getToolRawConfigFile", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 	public @ResponseBody JsonObject getToolRawConfigFile(@RequestParam String version,@RequestParam String tool) {
-		String details ;
+		String details = null;
 		try{
 			details = agentManagementService.getToolRawConfigFile(version,tool);
 		}catch(InsightsCustomException e){
@@ -87,13 +107,23 @@ public class InsightsAgentConfiguration {
 
 	@RequestMapping(value = "/getRegisteredAgents", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 	public @ResponseBody JsonObject getRegisteredAgents(){
-		List<AgentConfigTO>  agentList = agentManagementService.getRegisteredAgents();
+		List<AgentConfigTO>  agentList ;
+		try{
+			agentList = agentManagementService.getRegisteredAgents();
+		}catch(InsightsCustomException e){
+			return PlatformServiceUtil.buildFailureResponse(e.toString());
+		}
 		return PlatformServiceUtil.buildSuccessResponseWithData(agentList);
 	}
 
 	@RequestMapping(value = "/getRegisteredAgentDetail", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 	public @ResponseBody JsonObject getAgentDetails(@RequestParam String agentId) {
-		AgentConfigTO  agentDetails = agentManagementService.getAgentDetails(agentId);
+		AgentConfigTO  agentDetails ;
+		try{
+		 agentDetails = agentManagementService.getAgentDetails(agentId);
+		}catch(InsightsCustomException e){
+			return PlatformServiceUtil.buildFailureResponse(e.toString());
+		}
 		return PlatformServiceUtil.buildSuccessResponseWithData(agentDetails);
 	}
 
