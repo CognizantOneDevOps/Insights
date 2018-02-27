@@ -43,10 +43,10 @@ import org.jsoup.select.Elements;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
-import com.cognizant.devops.platformcommons.config.ApplicationConfigCache;
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.constants.MessageConstants;
 import com.cognizant.devops.platformcommons.core.enums.AGENTSTATUS;
+import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformdal.agentConfig.AgentConfig;
 import com.cognizant.devops.platformdal.agentConfig.AgentConfigDAL;
 import com.cognizant.devops.platformservice.agentmanagement.util.AgentManagementUtil;
@@ -65,30 +65,30 @@ public class AgentManagementServiceImpl  implements AgentManagementService{
 
 	@Override
 	public String registerAgent(String toolName,String agentVersion,String osversion,String configDetails) {
-		
+
 		try {
-		String agentId = getAgentkey(toolName);
+			String agentId = getAgentkey(toolName);
 
-		Gson gson = new Gson();
-		JsonElement jelement = gson.fromJson(configDetails.trim(),JsonElement.class);
-		JsonObject  json = jelement.getAsJsonObject();
-		json.addProperty("agentId",agentId);
-		json.addProperty("osversion",osversion);
-		json.addProperty("agentVersion",agentVersion);
-		json.get("subscribe").getAsJsonObject().addProperty("agentCtrlQueue" ,agentId);
-		boolean isDataUpdateSupported = false;
-		if(json.get("isDataUpdateSupported") != null && !json.get("isDataUpdateSupported").isJsonNull()) {
-			isDataUpdateSupported = json.get("isDataUpdateSupported").getAsBoolean();
-		}  
-		String uniqueKey = agentId;
-		Date updateDate= Timestamp.valueOf(LocalDateTime.now());
+			Gson gson = new Gson();
+			JsonElement jelement = gson.fromJson(configDetails.trim(),JsonElement.class);
+			JsonObject  json = jelement.getAsJsonObject();
+			json.addProperty("agentId",agentId);
+			json.addProperty("osversion",osversion);
+			json.addProperty("agentVersion",agentVersion);
+			json.get("subscribe").getAsJsonObject().addProperty("agentCtrlQueue" ,agentId);
+			boolean isDataUpdateSupported = false;
+			if(json.get("isDataUpdateSupported") != null && !json.get("isDataUpdateSupported").isJsonNull()) {
+				isDataUpdateSupported = json.get("isDataUpdateSupported").getAsBoolean();
+			}  
+			String uniqueKey = agentId;
+			Date updateDate= Timestamp.valueOf(LocalDateTime.now());
 
-		// register agent in DB
-		AgentConfigDAL agentConfigDAL = new AgentConfigDAL();
-		boolean updateStatus = agentConfigDAL.saveAgentConfigFromUI(agentId , toolName,json, isDataUpdateSupported, uniqueKey,agentVersion,osversion,updateDate);
+			// register agent in DB
+			AgentConfigDAL agentConfigDAL = new AgentConfigDAL();
+			agentConfigDAL.saveAgentConfigFromUI(agentId , toolName,json, isDataUpdateSupported, uniqueKey,agentVersion,osversion,updateDate);
 
-		//Create zip/tar file with updated config.json
-		
+			//Create zip/tar file with updated config.json
+
 			Path agentZipPath =updateAgentConfig(toolName,agentId,json);
 			byte[] data = Files.readAllBytes(agentZipPath);
 			sendAgentPackage(data,agentId,agentId,toolName,osversion);
@@ -134,42 +134,42 @@ public class AgentManagementServiceImpl  implements AgentManagementService{
 
 	@Override
 	public String updateAgent(String agentId, String configDetails, String toolName, String agentVersion, String osversion) {
-		
+
 		try {
 			//Get latest agent code
-			getConfigFile(agentVersion,toolName);
-			
+			getToolRawConfigFile(agentVersion,toolName);
+
 			Gson gson = new Gson();
 			JsonElement jelement = gson.fromJson(configDetails.trim(),JsonElement.class);
 			JsonObject  json = jelement.getAsJsonObject();
-			
+
 			boolean isDataUpdateSupported = false;
 			if(json.get("isDataUpdateSupported") != null && !json.get("isDataUpdateSupported").isJsonNull()) {
 				isDataUpdateSupported = json.get("isDataUpdateSupported").getAsBoolean();
 			}
 			String uniqueKey = agentId;
 			Date updateDate= Timestamp.valueOf(LocalDateTime.now());
-			
+
 			AgentConfigDAL agentConfigDAL = new AgentConfigDAL();
 			boolean updateStatus = agentConfigDAL.saveAgentConfigFromUI(agentId , toolName, json, isDataUpdateSupported, uniqueKey, agentVersion,osversion,updateDate);
-			
+
 			Path agentZipPath = updateAgentConfig(toolName,agentId,json);
-			
+
 			byte[] data = Files.readAllBytes(agentZipPath);
 			sendAgentPackage(data,agentId,agentId,toolName,osversion);
-			
+
 		} catch (Exception e) {
 			LOG.error("Error updating and installing agent", e);
 			return "FAILED";
 		}
-		
+
 		return "SUCCESS";
 	}
 
 	@Override
 	public List<AgentConfigTO> getRegisteredAgents() {
 		AgentConfigDAL agentConfigDAL = new AgentConfigDAL();
-		
+
 		List<AgentConfig> agentConfigList = agentConfigDAL.getAllAgentConfigurations();
 		List<AgentConfigTO> agentList = new ArrayList<>(agentConfigList.size());
 		for(AgentConfig agentConfig : agentConfigList) {
@@ -177,22 +177,22 @@ public class AgentManagementServiceImpl  implements AgentManagementService{
 			BeanUtils.copyProperties(agentConfig, to);
 			agentList.add(to);
 		}
-		System.out.println("Agent list -- "+agentList);
 		return agentList;
 	}
 
 	@Override
 	public AgentConfigTO getAgentDetails(String agentId) {
 		AgentConfigDAL agentConfigDAL = new AgentConfigDAL();
-		
+
 		AgentConfigTO agentConfig = new AgentConfigTO(); 
 		BeanUtils.copyProperties(agentConfigDAL.getAgentConfigurations(agentId), agentConfig);
 		return agentConfig;
 	}
 
 	@Override
-	public JsonObject getAgentDetails() {
-
+	public Map<String, ArrayList<String>> getSystemAvailableAgentList() {
+		System.setProperty("http.proxyHost", "proxy.cognizant.com");
+		System.setProperty("http.proxyPort","6050");
 		Map<String,ArrayList<String>>  agentDetails = new HashMap<String,ArrayList<String>>();
 		String url = ApplicationConfigProvider.getInstance().getAgentDetails().getDocrootUrl();
 		JsonObject details = new JsonObject();
@@ -211,25 +211,25 @@ public class AgentManagementServiceImpl  implements AgentManagementService{
 		} catch (IOException e) {
 			LOG.debug(e);
 		}
-		details.add("details", new Gson().toJsonTree(agentDetails));
-		return details;
+		return agentDetails;
 	}
 
 	@Override
-	public JsonObject getConfigFile(String version, String tool) {
-
-		JsonObject configJson = null;
+	public String getToolRawConfigFile(String version, String tool) throws InsightsCustomException  {
+		String configJson = null;
 		try {
-			System.setProperty("http.proxyHost", "proxy.cognizant.com");
-			System.setProperty("http.proxyPort","6050");
-			
+			/*System.setProperty("http.proxyHost", "proxy.cognizant.com");
+			System.setProperty("http.proxyPort","6050");*/
+
 			String filePath = ApplicationConfigProvider.getInstance().getAgentDetails().getDocrootUrl()
 					+"/"+version+"/agents/testagents/"+tool;
 			filePath=filePath.trim()+"/"+tool.trim()+".zip";
 			String targetDir =  ApplicationConfigProvider.getInstance().getAgentDetails().getUnzipPath();
-			configJson = AgentManagementUtil.getInstance().getAgentConfigfile(new URL(filePath), new File(targetDir));
+			configJson = AgentManagementUtil.getInstance().getAgentConfigfile(new URL(filePath), new File(targetDir)).toString();
 		} catch (IOException e) {
-			LOG.debug(e);
+			LOG.error("Error in getting raw config file ",e);
+			throw new InsightsCustomException(e.toString());
+
 		}
 		return configJson;
 	}
@@ -261,16 +261,16 @@ public class AgentManagementServiceImpl  implements AgentManagementService{
 
 		DirectoryStream<Path> paths = Files.newDirectoryStream(Paths.get(filePath));
 		Iterator<Path> pathIterator = paths.iterator();
-		while(pathIterator.hasNext()) {
+		/*while(pathIterator.hasNext()) {
 			Path path = pathIterator.next();
 			if(path.toString().endsWith(".json")) {
 				System.out.println(path.toFile().getAbsolutePath());
 			}
-		}
-		
+		}*/
+
 		File configFile = null;
 		try(Stream<Path> all =  Files.walk(Paths.get(filePath));){
-		
+
 			pathIterator = all.iterator();
 			while(pathIterator.hasNext()) {
 				Path path = pathIterator.next();
@@ -355,66 +355,69 @@ public class AgentManagementServiceImpl  implements AgentManagementService{
 	private String getAgentkey(String toolName) {
 		return toolName + "-"+ Instant.now().toEpochMilli();
 	}
-	
-	   public static void main(String... args) {
+
+	/* public static void main(String... args) {
 		   ApplicationConfigCache.loadConfigCache();
 		   AgentManagementServiceImpl impl = new AgentManagementServiceImpl();
-		   JsonObject json = impl.getConfigFile("v3.0", "bitbucket");
+
+		   JsonParser parser = new JsonParser();
+		   JsonObject json = (JsonObject) parser.parse(impl.getToolRawConfigFile("v3.0", "bitbucket"));
+		  // JsonObject json = impl.getToolRawConfigFile("v3.0", "bitbucket");
 		   System.out.println(json);
 		   String status = impl.registerAgent("bitbucket", "3.0", "WINDOWS", testConfig());
 		   System.out.println(status);
-		   
+
 		   impl.getRegisteredAgents();
 		   //System.out.println(impl.getAgentDetails("bitbucket-1519302061371"));
 		   //impl.startStopAgent("bitbucket-1519302061371", "RUNNING");
 		   System.exit(0);
-	   }
-	   
-	   public static String testConfig() {
-		   
-		  return "{\r\n" + 
-		  		"	\"mqConfig\" : {\r\n" + 
-		  		"		\"user\" : \"iSight\", \r\n" + 
-		  		"		\"password\" : \"iSight\", \r\n" + 
-		  		"		\"host\" : \"127.0.0.1\", \r\n" + 
-		  		"		\"exchange\" : \"iSight\"\r\n" + 
-		  		"	},\r\n" + 
-		  		"	\"subscribe\" : {\r\n" + 
-		  		"		\"config\" : \"SCM.GIT.config\"\r\n" + 
-		  		"	},\r\n" + 
-		  		"	\"publish\" : {\r\n" + 
-		  		"		\"data\" : \"SCM.GIT.DATA\",\r\n" + 
-		  		"		\"health\" : \"SCM.GIT.HEALTH\"\r\n" + 
-		  		"	},\r\n" + 
-		  		"	\"communication\":{\r\n" + 
-		  		"		\"type\" : \"REST\" \r\n" + 
-		  		"	},\r\n" + 
-		  		"	\"responseTemplate\" : {\r\n" + 
-		  		"		\"sha\": \"commitId\",\r\n" + 
-		  		"		\"commit\" : {\r\n" + 
-		  		"			\"author\" : {\r\n" + 
-		  		"				\"name\": \"authorName\",\r\n" + 
-		  		"				\"date\": \"commitTime\"\r\n" + 
-		  		"			}\r\n" + 
-		  		"		}\r\n" + 
-		  		"	},\r\n" + 
-		  		"	\"enableBranches\" : false,\r\n" + 
-		  		"	\"toolsTimeZone\" : \"GMT\",\r\n" + 
-		  		"	\"insightsTimeZone\" : \"Asia/Kolkata\",\r\n" + 
-		  		"	\"useResponseTemplate\" : true,\r\n" + 
-		  		"	\"auth\" : \"base64\",\r\n" + 
-		  		"	\"runSchedule\" : 30,\r\n" + 
-		  		"	\"timeStampField\":\"commitTime\",\r\n" + 
-		  		"	\"timeStampFormat\":\"%Y-%m-%dT%H:%M:%SZ\",\r\n" + 
-		  		"	\"StartFrom\" : \"2016-10-10 15:46:33\",\r\n" + 
-		  		"	\"AccessToken\": \"accesstoken\",\r\n" + 
-		  		"	\"GetRepos\":\"https://api.github.com/users/<USER_NAME>/repos\",\r\n" + 
-		  		"	\"CommitsBaseEndPoint\":\"https://api.github.com/repos/<REPO_NAME>/\",\r\n" + 
-		  		"	\"isDebugAllowed\" : false,\r\n" + 
-		  		"	\"loggingSetting\" : {\r\n" + 
-		  		"		\"logLevel\" : \"WARN\"\r\n" + 
-		  		"	}\r\n" + 
-		  		"}";
-	   }
+	   }*/
+
+	public static String testConfig() {
+
+		return "{\r\n" + 
+				"	\"mqConfig\" : {\r\n" + 
+				"		\"user\" : \"iSight\", \r\n" + 
+				"		\"password\" : \"iSight\", \r\n" + 
+				"		\"host\" : \"127.0.0.1\", \r\n" + 
+				"		\"exchange\" : \"iSight\"\r\n" + 
+				"	},\r\n" + 
+				"	\"subscribe\" : {\r\n" + 
+				"		\"config\" : \"SCM.GIT.config\"\r\n" + 
+				"	},\r\n" + 
+				"	\"publish\" : {\r\n" + 
+				"		\"data\" : \"SCM.GIT.DATA\",\r\n" + 
+				"		\"health\" : \"SCM.GIT.HEALTH\"\r\n" + 
+				"	},\r\n" + 
+				"	\"communication\":{\r\n" + 
+				"		\"type\" : \"REST\" \r\n" + 
+				"	},\r\n" + 
+				"	\"responseTemplate\" : {\r\n" + 
+				"		\"sha\": \"commitId\",\r\n" + 
+				"		\"commit\" : {\r\n" + 
+				"			\"author\" : {\r\n" + 
+				"				\"name\": \"authorName\",\r\n" + 
+				"				\"date\": \"commitTime\"\r\n" + 
+				"			}\r\n" + 
+				"		}\r\n" + 
+				"	},\r\n" + 
+				"	\"enableBranches\" : false,\r\n" + 
+				"	\"toolsTimeZone\" : \"GMT\",\r\n" + 
+				"	\"insightsTimeZone\" : \"Asia/Kolkata\",\r\n" + 
+				"	\"useResponseTemplate\" : true,\r\n" + 
+				"	\"auth\" : \"base64\",\r\n" + 
+				"	\"runSchedule\" : 30,\r\n" + 
+				"	\"timeStampField\":\"commitTime\",\r\n" + 
+				"	\"timeStampFormat\":\"%Y-%m-%dT%H:%M:%SZ\",\r\n" + 
+				"	\"StartFrom\" : \"2016-10-10 15:46:33\",\r\n" + 
+				"	\"AccessToken\": \"accesstoken\",\r\n" + 
+				"	\"GetRepos\":\"https://api.github.com/users/<USER_NAME>/repos\",\r\n" + 
+				"	\"CommitsBaseEndPoint\":\"https://api.github.com/repos/<REPO_NAME>/\",\r\n" + 
+				"	\"isDebugAllowed\" : false,\r\n" + 
+				"	\"loggingSetting\" : {\r\n" + 
+				"		\"logLevel\" : \"WARN\"\r\n" + 
+				"	}\r\n" + 
+				"}";
+	}
 
 }

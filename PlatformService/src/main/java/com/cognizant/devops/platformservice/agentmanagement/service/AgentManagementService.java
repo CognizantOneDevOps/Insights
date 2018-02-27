@@ -16,9 +16,11 @@
 
 package com.cognizant.devops.platformservice.agentmanagement.service;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
-import com.google.gson.JsonObject;
+import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 
 
 public interface AgentManagementService {
@@ -29,9 +31,9 @@ public interface AgentManagementService {
 	public String updateAgent(String agentId, String configDetails, String toolName, String agentVersion, String osversion);
 	
 	//This is used during Agent registration, provide list of Agents, with version from docroot.
-	public JsonObject getAgentDetails();
+	public Map<String, ArrayList<String>> getSystemAvailableAgentList();
 	//For agent registration, gives you RAW config.json from docroot
-	public JsonObject getConfigFile(String version, String tool);
+	public String getToolRawConfigFile(String version, String tool) throws InsightsCustomException;
 	
 	//Provides currently registered Agents in DB
 	public List<AgentConfigTO> getRegisteredAgents();
