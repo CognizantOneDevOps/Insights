@@ -102,8 +102,14 @@ module ISightApp {
 		  this.addEndPoint("INSIGHTS_GET",'/PlatformService/insights/inferences');
 		  this.addEndPoint("INSIGHTS_COMP_STATUS",'/PlatformService/ServicesHealthStatus/getStatus');
 		  
-		  this.addEndPoint("GET_AGENT_VERSION_TOOLS", '/PlatformService/admin/agentConfiguration/getAgentDetails');
-		  this.addEndPoint("GET_AGENT_TOOL_CONFIG", '/PlatformService/admin/agentConfiguration/getConfigFile');
+		  this.addEndPoint("AGENT_REGISTER", '/PlatformService/admin/agentConfiguration/registerAgent');
+		  
+		  this.addEndPoint("DOCROOT_AGENT_VERSION_TOOLS", '/PlatformService/admin/agentConfiguration/getSystemAvailableAgentList');
+		  this.addEndPoint("DOCROOT_AGENT_TOOL_CONFIG_DETAILS", '/PlatformService/admin/agentConfiguration/getToolRawConfigFile');
+		  		  		  
+		  this.addEndPoint("DB_AGENTS_LIST", '/PlatformService/admin/agentConfiguration/getRegisteredAgents');
+		  this.addEndPoint("DB_AGENT_CONFIG_DETAILS", '/PlatformService/admin/agentConfiguration/getAgentDetails');		  
+		  
         }
 
        addEndPoint(name:string, url:string){

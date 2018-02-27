@@ -15,27 +15,39 @@
  * the License.
  ******************************************************************************
  -->
-<div layout="column" class="contentCss" flex>	
-<div layout class="selectToolTxt">Please select a tool to configure</div>		
-	 <div class="confirmationMessage" layout="row" layout-align="end end" style="margin-right: 7px;">
-	 <md-icon class="ForActionsIcons" ng-style="{height: '20px', width: '20px'}" md-svg-src="{{agentListController.editIconSrc}}" ng-click="agentListController.buttonDisableStatus||agentListController.editAgentConfigurations(agentListController.SelectedToolDetails)">
+ <div layout="column" class="contentCss" flex>
+	<div layout="row" layout-align="space-between start">	
+		<div class="selectToolTxt"> Please select a tool to configure </div>
+		<div>
+			<md-button class="md-raised md-primary configureBut" ng-click="agentListController.newAgentRegister()">New Register</md-button>
+		</div>
+    </div>
+	 <div ng-if="agentListController.showThrobber" layout-sm="column" layout-align="center center" style="margin-left: 46%;margin-top: 46px;">
+				<md-progress-circular md-mode="indeterminate" md-diameter="50"></md-progress-circular>
+	 </div>
+		
+	 <div class="confirmationMessage" layout="row" layout-align="end start" style="margin-right: 7px;" ng-if="agentListController.showList">
+	 <md-icon class="ForActionsIcons" ng-style="{height: '20px', width: '20px'}" md-svg-src="{{agentListController.editIconSrc}}" ng-click="agentListController.buttonDisableStatus||agentListController.editAgentConfig(agentListController.SelectedToolDetails)">
             <md-tooltip md-direction="Bottom">
                 Edit
             </md-tooltip>
 	 </div>
-	<div class="agentlistTable" layout-align="center center">
+	<div class="agentlistTable" layout-align="center center" ng-if="agentListController.showList">	
 		<table ng-table="agentListController.tableParams" class="table md-api-table-landing table-condensed table-bordered table-striped textst" show-filter="true">
 			<tr ng-repeat="agentList in $data">
 			<td title="'Select'" header-class="'theadCss'" style="width: 5%;">
 			<md-radio-group ng-model="agentListController.SelectedToolDetails">
-			  <md-radio-button ng-value="{os: '{{agentList.os}}', toolname: '{{agentList.toolName}}', version: '{{agentList.Version}}'} " class="md-primary" ng-click="agentListController.enableActions()"></md-radio-button>			  
+			  <md-radio-button ng-value="{ type: 'update', agentid: '{{agentList.agentId}}'} " class="md-primary" ng-click="agentListController.enableActions()"></md-radio-button>			  
 			</md-radio-group>
 			</td>				
-			<td title="'OS'" filter="{ os: 'text'}" sortable="'os'" header-class="'theadCss'">{{agentList.os}}</td>	
+			<td title="'OS'" filter="{ osVersion: 'text'}" sortable="'os'" header-class="'theadCss'">{{agentList.osVersion}}</td>	
 			<td title="'ToolName'" filter="{ toolName: 'text'}" sortable="'toolName'" header-class="'theadCss'">{{agentList.toolName}}</td>				
-			<td title="'Version'" filter="{ Version: 'text'}" sortable="'Version'" header-class="'theadCss'">{{agentList.Version}}</td>				
-			<td title="'Status'" header-class="'theadCss'">{{agentList.Status}}</td>			
-			</tr>
-		</table>
+			<td title="'Version'" filter="{ agentVersion: 'text'}" sortable="'Version'" header-class="'theadCss'">{{agentList.agentVersion}}</td>				
+			<td title="'Status'" header-class="'theadCss'">{{agentList.agentStatus}}</td>						
+			</tr>			
+		</table>		
+	</div>
+	<div class="agentConfigTable" layout layout-align="center center" ng-if="!agentListController.showList"> 		
+			<h3 class="agentdefaultMessage">{{agentListController.showMessage}} </span>
 	</div>
 </div>
