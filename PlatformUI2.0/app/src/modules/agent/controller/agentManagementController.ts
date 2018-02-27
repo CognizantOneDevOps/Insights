@@ -27,14 +27,15 @@ module ISightApp {
             var homePageController = homePageControllerScope['homePageController'];
             this.homeController = homePageController;
             var self = this;	
+			
 			self.getSelectedAgentDetails();
 			self.showMessage = "Please select version & tools";
-			self.homeController.templateName = 'agentManagement';
+			self.showConfig = false;			
 			
-			self.agentService.getAgentversionTools()
+			self.agentService.getDocRootAgentVersionTools()
 			.then(function (data) {	
-				self.response['versions'] = data.data.details;
-				for(var key in self.response['versions']){					
+				self.response = data.data;
+				for(var key in self.response){					
 					self.versionList.push(key);
 				}				
 			})			
@@ -42,7 +43,10 @@ module ISightApp {
 				self.showMessage = "Problem with Platform Service, Please try again";	
 			}); 			
 			
-			self.getAgenttoolConfig(self.editAgentDetails['toolname'], self.editAgentDetails['version']);
+			if(self.editAgentDetails['type'] == "update") 
+			{
+				self.getDbAgentConfig(self.editAgentDetails['agentid']);
+			}
 			
 		}
 		
@@ -58,7 +62,9 @@ module ISightApp {
 		editAgentDetails = {};
 		headerData = [];
 		updatedConfigdata = {};
+		configData:string;
 		selectedOS: string;		
+		selectedVersion: string;
 		item = {};
 		datait = {};
 		defaultConfigdata = {};
@@ -72,29 +78,30 @@ module ISightApp {
 		}
 		
 		getSelectedAgentDetails(): void {
-            this.editAgentDetails = this.homeController.selectedAgentTooldetails;            
+            this.editAgentDetails = this.homeController.selectedAgentID;    
         }
 		
 		versionOnChange(key): void {				
 			this.selectedTool = "";			
 			this.toolsArr = [];
-			for(var data in this.response['versions'][key]){				
-				this.toolsArr[data] = this.response['versions'][key][data];
-			}					
+			/* for(var data in this.response[key]){				
+				this.toolsArr[data] = this.response[key];
+			} */					
+			this.toolsArr = this.response[key];
 		} 
 		
-		getAgenttoolConfig(version, toolName): void{
+		getDocRootAgentConfig(version, toolName): void{
 			var self = this;			
 			self.showConfig = false;
 			self.showThrobber = true;	
 			self.showMessage = "";
-			self.agentService.getAgentToolConfig(version, toolName)
+			self.agentService.getDocrootAgentConfig(version, toolName)
 			.then(function (data) {		
 				console.log(data);
 				self.showConfig = true;
 				self.showThrobber = false;
-				self.defaultConfigdata  = data.data;
-				self.dynamicData = JSON.stringify(self.defaultConfigdata['dynamic'], undefined, 4);
+				self.defaultConfigdata  = JSON.parse(data.data);
+				self.dynamicData = JSON.stringify(self.defaultConfigdata['dynamicTemplate'], undefined, 4);
 			})			
 			.catch(function (data) {		
 				self.showThrobber = false;							
@@ -103,33 +110,65 @@ module ISightApp {
 			
 		}
 		
-		getUpdatedConfigData(): void{			
+		getDbAgentConfig(agentId): void{
+			var self = this;			
+			self.showConfig = false;
+			self.showThrobber = true;	
+			self.showMessage = "";
+			self.agentService.getDbAgentConfig(agentId)
+			.then(function (data) {		
+				console.log(data);
+				self.showConfig = true;
+				self.showThrobber = false;
+				self.defaultConfigdata  = data.data;
+				self.dynamicData = JSON.stringify(self.defaultConfigdata['dynamicTemplate'], undefined, 4);
+			})			
+			.catch(function (data) {		
+				self.showThrobber = false;							
+				self.showMessage = "Problem with Platform Service, Please try again";				
+			}); 
 			
-			for(var key in this.defaultConfigdata) {
+		}
+		
+		getUpdatedConfigData(): void{		
+			var self = this;	
 			
-				if(key != "dynamic" && this.findDataType(key, this.defaultConfigdata) == "object"){
+			for(var key in self.defaultConfigdata) {
+			
+				if(key != "dynamicTemplate" && self.findDataType(key, self.defaultConfigdata) == "object"){
 					
-					this.item = {};
+					self.item = {};
 					
-					for(var value in this.defaultConfigdata[key]){				
-						this.item[value] = this.defaultConfigdata[key][value];						
+					for(var value in self.defaultConfigdata[key]){				
+						self.item[value] = self.defaultConfigdata[key][value];						
 					}					
 					
-					this.updatedConfigdata[key] = this.item;
+					self.updatedConfigdata[key] = self.item;
 					
 					if(key == "communication") {					
-						this.updatedConfigdata["dynamic"] = JSON.parse(this.dynamicData);
+						self.updatedConfigdata["dynamicTemplate"] = JSON.parse(self.dynamicData);
 					}
 					
-				}else if(key != "dynamic") {	
-						this.updatedConfigdata[key] = this.defaultConfigdata[key];						
+				}else if(key != "dynamicTemplate") {	
+						self.updatedConfigdata[key] = self.defaultConfigdata[key];						
 				}				
 			}	
 			
-			this.updatedConfigdata["OS"] = this.selectedOS;
+			//self.updatedConfigdata["OS"] = self.selectedOS;
 			
-			
-			console.log(JSON.stringify(this.updatedConfigdata));
+			if(self.updatedConfigdata){
+				
+				self.configData = JSON.stringify(self.updatedConfigdata);
+				
+				self.agentService.registerAgent(self.selectedTool, self.selectedVersion, self.selectedOS, self.configData)
+				.then(function (data) {		
+					console.log(data);					
+				})			
+				.catch(function (data) {		
+					console.log(data);			
+				}); 					
+				
+			}
 		}
 		
 	}
