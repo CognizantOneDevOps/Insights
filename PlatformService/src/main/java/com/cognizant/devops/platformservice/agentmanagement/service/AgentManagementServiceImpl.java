@@ -64,7 +64,7 @@ public class AgentManagementServiceImpl  implements AgentManagementService{
 	private static Logger LOG = Logger.getLogger(AgentManagementServiceImpl.class);
 
 	@Override
-	public String registerAgent(String toolName,String agentVersion,String osversion,String configDetails) {
+	public String registerAgent(String toolName,String agentVersion,String osversion,String configDetails) throws InsightsCustomException {
 
 		try {
 			String agentId = getAgentkey(toolName);
@@ -88,13 +88,12 @@ public class AgentManagementServiceImpl  implements AgentManagementService{
 			agentConfigDAL.saveAgentConfigFromUI(agentId , toolName,json, isDataUpdateSupported, uniqueKey,agentVersion,osversion,updateDate);
 
 			//Create zip/tar file with updated config.json
-
 			Path agentZipPath =updateAgentConfig(toolName,agentId,json);
 			byte[] data = Files.readAllBytes(agentZipPath);
 			sendAgentPackage(data,agentId,agentId,toolName,osversion);
 		} catch (Exception e) {
 			LOG.error("Error while registering agent "+toolName, e);
-			return "FAILED";
+			throw new InsightsCustomException(e.toString());
 		}
 
 		//call installAgent method
@@ -105,7 +104,7 @@ public class AgentManagementServiceImpl  implements AgentManagementService{
 
 
 	@Override
-	public String installAgent(String agentId,String toolName,String fileName,String osversion){
+	public String installAgent(String agentId,String toolName,String fileName,String osversion) throws InsightsCustomException{
 		try {
 
 			Path path = Paths.get(ApplicationConfigProvider.getInstance().getAgentDetails().getUnzipPath(),toolName,fileName);
@@ -113,27 +112,27 @@ public class AgentManagementServiceImpl  implements AgentManagementService{
 			sendAgentPackage(data,fileName,agentId,toolName,osversion);
 		} catch (Exception e) {
 			LOG.error("Error while installing agent..", e);
-			return "FAILED";
+			throw new InsightsCustomException(e.toString());
 		}
 
 		return "SUCCESS";
 	}
 
 	@Override
-	public String startStopAgent(String agentId, String action) {
+	public String startStopAgent(String agentId, String action) throws InsightsCustomException {
 		try {
 			AgentConfigDAL agentConfigDAL = new AgentConfigDAL();
 			agentConfigDAL.updateAgentRunningStatus(agentId,AGENTSTATUS.valueOf(action));
 			performAgentAction(agentId,action);
 		} catch (Exception e) {
 			LOG.error("Error while installing agent..", e);
-			return "FAILED";
+			throw new InsightsCustomException(e.toString());
 		}
 		return "SUCCESS";
 	}
 
 	@Override
-	public String updateAgent(String agentId, String configDetails, String toolName, String agentVersion, String osversion) {
+	public String updateAgent(String agentId, String configDetails, String toolName, String agentVersion, String osversion) throws InsightsCustomException {
 
 		try {
 			//Get latest agent code
@@ -151,7 +150,7 @@ public class AgentManagementServiceImpl  implements AgentManagementService{
 			Date updateDate= Timestamp.valueOf(LocalDateTime.now());
 
 			AgentConfigDAL agentConfigDAL = new AgentConfigDAL();
-			boolean updateStatus = agentConfigDAL.saveAgentConfigFromUI(agentId , toolName, json, isDataUpdateSupported, uniqueKey, agentVersion,osversion,updateDate);
+			 agentConfigDAL.saveAgentConfigFromUI(agentId , toolName, json, isDataUpdateSupported, uniqueKey, agentVersion,osversion,updateDate);
 
 			Path agentZipPath = updateAgentConfig(toolName,agentId,json);
 
@@ -160,42 +159,52 @@ public class AgentManagementServiceImpl  implements AgentManagementService{
 
 		} catch (Exception e) {
 			LOG.error("Error updating and installing agent", e);
-			return "FAILED";
+			throw new InsightsCustomException(e.toString());
 		}
 
 		return "SUCCESS";
 	}
 
 	@Override
-	public List<AgentConfigTO> getRegisteredAgents() {
+	public List<AgentConfigTO> getRegisteredAgents() throws InsightsCustomException {
 		AgentConfigDAL agentConfigDAL = new AgentConfigDAL();
-
-		List<AgentConfig> agentConfigList = agentConfigDAL.getAllAgentConfigurations();
-		List<AgentConfigTO> agentList = new ArrayList<>(agentConfigList.size());
-		for(AgentConfig agentConfig : agentConfigList) {
-			AgentConfigTO to = new AgentConfigTO();
-			BeanUtils.copyProperties(agentConfig, to);
-			agentList.add(to);
+		List<AgentConfigTO> agentList = null;
+		try{
+			List<AgentConfig> agentConfigList = agentConfigDAL.getAllAgentConfigurations();
+			agentList = new ArrayList<>(agentConfigList.size());
+			for(AgentConfig agentConfig : agentConfigList) {
+				AgentConfigTO to = new AgentConfigTO();
+				BeanUtils.copyProperties(agentConfig, to);
+				agentList.add(to);
+			}
+		}catch(Exception e){
+			LOG.error("Error getting all agent config", e);
+			throw new InsightsCustomException(e.toString());
 		}
+
 		return agentList;
 	}
 
 	@Override
-	public AgentConfigTO getAgentDetails(String agentId) {
+	public AgentConfigTO getAgentDetails(String agentId) throws InsightsCustomException {
 		AgentConfigDAL agentConfigDAL = new AgentConfigDAL();
 
-		AgentConfigTO agentConfig = new AgentConfigTO(); 
-		BeanUtils.copyProperties(agentConfigDAL.getAgentConfigurations(agentId), agentConfig);
+		AgentConfigTO agentConfig = new AgentConfigTO();
+		try{
+			BeanUtils.copyProperties(agentConfigDAL.getAgentConfigurations(agentId), agentConfig);
+		}catch(Exception e){
+			LOG.error("Error getting agent details", e);
+			throw new InsightsCustomException(e.toString());
+		}
 		return agentConfig;
 	}
 
 	@Override
-	public Map<String, ArrayList<String>> getSystemAvailableAgentList() {
-		System.setProperty("http.proxyHost", "proxy.cognizant.com");
-		System.setProperty("http.proxyPort","6050");
+	public Map<String, ArrayList<String>> getSystemAvailableAgentList()  throws InsightsCustomException{
+		/*System.setProperty("http.proxyHost", "proxy.cognizant.com");
+		System.setProperty("http.proxyPort","6050");*/
 		Map<String,ArrayList<String>>  agentDetails = new HashMap<String,ArrayList<String>>();
 		String url = ApplicationConfigProvider.getInstance().getAgentDetails().getDocrootUrl();
-		JsonObject details = new JsonObject();
 		Document doc;
 		try {
 			doc = Jsoup.connect(url).get();
@@ -209,7 +218,8 @@ public class AgentManagementServiceImpl  implements AgentManagementService{
 				}
 			}
 		} catch (IOException e) {
-			LOG.debug(e);
+			LOG.error("Error while getting system agent list ",e);
+			throw new InsightsCustomException(e.toString());
 		}
 		return agentDetails;
 	}
@@ -261,13 +271,6 @@ public class AgentManagementServiceImpl  implements AgentManagementService{
 
 		DirectoryStream<Path> paths = Files.newDirectoryStream(Paths.get(filePath));
 		Iterator<Path> pathIterator = paths.iterator();
-		/*while(pathIterator.hasNext()) {
-			Path path = pathIterator.next();
-			if(path.toString().endsWith(".json")) {
-				System.out.println(path.toFile().getAbsolutePath());
-			}
-		}*/
-
 		File configFile = null;
 		try(Stream<Path> all =  Files.walk(Paths.get(filePath));){
 
