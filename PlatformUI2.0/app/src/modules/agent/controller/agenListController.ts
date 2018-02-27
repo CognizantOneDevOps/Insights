@@ -30,17 +30,23 @@ module ISightApp {
             var self = this;				
 			
 			self.homeController.templateName = 'agentList';
-			self.data = [
+			/* self.data = [
 				{'os': 'windows', 'toolName': "JIRA", 'Version': 'v4.0', 'Status':'live'},
 				{'os': 'windows','toolName': "Jenkins", 'Version': 'v4.1', 'Status':'live'},
 				{'os': 'linux','toolName': "Rally", 'Version': 'v3.0', 'Status':'live'},
 				{'os': 'windows','toolName': "Sonar", 'Version': 'v4.5', 'Status':'live'},
 				{'os': 'windows','toolName': "Rundeck", 'Version': 'v3.5', 'Status':'live'},
-				{'os': 'linux','toolName': "Git", 'Version': 'v3.0', 'Status':'live'},
-				];
-			self.showAgentListtable();
+				{'os': 'linux','toolName': "Git", 'Version': 'v3.0', 'Status':'live'}, 
+				]; */
+			//self.showAgentListtable();
+			
+			self.getRegisteredAgents();
 			
 		}
+		
+		showList: boolean = false;
+		showThrobber: boolean;
+		showMessage: string;
 		data = [];
 		tableParams = [];
 		homeController: HomePageController;
@@ -51,14 +57,46 @@ module ISightApp {
 			this.tableParams = new this.NgTableParams({count: 5}, { dataset: this.data});
 		}
 		
-		editAgentConfigurations(params): void {				
-			this.homeController.selectedAgentTooldetails = params;            
+		editAgentConfig(params): void {							
+			this.homeController.selectedAgentID = params;
 			this.homeController.templateName = 'agentManagement';			
 		}
 		
 		enableActions(): void{		
             this.buttonDisableStatus = false;
 			this.editIconSrc = "dist/icons/svg/userOnboarding/Edit_icon_MouseOver.svg";
+		}
+		
+		getRegisteredAgents(): void{
+			
+			var self = this;						
+			self.showList = false;
+			self.showThrobber = true;				
+			self.agentService.loadAgentServices("DB_AGENTS_LIST")
+			.then(function (response) {						
+				self.showThrobber = false;	
+				self.data = response.data;
+				console.log(self.data);
+				
+				if(self.data.length == 0){
+					self.showMessage = "No Records found";							
+				}else{
+					self.showList = true;
+					self.tableParams = new self.NgTableParams({count: 5}, { dataset: self.data});					
+				}
+				
+			})			
+			.catch(function (response) {		
+				self.showThrobber = false;		
+				self.showList = false;				
+				self.showMessage = "Problem with Platform Service, Please try again";				
+			}); 
+			
+		}
+		
+		newAgentRegister(): void {	
+			this.homeController.selectedAgentID = {'type' : 'new'};  	
+			this.homeController.templateName = 'agentManagement';
 		}
 		
 	}

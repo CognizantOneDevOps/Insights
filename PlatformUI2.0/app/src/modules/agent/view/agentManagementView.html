@@ -16,39 +16,39 @@
  ******************************************************************************
  -->
 <div layout="column" class="contentCss" flex>
-<form name="agentMgment" id="agentMgment">
-	<div layout class="applicationButtMar">
-        <div layout layout="row" layout-align="center center" class="applicationContentCss">
-            
-			<div layout>
-			<md-select ng-model="agentManagementController.selectedOS" class="searchApplicationBoxContData inputApplicationBox dataBoardingFieldName"
-                     placeholder="Select OS" data-md-container-class="selectdemoSelectHeader">
-						  <md-option value="windows" selected>Windows</md-option>
-						  <md-option value="linux">Linux</md-option>
-			</md-select>
-            </div>
-			<div layout>
-			<md-select ng-model="agentManagementController.selectedVersion" class="searchApplicationBoxContData inputApplicationBox dataBoardingFieldName"
-                     placeholder="Select Version" data-md-container-class="selectdemoSelectHeader" ng-change="agentManagementController.versionOnChange(agentManagementController.selectedVersion)">				
-				<md-option  ng-repeat="key in agentManagementController.versionList | orderBy" value="{{key}}"
-					ng-selected="{{agentManagementController.editAgentDetails['version'] == key}}">{{key}}</md-option>
-						  
-			</md-select>
-            </div>
-			
-			<div layout>
-			<md-select ng-model="agentManagementController.selectedTool" class="searchApplicationBoxContData inputApplicationBox dataBoardingFieldName"
-                     placeholder="Select Tool" data-md-container-class="selectdemoSelectHeader" ng-change="agentManagementController.getAgenttoolConfig(agentManagementController.selectedVersion, agentManagementController.selectedTool)">				
-				<md-option  ng-repeat="(key, value) in agentManagementController.toolsArr" value="{{value}}" ng-selected="{{agentManagementController.editAgentDetails['toolname'] == value}}">{{value}}</md-option> 
-			</md-select>
-            </div>
-			
-            <div layout style="margin-left: 100px;">               
-				 <md-button class="md-raised md-primary configureBut" ng-click="agentManagementController.getUpdatedConfigData()" ng-disabled="agentMgment.$invalid">
+<!-- <form name="agentMgment" id="agentMgment"> -->
+	<div layout layout="row" layout-align="space-between start" class="applicationButtMar">
+        <div layout class="applicationContentCss">            
+				<div>
+				<md-select ng-model="agentManagementController.selectedOS" class="searchApplicationBoxContData inputApplicationBox dataBoardingFieldName"
+						 placeholder="Select OS" data-md-container-class="selectdemoSelectHeader">
+							  <md-option value="windows" selected>Windows</md-option>
+							  <md-option value="linux">Linux</md-option>
+				</md-select>
+				</div>
+				
+				<div>
+				<md-select ng-model="agentManagementController.selectedVersion" class="searchApplicationBoxContData inputApplicationBox dataBoardingFieldName"
+						 placeholder="Select Version" data-md-container-class="selectdemoSelectHeader" ng-change="agentManagementController.versionOnChange(agentManagementController.selectedVersion)">				
+					<md-option  ng-repeat="key in agentManagementController.versionList | orderBy" value="{{key}}"
+						ng-selected="{{agentManagementController.editAgentDetails['version'] == key}}">{{key}}</md-option>
+							  
+				</md-select>
+				</div>
+				
+				<div>
+				<md-select ng-model="agentManagementController.selectedTool" class="searchApplicationBoxContData inputApplicationBox dataBoardingFieldName"
+						 placeholder="Select Tool" data-md-container-class="selectdemoSelectHeader" ng-change="agentManagementController.getDocRootAgentConfig(agentManagementController.selectedVersion, agentManagementController.selectedTool)">				
+					<md-option  ng-repeat="(key, value) in agentManagementController.toolsArr" value="{{value}}" ng-selected="{{agentManagementController.editAgentDetails['toolname'] == value}}">{{value}}</md-option> 
+				</md-select>
+				</div>
+		</div>
+            <div style="margin-left: 100px;">               
+				 <md-button class="md-raised md-primary configureBut" ng-click="agentManagementController.getUpdatedConfigData()">
                     Register
                 </md-button>
             </div>
-        </div>
+       
     </div>
 	
 		<div class="agentConfigTable" layout layout-align="center center" ng-if="!agentManagementController.showConfig"> 		
@@ -59,7 +59,7 @@
 		</div>	
 	
 		<div class="agentConfigTable" layout layout-align="start center" ng-if="agentManagementController.showConfig" ng-repeat="(key,value) in agentManagementController.defaultConfigdata">	
-				<table class="md-api-table-landing" ng-if="key != 'dynamic' && agentManagementController.findDataType(key,agentManagementController.defaultConfigdata) == 'object'">
+				<table class="md-api-table-landing" ng-if="key != 'dynamicTemplate' && agentManagementController.findDataType(key,agentManagementController.defaultConfigdata) == 'object'">
 					<thead class="theadCss">
 						<tr layout="row" layout-align="start start">
 							<th flex="22.5" class="tableHeader">
@@ -100,5 +100,5 @@
 		<div class="agentConfigTable" layout layout-align="start center" ng-if="agentManagementController.showConfig">			
 			<textarea ng-model="agentManagementController.dynamicData" rows="5" class="frmTxtarea" required></textarea>
 		</div>
-	</form>
+	
 </div>
