@@ -118,4 +118,71 @@ public class DataProcessorUtil  {
 
 	}
 
+	public boolean updateHiearchyProperty(MultipartFile file) {
+		Neo4jDBHandler dbHandler = new Neo4jDBHandler();
+		File csvfile =null;
+		boolean status = false;
+		try {
+			csvfile = convertToFile(file);
+		} catch (IOException ex) {
+			status=true;
+			log.debug(ex);
+		}
+		String label = "METADATA:DATATAGGING";
+		CSVFormat format = CSVFormat.newFormat(',').withHeader();
+
+		try (Reader reader = new FileReader(csvfile); CSVParser csvParser = new CSVParser(reader, format);){
+			Map<String, Integer> headerMap = csvParser.getHeaderMap();
+			String cypherQuery = null;
+			for (CSVRecord record : csvParser) { 
+				JsonObject json = new JsonObject();
+				List<JsonObject>  list=new ArrayList<JsonObject>();
+
+				if( record.get("Action") != null &&  record.get("Action").equals("edit")){
+					
+					for(Map.Entry<String, Integer> header : headerMap.entrySet()){
+						if(header.getKey() != null){
+							json.addProperty(header.getKey(), record.get(header.getValue()));
+
+						}
+					}
+					list.add(json);
+					cypherQuery = "MATCH (n :"+label+"{id:'"+record.get("id")+"'}" + ")  SET n += {props} RETURN n ";
+					try {
+						JsonObject graphResponse = dbHandler.executeQueryWithData(cypherQuery,list);
+						if(graphResponse.get("response").getAsJsonObject().get("errors").getAsJsonArray().size() > 0){
+							status = false;
+							break;
+						}
+					} catch (GraphDBException e) {
+						status = false;
+						log.debug(e);
+					}
+					status = true;
+
+				}else if(record.get("Action") != null &&  record.get("Action").equals("delete") ){
+
+					cypherQuery = "MATCH (n :"+label+"{id:'"+record.get("id")+"'}" + ")   REMOVE n:"+label+"  SET n:METADATA_BACKUP  RETURN n ";
+					try {
+						dbHandler.executeCypherQuery(cypherQuery);
+						
+					} catch (GraphDBException e) {
+						status = false;
+						log.debug(e);
+					}
+
+					status = true;
+
+				}
+
+
+
+			}
+
+		} catch (IOException e) {
+			log.debug(e);
+		} 
+		return status;
+	}
+
 }
