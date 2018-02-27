@@ -18,8 +18,29 @@
 
 module ISightApp {
     export class LoginController {
-        static $inject = ['loginService', 'restEndpointService', '$location', '$document', '$cookies'];
-        constructor(private loginService: ILoginService, private restEndpointService: IRestEndpointService, private $location, private $document, private $cookies) {
+        static $inject = ['loginService', 'restEndpointService', '$location', '$document', '$cookies','$http', '$resource', 'restAPIUrlService'];
+        constructor(private loginService: ILoginService, private restEndpointService: IRestEndpointService, private $location, private $document, private $cookies, private $http, private $resource, private restAPIUrlService:IRestAPIUrlService) {
+            var self = this;
+            
+            var restCallUrl = restAPIUrlService.getRestCallUrl("GET_LOGO_IMAGE");
+
+            var resource = this.$resource(restCallUrl,
+                {},
+                {
+                    allData: {
+                        method: 'GET'
+                    }
+            });
+            
+            resource.allData().$promise.then(function(data){
+                    if(data.data.encodedString && data.data.encodedString.length > 0){
+                        self.imageSrc = 'data:image/jpg;base64,' + data.data.encodedString;                    
+                    }else{
+                        self.showDefaultImg = true;
+                    }
+                   
+            });
+
         }
         self;
         logMsg: string;
@@ -29,7 +50,10 @@ module ISightApp {
         cookies: string;
         usernameVal: string;
         passwordVal: string;
+        imageSrc: string = "";
+        showDefaultImg: boolean = false;
 
+        
         userAuthentication(username: string, password: string): void {
             if (username === '' || username === undefined || password === '' || password === undefined) {
                 this.logMsg = '';

@@ -18,9 +18,11 @@
  
 <div ng-if="homePageController.isValidUser" flex>
     <div layout style="height:77px;margin-bottom:20px">
-        <md-icon style="margin-left:30px" layout md-svg-src="dist/icons/svg/landingPage/Cognizant_Insights.svg" ng-style="{height: '78px', width: '252px'}"></md-icon>
+        <div ng-if="!homePageController.showDefaultImg">
+        <img  ng-src="{{homePageController.imageSrc}}" width="252px" height="78px" style="display:block"/> </div>
+        <md-icon  ng-if="homePageController.showDefaultImg" style="margin-left:30px" layout md-svg-src="{{homePageController.imageSrc}}" ng-style="{height: '78px', width: '252px'}"></md-icon>
 
-        <div layout="column">
+        <div layout="column" layout-align="end end" style="width:100%">
           <div layout>
             <div ng-if="homePageController.templateName == 'dashboards'" ng-include="'dist/modules/dashboards/view/dashboardAppSelection.tmp.html'"
                 ng-controller="dashboardController as dashboardController" layout="vertical"></div>
@@ -116,6 +118,13 @@
                                         ng-controller="dataTaggingDetailsController as dataTaggingDetailsController" layout="vertical"></div>
                                     <div ng-if="homePageController.templateName == 'dataTagging'" ng-include="'dist/modules/dataTagging/view/dataTaggingView.html'"
                                         ng-controller="dataTaggingController as dataTaggingController" layout="vertical"></div>
+                                </md-content>
+                            </md-tab>
+                            <md-tab label="Settings" ng-click="homePageController.selectAct('appSettings')">
+                                <md-content style="{{homePageController.mainContentMinHeight}}">
+                                   <div ng-if="homePageController.templateName == 'appSettings'" ng-include="'dist/modules/appSettings/view/appSettingsView.html'"
+                                        ng-controller="appSettingsController as appSettingsController" layout="vertical"></div>
+                                    
                                 </md-content>
                             </md-tab>
                         </md-tabs>
