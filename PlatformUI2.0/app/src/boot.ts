@@ -38,6 +38,7 @@ module ISightApp {
         .service('dataOnBoardingService', DataOnBoardingService)
         .service('singleToolConfigService', SingleToolConfigService)
         .service('dataTaggingDetailsService', DataTaggingDetailsService)
+        .service('appSettingsService', AppSettingsService)
         .controller('pipelineController', PipelineController)
         .controller('homePageController', HomePageController)
         .controller('toolsConfigurationController', ToolsConfigurationController)
@@ -52,6 +53,7 @@ module ISightApp {
         .controller('dataTaggingController', DataTaggingController)
 	    .controller('dataTaggingDetailsController', DataTaggingDetailsController)
         .controller('FileUploadController', FileUploadController)
+        .controller('appSettingsController', AppSettingsController)
         .component('footer', {
             templateUrl: './dist/components/footer/view/footerView.html',
             controller: FooterController,
@@ -85,10 +87,39 @@ module ISightApp {
        .directive('row', function() {
             return {
                 restrict: 'EA',
-                scope: { children:"=" , myVar: '=' ,clickHandler:"&",  'test': '=test' },
+                scope: { children:"=" , myVar: '=' ,clickHandler:"&",  'test': '=test', 'count': '=count' },
                 controller: RecursiveLiController,
                 templateUrl: './dist/modules/dataTaggingDetails/view/test.html'
 
+            };
+        })
+
+        .directive('demoFileModel', function ($parse) {
+            return {
+                restrict: 'A', //the directive can be used as an attribute only
+                    
+                link: function (scope, element, attrs) {
+                    var model = $parse(attrs.demoFileModel),
+                    modelSetter = model.assign; //define a setter for demoFileModel
+                    var maxSize = 1000000;
+                   
+                    element.bind('change', function () {
+                       
+                        scope.maxSizeErr = false;
+                        scope.$apply(function () {
+                           
+                            modelSetter(scope, (<HTMLInputElement>element[0]).files[0]);
+
+                        });
+                        var fileSize = (<HTMLInputElement>element[0]).files[0].size;
+                        if (fileSize > maxSize){
+                           scope.maxSizeErr = true;
+                        }else{
+                        scope.file = (<HTMLInputElement>element[0]).files[0];
+                        scope.getFile();
+                        }
+                    });
+                }
             };
         })
        
@@ -169,7 +200,7 @@ module ISightApp {
                     otherwise({
                         redirectTo: '/InSights/login'
                     });
-                $compileProvider.aHrefSanitizationWhitelist(/^\s*(https?|ftp|mailto|tel|file|blob):/);
+                $compileProvider.aHrefSanitizationWhitelist(/^\s*(https?|ftp|mailto|tel|file|blob):|data:image\//);
             }]
         ).run(function(restEndpointService: IRestEndpointService,authenticationService: IAuthenticationService, $cookies) {
             restEndpointService.getServiceHost();

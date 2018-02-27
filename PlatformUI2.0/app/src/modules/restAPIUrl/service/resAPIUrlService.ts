@@ -102,6 +102,8 @@ module ISightApp {
       this.addEndPoint("INSIGHTS_GET",'/PlatformService/insights/inferences');
       this.addEndPoint("HIERARCHY_ALL_DETAILS_GET",'/PlatformService/admin/hierarchyDetails/getAllHierarchyDetails');
       this.addEndPoint("UPLOAD_HIERARCHY_DETAILS",'/PlatformService/admin/hierarchyDetails/uploadHierarchyDetails');
+      this.addEndPoint("UPLOAD_IMAGE",'/PlatformService/settings/uploadCustomLogo');
+      this.addEndPoint("GET_LOGO_IMAGE",'/PlatformService/settings/getLogoImage');
       
        this.addEndPoint("GET_HIERARCHY_PROPERTIES",'/PlatformService/admin/hierarchyDetails/getHierarchyProperties');
         }
