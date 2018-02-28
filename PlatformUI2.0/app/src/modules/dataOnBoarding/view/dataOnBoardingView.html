@@ -17,13 +17,22 @@
  -->
 <div layout="column" class="layout" style="width: 100%;" >
   <div ng-controller="FileUploadController" style="min-height:450px">
-  <div  ng-if="showError" style="font-size:16px;margin:auto;border:1px solid #ccc" >
+  <div  ng-if="showError" style="font-size:16px;margin:auto;border:1px solid #ccc;margin-right:20px" >
   <md-icon  style="margin-right:10px" md-svg-src="dist/icons/svg/insightsPage/alert.svg" ng-style="{color:'red',fill:'red',height: '36px', width: '36px'}"></md-icon>Failed to upload data.</div>
 
+  <div style="padding-left:75px;padding-top:20px">Download the existing data :<md-button style="max-height:40px;margin-top:0px" ng-click="JSONToCSVConvertor()" class="md-raised md-primary configureBut md-button md-ink-ripple">
+                    Download data 
+        </md-button></div>
     <div  style="width:100%;background-color:#f3f3f3;margin-top:10px;border-bottom:1px solid #d8d9da">
       <div class="contentCss fnt" style="padding:15px">
-        <div layout flex="100">
+        <div layout flex="100"> 
           <div style="padding-right:20px;font-size:16px;padding-top:50px;font-weight:bold;width:15%">Select a File to Upload:</div>
+          <div>
+          <md-radio-group  ng-model="selectedType" layout="row" layout-wrap>
+                            <md-radio-button flex="35" style="padding-bottom:18px;outline:none" value="update" >Edit existing data</md-radio-button>
+                            <md-radio-button flex="35" style="padding-bottom:18px;outline:none" value="upload" >Upload new data</md-radio-button>
+                        </md-radio-group>
+
           <div class="drop" id="dropbox">
             <div class="cont">
               <md-icon  ng-style="{height: '40px', width: '40px'}" 
@@ -42,7 +51,7 @@
               </div>
             </div>
           </div>
-
+          </div>
         </div>
         <div ng-show="showUploadingThrobber" style="margin-left:15%;margin-top:5px">
           <span ng-if="showUploadingThrobber" style = "vertical-align: super;">
@@ -60,6 +69,7 @@
             </span>)
         
           </div>
+
           <md-button style="max-height:40px;margin-top:0px" ng-click="previewData()" class="md-raised md-primary configureBut md-button md-ink-ripple">
                     Preview File
         </md-button>

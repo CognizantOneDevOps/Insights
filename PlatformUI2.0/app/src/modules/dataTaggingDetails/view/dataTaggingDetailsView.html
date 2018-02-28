@@ -40,11 +40,11 @@
           <div style="width:15%;min-height:500px;background-color:#fff;margin-right:10px" flex>
             <div style="padding-bottom:10px;padding-top:10px;font-weight:normal;font-family:proxima_novaregular;color:#38840C" class="onboardStyle"> Bussiness Hierarchy </div>
             <ol class="tree scrollbar" id="stylescroll" data-keep-expanded="false" data-auto-scroll="true" data-slide-speed="200" style="overflow-y:auto">
-              <li ng-repeat="item in list" data-val="{{item.name}}">
+              <li ng-repeat="item in list" data-val="{{item.name}}" ng-init="count = 0">
                 <label for="{{item.name}}">{{item.name}}</label>
-                <input type="checkbox" ng-if="item.opened" checked id="{{item.name}}" />
-                <input type="checkbox" ng-if="!item.opened"  id="{{item.name}}" />
-                <ol ng-if="item.children && item.children.length > 0" class="tree child"  row children="item.children"  my-var="myVar" click-handler="clickHandler($event)" test="test"></ol>
+                <input type="radio" ng-if="item.opened || $first" checked id="{{item.name}}" />
+                <input type="radio" ng-if="!item.opened"  id="{{item.name}}" />
+                <ol ng-if="item.children && item.children.length > 0" class="tree child"  row children="item.children"  my-var="myVar" click-handler="clickHandler($event)" test="test" count="$index"></ol>
               </li>
             </ol>
           </div>
