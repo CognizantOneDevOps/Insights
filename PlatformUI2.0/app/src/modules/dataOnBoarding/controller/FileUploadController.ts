@@ -198,8 +198,11 @@ module ISightApp {
                     var row = "";
                     
                     //2nd loop will extract each column and convert it in string comma-seprated
-                    for (var index in colArr) {
-                        row += '"' + arrData[i].propertyMap[colArr[index]] + '",';
+                    for (var index=0; index< colArr.length;index++) {
+                            row += arrData[i].propertyMap[colArr[index]];
+                            if(index !== colArr.length-1 ){
+                                row += ',';
+                            }
                     }
 
                     row.slice(0, row.length - 1);
