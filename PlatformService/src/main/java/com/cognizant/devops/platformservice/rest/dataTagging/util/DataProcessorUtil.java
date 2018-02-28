@@ -44,12 +44,12 @@ public class DataProcessorUtil  {
 	}
 
 	public  boolean readData(MultipartFile file)   {
+
 		File csvfile =null;
 		boolean status = false;
 		try {
 			csvfile = convertToFile(file);
 		} catch (IOException ex) {
-			status=true;
 			log.debug(ex);
 		}
 
@@ -71,7 +71,6 @@ public class DataProcessorUtil  {
 			int bulkRecordCnt=10;
 			for (CSVRecord csvRecord : csvParser.getRecords()) {
 				size += 1;
-				//totalRecords++;
 				JsonObject json = new JsonObject();
 				for(Map.Entry<String, Integer> header : headerMap.entrySet()){
 					if(header.getKey()!= null){
@@ -102,17 +101,13 @@ public class DataProcessorUtil  {
 			}
 
 		} catch (FileNotFoundException e) {
-			status=false;
-			log.debug(e);
+			log.error("Exception in uploading csv file" , e);
 		} catch (IOException e) {
-			status=false;
-			log.debug(e);
+			log.error("Exception in uploading csv file" , e);
 		} catch (GraphDBException e) {
-			status=false;
-			log.debug(e);
+			log.error("Exception in uploading csv file" , e);
 		} catch (InterruptedException e) {
-			status=false;
-			log.debug(e);
+			log.error("Exception in uploading csv file" ,e);
 		}
 		return status;
 
@@ -124,9 +119,9 @@ public class DataProcessorUtil  {
 		boolean status = false;
 		try {
 			csvfile = convertToFile(file);
-		} catch (IOException ex) {
+		} catch (IOException e) {
 			status=true;
-			log.debug(ex);
+			log.error(e);
 		}
 		String label = "METADATA:DATATAGGING";
 		CSVFormat format = CSVFormat.newFormat(',').withHeader();
@@ -139,7 +134,7 @@ public class DataProcessorUtil  {
 				List<JsonObject>  list=new ArrayList<JsonObject>();
 
 				if( record.get("Action") != null &&  record.get("Action").equals("edit")){
-					
+
 					for(Map.Entry<String, Integer> header : headerMap.entrySet()){
 						if(header.getKey() != null){
 							json.addProperty(header.getKey(), record.get(header.getValue()));
@@ -156,7 +151,7 @@ public class DataProcessorUtil  {
 						}
 					} catch (GraphDBException e) {
 						status = false;
-						log.debug(e);
+						log.error(e);
 					}
 					status = true;
 
@@ -165,10 +160,10 @@ public class DataProcessorUtil  {
 					cypherQuery = "MATCH (n :"+label+"{id:'"+record.get("id")+"'}" + ")   REMOVE n:"+label+"  SET n:METADATA_BACKUP  RETURN n ";
 					try {
 						dbHandler.executeCypherQuery(cypherQuery);
-						
+
 					} catch (GraphDBException e) {
 						status = false;
-						log.debug(e);
+						log.error(e);
 					}
 
 					status = true;
@@ -180,7 +175,7 @@ public class DataProcessorUtil  {
 			}
 
 		} catch (IOException e) {
-			log.debug(e);
+			log.error("Exception in updating metadata" , e);
 		} 
 		return status;
 	}

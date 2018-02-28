@@ -36,6 +36,7 @@ import com.cognizant.devops.platformdal.entity.definition.EntityDefinition;
 import com.cognizant.devops.platformdal.entity.definition.EntityDefinitionDAL;
 import com.cognizant.devops.platformdal.hierarchy.details.HierarchyDetails;
 import com.cognizant.devops.platformdal.hierarchy.details.HierarchyDetailsDAL;
+import com.cognizant.devops.platformservice.rest.dataTagging.Constants.DatataggingConstants;
 import com.cognizant.devops.platformservice.rest.dataTagging.util.DataProcessorUtil;
 import com.cognizant.devops.platformservice.rest.neo4j.GraphDBService;
 import com.cognizant.devops.platformservice.rest.util.PlatformServiceUtil;
@@ -56,22 +57,22 @@ public class HierarchyDetailsService {
 
 		HierarchyDetails hierarchyDetails = new HierarchyDetails();
 		hierarchyDetails.setRowId(rowId);
-		if (!level1.equals("undefined")) {
+		if (!level1.equals(DatataggingConstants.UNDEFINED)) {
 			hierarchyDetails.setLevel_1(level1);
 		}
-		if (!level2.equals("undefined")) {
+		if (!level2.equals(DatataggingConstants.UNDEFINED)) {
 			hierarchyDetails.setLevel_2(level2);
 		}
-		if (!level3.equals("undefined")) {
+		if (!level3.equals(DatataggingConstants.UNDEFINED)) {
 			hierarchyDetails.setLevel_3(level3);
 		}
-		if (!level4.equals("undefined")) {
+		if (!level4.equals(DatataggingConstants.UNDEFINED)) {
 			hierarchyDetails.setLevel_4(level4);
 		}
-		if (!level5.equals("undefined")) {
+		if (!level5.equals(DatataggingConstants.UNDEFINED)) {
 			hierarchyDetails.setLevel_5(level5);
 		}
-		if (!level6.equals("undefined")) {
+		if (!level6.equals(DatataggingConstants.UNDEFINED)) {
 			hierarchyDetails.setLevel_6(level6);
 		}
 		hierarchyDetails.setHierarchyName(hierarchyName);
@@ -198,14 +199,18 @@ public class HierarchyDetailsService {
 
 	@RequestMapping(value = "/uploadHierarchyDetails", headers=("content-type=multipart/*"), method = RequestMethod.POST,
 			produces = MediaType.APPLICATION_JSON_UTF8_VALUE,consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-	public @ResponseBody JsonObject uploadHierarchyDetails(@RequestParam("file") MultipartFile file) {
-
-		boolean status = DataProcessorUtil.getInstance().readData(file);
-		if (status) {
-			return PlatformServiceUtil.buildSuccessResponse();
-		} else {
-			return PlatformServiceUtil.buildFailureResponse(ErrorMessage.DB_INSERTION_FAILED);
+	public @ResponseBody JsonObject uploadHierarchyDetails(@RequestParam("file") MultipartFile file,@RequestParam  String action) {
+		boolean status = false;
+		if(null != action && action.equals("upload")){
+			status = DataProcessorUtil.getInstance().readData(file);
+		}else if(null != action && action.equals("update")){
+			status  = DataProcessorUtil.getInstance().updateHiearchyProperty(file);
 		}
+		if (!status) {
+			return PlatformServiceUtil.buildFailureResponse(ErrorMessage.DB_INSERTION_FAILED);
+		} 
+
+		return PlatformServiceUtil.buildSuccessResponse();
 
 	}
 
@@ -215,8 +220,6 @@ public class HierarchyDetailsService {
 		String query = "MATCH (n:METADATA:DATATAGGING) return n";
 		GraphResponse response;
 		JsonArray parentArray=new JsonArray();
-		JsonObject hierarchyJsonObj = new JsonObject();
-		Gson gson = new Gson();
 		try {
 			response = dbHandler.executeCypherQuery(query);
 			JsonArray rows = response.getJson().get("results").getAsJsonArray().get(0).getAsJsonObject().get("data").getAsJsonArray();
@@ -225,55 +228,54 @@ public class HierarchyDetailsService {
 				JsonObject childJson_1 = getHierarchyObject(element);
 				parentArray.add(childJson_1);
 			}
-			hierarchyJsonObj.add("data",gson.toJsonTree(parentArray));
 		} catch (GraphDBException e) {
-			log.debug(e);
+			log.error(e);
 			return PlatformServiceUtil.buildFailureResponse(ErrorMessage.DB_INSERTION_FAILED);
 		}
-		return hierarchyJsonObj;
+		return PlatformServiceUtil.buildSuccessResponseWithData(parentArray);
 
 	}
 
 	private JsonObject getHierarchyObject(JsonElement element) {
-		JsonArray firstChild=new JsonArray();
-		JsonArray secondChild=new JsonArray();
-		JsonArray thirdChild=new JsonArray();
-		JsonObject childJson_1=new JsonObject();
-		JsonObject childJson_2=new JsonObject();
-		JsonObject childJson_3=new JsonObject();
-		JsonObject childJson_4=new JsonObject();
-		JsonObject json=element.getAsJsonObject().get("row").getAsJsonArray().get(0).getAsJsonObject();
+		JsonArray firstChild = new JsonArray();
+		JsonArray secondChild = new JsonArray();
+		JsonArray thirdChild = new JsonArray();
+		JsonObject childJson_1 = new JsonObject();
+		JsonObject childJson_2 = new JsonObject();
+		JsonObject childJson_3 = new JsonObject();
+		JsonObject childJson_4 = new JsonObject();
+		JsonObject json = element.getAsJsonObject().get("row").getAsJsonArray().get(0).getAsJsonObject();
 
-		if(null!=json.get("level_1").getAsString() &&  !json.get("level_1").getAsString().isEmpty() ){
-			childJson_1.addProperty("name",json.get("level_1").getAsString());
+		if(null != json.get(DatataggingConstants.LEVEL1).getAsString() &&  !json.get(DatataggingConstants.LEVEL1).getAsString().isEmpty() ){
+			childJson_1.addProperty(DatataggingConstants.NAME ,json.get(DatataggingConstants.LEVEL1).getAsString());
 		}
-		if(null!=json.get("level_2").getAsString() && !json.get("level_2").getAsString().isEmpty() ){
-			childJson_2.addProperty("name" , json.get("level_2").getAsString());
+		if(null != json.get(DatataggingConstants.LEVEL2).getAsString() && !json.get(DatataggingConstants.LEVEL2).getAsString().isEmpty() ){
+			childJson_2.addProperty(DatataggingConstants.NAME , json.get(DatataggingConstants.LEVEL2).getAsString());
 		}
-		if(null!=json.get("level_3").getAsString() &&  !json.get("level_3").getAsString().isEmpty() ){
-			childJson_3.addProperty("name" , json.get("level_3").getAsString());
+		if(null != json.get(DatataggingConstants.LEVEL3).getAsString() &&  !json.get(DatataggingConstants.LEVEL3).getAsString().isEmpty() ){
+			childJson_3.addProperty(DatataggingConstants.NAME , json.get(DatataggingConstants.LEVEL3).getAsString());
 		}
-		if(null!=json.get("level_4").getAsString() &&  !json.get("level_4").getAsString().isEmpty() ){
-			childJson_4.addProperty("name", json.get("level_4").getAsString());
+		if(null != json.get(DatataggingConstants.LEVEL4).getAsString() &&  !json.get(DatataggingConstants.LEVEL4).getAsString().isEmpty() ){
+			childJson_4.addProperty(DatataggingConstants.NAME , json.get(DatataggingConstants.LEVEL4).getAsString());
 		}
 		if(!childJson_4.isJsonNull()){
 			thirdChild.add(childJson_4);
 		}
-		if(null!=json.get("level_4").getAsString() &&  !json.get("level_4").getAsString().isEmpty() ){
-			childJson_3.add("children", thirdChild);
+		if(null != json.get(DatataggingConstants.LEVEL4).getAsString() &&  !json.get(DatataggingConstants.LEVEL4).getAsString().isEmpty() ){
+			childJson_3.add(DatataggingConstants.CHILDREN , thirdChild);
 		}
 		if(!childJson_3.isJsonNull()){
 			secondChild.add(childJson_3);
 		}
-		if(null!=json.get("level_3").getAsString() &&  !json.get("level_3").getAsString().isEmpty() ){
-			childJson_2.add("children", secondChild);
+		if(null != json.get(DatataggingConstants.LEVEL3).getAsString() &&  !json.get(DatataggingConstants.LEVEL3).getAsString().isEmpty() ){
+			childJson_2.add(DatataggingConstants.CHILDREN , secondChild);
 		}
 		if(!childJson_2.isJsonNull()){
 			firstChild.add(childJson_2);
 		}
 
-		if(null!=json.get("level_2").getAsString() && !json.get("level_2").getAsString().isEmpty() ){
-			childJson_1.add("children", firstChild);
+		if(null != json.get(DatataggingConstants.LEVEL2).getAsString() && !json.get(DatataggingConstants.LEVEL2).getAsString().isEmpty() ){
+			childJson_1.add(DatataggingConstants.CHILDREN , firstChild);
 		}
 		return childJson_1;
 	}
@@ -282,49 +284,52 @@ public class HierarchyDetailsService {
 	public JsonObject getHierarchyProperties(@RequestParam String level1,@RequestParam String level2, @RequestParam String level3, 
 			@RequestParam String level4) throws GraphDBException {
 		Neo4jDBHandler dbHandler = new Neo4jDBHandler();
-		String queryLabels=":METADATA:DATATAGGING";
+		String queryLabels = ":METADATA:DATATAGGING";
 		StringBuilder sb = new StringBuilder();
-		if(null!=level1 && !level1.isEmpty()){
+		if(null != level1 && !level1.isEmpty()){
 			sb.append("level_1:'");
 			sb.append(level1.trim());
 			sb.append("'");
 			sb.append(",");
 		}
-		if(null!=level2 && !level2.isEmpty()){
+		if(null != level2 && !level2.isEmpty()){
 			sb.append("level_2:'");
 			sb.append(level2.trim());
 			sb.append("'");
 			sb.append(",");
 		}
-		if(null!=level3 && !level3.isEmpty()){
+		if(null != level3 && !level3.isEmpty()){
 			sb.append("level_3:'");
 			sb.append(level3.trim());
 			sb.append("'");
 			sb.append(",");
 		}
-		if(null!=level4 && !level4.isEmpty()){
+		if(null != level4 && !level4.isEmpty()){
 
 			sb.append("level_4:'");
 			sb.append(level4.trim());
 			sb.append("'");
 
 		}
-		String props=StringUtils.stripEnd(sb.toString(),",");
+		String props = StringUtils.stripEnd(sb.toString(),",");
 		String query = "MATCH (n "+queryLabels+"{"+props+"}" + ") return n";
-		GraphResponse response=dbHandler.executeCypherQuery(query.toString());
+		GraphResponse response = dbHandler.executeCypherQuery(query.toString());
 		return PlatformServiceUtil.buildSuccessResponseWithData(response.getNodes());
 	}
 
-	@RequestMapping(value = "/updateHiearchyProperty", headers=("content-type=multipart/*"), method = RequestMethod.POST,
-					produces = MediaType.APPLICATION_JSON_UTF8_VALUE,consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-	public @ResponseBody JsonObject updateHiearchyProperty(@RequestParam("file") MultipartFile file) {
 
-		boolean status  = DataProcessorUtil.getInstance().updateHiearchyProperty(file);
-		if (status) {
-			return PlatformServiceUtil.buildSuccessResponse();
-		} else {
+	@RequestMapping(value = "/getMetaData", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+	public @ResponseBody JsonObject getMetaData() {
+		Neo4jDBHandler dbHandler = new Neo4jDBHandler();
+		String query = "MATCH (n:METADATA:DATATAGGING) return n";
+		GraphResponse response;
+		try {
+			response = dbHandler.executeCypherQuery(query);
+		} catch (GraphDBException e) {
+			log.error(e);
 			return PlatformServiceUtil.buildFailureResponse(ErrorMessage.DB_INSERTION_FAILED);
 		}
+		return PlatformServiceUtil.buildSuccessResponseWithData(response.getNodes());
 
 	}
 
