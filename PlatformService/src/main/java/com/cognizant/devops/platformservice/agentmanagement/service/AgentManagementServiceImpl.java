@@ -91,6 +91,7 @@ public class AgentManagementServiceImpl  implements AgentManagementService{
 			Path agentZipPath =updateAgentConfig(toolName,agentId,json);
 			byte[] data = Files.readAllBytes(agentZipPath);
 			sendAgentPackage(data,agentId,agentId,toolName,osversion);
+			performAgentAction(agentId,AGENTSTATUS.RUNNING.name());
 		} catch (Exception e) {
 			LOG.error("Error while registering agent "+toolName, e);
 			throw new InsightsCustomException(e.toString());
@@ -382,7 +383,7 @@ public class AgentManagementServiceImpl  implements AgentManagementService{
 				"	\"mqConfig\" : {\r\n" + 
 				"		\"user\" : \"iSight\", \r\n" + 
 				"		\"password\" : \"iSight\", \r\n" + 
-				"		\"host\" : \"127.0.0.1\", \r\n" + 
+				"		\"host\" : \"localhost\", \r\n" + 
 				"		\"exchange\" : \"iSight\"\r\n" + 
 				"	},\r\n" + 
 				"	\"subscribe\" : {\r\n" + 
@@ -395,12 +396,14 @@ public class AgentManagementServiceImpl  implements AgentManagementService{
 				"	\"communication\":{\r\n" + 
 				"		\"type\" : \"REST\" \r\n" + 
 				"	},\r\n" + 
-				"	\"responseTemplate\" : {\r\n" + 
-				"		\"sha\": \"commitId\",\r\n" + 
-				"		\"commit\" : {\r\n" + 
-				"			\"author\" : {\r\n" + 
-				"				\"name\": \"authorName\",\r\n" + 
-				"				\"date\": \"commitTime\"\r\n" + 
+				"	\"dynamicTemplate\" : {\r\n" + 
+				"		\"responseTemplate\" : {\r\n" + 
+				"			\"sha\": \"commitId\",\r\n" + 
+				"			\"commit\" : {\r\n" + 
+				"				\"author\" : {\r\n" + 
+				"					\"name\": \"authorName\",\r\n" + 
+				"					\"date\": \"commitTime\"\r\n" + 
+				"				}\r\n" + 
 				"			}\r\n" + 
 				"		}\r\n" + 
 				"	},\r\n" + 
@@ -412,10 +415,10 @@ public class AgentManagementServiceImpl  implements AgentManagementService{
 				"	\"runSchedule\" : 30,\r\n" + 
 				"	\"timeStampField\":\"commitTime\",\r\n" + 
 				"	\"timeStampFormat\":\"%Y-%m-%dT%H:%M:%SZ\",\r\n" + 
-				"	\"StartFrom\" : \"2016-10-10 15:46:33\",\r\n" + 
-				"	\"AccessToken\": \"accesstoken\",\r\n" + 
-				"	\"GetRepos\":\"https://api.github.com/users/<USER_NAME>/repos\",\r\n" + 
-				"	\"CommitsBaseEndPoint\":\"https://api.github.com/repos/<REPO_NAME>/\",\r\n" + 
+				"	\"StartFrom\" : \"2018-02-26 15:46:33\",\r\n" + 
+				"	\"AccessToken\": \"AuthToken\",\r\n" + 
+				"	\"GetRepos\":\"https://api.github.com/users/username/repos\",\r\n" + 
+				"	\"CommitsBaseEndPoint\":\"https://api.github.com/repos/username/\",\r\n" + 
 				"	\"isDebugAllowed\" : false,\r\n" + 
 				"	\"loggingSetting\" : {\r\n" + 
 				"		\"logLevel\" : \"WARN\"\r\n" + 
