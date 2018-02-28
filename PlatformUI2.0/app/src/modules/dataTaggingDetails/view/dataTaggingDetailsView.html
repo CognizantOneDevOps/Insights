@@ -30,7 +30,7 @@
             <div flex="15">
               <md-button ng-click="dataTaggingDetailsController.goToDataOnBoard()" style="margin-left:60px" class="md-raised md-primary configureBut" 
                     >
-                    Onboard Data
+                    Onboard/Download Data
                 </md-button>
             </div>
           </div>
@@ -65,55 +65,28 @@
                     <div flex="30" style="display:inline-block;width:30%" class="dataBoardingToolName">{{propertyDetails.propertyMap.toolProperty1}}</div>
                     <div flex="30" style="display:inline-block;width:30%" class="dataBoardingToolName">{{propertyDetails.propertyMap.propertyValue1}}</div>
                     <div flex="20" style="padding-left: 37px;display:inline-block">
-                      <md-icon class="ForActionsIcons" ng-style="{height: '20px', width: '20px'}" ng-click="dataOnBoardingController.disableDeleteButtonStatus||dataOnBoardingController.openDialog($event,'delete',tooldata.selectedTool, tooldata.toolCategory, tooldata.toolId,tooldata.isSaved)"
-                                                    md-svg-src="dist/icons/svg/oneToolsConfigIcons/Delete_icon_disabled.svg">
-                        <md-tooltip md-direction="Bottom">
-                                                        Delete Tool Details
-                                                    </md-tooltip>
-                      </md-icon>
+                      
                     </div>
                   </li>
                   <li ng-if="propertyDetails.propertyMap.toolProperty2">
                     <div flex="30" style="display:inline-block;width:30%" class="dataBoardingToolName">{{propertyDetails.propertyMap.toolProperty2}}</div>
                     <div flex="30" style="display:inline-block;width:30%" class="dataBoardingToolName">{{propertyDetails.propertyMap.propertyValue2}}</div>
                     <div flex="20" style="padding-left: 37px;display:inline-block">
-                      <md-icon class="ForActionsIcons" ng-style="{height: '20px', width: '20px'}" ng-click="dataOnBoardingController.disableDeleteButtonStatus||dataOnBoardingController.openDialog($event,'delete',tooldata.selectedTool, tooldata.toolCategory, tooldata.toolId,tooldata.isSaved)"
-                                                    md-svg-src="dist/icons/svg/oneToolsConfigIcons/Delete_icon_disabled.svg">
-                        <md-tooltip md-direction="Bottom">
-                                                        Delete Tool Details
-                                                    </md-tooltip>
-                      </md-icon>
+                      
                     </div>
                   </li>
                   <li ng-if="propertyDetails.propertyMap.toolProperty3">
                     <div flex="30" style="display:inline-block;width:30%" class="dataBoardingToolName">{{propertyDetails.propertyMap.toolProperty3}}</div>
                     <div flex="30" style="display:inline-block;width:30%" class="dataBoardingToolName">{{propertyDetails.propertyMap.propertyValue3}}</div>
                     <div flex="20" style="padding-left: 37px;display:inline-block">
-                      <md-icon class="ForActionsIcons" ng-style="{height: '20px', width: '20px'}" ng-click="dataOnBoardingController.disableDeleteButtonStatus||dataOnBoardingController.openDialog($event,'delete',tooldata.selectedTool, tooldata.toolCategory, tooldata.toolId,tooldata.isSaved)"
-                                                    md-svg-src="dist/icons/svg/oneToolsConfigIcons/Delete_icon_disabled.svg">
-                        <md-tooltip md-direction="Bottom">
-                                                        Delete Tool Details
-                                                    </md-tooltip>
-                      </md-icon>
+                     
                     </div>
                   </li>
                   <li ng-if="propertyDetails.propertyMap.toolProperty4">
                     <div flex="30" style="display:inline-block;width:30%" class="dataBoardingToolName">{{propertyDetails.propertyMap.toolProperty4}}</div>
                     <div flex="30" style="display:inline-block;width:30%" class="dataBoardingToolName">{{propertyDetails.propertyMap.propertyValue4}}</div>
                     <div flex="20" style="padding-left: 37px;display:inline-block">
-                      <md-icon class="ForActionsIcons" ng-style="{height: '20px', width: '20px'}" ng-click="dataOnBoardingController.disableDeleteButtonStatus||dataOnBoardingController.openDialog($event,'delete',tooldata.selectedTool, tooldata.toolCategory, tooldata.toolId,tooldata.isSaved)"
-                                                    md-svg-src="dist/icons/svg/oneToolsConfigIcons/Delete_icon_disabled.svg">
-                        <md-tooltip md-direction="Bottom">
-                                                        Delete Tool Details
-                                                    </md-tooltip>
-                      </md-icon>
-                       <md-icon class="ForActionsIcons" ng-style="{height: '20px', width: '20px'}" 
-                                                    ng-click="dataOnBoardingController.disableAddButtonStatus||dataOnBoardingController.addAction(tooldata.selectedTool, tooldata.toolId)"
-                                                    md-svg-src="dist/icons/svg/oneToolsConfigIcons/Add_icon_disabled.svg">
-                        <md-tooltip md-direction="Bottom">
-                                                        Add
-                                                    </md-tooltip>
-                      </md-icon>
+                    
                     </div>
                   </li>
                 </ol>
