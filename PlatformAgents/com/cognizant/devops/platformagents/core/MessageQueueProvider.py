@@ -37,11 +37,11 @@ class MessageFactory:
         
     def subscribe(self, routingKey, callback, seperateThread=True):
         def subscriberThread():
-            channel = self.connection.channel()
-            channel.exchange_declare(exchange=self.exchange, type='topic')
-            queueName = channel.queue_declare(exclusive=True, durable=True).method.queue
-            channel.queue_bind(exchange=self.exchange, queue=queueName, routing_key=routingKey)
-            channel.basic_consume(callback,queue=queueName,no_ack=False)
+            credentials = pika.PlainCredentials(self.user, self.password)
+            connection = pika.BlockingConnection(pika.ConnectionParameters(credentials=credentials,host=self.host))
+            channel = connection.channel()
+            channel.exchange_declare(exchange=self.exchange, exchange_type='topic', durable=True)
+            channel.basic_consume(callback,queue=routingKey,no_ack=False)
             channel.start_consuming()
         if seperateThread:
             thread.start_new_thread(subscriberThread, ())

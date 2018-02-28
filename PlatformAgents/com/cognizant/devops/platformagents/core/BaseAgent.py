@@ -49,6 +49,7 @@ class BaseAgent(object):
         self.loadCommunicationFacade()
         self.initializeMQ()
         #self.configUpdateSubscriber()
+        self.subscriberForAgentControl()
         self.setupLocalCache()
         self.extractToolName()
         self.execute()
@@ -142,9 +143,9 @@ class BaseAgent(object):
         def callback(ch, method, properties, data):
             #Update the config file and cache.
             action = data
-            if "START_AGENT" == action:
+            if "RUNNING" == action:
                 self.shouldAgentRun = True
-            if "STOP_AGENT" == action:
+            if "STOP" == action:
                 self.shouldAgentRun = False
                 self.publishHealthData(self.generateHealthData("Agent is in STOP mode"))
             ch.basic_ack(delivery_tag = method.delivery_tag)
