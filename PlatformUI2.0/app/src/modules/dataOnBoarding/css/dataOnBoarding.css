@@ -28,6 +28,11 @@
     padding-left: 10px;
     padding-top: 0px !important;
 }
+
+md-radio-button .md-container {
+    top: 20% !important;
+    transform: translateY(0);
+}
 .dataBoardingToolName{
     background-color: #d3e9c7;
     border: 1px solid #d8d8d8;

@@ -104,7 +104,7 @@ module ISightApp {
       this.addEndPoint("UPLOAD_HIERARCHY_DETAILS",'/PlatformService/admin/hierarchyDetails/uploadHierarchyDetails');
       this.addEndPoint("UPLOAD_IMAGE",'/PlatformService/settings/uploadCustomLogo');
       this.addEndPoint("GET_LOGO_IMAGE",'/PlatformService/settings/getLogoImage');
-      
+      this.addEndPoint("GET_METADATA",'/PlatformService/admin/hierarchyDetails/getMetaData');
        this.addEndPoint("GET_HIERARCHY_PROPERTIES",'/PlatformService/admin/hierarchyDetails/getHierarchyProperties');
         }
 

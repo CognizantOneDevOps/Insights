@@ -31,6 +31,11 @@ module ISightApp {
             var restHandler = this.restCallHandlerService;
             return restHandler.get("HIERARCHY_ALL_DETAILS_GET");
         }
+
+        getMetaData(): ng.IPromise<any> {
+            var restHandler = this.restCallHandlerService;
+            return restHandler.get("GET_METADATA");
+        }
         
         uploadHierarchyDetails(formData: FormData): ng.IPromise<any> {
             var restHandler = this.restCallHandlerService;
