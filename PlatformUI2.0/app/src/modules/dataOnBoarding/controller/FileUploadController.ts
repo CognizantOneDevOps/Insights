@@ -179,7 +179,7 @@ module ISightApp {
                 var ShowLabel = true;
                 //If JSONData is not an object then JSON.parse will parse the JSON string in an Object
                 var arrData = typeof JSONData != 'object' ? JSON.parse(JSONData) : JSONData;
-                var colArr = ["meatadata_id","level_1","level_2","level_3","level_4","toolName","toolProperty1","propertyValue1","toolProperty2","propertyValue2","toolProperty3","propertyValue3","toolProperty4","propertyValue4","Action"];
+                var colArr = ["metadata_id","level_1","level_2","level_3","level_4","toolName","toolProperty1","propertyValue1","toolProperty2","propertyValue2","toolProperty3","propertyValue3","toolProperty4","propertyValue4","Action"];
                 var CSV = '';    
                 //Set Report title in first row or line
                 
