@@ -23,6 +23,7 @@ module ISightApp {
             $scope.headers = [];
 			$scope.showError = false;
             $scope.selectedType = "";
+            $scope.showTextArea = false;
             
             // init event handlers
             function dragEnterLeave(evt) {
@@ -123,6 +124,13 @@ module ISightApp {
             $scope.previewData = function() {
 
                 csv2Array($scope.files[0]);
+                
+            };
+
+            $scope.changeSelected = function() {
+                if($scope.selectedType && $scope.selectedType.length >0){
+                    $scope.showTextArea = true;
+                }
                 
             };
 
