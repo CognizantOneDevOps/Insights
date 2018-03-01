@@ -43,7 +43,7 @@ public class DataProcessorUtil  {
 		return file;
 	}
 
-	public  boolean readData(MultipartFile file)   {
+	public  boolean readData(MultipartFile file) throws GraphDBException   {
 
 		File csvfile =null;
 		boolean status = false;
@@ -52,9 +52,7 @@ public class DataProcessorUtil  {
 		} catch (IOException ex) {
 			log.debug(ex);
 		}
-
 		CSVFormat format = CSVFormat.newFormat(',').withHeader();
-
 		try (Reader reader = new FileReader(csvfile); CSVParser csvParser = new CSVParser(reader, format);){
 
 			Neo4jDBHandler dbHandler = new Neo4jDBHandler();
@@ -113,14 +111,13 @@ public class DataProcessorUtil  {
 
 	}
 
-	public boolean updateHiearchyProperty(MultipartFile file) {
+	public boolean updateHiearchyProperty(MultipartFile file) throws GraphDBException{
 		Neo4jDBHandler dbHandler = new Neo4jDBHandler();
 		File csvfile =null;
 		boolean status = false;
 		try {
 			csvfile = convertToFile(file);
 		} catch (IOException e) {
-			status=true;
 			log.error(e);
 		}
 		String label = "METADATA:DATATAGGING";
@@ -129,49 +126,54 @@ public class DataProcessorUtil  {
 		try (Reader reader = new FileReader(csvfile); CSVParser csvParser = new CSVParser(reader, format);){
 			Map<String, Integer> headerMap = csvParser.getHeaderMap();
 			String cypherQuery = null;
+			List<JsonObject>  editList=new ArrayList<JsonObject>();
+			List<JsonObject>  deleteList=new ArrayList<JsonObject>();
 			for (CSVRecord record : csvParser) { 
-				JsonObject json = new JsonObject();
-				List<JsonObject>  list=new ArrayList<JsonObject>();
 
 				if( record.get("Action") != null &&  record.get("Action").equals("edit")){
-
+					JsonObject json = new JsonObject();
 					for(Map.Entry<String, Integer> header : headerMap.entrySet()){
 						if(header.getKey() != null){
 							json.addProperty(header.getKey(), record.get(header.getValue()));
 
 						}
 					}
-					list.add(json);
-					cypherQuery = "MATCH (n :"+label+"{id:'"+record.get("id")+"'}" + ")  SET n += {props} RETURN n ";
-					try {
-						JsonObject graphResponse = dbHandler.executeQueryWithData(cypherQuery,list);
-						if(graphResponse.get("response").getAsJsonObject().get("errors").getAsJsonArray().size() > 0){
-							status = false;
-							break;
-						}
-					} catch (GraphDBException e) {
-						status = false;
-						log.error(e);
-					}
-					status = true;
-
+					editList.add(json);
 				}else if(record.get("Action") != null &&  record.get("Action").equals("delete") ){
+					JsonObject json = new JsonObject();
+					for(Map.Entry<String, Integer> header : headerMap.entrySet()){
+						if(header.getKey() != null){
+							json.addProperty(header.getKey(), record.get(header.getValue()));
 
-					cypherQuery = "MATCH (n :"+label+"{id:'"+record.get("id")+"'}" + ")   REMOVE n:"+label+"  SET n:METADATA_BACKUP  RETURN n ";
-					try {
-						dbHandler.executeCypherQuery(cypherQuery);
-
-					} catch (GraphDBException e) {
-						status = false;
-						log.error(e);
+						}
 					}
-
-					status = true;
-
+					deleteList.add(json);
 				}
 
-
-
+			}
+			if(editList.size() > 0 ){
+				cypherQuery = "UNWIND {props} AS properties MATCH (n :"+label+"{id:properties.id})  SET n += {props} RETURN n ";
+				try {
+					JsonObject graphResponse = dbHandler.executeQueryWithData(cypherQuery,editList);
+					if(graphResponse.get("response").getAsJsonObject().get("errors").getAsJsonArray().size() > 0){
+						status = false;
+					}
+					status = true;
+				} catch (GraphDBException e) {
+					log.error(e);
+				}
+			}	
+			if( deleteList .size() > 0){
+				cypherQuery = "UNWIND {props} AS properties MATCH (n :"+label+"{id:properties.id})   REMOVE n:"+label+"  SET n:METADATA_BACKUP  RETURN n ";
+				try {
+					JsonObject graphResponse = dbHandler.executeQueryWithData(cypherQuery,deleteList);
+					if(graphResponse.get("response").getAsJsonObject().get("errors").getAsJsonArray().size() > 0){
+						status = false;
+					}
+					status = true;
+				} catch (GraphDBException e) {
+					log.error(e);
+				}
 			}
 
 		} catch (IOException e) {
