@@ -152,3 +152,10 @@ background-color:#e9e9e9;
 .lblclss {
 	padding: 10px 0px 10px 0px
 }
+.agentRegisteredMsg {
+	font-family: proxima_novaregular;
+    font-size: 14px;
+    color: green !important;
+    margin-top: 16px;
+	margin-right: 115px;
+}
