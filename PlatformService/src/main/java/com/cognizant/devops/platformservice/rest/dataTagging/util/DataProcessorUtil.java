@@ -43,7 +43,7 @@ public class DataProcessorUtil  {
 		return file;
 	}
 
-	public  boolean readData(MultipartFile file) throws GraphDBException   {
+	public  boolean readData(MultipartFile file)    {
 
 		File csvfile =null;
 		boolean status = false;
@@ -59,7 +59,7 @@ public class DataProcessorUtil  {
 			List<JsonObject> gitProperties = new ArrayList<>();
 			Map<String, Integer> headerMap = csvParser.getHeaderMap();
 
-			dbHandler.executeCypherQuery("CREATE CONSTRAINT ON (n:METADATA) ASSERT n.id  IS UNIQUE");
+			dbHandler.executeCypherQuery("CREATE CONSTRAINT ON (n:METADATA) ASSERT n.metadata_id  IS UNIQUE");
 			String query =  "UNWIND {props} AS properties " +
 					"CREATE (n:METADATA:DATATAGGING) " +
 					"SET n = properties";
@@ -111,7 +111,7 @@ public class DataProcessorUtil  {
 
 	}
 
-	public boolean updateHiearchyProperty(MultipartFile file) throws GraphDBException{
+	public boolean updateHiearchyProperty(MultipartFile file) {
 		Neo4jDBHandler dbHandler = new Neo4jDBHandler();
 		File csvfile =null;
 		boolean status = false;
@@ -152,7 +152,8 @@ public class DataProcessorUtil  {
 
 			}
 			if(editList.size() > 0 ){
-				cypherQuery = "UNWIND {props} AS properties MATCH (n :"+label+"{id:properties.id})  SET n += {props} RETURN n ";
+				cypherQuery = " UNWIND {props} AS properties MATCH (n :"+label+"{metadata_id:properties.metadata_id}) "
+							  + " SET n += {props} RETURN n ";
 				try {
 					JsonObject graphResponse = dbHandler.executeQueryWithData(cypherQuery,editList);
 					if(graphResponse.get("response").getAsJsonObject().get("errors").getAsJsonArray().size() > 0){
@@ -164,7 +165,8 @@ public class DataProcessorUtil  {
 				}
 			}	
 			if( deleteList .size() > 0){
-				cypherQuery = "UNWIND {props} AS properties MATCH (n :"+label+"{id:properties.id})   REMOVE n:"+label+"  SET n:METADATA_BACKUP  RETURN n ";
+				cypherQuery = " UNWIND {props} AS properties MATCH (n :"+label+"{metadata_id:properties.metadata_id})   "
+							+ " REMOVE n:"+label+"  SET n:METADATA_BACKUP  RETURN n ";
 				try {
 					JsonObject graphResponse = dbHandler.executeQueryWithData(cypherQuery,deleteList);
 					if(graphResponse.get("response").getAsJsonObject().get("errors").getAsJsonArray().size() > 0){
