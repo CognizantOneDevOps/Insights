@@ -16,7 +16,7 @@
  ******************************************************************************
  -->
 <div layout="column" class="contentCss" flex>
-<!-- <form name="agentMgment" id="agentMgment"> -->
+<form name="agentMgmnt">
 	<div layout layout="row" layout-align="space-between start" class="applicationButtMar">
         <div layout class="applicationContentCss">            
 				<div>
@@ -43,8 +43,9 @@
 				</md-select>
 				</div>
 		</div>
-            <div style="margin-left: 100px;">               
-				 <md-button class="md-raised md-primary configureBut" ng-click="agentManagementController.getUpdatedConfigData()">
+		<div ng-if="agentManagementController.showAgentRegisteredMessage" class="agentRegisteredMsg">{{agentManagementController.showMessage}}</div>
+            <div>               			
+				 <md-button type="submit" class="md-raised md-primary configureBut" ng-click="agentManagementController.getUpdatedConfigData()">
                     Register
                 </md-button>
             </div>
@@ -71,7 +72,7 @@
 						<tr flex="50" layout="column" layout-align="start start" ng-repeat="(x,y) in value" style="display: inline-table;">
 							<td flex="15" layout><span class="dataHead">{{x}}</span></td>
 							<td  style="height:56px;background-color: white !important; width: 50% !important;">
-								<input class="inputBoxCont" ng-model="agentManagementController.defaultConfigdata[key][x]" required>
+								<input class="inputBoxCont" ng-model="agentManagementController.defaultConfigdata[key][x]">
 							</td>								
 						</tr>						
 					</tbody>
@@ -90,7 +91,7 @@
 					<tr flex="50" layout="column" layout-align="start start" ng-repeat="(key,value) in agentManagementController.defaultConfigdata" ng-if="agentManagementController.findDataType(key,agentManagementController.defaultConfigdata) != 'object'" style="display: inline-table;">
 						<td flex="15"><span class="dataHead">{{key}}</span></td>
 						<td  style="height:56px;background-color: white !important; width: 50% !important;">
-							<input class="inputBoxCont" ng-model="agentManagementController.defaultConfigdata[key]" required  placeholder="">
+							<input class="inputBoxCont" ng-model="agentManagementController.defaultConfigdata[key]">
 						</td>								
 					</tr>						
 				</tbody>
@@ -98,7 +99,7 @@
 		</div>
 		
 		<div class="agentConfigTable" layout layout-align="start center" ng-if="agentManagementController.showConfig">			
-			<textarea ng-model="agentManagementController.dynamicData" rows="5" class="frmTxtarea" required></textarea>
+			<textarea ng-model="agentManagementController.dynamicData" rows="5" class="frmTxtarea"></textarea>
 		</div>
-	
+	</form>
 </div>
