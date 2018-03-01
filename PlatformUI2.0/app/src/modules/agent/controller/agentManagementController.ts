@@ -56,6 +56,7 @@ module ISightApp {
 		showMessage:string;
 		showConfig: boolean = false;
 		showThrobber: boolean;
+		showAgentRegisteredMessage: boolean = false;
 		versionList = [];
 		toolsArr = [];
 		response = {};
@@ -132,6 +133,7 @@ module ISightApp {
 		
 		getUpdatedConfigData(): void{		
 			var self = this;	
+			self.updatedConfigdata = {};
 			
 			for(var key in self.defaultConfigdata) {
 			
@@ -154,18 +156,25 @@ module ISightApp {
 				}				
 			}	
 			
-			//self.updatedConfigdata["OS"] = self.selectedOS;
-			
 			if(self.updatedConfigdata){
 				
-				self.configData = JSON.stringify(self.updatedConfigdata);
+				self.configData = "";
+				self.showAgentRegisteredMessage = true;
+				self.configData = encodeURIComponent(JSON.stringify(self.updatedConfigdata));	
 				
 				self.agentService.registerAgent(self.selectedTool, self.selectedVersion, self.selectedOS, self.configData)
 				.then(function (data) {		
-					console.log(data);					
+					console.log(data);	
+					if(data.status == "success"){						
+						self.showMessage = "Agent Registered Successfully";
+					}else {
+						self.showMessage = "Problem to Register, Please try again.";	
+					}
 				})			
 				.catch(function (data) {		
-					console.log(data);			
+					console.log(data);	
+					self.showAgentRegisteredMessage = false;		
+					self.showMessage = "Problem with Platform Service, Please try again.";					
 				}); 					
 				
 			}
