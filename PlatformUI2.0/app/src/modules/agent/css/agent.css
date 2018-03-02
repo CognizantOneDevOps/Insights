@@ -159,3 +159,6 @@ background-color:#e9e9e9;
     margin-top: 16px;
 	margin-right: 115px;
 }
+.ng-table-pager {
+	float: right;
+}
