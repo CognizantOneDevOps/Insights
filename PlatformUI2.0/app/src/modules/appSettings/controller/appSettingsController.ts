@@ -64,7 +64,7 @@ interface FileReaderEvent extends Event {
                    $scope.showSuccess = true;
                    var fileVal=<HTMLInputElement>document.getElementById("myFileField");
                    fileVal.value = null;
-                   $scope.imageSrc = "//:0";  
+                   $scope.imageSrc = "#";  
                    homeController.showDefaultImg = false;                    
                    $scope.showThrobber = false;
                    homeController.imageSrc= 'data:image/jpg;base64,' + data.data.data.encodedString;
