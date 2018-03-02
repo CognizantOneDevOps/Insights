@@ -121,6 +121,7 @@ module ISightApp {
         aboutMeContent = {};
         showAdminTab: boolean = false;
         showThrobber: boolean;
+		selectedAgentID = {};
         selectDashboard: boolean = false;
         selectedIndex: Number;
         selectedDashboardUrl: string = '';
