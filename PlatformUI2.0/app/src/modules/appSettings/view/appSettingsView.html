@@ -50,7 +50,7 @@
                         <img ng-src="{{imageSrc}}">
                         </div>
                         <div>
-                        <div style="float:right;width:25%" ng-show="!maxSizeErr">
+                        <div style="float:right;width:25%" ng-show="showUploadBtn">
                            <md-button md-no-ink type="submit" ng-disabled="showDisabled" ng-click="uploadFile()" class="md-raised md-primary configureBut md-button md-ink-ripple"
                               ng-disabled="showDisabled">Upload Image</md-button>
                            <span ng-if="showThrobber" style = "vertical-align: super;">

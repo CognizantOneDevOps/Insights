@@ -102,7 +102,7 @@ module ISightApp {
                     var model = $parse(attrs.demoFileModel),
                     modelSetter = model.assign; //define a setter for demoFileModel
                     var maxSize = 1000000;
-                   
+                    scope.showUploadBtn = false;
                     element.bind('change', function () {
                        
                         scope.maxSizeErr = false;
@@ -115,6 +115,7 @@ module ISightApp {
                         if (fileSize > maxSize){
                            scope.maxSizeErr = true;
                         }else{
+                        scope.showUploadBtn = true;
                         scope.file = (<HTMLInputElement>element[0]).files[0];
                         scope.getFile();
                         }
