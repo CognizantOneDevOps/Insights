@@ -28,22 +28,18 @@ module ISightApp {
             var homePageController = homePageControllerScope['homePageController'];
             this.homeController = homePageController;
             var self = this;				
+			self.showConfirmMessage = "";
+			self.homeController.templateName = 'agentList';			
 			
-			self.homeController.templateName = 'agentList';
-			/* self.data = [
-				{'os': 'windows', 'toolName': "JIRA", 'Version': 'v4.0', 'Status':'live'},
-				{'os': 'windows','toolName': "Jenkins", 'Version': 'v4.1', 'Status':'live'},
-				{'os': 'linux','toolName': "Rally", 'Version': 'v3.0', 'Status':'live'},
-				{'os': 'windows','toolName': "Sonar", 'Version': 'v4.5', 'Status':'live'},
-				{'os': 'windows','toolName': "Rundeck", 'Version': 'v3.5', 'Status':'live'},
-				{'os': 'linux','toolName': "Git", 'Version': 'v3.0', 'Status':'live'}, 
-				]; */
-			//self.showAgentListtable();
+			if(self.homeController.showConfirmMessage) {
+					self.showConfirmMessage = self.homeController.showConfirmMessage;
+			}			
 			
 			self.getRegisteredAgents();
 			
 		}
 		
+		showConfirmMessage: string;
 		showList: boolean = false;
 		showThrobber: boolean;
 		showMessage: string;
@@ -52,10 +48,8 @@ module ISightApp {
 		homeController: HomePageController;
 		buttonDisableStatus: boolean = true;
 	    editIconSrc: string = "dist/icons/svg/actionIcons/Edit_icon_disabled.svg";
-    	
-		showAgentListtable(): void {
-			this.tableParams = new this.NgTableParams({count: 5}, { dataset: this.data});
-		}
+		startIconSrc: string = "dist/icons/svg/actionIcons/Start_icon_Active.svg";
+		stopIconSrc: string = "dist/icons/svg/actionIcons/Stop_icon_Active.svg";    	
 		
 		editAgentConfig(params): void {							
 			this.homeController.selectedAgentID = params;
@@ -72,7 +66,8 @@ module ISightApp {
 			var self = this;						
 			self.showList = false;
 			self.showThrobber = true;				
-			self.agentService.loadAgentServices("DB_AGENTS_LIST")
+			self.homeController.showConfirmMessage = "";
+			self.agentService.loadAgentServices("DB_AGENTS_LIST")			
 			.then(function (response) {						
 				self.showThrobber = false;	
 				self.data = response.data;
@@ -82,7 +77,15 @@ module ISightApp {
 					self.showMessage = "No Records found";							
 				}else{
 					self.showList = true;
-					self.tableParams = new self.NgTableParams({count: 5}, { dataset: self.data});					
+					self.tableParams = new self.NgTableParams({				
+						page: 1,
+						count: 5				
+					}, 
+					{ 
+						counts: [], // hide page counts control
+						total: 1,  // value less than count hide pagination				
+						dataset: self.data
+					});				
 				}
 				
 			})			
@@ -91,6 +94,7 @@ module ISightApp {
 				self.showList = false;				
 				self.showMessage = "Problem with Platform Service, Please try again";				
 			}); 
+			
 			
 		}
 		

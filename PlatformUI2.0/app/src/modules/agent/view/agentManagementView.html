@@ -22,31 +22,30 @@
 				<div>
 				<md-select ng-model="agentManagementController.selectedOS" class="searchApplicationBoxContData inputApplicationBox dataBoardingFieldName"
 						 placeholder="Select OS" data-md-container-class="selectdemoSelectHeader">
-							  <md-option value="windows" selected>Windows</md-option>
+							  <md-option value="windows">Windows</md-option>
 							  <md-option value="linux">Linux</md-option>
 				</md-select>
 				</div>
 				
 				<div>
 				<md-select ng-model="agentManagementController.selectedVersion" class="searchApplicationBoxContData inputApplicationBox dataBoardingFieldName"
-						 placeholder="Select Version" data-md-container-class="selectdemoSelectHeader" ng-change="agentManagementController.versionOnChange(agentManagementController.selectedVersion)">				
-					<md-option  ng-repeat="key in agentManagementController.versionList | orderBy" value="{{key}}"
-						ng-selected="{{agentManagementController.editAgentDetails['version'] == key}}">{{key}}</md-option>
+						 placeholder="Select Version" data-md-container-class="selectdemoSelectHeader" ng-change="agentManagementController.btnValue == 'Register' && agentManagementController.versionOnChange(agentManagementController.selectedVersion)">				
+					<md-option  ng-repeat="key in agentManagementController.versionList | orderBy" value="{{key}}">{{key}}</md-option>
 							  
 				</md-select>
 				</div>
 				
 				<div>
 				<md-select ng-model="agentManagementController.selectedTool" class="searchApplicationBoxContData inputApplicationBox dataBoardingFieldName"
-						 placeholder="Select Tool" data-md-container-class="selectdemoSelectHeader" ng-change="agentManagementController.getDocRootAgentConfig(agentManagementController.selectedVersion, agentManagementController.selectedTool)">				
-					<md-option  ng-repeat="(key, value) in agentManagementController.toolsArr" value="{{value}}" ng-selected="{{agentManagementController.editAgentDetails['toolname'] == value}}">{{value}}</md-option> 
+						 placeholder="Select Tool" data-md-container-class="selectdemoSelectHeader" ng-change="agentManagementController.getDocRootAgentConfig(agentManagementController.selectedVersion, agentManagementController.selectedTool)" ng-disabled="agentManagementController.btnValue == 'Update'">				
+					<md-option  ng-repeat="(key, value) in agentManagementController.toolsArr" value="{{value}}">{{value}}</md-option> 
 				</md-select>
 				</div>
 		</div>
-		<div ng-if="agentManagementController.showAgentRegisteredMessage" class="agentRegisteredMsg">{{agentManagementController.showMessage}}</div>
+			<div ng-if="agentManagementController.showAgentRegisteredMessage" class="agentRegisteredMsg">{{agentManagementController.showMessage}}</div>
             <div>               			
-				 <md-button type="submit" class="md-raised md-primary configureBut" ng-click="agentManagementController.getUpdatedConfigData()">
-                    Register
+				 <md-button type="submit" class="md-raised md-primary configureBut" ng-click="agentManagementController.getUpdatedConfigData(agentManagementController.btnValue)" ng-disabled="agentManagementController.buttonDisableStatus">
+                    {{agentManagementController.btnValue}}
                 </md-button>
             </div>
        
