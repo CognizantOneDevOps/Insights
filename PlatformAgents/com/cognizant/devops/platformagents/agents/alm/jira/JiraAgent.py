@@ -55,7 +55,7 @@ class JiraAgent(BaseAgent):
                 if sprintField:
                     self.processSprintInformation(parsedIssue, issue, sprintField, self.tracking)
                 data += parsedIssue
-                workLogData += self.processWorkLog(issue, workLogFields)
+                workLogData += self.processChangeLog(issue, workLogFields)
             maxResults = response['maxResults']
             total = response['total']
             startAt = response['startAt']
@@ -77,7 +77,7 @@ class JiraAgent(BaseAgent):
             else:
                 break
     
-    def processWorkLog(self, issue, workLogFields, lastUpdatedDate):
+    def processChangeLog(self, issue, workLogFields):
         changeLog = issue.get('changelog', None)
         workLogData = []
         authorResponseTemplate = {
