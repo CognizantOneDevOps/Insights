@@ -20,8 +20,11 @@ Created on Jun 22, 2016
 '''
 from datetime import datetime as dateTime2
 import datetime
+
 from dateutil import parser
+
 from com.cognizant.devops.platformagents.core.BaseAgent import BaseAgent
+
 
 class JiraAgent(BaseAgent):
         
@@ -34,6 +37,9 @@ class JiraAgent(BaseAgent):
         responseTemplate = self.getResponseTemplate()
         fields = self.extractFields(responseTemplate)
         jiraIssuesUrl = baseUrl+"?jql=updated>='"+lastUpdated+"' ORDER BY updated ASC&maxResults="+str(self.config.get("dataFetchCount", 1000))+'&fields='+fields
+        workLogFields = self.config.get('workLogFields', None)
+        if workLogFields:
+            jiraIssuesUrl = jiraIssuesUrl + '&expand=changelog'
         total = 1
         maxResults = 0
         startAt = 0
@@ -41,6 +47,7 @@ class JiraAgent(BaseAgent):
         sprintField = self.config.get("sprintField", None)
         while (startAt + maxResults) < total:
             data = []
+            workLogData = []
             response = self.getResponse(jiraIssuesUrl+'&startAt='+str(startAt + maxResults), 'GET', self.userid, self.passwd, None)
             jiraIssues = response["issues"]
             for issue in jiraIssues:
@@ -48,6 +55,7 @@ class JiraAgent(BaseAgent):
                 if sprintField:
                     self.processSprintInformation(parsedIssue, issue, sprintField, self.tracking)
                 data += parsedIssue
+                workLogData += self.processWorkLog(issue, workLogFields)
             maxResults = response['maxResults']
             total = response['total']
             startAt = response['startAt']
@@ -58,9 +66,50 @@ class JiraAgent(BaseAgent):
                 fromDateTime = fromDateTime.strftime('%Y-%m-%d %H:%M')
                 self.tracking["lastupdated"] = fromDateTime
                 self.publishToolsData(data)
+                if len(workLogData) > 0:
+                    metadata = {
+                        "labels" : ["JIRA_CHANGE_LOG"],
+                        "dataUpdateSupported" : True,
+                        "uniqueKey" : ["key", "changeId"]
+                    }
+                    self.publishToolsData(workLogData, metadata)
                 self.updateTrackingJson(self.tracking)
             else:
                 break
+    
+    def processWorkLog(self, issue, workLogFields, lastUpdatedDate):
+        changeLog = issue.get('changelog', None)
+        workLogData = []
+        authorResponseTemplate = {
+                'id' : 'changeId',
+                'author' : {
+                    'name' : 'authorId',
+                    'emailAddress' : 'authorEmail',
+                    'displayName' : 'authorName'
+                },
+                'created' : 'changeDate'
+            }
+        injectData = {'key' : issue['key'] }
+        if changeLog:
+            histories = changeLog.get('histories', [])
+            for change in histories:
+                data = self.parseResponse(authorResponseTemplate, change, injectData)[0]
+                items = change['items']
+                recordChange = False
+                for item in items:
+                    if item['field'] in workLogFields:
+                        if item['fromString']:
+                            data[item['field']+'String'] = item['fromString']
+                        if item['toString']:
+                            data[item['field']+'UpdatedString'] = item['toString']
+                        if item['from']:
+                            data[item['field']] = item['from']
+                        if item['to']:
+                            data[item['field']+'Updated'] = item['to']
+                        recordChange = True
+                if recordChange:
+                    workLogData.append(data)
+        return workLogData
     
     def scheduleExtensions(self):
         extensions = self.config.get('extensions', None)
