@@ -37,9 +37,12 @@ class JiraAgent(BaseAgent):
         responseTemplate = self.getResponseTemplate()
         fields = self.extractFields(responseTemplate)
         jiraIssuesUrl = baseUrl+"?jql=updated>='"+lastUpdated+"' ORDER BY updated ASC&maxResults="+str(self.config.get("dataFetchCount", 1000))+'&fields='+fields
-        workLogFields = self.config.get('workLogFields', None)
-        if workLogFields:
+        changeLog = self.config.get('changeLog', None)
+        if changeLog:
             jiraIssuesUrl = jiraIssuesUrl + '&expand=changelog'
+            changeLogFields = changeLog['fields']
+            changeLogMetadata = changeLog['metadata']
+            changeLogResponseTemplate = changeLog['responseTemplate']
         total = 1
         maxResults = 0
         startAt = 0
@@ -55,7 +58,8 @@ class JiraAgent(BaseAgent):
                 if sprintField:
                     self.processSprintInformation(parsedIssue, issue, sprintField, self.tracking)
                 data += parsedIssue
-                workLogData += self.processChangeLog(issue, workLogFields)
+                if changeLog:
+                    workLogData += self.processChangeLog(issue, changeLogFields, changeLogResponseTemplate)
             maxResults = response['maxResults']
             total = response['total']
             startAt = response['startAt']
@@ -67,41 +71,27 @@ class JiraAgent(BaseAgent):
                 self.tracking["lastupdated"] = fromDateTime
                 self.publishToolsData(data)
                 if len(workLogData) > 0:
-                    metadata = {
-                        "labels" : ["JIRA_CHANGE_LOG"],
-                        "dataUpdateSupported" : True,
-                        "uniqueKey" : ["key", "changeId"]
-                    }
-                    self.publishToolsData(workLogData, metadata)
+                    self.publishToolsData(workLogData, changeLogMetadata)
                 self.updateTrackingJson(self.tracking)
             else:
                 break
     
-    def processChangeLog(self, issue, workLogFields):
+    def processChangeLog(self, issue, workLogFields, responseTemplate):
         changeLog = issue.get('changelog', None)
         workLogData = []
-        authorResponseTemplate = {
-                'id' : 'changeId',
-                'author' : {
-                    'name' : 'authorId',
-                    'emailAddress' : 'authorEmail',
-                    'displayName' : 'authorName'
-                },
-                'created' : 'changeDate'
-            }
         injectData = {'key' : issue['key'] }
         if changeLog:
             histories = changeLog.get('histories', [])
             for change in histories:
-                data = self.parseResponse(authorResponseTemplate, change, injectData)[0]
+                data = self.parseResponse(responseTemplate, change, injectData)[0]
                 items = change['items']
                 recordChange = False
                 for item in items:
                     if item['field'] in workLogFields:
                         if item['fromString']:
-                            data[item['field']+'String'] = item['fromString']
+                            data[item['field']+'Str'] = item['fromString']
                         if item['toString']:
-                            data[item['field']+'UpdatedString'] = item['toString']
+                            data[item['field']+'UpdatedStr'] = item['toString']
                         if item['from']:
                             data[item['field']] = item['from']
                         if item['to']:
