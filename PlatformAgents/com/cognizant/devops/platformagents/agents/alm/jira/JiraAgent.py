@@ -43,6 +43,7 @@ class JiraAgent(BaseAgent):
             changeLogFields = changeLog['fields']
             changeLogMetadata = changeLog['metadata']
             changeLogResponseTemplate = changeLog['responseTemplate']
+            startFromDate = parser.parse(startFrom)
         total = 1
         maxResults = 0
         startAt = 0
@@ -59,7 +60,7 @@ class JiraAgent(BaseAgent):
                     self.processSprintInformation(parsedIssue, issue, sprintField, self.tracking)
                 data += parsedIssue
                 if changeLog:
-                    workLogData += self.processChangeLog(issue, changeLogFields, changeLogResponseTemplate)
+                    workLogData += self.processChangeLog(issue, changeLogFields, changeLogResponseTemplate, startFromDate)
             maxResults = response['maxResults']
             total = response['total']
             startAt = response['startAt']
@@ -76,7 +77,7 @@ class JiraAgent(BaseAgent):
             else:
                 break
     
-    def processChangeLog(self, issue, workLogFields, responseTemplate):
+    def processChangeLog(self, issue, workLogFields, responseTemplate, startFromDate):
         changeLog = issue.get('changelog', None)
         workLogData = []
         injectData = {'key' : issue['key'] }
@@ -84,21 +85,23 @@ class JiraAgent(BaseAgent):
             histories = changeLog.get('histories', [])
             for change in histories:
                 data = self.parseResponse(responseTemplate, change, injectData)[0]
-                items = change['items']
-                recordChange = False
-                for item in items:
-                    if item['field'] in workLogFields:
-                        if item['fromString']:
-                            data[item['field']+'Str'] = item['fromString']
-                        if item['toString']:
-                            data[item['field']+'UpdatedStr'] = item['toString']
-                        if item['from']:
-                            data[item['field']] = item['from']
-                        if item['to']:
-                            data[item['field']+'Updated'] = item['to']
-                        recordChange = True
-                if recordChange:
-                    workLogData.append(data)
+                changeDate = parser.parse(data['changeDate'].split('.')[0]);
+                if changeDate > startFromDate:
+                    items = change['items']
+                    recordChange = False
+                    for item in items:
+                        if item['field'] in workLogFields:
+                            if item['fromString']:
+                                data[item['field']+'Str'] = item['fromString']
+                            if item['toString']:
+                                data[item['field']+'UpdatedStr'] = item['toString']
+                            if item['from']:
+                                data[item['field']] = item['from']
+                            if item['to']:
+                                data[item['field']+'Updated'] = item['to']
+                            recordChange = True
+                    if recordChange:
+                        workLogData.append(data)
         return workLogData
     
     def scheduleExtensions(self):
