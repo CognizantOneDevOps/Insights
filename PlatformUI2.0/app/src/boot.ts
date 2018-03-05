@@ -114,11 +114,14 @@ module ISightApp {
                         var fileSize = (<HTMLInputElement>element[0]).files[0].size;
                         if (fileSize > maxSize){
                            scope.maxSizeErr = true;
+						   scope.imageSrc = "#";
+						   scope.showUploadBtn = false;
                         }else{
                         scope.showUploadBtn = true;
                         scope.file = (<HTMLInputElement>element[0]).files[0];
                         scope.getFile();
                         }
+						scope.$apply();
                     });
                 }
             };
