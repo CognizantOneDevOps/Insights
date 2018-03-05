@@ -18,8 +18,8 @@
 
 module ISightApp {
     export class HomePageController {
-        static $inject = ['$location', '$window', '$cookies', '$rootScope', 'authenticationService', 'restEndpointService', '$sce', '$timeout', '$mdDialog', 'aboutService', '$resource'];
-        constructor(private $location, private $window, private $cookies, private $rootScope, private authenticationService: IAuthenticationService, private restEndpointService: IRestEndpointService, private $sce, private $timeout, private $mdDialog, private aboutService: IAboutService, private $resource) {
+        static $inject = ['$location', '$window', '$cookies', '$rootScope', 'authenticationService', 'restEndpointService', '$sce', '$timeout', '$mdDialog', 'aboutService', '$resource','restAPIUrlService'];
+        constructor(private $location, private $window, private $cookies, private $rootScope, private authenticationService: IAuthenticationService, private restEndpointService: IRestEndpointService, private $sce, private $timeout, private $mdDialog, private aboutService: IAboutService, private $resource,private restAPIUrlService:IRestAPIUrlService) {
             var self = this;
             this.authenticationService.validateSession();
             this.isValidUser = true;
@@ -88,9 +88,23 @@ module ISightApp {
                // self.selectedIndex = 2;
                 //self.templateName = 'dashboards';
             
-            console.log(self.templateName);
-            console.log(self.selectedIndex);
-
+             var restCallUrl = restAPIUrlService.getRestCallUrl("GET_LOGO_IMAGE");
+                var resource = this.$resource(restCallUrl,
+                {},
+                {
+                    allData: {
+                        method: 'GET'
+                    }
+                });
+                
+                resource.allData().$promise.then(function(data){
+                    if(data.data.encodedString && data.data.encodedString.length > 0){
+                        self.imageSrc = 'data:image/jpg;base64,' + data.data.encodedString;                    
+                    }else{
+                        self.showDefaultImg = true;
+                    }
+                   
+                });
               
         }
         isValidUser: boolean = false;
@@ -127,6 +141,8 @@ module ISightApp {
         userRole: string = '';
         userCurrentOrg: string = '';
         userCurrentOrgName: string = '';
+		imageSrc: string = "dist/icons/svg/landingPage/Cognizant_Insights.svg";
+        showDefaultImg: boolean = false;
 
         public redirect(iconId: string): void {
             if (iconId == 'dashboard') {
