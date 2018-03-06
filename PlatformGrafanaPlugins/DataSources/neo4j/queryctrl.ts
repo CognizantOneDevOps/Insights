@@ -16,8 +16,8 @@
 
 ///<reference path="../../../headers/common.d.ts" />
 
-import angular from 'angular';
-import _ from 'lodash';
+//import angular from 'angular';
+//import _ from 'lodash';
 import {QueryCtrl} from 'app/plugins/sdk';
 
 export class Neo4jQueryCtrl extends QueryCtrl {
@@ -26,13 +26,13 @@ export class Neo4jQueryCtrl extends QueryCtrl {
   target: any;
 
   /** @ngInject **/
-  constructor($scope, $injector, private templateSrv, private $q, private uiSegmentSrv) {
+  constructor($scope, $injector/* , private templateSrv, private $q, private uiSegmentSrv */) {
     super($scope, $injector);
-    this.target.rawQuery = true;
+    this.target.rawQuery = true;	
   }
 
   public onChangeInternal(): void{
-    this['panelCtrl'].refresh();
+    this['panelCtrl'].refresh();	
   }
 }
 
