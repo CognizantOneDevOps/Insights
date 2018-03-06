@@ -239,7 +239,7 @@ class BaseAgent(object):
         return self.communicationFacade.processResponse(template, response, injectData, self.config.get('useResponseTemplate',False))
     
     def getResponseTemplate(self):
-        return self.config.get('responseTemplate', None)
+        return self.config.get('dynamicTemplate', {}).get('responseTemplate',None)
     
     def generateHealthData(self, ex=None, systemFailure=False):
         data = []
