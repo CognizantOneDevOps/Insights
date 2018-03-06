@@ -20,7 +20,7 @@
 		<div class="selectToolTxt"> Please select a tool to configure </div>
 		<div ng-if="agentListController.showConfirmMessage != ''" class="selectToolTxt" style="text-transform: capitalize;">{{agentListController.showConfirmMessage}}</div>
 		<div>
-			<md-button class="md-raised md-primary configureBut" ng-disabled="agentListController.buttonDisableStatus" ng-click="agentListController.newAgentRegister()">Register</md-button>
+			<md-button class="md-raised md-primary configureBut" ng-click="agentListController.newAgentRegister()">Register</md-button>
 		</div>
     </div>
 	 <div ng-if="agentListController.showThrobber" layout-sm="column" layout-align="center center" style="margin-left: 46%;margin-top: 46px;">
