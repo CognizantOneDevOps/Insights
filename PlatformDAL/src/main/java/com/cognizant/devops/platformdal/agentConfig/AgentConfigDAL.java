@@ -68,7 +68,7 @@ public class AgentConfigDAL extends BaseDAL {
 		agentConfig.setUpdatedDate(updateDate);
 		agentConfig.setUniqueKey(uniqueKey);
 		agentConfig.setAgentKey(agentId);
-		agentConfig.setAgentStatus(AGENTSTATUS.RUNNING.name());
+		agentConfig.setAgentStatus(AGENTSTATUS.START.name());
 	}
 
 
