@@ -17,6 +17,12 @@ package com.cognizant.devops.platformservice.security.config;
 
 import java.io.IOException;
 
+import java.util.ArrayList;
+import java.util.List;
+import org.springframework.http.MediaType;
+import org.springframework.http.converter.ByteArrayHttpMessageConverter;
+import org.springframework.security.config.annotation.web.builders.WebSecurity;
+
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -120,4 +126,25 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 	         
 	        return resolver;
 	    }	
+		
+		@Override
+		public void configure(WebSecurity web) throws Exception {
+			web.ignoring().antMatchers("/settings/getLogoImage");
+		}
+		
+		@Bean
+		public ByteArrayHttpMessageConverter byteArrayHttpMessageConverter() {
+			final ByteArrayHttpMessageConverter arrayHttpMessageConverter = new ByteArrayHttpMessageConverter();
+			arrayHttpMessageConverter.setSupportedMediaTypes(getSupportedMediaTypes());
+			return arrayHttpMessageConverter;
+		}
+
+		private List<MediaType> getSupportedMediaTypes() {
+			final List<MediaType> list = new ArrayList<MediaType>();
+			list.add(MediaType.IMAGE_JPEG);
+			list.add(MediaType.IMAGE_PNG);
+			list.add(MediaType.APPLICATION_OCTET_STREAM);
+
+			return list;
+		}
 }
