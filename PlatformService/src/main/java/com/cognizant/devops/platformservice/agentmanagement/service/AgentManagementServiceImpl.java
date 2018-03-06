@@ -91,7 +91,7 @@ public class AgentManagementServiceImpl  implements AgentManagementService{
 			Path agentZipPath =updateAgentConfig(toolName,agentId,json);
 			byte[] data = Files.readAllBytes(agentZipPath);
 			sendAgentPackage(data,agentId,agentId,toolName,osversion);
-			performAgentAction(agentId,AGENTSTATUS.RUNNING.name());
+			performAgentAction(agentId,AGENTSTATUS.START.name());
 		} catch (Exception e) {
 			LOG.error("Error while registering agent "+toolName, e);
 			throw new InsightsCustomException(e.toString());
@@ -126,7 +126,7 @@ public class AgentManagementServiceImpl  implements AgentManagementService{
 			agentConfigDAL.updateAgentRunningStatus(agentId,AGENTSTATUS.valueOf(action));
 			performAgentAction(agentId,action);
 		} catch (Exception e) {
-			LOG.error("Error while installing agent..", e);
+			LOG.error("Error while starting agent..", e);
 			throw new InsightsCustomException(e.toString());
 		}
 		return "SUCCESS";
