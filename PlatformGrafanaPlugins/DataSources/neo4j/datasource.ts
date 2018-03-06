@@ -16,10 +16,10 @@
  
 ///<reference path="../../../headers/common.d.ts" />
 
-import angular from 'angular';
-import _ from 'lodash';
+//import angular from 'angular';
+//import _ from 'lodash';
 
-import * as dateMath from 'app/core/utils/datemath';
+//import * as dateMath from 'app/core/utils/datemath';
 
 export default class Neo4jDatasource {
   type: any;
@@ -56,7 +56,7 @@ export default class Neo4jDatasource {
 
   executeCypherQuery(cypherQuery, targets) {
     var deferred = this.$q.defer();
-    var self = this;
+    //var self = this;
     this.backendSrv.datasourceRequest({
       url: this.url,
       method: 'POST',
@@ -100,7 +100,7 @@ export default class Neo4jDatasource {
   }
 
   query(options) {
-    var adhocFilters = this.templateSrv.getAdhocFilters(this.name);
+    //var adhocFilters = this.templateSrv.getAdhocFilters(this.name);
     var targets = options.targets;
     var cypherQuery = {};
     var statements = [];
@@ -180,7 +180,7 @@ export default class Neo4jDatasource {
     };
     var testQuery = JSON.stringify(queryJson);
     var deferred = this.$q.defer();
-    var self = this;
+    //var self = this;
     try {
       this.backendSrv.datasourceRequest({
         url: this.url,
