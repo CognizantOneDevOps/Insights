@@ -27,6 +27,7 @@ module ISightApp {
 		loadAgentServices(ServerName: string): ng.IPromise<any>;
 		registerAgent(toolName: string,toolVersion: string,osName: string,configData: string): ng.IPromise<any>;
 		updateAgent(agentId: string, configData: string, toolName: string,toolVersion: string,osName: string): ng.IPromise<any>;
+		agentStartStop(agentId: string, actionType: string): ng.IPromise<any>;
     }
 
     export class AgentService implements IAgentService {
@@ -78,6 +79,11 @@ module ISightApp {
 		updateAgent(agentId: string, configData: string, toolName: string, toolVersion: string, osName: string): ng.IPromise<any> {
             var restHandler = this.restCallHandlerService;
             return restHandler.post("AGENT_UPDATE",{'agentId' : agentId, 'configJson':configData, 'toolName':toolName, 'agentVersion':toolVersion, 'osversion': osName},{'Content-Type': 'application/x-www-form-urlencoded'});           
+        }
+		
+		agentStartStop(agentId: string, actionType: string): ng.IPromise<any> {
+            var restHandler = this.restCallHandlerService;
+            return restHandler.post("AGENT_START_STOP",{'agentId' : agentId, 'action':actionType},{'Content-Type': 'application/x-www-form-urlencoded'});           
         }
 			
     }
