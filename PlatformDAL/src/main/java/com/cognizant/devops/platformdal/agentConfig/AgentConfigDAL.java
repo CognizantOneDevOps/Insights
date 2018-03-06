@@ -29,8 +29,8 @@ public class AgentConfigDAL extends BaseDAL {
 	
 	
 	
-	public boolean saveAgentConfigFromUI(String agentId, String toolName, JsonObject agentJson, 
-			boolean isDataUpdateSupported, String uniqueKey, String agentVersion, String osversion, Date updateDate) {
+	public boolean saveAgentConfigFromUI(String agentId, String toolCategory, String toolName, 
+			JsonObject agentJson, boolean isDataUpdateSupported, String uniqueKey, String agentVersion, String osversion, Date updateDate) {
 		
 		Query<AgentConfig> createQuery = getSession().createQuery(
 				"FROM AgentConfig a WHERE a.toolName = :toolName  AND a.agentKey = :agentId",
@@ -44,11 +44,11 @@ public class AgentConfigDAL extends BaseDAL {
 		}
 		getSession().beginTransaction();
 		if (agentConfig != null) {
-			setAgentConfigValues(agentConfig, agentId, toolName, agentJson, isDataUpdateSupported, uniqueKey, agentVersion, osversion, updateDate);
+			setAgentConfigValues(agentConfig, agentId, toolCategory, toolName, agentJson, isDataUpdateSupported, uniqueKey, agentVersion, osversion, updateDate);
 			getSession().update(agentConfig);
 		} else {
 			agentConfig = new AgentConfig();
-			setAgentConfigValues(agentConfig, agentId, toolName, agentJson, isDataUpdateSupported, uniqueKey, agentVersion, osversion, updateDate);
+			setAgentConfigValues(agentConfig, agentId, toolCategory, toolName, agentJson, isDataUpdateSupported, uniqueKey, agentVersion, osversion, updateDate);
 			getSession().save(agentConfig);
 		}
 		getSession().getTransaction().commit();
@@ -57,9 +57,10 @@ public class AgentConfigDAL extends BaseDAL {
 		return true;
 	}
 	
-	private void setAgentConfigValues(AgentConfig agentConfig,String agentId, String toolName, JsonObject agentJson, 
+	private void setAgentConfigValues(AgentConfig agentConfig,String toolCategory,String agentId, String toolName, JsonObject agentJson, 
 			boolean isDataUpdateSupported, String uniqueKey, String agentVersion, String osversion, Date updateDate) {
 		
+		agentConfig.setToolCategory(toolCategory.toUpperCase());
 		agentConfig.setToolName(toolName);
 		agentConfig.setDataUpdateSupported(isDataUpdateSupported);
 		agentConfig.setAgentJson(agentJson.toString());

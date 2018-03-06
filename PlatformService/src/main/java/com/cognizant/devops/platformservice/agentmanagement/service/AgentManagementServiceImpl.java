@@ -76,6 +76,7 @@ public class AgentManagementServiceImpl  implements AgentManagementService{
 			json.addProperty("osversion",osversion);
 			json.addProperty("agentVersion",agentVersion);
 			json.get("subscribe").getAsJsonObject().addProperty("agentCtrlQueue" ,agentId);
+			
 			boolean isDataUpdateSupported = false;
 			if(json.get("isDataUpdateSupported") != null && !json.get("isDataUpdateSupported").isJsonNull()) {
 				isDataUpdateSupported = json.get("isDataUpdateSupported").getAsBoolean();
@@ -85,7 +86,7 @@ public class AgentManagementServiceImpl  implements AgentManagementService{
 
 			// register agent in DB
 			AgentConfigDAL agentConfigDAL = new AgentConfigDAL();
-			agentConfigDAL.saveAgentConfigFromUI(agentId , toolName,json, isDataUpdateSupported, uniqueKey,agentVersion,osversion,updateDate);
+			agentConfigDAL.saveAgentConfigFromUI(agentId , json.get("toolCategory").getAsString(),toolName, json, isDataUpdateSupported,uniqueKey,agentVersion,osversion, updateDate);
 
 			//Create zip/tar file with updated config.json
 			Path agentZipPath =updateAgentConfig(toolName,agentId,json);
@@ -151,7 +152,7 @@ public class AgentManagementServiceImpl  implements AgentManagementService{
 			Date updateDate= Timestamp.valueOf(LocalDateTime.now());
 
 			AgentConfigDAL agentConfigDAL = new AgentConfigDAL();
-			 agentConfigDAL.saveAgentConfigFromUI(agentId , toolName, json, isDataUpdateSupported, uniqueKey, agentVersion,osversion,updateDate);
+			 agentConfigDAL.saveAgentConfigFromUI(agentId , json.get("toolCategory").getAsString(), toolName, json, isDataUpdateSupported, uniqueKey,agentVersion,osversion, updateDate);
 
 			Path agentZipPath = updateAgentConfig(toolName,agentId,json);
 
