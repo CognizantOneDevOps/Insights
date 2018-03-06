@@ -46,10 +46,27 @@ module ISightApp {
 		data = [];
 		tableParams = [];
 		homeController: HomePageController;
-		buttonDisableStatus: boolean = true;
+		buttonDisableStatus: boolean = false;
 	    editIconSrc: string = "dist/icons/svg/actionIcons/Edit_icon_disabled.svg";
 		startIconSrc: string = "dist/icons/svg/actionIcons/Start_icon_Active.svg";
-		stopIconSrc: string = "dist/icons/svg/actionIcons/Stop_icon_Active.svg";    	
+		stopIconSrc: string = "dist/icons/svg/actionIcons/Stop_icon_Active.svg";
+
+		agentStartStopAction(actDetails, actType, msg): void{
+			var self = this;
+			self.agentService.agentStartStop(actDetails.agentid, actType)
+			.then(function (data) {		
+				console.log(data);			
+				self.showConfirmMessage = data.status;
+				self.getRegisteredAgents();						
+			})			
+			.catch(function (data) {		
+				console.log(data);
+				self.showConfirmMessage = "Error";
+				self.getRegisteredAgents();	
+			}); 
+			
+			
+		}
 		
 		editAgentConfig(params): void {							
 			this.homeController.selectedAgentID = params;
@@ -57,7 +74,7 @@ module ISightApp {
 		}
 		
 		enableActions(): void{		
-            this.buttonDisableStatus = false;
+            this.buttonDisableStatus = true;
 			this.editIconSrc = "dist/icons/svg/userOnboarding/Edit_icon_MouseOver.svg";
 		}
 		
@@ -66,6 +83,8 @@ module ISightApp {
 			var self = this;						
 			self.showList = false;
 			self.showThrobber = true;				
+			self.buttonDisableStatus = false;
+			self.editIconSrc = "dist/icons/svg/actionIcons/Edit_icon_disabled.svg";
 			self.homeController.showConfirmMessage = "";
 			self.agentService.loadAgentServices("DB_AGENTS_LIST")			
 			.then(function (response) {						
