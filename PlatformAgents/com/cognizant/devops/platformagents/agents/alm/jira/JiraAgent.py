@@ -80,7 +80,7 @@ class JiraAgent(BaseAgent):
     def processChangeLog(self, issue, workLogFields, responseTemplate, startFromDate):
         changeLog = issue.get('changelog', None)
         workLogData = []
-        injectData = {'key' : issue['key'] }
+        injectData = {'issueKey' : issue['key'] }
         if changeLog:
             histories = changeLog.get('histories', [])
             for change in histories:
