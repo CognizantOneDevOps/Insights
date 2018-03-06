@@ -143,7 +143,7 @@ class BaseAgent(object):
         def callback(ch, method, properties, data):
             #Update the config file and cache.
             action = data
-            if "RUNNING" == action:
+            if "START" == action:
                 self.shouldAgentRun = True
             if "STOP" == action:
                 self.shouldAgentRun = False
