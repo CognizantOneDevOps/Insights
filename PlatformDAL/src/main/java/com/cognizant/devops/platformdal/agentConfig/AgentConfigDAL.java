@@ -44,11 +44,11 @@ public class AgentConfigDAL extends BaseDAL {
 		}
 		getSession().beginTransaction();
 		if (agentConfig != null) {
-			setAgentConfigValues(agentConfig, agentId, toolCategory, toolName, agentJson, isDataUpdateSupported, uniqueKey, agentVersion, osversion, updateDate);
+			setAgentConfigValues(agentConfig, toolCategory, agentId, toolName, agentJson, isDataUpdateSupported, uniqueKey, agentVersion, osversion, updateDate);
 			getSession().update(agentConfig);
 		} else {
 			agentConfig = new AgentConfig();
-			setAgentConfigValues(agentConfig, agentId, toolCategory, toolName, agentJson, isDataUpdateSupported, uniqueKey, agentVersion, osversion, updateDate);
+			setAgentConfigValues(agentConfig, toolCategory, agentId, toolName, agentJson, isDataUpdateSupported, uniqueKey, agentVersion, osversion, updateDate);
 			getSession().save(agentConfig);
 		}
 		getSession().getTransaction().commit();
