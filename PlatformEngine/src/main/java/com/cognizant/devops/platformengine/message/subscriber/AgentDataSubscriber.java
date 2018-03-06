@@ -225,6 +225,7 @@ public class AgentDataSubscriber extends EngineSubscriberResponseHandler{
 			for(JsonElement constraint : properties) {
 				String fieldName = constraint.getAsString();
 				cypherQuery.append(fieldName).append(" : properties.").append(fieldName).append(",");
+				Neo4jFieldIndexRegistry.getInstance().syncFieldIndex(toolName, fieldName);
 			}
 			cypherQuery.delete(cypherQuery.length()-1, cypherQuery.length());
 			cypherQuery.append(" }");
