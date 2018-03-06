@@ -101,6 +101,9 @@ module ISightApp {
 		 
 		  this.addEndPoint("INSIGHTS_GET",'/PlatformService/insights/inferences');
 		  this.addEndPoint("INSIGHTS_COMP_STATUS",'/PlatformService/ServicesHealthStatus/getStatus');
+		  
+		  this.addEndPoint("UPLOAD_IMAGE",'/PlatformService/settings/uploadCustomLogo');
+		  this.addEndPoint("GET_LOGO_IMAGE",'/Plagit tformService/settings/getLogoImage');
         }
 
        addEndPoint(name:string, url:string){
