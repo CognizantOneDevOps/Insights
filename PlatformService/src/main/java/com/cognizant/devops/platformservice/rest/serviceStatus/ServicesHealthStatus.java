@@ -49,7 +49,7 @@ public class ServicesHealthStatus {
 		//ApplicationConfigCache.loadConfigCache();
 		/*PostgreSQL health check*/
 		String hostEndPoint = ServiceStatusConstants.POSTGRESQL_HOST;
-		String apiUrl = hostEndPoint+"/api/health";		
+		String apiUrl = hostEndPoint;		
 		JsonObject postgreStatus = getClientResponse(hostEndPoint, apiUrl, ServiceStatusConstants.DB);
 		servicesHealthStatus.add(ServiceStatusConstants.PgSQL, postgreStatus);
 		
