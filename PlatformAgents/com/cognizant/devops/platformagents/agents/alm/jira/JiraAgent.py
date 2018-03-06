@@ -160,6 +160,13 @@ class JiraAgent(BaseAgent):
                         sprints.append(sprintId)
                 parsedIssue[0]['sprints'] = sprints
                 parsedIssue[0]['boards'] = boards
+                if len(boards) > 1 :
+                    for board in boards:
+                        boardTracking = boardsTracking.get(board)
+                        sprintTracking = boardTracking.get('sprints')
+                        for sprint in sprints:
+                            if sprintTracking.get(sprint, None) is None:
+                                sprintTracking[sprint] = {}
      
     def retrieveSprintReports(self):
         sprintDetails = self.config.get('extensions', {}).get('sprintReport', None)
