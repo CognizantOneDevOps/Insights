@@ -18,9 +18,9 @@
  <div layout="column" class="contentCss" flex>
 	<div layout="row" layout-align="space-between start">	
 		<div class="selectToolTxt"> Please select a tool to configure </div>
-		<div ng-if="agentListController.showConfirmMessage != ''" class="selectToolTxt">{{agentListController.showConfirmMessage}}</div>
+		<div ng-if="agentListController.showConfirmMessage != ''" class="selectToolTxt" style="text-transform: capitalize;">{{agentListController.showConfirmMessage}}</div>
 		<div>
-			<md-button class="md-raised md-primary configureBut" ng-disabled="!agentListController.buttonDisableStatus" ng-click="agentListController.newAgentRegister()">Register</md-button>
+			<md-button class="md-raised md-primary configureBut" ng-disabled="agentListController.buttonDisableStatus" ng-click="agentListController.newAgentRegister()">Register</md-button>
 		</div>
     </div>
 	 <div ng-if="agentListController.showThrobber" layout-sm="column" layout-align="center center" style="margin-left: 46%;margin-top: 46px;">
@@ -29,17 +29,17 @@
 		
 	 <div class="confirmationMessage" layout="row" layout-align="end start" style="margin-right: 7px;" ng-if="agentListController.showList">
 	 
-	<md-icon class="ForActionsIcons" ng-style="{height: '20px', width: '20px'}" md-svg-src="{{agentListController.startIconSrc}}" ng-click="agentListController.buttonDisableStatus||agentListController.editAgentConfig(agentListController.SelectedToolDetails)">
+	<md-icon class="ForActionsIcons" ng-style="{height: '20px', width: '20px'}" md-svg-src="{{agentListController.startIconSrc}}" ng-click="agentListController.buttonDisableStatus && agentListController.agentStartStopAction(agentListController.SelectedToolDetails,  'START')">
             <md-tooltip md-direction="Bottom">
                 Start
             </md-tooltip>
 	</md-icon>
-	<md-icon class="ForActionsIcons" ng-style="{height: '20px', width: '20px'}" md-svg-src="{{agentListController.stopIconSrc}}" ng-click="agentListController.buttonDisableStatus||agentListController.editAgentConfig(agentListController.SelectedToolDetails)">
+	<md-icon class="ForActionsIcons" ng-style="{height: '20px', width: '20px'}" md-svg-src="{{agentListController.stopIconSrc}}" ng-click="agentListController.buttonDisableStatus && agentListController.agentStartStopAction(agentListController.SelectedToolDetails, 'STOP')">
             <md-tooltip md-direction="Bottom">
                 Stop
             </md-tooltip>
 	</md-icon>
-	<md-icon class="ForActionsIcons" ng-style="{height: '20px', width: '20px'}" md-svg-src="{{agentListController.editIconSrc}}" ng-click="agentListController.buttonDisableStatus||agentListController.editAgentConfig(agentListController.SelectedToolDetails)">
+	<md-icon class="ForActionsIcons" ng-style="{height: '20px', width: '20px'}" md-svg-src="{{agentListController.editIconSrc}}" ng-click="agentListController.buttonDisableStatus && agentListController.editAgentConfig(agentListController.SelectedToolDetails)">
             <md-tooltip md-direction="Bottom">
                 Edit
             </md-tooltip>
