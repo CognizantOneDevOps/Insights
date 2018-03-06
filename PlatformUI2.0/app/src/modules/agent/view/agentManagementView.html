@@ -67,10 +67,10 @@
 							</th>
 						</tr>
 					</thead>
-					<tbody layout="row" layout-wrap>			
-						<tr flex="50" layout="column" layout-align="start start" ng-repeat="(x,y) in value" style="display: inline-table;">
-							<td flex="15" layout><span class="dataHead">{{x}}</span></td>
-							<td  style="height:56px;background-color: white !important; width: 50% !important;">
+					<tbody layout layout-wrap layout-margin layout-padding>			
+							<tr flex="30" layout layout-align="start start" ng-repeat="(x,y) in value" style="display: inline-table;">
+								<td class="agentlistLabel"><span class="dataHead">{{x}}</span></td>					
+							<td>
 								<input class="inputBoxCont" ng-model="agentManagementController.defaultConfigdata[key][x]">
 							</td>								
 						</tr>						
@@ -86,10 +86,10 @@
 						</th>
 					</tr>
 				</thead>			
-				<tbody layout="row" layout-wrap>				
-					<tr flex="50" layout="column" layout-align="start start" ng-repeat="(key,value) in agentManagementController.defaultConfigdata" ng-if="agentManagementController.findDataType(key,agentManagementController.defaultConfigdata) != 'object'" style="display: inline-table;">
-						<td flex="15"><span class="dataHead">{{key}}</span></td>
-						<td  style="height:56px;background-color: white !important; width: 50% !important;">
+				<tbody layout layout-wrap layout-margin layout-padding>		
+					<tr flex="30" layout layout-align="start start" ng-repeat="(key,value) in agentManagementController.defaultConfigdata" ng-if="agentManagementController.findDataType(key,agentManagementController.defaultConfigdata) != 'object'" style="display: inline-table;">
+						<td class="agentlistLabel"><span class="dataHead">{{key}}</span></td>
+						<td>				
 							<input class="inputBoxCont" ng-model="agentManagementController.defaultConfigdata[key]">
 						</td>								
 					</tr>						

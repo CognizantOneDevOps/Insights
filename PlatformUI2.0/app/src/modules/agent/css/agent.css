@@ -103,8 +103,8 @@ background-color:#e9e9e9;
 }
 .agentConfigTable table tr td {
 	height:56px;
-	/* max-width:22.5% !important; */
-	width: 50% !important;
+	/* max-width:22.5% !important; 
+	width: 50% !important;*/
 	background-color: white !important;
 }
 .inputBoxCont {
@@ -161,4 +161,9 @@ background-color:#e9e9e9;
 }
 .ng-table-pager {
 	float: right;
+}
+.agentlistLabel {
+    vertical-align: middle !important;    
+    text-transform: capitalize;
+	width: 25% !important;
 }
