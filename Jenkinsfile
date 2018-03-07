@@ -142,7 +142,6 @@ gitCommitID = sh (
 		}
 	   
 	   // Platform UI2.0 Ends
-
         //Send Notification to Slack Channel
 	stage ('SlackNotification') {
    	    slackSend channel: '#insightsjenkins', color: 'good', message: "New Insights artifacts are uploaded to Nexus for commitID : *${env.commitID}* ,Branch - *${env.branchName}* \n *PlatformService* ${PS_artifact} \n *PlatformEngine* ${PE_artifact} \n *PlatformInsights*  ${PI_artifact} \n *PlatformUI2.0* ${PUI_artifact}", teamDomain: 'insightscogdevops', token: slackToken // "*" is for making the text bold in slack notification
