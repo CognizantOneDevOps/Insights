@@ -11,7 +11,8 @@ gitCommitID = sh (
 	stage ('LicenseCheck') {
            checkout scm
     	   def commit = sh (returnStdout: true, script: '''var=''
-	for file in $(find . -print | grep -i -e .*[.]java -e .*[.]py)
+	#for file in $(find . -print | grep -i -e .*[.]java -e .*[.]py)
+	for file in $(find . -print | grep -i -e .*[.]java)
 	do
    	    if grep -q "Apache License" $file; then
         	updated="License is updated $file" ##Dummy line
@@ -142,7 +143,6 @@ gitCommitID = sh (
 		}
 	   
 	   // Platform UI2.0 Ends
-
         //Send Notification to Slack Channel
 	stage ('SlackNotification') {
    	    slackSend channel: '#insightsjenkins', color: 'good', message: "New Insights artifacts are uploaded to Nexus for commitID : *${env.commitID}* ,Branch - *${env.branchName}* \n *PlatformService* ${PS_artifact} \n *PlatformEngine* ${PE_artifact} \n *PlatformInsights*  ${PI_artifact} \n *PlatformUI2.0* ${PUI_artifact}", teamDomain: 'insightscogdevops', token: slackToken // "*" is for making the text bold in slack notification
