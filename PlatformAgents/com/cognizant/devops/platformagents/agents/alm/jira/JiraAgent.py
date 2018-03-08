@@ -107,6 +107,9 @@ class JiraAgent(BaseAgent):
     def scheduleExtensions(self):
         extensions = self.config.get('extensions', None)
         if extensions:
+            sprints = extensions.get('sprints', None)
+            if sprints:
+                self.registerExtension('sprints', self.retrieveSprintDetails, sprints.get('runSchedule'))
             sprintReport = extensions.get('sprintReport', None)
             if sprintReport:
                 self.registerExtension('sprintReport', self.retrieveSprintReports, sprintReport.get('runSchedule'))
@@ -160,14 +163,51 @@ class JiraAgent(BaseAgent):
                         sprints.append(sprintId)
                 parsedIssue[0]['sprints'] = sprints
                 parsedIssue[0]['boards'] = boards
-                if len(boards) > 1 :
-                    for board in boards:
-                        boardTracking = boardsTracking.get(board)
-                        sprintTracking = boardTracking.get('sprints')
-                        for sprint in sprints:
-                            if sprintTracking.get(sprint, None) is None:
-                                sprintTracking[sprint] = {}
+                #if len(boards) > 1 :
+                #    for board in boards:
+                #        boardTracking = boardsTracking.get(board)
+                #        sprintTracking = boardTracking.get('sprints')
+                #        for sprint in sprints:
+                #            if sprintTracking.get(sprint, None) is None:
+                #                sprintTracking[sprint] = {}
      
+    def retrieveSprintDetails(self):
+        sprintDetails = self.config.get('extensions', {}).get('sprints', None)
+        boardApiUrl = sprintDetails.get('boardApiUrl')
+        boards = self.tracking.get('boards', None)
+        if sprintDetails and boards:
+            responseTemplate = sprintDetails.get('sprintResponseTemplate', None)
+            sprintMetadata = sprintDetails.get('sprintMetadata')
+            for boardId in boards:
+                board = boards[boardId]
+                boardName = board.get('name', None)
+                boardRestUrl = boardApiUrl + '/' + str(boardId)
+                if boardName is None:
+                    try:
+                        boardResponse = self.getResponse(boardRestUrl, 'GET', self.userid, self.passwd, None)
+                        board['name'] = boardResponse.get('name')
+                        board['type'] = boardResponse.get('type')
+                        board.pop('error', None)
+                    except Exception as ex:
+                        board['error'] = str(ex)
+                        continue
+                sprintsUrl = boardRestUrl + '/sprint?startAt='
+                startAt = 0
+                isLast = False
+                data = []
+                injectData = {'boardName' : board['name']}
+                while not isLast:
+                    sprintsResponse = self.getResponse(sprintsUrl+str(startAt), 'GET', self.userid, self.passwd, None)
+                    isLast = sprintsResponse['isLast']
+                    startAt = startAt + sprintsResponse['maxResults']
+                    sprintValues = sprintsResponse['values']
+                    parsedSprints = self.parseResponse(responseTemplate, sprintValues, injectData)
+                    for parsedSprint in parsedSprints:
+                        if str(parsedSprint.get('boardId')) == str(boardId):
+                            data.append(parsedSprint)
+                if len(data) > 0 : 
+                    self.publishToolsData(data, sprintMetadata)
+    
     def retrieveSprintReports(self):
         sprintDetails = self.config.get('extensions', {}).get('sprintReport', None)
         boardApiUrl = sprintDetails.get('boardApiUrl')
