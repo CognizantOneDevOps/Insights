@@ -15,6 +15,7 @@
 	"communication":{
 		"type" : "REST" 
 	},
+	"toolCategory" : "ENVIRONMENT",
 	"toolsTimeZone" : "GMT",
 	"insightsTimeZone" : "Asia/Kolkata",
 	"useResponseTemplate" : false,

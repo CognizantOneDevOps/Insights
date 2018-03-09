@@ -58,6 +58,7 @@
 	"groupId" : "maven2-moduleset/rootModule/groupId",
 	"artifactId" : "maven2-moduleset/rootModule/artifactId"
 },
+"toolCategory" : "CI",
 "toolsTimeZone" : "Asia/Kolkata",
 "useResponseTemplate" : true,
 "useAllBuildsApi" : false,

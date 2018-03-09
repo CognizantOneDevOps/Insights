@@ -15,6 +15,7 @@
 	"communication":{
 		"type" : "REST" 
 	},
+	"toolCategory" : "SCM",
 	"toolsTimeZone" : "GMT",
 	"insightsTimeZone" : "Asia/Kolkata",
 	"useResponseTemplate" : false,

@@ -48,6 +48,7 @@
 		}]
 	}
 },
+"toolCategory" : "CI",
 "auth": "base64",
 "toolsTimeZone" : "Asia/Kolkata",
 "insightsTimeZone" : "Asia/Kolkata",

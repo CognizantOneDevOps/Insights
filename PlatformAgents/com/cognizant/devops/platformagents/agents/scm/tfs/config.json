@@ -29,6 +29,7 @@
     }
 },
 "auth": "NTLM",
+"toolCategory" : "SCM",
 "toolsTimeZone" : "Asia/Kolkata",
 "insightsTimeZone" : "Asia/Kolkata",
 "useResponseTemplate" : true,

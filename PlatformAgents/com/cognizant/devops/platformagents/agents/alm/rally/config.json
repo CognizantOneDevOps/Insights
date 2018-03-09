@@ -19,6 +19,7 @@
         "LastUpdateDate": "LastUpdateDate",
         "Name": "StoryName"
   },
+  "toolCategory" : "ALM",
   "proxy": "proxy.companyname.com:8080/",
   "accesstoken":"***REMOVED***",
   "runSchedule": 30,

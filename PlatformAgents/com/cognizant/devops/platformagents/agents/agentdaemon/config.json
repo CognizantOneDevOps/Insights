@@ -19,6 +19,7 @@
   "subscribe": {
     "agentPkgQueue": "INSIGHTS.AGENTS.PACKAGE"
   },
+   "toolCategory" : "DUMMY",
   "timeStampFormat": "%Y-%m-%dT%H:%M:%SZ",
   "toolsTimeZone": "GMT"
 }

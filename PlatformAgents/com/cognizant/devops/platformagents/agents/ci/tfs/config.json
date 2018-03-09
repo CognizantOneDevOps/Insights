@@ -41,6 +41,7 @@
     "url": "buildUrl",
     "priority": "priority"
   },
+"toolCategory" : "CI",
 "auth": "NTLM",
 "toolsTimeZone" : "Asia/Kolkata",
 "insightsTimeZone" : "Asia/Kolkata",
