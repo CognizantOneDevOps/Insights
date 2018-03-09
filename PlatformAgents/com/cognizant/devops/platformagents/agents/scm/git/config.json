@@ -26,6 +26,7 @@
 		}
 	},
 	"enableBranches" : false,
+	"toolCategory" : "SCM",
 	"toolsTimeZone" : "GMT",
 	"insightsTimeZone" : "Asia/Kolkata",
 	"useResponseTemplate" : true,
