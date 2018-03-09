@@ -38,6 +38,7 @@
 		"owner" : "owner"
 	}
   },
+  "toolCategory" : "ALM",
   "dataFetchCount" : 200,
   "auth": "base64",
   "runSchedule": 30,

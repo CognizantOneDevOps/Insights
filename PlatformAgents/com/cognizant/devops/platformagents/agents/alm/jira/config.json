@@ -51,6 +51,7 @@
       ]
     }
   },
+  "toolCategory" : "ALM",
   "runSchedule": 30,
   "dataFetchCount": 1000,
   "userid": "userid",

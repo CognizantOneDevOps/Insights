@@ -17,6 +17,7 @@
   "subscribe": {
     "config": "CODEQUALITY.SONAR.config"
   },
+  "toolCategory" : "CODEQUALITY",
   "metrics" : ["alert_status", "complexity", "coverage", "new_coverage", "duplicated_blocks", "duplicated_files", "duplicated_line", "new_violations", "sqale_index", "sqale_debt_ratio", "new_sqale_debt_ratio"],
   "toolName": "SONAR",
   "runSchedule": 30,

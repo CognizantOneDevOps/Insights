@@ -57,6 +57,7 @@
     "SCALR" : ["master"]
   }
  },
+ "toolCategory" : "SCM",
   "auth": "base64",
   "runSchedule": 5,
   "toolsTimeZone" : "Asia/Kolkata",
