@@ -179,22 +179,26 @@ class JiraAgent(BaseAgent):
             responseTemplate = sprintDetails.get('sprintResponseTemplate', None)
             sprintMetadata = sprintDetails.get('sprintMetadata')
             for boardId in boards:
+                data = []
                 board = boards[boardId]
-                boardName = board.get('name', None)
                 boardRestUrl = boardApiUrl + '/' + str(boardId)
-                if boardName is None:
-                    try:
-                        boardResponse = self.getResponse(boardRestUrl, 'GET', self.userid, self.passwd, None)
-                        board['name'] = boardResponse.get('name')
-                        board['type'] = boardResponse.get('type')
-                        board.pop('error', None)
-                    except Exception as ex:
-                        board['error'] = str(ex)
-                        continue
+                try:
+                    boardResponse = self.getResponse(boardRestUrl, 'GET', self.userid, self.passwd, None)
+                    board['name'] = boardResponse.get('name')
+                    board['type'] = boardResponse.get('type')
+                    board.pop('error', None)
+                except Exception as ex:
+                    board['error'] = str(ex)
+                    #Get the individual sprint details.
+                    sprints = board.get('sprints')
+                    for sprint in sprints:
+                        sprintApiUrl = sprintDetails.get('sprintApiUrl')+'/'+sprint
+                        sprintResponse = self.getResponse(sprintApiUrl, 'GET', self.userid, self.passwd, None)
+                        data.append(self.parseResponse(responseTemplate, sprintResponse)[0])
+                    continue
                 sprintsUrl = boardRestUrl + '/sprint?startAt='
                 startAt = 0
                 isLast = False
-                data = []
                 injectData = {'boardName' : board['name']}
                 while not isLast:
                     sprintsResponse = self.getResponse(sprintsUrl+str(startAt), 'GET', self.userid, self.passwd, None)
