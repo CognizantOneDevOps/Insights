@@ -195,6 +195,8 @@ class JiraAgent(BaseAgent):
                         sprintApiUrl = sprintDetails.get('sprintApiUrl')+'/'+sprint
                         sprintResponse = self.getResponse(sprintApiUrl, 'GET', self.userid, self.passwd, None)
                         data.append(self.parseResponse(responseTemplate, sprintResponse)[0])
+                    if len(data) > 0 : 
+                        self.publishToolsData(data, sprintMetadata)
                     continue
                 sprintsUrl = boardRestUrl + '/sprint?startAt='
                 startAt = 0
