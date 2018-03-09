@@ -24,6 +24,7 @@
 	"applicationRequestId": "applicationRequestId",
 	"user": "user"
   },
+  "toolCategory" : "DEPLOYMENT",
   "runSchedule": 30,
   "userid": "userId",
   "passwd": "Passwd",

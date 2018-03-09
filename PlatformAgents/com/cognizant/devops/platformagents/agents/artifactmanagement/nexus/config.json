@@ -17,6 +17,7 @@
   },
   "responseTemplate": {
   },
+  "toolCategory" : "ARTIFACTMANAGEMENT",
   "auth": "base64",
   "runSchedule": 5,
   "UserID": "userid",
