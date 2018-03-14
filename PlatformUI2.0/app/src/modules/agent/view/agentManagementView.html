@@ -24,6 +24,7 @@
 						 placeholder="Select OS" data-md-container-class="selectdemoSelectHeader">
 							  <md-option value="windows">Windows</md-option>
 							  <md-option value="linux">Linux</md-option>
+							  <md-option value="ubuntu">Ubuntu</md-option>							  
 				</md-select>
 				</div>
 				
@@ -63,7 +64,9 @@
 					<thead class="theadCss">
 						<tr layout="row" layout-align="start start">
 							<th flex="22.5" class="tableHeader">
-								<span class="tableHeadingStyle">{{key}}</span>
+								<span class="tableHeadingStyle" style="text-transform: capitalize;">
+									{{agentManagementController.configAbbr[key]}}
+								</span>								
 							</th>
 						</tr>
 					</thead>

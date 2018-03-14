@@ -16,12 +16,12 @@
 
 module ISightApp {
     export class AgentManagementController {
-        static $inject = ['agentService', 'iconService', '$sce', '$mdDialog', '$cookies', 'toolConfigService'];
+        static $inject = ['agentService', 'iconService', '$sce', '$mdDialog', '$cookies', 'toolConfigService', 'restEndpointService'];
         constructor(			
             private agentService: IAgentService,
             private iconService: IIconService,
 			private $sce,
-            private $mdDialog, private $cookies, private toolConfigService: IToolConfigService) {
+            private $mdDialog, private $cookies, private toolConfigService: IToolConfigService, private restEndpointService: IRestEndpointService) {
 			var elem = document.querySelector('#homePageTemplateContainer');
             var homePageControllerScope = angular.element(elem).scope();
             var homePageController = homePageControllerScope['homePageController'];
@@ -43,6 +43,8 @@ module ISightApp {
 			
 		}
 		
+		configDesc = {};
+		configAbbr = [];
 		buttonDisableStatus: boolean = true;
 		btnValue: string;
 		dynamicData: string;
@@ -109,6 +111,8 @@ module ISightApp {
 			self.showConfig = false;
 			self.showThrobber = true;	
 			self.showMessage = "";
+			self.configDesc = self.restEndpointService.getConfigDesc();
+			
 			self.agentService.getDocrootAgentConfig(version, toolName)
 			.then(function (data) {		
 				self.buttonDisableStatus = false;
@@ -116,6 +120,19 @@ module ISightApp {
 				self.showThrobber = false;
 				self.defaultConfigdata  = JSON.parse(data.data);				
 				self.dynamicData = JSON.stringify(self.defaultConfigdata['dynamicTemplate'], undefined, 4);
+				
+				//if(Object.keys(self.configDesc).length != 0 ) {
+					
+					for(var key in self.defaultConfigdata){		
+						if(self.configDesc.hasOwnProperty(key)) {
+							self.configAbbr[key] = self.configDesc[key];			
+						}else {
+							self.configAbbr[key] = key;
+						}
+					}				
+				//}
+				
+				
 			})			
 			.catch(function (data) {		
 				self.showThrobber = false;							
@@ -129,6 +146,7 @@ module ISightApp {
 			self.showConfig = false;
 			self.showThrobber = true;	
 			self.showMessage = "";			
+			self.configDesc = self.restEndpointService.getConfigDesc();
 			self.agentService.getDbAgentConfig(agentId)
 			.then(function (data) {		
 				console.log(data);
@@ -140,6 +158,15 @@ module ISightApp {
 				self.getOsVersionTools(self.selectedVersion);
 				self.selectedTool = data.data.toolName;
 				self.dynamicData = JSON.stringify(self.defaultConfigdata['dynamicTemplate'], undefined, 4);
+				
+				for(var key in self.defaultConfigdata){	
+				
+					if(self.configDesc.hasOwnProperty(key)) {
+						self.configAbbr[key] = self.configDesc[key];							
+					}else {
+						self.configAbbr[key] = key;
+					}
+				}
 			})			
 			.catch(function (data) {		
 				self.showThrobber = false;							
