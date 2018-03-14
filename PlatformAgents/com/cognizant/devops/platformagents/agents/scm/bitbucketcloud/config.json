@@ -15,48 +15,50 @@
   "communication": {
     "type": "REST"
   },
-  "responseTemplate": {
-  "hash": "commitId",
-  "author": {
-    "user": {
-      "username": "authorName"
-    }
-  },
-  "date": "commitTime",
-  "message": "commitMessage",
-  "properties": {
-    "jira-key": [
-      "jiraKey"
-    ]
-  }
-}, 
-"userInputBranches" : {
-  "TES": {
-    "OnlineBanking": [
-      "master",
-      "OnlineBankingBranch1"
-    ]
-  },
-  "DD": {
-    "devopsdigitalsolution": [
-      "master",
-      "sonar",
-      "DockerJenkins"
-    ]
-  },
-    "DOC": {
-    "dockerfile-generator": [
-      "master"
-    ]
-  },
-    "DEV": {
-    "PCF": [
-      "ElasticSearch0.5",
-      "ElasticSearch0.4"
-    ],
-    "SCALR" : ["master"]
-  }
- },
+ "dynamicTemplate": {
+	  "responseTemplate": {
+		  "hash": "commitId",
+		  "author": {
+		    "user": {
+		      "username": "authorName"
+		    }
+		  },
+		  "date": "commitTime",
+		  "message": "commitMessage",
+		  "properties": {
+		    "jira-key": [
+		      "jiraKey"
+		    ]
+		  }
+	  }, 
+	  "userInputBranches" : {
+		  "TES": {
+		    "OnlineBanking": [
+		      "master",
+		      "OnlineBankingBranch1"
+		    ]
+		  },
+		  "DD": {
+		    "devopsdigitalsolution": [
+		      "master",
+		      "sonar",
+		      "DockerJenkins"
+		    ]
+		  },
+		   "DOC": {
+		    "dockerfile-generator": [
+		      "master"
+		    ]
+		  },
+		   "DEV": {
+		    "PCF": [
+		      "ElasticSearch0.5",
+		      "ElasticSearch0.4"
+		    ],
+		    "SCALR" : ["master"]
+		  }
+	    }
+	},
  "toolCategory" : "SCM",
   "auth": "base64",
   "runSchedule": 5,

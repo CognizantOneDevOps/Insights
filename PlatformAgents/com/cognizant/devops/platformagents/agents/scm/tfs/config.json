@@ -15,19 +15,21 @@
   "communication": {
     "type": "REST"
   },
-  "responseTemplate": {
-    "changesetId": "changesetId",
-    "createdDate": "commitDate",
-    "comment": "comment",
-    "checkedInBy": {
-      "displayName": "scmAuthorName",
-      "uniqueName": "scmAuthor"
-    },
-    "author": {
-      "displayName": "creatorName",
-       "uniqueName": "creator"
-    }
-},
+  "dynamicTemplate": {
+	  "responseTemplate": {
+	    "changesetId": "changesetId",
+	    "createdDate": "commitDate",
+	    "comment": "comment",
+	    "checkedInBy": {
+	      "displayName": "scmAuthorName",
+	      "uniqueName": "scmAuthor"
+	    },
+	    "author": {
+	      "displayName": "creatorName",
+	       "uniqueName": "creator"
+	    }
+	  } 
+  },
 "auth": "NTLM",
 "toolCategory" : "SCM",
 "toolsTimeZone" : "Asia/Kolkata",

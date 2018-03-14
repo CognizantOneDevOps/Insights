@@ -15,25 +15,27 @@
   "communication": {
     "type": "REST"
   },
-  "responseTemplate": {
-    "id": "executionId",
-    "project": "projectName",
-    "status": "status",
-    "permalink": "permalink",
-    "user": "user",
-    "date-started": {
-      "unixtime": "unixTimestampStart",
-      "date": "dateStarted"
-    },
-    "date-ended": {
-      "unixtime": "unixTimestampEnd",
-      "date": "dateEnd"
-    },
-    "job": {
-      "id": "jobId",
-      "name": "jobName"
-    }
-},
+ "dynamicTemplate": {
+	  "responseTemplate": {
+	    "id": "executionId",
+	    "project": "projectName",
+	    "status": "status",
+	    "permalink": "permalink",
+	    "user": "user",
+	    "date-started": {
+	      "unixtime": "unixTimestampStart",
+	      "date": "dateStarted"
+	    },
+	    "date-ended": {
+	      "unixtime": "unixTimestampEnd",
+	      "date": "dateEnd"
+	    },
+	    "job": {
+	      "id": "jobId",
+	      "name": "jobName"
+	    }
+	  }  
+  },
   "toolCategory" : "DEPLOYMENT",
   "auth": "base64",
   "runSchedule": 2,

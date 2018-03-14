@@ -15,42 +15,44 @@
   "communication": {
     "type": "REST"
   },
-  "responseTemplate": {
-  "actions": [
-    {
-      "causes": [
-        {
-          "shortDescription": "shortDescription"
-        }
-      ]
-    },
-    {
-      "remoteUrls": [
-        "scmUrl"
-      ]
-    },
-    {
-    "url": "sonarUrl"
-    }
-  ],
-  "changeSet": {
-    "items": [
-      {
-        "commitId": "scmCommitId",
-        "author": {
-          "fullName": "scmAuthor"
-        },
-        "date": "buildDate"
-      }
-    ],
-    "kind": "scmKind"
-  },
-  "duration": "duration",
-  "id": "buildNumber",
-  "result": "result",
-  "timestamp": "buildTimestamp",
-  "url": "buildUrl"
-},
+ "dynamicTemplate": {
+	 "responseTemplate": {
+		  "actions": [
+		    {
+		      "causes": [
+		        {
+		          "shortDescription": "shortDescription"
+		        }
+		      ]
+		    },
+		    {
+		      "remoteUrls": [
+		        "scmUrl"
+		      ]
+		    },
+		    {
+		    "url": "sonarUrl"
+		    }
+		  ],
+		  "changeSet": {
+		    "items": [
+		      {
+		        "commitId": "scmCommitId",
+		        "author": {
+		          "fullName": "scmAuthor"
+		        },
+		        "date": "buildDate"
+		      }
+		    ],
+		    "kind": "scmKind"
+		  },
+		  "duration": "duration",
+		  "id": "buildNumber",
+		  "result": "result",
+		  "timestamp": "buildTimestamp",
+		  "url": "buildUrl"
+		}  
+	},
 "jobDetails" : {
 	"rundeckJobId" : "maven2-moduleset/publishers/org.jenkinsci.plugins.rundeck.RundeckNotifier/jobId",
 	"scmRemoteUrl" : "maven2-moduleset/scm/userRemoteConfigs/hudson.plugins.git.UserRemoteConfig/url",

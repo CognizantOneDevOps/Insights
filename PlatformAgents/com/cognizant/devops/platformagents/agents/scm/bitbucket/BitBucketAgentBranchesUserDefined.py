@@ -35,7 +35,7 @@ class BitBucketAgentBranchesUserDefined(BaseAgent):
         bitBucketProjects = self.getResponse(getProjectsUrl, 'GET', UserId, Passwd, None)
         responseTemplate = self.getResponseTemplate()
         data = []
-        self.userInputBranches = self.config.get("userInputBranches")
+        self.userInputBranches = self.config.get('dynamicTemplate', {}).get("userInputBranches")
         for projects in range(len(bitBucketProjects["values"])):
             ProjKey = bitBucketProjects["values"][projects]["key"]
             bitBicketReposUrl = BaseEndPoint+ProjKey+"/repos"

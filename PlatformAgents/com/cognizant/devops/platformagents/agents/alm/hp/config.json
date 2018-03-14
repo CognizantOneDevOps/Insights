@@ -15,28 +15,30 @@
   "communication": {
     "type": "REST"
   },
-  "almEntities" : {
-  	"requirements" : {
-		"parent-id" : "parentId", 
-		"id"		: "id", 
-		"name"		: "name", 
-		"creation-time" : "creationTime", 
-		"last-modified" : "lastModified", 
-		"req-reviewed"  : "reqReviewed", 
-		"req-priority"  : "priority", 
-		"father-name"   : "fatherName"
-	},
-	"defects" : {
-		"id" : "id", 
-		"priority" : "priority", 
-		"name" : "name", 
-		"creation-time" : "creationTime", 
-		"last-modified" : "lastModified", 
-		"status" : "status", 
-		"severity" : "severity", 
-		"detected-by" : "detectedBy", 
-		"owner" : "owner"
-	}
+  "dynamicTemplate": {
+	  "almEntities" : {
+	  	"requirements" : {
+			"parent-id" : "parentId", 
+			"id"		: "id", 
+			"name"		: "name", 
+			"creation-time" : "creationTime", 
+			"last-modified" : "lastModified", 
+			"req-reviewed"  : "reqReviewed", 
+			"req-priority"  : "priority", 
+			"father-name"   : "fatherName"
+		},
+		"defects" : {
+			"id" : "id", 
+			"priority" : "priority", 
+			"name" : "name", 
+			"creation-time" : "creationTime", 
+			"last-modified" : "lastModified", 
+			"status" : "status", 
+			"severity" : "severity", 
+			"detected-by" : "detectedBy", 
+			"owner" : "owner"
+		}
+	  }
   },
   "toolCategory" : "ALM",
   "dataFetchCount" : 200,
