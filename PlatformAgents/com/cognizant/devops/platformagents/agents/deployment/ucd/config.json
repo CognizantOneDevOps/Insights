@@ -15,14 +15,16 @@
   "communication": {
     "type": "REST"
   },
-  "responseTemplate": {
-    "status": "status",
-	"date": "date",
-	"duration": "duration",
-	"environment": "environment",
-	"application": "application",
-	"applicationRequestId": "applicationRequestId",
-	"user": "user"
+   "dynamicTemplate": {
+	  "responseTemplate": {
+	    "status": "status",
+		"date": "date",
+		"duration": "duration",
+		"environment": "environment",
+		"application": "application",
+		"applicationRequestId": "applicationRequestId",
+		"user": "user"
+	  }
   },
   "toolCategory" : "DEPLOYMENT",
   "runSchedule": 30,

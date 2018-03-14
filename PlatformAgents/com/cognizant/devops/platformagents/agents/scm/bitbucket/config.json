@@ -15,38 +15,40 @@
   "communication": {
     "type": "REST"
   },
-  "responseTemplate": {
-    "id": "commitId",
-    "author": {
-      "name": "authorName",
-      "emailAddress": "authorEmail"
-    },
-    "authorTimestamp": "createdTime",
-    "message": "commitMessage",
-    "properties": {
-      "jira-key": [
-        "jiraKey"
-      ]
-    },
-    "pullRequests": {
-      "id" : "pullReqId",
-      "state" : "pullReqState",
-      "createdDate" : "createdTime",
-      "updatedDate" : "updatedTime",
-      "closedDate" : "closedTime",
-      "fromRef" : {
-        "displayId" : "fromBranch"
-      },
-      "toRef" : {
-        "displayId" : "toBranch"
-      },
-      "author": {
-        "user": {
-          "name": "authorName",
-          "emailAddress": "authorEmail"
-        }
-      }
-    }
+    "dynamicTemplate": {
+	  "responseTemplate": {
+	    "id": "commitId",
+	    "author": {
+	      "name": "authorName",
+	      "emailAddress": "authorEmail"
+	    },
+	    "authorTimestamp": "createdTime",
+	    "message": "commitMessage",
+	    "properties": {
+	      "jira-key": [
+	        "jiraKey"
+	      ]
+	    },
+	    "pullRequests": {
+	      "id" : "pullReqId",
+	      "state" : "pullReqState",
+	      "createdDate" : "createdTime",
+	      "updatedDate" : "updatedTime",
+	      "closedDate" : "closedTime",
+	      "fromRef" : {
+	        "displayId" : "fromBranch"
+	      },
+	      "toRef" : {
+	        "displayId" : "toBranch"
+	      },
+	      "author": {
+	        "user": {
+	          "name": "authorName",
+	          "emailAddress": "authorEmail"
+	        }
+	      }
+	    }
+	  }
   },
   "toolCategory" : "SCM",
   "runSchedule": 30,

@@ -15,31 +15,33 @@
   "communication": {
     "type": "REST"
   },
-  "responseTemplate": {
-    "result": "result",
-    "id": "buildId",
-    "sourceVersion": "sourceVersion",
-    "queueTime": "queuedDate",
-    "reason": "manual",
-    "requestedBy": {
-	  "displayName": "ciAuthorName",
-	  "uniqueName": "ciAuthor"
-    },
-    "status": "status",
-    "repository": {
-  	  "type": "repository"
-    },
-    "buildNumber": "buildNumber",
-    "controller": {
-	  "name": "controllerName"
-    },
-    "startTime": "startDate",
-    "finishTime": "finishDate",
-    "definition": {
-	  "name": "buildDefinitionName"
-    },
-    "url": "buildUrl",
-    "priority": "priority"
+ "dynamicTemplate": {
+	  "responseTemplate": {
+	    "result": "result",
+	    "id": "buildId",
+	    "sourceVersion": "sourceVersion",
+	    "queueTime": "queuedDate",
+	    "reason": "manual",
+	    "requestedBy": {
+		  "displayName": "ciAuthorName",
+		  "uniqueName": "ciAuthor"
+	    },
+	    "status": "status",
+	    "repository": {
+	  	  "type": "repository"
+	    },
+	    "buildNumber": "buildNumber",
+	    "controller": {
+		  "name": "controllerName"
+	    },
+	    "startTime": "startDate",
+	    "finishTime": "finishDate",
+	    "definition": {
+		  "name": "buildDefinitionName"
+	    },
+	    "url": "buildUrl",
+	    "priority": "priority"
+	  }
   },
 "toolCategory" : "CI",
 "auth": "NTLM",
