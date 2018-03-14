@@ -1,6 +1,8 @@
 {
-  "responseTemplate": {
-    "sha": "dummyData"    
+  "dynamicTemplate": {
+	  "responseTemplate": {
+	    "sha": "dummyData"
+	  }     
   },
   "insightsTimeZone": "Asia/Kolkata",
   "communication": {
