@@ -15,39 +15,41 @@
   "communication": {
     "type": "REST"
   },
-  "responseTemplate": {
-	"status": "status",
-	"buildType": {
-		"name": "buildTypeName",
-		"projectId": "projectId",
-		"projectName": "projectName",
-		"id": "buildTypeId"
-	},
-	"queuedDate": "queuedDate",
-	"triggered": {
-		"date": "triggeredDate",
-		"type": "triggeredType",
-		"user": {
-			"username": "ciAuthor",
-			"name": "ciAuthorName"
-		}
-	},
-	"startDate": "startDate",
-	"agent": {
-		"name": "agentName"
-	},
-	"state": "state",
-	"href": "buildUrl",
-	"finishDate": "finishDate",
-	"id": "buildId",
-	"revisions": {
-		"revision": [{
-			"vcs-root-instance": {
-				"name": "scmUrl"
+   "dynamicTemplate": {
+	  "responseTemplate": {
+		"status": "status",
+		"buildType": {
+			"name": "buildTypeName",
+			"projectId": "projectId",
+			"projectName": "projectName",
+			"id": "buildTypeId"
+		},
+		"queuedDate": "queuedDate",
+		"triggered": {
+			"date": "triggeredDate",
+			"type": "triggeredType",
+			"user": {
+				"username": "ciAuthor",
+				"name": "ciAuthorName"
 			}
-		}]
+		},
+		"startDate": "startDate",
+		"agent": {
+			"name": "agentName"
+		},
+		"state": "state",
+		"href": "buildUrl",
+		"finishDate": "finishDate",
+		"id": "buildId",
+		"revisions": {
+			"revision": [{
+				"vcs-root-instance": {
+					"name": "scmUrl"
+				}
+			}]
+		}
 	}
-},
+  },
 "toolCategory" : "CI",
 "auth": "base64",
 "toolsTimeZone" : "Asia/Kolkata",

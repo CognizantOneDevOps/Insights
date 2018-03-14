@@ -15,41 +15,43 @@
   "communication": {
     "type": "REST"
   },
-  "responseTemplate": {
-    "key": "key",
-    "fields": {
-      "issuetype": {
-        "name": "issueType"
-      },
-      "updated": "lastUpdated",
-      "project": {
-        "name": "projectName"
-      },
-      "creator": {
-        "name": "creator"
-      },
-      "priority": {
-        "name": "priority"
-      },
-      "assignee": {
-        "name": "assignee"
-      },
-      "status": {
-        "name": "status"
-      },      
-      "issuelinks": [
-        {
-          "outwardIssue": {
-            "key": "outwardIssue"
-          }
-        },
-        {
-          "inwardIssue": {
-            "key": "inwardIssue"
-          }
-        }
-      ]
-    }
+ "dynamicTemplate": {
+	  "responseTemplate": {
+	    "key": "key",
+	    "fields": {
+	      "issuetype": {
+	        "name": "issueType"
+	      },
+	      "updated": "lastUpdated",
+	      "project": {
+	        "name": "projectName"
+	      },
+	      "creator": {
+	        "name": "creator"
+	      },
+	      "priority": {
+	        "name": "priority"
+	      },
+	      "assignee": {
+	        "name": "assignee"
+	      },
+	      "status": {
+	        "name": "status"
+	      },      
+	      "issuelinks": [
+	        {
+	          "outwardIssue": {
+	            "key": "outwardIssue"
+	          }
+	        },
+	        {
+	          "inwardIssue": {
+	            "key": "inwardIssue"
+	          }
+	        }
+	      ]
+	    } 
+	  }
   },
   "toolCategory" : "ALM",
   "runSchedule": 30,

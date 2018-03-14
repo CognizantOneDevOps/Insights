@@ -15,7 +15,9 @@
   "communication": {
     "type": "REST"
   },
-  "responseTemplate": {
+  "dynamicTemplate": {
+  	  "responseTemplate": {
+  	  }
   },
   "toolCategory" : "ARTIFACTMANAGEMENT",
   "auth": "base64",

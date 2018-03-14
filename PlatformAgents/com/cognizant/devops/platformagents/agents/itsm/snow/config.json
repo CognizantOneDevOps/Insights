@@ -15,14 +15,16 @@
 	"communication":{
 		"type" : "REST" 
 	},
-	"responseTemplate" : {
-		"sha": "commitId",
-		"commit" : {
-			"author" : {
-				"name": "authorName",
-				"date": "commitTime"
+	"dynamicTemplate": {
+	  "responseTemplate" : {
+			"sha": "commitId",
+			"commit" : {
+				"author" : {
+					"name": "authorName",
+					"date": "commitTime"
+				}
 			}
-		}
+	  }
 	},
 	"toolCategory" : "ITSM",
 	"toolsTimeZone" : "GMT",

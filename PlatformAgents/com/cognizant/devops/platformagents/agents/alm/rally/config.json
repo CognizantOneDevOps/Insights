@@ -15,9 +15,12 @@
   "communication": {
     "type": "REST"
   },
-  "responseTemplate": {
-        "LastUpdateDate": "LastUpdateDate",
-        "Name": "StoryName"
+  
+  "dynamicTemplate": {
+	  "responseTemplate": {
+	        "LastUpdateDate": "LastUpdateDate",
+	        "Name": "StoryName"
+	  }
   },
   "toolCategory" : "ALM",
   "proxy": "proxy.companyname.com:8080/",
