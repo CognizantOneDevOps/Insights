@@ -17,7 +17,7 @@ case "$1" in
      echo "InSightsGitAgent already running"
     else
      echo "Starting InSightsGitAgent"
-     cd $INSIGHTS_AGENT_HOME/PlatformAgents
+     cd $INSIGHTS_AGENT_HOME/PlatformAgents/git
      python -c "from com.cognizant.devops.platformagents.agents.scm.git.GitAgent import GitAgent; GitAgent()" &
     fi
     if [[ $(ps aux | grep '[s]cm.git.GitAgent' | awk '{print $2}') ]]; then
@@ -46,13 +46,13 @@ case "$1" in
      sudo kill -9 $(ps aux | grep '[s]cm.git.GitAgent' | awk '{print $2}')
      echo "InSightsGitAgent stopped"
      echo "InSightsGitAgent starting"
-     cd $INSIGHTS_AGENT_HOME/PlatformAgents
+     cd $INSIGHTS_AGENT_HOME/PlatformAgents/git
      python -c "from com.cognizant.devops.platformagents.agents.scm.git.GitAgent import GitAgent; GitAgent()" &
      echo "InSightsGitAgent started"
     else
      echo "InSightsGitAgent already in stopped state"
      echo "InSightsGitAgent starting"
-     cd $INSIGHTS_AGENT_HOME/PlatformAgents
+     cd $INSIGHTS_AGENT_HOME/PlatformAgents/git
      python -c "from com.cognizant.devops.platformagents.agents.scm.git.GitAgent import GitAgent; GitAgent()" &
      echo "InSightsGitAgent started"
     fi
