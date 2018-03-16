@@ -3,7 +3,8 @@
     "user": "iSight",
     "password": "iSight",
     "host": "127.0.0.1",
-    "exchange": "iSight"
+    "exchange": "iSight",
+    "agentControlXchg":"iAgent"
   },
   "subscribe": {
     "config": "ALM.RALLY.config"
@@ -18,8 +19,8 @@
   
   "dynamicTemplate": {
 	  "responseTemplate": {
-	        "LastUpdateDate": "LastUpdateDate",
-	        "Name": "StoryName"
+	        "lastUpdateDate": "LastUpdateDate",
+	        "name": "StoryName"
 	  }
   },
   "toolCategory" : "ALM",
