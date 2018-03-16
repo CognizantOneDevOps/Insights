@@ -1,0 +1,10 @@
+{
+	"labels" : [ 'DATATAGGING' ] ,
+  	
+  	"limit" : "4" ,
+  	
+  	"backupLocation" : "D://download" ,
+  	
+  	"deleteFrom" : "10";
+ 
+ } 
