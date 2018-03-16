@@ -41,8 +41,15 @@ module ISightApp {
 				self.btnValue = "Register";
 			}
 			
+			self.Oslists = {
+				"windows" : "Windows",
+				"linux" : "Linux",
+				"ubuntu" : "Ubuntu",
+			};
+			
 		}
 		
+		Oslists = {};
 		configDesc = {};
 		configAbbr = [];
 		buttonDisableStatus: boolean = true;

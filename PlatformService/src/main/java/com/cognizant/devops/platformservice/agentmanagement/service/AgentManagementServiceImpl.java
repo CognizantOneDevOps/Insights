@@ -232,11 +232,11 @@ public class AgentManagementServiceImpl  implements AgentManagementService{
 		try {
 			/*System.setProperty("http.proxyHost", "proxy.cognizant.com");
 			System.setProperty("http.proxyPort","6050");*/
-
+			//::TODO Remove /testagents from the URL. This has been added for testing purpose.
 			String filePath = ApplicationConfigProvider.getInstance().getAgentDetails().getDocrootUrl()
 					+"/"+version+"/agents/testagents/"+tool;
 			filePath=filePath.trim()+"/"+tool.trim()+".zip";
-			String targetDir =  ApplicationConfigProvider.getInstance().getAgentDetails().getUnzipPath();
+			String targetDir =  ApplicationConfigProvider.getInstance().getAgentDetails().getUnzipPath()+File.separator+tool;
 			configJson = AgentManagementUtil.getInstance().getAgentConfigfile(new URL(filePath), new File(targetDir)).toString();
 		} catch (IOException e) {
 			LOG.error("Error in getting raw config file ",e);
@@ -269,7 +269,7 @@ public class AgentManagementServiceImpl  implements AgentManagementService{
 
 	private Path updateAgentConfig( String toolName,String agentId,JsonObject json) throws Exception {
 		String filePath = ApplicationConfigProvider.getInstance().getAgentDetails().getUnzipPath();
-		filePath = filePath+"/"+toolName+"/com/cognizant/devops/platformagents/agents/";
+		filePath = filePath+File.separator+toolName+"/com/cognizant/devops/platformagents/agents/";
 
 		DirectoryStream<Path> paths = Files.newDirectoryStream(Paths.get(filePath));
 		Iterator<Path> pathIterator = paths.iterator();
