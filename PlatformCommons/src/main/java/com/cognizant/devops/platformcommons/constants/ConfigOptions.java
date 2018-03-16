@@ -45,4 +45,7 @@ public interface ConfigOptions {
 	String MAC_ADDRESS = "macAddress";
 	String VALID_TILL = "validTill";
 	String DATE_FORMAT = "MM/dd/yyyy";
+	String NEO4JBACKUP_TEMPLATE = "dataBackup.json";
+	String DATABACKUP_RESOLVED_PATH = System.getenv().get(INSIGHTS_HOME) + FILE_SEPERATOR + ConfigOptions.CONFIG_DIR + FILE_SEPERATOR + ConfigOptions.NEO4JBACKUP_TEMPLATE;
+
 }
