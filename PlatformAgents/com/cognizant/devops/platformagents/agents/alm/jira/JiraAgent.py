@@ -218,10 +218,11 @@ class JiraAgent(BaseAgent):
                     self.publishToolsData(data, sprintMetadata)
                     
     def retrieveBacklogDetails(self):
-        sprintDetails = self.config.get('extensions', {}).get('backlog', None)
-        boardApiUrl = sprintDetails.get('boardApiUrl')
+        backlogDetails = self.config.get('extensions', {}).get('backlog', None)
+        boardApiUrl = backlogDetails.get('boardApiUrl')
         boards = self.tracking.get('boards', None)
-        if sprintDetails and boards:
+        backlogMetadata = backlogDetails.get('backlogMetadata')
+        if backlogDetails and boards:
             for boardId in boards:
                 data = []
                 board = boards[boardId]
@@ -247,7 +248,7 @@ class JiraAgent(BaseAgent):
                             issue['boardId'] = boardId
                             data.append(issue)
                     if len(data) > 0 : 
-                        self.publishToolsData(data)
+                        self.publishToolsData(data, backlogMetadata)
                 except Exception as ex:
                     board['error'] = str(ex)
                     #Get the individual sprint details.
