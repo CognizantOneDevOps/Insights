@@ -3,7 +3,8 @@
     "user": "iSight",
     "password": "iSight",
     "host": "127.0.0.1",
-    "exchange": "iSight"
+    "exchange": "iSight",
+    "agentControlXchg":"iAgent"
   },
   "subscribe": {
     "config": "SCM.BITBUCKET.config"
@@ -54,16 +55,16 @@
   "runSchedule": 30,
   "toolsTimeZone" : "GMT",
   "insightsTimeZone" : "GMT",
-  "StartFrom" : "2017-07-01 00:00:00",
+  "startFrom" : "2017-07-01 00:00:00",
   "useResponseTemplate" : true,
   "scanAllBranches" : false,
   "scanPullRequests": true,
   "auth": "base64",
-  "UserID": "",
-  "Passwd": "",
+  "userID": "",
+  "passwd": "",
   "timeStampField":"createdTime",
   "isEpochTimeFormat" : true,
-  "BaseEndPoint": "http://127.0.0.1:7990/rest/api/1.0/projects/",
+  "baseEndPoint": "http://127.0.0.1:7990/rest/api/1.0/projects/",
   "isDebugAllowed" : false,
   "loggingSetting" : {
         "logLevel" : "WARN"

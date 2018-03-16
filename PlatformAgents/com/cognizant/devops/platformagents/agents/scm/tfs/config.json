@@ -3,7 +3,8 @@
     "user": "iSight",
     "password": "iSight",
     "host": "127.0.0.1",
-    "exchange": "iSight"
+    "exchange": "iSight",
+    "agentControlXchg":"iAgent"
   },
   "subscribe": {
     "config": "SCM.TFS.config"
@@ -36,13 +37,13 @@
 "insightsTimeZone" : "Asia/Kolkata",
 "useResponseTemplate" : true,
 "runSchedule": 2,
-"UserID": "tfs",
-"Passwd": "tfs",
-"BaseUrl": "http://hostname/tfs",
+"userID": "tfs",
+"passwd": "tfs",
+"baseUrl": "http://hostname/tfs",
 "timeStampField":"commitDate",
 "timeStampFormat":"%Y-%m-%dT%H:%M:%S",
 "isEpochTimeFormat" : false,
-"StartFrom" : "2017-01-01 01:01:01",
+"startFrom" : "2017-01-01 01:01:01",
 "isDebugAllowed" : false,
 "loggingSetting" : {
 		"logLevel" : "WARN"

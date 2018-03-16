@@ -47,7 +47,7 @@ class RallyAgent(BaseAgent):
             "http": "http://"+userid+":"+passwd+"@"+ proxy,
             "https": "http://"+userid+":"+passwd+"@"+ proxy
         }
-        hierachiesUrl = baseUrl+"hierarchicalrequirement?query=(LastUpdateDate > "+lastUpdated+")&fetch=LastUpdateDate,Name&order=LastUpdateDate desc"
+        hierachiesUrl = baseUrl+"hierarchicalrequirement?query=(lastUpdateDate > "+lastUpdated+")&fetch=lastUpdateDate,name&order=lastUpdateDate desc"
         hierachies = self.getResponse(hierachiesUrl, 'GET', userid, passwd, None, reqHeaders=headers, proxies=proxies)
         data = []
         for hierarchy in hierachies["QueryResult"]["Results"]:
@@ -56,7 +56,7 @@ class RallyAgent(BaseAgent):
             injectData['TestInject'] = "TestValue"
             data += self.parseResponse(responseTemplate, hierarchy, injectData)
         
-        fromDateTime = data[0]['LastUpdateDate']
+        fromDateTime = data[0]['lastUpdateDate']
         if len(hierachies)>0:
             self.tracking["lastupdated"] = fromDateTime
         self.publishToolsData(data)

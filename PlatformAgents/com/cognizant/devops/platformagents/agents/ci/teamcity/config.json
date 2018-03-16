@@ -3,7 +3,8 @@
     "user": "iSight",
     "password": "iSight",
     "host": "127.0.0.1",
-    "exchange": "iSight"
+    "exchange": "iSight",
+    "agentControlXchg":"iAgent"
   },
   "subscribe": {
     "config": "CI.TEAMCITY.config"
@@ -56,11 +57,11 @@
 "insightsTimeZone" : "Asia/Kolkata",
 "useResponseTemplate" : true,
 "runSchedule": 2,
-"UserID": "userid",
-"Passwd": "passwd",
-"BaseUrl": "http://hostname",
+"userID": "userid",
+"passwd": "passwd",
+"baseUrl": "http://hostname",
 "timeStampField":"startDate",
 "timeStampFormat":"%Y%m%dT%H%M%S+0000",
 "isEpochTimeFormat" : false,
-"StartFrom" : "2017-01-01 01:01:01"
+"startFrom" : "2017-01-01 01:01:01"
 }
