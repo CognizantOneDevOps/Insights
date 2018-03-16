@@ -31,8 +31,8 @@ class SonarAgent(BaseAgent):
         startFrom = parser.parse(startFrom)
         timeStampFormat = self.config.get('timeStampFormat')
         startFrom = startFrom.strftime(timeStampFormat)
-		userId = self.config.get("UserId", '')
-		password = self.config.get("Password", '')
+        userId = self.config.get("UserId", '')
+        password = self.config.get("Password", '')
         sonarProjects = self.getResponse(projectsUrl, 'GET', userId, password, None)
         metrics = self.config.get("metrics", '')
         metricsParam = ''
