@@ -8,14 +8,18 @@ case $opt in
 				sudo chmod +x /etc/init.d/InSightsSonarAgent
 				sudo chkconfig InSightsSonarAgent on
 				sudo service  InSightsSonarAgent status
-				echo "Service installed and started"
+				sudo chkconfig InSightsSonarAgent stop
+				sudo service  InSightsSonarAgent status
+				sudo chkconfig InSightsSonarAgent start
+				sudo service  InSightsSonarAgent status
+				echo "Service installed.."
                 ;;
         [uU][bB][uU][nN][tT][uU])
                 echo "SonarAgent Running on Ubuntu..."
 				sudo cp -xp InSightsSonarAgent.service /etc/systemd/system
 				sudo systemctl enable InSightsSonarAgent
 				sudo systemctl start InSightsSonarAgent
-				echo "Service Installed and started"
+				echo "Service Installed..."
                 ;;
         centos)
                 echo "SonarAgent Running on centso..."

@@ -286,7 +286,7 @@ class BaseAgent(object):
     def execute(self):
         
         if self.shouldAgentRun == True:
-            print('Agent is in START mode')
+            logging.debug('Agent is in START mode')
             try:
                 self.executionStartTime = datetime.now()
                 self.logIndicator(self.EXECUTION_START, self.config.get('isDebugAllowed', False))
@@ -298,7 +298,7 @@ class BaseAgent(object):
                 logging.error(ex)
                 self.logIndicator(self.EXECUTION_ERROR, self.config.get('isDebugAllowed', False))
         if self.shouldAgentRun == False:
-            print('Agent is in STOP mode')
+            logging.debug('Agent is in STOP mode')
         
     def process(self):
         '''

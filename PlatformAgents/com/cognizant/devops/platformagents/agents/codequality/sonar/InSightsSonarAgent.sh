@@ -11,6 +11,10 @@
 # Description: Runs a python program at boot
 ### END INIT INFO
 
+
+#export INSIGHTS_AGENT_HOME=/home/ec2-user/insightsagents
+source /etc/profile
+
 case "$1" in
   start)
     if [[ $(ps aux | grep '[c]odequality.sonar.SonarAgent' | awk '{print $2}') ]]; then
