@@ -231,26 +231,26 @@ class JiraAgent(BaseAgent):
                     board['name'] = boardResponse.get('name')
                     board['type'] = boardResponse.get('type')
                     board.pop('error', None)
+                    backlogUrl = boardRestUrl + '/backlog?fields=[]&startAt='
+                    startAt = 0
+                    isLast = False
+                    while not isLast:
+                        backlogResponse = self.getResponse(backlogUrl+str(startAt), 'GET', self.userid, self.passwd, None)
+                        isLast = (startAt + backlogResponse['maxResults']) > backlogResponse['total']
+                        startAt = startAt + backlogResponse['maxResults']
+                        backlogIssues = backlogResponse['issues']
+                        for backlogIssue in backlogIssues:
+                            issue = {}
+                            issue['backlogIssueKey'] = backlogIssue.get('key')
+                            issue['projectKey'] = backlogIssue.get('key').split('-')[0]
+                            issue['boardName'] = board['name']
+                            issue['boardId'] = boardId
+                            data.append(issue)
+                    if len(data) > 0 : 
+                        self.publishToolsData(data)
                 except Exception as ex:
                     board['error'] = str(ex)
                     #Get the individual sprint details.
-                backlogUrl = boardRestUrl + '/backlog?fields=[]&startAt='
-                startAt = 0
-                isLast = False
-                while not isLast:
-                    backlogResponse = self.getResponse(backlogUrl+str(startAt), 'GET', self.userid, self.passwd, None)
-                    isLast = (startAt + backlogResponse['maxResults']) > backlogResponse['total']
-                    startAt = startAt + backlogResponse['maxResults']
-                    backlogIssues = backlogResponse['issues']
-                    for backlogIssue in backlogIssues:
-                        issue = {}
-                        issue['backlogIssueKey'] = backlogIssue.get('key')
-                        issue['projectKey'] = backlogIssue.get('key').split('-')[0]
-                        issue['boardName'] = board['name']
-                        issue['boardId'] = boardId
-                        data.append(issue)
-                if len(data) > 0 : 
-                    self.publishToolsData(data)
     
     def retrieveSprintReports(self):
         sprintDetails = self.config.get('extensions', {}).get('sprintReport', None)
