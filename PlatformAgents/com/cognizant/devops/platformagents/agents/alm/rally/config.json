@@ -19,8 +19,8 @@
   
   "dynamicTemplate": {
 	  "responseTemplate": {
-	        "lastUpdateDate": "LastUpdateDate",
-	        "name": "StoryName"
+	        "LastUpdateDate": "LastUpdateDate",
+	        "Name": "StoryName"
 	  }
   },
   "toolCategory" : "ALM",
