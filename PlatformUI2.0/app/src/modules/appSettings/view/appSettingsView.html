@@ -1,0 +1,72 @@
+<!--
+ *******************************************************************************
+ * Copyright 2017 Cognizant Technology Solutions
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License.  You may obtain a copy
+ * of the License at
+ * 
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ ******************************************************************************
+ -->
+<div layout="row" flex>
+   <div layout style="width: 100%;font-family:proxima_novaregular">
+      <div  class="applicationContentCss" style="width: 100%;">
+         <div    ng-controller="appSettingsController" style="width: 100%;">
+            <div class="contentCss">
+               <h4 style="color:#38840C;font-family:proxima_novaregular;font-size:16px">Customize your application settings.</h4>
+               <div class="panel panel-default">
+                  <div class="panel-body">
+                     <div  ng-if="showError" style="font-size:16px;margin:auto;border:1px solid #ccc" >
+                        <md-icon  style="margin-right:10px" md-svg-src="dist/icons/svg/insightsPage/alert.svg" ng-style="{color:'red',fill:'red',height: '36px', width: '36px'}"></md-icon>
+                        Failed to upload data.
+                     </div>
+                     <div  ng-if="showSuccess" style="font-size:16px;margin:auto;color:#38840C;padding-bottom:10px" >
+                        Successfully uploaded image.
+                     </div>
+                     <form>
+                     <div layout="row">
+                     <div flex="20">
+                     <div style="font-size:14px;color:#666666;font-family:proxima_novaregular;font-weight:bold;margin-bottom:10px;"> Existing Image </div>
+                     <md-select class="searchApplicationBoxCont" md-no-asterisk="true" ng-model="selectedImage" ng-change="selectImage()" style="margin-top: 0px;margin-bottom:10px">
+                              <md-option value="logo"  ng-selected="true" >Application Logo</md-option>
+                              <md-option value="custom">Custom Image</md-option>
+                     </md-select>
+                      <img ng-src="{{appSettingsController.homeController.imageSrc}}" style="width:200px;height:200px">
+                      </div>
+                        <div class="form-group" flex="75" style="padding-left:20px;border-left:1px solid #666">
+                           <label for="myFileField" style="font-size:14px;color:#666666;font-weight:normal;font-family:proxima_novaregular;font-weight:bold;margin-bottom:10px">Replace existing image by selecting a file: </label>
+                           <input type="file" demo-file-model="myFile"  class="form-control" id ="myFileField" accept="image/x-png,image/gif,image/jpeg"/>
+                           <p> Please select only png,jpeg,jpg files to upload. Image size should be less than 1Mb. </p>
+                           <p ng-show="maxSizeErr" style="color:red">Max file size exceeded (1Mb).Please select different file.</p>
+                       
+                        <div style="display:block;margin:auto;text-align: center">
+                        <img ng-src="{{imageSrc}}">
+                        </div>
+                        <div>
+                        <div style="float:right;width:25%" ng-show="showUploadBtn">
+                           <md-button md-no-ink type="submit" ng-disabled="showDisabled" ng-click="uploadFile()" class="md-raised md-primary configureBut md-button md-ink-ripple"
+                              ng-disabled="showDisabled">Upload Image</md-button>
+                           <span ng-if="showThrobber" style = "vertical-align: super;">
+                              <md-progress-circular style="display: inline;" md-diameter="30" md-mode="indeterminate"></md-progress-circular>
+                           </span>
+                           </div>
+                        </div>
+
+                          </div>
+                        </div>
+                     </form>
+                     <img scr={{image_source}}/>
+                  </div>
+               </div>
+            </div>
+         </div>
+      </div>
+   </div>
+</div>
