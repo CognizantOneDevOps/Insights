@@ -38,6 +38,7 @@ module ISightApp {
         .service('singleToolConfigService', SingleToolConfigService)
         .service('insightsService', InsightsService)
 		.service('platformServiceStatusService', PlatformServiceStatusService)
+		.service('appSettingsService', AppSettingsService)
         .controller('pipelineController', PipelineController)
         .controller('homePageController', HomePageController)
         .controller('toolsConfigurationController', ToolsConfigurationController)
@@ -53,6 +54,7 @@ module ISightApp {
         .controller('singleToolConfigurationController', SingleToolConfigurationController)
         .controller('dataTaggingController', DataTaggingController)
         .controller('insightsController', InsightsController)
+		.controller('appSettingsController', AppSettingsController)
         .component('footer', {
             templateUrl: './dist/components/footer/view/footerView.html',
             controller: FooterController,
@@ -71,6 +73,35 @@ module ISightApp {
             controller: ThrobberController,
             bindings:{}
 
+        })
+		.directive('demoFileModel', function ($parse) {
+            return {
+                restrict: 'A', //the directive can be used as an attribute only
+                    
+                link: function (scope, element, attrs) {
+                    var model = $parse(attrs.demoFileModel),
+                    modelSetter = model.assign; //define a setter for demoFileModel
+                    var maxSize = 1000000;
+                    scope.showUploadBtn = false;
+                    element.bind('change', function () {
+                       
+                        scope.maxSizeErr = false;
+                        scope.$apply(function () {
+                           
+                            modelSetter(scope, (<HTMLInputElement>element[0]).files[0]);
+
+                        });
+                        var fileSize = (<HTMLInputElement>element[0]).files[0].size;
+                        if (fileSize > maxSize){
+                           scope.maxSizeErr = true;
+                        }else{
+                        scope.showUploadBtn = true;
+                        scope.file = (<HTMLInputElement>element[0]).files[0];
+                        scope.getFile();
+                        }
+                    });
+                }
+            };
         })
         .config(['$routeProvider', '$compileProvider',
             function($routeProvider, $compileProvider) {
@@ -164,7 +195,7 @@ module ISightApp {
                     otherwise({
                         redirectTo: '/InSights/login'
                     });
-                $compileProvider.aHrefSanitizationWhitelist(/^\s*(https?|ftp|mailto|tel|file|blob):/);
+                $compileProvider.aHrefSanitizationWhitelist(/^\s*(https?|ftp|mailto|tel|file|blob):|data:image\//);
             }]
         ).run(function(restEndpointService: IRestEndpointService,authenticationService: IAuthenticationService, $cookies) {
             restEndpointService.getServiceHost();

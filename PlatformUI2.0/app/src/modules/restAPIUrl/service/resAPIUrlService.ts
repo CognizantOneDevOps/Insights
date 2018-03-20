@@ -101,7 +101,10 @@ module ISightApp {
 		 
 		  this.addEndPoint("INSIGHTS_GET",'/PlatformService/insights/inferences');
 		  this.addEndPoint("INSIGHTS_COMP_STATUS",'/PlatformService/ServicesHealthStatus/getStatus');
-		  
+
+		  this.addEndPoint("UPLOAD_IMAGE",'/PlatformService/settings/uploadCustomLogo');
+		  this.addEndPoint("GET_LOGO_IMAGE",'/Plagit tformService/settings/getLogoImage');
+		  		  
 		  this.addEndPoint("AGENT_REGISTER", '/PlatformService/admin/agentConfiguration/registerAgent');
 		  this.addEndPoint("AGENT_UPDATE", '/PlatformService/admin/agentConfiguration/updateAgent');
 		  

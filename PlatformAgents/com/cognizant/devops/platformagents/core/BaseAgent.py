@@ -52,6 +52,7 @@ class BaseAgent(object):
         self.subscriberForAgentControl()
         self.setupLocalCache()
         self.extractToolName()
+        self.scheduleExtensions()
         self.execute()
         self.scheduleAgent()
         
@@ -90,7 +91,16 @@ class BaseAgent(object):
         self.epochStartDateTime = datetime(1970, 1, 1, tzinfo=self.insightsTimeZone)
         isEpochTime = self.config.get('isEpochTimeFormat', False)
         if not isEpochTime:
-            self.dateTimeLength = len(self.epochStartDateTime.strftime(self.config.get('timeStampFormat', None)))        
+            self.dateTimeLength = len(self.epochStartDateTime.strftime(self.config.get('timeStampFormat', None)))
+        self.buildTimeFormatLengthMapping()      
+    
+    def buildTimeFormatLengthMapping(self):
+        self.timeFormatLengthMapping = {}
+        timeFieldMapping = self.config.get('timeFieldMapping', None)
+        if timeFieldMapping:
+            for field in timeFieldMapping:
+                self.timeFormatLengthMapping[field] = len(self.epochStartDateTime.strftime(timeFieldMapping[field]))
+        
     
     def extractToolName(self):
         tokens = self.dataRoutingKey.split('.')
@@ -116,7 +126,8 @@ class BaseAgent(object):
         facadeType = config.get('type', None)
         sslVerify = config.get('sslVerify', True)
         self.responseType = config.get('responseType', 'JSON')
-        self.communicationFacade = communicationFacade.getCommunicationFacade(facadeType, sslVerify, self.responseType)
+        enableValueArray = self.config.get('enableValueArray', False)
+        self.communicationFacade = communicationFacade.getCommunicationFacade(facadeType, sslVerify, self.responseType, enableValueArray)
         
     def initializeMQ(self):
         mqConfig = self.config.get('mqConfig', None)
@@ -195,6 +206,7 @@ class BaseAgent(object):
             timeStampFormat = self.config.get('timeStampFormat')
         if not isEpochTime:
             isEpochTime = self.config.get('isEpochTimeFormat', False)
+        timeFieldMapping = self.config.get('timeFieldMapping', None)
         for d in data:
             eventTime = d.get(timeStampField, None)
             if eventTime != None:
@@ -208,6 +220,19 @@ class BaseAgent(object):
                     timeResponse = self.getRemoteDateTime(datetime.strptime(eventTime, timeStampFormat))
                 d['inSightsTime'] = timeResponse['epochTime']
                 d['inSightsTimeX'] = timeResponse['time']
+            
+            if timeFieldMapping:
+                for field in timeFieldMapping:
+                    timeFormat = timeFieldMapping[field]
+                    outputField = field + 'Epoch'
+                    value = d.get(field, None)
+                    if value:
+                        try:
+                            value = value[:self.timeFormatLengthMapping[field]]
+                            d[outputField] = self.getRemoteDateTime(datetime.strptime(value, timeFormat)).get('epochTime')
+                        except Exception as ex:
+                            logging.error(ex)
+            
             d['toolName'] = self.toolName;
             d['categoryName'] = self.categoryName; 
                         
@@ -283,8 +308,19 @@ class BaseAgent(object):
             else:
                 pass
     
+    def scheduleExtensions(self):
+        '''
+        Schedule the extensions from here
+        '''
+    '''
+    Register the agent extensions. All the extensions will be called after the time interval specified using duration (in minutes)
+    '''
+    def registerExtension(self, name, func, duration):
+        if not hasattr(self, 'extensions'):
+            self.extensions = {}
+        self.extensions[name] = {'func': func, 'duration': duration}
+    
     def execute(self):
-        
         if self.shouldAgentRun == True:
             logging.debug('Agent is in START mode')
             try:
@@ -292,6 +328,7 @@ class BaseAgent(object):
                 self.logIndicator(self.EXECUTION_START, self.config.get('isDebugAllowed', False))
                 self.executionId = str(uuid.uuid1())
                 self.process()
+                self.executeAgentExtensions()
                 self.publishHealthData(self.generateHealthData())
             except Exception as ex:
                 self.publishHealthData(self.generateHealthData(ex=ex))
@@ -299,6 +336,34 @@ class BaseAgent(object):
                 self.logIndicator(self.EXECUTION_ERROR, self.config.get('isDebugAllowed', False))
         if self.shouldAgentRun == False:
             logging.debug('Agent is in STOP mode')
+    
+    def executeAgentExtensions(self):
+        if hasattr(self, 'extensions'):
+            extensions = self.extensions
+            agentExtensionsTracking = self.tracking.get('agentExtensions', None)
+            if agentExtensionsTracking is None:
+                agentExtensionsTracking = {}
+                self.tracking['agentExtensions'] = agentExtensionsTracking
+            for name in extensions:
+                extension = extensions[name]
+                duration = extension.get('duration') * 60
+                lastRunTime = agentExtensionsTracking.get(name, None)
+                executeExtension = False
+                if lastRunTime is None:
+                    executeExtension = True
+                else:
+                    currentEpochTime = self.getRemoteDateTime(datetime.now()).get('epochTime')
+                    lastRunEpochTime = self.getRemoteDateTime(datetime.strptime(lastRunTime, '%Y-%m-%d %H:%M:%S')).get('epochTime')
+                    if currentEpochTime >= (lastRunEpochTime + duration):
+                        executeExtension = True
+                    else:
+                        executeExtension = False
+                if executeExtension:
+                    func = extension.get('func')
+                    func()
+                    agentExtensionsTracking[name] = datetime.strftime(datetime.now(), '%Y-%m-%d %H:%M:%S')
+                    self.updateTrackingJson(self.tracking)
+                    
         
     def process(self):
         '''

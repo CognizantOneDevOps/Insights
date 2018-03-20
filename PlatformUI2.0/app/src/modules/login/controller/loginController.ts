@@ -18,9 +18,28 @@
 
 module ISightApp {
     export class LoginController {
-        static $inject = ['loginService', 'restEndpointService', '$location', '$document', '$cookies'];
-        constructor(private loginService: ILoginService, private restEndpointService: IRestEndpointService, private $location, private $document, private $cookies) {
+        static $inject = ['loginService', 'restEndpointService', '$location', '$document', '$cookies','$http', '$resource', 'restAPIUrlService'];
+        constructor(private loginService: ILoginService, private restEndpointService: IRestEndpointService, private $location, private $document, private $cookies, private $http, private $resource, private restAPIUrlService:IRestAPIUrlService) {
+            var self = this;
+            
+            var restCallUrl = restAPIUrlService.getRestCallUrl("GET_LOGO_IMAGE");
 
+            var resource = this.$resource(restCallUrl,
+                {},
+                {
+                    allData: {
+                        method: 'GET'
+                    }
+            });
+            
+            resource.allData().$promise.then(function(data){
+                    if(data.data.encodedString && data.data.encodedString.length > 0){
+                        self.imageSrc = 'data:image/jpg;base64,' + data.data.encodedString;                    
+                    }else{
+                        self.showDefaultImg = true;
+                    }
+                   
+            });
 
         }
         self;
@@ -31,8 +50,10 @@ module ISightApp {
         cookies: string;
         usernameVal: string;
         passwordVal: string;
-        
+        imageSrc: string = "";
+        showDefaultImg: boolean = false;
 
+        
         userAuthentication(username: string, password: string): void {
             if (username === '' || username === undefined || password === '' || password === undefined) {
                 this.logMsg = '';
@@ -69,8 +90,11 @@ module ISightApp {
                             var form = document.createElement("form");
                             form.target = uniqueString;
                             //form.action = "http://localhost:3000/login";
-                            
-                            // repeat for each parametergetGrafanaHost()
+                            form.action = self.restEndpointService.getGrafanaHost() + '/login';
+                            //console.log(form.action);
+                            form.method = "POST";
+
+                            // repeat for each parameter
                             var input = document.createElement("input");
                             input.type = "hidden";
                             input.name = "user";
@@ -88,13 +112,9 @@ module ISightApp {
                             input2.name = "email";
                             input2.value = '';
                             form.appendChild(input2);
-                            self.restEndpointService.getGrafanaHost1().then(function(response){
-                                form.action = response.grafanaEndPoint + "/login";
-                                console.log("form action "+form.action);
-                                form.method = "POST";
-                                document.body.appendChild(form);
-                                form.submit();
-                            });
+
+                            document.body.appendChild(form);
+                            form.submit();
                         } else if (data.error.message) {
                             self.showThrobber = false;
                             self.isLoginError = true;
