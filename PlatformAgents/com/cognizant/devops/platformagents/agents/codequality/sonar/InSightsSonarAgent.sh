@@ -22,7 +22,7 @@ case "$1" in
     else
      echo "Starting InSightsSonarAgent"
      cd $INSIGHTS_AGENT_HOME/PlatformAgents/sonar
-     python -c "from com.cognizant.devops.platformagents.agents.scm.sonar.SonarAgent import SonarAgent; SonarAgent()" &
+     python -c "from com.cognizant.devops.platformagents.agents.codequality.sonar.SonarAgent import SonarAgent; SonarAgent()" &
     fi
     if [[ $(ps aux | grep '[c]odequality.sonar.SonarAgent' | awk '{print $2}') ]]; then
      echo "InSightsSonarAgent Started Sucessfully"
@@ -51,13 +51,13 @@ case "$1" in
      echo "InSightsSonarAgent stopped"
      echo "InSightsSonarAgent starting"
      cd $INSIGHTS_AGENT_HOME/PlatformAgents/sonar
-     python -c "from com.cognizant.devops.platformagents.agents.scm.sonar.SonarAgent import SonarAgent; SonarAgent()" &
+     python -c "from com.cognizant.devops.platformagents.agents.codequality.sonar.SonarAgent import SonarAgent; SonarAgent()" &
      echo "InSightsSonarAgent started"
     else
      echo "InSightsSonarAgent already in stopped state"
      echo "InSightsSonarAgent starting"
      cd $INSIGHTS_AGENT_HOME/PlatformAgents/sonar
-     python -c "from com.cognizant.devops.platformagents.agents.scm.sonar.SonarAgent import SonarAgent; SonarAgent()" &
+     python -c "from com.cognizant.devops.platformagents.agents.codequality.sonar.SonarAgent import SonarAgent; SonarAgent()" &
      echo "InSightsSonarAgent started"
     fi
     ;;
