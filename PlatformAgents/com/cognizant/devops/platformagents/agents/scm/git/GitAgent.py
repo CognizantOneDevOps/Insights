@@ -50,25 +50,53 @@ class GitAgent(BaseAgent):
                 repoModificationTime = trackingDetails.get('repoModificationTime', None)
                 if repoModificationTime is None:
                     repoModificationTime = startFrom
-                repoUpdatedAt = parser.parse(repo.get('updated_at'), ignoretz=True)
+                repoUpdatedAt = repo.get('pushed_at', None)
+                if repoUpdatedAt is None:
+                    repoUpdatedAt = repo.get('updated_at')
+                repoUpdatedAt = parser.parse(repoUpdatedAt, ignoretz=True)
                 if startFrom < repoUpdatedAt:
                     trackingDetails['repoModificationTime'] = repo.get('updated_at')
                     branches = ['master']
                     if repoName != None:
                         if enableBranches:
-                            getBranchesRestUrl = commitsBaseEndPoint+repoName+'/branches?access_token='+accessToken
-                            branchDetails = self.getResponse(getBranchesRestUrl, 'GET', None, None, None)
                             branches = []
-                            for branch in branchDetails:
-                                branches.append(branch['name'])
+                            allBranches = []
+                            branchPage = 1
+                            fetchNextBranchPage = True
+                            while fetchNextBranchPage:
+                                getBranchesRestUrl = commitsBaseEndPoint+repoName+'/branches?access_token='+accessToken+'&page='+str(branchPage)
+                                branchDetails = self.getResponse(getBranchesRestUrl, 'GET', None, None, None)
+                                for branch in branchDetails:
+                                    branchName = branch['name']
+                                    branchTracking = trackingDetails.get(branchName, {}).get('latestCommitId', None)
+                                    allBranches.append(branchName)
+                                    if branchTracking is None or branchTracking != branch.get('commit', {}).get('sha', None):
+                                        branches.append(branchName)
+                                if len(branchDetails) == 30:
+                                    branchPage = branchPage + 1
+                                else:
+                                    fetchNextBranchPage = False
+                                    break    
+                            if len(branches) > 0 :
+                                activeBranches = [{ 'repoName' : repoName, 'activeBranches' : allBranches, 'gitType' : 'metadata'}]
+                                metadata = {
+                                        "dataUpdateSupported" : True,
+                                        "uniqueKey" : ["repoName", "gitType"]
+                                    }
+                                self.publishToolsData(activeBranches, metadata)
                         for branch in branches:
                             data = []
                             injectData = {}
                             injectData['repoName'] = repoName
                             injectData['branchName'] = branch
+                            parsedBranch = branch
+                            if '+' in parsedBranch:
+                                parsedBranch = parsedBranch.replace('+', '%2B')
+                            if '&' in parsedBranch:
+                                parsedBranch = parsedBranch.replace('&', '%26')
                             fetchNextCommitsPage = True
-                            getCommitDetailsUrl = commitsBaseEndPoint+repoName+'/commits?sha='+branch+'&access_token='+accessToken+'&per_page=100'
-                            since = trackingDetails.get(branch, None)
+                            getCommitDetailsUrl = commitsBaseEndPoint+repoName+'/commits?sha='+parsedBranch+'&access_token='+accessToken+'&per_page=100'
+                            since = trackingDetails.get(branch, {}).get('latestCommitDate', None)
                             if since != None:
                                 getCommitDetailsUrl += '&since='+since
                             commitsPageNum = 1
@@ -82,23 +110,29 @@ class GitAgent(BaseAgent):
                                         if since is not None or startFrom < parser.parse(commit["commit"]["author"]["date"], ignoretz=True):
                                             data += self.parseResponse(responseTemplate, commit, injectData)
                                         else:
+                                            fetchNextCommitsPage = False
+                                            self.updateTrackingForBranch(trackingDetails, branch, latestCommit)
                                             break
                                     if len(commits) == 0 or len(data) == 0 or len(commits) < 100:
                                         fetchNextCommitsPage = False
                                         break
                                 except Exception as ex:
+                                    fetchNextCommitsPage = False
                                     logging.error(ex)
                                 commitsPageNum = commitsPageNum + 1
                             if len(data) > 0:
-                                updatetimestamp = latestCommit["commit"]["author"]["date"]
-                                dt = parser.parse(updatetimestamp)
-                                fromDateTime = dt + datetime.timedelta(seconds=01)
-                                fromDateTime = fromDateTime.strftime('%Y-%m-%dT%H:%M:%SZ')    
-                                trackingDetails[branch] = fromDateTime
+                                self.updateTrackingForBranch(trackingDetails, branch, latestCommit)
                                 self.publishToolsData(data)
-                                self.updateTrackingJson(self.tracking)
+                            self.updateTrackingJson(self.tracking)
             repoPageNum = repoPageNum + 1
             repos = self.getResponse(getReposUrl+'&per_page=100&sort=created&page='+str(repoPageNum), 'GET', None, None, None)
     
+    def updateTrackingForBranch(self, trackingDetails, branchName, latestCommit):
+        updatetimestamp = latestCommit["commit"]["author"]["date"]
+        dt = parser.parse(updatetimestamp)
+        fromDateTime = dt + datetime.timedelta(seconds=01)
+        fromDateTime = fromDateTime.strftime('%Y-%m-%dT%H:%M:%SZ')    
+        trackingDetails[branchName] = { 'latestCommitDate' : fromDateTime, 'latestCommitId' : latestCommit["sha"]}
+        
 if __name__ == "__main__":
     GitAgent()       

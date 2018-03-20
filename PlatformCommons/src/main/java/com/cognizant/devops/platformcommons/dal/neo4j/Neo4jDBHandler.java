@@ -303,8 +303,40 @@ public class Neo4jDBHandler {
 				.post(ClientResponse.class);
 		return response;
 	}
+	
+	/**
+	 * Load the available field indices in Neo4J
+	 * @return
+	 */
+	public JsonArray loadFieldIndices() {
+		WebResource resource = Client.create()
+				.resource(ApplicationConfigProvider.getInstance().getGraph().getEndpoint()+"/db/data/schema/index");
+		ClientResponse response = resource.accept( MediaType.APPLICATION_JSON ).header("Authorization", ApplicationConfigProvider.getInstance().getGraph().getAuthToken())
+				.type(MediaType.APPLICATION_JSON)
+				.get(ClientResponse.class);
+		return new JsonParser().parse(response.getEntity(String.class)).getAsJsonArray();
+	}
 
-
+	/**
+	 * Add the field index for give label and field
+	 * @param label
+	 * @param field
+	 * @return
+	 */
+	public JsonObject addFieldIndex(String label, String field) {
+		JsonObject requestJson = new JsonObject();
+		JsonArray properties = new JsonArray();
+		properties.add(field);
+		requestJson.add("property_keys", properties);
+		WebResource resource = Client.create()
+				.resource(ApplicationConfigProvider.getInstance().getGraph().getEndpoint()+"/db/data/schema/index/"+label);
+		ClientResponse response = resource.accept( MediaType.APPLICATION_JSON ).header("Authorization", ApplicationConfigProvider.getInstance().getGraph().getAuthToken())
+				.type(MediaType.APPLICATION_JSON)
+				.entity(requestJson.toString())
+				.post(ClientResponse.class);
+		return new JsonParser().parse(response.getEntity(String.class)).getAsJsonObject();
+	}
+	
 	/**
 	 * @param data
 	 * @param cypherQuery
