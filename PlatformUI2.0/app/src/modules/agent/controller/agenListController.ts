@@ -27,18 +27,17 @@ module ISightApp {
             var homePageControllerScope = angular.element(elem).scope();
             var homePageController = homePageControllerScope['homePageController'];
             this.homeController = homePageController;
-            var self = this;				
+           
+		    var self = this;				
 			self.showConfirmMessage = "";
-			self.homeController.templateName = 'agentList';			
-			
+			self.homeController.templateName = 'agentList';				
 			if(self.homeController.showConfirmMessage) {
 					self.showConfirmMessage = self.homeController.showConfirmMessage;
 			}			
-			
 			self.getRegisteredAgents();
-			
 		}
 		
+		validationArr = {};
 		showConfirmMessage: string;
 		showList: boolean = false;
 		showThrobber: boolean;
@@ -51,7 +50,7 @@ module ISightApp {
 		startIconSrc: string = "dist/icons/svg/actionIcons/Start_icon_Active.svg";
 		stopIconSrc: string = "dist/icons/svg/actionIcons/Stop_icon_Active.svg";
 
-		agentStartStopAction(actDetails, actType, msg): void{
+		agentStartStopAction(actDetails, actType): void{
 			var self = this;
 			self.agentService.agentStartStop(actDetails.agentid, actType)
 			.then(function (data) {		
@@ -63,8 +62,7 @@ module ISightApp {
 				console.log(data);
 				self.showConfirmMessage = "Error";
 				self.getRegisteredAgents();	
-			}); 
-			
+			}); 			
 			
 		}
 		
@@ -90,15 +88,15 @@ module ISightApp {
 			.then(function (response) {						
 				self.showThrobber = false;	
 				self.data = response.data;
-				console.log(self.data);
 				
 				if(self.data.length == 0){
 					self.showMessage = "No Records found";							
 				}else{
+					self.consolidatedArr(self.data);
 					self.showList = true;
 					self.tableParams = new self.NgTableParams({				
 						page: 1,
-						count: 5				
+						count: 10				
 					}, 
 					{ 
 						counts: [], // hide page counts control
@@ -112,13 +110,19 @@ module ISightApp {
 				self.showThrobber = false;		
 				self.showList = false;				
 				self.showMessage = "Problem with Platform Service, Please try again";				
-			}); 
-			
+			}); 			
 			
 		}
 		
-		newAgentRegister(): void {	
-			this.homeController.selectedAgentID = {'type' : 'new'};  	
+		consolidatedArr(detailArr): void {
+			var self = this;
+			for (var i = 0; i < detailArr.length; i++) {
+				 this.validationArr[i] = { "os": detailArr[i].osVersion, "version" : detailArr[i].agentVersion , "tool": detailArr[i].toolName }
+			}
+		}
+		
+		newAgentRegister(dataArr): void {	
+			this.homeController.selectedAgentID = {'type' : 'new', 'detailedArr' : dataArr};  	
 			this.homeController.templateName = 'agentManagement';
 		}
 		
