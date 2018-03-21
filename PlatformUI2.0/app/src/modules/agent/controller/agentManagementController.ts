@@ -22,15 +22,17 @@ module ISightApp {
             private iconService: IIconService,
 			private $sce,
             private $mdDialog, private $cookies, private toolConfigService: IToolConfigService, private restEndpointService: IRestEndpointService) {
+				
 			var elem = document.querySelector('#homePageTemplateContainer');
             var homePageControllerScope = angular.element(elem).scope();
             var homePageController = homePageControllerScope['homePageController'];
             this.homeController = homePageController;
+			
             var self = this;	
 			self.getOsVersionTools("");
 			self.getSelectedAgentDetails();
 			self.showMessage = "Please select version & tools";
-			self.showConfig = false;			
+			self.showConfig = false;		
 			
 			if(self.editAgentDetails['type'] == "update") 
 			{
@@ -39,9 +41,10 @@ module ISightApp {
 				self.buttonDisableStatus = false;
 			}else {
 				self.btnValue = "Register";
+				self.validationArr = self.editAgentDetails['detailedArr'];				
 			}
 			
-			self.Oslists = {
+			self.osLists = {
 				"windows" : "Windows",
 				"linux" : "Linux",
 				"ubuntu" : "Ubuntu",
@@ -49,40 +52,44 @@ module ISightApp {
 			
 		}
 		
-		Oslists = {};
+		validationArr = {};
+		osLists = {};
 		configDesc = {};
 		configAbbr = [];
 		buttonDisableStatus: boolean = true;
+		isRegisteredTool: boolean = false;
 		btnValue: string;
 		dynamicData: string;
 		homeController: HomePageController;
 		selectedTool: string;
+		selectedOS: string;		
+		selectedVersion: string;
 		showMessage:string;
 		showConfig: boolean = false;
 		showThrobber: boolean;		
-		versionList = [];
+		versionList = [];		
 		toolsArr = [];
 		response = {};
 		editAgentDetails = {};		
 		headerData = [];
 		updatedConfigdata = {};
-		configData:string;
-		selectedOS: string;		
-		selectedVersion: string;
-		item = {};
-		datait = {};
-		defaultConfigdata = {};
+		configData:string;		
+		item = {};		
+		defaultConfigdata = {};		
+		tempConfigdata: string;		
+		versionChangeddata = {};
 		addButtIcon: string = "dist/icons/svg/actionIcons/Add_icon_disabled.svg";
         deleteButtIcon: string = "dist/icons/svg/actionIcons/Delete_icon_disabled.svg";
         editButtIcon: string = "dist/icons/svg/actionIcons/Edit_icon_disabled.svg";
         saveButtonIcon: string = "dist/icons/svg/actionIcons/Save_icon_Disabled.svg";
 		
 		getOsVersionTools(Selversion): void{
+
 			var self = this;
 			self.toolsArr = [];			
 			self.agentService.getDocRootAgentVersionTools()
 			.then(function (data) {	
-				
+			
 				self.response = data.data;			
 				
 				if(Selversion) {	
@@ -96,7 +103,7 @@ module ISightApp {
 			})			
 			.catch(function (data) {												
 				self.showMessage = "Problem with Platform Service, Please try again";	
-			}); 
+			}); 			
 		}
 				
 		findDataType(key, arr) : string {			
@@ -107,28 +114,59 @@ module ISightApp {
             this.editAgentDetails = this.homeController.selectedAgentID;    
         }
 		
-		versionOnChange(key): void {				
-			this.selectedTool = "";			
-			this.toolsArr = [];							
-			this.toolsArr = this.response[key];
+		versionOnChange(key, type): void {
+			var self = this;							
+			
+			if(type == "Update"){
+				
+				self.showConfig = false;
+				self.showThrobber = true;	
+				self.showMessage = "";			
+				console.log(self.tempConfigdata);
+				self.defaultConfigdata = JSON.parse(self.tempConfigdata);
+				self.agentService.getDocrootAgentConfig(key, self.selectedTool)
+				.then(function (vdata) {				
+					self.showConfig = true;
+					self.showThrobber = false;
+					self.versionChangeddata = JSON.parse(vdata.data);
+					
+					for(var keY in self.versionChangeddata){
+						if(!self.defaultConfigdata.hasOwnProperty(keY)) {
+							self.defaultConfigdata[keY] = self.versionChangeddata[keY];
+						}
+					}			
+					
+				})			
+				.catch(function (vdata) {	
+					self.showThrobber = false;							
+					self.showMessage = "Problem with Platform Service, Please try again";				
+				});
+				
+			}else {
+				self.selectedTool = "";			
+				self.toolsArr = [];	
+				self.toolsArr = self.response[key];
+			}
 		} 
 		
 		getDocRootAgentConfig(version, toolName): void{
-			var self = this;			
-			self.showConfig = false;
-			self.showThrobber = true;	
-			self.showMessage = "";
-			self.configDesc = self.restEndpointService.getConfigDesc();
+			var self = this;	
+			self.isRegisteredTool = false;			
+			self.checkValidation();
 			
-			self.agentService.getDocrootAgentConfig(version, toolName)
-			.then(function (data) {		
-				self.buttonDisableStatus = false;
-				self.showConfig = true;
-				self.showThrobber = false;
-				self.defaultConfigdata  = JSON.parse(data.data);				
-				self.dynamicData = JSON.stringify(self.defaultConfigdata['dynamicTemplate'], undefined, 4);
+			if(!self.isRegisteredTool) {
 				
-				//if(Object.keys(self.configDesc).length != 0 ) {
+				self.showConfig = false;
+				self.showThrobber = true;	
+				self.showMessage = "";
+				self.configDesc = self.restEndpointService.getConfigDesc();
+				self.agentService.getDocrootAgentConfig(version, toolName)
+				.then(function (data) {
+					self.buttonDisableStatus = false;
+					self.showConfig = true;
+					self.showThrobber = false;
+					self.defaultConfigdata  = JSON.parse(data.data);				
+					self.dynamicData = JSON.stringify(self.defaultConfigdata['dynamicTemplate'], undefined, 4);
 					
 					for(var key in self.defaultConfigdata){		
 						if(self.configDesc.hasOwnProperty(key)) {
@@ -136,16 +174,19 @@ module ISightApp {
 						}else {
 							self.configAbbr[key] = key;
 						}
-					}				
-				//}
+					}			
+					
+				})			
+				.catch(function (data) {		
+					self.showThrobber = false;							
+					self.showMessage = "Problem with Platform Service, Please try again";				
+				}); 
 				
-				
-			})			
-			.catch(function (data) {		
-				self.showThrobber = false;							
-				self.showMessage = "Problem with Platform Service, Please try again";				
-			}); 
-			
+			}else {
+				self.buttonDisableStatus = true;
+				self.showConfig = false;
+				self.showMessage = "Tool already registered, Please select other tool";
+			}				
 		}
 		
 		getDbAgentConfig(agentId): void{
@@ -153,13 +194,16 @@ module ISightApp {
 			self.showConfig = false;
 			self.showThrobber = true;	
 			self.showMessage = "";			
-			self.configDesc = self.restEndpointService.getConfigDesc();
+			self.configDesc = self.restEndpointService.getConfigDesc();		
+			
 			self.agentService.getDbAgentConfig(agentId)
 			.then(function (data) {		
 				console.log(data);
 				self.showConfig = true;
 				self.showThrobber = false;
-				self.defaultConfigdata  = JSON.parse(data.data.agentJson);
+				self.tempConfigdata  = data.data.agentJson;	
+				console.log(self.tempConfigdata);
+				self.defaultConfigdata = JSON.parse(self.tempConfigdata);
 				self.selectedVersion = data.data.agentVersion;	
 				self.selectedOS = data.data.osVersion;
 				self.getOsVersionTools(self.selectedVersion);
@@ -258,6 +302,15 @@ module ISightApp {
 			}
 		}
 		
+		checkValidation(): void {
+			var self = this;			
+			for(var key in self.validationArr) {				
+				if(self.validationArr[key]['tool'] == self.selectedTool){
+					self.isRegisteredTool = true;
+					self.selectedTool = "";
+				}
+			}
+		}
 	}
 	
 }

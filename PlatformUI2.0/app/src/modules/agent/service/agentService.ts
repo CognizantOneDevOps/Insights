@@ -85,6 +85,6 @@ module ISightApp {
             var restHandler = this.restCallHandlerService;
             return restHandler.post("AGENT_START_STOP",{'agentId' : agentId, 'action':actionType},{'Content-Type': 'application/x-www-form-urlencoded'});           
         }
-			
+		
     }
 }
