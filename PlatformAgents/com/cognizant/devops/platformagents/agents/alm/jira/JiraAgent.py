@@ -63,7 +63,7 @@ class JiraAgent(BaseAgent):
                 break
     
     def scheduleExtensions(self):
-        extensions = self.config.get('extensions', None)
+        extensions = self.config.get('dynamicTemplate', {}).get('extensions', None)
         if extensions:
             sprintReport = extensions.get('sprintReport', None)
             if sprintReport:
@@ -120,7 +120,7 @@ class JiraAgent(BaseAgent):
                 parsedIssue[0]['boards'] = boards
      
     def retrieveSprintReports(self):
-        sprintDetails = self.config.get('extensions', {}).get('sprintReport', None)
+        sprintDetails = self.config.get('dynamicTemplate', {}).get('extensions', {}).get('sprintReport', None)
         boardApiUrl = sprintDetails.get('boardApiUrl')
         boards = self.tracking.get('boards', None)
         if sprintDetails and boards:
@@ -208,7 +208,7 @@ class JiraAgent(BaseAgent):
         return parsedIssues
      
     def retrieveReleaseDetails(self):
-        releaseDetails = self.config.get('extensions', {}).get('releaseDetails', None)
+        releaseDetails = self.config.get('dynamicTemplate', {}).get('extensions', {}).get('releaseDetails', None)
         if releaseDetails:
             jiraProjectApiUrl = releaseDetails.get('jiraProjectApiUrl', None)
             jiraProjectResponseTemplate = releaseDetails.get('jiraProjectResponseTemplate', None)

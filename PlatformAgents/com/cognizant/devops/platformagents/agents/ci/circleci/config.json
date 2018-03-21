@@ -15,29 +15,32 @@
   "communication": {
     "type": "REST"
   },
-  "responseTemplate": {
-    "user": {
-       "login": "User"
-      },
-    "branch": "branch",
-    "status": "Status",
-    "build_num": "BuildNo",
-    "build_time_millis": "BuildTimeMillis",
-    "queued_at": "Build_date"
+  "dynamicTemplate": {
+	  "responseTemplate": {
+	    "user": {
+	       "login": "User"
+	      },
+	    "branch": "branch",
+	    "status": "Status",
+	    "build_num": "BuildNo",
+	    "build_time_millis": "BuildTimeMillis",
+	    "queued_at": "Build_date"
+	  }  
   },
   "useResponseTemplate" : true,
+  "toolCategory" : "CI",
   "token" : "authenticatedtokenvalue",
   "useAllBuildsApi" : false,
   "runSchedule": 30,
   "userid": "username",
   "passwd": "password",
-  "Project": "organizationname/repositoryname",
-  "BaseUrl": "http://circleci.com/api/v1.1/project/github/",
+  "project": "organizationname/repositoryname",
+  "baseUrl": "http://circleci.com/api/v1.1/project/github/",
   "toolsTimeZone" : "Asia/Kolkata",
   "insightsTimeZone" : "Asia/Kolkata",
   "timeStampField": "LastUpdated",
   "timeStampFormat":"%Y-%m-%dT%H:%M:%S",
-  "StartFrom" : "2013-10-10 15:46:33",
+  "startFrom" : "2013-10-10 15:46:33",
   "loggingSetting" : {
                 "logLevel" : "WARN"
         }
