@@ -22,12 +22,12 @@
 				<div>
 				<md-select ng-model="agentManagementController.selectedOS" class="searchApplicationBoxContData inputApplicationBox dataBoardingFieldName"
 						 placeholder="Select OS" data-md-container-class="selectdemoSelectHeader">
-				<md-option  ng-repeat="(key, value) in agentManagementController.Oslists" value="{{key}}">{{value}}</md-option> 	</md-select>
+				<md-option  ng-repeat="(key, value) in agentManagementController.osLists" value="{{key}}">{{value}}</md-option> 	</md-select>
 				</div>
 				
 				<div>
 				<md-select ng-model="agentManagementController.selectedVersion" class="searchApplicationBoxContData inputApplicationBox dataBoardingFieldName"
-						 placeholder="Select Version" data-md-container-class="selectdemoSelectHeader" ng-change="agentManagementController.btnValue == 'Register' && agentManagementController.versionOnChange(agentManagementController.selectedVersion)">				
+						 placeholder="Select Version" data-md-container-class="selectdemoSelectHeader" ng-change="agentManagementController.versionOnChange(agentManagementController.selectedVersion, agentManagementController.btnValue)">				
 					<md-option  ng-repeat="key in agentManagementController.versionList | orderBy" value="{{key}}">{{key}}</md-option>
 							  
 				</md-select>
@@ -39,8 +39,7 @@
 					<md-option  ng-repeat="(key, value) in agentManagementController.toolsArr" value="{{value}}">{{value}}</md-option> 
 				</md-select>
 				</div>
-		</div>
-			
+		</div>			
             <div>               			
 				 <md-button type="submit" class="md-raised md-primary configureBut" ng-click="agentManagementController.getUpdatedConfigData(agentManagementController.btnValue)" ng-disabled="agentManagementController.buttonDisableStatus">
                     {{agentManagementController.btnValue}}
