@@ -1,0 +1,9 @@
+[Unit]
+Description=Ubuntu NexusAgent Service
+
+[Service]
+Type=forking
+ExecStart=/bin/bash /opt/insightsagents/PlatformAgents/nexus/InSightsNexusAgent.sh
+
+[Install]
+WantedBy=multi-user.target
