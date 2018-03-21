@@ -20,7 +20,7 @@ Created on 12 April 2017
 '''
 from com.cognizant.devops.platformagents.core.BaseAgent import BaseAgent
 
-class TFSAgent(BaseAgent):
+class CITFSAgent(BaseAgent):
     def process(self):
         BaseUrl = self.config.get("baseUrl", '')
         UserID = self.config.get("userID", '')
@@ -62,4 +62,4 @@ class TFSAgent(BaseAgent):
         self.publishToolsData(data)
         #self.updateTrackingJson(self.tracking)
 if __name__ == "__main__":
-    TFSAgent()
+    CITFSAgent()
