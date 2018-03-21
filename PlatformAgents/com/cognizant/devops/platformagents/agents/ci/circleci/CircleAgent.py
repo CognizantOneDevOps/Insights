@@ -27,10 +27,10 @@ class CircleAgent(BaseAgent):
     def process(self):
         userid = self.config.get("userid", '')
         passwd = self.config.get("passwd", '')
-        BaseUrl = self.config.get("BaseUrl", '')
-        Project = self.config.get("Project", '')
+        BaseUrl = self.config.get("baseUrl", '')
+        Project = self.config.get("project", '')
         token = self.config.get("token", '')
-        startFrom = self.config.get("StartFrom", '')
+        startFrom = self.config.get("startFrom", '')
         startFrom = parser.parse(startFrom)
         startFrom = startFrom.strftime('%Y-%m-%dT%H:%M:%S')
         responseTemplate = self.getResponseTemplate()
