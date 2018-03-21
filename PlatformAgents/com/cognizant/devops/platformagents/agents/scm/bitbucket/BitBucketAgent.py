@@ -35,12 +35,12 @@ from com.cognizant.devops.platformagents.core.BaseAgent import BaseAgent
 
 class BitBucketAgent(BaseAgent):
     def process(self):
-        self.baseEndPoint = self.config.get("BaseEndPoint", '')
-        self.userId = self.config.get("UserID", '')
-        self.passwd = self.config.get("Passwd", '')
+        self.baseEndPoint = self.config.get("baseEndPoint", '')
+        self.userId = self.config.get("userID", '')
+        self.passwd = self.config.get("passwd", '')
         self.scanAllBranches = self.config.get("scanAllBranches", False)
         self.scanPullRequests = self.config.get("scanPullRequests", False)
-        startFrom = self.config.get("StartFrom", '')
+        startFrom = self.config.get("startFrom", '')
         startFrom = parser.parse(startFrom)
         startFrom = mktime(startFrom.timetuple()) + startFrom.microsecond/1000000.0
         self.startFrom = long(startFrom * 1000)

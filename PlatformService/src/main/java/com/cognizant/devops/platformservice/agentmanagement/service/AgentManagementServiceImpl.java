@@ -143,6 +143,8 @@ public class AgentManagementServiceImpl  implements AgentManagementService{
 			Gson gson = new Gson();
 			JsonElement jelement = gson.fromJson(configDetails.trim(),JsonElement.class);
 			JsonObject  json = jelement.getAsJsonObject();
+			json.addProperty("osversion",osversion);
+			json.addProperty("agentVersion",agentVersion);
 
 			boolean isDataUpdateSupported = false;
 			if(json.get("isDataUpdateSupported") != null && !json.get("isDataUpdateSupported").isJsonNull()) {
