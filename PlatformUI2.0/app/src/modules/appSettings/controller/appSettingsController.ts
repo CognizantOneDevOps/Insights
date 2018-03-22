@@ -42,6 +42,8 @@ interface FileReaderEvent extends Event {
        homeController: HomePageController;
        selectedImage: string = 'logo';
        selectedImageSrc: string;
+       maxSizeErr: boolean = false;
+
 
        init($scope, $filter, appSettingsService, $resource, $http, $route, $window,homeController,selectedImageSrc,$cookies,restAPIUrlService) : void{
 

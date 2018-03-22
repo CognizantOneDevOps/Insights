@@ -44,7 +44,7 @@
                 <div class="profile">
 
                     <img src="dist/icons/svg/insightsPage/avatar_placeholder.svg" />
-                    <a href="#" class="name">Hi {{homePageController.userName}}!</a>
+                    <span class="name">Hi {{homePageController.userName}}!</span>
                     
                     <!-- more menu -->
                     <ul class="menu">
@@ -118,6 +118,14 @@
                                         ng-controller="dataTaggingDetailsController as dataTaggingDetailsController" layout="vertical"></div>
                                     <div ng-if="homePageController.templateName == 'dataTagging'" ng-include="'dist/modules/dataTagging/view/dataTaggingView.html'"
                                         ng-controller="dataTaggingController as dataTaggingController" layout="vertical"></div>
+										
+                                </md-content>
+                            </md-tab>
+							<md-tab label="Settings" ng-click="homePageController.selectAct('appSettings')">
+                                <md-content style="{{homePageController.mainContentMinHeight}}">
+                                   <div ng-if="homePageController.templateName == 'appSettings'" ng-include="'dist/modules/appSettings/view/appSettingsView.html'"
+                                        ng-controller="appSettingsController as appSettingsController" layout="vertical"></div>
+                                    
                                 </md-content>
                             </md-tab>
                             <md-tab label="Settings" ng-click="homePageController.selectAct('appSettings')">

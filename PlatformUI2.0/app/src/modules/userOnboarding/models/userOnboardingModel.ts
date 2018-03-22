@@ -24,6 +24,7 @@ module ISightApp {
         searchedString: string;
         editRole: boolean = false;
         familyName: string;
+        userName: string;
         selectedUserId: string;
         newUser: boolean;
         selectedOrgId: number;

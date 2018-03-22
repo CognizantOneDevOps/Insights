@@ -15,19 +15,21 @@
  ******************************************************************************/
 package com.cognizant.devops.platformservice.security.config;
 
+import java.io.IOException;
+
 import java.util.ArrayList;
 import java.util.List;
+import org.springframework.http.MediaType;
+import org.springframework.http.converter.ByteArrayHttpMessageConverter;
+import org.springframework.security.config.annotation.web.builders.WebSecurity;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.MediaType;
-import org.springframework.http.converter.ByteArrayHttpMessageConverter;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -36,6 +38,7 @@ import org.springframework.security.ldap.authentication.BindAuthenticator;
 import org.springframework.security.ldap.authentication.LdapAuthenticationProvider;
 import org.springframework.security.ldap.search.FilterBasedLdapUserSearch;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
+import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.config.LDAPConfiguration;
@@ -112,25 +115,36 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 			.headers().addHeaderWriter(springHeaderWriter);
 	}
 	
-	@Override
-	public void configure(WebSecurity web) throws Exception {
-	    web.ignoring().antMatchers("/settings/getLogoImage");
-	}
-	
-	@Bean
-    public ByteArrayHttpMessageConverter byteArrayHttpMessageConverter() {
-        final ByteArrayHttpMessageConverter arrayHttpMessageConverter = new ByteArrayHttpMessageConverter();
-        arrayHttpMessageConverter.setSupportedMediaTypes(getSupportedMediaTypes());
-        return arrayHttpMessageConverter;
-    }
+	 @Bean
+	    public CommonsMultipartResolver multipartResolver() throws IOException{
+	        CommonsMultipartResolver resolver = new CommonsMultipartResolver();
+	         
+	        //Set the maximum allowed size (in bytes) for each individual file.
+	        resolver.setMaxUploadSizePerFile(5242880);//5MB
+	         
+	        //You may also set other available properties.
+	         
+	        return resolver;
+	    }	
+		
+		@Override
+		public void configure(WebSecurity web) throws Exception {
+			web.ignoring().antMatchers("/settings/getLogoImage");
+		}
+		
+		@Bean
+		public ByteArrayHttpMessageConverter byteArrayHttpMessageConverter() {
+			final ByteArrayHttpMessageConverter arrayHttpMessageConverter = new ByteArrayHttpMessageConverter();
+			arrayHttpMessageConverter.setSupportedMediaTypes(getSupportedMediaTypes());
+			return arrayHttpMessageConverter;
+		}
 
-    private List<MediaType> getSupportedMediaTypes() {
-        final List<MediaType> list = new ArrayList<MediaType>();
-        list.add(MediaType.IMAGE_JPEG);
-        list.add(MediaType.IMAGE_PNG);
-        list.add(MediaType.APPLICATION_OCTET_STREAM);
+		private List<MediaType> getSupportedMediaTypes() {
+			final List<MediaType> list = new ArrayList<MediaType>();
+			list.add(MediaType.IMAGE_JPEG);
+			list.add(MediaType.IMAGE_PNG);
+			list.add(MediaType.APPLICATION_OCTET_STREAM);
 
-        return list;
-    }
-
+			return list;
+		}
 }
