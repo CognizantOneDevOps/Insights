@@ -21,40 +21,48 @@
       "name": "authorName",
       "emailAddress": "authorEmail"
     },
-    "authorTimestamp": "commitTime",
+    "authorTimestamp": "createdTime",
     "message": "commitMessage",
     "properties": {
       "jira-key": [
         "jiraKey"
       ]
+    },
+    "pullRequests": {
+      "id" : "pullReqId",
+      "state" : "pullReqState",
+      "createdDate" : "createdTime",
+      "updatedDate" : "updatedTime",
+      "closedDate" : "closedTime",
+      "fromRef" : {
+        "displayId" : "fromBranch"
+      },
+      "toRef" : {
+        "displayId" : "toBranch"
+      },
+      "author": {
+        "user": {
+          "name": "authorName",
+          "emailAddress": "authorEmail"
+        }
+      }
     }
   },
-"userInputBranches" : {
-  "ProjectName": {
-    "RepoName": [
-      "BranchName"
-    ]
-  },
-  "ProjectName2": {
-    "RepoName2": [
-      "BranchName",
-      "BranchName"
-    ]
-  }
- },
-  "auth": "base64",
-  "runSchedule": 5,
-  "toolsTimeZone" : "Asia/Kolkata",
-  "insightsTimeZone" : "Asia/Kolkata",
-  "StartFrom" : "2016-10-10 15:46:33",
+  "runSchedule": 30,
+  "toolsTimeZone" : "GMT",
+  "insightsTimeZone" : "GMT",
+  "StartFrom" : "2017-07-01 00:00:00",
   "useResponseTemplate" : true,
-  "UserID": "userid",
-  "Passwd": "passwd",
-  "timeStampField":"commitTime",
+  "scanAllBranches" : false,
+  "scanPullRequests": true,
+  "auth": "base64",
+  "UserID": "",
+  "Passwd": "",
+  "timeStampField":"createdTime",
   "isEpochTimeFormat" : true,
   "BaseEndPoint": "http://127.0.0.1:7990/rest/api/1.0/projects/",
   "isDebugAllowed" : false,
   "loggingSetting" : {
-  "logLevel" : "WARN"
-}
+        "logLevel" : "WARN"
+    }
 }

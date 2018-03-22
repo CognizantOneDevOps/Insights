@@ -72,12 +72,14 @@ var addRouteChangeDetector = function () {
 			addRouteChangeDetector();
 		}, 20);
 	} else {
-		var $injector = document.getElementById("iSightIframe").contentWindow.angular.element(".grafana-app").injector();
-		$injector.invoke(function ($rootScope) {
-			$rootScope.$on('$viewContentLoaded', function (next, current) {
-				calculateHeight();
+		setTimeout(function () {
+			var $injector = document.getElementById("iSightIframe").contentWindow.angular.element(".grafana-app").injector();
+			$injector.invoke(function ($rootScope) {
+				$rootScope.$on('$viewContentLoaded', function (next, current) {
+					calculateHeight();
+				});
 			});
-		});
+		}, 20);
 		addStyleTag();
 	}
 };

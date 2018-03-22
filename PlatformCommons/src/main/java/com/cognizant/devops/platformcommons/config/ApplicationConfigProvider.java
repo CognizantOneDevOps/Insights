@@ -47,9 +47,9 @@ public class ApplicationConfigProvider implements Serializable{
 	private List<String> trustedHosts = new ArrayList<String>(3);	
 	private boolean enableOnlineDatatagging = false;
 	private boolean enableNativeUsers;
-    private boolean enableNativeCorrelations;
-    
+    private CorrelationConfig correlations;
     private EmailConfiguration emailConfiguration=new EmailConfiguration();
+    private boolean enableFieldIndex;
 
     public boolean isEnableOnlineDatatagging() {
 		return enableOnlineDatatagging;
@@ -213,14 +213,6 @@ public class ApplicationConfigProvider implements Serializable{
 	public void setTrustedHosts(List<String> trustedHosts) {
 		this.trustedHosts = trustedHosts;
 	}
-	
-    public boolean isEnableNativeCorrelations() {
-        return enableNativeCorrelations;
-    }
-
-    public void setEnableNativeCorrelations(boolean enableNativeCorrelations) {
-        this.enableNativeCorrelations = enableNativeCorrelations;
-    }
 
 	public String getInsightsServiceURL() {
 		return insightsServiceURL;
@@ -228,5 +220,21 @@ public class ApplicationConfigProvider implements Serializable{
 
 	public void setInsightsServiceURL(String insightsServiceURL) {
 		this.insightsServiceURL = insightsServiceURL;
+	}
+
+	public CorrelationConfig getCorrelations() {
+		return correlations;
+	}
+
+	public void setCorrelations(CorrelationConfig correlations) {
+		this.correlations = correlations;
+	}
+
+	public boolean isEnableFieldIndex() {
+		return enableFieldIndex;
+	}
+
+	public void setEnableFieldIndex(boolean enableFieldIndex) {
+		this.enableFieldIndex = enableFieldIndex;
 	}
 }

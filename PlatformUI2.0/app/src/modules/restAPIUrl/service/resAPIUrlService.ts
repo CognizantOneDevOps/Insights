@@ -99,13 +99,16 @@ module ISightApp {
 		  this.addEndPoint("ACCESS_GROUP_MANAGEMENT_SWITCH_ORGS",'/PlatformService/accessGrpMgmt/switchUserOrg');
 		  this.addEndPoint("ACCESS_GROUP_MANAGEMENT_GET_USERS",'/PlatformService/accessGrpMgmt/getUser');
 
-      this.addEndPoint("INSIGHTS_GET",'/PlatformService/insights/inferences');
-      this.addEndPoint("HIERARCHY_ALL_DETAILS_GET",'/PlatformService/admin/hierarchyDetails/getAllHierarchyDetails');
-      this.addEndPoint("UPLOAD_HIERARCHY_DETAILS",'/PlatformService/admin/hierarchyDetails/uploadHierarchyDetails');
-      this.addEndPoint("UPLOAD_IMAGE",'/PlatformService/settings/uploadCustomLogo');
-      this.addEndPoint("GET_LOGO_IMAGE",'/PlatformService/settings/getLogoImage');
-      this.addEndPoint("GET_METADATA",'/PlatformService/admin/hierarchyDetails/getMetaData');
-       this.addEndPoint("GET_HIERARCHY_PROPERTIES",'/PlatformService/admin/hierarchyDetails/getHierarchyProperties');
+	      this.addEndPoint("INSIGHTS_GET",'/PlatformService/insights/inferences');
+	      this.addEndPoint("HIERARCHY_ALL_DETAILS_GET",'/PlatformService/admin/hierarchyDetails/getAllHierarchyDetails');
+	      this.addEndPoint("UPLOAD_HIERARCHY_DETAILS",'/PlatformService/admin/hierarchyDetails/uploadHierarchyDetails');
+	      this.addEndPoint("UPLOAD_IMAGE",'/PlatformService/settings/uploadCustomLogo');
+	      this.addEndPoint("GET_LOGO_IMAGE",'/PlatformService/settings/getLogoImage');
+	      this.addEndPoint("GET_METADATA",'/PlatformService/admin/hierarchyDetails/getMetaData');
+	      this.addEndPoint("GET_HIERARCHY_PROPERTIES",'/PlatformService/admin/hierarchyDetails/getHierarchyProperties');
+		 
+		  this.addEndPoint("INSIGHTS_COMP_STATUS",'/PlatformService/ServicesHealthStatus/getStatus');
+		  
         }
 
        addEndPoint(name:string, url:string){
@@ -122,8 +125,8 @@ module ISightApp {
                     throw new Error("Url Mapping doesnt exist");
                }
 
-               return this.restEndpointService.getServiceHost() + this.urlMapping[moduleUrlKey];
-        }      
+               return this.restEndpointService.getServiceHost() + this.urlMapping[moduleUrlKey];			   
+		}      
 
 
     }

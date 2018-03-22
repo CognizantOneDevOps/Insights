@@ -19,6 +19,7 @@ import java.io.Serializable;
 
 public class GrafanaData implements Serializable{
 	private String grafanaEndpoint;
+	private String grafanaExternalEndPoint;
 	private String grafanaDBEndpoint;
 	private String adminUserName;
 	private String adminUserPassword;
@@ -60,5 +61,11 @@ public class GrafanaData implements Serializable{
 	}
 	public void setDbPassword(String dbPassword) {
 		this.dbPassword = dbPassword;
+	}
+	public String getGrafanaExternalEndPoint() {
+		return grafanaExternalEndPoint;
+	}
+	public void setGrafanaExternalEndPoint(String grafanaExternalEndPoint) {
+		this.grafanaExternalEndPoint = grafanaExternalEndPoint;
 	}
 }

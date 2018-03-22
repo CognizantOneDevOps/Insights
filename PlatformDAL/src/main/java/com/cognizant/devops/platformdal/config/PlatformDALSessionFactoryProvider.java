@@ -31,6 +31,7 @@ import com.cognizant.devops.platformdal.mapping.hierarchy.HierarchyMapping;
 import com.cognizant.devops.platformdal.mapping.projects.ProjectMapping;
 import com.cognizant.devops.platformdal.tools.layout.ToolsLayout;
 import com.cognizant.devops.platformdal.user.UserPortfolio;
+import com.cognizant.devops.platformdal.icon.Icon;
 
 public class PlatformDALSessionFactoryProvider {
 	private static SessionFactory sessionFactory;

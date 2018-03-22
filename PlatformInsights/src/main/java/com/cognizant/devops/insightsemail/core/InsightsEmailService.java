@@ -16,7 +16,6 @@
 
 package com.cognizant.devops.insightsemail.core;
 
-import java.awt.Image;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.security.KeyManagementException;
@@ -24,13 +23,9 @@ import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 
-import javax.imageio.ImageIO;
 import javax.mail.MessagingException;
 import javax.net.ssl.SSLContext;
-import javax.swing.ImageIcon;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
@@ -47,7 +42,6 @@ import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.web.client.RestTemplate;
 
 import com.cognizant.devops.insightsemail.core.util.EmailFormatter;
-import com.cognizant.devops.platformcommons.config.ApplicationConfigCache;
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.config.EmailConfiguration;
 import com.cognizant.devops.platformcommons.core.email.EmailConstants;
@@ -69,14 +63,8 @@ public class InsightsEmailService {
 		try {
 			
 			JsonObject json = getInferenceDetails();
-			String logo= emailConfiguration.getLogo();
-			String line= emailConfiguration.getLine();
-			String footerLogo= emailConfiguration.getFooterLogo();
-			Image imageLogo = ImageIO.read(ClassLoader.getSystemResource(logo));
-			Image imageLine = ImageIO.read(ClassLoader.getSystemResource(line));
-			Image imagefooterLogo = ImageIO.read(ClassLoader.getSystemResource(footerLogo));
 			String emailTemplate = emailConfiguration.getEmailVelocityTemplate();
-			String emailBody = getFormattedEmailContent(json,emailTemplate,imageLogo,imageLine,imagefooterLogo); 
+			String emailBody = getFormattedEmailContent(json,emailTemplate); 
 			EmailUtil.getInstance().sendEmail(mail, emailConfiguration,emailBody);
 			LOG.debug("Email has been sent successfully..");
 		} catch (Exception e) {
@@ -97,7 +85,7 @@ public class InsightsEmailService {
 		headers.add(EmailConstants.AUTHORIZATION, "Basic "+base64Creds);
 		HttpEntity<?> entity = new HttpEntity<>(headers);
 		String restUrl = ApplicationConfigProvider.getInstance().getInsightsServiceURL()+"/PlatformService/insights/inferences";
-	//	String restUrl = "http://localhost:7080"+"/PlatformService/insights/inferences";
+		//String restUrl = "http://localhost:7080"+"/PlatformService/insights/inferences";
 		HttpEntity<String> response = restTemplate.exchange(restUrl,HttpMethod.GET,entity,String.class);
 		JsonParser parser = new JsonParser(); 
 		JsonObject resultJson=new JsonObject();
@@ -106,7 +94,7 @@ public class InsightsEmailService {
 		return resultJson;
 	}
 	
-	private String getFormattedEmailContent(JsonObject json, String emailTemplate, Image image, Image imageLine, Image imagefooterLogo) {
+	private String getFormattedEmailContent(JsonObject json, String emailTemplate) {
 	
 		JsonArray array = json.get(EmailConstants.DATA).getAsJsonArray();
 		for(JsonElement element : array){
@@ -145,7 +133,7 @@ public class InsightsEmailService {
 		}
 		
 
-		StringWriter stringWriter = EmailFormatter.getInstance().populateTemplate(array,emailTemplate,image,imageLine,imagefooterLogo);
+		StringWriter stringWriter = EmailFormatter.getInstance().populateTemplate(array,emailTemplate);
 		return stringWriter.toString();
 	}
 
@@ -172,7 +160,7 @@ public class InsightsEmailService {
 	
 	public static void main(String[] args)
 	{	
-		/**ApplicationConfigCache.loadConfigCache();
+		/*ApplicationConfigCache.loadConfigCache();
 		InsightsEmailService services=new InsightsEmailService();
 		Mail mail=new Mail();
 		mail.setMailTo("");
@@ -185,8 +173,8 @@ public class InsightsEmailService {
 		} catch (MessagingException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}**/
-
+		}
+	   */
 	}
 
 
