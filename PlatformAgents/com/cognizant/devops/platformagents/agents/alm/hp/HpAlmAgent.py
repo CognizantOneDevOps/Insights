@@ -78,62 +78,65 @@ class HpAlmAgent(BaseAgent):
         startIndex = 1
         totalResults = 1
         loadNextPageResult = True
-        if self.responseType == 'XML':
-            while loadNextPageResult:
-                restUrl = projectEndPoint + '&page-size='+str(self.dataFetchCount)+'&start-index='+str(startIndex)
-                projectResponse = self.getResponse(restUrl, 'GET', None, None, None, reqHeaders=reqHeaders)
-                entities = ET.fromstring(projectResponse)
-                totalResults = int(entities.attrib['TotalResults'])
-                if totalResults > 0:
-                    entities = list(entities.iter('Entity'))
-                    for entity in entities:
-                        data = {}
-                        data['almDomain'] = domain
-                        data['almProject'] = project
-                        data['almType'] = entity.attrib['Type']
-                        fields = list(entity.iter('Field'))
-                        for field in fields:
-                            fieldName = field.attrib['Name']
-                            propertyName = entityMetaDetails.get(fieldName, None)
-                            if propertyName:
-                                fieldTag = field.find('Value')
-                                if fieldTag is not None:
-                                    fieldValue = self.extractValueWithType(fieldTag.text)
-                                    data[propertyName] = fieldValue
-                        dataList.append(data)
-                startIndex += self.dataFetchCount
-                if totalResults < startIndex:
-                    loadNextPageResult = False
-            if len(dataList) > 0:
-                latestRecord = dataList[len(dataList) - 1]
-                projectTracking[entityName] = latestRecord[entityMetaDetails[trackingFieldName]]
-        else:
-            while loadNextPageResult:
-                restUrl = projectEndPoint + '&page-size='+str(self.dataFetchCount)+'&start-index='+str(startIndex)
-                projectResponse = self.getResponse(restUrl, 'GET', None, None, None, reqHeaders=reqHeaders)
-                totalResults = projectResponse.get("TotalResults",0)
-                if totalResults > 0:
-                    entities = projectResponse.get("entities", [])
-                    for entity in entities:
-                        data = {}
-                        data['domain'] = domain
-                        data['project'] = project
-                        data['type'] = entity['Type']
-                        fields = entity['Fields']
-                        for field in fields:
-                            values = field['values']
-                            for value in values:
-                                propertyName = entityMetaDetails.get(field['Name'], None)
+        try:
+            if self.responseType == 'XML':
+                while loadNextPageResult:
+                    restUrl = projectEndPoint + '&page-size='+str(self.dataFetchCount)+'&start-index='+str(startIndex)
+                    projectResponse = self.getResponse(restUrl, 'GET', None, None, None, reqHeaders=reqHeaders)
+                    entities = ET.fromstring(projectResponse)
+                    totalResults = int(entities.attrib['TotalResults'])
+                    if totalResults > 0:
+                        entities = list(entities.iter('Entity'))
+                        for entity in entities:
+                            data = {}
+                            data['almDomain'] = domain
+                            data['almProject'] = project
+                            data['almType'] = entity.attrib['Type']
+                            fields = list(entity.iter('Field'))
+                            for field in fields:
+                                fieldName = field.attrib['Name']
+                                propertyName = entityMetaDetails.get(fieldName, None)
                                 if propertyName:
-                                    fieldValue = value.get('value', '')
-                                    data[entityMetaDetails[propertyName]] = fieldValue
-                        dataList.append(data)
-                startIndex += self.dataFetchCount
-                if totalResults < startIndex:
-                    loadNextPageResult = False
-            if len(dataList) > 0:
-                latestRecord = dataList[len(dataList) - 1]
-                projectTracking[entityName] = latestRecord[entityMetaDetails[trackingFieldName]]
+                                    fieldTag = field.find('Value')
+                                    if fieldTag is not None:
+                                        fieldValue = self.extractValueWithType(fieldTag.text)
+                                        data[propertyName] = fieldValue
+                            dataList.append(data)
+                    startIndex += self.dataFetchCount
+                    if totalResults < startIndex:
+                        loadNextPageResult = False
+                if len(dataList) > 0:
+                    latestRecord = dataList[len(dataList) - 1]
+                    projectTracking[entityName] = latestRecord[entityMetaDetails[trackingFieldName]]
+            else:
+                while loadNextPageResult:
+                    restUrl = projectEndPoint + '&page-size='+str(self.dataFetchCount)+'&start-index='+str(startIndex)
+                    projectResponse = self.getResponse(restUrl, 'GET', None, None, None, reqHeaders=reqHeaders)
+                    totalResults = projectResponse.get("TotalResults",0)
+                    if totalResults > 0:
+                        entities = projectResponse.get("entities", [])
+                        for entity in entities:
+                            data = {}
+                            data['domain'] = domain
+                            data['project'] = project
+                            data['type'] = entity['Type']
+                            fields = entity['Fields']
+                            for field in fields:
+                                values = field['values']
+                                for value in values:
+                                    propertyName = entityMetaDetails.get(field['Name'], None)
+                                    if propertyName:
+                                        fieldValue = value.get('value', '')
+                                        data[entityMetaDetails[propertyName]] = fieldValue
+                            dataList.append(data)
+                    startIndex += self.dataFetchCount
+                    if totalResults < startIndex:
+                        loadNextPageResult = False
+                if len(dataList) > 0:
+                    latestRecord = dataList[len(dataList) - 1]
+                    projectTracking[entityName] = latestRecord[entityMetaDetails[trackingFieldName]]
+        except Exception as ex:
+            logging.error(ex)
         return dataList
     
     def extractValueWithType(self, value):

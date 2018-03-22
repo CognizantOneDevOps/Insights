@@ -16,10 +16,11 @@
 
 module ISightApp {
     export class AgentController {
-        static $inject = ['agentService', 'iconService', '$mdDialog', '$cookies', 'toolConfigService'];
-        constructor(
+        static $inject = ['agentService', 'iconService', '$sce', '$mdDialog', '$cookies', 'toolConfigService'];
+        constructor(			
             private agentService: IAgentService,
             private iconService: IIconService,
+			private $sce,
             private $mdDialog, private $cookies, private toolConfigService: IToolConfigService) {
             var self = this;
             self.toolsData = self.toolConfigService.readToolsDataList();
@@ -52,7 +53,26 @@ module ISightApp {
             var homePageController = homePageControllerScope['homePageController'];
             this.homeController = homePageController;
             this.homeController.templateName = 'healthCheck';
-        }
+			
+			this.showThrobber = true;
+			this.showcontent = true;
+			this.agentService.loadServerHealthConfiguration("INSIGHTS_COMP_STATUS")
+			.then(function (data) {		
+				self.showThrobber = false;
+				self.showcontent = !this.showThrobber;
+				self.serverStatus = data;	
+			})
+			.catch(function (data) {												
+				self.showThrobber = false;
+				self.showcontent = false;
+			}); 	
+			
+		
+        }		
+		
+		showcontent: boolean;
+		showThrobber: boolean;			
+		serverStatus = [];					
         agentNodes = [];
         selectedTool: string;
         selectedCategory: string;

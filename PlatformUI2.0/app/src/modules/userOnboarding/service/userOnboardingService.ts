@@ -18,16 +18,9 @@
 
 module ISightApp {
     export interface IUserOnboardingService {
-        getAllOrg(): ng.IPromise<any>;
-        getOrgUserInfo(orgId: number): ng.IPromise<any>;
-        userSearch(input: string): ng.IPromise<any>;
-        createUser(userName:string, userEmail:string, userLogin:string): ng.IPromise<any>;
-        getAllUsers(): ng.IPromise<any>;
-        addUserToOrg(orgId: number, orgName: string, userLogin: string, role:string): ng.IPromise<any>;
-        createOrg(orgName: string): ng.IPromise<any>;
-        deleteUserFromOrg(userId: number, orgId:number): ng.IPromise<any>;
-        addUser(userName: string, email: string, login:string): ng.IPromise<any>;
-        updateUserRoleOrg(orgId: number, userId: number, role:string): ng.IPromise<any>;
+        getCurrentUserOrgs(): ng.IPromise<any>;
+        switchUserOrg(orgId: number): ng.IPromise<any>;
+        getGrafanaCurrentOrgAndRole(): ng.IPromise<any>;
     }
 
     export class UserOnboardingService implements IUserOnboardingService {
@@ -35,61 +28,19 @@ module ISightApp {
         constructor(private $q: ng.IQService, private $resource, private $cookies, private restCallHandlerService: IRestCallHandlerService) {
         }
 
-        getAllOrg(): ng.IPromise<any> {
-
+        getCurrentUserOrgs(): ng.IPromise<any> {
             var restHandler = this.restCallHandlerService;
-            return restHandler.get("ORGS_GET");
+            return restHandler.get("ACCESS_GROUP_MANAGEMENT_GET_CURRENT_USER_ORGS");
         }
 
-        getOrgUserInfo(orgId: number): ng.IPromise<any> {
-          
+        switchUserOrg(orgId: number): ng.IPromise<any> {
             var restHandler = this.restCallHandlerService;
-            return restHandler.post("ORG_USERS_GET",{"orgId":orgId},{'Content-Type': 'application/x-www-form-urlencoded'});
+            return restHandler.post("ACCESS_GROUP_MANAGEMENT_SWITCH_ORGS", { "orgId": orgId }, { 'Content-Type': 'application/x-www-form-urlencoded' });
         }
 
-        userSearch(input: string): ng.IPromise<any>{
+        getGrafanaCurrentOrgAndRole(): ng.IPromise<any> {
             var restHandler = this.restCallHandlerService;
-            return restHandler.get("USER_SEARCH",{'query':input});
-       }
-
-       createUser(userName:string, userEmail:string, userLogin:string): ng.IPromise<any> {
-    
-            var restHandler = this.restCallHandlerService;
-            return restHandler.post("USER_ADD",{"orgId":1},{'Content-Type': 'application/x-www-form-urlencoded'});
-       }
-
-       getAllUsers(): ng.IPromise<any> {
-            var restHandler = this.restCallHandlerService;
-            return restHandler.get("ALL_USERS");
-       }
-
-       addUserToOrg(orgId: number, orgName: string, userLogin: string, role:string): ng.IPromise<any> {
-        
-           var restHandler = this.restCallHandlerService;
-           return restHandler.post("USER_TO_ORG_ADD",{"orgId":orgId, "orgName":orgName, "user":userLogin, "role":role},{'Content-Type': 'application/x-www-form-urlencoded'});
-       }
-
-       createOrg(orgName: string): ng.IPromise<any> {
-     
-           var restHandler = this.restCallHandlerService;
-           return restHandler.post("ORG_CREATE",{"orgName":orgName},{'Content-Type': 'application/x-www-form-urlencoded'});
-       }
-
-       deleteUserFromOrg(userId: number, orgId:number): ng.IPromise<any> {
-  
-           var restHandler = this.restCallHandlerService;
-           return restHandler.post("USER_ORG_DELETE",{"userId":userId, "orgId":orgId },{'Content-Type': 'application/x-www-form-urlencoded'});
-       }
-
-       addUser(userName: string, email: string, login:string): ng.IPromise<any> {
-    
-           var restHandler = this.restCallHandlerService;
-           return restHandler.post("USER_ADD",{"userName":userName, "email":email, "login":login},{'Content-Type': 'application/x-www-form-urlencoded'});
-       }
-
-       updateUserRoleOrg(orgId: number, userId: number, role:string): ng.IPromise<any> {
-           var restHandler = this.restCallHandlerService;
-           return restHandler.post("USER_ROLE_INORG_UPDATE",{"orgId":orgId, "userId":userId, "role":role},{'Content-Type': 'application/x-www-form-urlencoded'});
-       }
+            return restHandler.get("GRAPANA_CURRENT_ROLE_ORG");
+        }
     }
 }

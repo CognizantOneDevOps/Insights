@@ -17,7 +17,7 @@
 /// <reference path="_all.ts" />
 
 module ISightApp {
-    angular.module('iSightApp', ['ngMaterial', 'ngRoute', 'ngResource', 'ngMessages', 'ngCookies','ngAnimate','ui.bootstrap'])
+    angular.module('iSightApp', ['ngMaterial', 'ngRoute', 'ngResource', 'ngMessages', 'ngCookies','ngAnimate','ui.bootstrap','googlechart'])
         .service('pipelineService', PipelineService)
         .service('graphService', GraphService)
         .service('elasticSearchService', ElasticSearchService)
@@ -36,9 +36,12 @@ module ISightApp {
         .service('restCallHandlerService', RestCallHandlerService)
         .service('dataTaggingService', DataTaggingService)
         .service('dataOnBoardingService', DataOnBoardingService)
-        .service('singleToolConfigService', SingleToolConfigService)
         .service('dataTaggingDetailsService', DataTaggingDetailsService)
-        .service('appSettingsService', AppSettingsService)
+       	.service('singleToolConfigService', SingleToolConfigService)        
+        .service('insightsService', InsightsService)
+		.service('platformServiceStatusService', PlatformServiceStatusService)
+		.service('appSettingsService', AppSettingsService)
+
         .controller('pipelineController', PipelineController)
         .controller('homePageController', HomePageController)
         .controller('toolsConfigurationController', ToolsConfigurationController)
@@ -54,6 +57,7 @@ module ISightApp {
 	    .controller('dataTaggingDetailsController', DataTaggingDetailsController)
         .controller('FileUploadController', FileUploadController)
         .controller('appSettingsController', AppSettingsController)
+        .controller('insightsController', InsightsController)
         .component('footer', {
             templateUrl: './dist/components/footer/view/footerView.html',
             controller: FooterController,
@@ -73,6 +77,7 @@ module ISightApp {
             bindings:{}
 
         })
+<<<<<<< HEAD
         .directive('includeReplace', function () {
             return {
                 require: 'ngInclude',
@@ -95,6 +100,9 @@ module ISightApp {
         })
 
         .directive('demoFileModel', function ($parse) {
+=======
+		.directive('demoFileModel', function ($parse) {
+>>>>>>> origin/master
             return {
                 restrict: 'A', //the directive can be used as an attribute only
                     
@@ -114,19 +122,28 @@ module ISightApp {
                         var fileSize = (<HTMLInputElement>element[0]).files[0].size;
                         if (fileSize > maxSize){
                            scope.maxSizeErr = true;
+<<<<<<< HEAD
 						   scope.imageSrc = "#";
 						   scope.showUploadBtn = false;
+=======
+>>>>>>> origin/master
                         }else{
                         scope.showUploadBtn = true;
                         scope.file = (<HTMLInputElement>element[0]).files[0];
                         scope.getFile();
                         }
+<<<<<<< HEAD
 						scope.$apply();
+=======
+>>>>>>> origin/master
                     });
                 }
             };
         })
+<<<<<<< HEAD
        
+=======
+>>>>>>> origin/master
         .config(['$routeProvider', '$compileProvider',
             function($routeProvider, $compileProvider) {
                 $routeProvider.
@@ -199,6 +216,11 @@ module ISightApp {
                          templateUrl: './dist/modules/dataTagging/view/dataTaggingView.html',
                          controller: DataTaggingController,
                          controllerAs: 'dataTaggingController'
+                     }).
+                     when('/InSights/insights', {
+                         templateUrl: './dist/modules/insights/view/insightsView.html',
+                         controller: InsightsController,
+                         controllerAs: 'insightsController'
                      }).
 
                     otherwise({

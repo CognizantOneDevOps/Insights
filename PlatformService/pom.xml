@@ -49,6 +49,8 @@
 				    <include>**/*.md</include>
 				    <include>**/*.json</include>
 					<include>version.properties</include>
+					<include>*.properties</include>
+					<include>**/*.properties</include>
 					<include>PlatformServiceVersion.json</include>
 				</includes>
 				<filtering>true</filtering>
@@ -206,4 +208,28 @@
 		<mockito.version>1.10.19</mockito.version>
 		<junit.version>4.12</junit.version>
 	</properties>
+	<profiles>
+        <profile>
+                <id>tomcatDeployment</id>
+                <activation>
+                  <activeByDefault>false</activeByDefault>
+                </activation>
+
+                <build>
+                 <plugins>
+                <plugin>
+                <groupId>org.apache.tomcat.maven</groupId>
+                <artifactId>tomcat7-maven-plugin</artifactId>
+                <version>2.2</version>
+                <configuration>
+                        <url>http://insightsrheldev.cogdevops.com:8000/manager/text</url>
+                        <server>tomcat</server>
+                        <path>/PlatformService</path>
+
+                </configuration>
+                </plugin>
+                </plugins>
+                </build>
+        </profile>
+        </profiles>
 </project>

@@ -28,7 +28,6 @@ import org.quartz.impl.StdSchedulerFactory;
 import com.cognizant.devops.platformcommons.config.ApplicationConfigCache;
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformengine.modules.aggregator.EngineAggregatorModule;
-import com.cognizant.devops.platformengine.modules.correlation.EngineCorrelationNodeBuilderModule;
 import com.cognizant.devops.platformengine.modules.correlation.EngineCorrelatorModule;
 import com.cognizant.devops.platformengine.modules.mapper.ProjectMapperModule;
 
@@ -55,7 +54,7 @@ public class Application {
 		//new EngineUsersModule().onboardDefaultUsers();
 		ApplicationConfigProvider.performSystemCheck();
 		// Create correlation nodes
-		new EngineCorrelationNodeBuilderModule().initializeCorrelationNodes();
+		//new EngineCorrelationNodeBuilderModule().initializeCorrelationNodes();
 		
 		// Subscribe for desired events.
 		JobDetail aggrgatorJob = JobBuilder.newJob(EngineAggregatorModule.class)

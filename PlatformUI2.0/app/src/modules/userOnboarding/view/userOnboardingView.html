@@ -18,150 +18,28 @@
 
 <div layout="column" flex>
     <div layout class="applicationButtMar">
-        <div layout="row" class="applicationContentCss" style="width: 100%;">
+        <div layout="row" class="applicationContentCss" style="width: 100%;margin-top: 6px">
             <div layout layout-align="end center">
-               <!-- <md-button ng-click="userOnboardingController.showAddApplicationBox()" class="md-raised md-primary configureBut">
-                    Add New Application
-                </md-button>
-                <md-input-container layout class="md-block inputContainerDivNewApplication" md-no-float>
-                    <input class="inputBoxContNewApplication" type="text" required md-no-asterisk name="newApplication" ng-model="userOnboardingController.addNewApplicationName"
-                        placeholder="Application Name" ng-if="userOnboardingController.showAddApplication" />
-                </md-input-container>
-                <md-button ng-click="userOnboardingController.addApplication($event,userOnboardingController.addNewApplicationName)" class="md-raised md-primary goButton applicationManagement addApplication"
-                    ng-if="userOnboardingController.showAddApplication">
-                    Go
-                </md-button>
-                <span ng-if="userOnboardingController.showApplicationAddedMessage" class="applicationAddedMessage">New application added successfully</span>-->
-            <md-select class="searchApplicationBoxCont" md-no-asterisk="true" ng-model="userOnboardingController.selectedApp" ng-change="userOnboardingController.selectApp()" style="margin-top: 0px;">
-                    <md-option ng-repeat="app in userOnboardingController.apps" value="{{app.name}}">
-                        {{app.name}}
+                <md-label style="font-size: 14px; margin-right: 10px; color: #00728f; font-family: proxima_novasemibold;"> Switch Access Group</md-label>
+
+                <!--<md-button class="md-raised md-primary configureBut" style="background-color:#387c2c;padding-left: 15px;padding-right:15px"
+                    ng-click="userOnboardingController.showAccessGroupOptions()">
+                    Switch Access Group
+                </md-button>-->
+
+                <md-select class="searchApplicationBoxCont" md-no-asterisk="true" ng-model="userOnboardingController.selectedApp" style="margin-top: 0px; width:230px"
+                    placeholder="{{userOnboardingController.userCurrentOrgName}}">
+                    <md-option ng-repeat="org in userOnboardingController.adminOrgDataArray" value="{{org.name}}" ng-click="userOnboardingController.switchAccessGroup(org.orgId)">
+                        {{org.name}}
                     </md-option>
                 </md-select>
-                <md-autocomplete class="autocompleteSearchApplication" md-search-text="userOnboardingController.searchedUser" md-items="app in userOnboardingController.appData.appInfo | filter:userOnboardingController.searchedUser"
-                    md-item-text="app.login" md-min-length="3" placeholder="Search/Add User">
-                    <md-item-template>
-                        <span md-highlight-text="userOnboardingController.searchedUser" md-highlight-flags="^i">{{app.login}}</span>
-                    </md-item-template>
-                    <md-not-found>
-                        No matching record for "{{userOnboardingController.searchedUser}}" were found.Please add.
-                    </md-not-found>
-                </md-autocomplete>
-                <md-button ng-click="userOnboardingController.searchUser(userOnboardingController.searchedUser)" class="md-raised md-primary buttCss applicationManagement">
-                    Go
-                </md-button>
-                <span layout class="saveMsg" ng-if="!userOnboardingController.isValidUser">{{userOnboardingController.invalidUserMsg}}</span>
+
             </div>
-             
-            <div layout layout-align="end center" flex style="margin-right: -7px;">
-                <md-button class="md-raised md-primary configureBut" style="background-color:#387c2c;margin-left: 2px;">
-                    User Onboarding
-                </md-button>
-                <md-button ng-click="userOnboardingController. goToDataOnBoard()" class="md-raised md-primary configureBut">
-                    Data Onboarding
-                </md-button>
-            </div>
+
         </div>
     </div>
-    <div class="contentCss">
-        <div layout style="margin-right: -7px;margin-top: -20px;">
-            <div layout layout-align="start end" flex style="margin-top: 9px;margin-bottom: 15px;">
-               <!-- <md-select class="searchApplicationBoxCont" md-no-asterisk="true" ng-model="userOnboardingController.selectedApp" ng-change="userOnboardingController.selectApp()">
-                    <md-option ng-repeat="app in userOnboardingController.apps" value="{{app.name}}">
-                        {{app.name}}
-                    </md-option>
-                </md-select>
-                <md-autocomplete class="autocompleteSearchApplication" md-search-text="userOnboardingController.searchedUser" md-items="app in userOnboardingController.appData.appInfo | filter:userOnboardingController.searchedUser"
-                    md-item-text="app.login" md-min-length="3" placeholder="Search/Add User">
-                    <md-item-template>
-                        <span md-highlight-text="userOnboardingController.searchedUser" md-highlight-flags="^i">{{app.login}}</span>
-                    </md-item-template>
-                    <md-not-found>
-                        No matching record for "{{userOnboardingController.searchedUser}}" were found.Please add.
-                    </md-not-found>
-                </md-autocomplete>
-                <md-button ng-click="userOnboardingController.searchUser(userOnboardingController.searchedUser)" class="md-raised md-primary buttCss applicationManagement">
-                    Go
-                </md-button>
-                <span layout class="saveMsg" ng-if="!userOnboardingController.isValidUser">{{userOnboardingController.invalidUserMsg}}</span>-->
 
-            </div>
-            <!--start code for butttons-->
-            <div layout="row" layout-align="end end" style="margin-right: 7px;">
-                <span layout class="saveMsg" ng-if="userOnboardingController.saveMsgArr.saveMsg !== ''">{{userOnboardingController.saveMsgArr.saveMsg}}</span>
-                <md-icon class="ForActionsIcons" ng-style="{height: '20px', width: '20px'}" ng-click="!userOnboardingController.showActions||userOnboardingController.showEditedUser()"
-                    md-svg-src="{{userOnboardingController.editIconSrc}}">
-                    <md-tooltip md-direction="top">
-                        Edit
-                    </md-tooltip>
-                </md-icon>
-                <md-icon ng-click="!userOnboardingController.showActions||userOnboardingController.addNewUserToOrg($event)" class="ForActionsIcons"
-                    ng-style="{height: '20px', width: '20px'}" md-svg-src="{{userOnboardingController.saveIconSrc}}">
-                    <md-tooltip md-direction="top">
-                        Save
-                    </md-tooltip>
-                </md-icon>
-                <md-icon class="ForActionsIcons" ng-style="{height: '20px', width: '20px'}" ng-click="!userOnboardingController.showActions||userOnboardingController.deleteUserFromOrg($event)"
-                    md-svg-src="{{userOnboardingController.deleteIconSrc}}">
-                    <md-tooltip md-direction="top">
-                        Delete
-                    </md-tooltip>
-                </md-icon>
-            </div>
-            <!--end code for buttons-->
-        </div>
-        <div layout layout-align="center center">
-            <!--<div ng-if="userOnboardingController.showThrobber" layout-sm="column" layout-align="space-around" style="margin-top:50px">
-                        <md-progress-circular md-mode="indeterminate" md-diameter="30"></md-progress-circular>
-                    </div>-->
-            <table class="md-api-table-landing" style="border: 1px solid #a5d28b;width:100%">
-                <thead class="theadCss">
-                    <tr layout="row" layout-align="start center" style="height:54px">
-                        <th flex="30" class="tableHeader ">
-                            <span class="tableHeadingStyle">Login Name</span>
-                        </th>
-                        <th flex="40" class="tableHeader ">
-                            <span class="tableHeadingStyle">Email Address</span>
-                        </th>
-                        <th flex="20" class="tableHeader ">
-                            <span class="tableHeadingStyle">Role</span>
-                        </th>
-                        <th flex="10" ng-if="userDetails.editRole || userDetails.newUser">
-                        </th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr ng-repeat="userDetails in userOnboardingController.paginatedUserOnboardedArray.paginatedArr | orderBy:'$index':true"
-                        layout="row" layout-align="start none">
-                        <td class="tableContentStyle" flex="30">
-                            <md-radio-group ng-model="userOnboardingController.selectedUser">
-                                <md-radio-button flex="15" name="{{userDetails.login}}" value="{{userDetails.login}}" style="padding-bottom:18px;outline:none;margin-bottom:-20px"
-                                    class="onBoardingTableRadioButton" ng-click="userOnboardingController.radioSelection(userDetails.login, false)">
-                                    <div style="margin-top: -10px;" ng-if = "userDetails.login !== 'undefined'">{{userDetails.login}}</div>
-                                    <div style="margin-top: -10px;" ng-if = "userDetails.login === 'undefined'"></div>
-                                </md-radio-button>
-                            </md-radio-group>
-                        </td>
-
-                        <td class="tableContentStyle" flex="40" ng-if = "userDetails.email !== 'undefined'">{{userDetails.email}}</td>
-                        <td class="tableContentStyle" flex="40" ng-if = "userDetails.email === 'undefined'"></td>
-                        <td class="tableContentStyle" flex="30" ng-if="!userDetails.editRole && !userDetails.newUser">{{userDetails.role}}</td>
-                        <td style="outline:none" class="tableContentStyle" flex="20" ng-if="userDetails.editRole || userDetails.newUser">
-                            <md-select ng-model="userOnboardingController.selectedRole" class="searchApplicationBoxCont inputApplicationBox dropdownInTable"
-                                md-no-asterisk="true" placeholder="Select Role">
-                                <md-option ng-repeat="role in ['Admin','Editor','Viewer']" value="{{role}}">
-                                    {{role}}
-                                </md-option>
-                            </md-select>
-                        </td>
-                        <td flex="10" class="cancelTd" ng-click="userOnboardingController.restoreRoleData(userDetails.login)" ng-if="userDetails.editRole || userDetails.newUser">Cancel</td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-        <div ng-show="userOnboardingController.showPaginationJson.showPaginationBar" class="paginationClass" flex="100" layout="row" layout-align="end">
-            <ul uib-pagination total-items="userOnboardingController.totalItems" ng-model="userOnboardingController.currentPage" max-size="userOnboardingController.maxSize"
-                class="pagination-sm" boundary-links="true" num-pages="userOnboardingController.numPages" items-per-page="userOnboardingController.totalRows"
-                ng-change="userOnboardingController.updateResult()" first-text="<<" last-text=">>" next-text=">" previous-text="<"></ul>
-        </div>
+    <div id="iframeDiv" flex layout="column">
+        <iframe src="{{userOnboardingController.userListUrl}}" id="iSightIframe" frameBorder="0" scrolling="no" style="{{userOnboardingController.userIframeStyle}}"></iframe>
     </div>
 </div>
