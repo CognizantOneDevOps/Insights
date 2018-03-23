@@ -115,39 +115,90 @@ module ISightApp {
         }
 		
 		versionOnChange(key, type): void {
-			var self = this;							
+			var self = this;										
 			
 			if(type == "Update"){
 				
 				self.showConfig = false;
 				self.showThrobber = true;	
 				self.showMessage = "";			
-				console.log(self.tempConfigdata);
+				
 				self.defaultConfigdata = JSON.parse(self.tempConfigdata);
 				self.agentService.getDocrootAgentConfig(key, self.selectedTool)
 				.then(function (vdata) {				
 					self.showConfig = true;
 					self.showThrobber = false;
 					self.versionChangeddata = JSON.parse(vdata.data);
-					
-					for(var keY in self.versionChangeddata){
-						if(!self.defaultConfigdata.hasOwnProperty(keY)) {
-							self.defaultConfigdata[keY] = self.versionChangeddata[keY];
-						}
-					}			
+					self.concatConfigelement(self.versionChangeddata);					
+					self.removeConfigelement(self.versionChangeddata);					
+					self.configLabelMerge();
 					
 				})			
-				.catch(function (vdata) {	
+				.catch(function (vdata) {							
 					self.showThrobber = false;							
 					self.showMessage = "Problem with Platform Service, Please try again";				
 				});
 				
-			}else {
+			}else {				
+				self.buttonDisableStatus = true;								
 				self.selectedTool = "";			
 				self.toolsArr = [];	
 				self.toolsArr = self.response[key];
 			}
 		} 
+		
+		concatConfigelement(addObj): void {
+			var self = this;
+			
+			for(var vkeys in addObj){
+				
+				if(self.findDataType(vkeys, addObj) == 'object' && vkeys != "dynamicTemplate"){
+					
+					if(!self.defaultConfigdata.hasOwnProperty(vkeys)) {
+						self.defaultConfigdata[vkeys] = addObj[vkeys];
+					}
+					
+					for(var vkeys1 in addObj[vkeys]){
+						
+						if(!self.defaultConfigdata[vkeys].hasOwnProperty(vkeys1)) {
+							self.defaultConfigdata[vkeys][vkeys1] = addObj[vkeys][vkeys1];
+						}
+					}
+					
+				}else {
+					
+					if(!self.defaultConfigdata.hasOwnProperty(vkeys)) {
+						self.defaultConfigdata[vkeys] = addObj[vkeys];
+					}							
+				}
+				
+			}	
+		}
+		
+		removeConfigelement(remObj): void {
+			var self = this;
+			
+			for(var dkeys in self.defaultConfigdata){
+				
+				if(self.findDataType(dkeys, self.defaultConfigdata) == 'object' && dkeys != "dynamicTemplate"){
+					
+					if(!remObj.hasOwnProperty(dkeys)) {
+						delete self.defaultConfigdata[dkeys];
+					}
+					
+					for(var dkeys1 in self.defaultConfigdata[dkeys]){
+						if(!remObj[dkeys].hasOwnProperty(dkeys1)) {
+							delete self.defaultConfigdata[dkeys][dkeys1];
+						}
+					}
+					
+				}else {
+					if(!remObj.hasOwnProperty(dkeys)) {
+						delete self.defaultConfigdata[dkeys];
+					}							
+				}
+			}						
+		}
 		
 		getDocRootAgentConfig(version, toolName): void{
 			var self = this;	
@@ -159,23 +210,16 @@ module ISightApp {
 				self.showConfig = false;
 				self.showThrobber = true;	
 				self.showMessage = "";
-				self.configDesc = self.restEndpointService.getConfigDesc();
+				
 				self.agentService.getDocrootAgentConfig(version, toolName)
 				.then(function (data) {
+					
 					self.buttonDisableStatus = false;
 					self.showConfig = true;
 					self.showThrobber = false;
 					self.defaultConfigdata  = JSON.parse(data.data);				
 					self.dynamicData = JSON.stringify(self.defaultConfigdata['dynamicTemplate'], undefined, 4);
-					
-					for(var key in self.defaultConfigdata){		
-						if(self.configDesc.hasOwnProperty(key)) {
-							self.configAbbr[key] = self.configDesc[key];			
-						}else {
-							self.configAbbr[key] = key;
-						}
-					}			
-					
+					self.configLabelMerge();					
 				})			
 				.catch(function (data) {		
 					self.showThrobber = false;							
@@ -193,37 +237,42 @@ module ISightApp {
 			var self = this;			
 			self.showConfig = false;
 			self.showThrobber = true;	
-			self.showMessage = "";			
-			self.configDesc = self.restEndpointService.getConfigDesc();		
+			self.showMessage = "";							
 			
 			self.agentService.getDbAgentConfig(agentId)
 			.then(function (data) {		
-				console.log(data);
+				
 				self.showConfig = true;
 				self.showThrobber = false;
 				self.tempConfigdata  = data.data.agentJson;	
-				console.log(self.tempConfigdata);
+				
 				self.defaultConfigdata = JSON.parse(self.tempConfigdata);
 				self.selectedVersion = data.data.agentVersion;	
 				self.selectedOS = data.data.osVersion;
 				self.getOsVersionTools(self.selectedVersion);
 				self.selectedTool = data.data.toolName;
-				self.dynamicData = JSON.stringify(self.defaultConfigdata['dynamicTemplate'], undefined, 4);
+				self.dynamicData = JSON.stringify(self.defaultConfigdata['dynamicTemplate'], undefined, 4);				
+				self.configLabelMerge();
 				
-				for(var key in self.defaultConfigdata){	
-				
-					if(self.configDesc.hasOwnProperty(key)) {
-						self.configAbbr[key] = self.configDesc[key];							
-					}else {
-						self.configAbbr[key] = key;
-					}
-				}
 			})			
 			.catch(function (data) {		
 				self.showThrobber = false;							
 				self.showMessage = "Problem with Platform Service, Please try again";				
 			}); 
 			
+		}
+		
+		configLabelMerge(): void {	
+		
+			var self = this;
+			self.configDesc = self.restEndpointService.getConfigDesc();
+			for(var key in self.defaultConfigdata){	
+				if(self.configDesc.hasOwnProperty(key)) {
+					self.configAbbr[key] = self.configDesc[key];			
+				}else {
+					self.configAbbr[key] = key;
+				}
+			}			
 		}
 		
 		sendSuccessStatusMsg(Msg): void{
