@@ -26,7 +26,6 @@ import com.cognizant.devops.platformdal.dashboards.CustomDashboard;
 import com.cognizant.devops.platformdal.entity.definition.EntityDefinition;
 import com.cognizant.devops.platformdal.grafana.user.User;
 import com.cognizant.devops.platformdal.hierarchy.details.HierarchyDetails;
-import com.cognizant.devops.platformdal.icon.Icon;
 import com.cognizant.devops.platformdal.mapping.hierarchy.HierarchyMapping;
 import com.cognizant.devops.platformdal.mapping.projects.ProjectMapping;
 import com.cognizant.devops.platformdal.tools.layout.ToolsLayout;

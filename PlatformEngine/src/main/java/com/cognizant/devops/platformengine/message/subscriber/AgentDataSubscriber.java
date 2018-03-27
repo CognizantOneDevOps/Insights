@@ -107,14 +107,14 @@ public class AgentDataSubscriber extends EngineSubscriberResponseHandler{
 				if(metadata.has("relation")) {
 					relationMetadata = metadata.get("relation").getAsJsonObject();
 				}
-				}
 			}
-
+		}
 		Map<String,Map<String,NodeData>> metaDataMap=new HashMap<String,Map<String,NodeData>>();
 		Gson gson = new Gson();
 		if(enableOnlineDatatagging){
 			metaDataMap= getMetaData(dbHandler);
 		}
+		
 		if(json.isJsonArray()){
 			JsonArray asJsonArray = json.getAsJsonArray();
 			for(JsonElement e : asJsonArray){
@@ -146,7 +146,7 @@ public class AgentDataSubscriber extends EngineSubscriberResponseHandler{
 				}
 				if(relationMetadata != null) {
 					cypherQuery = buildRelationCypherQuery(relationMetadata, queryLabel);
-				} else if(dataUpdateSupported){
+				}else if(dataUpdateSupported){
 					cypherQuery = buildCypherQuery(queryLabel, uniqueKey);
 				}else{
 					cypherQuery = "UNWIND {props} AS properties CREATE (n"+queryLabel+") set n=properties return count(n)";
@@ -265,21 +265,21 @@ public class AgentDataSubscriber extends EngineSubscriberResponseHandler{
 	}
 
 	private <T> List<List<T>> partitionList(List<T> list, final int size) {
-		List<List<T>> parts = new ArrayList<List<T>>();
-		final int N = list.size();
-		for (int i = 0; i < N; i += size) {
-			/* parts.add(new ArrayList<T>(
+	    List<List<T>> parts = new ArrayList<List<T>>();
+	    final int N = list.size();
+	    for (int i = 0; i < N; i += size) {
+	       /* parts.add(new ArrayList<T>(
 	            list.subList(i, Math.min(N, i + size)))
 	        );*/
-			parts.add(getPartitionSubList(list,i,size,N));                 
-		}
-		return parts;
+	    	parts.add(getPartitionSubList(list,i,size,N));                 
+	    }
+	    return parts;
 	}
-
+	
 	private <T> ArrayList<T> getPartitionSubList(List<T> list, int index,int size, final int N){
 		return new ArrayList<T>(list.subList(index, Math.min(N, index + size)));
 	}
-
+	
 	private String buildCypherQuery(String labels, String fieldName){
 		StringBuffer query = new StringBuffer();
 		query.append("UNWIND {props} AS properties MERGE (node:LATEST").append(labels).append(" { ");
@@ -301,7 +301,7 @@ public class AgentDataSubscriber extends EngineSubscriberResponseHandler{
 		query.append("return count(node)").append(" ");
 		return query.toString();
 	}
-
+	
 	private String buildRelationCypherQuery(JsonObject relationMetadata, String labels) {
 		JsonObject source = relationMetadata.getAsJsonObject("source");
 		JsonObject destination = relationMetadata.getAsJsonObject("destination");
