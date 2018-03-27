@@ -156,6 +156,7 @@ class BaseAgent(object):
             action = data
             if "START" == action:
                 self.shouldAgentRun = True
+                self.publishHealthData(self.generateHealthData("Agent is in START mode"))
             if "STOP" == action:
                 self.shouldAgentRun = False
                 self.publishHealthData(self.generateHealthData("Agent is in STOP mode"))
