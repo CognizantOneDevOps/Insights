@@ -46,7 +46,7 @@
   },
   "graph": {
     "endpoint": "http://localhost:7474",
-    "authToken": "bmVvNGo6QzBnbml6YW50QDE=",
+    "authToken": "",
     "boltEndPoint": "bolt://localhost:7687",
     "maxIdleConnections": 25
   },
@@ -56,11 +56,11 @@
     "adminUserName": "admin",
     "adminUserPassword": "admin",
     "dbUserName": "grafana",
-    "dbPassword": "C0gnizant@1"
+    "dbPassword": "password"
   },
   "postgre": {
     "userName": "grafana",
-    "password": "C0gnizant@1",
+    "password": "passwords",
     "insightsDBUrl": "jdbc:postgresql://127.0.0.1:5432/insight",
     "grafanaDBUrl": "jdbc:postgresql://127.0.0.1:5432/grafana"
   },
