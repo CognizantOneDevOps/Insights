@@ -46,7 +46,7 @@ public class ApplicationConfigProvider implements Serializable{
 	private Date refreshTime;
 	private List<String> trustedHosts = new ArrayList<String>(3);	
 
-	private boolean enableOnlineDatatagging = true;
+	private boolean enableOnlineDatatagging = false;
 	private boolean enableNativeUsers;
     private boolean enableNativeCorrelations;
     private CorrelationConfig correlations;
