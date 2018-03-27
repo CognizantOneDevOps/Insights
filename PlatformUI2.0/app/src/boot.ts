@@ -77,7 +77,6 @@ module ISightApp {
             bindings:{}
 
         })
-<<<<<<< HEAD
         .directive('includeReplace', function () {
             return {
                 require: 'ngInclude',
@@ -100,9 +99,6 @@ module ISightApp {
         })
 
         .directive('demoFileModel', function ($parse) {
-=======
-		.directive('demoFileModel', function ($parse) {
->>>>>>> origin/master
             return {
                 restrict: 'A', //the directive can be used as an attribute only
                     
@@ -122,28 +118,19 @@ module ISightApp {
                         var fileSize = (<HTMLInputElement>element[0]).files[0].size;
                         if (fileSize > maxSize){
                            scope.maxSizeErr = true;
-<<<<<<< HEAD
 						   scope.imageSrc = "#";
 						   scope.showUploadBtn = false;
-=======
->>>>>>> origin/master
                         }else{
                         scope.showUploadBtn = true;
                         scope.file = (<HTMLInputElement>element[0]).files[0];
                         scope.getFile();
                         }
-<<<<<<< HEAD
 						scope.$apply();
-=======
->>>>>>> origin/master
                     });
                 }
             };
         })
-<<<<<<< HEAD
        
-=======
->>>>>>> origin/master
         .config(['$routeProvider', '$compileProvider',
             function($routeProvider, $compileProvider) {
                 $routeProvider.

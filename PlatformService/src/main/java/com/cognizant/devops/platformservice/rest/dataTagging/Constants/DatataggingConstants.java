@@ -34,4 +34,3 @@ public interface DatataggingConstants {
 	String CHILDREN="children";
 	String UNDEFINED="undefined";
 }
-

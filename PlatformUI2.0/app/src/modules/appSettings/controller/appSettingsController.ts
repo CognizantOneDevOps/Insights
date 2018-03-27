@@ -44,7 +44,6 @@ interface FileReaderEvent extends Event {
        selectedImageSrc: string;
        maxSizeErr: boolean = false;
 
-
        init($scope, $filter, appSettingsService, $resource, $http, $route, $window,homeController,selectedImageSrc,$cookies,restAPIUrlService) : void{
 
             $scope.uploadFile = function () {
