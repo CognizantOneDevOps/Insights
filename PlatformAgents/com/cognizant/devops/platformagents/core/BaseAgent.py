@@ -156,10 +156,10 @@ class BaseAgent(object):
             action = data
             if "START" == action:
                 self.shouldAgentRun = True
-                self.publishHealthData(self.generateHealthData("Agent is in START mode"))
+                self.publishHealthData(self.generateHealthData(note="Agent is in START mode"))
             if "STOP" == action:
                 self.shouldAgentRun = False
-                self.publishHealthData(self.generateHealthData("Agent is in STOP mode"))
+                self.publishHealthData(self.generateHealthData(note="Agent is in STOP mode"))
             ch.basic_ack(delivery_tag = method.delivery_tag)
         self.agentCtrlMessageFactory.subscribe(routingKey, callback)
            
@@ -267,7 +267,7 @@ class BaseAgent(object):
     def getResponseTemplate(self):
         return self.config.get('dynamicTemplate', {}).get('responseTemplate',None)
     
-    def generateHealthData(self, ex=None, systemFailure=False):
+    def generateHealthData(self, ex=None, systemFailure=False,note=None):
         data = []
         currentTime = self.getRemoteDateTime(datetime.now())
         health = { 'inSightsTimeX' : currentTime['time'], 'inSightsTime' : currentTime['epochTime'], 'executionTime' : int((datetime.now() - self.executionStartTime).total_seconds() * 1000)}
@@ -280,6 +280,8 @@ class BaseAgent(object):
             logging.error(ex)
         else:
             health['status'] = 'success'
+            if note != None:
+                health['message'] = note
         data.append(health)
         return data
     
