@@ -1,2 +1,2 @@
-pushd %INSIGHTS_AGENT_HOME%\PlatformAgents\bitbucket
+pushd %INSIGHTS_AGENT_HOME%\PlatformAgents
 python -c "from com.cognizant.devops.platformagents.agents.scm.bitbucketAllBranch.BitBucketAgentAllBranches  import BitBucketAgentAllBranches; BitBucketAgentAllBranches()"
