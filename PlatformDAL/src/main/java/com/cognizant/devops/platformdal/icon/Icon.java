@@ -1,5 +1,3 @@
-package com.cognizant.devops.platformdal.icon;
-
 /*******************************************************************************
  * Copyright 2017 Cognizant Technology Solutions
  *   
@@ -15,6 +13,8 @@ package com.cognizant.devops.platformdal.icon;
  * License for the specific language governing permissions and limitations under
  * the License.
  ******************************************************************************/
+package com.cognizant.devops.platformdal.icon;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -84,4 +84,3 @@ public class Icon {
 	}
 
 }
-

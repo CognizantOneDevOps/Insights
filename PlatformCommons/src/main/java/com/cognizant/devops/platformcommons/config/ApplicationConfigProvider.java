@@ -45,9 +45,12 @@ public class ApplicationConfigProvider implements Serializable{
 	private int proxyPort;
 	private Date refreshTime;
 	private List<String> trustedHosts = new ArrayList<String>(3);	
-	private boolean enableOnlineDatatagging = false;
+
+	private boolean enableOnlineDatatagging = true;
 	private boolean enableNativeUsers;
+    private boolean enableNativeCorrelations;
     private CorrelationConfig correlations;
+
     private EmailConfiguration emailConfiguration=new EmailConfiguration();
     private boolean enableFieldIndex;
 
@@ -213,6 +216,14 @@ public class ApplicationConfigProvider implements Serializable{
 	public void setTrustedHosts(List<String> trustedHosts) {
 		this.trustedHosts = trustedHosts;
 	}
+	
+    public boolean isEnableNativeCorrelations() {
+        return enableNativeCorrelations;
+    }
+
+    public void setEnableNativeCorrelations(boolean enableNativeCorrelations) {
+        this.enableNativeCorrelations = enableNativeCorrelations;
+    }
 
 	public String getInsightsServiceURL() {
 		return insightsServiceURL;

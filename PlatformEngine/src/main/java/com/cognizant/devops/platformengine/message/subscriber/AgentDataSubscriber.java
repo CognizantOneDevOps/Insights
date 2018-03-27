@@ -30,12 +30,10 @@ import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBException;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphResponse;
 import com.cognizant.devops.platformcommons.dal.neo4j.Neo4jDBHandler;
-<<<<<<< HEAD
+
 import com.cognizant.devops.platformcommons.dal.neo4j.NodeData;
 import com.cognizant.devops.platformengine.message.core.AgentDataConstants;
-=======
 import com.cognizant.devops.platformcommons.dal.neo4j.Neo4jFieldIndexRegistry;
->>>>>>> origin/master
 import com.cognizant.devops.platformengine.message.core.MessageConstants;
 import com.cognizant.devops.platformengine.message.factory.EngineSubscriberResponseHandler;
 import com.google.gson.Gson;
@@ -97,16 +95,6 @@ public class AgentDataSubscriber extends EngineSubscriberResponseHandler{
 					dataUpdateSupported = metadata.get("dataUpdateSupported").getAsBoolean();
 				}
 				if(metadata.has("uniqueKey")) {
-					uniqueKey = metadata.get("uniqueKey").getAsString();
-				}
-			}
-		}
-		Map<String,Map<String,NodeData>> metaDataMap=new HashMap<String,Map<String,NodeData>>();
-		Gson gson = new Gson();
-		if(enableOnlineDatatagging){
-			metaDataMap= getMetaData(dbHandler);
-		}
-=======
 					JsonArray uniqueKeyArray = metadata.getAsJsonArray("uniqueKey");
 					StringBuffer keys = new StringBuffer();
 					for(JsonElement key : uniqueKeyArray) {
@@ -119,10 +107,14 @@ public class AgentDataSubscriber extends EngineSubscriberResponseHandler{
 				if(metadata.has("relation")) {
 					relationMetadata = metadata.get("relation").getAsJsonObject();
 				}
+				}
 			}
+
+		Map<String,Map<String,NodeData>> metaDataMap=new HashMap<String,Map<String,NodeData>>();
+		Gson gson = new Gson();
+		if(enableOnlineDatatagging){
+			metaDataMap= getMetaData(dbHandler);
 		}
-		
->>>>>>> origin/master
 		if(json.isJsonArray()){
 			JsonArray asJsonArray = json.getAsJsonArray();
 			for(JsonElement e : asJsonArray){
@@ -152,13 +144,9 @@ public class AgentDataSubscriber extends EngineSubscriberResponseHandler{
 						queryLabel += ":"+label;
 					}
 				}
-<<<<<<< HEAD
-				if(dataUpdateSupported){
-=======
 				if(relationMetadata != null) {
 					cypherQuery = buildRelationCypherQuery(relationMetadata, queryLabel);
-				}else if(dataUpdateSupported){
->>>>>>> origin/master
+				} else if(dataUpdateSupported){
 					cypherQuery = buildCypherQuery(queryLabel, uniqueKey);
 				}else{
 					cypherQuery = "UNWIND {props} AS properties CREATE (n"+queryLabel+") set n=properties return count(n)";
@@ -291,13 +279,8 @@ public class AgentDataSubscriber extends EngineSubscriberResponseHandler{
 	private <T> ArrayList<T> getPartitionSubList(List<T> list, int index,int size, final int N){
 		return new ArrayList<T>(list.subList(index, Math.min(N, index + size)));
 	}
-<<<<<<< HEAD
 
-	private static String buildCypherQuery(String labels, String fieldName){
-=======
-	
 	private String buildCypherQuery(String labels, String fieldName){
->>>>>>> origin/master
 		StringBuffer query = new StringBuffer();
 		query.append("UNWIND {props} AS properties MERGE (node:LATEST").append(labels).append(" { ");
 		if(fieldName.contains(",")){
@@ -306,28 +289,19 @@ public class AgentDataSubscriber extends EngineSubscriberResponseHandler{
 			for(String field : fields){
 				searchCriteria.addProperty(field, field);
 				query.append(field).append(" : properties.").append(field).append(",");
-<<<<<<< HEAD
-=======
 				Neo4jFieldIndexRegistry.getInstance().syncFieldIndex(toolName, field);
->>>>>>> origin/master
 			}
 			query.delete(query.length()-1, query.length());
 			query.append(" ");
 		}else {
 			query.append(fieldName).append(" : ").append("properties.").append(fieldName);
-<<<<<<< HEAD
-=======
 			Neo4jFieldIndexRegistry.getInstance().syncFieldIndex(toolName, fieldName);
->>>>>>> origin/master
 		}
 		query.append(" }) set node+=properties ").append(" ");
 		query.append("return count(node)").append(" ");
 		return query.toString();
 	}
-<<<<<<< HEAD
-}
-=======
-	
+
 	private String buildRelationCypherQuery(JsonObject relationMetadata, String labels) {
 		JsonObject source = relationMetadata.getAsJsonObject("source");
 		JsonObject destination = relationMetadata.getAsJsonObject("destination");
@@ -385,4 +359,3 @@ public class AgentDataSubscriber extends EngineSubscriberResponseHandler{
 		return cypherQuery.toString();
 	}
 }
->>>>>>> origin/master

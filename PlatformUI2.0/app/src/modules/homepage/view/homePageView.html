@@ -121,13 +121,6 @@
 										
                                 </md-content>
                             </md-tab>
-							<md-tab label="Settings" ng-click="homePageController.selectAct('appSettings')">
-                                <md-content style="{{homePageController.mainContentMinHeight}}">
-                                   <div ng-if="homePageController.templateName == 'appSettings'" ng-include="'dist/modules/appSettings/view/appSettingsView.html'"
-                                        ng-controller="appSettingsController as appSettingsController" layout="vertical"></div>
-                                    
-                                </md-content>
-                            </md-tab>
                             <md-tab label="Settings" ng-click="homePageController.selectAct('appSettings')">
                                 <md-content style="{{homePageController.mainContentMinHeight}}">
                                    <div ng-if="homePageController.templateName == 'appSettings'" ng-include="'dist/modules/appSettings/view/appSettingsView.html'"
