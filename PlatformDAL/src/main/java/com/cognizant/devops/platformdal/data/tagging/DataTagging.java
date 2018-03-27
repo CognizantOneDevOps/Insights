@@ -30,7 +30,7 @@ public class DataTagging {
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private int id;
 	
-	@Column(name ="ROW_ID") 
+	@Column(name ="ROW_ID")
 	private int rowId;
 
 	@Column(name = "LEVEL1")
