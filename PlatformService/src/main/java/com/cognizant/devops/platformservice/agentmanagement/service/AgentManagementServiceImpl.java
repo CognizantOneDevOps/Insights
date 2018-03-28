@@ -234,9 +234,9 @@ public class AgentManagementServiceImpl  implements AgentManagementService{
 		try {
 			/*System.setProperty("http.proxyHost", "proxy.cognizant.com");
 			System.setProperty("http.proxyPort","6050");*/
-			//::TODO Remove /testagents from the URL. This has been added for testing purpose.
+
 			String filePath = ApplicationConfigProvider.getInstance().getAgentDetails().getDocrootUrl()
-					+"/"+version+"/agents/testagents/"+tool;
+					+"/"+version+"/agents/"+tool;
 			filePath=filePath.trim()+"/"+tool.trim()+".zip";
 			String targetDir =  ApplicationConfigProvider.getInstance().getAgentDetails().getUnzipPath()+File.separator+tool;
 			configJson = AgentManagementUtil.getInstance().getAgentConfigfile(new URL(filePath), new File(targetDir)).toString();
@@ -251,7 +251,7 @@ public class AgentManagementServiceImpl  implements AgentManagementService{
 	private ArrayList<String> getAgents(String version) {
 
 		Document doc;
-		String url = ApplicationConfigProvider.getInstance().getAgentDetails().getDocrootUrl()+"/"+version+"/agents/testagents/";
+		String url = ApplicationConfigProvider.getInstance().getAgentDetails().getDocrootUrl()+"/"+version+"/agents/";
 		ArrayList<String> tools = new ArrayList<String>();
 		try {
 			doc = Jsoup.connect(url).get();
