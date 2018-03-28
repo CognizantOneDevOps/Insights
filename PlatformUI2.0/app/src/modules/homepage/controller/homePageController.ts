@@ -85,8 +85,8 @@ module ISightApp {
 
                 });
 
-            self.selectedIndex = 2;
-            self.templateName = 'dashboards';
+            //self.selectedIndex = 2;
+            //self.templateName = 'dashboards';
 
             let location = this.$location;
             let uiConfigJsonUrl: string = location.absUrl().replace(location.path(), "");
