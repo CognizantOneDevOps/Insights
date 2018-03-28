@@ -35,10 +35,13 @@ module ISightApp {
         .service('restAPIUrlService', RestAPIUrlService)
         .service('restCallHandlerService', RestCallHandlerService)
         .service('dataTaggingService', DataTaggingService)
-        .service('singleToolConfigService', SingleToolConfigService)
+        .service('dataOnBoardingService', DataOnBoardingService)
+        .service('dataTaggingDetailsService', DataTaggingDetailsService)
+       	.service('singleToolConfigService', SingleToolConfigService)        
         .service('insightsService', InsightsService)
 		.service('platformServiceStatusService', PlatformServiceStatusService)
 		.service('appSettingsService', AppSettingsService)
+
         .controller('pipelineController', PipelineController)
         .controller('homePageController', HomePageController)
         .controller('toolsConfigurationController', ToolsConfigurationController)
@@ -51,8 +54,10 @@ module ISightApp {
         .controller('agentController', AgentController)
         .controller('singleToolConfigurationController', SingleToolConfigurationController)
         .controller('dataTaggingController', DataTaggingController)
+	    .controller('dataTaggingDetailsController', DataTaggingDetailsController)
+        .controller('FileUploadController', FileUploadController)
+        .controller('appSettingsController', AppSettingsController)
         .controller('insightsController', InsightsController)
-		.controller('appSettingsController', AppSettingsController)
         .component('footer', {
             templateUrl: './dist/components/footer/view/footerView.html',
             controller: FooterController,
@@ -72,7 +77,28 @@ module ISightApp {
             bindings:{}
 
         })
-		.directive('demoFileModel', function ($parse) {
+        .directive('includeReplace', function () {
+            return {
+                require: 'ngInclude',
+                restrict: 'A',
+                link: function(scope, tElem, tAttrs) {
+
+                    tElem.replaceWith(tElem.children());
+                }
+            };
+        })
+        
+       .directive('row', function() {
+            return {
+                restrict: 'EA',
+                scope: { children:"=" , myVar: '=' ,clickHandler:"&",  'test': '=test', 'count': '=count' },
+                controller: RecursiveLiController,
+                templateUrl: './dist/modules/dataTaggingDetails/view/test.html'
+
+            };
+        })
+
+        .directive('demoFileModel', function ($parse) {
             return {
                 restrict: 'A', //the directive can be used as an attribute only
                     
@@ -92,15 +118,19 @@ module ISightApp {
                         var fileSize = (<HTMLInputElement>element[0]).files[0].size;
                         if (fileSize > maxSize){
                            scope.maxSizeErr = true;
+						   scope.imageSrc = "#";
+						   scope.showUploadBtn = false;
                         }else{
                         scope.showUploadBtn = true;
                         scope.file = (<HTMLInputElement>element[0]).files[0];
                         scope.getFile();
                         }
+						scope.$apply();
                     });
                 }
             };
         })
+       
         .config(['$routeProvider', '$compileProvider',
             function($routeProvider, $compileProvider) {
                 $routeProvider.

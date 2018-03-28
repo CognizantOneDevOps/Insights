@@ -20,7 +20,6 @@ public interface DatataggingConstants {
 	String VALUE = "value";
 	String EXCEL_FILE="data/data.csv";
 	String COLON=":";
-//	String PROPERTY="property";
 	String LEVEL1="level_1";
 	String LEVEL2="level_2";
 	String LEVEL3="level_3";
@@ -31,4 +30,7 @@ public interface DatataggingConstants {
 	String PROPERTY_VALUE="propertyValue";
 	String HIEARCHYNAME="hiearchyName";
 	String CREATIONDATE="creationDate";
+	String NAME="name";
+	String CHILDREN="children";
+	String UNDEFINED="undefined";
 }
