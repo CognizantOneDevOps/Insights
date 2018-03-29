@@ -29,6 +29,7 @@ import com.cognizant.devops.platformcommons.config.ApplicationConfigCache;
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformengine.modules.aggregator.EngineAggregatorModule;
 import com.cognizant.devops.platformengine.modules.correlation.EngineCorrelatorModule;
+import com.cognizant.devops.platformengine.modules.datapurging.DataPurgingExecutor;
 import com.cognizant.devops.platformengine.modules.mapper.ProjectMapperModule;
 
 /**
@@ -94,6 +95,18 @@ public class Application {
 						.withIntervalInSeconds(defaultInterval)
 						.repeatForever())
 				.build();
+		// Schedule the DataPurging Executor Job
+		JobDetail dataPurgingJob = JobBuilder.newJob(DataPurgingExecutor.class)
+				.withIdentity("DataPurgingExecutor", "iSight")
+				.build();
+
+		Trigger dataPurgingTrigger = TriggerBuilder.newTrigger()
+				.withIdentity("DataPurgingExecutorTrigger", "iSight")
+				.startNow()
+				.withSchedule(SimpleScheduleBuilder.simpleSchedule()
+						.withIntervalInSeconds(defaultInterval)
+						.repeatForever())
+				.build();
 
 		// Tell quartz to schedule the job using our trigger
 		Scheduler scheduler;
@@ -103,6 +116,7 @@ public class Application {
 			scheduler.scheduleJob(aggrgatorJob, aggregatorTrigger);
 			scheduler.scheduleJob(correlationJob, correlationTrigger);
 			scheduler.scheduleJob(projectMappingJob, projectMappingTrigger);
+			scheduler.scheduleJob(dataPurgingJob, dataPurgingTrigger);
 		} catch (SchedulerException e) {
 			log.error(e);
 		}

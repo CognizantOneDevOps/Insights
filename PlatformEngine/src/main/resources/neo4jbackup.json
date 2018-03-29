@@ -1,10 +1,13 @@
 {
-	"labels" : [ 'DATATAGGING' ] ,
-  	
-  	"limit" : "4" ,
-  	
-  	"backupLocation" : "D://download" ,
-  	
-  	"deleteFrom" : "10";
- 
+	
+	"settingsJson" :{
+		"labels" :  ["DATATAGGING"] ,
+		"rowLimit": "4",
+		"backupFileLocation":"C://downloads",
+		"backupFileFormat" : "CSV",
+		"backupFileName" : "backup",
+		"backupDurationInDays" : "180"
+	}
+	
+	
  } 

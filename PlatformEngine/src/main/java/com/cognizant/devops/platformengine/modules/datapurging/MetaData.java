@@ -1,4 +1,4 @@
-package com.cognizant.devops.platformengine.backup;
+package com.cognizant.devops.platformengine.modules.datapurging;
 
 public class MetaData {
 	

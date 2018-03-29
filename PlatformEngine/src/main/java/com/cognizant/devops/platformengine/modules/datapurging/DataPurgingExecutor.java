@@ -1,11 +1,7 @@
-package com.cognizant.devops.platformengine.backup;
+package com.cognizant.devops.platformengine.modules.datapurging;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -15,31 +11,45 @@ import java.util.List;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 import org.apache.log4j.Logger;
+import org.quartz.Job;
+import org.quartz.JobExecutionContext;
+import org.quartz.JobExecutionException;
 
 import com.cognizant.devops.platformcommons.config.ApplicationConfigCache;
-import com.cognizant.devops.platformcommons.constants.ConfigOptions;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBException;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphResponse;
 import com.cognizant.devops.platformcommons.dal.neo4j.Neo4jDBHandler;
+import com.cognizant.devops.platformdal.settingsconfig.SettingsConfigurationDAL;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
 
-public class Neo4jBackupexecutor {
+public class DataPurgingExecutor implements Job {
 
-	static Logger log = Logger.getLogger(Neo4jBackupexecutor.class.getName());
+	
+	private static Logger log = Logger.getLogger(DataPurgingExecutor.class.getName());
+	protected static final String  DATAPURGING_SETTINGS_TYPE = "DATAPURGING";
+
+	public void execute(JobExecutionContext context) throws JobExecutionException {
+		try {
+			getLabelsAndNodes();
+		} catch (GraphDBException e) {
+			log.error(e);
+		}
+	}
+
 
 	public  void getLabelsAndNodes() throws GraphDBException{
 		List<String> labelList = new ArrayList<String>();
 		boolean isDelete = false;
-		String limit = null ;
-		String fileLocation = null ;
-		int deleteFrom = 0;
+		String rowLimit = null ;
+		String backupFileLocation = null ;
+		int backupDurationInDays = 0;
 		// reading data from neo4jbackup.json file in classpath 
-		File backupFile = new File(ConfigOptions.DATABACKUP_RESOLVED_PATH);
+		/*
+		 * File backupFile = new File(ConfigOptions.DATABACKUP_RESOLVED_PATH);
 		JsonObject backupJsonObj = new JsonObject();
 		if (!backupFile.exists()) {
 			URL resource = ApplicationConfigCache.class.getClassLoader().getResource(ConfigOptions.NEO4JBACKUP_TEMPLATE);
@@ -62,10 +72,29 @@ public class Neo4jBackupexecutor {
 			log.error("Unable to find  back up json file: "+ConfigOptions.DATABACKUP_RESOLVED_PATH, e);
 		} catch (IOException e) {
 			log.error(e);
+		}*/
+		
+		/**
+		 * To get Settings Configuration which is set by User from Insights application UI
+		 * is stored into Settings_Configuration table of PostGres database
+		 */
+		JsonObject configJsonObj = getSettingsJsonObject(); 
+		if (configJsonObj != null) {
+			JsonArray array = configJsonObj.get("labels").getAsJsonArray();
+			if (array != null) {
+				for (int i = 0; i < array.size(); i++) {
+					labelList.add(array.get(i).getAsString());
+				}
+			}			
+			rowLimit = configJsonObj.get("rowLimit") .getAsString();
+			backupFileLocation =configJsonObj.get("backupFileLocation").getAsString();
+			backupDurationInDays = -(configJsonObj.get("backupDurationInDays").getAsInt());
 		}
+		
+		
 		//convert to epoch time 
 		Calendar cal = GregorianCalendar.getInstance();
-		cal.add( Calendar.DAY_OF_YEAR, deleteFrom);
+		cal.add( Calendar.DAY_OF_YEAR, backupDurationInDays);
 		Date tenDaysAgo = cal.getTime();
 		long epochTime = tenDaysAgo.getTime() /1000;
 		Neo4jDBHandler dbHandler = new Neo4jDBHandler();
@@ -76,14 +105,14 @@ public class Neo4jBackupexecutor {
 			int splitlength = 0;
 			int count = getNodeCnt(dbHandler, label ,epochTime);
 			while(splitlength  < count){
-				GraphResponse response = executeCypherQuery(label ,limit.toString(),splitlength , epochTime) ;
-				String location = fileLocation.toString() +"/"+ label+ "_"+splitlength + ".csv";
+				GraphResponse response = executeCypherQuery(label ,rowLimit,splitlength , epochTime) ;
+				String location = backupFileLocation +"/"+ label+ "_"+splitlength + ".csv";
 				try {
 					writeToCSVFile(response , location);
 				} catch (IOException e) {
 					log.error(e);
 				}
-				splitlength = splitlength + Integer.parseInt(limit);
+				splitlength = splitlength + Integer.parseInt(rowLimit);
 			}	
 			if( labelSize >= labelList.size()){
 				isDelete = true;
@@ -151,12 +180,24 @@ public class Neo4jBackupexecutor {
 		csvPrinter.close();
 
 	}
+	
+	private JsonObject getSettingsJsonObject() {
+		SettingsConfigurationDAL settingsConfigurationDAL = new SettingsConfigurationDAL();	
+		String settingsJson = settingsConfigurationDAL.getSettingsJsonObject(DATAPURGING_SETTINGS_TYPE);
+		if (settingsJson != null && !settingsJson.isEmpty()) {
+			Gson gson = new Gson();
+			JsonElement jelement = gson.fromJson(settingsJson.trim(),JsonElement.class);
+			return jelement.getAsJsonObject();
+		}
+		return null;
+	}
 
 
 	public static void main(String[] a){
-		Neo4jBackupexecutor neo4j=new Neo4jBackupexecutor();
+		DataPurgingExecutor dataPurgingExecutor=new DataPurgingExecutor();
+		ApplicationConfigCache.loadConfigCache();
 		try {
-			neo4j.getLabelsAndNodes();
+			dataPurgingExecutor.getLabelsAndNodes();
 		} catch (GraphDBException e) {
 			log.error(e);
 		}
