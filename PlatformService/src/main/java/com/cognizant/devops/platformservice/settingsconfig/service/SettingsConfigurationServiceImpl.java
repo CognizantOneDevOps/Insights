@@ -32,8 +32,15 @@ public class SettingsConfigurationServiceImpl implements SettingsConfigurationSe
 		SettingsConfiguration settingsConfiguration = populateSettingsConfiguration(settingsJson,settingsType, activeFlag, lastModifiedByUser);
 		SettingsConfigurationDAL settingsConfigurationDAL = new SettingsConfigurationDAL();		
 		return settingsConfigurationDAL.saveSettingsConfiguration(settingsConfiguration);		
+	}	
+
+	@Override
+	public SettingsConfiguration loadSettingsConfiguration(String settingsType) {
+		SettingsConfigurationDAL settingsConfigurationDAL = new SettingsConfigurationDAL();		
+		return settingsConfigurationDAL.loadSettingsConfiguration(settingsType);	
 	}
 	
+
 	private SettingsConfiguration populateSettingsConfiguration(String settingsJson, String settingsType,
 			String activeFlag, String lastModifiedByUser) {
 		SettingsConfiguration settingsConfiguration = new SettingsConfiguration();
@@ -42,14 +49,6 @@ public class SettingsConfigurationServiceImpl implements SettingsConfigurationSe
 		settingsConfiguration.setActiveFlag(activeFlag);
 		settingsConfiguration.setLastModifiedByUser(lastModifiedByUser);
 		return settingsConfiguration;
-	}
-
-	@Override
-	public SettingsConfiguration loadSettingsConfiguration(String settingsType) {
-		SettingsConfigurationDAL settingsConfigurationDAL = new SettingsConfigurationDAL();		
-		return settingsConfigurationDAL.loadSettingsConfiguration(settingsType);	
-	}
-	
-		
+	}	
 
 }
