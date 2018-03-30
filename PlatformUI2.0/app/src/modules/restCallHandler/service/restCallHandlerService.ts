@@ -61,11 +61,13 @@ module ISightApp {
         post(url: string, requestParams?: Object, additionalheaders?: Object) {
 
             var restCallUrl = this.restAPIUrlService.getRestCallUrl(url);
+
             var headers;
             var authToken = this.$cookies.get('Authorization');
             var defaultHeader = {
                                     'Authorization': authToken
                                 };
+            
             if (this.checkValidObject(additionalheaders)) {
                 headers = this.extend(defaultHeader,additionalheaders);
             }else {
