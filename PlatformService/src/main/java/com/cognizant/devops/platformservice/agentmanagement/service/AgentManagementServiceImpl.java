@@ -91,7 +91,7 @@ public class AgentManagementServiceImpl  implements AgentManagementService{
 			//Create zip/tar file with updated config.json
 			Path agentZipPath =updateAgentConfig(toolName,agentId,json);
 			byte[] data = Files.readAllBytes(agentZipPath);
-			sendAgentPackage(data,agentId,agentId,toolName,osversion);
+			sendAgentPackage(data,toolName,agentId,toolName,osversion);
 			performAgentAction(agentId,AGENTSTATUS.START.name());
 		} catch (Exception e) {
 			LOG.error("Error while registering agent "+toolName, e);
@@ -159,7 +159,7 @@ public class AgentManagementServiceImpl  implements AgentManagementService{
 			Path agentZipPath = updateAgentConfig(toolName,agentId,json);
 
 			byte[] data = Files.readAllBytes(agentZipPath);
-			sendAgentPackage(data,agentId,agentId,toolName,osversion);
+			sendAgentPackage(data,toolName,agentId,toolName,osversion);
 
 		} catch (Exception e) {
 			LOG.error("Error updating and installing agent", e);
