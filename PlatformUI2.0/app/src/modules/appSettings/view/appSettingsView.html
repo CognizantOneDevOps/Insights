@@ -16,9 +16,17 @@
  ******************************************************************************
  -->
 <div layout="row" flex>
-   <div layout style="width: 100%;font-family:proxima_novaregular">
-      <div  class="applicationContentCss" style="width: 100%;">
-         <div    ng-controller="appSettingsController" style="width: 100%;">
+   <div layout style="width: 100%;font-family:proxima_novaregular">  
+      <div  class="applicationContentCss" style="width: 100%;">	  
+		<div layout layout="row" layout-align="start center" class="appsub appsubheader">
+			<div ng-click="homePageController.selectAct('appSettings')"> 		
+					<span style="color:#00728f !important">Logo Setting</span>
+			</div>
+			<div ng-click="homePageController.selectAct('datapurgeSettings')"> 		
+					<span>Data Purging</span>
+			</div>
+		</div>
+         <div ng-controller="appSettingsController" style="width: 100%;">
             <div class="contentCss">
                <h4 style="color:#38840C;font-family:proxima_novaregular;font-size:16px">Customize your application settings.</h4>
                <div class="panel panel-default">
