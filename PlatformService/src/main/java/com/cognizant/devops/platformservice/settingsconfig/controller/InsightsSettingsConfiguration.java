@@ -35,7 +35,7 @@ public class InsightsSettingsConfiguration {
 
 	private static final Logger LOG = Logger.getLogger(InsightsSettingsConfiguration.class);
 
-	@Autowired
+	@Autowired	
 	SettingsConfigurationService settingsConfigurationService;
 
 	@RequestMapping(value = "/saveSettingsConfiguration", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
@@ -50,8 +50,8 @@ public class InsightsSettingsConfiguration {
 	}
 
 	@RequestMapping(value = "/loadSettingsConfiguration", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public @ResponseBody JsonObject loadSettingsConfiguration(@RequestParam int id ) {
-		SettingsConfiguration settingsConfiguration = settingsConfigurationService.loadSettingsConfiguration(id);		
+	public @ResponseBody JsonObject loadSettingsConfiguration(@RequestParam String settingsType ) {
+		SettingsConfiguration settingsConfiguration = settingsConfigurationService.loadSettingsConfiguration(settingsType);		
 		return PlatformServiceUtil.buildSuccessResponseWithData(settingsConfiguration);
 	}
 

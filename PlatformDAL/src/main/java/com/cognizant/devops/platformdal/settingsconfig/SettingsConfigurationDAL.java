@@ -29,9 +29,9 @@ public class SettingsConfigurationDAL extends BaseDAL {
 
 	public Boolean saveSettingsConfiguration(SettingsConfiguration settingsConfiguration) {
 		Query<SettingsConfiguration> createQuery = getSession().createQuery(
-				"FROM SettingsConfiguration SC WHERE SC.id = :id",
+				"FROM SettingsConfiguration SC WHERE SC.settingsType = :settingsType",
 				SettingsConfiguration.class);
-		createQuery.setParameter("id", settingsConfiguration.getId());
+		createQuery.setParameter("settingsType", settingsConfiguration.getSettingsType());
 		List<SettingsConfiguration> resultList = createQuery.getResultList();
 		SettingsConfiguration settingsConfig = null;
 		if(resultList != null && !resultList.isEmpty()){
@@ -55,14 +55,10 @@ public class SettingsConfigurationDAL extends BaseDAL {
 		return Boolean.TRUE;
 	}
 
-	public SettingsConfiguration loadSettingsConfiguration(int id) {
-		Query<SettingsConfiguration> loadQuery = getSession().createQuery("FROM SettingsConfiguration SC WHERE SC.id = :id", SettingsConfiguration.class);
-		loadQuery.setParameter("id", id);
-		SettingsConfiguration settingsConfiguration = new SettingsConfiguration();
-		List<SettingsConfiguration> settingsConfigurationList = loadQuery.getResultList();
-		if(settingsConfigurationList != null  && !settingsConfigurationList.isEmpty()){
-			settingsConfiguration = settingsConfigurationList.get(0);
-		}
+	public SettingsConfiguration loadSettingsConfiguration(String settingsType) {
+		Query<SettingsConfiguration> loadQuery = getSession().createQuery("FROM SettingsConfiguration SC WHERE SC.settingsType = :settingsType", SettingsConfiguration.class);
+		loadQuery.setParameter("settingsType", settingsType);
+		SettingsConfiguration settingsConfiguration = loadQuery.getSingleResult();
 		terminateSession();
 		terminateSessionFactory();
 		return settingsConfiguration;
@@ -73,13 +69,9 @@ public class SettingsConfigurationDAL extends BaseDAL {
 				"FROM SettingsConfiguration SC WHERE SC.settingsType = :settingsType",
 				SettingsConfiguration.class);
 		createQuery.setParameter("settingsType",settingsType );
-		List<SettingsConfiguration> resultList = createQuery.getResultList();
-		SettingsConfiguration settingsConfiguration = null;
-		if(resultList != null && !resultList.isEmpty()){
-			settingsConfiguration = resultList.get(0);
-			if (settingsConfiguration != null) {
-				return settingsConfiguration.getSettingsJson();				
-			}
+		SettingsConfiguration settingsConfiguration = createQuery.getSingleResult();
+		if (settingsConfiguration != null) {
+			return settingsConfiguration.getSettingsJson();				
 		}
 		return null;
 	}

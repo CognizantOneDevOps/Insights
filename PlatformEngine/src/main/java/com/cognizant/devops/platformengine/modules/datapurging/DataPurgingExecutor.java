@@ -15,7 +15,7 @@ import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 
-import com.cognizant.devops.platformcommons.config.ApplicationConfigCache;
+import com.cognizant.devops.platformcommons.constants.ConfigOptions;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBException;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphResponse;
 import com.cognizant.devops.platformcommons.dal.neo4j.Neo4jDBHandler;
@@ -30,7 +30,6 @@ public class DataPurgingExecutor implements Job {
 
 	
 	private static Logger log = Logger.getLogger(DataPurgingExecutor.class.getName());
-	protected static final String  DATAPURGING_SETTINGS_TYPE = "DATAPURGING";
 
 	public void execute(JobExecutionContext context) throws JobExecutionException {
 		try {
@@ -47,6 +46,7 @@ public class DataPurgingExecutor implements Job {
 		String rowLimit = null ;
 		String backupFileLocation = null ;
 		int backupDurationInDays = 0;
+		String backupFileName = null ;
 		// reading data from neo4jbackup.json file in classpath 
 		/*
 		 * File backupFile = new File(ConfigOptions.DATABACKUP_RESOLVED_PATH);
@@ -86,8 +86,9 @@ public class DataPurgingExecutor implements Job {
 					labelList.add(array.get(i).getAsString());
 				}
 			}			
-			rowLimit = configJsonObj.get("rowLimit") .getAsString();
+			rowLimit = configJsonObj.get("rowLimit").getAsString();
 			backupFileLocation =configJsonObj.get("backupFileLocation").getAsString();
+			backupFileName = configJsonObj.get("backupFileName").getAsString();
 			backupDurationInDays = -(configJsonObj.get("backupDurationInDays").getAsInt());
 		}
 		
@@ -97,16 +98,17 @@ public class DataPurgingExecutor implements Job {
 		cal.add( Calendar.DAY_OF_YEAR, backupDurationInDays);
 		Date tenDaysAgo = cal.getTime();
 		long epochTime = tenDaysAgo.getTime() /1000;
+		
 		Neo4jDBHandler dbHandler = new Neo4jDBHandler();
 		int labelSize = 0;
 		
 		for(String label : labelList){
 			labelSize = labelSize + 1;
 			int splitlength = 0;
-			int count = getNodeCnt(dbHandler, label ,epochTime);
+			int count = getNodeCnt(dbHandler, label ,epochTime);			
 			while(splitlength  < count){
 				GraphResponse response = executeCypherQuery(label ,rowLimit,splitlength , epochTime) ;
-				String location = backupFileLocation +"/"+ label+ "_"+splitlength + ".csv";
+				String location = backupFileLocation +"/"+ backupFileName+ "_"+splitlength + ".csv";
 				try {
 					writeToCSVFile(response , location);
 				} catch (IOException e) {
@@ -121,14 +123,14 @@ public class DataPurgingExecutor implements Job {
 		
 		if( isDelete){
 			for(String label : labelList){
-				String deleteQry =  "MATCH (n:"+label+")  where n.inSightsTime < "+ epochTime  +"   delete n ";
+				String deleteQry =  "MATCH (n:"+label+")  where n.inSightsTimeX < "+ epochTime  +"   delete n ";
 				dbHandler.executeCypherQuery(deleteQry);
 			}
 		}
 	}
 
 	private int getNodeCnt(Neo4jDBHandler dbHandler, String label, long epochTime) throws GraphDBException {
-		String cntQry = "MATCH (n:"+label+")  where n.inSightsTime < "+ epochTime  +"    return count(n) ";
+		String cntQry = "MATCH (n:"+label+")  where n.inSightsTimeX < "+ epochTime  +"    return count(n) ";
 		GraphResponse cntResponse = dbHandler.executeCypherQuery(cntQry);
 		int count = cntResponse.getJson() .get("results").getAsJsonArray().get(0).getAsJsonObject().get("data").getAsJsonArray()
 				.get(0).getAsJsonObject().get("row").getAsInt();
@@ -137,7 +139,7 @@ public class DataPurgingExecutor implements Job {
 
 	private GraphResponse executeCypherQuery(String label, String limit, int splitlength, long epochTime) throws GraphDBException {
 		Neo4jDBHandler dbHandler = new Neo4jDBHandler();
-		String query = "MATCH (n:"+label+")  where n.inSightsTime < "+ epochTime  +"   return n skip  "+ splitlength +" limit  " +limit;
+		String query = "MATCH (n:"+label+")  where n.inSightsTimeX < "+ epochTime  +"   return n skip  "+ splitlength +" limit  " +limit;
 		GraphResponse response = dbHandler.executeCypherQuery(query);
 		return response;
 	}
@@ -183,17 +185,17 @@ public class DataPurgingExecutor implements Job {
 	
 	private JsonObject getSettingsJsonObject() {
 		SettingsConfigurationDAL settingsConfigurationDAL = new SettingsConfigurationDAL();	
-		String settingsJson = settingsConfigurationDAL.getSettingsJsonObject(DATAPURGING_SETTINGS_TYPE);
+		String settingsJson = settingsConfigurationDAL.getSettingsJsonObject(ConfigOptions.DATAPURGING_SETTINGS_TYPE);
 		if (settingsJson != null && !settingsJson.isEmpty()) {
 			Gson gson = new Gson();
-			JsonElement jelement = gson.fromJson(settingsJson.trim(),JsonElement.class);
-			return jelement.getAsJsonObject();
+			JsonElement jsonElement = gson.fromJson(settingsJson.trim(),JsonElement.class);
+			return jsonElement.getAsJsonObject();
 		}
 		return null;
 	}
 
 
-	public static void main(String[] a){
+	/*public static void main(String[] a){
 		DataPurgingExecutor dataPurgingExecutor=new DataPurgingExecutor();
 		ApplicationConfigCache.loadConfigCache();
 		try {
@@ -201,6 +203,5 @@ public class DataPurgingExecutor implements Job {
 		} catch (GraphDBException e) {
 			log.error(e);
 		}
-
-	}
+	}*/
 }
