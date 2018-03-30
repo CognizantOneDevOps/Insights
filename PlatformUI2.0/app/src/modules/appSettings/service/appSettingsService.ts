@@ -20,6 +20,7 @@ module ISightApp {
     export interface IAppSettingsService {
         
         uploadLogoImage(file:string, uploadUrl:string): ng.IPromise<any>;
+		saveDatapurging(settingsDataType: string, activeDataFlag: string, lastModifiedUser: string, settingsJsonstr: string): ng.IPromise<any>;
       
     }
 
@@ -39,6 +40,16 @@ module ISightApp {
            return null;
           
         }
+		
+		saveDatapurging(settingsDataType: string, activeDataFlag: string, lastModifiedUser: string, settingsJsonstr: string): ng.IPromise<any> {
+            var restHandler = this.restCallHandlerService;
+            return restHandler.post("SAVE_DATAPURGING_SETTING",{'settingsType':settingsDataType, 'activeFlag':activeDataFlag, 'lastModifiedByUser': lastModifiedUser, 'settingsJson':settingsJsonstr},{'Content-Type': 'application/x-www-form-urlencoded'});           
+        }
+		
+		listDatapurgingdata(label: string):ng.IPromise<any> {
+			var restHandler = this.restCallHandlerService;			
+			return restHandler.get("LIST_DATAPURGING_SETTING",{'settingsType':label});	 
+		}
 
        
     }

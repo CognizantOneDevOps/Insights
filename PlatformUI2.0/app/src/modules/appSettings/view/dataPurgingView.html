@@ -1,0 +1,140 @@
+<!--
+ *******************************************************************************
+ * Copyright 2017 Cognizant Technology Solutions
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License.  You may obtain a copy
+ * of the License at
+ * 
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ ******************************************************************************
+ -->
+<div layout="row" flex>
+   <div layout style="width: 100%;font-family:proxima_novaregular">  
+      <div  class="applicationContentCss" style="width: 100%;">	  
+		<div layout layout="row" layout-align="start center" class="appsub appsubheader">
+			<div ng-click="homePageController.selectAct('appSettings')"> 		
+					<span>Logo Setting</span>
+			</div>
+			<div ng-click="homePageController.selectAct('datapurgeSettings')"> 		
+					<span style="color:#00728f !important">Data Purging</span>
+			</div>
+		</div>
+		<div style="width: 100%;">
+			<div class="contentCss">
+			   <h4 style="color:#38840C;font-family:proxima_novaregular;font-size:16px">Customize your DataPurging settings.</h4>
+			    <div ng-if="dataPurgingController.saveView">
+					<div class="panel panel-default">				  
+						<form name="frmdatapurging">
+							 <div layout="row" layout-align="space-between start" layout-wrap layout-margin layout-padding>
+								<div flex="30">							
+									<span>DataType</span>
+									<input class="inputBoxCont" ng-model="dataPurgingController.backupDatatype" style="width: 90%;">							
+								</div>
+								<div flex="35">
+									<span>Row Limit</span>
+									<input class="inputBoxCont" ng-model="dataPurgingController.rowLimit" style="width: 90%;">	
+								</div>
+								<div flex="30">
+									<span>Backup Location</span>
+									<input class="inputBoxCont" ng-model="dataPurgingController.fileLocation" style="width: 90%;">	
+								</div>						
+							 </div>
+							  <div layout="row" layout-align="space-between start" layout-wrap layout-margin layout-padding>
+								<div flex="30">							
+									<span>Backup File Format</span>
+									 <md-select class="searchApplicationBoxCont" md-no-asterisk="true" ng-model="dataPurgingController.fileFormat"  style="margin-top: 0px;margin-bottom:10px">
+									  <md-option value="CSV"  ng-selected="true" >CSV</md-option>
+									  <md-option value="JSON">JSON</md-option>
+									</md-select>
+								</div>
+								<div flex="35">
+									<span>Backup File Name</span>
+									<input class="inputBoxCont" ng-model="dataPurgingController.fileName" style="width: 90%;">	
+								</div>
+								<div flex="30">
+									<span>Backup Duration (in Days)</span>
+									<input class="inputBoxCont" ng-model="dataPurgingController.duration" style="width: 90%;">	
+								</div>						
+							 </div>
+							  <div layout layout-align="end end">               			
+								 <md-button type="submit" class="md-raised md-primary configureBut" ng-click="dataPurgingController.saveData()">
+									Save
+								</md-button>
+							</div>
+						</form>
+					</div>
+				</div>
+				<div ng-if="dataPurgingController.listView">						
+					<div layout="row">	
+						<div flex="70" layout layout-align="center center" class="selectToolTxt">
+							<div ng-if="dataPurgingController.showConfirmMessage != ''" style="text-transform: capitalize;"  id="confrmMsg">	{{dataPurgingController.showConfirmMessage}}
+							</div>
+						</div>
+						
+						<div flex="30" layout layout-align="end end">
+							<md-button class="md-raised md-primary configureBut" ng-click="dataPurgingController.addData()">Add</md-button>
+						</div>		
+					</div>		
+					 <div ng-if="dataPurgingController.showThrobber" layout-sm="column" layout-align="center center" style="margin-left: 46%;margin-top: 46px;">
+							<md-progress-circular md-mode="indeterminate" md-diameter="50"></md-progress-circular>
+					</div>
+					<div layout layout-align="center center" style="margin-top: 25px;">
+					<table class="md-api-table-landing" style="border: 1px solid #a5d28b;width:100%">
+						<thead class="theadCss">
+						<tr layout="row" layout-align="start center">
+							<th flex="20" class="tableHeader">
+								<span>Labels</span>
+							</th>
+							<th flex="20" class="tableHeader">
+								<span>Rowlimit</span>
+							</th>
+							<th flex="20" class="tableHeader">
+								<span>Location</span>
+							</th>
+							<th flex="20" class="tableHeader">
+								<span>Format</span>
+							</th>
+							<th flex="20" class="tableHeader">
+								<span>File Name</span>
+							</th>
+							<th flex="20" class="tableHeader">
+								<span>Duration</span>
+							</th>
+							<th flex="20" class="tableHeader">
+								<span>Action</span>
+							</th>
+						</tr>
+						</thead>
+						<tbody>
+							<tr layout="row" layout-align="start center" ng-if="!dataPurgingController.showTble">
+								<td flex="20" class="tableContentStyle">{{dataPurgingController.settingData.labels}}</td>
+								<td flex="20" class="tableContentStyle">{{dataPurgingController.settingData.rowLimit}}</td>
+								<td flex="20" class="tableContentStyle">{{dataPurgingController.settingData.backupFileLocation}}</td>
+								<td flex="20" class="tableContentStyle">{{dataPurgingController.settingData.backupFileFormat}}</td>
+								<td flex="20" class="tableContentStyle">{{dataPurgingController.settingData.backupFileName}}</td>
+								<td flex="20" class="tableContentStyle">{{dataPurgingController.settingData.backupDurationInDays}}</td>
+								<td flex="20" class="tableContentStyle">
+								<md-icon md-svg-src="dist/icons/svg/userOnboarding/Edit_icon_MouseOver.svg" ng-style="{color: '#4ca64c', height: '25px', width: '25px'}"></md-icon>
+								</td>								
+								
+							</tr>							
+							<tr layout="row" layout-align="center center" ng-if="dataPurgingController.showTble">
+								<td colspan="8" ng-if="dataPurgingController.showTble"><span>No Record found</span></td>
+							</tr>
+						</tbody>
+					</table>										
+					</div>						
+				</div>
+				
+			</div>
+		</div>
+      </div>
+   </div>
+</div>

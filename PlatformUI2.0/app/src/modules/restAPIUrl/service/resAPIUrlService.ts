@@ -103,7 +103,11 @@ module ISightApp {
 		  this.addEndPoint("INSIGHTS_COMP_STATUS",'/PlatformService/ServicesHealthStatus/getStatus');
 		  
 		  this.addEndPoint("UPLOAD_IMAGE",'/PlatformService/settings/uploadCustomLogo');
-		  this.addEndPoint("GET_LOGO_IMAGE",'/Plagit tformService/settings/getLogoImage');
+		  this.addEndPoint("GET_LOGO_IMAGE",'/PlatformService/settings/getLogoImage');
+		  
+		  this.addEndPoint("SAVE_DATAPURGING_SETTING",'/PlatformService/admin/settingsConfiguration/saveSettingsConfiguration');
+		  this.addEndPoint("LIST_DATAPURGING_SETTING",'/PlatformService/admin/settingsConfiguration/loadSettingsConfiguration');
+
         }
 
        addEndPoint(name:string, url:string){
