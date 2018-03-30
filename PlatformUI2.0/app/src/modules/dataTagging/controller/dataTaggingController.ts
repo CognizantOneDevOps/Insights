@@ -76,6 +76,8 @@ module ISightApp {
         goToUserOnBoard(): void {
             this.homeController.templateName = 'userOnboarding';
         }
+
+       
         addApplication(params, addedApplicationName): void {
             var self = this;
             var statusObject = {
