@@ -45,10 +45,11 @@ public class SettingsConfigurationServiceImpl implements SettingsConfigurationSe
 	}
 
 	@Override
-	public SettingsConfiguration loadSettingsConfiguration(int id) {
+	public SettingsConfiguration loadSettingsConfiguration(String settingsType) {
 		SettingsConfigurationDAL settingsConfigurationDAL = new SettingsConfigurationDAL();		
-		return settingsConfigurationDAL.loadSettingsConfiguration(id);	
+		return settingsConfigurationDAL.loadSettingsConfiguration(settingsType);	
 	}
 	
+		
 
 }

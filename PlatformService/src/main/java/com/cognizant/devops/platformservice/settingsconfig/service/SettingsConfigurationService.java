@@ -22,6 +22,6 @@ import com.cognizant.devops.platformdal.settingsconfig.SettingsConfiguration;
 public interface SettingsConfigurationService {
 
 	public Boolean saveSettingsConfiguration(String settingsJson,String settingsType,String activeFlag,String lastModifiedByUser);
-	public SettingsConfiguration loadSettingsConfiguration(int id);
+	public SettingsConfiguration loadSettingsConfiguration(String settingsType);
 }
  
