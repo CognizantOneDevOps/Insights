@@ -48,4 +48,8 @@ public interface ConfigOptions {
 	String NEO4JBACKUP_TEMPLATE = "neo4jbackup.json";
 	String DATABACKUP_RESOLVED_PATH = System.getenv().get(INSIGHTS_HOME) + FILE_SEPERATOR + ConfigOptions.CONFIG_DIR + FILE_SEPERATOR + ConfigOptions.NEO4JBACKUP_TEMPLATE;
 	String DATAPURGING_SETTINGS_TYPE = "DATAPURGING";
+	String ROW_LIMIT = "rowLimit";
+	String BACKUP_FILE_LOCATION = "backupFileLocation";
+	String BACKUP_FILE_NAME = "backupFileName";
+	String BACKUP_DURATION_IN_DAYS = "backupDurationInDays";
 }
