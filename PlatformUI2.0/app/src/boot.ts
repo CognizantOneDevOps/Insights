@@ -17,7 +17,7 @@
 /// <reference path="_all.ts" />
 
 module ISightApp {
-    angular.module('iSightApp', ['ngMaterial', 'ngRoute', 'ngResource', 'ngMessages', 'ngCookies','ngAnimate','ui.bootstrap','googlechart'])
+    angular.module('iSightApp', ['ngMaterial', 'ngRoute', 'ngResource', 'ngMessages', 'ngCookies','ngAnimate','ui.bootstrap','googlechart','ngTable'])
         .service('pipelineService', PipelineService)
         .service('graphService', GraphService)
         .service('elasticSearchService', ElasticSearchService)
@@ -53,6 +53,7 @@ module ISightApp {
         .controller('dataTaggingController', DataTaggingController)
         .controller('insightsController', InsightsController)
 		.controller('appSettingsController', AppSettingsController)
+		.controller('dataPurgingController', DataPurgingController)
         .component('footer', {
             templateUrl: './dist/components/footer/view/footerView.html',
             controller: FooterController,
