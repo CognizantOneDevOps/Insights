@@ -1,3 +1,18 @@
+/*******************************************************************************
+ * Copyright 2017 Cognizant Technology Solutions
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License.  You may obtain a copy
+ * of the License at
+ * 
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ ******************************************************************************/
 package com.cognizant.devops.platformengine.modules.datapurging;
 
 import java.io.FileWriter;
@@ -47,33 +62,7 @@ public class DataPurgingExecutor implements Job {
 		String backupFileLocation = null ;
 		int backupDurationInDays = 0;
 		String backupFileName = null ;
-		// reading data from neo4jbackup.json file in classpath 
-		/*
-		 * File backupFile = new File(ConfigOptions.DATABACKUP_RESOLVED_PATH);
-		JsonObject backupJsonObj = new JsonObject();
-		if (!backupFile.exists()) {
-			URL resource = ApplicationConfigCache.class.getClassLoader().getResource(ConfigOptions.NEO4JBACKUP_TEMPLATE);
-			if (resource != null) {
-				backupFile = new File(resource.getFile());
-			}
-		}
-		try(FileReader fileReader = new FileReader(backupFile)){
-			JsonElement jsonElement = new JsonParser().parse(fileReader);
-			backupJsonObj = jsonElement.getAsJsonObject();
-			JsonArray array = backupJsonObj.get("labels").getAsJsonArray();
-			for (int i = 0; i < array.size(); i++) {
-				labelList.add(array.get(i).getAsString());
-			}
-			limit = backupJsonObj.get("limit") .getAsString();
-			fileLocation =backupJsonObj.get("backupLocation").getAsString();
-			deleteFrom = -(backupJsonObj.get("deleteFrom").getAsInt());
-
-		} catch (FileNotFoundException e) {
-			log.error("Unable to find  back up json file: "+ConfigOptions.DATABACKUP_RESOLVED_PATH, e);
-		} catch (IOException e) {
-			log.error(e);
-		}*/
-		
+				
 		/**
 		 * To get Settings Configuration which is set by User from Insights application UI
 		 * is stored into Settings_Configuration table of PostGres database
@@ -86,10 +75,10 @@ public class DataPurgingExecutor implements Job {
 					labelList.add(array.get(i).getAsString());
 				}
 			}			
-			rowLimit = configJsonObj.get("rowLimit").getAsString();
-			backupFileLocation =configJsonObj.get("backupFileLocation").getAsString();
-			backupFileName = configJsonObj.get("backupFileName").getAsString();
-			backupDurationInDays = -(configJsonObj.get("backupDurationInDays").getAsInt());
+			rowLimit = configJsonObj.get(ConfigOptions.ROW_LIMIT).getAsString();
+			backupFileLocation =configJsonObj.get(ConfigOptions.BACKUP_FILE_LOCATION).getAsString();
+			backupFileName = configJsonObj.get(ConfigOptions.BACKUP_FILE_NAME).getAsString();
+			backupDurationInDays = -(configJsonObj.get(ConfigOptions.BACKUP_DURATION_IN_DAYS).getAsInt());
 		}
 		
 		

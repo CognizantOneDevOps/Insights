@@ -58,7 +58,11 @@ public class SettingsConfigurationDAL extends BaseDAL {
 	public SettingsConfiguration loadSettingsConfiguration(String settingsType) {
 		Query<SettingsConfiguration> loadQuery = getSession().createQuery("FROM SettingsConfiguration SC WHERE SC.settingsType = :settingsType", SettingsConfiguration.class);
 		loadQuery.setParameter("settingsType", settingsType);
-		SettingsConfiguration settingsConfiguration = loadQuery.getSingleResult();
+		List<SettingsConfiguration> results = loadQuery.getResultList();
+		SettingsConfiguration settingsConfiguration = null;
+		if (results != null && !results.isEmpty()) {
+			settingsConfiguration = results.get(0);
+		}
 		terminateSession();
 		terminateSessionFactory();
 		return settingsConfiguration;
@@ -69,10 +73,14 @@ public class SettingsConfigurationDAL extends BaseDAL {
 				"FROM SettingsConfiguration SC WHERE SC.settingsType = :settingsType",
 				SettingsConfiguration.class);
 		createQuery.setParameter("settingsType",settingsType );
-		SettingsConfiguration settingsConfiguration = createQuery.getSingleResult();
-		if (settingsConfiguration != null) {
-			return settingsConfiguration.getSettingsJson();				
-		}
+		List<SettingsConfiguration> results = createQuery.getResultList();
+		SettingsConfiguration settingsConfiguration = null;
+		if (results != null && !results.isEmpty()) {
+			settingsConfiguration = results.get(0);
+			if (settingsConfiguration != null) {
+				return settingsConfiguration.getSettingsJson();				
+			}
+		}		
 		return null;
 	}
 		

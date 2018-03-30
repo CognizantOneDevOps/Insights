@@ -51,13 +51,13 @@ public class SettingsConfiguration {
 	@Column(name ="SETTINGS_JSON",length = 1023)
 	private String settingsJson;
 	
-	@Column(name = "SETTINGS_TYPE")
+	@Column(name = "SETTINGS_TYPE", unique = true, nullable = false)
 	private String settingsType;
 	
 	@Column(name = "ACTIVE_FLAG")
 	private String activeFlag;
 	
-		@Column(name = "CREATED_DATE")
+	@Column(name = "CREATED_DATE")
 	private Date createdDate;
 
 	@Column(name = "LAST_MODIFIED_DATE")
