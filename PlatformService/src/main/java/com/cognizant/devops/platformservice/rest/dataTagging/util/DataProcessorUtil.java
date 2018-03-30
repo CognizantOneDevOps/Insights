@@ -38,11 +38,9 @@ import com.cognizant.devops.platformservice.rest.dataTagging.Constants.Datataggi
 import com.google.gson.JsonObject;
 
 
-
-
 public class DataProcessorUtil  {
 	private static final DataProcessorUtil dataProcessorUtil = new DataProcessorUtil();
-	private static final Logger LOG = Logger.getLogger(DataProcessorUtil.class);
+	private static final Logger log = Logger.getLogger(DataProcessorUtil.class);
 	private DataProcessorUtil() {
 
 	}
@@ -50,7 +48,6 @@ public class DataProcessorUtil  {
 	public static DataProcessorUtil getInstance() {
 		return dataProcessorUtil;
 	}
-
 
 	private File convertToFile(MultipartFile multipartFile) throws IOException, FileNotFoundException {
 		File file = new File(multipartFile.getOriginalFilename());
@@ -61,62 +58,145 @@ public class DataProcessorUtil  {
 		return file;
 	}
 
-	public  boolean readData(MultipartFile file)   {
+	public  boolean readData(MultipartFile file)    {
+
 		File csvfile =null;
+		boolean status = false;
 		try {
 			csvfile = convertToFile(file);
 		} catch (IOException ex) {
-			LOG.debug(ex);
+			log.debug(ex);
 		}
-
 		CSVFormat format = CSVFormat.newFormat(',').withHeader();
-		boolean status = false;
 		try (Reader reader = new FileReader(csvfile); CSVParser csvParser = new CSVParser(reader, format);){
-			
+
 			Neo4jDBHandler dbHandler = new Neo4jDBHandler();
 			List<JsonObject> gitProperties = new ArrayList<>();
 			Map<String, Integer> headerMap = csvParser.getHeaderMap();
-			
-			dbHandler.executeCypherQuery("CREATE CONSTRAINT ON (n:METADATA) ASSERT n.id  IS UNIQUE");
+
+			dbHandler.executeCypherQuery("CREATE CONSTRAINT ON (n:METADATA) ASSERT n.metadata_id  IS UNIQUE");
 			String query =  "UNWIND {props} AS properties " +
 					"CREATE (n:METADATA:DATATAGGING) " +
 					"SET n = properties";
 			int sleepTime=500;
-			int totalRecords=0;
+			int size = 0;
+			int totalSize = 0;
+			int bulkRecordCnt=10;
 			for (CSVRecord csvRecord : csvParser.getRecords()) {
-				totalRecords++;
+				size += 1;
 				JsonObject json = new JsonObject();
 				for(Map.Entry<String, Integer> header : headerMap.entrySet()){
-					
-					json.addProperty(header.getKey(), csvRecord.get(header.getValue()));
+					if(header.getKey()!= null){
+						json.addProperty(header.getKey(), csvRecord.get(header.getValue()));
+					}
 				}			
 				json.addProperty(DatataggingConstants.CREATIONDATE, Instant.now().toEpochMilli() );
 				gitProperties.add(json);
-				if(totalRecords > 5) {
-					dbHandler.bulkCreateNodes(gitProperties, null, query);
+				if(size == bulkRecordCnt ) {
+					totalSize += size;
+					size = 0;
+					JsonObject graphResponse = dbHandler.bulkCreateNodes(gitProperties, null, query);
+					if(graphResponse.get("response").getAsJsonObject().get("errors").getAsJsonArray().size() > 0){
+						log.error(graphResponse);
+						status=false;
+						if(totalSize >= csvParser.getRecords().size()) {
+							break;
+						}
+					}
 					Thread.sleep(sleepTime);
 					gitProperties = new ArrayList<>();
 				}
-				status=true;	
+				/*if(totalSize >= totalRecords) {
 
+					break;
+				}*/
+				status=true;
 			}
 
-
 		} catch (FileNotFoundException e) {
-			status=false;
-			LOG.debug(e);
+			log.error("Exception in uploading csv file" , e);
 		} catch (IOException e) {
-			status=false;
-			LOG.debug(e);
+			log.error("Exception in uploading csv file" , e);
 		} catch (GraphDBException e) {
-			status=false;
-			LOG.debug(e);
+			log.error("Exception in uploading csv file" , e);
 		} catch (InterruptedException e) {
-			status=false;
-			LOG.debug(e);
+			log.error("Exception in uploading csv file" ,e);
 		}
 		return status;
 
+	}
+
+	public boolean updateHiearchyProperty(MultipartFile file) {
+		Neo4jDBHandler dbHandler = new Neo4jDBHandler();
+		File csvfile =null;
+		boolean status = false;
+		try {
+			csvfile = convertToFile(file);
+		} catch (IOException e) {
+			log.error(e);
+		}
+		String label = "METADATA:DATATAGGING";
+		CSVFormat format = CSVFormat.newFormat(',').withHeader();
+
+		try (Reader reader = new FileReader(csvfile); CSVParser csvParser = new CSVParser(reader, format);){
+			Map<String, Integer> headerMap = csvParser.getHeaderMap();
+			String cypherQuery = null;
+			List<JsonObject>  editList=new ArrayList<JsonObject>();
+			List<JsonObject>  deleteList=new ArrayList<JsonObject>();
+			for (CSVRecord record : csvParser) { 
+
+				if( record.get("Action") != null &&  record.get("Action").equals("edit")){
+					JsonObject json = new JsonObject();
+					for(Map.Entry<String, Integer> header : headerMap.entrySet()){
+						if(header.getKey() != null){
+							json.addProperty(header.getKey(), record.get(header.getValue()));
+
+						}
+					}
+					editList.add(json);
+				}else if(record.get("Action") != null &&  record.get("Action").equals("delete") ){
+					JsonObject json = new JsonObject();
+					for(Map.Entry<String, Integer> header : headerMap.entrySet()){
+						if(header.getKey() != null){
+							json.addProperty(header.getKey(), record.get(header.getValue()));
+
+						}
+					}
+					deleteList.add(json);
+				}
+
+			}
+			if(editList.size() > 0 ){
+				cypherQuery = " UNWIND {props} AS properties MATCH (n :"+label+"{metadata_id:properties.metadata_id}) "
+							  + " SET n += {props} RETURN n ";
+				try {
+					JsonObject graphResponse = dbHandler.executeQueryWithData(cypherQuery,editList);
+					if(graphResponse.get("response").getAsJsonObject().get("errors").getAsJsonArray().size() > 0){
+						status = false;
+					}
+					status = true;
+				} catch (GraphDBException e) {
+					log.error(e);
+				}
+			}	
+			if( deleteList .size() > 0){
+				cypherQuery = " UNWIND {props} AS properties MATCH (n :"+label+"{metadata_id:properties.metadata_id})   "
+							+ " REMOVE n:"+label+"  SET n:METADATA_BACKUP  RETURN n ";
+				try {
+					JsonObject graphResponse = dbHandler.executeQueryWithData(cypherQuery,deleteList);
+					if(graphResponse.get("response").getAsJsonObject().get("errors").getAsJsonArray().size() > 0){
+						status = false;
+					}
+					status = true;
+				} catch (GraphDBException e) {
+					log.error(e);
+				}
+			}
+
+		} catch (IOException e) {
+			log.error("Exception in updating metadata" , e);
+		} 
+		return status;
 	}
 
 }
