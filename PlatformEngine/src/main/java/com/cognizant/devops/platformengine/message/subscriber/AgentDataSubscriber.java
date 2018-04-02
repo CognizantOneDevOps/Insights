@@ -18,16 +18,25 @@ package com.cognizant.devops.platformengine.message.subscriber;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.StringTokenizer;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBException;
+import com.cognizant.devops.platformcommons.dal.neo4j.GraphResponse;
 import com.cognizant.devops.platformcommons.dal.neo4j.Neo4jDBHandler;
+
+import com.cognizant.devops.platformcommons.dal.neo4j.NodeData;
+import com.cognizant.devops.platformengine.message.core.AgentDataConstants;
 import com.cognizant.devops.platformcommons.dal.neo4j.Neo4jFieldIndexRegistry;
 import com.cognizant.devops.platformengine.message.core.MessageConstants;
 import com.cognizant.devops.platformengine.message.factory.EngineSubscriberResponseHandler;
+import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -37,7 +46,7 @@ import com.rabbitmq.client.Envelope;
 
 public class AgentDataSubscriber extends EngineSubscriberResponseHandler{
 	private static Logger log = Logger.getLogger(AgentDataSubscriber.class.getName());
-	
+
 	public AgentDataSubscriber(String routingKey) throws Exception {
 		super(routingKey);
 	}
@@ -56,6 +65,7 @@ public class AgentDataSubscriber extends EngineSubscriberResponseHandler{
 
 	public void handleDelivery(String consumerTag, Envelope envelope, BasicProperties properties, byte[] body) throws IOException{
 		ApplicationConfigProvider.performSystemCheck();
+		boolean enableOnlineDatatagging = ApplicationConfigProvider.getInstance().isEnableOnlineDatatagging();
 		Neo4jDBHandler dbHandler = new Neo4jDBHandler();
 		String message = new String(body, MessageConstants.MESSAGE_ENCODING);
 		String routingKey = envelope.getRoutingKey();
@@ -99,12 +109,31 @@ public class AgentDataSubscriber extends EngineSubscriberResponseHandler{
 				}
 			}
 		}
+		Map<String,Map<String,NodeData>> metaDataMap=new HashMap<String,Map<String,NodeData>>();
+		Gson gson = new Gson();
+		if(enableOnlineDatatagging){
+			metaDataMap= getMetaData(dbHandler);
+		}
 		
 		if(json.isJsonArray()){
 			JsonArray asJsonArray = json.getAsJsonArray();
 			for(JsonElement e : asJsonArray){
 				if(e.isJsonObject()){
-					dataList.add(e.getAsJsonObject());
+					if(enableOnlineDatatagging){
+						NodeData nodeData = applyDataTagging(e.getAsJsonObject(),metaDataMap);
+
+						if(nodeData != null){
+							String nodeJsonStr = gson.toJson(nodeData.getPropertyMap());
+							JsonObject finalJson = mergeProperty(e,nodeJsonStr);
+							finalJson.remove("uuid"); 
+							dataList.add(finalJson);
+
+						} else {
+							dataList.add(e.getAsJsonObject());
+						}
+					} else{
+						dataList.add(e.getAsJsonObject());
+					}
 				}
 			}
 			try {
@@ -136,7 +165,105 @@ public class AgentDataSubscriber extends EngineSubscriberResponseHandler{
 			}
 		}
 	}
-	
+
+	private   JsonObject mergeProperty(JsonElement e, String jsonStr) {
+		JsonParser jsonParser = new JsonParser();
+		JsonObject jsonObj = (JsonObject)jsonParser.parse(jsonStr);
+		Map<String,String> metaDataJson = new Gson().fromJson(jsonObj, HashMap.class);
+		Map<String,String> agentJson = new Gson().fromJson(e.getAsJsonObject(), HashMap.class);
+		Map<String,String> finalobj = new HashMap<String,String>();
+		finalobj.putAll(metaDataJson);
+		finalobj.putAll(agentJson);
+		String resultJson = new Gson().toJson(finalobj);
+		JsonObject finalJson = (JsonObject)jsonParser.parse(resultJson);
+		return finalJson;
+	}
+
+
+	private  NodeData applyDataTagging(JsonObject asJsonObject, Map<String, Map<String, NodeData>> metaDataMap) {
+
+		NodeData nodeData = null ;
+		StringBuilder sb=null;
+
+		for (String key : metaDataMap.keySet()){
+			StringTokenizer token = new StringTokenizer(key,AgentDataConstants.COLON);
+			sb= new StringBuilder();
+
+			while (token.hasMoreElements()) {
+				String agentJsonkey=token.nextElement().toString();
+
+				if(asJsonObject.has(agentJsonkey)){
+					sb.append(asJsonObject.get(agentJsonkey).getAsString());
+					sb.append(AgentDataConstants.COLON);
+				}
+			}  
+
+			Map<String ,NodeData> innerMap = metaDataMap.get(key);
+
+			String innerKey=StringUtils.stripEnd(sb.toString(),AgentDataConstants.COLON);
+			if(innerMap.containsKey(innerKey)){
+
+				nodeData = innerMap.get(innerKey);
+			}
+		}
+		return nodeData;
+	}
+
+	private  Map<String, Map<String, NodeData>> getMetaData(Neo4jDBHandler dbHandler) {
+		List<NodeData> nodes = null;
+		Map<String,NodeData> nodepropertyMap=null;
+		Map<String,Map<String,NodeData>> metaDataMap = new HashMap<String,Map<String,NodeData>>();
+		try {
+			GraphResponse response = dbHandler.executeCypherQuery("MATCH (n:METADATA:DATATAGGING) return n");
+			nodes=response.getNodes();
+		} catch (GraphDBException e) {
+			log.error(e);
+		}
+		if(nodes.size() > 0){
+			for(NodeData node : nodes){
+				StringBuilder labelVal=new StringBuilder();
+				StringBuilder key=new StringBuilder();
+				nodepropertyMap=new HashMap<String,NodeData>();
+
+				if(null!=node.getProperty(AgentDataConstants.PROPERTY_1)  && !node.getProperty(AgentDataConstants.PROPERTY_1).isEmpty()){
+					key.append(node.getProperty(AgentDataConstants.PROPERTY_1));
+					key.append(AgentDataConstants.COLON);
+				}
+				if(null!=node.getProperty(AgentDataConstants.PROPERTY_2)  && !node.getProperty(AgentDataConstants.PROPERTY_2).isEmpty()){
+					key.append(node.getProperty(AgentDataConstants.PROPERTY_2));
+					key.append(AgentDataConstants.COLON);
+				}
+				if(null!=node.getProperty(AgentDataConstants.PROPERTY_3)  && !node.getProperty(AgentDataConstants.PROPERTY_3).isEmpty()){
+					key.append(node.getProperty(AgentDataConstants.PROPERTY_3));
+					key.append(AgentDataConstants.COLON);
+				}
+				if(null!=node.getProperty(AgentDataConstants.PROPERTY_4) && !node.getProperty(AgentDataConstants.PROPERTY_4).isEmpty()){
+					key.append(node.getProperty(AgentDataConstants.PROPERTY_4));
+					key.append(AgentDataConstants.COLON);
+				}
+				if(null!=node.getProperty(AgentDataConstants.PROPERTYVALUE_1) && !node.getProperty(AgentDataConstants.PROPERTYVALUE_1).isEmpty()){
+					labelVal.append(node.getProperty(AgentDataConstants.PROPERTYVALUE_1));
+					labelVal.append(AgentDataConstants.COLON);
+				}
+				if(null!=node.getProperty(AgentDataConstants.PROPERTYVALUE_2) && !node.getProperty(AgentDataConstants.PROPERTYVALUE_2).isEmpty()){
+					labelVal.append(node.getProperty(AgentDataConstants.PROPERTYVALUE_2));
+					labelVal.append(AgentDataConstants.COLON);	 
+				}
+				if(null!=node.getProperty(AgentDataConstants.PROPERTYVALUE_3) && !node.getProperty(AgentDataConstants.PROPERTYVALUE_3).isEmpty()){
+					labelVal.append(node.getProperty(AgentDataConstants.PROPERTYVALUE_3));
+					labelVal.append(AgentDataConstants.COLON);	 
+				}
+				if(null!=node.getProperty(AgentDataConstants.PROPERTYVALUE_4) && !node.getProperty(AgentDataConstants.PROPERTYVALUE_4).isEmpty()){
+					labelVal.append(node.getProperty(AgentDataConstants.PROPERTYVALUE_4));
+				}
+
+				nodepropertyMap.put( StringUtils.stripEnd(labelVal.toString(),AgentDataConstants.COLON), node);
+				metaDataMap.put(StringUtils.stripEnd(key.toString(),AgentDataConstants.COLON), nodepropertyMap);
+			}
+		}
+		return metaDataMap;
+	}
+
 	private <T> List<List<T>> partitionList(List<T> list, final int size) {
 	    List<List<T>> parts = new ArrayList<List<T>>();
 	    final int N = list.size();

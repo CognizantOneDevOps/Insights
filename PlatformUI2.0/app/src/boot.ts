@@ -35,9 +35,13 @@ module ISightApp {
         .service('restAPIUrlService', RestAPIUrlService)
         .service('restCallHandlerService', RestCallHandlerService)
         .service('dataTaggingService', DataTaggingService)
-        .service('singleToolConfigService', SingleToolConfigService)
+        .service('dataOnBoardingService', DataOnBoardingService)
+        .service('dataTaggingDetailsService', DataTaggingDetailsService)
+       	.service('singleToolConfigService', SingleToolConfigService)        
         .service('insightsService', InsightsService)
 		.service('platformServiceStatusService', PlatformServiceStatusService)
+		.service('appSettingsService', AppSettingsService)
+
         .controller('pipelineController', PipelineController)
         .controller('homePageController', HomePageController)
         .controller('toolsConfigurationController', ToolsConfigurationController)
@@ -50,6 +54,9 @@ module ISightApp {
         .controller('agentController', AgentController)
         .controller('singleToolConfigurationController', SingleToolConfigurationController)
         .controller('dataTaggingController', DataTaggingController)
+	    .controller('dataTaggingDetailsController', DataTaggingDetailsController)
+        .controller('FileUploadController', FileUploadController)
+        .controller('appSettingsController', AppSettingsController)
         .controller('insightsController', InsightsController)
         .component('footer', {
             templateUrl: './dist/components/footer/view/footerView.html',
@@ -70,6 +77,60 @@ module ISightApp {
             bindings:{}
 
         })
+        .directive('includeReplace', function () {
+            return {
+                require: 'ngInclude',
+                restrict: 'A',
+                link: function(scope, tElem, tAttrs) {
+
+                    tElem.replaceWith(tElem.children());
+                }
+            };
+        })
+        
+       .directive('row', function() {
+            return {
+                restrict: 'EA',
+                scope: { children:"=" , myVar: '=' ,clickHandler:"&",  'test': '=test', 'count': '=count' },
+                controller: RecursiveLiController,
+                templateUrl: './dist/modules/dataTaggingDetails/view/test.html'
+
+            };
+        })
+
+        .directive('demoFileModel', function ($parse) {
+            return {
+                restrict: 'A', //the directive can be used as an attribute only
+                    
+                link: function (scope, element, attrs) {
+                    var model = $parse(attrs.demoFileModel),
+                    modelSetter = model.assign; //define a setter for demoFileModel
+                    var maxSize = 1000000;
+                    scope.showUploadBtn = false;
+                    element.bind('change', function () {
+                       
+                        scope.maxSizeErr = false;
+                        scope.$apply(function () {
+                           
+                            modelSetter(scope, (<HTMLInputElement>element[0]).files[0]);
+
+                        });
+                        var fileSize = (<HTMLInputElement>element[0]).files[0].size;
+                        if (fileSize > maxSize){
+                           scope.maxSizeErr = true;
+						   scope.imageSrc = "#";
+						   scope.showUploadBtn = false;
+                        }else{
+                        scope.showUploadBtn = true;
+                        scope.file = (<HTMLInputElement>element[0]).files[0];
+                        scope.getFile();
+                        }
+						scope.$apply();
+                    });
+                }
+            };
+        })
+       
         .config(['$routeProvider', '$compileProvider',
             function($routeProvider, $compileProvider) {
                 $routeProvider.
@@ -152,7 +213,7 @@ module ISightApp {
                     otherwise({
                         redirectTo: '/InSights/login'
                     });
-                $compileProvider.aHrefSanitizationWhitelist(/^\s*(https?|ftp|mailto|tel|file|blob):/);
+                $compileProvider.aHrefSanitizationWhitelist(/^\s*(https?|ftp|mailto|tel|file|blob):|data:image\//);
             }]
         ).run(function(restEndpointService: IRestEndpointService,authenticationService: IAuthenticationService, $cookies) {
             restEndpointService.getServiceHost();

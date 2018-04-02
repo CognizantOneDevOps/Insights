@@ -1,6 +1,7 @@
 {
 "showInsightsTab" : false,
-"showOptionsPanel" : false
+"showOptionsPanel" : false,
+"showBusinessMapping" : false
 }
 
 
