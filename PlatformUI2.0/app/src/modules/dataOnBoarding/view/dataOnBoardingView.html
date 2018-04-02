@@ -15,133 +15,95 @@
  * the License.
  ******************************************************************************
  -->
+<div layout="column" class="layout" style="width: 100%;" >
+  <div ng-controller="FileUploadController" style="min-height:450px">
+  <div  ng-if="showError" style="font-size:16px;margin:auto;border:1px solid #ccc;margin-left:20px" >
+  <md-icon  style="margin-right:10px" md-svg-src="dist/icons/svg/insightsPage/alert.svg" ng-style="{color:'red',fill:'red',height: '36px', width: '36px'}"></md-icon>Failed to upload data.</div>
 
-<throbber ng-if="!dataOnBoardingController.showTemplateAfterLoad" layout="column" flex="100">
-</throbber>
-<div ng-if="dataOnBoardingController.showTemplateAfterLoad" layout="column" flex>
-    <div layout class="applicationButtMar">
-        <div layout="row" class="applicationContentCss" style="width: 100%;">
-            <div layout layout-align="end center">
-                <!--<md-button ng-click="dataOnBoardingController.showAddApplicationBox()" class="md-raised md-primary configureBut">
-                    Add New Application
-                </md-button>-->
-                <md-select class="searchApplicationBoxContData inputApplicationBox" style="margin-left:10px;margin-top: 0px;" ng-change="dataOnBoardingController.onSelectionOfHierarchy(dataOnBoardingController.selectedHierarchy)"
-                    placeholder="Select Hierarchy" ng-model="dataOnBoardingController.selectedHierarchy" md-on-close="clearSearchTerm()"
-                    data-md-container-class="selectdemoSelectHeader">
-                    <md-optgroup label="Hierarchy">
-                        <md-option ng-value="hierarchy" ng-repeat="hierarchy in dataOnBoardingController.hierarchyList">{{hierarchy}}</md-option>
-                    </md-optgroup>
-                </md-select>
-                <md-autocomplete class="autocompleteSearchData" md-search-text="dataOnBoardingController.searchToolData" md-items="tooldata in dataOnBoardingController.toolCategoryArray  | filter:dataOnBoardingController.searchToolData"
-                    md-item-text="tooldata.selectedTool" md-min-length="3" placeholder="Search Tool">
-                    <md-item-template>
-                        <span md-highlight-text="dataOnBoardingController.searchToolData" md-highlight-flags="^i">{{tooldata}}</span>
-                    </md-item-template>
-                    <md-not-found>
-                        No matching record for "{{dataOnBoardingController.searchToolData}}" were found.
-                    </md-not-found>
-                </md-autocomplete>
-                <md-button style="max-height:40px;margin-top:0px" ng-click="dataOnBoardingController.searchtool()" class="md-raised md-primary goButton applicationManagement">
-                    Go
-                </md-button>
-                
-                <md-button ng-click="dataOnBoardingController.goToDataTagging()" class="md-raised md-primary configureBut">
-                    Data Tagging
-                </md-button>
-               <!-- <md-input-container layout class="md-block inputContainerDivNewApplication" md-no-float ng-if="dataOnBoardingController.showAddApplication">
-                    <input class="inputBoxContNewApplication" type="text" required md-no-asterisk name="newApplication" ng-model="dataOnBoardingController.addNewApplicationName"
-                        placeholder="Please input an Application Name" />
-                </md-input-container>
-                <md-button ng-click="dataOnBoardingController.addApplication($event,dataOnBoardingController.addNewApplicationName)" class="md-raised md-primary goButton applicationManagement addApplication"
-                    ng-if="dataOnBoardingController.showAddApplication">
-                    Go
-                </md-button>
-                <span ng-if="dataOnBoardingController.showApplicationAddedMessage" class="applicationAddedMessage">New application added successfully</span>-->
+  <div style="padding-left:70px;padding-top:20px;padding-right:20px;font-size:16px;font-weight:bold;font-family:proxima_novaregular"><span style="display:inline-block;width:14%;color:#666">Download the existing data :</span><md-button style="max-height:40px;margin-top:0px" ng-click="JSONToCSVConvertor()" class="md-raised md-primary configureBut md-button md-ink-ripple">
+                    Download data 
+        </md-button></div>
+    <div  style="width:100%;background-color:#f3f3f3;margin-top:10px;border-bottom:1px solid #d8d9da">
+      <div class="contentCss fnt" style="padding:15px">
+        <div layout flex="100"> 
+          <div style="padding-right:20px;font-size:16px;padding-top:50px;font-weight:bold;width:15%">Select a File to Upload:</div>
+          <div>
+          
+          <md-input-container style="background-color:#fff">
+          <label>Select the mode</label>
+           <md-select ng-model="selectedType" ng-change="changeSelected()">
+            <md-option value="update">Edit existing data</md-option>
+            <md-option value="upload">Upload new data</md-option>
+          </md-select>
+          </md-input-container>
+
+          <div class="drop" id="dropbox" ng-show="showTextArea">
+            <div class="cont">
+              <md-icon  ng-style="{height: '40px', width: '40px'}" 
+                        md-svg-src="dist/icons/svg/dataTagging/upload.svg"></md-icon>
+              <div class="titl" >
+           {{dropText}}
+          </div>
+              <div class="desc">
+            OR
+          </div>
+              <div class="">
+                <label id="#bb" style="cursor:pointer"> Click here to browse csv files
+            
+                  <input type="file" name="file" accept=".csv" id="fileInp"  ng-model-instant id="fileToUpload" multiple onchange="angular.element(this).scope().setFiles(this)" style="display:none" />
+                </label>
+              </div>
             </div>
-            <div layout layout-align="end center" flex style="margin-right: -7px;">
-                <md-button ng-click="dataOnBoardingController.goToOnBoard()" class="md-raised md-primary configureBut" style="background-color:#387c2c;margin-left: 2px;">
-                    User Onboarding
-                </md-button>
-                <md-button ng-click="" class="md-raised md-primary configureBut">
-                    Data Onboarding
-                </md-button>
-            </div>
+          </div>
+          </div>
         </div>
-    </div>
-    <div class="contentCss">
-        <div layout style="margin-right: -7px;margin-top: -20px;">
-            <div layout layout-align="start end" flex style="margin-top: 9px;margin-bottom: 15px;margin-left: 10px;">
-            </div>
-            <div class="confirmationMessage" layout="row" layout-align="end end" style="margin-right: 7px;">
-                {{dataOnBoardingController.saveMsg}} </div>
-            <!--start code for butttons-->
-            <div layout="row" layout-align="end end" style="margin-right: 7px;" ng-if="dataOnBoardingController.noHierarchyMsg === ''">
-                <md-icon class="ForActionsIcons" ng-style="{height: '20px', width: '20px'}" ng-click="dataOnBoardingController.disableSaveButtonStatus||dataOnBoardingController.openDialog($event,'save')"
-                    md-svg-src="{{dataOnBoardingController.saveButtonIcon}}">
-                    <md-tooltip md-direction="top">
-                        Save
-                    </md-tooltip>
-                </md-icon>
-            </div>
-            <!--end code for buttons-->
+        <div ng-show="showUploadingThrobber" style="margin-left:15%;margin-top:5px">
+          <span ng-if="showUploadingThrobber" style = "vertical-align: super;">
+            <md-progress-circular  md-diameter="30" md-mode="indeterminate"></md-progress-circular>
+          </span>
         </div>
+        <div ng-show="isTypeError" style="color:red;margin-left:15%;margin-top:5px">Invalid file selected, please upload only csv files</div>
+        <div ng-show="files.length" style="margin-left:15%;margin-top:5px">
+          <div ng-repeat="file in files.slice(0)" style="margin-left:8px">
+            <span>{{file.webkitRelativePath || file.name}}</span>
+            (
+            <span ng-switch="file.size > 1024*1024">
+              <span ng-switch-when="true">{{file.size / 1024 / 1024 | number:2}} MB</span>
+              <span ng-switch-default>{{file.size / 1024 | number:2}} kB</span>
+            </span>)
         
-        <md-divider ng-if="dataOnBoardingController.noHierarchyMsg === ''" layout flex="100" class="configsSeparationLine" style="margin-top: 0px;margin-bottom: 10px;"></md-divider>
-        <!--<div ng-if="dataOnBoardingController.showThrobber" layout-sm="column" layout-align="center center" style="margin-left: 46%;margin-top: 46px;">
-            <md-progress-circular md-mode="indeterminate" md-diameter="50"></md-progress-circular>
-        </div>-->
-        <div layout="column" layout-align="" ng-if=" !dataOnBoardingController.showThrobber || dataOnBoardingController.noHierarchyMsg === ''">
-            <div layout style="min-width:100%;margin-top: 10px;" ng-repeat="tooldata in dataOnBoardingController.paginatedDataOnboardedArray  | filter:dataOnBoardingController.searchSelectedToolData track by $index">
-                <md-select ng-if="tooldata.selectedTool == undefined" flex="30" class="searchApplicationBoxContData inputApplicationBox dataBoardingFieldName"
-                    ng-change="dataOnBoardingController.fieldSelection(tooldata.selectedTool,tooldata.toolId)" placeholder="Select Tool"
-                    ng-model="tooldata.selectedTool" data-md-container-class="selectdemoSelectHeader">
-                    <md-optgroup label="Tools">
-                        <md-option ng-value="tool" ng-repeat="tool in dataOnBoardingController.toolsList[1] track by $index">{{tool}}</md-option>
-                    </md-optgroup>
-                </md-select>
-                <div flex="30" ng-if="tooldata.selectedTool != undefined " class="dataBoardingToolName">{{tooldata.selectedTool}}</div>
-                <md-select flex="30" ng-if="tooldata.isSaved == false" class="searchApplicationBoxContData inputApplicationBox dataBoardingFieldName"
-                    ng-disabled="tooldata.selectedTool == undefined" ng-change="dataOnBoardingController.fieldValueSelection(tooldata.selectedTool,tooldata.selectedFieldName,tooldata.toolId)"
-                    placeholder="Select Field" ng-model="tooldata.selectedFieldName">
-                    <md-optgroup label="Fields">
-                        <md-option ng-value="value" ng-repeat="(key, value) in dataOnBoardingController.toolsFieldsArrayJson[tooldata.selectedTool]  track by $index"
-                            ng-selected="value=== tooldata.selectedFieldName">{{value}}</md-option>
-                    </md-optgroup>
-                </md-select>
-                <div flex="30" ng-if="tooldata.isSaved == true" class="dataBoardingToolName">{{tooldata.selectedFieldName}}</div>
-                <md-select flex="30" ng-if="tooldata.isSaved == false" class="searchApplicationBoxContData inputApplicationBox dataBoardingFieldName"
-                    ng-disabled="tooldata.selectedFieldName == undefined" placeholder="Select Field Values" ng-model="tooldata.selectedFieldValues"
-                    ng-change="dataOnBoardingController.changeButtonstatus()">
-                    <md-optgroup label="Project">
-                        <md-option ng-value="fieldVal" ng-repeat="fieldVal in dataOnBoardingController.toolsFieldsValueArrayJson[tooldata.selectedTool+'_'+tooldata.toolId] track by $index"
-                            ng-selected="fieldVal === tooldata.selectedFieldValues">{{fieldVal}}</md-option>
-                    </md-optgroup>
-                </md-select>
-                <div flex="30" ng-if="tooldata.isSaved == true" class="dataBoardingToolName">{{tooldata.selectedFieldValues}}</div>
-                <div flex="10" style="padding-left: 41px;">
-                    <md-icon class="ForActionsIcons" ng-style="{height: '20px', width: '20px'}" ng-click="dataOnBoardingController.disableDeleteButtonStatus||dataOnBoardingController.openDialog($event,'delete',tooldata.selectedTool, tooldata.toolCategory, tooldata.toolId,tooldata.isSaved)"
-                        md-svg-src="{{dataOnBoardingController.deleteButtonIcon}}">
-                        <md-tooltip md-direction="Bottom">
-                            Delete Tool Details
-                        </md-tooltip>
-                    </md-icon>
-                    <md-icon class="ForActionsIcons" ng-style="{height: '20px', width: '20px'}" ng-if="dataOnBoardingController.toolsRowModel.toolRows[dataOnBoardingController.toolsRowModel.toolRows.length-1].toolId == tooldata.toolId"
-                        ng-click="dataOnBoardingController.disableAddButtonStatus||dataOnBoardingController.addAction(tooldata.selectedTool, tooldata.toolId)"
-                        md-svg-src="{{dataOnBoardingController.addButtonIcon}}">
-                        <md-tooltip md-direction="Bottom">
-                            Add
-                        </md-tooltip>
-                    </md-icon>
-                </div>
+          </div>
+
+          <md-button  style="max-height:40px;margin-top:0px" ng-click="previewData()" class="md-raised md-primary configureBut md-button md-ink-ripple">
+                    Preview File
+        </md-button>
+          <div ng-show="progressVisible">
+            <div class="percent">{{progress}}%</div>
+            <div class="progress-bar">
+              <div class="uploaded" ng-style="{'width': progress+'%'}"></div>
             </div>
-            <div ng-show="dataOnBoardingController.showPaginationBar" class="paginationClass" flex="100" layout="row" layout-align="end">
-                <ul uib-pagination total-items="dataOnBoardingController.totalItems" ng-model="dataOnBoardingController.currentPage" max-size="dataOnBoardingController.maxSize"
-                    class="pagination-sm" boundary-links="true" num-pages="dataOnBoardingController.numPages" items-per-page="dataOnBoardingController.totalRows"
-                    ng-change="dataOnBoardingController.updateResult()" first-text="<<" last-text=">>" next-text=">" previous-text="<"></ul>
-            </div>
+          </div>
         </div>
-        <div class="noEntityAddedMsg" ng-if = "dataOnBoardingController.noHierarchyMsg" layout layout-align="center center">
-            {{dataOnBoardingController.noHierarchyMsg}}
-        </div>
+        <div></div>
+      </div>
     </div>
-</div>
+    <div style="padding-top:10px;margin:auto;width:90%">
+      <table class="md-api-table-landing" style="border: 1px solid #a5d28b;margin:auto" ng-if="lines.length > 0">
+        <thead class="theadCss">
+          <tr layout="row"  layout-align="start center" class="layout-align-start-center layout-row">
+            <th  style="width:100px;word-wrap:break-word" class="tableHeader" ng-repeat = "tabheaders in headers">{{tabheaders}}</th>
+          </tr>
+        </thead>
+        <tr ng-repeat = "tabData in lines" class="layout-align layout-row">
+          <td style="width:100px;word-wrap:break-word" ng-repeat="tabhd in headers">{{ tabData[tabhd] }}</td>
+        </tr>
+      </table>
+    </div>
+    <div flex="20" flex-offset="85" ng-if="lines.length > 0" >
+      <md-button md-no-ink type="submit" ng-disabled="showDisabled" ng-click="uploadFile()" class="md-raised md-primary goButton applicationManagement"
+                                    ng-disabled="showDisabled">Confirm and Upload</md-button>
+      <span ng-if="showThrobber" style = "vertical-align: super;">
+        <md-progress-circular style="display: inline;" md-diameter="30" md-mode="indeterminate"></md-progress-circular>
+      </span>
+    </div>
+  </div>

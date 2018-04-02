@@ -21,7 +21,10 @@
         <div>
             <md-whiteframe class="md-whiteframe-3dp whiteframeCss" layout>
                 <div class="textPad">
-                    <md-icon layout layout-align="center center" md-svg-src="dist/icons/svg/landingPage/Cognizant_Insights.svg" ng-style="{height: '120px', width: '300px'}"></md-icon>
+                   
+                     <img ng-if="!loginController.showDefaultImg" ng-src="{{loginController.imageSrc}}" width="100px" height="100px" style="margin:auto;display:block"/>  
+                     
+                    <md-icon ng-if="loginController.showDefaultImg" layout layout-align="center center" md-svg-src="dist/icons/svg/landingPage/Cognizant_Insights.svg" ng-style="{height: '120px', width: '300px'}"></md-icon>
                     <div class="topTxtCss" layout>
                         <div layout class="bulletCss"></div>
                         <div layout class="textCss">
@@ -39,7 +42,7 @@
                 <div layout="column" layout-align="center center" class="rgtPnlCss">
                     <form novalidate name="loginForm">
                         <div layout>
-                            <md-icon layout layout-align="center center" md-svg-src="dist/icons/svg/landingPage/Cognizant_Insights.svg" ng-style="{height: '130px', width: '140px'}"></md-icon>
+                            <!--md-icon layout layout-align="center center" md-svg-src="dist/icons/svg/landingPage/Cognizant_Insights.svg" ng-style="{height: '130px', width: '140px'}"></md-icon-->
                         </div>
                         <div class="validCredTextCss" layout>Sign in with valid credentials</div>
                         <div layout="column" style="width: 360px;">
