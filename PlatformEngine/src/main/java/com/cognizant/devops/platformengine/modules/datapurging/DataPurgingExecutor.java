@@ -48,14 +48,14 @@ public class DataPurgingExecutor implements Job {
 
 	public void execute(JobExecutionContext context) throws JobExecutionException {
 		try {
-			getLabelsAndNodes();
+			performDataPurging();
 		} catch (GraphDBException e) {
-			log.error(e);
+			log.error("Exception occured in DataPurgingExecutor Job: " + e);
 		}
 	}
 
 
-	public  void getLabelsAndNodes() throws GraphDBException{
+	public void performDataPurging() throws GraphDBException {
 		List<String> labelList = new ArrayList<String>();
 		boolean isDelete = false;
 		String rowLimit = null ;
