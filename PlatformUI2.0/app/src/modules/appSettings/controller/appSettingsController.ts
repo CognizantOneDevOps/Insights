@@ -81,7 +81,7 @@ interface FileReaderEvent extends Event {
 
           $scope.getFile = function () {
               $scope.progress = 0;
-              let reader: FileReader = new FileReader();
+              let reader: any = new FileReader();
                   reader.onload = function(event: FileReaderEvent) {
                       $scope.imageSrc = event.target.result
                       
