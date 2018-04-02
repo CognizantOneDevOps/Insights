@@ -102,11 +102,11 @@ module ISightApp {
 		  this.addEndPoint("INSIGHTS_GET",'/PlatformService/insights/inferences');
 		  this.addEndPoint("INSIGHTS_COMP_STATUS",'/PlatformService/ServicesHealthStatus/getStatus');
 		  
-		  this.addEndPoint("UPLOAD_IMAGE",'/PlatformService/settings/uploadCustomLogo');
+		  this.addEndPoint("UPLOAD_IMAGE",'/PlatformService/admin/settings/uploadCustomLogo');
 		  this.addEndPoint("GET_LOGO_IMAGE",'/PlatformService/settings/getLogoImage');
 		  
-		  this.addEndPoint("SAVE_DATAPURGING_SETTING",'/PlatformService/admin/settingsConfiguration/saveSettingsConfiguration');
-		  this.addEndPoint("LIST_DATAPURGING_SETTING",'/PlatformService/admin/settingsConfiguration/loadSettingsConfiguration');
+		  this.addEndPoint("SAVE_DATAPURGING_SETTING",'/PlatformService/admin/settings/saveSettingsConfiguration');
+		  this.addEndPoint("LIST_DATAPURGING_SETTING",'/PlatformService/admin/settings/loadSettingsConfiguration');
 
         }
 
