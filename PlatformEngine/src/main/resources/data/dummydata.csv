@@ -1,0 +1,11 @@
+metadata_id,level_1,level_2,level_3,level_4,toolName,toolProperty1,propertyValue1,toolProperty2,propertyValue2,toolProperty3,propertyValue3,toolProperty4,propertyValue4,Action
+1,BU1,Account1,Dept1,project1,JIRA,Resolution,Unresolved,Assignee,Malar,Fix version,stage,DefectID,I123,
+2,MALAr,MALAR,MALAR,MALAr,JIRA,jiraPriority,Medium,sprint,Sprint4,jiraStatus,Completed,jiraKey,KKT-3,edit
+3,BU3,Account3,Dept1,project1,JIRA,jiraKey,IS-10,gitReponame,Insights,gitAuthorName,Akshay,DefectID,I123,
+4,test,test,test,test,GIT ,Author,test,label,bug,projects,insights,Milesstones,open,
+5,BU5,Account5,Dept2,project2,GIT ,gitReponame,Insights,gitAuthorName,Akshay,jiraKey,IS-10,CommitUserName,,
+6,BU6,Account6,Dept2,project2,GIT ,CommitUserName,test,CommitMessage,Bug Fixing,CommitUserID,s123,DefectID,D123,
+7,BU7,Account7,Dept3,project3,JENKINS,JobStatus,success,AuthorName,test,JobID,S74x3,ProjectName,Insights,
+8,BU8,Account8,Dept3,project3,JENKINS,JobStatus,failed ,AuthorName,test,SprintID,S74,ProjectID,IS5,
+9,BU9,Account9,Dept3,project3,JENKINS,JobStatus,success,JobID,S74x4,ProjectName,insights,,,
+10,MALAr,MALAr,MALAR,,GIT ,UserStoryID,I547,Release,minor,ProjectName,insights,AuthorName,test,delete

@@ -1,0 +1,44 @@
+{
+  "mqConfig": {
+    "user": "iSight",
+    "password": "iSight",
+    "host": "127.0.0.1",
+    "exchange": "iSight"
+  },
+  "subscribe": {
+    "config": "CI.CIRCLECI.config"
+  },
+  "publish": {
+    "data": "CI.CIRCLECI.DATA",
+    "health": "CI.CIRCLECI.HEALTH"
+  },
+  "communication": {
+    "type": "REST"
+  },
+  "responseTemplate": {
+    "user": {
+       "login": "User"
+      },
+    "branch": "branch",
+    "status": "Status",
+    "build_num": "BuildNo",
+    "build_time_millis": "BuildTimeMillis",
+    "queued_at": "Build_date"
+  },
+  "useResponseTemplate" : true,
+  "token" : "authenticatedtokenvalue",
+  "useAllBuildsApi" : false,
+  "runSchedule": 30,
+  "userid": "username",
+  "passwd": "password",
+  "Project": "organizationname/repositoryname",
+  "BaseUrl": "http://circleci.com/api/v1.1/project/github/",
+  "toolsTimeZone" : "Asia/Kolkata",
+  "insightsTimeZone" : "Asia/Kolkata",
+  "timeStampField": "LastUpdated",
+  "timeStampFormat":"%Y-%m-%dT%H:%M:%S",
+  "StartFrom" : "2013-10-10 15:46:33",
+  "loggingSetting" : {
+                "logLevel" : "WARN"
+        }
+}
