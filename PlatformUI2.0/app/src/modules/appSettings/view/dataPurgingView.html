@@ -35,36 +35,36 @@
 							 <div layout="row" layout-align="space-between start" layout-wrap layout-margin layout-padding>
 								<div flex="30">							
 									<span>DataType</span>
-									<input class="inputBoxCont" ng-model="dataPurgingController.backupDatatype" style="width: 90%;">							
+									<input class="inputBoxCont" ng-model="dataPurgingController.backupDatatype" required style="width: 90%;">							
 								</div>
 								<div flex="35">
 									<span>Row Limit</span>
-									<input class="inputBoxCont" ng-model="dataPurgingController.rowLimit" style="width: 90%;">	
+									<input type="number" class="inputBoxCont" ng-model="dataPurgingController.rowLimit" required style="width: 90%;">	
 								</div>
 								<div flex="30">
 									<span>Backup Location</span>
-									<input class="inputBoxCont" ng-model="dataPurgingController.fileLocation" style="width: 90%;">	
+									<input class="inputBoxCont" ng-model="dataPurgingController.fileLocation" required style="width: 90%;">	
 								</div>						
 							 </div>
 							  <div layout="row" layout-align="space-between start" layout-wrap layout-margin layout-padding>
 								<div flex="30">							
 									<span>Backup File Format</span>
-									 <md-select class="searchApplicationBoxCont" md-no-asterisk="true" ng-model="dataPurgingController.fileFormat"  style="margin-top: 0px;margin-bottom:10px">
+									 <md-select class="searchApplicationBoxCont" md-no-asterisk="true" ng-model="dataPurgingController.fileFormat"  style="margin-top: 0px;margin-bottom:10px" required>
 									  <md-option value="CSV"  ng-selected="true" >CSV</md-option>
 									  <md-option value="JSON">JSON</md-option>
 									</md-select>
 								</div>
 								<div flex="35">
 									<span>Backup File Name</span>
-									<input class="inputBoxCont" ng-model="dataPurgingController.fileName" style="width: 90%;">	
+									<input class="inputBoxCont" ng-model="dataPurgingController.fileName" required style="width: 90%;">	
 								</div>
 								<div flex="30">
 									<span>Backup Duration (in Days)</span>
-									<input class="inputBoxCont" ng-model="dataPurgingController.duration" style="width: 90%;">	
+									<input type="number" class="inputBoxCont" ng-model="dataPurgingController.duration" required style="width: 90%;">	
 								</div>						
 							 </div>
 							  <div layout layout-align="end end">               			
-								 <md-button type="submit" class="md-raised md-primary configureBut" ng-click="dataPurgingController.saveData()">
+								 <md-button type="submit" class="md-raised md-primary configureBut" ng-click="dataPurgingController.saveData()" ng-disabled="frmdatapurging.$invalid">
 									Save
 								</md-button>
 							</div>
@@ -79,7 +79,7 @@
 						</div>
 						
 						<div flex="30" layout layout-align="end end">
-							<md-button class="md-raised md-primary configureBut" ng-click="dataPurgingController.addData()">Add</md-button>
+							<md-button class="md-raised md-primary configureBut" ng-click="dataPurgingController.addData()" ng-disabled="!dataPurgingController.showTble">Add</md-button>
 						</div>		
 					</div>		
 					 <div ng-if="dataPurgingController.showThrobber" layout-sm="column" layout-align="center center" style="margin-left: 46%;margin-top: 46px;">
@@ -93,40 +93,40 @@
 								<span>Labels</span>
 							</th>
 							<th flex="20" class="tableHeader">
-								<span>Rowlimit</span>
+								<span>Row Limit</span>
 							</th>
 							<th flex="20" class="tableHeader">
 								<span>Location</span>
 							</th>
-							<th flex="20" class="tableHeader">
+							<th flex="10" class="tableHeader">
 								<span>Format</span>
 							</th>
 							<th flex="20" class="tableHeader">
 								<span>File Name</span>
 							</th>
-							<th flex="20" class="tableHeader">
+							<th flex="10" class="tableHeader">
 								<span>Duration</span>
 							</th>
-							<th flex="20" class="tableHeader">
+							<th flex="10" class="tableHeader">
 								<span>Action</span>
 							</th>
 						</tr>
 						</thead>
 						<tbody>
 							<tr layout="row" layout-align="start center" ng-if="!dataPurgingController.showTble">
-								<td flex="20" class="tableContentStyle">{{dataPurgingController.settingData.labels}}</td>
+								<td flex="20" class="tableContentStyle" style="font-weight: normal !important;">{{dataPurgingController.settingData.labels}}</td>
 								<td flex="20" class="tableContentStyle">{{dataPurgingController.settingData.rowLimit}}</td>
 								<td flex="20" class="tableContentStyle">{{dataPurgingController.settingData.backupFileLocation}}</td>
-								<td flex="20" class="tableContentStyle">{{dataPurgingController.settingData.backupFileFormat}}</td>
+								<td flex="10" class="tableContentStyle">{{dataPurgingController.settingData.backupFileFormat}}</td>
 								<td flex="20" class="tableContentStyle">{{dataPurgingController.settingData.backupFileName}}</td>
-								<td flex="20" class="tableContentStyle">{{dataPurgingController.settingData.backupDurationInDays}}</td>
-								<td flex="20" class="tableContentStyle">
-								<md-icon md-svg-src="dist/icons/svg/userOnboarding/Edit_icon_MouseOver.svg" ng-style="{color: '#4ca64c', height: '25px', width: '25px'}"></md-icon>
+								<td flex="10" class="tableContentStyle">{{dataPurgingController.settingData.backupDurationInDays}}</td>
+								<td flex="10" class="tableContentStyle">
+								<md-icon md-svg-src="dist/icons/svg/userOnboarding/Edit_icon_MouseOver.svg" ng-style="{color: '#4ca64c', height: '20px', width: '20px'}" ng-click="dataPurgingController.showData();"></md-icon>
 								</td>								
 								
 							</tr>							
 							<tr layout="row" layout-align="center center" ng-if="dataPurgingController.showTble">
-								<td colspan="8" ng-if="dataPurgingController.showTble"><span>No Record found</span></td>
+								<td colspan="8" ng-if="dataPurgingController.showTble" class="tableContentStyle">No Record found</td>
 							</tr>
 						</tbody>
 					</table>										

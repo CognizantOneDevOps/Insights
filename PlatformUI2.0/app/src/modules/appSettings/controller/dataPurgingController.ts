@@ -50,7 +50,7 @@ module ISightApp {
 		 showThrobber: boolean;
 		 datalist= {};
 		 settingData = {};
-		 dataTypelabel = [];		 
+		 dataTypelabel:any;		 
 		 settingJsonstring: string;
 		 settingJsonObj = {};
 		 activeFlag: string;
@@ -75,7 +75,9 @@ module ISightApp {
 			
 			if( self.backupDatatype.indexOf(',') >= 0){
 				self.dataTypelabel = self.backupDatatype.split(",");				
-			}			
+			}else {
+				self.dataTypelabel = self.backupDatatype;
+			}
 			
 			self.settingJsonObj = {
 				"labels" : self.dataTypelabel,
@@ -96,15 +98,17 @@ module ISightApp {
 					}else {
 						self.showConfirmMessage = "Failed to save";
 					}
+					self.listData();		
 				})			
 				.catch(function (data) {	
 						self.listView = false;
 						self.saveView = true;				
-						self.showConfirmMessage ="Failed to save";					
+						self.showConfirmMessage ="Failed to save";		
+						self.listData();								
 				}); 	
 				
 				
-			self.listData();			
+				
 			
 		}
 		
@@ -142,6 +146,22 @@ module ISightApp {
                   self.showConfirmMessage = "";
 				  document.getElementById('confrmMsg').innerHTML = "";
 			}, 2000); 
+		}
+		
+		showData():void{
+			var self = this;
+			
+			self.listView = false;
+			self.saveView = true;	
+			
+			self.backupDatatype = self.settingData['labels'].toString();
+			console.log(self.backupDatatype);
+			self.rowLimit = self.settingData['rowLimit']; 
+			self.fileLocation = self.settingData['backupFileLocation'];
+			self.fileFormat = self.settingData['backupFileFormat'];
+			self.fileName = self.settingData['backupFileName'];
+			self.duration = self.settingData['backupDurationInDays'];
+			
 		}
 		
 	}
