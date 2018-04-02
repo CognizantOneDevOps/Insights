@@ -15,7 +15,7 @@ For Detailed product documentation and feature list please refer to the link -> 
 For information on the latest features and updates please refer to the below mentioned link -> https://onedevops.atlassian.net/wiki/spaces/OI/pages/218936/About+InSights
 
 
-NOTE:
+Latest Release Updates : 
 Release v3.8.1 has issue in terms of package structure in PlatformService module (https://github.com/CognizantOneDevOps/Insights/tree/master/PlatformService/src/main/java/com/cognizant/devops/platformservice/rest).
 In order to overcome this, while modifying code change package name from "dataTagging" to "datatagging" in IDE.
-Defect #60 has been raised to resolve the same.
+Defect #60 has been raised to resolve the same. Please note this issue only affects the developer community and existing users can continue to upgrade to the new version of the release. 
