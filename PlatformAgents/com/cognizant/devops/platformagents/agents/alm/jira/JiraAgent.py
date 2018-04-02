@@ -91,14 +91,15 @@ class JiraAgent(BaseAgent):
                     recordChange = False
                     for item in items:
                         if item['field'] in workLogFields:
+                            fieldName = item['field'].replace(' ', '')
                             if item['fromString']:
-                                data[item['field']+'Str'] = item['fromString']
+                                data[fieldName+'Str'] = item['fromString']
                             if item['toString']:
-                                data[item['field']+'UpdatedStr'] = item['toString']
+                                data[fieldName+'UpdatedStr'] = item['toString']
                             if item['from']:
-                                data[item['field']] = item['from']
+                                data[fieldName] = item['from']
                             if item['to']:
-                                data[item['field']+'Updated'] = item['to']
+                                data[fieldName+'Updated'] = item['to']
                             recordChange = True
                     if recordChange:
                         workLogData.append(data)
