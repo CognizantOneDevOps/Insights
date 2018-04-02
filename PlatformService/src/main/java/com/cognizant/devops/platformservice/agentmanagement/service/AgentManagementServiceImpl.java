@@ -62,6 +62,8 @@ import com.rabbitmq.client.ConnectionFactory;
 @Service("agentManagementService")
 public class AgentManagementServiceImpl  implements AgentManagementService{
 	private static Logger LOG = Logger.getLogger(AgentManagementServiceImpl.class);
+	
+	private static final String FILETYPE = ".zip";
 
 	@Override
 	public String registerAgent(String toolName,String agentVersion,String osversion,String configDetails) throws InsightsCustomException {
@@ -91,7 +93,9 @@ public class AgentManagementServiceImpl  implements AgentManagementService{
 			//Create zip/tar file with updated config.json
 			Path agentZipPath =updateAgentConfig(toolName,agentId,json);
 			byte[] data = Files.readAllBytes(agentZipPath);
-			sendAgentPackage(data,toolName,agentId,toolName,osversion);
+			
+			String fileName = toolName + FILETYPE;
+			sendAgentPackage(data,fileName,agentId,toolName,osversion);
 			performAgentAction(agentId,AGENTSTATUS.START.name());
 		} catch (Exception e) {
 			LOG.error("Error while registering agent "+toolName, e);
@@ -159,7 +163,10 @@ public class AgentManagementServiceImpl  implements AgentManagementService{
 			Path agentZipPath = updateAgentConfig(toolName,agentId,json);
 
 			byte[] data = Files.readAllBytes(agentZipPath);
-			sendAgentPackage(data,toolName,agentId,toolName,osversion);
+			
+			String fileName = toolName + FILETYPE;
+			
+			sendAgentPackage(data,fileName,agentId,toolName,osversion);
 
 		} catch (Exception e) {
 			LOG.error("Error updating and installing agent", e);
@@ -363,22 +370,22 @@ public class AgentManagementServiceImpl  implements AgentManagementService{
 		return toolName + "-"+ Instant.now().toEpochMilli();
 	}
 
-	/* public static void main(String... args) {
-		   ApplicationConfigCache.loadConfigCache();
+	 public static void main(String... args)  {
+		   /*ApplicationConfigCache.loadConfigCache();
 		   AgentManagementServiceImpl impl = new AgentManagementServiceImpl();
 
 		   JsonParser parser = new JsonParser();
-		   JsonObject json = (JsonObject) parser.parse(impl.getToolRawConfigFile("v3.0", "bitbucket"));
+		   JsonObject json = (JsonObject) parser.parse(impl.getToolRawConfigFile("v99.0", "git"));
 		  // JsonObject json = impl.getToolRawConfigFile("v3.0", "bitbucket");
 		   System.out.println(json);
-		   String status = impl.registerAgent("bitbucket", "3.0", "WINDOWS", testConfig());
+		   String status = impl.registerAgent("git", "v99.0", "WINDOWS", testConfig());
 		   System.out.println(status);
 
-		   impl.getRegisteredAgents();
+		   //impl.getRegisteredAgents();
 		   //System.out.println(impl.getAgentDetails("bitbucket-1519302061371"));
 		   //impl.startStopAgent("bitbucket-1519302061371", "RUNNING");
-		   System.exit(0);
-	   }*/
+		   System.exit(0);*/
+	   }
 
 	public static String testConfig() {
 
