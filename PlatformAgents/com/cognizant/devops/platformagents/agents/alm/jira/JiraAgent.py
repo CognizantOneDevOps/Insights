@@ -33,13 +33,13 @@ class JiraAgent(BaseAgent):
         self.passwd = self.config.get("passwd", '')
         baseUrl = self.config.get("baseUrl", '')
         startFrom = self.config.get("startFrom", '')
-        lastUpdated = self.tracking.get("lastupdated", startFrom)
+        #lastUpdated = self.tracking.get("lastupdated", startFrom)
         responseTemplate = self.getResponseTemplate()
         fields = self.extractFields(responseTemplate)
-        jiraIssuesUrl = baseUrl+"?jql=updated>='"+lastUpdated+"' ORDER BY updated ASC&maxResults="+str(self.config.get("dataFetchCount", 1000))+'&fields='+fields
+        #jiraIssuesUrl = baseUrl+"?jql=updated>='"+lastUpdated+"' ORDER BY updated ASC&maxResults="+str(self.config.get("dataFetchCount", 1000))+'&fields='+fields
         changeLog = self.config.get('changeLog', None)
         if changeLog:
-            jiraIssuesUrl = jiraIssuesUrl + '&expand=changelog'
+            #jiraIssuesUrl = jiraIssuesUrl + '&expand=changelog'
             changeLogFields = changeLog['fields']
             changeLogMetadata = changeLog['metadata']
             changeLogResponseTemplate = changeLog['responseTemplate']
@@ -52,7 +52,8 @@ class JiraAgent(BaseAgent):
         while (startAt + maxResults) < total:
             data = []
             workLogData = []
-            response = self.getResponse(jiraIssuesUrl+'&startAt='+str(startAt + maxResults), 'GET', self.userid, self.passwd, None)
+            jiraIssuesUrl = self.buildJiraRestUrl(baseUrl, startFrom, fields) + '&startAt='+str(startAt + maxResults)
+            response = self.getResponse(jiraIssuesUrl, 'GET', self.userid, self.passwd, None)
             jiraIssues = response["issues"]
             for issue in jiraIssues:
                 parsedIssue = self.parseResponse(responseTemplate, issue)
@@ -76,6 +77,16 @@ class JiraAgent(BaseAgent):
                 self.updateTrackingJson(self.tracking)
             else:
                 break
+    
+    def buildJiraRestUrl(self, baseUrl, startFrom, fields):
+        lastUpdatedDate = self.tracking.get("lastupdated", startFrom)
+        endDate = parser.parse(lastUpdatedDate) + datetime.timedelta(hours=24)
+        endDate = endDate.strftime('%Y-%m-%d %H:%M')
+        jiraIssuesUrl = baseUrl+"?jql=updated>='"+lastUpdatedDate+"' AND updated<'"+endDate+"' ORDER BY updated ASC&maxResults="+str(self.config.get("dataFetchCount", 1000))+'&fields='+fields
+        changeLog = self.config.get('changeLog', None)
+        if changeLog:
+            jiraIssuesUrl = jiraIssuesUrl + '&expand=changelog'
+        return jiraIssuesUrl
     
     def processChangeLog(self, issue, workLogFields, responseTemplate, startFromDate):
         changeLog = issue.get('changelog', None)
