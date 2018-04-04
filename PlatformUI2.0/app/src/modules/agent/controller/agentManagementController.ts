@@ -29,9 +29,9 @@ module ISightApp {
             this.homeController = homePageController;
 			
             var self = this;	
-			self.getOsVersionTools("");
-			self.getSelectedAgentDetails();
 			self.showMessage = "Please select version & tools";
+			self.getOsVersionTools("");
+			self.getSelectedAgentDetails();			
 			self.showConfig = false;		
 			
 			if(self.editAgentDetails['type'] == "update") 
@@ -89,15 +89,19 @@ module ISightApp {
 			self.toolsArr = [];			
 			self.agentService.getDocRootAgentVersionTools()
 			.then(function (data) {	
-			
-				self.response = data.data;			
 				
-				if(Selversion) {	
-					self.toolsArr = self.response[Selversion];
+				if(data.status == "success") {
+					self.response = data.data;			
+					
+					if(Selversion) {	
+						self.toolsArr = self.response[Selversion];
+					}else {
+						for(var key in self.response){					
+							self.versionList.push(key);
+						}			
+					}
 				}else {
-					for(var key in self.response){					
-						self.versionList.push(key);
-					}			
+					self.showMessage = "Problem with Docroot URL (or) Platform service. Please try again";	
 				}
 				
 			})			
