@@ -28,6 +28,7 @@ import java.net.URL;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Enumeration;
@@ -43,52 +44,58 @@ public class AgentManagementUtil {
 	private static final AgentManagementUtil agentManagementUtil = new AgentManagementUtil();
 
 	private AgentManagementUtil() {
-
 	}
-
 	public static AgentManagementUtil getInstance() {
 		return agentManagementUtil;
 	}
 
 	public  JsonObject getAgentConfigfile(URL filePath, File targetDir) throws IOException  {
-
 		if (!targetDir.exists()) {
 			targetDir.mkdirs();
 		}
-		InputStream in = new BufferedInputStream(filePath.openStream(), 1024);
 		File zip = File.createTempFile("agent_", ".zip", targetDir);
-		OutputStream out = new BufferedOutputStream(new FileOutputStream(zip));
-		copyInputStream(in, out);
-		out.close();
-		return getAgentConfigFile(zip, targetDir);
+		try(InputStream in = new BufferedInputStream(filePath.openStream(), 1024);
+				OutputStream out = new BufferedOutputStream(new FileOutputStream(zip))){
+			copyInputStream(in, out);
+		}
+		return getAgentConfiguration(zip, targetDir);
 	}
 
-	public  JsonObject getAgentConfigFile(File zip, File targetDir) throws IOException {
+	public   Path getAgentZipFolder(final Path sourceFolderPath, Path zipPath) throws IOException {
+		try(final ZipOutputStream zos = new ZipOutputStream(new FileOutputStream(zipPath.toFile()))){
+			Files.walkFileTree(sourceFolderPath, new SimpleFileVisitor<Path>() {
+				@Override
+				public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+					zos.putNextEntry(new ZipEntry(sourceFolderPath.relativize(file).toString().replace("\\",File.separator)));
+					Files.copy(file, zos);
+					zos.closeEntry();
+					return FileVisitResult.CONTINUE;
+				}
+			});
+		}
+		return zipPath;
+	}
 
+	private  JsonObject getAgentConfiguration(File zip, File targetDir) throws IOException {
 		if (!zip.exists()) {
 			throw new IOException(zip.getAbsolutePath() + " does not exist");
 		}
 		if (!buildDirectory(targetDir)) {
-			throw new IOException("Could not create directory: " + targetDir);
+			throw new IOException("Could not create directory" + targetDir);
 		}
 		String filePath=null;
-
 		try(ZipFile zipFile = new ZipFile(zip);){
-
 			for (Enumeration entries = zipFile.entries(); entries.hasMoreElements();) {
 				ZipEntry entry = (ZipEntry) entries.nextElement();
-				File file = new File(targetDir, File.separator + entry.getName());
-
+				File file = new File(targetDir,File.separator + entry.getName());
 				if (!buildDirectory(file.getParentFile())) {
 					throw new IOException("Could not create directory: " + file.getParentFile());
 				}
-
 				if (!entry.isDirectory()) {
 					copyInputStream(zipFile.getInputStream(entry), new BufferedOutputStream(new FileOutputStream(file)));
 					if(entry.getName().endsWith("config.json")){
 						filePath = entry.getName();
 					}
-
 				} else {
 					if (!buildDirectory(file)) {
 						throw new IOException("Could not create directory: " + file);
@@ -96,18 +103,20 @@ public class AgentManagementUtil {
 				}
 			}
 		}
-		JsonObject jsonObject = readJsonFile(targetDir, filePath);
-		return jsonObject;
+		if(zip.exists()){
+			Path path = Paths.get(zip.getPath());
+			Files.delete(path);
+		}
+		return readJsonFile(targetDir, filePath);
 	}
 
 	private  JsonObject readJsonFile(File targetDir, String filePath) throws FileNotFoundException {
 		JsonParser  parser = new JsonParser();
-		Object obj = parser.parse(new FileReader(targetDir+"/"+filePath));
-		JsonObject jsonObject = (JsonObject)obj;
-		return jsonObject;
+		Object obj = parser.parse(new FileReader(targetDir+File.separator+filePath));
+		return (JsonObject)obj;
 	}
 
-	public  void copyInputStream(InputStream in, OutputStream out) throws IOException {
+	private  void copyInputStream(InputStream in, OutputStream out) throws IOException {
 		byte[] buffer = new byte[1024];
 		int len = in.read(buffer);
 		while (len >= 0) {
@@ -118,24 +127,9 @@ public class AgentManagementUtil {
 		out.close();
 	}
 
-	public  boolean buildDirectory(File file) {
+	private  boolean buildDirectory(File file) {
 		return file.exists() || file.mkdirs();
 	}
 
-	public   Path getAgentZipFolder(final Path sourceFolderPath, Path zipPath) throws Exception {
-		final ZipOutputStream zos = new ZipOutputStream(new FileOutputStream(zipPath.toFile()));
-		Files.walkFileTree(sourceFolderPath, new SimpleFileVisitor<Path>() {
-			public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-				zos.putNextEntry(new ZipEntry(sourceFolderPath.relativize(file).toString().replace("\\", "/")));
-				Files.copy(file, zos);
-				zos.closeEntry();
-				return FileVisitResult.CONTINUE;
-			}
-		});
-		zos.close();
-		return zipPath;
-	}
-
-	
 
 }

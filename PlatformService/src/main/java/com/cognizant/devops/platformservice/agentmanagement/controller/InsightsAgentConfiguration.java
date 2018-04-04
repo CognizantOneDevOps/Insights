@@ -20,7 +20,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -38,8 +37,6 @@ import com.google.gson.JsonObject;
 @RestController
 @RequestMapping("/admin/agentConfiguration")
 public class InsightsAgentConfiguration {
-
-	private static final Logger LOG = Logger.getLogger(InsightsAgentConfiguration.class);
 
 	@Autowired
 	AgentManagementService agentManagementService;
@@ -115,7 +112,6 @@ public class InsightsAgentConfiguration {
 		}
 		return PlatformServiceUtil.buildSuccessResponseWithData(agentList);
 	}
-
 	@RequestMapping(value = "/getRegisteredAgentDetail", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 	public @ResponseBody JsonObject getAgentDetails(@RequestParam String agentId) {
 		AgentConfigTO  agentDetails ;
