@@ -32,7 +32,7 @@ module ISightApp {
 			self.showConfirmMessage = "";
 			self.homeController.templateName = 'agentList';				
 			if(self.homeController.showConfirmMessage) {
-					self.showConfirmMessage = self.homeController.showConfirmMessage;
+				self.showConfirmMessage = self.homeController.showConfirmMessage;				
 			}			
 			self.getRegisteredAgents();
 		}
@@ -46,12 +46,14 @@ module ISightApp {
 		tableParams = [];
 		homeController: HomePageController;
 		buttonDisableStatus: boolean = false;
+		runDisableStatus: string;
 	    editIconSrc: string = "dist/icons/svg/actionIcons/Edit_icon_disabled.svg";
-		startIconSrc: string = "dist/icons/svg/actionIcons/Start_icon_Active.svg";
-		stopIconSrc: string = "dist/icons/svg/actionIcons/Stop_icon_Active.svg";
+		startIconSrc: string = "dist/icons/svg/actionIcons/Start_icon_Disabled.svg";
+		stopIconSrc: string = "dist/icons/svg/actionIcons/Stop_icon_Disabled.svg";
 
 		agentStartStopAction(actDetails, actType): void{
 			var self = this;
+			
 			self.agentService.agentStartStop(actDetails.agentid, actType)
 			.then(function (data) {		
 				console.log(data);			
@@ -62,7 +64,7 @@ module ISightApp {
 				console.log(data);
 				self.showConfirmMessage = "Error";
 				self.getRegisteredAgents();	
-			}); 			
+			});		
 			
 		}
 		
@@ -71,9 +73,14 @@ module ISightApp {
 			this.homeController.templateName = 'agentManagement';			
 		}
 		
-		enableActions(): void{		
+		enableActions(agntStatus): void{		
             this.buttonDisableStatus = true;
-			this.editIconSrc = "dist/icons/svg/userOnboarding/Edit_icon_MouseOver.svg";
+			this.runDisableStatus = agntStatus;
+			this.editIconSrc = "dist/icons/svg/userOnboarding/Edit_icon_MouseOver.svg";			
+			if(agntStatus == "STOP"){				
+				this.startIconSrc = "dist/icons/svg/actionIcons/Start_icon_Active.svg";	
+			}else {
+			this.stopIconSrc = "dist/icons/svg/actionIcons/Stop_icon_Active.svg";}
 		}
 		
 		getRegisteredAgents(): void{
@@ -82,7 +89,10 @@ module ISightApp {
 			self.showList = false;
 			self.showThrobber = true;				
 			self.buttonDisableStatus = false;
+			self.runDisableStatus = "";
 			self.editIconSrc = "dist/icons/svg/actionIcons/Edit_icon_disabled.svg";
+			self.startIconSrc = "dist/icons/svg/actionIcons/Start_icon_Disabled.svg";
+			self.stopIconSrc = "dist/icons/svg/actionIcons/Stop_icon_Disabled.svg";
 			self.homeController.showConfirmMessage = "";
 			self.agentService.loadAgentServices("DB_AGENTS_LIST")			
 			.then(function (response) {						
@@ -111,6 +121,11 @@ module ISightApp {
 				self.showList = false;				
 				self.showMessage = "Problem with Platform Service, Please try again";				
 			}); 			
+			
+			setTimeout(function() {
+                  self.showConfirmMessage = "";
+				  document.getElementById('confrmMsg').innerHTML = "";
+				}, 2000); 	
 			
 		}
 		
