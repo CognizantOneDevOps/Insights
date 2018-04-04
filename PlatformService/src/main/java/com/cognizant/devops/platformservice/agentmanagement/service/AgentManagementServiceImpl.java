@@ -212,8 +212,6 @@ public class AgentManagementServiceImpl  implements AgentManagementService{
 
 	@Override
 	public Map<String, ArrayList<String>> getSystemAvailableAgentList()  throws InsightsCustomException{
-		System.setProperty("http.proxyHost", "proxy.cognizant.com");
-		System.setProperty("http.proxyPort","6050");
 		Map<String,ArrayList<String>>  agentDetails = new HashMap<>();
 		String url = ApplicationConfigProvider.getInstance().getAgentDetails().getDocrootUrl();
 		Document doc;
