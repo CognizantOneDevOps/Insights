@@ -32,6 +32,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeoutException;
 import java.util.stream.Stream;
 
 import org.apache.commons.lang3.StringUtils;
@@ -61,9 +62,11 @@ import com.rabbitmq.client.ConnectionFactory;
 
 @Service("agentManagementService")
 public class AgentManagementServiceImpl  implements AgentManagementService{
-	private static Logger LOG = Logger.getLogger(AgentManagementServiceImpl.class);
-	
+	private static Logger log = Logger.getLogger(AgentManagementServiceImpl.class);
+
 	private static final String FILETYPE = ".zip";
+	private static final String ISDATESUPPORTED = "isDataUpdateSupported";
+	private static final String SUCCESS = "SUCCESS";
 
 	@Override
 	public String registerAgent(String toolName,String agentVersion,String osversion,String configDetails) throws InsightsCustomException {
@@ -78,10 +81,10 @@ public class AgentManagementServiceImpl  implements AgentManagementService{
 			json.addProperty("osversion",osversion);
 			json.addProperty("agentVersion",agentVersion);
 			json.get("subscribe").getAsJsonObject().addProperty("agentCtrlQueue" ,agentId);
-			
+
 			boolean isDataUpdateSupported = false;
-			if(json.get("isDataUpdateSupported") != null && !json.get("isDataUpdateSupported").isJsonNull()) {
-				isDataUpdateSupported = json.get("isDataUpdateSupported").getAsBoolean();
+			if(json.get(ISDATESUPPORTED) != null && !json.get(ISDATESUPPORTED).isJsonNull()) {
+				isDataUpdateSupported = json.get(ISDATESUPPORTED).getAsBoolean();
 			}  
 			String uniqueKey = agentId;
 			Date updateDate= Timestamp.valueOf(LocalDateTime.now());
@@ -91,21 +94,18 @@ public class AgentManagementServiceImpl  implements AgentManagementService{
 			agentConfigDAL.saveAgentConfigFromUI(agentId , json.get("toolCategory").getAsString(),toolName, json, isDataUpdateSupported,uniqueKey,agentVersion,osversion, updateDate);
 
 			//Create zip/tar file with updated config.json
-			Path agentZipPath =updateAgentConfig(toolName,agentId,json);
+			Path agentZipPath =updateAgentConfig(toolName,json);
 			byte[] data = Files.readAllBytes(agentZipPath);
-			
+
 			String fileName = toolName + FILETYPE;
 			sendAgentPackage(data,fileName,agentId,toolName,osversion);
 			performAgentAction(agentId,AGENTSTATUS.START.name());
 		} catch (Exception e) {
-			LOG.error("Error while registering agent "+toolName, e);
+			log.error("Error while registering agent "+toolName, e);
 			throw new InsightsCustomException(e.toString());
 		}
 
-		//call installAgent method
-		//String status = installAgent(agentId, toolName,agentZipPath.getFileName().toString(), osversion);
-		//return status;
-		return "SUCCESS";
+		return SUCCESS;
 	}
 
 
@@ -117,11 +117,11 @@ public class AgentManagementServiceImpl  implements AgentManagementService{
 			byte[] data = Files.readAllBytes(path);
 			sendAgentPackage(data,fileName,agentId,toolName,osversion);
 		} catch (Exception e) {
-			LOG.error("Error while installing agent..", e);
+			log.error("Error while installing agent..", e);
 			throw new InsightsCustomException(e.toString());
 		}
 
-		return "SUCCESS";
+		return SUCCESS;
 	}
 
 	@Override
@@ -131,10 +131,10 @@ public class AgentManagementServiceImpl  implements AgentManagementService{
 			agentConfigDAL.updateAgentRunningStatus(agentId,AGENTSTATUS.valueOf(action));
 			performAgentAction(agentId,action);
 		} catch (Exception e) {
-			LOG.error("Error while starting agent..", e);
+			log.error("Error while starting agent..", e);
 			throw new InsightsCustomException(e.toString());
 		}
-		return "SUCCESS";
+		return SUCCESS;
 	}
 
 	@Override
@@ -151,29 +151,29 @@ public class AgentManagementServiceImpl  implements AgentManagementService{
 			json.addProperty("agentVersion",agentVersion);
 
 			boolean isDataUpdateSupported = false;
-			if(json.get("isDataUpdateSupported") != null && !json.get("isDataUpdateSupported").isJsonNull()) {
-				isDataUpdateSupported = json.get("isDataUpdateSupported").getAsBoolean();
+			if(json.get(ISDATESUPPORTED) != null && !json.get(ISDATESUPPORTED).isJsonNull()) {
+				isDataUpdateSupported = json.get(ISDATESUPPORTED).getAsBoolean();
 			}
 			String uniqueKey = agentId;
 			Date updateDate= Timestamp.valueOf(LocalDateTime.now());
 
 			AgentConfigDAL agentConfigDAL = new AgentConfigDAL();
-			 agentConfigDAL.saveAgentConfigFromUI(agentId , json.get("toolCategory").getAsString(), toolName, json, isDataUpdateSupported, uniqueKey,agentVersion,osversion, updateDate);
+			agentConfigDAL.saveAgentConfigFromUI(agentId , json.get("toolCategory").getAsString(), toolName, json, isDataUpdateSupported, uniqueKey,agentVersion,osversion, updateDate);
 
-			Path agentZipPath = updateAgentConfig(toolName,agentId,json);
+			Path agentZipPath = updateAgentConfig(toolName ,json);
 
 			byte[] data = Files.readAllBytes(agentZipPath);
-			
+
 			String fileName = toolName + FILETYPE;
-			
+
 			sendAgentPackage(data,fileName,agentId,toolName,osversion);
 
 		} catch (Exception e) {
-			LOG.error("Error updating and installing agent", e);
+			log.error("Error updating and installing agent", e);
 			throw new InsightsCustomException(e.toString());
 		}
 
-		return "SUCCESS";
+		return SUCCESS;
 	}
 
 	@Override
@@ -189,7 +189,7 @@ public class AgentManagementServiceImpl  implements AgentManagementService{
 				agentList.add(to);
 			}
 		}catch(Exception e){
-			LOG.error("Error getting all agent config", e);
+			log.error("Error getting all agent config", e);
 			throw new InsightsCustomException(e.toString());
 		}
 
@@ -204,7 +204,7 @@ public class AgentManagementServiceImpl  implements AgentManagementService{
 		try{
 			BeanUtils.copyProperties(agentConfigDAL.getAgentConfigurations(agentId), agentConfig);
 		}catch(Exception e){
-			LOG.error("Error getting agent details", e);
+			log.error("Error getting agent details", e);
 			throw new InsightsCustomException(e.toString());
 		}
 		return agentConfig;
@@ -212,9 +212,9 @@ public class AgentManagementServiceImpl  implements AgentManagementService{
 
 	@Override
 	public Map<String, ArrayList<String>> getSystemAvailableAgentList()  throws InsightsCustomException{
-		/*System.setProperty("http.proxyHost", "proxy.cognizant.com");
-		System.setProperty("http.proxyPort","6050");*/
-		Map<String,ArrayList<String>>  agentDetails = new HashMap<String,ArrayList<String>>();
+		System.setProperty("http.proxyHost", "proxy.cognizant.com");
+		System.setProperty("http.proxyPort","6050");
+		Map<String,ArrayList<String>>  agentDetails = new HashMap<>();
 		String url = ApplicationConfigProvider.getInstance().getAgentDetails().getDocrootUrl();
 		Document doc;
 		try {
@@ -229,7 +229,7 @@ public class AgentManagementServiceImpl  implements AgentManagementService{
 				}
 			}
 		} catch (IOException e) {
-			LOG.error("Error while getting system agent list ",e);
+			log.error("Error while getting system agent list ",e);
 			throw new InsightsCustomException(e.toString());
 		}
 		return agentDetails;
@@ -239,16 +239,13 @@ public class AgentManagementServiceImpl  implements AgentManagementService{
 	public String getToolRawConfigFile(String version, String tool) throws InsightsCustomException  {
 		String configJson = null;
 		try {
-			/*System.setProperty("http.proxyHost", "proxy.cognizant.com");
-			System.setProperty("http.proxyPort","6050");*/
-
 			String filePath = ApplicationConfigProvider.getInstance().getAgentDetails().getDocrootUrl()
 					+"/"+version+"/agents/"+tool;
 			filePath=filePath.trim()+"/"+tool.trim()+".zip";
-			String targetDir =  ApplicationConfigProvider.getInstance().getAgentDetails().getUnzipPath()+File.separator+tool;
+			String targetDir =  ApplicationConfigProvider.getInstance().getAgentDetails().getUnzipPath()+"/"+tool;
 			configJson = AgentManagementUtil.getInstance().getAgentConfigfile(new URL(filePath), new File(targetDir)).toString();
 		} catch (IOException e) {
-			LOG.error("Error in getting raw config file ",e);
+			log.error("Error in getting raw config file ",e);
 			throw new InsightsCustomException(e.toString());
 
 		}
@@ -259,7 +256,7 @@ public class AgentManagementServiceImpl  implements AgentManagementService{
 
 		Document doc;
 		String url = ApplicationConfigProvider.getInstance().getAgentDetails().getDocrootUrl()+"/"+version+"/agents/";
-		ArrayList<String> tools = new ArrayList<String>();
+		ArrayList<String> tools = new ArrayList<>();
 		try {
 			doc = Jsoup.connect(url).get();
 			Elements rows = doc.getElementsByTag("a");
@@ -271,38 +268,35 @@ public class AgentManagementServiceImpl  implements AgentManagementService{
 
 			}
 		} catch (IOException e) {
-			LOG.debug(e);
+			log.debug(e);
 		}
 		return tools;
 	}
 
-	private Path updateAgentConfig( String toolName,String agentId,JsonObject json) throws Exception {
+	private Path updateAgentConfig( String toolName,JsonObject json) throws IOException {
 		String filePath = ApplicationConfigProvider.getInstance().getAgentDetails().getUnzipPath();
-		filePath = filePath+File.separator+toolName+"/com/cognizant/devops/platformagents/agents/";
-
-		DirectoryStream<Path> paths = Files.newDirectoryStream(Paths.get(filePath));
-		Iterator<Path> pathIterator = paths.iterator();
+		filePath = filePath+"/"+toolName+"/com/cognizant/devops/platformagents/agents/";
 		File configFile = null;
-		try(Stream<Path> all =  Files.walk(Paths.get(filePath));){
+		try (DirectoryStream<Path> paths = Files.newDirectoryStream(Paths.get(filePath))){
+			Iterator<Path> pathIterator = paths.iterator();
 
-			pathIterator = all.iterator();
-			while(pathIterator.hasNext()) {
-				Path path = pathIterator.next();
-				if(path.toString().endsWith(".json")) {
-					configFile = path.toFile();
+			try(Stream<Path> all =  Files.walk(Paths.get(filePath))){
+
+				pathIterator = all.iterator();
+				while(pathIterator.hasNext()) {
+					Path path = pathIterator.next();
+					if(path.toString().endsWith(".json")) {
+						configFile = path.toFile();
+					}
 				}
 			}
-		}catch(IOException e) {
-			LOG.error("Error finding json file", e);
-			throw e;
 		}
 		//Writing json to file
 		try (FileWriter file = new FileWriter(configFile)) {
 			file.write(json.toString());
 			file.flush();
-			file.close();
 		} catch (IOException e) {
-			LOG.error("Error writing modified json file", e);
+			log.error("Error writing modified json file", e);
 			throw e;
 		}
 		Path sourceFolderPath = Paths.get(ApplicationConfigProvider.getInstance().getAgentDetails().getUnzipPath(),toolName);
@@ -311,15 +305,15 @@ public class AgentManagementServiceImpl  implements AgentManagementService{
 		try {
 			agentZipPath = AgentManagementUtil.getInstance().getAgentZipFolder(sourceFolderPath, zipPath);
 		} catch (Exception e) {
-			LOG.error("Error creatig final zip file with modified json file", e);
+			log.error("Error creatig final zip file with modified json file", e);
 			throw e;
 		}
 		return agentZipPath;
 
 	}
 
-	private void sendAgentPackage(byte[] data, String fileName, String agentId, String toolName, String osversion) throws Exception {
-		Map<String,Object> headers = new HashMap<String, Object>();
+	private void sendAgentPackage(byte[] data, String fileName, String agentId, String toolName, String osversion) throws IOException, TimeoutException {
+		Map<String,Object> headers = new HashMap<>();
 		headers.put("fileName", fileName);
 		headers.put("osType",osversion);
 		headers.put("agentToolName", toolName);
@@ -332,8 +326,8 @@ public class AgentManagementServiceImpl  implements AgentManagementService{
 		publishAgentAction(agentDaemonQueueName, data, props);
 	}
 
-	private void performAgentAction(String agentId, String action) throws Exception {
-		Map<String,Object> headers = new HashMap<String, Object>();
+	private void performAgentAction(String agentId, String action) throws TimeoutException, IOException {
+		Map<String,Object> headers = new HashMap<>();
 		headers.put("agentId", agentId);
 
 		BasicProperties props = getBasicProperties(headers);
@@ -341,7 +335,7 @@ public class AgentManagementServiceImpl  implements AgentManagementService{
 		publishAgentAction(agentId, action.getBytes(), props);
 	}
 
-	private void publishAgentAction(String routingKey, byte[] data, BasicProperties props) throws Exception {
+	private void publishAgentAction(String routingKey, byte[] data, BasicProperties props) throws TimeoutException, IOException {
 		String exchangeName = ApplicationConfigProvider.getInstance().getAgentDetails().getAgentExchange();
 		ConnectionFactory factory = new ConnectionFactory();
 		factory.setHost(ApplicationConfigProvider.getInstance().getMessageQueue().getHost());
@@ -370,70 +364,5 @@ public class AgentManagementServiceImpl  implements AgentManagementService{
 		return toolName + "-"+ Instant.now().toEpochMilli();
 	}
 
-	 public static void main(String... args)  {
-		   /*ApplicationConfigCache.loadConfigCache();
-		   AgentManagementServiceImpl impl = new AgentManagementServiceImpl();
-
-		   JsonParser parser = new JsonParser();
-		   JsonObject json = (JsonObject) parser.parse(impl.getToolRawConfigFile("v99.0", "git"));
-		  // JsonObject json = impl.getToolRawConfigFile("v3.0", "bitbucket");
-		   System.out.println(json);
-		   String status = impl.registerAgent("git", "v99.0", "WINDOWS", testConfig());
-		   System.out.println(status);
-
-		   //impl.getRegisteredAgents();
-		   //System.out.println(impl.getAgentDetails("bitbucket-1519302061371"));
-		   //impl.startStopAgent("bitbucket-1519302061371", "RUNNING");
-		   System.exit(0);*/
-	   }
-
-	public static String testConfig() {
-
-		return "{\r\n" + 
-				"	\"mqConfig\" : {\r\n" + 
-				"		\"user\" : \"iSight\", \r\n" + 
-				"		\"password\" : \"iSight\", \r\n" + 
-				"		\"host\" : \"localhost\", \r\n" + 
-				"		\"exchange\" : \"iSight\"\r\n" + 
-				"	},\r\n" + 
-				"	\"subscribe\" : {\r\n" + 
-				"		\"config\" : \"SCM.GIT.config\"\r\n" + 
-				"	},\r\n" + 
-				"	\"publish\" : {\r\n" + 
-				"		\"data\" : \"SCM.GIT.DATA\",\r\n" + 
-				"		\"health\" : \"SCM.GIT.HEALTH\"\r\n" + 
-				"	},\r\n" + 
-				"	\"communication\":{\r\n" + 
-				"		\"type\" : \"REST\" \r\n" + 
-				"	},\r\n" + 
-				"	\"dynamicTemplate\" : {\r\n" + 
-				"		\"responseTemplate\" : {\r\n" + 
-				"			\"sha\": \"commitId\",\r\n" + 
-				"			\"commit\" : {\r\n" + 
-				"				\"author\" : {\r\n" + 
-				"					\"name\": \"authorName\",\r\n" + 
-				"					\"date\": \"commitTime\"\r\n" + 
-				"				}\r\n" + 
-				"			}\r\n" + 
-				"		}\r\n" + 
-				"	},\r\n" + 
-				"	\"enableBranches\" : false,\r\n" + 
-				"	\"toolsTimeZone\" : \"GMT\",\r\n" + 
-				"	\"insightsTimeZone\" : \"Asia/Kolkata\",\r\n" + 
-				"	\"useResponseTemplate\" : true,\r\n" + 
-				"	\"auth\" : \"base64\",\r\n" + 
-				"	\"runSchedule\" : 30,\r\n" + 
-				"	\"timeStampField\":\"commitTime\",\r\n" + 
-				"	\"timeStampFormat\":\"%Y-%m-%dT%H:%M:%SZ\",\r\n" + 
-				"	\"StartFrom\" : \"2018-02-26 15:46:33\",\r\n" + 
-				"	\"AccessToken\": \"AuthToken\",\r\n" + 
-				"	\"GetRepos\":\"https://api.github.com/users/username/repos\",\r\n" + 
-				"	\"CommitsBaseEndPoint\":\"https://api.github.com/repos/username/\",\r\n" + 
-				"	\"isDebugAllowed\" : false,\r\n" + 
-				"	\"loggingSetting\" : {\r\n" + 
-				"		\"logLevel\" : \"WARN\"\r\n" + 
-				"	}\r\n" + 
-				"}";
-	}
 
 }
