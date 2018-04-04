@@ -41,7 +41,7 @@
 				</div>
 		</div>			
             <div>               			
-				 <md-button type="submit" class="md-raised md-primary configureBut" ng-click="agentManagementController.getUpdatedConfigData(agentManagementController.btnValue)" ng-disabled="agentManagementController.buttonDisableStatus">
+				 <md-button type="submit" class="md-raised md-primary configureBut" ng-click="agentManagementController.getUpdatedConfigData(agentManagementController.btnValue)" ng-disabled="agentManagementController.buttonDisableStatus && agentManagementController.dynamicData != ''">
                     {{agentManagementController.btnValue}}
                 </md-button>
             </div>

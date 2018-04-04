@@ -6,7 +6,7 @@
  </g>
  <g>
   <title>Layer 1</title>
-  <path id="svg_1" fill="none" d="m0,-1l24,0l0,24l-24,0l0,-24z"/>
-  <path fill="#00728f" id="svg_2" d="m6,6l12,0l0,12l-12,0c0,-4 0,-8 0,-12z"/>
+  <path id="svg_1" fill="none" d="m0,0l24,0l0,24l-24,0l0,-24z"/>
+  <path fill="#cccccc" id="svg_2" d="m6,6l12,0l0,12l-12,0l0,-12z"/>
  </g>
 </svg>
