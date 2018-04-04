@@ -41,7 +41,7 @@ public class AgentConfig {
 	@Column(name = "TOOL_CATEGORY")
 	private String toolCategory;
 
-	@Column(name = "AGENT_JSON", length = 1023)
+	@Column(name = "AGENT_JSON")
 	private String agentJson;
 
 	@Column(name = "UPDATE_DATE")
