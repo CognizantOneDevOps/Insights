@@ -128,8 +128,7 @@ li input:checked +  ol > li:first-child{margin:0 0 0.125em;}
 
 #stylescroll::-webkit-scrollbar-thumb
 {
-    background-color: #ccc;
-    
+    background-color: #ccc;    
 }
 
 .scrollbar {
