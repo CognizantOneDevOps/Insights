@@ -22,6 +22,7 @@
   <div class="gf-form" ng-if="ctrl.target.rawQuery">
     <editor-checkbox text="Graph" model="ctrl.target.graph"></editor-checkbox>
     <editor-checkbox text="Stats" model="ctrl.target.stats"></editor-checkbox>
+	<editor-checkbox text="Cache results" model="ctrl.target.rescache"></editor-checkbox>
   </div>
 
   <div ng-if="!ctrl.target.rawQuery">
