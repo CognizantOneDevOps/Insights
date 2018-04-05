@@ -240,7 +240,7 @@ public class AgentManagementServiceImpl  implements AgentManagementService{
 			String filePath = ApplicationConfigProvider.getInstance().getAgentDetails().getDocrootUrl()
 					+"/"+version+"/agents/"+tool;
 			filePath=filePath.trim()+"/"+tool.trim()+".zip";
-			String targetDir =  ApplicationConfigProvider.getInstance().getAgentDetails().getUnzipPath()+"/"+tool;
+			String targetDir =  ApplicationConfigProvider.getInstance().getAgentDetails().getUnzipPath()+File.separator+tool;
 			configJson = AgentManagementUtil.getInstance().getAgentConfigfile(new URL(filePath), new File(targetDir)).toString();
 		} catch (IOException e) {
 			log.error("Error in getting raw config file ",e);
@@ -273,7 +273,7 @@ public class AgentManagementServiceImpl  implements AgentManagementService{
 
 	private Path updateAgentConfig( String toolName,JsonObject json) throws IOException {
 		String filePath = ApplicationConfigProvider.getInstance().getAgentDetails().getUnzipPath();
-		filePath = filePath+"/"+toolName+"/com/cognizant/devops/platformagents/agents/";
+		filePath = filePath+File.separator+toolName+"/com/cognizant/devops/platformagents/agents/";
 		File configFile = null;
 		try (DirectoryStream<Path> paths = Files.newDirectoryStream(Paths.get(filePath))){
 			Iterator<Path> pathIterator = paths.iterator();
