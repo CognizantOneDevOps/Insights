@@ -102,9 +102,17 @@ export default class Neo4jDatasource {
   query(options) {
     //var adhocFilters = this.templateSrv.getAdhocFilters(this.name);
     var targets = options.targets;
+	let range = options.range;
+	var fromTime = range.from.valueOf() / 1000;
+	var toTime = range.to.valueOf() / 1000;
+		
     var cypherQuery = {};
-    var statements = [];
+    var statements = [];	
+    var metadata = [];
+	
     cypherQuery['statements'] = statements;
+    cypherQuery['metadata'] = metadata;
+	
     for (var i in targets) {
       var target = targets[i];
       let query = this.templateSrv.replace(target.target, options.scopedVars, this.applyTemplateVariables);
@@ -115,12 +123,21 @@ export default class Neo4jDatasource {
       } else {
         resultDataContents.push("row");
       }
+	  	  
       var statement = {
         "statement": query,
         "includeStats": target.stats,
         "resultDataContents": resultDataContents
       };
+	  
+	   var cacheoptions = {
+        "startTime": fromTime,
+        "endTime": toTime,
+        "resultCache":  target.rescache
+      };
+	  
       statements.push(statement);
+      metadata.push(cacheoptions);
     }
     return this.executeCypherQuery(cypherQuery, targets);
   }
