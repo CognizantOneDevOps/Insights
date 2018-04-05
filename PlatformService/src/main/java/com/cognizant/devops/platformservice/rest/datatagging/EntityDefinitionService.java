@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  ******************************************************************************/
-package com.cognizant.devops.platformservice.rest.datatagging;
+package com.cognizant.devops.platformservice.rest.dataTagging;
 
 import java.util.List;
 
