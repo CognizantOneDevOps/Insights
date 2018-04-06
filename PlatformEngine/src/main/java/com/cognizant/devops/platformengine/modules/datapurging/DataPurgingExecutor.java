@@ -15,13 +15,14 @@
  ******************************************************************************/
 package com.cognizant.devops.platformengine.modules.datapurging;
 
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
@@ -30,7 +31,9 @@ import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 
+import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.constants.ConfigOptions;
+import com.cognizant.devops.platformcommons.core.util.InsightsUtils;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBException;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphResponse;
 import com.cognizant.devops.platformcommons.dal.neo4j.Neo4jDBHandler;
@@ -39,30 +42,26 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.reflect.TypeToken;
 
 public class DataPurgingExecutor implements Job {
 
-	
+
 	private static Logger log = Logger.getLogger(DataPurgingExecutor.class.getName());
 
 	public void execute(JobExecutionContext context) throws JobExecutionException {
-		try {
-			performDataPurging();
-		} catch (GraphDBException e) {
-			log.error("Exception occured in DataPurgingExecutor Job: " + e);
-		}
+		if (ApplicationConfigProvider.getInstance().isEnableOnlineBackup()) {
+			performDataPurging();				
+		} 
 	}
 
 
-	public void performDataPurging() throws GraphDBException {
-		List<String> labelList = new ArrayList<String>();
-		boolean isDelete = false;
+	public void performDataPurging()   {
+		List<String> labelList = new ArrayList<>();
 		String rowLimit = null ;
 		String backupFileLocation = null ;
-		int backupDurationInDays = 0;
+		long backupDurationInDays = 0;
 		String backupFileName = null ;
-				
+
 		/**
 		 * To get Settings Configuration which is set by User from Insights application UI
 		 * is stored into Settings_Configuration table of PostGres database
@@ -78,48 +77,44 @@ public class DataPurgingExecutor implements Job {
 			rowLimit = configJsonObj.get(ConfigOptions.ROW_LIMIT).getAsString();
 			backupFileLocation =configJsonObj.get(ConfigOptions.BACKUP_FILE_LOCATION).getAsString();
 			backupFileName = configJsonObj.get(ConfigOptions.BACKUP_FILE_NAME).getAsString();
-			backupDurationInDays = -(configJsonObj.get(ConfigOptions.BACKUP_DURATION_IN_DAYS).getAsInt());
+			backupDurationInDays = configJsonObj.get(ConfigOptions.BACKUP_DURATION_IN_DAYS).getAsLong();
 		}
-		
-		
+
+
 		//convert to epoch time 
-		Calendar cal = GregorianCalendar.getInstance();
-		cal.add( Calendar.DAY_OF_YEAR, backupDurationInDays);
-		Date tenDaysAgo = cal.getTime();
-		long epochTime = tenDaysAgo.getTime() /1000;
-		
+		long epochTime = InsightsUtils.getTimeBeforeDays(backupDurationInDays);
 		Neo4jDBHandler dbHandler = new Neo4jDBHandler();
-		int labelSize = 0;
-		
 		for(String label : labelList){
-			labelSize = labelSize + 1;
 			int splitlength = 0;
-			int count = getNodeCnt(dbHandler, label ,epochTime);			
-			while(splitlength  < count){
-				GraphResponse response = executeCypherQuery(label ,rowLimit,splitlength , epochTime) ;
-				String location = backupFileLocation +"/"+ backupFileName+ "_"+splitlength + ".csv";
-				try {
-					writeToCSVFile(response , location);
-				} catch (IOException e) {
-					log.error(e);
+			boolean deleteFlag = true;
+			try {
+				int count = getNodeCount(dbHandler, label ,epochTime);
+				while(splitlength  < count){
+					GraphResponse response = executeCypherQuery(label,rowLimit,splitlength,epochTime) ;
+					String localDateTime = InsightsUtils.getLocalDateTime("yyyyMMddHHmmss");
+					String location = backupFileLocation + File.separator + backupFileName + "_" + splitlength + "_" + localDateTime + ".csv";
+					writeToCSVFile(response , location);				
+					splitlength = splitlength + Integer.parseInt(rowLimit);
 				}
-				splitlength = splitlength + Integer.parseInt(rowLimit);
-			}	
-			if( labelSize >= labelList.size()){
-				isDelete = true;
+			} 
+			catch (GraphDBException | IOException e) {
+				log.error("Exception occured while taking backup into csv file in DataPurgingExecutor Job: " + e);
+				deleteFlag = false;
+			}
+			if(deleteFlag){
+				String deleteQry =  "MATCH (n:"+label+")  where n.inSightsTime < "+ epochTime  +"   delete n ";
+				try {
+					dbHandler.executeCypherQuery(deleteQry);
+				} catch (GraphDBException e) {
+					log.error("Exception occured while deleting data of " + label +" label inside DataPurgingExecutor Job: " + e);
+				}
 			}
 		}
-		
-		if( isDelete){
-			for(String label : labelList){
-				String deleteQry =  "MATCH (n:"+label+")  where n.inSightsTimeX < "+ epochTime  +"   delete n ";
-				dbHandler.executeCypherQuery(deleteQry);
-			}
-		}
+
 	}
 
-	private int getNodeCnt(Neo4jDBHandler dbHandler, String label, long epochTime) throws GraphDBException {
-		String cntQry = "MATCH (n:"+label+")  where n.inSightsTimeX < "+ epochTime  +"    return count(n) ";
+	private int getNodeCount(Neo4jDBHandler dbHandler, String label, long epochTime) throws GraphDBException {
+		String cntQry = "MATCH (n:"+label+")  where n.inSightsTime < "+ epochTime  +" return count(n) ";
 		GraphResponse cntResponse = dbHandler.executeCypherQuery(cntQry);
 		int count = cntResponse.getJson() .get("results").getAsJsonArray().get(0).getAsJsonObject().get("data").getAsJsonArray()
 				.get(0).getAsJsonObject().get("row").getAsInt();
@@ -128,50 +123,66 @@ public class DataPurgingExecutor implements Job {
 
 	private GraphResponse executeCypherQuery(String label, String limit, int splitlength, long epochTime) throws GraphDBException {
 		Neo4jDBHandler dbHandler = new Neo4jDBHandler();
-		String query = "MATCH (n:"+label+")  where n.inSightsTimeX < "+ epochTime  +"   return n skip  "+ splitlength +" limit  " +limit;
+		String query = "MATCH (n:"+label+")  where n.inSightsTime < "+ epochTime  +"   return n skip  "+ splitlength +" limit  " +limit;
 		GraphResponse response = dbHandler.executeCypherQuery(query);
 		return response;
 	}
 
 	private void writeToCSVFile(GraphResponse response, String location) throws IOException {
-
-		Gson gson = new Gson();
-		List<MetaData> list = new ArrayList<MetaData>();
 		JsonArray array = response.getJson().get("results").getAsJsonArray().get(0).getAsJsonObject().get("data").getAsJsonArray();
+		Map<String,Integer> headerMap = new HashMap<>();
+		List<ArrayList<String>> valueStore = new ArrayList<>();
+		ArrayList<String> headerList = new ArrayList<>();
+		int rowCount = 0;
 		for(JsonElement element : array) {
+			int counter = 0;
+			ArrayListAnySize<String> valueList = new ArrayListAnySize<>();
+			JsonElement jsonElement = element.getAsJsonObject().get("row").getAsJsonArray().get(0);
+			Set<Map.Entry<String, JsonElement>> entries = jsonElement.getAsJsonObject().entrySet();//will return members of your object
+			for (Map.Entry<String, JsonElement> entry: entries) {
+				String key = entry.getKey();
+				if (rowCount > 0){
+					if(!headerMap.containsKey(key)) {
+						headerMap.put(key, headerMap.size());
+						counter++;
+						headerList.add(key);
+					}					
+				} else {					
+					headerMap.put(key, counter++);
+				}
 
-			MetaData metadata = gson.fromJson(element.getAsJsonObject().get("row").getAsJsonArray().get(0).toString(), new TypeToken<MetaData>() {}.getType());
-			list.add(metadata);
-		}	
+				int columnIndex = headerMap.get(key);
+				String value = entry.getValue().getAsString();
+				if (columnIndex < valueList.size() && valueList.get(columnIndex)== null) {
+					valueList.set(columnIndex,value); 
+				} else {
+					valueList.add(columnIndex, value);				   
+				}
+
+				//
+				if (rowCount == 0) {
+					headerList.add(key);
+				}			    
+			}			
+			valueStore.add(rowCount , valueList);
+			rowCount++;
+		}
+		valueStore.add(0 , headerList);		
 		CSVFormat csvFormat = CSVFormat.DEFAULT.withRecordSeparator("\n");
 		FileWriter fWriter = new FileWriter(location);
-		CSVPrinter csvPrinter = new CSVPrinter(fWriter, csvFormat);
-		csvPrinter.printRecord( "metadataid","level_1","level_2","level_3","level_4",
-				"toolproperty1","propertyvalue1","toolproperty2","propertyvalue2",
-				"toolproperty3","propertyvalue3","toolproperty4","propertyvalue4","toolname","action");
-		for(MetaData data : list){
-			List<String> record= new ArrayList<String>();
-			record.add(data.getMetadata_id());
-			record.add(data.getLevel_1());
-			record.add(data.getLevel_2());
-			record.add(data.getLevel_3());
-			record.add(data.getLevel_4());
-			record.add(data.getToolProperty1());
-			record.add(data.getPropertyValue1());
-			record.add(data.getToolProperty2());
-			record.add(data.getPropertyValue2());
-			record.add(data.getToolProperty3());
-			record.add(data.getPropertyValue3());
-			record.add(data.getToolProperty4());
-			record.add(data.getPropertyValue4());
-			record.add(data.getToolName());
-			record.add(data.getAction());
-			csvPrinter.printRecord(record);
-		}
-		csvPrinter.close();
-
+		try(CSVPrinter csvPrinter = new CSVPrinter(fWriter, csvFormat);) {			
+			for (ArrayList<String> values: valueStore) {
+				while (headerList.size()> values.size()) {
+					values.add(null);
+				}
+				csvPrinter.printRecord(values);
+			}
+		} catch (IOException e) {
+			log.error("Error in writeToCSV method" + e);
+			throw e;
+		} 
 	}
-	
+
 	private JsonObject getSettingsJsonObject() {
 		SettingsConfigurationDAL settingsConfigurationDAL = new SettingsConfigurationDAL();	
 		String settingsJson = settingsConfigurationDAL.getSettingsJsonObject(ConfigOptions.DATAPURGING_SETTINGS_TYPE);
@@ -186,11 +197,9 @@ public class DataPurgingExecutor implements Job {
 
 	/*public static void main(String[] a){
 		DataPurgingExecutor dataPurgingExecutor=new DataPurgingExecutor();
-		ApplicationConfigCache.loadConfigCache();
-		try {
-			dataPurgingExecutor.getLabelsAndNodes();
-		} catch (GraphDBException e) {
-			log.error(e);
-		}
+		long epochTime = InsightsUtils.getTimeBeforeDays(300L);
+		System.out.println("epoch time:>>"+epochTime );
+		//ApplicationConfigCache.loadConfigCache();
+		//dataPurgingExecutor.performDataPurging();
 	}*/
 }

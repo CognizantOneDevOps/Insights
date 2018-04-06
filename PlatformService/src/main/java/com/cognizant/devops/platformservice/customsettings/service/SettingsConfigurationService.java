@@ -14,7 +14,7 @@
  * the License.
  ******************************************************************************/
 
-package com.cognizant.devops.platformservice.rest.customsettings.service;
+package com.cognizant.devops.platformservice.customsettings.service;
 
 import com.cognizant.devops.platformdal.settingsconfig.SettingsConfiguration;
 
