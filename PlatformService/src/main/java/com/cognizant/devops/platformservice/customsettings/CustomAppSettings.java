@@ -13,7 +13,7 @@
 	 * License for the specific language governing permissions and limitations under
 	 * the License.
 	 ******************************************************************************/
-package com.cognizant.devops.platformservice.rest.customsettings;
+package com.cognizant.devops.platformservice.customsettings;
 
 import java.io.File;
 import java.io.FilenameFilter;
