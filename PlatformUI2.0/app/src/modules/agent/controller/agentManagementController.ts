@@ -218,12 +218,19 @@ module ISightApp {
 				self.agentService.getDocrootAgentConfig(version, toolName)
 				.then(function (data) {
 					
-					self.buttonDisableStatus = false;
-					self.showConfig = true;
 					self.showThrobber = false;
-					self.defaultConfigdata  = JSON.parse(data.data);				
-					self.dynamicData = JSON.stringify(self.defaultConfigdata['dynamicTemplate'], undefined, 4);
-					self.configLabelMerge();					
+					
+					if(data.status == "success") {					
+						self.buttonDisableStatus = false;
+						self.showConfig = true;						
+						self.defaultConfigdata  = JSON.parse(data.data);				
+						self.dynamicData = JSON.stringify(self.defaultConfigdata['dynamicTemplate'], undefined, 4);
+						self.configLabelMerge();
+					}else {
+						self.buttonDisableStatus = true;						
+						self.showMessage = "Problem with Platform Service, Please try again";
+					}
+						
 				})			
 				.catch(function (data) {		
 					self.showThrobber = false;							
