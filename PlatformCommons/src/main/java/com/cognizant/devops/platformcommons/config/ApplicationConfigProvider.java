@@ -49,6 +49,7 @@ public class ApplicationConfigProvider implements Serializable{
     private CorrelationConfig correlations;
     private EmailConfiguration emailConfiguration=new EmailConfiguration();
     private boolean enableFieldIndex;
+    private boolean enableOnlineBackup = false;
 
 	private ApplicationConfigProvider(){
 		this.refreshTime = new Date(new Date().getTime() - 86400000);
@@ -226,5 +227,13 @@ public class ApplicationConfigProvider implements Serializable{
 
 	public void setEnableFieldIndex(boolean enableFieldIndex) {
 		this.enableFieldIndex = enableFieldIndex;
+	}
+
+	public boolean isEnableOnlineBackup() {
+		return enableOnlineBackup;
+	}
+
+	public void setEnableOnlineBackup(boolean enableOnlineBackup) {
+		this.enableOnlineBackup = enableOnlineBackup;
 	}
 }

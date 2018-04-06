@@ -78,5 +78,6 @@
   "refreshTime": "Jan 22, 2017 5:04:25 PM",
   "trustedHosts": [
     "localhost"
-  ]
+  ],
+  "enableOnlineBackup":false
 }

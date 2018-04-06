@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  ******************************************************************************/
-package com.cognizant.devops.platformservice.rest.customsettings.controller;
+package com.cognizant.devops.platformservice.customsettings.controller;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;
@@ -35,8 +35,8 @@ import org.springframework.web.multipart.MultipartFile;
 import com.cognizant.devops.platformdal.icon.Icon;
 import com.cognizant.devops.platformdal.icon.IconDAL;
 import com.cognizant.devops.platformdal.settingsconfig.SettingsConfiguration;
-import com.cognizant.devops.platformservice.rest.customsettings.ImageResponse;
-import com.cognizant.devops.platformservice.rest.customsettings.service.SettingsConfigurationService;
+import com.cognizant.devops.platformservice.customsettings.ImageResponse;
+import com.cognizant.devops.platformservice.customsettings.service.SettingsConfigurationService;
 import com.cognizant.devops.platformservice.rest.util.PlatformServiceUtil;
 import com.google.gson.JsonObject;
 
