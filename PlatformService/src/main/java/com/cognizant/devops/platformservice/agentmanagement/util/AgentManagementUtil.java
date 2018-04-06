@@ -66,7 +66,7 @@ public class AgentManagementUtil {
 			Files.walkFileTree(sourceFolderPath, new SimpleFileVisitor<Path>() {
 				@Override
 				public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-					zos.putNextEntry(new ZipEntry(sourceFolderPath.relativize(file).toString().replace("\\",File.separator)));
+					zos.putNextEntry(new ZipEntry(sourceFolderPath.relativize(file).toString().replace("\\","/")));
 					Files.copy(file, zos);
 					zos.closeEntry();
 					return FileVisitResult.CONTINUE;
