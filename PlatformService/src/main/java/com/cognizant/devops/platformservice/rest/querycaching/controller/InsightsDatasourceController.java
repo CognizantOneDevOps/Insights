@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.RestController;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBException;
 import com.cognizant.devops.platformservice.rest.querycaching.service.InsightsDatasourceService;
 import com.cognizant.devops.platformservice.rest.querycaching.service.InsightsDatasourceServiceImpl;
-import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
 @RestController
@@ -30,16 +29,13 @@ public class InsightsDatasourceController {
 	public  JsonObject getNeo4jDatasource(HttpServletRequest request )  {
 		String payloadRequest = null;
 		JsonObject results = new JsonObject();
-		JsonArray array = new JsonArray();
 		try {
 			payloadRequest = request.getReader().lines().collect(Collectors.joining(System.lineSeparator()));
-			array = insightDatasourceService.getNeo4jDatasource(payloadRequest);
-		} catch (GraphDBException e) {
-			log.error(e);
-		} catch (IOException e) {
+			results = insightDatasourceService.getNeo4jDatasource(payloadRequest);
+		} catch (GraphDBException | IOException e) {
 			log.error(e);
 		}
-		results.add("results", array);
+
 		return results;
 	}
 
