@@ -107,6 +107,7 @@ class AgentDaemonExecutor:
                  h = properties.headers
                  pkgFileName = h.get('fileName')
                  osType = h.get('osType')
+                 osType = osType.upper()
                  agentToolName = h.get('agentToolName')
                  agentId = h.get('agentId')
                  agentServiceFileName = h.get('agentServiceFileName')
@@ -135,6 +136,7 @@ class AgentDaemonExecutor:
                  else:   
                      scriptFile = scriptPath + os.path.sep +'installagent.sh'
                      p = subprocess.Popen(['chmod 777 '+scriptFile,scriptFile],shell=True)
+                     p = subprocess.Popen(['chmod -R 777 '+scriptFile,scriptFile],shell=True) 
                      p = subprocess.Popen([scriptFile +' '+osType],cwd=scriptPath,shell=True)
                      '''
                      serviceName = agentServiceFileName.split(".")[0]
