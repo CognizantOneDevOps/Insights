@@ -73,7 +73,7 @@ public class EngineAggregatorModule implements Job{
 			try {
 				registry.put(dataRoutingKey, new AgentDataSubscriber(dataRoutingKey, 
 													agentConfig.isDataUpdateSupported(), 
-													agentConfig.getAgentKey(),
+													agentConfig.getUniqueKey(),
 													agentConfig.getToolCategory(),
 													agentConfig.getToolName()));
 			} catch (Exception e) {

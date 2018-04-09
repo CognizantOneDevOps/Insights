@@ -181,7 +181,7 @@ public class AgentManagementServiceImpl  implements AgentManagementService{
 		AgentConfigDAL agentConfigDAL = new AgentConfigDAL();
 		List<AgentConfigTO> agentList = null;
 		try{
-			List<AgentConfig> agentConfigList = agentConfigDAL.getAllAgentConfigurations();
+			List<AgentConfig> agentConfigList = agentConfigDAL.getAllDataAgentConfigurations();
 			agentList = new ArrayList<>(agentConfigList.size());
 			for(AgentConfig agentConfig : agentConfigList) {
 				AgentConfigTO to = new AgentConfigTO();

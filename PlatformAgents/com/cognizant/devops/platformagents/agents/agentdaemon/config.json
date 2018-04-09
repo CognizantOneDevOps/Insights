@@ -12,8 +12,8 @@
     "agentExchange":"iAgent"
   },
   "publish": {
-    "data": "DUMMY.DUMMYDATA.DATA",
-    "health": "AGENT.DAEMON.HEALTH"
+    "data": "DAEMONAGENT.AGENTDAEMON.DATA",
+    "health": "DAEMONAGENT.AGENTDAEMON.HEALTH"
   },
   "isDebugAllowed": false,
   "subscribe": {

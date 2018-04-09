@@ -157,6 +157,14 @@ public class AgentConfigDAL extends BaseDAL {
 		terminateSessionFactory();
 		return result;
 	}
+	
+	public List<AgentConfig> getAllDataAgentConfigurations() {
+		Query<AgentConfig> createQuery = getSession().createQuery("FROM AgentConfig AC WHERE AC.toolCategory != 'DAEMONAGENT' AND AC.toolName != 'AGENTDAEMON'", AgentConfig.class);
+		List<AgentConfig> result = createQuery.getResultList();
+		terminateSession();
+		terminateSessionFactory();
+		return result;
+	}
 
 	public boolean updateAgentSubscriberConfigurations(List<AgentConfig> agentConfigs) {
 		getSession().beginTransaction();
