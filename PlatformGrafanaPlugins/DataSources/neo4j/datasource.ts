@@ -133,7 +133,7 @@ export default class Neo4jDatasource {
 	   var cacheoptions = {
         "startTime": fromTime,
         "endTime": toTime,
-        "resultCache":  target.rescache
+        "resultCache":  (target.rescache) ? target.rescache : false
       };
 	  
       statements.push(statement);
