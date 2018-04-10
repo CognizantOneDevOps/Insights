@@ -173,10 +173,8 @@ public class DataProcessorUtil  {
 	private JsonObject getHierachyDetails(CSVRecord record,Map<String, Integer> headerMap){
 		JsonObject json = new JsonObject();
 		for(Map.Entry<String, Integer> header : headerMap.entrySet()){
-			if(header.getKey() != null){
-				if(record.get(DatataggingConstants.ACTION) != null) {
+			if(header.getKey() != null && !DatataggingConstants.ACTION.equalsIgnoreCase(header.getKey())){
 					json.addProperty(header.getKey(), record.get(header.getValue()));
-				}
 			}
 		}
 		return json;
