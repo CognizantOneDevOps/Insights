@@ -202,7 +202,7 @@ public class HierarchyDetailsService {
 	public @ResponseBody JsonObject uploadHierarchyDetails(@RequestParam("file") MultipartFile file,@RequestParam  String action) {
 		boolean status = false;
 		if(null != action && action.equals("upload")){
-			status = DataProcessorUtil.getInstance().readData(file);
+			status = DataProcessorUtil.getInstance().createBusinessHierarchyMetaData(file);
 		}else if(null != action && action.equals("update")){
 			status  = DataProcessorUtil.getInstance().updateHiearchyProperty(file);
 		}

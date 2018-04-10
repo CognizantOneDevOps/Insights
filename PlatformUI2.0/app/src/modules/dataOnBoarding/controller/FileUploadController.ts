@@ -207,7 +207,7 @@ module ISightApp {
                     
                     //2nd loop will extract each column and convert it in string comma-seprated
                     for (var j=0; j< colArr.length;j++) {
-                            row += arrData[i].propertyMap[colArr[j]];
+                            row += (arrData[i].propertyMap[colArr[j]]) ? arrData[i].propertyMap[colArr[j]] : '';
                             if(j !== colArr.length-1 ){
                                 row += ',';
                             }
