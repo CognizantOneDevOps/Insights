@@ -312,7 +312,7 @@ module ISightApp {
 					
 					self.updatedConfigdata[key] = self.item;
 					
-					if(key == "communication") {					
+					if(key == "communication" && self.dynamicData != "") {			
 						self.updatedConfigdata["dynamicTemplate"] = JSON.parse(self.dynamicData);
 					}
 					
