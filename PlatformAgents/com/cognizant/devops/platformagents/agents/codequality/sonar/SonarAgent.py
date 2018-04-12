@@ -35,7 +35,7 @@ class SonarAgent(BaseAgent):
         password = self.config.get("password", '')
         timeMachineapi = self.config.get("timeMachineapi", '')
         sonarProjects = self.getResponse(projectsUrl, 'GET', userId, password, None)
-        metrics = self.config.get("metrics", '')
+        metrics = self.config.get('dynamicTemplate', {}).get("metrics", '')
         metricsParam = ''
         if len(metrics) > 0:
             for metric in metrics:
