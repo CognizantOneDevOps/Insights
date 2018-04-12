@@ -1,0 +1,100 @@
+<!--
+ *******************************************************************************
+ * Copyright 2017 Cognizant Technology Solutions
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License.  You may obtain a copy
+ * of the License at
+ * 
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ ******************************************************************************
+ -->
+<div layout="row" flex>
+  <div layout style="width: 100%;">
+    <div  class="applicationContentCss" style="width: 100%;">
+      <div    ng-controller="dataTaggingDetailsController" style="width: 100%;">
+        <div class="contentCss">
+        <div ng-if="dataTaggingDetailsController.showThrobber" layout-sm="column" layout-align="center center" style="margin-left: 46%;margin-top: 200px;">
+              <md-progress-circular md-mode="indeterminate" md-diameter="50"></md-progress-circular>
+          </div>
+        </div>
+        <div>
+          <div layout="row" ng-if="!dataTaggingDetailsController.showThrobber">
+            <div flex="85" style="padding-top:20px" class="onboardStyle">Please select hierarchy to view associated tools and properties.</div>
+            <div flex="15">
+              <md-button ng-click="dataTaggingDetailsController.goToDataOnBoard()" style="margin-left:20px" class="md-raised md-primary configureBut" 
+                    >
+                    Onboard/Download Data
+                </md-button>
+            </div>
+          </div>
+          <div style="clear:both"></div>
+        </div>
+        <div layout="row" ng-if="!dataTaggingDetailsController.showThrobber">
+          <div style="width:15%;min-height:500px;background-color:#fff;margin-right:10px" flex>
+            <div style="padding-bottom:10px;padding-top:10px;font-weight:normal;font-family:proxima_novaregular;color:#38840C" class="onboardStyle"> Bussiness Hierarchy </div>
+            <ol class="tree scrollbar" id="stylescroll" data-keep-expanded="false" data-auto-scroll="true" data-slide-speed="200" style="overflow-y:auto">
+              <li ng-repeat="item in list" data-val="{{item.name}}" ng-init="count = 0">
+                <label for="{{item.name}}">{{item.name}}</label>
+                <input type="radio" ng-if="item.opened || $first" checked id="{{item.name}}" />
+                <input type="radio" ng-if="!item.opened"  id="{{item.name}}" />
+                <ol ng-if="item.children && item.children.length > 0" class="tree child"  row children="item.children"  my-var="myVar" click-handler="clickHandler($event)" test="test" count="$index"></ol>
+              </li>
+            </ol>
+          </div>
+          <div style="width:80%;background-color:#fff">
+            <div style="padding:20px;font-weight:normal;font-family:proxima_novaregular;color:#38840C" class="onboardStyle"> List of tools and their properties</div>
+             <ol  class="rectangle-list" style="width:90%;margin:auto;background-color:#fff" flex>
+              <li  ng-repeat="propertyDetails in hierarchyProperties" ng-click="showHideProps('listDet_'+$index)">
+                <a href="">{{propertyDetails.propertyMap.toolName}}</a>
+                <ol id="listDet_{{$index}}" style="display:none">
+                   <li>
+                    <div flex="30" style="display:inline-block;width:30%;height: 40px;font-family: proxima_novasemibold;font-size: 14px;color: #00728f !important;text-align: start;padding-left: 20px;padding-top: 10px;margin-top: 2px;margin-left: 10px;word-wrap: break-word;
+                      " >Property Name</div>
+                    <div flex="30" style="display:inline-block;width:30%;height: 40px;font-family: proxima_novasemibold;font-size: 14px;color: #00728f !important;text-align: start;padding-left: 20px;padding-top: 10px;margin-top: 2px;margin-left: 10px;word-wrap: break-word;
+                      " >Property Value</div>
+                    
+                  </li>
+                  <li ng-if="propertyDetails.propertyMap.toolProperty1">
+                    <div flex="30" style="display:inline-block;width:30%" class="dataBoardingToolName">{{propertyDetails.propertyMap.toolProperty1}}</div>
+                    <div flex="30" style="display:inline-block;width:30%" class="dataBoardingToolName">{{propertyDetails.propertyMap.propertyValue1}}</div>
+                    <div flex="20" style="padding-left: 37px;display:inline-block">
+                      
+                    </div>
+                  </li>
+                  <li ng-if="propertyDetails.propertyMap.toolProperty2">
+                    <div flex="30" style="display:inline-block;width:30%" class="dataBoardingToolName">{{propertyDetails.propertyMap.toolProperty2}}</div>
+                    <div flex="30" style="display:inline-block;width:30%" class="dataBoardingToolName">{{propertyDetails.propertyMap.propertyValue2}}</div>
+                    <div flex="20" style="padding-left: 37px;display:inline-block">
+                      
+                    </div>
+                  </li>
+                  <li ng-if="propertyDetails.propertyMap.toolProperty3">
+                    <div flex="30" style="display:inline-block;width:30%" class="dataBoardingToolName">{{propertyDetails.propertyMap.toolProperty3}}</div>
+                    <div flex="30" style="display:inline-block;width:30%" class="dataBoardingToolName">{{propertyDetails.propertyMap.propertyValue3}}</div>
+                    <div flex="20" style="padding-left: 37px;display:inline-block">
+                     
+                    </div>
+                  </li>
+                  <li ng-if="propertyDetails.propertyMap.toolProperty4">
+                    <div flex="30" style="display:inline-block;width:30%" class="dataBoardingToolName">{{propertyDetails.propertyMap.toolProperty4}}</div>
+                    <div flex="30" style="display:inline-block;width:30%" class="dataBoardingToolName">{{propertyDetails.propertyMap.propertyValue4}}</div>
+                    <div flex="20" style="padding-left: 37px;display:inline-block">
+                    
+                    </div>
+                  </li>
+                </ol>
+              </li>
+            </ol>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
