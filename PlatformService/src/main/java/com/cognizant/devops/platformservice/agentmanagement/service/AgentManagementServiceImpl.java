@@ -237,11 +237,11 @@ public class AgentManagementServiceImpl  implements AgentManagementService{
 	public String getToolRawConfigFile(String version, String tool) throws InsightsCustomException  {
 		String configJson = null;
 		try {
-			String filePath = ApplicationConfigProvider.getInstance().getAgentDetails().getDocrootUrl()
+			String docrootToolPath = ApplicationConfigProvider.getInstance().getAgentDetails().getDocrootUrl()
 					+"/"+version+"/agents/"+tool;
-			filePath=filePath.trim()+"/"+tool.trim()+".zip";
+			docrootToolPath = docrootToolPath.trim()+"/"+tool.trim()+".zip";
 			String targetDir =  ApplicationConfigProvider.getInstance().getAgentDetails().getUnzipPath()+File.separator+tool;
-			configJson = AgentManagementUtil.getInstance().getAgentConfigfile(new URL(filePath), new File(targetDir)).toString();
+			configJson = AgentManagementUtil.getInstance().getAgentConfigfile(new URL(docrootToolPath), new File(targetDir)).toString();
 		} catch (IOException e) {
 			log.error("Error in getting raw config file ",e);
 			throw new InsightsCustomException(e.toString());
