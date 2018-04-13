@@ -13,17 +13,17 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBException;
-import com.cognizant.devops.platformservice.rest.querycaching.service.InsightsDatasourceService;
-import com.cognizant.devops.platformservice.rest.querycaching.service.InsightsDatasourceServiceImpl;
+import com.cognizant.devops.platformservice.rest.querycaching.service.QueryCachingService;
+import com.cognizant.devops.platformservice.rest.querycaching.service.QueryCachingServiceImpl;
 import com.google.gson.JsonObject;
 
 @RestController
 @RequestMapping("/datasource")
-public class InsightsDatasourceController {
+public class QueryCachingController {
 
-	private static Logger log = Logger.getLogger(InsightsDatasourceServiceImpl.class);
+	private static Logger log = Logger.getLogger(QueryCachingServiceImpl.class);
 	@Autowired
-	InsightsDatasourceService insightDatasourceService;
+	QueryCachingService insightDatasourceService;
 
 	@RequestMapping(value = "/neo4jds", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 	public  JsonObject getNeo4jDatasource(HttpServletRequest request )  {
@@ -31,7 +31,7 @@ public class InsightsDatasourceController {
 		JsonObject results = new JsonObject();
 		try {
 			payloadRequest = request.getReader().lines().collect(Collectors.joining(System.lineSeparator()));
-			results = insightDatasourceService.getNeo4jDatasource(payloadRequest);
+			results = insightDatasourceService.getCacheResults(payloadRequest);
 		} catch (GraphDBException | IOException e) {
 			log.error(e);
 		}
