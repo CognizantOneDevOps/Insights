@@ -23,7 +23,7 @@ public class QueryCachingController {
 
 	private static Logger log = Logger.getLogger(QueryCachingServiceImpl.class);
 	@Autowired
-	QueryCachingService insightDatasourceService;
+	QueryCachingService queryCachingService;
 
 	@RequestMapping(value = "/neo4jds", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 	public  JsonObject getNeo4jDatasource(HttpServletRequest request )  {
@@ -31,7 +31,7 @@ public class QueryCachingController {
 		JsonObject results = new JsonObject();
 		try {
 			payloadRequest = request.getReader().lines().collect(Collectors.joining(System.lineSeparator()));
-			results = insightDatasourceService.getCacheResults(payloadRequest);
+			results = queryCachingService.getCacheResults(payloadRequest);
 		} catch (GraphDBException | IOException e) {
 			log.error(e);
 		}
