@@ -42,7 +42,7 @@ class SvnAgent(BaseAgent):
         self.client.callback_get_login = self.get_login
         self.head_rev = pysvn.Revision(pysvn.opt_revision_kind.head) 
         try:
-            self.repoList = self.config.get("baseUrl", '')
+            self.repoList = self.config.get('dynamicTemplate', {}).get("baseUrl", '')
             self.date_time = self.config.get("startFrom", '')
             self.pattern = self.config.get("timeStampFormat", '')
             logging.info('List of Repositories : %s ' % self.repoList)
