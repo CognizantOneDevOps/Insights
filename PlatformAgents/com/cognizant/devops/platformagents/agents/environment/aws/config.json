@@ -1,35 +1,40 @@
 {
-	"mqConfig" : {
-		"user" : "iSight", 
-		"password" : "iSight", 
-		"host" : "127.0.0.1", 
-		"exchange" : "iSight",
-		"agentControlXchg":"iAgent"
-	},
-	"subscribe" : {
-		"config" : "ENVIRONMENT.AWS.config"
-	},
-	"publish" : {
-		"data" : "ENVIRONMENT.AWS.DATA",
-		"health" : "ENVIRONMENT.AWS.HEALTH"
-	},
-	"communication":{
-		"type" : "REST" 
-	},
-	"toolCategory" : "ENVIRONMENT",
-	"toolsTimeZone" : "GMT",
-	"insightsTimeZone" : "Asia/Kolkata",
-	"useResponseTemplate" : false,
-	"auth" : "base64",
-	"runSchedule" : 2,
-	"timeStampField":"launchTime",
-	"timeStampFormat":"epoch",
-	"pattern" : "%Y-%m-%dT%H:%M:%S.%fZ",
-	"vpc_id": ["vpc-id1","vpc-id2"],
-	"access_key_id": "#Access_Key_ID#",
-	"secret_access_key": "#secret_key#",
-	"isDebugAllowed" : false,
-	"loggingSetting" : {
-		"logLevel" : "WARN"
-	}
+  "mqConfig": {
+    "user": "iSight",
+    "password": "iSight",
+    "host": "127.0.0.1",
+    "exchange": "iSight",
+    "agentControlXchg": "iAgent"
+  },
+  "subscribe": {
+    "config": "ENVIRONMENT.AWS.config"
+  },
+  "publish": {
+    "data": "ENVIRONMENT.AWS.DATA",
+    "health": "ENVIRONMENT.AWS.HEALTH"
+  },
+  "communication": {
+    "type": "REST"
+  },
+  "toolCategory": "ENVIRONMENT",
+  "toolsTimeZone": "GMT",
+  "insightsTimeZone": "Asia/Kolkata",
+  "useResponseTemplate": false,
+  "auth": "base64",
+  "runSchedule": 2,
+  "timeStampField": "launchTime",
+  "timeStampFormat": "epoch",
+  "pattern": "%Y-%m-%dT%H:%M:%S.%fZ",
+  "dynamicTemplate": {
+    "vpc_id": [
+      "vpc-id1",
+      "vpc-id2"
+    ]
+  },
+  "access_key_id": "#Access_Key_ID#",
+  "secret_access_key": "#secret_key#",
+  "isDebugAllowed": false,
+  "loggingSetting": {
+    "logLevel": "WARN"
+  }
 }

@@ -8,9 +8,9 @@ case $opt in
 				sudo chmod +x /etc/init.d/InSightsRallyAgent
 				sudo chkconfig InSightsRallyAgent on
 				sudo service  InSightsRallyAgent status
-				sudo chkconfig InSightsRallyAgent stop
+				sudo service InSightsRallyAgent stop
 				sudo service  InSightsRallyAgent status
-				sudo chkconfig InSightsRallyAgent start
+				sudo service InSightsRallyAgent start
 				sudo service  InSightsRallyAgent status
 				echo "Service installed.."
                 ;;
