@@ -98,7 +98,7 @@ public class QueryCachingServiceImpl implements QueryCachingService {
 				String queryHash = DigestUtils.md5Hex(statement).toUpperCase();
 				String esQuery = esQueryTemplate(startTime, endTime, queryHash);
 				JsonObject esResponse = queryES(sourceESCacheUrl + "/_search", esQuery);
-				JsonObject graphResponse = null;
+				String cacheResult = "cacheResult";
 
 				JsonArray esResponseArray = esResponse.get("hits").getAsJsonObject().get("hits").getAsJsonArray();
 				if (esResponseArray.size() != 0) {
@@ -107,18 +107,17 @@ public class QueryCachingServiceImpl implements QueryCachingService {
 
 				if (esResponseArray.size() == 0 || esResponse.isJsonNull()) {
 					JsonObject saveCache = new JsonObject();
-					graphResponse = getNeo4jDatasource(requestPayload);
+					JsonObject graphResponse = getNeo4jDatasource(requestPayload);
 					saveCache.addProperty("queryHash", queryHash);
-					saveCache.addProperty("startTimeRange", InsightsUtils.subtractTimeInHours(startTime, 1));
-					saveCache.addProperty("endTimeRange", InsightsUtils.addTimeInHours(endTime, 1));
-					saveCache.addProperty("cacheResult", graphResponse.toString());
+					saveCache.addProperty("startTimeRange", startTime);
+					saveCache.addProperty("endTimeRange", endTime);
+					saveCache.addProperty(cacheResult, graphResponse.toString());
 					saveCache.addProperty("hasExpired", false);
 
 					queryES(sourceESCacheUrl, saveCache.toString());
-					String cacheResult = saveCache.get("cacheResult").getAsString();
-					return parser.parse(cacheResult).getAsJsonObject();
+					return parser.parse(saveCache.get(cacheResult).getAsString()).getAsJsonObject();
 				}
-				return parser.parse(esResponse.get("cacheResult").getAsString()).getAsJsonObject();
+				return parser.parse(esResponse.get(cacheResult).getAsString()).getAsJsonObject();
 			} else {
 				return getNeo4jDatasource(requestPayload);
 			}
@@ -130,12 +129,20 @@ public class QueryCachingServiceImpl implements QueryCachingService {
 	}
 
 	private static String esQueryTemplate(Long startTime, Long endTime, String queryHash) {
-		String esQuery = "{\"query\": {    \"bool\": {      \"must\": [        {          \"match\": {            \"queryHash\": \"__queryCache__\"          }        },"
-				+ "        {          \"bool\": {            \"must\": [              {                \"range\":"
-				+ " {                  \"startTimeRange\": {                    \"gte\": \"__startTime__\",                    \"lte\": \"__endTime__\",                    \"format\": \"epoch_millis\"                  }                }              }            ]          }        }      ]    }  } }";
-
-		esQuery = esQuery.replace(String.valueOf("__startTime__"), startTime.toString())
+		String esQuery = "{\"query\": {    \"bool\": {      \"must\": [        {          \"match\": {            "
+				+ "\"queryHash\": \"__queryCache__\"          }        },        {          \"bool\": {"
+				+ "            \"must\": [              {                \"range\": {                  \"startTimeRange\": {"
+				+ "                    \"gte\": \"__cachedStartTime__\",                    \"lte\": \"__startTime__\",                  "
+				+ "  \"format\": \"epoch_millis\"                  }                }              }            ],\"must\": [ "
+				+ "             {                \"range\": {                  \"endTimeRange\": {                    "
+				+ "\"gte\": \"__cachedEndTime__\",                    \"lte\": \"__endTime__\",                    \"format\": \"epoch_millis\""
+				+ "                  }                }              }            ]          }        }      ]    }  } }";
+		esQuery = esQuery
+				.replace(String.valueOf("__cachedStartTime__"),
+						InsightsUtils.subtractTimeInHours(startTime, 1).toString())
+				.replace(String.valueOf("__startTime__"), startTime.toString())
 				.replace(String.valueOf("__endTime__"), endTime.toString())
+				.replace(String.valueOf("__cachedEndTime__"), InsightsUtils.subtractTimeInHours(endTime, 1).toString())
 				.replace(String.valueOf("__queryCache__"), queryHash);
 		return esQuery;
 	}
