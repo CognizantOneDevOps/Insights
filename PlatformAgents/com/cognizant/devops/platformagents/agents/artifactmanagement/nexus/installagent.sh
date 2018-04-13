@@ -8,9 +8,9 @@ case $opt in
 				sudo chmod +x /etc/init.d/InSightsNexusAgent
 				sudo chkconfig InSightsNexusAgent on
 				sudo service  InSightsNexusAgent status
-				sudo chkconfig InSightsNexusAgent stop
+				sudo service InSightsNexusAgent stop
 				sudo service  InSightsNexusAgent status
-				sudo chkconfig InSightsNexusAgent start
+				sudo service InSightsNexusAgent start
 				sudo service  InSightsNexusAgent status
 				echo "Service installed.."
                 ;;

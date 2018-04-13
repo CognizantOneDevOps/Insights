@@ -33,7 +33,7 @@ class AwsAgent(BaseAgent):
         try:
             self.id = self.config.get("access_key_id", None)
             self.key = self.config.get("secret_access_key", None)
-            self.vpcid = self.config.get("vpc_id", None)
+            self.vpcid = self.config.get('dynamicTemplate', {}).get("vpc_id", None)
         except Exception as e:
             logging.error(e)
             

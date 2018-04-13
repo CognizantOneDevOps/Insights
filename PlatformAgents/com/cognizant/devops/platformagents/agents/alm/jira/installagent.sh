@@ -8,9 +8,9 @@ case $opt in
 				sudo chmod +x /etc/init.d/InSightsJiraAgent
 				sudo chkconfig InSightsJiraAgent on
 				sudo service  InSightsJiraAgent status
-				sudo chkconfig InSightsJiraAgent stop
+				sudo service InSightsJiraAgent stop
 				sudo service  InSightsJiraAgent status
-				sudo chkconfig InSightsJiraAgent start
+				sudo service InSightsJiraAgent start
 				sudo service  InSightsJiraAgent status
 				echo "Service installed.."
                 ;;

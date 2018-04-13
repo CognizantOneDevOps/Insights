@@ -25,7 +25,9 @@
 	"timeStampField":"commitTime",
 	"timeStampFormat":"%Y-%m-%d %H:%M:%S.%f",
 	"startFrom" : "2016-10-10 15:46:33.000000",
-	"baseUrl": ["URL"],
+	"dynamicTemplate": {
+		"baseUrl": ["URL"]
+	},
 	"username": "Username",
 	"password": "password",
 	"isDebugAllowed" : true,

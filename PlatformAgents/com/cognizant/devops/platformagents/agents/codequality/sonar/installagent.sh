@@ -8,9 +8,9 @@ case $opt in
 				sudo chmod +x /etc/init.d/InSightsSonarAgent
 				sudo chkconfig InSightsSonarAgent on
 				sudo service  InSightsSonarAgent status
-				sudo chkconfig InSightsSonarAgent stop
+				sudo service InSightsSonarAgent stop
 				sudo service  InSightsSonarAgent status
-				sudo chkconfig InSightsSonarAgent start
+				sudo service InSightsSonarAgent start
 				sudo service  InSightsSonarAgent status
 				echo "Service installed.."
                 ;;

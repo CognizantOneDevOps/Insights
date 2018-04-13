@@ -8,9 +8,9 @@ case $opt in
 				sudo chmod +x /etc/init.d/InSightsHpAgent
 				sudo chkconfig InSightsHpAgent on
 				sudo service  InSightsHpAgent status
-				sudo chkconfig InSightsHpAgent stop
+				sudo service InSightsHpAgent stop
 				sudo service  InSightsHpAgent status
-				sudo chkconfig InSightsHpAgent start
+				sudo service InSightsHpAgent start
 				sudo service  InSightsHpAgent status
 				echo "Service installed.."
                 ;;
