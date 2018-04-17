@@ -55,7 +55,7 @@
 			<tr ng-repeat="agentList in $data">
 			<td title="''" header-class="'theadCss'"style="width: 5%;" >
 			<md-radio-group ng-model="agentListController.SelectedToolDetails">
-			  <md-radio-button style="outline:none; margin-left: 15px;" ng-value="{ type: 'update', agentid: '{{agentList.agentKey}}'} " class="md-primary" ng-click="agentListController.enableActions(agentList.agentStatus)"></md-radio-button>			  
+			  <md-radio-button style="outline:none; margin-left: 15px;  margin-bottom: 0px !important;" ng-value="{ type: 'update', agentid: '{{agentList.agentKey}}'} " class="md-primary" ng-click="agentListController.enableActions(agentList.agentStatus)"></md-radio-button>			  
 			</md-radio-group>
 			</td>				
 			<td title="'OS'" filter="{ osVersion: 'text'}" header-class="'theadCss'">{{agentList.osVersion}}</td>	
