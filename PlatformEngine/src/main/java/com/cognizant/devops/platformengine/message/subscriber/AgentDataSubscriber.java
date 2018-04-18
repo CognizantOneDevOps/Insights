@@ -60,7 +60,7 @@ public class AgentDataSubscriber extends EngineSubscriberResponseHandler{
 		this.dataUpdateSupported = dataUpdateSupported;
 		this.uniqueKey = uniqueKey;
 		this.category = category;
-		this.toolName = toolName;
+		this.toolName = toolName.toUpperCase();
 	}
 
 	public void handleDelivery(String consumerTag, Envelope envelope, BasicProperties properties, byte[] body) throws IOException{
