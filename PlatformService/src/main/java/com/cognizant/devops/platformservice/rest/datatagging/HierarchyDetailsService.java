@@ -315,11 +315,6 @@ public class HierarchyDetailsService {
 		}		
 	}
 	
-	/*public static void main(String args[]) {
-		ApplicationConfigCache.loadConfigCache();
-		HierarchyDetailsService hds = new HierarchyDetailsService();
-		hds.getAllHierarchyDetails();
-	}*/
 	
 	//TODO: Need to remove this code once testing is done with the fix
 	private JsonObject getHierarchyObject(JsonElement element) {
