@@ -50,19 +50,33 @@ module ISightApp {
 	    editIconSrc: string = "dist/icons/svg/actionIcons/Edit_icon_disabled.svg";
 		startIconSrc: string = "dist/icons/svg/actionIcons/Start_icon_Disabled.svg";
 		stopIconSrc: string = "dist/icons/svg/actionIcons/Stop_icon_Disabled.svg";
+		successIconSrc: string = "dist/icons/svg/ic_check_circle_24px.svg";
+		errorIconSrc: string = "dist/icons/svg/ic_report_problem_24px.svg";
 
 		agentStartStopAction(actDetails, actType): void{
 			var self = this;
 			
 			self.agentService.agentStartStop(actDetails.agentid, actType)
-			.then(function (data) {		
-				console.log(data);			
-				self.showConfirmMessage = data.status;
+			.then(function (data) {						
+			
+				if(actType == "START"){
+					if(data.status == "success"){
+						self.showConfirmMessage = "started";
+					}else {
+						self.showConfirmMessage = "start";
+					}
+				}else {
+					if(data.status == "success"){
+						self.showConfirmMessage = "stopped";
+					}else {
+						self.showConfirmMessage = "stop";
+					}
+				}				
+			
 				self.getRegisteredAgents();						
 			})			
-			.catch(function (data) {		
-				console.log(data);
-				self.showConfirmMessage = "Error";
+			.catch(function (data) {						
+				self.showConfirmMessage = "service_error";
 				self.getRegisteredAgents();	
 			});		
 			
@@ -119,13 +133,13 @@ module ISightApp {
 			.catch(function (response) {		
 				self.showThrobber = false;		
 				self.showList = false;				
-				self.showMessage = "Problem with Platform Service, Please try again";				
+				self.showMessage = "Something wrong with Service, Please try again.";				
 			}); 			
 			
 			setTimeout(function() {
-                  self.showConfirmMessage = "";
-				  document.getElementById('confrmMsg').innerHTML = "";
-				}, 2000); 	
+                self.showConfirmMessage = "";
+				document.getElementById('confrmMsg').innerHTML = "";
+			}, 5000); 
 			
 		}
 		
