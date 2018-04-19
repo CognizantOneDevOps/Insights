@@ -90,6 +90,11 @@ public class QueryCachingServiceImpl implements QueryCachingService {
 
 				String statement = requestJson.get("statements").getAsJsonArray().get(0).getAsJsonObject()
 						.get("statement").getAsString();
+				String startTimeStr = requestJson.get("metadata").getAsJsonArray().get(0).getAsJsonObject()
+						.get("startTime").getAsString();
+				String endTimeStr = requestJson.get("metadata").getAsJsonArray().get(0).getAsJsonObject().get("endTime")
+						.getAsString();
+				statement = getStatementWithoutTime(statement, startTimeStr, endTimeStr);
 				Long startTime = requestJson.get("metadata").getAsJsonArray().get(0).getAsJsonObject().get("startTime")
 						.getAsLong();
 				Long endTime = requestJson.get("metadata").getAsJsonArray().get(0).getAsJsonObject().get("endTime")
@@ -126,6 +131,11 @@ public class QueryCachingServiceImpl implements QueryCachingService {
 		}
 
 		return null;
+	}
+
+	private static String getStatementWithoutTime(String statement, String startTime, String endTime) {
+		return statement.replace(String.valueOf(startTime), "?START_TIME?").replace(String.valueOf(endTime),
+				"?END_TIME?");
 	}
 
 	private static String esQueryTemplate(Long startTime, Long endTime, String queryHash) {
