@@ -50,7 +50,7 @@ public class AgentConfig {
 	@Column(name = "DATA_UPDATE_SUPPORTED")
 	private Boolean dataUpdateSupported;
 	
-	@Column(name = "UNIQUE_KEY")
+	@Column(name = "UNIQUE_KEY", unique = true, nullable = false)
 	private String uniqueKey;
 	
 	@Column(name = "OS_VERSION")
@@ -62,7 +62,7 @@ public class AgentConfig {
 	@Column(name = "AGENT_STATUS")
 	private String agentStatus;
 	
-	@Column(name = "AGENT_KEY")
+	@Column(name = "AGENT_KEY", unique = true, nullable = false)
 	private String agentKey;
 	
 	
