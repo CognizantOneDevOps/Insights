@@ -106,7 +106,7 @@ module ISightApp {
 				
 			})			
 			.catch(function (data) {												
-				self.showMessage = "Problem with Platform Service, Please try again";	
+				self.showMessage = "Something wrong with service, Please try again";
 			}); 			
 		}
 				
@@ -121,7 +121,13 @@ module ISightApp {
 		versionOnChange(key, type): void {
 			var self = this;										
 			
-			if(type == "Update"){
+			if(type == "validate"){
+				if(self.selectedVersion === undefined || self.selectedTool === undefined || self.selectedOS === undefined) {
+					self.buttonDisableStatus = true;
+				 } 
+				 else {self.buttonDisableStatus = false;}
+			}
+			else if(type == "Update"){
 				
 				self.showConfig = false;
 				self.showThrobber = true;	
@@ -140,7 +146,7 @@ module ISightApp {
 				})			
 				.catch(function (vdata) {							
 					self.showThrobber = false;							
-					self.showMessage = "Problem with Platform Service, Please try again";				
+					self.showMessage = "Something wrong with service, Please try again";			
 				});
 				
 			}else {				
@@ -220,21 +226,27 @@ module ISightApp {
 					
 					self.showThrobber = false;
 					
-					if(data.status == "success") {					
-						self.buttonDisableStatus = false;
+					if(data.status == "success") {	
 						self.showConfig = true;						
 						self.defaultConfigdata  = JSON.parse(data.data);				
 						self.dynamicData = JSON.stringify(self.defaultConfigdata['dynamicTemplate'], undefined, 4);
 						self.configLabelMerge();
+						
+						if(self.selectedOS === undefined || self.dynamicData == '') {
+							self.buttonDisableStatus = true;
+						}else {
+							self.buttonDisableStatus = false;
+						}
+						
 					}else {
 						self.buttonDisableStatus = true;						
-						self.showMessage = "Problem with Platform Service, Please try again";
+						self.showMessage = "Something wrong with service, Please try again";
 					}
 						
 				})			
 				.catch(function (data) {		
 					self.showThrobber = false;							
-					self.showMessage = "Problem with Platform Service, Please try again";				
+					self.showMessage = "Something wrong with service, Please try again";				
 				}); 
 				
 			}else {
@@ -268,8 +280,12 @@ module ISightApp {
 			})			
 			.catch(function (data) {		
 				self.showThrobber = false;							
-				self.showMessage = "Problem with Platform Service, Please try again";				
+				self.showMessage = "Something wrong with service, Please try again";				
 			}); 
+			
+			if(self.dynamicData == '') {
+				self.buttonDisableStatus = true;
+			} 
 			
 		}
 		
@@ -286,13 +302,19 @@ module ISightApp {
 			}			
 		}
 		
-		sendSuccessStatusMsg(Msg): void{
-			this.homeController.showConfirmMessage = Msg+" Successfully";
+		/* sendSuccessStatusMsg(Msg): void{
+			//this.homeController.showConfirmMessage = "Agent"+ Msg+" Successfully";
+			this.homeController.showConfirmMessage = Msg;
 			this.homeController.templateName = 'agentList';		
 		}
 		
 		sendFailureStatusMsg(Msg): void{
-			this.homeController.showConfirmMessage = "Problem with "+Msg+", Please try again.";
+			this.homeController.showConfirmMessage = "Failed to Agent "+Msg+", Please try again.";
+			this.homeController.templateName = 'agentList';		
+		} */
+		
+		sendStatusMsg(Msg): void{
+			this.homeController.showConfirmMessage = Msg;
 			this.homeController.templateName = 'agentList';		
 		}
 		
@@ -332,13 +354,13 @@ module ISightApp {
 					.then(function (data) {				
 							
 						if(data.status == "success"){							
-							self.sendSuccessStatusMsg("Updated");
+							self.sendStatusMsg("updated");
 						}else {
-							self.sendFailureStatusMsg("update");
+							self.sendStatusMsg("update");
 						}
 					})			
 					.catch(function (data) {		
-							self.sendFailureStatusMsg("update Platform Service");					
+							self.sendStatusMsg("service_error");					
 					}); 					
 					
 					
@@ -348,13 +370,13 @@ module ISightApp {
 					.then(function (data) {		
 						console.log(data);	
 						if(data.status == "success"){						
-							self.sendSuccessStatusMsg("Registered");
+							self.sendStatusMsg("registered");
 						}else {
-							self.sendFailureStatusMsg("register");
+							self.sendStatusMsg("register");
 						}
 					})			
 					.catch(function (data) {		
-						self.sendFailureStatusMsg("register Platform Service");	
+						self.sendStatusMsg("service_error");	
 					}); 	
 					
 				}							

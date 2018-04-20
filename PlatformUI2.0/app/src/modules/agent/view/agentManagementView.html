@@ -21,7 +21,7 @@
         <div layout class="applicationContentCss">            
 				<div>
 				<md-select ng-model="agentManagementController.selectedOS" class="searchApplicationBoxContData inputApplicationBox dataBoardingFieldName"
-						 placeholder="Select OS" data-md-container-class="selectdemoSelectHeader">
+						 placeholder="Select OS" data-md-container-class="selectdemoSelectHeader" ng-change="agentManagementController.versionOnChange(agentManagementController.selectedVersion, 'validate')">
 				<md-option  ng-repeat="(key, value) in agentManagementController.osLists" value="{{key}}">{{value}}</md-option> 	</md-select>
 				</div>
 				
@@ -39,9 +39,9 @@
 					<md-option  ng-repeat="(key, value) in agentManagementController.toolsArr" value="{{value}}">{{value}}</md-option> 
 				</md-select>
 				</div>
-		</div>			
-            <div>               			
-				 <md-button type="submit" class="md-raised md-primary configureBut" ng-click="agentManagementController.getUpdatedConfigData(agentManagementController.btnValue)" ng-disabled="agentManagementController.buttonDisableStatus && agentManagementController.dynamicData != ''">
+		</div>						
+            <div>              				
+				 <md-button type="submit" class="md-raised md-primary configureBut" ng-click="agentManagementController.getUpdatedConfigData(agentManagementController.btnValue)" ng-disabled="agentManagementController.buttonDisableStatus">
                     {{agentManagementController.btnValue}}
                 </md-button>
             </div>
