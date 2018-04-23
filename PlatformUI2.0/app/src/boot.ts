@@ -17,7 +17,7 @@
 /// <reference path="_all.ts" />
 
 module ISightApp {
-    angular.module('iSightApp', ['ngMaterial', 'ngRoute', 'ngResource', 'ngMessages', 'ngCookies','ngAnimate','ui.bootstrap','googlechart','ngTable'])
+    angular.module('iSightApp', ['ngMaterial', 'ngRoute', 'ngResource', 'ngMessages', 'ngCookies','ngAnimate','ui.bootstrap','googlechart'])
         .service('pipelineService', PipelineService)
         .service('graphService', GraphService)
         .service('elasticSearchService', ElasticSearchService)
