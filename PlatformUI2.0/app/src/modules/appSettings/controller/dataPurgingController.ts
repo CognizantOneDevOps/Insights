@@ -76,7 +76,7 @@ module ISightApp {
 			if( self.backupDatatype.indexOf(',') >= 0){
 				self.dataTypelabel = self.backupDatatype.split(",");				
 			}else {
-				self.dataTypelabel = self.backupDatatype;
+				self.dataTypelabel = [self.backupDatatype];
 			}
 			
 			self.settingJsonObj = {
@@ -94,16 +94,16 @@ module ISightApp {
 				.then(function (data) {
 					
 					if(data.status == "success"){							
-						self.showConfirmMessage = "Saved successfully";						
+						self.showConfirmMessage = "Settings saved successfully";						
 					}else {
-						self.showConfirmMessage = "Failed to save";
+						self.showConfirmMessage = "Failed to save settings";
 					}
 					self.listData();		
 				})			
 				.catch(function (data) {	
 						self.listView = false;
 						self.saveView = true;				
-						self.showConfirmMessage ="Failed to save";		
+						self.showConfirmMessage ="Failed to save settings";		
 						self.listData();								
 				}); 	
 				
@@ -133,19 +133,19 @@ module ISightApp {
 					}
 				}
 				else{
-					self.showConfirmMessage = "Problem with platform service, please try again";
+					self.showConfirmMessage = "Something wrong with service, please try again";
 				}
 				
 			 })			
 			.catch(function (response) {		
 				self.showThrobber = false;		
-				self.showConfirmMessage = "Problem with platform service, please try again";
+				self.showConfirmMessage = "Something wrong with service, please try again";
 			});  		
 			
 			setTimeout(function() {
                   self.showConfirmMessage = "";
 				  document.getElementById('confrmMsg').innerHTML = "";
-			}, 2000); 
+			}, 3500); 
 		}
 		
 		showData():void{
