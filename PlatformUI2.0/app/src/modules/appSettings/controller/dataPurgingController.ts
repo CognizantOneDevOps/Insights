@@ -17,10 +17,10 @@
 module ISightApp {
 	
     export class DataPurgingController {
-        static $inject = ['appSettingsService', '$sce', 'NgTableParams', '$cookies'];
+        static $inject = ['appSettingsService', '$sce', '$cookies'];
         constructor(			
             private appSettingsService,            
-			private $sce, private NgTableParams,
+			private $sce,
             private $cookies) {
 			
 			var self = this;
