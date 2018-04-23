@@ -150,8 +150,8 @@ public class QueryCachingServiceImpl implements QueryCachingService {
 		esQuery = esQuery
 				.replace(String.valueOf("__cachedStartTime__"),
 						InsightsUtils.subtractTimeInHours(startTime, 1).toString())
-				.replace(String.valueOf("__startTime__"), startTime.toString())
-				.replace(String.valueOf("__endTime__"), endTime.toString())
+				.replace(String.valueOf("__startTime__"), InsightsUtils.addTimeInHours(startTime, 1).toString())
+				.replace(String.valueOf("__endTime__"), InsightsUtils.addTimeInHours(endTime, 1).toString())
 				.replace(String.valueOf("__cachedEndTime__"), InsightsUtils.subtractTimeInHours(endTime, 1).toString())
 				.replace(String.valueOf("__queryCache__"), queryHash);
 		return esQuery;
