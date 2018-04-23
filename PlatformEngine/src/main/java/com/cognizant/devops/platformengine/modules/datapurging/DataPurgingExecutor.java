@@ -102,7 +102,7 @@ public class DataPurgingExecutor implements Job {
 				deleteFlag = false;
 			}
 			if(deleteFlag){
-				String deleteQry =  "MATCH (n:"+label+")  where n.inSightsTime < "+ epochTime  +"   delete n ";
+				String deleteQry =  "MATCH (n:"+label+")  where n.inSightsTime < "+ epochTime  +" detach delete n ";
 				try {
 					dbHandler.executeCypherQuery(deleteQry);
 				} catch (GraphDBException e) {
