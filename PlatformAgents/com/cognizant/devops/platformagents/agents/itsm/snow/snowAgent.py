@@ -32,7 +32,7 @@ class snowAgent(BaseAgent):
     warnings.filterwarnings('ignore') 
     def process(self):
         try:
-            self.BaseUrl = self.config.get("BaseUrl", '')
+            self.BaseUrl = self.config.get("baseUrl", '')
             self.CR_sysid_url = self.config.get("CR_sysid_url", '')
             self.CR_Url = self.config.get("CR_Url", '')
             self.CR_Approval_Url = self.config.get("CR_Approval_Url", '')
@@ -47,7 +47,7 @@ class snowAgent(BaseAgent):
             self.response=[]
             self.start_time = self.tracking.get("start_time", '')
             if self.start_time == '':
-                self.start_time = self.config.get("StartFrom", '')    
+                self.start_time = self.config.get("startFrom", '')    
             self.end_time = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]
             self.tracking_time["start_time"]=self.end_time
             self.printdata()

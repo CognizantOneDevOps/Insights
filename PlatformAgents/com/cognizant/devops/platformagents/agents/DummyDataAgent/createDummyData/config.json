@@ -1,6 +1,8 @@
 {
-  "responseTemplate": {
-    "sha": "dummyData"    
+  "dynamicTemplate": {
+	  "responseTemplate": {
+	    "sha": "dummyData"
+	  }     
   },
   "insightsTimeZone": "Asia/Kolkata",
   "communication": {
@@ -13,7 +15,8 @@
     "host": "127.0.0.1",
     "password": "iSight",
     "user": "iSight",
-    "exchange": "iSight"
+    "exchange": "iSight",
+    "agentControlXchg":"iAgent"
   },
   "publish": {
     "data": "DUMMY.DUMMYDATA.DATA",
@@ -23,6 +26,7 @@
   "subscribe": {
     "config": "DUMMY.DUMMYDATA.config"
   },
+  "toolCategory" : "DUMMY",
   "enableBranches": false,
   "timeStampFormat": "%Y-%m-%dT%H:%M:%SZ",
   "toolsTimeZone": "GMT",
