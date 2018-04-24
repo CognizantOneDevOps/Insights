@@ -24,7 +24,7 @@ public class EmailConfiguration implements Serializable {
 	 * 
 	 */
 	private static final long serialVersionUID = 1942949927527968050L;
-	private Boolean sendEmailEnabled;
+	private Boolean sendEmailEnabled = false;
 	private String smtpHostServer;
 	private String smtpPort;
 	private String smtpUserName;

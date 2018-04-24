@@ -25,10 +25,10 @@ import logging
 
 class GitAgent(BaseAgent):
     def process(self):
-        getRepos = self.config.get("GetRepos", '')
-        accessToken = self.config.get("AccessToken", '')
-        commitsBaseEndPoint = self.config.get("CommitsBaseEndPoint", '')
-        startFrom = self.config.get("StartFrom", '')
+        getRepos = self.config.get("getRepos", '')
+        accessToken = self.config.get("accessToken", '')
+        commitsBaseEndPoint = self.config.get("commitsBaseEndPoint", '')
+        startFrom = self.config.get("startFrom", '')
         startFrom = parser.parse(startFrom)
         #startFrom = startFrom.strftime('%Y-%m-%dT%H:%M:%SZ')
         getReposUrl = getRepos+"?access_token="+accessToken

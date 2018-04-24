@@ -27,15 +27,15 @@ class SonarAgent(BaseAgent):
     def process(self):
         baseUrl = self.config.get("baseUrl", '')
         projectsUrl = baseUrl+"api/projects/index?format=json"
-        startFrom = self.config.get("StartFrom", '')
+        startFrom = self.config.get("startFrom", '')
         startFrom = parser.parse(startFrom)
         timeStampFormat = self.config.get('timeStampFormat')
         startFrom = startFrom.strftime(timeStampFormat)
-        userId = self.config.get("UserId", '')
-        password = self.config.get("Password", '')
+        userId = self.config.get("userId", '')
+        password = self.config.get("password", '')
         timeMachineapi = self.config.get("timeMachineapi", '')
         sonarProjects = self.getResponse(projectsUrl, 'GET', userId, password, None)
-        metrics = self.config.get("metrics", '')
+        metrics = self.config.get('dynamicTemplate', {}).get("metrics", '')
         metricsParam = ''
         if len(metrics) > 0:
             for metric in metrics:

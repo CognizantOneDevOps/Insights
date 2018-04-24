@@ -3,7 +3,8 @@
     "user": "iSight",
     "password": "iSight",
     "host": "127.0.0.1",
-    "exchange": "iSight"
+    "exchange": "iSight",
+    "agentControlXchg":"iAgent"
   },
   "subscribe": {
     "config": "ARTIFACTMANAGEMENT.NEXUS.config"
@@ -15,19 +16,22 @@
   "communication": {
     "type": "REST"
   },
-  "responseTemplate": {
+  "dynamicTemplate": {
+  	  "responseTemplate": {
+  	  }
   },
+  "toolCategory" : "ARTIFACTMANAGEMENT",
   "auth": "base64",
   "runSchedule": 5,
-  "UserID": "userid",
-  "Passwd": "passwd",
-  "BaseUrl": "http://127.0.0.1:9005/nexus/",
+  "userID": "userid",
+  "passwd": "passwd",
+  "baseUrl": "http://127.0.0.1:9005/nexus/",
   "timeStampField":"nex_lastupdated",
   "timeStampFormat":"%Y%m%d%H%M%S",
     "toolsTimeZone" : "Asia/Kolkata",
   "insightsTimeZone" : "Asia/Kolkata",
   "isDebugAllowed" : false,
-  "FirstEndPoint": "http://127.0.0.1:9005/nexus/service/local/lucene/search?g=com*",
+  "firstEndPoint": "http://127.0.0.1:9005/nexus/service/local/lucene/search?g=com*",
     	"loggingSetting" : {
 		"logLevel" : "WARN"
 	}
