@@ -20,8 +20,11 @@ Created on Jun 22, 2016
 '''
 from datetime import datetime as dateTime2
 import datetime
+
 from dateutil import parser
+
 from com.cognizant.devops.platformagents.core.BaseAgent import BaseAgent
+
 
 class JiraAgent(BaseAgent):
         
@@ -34,6 +37,13 @@ class JiraAgent(BaseAgent):
         responseTemplate = self.getResponseTemplate()
         fields = self.extractFields(responseTemplate)
         jiraIssuesUrl = baseUrl+"?jql=updated>='"+lastUpdated+"' ORDER BY updated ASC&maxResults="+str(self.config.get("dataFetchCount", 1000))+'&fields='+fields
+        changeLog = self.config.get('changeLog', None)
+        if changeLog:
+            jiraIssuesUrl = jiraIssuesUrl + '&expand=changelog'
+            changeLogFields = changeLog['fields']
+            changeLogMetadata = changeLog['metadata']
+            changeLogResponseTemplate = changeLog['responseTemplate']
+            startFromDate = parser.parse(startFrom)
         total = 1
         maxResults = 0
         startAt = 0
@@ -41,6 +51,8 @@ class JiraAgent(BaseAgent):
         sprintField = self.config.get("sprintField", None)
         while (startAt + maxResults) < total:
             data = []
+            workLogData = []
+            #jiraIssuesUrl = self.buildJiraRestUrl(baseUrl, startFrom, fields) + '&startAt='+str(startAt + maxResults)
             response = self.getResponse(jiraIssuesUrl+'&startAt='+str(startAt + maxResults), 'GET', self.userid, self.passwd, None)
             jiraIssues = response["issues"]
             for issue in jiraIssues:
@@ -48,6 +60,8 @@ class JiraAgent(BaseAgent):
                 if sprintField:
                     self.processSprintInformation(parsedIssue, issue, sprintField, self.tracking)
                 data += parsedIssue
+                if changeLog:
+                    workLogData += self.processChangeLog(issue, changeLogFields, changeLogResponseTemplate, startFromDate)
             maxResults = response['maxResults']
             total = response['total']
             startAt = response['startAt']
@@ -58,13 +72,59 @@ class JiraAgent(BaseAgent):
                 fromDateTime = fromDateTime.strftime('%Y-%m-%d %H:%M')
                 self.tracking["lastupdated"] = fromDateTime
                 self.publishToolsData(data)
+                if len(workLogData) > 0:
+                    self.publishToolsData(workLogData, changeLogMetadata)
                 self.updateTrackingJson(self.tracking)
             else:
                 break
     
+    def buildJiraRestUrl(self, baseUrl, startFrom, fields):
+        lastUpdatedDate = self.tracking.get("lastupdated", startFrom)
+        endDate = parser.parse(lastUpdatedDate) + datetime.timedelta(hours=24)
+        endDate = endDate.strftime('%Y-%m-%d %H:%M')
+        jiraIssuesUrl = baseUrl+"?jql=updated>='"+lastUpdatedDate+"' AND updated<'"+endDate+"' ORDER BY updated ASC&maxResults="+str(self.config.get("dataFetchCount", 1000))+'&fields='+fields
+        changeLog = self.config.get('changeLog', None)
+        if changeLog:
+            jiraIssuesUrl = jiraIssuesUrl + '&expand=changelog'
+        return jiraIssuesUrl
+    
+    def processChangeLog(self, issue, workLogFields, responseTemplate, startFromDate):
+        changeLog = issue.get('changelog', None)
+        workLogData = []
+        injectData = {'issueKey' : issue['key'] }
+        if changeLog:
+            histories = changeLog.get('histories', [])
+            for change in histories:
+                data = self.parseResponse(responseTemplate, change, injectData)[0]
+                changeDate = parser.parse(data['changeDate'].split('.')[0]);
+                if changeDate > startFromDate:
+                    items = change['items']
+                    recordChange = False
+                    for item in items:
+                        if item['field'] in workLogFields:
+                            fieldName = item['field'].replace(' ', '')
+                            if item['fromString']:
+                                data[fieldName+'Str'] = item['fromString']
+                            if item['toString']:
+                                data[fieldName+'UpdatedStr'] = item['toString']
+                            if item['from']:
+                                data[fieldName] = item['from']
+                            if item['to']:
+                                data[fieldName+'Updated'] = item['to']
+                            recordChange = True
+                    if recordChange:
+                        workLogData.append(data)
+        return workLogData
+    
     def scheduleExtensions(self):
         extensions = self.config.get('extensions', None)
         if extensions:
+            backlog = extensions.get('backlog', None)
+            if backlog:
+                self.registerExtension('backlog', self.retrieveBacklogDetails, backlog.get('runSchedule'))
+            sprints = extensions.get('sprints', None)
+            if sprints:
+                self.registerExtension('sprints', self.retrieveSprintDetails, sprints.get('runSchedule'))
             sprintReport = extensions.get('sprintReport', None)
             if sprintReport:
                 self.registerExtension('sprintReport', self.retrieveSprintReports, sprintReport.get('runSchedule'))
@@ -118,7 +178,93 @@ class JiraAgent(BaseAgent):
                         sprints.append(sprintId)
                 parsedIssue[0]['sprints'] = sprints
                 parsedIssue[0]['boards'] = boards
+                #if len(boards) > 1 :
+                #    for board in boards:
+                #        boardTracking = boardsTracking.get(board)
+                #        sprintTracking = boardTracking.get('sprints')
+                #        for sprint in sprints:
+                #            if sprintTracking.get(sprint, None) is None:
+                #                sprintTracking[sprint] = {}
      
+    def retrieveSprintDetails(self):
+        sprintDetails = self.config.get('extensions', {}).get('sprints', None)
+        boardApiUrl = sprintDetails.get('boardApiUrl')
+        boards = self.tracking.get('boards', None)
+        if sprintDetails and boards:
+            responseTemplate = sprintDetails.get('sprintResponseTemplate', None)
+            sprintMetadata = sprintDetails.get('sprintMetadata')
+            for boardId in boards:
+                data = []
+                board = boards[boardId]
+                boardRestUrl = boardApiUrl + '/' + str(boardId)
+                try:
+                    boardResponse = self.getResponse(boardRestUrl, 'GET', self.userid, self.passwd, None)
+                    board['name'] = boardResponse.get('name')
+                    board['type'] = boardResponse.get('type')
+                    board.pop('error', None)
+                except Exception as ex:
+                    board['error'] = str(ex)
+                    #Get the individual sprint details.
+                    sprints = board.get('sprints')
+                    for sprint in sprints:
+                        sprintApiUrl = sprintDetails.get('sprintApiUrl')+'/'+sprint
+                        sprintResponse = self.getResponse(sprintApiUrl, 'GET', self.userid, self.passwd, None)
+                        data.append(self.parseResponse(responseTemplate, sprintResponse)[0])
+                    if len(data) > 0 : 
+                        self.publishToolsData(data, sprintMetadata)
+                    continue
+                sprintsUrl = boardRestUrl + '/sprint?startAt='
+                startAt = 0
+                isLast = False
+                injectData = {'boardName' : board['name']}
+                while not isLast:
+                    sprintsResponse = self.getResponse(sprintsUrl+str(startAt), 'GET', self.userid, self.passwd, None)
+                    isLast = sprintsResponse['isLast']
+                    startAt = startAt + sprintsResponse['maxResults']
+                    sprintValues = sprintsResponse['values']
+                    parsedSprints = self.parseResponse(responseTemplate, sprintValues, injectData)
+                    for parsedSprint in parsedSprints:
+                        if str(parsedSprint.get('boardId')) == str(boardId):
+                            data.append(parsedSprint)
+                if len(data) > 0 : 
+                    self.publishToolsData(data, sprintMetadata)
+                    
+    def retrieveBacklogDetails(self):
+        backlogDetails = self.config.get('extensions', {}).get('backlog', None)
+        boardApiUrl = backlogDetails.get('boardApiUrl')
+        boards = self.tracking.get('boards', None)
+        backlogMetadata = backlogDetails.get('backlogMetadata')
+        if backlogDetails and boards:
+            for boardId in boards:
+                data = []
+                board = boards[boardId]
+                boardRestUrl = boardApiUrl + '/' + str(boardId)
+                try:
+                    boardResponse = self.getResponse(boardRestUrl, 'GET', self.userid, self.passwd, None)
+                    board['name'] = boardResponse.get('name')
+                    board['type'] = boardResponse.get('type')
+                    board.pop('error', None)
+                    backlogUrl = boardRestUrl + '/backlog?fields=[]&startAt='
+                    startAt = 0
+                    isLast = False
+                    while not isLast:
+                        backlogResponse = self.getResponse(backlogUrl+str(startAt), 'GET', self.userid, self.passwd, None)
+                        isLast = (startAt + backlogResponse['maxResults']) > backlogResponse['total']
+                        startAt = startAt + backlogResponse['maxResults']
+                        backlogIssues = backlogResponse['issues']
+                        for backlogIssue in backlogIssues:
+                            issue = {}
+                            issue['backlogIssueKey'] = backlogIssue.get('key')
+                            issue['projectKey'] = backlogIssue.get('key').split('-')[0]
+                            issue['boardName'] = board['name']
+                            issue['boardId'] = boardId
+                            data.append(issue)
+                    if len(data) > 0 : 
+                        self.publishToolsData(data, backlogMetadata)
+                except Exception as ex:
+                    board['error'] = str(ex)
+                    #Get the individual sprint details.
+    
     def retrieveSprintReports(self):
         sprintDetails = self.config.get('extensions', {}).get('sprintReport', None)
         boardApiUrl = sprintDetails.get('boardApiUrl')
