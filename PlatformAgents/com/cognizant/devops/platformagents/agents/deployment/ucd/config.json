@@ -3,7 +3,8 @@
     "user": "iSight",
     "password": "iSight",
     "host": "127.0.0.1",
-    "exchange": "iSight"
+    "exchange": "iSight",
+    "agentControlXchg":"iAgent"
   },
   "subscribe": {
     "config": "DEPLOYMENT.UCD.config"
@@ -15,15 +16,18 @@
   "communication": {
     "type": "REST"
   },
-  "responseTemplate": {
-    "status": "status",
-	"date": "date",
-	"duration": "duration",
-	"environment": "environment",
-	"application": "application",
-	"applicationRequestId": "applicationRequestId",
-	"user": "user"
+   "dynamicTemplate": {
+	  "responseTemplate": {
+	    "status": "status",
+		"date": "date",
+		"duration": "duration",
+		"environment": "environment",
+		"application": "application",
+		"applicationRequestId": "applicationRequestId",
+		"user": "user"
+	  }
   },
+  "toolCategory" : "DEPLOYMENT",
   "runSchedule": 30,
   "userid": "userId",
   "passwd": "Passwd",

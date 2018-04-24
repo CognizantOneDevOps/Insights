@@ -3,7 +3,8 @@
     "user": "iSight",
     "password": "iSight",
     "host": "localhost",
-    "exchange": "iSight"
+    "exchange": "iSight",
+    "agentControlXchg":"iAgent"
   },
   "subscribe": {
     "config": "DEPLOYMENT.XLDEPLOY.config"
@@ -15,6 +16,7 @@
   "communication": {
     "type": "REST"
   },
+ "dynamicTemplate": {
 	"responseTemplate" : {
 		"sha": "git_commitId",
 		"commit" : {
@@ -24,20 +26,22 @@
 			}
 		}
 	},
-  "auth": "base64",
-  "clientConfig": {
-    "runSchedule": {
-      "userInput": true,
-      "label": "Schedule interval in minutes",
-      "type": "input",
-      "value": 30,
-      "errorMessage": "Please specify schedule interval",
-      "required": true
-    }
+	"clientConfig": {
+	    "runSchedule": {
+	      "userInput": true,
+	      "label": "Schedule interval in minutes",
+	      "type": "input",
+	      "value": 30,
+	      "errorMessage": "Please specify schedule interval",
+	      "required": true
+	    }
+     }	
   },
+ "auth": "base64",
+ "toolCategory" : "DEPLOYMENT",
  "runSchedule": 5,
- "UserID": "userdi",
- "Passwd": "passwd",
-  "BaseEndPoint": "http://127.0.0.1:4516/deployit",
-  "isDebugAllowed" : false,
+ "userID": "userdi",
+ "passwd": "passwd",
+  "baseEndPoint": "http://127.0.0.1:4516/deployit",
+  "isDebugAllowed" : false
 }
