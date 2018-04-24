@@ -56,14 +56,25 @@ body {
     text-decoration: none;
     transition: all .3s ease-out;   
 }
-
+/* .rectangle-list a span{
+    position: relative;
+    display: block;
+    padding: .4em .4em .4em .8em;
+    *padding: .4em;
+    margin: .5em 0 .5em 2.5em;
+    background: #efefef;
+    color: #444;
+    text-decoration: none;
+    transition: all .3s ease-out;   
+}
+ */
 .rectangle-list a:hover{
     background: #eee;
 }   
 
-.rectangle-list a:before{
-    content: counter(li);
-    counter-increment: li;
+.rectangle-list a span{
+    /* content: counter(li);
+    counter-increment: li; */
     position: absolute; 
     left: -2.5em;
     top: 50%;
@@ -76,7 +87,7 @@ body {
     font-weight: bold;
 }
 
-.rectangle-list a:after{
+.rectangle-list a span:after{
     position: absolute; 
     content: '';
     border: .5em solid transparent;
@@ -86,8 +97,8 @@ body {
     transition: all .3s ease-out;               
 }
 
-.rectangle-list a:hover:after{
-    left: -.5em;
+.rectangle-list a span:hover:after{
+    left: 2.0em;
     border-left-color: #fa8072;             
 }   
 .input-group-lg>.form-control, .input-group-lg>.input-group-addon, .input-group-lg>.input-group-btn>.btn{
