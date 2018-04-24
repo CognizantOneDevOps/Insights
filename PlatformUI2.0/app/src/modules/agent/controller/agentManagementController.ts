@@ -252,7 +252,7 @@ module ISightApp {
 			}else {
 				self.buttonDisableStatus = true;
 				self.showConfig = false;
-				self.showMessage = "Tool already registered, Please select other tool";
+				self.showMessage = toolName.charAt(0).toUpperCase()+ toolName.slice(1)+"’s agent is already registered, Please select other tool.";
 			}				
 		}
 		
