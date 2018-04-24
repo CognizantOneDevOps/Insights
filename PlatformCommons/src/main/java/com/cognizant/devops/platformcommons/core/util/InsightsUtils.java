@@ -238,6 +238,12 @@ public class InsightsUtils {
 		return after.toInstant().toEpochMilli();
 	}
 	
+	public static Long getTimeBeforeDaysInSeconds(Long days){
+		ZonedDateTime now = ZonedDateTime.now( zoneId );
+		ZonedDateTime after = now.minusDays(days);
+		return after.toInstant().getEpochSecond();
+	}
+		
 	public static Long getDurationBetweenDatesInDays(Long inputEpochMillis){
 		ZonedDateTime now = ZonedDateTime.now( zoneId );
 		ZonedDateTime fromInput = ZonedDateTime.ofInstant(Instant.ofEpochMilli(inputEpochMillis), zoneId);
