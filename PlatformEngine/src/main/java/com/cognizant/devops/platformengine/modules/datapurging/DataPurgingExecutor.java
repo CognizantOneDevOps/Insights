@@ -81,8 +81,8 @@ public class DataPurgingExecutor implements Job {
 		}
 
 
-		//convert to epoch time 
-		long epochTime = InsightsUtils.getTimeBeforeDays(backupDurationInDays);
+		//Converts into epoch time in seconds as data inside inSightsTime property is stored in epoch seconds  
+		long epochTime = InsightsUtils.getTimeBeforeDaysInSeconds(backupDurationInDays);
 		Neo4jDBHandler dbHandler = new Neo4jDBHandler();
 		for(String label : labelList){
 			int splitlength = 0;
