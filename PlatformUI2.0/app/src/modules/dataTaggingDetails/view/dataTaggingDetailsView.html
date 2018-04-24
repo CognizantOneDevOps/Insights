@@ -38,10 +38,10 @@
         </div>
         <div layout="row" ng-if="!dataTaggingDetailsController.showThrobber">
           <div style="width:15%;min-height:500px;background-color:#fff;margin-right:10px" flex>
-            <div style="padding-bottom:10px;padding-top:10px;font-weight:normal;font-family:proxima_novaregular;color:#38840C" class="onboardStyle"> Bussiness Hierarchy </div>
+            <div style="padding-bottom:10px;padding-top:10px;font-weight:normal;font-family:proxima_novaregular;color:#38840C" class="onboardStyle"> Business Hierarchy </div>
             <ol class="tree scrollbar" id="stylescroll" data-keep-expanded="false" data-auto-scroll="true" data-slide-speed="200" style="overflow-y:auto">
               <li ng-repeat="item in list" data-val="{{item.name}}" ng-init="count = 0">
-                <label for="{{item.name}}">{{item.name}}</label>
+                <label for="{{item.name}}" ng-click="test(item.name)">{{item.name}}</label>
                 <input type="radio" ng-if="item.opened || $first" checked id="{{item.name}}" />
                 <input type="radio" ng-if="!item.opened"  id="{{item.name}}" />
                 <ol ng-if="item.children && item.children.length > 0" class="tree child"  row children="item.children"  my-var="myVar" click-handler="clickHandler($event)" test="test" count="$index"></ol>
@@ -52,7 +52,7 @@
             <div style="padding:20px;font-weight:normal;font-family:proxima_novaregular;color:#38840C" class="onboardStyle"> List of tools and their properties</div>
              <ol  class="rectangle-list" style="width:90%;margin:auto;background-color:#fff" flex>
               <li  ng-repeat="propertyDetails in hierarchyProperties" ng-click="showHideProps('listDet_'+$index)">
-                <a href="">{{propertyDetails.propertyMap.toolName}}</a>
+               <a href=""><span>{{$index+1}}</span>{{propertyDetails.propertyMap.toolName}}</a>
                 <ol id="listDet_{{$index}}" style="display:none">
                    <li>
                     <div flex="30" style="display:inline-block;width:30%;height: 40px;font-family: proxima_novasemibold;font-size: 14px;color: #00728f !important;text-align: start;padding-left: 20px;padding-top: 10px;margin-top: 2px;margin-left: 10px;word-wrap: break-word;

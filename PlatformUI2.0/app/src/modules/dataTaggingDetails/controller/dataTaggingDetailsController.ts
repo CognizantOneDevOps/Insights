@@ -31,14 +31,15 @@ module ISightApp {
             self.dataTaggingDetailsService.getHierarchyMapping()
                 .then(function (data) {
                     self.showThrobber = false;
-                    $scope.list = data.data;
+                    //$scope.list = data.data;
+		    $scope.list = data.data[0].children;
                     var level1 = $scope.list[0].name || '';
                   var level2 = $scope.list[0].children[0].name || '';
                   var level3 = $scope.list[0].children[0].children[0].name || '';
                   var level4 = $scope.list[0].children[0].children[0].children[0].name || '';
                  
                   self.showThrobber = false;
-                  self.dataTaggingDetailsService.getHierarchyProperties(level1,level2,level3,level4)
+                  self.dataTaggingDetailsService.getHierarchyProperties(level1,'','','')
                         .then(function (data) {
                          console.log(data);
                          $scope.hierarchyProperties = data.data;
