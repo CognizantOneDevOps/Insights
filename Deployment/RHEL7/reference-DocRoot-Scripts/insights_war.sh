@@ -11,9 +11,9 @@
 #  WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
 #  License for the specific language governing permissions and limitations under
 #  the License.
-# This script copies all required scripts to /etc/init.d
-echo "Copying the init.d scripts"
-sudo mkdir initscripts
-sudo wget http://platform.cogdevops.com/InSightsV1.0/initscripts/initscripts.zip
-sudo unzip initscripts.zip && cd initscripts chmod +x *.sh
-sudo cp -rp * /etc/init.d
+echo "#################### Updating Insights WAR ####################"
+cd /usr/share/tomcat/webapps
+sudo wget http://platform.cogdevops.com/InSightsV1.0/artifacts/PlatformService.war -O PlatformService.war
+sudo systemctl stop tomcat
+sleep 10
+sudo systemctl start tomcat
