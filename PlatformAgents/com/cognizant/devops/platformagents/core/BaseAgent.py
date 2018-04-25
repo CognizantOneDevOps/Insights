@@ -232,6 +232,7 @@ class BaseAgent(object):
                             value = value[:self.timeFormatLengthMapping[field]]
                             d[outputField] = self.getRemoteDateTime(datetime.strptime(value, timeFormat)).get('epochTime')
                         except Exception as ex:
+                            logging.warn('Unable to parse timestamp field '+ field)
                             logging.error(ex)
             
             d['toolName'] = self.toolName;
