@@ -6,7 +6,7 @@ sudo wget http://platform.cogdevops.com/insights_install/installationScripts/lat
 sudo tar -zxvf grafana-4.6.2.linux-x64.tar.gz
 sudo wget http://platform.cogdevops.com/insights_install/installationScripts/latest/RHEL/grafana/ldap.toml
 sudo cp ldap.toml ./grafana-4.6.2/conf/ldap.toml
-sudo wgethttp://platform.cogdevops.com/insights_install/installationScripts/latest/RHEL/grafana/defaults.ini
+sudo wget http://platform.cogdevops.com/insights_install/installationScripts/latest/RHEL/grafana/defaults.ini
 sudo cp defaults.ini ./grafana-4.6.2/conf/defaults.ini
 cd grafana-4.6.2
 sudo nohup ./bin/grafana-server &
