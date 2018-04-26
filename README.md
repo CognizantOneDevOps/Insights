@@ -16,6 +16,7 @@ For information on the latest features and updates please refer to the below men
 
 
 Latest Release Updates : 
+Beta - Release v3.8.2. Issue# 60 from 3.8.1 relases has been fixed.
 Release v3.8.1 has issue in terms of package structure in PlatformService module (https://github.com/CognizantOneDevOps/Insights/tree/master/PlatformService/src/main/java/com/cognizant/devops/platformservice/rest).
 In order to overcome this, while modifying code change package name from "dataTagging" to "datatagging" in IDE.
 Defect #60 has been raised to resolve the same. Please note this issue only affects the developer community and existing users can continue to upgrade to the new version of the release. 
