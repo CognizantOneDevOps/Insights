@@ -52,6 +52,7 @@ module ISightApp {
 			
 		}
 		
+		datatypeVal: boolean;
 		validationArr = {};
 		osLists = {};
 		configDesc = {};
@@ -300,22 +301,26 @@ module ISightApp {
 					self.configAbbr[key] = key;
 				}
 			}			
-		}
-		
-		/* sendSuccessStatusMsg(Msg): void{
-			//this.homeController.showConfirmMessage = "Agent"+ Msg+" Successfully";
-			this.homeController.showConfirmMessage = Msg;
-			this.homeController.templateName = 'agentList';		
-		}
-		
-		sendFailureStatusMsg(Msg): void{
-			this.homeController.showConfirmMessage = "Failed to Agent "+Msg+", Please try again.";
-			this.homeController.templateName = 'agentList';		
-		} */
+		}		
 		
 		sendStatusMsg(Msg): void{
 			this.homeController.showConfirmMessage = Msg;
 			this.homeController.templateName = 'agentList';		
+		}
+		
+		checkDatatype(dataVal) {
+			
+			if(typeof (dataVal) == "boolean") { return dataVal; }
+			else if(isNaN(dataVal)){		
+				
+				if(dataVal == "true") { this.datatypeVal = true; return this.datatypeVal; }
+				else if(dataVal == "false") { this.datatypeVal = false; return this.datatypeVal; }
+				else { return dataVal; }
+				
+			}
+			else {
+				return parseInt(dataVal);
+			}			
 		}
 		
 		getUpdatedConfigData(actionType): void{		
@@ -329,7 +334,7 @@ module ISightApp {
 					self.item = {};
 					
 					for(var value in self.defaultConfigdata[key]){				
-						self.item[value] = self.defaultConfigdata[key][value];						
+						self.item[value] = self.checkDatatype(self.defaultConfigdata[key][value]);						
 					}					
 					
 					self.updatedConfigdata[key] = self.item;
@@ -339,7 +344,7 @@ module ISightApp {
 					}
 					
 				}else if(key != "dynamicTemplate") {	
-						self.updatedConfigdata[key] = self.defaultConfigdata[key];						
+						self.updatedConfigdata[key] = self.checkDatatype(self.defaultConfigdata[key]);		
 				}				
 			}	
 			
