@@ -57,6 +57,19 @@ module ISightApp {
 		 lastModifiedByUser : string;
 		 editIconSrc = "dist/icons/svg/userOnboarding/Edit_icon_MouseOver.svg";
 		 showTble: boolean = true;
+		 
+		 checkData(event, myValue, txtName){
+			
+			if (myValue == undefined) {  return '' }
+			else { 
+			while(myValue.charAt(0) === '0')
+				{
+				 myValue = myValue.substr(1);
+				}				
+			}
+			if(txtName == 'rowLimit') { this.rowLimit  = myValue;}
+			else if(txtName == 'duration') { this.duration = myValue; }
+		}
 
 		addData(): void {
 			this.listView = false;
