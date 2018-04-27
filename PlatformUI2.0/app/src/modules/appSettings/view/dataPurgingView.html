@@ -39,7 +39,7 @@
 								</div>
 								<div flex="35">
 									<span>Row Limit</span>
-									<input type="text" class="inputBoxCont" ng-model="dataPurgingController.rowLimit" required style="width: 90%;" onkeypress='return event.charCode >= 48 && event.charCode <= 57' ng-keypress="dataPurgingController.checkData($event,dataPurgingController.rowLimit, 'rowLimit')" />
+									<input type="text" class="inputBoxCont" ng-model="dataPurgingController.rowLimit" required style="width: 90%;" onkeypress='return event.charCode >= 48 && event.charCode <= 57' ng-keypress="dataPurgingController.checkData($event,dataPurgingController.rowLimit, 'rowLimit')" ng-blur="dataPurgingController.checkData($event,dataPurgingController.rowLimit, 'rowLimit')" />
 								</div>
 								<div flex="30">
 									<span>Backup Location</span>
@@ -60,7 +60,7 @@
 								</div>
 								<div flex="30">
 									<span>Backup Duration (in Days)</span>
-									<input type="text" class="inputBoxCont" ng-model="dataPurgingController.duration" onkeypress='return event.charCode >= 48 && event.charCode <= 57' ng-keypress="dataPurgingController.checkData($event,dataPurgingController.duration, 'duration')" required style="width: 90%;">
+									<input type="text" class="inputBoxCont" ng-model="dataPurgingController.duration" onkeypress='return event.charCode >= 48 && event.charCode <= 57' ng-keypress="dataPurgingController.checkData($event,dataPurgingController.duration, 'duration')" ng-blur="dataPurgingController.checkData($event,dataPurgingController.rowLimit, 'rowLimit')" required style="width: 90%;">
 								</div>						
 							 </div>
 							  <div layout layout-align="end end">               			
