@@ -107,9 +107,9 @@ body {
 }
 
 
-ol.tree{padding-left:30px;}
+ol.tree{padding-left:3px;}
 li{list-style-type:none;color:#666;position:relative;margin-left:-15px;}
-li label{padding-left:37px;cursor:pointer;display:block;}
+li label{padding-left:20px;cursor:pointer;display:block;}
 li input{width:1em;height:2em;position:absolute;left:-0.5em;top:0;opacity:0;cursor:pointer;}
 li input + blah ol{height:2em;margin:-22px 0 0 -44px;background:url("../.././dist/icons/svg/dataTagging/toggle-small-expand.png") no-repeat 40px 0;}
 li input + blah ol > li{display:none;margin-left:-14px !important;padding-left:1px}
@@ -146,7 +146,8 @@ li input:checked +  ol > li:first-child{margin:0 0 0.125em;}
     float: left;
     height: 500px;
     margin-bottom: 25px;
-    margin-left: 22px;
+    margin-left: 0px;
+	padding-left: 3px;
     overflow-y: scroll;
     width:90%;
 }
