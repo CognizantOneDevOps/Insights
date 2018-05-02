@@ -134,7 +134,10 @@ export default class Neo4jDatasource {
         "startTime": fromTime,
         "endTime": toTime,
         "resultCache": (target.rescache) ? target.rescache : false,
-        "testDB": false
+        "testDB": false,
+        "cachingType": target.selectionval,
+        "cacheTime": target.cacheTime,
+        "cacheVariance": target.cacheVariance
       };
 
       statements.push(statement);
