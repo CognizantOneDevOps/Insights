@@ -287,6 +287,23 @@ public class InsightsUtils {
 		return fromInput.toEpochSecond();
 	}
 
+	public static Long getCurrentTimeInSeconds() {
+		ZonedDateTime now = ZonedDateTime.now(zoneId);
+		return now.toEpochSecond();
+	}
+
+	public static Long addVarianceTime(long inputTime, long varianceSeconds) {
+		Long varianceTime = inputTime + varianceSeconds;
+		ZonedDateTime fromInput = ZonedDateTime.ofInstant(Instant.ofEpochSecond(varianceTime), zoneId);
+		return fromInput.toEpochSecond();
+	}
+
+	public static Long subtractVarianceTime(long inputTime, long varianceSeconds) {
+		Long varianceTime = inputTime - varianceSeconds;
+		ZonedDateTime fromInput = ZonedDateTime.ofInstant(Instant.ofEpochSecond(varianceTime), zoneId);
+		return fromInput.toEpochSecond();
+	}
+
 	public static Boolean isAfterRange(String schedule, Long days) {
 		Boolean result = Boolean.FALSE;
 		if (JobSchedule.DAILY.name().equalsIgnoreCase(schedule)) {
