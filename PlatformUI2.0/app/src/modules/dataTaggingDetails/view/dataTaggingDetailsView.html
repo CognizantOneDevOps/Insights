@@ -41,7 +41,7 @@
             <div style="padding-bottom:10px;padding-top:10px;font-weight:normal;font-family:proxima_novaregular;color:#38840C" class="onboardStyle"> Business Hierarchy </div>
             <ol class="tree scrollbar" id="stylescroll" data-keep-expanded="false" data-auto-scroll="true" data-slide-speed="200" style="overflow-y:auto">
               <li ng-repeat="item in list" data-val="{{item.name}}" ng-init="count = 0">
-                <label for="{{item.name}}" ng-click="test(item.name)">{{item.name}}</label>
+				<label for="{{item.name}}" ng-click="(!item.children) ? test(item.name) : ''">{{item.name}}</label>
                 <input type="radio" ng-if="item.opened || $first" checked id="{{item.name}}" />
                 <input type="radio" ng-if="!item.opened"  id="{{item.name}}" />
                 <ol ng-if="item.children && item.children.length > 0" class="tree child"  row children="item.children"  my-var="myVar" click-handler="clickHandler($event)" test="test" count="$index"></ol>
