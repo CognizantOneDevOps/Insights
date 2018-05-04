@@ -109,7 +109,7 @@ body {
 
 ol.tree{padding-left:3px;}
 li{list-style-type:none;color:#666;position:relative;margin-left:-15px;}
-li label{padding-left:20px;cursor:pointer;display:block;}
+li label{padding-left:20px;display:block; outline: none;}
 li input{width:1em;height:2em;position:absolute;left:-0.5em;top:0;opacity:0;cursor:pointer;}
 li input + blah ol{height:2em;margin:-22px 0 0 -44px;background:url("../.././dist/icons/svg/dataTagging/toggle-small-expand.png") no-repeat 40px 0;}
 li input + blah ol > li{display:none;margin-left:-14px !important;padding-left:1px}

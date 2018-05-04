@@ -39,11 +39,11 @@ module ISightApp {
                   var level4 = $scope.list[0].children[0].children[0].children[0].name || '';
                  
                   self.showThrobber = false;
-                  self.dataTaggingDetailsService.getHierarchyProperties(level1,'','','')
+                  /* self.dataTaggingDetailsService.getHierarchyProperties(level1,'','','')
                         .then(function (data) {
                          console.log(data);
                          $scope.hierarchyProperties = data.data;
-                      });
+                      }); */
                        
                 });
 
