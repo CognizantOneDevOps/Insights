@@ -1,0 +1,45 @@
+{
+  "mqConfig": {
+    "user": "iSight",
+    "password": "iSight",
+    "host": "127.0.0.1",
+    "exchange": "iSight"
+  },
+  "subscribe": {
+    "config": "ARTIFACTMANAGEMENT.ARTIFACTORY.config"
+  },
+  "publish": {
+    "data": "ARTIFACTMANAGEMENT.ARTIFACTORY.DATA",
+    "health": "ARTIFACTMANAGEMENT.ARTIFACTORY.HEALTH"
+  },
+  "communication": {
+    "type": "REST"
+  },
+  "responseTemplate": {
+     "repo": "reponame",
+     "path": "repopath",
+     "created": "timecreated",
+     "createdBy": "personnamecreatedBy",
+     "modifiedBy": "modifiedBy",
+     "downloadUri": "downloadUri",
+     "size": "size",
+     "lastModified": "lastModified",
+     "uri": "uri",
+     "timeStampField": "timeStampField",
+     "lastUpdated": "lastUpdated"
+  },
+  "auth": "base64",
+  "runSchedule": 5,
+  "UserID": "admin",
+  "Passwd": "password",
+  "BaseUrl": "http://localhost:8081/artifactory/api/",
+  "timeStampField":"nex_lastupdated",
+  "timeStampFormat":"%Y%m%d%H%M%S",
+  "toolsTimeZone" : "GMT",
+  "insightsTimeZone" : "Asia/Kolkata",
+  "isDebugAllowed" : false,
+  "FirstEndPoint": "http://localhost:8081/artifactory/api/storage/",
+    	"loggingSetting" : {
+		"logLevel" : "WARN"
+	}
+}
