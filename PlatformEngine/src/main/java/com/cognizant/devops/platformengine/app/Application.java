@@ -30,6 +30,7 @@ import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformengine.modules.aggregator.EngineAggregatorModule;
 import com.cognizant.devops.platformengine.modules.correlation.EngineCorrelatorModule;
 import com.cognizant.devops.platformengine.modules.datapurging.DataPurgingExecutor;
+import com.cognizant.devops.platformengine.modules.dataenrichment.DataEnrichmentModule;
 import com.cognizant.devops.platformengine.modules.mapper.ProjectMapperModule;
 
 /**
@@ -107,6 +108,19 @@ public class Application {
 						.withIntervalInSeconds(defaultInterval)
 						.repeatForever())
 				.build();
+		
+		// Schedule the Data Enrichment Module.
+		JobDetail dataEnrichmentJob = JobBuilder.newJob(DataEnrichmentModule.class)
+				.withIdentity("DataEnrichmentModule", "iSight")
+				.build();
+
+		Trigger dataEnrichmentTrigger = TriggerBuilder.newTrigger()
+				.withIdentity("DataEnrichmentModuleTrigger", "iSight")
+				.startNow()
+				.withSchedule(SimpleScheduleBuilder.simpleSchedule()
+						.withIntervalInSeconds(defaultInterval)
+						.repeatForever())
+				.build();
 
 		// Tell quartz to schedule the job using our trigger
 		Scheduler scheduler;
@@ -117,6 +131,7 @@ public class Application {
 			scheduler.scheduleJob(correlationJob, correlationTrigger);
 			scheduler.scheduleJob(projectMappingJob, projectMappingTrigger);
 			scheduler.scheduleJob(dataPurgingJob, dataPurgingTrigger);
+			scheduler.scheduleJob(dataEnrichmentJob, dataEnrichmentTrigger);
 		} catch (SchedulerException e) {
 			log.error(e);
 		}

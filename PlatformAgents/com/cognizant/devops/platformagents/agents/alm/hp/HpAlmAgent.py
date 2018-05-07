@@ -73,7 +73,7 @@ class HpAlmAgent(BaseAgent):
             projectEndPoint += '&query={'+trackingFieldName+'[>"'+startFrom+'"]}&order-by={'+trackingFieldName+'[ASC]}'
         else:
             projectEndPoint += '&query={'+trackingFieldName+'[>"'+entityTracking+'"]}&order-by={'+trackingFieldName+'[ASC]}'
-        entityMetaDetails = self.config.get("almEntities").get(entityName)
+        entityMetaDetails = self.config.get('dynamicTemplate', {}).get("almEntities").get(entityName)
         dataList = []
         startIndex = 1
         totalResults = 1
@@ -157,7 +157,7 @@ class HpAlmAgent(BaseAgent):
         cookieHeader = self.getHpAlmSSOHeader(baseEndPoint)
         domainResponse = self.getDomains(baseEndPoint, cookieHeader)
         startFrom = self.config.get("startFrom", '')
-        almEntities = self.config.get("almEntities")
+        almEntities = self.config.get('dynamicTemplate', {}).get("almEntities").get(entityName)
         if almEntities:
             for almEntity in almEntities:
                 fieldsList = almEntities[almEntity]

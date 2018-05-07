@@ -1,0 +1,148 @@
+.table-nested .indent {
+  display: inline-block;
+  cursor: pointer;
+}
+.table-nested .parent > .cell-name > .indent:before {
+  content: "+";
+  font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+  display: inline-block;
+  
+}
+.table-nested .opened > tr > .cell-name > .indent:before {
+  content: "-";
+ }
+.table-nested .children {
+  display: none;
+}
+.table-nested .opened > .children {
+  display: table-row;
+}
+.table-child {
+  margin-left: 30px;
+  width:80%;
+}
+.table-nested {
+    width:100%;
+}
+body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+ }
+
+.rectangle-list {
+    counter-reset: li; /* Initiate a counter */
+    list-style: none; /* Remove default numbering */
+    *list-style: decimal; /* Keep using default numbering for IE6/7 */
+    font: 15px 'trebuchet MS', 'lucida sans';
+    padding: 0;
+    margin-bottom: 4em;
+    text-shadow: 0 1px 0 rgba(255,255,255,.5);
+}
+
+.rectangle-list ol {
+    margin: 0 0 0 2em; /* Add some left margin for inner lists */
+    counter-reset: li; 
+}
+
+.rectangle-list a{
+    position: relative;
+    display: block;
+    padding: .4em .4em .4em .8em;
+    *padding: .4em;
+    margin: .5em 0 .5em 2.5em;
+    background: #efefef;
+    color: #444;
+    text-decoration: none;
+    transition: all .3s ease-out;   
+}
+
+.rectangle-list a:hover{
+    background: #eee;
+}   
+
+.rectangle-list a:before{
+    content: counter(li);
+    counter-increment: li;
+    position: absolute; 
+    left: -2.5em;
+    top: 50%;
+    margin-top: -1em;
+    background: #fa8072;
+    height: 2em;
+    width: 2em;
+    line-height: 2em;
+    text-align: center;
+    font-weight: bold;
+}
+
+.rectangle-list a:after{
+    position: absolute; 
+    content: '';
+    border: .5em solid transparent;
+    left: -1em;
+    top: 50%;
+    margin-top: -.5em;
+    transition: all .3s ease-out;               
+}
+
+.rectangle-list a:hover:after{
+    left: -.5em;
+    border-left-color: #fa8072;             
+}   
+.input-group-lg>.form-control, .input-group-lg>.input-group-addon, .input-group-lg>.input-group-btn>.btn{
+    height:35px !important;
+    border-radius:0px !important;
+}
+
+
+ol.tree{padding-left:30px;}
+li{list-style-type:none;color:#666;position:relative;margin-left:-15px;}
+li label{padding-left:37px;cursor:pointer;display:block;}
+li input{width:1em;height:2em;position:absolute;left:-0.5em;top:0;opacity:0;cursor:pointer;}
+li input + blah ol{height:2em;margin:-22px 0 0 -44px;background:url("/app/dist/icons/svg/dataTagging/toggle-small-expand.png") no-repeat 40px 0;}
+li input + blah ol > li{display:none;margin-left:-14px !important;padding-left:1px}
+li.file{margin-left:-1px !important;}
+li.file a{display:inline-block;padding-left:21px;color:#666;text-decoration:none;background:url("https://www.thecssninja.com/demo/css_tree/document.png") no-repeat 0 0;}
+li input:checked + blah ol{height:auto;margin:-22px 0 0 -44px;padding:25px 0 0 80px;background:url("/app/dist/icons/svg/dataTagging/toggle-small.png") no-repeat 40px 5px;}
+li input:checked + blah ol > li{display:block;margin:0 0 0.063em;}
+li input:checked + blah ol > li:first-child{margin:0 0 0.125em;}
+
+li input +  ol{height:2em;margin:-22px 0 0 -44px;background:url("/app/dist/icons/svg/dataTagging/toggle-small-expand.png") no-repeat 40px 0;}
+li input +  ol > li{display:none;margin-left:-14px !important;padding-left:1px}
+li input:checked +  ol{height:auto;margin:-22px 0 0 -44px;padding:25px 0 0 80px;background:url("/app/dist/icons/svg/dataTagging/toggle-small.png") no-repeat 40px 5px;}
+li input:checked +  ol > li{display:block;margin:0 0 0.063em;}
+li input:checked +  ol > li:first-child{margin:0 0 0.125em;}
+
+#stylescroll::-webkit-scrollbar-track
+{
+    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+    background-color: #F5F5F5;
+}
+
+#stylescroll::-webkit-scrollbar
+{
+    width: 10px;
+    background-color: #F5F5F5;
+}
+
+#stylescroll::-webkit-scrollbar-thumb
+{
+    background-color: #ccc;
+    
+}
+
+.scrollbar {
+    float: left;
+    height: 500px;
+    margin-bottom: 25px;
+    margin-left: 22px;
+    overflow-y: scroll;
+    width:90%;
+}
+
+.force-overflow {
+    min-height: 450px;
+}
+
+

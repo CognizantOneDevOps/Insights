@@ -66,6 +66,10 @@ module ISightApp {
                 onRemoving: function () { self.addApplicationConfirmation(statusObject.status) }
             })
         }
+         goToDataTaggingDetails = function(){
+            this.homeController.templateName = 'dataTaggingDetails';
+        }
+
         showAddApplicationBox(): void {
             this.showApplicationAddedMessage = false;
             if (this.showAddApplication === false) {
