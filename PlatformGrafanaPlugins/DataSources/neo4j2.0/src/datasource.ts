@@ -61,10 +61,9 @@ export default class Neo4jDatasource {
     3. Table format
   */
   processResponse(data, options){
-    let range = options.range;
     let timestamp = new Date().getTime() * 1000;
-    if (range.to) {
-      timestamp = range.to.valueOf();
+    if (options && options.range && options.range.to) {
+      timestamp = options.range.to.valueOf();
     }
     let targets = data['targets'];
     let results = data['results'];

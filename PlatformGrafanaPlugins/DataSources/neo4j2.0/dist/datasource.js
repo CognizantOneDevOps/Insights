@@ -60,10 +60,9 @@ System.register([], function(exports_1) {
                   3. Table format
                 */
                 Neo4jDatasource.prototype.processResponse = function (data, options) {
-                    var range = options.range;
                     var timestamp = new Date().getTime() * 1000;
-                    if (range.to) {
-                        timestamp = range.to.valueOf();
+                    if (options && options.range && options.range.to) {
+                        timestamp = options.range.to.valueOf();
                     }
                     var targets = data['targets'];
                     var results = data['results'];
