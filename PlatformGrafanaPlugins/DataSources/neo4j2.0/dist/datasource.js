@@ -92,6 +92,19 @@ System.register([], function(exports_1) {
                             response.push(targetResponse);
                         }
                         else if (target.table) {
+                            var responseColumns = [];
+                            var responseRows = [];
+                            var tableResponse = { columns: responseColumns, rows: responseRows, type: "table" };
+                            var columns = result.columns;
+                            var data_1 = result.data;
+                            for (var columnId in columns) {
+                                responseColumns.push({ text: columns[columnId] });
+                            }
+                            var rows = result.data;
+                            for (var r in rows) {
+                                responseRows.push(rows[r].row);
+                            }
+                            response.push(tableResponse);
                         }
                         else {
                             defaultResponse = true;
