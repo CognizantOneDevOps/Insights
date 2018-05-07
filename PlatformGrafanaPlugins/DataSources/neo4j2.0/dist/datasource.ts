@@ -67,7 +67,7 @@ export default class Neo4jDatasource {
     }
     let targets = data['targets'];
     let results = data['results'];
-    let defaultResponse = false;
+    let defaultResponse = options ? false : true;
     let response = []
     for(let i in targets){
       let target = targets[i];

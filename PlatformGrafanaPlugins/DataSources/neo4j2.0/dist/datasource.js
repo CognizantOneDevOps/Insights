@@ -66,7 +66,7 @@ System.register([], function(exports_1) {
                     }
                     var targets = data['targets'];
                     var results = data['results'];
-                    var defaultResponse = false;
+                    var defaultResponse = options ? false : true;
                     var response = [];
                     for (var i in targets) {
                         var target = targets[i];
