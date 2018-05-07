@@ -24,10 +24,10 @@ from com.cognizant.devops.platformagents.core.BaseAgent import BaseAgent
 
 class NexusAgent(BaseAgent):
     def process(self):
-        UserID = self.config.get("UserID", '')
-        Passwd = self.config.get("Passwd", '')
-        BaseUrl = self.config.get("BaseUrl", '')
-        FirstEndPoint = self.config.get("FirstEndPoint", '')
+        UserID = self.config.get("userID", '')
+        Passwd = self.config.get("passwd", '')
+        BaseUrl = self.config.get("baseUrl", '')
+        FirstEndPoint = self.config.get("firstEndPoint", '')
         nexIDs = self.getResponse(FirstEndPoint, 'GET', UserID, Passwd, None)
         data = []
         for artifacts in range(len(nexIDs["data"])):

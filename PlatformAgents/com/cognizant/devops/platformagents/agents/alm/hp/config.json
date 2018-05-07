@@ -3,7 +3,8 @@
     "user": "iSight",
     "password": "iSight",
     "host": "127.0.0.1",
-    "exchange": "iSight"
+    "exchange": "iSight",
+    "agentControlXchg":"iAgent"
   },
   "subscribe": {
     "config": "ALM.HP.config"
@@ -15,29 +16,32 @@
   "communication": {
     "type": "REST"
   },
-  "almEntities" : {
-  	"requirements" : {
-		"parent-id" : "parentId", 
-		"id"		: "id", 
-		"name"		: "name", 
-		"creation-time" : "creationTime", 
-		"last-modified" : "lastModified", 
-		"req-reviewed"  : "reqReviewed", 
-		"req-priority"  : "priority", 
-		"father-name"   : "fatherName"
-	},
-	"defects" : {
-		"id" : "id", 
-		"priority" : "priority", 
-		"name" : "name", 
-		"creation-time" : "creationTime", 
-		"last-modified" : "lastModified", 
-		"status" : "status", 
-		"severity" : "severity", 
-		"detected-by" : "detectedBy", 
-		"owner" : "owner"
-	}
+  "dynamicTemplate": {
+	  "almEntities" : {
+	  	"requirements" : {
+			"parent-id" : "parentId", 
+			"id"		: "id", 
+			"name"		: "name", 
+			"creation-time" : "creationTime", 
+			"last-modified" : "lastModified", 
+			"req-reviewed"  : "reqReviewed", 
+			"req-priority"  : "priority", 
+			"father-name"   : "fatherName"
+		},
+		"defects" : {
+			"id" : "id", 
+			"priority" : "priority", 
+			"name" : "name", 
+			"creation-time" : "creationTime", 
+			"last-modified" : "lastModified", 
+			"status" : "status", 
+			"severity" : "severity", 
+			"detected-by" : "detectedBy", 
+			"owner" : "owner"
+		}
+	  }
   },
+  "toolCategory" : "ALM",
   "dataFetchCount" : 200,
   "auth": "base64",
   "runSchedule": 30,
