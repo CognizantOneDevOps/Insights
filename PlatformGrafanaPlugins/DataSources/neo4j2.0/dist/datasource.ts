@@ -91,7 +91,19 @@ export default class Neo4jDatasource {
         }
         response.push(targetResponse);
       }else if(target.table){
-  
+        let responseColumns = [];
+        let responseRows = [];
+        let tableResponse = {columns: responseColumns, rows: responseRows, type: "table"};
+        let columns = result.columns;
+        let data = result.data;
+        for (let columnId in columns){
+          responseColumns.push({ text : columns[columnId]});
+        }
+        let rows = result.data;
+        for(let r in rows){
+          responseRows.push(rows[r].row);
+        }
+        response.push(tableResponse);
       }else{
         defaultResponse = true;
         break;
