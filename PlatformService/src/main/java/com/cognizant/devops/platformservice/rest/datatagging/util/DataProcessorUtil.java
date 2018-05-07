@@ -49,15 +49,24 @@ public class DataProcessorUtil  {
 		return dataProcessorUtil;
 	}
 
-	public  boolean createBusinessHierarchyMetaData(MultipartFile file)    {
+	private File convertToFile(MultipartFile multipartFile) throws IOException {
+		File file = new File(multipartFile.getOriginalFilename());
+		if(file.createNewFile()) { 
+			try(FileOutputStream fos = new FileOutputStream(file) ){ 
+				fos.write(multipartFile.getBytes());
+			}
+		}
+		return file;
+	}
+
+	public  boolean readData(MultipartFile file)    {
 
 		File csvfile =null;
 		boolean status = false;
 		try {
 			csvfile = convertToFile(file);
 		} catch (IOException ex) {
-			log.debug("Exception while creating csv on server",ex);
-			return status;
+			log.debug(ex);
 		}
 		CSVFormat format = CSVFormat.newFormat(',').withHeader();
 		try (Reader reader = new FileReader(csvfile); CSVParser csvParser = new CSVParser(reader, format);){
@@ -72,7 +81,7 @@ public class DataProcessorUtil  {
 
 		} catch (FileNotFoundException e) {
 			log.error("File not found Exception in uploading csv file" , e);
-		} catch (IOException  | GraphDBException e ) {
+		} catch (IOException  | GraphDBException  |InterruptedException e ) {
 			log.error("IOException in uploading csv file" , e);
 		}
 		return status;
@@ -80,20 +89,40 @@ public class DataProcessorUtil  {
 	}
 
 	private boolean parseCsvRecords(boolean status, CSVParser csvParser, Neo4jDBHandler dbHandler,
-			Map<String, Integer> headerMap, String query) throws IOException, GraphDBException {
-		List<JsonObject> nodeProperties = new ArrayList<>();
+			Map<String, Integer> headerMap, String query) throws IOException, GraphDBException, InterruptedException {
+		List<JsonObject> gitProperties = new ArrayList<>();
+		int sleepTime=500;
+		int size = 0;
+		int totalSize = 0;
+		int bulkRecordCnt=10;
 		for (CSVRecord csvRecord : csvParser.getRecords()) {
-			JsonObject json = getHierachyDetails(csvRecord, headerMap);			
+			size += 1;
+			JsonObject json = new JsonObject();
+			for(Map.Entry<String, Integer> header : headerMap.entrySet()){
+				if(header.getKey()!= null){
+					json.addProperty(header.getKey(), csvRecord.get(header.getValue()));
+				}
+			}			
 			json.addProperty(DatataggingConstants.CREATIONDATE, Instant.now().toEpochMilli() );
-			nodeProperties.add(json);
+			gitProperties.add(json);
+			if(size == bulkRecordCnt ) {
+				totalSize += size;
+				size = 0;
+				JsonObject graphResponse = dbHandler.bulkCreateNodes(gitProperties, null, query);
+				if(graphResponse.get(DatataggingConstants.RESPONSE).getAsJsonObject().get(DatataggingConstants.ERRORS).getAsJsonArray().size() > 0){
+					log.error(graphResponse);
+					status=false;
+					if(totalSize >= csvParser.getRecords().size()) {
+						break;
+					}
+				}
+				Thread.sleep(sleepTime);
+				gitProperties = new ArrayList<>();
+			}
+
+			status=true;
 		}
-		JsonObject graphResponse = dbHandler.bulkCreateNodes(nodeProperties, null, query);
-		if(graphResponse.get(DatataggingConstants.RESPONSE).getAsJsonObject().get(DatataggingConstants.ERRORS).getAsJsonArray().size() > 0){
-			log.error(graphResponse);
-			return status;
-		}
-		
-		return true;
+		return status;
 	}
 
 	public boolean updateHiearchyProperty(MultipartFile file) {
@@ -103,23 +132,34 @@ public class DataProcessorUtil  {
 		try {
 			csvfile = convertToFile(file);
 		} catch (IOException e) {
-			log.debug("Exception while creating csv on server",e);
-			return status;
+			log.error("IOException in converting file",e);
 		}
 		String label = "METADATA:DATATAGGING";
 		CSVFormat format = CSVFormat.newFormat(',').withHeader();
 
 		try (Reader reader = new FileReader(csvfile); CSVParser csvParser = new CSVParser(reader, format);){
 			Map<String, Integer> headerMap = csvParser.getHeaderMap();
-			List<JsonObject>  editList = new ArrayList<>();
-			List<JsonObject>  deleteList = new ArrayList<>();
+			List<JsonObject>  editList=new ArrayList<>();
+			List<JsonObject>  deleteList=new ArrayList<>();
 			for (CSVRecord record : csvParser) { 
 
 				if( record.get(DatataggingConstants.ACTION) != null &&  record.get(DatataggingConstants.ACTION).equals("edit")){
-					JsonObject json = getHierachyDetails(record, headerMap);
+					JsonObject json = new JsonObject();
+					for(Map.Entry<String, Integer> header : headerMap.entrySet()){
+						if(header.getKey() != null){
+							json.addProperty(header.getKey(), record.get(header.getValue()));
+
+						}
+					}
 					editList.add(json);
 				}else if(record.get(DatataggingConstants.ACTION) != null &&  record.get(DatataggingConstants.ACTION).equals("delete") ){
-					JsonObject json = getHierachyDetails(record, headerMap);
+					JsonObject json = new JsonObject();
+					for(Map.Entry<String, Integer> header : headerMap.entrySet()){
+						if(header.getKey() != null){
+							json.addProperty(header.getKey(), record.get(header.getValue()));
+
+						}
+					}
 					deleteList.add(json);
 				}
 
@@ -168,26 +208,6 @@ public class DataProcessorUtil  {
 			log.error(e);
 		}
 		return status;
-	}
-	
-	private JsonObject getHierachyDetails(CSVRecord record,Map<String, Integer> headerMap){
-		JsonObject json = new JsonObject();
-		for(Map.Entry<String, Integer> header : headerMap.entrySet()){
-			if(header.getKey() != null && !DatataggingConstants.ACTION.equalsIgnoreCase(header.getKey())){
-					json.addProperty(header.getKey(), record.get(header.getValue()));
-			}
-		}
-		return json;
-	}
-	
-	private File convertToFile(MultipartFile multipartFile) throws IOException {
-		File file = new File(multipartFile.getOriginalFilename());
-		if(file.createNewFile()) { 
-			try(FileOutputStream fos = new FileOutputStream(file) ){ 
-				fos.write(multipartFile.getBytes());
-			}
-		}
-		return file;
 	}
 
 }

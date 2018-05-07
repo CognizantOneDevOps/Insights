@@ -143,6 +143,7 @@ module ISightApp {
         showInsightsTab: boolean;
         shouldReload: boolean;
         selectedToolName: string;
+		showConfirmMessage: string;	
         selectedToolCategory: string;
         footerMinHeight: string = 'min-height:' + (window.innerHeight - 146) + 'px;';
         footerHeight: string = '';
@@ -155,6 +156,7 @@ module ISightApp {
         showAdminTab: boolean = false;
         showBusinessMapping: boolean = false;
         showThrobber: boolean;
+		selectedAgentID = {};
         selectDashboard: boolean = false;
         selectedIndex: Number;
         selectedDashboardUrl: string = '';

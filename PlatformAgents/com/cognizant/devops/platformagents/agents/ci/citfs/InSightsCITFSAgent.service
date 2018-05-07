@@ -1,0 +1,9 @@
+[Unit]
+Description=Ubuntu CITFSAgent Service
+
+[Service]
+Type=forking
+ExecStart=/bin/bash /opt/insightsagents/PlatformAgents/citfs/InSightsCITFSAgent.sh
+
+[Install]
+WantedBy=multi-user.target

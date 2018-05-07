@@ -1,0 +1,9 @@
+[Unit]
+Description=Ubuntu HpAgent Service
+
+[Service]
+Type=forking
+ExecStart=/bin/bash /opt/insightsagents/PlatformAgents/hp/InSightsHpAgent.sh
+
+[Install]
+WantedBy=multi-user.target

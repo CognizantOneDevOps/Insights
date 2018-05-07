@@ -21,6 +21,13 @@ module ISightApp {
         loadGlobalHealthConfigurations(): ng.IPromise<any>;
         loadHealthConfigurations(toolName: string, toolCategory:string ): ng.IPromise<any>;
 		loadServerHealthConfiguration(ServerName: string): ng.IPromise<any>;		
+		getDocRootAgentVersionTools(): ng.IPromise<any>;
+		getDocrootAgentConfig(Version: string, toolName:string): ng.IPromise<any>;
+		getDbAgentConfig(agentId: string): ng.IPromise<any>;
+		loadAgentServices(ServerName: string): ng.IPromise<any>;
+		registerAgent(toolName: string,toolVersion: string,osName: string,configData: string): ng.IPromise<any>;
+		updateAgent(agentId: string, configData: string, toolName: string,toolVersion: string,osName: string): ng.IPromise<any>;
+		agentStartStop(agentId: string, actionType: string): ng.IPromise<any>;
     }
 
     export class AgentService implements IAgentService {
@@ -42,6 +49,42 @@ module ISightApp {
 		loadServerHealthConfiguration(ServerName: string): ng.IPromise<any> {
 			var restHandler = this.restCallHandlerService;			
 			return restHandler.get(ServerName);			
-		}				
+		}
+		
+		getDocRootAgentVersionTools():ng.IPromise<any> {
+			var restHandler = this.restCallHandlerService;			
+			return restHandler.get("DOCROOT_AGENT_VERSION_TOOLS");			
+		}
+		
+		getDocrootAgentConfig(Version: string, toolName:string): ng.IPromise<any> {
+            var restHandler = this.restCallHandlerService;
+            return restHandler.get("DOCROOT_AGENT_TOOL_CONFIG_DETAILS",{'version':Version,'tool':toolName});           
+        }
+		
+		getDbAgentConfig(agentId: string): ng.IPromise<any> {
+			var restHandler = this.restCallHandlerService;			
+			return restHandler.get("DB_AGENT_CONFIG_DETAILS",{'agentId':agentId}); 	
+		}
+		
+		loadAgentServices(ServerName: string): ng.IPromise<any> {
+			var restHandler = this.restCallHandlerService;			
+			return restHandler.get(ServerName);			
+		}
+		
+		registerAgent(toolName: string, toolVersion: string, osName: string, configData: string): ng.IPromise<any> {
+            var restHandler = this.restCallHandlerService;
+            return restHandler.post("AGENT_REGISTER",{'toolName':toolName, 'agentVersion':toolVersion, 'osversion': osName, 'configDetails':configData},{'Content-Type': 'application/x-www-form-urlencoded'});           
+        }
+		
+		updateAgent(agentId: string, configData: string, toolName: string, toolVersion: string, osName: string): ng.IPromise<any> {
+            var restHandler = this.restCallHandlerService;
+            return restHandler.post("AGENT_UPDATE",{'agentId' : agentId, 'configJson':configData, 'toolName':toolName, 'agentVersion':toolVersion, 'osversion': osName},{'Content-Type': 'application/x-www-form-urlencoded'});           
+        }
+		
+		agentStartStop(agentId: string, actionType: string): ng.IPromise<any> {
+            var restHandler = this.restCallHandlerService;
+            return restHandler.post("AGENT_START_STOP",{'agentId' : agentId, 'action':actionType},{'Content-Type': 'application/x-www-form-urlencoded'});           
+        }
+		
     }
 }
