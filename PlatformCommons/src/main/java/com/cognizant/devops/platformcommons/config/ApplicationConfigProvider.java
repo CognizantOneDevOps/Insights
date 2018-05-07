@@ -45,11 +45,14 @@ public class ApplicationConfigProvider implements Serializable{
 	private int proxyPort;
 	private Date refreshTime;
 	private List<String> trustedHosts = new ArrayList<String>(3);	
+    private boolean enableOnlineDatatagging = false;
 	private boolean enableNativeUsers;
+    private EmailConfiguration emailConfiguration = new EmailConfiguration();
     private CorrelationConfig correlations;
-    private EmailConfiguration emailConfiguration=new EmailConfiguration();
     private boolean enableFieldIndex;
     private boolean enableOnlineBackup = false;
+    private AgentDetails agentDetails = new AgentDetails();
+
 
 	private ApplicationConfigProvider(){
 		this.refreshTime = new Date(new Date().getTime() - 86400000);
@@ -169,6 +172,14 @@ public class ApplicationConfigProvider implements Serializable{
 		return proxyHost;
 	}
 
+	public AgentDetails getAgentDetails() {
+		return agentDetails;
+	}
+
+	public void setAgentDetails(AgentDetails agentDetails) {
+		this.agentDetails = agentDetails;
+	}
+
 	public EmailConfiguration getEmailConfiguration() {
 		return emailConfiguration;
 	}
@@ -236,4 +247,13 @@ public class ApplicationConfigProvider implements Serializable{
 	public void setEnableOnlineBackup(boolean enableOnlineBackup) {
 		this.enableOnlineBackup = enableOnlineBackup;
 	}
+	
+    public boolean isEnableOnlineDatatagging() {
+		return enableOnlineDatatagging;
+	}
+
+	public void setEnableOnlineDatatagging(boolean enableOnlineDatatagging) {
+		this.enableOnlineDatatagging = enableOnlineDatatagging;
+	}
+    
 }

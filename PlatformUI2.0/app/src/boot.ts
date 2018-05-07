@@ -17,7 +17,7 @@
 /// <reference path="_all.ts" />
 
 module ISightApp {
-    angular.module('iSightApp', ['ngMaterial', 'ngRoute', 'ngResource', 'ngMessages', 'ngCookies','ngAnimate','ui.bootstrap','googlechart'])
+    angular.module('iSightApp', ['ngMaterial', 'ngRoute', 'ngResource', 'ngMessages', 'ngCookies','ngAnimate','ui.bootstrap','googlechart','ngTable'])
         .service('pipelineService', PipelineService)
         .service('graphService', GraphService)
         .service('elasticSearchService', ElasticSearchService)
@@ -35,10 +35,13 @@ module ISightApp {
         .service('restAPIUrlService', RestAPIUrlService)
         .service('restCallHandlerService', RestCallHandlerService)
         .service('dataTaggingService', DataTaggingService)
-        .service('singleToolConfigService', SingleToolConfigService)
+        .service('dataOnBoardingService', DataOnBoardingService)
+        .service('dataTaggingDetailsService', DataTaggingDetailsService)
+       	.service('singleToolConfigService', SingleToolConfigService)        
         .service('insightsService', InsightsService)
 		.service('platformServiceStatusService', PlatformServiceStatusService)
 		.service('appSettingsService', AppSettingsService)
+
         .controller('pipelineController', PipelineController)
         .controller('homePageController', HomePageController)
         .controller('toolsConfigurationController', ToolsConfigurationController)
@@ -49,11 +52,16 @@ module ISightApp {
         .controller('dataOnBoardingController', DataOnBoardingController)
         .controller('oneToolConfigurationController', OneToolConfigurationController)
         .controller('agentController', AgentController)
+		.controller('agentManagementController', AgentManagementController)
+		.controller('agentListController', AgentListController)
         .controller('singleToolConfigurationController', SingleToolConfigurationController)
         .controller('dataTaggingController', DataTaggingController)
+	    .controller('dataTaggingDetailsController', DataTaggingDetailsController)
+        .controller('FileUploadController', FileUploadController)
+        .controller('appSettingsController', AppSettingsController)
         .controller('insightsController', InsightsController)
-		.controller('appSettingsController', AppSettingsController)
 		.controller('dataPurgingController', DataPurgingController)
+
         .component('footer', {
             templateUrl: './dist/components/footer/view/footerView.html',
             controller: FooterController,
@@ -73,7 +81,28 @@ module ISightApp {
             bindings:{}
 
         })
-		.directive('demoFileModel', function ($parse) {
+        .directive('includeReplace', function () {
+            return {
+                require: 'ngInclude',
+                restrict: 'A',
+                link: function(scope, tElem, tAttrs) {
+
+                    tElem.replaceWith(tElem.children());
+                }
+            };
+        })
+        
+       .directive('row', function() {
+            return {
+                restrict: 'EA',
+                scope: { children:"=" , myVar: '=' ,clickHandler:"&",  'test': '=test', 'count': '=count' },
+                controller: RecursiveLiController,
+                templateUrl: './dist/modules/dataTaggingDetails/view/test.html'
+
+            };
+        })
+
+        .directive('demoFileModel', function ($parse) {
             return {
                 restrict: 'A', //the directive can be used as an attribute only
                     
@@ -93,15 +122,19 @@ module ISightApp {
                         var fileSize = (<HTMLInputElement>element[0]).files[0].size;
                         if (fileSize > maxSize){
                            scope.maxSizeErr = true;
+						   scope.imageSrc = "#";
+						   scope.showUploadBtn = false;
                         }else{
                         scope.showUploadBtn = true;
                         scope.file = (<HTMLInputElement>element[0]).files[0];
                         scope.getFile();
                         }
+						scope.$apply();
                     });
                 }
             };
         })
+       
         .config(['$routeProvider', '$compileProvider',
             function($routeProvider, $compileProvider) {
                 $routeProvider.
@@ -179,6 +212,16 @@ module ISightApp {
                          templateUrl: './dist/modules/insights/view/insightsView.html',
                          controller: InsightsController,
                          controllerAs: 'insightsController'
+                     }).
+					 when('/InSights/agentManagement', {
+                         templateUrl: './dist/modules/agent/view/agentManagementView.html',
+                        controller: AgentManagementController,
+                        controllerAs: 'agentManagementController'
+                     }).
+					  when('/InSights/agentList', {
+                         templateUrl: './dist/modules/agent/view/agentListView.html',
+                        controller: AgentListController,
+                        controllerAs: 'agentListController'
                      }).
 
                     otherwise({

@@ -1,0 +1,9 @@
+{	
+  "desriptions": {
+	"mqConfig" : "Message Queue Config",
+	"subscribe" :	"Subscribe",
+	"publish" :	"Publish",
+	"communication" : "Communication",
+	"loggingSetting" :	" LoggingSetting"
+  }
+} 
