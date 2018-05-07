@@ -1,0 +1,9 @@
+[Unit]
+Description=Ubuntu SnowAgent Service
+
+[Service]
+Type=forking
+ExecStart=/bin/bash /opt/insightsagents/PlatformAgents/snow/InSightsSnowAgent.sh
+
+[Install]
+WantedBy=multi-user.target

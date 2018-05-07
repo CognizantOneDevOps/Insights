@@ -22,9 +22,9 @@ from com.cognizant.devops.platformagents.core.BaseAgent import BaseAgent
 
 class TFSAgent(BaseAgent):
     def process(self):
-        BaseUrl = self.config.get("BaseUrl", '')
-        UserID = self.config.get("UserID", '')
-        Passwd = self.config.get("Passwd", '')
+        BaseUrl = self.config.get("baseUrl", '')
+        UserID = self.config.get("userID", '')
+        Passwd = self.config.get("passwd", '')
         Auth = self.config.get("auth", '')
         getCollectionsUrl = BaseUrl+"/_apis/projectcollections"
         collections = self.getResponse(getCollectionsUrl, 'GET', UserID, Passwd, None, authType=Auth)

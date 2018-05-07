@@ -59,15 +59,21 @@
     "dbPassword": "password"
   },
   "postgre": {
-    "userName": "grafana",
-    "password": "passwords",
-    "insightsDBUrl": "jdbc:postgresql://127.0.0.1:5432/insight",
-    "grafanaDBUrl": "jdbc:postgresql://127.0.0.1:5432/grafana"
+	  "userName" : "grafana",
+	  "password" : "password",
+	  "insightsDBUrl": "jdbc:postgresql://127.0.0.1:5432/insight",
+	  "grafanaDBUrl": "jdbc:postgresql://127.0.0.1:5432/grafana"
   },
   "messageQueue": {
     "host": "localhost",
     "user": "iSight",
     "password": "iSight"
+  },
+   "agentDetails": {
+   "docrootUrl":"http://platform.cogdevops.com/insights_install/release",
+   "unzipPath":"D://download",
+   "agentExchange" : "iAgent",
+   "agentPkgQueue" : "INSIGHTS.AGENTS.PACKAGE"
   },
   "insightsServiceURL": "http://localhost:8080",
   "disableAuth": false,
