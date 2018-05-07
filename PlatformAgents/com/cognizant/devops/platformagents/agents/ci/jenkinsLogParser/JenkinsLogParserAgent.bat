@@ -1,0 +1,2 @@
+pushd %INSIGHTS_AGENT_HOME%\PlatformAgents\jenkinslogparser
+python -c "from com.cognizant.devops.platformagents.agents.ci.jenkinslogparser.JenkinsLogParserAgent import JenkinsLogParserAgent; JenkinsLogParserAgent()"

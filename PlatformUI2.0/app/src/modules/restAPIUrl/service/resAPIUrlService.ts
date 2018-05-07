@@ -15,18 +15,18 @@
  ******************************************************************************/
 
 /// <reference path="../../../_all.ts" />
-   
+
 module ISightApp {
     export interface IRestAPIUrlService {
-        getRestCallUrl(moduleUrlKey:string):string;
+        getRestCallUrl(moduleUrlKey: string): string;
     }
 
     export class RestAPIUrlService implements IRestAPIUrlService {
-        
+
         static $inject = ['$cookies', '$resource', 'restEndpointService'];
         urlMapping = {};
 
-        constructor(private $cookies, private $resource,private restEndpointService) { 
+        constructor(private $cookies, private $resource, private restEndpointService) {
             this.initializeEndpoints();
         }
 
@@ -99,6 +99,11 @@ module ISightApp {
 		  this.addEndPoint("ACCESS_GROUP_MANAGEMENT_SWITCH_ORGS",'/PlatformService/accessGrpMgmt/switchUserOrg');
 		  this.addEndPoint("ACCESS_GROUP_MANAGEMENT_GET_USERS",'/PlatformService/accessGrpMgmt/getUser');
 		 
+		  this.addEndPoint("HIERARCHY_ALL_DETAILS_GET", '/PlatformService/admin/hierarchyDetails/getAllHierarchyDetails');
+          this.addEndPoint("UPLOAD_HIERARCHY_DETAILS", '/PlatformService/admin/hierarchyDetails/uploadHierarchyDetails');
+          this.addEndPoint("GET_METADATA", '/PlatformService/admin/hierarchyDetails/getMetaData');
+          this.addEndPoint("GET_HIERARCHY_PROPERTIES", '/PlatformService/admin/hierarchyDetails/getHierarchyProperties');
+            
 		  this.addEndPoint("INSIGHTS_GET",'/PlatformService/insights/inferences');
 		  this.addEndPoint("INSIGHTS_COMP_STATUS",'/PlatformService/ServicesHealthStatus/getStatus');
 		  
@@ -108,25 +113,31 @@ module ISightApp {
 		  this.addEndPoint("SAVE_DATAPURGING_SETTING",'/PlatformService/admin/settings/saveSettingsConfiguration');
 		  this.addEndPoint("LIST_DATAPURGING_SETTING",'/PlatformService/admin/settings/loadSettingsConfiguration');
 
+		  this.addEndPoint("AGENT_REGISTER", '/PlatformService/admin/agentConfiguration/registerAgent');
+		  this.addEndPoint("AGENT_UPDATE", '/PlatformService/admin/agentConfiguration/updateAgent');
+		  this.addEndPoint("AGENT_START_STOP", '/PlatformService/admin/agentConfiguration/startStopAgent');
+		  this.addEndPoint("DOCROOT_AGENT_VERSION_TOOLS", '/PlatformService/admin/agentConfiguration/getSystemAvailableAgentList');
+		  this.addEndPoint("DOCROOT_AGENT_TOOL_CONFIG_DETAILS", '/PlatformService/admin/agentConfiguration/getToolRawConfigFile');
+		  this.addEndPoint("DB_AGENTS_LIST", '/PlatformService/admin/agentConfiguration/getRegisteredAgents');
+		  this.addEndPoint("DB_AGENT_CONFIG_DETAILS", '/PlatformService/admin/agentConfiguration/getRegisteredAgentDetail');		  
+
         }
 
-       addEndPoint(name:string, url:string){
-            if(this.urlMapping[name] === undefined){
+        addEndPoint(name: string, url: string) {
+            if (this.urlMapping[name] === undefined) {
                 this.urlMapping[name] = url;
-            }else{
+            } else {
                 throw new Error('Url with same name already exists');
             }
         }
 
 
-        getRestCallUrl( moduleUrlKey:string ) {
-               if(! this.urlMapping[moduleUrlKey]){
-                    throw new Error("Url Mapping doesnt exist");
-               }			   
-			   
-               return this.restEndpointService.getServiceHost() + this.urlMapping[moduleUrlKey];			   
-		}      
-
+        getRestCallUrl(moduleUrlKey: string) {
+            if (!this.urlMapping[moduleUrlKey]) {
+                throw new Error("Url Mapping doesnt exist");
+            }
+            return this.restEndpointService.getServiceHost() + this.urlMapping[moduleUrlKey];
+        }
 
     }
 }

@@ -24,10 +24,10 @@ from com.cognizant.devops.platformagents.core.BaseAgent import BaseAgent
 
 class RundeckAgent(BaseAgent):
     def process(self):
-        getProjects = self.config.get("BaseEndPoint", '')
+        getProjects = self.config.get("baseEndPoint", '')
         authtoken = self.config.get("authtoken", '')
-        ExecutionsBaseEndPoint = self.config.get("ExecutionsBaseEndPoint", '')
-        startFrom = self.config.get("StartFrom", '')
+        ExecutionsBaseEndPoint = self.config.get("executionsBaseEndPoint", '')
+        startFrom = self.config.get("startFrom", '')
         startFrom = parser.parse(startFrom)
         startFrom = mktime(startFrom.timetuple()) + startFrom.microsecond/1000000.0
         startFrom = long(startFrom * 1000)

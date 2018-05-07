@@ -1,0 +1,4 @@
+REM pushd %INSIGHTS_AGENT_HOME%\PlatformAgents\jenkinslogparser
+nssm install JenkinsLogParserAgent %INSIGHTS_AGENT_HOME%\PlatformAgents\jenkinslogparser\JenkinsLogParserAgent.bat
+sleep 2
+net start JenkinsLogParserAgent

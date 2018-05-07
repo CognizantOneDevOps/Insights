@@ -41,7 +41,7 @@ public class AgentConfig {
 	@Column(name = "TOOL_CATEGORY")
 	private String toolCategory;
 
-	@Column(name = "AGENT_JSON", length = 1023)
+	@Column(name = "AGENT_JSON" ,length = 10000)
 	private String agentJson;
 
 	@Column(name = "UPDATE_DATE")
@@ -50,8 +50,22 @@ public class AgentConfig {
 	@Column(name = "DATA_UPDATE_SUPPORTED")
 	private Boolean dataUpdateSupported;
 	
-	@Column(name = "UNIQUE_KEY")
+	@Column(name = "UNIQUE_KEY", unique = true, nullable = false)
 	private String uniqueKey;
+	
+	@Column(name = "OS_VERSION")
+	private String osVersion;
+	
+	@Column(name = "AGENT_VERSION")
+	private String agentVersion;
+	
+	@Column(name = "AGENT_STATUS")
+	private String agentStatus;
+	
+	@Column(name = "AGENT_KEY", unique = true, nullable = false)
+	private String agentKey;
+	
+	
 	
 	public int getId() {
 		return id;
@@ -115,5 +129,37 @@ public class AgentConfig {
 
 	public void setUniqueKey(String uniqueKey) {
 		this.uniqueKey = uniqueKey;
+	}
+
+	public String getOsVersion() {
+		return osVersion;
+	}
+
+	public void setOsVersion(String osVersion) {
+		this.osVersion = osVersion;
+	}
+
+	public String getAgentVersion() {
+		return agentVersion;
+	}
+
+	public void setAgentVersion(String agentVersion) {
+		this.agentVersion = agentVersion;
+	}
+
+	public String getAgentStatus() {
+		return agentStatus;
+	}
+
+	public void setAgentStatus(String agentStatus) {
+		this.agentStatus = agentStatus;
+	}
+
+	public String getAgentKey() {
+		return agentKey;
+	}
+
+	public void setAgentKey(String agentKey) {
+		this.agentKey = agentKey;
 	}
 }

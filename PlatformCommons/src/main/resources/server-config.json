@@ -1,37 +1,37 @@
 {
-"endpointData": {
+  "endpointData": {
     "elasticSearchEndpoint": "http://localhost:9200"
   },
   "sparkConfigurations": {
-    "appName" : "inSights",
-	  "master" : "local[*]",
-	  "sparkExecutorMemory" : "8g",
-	  "sparkElasticSearchHost": "http://localhost",
-	  "sparkElasticSearchPort": "9200",
-	  "sparkElasticSearchConfigIndex": "",
-	  "sparkElasticSearchResultIndex": "",
-	  "kpiSize": "30",
-	  "sparkResultSince": 5,		
-	  "sparkMasterExecutionEndPoint":"http://localhost:4040"
+    "appName": "inSights",
+    "master": "local[*]",
+    "sparkExecutorMemory": "8g",
+    "sparkElasticSearchHost": "http://localhost",
+    "sparkElasticSearchPort": "9200",
+    "sparkElasticSearchConfigIndex": "",
+    "sparkElasticSearchResultIndex": "",
+    "kpiSize": "30",
+    "sparkResultSince": 5,
+    "sparkMasterExecutionEndPoint": "http://localhost:4040"
   },
   "emailConfiguration": {
-		"sendEmailEnabled": true,
-		"smtpHostServer": "",
-		"smtpPort": "",
-		"smtpUserName": "",
-		"smtpPassword": "",
-		"isAuthRequired": true,
-		"smtpStarttlsEnable": true,
-		"emailVelocityTemplate": "",
-		"mailFrom": " ",
-		"mailTo": " ",
-		"subject": "QA - Insights inference details",
-		"logo" :"img/Insight.svg",
-		"line" :"img/Line.svg",
-		"footerLogo" :"img/FooterLogo.svg"
-	},
+    "sendEmailEnabled": true,
+    "smtpHostServer": "",
+    "smtpPort": "",
+    "smtpUserName": "",
+    "smtpPassword": "",
+    "isAuthRequired": true,
+    "smtpStarttlsEnable": true,
+    "emailVelocityTemplate": "",
+    "mailFrom": " ",
+    "mailTo": " ",
+    "subject": "QA - Insights inference details",
+    "logo": "img/Insight.svg",
+    "line": "img/Line.svg",
+    "footerLogo": "img/FooterLogo.svg"
+  },
   "ldapConfiguration": {
-	"ldapUrl" : "ldap://ldaphost:389",
+    "ldapUrl": "ldap://ldaphost:389",
     "bindDN": "BindDN",
     "bindPassword": "Passwd",
     "searchBaseDN": "DC=XX,DC=XX",
@@ -46,9 +46,9 @@
   },
   "graph": {
     "endpoint": "http://localhost:7474",
-    "authToken": "bmVvNGo6QzBnbml6YW50QDE=",
-	  "boltEndPoint" : "bolt://localhost:7687",
-		"maxIdleConnections":25
+    "authToken": "",
+    "boltEndPoint": "bolt://localhost:7687",
+    "maxIdleConnections": 25
   },
   "grafana": {
     "grafanaEndpoint": "http://localhost:3000",
@@ -56,11 +56,11 @@
     "adminUserName": "admin",
     "adminUserPassword": "admin",
     "dbUserName": "grafana",
-    "dbPassword": "C0gnizant@1"
+    "dbPassword": "password"
   },
   "postgre": {
 	  "userName" : "grafana",
-	  "password" : "C0gnizant@1",
+	  "password" : "password",
 	  "insightsDBUrl": "jdbc:postgresql://127.0.0.1:5432/insight",
 	  "grafanaDBUrl": "jdbc:postgresql://127.0.0.1:5432/grafana"
   },
@@ -69,6 +69,12 @@
     "user": "iSight",
     "password": "iSight"
   },
+   "agentDetails": {
+   "docrootUrl":"http://platform.cogdevops.com/insights_install/release",
+   "unzipPath":"D://download",
+   "agentExchange" : "iAgent",
+   "agentPkgQueue" : "INSIGHTS.AGENTS.PACKAGE"
+  },
   "insightsServiceURL": "http://localhost:8080",
   "disableAuth": false,
   "enableNativeUsers": true,
@@ -76,6 +82,7 @@
   "userId": "UserID",
   "password": "Passwd",
   "refreshTime": "Jan 22, 2017 5:04:25 PM",
+  "enableOnlineDatatagging": false,
   "trustedHosts": [
     "localhost"
   ],

@@ -3,7 +3,8 @@
     "user": "iSight",
     "password": "iSight",
     "host": "127.0.0.1",
-    "exchange": "iSight"
+    "exchange": "iSight",
+    "agentControlXchg":"iAgent"
   },
   "subscribe": {
     "config": "DEPLOYMENT.RUNDECK.config"
@@ -15,36 +16,39 @@
   "communication": {
     "type": "REST"
   },
-  "responseTemplate": {
-    "id": "executionId",
-    "project": "projectName",
-    "status": "status",
-    "permalink": "permalink",
-    "user": "user",
-    "date-started": {
-      "unixtime": "unixTimestampStart",
-      "date": "dateStarted"
-    },
-    "date-ended": {
-      "unixtime": "unixTimestampEnd",
-      "date": "dateEnd"
-    },
-    "job": {
-      "id": "jobId",
-      "name": "jobName"
-    }
-},
+ "dynamicTemplate": {
+	  "responseTemplate": {
+	    "id": "executionId",
+	    "project": "projectName",
+	    "status": "status",
+	    "permalink": "permalink",
+	    "user": "user",
+	    "date-started": {
+	      "unixtime": "unixTimestampStart",
+	      "date": "dateStarted"
+	    },
+	    "date-ended": {
+	      "unixtime": "unixTimestampEnd",
+	      "date": "dateEnd"
+	    },
+	    "job": {
+	      "id": "jobId",
+	      "name": "jobName"
+	    }
+	  }  
+  },
+  "toolCategory" : "DEPLOYMENT",
   "auth": "base64",
   "runSchedule": 2,
   "authtoken": "authToken",
   "timeStampField":"dateStarted",
   "timeStampFormat":"%Y-%m-%dT%H:%M:%SZ", 
-  "StartFrom": "2016-10-10 00:01:01",
+  "startFrom": "2016-10-10 00:01:01",
   "toolsTimeZone" : "Asia/Kolkata",
   "insightsTimeZone" : "Asia/Kolkata",
   "useResponseTemplate" : true,
-  "BaseEndPoint": "http://127.0.0.1:4440/api/15/projects",
-  "ExecutionsBaseEndPoint": "http://127.0.0.1:4440/api/15/project",
+  "baseEndPoint": "http://127.0.0.1:4440/api/15/projects",
+  "executionsBaseEndPoint": "http://127.0.0.1:4440/api/15/project",
   "isDebugAllowed" : false,
     	"loggingSetting" : {
 		"logLevel" : "WARN"

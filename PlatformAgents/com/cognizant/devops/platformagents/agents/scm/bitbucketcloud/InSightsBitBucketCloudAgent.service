@@ -1,0 +1,9 @@
+[Unit]
+Description=Ubuntu BitBucketCloudAgent Service
+
+[Service]
+Type=forking
+ExecStart=/bin/bash /opt/insightsagents/PlatformAgents/bitbucketcloud/InSightsBitBucketCloudAgent.sh
+
+[Install]
+WantedBy=multi-user.target
