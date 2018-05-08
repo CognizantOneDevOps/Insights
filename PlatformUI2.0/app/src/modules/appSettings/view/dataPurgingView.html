@@ -22,46 +22,58 @@
 			<div ng-click="homePageController.selectAct('appSettings')"> 		
 					<span>Logo Setting</span>
 			</div>
-			<div ng-click="homePageController.selectAct('datapurgeSettings')"> 		
-					<span style="color:#00728f !important">Data Purging</span>
+			<div ng-click="dataPurgingController.listData()"> 		
+					<span style="color:#00728f !important">Data Archiving</span>
 			</div>
 		</div>
 		<div style="width: 100%;">
 			<div class="contentCss">
-			   <h4 style="color:#38840C;font-family:proxima_novaregular;font-size:16px">Customize your DataPurging settings.</h4>
+			   <h4 style="color:#38840C;font-family:proxima_novaregular;font-size:16px">Customize your Data Archiving settings.</h4>
 			    <div ng-if="dataPurgingController.saveView">
 					<div class="panel panel-default">				  
 						<form name="frmdatapurging">
-							 <div layout="row" layout-align="space-between start" layout-wrap layout-margin layout-padding>
-								<div flex="30">							
-									<span>Label</span>
-									<input class="inputBoxCont" ng-model="dataPurgingController.backupDatatype" required style="width: 90%;">							
+							 <div layout="row" layout-align="space-between start" layout-wrap layout-margin layout-padding class="applicationContentCss">
+								<div flex="30">	
+									<span>Data Retention Period (in Days)</span>
+									<input type="text" class="inputBoxCont" ng-model="dataPurgingController.retention" onkeypress='return event.charCode >= 48 && event.charCode <= 57' ng-keypress="dataPurgingController.checkData($event,dataPurgingController.retention, 'retention')" ng-blur="dataPurgingController.checkData($event,dataPurgingController.retention, 'retention')" required style="width: 90%;">
 								</div>
 								<div flex="35">
-									<span>Row Limit</span>
-									<input type="text" class="inputBoxCont" ng-model="dataPurgingController.rowLimit" required style="width: 90%;" onkeypress='return event.charCode >= 48 && event.charCode <= 57' ng-keypress="dataPurgingController.checkData($event,dataPurgingController.rowLimit, 'rowLimit')" ng-blur="dataPurgingController.checkData($event,dataPurgingController.rowLimit, 'rowLimit')" />
+									<span>Maximum number of records for Backup File</span>								
+									 <md-select class="searchApplicationBoxContData inputApplicationBox dataBoardingFieldName" md-no-asterisk="true" ng-model="dataPurgingController.rowLimit"  style="margin-left: 0px;margin-top: 0px;margin-bottom:10px; width:94% !important;" required placeholder="Select number of records">
+									  <md-option value="10">10</md-option>
+									  <md-option value="100">100</md-option>
+									  <md-option value="1000">1000</md-option>
+									</md-select>
 								</div>
 								<div flex="30">
 									<span>Backup Location</span>
 									<input class="inputBoxCont" ng-model="dataPurgingController.fileLocation" required style="width: 90%;">	
 								</div>						
 							 </div>
-							  <div layout="row" layout-align="space-between start" layout-wrap layout-margin layout-padding>
-								<div flex="30">							
+							  <div layout="row" layout-align="space-between start" layout-margin layout-padding>
+							  <div flex="30">							
 									<span>Backup File Format</span>
-									 <md-select class="searchApplicationBoxCont" md-no-asterisk="true" ng-model="dataPurgingController.fileFormat"  style="margin-top: 0px;margin-bottom:10px" required>
+									 <md-select class="searchApplicationBoxContData inputApplicationBox dataBoardingFieldName" md-no-asterisk="true" ng-model="dataPurgingController.fileFormat"  style="margin-left: 0px;margin-top: 0px;margin-bottom:10px; width:94%;" required placeholder="Select Fileformat" >
 									  <md-option value="CSV"  ng-selected="true" >CSV</md-option>
 									  <md-option value="JSON">JSON</md-option>
 									</md-select>
 								</div>
-								<div flex="35">
-									<span>Backup File Name</span>
-									<input class="inputBoxCont" ng-model="dataPurgingController.fileName" required style="width: 90%;">	
+							  <div flex="35">
+									<span>Frequency of Data Archival</span>								
+									 <md-select class="searchApplicationBoxContData inputApplicationBox dataBoardingFieldName" md-no-asterisk="true" ng-model="dataPurgingController.dataFreq"  style="margin-left: 0px;margin-top: 0px;margin-bottom:10px; width:94% !important;" required placeholder="Select Frequency" >
+									  <md-option value="DAILY">Daily</md-option>
+									  <md-option value="WEEKLY">Weekly</md-option>
+									  <md-option value="MONTHLY">Monthly</md-option>
+									</md-select>
+								</div>	
+								<div flex="30" layout="column">							
+									<span style="margin-top: 18px;margin-bottom: 6px;">Last Run Time: </span>
+									<span>Next Run Time: </span>
 								</div>
-								<div flex="30">
-									<span>Backup Duration (in Days)</span>
-									<input type="text" class="inputBoxCont" ng-model="dataPurgingController.duration" onkeypress='return event.charCode >= 48 && event.charCode <= 57' ng-keypress="dataPurgingController.checkData($event,dataPurgingController.duration, 'duration')" ng-blur="dataPurgingController.checkData($event,dataPurgingController.rowLimit, 'rowLimit')" required style="width: 90%;">
-								</div>						
+								<!-- <div flex="25" style="margin-top: 37px;">
+									<span>Next Run Time: </span>
+									<span></span>
+								</div>	 -->																	
 							 </div>
 							  <div layout layout-align="end end">               			
 								 <md-button type="submit" class="md-raised md-primary configureBut" ng-click="dataPurgingController.saveData()" ng-disabled="frmdatapurging.$invalid">
@@ -90,22 +102,25 @@
 						<thead class="theadCss">
 						<tr layout="row" layout-align="start center">
 							<th flex="20" class="tableHeader">
-								<span>Labels</span>
+								<span>Data Retention Period</span>
 							</th>
 							<th flex="20" class="tableHeader">
-								<span>Row Limit</span>
+								<span>Maximum number of records for Backup File</span>
 							</th>
 							<th flex="20" class="tableHeader">
 								<span>Location</span>
 							</th>
-							<th flex="10" class="tableHeader">
-								<span>Format</span>
+							<th flex="20" class="tableHeader">
+								<span>Frequency of Data Archival</span>
 							</th>
 							<th flex="20" class="tableHeader">
-								<span>File Name</span>
+								<span>Last Runtime</span>
 							</th>
 							<th flex="10" class="tableHeader">
-								<span>Duration</span>
+								<span>Next Runtime</span>
+							</th>
+							<th flex="10" class="tableHeader">
+								<span>File Format</span>
 							</th>
 							<th flex="10" class="tableHeader">
 								<span>Action</span>
@@ -114,12 +129,13 @@
 						</thead>
 						<tbody>
 							<tr layout="row" layout-align="start center" ng-if="!dataPurgingController.showTble">
-								<td flex="20" class="tableContentStyle" style="font-weight: normal !important;">{{dataPurgingController.settingData.labels}}</td>
+								<td flex="20" class="tableContentStyle">{{dataPurgingController.settingData.backupRetentionInDays}}</td>
 								<td flex="20" class="tableContentStyle">{{dataPurgingController.settingData.rowLimit}}</td>
 								<td flex="20" class="tableContentStyle">{{dataPurgingController.settingData.backupFileLocation}}</td>
+								<td flex="10" class="tableContentStyle">{{dataPurgingController.settingData.dataFreq}}</td>
+								<td flex="20" class="tableContentStyle">{{dataPurgingController.settingData.lastRunTime}}</td>
+								<td flex="10" class="tableContentStyle">{{dataPurgingController.settingData.nextRunTime}}</td>
 								<td flex="10" class="tableContentStyle">{{dataPurgingController.settingData.backupFileFormat}}</td>
-								<td flex="20" class="tableContentStyle">{{dataPurgingController.settingData.backupFileName}}</td>
-								<td flex="10" class="tableContentStyle">{{dataPurgingController.settingData.backupDurationInDays}}</td>
 								<td flex="10" class="tableContentStyle">
 								<md-icon md-svg-src="dist/icons/svg/userOnboarding/Edit_icon_MouseOver.svg" ng-style="{color: '#4ca64c', height: '20px', width: '20px'}" ng-click="dataPurgingController.showData();"></md-icon>
 								</td>								
