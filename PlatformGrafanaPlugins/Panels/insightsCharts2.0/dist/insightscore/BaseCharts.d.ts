@@ -23,6 +23,7 @@ export declare class BaseCharts {
      * Will mostly be used in editor panel
      */
     private executeEditChart();
+    applyTheme(chartOptions: any): any;
     appendChartContainer(): void;
     private convertData(dataRows, typeMapping);
     private convertToType(data, type);

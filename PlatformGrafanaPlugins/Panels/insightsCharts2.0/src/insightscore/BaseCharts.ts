@@ -1,10 +1,11 @@
 ///<reference path="../../node_modules/grafana-sdk-mocks/app/headers/common.d.ts" />
 import $ from 'jquery';
 import { ChartModel, ChartData, ColumnModel, ContainerModel } from './ChartModel';
+import angular from 'angular';
 var google;
 
 export class BaseCharts {
-    static supportedDataTypes = ['string', 'number', 'boolean', 'date', 'datetime', 'timeofday'];
+    static supportedDataTypes = ['string', 'number', 'boolean', 'date'];
     private chartEditorWrapper: any = {};
     constructor(private chartModel: ChartModel) {
         this.loadGoogleCharts();
@@ -101,7 +102,7 @@ export class BaseCharts {
             chartOptions['height'] = this.chartModel.container.height;
             chartOptions['width'] = '100%';
             var chart = new google.visualization[this.chartModel.chartType](containerElem);
-            chart.draw(data, chartOptions);
+            chart.draw(data, this.applyTheme(chartOptions));
         } else {
             google.charts.load('current', { 'packages': [this.chartModel.chartType.toLowerCase()] });
             google.charts.setOnLoadCallback(this.executeRenderChart.bind(this));
@@ -143,6 +144,57 @@ export class BaseCharts {
         chartEditor.openDialog(wrapper, {});
         this.chartEditorWrapper['chartEditor'] = chartEditor;
         this.appendChartContainer();
+    }
+
+    applyTheme(chartOptions){
+        let grafanaBootData = window['grafanaBootData'];
+        let isLightTheme = grafanaBootData.user.lightTheme;
+        let version = Number(grafanaBootData.settings.buildInfo.version.split(".")[0]);
+        if(version >= 5){
+            let textColor = '';
+            let fillColor = '';
+            if(isLightTheme){
+                fillColor = '#ffffff';
+                textColor = '#52545c';
+            }else{
+                fillColor = '#212124';
+                textColor = '#d8d9da';
+            }
+            chartOptions = angular.copy(chartOptions, {})
+            chartOptions['backgroundColor'] = fillColor;
+            let hAxis = chartOptions['hAxis'];
+            if(hAxis === undefined){
+                hAxis = {};
+                chartOptions['hAxis'] = hAxis;
+            }
+            let hTextStyle = hAxis['textStyle'];
+            if(hTextStyle === undefined){
+                hTextStyle = {};
+                hAxis['textStyle'] = hTextStyle;
+            }
+            hTextStyle['color'] = textColor;
+            let legendTextStyle = chartOptions['legendTextStyle'];
+            if(legendTextStyle === undefined){
+                legendTextStyle = {};
+                chartOptions['legendTextStyle'] = legendTextStyle;
+            }
+            legendTextStyle['color'] = textColor;
+            let vAxes = chartOptions['vAxes'];
+            if(vAxes === undefined){
+                vAxes = [{}];
+                chartOptions['vAxes'] = vAxes;
+            }
+            for(let v in vAxes){
+                let vAxis = vAxes[v];
+                let vTextStyle = vAxis['textStyle'];
+                if(vTextStyle === undefined){
+                    vTextStyle = {};
+                    vAxis['textStyle'] =vTextStyle;
+                }
+                vTextStyle['color'] = textColor;
+            }
+        }
+        return chartOptions;
     }
 
     appendChartContainer() {
