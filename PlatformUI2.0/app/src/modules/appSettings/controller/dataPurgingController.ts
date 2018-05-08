@@ -42,7 +42,7 @@ module ISightApp {
 		 rowLimit: string;		
 		 fileFormat: string;
 		 fileName: string;
-		 duration: string;
+		 retention: string;
 		 settingsType: string;
 		 listView: boolean = true;
 		 saveView: boolean = false;
@@ -50,13 +50,15 @@ module ISightApp {
 		 showThrobber: boolean;
 		 datalist= {};
 		 settingData = {};
-		 dataTypelabel:any;		 
+		 nextRunTime: string;	
+		 lastRunTime: string;
 		 settingJsonstring: string;
 		 settingJsonObj = {};
 		 activeFlag: string;
 		 lastModifiedByUser : string;
 		 editIconSrc = "dist/icons/svg/userOnboarding/Edit_icon_MouseOver.svg";
 		 showTble: boolean = true;
+		 dataFreq: string;
 		 
 		 checkData(event, myValue, txtName){
 			
@@ -67,8 +69,7 @@ module ISightApp {
 				 myValue = myValue.substr(1);
 				}				
 			}
-			if(txtName == 'rowLimit') { this.rowLimit  = myValue;}
-			else if(txtName == 'duration') { this.duration = myValue; }
+			if(txtName == 'retention') { this.retention = myValue; }
 		}
 
 		addData(): void {
@@ -86,19 +87,20 @@ module ISightApp {
 			self.activeFlag = "Y";
 			self.lastModifiedByUser = self.homeController.userName;
 			
-			if( self.backupDatatype.indexOf(',') >= 0){
+			/* if( self.backupDatatype.indexOf(',') >= 0){
 				self.dataTypelabel = self.backupDatatype.split(",");				
 			}else {
 				self.dataTypelabel = [self.backupDatatype];
-			}
+			} */
 			
-			self.settingJsonObj = {
-				"labels" : self.dataTypelabel,
+			self.settingJsonObj = {				
+				"backupRetentionInDays" : self.retention,
 				"rowLimit": self.rowLimit,
 				"backupFileLocation": self.fileLocation,
 				"backupFileFormat" : self.fileFormat,
-				"backupFileName" : self.fileName,
-				"backupDurationInDays" : self.duration
+				"dataArchivalFrequency" : self.dataFreq,
+				"lastRunTime" : '',
+				"nextRunTime" : ''
 			}
 			
 			self.settingJsonstring = encodeURIComponent(JSON.stringify(self.settingJsonObj));	
@@ -166,14 +168,13 @@ module ISightApp {
 			
 			self.listView = false;
 			self.saveView = true;	
-			
-			self.backupDatatype = self.settingData['labels'].toString();
-			console.log(self.backupDatatype);
+			self.retention = self.settingData['backupRetentionInDays'];  
 			self.rowLimit = self.settingData['rowLimit']; 
 			self.fileLocation = self.settingData['backupFileLocation'];
 			self.fileFormat = self.settingData['backupFileFormat'];
-			self.fileName = self.settingData['backupFileName'];
-			self.duration = self.settingData['backupDurationInDays'];
+			self.dataFreq = self.settingData['dataArchivalFrequency'];			
+			self.lastRunTime = self.settingData['lastRunTime'];
+			self.nextRunTime = self.settingData['nextRunTime'];
 			
 		}
 		
