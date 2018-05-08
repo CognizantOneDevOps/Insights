@@ -15,6 +15,7 @@
   "communication": {
     "type": "REST"
   },
+"dynamicTemplate": {
   "responseTemplate": {
      "repo": "reponame",
      "path": "repopath",
@@ -27,7 +28,8 @@
      "uri": "uri",
      "timeStampField": "timeStampField",
      "lastUpdated": "lastUpdated"
-  },
+  }
+},
   "auth": "base64",
   "runSchedule": 5,
   "UserID": "admin",
