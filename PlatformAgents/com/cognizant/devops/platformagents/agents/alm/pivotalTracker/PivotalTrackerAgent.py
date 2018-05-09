@@ -29,8 +29,8 @@ class pivotalTrackerAgent(BaseAgent):
     def process(self):
         userid = self.config.get("userid", '')
         passwd = self.config.get("passwd", '')
-        relationMetadata = self.config.get("relationMetadata", '')
-        storyMetadata = self.config.get("storyMetadata", '')
+        relationMetadata = self.config.get('dynamicTemplate', {}).get('relationMetadata', None)
+        storyMetadata = self.config.get('dynamicTemplate', {}).get('storyMetadata', None)
         baseEndPoint = self.config.get('baseEndPoint', '')
         accessToken = self.config.get('token')
         reqHeaders = {'x-trackertoken': accessToken}
@@ -138,7 +138,7 @@ class pivotalTrackerAgent(BaseAgent):
             self.updateTrackingJson(self.tracking)
     def data_prepare(self, story, project_id, workspace_name, activity):
         #STORY DETAILS
-        responseTemplate = self.config.get("responseTemplate", '')
+        responseTemplate = self.config.get('dynamicTemplate', {}).get('responseTemplate', None)
         injectdata={}
         injectdata['storyId'] = story['id']
         injectdata['createdAt'] = story['created_at']
