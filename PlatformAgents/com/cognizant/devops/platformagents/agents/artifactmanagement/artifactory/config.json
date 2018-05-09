@@ -34,6 +34,7 @@
   "runSchedule": 5,
   "UserID": "admin",
   "Passwd": "password",
+  "toolCategory" : "ARTIFACTMANAGEMENT",
   "BaseUrl": "http://localhost:8081/artifactory/api/",
   "timeStampField":"nex_lastupdated",
   "timeStampFormat":"%Y%m%d%H%M%S",
