@@ -15,6 +15,10 @@
  ******************************************************************************/
 package com.cognizant.devops.platformservice.rest.querycaching.service;
 
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+
 import javax.ws.rs.core.MediaType;
 
 import org.apache.commons.codec.digest.DigestUtils;
@@ -43,8 +47,8 @@ public class QueryCachingServiceImpl implements QueryCachingService {
 		JsonObject resultJson = null;
 		JsonParser parser = new JsonParser();
 		JsonObject requestJson = parser.parse(requestPayload).getAsJsonObject();
-		String isTestDB = requestJson.get("metadata").getAsJsonArray().get(0).getAsJsonObject().get("testDB")
-				.toString();
+		String isTestDB = requestJson.get(QueryCachingConstants.METADATA).getAsJsonArray().get(0).getAsJsonObject()
+				.get("testDB").toString();
 		try {
 			if (isTestDB.equals("true")) {
 				resultJson = getNeo4jDatasource(requestPayload);
@@ -64,8 +68,10 @@ public class QueryCachingServiceImpl implements QueryCachingService {
 		GraphResponse response = null;
 		JsonParser parser = new JsonParser();
 		JsonObject json = parser.parse(queryjson).getAsJsonObject();
-		if (json.get("statements").getAsJsonArray().get(0).getAsJsonObject().has("statement")) {
-			query = json.get("statements").getAsJsonArray().get(0).getAsJsonObject().get("statement").getAsString();
+		if (json.get(QueryCachingConstants.STATEMENTS).getAsJsonArray().get(0).getAsJsonObject()
+				.has(QueryCachingConstants.STATEMENT)) {
+			query = json.get(QueryCachingConstants.STATEMENTS).getAsJsonArray().get(0).getAsJsonObject()
+					.get(QueryCachingConstants.STATEMENT).getAsString();
 		}
 		try {
 			response = dbHandler.executeCypherQuery(query);
@@ -82,44 +88,51 @@ public class QueryCachingServiceImpl implements QueryCachingService {
 			JsonParser parser = new JsonParser();
 			JsonObject requestJson = parser.parse(requestPayload).getAsJsonObject();
 
-			boolean isCacheResult = requestJson.get("metadata").getAsJsonArray().get(0).getAsJsonObject()
-					.get("resultCache").getAsBoolean();
-			String cachingType = requestJson.get("metadata").getAsJsonArray().get(0).getAsJsonObject()
-					.get("cachingType").getAsString();
+			boolean isCacheResult = requestJson.get(QueryCachingConstants.METADATA).getAsJsonArray().get(0)
+					.getAsJsonObject().get(QueryCachingConstants.RESULT_CACHE).getAsBoolean();
 
 			if (isCacheResult) {
 				String sourceESCacheUrl = ApplicationConfigProvider.getInstance().getQueryCache().getEsCacheIndex();
+				String cachingType = requestJson.get(QueryCachingConstants.METADATA).getAsJsonArray().get(0)
+						.getAsJsonObject().get(QueryCachingConstants.CACHING_TYPE).getAsString();
 
-				String statement = requestJson.get("statements").getAsJsonArray().get(0).getAsJsonObject()
-						.get("statement").getAsString();
-				String startTimeStr = requestJson.get("metadata").getAsJsonArray().get(0).getAsJsonObject()
-						.get("startTime").getAsString();
-				String endTimeStr = requestJson.get("metadata").getAsJsonArray().get(0).getAsJsonObject().get("endTime")
-						.getAsString();
+				String statement = requestJson.get(QueryCachingConstants.STATEMENTS).getAsJsonArray().get(0)
+						.getAsJsonObject().get(QueryCachingConstants.STATEMENT).getAsString();
+				String startTimeStr = requestJson.get(QueryCachingConstants.METADATA).getAsJsonArray().get(0)
+						.getAsJsonObject().get(QueryCachingConstants.START_TIME).getAsString();
+				String endTimeStr = requestJson.get(QueryCachingConstants.METADATA).getAsJsonArray().get(0)
+						.getAsJsonObject().get(QueryCachingConstants.END_TIME).getAsString();
 				statement = getStatementWithoutTime(statement, startTimeStr, endTimeStr);
-				Long startTime = requestJson.get("metadata").getAsJsonArray().get(0).getAsJsonObject().get("startTime")
-						.getAsLong();
-				Long endTime = requestJson.get("metadata").getAsJsonArray().get(0).getAsJsonObject().get("endTime")
-						.getAsLong();
+				Long startTime = requestJson.get(QueryCachingConstants.METADATA).getAsJsonArray().get(0)
+						.getAsJsonObject().get(QueryCachingConstants.START_TIME).getAsLong();
+				Long endTime = requestJson.get(QueryCachingConstants.METADATA).getAsJsonArray().get(0).getAsJsonObject()
+						.get(QueryCachingConstants.END_TIME).getAsLong();
 				Long currentTime = InsightsUtils.getCurrentTimeInSeconds();
 
-				String queryHash = DigestUtils.md5Hex(statement).toUpperCase();
+				String queryHash = "";
 				String esQuery = "";
 				int cacheTime = 0;
 				int cacheVariance = 0;
 				String cacheDetailsHash = "";
 
 				if (cachingType.equalsIgnoreCase("Cache Time")) {
-					cacheTime = requestJson.get("metadata").getAsJsonArray().get(0).getAsJsonObject().get("cacheTime")
-							.getAsInt();
+					cacheTime = requestJson.get(QueryCachingConstants.METADATA).getAsJsonArray().get(0)
+							.getAsJsonObject().get(QueryCachingConstants.CACHE_TIME).getAsInt();
 					cacheDetailsHash = getCacheDetailsHash(cachingType, cacheTime);
-					esQuery = esQueryWithCacheTime(currentTime, cacheTime, queryHash, cacheDetailsHash);
-				} else {
-					cacheVariance = requestJson.get("metadata").getAsJsonArray().get(0).getAsJsonObject()
-							.get("cacheVariance").getAsInt();
-					cacheDetailsHash = getCacheDetailsHash(cachingType, cacheVariance);
-					esQuery = esQueryTemplateWithVariance(cacheVariance, startTime, endTime, queryHash,
+					queryHash = DigestUtils.md5Hex(statement + cacheDetailsHash).toUpperCase();
+					String loadCacheTimeEsQuery = loadEsQueryFromJsonFile(
+							QueryCachingConstants.LOAD_CACHETIME_QUERY_FROM_RESOURCES);
+					esQuery = esQueryWithCacheTime(loadCacheTimeEsQuery, currentTime, cacheTime, queryHash,
 							cacheDetailsHash);
+				} else {
+					cacheVariance = requestJson.get(QueryCachingConstants.METADATA).getAsJsonArray().get(0)
+							.getAsJsonObject().get(QueryCachingConstants.CACHE_VARIANCE).getAsInt();
+					cacheDetailsHash = getCacheDetailsHash(cachingType, cacheVariance);
+					queryHash = DigestUtils.md5Hex(statement + cacheDetailsHash).toUpperCase();
+					String loadCacheVarianceEsQuery = loadEsQueryFromJsonFile(
+							QueryCachingConstants.LOAD_CACHEVARIANCE_QUERY_FROM_RESOURCES);
+					esQuery = esQueryTemplateWithVariance(loadCacheVarianceEsQuery, cacheVariance, startTime, endTime,
+							queryHash, cacheDetailsHash);
 				}
 				JsonObject esResponse = queryES(sourceESCacheUrl + "/_search", esQuery);
 				String cacheResult = "cacheResult";
@@ -134,18 +147,17 @@ public class QueryCachingServiceImpl implements QueryCachingService {
 
 					JsonObject graphResponse = null;
 					graphResponse = getNeo4jDatasource(requestPayload);
-					saveCache.addProperty("queryHash", queryHash);
-					saveCache.addProperty("cacheDetailsHash", cacheDetailsHash);
-					saveCache.addProperty("cachingType", cachingType);
+					saveCache.addProperty(QueryCachingConstants.QUERY_HASH, queryHash);
+					saveCache.addProperty(QueryCachingConstants.CACHING_TYPE, cachingType);
 					if (cachingType.equalsIgnoreCase("Cache Time"))
-						saveCache.addProperty("cacheTime", cacheTime);
+						saveCache.addProperty(QueryCachingConstants.CACHE_TIME, cacheTime);
 					else
-						saveCache.addProperty("cacheVariance", cacheVariance);
+						saveCache.addProperty(QueryCachingConstants.CACHE_VARIANCE, cacheVariance);
 					saveCache.addProperty("startTimeRange", startTime);
 					saveCache.addProperty("endTimeRange", endTime);
 					saveCache.addProperty(cacheResult, graphResponse.toString());
-					saveCache.addProperty("hasExpired", false);
-					saveCache.addProperty("creationTime", currentTime);
+					saveCache.addProperty(QueryCachingConstants.HAS_EXPIRED, false);
+					saveCache.addProperty(QueryCachingConstants.CREATION_TIME, currentTime);
 
 					queryES(sourceESCacheUrl, saveCache.toString());
 					return parser.parse(saveCache.get(cacheResult).getAsString()).getAsJsonObject();
@@ -178,56 +190,50 @@ public class QueryCachingServiceImpl implements QueryCachingService {
 				"?END_TIME?");
 	}
 
-	private static String esQueryTemplateWithVariance(int cacheVariance, Long startTime, Long endTime, String queryHash,
-			String cacheDetailsHash) {
-
-		String esQuery = "{\"query\": {    \"bool\": {      \"must\": [        {          \"match\": {            "
-				+ "\"queryHash\": \"__queryCache__\"          }        },"
-				+ "        {          \"match\": {            \"cacheDetailsHash\": \"__cacheDetailsHash__\"          }        },"
-				+ "        {          \"bool\": {"
-				+ "            \"must\": [              {                \"range\": {                  \"startTimeRange\": {"
-				+ "                    \"gte\": \"__cachedStartTime__\",                    \"lte\": \"__startTime__\",                  "
-				+ "  \"format\": \"epoch_millis\"                  }                }              }            ],\"must\": [ "
-				+ "             {                \"range\": {                  \"endTimeRange\": {                    "
-				+ "\"gte\": \"__cachedEndTime__\",                    \"lte\": \"__endTime__\",                    \"format\": \"epoch_millis\""
-				+ "                  }                }              }            ]          }        }      ]    }  },"
-				+ "\"sort\":		{		\"creationTime\"		:{		\"order\"		:\"desc\"}		} }";
+	private static String esQueryTemplateWithVariance(String esQuery, int cacheVariance, Long startTime, Long endTime,
+			String queryHash, String cacheDetailsHash) {
 
 		long varianceSeconds = getVarianceEpochSeconds(cacheVariance, endTime - startTime);
 
 		esQuery = esQuery
-				.replace(String.valueOf("__cachedStartTime__"),
+				.replace(String.valueOf(QueryCachingConstants.CACHED_STARTTIME),
 						InsightsUtils.subtractVarianceTime(startTime, varianceSeconds).toString())
-				.replace(String.valueOf("__startTime__"),
+				.replace(String.valueOf(QueryCachingConstants.START_TIME_RANGE),
 						InsightsUtils.addVarianceTime(startTime, varianceSeconds).toString())
-				.replace(String.valueOf("__endTime__"),
+				.replace(String.valueOf(QueryCachingConstants.END_TIME_RANGE),
 						InsightsUtils.addVarianceTime(endTime, varianceSeconds).toString())
-				.replace(String.valueOf("__cachedEndTime__"),
+				.replace(String.valueOf(QueryCachingConstants.CACHED_ENDTIME),
 						InsightsUtils.subtractVarianceTime(endTime, varianceSeconds).toString())
-				.replace(String.valueOf("__queryCache__"), queryHash)
-				.replace(String.valueOf("__cacheDetailsHash__"), cacheDetailsHash);
+				.replace(String.valueOf(QueryCachingConstants.QUERY_HASHING), queryHash);
 		return esQuery;
 	}
 
-	private static String esQueryWithCacheTime(Long currentTime, int cacheDuration, String queryHash,
+	private static String esQueryWithCacheTime(String esQuery, Long currentTime, int cacheDuration, String queryHash,
 			String cacheDetailsHash) {
-		String esQuery = "{\"query\": {    \"bool\": {      \"must\": [        {          \"match\": {"
-				+ "            \"queryHash\": \"__queryCache__\"          }        },"
-				+ "        {          \"match\": {            \"cacheDetailsHash\": \"__cacheDetailsHash__\"          }        },"
-				+ "        {          \"bool\": {"
-				+ "            \"must\": [              {                \"range\": {                  \"creationTime\": {                    \"gte\": \"__cachePreviousTime__\","
-				+ "                    \"lte\": \"__currentTime__\",                    \"format\": \"epoch_millis\"                  }                }              }"
-				+ "            ]          }        }      ]    }  },\"sort\":		{		\"creationTime\"		:{		\"order\"		:\"desc\"}		} }";
-		esQuery = esQuery.replace(String.valueOf("__queryCache__"), queryHash)
-				.replace(String.valueOf("__cacheDetailsHash__"), cacheDetailsHash)
-				.replace(String.valueOf("__cachePreviousTime__"),
+
+		esQuery = esQuery.replace(String.valueOf(QueryCachingConstants.QUERY_HASHING), queryHash)
+				.replace(String.valueOf(QueryCachingConstants.CACHED_PREVIOUS_TIME),
 						InsightsUtils.subtractTimeInHours(currentTime, cacheDuration).toString())
-				.replace(String.valueOf("__currentTime__"), currentTime.toString());
+				.replace(String.valueOf(QueryCachingConstants.CURRENT_TIME), currentTime.toString());
 		return esQuery;
 	}
 
 	private static long getVarianceEpochSeconds(int cacheVariance, Long durationSeconds) {
 		return (durationSeconds * cacheVariance) / 100;
+	}
+
+	private String loadEsQueryFromJsonFile(String fileName) {
+		JsonParser parser = new JsonParser();
+		BufferedReader reader = null;
+		try {
+			InputStream in = getClass().getClassLoader().getResourceAsStream(fileName);
+			reader = new BufferedReader(new InputStreamReader(in));
+			Object obj = parser.parse(reader);
+			return obj.toString();
+		} catch (Exception e) {
+			log.error("Error in reading file!" + e);
+		}
+		return null;
 	}
 
 	private JsonObject queryES(String sourceESUrl, String query) throws Exception {
