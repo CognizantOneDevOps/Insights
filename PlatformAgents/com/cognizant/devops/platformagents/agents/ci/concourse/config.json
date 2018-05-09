@@ -28,6 +28,7 @@
 },
 "BuildMetadata": {"labels" : ["Build_concourse"]},
 "toolsTimeZone" : "Asia/Kolkata",
+"toolCategory" : "CI",
 "insightsTimeZone" : "Asia/Kolkata",
 "useResponseTemplate" : true,
 "runSchedule": 30,
