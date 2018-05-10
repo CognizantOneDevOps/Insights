@@ -70,7 +70,9 @@
     "password": "iSight"
   },
    "agentDetails": {
+   "isOnlineRegistration" : true,
    "docrootUrl":"http://platform.cogdevops.com/insights_install/release",
+   "offlineAgentPath" : "D://download//agents",
    "unzipPath":"D://download",
    "agentExchange" : "iAgent",
    "agentPkgQueue" : "INSIGHTS.AGENTS.PACKAGE"
