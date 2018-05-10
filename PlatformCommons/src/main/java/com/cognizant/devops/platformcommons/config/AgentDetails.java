@@ -28,6 +28,8 @@ public class AgentDetails implements Serializable {
 	private String unzipPath;
 	private String agentExchange;
 	private String agentPkgQueue;
+	private boolean isOnlineRegistration =  true;
+	private String offlineAgentPath;
 	
 	public String getDocrootUrl() {
 		return docrootUrl;
@@ -52,6 +54,18 @@ public class AgentDetails implements Serializable {
 	}
 	public void setAgentPkgQueue(String agentPkgQueue) {
 		this.agentPkgQueue = agentPkgQueue;
+	}
+	public boolean isOnlineRegistration() {
+		return isOnlineRegistration;
+	}
+	public void setOnlineRegistration(boolean isOnlineRegistration) {
+		this.isOnlineRegistration = isOnlineRegistration;
+	}
+	public String getOfflineAgentPath() {
+		return offlineAgentPath;
+	}
+	public void setOfflineAgentPath(String offlineAgentPath) {
+		this.offlineAgentPath = offlineAgentPath;
 	}
 
 }
