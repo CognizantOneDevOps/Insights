@@ -77,18 +77,36 @@ System.register([], function(exports_1) {
                                 target: target.refId,
                                 datapoints: datapoints
                             };
+                            var targetDatapointsMap = {};
                             var rows = result.data;
+                            var multiSeriesResponse = false;
                             for (var r in rows) {
                                 var row = rows[r].row;
                                 if (result.columns.length === 1) {
                                     datapoints.push([row[0], timestamp]);
+                                }
+                                else if (result.columns.length === 3) {
+                                    var targetName = row[2];
+                                    var targetDataPoints = targetDatapointsMap[targetName];
+                                    if (targetDataPoints === undefined) {
+                                        targetDataPoints = [];
+                                        targetDatapointsMap[targetName] = targetDataPoints;
+                                        response.push({
+                                            target: targetName,
+                                            datapoints: targetDataPoints
+                                        });
+                                        multiSeriesResponse = true;
+                                    }
+                                    targetDataPoints.push([row[1], row[0] * 1000]);
                                 }
                                 else {
                                     //Assuming the first column will be the time and second column will be the data.
                                     datapoints.push([row[1], row[0] * 1000]);
                                 }
                             }
-                            response.push(targetResponse);
+                            if (!multiSeriesResponse) {
+                                response.push(targetResponse);
+                            }
                         }
                         else if (target.table) {
                             var responseColumns = [];
