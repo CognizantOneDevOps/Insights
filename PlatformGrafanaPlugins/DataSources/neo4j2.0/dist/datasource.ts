@@ -78,17 +78,34 @@ export default class Neo4jDatasource {
           target : target.refId,
           datapoints : datapoints
         };
+        let targetDatapointsMap = {}
         let rows = result.data;
+        let multiSeriesResponse = false;
         for(let r in rows){
           let row = rows[r].row;
           if(result.columns.length === 1){
             datapoints.push([row[0], timestamp]);  
+          }else if(result.columns.length === 3){
+            let targetName = row[2];
+            let targetDataPoints = targetDatapointsMap[targetName]
+            if (targetDataPoints === undefined){
+              targetDataPoints = [];
+              targetDatapointsMap[targetName] = targetDataPoints;
+              response.push({
+                target : targetName,
+                datapoints : targetDataPoints
+              });
+              multiSeriesResponse = true;
+            }
+            targetDataPoints.push([row[1], row[0] * 1000]);
           }else{
             //Assuming the first column will be the time and second column will be the data.
             datapoints.push([row[1], row[0] * 1000]);
           }
         }
-        response.push(targetResponse);
+        if(!multiSeriesResponse){
+          response.push(targetResponse);
+        }
       }else if(target.table){
         let responseColumns = [];
         let responseRows = [];
