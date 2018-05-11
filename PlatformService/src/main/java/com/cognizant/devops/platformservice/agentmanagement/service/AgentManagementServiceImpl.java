@@ -442,14 +442,4 @@ public class AgentManagementServiceImpl  implements AgentManagementService{
 	private String getAgentkey(String toolName) {
 		return toolName + "-"+ Instant.now().toEpochMilli();
 	}
-
-	public static void main(String... args) throws InsightsCustomException, IOException {
-		ApplicationConfigCache.loadConfigCache();
-		AgentManagementServiceImpl imp = new AgentManagementServiceImpl();
-		System.out.println(imp.getSystemAvailableAgentList());
-		System.out.println(imp.getOfflineToolRawConfigFile("v1.0", "git"));
-		
-		imp.updateAgentConfig("git", PlatformServiceUtil.buildSuccessResponseWithData("this is testing"));
-	}
-
 }
