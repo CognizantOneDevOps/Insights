@@ -122,19 +122,19 @@ class pivotalTrackerAgent(BaseAgent):
                 else:
                     previous_iteration_number = trackingDetails
                     trackingupdate = {'iterationNmber' : iteration['number']}
-                if int(iteration['number']) > int(previous_iteration_number):
-                    self.tracking['iteration_'+str(project)] = trackingupdate
-                    injectDataIteration['projectId'] = iteration['project_id']
-                    injectDataIteration['numberOfStoriesAttached'] = iteration['length']
-                    injectDataIteration['iterationStartTime'] = iteration['start']
-                    injectDataIteration['iterationFinishTime'] = iteration['finish']
-                    injectDataIteration['velocity'] = iteration['velocity']
-                    if len(iteration['stories']) > 0:
-                        for story in iteration['stories']:
-                            injectDataIteration['storyId'] = story['id']
-                            iteration_data.append(injectDataIteration)
-                            self.publishToolsData(iteration_data, relationMetadata)
-                            iteration_data = []
+                #if int(iteration['number']) > int(previous_iteration_number):
+                self.tracking['iteration_'+str(project)] = trackingupdate
+                injectDataIteration['projectId'] = iteration['project_id']
+                injectDataIteration['numberOfStoriesAttached'] = iteration['length']
+                injectDataIteration['iterationStartTime'] = iteration['start']
+                injectDataIteration['iterationFinishTime'] = iteration['finish']
+                injectDataIteration['velocity'] = iteration['velocity']
+                if len(iteration['stories']) > 0:
+                    for story in iteration['stories']:
+                        injectDataIteration['storyId'] = story['id']
+                        iteration_data.append(injectDataIteration)
+                        self.publishToolsData(iteration_data, relationMetadata)
+                        iteration_data = []
             self.updateTrackingJson(self.tracking)
     def data_prepare(self, story, project_id, workspace_name, activity):
         #STORY DETAILS
