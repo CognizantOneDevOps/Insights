@@ -46,7 +46,7 @@ import org.springframework.stereotype.Service;
 import com.cognizant.devops.platformcommons.config.ApplicationConfigCache;
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.constants.MessageConstants;
-import com.cognizant.devops.platformcommons.core.enums.AGENTSTATUS;
+import com.cognizant.devops.platformcommons.core.enums.AGENTACTION;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformdal.agentConfig.AgentConfig;
 import com.cognizant.devops.platformdal.agentConfig.AgentConfigDAL;
@@ -100,8 +100,8 @@ public class AgentManagementServiceImpl  implements AgentManagementService{
 			byte[] data = Files.readAllBytes(agentZipPath);
 
 			String fileName = toolName + FILETYPE;
-			sendAgentPackage(data,fileName,agentId,toolName,osversion);
-			performAgentAction(agentId,AGENTSTATUS.START.name());
+			sendAgentPackage(data,AGENTACTION.REGISTER.name(),fileName,agentId,toolName,osversion);
+			performAgentAction(agentId,AGENTACTION.START.name());
 		} catch (Exception e) {
 			log.error("Error while registering agent "+toolName, e);
 			throw new InsightsCustomException(e.toString());
@@ -112,25 +112,24 @@ public class AgentManagementServiceImpl  implements AgentManagementService{
 
 
 	@Override
-	public String installAgent(String agentId,String toolName,String fileName,String osversion) throws InsightsCustomException{
+	public List<AgentConfigTO> uninstallAgent(String agentId,String toolName, String osversion) throws InsightsCustomException{
 		try {
-
-			Path path = Paths.get(ApplicationConfigProvider.getInstance().getAgentDetails().getUnzipPath(),toolName,fileName);
-			byte[] data = Files.readAllBytes(path);
-			sendAgentPackage(data,fileName,agentId,toolName,osversion);
+			AgentConfigDAL agentConfigDAL = new AgentConfigDAL();
+			agentConfigDAL.deleteAgentConfigurations(agentId);
+			uninstallAgent(AGENTACTION.UNINSTALL.name(),agentId,toolName,osversion);
 		} catch (Exception e) {
-			log.error("Error while installing agent..", e);
+			log.error("Error while un-installing agent..", e);
 			throw new InsightsCustomException(e.toString());
 		}
 
-		return SUCCESS;
+		return getRegisteredAgents();
 	}
 
 	@Override
 	public String startStopAgent(String agentId, String action) throws InsightsCustomException {
 		try {
 			AgentConfigDAL agentConfigDAL = new AgentConfigDAL();
-			agentConfigDAL.updateAgentRunningStatus(agentId,AGENTSTATUS.valueOf(action));
+			agentConfigDAL.updateAgentRunningStatus(agentId,AGENTACTION.valueOf(action));
 			performAgentAction(agentId,action);
 		} catch (Exception e) {
 			log.error("Error while agent "+action, e);
@@ -168,7 +167,7 @@ public class AgentManagementServiceImpl  implements AgentManagementService{
 
 			String fileName = toolName + FILETYPE;
 
-			sendAgentPackage(data,fileName,agentId,toolName,osversion);
+			sendAgentPackage(data,AGENTACTION.UPDATE.name(),fileName,agentId,toolName,osversion);
 
 		} catch (Exception e) {
 			log.error("Error updating and installing agent", e);
@@ -377,18 +376,33 @@ public class AgentManagementServiceImpl  implements AgentManagementService{
 
 	}
 
-	private void sendAgentPackage(byte[] data, String fileName, String agentId, String toolName, String osversion) throws IOException, TimeoutException {
+	private void sendAgentPackage(byte[] data, String action, String fileName, String agentId, String toolName, String osversion) throws IOException, TimeoutException {
 		Map<String,Object> headers = new HashMap<>();
 		headers.put("fileName", fileName);
 		headers.put("osType",osversion);
 		headers.put("agentToolName", toolName);
 		headers.put("agentId", agentId);
+		headers.put("action", action);
 
 		BasicProperties props = getBasicProperties(headers);
 
 		String agentDaemonQueueName = ApplicationConfigProvider.getInstance().getAgentDetails().getAgentPkgQueue();
 
 		publishAgentAction(agentDaemonQueueName, data, props);
+	}
+	
+	private void uninstallAgent(String action, String agentId, String toolName, String osversion) throws IOException, TimeoutException {
+		Map<String,Object> headers = new HashMap<>();
+		headers.put("osType",osversion);
+		headers.put("agentToolName", toolName);
+		headers.put("agentId", agentId);
+		headers.put("action", action);
+
+		BasicProperties props = getBasicProperties(headers);
+
+		String agentDaemonQueueName = ApplicationConfigProvider.getInstance().getAgentDetails().getAgentPkgQueue();
+
+		publishAgentAction(agentDaemonQueueName, action.getBytes(), props);
 	}
 
 	private void performAgentAction(String agentId, String action) throws TimeoutException, IOException {
