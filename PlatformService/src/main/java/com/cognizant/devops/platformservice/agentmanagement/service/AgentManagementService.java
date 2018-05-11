@@ -26,7 +26,7 @@ import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 public interface AgentManagementService {
 
 	public String registerAgent(String toolName,String agentVersion,String osversion,String configDetails) throws InsightsCustomException;
-	public String installAgent(String agentId,String toolName,String fileName,String osversion) throws InsightsCustomException;
+	public List<AgentConfigTO> uninstallAgent(String agentId,String toolName,String osversion) throws InsightsCustomException;
 	public String startStopAgent(String agentId,String action) throws InsightsCustomException;
 	public String updateAgent(String agentId, String configDetails, String toolName, String agentVersion, String osversion) throws InsightsCustomException;
 	

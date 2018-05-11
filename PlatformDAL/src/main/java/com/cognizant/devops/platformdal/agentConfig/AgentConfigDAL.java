@@ -20,7 +20,7 @@ import java.util.List;
 
 import org.hibernate.query.Query;
 
-import com.cognizant.devops.platformcommons.core.enums.AGENTSTATUS;
+import com.cognizant.devops.platformcommons.core.enums.AGENTACTION;
 import com.cognizant.devops.platformdal.core.BaseDAL;
 import com.google.gson.JsonObject;
 
@@ -69,7 +69,7 @@ public class AgentConfigDAL extends BaseDAL {
 		agentConfig.setUpdatedDate(updateDate);
 		agentConfig.setUniqueKey(uniqueKey);
 		agentConfig.setAgentKey(agentId);
-		agentConfig.setAgentStatus(AGENTSTATUS.START.name());
+		agentConfig.setAgentStatus(AGENTACTION.START.name());
 	}
 
 
@@ -122,7 +122,7 @@ public class AgentConfigDAL extends BaseDAL {
 		return result;
 	}
 	
-	public AgentConfig updateAgentRunningStatus(String agentId,AGENTSTATUS action) {
+	public AgentConfig updateAgentRunningStatus(String agentId,AGENTACTION action) {
 		Query<AgentConfig> createQuery = getSession().createQuery(
 				"FROM AgentConfig AC WHERE AC.agentKey = :agentKey",
 				AgentConfig.class);
@@ -137,6 +137,20 @@ public class AgentConfigDAL extends BaseDAL {
 		terminateSession();
 		terminateSessionFactory();
 		return agentConfig;
+	}
+
+	public List<AgentConfig> deleteAgentConfigurations(String agentKey) {
+		Query<AgentConfig> createQuery = getSession().createQuery(
+				"FROM AgentConfig a WHERE a.agentKey = :agentKey",
+				AgentConfig.class);
+		createQuery.setParameter("agentKey", agentKey);
+		AgentConfig agentConfig = createQuery.getSingleResult();
+		getSession().beginTransaction();
+		getSession().delete(agentConfig);
+		getSession().getTransaction().commit();
+		terminateSession();
+		terminateSessionFactory();
+		return getAllDataAgentConfigurations();
 	}
 	
 	public AgentConfig getAgentConfigurations(String agentId) {
