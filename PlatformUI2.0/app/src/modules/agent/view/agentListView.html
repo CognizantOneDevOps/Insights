@@ -28,7 +28,7 @@
 				</div>
 				<div layout="row" layout-align="center center" ng-if="agentListController.showConfirmMessage === 'uninstall'">
 					<md-icon md-svg-src="{{agentListController.errorIconSrc}}" ng-style="{color: '#ff4c4c', height: '15px', width: '15px'}"></md-icon>
-					<span style="color: #ff4c4c;">Please Stop the Agent!</span>
+					<span style="color: #ff4c4c;">Please stop the Agent before uninstalling!</span>
 				</div>
 				<div layout="row" layout-align="center center" ng-if="agentListController.showConfirmMessage === 'register' || agentListController.showConfirmMessage === 'update' || agentListController.showConfirmMessage === 'start' || agentListController.showConfirmMessage === 'stop'">
 					<md-icon md-svg-src="{{agentListController.errorIconSrc}}" ng-style="{color: '#ff4c4c', height: '15px', width: '15px'}"></md-icon>
