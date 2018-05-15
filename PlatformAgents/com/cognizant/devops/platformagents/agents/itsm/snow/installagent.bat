@@ -1,4 +1,10 @@
 REM pushd %INSIGHTS_AGENT_HOME%\PlatformAgents\snow
-nssm install snowAgent %INSIGHTS_AGENT_HOME%\PlatformAgents\snow\SnowAgent.bat
-sleep 2
-net start SnowAgent
+IF /I "%1%" == "UNINSTALL" (
+	net stop snowAgent
+	sc delete snowAgent
+) ELSE (
+	net stop snowAgent
+	sc delete snowAgent
+    nssm install snowAgent %INSIGHTS_AGENT_HOME%\PlatformAgents\snow\SnowAgent.bat
+    net start SnowAgent
+)

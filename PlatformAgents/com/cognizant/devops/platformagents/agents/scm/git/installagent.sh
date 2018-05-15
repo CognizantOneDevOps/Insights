@@ -24,17 +24,26 @@ case $opt in
 						echo "Service installaton steps completed"
 		        	;;   
 				esac
-		;;
+		        ;;
         [uU][bB][uU][nN][tT][uU])
-                echo "Git Running on Ubuntu..."
-		sudo cp -xp InSightsGitAgent.service /etc/systemd/system
-		sudo systemctl enable InSightsGitAgent
-		sudo systemctl start InSightsGitAgent
-		echo "Service installaton steps completed"
-         ;;
+		     case $action in 
+                [uU][nN][iI][nN][sS][tT][aA][lL][lL]) 
+					sudo systemctl stop InSightsGitAgent
+					sudo rm -R /etc/systemd/system/InSightsGitAgent.service
+					echo "Service un-installation step completed"				
+			        ;;
+				*)
+                   echo "Git Running on Ubuntu..."
+					sudo cp -xp InSightsGitAgent.service /etc/systemd/system
+					sudo systemctl enable InSightsGitAgent
+					sudo systemctl start InSightsGitAgent
+					echo "Service installaton steps completed"
+        			;;
+			 esac
+			 ;;
         centos)
                echo "Git Running on centso..."
-        ;;
+               ;;
         *)
         	    echo "Please provide correct OS input"
 esac
