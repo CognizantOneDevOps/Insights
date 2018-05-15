@@ -174,12 +174,12 @@ module ISightApp {
 				self.showConfirmMessage = "uninstall";
 				setTimeout(function () {
 					self.showConfirmMessage = "";
-				}, 1000);
+				}, 5000);
 			} else {
 				self.$mdDialog.show({
 					controller: UninstallAgentDialogController,
 					controllerAs: 'UninstallAgentDialogController',
-					templateUrl: './dist/modules/agent/view/confirmUninstallAgentDialogViewTemplate.tmp.html',
+					templateUrl: './dist/modules/agent/view/uninstallAgentDialogViewTemplate.tmp.html',
 					parent: angular.element(document.body),
 					targetEvent: params,
 					preserveScope: true,
