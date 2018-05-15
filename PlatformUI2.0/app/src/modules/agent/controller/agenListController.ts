@@ -160,14 +160,14 @@ module ISightApp {
 		}
 
 		uninstallAgent(params): void {
-			console.log(params);
-			console.log(this.data);
+			//console.log(params);
+			//console.log(this.data);
 			var self = this;
 			var agentData;
 			for (var i in self.data) {
 				if (params.agentid === self.data[i].agentKey) {
 					agentData = self.data[i];
-					console.log(agentData);
+					//console.log(agentData);
 				}
 			}
 			if (agentData.agentStatus === "START") {
