@@ -1,4 +1,10 @@
 REM pushd %INSIGHTS_AGENT_HOME%\PlatformAgents\jenkinslogparser
-nssm install JenkinsLogParserAgent %INSIGHTS_AGENT_HOME%\PlatformAgents\jenkinslogparser\JenkinsLogParserAgent.bat
-sleep 2
-net start JenkinsLogParserAgent
+IF /I "%1%" == "UNINSTALL" (
+	net stop JenkinsLogParserAgent
+	sc delete JenkinsLogParserAgent
+) ELSE (
+	net stop JenkinsLogParserAgent
+	sc delete JenkinsLogParserAgent
+    nssm install JenkinsLogParserAgent %INSIGHTS_AGENT_HOME%\PlatformAgents\jenkinslogparser\JenkinsLogParserAgent.bat
+    net start JenkinsLogParserAgent
+)
