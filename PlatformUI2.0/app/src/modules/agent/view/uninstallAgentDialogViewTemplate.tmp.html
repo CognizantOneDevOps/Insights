@@ -1,0 +1,42 @@
+<!--
+ *******************************************************************************
+ * Copyright 2017 Cognizant Technology Solutions
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License.  You may obtain a copy
+ * of the License at
+ * 
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ ******************************************************************************
+ -->
+
+<md-dialog class="md-dialog-reponseTemplate">
+
+    <md-dialog-content>
+        <div layout="column">
+            <md-toolbar class="toolbarHt">
+                <div layout layout-align="center center" class="md-toolbar-tools">
+                    <h2 class="toolBar">Uninstall Agent</h2>
+                </div>
+            </md-toolbar>
+            <div layout layout-align="center center">
+                <div class="applicationAddDialog">
+                    <span style="color:blue">
+                        <b> Do you want to uninstall "{{UninstallAgentDialogController.toolName}}" on {{UninstallAgentDialogController.osVersion}}?</b>
+                    </span>
+                </div>
+            </div>
+            <md-dialog-actions layout="row" layout-align="center center" class="dialogAct">
+                <md-button layout type="submit" class="md-raised md-primary saveButt" ng-click="UninstallAgentDialogController.confirmation()">
+                    Yes</md-button>
+                <md-button layout class="cancelButt" ng-click="UninstallAgentDialogController.cancel()">Cancel</md-button>
+            </md-dialog-actions>
+    </md-dialog-content>
+
+</md-dialog>
