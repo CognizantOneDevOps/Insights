@@ -52,6 +52,17 @@ public class InsightsAgentConfiguration {
 		}
 		return PlatformServiceUtil.buildSuccessResponseWithData(message);
 	}
+	
+	@RequestMapping(value="/uninstallAgent", method = RequestMethod.POST, produces=MediaType.APPLICATION_JSON_UTF8_VALUE)
+	public @ResponseBody JsonObject uninstallAgent(@RequestParam String agentId,@RequestParam String toolName, @RequestParam String osversion) {
+		List<AgentConfigTO>  agentList ;
+		try{
+			agentList = agentManagementService.uninstallAgent(agentId, toolName, osversion);
+		}catch(InsightsCustomException e){
+			return PlatformServiceUtil.buildFailureResponse(e.toString());
+		}
+		return PlatformServiceUtil.buildSuccessResponseWithData(agentList);
+	}
 
 	@RequestMapping(value = "/updateAgent", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 	public @ResponseBody JsonObject updateAgent(@RequestParam String agentId,@RequestParam String configJson,
