@@ -27,9 +27,9 @@ module ISightApp {
             self.osVersion = self['locals'].osVersion;
 
             var elem = document.querySelector('#agentTemplateContainer');
-            var homePageControllerScope = angular.element(elem).scope();
-            var homePageController = homePageControllerScope['agentListController'];
-            this.agentListController = homePageController;
+            var agentListControllerScope = angular.element(elem).scope();
+            var agentController = agentListControllerScope['agentListController'];
+            this.agentListController = agentController;
         }
         statusObject: boolean;
         agentKey: any;
