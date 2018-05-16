@@ -67,8 +67,8 @@
 									</md-select>
 								</div>	
 								<div flex="30" layout="column">							
-									<span style="margin-top: 18px;margin-bottom: 6px;">Last Run Time: </span>
-									<span>Next Run Time: </span>
+									<span style="margin-top: 18px;margin-bottom: 6px;">Last Run Time: {{dataPurgingController.lastRunTime}} </span>
+									<span>Next Run Time:  {{dataPurgingController.nextRunTime}} </span>
 								</div>
 								<!-- <div flex="25" style="margin-top: 37px;">
 									<span>Next Run Time: </span>
@@ -132,7 +132,7 @@
 								<td flex="20" class="tableContentStyle">{{dataPurgingController.settingData.backupRetentionInDays}}</td>
 								<td flex="20" class="tableContentStyle">{{dataPurgingController.settingData.rowLimit}}</td>
 								<td flex="20" class="tableContentStyle">{{dataPurgingController.settingData.backupFileLocation}}</td>
-								<td flex="10" class="tableContentStyle">{{dataPurgingController.settingData.dataFreq}}</td>
+								<td flex="10" class="tableContentStyle" style="text-transform: capitalize;">{{dataPurgingController.settingData.dataArchivalFrequency}}</td>
 								<td flex="20" class="tableContentStyle">{{dataPurgingController.settingData.lastRunTime}}</td>
 								<td flex="10" class="tableContentStyle">{{dataPurgingController.settingData.nextRunTime}}</td>
 								<td flex="10" class="tableContentStyle">{{dataPurgingController.settingData.backupFileFormat}}</td>

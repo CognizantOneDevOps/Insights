@@ -18,8 +18,10 @@ package com.cognizant.devops.platformservice.customsettings.service;
 import org.apache.log4j.Logger;
 import org.springframework.stereotype.Service;
 
+import com.cognizant.devops.platformcommons.core.util.DataPurgingUtils;
 import com.cognizant.devops.platformdal.settingsconfig.SettingsConfiguration;
 import com.cognizant.devops.platformdal.settingsconfig.SettingsConfigurationDAL;
+import com.google.gson.JsonObject;
 
 
 @Service("settingsConfigurationService")
@@ -44,11 +46,38 @@ public class SettingsConfigurationServiceImpl implements SettingsConfigurationSe
 	private SettingsConfiguration populateSettingsConfiguration(String settingsJson, String settingsType,
 			String activeFlag, String lastModifiedByUser) {
 		SettingsConfiguration settingsConfiguration = new SettingsConfiguration();
-		settingsConfiguration.setSettingsJson(settingsJson);
+		String updatedSettingsJson = updateNextRunTimeValue(settingsJson);
+		settingsConfiguration.setSettingsJson(updatedSettingsJson);
 		settingsConfiguration.setSettingsType(settingsType);
 		settingsConfiguration.setActiveFlag(activeFlag);
 		settingsConfiguration.setLastModifiedByUser(lastModifiedByUser);
 		return settingsConfiguration;
-	}	
+	}
+	
+	/**
+	 * Updates settingJson string coming from UI with nextRunTime value
+	 * and saved into the database 
+	 * @param settingsJson
+	 * @return
+	 */
+	public String updateNextRunTimeValue(String settingsJson) {
+		String updatedSettingsJson = null;
+		JsonObject settingsJsonObject = DataPurgingUtils.convertSettingsJsonObject(settingsJson);
+		String dataArchivalFrequency = DataPurgingUtils.getDataArchivalFrequency(settingsJsonObject);
+		String nextRunTime = DataPurgingUtils.calculateNextRunTime(dataArchivalFrequency);
+		settingsJsonObject = DataPurgingUtils.updateNextRunTime(settingsJsonObject,nextRunTime);
+		if (settingsJsonObject != null) {
+		  updatedSettingsJson = settingsJsonObject.toString();			
+		}
+		return updatedSettingsJson;
+	}
+	
+	/*public static void main(String[] a){
+		SettingsConfigurationServiceImpl obj = new SettingsConfigurationServiceImpl();
+		SettingsConfiguration settingsConfiguration = obj.loadSettingsConfiguration(ConfigOptions.DATAPURGING_SETTINGS_TYPE);
+		String modifiedJson = obj.updateNextRunTimeValue(settingsConfiguration.getSettingsJson());
+		System.out.println(" Updated Setting json: >>>>"+ modifiedJson);
+	
+	}*/
 
 }

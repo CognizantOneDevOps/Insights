@@ -29,8 +29,8 @@ import com.cognizant.devops.platformcommons.config.ApplicationConfigCache;
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformengine.modules.aggregator.EngineAggregatorModule;
 import com.cognizant.devops.platformengine.modules.correlation.EngineCorrelatorModule;
-import com.cognizant.devops.platformengine.modules.datapurging.DataPurgingExecutor;
 import com.cognizant.devops.platformengine.modules.dataenrichment.DataEnrichmentModule;
+import com.cognizant.devops.platformengine.modules.datapurging.DataPurgingExecutor;
 import com.cognizant.devops.platformengine.modules.mapper.ProjectMapperModule;
 
 /**
@@ -136,4 +136,5 @@ public class Application {
 			log.error(e);
 		}
 	}
+	
 }

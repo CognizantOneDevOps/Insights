@@ -51,5 +51,11 @@ public interface ConfigOptions {
 	String ROW_LIMIT = "rowLimit";
 	String BACKUP_FILE_LOCATION = "backupFileLocation";
 	String BACKUP_FILE_NAME = "backupFileName";
-	String BACKUP_DURATION_IN_DAYS = "backupDurationInDays";
+	String BACKUP_DURATION_IN_DAYS = "backupRetentionInDays";
+	String DATA_ARCHIVAL_FREQUENCY = "dataArchivalFrequency";
+	String LAST_RUN_TIME = "lastRunTime";
+	String NEXT_RUN_TIME = "nextRunTime";
+	String BACKUP_FILE_FORMAT = "backupFileFormat";
+	String CSV_FORMAT = "CSV";
+	String JSON_FORMAT = "JSON";
 }

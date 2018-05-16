@@ -21,6 +21,7 @@ import java.util.List;
 
 import org.hibernate.query.Query;
 
+import com.cognizant.devops.platformcommons.constants.ConfigOptions;
 import com.cognizant.devops.platformdal.core.BaseDAL;
 
 public class SettingsConfigurationDAL extends BaseDAL {
@@ -82,6 +83,18 @@ public class SettingsConfigurationDAL extends BaseDAL {
 			}
 		}		
 		return null;
+	}
+	
+	public void updateSettingJson(String modifiedSettingJson) {
+		SettingsConfiguration settingsConfiguration = loadSettingsConfiguration(ConfigOptions.DATAPURGING_SETTINGS_TYPE);
+		getSession().beginTransaction();
+		if (settingsConfiguration != null) {
+			settingsConfiguration.setSettingsJson(modifiedSettingJson);
+			getSession().update(settingsConfiguration);
+		}
+		getSession().getTransaction().commit();
+		terminateSession();
+		terminateSessionFactory();
 	}
 		
 }
