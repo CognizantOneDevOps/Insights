@@ -69,8 +69,9 @@ public class DataPurgingExecutor implements Job {
 		String backupFileLocation = null ;
 		long backupDurationInDays = 0;
 		String backupFileFormat = null;
-		//Internally defined backup file prefix
+		//Internally defined backup file name prefix
 		String backupFilePrefix = "neo4jDataArchive";
+		boolean isCsvFormat = false;
 
 		/**
 		 * To get Settings Configuration which is set by User from Insights application UI
@@ -83,19 +84,25 @@ public class DataPurgingExecutor implements Job {
 			backupFileFormat = configJsonObj.get(ConfigOptions.BACKUP_FILE_FORMAT).getAsString();
 			backupDurationInDays = configJsonObj.get(ConfigOptions.BACKUP_DURATION_IN_DAYS).getAsLong();
 		}
-		
+
+		if (ConfigOptions.CSV_FORMAT.equals(backupFileFormat)) {
+			isCsvFormat = true;
+		} else if (ConfigOptions.JSON_FORMAT.equals(backupFileFormat)) {
+			isCsvFormat = false;	
+		}
+
 		//Converts into epoch time in seconds as data inside inSightsTime property is stored in epoch seconds  
 		long epochTime = InsightsUtils.getTimeBeforeDaysInSeconds(backupDurationInDays);
 		Neo4jDBHandler dbHandler = new Neo4jDBHandler();
 		GraphResponse response = null;
 		int splitlength = 0;
-		boolean successFlag = true;
+		boolean successFlag = false;
 		try {
 			int count = getNodeCount(dbHandler,epochTime);
 			while(splitlength  < count){
 				boolean deleteFlag = true;
 				try{
-					 response = executeCypherQuery(rowLimit,splitlength,epochTime) ;
+					response = executeCypherQuery(rowLimit,splitlength,epochTime) ;
 				}
 				catch (GraphDBException e){
 					log.error("Exception occured while selecting matching records for a specific data rentention period:" + e);
@@ -104,26 +111,24 @@ public class DataPurgingExecutor implements Job {
 				String localDateTime = InsightsUtils.getLocalDateTime("yyyyMMddHHmmss");
 				String location = backupFileLocation + File.separator + backupFilePrefix + "_" + splitlength + "_" + localDateTime; 
 				try{
-					if (ConfigOptions.CSV_FORMAT.equals(backupFileFormat)) {
-						String csvFileLocation = location + ".csv";
-						writeToCSVFile(response, csvFileLocation);
-					} else if (ConfigOptions.JSON_FORMAT.equals(backupFileFormat)) {
-						String jsonFileLocation = location + ".json";
-						writeToJsonFile(response , jsonFileLocation);	
+					if (isCsvFormat) {
+						writeToCSVFile(response,location);
+					} else {
+						writeToJsonFile(response,location);	
 					}
 				}
 				catch (IOException e) {
 					log.error("Exception occured while taking backup of data in DataPurgingExecutor Job: " + e);
 					deleteFlag = false;
 				}
-				
+
 				//delete call with modified query
 				/*if(deleteFlag){
 					String deleteQry = "MATCH (n:DATA) where n.inSightsTime < "+ epochTime  +" with n skip "+ splitlength
 												+" limit " + rowLimit + " detach delete n ";
 					try {
 						dbHandler.executeCypherQuery(deleteQry);
-						
+
 					} catch (GraphDBException e) {
 						log.error("Exception occured while deleting DATA nodes of Neo4j database inside DataPurgingExecutor Job: " + e);
 					}
@@ -165,6 +170,7 @@ public class DataPurgingExecutor implements Job {
 	 * @throws IOException
 	 */
 	private void writeToJsonFile(GraphResponse response, String location) throws IOException {
+		String jsonFileLocation = location + ".json";
 		JsonArray array = response.getJson().get("results").getAsJsonArray().get(0).getAsJsonObject().get("data").getAsJsonArray();
 		StringBuilder sb = new StringBuilder();
 		for(JsonElement element : array) {
@@ -174,9 +180,11 @@ public class DataPurgingExecutor implements Job {
 			sb.append(",");
 		}
 		String outputString = sb.toString();
+		//Removes last appended ',' from output string
 		outputString = outputString.substring(0,outputString.length()-1);
+		//Adds entire output string inside [] bracket
 		outputString = "[" + outputString +"]";
-		FileWriter fileWriter = new FileWriter(location);
+		FileWriter fileWriter = new FileWriter(jsonFileLocation);
 		fileWriter.write(outputString);
 		fileWriter.flush();
 		fileWriter.close();
@@ -191,6 +199,7 @@ public class DataPurgingExecutor implements Job {
 	 * @throws IOException
 	 */
 	private void writeToCSVFile(GraphResponse response, String location) throws IOException {
+		String csvFileLocation = location + ".csv";
 		JsonArray array = response.getJson().get("results").getAsJsonArray().get(0).getAsJsonObject().get("data").getAsJsonArray();
 		Map<String,Integer> headerMap = new HashMap<>();
 		List<ArrayList<String>> valueStore = new ArrayList<>();
@@ -231,7 +240,7 @@ public class DataPurgingExecutor implements Job {
 		}
 		valueStore.add(0 , headerList);		
 		CSVFormat csvFormat = CSVFormat.DEFAULT.withRecordSeparator("\n");
-		FileWriter fWriter = new FileWriter(location);
+		FileWriter fWriter = new FileWriter(csvFileLocation);
 		try(CSVPrinter csvPrinter = new CSVPrinter(fWriter, csvFormat);) {			
 			for (ArrayList<String> values: valueStore) {
 				while (headerList.size()> values.size()) {
@@ -357,7 +366,7 @@ public class DataPurgingExecutor implements Job {
 		 dataPurgingExecutor.performDataPurging();
 		long epochTime = InsightsUtils.getTimeBeforeDays(300L);
 		System.out.println("epoch time:>>"+epochTime );
-		
+
 		Boolean scheduleFlag = dataPurgingExecutor.checkDataPurgingJobSchedule();
 		System.out.println("Can we do purging? ---"+ scheduleFlag);
 		dataPurgingExecutor.updateRunTimeIntoDatabase();		
