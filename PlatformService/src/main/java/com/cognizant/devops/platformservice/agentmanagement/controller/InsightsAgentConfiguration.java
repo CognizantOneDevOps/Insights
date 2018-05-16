@@ -56,13 +56,13 @@ public class InsightsAgentConfiguration {
 	@RequestMapping(value = "/uninstallAgent", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 	public @ResponseBody JsonObject uninstallAgent(@RequestParam String agentId, @RequestParam String toolName,
 			@RequestParam String osversion) {
-		List<AgentConfigTO> agentList;
+		String message = null;
 		try {
-			agentList = agentManagementService.uninstallAgent(agentId, toolName, osversion);
+			message = agentManagementService.uninstallAgent(agentId, toolName, osversion);
 		} catch (InsightsCustomException e) {
 			return PlatformServiceUtil.buildFailureResponse(e.toString());
 		}
-		return PlatformServiceUtil.buildSuccessResponseWithData(agentList);
+		return PlatformServiceUtil.buildSuccessResponseWithData(message);
 	}
 
 	@RequestMapping(value = "/updateAgent", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
