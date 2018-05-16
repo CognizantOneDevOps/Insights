@@ -36,17 +36,23 @@ module ISightApp {
         toolName: string;
         osVersion: string;
         agentListController: AgentListController;
+
         confirmation(): void {
             var self = this;
             self.agentService.agentUninstall(self.agentKey, self.toolName, self.osVersion).then(function (data) {
 
+            }).catch(function (data) {
+                self.agentListController.showConfirmMessage = "service_error";
+                self.agentListController.getRegisteredAgents();
             });
             self.agentListController.getRegisteredAgents();
             self.hide();
         }
+
         hide(): void {
             this.$mdDialog.hide();
         }
+
         cancel(): void {
             this.$mdDialog.cancel();
         }
