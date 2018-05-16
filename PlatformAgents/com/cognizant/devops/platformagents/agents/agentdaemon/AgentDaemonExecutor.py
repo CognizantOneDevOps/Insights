@@ -134,7 +134,7 @@ class AgentDaemonExecutor:
                  ''' 
                  if osType == "WINDOWS":
                      scriptFile = scriptPath + os.path.sep +'installagent.bat'
-                     p = subprocess.Popen([scriptFile + ' '+action],cwd=scriptPath,shell=True)
+                     p = subprocess.Popen([scriptFile,action],cwd=scriptPath,shell=True)
                         
                  else:   
                      scriptFile = scriptPath + os.path.sep +'installagent.sh'
