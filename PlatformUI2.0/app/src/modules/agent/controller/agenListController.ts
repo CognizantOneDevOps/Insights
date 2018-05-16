@@ -149,6 +149,7 @@ module ISightApp {
 
 		consolidatedArr(detailArr): void {
 			var self = this;
+			this.validationArr = {};
 			for (var i = 0; i < detailArr.length; i++) {
 				this.validationArr[i] = { "os": detailArr[i].osVersion, "version": detailArr[i].agentVersion, "tool": detailArr[i].toolName }
 			}
