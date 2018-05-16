@@ -16,141 +16,148 @@
  ******************************************************************************
  -->
 <div layout="row" flex>
-   <div layout style="width: 100%;font-family:proxima_novaregular">  
-      <div  class="applicationContentCss" style="width: 100%;">	  
-		<div layout layout="row" layout-align="start center" class="appsub appsubheader">
-			<div ng-click="homePageController.selectAct('appSettings')"> 		
+	<div layout style="width: 100%;font-family:proxima_novaregular">
+		<div class="applicationContentCss" style="width: 100%;">
+			<div layout layout="row" layout-align="start center" class="appsub appsubheader">
+				<div ng-click="homePageController.selectAct('appSettings')">
 					<span>Logo Setting</span>
-			</div>
-			<div ng-click="dataPurgingController.listData()"> 		
+				</div>
+				<div ng-click="dataPurgingController.listData()">
 					<span style="color:#00728f !important">Data Archiving</span>
+				</div>
 			</div>
-		</div>
-		<div style="width: 100%;">
-			<div class="contentCss">
-			   <h4 style="color:#38840C;font-family:proxima_novaregular;font-size:16px">Customize your Data Archiving settings.</h4>
-			    <div ng-if="dataPurgingController.saveView">
-					<div class="panel panel-default">				  
-						<form name="frmdatapurging">
-							 <div layout="row" layout-align="space-between start" layout-wrap layout-margin layout-padding class="applicationContentCss">
-								<div flex="30">	
-									<span>Data Retention Period (in Days)</span>
-									<input type="text" class="inputBoxCont" ng-model="dataPurgingController.retention" onkeypress='return event.charCode >= 48 && event.charCode <= 57' ng-keypress="dataPurgingController.checkData($event,dataPurgingController.retention, 'retention')" ng-blur="dataPurgingController.checkData($event,dataPurgingController.retention, 'retention')" required style="width: 90%;">
+			<div style="width: 100%;">
+				<div class="contentCss">
+					<h4 style="color:#38840C;font-family:proxima_novaregular;font-size:16px">Customize your Data Archiving settings.</h4>
+					<div ng-if="dataPurgingController.saveView">
+						<div class="panel panel-default">
+							<form name="frmdatapurging">
+								<div layout="row" layout-align="space-between start" layout-wrap layout-margin layout-padding class="applicationContentCss"
+								 style="margin-left:8px">
+									<div flex="30">
+										<span>Data Retention Period (in Days)</span>
+										<input type="text" class="inputBoxCont" ng-model="dataPurgingController.retention" onkeypress='return event.charCode >= 48 && event.charCode <= 57'
+										 ng-keypress="dataPurgingController.checkData($event,dataPurgingController.retention, 'retention')" ng-blur="dataPurgingController.checkData($event,dataPurgingController.retention, 'retention')"
+										 required style="width: 90%;">
+									</div>
+									<div flex="35">
+										<span>Maximum number of records for Backup File</span>
+										<md-select class="searchApplicationBoxContData inputApplicationBox dataBoardingFieldName" md-no-asterisk="true" ng-model="dataPurgingController.rowLimit"
+										 style="margin-left: 0px;margin-top: 0px;margin-bottom:10px; width:94% !important;" required placeholder="Select number of records">
+											<md-option value="10">10</md-option>
+											<md-option value="100">100</md-option>
+											<md-option value="1000">1000</md-option>
+										</md-select>
+									</div>
+									<div flex="30">
+										<span>Backup Location</span>
+										<input class="inputBoxCont" ng-model="dataPurgingController.fileLocation" required style="width: 90%;">
+									</div>
 								</div>
-								<div flex="35">
-									<span>Maximum number of records for Backup File</span>								
-									 <md-select class="searchApplicationBoxContData inputApplicationBox dataBoardingFieldName" md-no-asterisk="true" ng-model="dataPurgingController.rowLimit"  style="margin-left: 0px;margin-top: 0px;margin-bottom:10px; width:94% !important;" required placeholder="Select number of records">
-									  <md-option value="10">10</md-option>
-									  <md-option value="100">100</md-option>
-									  <md-option value="1000">1000</md-option>
-									</md-select>
-								</div>
-								<div flex="30">
-									<span>Backup Location</span>
-									<input class="inputBoxCont" ng-model="dataPurgingController.fileLocation" required style="width: 90%;">	
-								</div>						
-							 </div>
-							  <div layout="row" layout-align="space-between start" layout-margin layout-padding>
-							  <div flex="30">							
-									<span>Backup File Format</span>
-									 <md-select class="searchApplicationBoxContData inputApplicationBox dataBoardingFieldName" md-no-asterisk="true" ng-model="dataPurgingController.fileFormat"  style="margin-left: 0px;margin-top: 0px;margin-bottom:10px; width:94%;" required placeholder="Select Fileformat" >
-									  <md-option value="CSV"  ng-selected="true" >CSV</md-option>
-									  <md-option value="JSON">JSON</md-option>
-									</md-select>
-								</div>
-							  <div flex="35">
-									<span>Frequency of Data Archival</span>								
-									 <md-select class="searchApplicationBoxContData inputApplicationBox dataBoardingFieldName" md-no-asterisk="true" ng-model="dataPurgingController.dataFreq"  style="margin-left: 0px;margin-top: 0px;margin-bottom:10px; width:94% !important;" required placeholder="Select Frequency" >
-									  <md-option value="DAILY">Daily</md-option>
-									  <md-option value="WEEKLY">Weekly</md-option>
-									  <md-option value="MONTHLY">Monthly</md-option>
-									</md-select>
-								</div>	
-								<div flex="30" layout="column">							
-									<span style="margin-top: 18px;margin-bottom: 6px;">Last Run Time: {{dataPurgingController.lastRunTime}} </span>
-									<span>Next Run Time:  {{dataPurgingController.nextRunTime}} </span>
-								</div>
-								<!-- <div flex="25" style="margin-top: 37px;">
+								<div layout="row" layout-align="space-between start" layout-margin layout-padding>
+									<div flex="30">
+										<span>Backup File Format</span>
+										<md-select class="searchApplicationBoxContData inputApplicationBox dataBoardingFieldName" md-no-asterisk="true" ng-model="dataPurgingController.fileFormat"
+										 style="margin-left: 0px;margin-top: 0px;margin-bottom:10px; width:94%;" required placeholder="Select Fileformat">
+											<md-option value="CSV">CSV</md-option>
+											<md-option value="JSON">JSON</md-option>
+										</md-select>
+									</div>
+									<div flex="35">
+										<span>Frequency of Data Archival</span>
+										<md-select class="searchApplicationBoxContData inputApplicationBox dataBoardingFieldName" md-no-asterisk="true" ng-model="dataPurgingController.dataFreq"
+										 style="margin-left: 0px;margin-top: 0px;margin-bottom:10px; width:94% !important;" required placeholder="Select Frequency">
+											<md-option value="Daily">Daily</md-option>
+											<md-option value="Weekly">Weekly</md-option>
+											<md-option value="Monthly">Monthly</md-option>
+										</md-select>
+									</div>
+									<div flex="30" layout="column">
+										<span style="margin-top: 18px;margin-bottom: 6px;">Last Run Time: {{dataPurgingController.lastRunTime}} </span>
+										<span>Next Run Time: {{dataPurgingController.nextRunTime}} </span>
+									</div>
+									<!-- <div flex="25" style="margin-top: 37px;">
 									<span>Next Run Time: </span>
 									<span></span>
-								</div>	 -->																	
-							 </div>
-							  <div layout layout-align="end end">               			
-								 <md-button type="submit" class="md-raised md-primary configureBut" ng-click="dataPurgingController.saveData()" ng-disabled="frmdatapurging.$invalid">
-									Save
-								</md-button>
-							</div>
-						</form>
+								</div>	 -->
+								</div>
+								<div layout layout-align="end end">
+									<md-button type="submit" class="md-raised md-primary configureBut" ng-click="dataPurgingController.saveData()" ng-disabled="frmdatapurging.$invalid">
+										Save
+									</md-button>
+								</div>
+							</form>
+						</div>
 					</div>
-				</div>
-				<div ng-if="dataPurgingController.listView">						
-					<div layout="row">	
-						<div flex="70" layout layout-align="center center" class="selectToolTxt">
-							<div ng-if="dataPurgingController.showConfirmMessage != ''" style="text-transform: capitalize;"  id="confrmMsg">	{{dataPurgingController.showConfirmMessage}}
+					<div ng-if="dataPurgingController.listView">
+						<div layout="row">
+							<div flex="70" layout layout-align="center center" class="selectToolTxt" style="margin-top:-5px;margin-bottom:10px">
+								<div ng-if="dataPurgingController.showConfirmMessage != ''" style="text-transform: capitalize;" id="confrmMsg"> {{dataPurgingController.showConfirmMessage}}
+								</div>
+							</div>
+
+							<div flex="30" layout layout-align="end end">
+								<md-button class="md-raised md-primary configureBut" ng-click="dataPurgingController.addData()" ng-show="dataPurgingController.showTble">Add</md-button>
 							</div>
 						</div>
-						
-						<div flex="30" layout layout-align="end end">
-							<md-button class="md-raised md-primary configureBut" ng-click="dataPurgingController.addData()" ng-show="dataPurgingController.showTble">Add</md-button>
-						</div>		
-					</div>		
-					 <div ng-if="dataPurgingController.showThrobber" layout-sm="column" layout-align="center center" style="margin-left: 46%;margin-top: 46px;">
+						<div ng-if="dataPurgingController.showThrobber" layout-sm="column" layout-align="center center" style="margin-left: 46%;margin-top: 46px;">
 							<md-progress-circular md-mode="indeterminate" md-diameter="50"></md-progress-circular>
+						</div>
+						<div layout layout-align="center center" style="margin-top: 0px;">
+							<table class="md-api-table-landing" style="border: 1px solid #a5d28b;width:100%">
+								<thead class="theadCss">
+									<tr layout="row" layout-align="start center">
+										<th flex="20" class="tableHeader">
+											<span>Data Retention Period</span>
+										</th>
+										<th flex="20" class="tableHeader">
+											<span>Maximum number of records for Backup File</span>
+										</th>
+										<th flex="20" class="tableHeader">
+											<span>Location</span>
+										</th>
+										<th flex="20" class="tableHeader">
+											<span>Frequency of Data Archival</span>
+										</th>
+										<th flex="20" class="tableHeader">
+											<span>Last Runtime</span>
+										</th>
+										<th flex="10" class="tableHeader">
+											<span>Next Runtime</span>
+										</th>
+										<th flex="10" class="tableHeader">
+											<span>File Format</span>
+										</th>
+										<th flex="10" class="tableHeader">
+											<span>Action</span>
+										</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr layout="row" layout-align="start center" ng-if="!dataPurgingController.showTble">
+										<td flex="20" class="tableContentStyle">{{dataPurgingController.settingData.backupRetentionInDays}}</td>
+										<td flex="20" class="tableContentStyle">{{dataPurgingController.settingData.rowLimit}}</td>
+										<td flex="20" class="tableContentStyle">{{dataPurgingController.settingData.backupFileLocation}}</td>
+										<td flex="20" class="tableContentStyle">{{dataPurgingController.settingData.dataArchivalFrequency}}</td>
+										<td flex="20" class="tableContentStyle">{{dataPurgingController.settingData.lastRunTime}}</td>
+										<td flex="10" class="tableContentStyle">{{dataPurgingController.settingData.nextRunTime}}</td>
+										<td flex="10" class="tableContentStyle">{{dataPurgingController.settingData.backupFileFormat}}</td>
+										<td flex="10" class="tableContentStyle">
+											<md-icon md-svg-src="dist/icons/svg/userOnboarding/Edit_icon_MouseOver.svg" ng-style="{color: '#4ca64c', height: '20px', width: '20px'}"
+											 ng-click="dataPurgingController.showData();"></md-icon>
+										</td>
+
+									</tr>
+									<tr layout="row" layout-align="center center" ng-if="dataPurgingController.showTble">
+										<td colspan="8" ng-if="dataPurgingController.showTble" class="tableContentStyle">No Record found</td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
 					</div>
-					<div layout layout-align="center center" style="margin-top: 25px;">
-					<table class="md-api-table-landing" style="border: 1px solid #a5d28b;width:100%">
-						<thead class="theadCss">
-						<tr layout="row" layout-align="start center">
-							<th flex="20" class="tableHeader">
-								<span>Data Retention Period</span>
-							</th>
-							<th flex="20" class="tableHeader">
-								<span>Maximum number of records for Backup File</span>
-							</th>
-							<th flex="20" class="tableHeader">
-								<span>Location</span>
-							</th>
-							<th flex="20" class="tableHeader">
-								<span>Frequency of Data Archival</span>
-							</th>
-							<th flex="20" class="tableHeader">
-								<span>Last Runtime</span>
-							</th>
-							<th flex="10" class="tableHeader">
-								<span>Next Runtime</span>
-							</th>
-							<th flex="10" class="tableHeader">
-								<span>File Format</span>
-							</th>
-							<th flex="10" class="tableHeader">
-								<span>Action</span>
-							</th>
-						</tr>
-						</thead>
-						<tbody>
-							<tr layout="row" layout-align="start center" ng-if="!dataPurgingController.showTble">
-								<td flex="20" class="tableContentStyle">{{dataPurgingController.settingData.backupRetentionInDays}}</td>
-								<td flex="20" class="tableContentStyle">{{dataPurgingController.settingData.rowLimit}}</td>
-								<td flex="20" class="tableContentStyle">{{dataPurgingController.settingData.backupFileLocation}}</td>
-								<td flex="10" class="tableContentStyle" style="text-transform: capitalize;">{{dataPurgingController.settingData.dataArchivalFrequency}}</td>
-								<td flex="20" class="tableContentStyle">{{dataPurgingController.settingData.lastRunTime}}</td>
-								<td flex="10" class="tableContentStyle">{{dataPurgingController.settingData.nextRunTime}}</td>
-								<td flex="10" class="tableContentStyle">{{dataPurgingController.settingData.backupFileFormat}}</td>
-								<td flex="10" class="tableContentStyle">
-								<md-icon md-svg-src="dist/icons/svg/userOnboarding/Edit_icon_MouseOver.svg" ng-style="{color: '#4ca64c', height: '20px', width: '20px'}" ng-click="dataPurgingController.showData();"></md-icon>
-								</td>								
-								
-							</tr>							
-							<tr layout="row" layout-align="center center" ng-if="dataPurgingController.showTble">
-								<td colspan="8" ng-if="dataPurgingController.showTble" class="tableContentStyle">No Record found</td>
-							</tr>
-						</tbody>
-					</table>										
-					</div>						
+
 				</div>
-				
 			</div>
 		</div>
-      </div>
-   </div>
+	</div>
 </div>
