@@ -110,7 +110,7 @@ public class AgentManagementServiceImpl  implements AgentManagementService{
 
 
 	@Override
-	public List<AgentConfigTO> uninstallAgent(String agentId,String toolName, String osversion) throws InsightsCustomException{
+	public String uninstallAgent(String agentId,String toolName, String osversion) throws InsightsCustomException{
 		try {
 			AgentConfigDAL agentConfigDAL = new AgentConfigDAL();
 			agentConfigDAL.deleteAgentConfigurations(agentId);
@@ -120,7 +120,7 @@ public class AgentManagementServiceImpl  implements AgentManagementService{
 			throw new InsightsCustomException(e.toString());
 		}
 
-		return getRegisteredAgents();
+		return SUCCESS;
 	}
 
 	@Override
