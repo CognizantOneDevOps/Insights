@@ -90,9 +90,11 @@ public class DataProcessorUtil  {
 		List<JsonObject> nodeProperties = new ArrayList<>();
 		List<String> combo = new ArrayList<>();
 		getCurrentRecords(combo,dbHandler);
+		int record = 0;
 		for (CSVRecord csvRecord : csvParser.getRecords()) {
 			JsonObject json = getHierachyDetails(csvRecord, headerMap);	
-			json.addProperty(DatataggingConstants.METADATA_ID, Instant.now().toEpochMilli());
+			record = record + 1;
+			json.addProperty(DatataggingConstants.METADATA_ID, Instant.now().getNano() + record );
 			json.addProperty(DatataggingConstants.CREATIONDATE, Instant.now().toEpochMilli() );
 			nodeProperties.add(json);
 			updateComboList(combo,json);
@@ -171,7 +173,7 @@ public class DataProcessorUtil  {
 	private boolean updateMedataNodes(Neo4jDBHandler dbHandler, boolean status, String label, List<JsonObject> editList) {
 		String cypherQuery;
 		cypherQuery = " UNWIND {props} AS properties MATCH (n :"+label+"{metadata_id:properties.metadata_id}) "
-				+ " SET n += {props} RETURN n ";
+				+ " SET n += {properties} RETURN n ";
 		try {
 			JsonObject graphResponse = dbHandler.executeQueryWithData(cypherQuery,editList);
 			if(graphResponse.get(DatataggingConstants.RESPONSE).getAsJsonObject().get(DatataggingConstants.ERRORS).getAsJsonArray().size() > 0){
