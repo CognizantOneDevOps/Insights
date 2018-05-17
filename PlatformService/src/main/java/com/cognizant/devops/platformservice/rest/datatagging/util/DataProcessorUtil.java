@@ -33,8 +33,12 @@ import org.apache.log4j.Logger;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBException;
+import com.cognizant.devops.platformcommons.dal.neo4j.GraphResponse;
 import com.cognizant.devops.platformcommons.dal.neo4j.Neo4jDBHandler;
+import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformservice.rest.datatagging.constants.DatataggingConstants;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 
@@ -74,18 +78,24 @@ public class DataProcessorUtil  {
 			log.error("File not found Exception in uploading csv file" , e);
 		} catch (IOException  | GraphDBException e ) {
 			log.error("IOException in uploading csv file" , e);
+		} catch (InsightsCustomException e) {
+			log.error("Duplicate record in CSV file" , e);
 		}
 		return status;
 
 	}
 
 	private boolean parseCsvRecords(boolean status, CSVParser csvParser, Neo4jDBHandler dbHandler,
-			Map<String, Integer> headerMap, String query) throws IOException, GraphDBException {
+			Map<String, Integer> headerMap, String query) throws IOException, GraphDBException, InsightsCustomException {
 		List<JsonObject> nodeProperties = new ArrayList<>();
+		List<String> combo = new ArrayList<>();
+		getCurrentRecords(combo,dbHandler);
 		for (CSVRecord csvRecord : csvParser.getRecords()) {
-			JsonObject json = getHierachyDetails(csvRecord, headerMap);			
+			JsonObject json = getHierachyDetails(csvRecord, headerMap);	
+			json.addProperty(DatataggingConstants.METADATA_ID, Instant.now().toEpochMilli());
 			json.addProperty(DatataggingConstants.CREATIONDATE, Instant.now().toEpochMilli() );
 			nodeProperties.add(json);
+			updateComboList(combo,json);
 		}
 		JsonObject graphResponse = dbHandler.bulkCreateNodes(nodeProperties, null, query);
 		if(graphResponse.get(DatataggingConstants.RESPONSE).getAsJsonObject().get(DatataggingConstants.ERRORS).getAsJsonArray().size() > 0){
@@ -114,10 +124,12 @@ public class DataProcessorUtil  {
 			List<JsonObject>  editList = new ArrayList<>();
 			List<JsonObject>  deleteList = new ArrayList<>();
 			for (CSVRecord record : csvParser) { 
-
+	
 				if( record.get(DatataggingConstants.ACTION) != null &&  record.get(DatataggingConstants.ACTION).equals("edit")){
 					JsonObject json = getHierachyDetails(record, headerMap);
 					editList.add(json);
+					List<String> combo = new ArrayList<>();
+					updateComboList(combo,json);
 				}else if(record.get(DatataggingConstants.ACTION) != null &&  record.get(DatataggingConstants.ACTION).equals("delete") ){
 					JsonObject json = getHierachyDetails(record, headerMap);
 					deleteList.add(json);
@@ -133,6 +145,8 @@ public class DataProcessorUtil  {
 
 		} catch (IOException e) {
 			log.error("Exception in updating metadata" , e);
+		} catch (InsightsCustomException e) {
+			log.error(e.getMessage() , e);
 		} 
 		return status;
 	}
@@ -179,7 +193,41 @@ public class DataProcessorUtil  {
 		}
 		return json;
 	}
+
+	private void getCurrentRecords(List<String> combo, Neo4jDBHandler dbHandler) throws GraphDBException {
+		String cypherQuery = " MATCH (n :METADATA:DATATAGGING)  RETURN n";
+		GraphResponse graphResponse = dbHandler.executeCypherQuery(cypherQuery);
+		JsonArray rows = graphResponse.getJson().get("results").getAsJsonArray().get(0).getAsJsonObject().get("data").getAsJsonArray();
+		JsonArray asJsonArray = rows.getAsJsonArray();
+		buildExistingBuToolCombinationList(combo,asJsonArray);
+	}
+
+	private void buildExistingBuToolCombinationList(List<String> combo,JsonArray array) {
+		for(JsonElement element : array) {
+			JsonElement jsonElement = element.getAsJsonObject().get("row").getAsJsonArray().get(0);
+			JsonObject jsonObject = jsonElement.getAsJsonObject();
+			combo.add(getUniqueString(jsonObject));
+		}
+	}
 	
+	private void updateComboList(List<String> combo, JsonObject json) throws InsightsCustomException {
+		String comboStr = getUniqueString(json);
+		
+		if(combo.contains(comboStr)) {
+			throw new InsightsCustomException("Duplicate Business Hierarchy..");
+		}
+		combo.add(comboStr);
+	}
+	
+	private String getUniqueString(JsonObject jsonObject) {
+		return jsonObject.get(DatataggingConstants.LEVEL1).getAsString()+"_"+
+				  jsonObject.get(DatataggingConstants.LEVEL2).getAsString()+"_"+
+				  jsonObject.get(DatataggingConstants.LEVEL3).getAsString()+"_"+
+				  jsonObject.get(DatataggingConstants.LEVEL4).getAsString()+"_"+
+				  jsonObject.get(DatataggingConstants.TOOL_NAME).getAsString();
+	}
+
+
 	private File convertToFile(MultipartFile multipartFile) throws IOException {
 		File file = new File(multipartFile.getOriginalFilename());
 		if(file.createNewFile()) { 
@@ -189,5 +237,5 @@ public class DataProcessorUtil  {
 		}
 		return file;
 	}
-
+	
 }
