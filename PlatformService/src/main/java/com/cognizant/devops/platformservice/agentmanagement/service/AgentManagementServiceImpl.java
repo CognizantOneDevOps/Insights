@@ -34,6 +34,7 @@ import java.util.Map;
 import java.util.concurrent.TimeoutException;
 import java.util.stream.Stream;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.jsoup.Jsoup;
@@ -306,9 +307,17 @@ public class AgentManagementServiceImpl  implements AgentManagementService{
 	
 	
 	private String getOfflineToolRawConfigFile(String version, String tool) throws InsightsCustomException {
-		String offlinePath = ApplicationConfigProvider.getInstance().getAgentDetails().getOfflineAgentPath();
-		offlinePath = offlinePath+File.separator+version+File.separator+tool;
-		Path dir = Paths.get(offlinePath);
+		String offlinePath = ApplicationConfigProvider.getInstance().getAgentDetails().getOfflineAgentPath()+File.separator+version+File.separator+tool;
+		String filePath = ApplicationConfigProvider.getInstance().getAgentDetails().getUnzipPath()+File.separator+tool;
+		
+        try {
+			FileUtils.copyDirectory(new File(offlinePath), new File(filePath));
+		} catch (IOException e) {
+			log.error("Error while copying offline tool files to unzip path",e);
+        	throw new InsightsCustomException("Error while copying offline tool files to unzip path -"+e.getMessage());
+		}
+        
+		Path dir = Paths.get(filePath);
 		String config =  null;
         try (Stream<Path> paths = Files.find(
                 dir, Integer.MAX_VALUE,
@@ -320,30 +329,15 @@ public class AgentManagementServiceImpl  implements AgentManagementService{
     		config =  ((JsonObject)obj).toString();
         } catch (IOException e) {
         	log.error("Offline file reading issue",e);
+        	throw new InsightsCustomException("Offline file reading issue -"+e.getMessage());
 		}
         
         return config;
 	}
 	
 	private Path updateAgentConfig( String toolName,JsonObject json) throws IOException {
-		String filePath = ApplicationConfigProvider.getInstance().getAgentDetails().getUnzipPath();
-		//filePath = filePath+File.separator+toolName+"/com/cognizant/devops/platformagents/agents/";
-		filePath = filePath+File.separator+toolName;
+		String filePath = ApplicationConfigProvider.getInstance().getAgentDetails().getUnzipPath()+File.separator+toolName;
 		File configFile = null;
-		/*try (DirectoryStream<Path> paths = Files.newDirectoryStream(Paths.get(filePath))){
-			Iterator<Path> pathIterator = paths.iterator();
-
-			try(Stream<Path> all =  Files.walk(Paths.get(filePath))){
-
-				pathIterator = all.iterator();
-				while(pathIterator.hasNext()) {
-					Path path = pathIterator.next();
-					if(path.toString().endsWith(".json")) {
-						configFile = path.toFile();
-					}
-				}
-			}
-		}*/
 		//Writing json to file
 		Path dir = Paths.get(filePath);
         try (Stream<Path> paths = Files.find(
@@ -440,4 +434,5 @@ public class AgentManagementServiceImpl  implements AgentManagementService{
 	private String getAgentkey(String toolName) {
 		return toolName + "-"+ Instant.now().toEpochMilli();
 	}
+	
 }
