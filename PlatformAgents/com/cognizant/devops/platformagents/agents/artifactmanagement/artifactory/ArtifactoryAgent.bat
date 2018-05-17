@@ -1,0 +1,2 @@
+pushd %INSIGHTS_AGENT_HOME%\PlatformAgents\artifactory
+python -c "from com.cognizant.devops.platformagents.agents.artifactmanagement.artifactory.ArtifactoryAgent import ArtifactoryAgent; ArtifactoryAgent()"
