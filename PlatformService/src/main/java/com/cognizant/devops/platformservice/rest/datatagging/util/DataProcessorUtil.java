@@ -173,7 +173,7 @@ public class DataProcessorUtil  {
 	private boolean updateMedataNodes(Neo4jDBHandler dbHandler, boolean status, String label, List<JsonObject> editList) {
 		String cypherQuery;
 		cypherQuery = " UNWIND {props} AS properties MATCH (n :"+label+"{metadata_id:properties.metadata_id}) "
-				+ " SET n += {properties} RETURN n ";
+				+ " SET n += properties RETURN n ";
 		try {
 			JsonObject graphResponse = dbHandler.executeQueryWithData(cypherQuery,editList);
 			if(graphResponse.get(DatataggingConstants.RESPONSE).getAsJsonObject().get(DatataggingConstants.ERRORS).getAsJsonArray().size() > 0){
@@ -190,7 +190,12 @@ public class DataProcessorUtil  {
 		JsonObject json = new JsonObject();
 		for(Map.Entry<String, Integer> header : headerMap.entrySet()){
 			if(header.getKey() != null && !DatataggingConstants.ACTION.equalsIgnoreCase(header.getKey())){
-					json.addProperty(header.getKey(), record.get(header.getValue()));
+					if(DatataggingConstants.METADATA_ID.equalsIgnoreCase(header.getKey()) && 
+							(record.get(header.getValue()) != null && !record.get(header.getValue()).isEmpty())) {
+						json.addProperty(header.getKey(), Integer.valueOf(record.get(header.getValue())));
+					} else {
+						json.addProperty(header.getKey(), record.get(header.getValue()));
+					}
 			}
 		}
 		return json;
