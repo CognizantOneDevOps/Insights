@@ -35,7 +35,6 @@ import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 
-import com.cognizant.devops.platformcommons.config.ApplicationConfigCache;
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.constants.ConfigOptions;
 import com.cognizant.devops.platformcommons.core.util.DataPurgingUtils;
@@ -123,7 +122,7 @@ public class DataPurgingExecutor implements Job {
 				}
 
 				//delete call with modified query
-				/*if(deleteFlag){
+				if(deleteFlag){
 					String deleteQry = "MATCH (n:DATA) where n.inSightsTime < "+ epochTime  +" with n skip "+ splitlength
 												+" limit " + rowLimit + " detach delete n ";
 					try {
@@ -132,7 +131,7 @@ public class DataPurgingExecutor implements Job {
 					} catch (GraphDBException e) {
 						log.error("Exception occured while deleting DATA nodes of Neo4j database inside DataPurgingExecutor Job: " + e);
 					}
-				}*/
+				}
 				splitlength = splitlength + Integer.parseInt(rowLimit);
 				successFlag = successFlag || deleteFlag;
 			}
@@ -359,16 +358,4 @@ public class DataPurgingExecutor implements Job {
 		}
 	}
 
-
-	/*public static void main(String[] a){
-		ApplicationConfigCache.loadConfigCache();
-		DataPurgingExecutor dataPurgingExecutor=new DataPurgingExecutor();
-		 dataPurgingExecutor.performDataPurging();
-		long epochTime = InsightsUtils.getTimeBeforeDays(300L);
-		System.out.println("epoch time:>>"+epochTime );
-
-		Boolean scheduleFlag = dataPurgingExecutor.checkDataPurgingJobSchedule();
-		System.out.println("Can we do purging? ---"+ scheduleFlag);
-		dataPurgingExecutor.updateRunTimeIntoDatabase();		
-	}*/
 }
