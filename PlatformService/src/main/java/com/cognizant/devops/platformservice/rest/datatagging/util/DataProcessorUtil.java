@@ -41,10 +41,10 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
-
-public class DataProcessorUtil  {
+public class DataProcessorUtil {
 	private static final DataProcessorUtil dataProcessorUtil = new DataProcessorUtil();
 	private static final Logger log = Logger.getLogger(DataProcessorUtil.class);
+
 	private DataProcessorUtil() {
 
 	}
@@ -53,130 +53,138 @@ public class DataProcessorUtil  {
 		return dataProcessorUtil;
 	}
 
-	public  boolean createBusinessHierarchyMetaData(MultipartFile file)    {
+	public boolean createBusinessHierarchyMetaData(MultipartFile file) throws InsightsCustomException {
 
-		File csvfile =null;
+		File csvfile = null;
 		boolean status = false;
 		try {
 			csvfile = convertToFile(file);
 		} catch (IOException ex) {
-			log.debug("Exception while creating csv on server",ex);
+			log.debug("Exception while creating csv on server", ex);
 			return status;
 		}
 		CSVFormat format = CSVFormat.newFormat(',').withHeader();
-		try (Reader reader = new FileReader(csvfile); CSVParser csvParser = new CSVParser(reader, format);){
+		try (Reader reader = new FileReader(csvfile); CSVParser csvParser = new CSVParser(reader, format);) {
 
 			Neo4jDBHandler dbHandler = new Neo4jDBHandler();
 			Map<String, Integer> headerMap = csvParser.getHeaderMap();
 			dbHandler.executeCypherQuery("CREATE CONSTRAINT ON (n:METADATA) ASSERT n.metadata_id  IS UNIQUE");
-			String query =  "UNWIND {props} AS properties " +
-					"CREATE (n:METADATA:DATATAGGING) " +
-					"SET n = properties";
+			String query = "UNWIND {props} AS properties " + "CREATE (n:METADATA:DATATAGGING) " + "SET n = properties";
 			status = parseCsvRecords(status, csvParser, dbHandler, headerMap, query);
 
 		} catch (FileNotFoundException e) {
-			log.error("File not found Exception in uploading csv file" , e);
-		} catch (IOException  | GraphDBException e ) {
-			log.error("IOException in uploading csv file" , e);
+			log.error("File not found Exception in uploading csv file", e);
+			throw new InsightsCustomException("File not found Exception in uploading csv file");
+		} catch (IOException | GraphDBException e) {
+			log.error("IOException in uploading csv file", e);
+			throw new InsightsCustomException("IOException in uploading csv file");
 		} catch (InsightsCustomException e) {
-			log.error("Duplicate record in CSV file" , e);
+			log.error("Duplicate record in CSV file", e);
+			throw new InsightsCustomException("Duplicate record in CSV file");
 		}
 		return status;
 
 	}
 
 	private boolean parseCsvRecords(boolean status, CSVParser csvParser, Neo4jDBHandler dbHandler,
-			Map<String, Integer> headerMap, String query) throws IOException, GraphDBException, InsightsCustomException {
+			Map<String, Integer> headerMap, String query)
+			throws IOException, GraphDBException, InsightsCustomException {
 		List<JsonObject> nodeProperties = new ArrayList<>();
 		List<String> combo = new ArrayList<>();
-		getCurrentRecords(combo,dbHandler);
+		getCurrentRecords(combo, dbHandler);
 		int record = 0;
 		for (CSVRecord csvRecord : csvParser.getRecords()) {
-			JsonObject json = getHierachyDetails(csvRecord, headerMap);	
+			JsonObject json = getHierachyDetails(csvRecord, headerMap);
 			record = record + 1;
-			json.addProperty(DatataggingConstants.METADATA_ID, Instant.now().getNano() + record );
-			json.addProperty(DatataggingConstants.CREATIONDATE, Instant.now().toEpochMilli() );
+			json.addProperty(DatataggingConstants.METADATA_ID, Instant.now().getNano() + record);
+			json.addProperty(DatataggingConstants.CREATIONDATE, Instant.now().toEpochMilli());
 			nodeProperties.add(json);
-			updateComboList(combo,json);
+			updateComboList(combo, json);
 		}
 		JsonObject graphResponse = dbHandler.bulkCreateNodes(nodeProperties, null, query);
-		if(graphResponse.get(DatataggingConstants.RESPONSE).getAsJsonObject().get(DatataggingConstants.ERRORS).getAsJsonArray().size() > 0){
+		if (graphResponse.get(DatataggingConstants.RESPONSE).getAsJsonObject().get(DatataggingConstants.ERRORS)
+				.getAsJsonArray().size() > 0) {
 			log.error(graphResponse);
 			return status;
 		}
-		
+
 		return true;
 	}
 
 	public boolean updateHiearchyProperty(MultipartFile file) {
 		Neo4jDBHandler dbHandler = new Neo4jDBHandler();
-		File csvfile =null;
+		File csvfile = null;
 		boolean status = false;
 		try {
 			csvfile = convertToFile(file);
 		} catch (IOException e) {
-			log.debug("Exception while creating csv on server",e);
+			log.debug("Exception while creating csv on server", e);
 			return status;
 		}
 		String label = "METADATA:DATATAGGING";
 		CSVFormat format = CSVFormat.newFormat(',').withHeader();
 
-		try (Reader reader = new FileReader(csvfile); CSVParser csvParser = new CSVParser(reader, format);){
+		try (Reader reader = new FileReader(csvfile); CSVParser csvParser = new CSVParser(reader, format);) {
 			Map<String, Integer> headerMap = csvParser.getHeaderMap();
-			List<JsonObject>  editList = new ArrayList<>();
-			List<JsonObject>  deleteList = new ArrayList<>();
-			for (CSVRecord record : csvParser) { 
-	
-				if( record.get(DatataggingConstants.ACTION) != null &&  record.get(DatataggingConstants.ACTION).equals("edit")){
+			List<JsonObject> editList = new ArrayList<>();
+			List<JsonObject> deleteList = new ArrayList<>();
+			for (CSVRecord record : csvParser) {
+
+				if (record.get(DatataggingConstants.ACTION) != null
+						&& record.get(DatataggingConstants.ACTION).equals("edit")) {
 					JsonObject json = getHierachyDetails(record, headerMap);
 					editList.add(json);
 					List<String> combo = new ArrayList<>();
-					updateComboList(combo,json);
-				}else if(record.get(DatataggingConstants.ACTION) != null &&  record.get(DatataggingConstants.ACTION).equals("delete") ){
+					updateComboList(combo, json);
+				} else if (record.get(DatataggingConstants.ACTION) != null
+						&& record.get(DatataggingConstants.ACTION).equals("delete")) {
 					JsonObject json = getHierachyDetails(record, headerMap);
 					deleteList.add(json);
 				}
 
 			}
-			if(!editList.isEmpty() ){
+			if (!editList.isEmpty()) {
 				status = updateMedataNodes(dbHandler, status, label, editList);
-			}	
-			if( !deleteList.isEmpty()){
+			}
+			if (!deleteList.isEmpty()) {
 				status = deleteMedataNodes(dbHandler, status, label, deleteList);
 			}
 
 		} catch (IOException e) {
-			log.error("Exception in updating metadata" , e);
+			log.error("Exception in updating metadata", e);
 		} catch (InsightsCustomException e) {
-			log.error(e.getMessage() , e);
-		} 
+			log.error(e.getMessage(), e);
+		}
 		return status;
 	}
 
 	private boolean deleteMedataNodes(Neo4jDBHandler dbHandler, boolean status, String label,
 			List<JsonObject> deleteList) {
 		String cypherQuery;
-		cypherQuery = " UNWIND {props} AS properties MATCH (n :"+label+"{metadata_id:properties.metadata_id})   "
-				+ " REMOVE n:"+label+"  SET n:METADATA_BACKUP  RETURN n ";
+		cypherQuery = " UNWIND {props} AS properties MATCH (n :" + label + "{metadata_id:properties.metadata_id})   "
+				+ " REMOVE n:" + label + "  SET n:METADATA_BACKUP  RETURN n ";
 		try {
-			JsonObject graphResponse = dbHandler.executeQueryWithData(cypherQuery,deleteList);
-			if(graphResponse.get(DatataggingConstants.RESPONSE).getAsJsonObject().get(DatataggingConstants.ERRORS).getAsJsonArray().size() > 0){
+			JsonObject graphResponse = dbHandler.executeQueryWithData(cypherQuery, deleteList);
+			if (graphResponse.get(DatataggingConstants.RESPONSE).getAsJsonObject().get(DatataggingConstants.ERRORS)
+					.getAsJsonArray().size() > 0) {
 				return status;
 			}
 			status = true;
 		} catch (GraphDBException e) {
-			log.error("Exception in deleting nodes ",e);
+			log.error("Exception in deleting nodes ", e);
 		}
 		return status;
 	}
 
-	private boolean updateMedataNodes(Neo4jDBHandler dbHandler, boolean status, String label, List<JsonObject> editList) {
+	private boolean updateMedataNodes(Neo4jDBHandler dbHandler, boolean status, String label,
+			List<JsonObject> editList) {
 		String cypherQuery;
-		cypherQuery = " UNWIND {props} AS properties MATCH (n :"+label+"{metadata_id:properties.metadata_id}) "
+		cypherQuery = " UNWIND {props} AS properties MATCH (n :" + label + "{metadata_id:properties.metadata_id}) "
 				+ " SET n += properties RETURN n ";
 		try {
-			JsonObject graphResponse = dbHandler.executeQueryWithData(cypherQuery,editList);
-			if(graphResponse.get(DatataggingConstants.RESPONSE).getAsJsonObject().get(DatataggingConstants.ERRORS).getAsJsonArray().size() > 0){
+			JsonObject graphResponse = dbHandler.executeQueryWithData(cypherQuery, editList);
+			if (graphResponse.get(DatataggingConstants.RESPONSE).getAsJsonObject().get(DatataggingConstants.ERRORS)
+					.getAsJsonArray().size() > 0) {
 				return status;
 			}
 			status = true;
@@ -185,17 +193,17 @@ public class DataProcessorUtil  {
 		}
 		return status;
 	}
-	
-	private JsonObject getHierachyDetails(CSVRecord record,Map<String, Integer> headerMap){
+
+	private JsonObject getHierachyDetails(CSVRecord record, Map<String, Integer> headerMap) {
 		JsonObject json = new JsonObject();
-		for(Map.Entry<String, Integer> header : headerMap.entrySet()){
-			if(header.getKey() != null && !DatataggingConstants.ACTION.equalsIgnoreCase(header.getKey())){
-					if(DatataggingConstants.METADATA_ID.equalsIgnoreCase(header.getKey()) && 
-							(record.get(header.getValue()) != null && !record.get(header.getValue()).isEmpty())) {
-						json.addProperty(header.getKey(), Integer.valueOf(record.get(header.getValue())));
-					} else {
-						json.addProperty(header.getKey(), record.get(header.getValue()));
-					}
+		for (Map.Entry<String, Integer> header : headerMap.entrySet()) {
+			if (header.getKey() != null && !DatataggingConstants.ACTION.equalsIgnoreCase(header.getKey())) {
+				if (DatataggingConstants.METADATA_ID.equalsIgnoreCase(header.getKey())
+						&& (record.get(header.getValue()) != null && !record.get(header.getValue()).isEmpty())) {
+					json.addProperty(header.getKey(), Integer.valueOf(record.get(header.getValue())));
+				} else {
+					json.addProperty(header.getKey(), record.get(header.getValue()));
+				}
 			}
 		}
 		return json;
@@ -204,45 +212,45 @@ public class DataProcessorUtil  {
 	private void getCurrentRecords(List<String> combo, Neo4jDBHandler dbHandler) throws GraphDBException {
 		String cypherQuery = " MATCH (n :METADATA:DATATAGGING)  RETURN n";
 		GraphResponse graphResponse = dbHandler.executeCypherQuery(cypherQuery);
-		JsonArray rows = graphResponse.getJson().get("results").getAsJsonArray().get(0).getAsJsonObject().get("data").getAsJsonArray();
+		JsonArray rows = graphResponse.getJson().get("results").getAsJsonArray().get(0).getAsJsonObject().get("data")
+				.getAsJsonArray();
 		JsonArray asJsonArray = rows.getAsJsonArray();
-		buildExistingBuToolCombinationList(combo,asJsonArray);
+		buildExistingBuToolCombinationList(combo, asJsonArray);
 	}
 
-	private void buildExistingBuToolCombinationList(List<String> combo,JsonArray array) {
-		for(JsonElement element : array) {
+	private void buildExistingBuToolCombinationList(List<String> combo, JsonArray array) {
+		for (JsonElement element : array) {
 			JsonElement jsonElement = element.getAsJsonObject().get("row").getAsJsonArray().get(0);
 			JsonObject jsonObject = jsonElement.getAsJsonObject();
 			combo.add(getUniqueString(jsonObject));
 		}
 	}
-	
+
 	private void updateComboList(List<String> combo, JsonObject json) throws InsightsCustomException {
 		String comboStr = getUniqueString(json);
-		
-		if(combo.contains(comboStr)) {
+
+		if (combo.contains(comboStr)) {
 			throw new InsightsCustomException("Duplicate Business Hierarchy..");
 		}
 		combo.add(comboStr);
 	}
-	
-	private String getUniqueString(JsonObject jsonObject) {
-		return jsonObject.get(DatataggingConstants.LEVEL1).getAsString()+"_"+
-				  jsonObject.get(DatataggingConstants.LEVEL2).getAsString()+"_"+
-				  jsonObject.get(DatataggingConstants.LEVEL3).getAsString()+"_"+
-				  jsonObject.get(DatataggingConstants.LEVEL4).getAsString()+"_"+
-				  jsonObject.get(DatataggingConstants.TOOL_NAME).getAsString();
-	}
 
+	private String getUniqueString(JsonObject jsonObject) {
+		return jsonObject.get(DatataggingConstants.LEVEL1).getAsString() + "_"
+				+ jsonObject.get(DatataggingConstants.LEVEL2).getAsString() + "_"
+				+ jsonObject.get(DatataggingConstants.LEVEL3).getAsString() + "_"
+				+ jsonObject.get(DatataggingConstants.LEVEL4).getAsString() + "_"
+				+ jsonObject.get(DatataggingConstants.TOOL_NAME).getAsString();
+	}
 
 	private File convertToFile(MultipartFile multipartFile) throws IOException {
 		File file = new File(multipartFile.getOriginalFilename());
-		if(file.createNewFile()) { 
-			try(FileOutputStream fos = new FileOutputStream(file) ){ 
-				fos.write(multipartFile.getBytes());
-			}
+
+		try (FileOutputStream fos = new FileOutputStream(file)) {
+			fos.write(multipartFile.getBytes());
 		}
+
 		return file;
 	}
-	
+
 }
