@@ -322,11 +322,12 @@ public class AgentManagementServiceImpl  implements AgentManagementService{
         try (Stream<Path> paths = Files.find(
                 dir, Integer.MAX_VALUE,
                 (path,attrs) -> attrs.isRegularFile()
-                        && path.toString().endsWith("config.json"))) {
+                        && path.toString().endsWith("config.json"));
+        		FileReader reader = new FileReader(paths.limit(1).findFirst().get().toFile())) {
         	
         	JsonParser  parser = new JsonParser();
-    		Object obj = parser.parse(new FileReader(paths.limit(1).findFirst().get().toFile()));
-    		config =  ((JsonObject)obj).toString();
+	    	Object obj = parser.parse(reader);
+	    	config =  ((JsonObject)obj).toString();
         } catch (IOException e) {
         	log.error("Offline file reading issue",e);
         	throw new InsightsCustomException("Offline file reading issue -"+e.getMessage());
