@@ -60,7 +60,7 @@ public class SettingsConfigurationServiceImpl implements SettingsConfigurationSe
 	 * @param settingsJson
 	 * @return
 	 */
-	public String updateNextRunTimeValue(String settingsJson) {
+	private String updateNextRunTimeValue(String settingsJson) {
 		String updatedSettingsJson = null;
 		JsonObject settingsJsonObject = DataPurgingUtils.convertSettingsJsonObject(settingsJson);
 		String dataArchivalFrequency = DataPurgingUtils.getDataArchivalFrequency(settingsJsonObject);
@@ -72,12 +72,4 @@ public class SettingsConfigurationServiceImpl implements SettingsConfigurationSe
 		return updatedSettingsJson;
 	}
 	
-	/*public static void main(String[] a){
-		SettingsConfigurationServiceImpl obj = new SettingsConfigurationServiceImpl();
-		SettingsConfiguration settingsConfiguration = obj.loadSettingsConfiguration(ConfigOptions.DATAPURGING_SETTINGS_TYPE);
-		String modifiedJson = obj.updateNextRunTimeValue(settingsConfiguration.getSettingsJson());
-		System.out.println(" Updated Setting json: >>>>"+ modifiedJson);
-	
-	}*/
-
 }
