@@ -131,13 +131,13 @@ public class DataProcessorUtil {
 			for (CSVRecord record : csvParser) {
 
 				if (record.get(DatataggingConstants.ACTION) != null
-						&& record.get(DatataggingConstants.ACTION).equals("edit")) {
+						&& record.get(DatataggingConstants.ACTION).equalsIgnoreCase("edit")) {
 					JsonObject json = getHierachyDetails(record, headerMap);
 					editList.add(json);
 					List<String> combo = new ArrayList<>();
 					updateComboList(combo, json);
 				} else if (record.get(DatataggingConstants.ACTION) != null
-						&& record.get(DatataggingConstants.ACTION).equals("delete")) {
+						&& record.get(DatataggingConstants.ACTION).equalsIgnoreCase("delete")) {
 					JsonObject json = getHierachyDetails(record, headerMap);
 					deleteList.add(json);
 				}
