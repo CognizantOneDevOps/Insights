@@ -183,10 +183,14 @@ public class DataPurgingExecutor implements Job {
 		outputString = outputString.substring(0,outputString.length()-1);
 		//Adds entire output string inside [] bracket
 		outputString = "[" + outputString +"]";
-		FileWriter fileWriter = new FileWriter(jsonFileLocation);
-		fileWriter.write(outputString);
-		fileWriter.flush();
-		fileWriter.close();
+		try (FileWriter fileWriter = new FileWriter(jsonFileLocation);) {
+			fileWriter.write(outputString);
+			fileWriter.flush();
+		}
+		catch (IOException e) {
+			log.error("Error in writeToJsonFile method" + e);
+			throw e;
+		} 
 	}
 
 
@@ -258,7 +262,7 @@ public class DataPurgingExecutor implements Job {
 	 * and returns settingJson string and converts into jsonobject
 	 * @return JsonObject
 	 */
-	public JsonObject getSettingsJsonObject() {
+	private JsonObject getSettingsJsonObject() {
 		SettingsConfigurationDAL settingsConfigurationDAL = new SettingsConfigurationDAL();	
 		String settingsJson = settingsConfigurationDAL.getSettingsJsonObject(ConfigOptions.DATAPURGING_SETTINGS_TYPE);
 		if (settingsJson != null && !settingsJson.isEmpty()) {
@@ -293,7 +297,7 @@ public class DataPurgingExecutor implements Job {
 	 * @param inputDate
 	 * @return
 	 */
-	public long parseDateIntoEpochSeconds(String inputDate) {
+	private long parseDateIntoEpochSeconds(String inputDate) {
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DATE_TIME_FORMAT).withZone(InsightsUtils.zoneId);
 		ZonedDateTime dateTime = null;
 		if (inputDate != null && !inputDate.isEmpty()) {
@@ -312,7 +316,7 @@ public class DataPurgingExecutor implements Job {
 	 * @param lastRunTime
 	 * @return
 	 */ 
-	public long getDifferenceFromLastRunTime(long lastRunTime){
+	private long getDifferenceFromLastRunTime(long lastRunTime){
 		ZonedDateTime now = ZonedDateTime.now(InsightsUtils.zoneId);
 		ZonedDateTime lastRunTimeInput = ZonedDateTime.ofInstant(Instant.ofEpochSecond(lastRunTime), InsightsUtils.zoneId);
 		Duration d = Duration.between(lastRunTimeInput,now);		
@@ -326,7 +330,7 @@ public class DataPurgingExecutor implements Job {
 	 * @param nextRunTime
 	 * @return
 	 */
-	public long getDifferenceFromNextRunTime(Long lastRunTime, Long nextRunTime){
+	private long getDifferenceFromNextRunTime(Long lastRunTime, Long nextRunTime){
 		ZonedDateTime lastRunTimeInput = ZonedDateTime.ofInstant(Instant.ofEpochSecond(lastRunTime), InsightsUtils.zoneId);
 		ZonedDateTime nextRunTimeInput = ZonedDateTime.ofInstant(Instant.ofEpochSecond(nextRunTime), InsightsUtils.zoneId);
 		Duration d = Duration.between(lastRunTimeInput, nextRunTimeInput);
