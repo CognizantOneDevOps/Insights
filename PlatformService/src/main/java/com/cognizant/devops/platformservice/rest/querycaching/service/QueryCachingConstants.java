@@ -13,7 +13,7 @@ public interface QueryCachingConstants {
 	String CACHE_VARIANCE = "cacheVariance";
 	String LOAD_CACHETIME_QUERY_FROM_RESOURCES = "/querycachingesquery/esQueryWithTime.json";
 	String LOAD_CACHEVARIANCE_QUERY_FROM_RESOURCES = "/querycachingesquery/esQueryWithVariance.json";
-	String QUERY_HASH = "__queryCache__";
+	String QUERY_HASH = "queryHash";
 	String QUERY_HASHING = "__queryCache__";
 	String CACHED_STARTTIME = "__cachedStartTime__";
 	String CACHED_ENDTIME = "__cachedEndTime__";
