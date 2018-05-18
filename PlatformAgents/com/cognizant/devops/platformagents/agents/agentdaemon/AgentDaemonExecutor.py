@@ -69,11 +69,14 @@ class AgentDaemonExecutor:
         password = mqConfig.get('password', None)
         host = mqConfig.get('host', None)
         agentCtrlXchg  = mqConfig.get('agentExchange', None)
+        routingKey = self.config.get('subscribe').get('agentPkgQueue')
         
         credentials = pika.PlainCredentials(user, password)
         self.connection = pika.BlockingConnection(pika.ConnectionParameters(credentials=credentials,host=host))
         self.channel = self.connection.channel()
         self.channel.exchange_declare(exchange=agentCtrlXchg, exchange_type='topic', durable=True)
+        self.channel.queue_declare(queue=routingKey, passive=False, durable=True, exclusive=False, auto_delete=False, arguments=None)
+        self.channel.queue_bind(queue=routingKey, exchange=agentCtrlXchg, routing_key=routingKey, arguments=None)
                
     def publishDaemonHealthData(self, ex=None):
         
