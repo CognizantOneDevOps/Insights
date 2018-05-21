@@ -36,6 +36,7 @@ module ISightApp {
         toolName: string;
         osVersion: string;
         agentListController: AgentListController;
+        uninstallNote = "Uninstalling the Agent doesn't delete the data that has been collected. The agent could be re-registered again, and the data collection would be resumed from the last run time.";
 
         confirmation(): void {
             var self = this;
