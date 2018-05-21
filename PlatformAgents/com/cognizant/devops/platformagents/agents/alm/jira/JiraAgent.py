@@ -187,7 +187,7 @@ class JiraAgent(BaseAgent):
                 #                sprintTracking[sprint] = {}
      
     def retrieveSprintDetails(self):
-        sprintDetails = self.config.get('extensions', {}).get('sprints', None)
+        sprintDetails = self.config.get('dynamicTemplate', {}).get('extensions', {}).get('sprints', None)
         boardApiUrl = sprintDetails.get('boardApiUrl')
         boards = self.tracking.get('boards', None)
         if sprintDetails and boards:
@@ -233,7 +233,7 @@ class JiraAgent(BaseAgent):
                     self.publishToolsData(data, sprintMetadata)
                     
     def retrieveBacklogDetails(self):
-        backlogDetails = self.config.get('extensions', {}).get('backlog', None)
+        backlogDetails = self.config.get('dynamicTemplate', {}).get('extensions', {}).get('backlog', None)
         boardApiUrl = backlogDetails.get('boardApiUrl')
         boards = self.tracking.get('boards', None)
         backlogMetadata = backlogDetails.get('backlogMetadata')
