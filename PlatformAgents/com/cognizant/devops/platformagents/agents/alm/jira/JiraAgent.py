@@ -119,9 +119,9 @@ class JiraAgent(BaseAgent):
     def scheduleExtensions(self):
         extensions = self.config.get('dynamicTemplate', {}).get('extensions', None)
         if extensions:
-            backlog = extensions.get('backlog', None)
-            if backlog:
-                self.registerExtension('backlog', self.retrieveBacklogDetails, backlog.get('runSchedule'))
+            #backlog = extensions.get('backlog', None)
+            #if backlog:
+            #    self.registerExtension('backlog', self.retrieveBacklogDetails, backlog.get('runSchedule'))
             sprints = extensions.get('sprints', None)
             if sprints:
                 self.registerExtension('sprints', self.retrieveSprintDetails, sprints.get('runSchedule'))
@@ -208,8 +208,11 @@ class JiraAgent(BaseAgent):
                     sprints = board.get('sprints')
                     for sprint in sprints:
                         sprintApiUrl = sprintDetails.get('sprintApiUrl')+'/'+sprint
-                        sprintResponse = self.getResponse(sprintApiUrl, 'GET', self.userid, self.passwd, None)
-                        data.append(self.parseResponse(responseTemplate, sprintResponse)[0])
+                        try:
+                            sprintResponse = self.getResponse(sprintApiUrl, 'GET', self.userid, self.passwd, None)
+                            data.append(self.parseResponse(responseTemplate, sprintResponse)[0])
+                        except Exception:
+                            pass;
                     if len(data) > 0 : 
                         self.publishToolsData(data, sprintMetadata)
                     continue
@@ -303,14 +306,14 @@ class JiraAgent(BaseAgent):
                             content = sprintReportResponse.get('contents', None)
                             if sprintReportResponse.get('sprint', {}).get('state', 'OPEN') == 'CLOSED':
                                 sprint['closed'] = True
-                            injectData = { 'boardId' : boardId, 'sprintId' : sprintId }
+                            injectData = { 'boardId' : int(boardId), 'sprintId' : int(sprintId) }
                             data = []
                             data += self.addSprintDetails(responseTemplate, content, 'completedIssues', injectData)
                             data += self.addSprintDetails(responseTemplate, content, 'issuesNotCompletedInCurrentSprint', injectData)
                             data += self.addSprintDetails(responseTemplate, content, 'puntedIssues', injectData)
                             data += self.addSprintDetails(responseTemplate, content, 'issuesCompletedInAnotherSprint', injectData)
                             if len(data) > 0:
-                                self.publishToolsData(self.getSprintInformation(sprintReportResponse, boardId, sprintId, board['name'], board['type']), sprintMetadata)
+                                #self.publishToolsData(self.getSprintInformation(sprintReportResponse, boardId, sprintId, board['name'], board['type']), sprintMetadata)
                                 self.publishToolsData(data, relationMetadata)
                                 self.updateTrackingJson(self.tracking)
     
