@@ -143,7 +143,7 @@ module ISightApp {
         showInsightsTab: boolean;
         shouldReload: boolean;
         selectedToolName: string;
-		showConfirmMessage: string;	
+        showConfirmMessage: string;
         selectedToolCategory: string;
         footerMinHeight: string = 'min-height:' + (window.innerHeight - 146) + 'px;';
         footerHeight: string = '';
@@ -156,7 +156,7 @@ module ISightApp {
         showAdminTab: boolean = false;
         showBusinessMapping: boolean = false;
         showThrobber: boolean;
-		selectedAgentID = {};
+        selectedAgentID = {};
         selectDashboard: boolean = false;
         selectedIndex: Number;
         selectedDashboardUrl: string = '';
@@ -293,26 +293,25 @@ module ISightApp {
             //this.$cookies.remove('Authorization');
             //this.$cookies.remove('grafanaOrg');
             var self = this;
+            var uniqueString = "grfanaLoginIframe";
+            var iframe = document.createElement("iframe");
+            iframe.id = uniqueString;
+            document.body.appendChild(iframe);
+            iframe.style.display = "none";
+            iframe.contentWindow.name = uniqueString;
+            // construct a form with hidden inputs, targeting the iframe
+            var form = document.createElement("form");
+            form.target = uniqueString;
+            this.restEndpointService.getGrafanaHost1().then(function (response) {
+                form.action = response.grafanaEndPoint + "/logout";
+                // console.log("form action "+form.action);
+                form.method = "GET";
+                document.body.appendChild(form);
+                form.submit();
+            });
             this.authenticationService.logout()
                 .then(function (data) {
                     //console.log(data);
-                    var uniqueString = "grfanaLoginIframe";
-                    var iframe = document.createElement("iframe");
-                    iframe.id = uniqueString;
-                    document.body.appendChild(iframe);
-                    iframe.style.display = "none";
-                    iframe.contentWindow.name = uniqueString;
-                    // construct a form with hidden inputs, targeting the iframe
-                    var form = document.createElement("form");
-                    form.target = uniqueString;
-                    self.restEndpointService.getGrafanaHost1().then(function (response) {
-                        form.action = response.grafanaEndPoint + "/logout";
-                        // console.log("form action "+form.action);
-                        form.method = "GET";
-                        document.body.appendChild(form);
-                        form.submit();
-                    });
-
                 });
             var cookieVal = this.$cookies.getAll();
             for (var key in cookieVal) {

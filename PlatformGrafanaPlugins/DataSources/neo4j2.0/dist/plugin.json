@@ -1,0 +1,23 @@
+{
+  "type": "datasource",
+  "name": "Neo4j",
+  "id": "neo4j",
+
+  "includes": [
+    
+  ],
+
+  "metrics": true,
+  "annotations": false,
+
+  "info": {
+    "author": {
+      "name": "Vishal Ganjare",
+      "url": ""
+    },
+    "logos": {
+      "small": "img/neo4j_logo.svg",
+      "large": "img/neo4j_logo.svg"
+    }
+  }
+}
