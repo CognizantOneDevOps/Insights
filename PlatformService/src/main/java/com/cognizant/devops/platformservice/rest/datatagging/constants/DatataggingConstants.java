@@ -17,7 +17,6 @@ package com.cognizant.devops.platformservice.rest.datatagging.constants;
 
 public final class DatataggingConstants {
 
-	public static final String TOOLNAME = "ToolName";
 	public static final String VALUE = "value";
 	public static final String EXCEL_FILE="data/data.csv";
 	public static final String COLON=":";
@@ -25,6 +24,7 @@ public final class DatataggingConstants {
 	public static final String LEVEL2="level_2";
 	public static final String LEVEL3="level_3";
 	public static final String LEVEL4="level_4";
+	public static final String METADATA_ID="metadata_id";
 	public static final String ID="id";
 	public static final String TOOL_NAME = "toolName";
 	public static final String TOOL_PROPERTY = "toolProperty";
