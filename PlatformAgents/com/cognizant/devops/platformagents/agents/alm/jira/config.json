@@ -3,7 +3,8 @@
     "user": "iSight",
     "password": "iSight",
     "host": "127.0.0.1",
-    "exchange": "iSight"
+    "exchange": "iSight",
+    "agentControlXchg":"iAgent"
   },
   "subscribe": {
     "config": "ALM.JIRA.config"
@@ -15,109 +16,112 @@
   "communication": {
     "type": "REST"
   },
-  "responseTemplate": {
-    "key": "key",
-    "fields": {
-      "issuetype": {
-        "name": "issueType"
-      },
-      "updated": "lastUpdated",
-      "project": {
-        "name": "projectName"
-      },
-      "creator": {
-        "name": "creator"
-      },
-      "priority": {
-        "name": "priority"
-      },
-      "assignee": {
-        "name": "assignee"
-      },
-      "status": {
-        "name": "status"
-      },      
-      "issuelinks": [
-        {
-          "outwardIssue": {
-            "key": "outwardIssue"
-          }
-        },
-        {
-          "inwardIssue": {
-            "key": "inwardIssue"
-          }
-        }
-      ]
-    }
-  },
-  "extensions" : {
-  	"sprintReport" : {
-  		"runSchedule" : 720,
-  		"boardApiUrl" : "https://<JIRA_HOST>/rest/agile/1.0/board",
-	  	"sprintReportUrl" : "https://<JIRA_HOST>/rest/greenhopper/1.0/rapid/charts/sprintreport",
-	  	"sprintReportResponseTemplate" : {
-	        "key": "key",
-	        "typeName": "issueType",
-	        "priorityName": "priority",
-	        "currentEstimateStatistic": {
-	          "statFieldValue": {
-	            "value": "currentEstimate"
+ "dynamicTemplate": {
+	  "responseTemplate": {
+	    "key": "key",
+	    "fields": {
+	      "issuetype": {
+	        "name": "issueType"
+	      },
+	      "updated": "lastUpdated",
+	      "project": {
+	        "name": "projectName"
+	      },
+	      "creator": {
+	        "name": "creator"
+	      },
+	      "priority": {
+	        "name": "priority"
+	      },
+	      "assignee": {
+	        "name": "assignee"
+	      },
+	      "status": {
+	        "name": "status"
+	      },      
+	      "issuelinks": [
+	        {
+	          "outwardIssue": {
+	            "key": "outwardIssue"
 	          }
 	        },
-	        "estimateStatistic": {
-	          "statFieldValue": {
-	            "value": "committedEstimate"
+	        {
+	          "inwardIssue": {
+	            "key": "inwardIssue"
 	          }
-	        },
-	    	"statusName": "status"
-	    },
-	    "relationMetadata" : {
-	        "labels" : ["LATEST"],
-	        "relation" : {
-	                "properties" : ["addedDuringSprint", "sprintIssueRegion", "committedEstimate"],
-	                "name" : "SPRINT_HAS_ISSUES",
-	                "source" : {
-	                        "constraints" : ["sprintId", "boardId"]
-	                    },
-	                "destination" : {
-	                        "constraints" : ["key"]
-	                    }
-	            }
-	    },
-	    "sprintMetadata" : {
-	        "labels" : ["SPRINT"],
-	        "dataUpdateSupported" : true,
-	        "uniqueKey" : ["boardId", "sprintId"]
-	    }
-  	},
-  	"releaseDetails" : {
-  		"runSchedule" : 720,
-	  	"jiraProjectApiUrl" : "https://<JIRA_HOST>/rest/api/2/project",
-	  	"jiraProjectResponseTemplate" : {
-		    "id": "projectId",
-		    "key": "projectKey",
-		    "name": "projectName",
-		    "projectCategory": {
-		      "name": "projectCategory"
-		    },
-		    "projectTypeKey": "projectType"
-		},
-		"jiraReleaseResponseTemplate" : {
-		    "id": "versionId",
-		    "name": "versionName",
-		    "archived": "archived",
-		    "released": "released",
-		    "releaseDate": "releaseDate",
-		    "projectId": "projectId"
-		},
-		"releaseVersionsMetadata" : {
-	        "labels" : ["RELEASE"],
-	        "dataUpdateSupported" : true,
-	        "uniqueKey" : ["projectKey", "projectId"]
-	    }
-	 }
+	        }
+	      ]
+	    } 
+	  },
+	  "extensions" : {
+		  	"sprintReport" : {
+		  		"runSchedule" : 720,
+		  		"boardApiUrl" : "https://<JIRA_HOST>/rest/agile/1.0/board",
+			  	"sprintReportUrl" : "https://<JIRA_HOST>/rest/greenhopper/1.0/rapid/charts/sprintreport",
+			  	"sprintReportResponseTemplate" : {
+			        "key": "key",
+			        "typeName": "issueType",
+			        "priorityName": "priority",
+			        "currentEstimateStatistic": {
+			          "statFieldValue": {
+			            "value": "currentEstimate"
+			          }
+			        },
+			        "estimateStatistic": {
+			          "statFieldValue": {
+			            "value": "committedEstimate"
+			          }
+			        },
+			    	"statusName": "status"
+			    },
+			    "relationMetadata" : {
+			        "labels" : ["LATEST"],
+			        "relation" : {
+			                "properties" : ["addedDuringSprint", "sprintIssueRegion", "committedEstimate"],
+			                "name" : "SPRINT_HAS_ISSUES",
+			                "source" : {
+			                        "constraints" : ["sprintId", "boardId"]
+			                    },
+			                "destination" : {
+			                        "constraints" : ["key"]
+			                    }
+			            }
+			    },
+			    "sprintMetadata" : {
+			        "labels" : ["SPRINT"],
+			        "dataUpdateSupported" : true,
+			        "uniqueKey" : ["boardId", "sprintId"]
+			    }
+		  	},
+		  	"releaseDetails" : {
+		  		"runSchedule" : 720,
+			  	"jiraProjectApiUrl" : "https://<JIRA_HOST>/rest/api/2/project",
+			  	"jiraProjectResponseTemplate" : {
+				    "id": "projectId",
+				    "key": "projectKey",
+				    "name": "projectName",
+				    "projectCategory": {
+				      "name": "projectCategory"
+				    },
+				    "projectTypeKey": "projectType"
+				},
+				"jiraReleaseResponseTemplate" : {
+				    "id": "versionId",
+				    "name": "versionName",
+				    "archived": "archived",
+				    "released": "released",
+				    "releaseDate": "releaseDate",
+				    "projectId": "projectId"
+				},
+				"releaseVersionsMetadata" : {
+			        "labels" : ["RELEASE"],
+			        "dataUpdateSupported" : true,
+			        "uniqueKey" : ["projectKey", "projectId"]
+			    }
+			 }
+ 		}
   },
+  "toolCategory" : "ALM",
   "enableSprintReport" : false,
   "runSchedule": 30,
   "sprintRetrivalSchedule" : 360,

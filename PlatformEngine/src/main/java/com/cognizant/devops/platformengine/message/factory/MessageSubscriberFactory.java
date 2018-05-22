@@ -22,7 +22,7 @@ import org.apache.log4j.Logger;
 
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.config.MessageQueueDataModel;
-import com.cognizant.devops.platformengine.message.core.MessageConstants;
+import com.cognizant.devops.platformcommons.constants.MessageConstants;
 import com.rabbitmq.client.AMQP;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
