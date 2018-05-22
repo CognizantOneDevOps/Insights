@@ -1,0 +1,25 @@
+{
+  "baseExtractionPath":"D:\\TEST\\",
+  "insightsTimeZone": "Asia/Kolkata",
+  "loggingSetting": {
+    "logLevel": "WARN"
+  },
+  "mqConfig": {
+    "host": "127.0.0.1",
+    "password": "guest",
+    "user": "guest",
+    "exchange": "iSight",
+    "agentExchange":"iAgent"
+  },
+  "publish": {
+    "data": "DAEMONAGENT.AGENTDAEMON.DATA",
+    "health": "DAEMONAGENT.AGENTDAEMON.HEALTH"
+  },
+  "isDebugAllowed": false,
+  "subscribe": {
+    "agentPkgQueue": "INSIGHTS.AGENTS.PACKAGE"
+  },
+   "toolCategory" : "DUMMY",
+  "timeStampFormat": "%Y-%m-%dT%H:%M:%SZ",
+  "toolsTimeZone": "GMT"
+}

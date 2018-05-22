@@ -1,0 +1,9 @@
+[Unit]
+Description=Ubuntu ConcourseAgent Service
+
+[Service]
+Type=forking
+ExecStart=/bin/bash /opt/insightsagents/PlatformAgents/concourse/InSightsConcourseAgent.sh
+
+[Install]
+WantedBy=multi-user.target

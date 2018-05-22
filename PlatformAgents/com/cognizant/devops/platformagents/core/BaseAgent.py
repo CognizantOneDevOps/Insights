@@ -34,6 +34,7 @@ class BaseAgent(object):
        
     def __init__(self):
         try:
+            self.shouldAgentRun = True;
             self.setupAgent()
         except Exception as ex:
             self.publishHealthData(self.generateHealthData(ex=ex))
@@ -48,6 +49,7 @@ class BaseAgent(object):
         self.loadCommunicationFacade()
         self.initializeMQ()
         #self.configUpdateSubscriber()
+        self.subscriberForAgentControl()
         self.setupLocalCache()
         self.extractToolName()
         self.scheduleExtensions()
@@ -132,13 +134,35 @@ class BaseAgent(object):
         if mqConfig == None:
             raise ValueError('BaseAgent: unable to initialize MQ. mqConfig is not found')
         
-        self.messageFactory = MessageFactory(mqConfig.get('user', None), 
-                                             mqConfig.get('password', None), 
-                                             mqConfig.get('host', None), 
-                                             mqConfig.get('exchange', None))
+        user = mqConfig.get('user', None)
+        mqPass =  mqConfig.get('password', None)
+        host = mqConfig.get('host', None)
+        exchange = mqConfig.get('exchange', None)
+        agentCtrlXchg  = mqConfig.get('agentControlXchg', None)
+        
+        self.messageFactory = MessageFactory(user,mqPass,host,exchange)
         if self.messageFactory == None:
             raise ValueError('BaseAgent: unable to initialize MQ. messageFactory is Null')
         
+        self.agentCtrlMessageFactory = MessageFactory(user,mqPass,host,agentCtrlXchg)
+
+    '''
+    Subscribe for Agent START/STOP exchange and queue
+    '''
+    def subscriberForAgentControl(self):
+        routingKey = self.config.get('subscribe').get('agentCtrlQueue')
+        def callback(ch, method, properties, data):
+            #Update the config file and cache.
+            action = data
+            if "START" == action:
+                self.shouldAgentRun = True
+                self.publishHealthData(self.generateHealthData(note="Agent is in START mode"))
+            if "STOP" == action:
+                self.shouldAgentRun = False
+                self.publishHealthData(self.generateHealthData(note="Agent is in STOP mode"))
+            ch.basic_ack(delivery_tag = method.delivery_tag)
+        self.agentCtrlMessageFactory.subscribe(routingKey, callback)
+           
     '''
     Subscribe for Engine Config Changes. Any changes to respective agent will be consumed and processed here.
     '''
@@ -208,6 +232,7 @@ class BaseAgent(object):
                             value = value[:self.timeFormatLengthMapping[field]]
                             d[outputField] = self.getRemoteDateTime(datetime.strptime(value, timeFormat)).get('epochTime')
                         except Exception as ex:
+                            logging.warn('Unable to parse timestamp field '+ field)
                             logging.error(ex)
             
             d['toolName'] = self.toolName;
@@ -241,9 +266,9 @@ class BaseAgent(object):
         return self.communicationFacade.processResponse(template, response, injectData, self.config.get('useResponseTemplate',False))
     
     def getResponseTemplate(self):
-        return self.config.get('responseTemplate', None)
+        return self.config.get('dynamicTemplate', {}).get('responseTemplate',None)
     
-    def generateHealthData(self, ex=None, systemFailure=False):
+    def generateHealthData(self, ex=None, systemFailure=False,note=None):
         data = []
         currentTime = self.getRemoteDateTime(datetime.now())
         health = { 'inSightsTimeX' : currentTime['time'], 'inSightsTime' : currentTime['epochTime'], 'executionTime' : int((datetime.now() - self.executionStartTime).total_seconds() * 1000)}
@@ -256,6 +281,8 @@ class BaseAgent(object):
             logging.error(ex)
         else:
             health['status'] = 'success'
+            if note != None:
+                health['message'] = note
         data.append(health)
         return data
     
@@ -298,17 +325,21 @@ class BaseAgent(object):
         self.extensions[name] = {'func': func, 'duration': duration}
     
     def execute(self):
-        try:
-            self.executionStartTime = datetime.now()
-            self.logIndicator(self.EXECUTION_START, self.config.get('isDebugAllowed', False))
-            self.executionId = str(uuid.uuid1())
-            self.process()
-            self.executeAgentExtensions()
-            self.publishHealthData(self.generateHealthData())
-        except Exception as ex:
-            self.publishHealthData(self.generateHealthData(ex=ex))
-            logging.error(ex)
-            self.logIndicator(self.EXECUTION_ERROR, self.config.get('isDebugAllowed', False))
+        if self.shouldAgentRun == True:
+            logging.debug('Agent is in START mode')
+            try:
+                self.executionStartTime = datetime.now()
+                self.logIndicator(self.EXECUTION_START, self.config.get('isDebugAllowed', False))
+                self.executionId = str(uuid.uuid1())
+                self.process()
+                self.executeAgentExtensions()
+                self.publishHealthData(self.generateHealthData())
+            except Exception as ex:
+                self.publishHealthData(self.generateHealthData(ex=ex))
+                logging.error(ex)
+                self.logIndicator(self.EXECUTION_ERROR, self.config.get('isDebugAllowed', False))
+        if self.shouldAgentRun == False:
+            logging.debug('Agent is in STOP mode')
     
     def executeAgentExtensions(self):
         if hasattr(self, 'extensions'):

@@ -23,15 +23,15 @@ module ISightApp {
 		getNeo4jServiceHost(): String;
 		getGrafanaHost(): String;
 		getGrafanaHost1(): ng.IPromise<any>;
-		
+		getConfigDesc();
 	}
 
 	export class RestEndpointService implements IRestEndpointService {
 		static $inject = ['$location', '$http', '$cookies', '$resource'];
 
 		constructor(private $location, private $http, private $cookies, private $resource) {
-			this.loadUiServiceLocation();
-	
+			this.loadUiServiceLocation();	
+			this.loadAgentConfigDesc();	
 		}
 
 		private loadUiServiceLocation(): void {
@@ -56,11 +56,27 @@ module ISightApp {
 				//self.grafanaHost = self.getGrafanaHost();
 			}
 		}
+		
+		public loadAgentConfigDesc(): void {
+			var self = this;
+			let location = this.$location;
+			let agentConfigJsonUrl: string = location.absUrl().replace(location.path(), "");
+			if (agentConfigJsonUrl.length > agentConfigJsonUrl.lastIndexOf('/')) {
+				agentConfigJsonUrl = agentConfigJsonUrl.substr(0, agentConfigJsonUrl.lastIndexOf('/'));
+			}
+			agentConfigJsonUrl += "/configDesc.json"
+			var configResource = this.$resource(agentConfigJsonUrl);
+			var data = configResource.get().$promise.then(function (data) {				
+				 self.configDesc = data.desriptions;
+			});					
+			
+		}		
 
 		serviceHost: String;
 		elasticSearchServiceHost: String;
 		neo4jServiceHost: String;
 		grafanaHost: String;
+		configDesc= {};
 				
 		public getServiceHost(): String {
 			if (!this.serviceHost) {
@@ -69,6 +85,9 @@ module ISightApp {
 			return this.serviceHost;
 		}
 		
+		public getConfigDesc() {				
+			return this.configDesc;
+		}		
 		
 
 		public getelasticSearchServiceHost(): String {

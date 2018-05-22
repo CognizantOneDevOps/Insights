@@ -1,0 +1,9 @@
+[Unit]
+Description=Ubuntu JenkinsLogParserAgent Service
+
+[Service]
+Type=forking
+ExecStart=/bin/bash /opt/insightsagents/PlatformAgents/jenkinslogparser/InSightsJenkinsLogParserAgent.sh
+
+[Install]
+WantedBy=multi-user.target
