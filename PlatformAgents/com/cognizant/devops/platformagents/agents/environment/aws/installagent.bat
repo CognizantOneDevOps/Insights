@@ -1,4 +1,10 @@
 REM pushd %INSIGHTS_AGENT_HOME%\PlatformAgents\aws
-nssm install AwsAgent %INSIGHTS_AGENT_HOME%\PlatformAgents\aws\AwsAgent.bat
-sleep 2
-net start AwsAgent
+IF /I "%1%" == "UNINSTALL" (
+	net stop AwsAgent
+	sc delete AwsAgent
+) ELSE (
+	net stop AwsAgent
+	sc delete AwsAgent
+    nssm install AwsAgent %INSIGHTS_AGENT_HOME%\PlatformAgents\aws\AwsAgent.bat
+    net start AwsAgent
+)

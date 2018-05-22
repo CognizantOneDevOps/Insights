@@ -1,4 +1,10 @@
 REM pushd %INSIGHTS_AGENT_HOME%\PlatformAgents\circleci
-nssm install CircleciAgent %INSIGHTS_AGENT_HOME%\PlatformAgents\circleci\CircleciAgent.bat
-sleep 2
-net start CircleciAgent
+IF /I "%1%" == "UNINSTALL" (
+	net stop CircleciAgent
+	sc delete CircleciAgent
+) ELSE (
+	net stop CircleciAgent
+	sc delete CircleciAgent
+    nssm install CircleciAgent %INSIGHTS_AGENT_HOME%\PlatformAgents\circleci\CircleciAgent.bat
+    net start CircleciAgent
+)
