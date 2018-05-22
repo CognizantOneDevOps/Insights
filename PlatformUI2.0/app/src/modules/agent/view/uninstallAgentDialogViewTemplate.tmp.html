@@ -28,10 +28,14 @@
             <div layout layout-align="center center">
                 <div class="applicationAddDialog">
                     <span style="color:red">
-                        <b> Note: {{UninstallAgentDialogController.uninstallNote}}</b>
+                        <b> Note: Uninstalling the Agent doesn't delete the data that has been collected. The agent could
+                            <br>
+                            <b style="margin-left: 6%"> be re-registered again, and the data collection would be resumed from the last run time.</b>
+                            </br>
+                        </b>
                     </span>
                     <br></br>
-                    <span style="color:blue;margin-left: 39%">
+                    <span style="color:blue;margin-left: 29%">
                         <b> Do you want to uninstall "{{UninstallAgentDialogController.toolName}}" on {{UninstallAgentDialogController.osVersion}}?</b>
                     </span>
                 </div>
