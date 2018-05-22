@@ -15,7 +15,7 @@ For Detailed product documentation and feature list please refer to the link -> 
 For information on the latest features and updates please refer to the below mentioned link -> https://onedevops.atlassian.net/wiki/spaces/OI/pages/218936/About+InSights
 
 
-Latest Release Updates :
+Latest Release Updates :  
 
 Beta - Release v3.8.2. Issue# 60 from 3.8.1 relases has been fixed.
 

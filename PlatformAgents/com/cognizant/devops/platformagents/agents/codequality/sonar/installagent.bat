@@ -1,4 +1,10 @@
 REM pushd %INSIGHTS_AGENT_HOME%\PlatformAgents\sonar
-nssm install SonarAgent %INSIGHTS_AGENT_HOME%\PlatformAgents\sonar\SonarAgent.bat
-sleep 2
-net start SonarAgent
+IF /I "%1%" == "UNINSTALL" (
+	net stop SonarAgent
+	sc delete SonarAgent
+) ELSE (
+	net stop SonarAgent
+	sc delete SonarAgent
+    nssm install SonarAgent %INSIGHTS_AGENT_HOME%\PlatformAgents\sonar\SonarAgent.bat
+    net start SonarAgent
+)
