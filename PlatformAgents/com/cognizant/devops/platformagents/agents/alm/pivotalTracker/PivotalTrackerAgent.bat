@@ -1,0 +1,2 @@
+pushd %INSIGHTS_AGENT_HOME%\PlatformAgents\pivotalTracker
+python -c "from com.cognizant.devops.platformagents.agents.alm.pivotalTracker.PivotalTrackerAgent import PivotalTrackerAgent; PivotalTrackerAgent()"

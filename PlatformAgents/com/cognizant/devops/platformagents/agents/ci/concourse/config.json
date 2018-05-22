@@ -1,0 +1,43 @@
+{
+  "mqConfig": {
+    "user": "iSight",
+    "password": "iSight",
+    "host": "127.0.0.1",
+    "exchange": "iSight"
+  },
+  "subscribe": {
+    "config": "CI.CONCOURSE.config"
+  },
+  "publish": {
+    "data": "CI.CONCOURSE.DATA",
+    "health": "CI.CONCOURSE.HEALTH"
+  },
+  "communication": {
+    "type": "REST"
+  },
+"dynamicTemplate": {
+  "responseTemplate": {
+    "id": "Id",
+    "name": "buildNumber",
+    "pipeline_name": "pipelineName",
+    "end_time": "endTime",
+    "start_time": "startTime",
+    "status": "status",
+    "team_name": "teamName"
+  }
+},
+"BuildMetadata": {"labels" : ["Build_concourse"]},
+"toolsTimeZone" : "Asia/Kolkata",
+"toolCategory" : "CI",
+"insightsTimeZone" : "Asia/Kolkata",
+"useResponseTemplate" : true,
+"runSchedule": 30,
+"UserID": "userid",
+"Passwd": "password",
+"BaseUrl": "#BaseUrl",
+"TeamName": "people-sched",
+"timeStampField":"startDate",
+"timeStampFormat":"%Y-%m-%dT%H:%M:%S",
+"isEpochTimeFormat" : false,
+"StartFrom" : "2017-01-01 01:01:01"
+}
