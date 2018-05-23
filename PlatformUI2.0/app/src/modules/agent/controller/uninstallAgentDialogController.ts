@@ -40,12 +40,11 @@ module ISightApp {
         confirmation(): void {
             var self = this;
             self.agentService.agentUninstall(self.agentKey, self.toolName, self.osVersion).then(function (data) {
-
+				self.agentListController.getRegisteredAgents();
             }).catch(function (data) {
                 self.agentListController.showConfirmMessage = "service_error";
                 self.agentListController.getRegisteredAgents();
             });
-            self.agentListController.getRegisteredAgents();
             self.hide();
         }
 
