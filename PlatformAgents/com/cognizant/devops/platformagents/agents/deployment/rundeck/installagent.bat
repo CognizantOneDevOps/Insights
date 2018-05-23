@@ -1,4 +1,10 @@
 REM pushd %INSIGHTS_AGENT_HOME%\PlatformAgents\rundeck
-nssm install RundeckAgent %INSIGHTS_AGENT_HOME%\PlatformAgents\rundeck\RundeckAgent.bat
-sleep 2
-net start RundeckAgent
+IF /I "%1%" == "UNINSTALL" (
+	net stop RundeckAgent
+	sc delete RundeckAgent
+) ELSE (
+	net stop RundeckAgent
+	sc delete RundeckAgent
+    nssm install RundeckAgent %INSIGHTS_AGENT_HOME%\PlatformAgents\rundeck\RundeckAgent.bat
+    net start RundeckAgent
+)

@@ -78,11 +78,6 @@
 		</dependency>
 		<dependency>
 			<groupId>com.cognizant.devops</groupId>
-			<artifactId>PlatformEngine</artifactId>
-			<version>1.0.0.1-SNAPSHOT</version>
-		</dependency>
-		<dependency>
-			<groupId>com.cognizant.devops</groupId>
 			<artifactId>PlatformDAL</artifactId>
 			<version>1.0.0.1-SNAPSHOT</version>
 		</dependency>
@@ -203,7 +198,11 @@
 		    <artifactId>jsoup</artifactId>
 		    <version>1.11.2</version>
 		</dependency>
-
+		<dependency>
+			<groupId>com.rabbitmq</groupId>
+			<artifactId>amqp-client</artifactId>
+			<version>3.6.2</version>
+		</dependency>
 	</dependencies>
 	<properties>
 		<jersey.version>2.23</jersey.version>

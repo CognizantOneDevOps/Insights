@@ -54,9 +54,7 @@ public class InsightsInferenceServiceImpl implements InsightsInferenceService {
 	}
 
 	public List<InsightsInference> getInferenceDetails(String schedule) {
-		List<InsightsInference> inferences = getInferences(schedule);
-
-		return inferences;
+		return getInferences(schedule);
 	}
 
 	private List<InsightsInference> getInferences(String schedule) {
