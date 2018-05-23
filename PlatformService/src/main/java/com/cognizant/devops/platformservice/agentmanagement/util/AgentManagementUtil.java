@@ -110,10 +110,11 @@ public class AgentManagementUtil {
 		return readJsonFile(targetDir, filePath);
 	}
 
-	private  JsonObject readJsonFile(File targetDir, String filePath) throws FileNotFoundException {
+	private JsonObject readJsonFile(File targetDir, String filePath) throws IOException {
 		JsonParser  parser = new JsonParser();
-		Object obj = parser.parse(new FileReader(targetDir+File.separator+filePath));
-		return (JsonObject)obj;
+		try(FileReader reader = new FileReader(targetDir+File.separator+filePath)){
+			return (JsonObject) parser.parse(reader);
+		}
 	}
 
 	private  void copyInputStream(InputStream in, OutputStream out) throws IOException {
