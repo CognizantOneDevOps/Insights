@@ -29,15 +29,7 @@ module ISightApp {
             this.homeController = homePageController;
             var self = this;
             self.getHost();
-            self.userOnboardingService.getCurrentUserOrgs().
-                then(function (orgData) {
-                    var orgDataArray = orgData.data;
-                    self.getUserAdminOrgs(orgDataArray);
-                    self.authenticationService.getGrafanaCurrentOrgAndRole()
-                        .then(function (data) {
-                            self.getCurrentOrgName(data, orgDataArray);
-                        });
-                });
+            self.getApplicationDetail();
             self.userIframeStyle = 'width:100%; height:1600px;';
             var receiveMessage = function (evt) {
                 var height = parseInt(evt.data);
@@ -58,6 +50,25 @@ module ISightApp {
         adminOrgDataArray = [];
         userCurrentOrgName: String = '';
         showSwitchOptions: boolean = false;
+        showAddApplication: boolean = false;
+        addNewApplicationName: string = "";
+        showApplicationAddedMessage: boolean = false;
+        showApplicationMessage: string = "";
+
+        getApplicationDetail() {
+            var self = this;
+            self.adminOrgDataArray = [];
+
+            self.userOnboardingService.getCurrentUserOrgs().
+                then(function (orgData) {
+                    var orgDataArray = orgData.data;
+                    self.getUserAdminOrgs(orgDataArray);
+                    self.authenticationService.getGrafanaCurrentOrgAndRole()
+                        .then(function (data) {
+                            self.getCurrentOrgName(data, orgDataArray);
+                        });
+                });
+        }
 
         getUserAdminOrgs(orgDataArray) {
             var self = this;
@@ -120,5 +131,66 @@ module ISightApp {
             });
             //console.log(this.userListUrl);
         }
+
+        showAddApplicationBox(): void {
+            //this.showApplicationAddedMessage = false;
+            if (this.showAddApplication === false) {
+                this.showAddApplication = true;
+            }
+            else {
+                this.showAddApplication = false;
+            }
+        }
+
+        addApplication(params, addedApplicationName): void {
+            var self = this;
+            var statusObject = {
+                'status': false
+            }
+            if (addedApplicationName !== "") {
+                self.$mdDialog.show({
+                    controller: ShowTemplateApplicationAddConformDialogController,
+                    controllerAs: 'showTemplateApplicationAddConformDialogController',
+                    templateUrl: './dist/modules/applicationManagement/view/conformApplicationAddDialogViewTemplate.tmp.html',
+                    parent: angular.element(document.body),
+                    targetEvent: params,
+                    preserveScope: true,
+                    clickOutsideToClose: true,
+                    locals: {
+                        statusObject: statusObject,
+                        addedApplicationName: addedApplicationName,
+                    },
+                    bindToController: true,
+                    onRemoving: function () { self.addApplicationConfirmation(statusObject.status) }
+                })
+            } else if (addedApplicationName === "") {
+                self.showApplicationMessage = "Error in adding application";
+                self.showApplicationAddedMessage = true;
+                setTimeout(function () {
+                    self.showApplicationAddedMessage = false;
+                    self.showApplicationMessage = "";
+                }, 1000);
+            }
+        }
+
+        addApplicationConfirmation(status): void {
+            var self = this;
+            if (status === true) {
+                this.roleService
+                    .createOrg(self.addNewApplicationName)
+                    .then(function (data) {
+                        self.showAddApplication = false;
+                        self.getApplicationDetail();
+                        self.showApplicationMessage = "New application added successfully";
+                        self.showApplicationAddedMessage = true;
+                        self.addNewApplicationName = "";
+                        setTimeout(function () {
+                            self.showApplicationAddedMessage = false;
+                            self.showApplicationMessage = "";
+                        }, 1000);
+                    });
+            }
+        }
+
     }
 }
