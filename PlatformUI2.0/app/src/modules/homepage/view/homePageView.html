@@ -87,7 +87,7 @@
         <md-dialog-content style="max-width:800px;max-height:810px; ">
             <md-tabs ng-if="homePageController.showAdminTab" md-selected="homePageController.selectedIndex" id="maintab" md-dynamic-height
                 md-stretch-tabs class="mainTabBorder">
-                <md-tab ng-click="homePageController.selectAct('applicationManagement')" md-on-select="homePageController.addSelectedImage('Admin')"
+                <md-tab ng-click="homePageController.selectAct('agentManagement')" md-on-select="homePageController.addSelectedImage('Admin')"
                     md-on-deselect="homePageController.removeSelectedImage('Admin')">
                     <md-tab-label>
                         <md-icon style="margin-top: -7px;" md-svg-src="{{homePageController.imageurl1}}" ng-style="{height: '20px', width: '20px'}"></md-icon>
@@ -106,12 +106,12 @@
                                         layout="vertical"></div>
                                 </md-content>
                             </md-tab> -->
-                            <md-tab label="Access Group Management" ng-click="homePageController.selectAct('applicationManagement')">
+                            <md-tab label="Agent Management" ng-click="homePageController.selectAct('agentList')">
                                 <md-content style="{{homePageController.mainContentMinHeight}}">
-                                    <div ng-if="homePageController.templateName == 'applicationManagement'" ng-include="'dist/modules/applicationManagement/view/applicationManagementView.html'"
-                                        ng-controller="applicationManagementController as applicationManagementController" layout="vertical"></div>
-                                    <div ng-if="homePageController.templateName == 'userOnboarding'" ng-include="'dist/modules/userOnboarding/view/userOnboardingView.html'"
-                                        ng-controller="userOnboardingController as userOnboardingController" layout="vertical"></div>
+                                    <div ng-if="homePageController.templateName == 'agentManagement'" ng-include="'dist/modules/agent/view/agentManagementView.html'"
+                                        ng-controller="agentManagementController as agentManagementController" layout="vertical"></div>
+                                    <div ng-if="homePageController.templateName == 'agentList'" ng-include="'dist/modules/agent/view/agentListView.html'" ng-controller="agentListController as agentListController"
+                                        layout="vertical" layout-align="center center"></div>
 
                                 </md-content>
                             </md-tab>
@@ -126,6 +126,15 @@
 
                                 </md-content>
                             </md-tab>
+                            <md-tab label="Access Group Management" ng-click="homePageController.selectAct('userOnboarding')">
+                                <md-content /*style="{{homePageController.mainContentMinHeight}}"*/>
+                                <div ng-if="homePageController.templateName == 'applicationManagement'" ng-include="'dist/modules/applicationManagement/view/applicationManagementView.html'"
+                                    ng-controller="applicationManagementController as applicationManagementController" layout="vertical"></div>
+                                <div ng-if="homePageController.templateName == 'userOnboarding'" ng-include="'dist/modules/userOnboarding/view/userOnboardingView.html'"
+                                    ng-controller="userOnboardingController as userOnboardingController" layout="vertical"></div>
+
+                                </md-content>
+                            </md-tab>
                             <md-tab label="Settings" ng-click="homePageController.selectAct('appSettings')">
                                 <md-content style="{{homePageController.mainContentMinHeight}}">
                                     <div ng-if="homePageController.templateName == 'appSettings'" ng-include="'dist/modules/appSettings/view/appSettingsView.html'"
@@ -133,15 +142,7 @@
 
                                 </md-content>
                             </md-tab>
-                            <md-tab label="Agent Management" ng-click="homePageController.selectAct('agentList')">
-                                <md-content style="{{homePageController.mainContentMinHeight}}">
-                                    <div ng-if="homePageController.templateName == 'agentManagement'" ng-include="'dist/modules/agent/view/agentManagementView.html'"
-                                        ng-controller="agentManagementController as agentManagementController" layout="vertical"></div>
-                                    <div ng-if="homePageController.templateName == 'agentList'" ng-include="'dist/modules/agent/view/agentListView.html'" ng-controller="agentListController as agentListController"
-                                        layout="vertical" layout-align="center center"></div>
 
-                                </md-content>
-                            </md-tab>
                         </md-tabs>
                     </md-tab-body>
                 </md-tab>
