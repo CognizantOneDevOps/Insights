@@ -17,8 +17,7 @@ For information on the latest features and updates please refer to the below men
 
 Latest Release Updates :  
 
-Beta - Release v3.8.2. Issue# 60 from 3.8.1 relases has been fixed.
-
-Release v3.8.1 has issue in terms of package structure in PlatformService module (https://github.com/CognizantOneDevOps/Insights/tree/master/PlatformService/src/main/java/com/cognizant/devops/platformservice/rest).
-In order to overcome this, while modifying code change package name from "dataTagging" to "datatagging" in IDE.
-Defect #60 has been raised to resolve the same. Please note this issue only affects the developer community and existing users can continue to upgrade to the new version of the release. 
+Release v4.0 - 
+Major enhancements to Agent management framework. All agent activties can now be performed via UI.
+Addition of new agents - Pivotal tracker and Concourse CI.
+Neo4j Data source updates to timeseries/table format and Google chart changes to support themes.
