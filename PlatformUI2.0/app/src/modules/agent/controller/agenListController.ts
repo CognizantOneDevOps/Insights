@@ -116,11 +116,10 @@ module ISightApp {
 				.then(function (response) {
 					self.showThrobber = false;
 					self.data = response.data;
-
+					self.consolidatedArr(self.data);
 					if (self.data.length == 0) {
 						self.showMessage = "No Records found";
 					} else {
-						self.consolidatedArr(self.data);
 						self.showList = true;
 						self.tableParams = new self.NgTableParams({
 							page: 1,
