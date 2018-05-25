@@ -1,6 +1,6 @@
 <li ng-repeat="item in children" data-val="{{item.name}}">
      
-            <label for="{{item.name}}" id="{{item.name}}" data-val="{{item.name}}" class="dataItem" ng-click="test(item.name)">{{item.name}}</label>
+            <label for="{{item.name}}" id="{{item.name}}" data-val="{{item.name}}" class="dataItem" ng-click="(!item.children) ? test(item.name): ''">{{item.name}}</label>
             <input type="checkbox" checked id="{{item.name}}" />
             <ol ng-if="item.children && item.children.length > 0" class="tree child"  row children="item.children"  my-var="myVar"  click-handler="clickHandler($event)" test="test">
             </ol>
