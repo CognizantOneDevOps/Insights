@@ -52,8 +52,8 @@ module ISightApp {
         showSwitchOptions: boolean = false;
         showAddApplication: boolean = false;
         addNewApplicationName: string = "";
-        showApplicationAddedMessage: boolean = false;
-        showApplicationMessage: string = "";
+        showAccessGroupAddedMessage: boolean = false;
+        accessGroupMessageStatus: string = "";
 
         getApplicationDetail() {
             var self = this;
@@ -133,7 +133,7 @@ module ISightApp {
         }
 
         showAddApplicationBox(): void {
-            //this.showApplicationAddedMessage = false;
+            //this.showAccessGroupAddedMessage = false;
             if (this.showAddApplication === false) {
                 this.showAddApplication = true;
             }
@@ -164,11 +164,11 @@ module ISightApp {
                     onRemoving: function () { self.addApplicationConfirmation(statusObject.status) }
                 })
             } else if (addedApplicationName === "") {
-                self.showApplicationMessage = "Error in adding application";
-                self.showApplicationAddedMessage = true;
+                self.accessGroupMessageStatus = "Error in adding access group";
+                self.showAccessGroupAddedMessage = true;
                 setTimeout(function () {
-                    self.showApplicationAddedMessage = false;
-                    self.showApplicationMessage = "";
+                    self.showAccessGroupAddedMessage = false;
+                    self.accessGroupMessageStatus = "";
                 }, 1000);
             }
         }
@@ -181,12 +181,12 @@ module ISightApp {
                     .then(function (data) {
                         self.showAddApplication = false;
                         self.getApplicationDetail();
-                        self.showApplicationMessage = "New application added successfully";
-                        self.showApplicationAddedMessage = true;
+                        self.accessGroupMessageStatus = "New access group added successfully";
+                        self.showAccessGroupAddedMessage = true;
                         self.addNewApplicationName = "";
                         setTimeout(function () {
-                            self.showApplicationAddedMessage = false;
-                            self.showApplicationMessage = "";
+                            self.showAccessGroupAddedMessage = false;
+                            self.accessGroupMessageStatus = "";
                         }, 1000);
                     });
             }
