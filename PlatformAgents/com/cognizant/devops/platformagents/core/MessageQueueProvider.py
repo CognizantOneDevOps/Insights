@@ -53,9 +53,11 @@ class MessageFactory:
             credentials = pika.PlainCredentials(self.user, self.password)
             connection = pika.BlockingConnection(pika.ConnectionParameters(credentials=credentials,host=self.host))
             channel = connection.channel()
+            
+            queueName = routingKey.replace('.','_')
             channel.exchange_declare(exchange=self.exchange, exchange_type='topic', durable=True)
-            channel.queue_declare(queue=routingKey, passive=False, durable=True, exclusive=False, auto_delete=False, arguments=None)
-            channel.queue_bind(queue=routingKey, exchange=self.exchange, routing_key=routingKey, arguments=None)
+            channel.queue_declare(queue=queueName, passive=False, durable=True, exclusive=False, auto_delete=False, arguments=None)
+            channel.queue_bind(queue=queueName, exchange=self.exchange, routing_key=routingKey, arguments=None)
             #channel.exchange_declare(exchange=self.exchange, type='topic', exchange_type='topic', durable=True)
             #self.exchange = exchange
             #self.channels = {}
