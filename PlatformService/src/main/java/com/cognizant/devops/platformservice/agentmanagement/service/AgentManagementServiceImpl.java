@@ -90,10 +90,6 @@ public class AgentManagementServiceImpl  implements AgentManagementService{
 			String uniqueKey = agentId;
 			Date updateDate= Timestamp.valueOf(LocalDateTime.now());
 
-			// register agent in DB
-			AgentConfigDAL agentConfigDAL = new AgentConfigDAL();
-			agentConfigDAL.saveAgentConfigFromUI(agentId , json.get("toolCategory").getAsString(),toolName, json, isDataUpdateSupported,uniqueKey,agentVersion,osversion, updateDate);
-
 			//Create zip/tar file with updated config.json
 			Path agentZipPath =updateAgentConfig(toolName,json);
 			byte[] data = Files.readAllBytes(agentZipPath);
@@ -101,6 +97,11 @@ public class AgentManagementServiceImpl  implements AgentManagementService{
 			String fileName = toolName + FILETYPE;
 			sendAgentPackage(data,AGENTACTION.REGISTER.name(),fileName,agentId,toolName,osversion);
 			performAgentAction(agentId,AGENTACTION.START.name());
+			
+			// register agent in DB
+			AgentConfigDAL agentConfigDAL = new AgentConfigDAL();
+			agentConfigDAL.saveAgentConfigFromUI(agentId , json.get("toolCategory").getAsString(),toolName, json, isDataUpdateSupported,uniqueKey,agentVersion,osversion, updateDate);
+
 		} catch (Exception e) {
 			log.error("Error while registering agent "+toolName, e);
 			throw new InsightsCustomException(e.toString());
@@ -113,9 +114,9 @@ public class AgentManagementServiceImpl  implements AgentManagementService{
 	@Override
 	public String uninstallAgent(String agentId,String toolName, String osversion) throws InsightsCustomException{
 		try {
+			uninstallAgent(AGENTACTION.UNINSTALL.name(),agentId,toolName,osversion);
 			AgentConfigDAL agentConfigDAL = new AgentConfigDAL();
 			agentConfigDAL.deleteAgentConfigurations(agentId);
-			uninstallAgent(AGENTACTION.UNINSTALL.name(),agentId,toolName,osversion);
 		} catch (Exception e) {
 			log.error("Error while un-installing agent..", e);
 			throw new InsightsCustomException(e.toString());
@@ -127,9 +128,10 @@ public class AgentManagementServiceImpl  implements AgentManagementService{
 	@Override
 	public String startStopAgent(String agentId, String action) throws InsightsCustomException {
 		try {
+			performAgentAction(agentId,action);
 			AgentConfigDAL agentConfigDAL = new AgentConfigDAL();
 			agentConfigDAL.updateAgentRunningStatus(agentId,AGENTACTION.valueOf(action));
-			performAgentAction(agentId,action);
+			
 		} catch (Exception e) {
 			log.error("Error while agent "+action, e);
 			throw new InsightsCustomException(e.toString());
@@ -157,9 +159,6 @@ public class AgentManagementServiceImpl  implements AgentManagementService{
 			String uniqueKey = agentId;
 			Date updateDate= Timestamp.valueOf(LocalDateTime.now());
 
-			AgentConfigDAL agentConfigDAL = new AgentConfigDAL();
-			agentConfigDAL.saveAgentConfigFromUI(agentId , json.get("toolCategory").getAsString(), toolName, json, isDataUpdateSupported, uniqueKey,agentVersion,osversion, updateDate);
-
 			Path agentZipPath = updateAgentConfig(toolName ,json);
 
 			byte[] data = Files.readAllBytes(agentZipPath);
@@ -167,6 +166,9 @@ public class AgentManagementServiceImpl  implements AgentManagementService{
 			String fileName = toolName + FILETYPE;
 
 			sendAgentPackage(data,AGENTACTION.UPDATE.name(),fileName,agentId,toolName,osversion);
+			
+			AgentConfigDAL agentConfigDAL = new AgentConfigDAL();
+			agentConfigDAL.saveAgentConfigFromUI(agentId , json.get("toolCategory").getAsString(), toolName, json, isDataUpdateSupported, uniqueKey,agentVersion,osversion, updateDate);
 
 		} catch (Exception e) {
 			log.error("Error updating and installing agent", e);
