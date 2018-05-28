@@ -11,8 +11,8 @@ gitCommitID = sh (
 	stage ('LicenseCheck') {
            checkout scm
     	   def commit = sh (returnStdout: true, script: '''var=''
-	#for file in $(find . -print | grep -i -e .*[.]java -e .*[.]py)
-	for file in $(find . -print | grep -i -e .*[.]java)
+	for file in $(find . -print | grep -i -e .*[.]java -e .*[.]py -e .*[.]sh -e .*[.]bat )
+	#for file in $(find . -print | grep -i -e .*[.]java)
 	do
    	    if grep -q "Apache License" $file; then
         	updated="License is updated $file" ##Dummy line
