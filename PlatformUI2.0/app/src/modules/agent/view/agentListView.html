@@ -15,74 +15,90 @@
  * the License.
  ******************************************************************************
  -->
- <div layout="column" class="contentCss" flex>
-	<div layout="row">			
-		
+<div layout="column" class="contentCss" flex>
+	<div layout="row">
+
 		<div flex="70" layout layout-align="center center" class="selectToolTxt">
 			<!-- <div ng-if="agentListController.showConfirmMessage != ''" style="text-transform: capitalize;" id="confrmMsg">	{{agentListController.showConfirmMessage}}
 			</div> -->
-			<div ng-if="agentListController.showConfirmMessage != ''" id="confrmMsg">	
+			<div ng-if="agentListController.showConfirmMessage != ''" id="confrmMsg">
 				<div layout="row" layout-align="center center" ng-if="agentListController.showConfirmMessage === 'registered' || agentListController.showConfirmMessage === 'updated' || agentListController.showConfirmMessage === 'started' || agentListController.showConfirmMessage === 'stopped'">
-				 <md-icon md-svg-src="{{agentListController.successIconSrc}}" ng-style="{color: '#4ca64c', height: '15px', width: '15px'}"></md-icon>			
-				 <span>Agent {{agentListController.showConfirmMessage}} successfully</span>
+					<md-icon md-svg-src="{{agentListController.successIconSrc}}" ng-style="{color: '#4ca64c', height: '15px', width: '15px'}"></md-icon>
+					<span>Agent {{agentListController.showConfirmMessage}} successfully</span>
+				</div>
+				<div layout="row" layout-align="center center" ng-if="agentListController.showConfirmMessage === 'uninstall'">
+					<md-icon md-svg-src="{{agentListController.errorIconSrc}}" ng-style="{color: '#ff4c4c', height: '15px', width: '15px'}"></md-icon>
+					<span style="color: #ff4c4c;">Please stop the Agent before uninstalling!</span>
 				</div>
 				<div layout="row" layout-align="center center" ng-if="agentListController.showConfirmMessage === 'register' || agentListController.showConfirmMessage === 'update' || agentListController.showConfirmMessage === 'start' || agentListController.showConfirmMessage === 'stop'">
-				 <md-icon md-svg-src="{{agentListController.errorIconSrc}}" ng-style="{color: '#ff4c4c', height: '15px', width: '15px'}"></md-icon>			
-				 <span style="color: #ff4c4c;">Agent {{agentListController.showConfirmMessage}} failed.</span>
+					<md-icon md-svg-src="{{agentListController.errorIconSrc}}" ng-style="{color: '#ff4c4c', height: '15px', width: '15px'}"></md-icon>
+					<span style="color: #ff4c4c;">Agent {{agentListController.showConfirmMessage}} failed.</span>
 				</div>
 				<div layout="row" layout-align="center center" ng-if="agentListController.showConfirmMessage === 'service_error'">
-				 <md-icon md-svg-src="{{agentListController.errorIconSrc}}" ng-style="{color: '#ff4c4c', height: '15px', width: '15px'}"></md-icon>			
-				 <span style="color: #ff4c4c;">Something wrong with service, Please try again</span>
+					<md-icon md-svg-src="{{agentListController.errorIconSrc}}" ng-style="{color: '#ff4c4c', height: '15px', width: '15px'}"></md-icon>
+					<span style="color: #ff4c4c;">Something wrong with service, Please try again</span>
 				</div>
-			</div>			
+			</div>
 		</div>
-		
+
 		<div flex="30" layout layout-align="end end">
 			<md-button class="md-raised md-primary configureBut" ng-click="agentListController.newAgentRegister(agentListController.validationArr)">Add</md-button>
 		</div>
-		
-    </div>	
-	 <div ng-if="agentListController.showThrobber" layout-sm="column" layout-align="center center" style="margin-left: 46%;margin-top: 46px;">
-				<md-progress-circular md-mode="indeterminate" md-diameter="50"></md-progress-circular>
-	 </div>	 
-		
-	 <div class="confirmationMessage" layout="row" layout-align="end start" style="margin-right: 7px;" ng-if="agentListController.showList">
-	 
-	<md-icon class="ForActionsIcons" ng-style="{height: '20px', width: '20px'}" md-svg-src="{{agentListController.startIconSrc}}" ng-click="agentListController.runDisableStatus == 'STOP' && agentListController.agentStartStopAction(agentListController.SelectedToolDetails,  'START')" ng-disabled="agentListController.buttonDisableStatus">
-            <md-tooltip md-direction="Bottom">
-                Start
-            </md-tooltip>
-	</md-icon>
-	<md-icon class="ForActionsIcons" ng-style="{height: '20px', width: '20px'}" md-svg-src="{{agentListController.stopIconSrc}}" ng-click="agentListController.runDisableStatus == 'START' && agentListController.agentStartStopAction(agentListController.SelectedToolDetails, 'STOP')">
-            <md-tooltip md-direction="Bottom">
-                Stop
-            </md-tooltip>
-	</md-icon>
-	<md-icon class="ForActionsIcons" ng-style="{height: '20px', width: '20px'}" md-svg-src="{{agentListController.editIconSrc}}" ng-click="agentListController.buttonDisableStatus && agentListController.editAgentConfig(agentListController.SelectedToolDetails)">
-            <md-tooltip md-direction="Bottom">
-                Edit
-            </md-tooltip>
-	</md-icon>
-	 </div>
-	<div class="agentlistTable" layout-align="center center" ng-if="agentListController.showList">	
-		<table ng-table="agentListController.tableParams" class="table md-api-table-landing table-condensed table-bordered table-striped textst" show-filter="(agentListController.data.length > 10) ? true : false">
+
+	</div>
+	<div ng-if="agentListController.showThrobber" layout-sm="column" layout-align="center center" style="margin-left: 46%;margin-top: 46px;">
+		<md-progress-circular md-mode="indeterminate" md-diameter="50"></md-progress-circular>
+	</div>
+
+	<div class="confirmationMessage" layout="row" layout-align="end start" style="margin-right: 7px;" ng-if="agentListController.showList">
+
+		<md-icon class="ForActionsIcons" ng-style="{height: '20px', width: '20px'}" md-svg-src="{{agentListController.startIconSrc}}"
+		 ng-click="agentListController.runDisableStatus == 'STOP' && agentListController.agentStartStopAction(agentListController.SelectedToolDetails,  'START')"
+		 ng-disabled="agentListController.buttonDisableStatus">
+			<md-tooltip md-direction="Bottom">
+				Start
+			</md-tooltip>
+		</md-icon>
+		<md-icon class="ForActionsIcons" ng-style="{height: '20px', width: '20px'}" md-svg-src="{{agentListController.stopIconSrc}}"
+		 ng-click="agentListController.runDisableStatus == 'START' && agentListController.agentStartStopAction(agentListController.SelectedToolDetails, 'STOP')">
+			<md-tooltip md-direction="Bottom">
+				Stop
+			</md-tooltip>
+		</md-icon>
+		<md-icon class="ForActionsIcons" ng-style="{height: '20px', width: '20px'}" md-svg-src="{{agentListController.editIconSrc}}"
+		 ng-click="agentListController.buttonDisableStatus && agentListController.editAgentConfig(agentListController.SelectedToolDetails)">
+			<md-tooltip md-direction="Bottom">
+				Edit
+			</md-tooltip>
+		</md-icon>
+		<md-icon class="ForActionsIcons" ng-style="{height: '20px', width: '20px'}" md-svg-src="{{agentListController.deleteIconSrc}}"
+		 ng-click="agentListController.buttonDisableStatus && agentListController.uninstallAgent(agentListController.SelectedToolDetails)">
+			<md-tooltip md-direction="Bottom">
+				Uninstall
+			</md-tooltip>
+		</md-icon>
+	</div>
+	<div id="agentTemplateContainer" class="agentlistTable" layout-align="center center" ng-if="agentListController.showList">
+		<table ng-table="agentListController.tableParams" class="table md-api-table-landing table-condensed table-bordered table-striped textst"
+		 show-filter="(agentListController.data.length > 10) ? true : false">
 			<tr ng-repeat="agentList in $data">
-			<td title="''" header-class="'theadCss'"style="width: 5%;" >
-			<md-radio-group ng-model="agentListController.SelectedToolDetails">
-			  <md-radio-button style="outline:none; margin-left: 15px;  margin-bottom: 0px !important; top: 5px;" ng-value="{ type: 'update', agentid: '{{agentList.agentKey}}'} " class="md-primary" ng-click="agentListController.enableActions(agentList.agentStatus)"></md-radio-button>			  
-			</md-radio-group>
-			</td>				
-			<td title="'OS'" filter="{ osVersion: 'text'}" header-class="'theadCss'">{{agentList.osVersion}}</td>	
-			<td title="'ToolName'" filter="{ toolName: 'text'}" header-class="'theadCss'">{{agentList.toolName}}</td>				
-			<td title="'Version'" filter="{ agentVersion: 'text'}" header-class="'theadCss'">{{agentList.agentVersion}}</td>				
-			<td title="'Status'" header-class="'theadCss'">{{agentList.agentStatus}}</td>					 
-			</tr>			
+				<td title="''" header-class="'theadCss'" style="width: 5%;">
+					<md-radio-group ng-model="agentListController.SelectedToolDetails">
+						<md-radio-button style="outline:none; margin-left: 15px;  margin-bottom: 0px !important; top: 5px;" ng-value="{ type: 'update', agentid: '{{agentList.agentKey}}'} "
+						 class="md-primary" ng-click="agentListController.enableActions(agentList.agentStatus)"></md-radio-button>
+					</md-radio-group>
+				</td>
+				<td title="'OS'" filter="{ osVersion: 'text'}" header-class="'theadCss'">{{agentList.osVersion}}</td>
+				<td title="'ToolName'" filter="{ toolName: 'text'}" header-class="'theadCss'">{{agentList.toolName}}</td>
+				<td title="'Version'" filter="{ agentVersion: 'text'}" header-class="'theadCss'">{{agentList.agentVersion}}</td>
+				<td title="'Status'" header-class="'theadCss'">{{agentList.agentStatus}}</td>
+			</tr>
 			<tr ng-show="$data.length == 0">
 				<td colspan="5" style="text-align: center">No Data found</td>
 			</tr>
-		</table>		
+		</table>
 	</div>
-	<div class="agentConfigTable" layout layout-align="center center" ng-if="!agentListController.showList"> 		
-			<h3 class="agentdefaultMessage">{{agentListController.showMessage}} </span>
+	<div class="agentConfigTable" layout layout-align="center center" ng-if="!agentListController.showList">
+		<h3 class="agentdefaultMessage">{{agentListController.showMessage}} </span>
 	</div>
 </div>
