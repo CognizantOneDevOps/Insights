@@ -32,6 +32,7 @@ public class AgentConfig {
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private int id;
 
+	@Deprecated
 	@Column(name = "AGENT_ID")
 	private int agentId;
 

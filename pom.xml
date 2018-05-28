@@ -14,7 +14,9 @@
   License for the specific language governing permissions and limitations under
   the License.
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<!-- adding a comment to test poll -6 -->
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.cognizant.devops</groupId>
@@ -47,90 +49,88 @@
 		<module>PlatformService</module>
 		<module>PlatformEngine</module>
 		<module>PlatformUI2.0</module>
-  </modules>
+	</modules>
 
-		<build>
-			<plugins>
-				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-compiler-plugin</artifactId>
-					<version>3.3</version>
-					<inherited>true</inherited>
-					<configuration>
-						<source>1.7</source>
-						<target>1.7</target>
-					</configuration>
-				</plugin>
-				<plugin>
-                    <artifactId>maven-release-plugin</artifactId>
-                    <version>2.3.2</version><dependencies><dependency><groupId>org.apache.maven.scm</groupId><artifactId>maven-scm-provider-gitexe</artifactId><version>1.9.4</version></dependency></dependencies>
-					<configuration>
-						<autoVersionSubmodules>true</autoVersionSubmodules>
-					</configuration>
-				</plugin>
-      		</plugins>
-		</build>
-    <scm>
-        <connection>scm:git:http://localhost:7990/scm/dev/devopsplatform.git</connection>
-        <developerConnection>scm:git:http://localhost:7990/scm/dev/devopsplatform.git</developerConnection>
-        <url>https://bitbucket.org/atlassian/stash-auto-unapprove-plugin</url>
-        <tag>InSights-2.11.0.0</tag>
-    </scm>
-	
- <!-- <distributionManagement>
-	<repository>
-		<id>InSightsArtifactsREL</id>
-		<name>InSightsArtifactsREL</name>
-		<url>http://localhost:9005/nexus/content/repositories/InSightsArtifactsREL/</url>
-	</repository>
-	
-   <snapshotRepository>
-        <id>InSightsArtifacts</id>
-        <name>InSightsArtifacts</name>
-        <url>http://localhost:9005/nexus/content/repositories/InSightsArtifacts/</url>
-    </snapshotRepository>
-	
-</distributionManagement> -->
-	
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.3</version>
+				<inherited>true</inherited>
+				<configuration>
+					<source>1.8</source>
+					<target>1.8</target>
+				</configuration>
+			</plugin>
+			<plugin>
+				<artifactId>maven-release-plugin</artifactId>
+				<version>2.3.2</version>
+				<dependencies>
+					<dependency>
+						<groupId>org.apache.maven.scm</groupId>
+						<artifactId>maven-scm-provider-gitexe</artifactId>
+						<version>1.9.4</version>
+					</dependency>
+				</dependencies>
+				<configuration>
+					<autoVersionSubmodules>true</autoVersionSubmodules>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+	<scm>
+		<connection>scm:git:http://localhost:7990/scm/dev/devopsplatform.git</connection>
+		<developerConnection>scm:git:http://localhost:7990/scm/dev/devopsplatform.git</developerConnection>
+		<url>https://bitbucket.org/atlassian/stash-auto-unapprove-plugin</url>
+		<tag>InSights-2.11.0.0</tag>
+	</scm>
+
+	<!-- <distributionManagement> <repository> <id>InSightsArtifactsREL</id> 
+		<name>InSightsArtifactsREL</name> <url>http://localhost:9005/nexus/content/repositories/InSightsArtifactsREL/</url> 
+		</repository> <snapshotRepository> <id>InSightsArtifacts</id> <name>InSightsArtifacts</name> 
+		<url>http://localhost:9005/nexus/content/repositories/InSightsArtifacts/</url> 
+		</snapshotRepository> </distributionManagement> -->
+
 	<distributionManagement>
-		   <snapshotRepository>
-			  <id>nexus</id>
-			  <url>http://insightsplatformnexusrepo.cogdevops.com:8001/nexus/content/repositories/buildonInsights</url>
-		   </snapshotRepository>
-	</distributionManagement> 
-	
-	<profiles>
-	   <profile>
-		<id>RunCobertura</id>
-		<activation>
-		  <activeByDefault>false</activeByDefault>
-		</activation>
+		<snapshotRepository>
+			<id>nexus</id>
+			<url>http://insightsplatformnexusrepo.cogdevops.com:8001/nexus/content/repositories/buildonInsights</url>
+		</snapshotRepository>
+	</distributionManagement>
 
-  <reporting>
-    <plugins>
-   <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>cobertura-maven-plugin</artifactId>
-        <version>2.7</version>
-        <reportSets>
-          <reportSet>
-            <reports>
-              <report>cobertura</report>
-            </reports>
-          </reportSet>
-        </reportSets>
-		<configuration>
-            <check />
-                <formats>
-                    <!--<format>html</format>-->
-                    <format>xml</format>
-                </formats>
-        </configuration>
-      </plugin>
-	</plugins>
-  </reporting>
-	</profile>
+	<profiles>
+		<profile>
+			<id>RunCobertura</id>
+			<activation>
+				<activeByDefault>false</activeByDefault>
+			</activation>
+
+			<reporting>
+				<plugins>
+					<plugin>
+						<groupId>org.codehaus.mojo</groupId>
+						<artifactId>cobertura-maven-plugin</artifactId>
+						<version>2.7</version>
+						<reportSets>
+							<reportSet>
+								<reports>
+									<report>cobertura</report>
+								</reports>
+							</reportSet>
+						</reportSets>
+						<configuration>
+							<check />
+							<formats>
+								<!--<format>html</format> -->
+								<format>xml</format>
+							</formats>
+						</configuration>
+					</plugin>
+				</plugins>
+			</reporting>
+		</profile>
 	</profiles>
-	
+
 
 </project>

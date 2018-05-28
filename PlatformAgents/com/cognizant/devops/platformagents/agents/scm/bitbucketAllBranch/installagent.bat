@@ -1,4 +1,10 @@
 REM pushd %INSIGHTS_AGENT_HOME%\PlatformAgents\bitbucketAllBranch
-nssm install BitBucketAgent %INSIGHTS_AGENT_HOME%\PlatformAgents\bitbucketAllBranch\BitBucketAgentAllBranches.bat
-sleep 2
-net start BitBucketAgent
+IF /I "%1%" == "UNINSTALL" (
+	net stop BitBucketAgent
+	sc delete BitBucketAgent
+) ELSE (
+	net stop BitBucketAgent
+	sc delete BitBucketAgent
+    nssm install BitBucketAgent %INSIGHTS_AGENT_HOME%\PlatformAgents\bitbucketAllBranch\BitBucketAgentAllBranches.bat
+    net start BitBucketAgent
+)
