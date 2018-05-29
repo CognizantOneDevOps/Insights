@@ -47,10 +47,10 @@ public class QueryCachingServiceImpl implements QueryCachingService {
 		JsonObject resultJson = null;
 		JsonParser parser = new JsonParser();
 		JsonObject requestJson = parser.parse(requestPayload).getAsJsonObject();
-		String isTestDB = requestJson.get(QueryCachingConstants.METADATA).getAsJsonArray().get(0).getAsJsonObject()
+		String isTestDBConnectivity = requestJson.get(QueryCachingConstants.METADATA).getAsJsonArray().get(0).getAsJsonObject()
 				.get("testDB").toString();
 		try {
-			if (isTestDB.equals("true")) {
+			if (isTestDBConnectivity.equals("true")) {
 				resultJson = getNeo4jDatasource(requestPayload);
 			} else {
 				resultJson = getEsCachedResults(requestPayload);
@@ -223,13 +223,14 @@ public class QueryCachingServiceImpl implements QueryCachingService {
 	}
 
 	private String loadEsQueryFromJsonFile(String fileName) {
-		JsonParser parser = new JsonParser();
+		// JsonParser parser = new JsonParser();
 		BufferedReader reader = null;
 		try {
 			InputStream in = getClass().getClassLoader().getResourceAsStream(fileName);
 			reader = new BufferedReader(new InputStreamReader(in));
-			Object obj = parser.parse(reader);
-			return obj.toString();
+			String queryStr = org.apache.commons.io.IOUtils.toString(reader);
+			// Object obj = parser.parse(reader);
+			return queryStr;
 		} catch (Exception e) {
 			log.error("Error in reading file!" + e);
 		}
