@@ -39,7 +39,8 @@
 	{
 		"creationTime": 
 		{
-			"order": "desc"
+			"order": "desc",
+			"unmapped_type": "long"
 		}
 	}
 }
