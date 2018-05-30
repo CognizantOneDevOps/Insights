@@ -25,9 +25,11 @@ gitCommitID = sh (
 	fi
 	echo " " ''').split()
 	if (fileExists('files.txt')) {
-		echo "**********************License is not updated in the following files**********************"
-    		sh 'cat files.txt'
-    		echo "*****************************************************************************************"
+		echo "#################################################################################################################"
+		echo "**********************LICENSE IS NOT UPDATED IN THE FOLLOWING LIST OF COMMA SEPARATED FILES *********************"
+		sh 'cat files.txt'
+		echo "*****************************************************************************************************************"
+		echo "#################################################################################################################"
     		slackSend channel: '#insightsjenkins', color: 'good', message: "BuildFailed for commitID - *$gitCommitID*, Branch - *$branchName* because Apache License is not updated in few files. \n List of files can be found at the bottom of the page @ https://buildon.cogdevops.com/buildon/HistoricCIWebController?commitId=$gitCommitID",  teamDomain: 'insightscogdevops',  token: slackToken
     		sh 'rm -rf files.txt'
     		sh 'exit 1'
