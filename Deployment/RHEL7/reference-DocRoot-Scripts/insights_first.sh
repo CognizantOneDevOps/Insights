@@ -19,8 +19,7 @@ cd /usr/
 sudo mkdir INSIGHTS_HOME
 cd INSIGHTS_HOME
 sudo wget http://platform.cogdevops.com/insights_install/installationScripts/latest/RHEL/InSightsConfig.zip
-sudo unzip InSightsConfig.zip && sudo rm -rf InSightsConfig.zip
-sudo cp -R InSightsConfig/.InSights/ .
+sudo unzip InSightsConfig.zip && sudo rm -rf InSightsConfig.zip && sudo rm -rf InSightsConfig
 export INSIGHTS_HOME=`pwd`
 sudo echo INSIGHTS_HOME=`pwd` | sudo tee -a /etc/environment
 sudo echo "export" INSIGHTS_HOME=`pwd` | sudo tee -a /etc/profile
