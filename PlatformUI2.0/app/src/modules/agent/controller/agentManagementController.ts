@@ -16,17 +16,14 @@
 
 module ISightApp {
 	export class AgentManagementController {
-		static $inject = ['$scope', '$http', '$filter', '$resource', 'agentService', 'restAPIUrlService', 'iconService', '$sce', '$mdDialog', '$cookies', 'toolConfigService', 'restEndpointService', '$window'];
+		static $inject = ['agentService', 'restAPIUrlService', 'iconService', '$sce', '$mdDialog', '$cookies', 'toolConfigService', 'restEndpointService'];
 		constructor(
-			private $scope,
-			private $http,
-			private $filter,
-			private $resource,
+
 			private agentService: IAgentService,
 			private restAPIUrlService: IRestAPIUrlService,
 			private iconService: IIconService,
 			private $sce,
-			private $mdDialog, private $cookies, private toolConfigService: IToolConfigService, private restEndpointService: IRestEndpointService, private $window) {
+			private $mdDialog, private $cookies, private toolConfigService: IToolConfigService, private restEndpointService: IRestEndpointService) {
 
 			var elem = document.querySelector('#homePageTemplateContainer');
 			var homePageControllerScope = angular.element(elem).scope();
@@ -53,11 +50,6 @@ module ISightApp {
 				"linux": "Linux",
 				"ubuntu": "Ubuntu",
 			};
-
-
-
-			//this.init($scope, $filter, agentService, $resource, $http, $window, self.homeController, $cookies, restAPIUrlService);
-			//this.initApp(this.$scope, this.$cookies, this.$http, this.agentService, homePageController, restAPIUrlService, this.$window);
 		}
 
 		datatypeVal: boolean;
