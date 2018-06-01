@@ -44,7 +44,6 @@ import org.jsoup.select.Elements;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
-import com.cognizant.devops.platformcommons.config.ApplicationConfigCache;
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.constants.MessageConstants;
 import com.cognizant.devops.platformcommons.core.enums.AGENTACTION;
@@ -481,34 +480,5 @@ public class AgentManagementServiceImpl implements AgentManagementService {
 	private String getAgentkey(String toolName) {
 		return toolName + "-" + Instant.now().toEpochMilli();
 	}
-
-	/*
-	 * public static void main(String args[]) {
-	 * ApplicationConfigCache.loadConfigCache(); AgentManagementServiceImpl agentObj
-	 * = new AgentManagementServiceImpl(); JsonObject tracking = new JsonObject();
-	 * tracking.addProperty("Test", "Test123"); String config =
-	 * "{\"mqConfig\":{\"user\":\"iSight\",\"password\":\"iSight\",\"host\":\"127.0.0.1\","
-	 * +
-	 * "\"exchange\":\"iSight\",\"agentControlXchg\":\"iAgent\"},\"subscribe\":{\"config\":\"SCM.GIT.config\"},"
-	 * +
-	 * "\"publish\":{\"data\":\"SCM.GIT.DATA\",\"health\":\"SCM.GIT.HEALTH\"},\"communication\":{\"type\":\"REST\"},"
-	 * +
-	 * "\"dynamicTemplate\":{\"responseTemplate\":{\"sha\":\"commitId\",\"commit\":{\"author\":"
-	 * +
-	 * "{\"name\":\"authorName\",\"date\":\"commitTime\"}}}},\"enableBranches\":false,\"toolCategory\""
-	 * +
-	 * ":\"SCM\",\"toolsTimeZone\":\"GMT\",\"insightsTimeZone\":\"Asia/Kolkata\",\"useResponseTemplate\":true,"
-	 * +
-	 * "\"auth\":\"base64\",\"runSchedule\":30,\"timeStampField\":\"commitTime\",\"timeStampFormat\":\"%Y-%m-%dT%H:"
-	 * +
-	 * "%M:%SZ\",\"startFrom\":\"2016-10-10 15:46:33\",\"accessToken\":\"accesstoken\",\"getRepos\":"
-	 * +
-	 * "\"https://api.github.com/users/<USER_NAME>/repos\",\"commitsBaseEndPoint\":"
-	 * +
-	 * "\"https://api.github.com/repos/<REPO_NAME>/\",\"isDebugAllowed\":false,\"loggingSetting\":{\"logLevel\":"
-	 * + "\"WARN\"}}"; try { agentObj.registerAgent("git", "v1.0", "windows",
-	 * config, tracking.toString()); } catch (InsightsCustomException e) { // TODO
-	 * Auto-generated catch block e.printStackTrace(); } }
-	 */
 
 }
