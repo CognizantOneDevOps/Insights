@@ -33,7 +33,6 @@ import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 
-import com.cognizant.devops.platformcommons.config.ApplicationConfigCache;
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.constants.ConfigOptions;
 import com.cognizant.devops.platformcommons.core.util.DataPurgingUtils;
@@ -53,7 +52,7 @@ public class DataPurgingExecutor implements Job {
 
 	private static Logger log = Logger.getLogger(DataPurgingExecutor.class.getName());
 	private static final String DATE_TIME_FORMAT = "yyyy/MM/dd hh:mm a";
-	private static final double MAXIMUM_BACKUP_FILE_SIZE = 0.3000d;
+	private static final double MAXIMUM_BACKUP_FILE_SIZE = 5.0000d;
 	
 	public void execute(JobExecutionContext context) throws JobExecutionException {
 		if (ApplicationConfigProvider.getInstance().isEnableOnlineBackup()) {
@@ -435,16 +434,17 @@ public class DataPurgingExecutor implements Job {
 		}
 	}
 	
+	/*
 	public static void main(String[] a){
 		ApplicationConfigCache.loadConfigCache();
 		DataPurgingExecutor dataPurgingExecutor = new DataPurgingExecutor();
 		dataPurgingExecutor.performDataPurging();
-		/*long epochTime = InsightsUtils.getTimeBeforeDays(300L);
+		long epochTime = InsightsUtils.getTimeBeforeDays(300L);
 		System.out.println("epoch time:>>"+epochTime );
 	
 		Boolean scheduleFlag = dataPurgingExecutor.checkDataPurgingJobSchedule();
 		System.out.println("Can we do purging? ---"+ scheduleFlag);
-		dataPurgingExecutor.updateRunTimeIntoDatabase();*/		
-	}
+		dataPurgingExecutor.updateRunTimeIntoDatabase();		
+	}*/
 
 }
