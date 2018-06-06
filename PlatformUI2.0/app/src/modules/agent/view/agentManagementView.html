@@ -109,7 +109,8 @@
 			<textarea ng-model="agentManagementController.dynamicData" rows="5" class="frmTxtarea"></textarea>
 		</div>
 
-		<div class="agentConfigTable" layout layout-align="start center" ng-if="agentManagementController.showConfig" style="margin-top: 10px">
+		<div class="agentConfigTable" layout layout-align="start center" ng-if="agentManagementController.showConfig && agentManagementController.showTrackingJsonUploadButton"
+		 style="margin-top: 10px">
 			<table class="md-api-table-landing">
 				<thead class="theadCss">
 					<tr layout="row" layout-align="start start">
