@@ -68,7 +68,7 @@ public class DataPurgingUtils {
 	 */
 	public static String getLastRunTime(JsonObject settingsJsonObject) {
 		String lastRunTime = null;
-		if (settingsJsonObject != null) {
+		if (settingsJsonObject != null && settingsJsonObject.get(ConfigOptions.LAST_RUN_TIME)!= null) {
 			lastRunTime = settingsJsonObject.get(ConfigOptions.LAST_RUN_TIME).getAsString();
 		}
 		return lastRunTime;
@@ -81,7 +81,7 @@ public class DataPurgingUtils {
 	 */
 	public static String getNextRunTime(JsonObject settingsJsonObject) {
 		String nextRunTime = null;
-		if (settingsJsonObject != null) {
+		if (settingsJsonObject != null && settingsJsonObject.get(ConfigOptions.NEXT_RUN_TIME)!= null) {
 			nextRunTime = settingsJsonObject.get(ConfigOptions.NEXT_RUN_TIME).getAsString();
 		}
 		return nextRunTime;
@@ -94,7 +94,7 @@ public class DataPurgingUtils {
 	 */
 	public static String getDataArchivalFrequency(JsonObject settingsJsonObject) {
 		String dataArchivalFrequency = null;
-		if (settingsJsonObject != null) {
+		if (settingsJsonObject != null && settingsJsonObject.get(ConfigOptions.DATA_ARCHIVAL_FREQUENCY)!= null) {
 			dataArchivalFrequency = settingsJsonObject.get(ConfigOptions.DATA_ARCHIVAL_FREQUENCY).getAsString();
 		}
 		return dataArchivalFrequency;
