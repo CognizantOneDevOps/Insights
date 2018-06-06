@@ -106,6 +106,11 @@ public class AgentManagementServiceImpl implements AgentManagementService {
 			sendAgentPackage(data, AGENTACTION.REGISTER.name(), fileName, agentId, toolName, osversion);
 			performAgentAction(agentId, AGENTACTION.START.name());
 
+			// Delete tracking.json
+			if (!trackingDetails.isEmpty()) {
+				deleteTrackingJson(toolName);
+			}
+
 			// register agent in DB
 			AgentConfigDAL agentConfigDAL = new AgentConfigDAL();
 			agentConfigDAL.saveAgentConfigFromUI(agentId, json.get("toolCategory").getAsString(), toolName, json,
@@ -410,6 +415,33 @@ public class AgentManagementServiceImpl implements AgentManagementService {
 
 	}
 
+	private String deleteTrackingJson(String toolName) throws IOException {
+		String filePath = ApplicationConfigProvider.getInstance().getAgentDetails().getUnzipPath() + File.separator
+				+ toolName;
+		File trackingFile = null;
+		// Writing json to file
+		Path dir = Paths.get(filePath);
+		try (Stream<Path> paths = Files.find(dir, Integer.MAX_VALUE,
+				(path, attrs) -> attrs.isRegularFile() && path.toString().endsWith("config.json"))) {
+
+			trackingFile = paths.limit(1).findFirst().get().toFile();
+			trackingFile = trackingFile.getParentFile();
+			dir = Paths.get(trackingFile.toString() + File.separator + "tracking.json");
+			trackingFile = dir.toFile();
+		}
+		try {
+			if (trackingFile.exists()) {
+				trackingFile.delete();
+			}
+		} catch (NullPointerException e) {
+			log.error("No tracking json file found!", e);
+			throw e;
+		}
+
+		return SUCCESS;
+
+	}
+
 	private void sendAgentPackage(byte[] data, String action, String fileName, String agentId, String toolName,
 			String osversion) throws IOException, TimeoutException {
 		Map<String, Object> headers = new HashMap<>();
@@ -480,5 +512,4 @@ public class AgentManagementServiceImpl implements AgentManagementService {
 	private String getAgentkey(String toolName) {
 		return toolName + "-" + Instant.now().toEpochMilli();
 	}
-
 }
