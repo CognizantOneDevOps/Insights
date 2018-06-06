@@ -290,4 +290,36 @@ public class InsightsUtils {
 		return dtf.format(now);
 	}
 	
+	/**
+	 * 
+	 * Calculates difference between currentTime and lastRunTime
+	 * (now - lastRunTime)
+	 * @param lastRunTime
+	 * @return
+	 */ 
+	public static long getDifferenceFromLastRunTime(long lastRunTime){
+		ZonedDateTime now = ZonedDateTime.now(InsightsUtils.zoneId);
+		ZonedDateTime lastRunTimeInput = ZonedDateTime.ofInstant(Instant.ofEpochSecond(lastRunTime), InsightsUtils.zoneId);
+		Duration d = Duration.between(lastRunTimeInput,now);		
+		return d.abs().toMillis();
+	}
+
+	/**
+	 * Calculates difference between nextRunTime and lastRunTime
+	 * (nextRunTime - lastRunTime )
+	 * @param lastRunTime
+	 * @param nextRunTime
+	 * @return
+	 */
+	public static long getDifferenceFromNextRunTime(Long lastRunTime, Long nextRunTime){
+		ZonedDateTime lastRunTimeInput = ZonedDateTime.ofInstant(Instant.ofEpochSecond(lastRunTime), InsightsUtils.zoneId);
+		ZonedDateTime nextRunTimeInput = ZonedDateTime.ofInstant(Instant.ofEpochSecond(nextRunTime), InsightsUtils.zoneId);
+		Duration d = Duration.between(lastRunTimeInput, nextRunTimeInput);
+		return d.abs().toMillis();
+	}
+
+
+
+
+	
 }
