@@ -35,6 +35,7 @@ module ISightApp {
 			self.getOsVersionTools("");
 			self.getSelectedAgentDetails();
 			self.showConfig = false;
+			self.showTrackingJsonUploadButton = self.homeController.showTrackingJsonUploadButton;
 
 			if (self.editAgentDetails['type'] == "update") {
 				self.getDbAgentConfig(self.editAgentDetails['agentid']);
@@ -88,6 +89,7 @@ module ISightApp {
 		files = [];
 		fileUploadSuccessMessage: boolean = false;
 		trackingUploadedFileContentStr: string = "";
+		showTrackingJsonUploadButton: boolean;
 
 		getOsVersionTools(Selversion): void {
 
