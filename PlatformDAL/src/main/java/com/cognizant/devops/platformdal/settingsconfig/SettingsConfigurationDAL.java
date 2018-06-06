@@ -19,14 +19,16 @@ import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.hibernate.query.Query;
 
 import com.cognizant.devops.platformcommons.constants.ConfigOptions;
+import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformdal.core.BaseDAL;
 
 public class SettingsConfigurationDAL extends BaseDAL {
 	
-	
+	private static Logger log = Logger.getLogger(SettingsConfigurationDAL.class.getName());
 
 	public Boolean saveSettingsConfiguration(SettingsConfiguration settingsConfiguration) {
 		Query<SettingsConfiguration> createQuery = getSession().createQuery(
@@ -85,16 +87,22 @@ public class SettingsConfigurationDAL extends BaseDAL {
 		return null;
 	}
 	
-	public void updateSettingJson(String modifiedSettingJson) {
-		SettingsConfiguration settingsConfiguration = loadSettingsConfiguration(ConfigOptions.DATAPURGING_SETTINGS_TYPE);
-		getSession().beginTransaction();
-		if (settingsConfiguration != null) {
-			settingsConfiguration.setSettingsJson(modifiedSettingJson);
-			getSession().update(settingsConfiguration);
-		}
-		getSession().getTransaction().commit();
-		terminateSession();
-		terminateSessionFactory();
+	public void updateSettingJson(String modifiedSettingJson)throws InsightsCustomException {
+		try {
+			SettingsConfiguration settingsConfiguration = loadSettingsConfiguration(ConfigOptions.DATAPURGING_SETTINGS_TYPE);
+			getSession().beginTransaction();
+			if (settingsConfiguration != null) {
+				settingsConfiguration.setSettingsJson(modifiedSettingJson);
+				getSession().update(settingsConfiguration);
+			}
+			getSession().getTransaction().commit();
+			terminateSession();
+			terminateSessionFactory();
+		}		
+		catch(Exception e){
+			log.error("Error in updating setting_json column of settings_configuration table", e);
+			throw new InsightsCustomException(e.toString());
+		}		
 	}
 		
 }
