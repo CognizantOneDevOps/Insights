@@ -18,8 +18,6 @@ package com.cognizant.devops.platformengine.modules.datapurging;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.time.Duration;
-import java.time.Instant;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -35,6 +33,7 @@ import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 
+import com.cognizant.devops.platformcommons.config.ApplicationConfigCache;
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.constants.ConfigOptions;
 import com.cognizant.devops.platformcommons.core.util.DataPurgingUtils;
@@ -42,6 +41,7 @@ import com.cognizant.devops.platformcommons.core.util.InsightsUtils;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBException;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphResponse;
 import com.cognizant.devops.platformcommons.dal.neo4j.Neo4jDBHandler;
+import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformdal.settingsconfig.SettingsConfigurationDAL;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
@@ -53,7 +53,8 @@ public class DataPurgingExecutor implements Job {
 
 	private static Logger log = Logger.getLogger(DataPurgingExecutor.class.getName());
 	private static final String DATE_TIME_FORMAT = "yyyy/MM/dd hh:mm a";
-
+	private static final double MAXIMUM_BACKUP_FILE_SIZE = 0.3000d;
+	
 	public void execute(JobExecutionContext context) throws JobExecutionException {
 		if (ApplicationConfigProvider.getInstance().isEnableOnlineBackup()) {
 			if(checkDataPurgingJobSchedule()) {
@@ -67,10 +68,8 @@ public class DataPurgingExecutor implements Job {
 		String rowLimit = null ;
 		String backupFileLocation = null ;
 		long backupDurationInDays = 0;
-		String backupFileFormat = null;
 		//Internally defined backup file name prefix
 		String backupFilePrefix = "neo4jDataArchive";
-		boolean isCsvFormat = false;
 
 		/**
 		 * To get Settings Configuration which is set by User from Insights application UI
@@ -80,82 +79,132 @@ public class DataPurgingExecutor implements Job {
 		if (configJsonObj != null) {
 			rowLimit = configJsonObj.get(ConfigOptions.ROW_LIMIT).getAsString();
 			backupFileLocation = configJsonObj.get(ConfigOptions.BACKUP_FILE_LOCATION).getAsString();	
-			backupFileFormat = configJsonObj.get(ConfigOptions.BACKUP_FILE_FORMAT).getAsString();
 			backupDurationInDays = configJsonObj.get(ConfigOptions.BACKUP_DURATION_IN_DAYS).getAsLong();
 		}
-
-		if (ConfigOptions.CSV_FORMAT.equals(backupFileFormat)) {
-			isCsvFormat = true;
-		} else if (ConfigOptions.JSON_FORMAT.equals(backupFileFormat)) {
-			isCsvFormat = false;	
-		}
-
+		boolean deleteFlag = true;
+		List<GraphResponse> responseList = new ArrayList<>();
 		//Converts into epoch time in seconds as data inside inSightsTime property is stored in epoch seconds  
 		long epochTime = InsightsUtils.getTimeBeforeDaysInSeconds(backupDurationInDays);
 		Neo4jDBHandler dbHandler = new Neo4jDBHandler();
-		GraphResponse response = null;
-		int splitlength = 0;
-		boolean successFlag = false;
 		try {
-			int count = getNodeCount(dbHandler,epochTime);
-			while(splitlength  < count){
-				boolean deleteFlag = true;
-				try{
-					response = executeCypherQuery(rowLimit,splitlength,epochTime) ;
-				}
-				catch (GraphDBException e){
-					log.error("Exception occured while selecting matching records for a specific data rentention period:" + e);
-					deleteFlag = false;
-				}
-				String localDateTime = InsightsUtils.getLocalDateTime("yyyyMMddHHmmss");
-				String location = backupFileLocation + File.separator + backupFilePrefix + "_" + splitlength + "_" + localDateTime; 
-				try{
-					if (isCsvFormat) {
-						writeToCSVFile(response,location);
-					} else {
-						writeToJsonFile(response,location);	
-					}
-				}
-				catch (IOException e) {
-					log.error("Exception occured while taking backup of data in DataPurgingExecutor Job: " + e);
-					deleteFlag = false;
-				}
-
-				//delete call with modified query
-				if(deleteFlag){
-					String deleteQry = "MATCH (n:DATA) where n.inSightsTime < "+ epochTime  +" with n skip "+ splitlength
-												+" limit " + rowLimit + " detach delete n ";
-					try {
-						dbHandler.executeCypherQuery(deleteQry);
-
-					} catch (GraphDBException e) {
-						log.error("Exception occured while deleting DATA nodes of Neo4j database inside DataPurgingExecutor Job: " + e);
-					}
-				}
-				splitlength = splitlength + Integer.parseInt(rowLimit);
-				successFlag = successFlag || deleteFlag;
-			}
-		} 
-		catch (GraphDBException e) {
-			log.error("Exception occured while getting total node count of all data nodes in DataPurgingExecutor Job: " + e);
+			responseList = getAllOrphanNodesInfo(responseList, rowLimit, epochTime, dbHandler);
+			responseList = getNodesRelationshipsInfo(responseList, rowLimit, epochTime, dbHandler);	
+			
+			String localDateTime = InsightsUtils.getLocalDateTime("yyyyMMddHHmmss");
+			String fileLocation = backupFileLocation + File.separator + backupFilePrefix + "_" + localDateTime;
+			writeToJsonFile(responseList, fileLocation);
+			
+		} catch (GraphDBException e) {
+			log.error("Exception occured while selecting matching records for a specific data rentention period:" + e);
+			deleteFlag = false;
+		} catch (IOException e) {
+			log.error("Exception occured while taking backup of data in DataPurgingExecutor Job: " + e);
+			deleteFlag = false;
 		}
-		if(successFlag){
-			// Update lastRunTime and nextRunTine into the database as per dataArchivalFrequency
+		//delete all nodes along with its relationships for which data backup is already taken
+		/*if(deleteFlag){
+			String deleteQry = "MATCH (n:DATA) WHERE n.inSightsTime <"+ epochTime  +" detach delete n ";
+			try {
+				dbHandler.executeCypherQuery(deleteQry);
+
+			} catch (GraphDBException e) {
+				log.error("Exception occured while deleting DATA nodes of Neo4j database inside DataPurgingExecutor Job: " + e);
+			}
+		}*/		 
+
+		try {
+			// Update lastRunTime and nextRunTine into the database as per dataArchivalFrequency	
 			updateRunTimeIntoDatabase();
+		} catch (InsightsCustomException e) {
+			log.error("Exception occured while updating lastRunTime and nextRunTime in DataPurgingExecutor Job: " + e);
 		}
 	}
+	
+	/**
+	 * Fetches all orphan nodes info along with its labels, properties
+	 * @param resultList
+	 * @param rowLimit
+	 * @param epochTime
+	 * @param dbHandler
+	 * @return
+	 * @throws GraphDBException
+	 */
+	private List<GraphResponse> getAllOrphanNodesInfo(List<GraphResponse> resultList, String rowLimit, long epochTime,
+			Neo4jDBHandler dbHandler) throws GraphDBException {
+		GraphResponse response = null;
+		int splitlength = 0;
+		try {
+			int count = getOrphanNodeCount(dbHandler, epochTime);
+			while (splitlength < count) {
+				response = getOrphanNodesInfo(rowLimit, splitlength, epochTime);
+				resultList.add(response);
+				splitlength = splitlength + Integer.parseInt(rowLimit);
 
-	private int getNodeCount(Neo4jDBHandler dbHandler,long epochTime) throws GraphDBException {
-		String cntQry = "MATCH (n:DATA)  where n.inSightsTime < "+ epochTime  +" return count(n) ";
+			}
+		} catch (GraphDBException e) {
+			log.error(
+					"Exception occured while getting information of all orphan data nodes in DataPurgingExecutor Job: "
+							+ e);
+		}
+		return resultList;
+	}
+	
+	/**
+	 * Fetches all nodes along with its relationships, start node, end node and properties info
+	 * @param resultList
+	 * @param rowLimit
+	 * @param epochTime
+	 * @param dbHandler
+	 * @return
+	 * @throws GraphDBException
+	 */
+	private List<GraphResponse> getNodesRelationshipsInfo(List<GraphResponse> resultList, String rowLimit, long epochTime,
+			Neo4jDBHandler dbHandler)throws GraphDBException {
+		GraphResponse response = null;
+		int splitlength = 0;
+		try {
+			int count = getNodesWithRelationshipsCount(dbHandler, epochTime);
+			while (splitlength < count) {
+				response = getNodesWithRelationshipInfo(rowLimit, splitlength, epochTime);
+				resultList.add(response);
+				splitlength = splitlength + Integer.parseInt(rowLimit);
+
+			}
+		} catch (GraphDBException e) {
+			log.error(
+					"Exception occured while getting information of all nodes with relationships in DataPurgingExecutor Job:"
+							+ e);
+			throw e;
+		}
+		return resultList;
+	}
+	
+	private int getOrphanNodeCount(Neo4jDBHandler dbHandler,long epochTime) throws GraphDBException {
+		String cntQry = "MATCH (n:DATA) WHERE not (n)-[]-() and n.inSightsTime<"+ epochTime +" return count(*)" ;
 		GraphResponse cntResponse = dbHandler.executeCypherQuery(cntQry);
-		int count = cntResponse.getJson() .get("results").getAsJsonArray().get(0).getAsJsonObject().get("data").getAsJsonArray()
+		int count = cntResponse.getJson().get("results").getAsJsonArray().get(0).getAsJsonObject().get("data").getAsJsonArray()
+				.get(0).getAsJsonObject().get("row").getAsInt();
+		return count;
+	}
+	
+	private int getNodesWithRelationshipsCount(Neo4jDBHandler dbHandler,long epochTime) throws GraphDBException {
+		String cntQry = "MATCH (n:DATA)-[r]->(m:DATA) where n.inSightsTime<"+ epochTime +" return count(*)" ;
+		GraphResponse cntResponse = dbHandler.executeCypherQuery(cntQry);
+		int count = cntResponse.getJson().get("results").getAsJsonArray().get(0).getAsJsonObject().get("data").getAsJsonArray()
 				.get(0).getAsJsonObject().get("row").getAsInt();
 		return count;
 	}
 
-	private GraphResponse executeCypherQuery(String limit, int splitlength, long epochTime) throws GraphDBException {
+	private GraphResponse getOrphanNodesInfo(String limit, int splitlength, long epochTime) throws GraphDBException {
 		Neo4jDBHandler dbHandler = new Neo4jDBHandler();
-		String query = "MATCH (n:DATA)  where n.inSightsTime < "+ epochTime  +"   return n skip  "+ splitlength +" limit  " +limit;
+		String query = "MATCH (n:DATA) WHERE not(n)-[]-() and n.inSightsTime<"+ epochTime +" return n skip "+ splitlength +" limit " +limit;
+		GraphResponse response = dbHandler.executeCypherQuery(query);
+		return response;
+	}
+	
+	private GraphResponse getNodesWithRelationshipInfo(String limit, int splitlength, long epochTime) throws GraphDBException {
+		Neo4jDBHandler dbHandler = new Neo4jDBHandler();
+		String query = "MATCH (n:DATA)-[r]->(m:DATA) where n.inSightsTime<"+ epochTime +" return distinct n,r,m skip "+ splitlength +" limit " +limit;
 		GraphResponse response = dbHandler.executeCypherQuery(query);
 		return response;
 	}
@@ -168,30 +217,82 @@ public class DataPurgingExecutor implements Job {
 	 * @param location
 	 * @throws IOException
 	 */
-	private void writeToJsonFile(GraphResponse response, String location) throws IOException {
-		String jsonFileLocation = location + ".json";
-		JsonArray array = response.getJson().get("results").getAsJsonArray().get(0).getAsJsonObject().get("data").getAsJsonArray();
+
+	private void writeToJsonFile(List<GraphResponse> responseList,String fileLocation) throws IOException {		
+		JsonObject graphObj=new JsonObject();
+		JsonArray nodeArray = new JsonArray();
+		JsonArray relArray = new JsonArray();	
+		
+		JsonObject resultObj= new JsonObject();
+		resultObj.add("graph", graphObj);
+		graphObj.add("nodes", nodeArray);
+		graphObj.add("relationships", relArray);
+		int noOfFiles = 1;
 		StringBuilder sb = new StringBuilder();
-		for(JsonElement element : array) {
-			JsonElement jsonElement = element.getAsJsonObject().get("row").getAsJsonArray().get(0);
-			JsonObject jsonObject = jsonElement.getAsJsonObject();
-			sb.append(jsonObject.toString());
-			sb.append(",");
+		for (GraphResponse response:responseList) {
+			JsonArray array = response.getJson().get("results").getAsJsonArray().get(0).getAsJsonObject().get("data").getAsJsonArray();			
+			for(JsonElement element : array) {
+				JsonObject jsonObject = element.getAsJsonObject().get("graph").getAsJsonObject();
+				JsonArray nodes = jsonObject.get("nodes").getAsJsonArray();	
+				for(JsonElement node : nodes) {
+					nodeArray.add(node);
+				}
+				JsonArray rel = jsonObject.get("relationships").getAsJsonArray();
+				if (rel.size()>0) {
+					relArray.add(rel.get(0));
+				}
+			}			
+			sb = new StringBuilder();
+			sb.append(resultObj.toString());
+			String outputString = sb.toString();
+			double dataSizeinMB = getOutputDataSize(outputString);
+			if(dataSizeinMB > MAXIMUM_BACKUP_FILE_SIZE){
+				String jsonFileLocation = fileLocation +"_" + noOfFiles +".json";
+				try (FileWriter fileWriter = new FileWriter(jsonFileLocation);) {
+					fileWriter.write(outputString);
+					fileWriter.flush();
+				}
+				catch (IOException e) {
+					log.error("Error in writeToJsonFile method" + e);
+					throw e;
+				}
+				noOfFiles++;				
+				graphObj = new JsonObject();
+				nodeArray = new JsonArray();
+				relArray = new JsonArray();
+				resultObj= new JsonObject();
+				resultObj.add("graph", graphObj);
+				graphObj.add("nodes", nodeArray);
+				graphObj.add("relationships", relArray);
+			}		
 		}
 		String outputString = sb.toString();
-		//Removes last appended ',' from output string
-		outputString = outputString.substring(0,outputString.length()-1);
-		//Adds entire output string inside [] bracket
-		outputString = "[" + outputString +"]";
-		try (FileWriter fileWriter = new FileWriter(jsonFileLocation);) {
-			fileWriter.write(outputString);
-			fileWriter.flush();
-		}
-		catch (IOException e) {
-			log.error("Error in writeToJsonFile method" + e);
-			throw e;
-		} 
+		double dataSizeinMB = getOutputDataSize(outputString);
+		if(dataSizeinMB < MAXIMUM_BACKUP_FILE_SIZE) {			
+			String jsonFileLocation = fileLocation +"_" + noOfFiles +".json";
+			try (FileWriter fileWriter = new FileWriter(jsonFileLocation);) {
+				fileWriter.write(outputString);
+				fileWriter.flush();
+			}
+			catch (IOException e) {
+				log.error("Error in writeToJsonFile method" + e);		
+				throw e;
+			}
+		}		
 	}
+
+
+	/**
+	 * Return size of output data in MB
+	 * @param outputData
+	 * @return
+	 */
+	private double getOutputDataSize(String outputData) {
+		double dataSizeinKB = outputData.getBytes().length/1024;
+		double dataSizeinMB = dataSizeinKB/1024;
+		return dataSizeinMB;
+	} 
+
 
 
 	/**
@@ -201,6 +302,7 @@ public class DataPurgingExecutor implements Job {
 	 * @param location
 	 * @throws IOException
 	 */
+	@SuppressWarnings("unused")
 	private void writeToCSVFile(GraphResponse response, String location) throws IOException {
 		String csvFileLocation = location + ".csv";
 		JsonArray array = response.getJson().get("results").getAsJsonArray().get(0).getAsJsonObject().get("data").getAsJsonArray();
@@ -283,8 +385,8 @@ public class DataPurgingExecutor implements Job {
 		String nextRunTimeStr = DataPurgingUtils.getNextRunTime(settingsJsonObject);
 		Long lastRunTime = parseDateIntoEpochSeconds(lastRunTimeStr);
 		Long nextRunTime = parseDateIntoEpochSeconds(nextRunTimeStr);
-		Long x = getDifferenceFromLastRunTime(lastRunTime);
-		Long y = getDifferenceFromNextRunTime(lastRunTime, nextRunTime);
+		Long x = InsightsUtils.getDifferenceFromLastRunTime(lastRunTime);
+		Long y = InsightsUtils.getDifferenceFromNextRunTime(lastRunTime, nextRunTime);
 		if (x > y) {
 			return Boolean.TRUE;
 		}
@@ -309,42 +411,13 @@ public class DataPurgingExecutor implements Job {
 		return 0L;
 	}
 
-	/**
-	 * 
-	 * Calculates difference between currentTime and lastRunTime
-	 * (now - lastRunTime)
-	 * @param lastRunTime
-	 * @return
-	 */ 
-	private long getDifferenceFromLastRunTime(long lastRunTime){
-		ZonedDateTime now = ZonedDateTime.now(InsightsUtils.zoneId);
-		ZonedDateTime lastRunTimeInput = ZonedDateTime.ofInstant(Instant.ofEpochSecond(lastRunTime), InsightsUtils.zoneId);
-		Duration d = Duration.between(lastRunTimeInput,now);		
-		return d.abs().toMillis();
-	}
-
-	/**
-	 * Calculates difference between nextRunTime and lastRunTime
-	 * (nextRunTime - lastRunTime )
-	 * @param lastRunTime
-	 * @param nextRunTime
-	 * @return
-	 */
-	private long getDifferenceFromNextRunTime(Long lastRunTime, Long nextRunTime){
-		ZonedDateTime lastRunTimeInput = ZonedDateTime.ofInstant(Instant.ofEpochSecond(lastRunTime), InsightsUtils.zoneId);
-		ZonedDateTime nextRunTimeInput = ZonedDateTime.ofInstant(Instant.ofEpochSecond(nextRunTime), InsightsUtils.zoneId);
-		Duration d = Duration.between(lastRunTimeInput, nextRunTimeInput);
-		return d.abs().toMillis();
-	}
-
-
-
-	/**
+		/**
 	 * Updates lastRunTime in db with current date time,
 	 * Calculates nextRunTime as per dataArchivalFrequency,
 	 * Updates nextRunTime into the database
+	 * @throws InsightsCustomException 
 	 */
-	private void updateRunTimeIntoDatabase() {
+	private void updateRunTimeIntoDatabase() throws InsightsCustomException {
 		JsonObject settingsJsonObject = getSettingsJsonObject();
 		String dataArchivalFrequency = DataPurgingUtils.getDataArchivalFrequency(settingsJsonObject);
 		//Captures current date time to update lastRunTime
@@ -360,6 +433,18 @@ public class DataPurgingExecutor implements Job {
 			SettingsConfigurationDAL settingsConfigurationDAL = new SettingsConfigurationDAL();
 			settingsConfigurationDAL.updateSettingJson(modifiedSettingsJson);
 		}
+	}
+	
+	public static void main(String[] a){
+		ApplicationConfigCache.loadConfigCache();
+		DataPurgingExecutor dataPurgingExecutor = new DataPurgingExecutor();
+		dataPurgingExecutor.performDataPurging();
+		/*long epochTime = InsightsUtils.getTimeBeforeDays(300L);
+		System.out.println("epoch time:>>"+epochTime );
+	
+		Boolean scheduleFlag = dataPurgingExecutor.checkDataPurgingJobSchedule();
+		System.out.println("Can we do purging? ---"+ scheduleFlag);
+		dataPurgingExecutor.updateRunTimeIntoDatabase();*/		
 	}
 
 }
