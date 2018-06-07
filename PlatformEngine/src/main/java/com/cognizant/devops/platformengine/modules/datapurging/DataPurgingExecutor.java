@@ -55,10 +55,8 @@ public class DataPurgingExecutor implements Job {
 	private static final double MAXIMUM_BACKUP_FILE_SIZE = 5.0000d;
 	
 	public void execute(JobExecutionContext context) throws JobExecutionException {
-		if (ApplicationConfigProvider.getInstance().isEnableOnlineBackup()) {
-			if(checkDataPurgingJobSchedule()) {
-				performDataPurging();		
-			}
+		if (ApplicationConfigProvider.getInstance().isEnableOnlineBackup() && checkDataPurgingJobSchedule()) {
+			performDataPurging();		
 		} 
 	}
 
@@ -101,7 +99,7 @@ public class DataPurgingExecutor implements Job {
 			deleteFlag = false;
 		}
 		//delete all nodes along with its relationships for which data backup is already taken
-		/*if(deleteFlag){
+		if(deleteFlag){
 			String deleteQry = "MATCH (n:DATA) WHERE n.inSightsTime <"+ epochTime  +" detach delete n ";
 			try {
 				dbHandler.executeCypherQuery(deleteQry);
@@ -109,7 +107,7 @@ public class DataPurgingExecutor implements Job {
 			} catch (GraphDBException e) {
 				log.error("Exception occured while deleting DATA nodes of Neo4j database inside DataPurgingExecutor Job: " + e);
 			}
-		}*/		 
+		}	 
 
 		try {
 			// Update lastRunTime and nextRunTine into the database as per dataArchivalFrequency	
@@ -181,31 +179,27 @@ public class DataPurgingExecutor implements Job {
 	private int getOrphanNodeCount(Neo4jDBHandler dbHandler,long epochTime) throws GraphDBException {
 		String cntQry = "MATCH (n:DATA) WHERE not (n)-[]-() and n.inSightsTime<"+ epochTime +" return count(*)" ;
 		GraphResponse cntResponse = dbHandler.executeCypherQuery(cntQry);
-		int count = cntResponse.getJson().get("results").getAsJsonArray().get(0).getAsJsonObject().get("data").getAsJsonArray()
+		return cntResponse.getJson().get("results").getAsJsonArray().get(0).getAsJsonObject().get("data").getAsJsonArray()
 				.get(0).getAsJsonObject().get("row").getAsInt();
-		return count;
 	}
 	
 	private int getNodesWithRelationshipsCount(Neo4jDBHandler dbHandler,long epochTime) throws GraphDBException {
 		String cntQry = "MATCH (n:DATA)-[r]->(m:DATA) where n.inSightsTime<"+ epochTime +" return count(*)" ;
 		GraphResponse cntResponse = dbHandler.executeCypherQuery(cntQry);
-		int count = cntResponse.getJson().get("results").getAsJsonArray().get(0).getAsJsonObject().get("data").getAsJsonArray()
+		return cntResponse.getJson().get("results").getAsJsonArray().get(0).getAsJsonObject().get("data").getAsJsonArray()
 				.get(0).getAsJsonObject().get("row").getAsInt();
-		return count;
 	}
 
 	private GraphResponse getOrphanNodesInfo(String limit, int splitlength, long epochTime) throws GraphDBException {
 		Neo4jDBHandler dbHandler = new Neo4jDBHandler();
 		String query = "MATCH (n:DATA) WHERE not(n)-[]-() and n.inSightsTime<"+ epochTime +" return n skip "+ splitlength +" limit " +limit;
-		GraphResponse response = dbHandler.executeCypherQuery(query);
-		return response;
+		return dbHandler.executeCypherQuery(query);
 	}
 	
 	private GraphResponse getNodesWithRelationshipInfo(String limit, int splitlength, long epochTime) throws GraphDBException {
 		Neo4jDBHandler dbHandler = new Neo4jDBHandler();
 		String query = "MATCH (n:DATA)-[r]->(m:DATA) where n.inSightsTime<"+ epochTime +" return distinct n,r,m skip "+ splitlength +" limit " +limit;
-		GraphResponse response = dbHandler.executeCypherQuery(query);
-		return response;
+		return dbHandler.executeCypherQuery(query);
 	}
 
 	/**
@@ -287,9 +281,8 @@ public class DataPurgingExecutor implements Job {
 	 * @return
 	 */
 	private double getOutputDataSize(String outputData) {
-		double dataSizeinKB = outputData.getBytes().length/1024;
-		double dataSizeinMB = dataSizeinKB/1024;
-		return dataSizeinMB;
+		double dataSizeinKB = (double)outputData.getBytes().length /1024;
+		return (dataSizeinKB/1024);
 	} 
 
 
@@ -433,18 +426,4 @@ public class DataPurgingExecutor implements Job {
 			settingsConfigurationDAL.updateSettingJson(modifiedSettingsJson);
 		}
 	}
-	
-	/*
-	public static void main(String[] a){
-		ApplicationConfigCache.loadConfigCache();
-		DataPurgingExecutor dataPurgingExecutor = new DataPurgingExecutor();
-		dataPurgingExecutor.performDataPurging();
-		long epochTime = InsightsUtils.getTimeBeforeDays(300L);
-		System.out.println("epoch time:>>"+epochTime );
-	
-		Boolean scheduleFlag = dataPurgingExecutor.checkDataPurgingJobSchedule();
-		System.out.println("Can we do purging? ---"+ scheduleFlag);
-		dataPurgingExecutor.updateRunTimeIntoDatabase();		
-	}*/
-
 }
