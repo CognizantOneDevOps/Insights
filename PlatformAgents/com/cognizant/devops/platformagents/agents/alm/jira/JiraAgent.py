@@ -275,7 +275,7 @@ class JiraAgent(BaseAgent):
         if sprintDetails and boards:
             sprintReportUrl = sprintDetails.get('sprintReportUrl', None)
             responseTemplate = sprintDetails.get('sprintReportResponseTemplate', None)
-            sprintMetadata = sprintDetails.get('sprintMetadata')
+            #sprintMetadata = sprintDetails.get('sprintMetadata')
             relationMetadata = sprintDetails.get('relationMetadata')
             for boardId in boards:
                 board = boards[boardId]
@@ -298,6 +298,7 @@ class JiraAgent(BaseAgent):
                     sprintClosed = sprint.get('closed', False)
                     if not sprintClosed:
                         sprintReportRestUrl = sprintReportUrl + '?rapidViewId='+str(boardId)+'&sprintId='+str(sprintId)
+                        sprintReportResponse = None
                         try:
                             sprintReportResponse = self.getResponse(sprintReportRestUrl, 'GET', self.userid, self.passwd, None)
                         except Exception as ex:
