@@ -40,7 +40,7 @@ module ISightApp {
 		backupDatatype: string;
 		fileLocation: string;
 		rowLimit: string;
-		fileFormat: string;
+		fileFormat: string = "JSON";
 		fileName: string;
 		retention: string;
 		settingsType: string;
@@ -98,7 +98,7 @@ module ISightApp {
 				"backupFileLocation": self.fileLocation,
 				"backupFileFormat": self.fileFormat,
 				"dataArchivalFrequency": self.dataFreq,
-				"lastRunTime": self.lastRunTime,
+				"lastRunTime": '',
 				"nextRunTime": ''
 			}
 
