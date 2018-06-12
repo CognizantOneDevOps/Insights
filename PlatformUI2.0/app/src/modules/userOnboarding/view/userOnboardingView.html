@@ -20,7 +20,7 @@
     <div layout class="applicationButtMar">
         <div layout="row" class="applicationContentCss" style="width: 100%;margin-top: 6px">
             <div layout layout-align="end center">
-                <md-label style="font-size: 14px; margin-right: 10px; color: #00728f; font-family: proxima_novasemibold;"> Switch Access Group</md-label>
+                <md-label style="font-size: 14px; margin-right: 10px; color: #00728f; font-family: proxima_novasemibold;"> Current Access Group</md-label>
 
                 <!--<md-button class="md-raised md-primary configureBut" style="background-color:#387c2c;padding-left: 15px;padding-right:15px"
                     ng-click="userOnboardingController.showAccessGroupOptions()">
@@ -34,6 +34,34 @@
                     </md-option>
                 </md-select>
 
+                <span ng-if="userOnboardingController.showApplicationAddedMessage" class="applicationAddedMessage" style="margin-top: 0px">{{userOnboardingController.showApplicationMessage}}</span>
+            </div>
+
+        </div>
+
+        <div layout="column" ng-if="!(userOnboardingController.showAddApplication)" class="applicationContentCss" style="width: 100%;margin-top: 6px">
+            <div layout layout-align="end center">
+                <md-button ng-click="userOnboardingController.showAddApplicationBox()" class="md-raised md-primary configureBut">
+                    Add New Access Group
+                </md-button>
+            </div>
+
+        </div>
+
+        <div layout="column" ng-if="userOnboardingController.showAddApplication" class="applicationContentCss" style="width: 100%;margin-top: 6px">
+            <div layout layout-align="end center">
+                <md-button ng-click="userOnboardingController.showAddApplicationBox()" class="md-raised md-primary configureBut">
+                    Add New Access Group
+                </md-button>
+                <md-input-container layout class="md-block inputContainerDivNewApplication" md-no-float>
+                    <input class="inputBoxContNewApplication" type="text" required md-no-asterisk name="newApplication" ng-model="userOnboardingController.addNewApplicationName"
+                        placeholder="Please input an Access Group Name" ng-if="userOnboardingController.showAddApplication" />
+                </md-input-container>
+
+                <md-button ng-click="userOnboardingController.addApplication($event,userOnboardingController.addNewApplicationName)" class="md-raised md-primary goButton applicationManagement addApplication"
+                    ng-if="userOnboardingController.showAddApplication">
+                    Go
+                </md-button>
             </div>
 
         </div>
