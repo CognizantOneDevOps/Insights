@@ -28,18 +28,18 @@
 
   <div class="gf-form" ng-if="ctrl.target.rescache" style="margin-bottom: 15px">
     <span class="gf-form-label">Select Caching Type</span>
-    <select type="text" ng-model="ctrl.target.selectionval" class="gf-form-input width-10" ng-options="f for f in ['Cache Time', 'Cache Time Variance']">
+    <select type="text" ng-model="ctrl.target.selectionval" class="gf-form-input width-10" ng-options="f for f in ['Fixed Time', 'Variance Time']">
       <option value="" disabled selected>Select a value</option>
     </select>
 
-    <span ng-if="ctrl.target.selectionval == 'Cache Time' && ctrl.target.rescache" class="gf-form-label">Select Duration(hours)</span>
-    <select type="text" ng-if="ctrl.target.selectionval == 'Cache Time' && ctrl.target.rescache" ng-model="ctrl.target.cacheTime"
+    <span ng-if="ctrl.target.selectionval == 'Fixed Time' && ctrl.target.rescache" class="gf-form-label">Select Duration(hours)</span>
+    <select type="text" ng-if="ctrl.target.selectionval == 'Fixed Time' && ctrl.target.rescache" ng-model="ctrl.target.cacheFixedTime"
       class="gf-form-input width-10" ng-options="f for f in [1, 2, 3]">
       <option value="" disabled selected>Select a value</option>
     </select>
 
-    <span class="gf-form-label" ng-if="ctrl.target.selectionval == 'Cache Time Variance' && ctrl.target.rescache">Select Variance(%)</span>
-    <select type="text" ng-if="ctrl.target.selectionval == 'Cache Time Variance' && ctrl.target.rescache" ng-model="ctrl.target.cacheVariance"
+    <span class="gf-form-label" ng-if="ctrl.target.selectionval == 'Variance Time' && ctrl.target.rescache">Select Variance(%)</span>
+    <select type="text" ng-if="ctrl.target.selectionval == 'Variance Time' && ctrl.target.rescache" ng-model="ctrl.target.cacheVariance"
       class="gf-form-input width-10" ng-options="f for f in [5, 10, 15]">
       <option value="" disabled selected>Select a value</option>
     </select>

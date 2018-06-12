@@ -130,14 +130,20 @@ export default class Neo4jDatasource {
         "resultDataContents": resultDataContents
       };
 
+      var cachingValue;
+      if (target.selectionval === "Fixed Time") {
+        cachingValue = target.cacheFixedTime;
+      } else {
+        cachingValue = target.cacheVariance;
+      }
+
       var cacheoptions = {
         "startTime": fromTime,
         "endTime": toTime,
         "resultCache": (target.rescache) ? target.rescache : false,
         "testDB": false,
         "cachingType": target.selectionval,
-        "cacheTime": target.cacheTime,
-        "cacheVariance": target.cacheVariance
+        "cachingValue": cachingValue
       };
 
       statements.push(statement);
