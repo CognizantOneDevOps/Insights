@@ -98,7 +98,7 @@ module ISightApp {
 				"backupFileLocation": self.fileLocation,
 				"backupFileFormat": self.fileFormat,
 				"dataArchivalFrequency": self.dataFreq,
-				"lastRunTime": '',
+				"lastRunTime": self.lastRunTime,
 				"nextRunTime": ''
 			}
 
