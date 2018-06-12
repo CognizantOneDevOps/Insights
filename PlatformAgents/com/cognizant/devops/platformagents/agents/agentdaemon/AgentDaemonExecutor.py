@@ -69,11 +69,14 @@ class AgentDaemonExecutor:
         password = mqConfig.get('password', None)
         host = mqConfig.get('host', None)
         agentCtrlXchg  = mqConfig.get('agentExchange', None)
+        routingKey = self.config.get('subscribe').get('agentPkgQueue')
         
         credentials = pika.PlainCredentials(user, password)
         self.connection = pika.BlockingConnection(pika.ConnectionParameters(credentials=credentials,host=host))
         self.channel = self.connection.channel()
         self.channel.exchange_declare(exchange=agentCtrlXchg, exchange_type='topic', durable=True)
+        self.channel.queue_declare(queue=routingKey, passive=False, durable=True, exclusive=False, auto_delete=False, arguments=None)
+        self.channel.queue_bind(queue=routingKey, exchange=agentCtrlXchg, routing_key=routingKey, arguments=None)
                
     def publishDaemonHealthData(self, ex=None):
         
@@ -111,44 +114,40 @@ class AgentDaemonExecutor:
                  agentToolName = h.get('agentToolName')
                  agentId = h.get('agentId')
                  agentServiceFileName = h.get('agentServiceFileName')
+                 action = h.get('action')
                  #Code for handling subscribed messages
                  ch.basic_ack(delivery_tag = method.delivery_tag)
                  
                  basePath = self.config.get('baseExtractionPath')
-                 f = open(basePath + os.path.sep + pkgFileName, 'wb')
-                 #with open(basePath + os.path.sep + pkgFileName) as f :
-                 f.write(body)
-                 f.close()
-                 
                  scriptPath = basePath + os.path.sep + agentToolName
                  
-                 zip_ref = zipfile.ZipFile(basePath + os.path.sep + pkgFileName, 'r')
-                 zip_ref.extractall(scriptPath)
-                 print('Zip File operation complete')
-                 zip_ref.close()
+                 if (action == "REGISTER" or action == "UPDATE"):
+                     f = open(basePath + os.path.sep + pkgFileName, 'wb')
+                     #with open(basePath + os.path.sep + pkgFileName) as f :
+                     f.write(body)
+                     f.close()
+                     
+                     zip_ref = zipfile.ZipFile(basePath + os.path.sep + pkgFileName, 'r')
+                     zip_ref.extractall(scriptPath)
+                     print('Zip File operation complete')
+                     zip_ref.close()
                  
                  '''
                  Give execution permission and then execute the script. Script should have all steps to handle Agent execution.
                  ''' 
                  if osType == "WINDOWS":
                      scriptFile = scriptPath + os.path.sep +'installagent.bat'
-                     p = subprocess.Popen([scriptFile],cwd=scriptPath,shell=True)
+                     p = subprocess.Popen([scriptFile,action],cwd=scriptPath,shell=True)
+                        
                  else:   
                      scriptFile = scriptPath + os.path.sep +'installagent.sh'
                      p = subprocess.Popen(['chmod 777 '+scriptFile,scriptFile],shell=True)
                      p = subprocess.Popen(['chmod -R 777 '+scriptFile,scriptFile],shell=True) 
-                     p = subprocess.Popen([scriptFile +' '+osType],cwd=scriptPath,shell=True)
-                     '''
-                     serviceName = agentServiceFileName.split(".")[0]
-                     p = subprocess.Popen(['sudo cp -rp '+agentServiceFileName+' /etc/init.d/'+serviceName],cwd=basePath,shell=True)
-                     p = subprocess.Popen(['sudo chmod 777 '+serviceName,serviceName],cwd='/etc/init.d',shell=True)
-                     
-                     p = subprocess.Popen(['sudo service '+serviceName+ ' start'],shell=True)
-                     '''
+                     p = subprocess.Popen([scriptFile +' '+osType+' '+action],cwd=scriptPath,shell=True)
                      #stdout, stderr = p.communicate()
                      print('Process id - '+ str(p.returncode))
             except Exception as ex:
-                print('There is exception')
+                print('There is an exception')
                 self.publishDaemonHealthData(ex)
                 logging.error(ex)
                 #self.logIndicator(self.EXECUTION_ERROR, self.config.get('isDebugAllowed', False)) 

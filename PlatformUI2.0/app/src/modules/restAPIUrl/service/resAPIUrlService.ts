@@ -30,6 +30,7 @@ module ISightApp {
             this.initializeEndpoints();
         }
 
+
         initializeEndpoints(){
           this.addEndPoint("ABOUT_READ",'/PlatformService/about/read');
           this.addEndPoint("HEALTH_GLOBAL",'/PlatformService/admin/agent/globalHealth'); 
@@ -119,8 +120,8 @@ module ISightApp {
 		  this.addEndPoint("DOCROOT_AGENT_VERSION_TOOLS", '/PlatformService/admin/agentConfiguration/getSystemAvailableAgentList');
 		  this.addEndPoint("DOCROOT_AGENT_TOOL_CONFIG_DETAILS", '/PlatformService/admin/agentConfiguration/getToolRawConfigFile');
 		  this.addEndPoint("DB_AGENTS_LIST", '/PlatformService/admin/agentConfiguration/getRegisteredAgents');
-		  this.addEndPoint("DB_AGENT_CONFIG_DETAILS", '/PlatformService/admin/agentConfiguration/getRegisteredAgentDetail');		  
-
+		  this.addEndPoint("DB_AGENT_CONFIG_DETAILS", '/PlatformService/admin/agentConfiguration/getRegisteredAgentDetail');
+          this.addEndPoint("AGENT_UNINSTALL", '/PlatformService/admin/agentConfiguration/uninstallAgent');
         }
 
         addEndPoint(name: string, url: string) {
