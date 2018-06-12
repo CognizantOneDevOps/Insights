@@ -147,19 +147,25 @@ public class GrafanaUserDetailsUtil {
 	}
 
 	private static String getGrafanaCurrentOrg(Map<String, String> headers) {
+		log.debug("Inside getGrafanaCurrentOrg method call");
 		String loginApiUrl = ApplicationConfigProvider.getInstance().getGrafana().getGrafanaEndpoint() + "/api/user";
+		log.debug("Fetching user's detail at: " + loginApiUrl);
 		ClientResponse grafanaCurrentOrgResponse = RestHandler.doGet(loginApiUrl, null, headers);
 		JsonObject responseJson = new JsonParser().parse(grafanaCurrentOrgResponse.getEntity(String.class))
 				.getAsJsonObject();
+		log.debug("Response obtained after client call is: " + responseJson);
 		String grafanaCurrentOrg = responseJson.get("orgId").toString();
+		log.debug("User's current Org is: " + grafanaCurrentOrg);
 		return grafanaCurrentOrg;
 	}
 
 	private static List<NewCookie> getValidGrafanaSession(String userName, String password) {
+		log.debug("Inside getValidGrafanaSession method call");
 		JsonObject loginRequestParams = new JsonObject();
 		loginRequestParams.addProperty("user", userName);
 		loginRequestParams.addProperty("password", password);
 		String loginApiUrl = ApplicationConfigProvider.getInstance().getGrafana().getGrafanaEndpoint() + "/login";
+		log.debug("Fetching valid session at: " + loginApiUrl);
 		ClientResponse grafanaLoginResponse = RestHandler.doPost(loginApiUrl, loginRequestParams, null);
 		return grafanaLoginResponse.getCookies();
 	}

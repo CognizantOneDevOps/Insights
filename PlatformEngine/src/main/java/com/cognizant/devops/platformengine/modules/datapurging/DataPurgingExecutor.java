@@ -261,7 +261,7 @@ public class DataPurgingExecutor implements Job {
 		}
 		String outputString = sb.toString();
 		double dataSizeinMB = getOutputDataSize(outputString);
-		if(dataSizeinMB < MAXIMUM_BACKUP_FILE_SIZE) {			
+		if(!outputString.isEmpty() && dataSizeinMB < MAXIMUM_BACKUP_FILE_SIZE) {			
 			String jsonFileLocation = fileLocation +"_" + noOfFiles +".json";
 			try (FileWriter fileWriter = new FileWriter(jsonFileLocation);) {
 				fileWriter.write(outputString);

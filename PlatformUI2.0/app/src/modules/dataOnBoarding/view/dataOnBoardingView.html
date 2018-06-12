@@ -15,51 +15,55 @@
  * the License.
  ******************************************************************************
  -->
-<div layout="column" class="layout" style="width: 100%;" >
+<div layout="column" class="layout" style="width: 100%;">
   <div ng-controller="FileUploadController" style="min-height:450px">
-  <div  ng-if="showError" style="font-size:16px;margin:auto;border:1px solid #ccc;margin-left:20px" >
-  <md-icon  style="margin-right:10px" md-svg-src="dist/icons/svg/insightsPage/alert.svg" ng-style="{color:'red',fill:'red',height: '36px', width: '36px'}"></md-icon>Failed to upload data.</div>
+    <div ng-if="showError" style="font-size:16px;margin:auto;border:1px solid #ccc;margin-left:20px">
+      <md-icon style="margin-right:10px" md-svg-src="dist/icons/svg/insightsPage/alert.svg" ng-style="{color:'red',fill:'red',height: '36px', width: '36px'}"></md-icon>{{showErrorMessage}}</div>
 
-  <div style="padding-left:70px;padding-top:20px;padding-right:20px;font-size:16px;font-weight:bold;font-family:proxima_novaregular"><span style="display:inline-block;width:14%;color:#666">Download the existing data :</span><md-button style="max-height:40px;margin-top:0px" ng-click="JSONToCSVConvertor()" class="md-raised md-primary configureBut md-button md-ink-ripple">
-                    Download data 
-        </md-button></div>
-    <div  style="width:100%;background-color:#f3f3f3;margin-top:10px;border-bottom:1px solid #d8d9da">
+    <div style="padding-left:70px;padding-top:20px;padding-right:20px;font-size:16px;font-weight:bold;font-family:proxima_novaregular">
+      <span style="display:inline-block;width:14%;color:#666">Download the existing data :</span>
+      <md-button style="max-height:40px;margin-top:0px" ng-click="JSONToCSVConvertor()"
+        class="md-raised md-primary configureBut md-button md-ink-ripple">
+        Download data
+      </md-button>
+    </div>
+    <div style="width:100%;background-color:#f3f3f3;margin-top:10px;border-bottom:1px solid #d8d9da">
       <div class="contentCss fnt" style="padding:15px">
-        <div layout flex="100"> 
+        <div layout flex="100">
           <div style="padding-right:20px;font-size:16px;padding-top:50px;font-weight:bold;width:15%">Select a File to Upload:</div>
           <div>
-          
-          <md-input-container style="background-color:#fff">
-          <label>Select the mode</label>
-           <md-select ng-model="selectedType" ng-change="changeSelected()">
-            <md-option value="update">Edit existing data</md-option>
-            <md-option value="upload">Upload new data</md-option>
-          </md-select>
-          </md-input-container>
 
-          <div class="drop" id="dropbox" ng-show="showTextArea">
-            <div class="cont">
-              <md-icon  ng-style="{height: '40px', width: '40px'}" 
-                        md-svg-src="dist/icons/svg/dataTagging/upload.svg"></md-icon>
-              <div class="titl" >
-           {{dropText}}
-          </div>
-              <div class="desc">
-            OR
-          </div>
-              <div class="">
-                <label id="#bb" style="cursor:pointer"> Click here to browse csv files
-            
-                  <input type="file" name="file" accept=".csv" id="fileInp"  ng-model-instant id="fileToUpload" multiple onchange="angular.element(this).scope().setFiles(this)" style="display:none" />
-                </label>
+            <md-input-container style="background-color:#fff">
+              <label>Select the mode</label>
+              <md-select ng-model="selectedType" ng-change="changeSelected()">
+                <md-option value="update">Edit existing data</md-option>
+                <md-option value="upload">Upload new data</md-option>
+              </md-select>
+            </md-input-container>
+
+            <div class="drop" id="dropbox" ng-show="showTextArea">
+              <div class="cont">
+                <md-icon ng-style="{height: '40px', width: '40px'}" md-svg-src="dist/icons/svg/dataTagging/upload.svg"></md-icon>
+                <div class="titl">
+                  {{dropText}}
+                </div>
+                <div class="desc">
+                  OR
+                </div>
+                <div class="">
+                  <label id="#bb" style="cursor:pointer"> Click here to browse csv files
+
+                    <input type="file" name="file" accept=".csv" id="fileInp" ng-model-instant id="fileToUpload" multiple onchange="angular.element(this).scope().setFiles(this)"
+                      style="display:none" />
+                  </label>
+                </div>
               </div>
             </div>
           </div>
-          </div>
         </div>
         <div ng-show="showUploadingThrobber" style="margin-left:15%;margin-top:5px">
-          <span ng-if="showUploadingThrobber" style = "vertical-align: super;">
-            <md-progress-circular  md-diameter="30" md-mode="indeterminate"></md-progress-circular>
+          <span ng-if="showUploadingThrobber" style="vertical-align: super;">
+            <md-progress-circular md-diameter="30" md-mode="indeterminate"></md-progress-circular>
           </span>
         </div>
         <div ng-show="isTypeError" style="color:red;margin-left:15%;margin-top:5px">Invalid file selected, please upload only csv files</div>
@@ -71,12 +75,12 @@
               <span ng-switch-when="true">{{file.size / 1024 / 1024 | number:2}} MB</span>
               <span ng-switch-default>{{file.size / 1024 | number:2}} kB</span>
             </span>)
-        
+
           </div>
 
-          <md-button  style="max-height:40px;margin-top:0px" ng-click="previewData()" class="md-raised md-primary configureBut md-button md-ink-ripple">
-                    Preview File
-        </md-button>
+          <md-button style="max-height:40px;margin-top:0px" ng-click="previewData()" class="md-raised md-primary configureBut md-button md-ink-ripple">
+            Preview File
+          </md-button>
           <div ng-show="progressVisible">
             <div class="percent">{{progress}}%</div>
             <div class="progress-bar">
@@ -90,19 +94,19 @@
     <div style="padding-top:10px;margin:auto;width:90%">
       <table class="md-api-table-landing" style="border: 1px solid #a5d28b;margin:auto" ng-if="lines.length > 0">
         <thead class="theadCss">
-          <tr layout="row"  layout-align="start center" class="layout-align-start-center layout-row">
-            <th  style="width:100px;word-wrap:break-word" class="tableHeader" ng-repeat = "tabheaders in headers">{{tabheaders}}</th>
+          <tr layout="row" layout-align="start center" class="layout-align-start-center layout-row">
+            <th style="width:100px;word-wrap:break-word" class="tableHeader" ng-repeat="tabheaders in headers">{{tabheaders}}</th>
           </tr>
         </thead>
-        <tr ng-repeat = "tabData in lines" class="layout-align layout-row">
+        <tr ng-repeat="tabData in lines" class="layout-align layout-row">
           <td style="width:100px;word-wrap:break-word" ng-repeat="tabhd in headers">{{ tabData[tabhd] }}</td>
         </tr>
       </table>
     </div>
-    <div flex="20" flex-offset="85" ng-if="lines.length > 0" >
+    <div flex="20" flex-offset="85" ng-if="lines.length > 0">
       <md-button md-no-ink type="submit" ng-disabled="showDisabled" ng-click="uploadFile()" class="md-raised md-primary goButton applicationManagement"
-                                    ng-disabled="showDisabled">Confirm and Upload</md-button>
-      <span ng-if="showThrobber" style = "vertical-align: super;">
+        ng-disabled="showDisabled">Confirm and Upload</md-button>
+      <span ng-if="showThrobber" style="vertical-align: super;">
         <md-progress-circular style="display: inline;" md-diameter="30" md-mode="indeterminate"></md-progress-circular>
       </span>
     </div>
