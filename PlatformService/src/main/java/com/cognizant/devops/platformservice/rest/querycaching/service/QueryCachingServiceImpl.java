@@ -19,23 +19,19 @@ import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
-import javax.ws.rs.core.MediaType;
-
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.log4j.Logger;
 import org.springframework.stereotype.Service;
 
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.core.util.InsightsUtils;
+import com.cognizant.devops.platformcommons.dal.elasticsearch.ElasticSearchDBHandler;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBException;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphResponse;
 import com.cognizant.devops.platformcommons.dal.neo4j.Neo4jDBHandler;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import com.sun.jersey.api.client.Client;
-import com.sun.jersey.api.client.ClientResponse;
-import com.sun.jersey.api.client.WebResource;
 
 @Service("queryCachingService")
 public class QueryCachingServiceImpl implements QueryCachingService {
@@ -136,7 +132,8 @@ public class QueryCachingServiceImpl implements QueryCachingService {
 							queryHash);
 				}
 
-				JsonObject esResponse = queryES(sourceESCacheUrl + "/_search", esQuery);
+				ElasticSearchDBHandler esDbHandler = new ElasticSearchDBHandler();
+				JsonObject esResponse = esDbHandler.queryES(sourceESCacheUrl + "/_search", esQuery);
 				String cacheResult = "cacheResult";
 
 				JsonArray esResponseArray = esResponse.get("hits").getAsJsonObject().get("hits").getAsJsonArray();
@@ -158,7 +155,7 @@ public class QueryCachingServiceImpl implements QueryCachingService {
 					saveCache.addProperty(QueryCachingConstants.HAS_EXPIRED, false);
 					saveCache.addProperty(QueryCachingConstants.CREATION_TIME, currentTime);
 
-					queryES(sourceESCacheUrl, saveCache.toString());
+					esDbHandler.queryES(sourceESCacheUrl, saveCache.toString());
 					return parser.parse(saveCache.get(cacheResult).getAsString()).getAsJsonObject();
 				}
 				return parser.parse(esResponse.get(cacheResult).getAsString()).getAsJsonObject();
@@ -233,31 +230,4 @@ public class QueryCachingServiceImpl implements QueryCachingService {
 		}
 		return null;
 	}
-
-	private JsonObject queryES(String sourceESUrl, String query) throws Exception {
-
-		ClientResponse response = null;
-		JsonObject data = null;
-		try {
-			WebResource resource = Client.create().resource(sourceESUrl);
-			response = resource.accept(MediaType.APPLICATION_JSON).type(MediaType.APPLICATION_JSON)
-					.post(ClientResponse.class, query);
-			if (response.getStatus() == 201) {
-				log.debug("New object created at index - " + sourceESUrl);
-			} else if (response.getStatus() != 200) {
-				throw new Exception("Failed to get response from ElasticSeach for query - " + query
-						+ "-- HTTP response code -" + response.getStatus());
-			}
-			data = new JsonParser().parse(response.getEntity(String.class)).getAsJsonObject();
-		} catch (Exception e) {
-			log.error("Exception while getting data from ES for query - " + query, e);
-			throw new Exception(e.getMessage());
-		} finally {
-			if (response != null) {
-				response.close();
-			}
-		}
-		return data;
-	}
-
 }
