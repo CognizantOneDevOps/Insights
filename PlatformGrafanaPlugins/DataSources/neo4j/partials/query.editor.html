@@ -45,6 +45,11 @@
     </select>
   </div>
 
+  <div>
+    <span class="gf-form-label" ng-if="ctrl.target.rescache" style="margin-top: -10px;margin-bottom: 5px;">
+      <img style="height: 15px;width: 15px;margin-right: 5px;margin-top: -2px" src="/public/plugins/neo4j/img/info_icon.svg">Please note that when Fixed Time is selected, the time selector would be disabled for selected fixed time interval.</span>
+  </div>
+
   <div ng-if="!ctrl.target.rawQuery">
     <div class="gf-form">
       <metric-segment-model property="ctrl.target.target" get-options="ctrl.getOptions()" on-change="ctrl.onChangeInternal()" css-class="tight-form-item-xxlarge"></metric-segment-model>
