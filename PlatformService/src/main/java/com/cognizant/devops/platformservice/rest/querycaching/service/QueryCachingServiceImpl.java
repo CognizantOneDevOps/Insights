@@ -63,14 +63,19 @@ public class QueryCachingServiceImpl implements QueryCachingService {
 		GraphResponse response = null;
 		JsonParser parser = new JsonParser();
 		JsonObject json = parser.parse(queryjson).getAsJsonObject();
-		JsonArray queryArray = new JsonArray();
+		JsonArray statementsArray = new JsonArray();
 
 		if (json.get(QueryCachingConstants.STATEMENTS).getAsJsonArray().get(0).getAsJsonObject()
 				.has(QueryCachingConstants.STATEMENT)) {
-			queryArray = json.get(QueryCachingConstants.STATEMENTS).getAsJsonArray();
+			statementsArray = json.get(QueryCachingConstants.STATEMENTS).getAsJsonArray();
 		}
 		try {
-			response = dbHandler.executeCypherQueryMultiple(queryArray);
+			String[] queriesArray = new String[statementsArray.size()];
+			for (int index = 0; index < statementsArray.size(); index++) {
+				queriesArray[index] = statementsArray.get(index).getAsJsonObject().get(QueryCachingConstants.STATEMENT)
+						.getAsString();
+			}
+			response = dbHandler.executeCypherQueryMultiple(queriesArray);
 		} catch (GraphDBException e) {
 			log.error("Exception in neo4j query execution", e);
 			throw e;
