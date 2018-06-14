@@ -26,4 +26,9 @@ sudo echo "export" INSIGHTS_HOME=`pwd` | sudo tee -a /etc/profile
 sudo chmod -R 777 /usr/INSIGHTS_HOME/
 source /etc/environment
 source /etc/profile
+# getting the external ip an replacing in server config json
+myextip=$(wget -qO- icanhazip.com)
+echo $myextip
+sed -i -e "s|localhost:3000|${myextip}:3000|g" /usr/INSIGHTS_HOME/.InSights/server-config.json
+
 
