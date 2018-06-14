@@ -23,6 +23,7 @@ sudo unzip InSightsConfig.zip && sudo rm -rf InSightsConfig.zip && sudo rm -rf I
 export INSIGHTS_HOME=`pwd`
 sudo echo INSIGHTS_HOME=`pwd` | sudo tee -a /etc/environment
 sudo echo "export" INSIGHTS_HOME=`pwd` | sudo tee -a /etc/profile
+sudo chmod -R 777 /usr/INSIGHTS_HOME/
 source /etc/environment
 source /etc/profile
 
