@@ -52,7 +52,7 @@ public final class InsightsConfiguration {
 	 * Grafana 3. Default Dashboards in Grafana
 	 */
 	public static void doInsightsConfiguration() {
-		updateLayouts();
+		//updateLayouts();
 		updateDatasources();
 		updateDashboards();
 	}
