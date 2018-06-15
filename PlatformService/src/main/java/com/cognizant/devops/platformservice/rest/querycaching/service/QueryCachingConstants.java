@@ -28,5 +28,8 @@ public interface QueryCachingConstants {
 	String CACHED_PREVIOUS_TIME = "__cachePreviousTime__";
 	String HAS_EXPIRED = "hasExpired";
 	String CREATION_TIME = "creationTime";
+	int ZEROTH_INDEX = 0;
+	String CACHE_RESULT = "cacheResult";
+	String NEW_STATEMENT = "newStatement";
 
 }
