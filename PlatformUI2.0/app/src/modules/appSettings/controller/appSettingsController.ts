@@ -87,7 +87,7 @@ interface FileReaderEvent extends Event {
                       
                       $scope.$apply()
                   };
-                  reader.readAsDataURL($scope.file);
+               reader.readAsDataURL($scope.file); 
           };
 
           $scope.selectImage = function(){

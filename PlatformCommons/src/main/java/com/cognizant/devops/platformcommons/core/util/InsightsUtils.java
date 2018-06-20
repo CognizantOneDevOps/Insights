@@ -18,8 +18,10 @@ package com.cognizant.devops.platformcommons.core.util;
 import java.time.DayOfWeek;
 import java.time.Duration;
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAdjusters;
 
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
@@ -31,7 +33,7 @@ public class InsightsUtils {
 	}
 	
 	private static String sparkTimezone = ApplicationConfigProvider.getInstance().getInsightsTimeZone();
-	private static ZoneId zoneId = ZoneId.of( sparkTimezone );
+	public static ZoneId zoneId = ZoneId.of( sparkTimezone );
 	
 	public static long getDataFromTime(String schedule) {
 		Long time = null;
@@ -236,6 +238,12 @@ public class InsightsUtils {
 		return after.toInstant().toEpochMilli();
 	}
 	
+	public static Long getTimeBeforeDaysInSeconds(Long days){
+		ZonedDateTime now = ZonedDateTime.now( zoneId );
+		ZonedDateTime after = now.minusDays(days);
+		return after.toInstant().getEpochSecond();
+	}
+		
 	public static Long getDurationBetweenDatesInDays(Long inputEpochMillis){
 		ZonedDateTime now = ZonedDateTime.now( zoneId );
 		ZonedDateTime fromInput = ZonedDateTime.ofInstant(Instant.ofEpochMilli(inputEpochMillis), zoneId);
@@ -275,5 +283,43 @@ public class InsightsUtils {
 		
 		return result;
 	}
+	
+	public static String getLocalDateTime(String formatPattern) {
+		LocalDateTime now = LocalDateTime.now();
+		DateTimeFormatter dtf = DateTimeFormatter.ofPattern(formatPattern);
+		return dtf.format(now);
+	}
+	
+	/**
+	 * 
+	 * Calculates difference between currentTime and lastRunTime
+	 * (now - lastRunTime)
+	 * @param lastRunTime
+	 * @return
+	 */ 
+	public static long getDifferenceFromLastRunTime(long lastRunTime){
+		ZonedDateTime now = ZonedDateTime.now(InsightsUtils.zoneId);
+		ZonedDateTime lastRunTimeInput = ZonedDateTime.ofInstant(Instant.ofEpochSecond(lastRunTime), InsightsUtils.zoneId);
+		Duration d = Duration.between(lastRunTimeInput,now);		
+		return d.abs().toMillis();
+	}
+
+	/**
+	 * Calculates difference between nextRunTime and lastRunTime
+	 * (nextRunTime - lastRunTime )
+	 * @param lastRunTime
+	 * @param nextRunTime
+	 * @return
+	 */
+	public static long getDifferenceFromNextRunTime(Long lastRunTime, Long nextRunTime){
+		ZonedDateTime lastRunTimeInput = ZonedDateTime.ofInstant(Instant.ofEpochSecond(lastRunTime), InsightsUtils.zoneId);
+		ZonedDateTime nextRunTimeInput = ZonedDateTime.ofInstant(Instant.ofEpochSecond(nextRunTime), InsightsUtils.zoneId);
+		Duration d = Duration.between(lastRunTimeInput, nextRunTimeInput);
+		return d.abs().toMillis();
+	}
+
+
+
+
 	
 }

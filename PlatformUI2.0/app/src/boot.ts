@@ -60,6 +60,8 @@ module ISightApp {
         .controller('FileUploadController', FileUploadController)
         .controller('appSettingsController', AppSettingsController)
         .controller('insightsController', InsightsController)
+		.controller('dataPurgingController', DataPurgingController)
+
         .controller('uninstallAgentDialogController', UninstallAgentDialogController)
         .component('footer', {
             templateUrl: './dist/components/footer/view/footerView.html',

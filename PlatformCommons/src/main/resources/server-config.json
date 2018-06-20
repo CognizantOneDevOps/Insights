@@ -87,5 +87,6 @@
   "enableOnlineDatatagging": false,
   "trustedHosts": [
     "localhost"
-  ]
+  ],
+  "enableOnlineBackup":false
 }
