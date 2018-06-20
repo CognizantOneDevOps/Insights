@@ -43,10 +43,11 @@ public class InsightsAgentConfiguration {
 
 	@RequestMapping(value = "/registerAgent", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 	public @ResponseBody JsonObject registerAgent(@RequestParam String toolName, @RequestParam String agentVersion,
-			@RequestParam String osversion, @RequestParam String configDetails) {
+			@RequestParam String osversion, @RequestParam String configDetails, @RequestParam String trackingDetails) {
 		String message = null;
 		try {
-			message = agentManagementService.registerAgent(toolName, agentVersion, osversion, configDetails);
+			message = agentManagementService.registerAgent(toolName, agentVersion, osversion, configDetails,
+					trackingDetails);
 		} catch (InsightsCustomException e) {
 			return PlatformServiceUtil.buildFailureResponse(e.toString());
 		}
