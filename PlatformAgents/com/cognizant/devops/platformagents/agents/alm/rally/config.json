@@ -18,10 +18,38 @@
   },
   
   "dynamicTemplate": {
-	  "responseTemplate": {
-	        "LastUpdateDate": "LastUpdateDate",
-	        "Name": "StoryName"
-	  }
+  "relationMetadata": {"labels" : ["RALLY_ITERATION"],"dataUpdateSupported" : true,"uniqueKey":["workspaceID", "projectID", "iterationID"]},
+  "runSchedule": 30,
+  "storyMetadata": {"labels":["RALLY_STORY"],"dataUpdateSupported" : true,"uniqueKey":["formattedID" , "workspaceID"]},
+  "specificWorkspaceList": [
+                           
+                          ],
+  "artifactType" : ["TestCase" , "Defect" , "HierarchicalRequirement", "DefectSuite" , "TestSet" , "Task"],
+  "storyResponseTemplate" : [
+  "DefectSuites:Count", "WorkProduct:_refObjectName", "Tasks:Count","State" , "Priority" , "Risk", "TesCaseType" , "ClosedDate" , "Environment", "FlowStateChangedDate", "ScheduleState", "TestCaseCount", "PlanEstimate", "TaskActualTotal" , "TaskEstimateTotal" , "TaskEstimateTotal", "TaskRemainingTotal"
+  ],
+  "iterationResponseTemplate" : {
+							"sha": "commitId",
+							"url": "commitUrl",
+							"Iteration" : {
+										"_refObjectName": "iterationName",
+										"CreationDate": "iterationCreationDate",
+										"EndDate": "iterationEndDate",
+										"PlanEstimate": "iterationPlanEstimate",
+										"PlannedVelocity": "iterationPlannedVelocity",
+										"StartDate": "iterationStartDate",
+										"TaskActualTotal": "iterationState",
+
+										"TaskEstimateTotal": "iterationTaskEstimateTotal",
+										"TaskRemainingTotal": "iterationTaskRemainingTotal",
+										"Workspace" : {
+											"_refObjectName": "iterationWorkspace"
+										              },
+										"Project" : {
+											"_refObjectName": "iterationProjectName"
+										             }
+							            }
+                               }
   },
   "toolCategory" : "ALM",
   "proxy": "proxy.companyname.com:8080/",
@@ -29,13 +57,14 @@
   "runSchedule": 30,
   "userid": "userid",
   "passwd": "passwd",
+  "dataSize" : 20,
   "baseUrl": "https://rally1.rallydev.com/slm/webservice/v2.0/",
   "startFrom": "2016-10-10 00:01",
   "toolsTimeZone" : "Asia/Kolkata",
   "insightsTimeZone" : "Asia/Kolkata",
   "useResponseTemplate" : true,
-  "timeStampField":"LastUpdated",
-  "timeStampFormat":"%Y-%m-%dT%H:%M:%S",
+  "timeStampField":"lastUpdateDate",
+  "timeStampFormat":"%Y-%m-%dT%H:%M:%SZ",
   "isDebugAllowed" : false,
   "loggingSetting" : {
 		"logLevel" : "WARN"
