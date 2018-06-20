@@ -29,8 +29,6 @@
   "DefectSuites:Count", "WorkProduct:_refObjectName", "Tasks:Count","State" , "Priority" , "Risk", "TesCaseType" , "ClosedDate" , "Environment", "FlowStateChangedDate", "ScheduleState", "TestCaseCount", "PlanEstimate", "TaskActualTotal" , "TaskEstimateTotal" , "TaskEstimateTotal", "TaskRemainingTotal"
   ],
   "iterationResponseTemplate" : {
-							"sha": "commitId",
-							"url": "commitUrl",
 							"Iteration" : {
 										"_refObjectName": "iterationName",
 										"CreationDate": "iterationCreationDate",
