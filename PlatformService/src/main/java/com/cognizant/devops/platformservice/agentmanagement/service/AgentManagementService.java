@@ -21,23 +21,30 @@ import java.util.List;
 import java.util.Map;
 
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
-
+import com.google.gson.JsonObject;
 
 public interface AgentManagementService {
 
-	public String registerAgent(String toolName,String agentVersion,String osversion,String configDetails) throws InsightsCustomException;
-	public String uninstallAgent(String agentId,String toolName,String osversion) throws InsightsCustomException;
-	public String startStopAgent(String agentId,String action) throws InsightsCustomException;
-	public String updateAgent(String agentId, String configDetails, String toolName, String agentVersion, String osversion) throws InsightsCustomException;
-	
-	//This is used during Agent registration, provide list of Agents, with version from docroot.
+	public String registerAgent(String toolName, String agentVersion, String osversion, String configDetails,
+			String trackingDetails) throws InsightsCustomException;
+
+	public String uninstallAgent(String agentId, String toolName, String osversion) throws InsightsCustomException;
+
+	public String startStopAgent(String agentId, String action) throws InsightsCustomException;
+
+	public String updateAgent(String agentId, String configDetails, String toolName, String agentVersion,
+			String osversion) throws InsightsCustomException;
+
+	// This is used during Agent registration, provide list of Agents, with version
+	// from docroot.
 	public Map<String, ArrayList<String>> getSystemAvailableAgentList() throws InsightsCustomException;
-	//For agent registration, gives you RAW config.json from docroot
+
+	// For agent registration, gives you RAW config.json from docroot
 	public String getToolRawConfigFile(String version, String tool) throws InsightsCustomException;
-	
-	//Provides currently registered Agents in DB
+
+	// Provides currently registered Agents in DB
 	public List<AgentConfigTO> getRegisteredAgents() throws InsightsCustomException;
-	//Returns config.json for request AgentId from Db
+
+	// Returns config.json for request AgentId from Db
 	public AgentConfigTO getAgentDetails(String agentId) throws InsightsCustomException;
 }
- 
