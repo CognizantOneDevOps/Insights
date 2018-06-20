@@ -50,6 +50,7 @@ public class ApplicationConfigProvider implements Serializable{
     private EmailConfiguration emailConfiguration = new EmailConfiguration();
     private CorrelationConfig correlations;
     private boolean enableFieldIndex;
+    private boolean enableOnlineBackup = false;
     private AgentDetails agentDetails = new AgentDetails();
 
 
@@ -237,6 +238,14 @@ public class ApplicationConfigProvider implements Serializable{
 
 	public void setEnableFieldIndex(boolean enableFieldIndex) {
 		this.enableFieldIndex = enableFieldIndex;
+	}
+
+	public boolean isEnableOnlineBackup() {
+		return enableOnlineBackup;
+	}
+
+	public void setEnableOnlineBackup(boolean enableOnlineBackup) {
+		this.enableOnlineBackup = enableOnlineBackup;
 	}
 	
     public boolean isEnableOnlineDatatagging() {
