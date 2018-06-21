@@ -1,13 +1,13 @@
 {
-  "baseExtractionPath":"D:\\TEST\\",
+  "baseExtractionPath":"extractionpath",
   "insightsTimeZone": "Asia/Kolkata",
   "loggingSetting": {
     "logLevel": "WARN"
   },
   "mqConfig": {
     "host": "127.0.0.1",
-    "password": "guest",
-    "user": "guest",
+    "password": "iSight",
+    "user": "iSight",
     "exchange": "iSight",
     "agentExchange":"iAgent"
   },
@@ -19,7 +19,7 @@
   "subscribe": {
     "agentPkgQueue": "INSIGHTS.AGENTS.PACKAGE"
   },
-   "toolCategory" : "DUMMY",
+   "toolCategory" : "AGENTDAEMON",
   "timeStampFormat": "%Y-%m-%dT%H:%M:%SZ",
   "toolsTimeZone": "GMT"
 }
