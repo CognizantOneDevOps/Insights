@@ -127,7 +127,6 @@ module ISightApp {
             var self = this
             self.showNoToolsSelectedForCorrelation = false;
             self.showCorrelationsLoadThrobber = "true";
-            console.log(self.test.relationName);
             self.dataDictionaryService.getToolsRelationshipAndProperties(self.startTool.toolName, self.startTool.categoryName, self.endTool.toolName, self.endTool.categoryName)
                 .then(function (response) {
                     self.data = response.data;
