@@ -60,7 +60,10 @@ public class DataDictionaryServiceImpl implements DataDictionaryService {
 					.getAsJsonObject().get("data").getAsJsonArray().iterator().next().getAsJsonObject().get("row")
 					.getAsJsonArray().iterator().next().getAsJsonArray().iterator();
 			while (iterator.hasNext()) {
-				stringBuilder = stringBuilder.append(iterator.next().getAsString()).append(",");
+				String element = iterator.next().getAsString();
+				if (!(element.equalsIgnoreCase(DataDictionaryConstants.EXEC_ID)
+						|| element.equalsIgnoreCase(DataDictionaryConstants.UUID)))
+					stringBuilder = stringBuilder.append(iterator.next().getAsString()).append(",");
 			}
 			String[] keysArray = stringBuilder.toString().split(",");
 			Gson gson = new GsonBuilder().create();
