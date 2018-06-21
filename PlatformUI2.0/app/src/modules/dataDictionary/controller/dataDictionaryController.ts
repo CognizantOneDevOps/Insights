@@ -26,10 +26,6 @@ module ISightApp {
             var self = this;
             self.showConfirmMessage = "";
             self.homeController.templateName = 'dataDictionary';
-            /*if (self.homeController.showConfirmMessage) {
-                self.showConfirmMessage = self.homeController.showConfirmMessage;
-            }*/
-            //this.getColumnHeight();
             self.getToolsList();
         }
 
@@ -45,8 +41,7 @@ module ISightApp {
         startToolProperties = [];
         endToolProperties = [];
         selectedToolProperties = [];
-        correlationProperties: any;
-        test: any;
+        correlationProperties: any = {};
         selectedToolName: any;
         showNoToolsSelectedMessage: boolean = true;
         showNoToolsSelectedForCorrelation: boolean = true;
@@ -130,7 +125,6 @@ module ISightApp {
 
         getCorrelatedToolsData() {
             var self = this
-            self.test = { "relationName": "JENKINS_TRG_BY_GIT", "properties": { "testProperty": "Akshay" } };
             self.showNoToolsSelectedForCorrelation = false;
             self.showCorrelationsLoadThrobber = "true";
             console.log(self.test.relationName);
@@ -139,7 +133,6 @@ module ISightApp {
                     self.data = response.data;
                     self.showCorrelationsLoadThrobber = "false";
                     self.correlationProperties = self.data;
-                    console.log(self.correlationProperties);
                 })
                 .catch(function (response) {
                     self.showMessage = "Something wrong with Service, Please try again.";

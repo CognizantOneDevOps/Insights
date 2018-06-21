@@ -55,29 +55,11 @@
 
     <div ng-if="dataDictionaryController.showSelectStartToolThrobber === 'false'">
         <div class="column1 columnsCommonCSS" style="margin-left: 2% !important" id="selectColumn1">
-            <!--<div class="columnHeading">
-            <span style="display: inline-block;">Select Start Tool</span>
-            <md-select placeholder="Select a Tool" ng-model="dataDictionaryController.startTool" style="width: 150px; background-color: whitesmoke; margin: 5px;display: inline-block;">
-                <md-option ng-value="{{tool}}" ng-repeat="tool in dataDictionaryController.toolsList" ng-click="dataDictionaryController.getStartToolProperties(tool.toolName, tool.categoryName)">{{tool.toolName}}</md-option>
-            </md-select>
-        </div>-->
             <div style="text-align: center; padding-bottom: 5px; background-color: #dff1f6">
                 <md-label style="font-size: 16px; margin-right: 10px;color: #00728f; font-family: proxima_novaregular;text-align: center">
                     Tools Properties</md-label>
             </div>
 
-            <!--<div>
-            <md-button ng-disabled="!dataDictionaryController.endTool" ng-click="dataDictionaryController.showStartToolProperties()"
-                class="md-raised md-primary configureBut" style="height: 40px; width: 60px !important; margin: 0px; margin-left: 5px; display: inline-block;">
-                {{dataDictionaryController.startTool.toolName}}
-            </md-button>
-
-            <md-button ng-if="dataDictionaryController.startTool" ng-disabled="!dataDictionaryController.endTool" ng-click="dataDictionaryController.showEndToolProperties()"
-                class="md-raised md-primary configureBut" style="height: 40px; width: 60px !important; margin: 0px; margin-left: 5px; display: inline-block;">
-                {{dataDictionaryController.endTool.toolName}}
-            </md-button>
-
-        </div>-->
             <div>
                 <div class="divTablesHeading" style="width:49%;display: inline-block;margin-left: 5px">
                     {{dataDictionaryController.startTool.toolName}} Properties
@@ -136,6 +118,10 @@
             <throbber ng-if="dataDictionaryController.showCorrelationsLoadThrobber === 'true'" layout="column" flex="100">
             </throbber>
 
+            <div class="agentConfigTable" layout layout-align="center center" ng-if="dataDictionaryController.correlationProperties === undefined">
+                <h1 class="dataDictionaryMessages">No Correlations found between the selected tools.</span>
+            </div>
+
             <div ng-if="dataDictionaryController.showCorrelationsLoadThrobber === 'false'">
                 <div class="divTablesHeading" style="text-align: left;margin-left: 3%;">
                     <span>Realtionship Name:
@@ -144,7 +130,7 @@
                 </div>
 
                 <div class="tableDiv" style="margin-left: 3%; margin-right: 3%">
-                    <table class="table md-api-table-landing table-condensed table-bordered table-striped textst" ng-repeat="(key,value) in dataDictionaryController.test.properties">
+                    <table class="table md-api-table-landing table-condensed table-bordered table-striped textst" ng-repeat="(key,value) in dataDictionaryController.correlationProperties.properties">
                         <thead class="theadCss">
                             <tr>
                                 <th style="word-wrap:break-word; width: 50%; font-size: 14px" class="tableHeader">Property Name</th>
@@ -164,33 +150,5 @@
 
         </div>
     </div>
-
-    <!-- <div class="column3 columnsCommonCSS">
-
-        <div class="columnHeading">
-            <span style="display: inline-block;">Select End Tool</span>
-            <md-select ng-disabled="!dataDictionaryController.startTool" placeholder="Select a Tool" ng-model="dataDictionaryController.endTool"
-                style="width: 150px; background-color: whitesmoke; margin: 5px;display: inline-block;">
-                <md-option ng-value="{{tool}}" ng-repeat="tool in dataDictionaryController.endToolsList" ng-click="dataDictionaryController.getEndToolProperties(tool.toolName, tool.categoryName)">{{tool.toolName}}</md-option>
-            </md-select>
-        </div>
-
-        <div class="divTablesHeading">
-            Properties
-        </div>
-
-        <div class="tableDiv">
-            <table class="table md-api-table-landing table-condensed table-bordered table-striped textst">
-                <tr ng-repeat="property in dataDictionaryController.endToolProperties">
-                    <td title="'Properties'" header-class="'theadCss'">{{property}}</td>
-                </tr>
-                <tr ng-show="dataDictionaryController.endToolProperties.length == 0">
-                    <td colspan="5" style="text-align: center">No Data found</td>
-                </tr>
-            </table>
-
-        </div>
-
-    </div>-->
 
 </div>
