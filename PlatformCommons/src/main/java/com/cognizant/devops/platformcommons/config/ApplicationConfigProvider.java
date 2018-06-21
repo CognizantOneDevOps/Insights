@@ -46,11 +46,13 @@ public class ApplicationConfigProvider implements Serializable {
 	private List<String> trustedHosts = new ArrayList<String>(3);
 	private boolean enableOnlineDatatagging = false;
 	private boolean enableNativeUsers;
-	private CorrelationConfig correlations;
-	private boolean enableFieldIndex;
 
 	private EmailConfiguration emailConfiguration = new EmailConfiguration();
+	private CorrelationConfig correlations;
+	private boolean enableFieldIndex;
+	private boolean enableOnlineBackup = false;
 	private AgentDetails agentDetails = new AgentDetails();
+
 	private QueryCache queryCache = new QueryCache();
 
 	private ApplicationConfigProvider() {
@@ -239,16 +241,24 @@ public class ApplicationConfigProvider implements Serializable {
 		this.enableFieldIndex = enableFieldIndex;
 	}
 
+	public boolean isEnableOnlineBackup() {
+		return enableOnlineBackup;
+	}
+
+	public void setEnableOnlineBackup(boolean enableOnlineBackup) {
+		this.enableOnlineBackup = enableOnlineBackup;
+	}
+
+	public boolean isEnableOnlineDatatagging() {
+		return enableOnlineDatatagging;
+	}
+
 	public QueryCache getQueryCache() {
 		return queryCache;
 	}
 
 	public void setQueryCache(QueryCache queryCache) {
 		this.queryCache = queryCache;
-	}
-
-	public boolean isEnableOnlineDatatagging() {
-		return enableOnlineDatatagging;
 	}
 
 	public void setEnableOnlineDatatagging(boolean enableOnlineDatatagging) {

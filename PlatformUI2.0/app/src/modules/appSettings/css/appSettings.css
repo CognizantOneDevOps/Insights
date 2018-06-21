@@ -1,0 +1,19 @@
+.appsubheader {
+	color: #666666 !important;
+	font-size: 14px;
+	font-family: proxima_novasemibold !important;
+}
+.appsub {
+	margin-bottom: 20px;
+    background-color: #f0f0f0;
+    border-bottom: 1px solid #d8d8d8;
+    margin-top: 2px;
+    height: 35px;
+}
+.appsub div {
+	margin: 25px;
+    margin-right: 50px;
+}
+.inputBoxCont {
+	padding-left: 10px;
+}
