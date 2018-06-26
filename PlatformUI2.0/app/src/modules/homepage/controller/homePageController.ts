@@ -166,6 +166,7 @@ module ISightApp {
         userCurrentOrgName: string = '';
         imageSrc: string = "dist/icons/svg/landingPage/Cognizant_Insights.svg";
         showDefaultImg: boolean = false;
+        showTrackingJsonUploadButton: boolean = false;
 
         public redirect(iconId: string): void {
             if (iconId == 'dashboard') {
