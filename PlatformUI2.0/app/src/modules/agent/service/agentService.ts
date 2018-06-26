@@ -25,7 +25,7 @@ module ISightApp {
         getDocrootAgentConfig(Version: string, toolName: string): ng.IPromise<any>;
         getDbAgentConfig(agentId: string): ng.IPromise<any>;
         loadAgentServices(ServerName: string): ng.IPromise<any>;
-        registerAgent(toolName: string, toolVersion: string, osName: string, configData: string): ng.IPromise<any>;
+        registerAgent(toolName: string, toolVersion: string, osName: string, configData: string, trackingDetails: string): ng.IPromise<any>;
         updateAgent(agentId: string, configData: string, toolName: string, toolVersion: string, osName: string): ng.IPromise<any>;
         agentStartStop(agentId: string, actionType: string): ng.IPromise<any>;
         agentUninstall(agentId: string, toolName: string, osversion: string): ng.IPromise<any>
@@ -72,9 +72,9 @@ module ISightApp {
             return restHandler.get(ServerName);
         }
 
-        registerAgent(toolName: string, toolVersion: string, osName: string, configData: string): ng.IPromise<any> {
+        registerAgent(toolName: string, toolVersion: string, osName: string, configData: string, trackingDetails: string): ng.IPromise<any> {
             var restHandler = this.restCallHandlerService;
-            return restHandler.post("AGENT_REGISTER", { 'toolName': toolName, 'agentVersion': toolVersion, 'osversion': osName, 'configDetails': configData }, { 'Content-Type': 'application/x-www-form-urlencoded' });
+            return restHandler.post("AGENT_REGISTER", { 'toolName': toolName, 'agentVersion': toolVersion, 'osversion': osName, 'configDetails': configData, 'trackingDetails': trackingDetails }, { 'Content-Type': 'application/x-www-form-urlencoded' });
         }
 
         updateAgent(agentId: string, configData: string, toolName: string, toolVersion: string, osName: string): ng.IPromise<any> {

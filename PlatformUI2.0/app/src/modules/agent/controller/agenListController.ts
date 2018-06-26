@@ -84,6 +84,7 @@ module ISightApp {
 		}
 
 		editAgentConfig(params): void {
+			this.homeController.showTrackingJsonUploadButton = false;
 			this.homeController.selectedAgentID = params;
 			this.homeController.templateName = 'agentManagement';
 		}
@@ -155,6 +156,7 @@ module ISightApp {
 		}
 
 		newAgentRegister(dataArr): void {
+			this.homeController.showTrackingJsonUploadButton = true;
 			this.homeController.selectedAgentID = { 'type': 'new', 'detailedArr': dataArr };
 			this.homeController.templateName = 'agentManagement';
 		}
