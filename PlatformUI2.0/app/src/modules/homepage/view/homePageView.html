@@ -126,23 +126,24 @@
 
                                 </md-content>
                             </md-tab>
+
+                            <md-tab label="Settings" ng-click="homePageController.selectAct('appSettings')">
+                                <md-content style="{{homePageController.mainContentMinHeight}}">
+                                   <div ng-if="homePageController.templateName == 'appSettings'" ng-include="'dist/modules/appSettings/view/appSettingsView.html'"
+                                        ng-controller="appSettingsController as appSettingsController" layout="vertical"></div>
+                                    <div ng-if="homePageController.templateName == 'datapurgeSettings'" ng-include="'dist/modules/appSettings/view/dataPurgingView.html'"
+                                        ng-controller="dataPurgingController as dataPurgingController" layout="vertical"></div>
+                                  </md-content>
+                            </md-tab>
+
                             <md-tab label="Access Group Management" ng-click="homePageController.selectAct('userOnboarding')">
                                 <md-content /*style="{{homePageController.mainContentMinHeight}}"*/>
                                 <div ng-if="homePageController.templateName == 'applicationManagement'" ng-include="'dist/modules/applicationManagement/view/applicationManagementView.html'"
                                     ng-controller="applicationManagementController as applicationManagementController" layout="vertical"></div>
                                 <div ng-if="homePageController.templateName == 'userOnboarding'" ng-include="'dist/modules/userOnboarding/view/userOnboardingView.html'"
                                     ng-controller="userOnboardingController as userOnboardingController" layout="vertical"></div>
-
                                 </md-content>
                             </md-tab>
-                            <md-tab label="Settings" ng-click="homePageController.selectAct('appSettings')">
-                                <md-content style="{{homePageController.mainContentMinHeight}}">
-                                    <div ng-if="homePageController.templateName == 'appSettings'" ng-include="'dist/modules/appSettings/view/appSettingsView.html'"
-                                        ng-controller="appSettingsController as appSettingsController" layout="vertical"></div>
-
-                                </md-content>
-                            </md-tab>
-
                         </md-tabs>
                     </md-tab-body>
                 </md-tab>
