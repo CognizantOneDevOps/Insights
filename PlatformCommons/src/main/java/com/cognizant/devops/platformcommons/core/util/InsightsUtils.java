@@ -33,7 +33,7 @@ public class InsightsUtils {
 	}
 
 	private static String sparkTimezone = ApplicationConfigProvider.getInstance().getInsightsTimeZone();
-	private static ZoneId zoneId = ZoneId.of(sparkTimezone);
+	public static ZoneId zoneId = ZoneId.of(sparkTimezone);
 
 	public static long getDataFromTime(String schedule) {
 		Long time = null;
