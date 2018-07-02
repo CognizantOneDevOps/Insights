@@ -83,10 +83,33 @@ public class ElasticSearchService {
 			for(JsonElement data : dashboardsJsonArray){
 				JsonObject dashboardData = data.getAsJsonObject();
 				DashboardModel model = new DashboardModel();
+				//model.setId(dashboardData.get("title").getAsString());
+				//model.setTitle(dashboardData.get("title").getAsString());
+				//model.setUrl(grafanaIframeUrl + grafanaUrl + dashboardData.get("uri").getAsString());
+				//dashboardResponse.addDashboard(model);
+				if( dashboardData.get("type").getAsString().contains("dash-db")) {
+				DashboardModel model = new DashboardModel();
 				model.setId(dashboardData.get("title").getAsString());
 				model.setTitle(dashboardData.get("title").getAsString());
-				model.setUrl(grafanaIframeUrl + grafanaUrl + dashboardData.get("uri").getAsString());
+				ClientResponse grafanaVersion = RestHandler.doGet(grafanaBaseUrl + "/api/health", null, headers);
+				if(grafanaVersion.toString().contains("404")) {
+					model.setUrl(grafanaIframeUrl + grafanaUrl + dashboardData.get("uri").getAsString());
+				}
+				else {
+					JsonElement responsegrafanaVersion = new JsonParser().parse(grafanaVersion.getEntity(String.class));
+					if(responsegrafanaVersion.getAsJsonObject().get("version").getAsString().contains("5.")) {
+						String urlFromResponseGrafana = dashboardData.get("url").getAsString();
+						if((grafanaIframeUrl + grafanaBaseUrl + urlFromResponseGrafana).contains("/dashboards/f/")) {
+						}
+						else {
+							model.setUrl(grafanaIframeUrl + grafanaBaseUrl + urlFromResponseGrafana);}
+					}
+					else {
+						model.setUrl(grafanaIframeUrl + grafanaUrl + dashboardData.get("uri").getAsString());
+					}
+				}
 				dashboardResponse.addDashboard(model);
+			}
 			}
 			/*ElasticSearchDBHandler dbHandler = new ElasticSearchDBHandler();
 			String url = ApplicationConfigProvider.getInstance().getEndpointData().getElasticSearchEndpoint() +"/.kibana/dashboard/_search?fields=_id,title";

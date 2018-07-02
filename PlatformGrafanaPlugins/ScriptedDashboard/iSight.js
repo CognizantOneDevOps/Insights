@@ -52,6 +52,7 @@ $('<style>iframe {overflow:hidden;}</style>').appendTo('head');
 var documentWidth = $(document).width();
 var width = documentWidth - 10;
 var documentHeight = window.innerHeight;
+var documentHeight = 100;
 
 var addDashboardIframeToDom = function (url) {
 	$('<iframe>', {
@@ -70,17 +71,20 @@ var addRouteChangeDetector = function () {
 	if (grafanaApp.length === 0 || document.getElementById("iSightIframe").contentWindow.angular === undefined) {
 		setTimeout(function () {
 			addRouteChangeDetector();
-		}, 20);
+		}, 300);
 	} else {
-		setTimeout(function () {
+		try{
 			var $injector = document.getElementById("iSightIframe").contentWindow.angular.element(".grafana-app").injector();
-			$injector.invoke(function ($rootScope) {
-				$rootScope.$on('$viewContentLoaded', function (next, current) {
-					calculateHeight();
-				});
+		console.log($injector);
+		$injector.invoke(function ($rootScope) {
+			$rootScope.$on('$viewContentLoaded', function (next, current) {
+				calculateHeight();
 			});
-		}, 20);
-		addStyleTag();
+		});
+		}
+		finally{
+			addStyleTag();
+		}
 	}
 };
 
@@ -141,6 +145,7 @@ var addStyleTag = function () {
 		}, 20);
 	} else {
 		var style = "<style type=\"text/css\">" +
+			".sidemenu {display : none !important;}\n" +
 			".navbar-brand-btn {display : none !important;}\n" +
 			".search-item-dash-home {display : none !important;}" +
 			".search-button-row-explore-link {display : none !important;}" +
