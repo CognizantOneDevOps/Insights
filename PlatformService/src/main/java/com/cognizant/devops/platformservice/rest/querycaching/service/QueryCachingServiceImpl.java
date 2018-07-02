@@ -25,6 +25,7 @@ import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.log4j.Logger;
 import org.springframework.stereotype.Service;
 
+import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.core.util.InsightsUtils;
 import com.cognizant.devops.platformcommons.dal.elasticsearch.ElasticSearchDBHandler;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBException;
@@ -94,7 +95,10 @@ public class QueryCachingServiceImpl implements QueryCachingService {
 					.getAsBoolean();
 
 			if (isCacheResult) {
-				String sourceESCacheUrl = QueryCachingConstants.ES_HOST + "/" + QueryCachingConstants.ES_CACHE_INDEX;
+				String esCacheIndex = QueryCachingConstants.ES_CACHE_INDEX;
+				if (esCacheIndex == null)
+					esCacheIndex = QueryCachingConstants.DEFAULT_ES_CACHE_INDEX;
+				String sourceESCacheUrl = QueryCachingConstants.ES_HOST + "/" + esCacheIndex;
 				String cachingType = requestJson.get(QueryCachingConstants.METADATA).getAsJsonArray()
 						.get(QueryCachingConstants.ZEROTH_INDEX).getAsJsonObject()
 						.get(QueryCachingConstants.CACHING_TYPE).getAsString();
