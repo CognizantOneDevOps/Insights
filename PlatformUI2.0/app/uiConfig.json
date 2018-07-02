@@ -1,7 +1,11 @@
 {
 "showInsightsTab" : false,
 "showOptionsPanel" : false,
-"showBusinessMapping" : true
+"showBusinessMapping" : true,
+"agentsOsList":{
+				"windows": "Windows",
+				"linux": "Linux"
+			}
 }
 
 
