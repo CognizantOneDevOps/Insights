@@ -79,7 +79,7 @@ public class DataDictionaryServiceImpl implements DataDictionaryService {
 				String element = iterator.next().getAsString();
 				if (!(element.equalsIgnoreCase(DataDictionaryConstants.EXEC_ID)
 						|| element.equalsIgnoreCase(DataDictionaryConstants.UUID)))
-					stringBuilder = stringBuilder.append(iterator.next().getAsString()).append(",");
+					stringBuilder = stringBuilder.append(element).append(",");
 			}
 			String[] keysArray = stringBuilder.toString().split(",");
 			Gson gson = new GsonBuilder().create();
