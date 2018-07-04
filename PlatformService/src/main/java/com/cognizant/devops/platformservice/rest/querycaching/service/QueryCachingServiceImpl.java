@@ -150,10 +150,10 @@ public class QueryCachingServiceImpl implements QueryCachingService {
 
 				ElasticSearchDBHandler esDbHandler = new ElasticSearchDBHandler();
 				JsonObject esResponse = esDbHandler.queryES(sourceESCacheUrl + "/_search", esQuery);
-				JsonArray esResponseArray;
+				JsonArray esResponseArray = new JsonArray();
 
 				if (esResponse.has("status") && esResponse.get("status").getAsInt() == 404)
-					esResponseArray = new JsonArray();
+					log.debug("No such elasticsearch index is found. Creating a new index - " + sourceESCacheUrl);
 				else
 					esResponseArray = esResponse.get("hits").getAsJsonObject().get("hits").getAsJsonArray();
 
