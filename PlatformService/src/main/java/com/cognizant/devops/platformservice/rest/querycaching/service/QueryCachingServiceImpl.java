@@ -25,7 +25,6 @@ import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.log4j.Logger;
 import org.springframework.stereotype.Service;
 
-import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.core.util.InsightsUtils;
 import com.cognizant.devops.platformcommons.dal.elasticsearch.ElasticSearchDBHandler;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBException;
@@ -95,7 +94,12 @@ public class QueryCachingServiceImpl implements QueryCachingService {
 					.getAsBoolean();
 
 			if (isCacheResult) {
-				String sourceESCacheUrl = ApplicationConfigProvider.getInstance().getQueryCache().getEsCacheIndex();
+				String esCacheIndex = QueryCachingConstants.ES_CACHE_INDEX;
+				if (esCacheIndex == null)
+					esCacheIndex = QueryCachingConstants.DEFAULT_ES_CACHE_INDEX;
+				else
+					esCacheIndex = esCacheIndex + "/querycacheresults";
+				String sourceESCacheUrl = QueryCachingConstants.ES_HOST + "/" + esCacheIndex;
 				String cachingType = requestJson.get(QueryCachingConstants.METADATA).getAsJsonArray()
 						.get(QueryCachingConstants.ZEROTH_INDEX).getAsJsonObject()
 						.get(QueryCachingConstants.CACHING_TYPE).getAsString();
@@ -146,8 +150,13 @@ public class QueryCachingServiceImpl implements QueryCachingService {
 
 				ElasticSearchDBHandler esDbHandler = new ElasticSearchDBHandler();
 				JsonObject esResponse = esDbHandler.queryES(sourceESCacheUrl + "/_search", esQuery);
+				JsonArray esResponseArray = new JsonArray();
 
-				JsonArray esResponseArray = esResponse.get("hits").getAsJsonObject().get("hits").getAsJsonArray();
+				if (esResponse.has("status") && esResponse.get("status").getAsInt() == 404)
+					log.debug("No such elasticsearch index is found. Creating a new index - " + sourceESCacheUrl);
+				else
+					esResponseArray = esResponse.get("hits").getAsJsonObject().get("hits").getAsJsonArray();
+
 				if (esResponseArray.size() != 0) {
 					esResponse = esResponseArray.get(0).getAsJsonObject().get("_source").getAsJsonObject();
 				} else {
