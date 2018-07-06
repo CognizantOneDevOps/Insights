@@ -84,7 +84,7 @@ public class ElasticSearchDBHandler {
 			WebResource resource = Client.create().resource(sourceESUrl);
 			response = resource.accept(MediaType.APPLICATION_JSON).type(MediaType.APPLICATION_JSON)
 					.post(ClientResponse.class, query);
-			if (!((response.getStatus() == 200) || (response.getStatus() == 201))) {
+			if (!((response.getStatus() == 200) || (response.getStatus() == 201) || (response.getStatus() == 404))) {
 				throw new Exception("Failed to get response from ElasticSeach for query - " + query
 						+ "-- HTTP response code -" + response.getStatus());
 			}
