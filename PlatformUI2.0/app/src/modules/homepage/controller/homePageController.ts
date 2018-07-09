@@ -87,7 +87,7 @@ module ISightApp {
 
             //self.selectedIndex = 2;
             //self.templateName = 'dashboards';
-
+            self.loadDataDictionaryURL();
             let location = this.$location;
             let uiConfigJsonUrl: string = location.absUrl().replace(location.path(), "");
             if (uiConfigJsonUrl.length > uiConfigJsonUrl.lastIndexOf('/')) {
@@ -167,6 +167,8 @@ module ISightApp {
         imageSrc: string = "dist/icons/svg/landingPage/Cognizant_Insights.svg";
         showDefaultImg: boolean = false;
         showTrackingJsonUploadButton: boolean = false;
+        trackingJsonLocation: string = '';
+        dataDictionaryURL: string = '';
 
         public redirect(iconId: string): void {
             if (iconId == 'dashboard') {
@@ -207,6 +209,19 @@ module ISightApp {
         public closeDialog() {
             this.$mdDialog.cancel();
             this.$mdDialog.hide();
+        }
+
+        showDataDictionary() {
+            var self = this;
+            self.$mdDialog.show({
+                controller: DataDictionaryController,
+                controllerAs: 'dataDictionaryController',
+                templateUrl: './dist/modules/dataDictionary/view/dataDictionaryView.html',
+                parent: angular.element(document.body),
+                preserveScope: true,
+                clickOutsideToClose: true,
+                bindToController: true
+            })
         }
 
         selectAct(tabName: string): void {
@@ -321,6 +336,16 @@ module ISightApp {
                 this.$cookies.remove(key);
             }
             this.$location.path('/iSight/login');
+        }
+
+        loadDataDictionaryURL() {
+            var self = this;
+            let location = self.$location;
+            let dataDictionaryUrl: string = location.absUrl().replace(location.path(), "/InSights/dataDictionary");
+            if (dataDictionaryUrl.length > dataDictionaryUrl.lastIndexOf('/')) {
+                dataDictionaryUrl = dataDictionaryUrl.substr(0, dataDictionaryUrl.lastIndexOf('/'));
+            }
+            self.dataDictionaryURL = dataDictionaryUrl + "/dataDictionary";
         }
     }
 }

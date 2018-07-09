@@ -33,12 +33,39 @@
                     <md-icon style="margin-top:30px" layout md-svg-src="{{homePageController.aboutImg}}" ng-style="{height: '20px', width: '20px'}"></md-icon>
                     <span layout class="iconLablCss iconMrgn" id="aboutHover">About</span>
                 </a>
-                <div class="verticallineHelp"></div>
+                <!--<div class="verticallineHelp"></div>
                 <a ng-mouseover="homePageController.addHoverImage('Help')" ng-mouseleave="homePageController.removeHoverImage('Help')" style="margin-right:7px"
                     layout class="logout" href="https://onedevops.atlassian.net/wiki/display/OI/InSights" id="helpHover" target="_blank">
                     <md-icon style="margin-top:30px" layout md-svg-src="{{homePageController.imageurl4}}" ng-style="{height: '20px', width: '20px'}"></md-icon>
                     <span layout class="iconLablCss iconMrgn" id="helpHover">Help</span>
-                </a>
+                </a>-->
+
+                <div class="verticallineHelp"></div>
+                <ul class="profile-wrapper">
+                    <li>
+                        <!-- Help section -->
+                        <div class="profile" style="margin-right: 5px">
+
+                            <md-icon md-svg-src="{{homePageController.imageurl4}}" ng-style="{height: '20px', width: '20px'}"></md-icon>
+                            <span class="name" style="margin-left: 0px">Help</span>
+
+                            <!-- more menu -->
+                            <ul class="menu">
+                                <li>
+                                    <a href="https://onedevops.atlassian.net/wiki/display/OI/InSights" id="helpHover" target="_blank">
+                                        <span id="helpHover">Product Help</span>
+                                    </a>
+                                </li>
+                                <li ng-if="homePageController.userRole === 'Admin' || homePageController.userRole === 'Editor'">
+                                    <a href="{{homePageController.dataDictionaryURL}}" id="helpHover" target="_blank">
+                                        <span id="helpHover">Data Dictionary</span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </li>
+                </ul>
+
                 <div class="verticallineHelp"></div>
                 <ul class="profile-wrapper">
                     <li>

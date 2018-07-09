@@ -226,6 +226,11 @@ module ISightApp {
                         controller: AgentListController,
                         controllerAs: 'agentListController'
                     }).
+                    when('/InSights/dataDictionary', {
+                        templateUrl: './dist/modules/dataDictionary/view/dataDictionaryView.html',
+                        controller: DataDictionaryController,
+                        controllerAs: 'dataDictionaryController'
+                    }).
 
                     otherwise({
                         redirectTo: '/InSights/login'

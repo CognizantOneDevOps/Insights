@@ -18,18 +18,18 @@ module ISightApp {
     export class DataDictionaryController {
         static $inject = ['dataDictionaryService']
         constructor(private dataDictionaryService: IDataDictionaryService) {
-            var elem = document.querySelector('#homePageTemplateContainer');
-            var homePageControllerScope = angular.element(elem).scope();
-            var homePageController = homePageControllerScope['homePageController'];
-            this.homeController = homePageController;
+            // var elem = document.querySelector('#homePageTemplateContainer');
+            //var homePageControllerScope = angular.element(elem).scope();
+            //var homePageController = homePageControllerScope['homePageController'];
+            //this.homeController = homePageController;
 
             var self = this;
             self.showConfirmMessage = "";
-            self.homeController.templateName = 'dataDictionary';
+            //self.homeController.templateName = 'dataDictionary';
             self.getToolsList();
         }
 
-        homeController: HomePageController;
+        // homeController: HomePageController;
         showConfirmMessage: string;
         columnContentHeight: string;
         startTool: any;

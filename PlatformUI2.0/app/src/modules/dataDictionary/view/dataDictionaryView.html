@@ -47,7 +47,7 @@
     </div>
 
     <div class="agentConfigTable" layout layout-align="center center" ng-if="dataDictionaryController.showNoToolsSelectedMessage">
-        <h3 class="dataDictionaryMessages">Please Select Tools To Check Data Dictionary!</span>
+        <h3 class="dataDictionaryMessages">Please Ensure You Are Logged Into Insights & Select Tools To Check Data Dictionary!</span>
     </div>
 
     <throbber ng-if="dataDictionaryController.showSelectStartToolThrobber === 'true'" layout="column" flex="100">
@@ -67,6 +67,18 @@
 
                 <div ng-if="!dataDictionaryController.showSelectEndToolMessage" class="divTablesHeading" style="width:49%;display: inline-block;margin-left: 5px">
                     {{dataDictionaryController.endTool.toolName}} Properties
+                </div>
+            </div>
+
+            <div style="margin-top: -5px">
+                <div class="divTablesHeading" style="width:49%;display: inline-block;margin-left: 5px; margin-top: -10px">
+                    Label Information:
+                    <span style="font-weight: bold; color: black">({{dataDictionaryController.startTool.categoryName}}:{{dataDictionaryController.startTool.toolName}})</span>
+                </div>
+
+                <div ng-if="!dataDictionaryController.showSelectEndToolMessage" class="divTablesHeading" style="width:49%;display: inline-block;margin-left: 5px; margin-top: -10px">
+                    Label Information:
+                    <span style="font-weight: bold; color: black">({{dataDictionaryController.endTool.categoryName}}:{{dataDictionaryController.endTool.toolName}})</span>
                 </div>
             </div>
 
@@ -118,14 +130,14 @@
             <throbber ng-if="dataDictionaryController.showCorrelationsLoadThrobber === 'true'" layout="column" flex="100">
             </throbber>
 
-            <div class="agentConfigTable" layout layout-align="center center" ng-if="dataDictionaryController.correlationProperties === undefined">
+            <div class="agentConfigTable" layout layout-align="center center" ng-if="dataDictionaryController.correlationProperties === undefined && dataDictionaryController.showCorrelationsLoadThrobber === 'false'">
                 <h1 class="dataDictionaryMessages">No Correlations found between the selected tools.</span>
             </div>
 
-            <div ng-if="dataDictionaryController.showCorrelationsLoadThrobber === 'false'">
+            <div ng-if="dataDictionaryController.showCorrelationsLoadThrobber === 'false' && dataDictionaryController.correlationProperties!= undefined">
                 <div class="divTablesHeading" style="text-align: left;margin-left: 3%;">
                     <span>Realtionship Name:
-                        <b style="color: black;">{{dataDictionaryController.test.relationName}}</b>
+                        <b style="color: black;">{{dataDictionaryController.correlationProperties.relationName}}</b>
                     </span>
                 </div>
 
