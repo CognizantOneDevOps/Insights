@@ -49,6 +49,7 @@ module ISightApp {
         showSelectEndToolMessage: boolean = true;
         showSelectStartToolThrobber: string = "";
         showSelectEndToolThrobber: string = "";
+        logoSrc = "dist/icons/svg/landingPage/Cognizant_Insights.svg";
 
         getColumnHeight() {
             var height = (<HTMLIFrameElement>document.getElementById('selectColumn1'));
