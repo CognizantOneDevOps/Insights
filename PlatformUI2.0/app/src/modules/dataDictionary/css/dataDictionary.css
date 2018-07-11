@@ -128,3 +128,17 @@ selectButtonDivCss {
     margin-top: 70px;
     text-align: center;
 }
+
+.pageHeading {
+    margin-bottom: 0px;
+    margin-top: 0px;
+    font-size: 18px;
+    font-family: proxima_novaregular;
+    color: #00728f;
+    background-color: #dff1f6;
+    padding-bottom: 10px;
+    padding-top: 10px;
+    border: solid;
+    border-color: #addbe8;
+    border-width: 1px;
+}
