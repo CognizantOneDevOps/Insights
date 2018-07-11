@@ -181,9 +181,4 @@ public class OfflineDataProcessingExecutor implements Job {
 		return Boolean.FALSE;
 	}
 
-	 public static void main(String args[]) {
-		ApplicationConfigCache.loadConfigCache();
-		OfflineDataProcessingExecutor executor = new OfflineDataProcessingExecutor();
-		executor.executeOfflineProcessing();
-	}
 }
