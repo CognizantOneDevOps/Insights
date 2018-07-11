@@ -18,11 +18,15 @@
 
 <div class="mainDivContainer">
 
-    <div layout class="applicationButtMar">
+    <div style="text-align: center">
+        <div>
+            <md-icon style="margin-left:30px" layout md-svg-src="{{dataDictionaryController.logoSrc}}" ng-style="{height: '78px', width: '252px'}"></md-icon>
+        </div>
+        <h3 class="pageHeading">DATA DICTIONARY</h3>
+    </div>
+
+    <div layout class="applicationButtMar" style="margin-top: 0px">
         <div layout style="height:77px;margin-bottom:20px">
-            <div>
-                <md-icon style="margin-left:30px" layout md-svg-src="{{dataDictionaryController.logoSrc}}" ng-style="{height: '78px', width: '252px'}"></md-icon>
-            </div>
         </div>
         <div layout="row" class="applicationContentCss" style="width: 100%;margin-top: 6px">
             <div layout layout-align="end center">
@@ -52,14 +56,14 @@
     </div>
 
     <div class="agentConfigTable" layout layout-align="center center" ng-if="dataDictionaryController.showNoToolsSelectedMessage">
-        <h3 class="dataDictionaryMessages">Please Ensure You Are Logged Into Insights & Select Tools To Check Data Dictionary!</span>
+        <h3 class="dataDictionaryMessages">Please Ensure You Are Logged Into Insights, and Select Tools To Check Data Dictionary!</h3>
     </div>
 
     <throbber ng-if="dataDictionaryController.showSelectStartToolThrobber === 'true'" layout="column" flex="100">
     </throbber>
 
     <div ng-if="dataDictionaryController.showSelectStartToolThrobber === 'false'">
-        <div class="column1 columnsCommonCSS" style="margin-left: 2% !important" id="selectColumn1">
+        <div class="column1 columnsCommonCSS" style="margin-left: 2% !important; margin-bottom: 1%" id="selectColumn1">
             <div style="text-align: center; padding-bottom: 5px; background-color: #dff1f6">
                 <md-label style="font-size: 16px; margin-right: 10px;color: #00728f; font-family: proxima_novaregular;text-align: center">
                     Tools Properties</md-label>
@@ -101,7 +105,7 @@
 
                 <div class="tableDiv" style="display: inline-block;width: 43%;margin-left: 3%;margin-right: 3%; height: 100%">
                     <div class="agentConfigTable" layout layout-align="center center" ng-if="dataDictionaryController.showSelectEndToolMessage">
-                        <h1 class="dataDictionaryMessages">Please Select End Tool To Check Properties.</span>
+                        <h1 class="dataDictionaryMessages">Please Select End Tool To Check Properties.</h1>
                     </div>
 
                     <throbber ng-if="dataDictionaryController.showSelectEndToolThrobber === 'true'" layout="column" flex="100">
@@ -129,14 +133,14 @@
             </div>
 
             <div class="agentConfigTable" layout layout-align="center center" ng-if="dataDictionaryController.showNoToolsSelectedForCorrelation">
-                <h1 class="dataDictionaryMessages">Please Select Tools To Check Correlations.</span>
+                <h1 class="dataDictionaryMessages">Please Select Tools To Check Correlations.</h1>
             </div>
 
             <throbber ng-if="dataDictionaryController.showCorrelationsLoadThrobber === 'true'" layout="column" flex="100">
             </throbber>
 
             <div class="agentConfigTable" layout layout-align="center center" ng-if="dataDictionaryController.correlationProperties === undefined && dataDictionaryController.showCorrelationsLoadThrobber === 'false'">
-                <h1 class="dataDictionaryMessages">No Correlations found between the selected tools.</span>
+                <h1 class="dataDictionaryMessages">No Correlations found between the selected tools.</h1>
             </div>
 
             <div ng-if="dataDictionaryController.showCorrelationsLoadThrobber === 'false' && dataDictionaryController.correlationProperties!= undefined">
