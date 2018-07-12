@@ -27,6 +27,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.List;
 
+import org.apache.commons.io.FilenameUtils;
 import org.apache.log4j.Logger;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
@@ -42,25 +43,28 @@ import com.cognizant.devops.platformengine.modules.offlinedataprocessing.model.D
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonSyntaxException;
 import com.google.gson.stream.JsonWriter;
 
 /**
- *  This is the executor class for Offline Data Processing
- *  This class has the ability to execute a sequence of Cypher queries. 
- *  These cypher queries should be stored inside a JSON configuration file. 
- *  This code has the capability of reading multiple json files which reside inside "data-enrichment" folder of  INSIGHTS_HOME path
- *  Config JSON files should have following predefined format
- *       	"queryName": "Some description on the query",
-    		"cypherQuery": "Actual cypher query",
-    		"runSchedule": "Query execution interval in minutes",
-    		"lastExecutionTime": "Last execution time will be updated by code",
- *    
+ * This is the executor class for Offline Data Processing This class has the
+ * ability to execute a sequence of Cypher queries. These cypher queries should
+ * be stored inside a JSON configuration file. This code has the capability of
+ * reading multiple json files which reside inside "data-enrichment" folder of
+ * INSIGHTS_HOME path.
+ * Config JSON files should have following predefined format
+ * "queryName": "Some description on the query", 
+ * "cypherQuery": "Actual cypher query", 
+ * "runSchedule": "Query execution interval in minutes",
+ * "lastExecutionTime": "Last execution time will be updated by code",
+ * 
  * @author 368419
  *
  */
 public class OfflineDataProcessingExecutor implements Job {
 	private static Logger log = Logger.getLogger(OfflineDataProcessingExecutor.class);
 	private static final String DATE_TIME_FORMAT = "yyyy/MM/dd hh:mm a";
+	private static final String JSON_FILE_EXTENSION = "json";
 
 	@Override
 	public void execute(JobExecutionContext context) throws JobExecutionException {
@@ -70,40 +74,75 @@ public class OfflineDataProcessingExecutor implements Job {
 	private void executeOfflineProcessing() {
 		File queryFolderPath = new File(ConfigOptions.OFFLINE_DATA_PROCESSING_RESOLVED_PATH);
 		File[] files = queryFolderPath.listFiles();
-		for (File eachFile: files) {
-			if (eachFile.isFile()) { // this line removes other directories/folders
-				processOfflineConfiguration(eachFile);
+		for (File eachFile : files) {
+			if (eachFile.isFile()) { // this line removes other
+										// directories/folders
+				String fileName = eachFile.getName();
+				if (hasJsonFileExtension(fileName)) {
+					processOfflineConfiguration(eachFile);
+				}
 			}
-		}
-	}
-
-	private void processOfflineConfiguration(File jsonFile) {
-		try (BufferedReader reader = new BufferedReader(new FileReader(jsonFile))) {
-			DataEnrichmentModel[] dataEnrichmentModelArray = new Gson().fromJson(reader, DataEnrichmentModel[].class);
-			List<DataEnrichmentModel> dataEnrichmentModels = Arrays.asList(dataEnrichmentModelArray);
-			for (DataEnrichmentModel dataEnrichmentModel : dataEnrichmentModels) {
-				String cypherQuery = dataEnrichmentModel.getCypherQuery() ;				
-				if (isQueryScheduledToRun(dataEnrichmentModel.getRunSchedule(), dataEnrichmentModel.getLastExecutionTime())) {
-					executeCypherQuery(cypherQuery, dataEnrichmentModel);
-					updateLastExecutionTime(dataEnrichmentModel);
-				} 
-			}
-			// Write into the file
-			try (JsonWriter writer = new JsonWriter(new FileWriter(jsonFile))) {
-				writer.setIndent("  ");
-				new GsonBuilder().disableHtmlEscaping().create().toJson(dataEnrichmentModels.toArray(), DataEnrichmentModel[].class, writer);
-			} catch (IOException e) {
-				log.error("Unable to update data-enrichment.json file.", e);
-			}
-		} catch (FileNotFoundException e) {
-			log.error("data-enrichment.json file not found.", e);
-		} catch (IOException e) {
-			log.error("Unable to read data-enrichment.json file.", e);
 		}
 	}
 
 	/**
-	 * Updates lastRunTime in the offline vector file after processing cypher query
+	 * Checks whether file has .json/.JSON extension
+	 * 
+	 * @param fileName
+	 * @return
+	 */
+	private Boolean hasJsonFileExtension(String fileName) {
+		if (fileName != null && !fileName.isEmpty()) {
+			String extension = FilenameUtils.getExtension(fileName);
+			if (JSON_FILE_EXTENSION.equalsIgnoreCase(extension)) {
+				return Boolean.TRUE;
+			}
+		}
+		return Boolean.FALSE;
+	}
+
+	/**
+	 * Processes each offline configuration file
+	 * Processes each query block inside each configuration file and executes cypher query
+	 * @param jsonFile
+	 */
+	private void processOfflineConfiguration(File jsonFile) {
+		try {
+			try (BufferedReader reader = new BufferedReader(new FileReader(jsonFile))) {
+				DataEnrichmentModel[] dataEnrichmentModelArray = new Gson().fromJson(reader,
+						DataEnrichmentModel[].class);
+				List<DataEnrichmentModel> dataEnrichmentModels = Arrays.asList(dataEnrichmentModelArray);
+				for (DataEnrichmentModel dataEnrichmentModel : dataEnrichmentModels) {
+					String cypherQuery = dataEnrichmentModel.getCypherQuery();
+					if (isQueryScheduledToRun(dataEnrichmentModel.getRunSchedule(),
+							dataEnrichmentModel.getLastExecutionTime())) {
+						executeCypherQuery(cypherQuery, dataEnrichmentModel);
+						updateLastExecutionTime(dataEnrichmentModel);
+					}
+				}
+				// Write into the file
+				try (JsonWriter writer = new JsonWriter(new FileWriter(jsonFile))) {
+					writer.setIndent("  ");
+					new GsonBuilder().disableHtmlEscaping().create().toJson(dataEnrichmentModels.toArray(),
+							DataEnrichmentModel[].class, writer);
+				} catch (IOException e) {
+					log.error("Unable to update offline configuration file.", e);
+				}
+			} catch (FileNotFoundException e) {
+				log.error("offline configuration file not found.", e);
+			} catch (IOException e) {
+				log.error("Unable to read offline configuration file.", e);
+			}
+		} catch (IllegalStateException | JsonSyntaxException ex) {
+			log.error(jsonFile.getName() + " file is not as per expected format", ex);
+			return;
+		}
+
+	}
+
+	/**
+	 * Updates lastRunTime in the offline vector file after processing cypher
+	 * query
 	 * 
 	 */
 	private DataEnrichmentModel updateLastExecutionTime(DataEnrichmentModel dataEnrichmentModel) {
@@ -153,7 +192,9 @@ public class OfflineDataProcessingExecutor implements Job {
 
 	/**
 	 * 
-	 * Checks whether query is scheduled to run or not depending on runSchedule and lastRunTime
+	 * Checks whether query is scheduled to run or not depending on runSchedule
+	 * and lastRunTime
+	 * 
 	 * @param runSchedule
 	 * @param lastRunTime
 	 * @return
@@ -180,5 +221,11 @@ public class OfflineDataProcessingExecutor implements Job {
 		}
 		return Boolean.FALSE;
 	}
+
+	/*public static void main(String args[]) {
+		ApplicationConfigCache.loadConfigCache();
+		OfflineDataProcessingExecutor dataProcessing = new OfflineDataProcessingExecutor();
+		dataProcessing.executeOfflineProcessing();
+	}*/
 
 }
