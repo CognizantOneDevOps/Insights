@@ -33,7 +33,6 @@ import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 
-import com.cognizant.devops.platformcommons.config.ApplicationConfigCache;
 import com.cognizant.devops.platformcommons.constants.ConfigOptions;
 import com.cognizant.devops.platformcommons.core.util.InsightsUtils;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBException;
@@ -76,7 +75,7 @@ public class OfflineDataProcessingExecutor implements Job {
 		File[] files = queryFolderPath.listFiles();
 		for (File eachFile : files) {
 			if (eachFile.isFile()) { // this line removes other
-										// directories/folders
+				// directories/folders
 				String fileName = eachFile.getName();
 				if (hasJsonFileExtension(fileName)) {
 					processOfflineConfiguration(eachFile);
@@ -114,6 +113,11 @@ public class OfflineDataProcessingExecutor implements Job {
 				List<DataEnrichmentModel> dataEnrichmentModels = Arrays.asList(dataEnrichmentModelArray);
 				for (DataEnrichmentModel dataEnrichmentModel : dataEnrichmentModels) {
 					String cypherQuery = dataEnrichmentModel.getCypherQuery();
+					Long runSchedule = dataEnrichmentModel.getRunSchedule();
+					if (cypherQuery == null || cypherQuery.isEmpty() || runSchedule == null )  {
+						log.error(dataEnrichmentModel.getQueryName() + " doesn't have either cypherQuery or runSchedule attribute.");
+						continue;
+					}
 					if (isQueryScheduledToRun(dataEnrichmentModel.getRunSchedule(),
 							dataEnrichmentModel.getLastExecutionTime())) {
 						executeCypherQuery(cypherQuery, dataEnrichmentModel);
@@ -137,7 +141,6 @@ public class OfflineDataProcessingExecutor implements Job {
 			log.error(jsonFile.getName() + " file is not as per expected format", ex);
 			return;
 		}
-
 	}
 
 	/**
