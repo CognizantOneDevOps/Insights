@@ -3,7 +3,8 @@ Description=Ubuntu BitBucketAgent Service
 
 [Service]
 Type=forking
-ExecStart=/bin/bash /opt/insightsagents/PlatformAgents/bitbucket/InSightsBitBucketAgent.sh
+ExecStart=/bin/bash /opt/insightsagents/PlatformAgents/bitbucket/InSightsBitBucketAgent.sh start
+ExecStop=/bin/bash /opt/insightsagents/PlatformAgents/bitbucket/InSightsBitBucketAgent.sh stop
 
 [Install]
 WantedBy=multi-user.target
