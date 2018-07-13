@@ -3,7 +3,8 @@ Description=Ubuntu XLDeployAgent Service
 
 [Service]
 Type=forking
-ExecStart=/bin/bash /opt/insightsagents/PlatformAgents/xldeploy/InSightsXLDeployAgent.sh
+ExecStart=/bin/bash /opt/insightsagents/PlatformAgents/xldeploy/InSightsXLDeployAgent.sh start
+ExecStop=/bin/bash /opt/insightsagents/PlatformAgents/xldeploy/InSightsXLDeployAgent.sh stop
 
 [Install]
 WantedBy=multi-user.target

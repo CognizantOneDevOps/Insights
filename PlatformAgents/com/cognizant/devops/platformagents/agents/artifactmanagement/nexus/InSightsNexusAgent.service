@@ -3,7 +3,8 @@ Description=Ubuntu NexusAgent Service
 
 [Service]
 Type=forking
-ExecStart=/bin/bash /opt/insightsagents/PlatformAgents/nexus/InSightsNexusAgent.sh
+ExecStart=/bin/bash /opt/insightsagents/PlatformAgents/nexus/InSightsNexusAgent.sh start
+ExecStop=/bin/bash /opt/insightsagents/PlatformAgents/nexus/InSightsNexusAgent.sh stop
 
 [Install]
 WantedBy=multi-user.target
