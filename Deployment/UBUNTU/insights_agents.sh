@@ -20,20 +20,20 @@ cd insightsagents
 export INSIGHTS_AGENT_HOME=`pwd`
 echo INSIGHTS_AGENT_HOME=`pwd` | tee -a /etc/environment
 echo "export" INSIGHTS_AGENT_HOME=`pwd` | tee -a /etc/profile
-sudo mkdir AgentDaemon
-sudo mkdir PlatformAgents
+mkdir AgentDaemon
+mkdir PlatformAgents
 chmod -R 755 AgentDaemon
 chmod -R 755 PlatformAgents
 echo $INSIGHTS_AGENT_HOME
 cd AgentDaemon
-sudo wget http://platform.cogdevops.com/insights_install/release/latest/agentdaemon.zip -O agentdaemon.zip
-sudo unzip agentdaemon.zip && sudo rm -rf agentdaemon.zip
+wget http://platform.cogdevops.com/insights_install/release/latest/agentdaemon.zip -O agentdaemon.zip
+unzip agentdaemon.zip && rm -rf agentdaemon.zip
 source /etc/environment
 source /etc/profile
-sudo sed -i -e "s|extractionpath|/opt/insightsagents/PlatformAgents|g" /opt/insightsagents/AgentDaemon/com/cognizant/devops/platformagents/agents/agentdaemon/config.json
-sudo chmod +x installdaemonagent.sh
-sudo mkdir /opt/agent20
-sudo mkdir /opt/agent20/download
-sudo chmod -R 777 /opt/agent20
-sh ./installdaemonagent.sh Linux
+sed -i -e "s|extractionpath|/opt/insightsagents/PlatformAgents|g" /opt/insightsagents/AgentDaemon/com/cognizant/devops/platformagents/agents/agentdaemon/config.json
+chmod +x installdaemonagent.sh
+mkdir /opt/agent20
+mkdir /opt/agent20/download
+chmod -R 777 /opt/agent20
+sh ./installdaemonagent.sh Ubuntu
 
