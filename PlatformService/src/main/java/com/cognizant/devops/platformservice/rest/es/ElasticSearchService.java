@@ -88,7 +88,6 @@ public class ElasticSearchService {
 				//model.setUrl(grafanaIframeUrl + grafanaUrl + dashboardData.get("uri").getAsString());
 				//dashboardResponse.addDashboard(model);
 				if( dashboardData.get("type").getAsString().contains("dash-db")) {
-				DashboardModel model = new DashboardModel();
 				model.setId(dashboardData.get("title").getAsString());
 				model.setTitle(dashboardData.get("title").getAsString());
 				ClientResponse grafanaVersion = RestHandler.doGet(grafanaBaseUrl + "/api/health", null, headers);
@@ -167,7 +166,8 @@ public class ElasticSearchService {
 			JsonArray asJsonArray = data.get("hits").getAsJsonObject().get("hits").getAsJsonArray();
 			for(JsonElement vizEle : asJsonArray){
 				JsonObject viz = vizEle.getAsJsonObject();
-				dbHandler.cloneVisualizations(baseUrl + viz.get("_id").getAsString(), viz.get("_source").getAsJsonObject());
+				dbHandler.cloneVisualizations(baseUrl + viz.get("_id").getAsString(),
+						viz.get("_source").getAsJsonObject());
 			}
 		}
 	}
