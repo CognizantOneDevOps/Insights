@@ -97,8 +97,8 @@
                         <tr ng-repeat="property in dataDictionaryController.startToolProperties">
                             <td title="'Properties'" header-class="'theadCss'" style="text-align: left !important">{{property}}</td>
                         </tr>
-                        <tr ng-show="dataDictionaryController.startToolProperties.length == 0">
-                            <td colspan="5" style="text-align: center">No Data found</td>
+                        <tr ng-show="dataDictionaryController.startToolNullPropertiesMessage!=''">
+                            <td colspan="5" style="text-align: center">{{dataDictionaryController.startToolNullPropertiesMessage}}</td>
                         </tr>
                     </table>
                 </div>
@@ -116,8 +116,8 @@
                             <tr ng-repeat="property in dataDictionaryController.endToolProperties">
                                 <td title="'Properties'" header-class="'theadCss'" style="text-align: left !important">{{property}}</td>
                             </tr>
-                            <tr ng-show="dataDictionaryController.endToolProperties.length == 0">
-                                <td colspan="5" style="text-align: center">No Data found</td>
+                            <tr ng-show="dataDictionaryController.endToolNullPropertiesMessage!=''">
+                                <td colspan="5" style="text-align: center">{{dataDictionaryController.endToolNullPropertiesMessage}}</td>
                             </tr>
                         </table>
                     </div>
@@ -151,6 +151,11 @@
                 </div>
 
                 <div class="tableDiv" style="margin-left: 3%; margin-right: 3%">
+
+                    <div class="agentConfigTable" layout layout-align="center center" ng-if="dataDictionaryController.relationPropertiesSize === 0">
+                        <h1 class="dataDictionaryMessages">No Relationship Properties Found.</h1>
+                    </div>
+
                     <table class="table md-api-table-landing table-condensed table-bordered table-striped textst" ng-repeat="(key,value) in dataDictionaryController.correlationProperties.properties">
                         <thead class="theadCss">
                             <tr>
@@ -162,7 +167,7 @@
                             <td title="'Properties'" header-class="'theadCss'" style="width: 50%; text-align: left !important">{{key}}</td>
                             <td title="'Properties'" header-class="'theadCss'" style="width: 50%; text-align: left !important">{{value}}</td>
                         </tr>
-                        <tr ng-show="dataDictionaryController.endToolProperties.length == 0">
+                        <tr ng-if="dataDictionaryController.relationPropertiesSize === 0">
                             <td colspan="5" style="text-align: center">No Data found</td>
                         </tr>
                     </table>
