@@ -50,11 +50,14 @@ module ISightApp {
         showSelectStartToolThrobber: string = "";
         showSelectEndToolThrobber: string = "";
         logoSrc = "dist/icons/svg/landingPage/Cognizant_Insights.svg";
+        startToolNullPropertiesMessage = "";
+        endToolNullPropertiesMessage = "";
+        correlatedToolsNullPropertiesMessage = "";
+        relationPropertiesSize: any;
 
         getColumnHeight() {
             var height = (<HTMLIFrameElement>document.getElementById('selectColumn1'));
             this.columnContentHeight = height.height;
-            console.log(this.columnContentHeight);
         }
 
         getToolsList() {
@@ -81,6 +84,9 @@ module ISightApp {
                     self.selectedToolProperties = self.data;
                     self.selectedToolName = self.startTool.toolName;
                     self.getEndToolsList(toolName);
+                    if (self.startToolProperties === undefined) {
+                        self.startToolNullPropertiesMessage = "No Properties Found."
+                    }
                 })
                 .catch(function (response) {
                     self.showMessage = "Something wrong with Service, Please try again.";
@@ -106,6 +112,9 @@ module ISightApp {
                     self.data = response.data;
                     self.showSelectEndToolThrobber = "false";
                     self.endToolProperties = self.data;
+                    if (self.endToolProperties === undefined) {
+                        self.endToolNullPropertiesMessage = "No Properties Found."
+                    }
                 })
                 .catch(function (response) {
                     self.showMessage = "Something wrong with Service, Please try again.";
@@ -133,6 +142,10 @@ module ISightApp {
                     self.data = response.data;
                     self.showCorrelationsLoadThrobber = "false";
                     self.correlationProperties = self.data;
+                    self.relationPropertiesSize = Object.keys(self.correlationProperties.properties).length;
+                    if (self.correlationProperties === undefined) {
+                        self.correlatedToolsNullPropertiesMessage = "No Relationship Properties Found."
+                    }
                 })
                 .catch(function (response) {
                     self.showMessage = "Something wrong with Service, Please try again.";
