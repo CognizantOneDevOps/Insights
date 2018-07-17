@@ -46,7 +46,7 @@ import com.google.gson.JsonSyntaxException;
 import com.google.gson.stream.JsonWriter;
 
 /**
- * This is the executor class for Offline Data Processing This class has the
+ * This is the executor class for Offline Data Processing. This class has the
  * ability to execute a sequence of Cypher queries. These cypher queries should
  * be stored inside a JSON configuration file. This code has the capability of
  * reading multiple json files which reside inside "data-enrichment" folder of
@@ -70,18 +70,20 @@ public class OfflineDataProcessingExecutor implements Job {
 		executeOfflineProcessing();
 	}
 
-	private void executeOfflineProcessing() {
+	public int executeOfflineProcessing() {
 		File queryFolderPath = new File(ConfigOptions.OFFLINE_DATA_PROCESSING_RESOLVED_PATH);
 		File[] files = queryFolderPath.listFiles();
+		int jsonFileCount = 0;
 		for (File eachFile : files) {
-			if (eachFile.isFile()) { // this line removes other
-				// directories/folders
+			if (eachFile.isFile()) { // this line removes other directories/folders
 				String fileName = eachFile.getName();
 				if (hasJsonFileExtension(fileName)) {
+					jsonFileCount++;
 					processOfflineConfiguration(eachFile);
 				}
 			}
 		}
+		return jsonFileCount;
 	}
 
 	/**
@@ -90,7 +92,7 @@ public class OfflineDataProcessingExecutor implements Job {
 	 * @param fileName
 	 * @return
 	 */
-	private Boolean hasJsonFileExtension(String fileName) {
+	public Boolean hasJsonFileExtension(String fileName) {
 		if (fileName != null && !fileName.isEmpty()) {
 			String extension = FilenameUtils.getExtension(fileName);
 			if (JSON_FILE_EXTENSION.equalsIgnoreCase(extension)) {
@@ -105,7 +107,7 @@ public class OfflineDataProcessingExecutor implements Job {
 	 * Processes each query block inside each configuration file and executes cypher query
 	 * @param jsonFile
 	 */
-	private void processOfflineConfiguration(File jsonFile) {
+	public Boolean processOfflineConfiguration(File jsonFile) {
 		try {
 			try (BufferedReader reader = new BufferedReader(new FileReader(jsonFile))) {
 				DataEnrichmentModel[] dataEnrichmentModelArray = new Gson().fromJson(reader,
@@ -139,8 +141,9 @@ public class OfflineDataProcessingExecutor implements Job {
 			}
 		} catch (IllegalStateException | JsonSyntaxException ex) {
 			log.error(jsonFile.getName() + " file is not as per expected format", ex);
-			return;
+			return Boolean.FALSE;
 		}
+		return Boolean.TRUE;
 	}
 
 	/**
@@ -148,7 +151,7 @@ public class OfflineDataProcessingExecutor implements Job {
 	 * query
 	 * 
 	 */
-	private DataEnrichmentModel updateLastExecutionTime(DataEnrichmentModel dataEnrichmentModel) {
+	public DataEnrichmentModel updateLastExecutionTime(DataEnrichmentModel dataEnrichmentModel) {
 		String lastRunTime = InsightsUtils.getLocalDateTime(DATE_TIME_FORMAT);
 		if (dataEnrichmentModel != null) {
 			dataEnrichmentModel.setLastExecutionTime(lastRunTime);
@@ -163,7 +166,7 @@ public class OfflineDataProcessingExecutor implements Job {
 	 * @param cypherQuery
 	 * @param jsonObject
 	 */
-	private void executeCypherQuery(String cypherQuery, DataEnrichmentModel dataEnrichmentModel) {
+	public Boolean executeCypherQuery(String cypherQuery, DataEnrichmentModel dataEnrichmentModel) {
 		Neo4jDBHandler dbHandler = new Neo4jDBHandler();
 		int processedRecords = 1;
 		int recordCount = 0;
@@ -175,7 +178,7 @@ public class OfflineDataProcessingExecutor implements Job {
 				try {
 					processedRecords = sprintResponseJson.getAsJsonArray("results").get(0).getAsJsonObject()
 							.getAsJsonArray("data").get(0).getAsJsonObject().getAsJsonArray("row").get(0).getAsInt();
-				} catch (UnsupportedOperationException | IllegalStateException ex) {
+				} catch (UnsupportedOperationException | IllegalStateException | IndexOutOfBoundsException ex) {
 					log.error(cypherQuery + "  - query processing failed", ex);
 					break;
 				}
@@ -191,6 +194,7 @@ public class OfflineDataProcessingExecutor implements Job {
 		} catch (GraphDBException e) {
 			log.error(cypherQuery + " - query processing failed", e);
 		}
+		return Boolean.TRUE;
 	}
 
 	/**
@@ -202,7 +206,7 @@ public class OfflineDataProcessingExecutor implements Job {
 	 * @param lastRunTime
 	 * @return
 	 */
-	private Boolean isQueryScheduledToRun(Long runSchedule, String lastRunTime) {
+	public Boolean isQueryScheduledToRun(Long runSchedule, String lastRunTime) {
 		// if lastExecutionTime property is not added in the json file, we'll
 		// execute the query by default
 		if (lastRunTime == null) {
