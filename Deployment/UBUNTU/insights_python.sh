@@ -37,6 +37,8 @@ echo "#################### Installing Python 2.7.11 with Virtual Env ###########
 mkdir python && cd python && wget http://platform.cogdevops.com/insights_install/installationScripts/latest/RHEL/python/Python-2.7.11.tgz
 tar -zxf Python-2.7.11.tgz && cd Python-2.7.11 && apt-get install gcc-4.9 -y && ./configure --prefix=/opt/
 make install && cd .. && wget http://platform.cogdevops.com/insights_install/installationScripts/latest/RHEL/python/get-pip.py
+apt-get install python2.7
+sleep 10
 python get-pip.py
 pip install pika requests apscheduler python-dateutil xmltodict pytz requests_ntlm
 mkdir /opt/insightsagents
