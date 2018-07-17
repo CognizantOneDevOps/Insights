@@ -30,9 +30,10 @@ echo "#################### Installing Postgres with configs , Databases and Role
 #psql -U postgres -f dbscript.sql
 apt install postgresql
 wget http://platform.cogdevops.com/insights_install/installationScripts/latest/RHEL/postgres/pg_hba.conf
-cp pg_hba.conf /var/lib/pgsql/9.5/data/pg_hba.conf --- /etc/postgresql/9.5/main/
-systemctl stop postgresql-9.5.service
-systemctl start postgresql-9.5.service
+cp pg_hba.conf /var/lib/pgsql/9.5/data/pg_hba.conf /etc/postgresql/9.5/main/
+systemctl stop postgresql.service
+sleep 15
+systemctl start postgresql.service
 useradd grafana
 usermod --password C0gnizant@1 grafana
 wget http://platform.cogdevops.com/insights_install/installationScripts/latest/RHEL/postgres/dbscript.sql
