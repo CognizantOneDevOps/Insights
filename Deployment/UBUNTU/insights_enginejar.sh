@@ -16,14 +16,14 @@
 # get insights engine jar
 # get insights engine jar
 echo "#################### Getting Insights Engine Jar ####################"
-sudo mkdir /opt/insightsengine
+mkdir /opt/insightsengine
 cd /opt/insightsengine
 export INSIGHTS_ENGINE=`pwd`
-sudo echo INSIGHTS_ENGINE=`pwd` | sudo tee -a /etc/environment
-sudo echo "export" INSIGHTS_ENGINE=`pwd` | sudo tee -a /etc/profile
+echo INSIGHTS_ENGINE=`pwd` | tee -a /etc/environment
+echo "export" INSIGHTS_ENGINE=`pwd` | tee -a /etc/profile
 source /etc/environment
 source /etc/profile
-sudo wget http://platform.cogdevops.com/insights_install/installationScripts/latest/RHEL/artifacts/PlatformEngine.jar -O PlatformEngine.jar
+wget http://platform.cogdevops.com/insights_install/installationScripts/latest/RHEL/artifacts/PlatformEngine.jar -O PlatformEngine.jar
 sleep 2
-sudo nohup java -jar PlatformEngine.jar &
+nohup java -jar PlatformEngine.jar &
 
