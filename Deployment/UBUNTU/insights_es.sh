@@ -28,8 +28,11 @@ cd elasticsearch
 #sudo systemctl start elasticsearch.service
 curl -L -O https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-5.6.10.zip
 unzip elasticsearch-5.6.10.zip
+chmod 777 elasticsearch-5.6.10
 cd elasticsearch-5.6.10
+exit
 nohup ./bin/elasticsearch &
+echo $! > es-pid.txt
 sleep 20
-curl -XPUT 'localhost:9200/_template/neo4j-*' -d '{"order" : 0, "template": "neo4j-*","settings": {"index.number_of_shards": "5"},"mappings": {"_default_": {"dynamic_templates": [{"string_fields" : {"mapping" : {"index" : "analyzed","omit_norms" : true,"type" : "string","fields" : {"raw" : {"ignore_above" : 256,"index" : "not_analyzed","type" : "string"}}},"match_mapping_type" : "string","match" : "*"}}]}},"aliases": {}}}'
+curl -X PUT 'localhost:9200/_template/neo4j-*' -d '{"order" : 0, "template": "neo4j-*","settings": {"index.number_of_shards": "5"},"mappings": {"_default_": {"dynamic_templates": [{"string_fields" : {"mapping" : {"index" : "analyzed","omit_norms" : true,"type" : "string","fields" : {"raw" : {"ignore_above" : 256,"index" : "not_analyzed","type" : "string"}}},"match_mapping_type" : "string","match" : "*"}}]}},"aliases": {}}}'
 
