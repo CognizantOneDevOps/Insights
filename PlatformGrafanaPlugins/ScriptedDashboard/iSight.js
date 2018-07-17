@@ -73,16 +73,16 @@ var addRouteChangeDetector = function () {
 			addRouteChangeDetector();
 		}, 300);
 	} else {
-		try{
+		try {
 			var $injector = document.getElementById("iSightIframe").contentWindow.angular.element(".grafana-app").injector();
-		console.log($injector);
-		$injector.invoke(function ($rootScope) {
-			$rootScope.$on('$viewContentLoaded', function (next, current) {
-				calculateHeight();
+			console.log($injector);
+			$injector.invoke(function ($rootScope) {
+				$rootScope.$on('$viewContentLoaded', function (next, current) {
+					calculateHeight();
+				});
 			});
-		});
 		}
-		finally{
+		finally {
 			addStyleTag();
 		}
 	}
@@ -94,10 +94,10 @@ var calculateHeight = function (time) {
 	var playlist = $('#iSightIframe').contents().find('.page-container');
 	if (view.length !== 0 && (dashboard.length !== 0 || playlist.length !== 0)) {
 		var height = $('#iSightIframe').contents().find('.main-view').height();
-		if(height < 800){
+		if (height < 800) {
 			height = 800;
 			$('#iSightIframe').width(documentWidth);
-		}else{
+		} else {
 			$('#iSightIframe').width(documentWidth - 10);
 		}
 		$('#iSightIframe').width(documentWidth);
@@ -108,7 +108,7 @@ var calculateHeight = function (time) {
 				calculateHeight(time - 20);
 			}, 20);
 		}
-	}else{
+	} else {
 		setTimeout(function () {
 			calculateHeight(3000);
 		}, 20);
@@ -147,6 +147,7 @@ var addStyleTag = function () {
 		var style = "<style type=\"text/css\">" +
 			".sidemenu {display : none !important;}\n" +
 			".navbar-brand-btn {display : none !important;}\n" +
+			".page-header-canvas {display : none !important;}\n" +
 			".search-item-dash-home {display : none !important;}" +
 			".search-button-row-explore-link {display : none !important;}" +
 			".footer {display : none !important;}" +
@@ -156,7 +157,7 @@ var addStyleTag = function () {
 	}
 };
 
-var addDashboardClickDetector = function(){
+var addDashboardClickDetector = function () {
 	var iframeBody = $('#iSightIframe').contents().find('.grafana-app');
 	if (iframeBody.length === 0) {
 		setTimeout(function () {
@@ -170,11 +171,11 @@ var addDashboardClickDetector = function(){
 };
 
 //Dast Fixes for URL parameter
-var currentreferrer  = document.createElement ('a');
+var currentreferrer = document.createElement('a');
 currentreferrer.href = window.location.origin;
 var grafanaUrl = document.createElement('a');
 grafanaUrl.href = url;
-if (currentreferrer.hostname === grafanaUrl.hostname){
+if (currentreferrer.hostname === grafanaUrl.hostname) {
 	addDashboardIframeToDom(url);
 	calculateHeight();
 	addStyleTag();

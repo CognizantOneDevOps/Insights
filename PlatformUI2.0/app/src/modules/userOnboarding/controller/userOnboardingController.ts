@@ -127,7 +127,7 @@ module ISightApp {
             self.restEndpointService.getGrafanaHost1().then(function (response) {
                 var grafanaEndPoint = response.grafanaEndPoint;
                 //console.log(grafanaEndPoint);
-                self.userListUrl = self.$sce.trustAsResourceUrl(grafanaEndPoint + '/dashboard/script/CustomiSight.js?url=' + grafanaEndPoint + '/org/users');
+                self.userListUrl = self.$sce.trustAsResourceUrl(grafanaEndPoint + '/dashboard/script/iSight.js?url=' + grafanaEndPoint + '/org/users');
             });
             //console.log(this.userListUrl);
         }
