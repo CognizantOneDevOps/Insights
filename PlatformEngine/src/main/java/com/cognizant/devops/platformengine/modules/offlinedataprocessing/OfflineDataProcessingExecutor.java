@@ -33,6 +33,7 @@ import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 
+import com.cognizant.devops.platformcommons.config.ApplicationConfigCache;
 import com.cognizant.devops.platformcommons.constants.ConfigOptions;
 import com.cognizant.devops.platformcommons.core.util.InsightsUtils;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBException;
@@ -122,8 +123,11 @@ public class OfflineDataProcessingExecutor implements Job {
 					}
 					if (isQueryScheduledToRun(dataEnrichmentModel.getRunSchedule(),
 							dataEnrichmentModel.getLastExecutionTime())) {
-						executeCypherQuery(cypherQuery, dataEnrichmentModel);
-						updateLastExecutionTime(dataEnrichmentModel);
+						Boolean successFlag = executeCypherQuery(cypherQuery, dataEnrichmentModel);
+						//Checks if query execution fails due to some exception, don't update lastExecutionTime 
+						if (successFlag) {
+							updateLastExecutionTime(dataEnrichmentModel);							
+						}
 					}
 				}
 				// Write into the file
@@ -180,7 +184,7 @@ public class OfflineDataProcessingExecutor implements Job {
 							.getAsJsonArray("data").get(0).getAsJsonObject().getAsJsonArray("row").get(0).getAsInt();
 				} catch (UnsupportedOperationException | IllegalStateException | IndexOutOfBoundsException ex) {
 					log.error(cypherQuery + "  - query processing failed", ex);
-					break;
+					return Boolean.FALSE; 
 				}
 				log.debug(" Processed " + processedRecords);
 				recordCount = recordCount + processedRecords;
@@ -193,6 +197,7 @@ public class OfflineDataProcessingExecutor implements Job {
 			}
 		} catch (GraphDBException e) {
 			log.error(cypherQuery + " - query processing failed", e);
+			return Boolean.FALSE;
 		}
 		return Boolean.TRUE;
 	}
