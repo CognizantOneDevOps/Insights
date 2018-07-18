@@ -1,9 +1,9 @@
 {
-"showInsightsTab" : false,
-"showOptionsPanel" : false,
-"showBusinessMapping" : true
+  "showInsightsTab": false,
+  "showOptionsPanel": false,
+  "showBusinessMapping": true,
+  "agentsOsList": {
+    "windows": "Windows",
+    "linux": "Linux"
+  }
 }
-
-
-
-
