@@ -98,6 +98,7 @@ module ISightApp {
             var data = configResource.get().$promise.then(function (data) {
                 self.showInsightsTab = data.showInsightsTab;
                 self.showBusinessMapping = data.showBusinessMapping;
+                self.agentsOsList = data.agentsOsList;
                 if (self.showInsightsTab) {
                     self.selectedIndex = 1;
                     self.templateName = 'insights';
@@ -155,6 +156,7 @@ module ISightApp {
         aboutMeContent = {};
         showAdminTab: boolean = false;
         showBusinessMapping: boolean = false;
+        agentsOsList = {};
         showThrobber: boolean;
         selectedAgentID = {};
         selectDashboard: boolean = false;
