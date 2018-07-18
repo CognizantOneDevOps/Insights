@@ -343,7 +343,7 @@ module ISightApp {
 			}
 		}
 
-		getUpdatedConfigData($scope, actionType): void {
+		getUpdatedConfigData(actionType): void {
 			var self = this;
 			self.updatedConfigdata = {};
 
