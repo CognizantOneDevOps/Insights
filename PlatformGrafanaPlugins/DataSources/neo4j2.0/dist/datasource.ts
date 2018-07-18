@@ -133,25 +133,54 @@ export default class Neo4jDatasource {
 
   executeCypherQuery(cypherQuery, targets, options) {
     var deferred = this.$q.defer();
-    var self = this;
-    this.backendSrv.datasourceRequest({
-      url: this.url,
-      method: 'POST',
-      data: JSON.stringify(cypherQuery)
-    }).then(function (response) {
-      var data = response.data;
-      if (response.status === 200) {
-        if (data && data.results && data.results.length > 0) {
-          data['targets'] = targets;
-          deferred.resolve({ data: self.processResponse(data, options) });
+    var flag = this.checkCypherQueryModificationKeyword(cypherQuery);
+    if (flag == true) {
+
+      options.targets[0].checkQuery = false;
+      var self = this;
+      this.backendSrv.datasourceRequest({
+        url: this.url,
+        method: 'POST',
+        data: JSON.stringify(cypherQuery)
+      }).then(function (response) {
+        var data = response.data;
+        if (response.status === 200) {
+          if (data && data.results && data.results.length > 0) {
+            data['targets'] = targets;
+            deferred.resolve({ data: self.processResponse(data, options) });
+          } else {
+            deferred.resolve({ status: "success", message: "No data returned", title: "success" });
+          }
         } else {
-          deferred.resolve({ status: "success", message: "No data returned", title: "success" });
+          deferred.resolve({ status: "failure", message: "Unable to connect to Datasource", title: "Failure" });
         }
-      } else {
-        deferred.resolve({ status: "failure", message: "Unable to connect to Datasource", title: "Failure" });
-      }
-    });
+      });
+
+    }
+    else {
+
+      options.targets[0].checkQuery = true;
+      deferred.resolve({ status: "failure", message: "Cannot run modification query in neo4j", title: "Failure" });
+      console.log("It has create//delete/set/update keyword.");
+    }
     return deferred.promise;
+  }
+
+  checkCypherQueryModificationKeyword(cypherQuery) {
+    var keywords: string[];
+    keywords = ["create", "delete", "set", "update"];
+    var flag: number = 0;
+    var queryCorrect = true;
+    var j;
+    for (j in keywords) {
+      var query = (cypherQuery.statements[0].statement.toString()).toLowerCase();
+      if (query.indexOf(keywords[j]) >= 0) { flag = 1; break; }
+    }
+    if (flag == 0) { return queryCorrect; }
+    else {
+      queryCorrect = false;
+      return queryCorrect
+    }
   }
 
   //let templateName = variable.model.name;
@@ -179,10 +208,13 @@ export default class Neo4jDatasource {
   query(options) {
     //var adhocFilters = this.templateSrv.getAdhocFilters(this.name);
     var targets = options.targets;
-    let range = options.range;
-    var fromTime = range.from.valueOf() / 1000;
-    var toTime = range.to.valueOf() / 1000;
-
+    var target = targets[0];
+    var resultCache = (target.rescache) ? target.rescache : false;
+    if (resultCache) {
+      let range = options.range;
+      var fromTime = range.from.valueOf() / 1000;
+      var toTime = range.to.valueOf() / 1000;
+    }
     var cypherQuery = {};
     var statements = [];
     var metadata = [];
@@ -216,7 +248,7 @@ export default class Neo4jDatasource {
       var cacheoptions = {
         "startTime": fromTime,
         "endTime": toTime,
-        "resultCache": (target.rescache) ? target.rescache : false,
+        "resultCache": resultCache,
         "testDB": false,
         "cachingType": target.selectionval,
         "cachingValue": cachingValue

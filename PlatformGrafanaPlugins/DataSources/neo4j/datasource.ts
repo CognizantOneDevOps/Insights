@@ -102,10 +102,13 @@ export default class Neo4jDatasource {
   query(options) {
     //var adhocFilters = this.templateSrv.getAdhocFilters(this.name);
     var targets = options.targets;
-    let range = options.range;
-    var fromTime = range.from.valueOf() / 1000;
-    var toTime = range.to.valueOf() / 1000;
-
+    var target = targets[0];
+    var resultCache = (target.rescache) ? target.rescache : false;
+    if (resultCache) {
+      let range = options.range;
+      var fromTime = range.from.valueOf() / 1000;
+      var toTime = range.to.valueOf() / 1000;
+    }
     var cypherQuery = {};
     var statements = [];
     var metadata = [];
@@ -140,7 +143,7 @@ export default class Neo4jDatasource {
       var cacheoptions = {
         "startTime": fromTime,
         "endTime": toTime,
-        "resultCache": (target.rescache) ? target.rescache : false,
+        "resultCache": resultCache,
         "testDB": false,
         "cachingType": target.selectionval,
         "cachingValue": cachingValue
