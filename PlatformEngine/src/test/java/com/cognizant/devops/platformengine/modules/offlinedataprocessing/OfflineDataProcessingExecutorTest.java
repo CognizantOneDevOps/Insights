@@ -140,7 +140,7 @@ public class OfflineDataProcessingExecutorTest extends TestCase {
     	String cypherQuery = "MATCH (n:ALM) where not exists (n.processed) with n limit 100 set n.processed=true return n";
     	DataEnrichmentModel model = new DataEnrichmentModel();
     	Boolean resultFlag = executor.executeCypherQuery(cypherQuery, model);
-    	assertTrue(resultFlag);    
+    	assertFalse(resultFlag);    
     }
     
     /**
