@@ -21,8 +21,8 @@ cd /opt/insightsengine
 export INSIGHTS_ENGINE=`pwd`
 echo INSIGHTS_ENGINE=`pwd` | tee -a /etc/environment
 echo "export" INSIGHTS_ENGINE=`pwd` | tee -a /etc/profile
-source /etc/environment
-source /etc/profile
+sudo -E source /etc/environment
+sudo -E source /etc/profile
 wget http://platform.cogdevops.com/insights_install/installationScripts/latest/RHEL/artifacts/PlatformEngine.jar -O PlatformEngine.jar
 sleep 2
 nohup java -jar PlatformEngine.jar &

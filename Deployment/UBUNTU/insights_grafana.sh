@@ -33,5 +33,5 @@ cd ..
 export GRAFANA_HOME=`pwd`
 echo GRAFANA_HOME=`pwd` | tee -a /etc/environment
 echo "export" GRAFANA_HOME=`pwd` | tee -a /etc/profile
-source /etc/environment
-source /etc/profile
+sudo -E source /etc/environment
+sudo -E source /etc/profile

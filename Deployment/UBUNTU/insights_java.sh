@@ -39,7 +39,7 @@ echo JRE_HOME=/opt/jdk1.8.0_151/jre | tee -a /etc/environment
 echo "export" JRE_HOME=/opt/jdk1.8.0_151/jre | tee -a /etc/profile
 export PATH=$PATH:/opt/jdk1.8.0_151/bin:/opt/jdk1.8.0_151/jre/bin
 echo PATH=$PATH:/opt/jdk1.8.0_151/bin:/opt/jdk1.8.0_151/jre/bin | tee -a /etc/environment
-alternatives --install /usr/bin/java java /opt/jdk1.8.0_151/bin/java 20000
-source /etc/environment
-source /etc/profile
+update-alternatives --install /usr/bin/java java /opt/jdk1.8.0_151/bin/java 20000
+sudo -E source /etc/environment
+sudo -E source /etc/profile
 

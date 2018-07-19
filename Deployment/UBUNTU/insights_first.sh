@@ -16,6 +16,9 @@
 # Set InSights Home
 # Set InSights Home
 echo "#################### Setting up Insights Home ####################"
+apt-get install wget
+apt-get install unzip
+apt-get update
 cd /usr/
 mkdir INSIGHTS_HOME
 cd INSIGHTS_HOME
@@ -26,8 +29,8 @@ export INSIGHTS_HOME=`pwd`
 echo INSIGHTS_HOME=`pwd` | tee -a /etc/environment
 echo "export" INSIGHTS_HOME=`pwd` | tee -a /etc/profile
 chmod -R 777 /usr/INSIGHTS_HOME/
-source /etc/environment
-source /etc/profile
+sudo -E source /etc/environment
+sudo -E source /etc/profile
 myextip=$(wget -qO- icanhazip.com)
 echo $myextip
 sed -i -e "s|localhost:3000|${myextip}:3000|g" /usr/INSIGHTS_HOME/.InSights/server-config.json
