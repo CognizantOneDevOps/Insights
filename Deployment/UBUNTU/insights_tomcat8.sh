@@ -31,7 +31,7 @@ cd /etc/init.d/
 wget http://platform.cogdevops.com/insights_install/installationScripts/latest/RHEL/initscripts/Tomcat8.sh
 mv Tomcat8.sh Tomcat8
 chmod +x Tomcat8
-#chkconfig Tomcat8 on
-update-rc.d Tomcat8 defaults
-update-rc.d Tomcat8 enable
-service Tomcat8 start
+cd /etc/systemd/system
+wget https://raw.githubusercontent.com/CognizantOneDevOps/Insights/UbuntuInstallationScripts/Deployment/UBUNTU/Tomcat.service
+systemctl enable Tomcat.service
+systemctl start Tomcat.service

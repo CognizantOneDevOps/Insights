@@ -28,8 +28,8 @@ echo $INSIGHTS_AGENT_HOME
 cd AgentDaemon
 wget http://platform.cogdevops.com/insights_install/release/latest/agentdaemon.zip -O agentdaemon.zip
 unzip agentdaemon.zip && rm -rf agentdaemon.zip
-source /etc/environment
-source /etc/profile
+sudo -E source /etc/environment
+sudo -E source /etc/profile
 sed -i -e "s|extractionpath|/opt/insightsagents/PlatformAgents|g" /opt/insightsagents/AgentDaemon/com/cognizant/devops/platformagents/agents/agentdaemon/config.json
 chmod +x installdaemonagent.sh
 mkdir /opt/agent20
