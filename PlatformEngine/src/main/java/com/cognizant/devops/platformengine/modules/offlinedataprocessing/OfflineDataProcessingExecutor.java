@@ -33,7 +33,6 @@ import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 
-import com.cognizant.devops.platformcommons.config.ApplicationConfigCache;
 import com.cognizant.devops.platformcommons.constants.ConfigOptions;
 import com.cognizant.devops.platformcommons.core.util.InsightsUtils;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBException;
@@ -234,10 +233,5 @@ public class OfflineDataProcessingExecutor implements Job {
 		return Boolean.FALSE;
 	}
 
-	/*public static void main(String args[]) {
-		ApplicationConfigCache.loadConfigCache();
-		OfflineDataProcessingExecutor dataProcessing = new OfflineDataProcessingExecutor();
-		dataProcessing.executeOfflineProcessing();
-	}*/
 
 }
