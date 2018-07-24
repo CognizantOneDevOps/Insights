@@ -64,9 +64,10 @@ public class GrafanaUserDetailsUtil {
 			userName = authTokens[0];
 			credential = authTokens[1];
 			String grafanaUser = cookieMap.get("grafana_user");
+			String grafanaSession = cookieMap.get("grafana_sess");
 			log.debug("Insights User Name is: " + userName);
 			log.debug("Grafana's User Name is: " + grafanaUser);
-			if (userName.equals(grafanaUser)) {
+			if (userName.equals(grafanaUser) && grafanaSession != null) {
 				log.debug("LDAP user is found. Insights username matches Grafana's username");
 				grafanaResponseCookies.putAll(cookieMap);
 				log.debug("Grafana's resposne cookies are: " + grafanaResponseCookies);
