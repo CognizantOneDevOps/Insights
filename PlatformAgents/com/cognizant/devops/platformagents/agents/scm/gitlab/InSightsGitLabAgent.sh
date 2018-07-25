@@ -14,7 +14,7 @@
 # the License.
 #-------------------------------------------------------------------------------
 #! /bin/sh
-# /etc/init.d/InSightsGitAgent
+# /etc/init.d/InSightsGitLabAgent
 
 ### BEGIN INIT INFO
 # Provides: Runs a Python script on startup
@@ -33,7 +33,7 @@ case "$1" in
     if [[ $(ps aux | grep '[s]cm.gitlab.GitLabAgent' | awk '{print $2}') ]]; then
      echo "InSightsGitLabAgent already running"
     else
-     echo "Starting InSightsGitAgent"
+     echo "Starting InSightsGitLabAgent"
      cd $INSIGHTS_AGENT_HOME/PlatformAgents/gitlab
      python -c "from com.cognizant.devops.platformagents.agents.scm.gitlab.GitLabAgent import GitLabAgent; GitLabAgent()" &
     fi
