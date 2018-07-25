@@ -1,5 +1,5 @@
 [Unit]
-Description=Ubuntu GitAgent Service
+Description=Ubuntu GitLabAgent Service
 
 [Service]
 Type=forking
