@@ -203,11 +203,6 @@ public final class InsightsConfiguration {
 			requestJson.add("inputs", inputs);
 			ClientResponse response = RestHandler.doPost(apiUrl, requestJson, headers);
 			jsonResponse = getNewJsonParser().parse(response.getEntity(String.class)).getAsJsonObject();
-			if (jsonResponse.get("imported").getAsBoolean()) {
-				log.info("Dashboard created : " + dashboard);
-			} else {
-				log.warn("Unable to create dashboard: " + jsonResponse.toString());
-			}
 		}
 	}
 
