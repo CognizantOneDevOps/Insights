@@ -1,0 +1,79 @@
+{
+	"mqConfig" : {
+		"user" : "iSight", 
+		"password" : "iSight", 
+		"host" : "127.0.0.1", 
+		"exchange" : "iSight"
+	},
+	"subscribe" : {
+		"config" : "SCM.GITLAB.config"
+	},
+	"publish" : {
+		"data" : "SCM.GITLAB.DATA",
+		"health" : "SCM.GITLAB.HEALTH"
+	},
+	"communication":{
+		"type" : "REST" 
+	},
+        "dynamicTemplate": {
+	"responseTemplate" : {
+		"id": "commitId",
+                "title": "title",
+                "created_at": "createdAt",
+                "message": "message",
+                "committer_name": "committerName",
+                "committer_email": "committerEmail",
+                "author_email": "authorEmail"
+	},
+	"responseTemplateMerge" : {
+		"id": "Id",
+                "target_branch": "targetBranch",
+                "source_branch": "sourceBranch",
+                "project_id": "projectId",
+                "title": "name",
+                "state": "state",
+                "updated_at": "updatedAt",
+		"author" : {
+				"username": "author",
+				"id": "authorId"
+				},
+		"assignee" : {
+				"username": "assignee"
+				}
+	},
+	"responseTemplateTag" : {
+		"message": "message",
+		"name": "name",
+                "release": "release",
+		"commit" : {
+				"message": "commitMessage",
+				"id": "tagCommitId",
+				"author_name": "commitName",
+				"committer_email": "commitEmail"
+				}
+	},
+        "relationMetadata": {"labels" : ["BRANCHRELATION_GITLAB"],"relation":{"properties":["commitId","projectName","projectId","branchName"],"name":"BRANCH_HAS_COMMITS_GITLAB","source":{"constraints":["commitId"]},"destination":{"constraints":["branchName","projectName"]}}},
+        "commitMetadata": {"labels" : ["COMMIT_GITLAB"], "dataUpdateSupported" : true,"uniqueKey":["commitId"]},
+        "tagMetadata": {"labels" : ["TAG_GITLAB"]},
+        "mergeMetadata": {"labels" : ["MERGE_GITLAB"]}
+        },
+	"enableBranches" : true,
+	"enableMerge" : false,
+	"enableGroup" : true,
+	"enableCommitRelation" : true,
+        "restrictedProjects": ["projects_name"],
+	"toolsTimeZone" : "GMT",
+	"insightsTimeZone" : "Asia/Kolkata",
+	"useResponseTemplate" : true,
+	"auth" : "base64",
+	"runSchedule" : 30,
+	"timeStampField":"createdAt",
+	"timeStampFormat":"%Y-%m-%dT%H:%M:%S.",
+	"StartFrom" : "2017-03-03 15:46:33",
+	"AccessToken": "",
+	"GetProjects":"",
+	"isDebugAllowed" : false,
+	"loggingSetting" : {
+		"logLevel" : "WARN"
+	}
+}
