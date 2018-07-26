@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  ******************************************************************************/
- 
+
 ///<reference path="../../../headers/common.d.ts" />
 
 //import angular from 'angular';
@@ -102,9 +102,17 @@ export default class Neo4jDatasource {
   query(options) {
     //var adhocFilters = this.templateSrv.getAdhocFilters(this.name);
     var targets = options.targets;
+    let range = options.range;
+    var fromTime = range.from.valueOf() / 1000;
+    var toTime = range.to.valueOf() / 1000;
+
     var cypherQuery = {};
     var statements = [];
+    var metadata = [];
+
     cypherQuery['statements'] = statements;
+    cypherQuery['metadata'] = metadata;
+
     for (var i in targets) {
       var target = targets[i];
       let query = this.templateSrv.replace(target.target, options.scopedVars, this.applyTemplateVariables);
@@ -115,12 +123,31 @@ export default class Neo4jDatasource {
       } else {
         resultDataContents.push("row");
       }
+
       var statement = {
         "statement": query,
         "includeStats": target.stats,
         "resultDataContents": resultDataContents
       };
+
+      var cachingValue;
+      if (target.selectionval === "Fixed Time") {
+        cachingValue = target.cacheFixedTime;
+      } else {
+        cachingValue = target.cacheVariance;
+      }
+
+      var cacheoptions = {
+        "startTime": fromTime,
+        "endTime": toTime,
+        "resultCache": (target.rescache) ? target.rescache : false,
+        "testDB": false,
+        "cachingType": target.selectionval,
+        "cachingValue": cachingValue
+      };
+
       statements.push(statement);
+      metadata.push(cacheoptions);
     }
     return this.executeCypherQuery(cypherQuery, targets);
   }
@@ -176,7 +203,11 @@ export default class Neo4jDatasource {
           "includeStats": true,
           "resultDataContents": ["row", "graph"]
         }
-      ]
+      ],
+      "metadata": [{
+        "testDB": true
+      }]
+
     };
     var testQuery = JSON.stringify(queryJson);
     var deferred = this.$q.defer();

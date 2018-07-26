@@ -51,6 +51,7 @@ module ISightApp {
 				"linux": "Linux",
 				"ubuntu": "Ubuntu",
 			};
+			self.getOsList();
 		}
 
 		datatypeVal: boolean;
@@ -90,6 +91,13 @@ module ISightApp {
 		fileUploadSuccessMessage: boolean = false;
 		trackingUploadedFileContentStr: string = "";
 		showTrackingJsonUploadButton: boolean;
+
+		getOsList() {
+			var self = this;
+			var agentsListFromUiConfig = self.homeController.agentsOsList;
+			if (agentsListFromUiConfig !== undefined)
+				self.osLists = agentsListFromUiConfig;
+		}
 
 		getOsVersionTools(Selversion): void {
 
@@ -335,7 +343,7 @@ module ISightApp {
 			}
 		}
 
-		getUpdatedConfigData($scope, actionType): void {
+		getUpdatedConfigData(actionType): void {
 			var self = this;
 			self.updatedConfigdata = {};
 
