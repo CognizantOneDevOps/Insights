@@ -81,8 +81,7 @@ public class AgentManagementServiceImpl implements AgentManagementService {
 			json.addProperty("agentId", agentId);
 			json.addProperty("osversion", osversion);
 			json.addProperty("agentVersion", agentVersion);
-			// json.get("subscribe").getAsJsonObject().addProperty("agentCtrlQueue",
-			// agentId);
+			json.get("subscribe").getAsJsonObject().addProperty("agentCtrlQueue", agentId);
 
 			boolean isDataUpdateSupported = false;
 			if (json.get(ISDATESUPPORTED) != null && !json.get(ISDATESUPPORTED).isJsonNull()) {
