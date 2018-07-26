@@ -33,13 +33,40 @@
                     <md-icon style="margin-top:30px" layout md-svg-src="{{homePageController.aboutImg}}" ng-style="{height: '20px', width: '20px'}"></md-icon>
                     <span layout class="iconLablCss iconMrgn" id="aboutHover">About</span>
                 </a>
-                <div class="verticallineHelp"></div>
+                <!--<div class="verticallineHelp"></div>
                 <a ng-mouseover="homePageController.addHoverImage('Help')" ng-mouseleave="homePageController.removeHoverImage('Help')" style="margin-right:7px"
                     layout class="logout" href="https://onedevops.atlassian.net/wiki/display/OI/InSights" id="helpHover" target="_blank">
                     <md-icon style="margin-top:30px" layout md-svg-src="{{homePageController.imageurl4}}" ng-style="{height: '20px', width: '20px'}"></md-icon>
                     <span layout class="iconLablCss iconMrgn" id="helpHover">Help</span>
-                </a>
+                </a>-->
+
                 <div class="verticallineHelp"></div>
+                <ul class="profile-wrapper" style="width: 130px">
+                    <li>
+                        <!-- Help section -->
+                        <div class="profile">
+
+                            <md-icon md-svg-src="{{homePageController.imageurl4}}" ng-style="{height: '20px', width: '20px'}"></md-icon>
+                            <span class="name" style="margin-left: 0px">Help</span>
+
+                            <!-- more menu -->
+                            <ul class="menu">
+                                <li>
+                                    <a href="https://onedevops.atlassian.net/wiki/display/OI/InSights" id="helpHover" target="_blank">
+                                        <span id="helpHover">Product Help</span>
+                                    </a>
+                                </li>
+                                <li ng-if="homePageController.userRole === 'Admin' || homePageController.userRole === 'Editor'">
+                                    <a href="{{homePageController.dataDictionaryURL}}" id="helpHover" target="_blank">
+                                        <span id="helpHover">Data Dictionary</span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </li>
+                </ul>
+
+                <div class="verticallineHelp" style="margin-left: 7px"></div>
                 <ul class="profile-wrapper">
                     <li>
                         <!-- user profile -->
@@ -115,6 +142,14 @@
 
                                 </md-content>
                             </md-tab>
+
+                            <!-- <md-tab label="Data Dictionary" ng-click="homePageController.selectAct('dataDictionary')">
+                                <md-content style="{{homePageController.mainContentMinHeight}}">
+                                    <div ng-if="homePageController.templateName == 'dataDictionary'" ng-include="'dist/modules/dataDictionary/view/dataDictionaryView.html'"
+                                        ng-controller="dataDictionaryController as dataDictionaryController" layout="vertical"></div>
+                                </md-content>
+                            </md-tab>-->
+
                             <md-tab label="Business Mapping" ng-if="homePageController.showBusinessMapping" ng-click="homePageController.selectAct('dataTaggingDetails')">
                                 <md-content style="{{homePageController.mainContentMinHeight}}">
                                     <div ng-if="homePageController.templateName == 'dataOnboarding'" ng-include="'dist/modules/dataOnBoarding/view/dataOnBoardingView.html'"
@@ -127,23 +162,24 @@
                                 </md-content>
                             </md-tab>
 
+                            <md-tab label="Access Group Management" ng-click="homePageController.selectAct('userOnboarding')">
+                                <md-content>
+                                    <div ng-if="homePageController.templateName == 'applicationManagement'" ng-include="'dist/modules/applicationManagement/view/applicationManagementView.html'"
+                                        ng-controller="applicationManagementController as applicationManagementController" layout="vertical"></div>
+                                    <div ng-if="homePageController.templateName == 'userOnboarding'" ng-include="'dist/modules/userOnboarding/view/userOnboardingView.html'"
+                                        ng-controller="userOnboardingController as userOnboardingController" layout="vertical"></div>
+                                </md-content>
+                            </md-tab>
+
                             <md-tab label="Settings" ng-click="homePageController.selectAct('appSettings')">
                                 <md-content style="{{homePageController.mainContentMinHeight}}">
-                                   <div ng-if="homePageController.templateName == 'appSettings'" ng-include="'dist/modules/appSettings/view/appSettingsView.html'"
+                                    <div ng-if="homePageController.templateName == 'appSettings'" ng-include="'dist/modules/appSettings/view/appSettingsView.html'"
                                         ng-controller="appSettingsController as appSettingsController" layout="vertical"></div>
                                     <div ng-if="homePageController.templateName == 'datapurgeSettings'" ng-include="'dist/modules/appSettings/view/dataPurgingView.html'"
                                         ng-controller="dataPurgingController as dataPurgingController" layout="vertical"></div>
-                                  </md-content>
-                            </md-tab>
-
-                            <md-tab label="Access Group Management" ng-click="homePageController.selectAct('userOnboarding')">
-                                <md-content /*style="{{homePageController.mainContentMinHeight}}"*/>
-                                <div ng-if="homePageController.templateName == 'applicationManagement'" ng-include="'dist/modules/applicationManagement/view/applicationManagementView.html'"
-                                    ng-controller="applicationManagementController as applicationManagementController" layout="vertical"></div>
-                                <div ng-if="homePageController.templateName == 'userOnboarding'" ng-include="'dist/modules/userOnboarding/view/userOnboardingView.html'"
-                                    ng-controller="userOnboardingController as userOnboardingController" layout="vertical"></div>
                                 </md-content>
                             </md-tab>
+
                         </md-tabs>
                     </md-tab-body>
                 </md-tab>
