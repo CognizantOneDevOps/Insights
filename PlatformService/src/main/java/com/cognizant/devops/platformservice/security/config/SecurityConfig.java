@@ -104,6 +104,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 	protected void configure(HttpSecurity http) throws Exception {
 		http
 			.authorizeRequests()
+			.antMatchers("/datasources/**").permitAll()
 			.antMatchers("/admin/**").access("hasAuthority('Admin')")
 			.antMatchers("/configure/loadConfigFromResources").permitAll()
 			.antMatchers("/**").authenticated()

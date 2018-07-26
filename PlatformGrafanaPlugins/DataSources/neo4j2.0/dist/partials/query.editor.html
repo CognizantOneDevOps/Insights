@@ -17,19 +17,44 @@
  -->
 <query-editor-row query-ctrl="ctrl" class="generic-datasource-query-row" has-text-edit-mode="true">
   <div class="gf-form" ng-if="ctrl.target.rawQuery">
-    <textarea class="gf-form-input" rows="5" ng-model="ctrl.target.target" spellcheck="false" ng-blur="ctrl.onChangeInternal()" />
+    <textarea class="gf-form-input" rows="5" ng-model="ctrl.target.target" spellcheck="false" ng-blur="ctrl.onChangeInternal()"
+    />
   </div>
   <div class="gf-form" ng-if="ctrl.target.rawQuery">
     <editor-checkbox text="Graph" model="ctrl.target.graph"></editor-checkbox>
     <editor-checkbox text="Stats" model="ctrl.target.stats"></editor-checkbox>
     <editor-checkbox text="TimeSeries" model="ctrl.target.timeSeries"></editor-checkbox>
     <editor-checkbox text="Table" model="ctrl.target.table"></editor-checkbox>
+    <editor-checkbox text="Cache results" model="ctrl.target.rescache"></editor-checkbox>
+  </div>
+
+  <div class="gf-form" ng-if="ctrl.target.rescache" style="margin-bottom: 15px">
+    <span class="gf-form-label">Select Caching Type</span>
+    <select type="text" ng-model="ctrl.target.selectionval" class="gf-form-input width-10" ng-options="f for f in ['Fixed Time', 'Variance Time']">
+      <option value="" disabled selected>Select a value</option>
+    </select>
+
+    <span ng-if="ctrl.target.selectionval == 'Fixed Time' && ctrl.target.rescache" class="gf-form-label">Select Duration(hours)</span>
+    <select type="text" ng-if="ctrl.target.selectionval == 'Fixed Time' && ctrl.target.rescache" ng-model="ctrl.target.cacheFixedTime"
+      class="gf-form-input width-10" ng-options="f for f in [1, 2, 3]">
+      <option value="" disabled selected>Select a value</option>
+    </select>
+
+    <span class="gf-form-label" ng-if="ctrl.target.selectionval == 'Variance Time' && ctrl.target.rescache">Select Variance(%)</span>
+    <select type="text" ng-if="ctrl.target.selectionval == 'Variance Time' && ctrl.target.rescache" ng-model="ctrl.target.cacheVariance"
+      class="gf-form-input width-10" ng-options="f for f in [5, 10, 15]">
+      <option value="" disabled selected>Select a value</option>
+    </select>
+  </div>
+
+  <div>
+    <span class="gf-form-label" ng-if="ctrl.target.rescache" style="margin-top: -10px;margin-bottom: 5px;">
+      <img style="height: 15px;width: 15px;margin-right: 5px;margin-top: -2px" src="/public/plugins/neo4j/img/info_icon.svg">Please note that when Fixed Time is selected, the time selector would be disabled for selected fixed time interval.</span>
   </div>
 
   <div ng-if="!ctrl.target.rawQuery">
     <div class="gf-form">
-      <metric-segment-model property="ctrl.target.target" get-options="ctrl.getOptions()" on-change="ctrl.onChangeInternal()"
-        css-class="tight-form-item-xxlarge"></metric-segment-model>
+      <metric-segment-model property="ctrl.target.target" get-options="ctrl.getOptions()" on-change="ctrl.onChangeInternal()" css-class="tight-form-item-xxlarge"></metric-segment-model>
     </div>
   </div>
 </query-editor-row>

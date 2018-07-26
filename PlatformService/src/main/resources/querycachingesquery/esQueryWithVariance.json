@@ -1,0 +1,61 @@
+{
+	"query": 
+	{
+		"bool": 
+		{
+			"must": 
+			[
+				{
+					"match": 
+					{
+						"queryHash": "__queryCache__"
+					}
+				},
+
+				{
+					"bool": 
+					{
+						"must": 
+						[
+							{
+								"range": 
+								{
+									"startTimeRange": 
+									{
+										"gte": "__cachedStartTime__",
+										"lte": "__startTime__",
+										"format": "epoch_millis"
+									}
+								}
+							}
+						],
+
+						"must": 
+						[
+							{
+								"range": 
+								{
+									"endTimeRange": 
+									{
+										"gte": "__cachedEndTime__",
+										"lte": "__endTime__",
+										"format": "epoch_millis"
+									}
+								}
+							}
+						]
+					}
+				}
+			]
+		}
+	},
+
+	"sort": 
+	{
+		"creationTime": 
+		{
+			"order": "desc",
+			"unmapped_type": "long"
+		}
+	}
+}

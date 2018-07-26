@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  ******************************************************************************/
- 
+
 ///<reference path="../node_modules/grafana-sdk-mocks/app/headers/common.d.ts" />
 
 //import angular from 'angular';
@@ -60,7 +60,7 @@ export default class Neo4jDatasource {
     2. Provide group by options (group by a result column)
     3. Table format
   */
-  processResponse(data, options){
+  processResponse(data, options) {
     let timestamp = new Date().getTime() * 1000;
     if (options && options.range && options.range.to) {
       timestamp = options.range.to.valueOf();
@@ -69,63 +69,63 @@ export default class Neo4jDatasource {
     let results = data['results'];
     let defaultResponse = options ? false : true;
     let response = []
-    for(let i in targets){
+    for (let i in targets) {
       let target = targets[i];
       let result = results[i];
-      if(target.timeSeries){
+      if (target.timeSeries) {
         let datapoints = [];
         let targetResponse = {
-          target : target.refId,
-          datapoints : datapoints
+          target: target.refId,
+          datapoints: datapoints
         };
         let targetDatapointsMap = {}
         let rows = result.data;
         let multiSeriesResponse = false;
-        for(let r in rows){
+        for (let r in rows) {
           let row = rows[r].row;
-          if(result.columns.length === 1){
-            datapoints.push([row[0], timestamp]);  
-          }else if(result.columns.length === 3){
+          if (result.columns.length === 1) {
+            datapoints.push([row[0], timestamp]);
+          } else if (result.columns.length === 3) {
             let targetName = row[2];
             let targetDataPoints = targetDatapointsMap[targetName]
-            if (targetDataPoints === undefined){
+            if (targetDataPoints === undefined) {
               targetDataPoints = [];
               targetDatapointsMap[targetName] = targetDataPoints;
               response.push({
-                target : targetName,
-                datapoints : targetDataPoints
+                target: targetName,
+                datapoints: targetDataPoints
               });
               multiSeriesResponse = true;
             }
             targetDataPoints.push([row[1], row[0] * 1000]);
-          }else{
+          } else {
             //Assuming the first column will be the time and second column will be the data.
             datapoints.push([row[1], row[0] * 1000]);
           }
         }
-        if(!multiSeriesResponse){
+        if (!multiSeriesResponse) {
           response.push(targetResponse);
         }
-      }else if(target.table){
+      } else if (target.table) {
         let responseColumns = [];
         let responseRows = [];
-        let tableResponse = {columns: responseColumns, rows: responseRows, type: "table"};
+        let tableResponse = { columns: responseColumns, rows: responseRows, type: "table" };
         let columns = result.columns;
         let data = result.data;
-        for (let columnId in columns){
-          responseColumns.push({ text : columns[columnId]});
+        for (let columnId in columns) {
+          responseColumns.push({ text: columns[columnId] });
         }
         let rows = result.data;
-        for(let r in rows){
+        for (let r in rows) {
           responseRows.push(rows[r].row);
         }
         response.push(tableResponse);
-      }else{
+      } else {
         defaultResponse = true;
         break;
       }
     }
-    if(defaultResponse){
+    if (defaultResponse) {
       return data;
     }
     return response;
@@ -143,7 +143,7 @@ export default class Neo4jDatasource {
       if (response.status === 200) {
         if (data && data.results && data.results.length > 0) {
           data['targets'] = targets;
-          deferred.resolve({data : self.processResponse(data, options)});
+          deferred.resolve({ data: self.processResponse(data, options) });
         } else {
           deferred.resolve({ status: "success", message: "No data returned", title: "success" });
         }
@@ -179,9 +179,17 @@ export default class Neo4jDatasource {
   query(options) {
     //var adhocFilters = this.templateSrv.getAdhocFilters(this.name);
     var targets = options.targets;
+    let range = options.range;
+    var fromTime = range.from.valueOf() / 1000;
+    var toTime = range.to.valueOf() / 1000;
+
     var cypherQuery = {};
     var statements = [];
+    var metadata = [];
+
     cypherQuery['statements'] = statements;
+    cypherQuery['metadata'] = metadata;
+
     for (var i in targets) {
       var target = targets[i];
       let query = this.templateSrv.replace(target.target, options.scopedVars, this.applyTemplateVariables);
@@ -197,7 +205,25 @@ export default class Neo4jDatasource {
         "includeStats": target.stats,
         "resultDataContents": resultDataContents
       };
+
+      var cachingValue;
+      if (target.selectionval === "Fixed Time") {
+        cachingValue = target.cacheFixedTime;
+      } else {
+        cachingValue = target.cacheVariance;
+      }
+
+      var cacheoptions = {
+        "startTime": fromTime,
+        "endTime": toTime,
+        "resultCache": (target.rescache) ? target.rescache : false,
+        "testDB": false,
+        "cachingType": target.selectionval,
+        "cachingValue": cachingValue
+      };
+
       statements.push(statement);
+      metadata.push(cacheoptions);
     }
     return this.executeCypherQuery(cypherQuery, targets, options);
   }
@@ -253,7 +279,10 @@ export default class Neo4jDatasource {
           "includeStats": true,
           "resultDataContents": ["row", "graph"]
         }
-      ]
+      ],
+      "metadata": [{
+        "testDB": true
+      }]
     };
     var testQuery = JSON.stringify(queryJson);
     var deferred = this.$q.defer();
