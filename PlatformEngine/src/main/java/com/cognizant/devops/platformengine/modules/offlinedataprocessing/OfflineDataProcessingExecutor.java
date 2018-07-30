@@ -74,15 +74,17 @@ public class OfflineDataProcessingExecutor implements Job {
 		File queryFolderPath = new File(ConfigOptions.OFFLINE_DATA_PROCESSING_RESOLVED_PATH);
 		File[] files = queryFolderPath.listFiles();
 		int jsonFileCount = 0;
-		for (File eachFile : files) {
-			if (eachFile.isFile()) { // this line removes other directories/folders
-				String fileName = eachFile.getName();
-				if (hasJsonFileExtension(fileName)) {
-					jsonFileCount++;
-					processOfflineConfiguration(eachFile);
+		if (files != null) {
+			for (File eachFile : files) {
+				if (eachFile.isFile()) { // this line removes other directories/folders
+					String fileName = eachFile.getName();
+					if (hasJsonFileExtension(fileName)) {
+						jsonFileCount++;
+						processOfflineConfiguration(eachFile);
+					}
 				}
 			}
-		}
+		}		
 		return jsonFileCount;
 	}
 
@@ -232,6 +234,5 @@ public class OfflineDataProcessingExecutor implements Job {
 		}
 		return Boolean.FALSE;
 	}
-
-
+	
 }
