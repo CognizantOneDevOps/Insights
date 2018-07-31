@@ -3,7 +3,8 @@ Description=Ubuntu GitAgent Service
 
 [Service]
 Type=forking
-ExecStart=/bin/bash /opt/insightsagents/PlatformAgents/git/InSightsGitAgent.sh
+ExecStart=/bin/bash /opt/insightsagents/PlatformAgents/git/InSightsGitAgent.sh start
+ExecStop=/bin/bash /opt/insightsagents/PlatformAgents/git/InSightsGitAgent.sh stop
 
 [Install]
 WantedBy=multi-user.target
