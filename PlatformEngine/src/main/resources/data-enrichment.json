@@ -1,0 +1,26 @@
+[
+  {
+    "queryName": "Sprint-6 Historical Sprint",
+    "cypherQuery": "MATCH(n:GIT) where not exists(n.processed) with n limit 100 set n.processed=true return count(n)",
+    "runSchedule": 720,
+    "lastExecutionTime": "2018/07/12 01:27 PM"   
+  },
+  {
+    "queryName": "Sprint-7 Historical Sprint",
+    "cypherQuery": "MATCH(n:GIT) where exists(n.processed) with n limit 100 remove n.processed return count(n)",
+    "runSchedule": 600,
+    "lastExecutionTime": "2018/07/12 01:27 PM"
+  },
+  {
+    "queryName": "Sprint-8 Historical Sprint",
+    "cypherQuery": "MATCH(n:JIRA) where not exists(n.processed) with n limit 100 set n.processed=true return count(n)",
+    "runSchedule": 660,
+    "lastExecutionTime": "2018/07/12 01:27 PM"
+  },
+  {
+    "queryName": "Sprint-9 Historical Sprint",
+    "cypherQuery": "MATCH(n:JIRA) where exists(n.processed) with n limit 100 remove n.processed return count(n)",
+    "runSchedule": 660,
+    "lastExecutionTime": "2018/07/12 01:27 PM"
+  }
+]
