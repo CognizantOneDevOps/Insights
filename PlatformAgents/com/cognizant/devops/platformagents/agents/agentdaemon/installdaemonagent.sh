@@ -48,9 +48,9 @@ case $opt in
 		        ;;
 		     *)
                 echo "Daemon Running on Ubuntu..."
-				sudo cp -xp InSightsDaemonAgent.service /etc/systemd/system
-				sudo systemctl enable InSightsDaemonAgent
-				sudo systemctl start InSightsDaemonAgent
+				cp -xp InSightsDaemonAgent.service /etc/systemd/system
+				systemctl enable InSightsDaemonAgent
+				systemctl start InSightsDaemonAgent
 				echo "Service installaton steps completed"
                 ;;
 		   esac

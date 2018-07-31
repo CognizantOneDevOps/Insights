@@ -3,7 +3,8 @@ Description=Ubuntu JenkinsAgent Service
 
 [Service]
 Type=forking
-ExecStart=/bin/bash /opt/insightsagents/PlatformAgents/jenkins/InSightsJenkinsAgent.sh
+ExecStart=/bin/bash /opt/insightsagents/PlatformAgents/jenkins/InSightsJenkinsAgent.sh start
+ExecStop=/bin/bash /opt/insightsagents/PlatformAgents/jenkins/InSightsJenkinsAgent.sh stop
 
 [Install]
 WantedBy=multi-user.target
