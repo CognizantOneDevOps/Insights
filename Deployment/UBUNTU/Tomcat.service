@@ -1,0 +1,10 @@
+[Unit]
+Description=Ubuntu Tomcat Service
+
+[Service]
+Type=forking
+ExecStart=/bin/bash /etc/init.d/Tomcat8 start
+ExecStop=/bin/bash /etc/init.d/Tomcat8 stop
+
+[Install]
+WantedBy=multi-user.target
