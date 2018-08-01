@@ -19,7 +19,7 @@
 	"responseTemplate" : {
 		"id": "commitId",
                 "title": "title",
-                "created_at": "createdAt",
+                "created_at": "commitTime",
                 "message": "message",
                 "committer_name": "committerName",
                 "committer_email": "committerEmail",
@@ -52,11 +52,15 @@
 				"committer_email": "commitEmail"
 				}
 	},
-        "relationMetadata": {"labels" : ["BRANCHRELATION_GITLAB"],"relation":{"properties":["commitId","projectName","projectId","branchName"],"name":"BRANCH_HAS_COMMITS_GITLAB","source":{"constraints":["commitId"]},"destination":{"constraints":["branchName","projectName"]}}},
-        "commitMetadata": {"labels" : ["COMMIT_GITLAB"], "dataUpdateSupported" : true,"uniqueKey":["commitId"]},
+        "relationMetadata": {"relation":{"properties":["commitId","projectName","projectId","branchName"],"name":"BRANCH_HAS_COMMITS_GITLAB","source":{"constraints":["commitId"]},"destination":{"constraints":["branchName","projectName"]}}},
+        "commitMetadata": {"dataUpdateSupported" : true,"uniqueKey":["commitId"]},
         "tagMetadata": {"labels" : ["TAG_GITLAB"]},
-        "mergeMetadata": {"labels" : ["MERGE_GITLAB"]}
+        "mergeMetadata": {"labels" : ["MERGE_GITLAB"]},
+	"branchDeleteMetadata": {"labels" : ["METADATA"], "dataUpdateSupported" : true,"uniqueKey":["branchName", "projectName"]}
         },
+ "timeFieldMapping" : {
+        "commitTime" : "%Y-%m-%dT%H:%M:%S."
+},
 	"enableBranches" : true,
 	"enableMerge" : false,
 	"enableGroup" : true,
@@ -67,7 +71,7 @@
 	"useResponseTemplate" : true,
 	"auth" : "base64",
 	"runSchedule" : 30,
-	"timeStampField":"createdAt",
+	"timeStampField":"commitTime",
 	"timeStampFormat":"%Y-%m-%dT%H:%M:%S.",
 	"StartFrom" : "2017-03-03 15:46:33",
 	"AccessToken": "",
