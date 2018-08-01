@@ -33,6 +33,7 @@ class GitLabAgent(BaseAgent):
         commitMetadata = self.config.get('dynamicTemplate', {}).get('commitMetadata', None)
         tagMetadata = self.config.get('dynamicTemplate', {}).get('tagMetadata', None)
         mergeMetadata = self.config.get('dynamicTemplate', {}).get('mergeMetadata', None)
+        branchDeleteMetadata = self.config.get('dynamicTemplate', {}).get('branchDeleteMetadata', None)
         startFrom = self.config.get("StartFrom", '')
         startFrom = parser.parse(startFrom)
         getProjectsUrl = baseUrl+"/projects?private_token="+accessToken
@@ -87,17 +88,19 @@ class GitLabAgent(BaseAgent):
             if startFrom < repoUpdatedAt:
                 getBranchesUrl = baseUrl+"/projects/"+str(project['id'])+"/repository/branches?private_token="+accessToken
                 branches = self.getResponse(getBranchesUrl, 'GET', None, None, None)
+                active_branches = []
                 for branch in branches:
                     data_commit = []
                     data_commit_relation = []
                     branchName = branch['name']
+                    active_branches.append(branchName)
                     since = trackingDetails.get(branchName, {}).get('latestCommitDate', None)
                     if since is None:
                         since = startFrom
                     else:
                         since = parser.parse(since, ignoretz=True)
                     branchUpdatedAt = parser.parse(branch['commit']['created_at'], ignoretz=True)
-                    self.updateTrackingForBranch(trackingDetails, branchName, branch)
+                    #self.updateTrackingForBranch(trackingDetails, branchName, branch)
                     getCommitsUrl = baseUrl+"/projects/"+str(project['id'])+"/repository/commits?&private_token="+accessToken+"&since="+str(since)+"&ref_name="+branchName+"&page=1&per_page=50"
                     commits = self.getResponse(getCommitsUrl, 'GET', None, None, None)
                     commitPageNum = 1
@@ -106,12 +109,13 @@ class GitLabAgent(BaseAgent):
                         if len(commits) == 0:
                             fetchNextPage = False
                             break;
+                        self.updateTrackingForBranch(trackingDetails, branchName, branch, False)
                         for commit in commits:
                             if since < parser.parse(commit['created_at'], ignoretz=True):
                                 injectData = {}
                                 injectData['commitId'] = commit['id']
                                 injectData['title'] = commit['title']
-                                injectData['createdAt'] = commit['created_at']
+                                injectData['commitTime'] = commit['created_at']
                                 injectData['message'] = commit['message']
                                 injectData['committerName'] = commit['committer_name']
                                 injectData['committerEmail'] = commit['committer_email']
@@ -119,7 +123,8 @@ class GitLabAgent(BaseAgent):
                                 injectData['projectName'] = project['name']
                                 injectData['projectId'] = project['id']
                                 injectData['branchName'] = branchName
-                                data_commit_relation += self.getCommitInformation(commit)
+                                injectData['projectName'] = projectName
+                                data_commit_relation += self.getCommitInformation(commit, projectName)
                                 data_commit.append(injectData)
                         commitPageNum = commitPageNum + 1
                         getcommitsUrl = baseUrl+"/projects/"+str(project['id'])+"/repository/commits?private_token="+accessToken+"&since="+str(since)+"&page="+str(commitPageNum)+"&per_page=50"
@@ -128,6 +133,25 @@ class GitLabAgent(BaseAgent):
                         self.publishToolsData(data_commit_relation, commitMetadata)
                         self.publishToolsData(data_commit, relationMetadata)
                     self.updateTrackingJson(self.tracking)
+                activeBranchesPublish = [{ 'projectName' : projectName, 'activeBranches' : active_branches, 'gitLabType' : 'metadata'}]
+                metadata = {"dataUpdateSupported" : True,"uniqueKey" : ["projectName", "gitLabType"]}
+                self.publishToolsData(activeBranchesPublish, metadata)
+                data_branch_delete = []
+                for keys in self.tracking.get(projectName,None):
+                    if "ModificationTime" not in keys:                 
+                        branch_delete_status = self.tracking.get(projectName).get(keys, {}).get('delete_status', None)
+                        if keys not in active_branches and branch_delete_status != True and branch_delete_status == False:
+                            injectDataBranchDelete = {}
+                            injectDataBranchDelete['branchName'] = keys
+                            injectDataBranchDelete['projectName'] = projectName
+                            injectDataBranchDelete['activeStatus'] = False
+                            injectDataBranchDelete['latestCommitDate'] = trackingDetails.get(keys, {}).get('latestCommitDate', None)
+                            injectDataBranchDelete['latestCommitId'] = trackingDetails.get(keys, {}).get('latestCommitId', None)
+                            data_branch_delete.append(injectDataBranchDelete)
+                            self.updateTrackingForBranch(trackingDetails, keys, branch, True)
+                    self.updateTrackingJson(self.tracking)
+                if len(data_branch_delete) > 0:
+                    self.publishToolsData(data_branch_delete, branchDeleteMetadata)
                 projectTagModificationTime = startFrom
                 getTagsUrl = baseUrl+"/projects/"+str(project['id'])+"/repository/tags?private_token="+accessToken+"&since="+str(projectTagModificationTime)
                 tags = self.getResponse(getTagsUrl, 'GET', None, None, None)
@@ -171,10 +195,11 @@ class GitLabAgent(BaseAgent):
                         self.publishToolsData(data_merge, mergeMetadata)
         if len(data) > 0:
             self.publishToolsData(data)
-    def updateTrackingForBranch(self, trackingDetails, branchName, branch):
-        trackingDetails[branchName] = { 'latestCommitDate' : branch['commit']['created_at'], 'latestCommitId' : branch['commit']['id']}
-    def getCommitInformation(self, commit):
+    def updateTrackingForBranch(self, trackingDetails, branchName, branch, delete_status):
+        trackingDetails[branchName] = { 'latestCommitDate' : branch['commit']['created_at'], 'latestCommitId' : branch['commit']['id'], 'delete_status': delete_status}
+    def getCommitInformation(self, commit, projectName):
         injectData = {}
+        injectData['projectName'] = projectName
         responseTemplate = self.config.get('dynamicTemplate', {}).get('responseTemplate', None)
         return self.parseResponse(responseTemplate, commit, injectData)
 if __name__ == "__main__":
