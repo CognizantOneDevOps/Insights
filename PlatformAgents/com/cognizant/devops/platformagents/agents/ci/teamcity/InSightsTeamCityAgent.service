@@ -3,7 +3,8 @@ Description=Ubuntu TeamCityAgent Service
 
 [Service]
 Type=forking
-ExecStart=/bin/bash /opt/insightsagents/PlatformAgents/teamcity/InSightsTeamCityAgent.sh
+ExecStart=/bin/bash /opt/insightsagents/PlatformAgents/teamcity/InSightsTeamCityAgent.sh start
+ExecStop=/bin/bash /opt/insightsagents/PlatformAgents/teamcity/InSightsTeamCityAgent.sh stop
 
 [Install]
 WantedBy=multi-user.target
