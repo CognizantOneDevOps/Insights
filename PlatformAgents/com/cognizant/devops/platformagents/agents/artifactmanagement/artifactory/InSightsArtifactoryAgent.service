@@ -3,7 +3,8 @@ Description=Ubuntu ArtifactoryAgent Service
 
 [Service]
 Type=forking
-ExecStart=/bin/bash /opt/insightsagents/PlatformAgents/artifactory/InSightsArtifactoryAgent.sh
+ExecStart=/bin/bash /opt/insightsagents/PlatformAgents/artifactory/InSightsArtifactoryAgent.sh start
+ExecStop=/bin/bash /opt/insightsagents/PlatformAgents/artifactory/InSightsArtifactoryAgent.sh stop
 
 [Install]
 WantedBy=multi-user.target

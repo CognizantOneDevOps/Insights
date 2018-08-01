@@ -3,7 +3,8 @@ Description=Ubuntu SonarAgent Service
 
 [Service]
 Type=forking
-ExecStart=/bin/bash /opt/insightsagents/PlatformAgents/sonar/InSightsSonarAgent.sh
+ExecStart=/bin/bash /opt/insightsagents/PlatformAgents/sonar/InSightsSonarAgent.sh start
+ExecStop=/bin/bash /opt/insightsagents/PlatformAgents/sonar/InSightsSonarAgent.sh stop
 
 [Install]
 WantedBy=multi-user.target

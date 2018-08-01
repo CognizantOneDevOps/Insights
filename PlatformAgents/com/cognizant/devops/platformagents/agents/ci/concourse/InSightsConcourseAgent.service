@@ -3,7 +3,8 @@ Description=Ubuntu ConcourseAgent Service
 
 [Service]
 Type=forking
-ExecStart=/bin/bash /opt/insightsagents/PlatformAgents/concourse/InSightsConcourseAgent.sh
+ExecStart=/bin/bash /opt/insightsagents/PlatformAgents/concourse/InSightsConcourseAgent.sh start
+ExecStop=/bin/bash /opt/insightsagents/PlatformAgents/concourse/InSightsConcourseAgent.sh stop
 
 [Install]
 WantedBy=multi-user.target

@@ -1,0 +1,10 @@
+[Unit]
+Description=Ubuntu InSightsDaemonAgent Service
+
+[Service]
+Type=forking
+ExecStart=/bin/bash /opt/insightsagents/AgentDaemon/InSightsDaemonAgent.sh start
+ExecStop=/bin/bash /opt/insightsagents/AgentDaemon/InSightsDaemonAgent.sh stop
+
+[Install]
+WantedBy=multi-user.target

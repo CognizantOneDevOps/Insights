@@ -41,6 +41,7 @@ module ISightApp {
         .service('insightsService', InsightsService)
         .service('platformServiceStatusService', PlatformServiceStatusService)
         .service('appSettingsService', AppSettingsService)
+        .service('dataDictionaryService', DataDictionaryService)
 
         .controller('pipelineController', PipelineController)
         .controller('homePageController', HomePageController)
@@ -60,7 +61,8 @@ module ISightApp {
         .controller('FileUploadController', FileUploadController)
         .controller('appSettingsController', AppSettingsController)
         .controller('insightsController', InsightsController)
-		.controller('dataPurgingController', DataPurgingController)
+        .controller('dataPurgingController', DataPurgingController)
+        .controller('dataDictionaryController', DataDictionaryController)
 
         .controller('uninstallAgentDialogController', UninstallAgentDialogController)
         .component('footer', {
@@ -223,6 +225,11 @@ module ISightApp {
                         templateUrl: './dist/modules/agent/view/agentListView.html',
                         controller: AgentListController,
                         controllerAs: 'agentListController'
+                    }).
+                    when('/InSights/dataDictionary', {
+                        templateUrl: './dist/modules/dataDictionary/view/dataDictionaryView.html',
+                        controller: DataDictionaryController,
+                        controllerAs: 'dataDictionaryController'
                     }).
 
                     otherwise({
