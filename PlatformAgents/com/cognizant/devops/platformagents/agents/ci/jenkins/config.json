@@ -14,7 +14,9 @@
     "health": "CI.JENKINS.HEALTH"
   },
   "communication": {
-    "type": "REST"
+    "type": "REST",
+    "sslVerify": true,
+    "responseType": "JSON"
   },
   "dynamicTemplate": {
 	"responseTemplate": {
@@ -65,6 +67,12 @@
 "toolsTimeZone" : "Asia/Kolkata",
 "useResponseTemplate" : true,
 "useAllBuildsApi" : false,
+"isDebugAllowed" : false,
+"enableValueArray": false,
+"dataBatchSize": "None",
+"schedulerStatus": "None",
+"userid": "username",
+"passwd": "password",
 "runSchedule": 30,
 "baseUrl": "http://127.0.0.1:8080/",
 "jenkinsMasters" : {
@@ -73,9 +81,12 @@
   },
 "timeStampField":"buildTimestamp",
 "timeStampFormat":"epoch",
+"timeFieldMapping": "None",
 "isEpochTimeFormat" : true,
 "startFrom" : "2016-10-10 15:46:33",
 "loggingSetting" : {
-	"logLevel" : "WARN"
+	"logLevel" : "WARN",
+	"maxBytes" : 5000000,
+	"backupCount" : 1000
 }
 }

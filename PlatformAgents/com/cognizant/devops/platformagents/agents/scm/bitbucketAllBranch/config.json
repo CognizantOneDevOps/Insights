@@ -14,7 +14,9 @@
     "health": "SCM.BITBUCKET.HEALTH"
   },
   "communication": {
-    "type": "REST"
+    "type": "REST",
+    "sslVerify": true,
+    "responseType": "JSON"
   },
     "dynamicTemplate": {
 	  "responseTemplate": {
@@ -53,8 +55,11 @@
   },
   "toolCategory" : "SCM",
   "runSchedule": 30,
+  "schedulerStatus": "None",
   "toolsTimeZone" : "GMT",
   "insightsTimeZone" : "GMT",
+  "enableValueArray": false,
+  "dataBatchSize": "None",
   "startFrom" : "2017-07-01 00:00:00",
   "useResponseTemplate" : true,
   "scanAllBranches" : false,
@@ -63,10 +68,14 @@
   "userID": "",
   "passwd": "",
   "timeStampField":"createdTime",
+  "timeStampFormat":"%Y-%m-%dT%H:%M:%S",
+  "timeFieldMapping": "None",
   "isEpochTimeFormat" : true,
   "baseEndPoint": "http://127.0.0.1:7990/rest/api/1.0/projects/",
   "isDebugAllowed" : false,
   "loggingSetting" : {
-        "logLevel" : "WARN"
+        "logLevel" : "WARN",
+		"maxBytes" : 5000000,
+		"backupCount" : 1000
     }
 }

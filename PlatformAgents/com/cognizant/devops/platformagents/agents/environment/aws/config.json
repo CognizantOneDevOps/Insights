@@ -14,16 +14,22 @@
     "health": "ENVIRONMENT.AWS.HEALTH"
   },
   "communication": {
-    "type": "REST"
+    "type": "REST",
+    "sslVerify": true,
+    "responseType": "JSON"
   },
   "toolCategory": "ENVIRONMENT",
   "toolsTimeZone": "GMT",
   "insightsTimeZone": "Asia/Kolkata",
+  "dataBatchSize": "None",
   "useResponseTemplate": false,
   "auth": "base64",
   "runSchedule": 2,
+  "schedulerStatus": "None",
   "timeStampField": "launchTime",
+  "timeFieldMapping": "None",
   "timeStampFormat": "epoch",
+  "isEpochTimeFormat" : false,
   "pattern": "%Y-%m-%dT%H:%M:%S.%fZ",
   "dynamicTemplate": {
     "vpc_id": [
@@ -34,7 +40,10 @@
   "access_key_id": "#Access_Key_ID#",
   "secret_access_key": "#secret_key#",
   "isDebugAllowed": false,
+  "enableValueArray": false,
   "loggingSetting": {
-    "logLevel": "WARN"
+    "logLevel": "WARN",
+	"maxBytes" : 5000000,
+	"backupCount" : 1000
   }
 }

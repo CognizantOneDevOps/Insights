@@ -1,7 +1,9 @@
 {
   "category": "CODEQUALITY",
   "communication": {
-    "type": "REST"
+    "type": "REST",
+    "sslVerify": true,
+    "responseType": "JSON"
   },
   "mqConfig": {
     "exchange": "iSight",
@@ -23,17 +25,24 @@
   },
   "toolName": "SONAR",
   "runSchedule": 30,
+  "schedulerStatus": "None",
   "timeStampField": "metricdate",
   "UserId":"admin",
   "Password":"admin",
   "timeMachineapi": "no",
   "timeStampFormat": "%Y-%m-%dT%H:%M:%S",
+  "timeFieldMapping": "None",
   "startFrom": "2015-10-10 00:01:01",
   "toolsTimeZone": "Asia/Kolkata",
   "useResponseTemplate": false,
   "isDebugAllowed": false,
+  "enableValueArray": false,
+  "dataBatchSize": "None",
+  "isEpochTimeFormat" : false,
   "baseUrl": "http://127.0.0.1:9000/sonar/",
   "loggingSetting": {
-    "logLevel": "WARN"
+    	"logLevel": "WARN",
+		"maxBytes" : 5000000,
+		"backupCount" : 1000
   }
 }
