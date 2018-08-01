@@ -17,65 +17,65 @@
 	},
         "dynamicTemplate": {
 	"responseTemplate" : {
-		"id": "commitId",
-                "title": "title",
-                "created_at": "commitTime",
-                "message": "message",
-                "committer_name": "committerName",
-                "committer_email": "committerEmail",
-                "author_email": "authorEmail"
+		"id" : "commitId",
+                "title" : "title",
+                "created_at" : "commitTime",
+                "message" : "message",
+                "committer_name" : "committerName",
+                "committer_email" : "committerEmail",
+                "author_email" : "authorEmail"
 	},
 	"responseTemplateMerge" : {
-		"id": "Id",
-                "target_branch": "targetBranch",
-                "source_branch": "sourceBranch",
-                "project_id": "projectId",
-                "title": "name",
-                "state": "state",
-                "updated_at": "updatedAt",
+		"id" : "Id",
+                "target_branch" : "targetBranch",
+                "source_branch" : "sourceBranch",
+                "project_id" : "projectId",
+                "title" : "name",
+                "state" : "state",
+                "updated_at" : "updatedAt",
 		"author" : {
-				"username": "author",
-				"id": "authorId"
+				"username" : "author",
+				"id" : "authorId"
 				},
 		"assignee" : {
-				"username": "assignee"
+				"username" : "assignee"
 				}
 	},
 	"responseTemplateTag" : {
-		"message": "message",
-		"name": "name",
-                "release": "release",
+		"message" : "message",
+		"name" : "name",
+                "release" : "release",
 		"commit" : {
-				"message": "commitMessage",
-				"id": "tagCommitId",
-				"author_name": "commitName",
-				"committer_email": "commitEmail"
+				"message" : "commitMessage",
+				"id" : "tagCommitId",
+				"author_name" : "commitName",
+				"committer_email" : "commitEmail"
 				}
 	},
-        "relationMetadata": {"relation":{"properties":["commitId","projectName","projectId","branchName"],"name":"BRANCH_HAS_COMMITS_GITLAB","source":{"constraints":["commitId"]},"destination":{"constraints":["branchName","projectName"]}}},
-        "commitMetadata": {"dataUpdateSupported" : true,"uniqueKey":["commitId"]},
-        "tagMetadata": {"labels" : ["TAG_GITLAB"]},
-        "mergeMetadata": {"labels" : ["MERGE_GITLAB"]},
-	"branchDeleteMetadata": {"labels" : ["METADATA"], "dataUpdateSupported" : true,"uniqueKey":["branchName", "projectName"]}
+        "relationMetadata" : {"relation":{"properties":["commitId","projectName","projectId","branchName"],"name":"BRANCH_HAS_COMMITS_GITLAB","source":{"constraints":["commitId"]},"destination":{"constraints":["branchName","projectName"]}}},
+        "commitMetadata" : {"dataUpdateSupported" : true,"uniqueKey":["commitId"]},
+        "tagMetadata" : {"labels" : ["TAG_GITLAB"]},
+        "mergeMetadata" : {"labels" : ["MERGE_GITLAB"]},
+	"branchDeleteMetadata" : {"labels" : ["METADATA"], "dataUpdateSupported" : true,"uniqueKey":["branchName", "projectName"]}
         },
- "timeFieldMapping" : {
-        "commitTime" : "%Y-%m-%dT%H:%M:%S."
-},
+	 "timeFieldMapping" : {
+		"commitTime" : "%Y-%m-%dT%H:%M:%S."
+	},
 	"enableBranches" : true,
 	"enableMerge" : false,
 	"enableGroup" : true,
 	"enableCommitRelation" : true,
-        "restrictedProjects": ["projects_name"],
+        "restrictedProjects" : ["projects_name"],
 	"toolsTimeZone" : "GMT",
 	"insightsTimeZone" : "Asia/Kolkata",
 	"useResponseTemplate" : true,
 	"auth" : "base64",
 	"runSchedule" : 30,
-	"timeStampField":"commitTime",
-	"timeStampFormat":"%Y-%m-%dT%H:%M:%S.",
+	"timeStampField" : "commitTime",
+	"timeStampFormat" :"%Y-%m-%dT%H:%M:%S.",
 	"StartFrom" : "2017-03-03 15:46:33",
-	"AccessToken": "",
-	"GetProjects":"",
+	"AccessToken" : "",
+	"GetProjects" : "",
 	"isDebugAllowed" : false,
 	"loggingSetting" : {
 		"logLevel" : "WARN"
