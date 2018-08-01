@@ -14,25 +14,35 @@
     "health": "ARTIFACTMANAGEMENT.NEXUS.HEALTH"
   },
   "communication": {
-    "type": "REST"
+    "type": "REST",
+    "sslVerify": true,
+    "responseType": "JSON"
   },
   "dynamicTemplate": {
   	  "responseTemplate": {
   	  }
   },
   "toolCategory" : "ARTIFACTMANAGEMENT",
+  "enableValueArray": false,
+  "dataBatchSize": "None",
   "auth": "base64",
   "runSchedule": 5,
+  "schedulerStatus": "None",
   "userID": "userid",
   "passwd": "passwd",
   "baseUrl": "http://127.0.0.1:9005/nexus/",
   "timeStampField":"nex_lastupdated",
   "timeStampFormat":"%Y%m%d%H%M%S",
-    "toolsTimeZone" : "Asia/Kolkata",
+  "timeFieldMapping": "None",
+  "useResponseTemplate": false,
+   "toolsTimeZone" : "Asia/Kolkata",
   "insightsTimeZone" : "Asia/Kolkata",
+  "isEpochTimeFormat" : false,
   "isDebugAllowed" : false,
   "firstEndPoint": "http://127.0.0.1:9005/nexus/service/local/lucene/search?g=com*",
     	"loggingSetting" : {
-		"logLevel" : "WARN"
+		"logLevel" : "WARN",
+		"maxBytes" : 5000000,
+		"backupCount" : 1000
 	}
 }

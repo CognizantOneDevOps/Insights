@@ -14,16 +14,23 @@
 		"health" : "SCM.SVN.HEALTH"
 	},
 	"communication":{
-		"type" : "REST" 
+		"type" : "REST",
+    	"sslVerify": true,
+    	"responseType": "JSON" 
 	},
 	"toolCategory" : "SCM",
 	"toolsTimeZone" : "GMT",
 	"insightsTimeZone" : "Asia/Kolkata",
+	"dataBatchSize": "None",
 	"useResponseTemplate" : false,
+	"schedulerStatus": "None",
+	"enableValueArray": false,
 	"auth" : "base64",
 	"runSchedule" : 2,
 	"timeStampField":"commitTime",
+	"timeFieldMapping": "None",
 	"timeStampFormat":"%Y-%m-%d %H:%M:%S.%f",
+	"isEpochTimeFormat" : false,
 	"startFrom" : "2016-10-10 15:46:33.000000",
 	"dynamicTemplate": {
 		"baseUrl": ["URL"]
@@ -32,6 +39,8 @@
 	"password": "password",
 	"isDebugAllowed" : true,
 	"loggingSetting" : {
-		"logLevel" : "WARN"
+		"logLevel" : "WARN",
+		"maxBytes" : 5000000,
+		"backupCount" : 1000
 	}
 }

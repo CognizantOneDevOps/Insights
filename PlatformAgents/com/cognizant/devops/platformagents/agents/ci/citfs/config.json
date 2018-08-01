@@ -14,7 +14,9 @@
     "health": "CI.TFS.HEALTH"
   },
   "communication": {
-    "type": "REST"
+    "type": "REST",
+    "sslVerify": true,
+    "responseType": "JSON"
   },
  "dynamicTemplate": {
 	  "responseTemplate": {
@@ -45,16 +47,26 @@
 	  }
   },
 "toolCategory" : "CI",
+ "isDebugAllowed" : false,
+"enableValueArray": false,
+ "dataBatchSize": "None",
 "auth": "NTLM",
 "toolsTimeZone" : "Asia/Kolkata",
 "insightsTimeZone" : "Asia/Kolkata",
 "useResponseTemplate" : true,
 "runSchedule": 2,
+"schedulerStatus": "None",
 "userID": "tfs",
 "passwd": "tfs",
 "baseUrl": "http://hostname/tfs",
 "timeStampField":"startDate",
 "timeStampFormat":"%Y-%m-%dT%H:%M:%S",
+"timeFieldMapping": "None",
 "isEpochTimeFormat" : false,
-"startFrom" : "2017-01-01 01:01:01"
+"startFrom" : "2017-01-01 01:01:01",
+"loggingSetting" : {
+		"logLevel" : "WARN",
+		"maxBytes" : 5000000,
+		"backupCount" : 1000
+ } 
 }

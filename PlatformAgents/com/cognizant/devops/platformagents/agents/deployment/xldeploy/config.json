@@ -14,7 +14,9 @@
     "health": "DEPLOYMENT.XLDEPLOY.HEALTH"
   },
   "communication": {
-    "type": "REST"
+    "type": "REST",
+    "sslVerify": true,
+    "responseType": "JSON"
   },
  "dynamicTemplate": {
 	"responseTemplate" : {
@@ -40,8 +42,22 @@
  "auth": "base64",
  "toolCategory" : "DEPLOYMENT",
  "runSchedule": 5,
+ "schedulerStatus": "None",
+ "toolsTimeZone" : "Asia/Kolkata",
+ "isEpochTimeFormat" : false,
+ "enableValueArray": false,
+ "timeStampFormat":"%Y-%m-%dT%H:%M:%S",
+ "timeFieldMapping": "None",
+ "timeStampField":"startDate",
+ "useResponseTemplate" : true,
+ "dataBatchSize": "None",
  "userID": "userdi",
  "passwd": "passwd",
   "baseEndPoint": "http://127.0.0.1:4516/deployit",
-  "isDebugAllowed" : false
+  "isDebugAllowed" : false,
+  "loggingSetting" : {
+		"logLevel" : "WARN",
+		"maxBytes" : 5000000,
+		"backupCount" : 1000
+ } 
 }
