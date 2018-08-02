@@ -28,24 +28,18 @@
 #  the License.
 # Install Java
 echo "#################### Installing Java with Env Variable ####################"
-cd /opt
-sudo wget  http://platform.cogdevops.com/insights_install/installationScripts/latest/RHEL/java/jdk-8u151-linux-x64.tar.gz
-sudo tar xzf jdk-8u151-linux-x64.tar.gz
+cd /opt/
+wget  http://platform.cogdevops.com/insights_install/installationScripts/latest/RHEL/java/jdk-8u151-linux-x64.tar.gz
+tar xzf jdk-8u151-linux-x64.tar.gz
 export JAVA_HOME=/opt/jdk1.8.0_151
-sudo echo JAVA_HOME=/opt/jdk1.8.0_151  | sudo tee -a /etc/environment
-sudo echo "export" JAVA_HOME=/opt/jdk1.8.0_151 | sudo tee -a /etc/profile
+echo JAVA_HOME=/opt/jdk1.8.0_151  | tee -a /etc/environment
+echo "export" JAVA_HOME=/opt/jdk1.8.0_151 | tee -a /etc/profile
 export JRE_HOME=/opt/jdk1.8.0_151/jre
-sudo echo JRE_HOME=/opt/jdk1.8.0_151/jre | sudo tee -a /etc/environment
-sudo echo "export" JRE_HOME=/opt/jdk1.8.0_151/jre | sudo tee -a /etc/profile
+echo JRE_HOME=/opt/jdk1.8.0_151/jre | tee -a /etc/environment
+echo "export" JRE_HOME=/opt/jdk1.8.0_151/jre | tee -a /etc/profile
 export PATH=$PATH:/opt/jdk1.8.0_151/bin:/opt/jdk1.8.0_151/jre/bin
-sudo echo PATH=$PATH:/opt/jdk1.8.0_151/bin:/opt/jdk1.8.0_151/jre/bin | sudo tee -a /etc/environment
-sudo alternatives --install /usr/bin/java java /opt/jdk1.8.0_151/bin/java 20000
-sudo update-alternatives --install "/usr/bin/java" "java" "/opt/jdk1.8.0_151/bin/java" 1
-sudo update-alternatives --install "/usr/bin/javac" "javac" "/opt/jdk1.8.0_151/bin/javac" 1
-sudo update-alternatives --install "/usr/bin/javaws" "javaws" "/opt/jdk1.8.0_151/bin/javaws" 1
-sudo update-alternatives --set java /opt/jdk1.8.0_151/bin/java
-sudo update-alternatives --set javac /opt/jdk1.8.0_151/bin/javac
-sudo update-alternatives --set javaws /opt/jdk1.8.0_151/bin/javaws
-source /etc/environment
-source /etc/profile
+echo PATH=$PATH:/opt/jdk1.8.0_151/bin:/opt/jdk1.8.0_151/jre/bin | tee -a /etc/environment
+update-alternatives --install /usr/bin/java java /opt/jdk1.8.0_151/bin/java 20000
+sudo -E source /etc/environment
+sudo -E source /etc/profile
 

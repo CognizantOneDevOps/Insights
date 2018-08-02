@@ -3,7 +3,8 @@ Description=Ubuntu PivotalTrackerAgent Service
 
 [Service]
 Type=forking
-ExecStart=/bin/bash /opt/insightsagents/PlatformAgents/pivotalTracker/InSightsPivotalTrackerAgent.sh
+ExecStart=/bin/bash /opt/insightsagents/PlatformAgents/pivotalTracker/InSightsPivotalTrackerAgent.sh start
+ExecStop=/bin/bash /opt/insightsagents/PlatformAgents/pivotalTracker/InSightsPivotalTrackerAgent.sh stop
 
 [Install]
 WantedBy=multi-user.target
