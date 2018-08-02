@@ -3,7 +3,8 @@ Description=Ubuntu SnowAgent Service
 
 [Service]
 Type=forking
-ExecStart=/bin/bash /opt/insightsagents/PlatformAgents/snow/InSightsSnowAgent.sh
+ExecStart=/bin/bash /opt/insightsagents/PlatformAgents/snow/InSightsSnowAgent.sh start
+ExecStop=/bin/bash /opt/insightsagents/PlatformAgents/snow/InSightsSnowAgent.sh stop
 
 [Install]
 WantedBy=multi-user.target
