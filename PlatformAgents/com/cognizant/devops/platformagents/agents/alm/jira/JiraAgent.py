@@ -159,7 +159,8 @@ class JiraAgent(BaseAgent):
                     sprintPropertieTokens = sprintDetail.split(",")
                     for propertyToken in sprintPropertieTokens:
                         propertyKeyValToken = propertyToken.split("=")
-                        sprintData[propertyKeyValToken[0]] = propertyKeyValToken[1]
+                        if len(propertyKeyValToken) > 1:
+                            sprintData[propertyKeyValToken[0]] = propertyKeyValToken[1]
                     boardId = sprintData.get('rapidViewId')
                     sprintId = sprintData.get('id')
                     boardTracking = boardsTracking.get(boardId, None)

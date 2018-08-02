@@ -3,7 +3,8 @@ Description=Ubuntu RallyAgent Service
 
 [Service]
 Type=forking
-ExecStart=/bin/bash /opt/insightsagents/PlatformAgents/rally/InSightsRallyAgent.sh
+ExecStart=/bin/bash /opt/insightsagents/PlatformAgents/rally/InSightsRallyAgent.sh start
+ExecStop=/bin/bash /opt/insightsagents/PlatformAgents/rally/InSightsRallyAgent.sh stop
 
 [Install]
 WantedBy=multi-user.target
