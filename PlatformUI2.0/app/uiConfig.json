@@ -3,7 +3,8 @@
   "showOptionsPanel": false,
   "showBusinessMapping": true,
   "agentsOsList": {
-    "windows": "Windows",
-    "linux": "Linux"
+    "Windows": "windows",
+    "RHEL": "linux",
+    "CentOS": "linux"
   }
 }

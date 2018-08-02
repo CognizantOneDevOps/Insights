@@ -3,7 +3,8 @@ Description=Ubuntu JiraAgent Service
 
 [Service]
 Type=forking
-ExecStart=/bin/bash /opt/insightsagents/PlatformAgents/jira/InSightsJiraAgent.sh
+ExecStart=/bin/bash /opt/insightsagents/PlatformAgents/jira/InSightsJiraAgent.sh start
+ExecStop=/bin/bash /opt/insightsagents/PlatformAgents/jira/InSightsJiraAgent.sh stop
 
 [Install]
 WantedBy=multi-user.target
