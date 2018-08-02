@@ -1,5 +1,8 @@
 {
   "dynamicTemplate": {
+  	  "timeFieldMapping" : {
+			"startDate" : "%Y-%m-%d"
+  		},
 	  "responseTemplate": {
 	    "sha": "dummyData"
 	  }     
@@ -33,13 +36,10 @@
   "toolCategory" : "DUMMY",
   "enableBranches": false,
   "enableValueArray": false,
-  "dataBatchSize": "None",
   "timeStampFormat": "%Y-%m-%dT%H:%M:%SZ",
-  "timeFieldMapping": "None",
   "toolsTimeZone": "GMT",
   "isEpochTimeFormat" : false,
   "runSchedule": 30,
-  "schedulerStatus": "None",
   "useResponseTemplate": true,
   "timeStampField":"lastUpdated",
   "startFrom": "2016-10-10 00:01"

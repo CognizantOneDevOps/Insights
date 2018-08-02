@@ -21,18 +21,18 @@
 	"toolCategory" : "SCM",
 	"toolsTimeZone" : "GMT",
 	"insightsTimeZone" : "Asia/Kolkata",
-	"dataBatchSize": "None",
 	"useResponseTemplate" : false,
-	"schedulerStatus": "None",
 	"enableValueArray": false,
 	"auth" : "base64",
 	"runSchedule" : 2,
 	"timeStampField":"commitTime",
-	"timeFieldMapping": "None",
 	"timeStampFormat":"%Y-%m-%d %H:%M:%S.%f",
 	"isEpochTimeFormat" : false,
 	"startFrom" : "2016-10-10 15:46:33.000000",
 	"dynamicTemplate": {
+		"timeFieldMapping" : {
+			"startDate" : "%Y-%m-%d"
+  		},
 		"baseUrl": ["URL"]
 	},
 	"username": "Username",

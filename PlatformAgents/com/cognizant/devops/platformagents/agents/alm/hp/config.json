@@ -19,6 +19,9 @@
     "responseType": "JSON"
   },
   "dynamicTemplate": {
+	  "timeFieldMapping" : {
+		"startDate" : "%Y-%m-%d"
+ 	   },
 	  "almEntities" : {
 	  	"requirements" : {
 			"parent-id" : "parentId", 
@@ -45,11 +48,9 @@
   },
   "toolCategory" : "ALM",
   "dataFetchCount" : 200,
-  "dataBatchSize": "None",
   "useResponseTemplate" : false,
   "auth": "base64",
   "runSchedule": 30,
-  "schedulerStatus": "None",
   "userid": "userid",
   "passwd": "password",
   "baseEndPoint": "http://hostname",
@@ -57,7 +58,6 @@
   "toolsTimeZone" : "Asia/Kolkata",
   "timeStampField":"last-modified",
   "timeStampFormat":"%Y-%m-%d %H:%M:%S",
-  "timeFieldMapping": "None",
   "isEpochTimeFormat" : false,
   "isDebugAllowed" : true,
   	"loggingSetting" : {

@@ -19,6 +19,9 @@
     "responseType": "JSON"
   },
    "dynamicTemplate": {
+   	    "timeFieldMapping" : {
+			"startDate" : "%Y-%m-%d"
+  		},
 	  "responseTemplate": {
 	    "status": "status",
 		"date": "date",
@@ -31,7 +34,6 @@
   },
   "toolCategory" : "DEPLOYMENT",
   "runSchedule": 30,
-  "schedulerStatus": "None",
   "userid": "userId",
   "passwd": "Passwd",
   "reportType": "com.urbancode.ds.subsys.report.domain.deployment_report.DeploymentReport",
@@ -42,9 +44,7 @@
   "useResponseTemplate" : true,
   "timeStampField": "date",
   "timeStampFormat":"%Y-%m-%dT%H:%M:%S",
-  "timeFieldMapping": "None",
   "isEpochTimeFormat": true,
-  "dataBatchSize": "None",
   "isDebugAllowed" : false,
   "enableValueArray": false,
   "loggingSetting" : {

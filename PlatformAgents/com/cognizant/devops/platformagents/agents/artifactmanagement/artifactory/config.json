@@ -19,6 +19,9 @@
     "responseType": "JSON"
   },
 "dynamicTemplate": {
+	"timeFieldMapping" : {
+		"startDate" : "%Y-%m-%d"
+  	},
   "responseTemplate": {
      "repo": "reponame",
      "path": "repopath",
@@ -35,17 +38,14 @@
 },
   "auth": "base64",
   "enableValueArray": false,
-  "dataBatchSize": "None",
   "useResponseTemplate" : true,
   "runSchedule": 5,
-  "schedulerStatus": "None",
   "UserID": "admin",
   "Passwd": "password",
   "toolCategory" : "ARTIFACTMANAGEMENT",
   "BaseUrl": "http://localhost:8081/artifactory/api/",
   "timeStampField":"nex_lastupdated",
   "timeStampFormat":"%Y%m%d%H%M%S",
-  "timeFieldMapping": "None",
   "isEpochTimeFormat" : false,
   "toolsTimeZone" : "GMT",
   "insightsTimeZone" : "Asia/Kolkata",

@@ -19,6 +19,9 @@
     "responseType": "JSON"
   },
 "dynamicTemplate": {
+	"timeFieldMapping" : {
+		"startDate" : "%Y-%m-%d"
+  	},
   "responseTemplate": {
     "id": "Id",
     "name": "buildNumber",
@@ -37,15 +40,12 @@
 "runSchedule": 30,
  "isDebugAllowed" : false,
  "enableValueArray": false,
-  "dataBatchSize": "None",
-  "schedulerStatus": "None",
 "UserID": "userid",
 "Passwd": "password",
 "BaseUrl": "#BaseUrl",
 "TeamName": "people-sched",
 "timeStampField":"startDate",
 "timeStampFormat":"%Y-%m-%dT%H:%M:%S",
-"timeFieldMapping": "None",
 "isEpochTimeFormat" : false,
 "StartFrom" : "2017-01-01 01:01:01",
 "loggingSetting" : {

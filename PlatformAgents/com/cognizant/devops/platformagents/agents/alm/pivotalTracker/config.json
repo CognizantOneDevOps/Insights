@@ -19,6 +19,9 @@
     	"responseType": "JSON"
   },
   "dynamicTemplate": {
+   "timeFieldMapping" : {
+		"startDate" : "%Y-%m-%d"
+  	},
   "responseTemplate": {
     "id": "storyId",
     "created_at": "createdAt",
@@ -31,10 +34,8 @@
   },
   "auth": "base64",
   "runSchedule": 30,
-  "schedulerStatus": "None",
   "toolCategory" : "ALM",
   "enableValueArray": false,
-  "dataBatchSize": "None",
   "useResponseTemplate" : true,
   "userid": "",
   "passwd": "",
@@ -44,7 +45,6 @@
   "toolsTimeZone" : "Asia/Kolkata",
   "timeStampField":"last-modified",
   "timeStampFormat":"%Y-%m-%dT%H:%M:%SZ",
-  "timeFieldMapping": "None",
   "isEpochTimeFormat" : false,
   "isDebugAllowed" : true,
   	"loggingSetting" : {

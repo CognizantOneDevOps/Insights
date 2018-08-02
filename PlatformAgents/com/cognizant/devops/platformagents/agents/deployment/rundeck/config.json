@@ -19,6 +19,9 @@
     "responseType": "JSON"
   },
  "dynamicTemplate": {
+   	  "timeFieldMapping" : {
+			"startDate" : "%Y-%m-%d"
+  	   },
 	  "responseTemplate": {
 	    "id": "executionId",
 	    "project": "projectName",
@@ -42,12 +45,9 @@
   "toolCategory" : "DEPLOYMENT",
   "auth": "base64",
   "runSchedule": 2,
-  "schedulerStatus": "None",
-  "dataBatchSize": "None",
   "authtoken": "authToken",
   "timeStampField":"dateStarted",
   "timeStampFormat":"%Y-%m-%dT%H:%M:%SZ", 
-  "timeFieldMapping": "None",
   "isEpochTimeFormat" : false,
   "enableValueArray": false,
   "startFrom": "2016-10-10 00:01:01",

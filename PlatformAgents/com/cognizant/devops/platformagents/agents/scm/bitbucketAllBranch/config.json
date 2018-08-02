@@ -19,6 +19,9 @@
     "responseType": "JSON"
   },
     "dynamicTemplate": {
+    	"timeFieldMapping" : {
+			"startDate" : "%Y-%m-%d"
+  		},
 	  "responseTemplate": {
 	    "id": "commitId",
 	    "author": {
@@ -55,11 +58,9 @@
   },
   "toolCategory" : "SCM",
   "runSchedule": 30,
-  "schedulerStatus": "None",
   "toolsTimeZone" : "GMT",
   "insightsTimeZone" : "GMT",
   "enableValueArray": false,
-  "dataBatchSize": "None",
   "startFrom" : "2017-07-01 00:00:00",
   "useResponseTemplate" : true,
   "scanAllBranches" : false,
@@ -69,7 +70,6 @@
   "passwd": "",
   "timeStampField":"createdTime",
   "timeStampFormat":"%Y-%m-%dT%H:%M:%S",
-  "timeFieldMapping": "None",
   "isEpochTimeFormat" : true,
   "baseEndPoint": "http://127.0.0.1:7990/rest/api/1.0/projects/",
   "isDebugAllowed" : false,
