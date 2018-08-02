@@ -19,6 +19,9 @@
     "responseType": "JSON"
   },
  "dynamicTemplate": {
+ 	   "timeFieldMapping" : {
+		"startDate" : "%Y-%m-%d"
+  		}, 		
 	  "responseTemplate": {
 	    "key": "key",
 	    "fields": {
@@ -127,10 +130,8 @@
   "enableSprintReport" : false,
   "sprintField": "sprintField",
   "enableValueArray": true, 
-  "dataBatchSize": "None",
   "isDebugAllowed" : false,  
   "runSchedule": 30,
-  "schedulerStatus": "None",
   "sprintRetrivalSchedule" : 360,
   "dataFetchCount": 1000,
   "userid": "userid",
@@ -142,7 +143,6 @@
   "useResponseTemplate" : true,
   "timeStampField":"lastUpdated",
   "timeStampFormat":"%Y-%m-%dT%H:%M:%S",
-  "timeFieldMapping": "None",
   "isEpochTimeFormat" : false,
   "loggingSetting" : {
 		"logLevel" : "WARN",

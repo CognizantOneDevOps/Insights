@@ -19,6 +19,9 @@
     "responseType": "JSON"
   },
  "dynamicTemplate": {
+ 	 "timeFieldMapping" : {
+		"startDate" : "%Y-%m-%d"
+  	 },
 	 "responseTemplate": {
 		  "actions": [
 		    {
@@ -67,7 +70,6 @@
 "toolsTimeZone" : "Asia/Kolkata",
 "isDebugAllowed" : false,
 "enableValueArray": false,
-"dataBatchSize": "None",
 "useResponseTemplate" : true,
 "useAllBuildsApi" : false,
 "runSchedule": 30,
@@ -77,10 +79,8 @@
   	"master2" : "http://127.0.0.1:8080/"
   },
 "timeStampField":"buildTimestamp",
-"timeFieldMapping": "None",
 "timeStampFormat":"epoch",
 "isEpochTimeFormat" : true,
-"schedulerStatus": "None",
 "startFrom" : "2016-10-10 15:46:33",
 "loggingSetting" : {
 	"logLevel" : "WARN",

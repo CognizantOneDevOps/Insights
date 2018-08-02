@@ -19,6 +19,9 @@
     "responseType": "JSON"
   },
    "dynamicTemplate": {
+      "timeFieldMapping" : {
+		"startDate" : "%Y-%m-%d"
+  	  },
 	  "responseTemplate": {
 		"status": "status",
 		"buildType": {
@@ -56,19 +59,16 @@
 "toolCategory" : "CI",
 "isDebugAllowed" : false,
 "enableValueArray": false,
-"dataBatchSize": "None",
 "auth": "base64",
 "toolsTimeZone" : "Asia/Kolkata",
 "insightsTimeZone" : "Asia/Kolkata",
 "useResponseTemplate" : true,
 "runSchedule": 2,
-"schedulerStatus": "None",
 "userID": "userid",
 "passwd": "passwd",
 "baseUrl": "http://hostname",
 "timeStampField":"startDate",
 "timeStampFormat":"%Y%m%dT%H%M%S+0000",
-"timeFieldMapping": "None",
 "isEpochTimeFormat" : false,
 "startFrom" : "2017-01-01 01:01:01",
 "loggingSetting" : {

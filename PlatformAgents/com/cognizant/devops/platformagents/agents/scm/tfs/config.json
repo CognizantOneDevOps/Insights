@@ -19,6 +19,9 @@
     "responseType": "JSON"
   },
   "dynamicTemplate": {
+    "timeFieldMapping" : {
+		"startDate" : "%Y-%m-%d"
+  	  },
 	  "responseTemplate": {
 	    "changesetId": "changesetId",
 	    "createdDate": "commitDate",
@@ -38,16 +41,13 @@
 "toolsTimeZone" : "Asia/Kolkata",
 "insightsTimeZone" : "Asia/Kolkata",
 "useResponseTemplate" : true,
-"dataBatchSize": "None",
 "enableValueArray": false,
 "runSchedule": 2,
-"schedulerStatus": "None",
 "userID": "tfs",
 "passwd": "tfs",
 "baseUrl": "http://hostname/tfs",
 "timeStampField":"commitDate",
 "timeStampFormat":"%Y-%m-%dT%H:%M:%S",
-"timeFieldMapping": "None",
 "isEpochTimeFormat" : false,
 "startFrom" : "2017-01-01 01:01:01",
 "isDebugAllowed" : false,

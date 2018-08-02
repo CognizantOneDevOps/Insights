@@ -19,6 +19,9 @@
     "responseType": "JSON"
   },
  "dynamicTemplate": {
+   	  "timeFieldMapping" : {
+		"startDate" : "%Y-%m-%d"
+  	   },
 	  "responseTemplate": {
 	    "result": "result",
 	    "id": "buildId",
@@ -49,19 +52,16 @@
 "toolCategory" : "CI",
  "isDebugAllowed" : false,
 "enableValueArray": false,
- "dataBatchSize": "None",
 "auth": "NTLM",
 "toolsTimeZone" : "Asia/Kolkata",
 "insightsTimeZone" : "Asia/Kolkata",
 "useResponseTemplate" : true,
 "runSchedule": 2,
-"schedulerStatus": "None",
 "userID": "tfs",
 "passwd": "tfs",
 "baseUrl": "http://hostname/tfs",
 "timeStampField":"startDate",
 "timeStampFormat":"%Y-%m-%dT%H:%M:%S",
-"timeFieldMapping": "None",
 "isEpochTimeFormat" : false,
 "startFrom" : "2017-01-01 01:01:01",
 "loggingSetting" : {

@@ -19,6 +19,9 @@
     "responseType": "JSON"
   },
   "dynamicTemplate": {
+      "timeFieldMapping" : {
+		"startDate" : "%Y-%m-%d"
+  	  },
 	  "responseTemplate": {
 	    "user": {
 	       "login": "User"
@@ -35,7 +38,6 @@
   "token" : "authenticatedtokenvalue",
   "useAllBuildsApi" : false,
   "runSchedule": 30,
-  "schedulerStatus": "None",
   "userid": "username",
   "passwd": "password",
   "project": "organizationname/repositoryname",
@@ -43,10 +45,8 @@
   "toolsTimeZone" : "Asia/Kolkata",
   "insightsTimeZone" : "Asia/Kolkata",
   "enableValueArray": false,
-   "dataBatchSize": "None",
   "timeStampField": "LastUpdated",
   "timeStampFormat":"%Y-%m-%dT%H:%M:%S",
-  "timeFieldMapping": "None",
   "isEpochTimeFormat" : false,
   "isDebugAllowed" : false,
   "startFrom" : "2013-10-10 15:46:33",
