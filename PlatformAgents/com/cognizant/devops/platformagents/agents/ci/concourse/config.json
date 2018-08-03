@@ -3,7 +3,8 @@
     "user": "iSight",
     "password": "iSight",
     "host": "127.0.0.1",
-    "exchange": "iSight"
+    "exchange": "iSight",
+    "agentControlXchg":"iAgent"
   },
   "subscribe": {
     "config": "CI.CONCOURSE.config"
@@ -13,9 +14,14 @@
     "health": "CI.CONCOURSE.HEALTH"
   },
   "communication": {
-    "type": "REST"
+    "type": "REST",
+    "sslVerify": true,
+    "responseType": "JSON"
   },
 "dynamicTemplate": {
+	"timeFieldMapping" : {
+		"startDate" : "%Y-%m-%d"
+  	},
   "responseTemplate": {
     "id": "Id",
     "name": "buildNumber",
@@ -32,6 +38,8 @@
 "insightsTimeZone" : "Asia/Kolkata",
 "useResponseTemplate" : true,
 "runSchedule": 30,
+ "isDebugAllowed" : false,
+ "enableValueArray": false,
 "UserID": "userid",
 "Passwd": "password",
 "BaseUrl": "#BaseUrl",
@@ -39,5 +47,10 @@
 "timeStampField":"startDate",
 "timeStampFormat":"%Y-%m-%dT%H:%M:%S",
 "isEpochTimeFormat" : false,
-"StartFrom" : "2017-01-01 01:01:01"
+"StartFrom" : "2017-01-01 01:01:01",
+"loggingSetting" : {
+		"logLevel" : "WARN",
+		"maxBytes" : 5000000,
+		"backupCount" : 1000
+ } 
 }

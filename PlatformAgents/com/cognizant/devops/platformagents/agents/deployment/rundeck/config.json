@@ -14,9 +14,14 @@
     "health": "DEPLOYMENT.RUNDECK.HEALTH"
   },
   "communication": {
-    "type": "REST"
+    "type": "REST",
+    "sslVerify": true,
+    "responseType": "JSON"
   },
  "dynamicTemplate": {
+   	  "timeFieldMapping" : {
+			"startDate" : "%Y-%m-%d"
+  	   },
 	  "responseTemplate": {
 	    "id": "executionId",
 	    "project": "projectName",
@@ -43,6 +48,8 @@
   "authtoken": "authToken",
   "timeStampField":"dateStarted",
   "timeStampFormat":"%Y-%m-%dT%H:%M:%SZ", 
+  "isEpochTimeFormat" : false,
+  "enableValueArray": false,
   "startFrom": "2016-10-10 00:01:01",
   "toolsTimeZone" : "Asia/Kolkata",
   "insightsTimeZone" : "Asia/Kolkata",
@@ -51,6 +58,8 @@
   "executionsBaseEndPoint": "http://127.0.0.1:4440/api/15/project",
   "isDebugAllowed" : false,
     	"loggingSetting" : {
-		"logLevel" : "WARN"
+		"logLevel" : "WARN",
+		"maxBytes" : 5000000,
+		"backupCount" : 1000
 	}
 }
