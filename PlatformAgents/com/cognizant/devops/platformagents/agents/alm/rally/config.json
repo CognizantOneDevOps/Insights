@@ -14,10 +14,15 @@
     "health": "ALM.RALLY.HEALTH"
   },
   "communication": {
-    "type": "REST"
+    "type": "REST",
+    "sslVerify": true,
+    "responseType": "JSON"
   },
   
   "dynamicTemplate": {
+    "timeFieldMapping" : {
+		"startDate" : "%Y-%m-%d"
+  	},
   "relationMetadata": {"labels" : ["RALLY_ITERATION"],"dataUpdateSupported" : true,"uniqueKey":["workspaceID", "projectID", "iterationID"]},
   "runSchedule": 30,
   "storyMetadata": {"labels":["RALLY_STORY"],"dataUpdateSupported" : true,"uniqueKey":["formattedID" , "workspaceID"]},
@@ -58,13 +63,17 @@
   "dataSize" : 20,
   "baseUrl": "https://rally1.rallydev.com/slm/webservice/v2.0/",
   "startFrom": "2016-10-10 00:01",
+  "enableValueArray": false,
   "toolsTimeZone" : "Asia/Kolkata",
   "insightsTimeZone" : "Asia/Kolkata",
   "useResponseTemplate" : true,
   "timeStampField":"lastUpdateDate",
   "timeStampFormat":"%Y-%m-%dT%H:%M:%SZ",
+  "isEpochTimeFormat" : false,
   "isDebugAllowed" : false,
   "loggingSetting" : {
-		"logLevel" : "WARN"
+		"logLevel" : "WARN",
+		"maxBytes" : 5000000,
+		"backupCount" : 1000
 	}
 }
