@@ -168,7 +168,7 @@ System.register([], function(exports_1) {
                 };
                 Neo4jDatasource.prototype.checkCypherQueryModificationKeyword = function (cypherQuery) {
                     var keywords;
-                    keywords = ["create", "delete", "set", "update"];
+                    keywords = ["create", "delete", "set", "update", "merge", "detach"];
                     var flag = 0;
                     var queryCorrect = true;
                     var j;

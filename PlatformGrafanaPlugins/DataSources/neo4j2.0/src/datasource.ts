@@ -168,7 +168,7 @@ export default class Neo4jDatasource {
 
   checkCypherQueryModificationKeyword(cypherQuery) {
     var keywords: string[];
-    keywords = ["create", "delete", "set", "update"];
+    keywords = ["create", "delete", "set", "update", "merge", "detach"];
     var flag: number = 0;
     var queryCorrect = true;
     var j;

@@ -52,7 +52,7 @@ $('<style>iframe {overflow:hidden;}</style>').appendTo('head');
 var documentWidth = $(document).width();
 var width = documentWidth - 10;
 var documentHeight = window.innerHeight;
-var documentHeight = 100;
+var documentHeight = 20;
 
 var addDashboardIframeToDom = function (url) {
 	$('<iframe>', {
