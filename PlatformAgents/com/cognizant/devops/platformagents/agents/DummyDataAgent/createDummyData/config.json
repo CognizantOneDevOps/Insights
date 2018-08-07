@@ -1,15 +1,22 @@
 {
   "dynamicTemplate": {
+  	  "timeFieldMapping" : {
+			"startDate" : "%Y-%m-%d"
+  		},
 	  "responseTemplate": {
 	    "sha": "dummyData"
 	  }     
   },
   "insightsTimeZone": "Asia/Kolkata",
   "communication": {
-    "type": "REST"
+    "type": "REST",
+    "sslVerify": true,
+    "responseType": "JSON"
   },
   "loggingSetting": {
-    "logLevel": "WARN"
+    "logLevel": "WARN",
+	"maxBytes" : 5000000,
+	"backupCount" : 1000
   },
   "mqConfig": {
     "host": "127.0.0.1",
@@ -28,8 +35,10 @@
   },
   "toolCategory" : "DUMMY",
   "enableBranches": false,
+  "enableValueArray": false,
   "timeStampFormat": "%Y-%m-%dT%H:%M:%SZ",
   "toolsTimeZone": "GMT",
+  "isEpochTimeFormat" : false,
   "runSchedule": 30,
   "useResponseTemplate": true,
   "timeStampField":"lastUpdated",

@@ -43,16 +43,16 @@ public final class InsightsConfiguration {
 	private static final String NEO4J_DS = "Neo4j_DS";
 	private static final String ElaticSearch_DS = "ElaticSearch_DS";
 
-	private InsightsConfiguration(){
-		
+	private InsightsConfiguration() {
+
 	}
-	
+
 	/**
-	 * Update following: 1. Default layout JSON's 2. Default Datasources in
-	 * Grafana 3. Default Dashboards in Grafana
+	 * Update following: 1. Default layout JSON's 2. Default Datasources in Grafana
+	 * 3. Default Dashboards in Grafana
 	 */
 	public static void doInsightsConfiguration() {
-		//updateLayouts();
+		// updateLayouts();
 		updateDatasources();
 		updateDashboards();
 	}
@@ -82,10 +82,9 @@ public final class InsightsConfiguration {
 
 	private static JsonObject loadJsonFile(String path) {
 		/*
-		 * InputStream in =
-		 * InsightsConfiguration.class.getResourceAsStream(path); BufferedReader
-		 * reader = new BufferedReader(new InputStreamReader(in)); JsonObject
-		 * json = new JsonParser().parse(reader).getAsJsonObject(); try {
+		 * InputStream in = InsightsConfiguration.class.getResourceAsStream(path);
+		 * BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+		 * JsonObject json = new JsonParser().parse(reader).getAsJsonObject(); try {
 		 * reader.close(); } catch (IOException e) { log.error(
 		 * "Unable to close the reader.", e); }
 		 */

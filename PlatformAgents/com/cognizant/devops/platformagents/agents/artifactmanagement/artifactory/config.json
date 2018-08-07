@@ -3,7 +3,8 @@
     "user": "iSight",
     "password": "iSight",
     "host": "127.0.0.1",
-    "exchange": "iSight"
+    "exchange": "iSight",
+    "agentControlXchg":"iAgent"
   },
   "subscribe": {
     "config": "ARTIFACTMANAGEMENT.ARTIFACTORY.config"
@@ -13,9 +14,14 @@
     "health": "ARTIFACTMANAGEMENT.ARTIFACTORY.HEALTH"
   },
   "communication": {
-    "type": "REST"
+    "type": "REST",
+    "sslVerify": true,
+    "responseType": "JSON"
   },
 "dynamicTemplate": {
+	"timeFieldMapping" : {
+		"startDate" : "%Y-%m-%d"
+  	},
   "responseTemplate": {
      "repo": "reponame",
      "path": "repopath",
@@ -31,6 +37,8 @@
   }
 },
   "auth": "base64",
+  "enableValueArray": false,
+  "useResponseTemplate" : true,
   "runSchedule": 5,
   "UserID": "admin",
   "Passwd": "password",
@@ -38,11 +46,14 @@
   "BaseUrl": "http://localhost:8081/artifactory/api/",
   "timeStampField":"nex_lastupdated",
   "timeStampFormat":"%Y%m%d%H%M%S",
+  "isEpochTimeFormat" : false,
   "toolsTimeZone" : "GMT",
   "insightsTimeZone" : "Asia/Kolkata",
   "isDebugAllowed" : false,
   "FirstEndPoint": "http://localhost:8081/artifactory/api/storage/",
     	"loggingSetting" : {
-		"logLevel" : "WARN"
+		"logLevel" : "WARN",
+		"maxBytes" : 5000000,
+		"backupCount" : 1000
 	}
 }
