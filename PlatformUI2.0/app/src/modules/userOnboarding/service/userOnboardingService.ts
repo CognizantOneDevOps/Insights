@@ -21,6 +21,7 @@ module ISightApp {
         getCurrentUserOrgs(): ng.IPromise<any>;
         switchUserOrg(orgId: number): ng.IPromise<any>;
         getGrafanaCurrentOrgAndRole(): ng.IPromise<any>;
+        getGrafanaCurrentVersion(): ng.IPromise<any>;
     }
 
     export class UserOnboardingService implements IUserOnboardingService {
@@ -42,5 +43,11 @@ module ISightApp {
             var restHandler = this.restCallHandlerService;
             return restHandler.get("GRAPANA_CURRENT_ROLE_ORG");
         }
+
+        getGrafanaCurrentVersion(): ng.IPromise<any> {
+            var restHandler = this.restCallHandlerService;
+            return restHandler.get("GET_GRAFANA_VERSION");
+        }
+
     }
 }
