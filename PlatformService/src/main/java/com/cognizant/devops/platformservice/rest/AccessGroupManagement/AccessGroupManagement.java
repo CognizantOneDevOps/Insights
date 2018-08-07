@@ -42,7 +42,6 @@ import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.config.GrafanaData;
 import com.cognizant.devops.platformcommons.dal.rest.RestHandler;
 import com.cognizant.devops.platformservice.rest.util.PlatformServiceUtil;
-import com.cognizant.devops.platformservice.security.config.SpringAuthority;
 import com.cognizant.devops.platformservice.security.config.SpringAuthorityUtil;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -84,7 +83,8 @@ public class AccessGroupManagement {
 		log.debug("API URL is: " + apiUrl);
 		log.debug("Headers: " + headers);
 
-		// Since Access group has changed, need to check and update user role to new
+		// Since Access group has changed, need to check and update user role to
+		// new
 		// Access group
 		// Update cookies and SpringAuthorities accordingly
 		Map<String, String> grafanaResponseCookies = new HashMap<String, String>();
@@ -141,6 +141,16 @@ public class AccessGroupManagement {
 		headers.put("Cookie", getUserCookies());
 		ClientResponse response = RestHandler.doGet(apiUrl, null, headers);
 		log.debug("Headers: " + headers + "\n\n");
+		return PlatformServiceUtil
+				.buildSuccessResponseWithData(new JsonParser().parse(response.getEntity(String.class)));
+	}
+
+	@RequestMapping(value = "/getGrafanaVersion", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+	public JsonObject getGrafanaVersion() {
+		log.debug("\n\nInside getGrafanaVersion method call");
+		String apiUrl = ApplicationConfigProvider.getInstance().getGrafana().getGrafanaEndpoint() + "/api/health";
+		log.debug("getOrgs API is: " + apiUrl);
+		ClientResponse response = RestHandler.doGet(apiUrl, null, null);
 		return PlatformServiceUtil
 				.buildSuccessResponseWithData(new JsonParser().parse(response.getEntity(String.class)));
 	}
