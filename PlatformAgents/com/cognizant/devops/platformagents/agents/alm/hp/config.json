@@ -14,9 +14,14 @@
     "health": "ALM.HP.HEALTH"
   },
   "communication": {
-    "type": "REST"
+    "type": "REST",
+    "sslVerify": true,
+    "responseType": "JSON"
   },
   "dynamicTemplate": {
+	  "timeFieldMapping" : {
+		"startDate" : "%Y-%m-%d"
+ 	   },
 	  "almEntities" : {
 	  	"requirements" : {
 			"parent-id" : "parentId", 
@@ -43,6 +48,7 @@
   },
   "toolCategory" : "ALM",
   "dataFetchCount" : 200,
+  "useResponseTemplate" : false,
   "auth": "base64",
   "runSchedule": 30,
   "userid": "userid",
@@ -52,8 +58,11 @@
   "toolsTimeZone" : "Asia/Kolkata",
   "timeStampField":"last-modified",
   "timeStampFormat":"%Y-%m-%d %H:%M:%S",
+  "isEpochTimeFormat" : false,
   "isDebugAllowed" : true,
   	"loggingSetting" : {
-		"logLevel" : "WARN"
+		"logLevel" : "WARN",
+		"maxBytes" : 5000000,
+		"backupCount" : 1000
 	}
 }

@@ -14,9 +14,14 @@
     "health": "SCM.TFS.HEALTH"
   },
   "communication": {
-    "type": "REST"
+    "type": "REST",
+    "sslVerify": true,
+    "responseType": "JSON"
   },
   "dynamicTemplate": {
+    "timeFieldMapping" : {
+		"startDate" : "%Y-%m-%d"
+  	  },
 	  "responseTemplate": {
 	    "changesetId": "changesetId",
 	    "createdDate": "commitDate",
@@ -36,6 +41,7 @@
 "toolsTimeZone" : "Asia/Kolkata",
 "insightsTimeZone" : "Asia/Kolkata",
 "useResponseTemplate" : true,
+"enableValueArray": false,
 "runSchedule": 2,
 "userID": "tfs",
 "passwd": "tfs",
@@ -46,6 +52,8 @@
 "startFrom" : "2017-01-01 01:01:01",
 "isDebugAllowed" : false,
 "loggingSetting" : {
-		"logLevel" : "WARN"
+		"logLevel" : "WARN",
+		"maxBytes" : 5000000,
+		"backupCount" : 1000
 	}
 }

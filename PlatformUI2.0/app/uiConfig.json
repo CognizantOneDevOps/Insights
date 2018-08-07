@@ -5,6 +5,7 @@
   "agentsOsList": {
     "Windows": "windows",
     "RHEL": "linux",
+    "Ubuntu":"Ubuntu",
     "CentOS": "linux"
   }
 }
