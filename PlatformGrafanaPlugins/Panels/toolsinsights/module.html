@@ -2,6 +2,10 @@
 
 <head>
 	<style>
+		.react-grid-layout {
+			height: max-content !important
+		}
+
 		.panel-content {
 			padding: 0 10px 5px;
 			height: max-content !important;
@@ -24,7 +28,8 @@
 
 		.panel {
 			min-height: max-content;
-			height: 100%;
+			height: max-content !important;
+			position: relative !important;
 		}
 
 		@media (max-width: 768px) {
