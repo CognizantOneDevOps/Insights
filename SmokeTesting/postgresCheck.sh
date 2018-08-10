@@ -16,15 +16,15 @@
 #-------------------------------------------------------------------------------
 echo "======= Postgres Health check Started  ========" >> postgres_health.txt
 HOST=127.0.0.1
-IP=5432
+PORT=5432
 if [ $# -eq 0 ]; then
     echo "No arguments supplied"
 fi
 if [ ! -z "$1" ]; then HOST="$1"; fi
-if [ ! -z "$2" ]; then IP="$2"; fi
+if [ ! -z "$2" ]; then PORT="$2"; fi
 
 echo "***** Script run  at " $(date '+%F %T')"*****"   >> postgres_health.txt
-echo "Host "$HOST" IP "$IP  >> postgres_health.txt
+echo "Host "$HOST" PORT "$PORT  >> postgres_health.txt
 
 echo "Check Postgres service status  " >> postgres_health.txt ;
 systemctl is-active postgresql-9.5.service >> postgres_health.txt
@@ -37,7 +37,7 @@ else
   echo "	Postgres is not installed or not Running as service "  >> postgres_health.txt
 fi
 
-db_psql_connetion=$(psql -A --quiet --no-align --tuples-only --dbname=postgres  -v ON_ERROR_STOP=1 --username=postgres --host=$HOST --port=$IP  --command=" select 1 ")
+db_psql_connetion=$(psql -A --quiet --no-align --tuples-only --dbname=postgres  -v ON_ERROR_STOP=1 --username=postgres --host=$HOST --port=$PORT  --command=" select 1 ")
 echo $db_psql_connetion
 
 if [ -z "$db_psql_connetion" ];then 
@@ -49,11 +49,11 @@ if [ "$db_psql_connetion" -eq "1" ]; then
 	echo "	pgsgl command working fine" >> postgres_health.txt
 	echo "Run command to check DB file" >> postgres_health.txt
 
-	database_names=$(psql -A --quiet --no-align --tuples-only --dbname=postgres  -v ON_ERROR_STOP=1 --username=postgres --host=$HOST --port=$IP  --command="select datname FROM pg_database where datname in ('grafana','insight')")
+	database_names=$(psql -A --quiet --no-align --tuples-only --dbname=postgres  -v ON_ERROR_STOP=1 --username=postgres --host=$HOST --port=$PORT  --command="select datname FROM pg_database where datname in ('grafana','insight')")
 
-	grafana_user_count=$(psql -X --host=$HOST --port=$IP -d 'grafana' --username=grafana --tuples-only --set ON_ERROR_STOP=on --command "select count(*) from public.user u where u.login='admin'" )
+	grafana_user_count=$(psql -X --host=$HOST --port=$PORT -d 'grafana' --username=grafana --tuples-only --set ON_ERROR_STOP=on --command "select count(*) from public.user u where u.login='admin'" )
 
-	grafana_user=$(psql -X --host=$HOST --port=$IP -d 'grafana' --username=grafana --tuples-only -v ON_ERROR_STOP=1 --command "select u.login from public.user u" )
+	grafana_user=$(psql -X --host=$HOST --port=$PORT -d 'grafana' --username=grafana --tuples-only -v ON_ERROR_STOP=1 --command "select u.login from public.user u" )
 
 	echo "	Database created with name as :"$database_names >> postgres_health.txt
 
@@ -61,11 +61,11 @@ if [ "$db_psql_connetion" -eq "1" ]; then
 
 	echo "	Grafana user details :"$grafana_user >> postgres_health.txt
 
-	dashboard_count=$(psql --quiet --no-align --tuples-only --dbname=grafana --username=grafana --host=$HOST --port=$IP   --command="select count(*) from public.dashboard d ")
+	dashboard_count=$(psql --quiet --no-align --tuples-only --dbname=grafana --username=grafana --host=$HOST --port=$PORT   --command="select count(*) from public.dashboard d ")
 	echo "	Number of dashboard configured = " $dashboard_count >> postgres_health.txt
 
 	echo "	Datasource information : " >> postgres_health.txt
-	psql -A --quiet --no-align --dbname=grafana --username=grafana --host=$HOST --port=$IP   --command="select ds.type as Database_Type, ds.Name as Datasouce_Name, ds.url as  Datasouce_Url , ds.json_data as Datasouce_configuration from public.data_source ds " | while read -a Record ; do
+	psql -A --quiet --no-align --dbname=grafana --username=grafana --host=$HOST --port=$PORT   --command="select ds.type as Database_Type, ds.Name as Datasouce_Name, ds.url as  Datasouce_Url , ds.json_data as Datasouce_configuration from public.data_source ds " | while read -a Record ; do
 	   datasouce_information=${Record}
 	   echo "		"$datasouce_information  >> postgres_health.txt
 	done
@@ -75,4 +75,4 @@ fi
 
 echo "=======Postgres Health check completed ======== " >> postgres_health.txt
 
-echo "Usage: postgresCheck.sh Host IP "
+echo "Usage: postgresCheck.sh Host PORT "

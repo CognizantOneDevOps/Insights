@@ -1,6 +1,6 @@
 ======= Postgres Health check Started  ========
-***** Script run  at  2018-08-10 10:47:46*****
-Host 127.0.0.1 IP 5432
+***** Script run  at  2018-08-10 10:58:28*****
+Host 127.0.0.1 PORT 5432
 Check Postgres service status  
 active
 	Postgres service status : 0
