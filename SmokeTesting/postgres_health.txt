@@ -1,0 +1,19 @@
+======= Postgres Health check Started  ========
+***** Script run  at  2018-08-10 10:47:46*****
+Host 127.0.0.1 IP 5432
+Check Postgres service status  
+active
+	Postgres service status : 0
+	Postgres is installed and Running fine
+	pgsgl command working fine
+Run command to check DB file
+	Database created with name as :grafana insight
+	Number of user created in Grafana =  1
+	Grafana user details : PowerUser admin
+	Number of dashboard configured =  0
+	Datasource information : 
+		database_type|datasouce_name|datasouce_url|datasouce_configuration
+		elasticsearch|ElaticSearch_DS|http://localhost:9200|{"esVersion":2,"timeField":"inSightsTimeX"}
+		neo4j|Neo4j_DS|http://localhost:7474/db/data/transaction/commit?includeStats=true|
+		(2
+=======Postgres Health check completed ======== 
