@@ -3,7 +3,8 @@ Description=Ubuntu TFSAgent Service
 
 [Service]
 Type=forking
-ExecStart=/bin/bash /opt/insightsagents/PlatformAgents/tfs/InSightsTFSAgent.sh
+ExecStart=/bin/bash /opt/insightsagents/PlatformAgents/tfs/InSightsTFSAgent.sh start
+ExecStop=/bin/bash /opt/insightsagents/PlatformAgents/tfs/InSightsTFSAgent.sh stop
 
 [Install]
 WantedBy=multi-user.target

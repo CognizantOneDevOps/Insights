@@ -3,7 +3,8 @@
     "user": "iSight",
     "password": "iSight",
     "host": "127.0.0.1",
-    "exchange": "iSight"
+    "exchange": "iSight",
+    "agentControlXchg":"iAgent"
   },
   "subscribe": {
     "config": "ALM.PIVOTALTRACKER.config"
@@ -13,9 +14,14 @@
     "health": "ALM.PIVOTALTRACKER.HEALTH"
   },
   "communication": {
-    "type": "REST"
+    	"type": "REST",
+    	"sslVerify": true,
+    	"responseType": "JSON"
   },
   "dynamicTemplate": {
+   "timeFieldMapping" : {
+		"startDate" : "%Y-%m-%d"
+  	},
   "responseTemplate": {
     "id": "storyId",
     "created_at": "createdAt",
@@ -29,6 +35,8 @@
   "auth": "base64",
   "runSchedule": 30,
   "toolCategory" : "ALM",
+  "enableValueArray": false,
+  "useResponseTemplate" : true,
   "userid": "",
   "passwd": "",
   "token": "",
@@ -37,8 +45,11 @@
   "toolsTimeZone" : "Asia/Kolkata",
   "timeStampField":"last-modified",
   "timeStampFormat":"%Y-%m-%dT%H:%M:%SZ",
+  "isEpochTimeFormat" : false,
   "isDebugAllowed" : true,
   	"loggingSetting" : {
-		"logLevel" : "WARN"
+		"logLevel" : "WARN",
+		"maxBytes" : 5000000,
+		"backupCount" : 1000
 	}
 }

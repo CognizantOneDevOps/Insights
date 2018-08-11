@@ -14,13 +14,19 @@
     "health": "ARTIFACTMANAGEMENT.NEXUS.HEALTH"
   },
   "communication": {
-    "type": "REST"
+    "type": "REST",
+    "sslVerify": true,
+    "responseType": "JSON"
   },
   "dynamicTemplate": {
+  	  "timeFieldMapping" : {
+		"startDate" : "%Y-%m-%d"
+  	  },
   	  "responseTemplate": {
   	  }
   },
   "toolCategory" : "ARTIFACTMANAGEMENT",
+  "enableValueArray": false,
   "auth": "base64",
   "runSchedule": 5,
   "userID": "userid",
@@ -28,11 +34,15 @@
   "baseUrl": "http://127.0.0.1:9005/nexus/",
   "timeStampField":"nex_lastupdated",
   "timeStampFormat":"%Y%m%d%H%M%S",
-    "toolsTimeZone" : "Asia/Kolkata",
+  "useResponseTemplate": false,
+   "toolsTimeZone" : "Asia/Kolkata",
   "insightsTimeZone" : "Asia/Kolkata",
+  "isEpochTimeFormat" : false,
   "isDebugAllowed" : false,
   "firstEndPoint": "http://127.0.0.1:9005/nexus/service/local/lucene/search?g=com*",
     	"loggingSetting" : {
-		"logLevel" : "WARN"
+		"logLevel" : "WARN",
+		"maxBytes" : 5000000,
+		"backupCount" : 1000
 	}
 }
