@@ -33,7 +33,7 @@ class RestCommunicationFacade(object):
         self.responseType = responseType
         self.enableValueArray = enableValueArray
         
-    def communicate(self, url, method, userName, password, data, authType='BASIC', reqHeaders=None, responseTupple=None, proxies=None, retryCount=5):
+    def communicate(self, url, method, userName, password, data, authType='BASIC', reqHeaders=None, responseTupple=None, proxies=None):
         auth = None
         if(userName != None and password != None):
             if(authType == 'NTLM'):
@@ -45,17 +45,13 @@ class RestCommunicationFacade(object):
             reqHeaders = RestCommunicationFacade.headers
                    
         response = None
-        try:
-            if('GET' == method):
-                response = requests.get(url, auth=auth, headers=reqHeaders, data=data,proxies=proxies, verify=self.sslVerify)
-            elif('POST' == method):
-                response = requests.post(url, auth=auth, headers=reqHeaders, data=data,proxies=proxies, verify=self.sslVerify)
-            else:
-                raise ValueError('RestFacade: Unsupported HTTP Method '+method)
-        except Exception as ex:
-            #Need to handle the connection timeout.
-            if retryCount > 0:
-                self.communicate(url, method, userName, password, data, authType, reqHeaders, responseTupple, proxies, retryCount-1)
+        if('GET' == method):
+            response = requests.get(url, auth=auth, headers=reqHeaders, data=data,proxies=proxies, verify=self.sslVerify)
+        elif('POST' == method):
+            response = requests.post(url, auth=auth, headers=reqHeaders, data=data,proxies=proxies, verify=self.sslVerify)
+        else:
+            raise ValueError('RestFacade: Unsupported HTTP Method '+method)
+            
             
         if None == response:
             raise ValueError('RestFacade: Null response')
