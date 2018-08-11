@@ -14,9 +14,14 @@
     "health": "ALM.JIRA.HEALTH"
   },
   "communication": {
-    "type": "REST"
+    "type": "REST",
+    "sslVerify": true,
+    "responseType": "JSON"
   },
  "dynamicTemplate": {
+ 	   "timeFieldMapping" : {
+		"startDate" : "%Y-%m-%d"
+  		}, 		
 	  "responseTemplate": {
 	    "key": "key",
 	    "fields": {
@@ -123,6 +128,9 @@
   },
   "toolCategory" : "ALM",
   "enableSprintReport" : false,
+  "sprintField": "sprintField",
+  "enableValueArray": true, 
+  "isDebugAllowed" : false,  
   "runSchedule": 30,
   "sprintRetrivalSchedule" : 360,
   "dataFetchCount": 1000,
@@ -135,7 +143,10 @@
   "useResponseTemplate" : true,
   "timeStampField":"lastUpdated",
   "timeStampFormat":"%Y-%m-%dT%H:%M:%S",
+  "isEpochTimeFormat" : false,
   "loggingSetting" : {
-		"logLevel" : "WARN"
+		"logLevel" : "WARN",
+		"maxBytes" : 5000000,
+		"backupCount" : 1000
 	}
 }

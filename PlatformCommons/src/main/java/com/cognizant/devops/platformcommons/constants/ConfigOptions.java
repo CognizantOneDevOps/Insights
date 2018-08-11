@@ -58,4 +58,6 @@ public interface ConfigOptions {
 	String BACKUP_FILE_FORMAT = "backupFileFormat";
 	String CSV_FORMAT = "CSV";
 	String JSON_FORMAT = "JSON";
+	String OFFLINE_DATA_PROCESSING_FOLDER = "data-enrichment";
+	String OFFLINE_DATA_PROCESSING_RESOLVED_PATH = System.getenv().get(INSIGHTS_HOME) + FILE_SEPERATOR + ConfigOptions.CONFIG_DIR + FILE_SEPERATOR + ConfigOptions.OFFLINE_DATA_PROCESSING_FOLDER;
 }

@@ -14,9 +14,14 @@
     "health": "DEPLOYMENT.UCD.HEALTH"
   },
   "communication": {
-    "type": "REST"
+    "type": "REST",
+    "sslVerify": true,
+    "responseType": "JSON"
   },
    "dynamicTemplate": {
+   	    "timeFieldMapping" : {
+			"startDate" : "%Y-%m-%d"
+  		},
 	  "responseTemplate": {
 	    "status": "status",
 		"date": "date",
@@ -38,9 +43,13 @@
   "insightsTimeZone" : "GMT",
   "useResponseTemplate" : true,
   "timeStampField": "date",
+  "timeStampFormat":"%Y-%m-%dT%H:%M:%S",
   "isEpochTimeFormat": true,
   "isDebugAllowed" : false,
+  "enableValueArray": false,
   "loggingSetting" : {
-		"logLevel" : "WARN"
+		"logLevel" : "WARN",
+		"maxBytes" : 5000000,
+		"backupCount" : 1000
 	}
 }
