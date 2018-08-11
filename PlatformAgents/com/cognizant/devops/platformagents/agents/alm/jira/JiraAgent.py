@@ -20,6 +20,7 @@ Created on Jun 22, 2016
 '''
 from datetime import datetime as dateTime2
 import datetime
+import copy
 
 from dateutil import parser
 
@@ -99,17 +100,15 @@ class JiraAgent(BaseAgent):
                 changeDate = parser.parse(data['changeDate'].split('.')[0]);
                 if changeDate > startFromDate:
                     items = change['items']
-                    recordChange = False
                     for item in items:
                         if item['field'] in workLogFields:
-                            data['changedfield'] = item['field']
-                            data['fromString'] = item['fromString']
-                            data['toString'] = item['toString']
-                            data['from'] = item['from']
-                            data['to'] = item['to']
-                            recordChange = True
-                    if recordChange:
-                        workLogData.append(data)
+                            dataCopy = copy.deepcopy(data)
+                            dataCopy['changedfield'] = item['field']
+                            dataCopy['fromString'] = item['fromString']
+                            dataCopy['toString'] = item['toString']
+                            dataCopy['from'] = item['from']
+                            dataCopy['to'] = item['to']
+                            workLogData.append(dataCopy)
         return workLogData
     
     def scheduleExtensions(self):
