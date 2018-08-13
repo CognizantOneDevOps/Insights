@@ -1,9 +1,0 @@
-MQ STATUS CHECK
-TimeStamp :  2018-08-10 13:38:19
-MQ is down with :15672
-MQ STATUS CHECK
-TimeStamp :  2018-08-10 13:38:26
-MQ is up and running in localhost:15672
-        Total number of queues: 9
-        Name: SCM_GIT_HEALTH , Size: 2
-        This is more than expected queue size which is 1
