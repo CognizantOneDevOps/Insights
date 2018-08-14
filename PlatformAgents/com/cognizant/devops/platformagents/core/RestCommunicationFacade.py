@@ -52,6 +52,7 @@ class RestCommunicationFacade(object):
         else:
             raise ValueError('RestFacade: Unsupported HTTP Method '+method)
             
+            
         if None == response:
             raise ValueError('RestFacade: Null response')
         elif 200 != response.status_code and 201 != response.status_code:
