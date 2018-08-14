@@ -174,7 +174,7 @@ export default class Neo4jDatasource {
     var j;
     for (j in keywords) {
       var query = (cypherQuery.statements[0].statement.toString()).toLowerCase();
-      if (query.indexOf(keywords[j]) >= 0) { flag = 1; break; }
+      if (query.indexOf( " "+keywords[j] ) >= 0 || query.indexOf( keywords[j] + " " ) >= 0 || query.indexOf( ")"+keywords[j] ) || query.indexOf( keywords[j] + "(" ) >= 0) { flag = 1; break; }
     }
     if (flag == 0) { return queryCorrect; }
     else {
