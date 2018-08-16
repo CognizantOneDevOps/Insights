@@ -148,11 +148,13 @@ public class AccessGroupManagement {
 	@RequestMapping(value = "/getGrafanaVersion", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 	public JsonObject getGrafanaVersion() {
 		log.debug("\n\nInside getGrafanaVersion method call");
-		String apiUrl = ApplicationConfigProvider.getInstance().getGrafana().getGrafanaEndpoint() + "/api/health";
-		log.debug("getOrgs API is: " + apiUrl);
-		ClientResponse response = RestHandler.doGet(apiUrl, null, null);
-		return PlatformServiceUtil
-				.buildSuccessResponseWithData(new JsonParser().parse(response.getEntity(String.class)));
+		JsonObject grafanaVersionJson = new JsonObject();
+		String grafanaVersion = ApplicationConfigProvider.getInstance().getGrafana().getGrafanaVersion();
+		if (grafanaVersion == null) {
+			grafanaVersion = "4.6.2";
+		}
+		grafanaVersionJson.addProperty("version", grafanaVersion);
+		return PlatformServiceUtil.buildSuccessResponseWithData(grafanaVersionJson);
 	}
 
 	private String getUserCookies() {
