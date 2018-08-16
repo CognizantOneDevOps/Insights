@@ -84,33 +84,23 @@ public class ElasticSearchService {
 			String grafanaUrl = grafanaBaseUrl + "/dashboard/";
 			String grafanaIframeUrl = grafanaBaseUrl + "/dashboard/script/iSight.js?url=";
 			String grafanaDomainUrl = grafanaUrl(grafanaBaseUrl);
+			String grafanaVersion = ApplicationConfigProvider.getInstance().getGrafana().getGrafanaVersion();
+			if (grafanaVersion == null) {
+				grafanaVersion = "4.6.2";
+			}
 			for (JsonElement data : dashboardsJsonArray) {
 				JsonObject dashboardData = data.getAsJsonObject();
 				DashboardModel model = new DashboardModel();
 				model.setId(dashboardData.get("title").getAsString());
 				model.setTitle(dashboardData.get("title").getAsString());
-				// model.setId(dashboardData.get("title").getAsString());
-				// model.setTitle(dashboardData.get("title").getAsString());
-				// model.setUrl(grafanaIframeUrl + grafanaUrl +
-				// dashboardData.get("uri").getAsString());
-				// dashboardResponse.addDashboard(model);
 				if (dashboardData.has("type")) {
 					if ("dash-db".equals(dashboardData.get("type").getAsString())) {
-						ClientResponse grafanaVersion = RestHandler.doGet(grafanaBaseUrl + "/api/health", null,
-								headers);
-						if (grafanaVersion.getStatus() == 404) {
-							model.setUrl(grafanaIframeUrl + grafanaUrl + dashboardData.get("uri").getAsString());
+						if (grafanaVersion.contains("5.")) {
+							model.setUrl(grafanaIframeUrl + grafanaDomainUrl + dashboardData.get("url").getAsString());
 						} else {
-							JsonElement responsegrafanaVersion = new JsonParser()
-									.parse(grafanaVersion.getEntity(String.class));
-							if (responsegrafanaVersion.getAsJsonObject().get("version").getAsString().contains("5.")) {
-								model.setUrl(
-										grafanaIframeUrl + grafanaDomainUrl + dashboardData.get("url").getAsString());
-							} else {
-								model.setUrl(grafanaIframeUrl + grafanaUrl + dashboardData.get("uri").getAsString());
-							}
-							dashboardResponse.addDashboard(model);
+							model.setUrl(grafanaIframeUrl + grafanaUrl + dashboardData.get("uri").getAsString());
 						}
+						dashboardResponse.addDashboard(model);
 					}
 				}
 			}
