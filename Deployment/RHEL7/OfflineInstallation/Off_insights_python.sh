@@ -47,7 +47,6 @@ pip install /usr/Offline_Installation/Python/Libraries/cffi-1.11.5-cp27-cp27mu-m
 pip install /usr/Offline_Installation/Python/Libraries/idna-2.7-py2.py3-none-any.whl
 pip install /usr/Offline_Installation/Python/Libraries/enum34-1.1.6-py2-none-any.whl
 pip install /usr/Offline_Installation/Python/Libraries/cryptography-2.3-cp27-cp27mu-manylinux1_x86_64.whl
-pip install --no-index --find-links /usr/Offline_Installation/Python/Libraries/requests-2.19.1-py2.py3-none-any.whl requests
 pip install /usr/Offline_Installation/Python/Libraries/APScheduler-3.5.1-py2.py3-none-any.whl
 pip install /usr/Offline_Installation/Python/Libraries/requests_ntlm-1.1.0-py2.py3-none-any.whl
 pip install /usr/Offline_Installation/Python/Libraries/pika-0.12.0-py2.py3-none-any.whl
