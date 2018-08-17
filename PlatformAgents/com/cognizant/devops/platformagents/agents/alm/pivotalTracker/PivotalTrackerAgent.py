@@ -25,7 +25,7 @@ import json
 import datetime
 from dateutil import parser
 
-class pivotalTrackerAgent(BaseAgent):
+class PivotalTrackerAgent(BaseAgent):
     def process(self):
         userid = self.config.get("userid", '')
         passwd = self.config.get("passwd", '')
