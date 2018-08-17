@@ -52,6 +52,7 @@ $('<style>iframe {overflow:hidden;}</style>').appendTo('head');
 var documentWidth = $(document).width();
 var width = documentWidth - 10;
 var documentHeight = window.innerHeight;
+var documentHeight = 20;
 
 var addDashboardIframeToDom = function (url) {
 	$('<iframe>', {
@@ -70,17 +71,20 @@ var addRouteChangeDetector = function () {
 	if (grafanaApp.length === 0 || document.getElementById("iSightIframe").contentWindow.angular === undefined) {
 		setTimeout(function () {
 			addRouteChangeDetector();
-		}, 20);
+		}, 300);
 	} else {
-		setTimeout(function () {
+		try {
 			var $injector = document.getElementById("iSightIframe").contentWindow.angular.element(".grafana-app").injector();
+			console.log($injector);
 			$injector.invoke(function ($rootScope) {
 				$rootScope.$on('$viewContentLoaded', function (next, current) {
 					calculateHeight();
 				});
 			});
-		}, 20);
-		addStyleTag();
+		}
+		finally {
+			addStyleTag();
+		}
 	}
 };
 
@@ -90,10 +94,11 @@ var calculateHeight = function (time) {
 	var playlist = $('#iSightIframe').contents().find('.page-container');
 	if (view.length !== 0 && (dashboard.length !== 0 || playlist.length !== 0)) {
 		var height = $('#iSightIframe').contents().find('.main-view').height();
-		if(height < 800){
+		//var height = 1500;
+		if (height < 800) {
 			height = 800;
 			$('#iSightIframe').width(documentWidth);
-		}else{
+		} else {
 			$('#iSightIframe').width(documentWidth - 10);
 		}
 		$('#iSightIframe').width(documentWidth);
@@ -104,7 +109,7 @@ var calculateHeight = function (time) {
 				calculateHeight(time - 20);
 			}, 20);
 		}
-	}else{
+	} else {
 		setTimeout(function () {
 			calculateHeight(3000);
 		}, 20);
@@ -141,7 +146,11 @@ var addStyleTag = function () {
 		}, 20);
 	} else {
 		var style = "<style type=\"text/css\">" +
+			".sidemenu {display : none !important;}\n" +
+			".main-view{position:absolute;width:100%;-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;)}\n" +
+			".scroll-canvas{position:relative;width:100%;overflow:auto;height:100%;-webkit-overflow-scrolling:touch}\n" +
 			".navbar-brand-btn {display : none !important;}\n" +
+			".page-header-canvas {display : none !important;}\n" +
 			".search-item-dash-home {display : none !important;}" +
 			".search-button-row-explore-link {display : none !important;}" +
 			".footer {display : none !important;}" +
@@ -151,7 +160,7 @@ var addStyleTag = function () {
 	}
 };
 
-var addDashboardClickDetector = function(){
+var addDashboardClickDetector = function () {
 	var iframeBody = $('#iSightIframe').contents().find('.grafana-app');
 	if (iframeBody.length === 0) {
 		setTimeout(function () {
@@ -165,11 +174,11 @@ var addDashboardClickDetector = function(){
 };
 
 //Dast Fixes for URL parameter
-var currentreferrer  = document.createElement ('a');
+var currentreferrer = document.createElement('a');
 currentreferrer.href = window.location.origin;
 var grafanaUrl = document.createElement('a');
 grafanaUrl.href = url;
-if (currentreferrer.hostname === grafanaUrl.hostname){
+if (currentreferrer.hostname === grafanaUrl.hostname) {
 	addDashboardIframeToDom(url);
 	calculateHeight();
 	addStyleTag();
