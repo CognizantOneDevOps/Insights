@@ -174,7 +174,23 @@ System.register([], function(exports_1) {
                     var j;
                     for (j in keywords) {
                         var query = (cypherQuery.statements[0].statement.toString()).toLowerCase();
-                        if (query.indexOf(keywords[j]) >= 0) {
+                        if (query.indexOf(" " + keywords[j]) >= 0) {
+                            console.log("1st");
+                            flag = 1;
+                            break;
+                        }
+                        if (query.indexOf(keywords[j] + " ") >= 0) {
+                            console.log("2nd");
+                            flag = 1;
+                            break;
+                        }
+                        if (query.indexOf(keywords[j] + ")") >= 0) {
+                            console.log("3rd");
+                            flag = 1;
+                            break;
+                        }
+                        if (query.indexOf(keywords[j] + "(") >= 0) {
+                            console.log("4th");
                             flag = 1;
                             break;
                         }
