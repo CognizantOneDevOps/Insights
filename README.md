@@ -15,9 +15,9 @@ For Detailed product documentation and feature list please refer to the link -> 
 For information on the latest features and updates please refer to the below mentioned link -> https://onedevops.atlassian.net/wiki/spaces/OI/pages/218936/About+InSights
 
 
-Latest Release Updates :  
+Latest Major Release Updates :  
 
-Release v4.0 - 
+Major Release v4.0 - 
 Major enhancements to Agent management framework. All agent activties can now be performed via UI.
 Addition of new agents - Pivotal tracker and Concourse CI.
 Neo4j Data source updates to timeseries/table format and Google chart changes to support themes.
