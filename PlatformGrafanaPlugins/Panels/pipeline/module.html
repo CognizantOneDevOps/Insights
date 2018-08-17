@@ -2,53 +2,91 @@
 
 <head>
     <style>
+        .react-grid-layout {
+            height: max-content !important
+        }
+
+        .panel-content {
+            padding: 0 10px 5px;
+            height: max-content !important;
+            position: relative;
+            overflow: auto
+        }
+
+        .panel-height-helper {
+            display: block;
+            min-height: max-content;
+        }
+
+        .panel-container {
+            background-color: #fff;
+            border: 1px solid #dde4ed;
+            position: relative;
+            border-radius: 3px;
+            min-height: max-content;
+        }
+
+        .panel {
+            min-height: max-content;
+            height: max-content !important;
+            position: relative !important;
+        }
+
+        @media (max-width: 768px) {
+            .panel,
+            .panel-container,
+            .panel-height-helper {
+                min-height: max-content;
+            }
+        }
+
         .minDivHgt {
             min-height: 200px
         }
-        
+
         .toolCatDiv_1 {
             width: 100%;
             margin-left: 20%;
         }
-        
+
         .toolCatDiv_2 {
             width: 11%;
             margin-left: 55px;
             margin-right: 40px
         }
-        
+
         .toolCatDiv_3 {
             width: 300px;
             margin-right: 25px;
             float: left
         }
-        
+
         .toolCatDiv_4 {
             font-size: 14px;
             font-weight: bold;
             text-align: center;
             color: #696969;
         }
-        
+
         .clearProp {
             clear: both;
         }
-        
+
         .floatLfProp {
             float: left;
         }
-        
+
         .leftArrDiv {
             position: absolute;
             top: 50%;
             left: 187px;
             z-index: 10;
         }
-        
+
         .minHtWhtFrm {
             min-height: 180px
         }
-        
+
         .buttname {
             min-width: 11%;
             height: 35px;
@@ -66,18 +104,18 @@
             font-size: 14px;
             float: left
         }
-        
+
         .pipelineInfo_1 {
             padding-top: 15px;
             padding-left: 25px;
             float: left;
         }
-        
+
         .pipelineInfo_brd {
             border-bottom: 1px solid #cccccc;
             padding-bottom: 25px;
         }
-        
+
         .pipelineInfo_2 {
             box-shadow: 0px 3px 5px -1px rgba(0, 0, 0, 0.2), 0px 6px 10px 0px rgba(0, 0, 0, 0.14), 0px 1px 18px 0px rgba(0, 0, 0, 0.12);
             height: 100px;
@@ -88,21 +126,21 @@
             margin-right: 30px;
             background-color: #F2FCE2;
         }
-        
+
         .txtMrg {
             margin-left: 10px
         }
-        
+
         .txtFont {
             font-size: 12.5px;
             font-weight: bold;
             text-align: center
         }
-        
+
         .txtWt {
             font-weight: bold
         }
-        
+
         .noTxtImg {
             position: absolute;
             margin-left: 120px;
@@ -119,12 +157,12 @@
             background-color: #d8d8d8;
             margin-top: 10px;
         }
-        
+
         .imgAlign {
             margin-top: 7px;
             margin-left: 8px;
         }
-        
+
         .rtArrowImg {
             position: absolute;
             top: 50%;
