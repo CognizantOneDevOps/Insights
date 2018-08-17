@@ -15,55 +15,33 @@
   "communication": {
     "type": "REST"
   },
+  "dynamicTemplate": {
   "responseTemplate": {
-  "actions": [
-    {
-      "causes": [
-        {
-          "shortDescription": "jen_ShortDesc"
-        }
-      ]
-    },
-    {
-      "remoteUrls": [
-        "jen_SCMRemoteUrl"
-      ]
-    },
-    {
-    "url": "jen_SonarUrl"
-    }
-  ],
-  "changeSet": {
-    "items": [
-      {
-        "commitId": "jen_SCMCommitId",
-        "author": {
-          "fullName": "jen_SCMAuthor"
-        },
-        "date": "jen_Date"
-      }
-    ],
-    "kind": "jen_SCMKind"
-  },
-  "duration": "jen_Duration",
-  "id": "jen_BuildNumber",
-  "result": "jen_Result",
-  "timestamp": "jen_TimeStamp",
-  "url": "jen_BuildUrl"
+"id" : "id",
+"buildStartedTime" : "buildStartedTime" ,
+"buildCompletedTime": "buildCompletedTime",
+"buildResultKey": "buildResultKey",
+"projectName": "projectName",
+"planName" : "planName" ,
+"lifeCycleState" : "lifeCycleState",
+"buildDuration" : "buildDuration" ,
+"successful":"successful",
+"buildReason":"buildReason"
+}
 },
 "auth": "base64",
-"UserID": "gangwama",
-"Passwd": "C0gnizant@1",
+"userid": "root",
+"passwd": "123456789",
 "toolsTimeZone" : "Asia/Kolkata",
 "insightsTimeZone" : "Asia/Kolkata",
 "useResponseTemplate" : true,
-"runSchedule": 2,
-"BaseUrl": "http://127.0.0.1:8085/",
+"runSchedule": 30,
+"baseUrl": "http://52.202.65.198:8085/",
 "timeStampField":"jen_TimeStamp",
 "timeStampFormat":"epoch",
 "isEpochTimeFormat" : true,
-"StartFrom" : "2016-12-07 15:46:33",
-"FirstEndPoint": "http://10.155.143.184:8080/api/json?tree=jobs[name,lastBuild[number]]",
+"startFrom" : "2016-12-07 15:46:33",
+
 	"loggingSetting" : {
 		"logLevel" : "WARN"
 	},
