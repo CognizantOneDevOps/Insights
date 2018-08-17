@@ -17,7 +17,7 @@ package com.cognizant.devops.platformcommons.config;
 
 import java.io.Serializable;
 
-public class GrafanaData implements Serializable{
+public class GrafanaData implements Serializable {
 	private String grafanaEndpoint;
 	private String grafanaExternalEndPoint;
 	private String grafanaDBEndpoint;
@@ -25,47 +25,69 @@ public class GrafanaData implements Serializable{
 	private String adminUserPassword;
 	private String dbUserName;
 	private String dbPassword;
-	
+	private String grafanaVersion;
+
 	public String getGrafanaEndpoint() {
 		return grafanaEndpoint;
 	}
+
 	public void setGrafanaEndpoint(String grafanaEndpoint) {
 		this.grafanaEndpoint = grafanaEndpoint;
 	}
+
 	public String getGrafanaDBEndpoint() {
 		return grafanaDBEndpoint;
 	}
+
 	public void setGrafanaDBEndpoint(String grafanaDBEndpoint) {
 		this.grafanaDBEndpoint = grafanaDBEndpoint;
 	}
+
 	public String getAdminUserName() {
 		return adminUserName;
 	}
+
 	public void setAdminUserName(String adminUserName) {
 		this.adminUserName = adminUserName;
 	}
+
 	public String getAdminUserPassword() {
 		return adminUserPassword;
 	}
+
 	public void setAdminUserPassword(String adminUserPassword) {
 		this.adminUserPassword = adminUserPassword;
 	}
+
 	public String getDbUserName() {
 		return dbUserName;
 	}
+
 	public void setDbUserName(String dbUserName) {
 		this.dbUserName = dbUserName;
 	}
+
 	public String getDbPassword() {
 		return dbPassword;
 	}
+
 	public void setDbPassword(String dbPassword) {
 		this.dbPassword = dbPassword;
 	}
+
 	public String getGrafanaExternalEndPoint() {
 		return grafanaExternalEndPoint;
 	}
+
 	public void setGrafanaExternalEndPoint(String grafanaExternalEndPoint) {
 		this.grafanaExternalEndPoint = grafanaExternalEndPoint;
+	}
+
+	public String getGrafanaVersion() {
+		return grafanaVersion;
+	}
+
+	public void setGrafanaVersion(String grafanaVersion) {
+		this.grafanaVersion = grafanaVersion;
 	}
 }
