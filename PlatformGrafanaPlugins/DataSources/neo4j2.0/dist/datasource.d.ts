@@ -26,6 +26,7 @@ export default class Neo4jDatasource {
     addTimestampToQuery(query: any, options: any): any;
     processResponse(data: any, options: any): any;
     executeCypherQuery(cypherQuery: any, targets: any, options: any): any;
+    checkCypherQueryModificationKeyword(cypherQuery: any): boolean;
     applyTemplateVariables(value: any, variable: any, formatValue: any): string;
     query(options: any): any;
     annotationQuery(options: any): void;

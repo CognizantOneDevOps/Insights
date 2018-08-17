@@ -18,8 +18,8 @@
 
 module ISightApp {
     export class HomePageController {
-        static $inject = ['$location', '$window', '$cookies', '$rootScope', 'authenticationService', 'restEndpointService', '$sce', '$timeout', '$mdDialog', 'aboutService', '$resource', 'restAPIUrlService'];
-        constructor(private $location, private $window, private $cookies, private $rootScope, private authenticationService: IAuthenticationService, private restEndpointService: IRestEndpointService, private $sce, private $timeout, private $mdDialog, private aboutService: IAboutService, private $resource, private restAPIUrlService: IRestAPIUrlService) {
+        static $inject = ['$location', '$window', '$cookies', '$rootScope', 'authenticationService', 'restEndpointService', '$sce', '$timeout', '$mdDialog', 'aboutService', '$resource', 'restAPIUrlService', 'userOnboardingService'];
+        constructor(private $location, private $window, private $cookies, private $rootScope, private authenticationService: IAuthenticationService, private restEndpointService: IRestEndpointService, private $sce, private $timeout, private $mdDialog, private aboutService: IAboutService, private $resource, private restAPIUrlService: IRestAPIUrlService, private userOnboardingService: IUserOnboardingService) {
             var self = this;
             this.authenticationService.validateSession();
             this.isValidUser = true;
@@ -126,6 +126,7 @@ module ISightApp {
 
             });
 
+            self.getGrafanaVersion();
 
         }
         isValidUser: boolean = false;
@@ -171,6 +172,7 @@ module ISightApp {
         showTrackingJsonUploadButton: boolean = false;
         trackingJsonLocation: string = '';
         dataDictionaryURL: string = '';
+        grafanaVersion: Number;
 
         public redirect(iconId: string): void {
             if (iconId == 'dashboard') {
@@ -349,5 +351,15 @@ module ISightApp {
             }
             self.dataDictionaryURL = dataDictionaryUrl + "/dataDictionary";
         }
+
+        getGrafanaVersion() {
+            var self = this;
+            self.userOnboardingService.getGrafanaCurrentVersion()
+                .then(function (response) {
+                    var version = response.data.version;
+                    self.grafanaVersion = parseInt(version);
+                });
+        }
+
     }
 }

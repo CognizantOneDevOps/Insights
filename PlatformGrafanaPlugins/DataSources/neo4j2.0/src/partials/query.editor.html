@@ -27,7 +27,9 @@
     <editor-checkbox text="Table" model="ctrl.target.table"></editor-checkbox>
     <editor-checkbox text="Cache results" model="ctrl.target.rescache"></editor-checkbox>
   </div>
-
+  <div class="gf-form" ng-if="ctrl.target.checkQuery">
+    <p>This query contains a modifier keyword.</p>
+  </div>
   <div class="gf-form" ng-if="ctrl.target.rescache" style="margin-bottom: 15px">
     <span class="gf-form-label">Select Caching Type</span>
     <select type="text" ng-model="ctrl.target.selectionval" class="gf-form-input width-10" ng-options="f for f in ['Fixed Time', 'Variance Time']">
