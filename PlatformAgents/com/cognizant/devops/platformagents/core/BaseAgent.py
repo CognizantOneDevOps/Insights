@@ -191,14 +191,16 @@ class BaseAgent(object):
             if metadataType is not dict:
                 raise ValueError('BaseAgent: Dict metadata object is expected')
         if data:
-            self.validateData(data)
+            data = self.validateData(data)
             self.addExecutionId(data, self.executionId)
             self.addTimeStampField(data, timeStampField, timeStampFormat, isEpochTime)
             self.messageFactory.publish(self.dataRoutingKey, data, self.config.get('dataBatchSize', None), metadata)
             self.logIndicator(self.PUBLISH_START, self.config.get('isDebugAllowed', False))
             
     '''
-        This method validates data and removes any entry which contains child json object as an element value
+        This method validates data and 
+        removes any entry which contains nested JSON object 
+        as an element value
     '''
     def validateData(self, data):   
         corrected_json_array =[]
@@ -219,6 +221,7 @@ class BaseAgent(object):
         print("-----------After processing-----------------")
         print(data)
         print("---------------------------")    
+        return data
         
     def publishHealthData(self, data):
         self.addExecutionId(data, self.executionId)
