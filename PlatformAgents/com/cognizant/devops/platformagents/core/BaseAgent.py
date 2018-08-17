@@ -209,7 +209,6 @@ class BaseAgent(object):
             errorFlag = False
             for element in each_json:        
                 if isinstance(each_json[element],dict):
-                    raise ValueError('BaseAgent: Value is not in expected format, so rejecting this entry')
                     errorFlag = True
                     break;
             if not errorFlag:
