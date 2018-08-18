@@ -14,6 +14,12 @@ License for the specific language governing permissions and limitations under
 the License.
 :comment
 REM pushd %INSIGHTS_AGENT_HOME%\PlatformAgents\artifactory
-nssm install ArtifactoryAgent %INSIGHTS_AGENT_HOME%\PlatformAgents\artifactory\ArtifactoryAgent.bat
-sleep 2
-net start ArtifactoryAgent
+IF /I "%1%" == "UNINSTALL" (
+	net stop ArtifactoryAgent
+	sc delete ArtifactoryAgent
+) ELSE (
+	net stop ArtifactoryAgent
+	sc delete ArtifactoryAgent
+    nssm install ArtifactoryAgent %INSIGHTS_AGENT_HOME%\PlatformAgents\artifactory\ArtifactoryAgent.bat
+    net start ArtifactoryAgent
+)
