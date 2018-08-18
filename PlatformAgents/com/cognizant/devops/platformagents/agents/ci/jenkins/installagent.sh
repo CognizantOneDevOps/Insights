@@ -39,6 +39,7 @@ case $opt in
 				echo "Service installaton steps completed"
                 ;;
 		   esac
+		   ;;
         [uU][bB][uU][nN][tT][uU])
 	       case $action in 
                 [uU][nN][iI][nN][sS][tT][aA][lL][lL]) 
@@ -54,6 +55,7 @@ case $opt in
 					echo "Service installaton steps completed"
                 	;;
 		   esac
+		   ;;
         centos)
                 echo "Jenkins Running on centso..."
                 ;;
