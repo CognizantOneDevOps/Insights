@@ -199,7 +199,7 @@ class BaseAgent(object):
             
     '''
         This method validates data and 
-        removes any entry which contains nested JSON object 
+        removes any JSON which contains nested JSON object 
         as an element value
     '''
     def validateData(self, data):   
@@ -212,10 +212,10 @@ class BaseAgent(object):
             for element in each_json:        
                 if isinstance(each_json[element],dict):
                     errorFlag = True
+                    logging.error('Value is not in expected format, nested JSON encountered.Rejecting: '+ str(each_json))
                     break;
             if not errorFlag:
                 corrected_json_array.append(each_json)
-            
         data = []
         data = corrected_json_array
         print("-----------After processing-----------------")
