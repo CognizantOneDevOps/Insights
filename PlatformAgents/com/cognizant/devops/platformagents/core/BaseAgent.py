@@ -204,9 +204,6 @@ class BaseAgent(object):
     '''
     def validateData(self, data):   
         corrected_json_array =[]
-        print("-----------Before Processing-----------------")
-        print(data)
-        print("----------------------------")
         for each_json in data:    
             errorFlag = False
             for element in each_json:        
@@ -218,9 +215,6 @@ class BaseAgent(object):
                 corrected_json_array.append(each_json)
         data = []
         data = corrected_json_array
-        print("-----------After processing-----------------")
-        print(data)
-        print("---------------------------")    
         return data
         
     def publishHealthData(self, data):
