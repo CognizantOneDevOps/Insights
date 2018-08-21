@@ -28,7 +28,7 @@
 ### END INIT INFO
 
 [[ -z "${GRAFANA_HOME}" ]] && GRAFANA_HOME_VAR=sudo env | grep GRAFANA_HOME | cut -d'=' -f2 || GRAFANA_HOME_VAR="${GRAFANA_HOME}"
-GRAFANA_HOME_VAR=$GRAFANA_HOME_VAR/grafana-5.2.2/bin
+GRAFANA_HOME_VAR=$GRAFANA_HOME_VAR/grafana-5.2.2
 echo $GRAFANA_HOME_VAR
 case "$1" in
   start)
@@ -37,7 +37,7 @@ case "$1" in
     else
      echo "Starting Grafana"
      cd $GRAFANA_HOME_VAR
-     sudo nohup ./grafana-server &
+     sudo nohup ./bin/grafana-server &
      echo $! > grafana-pid.txt
     fi
     if [[ $(ps aux | grep '[g]rafana-server' | awk '{print $2}') ]]; then
@@ -67,14 +67,14 @@ case "$1" in
      echo "Grafana stopped"
      echo "Grafana starting"
      cd $GRAFANA_HOME_VAR
-     sudo nohup ./grafana-server &
+     sudo nohup ./bin/grafana-server &
      echo $! > grafana-pid.txt
      echo "Grafana started"
     else
      echo "Grafana already in stopped state"
      echo "Grafana starting"
      cd $GRAFANA_HOME_VAR
-     sudo nohup ./grafana-server &
+     sudo nohup ./bin/grafana-server &
      echo $! > grafana-pid.txt
      echo "Grafana started"
     fi
