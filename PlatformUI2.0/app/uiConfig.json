@@ -4,8 +4,7 @@
   "showBusinessMapping": true,
   "agentsOsList": {
     "Windows": "windows",
-    "RHEL": "linux",
-    "Ubuntu":"Ubuntu",
-    "CentOS": "linux"
+    "RHEL/CentOS": "linux",
+    "Ubuntu":"Ubuntu"
   }
 }
