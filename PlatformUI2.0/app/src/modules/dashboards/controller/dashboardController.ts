@@ -40,7 +40,7 @@ module ISightApp {
             });
 
             this.loadorganizations();
-            self.iframeStyle = 'width:100%; height:1600px;';
+            self.iframeStyle = 'width:100%; height:500px;';
             var receiveMessage = function (evt) {
                 var height = parseInt(evt.data);
                 if (!isNaN(height)) {
