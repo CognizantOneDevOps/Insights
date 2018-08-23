@@ -14,6 +14,12 @@ License for the specific language governing permissions and limitations under
 the License.
 :comment
 REM pushd %INSIGHTS_AGENT_HOME%\PlatformAgents\concourse
-nssm install ConcourseAgent %INSIGHTS_AGENT_HOME%\PlatformAgents\concourse\ConcourseAgent.bat
-sleep 2
-net start ConcourseAgent
+IF /I "%1%" == "UNINSTALL" (
+	net stop ConcourseAgent
+	sc delete ConcourseAgent
+) ELSE (
+	net stop ConcourseAgent
+	sc delete ConcourseAgent
+    nssm install ConcourseAgent %INSIGHTS_AGENT_HOME%\PlatformAgents\concourse\ConcourseAgent.bat
+    net start ConcourseAgent
+)
