@@ -30,7 +30,7 @@ module ISightApp {
             var self = this;
             self.getHost();
             self.getApplicationDetail();
-            self.userIframeStyle = 'width:100%; height:500px;';
+            self.userIframeStyle = 'width:100%; height:400px;';
             var receiveMessage = function (evt) {
                 var height = parseInt(evt.data);
                 if (!isNaN(height)) {
