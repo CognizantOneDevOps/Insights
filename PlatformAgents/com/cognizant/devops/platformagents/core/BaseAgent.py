@@ -29,6 +29,7 @@ import uuid
 from datetime import datetime
 from pytz import timezone
 import logging.handlers
+import time
 
 class BaseAgent(object):
        
@@ -191,7 +192,9 @@ class BaseAgent(object):
             if metadataType is not dict:
                 raise ValueError('BaseAgent: Dict metadata object is expected')
         if data:
-            data = self.validateData(data)
+            enableValidateData = self.config.get('enableValidateData',False)
+            if enableValidateData:
+                data = self.validateData(data)
             self.addExecutionId(data, self.executionId)
             self.addTimeStampField(data, timeStampField, timeStampFormat, isEpochTime)
             self.messageFactory.publish(self.dataRoutingKey, data, self.config.get('dataBatchSize', None), metadata)
@@ -210,6 +213,7 @@ class BaseAgent(object):
                 if isinstance(each_json[element],dict):
                     errorFlag = True
                     logging.error('Value is not in expected format, nested JSON encountered.Rejecting: '+ str(each_json))
+                    self.publishHealthData(self.generateHealthData(note="Agent has encountered nested JSON, rejecting that node."))
                     break;
             if not errorFlag:
                 corrected_json_array.append(each_json)
@@ -298,7 +302,7 @@ class BaseAgent(object):
             health['message'] = 'Agent is shutting down'
         elif ex != None:
             health['status'] = 'failure'
-            health['message'] = 'Error occured: '+str(ex)
+            health['message'] = 'Error occurred: '+str(ex)
             logging.error(ex)
         else:
             health['status'] = 'success'

@@ -59,6 +59,7 @@
   "toolCategory" : "SCM",
   "runSchedule": 30,
   "toolsTimeZone" : "GMT",
+  "enableValidateData": true,
   "insightsTimeZone" : "GMT",
   "startFrom" : "2017-07-01 00:00:00",
   "useResponseTemplate" : true,

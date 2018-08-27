@@ -35,6 +35,7 @@
   },
   "toolCategory" : "DUMMY",
   "enableBranches": false,
+  "enableValidateData": true,
   "enableValueArray": false,
   "timeStampFormat": "%Y-%m-%dT%H:%M:%SZ",
   "toolsTimeZone": "GMT",
