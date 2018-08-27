@@ -136,7 +136,10 @@ export default class Neo4jDatasource {
     var flag = this.checkCypherQueryModificationKeyword(cypherQuery);
     if (flag == true) {
 
-      options.targets[0].checkQuery = false;
+	if(options != null)
+	{
+		options.targets[0].checkQuery = false;
+	}
       var self = this;
       this.backendSrv.datasourceRequest({
         url: this.url,
@@ -159,7 +162,10 @@ export default class Neo4jDatasource {
     }
     else {
 
-      options.targets[0].checkQuery = true;
+      	if(options != null)
+	{
+		options.targets[0].checkQuery = true;
+	}
       deferred.resolve({ status: "failure", message: "Cannot run modification query in neo4j", title: "Failure" });
       console.log("It has create//delete/set/update keyword.");
     }

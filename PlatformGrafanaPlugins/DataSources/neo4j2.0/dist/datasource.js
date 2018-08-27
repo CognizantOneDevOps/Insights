@@ -137,7 +137,9 @@ System.register([], function(exports_1) {
                     var deferred = this.$q.defer();
                     var flag = this.checkCypherQueryModificationKeyword(cypherQuery);
                     if (flag == true) {
-                        options.targets[0].checkQuery = false;
+                        if (options != null) {
+                            options.targets[0].checkQuery = false;
+                        }
                         var self = this;
                         this.backendSrv.datasourceRequest({
                             url: this.url,
@@ -160,7 +162,9 @@ System.register([], function(exports_1) {
                         });
                     }
                     else {
-                        options.targets[0].checkQuery = true;
+                        if (options != null) {
+                            options.targets[0].checkQuery = true;
+                        }
                         deferred.resolve({ status: "failure", message: "Cannot run modification query in neo4j", title: "Failure" });
                         console.log("It has create//delete/set/update keyword.");
                     }
