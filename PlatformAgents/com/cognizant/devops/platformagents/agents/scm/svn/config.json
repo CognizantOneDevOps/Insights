@@ -23,6 +23,7 @@
 	"insightsTimeZone" : "Asia/Kolkata",
 	"useResponseTemplate" : false,
 	"enableValueArray": false,
+	"enableValidateData": true,
 	"auth" : "base64",
 	"runSchedule" : 2,
 	"timeStampField":"commitTime",

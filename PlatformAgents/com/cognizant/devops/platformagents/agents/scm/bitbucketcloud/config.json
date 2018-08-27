@@ -71,6 +71,7 @@
   "toolsTimeZone" : "Asia/Kolkata",
   "insightsTimeZone" : "Asia/Kolkata",
   "startFrom" : "2016-10-10 15:46:33",
+  "enableValidateData": true,
   "useResponseTemplate" : true,
   "userID": "userID",
   "passwd": "passwd",
