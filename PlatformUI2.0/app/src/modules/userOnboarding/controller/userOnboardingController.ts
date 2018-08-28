@@ -123,11 +123,16 @@ module ISightApp {
 
         getHost() {
             var self = this;
+            var grafanaVersion = this.homeController.grafanaVersion;
             /*self.userListUrl = self.$sce.trustAsResourceUrl('http://localhost:3000/dashboard/script/CustomiSight.js?url=http://localhost:3000/org/users');*/
             self.restEndpointService.getGrafanaHost1().then(function (response) {
                 var grafanaEndPoint = response.grafanaEndPoint;
                 //console.log(grafanaEndPoint);
-                self.userListUrl = self.$sce.trustAsResourceUrl(grafanaEndPoint + '/dashboard/script/CustomiSight.js?url=' + grafanaEndPoint + '/org/users');
+                if (grafanaVersion >= 5) {
+                    self.userListUrl = self.$sce.trustAsResourceUrl(grafanaEndPoint + '/dashboard/script/iSight.js?url=' + grafanaEndPoint + '/org/users');
+                } else {
+                    self.userListUrl = self.$sce.trustAsResourceUrl(grafanaEndPoint + '/dashboard/script/CustomiSight.js?url=' + grafanaEndPoint + '/org/users');
+                }
             });
             //console.log(this.userListUrl);
         }

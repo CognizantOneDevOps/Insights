@@ -184,6 +184,11 @@ public class QueryCachingServiceImpl implements QueryCachingService {
 
 		} catch (Exception e) {
 			log.error("Error in capturing Elasticsearch response", e);
+			try {
+				return getNeo4jDatasource(requestPayload);
+			} catch (GraphDBException graphDBEx) {
+				log.error("Exception in neo4j query execution", graphDBEx);
+			}
 		}
 
 		return null;

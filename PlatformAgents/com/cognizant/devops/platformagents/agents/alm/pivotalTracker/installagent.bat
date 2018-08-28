@@ -14,6 +14,12 @@ License for the specific language governing permissions and limitations under
 the License.
 :comment
 REM pushd %INSIGHTS_AGENT_HOME%\PlatformAgents\pivotalTracker
-nssm install PivotalTrackerAgent %INSIGHTS_AGENT_HOME%\PlatformAgents\pivotalTracker\PivotalTrackerAgent.bat
-sleep 2
-net start PivotalTrackerAgent
+IF /I "%1%" == "UNINSTALL" (
+	net stop PivotalTrackerAgent
+	sc delete PivotalTrackerAgent
+) ELSE (
+	net stop PivotalTrackerAgent
+	sc delete PivotalTrackerAgent
+	nssm install PivotalTrackerAgent %INSIGHTS_AGENT_HOME%\PlatformAgents\pivotalTracker\PivotalTrackerAgent.bat
+	net start PivotalTrackerAgent
+)
