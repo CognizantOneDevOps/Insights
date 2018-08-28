@@ -19,6 +19,7 @@
   "responseTemplate": {
 "id" : "id",
 "buildStartedTime" : "buildStartedTime" ,
+"buildCompletedTime": "buildCompletedTime",
 "buildResultKey": "buildResultKey",
 "projectName": "projectName",
 "planName" : "planName" ,
@@ -26,7 +27,10 @@
 "buildDuration" : "buildDuration" ,
 "successful":"successful",
 "buildReason":"buildReason"
-}
+},
+"timeFieldMapping" : {
+"buildCompletedTime" : "%Y-%m-%dT%H:%M:%S.%fZ"
+} 
 },
 "auth": "base64",
 "userid": "userid",
