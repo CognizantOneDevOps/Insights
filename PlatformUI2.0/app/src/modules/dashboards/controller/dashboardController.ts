@@ -19,7 +19,7 @@
 module ISightApp {
     export class DashboardController {
         static $inject = ['elasticSearchService', 'dashboardService', '$sce',
-            '$mdSidenav', '$location', '$timeout', 'restEndpointService', '$rootScope', '$cookies', 'authenticationService','$resource'];
+            '$mdSidenav', '$location', '$timeout', 'restEndpointService', '$rootScope', '$cookies', 'authenticationService', '$resource'];
 
         constructor(
             private elasticSearchService: IElasticSearchService,
@@ -57,7 +57,7 @@ module ISightApp {
             var homePageController = homePageControllerScope['homePageController'];
             this.homeController = homePageController;
             this.homeController.templateName = 'dashboards';
-            this.homeController.imageurl5 = "dist/icons/svg/landingPage/playlist_normal.svg"; 
+            this.homeController.imageurl5 = "dist/icons/svg/landingPage/playlist_normal.svg";
 
         }
 
@@ -91,15 +91,23 @@ module ISightApp {
             }
         }
 
+        setScrollBarPosition() {
+            setTimeout(function () {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }, 500);
+        }
+
         setSelectedDashboard = function (dashboard) {
-            this.selectedDashboard = dashboard;
-            this.dashboardTitle = dashboard.title;
+            var self = this;
+            self.selectedDashboard = dashboard;
+            self.dashboardTitle = dashboard.title;
             if (dashboard.iframeUrl && !dashboard.trustedUrl) {
-                this.selectedDashboard.iframeUrl = this.$sce.trustAsResourceUrl(dashboard.iframeUrl);
-                this.selectedDashboard.trustedUrl = true;
+                self.selectedDashboard.iframeUrl = self.$sce.trustAsResourceUrl(dashboard.iframeUrl);
+                self.selectedDashboard.trustedUrl = true;
+                self.setScrollBarPosition();
             }
         };
-        
+
         loadorganizations(): void {
             var self = this;
             this.dashboardService
@@ -125,10 +133,9 @@ module ISightApp {
 
         switchOrganizations(orgId): void {
             var self = this;
-            
-                    self.defaultOrg = orgId;
-                    self.checkStyle(orgId);
-                self.dashboardService
+            self.defaultOrg = orgId;
+            self.checkStyle(orgId);
+            self.dashboardService
                 .switchUserOrg(orgId)
                 .then(function (selOrgStatus) {
                     self.$rootScope.refreshDashboard = new Date();
@@ -136,43 +143,45 @@ module ISightApp {
                         self.getDashboards();
                     }
                     self.authenticationService.getGrafanaCurrentOrgAndRole()
-                .then(function (data) {
-                    if (data.grafanaCurrentOrgRole === 'Admin') {
-                        self.homeController.showAdminTab = true;
-                        if(self.homeController.showInsightsTab){
-                            self.homeController.selectedIndex = 2;
-                        }else{
-                            self.homeController.selectedIndex = 1;
-                        }
-                        
-                    } else {
-                        self.homeController.showAdminTab = false;
-                        if(self.homeController.showInsightsTab){
-                            self.homeController.selectedIndex = 1;
-                        }else{
-                            self.homeController.selectedIndex = 0;
-                        }
-                    }
+                        .then(function (data) {
+                            if (data.grafanaCurrentOrgRole === 'Admin') {
+                                self.homeController.showAdminTab = true;
+                                if (self.homeController.showInsightsTab) {
+                                    self.homeController.selectedIndex = 2;
+                                } else {
+                                    self.homeController.selectedIndex = 1;
+                                }
 
-                    self.$cookies.put('grafanaRole', data.grafanaCurrentOrgRole);
-                        self.$cookies.put('grafanaOrg', data.grafanaCurrentOrg);
-                    if( data.userName != undefined){
-                        self.homeController.userName = data.userName.replace(/['"]+/g, '');
-                    }
-                    self.homeController.userRole = data.grafanaCurrentOrgRole;
-                    self.homeController.userCurrentOrg = data.grafanaCurrentOrg;
-                    self.authenticationService.getCurrentUserOrgs()
-                    .then(function (orgdata){
-                         self.homeController.userCurrentOrgName = orgdata.data.filter(function(i) {
-                            return i.orgId == self.homeController.userCurrentOrg;
+                            } else {
+                                self.homeController.showAdminTab = false;
+                                if (self.homeController.showInsightsTab) {
+                                    self.homeController.selectedIndex = 1;
+                                } else {
+                                    self.homeController.selectedIndex = 0;
+                                }
+                            }
+
+                            self.$cookies.put('grafanaRole', data.grafanaCurrentOrgRole);
+                            self.$cookies.put('grafanaOrg', data.grafanaCurrentOrg);
+                            if (data.userName != undefined) {
+                                self.homeController.userName = data.userName.replace(/['"]+/g, '');
+                            }
+                            self.homeController.userRole = data.grafanaCurrentOrgRole;
+                            self.homeController.userCurrentOrg = data.grafanaCurrentOrg;
+                            self.authenticationService.getCurrentUserOrgs()
+                                .then(function (orgdata) {
+                                    self.homeController.userCurrentOrgName = orgdata.data.filter(function (i) {
+                                        return i.orgId == self.homeController.userCurrentOrg;
+                                    });
+                                });
                         });
-                    });
+
+
+
                 });
 
-                    
-                    
-                });
-            
+            self.iframeStyle = 'width:100%; height:200px;';
+
         }
 
         checkStyle(orgId: number): string {
@@ -195,8 +204,8 @@ module ISightApp {
                     });
                     self.dashboards = model;
                     self.setSelectedDashboard(model[0]);
-                    if(self.homeController.selectedDashboardUrl && self.homeController.selectedDashboardUrl.trim().length != 0){
-                        var dashbmodel =  new DashboardModel(null,null,self.homeController.selectedDashboardUrl,null,null,false);
+                    if (self.homeController.selectedDashboardUrl && self.homeController.selectedDashboardUrl.trim().length != 0) {
+                        var dashbmodel = new DashboardModel(null, null, self.homeController.selectedDashboardUrl, null, null, false);
                         self.setSelectedDashboard(dashbmodel);
                     }
                     if (self.selectedDashboard) {
