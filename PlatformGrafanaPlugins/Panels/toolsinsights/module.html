@@ -2,6 +2,44 @@
 
 <head>
 	<style>
+		.react-grid-layout {
+			height: max-content !important
+		}
+
+		.panel-content {
+			padding: 0 10px 5px;
+			height: max-content !important;
+			position: relative;
+			overflow: auto
+		}
+
+		.panel-height-helper {
+			display: block;
+			min-height: max-content;
+		}
+
+		.panel-container {
+			background-color: #fff;
+			border: 1px solid #dde4ed;
+			position: relative;
+			border-radius: 3px;
+			min-height: max-content;
+		}
+
+		.panel {
+			min-height: max-content;
+			height: max-content !important;
+			position: relative !important;
+		}
+
+		@media (max-width: 768px) {
+			.panel,
+			.panel-container,
+			.panel-height-helper {
+				min-height: max-content;
+			}
+		}
+
 		.circle {
 			width: 115px;
 			height: 115px;
@@ -11,49 +49,49 @@
 			margin-right: 30px;
 			box-shadow: 0 4px 4px 0 rgba(0, 0, 0, 0.26);
 		}
-		
+
 		.textDecoration {
 			outline: none;
 			border: 0;
 		}
-		
+
 		table.attributes,
 		table.md-api-table {
 			margin-bottom: 20px;
 			border-collapse: collapse;
 			border: 1px solid #757575;
 		}
-		
+
 		table.attributes tr td:first-child {
 			background-color: #DBEEF5;
 		}
-		
+
 		table.attributes tr td:last-child {
 			padding-left: 10px;
 		}
-		
+
 		table.md-api-table tr td:first-child {
 			font-weight: bold;
 		}
-		
+
 		.md-api-table td,
 		.md-api-table th {
 			padding: 14px 16px;
 			text-align: center;
 		}
-		
+
 		.md-api-table td {
 			vertical-align: top;
 		}
-		
+
 		.md-api-table td.description *:first-child {
 			margin-top: 0;
 		}
-		
+
 		.md-api-table td.description *:last-child {
 			margin-bottom: 0;
 		}
-		
+
 		.md-api-table th {
 			font-size: 13px;
 			font-weight: 500;
@@ -61,21 +99,21 @@
 			letter-spacing: .010em;
 			text-align: center;
 		}
-		
+
 		.borderBottom {
 			border-bottom: 1px solid #bcbcbc;
 		}
-		
+
 		.textFormatTable {
 			font-size: 13px;
 			color: #212121;
 			text-align: left;
 		}
-		
+
 		.hoverme:hover {
 			background-color: #d9d9d9;
 		}
-		
+
 		.layout-align-start-center,
 		.layout-align-center-center,
 		.layout-align-end-center,
@@ -87,37 +125,37 @@
 			-ms-flex-line-pack: center;
 			max-width: 100%;
 		}
-		
+
 		svg {
 			width: 100%;
 			height: 80%;
 		}
-		
+
 		.live.map .node rect {
 			stroke-width: 0.5px;
 			stroke: black;
 		}
-		
+
 		.jiraCss {
 			fill: #80ced6;
 		}
-		
+
 		.scmCss {
 			fill: #80ced6;
 		}
-		
+
 		.ciCss {
 			fill: #fefbd8;
 		}
-		
+
 		.sonarCss {
 			fill: #D4F469;
 		}
-		
+
 		.deploymentCss {
 			fill: #f4e1d2;
 		}
-		
+
 		.live.map .node g div {
 			width: 80px;
 			height: 20px;
@@ -126,62 +164,62 @@
 			color: #1f285a;
 			cursor: pointer
 		}
-		
+
 		.live.map .edgeLabel text {
 			fill: #484f4f;
 		}
-		
+
 		.live.map .edgePath path {
 			stroke: #484f4f;
 			stroke-width: 1px;
 			fill: #484f4f;
 		}
-		
+
 		.tipsy .name {
 			font-size: 1.5em;
 			font-weight: bold;
 			color: #60b1fc;
 			margin: 0;
 		}
-		
+
 		tipsy .description {
 			font-size: 1.2em;
 			word-break: break-all;
 			text-align: left;
 		}
-		
+
 		.legend {
 			font-size: 12px;
 			margin-right: 40px
 		}
-		
+
 		.rect {
 			stroke-width: 2;
 		}
-		
+
 		.stop-left {
 			stop-color: #dcdff1;
 		}
-		
+
 		.stop-right {
 			stop-color: #b9c0e4;
 		}
-		
+
 		.filled {
 			fill: url(#mainGradient);
 			-webkit-filter: drop-shadow( 2px 2px 4px rgba(0, 0, 0, .4));
 			filter: drop-shadow( 2px 2px 4px rgba(0, 0, 0, .4));
 		}
-		
+
 		.outlined {
 			stroke: url(#mainGradient);
 		}
-		
+
 		.shadow {
 			filter: url(#drop-shadow);
 			fill: url(#mainGradient);
 		}
-		
+
 		#toolData {
 			font: 600 13px/36px 'Arial', Helvetica, Clean, sans-serif;
 			/*width: 1300px;*/
@@ -189,7 +227,7 @@
 			border-collapse: collapse;
 			border-spacing: 0;
 		}
-		
+
 		.text {
 			font: 600 13px/36px 'Arial', Helvetica, Clean, sans-serif;
 			text-align: left;
@@ -198,15 +236,15 @@
 			margin-left: 20px;
 			text-decoration: underline;
 		}
-		
+
 		#toolData tr:nth-child(even) {
 			background-color: #f2f2f2;
 		}
-		
+
 		#toolData tr:hover {
 			background-color: #ddd;
 		}
-		
+
 		#toolData th {
 			text-align: left;
 			font-family: "Lucida Sans Unicode", "Lucida Grande", Sans-Serif;
@@ -216,7 +254,7 @@
 			padding-left: 10px;
 			width: 220px;
 		}
-		
+
 		#toolData td {
 			background: white;
 			font-family: "Open Sans", Helvetica, Arial, sans-serif;
@@ -228,14 +266,15 @@
 			word-break: break-word;
 			line-height: 2;
 		}
-		
+
 		#toolData tr:nth-child(even) td {
 			background-color: white;
 		}
-		
+
 		#toolData tr:nth-child(odd) td {
 			background-color: #f0f0f0;
 		}
+
 		/*#toolData tr:first-child {
 			counter-reset: Serial;
 		}
@@ -244,7 +283,7 @@
 			counter-increment: Serial;
 			content: counter(Serial);
 		}*/
-		
+
 		.showDtlTxt {
 			padding: 10px;
 			text-decoration: none;
@@ -252,17 +291,17 @@
 			font-style: italic;
 			font-weight: bold;
 		}
-		
+
 		md-whiteframe:focus {
 			border: 6px solid #00728f !important;
 			box-shadow: none;
 		}
-		
+
 		.svg-wrapper {
 			-webkit-filter: drop-shadow( 2px 2px 4px rgba(0, 0, 0, .4));
 			filter: drop-shadow(2px 2px 4px rgba(0, 0, 0, .4));
 		}
-		
+
 		.submitBut {
 			min-height: 40px !important;
 			min-width: 150px !important;
@@ -274,15 +313,16 @@
 			background-color: #00728f !important;
 			padding-right: 20px !important;
 		}
+
 		/*advance table view CSS*/
-		
+
 		#advanceToolData {
 			font: 600 13px/36px 'Arial', Helvetica, Clean, sans-serif;
 			text-align: left;
 			border-collapse: collapse;
 			border-spacing: 0;
 		}
-		
+
 		.text {
 			font: 600 13px/36px 'Arial', Helvetica, Clean, sans-serif;
 			text-align: left;
@@ -291,15 +331,15 @@
 			margin-left: 20px;
 			text-decoration: underline;
 		}
-		
+
 		#advanceToolData tr:nth-child(even) {
 			background-color: #f2f2f2;
 		}
-		
+
 		#advanceToolData tr:hover {
 			background-color: #ddd;
 		}
-		
+
 		#advanceToolData th {
 			text-align: left;
 			font-family: "Lucida Sans Unicode", "Lucida Grande", Sans-Serif;
@@ -309,7 +349,7 @@
 			padding-left: 10px;
 			width: 220px;
 		}
-		
+
 		#advanceToolData td {
 			background: white;
 			font-family: "Open Sans", Helvetica, Arial, sans-serif;
@@ -320,7 +360,7 @@
 			word-wrap: break-word;
 			word-break: break-word;
 		}
-		
+
 		.advanceViewText {
 			margin-right: 14px;
 			color: #00728f;
@@ -328,32 +368,32 @@
 			font-style: italic;
 			font-weight: bold;
 		}
-		
+
 		#paginationDiv ul li a.selected {
 			background-color: #337ab7;
 			border-color: #337ab7;
 			color: #FFFFFF;
 		}
-		
+
 		#paginationDiv li a {
 			display: block;
 			color: #337ab7;
 			background-color: #fff;
 			border: 1px solid #bcbcbc;
 		}
-		
+
 		#nav li a:hover {
 			color: #23527c;
 			background-color: #eee;
 			border-color: #bcbcbc;
 		}
-		
+
 		#nav li a.active {
 			background-color: #337ab7;
 			border-color: #337ab7;
 			color: #FFFFFF;
 		}
-		
+
 		#nav li a.disableLi {
 			pointer-events: none;
 			opacity: 0.6;
@@ -363,19 +403,19 @@
 			border-color: #bcbcbc;
 			color: gray;
 		}
-		
+
 		.mainDiv {
 			height: 120px;
 			margin-top: 25px
 		}
-		
+
 		.toolNmDv {
 			min-width: 20%;
 			height: 100px;
 			float: left;
 			margin-right: 60px
 		}
-		
+
 		.toolNmSelect {
 			font-style: italic;
 			font-size: 15px;
@@ -387,29 +427,29 @@
 			height: 45px;
 			border-radius: 2px
 		}
-		
+
 		.toolNmWd {
 			width: 101%;
 		}
-		
+
 		.fldNmDv {
 			margin-right: 110px;
 			min-width: 26%;
 			height: 100px;
 			float: left
 		}
-		
+
 		.fldNmWdt {
 			width: 117%;
 		}
-		
+
 		.fldValDv {
 			min-width: 23%;
 			height: 100px;
 			float: left;
 			margin-right: 75px;
 		}
-		
+
 		.fldValInp {
 			color: #757575;
 			outline: none;
@@ -421,7 +461,7 @@
 			border: 1px solid rgb(147, 147, 147);
 			border-radius: 2px;
 		}
-		
+
 		.subButtCss {
 			box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.26);
 			outline: none;
@@ -431,51 +471,51 @@
 			text-decoration: none ! important;
 			text-align: center
 		}
-		
+
 		.pagLi {
 			padding: 10px;
 			outline: none
 		}
-		
+
 		.pagAnchor {
 			outline: none;
 			padding-right: 15px;
 			padding-left: 15px;
 		}
-		
+
 		.pagMainDv {
 			margin-top: 25px;
 			margin-bottom: 25px
 		}
-		
+
 		.basicTblMrgDv {
 			margin-top: 30px;
 			text-align: -webkit-center;
 			overflow-x: scroll;
 		}
-		
+
 		.basicTblBrdDv {
 			border: 1px solid #757575;
 		}
-		
+
 		.clearProp {
 			clear: both;
 		}
-		
+
 		.floatLfProp {
 			float: left;
 		}
-		
+
 		.basicTblTr {
 			border-right: 1px solid #757575;
 			min-width: 160px;
 		}
-		
+
 		.toolIconMnDv {
 			height: 175px;
 			font-family: Open Sans, Helvetica, Arial, sans-serif;
 		}
-		
+
 		.noDataMsg {
 			color: green;
 			font-size: 25px;
@@ -483,17 +523,17 @@
 			margin-top: 70px;
 			text-align: center;
 		}
-		
+
 		.centerAlnDv {
 			display: table;
 			margin: 0 auto
 		}
-		
+
 		.toolImg {
 			margin: 16px auto 0px;
 			display: table
 		}
-		
+
 		.toolIconMsg {
 			margin-right: 30px;
 			color: gray;
@@ -501,7 +541,7 @@
 			margin-top: 10px;
 			text-align: center
 		}
-		
+
 		.searchTxt {
 			margin: 0 auto;
 			width: 65%;
@@ -513,7 +553,7 @@
 			margin-top: 45px;
 			margin-bottom: 115px;
 		}
-		
+
 		.advViewTxt {
 			display: none;
 			text-align: center;
@@ -523,28 +563,28 @@
 			font-weight: bold;
 			clear: both
 		}
-		
+
 		.advViewTableDv {
 			margin-top: 30px;
 			clear: both;
 			display: table;
 			margin: 0 auto
 		}
-		
+
 		.advanceToolDataTbl {
 			float: left;
 			border: 1px solid #757575;
 			margin-right: 50px;
 			text-align: center
 		}
-		
+
 		.advViewTh_1 {
 			border-right: 1px solid #757575;
 			min-width: 220px !important;
 			min-height: 30px;
 			width: 0px !important
 		}
-		
+
 		.advViewTh_2 {
 			text-align: center;
 			min-height: 30px;
@@ -552,11 +592,11 @@
 			min-width: 110px !important;
 			text-transform: initial !important;
 		}
-		
+
 		.advViewThBrd {
 			border-right: 1px solid #757575;
 		}
-		
+
 		.firstdataTh_1 {
 			border-right: 1px solid #757575;
 			min-width: 220px !important;
@@ -564,13 +604,13 @@
 			width: 0px !important;
 			word-break: break-all;
 		}
-		
+
 		.firstdataTd_1 {
 			min-height: 30px;
 			min-width: 130px !important;
 			text-transform: initial !important;
 		}
-		
+
 		.advToolData {
 			border-right: 1px solid #757575;
 			min-width: 185px !important;
@@ -578,7 +618,7 @@
 			width: 0px !important;
 			word-break: break-all;
 		}
-		
+
 		.advToolDataTh_1 {
 			text-align: center;
 			border-right: 1px solid #757575;
@@ -586,25 +626,26 @@
 			min-height: 30px;
 			width: 0px !important
 		}
-		
+
 		.advToolDataTh_2 {
 			text-align: center;
 			min-height: 30px;
 			min-width: 110px !important;
 			text-transform: initial !important;
 		}
-		
+
 		.advTableDv {
 			border: 1px solid #757575;
 			text-align: center
 		}
-		
+
 		.showAdvDas {
 			margin-top: 45px;
 			margin-left: 50px
 		}
+
 		/*Code for Throbber starts here*/
-		
+
 		.sk-fading-circle {
 			margin: 0px auto;
 			width: 5px;
@@ -612,7 +653,7 @@
 			position: relative;
 			margin-bottom: 215px !important;
 		}
-		
+
 		.sk-fading-circle .sk-circle {
 			width: 50px;
 			height: 50px;
@@ -620,7 +661,7 @@
 			left: 0;
 			top: 0;
 		}
-		
+
 		.sk-fading-circle .sk-circle:before {
 			content: '';
 			display: block;
@@ -632,128 +673,128 @@
 			-webkit-animation: sk-circleFadeDelay 1.2s infinite ease-in-out both;
 			animation: sk-circleFadeDelay 1.2s infinite ease-in-out both;
 		}
-		
+
 		.sk-fading-circle .sk-circle2 {
 			-webkit-transform: rotate(30deg);
 			-ms-transform: rotate(30deg);
 			transform: rotate(30deg);
 		}
-		
+
 		.sk-fading-circle .sk-circle3 {
 			-webkit-transform: rotate(60deg);
 			-ms-transform: rotate(60deg);
 			transform: rotate(60deg);
 		}
-		
+
 		.sk-fading-circle .sk-circle4 {
 			-webkit-transform: rotate(90deg);
 			-ms-transform: rotate(90deg);
 			transform: rotate(90deg);
 		}
-		
+
 		.sk-fading-circle .sk-circle5 {
 			-webkit-transform: rotate(120deg);
 			-ms-transform: rotate(120deg);
 			transform: rotate(120deg);
 		}
-		
+
 		.sk-fading-circle .sk-circle6 {
 			-webkit-transform: rotate(150deg);
 			-ms-transform: rotate(150deg);
 			transform: rotate(150deg);
 		}
-		
+
 		.sk-fading-circle .sk-circle7 {
 			-webkit-transform: rotate(180deg);
 			-ms-transform: rotate(180deg);
 			transform: rotate(180deg);
 		}
-		
+
 		.sk-fading-circle .sk-circle8 {
 			-webkit-transform: rotate(210deg);
 			-ms-transform: rotate(210deg);
 			transform: rotate(210deg);
 		}
-		
+
 		.sk-fading-circle .sk-circle9 {
 			-webkit-transform: rotate(240deg);
 			-ms-transform: rotate(240deg);
 			transform: rotate(240deg);
 		}
-		
+
 		.sk-fading-circle .sk-circle10 {
 			-webkit-transform: rotate(270deg);
 			-ms-transform: rotate(270deg);
 			transform: rotate(270deg);
 		}
-		
+
 		.sk-fading-circle .sk-circle11 {
 			-webkit-transform: rotate(300deg);
 			-ms-transform: rotate(300deg);
 			transform: rotate(300deg);
 		}
-		
+
 		.sk-fading-circle .sk-circle12 {
 			-webkit-transform: rotate(330deg);
 			-ms-transform: rotate(330deg);
 			transform: rotate(330deg);
 		}
-		
+
 		.sk-fading-circle .sk-circle2:before {
 			-webkit-animation-delay: -1.1s;
 			animation-delay: -1.1s;
 		}
-		
+
 		.sk-fading-circle .sk-circle3:before {
 			-webkit-animation-delay: -1s;
 			animation-delay: -1s;
 		}
-		
+
 		.sk-fading-circle .sk-circle4:before {
 			-webkit-animation-delay: -0.9s;
 			animation-delay: -0.9s;
 		}
-		
+
 		.sk-fading-circle .sk-circle5:before {
 			-webkit-animation-delay: -0.8s;
 			animation-delay: -0.8s;
 		}
-		
+
 		.sk-fading-circle .sk-circle6:before {
 			-webkit-animation-delay: -0.7s;
 			animation-delay: -0.7s;
 		}
-		
+
 		.sk-fading-circle .sk-circle7:before {
 			-webkit-animation-delay: -0.6s;
 			animation-delay: -0.6s;
 		}
-		
+
 		.sk-fading-circle .sk-circle8:before {
 			-webkit-animation-delay: -0.5s;
 			animation-delay: -0.5s;
 		}
-		
+
 		.sk-fading-circle .sk-circle9:before {
 			-webkit-animation-delay: -0.4s;
 			animation-delay: -0.4s;
 		}
-		
+
 		.sk-fading-circle .sk-circle10:before {
 			-webkit-animation-delay: -0.3s;
 			animation-delay: -0.3s;
 		}
-		
+
 		.sk-fading-circle .sk-circle11:before {
 			-webkit-animation-delay: -0.2s;
 			animation-delay: -0.2s;
 		}
-		
+
 		.sk-fading-circle .sk-circle12:before {
 			-webkit-animation-delay: -0.1s;
 			animation-delay: -0.1s;
 		}
-		
+
 		@-webkit-keyframes sk-circleFadeDelay {
 			0%,
 			39%,
@@ -764,7 +805,7 @@
 				opacity: 1;
 			}
 		}
-		
+
 		@keyframes sk-circleFadeDelay {
 			0%,
 			39%,
@@ -776,7 +817,7 @@
 			}
 			/*Code for Throbber ends here*/
 		}
-		
+
 		.noimgToolname {
 			text-align: center;
 			margin-top: 40px;
@@ -793,22 +834,22 @@
 		<div class="mainDiv">
 			<div class="toolNmDv">
 				<select class="toolNmSelect toolNmWd" ng-change="ctrl.onToolSelectAction()" ng-model="ctrl.selectedTool" ng-click="ctrl.toolSelection(ctrl.selectedTool)">
-						<option value="" selected="" disabled="">Select Tool</option>
-						<option ng-repeat="key in ctrl.toolDetailMappingJson" value="{{key.toolName}}" >{{key.toolName}}</option>
-					</select>
+					<option value="" selected="" disabled="">Select Tool</option>
+					<option ng-repeat="key in ctrl.toolDetailMappingJson" value="{{key.toolName}}">{{key.toolName}}</option>
+				</select>
 			</div>
 			<div class="fldNmDv" ng-if="ctrl.selectedTool">
 				<select class="toolNmSelect fldNmWdt" ng-change="ctrl.onFieldSelectAction()" ng-click="ctrl.toolSelection(ctrl.selectedTool)"
-					ng-model="ctrl.selectedField">
+				 ng-model="ctrl.selectedField">
 					<option value="" selected="" disabled="">Select Field</option>
 					<option ng-if="fields !== 'position'" ng-repeat="fields in ctrl.fieldOptions" value="{{fields}}">{{fields}}</option>
-					</select>
+				</select>
 			</div>
 			<div class="fldValDv" ng-if="ctrl.selectedField">
 				<input class="fldValInp" type="text" ng-model="ctrl.inputVal" ng-change="ctrl.onInputValChangeAction() " placeholder="{{ctrl.selectedField}}_value">
 			</div>
 			<input class="submitBut subButtCss" ng-if="ctrl.inputVal " ng-click="ctrl.onSubmitAction(ctrl.selectedField, ctrl.inputVal) "
-				type="submit" value="Submit">
+			 type="submit" value="Submit">
 		</div>
 
 		<div class="sk-fading-circle" ng-if="ctrl.showThrobber">
@@ -846,11 +887,14 @@
 
 		<div class="searchTxt" ng-if="ctrl.toolsRelationDataArray.length>0">
 			<div class="floatLfProp">
-				<p>Search for <b>{{ctrl.selectedField}} - {{ctrl.inputVal}}</b> has fetched &nbsp;</p>
+				<p>Search for
+					<b>{{ctrl.selectedField}} - {{ctrl.inputVal}}</b> has fetched &nbsp;</p>
 			</div>
 			<div> </div>
 			<div ng-repeat="data in ctrl.toolsRelationDataArray track by $index">
-				<p class="floatLfProp"><b>{{data.count}} {{ctrl.nodeNameMapping[data.name]}}</b></p>
+				<p class="floatLfProp">
+					<b>{{data.count}} {{ctrl.nodeNameMapping[data.name]}}</b>
+				</p>
 				<p class="floatLfProp" ng-if="$index+1 !== ctrl.toolsRelationDataArray.length"> , &nbsp;</p>
 			</div>
 		</div>
