@@ -53,11 +53,7 @@ class BambooAgent(BaseAgent):
                             plan_Individual_result_key =  plan_Individual_result.get("key")
                             plan_Individual_result_url = getCollectionUrl + "result/" + plan_Individual_result_key +".json"
                             plan_Individual_result_details = self.getResponse(plan_Individual_result_url,'GET', UserID, Passwd, None,None)
-                            utc_time = datetime.strptime(plan_Individual_result_details["buildCompletedTime"], "%Y-%m-%dT%H:%M:%S.%fZ")
-                            epoch_time = (utc_time - datetime(1970, 1, 1)).total_seconds()
                             injectData = {}
-                            injectData['buildCompletedTime'] = plan_Individual_result_details["buildCompletedTime"]
-                            injectData['buildCompletedTimeEpoch'] = epoch_time
                             data += self.parseResponse(responseTemplate, plan_Individual_result_details, injectData)
                 start_index = start_index + plan_size
                 plan_Individual_Url = getCollectionUrl + "result/" + plan_Individual_Key +".json?start-index=" + str(start_index) + "&max-result=25"
