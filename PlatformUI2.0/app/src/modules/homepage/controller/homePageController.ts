@@ -23,7 +23,7 @@ module ISightApp {
             var self = this;
             this.authenticationService.validateSession();
             this.isValidUser = true;
-            self.iframeStyle = 'width:100%; height:1600px;';
+            self.iframeStyle = 'width:100%; height:400px;';
             var receiveMessage = function (evt) {
                 var height = parseInt(evt.data);
                 if (!isNaN(height)) {
@@ -151,7 +151,7 @@ module ISightApp {
         footerHeight: string = '';
         mainContentMinHeight: string = 'min-height:' + (window.innerHeight - 146 - 96) + 'px';
         mainContentMinHeightWoSbTab: string = 'min-height:' + (window.innerHeight - 146 - 48) + 'px';
-        iframeStyle = 'width:100%; height:1600px;border:0';
+        iframeStyle = 'width:100%; height:500px;';
         iframeWidth = window.innerWidth - 20;
         iframeHeight = window.innerHeight;
         aboutMeContent = {};

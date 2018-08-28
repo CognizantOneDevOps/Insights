@@ -34,12 +34,14 @@ module ISightApp {
             var receiveMessage = function (evt) {
                 var height = parseInt(evt.data);
                 if (!isNaN(height)) {
-                    self.userIframeStyle = 'width:100%; height:' + (evt.data + 20) + 'px !important';
+                    self.userIframeStyle = 'width:100%; height:' + (evt.data + 20) + 'px !important;)';
                     $timeout(0);
                 }
             }
             window.addEventListener('message', receiveMessage, false);
+            self.setScrollBarPosition();
         }
+
         userIframeStyle: String;
         homeController: HomePageController;
         userListUrl: String = '';
@@ -100,6 +102,7 @@ module ISightApp {
             self.userOnboardingService.switchUserOrg(orgId)
                 .then(function (selOrgStatus) {
                 });
+            //self.userIframeStyle = 'width:100%; height:200px;';
             self.authenticationService.getGrafanaCurrentOrgAndRole()
                 .then(function (data) {
                     self.$cookies.put('grafanaRole', data.grafanaCurrentOrgRole);
@@ -110,9 +113,17 @@ module ISightApp {
         }
 
         refreshIframe() {
+            var self = this;
             var myIframe = (<HTMLIFrameElement>document.getElementById('iSightIframe'));
             setTimeout(function () {
                 myIframe.src = myIframe.src;
+                self.setScrollBarPosition();
+            }, 500);
+        }
+
+        setScrollBarPosition() {
+            setTimeout(function () {
+                window.scrollTo(0, 0);
             }, 500);
         }
 
