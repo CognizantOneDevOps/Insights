@@ -27,7 +27,7 @@
   },
   "toolCategory" : "ARTIFACTMANAGEMENT",
   "enableValueArray": false,
-  "enableValidateData": true,
+  "enableDataValidation": true,
   "auth": "base64",
   "runSchedule": 5,
   "userID": "userid",

@@ -68,7 +68,7 @@
 },
 "toolCategory" : "CI",
 "toolsTimeZone" : "Asia/Kolkata",
-"enableValidateData": true,
+"enableDataValidation": true,
 "useResponseTemplate" : true,
 "useAllBuildsApi" : false,
 "isDebugAllowed" : false,

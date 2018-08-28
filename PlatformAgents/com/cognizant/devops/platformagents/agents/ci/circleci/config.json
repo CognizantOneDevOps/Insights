@@ -34,7 +34,7 @@
 	  }  
   },
   "useResponseTemplate" : true,
-  "enableValidateData": true,
+  "enableDataValidation": true,
   "toolCategory" : "CI",
   "token" : "authenticatedtokenvalue",
   "useAllBuildsApi" : false,

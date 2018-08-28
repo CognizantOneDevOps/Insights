@@ -38,7 +38,7 @@
 },
   "auth": "base64",
   "enableValueArray": false,
-  "enableValidateData": true,
+  "enableDataValidation": true,
   "useResponseTemplate" : true,
   "runSchedule": 5,
   "UserID": "admin",

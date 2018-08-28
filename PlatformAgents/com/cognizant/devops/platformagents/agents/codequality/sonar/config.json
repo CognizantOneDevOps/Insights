@@ -28,7 +28,7 @@
   },
   "toolName": "SONAR",
   "runSchedule": 30,
-  "enableValidateData": true,
+  "enableDataValidation": true,
   "timeStampField": "metricdate",
   "userId":"admin",
   "password":"admin",

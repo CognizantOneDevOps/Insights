@@ -192,8 +192,8 @@ class BaseAgent(object):
             if metadataType is not dict:
                 raise ValueError('BaseAgent: Dict metadata object is expected')
         if data:
-            enableValidateData = self.config.get('enableValidateData',False)
-            if enableValidateData:
+            enableDataValidation = self.config.get('enableDataValidation',False)
+            if enableDataValidation:
                 data = self.validateData(data)
             self.addExecutionId(data, self.executionId)
             self.addTimeStampField(data, timeStampField, timeStampFormat, isEpochTime)
@@ -207,16 +207,19 @@ class BaseAgent(object):
     '''
     def validateData(self, data):   
         corrected_json_array =[]
+        showErrorMessage = False
         for each_json in data:    
             errorFlag = False
             for element in each_json:        
                 if isinstance(each_json[element],dict):
                     errorFlag = True
-                    logging.error('Value is not in expected format, nested JSON encountered.Rejecting: '+ str(each_json))
-                    self.publishHealthData(self.generateHealthData(note="Agent has encountered nested JSON, rejecting that node."))
+                    showErrorMessage = True
+                    logging.error('Value is not in expected format, nested JSON encountered.Rejecting: '+ str(each_json))                    
                     break;
             if not errorFlag:
                 corrected_json_array.append(each_json)
+        if showErrorMessage:
+            self.publishHealthData(self.generateHealthData(note="Agent has encountered nested JSON, rejecting that node."))     
         data = []
         data = corrected_json_array
         return data

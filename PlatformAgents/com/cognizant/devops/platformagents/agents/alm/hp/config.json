@@ -47,7 +47,7 @@
 	  }
   },
   "toolCategory" : "ALM",
-  "enableValidateData": true,
+  "enableDataValidation": true,
   "dataFetchCount" : 200,
   "useResponseTemplate" : false,
   "auth": "base64",

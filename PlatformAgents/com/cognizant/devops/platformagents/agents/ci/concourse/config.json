@@ -37,7 +37,7 @@
 "toolCategory" : "CI",
 "insightsTimeZone" : "Asia/Kolkata",
 "useResponseTemplate" : true,
-"enableValidateData": true,
+"enableDataValidation": true,
 "runSchedule": 30,
  "isDebugAllowed" : false,
  "enableValueArray": false,
