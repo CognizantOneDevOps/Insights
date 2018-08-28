@@ -180,8 +180,6 @@ module ISightApp {
 
                 });
 
-            self.iframeStyle = 'width:100%; height:200px;';
-
         }
 
         checkStyle(orgId: number): string {
