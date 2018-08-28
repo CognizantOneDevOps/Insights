@@ -237,12 +237,19 @@ module ISightApp {
                 self.restEndpointService.getGrafanaHost1().then(function (response) {
                     var grafanaEndPoint = response.grafanaEndPoint;
                     self.playListUrl = self.$sce.trustAsResourceUrl(grafanaEndPoint + '/dashboard/script/iSight.js?url=' + grafanaEndPoint + '/playlists');
+                    self.setScrollBarPosition();
                 });
                 // this.playListUrl = this.$sce.trustAsResourceUrl(self.restEndpointService.getGrafanaHost()  + '/dashboard/script/iSight.js?url=' + self.restEndpointService.getGrafanaHost() + '/playlists');
                 //this.playListUrl = self.restEndpointService.getGrafanaHost() + '/dashboard/script/iSight.js?url=' + self.restEndpointService.getGrafanaHost() + '/playlists';
             } else {
                 this.playListUrl = '';
             }
+        }
+
+        setScrollBarPosition() {
+            setTimeout(function () {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }, 500);
         }
 
         addSelectedImage(selectedTab: string): void {
