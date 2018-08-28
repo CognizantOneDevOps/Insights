@@ -44,7 +44,7 @@
   },
  "auth": "base64",
  "toolCategory" : "DEPLOYMENT",
- "enableValidateData": true,
+ "enableDataValidation": true,
  "runSchedule": 5,
  "toolsTimeZone" : "Asia/Kolkata",
  "isEpochTimeFormat" : false,

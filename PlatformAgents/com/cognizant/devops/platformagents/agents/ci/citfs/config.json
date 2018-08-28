@@ -50,7 +50,7 @@
 	  }
   },
 "toolCategory" : "CI",
-"enableValidateData": true,
+"enableDataValidation": true,
  "isDebugAllowed" : false,
 "enableValueArray": false,
 "auth": "NTLM",

@@ -43,7 +43,7 @@
 	  }  
   },
   "toolCategory" : "DEPLOYMENT",
-  "enableValidateData": true,
+  "enableDataValidation": true,
   "auth": "base64",
   "runSchedule": 2,
   "authtoken": "authToken",

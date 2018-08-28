@@ -128,7 +128,7 @@
   },
   "toolCategory" : "ALM",
   "enableSprintReport" : false,
-  "enableValidateData": true,
+  "enableDataValidation": true,
   "sprintField": "sprintField",
   "enableValueArray": true, 
   "isDebugAllowed" : false,  

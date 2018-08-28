@@ -34,7 +34,7 @@
   },
   "toolCategory" : "DEPLOYMENT",
   "runSchedule": 30,
-  "enableValidateData": true,
+  "enableDataValidation": true,
   "userid": "userId",
   "passwd": "Passwd",
   "reportType": "com.urbancode.ds.subsys.report.domain.deployment_report.DeploymentReport",
