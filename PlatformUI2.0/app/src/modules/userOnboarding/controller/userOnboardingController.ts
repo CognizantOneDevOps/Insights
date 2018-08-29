@@ -123,7 +123,7 @@ module ISightApp {
         setScrollBarPosition() {
             setTimeout(function () {
                 window.scrollTo({ top: 0, behavior: 'smooth' });
-            }, 500);
+            }, 700);
         }
 
         /*showAccessGroupOptions() {
