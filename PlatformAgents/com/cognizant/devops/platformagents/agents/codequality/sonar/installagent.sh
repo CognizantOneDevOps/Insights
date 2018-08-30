@@ -54,6 +54,7 @@ case $opt in
 				echo "Service Installed..."
                 ;;
 		  esac
+		  ;;
         centos)
                 echo "SonarAgent Running on centso..."
                 ;;

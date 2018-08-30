@@ -21,42 +21,43 @@ case $opt in
         [lL][Ii][nN][uU][Xx])
           case $action in 
             [uU][nN][iI][nN][sS][tT][aA][lL][lL])
-	          	sudo service InSightsConcourseAgent stop
-				sudo rm -R /etc/init.d/InSightsConcourseAgent
+	          	sudo service InSightsBambooAgent stop
+				sudo rm -R /etc/init.d/InSightsBambooAgent
 				echo "Service un-installation step completed"
 		        ;;
 		    *)
-                echo "Concourse Running on Linux..."
-				sudo cp -xp InSightsConcourseAgent.sh  /etc/init.d/InSightsConcourseAgent
-				sudo chmod +x /etc/init.d/InSightsConcourseAgent
-				sudo chkconfig InSightsConcourseAgent on
-				sudo service  InSightsConcourseAgent status
-				sudo service  InSightsConcourseAgent stop
-				sudo service  InSightsConcourseAgent status
-				sudo service  InSightsConcourseAgent start
-				sudo service  InSightsConcourseAgent status
+                echo "Bamboo Running on Linux..."
+				sudo cp -xp InSightsBambooAgent.sh  /etc/init.d/InSightsBambooAgent
+				sudo chmod +x /etc/init.d/InSightsBambooAgent
+				sudo chkconfig InSightsBambooAgent on
+				sudo service  InSightsBambooAgent status
+				sudo service  InSightsBambooAgent stop
+				sudo service  InSightsBambooAgent status
+				sudo service  InSightsBambooAgent start
+				sudo service  InSightsBambooAgent status
+				
 				echo "Service installaton steps completed"
                 ;;
 		  esac
 		  ;;
         [uU][bB][uU][nN][tT][uU])
 	      case $action in 
-            [uU][nN][iI][nN][sS][tT][aA][lL][lL]) 
-				sudo systemctl stop InSightsConcourseAgent
-				sudo rm -R /etc/systemd/system/InSightsConcourseAgent.service
-				echo "Service un-installation step completed"				
-			    ;;
-			*)
-                echo "Concourse Running on Ubuntu..."
-				sudo cp -xp InSightsConcourseAgent.service /etc/systemd/system
-				sudo systemctl enable InSightsConcourseAgent
-				sudo systemctl start InSightsConcourseAgent
-				echo "Service installaton steps completed"
-                ;;
+                [uU][nN][iI][nN][sS][tT][aA][lL][lL]) 
+					sudo systemctl stop InSightsBambooAgent
+					sudo rm -R /etc/systemd/system/InSightsBambooAgent.service
+					echo "Service un-installation step completed"				
+			        ;;
+				*)
+                	echo "Bamboo Running on Ubuntu..."
+					sudo cp -xp InSightsBambooAgent.service /etc/systemd/system
+					sudo systemctl enable InSightsBambooAgent
+					sudo systemctl start InSightsBambooAgent
+					echo "Service installaton steps completed"
+                	;;
 		  esac
 		  ;;
         centos)
-                echo "Concourse Running on centso..."
+                echo "Bamboo Running on centso..."
                 ;;
         *)
         	    echo "Please provide correct OS input"

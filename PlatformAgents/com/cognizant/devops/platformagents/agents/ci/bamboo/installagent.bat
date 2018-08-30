@@ -13,13 +13,13 @@ WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
 License for the specific language governing permissions and limitations under
 the License.
 :comment
-REM pushd %INSIGHTS_AGENT_HOME%\PlatformAgents\artifactory
+REM pushd %INSIGHTS_AGENT_HOME%\PlatformAgents\bamboo
 IF /I "%1%" == "UNINSTALL" (
-	net stop ArtifactoryAgent
-	sc delete ArtifactoryAgent
+	net stop BambooAgent
+	sc delete BambooAgent
 ) ELSE (
-	net stop ArtifactoryAgent
-	sc delete ArtifactoryAgent
-    nssm install ArtifactoryAgent %INSIGHTS_AGENT_HOME%\PlatformAgents\artifactory\ArtifactoryAgent.bat
-    net start ArtifactoryAgent
+	net stop BambooAgent
+	sc delete BambooAgent
+    nssm install BambooAgent %INSIGHTS_AGENT_HOME%\PlatformAgents\bamboo\BambooAgent.bat
+    net start BambooAgent
 )
