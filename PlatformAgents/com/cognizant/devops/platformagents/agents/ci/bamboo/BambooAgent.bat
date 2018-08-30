@@ -13,13 +13,5 @@ WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
 License for the specific language governing permissions and limitations under
 the License.
 :comment
-REM pushd %INSIGHTS_AGENT_HOME%\PlatformAgents\artifactory
-IF /I "%1%" == "UNINSTALL" (
-	net stop ArtifactoryAgent
-	sc delete ArtifactoryAgent
-) ELSE (
-	net stop ArtifactoryAgent
-	sc delete ArtifactoryAgent
-    nssm install ArtifactoryAgent %INSIGHTS_AGENT_HOME%\PlatformAgents\artifactory\ArtifactoryAgent.bat
-    net start ArtifactoryAgent
-)
+pushd %INSIGHTS_AGENT_HOME%\PlatformAgents\bamboo
+python -c "from com.cognizant.devops.platformagents.agents.ci.bamboo.BambooAgent import BambooAgent; BambooAgent()"
