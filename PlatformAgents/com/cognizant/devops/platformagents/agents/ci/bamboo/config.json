@@ -1,0 +1,51 @@
+{
+  "mqConfig": {
+    "user": "iSight",
+    "password": "iSight",
+    "host": "127.0.0.1",
+    "exchange": "iSight"
+  },
+  "subscribe": {
+    "config": "CI.BAMBOO.config"
+  },
+  "publish": {
+    "data": "CI.BAMBOO.DATA",
+    "health": "CI.BAMBOO.HEALTH"
+  },
+  "communication": {
+    "type": "REST"
+  },
+  "dynamicTemplate": {
+  "responseTemplate": {
+"id" : "id",
+"buildStartedTime" : "buildStartedTime" ,
+"buildCompletedTime": "buildCompletedTime",
+"buildResultKey": "buildResultKey",
+"projectName": "projectName",
+"planName" : "planName" ,
+"lifeCycleState" : "lifeCycleState",
+"buildDuration" : "buildDuration" ,
+"successful":"successful",
+"buildReason":"buildReason"
+},
+"timeFieldMapping" : {
+"buildCompletedTime" : "%Y-%m-%dT%H:%M:%S.%fZ"
+} 
+},
+"auth": "base64",
+"userid": "userid",
+"passwd": "password",
+"toolsTimeZone" : "Asia/Kolkata",
+"insightsTimeZone" : "Asia/Kolkata",
+"useResponseTemplate" : true,
+"runSchedule": 30,
+"baseUrl": "baseUrl",
+"timeStampFormat":"epoch",
+"isEpochTimeFormat" : true,
+"startFrom" : "2016-12-07 15:46:33",
+
+	"loggingSetting" : {
+		"logLevel" : "WARN"
+	},
+	"isDebugAllowed" : true
+}
