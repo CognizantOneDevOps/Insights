@@ -33,6 +33,7 @@
 		}
 	},
 	"enableBranches" : false,
+	"enableDataValidation": true,	
 	"toolCategory" : "SCM",
 	"toolsTimeZone" : "GMT",
 	"insightsTimeZone" : "Asia/Kolkata",

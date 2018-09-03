@@ -69,6 +69,7 @@
 	"toolsTimeZone" : "GMT",
 	"insightsTimeZone" : "Asia/Kolkata",
 	"useResponseTemplate" : true,
+	"enableDataValidation": true,
 	"auth" : "base64",
 	"runSchedule" : 30,
 	"timeStampField" : "commitTime",

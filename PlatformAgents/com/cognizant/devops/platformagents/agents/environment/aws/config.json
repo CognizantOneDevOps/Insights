@@ -24,6 +24,7 @@
   		}
    },	
   "toolCategory": "ENVIRONMENT",
+  "enableDataValidation": true,
   "toolsTimeZone": "GMT",
   "insightsTimeZone": "Asia/Kolkata",
   "useResponseTemplate": false,

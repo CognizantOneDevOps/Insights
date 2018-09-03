@@ -57,6 +57,7 @@
 	  }
   },
   "toolCategory" : "SCM",
+  "enableDataValidation": true,
   "runSchedule": 30,
   "toolsTimeZone" : "GMT",
   "insightsTimeZone" : "GMT",
