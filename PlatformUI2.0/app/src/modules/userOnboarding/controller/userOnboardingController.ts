@@ -30,16 +30,18 @@ module ISightApp {
             var self = this;
             self.getHost();
             self.getApplicationDetail();
-            self.userIframeStyle = 'width:100%; height:1600px;';
+            self.userIframeStyle = 'width:100%; height:400px;';
             var receiveMessage = function (evt) {
                 var height = parseInt(evt.data);
                 if (!isNaN(height)) {
-                    self.userIframeStyle = 'width:100%; height:' + (evt.data + 20) + 'px !important';
+                    self.userIframeStyle = 'width:100%; height:' + (evt.data + 20) + 'px !important;';
                     $timeout(0);
                 }
             }
             window.addEventListener('message', receiveMessage, false);
+            self.setScrollBarPosition();
         }
+
         userIframeStyle: String;
         homeController: HomePageController;
         userListUrl: String = '';
@@ -110,10 +112,18 @@ module ISightApp {
         }
 
         refreshIframe() {
+            var self = this;
             var myIframe = (<HTMLIFrameElement>document.getElementById('iSightIframe'));
             setTimeout(function () {
                 myIframe.src = myIframe.src;
+                self.setScrollBarPosition();
             }, 500);
+        }
+
+        setScrollBarPosition() {
+            setTimeout(function () {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }, 1000);
         }
 
         /*showAccessGroupOptions() {
