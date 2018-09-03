@@ -59,6 +59,7 @@
 "toolCategory" : "CI",
 "isDebugAllowed" : false,
 "enableValueArray": false,
+"enableDataValidation": true,
 "auth": "base64",
 "toolsTimeZone" : "Asia/Kolkata",
 "insightsTimeZone" : "Asia/Kolkata",

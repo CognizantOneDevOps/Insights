@@ -42,6 +42,7 @@
 "insightsTimeZone" : "Asia/Kolkata",
 "useResponseTemplate" : true,
 "enableValueArray": false,
+"enableDataValidation": true,
 "runSchedule": 2,
 "userID": "tfs",
 "passwd": "tfs",

@@ -36,6 +36,7 @@
   "runSchedule": 30,
   "toolCategory" : "ALM",
   "enableValueArray": false,
+  "enableDataValidation": true,
   "useResponseTemplate" : true,
   "userid": "",
   "passwd": "",
