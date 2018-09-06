@@ -28,7 +28,8 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.apache.commons.io.FilenameUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
@@ -61,7 +62,7 @@ import com.google.gson.stream.JsonWriter;
  *
  */
 public class OfflineDataProcessingExecutor implements Job {
-	private static Logger log = Logger.getLogger(OfflineDataProcessingExecutor.class);
+	private static Logger log = LogManager.getLogger(OfflineDataProcessingExecutor.class);
 	private static final String DATE_TIME_FORMAT = "yyyy/MM/dd hh:mm a";
 	private static final String JSON_FILE_EXTENSION = "json";
 
