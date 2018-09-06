@@ -15,19 +15,27 @@
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
-	<parent>
+	<!-- <parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
 		<version>1.5.2.RELEASE</version>
+	</parent> -->
+	<parent>
+		<artifactId>PlatformParent</artifactId>
+		<groupId>com.cognizant.devops</groupId>
+		<version>4.5.10</version>
 	</parent>
 
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.cognizant.devops</groupId>
 	<artifactId>PlatformEngine</artifactId>
 	<packaging>jar</packaging>
-	<version>1.0.0.1-SNAPSHOT</version>
+	<version>4.5.10</version>
 	<name>PlatformEngine</name>
 	<url>http://maven.apache.org</url>
+	
+	
+	
 	<dependencies>
 		<dependency>
 			<groupId>junit</groupId>
@@ -62,13 +70,13 @@
 		<dependency>
 			<groupId>com.cognizant.devops</groupId>
 			<artifactId>PlatformCommons</artifactId>
-			<version>1.0.0.1-SNAPSHOT</version>
+			<version>4.5.10</version>
 		</dependency>
 
 		<dependency>
 			<groupId>com.cognizant.devops</groupId>
 			<artifactId>PlatformDAL</artifactId>
-			<version>1.0.0.1-SNAPSHOT</version>
+			<version>4.5.10</version>
 		</dependency>
 
 		<dependency>
@@ -82,7 +90,7 @@
 			<version>2.2.1</version>
 		</dependency>
 
-		<dependency>
+	<!-- 	<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter</artifactId>
 		</dependency>
@@ -90,7 +98,7 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
-		</dependency>
+		</dependency> -->
 		<dependency>
 			<groupId>org.hibernate</groupId>
 			<artifactId>hibernate-core</artifactId>

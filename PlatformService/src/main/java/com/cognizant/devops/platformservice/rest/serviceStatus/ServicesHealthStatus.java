@@ -28,6 +28,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
@@ -50,7 +51,7 @@ public class ServicesHealthStatus {
 		/*PostgreSQL health check*/
 		String hostEndPoint = ServiceStatusConstants.POSTGRESQL_HOST;
 		String apiUrl = hostEndPoint;		
-		JsonObject postgreStatus = getClientResponse(hostEndPoint, apiUrl, ServiceStatusConstants.DB);
+		JsonObject postgreStatus = getClientResponse(hostEndPoint, apiUrl, ServiceStatusConstants.DB,"");
 		servicesHealthStatus.add(ServiceStatusConstants.PgSQL, postgreStatus);
 		
 		/*PlatformService health check*/
@@ -61,25 +62,34 @@ public class ServicesHealthStatus {
 		/*Insights Inference health check*/	
 		hostEndPoint = ServiceStatusConstants.INSIGHTS_INFERENCE_MASTER_HOST;
 		apiUrl = hostEndPoint+"/jobs";
-		JsonObject inferenceServStatus = getClientResponse(hostEndPoint, apiUrl, ServiceStatusConstants.Service);
+		JsonObject inferenceServStatus = getClientResponse(hostEndPoint, apiUrl, ServiceStatusConstants.Service,"");
 		servicesHealthStatus.add(ServiceStatusConstants.InsightsInference, inferenceServStatus);
 		
 		/*Neo4j health check*/
 		hostEndPoint = ServiceStatusConstants.NEO4J_HOST;
 		apiUrl = hostEndPoint+"/browser";
-		JsonObject neo4jStatus = getClientResponse(hostEndPoint, apiUrl, ServiceStatusConstants.DB);
+		JsonObject neo4jStatus = getClientResponse(hostEndPoint, apiUrl, ServiceStatusConstants.DB,"");
 		servicesHealthStatus.add(ServiceStatusConstants.Neo4j, neo4jStatus);
 		
 		/*Elastic Search health check*/
 		hostEndPoint = ServiceStatusConstants.ES_HOST;
 		apiUrl = hostEndPoint;
-		JsonObject EsStatus = getClientResponse(hostEndPoint, apiUrl, ServiceStatusConstants.DB);
+		JsonObject EsStatus = getClientResponse(hostEndPoint, apiUrl, ServiceStatusConstants.DB,"");
 		servicesHealthStatus.add(ServiceStatusConstants.ES, EsStatus);
 		
+		/*Demon Agent Health Check */
+		hostEndPoint = ServiceStatusConstants.DemonAgent;
+		apiUrl = hostEndPoint;
+		JsonParser parser = new JsonParser();
+		String jsonString="{\"DemonAgent\":{\"status\":\"success\",\"message\":\"Response successfully recieved from Demon Agent \",\"endPoint\":\"\",\"type\":\"Database\"}}";
+		JsonObject demonStatus = (JsonObject) parser.parse(jsonString);
+		servicesHealthStatus.add(ServiceStatusConstants.DemonAgent, demonStatus);
+		
+		log.info(" servicesHealthStatus "+servicesHealthStatus.toString());
 		return servicesHealthStatus;		
 	}
 	
-	private JsonObject getClientResponse(String hostEndPoint, String apiUrl, String type){
+	private JsonObject getClientResponse(String hostEndPoint, String apiUrl, String type,String version){
 		try {
 			Client client = Client.create();
 			WebResource webResource = client
@@ -97,24 +107,26 @@ public class ServicesHealthStatus {
 				if( response.getStatus() == 200){
 					successResponse = "Response successfully recieved from "+apiUrl;
 				}
-				return buildSuccessResponse(successResponse, hostEndPoint, type);
+				return buildSuccessResponse(successResponse, hostEndPoint, type,version);
 
 			  } catch (Exception e) {
 				  log.error("Error while capturing health check at "+apiUrl,e);
 			  }
 		String failureResponse = "Error while capturing health check at "+apiUrl;
-		return buildFailureResponse(failureResponse, hostEndPoint, type);
+		return buildFailureResponse(failureResponse, hostEndPoint, type,version);
 	}
 	
 	private JsonObject getVersionDetails(String fileName, String hostEndPoint, String type) throws IOException {
 		InputStream input = ServicesHealthStatus.class.getClassLoader().getResourceAsStream(fileName);
+		String version=""; 
 		try {
 			Properties prop = new Properties();
 			prop.load(input);
 			String successResponse = "";
+			version=prop.getProperty(VERSION);
 			if(input != null){
-				successResponse = "Version captured as "+prop.getProperty(VERSION);
-				return buildSuccessResponse(successResponse, hostEndPoint, type);
+				successResponse = "Version captured as "+version;
+				return buildSuccessResponse(successResponse, hostEndPoint, type,version);
 			}
 		}finally {
 			try {
@@ -126,24 +138,26 @@ public class ServicesHealthStatus {
 			}
 		}
 		String failureResponse = "Error while capturing PlatformService health check at "+hostEndPoint;
-		return buildFailureResponse(failureResponse, hostEndPoint, type);
+		return buildFailureResponse(failureResponse, hostEndPoint, type,version);
 	}
 	
-	private JsonObject buildSuccessResponse(String message, String apiUrl, String type) {
+	private JsonObject buildSuccessResponse(String message, String apiUrl, String type,String version) {
 		JsonObject jsonResponse = new JsonObject();
 		jsonResponse.addProperty(PlatformServiceConstants.STATUS, PlatformServiceConstants.SUCCESS);
 		jsonResponse.addProperty(PlatformServiceConstants.MESSAGE, message);
 		jsonResponse.addProperty(HOST_ENDPOINT, apiUrl);
 		jsonResponse.addProperty(ServiceStatusConstants.type, type);
+		jsonResponse.addProperty(VERSION,version);
 		return jsonResponse;
 	}
 	
-	private JsonObject buildFailureResponse(String message, String apiUrl, String type) {
+	private JsonObject buildFailureResponse(String message, String apiUrl, String type,String version) {
 		JsonObject jsonResponse = new JsonObject();
 		jsonResponse.addProperty(PlatformServiceConstants.STATUS, PlatformServiceConstants.FAILURE);
 		jsonResponse.addProperty(PlatformServiceConstants.MESSAGE, message);
 		jsonResponse.addProperty(HOST_ENDPOINT, apiUrl);
 		jsonResponse.addProperty(ServiceStatusConstants.type, type);
+		jsonResponse.addProperty(VERSION,version);
 		return jsonResponse;
 	}
 	

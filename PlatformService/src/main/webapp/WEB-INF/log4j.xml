@@ -45,6 +45,6 @@
 	<root>
 		<priority value="debug" />
 		<appender-ref ref="springAppender" />
-		<!-- <appender-ref ref="STDOUT"/> -->
+		<appender-ref ref="STDOUT"/>
 	</root>
 </log4j:configuration>
