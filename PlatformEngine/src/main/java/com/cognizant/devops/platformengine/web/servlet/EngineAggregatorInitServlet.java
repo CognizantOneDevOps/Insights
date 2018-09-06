@@ -24,7 +24,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import com.cognizant.devops.platformengine.message.factory.MessagePublisherFactory;
 import com.cognizant.devops.platformengine.modules.aggregator.EngineAggregatorModule;
@@ -32,7 +33,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
 public class EngineAggregatorInitServlet extends HttpServlet{
-	private static Logger log = Logger.getLogger(EngineAggregatorInitServlet.class.getName());
+	private static Logger log = LogManager.getLogger(EngineAggregatorInitServlet.class.getName());
 	
 	@Override
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {

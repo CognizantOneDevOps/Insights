@@ -18,8 +18,8 @@ package com.cognizant.devops.platformengine.message.factory;
 import java.io.IOException;
 import java.util.concurrent.TimeoutException;
 
-import org.apache.log4j.Logger;
-
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.config.MessageQueueDataModel;
 import com.cognizant.devops.platformcommons.constants.MessageConstants;
@@ -32,7 +32,7 @@ import com.rabbitmq.client.DefaultConsumer;
 import com.rabbitmq.client.Envelope;
 
 public class MessageSubscriberFactory {
-	private static final Logger log = Logger.getLogger(MessageSubscriberFactory.class);
+	private static final Logger log = LogManager.getLogger(MessageSubscriberFactory.class);
 	private ConnectionFactory factory;
 	private Connection connection;
 	private static MessageSubscriberFactory instance = new MessageSubscriberFactory(); 
