@@ -18,14 +18,14 @@
 	<parent>
 		<artifactId>PlatformParent</artifactId>
 		<groupId>com.cognizant.devops</groupId>
-		<version>1.0.0.1-SNAPSHOT</version>
+		<version>4.5.10</version>
 	</parent>
 
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.cognizant.devops</groupId>
 	<artifactId>PlatformService</artifactId>
 	<packaging>war</packaging>
-	<version>1.0.0.1-SNAPSHOT</version>
+	<version>4.5.10</version>
 	<name>PlatformService</name>
 
 	<build>
@@ -74,12 +74,13 @@
 		<dependency>
 			<groupId>com.cognizant.devops</groupId>
 			<artifactId>PlatformCommons</artifactId>
-			<version>1.0.0.1-SNAPSHOT</version>
+			<version>4.5.10</version>
 		</dependency>
+
 		<dependency>
 			<groupId>com.cognizant.devops</groupId>
 			<artifactId>PlatformDAL</artifactId>
-			<version>1.0.0.1-SNAPSHOT</version>
+			<version>4.5.10</version>
 		</dependency>
 
 		<dependency>
@@ -217,6 +218,7 @@
 		<spring.security.version>4.1.0.RELEASE</spring.security.version>
 		<mockito.version>1.10.19</mockito.version>
 		<junit.version>4.12</junit.version>
+		<project.version>4.4</project.version>
 	</properties>
 	<profiles>
         <profile>

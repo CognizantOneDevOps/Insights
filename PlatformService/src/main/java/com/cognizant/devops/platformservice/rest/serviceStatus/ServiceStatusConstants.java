@@ -31,4 +31,5 @@ public interface ServiceStatusConstants {
 	String type = "type";
 	String DB = "Database";
 	String Service = "Service";
+	String DemonAgent="Demon Agent";
 }
