@@ -15,7 +15,8 @@
  ******************************************************************************/
 package com.cognizant.devops.platformengine.app;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.quartz.JobBuilder;
 import org.quartz.JobDetail;
 import org.quartz.Scheduler;
@@ -38,7 +39,7 @@ import com.cognizant.devops.platformengine.modules.offlinedataprocessing.Offline
  * Initialize Publisher and subscriber modules 3. Initialize Correlation Module.
  */
 public class Application {
-	private static Logger log = Logger.getLogger(Application.class.getName());
+	private static Logger log = LogManager.getLogger(Application.class.getName());
 	
 	private static int defaultInterval = 600;
 	private Application(){
