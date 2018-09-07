@@ -20,8 +20,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.apache.log4j.Logger;
-
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBException;
 import com.cognizant.devops.platformcommons.dal.neo4j.Neo4jDBHandler;
 import com.cognizant.devops.platformcommons.constants.MessageConstants;
@@ -34,7 +34,7 @@ import com.rabbitmq.client.AMQP.BasicProperties;
 import com.rabbitmq.client.Envelope;
 
 public class AgentHealthSubscriber extends EngineSubscriberResponseHandler{
-	private static Logger log = Logger.getLogger(AgentHealthSubscriber.class.getName());
+	private static Logger log = LogManager.getLogger(AgentHealthSubscriber.class.getName());
 	
 	public AgentHealthSubscriber(String routingKey) throws Exception {
 		super(routingKey);
