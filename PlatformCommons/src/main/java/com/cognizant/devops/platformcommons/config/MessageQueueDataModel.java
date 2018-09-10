@@ -21,6 +21,7 @@ public class MessageQueueDataModel implements Serializable{
 	private String host;
 	private String user;
 	private String password;
+	private int prefetchCount=10;
 	
 	public String getHost() {
 		return host;
@@ -39,5 +40,13 @@ public class MessageQueueDataModel implements Serializable{
 	}
 	public void setPassword(String password) {
 		this.password = password;
+	}
+	
+	public int getPrefetchCount() {
+		return prefetchCount;
+	}
+
+	public void setPrefetchCount(int prefetchCount) {
+		this.prefetchCount = prefetchCount;
 	}
 }
