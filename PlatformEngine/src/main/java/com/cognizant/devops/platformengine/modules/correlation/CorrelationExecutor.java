@@ -26,8 +26,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.apache.log4j.Logger;
-
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.config.CorrelationConfig;
 import com.cognizant.devops.platformcommons.constants.ConfigOptions;
@@ -46,7 +46,7 @@ import com.google.gson.JsonObject;
  * @author Vishal Ganjare (vganjare)
  */
 public class CorrelationExecutor {
-	private static final Logger log = Logger.getLogger(CorrelationExecutor.class);
+	private static final Logger log = LogManager.getLogger(CorrelationExecutor.class);
 	private long maxCorrelationTime;
 	private long lastCorrelationTime;
 	private long currentCorrelationTime;
