@@ -17,6 +17,7 @@
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
 import java.util.Properties;
 
 import org.apache.log4j.Logger;
@@ -27,6 +28,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
+import com.cognizant.devops.platformdal.ComponentConfig.CompanentConfigurationDAL;
+import com.cognizant.devops.platformdal.ComponentConfig.ComponentConfiguration;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.sun.jersey.api.client.Client;
@@ -46,6 +49,7 @@ public class ServicesHealthStatus {
 	@ResponseBody
 	public JsonObject getHealthStatus() throws IOException{
 		JsonObject servicesHealthStatus = new JsonObject();
+		String serviceVersion="";
 		
 		//ApplicationConfigCache.loadConfigCache();
 		/*PostgreSQL health check*/
@@ -58,6 +62,7 @@ public class ServicesHealthStatus {
 		hostEndPoint = ServiceStatusConstants.PLATFORM_SERVICE_HOST;
 		JsonObject platformServStatus = getVersionDetails(PLATFORM_SERVICE_VERSION_FILE, hostEndPoint, ServiceStatusConstants.Service);
 		servicesHealthStatus.add(ServiceStatusConstants.PlatformService, platformServStatus);
+		serviceVersion=platformServStatus.getAsJsonPrimitive(VERSION).toString();
 		
 		/*Insights Inference health check*/	
 		hostEndPoint = ServiceStatusConstants.INSIGHTS_INFERENCE_MASTER_HOST;
@@ -81,11 +86,17 @@ public class ServicesHealthStatus {
 		hostEndPoint = ServiceStatusConstants.DemonAgent;
 		apiUrl = hostEndPoint;
 		JsonParser parser = new JsonParser();
-		String jsonString="{\"DemonAgent\":{\"status\":\"success\",\"message\":\"Response successfully recieved from Demon Agent \",\"endPoint\":\"\",\"type\":\"Database\"}}";
+		String jsonString="{\"status\":\"success\",\"message\":\"Response successfully recieved from Demon Agent \",\"endPoint\":\"A\",\"type\":\"Service\",\"version\":"+serviceVersion+"}";
 		JsonObject demonStatus = (JsonObject) parser.parse(jsonString);
 		servicesHealthStatus.add(ServiceStatusConstants.DemonAgent, demonStatus);
 		
-		log.info(" servicesHealthStatus "+servicesHealthStatus.toString());
+		/*Patform Engine Health Check*/
+		hostEndPoint = ServiceStatusConstants.PlatformEngine;
+		apiUrl = hostEndPoint;
+		JsonObject jsonPlatformEngineStatus = getEngineStatus("PlatformEngine",serviceVersion);
+		servicesHealthStatus.add(ServiceStatusConstants.PlatformEngine, jsonPlatformEngineStatus);
+		
+		log.debug(" servicesHealthStatus "+servicesHealthStatus.toString());
 		return servicesHealthStatus;		
 	}
 	
@@ -159,6 +170,18 @@ public class ServicesHealthStatus {
 		jsonResponse.addProperty(ServiceStatusConstants.type, type);
 		jsonResponse.addProperty(VERSION,version);
 		return jsonResponse;
+	}
+	
+	private JsonObject getEngineStatus(String serviceType,String version) {
+		CompanentConfigurationDAL ccd= new CompanentConfigurationDAL();
+		List<ComponentConfiguration> componentConfigurationList= ccd.getComponentConfigurations(serviceType);
+		String successResponse=null;
+		if(componentConfigurationList.size() > 0 ) {
+			successResponse=serviceType +" registerd and works Fine ";
+			return buildSuccessResponse(successResponse, "-", ServiceStatusConstants.Service,componentConfigurationList.get(0).getComponentVersion());
+		}else {
+			return buildFailureResponse("Service registration not found ", "-", ServiceStatusConstants.Service,version);
+		}
 	}
 	
 }

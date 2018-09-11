@@ -32,4 +32,5 @@ public interface ServiceStatusConstants {
 	String DB = "Database";
 	String Service = "Service";
 	String DemonAgent="Demon Agent";
+	String PlatformEngine="Platform Engine";
 }
