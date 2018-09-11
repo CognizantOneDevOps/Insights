@@ -13,7 +13,7 @@
 	<groupId>com.cognizant.devops</groupId>
 	<artifactId>PlatformParent</artifactId>
 	<packaging>pom</packaging>
-	<version>4.5.10</version>
+	<version>4.4-FINAL</version>
 	<name>PlatformParent</name>
 
 	<dependencies>
@@ -40,6 +40,7 @@
 		<module>PlatformService</module>
 		<module>PlatformEngine</module>
 		<module>PlatformUI2.0</module>
+		<module>PlatformInsights</module>
 	</modules>
 
 	<build>
