@@ -31,12 +31,14 @@ import org.apache.logging.log4j.Logger;
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.config.CorrelationConfig;
 import com.cognizant.devops.platformcommons.constants.ConfigOptions;
+import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBException;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphResponse;
 import com.cognizant.devops.platformcommons.dal.neo4j.Neo4jDBHandler;
 import com.cognizant.devops.platformcommons.dal.neo4j.Neo4jFieldIndexRegistry;
 import com.cognizant.devops.platformengine.modules.correlation.model.Correlation;
 import com.cognizant.devops.platformengine.modules.correlation.model.CorrelationNode;
+import com.cognizant.devops.platformengine.modules.users.EngineUsersModule;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -229,6 +231,7 @@ public class CorrelationExecutor {
 			log.debug("Correlated "+destination.getToolName()+" records: "+processedRecords+" in: "+(System.currentTimeMillis() - st) + " ms");
 		} catch (GraphDBException e) {
 			log.error("Error occured while executing correlations for relation "+relationName+".", e);
+			EngineUsersModule.createEngineStatusNode(" Error occured while executing correlations for relation "+e.getMessage(),PlatformServiceConstants.FAILURE);
 		}
 		return processedRecords;
 	}
