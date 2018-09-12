@@ -175,7 +175,6 @@
 								<resource>
 									<directory>src/main/resources</directory>
 									<includes>
-										<include>PlatformEngineVersion.json</include>
 										<include>log4j2.xml</include>
 										<include>**/*.csv</include>
 									</includes>
@@ -200,6 +199,7 @@
 					<archive>
 						<manifest>
 							<addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+							<addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
 						</manifest>
 					</archive>
 				</configuration>

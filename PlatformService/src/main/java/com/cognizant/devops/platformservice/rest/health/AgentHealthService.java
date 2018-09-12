@@ -28,6 +28,7 @@ import com.cognizant.devops.platformcommons.constants.ErrorMessage;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBException;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphResponse;
 import com.cognizant.devops.platformcommons.dal.neo4j.Neo4jDBHandler;
+import com.cognizant.devops.platformservice.rest.serviceStatus.ServiceStatusConstants;
 import com.cognizant.devops.platformservice.rest.util.PlatformServiceUtil;
 import com.google.gson.JsonObject;
 
@@ -47,14 +48,19 @@ public class AgentHealthService {
 		if(StringUtils.isEmpty(category) || StringUtils.isEmpty(tool)){
 			return PlatformServiceUtil.buildFailureResponse(ErrorMessage.CATEGORY_AND_TOOL_NAME_NOT_SPECIFIED);
 		}
+		log.debug(" message tool name "+category+"  "+tool);
 		StringBuffer label = new StringBuffer(":HEALTH");
-		label.append(":").append(category);
-		label.append(":").append(tool);		
+		if(category.equalsIgnoreCase(ServiceStatusConstants.PlatformEngine)) {
+			label.append(":").append("ENGINE");
+		}else {
+			label.append(":").append(category);
+			label.append(":").append(tool);	
+		}
 		return loadHealthData(label.toString());
 	}
 
 	private JsonObject loadHealthData(String label) {
-		String query = "MATCH (n"+label+") where n.inSightsTime IS NOT NULL return n limit 100";
+		String query = "MATCH (n"+label+") where n.inSightsTime IS NOT NULL return n order by n.inSightsTime DESC limit 100";
 		try { 
 			Neo4jDBHandler dbHandler = new Neo4jDBHandler();
 			GraphResponse response = dbHandler.executeCypherQuery(query);

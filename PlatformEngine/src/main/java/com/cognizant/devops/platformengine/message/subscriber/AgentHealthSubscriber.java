@@ -44,7 +44,7 @@ public class AgentHealthSubscriber extends EngineSubscriberResponseHandler{
 		Neo4jDBHandler dbHandler = new Neo4jDBHandler();
 		String message = new String(body, MessageConstants.MESSAGE_ENCODING);
 		String routingKey = envelope.getRoutingKey();
-		//System.out.println(consumerTag+" [x] Received '" + envelope.getRoutingKey() + "':'" + message + "'");
+		log.debug(consumerTag+" [x] Received '" + envelope.getRoutingKey() + "':'" + message + "'");
 		List<String> labels = Arrays.asList(routingKey.split(MessageConstants.ROUTING_KEY_SEPERATOR));
 		List<JsonObject> dataList = new ArrayList<JsonObject>();
 		JsonElement json = new JsonParser().parse(message);
