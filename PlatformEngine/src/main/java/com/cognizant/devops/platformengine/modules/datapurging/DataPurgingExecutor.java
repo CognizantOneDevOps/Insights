@@ -36,6 +36,7 @@ import org.quartz.JobExecutionException;
 
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.constants.ConfigOptions;
+import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
 import com.cognizant.devops.platformcommons.core.util.DataPurgingUtils;
 import com.cognizant.devops.platformcommons.core.util.InsightsUtils;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBException;
@@ -43,6 +44,7 @@ import com.cognizant.devops.platformcommons.dal.neo4j.GraphResponse;
 import com.cognizant.devops.platformcommons.dal.neo4j.Neo4jDBHandler;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformdal.settingsconfig.SettingsConfigurationDAL;
+import com.cognizant.devops.platformengine.modules.users.EngineUsersModule;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -57,7 +59,8 @@ public class DataPurgingExecutor implements Job {
 	
 	public void execute(JobExecutionContext context) throws JobExecutionException {
 		if (ApplicationConfigProvider.getInstance().isEnableOnlineBackup() && checkDataPurgingJobSchedule()) {
-			performDataPurging();		
+			performDataPurging();
+			EngineUsersModule.createEngineStatusNode("Data Purginig completed",PlatformServiceConstants.SUCCESS);
 		} 
 	}
 

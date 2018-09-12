@@ -17,7 +17,6 @@
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.List;
 import java.util.Properties;
 
 import org.apache.log4j.Logger;
@@ -28,10 +27,10 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
-import com.cognizant.devops.platformdal.ComponentConfig.CompanentConfigurationDAL;
-import com.cognizant.devops.platformdal.ComponentConfig.ComponentConfiguration;
+import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBException;
+import com.cognizant.devops.platformcommons.dal.neo4j.GraphResponse;
+import com.cognizant.devops.platformcommons.dal.neo4j.Neo4jDBHandler;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
@@ -49,7 +48,6 @@ public class ServicesHealthStatus {
 	@ResponseBody
 	public JsonObject getHealthStatus() throws IOException{
 		JsonObject servicesHealthStatus = new JsonObject();
-		String serviceVersion="";
 		
 		//ApplicationConfigCache.loadConfigCache();
 		/*PostgreSQL health check*/
@@ -62,7 +60,6 @@ public class ServicesHealthStatus {
 		hostEndPoint = ServiceStatusConstants.PLATFORM_SERVICE_HOST;
 		JsonObject platformServStatus = getVersionDetails(PLATFORM_SERVICE_VERSION_FILE, hostEndPoint, ServiceStatusConstants.Service);
 		servicesHealthStatus.add(ServiceStatusConstants.PlatformService, platformServStatus);
-		serviceVersion=platformServStatus.getAsJsonPrimitive(VERSION).toString();
 		
 		/*Insights Inference health check*/	
 		hostEndPoint = ServiceStatusConstants.INSIGHTS_INFERENCE_MASTER_HOST;
@@ -82,18 +79,10 @@ public class ServicesHealthStatus {
 		JsonObject EsStatus = getClientResponse(hostEndPoint, apiUrl, ServiceStatusConstants.DB,"");
 		servicesHealthStatus.add(ServiceStatusConstants.ES, EsStatus);
 		
-		/*Demon Agent Health Check */
-		hostEndPoint = ServiceStatusConstants.DemonAgent;
-		apiUrl = hostEndPoint;
-		JsonParser parser = new JsonParser();
-		String jsonString="{\"status\":\"success\",\"message\":\"Response successfully recieved from Demon Agent \",\"endPoint\":\"A\",\"type\":\"Service\",\"version\":"+serviceVersion+"}";
-		JsonObject demonStatus = (JsonObject) parser.parse(jsonString);
-		servicesHealthStatus.add(ServiceStatusConstants.DemonAgent, demonStatus);
-		
 		/*Patform Engine Health Check*/
 		hostEndPoint = ServiceStatusConstants.PlatformEngine;
 		apiUrl = hostEndPoint;
-		JsonObject jsonPlatformEngineStatus = getEngineStatus("PlatformEngine",serviceVersion);
+		JsonObject jsonPlatformEngineStatus = getEngineStatus("PlatformEngine");
 		servicesHealthStatus.add(ServiceStatusConstants.PlatformEngine, jsonPlatformEngineStatus);
 		
 		log.debug(" servicesHealthStatus "+servicesHealthStatus.toString());
@@ -172,16 +161,44 @@ public class ServicesHealthStatus {
 		return jsonResponse;
 	}
 	
-	private JsonObject getEngineStatus(String serviceType,String version) {
-		CompanentConfigurationDAL ccd= new CompanentConfigurationDAL();
-		List<ComponentConfiguration> componentConfigurationList= ccd.getComponentConfigurations(serviceType);
-		String successResponse=null;
-		if(componentConfigurationList.size() > 0 ) {
-			successResponse=serviceType +" registerd and works Fine ";
-			return buildSuccessResponse(successResponse, "-", ServiceStatusConstants.Service,componentConfigurationList.get(0).getComponentVersion());
-		}else {
-			return buildFailureResponse("Service registration not found ", "-", ServiceStatusConstants.Service,version);
+	private JsonObject getEngineStatus(String serviceType) {
+		String successResponse="";
+		String version="";
+		String status="";
+		JsonObject returnObject=null;
+		try {
+			GraphResponse engineJson = loadHealthData("HEALTH:ENGINE");
+			log.debug(" engineJson message arg 0  "+engineJson);
+			if(engineJson !=null ) {
+				 successResponse=engineJson.getNodes().get(0).getPropertyMap().get("message");;
+				 version=engineJson.getNodes().get(0).getPropertyMap().get("version");
+				 status=engineJson.getNodes().get(0).getPropertyMap().get("status");
+				if(status.equalsIgnoreCase(PlatformServiceConstants.SUCCESS)) {
+					returnObject=buildSuccessResponse(successResponse.toString(), "-", ServiceStatusConstants.Service,version);
+				}else {
+					returnObject=buildFailureResponse(successResponse.toString(), "-", ServiceStatusConstants.Service,version);
+				}
+			}else {
+				successResponse="Response not received from Neo4j";
+				returnObject=buildFailureResponse(successResponse.toString(), "-", ServiceStatusConstants.Service,version);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
+		return returnObject;
+	}
+	
+	private GraphResponse loadHealthData(String label) {
+		String query = "MATCH (n:"+label+") where n.inSightsTime IS NOT NULL RETURN n order by n.inSightsTime DESC LIMIT 1";
+		GraphResponse response =null;
+		try { 
+			Neo4jDBHandler dbHandler = new Neo4jDBHandler();
+			response= dbHandler.executeCypherQuery(query);
+		} catch (GraphDBException e) {
+			log.error(e);
+			response=new GraphResponse();
+		}
+		return response;
 	}
 	
 }

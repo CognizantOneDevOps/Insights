@@ -80,7 +80,7 @@ public class CorrelationExecutor {
 				removeRawLabel(correlation.getDestination());
 			}
 		}else {
-			log.info("Correlation configuration is not provided.");
+			log.error("Correlation configuration is not provided.");
 		}
 	}
 	
