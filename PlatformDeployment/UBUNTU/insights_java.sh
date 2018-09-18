@@ -29,7 +29,7 @@
 # Install Java
 echo "#################### Installing Java with Env Variable ####################"
 cd /opt/
-wget  http://platform.cogdevops.com/insights_install/installationScripts/latest/RHEL/java/jdk-8u151-linux-x64.tar.gz
+wget  https://platform.cogdevops.com/insights_install/installationScripts/latest/RHEL/java/jdk-8u151-linux-x64.tar.gz
 tar xzf jdk-8u151-linux-x64.tar.gz
 export JAVA_HOME=/opt/jdk1.8.0_151
 echo JAVA_HOME=/opt/jdk1.8.0_151  | tee -a /etc/environment

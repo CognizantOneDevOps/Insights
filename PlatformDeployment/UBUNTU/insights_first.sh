@@ -22,7 +22,7 @@ apt-get update
 cd /usr/
 mkdir INSIGHTS_HOME
 cd INSIGHTS_HOME
-wget http://platform.cogdevops.com/insights_install/installationScripts/latest/RHEL/InSightsConfig.zip
+wget https://platform.cogdevops.com/insights_install/installationScripts/latest/RHEL/InSightsConfig.zip
 unzip InSightsConfig.zip && rm -rf InSightsConfig.zip
 cp -R InSightsConfig/.InSights/ .
 export INSIGHTS_HOME=`pwd`
