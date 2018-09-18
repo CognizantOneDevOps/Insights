@@ -40,7 +40,21 @@
 					<argLine>-Xms512m -Xmx1024m</argLine>
 				</configuration>
 			</plugin>
-
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-war-plugin</artifactId>
+				<version>2.3</version>
+				<configuration>
+					<!-- <manifest> <addDefaultImplementationEntries>true</addDefaultImplementationEntries> 
+						<addDefaultSpecificationEntries>true</addDefaultSpecificationEntries> </manifest> -->
+					<archive>
+						<manifestEntries>
+							<Specification-Title>${project.name}</Specification-Title>
+							<Specification-Version>${project.version}</Specification-Version>
+						</manifestEntries>
+					</archive>
+				</configuration>
+			</plugin>
 		</plugins>
 		<resources>
 			<resource>
@@ -51,7 +65,6 @@
 					<include>version.properties</include>
 					<include>*.properties</include>
 					<include>**/*.properties</include>
-					<include>PlatformServiceVersion.json</include>
 				</includes>
 				<filtering>true</filtering>
 			</resource>
