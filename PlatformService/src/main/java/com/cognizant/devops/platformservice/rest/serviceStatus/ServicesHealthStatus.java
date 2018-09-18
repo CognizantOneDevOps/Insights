@@ -60,7 +60,7 @@ public class ServicesHealthStatus {
 		hostEndPoint = ServiceStatusConstants.PLATFORM_SERVICE_HOST;
 		JsonObject platformServStatus = getVersionDetails(PLATFORM_SERVICE_VERSION_FILE, hostEndPoint, ServiceStatusConstants.Service);
 		servicesHealthStatus.add(ServiceStatusConstants.PlatformService, platformServStatus);
-		
+				
 		/*Insights Inference health check*/	
 		hostEndPoint = ServiceStatusConstants.INSIGHTS_INFERENCE_MASTER_HOST;
 		apiUrl = hostEndPoint+"/jobs";
@@ -117,28 +117,18 @@ public class ServicesHealthStatus {
 	}
 	
 	private JsonObject getVersionDetails(String fileName, String hostEndPoint, String type) throws IOException {
-		InputStream input = ServicesHealthStatus.class.getClassLoader().getResourceAsStream(fileName);
-		String version=""; 
-		try {
-			Properties prop = new Properties();
-			prop.load(input);
-			String successResponse = "";
-			version=prop.getProperty(VERSION);
-			if(input != null){
-				successResponse = "Version captured as "+version;
-				return buildSuccessResponse(successResponse, hostEndPoint, type,version);
-			}
-		}finally {
-			try {
-				if( null != input ){
-				   input.close();
-				}
-			} catch (IOException e) {
-				log.error("Error while capturing PlatformService health check at "+hostEndPoint,e);
-			}
+		
+		String version ="";
+		String strResponse  = "";
+		if(version.equalsIgnoreCase("") ) {
+			version=ServicesHealthStatus.class.getPackage().getSpecificationVersion();
+			log.info("message version =================== "+version);
+			strResponse = "Version captured as "+version;
+			return buildSuccessResponse(strResponse, hostEndPoint, type,version);	
+		}else {
+			strResponse = "Error while capturing PlatformService (version "+version+") health check at "+hostEndPoint;
+			return buildFailureResponse(strResponse, hostEndPoint, type,version);
 		}
-		String failureResponse = "Error while capturing PlatformService health check at "+hostEndPoint;
-		return buildFailureResponse(failureResponse, hostEndPoint, type,version);
 	}
 	
 	private JsonObject buildSuccessResponse(String message, String apiUrl, String type,String version) {
@@ -170,12 +160,17 @@ public class ServicesHealthStatus {
 			GraphResponse engineJson = loadHealthData("HEALTH:ENGINE");
 			log.debug(" engineJson message arg 0  "+engineJson);
 			if(engineJson !=null ) {
-				 successResponse=engineJson.getNodes().get(0).getPropertyMap().get("message");;
-				 version=engineJson.getNodes().get(0).getPropertyMap().get("version");
-				 status=engineJson.getNodes().get(0).getPropertyMap().get("status");
-				if(status.equalsIgnoreCase(PlatformServiceConstants.SUCCESS)) {
-					returnObject=buildSuccessResponse(successResponse.toString(), "-", ServiceStatusConstants.Service,version);
+				if(engineJson.getNodes().size() > 0 ) {
+					 successResponse=engineJson.getNodes().get(0).getPropertyMap().get("message");;
+					 version=engineJson.getNodes().get(0).getPropertyMap().get("version");
+					 status=engineJson.getNodes().get(0).getPropertyMap().get("status");
+					if(status.equalsIgnoreCase(PlatformServiceConstants.SUCCESS)) {
+						returnObject=buildSuccessResponse(successResponse.toString(), "-", ServiceStatusConstants.Service,version);
+					}else {
+						returnObject=buildFailureResponse(successResponse.toString(), "-", ServiceStatusConstants.Service,version);
+					}
 				}else {
+					successResponse="Node list is empty in response not received from Neo4j";
 					returnObject=buildFailureResponse(successResponse.toString(), "-", ServiceStatusConstants.Service,version);
 				}
 			}else {

@@ -82,6 +82,7 @@ public class EngineAggregatorModule implements Job{
 													agentConfig.getToolName()));
 			} catch (Exception e) {
 				log.error("Unable to add subscriber for routing key: "+dataRoutingKey,e);
+				EngineUsersModule.createEngineStatusNode(" Error occured while executing aggragator for data queue subscriber "+e.getMessage(),PlatformServiceConstants.FAILURE);
 			}
 		}
 		
@@ -94,6 +95,7 @@ public class EngineAggregatorModule implements Job{
 				registry.put(healthRoutingKey, new AgentHealthSubscriber(healthRoutingKey));
 			} catch (Exception e) {
 				log.error("Unable to add subscriber for routing key: "+healthRoutingKey,e);
+				EngineUsersModule.createEngineStatusNode(" Error occured while executing aggragator for health queue subscriber  "+e.getMessage(),PlatformServiceConstants.FAILURE);
 			}
 		}
 	}

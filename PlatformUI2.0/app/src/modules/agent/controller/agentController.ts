@@ -61,8 +61,7 @@ module ISightApp {
 				self.showThrobber = false;
 				self.showcontent = !this.showThrobber;
 				self.serverStatus = data;	
-                console.log("date for "+data);
-			})
+            })
 			.catch(function (data) {												
 				self.showThrobber = false;
 				self.showcontent = false;
