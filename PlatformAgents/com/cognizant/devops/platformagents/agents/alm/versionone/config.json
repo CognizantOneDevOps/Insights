@@ -1,0 +1,41 @@
+{
+  "mqConfig": {
+    "user": "iSight",
+    "password": "iSight",
+    "host": "127.0.0.1",
+    "exchange": "iSight"
+  },
+  "subscribe": {
+    "config": "ALM.VERSIONONE.config"
+  },
+  "publish": {
+    "data": "ALM.VERSIONONE.DATA",
+    "health": "ALM.VERSIONONE.HEALTH"
+  },
+  "communication": {
+    "type": "REST"
+  },
+  "dynamicTemplate": {
+          "timeFieldMapping" : {
+                "startDate" : "%Y-%m-%d"
+                },
+                "responseTemplate": {
+                        "LastUpdateDate": "LastUpdateDate"
+                }
+  },
+  "runSchedule": 30,
+  "userid": "admin",
+  "passwd": "admin",
+  "project": "Test Project",
+  "baseUrl": "https://www5.v1host.com/CognizantTechnologySolutionsAsiaPacificPteLtd/rest-1.v1/Data/",
+  "startFrom": "2010-10-10 00:01",
+  "toolsTimeZone" : "Asia/Kolkata",
+  "insightsTimeZone" : "Asia/Kolkata",
+  "useResponseTemplate" : false,
+  "timeStampField":"LastUpdated",
+  "timeStampFormat":"%Y-%m-%dT%H:%M:%S",
+  "isDebugAllowed" : false,
+  "loggingSetting" : {
+                "logLevel" : "WARN"
+        }
+}
