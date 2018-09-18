@@ -15,10 +15,10 @@
 #-------------------------------------------------------------------------------
 echo "#################### Installing Tomcat8 ####################"
 cd /opt
-wget http://platform.cogdevops.com/insights_install/release/latest/InSightsUI.zip -O InSightsUI.zip
+wget https://platform.cogdevops.com/insights_install/release/latest/InSightsUI.zip -O InSightsUI.zip
 unzip InSightsUI.zip && rm -rf InSightsUI.zip
-wget http://platform.cogdevops.com/insights_install/release/latest/PlatformService.war -O PlatformService.war
-wget http://platform.cogdevops.com/insights_install/installationScripts/latest/RHEL/tomcat/apache-tomcat-8.5.27.tar.gz
+wget https://platform.cogdevops.com/insights_install/release/latest/PlatformService.war -O PlatformService.war
+wget https://platform.cogdevops.com/insights_install/installationScripts/latest/RHEL/tomcat/apache-tomcat-8.5.27.tar.gz
 tar -zxvf apache-tomcat-8.5.27.tar.gz
 cp -R ./app /opt/apache-tomcat-8.5.27/webapps
 #sudo cp -R app /opt/apache-tomcat-8.5.27/webapps
@@ -28,7 +28,7 @@ rm -rf PlatformService.war
 cd apache-tomcat-8.5.27
 chmod -R 777 /opt/apache-tomcat-8.5.27
 cd /etc/init.d/
-wget http://platform.cogdevops.com/insights_install/installationScripts/latest/RHEL/initscripts/Tomcat8.sh
+wget https://platform.cogdevops.com/insights_install/installationScripts/latest/RHEL/initscripts/Tomcat8.sh
 mv Tomcat8.sh Tomcat8
 chmod +x Tomcat8
 cd /etc/systemd/system

@@ -15,17 +15,17 @@
 #-------------------------------------------------------------------------------
 # install postgresql
 echo "#################### Installing Postgres with configs , Databases and Roles ####################"
-sudo yum install http://platform.cogdevops.com/insights_install/installationScripts/latest/RHEL/postgres/pgdg-redhat95-9.5-2.noarch.rpm -y
+sudo yum install https://platform.cogdevops.com/insights_install/installationScripts/latest/RHEL/postgres/pgdg-redhat95-9.5-2.noarch.rpm -y
 sudo yum install postgresql95-server postgresql95-contrib -y
 sudo /usr/pgsql-9.5/bin/postgresql95-setup initdb
 sudo systemctl enable postgresql-9.5.service
 sudo chkconfig postgresql-9.5 on
-sudo wget http://platform.cogdevops.com/insights_install/installationScripts/latest/RHEL/postgres/pg_hba.conf
+sudo wget https://platform.cogdevops.com/insights_install/installationScripts/latest/RHEL/postgres/pg_hba.conf
 sudo cp pg_hba.conf /var/lib/pgsql/9.5/data/pg_hba.conf
 sudo systemctl start  postgresql-9.5.service
 sudo useradd grafana
 sudo usermod --password C0gnizant@1 grafana
-sudo wget http://platform.cogdevops.com/insights_install/installationScripts/latest/RHEL/postgres/dbscript.sql
+sudo wget https://platform.cogdevops.com/insights_install/installationScripts/latest/RHEL/postgres/dbscript.sql
 sudo chmod +x dbscript.sql
 psql -U postgres -f dbscript.sql
 
