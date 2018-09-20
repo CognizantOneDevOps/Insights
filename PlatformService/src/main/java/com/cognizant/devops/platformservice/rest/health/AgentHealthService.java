@@ -52,6 +52,8 @@ public class AgentHealthService {
 		StringBuffer label = new StringBuffer(":HEALTH");
 		if(category.equalsIgnoreCase(ServiceStatusConstants.PlatformEngine)) {
 			label.append(":").append("ENGINE");
+		}else if(category.equalsIgnoreCase(ServiceStatusConstants.InsightsInference)) {
+			label.append(":").append("INSIGHTS");
 		}else {
 			label.append(":").append(category);
 			label.append(":").append(tool);	

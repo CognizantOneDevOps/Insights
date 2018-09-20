@@ -21,6 +21,14 @@ import org.apache.log4j.Logger;
 
 import com.cognizant.devops.platformcommons.dal.neo4j.Neo4jDBHandler;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import com.sun.jersey.api.client.Client;
+import com.sun.jersey.api.client.ClientHandlerException;
+import com.sun.jersey.api.client.ClientResponse;
+import com.sun.jersey.api.client.UniformInterfaceException;
+import com.sun.jersey.api.client.WebResource;
+
+import sun.misc.BASE64Encoder;
 
 public  class SystemStatus {
 	private static Logger log = Logger.getLogger(SystemStatus.class.getName());
@@ -28,7 +36,7 @@ public  class SystemStatus {
 	public static JsonObject addSystemInformationInNeo4j(String version,List<JsonObject> dataList,List<String> labels) {
 		Neo4jDBHandler graphDBHandler = new Neo4jDBHandler();
 		boolean status = Boolean.TRUE;
-		JsonObject response=null;
+		JsonObject response = null;
 		try {
 			String queryLabel = "";
 			for (String label : labels) {
@@ -49,5 +57,63 @@ public  class SystemStatus {
 		
 		return response;
 	}
-
+	
+	public static String jerseyGetClientWithAuthentication(String url, String name, String password,String authtoken) {
+		String output;
+		String authStringEnc;
+		ClientResponse response = null;
+        try {
+        	if(authtoken==null) {
+        		String authString = name + ":" + password;
+    			authStringEnc= new BASE64Encoder().encode(authString.getBytes());
+    		}else {
+    			authStringEnc=authtoken;
+    		}
+			Client restClient = Client.create();
+			WebResource webResource = restClient.resource(url);
+			response= webResource.accept("application/json")
+			                                 .header("Authorization", "Basic " + authStringEnc)
+			                                 .get(ClientResponse.class);
+			if(response.getStatus() != 200){
+				throw new RuntimeException("Failed : HTTP error code : "+ response.getStatus());
+			}else {
+				output= response.getEntity(String.class);
+			}
+		} catch (Exception e) {
+			log.error(" error while getting jerseyGetClientWithAuthentication "+e.getMessage());
+			throw new RuntimeException("Failed : error while getting jerseyGetClientWithAuthentication : "+ e.getMessage());
+		}finally {
+			if(response!=null) {
+				response.close();
+			}
+		}
+        return output;
+	}
+	
+	public static String jerseyGetClientWithoutAuthentication(String url) {
+		
+		String output=null;
+		ClientResponse response = null;
+		
+        try {
+			Client restClient = Client.create();
+			WebResource webResource = restClient.resource(url);
+			response= webResource.accept("application/json")
+			                                 .get(ClientResponse.class);
+			if(response.getStatus() != 200){
+				log.error("Unable to connect to the server");
+				throw new RuntimeException("Failed : HTTP error code : "+ response.getStatus());
+			}else {
+				output= response.getEntity(String.class);
+			}
+		} catch (Exception e) {
+			log.error(" error while getting jerseyGetClientWithoutAuthentication "+e.getMessage());
+			throw new RuntimeException("Failed : error while getting jerseyGetClientWithoutAuthentication : "+ e.getMessage());
+		}finally {
+			if(response!=null) {
+				response.close();
+			}
+		}
+        return output;
+	}
 }
