@@ -17,6 +17,7 @@
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
 import java.util.Properties;
 
 import org.apache.log4j.Logger;
@@ -26,14 +27,22 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
+import com.cognizant.devops.platformcommons.core.util.SystemStatus;
+import com.cognizant.devops.platformcommons.dal.elasticsearch.ElasticSearchDBHandler;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBException;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphResponse;
 import com.cognizant.devops.platformcommons.dal.neo4j.Neo4jDBHandler;
+import com.cognizant.devops.platformdal.dal.PostgresMetadataHandler;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
+import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.WebResource;
+
+import sun.misc.BASE64Encoder;
 
 @RestController
 @RequestMapping("/ServicesHealthStatus")
@@ -48,12 +57,15 @@ public class ServicesHealthStatus {
 	@ResponseBody
 	public JsonObject getHealthStatus() throws IOException{
 		JsonObject servicesHealthStatus = new JsonObject();
+		String username=null;
+		String password=null;
+		String authToken=null;
 		
 		//ApplicationConfigCache.loadConfigCache();
 		/*PostgreSQL health check*/
 		String hostEndPoint = ServiceStatusConstants.POSTGRESQL_HOST;
 		String apiUrl = hostEndPoint;		
-		JsonObject postgreStatus = getClientResponse(hostEndPoint, apiUrl, ServiceStatusConstants.DB,"");
+		JsonObject postgreStatus = getClientResponse(hostEndPoint, apiUrl, ServiceStatusConstants.DB,ServiceStatusConstants.PgSQL,Boolean.FALSE,username,password,authToken);
 		servicesHealthStatus.add(ServiceStatusConstants.PgSQL, postgreStatus);
 		
 		/*PlatformService health check*/
@@ -64,25 +76,35 @@ public class ServicesHealthStatus {
 		/*Insights Inference health check*/	
 		hostEndPoint = ServiceStatusConstants.INSIGHTS_INFERENCE_MASTER_HOST;
 		apiUrl = hostEndPoint+"/jobs";
-		JsonObject inferenceServStatus = getClientResponse(hostEndPoint, apiUrl, ServiceStatusConstants.Service,"");
+		JsonObject inferenceServStatus = getComponentStatus("PlatformInsightSpark",apiUrl);//getClientResponse(hostEndPoint, apiUrl, ServiceStatusConstants.Service,"");
 		servicesHealthStatus.add(ServiceStatusConstants.InsightsInference, inferenceServStatus);
 		
 		/*Neo4j health check*/
 		hostEndPoint = ServiceStatusConstants.NEO4J_HOST;
-		apiUrl = hostEndPoint+"/browser";
-		JsonObject neo4jStatus = getClientResponse(hostEndPoint, apiUrl, ServiceStatusConstants.DB,"");
+		apiUrl = hostEndPoint+"/db/data/";
+		authToken=ApplicationConfigProvider.getInstance().getGraph().getAuthToken();
+		JsonObject neo4jStatus = getClientResponse(hostEndPoint, apiUrl, ServiceStatusConstants.DB,ServiceStatusConstants.Neo4j,Boolean.TRUE,username,password,authToken);
 		servicesHealthStatus.add(ServiceStatusConstants.Neo4j, neo4jStatus);
 		
 		/*Elastic Search health check*/
 		hostEndPoint = ServiceStatusConstants.ES_HOST;
 		apiUrl = hostEndPoint;
-		JsonObject EsStatus = getClientResponse(hostEndPoint, apiUrl, ServiceStatusConstants.DB,"");
+		JsonObject EsStatus = getClientResponse(hostEndPoint, apiUrl, ServiceStatusConstants.DB,ServiceStatusConstants.ES,Boolean.FALSE,username,password,authToken);
 		servicesHealthStatus.add(ServiceStatusConstants.ES, EsStatus);
+		
+		/*Rabbit Mq health check */
+		hostEndPoint = ServiceStatusConstants.RABBIT_MQ;
+		apiUrl = hostEndPoint+"/api/overview";
+		authToken=null;
+		username=ApplicationConfigProvider.getInstance().getMessageQueue().getUser();
+		password=ApplicationConfigProvider.getInstance().getMessageQueue().getPassword();
+		JsonObject rabbitMq = getClientResponse(hostEndPoint, apiUrl, ServiceStatusConstants.DB,ServiceStatusConstants.RabbitMq,Boolean.TRUE,username,password,authToken);
+		servicesHealthStatus.add(ServiceStatusConstants.RabbitMq, rabbitMq);
 		
 		/*Patform Engine Health Check*/
 		hostEndPoint = ServiceStatusConstants.PlatformEngine;
 		apiUrl = hostEndPoint;
-		JsonObject jsonPlatformEngineStatus = getEngineStatus("PlatformEngine");
+		JsonObject jsonPlatformEngineStatus = getComponentStatus("PlatformEngine","");
 		servicesHealthStatus.add(ServiceStatusConstants.PlatformEngine, jsonPlatformEngineStatus);
 		
 		log.debug(" servicesHealthStatus "+servicesHealthStatus.toString());
@@ -99,8 +121,7 @@ public class ServicesHealthStatus {
 		                   .get(ClientResponse.class);
 
 				if (response.getStatus() != 200) {
-				   throw new RuntimeException("Failed : HTTP error code : "
-					+ response.getStatus());
+					throw new RuntimeException("Failed : HTTP error code : "+ response.getStatus());
 				}
 				
 				String successResponse = "" ;
@@ -114,6 +135,54 @@ public class ServicesHealthStatus {
 			  }
 		String failureResponse = "Error while capturing health check at "+apiUrl;
 		return buildFailureResponse(failureResponse, hostEndPoint, type,version);
+	}
+	
+	private JsonObject getClientResponse(String hostEndPoint, String apiUrl, String displayType,String serviceType, boolean isRequiredAuthentication,String username, String password,String authToken){
+		JsonObject returnResponse=null;
+		String strResponse = "" ;
+		JsonObject json=null;
+		String version="";
+		String serviceResponse;
+		JsonParser jsonParser = new JsonParser();
+		ElasticSearchDBHandler apiCallElasticsearch =new ElasticSearchDBHandler();
+		try {
+				if(isRequiredAuthentication) {
+					serviceResponse=SystemStatus.jerseyGetClientWithAuthentication(apiUrl, username, password,authToken);
+				}else {
+					serviceResponse=apiCallElasticsearch.search(apiUrl); //SystemStatus.jerseyGetClientWithoutAuthentication(apiUrl)
+				}
+				
+				if( serviceResponse !=null){
+					strResponse = "Response successfully recieved from "+apiUrl;
+					log.info("response: "+serviceResponse);
+					
+					if(serviceType.equalsIgnoreCase(ServiceStatusConstants.Neo4j)) {
+						json=(JsonObject) jsonParser.parse(serviceResponse);
+						version=json.get("neo4j_version").getAsString();
+					}else if(serviceType.equalsIgnoreCase(ServiceStatusConstants.RabbitMq)) {
+						json=(JsonObject) jsonParser.parse(serviceResponse);
+						version="RabbitMq version "+json.get("rabbitmq_version").getAsString() + "\n Erlang version "+ json.get("erlang_version").getAsString();
+					}else if(serviceType.equalsIgnoreCase(ServiceStatusConstants.ES)) { //0
+						json=(JsonObject) jsonParser.parse(serviceResponse);
+						JsonObject versionElasticsearch=(JsonObject) json.get("version");
+						if(versionElasticsearch!=null) {
+							version=versionElasticsearch.get("number").getAsString();
+						}
+					}else if(serviceType.equalsIgnoreCase(ServiceStatusConstants.PgSQL)) {
+						PostgresMetadataHandler pgdbHandler =new PostgresMetadataHandler();
+						version =pgdbHandler.getPostgresDBVersion();
+					}
+					returnResponse= buildSuccessResponse(strResponse, hostEndPoint, displayType,version);
+				}else {
+					strResponse="Response not received from service "+apiUrl;
+					returnResponse= buildFailureResponse(strResponse, hostEndPoint, displayType,version);
+				}
+			} catch (Exception e) {
+				  log.error("Error while capturing health check at "+apiUrl,e);
+				  strResponse = "Error while capturing health check at "+apiUrl;
+				  returnResponse= buildFailureResponse(strResponse, hostEndPoint, displayType,version);
+			}
+		return returnResponse;
 	}
 	
 	private JsonObject getVersionDetails(String fileName, String hostEndPoint, String type) throws IOException {
@@ -151,31 +220,61 @@ public class ServicesHealthStatus {
 		return jsonResponse;
 	}
 	
-	private JsonObject getEngineStatus(String serviceType) {
+	private JsonObject getComponentStatus(String serviceType, String apiUrl) {
 		String successResponse="";
 		String version="";
 		String status="";
 		JsonObject returnObject=null;
+		GraphResponse graphResponse;
+		String serviceResponse=null;
+		ElasticSearchDBHandler apiCallElasticsearch =new ElasticSearchDBHandler();
 		try {
-			GraphResponse engineJson = loadHealthData("HEALTH:ENGINE");
-			log.debug(" engineJson message arg 0  "+engineJson);
-			if(engineJson !=null ) {
-				if(engineJson.getNodes().size() > 0 ) {
-					 successResponse=engineJson.getNodes().get(0).getPropertyMap().get("message");;
-					 version=engineJson.getNodes().get(0).getPropertyMap().get("version");
-					 status=engineJson.getNodes().get(0).getPropertyMap().get("status");
-					if(status.equalsIgnoreCase(PlatformServiceConstants.SUCCESS)) {
-						returnObject=buildSuccessResponse(successResponse.toString(), "-", ServiceStatusConstants.Service,version);
+			if(serviceType.equalsIgnoreCase("PlatformEngine")) {
+				graphResponse = loadHealthData("HEALTH:ENGINE");
+				log.debug(" graphResponse message arg 0  "+graphResponse);
+				if(graphResponse !=null ) {
+					if(graphResponse.getNodes().size() > 0 ) {
+						 successResponse=graphResponse.getNodes().get(0).getPropertyMap().get("message");;
+						 version=graphResponse.getNodes().get(0).getPropertyMap().get("version");
+						 status=graphResponse.getNodes().get(0).getPropertyMap().get("status");
+						if(status.equalsIgnoreCase(PlatformServiceConstants.SUCCESS)) {
+							returnObject=buildSuccessResponse(successResponse.toString(), "-", ServiceStatusConstants.Service,version);
+						}else {
+							returnObject=buildFailureResponse(successResponse.toString(), "-", ServiceStatusConstants.Service,version);
+						}
 					}else {
+						successResponse="Node list is empty in response not received from Neo4j";
 						returnObject=buildFailureResponse(successResponse.toString(), "-", ServiceStatusConstants.Service,version);
 					}
 				}else {
-					successResponse="Node list is empty in response not received from Neo4j";
+					successResponse="Response not received from Neo4j";
 					returnObject=buildFailureResponse(successResponse.toString(), "-", ServiceStatusConstants.Service,version);
 				}
-			}else {
-				successResponse="Response not received from Neo4j";
-				returnObject=buildFailureResponse(successResponse.toString(), "-", ServiceStatusConstants.Service,version);
+			}else if(serviceType.equalsIgnoreCase("PlatformInsightSpark")) {
+				serviceResponse=apiCallElasticsearch.search(apiUrl);
+				log.info(" PlatformInsightSpark service response "+serviceResponse);
+				graphResponse = loadHealthData("HEALTH:INSIGHTS");
+				log.debug(" graphResponse message arg 0  "+graphResponse);
+				if(graphResponse !=null ) {
+					if(graphResponse.getNodes().size() > 0 ) {
+						 successResponse=graphResponse.getNodes().get(0).getPropertyMap().get("message");;
+						 version=graphResponse.getNodes().get(0).getPropertyMap().get("version");
+						 status=graphResponse.getNodes().get(0).getPropertyMap().get("status");
+					}else {
+						successResponse="Node list is empty in response not received from Neo4j";
+						status=PlatformServiceConstants.FAILURE;
+					}
+				}else {
+					successResponse="Response not received from Neo4j";
+					status=PlatformServiceConstants.FAILURE;
+				}
+				
+				if(status.equalsIgnoreCase(PlatformServiceConstants.SUCCESS) && serviceResponse !=null) {
+					returnObject=buildSuccessResponse(successResponse.toString(), apiUrl, ServiceStatusConstants.Service,version);
+				}else {
+					returnObject=buildFailureResponse(successResponse.toString(), apiUrl, ServiceStatusConstants.Service,version);
+				}
+				
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
