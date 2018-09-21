@@ -67,7 +67,7 @@ public class AgentHealthService {
 			Neo4jDBHandler dbHandler = new Neo4jDBHandler();
 			GraphResponse response = dbHandler.executeCypherQuery(query);
 			return PlatformServiceUtil.buildSuccessResponseWithData(response);
-		} catch (GraphDBException e) {
+		} catch (Exception e) {
 			log.error(e);
 			return PlatformServiceUtil.buildFailureResponse(ErrorMessage.DB_INSERTION_FAILED);
 		}
