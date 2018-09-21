@@ -89,31 +89,4 @@ public  class SystemStatus {
 		}
         return output;
 	}
-	
-	public static String jerseyGetClientWithoutAuthentication(String url) {
-		
-		String output=null;
-		ClientResponse response = null;
-		
-        try {
-			Client restClient = Client.create();
-			WebResource webResource = restClient.resource(url);
-			response= webResource.accept("application/json")
-			                                 .get(ClientResponse.class);
-			if(response.getStatus() != 200){
-				log.error("Unable to connect to the server");
-				throw new RuntimeException("Failed : HTTP error code : "+ response.getStatus());
-			}else {
-				output= response.getEntity(String.class);
-			}
-		} catch (Exception e) {
-			log.error(" error while getting jerseyGetClientWithoutAuthentication "+e.getMessage());
-			throw new RuntimeException("Failed : error while getting jerseyGetClientWithoutAuthentication : "+ e.getMessage());
-		}finally {
-			if(response!=null) {
-				response.close();
-			}
-		}
-        return output;
-	}
 }

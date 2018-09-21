@@ -149,10 +149,10 @@ public class ServicesHealthStatus {
 				if(isRequiredAuthentication) {
 					serviceResponse=SystemStatus.jerseyGetClientWithAuthentication(apiUrl, username, password,authToken);
 				}else {
-					serviceResponse=apiCallElasticsearch.search(apiUrl); //SystemStatus.jerseyGetClientWithoutAuthentication(apiUrl)
+					serviceResponse=apiCallElasticsearch.search(apiUrl); 
 				}
 				
-				if( serviceResponse !=null){
+				if( serviceResponse !=null && !("").equalsIgnoreCase(serviceResponse)){
 					strResponse = "Response successfully recieved from "+apiUrl;
 					log.info("response: "+serviceResponse);
 					
@@ -269,7 +269,7 @@ public class ServicesHealthStatus {
 					status=PlatformServiceConstants.FAILURE;
 				}
 				
-				if(status.equalsIgnoreCase(PlatformServiceConstants.SUCCESS) && serviceResponse !=null) {
+				if(status.equalsIgnoreCase(PlatformServiceConstants.SUCCESS) && !("").equalsIgnoreCase(serviceResponse)) {
 					returnObject=buildSuccessResponse(successResponse.toString(), apiUrl, ServiceStatusConstants.Service,version);
 				}else {
 					returnObject=buildFailureResponse(successResponse.toString(), apiUrl, ServiceStatusConstants.Service,version);
@@ -288,7 +288,7 @@ public class ServicesHealthStatus {
 		try { 
 			Neo4jDBHandler dbHandler = new Neo4jDBHandler();
 			response= dbHandler.executeCypherQuery(query);
-		} catch (GraphDBException e) {
+		} catch (Exception e) {
 			log.error(e);
 			response=new GraphResponse();
 		}
