@@ -20,9 +20,9 @@ sed  -i '$ a root   hard    nofile  40000' /etc/security/limits.conf
 source /etc/environment
 mkdir NEO4J_HOME
 cd NEO4J_HOME
-wget http://platform.cogdevops.com/insights_install/installationScripts/latest/RHEL/neo4j/neo4j-community-3.3.0-unix.tar.gz
+wget https://platform.cogdevops.com/insights_install/installationScripts/latest/RHEL/neo4j/neo4j-community-3.3.0-unix.tar.gz
 tar -xf neo4j-community-3.3.0-unix.tar.gz
-wget http://platform.cogdevops.com/insights_install/installationScripts/latest/RHEL/neo4j/Neo4j-3.3.0.zip
+wget https://platform.cogdevops.com/insights_install/installationScripts/latest/RHEL/neo4j/Neo4j-3.3.0.zip
 unzip Neo4j-3.3.0.zip
 cp Neo4j-3.3.0/conf/neo4j.conf neo4j-community-3.3.0/conf
 cp -R Neo4j-3.3.0/plugins neo4j-community-3.3.0/

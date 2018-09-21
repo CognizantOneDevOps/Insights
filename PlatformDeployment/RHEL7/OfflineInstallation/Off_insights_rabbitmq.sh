@@ -16,10 +16,10 @@
 
 #
 # arfifacts
-# http://platform.cogdevops.com/insights_install/installationScripts/latest/RHEL/rabbitmq/erlang-20.0.5-1.el6.x86_64.rpm
+# https://platform.cogdevops.com/insights_install/installationScripts/latest/RHEL/rabbitmq/erlang-20.0.5-1.el6.x86_64.rpm
 # https://www.rabbitmq.com/releases/rabbitmq-server/v3.6.1/ 
-# http://platform.cogdevops.com/insights_install/installationScripts/latest/RHEL/rabbitmq/rabbitmq-signing-key-public.asc
-# http://platform.cogdevops.com/insights_install/installationScripts/latest/RHEL/rabbitmq/RabbitMQ-3.6.5.zip
+# https://platform.cogdevops.com/insights_install/installationScripts/latest/RHEL/rabbitmq/rabbitmq-signing-key-public.asc
+# https://platform.cogdevops.com/insights_install/installationScripts/latest/RHEL/rabbitmq/RabbitMQ-3.6.5.zip
 
 
 echo "#################### Installing Erlang , required for Rabbit MQ ####################"
