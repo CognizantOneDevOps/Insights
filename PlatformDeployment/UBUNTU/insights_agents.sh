@@ -26,7 +26,7 @@ chmod -R 755 AgentDaemon
 chmod -R 755 PlatformAgents
 echo $INSIGHTS_AGENT_HOME
 cd AgentDaemon
-wget http://platform.cogdevops.com/insights_install/release/latest/agentdaemon.zip -O agentdaemon.zip
+wget https://platform.cogdevops.com/insights_install/release/latest/agentdaemon.zip -O agentdaemon.zip
 unzip agentdaemon.zip && rm -rf agentdaemon.zip
 sudo -E source /etc/environment
 sudo -E source /etc/profile

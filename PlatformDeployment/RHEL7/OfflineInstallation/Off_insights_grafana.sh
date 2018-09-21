@@ -15,9 +15,9 @@
 #-------------------------------------------------------------------------------
 
 # arfifacts
-# http://platform.cogdevops.com/insights_install/installationScripts/latest/RHEL/grafana/grafana-4.6.2.linux-x64.tar.gz
-# http://platform.cogdevops.com/insights_install/installationScripts/latest/RHEL/grafana/ldap.toml
-# http://platform.cogdevops.com/insights_install/installationScripts/latest/RHEL/grafana/defaults.ini
+# https://platform.cogdevops.com/insights_install/installationScripts/latest/RHEL/grafana/grafana-4.6.2.linux-x64.tar.gz
+# https://platform.cogdevops.com/insights_install/installationScripts/latest/RHEL/grafana/ldap.toml
+# https://platform.cogdevops.com/insights_install/installationScripts/latest/RHEL/grafana/defaults.ini
 
 
 echo "#################### Installing Grafana (running as BG process) with user creation ####################"
