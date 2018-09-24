@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  ******************************************************************************/
- package com.cognizant.devops.platformservice.rest.serviceStatus;
+ package com.cognizant.devops.platformcommons.constants;
 
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 

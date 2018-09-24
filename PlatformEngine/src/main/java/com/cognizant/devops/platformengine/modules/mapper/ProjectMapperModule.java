@@ -28,6 +28,7 @@ import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBException;
 import com.cognizant.devops.platformcommons.dal.neo4j.Neo4jDBHandler;
 import com.cognizant.devops.platformdal.mapping.projects.ProjectMapping;
 import com.cognizant.devops.platformdal.mapping.projects.ProjectMappingDAL;
+import com.cognizant.devops.platformengine.message.core.EngineStatusLogger;
 import com.cognizant.devops.platformengine.modules.users.EngineUsersModule;
 
 public class ProjectMapperModule implements Job {
@@ -50,6 +51,6 @@ public class ProjectMapperModule implements Job {
 				}
 			}
 		}
-		EngineUsersModule.createEngineStatusNode("Project Mapper Module run successfully",PlatformServiceConstants.SUCCESS);
+		EngineStatusLogger.getInstance().createEngineStatusNode("Project Mapper Module run successfully",PlatformServiceConstants.SUCCESS);
 	}
 }

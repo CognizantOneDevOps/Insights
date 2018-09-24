@@ -74,13 +74,12 @@ public class PlatformInsightsSparkApplication {
 			scheduler.scheduleJob(sparkAggrgatorJob, sparkAggregatorTrigger);
 			log.debug("Job has been scheduled with interval of - "+defaultInterval);
 			//Insight status to DB
-			InsightsStatusProvider.createInsightStatusNode("Platform Insights Spark Application started Successfully", PlatformServiceConstants.SUCCESS);
 		} catch (SchedulerException e) {
 			log.error("Exception in Sparkjob schedular",e);
-			InsightsStatusProvider.createInsightStatusNode("Platform Insights Spark Application not started ", PlatformServiceConstants.FAILURE);
+			InsightsStatusProvider.getInstance().createInsightStatusNode("Platform Insights Spark Application not started ", PlatformServiceConstants.FAILURE);
 		}catch (Exception e) {
 			log.error("Exception in Sparkjob ",e);
-			InsightsStatusProvider.createInsightStatusNode("Platform Insights Spark Application not started ", PlatformServiceConstants.FAILURE);
+			InsightsStatusProvider.getInstance().createInsightStatusNode("Platform Insights Spark Application not started ", PlatformServiceConstants.FAILURE);
 		}
 	}
 }

@@ -15,40 +15,30 @@
  ******************************************************************************/
 package com.cognizant.devops.platforminsights.core;
 
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-
 import org.apache.log4j.Logger;
 
-import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
-import com.cognizant.devops.platformcommons.core.util.SystemStatus;
-import com.cognizant.devops.platformcommons.dal.neo4j.Neo4jDBHandler;
-import com.google.gson.JsonObject;
+import com.cognizant.devops.platformcommons.core.util.ComponentHealthLogger;
 
-public class InsightsStatusProvider  {
+public class InsightsStatusProvider extends ComponentHealthLogger {
 	private static Logger log = Logger.getLogger(InsightsStatusProvider.class);
-	Neo4jDBHandler graphDBHandler = new Neo4jDBHandler();
-	private static final String DATE_TIME_FORMAT = "yyyy/MM/dd hh:mm a";
-	private static SimpleDateFormat  dtf = new SimpleDateFormat(DATE_TIME_FORMAT);
 	
-	public static boolean createInsightStatusNode(String message,String status) {
+	static InsightsStatusProvider instance=null;
+	private InsightsStatusProvider() {
+		
+	}
+	
+	public static InsightsStatusProvider getInstance() {
+		if(instance==null) {
+			instance=new InsightsStatusProvider();
+		}
+		return instance;
+	}
+	
+	public boolean createInsightStatusNode(String message,String status) {
 			String version = "";
 			version = InsightsStatusProvider.class.getPackage().getImplementationVersion();
 			log.debug( " Insights version " +  version    );
-			List<JsonObject> dataList = new ArrayList<JsonObject>();
-			List<String> labels = new ArrayList<String>();
-			labels.add("HEALTH");
-			labels.add("INSIGHTS");
-			JsonObject jsonObj = new JsonObject();
-			jsonObj.addProperty("version", version==null?"-":version);
-			jsonObj.addProperty("message", message);
-			jsonObj.addProperty("inSightsTime",System.currentTimeMillis());
-			jsonObj.addProperty("inSightsTimeX", dtf.format(new Date()));
-			jsonObj.addProperty(PlatformServiceConstants.STATUS,status);
-			dataList.add(jsonObj);
-			JsonObject response=SystemStatus.addSystemInformationInNeo4j(version, dataList, labels);
+			createComponentStatusNode("HEALTH:INSIGHTS",version,message,status);
 			return Boolean.TRUE;
 	}
 }

@@ -30,10 +30,10 @@ import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
 import com.cognizant.devops.platformcommons.dal.neo4j.Neo4jDBHandler;
 import com.cognizant.devops.platformdal.agentConfig.AgentConfig;
 import com.cognizant.devops.platformdal.agentConfig.AgentConfigDAL;
+import com.cognizant.devops.platformengine.message.core.EngineStatusLogger;
 import com.cognizant.devops.platformengine.message.factory.EngineSubscriberResponseHandler;
 import com.cognizant.devops.platformengine.message.subscriber.AgentDataSubscriber;
 import com.cognizant.devops.platformengine.message.subscriber.AgentHealthSubscriber;
-import com.cognizant.devops.platformengine.modules.users.EngineUsersModule;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
@@ -56,7 +56,7 @@ public class EngineAggregatorModule implements Job{
 			registerAggragators(agentConfig, graphDBHandler);
 			//publishAgentConfig(agentConfig);
 		}
-		EngineUsersModule.createEngineStatusNode(" Engine Aggregator Module (Data Collection ) run successfully  ",PlatformServiceConstants.SUCCESS);
+		EngineStatusLogger.getInstance().createEngineStatusNode(" Engine Aggregator Module (Data Collection ) run successfully  ",PlatformServiceConstants.SUCCESS);
 		//agentConfigDal.updateAgentSubscriberConfigurations(allAgentConfigurations);
 	}
 	
@@ -82,7 +82,7 @@ public class EngineAggregatorModule implements Job{
 													agentConfig.getToolName()));
 			} catch (Exception e) {
 				log.error("Unable to add subscriber for routing key: "+dataRoutingKey,e);
-				EngineUsersModule.createEngineStatusNode(" Error occured while executing aggragator for data queue subscriber "+e.getMessage(),PlatformServiceConstants.FAILURE);
+				EngineStatusLogger.getInstance().createEngineStatusNode(" Error occured while executing aggragator for data queue subscriber "+e.getMessage(),PlatformServiceConstants.FAILURE);
 			}
 		}
 		
@@ -95,7 +95,7 @@ public class EngineAggregatorModule implements Job{
 				registry.put(healthRoutingKey, new AgentHealthSubscriber(healthRoutingKey));
 			} catch (Exception e) {
 				log.error("Unable to add subscriber for routing key: "+healthRoutingKey,e);
-				EngineUsersModule.createEngineStatusNode(" Error occured while executing aggragator for health queue subscriber  "+e.getMessage(),PlatformServiceConstants.FAILURE);
+				EngineStatusLogger.getInstance().createEngineStatusNode(" Error occured while executing aggragator for health queue subscriber  "+e.getMessage(),PlatformServiceConstants.FAILURE);
 			}
 		}
 	}

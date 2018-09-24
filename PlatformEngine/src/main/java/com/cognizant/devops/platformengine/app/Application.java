@@ -29,6 +29,7 @@ import org.quartz.impl.StdSchedulerFactory;
 import com.cognizant.devops.platformcommons.config.ApplicationConfigCache;
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
+import com.cognizant.devops.platformengine.message.core.EngineStatusLogger;
 import com.cognizant.devops.platformengine.modules.aggregator.EngineAggregatorModule;
 import com.cognizant.devops.platformengine.modules.correlation.EngineCorrelatorModule;
 import com.cognizant.devops.platformengine.modules.datapurging.DataPurgingExecutor;
@@ -132,12 +133,12 @@ public class Application {
 			scheduler.scheduleJob(projectMappingJob, projectMappingTrigger);
 			scheduler.scheduleJob(dataPurgingJob, dataPurgingTrigger);
 			scheduler.scheduleJob(offlineDataProcessingJob, offlineDataProcessingTrigger);
-			EngineUsersModule.createEngineStatusNode("Platform Engine Service Started ",PlatformServiceConstants.SUCCESS);
+			EngineStatusLogger.getInstance().createEngineStatusNode("Platform Engine Service Started ",PlatformServiceConstants.SUCCESS);
 		} catch (SchedulerException e) {
-			EngineUsersModule.createEngineStatusNode("Platform Engine Service not running due to Scheduler Exception "+e.getMessage(),PlatformServiceConstants.FAILURE);
+			EngineStatusLogger.getInstance().createEngineStatusNode("Platform Engine Service not running due to Scheduler Exception "+e.getMessage(),PlatformServiceConstants.FAILURE);
 			log.error(e);
 		}catch (Exception e) {
-			EngineUsersModule.createEngineStatusNode("Platform Engine Service not running "+e.getMessage(),PlatformServiceConstants.FAILURE);
+			EngineStatusLogger.getInstance().createEngineStatusNode("Platform Engine Service not running "+e.getMessage(),PlatformServiceConstants.FAILURE);
 			log.error(e);
 		}
 	}
