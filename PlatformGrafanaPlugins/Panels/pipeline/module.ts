@@ -18,6 +18,11 @@ class PipelinePanelCtrl extends MetricsPanelCtrl {
   panelDefaults: any = {
     pipelinePanelMetaData : this.pipelinePanelMetaData
   };
+      labelIcons = {
+        'clear': 'public/plugins/pipeline/img/ic_clear_24px.svg',
+        'left': 'public/plugins/pipeline/img/ic_keyboard_arrow_left_24px.svg',
+        'right': 'public/plugins/pipeline/img/ic_keyboard_arrow_right_24px.svg'
+    };
   pipelineCloneData: any;
   screenWidth: number;
   toolsCompWidth: number;

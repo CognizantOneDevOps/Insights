@@ -16,7 +16,7 @@
 
 #
 # arfifacts
-# http://platform.cogdevops.com/insights_install/installationScripts/latest/RHEL/python/Python-2.7.11.tgz
+# https://platform.cogdevops.com/insights_install/installationScripts/latest/RHEL/python/Python-2.7.11.tgz
 # http://www.rpmseek.com/rpm-pl/gcc.html?hl=com&cx=0:-:0:0:0:0:0
 # https://pypi.org/project/pip/#files
 # https://pypi.org/project/pytz/#files

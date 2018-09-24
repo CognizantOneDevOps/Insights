@@ -17,8 +17,8 @@
 #
 # arfifacts
 # https://yum.postgresql.org/9.5/redhat/rhel-7-x86_64/
-# http://platform.cogdevops.com/insights_install/installationScripts/latest/RHEL/postgres/pg_hba.conf
-# http://platform.cogdevops.com/insights_install/installationScripts/latest/RHEL/postgres/dbscript.sql
+# https://platform.cogdevops.com/insights_install/installationScripts/latest/RHEL/postgres/pg_hba.conf
+# https://platform.cogdevops.com/insights_install/installationScripts/latest/RHEL/postgres/dbscript.sql
 
 
 echo "#################### Installing Postgres with configs , Databases and Roles ####################"

@@ -14,7 +14,7 @@
 # the License.
 #-------------------------------------------------------------------------------
 # arfifacts
-# http://platform.cogdevops.com/insights_install/installationScripts/latest/RHEL/java/jdk-8u151-linux-x64.tar.gz
+# https://platform.cogdevops.com/insights_install/installationScripts/latest/RHEL/java/jdk-8u151-linux-x64.tar.gz
 
 
 
