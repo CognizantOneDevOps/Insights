@@ -20,6 +20,7 @@ import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
+import com.cognizant.devops.platformengine.message.core.EngineStatusLogger;
 import com.cognizant.devops.platformengine.modules.users.EngineUsersModule;
 /**
  * 
@@ -37,7 +38,7 @@ public class EngineCorrelatorModule implements Job{
 			CorrelationExecutor correlationsExecutor = new CorrelationExecutor();
 			correlationsExecutor.execute();
 			isCorrelationExecutionInProgress = false;
-			EngineUsersModule.createEngineStatusNode("Correlation Execution Completed",PlatformServiceConstants.SUCCESS);
+			EngineStatusLogger.getInstance().createEngineStatusNode("Correlation Execution Completed",PlatformServiceConstants.SUCCESS);
 		}
 	}
 }

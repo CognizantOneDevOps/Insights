@@ -21,11 +21,8 @@ import org.apache.log4j.Logger;
 
 import com.cognizant.devops.platformcommons.dal.neo4j.Neo4jDBHandler;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import com.sun.jersey.api.client.Client;
-import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.ClientResponse;
-import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
 
 import sun.misc.BASE64Encoder;
@@ -48,7 +45,7 @@ public  class SystemStatus {
 			String cypherQuery = "CREATE (n" + queryLabel + " {props} ) return count(n)";
 	
 			response = graphDBHandler.executeQueryWithData(cypherQuery,dataList);
-			log.info("  GraphDB response created " + response);
+			//log.info("  GraphDB response created " + response);
 		
 		} catch (Exception e) {
 			// TODO Auto-generated catch block

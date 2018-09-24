@@ -44,6 +44,7 @@ import com.cognizant.devops.platformcommons.dal.neo4j.GraphResponse;
 import com.cognizant.devops.platformcommons.dal.neo4j.Neo4jDBHandler;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformdal.settingsconfig.SettingsConfigurationDAL;
+import com.cognizant.devops.platformengine.message.core.EngineStatusLogger;
 import com.cognizant.devops.platformengine.modules.users.EngineUsersModule;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
@@ -60,7 +61,7 @@ public class DataPurgingExecutor implements Job {
 	public void execute(JobExecutionContext context) throws JobExecutionException {
 		if (ApplicationConfigProvider.getInstance().isEnableOnlineBackup() && checkDataPurgingJobSchedule()) {
 			performDataPurging();
-			EngineUsersModule.createEngineStatusNode("Data Purginig completed",PlatformServiceConstants.SUCCESS);
+			EngineStatusLogger.getInstance().createEngineStatusNode("Data Purginig completed",PlatformServiceConstants.SUCCESS);
 		} 
 	}
 
@@ -100,7 +101,7 @@ public class DataPurgingExecutor implements Job {
 			deleteFlag = false;
 		} catch (IOException e) {
 			log.error("Exception occured while taking backup of data in DataPurgingExecutor Job: " + e);
-			EngineUsersModule.createEngineStatusNode(" Error occured while executing DataPurgingExecutor "+e.getMessage(),PlatformServiceConstants.FAILURE);
+			EngineStatusLogger.getInstance().createEngineStatusNode(" Error occured while executing DataPurgingExecutor "+e.getMessage(),PlatformServiceConstants.FAILURE);
 			deleteFlag = false;
 		}
 		//delete all nodes along with its relationships for which data backup is already taken
@@ -111,7 +112,7 @@ public class DataPurgingExecutor implements Job {
 
 			} catch (GraphDBException e) {
 				log.error("Exception occured while deleting DATA nodes of Neo4j database inside DataPurgingExecutor Job: " + e);
-				EngineUsersModule.createEngineStatusNode(" Error occured while executing DataPurgingExecutor "+e.getMessage(),PlatformServiceConstants.FAILURE);
+				EngineStatusLogger.getInstance().createEngineStatusNode(" Error occured while executing DataPurgingExecutor "+e.getMessage(),PlatformServiceConstants.FAILURE);
 			}
 		}	 
 
@@ -120,7 +121,7 @@ public class DataPurgingExecutor implements Job {
 			updateRunTimeIntoDatabase();
 		} catch (InsightsCustomException e) {
 			log.error("Exception occured while updating lastRunTime and nextRunTime in DataPurgingExecutor Job: " + e);
-			EngineUsersModule.createEngineStatusNode(" Error occured while executing DataPurgingExecutor "+e.getMessage(),PlatformServiceConstants.FAILURE);
+			EngineStatusLogger.getInstance().createEngineStatusNode(" Error occured while executing DataPurgingExecutor "+e.getMessage(),PlatformServiceConstants.FAILURE);
 		}
 	}
 	

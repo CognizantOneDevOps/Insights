@@ -16,9 +16,6 @@
  package com.cognizant.devops.platformservice.rest.serviceStatus;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.util.List;
-import java.util.Properties;
 
 import org.apache.log4j.Logger;
 import org.springframework.http.MediaType;
@@ -29,9 +26,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
+import com.cognizant.devops.platformcommons.constants.ServiceStatusConstants;
 import com.cognizant.devops.platformcommons.core.util.SystemStatus;
 import com.cognizant.devops.platformcommons.dal.elasticsearch.ElasticSearchDBHandler;
-import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBException;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphResponse;
 import com.cognizant.devops.platformcommons.dal.neo4j.Neo4jDBHandler;
 import com.cognizant.devops.platformdal.dal.PostgresMetadataHandler;
@@ -39,10 +36,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
-import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.WebResource;
-
-import sun.misc.BASE64Encoder;
 
 @RestController
 @RequestMapping("/ServicesHealthStatus")
