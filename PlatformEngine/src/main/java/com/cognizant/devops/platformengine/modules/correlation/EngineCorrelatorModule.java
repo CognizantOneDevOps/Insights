@@ -18,6 +18,10 @@ package com.cognizant.devops.platformengine.modules.correlation;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
+
+import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
+import com.cognizant.devops.platformengine.message.core.EngineStatusLogger;
+import com.cognizant.devops.platformengine.modules.users.EngineUsersModule;
 /**
  * 
  * @author Vishal Ganjare (vganjare)
@@ -34,6 +38,7 @@ public class EngineCorrelatorModule implements Job{
 			CorrelationExecutor correlationsExecutor = new CorrelationExecutor();
 			correlationsExecutor.execute();
 			isCorrelationExecutionInProgress = false;
+			EngineStatusLogger.getInstance().createEngineStatusNode("Correlation Execution Completed",PlatformServiceConstants.SUCCESS);
 		}
 	}
 }

@@ -16,10 +16,17 @@
 
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	
+	<parent>
+		<artifactId>PlatformParent</artifactId>
+		<groupId>com.cognizant.devops</groupId>
+		<version>4.4</version>
+	</parent>
+	
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.cognizant.devops</groupId>
 	<artifactId>PlatformInsights</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>4.4</version>
 	<name>PlatformInsights</name>
 	<description>PlatformInsights</description>
 	<dependencies>
@@ -47,7 +54,7 @@
 		<dependency>
 			<groupId>com.cognizant.devops</groupId>
 			<artifactId>PlatformCommons</artifactId>
-			<version>1.0.0.1-SNAPSHOT</version>
+			<version>4.4</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.spark</groupId>
@@ -93,6 +100,7 @@
 
 	</dependencies>
 	<build>
+		<!-- <finalName>PlatformInsights</finalName> -->
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -103,29 +111,78 @@
 					<target>1.8</target>
 				</configuration>
 			</plugin>
-			
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-assembly-plugin</artifactId>
+				<artifactId>maven-shade-plugin</artifactId>
+				<version>2.3</version>
 				<executions>
 					<execution>
 						<phase>package</phase>
 						<goals>
-							<goal>single</goal>
+							<goal>shade</goal>
 						</goals>
 						<configuration>
-							<archive>
-							<manifest>
-								<mainClass>com.cognizant.devops.platforminsights.app.PlatformInsightsSparkApplication</mainClass>
-							</manifest>
-							</archive>
-							<descriptorRefs>
-								<descriptorRef>jar-with-dependencies</descriptorRef>
-							</descriptorRefs>
+							<transformers>
+								<transformer
+									implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+									<manifestEntries>
+										<Main-Class>com.cognizant.devops.platforminsights.app.PlatformInsightsSparkApplication</Main-Class>
+									</manifestEntries>
+								</transformer>
+							</transformers>
+							<!-- <finalName>${project.name}</finalName> -->
+							<filters>
+								<filter>
+									<artifact>*:*</artifact>
+									<excludes>
+										<exclude>META-INF/*.SF</exclude>
+										<exclude>META-INF/*.DSA</exclude>
+										<exclude>META-INF/*.RSA</exclude>
+									</excludes>
+								</filter>
+							</filters>
 						</configuration>
 					</execution>
 				</executions>
-			</plugin>			
+			</plugin>
+			<plugin>
+				<artifactId>maven-resources-plugin</artifactId>
+				<version>2.4.3</version>
+				<executions>
+					<execution>
+						<id>copy-resources</id>
+
+						<phase>package</phase>
+						<goals>
+							<goal>copy-resources</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>${project.basedir}/target</outputDirectory>
+							<resources>
+								<resource>
+									<directory>/target/</directory>
+									<includes>
+										<include>${project.name}.jar</include>
+									</includes>
+								</resource>
+							</resources>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<version>2.3.2</version>
+				<configuration>
+					<archive>
+						<manifest>
+							<addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+							<addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
+						</manifest>
+					</archive>
+				</configuration>
+			</plugin>
 		</plugins>
 		
 	  <resources>
@@ -140,40 +197,9 @@
 	</build>
 	<properties>
 		<spring.version>4.2.6.RELEASE</spring.version>
+		<project.name>PlatformInsights</project.name>
 	</properties>
 	 <profiles>
-        <profile>
-                <id>NexusUpload</id>
-                <activation>
-                  <activeByDefault>false</activeByDefault>
-                </activation>
-                <distributionManagement>
-                   <snapshotRepository>
-                          <id>nexus</id>
-                          <url>http://insightsplatformnexusrepo.cogdevops.com:8001/nexus/content/repositories/buildonInsights</url>
-                   </snapshotRepository>
-                </distributionManagement>
-
-                <build>
-                 <plugins>
-                        <plugin>
-                        <artifactId>maven-deploy-plugin</artifactId>
-                   <version>2.8.1</version>
-                   <executions>
-                          <execution>
-                                 <id>default-deploy</id>
-                                 <phase>deploy</phase>
-                                 <goals>
-                                        <goal>deploy</goal>
-                                 </goals>
-                          </execution>
-                   </executions>
-
-                </plugin>
-                </plugins>
-                </build>
-        </profile>
-		
 		<profile>
 		<id>RunCobertura</id>
 		<activation>

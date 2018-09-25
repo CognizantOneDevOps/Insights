@@ -54,7 +54,7 @@ public final class InsightsConfiguration {
 	public static void doInsightsConfiguration() {
 		// updateLayouts();
 		updateDatasources();
-		updateDashboards();
+		//updateDashboards();
 	}
 
 	private static void updateLayouts() {

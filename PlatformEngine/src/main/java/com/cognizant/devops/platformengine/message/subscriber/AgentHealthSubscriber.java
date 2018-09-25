@@ -25,6 +25,8 @@ import org.apache.logging.log4j.Logger;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBException;
 import com.cognizant.devops.platformcommons.dal.neo4j.Neo4jDBHandler;
 import com.cognizant.devops.platformcommons.constants.MessageConstants;
+import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
+import com.cognizant.devops.platformengine.message.core.EngineStatusLogger;
 import com.cognizant.devops.platformengine.message.factory.EngineSubscriberResponseHandler;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -44,7 +46,7 @@ public class AgentHealthSubscriber extends EngineSubscriberResponseHandler{
 		Neo4jDBHandler dbHandler = new Neo4jDBHandler();
 		String message = new String(body, MessageConstants.MESSAGE_ENCODING);
 		String routingKey = envelope.getRoutingKey();
-		//System.out.println(consumerTag+" [x] Received '" + envelope.getRoutingKey() + "':'" + message + "'");
+		log.debug(consumerTag+" [x] Received '" + envelope.getRoutingKey() + "':'" + message + "'");
 		List<String> labels = Arrays.asList(routingKey.split(MessageConstants.ROUTING_KEY_SEPERATOR));
 		List<JsonObject> dataList = new ArrayList<JsonObject>();
 		JsonElement json = new JsonParser().parse(message);
@@ -73,6 +75,7 @@ public class AgentHealthSubscriber extends EngineSubscriberResponseHandler{
 				if(graphResponse.get("response").getAsJsonObject().get("errors").getAsJsonArray().size() > 0){
 					log.error("Unable to insert health nodes for routing key: "+routingKey+", error occured: "+graphResponse);
 					log.error(dataList);
+					EngineStatusLogger.getInstance().createEngineStatusNode("Unable to insert health nodes for routing key: "+routingKey,PlatformServiceConstants.FAILURE);
 				}
 				getChannel().basicAck(envelope.getDeliveryTag(), false);
 			} catch (GraphDBException e) {

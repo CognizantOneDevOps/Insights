@@ -69,7 +69,7 @@ module ISightApp {
     showThrobber: boolean;
     showcontent: boolean;
     checkResponseData: boolean
-    showFieldVal = ['id', 'type', 'uuid', 'status', 'execId', 'message'];
+    showFieldVal = ['type', 'uuid', 'status', 'execId', 'message','inSightsTimeX'];
     headerArrayDisplay = [];
     hide(): void {
       this.$mdDialog.hide();

@@ -80,18 +80,27 @@
                         <span>IP Address:Port</span>
                     </th>
                     <th flex="50" class="tableHeader">
+                        <span>Version</span>
+                    </th> 
+                    <th flex="50" class="tableHeader">
                         <span>Status</span>
-                    </th>                    
+                    </th>
+                     <th flex="20" style="visibility:hidden;" class="tableHeader">
+                        <span>Details</span>
+                    </th>
+                  
                 </tr>
             </thead>
             <tbody>			 				
                 <tr ng-repeat="(key, val) in agentController.serverStatus"  ng-if="val.type == 'Database'" layout="row" layout-align="start none" ng-if="agentController.showcontent">                   
                     <td flex="50" class="tableContentStyle">{{key}}</td>
 					<td flex="50" class="tableContentStyle">{{val.endPoint}}</td>
+                    <td flex="50" class="tableContentStyle">{{val.version}}</td>
                     <td flex="50" class="tableContentStyle">
 					 <md-icon ng-if="val.status ==='success'" md-svg-src="dist/icons/svg/ic_check_circle_24px.svg" ng-style="{color: '#4ca64c', height: '25px', width: '25px'}"></md-icon>
                         <md-icon ng-if="val.status ==='failure'" md-svg-src="dist/icons/svg/ic_report_problem_24px.svg" ng-style="{color: '#ff4c4c', height: '25px', width: '25px'}"></md-icon>
-					</td>                    
+					</td>  
+                    <td flex="20" class="tableContentStyle">                  
                 </tr>
 				<tr layout="row" layout-align="start none">
 					<td flex="150" class="tableContentStyle" ng-if="!agentController.showcontent">
@@ -115,27 +124,38 @@
                         <span>IP Address:Port</span>
                     </th>
                     <th flex="50" class="tableHeader">
+                        <span>Version</span>
+                    </th> 
+                    <th flex="50" class="tableHeader">
                         <span>Status</span>
-                    </th>                    
+                    </th>
+                    <th flex="20" class="tableHeader">
+                        <span>Details</span>
+                    </th>                  
                 </tr>
             </thead>
             <tbody>			 				
                 <tr ng-repeat="(key, val) in agentController.serverStatus"  ng-if="val.type == 'Service'" layout="row" layout-align="start none" ng-if="agentController.showcontent">                   
                     <td flex="50" class="tableContentStyle">{{key}}</td>
 					<td flex="50" class="tableContentStyle">{{val.endPoint}}</td>
+                    <td flex="50" class="tableContentStyle">{{val.version}}</td>
                     <td flex="50" class="tableContentStyle">
 					 <md-icon ng-if="val.status ==='success'" md-svg-src="dist/icons/svg/ic_check_circle_24px.svg" ng-style="{color: '#4ca64c', height: '25px', width: '25px'}"></md-icon>
                         <md-icon ng-if="val.status ==='failure'" md-svg-src="dist/icons/svg/ic_report_problem_24px.svg" ng-style="{color: '#ff4c4c', height: '25px', width: '25px'}"></md-icon>
-					</td>                    
+					</td> 
+                    <td flex="20" class="tableContentStyle" style="font-family: proxima_novasemibold;font-size: 16px;color: #00728f !important;">
+                        <div class="icon-textDecoration" style="cursor: pointer" ng-click="agentController.showTabDialog($event,'-',key)">Show Details</div>
+                    </td>                   
                 </tr>
 				<tr layout="row" layout-align="start none">
 					<td flex="50" class="tableContentStyle" ng-if="!agentController.showcontent">	<md-icon md-svg-src="dist/icons/svg/ic_report_problem_24px.svg" ng-style="{color: '#ff4c4c', height: '25px', width: '25px'}"></md-icon> Service Failure. Please try again.</td>
 				</tr>
-				<tr layout="row" layout-align="center center" ng-show="agentController.showThrobber">
+				<tr layout="row" layout-align="center center" ng-show="agentController.showThrobber"> 
 					<td  style="background-color: #ffffff; margin:15px;">
 					<md-progress-circular style="display: inline;" md-diameter="30" md-mode="indeterminate"></md-progress-circular>
 					</td>
 				</tr>
+                
             </tbody>			
         </table>		
     </div>		
