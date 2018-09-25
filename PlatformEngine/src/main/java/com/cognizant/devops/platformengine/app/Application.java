@@ -35,7 +35,6 @@ import com.cognizant.devops.platformengine.modules.correlation.EngineCorrelatorM
 import com.cognizant.devops.platformengine.modules.datapurging.DataPurgingExecutor;
 import com.cognizant.devops.platformengine.modules.mapper.ProjectMapperModule;
 import com.cognizant.devops.platformengine.modules.offlinedataprocessing.OfflineDataProcessingExecutor;
-import com.cognizant.devops.platformengine.modules.users.EngineUsersModule;
 
 /**
  * Engine execution will start from Application. 1. Load the iSight config 2.

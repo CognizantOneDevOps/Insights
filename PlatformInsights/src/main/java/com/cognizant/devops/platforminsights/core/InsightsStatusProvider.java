@@ -15,6 +15,9 @@
  ******************************************************************************/
 package com.cognizant.devops.platforminsights.core;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.apache.log4j.Logger;
 
 import com.cognizant.devops.platformcommons.core.util.ComponentHealthLogger;
@@ -38,7 +41,8 @@ public class InsightsStatusProvider extends ComponentHealthLogger {
 			String version = "";
 			version = InsightsStatusProvider.class.getPackage().getImplementationVersion();
 			log.debug( " Insights version " +  version    );
-			createComponentStatusNode("HEALTH:INSIGHTS",version,message,status);
+			Map<String,String> extraParameter= new HashMap<String,String>(0);
+			createComponentStatusNode("HEALTH:INSIGHTS",version,message,status,extraParameter);
 			return Boolean.TRUE;
 	}
 }

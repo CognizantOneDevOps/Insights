@@ -164,7 +164,6 @@ public class AgentDataSubscriber extends EngineSubscriberResponseHandler{
 				getChannel().basicAck(envelope.getDeliveryTag(), false);
 			} catch (GraphDBException e) {
 				log.error("GraphDBException occured.", e);
-				EngineStatusLogger.getInstance().createEngineStatusNode("Unable to insert data nodes for routing key: "+routingKey+" "+e.getMessage(),PlatformServiceConstants.FAILURE);
 			}
 		}
 	}
