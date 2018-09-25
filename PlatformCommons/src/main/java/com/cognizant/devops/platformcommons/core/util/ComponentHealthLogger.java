@@ -20,6 +20,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
 import com.google.gson.JsonObject;
@@ -29,7 +31,7 @@ public abstract class ComponentHealthLogger {
 	public final  SimpleDateFormat  dtf = new SimpleDateFormat(DATE_TIME_FORMAT);
 	
 	
-	public boolean createComponentStatusNode(String label,String version,String message,String status){
+	public boolean createComponentStatusNode(String label,String version,String message,String status,Map<String,String> parameter){
 		List<JsonObject> dataList = new ArrayList<JsonObject>();
 		List<String> labels = new ArrayList<String>();
 		/*labels.add("HEALTH");
@@ -45,6 +47,9 @@ public abstract class ComponentHealthLogger {
 		jsonObj.addProperty("inSightsTime",System.currentTimeMillis());
 		jsonObj.addProperty("inSightsTimeX", dtf.format(new Date()));
 		jsonObj.addProperty(PlatformServiceConstants.STATUS,status);
+		for (Map.Entry<String,String> entry: parameter.entrySet()){
+			jsonObj.addProperty(entry.getKey(), entry.getValue());
+		}
 		dataList.add(jsonObj);
 		JsonObject response=SystemStatus.addSystemInformationInNeo4j(version, dataList, labels);
 		if (response!=null) {
