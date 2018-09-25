@@ -50,7 +50,7 @@ class BaseAgent(object):
         self.loadCommunicationFacade()
         self.initializeMQ()
         #self.configUpdateSubscriber()
-        self.subscriberForAgentControl()
+        #self.subscriberForAgentControl()
         self.setupLocalCache()
         self.extractToolName()
         self.scheduleExtensions()
