@@ -33,11 +33,8 @@ class DynatraceAgent(BaseAgent):
             self.apiToken = self.config.get("apiToken", None)
             startFrom = self.config.get("startFrom", None)
             startFrom = parser.parse(startFrom)
-            responseTemplate = self.getResponseTemplate()
-            hostURL = responseTemplate.get('hostInfo').get('hostListURL')
-            gethostUrlWithToken = hostURL+"?Api-Token="+self.apiToken
-            repos = self.getResponse(gethostUrlWithToken+'&per_page=100&sort=created&page=1', 'GET', None, None, None)
-            print(repos)
+            self.responseTemplate = self.getResponseTemplate()
+            self.getHostsDetails()
         except Exception as e:
             logging.error(e)
             
@@ -46,5 +43,18 @@ class DynatraceAgent(BaseAgent):
         if tracking_data!=[]:
             self.publishToolsData(tracking_data)
         
+    def getHostsDetails(self):
+        hostInfo = self.responseTemplate.get('hostInfo')
+        print(hostInfo)
+        hostURL = hostInfo.get('hostListURL')
+        gethostUrlWithToken = hostURL+"?Api-Token="+self.apiToken
+        serverHosts = self.getResponse(gethostUrlWithToken+'&per_page=100&sort=created&page=1', 'GET', None, None, None)
+        print(serverHosts)
+        fieldToPull = hostInfo.get('relevantHostFields')
+        data = []
+        for host in serverHosts:
+            data += self.parseResponse(fieldToPull, host)
+        
+        print(data)
 if __name__ == "__main__":
     DynatraceAgent()
