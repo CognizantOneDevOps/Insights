@@ -36,6 +36,7 @@ import org.quartz.JobExecutionException;
 
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.constants.ConfigOptions;
+import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
 import com.cognizant.devops.platformcommons.core.util.DataPurgingUtils;
 import com.cognizant.devops.platformcommons.core.util.InsightsUtils;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBException;
@@ -43,6 +44,8 @@ import com.cognizant.devops.platformcommons.dal.neo4j.GraphResponse;
 import com.cognizant.devops.platformcommons.dal.neo4j.Neo4jDBHandler;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformdal.settingsconfig.SettingsConfigurationDAL;
+import com.cognizant.devops.platformengine.message.core.EngineStatusLogger;
+import com.cognizant.devops.platformengine.modules.users.EngineUsersModule;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -57,7 +60,8 @@ public class DataPurgingExecutor implements Job {
 	
 	public void execute(JobExecutionContext context) throws JobExecutionException {
 		if (ApplicationConfigProvider.getInstance().isEnableOnlineBackup() && checkDataPurgingJobSchedule()) {
-			performDataPurging();		
+			performDataPurging();
+			EngineStatusLogger.getInstance().createEngineStatusNode("Data Purginig completed",PlatformServiceConstants.SUCCESS);
 		} 
 	}
 
@@ -97,6 +101,7 @@ public class DataPurgingExecutor implements Job {
 			deleteFlag = false;
 		} catch (IOException e) {
 			log.error("Exception occured while taking backup of data in DataPurgingExecutor Job: " + e);
+			EngineStatusLogger.getInstance().createEngineStatusNode(" Error occured while executing DataPurgingExecutor "+e.getMessage(),PlatformServiceConstants.FAILURE);
 			deleteFlag = false;
 		}
 		//delete all nodes along with its relationships for which data backup is already taken
@@ -107,6 +112,7 @@ public class DataPurgingExecutor implements Job {
 
 			} catch (GraphDBException e) {
 				log.error("Exception occured while deleting DATA nodes of Neo4j database inside DataPurgingExecutor Job: " + e);
+				EngineStatusLogger.getInstance().createEngineStatusNode(" Error occured while executing DataPurgingExecutor "+e.getMessage(),PlatformServiceConstants.FAILURE);
 			}
 		}	 
 
@@ -115,6 +121,7 @@ public class DataPurgingExecutor implements Job {
 			updateRunTimeIntoDatabase();
 		} catch (InsightsCustomException e) {
 			log.error("Exception occured while updating lastRunTime and nextRunTime in DataPurgingExecutor Job: " + e);
+			EngineStatusLogger.getInstance().createEngineStatusNode(" Error occured while executing DataPurgingExecutor "+e.getMessage(),PlatformServiceConstants.FAILURE);
 		}
 	}
 	
