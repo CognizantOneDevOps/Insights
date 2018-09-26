@@ -53,8 +53,21 @@ class DynatraceAgent(BaseAgent):
         fieldToPull = hostInfo.get('relevantHostFields')
         data = []
         for host in serverHosts:
-            data += self.parseResponse(fieldToPull, host)
+            hostData = self.parseResponse(fieldToPull, host)
+            '''
+                Get host log details based on entityid
+            '''
+            hostLogDetailsURL = hostURL + '/' + hostData.get('entityId') + '/logs?Api-Token='+self.apiToken
+            rawHostLogDetails = self.getResponse(hostLogDetailsURL+'&per_page=100&sort=created&page=1', 'GET', None, None, None)
+            hostDetails = self.parseResponse(fieldToPull, rawHostLogDetails)
+            '''
+                Merge host and host details
+            '''
+            hostDetails = hostDetails.update(hostData)
+            data += hostDetails
         
         print(data)
+        self.publishToolsData(data)
+        self.updateTrackingJson(self.tracking)
 if __name__ == "__main__":
     DynatraceAgent()
