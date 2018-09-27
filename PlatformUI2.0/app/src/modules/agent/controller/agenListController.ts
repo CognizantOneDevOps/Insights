@@ -59,7 +59,6 @@ module ISightApp {
 
 			self.agentService.agentStartStop(actDetails.agentid, actType)
 				.then(function (data) {
-					console.log(data);
 					if (actType == "START") {
 						if (data.status == "success") {
 							self.showConfirmMessage = "started";
@@ -142,7 +141,6 @@ module ISightApp {
 
 			setTimeout(function () {
 				self.showConfirmMessage = "";
-				document.getElementById('confrmMsg').innerHTML = "";
 			}, 5000);
 
 		}
