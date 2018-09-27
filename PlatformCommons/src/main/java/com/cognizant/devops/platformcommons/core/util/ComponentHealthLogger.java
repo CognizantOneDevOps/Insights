@@ -21,7 +21,6 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
 import com.google.gson.JsonObject;
@@ -32,26 +31,31 @@ public abstract class ComponentHealthLogger {
 	
 	
 	public boolean createComponentStatusNode(String label,String version,String message,String status,Map<String,String> parameter){
-		List<JsonObject> dataList = new ArrayList<JsonObject>();
-		List<String> labels = new ArrayList<String>();
-		/*labels.add("HEALTH");
-		if(serviceType.equalsIgnoreCase(ServiceStatusConstants.PlatformEngine)) {
-			labels.add("ENGINE");
-		}else if(serviceType.equalsIgnoreCase(ServiceStatusConstants.InsightsInference)){
-			labels.add("INSIGHTS");
-		}*/
-		labels.addAll(Arrays.asList(label.split(":")));
-		JsonObject jsonObj = new JsonObject();
-		jsonObj.addProperty("version", version==null?"-":version);
-		jsonObj.addProperty("message", message);
-		jsonObj.addProperty("inSightsTime",System.currentTimeMillis());
-		jsonObj.addProperty("inSightsTimeX", dtf.format(new Date()));
-		jsonObj.addProperty(PlatformServiceConstants.STATUS,status);
-		for (Map.Entry<String,String> entry: parameter.entrySet()){
-			jsonObj.addProperty(entry.getKey(), entry.getValue());
+		JsonObject response = null;
+		try {
+			List<JsonObject> dataList = new ArrayList<JsonObject>();
+			List<String> labels = new ArrayList<String>();
+			/*labels.add("HEALTH");
+			if(serviceType.equalsIgnoreCase(ServiceStatusConstants.PlatformEngine)) {
+				labels.add("ENGINE");
+			}else if(serviceType.equalsIgnoreCase(ServiceStatusConstants.InsightsInference)){
+				labels.add("INSIGHTS");
+			}*/
+			labels.addAll(Arrays.asList(label.split(":")));
+			JsonObject jsonObj = new JsonObject();
+			jsonObj.addProperty("version", version==null?"-":version);
+			jsonObj.addProperty("message", message);
+			jsonObj.addProperty("inSightsTime",System.currentTimeMillis());
+			jsonObj.addProperty("inSightsTimeX", dtf.format(new Date()));
+			jsonObj.addProperty(PlatformServiceConstants.STATUS,status);
+			for (Map.Entry<String,String> entry: parameter.entrySet()){
+				jsonObj.addProperty(entry.getKey(), entry.getValue());
+			}
+			dataList.add(jsonObj);
+			response = SystemStatus.addSystemInformationInNeo4j(version, dataList, labels);
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
-		dataList.add(jsonObj);
-		JsonObject response=SystemStatus.addSystemInformationInNeo4j(version, dataList, labels);
 		if (response!=null) {
 		 return Boolean.TRUE;
 		}else {
