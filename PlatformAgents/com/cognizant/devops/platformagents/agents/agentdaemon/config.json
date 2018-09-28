@@ -2,10 +2,10 @@
   "baseExtractionPath":"extractionpath",
   "insightsTimeZone": "Asia/Kolkata",
   "loggingSetting": {
-    "logLevel": "WARN"
+    "logLevel": "INFO"
   },
   "mqConfig": {
-    "host": "127.0.0.1",
+    "host": "localhost",
     "password": "iSight",
     "user": "iSight",
     "exchange": "iSight",
@@ -15,7 +15,7 @@
     "data": "DAEMONAGENT.AGENTDAEMON.DATA",
     "health": "DAEMONAGENT.AGENTDAEMON.HEALTH"
   },
-  "isDebugAllowed": false,
+  "isDebugAllowed": true,
   "subscribe": {
     "agentPkgQueue": "INSIGHTS.AGENTS.PACKAGE"
   },
