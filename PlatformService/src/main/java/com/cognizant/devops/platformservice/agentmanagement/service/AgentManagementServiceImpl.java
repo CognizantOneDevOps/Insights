@@ -31,6 +31,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 import java.util.concurrent.TimeoutException;
 import java.util.stream.Stream;
 
@@ -228,7 +229,7 @@ public class AgentManagementServiceImpl implements AgentManagementService {
 
 	@Override
 	public Map<String, ArrayList<String>> getSystemAvailableAgentList() throws InsightsCustomException {
-		Map<String, ArrayList<String>> agentDetails = new HashMap<>();
+		Map<String, ArrayList<String>> agentDetails = new TreeMap<>();
 
 		if (!ApplicationConfigProvider.getInstance().getAgentDetails().isOnlineRegistration()) {
 			agentDetails = getOfflineSystemAvailableAgentList();
