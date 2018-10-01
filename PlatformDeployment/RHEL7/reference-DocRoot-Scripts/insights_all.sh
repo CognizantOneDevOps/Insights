@@ -24,7 +24,7 @@ wget https://platform.cogdevops.com/insights_install/installationScripts/latest/
 echo "Install Postgres"
 wget https://platform.cogdevops.com/insights_install/installationScripts/latest/RHEL/scripts/insights_postgres.sh -O insights_postgres.sh && sh insights_postgres.sh
 echo "Install Grafana"
-wget https://platform.cogdevops.com/insights_install/installationScripts/latest/RHEL/scripts/insights_grafana.sh -O insights_grafana.sh && sh insights_grafana.sh
+wget https://platform.cogdevops.com/insights_install/installationScripts/latest/RHEL/scripts/insights_grafana5.sh -O insights_grafana5.sh && sh insights_grafana5.sh
 echo "Install Python 2.7.11 with required libraries needed for Insights"
 wget https://platform.cogdevops.com/insights_install/installationScripts/latest/RHEL/scripts/insights_python.sh -O insights_python.sh && sh insights_python.sh
 echo "Install Erlang and RabbitMQ"
