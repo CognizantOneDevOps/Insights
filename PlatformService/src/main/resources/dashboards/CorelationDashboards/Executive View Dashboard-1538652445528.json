@@ -11,30 +11,91 @@
   ],
   "__requires": [
     {
-      "type": "grafana",
-      "id": "grafana",
-      "name": "Grafana",
-      "version": "4.6.2"
-    },
-    {
       "type": "panel",
       "id": "insightscharts",
       "name": "Insights Charts",
       "version": ""
     },
     {
-      "type": "datasource",
-      "id": "neo4j",
-      "name": "Neo4j",
-      "version": "1.0.0"
-    },
-    {
       "type": "panel",
       "id": "singlestatneo",
       "name": "SingleStat-Neo4j",
       "version": ""
+    },
+    {
+      "type": "grafana",
+      "id": "grafana",
+      "name": "Grafana",
+      "version": "4.0.2"
+    },
+    {
+      "type": "datasource",
+      "id": "neo4j",
+      "name": "Neo4j",
+      "version": "1.0.0"
     }
   ],
+  "id": null,
+  "title": "Executive View Dashboard",
+  "tags": [],
+  "style": "dark",
+  "timezone": "browser",
+  "editable": true,
+  "sharedCrosshair": false,
+  "hideControls": false,
+  "time": {
+    "from": "now-6M",
+    "to": "now"
+  },
+  "timepicker": {
+    "refresh_intervals": [
+      "5s",
+      "10s",
+      "30s",
+      "1m",
+      "5m",
+      "15m",
+      "30m",
+      "1h",
+      "2h",
+      "1d"
+    ],
+    "time_options": [
+      "5m",
+      "15m",
+      "1h",
+      "6h",
+      "12h",
+      "24h",
+      "2d",
+      "7d",
+      "30d"
+    ]
+  },
+  "templating": {
+    "list": [
+      {
+        "allValue": null,
+        "current": {},
+        "datasource": "${DS_NEO4J_DS}",
+        "hide": 0,
+        "includeAll": true,
+        "label": null,
+        "multi": true,
+        "name": "SprintName",
+        "options": [],
+        "query": "Match (n:JIRA:DATA:SPRINT) return distinct n.sprintName as SprintName order by SprintName",
+        "refresh": 1,
+        "regex": "",
+        "sort": 1,
+        "tagValuesQuery": "",
+        "tags": [],
+        "tagsQuery": "",
+        "type": "query",
+        "useTags": false
+      }
+    ]
+  },
   "annotations": {
     "list": [
       {
@@ -48,16 +109,13 @@
       }
     ]
   },
-  "editable": true,
-  "gnetId": null,
-  "graphTooltip": 0,
-  "hideControls": false,
-  "id": null,
+  "schemaVersion": 13,
+  "version": 66,
   "links": [],
+  "gnetId": null,
   "rows": [
     {
-      "collapse": false,
-      "height": 279,
+      "title": "Dashboard Row",
       "panels": [
         {
           "datasource": "${DS_NEO4J_DS}",
@@ -127,7 +185,7 @@
             {
               "rawQuery": true,
               "refId": "A",
-              "target": "MATCH p=(b:PIVOTALTRACKER:DATA) -[r1:FROM_JIRA_TO_GIT]->(b1:GIT_1:DATA)\n RETURN distinct b.key as JIRAKey ,count( b1.commitId) as Commits"
+              "target": "MATCH p=(b:JIRA:DATA) -[r1:FROM_JIRA_TO_GIT]->(b1:GIT:DATA)\n RETURN distinct b.key as JIRAKey ,count( b1.commitId) as Commits"
             }
           ],
           "title": "In Progress JIRA Keys Vs Number of Commits",
@@ -204,23 +262,23 @@
             {
               "rawQuery": true,
               "refId": "A",
-              "target": "MATCH p=(b:PIVOTALTRACKER:DATA) -[r1:FROM_JIRA_TO_GIT]->(b1:GIT_1:DATA)\nRETURN b1.gitAuthorName as Name, split(b1.gitCommiTime, \"T\")[0] as Date, count(b1.commitId) as Commits order by Date desc limit 20"
+              "target": "MATCH p=(b:JIRA:DATA) -[r1:FROM_JIRA_TO_GIT]->(b1:GIT:DATA)\nRETURN b1.gitAuthorName as Name, split(b1.gitCommiTime, \"T\")[0] as Date, count(b1.commitId) as Commits order by Date desc limit 20"
             }
           ],
           "title": "Commits per day",
           "type": "insightscharts"
         }
       ],
-      "repeat": null,
-      "repeatIteration": null,
-      "repeatRowId": null,
       "showTitle": false,
-      "title": "Dashboard Row",
-      "titleSize": "h6"
+      "titleSize": "h6",
+      "height": 279,
+      "repeat": null,
+      "repeatRowId": null,
+      "repeatIteration": null,
+      "collapse": false
     },
     {
-      "collapse": false,
-      "height": -18941,
+      "title": "Dashboard Row",
       "panels": [
         {
           "datasource": "${DS_NEO4J_DS}",
@@ -301,7 +359,7 @@
             {
               "rawQuery": true,
               "refId": "A",
-              "target": "MATCH p=(b:PIVOTALTRACKER:DATA) -[r1:FROM_JIRA_TO_GIT]->(b1:GIT_1:DATA)-[r2:FROM_GIT_TO_JENKINS]->(c1:JENKINS:DATA)\nwhere exists(b1.commitId) with distinct c1.buildUrl as Builds,  b1.commitId as Commits, b.key as JiraKeys,split(c1.inSightsTimeX, \"T\")[0] as Date return JiraKeys, Date,Commits,  Builds order by Date desc limit 20"
+              "target": "MATCH p=(b:JIRA:DATA) -[r1:FROM_JIRA_TO_GIT]->(b1:GIT:DATA)-[r2:FROM_GIT_TO_JENKINS]->(c1:JENKINS:DATA)\nwhere exists(b1.commitId) with distinct c1.buildUrl as Builds,  b1.commitId as Commits, b.key as JiraKeys,split(c1.inSightsTimeX, \"T\")[0] as Date return JiraKeys, Date,Commits,  Builds order by Date desc limit 20"
             }
           ],
           "title": "Commits Vs CI Jobs per Jira Key",
@@ -321,20 +379,13 @@
                 "maxValue": null,
                 "minValue": null,
                 "useFormatFromData": true,
-                "viewWindow": {
-                  "max": null,
-                  "min": null
-                }
+                "viewWindow": null,
+                "viewWindowMode": null
               },
               "height": 268,
+              "isStacked": false,
               "legacyScatterChartLabels": true,
               "legend": "right",
-              "series": [
-                {
-                  "type": "bars"
-                }
-              ],
-              "type": "line",
               "vAxes": [
                 {
                   "maxValue": null,
@@ -357,7 +408,7 @@
               ],
               "width": "100%"
             },
-            "chartType": "ComboChart",
+            "chartType": "ColumnChart",
             "insightsChartEditorModel": {
               "targets": [
                 {
@@ -382,23 +433,23 @@
             {
               "rawQuery": true,
               "refId": "A",
-              "target": "MATCH p=(b:PIVOTALTRACKER:DATA) -[r1:FROM_JIRA_TO_GIT]->(b1:GIT_1:DATA)\n RETURN  split(b1.gitCommiTime, \"T\")[0] as Date, count(distinct b1.commitId) as Commits order by Date desc"
+              "target": "MATCH p=(b:JIRA:DATA) -[r1:FROM_JIRA_TO_GIT]->(b1:GIT:DATA)\n RETURN  split(b1.gitCommiTime, \"T\")[0] as Date, count(distinct b1.commitId) as Commits order by Date desc"
             }
           ],
           "title": "Commits Trend",
           "type": "insightscharts"
         }
       ],
-      "repeat": null,
-      "repeatIteration": null,
-      "repeatRowId": null,
       "showTitle": false,
-      "title": "Dashboard Row",
-      "titleSize": "h6"
+      "titleSize": "h6",
+      "height": -18941,
+      "repeat": null,
+      "repeatRowId": null,
+      "repeatIteration": null,
+      "collapse": false
     },
     {
-      "collapse": false,
-      "height": 232,
+      "title": "Dashboard Row",
       "panels": [
         {
           "datasource": "${DS_NEO4J_DS}",
@@ -473,7 +524,7 @@
             {
               "rawQuery": true,
               "refId": "A",
-              "target": "MATCH p=(b:PIVOTALTRACKER:DATA) -[r1:FROM_JIRA_TO_GIT]->(b1:GIT_1:DATA)-[r2:FROM_GIT_TO_JENKINS]->(c1:JENKINS:DATA)   with distinct c1.jobName as ProjectName,c1.buildNumber as BuildNumber ,c1.result as Status , c1.inSightsTime as time,(((timestamp()/1000)-c1.inSightsTime)/60) as timedifference return  ProjectName,BuildNumber,Status ,ceil( timedifference) as TimeElapsedinMinutes order by time desc limit 5"
+              "target": "MATCH p=(b:JIRA:DATA) -[r1:FROM_JIRA_TO_GIT]->(b1:GIT:DATA)-[r2:FROM_GIT_TO_JENKINS]->(c1:JENKINS:DATA)   with distinct c1.jobName as ProjectName,c1.buildNumber as BuildNumber ,c1.result as Status , c1.inSightsTime as time,(((timestamp()/1000)-c1.inSightsTime)/60) as timedifference return  ProjectName,BuildNumber,Status ,ceil( timedifference) as TimeElapsedinMinutes order by time desc limit 5"
             }
           ],
           "title": "Latest Build status for the Sprint selected",
@@ -546,7 +597,7 @@
             {
               "rawQuery": true,
               "refId": "A",
-              "target": "MATCH p=(b:PIVOTALTRACKER:DATA) -[r1:FROM_JIRA_TO_GIT]->(b1:GIT_1:DATA)-[r2:FROM_GIT_TO_JENKINS]->(c1:JENKINS:DATA)\nreturn split(c1.inSightsTimeX, \"T\")[0] as Time,  ceil(avg(toInt(c1.duration))) / (60 * 1000) as BuildDurationinMins"
+              "target": "MATCH p=(b:JIRA:DATA) -[r1:FROM_JIRA_TO_GIT]->(b1:GIT:DATA)-[r2:FROM_GIT_TO_JENKINS]->(c1:JENKINS:DATA)\nreturn split(c1.inSightsTimeX, \"T\")[0] as Time,  ceil(avg(toInt(c1.duration))) / (60 * 1000) as BuildDurationinMins"
             }
           ],
           "title": "Average Build duration for the sprint selected",
@@ -625,7 +676,7 @@
             {
               "rawQuery": true,
               "refId": "A",
-              "target": "MATCH p=(b:PIVOTALTRACKER:DATA) -[r1:FROM_JIRA_TO_GIT]->(b1:GIT_1:DATA)-[r2:FROM_GIT_TO_JENKINS]->(c1:JENKINS:DATA)\n with count(distinct c1.buildUrl) as Total,\nCASE WHEN c1.inSightsTime >=(timestamp()-86400000) /1000 and c1.inSightsTime <= (timestamp()) THEN 1 ELSE 0 END as OneDay,\nCASE WHEN c1.inSightsTime >=(timestamp()-604800000) / 1000 and c1.inSightsTime <= (timestamp()) THEN 1 ELSE 0 END as SevenDays,\nCASE WHEN c1.inSightsTime >=(timestamp()-1209600000) /1000 and c1.inSightsTime <= (timestamp()) THEN 1 ELSE 0 END as FourteenDays\nwith sum(OneDay) as Last1Day, sum(SevenDays) as Last7Days,sum(FourteenDays) as Last14Days,Total\nreturn Total,Last1Day,Last7Days,Last14Days"
+              "target": "MATCH p=(b:JIRA:DATA) -[r1:FROM_JIRA_TO_GIT]->(b1:GIT:DATA)-[r2:FROM_GIT_TO_JENKINS]->(c1:JENKINS:DATA)\n with count(distinct c1.buildUrl) as Total,\nCASE WHEN c1.inSightsTime >=(timestamp()-86400000) /1000 and c1.inSightsTime <= (timestamp()) THEN 1 ELSE 0 END as OneDay,\nCASE WHEN c1.inSightsTime >=(timestamp()-604800000) / 1000 and c1.inSightsTime <= (timestamp()) THEN 1 ELSE 0 END as SevenDays,\nCASE WHEN c1.inSightsTime >=(timestamp()-1209600000) /1000 and c1.inSightsTime <= (timestamp()) THEN 1 ELSE 0 END as FourteenDays\nwith sum(OneDay) as Last1Day, sum(SevenDays) as Last7Days,sum(FourteenDays) as Last14Days,Total\nreturn Total,Last1Day,Last7Days,Last14Days"
             }
           ],
           "title": "Builds(total,last,1,7,14 days)",
@@ -718,7 +769,7 @@
             {
               "rawQuery": true,
               "refId": "A",
-              "target": "MATCH p=(b:PIVOTALTRACKER:DATA) -[r1:FROM_JIRA_TO_GIT]->(b1:GIT_1:DATA)-[r2:FROM_GIT_TO_JENKINS]->(c1:JENKINS:DATA)\nwhere exists(b1.commitId) and c1.result in [\"SUCCESS\"] with distinct c1.buildUrl as Builds,  b1.commitId as Commits, b.key as JiraKeys,split(c1.inSightsTimeX, \"T\")[0] as Time, c1.result as Status return Time, count(Builds) as Success order by Time desc"
+              "target": "MATCH p=(b:JIRA:DATA) -[r1:FROM_JIRA_TO_GIT]->(b1:GIT:DATA)-[r2:FROM_GIT_TO_JENKINS]->(c1:JENKINS:DATA)\nwhere exists(b1.commitId) and c1.result in [\"SUCCESS\"] with distinct c1.buildUrl as Builds,  b1.commitId as Commits, b.key as JiraKeys,split(c1.inSightsTimeX, \"T\")[0] as Time, c1.result as Status return Time, count(Builds) as Success order by Time desc"
             },
             {
               "rawQuery": true,
@@ -730,16 +781,16 @@
           "type": "insightscharts"
         }
       ],
-      "repeat": null,
-      "repeatIteration": null,
-      "repeatRowId": null,
       "showTitle": false,
-      "title": "Dashboard Row",
-      "titleSize": "h6"
+      "titleSize": "h6",
+      "height": 232,
+      "repeat": null,
+      "repeatRowId": null,
+      "repeatIteration": null,
+      "collapse": false
     },
     {
-      "collapse": false,
-      "height": 248,
+      "title": "Dashboard Row",
       "panels": [
         {
           "datasource": "${DS_NEO4J_DS}",
@@ -750,7 +801,7 @@
             {
               "rawQuery": true,
               "refId": "A",
-              "target": "match(n:CI:CONCOURSE:DATA) return count(distinct(n)) as total"
+              "target": "match(n:CI:SONAR:DATA) return count(distinct(n)) as total"
             }
           ],
           "title": "No. of Code Quality Executions",
@@ -828,7 +879,7 @@
             {
               "rawQuery": true,
               "refId": "A",
-              "target": "match(n:CI:CONCOURSE:DATA)  return n.inSightsTime as Time,count(n.resourceKey) as Runs"
+              "target": "match(n:CI:SONAR:DATA)  return n.inSightsTime as Time,count(n.resourceKey) as Runs"
             }
           ],
           "title": "Code Quality Runs",
@@ -857,16 +908,16 @@
           }
         }
       ],
-      "repeat": null,
-      "repeatIteration": null,
-      "repeatRowId": null,
       "showTitle": false,
-      "title": "Dashboard Row",
-      "titleSize": "h6"
+      "titleSize": "h6",
+      "height": 248,
+      "repeat": null,
+      "repeatRowId": null,
+      "repeatIteration": null,
+      "collapse": false
     },
     {
-      "collapse": false,
-      "height": 237,
+      "title": "Dashboard Row",
       "panels": [
         {
           "datasource": "${DS_NEO4J_DS}",
@@ -1024,16 +1075,16 @@
           "type": "insightscharts"
         }
       ],
-      "repeat": null,
-      "repeatIteration": null,
-      "repeatRowId": null,
       "showTitle": false,
-      "title": "Dashboard Row",
-      "titleSize": "h6"
+      "titleSize": "h6",
+      "height": 237,
+      "repeat": null,
+      "repeatRowId": null,
+      "repeatIteration": null,
+      "collapse": false
     },
     {
-      "collapse": false,
-      "height": 233,
+      "title": "Dashboard Row",
       "panels": [
         {
           "datasource": "${DS_NEO4J_DS}",
@@ -1134,16 +1185,16 @@
           "type": "insightscharts"
         }
       ],
-      "repeat": null,
-      "repeatIteration": null,
-      "repeatRowId": null,
       "showTitle": false,
-      "title": "Dashboard Row",
-      "titleSize": "h6"
+      "titleSize": "h6",
+      "height": 233,
+      "repeat": null,
+      "repeatRowId": null,
+      "repeatIteration": null,
+      "collapse": false
     },
     {
-      "collapse": false,
-      "height": 250,
+      "title": "Build statistics per sprint",
       "panels": [
         {
           "datasource": "${DS_NEO4J_DS}",
@@ -1214,7 +1265,7 @@
             {
               "rawQuery": true,
               "refId": "A",
-              "target": "MATCH p=(b:PIVOTALTRACKER:DATA) -[r1:FROM_JIRA_TO_GIT]->(b1:GIT_1:DATA)-[r2:FROM_GIT_TO_JENKINS]->(c1:JENKINS:DATA)\nreturn ceil(max(toInt(c1.duration)/(60))) as MaxTimeInMins"
+              "target": "MATCH p=(b:JIRA:DATA) -[r1:FROM_JIRA_TO_GIT]->(b1:GIT:DATA)-[r2:FROM_GIT_TO_JENKINS]->(c1:JENKINS:DATA)\nreturn ceil(max(toInt(c1.duration)/(60))) as MaxTimeInMins"
             }
           ],
           "title": "Maximum Build time for the Sprint",
@@ -1289,78 +1340,20 @@
             {
               "rawQuery": true,
               "refId": "A",
-              "target": "MATCH p=(b:PIVOTALTRACKER:DATA) -[r1:FROM_JIRA_TO_GIT]->(b1:GIT_1:DATA)-[r2:FROM_GIT_TO_JENKINS]->(c1:JENKINS:DATA)\nreturn ceil(avg(toInt(c1.duration)/(60))) as AvgTimeInMins"
+              "target": "MATCH p=(b:JIRA:DATA) -[r1:FROM_JIRA_TO_GIT]->(b1:GIT:DATA)-[r2:FROM_GIT_TO_JENKINS]->(c1:JENKINS:DATA)\nreturn ceil(avg(toInt(c1.duration)/(60))) as AvgTimeInMins"
             }
           ],
           "title": "Average Build time for the sprint",
           "type": "insightscharts"
         }
       ],
-      "repeat": null,
-      "repeatIteration": null,
-      "repeatRowId": null,
       "showTitle": false,
-      "title": "Build statistics per sprint",
-      "titleSize": "h6"
+      "titleSize": "h6",
+      "height": 250,
+      "repeat": null,
+      "repeatRowId": null,
+      "repeatIteration": null,
+      "collapse": false
     }
-  ],
-  "schemaVersion": 14,
-  "style": "dark",
-  "tags": [],
-  "templating": {
-    "list": [
-      {
-        "allValue": null,
-        "current": {},
-        "datasource": "${DS_NEO4J_DS}",
-        "hide": 0,
-        "includeAll": true,
-        "label": null,
-        "multi": true,
-        "name": "SprintName",
-        "options": [],
-        "query": "Match (n:JIRA:DATA:SPRINT) return distinct n.sprintName as SprintName order by SprintName",
-        "refresh": 1,
-        "regex": "",
-        "sort": 1,
-        "tagValuesQuery": "",
-        "tags": [],
-        "tagsQuery": "",
-        "type": "query",
-        "useTags": false
-      }
-    ]
-  },
-  "time": {
-    "from": "now-6M",
-    "to": "now"
-  },
-  "timepicker": {
-    "refresh_intervals": [
-      "5s",
-      "10s",
-      "30s",
-      "1m",
-      "5m",
-      "15m",
-      "30m",
-      "1h",
-      "2h",
-      "1d"
-    ],
-    "time_options": [
-      "5m",
-      "15m",
-      "1h",
-      "6h",
-      "12h",
-      "24h",
-      "2d",
-      "7d",
-      "30d"
-    ]
-  },
-  "timezone": "browser",
-  "title": "Executive View Dashboard",
-  "version": 60
+  ]
 }
