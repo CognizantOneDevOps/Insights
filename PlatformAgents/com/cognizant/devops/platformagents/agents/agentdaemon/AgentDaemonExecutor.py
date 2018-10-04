@@ -27,13 +27,18 @@ import os
 import subprocess
 import logging.handlers
 import json
+from datetime import datetime
+from pytz import timezone
 
 class AgentDaemonExecutor:
     def __init__(self):
         self.loadConfig()
         self.setupLogging()
+        self.loadVersionConfig()
         self.initializeMQ()
         self.subscribe()
+        
+        
         
     def loadConfig(self):
         filePresent = os.path.isfile('config.json')
@@ -49,6 +54,24 @@ class AgentDaemonExecutor:
             self.config = json.load(config_file)
         if self.config == None:
             raise ValueError('BaseAgent: unable to load config JSON')
+
+    def loadVersionConfig(self):
+        filePresent = os.path.isfile('version.json')
+        self.version=''
+        if filePresent:
+            self.versionConfigFilePath = 'version.json'
+        else:
+            agentDir = os.path.dirname(sys.modules[self.__class__.__module__].__file__) + os.path.sep
+            self.versionConfigFilePath = agentDir+'version.json'
+            self.logFilePath = 'log_'+type(self).__name__+'.log'
+            
+        with open(self.versionConfigFilePath, 'r') as versionConfig_file:    
+            self.versionConfig = json.load(versionConfig_file)
+            logging.info(' Version of Agent Demon ',self.versionConfig.get("version"))
+            self.version=self.versionConfig.get("version")
+        if self.versionConfig == None:
+            self.version=''
+            raise ValueError('BaseAgent: unable to load version config JSON')        
 
     def setupLogging(self):
         loggingSetting = self.config.get('loggingSetting',{})
@@ -77,35 +100,46 @@ class AgentDaemonExecutor:
         self.channel.exchange_declare(exchange=agentCtrlXchg, exchange_type='topic', durable=True)
         self.channel.queue_declare(queue=routingKey, passive=False, durable=True, exclusive=False, auto_delete=False, arguments=None)
         self.channel.queue_bind(queue=routingKey, exchange=agentCtrlXchg, routing_key=routingKey, arguments=None)
+    
+    def generateHealthData(self, ex=None, systemFailure=False,note=None):
+        data = []
+        currentTime = self.getRemoteDateTime(datetime.now())
+        health = {'version':self.version, 'inSightsTime' : currentTime['epochTime'] ,'inSightsTimeX' : currentTime['time']}
+        if systemFailure:
+            health['status'] = 'failure'
+            health['message'] = 'Agent is shutting down'
+        elif ex != None:
+            health['status'] = 'failure'
+            health['message'] = 'Error occurred: '+str(ex)
+            logging.error(ex)
+        else:
+            health['status'] = 'success'
+            if note != None:
+                health['message'] = note
+        health['message'] = 'Agent Demon Version : '+self.version+' '+health['message']
+        data.append(health)
+        return data
                
-    def publishDaemonHealthData(self, ex=None):
-        
-        health = {}
-        
-        health['status'] = 'failure'
-        health['message'] = 'Agent Daemon has errors: '+str(ex)
-        data = json.dumps(health)
-        
+    def publishDaemonHealthData(self, data):
         mqConfig = self.config.get('mqConfig', None)
-        
         healthExchange = mqConfig.get('exchange', None)
-        healthQueue = self.config.get('publish').get('health')
+        healthRoutingKey = self.config.get('publish').get('health')
+        healthQueue = healthRoutingKey.replace('.','_')
         credentials = pika.PlainCredentials(mqConfig.get('user', None), 
                                             mqConfig.get('password', None))
         connection = pika.BlockingConnection(pika.ConnectionParameters(credentials=credentials,host=mqConfig.get('host', None)))
         channel = connection.channel()
         channel.exchange_declare(exchange=healthExchange, exchange_type='topic', durable=True)
         channel.queue_declare(queue=healthQueue, passive=False, durable=True, exclusive=False, auto_delete=False, arguments=None)
-        channel.queue_bind(queue=healthQueue, exchange=healthExchange, routing_key=healthQueue, arguments=None)
-        channel.basic_publish(exchange=healthExchange,routing_key=healthQueue,body=data,properties=pika.BasicProperties(
-                                        delivery_mode=2 #make message persistent
-                                    ))
-        connection.close() 
+        channel.queue_bind(queue=healthQueue, exchange=healthExchange, routing_key=healthRoutingKey, arguments=None)
+        dataJson = json.dumps(data)
+        channel.basic_publish(exchange=healthExchange,routing_key=healthRoutingKey,body=dataJson,properties=pika.BasicProperties(delivery_mode=2))
+        connection.close()
+        logging.info("health message publish successfully")
         
     def subscribe(self):
         routingKey = self.config.get('subscribe').get('agentPkgQueue')
         def callback(ch, method, properties, body):
-            
             try:
                  h = properties.headers
                  pkgFileName = h.get('fileName')
@@ -117,7 +151,6 @@ class AgentDaemonExecutor:
                  action = h.get('action')
                  #Code for handling subscribed messages
                  ch.basic_ack(delivery_tag = method.delivery_tag)
-                 
                  basePath = self.config.get('baseExtractionPath')
                  scriptPath = basePath + os.path.sep + agentToolName
                  
@@ -129,7 +162,6 @@ class AgentDaemonExecutor:
                      
                      zip_ref = zipfile.ZipFile(basePath + os.path.sep + pkgFileName, 'r')
                      zip_ref.extractall(scriptPath)
-                     print('Zip File operation complete')
                      zip_ref.close()
                  
                  '''
@@ -147,17 +179,29 @@ class AgentDaemonExecutor:
                      #stdout, stderr = p.communicate()
                      print('Process id - '+ str(p.returncode))
             except Exception as ex:
-                print('There is an exception')
-                self.publishDaemonHealthData(ex)
+                self.publishDaemonHealthData(self.generateHealthData(ex))
+                #ch.basic_ack(delivery_tag = method.delivery_tag)
                 logging.error(ex)
                 #self.logIndicator(self.EXECUTION_ERROR, self.config.get('isDebugAllowed', False)) 
                 
             #self.channel.close(0, 'File Received')
         
-        print('Inside subscribe method')    
+        print('Inside subscribe method')
         self.channel.basic_consume(callback,queue=routingKey)
-        self.channel.start_consuming() 
-        self.connection.close()    
+        self.publishDaemonHealthData(self.generateHealthData(note="Agent Demon is in START mode"))
+        self.channel.start_consuming()
+        self.connection.close() 
+        
+    def getRemoteDateTime(self, time):
+        self.toolsTimeZone = timezone("UTC") #GMT
+        self.epochStartDateTime = datetime(1970, 1, 1, tzinfo=self.toolsTimeZone)
+        localDateTime = self.toolsTimeZone.localize(time)
+        remoteDateTime = localDateTime.astimezone(self.toolsTimeZone)
+        response = {
+                    'epochTime' : (remoteDateTime - self.epochStartDateTime).total_seconds(),
+                    'time' : remoteDateTime.strftime('%Y-%m-%dT%H:%M:%SZ')
+                    }
+        return response;   
 
 if __name__=="__main__":
     AgentDaemonExecutor()

@@ -1,10 +1,10 @@
 {
-  "showInsightsTab": false,
-  "showOptionsPanel": false,
-  "showBusinessMapping": true,
-  "agentsOsList": {
-    "Windows": "windows",
-    "RHEL/CentOS": "linux",
-    "Ubuntu":"Ubuntu"
-  }
+	"showInsightsTab": false,
+	"showOptionsPanel": false,
+	"showBusinessMapping": true,
+	"agentsOsList": {
+		"Windows": "windows",
+		"RHEL/CentOS": "linux",
+		"Ubuntu":"Ubuntu"
+	}
 }

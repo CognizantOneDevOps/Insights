@@ -27,26 +27,30 @@ module ISightApp {
             this.checkResponseData = true;
             this.agentService.loadGlobalHealthConfigurations()
                 .then(function (data) {
-                    var dataArray = data.data.nodes;
-                    if (dataArray.length === 0) {
-                        this.checkResponseData = false;
-                    }
-                    self.agentNodes = dataArray;
-                     self.showTemplateAfterLoad = true;
+                    var status= data.status;
+                    if(angular.equals(status,'success')) {
+                        var dataArray = data.data.nodes;
+                        if (dataArray.length === 0) {
+                            this.checkResponseData = false;
+                        }
+                        self.agentNodes = dataArray;
+                        self.showTemplateAfterLoad = true;
 
-                    for (var key in dataArray) {
-                        var nodesArray = dataArray[key];
-                        var toolIconSrc = '';
-                        for (var attr in nodesArray) {
-                            var attrValue = nodesArray['propertyMap'];
-                            if (attrValue.toolName != undefined) {
-                                toolIconSrc = self.iconService.getIcon(attrValue.toolName);
-                                self.agentToolsIcon[attrValue.toolName] = toolIconSrc;
-                                break;
+                        for (var key in dataArray) {
+                            var nodesArray = dataArray[key];
+                            var toolIconSrc = '';
+                            for (var attr in nodesArray) {
+                                var attrValue = nodesArray['propertyMap'];
+                                if (attrValue.toolName != undefined) {
+                                    toolIconSrc = self.iconService.getIcon(attrValue.toolName);
+                                    self.agentToolsIcon[attrValue.toolName] = toolIconSrc;
+                                    break;
+                                }
                             }
                         }
+                     }else{
+                        this.showcontent=false;
                     }
-
                 });
             var elem = document.querySelector('#homePageTemplateContainer');
             var homePageControllerScope = angular.element(elem).scope();
@@ -61,7 +65,7 @@ module ISightApp {
 				self.showThrobber = false;
 				self.showcontent = !this.showThrobber;
 				self.serverStatus = data;	
-			})
+            })
 			.catch(function (data) {												
 				self.showThrobber = false;
 				self.showcontent = false;

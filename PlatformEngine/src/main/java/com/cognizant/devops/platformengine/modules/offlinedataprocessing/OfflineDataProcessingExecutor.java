@@ -35,11 +35,14 @@ import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 
 import com.cognizant.devops.platformcommons.constants.ConfigOptions;
+import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
 import com.cognizant.devops.platformcommons.core.util.InsightsUtils;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBException;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphResponse;
 import com.cognizant.devops.platformcommons.dal.neo4j.Neo4jDBHandler;
+import com.cognizant.devops.platformengine.message.core.EngineStatusLogger;
 import com.cognizant.devops.platformengine.modules.offlinedataprocessing.model.DataEnrichmentModel;
+import com.cognizant.devops.platformengine.modules.users.EngineUsersModule;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
@@ -69,6 +72,7 @@ public class OfflineDataProcessingExecutor implements Job {
 	@Override
 	public void execute(JobExecutionContext context) throws JobExecutionException {
 		executeOfflineProcessing();
+		EngineStatusLogger.getInstance().createEngineStatusNode("Offline Data Procesing completed",PlatformServiceConstants.SUCCESS);
 	}
 
 	public int executeOfflineProcessing() {

@@ -26,6 +26,7 @@ import org.quartz.JobExecutionException;
 
 import com.cognizant.devops.insightsemail.job.AlertEmailJobExecutor;
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
+import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
 import com.cognizant.devops.platformcommons.core.enums.ExecutionActions;
 import com.cognizant.devops.platformcommons.core.util.InsightsUtils;
 import com.cognizant.devops.platforminsights.core.avg.AverageActionImpl;
@@ -48,38 +49,49 @@ public class SparkJobExecutor implements Job,Serializable{
 	 */
 	private static final Logger log = Logger.getLogger(SparkJobExecutor.class);
 	private static final long serialVersionUID = -4343203105485076004L;
-	public void execute(JobExecutionContext context) throws JobExecutionException{
-		startExecution();
+	public void execute(JobExecutionContext context) {
+		try {
+			startExecution();
+			InsightsStatusProvider.getInstance().createInsightStatusNode("Platform Insights Spark Application started Successfully", PlatformServiceConstants.SUCCESS);
+		} catch (JobExecutionException e) {
+			InsightsStatusProvider.getInstance().createInsightStatusNode("message Exception occur while Job Execution "+e.getMessage(), PlatformServiceConstants.FAILURE);
+		}
 	}
 	
-	private void startExecution() {
+	private void startExecution() throws JobExecutionException {
 		log.debug("Starting Spark Jobs Execution");
 		//ApplicationConfigCache.loadConfigCache();
 		SparkJobConfigHandler configHandler = new SparkJobConfigHandler();
-		List<SparkJobConfiguration> jobs = configHandler.loadJobsFromES();
-		
-		log.debug("Counting the number of Spark jobs. Count:  "+jobs.size());
-		List<SparkJobConfiguration> updatedJobs = new ArrayList<>();
-		
-			for(SparkJobConfiguration job : jobs){
-				try {
-					if(!(job.isActive() && isJobScheduledToRun(job.getLastRunTime(),job.getSchedule()))) {
-						continue;
+		try {
+			List<SparkJobConfiguration> jobs = configHandler.loadJobsFromES();
+			
+			log.debug("Counting the number of Spark jobs. Count:  "+jobs.size());
+			List<SparkJobConfiguration> updatedJobs = new ArrayList<>();
+			
+				for(SparkJobConfiguration job : jobs){
+					try {
+						if(!(job.isActive() && isJobScheduledToRun(job.getLastRunTime(),job.getSchedule()))) {
+							continue;
+						}
+						executeJob(job);
+						configHandler.updateNextRun(job);
+						job.setLastRunTime(InsightsUtils.getLastRunTime(job.getSchedule()));
+						updatedJobs.add(job);
+					} catch (Exception e) {
+						log.error(e.getMessage(), e);
 					}
-					executeJob(job);
-					configHandler.updateNextRun(job);
-					job.setLastRunTime(InsightsUtils.getLastRunTime(job.getSchedule()));
-					updatedJobs.add(job);
-				} catch (Exception e) {
-					log.error(e.getMessage(), e);
 				}
-			}
-			if(updatedJobs.size() > 0) {
-				if(ApplicationConfigProvider.getInstance().getEmailConfiguration().getSendEmailEnabled()) {
-					sendEmail();
+				if(updatedJobs.size() > 0) {
+					if(ApplicationConfigProvider.getInstance().getEmailConfiguration().getSendEmailEnabled()) {
+						sendEmail();
+					}
+					configHandler.updateJobsInES(jobs);
 				}
-				configHandler.updateJobsInES(jobs);
-			}
+		} catch (Exception e) {
+			log.error(e.getMessage(), e);
+			throw new JobExecutionException("Platform Insights Spark Application not started "+e.getMessage());
+			//InsightsStatusProvider.createInsightStatusNode("Platform Insights Spark Application not started "+e.getMessage(), PlatformServiceConstants.FAILURE);
+		}
 	}
 	
 	private void sendEmail() {
