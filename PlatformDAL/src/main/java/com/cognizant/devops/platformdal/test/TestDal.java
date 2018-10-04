@@ -16,7 +16,6 @@
 package com.cognizant.devops.platformdal.test;
 
 import org.apache.log4j.Logger;
-import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.boot.Metadata;
@@ -25,9 +24,6 @@ import org.hibernate.boot.model.naming.ImplicitNamingStrategyJpaCompliantImpl;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.service.ServiceRegistry;
 
-import com.cognizant.devops.platformcommons.config.ApplicationConfigCache;
-import com.cognizant.devops.platformdal.config.PlatformDALSessionFactoryProvider;
-
 public class TestDal {
 	final static Logger logger = Logger.getLogger(TestDal.class);
 	public static void main(String[] args) {
@@ -35,7 +31,7 @@ public class TestDal {
 		configuration.configure("hibernate.cfg.xml");
 		configuration.setProperty("hibernate.connection.username","grafana123");
 		ServiceRegistry standardRegistry = new StandardServiceRegistryBuilder().applySettings(configuration.getProperties()).configure().build();*/
-		/*ServiceRegistry standardRegistry = new StandardServiceRegistryBuilder().configure().build();
+		ServiceRegistry standardRegistry = new StandardServiceRegistryBuilder().configure().build();
 		MetadataSources sources = new MetadataSources( standardRegistry );
 		sources.addAnnotatedClass( Test.class );
 		Metadata metadata = sources.getMetadataBuilder().applyImplicitNamingStrategy(ImplicitNamingStrategyJpaCompliantImpl.INSTANCE).build();
@@ -47,12 +43,6 @@ public class TestDal {
 		session.save(s);
 		session.getTransaction().commit();
 		session.close();
-		sessionFactory.close();*/
-		ApplicationConfigCache.loadConfigCache();
-		Session session = PlatformDALSessionFactoryProvider.getSessionFactory().openSession();
-		String query="Select version()";
-		Object result = session.createNativeQuery(query).getSingleResult();  //uniqueResult
-		System.out.println(" postgres version "+result);
-		session.close();
+		sessionFactory.close();
 	}
 }
