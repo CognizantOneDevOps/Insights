@@ -154,7 +154,7 @@ class DummyDataAgent(BaseAgent):
         
         #To save the data count in tracking.json
         script_dir = os.path.dirname(__file__)
-        file_path = os.path.join('C:\\InSights_V1.0\\Agents\\PlatformAgents\\git\\com\\cognizant\\devops\\platformagents\\agents\\scm\\git\\tracking.json')
+        file_path = os.path.join('tracking.json')
         #Input your system path to tracking.json of DummyAgent          
         with open(file_path, "r") as jsonFile: # Open the JSON file for reading
             data = json.load(jsonFile) # Read the JSON into the buffer
