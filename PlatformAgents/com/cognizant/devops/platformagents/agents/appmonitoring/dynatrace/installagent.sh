@@ -21,20 +21,20 @@ case $opt in
         [lL][Ii][nN][uU][Xx])
           case $action in 
             [uU][nN][iI][nN][sS][tT][aA][lL][lL])
-	          	sudo service InSightsAwsAgent stop
-				sudo rm -R /etc/init.d/InSightsAwsAgent
+	          	sudo service InSightsDynatraceAgent stop
+				sudo rm -R /etc/init.d/InSightsDynatraceAgent
 				echo "Service un-installation step completed"
 		        ;;
 		    *)
-                echo "Aws Running on Linux..."
-				sudo cp -xp InSightsAwsAgent.sh  /etc/init.d/InSightsAwsAgent
-				sudo chmod +x /etc/init.d/InSightsAwsAgent
-				sudo chkconfig InSightsAwsAgent on
-				sudo service  InSightsAwsAgent status
-				sudo service  InSightsAwsAgent stop
-				sudo service  InSightsAwsAgent status
-				sudo service  InSightsAwsAgent start
-				sudo service  InSightsAwsAgent status
+                echo "Dynatrace Running on Linux..."
+				sudo cp -xp InSightsDynatraceAgent.sh  /etc/init.d/InSightsDynatraceAgent
+				sudo chmod +x /etc/init.d/InSightsDynatraceAgent
+				sudo chkconfig InSightsDynatraceAgent on
+				sudo service  InSightsDynatraceAgent status
+				sudo service  InSightsDynatraceAgent stop
+				sudo service  InSightsDynatraceAgent status
+				sudo service  InSightsDynatraceAgent start
+				sudo service  InSightsDynatraceAgent status
 				
 				echo "Service installaton steps completed"
                 ;;
@@ -43,21 +43,21 @@ case $opt in
         [uU][bB][uU][nN][tT][uU])
 	       case $action in 
              [uU][nN][iI][nN][sS][tT][aA][lL][lL]) 
-				sudo systemctl stop InSightsAwsAgent
-				sudo rm -R /etc/systemd/system/InSightsAwsAgent.service
+				sudo systemctl stop InSightsDynatraceAgent
+				sudo rm -R /etc/systemd/system/InSightsDynatraceAgent.service
 				echo "Service un-installation step completed"				
 			    ;;
 			 *)
-                echo "Aws Running on Ubuntu..."
-				sudo cp -xp InSightsAwsAgent.service /etc/systemd/system
-				sudo systemctl enable InSightsAwsAgent
-				sudo systemctl start InSightsAwsAgent
+                echo "Dynatrace Running on Ubuntu..."
+				sudo cp -xp InSightsDynatraceAgent.service /etc/systemd/system
+				sudo systemctl enable InSightsDynatraceAgent
+				sudo systemctl start InSightsDynatraceAgent
 				echo "Service installaton steps completed"
                 ;;
 		   esac
 		   ;;
         centos)
-                echo "Aws Running on centso..."
+                echo "Dynatrace Running on centso..."
                 ;;
         *)
         	    echo "Please provide correct OS input"

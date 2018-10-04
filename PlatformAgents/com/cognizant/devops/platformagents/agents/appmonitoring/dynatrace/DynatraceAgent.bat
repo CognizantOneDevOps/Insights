@@ -13,5 +13,5 @@ WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
 License for the specific language governing permissions and limitations under
 the License.
 :comment
-pushd %INSIGHTS_AGENT_HOME%\PlatformAgents\aws
-python -c "from com.cognizant.devops.platformagents.agents.environment.aws.AwsAgent import AwsAgent; AwsAgent()"
+pushd %INSIGHTS_AGENT_HOME%\PlatformAgents\dynatrace
+python -c "from com.cognizant.devops.platformagents.agents.appmonitoring.dynatrace.DynatraceAgent import DynatraceAgent; DynatraceAgent()"
