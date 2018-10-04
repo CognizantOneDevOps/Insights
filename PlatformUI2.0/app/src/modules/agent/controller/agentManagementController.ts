@@ -112,13 +112,8 @@ module ISightApp {
 						if (Selversion) {
 							self.toolsArr = self.response[Selversion];
 						} else {
-							var versionListLength = 1;
 							for (var key in self.response) {
-								if (versionListLength <= 5) {
-									self.versionList.push(key);
-								} else
-									break;
-								versionListLength++;
+								self.versionList.push(key);
 							}
 						}
 					} else {

@@ -16,10 +16,10 @@
 
 #
 # arfifacts
-# http://platform.cogdevops.com/insights_install/release/latest/InSightsUI.zip 
-# http://platform.cogdevops.com/insights_install/release/latest/PlatformService.war 
-# http://platform.cogdevops.com/insights_install/installationScripts/latest/RHEL/tomcat/apache-tomcat-8.5.27.tar.gz
-# http://platform.cogdevops.com/insights_install/installationScripts/latest/RHEL/initscripts/Tomcat8.sh
+# https://platform.cogdevops.com/insights_install/release/latest/InSightsUI.zip 
+# https://platform.cogdevops.com/insights_install/release/latest/PlatformService.war 
+# https://platform.cogdevops.com/insights_install/installationScripts/latest/RHEL/tomcat/apache-tomcat-8.5.27.tar.gz
+# https://platform.cogdevops.com/insights_install/installationScripts/latest/RHEL/initscripts/Tomcat8.sh
 
 
 echo "#################### Installing Tomcat8 ####################"

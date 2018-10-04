@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  ******************************************************************************/
- package com.cognizant.devops.platformservice.rest.serviceStatus;
+ package com.cognizant.devops.platformcommons.constants;
 
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 
@@ -23,6 +23,7 @@ public interface ServiceStatusConstants {
 	String INSIGHTS_INFERENCE_MASTER_HOST = ApplicationConfigProvider.getInstance().getSparkConfigurations().getSparkMasterExecutionEndPoint();
 	String NEO4J_HOST = ApplicationConfigProvider.getInstance().getGraph().getEndpoint();
 	String ES_HOST = ApplicationConfigProvider.getInstance().getEndpointData().getElasticSearchEndpoint();
+	String RABBIT_MQ="http://"+ApplicationConfigProvider.getInstance().getMessageQueue().getHost()+":15672";
 	String Neo4j = "Neo4j";
 	String PgSQL = "PostgreSQL";
 	String PlatformService = "Platform Service";
@@ -31,4 +32,7 @@ public interface ServiceStatusConstants {
 	String type = "type";
 	String DB = "Database";
 	String Service = "Service";
+	String DemonAgent="Demon Agent";
+	String PlatformEngine="Platform Engine";
+	String RabbitMq="RabbitMQ";
 }

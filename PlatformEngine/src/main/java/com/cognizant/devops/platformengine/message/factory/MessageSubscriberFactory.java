@@ -23,6 +23,8 @@ import org.apache.logging.log4j.Logger;
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.config.MessageQueueDataModel;
 import com.cognizant.devops.platformcommons.constants.MessageConstants;
+import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
+import com.cognizant.devops.platformengine.message.core.EngineStatusLogger;
 import com.rabbitmq.client.AMQP;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
@@ -50,8 +52,11 @@ public class MessageSubscriberFactory {
 			channel.close();
 		} catch (IOException e) {
 			log.error("Unable to create MQ connection", e);
+			EngineStatusLogger.getInstance().createEngineStatusNode("Exception while creating Message Queue connection "+e.getMessage(),PlatformServiceConstants.FAILURE);
 		} catch (TimeoutException e) {
 			log.error("Unable to create MQ connection within specified time.", e);
+			EngineStatusLogger.getInstance().createEngineStatusNode("Exception while creating Message queue connection"+e.getMessage(),PlatformServiceConstants.FAILURE);
+
 		}
 	}
 

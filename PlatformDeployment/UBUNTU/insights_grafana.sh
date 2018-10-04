@@ -17,11 +17,11 @@
 echo "#################### Installing Grafana (running as BG process) with user creation ####################"
 mkdir grafana-v4.6.2
 cd grafana-v4.6.2
-wget http://platform.cogdevops.com/insights_install/installationScripts/latest/RHEL/grafana/grafana-4.6.2.linux-x64.tar.gz
+wget https://platform.cogdevops.com/insights_install/installationScripts/latest/RHEL/grafana/grafana-4.6.2.linux-x64.tar.gz
 tar -zxvf grafana-4.6.2.linux-x64.tar.gz
-wget http://platform.cogdevops.com/insights_install/installationScripts/latest/RHEL/grafana/ldap.toml
+wget https://platform.cogdevops.com/insights_install/installationScripts/latest/RHEL/grafana/ldap.toml
 cp ldap.toml ./grafana-4.6.2/conf/ldap.toml
-wget http://platform.cogdevops.com/insights_install/installationScripts/latest/RHEL/grafana/defaults.ini
+wget https://platform.cogdevops.com/insights_install/installationScripts/latest/RHEL/grafana/defaults.ini
 cp defaults.ini ./grafana-4.6.2/conf/defaults.ini
 cd grafana-4.6.2
 nohup ./bin/grafana-server &

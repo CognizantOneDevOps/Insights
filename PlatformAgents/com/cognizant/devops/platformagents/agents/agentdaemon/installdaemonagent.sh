@@ -16,6 +16,7 @@
 # Turn on a case-insensitive matching (-s set nocasematch)
 opt=$1
 action=$2
+config=$(cat com/cognizant/devops/platformagents/agents/agentdaemon/config.json|xargs)
 echo "$opt"
 case $opt in
         [lL][Ii][nN][uU][Xx])
@@ -35,6 +36,12 @@ case $opt in
 				sudo service  InSightsDaemonAgent status
 				sudo service  InSightsDaemonAgent start
 				sudo service  InSightsDaemonAgent status
+				sudo rm Daemonagent_db.sql
+				echo INSERT INTO public.agent_configuration(id, agent_id, agent_json, agent_key, agent_status, agent_version,data_update_supported, os_version, tool_category, tool_name,unique_key, update_date) VALUES (100, 0,'FOO','daemon-1523257126' ,'' ,'' , FALSE,'' , 'DAEMONAGENT', 'AGENTDAEMON', 'daemon-1523257126', current_date); >> Daemonagent.sql
+                sudo cp Daemonagent.sql Daemonagent_db.sql
+                sudo sed -i "s~FOO~$config~g" Daemonagent_db.sql
+				sudo chmod +x Daemonagent_db.sql
+				psql -U postgres -f Daemonagent_db.sql
 				echo "Service installaton steps completed"
                 ;;
 		  esac
@@ -51,6 +58,12 @@ case $opt in
 				cp -xp InSightsDaemonAgent.service /etc/systemd/system
 				systemctl enable InSightsDaemonAgent
 				systemctl start InSightsDaemonAgent
+				sudo rm Daemonagent_db.sql
+				echo INSERT INTO public.agent_configuration(id, agent_id, agent_json, agent_key, agent_status, agent_version,data_update_supported, os_version, tool_category, tool_name,unique_key, update_date) VALUES (100, 0,'FOO','daemon-1523257126' ,'' ,'' , FALSE,'' , 'DAEMONAGENT', 'AGENTDAEMON', 'daemon-1523257126', current_date); >> Daemonagent.sql
+                sudo cp Daemonagent.sql Daemonagent_db.sql
+                sudo sed -i "s~FOO~$config~g" Daemonagent_db.sql
+				sudo chmod +x Daemonagent_db.sql
+				psql -U postgres -f Daemonagent_db.sql
 				echo "Service installaton steps completed"
                 ;;
 		   esac

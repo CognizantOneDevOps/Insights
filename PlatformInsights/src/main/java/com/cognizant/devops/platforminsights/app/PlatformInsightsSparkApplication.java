@@ -27,6 +27,8 @@ import org.quartz.impl.StdSchedulerFactory;
 
 import com.cognizant.devops.platformcommons.config.ApplicationConfigCache;
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
+import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
+import com.cognizant.devops.platforminsights.core.InsightsStatusProvider;
 import com.cognizant.devops.platforminsights.core.SparkJobExecutor;
 
 /**
@@ -50,7 +52,7 @@ public class PlatformInsightsSparkApplication {
 		ApplicationConfigCache.loadConfigCache();
 		// Create Default users
 		ApplicationConfigProvider.performSystemCheck();
-		
+				
 		// Subscribe for desired events.
 		JobDetail sparkAggrgatorJob = JobBuilder.newJob(SparkJobExecutor.class)
 				.withIdentity("SparkJobExecutorModule", "iSightSpark")
@@ -71,8 +73,13 @@ public class PlatformInsightsSparkApplication {
 			scheduler.start();
 			scheduler.scheduleJob(sparkAggrgatorJob, sparkAggregatorTrigger);
 			log.debug("Job has been scheduled with interval of - "+defaultInterval);
+			//Insight status to DB
 		} catch (SchedulerException e) {
 			log.error("Exception in Sparkjob schedular",e);
+			InsightsStatusProvider.getInstance().createInsightStatusNode("Platform Insights Spark Application not started ", PlatformServiceConstants.FAILURE);
+		}catch (Exception e) {
+			log.error("Exception in Sparkjob ",e);
+			InsightsStatusProvider.getInstance().createInsightStatusNode("Platform Insights Spark Application not started ", PlatformServiceConstants.FAILURE);
 		}
 	}
 }
