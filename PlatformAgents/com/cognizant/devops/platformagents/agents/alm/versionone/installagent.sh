@@ -26,7 +26,7 @@ case $opt in
 						echo "Service un-installation step completed"
 		            ;;
 		         	*)
-		         		echo "Git Running on Linux..."
+		         		echo "VersionOne Running on Linux..."
 						sudo cp -xp InSightsVersionOneAgent.sh  /etc/init.d/InSightsVersionOneAgent
 						sudo chmod +x /etc/init.d/InSightsVersionOneAgent
 						sudo chkconfig InSightsVersionOneAgent on
@@ -48,7 +48,7 @@ case $opt in
 					echo "Service un-installation step completed"				
 			        ;;
 				*)
-                   echo "Git Running on Ubuntu..."
+                   echo "VersionOne Running on Ubuntu..."
 					sudo cp -xp InSightsVersionOneAgent.service /etc/systemd/system
 					sudo systemctl enable InSightsVersionOneAgent
 					sudo systemctl start InSightsVersionOneAgent
