@@ -3,7 +3,8 @@
     "user": "iSight",
     "password": "iSight",
     "host": "127.0.0.1",
-    "exchange": "iSight"
+    "exchange": "iSight",
+    "agentControlXchg":"iAgent"
   },
   "subscribe": {
     "config": "ALM.VERSIONONE.config"
@@ -13,7 +14,9 @@
     "health": "ALM.VERSIONONE.HEALTH"
   },
   "communication": {
-    "type": "REST"
+    "type": "REST",
+    "sslVerify": true,
+    "responseType": "JSON"
   },
   "dynamicTemplate": {
           "timeFieldMapping" : {
@@ -24,18 +27,23 @@
                 }
   },
   "runSchedule": 30,
-  "userid": "admin",
-  "passwd": "admin",
-  "project": "Test Project",
-  "baseUrl": "https://www5.v1host.com/CognizantTechnologySolutionsAsiaPacificPteLtd/rest-1.v1/Data/",
+  "toolCategory" : "ALM",
+  "userid": "userid",
+  "passwd": "password",
+  "project": "sample_project",
+  "baseUrl": "sample_url",
   "startFrom": "2010-10-10 00:01",
   "toolsTimeZone" : "Asia/Kolkata",
   "insightsTimeZone" : "Asia/Kolkata",
   "useResponseTemplate" : false,
   "timeStampField":"LastUpdated",
   "timeStampFormat":"%Y-%m-%dT%H:%M:%S",
+  "isEpochTimeFormat" : false,
   "isDebugAllowed" : false,
+  "enableDataValidation": true,
   "loggingSetting" : {
-                "logLevel" : "WARN"
+                "logLevel" : "WARN",
+		"maxBytes" : 5000000,
+		"backupCount" : 1000
         }
 }
