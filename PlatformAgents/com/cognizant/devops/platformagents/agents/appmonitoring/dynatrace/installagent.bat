@@ -13,13 +13,13 @@ WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
 License for the specific language governing permissions and limitations under
 the License.
 :comment
-REM pushd %INSIGHTS_AGENT_HOME%\PlatformAgents\aws
+REM pushd %INSIGHTS_AGENT_HOME%\PlatformAgents\dynatrace
 IF /I "%1%" == "UNINSTALL" (
-	net stop AwsAgent
-	sc delete AwsAgent
+	net stop DynatraceAgent
+	sc delete DynatraceAgent
 ) ELSE (
-	net stop AwsAgent
-	sc delete AwsAgent
-    nssm install AwsAgent %INSIGHTS_AGENT_HOME%\PlatformAgents\aws\AwsAgent.bat
-    net start AwsAgent
+	net stop DynatraceAgent
+	sc delete DynatraceAgent
+    nssm install DynatraceAgent %INSIGHTS_AGENT_HOME%\PlatformAgents\dynatrace\DynatraceAgent.bat
+    net start DynatraceAgent
 )

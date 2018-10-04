@@ -1,0 +1,10 @@
+[Unit]
+Description=Ubuntu DynatraceAgent Service
+
+[Service]
+Type=forking
+ExecStart=/bin/bash /opt/insightsagents/PlatformAgents/dynatrace/InSightsDynatraceAgent.sh start
+ExecStop=/bin/bash /opt/insightsagents/PlatformAgents/dynatrace/InSightsDynatraceAgent.sh stop
+
+[Install]
+WantedBy=multi-user.target
