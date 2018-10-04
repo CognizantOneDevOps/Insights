@@ -65,10 +65,6 @@ public class ApplicationConfigCache {
 			log.error("INSIGHTS_HOME environment variable is not set.");
 			System.exit(0);
 		}
-		System.getProperties().put("http.proxyHost", "proxy.cognizant.com");
-		System.getProperties().put("http.proxyPort", "6050");
-		System.getProperties().put("http.proxyUser", "SDevOpsJira");
-		System.getProperties().put("http.proxyPassword", "D111111");
 		File configFile = new File(ConfigOptions.CONFIG_FILE_RESOLVED_PATH);
 		StringBuffer json = new StringBuffer();
 		if(configFile.exists()){
