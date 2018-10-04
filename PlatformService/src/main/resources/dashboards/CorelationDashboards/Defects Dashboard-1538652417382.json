@@ -11,10 +11,10 @@
   ],
   "__requires": [
     {
-      "type": "grafana",
-      "id": "grafana",
-      "name": "Grafana",
-      "version": "4.6.2"
+      "type": "panel",
+      "id": "singlestatneo",
+      "name": "SingleStat-Neo4j",
+      "version": ""
     },
     {
       "type": "panel",
@@ -23,18 +23,99 @@
       "version": ""
     },
     {
+      "type": "grafana",
+      "id": "grafana",
+      "name": "Grafana",
+      "version": "4.0.2"
+    },
+    {
       "type": "datasource",
       "id": "neo4j",
       "name": "Neo4j",
       "version": "1.0.0"
-    },
-    {
-      "type": "panel",
-      "id": "singlestatneo",
-      "name": "SingleStat-Neo4j",
-      "version": ""
     }
   ],
+  "id": null,
+  "title": "Defects Dashboard",
+  "tags": [],
+  "style": "dark",
+  "timezone": "browser",
+  "editable": true,
+  "sharedCrosshair": false,
+  "hideControls": false,
+  "time": {
+    "from": "2018-07-23T12:26:06.329Z",
+    "to": "2019-04-06T12:26:06.329Z"
+  },
+  "timepicker": {
+    "refresh_intervals": [
+      "5s",
+      "10s",
+      "30s",
+      "1m",
+      "5m",
+      "15m",
+      "30m",
+      "1h",
+      "2h",
+      "1d"
+    ],
+    "time_options": [
+      "5m",
+      "15m",
+      "1h",
+      "6h",
+      "12h",
+      "24h",
+      "2d",
+      "7d",
+      "30d"
+    ]
+  },
+  "templating": {
+    "list": [
+      {
+        "allValue": null,
+        "current": {},
+        "datasource": "${DS_NEO4J_DS}",
+        "hide": 0,
+        "includeAll": true,
+        "label": null,
+        "multi": true,
+        "name": "ProjectName",
+        "options": [],
+        "query": "match (n:JIRA:DATA) where exists(n.status) return distinct n.projectName as PN order by PN",
+        "refresh": 1,
+        "regex": "",
+        "sort": 1,
+        "tagValuesQuery": "",
+        "tags": [],
+        "tagsQuery": "",
+        "type": "query",
+        "useTags": false
+      },
+      {
+        "allValue": null,
+        "current": {},
+        "datasource": "${DS_NEO4J_DS}",
+        "hide": 0,
+        "includeAll": true,
+        "label": null,
+        "multi": true,
+        "name": "SprintName",
+        "options": [],
+        "query": "match (n:JIRA:DATA) where  n.projectName IN ['ClaimFinder']  WITH n UNWIND n.sprints as Sp WITH distinct toString(Sp) as Sprints WITH collect(distinct Sprints) as Sprint MATCH (n:SPRINT) where n.sprintId IN Sprint return distinct n.sprintName ",
+        "refresh": 1,
+        "regex": "",
+        "sort": 1,
+        "tagValuesQuery": "",
+        "tags": [],
+        "tagsQuery": "",
+        "type": "query",
+        "useTags": false
+      }
+    ]
+  },
   "annotations": {
     "list": [
       {
@@ -48,17 +129,14 @@
       }
     ]
   },
-  "editable": true,
-  "gnetId": null,
-  "graphTooltip": 0,
-  "hideControls": false,
-  "id": null,
-  "links": [],
   "refresh": false,
+  "schemaVersion": 13,
+  "version": 64,
+  "links": [],
+  "gnetId": null,
   "rows": [
     {
-      "collapse": false,
-      "height": 232,
+      "title": "Dashboard Row",
       "panels": [
         {
           "datasource": "${DS_NEO4J_DS}",
@@ -70,7 +148,7 @@
               "hide": false,
               "rawQuery": true,
               "refId": "A",
-              "target": "match (n:SPRINT) where n.sprintName IN $SprintName\nWITH (n.sprintId) as SPID , n.sprintName as SprintName, n.state as State\nWITH collect(distinct SPID) as SPIDs , SprintName, State\nmatch (n:PIVOTALTRACKER:DATA) WITH SprintName, State,SPIDs,n UNWIND n.sprints as SP WITH SprintName, State, SP,SPIDs,n where toString(SP) IN SPIDs and n.issueType IN [\"Bug\", \"Sprint Bug\",\"SIT Bug\",\"Performance Bug\",\"Regression Bug\"]  RETURN distinct Count( n.key) as Total"
+              "target": "match (n:SPRINT) where n.sprintName IN $SprintName\nWITH (n.sprintId) as SPID , n.sprintName as SprintName, n.state as State\nWITH collect(distinct SPID) as SPIDs , SprintName, State\nmatch (n:JIRA:DATA) WITH SprintName, State,SPIDs,n UNWIND n.sprints as SP WITH SprintName, State, SP,SPIDs,n where toString(SP) IN SPIDs and n.jiraIssueType IN [\"Bug\", \"Sprint Bug\",\"SIT Bug\",\"Performance Bug\",\"Regression Bug\"] and ?START_TIME?<=n.inSightsTime<=?END_TIME? RETURN distinct Count( n.key) as Total"
             }
           ],
           "title": "Total defects",
@@ -156,7 +234,7 @@
               "hide": false,
               "rawQuery": true,
               "refId": "B",
-              "target": "match (n:SPRINT) where n.sprintName IN $SprintName\nWITH (n.sprintId) as SPID , n.sprintName as SprintName, n.state as State\nWITH collect(distinct SPID) as SPIDs , SprintName, State\nmatch (n:PIVOTALTRACKER:DATA) WITH SprintName, State,SPIDs,n UNWIND n.sprints as SP WITH SprintName, State, SP,SPIDs,n where toString(SP) IN SPIDs and n.issueType IN [\"Bug\", \"Sprint Bug\",\"SIT Bug\",\"Performance Bug\",\"Regression Bug\"]  return DISTINCT SprintName, count(n.key) as Count"
+              "target": "match (n:SPRINT) where n.sprintName IN $SprintName\nWITH (n.sprintId) as SPID , n.sprintName as SprintName, n.state as State\nWITH collect(distinct SPID) as SPIDs , SprintName, State\nmatch (n:JIRA:DATA) WITH SprintName, State,SPIDs,n UNWIND n.sprints as SP WITH SprintName, State, SP,SPIDs,n where toString(SP) IN SPIDs and n.issueType IN [\"Bug\", \"Sprint Bug\",\"SIT Bug\",\"Performance Bug\",\"Regression Bug\"] and ?START_TIME?<=n.inSightsTime<=?END_TIME? return DISTINCT SprintName, count(n.key) as Count"
             }
           ],
           "title": "Defects by Sprint",
@@ -229,23 +307,23 @@
               "rawQuery": true,
               "refId": "A",
               "stats": false,
-              "target": "match (n:SPRINT) where n.sprintName IN $SprintName\nWITH (n.sprintId) as SPID , n.sprintName as SprintName, n.state as State\nWITH collect(distinct SPID) as SPIDs , SprintName, State\nmatch (n:PIVOTALTRACKER:DATA) WITH SprintName, State,SPIDs,n UNWIND n.sprints as SP WITH SprintName, State, SP,SPIDs,n where toString(SP) IN SPIDs and n.issueType IN [\"Bug\", \"Sprint Bug\",\"SIT Bug\",\"Performance Bug\",\"Regression Bug\"] return SprintName, count(n.key) as Count order by Count desc"
+              "target": "match (n:SPRINT) where n.sprintName IN $SprintName\nWITH (n.sprintId) as SPID , n.sprintName as SprintName, n.state as State\nWITH collect(distinct SPID) as SPIDs , SprintName, State\nmatch (n:JIRA:DATA) WITH SprintName, State,SPIDs,n UNWIND n.sprints as SP WITH SprintName, State, SP,SPIDs,n where toString(SP) IN SPIDs and n.issueType IN [\"Bug\", \"Sprint Bug\",\"SIT Bug\",\"Performance Bug\",\"Regression Bug\"] and ?START_TIME?<=n.inSightsTime<=?END_TIME? return SprintName, count(n.key) as Count order by Count desc"
             }
           ],
           "title": "Defects By Sprint",
           "type": "insightscharts"
         }
       ],
-      "repeat": null,
-      "repeatIteration": null,
-      "repeatRowId": null,
       "showTitle": false,
-      "title": "Dashboard Row",
-      "titleSize": "h6"
+      "titleSize": "h6",
+      "height": 232,
+      "repeat": null,
+      "repeatRowId": null,
+      "repeatIteration": null,
+      "collapse": false
     },
     {
-      "collapse": false,
-      "height": 182,
+      "title": "Row",
       "panels": [
         {
           "datasource": "${DS_NEO4J_DS}",
@@ -260,7 +338,7 @@
               "hide": false,
               "rawQuery": true,
               "refId": "A",
-              "target": "match (n:SPRINT) where n.sprintName IN $SprintName\nWITH (n.sprintId) as SPID , n.sprintName as SprintName, n.state as State\nWITH collect(distinct SPID) as SPIDs , SprintName, State\nmatch (n:PIVOTALTRACKER:DATA) WITH SprintName, State,SPIDs,n UNWIND n.sprints as SP WITH SprintName, State, SP,SPIDs,n where toString(SP) IN SPIDs and n.issueType IN [\"Bug\", \"Sprint Bug\",\"SIT Bug\",\"Performance Bug\",\"Regression Bug\"]  and NOT n.jiraStatus IN [\"Done\",\"Closed\"] return count(n.key) as ClosedDefect"
+              "target": "match (n:SPRINT) where n.sprintName IN $SprintName\nWITH (n.sprintId) as SPID , n.sprintName as SprintName, n.state as State\nWITH collect(distinct SPID) as SPIDs , SprintName, State\nmatch (n:JIRA:DATA) WITH SprintName, State,SPIDs,n UNWIND n.sprints as SP WITH SprintName, State, SP,SPIDs,n where toString(SP) IN SPIDs and n.jiraIssueType IN [\"Bug\", \"Sprint Bug\",\"SIT Bug\",\"Performance Bug\",\"Regression Bug\"] and ?START_TIME?<=n.inSightsTime<=?END_TIME? and not n.jiraStatus in [\"Done\",\"Closed\"] return count(n.key) as  ClosedDefects"
             }
           ],
           "title": "Defects Not Closed",
@@ -270,7 +348,7 @@
               "color": "black",
               "font-size": "50px"
             },
-            "selectedfield": "ClosedDefect"
+            "selectedfield": "ClosedDefects"
           }
         },
         {
@@ -285,7 +363,7 @@
               "hide": false,
               "rawQuery": true,
               "refId": "A",
-              "target": "match (n:SPRINT) where n.sprintName IN $SprintName\nWITH (n.sprintId) as SPID , n.sprintName as SprintName, n.state as State\nWITH collect(distinct SPID) as SPIDs , SprintName, State\nmatch (n:PIVOTALTRACKER:DATA) WITH SprintName, State,SPIDs,n UNWIND n.sprints as SP WITH SprintName, State, SP,SPIDs,n where toString(SP) IN SPIDs and n.issueType IN [\"Bug\", \"Sprint Bug\",\"SIT Bug\",\"Performance Bug\",\"Regression Bug\"]  and n.jiraStatus IN [\"Done\",\"Closed\"] return count(n.key) as ClosedDefect"
+              "target": "match (n:SPRINT) where n.sprintName IN $SprintName\nWITH (n.sprintId) as SPID , n.sprintName as SprintName, n.state as State\nWITH collect(distinct SPID) as SPIDs , SprintName, State\nmatch (n:JIRA:DATA) WITH SprintName, State,SPIDs,n UNWIND n.sprints as SP WITH SprintName, State, SP,SPIDs,n where toString(SP) IN SPIDs and n.jiraIssueType IN [\"Bug\", \"Sprint Bug\",\"SIT Bug\",\"Performance Bug\",\"Regression Bug\"] and ?START_TIME?<=n.inSightsTime<=?END_TIME? and n.jiraStatus IN [\"Done\",\"Closed\"] return count(n.key) as ClosedDefect"
             }
           ],
           "title": "Defects Closed",
@@ -373,7 +451,7 @@
               "hide": false,
               "rawQuery": true,
               "refId": "A",
-              "target": "match (n:SPRINT) where n.sprintName IN $SprintName\nWITH (n.sprintId) as SPID , n.sprintName as SprintName, n.state as State\nWITH collect(distinct SPID) as SPIDs , SprintName, State\nmatch (n:PIVOTALTRACKER:DATA) WITH SprintName, State,SPIDs,n UNWIND n.sprints as SP WITH SprintName, State, SP,SPIDs,n where toString(SP) IN SPIDs and n.issueType IN [\"Bug\", \"Sprint Bug\",\"SIT Bug\",\"Performance Bug\",\"Regression Bug\"]  return SprintName, n.status as Status,count(n.key) as Count order by Count desc"
+              "target": "match (n:SPRINT) where n.sprintName IN $SprintName\nWITH (n.sprintId) as SPID , n.sprintName as SprintName, n.state as State\nWITH collect(distinct SPID) as SPIDs , SprintName, State\nmatch (n:JIRA:DATA) WITH SprintName, State,SPIDs,n UNWIND n.sprints as SP WITH SprintName, State, SP,SPIDs,n where toString(SP) IN SPIDs and n.issueType IN [\"Bug\", \"Sprint Bug\",\"SIT Bug\",\"Performance Bug\",\"Regression Bug\"] and ?START_TIME?<=n.inSightsTime<=?END_TIME? return SprintName, n.status as Status,count(n.key) as Count order by Count desc"
             }
           ],
           "title": "Defects by Status",
@@ -454,98 +532,20 @@
               "hide": false,
               "rawQuery": true,
               "refId": "A",
-              "target": "match (n:SPRINT) where n.sprintName IN $SprintName\nWITH (n.sprintId) as SPID , n.sprintName as SprintName, n.state as State\nWITH collect(distinct SPID) as SPIDs , SprintName, State\nmatch (n:PIVOTALTRACKER:DATA) WITH SprintName, State,SPIDs,n UNWIND n.sprints as SP WITH SprintName, State, SP,SPIDs,n where toString(SP) IN SPIDs and n.issueType IN [\"Bug\", \"Sprint Bug\",\"SIT Bug\",\"Performance Bug\",\"Regression Bug\"] return SprintName, n.priority as Priority,count(n.key) as Count order by Priority desc"
+              "target": "match (n:SPRINT) where n.sprintName IN $SprintName\nWITH (n.sprintId) as SPID , n.sprintName as SprintName, n.state as State\nWITH collect(distinct SPID) as SPIDs , SprintName, State\nmatch (n:JIRA:DATA) WITH SprintName, State,SPIDs,n UNWIND n.sprints as SP WITH SprintName, State, SP,SPIDs,n where toString(SP) IN SPIDs and n.issueType IN [\"Bug\", \"Sprint Bug\",\"SIT Bug\",\"Performance Bug\",\"Regression Bug\"] and ?START_TIME?<=n.inSightsTime<=?END_TIME? return SprintName, n.priority as Priority,count(n.key) as Count order by Priority desc"
             }
           ],
           "title": "Defects by Priority",
           "type": "insightscharts"
         }
       ],
-      "repeat": null,
-      "repeatIteration": null,
-      "repeatRowId": null,
       "showTitle": false,
-      "title": "Row",
-      "titleSize": "h6"
+      "titleSize": "h6",
+      "height": 182,
+      "repeat": null,
+      "repeatRowId": null,
+      "repeatIteration": null,
+      "collapse": false
     }
-  ],
-  "schemaVersion": 14,
-  "style": "dark",
-  "tags": [],
-  "templating": {
-    "list": [
-      {
-        "allValue": null,
-        "current": {},
-        "datasource": "${DS_NEO4J_DS}",
-        "hide": 0,
-        "includeAll": true,
-        "label": null,
-        "multi": true,
-        "name": "ProjectName",
-        "options": [],
-        "query": "match (n:PIVOTALTRACKER:DATA) where exists(n.status) return distinct n.projectName as PN order by PN",
-        "refresh": 1,
-        "regex": "",
-        "sort": 1,
-        "tagValuesQuery": "",
-        "tags": [],
-        "tagsQuery": "",
-        "type": "query",
-        "useTags": false
-      },
-      {
-        "allValue": null,
-        "current": {},
-        "datasource": "${DS_NEO4J_DS}",
-        "hide": 0,
-        "includeAll": true,
-        "label": null,
-        "multi": true,
-        "name": "SprintName",
-        "options": [],
-        "query": "match (n:PIVOTALTRACKER:DATA) where  n.projectName IN ['ClaimFinder']  WITH n UNWIND n.sprints as Sp WITH distinct toString(Sp) as Sprints WITH collect(distinct Sprints) as Sprint MATCH (n:SPRINT) where n.sprintId IN Sprint return distinct n.sprintName ",
-        "refresh": 1,
-        "regex": "",
-        "sort": 1,
-        "tagValuesQuery": "",
-        "tags": [],
-        "tagsQuery": "",
-        "type": "query",
-        "useTags": false
-      }
-    ]
-  },
-  "time": {
-    "from": "2018-07-23T12:26:06.329Z",
-    "to": "2018-09-21T12:26:06.329Z"
-  },
-  "timepicker": {
-    "refresh_intervals": [
-      "5s",
-      "10s",
-      "30s",
-      "1m",
-      "5m",
-      "15m",
-      "30m",
-      "1h",
-      "2h",
-      "1d"
-    ],
-    "time_options": [
-      "5m",
-      "15m",
-      "1h",
-      "6h",
-      "12h",
-      "24h",
-      "2d",
-      "7d",
-      "30d"
-    ]
-  },
-  "timezone": "browser",
-  "title": "Defects Dashboard",
-  "version": 60
+  ]
 }
