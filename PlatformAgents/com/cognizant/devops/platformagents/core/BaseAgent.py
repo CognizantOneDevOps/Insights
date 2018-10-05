@@ -78,7 +78,7 @@ class BaseAgent(object):
         maxBytes = loggingSetting.get('maxBytes', 1000 * 1000 * 5)
         backupCount = loggingSetting.get('backupCount', 1000)
         handler = logging.handlers.RotatingFileHandler(self.logFilePath, maxBytes=maxBytes, backupCount=backupCount)
-        formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(filename)s - %(funcName)s - %(message)s')
+        formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(filename)s - %(lineno)s - %(funcName)s - %(message)s')
         handler.setFormatter(formatter)
         logging.getLogger().setLevel(loggingSetting.get('logLevel',logging.WARN))
         logging.getLogger().addHandler(handler)
@@ -197,6 +197,7 @@ class BaseAgent(object):
                 data = self.validateData(data)
             self.addExecutionId(data, self.executionId)
             self.addTimeStampField(data, timeStampField, timeStampFormat, isEpochTime)
+            logging.info(data)
             self.messageFactory.publish(self.dataRoutingKey, data, self.config.get('dataBatchSize', 100), metadata)
             self.logIndicator(self.PUBLISH_START, self.config.get('isDebugAllowed', False))
             
