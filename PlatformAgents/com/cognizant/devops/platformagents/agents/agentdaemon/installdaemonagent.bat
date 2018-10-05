@@ -23,3 +23,32 @@ IF /I "%1%" == "UNINSTALL" (
     nssm install DaemonAgent %INSIGHTS_AGENT_HOME%\AgentDaemon\DaemonAgent.bat 
     net start DaemonAgent
 )
+
+    @echo off 
+	setlocal enableextensions enabledelayedexpansion
+	set "search=FOO"
+	set configPath=%INSIGHTS_AGENT_HOME%\AgentDaemon\com\cognizant\devops\platformagents\agents\agentdaemon\config.json
+	echo %configPath%
+	set psqlpath=%INSIGHTS_HOME%\..\postgresql-9.5.4-1\pgsql\bin
+	echo %psqlpath%
+
+	set data=
+	for /f "delims=" %%x in (%configPath%) do set "data=!data!%%x"
+
+	set textFile=Daemonagent.sql
+
+	del %textFile%
+
+	echo INSERT INTO public.agent_configuration(id, agent_id, agent_json, agent_key, agent_status, agent_version,data_update_supported, os_version, tool_category, tool_name,unique_key, update_date) VALUES (100, 0,'FOO','daemon-1523257126' ,'' ,'' , FALSE,'' , 'DAEMONAGENT', 'AGENTDAEMON', 'daemon-1523257126', current_date); >> %textFile%
+
+	for /f "delims=" %%i in ('type "%textFile%" ^& break ^> "%textFile%" ') do (
+		set "line=%%i"
+		setlocal enabledelayedexpansion
+		 >> %textFile% echo(!line:%search%=%data%!
+		endlocal
+	)
+	IF /I "%1%" == "UNINSTALL" (
+		echo "Uninstall no need to updare DB"
+	) ELSE (
+		%psqlpath%\psql -U postgres -d "insight" -f %~dp0Daemonagent.sql
+	)
