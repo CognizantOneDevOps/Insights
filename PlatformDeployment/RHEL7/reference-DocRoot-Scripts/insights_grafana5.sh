@@ -30,10 +30,6 @@ sudo wget https://platform.cogdevops.com/insights_install/installationScripts/la
 sudo cp ldap.toml $GRAFANA_DIR/conf/ldap.toml
 sudo wget https://platform.cogdevops.com/insights_install/installationScripts/latest/RHEL/grafana/defaults.ini
 sudo cp defaults.ini $GRAFANA_DIR/conf/defaults.ini
-sudo wget https://platform.cogdevops.com/insights_install/installationScripts/latest/RHEL/grafana/index.html
-sudo cp index.html $GRAFANA_DIR/public/views/index.html
-sudo wget https://platform.cogdevops.com/insights_install/installationScripts/latest/RHEL/grafana/icon_insights_branding.svg
-sudo cp icon_insights_branding-light.svg $GRAFANA_DIR/public/img/icon_insights_branding.svg
 cd $GRAFANA_DIR
 echo 'pwd'
 sudo nohup ./bin/grafana-server &
