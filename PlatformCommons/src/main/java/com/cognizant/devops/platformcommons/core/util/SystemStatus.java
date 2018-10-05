@@ -32,7 +32,6 @@ public  class SystemStatus {
 	
 	public static JsonObject addSystemInformationInNeo4j(String version,List<JsonObject> dataList,List<String> labels) {
 		Neo4jDBHandler graphDBHandler = new Neo4jDBHandler();
-		boolean status = Boolean.TRUE;
 		JsonObject response = null;
 		try {
 			String queryLabel = "";
@@ -48,8 +47,7 @@ public  class SystemStatus {
 			//log.info("  GraphDB response created " + response);
 		
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			log.error(" Neo4j Node not created "+e.getMessage());
 		}
 		
 		return response;
