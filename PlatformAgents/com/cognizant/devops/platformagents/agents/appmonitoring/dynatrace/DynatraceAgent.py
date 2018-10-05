@@ -30,6 +30,7 @@ class DynatraceAgent(BaseAgent):
     def process(self):
         print("Inside process")
         try:
+            self.headers = {"Accept":"application/json","charset":"utf-8"}
             self.apiToken = self.config.get("apiToken", None)
             self.start = self.tracking.get('lastFetchTime',None)
             self.end = int(time.time()*1000.0)
@@ -46,7 +47,7 @@ class DynatraceAgent(BaseAgent):
             self.responseTemplate = self.getResponseTemplate()
             self.getHostsDetails(data)
             trackingDetails['lastFetchTime'] = self.end
-            #print(data)
+            logging.error(data)
             self.publishToolsData(data)
             self.updateTrackingJson(trackingDetails)
         except Exception as e:
@@ -56,23 +57,34 @@ class DynatraceAgent(BaseAgent):
         hostInfo = self.responseTemplate.get('Host')
         hostURL = hostInfo.get('hostListURL')
         gethostUrlWithToken = hostURL+"?Api-Token="+self.apiToken+'&startTimestamp='+str(self.start)+'&endTimestamp='+str(self.end)+'&per_page=100&sort=created&page=1'
-        serverHosts = self.getResponse(gethostUrlWithToken, 'GET', None, None, None)
+        serverHosts = self.getResponse(gethostUrlWithToken, 'GET', None, None, None,reqHeaders=self.headers)
         fieldToPull = hostInfo.get('relevantHostFields')
         for host in serverHosts:
-            hostData = self.parseResponse(fieldToPull, host)
-            print(hostData.get('entityId'))
-            eventData = getHostEventDetails(hostData.get('entityId'))
-            data += hostData
+            hostDataArry = self.parseResponse(fieldToPull, host)
+            hostData = hostDataArry[0]
+            eventData = self.getHostEventDetails(hostData)
+            data += eventData
         
         return data
     
-    def getHostEventDetails(self,entityId):
+    def getHostEventDetails(self, hostData):
         eventInfo = self.responseTemplate.get('Event')
-        eventURL = entityId.get('eventListURL')
-        getEventUrlWithToken = eventURL+"?Api-Token="+self.apiToken+'&startTimestamp='+str(self.start)+'&endTimestamp='+str(self.end)+'&entityId='+entityId+'&per_page=100&sort=created&page=1'
-        hostEvents = self.getResponse(getEventUrlWithToken, 'GET', None, None, None)
+        eventURL = eventInfo.get('eventListURL')
+        getEventUrlWithToken = eventURL+"?Api-Token="+self.apiToken+'&startTimestamp='+str(self.start)+'&endTimestamp='+str(self.end)+'&entityId='+hostData.get('entityId')+'&per_page=100&sort=created&page=1'
+        hostEvents = self.getResponse(getEventUrlWithToken, 'GET', None, None, None,reqHeaders=self.headers)
         fieldToPull = eventInfo.get('relevantEventFields')
+        eventDataList = {}
+        events = []
+        events = hostEvents.get('events')
+        print('worked')
+        for event in events:
+            eventDataList = self.parseResponse(fieldToPull, event)
+            eventData = eventDataList[0]
+            hostData = hostData.update(eventData)
+            eventDataList += hostData
         
+        #print(hostEvents)
+        return eventDataList
         
 if __name__ == "__main__":
     DynatraceAgent()
