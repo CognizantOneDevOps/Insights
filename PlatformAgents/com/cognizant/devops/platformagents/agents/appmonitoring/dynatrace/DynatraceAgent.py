@@ -13,6 +13,7 @@
 # License for the specific language governing permissions and limitations under
 # the License.
 #-------------------------------------------------------------------------------
+from cookielib import logger
 '''
 Created on Sep 24, 2018
 
@@ -25,6 +26,7 @@ import os
 from datetime import datetime, timedelta
 from com.cognizant.devops.platformagents.core.BaseAgent import BaseAgent
 import logging.handlers
+import json
 
 class DynatraceAgent(BaseAgent):
     def process(self):
@@ -35,25 +37,21 @@ class DynatraceAgent(BaseAgent):
             self.start = self.tracking.get('lastFetchTime',None)
             self.end = int(time.time()*1000.0)
             trackingDetails = {}
-            data = []
+            self.data = []
             if self.start is None:
                 startFrom = self.config.get("startFrom", None)
                 startFrom = parser.parse(startFrom)
                 startFrom = time.mktime(startFrom.timetuple()) + startFrom.microsecond/1000000.0
                 self.start = long(startFrom * 1000)
-            
-            print(self.start)
-            print(self.end)
             self.responseTemplate = self.getResponseTemplate()
-            self.getHostsDetails(data)
+            self.getHostsDetails()
             trackingDetails['lastFetchTime'] = self.end
-            logging.error(data)
-            self.publishToolsData(data)
+            self.publishToolsData(self.data)
             self.updateTrackingJson(trackingDetails)
         except Exception as e:
             logging.error(e)
             
-    def getHostsDetails(self, data):
+    def getHostsDetails(self):
         hostInfo = self.responseTemplate.get('Host')
         hostURL = hostInfo.get('hostListURL')
         gethostUrlWithToken = hostURL+"?Api-Token="+self.apiToken+'&startTimestamp='+str(self.start)+'&endTimestamp='+str(self.end)+'&per_page=100&sort=created&page=1'
@@ -62,29 +60,25 @@ class DynatraceAgent(BaseAgent):
         for host in serverHosts:
             hostDataArry = self.parseResponse(fieldToPull, host)
             hostData = hostDataArry[0]
-            eventData = self.getHostEventDetails(hostData)
-            data += eventData
+            self.getHostEventDetails(hostData)
         
-        return data
     
     def getHostEventDetails(self, hostData):
+        a=0
         eventInfo = self.responseTemplate.get('Event')
         eventURL = eventInfo.get('eventListURL')
         getEventUrlWithToken = eventURL+"?Api-Token="+self.apiToken+'&startTimestamp='+str(self.start)+'&endTimestamp='+str(self.end)+'&entityId='+hostData.get('entityId')+'&per_page=100&sort=created&page=1'
         hostEvents = self.getResponse(getEventUrlWithToken, 'GET', None, None, None,reqHeaders=self.headers)
         fieldToPull = eventInfo.get('relevantEventFields')
-        eventDataList = {}
-        events = []
+        eventData={}
+        eventhostData={}
         events = hostEvents.get('events')
-        print('worked')
         for event in events:
             eventDataList = self.parseResponse(fieldToPull, event)
             eventData = eventDataList[0]
-            hostData = hostData.update(eventData)
-            eventDataList += hostData
-        
-        #print(hostEvents)
-        return eventDataList
+            eventhostData = dict(eventData.items()+ hostData.items())
+            self.data.append(eventhostData)
+        return self.data
         
 if __name__ == "__main__":
     DynatraceAgent()
