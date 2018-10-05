@@ -23,10 +23,6 @@ wget https://platform.cogdevops.com/insights_install/installationScripts/latest/
 cp ldap.toml ./grafana-4.6.2/conf/ldap.toml
 wget https://platform.cogdevops.com/insights_install/installationScripts/latest/RHEL/grafana/defaults.ini
 cp defaults.ini ./grafana-4.6.2/conf/defaults.ini
-sudo wget https://platform.cogdevops.com/insights_install/installationScripts/latest/RHEL/grafana/index.html
-sudo cp index.html $GRAFANA_DIR/public/views/index.html
-sudo wget https://platform.cogdevops.com/insights_install/installationScripts/latest/RHEL/grafana/icon_insights_branding-light.svg
-sudo cp icon_insights_branding-light.svg $GRAFANA_DIR/public/img/icon_insights_branding-light.svg
 cd grafana-4.6.2
 nohup ./bin/grafana-server &
 echo $! > grafana-pid.txt
