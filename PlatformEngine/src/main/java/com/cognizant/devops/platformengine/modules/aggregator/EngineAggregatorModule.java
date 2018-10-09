@@ -56,7 +56,7 @@ public class EngineAggregatorModule implements Job{
 			registerAggragators(agentConfig, graphDBHandler);
 			//publishAgentConfig(agentConfig);
 		}
-		EngineStatusLogger.getInstance().createEngineStatusNode(" Engine Aggregator Module (Data Collection ) run successfully  ",PlatformServiceConstants.SUCCESS);
+		//EngineStatusLogger.getInstance().createEngineStatusNode("Engine Aggregator Module (Data Collection ) run successfully  ",PlatformServiceConstants.SUCCESS);
 		//agentConfigDal.updateAgentSubscriberConfigurations(allAgentConfigurations);
 	}
 	
@@ -70,33 +70,42 @@ public class EngineAggregatorModule implements Job{
 		}
 	}*/
 	private void registerAggragators(AgentConfig agentConfig, Neo4jDBHandler graphDBHandler){
-		JsonObject config = (JsonObject)new JsonParser().parse(agentConfig.getAgentJson());
-		JsonObject json = config.get("publish").getAsJsonObject();
-		String dataRoutingKey = json.get("data").getAsString();
-		if(dataRoutingKey!= null && !registry.containsKey(dataRoutingKey)){
-			try {
-				registry.put(dataRoutingKey, new AgentDataSubscriber(dataRoutingKey, 
-													agentConfig.isDataUpdateSupported(), 
-													agentConfig.getUniqueKey(),
-													agentConfig.getToolCategory(),
-													agentConfig.getToolName()));
-			} catch (Exception e) {
-				log.error("Unable to add subscriber for routing key: "+dataRoutingKey,e);
-				EngineStatusLogger.getInstance().createEngineStatusNode(" Error occured while executing aggragator for data queue subscriber "+e.getMessage(),PlatformServiceConstants.FAILURE);
+		try {
+			JsonObject config = (JsonObject)new JsonParser().parse(agentConfig.getAgentJson());
+			JsonObject json = config.get("publish").getAsJsonObject();
+			String dataRoutingKey = json.get("data").getAsString();
+			log.info(" dataRoutingKey "+dataRoutingKey);
+			if(dataRoutingKey!= null && !registry.containsKey(dataRoutingKey)){
+				try {
+					registry.put(dataRoutingKey, new AgentDataSubscriber(dataRoutingKey, 
+														agentConfig.isDataUpdateSupported(), 
+														agentConfig.getUniqueKey(),
+														agentConfig.getToolCategory(),
+														agentConfig.getToolName()));
+				} catch (Exception e) {
+					log.error("Unable to add subscriber for routing key: "+dataRoutingKey,e);
+					EngineStatusLogger.getInstance().createEngineStatusNode(" Error occured while executing aggragator for data queue subscriber "+e.getMessage(),PlatformServiceConstants.FAILURE);
+				}
+				EngineStatusLogger.getInstance().createEngineStatusNode(" Agent data queue "+ dataRoutingKey +" subscribed successfully ",PlatformServiceConstants.SUCCESS);
 			}
-		}
+			
+			String healthRoutingKey = json.get("health").getAsString();
+			if(healthRoutingKey!= null && !registry.containsKey(healthRoutingKey)){
+				//Make sure that default health node is initialized
+				String nodeLabels = ":LATEST:" + healthRoutingKey.replace(".",":");
+				try {
+					graphDBHandler.executeCypherQuery("MERGE (n"+nodeLabels+") return n");
+					registry.put(healthRoutingKey, new AgentHealthSubscriber(healthRoutingKey));
+				} catch (Exception e) {
+					log.error("Unable to add subscriber for routing key: "+healthRoutingKey,e);
+					EngineStatusLogger.getInstance().createEngineStatusNode(" Error occured while executing aggragator for health queue subscriber  "+e.getMessage(),PlatformServiceConstants.FAILURE);
+				}
+				EngineStatusLogger.getInstance().createEngineStatusNode(" Agent health queue "+ healthRoutingKey +" subscribed successfully ",PlatformServiceConstants.SUCCESS);
+			}
 		
-		String healthRoutingKey = json.get("health").getAsString();
-		if(healthRoutingKey!= null && !registry.containsKey(healthRoutingKey)){
-			//Make sure that default health node is initialized
-			String nodeLabels = ":LATEST:" + healthRoutingKey.replace(".",":");
-			try {
-				graphDBHandler.executeCypherQuery("MERGE (n"+nodeLabels+") return n");
-				registry.put(healthRoutingKey, new AgentHealthSubscriber(healthRoutingKey));
-			} catch (Exception e) {
-				log.error("Unable to add subscriber for routing key: "+healthRoutingKey,e);
-				EngineStatusLogger.getInstance().createEngineStatusNode(" Error occured while executing aggragator for health queue subscriber  "+e.getMessage(),PlatformServiceConstants.FAILURE);
-			}
+		} catch (Exception e) {
+			log.error("Unable to add subscriber for routing key: "+agentConfig.getAgentKey() ,e);
+			EngineStatusLogger.getInstance().createEngineStatusNode(" Error occured while executing aggragator  "+ agentConfig.getAgentKey() +e.getMessage(),PlatformServiceConstants.FAILURE);
 		}
 	}
 	
