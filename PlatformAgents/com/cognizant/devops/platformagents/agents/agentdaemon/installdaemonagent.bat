@@ -35,7 +35,7 @@ IF /I "%1%" == "UNINSTALL" (
 	set data=
 	for /f "delims=" %%x in (%configPath%) do set "data=!data!%%x"
 
-	set textFile=Deamonagent.sql
+	set textFile=Daemonagent.sql
 
 	del %textFile%
 
@@ -50,5 +50,5 @@ IF /I "%1%" == "UNINSTALL" (
 	IF /I "%1%" == "UNINSTALL" (
 		echo "Uninstall no need to updare DB"
 	) ELSE (
-		%psqlpath%\psql -U postgres -d "insight" -f %~dp0Deamonagent.sql
+		%psqlpath%\psql -U postgres -d "insight" -f %~dp0Daemonagent.sql
 	)
