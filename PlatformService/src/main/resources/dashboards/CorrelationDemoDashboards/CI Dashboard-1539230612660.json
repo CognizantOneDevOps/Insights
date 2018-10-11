@@ -111,36 +111,13 @@
   },
   "refresh": false,
   "schemaVersion": 13,
-  "version": 41,
+  "version": 49,
   "links": [],
   "gnetId": null,
   "rows": [
     {
       "title": "Row",
       "panels": [
-        {
-          "datasource": "${DS_NEO4J_DS}",
-          "id": 21,
-          "links": [],
-          "span": 3,
-          "targets": [
-            {
-              "hide": false,
-              "rawQuery": true,
-              "refId": "A",
-              "target": "MATCH (n:JENKINS) where ?START_TIME?<=n.inSightsTime<=?END_TIME? and n.jobName In $JenkinsProject RETURN count( n.jobName)"
-            }
-          ],
-          "title": "Total CI Projects",
-          "type": "singlestatneo",
-          "uniqueSingleStatPanelMetaData": {
-            "inputProperties": {
-              "color": "black",
-              "font-size": "30px"
-            },
-            "selectedfield": "count( n.jobName)"
-          }
-        },
         {
           "datasource": "${DS_NEO4J_DS}",
           "editable": true,
@@ -153,7 +130,7 @@
               "hide": false,
               "rawQuery": true,
               "refId": "A",
-              "target": "match (n:CI:DATA) where n.jobName In $JenkinsProject and ?START_TIME?<=n.inSightsTime<=?END_TIME? return count (n.buildUrl)"
+              "target": "match (n:JENKINS:DATA) where n.jobName In $JenkinsProject and ?START_TIME?<=n.inSightsTime<=?END_TIME? return count (n.buildUrl)"
             }
           ],
           "title": "Total Builds",
@@ -168,6 +145,29 @@
         },
         {
           "datasource": "${DS_NEO4J_DS}",
+          "id": 21,
+          "links": [],
+          "span": 3,
+          "targets": [
+            {
+              "hide": false,
+              "rawQuery": true,
+              "refId": "A",
+              "target": "match (n:JENKINS:DATA) where ?START_TIME?<=n.inSightsTime<=?END_TIME? and n.jobName In $JenkinsProject and n.result='ABORTED' return count ( n.buildUrl)"
+            }
+          ],
+          "title": "Count of Aborted Builds",
+          "type": "singlestatneo",
+          "uniqueSingleStatPanelMetaData": {
+            "inputProperties": {
+              "color": "black",
+              "font-size": "30px"
+            },
+            "selectedfield": "count ( n.buildUrl)"
+          }
+        },
+        {
+          "datasource": "${DS_NEO4J_DS}",
           "editable": true,
           "error": false,
           "id": 17,
@@ -178,7 +178,7 @@
               "hide": true,
               "rawQuery": true,
               "refId": "A",
-              "target": "match (n:CI:DATA) where ?START_TIME?<=n.inSightsTime<=?END_TIME? and n.jobName In $JenkinsProject and n.result='SUCCESS' return count ( n.buildUrl)"
+              "target": "match (n:JENKINS:DATA) where ?START_TIME?<=n.inSightsTime<=?END_TIME? and n.jobName In $JenkinsProject and n.result='SUCCESS' return count ( n.buildUrl)"
             }
           ],
           "title": "Count of Successful Builds",
@@ -203,7 +203,7 @@
               "hide": true,
               "rawQuery": true,
               "refId": "A",
-              "target": "match (n:CI:DATA) where ?START_TIME?<=n.inSightsTime<=?END_TIME? and n.jobName In $JenkinsProject and n.result<>'FAILURE' return count (n.buildUrl)"
+              "target": "match (n:JENKINS:DATA) where ?START_TIME?<=n.inSightsTime<=?END_TIME? and n.jobName In $JenkinsProject and n.result='FAILURE' return count (n.buildUrl)"
             }
           ],
           "title": "Count of Failed Builds",
