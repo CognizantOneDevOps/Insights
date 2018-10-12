@@ -38,11 +38,15 @@ public class InsightsStatusProvider extends ComponentHealthLogger {
 	}
 	
 	public boolean createInsightStatusNode(String message,String status) {
+	try {
 			String version = "";
 			version = InsightsStatusProvider.class.getPackage().getImplementationVersion();
 			log.debug( " Insights version " +  version    );
 			Map<String,String> extraParameter= new HashMap<String,String>(0);
 			createComponentStatusNode("HEALTH:INSIGHTS",version,message,status,extraParameter);
+		} catch (Exception e) {
+			log.error(" Unable to create node " + e.getMessage());
+		}
 			return Boolean.TRUE;
 	}
 }

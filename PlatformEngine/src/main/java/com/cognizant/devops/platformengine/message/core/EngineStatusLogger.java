@@ -40,11 +40,15 @@ public class EngineStatusLogger extends ComponentHealthLogger {
 	}
 
 	public boolean createEngineStatusNode(String message, String status) {
-		String version = "";
-		version = EngineStatusLogger.class.getPackage().getImplementationVersion();
-		log.debug(" Engine version " + version);
-		Map<String,String> extraParameter= new HashMap<String,String>(0);
-		createComponentStatusNode("HEALTH:ENGINE", version, message, status,extraParameter);
+	try {
+			String version = "";
+			version = EngineStatusLogger.class.getPackage().getImplementationVersion();
+			log.debug(" Engine version " + version);
+			Map<String, String> extraParameter = new HashMap<String, String>(0);
+			createComponentStatusNode("HEALTH:ENGINE", version, message, status, extraParameter);
+		} catch (Exception e) {
+			log.error(" Unable to create node " + e.getMessage());
+		}
 		return Boolean.TRUE;
 	}
 }
