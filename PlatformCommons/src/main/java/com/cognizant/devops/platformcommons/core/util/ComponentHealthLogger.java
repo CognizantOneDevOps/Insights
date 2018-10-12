@@ -21,20 +21,23 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.TimeZone;
 
 import org.apache.log4j.Logger;
 
+import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
 import com.google.gson.JsonObject;
 
 public abstract class ComponentHealthLogger {
-	public final String DATE_TIME_FORMAT = "yyyy/MM/dd hh:mm a";
+	public final String DATE_TIME_FORMAT = "yyyy-MM-dd'T'HH:mm:ss'Z'";
 	public final  SimpleDateFormat  dtf = new SimpleDateFormat(DATE_TIME_FORMAT);
 	private static final Logger log = Logger.getLogger(ComponentHealthLogger.class);
 	
 	public boolean createComponentStatusNode(String label,String version,String message,String status,Map<String,String> parameter){
 		JsonObject response = null;
 		try {
+			dtf.setTimeZone(TimeZone.getTimeZone(ApplicationConfigProvider.getInstance().getInsightsTimeZone()));
 			List<JsonObject> dataList = new ArrayList<JsonObject>();
 			List<String> labels = new ArrayList<String>();
 			labels.addAll(Arrays.asList(label.split(":")));
