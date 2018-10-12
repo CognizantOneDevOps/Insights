@@ -1,0 +1,49 @@
+{
+  "mqConfig": {
+    "user": "iSight",
+    "password": "iSight",
+    "host": "127.0.0.1",
+    "exchange": "iSight",
+    "agentControlXchg":"iAgent"
+  },
+  "subscribe": {
+    "config": "ALM.VERSIONONE.config"
+  },
+  "publish": {
+    "data": "ALM.VERSIONONE.DATA",
+    "health": "ALM.VERSIONONE.HEALTH"
+  },
+  "communication": {
+    "type": "REST",
+    "sslVerify": true,
+    "responseType": "JSON"
+  },
+  "dynamicTemplate": {
+          "timeFieldMapping" : {
+                "startDate" : "%Y-%m-%d"
+                },
+                "responseTemplate": {
+                        "LastUpdateDate": "LastUpdateDate"
+                }
+  },
+  "runSchedule": 30,
+  "toolCategory" : "ALM",
+  "userid": "userid",
+  "passwd": "password",
+  "project": "sample_project",
+  "baseUrl": "sample_url",
+  "startFrom": "2010-10-10 00:01",
+  "toolsTimeZone" : "Asia/Kolkata",
+  "insightsTimeZone" : "Asia/Kolkata",
+  "useResponseTemplate" : false,
+  "timeStampField":"LastUpdated",
+  "timeStampFormat":"%Y-%m-%dT%H:%M:%S",
+  "isEpochTimeFormat" : false,
+  "isDebugAllowed" : false,
+  "enableDataValidation": true,
+  "loggingSetting" : {
+                "logLevel" : "WARN",
+		"maxBytes" : 5000000,
+		"backupCount" : 1000
+        }
+}
