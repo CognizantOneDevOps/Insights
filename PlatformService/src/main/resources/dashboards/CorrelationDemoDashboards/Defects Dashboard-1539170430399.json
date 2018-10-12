@@ -1,0 +1,551 @@
+{
+  "__inputs": [
+    {
+      "name": "DS_NEO4J_DS",
+      "label": "Neo4j_DS",
+      "description": "",
+      "type": "datasource",
+      "pluginId": "neo4j",
+      "pluginName": "Neo4j"
+    }
+  ],
+  "__requires": [
+    {
+      "type": "panel",
+      "id": "singlestatneo",
+      "name": "SingleStat-Neo4j",
+      "version": ""
+    },
+    {
+      "type": "panel",
+      "id": "insightscharts",
+      "name": "Insights Charts",
+      "version": ""
+    },
+    {
+      "type": "grafana",
+      "id": "grafana",
+      "name": "Grafana",
+      "version": "4.0.2"
+    },
+    {
+      "type": "datasource",
+      "id": "neo4j",
+      "name": "Neo4j",
+      "version": "1.0.0"
+    }
+  ],
+  "id": null,
+  "title": "Defects Dashboard",
+  "tags": [],
+  "style": "dark",
+  "timezone": "browser",
+  "editable": true,
+  "sharedCrosshair": false,
+  "hideControls": false,
+  "time": {
+    "from": "2018-07-23T12:26:06.329Z",
+    "to": "2019-04-06T12:26:06.329Z"
+  },
+  "timepicker": {
+    "refresh_intervals": [
+      "5s",
+      "10s",
+      "30s",
+      "1m",
+      "5m",
+      "15m",
+      "30m",
+      "1h",
+      "2h",
+      "1d"
+    ],
+    "time_options": [
+      "5m",
+      "15m",
+      "1h",
+      "6h",
+      "12h",
+      "24h",
+      "2d",
+      "7d",
+      "30d"
+    ]
+  },
+  "templating": {
+    "list": [
+      {
+        "allValue": null,
+        "current": {},
+        "datasource": "${DS_NEO4J_DS}",
+        "hide": 0,
+        "includeAll": true,
+        "label": null,
+        "multi": true,
+        "name": "ProjectName",
+        "options": [],
+        "query": "match (n:JIRA:DATA) where exists(n.status) return distinct n.projectName as PN order by PN",
+        "refresh": 1,
+        "regex": "",
+        "sort": 1,
+        "tagValuesQuery": "",
+        "tags": [],
+        "tagsQuery": "",
+        "type": "query",
+        "useTags": false
+      },
+      {
+        "allValue": null,
+        "current": {},
+        "datasource": "${DS_NEO4J_DS}",
+        "hide": 0,
+        "includeAll": true,
+        "label": null,
+        "multi": true,
+        "name": "SprintName",
+        "options": [],
+        "query": "match (n:JIRA:DATA) where  n.projectName IN ['ClaimFinder']  WITH n UNWIND n.sprints as Sp WITH distinct toString(Sp) as Sprints WITH collect(distinct Sprints) as Sprint MATCH (n:SPRINT) where n.sprintId IN Sprint return distinct n.sprintName ",
+        "refresh": 1,
+        "regex": "",
+        "sort": 1,
+        "tagValuesQuery": "",
+        "tags": [],
+        "tagsQuery": "",
+        "type": "query",
+        "useTags": false
+      }
+    ]
+  },
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": "-- Grafana --",
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "refresh": false,
+  "schemaVersion": 13,
+  "version": 64,
+  "links": [],
+  "gnetId": null,
+  "rows": [
+    {
+      "title": "Dashboard Row",
+      "panels": [
+        {
+          "datasource": "${DS_NEO4J_DS}",
+          "id": 10,
+          "links": [],
+          "span": 4,
+          "targets": [
+            {
+              "hide": false,
+              "rawQuery": true,
+              "refId": "A",
+              "target": "match (n:SPRINT) where n.sprintName IN $SprintName\nWITH (n.sprintId) as SPID , n.sprintName as SprintName, n.state as State\nWITH collect(distinct SPID) as SPIDs , SprintName, State\nmatch (n:JIRA:DATA) WITH SprintName, State,SPIDs,n UNWIND n.sprints as SP WITH SprintName, State, SP,SPIDs,n where toString(SP) IN SPIDs and n.jiraIssueType IN [\"Bug\", \"Sprint Bug\",\"SIT Bug\",\"Performance Bug\",\"Regression Bug\"] and ?START_TIME?<=n.inSightsTime<=?END_TIME? RETURN distinct Count( n.key) as Total"
+            }
+          ],
+          "title": "Total defects",
+          "type": "singlestatneo",
+          "uniqueSingleStatPanelMetaData": {
+            "inputProperties": {
+              "color": "black",
+              "font-size": "30px"
+            },
+            "selectedfield": "Total"
+          }
+        },
+        {
+          "datasource": "${DS_NEO4J_DS}",
+          "editable": true,
+          "error": false,
+          "height": "300px",
+          "id": 2,
+          "insightsPanelData": {
+            "chartOptions": {
+              "backgroundColor": {
+                "fill": "#fbfbfb"
+              },
+              "booleanRole": "certainty",
+              "hAxis": {
+                "maxValue": null,
+                "minValue": null,
+                "useFormatFromData": true,
+                "viewWindow": {
+                  "max": null,
+                  "min": null
+                }
+              },
+              "height": 268,
+              "is3D": false,
+              "legacyScatterChartLabels": true,
+              "pieHole": 0.5,
+              "vAxes": [
+                {
+                  "maxValue": null,
+                  "minValue": null,
+                  "useFormatFromData": true,
+                  "viewWindow": {
+                    "max": null,
+                    "min": null
+                  }
+                },
+                {
+                  "maxValue": null,
+                  "minValue": null,
+                  "useFormatFromData": true,
+                  "viewWindow": {
+                    "max": null,
+                    "min": null
+                  }
+                }
+              ],
+              "width": "100%"
+            },
+            "chartType": "PieChart",
+            "insightsChartEditorModel": {
+              "targets": [
+                {
+                  "columnModel": [
+                    {
+                      "name": "SprintName",
+                      "type": "string"
+                    },
+                    {
+                      "name": "Count",
+                      "type": "number"
+                    }
+                  ],
+                  "id": "B"
+                }
+              ]
+            }
+          },
+          "links": [],
+          "span": 4,
+          "targets": [
+            {
+              "hide": false,
+              "rawQuery": true,
+              "refId": "B",
+              "target": "match (n:SPRINT) where n.sprintName IN $SprintName\nWITH (n.sprintId) as SPID , n.sprintName as SprintName, n.state as State\nWITH collect(distinct SPID) as SPIDs , SprintName, State\nmatch (n:JIRA:DATA) WITH SprintName, State,SPIDs,n UNWIND n.sprints as SP WITH SprintName, State, SP,SPIDs,n where toString(SP) IN SPIDs and n.issueType IN [\"Bug\", \"Sprint Bug\",\"SIT Bug\",\"Performance Bug\",\"Regression Bug\"] and ?START_TIME?<=n.inSightsTime<=?END_TIME? return DISTINCT SprintName, count(n.key) as Count"
+            }
+          ],
+          "title": "Defects by Sprint",
+          "type": "insightscharts"
+        },
+        {
+          "datasource": "${DS_NEO4J_DS}",
+          "id": 11,
+          "insightsPanelData": {
+            "chartOptions": {
+              "backgroundColor": "#fbfbfb",
+              "booleanRole": "certainty",
+              "hAxis": {
+                "maxValue": null,
+                "minValue": null,
+                "useFormatFromData": true,
+                "viewWindow": {
+                  "max": null,
+                  "min": null
+                }
+              },
+              "height": 200,
+              "legacyScatterChartLabels": true,
+              "vAxes": [
+                {
+                  "maxValue": null,
+                  "minValue": null,
+                  "useFormatFromData": true,
+                  "viewWindow": {
+                    "max": null,
+                    "min": null
+                  }
+                },
+                {
+                  "maxValue": null,
+                  "minValue": null,
+                  "useFormatFromData": true,
+                  "viewWindow": {
+                    "max": null,
+                    "min": null
+                  }
+                }
+              ],
+              "width": "100%"
+            },
+            "chartType": "Table",
+            "insightsChartEditorModel": {
+              "targets": [
+                {
+                  "columnModel": [
+                    {
+                      "name": "SprintName",
+                      "type": "string"
+                    },
+                    {
+                      "name": "Count",
+                      "type": "number"
+                    }
+                  ],
+                  "id": "A"
+                }
+              ]
+            }
+          },
+          "links": [],
+          "span": 4,
+          "targets": [
+            {
+              "hide": false,
+              "rawQuery": true,
+              "refId": "A",
+              "stats": false,
+              "target": "match (n:SPRINT) where n.sprintName IN $SprintName\nWITH (n.sprintId) as SPID , n.sprintName as SprintName, n.state as State\nWITH collect(distinct SPID) as SPIDs , SprintName, State\nmatch (n:JIRA:DATA) WITH SprintName, State,SPIDs,n UNWIND n.sprints as SP WITH SprintName, State, SP,SPIDs,n where toString(SP) IN SPIDs and n.issueType IN [\"Bug\", \"Sprint Bug\",\"SIT Bug\",\"Performance Bug\",\"Regression Bug\"] and ?START_TIME?<=n.inSightsTime<=?END_TIME? return SprintName, count(n.key) as Count order by Count desc"
+            }
+          ],
+          "title": "Defects By Sprint",
+          "type": "insightscharts"
+        }
+      ],
+      "showTitle": false,
+      "titleSize": "h6",
+      "height": 232,
+      "repeat": null,
+      "repeatRowId": null,
+      "repeatIteration": null,
+      "collapse": false
+    },
+    {
+      "title": "Row",
+      "panels": [
+        {
+          "datasource": "${DS_NEO4J_DS}",
+          "editable": true,
+          "error": false,
+          "height": "",
+          "id": 8,
+          "links": [],
+          "span": 2,
+          "targets": [
+            {
+              "hide": false,
+              "rawQuery": true,
+              "refId": "A",
+              "target": "match (n:SPRINT) where n.sprintName IN $SprintName\nWITH (n.sprintId) as SPID , n.sprintName as SprintName, n.state as State\nWITH collect(distinct SPID) as SPIDs , SprintName, State\nmatch (n:JIRA:DATA) WITH SprintName, State,SPIDs,n UNWIND n.sprints as SP WITH SprintName, State, SP,SPIDs,n where toString(SP) IN SPIDs and n.jiraIssueType IN [\"Bug\", \"Sprint Bug\",\"SIT Bug\",\"Performance Bug\",\"Regression Bug\"] and ?START_TIME?<=n.inSightsTime<=?END_TIME? and not n.jiraStatus in [\"Done\",\"Closed\"] return count(n.key) as  ClosedDefects"
+            }
+          ],
+          "title": "Defects Not Closed",
+          "type": "singlestatneo",
+          "uniqueSingleStatPanelMetaData": {
+            "inputProperties": {
+              "color": "black",
+              "font-size": "50px"
+            },
+            "selectedfield": "ClosedDefects"
+          }
+        },
+        {
+          "datasource": "${DS_NEO4J_DS}",
+          "editable": true,
+          "error": false,
+          "id": 9,
+          "links": [],
+          "span": 2,
+          "targets": [
+            {
+              "hide": false,
+              "rawQuery": true,
+              "refId": "A",
+              "target": "match (n:SPRINT) where n.sprintName IN $SprintName\nWITH (n.sprintId) as SPID , n.sprintName as SprintName, n.state as State\nWITH collect(distinct SPID) as SPIDs , SprintName, State\nmatch (n:JIRA:DATA) WITH SprintName, State,SPIDs,n UNWIND n.sprints as SP WITH SprintName, State, SP,SPIDs,n where toString(SP) IN SPIDs and n.jiraIssueType IN [\"Bug\", \"Sprint Bug\",\"SIT Bug\",\"Performance Bug\",\"Regression Bug\"] and ?START_TIME?<=n.inSightsTime<=?END_TIME? and n.jiraStatus IN [\"Done\",\"Closed\"] return count(n.key) as ClosedDefect"
+            }
+          ],
+          "title": "Defects Closed",
+          "type": "singlestatneo",
+          "uniqueSingleStatPanelMetaData": {
+            "inputProperties": {
+              "color": "black",
+              "font-size": "50px"
+            },
+            "selectedfield": "ClosedDefect"
+          }
+        },
+        {
+          "datasource": "${DS_NEO4J_DS}",
+          "id": 12,
+          "insightsPanelData": {
+            "chartOptions": {
+              "annotations": {
+                "domain": {
+                  "style": "line"
+                }
+              },
+              "backgroundColor": "#fbfbfb",
+              "booleanRole": "certainty",
+              "hAxis": {
+                "maxValue": null,
+                "minValue": null,
+                "useFormatFromData": true,
+                "viewWindow": {
+                  "max": null,
+                  "min": null
+                }
+              },
+              "height": 150,
+              "legacyScatterChartLabels": true,
+              "vAxes": [
+                {
+                  "maxValue": null,
+                  "minValue": null,
+                  "useFormatFromData": true,
+                  "viewWindow": {
+                    "max": null,
+                    "min": null
+                  }
+                },
+                {
+                  "maxValue": null,
+                  "minValue": null,
+                  "useFormatFromData": true,
+                  "viewWindow": {
+                    "max": null,
+                    "min": null
+                  }
+                }
+              ],
+              "width": "100%"
+            },
+            "chartType": "Table",
+            "insightsChartEditorModel": {
+              "targets": [
+                {
+                  "columnModel": [
+                    {
+                      "name": "SprintName",
+                      "type": "string"
+                    },
+                    {
+                      "name": "Status",
+                      "type": "string"
+                    },
+                    {
+                      "name": "Count",
+                      "type": "number"
+                    }
+                  ],
+                  "id": "A"
+                }
+              ]
+            }
+          },
+          "links": [],
+          "span": 5,
+          "targets": [
+            {
+              "hide": false,
+              "rawQuery": true,
+              "refId": "A",
+              "target": "match (n:SPRINT) where n.sprintName IN $SprintName\nWITH (n.sprintId) as SPID , n.sprintName as SprintName, n.state as State\nWITH collect(distinct SPID) as SPIDs , SprintName, State\nmatch (n:JIRA:DATA) WITH SprintName, State,SPIDs,n UNWIND n.sprints as SP WITH SprintName, State, SP,SPIDs,n where toString(SP) IN SPIDs and n.issueType IN [\"Bug\", \"Sprint Bug\",\"SIT Bug\",\"Performance Bug\",\"Regression Bug\"] and ?START_TIME?<=n.inSightsTime<=?END_TIME? return SprintName, n.status as Status,count(n.key) as Count order by Count desc"
+            }
+          ],
+          "title": "Defects by Status",
+          "type": "insightscharts"
+        },
+        {
+          "datasource": "${DS_NEO4J_DS}",
+          "id": 13,
+          "insightsPanelData": {
+            "chartOptions": {
+              "annotations": {
+                "domain": {
+                  "style": "line"
+                }
+              },
+              "backgroundColor": "#fbfbfb",
+              "booleanRole": "certainty",
+              "hAxis": {
+                "maxValue": null,
+                "minValue": null,
+                "useFormatFromData": true,
+                "viewWindow": {
+                  "max": null,
+                  "min": null
+                }
+              },
+              "height": 150,
+              "legacyScatterChartLabels": true,
+              "vAxes": [
+                {
+                  "maxValue": null,
+                  "minValue": null,
+                  "useFormatFromData": true,
+                  "viewWindow": {
+                    "max": null,
+                    "min": null
+                  }
+                },
+                {
+                  "maxValue": null,
+                  "minValue": null,
+                  "useFormatFromData": true,
+                  "viewWindow": {
+                    "max": null,
+                    "min": null
+                  }
+                }
+              ],
+              "width": "100%"
+            },
+            "chartType": "Table",
+            "insightsChartEditorModel": {
+              "targets": [
+                {
+                  "columnModel": [
+                    {
+                      "name": "SprintName",
+                      "type": "string"
+                    },
+                    {
+                      "name": "Priority",
+                      "type": "string"
+                    },
+                    {
+                      "name": "Count",
+                      "type": "number"
+                    }
+                  ],
+                  "id": "A"
+                }
+              ]
+            }
+          },
+          "links": [],
+          "span": 3,
+          "targets": [
+            {
+              "hide": false,
+              "rawQuery": true,
+              "refId": "A",
+              "target": "match (n:SPRINT) where n.sprintName IN $SprintName\nWITH (n.sprintId) as SPID , n.sprintName as SprintName, n.state as State\nWITH collect(distinct SPID) as SPIDs , SprintName, State\nmatch (n:JIRA:DATA) WITH SprintName, State,SPIDs,n UNWIND n.sprints as SP WITH SprintName, State, SP,SPIDs,n where toString(SP) IN SPIDs and n.issueType IN [\"Bug\", \"Sprint Bug\",\"SIT Bug\",\"Performance Bug\",\"Regression Bug\"] and ?START_TIME?<=n.inSightsTime<=?END_TIME? return SprintName, n.priority as Priority,count(n.key) as Count order by Priority desc"
+            }
+          ],
+          "title": "Defects by Priority",
+          "type": "insightscharts"
+        }
+      ],
+      "showTitle": false,
+      "titleSize": "h6",
+      "height": 182,
+      "repeat": null,
+      "repeatRowId": null,
+      "repeatIteration": null,
+      "collapse": false
+    }
+  ]
+}
