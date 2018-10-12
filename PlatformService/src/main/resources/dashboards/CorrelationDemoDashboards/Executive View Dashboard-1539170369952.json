@@ -1,0 +1,1359 @@
+{
+  "__inputs": [
+    {
+      "name": "DS_NEO4J_DS",
+      "label": "Neo4j_DS",
+      "description": "",
+      "type": "datasource",
+      "pluginId": "neo4j",
+      "pluginName": "Neo4j"
+    }
+  ],
+  "__requires": [
+    {
+      "type": "panel",
+      "id": "insightscharts",
+      "name": "Insights Charts",
+      "version": ""
+    },
+    {
+      "type": "panel",
+      "id": "singlestatneo",
+      "name": "SingleStat-Neo4j",
+      "version": ""
+    },
+    {
+      "type": "grafana",
+      "id": "grafana",
+      "name": "Grafana",
+      "version": "4.0.2"
+    },
+    {
+      "type": "datasource",
+      "id": "neo4j",
+      "name": "Neo4j",
+      "version": "1.0.0"
+    }
+  ],
+  "id": null,
+  "title": "Executive View Dashboard",
+  "tags": [],
+  "style": "dark",
+  "timezone": "browser",
+  "editable": true,
+  "sharedCrosshair": false,
+  "hideControls": false,
+  "time": {
+    "from": "now-6M",
+    "to": "now"
+  },
+  "timepicker": {
+    "refresh_intervals": [
+      "5s",
+      "10s",
+      "30s",
+      "1m",
+      "5m",
+      "15m",
+      "30m",
+      "1h",
+      "2h",
+      "1d"
+    ],
+    "time_options": [
+      "5m",
+      "15m",
+      "1h",
+      "6h",
+      "12h",
+      "24h",
+      "2d",
+      "7d",
+      "30d"
+    ]
+  },
+  "templating": {
+    "list": [
+      {
+        "allValue": null,
+        "current": {},
+        "datasource": "${DS_NEO4J_DS}",
+        "hide": 0,
+        "includeAll": true,
+        "label": null,
+        "multi": true,
+        "name": "SprintName",
+        "options": [],
+        "query": "Match (n:JIRA:DATA:SPRINT) return distinct n.sprintName as SprintName order by SprintName",
+        "refresh": 1,
+        "regex": "",
+        "sort": 1,
+        "tagValuesQuery": "",
+        "tags": [],
+        "tagsQuery": "",
+        "type": "query",
+        "useTags": false
+      }
+    ]
+  },
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": "-- Grafana --",
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "schemaVersion": 13,
+  "version": 66,
+  "links": [],
+  "gnetId": null,
+  "rows": [
+    {
+      "title": "Dashboard Row",
+      "panels": [
+        {
+          "datasource": "${DS_NEO4J_DS}",
+          "description": "Trend of commits in a sprint duration compared to WIP JIRA Keys. Helps to identify the issues if not as expected.",
+          "id": 4,
+          "insightsPanelData": {
+            "chartOptions": {
+              "backgroundColor": {
+                "fill": "#fbfbfb"
+              },
+              "booleanRole": "certainty",
+              "hAxis": {
+                "maxValue": null,
+                "minValue": null,
+                "useFormatFromData": true,
+                "viewWindow": null,
+                "viewWindowMode": null
+              },
+              "height": 247,
+              "isStacked": false,
+              "legacyScatterChartLabels": true,
+              "legend": "right",
+              "vAxes": [
+                {
+                  "maxValue": null,
+                  "minValue": null,
+                  "useFormatFromData": true,
+                  "viewWindow": {
+                    "max": null,
+                    "min": null
+                  }
+                },
+                {
+                  "maxValue": null,
+                  "minValue": null,
+                  "useFormatFromData": true,
+                  "viewWindow": {
+                    "max": null,
+                    "min": null
+                  }
+                }
+              ],
+              "width": "100%"
+            },
+            "chartType": "ColumnChart",
+            "insightsChartEditorModel": {
+              "targets": [
+                {
+                  "columnModel": [
+                    {
+                      "name": "JIRAKey",
+                      "type": "string"
+                    },
+                    {
+                      "name": "Commits",
+                      "type": "number"
+                    }
+                  ],
+                  "id": "A"
+                }
+              ]
+            }
+          },
+          "links": [],
+          "span": 6,
+          "targets": [
+            {
+              "rawQuery": true,
+              "refId": "A",
+              "target": "MATCH p=(b:JIRA:DATA) -[r1:FROM_JIRA_TO_GIT]->(b1:GIT:DATA)\n RETURN distinct b.key as JIRAKey ,count( b1.commitId) as Commits"
+            }
+          ],
+          "title": "In Progress JIRA Keys Vs Number of Commits",
+          "type": "insightscharts"
+        },
+        {
+          "datasource": "${DS_NEO4J_DS}",
+          "description": "Number of changes to the application over a time period",
+          "id": 6,
+          "insightsPanelData": {
+            "chartOptions": {
+              "backgroundColor": "#fbfbfb",
+              "booleanRole": "certainty",
+              "hAxis": {
+                "maxValue": null,
+                "minValue": null,
+                "useFormatFromData": true,
+                "viewWindow": {
+                  "max": null,
+                  "min": null
+                }
+              },
+              "height": 247,
+              "legacyScatterChartLabels": true,
+              "legend": "right",
+              "vAxes": [
+                {
+                  "maxValue": null,
+                  "minValue": null,
+                  "useFormatFromData": true,
+                  "viewWindow": {
+                    "max": null,
+                    "min": null
+                  }
+                },
+                {
+                  "maxValue": null,
+                  "minValue": null,
+                  "useFormatFromData": true,
+                  "viewWindow": {
+                    "max": null,
+                    "min": null
+                  }
+                }
+              ],
+              "width": "100%"
+            },
+            "chartType": "Table",
+            "insightsChartEditorModel": {
+              "targets": [
+                {
+                  "columnModel": [
+                    {
+                      "name": "Name",
+                      "type": "string"
+                    },
+                    {
+                      "name": "Date",
+                      "type": "date"
+                    },
+                    {
+                      "name": "Commits",
+                      "type": "number"
+                    }
+                  ],
+                  "id": "A"
+                }
+              ]
+            }
+          },
+          "links": [],
+          "span": 6,
+          "targets": [
+            {
+              "rawQuery": true,
+              "refId": "A",
+              "target": "MATCH p=(b:JIRA:DATA) -[r1:FROM_JIRA_TO_GIT]->(b1:GIT:DATA)\nRETURN b1.gitAuthorName as Name, split(b1.gitCommiTime, \"T\")[0] as Date, count(b1.commitId) as Commits order by Date desc limit 20"
+            }
+          ],
+          "title": "Commits per day",
+          "type": "insightscharts"
+        }
+      ],
+      "showTitle": false,
+      "titleSize": "h6",
+      "height": 279,
+      "repeat": null,
+      "repeatRowId": null,
+      "repeatIteration": null,
+      "collapse": false
+    },
+    {
+      "title": "Dashboard Row",
+      "panels": [
+        {
+          "datasource": "${DS_NEO4J_DS}",
+          "height": "300px",
+          "id": 18,
+          "insightsPanelData": {
+            "chartOptions": {
+              "annotations": {
+                "domain": {
+                  "style": "line"
+                }
+              },
+              "backgroundColor": "#fbfbfb",
+              "booleanRole": "certainty",
+              "hAxis": {
+                "maxValue": null,
+                "minValue": null,
+                "useFormatFromData": true,
+                "viewWindow": {
+                  "max": null,
+                  "min": null
+                }
+              },
+              "height": 268,
+              "legacyScatterChartLabels": true,
+              "vAxes": [
+                {
+                  "maxValue": null,
+                  "minValue": null,
+                  "useFormatFromData": true,
+                  "viewWindow": {
+                    "max": null,
+                    "min": null
+                  }
+                },
+                {
+                  "maxValue": null,
+                  "minValue": null,
+                  "useFormatFromData": true,
+                  "viewWindow": {
+                    "max": null,
+                    "min": null
+                  }
+                }
+              ],
+              "width": "100%"
+            },
+            "chartType": "Table",
+            "insightsChartEditorModel": {
+              "targets": [
+                {
+                  "columnModel": [
+                    {
+                      "name": "JiraKeys",
+                      "type": "string"
+                    },
+                    {
+                      "name": "Date",
+                      "type": "date"
+                    },
+                    {
+                      "name": "Commits",
+                      "type": "string"
+                    },
+                    {
+                      "name": "Builds",
+                      "type": "string"
+                    }
+                  ],
+                  "id": "A"
+                }
+              ]
+            }
+          },
+          "links": [],
+          "span": 6,
+          "targets": [
+            {
+              "rawQuery": true,
+              "refId": "A",
+              "target": "MATCH p=(b:JIRA:DATA) -[r1:FROM_JIRA_TO_GIT]->(b1:GIT:DATA)-[r2:FROM_GIT_TO_JENKINS]->(c1:JENKINS:DATA)\nwhere exists(b1.commitId) with distinct c1.buildUrl as Builds,  b1.commitId as Commits, b.key as JiraKeys,split(c1.inSightsTimeX, \"T\")[0] as Date return JiraKeys, Date,Commits,  Builds order by Date desc limit 20"
+            }
+          ],
+          "title": "Commits Vs CI Jobs per Jira Key",
+          "type": "insightscharts"
+        },
+        {
+          "datasource": "${DS_NEO4J_DS}",
+          "height": "300px",
+          "id": 9,
+          "insightsPanelData": {
+            "chartOptions": {
+              "backgroundColor": {
+                "fill": "#fbfbfb"
+              },
+              "booleanRole": "certainty",
+              "hAxis": {
+                "maxValue": null,
+                "minValue": null,
+                "useFormatFromData": true,
+                "viewWindow": null,
+                "viewWindowMode": null
+              },
+              "height": 268,
+              "isStacked": false,
+              "legacyScatterChartLabels": true,
+              "legend": "right",
+              "vAxes": [
+                {
+                  "maxValue": null,
+                  "minValue": null,
+                  "useFormatFromData": true,
+                  "viewWindow": {
+                    "max": null,
+                    "min": null
+                  }
+                },
+                {
+                  "maxValue": null,
+                  "minValue": null,
+                  "useFormatFromData": true,
+                  "viewWindow": {
+                    "max": null,
+                    "min": null
+                  }
+                }
+              ],
+              "width": "100%"
+            },
+            "chartType": "ColumnChart",
+            "insightsChartEditorModel": {
+              "targets": [
+                {
+                  "columnModel": [
+                    {
+                      "name": "Date",
+                      "type": "date"
+                    },
+                    {
+                      "name": "Commits",
+                      "type": "number"
+                    }
+                  ],
+                  "id": "A"
+                }
+              ]
+            }
+          },
+          "links": [],
+          "span": 6,
+          "targets": [
+            {
+              "rawQuery": true,
+              "refId": "A",
+              "target": "MATCH p=(b:JIRA:DATA) -[r1:FROM_JIRA_TO_GIT]->(b1:GIT:DATA)\n RETURN  split(b1.gitCommiTime, \"T\")[0] as Date, count(distinct b1.commitId) as Commits order by Date desc"
+            }
+          ],
+          "title": "Commits Trend",
+          "type": "insightscharts"
+        }
+      ],
+      "showTitle": false,
+      "titleSize": "h6",
+      "height": -18941,
+      "repeat": null,
+      "repeatRowId": null,
+      "repeatIteration": null,
+      "collapse": false
+    },
+    {
+      "title": "Dashboard Row",
+      "panels": [
+        {
+          "datasource": "${DS_NEO4J_DS}",
+          "id": 14,
+          "insightsPanelData": {
+            "chartOptions": {
+              "backgroundColor": "#fbfbfb",
+              "booleanRole": "certainty",
+              "hAxis": {
+                "maxValue": null,
+                "minValue": null,
+                "useFormatFromData": true,
+                "viewWindow": {
+                  "max": null,
+                  "min": null
+                }
+              },
+              "height": 200,
+              "legacyScatterChartLabels": true,
+              "vAxes": [
+                {
+                  "maxValue": null,
+                  "minValue": null,
+                  "useFormatFromData": true,
+                  "viewWindow": {
+                    "max": null,
+                    "min": null
+                  }
+                },
+                {
+                  "maxValue": null,
+                  "minValue": null,
+                  "useFormatFromData": true,
+                  "viewWindow": {
+                    "max": null,
+                    "min": null
+                  }
+                }
+              ],
+              "width": "100%"
+            },
+            "chartType": "Table",
+            "insightsChartEditorModel": {
+              "targets": [
+                {
+                  "columnModel": [
+                    {
+                      "name": "ProjectName",
+                      "type": "string"
+                    },
+                    {
+                      "name": "BuildNumber",
+                      "type": "number"
+                    },
+                    {
+                      "name": "Status",
+                      "type": "string"
+                    },
+                    {
+                      "name": "TimeElapsedinMinutes",
+                      "type": "number"
+                    }
+                  ],
+                  "id": "A"
+                }
+              ]
+            }
+          },
+          "links": [],
+          "span": 2.5,
+          "targets": [
+            {
+              "rawQuery": true,
+              "refId": "A",
+              "target": "MATCH p=(b:JIRA:DATA) -[r1:FROM_JIRA_TO_GIT]->(b1:GIT:DATA)-[r2:FROM_GIT_TO_JENKINS]->(c1:JENKINS:DATA)   with distinct c1.jobName as ProjectName,c1.buildNumber as BuildNumber ,c1.result as Status , c1.inSightsTime as time,(((timestamp()/1000)-c1.inSightsTime)/60) as timedifference return  ProjectName,BuildNumber,Status ,ceil( timedifference) as TimeElapsedinMinutes order by time desc limit 5"
+            }
+          ],
+          "title": "Latest Build status for the Sprint selected",
+          "type": "insightscharts"
+        },
+        {
+          "datasource": "${DS_NEO4J_DS}",
+          "id": 17,
+          "insightsPanelData": {
+            "chartOptions": {
+              "backgroundColor": {
+                "fill": "#fbfbfb"
+              },
+              "booleanRole": "certainty",
+              "hAxis": {
+                "maxValue": null,
+                "minValue": null,
+                "useFormatFromData": true,
+                "viewWindow": null,
+                "viewWindowMode": null
+              },
+              "height": 200,
+              "isStacked": false,
+              "legacyScatterChartLabels": true,
+              "legend": "right",
+              "vAxes": [
+                {
+                  "maxValue": null,
+                  "minValue": null,
+                  "useFormatFromData": true,
+                  "viewWindow": {
+                    "max": null,
+                    "min": null
+                  }
+                },
+                {
+                  "maxValue": null,
+                  "minValue": null,
+                  "useFormatFromData": true,
+                  "viewWindow": {
+                    "max": null,
+                    "min": null
+                  }
+                }
+              ],
+              "width": "100%"
+            },
+            "chartType": "ColumnChart",
+            "insightsChartEditorModel": {
+              "targets": [
+                {
+                  "columnModel": [
+                    {
+                      "name": "Time",
+                      "type": "date"
+                    },
+                    {
+                      "name": "BuildDurationinMins",
+                      "type": "number"
+                    }
+                  ],
+                  "id": "A"
+                }
+              ]
+            }
+          },
+          "links": [],
+          "span": 2.5,
+          "targets": [
+            {
+              "rawQuery": true,
+              "refId": "A",
+              "target": "MATCH p=(b:JIRA:DATA) -[r1:FROM_JIRA_TO_GIT]->(b1:GIT:DATA)-[r2:FROM_GIT_TO_JENKINS]->(c1:JENKINS:DATA)\nreturn split(c1.inSightsTimeX, \"T\")[0] as Time,  ceil(avg(toInt(c1.duration))) / (60 * 1000) as BuildDurationinMins"
+            }
+          ],
+          "title": "Average Build duration for the sprint selected",
+          "type": "insightscharts"
+        },
+        {
+          "datasource": "${DS_NEO4J_DS}",
+          "id": 19,
+          "insightsPanelData": {
+            "chartOptions": {
+              "backgroundColor": "#fbfbfb",
+              "booleanRole": "certainty",
+              "hAxis": {
+                "maxValue": null,
+                "minValue": null,
+                "useFormatFromData": true,
+                "viewWindow": {
+                  "max": null,
+                  "min": null
+                }
+              },
+              "height": 200,
+              "legacyScatterChartLabels": true,
+              "vAxes": [
+                {
+                  "maxValue": null,
+                  "minValue": null,
+                  "useFormatFromData": true,
+                  "viewWindow": {
+                    "max": null,
+                    "min": null
+                  }
+                },
+                {
+                  "maxValue": null,
+                  "minValue": null,
+                  "useFormatFromData": true,
+                  "viewWindow": {
+                    "max": null,
+                    "min": null
+                  }
+                }
+              ],
+              "width": "100%"
+            },
+            "chartType": "Table",
+            "insightsChartEditorModel": {
+              "targets": [
+                {
+                  "columnModel": [
+                    {
+                      "name": "Total",
+                      "type": "number"
+                    },
+                    {
+                      "name": "Last1Day",
+                      "type": "number"
+                    },
+                    {
+                      "name": "Last7Days",
+                      "type": "number"
+                    },
+                    {
+                      "name": "Last14Days",
+                      "type": "number"
+                    }
+                  ],
+                  "id": "A"
+                }
+              ]
+            }
+          },
+          "links": [],
+          "span": 3,
+          "targets": [
+            {
+              "rawQuery": true,
+              "refId": "A",
+              "target": "MATCH p=(b:JIRA:DATA) -[r1:FROM_JIRA_TO_GIT]->(b1:GIT:DATA)-[r2:FROM_GIT_TO_JENKINS]->(c1:JENKINS:DATA)\n with count(distinct c1.buildUrl) as Total,\nCASE WHEN c1.inSightsTime >=(timestamp()-86400000) /1000 and c1.inSightsTime <= (timestamp()) THEN 1 ELSE 0 END as OneDay,\nCASE WHEN c1.inSightsTime >=(timestamp()-604800000) / 1000 and c1.inSightsTime <= (timestamp()) THEN 1 ELSE 0 END as SevenDays,\nCASE WHEN c1.inSightsTime >=(timestamp()-1209600000) /1000 and c1.inSightsTime <= (timestamp()) THEN 1 ELSE 0 END as FourteenDays\nwith sum(OneDay) as Last1Day, sum(SevenDays) as Last7Days,sum(FourteenDays) as Last14Days,Total\nreturn Total,Last1Day,Last7Days,Last14Days"
+            }
+          ],
+          "title": "Builds(total,last,1,7,14 days)",
+          "type": "insightscharts"
+        },
+        {
+          "datasource": "${DS_NEO4J_DS}",
+          "id": 23,
+          "insightsPanelData": {
+            "chartOptions": {
+              "backgroundColor": {
+                "fill": "#fbfbfb"
+              },
+              "booleanRole": "certainty",
+              "hAxis": {
+                "maxValue": null,
+                "minValue": null,
+                "useFormatFromData": true,
+                "viewWindow": null,
+                "viewWindowMode": null
+              },
+              "height": 200,
+              "isStacked": false,
+              "legacyScatterChartLabels": true,
+              "legend": "right",
+              "series": {
+                "0": {
+                  "color": "#38761d"
+                }
+              },
+              "vAxes": [
+                {
+                  "maxValue": null,
+                  "minValue": null,
+                  "useFormatFromData": true,
+                  "viewWindow": {
+                    "max": null,
+                    "min": null
+                  }
+                },
+                {
+                  "maxValue": null,
+                  "minValue": null,
+                  "useFormatFromData": true,
+                  "viewWindow": {
+                    "max": null,
+                    "min": null
+                  }
+                }
+              ],
+              "width": "100%"
+            },
+            "chartType": "ColumnChart",
+            "insightsChartEditorModel": {
+              "joinInstructions": "return google.visualization.data.join(dataTables[0], dataTables[1], 'full', [[0, 0]], [1], [1]);",
+              "targets": [
+                {
+                  "columnModel": [
+                    {
+                      "name": "Time",
+                      "type": "date"
+                    },
+                    {
+                      "name": "Success",
+                      "type": "number"
+                    }
+                  ],
+                  "id": "A"
+                },
+                {
+                  "columnModel": [
+                    {
+                      "name": "Time",
+                      "type": "date"
+                    },
+                    {
+                      "name": "Failure",
+                      "type": "number"
+                    }
+                  ],
+                  "id": "B"
+                }
+              ],
+              "transformInstrctions": "var formatter3 = new google.visualization.DateFormat({ pattern: \"yyyy-MM-dd\" });\nvar testFunction = function (val) {\n        return new Date(formatter3.formatValue(val));\n};\nvar result = google.visualization.data.group(data,\n        [{ column: 0, modifier: testFunction, type: 'date' }],\n        [{ 'column': 1, 'aggregation': google.visualization.data.sum, 'type': 'number' },\n        { 'column': 2, 'aggregation': google.visualization.data.sum, 'type': 'number' }]);\nreturn result;"
+            }
+          },
+          "links": [],
+          "span": 4,
+          "targets": [
+            {
+              "rawQuery": true,
+              "refId": "A",
+              "target": "MATCH p=(b:JIRA:DATA) -[r1:FROM_JIRA_TO_GIT]->(b1:GIT:DATA)-[r2:FROM_GIT_TO_JENKINS]->(c1:JENKINS:DATA)\nwhere exists(b1.commitId) and c1.result in [\"SUCCESS\"] with distinct c1.buildUrl as Builds,  b1.commitId as Commits, b.key as JiraKeys,split(c1.inSightsTimeX, \"T\")[0] as Time, c1.result as Status return Time, count(Builds) as Success order by Time desc"
+            },
+            {
+              "rawQuery": true,
+              "refId": "B",
+              "target": "MATCH p=(a:JIRA:SPRINT)-[r:SPRINT_HAS_ISSUES]->(b:JIRA:DATA) -[r1:FROM_JIRA_TO_GIT]->(b1:GIT:DATA)-[r2:FROM_GIT_TO_JENKINS]->(c1:JENKINS:DATA)\nwhere a.sprintName in $SprintName and exists(b1.commitId) and c1.result in [\"FAILURE\" ,\"ABORTED\" , \"UNSTABLE\"] with distinct c1.buildUrl as Builds,  b1.commitId as Commits, b.key as JiraKeys,split(c1.inSightsTimeX , \"T\")[0] as Time, c1.result as Status return Time, count(Builds) as Failure order by Time desc"
+            }
+          ],
+          "title": "Builds per month(Success vs Failure) on time scale",
+          "type": "insightscharts"
+        }
+      ],
+      "showTitle": false,
+      "titleSize": "h6",
+      "height": 232,
+      "repeat": null,
+      "repeatRowId": null,
+      "repeatIteration": null,
+      "collapse": false
+    },
+    {
+      "title": "Dashboard Row",
+      "panels": [
+        {
+          "datasource": "${DS_NEO4J_DS}",
+          "id": 21,
+          "links": [],
+          "span": 4,
+          "targets": [
+            {
+              "rawQuery": true,
+              "refId": "A",
+              "target": "match(n:CI:SONAR:DATA) return count(distinct(n)) as total"
+            }
+          ],
+          "title": "No. of Code Quality Executions",
+          "type": "singlestatneo",
+          "uniqueSingleStatPanelMetaData": {
+            "inputProperties": {
+              "color": "black",
+              "font-size": "30px"
+            },
+            "selectedfield": "total"
+          }
+        },
+        {
+          "datasource": "${DS_NEO4J_DS}",
+          "id": 24,
+          "insightsPanelData": {
+            "chartOptions": {
+              "backgroundColor": "#fbfbfb",
+              "booleanRole": "certainty",
+              "hAxis": {
+                "maxValue": null,
+                "minValue": null,
+                "useFormatFromData": true,
+                "viewWindow": {
+                  "max": null,
+                  "min": null
+                }
+              },
+              "height": 216,
+              "legacyScatterChartLabels": true,
+              "vAxes": [
+                {
+                  "maxValue": null,
+                  "minValue": null,
+                  "useFormatFromData": true,
+                  "viewWindow": {
+                    "max": null,
+                    "min": null
+                  }
+                },
+                {
+                  "maxValue": null,
+                  "minValue": null,
+                  "useFormatFromData": true,
+                  "viewWindow": {
+                    "max": null,
+                    "min": null
+                  }
+                }
+              ],
+              "width": "100%"
+            },
+            "chartType": "Table",
+            "insightsChartEditorModel": {
+              "targets": [
+                {
+                  "columnModel": [
+                    {
+                      "name": "Time",
+                      "type": "date"
+                    },
+                    {
+                      "name": "Runs",
+                      "type": "number"
+                    }
+                  ],
+                  "id": "A"
+                }
+              ]
+            }
+          },
+          "links": [],
+          "span": 4,
+          "targets": [
+            {
+              "rawQuery": true,
+              "refId": "A",
+              "target": "match(n:CI:SONAR:DATA)  return n.inSightsTime as Time,count(n.resourceKey) as Runs"
+            }
+          ],
+          "title": "Code Quality Runs",
+          "type": "insightscharts"
+        },
+        {
+          "datasource": "${DS_NEO4J_DS}",
+          "id": 10,
+          "links": [],
+          "span": 4,
+          "targets": [
+            {
+              "rawQuery": true,
+              "refId": "A",
+              "target": "Match (n:JENKINS:DATA) where n.jobName contains \"deploy\" return count(n.jobName) as Count"
+            }
+          ],
+          "title": "Number of Deployment projects ( not related to Sprint)",
+          "type": "singlestatneo",
+          "uniqueSingleStatPanelMetaData": {
+            "inputProperties": {
+              "color": "black",
+              "font-size": "30px"
+            },
+            "selectedfield": "Count"
+          }
+        }
+      ],
+      "showTitle": false,
+      "titleSize": "h6",
+      "height": 248,
+      "repeat": null,
+      "repeatRowId": null,
+      "repeatIteration": null,
+      "collapse": false
+    },
+    {
+      "title": "Dashboard Row",
+      "panels": [
+        {
+          "datasource": "${DS_NEO4J_DS}",
+          "id": 11,
+          "insightsPanelData": {
+            "chartOptions": {
+              "backgroundColor": "#fbfbfb",
+              "booleanRole": "certainty",
+              "hAxis": {
+                "maxValue": null,
+                "minValue": null,
+                "useFormatFromData": true,
+                "viewWindow": {
+                  "max": null,
+                  "min": null
+                }
+              },
+              "height": 205,
+              "legacyScatterChartLabels": true,
+              "vAxes": [
+                {
+                  "maxValue": null,
+                  "minValue": null,
+                  "useFormatFromData": true,
+                  "viewWindow": {
+                    "max": null,
+                    "min": null
+                  }
+                },
+                {
+                  "maxValue": null,
+                  "minValue": null,
+                  "useFormatFromData": true,
+                  "viewWindow": {
+                    "max": null,
+                    "min": null
+                  }
+                }
+              ],
+              "width": "100%"
+            },
+            "chartType": "Table",
+            "insightsChartEditorModel": {
+              "targets": [
+                {
+                  "columnModel": [
+                    {
+                      "name": "Total",
+                      "type": "number"
+                    },
+                    {
+                      "name": "Success",
+                      "type": "number"
+                    },
+                    {
+                      "name": "Failure",
+                      "type": "number"
+                    }
+                  ],
+                  "id": "A"
+                }
+              ]
+            }
+          },
+          "links": [],
+          "span": 4,
+          "targets": [
+            {
+              "rawQuery": true,
+              "refId": "A",
+              "target": "match (n:JENKINS) with n\n where n.jobName contains \"deploy\" and tofloat(n.inSightsTime)>=?START_TIME? AND tofloat(n.inSightsTime)<?END_TIME? and n.result= 'SUCCESS' with count( n.buildUrl) as success \nmatch (n:JENKINS) with success, n \nwhere n.jobName contains \"deploy\" and tofloat(n.inSightsTime)>=?START_TIME? AND tofloat(n.inSightsTime)<?END_TIME? and n.result in  ['FAILURE','ABORTED','UNSTABLE'] with success, count(n.buildUrl) as failure \nmatch (n:JENKINS) with success, failure, n\n where n.jobName contains \"deploy\" and tofloat(n.inSightsTime)>=?START_TIME? AND tofloat(n.inSightsTime)<?END_TIME? with success, failure, count ( n.buildUrl) as Total \nreturn  Total, success as Success,failure as Failure"
+            }
+          ],
+          "title": "Deployment trend",
+          "type": "insightscharts"
+        },
+        {
+          "datasource": "${DS_NEO4J_DS}",
+          "description": "Displays the result of the last 5 deployment jobs",
+          "id": 12,
+          "insightsPanelData": {
+            "chartOptions": {
+              "backgroundColor": "#fbfbfb",
+              "booleanRole": "certainty",
+              "hAxis": {
+                "maxValue": null,
+                "minValue": null,
+                "useFormatFromData": true,
+                "viewWindow": {
+                  "max": null,
+                  "min": null
+                }
+              },
+              "height": 205,
+              "legacyScatterChartLabels": true,
+              "vAxes": [
+                {
+                  "maxValue": null,
+                  "minValue": null,
+                  "useFormatFromData": true,
+                  "viewWindow": {
+                    "max": null,
+                    "min": null
+                  }
+                },
+                {
+                  "maxValue": null,
+                  "minValue": null,
+                  "useFormatFromData": true,
+                  "viewWindow": {
+                    "max": null,
+                    "min": null
+                  }
+                }
+              ],
+              "width": "100%"
+            },
+            "chartType": "Table",
+            "insightsChartEditorModel": {
+              "targets": [
+                {
+                  "columnModel": [
+                    {
+                      "name": "ProjectName",
+                      "type": "string"
+                    },
+                    {
+                      "name": "BuildNumber",
+                      "type": "number"
+                    },
+                    {
+                      "name": "Status",
+                      "type": "string"
+                    },
+                    {
+                      "name": "TimeElapsedinMinutes",
+                      "type": "number"
+                    }
+                  ],
+                  "id": "A"
+                }
+              ]
+            }
+          },
+          "links": [],
+          "span": 8,
+          "targets": [
+            {
+              "rawQuery": true,
+              "refId": "A",
+              "target": "match(n:JENKINS:DATA) with n where n.jobName contains \"deploy\"  with distinct  n.jobName as ProjectName,n ,n.buildNumber as BuildNumber ,n.result as Status,\nn.inSightsTime as time,(((timestamp()/1000)-n.inSightsTime)/60) as timedifference\nreturn  ProjectName,BuildNumber,Status, ceil( timedifference) as TimeElapsedinMinutes order by time desc limit 5"
+            }
+          ],
+          "title": "Last 5 Deployment Jobs status",
+          "type": "insightscharts"
+        }
+      ],
+      "showTitle": false,
+      "titleSize": "h6",
+      "height": 237,
+      "repeat": null,
+      "repeatRowId": null,
+      "repeatIteration": null,
+      "collapse": false
+    },
+    {
+      "title": "Dashboard Row",
+      "panels": [
+        {
+          "datasource": "${DS_NEO4J_DS}",
+          "id": 13,
+          "insightsPanelData": {
+            "chartOptions": {
+              "backgroundColor": {
+                "fill": "#fbfbfb"
+              },
+              "booleanRole": "certainty",
+              "hAxis": {
+                "maxValue": null,
+                "minValue": null,
+                "useFormatFromData": true,
+                "viewWindow": null,
+                "viewWindowMode": null
+              },
+              "height": 201,
+              "isStacked": false,
+              "legacyScatterChartLabels": true,
+              "legend": "right",
+              "series": {
+                "0": {
+                  "color": "#38761d"
+                }
+              },
+              "vAxes": [
+                {
+                  "maxValue": null,
+                  "minValue": null,
+                  "useFormatFromData": true,
+                  "viewWindow": {
+                    "max": null,
+                    "min": null
+                  }
+                },
+                {
+                  "maxValue": null,
+                  "minValue": null,
+                  "useFormatFromData": true,
+                  "viewWindow": {
+                    "max": null,
+                    "min": null
+                  }
+                }
+              ],
+              "width": "100%"
+            },
+            "chartType": "ColumnChart",
+            "insightsChartEditorModel": {
+              "joinInstructions": "return google.visualization.data.join(dataTables[0], dataTables[1], 'full', [[0, 0]], [1], [1]);",
+              "targets": [
+                {
+                  "columnModel": [
+                    {
+                      "name": "Time",
+                      "type": "date"
+                    },
+                    {
+                      "name": "Success",
+                      "type": "number"
+                    }
+                  ],
+                  "id": "A"
+                },
+                {
+                  "columnModel": [
+                    {
+                      "name": "Time",
+                      "type": "date"
+                    },
+                    {
+                      "name": "Failure",
+                      "type": "number"
+                    }
+                  ],
+                  "id": "B"
+                }
+              ]
+            }
+          },
+          "links": [],
+          "span": 12,
+          "targets": [
+            {
+              "rawQuery": true,
+              "refId": "A",
+              "target": "MATCH (n:JENKINS:DATA) where n.jobName contains \"deploy\" and  n.result=\"SUCCESS\"  return split(n.inSightsTimeX, \"T\")[0] as Time, count(distinct n.buildUrl) as Success order by Time desc"
+            },
+            {
+              "hide": false,
+              "rawQuery": true,
+              "refId": "B",
+              "target": "MATCH (n:JENKINS:DATA) where n.jobName contains \"deploy\" and n.result<> \"SUCCESS\"  return split(n.inSightsTimeX, \"T\")[0] as Time, count(distinct n.buildUrl) as Failure order by Time desc limit 50"
+            }
+          ],
+          "title": "Deployment by status(time scale)",
+          "type": "insightscharts"
+        }
+      ],
+      "showTitle": false,
+      "titleSize": "h6",
+      "height": 233,
+      "repeat": null,
+      "repeatRowId": null,
+      "repeatIteration": null,
+      "collapse": false
+    },
+    {
+      "title": "Build statistics per sprint",
+      "panels": [
+        {
+          "datasource": "${DS_NEO4J_DS}",
+          "id": 25,
+          "insightsPanelData": {
+            "chartOptions": {
+              "backgroundColor": "#fbfbfb",
+              "booleanRole": "certainty",
+              "greenFrom": 0,
+              "greenTo": 10,
+              "hAxis": {
+                "maxValue": null,
+                "minValue": null,
+                "useFormatFromData": true,
+                "viewWindow": {
+                  "max": null,
+                  "min": null
+                }
+              },
+              "height": 218,
+              "legacyScatterChartLabels": true,
+              "max": 25,
+              "min": 0,
+              "redFrom": 20,
+              "redTo": 25,
+              "vAxes": [
+                {
+                  "maxValue": null,
+                  "minValue": null,
+                  "useFormatFromData": true,
+                  "viewWindow": {
+                    "max": null,
+                    "min": null
+                  }
+                },
+                {
+                  "maxValue": null,
+                  "minValue": null,
+                  "useFormatFromData": true,
+                  "viewWindow": {
+                    "max": null,
+                    "min": null
+                  }
+                }
+              ],
+              "width": "100%",
+              "yellowFrom": 10,
+              "yellowTo": 20
+            },
+            "chartType": "Gauge",
+            "insightsChartEditorModel": {
+              "targets": [
+                {
+                  "columnModel": [
+                    {
+                      "name": "MaxTimeInMins",
+                      "type": "number"
+                    }
+                  ],
+                  "id": "A"
+                }
+              ]
+            }
+          },
+          "links": [],
+          "span": 6,
+          "targets": [
+            {
+              "rawQuery": true,
+              "refId": "A",
+              "target": "MATCH p=(b:JIRA:DATA) -[r1:FROM_JIRA_TO_GIT]->(b1:GIT:DATA)-[r2:FROM_GIT_TO_JENKINS]->(c1:JENKINS:DATA)\nreturn ceil(max(toInt(c1.duration)/(60))) as MaxTimeInMins"
+            }
+          ],
+          "title": "Maximum Build time for the Sprint",
+          "type": "insightscharts"
+        },
+        {
+          "datasource": "${DS_NEO4J_DS}",
+          "id": 26,
+          "insightsPanelData": {
+            "chartOptions": {
+              "backgroundColor": "#fbfbfb",
+              "booleanRole": "certainty",
+              "greenFrom": 0,
+              "greenTo": 10,
+              "hAxis": {
+                "maxValue": null,
+                "minValue": null,
+                "useFormatFromData": true,
+                "viewWindow": {
+                  "max": null,
+                  "min": null
+                }
+              },
+              "height": 218,
+              "legacyScatterChartLabels": true,
+              "max": 25,
+              "min": 0,
+              "redFrom": 20,
+              "redTo": 25,
+              "vAxes": [
+                {
+                  "maxValue": null,
+                  "minValue": null,
+                  "useFormatFromData": true,
+                  "viewWindow": {
+                    "max": null,
+                    "min": null
+                  }
+                },
+                {
+                  "maxValue": null,
+                  "minValue": null,
+                  "useFormatFromData": true,
+                  "viewWindow": {
+                    "max": null,
+                    "min": null
+                  }
+                }
+              ],
+              "width": "100%",
+              "yellowFrom": 10,
+              "yellowTo": 20
+            },
+            "chartType": "Gauge",
+            "insightsChartEditorModel": {
+              "targets": [
+                {
+                  "columnModel": [
+                    {
+                      "name": "AvgTimeInMins",
+                      "type": "number"
+                    }
+                  ],
+                  "id": "A"
+                }
+              ]
+            }
+          },
+          "links": [],
+          "span": 6,
+          "targets": [
+            {
+              "rawQuery": true,
+              "refId": "A",
+              "target": "MATCH p=(b:JIRA:DATA) -[r1:FROM_JIRA_TO_GIT]->(b1:GIT:DATA)-[r2:FROM_GIT_TO_JENKINS]->(c1:JENKINS:DATA)\nreturn ceil(avg(toInt(c1.duration)/(60))) as AvgTimeInMins"
+            }
+          ],
+          "title": "Average Build time for the sprint",
+          "type": "insightscharts"
+        }
+      ],
+      "showTitle": false,
+      "titleSize": "h6",
+      "height": 250,
+      "repeat": null,
+      "repeatRowId": null,
+      "repeatIteration": null,
+      "collapse": false
+    }
+  ]
+}
