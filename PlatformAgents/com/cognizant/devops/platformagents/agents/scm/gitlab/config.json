@@ -3,7 +3,8 @@
 		"user" : "iSight", 
 		"password" : "iSight", 
 		"host" : "127.0.0.1", 
-		"exchange" : "iSight"
+		"exchange" : "iSight",
+    		"agentControlXchg":"iAgent"
 	},
 	"subscribe" : {
 		"config" : "SCM.GITLAB.config"
@@ -67,6 +68,7 @@
 	"enableCommitRelation" : true,
         "restrictedProjects" : ["projects_name"],
 	"toolsTimeZone" : "GMT",
+	"toolCategory" : "SCM",
 	"insightsTimeZone" : "Asia/Kolkata",
 	"useResponseTemplate" : true,
 	"enableDataValidation": true,
