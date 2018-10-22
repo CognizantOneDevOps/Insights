@@ -33,6 +33,7 @@
 		}
 	},
 	"enableBranches" : false,
+	"enableBrancheDeletion" : false,
 	"enableDataValidation": true,	
 	"toolCategory" : "SCM",
 	"toolsTimeZone" : "GMT",
