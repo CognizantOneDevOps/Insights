@@ -178,23 +178,23 @@ System.register([], function(exports_1) {
                     var j;
                     for (j in keywords) {
                         var query = (cypherQuery.statements[0].statement.toString()).toLowerCase();
-                        if (query.indexOf(" " + keywords[j]) >= 0) {
-                            console.log("1st");
+                        if (query.indexOf(" " + keywords[j] + " ") >= 0) {
+                            console.log(keywords[j] + " is present as an individual word.");
                             flag = 1;
                             break;
                         }
-                        if (query.indexOf(keywords[j] + " ") >= 0) {
-                            console.log("2nd");
+                        if (query.indexOf("\n" + keywords[j]) >= 0 && query.indexOf("\n" + keywords[j] + " ") >= 0) {
+                            console.log(keywords[j] + " is present after new line.");
                             flag = 1;
                             break;
                         }
-                        if (query.indexOf(keywords[j] + ")") >= 0) {
-                            console.log("3rd");
-                            flag = 1;
-                            break;
-                        }
-                        if (query.indexOf(keywords[j] + "(") >= 0) {
-                            console.log("4th");
+                        if (query.indexOf(keywords[j] + ")") >= 0
+                            || query.indexOf(keywords[j] + "(") >= 0
+                            || query.indexOf(")" + keywords[j]) >= 0
+                            || query.indexOf("(" + keywords[j]) >= 0
+                            || query.indexOf(" " + keywords[j] + "\n") >= 0
+                            || query.indexOf("\n" + keywords[j] + "\n") >= 0) {
+                            console.log(keywords[j] + " is present.");
                             flag = 1;
                             break;
                         }
