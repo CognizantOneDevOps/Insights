@@ -14,7 +14,6 @@
  * the License.
  ******************************************************************************/
 package com.cognizant.devops.platformservice.config;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -26,6 +25,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+
 
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.config.GrafanaData;
@@ -39,7 +40,9 @@ import com.google.gson.JsonParser;
 import com.sun.jersey.api.client.ClientResponse;
 
 public final class InsightsConfiguration {
-	private static Logger log = Logger.getLogger(InsightsConfiguration.class);
+	
+	//private static Logger log = Logger.getLogger(InsightsConfiguration.class);
+	private static org.apache.logging.log4j.Logger log = LogManager.getLogger(InsightsConfiguration.class);
 	private static final String NEO4J_DS = "Neo4j_DS";
 	private static final String ElaticSearch_DS = "ElaticSearch_DS";
 
@@ -52,6 +55,7 @@ public final class InsightsConfiguration {
 	 * 3. Default Dashboards in Grafana
 	 */
 	public static void doInsightsConfiguration() {
+		log.info("Coming inside do insights");
 		// updateLayouts();
 		updateDatasources();
 		//updateDashboards();
