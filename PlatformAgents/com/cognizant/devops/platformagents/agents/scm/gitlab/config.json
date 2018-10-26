@@ -17,6 +17,7 @@
 		"type" : "REST" 
 	},
         "dynamicTemplate": {
+	"restrictedProjects" : ["projects_name"],
 	"responseTemplate" : {
 		"id" : "commitId",
                 "title" : "title",
@@ -66,7 +67,6 @@
 	"enableMerge" : false,
 	"enableGroup" : true,
 	"enableCommitRelation" : true,
-        "restrictedProjects" : ["projects_name"],
 	"toolsTimeZone" : "GMT",
 	"toolCategory" : "SCM",
 	"insightsTimeZone" : "Asia/Kolkata",
