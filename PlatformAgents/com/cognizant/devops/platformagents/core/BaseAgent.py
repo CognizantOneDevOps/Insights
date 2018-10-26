@@ -60,15 +60,21 @@ class BaseAgent(object):
     
     def resolveConfigPath(self):
         filePresent = os.path.isfile('config.json')
-        if filePresent:
+        agentDir = os.path.dirname(sys.modules[self.__class__.__module__].__file__) + os.path.sep
+        if "INSIGHTS_HOME" in os.environ:
+            logDirPath = os.environ['INSIGHTS_HOME']+'/logs/PlatformAgent'
+            if not os.path.exists(logDirPath):
+                os.makedirs(logDirPath)
+        else:
+            logDirPath = agentDir
+	if filePresent:
             self.configFilePath = 'config.json'
             self.trackingFilePath = 'tracking.json'
-            self.logFilePath = 'log_'+type(self).__name__+'.log'
+            self.logFilePath = logDirPath +'/'+ 'log_'+type(self).__name__+'.log'            
         else:
-            agentDir = os.path.dirname(sys.modules[self.__class__.__module__].__file__) + os.path.sep
             self.configFilePath = agentDir+'config.json'
-            self.trackingFilePath = agentDir+'tracking.json'
-            self.logFilePath = agentDir+'log_'+type(self).__name__+'.log'
+            self.trackingFilePath = agentDir+'tracking.json' 
+	    self.logFilePath = logDirPath + '/'+'log_'+type(self).__name__+'.log'	    
         trackingFilePresent = os.path.isfile(self.trackingFilePath)
         if not trackingFilePresent:
             self.updateTrackingJson({})
