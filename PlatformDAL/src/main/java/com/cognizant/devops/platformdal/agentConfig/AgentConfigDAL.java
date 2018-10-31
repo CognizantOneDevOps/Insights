@@ -15,6 +15,7 @@
  ******************************************************************************/
 package com.cognizant.devops.platformdal.agentConfig;
 
+import java.time.Instant;
 import java.util.Date;
 import java.util.List;
 
@@ -92,10 +93,14 @@ public class AgentConfigDAL extends BaseDAL {
 			agentConfig.setAgentJson(agentJson.toString());
 			agentConfig.setDataUpdateSupported(isDataUpdateSupported);
 			agentConfig.setUniqueKey(uniqueKey);
+			if(agentConfig.getAgentKey() == null) {
+				agentConfig.setAgentKey(toolName + "-" + Instant.now().toEpochMilli());
+			}
 			getSession().update(agentConfig);
 		} else {
 			agentConfig = new AgentConfig();
 			agentConfig.setAgentId(agentId);
+			agentConfig.setAgentKey(toolName + "-" + Instant.now().toEpochMilli());
 			agentConfig.setToolName(toolName);
 			agentConfig.setToolCategory(toolCategory);
 			agentConfig.setAgentJson(agentJson.toString());
