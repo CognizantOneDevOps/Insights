@@ -40,6 +40,7 @@ class BitBucketAgent(BaseAgent):
         self.passwd = self.config.get("passwd", '')
         self.scanAllBranches = self.config.get("scanAllBranches", False)
         self.scanPullRequests = self.config.get("scanPullRequests", False)
+        self.scanReleaseBranches = self.config.get("scanReleaseBranches", False)
         startFrom = self.config.get("startFrom", '')
         startFrom = parser.parse(startFrom)
         startFrom = mktime(startFrom.timetuple()) + startFrom.microsecond/1000000.0
@@ -94,6 +95,26 @@ class BitBucketAgent(BaseAgent):
                                 for branches in range(numBranches):
                                     branchName = bitBicketBranches["values"][branches]["displayId"]
                                     self.processAllCommitsForBranch(projKey, repoName, branchName, repoTracking)
+                                if bitBicketBranches.get("isLastPage", True):
+                                    fetchNextBranchPage = False
+                                    break;
+                                branchStart = bitBicketBranches.get("nextPageStart", None)
+                        if self.scanReleaseBranches:
+                            # scan all release branches (starting with "release/" and master and commit inside it
+                            bitBicketBranchessUrl = self.baseEndPoint+projKey+"/repos/"+repoName+"/branches/"
+                            # get all branches under a repo
+                            branchStart = 0
+                            fetchNextBranchPage = True
+                            while fetchNextBranchPage:
+                                bitBicketBranches = self.getResponse(bitBicketBranchessUrl+'?limit='+str(limit)+'&start='+str(branchStart), 'GET', self.userId, self.passwd, None)
+                                numBranches = len(bitBicketBranches["values"])
+                                if numBranches == 0:
+                                    fetchNextBranchPage = False
+                                    break;
+                                for branches in range(numBranches):
+                                    branchName = bitBicketBranches["values"][branches]["displayId"]
+                                    if(branchName == "master" or branchName.startswith("release/") ):
+                                        self.processAllCommitsForBranch(projKey, repoName, branchName, repoTracking)
                                 if bitBicketBranches.get("isLastPage", True):
                                     fetchNextBranchPage = False
                                     break;
@@ -204,7 +225,7 @@ class BitBucketAgent(BaseAgent):
                 break;
             prStart = pullRequests.get("nextPageStart", None)
 
-        # Update data once its processed for each repositor
+        # Update data once its processed for each repository
         if len(data) > 0:
             self.publishToolsData(data)
         if lastUpdatedPRId != None :
