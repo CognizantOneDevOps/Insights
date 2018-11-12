@@ -222,8 +222,8 @@
 		<dependency>
 			<groupId>com.rabbitmq</groupId>
 			<artifactId>amqp-client</artifactId>
-			<version>3.6.2</version>
-		</dependency>
+			<version>5.5.0</version>
+		</dependency> 
 		<dependency>
 			<groupId>org.apache.logging.log4j</groupId>
 			<artifactId>log4j-api</artifactId>
@@ -272,8 +272,8 @@
 	<properties>
 		<jersey.version>2.23</jersey.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<spring.version>4.2.6.RELEASE</spring.version>
-		<spring.security.version>4.1.0.RELEASE</spring.security.version>
+		<spring.version>4.3.19.RELEASE</spring.version>
+        <spring.security.version>4.2.9.RELEASE</spring.security.version>
 		<mockito.version>1.10.19</mockito.version>
 		<junit.version>4.12</junit.version>
 	</properties>
