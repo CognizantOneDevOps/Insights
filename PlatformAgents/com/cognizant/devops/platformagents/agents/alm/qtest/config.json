@@ -1,0 +1,126 @@
+{
+  "mqConfig": {
+    "user": "iSight",
+    "password": "iSight",
+    "host": "127.0.0.1",
+    "exchange": "iSight",
+    "agentControlXchg": "iAgent"
+  },
+  "subscribe": {
+    "config": "ALM.QTEST.config"
+  },
+  "publish": {
+    "data": "ALM.QTEST.DATA",
+    "health": "ALM.QTEST.HEALTH"
+  },
+  "communication": {
+    "type": "REST",
+    "sslVerify": false,
+    "responseType": "JSON"
+  },
+  "dynamicTemplate": {
+    "timeFieldMapping": {
+      "creationDate": "%Y-%m-%dT%H:%M:%S",
+      "lastModifiedDate": "%Y-%m-%dT%H:%M:%S"
+    },
+    "almEntities": {
+      "releases": {
+        "name": "name",
+        "pid": "pid",
+        "id": "id",
+        "created_date": "creationDate",
+        "description": "description",
+        "last_modified_date": "lastModifiedDate"
+      },
+      "test-cycles": {
+        "name": "name",
+        "pid": "pid",
+        "id": "id",
+        "created_date": "creationDate",
+        "description": "description",
+        "last_modified_date": "lastModifiedDate"
+      },
+      "test-suites": {
+        "name": "name",
+        "pid": "pid",
+        "id": "id",
+        "created_date": "creationDate",
+        "description": "description",
+        "last_modified_date": "lastModifiedDate"
+      },
+      "test-runs": {
+        "name": "name",
+        "pid": "pid",
+        "id": "id",
+        "created_date": "creationDate",
+        "description": "description",
+        "last_modified_date": "lastModifiedDate"
+      },
+      "test-cases": {
+        "name": "name",
+        "pid": "pid",
+        "id": "id",
+        "created_date": "creationDate",
+        "description": "description",
+        "last_modified_date": "lastModifiedDate"
+      },
+      "requirements": {
+        "name": "name",
+        "pid": "pid",
+        "id": "id",
+        "created_date": "creationDate",
+        "description": "description",
+        "last_modified_date": "lastModifiedDate"
+      },
+      "modules": {
+        "name": "name",
+        "pid": "pid",
+        "id": "id",
+        "created_date": "creationDate",
+        "description": "description",
+        "last_modified_date": "lastModifiedDate"
+      },
+      "defects": {
+        "name": "name",
+        "pid": "pid",
+        "id": "id",
+        "created_date": "creationDate",
+        "description": "description",
+        "last_modified_date": "lastModifiedDate"
+      },
+      "trace-matrix-report": {
+        "testcases": "testcases",
+        "linkedTestcaseCount": "linkedTestcaseCount",
+        "id": "id"
+      }
+    },
+    "almEntityMetaData": {
+      "dataUpdateSupported": true,
+      "uniqueKey": [
+        "projectId",
+        "id",
+        "almType"
+      ]
+    }
+  },
+  "toolCategory": "ALM",
+  "toolsTimeZone": "GMT",
+  "insightsTimeZone": "GMT",
+  "enableValueArray": false,
+  "useResponseTemplate": true,
+  "auth": "base64",
+  "runSchedule": 30,
+  "timeStampField": "lastModifiedDate",
+  "timeStampFormat": "%Y-%m-%dT%H:%M:%S",
+  "isEpochTimeFormat": false,
+  "startFrom": "2018-01-01T15:46:33",
+  "baseUrl": "https://base_url.com",
+  "username": "user_name",
+  "password": "password",
+  "isDebugAllowed": false,
+  "loggingSetting": {
+    "logLevel": "WARN",
+    "maxBytes": 5000000,
+    "backupCount": 1000
+  }
+}
