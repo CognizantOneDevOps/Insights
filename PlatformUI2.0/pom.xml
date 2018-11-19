@@ -4,14 +4,14 @@
 		<artifactId>PlatformParent</artifactId>
 		<groupId>com.cognizant.devops</groupId>
 		<!--<relativePath>../../pom.xml</relativePath>-->
-		<version>4.5</version>
+		<version>4.6</version>
 	</parent>
 
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>com.cognizant.devops</groupId>
 	<artifactId>PlatformUI2.0</artifactId>
-	<version>4.5</version>
+	<version>4.6</version>
 	<packaging>pom</packaging>
 
 	<name>PlatformUI2.0</name>
