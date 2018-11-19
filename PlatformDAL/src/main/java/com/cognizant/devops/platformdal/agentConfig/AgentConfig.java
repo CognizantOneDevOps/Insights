@@ -50,7 +50,7 @@ public class AgentConfig {
 	
 	@Deprecated
 	@Column(name = "DATA_UPDATE_SUPPORTED")
-	private Boolean dataUpdateSupported;
+	private Boolean dataUpdateSupported = false;
 	
 	@Deprecated
 	@Column(name = "UNIQUE_KEY")
