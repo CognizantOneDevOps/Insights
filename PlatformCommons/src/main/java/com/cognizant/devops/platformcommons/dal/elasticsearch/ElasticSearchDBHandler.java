@@ -17,7 +17,8 @@ package com.cognizant.devops.platformcommons.dal.elasticsearch;
 
 import javax.ws.rs.core.MediaType;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -29,7 +30,7 @@ import com.sun.jersey.api.client.WebResource;
 
 public class ElasticSearchDBHandler {
 
-	private static final Logger log = Logger.getLogger(ElasticSearchDBHandler.class);
+	private static final Logger log = LogManager.getLogger(ElasticSearchDBHandler.class);
 
 	public String search(String url) {
 		ClientResponse response = null;

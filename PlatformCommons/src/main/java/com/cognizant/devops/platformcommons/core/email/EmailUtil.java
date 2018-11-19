@@ -35,12 +35,13 @@ import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 import javax.mail.util.ByteArrayDataSource;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import com.cognizant.devops.platformcommons.config.EmailConfiguration;
 
 public class EmailUtil {
-	private static final Logger LOG = Logger.getLogger(EmailUtil.class);
+	private static final Logger LOG = LogManager.getLogger(EmailUtil.class);
 
 	private static final EmailUtil emailUtil = new EmailUtil();
 

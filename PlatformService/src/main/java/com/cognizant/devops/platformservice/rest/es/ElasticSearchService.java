@@ -24,7 +24,8 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -47,7 +48,7 @@ import com.sun.jersey.api.client.ClientResponse;
 @RestController
 @RequestMapping("/search")
 public class ElasticSearchService {
-	static Logger log = Logger.getLogger(ElasticSearchService.class.getName());
+	static Logger log = LogManager.getLogger(ElasticSearchService.class.getName());
 
 	@Autowired
 	private HttpServletRequest context;

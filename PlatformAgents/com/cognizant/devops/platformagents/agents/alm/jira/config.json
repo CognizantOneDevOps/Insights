@@ -20,6 +20,7 @@
   },
  "dynamicTemplate": {
  	   "timeFieldMapping" : {
+        "creationDate" : "%Y-%m-%dT%H:%M:%S",
 		"startDate" : "%Y-%m-%d"
   		}, 		
 	  "responseTemplate": {
@@ -28,6 +29,7 @@
 	      "issuetype": {
 	        "name": "issueType"
 	      },
+		  "created": "creationDate",
 	      "updated": "lastUpdated",
 	      "project": {
 	        "name": "projectName"
@@ -59,6 +61,25 @@
 	    } 
 	  },
 	  "extensions" : {
+        "sprints" : {
+                "runSchedule" : 720,
+                "boardApiUrl" : "#JIRA_URL#/rest/agile/1.0/board",
+                "sprintApiUrl" : "#JIRA_URL#/rest/agile/1.0/sprint",
+                "sprintResponseTemplate" : {
+                        "id": "sprintId",
+                        "state": "state",
+                        "name": "sprintName",
+                        "startDate": "sprintStartDate",
+                        "endDate": "sprintEndDate",
+                        "completeDate": "sprintCompleteDate",
+                        "originBoardId": "boardId"
+                },
+                "sprintMetadata" : {
+                "labels" : ["SPRINT"],
+                "dataUpdateSupported" : true,
+                "uniqueKey" : ["boardId", "sprintId"]
+            }
+        },
 		  	"sprintReport" : {
 		  		"runSchedule" : 720,
 		  		"boardApiUrl" : "https://<JIRA_HOST>/rest/agile/1.0/board",

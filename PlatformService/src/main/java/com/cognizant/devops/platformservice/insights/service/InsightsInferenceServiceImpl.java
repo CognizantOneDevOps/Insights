@@ -26,7 +26,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
 import org.springframework.stereotype.Service;
@@ -43,7 +44,7 @@ import com.google.gson.JsonObject;
 @Service("insightsInferenceService")
 public class InsightsInferenceServiceImpl implements InsightsInferenceService {
 
-	private static final Logger log = Logger.getLogger(InsightsInferenceServiceImpl.class);
+	private static final Logger log = LogManager.getLogger(InsightsInferenceServiceImpl.class);
 	
 	@Autowired
 	private ReloadableResourceBundleMessageSource messageSource;

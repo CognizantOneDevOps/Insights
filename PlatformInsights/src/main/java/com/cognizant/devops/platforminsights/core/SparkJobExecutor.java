@@ -19,7 +19,8 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
@@ -47,7 +48,7 @@ public class SparkJobExecutor implements Job,Serializable{
 	/**
 	 * 
 	 */
-	private static final Logger log = Logger.getLogger(SparkJobExecutor.class);
+	private static final Logger log = LogManager.getLogger(SparkJobExecutor.class);
 	private static final long serialVersionUID = -4343203105485076004L;
 	public void execute(JobExecutionContext context) {
 		try {

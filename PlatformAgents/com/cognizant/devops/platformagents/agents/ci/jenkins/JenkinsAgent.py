@@ -160,6 +160,15 @@ class JenkinsAgent(BaseAgent):
                 if not trackingUpdated:
                     self.updateTrackingDetails(url, completedBuilds[0]["number"])
                     trackingUpdated = True
+                    '''
+		    if 'number' in completedBuilds[0]:
+                        self.updateTrackingDetails(url, completedBuilds[0]["number"])
+                        trackingUpdated = True
+                    else:
+                        self.updateTrackingDetails(url, buildDetails[0]["buildNumber"])
+			trackingUpdated = True
+		    '''
+                    
             start = start + 100
     
     def processLogParsing(self, buildDetails):

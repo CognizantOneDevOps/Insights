@@ -26,7 +26,8 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.NewCookie;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -52,7 +53,7 @@ import com.sun.jersey.api.client.ClientResponse;
 @RestController
 @RequestMapping("/accessGrpMgmt")
 public class AccessGroupManagement {
-	private static Logger log = Logger.getLogger(AccessGroupManagement.class.getName());
+	private static Logger log = LogManager.getLogger(AccessGroupManagement.class.getName());
 	private static String authHeader = null;
 
 	@Autowired
@@ -113,7 +114,7 @@ public class AccessGroupManagement {
 		String cookies = getUserCookies();
 		headers.put("Cookie", cookies);
 
-		log.debug("Inside getCurrentUserOrgs() - Cookies -- " + cookies);
+		//log.debug("Inside getCurrentUserOrgs() - Cookies -- " + cookies);
 
 		String apiUrl = ApplicationConfigProvider.getInstance().getGrafana().getGrafanaEndpoint() + "/api/user/orgs";
 		ClientResponse response = RestHandler.doGet(apiUrl, null, headers);
@@ -179,7 +180,7 @@ public class AccessGroupManagement {
 					loginRequestParams.addProperty("password", authTokens[1]);
 					String loginApiUrl = ApplicationConfigProvider.getInstance().getGrafana().getGrafanaEndpoint()
 							+ "/login";
-					log.debug("Getting user cookies from: " + loginApiUrl);
+					//log.debug("Getting user cookies from: " + loginApiUrl);
 					ClientResponse grafanaLoginResponse = RestHandler.doPost(loginApiUrl, loginRequestParams, null);
 					List<NewCookie> cookies2 = grafanaLoginResponse.getCookies();
 					for (NewCookie cookie : cookies2) {
@@ -203,7 +204,7 @@ public class AccessGroupManagement {
 		String userOrgsApiUrl = ApplicationConfigProvider.getInstance().getGrafana().getGrafanaEndpoint()
 				+ "/api/user/orgs";
 		log.debug("userOrgs API URL is: " + userOrgsApiUrl);
-		log.debug("Headers: " + headers);
+		//log.debug("Headers: " + headers);
 		ClientResponse grafanaCurrentOrgResponse = RestHandler.doGet(userOrgsApiUrl, null, headers);
 		JsonArray grafanaOrgs = new JsonParser().parse(grafanaCurrentOrgResponse.getEntity(String.class))
 				.getAsJsonArray();

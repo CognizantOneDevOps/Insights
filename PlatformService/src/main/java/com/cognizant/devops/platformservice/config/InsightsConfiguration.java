@@ -24,9 +24,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
-
+import org.apache.logging.log4j.Logger;
 
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.config.GrafanaData;
@@ -41,8 +40,8 @@ import com.sun.jersey.api.client.ClientResponse;
 
 public final class InsightsConfiguration {
 	
-	//private static Logger log = Logger.getLogger(InsightsConfiguration.class);
-	private static org.apache.logging.log4j.Logger log = LogManager.getLogger(InsightsConfiguration.class);
+	//private static Logger log = LogManager.getLogger(InsightsConfiguration.class);
+	private static Logger log = LogManager.getLogger(InsightsConfiguration.class);
 	private static final String NEO4J_DS = "Neo4j_DS";
 	private static final String ElaticSearch_DS = "ElaticSearch_DS";
 

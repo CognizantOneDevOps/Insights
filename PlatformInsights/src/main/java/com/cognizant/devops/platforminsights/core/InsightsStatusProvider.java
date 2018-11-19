@@ -18,12 +18,13 @@ package com.cognizant.devops.platforminsights.core;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import com.cognizant.devops.platformcommons.core.util.ComponentHealthLogger;
 
 public class InsightsStatusProvider extends ComponentHealthLogger {
-	private static Logger log = Logger.getLogger(InsightsStatusProvider.class);
+	private static Logger log = LogManager.getLogger(InsightsStatusProvider.class);
 	
 	static InsightsStatusProvider instance=null;
 	private InsightsStatusProvider() {

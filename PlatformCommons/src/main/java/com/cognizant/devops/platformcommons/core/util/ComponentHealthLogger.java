@@ -23,7 +23,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
@@ -32,7 +33,7 @@ import com.google.gson.JsonObject;
 public abstract class ComponentHealthLogger {
 	public final String DATE_TIME_FORMAT = "yyyy-MM-dd'T'HH:mm:ss'Z'";
 	public final  SimpleDateFormat  dtf = new SimpleDateFormat(DATE_TIME_FORMAT);
-	private static final Logger log = Logger.getLogger(ComponentHealthLogger.class);
+	private static final Logger log = LogManager.getLogger(ComponentHealthLogger.class);
 	
 	public boolean createComponentStatusNode(String label,String version,String message,String status,Map<String,String> parameter){
 		JsonObject response = null;

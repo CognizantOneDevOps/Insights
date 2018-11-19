@@ -25,6 +25,7 @@
 		"responseTemplate" : {
 			"sha": "commitId",
 			"commit" : {
+				"message": "message",
 				"author" : {
 					"name": "authorName",
 					"date": "commitTime"

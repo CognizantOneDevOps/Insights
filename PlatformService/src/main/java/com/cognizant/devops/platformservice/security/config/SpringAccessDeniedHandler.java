@@ -22,14 +22,15 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.stereotype.Component;
 
 @Component
 public class SpringAccessDeniedHandler implements AccessDeniedHandler {
-	static Logger log = Logger.getLogger(SpringAccessDeniedHandler.class.getName());
+	static Logger log = LogManager.getLogger(SpringAccessDeniedHandler.class.getName());
 	
 	@Override
 	public void handle(HttpServletRequest request, HttpServletResponse response,

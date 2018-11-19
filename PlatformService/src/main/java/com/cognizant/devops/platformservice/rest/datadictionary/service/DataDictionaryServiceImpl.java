@@ -19,7 +19,8 @@ package com.cognizant.devops.platformservice.rest.datadictionary.service;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Service;
 
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphResponse;
@@ -37,7 +38,7 @@ import com.google.gson.JsonParser;
 @Service("dataDictionaryService")
 public class DataDictionaryServiceImpl implements DataDictionaryService {
 	Neo4jDBHandler neo4jDBHandler = new Neo4jDBHandler();
-	private static Logger log = Logger.getLogger(DataDictionaryServiceImpl.class);
+	private static Logger log = LogManager.getLogger(DataDictionaryServiceImpl.class);
 
 	@Override
 	public JsonObject getToolsAndCategories() {

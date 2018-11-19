@@ -15,7 +15,8 @@
  ******************************************************************************/
 package com.cognizant.devops.platformservice.rest.neo4j;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -27,7 +28,7 @@ import com.cognizant.devops.platformcommons.dal.neo4j.Neo4jDBHandler;
 @RestController
 @RequestMapping("/db")
 public class GraphDBService {
-	static Logger log = Logger.getLogger(GraphDBService.class.getName());
+	static Logger log = LogManager.getLogger(GraphDBService.class.getName());
 
 	@RequestMapping(value = "/data", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 	public String executeCypher(@RequestParam String cypher){

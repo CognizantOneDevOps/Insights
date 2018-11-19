@@ -22,7 +22,8 @@ import java.util.Base64;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -41,7 +42,7 @@ public class CustomAppSettings {
 
 	private static final String INSIGHTS_HOME = "INSIGHTS_HOME";
 
-	private static Logger LOG = Logger.getLogger(CustomAppSettings.class);
+	private static Logger LOG = LogManager.getLogger(CustomAppSettings.class);
 
 	@Autowired
 	private HttpServletRequest request;

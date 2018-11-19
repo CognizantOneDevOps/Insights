@@ -23,10 +23,10 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.NewCookie;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.ldap.core.DirContextOperations;
@@ -57,14 +57,12 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
-import com.sun.jersey.api.client.WebResource;
 
 @RestController
 @RequestMapping("/user")
 public class UserDetailsService {
-	private static Logger log = Logger.getLogger(UserDetailsService.class.getName());
+	private static Logger log = LogManager.getLogger(UserDetailsService.class.getName());
 	// private static final String[] ldapAttributeIds =
 	// {"sAMAccountName","distinguishedName", "sn", "givenname", "mail",
 	// "telephonenumber", "thumbnailPhoto", "title"};

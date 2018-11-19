@@ -16,23 +16,12 @@
 
 package com.cognizant.devops.insightsemail.app;
 
-import org.apache.log4j.Logger;
-import org.quartz.JobBuilder;
-import org.quartz.JobDetail;
-import org.quartz.Scheduler;
-import org.quartz.SchedulerException;
-import org.quartz.SimpleScheduleBuilder;
-import org.quartz.Trigger;
-import org.quartz.TriggerBuilder;
-import org.quartz.impl.StdSchedulerFactory;
-
-import com.cognizant.devops.insightsemail.job.AlertEmailJobExecutor;
-import com.cognizant.devops.platformcommons.config.ApplicationConfigCache;
-import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 
 public class InsightsEmailTriggerApplication {
-	private static Logger log = Logger.getLogger(InsightsEmailTriggerApplication.class);
+	private static Logger log = LogManager.getLogger(InsightsEmailTriggerApplication.class);
 	private static int defaultInterval = 600;
 
 	/*public static void main(String[] args) {

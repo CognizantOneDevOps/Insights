@@ -20,7 +20,7 @@ import org.hibernate.Session;
 import com.cognizant.devops.platformdal.config.PlatformDALSessionFactoryProvider;
 
 public class BaseDAL {
-	//private static Logger logger = Logger.getLogger(BaseDAL.class);
+	//private static Logger logger = LogManager.getLogger(BaseDAL.class);
 	
 	private Session session;
 

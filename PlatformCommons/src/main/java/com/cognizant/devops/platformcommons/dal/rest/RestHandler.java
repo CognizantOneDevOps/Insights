@@ -22,7 +22,8 @@ import java.util.Map;
 
 import javax.ws.rs.core.MediaType;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import com.google.gson.JsonElement;
 import com.sun.jersey.api.client.Client;
@@ -31,7 +32,7 @@ import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.client.WebResource.Builder;
 
 public class RestHandler {
-	private static Logger log = Logger.getLogger(RestHandler.class.getName());
+	private static Logger log = LogManager.getLogger(RestHandler.class.getName());
 		
 	private RestHandler(){
 		

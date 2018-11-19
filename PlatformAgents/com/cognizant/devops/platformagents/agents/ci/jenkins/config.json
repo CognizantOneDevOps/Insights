@@ -70,7 +70,7 @@
 "toolsTimeZone" : "Asia/Kolkata",
 "enableDataValidation": true,
 "useResponseTemplate" : true,
-"useAllBuildsApi" : false,
+"useAllBuildsApi" : true,
 "isDebugAllowed" : false,
 "enableValueArray": false,
 "userid": "username",

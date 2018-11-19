@@ -28,7 +28,8 @@ import javax.net.ssl.X509TrustManager;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.web.WebApplicationInitializer;
 
 import com.cognizant.devops.platformcommons.config.ApplicationConfigCache;
@@ -38,7 +39,7 @@ import com.cognizant.devops.platformcommons.config.ApplicationConfigCache;
  * This class will initialize the config.json.
  */
 public class PlatformServiceInitializer implements WebApplicationInitializer  {
-	static Logger log = Logger.getLogger(PlatformServiceInitializer.class.getName());
+	static Logger log = LogManager.getLogger(PlatformServiceInitializer.class.getName());
 
 	@Override
 	public void onStartup(ServletContext servletContext) throws ServletException {
