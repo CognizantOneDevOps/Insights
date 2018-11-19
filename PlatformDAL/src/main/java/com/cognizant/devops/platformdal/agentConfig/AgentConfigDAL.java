@@ -29,7 +29,7 @@ import com.google.gson.JsonObject;
 public class AgentConfigDAL extends BaseDAL {
 	
 	
-	
+	@Deprecated
 	public boolean saveAgentConfigFromUI(String agentId, String toolCategory, String toolName, 
 			JsonObject agentJson, boolean isDataUpdateSupported, String uniqueKey, String agentVersion, String osversion, Date updateDate) {
 		
@@ -40,7 +40,7 @@ public class AgentConfigDAL extends BaseDAL {
 		createQuery.setParameter("agentId", agentId);
 		List<AgentConfig> resultList = createQuery.getResultList();
 		AgentConfig agentConfig = null;
-		if(resultList.size()>0){
+		if(!resultList.isEmpty()){
 			agentConfig = resultList.get(0);
 		}
 		getSession().beginTransaction();
@@ -58,6 +58,46 @@ public class AgentConfigDAL extends BaseDAL {
 		return true;
 	}
 	
+	/**
+	 * New method 
+	 * @param agentId
+	 * @param toolCategory
+	 * @param toolName
+	 * @param agentJson
+	 * @param agentVersion
+	 * @param osversion
+	 * @param updateDate
+	 * @return
+	 */
+	public boolean saveAgentConfigFromUI(String agentId, String toolCategory, String toolName, 
+			JsonObject agentJson, String agentVersion, String osversion, Date updateDate) {
+		
+		Query<AgentConfig> createQuery = getSession().createQuery(
+				"FROM AgentConfig a WHERE a.toolName = :toolName  AND a.agentKey = :agentId",
+				AgentConfig.class);
+		createQuery.setParameter("toolName", toolName);
+		createQuery.setParameter("agentId", agentId);
+		List<AgentConfig> resultList = createQuery.getResultList();
+		AgentConfig agentConfig = null;
+		if(!resultList.isEmpty()){
+			agentConfig = resultList.get(0);
+		}
+		getSession().beginTransaction();
+		if (agentConfig != null) {
+			setAgentConfigValues(agentConfig, toolCategory, agentId, toolName, agentJson, agentVersion, osversion, updateDate);
+			getSession().update(agentConfig);
+		} else {
+			agentConfig = new AgentConfig();
+			setAgentConfigValues(agentConfig, toolCategory, agentId, toolName, agentJson, agentVersion, osversion, updateDate);
+			getSession().save(agentConfig);
+		}
+		getSession().getTransaction().commit();
+		terminateSession();
+		terminateSessionFactory();
+		return true;
+	}
+	
+	@Deprecated
 	private void setAgentConfigValues(AgentConfig agentConfig,String toolCategory,String agentId, String toolName, JsonObject agentJson, 
 			boolean isDataUpdateSupported, String uniqueKey, String agentVersion, String osversion, Date updateDate) {
 		
@@ -73,6 +113,18 @@ public class AgentConfigDAL extends BaseDAL {
 		agentConfig.setAgentStatus(AGENTACTION.START.name());
 	}
 
+	private void setAgentConfigValues(AgentConfig agentConfig,String toolCategory,String agentId, String toolName, JsonObject agentJson, 
+			String agentVersion, String osversion, Date updateDate) {
+		
+		agentConfig.setToolCategory(toolCategory.toUpperCase());
+		agentConfig.setToolName(toolName);
+		agentConfig.setAgentJson(agentJson.toString());
+		agentConfig.setOsVersion(osversion);
+		agentConfig.setAgentVersion(agentVersion);
+		agentConfig.setUpdatedDate(updateDate);
+		agentConfig.setAgentKey(agentId);
+		agentConfig.setAgentStatus(AGENTACTION.START.name());
+	}
 
 	// for update action i.e. Insert
 	public boolean saveAgentConfigurationData(int agentId, String toolName, String toolCategory, JsonObject agentJson, 

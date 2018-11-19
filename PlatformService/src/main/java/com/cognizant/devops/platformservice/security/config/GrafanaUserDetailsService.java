@@ -17,7 +17,8 @@ package com.cognizant.devops.platformservice.security.config;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -26,7 +27,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class GrafanaUserDetailsService implements UserDetailsService {
-	static Logger log = Logger.getLogger(GrafanaUserDetailsService.class.getName());
+	static Logger log = LogManager.getLogger(GrafanaUserDetailsService.class.getName());
 
 	@Autowired
 	private HttpServletRequest request;

@@ -48,10 +48,12 @@ public class AgentConfig {
 	@Column(name = "UPDATE_DATE")
 	private Date updatedDate;
 	
+	@Deprecated
 	@Column(name = "DATA_UPDATE_SUPPORTED")
 	private Boolean dataUpdateSupported;
 	
-	@Column(name = "UNIQUE_KEY", unique = true, nullable = false)
+	@Deprecated
+	@Column(name = "UNIQUE_KEY")
 	private String uniqueKey;
 	
 	@Column(name = "OS_VERSION")
@@ -75,11 +77,13 @@ public class AgentConfig {
 	public void setId(int id) {
 		this.id = id;
 	}
-
+	
+	@Deprecated
 	public int getAgentId() {
 		return agentId;
 	}
 
+	@Deprecated
 	public void setAgentId(int agentId) {
 		this.agentId = agentId;
 	}
@@ -116,18 +120,22 @@ public class AgentConfig {
 		this.updatedDate = updatedDate;
 	}
 
+	@Deprecated
 	public Boolean isDataUpdateSupported() {
 		return dataUpdateSupported;
 	}
 
+	@Deprecated
 	public void setDataUpdateSupported(Boolean dataUpdateSupported) {
 		this.dataUpdateSupported = dataUpdateSupported;
 	}
 
+	@Deprecated
 	public String getUniqueKey() {
 		return uniqueKey;
 	}
 
+	@Deprecated
 	public void setUniqueKey(String uniqueKey) {
 		this.uniqueKey = uniqueKey;
 	}

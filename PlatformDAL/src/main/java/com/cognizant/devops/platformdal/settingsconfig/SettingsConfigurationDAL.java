@@ -19,7 +19,8 @@ import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.hibernate.query.Query;
 
 import com.cognizant.devops.platformcommons.constants.ConfigOptions;
@@ -28,7 +29,7 @@ import com.cognizant.devops.platformdal.core.BaseDAL;
 
 public class SettingsConfigurationDAL extends BaseDAL {
 	
-	private static Logger log = Logger.getLogger(SettingsConfigurationDAL.class.getName());
+	private static Logger log = LogManager.getLogger(SettingsConfigurationDAL.class.getName());
 
 	public Boolean saveSettingsConfiguration(SettingsConfiguration settingsConfiguration) {
 		Query<SettingsConfiguration> createQuery = getSession().createQuery(

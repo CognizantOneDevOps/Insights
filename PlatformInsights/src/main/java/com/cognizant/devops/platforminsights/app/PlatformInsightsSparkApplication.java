@@ -15,7 +15,8 @@
  ******************************************************************************/
 package com.cognizant.devops.platforminsights.app;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.quartz.JobBuilder;
 import org.quartz.JobDetail;
 import org.quartz.Scheduler;
@@ -36,7 +37,7 @@ import com.cognizant.devops.platforminsights.core.SparkJobExecutor;
  * Initialize Publisher and subscriber modules 3. Initialize Correlation Module.
  */
 public class PlatformInsightsSparkApplication {
-	private static Logger log = Logger.getLogger(PlatformInsightsSparkApplication.class);
+	private static Logger log = LogManager.getLogger(PlatformInsightsSparkApplication.class);
 	
 	private static int defaultInterval = 600;
 	private PlatformInsightsSparkApplication(){

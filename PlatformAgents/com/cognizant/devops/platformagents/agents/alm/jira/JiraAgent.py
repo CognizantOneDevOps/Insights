@@ -72,7 +72,9 @@ class JiraAgent(BaseAgent):
                 fromDateTime = dt + datetime.timedelta(minutes=01)
                 fromDateTime = fromDateTime.strftime('%Y-%m-%d %H:%M')
                 self.tracking["lastupdated"] = fromDateTime
-                self.publishToolsData(data)
+                jiraKeyMetadata = {"dataUpdateSupported" : True,"uniqueKey" : ["key"]}
+                self.publishToolsData(data, jiraKeyMetadata)
+                #self.publishToolsData(data)
                 if len(workLogData) > 0:
                     self.publishToolsData(workLogData, changeLogMetadata)
                 self.updateTrackingJson(self.tracking)
@@ -217,7 +219,11 @@ class JiraAgent(BaseAgent):
                 isLast = False
                 injectData = {'boardName' : board['name']}
                 while not isLast:
-                    sprintsResponse = self.getResponse(sprintsUrl+str(startAt), 'GET', self.userid, self.passwd, None)
+                    try:
+                        sprintsResponse = self.getResponse(sprintsUrl+str(startAt), 'GET', self.userid, self.passwd, None)
+                    except Exception as ex3:
+                        #board['error'] = str(ex3)
+                        break
                     isLast = sprintsResponse['isLast']
                     startAt = startAt + sprintsResponse['maxResults']
                     sprintValues = sprintsResponse['values']

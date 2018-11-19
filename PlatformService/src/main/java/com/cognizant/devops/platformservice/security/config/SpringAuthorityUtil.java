@@ -15,11 +15,12 @@
  ******************************************************************************/
 package com.cognizant.devops.platformservice.security.config;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class SpringAuthorityUtil {
 	
-	private static Logger log = Logger.getLogger(SpringAuthorityUtil.class.getName());
+	private static Logger log = LogManager.getLogger(SpringAuthorityUtil.class.getName());
 	
 	public static SpringAuthority getSpringAuthorityRole(String grafanaCurrentOrgRole) {
 		try{

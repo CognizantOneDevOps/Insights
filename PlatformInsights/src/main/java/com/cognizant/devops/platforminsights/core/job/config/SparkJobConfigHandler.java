@@ -20,7 +20,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
 import org.elasticsearch.spark.rdd.api.java.JavaEsSpark;
@@ -41,7 +42,7 @@ import com.google.gson.JsonObject;
  *
  */
 public class SparkJobConfigHandler {
-	private static final Logger log = Logger.getLogger(SparkJobConfigHandler.class);
+	private static final Logger log = LogManager.getLogger(SparkJobConfigHandler.class);
 	
 	public List<SparkJobConfiguration> loadJobsFromES(){		
 		log.debug("Loading jobs from Elasticsearch");

@@ -20,7 +20,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.google.gson.JsonArray;
@@ -34,7 +35,7 @@ import com.google.gson.JsonObject;
  *
  */
 public class Neo4jFieldIndexRegistry {
-	private static final Logger log = Logger.getLogger(Neo4jFieldIndexRegistry.class);
+	private static final Logger log = LogManager.getLogger(Neo4jFieldIndexRegistry.class);
 	private static Map<String, List<String>> indexedFieldsRegistry = new HashMap<String, List<String>>();
 	private static final Neo4jFieldIndexRegistry instance = new Neo4jFieldIndexRegistry();
 	

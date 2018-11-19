@@ -17,7 +17,8 @@ package com.cognizant.devops.platformcommons.core.util;
 
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import com.cognizant.devops.platformcommons.dal.neo4j.Neo4jDBHandler;
 import com.google.gson.JsonObject;
@@ -28,7 +29,7 @@ import com.sun.jersey.api.client.WebResource;
 import sun.misc.BASE64Encoder;
 
 public  class SystemStatus {
-	private static Logger log = Logger.getLogger(SystemStatus.class.getName());
+	private static Logger log = LogManager.getLogger(SystemStatus.class.getName());
 	
 	public static JsonObject addSystemInformationInNeo4j(String version,List<JsonObject> dataList,List<String> labels) {
 		Neo4jDBHandler graphDBHandler = new Neo4jDBHandler();

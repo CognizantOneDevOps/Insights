@@ -37,7 +37,8 @@ import java.util.stream.Stream;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -63,10 +64,9 @@ import com.rabbitmq.client.ConnectionFactory;
 
 @Service("agentManagementService")
 public class AgentManagementServiceImpl implements AgentManagementService {
-	private static Logger log = Logger.getLogger(AgentManagementServiceImpl.class);
+	private static Logger log = LogManager.getLogger(AgentManagementServiceImpl.class);
 
 	private static final String FILETYPE = ".zip";
-	private static final String ISDATESUPPORTED = "isDataUpdateSupported";
 	private static final String SUCCESS = "SUCCESS";
 
 	@Override
@@ -84,11 +84,6 @@ public class AgentManagementServiceImpl implements AgentManagementService {
 			json.addProperty("agentVersion", agentVersion);
 			json.get("subscribe").getAsJsonObject().addProperty("agentCtrlQueue", agentId);
 
-			boolean isDataUpdateSupported = false;
-			if (json.get(ISDATESUPPORTED) != null && !json.get(ISDATESUPPORTED).isJsonNull()) {
-				isDataUpdateSupported = json.get(ISDATESUPPORTED).getAsBoolean();
-			}
-			String uniqueKey = agentId;
 			Date updateDate = Timestamp.valueOf(LocalDateTime.now());
 
 			// Update tracking.json file
@@ -114,7 +109,7 @@ public class AgentManagementServiceImpl implements AgentManagementService {
 			// register agent in DB
 			AgentConfigDAL agentConfigDAL = new AgentConfigDAL();
 			agentConfigDAL.saveAgentConfigFromUI(agentId, json.get("toolCategory").getAsString(), toolName, json,
-					isDataUpdateSupported, uniqueKey, agentVersion, osversion, updateDate);
+					agentVersion, osversion, updateDate);
 
 		} catch (Exception e) {
 			log.error("Error while registering agent " + toolName, e);
@@ -166,11 +161,6 @@ public class AgentManagementServiceImpl implements AgentManagementService {
 			json.addProperty("osversion", osversion);
 			json.addProperty("agentVersion", agentVersion);
 
-			boolean isDataUpdateSupported = false;
-			if (json.get(ISDATESUPPORTED) != null && !json.get(ISDATESUPPORTED).isJsonNull()) {
-				isDataUpdateSupported = json.get(ISDATESUPPORTED).getAsBoolean();
-			}
-			String uniqueKey = agentId;
 			Date updateDate = Timestamp.valueOf(LocalDateTime.now());
 
 			Path agentZipPath = updateAgentConfig(toolName, json);
@@ -183,7 +173,7 @@ public class AgentManagementServiceImpl implements AgentManagementService {
 
 			AgentConfigDAL agentConfigDAL = new AgentConfigDAL();
 			agentConfigDAL.saveAgentConfigFromUI(agentId, json.get("toolCategory").getAsString(), toolName, json,
-					isDataUpdateSupported, uniqueKey, agentVersion, osversion, updateDate);
+					agentVersion, osversion, updateDate);
 
 		} catch (Exception e) {
 			log.error("Error updating and installing agent", e);

@@ -15,7 +15,8 @@
  ******************************************************************************/
 package com.cognizant.devops.platformdal.test;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.boot.Metadata;
@@ -25,7 +26,7 @@ import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.service.ServiceRegistry;
 
 public class TestDal {
-	final static Logger logger = Logger.getLogger(TestDal.class);
+	final static Logger logger = LogManager.getLogger(TestDal.class);
 	public static void main(String[] args) {
 		/*Configuration configuration = new Configuration();
 		configuration.configure("hibernate.cfg.xml");

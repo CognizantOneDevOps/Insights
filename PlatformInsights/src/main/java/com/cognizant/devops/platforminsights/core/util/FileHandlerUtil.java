@@ -20,14 +20,15 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import com.cognizant.devops.platforminsights.core.SparkJobExecutor;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
 public class FileHandlerUtil {
-	private static final Logger log = Logger.getLogger(FileHandlerUtil.class);
+	private static final Logger log = LogManager.getLogger(FileHandlerUtil.class);
 	
 	public static JsonObject loadJsonFile(String path) {
 		InputStream in = SparkJobExecutor.class.getResourceAsStream(path);

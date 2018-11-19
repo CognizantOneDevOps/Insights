@@ -20,7 +20,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import com.cognizant.devops.platformcommons.dal.elasticsearch.ElasticSearchDBHandler;
 import com.cognizant.devops.platforminsights.configs.ConfigConstants;
@@ -33,7 +34,7 @@ import com.google.gson.JsonObject;
 
 public class CountActionImpl extends BaseActionImpl {
 
-	private static final Logger log = Logger.getLogger(CountActionImpl.class);
+	private static final Logger log = LogManager.getLogger(CountActionImpl.class);
 	public CountActionImpl(KPIDefinition kpiDefinition) {
 		super(kpiDefinition);
 	}

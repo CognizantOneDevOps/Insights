@@ -17,7 +17,8 @@ package com.cognizant.devops.platformservice.rest.data;
 
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -36,7 +37,7 @@ import com.google.gson.JsonObject;
 @RestController
 @RequestMapping("/admin/mappingdata")
 public class PlatformMappingData {
-	private static Logger log = Logger.getLogger(PlatformMappingData.class.getName());
+	private static Logger log = LogManager.getLogger(PlatformMappingData.class.getName());
 
 	@RequestMapping(value = "/tools", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 	public @ResponseBody JsonObject getToolsList() {

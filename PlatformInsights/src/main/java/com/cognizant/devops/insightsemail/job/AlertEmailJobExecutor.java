@@ -21,7 +21,8 @@ import java.io.UnsupportedEncodingException;
 
 import javax.mail.MessagingException;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
@@ -29,7 +30,6 @@ import org.quartz.JobExecutionException;
 import com.cognizant.devops.insightsemail.core.InsightsEmailService;
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.config.EmailConfiguration;
-import com.cognizant.devops.platformcommons.core.email.EmailConstants;
 import com.cognizant.devops.platformcommons.core.email.Mail;
 
 
@@ -39,7 +39,7 @@ public class AlertEmailJobExecutor implements Job,Serializable {
 	 * 
 	 */
 	private static final long serialVersionUID = -7027158833277846218L;
-	private static final Logger log = Logger.getLogger(AlertEmailJobExecutor.class);
+	private static final Logger log = LogManager.getLogger(AlertEmailJobExecutor.class);
 
 	@Override
 	public void execute(JobExecutionContext context) throws JobExecutionException {

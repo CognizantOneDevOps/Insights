@@ -25,7 +25,8 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.NewCookie;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -39,14 +40,14 @@ import com.google.gson.JsonParser;
 import com.sun.jersey.api.client.ClientResponse;
 
 public class GrafanaUserDetailsUtil {
-	private static final Logger log = Logger.getLogger(GrafanaUserDetailsUtil.class);
+	private static final Logger log = LogManager.getLogger(GrafanaUserDetailsUtil.class);
 
 	public static UserDetails getUserDetails(HttpServletRequest httpRequest) {
 		log.debug("\n\nInside getUserDetails function call!");
 		ApplicationConfigProvider.performSystemCheck();
 		String authHeader = httpRequest.getHeader("Authorization");
 		Cookie[] requestCookies = httpRequest.getCookies();
-		log.debug("\nCookies:\n" + requestCookies);
+		//log.debug("\nCookies:\n" + requestCookies);
 		Map<String, String> grafanaResponseCookies = new HashMap<String, String>();
 		Map<String, String> cookieMap = new HashMap<String, String>();
 		if (requestCookies != null) {
@@ -54,7 +55,7 @@ public class GrafanaUserDetailsUtil {
 				cookieMap.put(cookie.getName(), cookie.getValue());
 			}
 		}
-		log.debug("\nCookies Map:\n" + cookieMap);
+		//log.debug("\nCookies Map:\n" + cookieMap);
 		String userName = null;
 		String credential = null;
 		// Validate if the Logged in user is same as that of grafana logged in user
@@ -65,12 +66,12 @@ public class GrafanaUserDetailsUtil {
 			credential = authTokens[1];
 			String grafanaUser = cookieMap.get("grafana_user");
 			String grafanaSession = cookieMap.get("grafana_sess");
-			log.debug("Insights User Name is: " + userName);
-			log.debug("Grafana's User Name is: " + grafanaUser);
+			//log.debug("Insights User Name is: " + userName);
+			//log.debug("Grafana's User Name is: " + grafanaUser);
 			if (userName.equals(grafanaUser) && grafanaSession != null) {
 				log.debug("LDAP user is found. Insights username matches Grafana's username");
 				grafanaResponseCookies.putAll(cookieMap);
-				log.debug("Grafana's resposne cookies are: " + grafanaResponseCookies);
+				//log.debug("Grafana's resposne cookies are: " + grafanaResponseCookies);
 				if ((grafanaResponseCookies.get("grafanaOrg") == null
 						|| grafanaResponseCookies.get("grafanaOrg").isEmpty())
 						&& (grafanaResponseCookies.get("grafanaRole") == null
@@ -86,7 +87,7 @@ public class GrafanaUserDetailsUtil {
 					grafanaResponseCookies.put("grafanaOrg", grafanaCurrentOrg);
 					String grafanaCurrentOrgRole = getCurrentOrgRole(headers, grafanaCurrentOrg);
 					grafanaResponseCookies.put("grafanaRole", grafanaCurrentOrgRole);
-					log.debug("Re-initilized Grafana response cookies are: " + grafanaResponseCookies);
+					//log.debug("Re-initilized Grafana response cookies are: " + grafanaResponseCookies);
 				}
 			} else {
 				log.debug("Grafana's native user found! Establishing valid garafna session");
@@ -131,11 +132,11 @@ public class GrafanaUserDetailsUtil {
 		log.debug("\nInside getCurrentOrgRole function call!");
 		String userOrgsApiUrl = ApplicationConfigProvider.getInstance().getGrafana().getGrafanaEndpoint()
 				+ "/api/user/orgs";
-		log.debug("Fetching User's Organizations at: " + userOrgsApiUrl);
+		//log.debug("Fetching User's Organizations at: " + userOrgsApiUrl);
 		ClientResponse grafanaCurrentOrgResponse = RestHandler.doGet(userOrgsApiUrl, null, headers);
 		JsonArray grafanaOrgs = new JsonParser().parse(grafanaCurrentOrgResponse.getEntity(String.class))
 				.getAsJsonArray();
-		log.debug("User's current organization ID is: " + grafanaCurrentOrg);
+		//log.debug("User's current organization ID is: " + grafanaCurrentOrg);
 		String grafanaCurrentOrgRole = null;
 		for (JsonElement org : grafanaOrgs) {
 			if (grafanaCurrentOrg.equals(org.getAsJsonObject().get("orgId").toString())) {
@@ -150,7 +151,7 @@ public class GrafanaUserDetailsUtil {
 	private static String getGrafanaCurrentOrg(Map<String, String> headers) {
 		log.debug("Inside getGrafanaCurrentOrg method call");
 		String loginApiUrl = ApplicationConfigProvider.getInstance().getGrafana().getGrafanaEndpoint() + "/api/user";
-		log.debug("Fetching user's detail at: " + loginApiUrl);
+		//log.debug("Fetching user's detail at: " + loginApiUrl);
 		ClientResponse grafanaCurrentOrgResponse = RestHandler.doGet(loginApiUrl, null, headers);
 		JsonObject responseJson = new JsonParser().parse(grafanaCurrentOrgResponse.getEntity(String.class))
 				.getAsJsonObject();

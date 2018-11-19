@@ -15,7 +15,8 @@
  *******************************************************************************/
 package com.cognizant.devops.platformservice.customsettings.service;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Service;
 
 import com.cognizant.devops.platformcommons.core.util.DataPurgingUtils;
@@ -27,7 +28,7 @@ import com.google.gson.JsonObject;
 @Service("settingsConfigurationService")
 public class SettingsConfigurationServiceImpl implements SettingsConfigurationService{
 	
-	private static Logger LOG = Logger.getLogger(SettingsConfigurationServiceImpl.class);
+	private static Logger LOG = LogManager.getLogger(SettingsConfigurationServiceImpl.class);
 
 	@Override
 	public Boolean saveSettingsConfiguration(String settingsJson,String settingsType,String activeFlag,String lastModifiedByUser) {		

@@ -26,17 +26,15 @@ import java.util.StringTokenizer;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.constants.MessageConstants;
-import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBException;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphResponse;
 import com.cognizant.devops.platformcommons.dal.neo4j.Neo4jDBHandler;
-
+import com.cognizant.devops.platformcommons.dal.neo4j.Neo4jFieldIndexRegistry;
 import com.cognizant.devops.platformcommons.dal.neo4j.NodeData;
 import com.cognizant.devops.platformengine.message.core.AgentDataConstants;
-import com.cognizant.devops.platformengine.message.core.EngineStatusLogger;
-import com.cognizant.devops.platformcommons.dal.neo4j.Neo4jFieldIndexRegistry;
 import com.cognizant.devops.platformengine.message.factory.EngineSubscriberResponseHandler;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;

@@ -18,7 +18,8 @@ package com.cognizant.devops.platformservice.rest.setup;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -45,7 +46,7 @@ import com.google.gson.JsonParser;
 @RestController
 @RequestMapping("/configure")
 public class SetupApplication {
-	static Logger log = Logger.getLogger(SetupApplication.class.getName());
+	static Logger log = LogManager.getLogger(SetupApplication.class.getName());
 	
 	@RequestMapping(value = "/read", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 	@ResponseBody

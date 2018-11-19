@@ -21,7 +21,8 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -39,7 +40,7 @@ import com.google.gson.JsonObject;
 @RestController
 @RequestMapping("/admin/data")
 public class InSightDataService {
-	static Logger log = Logger.getLogger(GraphDBService.class.getName());
+	static Logger log = LogManager.getLogger(GraphDBService.class.getName());
 
 	@Autowired
 	private HttpServletRequest request;

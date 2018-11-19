@@ -29,7 +29,8 @@ import java.util.Scanner;
 import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -57,7 +58,7 @@ import com.google.gson.JsonParser;
 @RestController
 @RequestMapping("/admin/tools")
 public class ToolsConfigurationService {
-	private static Logger log = Logger.getLogger(ToolsConfigurationService.class.getName());
+	private static Logger log = LogManager.getLogger(ToolsConfigurationService.class.getName());
 
 	/**
 	 * Avoid instantiations inside loops - Created JsonParser object outside of loop

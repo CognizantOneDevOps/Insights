@@ -25,7 +25,8 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.NewCookie;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -45,7 +46,7 @@ import com.sun.jersey.api.client.ClientResponse;
 @RestController
 @RequestMapping("/admin/userMgmt")
 public class UserManagementService {
-	private static Logger log = Logger.getLogger(UserManagementService.class.getName());
+	private static Logger log = LogManager.getLogger(UserManagementService.class.getName());
 	private static String authHeader = null;
 	
 	@Autowired

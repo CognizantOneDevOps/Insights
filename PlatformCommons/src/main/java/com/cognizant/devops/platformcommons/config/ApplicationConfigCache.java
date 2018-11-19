@@ -24,7 +24,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import com.cognizant.devops.platformcommons.constants.ConfigOptions;
 import com.google.gson.Gson;
@@ -36,7 +37,7 @@ import com.google.gson.JsonSyntaxException;
 import com.google.gson.stream.JsonWriter;
 
 public class ApplicationConfigCache {
-	static Logger log = Logger.getLogger(ApplicationConfigCache.class.getName());
+	static Logger log = LogManager.getLogger(ApplicationConfigCache.class.getName());
 	
 	private ApplicationConfigCache(){
 		

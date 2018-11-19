@@ -23,7 +23,8 @@ import java.util.Scanner;
 import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -32,8 +33,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.cognizant.devops.platformcommons.constants.ErrorMessage;
-import com.cognizant.devops.platformdal.tools.layout.ToolsLayoutDAL;
 import com.cognizant.devops.platformdal.tools.layout.ToolsLayout;
+import com.cognizant.devops.platformdal.tools.layout.ToolsLayoutDAL;
 import com.cognizant.devops.platformservice.rest.util.PlatformServiceUtil;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -44,7 +45,7 @@ import com.google.gson.JsonParser;
 @RestController
 @RequestMapping("/admin/toollayout")
 public class ToolsLayoutService {
-	private static Logger log = Logger.getLogger(ToolsLayoutService.class.getName());
+	private static Logger log = LogManager.getLogger(ToolsLayoutService.class.getName());
 
 	@RequestMapping(value = "/read", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 	public @ResponseBody JsonObject loadToolsLayout(@RequestParam String category, @RequestParam String toolName) {

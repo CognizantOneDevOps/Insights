@@ -8,7 +8,7 @@
  
 		<RollingFile name="RollingFile" filename="${env:INSIGHTS_HOME}/logs/PlatformEngine/PlatformEngine.log"
 			filepattern="${env:INSIGHTS_HOME}/logs/PlatformEngine/log4j_PlatformEngine.log">
-			<PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss} [%t] %-5p:: %m%n" />
+			<PatternLayout pattern="%d{dd MMM yyyy HH:mm:ss,SSS} %p [%t]:%c{3}.%M()%L - %m%n" />
 			<Policies>
 				<SizeBasedTriggeringPolicy size="10 MB" />
 			</Policies>
@@ -16,9 +16,11 @@
 		</RollingFile>
  
 	</Appenders>
-	<Loggers>
-		<Root level="ERROR">
-			<AppenderRef ref="Console" />
+		<Loggers>
+		<Logger name="com.cognizant" level="debug">
+				<AppenderRef ref="RollingFile" />
+		</Logger>
+		<Root level="error">
 			<AppenderRef ref="RollingFile" />
 		</Root>
 	</Loggers>

@@ -22,7 +22,8 @@ import java.io.InputStreamReader;
 import java.util.Iterator;
 
 import org.apache.commons.codec.digest.DigestUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Service;
 
 import com.cognizant.devops.platformcommons.core.util.InsightsUtils;
@@ -38,7 +39,7 @@ import com.google.gson.JsonParser;
 @Service("queryCachingService")
 public class QueryCachingServiceImpl implements QueryCachingService {
 
-	private static Logger log = Logger.getLogger(QueryCachingServiceImpl.class);
+	private static Logger log = LogManager.getLogger(QueryCachingServiceImpl.class);
 
 	@Override
 	public JsonObject getCacheResults(String requestPayload) {

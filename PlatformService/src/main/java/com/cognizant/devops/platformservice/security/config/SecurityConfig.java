@@ -16,20 +16,20 @@
 package com.cognizant.devops.platformservice.security.config;
 
 import java.io.IOException;
-
 import java.util.ArrayList;
 import java.util.List;
-import org.springframework.http.MediaType;
-import org.springframework.http.converter.ByteArrayHttpMessageConverter;
-import org.springframework.security.config.annotation.web.builders.WebSecurity;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.MediaType;
+import org.springframework.http.converter.ByteArrayHttpMessageConverter;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -37,8 +37,8 @@ import org.springframework.security.ldap.DefaultSpringSecurityContextSource;
 import org.springframework.security.ldap.authentication.BindAuthenticator;
 import org.springframework.security.ldap.authentication.LdapAuthenticationProvider;
 import org.springframework.security.ldap.search.FilterBasedLdapUserSearch;
-import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.multipart.commons.CommonsMultipartResolver;
+import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.config.LDAPConfiguration;
@@ -48,7 +48,7 @@ import com.cognizant.devops.platformcommons.config.LDAPConfiguration;
 @EnableWebSecurity
 @EnableWebMvc
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
-	static Logger log = Logger.getLogger(SecurityConfig.class.getName());
+	static Logger log = LogManager.getLogger(SecurityConfig.class.getName());
 
 	@Autowired
 	private SpringAccessDeniedHandler springAccessDeniedHandler;

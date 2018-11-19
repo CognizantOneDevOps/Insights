@@ -17,7 +17,8 @@ package com.cognizant.devops.platformservice.rest.datatagging;
 
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -34,7 +35,7 @@ import com.google.gson.JsonObject;
 @RestController
 @RequestMapping("/admin/dataTagging")
 public class EntityDefinitionService {
-	static Logger log = Logger.getLogger(GraphDBService.class.getName());
+	static Logger log = LogManager.getLogger(GraphDBService.class.getName());
 
 	@RequestMapping(value = "/addEntityDefinition", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 	public JsonObject addEntityDefinition(@RequestParam int rowId, @RequestParam String levelName, @RequestParam String entityName) {

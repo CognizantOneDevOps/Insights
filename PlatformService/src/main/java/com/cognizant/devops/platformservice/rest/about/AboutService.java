@@ -20,7 +20,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -40,7 +41,7 @@ private static final String VERSION = "version";
 private static final String PLATFORM_SERVICE_VERSION_JSON = "PlatformServiceVersion.json";
 private static final String PLATFORM_ENGINE_VERSION_JSON = "PlatformEngineVersion."
 		+ "json";
-static Logger log = Logger.getLogger(AboutService.class.getName());
+static Logger log = LogManager.getLogger(AboutService.class.getName());
 	
 	@RequestMapping(value = "/read", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 	@ResponseBody

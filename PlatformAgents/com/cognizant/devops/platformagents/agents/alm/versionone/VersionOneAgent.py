@@ -71,7 +71,9 @@ class VersionOneAgent(BaseAgent):
                 fromDateTime = lastUpdated
             if len(hierachies)>0 and len(data)!=0:
                 self.tracking[name] = fromDateTime
-                self.publishToolsData(data)
+                versionOneMetadata = {"dataUpdateSupported" : True,"uniqueKey" : ["id"]} 
+                #self.publishToolsData(data)
+                self.publishToolsData(data, versionOneMetadata)
                 self.updateTrackingJson(self.tracking)
 
 if __name__ == "__main__":

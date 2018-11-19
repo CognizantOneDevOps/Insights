@@ -19,7 +19,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.elasticsearch.spark.rdd.api.java.JavaEsSpark;
@@ -34,7 +35,7 @@ import com.cognizant.devops.platforminsights.exception.InsightsSparkJobFailedExc
 
 public abstract class BaseActionImpl {
 	
-	private static Logger log = Logger.getLogger(BaseActionImpl.class);
+	private static Logger log = LogManager.getLogger(BaseActionImpl.class);
 	protected JavaPairRDD<String,Map<String,Object>> esRDD;
 	protected KPIDefinition kpiDefinition;
 	

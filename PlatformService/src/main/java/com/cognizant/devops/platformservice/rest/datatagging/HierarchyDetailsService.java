@@ -19,7 +19,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -28,7 +29,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.cognizant.devops.platformcommons.config.ApplicationConfigCache;
 import com.cognizant.devops.platformcommons.constants.ErrorMessage;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBException;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphResponse;
@@ -51,7 +51,7 @@ import com.google.gson.JsonObject;
 @RestController
 @RequestMapping("/admin/hierarchyDetails")
 public class HierarchyDetailsService {
-	static Logger log = Logger.getLogger(GraphDBService.class.getName());
+	static Logger log = LogManager.getLogger(GraphDBService.class.getName());
 	private JsonObject asJsonObject;
 
 	@RequestMapping(value = "/addHierarchyDetails", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)

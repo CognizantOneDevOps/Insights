@@ -29,7 +29,8 @@ import java.util.Map;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBException;
@@ -43,7 +44,7 @@ import com.google.gson.JsonObject;
 
 public class DataProcessorUtil {
 	private static final DataProcessorUtil dataProcessorUtil = new DataProcessorUtil();
-	private static final Logger log = Logger.getLogger(DataProcessorUtil.class);
+	private static final Logger log = LogManager.getLogger(DataProcessorUtil.class);
 
 	private DataProcessorUtil() {
 
