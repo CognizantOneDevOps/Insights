@@ -23,6 +23,6 @@ sudo echo INSIGHTS_ENGINE=`pwd` | sudo tee -a /etc/environment
 sudo echo "export" INSIGHTS_ENGINE=`pwd` | sudo tee -a /etc/profile
 source /etc/environment
 source /etc/profile
-sudo wget https://platform.cogdevops.com/insights_install/installationScripts/latest/RHEL/artifacts/PlatformEngine.jar -O PlatformEngine.jar
+sudo wget https://platform.cogdevops.com/insights_install/release/latest/PlatformEngine.jar -O PlatformEngine.jar
 sleep 2
 sudo nohup java -jar PlatformEngine.jar >> $INSIGHTS_HOME/logs/PlatformEngine/PlatformEnginenohup.out &
