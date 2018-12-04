@@ -20,6 +20,7 @@ Created on May 31, 2017
 '''
 import json
 import datetime
+import time
 from time import mktime
 from dateutil import parser
 
@@ -51,15 +52,15 @@ class UrbanCodeDeployAgent(BaseAgent):
             self.publishToolsData(data)
             self.updateTrackingJson(self.tracking)
         else:
-            # Component URL: to get list of component
             rowsPerPage = 50
             pageNumber = 1
             exitCondition = True
+            startFrom = int(time.mktime(time.strptime(startFrom, '%Y-%m-%d'))) * 1000
             while exitCondition:
-                componentUrl = baseUrl+"/rest/deploy/component/details?dateRange=custom&date_low="+str(startFrom)+"&date_hi="+str(timeNow)+"&rowsPerPage="+str(rowsPerPage)+"&pageNumber="+str(pageNumber)+"&orderField=name&sortType=asc&filterFields=active&filterValue_active=true&filterType_active=eq&filterClass_active=Boolean&outputType=BASIC&outputType=SECURITY&outputType=LINKED"
+                componentUrl = baseUrl+"/rest/deploy/component/details?rowsPerPage="+str(rowsPerPage)+"&pageNumber="+str(pageNumber)+"&orderField=name&sortType=asc&filterFields=active&filterValue_active=true&filterType_active=eq&filterClass_active=Boolean&outputType=BASIC&outputType=SECURITY&outputType=LINKED"
                 print("componentUrl - ", componentUrl)
                 componentResponse = self.getResponse(componentUrl, 'GET', userid, passwd, None)
-                # for each component ID calling deployment URL to get the deployments detail.
+                # for each component ID calling processDeploymentData to execute deployment URL to get the deployments detail.
                 for i in range(len(componentResponse)):
                     self.processDeploymentData(baseUrl, componentResponse[i]["id"], userid, passwd, startFrom, timeNow)
                 pageNumber += 1
@@ -69,29 +70,45 @@ class UrbanCodeDeployAgent(BaseAgent):
         rowsPerPage = 10
         pageNumber = 1
         exitCondition = True
-        deploymentId = ""
+        deploymentId = None
+        lastDeploymentDate = 0
+        lastDeploymentID = ""
+        snowChange = ""
         deploymentData = []
         deploymentChildrenData = []
         deploymentResponseTemplate = self.config.get('dynamicTemplate', {}).get('deploymentResponseTemplate',None)
         deploymentResponseTemplateChildren = self.config.get('dynamicTemplate', {}).get('deploymentResponseTemplateChildren',None)
+        snowData = self.config.get('dynamicTemplate', {}).get('snowData',None)
         trackingDetails = self.tracking.get(str(componentId),None)
         if trackingDetails is None:
             trackingDetails = {}
             self.tracking[str(componentId)] = trackingDetails
+        else:
+            lastDeploymentDate = trackingDetails.get("deployments", {}).get("lastUpdated", None)
+            lastDeploymentID = trackingDetails.get("deployments", {}).get("deploymentId", None)
         while exitCondition:
-            deploymentUrl = baseUrl+"/rest/deploy/componentProcessRequest/table?dateRange=custom&date_low="+str(startFrom)+"&date_hi="+str(timeNow)+"&rowsPerPage="+str(rowsPerPage)+"&pageNumber="+str(pageNumber)+"&orderField=calendarEntry.scheduledDate&sortType=desc&filterFields=component.id&filterValue_component.id="+str(componentId)+"&filterType_component.id=eq&filterClass_component.id=UUID&outputType=BASIC&outputType=LINKED&outputType=EXTENDED"
+            deploymentUrl = baseUrl+"/rest/deploy/componentProcessRequest/table?rowsPerPage="+str(rowsPerPage)+"&pageNumber="+str(pageNumber)+"&orderField=calendarEntry.scheduledDate&sortType=desc&filterFields=component.id&filterValue_component.id="+str(componentId)+"&filterType_component.id=eq&filterClass_component.id=UUID&outputType=BASIC&outputType=LINKED&outputType=EXTENDED"
             print("deploymentUrl -", deploymentUrl)
             deploymentResponse = self.getResponse(deploymentUrl, 'GET', userid, passwd, None)
-            # Looping through response json to get deployment data
+            # Looping through response json to get deployment data array
             for i in range(len(deploymentResponse)):
-                injectData = {"componentId": componentId, "applicationId": deploymentResponse[i]["application"]["id"]}
-                for x in range(len(deploymentResponse[i]["rootTrace"]["children"])):
-                    deploymentChildrenData += (self.parseResponse(deploymentResponseTemplateChildren, deploymentResponse[i]["rootTrace"]["children"], injectData))
-                deploymentData += (self.parseResponse(deploymentResponseTemplate, deploymentResponse[i]))
-                deploymentId = deploymentResponse[i]["id"]
-                timeNow = deploymentResponse[i]["startTime"]
-                #self.publishToolsData(deploymentData)
-                #self.publishToolsData(deploymentChildrenData)
+                if (deploymentResponse[i]["startTime"] > lastDeploymentDate) and (deploymentResponse[i]["startTime"] > startFrom):
+                    injectDataChild = {"componentId": componentId, "applicationId": deploymentResponse[i]["application"]["id"], "dataType": "step"}
+                    for x in range(len(deploymentResponse[i]["rootTrace"]["children"])):
+                        deploymentChildrenData += (self.parseResponse(deploymentResponseTemplateChildren, deploymentResponse[i]["rootTrace"]["children"][x], injectDataChild))
+                    #Looping through contextProperties to get snow change value 
+                    for y in range(len(deploymentResponse[i]["contextProperties"])):
+                        if(deploymentResponse[i]["contextProperties"][y]["name"] == snowData.get("name")):
+                            snowChange = deploymentResponse[i]["contextProperties"][y][snowData.get("value")]
+                    injectDataParrent = {"dataType": "deployment", "snowChange": snowChange}
+                    deploymentData += (self.parseResponse(deploymentResponseTemplate, deploymentResponse[i], injectDataParrent))
+                    if deploymentId == None:
+                        deploymentId = deploymentResponse[0]["id"]
+                        timeNow = deploymentResponse[0]["startTime"]
+                    self.publishToolsData(deploymentData)
+                    self.publishToolsData(deploymentChildrenData)
+                    deploymentData = []
+                    deploymentChildrenData = []
             pageNumber += 1
             exitCondition = len(deploymentResponse) > 0
         # Update tracking json with the last captured deployment time
