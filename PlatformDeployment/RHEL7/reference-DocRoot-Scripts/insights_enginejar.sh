@@ -25,4 +25,4 @@ source /etc/environment
 source /etc/profile
 sudo wget https://platform.cogdevops.com/insights_install/release/latest/PlatformEngine.jar -O PlatformEngine.jar
 sleep 2
-sudo nohup java -jar PlatformEngine.jar >> $INSIGHTS_HOME/logs/PlatformEngine/PlatformEnginenohup.out &
+sudo nohup java -jar PlatformEngine.jar &
