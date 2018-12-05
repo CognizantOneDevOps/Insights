@@ -54,6 +54,7 @@
 	  },
 	  "duration": "duration",
 	  "id": "buildNumber",
+	  "number": "number",
 	  "result": "result",
 	  "timestamp": "buildTimestamp",
 	  "url": "buildUrl"
