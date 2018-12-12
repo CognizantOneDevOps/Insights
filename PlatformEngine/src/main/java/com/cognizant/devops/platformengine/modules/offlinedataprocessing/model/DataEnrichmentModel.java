@@ -30,6 +30,7 @@ public class DataEnrichmentModel  {
 	private String lastExecutionTime;
 	private int recordsProcessed;
 	private long queryProcessingTime;
+	private String cronSchedule;
 	
 	
 	public String getQueryName() {
@@ -67,6 +68,12 @@ public class DataEnrichmentModel  {
 	}
 	public void setQueryProcessingTime(long queryProcessingTime) {
 		this.queryProcessingTime = queryProcessingTime;
+	}
+	public String getCronSchedule() {
+		return cronSchedule;
+	}
+	public void setCronSchedule(String cronSchedule) {
+		this.cronSchedule = cronSchedule;
 	}
 	
 	
