@@ -57,7 +57,7 @@
         "last_modified_date": "lastModifiedDate"
       },
       "test-cases": {
-        "name": "name",
+        "name": "Name",
         "pid": "pid",
         "id": "id",
         "created_date": "creationDate",
@@ -101,6 +101,50 @@
         "id",
         "almType"
       ]
+    },
+    "extensions": {
+      "requirementMatrix": {
+        "runSchedule": 720,
+        "almEntityMetaData": {
+          "labels": [
+            "QtestRequirementMatrix"
+          ],
+          "dataUpdateSupported": true,
+          "uniqueKey": [
+            "projectId",
+            "id",
+            "almType"
+          ]
+        }
+      },
+      "linkedArtifacts": {
+        "runSchedule": "720",
+        "almEntityMetaData": {
+          "labels": [
+            "QtestLinkedArtifacts"
+          ],
+          "dataUpdateSupported": true,
+          "uniqueKey": [
+            "projectId",
+            "id",
+            "almType"
+          ]
+        },
+        "almEntities": {
+          "test-cases": {
+            
+          },
+          "requirements": {
+            
+          },
+          "defects": {
+            
+          },
+          "test-runs": {
+            
+          }
+        }
+      }
     }
   },
   "toolCategory": "ALM",
