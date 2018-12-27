@@ -24,6 +24,7 @@ export default class Neo4jDatasource {
     /** @ngInject */
     constructor(instanceSettings: any, $q: any, backendSrv: any, templateSrv: any);
     addTimestampToQuery(query: any, options: any): any;
+    processStatusQueryResponse(data: any, options: any, timestamp: any): any[];
     processResponse(data: any, options: any): any;
     executeCypherQuery(cypherQuery: any, targets: any, options: any): any;
     checkCypherQueryModificationKeyword(cypherQuery: any): boolean;
