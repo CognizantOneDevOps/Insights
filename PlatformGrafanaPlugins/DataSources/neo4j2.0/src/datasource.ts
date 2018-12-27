@@ -54,6 +54,64 @@ export default class Neo4jDatasource {
     return query;
   }
 
+	/*
+	This function gets executed when EnableTarget and TimeSeries checkbox is clicked.
+	Purpose of this function is show data based on alias name in Status Panel with suuported Neo4j Datasource.
+	*/
+	processStatusQueryResponse(data, options, timestamp) {
+			/*let query = data['targets'][0].target;
+			let preseneceOfAs = query.split(" as ");
+			var obj = Object.assign({}, data['targets'][0]);
+			var data_targets = [];
+			for(let i = 0; i < preseneceOfAs.length-1; i++) {
+				var obj = Object.assign({}, data['targets'][0]);
+				obj.refId = i;
+				obj.$$hashKey = "object:"+i;
+				data_targets.push(obj);
+			}
+			data['targets'] = data_targets;*/
+			let targets = data['targets'];
+			let results = data['results'];
+			let defaultResponse = options ? false : true;
+			let response = []
+			let finalResponse = {}
+			for (let i in targets) {
+			  let target = targets[i];
+			  let result = results[i];
+			  if (target.timeSeries) {
+				let datapoints = [];
+				let targetResponse = {
+				  target: target.refId,
+				  datapoints: datapoints
+				};
+				let targetDatapointsMap = {}
+				let rows = result.data;
+				let columns = result.columns;
+				let multiSeriesResponse = false;
+				var i:number;
+				for (let r in rows) {
+						let row = rows[r].row;
+						for (let values in rows[r].row) {
+							let targetName = columns[values];
+							let targetDataPoints = targetDatapointsMap[targetName];
+							if (targetDataPoints === undefined) {
+									targetDataPoints = [];
+									targetDatapointsMap[targetName] = targetDataPoints;
+									response.push({
+											target: targetName,
+											datapoints: targetDataPoints
+									});
+									multiSeriesResponse = true;
+							}
+							targetDataPoints.push([rows[r].row[values], timestamp * 1000]);
+							finalResponse[values] = response;						
+						}
+				}
+						return response;
+			  }
+			}
+		return null;		
+	}
   /*
     Need to provide following options:
     1. Consider time interval (5s, 30 mins, 30 hours, etc)
@@ -65,6 +123,15 @@ export default class Neo4jDatasource {
     if (options && options.range && options.range.to) {
       timestamp = options.range.to.valueOf();
     }
+	var enableTarget = false;
+	if(options)
+	{
+		enableTarget = (options.targets[0].enableTarget) ? options.targets[0].enableTarget : false;
+	}
+	if(enableTarget)
+	{
+		return this.processStatusQueryResponse(data, options, timestamp);
+	}
     let targets = data['targets'];
     let results = data['results'];
     let defaultResponse = options ? false : true;
@@ -173,24 +240,33 @@ export default class Neo4jDatasource {
     keywords = ["create", "delete", "set", "update", "merge", "detach"];
     var flag: number = 0;
     var queryCorrect = true;
+	if(cypherQuery.statements[0].statement == undefined)
+	{
+		return queryCorrect;
+	}
     var j;
-    for (j in keywords) {
-      var query = (cypherQuery.statements[0].statement.toString()).toLowerCase();
-	if(query.indexOf( " " + keywords[j] + " " ) >= 0){console.log(keywords[j]+" is present as an individual word.");flag = 1; break;}
-	if(query.indexOf( "\n" + keywords[j] ) >= 0 && query.indexOf( "\n" + keywords[j] + " ") >= 0){console.log(keywords[j]+" is present after new line.");flag = 1; break;}
-	if(query.indexOf( keywords[j] + ")" ) >= 0 
-				|| query.indexOf( keywords[j] + "(" ) >= 0 
-					|| query.indexOf( ")"+keywords[j]) >= 0 
-						|| query.indexOf( "("+keywords[j]) >= 0 
-							|| query.indexOf( " "+keywords[j] + "\n" ) >= 0
-								|| query.indexOf( "\n" + keywords[j] + "\n" ) >= 0)
-									{console.log(keywords[j]+" is present.");flag = 1; break;}
-	//if(query.indexOf( keywords[j] + " (") >= 0){console.log(keywords[j]+" is present before ");flag = 1; break;}
+    for (j in keywords) 
+	{
+		var query = (cypherQuery.statements[0].statement.toString()).toLowerCase();
+		if(query.indexOf( " " + keywords[j] + " " ) >= 0){console.log(keywords[j]+" is present as an individual word.");flag = 1; break;}
+		if(query.indexOf( "\n" + keywords[j] ) >= 0 && query.indexOf( "\n" + keywords[j] + " ") >= 0){console.log(keywords[j]+" is present after new line.");flag = 1; break;}
+		if(query.indexOf( keywords[j] + ")" ) >= 0 
+					|| query.indexOf( keywords[j] + "(" ) >= 0 
+						|| query.indexOf( ")"+keywords[j]) >= 0 
+							|| query.indexOf( "("+keywords[j]) >= 0 
+								|| query.indexOf( " "+keywords[j] + "\n" ) >= 0
+									|| query.indexOf( "\n" + keywords[j] + "\n" ) >= 0)
+										{console.log(keywords[j]+" is present.");flag = 1; break;}
+		//if(query.indexOf( keywords[j] + " (") >= 0){console.log(keywords[j]+" is present before ");flag = 1; break;}
     }
-    if (flag == 0) { return queryCorrect; }
-    else {
-      queryCorrect = false;
-      return queryCorrect
+    if (flag == 0) 
+	{ 
+		return queryCorrect; 
+	}
+    else 
+	{
+		queryCorrect = false;
+		return queryCorrect;
     }
   }
 

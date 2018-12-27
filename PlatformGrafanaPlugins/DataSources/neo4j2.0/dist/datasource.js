@@ -54,6 +54,64 @@ System.register([], function(exports_1) {
                     return query;
                 };
                 /*
+                This function gets executed when EnableTarget and TimeSeries checkbox is clicked.
+                Purpose of this function is show data based on alias name in Status Panel with suuported Neo4j Datasource.
+                */
+                Neo4jDatasource.prototype.processStatusQueryResponse = function (data, options, timestamp) {
+                    /*let query = data['targets'][0].target;
+                    let preseneceOfAs = query.split(" as ");
+                    var obj = Object.assign({}, data['targets'][0]);
+                    var data_targets = [];
+                    for(let i = 0; i < preseneceOfAs.length-1; i++) {
+                        var obj = Object.assign({}, data['targets'][0]);
+                        obj.refId = i;
+                        obj.$$hashKey = "object:"+i;
+                        data_targets.push(obj);
+                    }
+                    data['targets'] = data_targets;*/
+                    var targets = data['targets'];
+                    var results = data['results'];
+                    var defaultResponse = options ? false : true;
+                    var response = [];
+                    var finalResponse = {};
+                    for (var i_1 in targets) {
+                        var target = targets[i_1];
+                        var result = results[i_1];
+                        if (target.timeSeries) {
+                            var datapoints = [];
+                            var targetResponse = {
+                                target: target.refId,
+                                datapoints: datapoints
+                            };
+                            var targetDatapointsMap = {};
+                            var rows = result.data;
+                            var columns = result.columns;
+                            var multiSeriesResponse = false;
+                            var i;
+                            for (var r in rows) {
+                                var row = rows[r].row;
+                                for (var values in rows[r].row) {
+                                    var targetName = columns[values];
+                                    var targetDataPoints = targetDatapointsMap[targetName];
+                                    if (targetDataPoints === undefined) {
+                                        targetDataPoints = [];
+                                        targetDatapointsMap[targetName] = targetDataPoints;
+                                        response.push({
+                                            target: targetName,
+                                            datapoints: targetDataPoints
+                                        });
+                                        multiSeriesResponse = true;
+                                    }
+                                    targetDataPoints.push([rows[r].row[values], timestamp * 1000]);
+                                    finalResponse[values] = response;
+                                }
+                            }
+                            return response;
+                        }
+                    }
+                    return null;
+                };
+                /*
                   Need to provide following options:
                   1. Consider time interval (5s, 30 mins, 30 hours, etc)
                   2. Provide group by options (group by a result column)
@@ -63,6 +121,13 @@ System.register([], function(exports_1) {
                     var timestamp = new Date().getTime() * 1000;
                     if (options && options.range && options.range.to) {
                         timestamp = options.range.to.valueOf();
+                    }
+                    var enableTarget = false;
+                    if (options) {
+                        enableTarget = (options.targets[0].enableTarget) ? options.targets[0].enableTarget : false;
+                    }
+                    if (enableTarget) {
+                        return this.processStatusQueryResponse(data, options, timestamp);
                     }
                     var targets = data['targets'];
                     var results = data['results'];
@@ -175,6 +240,9 @@ System.register([], function(exports_1) {
                     keywords = ["create", "delete", "set", "update", "merge", "detach"];
                     var flag = 0;
                     var queryCorrect = true;
+                    if (cypherQuery.statements[0].statement == undefined) {
+                        return queryCorrect;
+                    }
                     var j;
                     for (j in keywords) {
                         var query = (cypherQuery.statements[0].statement.toString()).toLowerCase();
