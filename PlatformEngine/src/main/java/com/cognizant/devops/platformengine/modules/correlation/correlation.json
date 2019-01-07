@@ -2,31 +2,39 @@
   {
     "destination": {
       "toolName": "JENKINS",
+	  "toolCategory": "CI",
       "fields": [
-        "scmCommitId", "lastBuiltRevision"
+        "scmCommitId"
       ]
     },
     "source": {
-      "toolName" : "GIT",
+      "toolName": "GIT",
+	  "toolCategory": "SCM",
       "fields": [
         "commitId"
       ]
     },
-    "relationName" : "FROM_GIT_TO_JENKINS" 
+    "relationName": "FROM_GIT_TO_JENKINS"
   },
   {
     "destination": {
       "toolName": "GIT",
+	  "toolCategory": "SCM",
       "fields": [
-        "jiraKeys"
+        "almKeys"
       ]
     },
     "source": {
-      "toolName" : "JIRA",
+      "toolName": "JIRA",
+	  "toolCategory": "ALM",
+	  "enrichAlmData": false,
+	  "almKeyProcessedIndex" : "almKeyProcessed",
+	  "almKeysIndex": "almKeys",
+	  "almkeyPattern": "-",
       "fields": [
         "key"
       ]
     },
-    "relationName" : "FROM_JIRA_TO_GIT" 
+    "relationName": "FROM_JIRA_TO_GIT"
   }
 ]
