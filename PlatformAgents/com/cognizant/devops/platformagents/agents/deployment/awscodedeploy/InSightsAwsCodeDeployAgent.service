@@ -1,0 +1,10 @@
+[Unit]
+Description=Ubuntu AwsCodeDeploy Service
+
+[Service]
+Type=forking
+ExecStart=/bin/bash /opt/insightsagents/PlatformAgents/awscodedeploy/InSightsAwsCodeDeployAgent.sh start
+ExecStop=/bin/bash /opt/insightsagents/PlatformAgents/awscodedeploy/InSightsAwsCodeDeployAgent.sh stop
+
+[Install]
+WantedBy=multi-user.target

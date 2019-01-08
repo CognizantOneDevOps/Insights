@@ -1,0 +1,51 @@
+{
+  "mqConfig": {
+    "user": "iSight",
+    "password": "iSight",
+    "host": "127.0.0.1",
+    "exchange": "iSight",
+    "agentControlXchg": "iAgent"
+  },
+  "subscribe": {
+    "config": "CI.AWSCODEBUILD.config"
+  },
+  "publish": {
+    "data": "CI.AWSCODEBUILD.DATA",
+    "health": "CI.AWSCODEBUILD.HEALTH"
+  },
+  "communication": {
+    "type": "REST",
+    "sslVerify": false,
+    "responseType": "JSON"
+  },
+  "dynamicTemplate": {
+    "timeFieldMapping": {
+      "buildTime": "%Y-%m-%dT%H:%M:%SZ"
+    },
+    "responseTemplate": {
+     }
+  },
+  "enableDataValidation": true,
+  "toolCategory": "SCM",
+  "toolsTimeZone": "GMT",
+  "insightsTimeZone": "Asia/Kolkata",
+  "enableValueArray": false,
+  "useResponseTemplate": false,
+  "auth": "base64",
+  "runSchedule": 30,
+  "timeStampField": "buildTime",
+  "timeStampFormat": "%Y-%m-%dT%H:%M:%SZ",
+  "awsAccesskey": "accesskey",
+  "awsSecretkey": "seccretkey",
+  "awsRegion": "region",
+  "isEpochTimeFormat": false,
+  "startFrom": "2016-10-10 15:46:33",
+  "isDebugAllowed": false,
+  "loggingSetting": {
+    "logLevel": "WARN",
+    "maxBytes": 5000000,
+    "backupCount": 1000
+  },
+  "osversion": "linux",
+  "agentVersion": "v4.7",
+}

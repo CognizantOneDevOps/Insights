@@ -1,0 +1,10 @@
+[Unit]
+Description=Ubuntu awscodebuild Service
+
+[Service]
+Type=forking
+ExecStart=/bin/bash /opt/insightsagents/PlatformAgents/awscodebuild/InSightsAwsCodeBuildAgent.sh start
+ExecStop=/bin/bash /opt/insightsagents/PlatformAgents/awscodebuild/InSightsAwsCodeBuildAgent.sh stop
+
+[Install]
+WantedBy=multi-user.target

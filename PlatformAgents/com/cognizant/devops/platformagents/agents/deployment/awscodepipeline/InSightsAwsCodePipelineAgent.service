@@ -1,0 +1,10 @@
+[Unit]
+Description=Ubuntu awscodepipeline Service
+
+[Service]
+Type=forking
+ExecStart=/bin/bash /opt/insightsagents/PlatformAgents/awscodepipeline/InSightsAwsCodePipelineAgent.sh start
+ExecStop=/bin/bash /opt/insightsagents/PlatformAgents/awscodepipeline/InSightsAwsCodePipelineAgent.sh stop
+
+[Install]
+WantedBy=multi-user.target
