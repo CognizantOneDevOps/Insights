@@ -20,13 +20,13 @@
 	<parent>
 		<artifactId>PlatformParent</artifactId>
 		<groupId>com.cognizant.devops</groupId>
-		<version>4.7</version>
+		<version>4.8</version>
 	</parent>
 	
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.cognizant.devops</groupId>
 	<artifactId>PlatformInsights</artifactId>
-	<version>4.7</version>
+	<version>4.8</version>
 	<name>PlatformInsights</name>
 	<description>PlatformInsights</description>
 	<dependencies>
@@ -54,7 +54,7 @@
 		<dependency>
 			<groupId>com.cognizant.devops</groupId>
 			<artifactId>PlatformCommons</artifactId>
-			<version>4.7</version>
+			<version>4.8</version>
 		</dependency>
 		<dependency>
 				<groupId>org.apache.logging.log4j</groupId>
@@ -112,7 +112,7 @@
         <dependency>
 			 <groupId>com.cognizant.devops</groupId>
 			<artifactId>PlatformCommons</artifactId>
-			<version>4.7</version>
+			<version>4.8</version>
 
 			<exclusions>
 					<exclusion>
