@@ -18,12 +18,12 @@
 	<parent>
 		<groupId>com.cognizant.devops</groupId>
 		<artifactId>PlatformParent</artifactId>
-		<version>4.7</version>
+		<version>4.8</version>
 	</parent>
 	<artifactId>PlatformDAL</artifactId>
 	<name>PlatformDAL</name>
 	<groupId>com.cognizant.devops</groupId>
-	<version>4.7</version>
+	<version>4.8</version>
 	<url>http://maven.apache.org</url>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -39,7 +39,7 @@
 		<dependency>
 			<groupId>com.cognizant.devops</groupId>
 			<artifactId>PlatformCommons</artifactId>
-			<version>4.7</version>
+			<version>4.8</version>
 		</dependency>
 
 		<!-- <dependency>
