@@ -18,7 +18,7 @@ package com.cognizant.devops.platformservice.rest.querycaching.service;
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 
 public interface QueryCachingConstants {
-	
+
 	String ES_HOST = ApplicationConfigProvider.getInstance().getEndpointData().getElasticSearchEndpoint();
 	String ES_CACHE_INDEX = ApplicationConfigProvider.getInstance().getQueryCache().getEsCacheIndex();
 	String DEFAULT_ES_CACHE_INDEX = "neo4j-cached-results/querycacheresult";
@@ -48,6 +48,8 @@ public interface QueryCachingConstants {
 	String CACHED_PREVIOUS_TIME = "__cachePreviousTime__";
 	String HAS_EXPIRED = "hasExpired";
 	String CREATION_TIME = "creationTime";
+	String QUERY_EXECUTION_TIME = "queryExecutionTime";
+	String NEO4J_RESULT_CREATION_TIME = "neo4jResultCreationTime";
 	int ZEROTH_INDEX = 0;
 	String CACHE_RESULT = "cacheResult";
 	String NEW_STATEMENT = "newStatement";
