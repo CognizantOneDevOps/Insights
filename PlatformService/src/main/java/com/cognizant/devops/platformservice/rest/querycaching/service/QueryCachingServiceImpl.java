@@ -167,7 +167,6 @@ public class QueryCachingServiceImpl implements QueryCachingService {
 							startTime, endTime, queryHash);
 				}
 
-				
 				JsonObject esResponse = esDbHandler.queryES(sourceESCacheUrl + "/_search", esQuery);
 				JsonArray esResponseArray = new JsonArray();
 
@@ -185,19 +184,20 @@ public class QueryCachingServiceImpl implements QueryCachingService {
 					JsonObject saveCache = new JsonObject();
 
 					JsonObject graphResponse = null;
-					Long beforeQueryExecutionTime = InsightsUtils.getSystemTimeInNanoSeconds()/1000000;
+					Long beforeQueryExecutionTime = InsightsUtils.getSystemTimeInNanoSeconds();
 					graphResponse = getNeo4jDatasourceResults(requestPayload);
-					Long afterQueryExecutionTime = InsightsUtils.getSystemTimeInNanoSeconds()/1000000;
-					Long queryExecutionTimeInMs = (afterQueryExecutionTime - beforeQueryExecutionTime);
+					Long afterQueryExecutionTime = InsightsUtils.getSystemTimeInNanoSeconds();
+					Long queryExecutionTimeInNanoSec = (afterQueryExecutionTime - beforeQueryExecutionTime);
 					saveCache.addProperty(QueryCachingConstants.QUERY_HASH, queryHash);
 					saveCache.addProperty(QueryCachingConstants.CACHING_TYPE, cachingType);
 					saveCache.addProperty(QueryCachingConstants.CACHING_VALUE, cachingValue);
 					saveCache.addProperty(QueryCachingConstants.START_TIME_RANGE, startTime);
 					saveCache.addProperty(QueryCachingConstants.END_TIME_RANGE, endTime);
 					saveCache.addProperty(QueryCachingConstants.CACHE_RESULT, graphResponse.toString());
-					saveCache.addProperty(QueryCachingConstants.CREATION_TIME, currentTime);
-					saveCache.addProperty(QueryCachingConstants.QUERY_EXECUTION_TIME, queryExecutionTimeInMs);
-					saveCache.addProperty(QueryCachingConstants.NEO4J_RESULT_CREATION_TIME, currentTime * 1000);
+					saveCache.addProperty(QueryCachingConstants.CREATION_TIME, InsightsUtils.getCurrentTimeInSeconds());
+					saveCache.addProperty(QueryCachingConstants.QUERY_EXECUTION_TIME, queryExecutionTimeInNanoSec);
+					saveCache.addProperty(QueryCachingConstants.NEO4J_RESULT_CREATION_TIME,
+							InsightsUtils.getCurrentTimeInEpochMilliSeconds());
 
 					esDbHandler.queryES(sourceESCacheUrl, saveCache.toString());
 					log.debug("\n\nSaving Fetched Neo4j Results Into Elasticsearch!");

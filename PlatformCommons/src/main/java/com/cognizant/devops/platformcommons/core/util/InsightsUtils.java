@@ -299,9 +299,13 @@ public class InsightsUtils {
 		ZonedDateTime now = ZonedDateTime.now(zoneId);
 		return now.toEpochSecond();
 	}
-	
+
 	public static Long getSystemTimeInNanoSeconds() {
 		return System.nanoTime();
+	}
+
+	public static Long getCurrentTimeInEpochMilliSeconds() {
+		return System.currentTimeMillis();
 	}
 
 	public static Long addVarianceTime(long inputTime, long varianceSeconds) {
