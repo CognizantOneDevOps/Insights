@@ -21,63 +21,15 @@
   "dynamicTemplate": {
     "timeFieldMapping": {
       "creationDate": "%Y-%m-%dT%H:%M:%S",
-      "lastModifiedDate": "%Y-%m-%dT%H:%M:%S"
+      "lastModifiedDate": "%Y-%m-%dT%H:%M:%S",
+      "automationTime": "%Y-%m-%dT%H:%M:%S"
     },
     "almEntities": {
-      "releases": {
-        "name": "name",
-        "pid": "pid",
-        "id": "id",
-        "created_date": "creationDate",
-        "description": "description",
-        "last_modified_date": "lastModifiedDate"
-      },
-      "test-cycles": {
-        "name": "name",
-        "pid": "pid",
-        "id": "id",
-        "created_date": "creationDate",
-        "description": "description",
-        "last_modified_date": "lastModifiedDate"
-      },
-      "test-suites": {
-        "name": "name",
-        "pid": "pid",
-        "id": "id",
-        "created_date": "creationDate",
-        "description": "description",
-        "last_modified_date": "lastModifiedDate"
-      },
-      "test-runs": {
-        "name": "name",
-        "pid": "pid",
-        "id": "id",
-        "created_date": "creationDate",
-        "description": "description",
-        "last_modified_date": "lastModifiedDate"
-      },
-      "test-cases": {
-        "name": "Name",
-        "pid": "pid",
-        "id": "id",
-        "created_date": "creationDate",
-        "description": "description",
-        "last_modified_date": "lastModifiedDate"
-      },
       "requirements": {
         "name": "name",
         "pid": "pid",
         "id": "id",
         "created_date": "creationDate",
-        "description": "description",
-        "last_modified_date": "lastModifiedDate"
-      },
-      "modules": {
-        "name": "name",
-        "pid": "pid",
-        "id": "id",
-        "created_date": "creationDate",
-        "description": "description",
         "last_modified_date": "lastModifiedDate"
       },
       "defects": {
@@ -85,13 +37,21 @@
         "pid": "pid",
         "id": "id",
         "created_date": "creationDate",
-        "description": "description",
         "last_modified_date": "lastModifiedDate"
       },
-      "trace-matrix-report": {
-        "testcases": "testcases",
-        "linkedTestcaseCount": "linkedTestcaseCount",
-        "id": "id"
+      "test-cases": {
+        "name": "name",
+        "pid": "pid",
+        "id": "id",
+        "created_date": "creationDate",
+        "last_modified_date": "lastModifiedDate"
+      },
+      "test-runs": {
+        "name": "name",
+        "pid": "pid",
+        "id": "id",
+        "created_date": "creationDate",
+        "last_modified_date": "lastModifiedDate"
       }
     },
     "almEntityMetaData": {
@@ -102,46 +62,44 @@
         "almType"
       ]
     },
+    "automationType": {
+      "test-cases": {
+        "field": "Type",
+        "newValue": "Automation"
+      }
+    },
+    "testRunsType": {
+      "testRunsWithAutomation": {
+        "query": "'Test Case Type' = 'Automation'",
+        "automation": true
+      },
+      "testRunsWithOutAutomation": {
+        "query": "'Test Case Type' <> 'Automation'",
+        "automation": false
+      }
+    },
     "extensions": {
-      "requirementMatrix": {
+      "linkedArtifacts": {
         "runSchedule": 720,
         "almEntityMetaData": {
           "labels": [
-            "QtestRequirementMatrix"
           ],
           "dataUpdateSupported": true,
           "uniqueKey": [
             "projectId",
             "id",
-            "almType"
-          ]
-        }
-      },
-      "linkedArtifacts": {
-        "runSchedule": "720",
-        "almEntityMetaData": {
-          "labels": [
-            "QtestLinkedArtifacts"
-          ],
-          "dataUpdateSupported": true,
-          "uniqueKey": [
-            "projectId",
-            "id",
-            "almType"
+            "almType",
+            "almParentType"
           ]
         },
         "almEntities": {
           "test-cases": {
-            
           },
           "requirements": {
-            
           },
           "defects": {
-            
           },
           "test-runs": {
-            
           }
         }
       }
@@ -152,14 +110,17 @@
   "insightsTimeZone": "GMT",
   "enableValueArray": false,
   "useResponseTemplate": true,
+  "almEntityPageSize": 20,
+  "isHistoryApi": true,
+  "historyIdChunkSize": 10,
   "auth": "base64",
   "runSchedule": 30,
   "timeStampField": "lastModifiedDate",
   "timeStampFormat": "%Y-%m-%dT%H:%M:%S",
   "isEpochTimeFormat": false,
-  "startFrom": "2018-01-01T15:46:33",
-  "baseUrl": "https://base_url.com",
-  "username": "user_name",
+  "startFrom": "2017-10-01T15:46:33",
+  "baseUrl": "baseUrl",
+  "username": "username",
   "password": "password",
   "isDebugAllowed": false,
   "loggingSetting": {
