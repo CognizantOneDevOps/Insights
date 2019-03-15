@@ -53,5 +53,6 @@ public interface QueryCachingConstants {
 	int ZEROTH_INDEX = 0;
 	String CACHE_RESULT = "cacheResult";
 	String NEW_STATEMENT = "newStatement";
-
+	String START_TIME_IN_MS = "startTimeInMs";
+	String END_TIME_IN_MS = "endTimeInMs";
 }
