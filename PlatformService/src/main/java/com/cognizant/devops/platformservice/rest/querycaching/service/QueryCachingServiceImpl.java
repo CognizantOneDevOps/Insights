@@ -193,6 +193,8 @@ public class QueryCachingServiceImpl implements QueryCachingService {
 					saveCache.addProperty(QueryCachingConstants.CACHING_VALUE, cachingValue);
 					saveCache.addProperty(QueryCachingConstants.START_TIME_RANGE, startTime);
 					saveCache.addProperty(QueryCachingConstants.END_TIME_RANGE, endTime);
+					saveCache.addProperty(QueryCachingConstants.START_TIME_IN_MS, startTime * 1000);
+					saveCache.addProperty(QueryCachingConstants.END_TIME_IN_MS, endTime * 1000);
 					saveCache.addProperty(QueryCachingConstants.CACHE_RESULT, graphResponse.toString());
 					saveCache.addProperty(QueryCachingConstants.CREATION_TIME, InsightsUtils.getCurrentTimeInSeconds());
 					saveCache.addProperty(QueryCachingConstants.QUERY_EXECUTION_TIME, queryExecutionTimeInNanoSec);
