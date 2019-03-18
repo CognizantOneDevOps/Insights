@@ -55,4 +55,5 @@ public interface QueryCachingConstants {
 	String NEW_STATEMENT = "newStatement";
 	String START_TIME_IN_MS = "startTimeInMs";
 	String END_TIME_IN_MS = "endTimeInMs";
+	String CYPHER_QUERY = "cypherQuery";
 }
