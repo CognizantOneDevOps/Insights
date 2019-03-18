@@ -186,6 +186,7 @@ public class QueryCachingServiceImpl implements QueryCachingService {
 					JsonObject graphResponse = null;
 					Long beforeQueryExecutionTime = InsightsUtils.getSystemTimeInNanoSeconds();
 					graphResponse = getNeo4jDatasourceResults(requestPayload);
+					String statements = requestJson.get(QueryCachingConstants.STATEMENTS).getAsJsonArray().toString();
 					Long afterQueryExecutionTime = InsightsUtils.getSystemTimeInNanoSeconds();
 					Long queryExecutionTimeInNanoSec = (afterQueryExecutionTime - beforeQueryExecutionTime);
 					saveCache.addProperty(QueryCachingConstants.QUERY_HASH, queryHash);
@@ -195,6 +196,7 @@ public class QueryCachingServiceImpl implements QueryCachingService {
 					saveCache.addProperty(QueryCachingConstants.END_TIME_RANGE, endTime);
 					saveCache.addProperty(QueryCachingConstants.START_TIME_IN_MS, startTime * 1000);
 					saveCache.addProperty(QueryCachingConstants.END_TIME_IN_MS, endTime * 1000);
+					saveCache.addProperty(QueryCachingConstants.CYPHER_QUERY, statements);
 					saveCache.addProperty(QueryCachingConstants.CACHE_RESULT, graphResponse.toString());
 					saveCache.addProperty(QueryCachingConstants.CREATION_TIME, InsightsUtils.getCurrentTimeInSeconds());
 					saveCache.addProperty(QueryCachingConstants.QUERY_EXECUTION_TIME, queryExecutionTimeInNanoSec);
