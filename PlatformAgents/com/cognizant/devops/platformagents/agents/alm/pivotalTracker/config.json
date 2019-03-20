@@ -15,7 +15,7 @@
   },
   "communication": {
     	"type": "REST",
-    	"sslVerify": true,
+    	"sslVerify": false,
     	"responseType": "JSON"
   },
   "dynamicTemplate": {
@@ -29,7 +29,7 @@
     "name": "storyName",
     "current_state": "currentStoryState"
   },
-  "relationMetadata": {"labels" : ["LATEST"],"relation":{"properties":["iterationNmber","projectId"],"name":"ITERATION_HAS_ISSUES","source":{"constraints":["projectId","storyId"]},"destination":{"constraints":["iterationNmber"]}}},
+  "relationMetadata": {"labels" : ["LATEST"],"relation":{"properties":["iterationNumber","projectId", "storyId", "backLog","cycleTime","rejectionRate"],"name":"ITERATION_HAS_ISSUES","source":{"constraints":["projectId","storyId"]},"destination":{"constraints":["iterationNumber"]}}},
   "storyMetadata": {"labels" : ["STORY"],"dataUpdateSupported" : true,"uniqueKey":["projectId","storyId"]}
   },
   "auth": "base64",
@@ -44,7 +44,7 @@
   "baseEndPoint": "https://www.pivotaltracker.com",
   "startFrom": "2015-11-29 12:17:45",
   "toolsTimeZone" : "Asia/Kolkata",
-  "timeStampField":"last-modified",
+  "timeStampField":"createdAt",
   "timeStampFormat":"%Y-%m-%dT%H:%M:%SZ",
   "isEpochTimeFormat" : false,
   "isDebugAllowed" : true,
