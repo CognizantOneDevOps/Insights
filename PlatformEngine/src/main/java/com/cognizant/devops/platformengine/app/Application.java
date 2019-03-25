@@ -70,7 +70,7 @@ public class Application {
 							.withIntervalInSeconds(defaultInterval)
 							.repeatForever())
 					.build();
-	
+
 			// Schedule the Correlation Module.
 			JobDetail correlationJob = JobBuilder.newJob(EngineCorrelatorModule.class)
 					.withIdentity("EngineCorrelatorModule", "iSight")

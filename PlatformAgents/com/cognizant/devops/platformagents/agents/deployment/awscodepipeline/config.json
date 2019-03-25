@@ -25,6 +25,7 @@
     "responseTemplate": {
      }
   },
+  "agentId" : "",
   "enableDataValidation": true,
   "toolCategory": "DEPLOYMENT",
   "toolsTimeZone": "GMT",
@@ -39,6 +40,7 @@
   "awsSecretkey": "seccretkey",
   "awsRegion": "region",
   "isEpochTimeFormat": false,
+  
   "startFrom": "2016-10-10 15:46:33",
   "isDebugAllowed": false,
   "loggingSetting": {

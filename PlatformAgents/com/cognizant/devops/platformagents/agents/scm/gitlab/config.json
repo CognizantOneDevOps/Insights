@@ -63,6 +63,7 @@
 	 "timeFieldMapping" : {
 		"commitTime" : "%Y-%m-%dT%H:%M:%S."
 	},
+	"agentId" : "",
 	"enableBranches" : true,
 	"enableMerge" : false,
 	"enableGroup" : true,
@@ -80,6 +81,7 @@
 	"AccessToken" : "",
 	"GetProjects" : "",
 	"isDebugAllowed" : false,
+	
 	"loggingSetting" : {
 		"logLevel" : "WARN"
 	}

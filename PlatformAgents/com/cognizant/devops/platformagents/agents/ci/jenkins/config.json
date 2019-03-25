@@ -67,6 +67,7 @@
 	"groupId" : "maven2-moduleset/rootModule/groupId",
 	"artifactId" : "maven2-moduleset/rootModule/artifactId"
 },
+"agentId":"",
 "toolCategory" : "CI",
 "toolsTimeZone" : "Asia/Kolkata",
 "enableDataValidation": true,
@@ -85,7 +86,7 @@
 "timeStampField":"buildTimestamp",
 "timeStampFormat":"epoch",
 "isEpochTimeFormat" : true,
-"startFrom" : "2016-10-10 15:46:33",
+"startFrom" : "2019-03-01 15:46:33",
 "loggingSetting" : {
 	"logLevel" : "WARN",
 	"maxBytes" : 5000000,

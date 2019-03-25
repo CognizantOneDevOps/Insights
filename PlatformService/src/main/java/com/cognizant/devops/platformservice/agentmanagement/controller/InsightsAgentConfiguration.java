@@ -79,10 +79,10 @@ public class InsightsAgentConfiguration {
 	}
 
 	@RequestMapping(value = "/startStopAgent", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public @ResponseBody JsonObject startStopAgent(@RequestParam String agentId, @RequestParam String action) {
+	public @ResponseBody JsonObject startStopAgent(@RequestParam String agentId, @RequestParam String toolName, @RequestParam String osversion, @RequestParam String action) {
 		String message = null;
 		try {
-			message = agentManagementService.startStopAgent(agentId, action);
+			message = agentManagementService.startStopAgent(agentId, toolName, osversion, action);
 		} catch (InsightsCustomException e) {
 			return PlatformServiceUtil.buildFailureResponse(e.toString());
 		}

@@ -33,6 +33,7 @@
   "subscribe": {
     "config": "DUMMY.DUMMYDATA.config"
   },
+  "agentId" : "",
   "toolCategory" : "DUMMY",
   "enableBranches": false,
   "enableDataValidation": true,
@@ -40,6 +41,7 @@
   "timeStampFormat": "%Y-%m-%dT%H:%M:%SZ",
   "toolsTimeZone": "GMT",
   "isEpochTimeFormat" : false,
+  
   "runSchedule": 30,
   "useResponseTemplate": true,
   "timeStampField":"lastUpdated",

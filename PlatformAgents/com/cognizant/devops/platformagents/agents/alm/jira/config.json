@@ -147,6 +147,7 @@
 			 }
  		}
   },
+  "agentId": "",
   "toolCategory" : "ALM",
   "enableSprintReport" : false,
   "enableDataValidation": true,
@@ -166,6 +167,7 @@
   "timeStampField":"lastUpdated",
   "timeStampFormat":"%Y-%m-%dT%H:%M:%S",
   "isEpochTimeFormat" : false,
+  
   "loggingSetting" : {
 		"logLevel" : "WARN",
 		"maxBytes" : 5000000,

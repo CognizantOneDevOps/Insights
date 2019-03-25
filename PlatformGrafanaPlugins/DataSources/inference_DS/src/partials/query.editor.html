@@ -1,0 +1,37 @@
+<!--
+ *******************************************************************************
+ * Copyright 2017 Cognizant Technology Solutions
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License.  You may obtain a copy
+ * of the License at
+ * 
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ ******************************************************************************
+ -->
+<query-editor-row query-ctrl="ctrl" class="generic-datasource-query-row" has-text-edit-mode="true">
+  <!--<div class="gf-form" ng-if="ctrl.target.rawQuery">
+    <textarea class="gf-form-input" rows="5" ng-model="ctrl.target.target" spellcheck="false" ng-blur="ctrl.onChangeInternal()"
+    />
+  </div>-->
+	<div class="gf-form">
+			<span class="gf-form-label width-9">Vector Type</span>
+			<input type="text" ng-model="ctrl.target.vectorType" class="gf-form-input max-width-9">
+	</div>
+	<span class="gf-form-label width-9">Select Schedule</span>
+	<select ng-model="ctrl.target.vectorSchedule"  class="gf-form-input width-9" ng-options="x for x in ['Daily', 'Weekly', 'Monthly', 'Yearly']">
+    </select>
+	<!--<div class="gf-form">
+			<span class="gf-form-label width-9">Display Message</span>
+			<input type="text" ng-model="ctrl.target.displayMessage" placeholder="This is the message from {0} to {1}." class="gf-form-input max-width-9">
+	</div>-->
+	<span class="gf-form-label width-9">Chart Type</span>
+	<select ng-model="ctrl.target.chartType"  class="gf-form-input width-9" ng-options="x for x in ['LineChart', 'BarChart']">
+    </select>
+</query-editor-row>

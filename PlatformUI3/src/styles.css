@@ -1,0 +1,81 @@
+/*
+*******************************************************************************
+ * Copyright 2019 Cognizant Technology Solutions
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License.  You may obtain a copy
+ * of the License at
+ * 
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ *******************************************************************************/
+
+/* You can add global styles to this file, and also import other style files */
+
+@import "../node_modules/@angular/material/prebuilt-themes/deeppurple-amber.css";
+
+/*@import url('https://fonts.googleapis.com/css?family=Open+Sans');*/
+
+body { 
+   font-family: Open Sans, Tahoma, San Serif, Helvitica;
+   background-color: #f0f0f0;
+   margin: 0;
+}
+
+/*.basic-container {
+  padding: 5px;
+}
+
+*/
+
+.healthcheck-show-details-dialog-container .mat-dialog-container {
+  padding: 0px !important;
+  margin: 0px !important;
+  border-radius:15px;
+  overflow: hidden;
+}
+
+.head_class{
+  background-color: #f0f0f0
+}
+
+
+/*.colouricon {
+    background-repeat: no-repeat;
+    display: inline-block;
+    fill: white !important;
+    height: 24px;
+    width: 24px;
+    padding-left: 30px;
+}*/
+
+.AssetDetailsDialog .mat-dialog-container {
+  padding: 0px !important;
+  margin: 0px !important;
+  border-radius:15px;
+  overflow: hidden;
+}
+
+
+.DialogBox  .mat-dialog-container{
+      
+    border-radius: 10px !important ;
+    overflow: hidden;
+    outline: 0;
+    width: 100%;
+    height: 100%;
+    min-height: inherit;
+    max-height: inherit;
+    background: #fff;
+    padding: 0px;
+    color: rgba(0,0,0,.87);
+
+}
+
+
+

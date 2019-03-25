@@ -24,7 +24,7 @@ import time
 import sys
 import os
 from datetime import datetime, timedelta
-from com.cognizant.devops.platformagents.core.BaseAgent import BaseAgent
+from ....core.BaseAgent import BaseAgent
 #from core.BaseAgent import BaseAgent
 import logging.handlers
 

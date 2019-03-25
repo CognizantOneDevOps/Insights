@@ -74,7 +74,9 @@
                             <div flex="60" flex-offset="15">
                                 <md-button md-no-ink type="submit" ng-click="loginController.userAuthentication(username , password)" class="md-raised md-primary sigBtnCss"
                                     ng-disabled="loginController.isDisabled">Sign In</md-button>
-                                <span ng-show="loginController.showThrobber" style = "vertical-align: super;"><md-progress-circular style="display: inline;" md-diameter="30" md-mode="indeterminate"></md-progress-circular></span>
+                                <span ng-show="loginController.showThrobber" style = "vertical-align: super;">
+                                    <md-progress-circular style="display: inline;" md-diameter="30" md-mode="indeterminate">
+                                        </md-progress-circular></span>
                             </div>
                         </md-dialog-actions>
                         <div layout layout-align="center center">

@@ -16,8 +16,10 @@
 
 package com.cognizant.devops.platformservice.rest.datadictionary.service;
 
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -45,19 +47,21 @@ public class DataDictionaryServiceImpl implements DataDictionaryService {
 		AgentConfigDAL agentConfigDAL = new AgentConfigDAL();
 		JsonObject toolsLabelsJson = new JsonObject();
 		JsonArray toolDetailArray = new JsonArray();
+		Set<String> toolUniqueSet = new HashSet<>(0);
 		try {
 			List<AgentConfig> agentConfigList = agentConfigDAL.getAllDataAgentConfigurations();
 			Iterator<AgentConfig> iterator = agentConfigList.iterator();
 			while (iterator.hasNext()) {
 				AgentConfig configDetails = iterator.next();
-				JsonObject toolsDetailJson = new JsonObject();
-				toolsDetailJson.addProperty("toolName", configDetails.getToolName().toUpperCase());
-				toolsDetailJson.addProperty("categoryName", configDetails.getToolCategory().toUpperCase());
-				toolDetailArray.add(toolsDetailJson);
-				System.out.println("c");
+				if (!toolUniqueSet.contains(configDetails.getToolName().toUpperCase())) {
+					JsonObject toolsDetailJson = new JsonObject();
+					toolsDetailJson.addProperty("toolName", configDetails.getToolName().toUpperCase());
+					toolsDetailJson.addProperty("categoryName", configDetails.getToolCategory().toUpperCase());
+					toolDetailArray.add(toolsDetailJson);
+					toolUniqueSet.add(configDetails.getToolName().toUpperCase());
+				}
 			}
 			toolsLabelsJson.add("data", toolDetailArray);
-
 		} catch (Exception e) {
 			log.error("Error Caught while capturing Graph Response!" + e);
 		}

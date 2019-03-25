@@ -46,15 +46,21 @@ public class AgentHealthSubscriber extends EngineSubscriberResponseHandler{
 		Neo4jDBHandler dbHandler = new Neo4jDBHandler();
 		String message = new String(body, MessageConstants.MESSAGE_ENCODING);
 		String routingKey = envelope.getRoutingKey();
-		log.debug(consumerTag+" [x] Received '" + envelope.getRoutingKey() + "':'" + message + "'");
+		//routingKey=routingKey.replace("_", ".");
+		log.debug(consumerTag+" [x] Received '" + routingKey + "':'" + message + "'");
 		List<String> labels = Arrays.asList(routingKey.split(MessageConstants.ROUTING_KEY_SEPERATOR));
 		List<JsonObject> dataList = new ArrayList<JsonObject>();
 		JsonElement json = new JsonParser().parse(message);
+		String agentId="";
 		if(json.isJsonArray()){
 			JsonArray asJsonArray = json.getAsJsonArray();
 			for(JsonElement e : asJsonArray){
 				if(e.isJsonObject()){
 					JsonObject jsonObject = e.getAsJsonObject();
+					if(jsonObject.has("agentId")) {
+						agentId=jsonObject.get("agentId").getAsString();
+					}
+					//log.debug("agentId   === "+agentId);
 					if(labels.size()>1){
 						jsonObject.addProperty("category", labels.get(0));
 						jsonObject.addProperty("toolName", labels.get(1));						
@@ -64,14 +70,40 @@ public class AgentHealthSubscriber extends EngineSubscriberResponseHandler{
 			}
 			try {
 				String healthLabels = ":LATEST:"+routingKey.replace(".", ":");
-				String healthQuery = "Match (old"+healthLabels+")";
-				healthQuery = healthQuery + " OPTIONAL MATCH (old) <-[:UPDATED_TO*10]-(purge) ";
-				healthQuery = healthQuery + " CREATE (new"+healthLabels+" {props})";
-				healthQuery = healthQuery + " CREATE (new)<-[r:UPDATED_TO]-(old)";
-				healthQuery = healthQuery + " REMOVE old:LATEST";
-				healthQuery = healthQuery + " detach delete purge ";
-				healthQuery = healthQuery + " return old,new";
+				String healthQuery;
+				
+				if(!agentId.equalsIgnoreCase("")) {
+					healthQuery= "Match";
+					healthQuery = healthQuery + " (old"+healthLabels+")"; // {} 
+					healthQuery = healthQuery + " where old.agentId='"+agentId+"' or old.agentId is null";
+					healthQuery = healthQuery + " OPTIONAL MATCH (old) <-[:UPDATED_TO*10]-(purge)  where old.agentId='"+agentId+"'";
+					healthQuery = healthQuery + " CREATE (new"+healthLabels+" {props}) ";
+					healthQuery = healthQuery + " MERGE  (new)<-[r:UPDATED_TO]-(old)";
+					healthQuery = healthQuery + " REMOVE old:LATEST";
+					healthQuery = healthQuery + " detach delete purge ";
+					healthQuery = healthQuery + " return old,new";
+			
+				}else {
+					healthQuery = "Match (old"+healthLabels+")";
+					healthQuery = healthQuery + " OPTIONAL MATCH (old) <-[:UPDATED_TO*10]-(purge) ";
+					healthQuery = healthQuery + " CREATE (new"+healthLabels+" {props})";
+					healthQuery = healthQuery + " MERGE  (new)<-[r:UPDATED_TO]-(old)";
+					healthQuery = healthQuery + " REMOVE old:LATEST";
+					healthQuery = healthQuery + " detach delete purge ";
+					healthQuery = healthQuery + " return old,new";
+				}
+				
+				//log.debug("arg0 git2  ======"+healthQuery );
 				JsonObject graphResponse = dbHandler.executeQueryWithData(healthQuery, dataList);
+				//log.debug("arg0 ====== "+graphResponse.get("response"));
+				if(graphResponse.get("response").getAsJsonObject().get("results").getAsJsonArray().get(0).getAsJsonObject().get("data")
+						.getAsJsonArray().size() == 0) {
+					//log.debug("arg0 === data not present ====== " );
+					healthQuery="";
+					healthQuery = healthQuery + " CREATE (new"+healthLabels+" {props})";
+					JsonObject graphResponse1 = dbHandler.executeQueryWithData(healthQuery, dataList);
+					//log.debug("arg1 ====== "+graphResponse1.get("response"));
+				}
 				if(graphResponse.get("response").getAsJsonObject().get("errors").getAsJsonArray().size() > 0){
 					log.error("Unable to insert health nodes for routing key: "+routingKey+", error occured: "+graphResponse);
 					log.error(dataList);

@@ -144,7 +144,7 @@ public class InsightsInferenceServiceImpl implements InsightsInferenceService {
 				}
 				Collections.reverse(resultValues);
 				List<InsightsInferenceDetail> detailsList = getInferenceDetails(inferenceName, sentiment, action, trend,
-						inferenceText, jobSchedule, lastRunDate, resultValues);
+						inferenceText, jobSchedule, lastRunDate, resultValues, kpiID);
 				if (tempMap.get(vector) != null) {
 					tempMap.get(vector).addAll(detailsList);
 				} else {
@@ -158,7 +158,7 @@ public class InsightsInferenceServiceImpl implements InsightsInferenceService {
 	}
 
 	private List<InsightsInferenceDetail> getInferenceDetails(String name, KPISentiment sentiment, String action,
-			String trend, String inferenceLine, String jobSchedule, Date lastRunDate, List<ResultSetModel> result) {
+			String trend, String inferenceLine, String jobSchedule, Date lastRunDate, List<ResultSetModel> result, Long kpiID) {
 
 		List<InsightsInferenceDetail> details = new ArrayList<>(10);
 
@@ -171,6 +171,7 @@ public class InsightsInferenceServiceImpl implements InsightsInferenceService {
 		detail.setSchedule(jobSchedule);
 		detail.setLastRun(lastRunDate);
 		detail.setResultSet(result);
+		detail.setKpiId(kpiID.intValue());
 		details.add(detail);
 
 		return details;

@@ -22,7 +22,7 @@ import requests
 from requests.auth import HTTPBasicAuth
 import json
 import copy
-from com.cognizant.devops.platformagents.agents.ci.jenkins.JenkinsAgent import JenkinsAgent
+from ....core.BaseAgent import BaseAgent
 
 
 class JenkinsLogParserAgent(JenkinsAgent):         

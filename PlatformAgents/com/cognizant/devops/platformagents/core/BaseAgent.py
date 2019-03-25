@@ -20,8 +20,8 @@ Created on Jun 16, 2016
 '''
 
 import json
-from com.cognizant.devops.platformagents.core.MessageQueueProvider import MessageFactory
-from com.cognizant.devops.platformagents.core.CommunicationFacade import CommunicationFacade
+from .MessageQueueProvider import MessageFactory
+from .CommunicationFacade import CommunicationFacade
 from apscheduler.schedulers.blocking import BlockingScheduler
 import sys
 import os.path
@@ -70,16 +70,25 @@ class BaseAgent(object):
 	if filePresent:
             self.configFilePath = 'config.json'
             self.trackingFilePath = 'tracking.json'
-            self.logFilePath = logDirPath +'/'+ 'log_'+type(self).__name__+'.log'            
+            #self.logFilePath = logDirPath +'/'+ 'log_'+type(self).__name__+'.log'            
         else:
             self.configFilePath = agentDir+'config.json'
             self.trackingFilePath = agentDir+'tracking.json' 
-	    self.logFilePath = logDirPath + '/'+'log_'+type(self).__name__+'.log'	    
+	    #self.logFilePath = logDirPath + '/'+'log_'+type(self).__name__+'.log'	    
         trackingFilePresent = os.path.isfile(self.trackingFilePath)
         if not trackingFilePresent:
             self.updateTrackingJson({})
     
     def setupLogging(self):
+        agentDir = os.path.dirname(sys.modules[self.__class__.__module__].__file__) + os.path.sep
+        self.logFilePath = agentDir +'/'+ 'log_'+type(self).__name__+'.log'
+        if self.config.get('agentId') != None and self.config.get('agentId') != '':
+            if "INSIGHTS_HOME" in os.environ:
+                logDirPath = os.environ['INSIGHTS_HOME']+'/logs/PlatformAgent'
+                if not os.path.exists(logDirPath):
+                    os.makedirs(logDirPath)
+                self.logFilePath = logDirPath +'/'+ 'log_'+self.config.get('agentId')+'.log'
+        
         loggingSetting = self.config.get('loggingSetting',{})
         maxBytes = loggingSetting.get('maxBytes', 1000 * 1000 * 5)
         backupCount = loggingSetting.get('backupCount', 1000)
@@ -161,9 +170,6 @@ class BaseAgent(object):
         def callback(ch, method, properties, data):
             #Update the config file and cache.
             action = data
-            if "START" == action:
-                self.shouldAgentRun = True
-                self.publishHealthData(self.generateHealthData(note="Agent is in START mode"))
             if "STOP" == action:
                 self.shouldAgentRun = False
                 self.publishHealthData(self.generateHealthData(note="Agent is in STOP mode"))
@@ -306,7 +312,7 @@ class BaseAgent(object):
     def generateHealthData(self, ex=None, systemFailure=False,note=None):
         data = []
         currentTime = self.getRemoteDateTime(datetime.now())
-        health = { 'inSightsTimeX' : currentTime['time'], 'inSightsTime' : currentTime['epochTime'], 'executionTime' : int((datetime.now() - self.executionStartTime).total_seconds() * 1000)}
+        health = { 'agentId' : self.config.get('agentId'), 'inSightsTimeX' : currentTime['time'], 'inSightsTime' : currentTime['epochTime'], 'executionTime' : int((datetime.now() - self.executionStartTime).total_seconds() * 1000)}
         if systemFailure:
             health['status'] = 'failure'
             health['message'] = 'Agent is shutting down'
@@ -360,22 +366,24 @@ class BaseAgent(object):
         self.extensions[name] = {'func': func, 'duration': duration}
     
     def execute(self):
-        if self.shouldAgentRun == True:
-            logging.debug('Agent is in START mode')
-            try:
-                self.executionStartTime = datetime.now()
-                self.logIndicator(self.EXECUTION_START, self.config.get('isDebugAllowed', False))
-                self.executionId = str(uuid.uuid1())
-                self.process()
-                self.executeAgentExtensions()
-                self.publishHealthData(self.generateHealthData())
-            except Exception as ex:
-                self.publishHealthData(self.generateHealthData(ex=ex))
-                logging.error(ex)
-                self.logIndicator(self.EXECUTION_ERROR, self.config.get('isDebugAllowed', False))
-        if self.shouldAgentRun == False:
-            logging.debug('Agent is in STOP mode')
-    
+        logging.debug('Agent is in START mode')
+        try:
+            self.executionStartTime = datetime.now()
+            self.logIndicator(self.EXECUTION_START, self.config.get('isDebugAllowed', False))
+            self.executionId = str(uuid.uuid1())
+            self.process()
+            self.executeAgentExtensions()
+            self.publishHealthData(self.generateHealthData())
+            
+        except Exception as ex:
+            self.publishHealthData(self.generateHealthData(ex=ex))
+            logging.error(ex)
+            self.logIndicator(self.EXECUTION_ERROR, self.config.get('isDebugAllowed', False))
+        finally:
+            '''If agent receive the STOP command, Python program should exit gracefully after current data collection is complete.  '''
+            if self.shouldAgentRun == False:
+                os._exit(0)
+        
     def executeAgentExtensions(self):
         if hasattr(self, 'extensions'):
             extensions = self.extensions

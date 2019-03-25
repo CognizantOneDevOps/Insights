@@ -1,0 +1,154 @@
+/*******************************************************************************
+ * Copyright 2019 Cognizant Technology Solutions
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License.  You may obtain a copy
+ * of the License at
+ * 
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ ******************************************************************************/
+
+
+.mainDivContainer{
+    margin-left: 16px;
+    margin-right: 16px;
+    height:90vh;
+    overflow: hidden;
+}
+.divider{
+    width:5px;
+    height:auto;
+    display:inline-block;
+}
+
+.column1{
+    float: left;
+    width: 60%;
+    box-shadow: 0 2px 2px -3px rgba(0,0,0,.2), 0 8px 10px 1px rgba(0,0,0,.14), 0 3px 14px 2px rgba(0,0,0,.12);
+    -o-box-shadow: 2px  0 5px  rgba(0,0,0,.2);
+    
+}
+
+.showTable {
+    background-color: #00B140;   
+    color: white;
+    border-radius: 10px 10px 0 0;   
+}
+.tableDiv {
+    overflow-X:hidden;
+    height: 100%;
+}
+
+.column2{
+    float: right;
+    width:37%;
+    box-shadow: 0 2px 2px -3px rgba(0,0,0,.2), 0 8px 10px 1px rgba(0,0,0,.14), 0 3px 14px 2px rgba(0,0,0,.12);
+    -o-box-shadow: 2px  0 5px  rgba(0,0,0,.2);
+}
+.divTablesHeading{
+    font-size: 16px;
+    margin-top: 10px;
+    margin-bottom: 6px;
+    text-align: left;
+    width: 100vh;
+    padding-left: 15px;
+}
+.dat-row{
+    height: 40px !important;
+    text-align: left !important;
+    vertical-align: middle;
+}
+
+.dat-row:nth-child(even){
+    background-color:#e1e3e7;
+}
+
+.dat-row:nth-child(odd){
+    background-color:#FFFFFF;
+}
+
+
+table tr:last-child td:first-child {
+    border-bottom-left-radius: 0px;
+}
+
+table tr:last-child td:last-child {
+    border-bottom-right-radius: 0px;
+}
+.mainText{
+    font-size: 14px;
+    color:  #0033A0;
+    font-weight:bold;
+    vertical-align: sub;
+    width: 10%;
+    overflow: auto; 
+}
+
+
+
+.form-control {
+    padding: 6px 12px;
+    font-size: 13px;
+    background-color: white;
+    background-image: none;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
+    box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
+    -webkit-transition: border-color ease-in-out .15s,-webkit-box-shadow ease-in-out .15s;
+    -o-transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
+    transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
+    margin-left: 5px;
+    margin-bottom: 5px;
+}
+
+.searchBtnStyle { 
+    vertical-align: center;
+    background-color: #0033A0;
+    color: white;
+    border: 1px solid #0033A0;
+    border-radius: 10px 10px 10px 10px;
+    padding: 5px;
+    font-size: 13px;
+}
+
+
+tbody::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+tbody::-webkit-scrollbar-thumb {
+    background-image: initial;
+    background-position-x: initial;
+    background-position-y: initial;
+    background-size: initial;
+    background-attachment: initial;
+    background-origin: initial;
+    background-clip: initial;
+    background-color: #676666;
+}
+
+tbody::-webkit-scrollbar-track {
+    border-radius: 10px;
+} 
+
+button[disabled]{
+    border: 1px solid #999999;
+    background-color: #cccccc;
+    color: black;
+}
+
+.dataDictionaryMessages{
+    margin-top: 70px;
+    text-align: center;
+    color:#0033A0;
+    font-size: 18px;
+    padding-top: 10px
+}

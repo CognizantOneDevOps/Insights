@@ -19,7 +19,7 @@ Created on Jun 16, 2016
 '''
 
 from __future__ import unicode_literals
-from com.cognizant.devops.platformagents.core.BaseAgent import BaseAgent
+from ....core.BaseAgent import BaseAgent
 from dateutil import parser
 import boto3
 import time

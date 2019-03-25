@@ -32,6 +32,7 @@
   "relationMetadata": {"labels" : ["LATEST"],"relation":{"properties":["iterationNumber","projectId", "storyId", "backLog","cycleTime","rejectionRate"],"name":"ITERATION_HAS_ISSUES","source":{"constraints":["projectId","storyId"]},"destination":{"constraints":["iterationNumber"]}}},
   "storyMetadata": {"labels" : ["STORY"],"dataUpdateSupported" : true,"uniqueKey":["projectId","storyId"]}
   },
+  "agentId" : "",
   "auth": "base64",
   "runSchedule": 30,
   "toolCategory" : "ALM",

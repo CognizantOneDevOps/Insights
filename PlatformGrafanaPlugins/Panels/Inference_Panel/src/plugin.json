@@ -1,0 +1,31 @@
+{
+  "type": "panel",
+  "name": "Inference Panel",
+  "id": "inference_panel",
+
+  "info": {
+    "description": "Inference Panel for Grafana",
+    "author": {
+      "name": "",
+      "url": ""
+    },
+    "keywords": ["Inference", "panel"],
+    "logos": {
+      "small": "img/Inference.png",
+      "large": "img/Inference.png"
+    },
+    "links": [
+      {"name": "", "url": ""}
+    ],
+    "screenshots": [
+      
+    ],
+    "version": "1.0.0",
+    "updated": "2019-1-25"
+  },
+
+  "dependencies": {
+    "grafanaVersion": "5.x.x",
+    "plugins": [ ]
+  }
+}

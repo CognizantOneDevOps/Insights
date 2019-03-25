@@ -19,7 +19,7 @@ Created on Jun 22, 2016
 @author: 463188
 '''
 from dateutil import parser
-from com.cognizant.devops.platformagents.core.BaseAgent import BaseAgent
+from ....core.BaseAgent import BaseAgent
 from urllib import quote
 import time
 

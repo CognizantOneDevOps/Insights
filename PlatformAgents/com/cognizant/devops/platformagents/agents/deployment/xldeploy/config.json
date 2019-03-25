@@ -42,12 +42,14 @@
 	    }
      }	
   },
+ "agentId" : "",
  "auth": "base64",
  "toolCategory" : "DEPLOYMENT",
  "enableDataValidation": true,
  "runSchedule": 5,
  "toolsTimeZone" : "Asia/Kolkata",
  "isEpochTimeFormat" : false,
+ 
  "enableValueArray": false,
  "timeStampFormat":"%Y-%m-%dT%H:%M:%S",
  "timeStampField":"startDate",

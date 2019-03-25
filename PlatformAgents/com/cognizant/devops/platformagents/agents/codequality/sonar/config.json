@@ -1,10 +1,6 @@
 {
-  "category": "CODEQUALITY",
-  "communication": {
-    "type": "REST",
-    "sslVerify": true,
-    "responseType": "JSON"
-  },
+ 
+ 
   "mqConfig": {
     "exchange": "iSight",
     "host": "127.0.0.1",
@@ -26,6 +22,7 @@
   		},
   		"metrics" : ["alert_status", "complexity", "coverage", "new_coverage"]
   },
+  "agentId" : "",
   "toolName": "SONAR",
   "runSchedule": 30,
   "enableDataValidation": true,
@@ -40,6 +37,7 @@
   "isDebugAllowed": false,
   "enableValueArray": false,
   "isEpochTimeFormat" : false,
+  
   "baseUrl": "http://127.0.0.1:9000/sonar/",
   "loggingSetting": {
     	"logLevel": "WARN",

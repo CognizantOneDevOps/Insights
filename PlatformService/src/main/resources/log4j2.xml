@@ -18,11 +18,14 @@
 	</Appenders>
 	
 	<Loggers>
-		<Logger name="com.cognizant" level="debug">
+		<Logger name="RollingFile" level="debug"> <!-- com.cognizant  -->
 				<AppenderRef ref="RollingFile" />
 		</Logger>
-		<Logger name="org" level="error">
+		<!-- <Logger name="org" level="error">
 				<AppenderRef ref="RollingFile" />
+		</Logger> -->
+		<Logger name="Console" level="debug">
+				<AppenderRef ref="Console" />
 		</Logger>
 	</Loggers>
 

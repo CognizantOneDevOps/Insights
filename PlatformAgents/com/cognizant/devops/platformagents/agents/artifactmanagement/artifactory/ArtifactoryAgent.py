@@ -22,7 +22,7 @@ Created on Feb 16, 2018
 
 import requests, json
 from requests.auth import HTTPBasicAuth
-from com.cognizant.devops.platformagents.core.BaseAgent import BaseAgent
+from ....core.BaseAgent import BaseAgent
 from datetime import datetime, timedelta
 import time
 class ArtifactoryAgent(BaseAgent):

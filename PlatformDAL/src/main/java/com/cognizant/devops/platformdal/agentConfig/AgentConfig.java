@@ -116,6 +116,14 @@ public class AgentConfig {
 		return updatedDate;
 	}
 
+	public Boolean getDataUpdateSupported() {
+		return dataUpdateSupported;
+	}
+
+	public String getUniqueKey() {
+		return uniqueKey;
+	}
+
 	public void setUpdatedDate(Date updatedDate) {
 		this.updatedDate = updatedDate;
 	}
@@ -131,7 +139,7 @@ public class AgentConfig {
 	}
 
 	@Deprecated
-	public String getUniqueKey() {
+	public String Subscriber() {
 		return uniqueKey;
 	}
 

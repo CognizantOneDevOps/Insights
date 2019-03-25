@@ -1,0 +1,72 @@
+<!--
+ *********************************************************************************
+ * Copyright 2019 Cognizant Technology Solutions
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License.  You may obtain a copy
+ * of the License at
+ * 
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ *******************************************************************************-->
+
+<!--<div class="titleStyle">
+        <li style="background-color: #0033a0; margin-left: 130px">About Insights
+        </li>
+        <li (click)="closeShowDetailsDialog()" style="background-color: #0033a0;">
+                <mat-icon svgIcon="close_dialog" [ngStyle]="{'width': '20px', 'height': '20px','padding-right':'20px','margin-top': '-30px','margin-left':'90%'}">
+                </mat-icon>
+        </li>
+</div>-->
+
+<div class="arrange-horizontally-Dialog">
+        <div class="gridheadercenter">
+                About Insights
+        </div>
+        <div class="closeIconCss">
+                <a (click)="closeShowDetailsDialog()">
+                        <mat-icon class="closeiconConf" svgIcon="close_dialog">
+                        </mat-icon>
+                </a>
+        </div>
+</div>
+
+<div class="aboutLogo">
+        <img mat-card-image align="center" height="45px" width="211px" src='icons/svg/about/aboutInsights.png' alt="Cognizant Insights log"
+                class="insightLogo" />
+</div>
+
+<div class="aboutText">
+        <!--<span class="heading1">Insights</span>-->
+        <p> <b>For Version Please</b>&nbsp;<b> <b class="hyperlink" (click)="onVersionClick()"><u>Click Here</u></b></b>
+                <!--href="https://github.com/CognizantOneDevOps/Insights/releases"-->
+        </p>
+</div>
+
+<div class="aboutText1">
+        <p>© 2019 Cognizant Technology Solutions Limited. All Rights Reserved. Insights is Property of Cognizant Technology
+                Solutions Ltd. Created under the brand of OneDevOps<sup class="tmText">TM</sup></p>
+</div>
+
+<!--<div class="gitLink">
+        <p>
+                <a class="hyperlink" (click)="onGitLinkClick()"><u>https://github.com/CognizantOneDevOps/Insights</u></a>
+        </p>
+</div>-->
+<div class="gitLink">
+        <p>
+                For Licensing Information Please&nbsp;<a class="hyperlink" (click)="onLicenseClick()"><u>Click Here</u></a>        
+        </p>
+</div>
+
+<div class="gitLink">
+        For Support - Please write to us @&nbsp;<a href="mailto:devopsplatformsupport@cognizant.com">InsightsSupportTeam</a>
+</div>
+<mat-dialog-actions class="mat-dialog-actions-button">
+        <button mat-raised-button (click)="onCloseClick()">OK</button>
+</mat-dialog-actions>

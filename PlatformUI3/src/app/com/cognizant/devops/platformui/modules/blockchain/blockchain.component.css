@@ -1,0 +1,148 @@
+/*******************************************************************************
+ * Copyright 2019 Cognizant Technology Solutions
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License.  You may obtain a copy
+ * of the License at
+ * 
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ ******************************************************************************/
+
+
+.titleStyle {    
+    margin-top:25px;
+    color: #0033A0;
+    font-family: Open Sans !important;
+    font-size: 20px;
+    padding-bottom: 10px;    
+    vertical-align: center;
+}
+
+.greenTitleTxt {
+    color: #00B140;    
+    font-family: Open Sans !important;
+    font-size: 20px; 
+}
+
+.searchTitleTxt {        
+    color: #FFFFFF;
+    background-color: #0033A0;
+    border: 1px solid #0033A0;
+    border-radius: 6px 6px 0px 0px;
+    font-family: Open Sans !important;
+    font-size: 16px;
+    padding-left: 10px;
+    vertical-align: middle;
+    height: 30px;
+}
+
+.searchBoxStyle {
+    margin-top:20px;
+    padding-bottom: 10px;    
+    background-color: #FFFFFF;
+    border: 1px solid #0033A0;
+    border-radius: 10px 10px 10px 10px;
+}
+
+.dateRowStyle {    
+    overflow: auto; 
+    width: 100%; 
+    padding-left: 10px;
+}
+.dateElementStyle {    
+    float: left;  
+    font-family: Open Sans !important;
+    font-size: 14px;
+    margin-right: 20px; 
+}
+.searchBtnStyle {
+    width:57px;
+    height:29px; 
+    vertical-align: center;
+    background-color: #00B140;
+    color: white;
+    border: 1px solid #00B140;
+    border-radius: 10px 10px 10px 10px;
+    padding-left: 10px;
+}
+.searchHeadingStyle{
+    background-color: #0033A0;
+    color: white;
+    font-size: 16px;
+    margin-top: 20px;
+    height: 30px;
+    border: 1px solid #0033A0;
+    border-radius: 10px 10px 10px 10px;
+    vertical-align: middle;    
+    margin-bottom: 20px;
+    padding-left: 10px;
+}
+
+::ng-deep .mat-sort-header-arrow {
+    color: white !important;    
+}
+
+
+ ::ng-deep .inputAssetIdStyle .mat-form-field-underline {
+   /*change color of underline*/
+    background-color: grey !important;
+ } 
+
+ ::ng-deep .inputAssetIdStyle .mat-form-field-ripple {
+   /*change color of underline when focused*/
+   background-color: grey !important;
+ } 
+
+ ::ng-deep .mat-focused .mat-form-field-label{
+      /*change color of label*/
+      color: grey !important;
+      font-family: Open Sans !important;
+      font-size: 14px !important; 
+  }
+  .redFontStyle {
+     color: red !important;
+     font-family: Open Sans !important;
+     font-size: 14px !important;  
+  }
+
+  .paginationStyle {
+      font-family: Open Sans !important;
+      font-size: 14px !important; 
+      background-color: #DEDBDB;
+  }
+
+table {
+    width: 100%;  
+    border: 1px solid #00B140;
+    border-radius: 10px 10px 10px 10px;
+    font-size: 14px;
+    text-align: left;
+    vertical-align: middle;
+}
+
+.leftAlignStyle {
+    text-align: left;
+}
+
+.rowContainer {
+  display:flex;
+  flex-direction:row;                   
+}
+
+.rowContainer > div{
+  flex: 1 1 auto;  
+}
+
+.progressBarStyle {
+    display: flex; 
+    justify-content: center; 
+    align-items: center;
+    overflow: hidden;
+}
+
