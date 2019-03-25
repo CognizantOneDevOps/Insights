@@ -18,11 +18,12 @@ export default class Neo4jDatasource {
     private $q;
     private backendSrv;
     private templateSrv;
+    private timeSrv;
     type: any;
     url: string;
     name: string;
     /** @ngInject */
-    constructor(instanceSettings: any, $q: any, backendSrv: any, templateSrv: any);
+    constructor(instanceSettings: any, $q: any, backendSrv: any, templateSrv: any, timeSrv: any);
     addTimestampToQuery(query: any, options: any): any;
     processStatusQueryResponse(data: any, options: any, timestamp: any): any[];
     processResponse(data: any, options: any): any;

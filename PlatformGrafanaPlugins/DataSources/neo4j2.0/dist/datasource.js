@@ -24,10 +24,11 @@ System.register([], function(exports_1) {
             //import * as dateMath from 'app/core/utils/datemath';
             Neo4jDatasource = (function () {
                 /** @ngInject */
-                function Neo4jDatasource(instanceSettings, $q, backendSrv, templateSrv) {
+                function Neo4jDatasource(instanceSettings, $q, backendSrv, templateSrv, timeSrv) {
                     this.$q = $q;
                     this.backendSrv = backendSrv;
                     this.templateSrv = templateSrv;
+                    this.timeSrv = timeSrv;
                     this.type = instanceSettings.type;
                     this.url = instanceSettings.url;
                     this.name = instanceSettings.name;
@@ -236,6 +237,7 @@ System.register([], function(exports_1) {
                     return deferred.promise;
                 };
                 Neo4jDatasource.prototype.checkCypherQueryModificationKeyword = function (cypherQuery) {
+                    return true;
                     var keywords;
                     keywords = ["create", "delete", "set", "update", "merge", "detach"];
                     var flag = 0;
@@ -352,7 +354,10 @@ System.register([], function(exports_1) {
                     var cypherQuery = {};
                     var statements = [];
                     cypherQuery['statements'] = statements;
-                    query = this.addTimestampToQuery(query, null);
+                    if (this.timeSrv && this.timeSrv.timeRange()) {
+                        var options = { range: this.timeSrv.timeRange() };
+                        query = this.addTimestampToQuery(query, options);
+                    }
                     query = this.templateSrv.replace(query, {}, this.applyTemplateVariables);
                     var resultDataContents = ["row"];
                     var statement = {

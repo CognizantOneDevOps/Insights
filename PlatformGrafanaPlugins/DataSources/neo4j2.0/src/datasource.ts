@@ -26,7 +26,7 @@ export default class Neo4jDatasource {
   url: string;
   name: string;
   /** @ngInject */
-  constructor(instanceSettings, private $q, private backendSrv, private templateSrv) {
+  constructor(instanceSettings, private $q, private backendSrv, private templateSrv, private timeSrv) {
     this.type = instanceSettings.type;
     this.url = instanceSettings.url;
     this.name = instanceSettings.name;
@@ -236,6 +236,7 @@ export default class Neo4jDatasource {
   }
 
   checkCypherQueryModificationKeyword(cypherQuery) {
+    return true;
     var keywords: string[];
     keywords = ["create", "delete", "set", "update", "merge", "detach"];
     var flag: number = 0;
@@ -354,7 +355,10 @@ export default class Neo4jDatasource {
     var cypherQuery = {};
     var statements = [];
     cypherQuery['statements'] = statements;
-    query = this.addTimestampToQuery(query, null);
+    if(this.timeSrv && this.timeSrv.timeRange()){
+      let options = {range: this.timeSrv.timeRange()};
+      query = this.addTimestampToQuery(query, options);
+    }
     query = this.templateSrv.replace(query, {}, this.applyTemplateVariables);
     var resultDataContents = ["row"];
     var statement = {
