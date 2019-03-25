@@ -45,7 +45,7 @@ class JenkinsLogParserAgent(JenkinsAgent):
                                 data = copy.deepcopy(build)
                                 dataList.append(data)
                                 for stageProperty in stage:
-                                    data[stageProperty+"Stage"] = stage[stageProperty]
+                                    data[stageProperty + "Stage"] = stage[stageProperty]
                 except Exception as ex:
                     pass
             else:
@@ -74,35 +74,46 @@ class JenkinsLogParserAgent(JenkinsAgent):
                 for buildStagePropery in buildStageDetails:
                     build[buildStagePropery] = buildStageDetails[buildStagePropery]
                 try:
-                    logTokens = logResponse.split('****Start of Json Output****')
+                    flag = logResponse.find('****Start of Json Output****')
+                    if flag == -1:
+                        logTokens = logResponse.split('[Pipeline] echo')
+                    else:
+                        logTokens = logResponse.split('****Start of Json Output****')
                     for logToken in logTokens:
-                        deploymentTokens = logToken.split('****End of Json Output****')
-                        if len(deploymentTokens) > 1:
-                            data = copy.deepcopy(build)
-                            dataList.append(data)
-                            buildAdded = True
-                            deploymentJsonTokens = deploymentTokens[0].split('{')
-                            if len(deploymentJsonTokens) > 1:
-                                deploymentJsonStr = '{' + deploymentJsonTokens[1].split('}')[0] + '}'
-                                buildJson = json.loads(deploymentJsonStr)
-                                for attr in buildJson:
-                                    if data.get(attr, None) is None:
-                                        data[attr] = buildJson[attr]
-                                envDetails = data.get('envDetail', None)
-                                if envDetails:
-                                    deployStageDetails = deployStageToEnvMap.get(envDetails, {})
-                                    for deploymentStagePropery in deployStageDetails:
-                                        data[deploymentStagePropery] = deployStageDetails[deploymentStagePropery]
+                        isJsonValid = logToken.find('buildDurationEpoch')
+                        if isJsonValid > 0:
+                            if flag == -1:
+                                deploymentTokens = logToken.split('[Pipeline] }')
+                            else:
+                                deploymentTokens = logToken.split('****End of Json Output****')
+                            
+                            if len(deploymentTokens) > 1:
+                                data = copy.deepcopy(build)
+                                dataList.append(data)
+                                buildAdded = True
+                                deploymentJsonTokens = deploymentTokens[0].split('{')
+                                if len(deploymentJsonTokens) > 1:
+                                    deploymentJsonStr = '{' + deploymentJsonTokens[1].split('}')[0] + '}'
+                                    buildJson = json.loads(deploymentJsonStr)
+                                    for attr in buildJson:
+                                        if data.get(attr, None) is None:
+                                            data[attr] = buildJson[attr]
+                                    envDetails = data.get('envDetail', None)
+                                    if envDetails:
+                                        deployStageDetails = deployStageToEnvMap.get(envDetails, {})
+                                        for deploymentStagePropery in deployStageDetails:
+                                            data[deploymentStagePropery] = deployStageDetails[deploymentStagePropery]
                 except Exception as ex:
                     pass
             if not buildAdded:
                 dataList.append(build)
         return dataList
     
-    def getBuildLog(self,url):
+    def getBuildLog(self, url):
         auth = HTTPBasicAuth(self.userid, self.passwd)
         response = requests.get(url, auth=auth)
         return response.content
+
 
 if __name__ == "__main__":
     JenkinsLogParserAgent()
