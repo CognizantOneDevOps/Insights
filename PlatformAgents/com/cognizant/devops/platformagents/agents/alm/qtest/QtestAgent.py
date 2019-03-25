@@ -13,12 +13,10 @@
 # License for the specific language governing permissions and limitations under
 # the License.
 #-------------------------------------------------------------------------------
-import base64
+from ....core.BaseAgent import BaseAgent
 import json
 import logging.handlers
 import math
-
-from com.cognizant.devops.platformagents.core.BaseAgent import BaseAgent
 from dateutil import parser
 
 

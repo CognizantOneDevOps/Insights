@@ -35,4 +35,5 @@ public interface ServiceStatusConstants {
 	String DemonAgent="Demon Agent";
 	String PlatformEngine="Platform Engine";
 	String RabbitMq="RabbitMQ";
+	String Agents="Agents";
 }

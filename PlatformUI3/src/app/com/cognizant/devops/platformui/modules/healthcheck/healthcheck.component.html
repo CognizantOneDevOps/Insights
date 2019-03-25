@@ -1,0 +1,207 @@
+<!--
+*******************************************************************************
+ * Copyright 2019 Cognizant Technology Solutions
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License.  You may obtain a copy
+ * of the License at
+ * 
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ ****************************************************************************** -->
+<div class="pageCss">
+  <div layout layout-align="left" class="heading">
+    <div id="healthCheckTitle">Health Check </div>
+  </div>
+
+  <div class="orangeStripCss"></div>
+
+  <mat-tab-group color="primary" class="healthcheck-tab-style">
+    <mat-tab label="Agents">
+      <div layout layout-align="left" class="sectionHeadingStyleWithoutButton">
+        <div layout>&nbsp; Agents</div>
+      </div>
+      <div class="arrange-horizontally">
+        <label class="mainText"> Select Tool </label>
+        <mat-select [(ngModel)]="selectAgentTool" [style.height.px]="20" [style.width.%]="21" (ngModelChange)="selectToolAgent(selectAgentTool)"
+          name="selectAgentTool" required placeholder="Select Tool" class="toolsBoxCss" [ngClass]="{  'input-disabled' :false  ,  'form-control': true}">
+          <mat-option *ngFor="let data of agentNameList" [value]="data" style="color:#0033A0">
+            {{data}}
+          </mat-option>
+          </mat-select>
+      </div>
+      <div id="agentsTable" layout-align="center center" class="tableContainerStyle" *ngIf="showContentAgent">
+        <!-- Insights Agents Table -->
+        <table mat-table [dataSource]="agentListDatasource">
+          <!-- Tool Column -->
+          <ng-container matColumnDef="toolName">
+            <th mat-header-cell *matHeaderCellDef class="tableHeaderCss"> Tool </th>
+            <td mat-cell *matCellDef="let element"> {{element.toolName}} </td>
+          </ng-container>
+          <!-- Tool Instance Id Column -->
+          <ng-container matColumnDef="agentKey">
+            <th mat-header-cell *matHeaderCellDef class="tableHeaderCss"> Instance Id </th>
+            <td mat-cell *matCellDef="let element"> {{element.agentId}} </td>
+          </ng-container>
+          <!-- Category Column -->
+          <ng-container matColumnDef="category">
+            <th mat-header-cell *matHeaderCellDef class="tableHeaderCss"> Category </th>
+            <td mat-cell *matCellDef="let element" style="width:200px !important"> {{element.category}} </td>
+          </ng-container>
+
+          <!-- Time Column -->
+          <ng-container matColumnDef="inSightsTimeX">
+            <th mat-header-cell *matHeaderCellDef class="tableHeaderCss"> Time </th>
+            <td mat-cell *matCellDef="let element">{{element.inSightsTimeX | date:'yyyy-MM-dd HH:mm:ss'}}</td>
+          </ng-container>
+          <!-- Status Column -->
+          <ng-container matColumnDef="status">
+            <th mat-header-cell *matHeaderCellDef class="tableHeaderCss"> Status </th>
+            <td mat-cell *matCellDef="let element">
+              <mat-icon svgIcon="healthcheck_success_status" *ngIf="element.status =='success'" [ngStyle]="{color: '#00B140', height: '20px', width: '20px'}">
+              </mat-icon>
+              <mat-icon svgIcon="healthcheck_failure_status" *ngIf="element.status =='failure'" [ngStyle]="{color: '#FF8F1C', height: '20px', width: '20px'}">
+              </mat-icon>
+            </td>
+          </ng-container>
+          <!-- Details Column -->
+          <ng-container matColumnDef="details">
+            <th mat-header-cell *matHeaderCellDef class="tableHeaderCss"> Details </th>
+            <td mat-cell *matCellDef="let element">
+              <a (click)="showDetailsDialog(element.toolName,element.category,element.agentId)">
+                <mat-icon svgIcon="healthcheck_show_details" [ngStyle]="{color:'#5C068C', height: '20px', width: '20px'}">
+                </mat-icon>
+              </a>
+            </td>
+          </ng-container>
+          <tr mat-header-row *matHeaderRowDef="displayedAgentColumns" class="tableHeaderCss" style="height:40px"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedAgentColumns;"></tr>
+        </table>
+      </div>
+
+      <!-- Displays Progress spinner and Error message for service failure-->
+      <div *ngIf="showThrobberAgent" style="display: flex; justify-content: center; align-items: center;overflow: hidden;">
+        <mat-progress-spinner [diameter]="100" color="primary" mode="indeterminate">
+        </mat-progress-spinner>
+      </div>
+      <div *ngIf="!(showContentAgent || showThrobberAgent)" layout-align="center center" style="text-align: center;">
+        <mat-icon svgIcon="healthcheck_failure_status" [ngStyle]="{color: '#FF8F1C', height: '25px', width: '25px'}">
+        </mat-icon>
+        Service Failure. Please try again.
+      </div>
+    </mat-tab>
+    <mat-tab label="Data Components" class="healthcheck-tab-style">
+      <div layout layout-align="left" class="sectionHeadingStyleWithoutButton">
+        <div layout>&nbsp; Data Components</div>
+      </div>
+
+      <div id="dataComponentTable" layout-align="center center" class="tableContainerStyle" *ngIf="showContent">
+        <table mat-table [dataSource]="dataComponentDataSource">
+          <!-- Server Column -->
+          <ng-container matColumnDef="serverName">
+            <th mat-header-cell *matHeaderCellDef class="tableHeaderCss">Name</th>
+            <td mat-cell *matCellDef="let key" style="width:200px !important"> {{key.serverName}} </td>
+          </ng-container>
+
+          <!-- IP Address:Port Column -->
+          <ng-container matColumnDef="ipAddress">
+            <th mat-header-cell *matHeaderCellDef class="tableHeaderCss">IP Address:Port</th>
+            <td mat-cell *matCellDef="let key"> {{key.endPoint}} </td>
+          </ng-container>
+
+          <!-- Version Column -->
+          <ng-container matColumnDef="version">
+            <th mat-header-cell *matHeaderCellDef class="tableHeaderCss">Version</th>
+            <td mat-cell *matCellDef="let key"> {{key.version}} </td>
+          </ng-container>
+
+          <!-- Status Column -->
+          <ng-container matColumnDef="status">
+            <th mat-header-cell *matHeaderCellDef class="tableHeaderCss">Status</th>
+            <td mat-cell *matCellDef="let key">
+              <mat-icon svgIcon="healthcheck_success_status" *ngIf="key.status =='success'" [ngStyle]="{color: '#00B140', height: '20px', width: '20px'}">
+              </mat-icon>
+              <mat-icon svgIcon="healthcheck_failure_status" *ngIf="key.status =='failure'" [ngStyle]="{color: '#FF8F1C', height: '20px', width: '20px'}">
+              </mat-icon>
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="dataComponentColumns" class="tableHeaderCss" style="height:40px"></tr>
+          <tr mat-row *matRowDef="let row; columns: dataComponentColumns;"></tr>
+        </table>
+      </div>
+      <!-- Displays Progress spinner and Error message for service failure-->
+      <div *ngIf="showThrobber" style="display: flex; justify-content: center; align-items: center;overflow: hidden;">
+        <mat-progress-spinner [diameter]="100" color="primary" mode="indeterminate">
+        </mat-progress-spinner>
+      </div>
+      <div *ngIf="!(showContent || showThrobber)" layout-align="center center" style="text-align: center;">
+        <mat-icon svgIcon="healthcheck_failure_status" [ngStyle]="{color: '#FF8F1C', height: '25px', width: '25px'}">
+        </mat-icon>
+        Service Failure. Please try again.
+      </div>
+    </mat-tab>
+    <mat-tab label="Services" class="healthcheck-tab-style">
+      <div layout layout-align="left" class="sectionHeadingStyleWithoutButton">
+        <div layout> &nbsp; Services</div>
+      </div>
+
+      <div id="servicesTable" layout-align="center center" class="tableContainerStyle" *ngIf="showContent">
+        <table mat-table [dataSource]="servicesDataSource">
+          <!-- Server Column -->
+          <ng-container matColumnDef="serverName">
+            <th mat-header-cell *matHeaderCellDef class="tableHeaderCss">Name</th>
+            <td mat-cell *matCellDef="let key" style="width:200px !important"> {{key.serverName}} </td>
+          </ng-container>
+          <!-- IP Address:Port Column -->
+          <ng-container matColumnDef="ipAddress">
+            <th mat-header-cell *matHeaderCellDef class="tableHeaderCss">IP Address:Port</th>
+            <td mat-cell *matCellDef="let key"> {{key.endPoint}} </td>
+          </ng-container>
+          <!-- Version Column -->
+          <ng-container matColumnDef="version" class="tableHeaderCss">
+            <th mat-header-cell *matHeaderCellDef class="tableHeaderCss">Version</th>
+            <td mat-cell *matCellDef="let key"> {{key.version}} </td>
+          </ng-container>
+          <!-- Status Column -->
+          <ng-container matColumnDef="status" class="tableHeaderCss">
+            <th mat-header-cell *matHeaderCellDef class="tableHeaderCss">Status</th>
+            <td mat-cell *matCellDef="let key">
+              <mat-icon svgIcon="healthcheck_success_status" *ngIf="key.status =='success'" [ngStyle]="{color: '#00B140', height: '20px', width: '20px'}">
+              </mat-icon>
+              <mat-icon svgIcon="healthcheck_failure_status" *ngIf="key.status =='failure'" [ngStyle]="{color: '#FF8F1C', height: '20px', width: '20px'}">
+              </mat-icon>
+            </td>
+          </ng-container>
+          <!-- Details Column -->
+          <ng-container matColumnDef="details">
+            <th mat-header-cell *matHeaderCellDef class="tableHeaderCss">Details</th>
+            <td mat-cell *matCellDef="let key">
+              <a (click)="showDetailsDialog('-',key.serverName,'')">
+                <mat-icon svgIcon="healthcheck_show_details" [ngStyle]="{color:'#5C068C', height: '20px', width: '20px'}">
+                </mat-icon>
+              </a>
+            </td>
+          </ng-container>
+          <tr mat-header-row *matHeaderRowDef="servicesColumns" class="tableHeaderCss" style="height:40px"></tr>
+          <tr mat-row *matRowDef="let row; columns: servicesColumns;"></tr>
+        </table>
+      </div>
+      <!-- Displays Progress spinner and Error message for service failure-->
+      <div *ngIf="showThrobber" style="display: flex; justify-content: center; align-items: center;overflow: hidden;">
+        <mat-progress-spinner [diameter]="100" color="primary" mode="indeterminate">
+        </mat-progress-spinner>
+      </div>
+      <div *ngIf="!(showContent || showThrobber)" layout-align="center center" style="text-align: center;">
+        <mat-icon svgIcon="healthcheck_failure_status" [ngStyle]="{color: '#FF8F1C', height: '25px', width: '25px'}">
+        </mat-icon>
+        Service Failure. Please try again.
+      </div>
+    </mat-tab>
+  </mat-tab-group>
+</div>

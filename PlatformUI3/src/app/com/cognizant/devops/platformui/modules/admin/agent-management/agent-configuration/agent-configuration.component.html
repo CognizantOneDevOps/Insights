@@ -1,0 +1,181 @@
+<!--
+*******************************************************************************
+ * Copyright 2019 Cognizant Technology Solutions
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License.  You may obtain a copy
+ * of the License at
+ * 
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ ****************************************************************************** -->
+<div class="pageCss">
+  <div layout layout-align="left" class="titleStyle">
+    <div>Configuration |
+      <a class="greenTitleTxt">Agent Management </a>
+    </div>
+  </div>
+
+  <div class="orangeStripCss"></div>
+
+  <div layout layout-align="left" class="sectionHeadingStyleWithoutButton">
+    <div layout>&nbsp; {{subTitleName}}
+      <span class="sectionSubHeading"> {{subTitleInfoText}} </span>
+    </div>
+  </div>
+
+  <form #frmagentconfig="ngForm" class="form">
+    <div class="arrange-horizontally button-row">
+      <div> <label class="mainText"> Select the Operating System </label> </div>
+      <div>
+        <mat-select required [(ngModel)]="selectedOS" name="selectedOS" class="form-control" placeholder="Select OS" (ngModelChange)="versionOnChange(selectedVersion, 'validate')"
+          style="width:150px;">
+          <mat-option *ngFor="let os of osLists | keyvalue" value="{{os.value}}">{{os.key}}</mat-option>
+          </mat-select>
+      </div>
+      <div> <label class="mainText"> Version of the Agent </label> </div>
+      <div>
+        <mat-select required [(ngModel)]="selectedVersion" name="selectedVersion" class="form-control" placeholder="Select Version"
+          (ngModelChange)="versionOnChange(selectedVersion, btnValue)" style="width:150px;">
+          <mat-option *ngFor="let key of versionList" value="{{key}}">{{key}}</mat-option>
+          </mat-select>
+      </div>
+      <div> <label class="mainText"> Tool </label> </div>
+      <div>
+        <mat-select required [(ngModel)]="selectedTool" name="selectedTool" class="form-control" placeholder="Select Tool" (ngModelChange)="getAgentConfig(selectedVersion, selectedTool)"
+          style="width:150px;" [disabled]="btnValue == 'Update'">
+          <mat-option *ngFor=" let tool of toolsArr | keyvalue" value="{{tool.value}}">{{tool.value}}</mat-option>
+          </mat-select>
+      </div>
+    </div>
+    <div style="display: flex; justify-content: center; align-items: center">
+      <div class="loading-indicator">
+        <mat-progress-spinner [diameter]="100" *ngIf="showThrobber" color="primary" mode="indeterminate">
+        </mat-progress-spinner>
+      </div>
+    </div>
+
+
+    <div class="agentConfigTable" layout layout-align="start center" *ngFor="let configData of getAgentConfigItems('object')">
+      <table class="mat-elevation-z8 mat-table dynamic-table">
+        <thead>
+          <tr class="mat-header-row" layout-align="start start">
+            <th colspan="3" class="dynamicTableHeaderCss mat-header-cell" style="height:40px;border-radius: 10px 10px 0 0;">
+              <span class="mainHeaderText">{{configAbbr[configData.key]}}</span>
+            </th>
+          </tr>
+        </thead>
+        <tbody layout layout-wrap layout-margin layout-padding>
+          <tbody class="dynamic-table-body" layout layout-wrap layout-margin layout-padding>
+            <tr flex="30" layout layout-align="start start" class="mat-row-dynamic" *ngFor="let configDataChild of configData.children"
+              style="display: inline-table;">
+              <td class="mat-cell-header">
+                <span>{{configDataChild.key}}</span>
+              </td>
+              <td class="mat-cell-value">
+                <input class="inputBoxCont" [(ngModel)]="configDataChild.value" name="{{configDataChild.key}}">
+              </td>
+              </tr>
+          </tbody>
+      </table>
+    </div>
+    <div class="others" layout layout-align="start center" *ngIf="showConfig">
+      <table class="mat-elevation-z8 mat-table dynamic-table">
+        <thead>
+          <tr class="mat-header-row" layout-align="start start">
+            <th colspan="3" class="dynamicTableHeaderCss mat-header-cell" style="height:40px;border-radius: 10px 10px 0 0;">
+              <span class="mainHeaderText">Others</span>
+            </th>
+          </tr>
+        </thead>
+        <tbody class="dynamic-table-body" layout layout-wrap layout-margin layout-padding>
+          <tr layout layout-align="start start" class="mat-row-dynamic" *ngFor="let configData of getAgentConfigItems('all')" style="display: inline-table;">
+            <td class="mat-cell-header">
+              <span>{{configData.key}}</span>
+            </td>
+            <td class="mat-cell-value">
+              <input class="inputBoxCont" [(ngModel)]="configData.value" name="{{configData.key}}">
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="others" layout layout-align="start center" *ngIf="showConfig">
+      <table class="mat-elevation-z8 mat-table dynamic-table">
+        <thead>
+          <tr class="mat-header-row" layout-align="start start">
+            <th colspan="3" class="dynamicTableHeaderCss mat-header-cell" style="height:40px;border-radius: 10px 10px 0 0;">
+              <span class="mainHeaderText">Dynamic Data</span>
+            </th>
+          </tr>
+        </thead>
+        <tbody style="width: inherit;">
+          <tr flex="30" layout layout-align="start start" class="mat-row-dynamic-data" style="display: inline-table;" *ngFor="let configData of getAgentConfigItems('dynamicTemplate')">
+            <td class="mat-cell-value-dynamic-data">
+              <textarea [(ngModel)]="configData.value" name="{{configData.value}}" rows="5" class="frmTxtarea"></textarea>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="others" layout layout-align="start center" *ngIf="showConfig && showTrackingJsonUploadButton ">
+      <table class="mat-elevation-z8 mat-table dynamic-table">
+        <thead>
+          <tr class="mat-header-row" layout-align="start start">
+            <th colspan="3" class="dynamicTableHeaderCss mat-header-cell" style="height:40px;border-radius: 10px 10px 0 0;">
+              <span class="mainHeaderText">Upload Tracking File</span>
+            </th>
+          </tr>
+        </thead>
+        <tbody style="width:inherit;">
+          <tr layout layout-align="start start" class="mat-row-upload-data" style="display: inline-block;">
+            <td class="mat-cell-value-dynamic-data">
+              <span class="upload-main-text">If you are migrating previous version of agents, please upload the
+                tracking.json file of <b> {{selectedTool}} </b>
+                Agent </span>
+            </td>
+          </tr>
+          <tr layout layout-align="start start" class="mat-row-upload-data" style="display: inline-block;">
+            <td class="mat-cell-header-single">
+              <span>Select a file to Upload:</span>
+            </td>
+            <td class="mat-cell-value-single">
+              <input #fileInput class="input-file" type="file" accept=".json" />
+            </td>
+          </tr>
+          <tr layout layout-align="start start" class="mat-row-icon-button" style="float: right;">
+            <button class="configureButIcon" mat-icon-button (click)="uploadFile()">
+              <mat-icon style="font-size: 50px;" title="Upload File " class="mat-icon material-icons">
+                cloud_upload
+              </mat-icon>
+            </button>
+            <button class="configureButIcon" mat-icon-button (click)="cancelFileUpload()">
+              <mat-icon style="font-size: 50px;" title="Cancel Upload " class="mat-icon material-icons">
+                cancel
+              </mat-icon>
+            </button>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+
+    <div style="margin-bottom: 15px;margin-top: 30px">
+      <button mat-raised-button (click)="saveData(btnValue)" [disabled]="frmagentconfig.invalid" class="configureBut" style="width:150px;">
+        {{btnValue | uppercase }}
+      </button>
+      <button mat-raised-button (click)="cancelChange(btnValue)" [disabled]="frmagentconfig.invalid" class="configureBut" style="width:150px;padding-left: 10px;padding-right: 10px;">
+        CANCEL
+      </button>
+      <br>
+    </div>
+    <br>
+  </form>
+
+</div>

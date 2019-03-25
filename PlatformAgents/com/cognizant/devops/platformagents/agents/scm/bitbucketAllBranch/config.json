@@ -56,6 +56,8 @@
 	    }
 	  }
   },
+  "agentId": "",
+  
   "toolCategory" : "SCM",
   "enableDataValidation": true,
   "runSchedule": 30,
@@ -74,6 +76,7 @@
   "isEpochTimeFormat" : true,
   "baseEndPoint": "http://127.0.0.1:7990/rest/api/1.0/projects/",
   "isDebugAllowed" : false,
+  
   "loggingSetting" : {
         "logLevel" : "WARN",
 		"maxBytes" : 5000000,

@@ -56,6 +56,7 @@
 	    }
 	  }
   },
+  "agentId" : "",
   "toolCategory" : "SCM",
   "runSchedule": 30,
   "toolsTimeZone" : "GMT",
@@ -73,6 +74,7 @@
   "timeStampField":"createdTime",
   "timeStampFormat":"%Y-%m-%dT%H:%M:%S",
   "isEpochTimeFormat" : true,
+  
   "baseEndPoint": "http://127.0.0.1:7990/rest/api/1.0/projects/",
   "isDebugAllowed" : false,
   "loggingSetting" : {

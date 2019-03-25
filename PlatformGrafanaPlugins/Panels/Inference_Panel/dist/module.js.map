@@ -1,0 +1,1 @@
+{"version":3,"sources":["../src/module.js"],"names":["InferenceCtrl"],"mappings":";;;;;;;;AAAQA,mB,kBAAAA,a;;;2BAGNA,a","file":"module.js","sourcesContent":["import {InferenceCtrl} from './inferenceCtrl';\r\n\r\nexport {\r\n  InferenceCtrl as PanelCtrl\r\n};\r\n"]}

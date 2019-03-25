@@ -18,7 +18,7 @@ Created on 12 April 2017
 
 @author: 446620
 '''
-from com.cognizant.devops.platformagents.core.BaseAgent import BaseAgent
+from ....core.BaseAgent import BaseAgent
 
 class CITFSAgent(BaseAgent):
     def process(self):

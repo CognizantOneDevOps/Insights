@@ -25,6 +25,7 @@
   	  "responseTemplate": {
   	  }
   },
+  "agentId" : "" ,
   "toolCategory" : "ARTIFACTMANAGEMENT",
   "enableValueArray": false,
   "enableDataValidation": true,
@@ -39,6 +40,7 @@
    "toolsTimeZone" : "Asia/Kolkata",
   "insightsTimeZone" : "Asia/Kolkata",
   "isEpochTimeFormat" : false,
+  
   "isDebugAllowed" : false,
   "firstEndPoint": "http://127.0.0.1:9005/nexus/service/local/lucene/search?g=com*",
     	"loggingSetting" : {

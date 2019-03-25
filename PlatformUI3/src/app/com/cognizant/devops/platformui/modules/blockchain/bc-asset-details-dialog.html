@@ -1,0 +1,285 @@
+<!--
+ *********************************************************************************
+ * Copyright 2019 Cognizant Technology Solutions
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License.  You may obtain a copy
+ * of the License at
+ * 
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ *******************************************************************************
+-->
+<div style="overflow: auto;">
+<div class="titleStyle">
+    <ul>
+        <li style="background-color: #FF8F1C;">Asset ID - {{assetID}}</li>
+        <li (click)="closeAssetDetailsDialog()" style="background-color: #FF8F1C;">
+            <mat-icon svgIcon="close_dialog" [ngStyle]="{'width': '20px', 'height': '20px','padding-right':'24px'}">
+            </mat-icon>
+        </li>
+    </ul>
+</div>
+
+<!-- Displays Progress spinner until we get server response to display result-->
+
+<div *ngIf="displayProgressBar" class="progressBarStyle">
+     <mat-progress-spinner color="primary" mode="indeterminate" [diameter]="100">
+    </mat-progress-spinner> 
+</div>
+
+<div class="scrollData" [hidden]="displayProgressBar">
+    <div class="rowContainer">
+        <div class="leftAlignStyle" *ngIf="!pipeline">
+            <mat-form-field class="inputAssetIdStyle">
+                <input matInput [(ngModel)]="searchInput" (keyup)="applyAssetDetailsFilter()" placeholder="Search for an Asset">
+            </mat-form-field>
+        </div>
+        <div layout layout-align="right" class="rightAlignStyle">
+                <a style="padding-right: 10px;">
+                    <mat-icon svgIcon="view_pipe_line" [ngStyle]="{height: '45px', width: '35px'}" matTooltip="Pipeline View" matTooltipPosition="above"
+                            (click)="workflow()">
+                    </mat-icon>
+                </a>
+            <a>
+                <mat-icon svgIcon="export_to_pdf_icon" [ngStyle]="{height: '45px', width: '35px'}" matTooltip="Export to Pdf" matTooltipPosition="above"
+                    (click)="exportToPdf()">
+                </mat-icon>
+            </a>
+        </div>
+    </div>
+
+  <div class="hide" [class.block]="!pipeline">
+    <table mat-table [dataSource]="assetHistoryDataSource" multiTemplateDataRows matSort>
+        <!-- Expand/Collapse Column -->
+        <ng-container matColumnDef="select">
+            <th mat-header-cell *matHeaderCellDef class="tableHeaderCss">
+            </th>
+            <td mat-cell *matCellDef="let row;" style="width:30px !important">
+                <a>
+                    <mat-icon svgIcon="{{expandedElement === row? 'minus_icon' : 'plus_icon' }}" [ngStyle]="{height: '20px', width: '20px'}"
+                        (click)="expandedElement = expandedElement === row ? null : row;">
+                    </mat-icon>
+                </a>
+            </td>
+        </ng-container>
+
+        <!-- Asset ID Column -->
+        <ng-container matColumnDef="assetID">
+            <th mat-header-cell *matHeaderCellDef class="tableHeaderCss" mat-sort-header>Asset ID</th>
+            <td mat-cell *matCellDef="let element"> {{element.assetID}} </td>
+        </ng-container>
+
+        <!-- Phase Column -->
+        <ng-container matColumnDef="phase">
+            <th mat-header-cell *matHeaderCellDef class="tableHeaderCss" mat-sort-header>Phase</th>
+            <td mat-cell *matCellDef="let element"> {{element.phase}} </td>
+        </ng-container>
+
+
+        <!-- Status Column -->
+        <ng-container matColumnDef="toolstatus">
+            <th mat-header-cell *matHeaderCellDef class="tableHeaderCss" mat-sort-header> Status </th>
+            <td mat-cell *matCellDef="let element"> {{element.toolstatus}} </td>
+        </ng-container>
+
+        <!-- Tool Column -->
+        <ng-container matColumnDef="toolName">
+            <th mat-header-cell *matHeaderCellDef class="tableHeaderCss" mat-sort-header> Tool </th>
+            <td mat-cell *matCellDef="let element"> {{element.toolName}} </td>
+        </ng-container>
+
+        <!-- Owner Column -->
+        <ng-container matColumnDef="author">
+            <th mat-header-cell *matHeaderCellDef class="tableHeaderCss" mat-sort-header> Owner </th>
+            <td mat-cell *matCellDef="let element"> {{element.author}} </td>
+        </ng-container>
+
+        <!-- Time Stamp Column -->
+        <ng-container matColumnDef="timestamp">
+            <th mat-header-cell *matHeaderCellDef class="tableHeaderCss" mat-sort-header>Time Stamp</th>
+            <td mat-cell *matCellDef="let element"> {{element.timestamp}} </td>
+        </ng-container>
+
+        <!-- Expanded Content Column - The detail row is made up of this one column that spans across all columns -->
+        <ng-container matColumnDef="expandedDetail">
+            <td mat-cell *matCellDef="let element" [attr.colspan]="displayedColumns.length">
+                <div class="asset-details-element-detail" [@detailExpand]="element == expandedElement ? 'expanded' : 'collapsed'"
+                      [style.height]="element.expanded ? 'unset' : '0 !important'">
+                    <div *ngFor="let column of expandObjects[0]">
+                      <div class="asset-details-element-description">
+                        <!-- <div [innerHTML]="getLevel2Properties(column, element)"></div> -->
+                        <dt class="dt">{{column.key}}</dt>
+                        <dd class="dd" *ngIf="column.value?.toString()?.startsWith('http')"> : <span><a href="{{column.value?.toString()}}">{{column.value}}</a></span></dd>
+                        <dd *ngIf="!column.value?.toString()?.startsWith('http')" class="dd"> : {{column.value}}</dd>
+                      </div><br/>
+                    </div>
+                </div>
+            </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let element; columns: displayedColumns;let i = dataIndex;" (click)="clickRow(i,element.TxID);" class="asset-details-element-row" [class.asset-details-expanded-row]="expandedElement === element">
+        </tr>
+        <tr mat-row *matRowDef="let row; columns: ['expandedDetail'];let i = dataIndex;" class="asset-details-detail-row"></tr>
+    </table>
+    <mat-paginator #paginator [pageSize]="MAX_ROWS_PER_TABLE" showFirstLastButtons class="paginationStyle"></mat-paginator>
+  </div>
+
+<div  class="hide" [class.block]="list?.length > 0 && pipeline">
+    <div class="PWGx-PipelineGraph" style="position: relative; overflow: auto;">
+      <svg  [attr.width.px]="(253.75 + ((list.length) * 120))" [attr.height.px]="125 + (pipeheight * 70) + 300">
+    
+        <g transform="translate(40,55)" class="PWGx-pipeline-node" *ngIf="list[0]?.child?.length >= 2">
+          <circle r="7" class="PWGx-pipeline-node-terminal"></circle>
+          <circle r="19" class="PWGx-pipeline-node-hittarget" fill-opacity="0" stroke="none"></circle>
+        </g>
+        <g transform="translate(60,55)" class="PWGx-pipeline-node" *ngIf="list?.length == 1 && list[0]?.child?.length == 1">
+          <circle r="7" class="PWGx-pipeline-node-terminal"></circle>
+          <circle r="19" class="PWGx-pipeline-node-hittarget" fill-opacity="0" stroke="none"></circle>
+        </g>
+
+        <g transform="translate(60,55)" class="PWGx-pipeline-node" *ngIf="list?.length > 1 && list[0]?.child?.length == 1">
+            <circle r="7" class="PWGx-pipeline-node-terminal"></circle>
+            <circle r="19" class="PWGx-pipeline-node-hittarget" fill-opacity="0" stroke="none"></circle>
+          </g>
+    
+        <!-- end -->
+        <g [attr.transform]="'translate(' + (253.75 + ((list.length-1) * 120)) + ',55)'" class="PWGx-pipeline-node">
+          <circle r="7" class="PWGx-pipeline-node-terminal"></circle>
+          <circle r="19" class="PWGx-pipeline-node-hittarget" fill-opacity="0" stroke="none"></circle>
+        </g>
+    
+        <!-- first lines -->
+        <line class="PWGx-pipeline-connector" *ngFor="let item of list; let i = index" stroke-width="3.5" x1="65.25" y1="55"
+          x2="133.75" y2="55"></line>
+        <!-- lines -->
+        <g *ngFor="let item of list; let i = index">
+          <line class="PWGx-pipeline-connector" stroke-width="3.5" [attr.x1]="154.25 + ((i)*120)" y1="55"
+            [attr.x2]="253.75 + ((i)*120)" y2="55"></line>
+          <!-- left paths -->
+          <path class="PWGx-pipeline-connector"
+            *ngFor="let item of item?.child | slice:1:item?.child?.length; let j = index;" stroke-width="3.5"
+            [attr.d]="'M ' + (154.25 + ((i-1)*120)) + ' 55 l 49.75 0 c 12 0 12 12 12 12 l 0  ' + (46 + (j*70)) +' c 0 12 12 12 12 12 l 25.75 0'"
+            fill="none"></path>
+          <!-- right paths -->
+          <path class="PWGx-pipeline-connector"
+            *ngFor="let item of item?.child | slice:1:item?.child?.length; let j = index;" stroke-width="3.5"
+            [attr.d]="'M ' + (154.75 + ((i)*120)) + ' '+ (125 + (j*70))  +' l 25.75 0 c 12 0 12 -12 12 -12 l 0  ' + (-46 - (j*70)) +' c 0 -12 12 -12 12 -12 l 49.75 0'"
+            fill="none"></path>
+        </g>
+    
+        <!-- points -->
+        <g *ngFor="let item of list; let i = index">
+          <!-- top points -->
+          <g [attr.transform]="'translate(' + (144 + (i*120)) + ', 55)'" class="PWGx-pipeline-node"
+            (mouseenter)="eventGet(i)" > <!--(mouseout)="eventLeave()"-->
+            <a xlink:href="#0" class="second_popup" data-toggle="modal" data-target="#myModal2">
+              <g class="PWGx-svgResultStatusSolid">
+                <circle cx="0" cy="0" r="12" class="halo" stroke-width="3.5"></circle>
+                <circle cx="0" cy="0" r="12" class="statusColor circle-bg success"></circle>
+                <g class="PWGx-result-status-glyph">
+                  <polygon points="-2.00 2.80 -4.80 0.00 -5.73 0.933 -2.00 4.67 6.00 -3.33 5.07 -4.27"></polygon>
+                </g>
+              </g>
+              <g class="PWGx-svgResultStatusSolid" *ngIf="item?.child[0]?.point?.toolstatus == 'FAILURE'">
+                <circle cx="0" cy="0" r="12" class="halo" stroke-width="3.5"></circle>
+                <circle cx="0" cy="0" r="12" class="statusColor circle-bg failure"></circle>
+                <g class="PWGx-result-status-glyph">
+                  <polygon
+                    points="4.67 -3.73 3.73 -4.67 0 -0.94 -3.73 -4.67 -4.67 -3.73 -0.94 0 -4.67 3.73 -3.73 4.67 0 0.94 3.73 4.67 4.67 3.73 0.94 0">
+                  </polygon>
+                </g>
+              </g>
+              <title style="white-space: pre-wrap">
+                {{item.child[0].point.toolstatus}}
+              </title>
+    
+              <circle r="19" class="PWGx-pipeline-node-hittarget" fill-opacity="0" stroke="none" cursor="pointer"></circle>
+            </a> </g>
+    
+          <!-- child points -->
+          <g [attr.transform]="'translate(' + (144 + (i*120)) + ',' + (125 + (j * 70)) + ')'"
+            *ngFor="let item of item?.child | slice:1:item?.child?.length; let j = index;" class="PWGx-pipeline-node"
+            (mouseenter)="eventGet(i+'-'+j)">
+            <!-- (mouseout)="eventLeave()"> -->
+            <g class="PWGx-svgResultStatusSolid" (mouseleave)="eventLeave()">
+              <circle cx="0" cy="0" r="12" class="halo" stroke-width="3.5"></circle>
+              <circle cx="0" cy="0" r="12" class="statusColor circle-bg success"></circle>
+              <g class="PWGx-result-status-glyph">
+                <polygon points="-2.00 2.80 -4.80 0.00 -5.73 0.933 -2.00 4.67 6.00 -3.33 5.07 -4.27"></polygon>
+              </g>
+            </g>
+            <g class="PWGx-svgResultStatusSolid" *ngIf="item?.point?.toolstatus == 'FAILURE'" (mouseleave)="eventLeave()">
+              <circle cx="0" cy="0" r="12" class="halo" stroke-width="3.5"></circle>
+              <circle cx="0" cy="0" r="12" class="statusColor circle-bg failure"></circle>
+              <g class="PWGx-result-status-glyph">
+                <polygon
+                  points="4.67 -3.73 3.73 -4.67 0 -0.94 -3.73 -4.67 -4.67 -3.73 -0.94 0 -4.67 3.73 -3.73 4.67 0 0.94 3.73 4.67 4.67 3.73 0.94 0">
+                </polygon>
+              </g>
+            </g>
+            <title>
+              {{item?.point?.toolstatus}}
+            </title>
+            <circle r="19" class="PWGx-pipeline-node-hittarget" fill-opacity="0" stroke="none" cursor="pointer"></circle>
+          </g>
+        </g>
+    
+      </svg>
+      <!-- <div class="TruncatingLabel PWGx-pipeline-big-label" title="Start" style="overflow: hidden; overflow-wrap: break-word; position: absolute; width: 113px; max-height: 35px; text-align: center; margin-left: -57px; top: 15px; left: 60px;">Start</div> -->
+    
+      <!-- point names -->
+      <div *ngFor="let item of list; let i = index">
+          <div class="TruncatingLabel PWGx-pipeline-big-label" [title]="item?.point" class="letter-fix"
+            [ngStyle]="{'left': (144 + (i*120)) + 'px'}">{{item.point}}</div>
+          <div *ngFor="let ite of item?.child; let j = index" class="TruncatingLabel PWGx-pipeline-small-label"
+            [title]="ite.point"
+            style="overflow-wrap: break-word; top: 70px; left: 219px; position: absolute; width: 89px; max-height: 39px; text-align: center;"
+            [style.top]="(70 * (j+1)) + 'px'" [style.left]="(94 + (i*120)) + 'px'">{{ite.point.toolstatus}}</div>
+          <!-- <div class="TruncatingLabel PWGx-pipeline-big-label" title="End" style="overflow: hidden; overflow-wrap: break-word; position: absolute; width: 113px; max-height: 35px; text-align: center; margin-left: -57px; top: 15px; left: 948px;">End</div> -->
+        </div>
+    
+      <!--Modal-->
+      <div *ngFor="let item of list; let i = index">
+        <div *ngIf="showModel == i" class="TruncatingLabel model-position PWGx-pipeline-big-label" [title]="item?.point"
+          [ngStyle]="{'left': (144 + (i*120)) + 'px'}">
+          <div [style.top]="(70 * (j+1)) + 'px'" [style.left]="(94 + (i*120)) + 'px'">
+            <div class="dialog-model">
+              <h4>Asset Details <span (click)="showModel = null">x</span></h4>
+              <div class="body-content">
+                  <pre [innerHTML]="item?.child[0]?.point | assetPipe "></pre>
+              </div>
+            </div>
+          </div>
+        </div>
+    
+        <div *ngFor="let ite of item?.child | slice:1:item?.child?.length; let j = index">
+          <div *ngIf="showModel == (i+'-'+j)" class="TruncatingLabel model-position PWGx-pipeline-small-label modal-view"
+            [title]="ite.point" [style.top]="(70 * (j+1)) + 'px'" [style.left]="(94 + (i*120)) + 'px'">
+            {{ite.point.toolstatus}}
+            <div [style.top]="(70 * (j+1)) + 'px'" [style.left]="(94 + (i*120)) + 'px'">
+              <div class="dialog-model">
+                <h4>Asset Details <span (click)="showModel = null">x</span></h4>
+                <div class="body-content">
+                  <pre [innerHTML]="ite?.point | assetPipe "></pre>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- <div class="TruncatingLabel PWGx-pipeline-big-label" title="End" style="overflow: hidden; overflow-wrap: break-word; position: absolute; width: 113px; max-height: 35px; text-align: center; margin-left: -57px; top: 15px; left: 948px;">End</div> -->
+        </div>
+        </div>
+    
+
+
+</div>
+</div>
+</div>
+</div>
+

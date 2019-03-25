@@ -35,6 +35,7 @@
 		"buildStartedTime": "%Y-%m-%dT%H:%M:%S.%f-%j:%U"
 		} 
 	},
+	"agentId" : "",
 	"enableAllBranches":false,
 	"toolCategory": "CI",
 	"auth": "base64",

@@ -21,7 +21,7 @@ Created on Jun 18, 2018
 
 
 from dateutil import parser
-from com.cognizant.devops.platformagents.core.BaseAgent import BaseAgent
+from ....core.BaseAgent import BaseAgent
 import json
 import datetime
 import time

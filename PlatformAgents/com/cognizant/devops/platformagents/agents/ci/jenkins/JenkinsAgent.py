@@ -23,7 +23,7 @@ from dateutil import parser
 import requests
 import xml.etree.ElementTree as ET
 from requests.auth import HTTPBasicAuth
-from com.cognizant.devops.platformagents.core.BaseAgent import BaseAgent
+from ....core.BaseAgent import BaseAgent
 
 class JenkinsAgent(BaseAgent):
     def process(self):

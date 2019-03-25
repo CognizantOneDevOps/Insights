@@ -21,7 +21,9 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.StringTokenizer;
+import java.util.TreeMap;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
@@ -36,6 +38,7 @@ import com.cognizant.devops.platformcommons.dal.neo4j.Neo4jFieldIndexRegistry;
 import com.cognizant.devops.platformcommons.dal.neo4j.NodeData;
 import com.cognizant.devops.platformengine.message.core.AgentDataConstants;
 import com.cognizant.devops.platformengine.message.factory.EngineSubscriberResponseHandler;
+import com.cognizant.devops.platformengine.modules.aggregator.BusinessMappingData;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -54,21 +57,32 @@ public class AgentDataSubscriber extends EngineSubscriberResponseHandler{
 	private String uniqueKey;
 	private String category;
 	private String toolName;
+	List<BusinessMappingData> businessMappingList = new ArrayList<BusinessMappingData>(0);
 	
-	public AgentDataSubscriber(String routingKey, boolean dataUpdateSupported, String uniqueKey, String category, String toolName) throws Exception {
+	public AgentDataSubscriber(String routingKey, boolean dataUpdateSupported, String uniqueKey, String category,
+			String toolName, List<BusinessMappingData> businessMappingList) throws Exception {
 		super(routingKey);
 		this.dataUpdateSupported = dataUpdateSupported;
 		this.uniqueKey = uniqueKey;
 		this.category = category;
-		this.toolName = toolName.toUpperCase();
+		this.toolName = toolName;
+		this.businessMappingList = businessMappingList;
+	}
+	
+	public void setMappingData(List<BusinessMappingData> businessMappingList) {
+		this.businessMappingList = businessMappingList;
 	}
 
+	@Override
 	public void handleDelivery(String consumerTag, Envelope envelope, BasicProperties properties, byte[] body) throws IOException{
 		ApplicationConfigProvider.performSystemCheck();
 		boolean enableOnlineDatatagging = ApplicationConfigProvider.getInstance().isEnableOnlineDatatagging();
 		Neo4jDBHandler dbHandler = new Neo4jDBHandler();
 		String message = new String(body, MessageConstants.MESSAGE_ENCODING);
+		log.warn(" Received message ==== " + message);
 		String routingKey = envelope.getRoutingKey();
+		// routingKey = routingKey.replaceAll("_", ".");
+		log.debug("Routing key in data " + routingKey);
 		List<String> labels = new ArrayList<String>();
 		labels.add("RAW");
 		labels.addAll(Arrays.asList(routingKey.split(MessageConstants.ROUTING_KEY_SEPERATOR)));
@@ -109,25 +123,18 @@ public class AgentDataSubscriber extends EngineSubscriberResponseHandler{
 				}
 			}
 		}
-		Map<String,Map<String,NodeData>> metaDataMap=new HashMap<String,Map<String,NodeData>>();
-		Gson gson = new Gson();
-		if(enableOnlineDatatagging){
-			metaDataMap= getMetaData(dbHandler);
-		}
 		
 		if(json.isJsonArray()){
 			JsonArray asJsonArray = json.getAsJsonArray();
 			for(JsonElement e : asJsonArray){
 				if(e.isJsonObject()){
 					if(enableOnlineDatatagging){
-						NodeData nodeData = applyDataTagging(e.getAsJsonObject(),metaDataMap);
+						// NodeData nodeData = applyDataTagging(e.getAsJsonObject(),metaDataMap);
 
-						if(nodeData != null){
-							String nodeJsonStr = gson.toJson(nodeData.getPropertyMap());
-							JsonObject finalJson = mergeProperty(e,nodeJsonStr);
-							finalJson.remove("uuid"); 
-							dataList.add(finalJson);
+						JsonObject jsonWithLabel = applyDataTagging(e.getAsJsonObject());
 
+						if (jsonWithLabel != null) {
+							dataList.add(jsonWithLabel);// finalJson
 						} else {
 							dataList.add(e.getAsJsonObject());
 						}
@@ -151,12 +158,12 @@ public class AgentDataSubscriber extends EngineSubscriberResponseHandler{
 				}else{
 					cypherQuery = "UNWIND {props} AS properties CREATE (n"+queryLabel+") set n=properties return count(n)";
 				}
+
 				List<List<JsonObject>> partitionList = partitionList(dataList, 1000);
 				for(List<JsonObject> chunk : partitionList){
 					JsonObject graphResponse = dbHandler.bulkCreateNodes(chunk, labels, cypherQuery);
 					if(graphResponse.get("response").getAsJsonObject().get("errors").getAsJsonArray().size() > 0){
 						log.error("Unable to insert nodes for routing key: "+routingKey+", error occured: "+graphResponse);
-						//log.error(chunk);
 					}
 				}
 				getChannel().basicAck(envelope.getDeliveryTag(), false);
@@ -179,34 +186,62 @@ public class AgentDataSubscriber extends EngineSubscriberResponseHandler{
 		return finalJson;
 	}
 
+	private JsonObject applyDataTagging(JsonObject asJsonObject) {
 
-	private  NodeData applyDataTagging(JsonObject asJsonObject, Map<String, Map<String, NodeData>> metaDataMap) {
-
-		NodeData nodeData = null ;
-		StringBuilder sb=null;
-
-		for (String key : metaDataMap.keySet()){
-			StringTokenizer token = new StringTokenizer(key,AgentDataConstants.COLON);
-			sb= new StringBuilder();
-
-			while (token.hasMoreElements()) {
-				String agentJsonkey=token.nextElement().toString();
-
-				if(asJsonObject.has(agentJsonkey)){
-					sb.append(asJsonObject.get(agentJsonkey).getAsString());
-					sb.append(AgentDataConstants.COLON);
+		List<String> selectedBusinessMappingArray = new ArrayList<String>(0);
+		Map<String, String> labelMappingMap = new TreeMap<String, String>();
+			for (BusinessMappingData businessMappingData : businessMappingList) {
+				Map<String, String> map = businessMappingData.getPropertyMap();
+			int totalCount = businessMappingData.getPropertyMap().size();
+			int matchLabelcount = 0;
+				for (Entry<String, String> mapValue : map.entrySet()) {
+					if (asJsonObject.has(mapValue.getKey())) {
+						String jsonValue = asJsonObject.get(mapValue.getKey()).getAsString();
+						if (jsonValue.equalsIgnoreCase(mapValue.getValue())) {
+						matchLabelcount++;
+						}
+					}
 				}
-			}  
-
-			Map<String ,NodeData> innerMap = metaDataMap.get(key);
-
-			String innerKey=StringUtils.stripEnd(sb.toString(),AgentDataConstants.COLON);
-			if(innerMap.containsKey(innerKey)){
-
-				nodeData = innerMap.get(innerKey);
+			if (totalCount == matchLabelcount) {
+				selectedBusinessMappingArray.add(businessMappingData.getBusinessMappingLabel());
 			}
+			}
+
+		// selectedBusinessMappingArray.forEach(arg0 -> log.info(" arg0 " + arg0));
+		// ;
+
+		if (!selectedBusinessMappingArray.isEmpty()) {
+			for (int i = 0; i < selectedBusinessMappingArray.size(); i++) {
+				StringTokenizer sk = new StringTokenizer(selectedBusinessMappingArray.get(i), ":");
+				int level = 0;
+				while (sk.hasMoreTokens()) {
+					String token = sk.nextToken();
+					level++;
+					String key = "orgLevel_" + level;
+					// log.debug(" apply label set Array " + token + " " + level + " " + key);
+					if (!labelMappingMap.containsKey(key)) {
+						labelMappingMap.put(key, token);
+					} else {
+						if (!labelMappingMap.get(key).contains(token)) {
+							labelMappingMap.put(key, labelMappingMap.get(key).concat("," + token));
+						}
+					}
+				}
+			}
+			JsonParser jsonParser = new JsonParser();
+			Gson gson = new Gson();
+			for (Entry<String, String> entry : labelMappingMap.entrySet()) {
+				// log.debug("Business Mapping label info " + entry);
+				List<String> items = Arrays.asList(entry.getValue().split("\\s*,\\s*"));
+				JsonArray jsonArray = (JsonArray) jsonParser.parse(items.toString());// entry.getValue()
+				// jsonArray.("aa");
+				// log.info(" jsonArray " + jsonArray);
+
+				asJsonObject.add(entry.getKey(), jsonArray); // .getAsJsonPrimitive()
+			}
+			// log.info(" asJsonObject ====== " + asJsonObject);
 		}
-		return nodeData;
+		return asJsonObject;
 	}
 
 	private  Map<String, Map<String, NodeData>> getMetaData(Neo4jDBHandler dbHandler) {
@@ -268,9 +303,6 @@ public class AgentDataSubscriber extends EngineSubscriberResponseHandler{
 	    List<List<T>> parts = new ArrayList<List<T>>();
 	    final int N = list.size();
 	    for (int i = 0; i < N; i += size) {
-	       /* parts.add(new ArrayList<T>(
-	            list.subList(i, Math.min(N, i + size)))
-	        );*/
 	    	parts.add(getPartitionSubList(list,i,size,N));                 
 	    }
 	    return parts;

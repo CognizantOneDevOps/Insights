@@ -150,9 +150,9 @@ class AgentDaemonExecutor:
                  agentServiceFileName = h.get('agentServiceFileName')
                  action = h.get('action')
                  #Code for handling subscribed messages
-                 ch.basic_ack(delivery_tag = method.delivery_tag)
                  basePath = self.config.get('baseExtractionPath')
-                 scriptPath = basePath + os.path.sep + agentToolName
+                 scriptPath = basePath + os.path.sep + agentToolName + os.path.sep + agentId
+                 installagentFilePath = os.environ['INSIGHTS_AGENT_HOME'] + os.path.sep + 'AgentDaemon'
                  
                  if (action == "REGISTER" or action == "UPDATE"):
                      f = open(basePath + os.path.sep + pkgFileName, 'wb')
@@ -168,16 +168,24 @@ class AgentDaemonExecutor:
                  Give execution permission and then execute the script. Script should have all steps to handle Agent execution.
                  ''' 
                  if osType == "WINDOWS":
-                     scriptFile = scriptPath + os.path.sep +'installagent.bat'
-                     p = subprocess.Popen([scriptFile,action],cwd=scriptPath,shell=True)
+                     if (action == "START" or action == "STOP"):
+                        p = subprocess.Popen(['net',action,agentId],shell=True)
+                     else:
+                        scriptFile = installagentFilePath + os.path.sep +'installagent.bat'
+                        p = subprocess.Popen([scriptFile,action,agentToolName,agentId],cwd=installagentFilePath,shell=True)
                         
-                 else:   
-                     scriptFile = scriptPath + os.path.sep +'installagent.sh'
-                     p = subprocess.Popen(['chmod 777 '+scriptFile,scriptFile],shell=True)
-                     p = subprocess.Popen(['chmod -R 777 '+scriptFile,scriptFile],shell=True) 
-                     p = subprocess.Popen([scriptFile +' '+osType+' '+action],cwd=scriptPath,shell=True)
-                     #stdout, stderr = p.communicate()
-                     print('Process id - '+ str(p.returncode))
+                 else:
+                     if (action == "START" or action == "STOP"):
+                        p = subprocess.Popen(['service '+agentId+ ' '+action.lower()],shell=True)
+                     else:   
+                         scriptFile = installagentFilePath + os.path.sep +'installagent.sh'
+                         p = subprocess.Popen(['chmod 777 '+scriptFile,scriptFile],shell=True)
+                         p = subprocess.Popen(['chmod -R 777 '+scriptFile,scriptFile],shell=True)
+                         p = subprocess.Popen(['chmod -R 777 '+basePath + os.path.sep + agentToolName,basePath + os.path.sep + agentToolName],shell=True)
+                         p = subprocess.Popen([scriptFile +' '+osType+' '+action+' '+agentToolName+' '+agentId],cwd=installagentFilePath,shell=True)
+                         #stdout, stderr = p.communicate()
+                         print('Process id - '+ str(p.returncode))
+                 ch.basic_ack(delivery_tag = method.delivery_tag)
             except Exception as ex:
                 self.publishDaemonHealthData(self.generateHealthData(ex))
                 #ch.basic_ack(delivery_tag = method.delivery_tag)

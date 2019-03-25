@@ -114,10 +114,11 @@ public class AccessGroupManagement {
 		String cookies = getUserCookies();
 		headers.put("Cookie", cookies);
 
-		//log.debug("Inside getCurrentUserOrgs() - Cookies -- " + cookies);
+		log.debug("Inside getCurrentUserOrgs() - Cookies -- " + cookies);
 
 		String apiUrl = ApplicationConfigProvider.getInstance().getGrafana().getGrafanaEndpoint() + "/api/user/orgs";
 		ClientResponse response = RestHandler.doGet(apiUrl, null, headers);
+		log.debug(" response "+ response);
 		return PlatformServiceUtil
 				.buildSuccessResponseWithData(new JsonParser().parse(response.getEntity(String.class)));
 	}
@@ -145,7 +146,7 @@ public class AccessGroupManagement {
 		return PlatformServiceUtil
 				.buildSuccessResponseWithData(new JsonParser().parse(response.getEntity(String.class)));
 	}
-
+	
 	@RequestMapping(value = "/getGrafanaVersion", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 	public JsonObject getGrafanaVersion() {
 		log.debug("\n\nInside getGrafanaVersion method call");

@@ -33,6 +33,7 @@
 			}
 		}
 	},
+	"agentId": "",
 	"enableBranches" : false,
 	"enableBrancheDeletion" : false,
 	"enableDataValidation": true,	
@@ -46,7 +47,8 @@
 	"timeStampField":"commitTime",
 	"timeStampFormat":"%Y-%m-%dT%H:%M:%SZ",
 	"isEpochTimeFormat" : false,
-	"startFrom" : "2016-10-10 15:46:33",
+	
+	"startFrom" : "2019-03-01 15:46:33",
 	"accessToken": "accesstoken",
 	"getRepos":"https://api.github.com/users/<USER_NAME>/repos",
 	"commitsBaseEndPoint":"https://api.github.com/repos/<REPO_NAME>/",

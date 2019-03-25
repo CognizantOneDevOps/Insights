@@ -1,0 +1,138 @@
+<!--
+*******************************************************************************
+ * Copyright 2019 Cognizant Technology Solutions
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License.  You may obtain a copy
+ * of the License at
+ * 
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ ****************************************************************************** -->
+
+<div class="mainDivContainer" >
+    <div layout layout-align="left" class="titleStyle">
+        <a>Data Dictionary</a>
+    </div>
+    <div class="orangeStripCss"></div>
+    <div layout style="height: 60px;margin-left: 7px;">
+        <div layout="row" style="width: 100%;margin-top: 6px; height: 80%;">
+            <div layout layout-align="end center">
+                <label class="mainText"> Select Tools </label>
+                <mat-select [(ngModel)]="selectedAgent1"  [style.height.px]="20" [style.width.%]="10" (ngModelChange)="loadAgent1Info(selectedAgent1)"
+                name="selectedAgent1" required placeholder="Select Tool 1" [ngClass]="{  'input-disabled' : readChange ,  'form-control': !readChange}">
+                    <mat-option [disabled]="data1 === selectedAgent2" *ngFor="let data1 of agentDataSource" [value]="data1" style="color:#0033A0">
+                    {{data1.toolName}}
+                    </mat-option>
+                </mat-select>
+                <mat-select [(ngModel)]="selectedAgent2"  [style.height.px]="20" [style.width.%]="10" (ngModelChange)="loadAgent1Info2(selectedAgent2)"
+                name="selectedAgent2" required placeholder="Select Tool 2" [ngClass]="{  'input-disabled' : readChange2 ,  'form-control': !readChange2}">
+                    <mat-option [disabled]="data2 === selectedAgent1" *ngFor="let data2 of agentDataSource" [value]="data2" style="color:#0033A0">
+                    {{data2.toolName}}
+                    </mat-option>
+                </mat-select>
+                <div class="divider"></div>
+                <button [disabled]="(noShowDetail||noShowDetail2||!selectedAgent1 || !selectedAgent2||buttonOn) " style="outline:none;" class="searchBtnStyle" (click)="getCorrelation(selectedAgent1,selectedAgent2)">Click to show Correlation</button>
+                <h2 style="font-size:13px;display: inline-block;padding-left: 10px;color: black">(Please select Tool 1 and Tool 2 to see the Correlation)</h2>
+            </div>
+        </div>  
+    </div>  
+    <div >
+        <div class="column1" style="margin-bottom: 1%;margin-left: 7px;border :white;border-radius: 10px;background-color:white;height: 69vh;">
+            <div class="showTable" style="text-align: center; padding: 5px;">
+                    <b>&nbsp; Tool Properties</b>
+            </div>
+            <div style="height:100%;width:100%;overflow:visible;" >
+                <div   style="width:47%;display:inline-block;margin-left:8px ;vertical-align:top;">
+                        <table *ngIf="noShowDetail">
+                                <tr>
+                                    <td colspan="5" style="color:#0033A0;font-size: 18px;text-align: left;padding-top: 10px"><b>{{startToolNullPropertiesMessage}} for selected tool</b></td>
+                                </tr>
+                                <tr>
+                                    <td colspan="5" style="text-align: left;color:#00B140;padding-top: 10px;font-size: 16px;">Label:<b>({{agent1Category}}:{{agent1Tool}})</b></td>
+                                </tr>
+                            </table>
+                    <div *ngIf="showDetail" class="divTablesHeading">
+                        <div ><b style="color:#0033A0;font-size: 18px;">{{agent1Tool}} Properties</b></div>
+                        <div style="color:#00B140;padding-top: 10px"> Label:<b>({{agent1Category}}:{{agent1Tool}})</b></div>
+                    </div>
+                    <table *ngIf="showDetail" style="margin-left: 3%;">
+                        <tbody style="display:grid;max-height:50vh;overflow:auto;">
+                            <tr class="dat-row" *ngFor="let element of agent1TableData">
+                                <td style="text-align:left;padding-left: 15px;padding-top: 8px;align-items: center;">{{element}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                </div>
+                <div   style="width:47%;display:inline-block;margin-left: 10px;vertical-align:top;">
+                    <div *ngIf="showDetail2"  class="divTablesHeading">
+                        <div><b style="color:#0033A0;font-size: 18px;">{{agent2Tool}} Properties</b></div>
+                        <div style="color:#00B140;padding-top:10px;"> Label:<b>({{agent2Category}}:{{agent2Tool}})</b></div>
+                    </div>
+                    <table *ngIf="showDetail2" style="margin-left: 4%;">
+                        <tbody style="display:grid;max-height:50vh;overflow:auto;">
+                            <tr  class="dat-row"  *ngFor="let element of agent2TableData">
+                                <td style="text-align:left;padding-left: 15px;padding-top: 8px;">{{element}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <table *ngIf="noShowDetail2">
+                        <tr>
+                            <td colspan="5" style="color:#0033A0;font-size: 18px;text-align: left;padding-top: 10px"><b>{{endToolNullPropertiesMessage}} for selected tool</b></td>
+                        </tr>
+                        <tr>
+                            <td colspan="5" style="text-align: left;color:#00B140;padding-top: 10px;font-size: 16px;">Label:<b>({{agent2Category}}:{{agent2Tool}})</b></td>
+                        </tr>
+                    </table>
+                </div>
+                
+            </div>
+
+        </div>
+        <div class="column2" style="margin-bottom: 1%;margin-left:10px;margin-right: 7px;border :white;border-radius: 10px;background-color:white;height: 69vh;" >
+            <div  class="showTable" style="text-align: center; padding: 5px;" >
+                <b>&nbsp; Correlation Details</b>
+            </div>
+            <!--<div layout layout-align="center center" *ngIf="!showNoToolsSelectedForCorrelation">
+                <h1 class="dataDictionaryMessages">Please Select Tools To Check Correlations.</h1>
+            </div>-->
+            <div *ngIf="clicked">
+                <div layout layout-align="center center" *ngIf="noShowDetailCorr">
+                    <h1 class="dataDictionaryMessages">No Correlations found between the selected tools:<b style="color:#00B140;">({{agent1Tool}}:{{agent2Tool}})</b></h1>
+                </div>
+                <div *ngIf="showDetail3" style="margin-left:15px;margin-right: 15px">
+                    <div class="divTablesHeading">
+                        <div><b style="color:#0033A0;font-size: 18px;">Realtionship Name:</b></div>
+                        <div style="color:#00B140;padding-top: 10px;"><b>{{corrprop}}</b></div>
+                    </div>
+                    <div>
+                        <div layout layout-align="center center" *ngIf="!relationPropertiesSize">
+                            <h1 class="dataDictionaryMessages">No Relationship Properties Found</h1>
+                        </div>
+                        <table *ngIf="relationPropertiesSize" style="border-spacing:10px;">
+                            <thead >
+                                <tr class="dat-header-row">
+                                <th style="text-align:left;color:#0033A0">Property Name</th>
+                                <th style="text-align:left;color:#0033A0">Property Value</th>
+                                </tr>
+                            </thead>
+                            <tbody style="max-height:50vh;overflow:auto;">
+                                <tr class="dat-row"  *ngFor="let element of corrData | keyvalue">
+                                <td style="text-align:left;padding-left: 15px">{{element.key}}</td>
+                                <td style="text-align:left;padding-left: 15px">{{element.value}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>

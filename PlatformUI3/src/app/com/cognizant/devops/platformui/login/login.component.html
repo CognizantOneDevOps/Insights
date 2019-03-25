@@ -1,0 +1,125 @@
+<!-- 
+ *******************************************************************************
+ * Copyright 2019 Cognizant Technology Solutions
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License.  You may obtain a copy
+ * of the License at
+ * 
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ ******************************************************************************
+ -->
+
+<div class="whiteBackground">
+  <div layout="column" layout-align="center center" class="wfTopAlign">
+
+    <div class="row" flex>
+      <div class="blueStripCss"></div>
+
+      <div class="column textPad">
+        <div>
+          <img mat-card-image align="left" height="67px" width="250px" class="customerLogoImage" [src]="imageSrc" />
+        </div>
+        <div class="topTxtCss">
+          <div layout class="bulletCss"></div>
+          <div layout class="textCss">
+            <p>
+              Leverage real-time
+              <span class="middleTextColr">Dashboards</span> for the
+              <span class="middleTextColr">DevOps Journey</span>
+            </p>
+          </div>
+        </div>
+        <div class="secondLineTxt">
+          <div layout class="bulletCss"></div>
+          <div layout class="textCss">
+            <p>
+              Achieve end-to-end
+              <span class="middleTextColr">Traceability</span> across the
+              <span class="middleTextColr">DevOps Lifecycle</span>
+            </p>
+          </div>
+        </div>
+        <div class="secondLineTxt">
+          <div layout class="bulletCss"></div>
+          <div layout class="textCss">
+            <p>
+              Measure the overall progress of <br>
+              <span class="middleTextColr">DevOps Maturity </span>
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="column-image">
+        <mat-icon svgIcon="verticleLine" [ngStyle]="{height: '285px', width: '1px'}"></mat-icon>
+      </div>
+
+      <div class="column-user rgtPnlCss" layout-align="center center" layout="column">
+
+        <form [formGroup]="loginForm">
+
+          <div class="validCredTextCss" layout>Sign in with valid credentials</div>
+          <div layout="column" style="width: 360px;">
+
+            <mat-icon svgIcon="user-icon-active" class="actvIcoCss" [ngStyle]="{height: '17px', width: '17px'}"></mat-icon>
+            &nbsp;
+            <mat-form-field layout class="md-block containerMargin" [ngClass]="{'wrnTxt': loginForm.controls['username'].errors && !loginForm.controls['username'].pristine}">
+              <input matInput name="username" required placeholder="User Name" class="inputGreyTextCss activeCss" type="text" formControlName="username"
+              />
+            </mat-form-field>
+            <div *ngIf="loginForm.controls['username'].errors && !loginForm.controls['username'].pristine" [ngStyle]="{'width':'190px','padding-left':'35px'}">
+              <div class="wrnTxt">Please enter a valid Username.</div>
+            </div>
+            <br>
+
+            <mat-icon svgIcon="password-icon-active" [ngStyle]="{height: '20px', width: '16px'}"></mat-icon>
+
+            &nbsp;
+            <mat-form-field [ngClass]="{'error': loginForm.controls['password'].errors && !loginForm.controls['password'].pristine}">
+              <input matInput placeholder="Password" type="password" name="password" required class="inputGreyTextCss activeCss" formControlName="password"
+                autocomplete="new-password" />
+            </mat-form-field>
+            <div *ngIf="loginForm.controls['password'].errors && !loginForm.controls['password'].pristine" [ngStyle]="{'width':'190px','padding-left':'35px'}">
+              <div class="wrnTxt" [hidden]="!loginForm.controls['password'].errors.required">Please enter a valid password.
+              </div>
+            </div>
+            <div id="invalidMsg" class="errTxt" ng-if="loginController.isLoginError">
+              {{logMsg}}
+            </div>
+          </div>
+          <mat-card-actions layout="row" class="buttonMar" layout-align="center center">
+            <div flex="60" flex-offset="15" class="logOnBtnAlign">
+              <button mat-button class="md-raised md-primary sigBtnCss" [disabled]="loginForm.invalid" (click)="userAuthentication()">LOG
+                ON</button>
+              <!--  <span ng-show="loginController.showThrobber" style="vertical-align: super;">  
+                <mat-progress-spinner style="display: inline;" diameter="30" mode="indeterminate"></mat-progress-spinner></span> -->
+            </div>
+          </mat-card-actions>
+
+          <mat-icon svgIcon="PoweredBy" layout layout-align="center center" class="powerByImage">
+          </mat-icon>
+          <div *ngIf="showThrobber">
+            <div class="loading-indicator">
+              <mat-progress-spinner [diameter]="50" style="margin:0 auto;" color="primary" mode="indeterminate">
+              </mat-progress-spinner>
+            </div>
+          </div>
+        </form>
+      </div>
+
+    </div>
+    <div class="greenStripDivCss">
+      <div class="greenStripCss"></div>
+    </div>
+    <div class="copyRightDivCss">
+      <div class="copyRightCss">© 2019 Cognizant Technologies Solutions Limited. All rights reserved.</div>
+    </div>
+  </div>
+</div>

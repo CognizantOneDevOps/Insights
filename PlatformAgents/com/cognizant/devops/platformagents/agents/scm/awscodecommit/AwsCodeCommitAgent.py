@@ -21,7 +21,7 @@ Created on Jun 16, 2016
 
 import boto3
 import time
-from com.cognizant.devops.platformagents.core.BaseAgent import BaseAgent
+from ....core.BaseAgent import BaseAgent
 from datetime import datetime, timedelta
 
 

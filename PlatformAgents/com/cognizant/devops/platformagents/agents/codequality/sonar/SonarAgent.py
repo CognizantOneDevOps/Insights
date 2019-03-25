@@ -21,7 +21,7 @@ Created on Jul 1, 2016
 from dateutil import parser
 from datetime import datetime
 from datetime import timedelta
-from com.cognizant.devops.platformagents.core.BaseAgent import BaseAgent
+from ....core.BaseAgent import BaseAgent
 
 class SonarAgent(BaseAgent):
     def process(self):

@@ -48,6 +48,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
+@Deprecated
 @RestController
 @RequestMapping("/admin/hierarchyDetails")
 public class HierarchyDetailsService {
@@ -325,7 +326,7 @@ public class HierarchyDetailsService {
 	}
 
 	// TODO: Need to remove this code once testing is done with the fix
-	private JsonObject getHierarchyObject(JsonElement element) {
+	/*private JsonObject getHierarchyObject(JsonElement element) {
 		JsonArray firstChild = new JsonArray();
 		JsonArray secondChild = new JsonArray();
 		JsonArray thirdChild = new JsonArray();
@@ -374,7 +375,7 @@ public class HierarchyDetailsService {
 			childJson1.add(DatataggingConstants.CHILDREN, firstChild);
 		}
 		return childJson1;
-	}
+	}*/
 
 	@RequestMapping(value = "/getHierarchyProperties", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 	public JsonObject getHierarchyProperties(@RequestParam String level1, @RequestParam String level2,

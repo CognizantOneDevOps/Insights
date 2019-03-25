@@ -30,7 +30,7 @@ public interface AgentManagementService {
 
 	public String uninstallAgent(String agentId, String toolName, String osversion) throws InsightsCustomException;
 
-	public String startStopAgent(String agentId, String action) throws InsightsCustomException;
+	public String startStopAgent(String agentId, String toolName, String osversion, String action) throws InsightsCustomException;
 
 	public String updateAgent(String agentId, String configDetails, String toolName, String agentVersion,
 			String osversion) throws InsightsCustomException;

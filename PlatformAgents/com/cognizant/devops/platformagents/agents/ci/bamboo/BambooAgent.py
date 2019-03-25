@@ -18,7 +18,7 @@ Created on 12 April 2017
 
 @author: 476693
 '''
-from com.cognizant.devops.platformagents.core.BaseAgent import BaseAgent
+from ....core.BaseAgent import BaseAgent
 from datetime import datetime
 class BambooAgent(BaseAgent):
     def process(self):        

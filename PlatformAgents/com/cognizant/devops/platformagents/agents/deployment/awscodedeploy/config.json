@@ -25,6 +25,7 @@
     "responseTemplate": {
      }
   },
+  "agentId" : "",
   "enableDataValidation": true,
   "toolCategory": "DEPLOYMENT",
   "toolsTimeZone": "GMT",
@@ -36,6 +37,7 @@
   "timeStampField": "deploymentTime",
   "timeStampFormat": "%Y-%m-%dT%H:%M:%SZ",
   "isEpochTimeFormat": false,
+  
   "awsAccesskey": "#accesskey",
   "awsSecretkey": "#seccretkey",
   "awsRegion": "#region",

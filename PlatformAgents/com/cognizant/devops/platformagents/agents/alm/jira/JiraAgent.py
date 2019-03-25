@@ -24,7 +24,7 @@ import copy
 
 from dateutil import parser
 
-from com.cognizant.devops.platformagents.core.BaseAgent import BaseAgent
+from ....core.BaseAgent import BaseAgent
 
 
 class JiraAgent(BaseAgent):

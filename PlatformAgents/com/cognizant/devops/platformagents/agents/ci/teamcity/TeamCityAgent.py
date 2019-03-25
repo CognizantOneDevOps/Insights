@@ -19,7 +19,7 @@ Created on 30 March 2017
 @author: 446620
 '''
 import json
-from com.cognizant.devops.platformagents.core.BaseAgent import BaseAgent
+from ....core.BaseAgent import BaseAgent
 
 class TeamCityAgent(BaseAgent):
     def process(self):

@@ -1,0 +1,128 @@
+
+
+
+table {
+    width: 100%;  
+    border: 1px solid #00B140;
+    border-radius: 10px 10px 10px 10px;
+    font-size: 14px;
+    text-align: left;
+    vertical-align: middle;
+}
+.toolsBoxCss{
+    display: block;
+    width: 100%;
+    padding: 6px 12px;
+    font-size: 14px;
+    line-height: 1.42857143;
+    color: #555;
+    background-color: #fff;
+    background-image: none;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    margin-left: 10px;
+}
+.arrange-horizontally {
+    -webkit-box-orient: horizontal;
+    -webkit-box-direction: normal;
+    -webkit-flex-direction: row;
+    flex-direction: row;
+    box-sizing: border-box;
+    display: -webkit-box;
+    display: -webkit-flex;
+    height: 40px;
+    margin-left: 7px;
+    margin-bottom: 20px;
+}
+.labelInfo{
+    font-size:13px;
+    padding-left: 10px;
+    color: black
+  }
+
+.mainText{
+    font-size: 15px;
+    color:  #00b140;
+    font-weight:bold;
+    vertical-align:middle;
+    width: 10%;
+    padding-left: 5px;
+    padding-top: 8px;
+}
+th:first-child { border-radius: 10px 0 0 0; }
+th:last-child { border-radius: 0 10px 0 0; }
+
+tr:last-child td:first-child { border-radius: 0 0 0 10px; }
+tr:last-child td:last-child { border-radius: 0 0 10px 0; }
+
+tr:nth-child(odd) td {
+  background-color: #ffffff;
+}
+
+tr:nth-child(even) td {
+  background-color: #E1E3E7;
+}
+
+.mat-table {  
+    font-size: 14px;
+    text-align: left;
+    vertical-align: middle;
+}
+
+tr.mat-footer-row, tr.mat-row {
+    height: 40px !important;
+    font-size: 14px;
+    text-align: left !important;
+    vertical-align: middle;
+}
+
+.backToTopButtonStyle {    
+    color: #FF8F1C;
+    background-color: white !important;
+    font-size: 15px;
+    font-weight: bold;
+    border: 1px solid #FF8F1C;
+    border-radius: 10px 10px 10px 10px; 
+}
+/*.rightAlignStyle {
+    text-align: right;
+    padding-right: 16px; 
+}*/
+
+.mat-dialog-container, .mat-dialog {
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+.linkTxt {    
+    cursor: pointer;
+}
+ 
+ /* Styles for tab labels */
+ ::ng-deep .healthcheck-tab-style .mat-tab-label {     
+     background-color: transparent;
+     color: #0033A0;
+     font-size: 18px;
+     font-family: inherit;
+     opacity: 1.0;
+ }
+ 
+ /* Styles for the active tab label */
+ ::ng-deep .healthcheck-tab-style .mat-tab-label-active {
+    color: #00B140;
+    font-weight:bold;
+    font-size: 18px;    
+    background-color: transparent;
+    font-family: inherit;
+ }
+
+ ::ng-deep .healthcheck-tab-style .mat-tab-header {
+    border-bottom-style: none !important;  
+    
+ }
+ 
+ /* Styles for the ink bar */
+ ::ng-deep .healthcheck-tab-style .mat-ink-bar {
+     background-color: #00B140 !important;
+
+ }  

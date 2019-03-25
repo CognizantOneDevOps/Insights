@@ -1,0 +1,260 @@
+﻿<style>
+  .collapsible {
+    border: 1px solid;
+    padding: 10;
+    width: 50%;
+    background-color: none;
+  }
+  
+  .content {
+    display: none;
+    overflow: hidden;
+  }
+  
+  d {
+    display: none;
+  }
+  
+  a:hover + d {
+    display: block;
+  }
+  
+  .md-accordion .expandCollapse:active {
+    border: 0px;
+  }
+  
+  .md-accordion .expandCollapse:before {
+    content: '';
+    position: absolute;
+    top: 30px;
+    right: 10px;
+    border-color: #666 transparent transparent;
+    border-width: 8px;
+    border-style: solid;
+  }
+  
+  .capitalize:first-letter {
+    text-transform: uppercase;
+  }
+  
+  .outerdiv {
+    width: 100%;
+  }
+  
+  .highlightedText {
+    font-style: italic;
+    font-weight: bold;
+  }
+  
+  .md-toolbar-tools {
+    font-size: 14px !important;
+  }
+  
+  .md-accordion .active:before {
+    content: '';
+    position: absolute;
+    top: 30px;
+    right: 10px;
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-bottom: 5px solid #666;
+    border-width: 8px;
+  }
+  
+  .md-accordion .dataContent {
+    background: #fff;
+    height: 0px;
+    overflow: hidden;
+    -webkit-transition: .3s all ease-out;
+    transition: .3s all ease-out;
+  }
+  
+  .md-accordion .activeContent {
+    height: auto;
+    padding: 20px;
+    display: block;
+  }
+  
+  .md-accordion md-toolbar {
+    cursor: pointer;
+    border-bottom: 1px solid rgb(63, 107, 181)
+  }
+  
+  .textst {
+    font-family: Roboto, Helvetica, Arial, sans-serif;
+    font-size: 15px;
+    color: #666666 !important;
+    text-decoration: none !important;
+  }
+  
+  a {
+    color: #666666;
+  }
+  
+  a:hover {
+    color: #7682c5 !important;
+  }
+  
+  .fnt-bld {
+    font-weight: bold;
+  }
+  
+  .txthover {
+    color: #7682c5 !important;
+    text-decoration: underline !important
+  }
+  /* The side navigation menu */
+  
+  .sidenav {
+    height: 100%;
+    /* 100% Full-height */
+    width: 0;
+    /* 0 width - change this with JavaScript */
+    position: fixed;
+    /* Stay in place */
+    z-index: 10;
+    /* Stay on top */
+    top: 0;
+    left: 0;
+    background-color: #fff;
+    /* Black*/
+    overflow-x: hidden;
+    /* Disable horizontal scroll */
+    padding-top: 60px;
+    /* Place content 60px from the top */
+    transition: 0.5s;
+    /* 0.5 second transition effect to slide in the sidenav */
+    box-shadow: 0px 0px 20px #333;
+  }
+  /* The navigation menu links */
+  
+  .sidenav a {
+    padding: 8px 8px 8px 32px;
+    text-decoration: none;
+    font-size: 15px;
+    color: #818181;
+    display: block;
+    transition: 0.3s;
+    font-family: Roboto, Helvetica, Arial, sans-serif !important
+  }
+  /* When you mouse over the navigation links, change their color */
+  
+  .sidenav a:hover,
+  .offcanvas a:focus {
+    color: #f1f1f1;
+  }
+  /* Position and style the close button (top right corner) */
+  
+  .sidenav .closebtn {
+    position: absolute;
+    top: 0;
+    right: 25px;
+    font-size: 20px;
+    margin-left: 50px;
+  }
+  /* Style page content - use this if you want to push the page content to the right when you open the side navigation */
+  
+  #accrdion {
+    transition: margin-left 0.5s;
+    padding: 20px;
+  }
+  /* On smaller screens, where height is less than 450px, change the style of the sidenav (less padding and a smaller font size) */
+  
+  @media screen and (max-height: 450px) {
+    .sidenav {
+      padding-top: 10px;
+    }
+    .sidenav a {
+      font-size: 14px;
+    }
+  }
+  
+  md-radio-button .md-container {
+    top: 50%;
+    transform: translateY(0);
+  }
+  
+  md-radio-button {
+    margin-bottom: 10px !important;
+  }
+  
+  .arrowdown {
+    width: 0;
+    height: 0;
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-top: 5px solid #f00;
+    margin-top: 15px
+  }
+  
+  .flthd {
+    margin-top: 15px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #eee;
+    font-size: 14px;
+  }
+  
+  .flthld {
+    margin-left: 20px;
+    display: none;
+    padding-top: 10px
+  }
+  
+  .sideMenu {
+    height: 100%;
+    width: 160px;
+    position: fixed;
+    z-index: 1;
+    top: 0;
+    left: 0;
+    background-color: #111;
+    overflow-x: hidden;
+    padding-top: 20px;
+  }
+  
+  .topMenu {
+    background-color: grey;
+    overflow: auto;
+    white-space: nowrap;
+    text-align: center;
+    color: white;
+    width: 50%;
+  }
+</style>
+
+<head>
+  <title>Google Charts Tutorial</title>
+  <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js">
+
+  </script>
+  <script type="text/javascript">
+    google.charts.load('current', { packages: ['corechart'] });
+  </script>
+</head>
+<div ng-if="this.panel.showNoDataMessage !=''" style="padding:10; width: 100%; font-size: 15px;font-weight: 500;color:textcolor">
+  {{ctrl.panel.showNoDataMessage}}</div>
+<div class="md-accordion" ng-repeat="vectorData in ctrl.uiResponseArr">
+  <md-toolbar ng-click="ctrl.openCollapse()" style="padding:10; width: 100%;  font-size: 15px;font-weight: 500;color: 
+        ctrl.panel.textColor; background:#d3e9c7;">
+    <div style="padding-left:0em;" ng-hide="vectorData.schedule == null">Run Schedule: {{vectorData.schedule}}</div>
+    <div style="width:100%; float: top; padding-top:0em;">
+      <div google-chart chart-legend="false" style="float: right; height:200px; width:50%;" ng-attr-id="{{ctrl.panel.id}}"></div>
+    </div>
+    <div layout>
+      <div class="outerdiv">
+        <div class="textst"></div>
+        <div ng-repeat="y in vectorData.data" ng-style="{'color':textcolor}" ng-mouseenter="ctrl.hoverOn(y.kpiId, y.inference, vectorData.vectorName)"
+          style="margin-top:10px">
+          <img ng-src="public/img/dissatisfied.png" ng-if="y.color === 'red'" width="30" height="30" style="fill:r#FF0000;color:#FF0000"
+          />
+          <img ng-src="public/img/satisfied.png" ng-if="y.color === 'green'" width="30" height="30" style="fill:#508642;color:#508642"
+          />
+          <a ng-class="{textst:true, txthover:hovering}" ng-mouseenter="hovering=true" ng-mouseleave="hovering=false"></a>
+          &nbsp;{{y.inference}}
+      </div>
+    </div>
+</div>
+</md-toolbar>
+</div>
+<br>

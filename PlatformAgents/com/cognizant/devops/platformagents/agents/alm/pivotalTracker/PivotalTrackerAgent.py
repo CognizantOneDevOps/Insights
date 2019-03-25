@@ -18,7 +18,7 @@ Created on May 9, 2018
 
 @author: 476693
 '''
-from com.cognizant.devops.platformagents.core.BaseAgent import BaseAgent
+from ....core.BaseAgent import BaseAgent
 import time
 import requests
 import json
