@@ -56,6 +56,11 @@ gitCommitID = sh (
 		sh 'cd /var/jenkins/jobs/$commitID/workspace/PlatformUI3 && mvn sonar:sonar -Dmaven.test.failure.ignore=true -DskipTests=true -Dsonar.sources=src/app/com/cognizant/devops/platformui/modules -Dsonar.language=js -Dsonar.javascript.file.suffixes=.ts'
 	}
 		
+	 //Evaluate Insights artifacts in Nexus3 IQ server. applicationId must be created in IQ server and also enable user access to this app.
+	stage ('Insight_NEXUS_IQAnalysis') {	
+	sh 'mvn com.sonatype.clm:clm-maven-plugin:evaluate -Dclm.applicationId=Insights'
+   	  }	
+		
 	stage ('Insight_PS_NexusUpload') {		
 		sh 'mvn deploy -DskipTests=true'		
 		}
