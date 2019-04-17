@@ -35,7 +35,15 @@ case "$1" in
     else
      echo "Starting InSightsBitBucketAgent"
      cd $INSIGHTS_AGENT_HOME/PlatformAgents/bitbucket
+     python_version="$(python -V 2>&1)"
+     echo $python_version
+     if echo "$python_version" | grep -q "Python 2"; then
+      echo "Detected python 2 version";
      python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.scm.bitbucket.BitBucketAgent import BitBucketAgent; BitBucketAgent()" &
+     else
+      echo "Detected python 3 version";
+     python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.scm.bitbucket.BitBucketAgent3 import BitBucketAgent; BitBucketAgent()" &
+     fi
     fi
     if [[ $(ps aux | grep '__PS_KEY__' | awk '{print $2}') ]]; then
      echo "InSightsBitBucketAgent Started Sucessfully"
@@ -64,13 +72,29 @@ case "$1" in
      echo "InSightsBitBucketAgent stopped"
      echo "InSightsBitBucketAgent starting"
      cd $INSIGHTS_AGENT_HOME/PlatformAgents/bitbucket
+     python_version="$(python -V 2>&1)"
+     echo $python_version
+     if echo "$python_version" | grep -q "Python 2"; then
+      echo "Detected python 2 version";
      python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.scm.bitbucket.BitBucketAgent import BitBucketAgent; BitBucketAgent()" &
+     else
+      echo "Detected python 3 version";
+     python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.scm.bitbucket.BitBucketAgent3 import BitBucketAgent; BitBucketAgent()" &
+     fi
      echo "InSightsBitBucketAgent started"
     else
      echo "InSightsBitBucketAgent already in stopped state"
      echo "InSightsBitBucketAgent starting"
      cd $INSIGHTS_AGENT_HOME/PlatformAgents/bitbucket
+     python_version="$(python -V 2>&1)"
+     echo $python_version
+     if echo "$python_version" | grep -q "Python 2"; then
+      echo "Detected python 2 version";
      python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.scm.bitbucket.BitBucketAgent import BitBucketAgent; BitBucketAgent()" &
+     else
+      echo "Detected python 3 version";
+     python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.scm.bitbucket.BitBucketAgent3 import BitBucketAgent; BitBucketAgent()" &
+     fi
      echo "InSightsBitBucketAgent started"
     fi
     ;;

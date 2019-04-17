@@ -37,7 +37,15 @@ case "$1" in
     else
      echo "Starting InSightsSonarAgent"
      cd $INSIGHTS_AGENT_HOME/PlatformAgents/sonar
-     python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.codequality.sonar.SonarAgent import SonarAgent; SonarAgent()" &
+     python_version="$(python -V 2>&1)"
+     echo $python_version
+     if echo "$python_version" | grep -q "Python 2"; then
+      echo "Detected python 2 version";
+      python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.codequality.sonar.SonarAgent import SonarAgent; SonarAgent()" &
+     else
+      echo "Detected python 3 version";
+      python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.codequality.sonar.SonarAgent3 import SonarAgent; SonarAgent()" &
+     fi
     fi
     if [[ $(ps aux | grep '__PS_KEY__' | awk '{print $2}') ]]; then
      echo "InSightsSonarAgent Started Sucessfully"
@@ -66,13 +74,29 @@ case "$1" in
      echo "InSightsSonarAgent stopped"
      echo "InSightsSonarAgent starting"
      cd $INSIGHTS_AGENT_HOME/PlatformAgents/sonar
-     python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.codequality.sonar.SonarAgent import SonarAgent; SonarAgent()" &
+     python_version="$(python -V 2>&1)"
+     echo $python_version
+     if echo "$python_version" | grep -q "Python 2"; then
+      echo "Detected python 2 version";
+      python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.codequality.sonar.SonarAgent import SonarAgent; SonarAgent()" &
+     else
+      echo "Detected python 3 version";
+      python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.codequality.sonar.SonarAgent3 import SonarAgent; SonarAgent()" &
+     fi
      echo "InSightsSonarAgent started"
     else
      echo "InSightsSonarAgent already in stopped state"
      echo "InSightsSonarAgent starting"
      cd $INSIGHTS_AGENT_HOME/PlatformAgents/sonar
-     python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.codequality.sonar.SonarAgent import SonarAgent; SonarAgent()" &
+     python_version="$(python -V 2>&1)"
+     echo $python_version
+     if echo "$python_version" | grep -q "Python 2"; then
+      echo "Detected python 2 version";
+      python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.codequality.sonar.SonarAgent import SonarAgent; SonarAgent()" &
+     else
+      echo "Detected python 3 version";
+      python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.codequality.sonar.SonarAgent3 import SonarAgent; SonarAgent()" &
+     fi
      echo "InSightsSonarAgent started"
     fi
     ;;

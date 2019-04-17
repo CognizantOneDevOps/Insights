@@ -35,7 +35,15 @@ case "$1" in
     else
      echo "Starting InSightsTFSAgent"
      cd $INSIGHTS_AGENT_HOME/PlatformAgents/tfs
-     python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.scm.tfs.TFSAgent import TFSAgent; TFSAgent()" &
+     python_version="$(python -V 2>&1)"
+     echo $python_version
+     if echo "$python_version" | grep -q "Python 2"; then
+      echo "Detected python 2 version";
+      python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.scm.tfs.TFSAgent import TFSAgent; TFSAgent()" &
+     else
+      echo "Detected python 3 version";
+      python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.scm.tfs.TFSAgent3 import TFSAgent; TFSAgent()" &
+     fi
     fi
     if [[ $(ps aux | grep '__PS_KEY__' | awk '{print $2}') ]]; then
      echo "InSightsTFSAgent Started Sucessfully"
@@ -64,13 +72,29 @@ case "$1" in
      echo "InSightsTFSAgent stopped"
      echo "InSightsTFSAgent starting"
      cd $INSIGHTS_AGENT_HOME/PlatformAgents/tfs
-     python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.scm.tfs.TFSAgent import TFSAgent; TFSAgent()" &
+     python_version="$(python -V 2>&1)"
+     echo $python_version
+     if echo "$python_version" | grep -q "Python 2"; then
+      echo "Detected python 2 version";
+      python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.scm.tfs.TFSAgent import TFSAgent; TFSAgent()" &
+     else
+      echo "Detected python 3 version";
+      python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.scm.tfs.TFSAgent3 import TFSAgent; TFSAgent()" &
+     fi
      echo "InSightsTFSAgent started"
     else
      echo "InSightsTFSAgent already in stopped state"
      echo "InSightsTFSAgent starting"
      cd $INSIGHTS_AGENT_HOME/PlatformAgents/tfs
-     python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.scm.tfs.TFSAgent import TFSAgent; TFSAgent()" &
+     python_version="$(python -V 2>&1)"
+     echo $python_version
+     if echo "$python_version" | grep -q "Python 2"; then
+      echo "Detected python 2 version";
+      python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.scm.tfs.TFSAgent import TFSAgent; TFSAgent()" &
+     else
+      echo "Detected python 3 version";
+      python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.scm.tfs.TFSAgent3 import TFSAgent; TFSAgent()" &
+     fi
      echo "InSightsTFSAgent started"
     fi
     ;;
