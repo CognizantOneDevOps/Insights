@@ -36,7 +36,15 @@ case "$1" in
     else
      echo "Starting __AGENT_KEY__"
      cd $INSIGHTS_AGENT_HOME/PlatformAgents/git
-     python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.scm.git.GitAgent import GitAgent; GitAgent()" &
+     python_version="$(python -V 2>&1)"
+     echo $python_version
+     if echo "$python_version" | grep -q "Python 2"; then
+      echo "Detected python 2 version";
+      python -c "from com.cognizant.devops.platformagents.agents.scm.git.GitAgent import GitAgent; GitAgent()" &
+     else
+      echo "Detected python 3 version";
+      python -c "from com.cognizant.devops.platformagents.agents.scm.git.GitAgent3 import GitAgent; GitAgent()" &
+     fi
     fi
     if [[ $(ps aux | grep '__PS_KEY__' | awk '{print $2}') ]]; then
      echo "__AGENT_KEY__ Started Sucessfully"
@@ -65,13 +73,29 @@ case "$1" in
      echo "__AGENT_KEY__ stopped"
      echo "__AGENT_KEY__ starting"
      cd $INSIGHTS_AGENT_HOME/PlatformAgents/git
-     python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.scm.git.GitAgent import GitAgent; GitAgent()" &
+     python_version="$(python -V 2>&1)"
+     echo $python_version
+     if echo "$python_version" | grep -q "Python 2"; then
+      echo "Detected python 2 version";
+      python -c "from com.cognizant.devops.platformagents.agents.scm.git.GitAgent import GitAgent; GitAgent()" &
+     else
+      echo "Detected python 3 version";
+      python -c "from com.cognizant.devops.platformagents.agents.scm.git.GitAgent3 import GitAgent; GitAgent()" &
+     fi
      echo "__AGENT_KEY__ started"
     else
      echo "__AGENT_KEY__ already in stopped state"
      echo "__AGENT_KEY__ starting"
      cd $INSIGHTS_AGENT_HOME/PlatformAgents/git
-     python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.scm.git.GitAgent import GitAgent; GitAgent()" &
+     python_version="$(python -V 2>&1)"
+     echo $python_version
+     if echo "$python_version" | grep -q "Python 2"; then
+      echo "Detected python 2 version";
+      python -c "from com.cognizant.devops.platformagents.agents.scm.git.GitAgent import GitAgent; GitAgent()" &
+     else
+      echo "Detected python 3 version";
+      python -c "from com.cognizant.devops.platformagents.agents.scm.git.GitAgent3 import GitAgent; GitAgent()" &
+     fi
      echo "__AGENT_KEY__ started"
     fi
     ;;

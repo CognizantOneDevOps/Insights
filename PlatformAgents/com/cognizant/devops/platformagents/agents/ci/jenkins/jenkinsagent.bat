@@ -13,5 +13,13 @@ WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
 License for the specific language governing permissions and limitations under
 the License.
 :comment
-pushd %INSIGHTS_AGENT_HOME%\PlatformAgents\jenkins
-python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.ci.jenkins.JenkinsAgent import JenkinsAgent; JenkinsAgent()"
+pushd %INSIGHTS_AGENT_HOME%\PlatformAgents\git
+python -V> tmpfile.txt 2>&1
+FINDSTR /C:"Python 2" tmpfile.txt > nul
+if %ERRORLEVEL% EQU 0 (
+   echo "Detected Python2 version"
+   python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.ci.jenkins.JenkinsAgent import JenkinsAgent; JenkinsAgent()"
+) else (
+   echo "Detected Python3 version"
+   python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.ci.jenkins.JenkinsAgent3 import JenkinsAgent; JenkinsAgent()"
+)

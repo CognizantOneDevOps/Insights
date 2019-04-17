@@ -37,7 +37,15 @@ case "$1" in
     else
      echo "Starting InSightsArtifactoryAgent"
      cd $INSIGHTS_AGENT_HOME/PlatformAgents/artifactory
-     python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.artifactmanagement.artifactory.ArtifactoryAgent import ArtifactoryAgent; ArtifactoryAgent()" &
+     python_version="$(python -V 2>&1)"
+     echo $python_version
+     if echo "$python_version" | grep -q "Python 2"; then
+      echo "Detected python 2 version";
+      python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.artifactmanagement.artifactory.ArtifactoryAgent import ArtifactoryAgent; ArtifactoryAgent()" &
+     else
+      echo "Detected python 3 version";
+      python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.artifactmanagement.artifactory.ArtifactoryAgent3 import ArtifactoryAgent; ArtifactoryAgent()" &
+     fi
     fi
     if [[ $(ps aux | grep '__PS_KEY__' | awk '{print $2}') ]]; then
      echo "InSightsArtifactoryAgent Started Sucessfully"
@@ -66,13 +74,29 @@ case "$1" in
      echo "InSightsArtifactoryAgent stopped"
      echo "InSightsArtifactoryAgent starting"
      cd $INSIGHTS_AGENT_HOME/PlatformAgents/artifactory
-     python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.artifactmanagement.artifactory.ArtifactoryAgent import ArtifactoryAgent; ArtifactoryAgent()" &
+     python_version="$(python -V 2>&1)"
+     echo $python_version
+     if echo "$python_version" | grep -q "Python 2"; then
+      echo "Detected python 2 version";
+      python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.artifactmanagement.artifactory.ArtifactoryAgent import ArtifactoryAgent; ArtifactoryAgent()" &
+     else
+      echo "Detected python 3 version";
+      python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.artifactmanagement.artifactory.ArtifactoryAgent3 import ArtifactoryAgent; ArtifactoryAgent()" &
+     fi
      echo "InSightsArtifactoryAgent started"
     else
      echo "InSightsArtifactoryAgent already in stopped state"
      echo "InSightsArtifactoryAgent starting"
      cd $INSIGHTS_AGENT_HOME/PlatformAgents/artifactory
-     python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.artifactmanagement.artifactory.ArtifactoryAgent import ArtifactoryAgent; ArtifactoryAgent()" &
+     python_version="$(python -V 2>&1)"
+     echo $python_version
+     if echo "$python_version" | grep -q "Python 2"; then
+      echo "Detected python 2 version";
+      python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.artifactmanagement.artifactory.ArtifactoryAgent import ArtifactoryAgent; ArtifactoryAgent()" &
+     else
+      echo "Detected python 3 version";
+      python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.artifactmanagement.artifactory.ArtifactoryAgent3 import ArtifactoryAgent; ArtifactoryAgent()" &
+     fi
      echo "InSightsArtifactoryAgent started"
     fi
     ;;

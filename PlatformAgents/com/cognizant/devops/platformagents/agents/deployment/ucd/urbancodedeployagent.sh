@@ -35,7 +35,15 @@ case "$1" in
     else
      echo "Starting InSightsUCDAgent"
      cd $INSIGHTS_AGENT_HOME/PlatformAgents/ucd
-     python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.deployment.ucd.UrbanCodeDeployAgent import UrbanCodeDeployAgent; UrbanCodeDeployAgent()" &
+     python_version="$(python -V 2>&1)"
+     echo $python_version
+     if echo "$python_version" | grep -q "Python 2"; then
+      echo "Detected python 2 version";
+      python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.deployment.ucd.UrbanCodeDeployAgent  import UrbanCodeDeployAgent ; UrbanCodeDeployAgent ()" &
+     else
+      echo "Detected python 3 version";
+      python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.deployment.ucd.UrbanCodeDeployAgent 3 import UrbanCodeDeployAgent ; UrbanCodeDeployAgent ()" &
+     fi
     fi
     if [[ $(ps aux | grep '__PS_KEY__' | awk '{print $2}') ]]; then
      echo "InSightsUCDAgent Started Sucessfully"
@@ -64,13 +72,29 @@ case "$1" in
      echo "InSightsUCDAgent stopped"
      echo "InSightsUCDAgent starting"
      cd $INSIGHTS_AGENT_HOME/PlatformAgents/ucd
-     python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.deployment.ucd.UrbanCodeDeployAgent import UrbanCodeDeployAgent; UrbanCodeDeployAgent()" &
+     python_version="$(python -V 2>&1)"
+     echo $python_version
+     if echo "$python_version" | grep -q "Python 2"; then
+      echo "Detected python 2 version";
+      python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.deployment.ucd.UrbanCodeDeployAgent  import UrbanCodeDeployAgent ; UrbanCodeDeployAgent ()" &
+     else
+      echo "Detected python 3 version";
+      python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.deployment.ucd.UrbanCodeDeployAgent 3 import UrbanCodeDeployAgent ; UrbanCodeDeployAgent ()" &
+     fi
      echo "InSightsUCDAgent started"
     else
      echo "InSightsUCDAgent already in stopped state"
      echo "InSightsUCDAgent starting"
      cd $INSIGHTS_AGENT_HOME/PlatformAgents/ucd
-     python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.deployment.ucd.UrbanCodeDeployAgent import UrbanCodeDeployAgent; UrbanCodeDeployAgent()" &
+     python_version="$(python -V 2>&1)"
+     echo $python_version
+     if echo "$python_version" | grep -q "Python 2"; then
+      echo "Detected python 2 version";
+      python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.deployment.ucd.UrbanCodeDeployAgent  import UrbanCodeDeployAgent ; UrbanCodeDeployAgent ()" &
+     else
+      echo "Detected python 3 version";
+      python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.deployment.ucd.UrbanCodeDeployAgent 3 import UrbanCodeDeployAgent ; UrbanCodeDeployAgent ()" &
+     fi
      echo "InSightsUCDAgent started"
     fi
     ;;

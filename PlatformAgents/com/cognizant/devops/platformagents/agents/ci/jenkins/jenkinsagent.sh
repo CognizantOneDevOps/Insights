@@ -35,7 +35,15 @@ case "$1" in
     else
      echo "Starting InSightsJenkinsAgent"
      cd $INSIGHTS_AGENT_HOME/PlatformAgents/jenkins
-     python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.ci.jenkins.JenkinsAgent import JenkinsAgent; JenkinsAgent()" &
+     python_version="$(python -V 2>&1)"
+     echo $python_version
+     if echo "$python_version" | grep -q "Python 2"; then
+      echo "Detected python 2 version";
+      python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.ci.jenkins.JenkinsAgent import JenkinsAgent; JenkinAgent()" &
+     else
+      echo "Detected python 3 version";
+      python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.ci.jenkins.JenkinsAgent3 import JenkinsAgent; JenkinsAgent()" &
+     fi
     fi
     if [[ $(ps aux | grep '__PS_KEY__' | awk '{print $2}') ]]; then
      echo "InSightsJenkinsAgent Started Sucessfully"
@@ -64,13 +72,29 @@ case "$1" in
      echo "InSightsJenkinsAgent stopped"
      echo "InSightsJenkinsAgent starting"
      cd $INSIGHTS_AGENT_HOME/PlatformAgents/jenkins
-     python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.ci.jenkins.JenkinsAgent import JenkinsAgent; JenkinsAgent()" &
+     python_version="$(python -V 2>&1)"
+     echo $python_version
+     if echo "$python_version" | grep -q "Python 2"; then
+      echo "Detected python 2 version";
+      python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.ci.jenkins.JenkinsAgent import JenkinsAgent; JenkinsAgent()" &
+     else
+      echo "Detected python 3 version";
+      python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.ci.jenkins.JenkinsAgent3 import JenkinsAgent; JenkinsAgent()" &
+     fi
      echo "InSightsJenkinsAgent started"
     else
      echo "InSightsJenkinsAgent already in stopped state"
      echo "InSightsJenkinsAgent starting"
      cd $INSIGHTS_AGENT_HOME/PlatformAgents/jenkins
-     python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.ci.jenkins.JenkinsAgent import JenkinsAgent; JenkinsAgent()" &
+     python_version="$(python -V 2>&1)"
+     echo $python_version
+     if echo "$python_version" | grep -q "Python 2"; then
+      echo "Detected python 2 version";
+      python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.ci.jenkins.JenkinsAgent import JenkinsAgent; JenkinsAgent()" &
+     else
+      echo "Detected python 3 version";
+      python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.ci.jenkins.JenkinsAgent3 import JenkinsAgent; JenkinsAgent()" &
+     fi
      echo "InSightsJenkinsAgent started"
     fi
     ;;

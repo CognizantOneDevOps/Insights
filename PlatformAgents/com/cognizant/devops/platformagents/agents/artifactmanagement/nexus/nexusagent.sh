@@ -37,7 +37,15 @@ case "$1" in
     else
      echo "Starting InSightsNexusAgent"
      cd $INSIGHTS_AGENT_HOME/PlatformAgents/nexus
-     python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.artifactmanagement.nexus.NexusAgent import NexusAgent; NexusAgent()" &
+     python_version="$(python -V 2>&1)"
+     echo $python_version
+     if echo "$python_version" | grep -q "Python 2"; then
+      echo "Detected python 2 version";
+      python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.artifactmanagement.nexus.NexusAgent import NexusAgent; NexusAgent()" &
+     else
+      echo "Detected python 3 version";
+      python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.artifactmanagement.nexus.NexusAgent3 import NexusAgent; NexusAgent()" &
+     fi
     fi
     if [[ $(ps aux | grep '__PS_KEY__' | awk '{print $2}') ]]; then
      echo "InSightsNexusAgent Started Sucessfully"
@@ -66,13 +74,29 @@ case "$1" in
      echo "InSightsNexusAgent stopped"
      echo "InSightsNexusAgent starting"
      cd $INSIGHTS_AGENT_HOME/PlatformAgents/nexus
-     python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.artifactmanagement.nexus.NexusAgent import NexusAgent; NexusAgent()" &
+     python_version="$(python -V 2>&1)"
+     echo $python_version
+     if echo "$python_version" | grep -q "Python 2"; then
+      echo "Detected python 2 version";
+      python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.artifactmanagement.nexus.NexusAgent import NexusAgent; NexusAgent()" &
+     else
+      echo "Detected python 3 version";
+      python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.artifactmanagement.nexus.NexusAgent3 import NexusAgent; NexusAgent()" &
+     fi
      echo "InSightsNexusAgent started"
     else
      echo "InSightsNexusAgent already in stopped state"
      echo "InSightsNexusAgent starting"
      cd $INSIGHTS_AGENT_HOME/PlatformAgents/nexus
-     python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.artifactmanagement.nexus.NexusAgent import NexusAgent; NexusAgent()" &
+     python_version="$(python -V 2>&1)"
+     echo $python_version
+     if echo "$python_version" | grep -q "Python 2"; then
+      echo "Detected python 2 version";
+      python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.artifactmanagement.nexus.NexusAgent import NexusAgent; NexusAgent()" &
+     else
+      echo "Detected python 3 version";
+      python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.artifactmanagement.nexus.NexusAgent3 import NexusAgent; NexusAgent()" &
+     fi
      echo "InSightsNexusAgent started"
     fi
     ;;

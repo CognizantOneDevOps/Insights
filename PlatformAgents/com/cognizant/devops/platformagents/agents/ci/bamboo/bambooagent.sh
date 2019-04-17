@@ -35,7 +35,15 @@ case "$1" in
     else
      echo "Starting InSightsBambooAgent"
      cd $INSIGHTS_AGENT_HOME/PlatformAgents/bamboo
-     python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.ci.bamboo.BambooAgent import BambooAgent; BambooAgent()" &
+     python_version="$(python -V 2>&1)"
+     echo $python_version
+     if echo "$python_version" | grep -q "Python 2"; then
+      echo "Detected python 2 version";
+      python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.ci.bamboo.BambooAgent import BambooAgent; BambooAgent()" &
+     else
+      echo "Detected python 3 version";
+      python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.ci.bamboo.BambooAgent3 import BambooAgent; BambooAgent()" &
+     fi
     fi
     if [[ $(ps aux | grep '__PS_KEY__' | awk '{print $2}') ]]; then
      echo "InSightsBambooAgent Started Sucessfully"
@@ -64,13 +72,29 @@ case "$1" in
      echo "InSightsBambooAgent stopped"
      echo "InSightsBambooAgent starting"
      cd $INSIGHTS_AGENT_HOME/PlatformAgents/bamboo
-     python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.ci.bamboo.BambooAgent import BambooAgent; BambooAgent()" &
+     python_version="$(python -V 2>&1)"
+     echo $python_version
+     if echo "$python_version" | grep -q "Python 2"; then
+      echo "Detected python 2 version";
+      python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.ci.bamboo.BambooAgent import BambooAgent; BambooAgent()" &
+     else
+      echo "Detected python 3 version";
+      python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.ci.bamboo.BambooAgent3 import BambooAgent; BambooAgent()" &
+     fi
      echo "InSightsBambooAgent started"
     else
      echo "InSightsBambooAgent already in stopped state"
      echo "InSightsBambooAgent starting"
      cd $INSIGHTS_AGENT_HOME/PlatformAgents/bamboo
-     python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.ci.bamboo.BambooAgent import BambooAgent; BambooAgent()" &
+     python_version="$(python -V 2>&1)"
+     echo $python_version
+     if echo "$python_version" | grep -q "Python 2"; then
+      echo "Detected python 2 version";
+      python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.ci.bamboo.BambooAgent import BambooAgent; BambooAgent()" &
+     else
+      echo "Detected python 3 version";
+      python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.ci.bamboo.BambooAgent3 import BambooAgent; BambooAgent()" &
+     fi
      echo "InSightsBambooAgent started"
     fi
     ;;

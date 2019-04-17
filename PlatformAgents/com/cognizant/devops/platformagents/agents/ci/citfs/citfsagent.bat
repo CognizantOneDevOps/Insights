@@ -14,4 +14,14 @@ License for the specific language governing permissions and limitations under
 the License.
 :comment
 pushd %INSIGHTS_AGENT_HOME%\PlatformAgents\citfs
-python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.ci.citfs.CITFSAgent import CITFSAgent; CITFSAgent()"
+python -V> tmpfile.txt 2>&1
+FINDSTR /C:"Python 2" tmpfile.txt > nul
+if %ERRORLEVEL% EQU 0 (
+   echo "Detected Python2 version"
+   del tmpfile.txt
+   python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.ci.citfs.CITFSAgent import CITFSAgent; CITFSAgent()"
+) else (
+   echo "Detected Python3 version"
+   del tmpfile.txt
+   python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.ci.citfs.CITFSAgent3 import CITFSAgent; CITFSAgent()"
+)

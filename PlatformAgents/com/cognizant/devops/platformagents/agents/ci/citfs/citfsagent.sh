@@ -35,7 +35,15 @@ case "$1" in
     else
      echo "Starting InSightsCITFSAgent"
      cd $INSIGHTS_AGENT_HOME/PlatformAgents/citfs
-     python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.ci.citfs.CITFSAgent import CITFSAgent; CITFSAgent()" &
+     python_version="$(python -V 2>&1)"
+     echo $python_version
+     if echo "$python_version" | grep -q "Python 2"; then
+      echo "Detected python 2 version";
+      python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.ci.citfs.CITFSAgent import CITFSAgent; CITFSAgent()" &
+     else
+      echo "Detected python 3 version";
+      python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.ci.citfs.CITFSAgent3 import CITFSAgent; CITFSAgent()" &
+     fi
     fi
     if [[ $(ps aux | grep '__PS_KEY__' | awk '{print $2}') ]]; then
      echo "InSightsCITFSAgent Started Sucessfully"
@@ -64,13 +72,29 @@ case "$1" in
      echo "InSightsCITFSAgent stopped"
      echo "InSightsCITFSAgent starting"
      cd $INSIGHTS_AGENT_HOME/PlatformAgents/citfs
-     python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.ci.citfs.CITFSAgent import CITFSAgent; CITFSAgent()" &
+     python_version="$(python -V 2>&1)"
+     echo $python_version
+     if echo "$python_version" | grep -q "Python 2"; then
+      echo "Detected python 2 version";
+      python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.ci.citfs.CITFSAgent import CITFSAgent; CITFSAgent()" &
+     else
+      echo "Detected python 3 version";
+      python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.ci.citfs.CITFSAgent3 import CITFSAgent; CITFSAgent()" &
+     fi
      echo "InSightsCITFSAgent started"
     else
      echo "InSightsCITFSAgent already in stopped state"
      echo "InSightsCITFSAgent starting"
      cd $INSIGHTS_AGENT_HOME/PlatformAgents/citfs
-     python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.ci.citfs.CITFSAgent import CITFSAgent; CITFSAgent()" &
+     python_version="$(python -V 2>&1)"
+     echo $python_version
+     if echo "$python_version" | grep -q "Python 2"; then
+      echo "Detected python 2 version";
+      python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.ci.citfs.CITFSAgent import CITFSAgent; CITFSAgent()" &
+     else
+      echo "Detected python 3 version";
+      python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.ci.citfs.CITFSAgent3 import CITFSAgent; CITFSAgent()" &
+     fi
      echo "InSightsCITFSAgent started"
     fi
     ;;

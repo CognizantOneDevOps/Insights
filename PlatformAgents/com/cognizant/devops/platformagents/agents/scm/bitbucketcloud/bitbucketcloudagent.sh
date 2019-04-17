@@ -35,7 +35,15 @@ case "$1" in
     else
      echo "Starting InSightsBitBucketCloudAgent"
      cd $INSIGHTS_AGENT_HOME/PlatformAgents/bitbucketcloud
-     python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.scm.bitbucketcloud.BitBucketCloudAgent import BitBucketCloudAgent; BitBucketCloudAgent()" &
+     python_version="$(python -V 2>&1)"
+     echo $python_version
+     if echo "$python_version" | grep -q "Python 2"; then
+      echo "Detected python 2 version";
+      python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.scm.bitbucketcloud.BitBucketCloudAgent import BitBucketCloudAgent; BitBucketCloudAgent()" &
+     else
+      echo "Detected python 3 version";
+      python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.scm.bitbucketcloud.BitBucketCloudAgent3 import BitBucketCloudAgent; BitBucketCloudAgent()" &	  
+     fi
     fi
     if [[ $(ps aux | grep '__PS_KEY__' | awk '{print $2}') ]]; then
      echo "InSightsBitBucketCloudAgent Started Sucessfully"
@@ -64,13 +72,29 @@ case "$1" in
      echo "InSightsBitBucketCloudAgent stopped"
      echo "InSightsBitBucketCloudAgent starting"
      cd $INSIGHTS_AGENT_HOME/PlatformAgents/bitbucketcloud
-     python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.scm.bitbucketcloud.BitBucketCloudAgent import BitBucketCloudAgent; BitBucketCloudAgent()" &
+     python_version="$(python -V 2>&1)"
+     echo $python_version
+     if echo "$python_version" | grep -q "Python 2"; then
+      echo "Detected python 2 version";
+      python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.scm.bitbucketcloud.BitBucketCloudAgent import BitBucketCloudAgent; BitBucketCloudAgent()" &
+     else
+      echo "Detected python 3 version";
+      python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.scm.bitbucketcloud.BitBucketCloudAgent3 import BitBucketCloudAgent; BitBucketCloudAgent()" &	  
+     fi
      echo "InSightsBitBucketCloudAgent started"
     else
      echo "InSightsBitBucketCloudAgent already in stopped state"
      echo "InSightsBitBucketCloudAgent starting"
      cd $INSIGHTS_AGENT_HOME/PlatformAgents/bitbucketcloud
-     python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.scm.bitbucketcloud.BitBucketCloudAgent import BitBucketCloudAgent; BitBucketCloudAgent()" &
+     python_version="$(python -V 2>&1)"
+     echo $python_version
+     if echo "$python_version" | grep -q "Python 2"; then
+      echo "Detected python 2 version";
+      python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.scm.bitbucketcloud.BitBucketCloudAgent import BitBucketCloudAgent; BitBucketCloudAgent()" &
+     else
+      echo "Detected python 3 version";
+      python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.scm.bitbucketcloud.BitBucketCloudAgent3 import BitBucketCloudAgent; BitBucketCloudAgent()" &	  
+     fi
      echo "InSightsBitBucketCloudAgent started"
     fi
     ;;
