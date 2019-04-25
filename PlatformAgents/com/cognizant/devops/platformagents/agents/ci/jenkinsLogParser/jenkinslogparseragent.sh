@@ -27,6 +27,21 @@
 ### END INIT INFO
 #export INSIGHTS_AGENT_HOME=/home/ec2-user/insightsagents
 source /etc/profile
+python_version="$(python -V 2>&1)"
+detectPythonVersion()
+{
+     if echo "$1" | grep -q "Python 2"; then
+      echo "Detected python 2 version";
+      python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.ci.jenkinsLogParser.JenkinsLogParserAgent import JenkinsLogParserAgent; JenkinsLogParserAgent()" &
+     elif echo "$1" | grep -q "Python 3"; then
+      echo "Detected python 3 version";
+      python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.ci.jenkinsLogParser.JenkinsLogParserAgent3 import JenkinsLogParserAgent; JenkinsLogParserAgent()" &
+     else
+      echo "python version not supported"
+	  exit 1;
+     fi
+
+}
 
 case "$1" in
   start)
@@ -35,15 +50,8 @@ case "$1" in
     else
      echo "Starting InSightsJenkinsLogParserAgent"
      cd $INSIGHTS_AGENT_HOME/PlatformAgents/jenkinslogparser
-     python_version="$(python -V 2>&1)"
-     echo $python_version
-     if echo "$python_version" | grep -q "Python 2"; then
-      echo "Detected python 2 version";
-      python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.ci.jenkinsLogParser.JenkinsLogParserAgent import JenkinsLogParserAgent; JenkinsLogParserAgent()" &
-     else
-      echo "Detected python 3 version";
-      python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.ci.jenkinsLogParser.JenkinsLogParserAgent3 import JenkinsLogParserAgent; JenkinsLogParserAgent()" &
-     fi
+	 echo $python_version
+     detectPythonVersion "$python_version"
     fi
     if [[ $(ps aux | grep '__PS_KEY__' | awk '{print $2}') ]]; then
      echo "InSightsJenkinsLogParserAgent Started Sucessfully"
@@ -72,29 +80,15 @@ case "$1" in
      echo "InSightsJenkinsLogParserAgent stopped"
      echo "InSightsJenkinsLogParserAgent starting"
      cd $INSIGHTS_AGENT_HOME/PlatformAgents/jenkinslogparser
-     python_version="$(python -V 2>&1)"
-     echo $python_version
-     if echo "$python_version" | grep -q "Python 2"; then
-      echo "Detected python 2 version";
-      python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.ci.jenkinsLogParser.JenkinsLogParserAgent import JenkinsLogParserAgent; JenkinsLogParserAgent()" &
-     else
-      echo "Detected python 3 version";
-      python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.ci.jenkinsLogParser.JenkinsLogParserAgent3 import JenkinsLogParserAgent; JenkinsLogParserAgent()" &
-     fi
+	 echo $python_version
+     detectPythonVersion "$python_version"
      echo "InSightsJenkinsLogParserAgent started"
     else
      echo "InSightsJenkinsLogParserAgent already in stopped state"
      echo "InSightsJenkinsLogParserAgent starting"
      cd $INSIGHTS_AGENT_HOME/PlatformAgents/jenkinslogparser
-     python_version="$(python -V 2>&1)"
-     echo $python_version
-     if echo "$python_version" | grep -q "Python 2"; then
-      echo "Detected python 2 version";
-      python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.ci.jenkinsLogParser.JenkinsLogParserAgent import JenkinsLogParserAgent; JenkinsLogParserAgent()" &
-     else
-      echo "Detected python 3 version";
-      python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.ci.jenkinsLogParser.JenkinsLogParserAgent3 import JenkinsLogParserAgent; JenkinsLogParserAgent()" &
-     fi
+	 echo $python_version
+     detectPythonVersion "$python_version"
      echo "InSightsJenkinsLogParserAgent started"
     fi
     ;;

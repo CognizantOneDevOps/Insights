@@ -27,6 +27,21 @@
 ### END INIT INFO
 #export INSIGHTS_AGENT_HOME=/home/ec2-user/insightsagents
 source /etc/profile
+python_version="$(python -V 2>&1)"
+detectPythonVersion()
+{
+     if echo "$1" | grep -q "Python 2"; then
+      echo "Detected python 2 version";
+      python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.scm.bitbucketcloud.BitBucketCloudAgent import BitBucketCloudAgent; BitBucketCloudAgent()" &
+     elif echo "$1" | grep -q "Python 3"; then
+      echo "Detected python 3 version";
+      python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.scm.bitbucketcloud.BitBucketCloudAgent3 import BitBucketCloudAgent; BitBucketCloudAgent()" &
+     else
+      echo "python version not supported"
+	  exit 1;
+     fi
+
+}
 
 case "$1" in
   start)
@@ -35,15 +50,8 @@ case "$1" in
     else
      echo "Starting InSightsBitBucketCloudAgent"
      cd $INSIGHTS_AGENT_HOME/PlatformAgents/bitbucketcloud
-     python_version="$(python -V 2>&1)"
-     echo $python_version
-     if echo "$python_version" | grep -q "Python 2"; then
-      echo "Detected python 2 version";
-      python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.scm.bitbucketcloud.BitBucketCloudAgent import BitBucketCloudAgent; BitBucketCloudAgent()" &
-     else
-      echo "Detected python 3 version";
-      python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.scm.bitbucketcloud.BitBucketCloudAgent3 import BitBucketCloudAgent; BitBucketCloudAgent()" &	  
-     fi
+	 echo $python_version
+     detectPythonVersion "$python_version"
     fi
     if [[ $(ps aux | grep '__PS_KEY__' | awk '{print $2}') ]]; then
      echo "InSightsBitBucketCloudAgent Started Sucessfully"
@@ -72,29 +80,15 @@ case "$1" in
      echo "InSightsBitBucketCloudAgent stopped"
      echo "InSightsBitBucketCloudAgent starting"
      cd $INSIGHTS_AGENT_HOME/PlatformAgents/bitbucketcloud
-     python_version="$(python -V 2>&1)"
-     echo $python_version
-     if echo "$python_version" | grep -q "Python 2"; then
-      echo "Detected python 2 version";
-      python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.scm.bitbucketcloud.BitBucketCloudAgent import BitBucketCloudAgent; BitBucketCloudAgent()" &
-     else
-      echo "Detected python 3 version";
-      python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.scm.bitbucketcloud.BitBucketCloudAgent3 import BitBucketCloudAgent; BitBucketCloudAgent()" &	  
-     fi
+	 echo $python_version
+     detectPythonVersion "$python_version"
      echo "InSightsBitBucketCloudAgent started"
     else
      echo "InSightsBitBucketCloudAgent already in stopped state"
      echo "InSightsBitBucketCloudAgent starting"
      cd $INSIGHTS_AGENT_HOME/PlatformAgents/bitbucketcloud
-     python_version="$(python -V 2>&1)"
-     echo $python_version
-     if echo "$python_version" | grep -q "Python 2"; then
-      echo "Detected python 2 version";
-      python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.scm.bitbucketcloud.BitBucketCloudAgent import BitBucketCloudAgent; BitBucketCloudAgent()" &
-     else
-      echo "Detected python 3 version";
-      python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.scm.bitbucketcloud.BitBucketCloudAgent3 import BitBucketCloudAgent; BitBucketCloudAgent()" &	  
-     fi
+	 echo $python_version
+     detectPythonVersion "$python_version"
      echo "InSightsBitBucketCloudAgent started"
     fi
     ;;

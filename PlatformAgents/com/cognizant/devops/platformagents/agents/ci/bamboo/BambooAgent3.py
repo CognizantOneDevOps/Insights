@@ -18,7 +18,7 @@ Created on 12 April 2017
 
 @author: 476693
 '''
-from ....core.BaseAgent import BaseAgent
+from ....core.BaseAgent3 import BaseAgent
 from datetime import datetime
 class BambooAgent(BaseAgent):
     def process(self):        
