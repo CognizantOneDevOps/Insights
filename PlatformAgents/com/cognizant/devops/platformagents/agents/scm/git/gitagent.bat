@@ -17,12 +17,18 @@ the License.
 pushd %INSIGHTS_AGENT_HOME%\PlatformAgents\git
 python -V> tmpfile.txt 2>&1
 FINDSTR /C:"Python 2" tmpfile.txt > nul
-if %ERRORLEVEL% EQU 0 (
+set /p PYTHON_VERSION= < tmpfile.txt
+IF "%PYTHON_VERSION:~0,8%" EQU "Python 2" (
    echo "Detected Python2 version"
    del tmpfile.txt
-   python -c "from com.cognizant.devops.platformagents.agents.scm.git.GitAgent import GitAgent; GitAgent()"
-) else (
-   echo "Detected Python3 version"
-   del tmpfile.txt
-   python -c "from com.cognizant.devops.platformagents.agents.scm.git.GitAgent3 import GitAgent; GitAgent()"
+   python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.scm.git.GitAgent import GitAgent; GitAgent()"
+) ELSE (
+   IF "%PYTHON_VERSION:~0,8%" EQU "Python 3" (
+      echo "Detected Python3 version"
+      del tmpfile.txt
+      python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.scm.git.GitAgent3 import GitAgent; GitAgent()"
+   ) ELSE ( 
+      echo "python version not supported"
+      del tmpfile.txt
+   )
 )
