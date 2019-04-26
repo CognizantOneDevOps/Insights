@@ -14,14 +14,18 @@ License for the specific language governing permissions and limitations under
 the License.
 :comment
 pushd %INSIGHTS_AGENT_HOME%\PlatformAgents\tfs
-python -V> tmpfile.txt 2>&1
-FINDSTR /C:"Python 2" tmpfile.txt > nul
-if %ERRORLEVEL% EQU 0 (
-   echo "Detected Python2 version"
-   del tmpfile.txt
-   python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.scm.tfs.TFSAgent import TFSAgent; TFSAgent()"
-) else (
-   echo "Detected Python3 version"
-   del tmpfile.txt
-   python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.scm.tfs.TFSAgent3 import TFSAgent; TFSAgent()"
+setlocal ENABLEDELAYEDEXPANSION
+for /f "delims=" %%i in ('python -V ^2^>^&^1') do (
+   set PYTHON_VERSION=%%i
+   if "!PYTHON_VERSION:~0,8!" EQU "Python 2" ( 
+      echo Detected python 2 version
+	  python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.scm.tfs.TFSAgent import TFSAgent; TFSAgent()"
+   ) else (
+      if "!PYTHON_VERSION:~0,8!" EQU "Python 3" ( 
+         echo Detected python 3 version
+		 python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.scm.tfs.TFSAgent3 import TFSAgent; TFSAgent()"
+      ) else ( 
+         echo python version not supported 
+      )
+   )
 )
