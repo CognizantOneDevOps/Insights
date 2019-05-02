@@ -17,6 +17,7 @@
 import { Injectable, Inject } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 import { SESSION_STORAGE, StorageService } from 'ngx-webstorage-service';
+import { CommonModule, DatePipe } from '@angular/common';
 
 
 @Injectable()
@@ -25,7 +26,7 @@ export class DataSharedService {
   private userSource = new BehaviorSubject<String>('admin');
   currentUser = this.userSource.asObservable();
 
-  constructor(@Inject(SESSION_STORAGE) private storage: StorageService) { }
+  constructor(@Inject(SESSION_STORAGE) private storage: StorageService, private datePipe: DatePipe) { }
 
   public changeUser(user: String) {
     this.userSource.next(user)
@@ -61,5 +62,39 @@ export class DataSharedService {
   public getStorageService(): StorageService {
     return this.storage;
   }
+
+  public getTimeZone() {
+    return this.storage.get("timeZone");
+  }
+
+
+ public getStoragedProperty(key: string): any {
+  
+    return this.storage.get(key);
+  }
+  
+  public storeTimeZone() {
+    var date = new Date();
+    //const timeZoneOffset = date.getTimezoneOffset(); " ==== " + timeZoneOffset +
+    var zone = this.datePipe.transform(date, 'ZZZZ')
+    var zoneOffset = zone.slice(3, zone.length);
+    var dateStr = new Date().toTimeString();
+    var parts = dateStr.match(/\(([^)]+)\)/i); //time
+    var timezone = parts[1];
+    this.storage.set("timeZone", timezone);  
+    this.storage.set("timeZoneOffSet", zone);
+
+  }
+  
+ public convertDateToZone(dateStr: string): string {
+    var date = new Date(dateStr);
+    var zone = this.storage.get("timeZone");
+    var zoneOffset = this.storage.get("timeZoneOffSet");
+    //var utcDate = this.datePipe.transform(date, 'yyyy-MM-ddTHH:mm:ssZ', '+0000');
+    var dateWithTimeZone = this.datePipe.transform(date, 'yyyy-MM-ddTHH:mm:ssZ', zoneOffset);//  '+0530' utcDate
+    console.log(date + " ==== " + zone + " ==== " + zoneOffset + " ==== " + dateWithTimeZone + " ====  " + + " ====  " + dateWithTimeZone.toString());
+    return dateWithTimeZone;
+  }
+ 
 
 }

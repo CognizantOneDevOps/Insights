@@ -29,6 +29,7 @@ import { DataSharedService } from '@insights/common/data-shared-service';
 export interface ILoginComponent {
   createAndValidateForm(): void;
   userAuthentication(): void;
+
 }
 
 @Component({
@@ -62,6 +63,7 @@ export class LoginComponent implements OnInit, ILoginComponent {
 
   ngOnInit() {
     this.createAndValidateForm();
+    this.dataShare.storeTimeZone();
     //this.deleteAllPreviousCookies();
   }
 

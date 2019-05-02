@@ -18,6 +18,7 @@ import { InsightsInitService } from '@insights/common/insights-initservice';
 import { HealthCheckService } from '@insights/app/modules/healthcheck/healthcheck.service';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 import { ShowDetailsDialog } from '@insights/app/modules/healthcheck/healthcheck-show-details-dialog';
+import { DataSharedService } from '@insights/common/data-shared-service';
 
 
 @Component({
@@ -44,16 +45,20 @@ export class HealthCheckComponent implements OnInit {
   dataListDatasource = [];
   servicesDataSource = [];
   servicesListDatasource = [];
+  timeZone: string = "";
   healthResponse: any;
   agentResponse: any;
   agentNameList: any = [];
   selectAgentTool: any;
-  constructor(private healthCheckService: HealthCheckService, private dialog: MatDialog) {
+  constructor(private healthCheckService: HealthCheckService, private dialog: MatDialog, private dataShare: DataSharedService) {
     this.loadAgentCheckInfo();
     this.loadOtherHealthCheckInfo();
   }
 
-  ngOnInit() { }
+  ngOnInit() {
+    
+    this.timeZone = this.dataShare.getTimeZone()
+  }
 
   async loadAgentCheckInfo() {
     try {
@@ -162,7 +167,7 @@ export class HealthCheckComponent implements OnInit {
       height: '500px',
       width: '900px',
       disableClose: true,
-      data: { toolName: toolName, categoryName: categoryName, pathName: filePath, detailType: detailType, agentId: agentId },
+      data: { toolName: toolName, categoryName: categoryName, pathName: filePath, detailType: detailType, agentId: agentId, timeZone: this.timeZone },
     });
   }
 
