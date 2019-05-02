@@ -311,7 +311,7 @@ class BaseAgent(object):
     
     def generateHealthData(self, ex=None, systemFailure=False,note=None):
         data = []
-        currentTime = self.getRemoteDateTime(datetime.now())
+        currentTime = self.getRemoteDateTime(datetime.utcnow())
         health = { 'agentId' : self.config.get('agentId'), 'inSightsTimeX' : currentTime['time'], 'inSightsTime' : currentTime['epochTime'], 'executionTime' : int((datetime.now() - self.executionStartTime).total_seconds() * 1000)}
         if systemFailure:
             health['status'] = 'failure'
