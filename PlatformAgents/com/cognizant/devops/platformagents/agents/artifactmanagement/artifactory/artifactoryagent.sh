@@ -14,7 +14,7 @@
 # the License.
 #-------------------------------------------------------------------------------
 #! /bin/sh
-# /etc/init.d/__AGENT_KEY__
+# /etc/init.d/__AGENT_KEY__ 
 
 ### BEGIN INIT INFO
 # Provides: Runs a Python script on startup
@@ -34,10 +34,10 @@ detectPythonVersion()
 {
      if echo "$1" | grep -q "Python 2"; then
       echo "Detected python 2 version";
-      python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.artifactmanagement.artifactory.ArtifactoryAgent import ArtifactoryAgent; ArtifactoryAgent()" &
+      python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.alm.artifactory.ArtifactoryAgent import ArtifactoryAgent; ArtifactoryAgent()" &
      elif echo "$1" | grep -q "Python 3"; then
       echo "Detected python 3 version";
-      python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.artifactmanagement.artifactory.ArtifactoryAgent3 import ArtifactoryAgent; ArtifactoryAgent()" &
+      python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.alm.artifactory.ArtifactoryAgent3 import ArtifactoryAgent; ArtifactoryAgent()" &
      else
       echo "python version not supported"
 	  exit 1;
@@ -103,7 +103,7 @@ case "$1" in
     fi
     ;;
   *)
-    echo "Usage: /etc/init.d/__AGENT_KEY__ {start|stop|restart|status}"
+    echo "Usage: /etc/init.d/__AGENT_KEY__  {start|stop|restart|status}"
     exit 1
     ;;
 esac
