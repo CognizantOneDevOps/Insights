@@ -19,7 +19,7 @@ Created on 30 March 2017
 @author: 446620
 '''
 import json
-from ....core.BaseAgent import BaseAgent
+from ....core.BaseAgent3 import BaseAgent
 
 class TeamCityAgent(BaseAgent):
     def process(self):
