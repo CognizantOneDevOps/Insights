@@ -27,6 +27,21 @@
 ### END INIT INFO
 #export INSIGHTS_AGENT_HOME=/home/ec2-user/insightsagents
 source /etc/profile
+python_version="$(python -V 2>&1)"
+detectPythonVersion()
+{
+     if echo "$1" | grep -q "Python 2"; then
+      echo "Detected python 2 version";
+      python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.itsm.snow.snowAgent import snowAgent; snowAgent()" &
+     elif echo "$1" | grep -q "Python 3"; then
+      echo "Detected python 3 version";
+      python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.itsm.snow.snowAgent3 import snowAgent; snowAgent()" &
+     else
+      echo "python version not supported"
+      exit 1;
+     fi
+
+}
 
 case "$1" in
   start)
@@ -35,7 +50,8 @@ case "$1" in
     else
      echo "Starting InSightsSnowAgent"
      cd $INSIGHTS_AGENT_HOME/PlatformAgents/snow
-     python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.itsm.snow.snowAgent import snowAgent; snowAgent()" &
+     echo $python_version
+     detectPythonVersion "$python_version"
     fi
     if [[ $(ps aux | grep '__PS_KEY__' | awk '{print $2}') ]]; then
      echo "InSightsSnowAgent Started Sucessfully"
