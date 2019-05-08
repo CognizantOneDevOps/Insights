@@ -14,7 +14,7 @@
 # the License.
 #-------------------------------------------------------------------------------
 #! /bin/sh
-# /etc/init.d/__AGENT_KEY__ 
+# /etc/init.d/__AGENT_KEY__
 
 ### BEGIN INIT INFO
 # Provides: Runs a Python script on startup
@@ -25,85 +25,65 @@
 # Short-Description: Simple script to run python program at boot
 # Description: Runs a python program at boot
 ### END INIT INFO
-
-
 #export INSIGHTS_AGENT_HOME=/home/ec2-user/insightsagents
 source /etc/profile
-python_version="$(python -V 2>&1)"
-detectPythonVersion()
-{
-     if echo "$1" | grep -q "Python 2"; then
-      echo "Detected python 2 version";
-      python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.alm.cirlcleci.CircleAgent import CircleAgent; CircleAgent()" &
-     elif echo "$1" | grep -q "Python 3"; then
-      echo "Detected python 3 version";
-      python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.alm.cirlcleci.CircleAgent3 import CircleAgent; CircleAgent()" &
-     else
-      echo "python version not supported"
-	  exit 1;
-     fi
-
-}
 
 case "$1" in
   start)
     if [[ $(ps aux | grep '__PS_KEY__' | awk '{print $2}') ]]; then
-     echo "InSightsCircleAgent already running"
+     echo "InSightsPivotalTrackerAgent already running"
     else
-     echo "Starting InSightsCircleAgent"
-     cd $INSIGHTS_AGENT_HOME/PlatformAgents/cirlcleci
-	 echo $python_version
-     detectPythonVersion "$python_version"
+     echo "Starting InSightsPivotalTrackerAgent"
+     cd $INSIGHTS_AGENT_HOME/PlatformAgents/pivotalTracker
+     python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.alm.pivotalTracker.PivotalTrackerAgent import PivotalTrackerAgent; PivotalTrackerAgent()" &
     fi
     if [[ $(ps aux | grep '__PS_KEY__' | awk '{print $2}') ]]; then
-     echo "InSightsCircleAgent Started Sucessfully"
+     echo "InSightsPivotalTrackerAgent Started Sucessfully"
     else
-     echo "InSightsCircleAgent Failed to Start"
+     echo "InSightsPivotalTrackerAgent Failed to Start"
     fi
     ;;
   stop)
-    echo "Stopping InSightsCircleAgent"
+    echo "Stopping InSightsPivotalTrackerAgent"
     if [[ $(ps aux | grep '__PS_KEY__' | awk '{print $2}') ]]; then
      sudo kill -9 $(ps aux | grep '__PS_KEY__' | awk '{print $2}')
     else
-     echo "InSightsCircleAgent already in stopped state"
+     echo "InSightsPivotalTrackerAgent already in stopped state"
     fi
     if [[ $(ps aux | grep '__PS_KEY__' | awk '{print $2}') ]]; then
-     echo "InSightsCircleAgent Failed to Stop"
+     echo "InSightsPivotalTrackerAgent Failed to Stop"
     else
-     echo "InSightsCircleAgent Stopped"
+     echo "InSightsPivotalTrackerAgent Stopped"
     fi
     ;;
   restart)
-    echo "Restarting InSightsCircleAgent"
+    echo "Restarting InSightsPivotalTrackerAgent"
     if [[ $(ps aux | grep '__PS_KEY__' | awk '{print $2}') ]]; then
-     echo "InSightsCircleAgent stopping"
+     echo "InSightsPivotalTrackerAgent stopping"
      sudo kill -9 $(ps aux | grep '__PS_KEY__' | awk '{print $2}')
-     echo "InSightsCircleAgent stopped"
-     echo "InSightsCircleAgent starting"
-     cd $INSIGHTS_AGENT_HOME/PlatformAgents/cirlcleci
-	 echo $python_version
-     detectPythonVersion "$python_version"
-     echo "InSightsCircleAgent started"
+     echo "InSightsPivotalTrackerAgent stopped"
+     echo "InSightsPivotalTrackerAgent starting"
+     cd $INSIGHTS_AGENT_HOME/PlatformAgents/pivotalTracker
+     python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.alm.pivotalTracker.PivotalTrackerAgent import PivotalTrackerAgent; PivotalTrackerAgent()" &
+     echo "InSightsPivotalTrackerAgent started"
     else
-     echo "InSightsCircleAgent already in stopped state"
-     echo "InSightsCircleAgent starting"
-     cd $INSIGHTS_AGENT_HOME/PlatformAgents/cirlcleci
-	 echo $python_version
-     detectPythonVersion "$python_version"
-     echo "InSightsCircleAgent started"
+     echo "InSightsPivotalTrackerAgent already in stopped state"
+     echo "InSightsPivotalTrackerAgent starting"
+     cd $INSIGHTS_AGENT_HOME/PlatformAgents/pivotalTracker
+     python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.alm.pivotalTracker.PivotalTrackerAgent import PivotalTrackerAgent; PivotalTrackerAgent()" &
+     echo "InSightsPivotalTrackerAgent started"
     fi
     ;;
   status)
-    echo "Checking the Status of InSightsCircleAgent"
+    echo "Checking the Status of InSightsPivotalTrackerAgent"
     if [[ $(ps aux | grep '__PS_KEY__' | awk '{print $2}') ]]; then
-     echo "InSightsCircleAgent is running"
+     echo "InSightsPivotalTrackerAgent is running"
     else
-     echo "InSightsCircleAgent is stopped"
+     echo "InSightsPivotalTrackerAgent is stopped"
     fi
     ;;
   *)
-    echo "Usage: /etc/init.d/__AGENT_KEY__  {start|stop|restart|status}"
+    echo "Usage: /etc/init.d/__AGENT_KEY__ {start|stop|restart|status}"
     exit 1
     ;;
 esac

@@ -19,11 +19,11 @@ for /f "delims=" %%i in ('python -V ^2^>^&^1') do (
    set PYTHON_VERSION=%%i
    if "!PYTHON_VERSION:~0,8!" EQU "Python 2" ( 
       echo Detected python 2 version
-	  python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.artifactmanagement.artifactory.ArtifactoryAgent import ArtifactoryAgent; ArtifactoryAgent()"
+	  python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.alm.artifactory.ArtifactoryAgent import ArtifactoryAgent; ArtifactoryAgent()"
    ) else (
       if "!PYTHON_VERSION:~0,8!" EQU "Python 3" ( 
          echo Detected python 3 version
-		 python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.artifactmanagement.artifactory.ArtifactoryAgent3 import ArtifactoryAgent; ArtifactoryAgent()"
+		 python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.alm.artifactory.ArtifactoryAgent3 import ArtifactoryAgent; ArtifactoryAgent()"
       ) else ( 
          echo python version not supported 
       )
