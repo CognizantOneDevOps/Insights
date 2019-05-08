@@ -19,7 +19,7 @@ Created on Jun 22, 2016
 @author: 463188
 '''
 from dateutil import parser
-from ....core.BaseAgent import BaseAgent
+from ....core.BaseAgent3 import BaseAgent
 from urllib.parse import quote
 import time
 
