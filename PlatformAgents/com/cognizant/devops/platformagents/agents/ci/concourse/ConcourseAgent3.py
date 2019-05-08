@@ -18,7 +18,7 @@ Created on 12 April 2018
 
 @author: 476693 & 610951
 '''
-from ....core.BaseAgent import BaseAgent
+from ....core.BaseAgent3 import BaseAgent
 import json
 
 class ConcourseAgent(BaseAgent):
