@@ -24,7 +24,7 @@ import time
 import sys
 import os
 from datetime import datetime, timedelta
-from ....core.BaseAgent import BaseAgent
+from ....core.BaseAgent3 import BaseAgent
 import logging.handlers
 import json
 
