@@ -22,7 +22,7 @@ Created on Oct 13, 2016
 import json
 import datetime
 from datetime import timedelta
-from ....core.BaseAgent import BaseAgent
+from ....core.BaseAgent3 import BaseAgent
 
 class XLDeployAgent(BaseAgent):
     def process(self):

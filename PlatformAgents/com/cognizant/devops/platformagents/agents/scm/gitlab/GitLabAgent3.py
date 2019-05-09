@@ -19,7 +19,7 @@ Created on Jun 16, 2016
 '''
 from dateutil import parser
 import datetime
-from ....core.BaseAgent import BaseAgent
+from ....core.BaseAgent3 import BaseAgent
 import logging
 import json
 
