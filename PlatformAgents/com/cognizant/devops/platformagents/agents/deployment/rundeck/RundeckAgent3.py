@@ -20,7 +20,7 @@ Created on Jun 23, 2016
 '''
 from time import mktime
 from dateutil import parser
-from ....core.BaseAgent import BaseAgent
+from ....core.BaseAgent3 import BaseAgent
 
 class RundeckAgent(BaseAgent):
     def process(self):
