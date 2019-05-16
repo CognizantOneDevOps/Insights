@@ -19,6 +19,7 @@ import { SelectionModel } from '@angular/cdk/collections';
 import { Router, NavigationExtras, ActivatedRoute } from '@angular/router';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA, MatTableDataSource, MatPaginator } from '@angular/material';
 import { MessageDialogService } from '@insights/app/modules/application-dialog/message-dialog-service';
+import { DataSharedService } from '@insights/common/data-shared-service';
 
 @Component({
   selector: 'app-agent-management',
@@ -52,7 +53,8 @@ export class AgentManagementComponent implements OnInit {
   MAX_ROWS_PER_TABLE = 5;
   constructor(public agentService: AgentService, public router: Router,
     private route: ActivatedRoute, public dialog: MatDialog,
-    public messageDialog: MessageDialogService, private changeDetectorRefs: ChangeDetectorRef) {
+    public messageDialog: MessageDialogService, private changeDetectorRefs: ChangeDetectorRef,
+    private dataShare: DataSharedService) {
     this.getRegisteredAgents();
   }
 
@@ -184,14 +186,17 @@ export class AgentManagementComponent implements OnInit {
   }
 
   async editAgent() {
-    this.agentparameter = JSON.stringify({ 'type': 'update', 'detailedArr': this.selectedAgent });
-    let navigationExtras: NavigationExtras = {
-      skipLocationChange: true,
-      queryParams: {
-        "agentparameter": this.agentparameter
-      }
-    };
-    this.router.navigate(['InSights/Home/agentconfiguration'], navigationExtras);
+    var isSessionExpired = this.dataShare.validateSession();
+    if (!isSessionExpired) {
+      this.agentparameter = JSON.stringify({ 'type': 'update', 'detailedArr': this.selectedAgent });
+      let navigationExtras: NavigationExtras = {
+        skipLocationChange: true,
+        queryParams: {
+          "agentparameter": this.agentparameter
+        }
+      };
+      this.router.navigate(['InSights/Home/agentconfiguration'], navigationExtras);
+    }
   }
 
   uninstallAgent() {

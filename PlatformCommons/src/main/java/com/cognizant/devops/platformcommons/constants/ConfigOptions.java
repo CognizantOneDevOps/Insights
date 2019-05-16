@@ -16,12 +16,14 @@
 package com.cognizant.devops.platformcommons.constants;
 
 import java.io.File;
-
+import java.time.Instant;
 public interface ConfigOptions {
 	String CONFIG_DIR = ".InSights";
 	String CONFIG_FILE = "server-config.json";
 	String TOOLS_CONFIG_FILE = "toolsConfig.json";
 	String CORRELATION_TEMPLATE = "correlation.json";
+	String NEO4J_TEMPLATE = "neo4jdata.json";
+	String CORRELATION = "correlation"+Instant.now().toEpochMilli()+".json";
 	String DATA_ENRICHMENT_TEMPLATE = "data-enrichment.json";
 	String ENDPOINT_DATA = "endpointData";
 	String USER_DATA = "userData";

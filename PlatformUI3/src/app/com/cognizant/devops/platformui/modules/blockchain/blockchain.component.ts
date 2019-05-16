@@ -24,7 +24,8 @@ import { CollectionViewer, DataSource } from "@angular/cdk/collections";
 import { MessageDialogService } from '@insights/app/modules/application-dialog/message-dialog-service';
 import { MatRadioChange, MatInput } from '@angular/material';
 import { AssetDetailsDialog } from '@insights/app/modules/blockchain/bc-asset-details-dialog';
-import {FormControl, Validators} from '@angular/forms';
+import { FormControl, Validators } from '@angular/forms';
+import { InsightsInitService } from '../../common.services/insights-initservice';
 
 export interface AssetData {
   assetID: string;
@@ -46,7 +47,7 @@ export class BlockChainComponent implements OnInit {
   maxDateValue: any;
   @ViewChild(MatSort) sort: MatSort;
   @ViewChild(MatPaginator) paginator: MatPaginator;
-  displayedColumns: string[] = ['select', 'assetID', 'toolName', 'phase', 'toolstatus','timestamp'];
+  displayedColumns: string[] = ['select', 'assetID', 'toolName', 'phase', 'toolstatus', 'timestamp'];
   dataSource = new MatTableDataSource<AssetData>([]);
   MAX_ROWS_PER_TABLE = 10;
   startDate: string;
@@ -68,14 +69,22 @@ export class BlockChainComponent implements OnInit {
   selectedAssetID: string = "";
   displayProgressBar: boolean = false;
   toolname = new FormControl('', [Validators.required]);
-  tools = ['JIRA','GIT','JENKINS','NEXUS'];
+  tools = [];
 
 
 
 
   constructor(private blockChainService: BlockChainService, private datepipe: DatePipe,
     private messageDialog: MessageDialogService, private dialog: MatDialog) {
-    
+
+    this.blockChainService.getProcessFlow()
+      .then((data) => {
+        console.log('dbbbb', data);
+        data.Steps.forEach(element => {
+          this.tools.push(element.Tool.toUpperCase());
+        });
+      });
+
   }
 
   ngOnInit() {
@@ -91,7 +100,7 @@ export class BlockChainComponent implements OnInit {
   searchAllAssets() {
     this.searchCriteria = "";
     this.selectedAssetID = "";
-    this.selectedBasePrimeID = "";    
+    this.selectedBasePrimeID = "";
     if (this.selectedOption == "searchByDates") {
       console.log(this.toolname.value);
       if (this.startDateInput === undefined || this.endDateInput === undefined || this.toolname.value == '') {
@@ -106,19 +115,22 @@ export class BlockChainComponent implements OnInit {
       this.displayProgressBar = true;
       this.noSearchResultFlag = false;
       this.showSearchResult = false;
-      this.blockChainService.getAllAssets(this.startDate, this.endDate,this.toolname.value)
+      this.blockChainService.getAllAssets(this.startDate, this.endDate, this.toolname.value)
         .then((data) => {
+          console.log(data);
           let assetDetails = [];
-            data.data.map((d)=>{
-              Object.keys(d).forEach(k=>{
-                  const matchKey = k.match('AssetID');
-                  if (matchKey) {
-                    d['assetID'] = d[k];
-                  }
-                  
+          if (data.status != 'failure') {
+            data.data.map((d) => {
+              Object.keys(d).forEach(k => {
+                const matchKey = k.match('AssetID');
+                if (matchKey) {
+                  d['assetID'] = d[k];
+                }
+
               })
               assetDetails.push(d);
-          });
+            });
+          }
           this.displayProgressBar = false;
           if (data.status === "failure") {
             console.log("inside failure loop");
@@ -153,16 +165,18 @@ export class BlockChainComponent implements OnInit {
             console.log(" assetId server response >>");
             console.log(data);
             let assetDetails = [];
-            data.data.map((d) => {
-              Object.keys(d).forEach(k => {
-                const matchKey = k.match('AssetID');
-                if (matchKey) {
-                  d['assetID'] = d[k];
-                }
+            if (data.status != 'failure') {
+              data.data.map((d) => {
+                Object.keys(d).forEach(k => {
+                  const matchKey = k.match('AssetID');
+                  if (matchKey) {
+                    d['assetID'] = d[k];
+                  }
 
-              })
-              assetDetails.push(d);
-            });
+                })
+                assetDetails.push(d);
+              });
+            }
             this.displayProgressBar = false;
             if (data.status === "failure") {
               this.noSearchResultFlag = true;
@@ -261,7 +275,7 @@ export class BlockChainComponent implements OnInit {
 
   //Displays Asset Details Dialog box
   showAssetDetailsDialog() {
-    if (this.selectedAssetID =="") {
+    if (this.selectedAssetID == "") {
       return;
     }
     let showDetailsDialog = this.dialog.open(AssetDetailsDialog, {
@@ -270,7 +284,7 @@ export class BlockChainComponent implements OnInit {
       width: '1200px',
       disableClose: true,
       position: { top: '0px', left: '100px', right: '0px', bottom: '0px' },
-      data: { assetID: this.selectedAssetID },
+      data: { assetID: this.selectedAssetID, tools: this.tools },
     });
   }
 
