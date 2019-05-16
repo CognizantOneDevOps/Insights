@@ -16,7 +16,7 @@
 import { Injectable } from '@angular/core';
 import { RestCallHandlerService } from '@insights/common/rest-call-handler.service';
 import { Observable } from 'rxjs';
-import { HttpHeaders, HttpClient } from '@angular/common/http';
+import { HttpHeaders, HttpClient, HttpParams } from '@angular/common/http';
 import { CookieService } from 'ngx-cookie-service';
 
 
@@ -27,6 +27,7 @@ export interface IBlockChainService {
     getAssetInfo(assetID: string): Promise<any>;
     getAssetHistory(assetID: string): Promise<any>;
     exportToPdf(pdfData:any):Observable<any>;
+    getProcessFlow():Promise<any>;
 }
 
 
@@ -56,10 +57,17 @@ export class BlockChainService implements IBlockChainService {
     exportToPdf(pdfData):Observable<Blob> {
         var authToken = this.cookieService.get('Authorization');
         var EXPORT_TO_PDF = "/PlatformAuditService/traceability/getAuditReport";
-        var headers_object = new HttpHeaders();                
-        headers_object = headers_object.append("Content-Type", "application/json");
-        headers_object = headers_object.append("Authorization", authToken);
-        return this.httpClient.post(EXPORT_TO_PDF, pdfData, {headers:headers_object, responseType: 'blob'});
+        let params= new HttpParams();
+        params = params.append("pdfName","Traceability_report.pdf");
+        var headers_object = new HttpHeaders();
+        headers_object = headers_object.append("Content-Type", "application/json");
+        headers_object = headers_object.append("Authorization", authToken);
+        return this.httpClient.post(EXPORT_TO_PDF, pdfData, {headers:headers_object, responseType: 'blob',params});
+    }
+
+    getProcessFlow(): Promise<any> {
+        var restHandler = this.restCallHandlerService;
+        return restHandler.get("GET_PROCESS_JSON");
     }
 
 }

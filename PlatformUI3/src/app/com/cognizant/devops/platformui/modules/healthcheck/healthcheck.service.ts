@@ -16,11 +16,14 @@
 import { Injectable } from '@angular/core';
 import { RestCallHandlerService } from '@insights/common/rest-call-handler.service';
 import { Observable } from 'rxjs';
+import { HttpHeaders, HttpClient, HttpParams } from '@angular/common/http';
+import { CookieService } from 'ngx-cookie-service';
 
 
 export interface IHealthCheckService {
     loadServerHealthConfiguration(): Promise<any>;
     loadHealthConfigurations(toolName: string, toolCategory: string, agentId: String): Promise<any>;
+    downloadLog(fileName: string): Observable<any>;
 }
 
 
@@ -29,7 +32,8 @@ export interface IHealthCheckService {
 @Injectable()
 export class HealthCheckService implements IHealthCheckService {
 
-    constructor(private restCallHandlerService: RestCallHandlerService) {
+    constructor(private restCallHandlerService: RestCallHandlerService, private httpClient: HttpClient,
+        private cookieService: CookieService) {
     }
 
     loadServerHealthConfiguration(): Promise<any> {
@@ -43,6 +47,14 @@ export class HealthCheckService implements IHealthCheckService {
     loadHealthConfigurations(toolName: string, toolCategory: string, agentId: String): Promise<any> {
         var restHandler = this.restCallHandlerService;
         return restHandler.get("HEALTH_TOOL", { 'tool': toolName, 'category': toolCategory, 'agentId': agentId });
+    }
+    downloadLog(fileName): Observable<Blob> {
+        let authToken = this.cookieService.get('Authorization');
+        let headers_object = new HttpHeaders();
+        headers_object = headers_object.append("Authorization", authToken);
+        let params = new HttpParams();
+        params = params.append("logFileName", fileName + ".log");
+        return this.httpClient.get("/PlatformAuditService/traceability/getReportLog", { headers: headers_object, responseType: 'blob', params });
     }
 
 }

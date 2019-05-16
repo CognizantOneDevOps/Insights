@@ -126,3 +126,9 @@ tr.mat-footer-row, tr.mat-row {
      background-color: #00B140 !important;
 
  }  
+
+ .file {
+    text-decoration-line: underline;
+    text-decoration-color: blue;
+    cursor: pointer;
+}

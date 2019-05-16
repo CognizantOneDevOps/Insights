@@ -36,12 +36,14 @@ public class ElasticSearchDBHandler {
 		ClientResponse response = null;
 		String result = "";
 		try {
-			WebResource resource = Client.create().resource(url);
+			Client client = Client.create();
+			client.setConnectTimeout(5001);
+			WebResource resource = client.resource(url);
 			response = resource.accept(MediaType.APPLICATION_JSON).type(MediaType.APPLICATION_JSON)
 					.get(ClientResponse.class);
 			result = response.getEntity(String.class);
 		} catch (Exception e) {
-			log.error("Exception while getting data from ES", e);
+			log.error("Exception while getting data of url " + url, e);
 		} finally {
 			if (response != null) {
 				response.close();
