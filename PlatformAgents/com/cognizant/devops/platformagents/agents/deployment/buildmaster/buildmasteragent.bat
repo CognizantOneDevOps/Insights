@@ -13,5 +13,5 @@ WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
 License for the specific language governing permissions and limitations under
 the License.
 :comment
-pushd %INSIGHTS_AGENT_HOME%\PlatformAgents\awscodepipeline
-python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.deployment.awscodepipeline.AwsCodePipelineAgent import AwsCodePipelineAgent; AwsCodePipelineAgent()"
+pushd %INSIGHTS_AGENT_HOME%\PlatformAgents\buildmaster
+python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.deployment.buildmaster.BuildMasterAgent import BuildMasterAgent; BuildMasterAgent()"

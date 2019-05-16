@@ -25,6 +25,7 @@ import boto3
 import time
 import json, ast
 
+
 class AwsCodePipelineAgent(BaseAgent):
     def process(self):
         startFrom = self.config.get("startFrom", '')
@@ -46,39 +47,63 @@ class AwsCodePipelineAgent(BaseAgent):
                               aws_access_key_id=accesskey,
                               aws_secret_access_key=secretkey,
                               region_name=regionName)
-        tracking_data = []
-        injectData = {}
-        pipeline = client.list_pipelines(
-        )
-        for names in pipeline["pipelines"]:
-            response = client.get_pipeline_state(
-                name=names["name"]
-            )
-            date = str(response['created'])
-            date = parser.parse(date)
-            date = date.strftime('%Y-%m-%dT%H:%M:%S')
-            pattern = '%Y-%m-%dT%H:%M:%S'
-            date = int(time.mktime(time.strptime(date, pattern)))
-            if since == None or date > since:
-                injectData['pipelineName'] = str(response['pipelineName'])
-                injectData['jobName'] = str(response['stageStates'][1]['stageName'])
-                injectData['status'] = str(response['stageStates'][0]['actionStates'][0]['latestExecution']['status'])
-                summary = response['stageStates'][0]['actionStates'][0]['latestExecution']["errorDetails"]
-                injectData['summary'] = summary['message']
-                injectData['createTime'] = str(response['created'])
-                injectData['pipelineTime'] = response['created'].strftime('%Y-%m-%dT%H:%M:%SZ')
-                start = str(response['stageStates'][0]['actionStates'][0]['latestExecution']['lastStatusChange'])
-                injectData['pipelineStartTime'] = start
-                string = ast.literal_eval(json.dumps(injectData))
-                tracking_data.append(string)
-                seq = [x['createTime'] for x in tracking_data]
-                fromDateTime = max(seq)
-                fromDateTime = parser.parse(fromDateTime)
-                fromDateTime = fromDateTime.strftime('%Y-%m-%dT%H:%M:%S')
-        if tracking_data != []:
-            self.publishToolsData(tracking_data)
-            self.tracking["lastupdated"] = fromDateTime
-            self.updateTrackingJson(self.tracking)
 
+        response = client.list_pipelines()
+        length = len(response['pipelines'])
+        pipeline = []
+        for n in range(0,length):
+            res = str(response['pipelines'][n]['name'])
+            pipeline.append(res)
+        pipeline=list(set(pipeline))
+        for value in pipeline:            
+            response = client.list_pipeline_executions(
+                 pipelineName=value
+                 )
+            
+            injectData = {}
+            tracking_data = []
+            since = self.tracking.get(value,None)
+            if since == None:
+                lastUpdated = startFrom
+            else:
+                since = parser.parse(since)
+                since = since.strftime('%Y-%m-%dT%H:%M:%S')
+                lastUpdated = since
+           
+            if len(response['pipelineExecutionSummaries']) > 0:
+                date = str(response['pipelineExecutionSummaries'][0]['lastUpdateTime'])
+                date = parser.parse(date)
+                date = date.strftime('%Y-%m-%dT%H:%M:%S')
+                if since == None or date > since:                   
+                   for response in response['pipelineExecutionSummaries']:                       
+                       injectData['pipelineName'] = value
+                       injectData['status'] = str(response['status'])
+                       injectData['jobId'] = str(response['pipelineExecutionId'])
+                       injectData['createTime'] = str(response['startTime'])
+                       start = str(response['startTime'])
+                       start = parser.parse(start)
+                       start_e = start.strftime('%Y-%m-%dT%H:%M:%S')
+                       start_f = start.strftime('%Y-%m-%d')
+                       injectData['startTime'] = start_f
+                       pattern = '%Y-%m-%dT%H:%M:%S'
+                       epoch = int(time.mktime(time.strptime(start_e,pattern)))
+                       injectData['startTimeepoch'] = epoch
+                       date = str(response['lastUpdateTime'])
+                       date = parser.parse(date)
+                       date = date.strftime('%Y-%m-%dT%H:%M:%S')
+                       injectData['lastUpdateTime'] = date
+                       pattern = '%Y-%m-%dT%H:%M:%S'
+                       date = int(time.mktime(time.strptime(date,pattern)))
+                       injectData['lastUpdateTimeepoch'] = date
+                       string = ast.literal_eval(json.dumps(injectData))
+                       tracking_data.append(string)
+                       seq = [x['lastUpdateTime'] for x in tracking_data]
+                       fromDateTime = max(seq)
+                else:                   
+                   fromDateTime = lastUpdated
+            self.tracking[value] = fromDateTime            
+            if tracking_data!=[]:                
+                self.publishToolsData(tracking_data)
+                self.updateTrackingJson(self.tracking)
 if __name__ == "__main__":
     AwsCodePipelineAgent()
