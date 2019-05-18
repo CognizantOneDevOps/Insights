@@ -7,7 +7,8 @@
     "agentControlXchg":"iAgent"
   },
   "subscribe": {
-    "config": "ALM.RALLY.config"
+    "config": "ALM.RALLY.config",
+    "agentCtrlQueue" : "pizzahutagent"
   },
   "publish": {
     "data": "ALM.RALLY.DATA",
@@ -15,46 +16,69 @@
   },
   "communication": {
     "type": "REST",
-    "sslVerify": true,
+    "sslVerify": false,
     "responseType": "JSON"
   },
   
   "dynamicTemplate": {
     "timeFieldMapping" : {
-		"startDate" : "%Y-%m-%d"
+		"startDate" : "%Y-%m-%dT%H:%M:%S.%fZ"
   	},
-  "relationMetadata": {"labels" : ["RALLY_ITERATION"],"dataUpdateSupported" : true,"uniqueKey":["workspaceID", "projectID", "iterationID"]},
   "runSchedule": 30,
+  "relationMetadata": {"labels" : ["RALLY_ITERATION"],"dataUpdateSupported" : true,"uniqueKey":["workspaceID", "projectID", "iterationID"]},
+  "releaseMetadata": {"labels":["RALLY_RELEASE"],"dataUpdateSupported" : true,"uniqueKey":["workspaceID", "projectID","releaseID"]},
   "storyMetadata": {"labels":["RALLY_STORY"],"dataUpdateSupported" : true,"uniqueKey":["formattedID" , "workspaceID"]},
   "specificWorkspaceList": [
                            
                           ],
-  "artifactType" : ["TestCase" , "Defect" , "HierarchicalRequirement", "DefectSuite" , "TestSet" , "Task"],
+  "artifactType" : ["Defect", "TestCase", "HierarchicalRequirement", "DefectSuite", "TestSet", "Task", "TAGS"],
   "storyResponseTemplate" : [
-  "DefectSuites:Count", "WorkProduct:_refObjectName", "Tasks:Count","State" , "Priority" , "Risk", "TesCaseType" , "ClosedDate" , "Environment", "FlowStateChangedDate", "ScheduleState", "TestCaseCount", "PlanEstimate", "TaskActualTotal" , "TaskEstimateTotal" , "TaskEstimateTotal", "TaskRemainingTotal"
-  ],
+  "DefectSuites:Count", "WorkProduct:_refObjectName", "Tasks:Count","Defects:Count","State" , "Priority" , "Risk", "TesCaseType" , "OpenedDate" , "ClosedDate" , "Environment", "FlowStateChangedDate", "ScheduleState", "TestCaseCount", "PlanEstimate", "TaskActualTotal" , "TaskEstimateTotal",  "TaskRemainingTotal","PassingTestCaseCount","TaskStatus","CreationDate","LastRun","LastVerdict" ],
   "iterationResponseTemplate" : {
-							"Iteration" : {
-										"_refObjectName": "iterationName",
-										"CreationDate": "iterationCreationDate",
-										"EndDate": "iterationEndDate",
-										"PlanEstimate": "iterationPlanEstimate",
-										"PlannedVelocity": "iterationPlannedVelocity",
-										"StartDate": "iterationStartDate",
-										"TaskActualTotal": "iterationState",
-
-										"TaskEstimateTotal": "iterationTaskEstimateTotal",
-										"TaskRemainingTotal": "iterationTaskRemainingTotal",
-										"Workspace" : {
-											"_refObjectName": "iterationWorkspace"
-										              },
-										"Project" : {
-											"_refObjectName": "iterationProjectName"
-										             }
-							            }
-                               }
+	"Iteration" : {
+				"_refObjectName": "iterationName",
+				"CreationDate": "iterationCreationDate",
+				"EndDate": "iterationEndDate",
+				"PlanEstimate": "iterationPlanEstimate",
+				"PlannedVelocity": "iterationPlannedVelocity",
+				"StartDate": "iterationStartDate",
+				"TaskActualTotal": "iterationState",
+				"TaskEstimateTotal": "iterationTaskEstimateTotal",
+				"TaskRemainingTotal": "iterationTaskRemainingTotal",
+				"Workspace" : {
+					"_refObjectName": "iterationWorkspace"
+							  },
+				"Project" : {
+					"_refObjectName": "iterationProjectName"
+							 }
+				}
+	   },
+	"releaseResponseTemplate" : {
+	"Release" : {
+					"_refObjectName": "releaseName",
+					"CreationDate": "releaseCreationDate",
+					"State": "releaseState",
+					"Accepted":"releaseAccepted",
+					"PlanEstimate": "releasePlanEstimate",
+					"PlannedVelocity": "releasePlannedVelocity",
+					"ReleaseDate": "releaseEndDate",
+					"ReleaseStartDate": "releaseStartDate",
+					"TaskActualTotal": "releaseTaskActualTotal",
+					"TaskEstimateTotal": "releaseTaskEstimateTotal",
+					"TaskRemainingTotal": "releaseTaskRemainingTotal",
+					"Workspace" : {
+						"_refObjectName": "releaseWorkspace"
+								  },
+					"Project" : {
+						"_refObjectName": "iterationProjectName"
+								 },
+					"WorkProducts":{
+						"Count":"releaseWorkProducyCount"
+					}			 
+			  }
+	   }
   },
-  "agentId" : "",
+  "agentId": "",
   "toolCategory" : "ALM",
   "proxy": "proxy.companyname.com:8080/",
   "accesstoken":"***REMOVED***",
@@ -64,13 +88,13 @@
   "dataSize" : 20,
   "enableDataValidation": true,
   "baseUrl": "https://rally1.rallydev.com/slm/webservice/v2.0/",
-  "startFrom": "2016-10-10 00:01",
+  "startFrom": "2019-04-15T00:00:01.000Z",
   "enableValueArray": false,
   "toolsTimeZone" : "Asia/Kolkata",
   "insightsTimeZone" : "Asia/Kolkata",
   "useResponseTemplate" : true,
   "timeStampField":"lastUpdateDate",
-  "timeStampFormat":"%Y-%m-%dT%H:%M:%SZ",
+  "timeStampFormat":"%Y-%m-%dT%H:%M:%S.%fZ",
   "isEpochTimeFormat" : false,
   
   "isDebugAllowed" : false,

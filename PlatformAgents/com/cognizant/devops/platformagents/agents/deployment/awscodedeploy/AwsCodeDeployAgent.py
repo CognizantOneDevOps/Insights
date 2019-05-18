@@ -44,6 +44,7 @@ class AwsCodeDeployAgent(BaseAgent):
         accesskey = self.config.get("awsAccesskey", '')
         secretkey = self.config.get("awsSecretkey", '')
         regionName = self.config.get("awsRegion", '')
+        #print("before client")
         client = boto3.client('codedeploy',
                               aws_access_key_id=accesskey,
                               aws_secret_access_key=secretkey,
@@ -52,6 +53,10 @@ class AwsCodeDeployAgent(BaseAgent):
         tracking_data = []
         getApps = client.list_applications(
         )
+
+        #print("after list_app")
+        #print(getApps)
+
         for app in getApps["applications"]:
             depGroups = client.list_deployment_groups(
                 applicationName=app
@@ -68,17 +73,25 @@ class AwsCodeDeployAgent(BaseAgent):
                 getlist = [[str(deployments) for deployments in response['deployments']] for deployments in response]
                 getlist = [item for items in getlist for item in items]
                 deployId = list(set(getlist))
+
                 for n in deployId:
                     injectData = {}
                     string = {}
-                    deploy = client.get_deployment(
-                        deploymentId=n
-                    )
+                    #print(n)
+                    try:
+                        deploy = client.get_deployment(
+                                        deploymentId=n
+                                        )
+                    except Exception as ex:
+                        #self.tracking["latestError"] = str(ex)
+                        pass;
+
                     date = str(deploy['deploymentInfo']['createTime'])
                     date = parser.parse(date)
                     date = date.strftime('%Y-%m-%dT%H:%M:%S')
                     pattern = '%Y-%m-%dT%H:%M:%S'
                     date = int(time.mktime(time.strptime(date, pattern)))
+
                     if since == None or date > since:
                         injectData['status'] = str(deploy['deploymentInfo']['status'])
                         injectData['applicationName'] = str(deploy['deploymentInfo']['applicationName'])
@@ -97,7 +110,9 @@ class AwsCodeDeployAgent(BaseAgent):
                         fromDateTime = max(seq)
                         fromDateTime = parser.parse(fromDateTime)
                         fromDateTime = fromDateTime.strftime('%Y-%m-%dT%H:%M:%S')
+
         if tracking_data != []:
+
             self.publishToolsData(tracking_data)
             self.tracking["lastupdated"] = fromDateTime
             self.updateTrackingJson(self.tracking)
