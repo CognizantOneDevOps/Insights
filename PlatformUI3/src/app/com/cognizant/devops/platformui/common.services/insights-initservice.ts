@@ -18,9 +18,9 @@ import { Location, LocationStrategy, PathLocationStrategy } from '@angular/commo
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { CookieService } from 'ngx-cookie-service';
 import { ImageHandlerService } from '@insights/common/imageHandler.service';
 import { LogService } from '@insights/common/log-service';
+
 
 @Injectable()
 export class InsightsInitService {
@@ -33,8 +33,7 @@ export class InsightsInitService {
     static showAuditReporting = false;
 
     constructor(location: Location, private http: HttpClient,
-        private cookieService: CookieService, private imageHandler: ImageHandlerService,
-        private logger: LogService) {
+        private imageHandler: ImageHandlerService, private logger: LogService) {
     }
 
     public async initMethods() {
@@ -91,15 +90,6 @@ export class InsightsInitService {
 
     public getAgentsOsList(): any {
         return InsightsInitService.agentsOsList;
-    }
-
-    public getGrafanaHost1(): Promise<any> {
-        var self = this;
-        var resource;
-        var authToken = this.cookieService.get('Authorization');
-        var defaultHeader = { 'Authorization': authToken };
-        var restcallUrl = InsightsInitService.getServiceHost() + "/PlatformService/configure/grafanaEndPoint";
-        return this.http.get(restcallUrl).toPromise();
     }
 
     public getJSONUsingObservable(url): Observable<any> {

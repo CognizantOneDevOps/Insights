@@ -418,12 +418,12 @@ export class HomeComponent implements OnInit {
     // construct a form with hidden inputs, targeting the iframe
     var form = document.createElement("form");
     form.target = uniqueString;
-    this.config.getGrafanaHost1().then(function (response) {
+    if (this.config.getGrafanaHost()) {
       form.action = InsightsInitService.grafanaHost + "/logout";
       form.method = "GET";
       document.body.appendChild(form);
       form.submit();
-    });
+    }
     this.grafanaService.logout()
       .then(function (data) {
         //console.log(data);
