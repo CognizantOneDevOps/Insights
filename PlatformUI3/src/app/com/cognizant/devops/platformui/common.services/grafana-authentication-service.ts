@@ -17,26 +17,25 @@
 import { Injectable } from '@angular/core';
 import { RestCallHandlerService } from '@insights/common/rest-call-handler.service';
 import { Observable } from 'rxjs';
-import { CookieService } from 'ngx-cookie-service';
 import { Location, LocationStrategy, PathLocationStrategy } from '@angular/common';
 import { Router, ActivatedRoute } from '@angular/router';
+import { DataSharedService } from '@insights/common/data-shared-service';
 
 export interface IAuthenticationService {
     getAuthentication(authToken: string, msg: string): void;
-    validateSession(): void;
     logout(): Promise<any>;
     getGrafanaCurrentOrgAndRole(): Promise<any>;
     getCurrentUserOrgs(): Promise<any>;
-    getUsers(): Promise<any> ;
+    getUsers(): Promise<any>;
 }
- 
+
 
 @Injectable()
 export class GrafanaAuthenticationService implements IAuthenticationService {
     response: any;
     location: Location;
     constructor(location: Location, private router: Router,
-        private cookieService: CookieService, private restCallHandlerService: RestCallHandlerService
+        private dataShare: DataSharedService, private restCallHandlerService: RestCallHandlerService
     ) {
 
 
@@ -50,27 +49,6 @@ export class GrafanaAuthenticationService implements IAuthenticationService {
         }
     }
 
-    public validateSession(): void {
-        var authToken = this.cookieService.get('Authorization');
-        //console.log(authToken)
-        if (authToken === undefined) {
-            this.cookieService.delete('Authorization');
-            this.router.navigate(['/login']);
-        } else {
-            var dashboardSessionExpirationTime = this.cookieService.get('DashboardSessionExpiration');
-            var date = new Date();
-            //console.log(dashboardSessionExpirationTime)
-            if (new Date(dashboardSessionExpirationTime) > date) {
-                var minutes = 30;
-                //console.log("Inside validateSession");
-                date.setTime(date.getTime() + (minutes * 60 * 1000));
-                this.cookieService.set('Authorization', authToken, date);
-            } else {
-                this.cookieService.delete('Authorization');
-                this.router.navigate(['/login']);
-            }
-        }
-    }
 
     public logout(): Promise<any> {
         var restHandler = this.restCallHandlerService;
@@ -92,8 +70,8 @@ export class GrafanaAuthenticationService implements IAuthenticationService {
         return restHandler.postWithParameter("ACCESS_GROUP_MANAGEMENT_SWITCH_ORGS", { "orgId": orgId }, { 'Content-Type': 'application/x-www-form-urlencoded' }).toPromise();
     }
 
-   public getUsers(): Promise<any> {
-            var restHandler = this.restCallHandlerService;
-             return restHandler.get("ACCESS_GROUP_MANAGEMENT_GET_USERS");
+    public getUsers(): Promise<any> {
+        var restHandler = this.restCallHandlerService;
+        return restHandler.get("ACCESS_GROUP_MANAGEMENT_GET_USERS");
     }
 }

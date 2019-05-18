@@ -17,7 +17,7 @@ import { Injectable } from '@angular/core';
 import { RestCallHandlerService } from '@insights/common/rest-call-handler.service';
 import { Observable } from 'rxjs';
 import { HttpHeaders, HttpClient, HttpParams } from '@angular/common/http';
-import { CookieService } from 'ngx-cookie-service';
+import { DataSharedService } from '@insights/common/data-shared-service';
 
 
 export interface IHealthCheckService {
@@ -33,7 +33,7 @@ export interface IHealthCheckService {
 export class HealthCheckService implements IHealthCheckService {
 
     constructor(private restCallHandlerService: RestCallHandlerService, private httpClient: HttpClient,
-        private cookieService: CookieService) {
+        private dataShare: DataSharedService) {
     }
 
     loadServerHealthConfiguration(): Promise<any> {
@@ -49,7 +49,7 @@ export class HealthCheckService implements IHealthCheckService {
         return restHandler.get("HEALTH_TOOL", { 'tool': toolName, 'category': toolCategory, 'agentId': agentId });
     }
     downloadLog(fileName): Observable<Blob> {
-        let authToken = this.cookieService.get('Authorization');
+        let authToken = this.dataShare.getAuthorizationToken();
         let headers_object = new HttpHeaders();
         headers_object = headers_object.append("Authorization", authToken);
         let params = new HttpParams();
