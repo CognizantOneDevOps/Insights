@@ -65,7 +65,6 @@ export class UserOnboardingComponent implements OnInit {
 
     this.framesize = window.frames.innerHeight;
     var orgId2 = this.dataShare.getStoragedProperty("orgId");
-    console.log(" orgId2 " + orgId2);
 
     var receiveMessage = function (evt) {
       var height = parseInt(evt.data);
@@ -89,17 +88,17 @@ export class UserOnboardingComponent implements OnInit {
     this.adminOrgDataArray = [];
 
     let adminOrgsResponse = await this.userOnboardingService.getCurrentUserOrgs();
-    console.log(adminOrgsResponse);
+    //console.log(adminOrgsResponse);
     if (adminOrgsResponse.data != undefined && adminOrgsResponse.status == "success") {
       var orgId2 = this.dataShare.getStoragedProperty("orgId");
-      console.log(" orgId2 === " + orgId2);
+      //console.log(" orgId2 === " + orgId2);
       for (var orgData of adminOrgsResponse.data) {
-        console.log(orgData)
+        //console.log(orgData)
         if ((orgData.role) === 'Admin') {
           this.adminOrgDataArray.push(orgData);
           if (orgId2 == orgData.orgId) {
             var record = orgData;
-            console.log("Selected === " + orgData);
+            //console.log("Selected === " + orgData);
             this.selectedAdminOrg = record;
           }
         }
@@ -107,13 +106,13 @@ export class UserOnboardingComponent implements OnInit {
       this.isSaveEnable = false;
     }
 
-    console.log(this.selectedAdminOrg);
+    //console.log(this.selectedAdminOrg);
     this.loadUsersInfo(this.selectedAdminOrg);
 
   }
 
   loadUsersInfo(selectedAdminOrg) {
-    console.log(selectedAdminOrg);
+    //console.log(selectedAdminOrg);
     this.isSaveEnable = false;
     this.showThrobber = true;
     var self = this;
