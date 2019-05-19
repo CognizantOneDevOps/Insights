@@ -60,10 +60,10 @@
         </mat-icon>
 
       </button>
-      <button mat-icon-button (click)="addGlobalUser()">
+      <button mat-icon-button>
         <!-- <mat-icon title="Add Global User" class="mat-icon material-icons">
           person_add
-        </mat-icon> -->
+        </mat-icon> (click)="addGlobalUser()" -->
         <mat-icon svgIcon="lineInButton" class="mat-icon material-icons">
           linea
         </mat-icon>
@@ -152,7 +152,7 @@
 
   <div *ngIf=" !showDetail ">
 
-    <div class="column1">
+    <!-- <div class="column1">
       <div class="showTable" style="text-align: center; padding: 25px;">
       </div>
       <table>
@@ -228,13 +228,13 @@
         </tbody>
       </table>
 
-    </div>
+    </div> -->
 
-    <div class="column2">
+    <!-- <div class="column2">
       <div class="showTable" style="text-align: center; padding: 25px;">
       </div>
 
-    </div>
+    </div> -->
 
 
     <!-- <div [hidden]="!showDetail">

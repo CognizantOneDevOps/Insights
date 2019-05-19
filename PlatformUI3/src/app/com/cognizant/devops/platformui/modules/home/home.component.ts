@@ -206,11 +206,7 @@ export class HomeComponent implements OnInit {
         } else {
           this.router.navigateByUrl(item.route, { skipLocationChange: true });
         }
-      } /*else {
-      if (item.displayName == 'grafana') {
-        console.log("in grafana");
       }
-    }*/
     }
   }
 
@@ -259,7 +255,7 @@ export class HomeComponent implements OnInit {
       {
         displayName: 'Audit Reporting',
         iconName: 'feature',
-        isAdminMenu: false,
+        isAdminMenu: true,
         showMenu: InsightsInitService.showAuditReporting,
         title: "Audit Report and search assets",
         isToolbarDisplay: true,//false

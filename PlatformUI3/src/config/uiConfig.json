@@ -1,6 +1,6 @@
 {
 	"showBusinessMapping": true,
-	"showAuditReporting": true,
+	"showAuditReporting": false,
 	"agentsOsList": {
 		"Windows": "windows",
 		"RHEL/CentOS": "linux",
