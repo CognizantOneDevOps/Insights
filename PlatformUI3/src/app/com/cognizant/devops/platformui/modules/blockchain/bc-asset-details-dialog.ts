@@ -227,12 +227,14 @@ export class AssetDetailsDialog implements OnInit {
                     } else {
                         let checkFinal = false;
                         orderlst.forEach((b) => {
-                            b.child.forEach(k => {
-                                if (k.point.assetID === s.assetID) {
-                                    b.child.push({ point: s });
-                                    checkFinal = true;
-                                }
-                            })
+                            if (b.point === s.toolName) {
+                                b.child.forEach(k => {
+                                    if (!checkFinal && k.point.assetID === s.assetID) {
+                                        b.child.push({ point: s });
+                                        checkFinal = true;
+                                    }
+                                })
+                            }
                         })
                         if (!checkFinal) {
                             let obj = {
