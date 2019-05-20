@@ -41,7 +41,7 @@
   "enableDataValidation": true,
   "useResponseTemplate": false,
   "isEpochTimeFormat": true,
-  "apiKey": "9723386877",
+  "apiKey": "apiKey",
   "endpoint": "endpoint",
   "userid": "userid",
   "passwd": "passwd",

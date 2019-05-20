@@ -21,7 +21,7 @@ from dateutil import parser
 class BuildMasterAgent(BaseAgent):
     def process(self):
         startFrom = self.config.get("StartFrom", '')
-        apiKey = self.config.get("apiKey", '')
+        apiKey = str(self.config.get("apiKey", ''))
         baseurl = self.config.get("endpoint", '')
         userid = self.config.get("userid", '')
         passwd = self.config.get("passwd", '')
