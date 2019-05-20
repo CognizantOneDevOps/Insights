@@ -47,7 +47,5 @@
     "logLevel": "WARN",
     "maxBytes": 5000000,
     "backupCount": 1000
-  },
-  "osversion": "linux",
-  "agentVersion": "v4.7",
+  }
 }
