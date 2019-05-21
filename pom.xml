@@ -152,9 +152,10 @@
 				<module>PlatformUI2.0</module>
 				<module>PlatformUI3</module>
 				<module>PlatformInsights</module>
-				<module>PlatformAuditEngine</module>
+			        <module>PlatformAuditEngine</module>
+			        <module>PlatformAuditing</module>				
 				<module>PlatformAuditService</module>
-				<module>PlatformAuditing</module>
+				
 			</modules>
 			<distributionManagement>
 				<repository> 
