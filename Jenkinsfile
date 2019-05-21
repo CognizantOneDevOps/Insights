@@ -39,7 +39,7 @@ gitCommitID = sh (
   	} //License Check ends	
    // Platform Service Starts
 	try{
-	
+	//Build for the pom profile enterprise
   	stage ('Insight_PS_Build') {
         sh 'cd /var/jenkins/jobs/$commitID/workspace/PlatformUI3 && npm install'
 	sh 'cd /var/jenkins/jobs/$commitID/workspace && mvn clean install -DskipTests -P enterprise'
