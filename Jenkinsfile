@@ -35,7 +35,7 @@ gitCommitID = sh (
 		sh 'cat files.txt'
 		echo "*****************************************************************************************************************"
 		echo "#################################################################################################################"
-    		slackSend channel: '#insightsjenkins', color: 'good', message: "BuildFailed for commitID - *$gitCommitID*, Branch - *$branchName* because Apache License is not updated in few files. \n List of files can be found at the bottom of the page @ https://buildon.cogdevops.com/buildon/HistoricCIWebController?commitId=$gitCommitID",  teamDomain: 'insightscogdevops',  token: slackToken
+    		slackSend channel: '#insightsjenkins', color: 'good', message: "Insights Enterprise Build Failed BuildFailed for commitID - *$gitCommitID*, Branch - *$branchName* because Apache License is not updated in few files. \n List of files can be found at the bottom of the page @ https://buildon.cogdevops.com/buildon/HistoricCIWebController?commitId=$gitCommitID",  teamDomain: 'insightscogdevops',  token: slackToken
     		sh 'rm -rf files.txt'
     		sh 'exit 1'
 	} else {
@@ -76,7 +76,7 @@ gitCommitID = sh (
 	}
 	catch (err){
 		
-	slackSend channel: '#insightsjenkins', color: 'bad', message: "BuildFailed for commitID - *$gitCommitID*, Branch - *$branchName* \n Build Log can be found @ https://buildon.cogdevops.com/buildon/HistoricCIWebController?commitId=$gitCommitID", teamDomain: "insightscogdevops", token: slackToken
+	slackSend channel: '#insightsjenkins', color: 'bad', message: "Insights Enterprise Build Failed for commitID - *$gitCommitID*, Branch - *$branchName* \n Build Log can be found @ https://buildon.cogdevops.com/buildon/HistoricCIWebController?commitId=$gitCommitID", teamDomain: "insightscogdevops", token: slackToken
 	sh 'exit 1'
 	}	
 	// Platform Service Ends	   
