@@ -6,8 +6,13 @@ gitCommitID = sh (
     script: 'echo $commitID | cut -d "-" -f2',
     returnStdout: true
 ).trim()
-// All single and double quotes in this file are used in a certain format.Do not alter in any step
+	
+	stage('SCM Checkout') {
+	checkout scm	
+	}
+// All single and double quotes in this file are used in a certain format.Do not alter in any step.
 	//ApacheLicense Check in java and Python files
+	/*
 	stage ('LicenseCheck') {
            checkout scm
     	   def commit = sh (returnStdout: true, script: '''var=''
@@ -30,19 +35,21 @@ gitCommitID = sh (
 		sh 'cat files.txt'
 		echo "*****************************************************************************************************************"
 		echo "#################################################################################################################"
-    		slackSend channel: '#insightsjenkins', color: 'good', message: "BuildFailed for commitID - *$gitCommitID*, Branch - *$branchName* because Apache License is not updated in few files. \n List of files can be found at the bottom of the page @ https://buildon.cogdevops.com/buildon/HistoricCIWebController?commitId=$gitCommitID",  teamDomain: 'insightscogdevops',  token: slackToken
+    		slackSend channel: '#insightsjenkins', color: 'good', message: "Insights Enterprise Build Failed BuildFailed for commitID - *$gitCommitID*, Branch - *$branchName* because Apache License is not updated in few files. \n List of files can be found at the bottom of the page @ https://buildon.cogdevops.com/buildon/HistoricCIWebController?commitId=$gitCommitID",  teamDomain: 'insightscogdevops',  token: slackToken
     		sh 'rm -rf files.txt'
     		sh 'exit 1'
 	} else {
     		echo 'License is up to date'
     		}
   	} //License Check ends	
+	
+	*/
    // Platform Service Starts
 	try{
-	
+	//Build for the pom profile enterprise
   	stage ('Insight_PS_Build') {
         sh 'cd /var/jenkins/jobs/$commitID/workspace/PlatformUI3 && npm install'
-	sh 'cd /var/jenkins/jobs/$commitID/workspace && mvn clean install -DskipTests'
+	sh 'cd /var/jenkins/jobs/$commitID/workspace && mvn clean install -DskipTests -P enterprise'
 	   }	
 	
 	//Below step will be enabled in next release to include security analysis.
@@ -63,13 +70,13 @@ gitCommitID = sh (
 	}
 		
 	stage ('Insight_PS_NexusUpload') {		
-		sh 'mvn deploy -DskipTests=true'		
+		sh 'mvn deploy -DskipTests -P enterprise'		
 		}
 	
 	}
 	catch (err){
 		
-	slackSend channel: '#insightsjenkins', color: 'bad', message: "BuildFailed for commitID - *$gitCommitID*, Branch - *$branchName* \n Build Log can be found @ https://buildon.cogdevops.com/buildon/HistoricCIWebController?commitId=$gitCommitID", teamDomain: "insightscogdevops", token: slackToken
+	slackSend channel: '#insightsjenkins', color: 'bad', message: "Insights Enterprise Build Failed for commitID - *$gitCommitID*, Branch - *$branchName* \n Build Log can be found @ https://buildon.cogdevops.com/buildon/HistoricCIWebController?commitId=$gitCommitID", teamDomain: "insightscogdevops", token: slackToken
 	sh 'exit 1'
 	}	
 	// Platform Service Ends	   
@@ -104,7 +111,7 @@ gitCommitID = sh (
 		
 		if(pomversionService.contains("SNAPSHOT") && pomversionEngine.contains("SNAPSHOT") && pomversion.contains("SNAPSHOT") && pomUIversion.contains("SNAPSHOT") && pomUI3version.contains("SNAPSHOT")){
 		
-			NEXUSREPO="https://repo.cogdevops.com/repository/buildonInsights"
+			NEXUSREPO="https://repo.cogdevops.com/repository/buildonInsightsEnterprise"
 			
 			//get artifact info (artifactID,classifier,timestamp, buildnumber,version) from maven-metadata.xml
 		sh "curl -s ${NEXUSREPO}/com/cognizant/devops/PlatformService/${pomversionService}/maven-metadata.xml  | grep -oP '(?<=<artifactId>).*?(?=</artifactId>)|(?<=<version>).*?(?=</version>)|(?<=<timestamp>).*?(?=</timestamp>)|(?<=<buildNumber>).*?(?=</buildNumber>)|(?<=<classifier>).*?(?=</classifier>)' | paste -sd- - | sed 's/-SNAPSHOT//g' | sed 's/--/-/g' | sed 's/\$/.war/' > /var/jenkins/jobs/$commitID/workspace/PlatformService/PS_artifact"
@@ -124,7 +131,7 @@ gitCommitID = sh (
 		
 		} else {
 		
-		    NEXUSREPO="https://repo.cogdevops.com/repository/InsightsRelease"
+		    NEXUSREPO="https://repo.cogdevops.com/repository/InsightsEnterpriseRelease"
 			
 			//get artifact info (artifactID,classifier,timestamp, buildnumber,version) from maven-metadata.xml
 		sh "curl -s ${NEXUSREPO}/com/cognizant/devops/PlatformService/maven-metadata.xml  | grep -oP '(?<=<artifactId>).*?(?=</artifactId>)|(?<=<release>).*?(?=</release>)|(?<=<timestamp>).*?(?=</timestamp>)|(?<=<buildNumber>).*?(?=</buildNumber>)|(?<=<classifier>).*?(?=</classifier>)' | paste -sd- - | sed 's/-SNAPSHOT//g' | sed 's/--/-/g' | sed 's/\$/.war/' > /var/jenkins/jobs/$commitID/workspace/PlatformService/PS_artifact"
