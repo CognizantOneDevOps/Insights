@@ -54,19 +54,19 @@ gitCommitID = sh (
 	
 	//Below step will be enabled in next release to include security analysis.
 	/*stage ('Insight_PS_IQ') {	
-	sh 'mvn com.sonatype.clm:clm-maven-plugin:evaluate -Dclm.applicationId=Insights'
+	sh 'mvn com.sonatype.clm:clm-maven-plugin:evaluate -Dclm.applicationId=Insights -P enterprise'
    	}*/
 
 	stage ('Insight_PS_CodeAnalysis') {
-		sh 'mvn sonar:sonar -Dmaven.test.failure.ignore=true -DskipTests=true -Dsonar.sources=src/main/java -pl !PlatformUI3'
+		sh 'mvn sonar:sonar -Dmaven.test.failure.ignore=true -DskipTests=true -Dsonar.sources=src/main/java -pl !PlatformUI3 -P enterprise'
 		
         }
 		
         stage ('Insight_PUI2.0_CodeAnalysis') {		
-		sh 'cd /var/jenkins/jobs/$commitID/workspace/PlatformUI2.0 && mvn sonar:sonar -Dmaven.test.failure.ignore=true -DskipTests=true -Dsonar.sources=app/src/modules -Dsonar.language=js -Dsonar.javascript.file.suffixes=.ts'
+		sh 'cd /var/jenkins/jobs/$commitID/workspace/PlatformUI2.0 && mvn sonar:sonar -Dmaven.test.failure.ignore=true -DskipTests=true -Dsonar.sources=app/src/modules -Dsonar.language=js -Dsonar.javascript.file.suffixes=.ts -P enterprise'
 	}
         stage ('Insight_PUI3_CodeAnalysis') {		
-		sh 'cd /var/jenkins/jobs/$commitID/workspace/PlatformUI3 && mvn sonar:sonar -Dmaven.test.failure.ignore=true -DskipTests=true -Dsonar.sources=src/app/com/cognizant/devops/platformui/modules -Dsonar.language=js -Dsonar.javascript.file.suffixes=.ts'
+		sh 'cd /var/jenkins/jobs/$commitID/workspace/PlatformUI3 && mvn sonar:sonar -Dmaven.test.failure.ignore=true -DskipTests=true -Dsonar.sources=src/app/com/cognizant/devops/platformui/modules -Dsonar.language=js -Dsonar.javascript.file.suffixes=.ts -P enterprise'
 	}
 		
 	stage ('Insight_PS_NexusUpload') {		
