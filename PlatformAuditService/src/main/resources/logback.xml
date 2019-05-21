@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+	<appender name="FILE-THREAD" class="ch.qos.logback.classic.sift.SiftingAppender">
+
+		<discriminator>
+			<key>logFileName</key>
+			<defaultValue>Report</defaultValue>
+		</discriminator>
+
+		<sift>
+
+			<!-- A standard RollingFileAppender, the log file is based on 'logFileName' 
+				at runtime -->
+			<appender name="FILE-${logFileName}"
+				class="ch.qos.logback.core.rolling.RollingFileAppender">
+				<file>${INSIGHTS_HOME}/logs/PlatformAuditService/Reports/${logFileName}.log
+				</file>
+
+				<encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+					<Pattern>
+						%d{yyyy-MM-dd HH:mm:ss} %mdc [%thread] %level %logger{35}
+						- %msg%n
+					</Pattern>
+				</encoder>
+
+				<rollingPolicy
+					class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
+					<FileNamePattern>${INSIGHTS_HOME}/logs/PlatformAuditService/Reports/${logFileName}.%i.log.zip
+					</FileNamePattern>
+					<MinIndex>1</MinIndex>
+					<MaxIndex>10</MaxIndex>
+				</rollingPolicy>
+
+				<triggeringPolicy
+					class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+					<MaxFileSize>10MB</MaxFileSize>
+				</triggeringPolicy>
+
+			</appender>
+
+		</sift>
+	</appender>
+
+	<!-- <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender"> 
+		<layout class="ch.qos.logback.classic.PatternLayout"> <Pattern> %-5level 
+		%logger{36} - %msg%n </Pattern> </layout> </appender> -->
+
+	<appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+		<encoder>
+			<pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n
+			</pattern>
+		</encoder>
+	</appender>
+
+	<logger name="com.cognizant" level="debug" additivity="false">
+		<appender-ref ref="FILE-THREAD" />
+		<appender-ref ref="STDOUT" />
+	</logger>
+
+	<root level="error">
+		<appender-ref ref="FILE-THREAD" />
+		<appender-ref ref="STDOUT" />
+	</root>
+
+	<root level="info">
+		<appender-ref ref="FILE-THREAD" />
+		<appender-ref ref="STDOUT" />
+	</root>
+
+	<root level="debug">
+		<appender-ref ref="FILE-THREAD" />
+		<appender-ref ref="STDOUT" />
+	</root>
+
+</configuration>
