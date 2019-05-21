@@ -1,0 +1,64 @@
+{
+
+"ORG1_MSP" :"Org1MSP",
+
+"ORG1" : "org1",
+
+"CA_ORG1_URL" : "http://10.224.90.37:7054",
+
+"CA_ORG2_URL" : "http://localhost:8054",
+
+"ORDERER_URL" : "grpc://10.224.90.37:7050",
+
+"ORDERER_NAME" : "orderer.fabric.basic.network.com",
+
+"CHANNEL_NAME" : "fabricchannel",
+
+"ORG1_PEER_0" : "peer0.org1.fabric.basic.network.com",
+
+"ORG1_PEER_0_URL" : "grpc://10.224.90.37:7051",
+
+"ORG1_PEER_1" : "peer1.org1.fabric.basic.network.com",
+
+"ORG1_PEER_1_URL" : "grpc://10.224.90.37:8051",
+
+"ORG1_PEER_2" : "peer2.org1.fabric.basic.network.com",
+
+"ORG1_PEER_2_URL" : "grpc://10.224.90.37:9051",
+
+"ORG2_PEER_0" : "peer0.org2.example.com",
+
+"ORG2_PEER_0_URL" : "grpc://localhost:8051",
+
+"ORG2_PEER_1" : "peer1.org2.example.com",
+
+"ORG2_PEER_1_URL" : "grpc://localhost:8056",
+
+"EVENTHUB_NAME" : "eventhub01",
+"EVENTHUB_URL" : "grpc://10.224.90.37:7053",
+
+"CHAINCODE_ROOT_DIR" : "chaincode",
+
+"CHAINCODE_1_NAME" : "toolsContract",
+
+"CHAINCODE_1_PATH" : "/chaincode/src/node",
+
+"CHAINCODE_1_VERSION" : "2.0",
+
+"USERCERT_FILEPATH" : "/home/devopsuser/users/",
+
+"USERCERT_NAME" : "admin",
+
+"KEY_FOLDER_PATH" : "/home/devopsuser/certificates",
+
+"KEY_FILE_NAME" : "6df8beb5427710d5c3590b2bce6aaeb389e60db5e508a3aecbb5e53841a3074c_sk",
+
+"CERT_FOLDER_PATH" : "/home/devopsuser/certificates",
+
+"CERT_FILE_NAME" : "cert.pem",
+
+"DATAMODEL_PATH" : "/home/devopsuser/datamodel.json",
+
+"PROCESSJSON_PATH" : "/home/devopsuser/Process.json"
+
+}

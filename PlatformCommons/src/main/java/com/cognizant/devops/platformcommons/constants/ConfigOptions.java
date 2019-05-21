@@ -25,6 +25,7 @@ public interface ConfigOptions {
 	String NEO4J_TEMPLATE = "neo4jdata.json";
 	String CORRELATION = "correlation"+Instant.now().toEpochMilli()+".json";
 	String DATA_ENRICHMENT_TEMPLATE = "data-enrichment.json";
+	String BLOCKCHAIN_CONFIG_FILE = "blockchainConfig.json";
 	String ENDPOINT_DATA = "endpointData";
 	String USER_DATA = "userData";
 	String PROPERTY_USER_HOME = "user.home";
@@ -64,5 +65,5 @@ public interface ConfigOptions {
 	String QUERY_DATA_PROCESSING_FOLDER = "Audit-report";
 	String OFFLINE_DATA_PROCESSING_RESOLVED_PATH = System.getenv().get(INSIGHTS_HOME) + FILE_SEPERATOR + ConfigOptions.CONFIG_DIR + FILE_SEPERATOR + ConfigOptions.OFFLINE_DATA_PROCESSING_FOLDER;
 	String QUERY_DATA_PROCESSING_RESOLVED_PATH = System.getenv().get(INSIGHTS_HOME) + FILE_SEPERATOR + ConfigOptions.CONFIG_DIR + FILE_SEPERATOR + ConfigOptions.QUERY_DATA_PROCESSING_FOLDER;
-
+	String BLOCKCHAIN_CONFIG_FILE_RESOLVED_PATH = System.getenv().get(INSIGHTS_HOME) + FILE_SEPERATOR + ConfigOptions.CONFIG_DIR + FILE_SEPERATOR + ConfigOptions.BLOCKCHAIN_CONFIG_FILE;
 }
