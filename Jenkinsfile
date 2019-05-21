@@ -70,7 +70,7 @@ gitCommitID = sh (
 	}
 		
 	stage ('Insight_PS_NexusUpload') {		
-		sh 'mvn deploy -DskipTests -P enterprise'		
+		sh 'mvn clean deploy -DskipTests -P enterprise'		
 		}
 	
 	}
