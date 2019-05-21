@@ -10,7 +10,7 @@ gitCommitID = sh (
 	stage('SCM Checkout') {
 	checkout scm	
 	}
-// All single and double quotes in this file are used in a certain format.Do not alter in any step.
+// All single and double quotes in this file are used in a certain format.Do not alter in any step
 	//ApacheLicense Check in java and Python files
 	/*
 	stage ('LicenseCheck') {
