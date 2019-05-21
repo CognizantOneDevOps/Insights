@@ -6,7 +6,7 @@ gitCommitID = sh (
     script: 'echo $commitID | cut -d "-" -f2',
     returnStdout: true
 ).trim()
-// All single and double quotes in this file are used in a certain format.Do not alter in any step
+// All single and double quotes in this file are used in a certain format.Do not alter in any step test
 	//ApacheLicense Check in java and Python files
 	stage ('LicenseCheck') {
            checkout scm
