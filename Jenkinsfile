@@ -8,6 +8,7 @@ gitCommitID = sh (
 ).trim()
 // All single and double quotes in this file are used in a certain format.Do not alter in any step.
 	//ApacheLicense Check in java and Python files
+	/*
 	stage ('LicenseCheck') {
            checkout scm
     	   def commit = sh (returnStdout: true, script: '''var=''
@@ -37,6 +38,8 @@ gitCommitID = sh (
     		echo 'License is up to date'
     		}
   	} //License Check ends	
+	
+	*/
    // Platform Service Starts
 	try{
 	//Build for the pom profile enterprise
