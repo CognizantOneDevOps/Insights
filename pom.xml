@@ -45,7 +45,15 @@
 			<version>2.5</version>
 		</dependency>
 	</dependencies>
-	
+	<modules>
+		<module>PlatformCommons</module>
+		<module>PlatformDAL</module>
+		<module>PlatformService</module>
+		<module>PlatformEngine</module>
+		<module>PlatformUI2.0</module>
+		<module>PlatformUI3</module>
+		<module>PlatformInsights</module>
+	</modules>
 
 	<build>
 		<plugins>
@@ -81,6 +89,34 @@
 		<url>https://bitbucket.org/atlassian/stash-auto-unapprove-plugin</url>
 		<tag>InSights-2.11.0.0</tag>
 	</scm>
+
+	<!-- <distributionManagement> <repository> <id>InSightsArtifactsREL</id> 
+		<name>InSightsArtifactsREL</name> <url>http://localhost:9005/nexus/content/repositories/InSightsArtifactsREL/</url> 
+		</repository> <snapshotRepository> <id>InSightsArtifacts</id> <name>InSightsArtifacts</name> 
+		<url>http://localhost:9005/nexus/content/repositories/InSightsArtifacts/</url> 
+		</snapshotRepository> </distributionManagement> -->
+
+        <!--  <distributionManagement>
+		<repository> 
+		<id>nexus</id>		
+			<url>http://insightsplatformnexusrepo.cogdevops.com:8001/nexus/content/repositories/InsightsRelease</url> 
+		</repository>
+		<snapshotRepository>
+			<id>nexus</id>
+			<url>http://insightsplatformnexusrepo.cogdevops.com:8001/nexus/content/repositories/buildonInsights</url>
+		</snapshotRepository>
+	</distributionManagement> -->
+	
+	<distributionManagement>
+		<repository> 
+						<id>nexus</id>                
+						<url>https://repo.cogdevops.com/repository/InsightsRelease</url> 
+		</repository>
+		<snapshotRepository>
+						<id>nexus</id>
+						<url>https://repo.cogdevops.com/repository/buildonInsights</url>
+		</snapshotRepository>
+	</distributionManagement>
 	
 	<profiles>
 		<profile>
@@ -138,60 +174,7 @@
 				</plugins>
 			</reporting>
 		</profile>
-		
-		<profile>
-			<id>enterprise</id>
-			<activation>
-				<activeByDefault>false</activeByDefault>
-			</activation>
-		    <modules>
-				<module>PlatformCommons</module>
-				<module>PlatformDAL</module>
-				<module>PlatformService</module>
-				<module>PlatformEngine</module>				
-				<module>PlatformUI3</module>
-				<module>PlatformInsights</module>
-			        <module>PlatformAuditEngine</module>
-			        <module>PlatformAuditing</module>				
-				<module>PlatformAuditService</module>
-				
-			</modules>
-			<distributionManagement>
-				<repository> 
-				<id>nexus</id>		
-					<url>https://repo.cogdevops.com/repository/InsightsEnterpriseRelease</url>
-				</repository>
-				<snapshotRepository>
-					<id>nexus</id>
-					<url>https://repo.cogdevops.com/repository/buildonInsightsEnterprise</url>
-				</snapshotRepository>
-			</distributionManagement>
-		</profile>
-		<profile>
-			<id>oss</id>
-			<activation>
-				<activeByDefault>false</activeByDefault>
-			</activation>
-		    <modules>
-				<module>PlatformCommons</module>
-				<module>PlatformDAL</module>
-				<module>PlatformService</module>
-				<module>PlatformEngine</module>
-				<module>PlatformUI2.0</module>
-				<module>PlatformUI3</module>
-				<module>PlatformInsights</module>
-			</modules>
-			<distributionManagement>
-				<repository> 
-				<id>nexus</id>		
-					<url>https://repo.cogdevops.com/repository/InsightsRelease</url>
-				</repository>
-				<snapshotRepository>
-					<id>nexus</id>
-					<url>https://repo.cogdevops.com/repository/buildonInsights</url>
-				</snapshotRepository>
-			</distributionManagement>
-		</profile>		
 	</profiles>
+
 
 </project>
