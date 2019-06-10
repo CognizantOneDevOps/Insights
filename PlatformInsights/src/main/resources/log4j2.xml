@@ -20,10 +20,16 @@
 	<Loggers>
 		<Logger name="com.cognizant" level="debug">
 				<AppenderRef ref="RollingFile" />
+				<AppenderRef ref="Console" />
 		</Logger>
-		<Logger name="org.apache.spark" level="error">
+		<Logger name="org.apache.spark" level="debug">
 				<AppenderRef ref="RollingFile" />
+				<AppenderRef ref="Console" />
 		</Logger>
+		<Root level="debug">
+			<AppenderRef ref="RollingFile" />
+			<AppenderRef ref="Console" />
+		</Root>
 	</Loggers>
 
 </Configuration>

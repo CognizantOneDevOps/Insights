@@ -44,6 +44,7 @@ import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.config.LDAPAttributes;
 import com.cognizant.devops.platformcommons.constants.ConfigOptions;
 import com.cognizant.devops.platformcommons.constants.ErrorMessage;
+import com.cognizant.devops.platformcommons.core.util.ValidationUtils;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBException;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphResponse;
 import com.cognizant.devops.platformcommons.dal.neo4j.Neo4jDBHandler;
@@ -67,7 +68,7 @@ public class UserDetailsService {
 	// {"sAMAccountName","distinguishedName", "sn", "givenname", "mail",
 	// "telephonenumber", "thumbnailPhoto", "title"};
 
-	@Autowired
+	// @Autowired
 	private DefaultSpringSecurityContextSource contextSource;
 
 	/**
@@ -80,7 +81,8 @@ public class UserDetailsService {
 	@RequestMapping(value = "/search", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 	@ResponseBody
 	public String searchUser(@RequestParam String query) {
-		if (ApplicationConfigProvider.getInstance().isDisableAuth()) {
+		ServiceResponse response = new ServiceResponse();
+		/*if (ApplicationConfigProvider.getInstance().isDisableAuth()) {
 			return "{\"error\": \"LDAP authentication is disabled\"}";
 		}
 		if (query == null || query.trim().length() == 0) {
@@ -89,7 +91,7 @@ public class UserDetailsService {
 		LDAPAttributes ldapAttributes = ApplicationConfigProvider.getInstance().getLdapConfiguration()
 				.getLdapAttributes();
 		String[] ldapAttributeIds = ldapAttributes.getAttributeList();
-		ServiceResponse response = new ServiceResponse();
+		
 		DirContextOperations userDataFromLdap = null;
 		FilterBasedLdapUserSearch userSearch = null;
 		if (query.contains("@")) {
@@ -108,14 +110,14 @@ public class UserDetailsService {
 		}
 		if (userDataFromLdap != null) {
 			UserData user = new UserData();
-			/*
+			
 			 * byte[] buf =
 			 * (byte[])userDataFromLdap.getObjectAttribute("thumbnailPhoto");
 			 * if(buf != null){ String imageString = "data:image/jpeg;base64," +
 			 * DatatypeConverter.printBase64Binary(buf);
 			 * user.setProfileImage(imageString); }
-			 */
-			/*
+			 
+			
 			 * user.setEmployeeId(extractAttributeValue(userDataFromLdap,
 			 * "sAMAccountName"));
 			 * user.setDistinguishedName(userDataFromLdap.getDn().toString());
@@ -128,8 +130,8 @@ public class UserDetailsService {
 			 * user.setContactNumber(extractAttributeValue(userDataFromLdap,
 			 * "telephonenumber"));
 			 * user.setTitle(extractAttributeValue(userDataFromLdap, "title"));
-			 */
-
+			 
+		
 			user.setEmployeeId(extractAttributeValue(userDataFromLdap, ldapAttributes.getUsername()));
 			// user.setDistinguishedName(userDataFromLdap.getDn().toString());
 			user.setGivenName(extractAttributeValue(userDataFromLdap, ldapAttributes.getName()));
@@ -138,20 +140,21 @@ public class UserDetailsService {
 			// user.setContactNumber(extractAttributeValue(userDataFromLdap,
 			// "telephonenumber"));
 			// user.setTitle(extractAttributeValue(userDataFromLdap, "title"));
-			response.setStatus(ConfigOptions.SUCCESS_RESPONSE);
-			response.setData(user);
-		}
+			
+		}*/
+		response.setStatus(ConfigOptions.SUCCESS_RESPONSE);
+		response.setData("");//
 		return new GsonBuilder().disableHtmlEscaping().create().toJson(response);
 	}
 
-	private String extractAttributeValue(DirContextOperations ldapUserData, String attribute) {
+	/*private String extractAttributeValue(DirContextOperations ldapUserData, String attribute) {
 		Object object = ldapUserData.getObjectAttribute(attribute);
 		if (object != null) {
 			return object.toString();
 		} else {
 			return null;
 		}
-	}
+	}*/
 
 	/**
 	 * Given the query param, search on the LDAP and return the valid user
@@ -258,7 +261,9 @@ public class UserDetailsService {
 
 	@RequestMapping(value = "/getCurrentOrgAndRole", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 	public @ResponseBody JsonObject getCurrentOrgAndRole(HttpServletRequest httpRequest) {
-		String authHeader = httpRequest.getHeader("Authorization");
+		String authHeader = ValidationUtils.extactAutharizationToken(httpRequest.getHeader("Authorization"));
+
+		log.debug(" authTokenDecrypt  ========= " + authHeader);
 		Map<String, String> grafanaResponseCookies = new HashMap<String, String>();
 		JsonObject grafanaOrgRoleDataJsonObj = new JsonObject();
 		try {
