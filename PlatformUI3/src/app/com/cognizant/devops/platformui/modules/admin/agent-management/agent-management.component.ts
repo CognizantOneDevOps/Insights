@@ -86,6 +86,7 @@ export class AgentManagementComponent implements OnInit {
     self.showThrobber = true;
     self.buttonDisableStatus = true;
     self.runDisableStatus = "";
+    this.agentNameList = [];
     this.agentList = await self.agentService.loadAgentServices("DB_AGENTS_LIST");
     if (this.agentList != null && this.agentList.status == 'success') {
       this.agentListDatasource.data = this.agentList.data.sort((a, b) => a.toolName > b.toolName);
@@ -105,8 +106,8 @@ export class AgentManagementComponent implements OnInit {
         this.showConfirmMessage = "";
       }, 3000);
     } else {
-      self.showMessage = "Something wrong with Service, Please try again.";
-      self.messageDialog.showApplicationsMessage("Something wrong with Service, Please try again.", "ERROR");
+      self.showMessage = "Something wrong with Service.Please try again.";
+      self.messageDialog.showApplicationsMessage("Something wrong with Service.Please try again.", "ERROR");
     }
   }
   private consolidatedArr(detailArr): void {

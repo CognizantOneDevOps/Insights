@@ -22,9 +22,11 @@ import { RestCallHandlerService } from '@insights/common/rest-call-handler.servi
 import { CookieService } from 'ngx-cookie-service';
 import { Router, ActivatedRoute } from '@angular/router';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
-import { CommonModule } from '@angular/common';
+import { CommonModule, DatePipe } from '@angular/common';
 import { LogService } from '@insights/common/log-service';
 import { DataSharedService } from '@insights/common/data-shared-service';
+import { ImageHandlerService } from '@insights/common/imageHandler.service';
+
 
 export interface ILoginComponent {
   createAndValidateForm(): void;
@@ -36,7 +38,7 @@ export interface ILoginComponent {
   selector: 'app-login',
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.css'],
-  providers: [LogService]
+  providers: [LogService, DatePipe]
 })
 export class LoginComponent implements OnInit, ILoginComponent {
 
@@ -55,16 +57,14 @@ export class LoginComponent implements OnInit, ILoginComponent {
 
   constructor(private loginService: LoginService, private restAPIUrlService: RestAPIurlService,
     private restCallHandlerService: RestCallHandlerService, private cookieService: CookieService,
-    private router: Router, private logger: LogService, private dataShare: DataSharedService) {
-    //console.log(" logging in login "); //this.logger.log
+    private router: Router, private logger: LogService, private dataShare: DataSharedService,
+    private datePipe: DatePipe, private imageHandeler: ImageHandlerService) {
     this.getAsyncData();
-
   }
 
   ngOnInit() {
     this.createAndValidateForm();
     this.dataShare.storeTimeZone();
-    //this.deleteAllPreviousCookies();
   }
 
   public createAndValidateForm() {
@@ -78,16 +78,16 @@ export class LoginComponent implements OnInit, ILoginComponent {
     try {
       var restCallUrl = this.restAPIUrlService.getRestCallUrl("GET_LOGO_IMAGE");
       this.resourceImage = await this.restCallHandlerService.getJSON(restCallUrl);
-      //console.log(this.resourceImage);
+      this.dataShare.removeCustomerLogoFromSesssion()
       if (this.resourceImage.data.encodedString.length > 0) {
         this.imageSrc = 'data:image/jpg;base64,' + this.resourceImage.data.encodedString;
+        this.imageHandeler.addImage("customer_logo_uploded", this.imageSrc);
         this.dataShare.uploadOrFetchLogo(this.imageSrc);
       } else {
         this.imageSrc = 'icons/svg/landingPage/Insights_Logo.png';
         this.imageAlt = 'Cognizant log';
         this.dataShare.uploadOrFetchLogo("DefaultLogo");
       }
-
     } catch (error) {
       //console.log(error);
     }
@@ -104,12 +104,14 @@ export class LoginComponent implements OnInit, ILoginComponent {
       this.isDisabled = true;
       this.showThrobber = true;
       var token = 'Basic ' + btoa(this.username + ":" + this.password);
+      this.dataShare.setAuthorizationToken(token);
       this.loginService.loginUserAuthentication(this.username, this.password)
         .then((data) => {
           var grafcookies = data.data;
           if (data.status === 'SUCCESS') {
             self.showThrobber = false;
             var date = new Date();
+
             var dateDashboardSessionExpiration = new Date(new Date().getTime() + 86400 * 1000);
             var minutes = 30;
             date.setTime(date.getTime() + (minutes * 60 * 1000));
@@ -156,19 +158,32 @@ export class LoginComponent implements OnInit, ILoginComponent {
               //self.showThrobber = false;
               self.router.navigate(['/InSights/Home']);
             }, 2000);
-          } else if (data.error.message) {
+          } else if (data.status === "failure") {
             self.showThrobber = false;
             self.isLoginError = true;
-            self.logMsg = data.error.message;
+            self.logMsg = data.message;
             self.isDisabled = false;
           }
+        })
+        .catch(function (data) {
+          if (data.status == 500) {
+            self.logMsg = "Internal server error"
+          } else if (data.status == 404) {
+            self.logMsg = "Server Not found"
+          } else if (data.status == 401) {
+            self.logMsg = "Unauthorized Access"
+          } else {
+            self.logMsg = "Internal server error";
+          }
+          self.showThrobber = false;
+          self.isLoginError = true;
+          self.isDisabled = false;
         });
     }
   }
 
   deleteAllPreviousCookies(): void {
     let allCookies = this.cookieService.getAll();
-
     for (let key of Object.keys(allCookies)) {
       this.cookieService.delete(key);
     }

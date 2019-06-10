@@ -28,14 +28,13 @@ export class ApplicationMessageDialog implements OnInit {
     colorCode: String;
     dialogTitle: String;
     svgCustomIcon: String;
-    isRedirect: boolean=false;
+    isRedirect: boolean = false;
 
     constructor(public dialogRef: MatDialogRef<ApplicationMessageDialog>, @Inject(MAT_DIALOG_DATA) public data: any, public router: Router) {
-         
-         if(data.values==true)
-        {
+
+        if (data.values == true) {
             this.isRedirect = true;
-   
+
         }
         if (data.type == 'SUCCESS') {
             this.colorCode = "#000000";
@@ -62,9 +61,9 @@ export class ApplicationMessageDialog implements OnInit {
     closeShowDetailsDialog(): void {
         this.dialogRef.close();
     }
-     onOkClick(): void {
+    onOkClick(): void {
         this.dialogRef.close()
         this.router.navigateByUrl('/login');
-        
+
     }
 }

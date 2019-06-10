@@ -128,8 +128,7 @@ public class CorrelationBuilderServiceImpl implements CorrelationBuilderService 
 			file.write(correlationJson.toString());
 			file.flush();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			log.error(e);
 		} 
 		return "succcess";
 

@@ -26,7 +26,9 @@
               "src/styles.css",
               "src/assets/mfonts/material-icons/material-icons.css"
             ],
-            "scripts": []
+            "scripts": [
+              "node_modules/crypto-js/crypto-js.js"
+            ]
           },
           "configurations": {
             "production": {
@@ -52,7 +54,7 @@
           "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
             "browserTarget": "platform-ui3:build",
-            "port": 7171
+            "port": 8181
           },
           "configurations": {
             "production": {

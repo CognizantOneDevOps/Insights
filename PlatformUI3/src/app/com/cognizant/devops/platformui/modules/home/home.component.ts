@@ -82,10 +82,7 @@ export class HomeComponent implements OnInit {
   aboutPageURL = "https://onedevops.atlassian.net/wiki/spaces/OI/pages/218936/Release+Notes";
   helpPageURL = "https://onedevops.atlassian.net/wiki/spaces/OI/overview";
   ngOnInit() {
-    this.insightsCustomerLogo = this.dataShare.getCustomerLogo();
-    if (this.insightsCustomerLogo == "DefaultLogo") {
-      this.insightsCustomerLogo = "";//icons/svg/homePage/Customer_Logo.png
-    }
+    this.loadCustomerLogo();
   }
 
   constructor(private grafanaService: GrafanaAuthenticationService,
@@ -97,7 +94,7 @@ export class HomeComponent implements OnInit {
     if (this.depth === undefined) {
       this.depth = 0;
     }
-    //this.grafanaService.validateSession();
+    this.loadCustomerLogo();
     this.isValidUser = true;
     this.framesize = window.frames.innerHeight;
     this.leftNavWidthInPer = 20;
@@ -117,6 +114,15 @@ export class HomeComponent implements OnInit {
 
   onMenuClick() {
     this.isExpanded = !this.isExpanded
+  }
+
+  loadCustomerLogo() {
+    this.insightsCustomerLogo = this.dataShare.getCustomerLogo();
+    //console.log(this.insightsCustomerLogo);
+    if (this.insightsCustomerLogo == "DefaultLogo") {
+      this.insightsCustomerLogo = "";
+    }
+    //console.log(this.insightsCustomerLogo);
   }
 
   public async getInformationFromGrafana() {
@@ -220,37 +226,6 @@ export class HomeComponent implements OnInit {
         title: "Click on Organization to see various Org's Dashboards",
         isToolbarDisplay: true,//false
         children: this.navOrgList
-        /*[
-          {
-            displayName: 'Grafana: ',
-            iconName: 'grafana',
-            isAdminMenu: false,
-            isToolbarDisplay: false,
-            showMenu: true,
-            children: this.navOrgList
-          },
-          {
-            displayName: 'ML Capabilities',
-            iconName: 'feature',
-            route: 'InSights/Home/grafanadashboard/100',
-            isToolbarDisplay: true,
-            isAdminMenu: true
-          },
-          {
-            displayName: 'InSights',
-            iconName: 'feature',
-            route: 'InSights/Home/grafanadashboard/900',
-            isToolbarDisplay: true,
-            isAdminMenu: true
-          },
-          {
-            displayName: 'DevOps Maturity',
-            iconName: 'feature',
-            route: 'InSights/Home/grafanadashboard/300',
-            isToolbarDisplay: true,
-            isAdminMenu: true
-          }
-        ]*/
       },
       {
         displayName: 'Audit Reporting',
