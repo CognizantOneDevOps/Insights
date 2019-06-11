@@ -44,6 +44,8 @@ export class RestAPIurlService implements IRestAPIUrlService {
         this.addEndPoint("SEARCH_DASHBOARD", '/PlatformService/search/dashboards');
         this.addEndPoint("ORG_USERS_GET", '/PlatformService/admin/userMgmt/getOrgUsers');
         this.addEndPoint("ORG_CREATE", '/PlatformService/admin/userMgmt/createOrg');
+        this.addEndPoint("USER_CREATE", '/PlatformService/accessGrpMgmt/addUserInOrg');
+        this.addEndPoint("ASSIGN_USER", '/PlatformService/accessGrpMgmt/assignUser');
 
         this.addEndPoint("ACCESS_GROUP_MANAGEMENT_GET_ORGS", '/PlatformService/accessGrpMgmt/getOrgs');
         this.addEndPoint("ACCESS_GROUP_MANAGEMENT_GET_CURRENT_USER_ORGS", '/PlatformService/accessGrpMgmt/getCurrentUserOrgs');
@@ -51,7 +53,7 @@ export class RestAPIurlService implements IRestAPIUrlService {
         this.addEndPoint("ACCESS_GROUP_MANAGEMENT_GET_USERS", '/PlatformService/accessGrpMgmt/getUser');
         this.addEndPoint("ACCESS_GROUP_MANAGEMENT_EDIT_ORGS_UESRS", '/PlatformService/admin/userMgmt/editOrganizationUser');
         this.addEndPoint("ACCESS_GROUP_MANAGEMENT_DELETE_ORGS_UESRS", '/PlatformService/admin/userMgmt/deleteOrganizationUser');
-
+        this.addEndPoint("ACCESS_GROUP_MANAGEMENT_GET_USERS_ORGS", '/PlatformService/accessGrpMgmt/getCurrentOrgRole');
         this.addEndPoint("GET_GRAFANA_VERSION", "/PlatformService/accessGrpMgmt/getGrafanaVersion");
 
         //Business Mapping module under Admin section
