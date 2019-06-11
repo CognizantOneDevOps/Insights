@@ -81,12 +81,14 @@ public class AgentManagementServiceImpl implements AgentManagementService {
 
 		try {
 			String agentId = null;
-
+			
 			Gson gson = new Gson();
 			JsonElement jelement = gson.fromJson(configDetails.trim(), JsonElement.class);
 			JsonObject json = jelement.getAsJsonObject();
 			json.addProperty("osversion", osversion);
 			json.addProperty("agentVersion", agentVersion);
+			json.addProperty("toolName", toolName.toUpperCase());
+
 			
 			if(json.get("agentId") == null || json.get("agentId").getAsString().isEmpty()) {
 				agentId = getAgentkey(toolName);
