@@ -122,6 +122,8 @@ class BaseAgent(object):
         tokens = self.dataRoutingKey.split('.')
         self.categoryName = tokens[0]
         self.toolName = tokens[1]
+        self.categoryName = self.config.get('toolCategory', tokens[0])      
+        self.toolName = self.config.get('toolName', tokens[1])
          
     
     def loadConfig(self):
@@ -312,7 +314,10 @@ class BaseAgent(object):
     def generateHealthData(self, ex=None, systemFailure=False,note=None):
         data = []
         currentTime = self.getRemoteDateTime(datetime.utcnow())
-        health = { 'agentId' : self.config.get('agentId'), 'inSightsTimeX' : currentTime['time'], 'inSightsTime' : currentTime['epochTime'], 'executionTime' : int((datetime.now() - self.executionStartTime).total_seconds() * 1000)}
+        tokens = self.dataRoutingKey.split('.')
+        self.categoryName = tokens[0]
+        self.toolName = tokens[1]
+        health = { 'toolName' : self.config.get('toolName', tokens[1]), 'categoryName' : self.config.get('toolCategory', tokens[0]), 'agentId' : self.config.get('agentId'), 'inSightsTimeX' : currentTime['time'], 'inSightsTime' : currentTime['epochTime'], 'executionTime' : int((datetime.now() - self.executionStartTime).total_seconds() * 1000)}
         if systemFailure:
             health['status'] = 'failure'
             health['message'] = 'Agent is shutting down'
