@@ -15,15 +15,15 @@
  ******************************************************************************/
 package com.cognizant.devops.platformservice.content.config;
 
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
-import org.springframework.web.servlet.config.annotation.EnableWebMvc;	
 
 @ComponentScan(basePackages = {"com.cognizant.devops.platformservice"})
 @Configuration
-@EnableWebMvc
+// @EnableWebMvc
 public class ContentConfig  {
 	
 	 @Bean

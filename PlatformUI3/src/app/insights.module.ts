@@ -16,7 +16,7 @@
 
 import { DomSanitizer, BrowserModule, SafeUrl } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
-import { HttpClientModule, HttpHeaders } from '@angular/common/http';
+import { HttpClientModule, HttpHeaders, HttpClientXsrfModule } from '@angular/common/http';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { APP_INITIALIZER } from '@angular/core';
@@ -52,7 +52,8 @@ export function initializeApp(initConfig: InsightsInitService) {
     FormsModule,
     HomeModules,
     MaterialModule,
-    SharedServices.forRoot()
+    SharedServices.forRoot(),
+    HttpClientXsrfModule.withOptions({ cookieName: 'XSRF-TOKEN', headerName: 'XSRF-TOKEN' }) //
   ],
   providers: [
     {

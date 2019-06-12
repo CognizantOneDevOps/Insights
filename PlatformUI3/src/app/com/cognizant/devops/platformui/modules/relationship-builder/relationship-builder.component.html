@@ -32,8 +32,10 @@
         <div style="margin-left: -77px; margin-top: 22px;">
 
           <label class="mainText"> Select Tools </label>
-          <mat-select [(ngModel)]="selectedAgent1" [style.height.px]="20" [style.width.%]="14" (ngModelChange)="loadAgent1Info(selectedAgent1)"
-            name="selectedAgent1" required placeholder="Select Source Tool" [ngClass]="{  'input-disabled' : readChange ,  'form-control': !readChange}">
+          <mat-select [(ngModel)]="selectedAgent1" [style.height.px]="20" [style.width.%]="14"
+            (ngModelChange)="loadAgent1Info(selectedAgent1)" name="selectedAgent1" required
+            placeholder="Select Source Tool"
+            [ngClass]="{  'input-disabled' : readChange ,  'form-control': !readChange}">
             <mat-option [disabled]="data1 === selectedAgent2" *ngFor="let data1 of agentDataSource" [value]="data1"
               style="color:#0033A0"> {{data1.toolName}} </mat-option>
           </mat-select>
@@ -43,7 +45,8 @@
             </mat-icon>
           </button> -->
           <mat-select [(ngModel)]="selectedAgent2" [style.height.px]="20" [style.width.%]="14" [style.margin-left.%]="2"
-            (ngModelChange)="loadAgent1Info2(selectedAgent2)" name="selectedAgent2" required placeholder="Select Destination Tool"
+            (ngModelChange)="loadAgent1Info2(selectedAgent2)" name="selectedAgent2" required
+            placeholder="Select Destination Tool"
             [ngClass]="{  'input-disabled' : readChange2 ,  'form-control': !readChange2}">
             <mat-option [disabled]="data2 === selectedAgent1" *ngFor="let data2 of agentDataSource" [value]="data2"
               style="color:#0033A0"> {{data2.toolName}} </mat-option>
@@ -101,7 +104,8 @@
                   <label class="SubHeading">Display Co-Relation</label>
                 </td>
                 <td>
-                  <button style="margin-left: 40px" mat-raised-button (click)="showDetailsDialog()" class="configureBut">View
+                  <button style="margin-left: 40px" mat-raised-button (click)="showDetailsDialog()"
+                    class="configureBut">View
                     Correlation.json
                   </button>
                 </td>
@@ -149,11 +153,14 @@
         <b>&nbsp; Tool Properties</b> (Please select Tool Properties to build a Co-Relation)
         <br>
         <a style="font-size: 13px">
-          (Please Note: A prefix "FROM_SOURCETOOL_TO_DESTINATIONTOOL_" <br> will be added to the Co-Relation name you input)
+          (Please Note: A prefix "FROM_SOURCETOOL_TO_DESTINATIONTOOL_" <br> will be added to the Co-Relation name you
+          input)
         </a>
       </div>
-      <input type="text" class="inputcss" #newName [(ngModel)]='listFilter' [value]="searchValue" required placeholder="   Please input a Co-Relation name">
-      <button mat-raised-button [disabled]="(noShowDetail||noShowDetail2||!selectedAgent1 || !selectedAgent2||buttonOn) "
+      <input type="text" class="inputcss" #newName [(ngModel)]='listFilter' [value]="searchValue" required
+        placeholder="   Please input a Co-Relation name">
+      <button mat-raised-button
+        [disabled]="(noShowDetail||noShowDetail2||!selectedAgent1 || !selectedAgent2||buttonOn) "
         (click)="showDetailsDialogForNeo4j(selectedAgent1,selectedAgent2)" class="Neo4jDataButtonCss">Click to see the
         exsisting Co-Relations in Neo4j</button>
       <div style="height: 100%; width: 100%; overflow: visible;">
@@ -188,7 +195,8 @@
                     </mat-radio-button>
                   </ng-container>
 
-                  <td style="text-align: left; padding-left: 15px; padding-top: 8px; align-items: center;">{{element}}</td>
+                  <td style="text-align: left; padding-left: 15px; padding-top: 8px; align-items: center;">{{element}}
+                  </td>
                 </mat-radio-group>
               </tr>
             </tbody>

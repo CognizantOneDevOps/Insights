@@ -30,10 +30,18 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.util.Arrays;
 import java.util.Enumeration;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
+
+import org.apache.commons.io.FilenameUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.springframework.util.FileCopyUtils;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -41,7 +49,9 @@ import com.google.gson.JsonParser;
 public class AgentManagementUtil {
 
 	private static final AgentManagementUtil agentManagementUtil = new AgentManagementUtil();
-
+	private static Logger log = LogManager.getLogger(AgentManagementUtil.class);
+	private static final Set<String> validFileExtention = new HashSet<String>(
+			Arrays.asList(new String[] { "py", "json", "bat", "sh" ,"service"}));
 	private AgentManagementUtil() {
 	}
 	public static AgentManagementUtil getInstance() {
@@ -86,18 +96,22 @@ public class AgentManagementUtil {
 		try(ZipFile zipFile = new ZipFile(zip);){
 			for (Enumeration entries = zipFile.entries(); entries.hasMoreElements();) {
 				ZipEntry entry = (ZipEntry) entries.nextElement();
-				File file = new File(targetDir,File.separator + entry.getName());
-				if (!buildDirectory(file.getParentFile())) {
-					throw new IOException("Could not create directory: " + file.getParentFile());
-				}
-				if (!entry.isDirectory()) {
-					copyInputStream(zipFile.getInputStream(entry), new BufferedOutputStream(new FileOutputStream(file)));
-					if(entry.getName().endsWith("config.json")){
-						filePath = entry.getName();
+				String extentation = FilenameUtils.getExtension(entry.getName());
+				if (validFileExtention.contains(extentation)) {
+					File file = new File(targetDir, File.separator + entry.getName());
+					if (!buildDirectory(file.getParentFile())) {
+						throw new IOException("Could not create directory: " + file.getParentFile());
 					}
-				} else {
-					if (!buildDirectory(file)) {
-						throw new IOException("Could not create directory: " + file);
+					if (!entry.isDirectory()) {
+						copyInputStream(zipFile.getInputStream(entry),
+								new BufferedOutputStream(new FileOutputStream(file)));
+						if (entry.getName().endsWith("config.json")) {
+							filePath = entry.getName();
+						}
+					} else {
+						if (!buildDirectory(file)) {
+							throw new IOException("Could not create directory: " + file);
+						}
 					}
 				}
 			}
@@ -117,12 +131,7 @@ public class AgentManagementUtil {
 	}
 
 	private  void copyInputStream(InputStream in, OutputStream out) throws IOException {
-		byte[] buffer = new byte[1024];
-		int len = in.read(buffer);
-		while (len >= 0) {
-			out.write(buffer, 0, len);
-			len = in.read(buffer);
-		}
+		FileCopyUtils.copy(in, out);
 		in.close();
 		out.close();
 	}
@@ -130,6 +139,4 @@ public class AgentManagementUtil {
 	private  boolean buildDirectory(File file) {
 		return file.exists() || file.mkdirs();
 	}
-
-
 }

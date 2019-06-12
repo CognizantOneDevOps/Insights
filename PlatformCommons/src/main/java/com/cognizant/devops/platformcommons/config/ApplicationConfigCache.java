@@ -64,7 +64,7 @@ public class ApplicationConfigCache {
 	public static boolean loadConfigCache() {
 		if(System.getenv().get(ConfigOptions.INSIGHTS_HOME) == null){
 			log.error("INSIGHTS_HOME environment variable is not set.");
-			System.exit(0);
+			// System.exit(0);
 		}
 		File configFile = new File(ConfigOptions.CONFIG_FILE_RESOLVED_PATH);
 		StringBuffer json = new StringBuffer();

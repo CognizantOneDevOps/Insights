@@ -43,6 +43,8 @@ import com.cognizant.devops.platformcommons.config.ApplicationConfigCache;
 import com.cognizant.devops.platformcommons.constants.ConfigOptions;
 import com.cognizant.devops.platformcommons.constants.ErrorMessage;
 import com.cognizant.devops.platformcommons.constants.NamedNodeAttribute;
+import com.cognizant.devops.platformcommons.core.util.ValidationUtils;
+import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformdal.agentConfig.AgentConfig;
 import com.cognizant.devops.platformdal.agentConfig.AgentConfigDAL;
 import com.cognizant.devops.platformservice.rest.graph.ToolsConfigUtil;
@@ -68,21 +70,32 @@ public class ToolsConfig {
 	public @ResponseBody JsonObject loadToolsConfig(@RequestParam(required = false) String category,
 			@RequestParam(required = false) String toolName) {
 		AgentConfigDAL agentConfigDAL = new AgentConfigDAL();
-		List<AgentConfig> results = agentConfigDAL.getAgentConfigurations(toolName, category);
-		JsonArray response = new JsonArray();
-		JsonParser parser = new JsonParser();
-		for(AgentConfig agentConfig : results){
-			JsonObject data = new JsonObject();
-			JsonObject agentJson = (JsonObject) parser.parse(agentConfig.getAgentJson());
-			JsonArray userInputArray = (JsonArray)agentJson.get(NamedNodeAttribute.USER_INPUT);
-			for(JsonElement input : userInputArray){
-				data.add(input.getAsString(), agentJson.get(input.getAsString()));
+		try {
+			boolean checkToolName = ValidationUtils.checkString(toolName);
+			boolean checkCategoryName = ValidationUtils.checkString(category);
+			if (checkToolName || checkCategoryName) {
+
+				throw new InsightsCustomException("Agent name not valid");
+
 			}
-			data.addProperty("category", category);
-			data.addProperty("toolName", toolName);
-			response.add(data);
+			List<AgentConfig> results = agentConfigDAL.getAgentConfigurations(toolName, category);
+			JsonArray response = new JsonArray();
+			JsonParser parser = new JsonParser();
+			for (AgentConfig agentConfig : results) {
+				JsonObject data = new JsonObject();
+				JsonObject agentJson = (JsonObject) parser.parse(agentConfig.getAgentJson());
+				JsonArray userInputArray = (JsonArray) agentJson.get(NamedNodeAttribute.USER_INPUT);
+				for (JsonElement input : userInputArray) {
+					data.add(input.getAsString(), agentJson.get(input.getAsString()));
+				}
+				data.addProperty("category", category);
+				data.addProperty("toolName", toolName);
+				response.add(data);
+			}
+			return PlatformServiceUtil.buildSuccessResponseWithData(response);
+		} catch (InsightsCustomException e) {
+			return PlatformServiceUtil.buildFailureResponse(e.getMessage());
 		}
-		return PlatformServiceUtil.buildSuccessResponseWithData(response);
 	}
 	
 	/**
