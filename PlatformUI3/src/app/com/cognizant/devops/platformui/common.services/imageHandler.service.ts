@@ -68,13 +68,14 @@ export class ImageHandlerService implements IImageHandlerService {
         this.addImage('error', "icons/svg/dialogBoxIcon/error.svg");
         this.addImage('alert', "icons/svg/confirmBox/alert.svg");
         this.addImage('menuImage', "icons/svg/homePage/menu_white_36.png");
-        this.addImage('plus_icon', "icons/svg/auditReporting/Plus.svg");  
-        this.addImage('minus_icon', "icons/svg/auditReporting/minus.svg");  
+        this.addImage('plus_icon', "icons/svg/auditReporting/Plus.svg");
+        this.addImage('minus_icon', "icons/svg/auditReporting/minus.svg");
         this.addImage('active_show_details', "icons/svg/auditReporting/ShowDetails-active.svg");
         this.addImage('inactive_show_details', "icons/svg/auditReporting/ShowDetails-Inactive.svg");
         this.addImage('export_to_pdf_icon', "icons/svg/auditReporting/PDFIcon.svg");
         this.addImage('view_pipe_line', "icons/svg/auditReporting/ViewPipeLine-GREEN.svg");
         this.addImage('ic_about_logo', "icons/svg/ic_about_logo.svg");
+        this.addImage('ic_Insights_default_logo', "icons/svg/landingPage/Insights_Logo.png");
 
     }
 
