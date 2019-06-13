@@ -82,8 +82,10 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
 		final AdvanceAuthenticationFilter tokenFilter = new AdvanceAuthenticationFilter();
 		http
-				.cors().and().authorizeRequests().antMatchers("/datasources/**").permitAll().antMatchers("/admin/**")
-				.access("hasAuthority('Admin')").antMatchers("/configure/loadConfigFromResources").permitAll()
+				.cors().and().authorizeRequests().antMatchers("/datasources/**").permitAll()
+				.antMatchers("/admin/**").access("hasAuthority('Admin')")
+				.antMatchers("/traceability/**").access("hasAuthority('Admin')")
+				.antMatchers("/configure/loadConfigFromResources").permitAll()
 				.antMatchers("/**").authenticated() //.permitAll()
 				.and().exceptionHandling().accessDeniedHandler(springAccessDeniedHandler).and().httpBasic().disable()
 				.addFilterBefore(tokenFilter, BasicAuthenticationFilter.class) // .disable()  .authenticationEntryPoint(springAuthenticationEntryPoint) .and() .and()
@@ -92,6 +94,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 				.csrfTokenRepository(csrfTokenRepository()).and()
 				.addFilterAfter(new CustomCsrfFilter(), CsrfFilter.class)
 		;
+	
 	}
 	
 	@Bean
