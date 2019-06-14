@@ -75,6 +75,11 @@ import { from } from 'rxjs';
 import { RelationshipBuilderComponent } from '@insights/app/modules/relationship-builder/relationship-builder.component';
 import { RelationshipBuilderService } from '@insights/app/modules/relationship-builder/relationship-builder.service';
 
+import { BulkUploadComponent } from '@insights/app/modules/bulkupload/bulkupload.component';
+import { BulkUploadService } from '@insights/app/modules/bulkupload/bulkupload.service';
+
+
+
 
 
 
@@ -107,7 +112,8 @@ import { RelationshipBuilderService } from '@insights/app/modules/relationship-b
     CustomReportComponent,
     CustomReportConfigComponent,
     ShowJsonDialog,
-    RelationshipBuilderComponent
+    RelationshipBuilderComponent,
+    BulkUploadComponent
   ],
   imports: [
     HomeRouting,
@@ -145,7 +151,8 @@ import { RelationshipBuilderService } from '@insights/app/modules/relationship-b
     BlockChainService,
     DatePipe,
     QueryBuilderService,
-    RelationshipBuilderService
+    RelationshipBuilderService,
+    BulkUploadService
   ]
 })
 
