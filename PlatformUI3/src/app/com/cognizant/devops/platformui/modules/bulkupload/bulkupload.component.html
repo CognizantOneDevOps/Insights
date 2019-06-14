@@ -1,0 +1,107 @@
+<!--
+*******************************************************************************
+ * Copyright 2019 Cognizant Technology Solutions
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License.  You may obtain a copy
+ * of the License at
+ * 
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ ****************************************************************************** -->
+<div class="pageCss">
+
+    <div layout layout-align="left" class="titleStyle">
+        <div>Configuration |
+            <a class="greenTitleTxt">Bulk Upload </a>
+        </div>
+    </div>
+
+    <div class="orangeStripCss"></div>
+
+    <div layout layout-align="left" class="sectionHeadingStyleWithoutButton">
+        <div layout>&nbsp;Bulk Upload (Please note you may upload UPTO 5 .csv files of maximum 2 MB ONE AT A TIME.)
+        </div>
+    </div>
+    <button mat-icon-button (click)="savedata()">
+        <mat-icon title="Save " class="mat-icon material-icons ">
+            save
+        </mat-icon>
+    </button>
+    <div>
+        <div class="inputWidth">
+
+
+            <!--  <span>
+
+                <input type="file" class="form-control">
+            </span> -->
+
+
+        </div>
+    </div>
+
+
+    <div class="bulkuploadtablecss">
+        <div class="showTable" style="text-align: center; padding: 10px;">
+            <div style="margin-right: 110px;">
+                Bulk Upload
+            </div>
+
+        </div>
+
+
+
+
+
+
+
+        <div class="col-md-2">
+            <div>
+
+                <table>
+
+                    <tbody>
+                        <!--  <tr class="AddUserColTextCss" *ngFor="let row of rows?.controls;let index = index;">
+                            <td style="padding:0 15px 0 15px;">Tool Name
+                            </td>
+
+                        </tr> -->
+                        <tr *ngFor="let row of rows?.controls;let index = index;">
+                            <td style="padding:0 15px 0 15px;">Tool Name
+                            </td>
+                            <td>
+
+                                <div>
+                                    <mat-select required [formControl]="row.get('toolName')" name="selectedTool" class="form-control"
+                                        placeholder="Select Tool" style="width:150px;">
+                                        <mat-option *ngFor=" let tool of toolsArr | keyvalue" value="{{tool.value}}">{{tool.value}}</mat-option>
+                                    </mat-select>
+                                </div>
+
+                            </td>
+                            <td>
+                                <input type="file" class="form-control" required [formControl]="row.get('fileName')">
+                            </td>
+
+                        </tr>
+
+
+
+
+
+                    </tbody>
+                </table>
+
+            </div>
+        </div>
+
+
+
+    </div>
+</div>

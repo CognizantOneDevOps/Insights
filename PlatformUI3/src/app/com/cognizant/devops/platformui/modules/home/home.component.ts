@@ -325,6 +325,15 @@ export class HomeComponent implements OnInit {
             isAdminMenu: true
           },
           {
+            displayName: 'Bulk Upload',
+            iconName: 'feature',
+            route: 'InSights/Home/bulkupload',
+            isToolbarDisplay: true,
+            showMenu: true,
+            title: "Bulk Upload",
+            isAdminMenu: true
+          },
+          {
             displayName: 'Business Mapping',
             iconName: 'feature',
             route: 'InSights/Home/businessmapping',
