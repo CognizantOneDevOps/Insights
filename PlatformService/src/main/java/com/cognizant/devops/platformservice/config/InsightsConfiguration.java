@@ -34,9 +34,13 @@ import com.cognizant.devops.platformcommons.dal.rest.RestHandler;
 import com.cognizant.devops.platformdal.tools.layout.ToolsLayout;
 import com.cognizant.devops.platformdal.tools.layout.ToolsLayoutDAL;
 import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.google.gson.JsonSyntaxException;
+import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.ClientResponse;
+import com.sun.jersey.api.client.UniformInterfaceException;
 
 public final class InsightsConfiguration {
 	
@@ -133,13 +137,27 @@ public final class InsightsConfiguration {
 		headers.put("Authorization", buildAuthenticationHeader());
 		String apiUrl = grafanaBaseUrl + "/api/datasources";
 		ClientResponse response = RestHandler.doGet(apiUrl, null, headers);
-		JsonArray datasources = new JsonParser().parse(response.getEntity(String.class)).getAsJsonArray();
-		if (datasources.size() > 0) {
-			log.info("Datasources are already configured.");
-			return;
+		try {
+			JsonElement responceElement = new JsonParser().parse(response.getEntity(String.class));
+			if(responceElement.isJsonArray()) {
+				JsonArray datasources = responceElement.getAsJsonArray();
+				if (datasources.size() > 0) {
+					log.info("Datasources are already configured.");
+					return;
+				}
+			}else {
+				log.info("Datasources are not configured.");
+				RestHandler.doPost(apiUrl, buildElasticSearchDataSourceRequest(), headers);
+				RestHandler.doPost(apiUrl, buildNeo4jDataSourceRequest(), headers);
+				return;
+			}
+		} catch (JsonSyntaxException e) {
+			log.error("Datasouce not configured "+e.getMessage());
+		} catch (ClientHandlerException e) {
+			log.error("Datasouce not configured "+e.getMessage());
+		} catch (UniformInterfaceException e) {
+			log.error("Datasouce not configured "+e.getMessage());
 		}
-		RestHandler.doPost(apiUrl, buildElasticSearchDataSourceRequest(), headers);
-		RestHandler.doPost(apiUrl, buildNeo4jDataSourceRequest(), headers);
 	}
 
 	private static JsonObject buildElasticSearchDataSourceRequest() {

@@ -36,9 +36,8 @@
 
   <div *ngIf=" showDetail ">
     <label class="mainText"> Current Access Group </label>
-    <mat-select [(ngModel)]="selectedAdminOrg" [style.height.px]="20" [style.width.%]="20"
-      (ngModelChange)="loadUsersInfo(selectedAdminOrg)" name="selectedAdminOrg"
-      [ngClass]="{  'input-disabled' : readOnlyOrg ,  'form-control': !readOnlyOrg}">
+    <mat-select [(ngModel)]="selectedAdminOrg" [style.height.px]="20" [style.width.%]="20" (ngModelChange)="loadUsersInfo(selectedAdminOrg)"
+      name="selectedAdminOrg" [ngClass]="{  'input-disabled' : readOnlyOrg ,  'form-control': !readOnlyOrg}">
 
       <mat-option *ngFor="let record of adminOrgDataArray" [value]="record">
         {{record.name}}
@@ -46,11 +45,10 @@
     </mat-select>
     <div class="filterGroupCSS" *ngIf=" showDetail ">
       <input matInput (keyup)="applyFilter($event.target.value)" placeholder="Search by Login ID or Email Address
-          " [style.height.px]="20" [style.width.%]="80" class="form-control">
+          "
+        [style.height.px]="20" [style.width.%]="90" class="form-control">
     </div>
   </div>
-
-
 
   <div>
     <div class="btnAlign">
@@ -60,19 +58,37 @@
         </mat-icon>
 
       </button>
-      <button mat-icon-button>
-        <!-- <mat-icon title="Add Global User" class="mat-icon material-icons">
+      <button *ngIf="!showAddUserDetail " mat-icon-button (click)="addGlobalUser()">
+        <mat-icon title="Add Global User" class="mat-icon material-icons">
           person_add
-        </mat-icon> (click)="addGlobalUser()" -->
+        </mat-icon>
+      </button>
+      <button mat-icon-button>
         <mat-icon svgIcon="lineInButton" class="mat-icon material-icons">
           linea
         </mat-icon>
+
       </button>
 
+      <button *ngIf="showDetail" mat-icon-button (click)="saveData() " [disabled]="!isSaveEnable ">
+        <mat-icon title="Save " class="mat-icon material-icons ">
+          save
+        </mat-icon>
+      </button>
 
+      <button *ngIf="!showDetail2" mat-icon-button (click)="saveData() " [disabled]="!isSaveEnable ">
+        <mat-icon title="Save " class="mat-icon material-icons ">
+          save
+        </mat-icon>
+      </button>
 
+      <button *ngIf="adduserSaveEnable" mat-icon-button (click)="saveUser(names,email,username,pass)" [disabled]="!adduserSaveEnable">
+        <mat-icon title="Save " class="mat-icon material-icons ">
+          save
+        </mat-icon>
+      </button>
 
-      <button mat-icon-button (click)="saveData() " [disabled]="!isSaveEnable ">
+      <button *ngIf="assignuserSaveEnable" mat-icon-button (click)="assignUser()" [disabled]="!assignuserSaveEnable">
         <mat-icon title="Save " class="mat-icon material-icons ">
           save
         </mat-icon>
@@ -91,13 +107,12 @@
       </button>
 
       <button mat-icon-button [disabled]="">
-        <mat-icon title="Cancel " class="mat-icon material-icons">
+        <mat-icon title="Cancel " class="mat-icon material-icons" (click)="Refresh()">
           cancel </mat-icon>
       </button>
 
     </div>
     <div *ngIf=" showDetail ">
-
 
       <mat-radio-group [(ngModel)]="selectedUser ">
         <table mat-table [dataSource]="userDataSource " class="mat-elevation-z8 ">
@@ -120,15 +135,16 @@
           </ng-container>
 
           <ng-container matColumnDef="Seen">
-            <th mat-header-cell *matHeaderCellDef class="tableHeaderCss ">Last Seen</th>
-            <td mat-cell *matCellDef="let element "> {{element.lastSeenAtAge}} </td>
+            <th mat-header-cell *matHeaderCellDef class="tableHeaderCss "></th>
+            <td mat-cell *matCellDef="let element "> </td>
           </ng-container>
 
           <ng-container matColumnDef="Role">
             <th mat-header-cell *matHeaderCellDef class="tableHeaderCss ">User Role in Access Group</th>
             <td mat-cell *matCellDef="let element ">
               <mat-select [(ngModel)]="element.role " [style.width.%]="80 " name="{{element.role}}
-                   " required placeholder="Select number of records " [disabled]="isSelectedUserId!=element.userId "
+                   "
+                required placeholder="Select number of records " [disabled]="isSelectedUserId!=element.userId "
                 [ngClass]="{ 'input-disabled' : !isSaveEnable  , 'form-control': isSaveEnable} ">
                 <mat-option *ngFor=" let record of roleRecord " [value]="record.value ">
                   {{record.name}}
@@ -142,33 +158,36 @@
         </table>
       </mat-radio-group>
 
-
     </div>
   </div>
 
+  <div *ngIf="showAddUserDetail ">
 
+    <div class="adduserCol">
+      <div class="showTable" style="text-align: center; padding: 8px;">
+        <div style="margin-right: 110px;">
+          <mat-radio-group>
+            <mat-radio-button [checked]="addRadioSelected" [value]="element1" color="primary" (click)=adduserenableSave()>
+            </mat-radio-button>
 
-
-
-  <div *ngIf=" !showDetail ">
-
-    <!-- <div class="column1">
-      <div class="showTable" style="text-align: center; padding: 25px;">
+          </mat-radio-group>
+          Add User (Please note: You are adding the user to {{selectedAdminOrg.name}})
+        </div>
       </div>
+
       <table>
-        <tbody style="display: grid; max-height: 38vh; overflow: auto;">
+        <tbody style="display: grid; max-height: 38vh">
           <tr class="dat-row1">
 
-
-            <td style="text-align: left; padding-left: 15px; padding-top: 8px; align-items: center;">
+            <td class="AddUserColTextCss">
               <div>
                 <label class="mainText"> Current Access Group </label>
 
               </div>
             </td>
-            <td style="text-align: left; padding-left: 15px; padding-top: 8px; align-items: center;">
-              <mat-select [(ngModel)]="selectedAdminOrg" [style.height.px]="20" [style.width.%]="60"
-                name="selectedAdminOrg" [ngClass]="{  'input-disabled' : readOnlyOrg ,  'form-control': !readOnlyOrg}">
+            <td class="AddUserColTextCss">
+              <mat-select [disabled]="!adduserSaveEnable" [(ngModel)]="selectedAdminOrg" [style.height.px]="20"
+                [style.width.%]="260" name="selectedAdminOrg" [ngClass]="{  'input-disabled' : readOnlyOrg ,  'form-control': !readOnlyOrg}">
 
                 <mat-option *ngFor="let record of adminOrgDataArray" [value]="record">
                   {{record.name}}
@@ -176,68 +195,164 @@
               </mat-select>
             </td>
 
+            <input [disabled]="!adduserSaveEnable" type="text" class="searchbox" [(ngModel)]='searchUser' [value]="searchuser"
+              required placeholder=" Search by Login ID or E-mail Address">
+            <button mat-icon-button (click)="searchData(searchUser,selectedAdminOrg) ">
+              <mat-icon title="Search" class="mat-icon material-icons">
+                search
+              </mat-icon>
+
+            </button>
           </tr>
 
           <tr class="dat-row2">
 
-
-            <td style="text-align: left; padding-left: 15px; padding-top: 8px; align-items: center;">Name</td>
-            <td style="text-align: left; padding-left: 15px; padding-top: 8px; align-items: center;">hfth</td>
-
+            <td class="AddUserColTextCss" style=" width:30px;">Name</td>
+            <td>
+              <input [disabled]="!adduserSaveEnable" style="margin-left: 40px;" type="text" class="inputcss"
+                [(ngModel)]='names' [value]="searchValue" required placeholder=" Input a Name">
+            </td>
+            <td *ngIf="isNameIncorrect" class="wrnTxt">Please enter a valid Name.</td>
           </tr>
-
-
-
 
           <tr class="dat-row">
 
+            <td class="AddUserColTextCss" style=" width:30px;">Email</td>
+            <td>
+              <input [disabled]="!adduserSaveEnable" type="text" style="margin-left: 43px;" class="inputcss"
+                [(ngModel)]='email' [value]="emailvalue" required placeholder=" Provide a valid E-mail Address">
+            </td>
 
-            <td style="text-align: left; padding-left: 15px; padding-top: 8px; align-items: center;">Email</td>
-            <td style="text-align: left; padding-left: 15px; padding-top: 8px; align-items: center;">hfth</td>
+            <td *ngIf="isEmailIncorrect" class="wrnTxt">Please enter a valid Email.</td>
 
           </tr>
 
           <tr class="dat-row2">
 
-
-            <td style="text-align: left; padding-left: 15px; padding-top: 8px; align-items: center;">Username</td>
-            <td style="text-align: left; padding-left: 15px; padding-top: 8px; align-items: center;">hfth</td>
-
+            <td class="AddUserColTextCss" style=" width:30px;">Username</td>
+            <td>
+              <input [disabled]="!adduserSaveEnable" type="text" style="margin-left: 11px;" class="inputcss"
+                [(ngModel)]='username' [value]="searchValue" required placeholder=" Input a Username">
+            </td>
+            <td *ngIf="isUsernameIncorrect" class="wrnTxt">Please enter a valid Username.</td>
           </tr>
-
-
-
 
           <tr class="dat-row">
 
-
-            <td style="text-align: left; padding-left: 15px; padding-top: 8px; align-items: center;">Password</td>
-            <td style="text-align: left; padding-left: 15px; padding-top: 8px; align-items: center;">hfth</td>
-
+            <td class="AddUserColTextCss" style=" width:30px;">Password</td>
+            <td>
+              <input [disabled]="!adduserSaveEnable" type="password" class="inputcss" style="margin-left: 13px;"
+                [(ngModel)]='pass' [value]="searchValue" required placeholder=" Input a Password">
+            </td>
+            <td *ngIf="isPasswordIncorrect" class="wrnTxt">Please enter a valid Password.</td>
           </tr>
 
           <tr class="dat-row2">
 
+            <td class="AddUserColTextCss" style=" width:30px;">Role</td>
 
-            <td style="text-align: left; padding-left: 15px; padding-top: 8px; align-items: center;">Role</td>
-            <td style="text-align: left; padding-left: 15px; padding-top: 8px; align-items: center;">hfth</td>
+            <td>
+              <mat-select [disabled]="!adduserSaveEnable" style="margin-left: 45px;" [(ngModel)]="role "
+                [style.width.%]="200 " name="{{role}}" required placeholder=" Select a Role" [ngClass]="{ 'input-disabled' : !isSaveEnable  , 'form-control': isSaveEnable} ">
+                <mat-option *ngFor=" let record of roleRecord " [value]="record.value ">
+                  {{record.name}}
+                </mat-option>
+              </mat-select>
+            </td>
+
+            <td style="padding-left: 170px;" *ngIf="isRoleIncorrect" class="wrnTxt">Please select a Role.</td>
 
           </tr>
-
 
         </tbody>
       </table>
 
-    </div> -->
+    </div>
 
-    <!-- <div class="column2">
-      <div class="showTable" style="text-align: center; padding: 25px;">
+    <div class="assignUserCol">
+      <div class="showTable" style="text-align: center; padding: 20px;">
+        <div style="margin-right: 110px;">
+          <mat-radio-group>
+            <mat-radio-button [checked]="assignRadioSelected" [value]="element2" color="primary" (click)=assignuserenableSave()>
+            </mat-radio-button>
+
+          </mat-radio-group>
+          Assign users to various access groups
+        </div>
       </div>
 
-    </div> -->
+      <table>
+        <tbody style="display: grid; max-height: 38vh ;border-spacing:0px !important;; border-collapse: none !important">
+          <tr>
 
+            <td class="AddUserColTextCss" style="border-spacing:0px !important;; border-collapse: none !important">
+              <div>
 
-    <!-- <div [hidden]="!showDetail">
-    <mat-paginator #paginator [pageSize]="MAX_ROWS_PER_TABLE" showFirstLastButtons class="paginationStyle"></mat-paginator>
-  </div> -->
-  </div>
+              </div>
+            </td>
+            <td class="AddUserColTextCss" style="border-spacing:0px !important;; border-collapse: none !important">
+
+            </td>
+
+            <input [disabled]="!assignuserSaveEnable" type="text" class="searchbox" [(ngModel)]='searchOrgForUser'
+              [value]="searchOrgForUser" required placeholder=" Search by Login ID">
+            <button mat-icon-button (click)="searchData(searchOrgForUser,selectedAdminOrg)">
+              <mat-icon title="Search" class="mat-icon material-icons">
+                search
+              </mat-icon>
+
+            </button>
+          </tr>
+
+          <div class="col-md-2" [formGroup]="addForm">
+            <div class="form-group">
+              <!--  <label class="label-control">Items</label>
+        <br> -->
+
+              <table style="margin-top: 10px;">
+
+                <tbody>
+                  <tr class="AddUserColTextCss" style="border-spacing:0px !important;; border-collapse: none !important"
+                    *ngFor="let row of rows?.controls;let index = index;">
+                    <td style="border-spacing:0px !important;padding:0 15px 0 15px;">Access Group </td>
+                    <td style="border-spacing:0px !important;">
+                      <mat-select [disabled]="!assignuserSaveEnable" required placeholder="Select Access Group"
+                        [formControl]="row.get('org')" [style.width.px]="100 " [style.height.px]="20" [style.width.px]="160"
+                        name="selectOrgForUser5" [ngClass]="{  'input-disabled' : readOnlyOrg ,  'form-control': !readOnlyOrg}">
+
+                        <mat-option [disabled]="!assignuserSaveEnable" *ngFor="let record of adminOrgDataArray" [value]="record">
+                          {{record.name}}
+                        </mat-option>
+                      </mat-select>
+
+                    </td>
+                    <td style="padding:0 15px 0 15px;border-spacing:0px !important;">Role</td>
+
+                    <td style="border-spacing:0px !important; border-collapse: none !important">
+
+                      <mat-select required placeholder="Select Role" [formControl]="row.get('role')" [ngClass]="{  'input-disabled' : readOnlyOrg ,  'form-control': !readOnlyOrg}"
+                        [style.width.px]="100 " name="role5">
+                        <mat-option *ngFor=" let record of roleRecord " [value]="record.value ">
+                          {{record.name}}
+                        </mat-option>
+                      </mat-select>
+
+                    </td>
+
+                  </tr>
+                  <tr style="padding-top: 35px;">
+                    <td style="padding-top: 35px;"></td>
+                    <td style="padding-top: 35px;"></td>
+                    <td style="padding-top: 35px;"></td>
+                    <td style="padding-top: 35px;"></td>
+
+                  </tr>
+                </tbody>
+              </table>
+
+            </div>
+          </div>
+        </tbody>
+      </table>
+    </div>
+    <!--   <pre>{{rows.value | json}}</pre> -->

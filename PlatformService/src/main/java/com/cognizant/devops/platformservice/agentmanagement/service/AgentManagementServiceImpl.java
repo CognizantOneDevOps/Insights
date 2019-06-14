@@ -35,8 +35,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.concurrent.TimeoutException;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -54,6 +52,7 @@ import org.springframework.stereotype.Service;
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.constants.MessageConstants;
 import com.cognizant.devops.platformcommons.core.enums.AGENTACTION;
+import com.cognizant.devops.platformcommons.core.util.ValidationUtils;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformdal.agentConfig.AgentConfig;
 import com.cognizant.devops.platformdal.agentConfig.AgentConfigDAL;
@@ -75,8 +74,6 @@ public class AgentManagementServiceImpl implements AgentManagementService {
 	private static final String SUCCESS = "SUCCESS";
 	
 	String filePath = ApplicationConfigProvider.getInstance().getAgentDetails().getUnzipPath();
-	Pattern agentIdPattern = Pattern.compile("[^A-Za-z0-9\\_]", Pattern.CASE_INSENSITIVE);
-	
 
 	@Override
 	public String registerAgent(String toolName, String agentVersion, String osversion, String configDetails,
@@ -84,22 +81,22 @@ public class AgentManagementServiceImpl implements AgentManagementService {
 
 		try {
 			String agentId = null;
-
+			
 			Gson gson = new Gson();
 			JsonElement jelement = gson.fromJson(configDetails.trim(), JsonElement.class);
 			JsonObject json = jelement.getAsJsonObject();
 			json.addProperty("osversion", osversion);
 			json.addProperty("agentVersion", agentVersion);
+			json.addProperty("toolName", toolName.toUpperCase());
+
 			
 			if(json.get("agentId") == null || json.get("agentId").getAsString().isEmpty()) {
 				agentId = getAgentkey(toolName);
 			} else {
 				agentId = json.get("agentId").getAsString();
 			}
-			
-			Matcher m = agentIdPattern.matcher(agentId);
 
-			if (m.find()) {
+			if (ValidationUtils.checkAgentIdString(agentId)) {
 			   throw new InsightsCustomException("Agent Id has to be Alpha numeric with '_' as special character");
 			}
 
@@ -313,7 +310,6 @@ public class AgentManagementServiceImpl implements AgentManagementService {
 	}
 
 	private ArrayList<String> getAgents(String version) {
-
 		Document doc;
 		String url = ApplicationConfigProvider.getInstance().getAgentDetails().getDocrootUrl() + "/" + version
 				+ "/agents/";
@@ -324,9 +320,7 @@ public class AgentManagementServiceImpl implements AgentManagementService {
 			for (Element element : rows) {
 				if (null != element.text() && element.text().endsWith("/")) {
 					tools.add(StringUtils.stripEnd(element.text(), "/"));
-
 				}
-
 			}
 		} catch (IOException e) {
 			log.debug(e);

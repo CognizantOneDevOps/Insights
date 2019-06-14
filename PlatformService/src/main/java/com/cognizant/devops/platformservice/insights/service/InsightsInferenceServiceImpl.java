@@ -54,6 +54,7 @@ public class InsightsInferenceServiceImpl implements InsightsInferenceService {
 		this.messageSource = messageSource;
 	}
 
+	@Override
 	public List<InsightsInference> getInferenceDetails(String schedule) {
 		return getInferences(schedule);
 	}

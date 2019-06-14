@@ -56,6 +56,8 @@ public class SparkJobConfigHandler {
 		jobConf.put("es.query", json);
 		JavaPairRDD<String,Map<String,Object>> esRDD = JavaEsSpark.esRDD(JavaSparkContextProvider.getJavaSparkContext(), jobConf);
 		JavaRDD<SparkJobConfiguration> jobsRDD = esRDD.map(new SparkJobMapFunction());
+		log.debug("Loading jobs from Elasticsearch complete");
+		log.debug("  jobsRDD.collect() "+jobsRDD.collect().size());
 		return jobsRDD.collect();
 	}
 	

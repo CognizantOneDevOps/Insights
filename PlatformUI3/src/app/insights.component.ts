@@ -15,7 +15,6 @@
  ******************************************************************************/
 
 import { Component } from '@angular/core';
-import { InsightsInitService } from '@insights/common/insights-initservice';
 
 
 @Component({

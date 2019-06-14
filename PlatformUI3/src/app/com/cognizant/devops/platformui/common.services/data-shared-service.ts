@@ -17,27 +17,28 @@
 import { Injectable, Inject } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 import { SESSION_STORAGE, StorageService } from 'ngx-webstorage-service';
-import { CommonModule, DatePipe } from '@angular/common';
-import { Router, NavigationExtras } from '@angular/router';
+import { DatePipe } from '@angular/common';
 import { CookieService } from 'ngx-cookie-service';
-import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
+import { Router } from '@angular/router';
+import { MatDialog, MatDialogRef } from '@angular/material';
 import { ApplicationMessageDialog } from '@insights/app/modules/application-dialog/application-message-dialog';
+import * as CryptoJS from 'crypto-js';
+import { v4 as uuid } from 'uuid';
 
 @Injectable()
 export class DataSharedService {
-
   sessionExpireMessage: String = "";
   private userSource = new BehaviorSubject<String>('admin');
   currentUser = this.userSource.asObservable();
 
-  constructor(@Inject(SESSION_STORAGE) private storage: StorageService, private datePipe: DatePipe, public router: Router, private cookieService: CookieService, public dialog: MatDialog) { }
+  constructor(@Inject(SESSION_STORAGE) private storage: StorageService, private datePipe: DatePipe, private cookieService: CookieService,
+    public router: Router, public dialog: MatDialog) { }
 
   public changeUser(user: String) {
     this.userSource.next(user)
   }
 
   public uploadOrFetchLogo(imageSrc: any) {
-    //console.log("in uploadOrFetchLogo ")
     if (imageSrc != 'DefaultLogo') {
       this.storage.set("customerLogo", imageSrc);
     } else {
@@ -45,12 +46,35 @@ export class DataSharedService {
     }
   }
 
-  public getCustomerLogo() {
+  public getCustomerLogo(): any {
     return this.storage.get("customerLogo");
+  }
+
+  public removeCustomerLogoFromSesssion(): void {
+    this.storage.remove("customerLogo");
   }
 
   public setUserName(userName: String) {
     this.storage.set("userName", userName);
+  }
+
+  public setAuthorizationToken(strAuthorization: string) {
+    var auth_uuid = uuid();
+    auth_uuid = auth_uuid.substring(0, 15);
+    var auth = this.encryptData(auth_uuid, strAuthorization) + auth_uuid;
+    this.storage.set("Authorization", auth); // strAuthorization
+  }
+
+  public getAuthorizationToken() {
+    return this.storage.get("Authorization");
+  }
+
+  public setSessionExpirationTime(timeDashboardSessionExpiration: any) {
+    this.storage.set("dashboardSessionExpiration", timeDashboardSessionExpiration);
+  }
+
+  public getSessionExpirationTime() {
+    return this.storage.get("dashboardSessionExpiration");
   }
 
   public setOrgAndRole(orgName: String, orgId: any, role: String) {
@@ -63,26 +87,19 @@ export class DataSharedService {
     return this.storage.get("userName");
   }
 
-  public getStorageService(): StorageService {
-    return this.storage;
-  }
-
   public getTimeZone() {
     return this.storage.get("timeZone");
   }
 
+  public getStorageService(): StorageService {
+    return this.storage;
+  }
 
   public getStoragedProperty(key: string): any {
 
     return this.storage.get(key);
   }
-  public setAuthorizationToken(strAuthorization: string) {
-    this.storage.set("Authorization", strAuthorization);
-  }
 
-  public getAuthorizationToken() {
-    return this.storage.get("Authorization");
-  }
   public storeTimeZone() {
     var date = new Date();
     //const timeZoneOffset = date.getTimezoneOffset(); " ==== " + timeZoneOffset +
@@ -93,7 +110,7 @@ export class DataSharedService {
     var timezone = parts[1];
     this.storage.set("timeZone", timezone);
     this.storage.set("timeZoneOffSet", zone);
-
+    //console.log(this.storage.get("timeZone"));
   }
 
   public convertDateToZone(dateStr: string): string {
@@ -102,7 +119,7 @@ export class DataSharedService {
     var zoneOffset = this.storage.get("timeZoneOffSet");
     //var utcDate = this.datePipe.transform(date, 'yyyy-MM-ddTHH:mm:ssZ', '+0000');
     var dateWithTimeZone = this.datePipe.transform(date, 'yyyy-MM-ddTHH:mm:ssZ', zoneOffset);//  '+0530' utcDate
-    console.log(date + " ==== " + zone + " ==== " + zoneOffset + " ==== " + dateWithTimeZone + " ====  " + + " ====  " + dateWithTimeZone.toString());
+    //console.log(date + " ==== " + zone + " ==== " + zoneOffset + " ==== " + dateWithTimeZone + " ====  " + + " ====  " + dateWithTimeZone.toString());
     return dateWithTimeZone;
   }
 
@@ -111,7 +128,6 @@ export class DataSharedService {
     var minutes = 30;
     date.setTime(date.getTime() + (minutes * 60 * 1000));
     var dateDashboardSessionExpiration = date.getTime();
-    // console.log(dateDashboardSessionExpiration + "  @@@@@@  " + date)
     this.storage.set("dateDashboardSessionExpiration", dateDashboardSessionExpiration);
   }
 
@@ -161,7 +177,7 @@ export class DataSharedService {
 
   //Method used only for session expired
   public sessionExpiredMessage(message, type, values): MatDialogRef<ApplicationMessageDialog> {
-    console.log(" in sessionExpiredMessage ")
+    //console.log(" in sessionExpiredMessage ")
     const dialogRef = this.dialog.open(ApplicationMessageDialog, {
       panelClass: 'DialogBox',
       width: '40%',
@@ -176,6 +192,9 @@ export class DataSharedService {
     });
 
     return dialogRef;
-
+  }
+  public encryptData(keys, value): string {
+    var encryptedValue = CryptoJS.AES.encrypt(value, keys);
+    return encryptedValue.toString();
   }
 }

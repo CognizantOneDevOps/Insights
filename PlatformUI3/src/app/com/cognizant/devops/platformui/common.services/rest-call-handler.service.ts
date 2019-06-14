@@ -18,7 +18,6 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs'
 import { RestAPIurlService } from '@insights/common/rest-apiurl.service'
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
-import { CommonModule } from '@angular/common';
 import { DataSharedService } from '@insights/common/data-shared-service';
 
 @Injectable()
@@ -35,26 +34,11 @@ export class RestCallHandlerService {
     if (!isSessionExpired) {
       var dataresponse;
       var authToken = this.dataShare.getAuthorizationToken();
-      /* var headers;
-      var defaultHeader = {
-        'Authorization': authToken
-      };
-  
-      if (this.checkValidObject(additionalheaders)) {
-        headers = this.extend(defaultHeader, additionalheaders);
-      } else {
-        headers = defaultHeader;
-      }
-      var allData = {
-        method: 'GET',
-        headers: headers
-      }*/
       const headers = new HttpHeaders()
         .set("Authorization", authToken);
-      //console.log(headers);
       var restCallUrl = this.constructGetUrl(url, requestParams);
       this.asyncResult = await this.http.get(restCallUrl, { headers }).toPromise();
-      //console.log(this.asyncResult)//.toString
+      //console.log(this.asyncResult)
       return this.asyncResult;
     }
     else {
@@ -62,9 +46,7 @@ export class RestCallHandlerService {
     }
   }
 
-
   public post(url: string, requestParams?: Object, additionalheaders?: Object): Observable<any> {
-
     var isSessionExpired = false
     if (url != "USER_AUTHNTICATE") {
       isSessionExpired = this.dataShare.validateSession();
@@ -108,7 +90,6 @@ export class RestCallHandlerService {
     } else {
       console.log("Session Expire")
     }
-
   }
 
   public postWithParameter(url: string, requestParams?: Object, additionalheaders?: Object): Observable<any> {
@@ -119,19 +100,15 @@ export class RestCallHandlerService {
       var dataresponse;
       let headers;
       var authToken = this.dataShare.getAuthorizationToken();
-
       let params = new HttpParams();
-
       for (var key in requestParams) {
         // console.log(key + " " + requestParams[key]);
         if (requestParams.hasOwnProperty(key)) {
           params = params.set(key, requestParams[key]);
         }
       }
-
       headers = new HttpHeaders();
       headers = headers.set('Authorization', authToken);
-
       for (var key in additionalheaders) {
         //console.log(key + " " + additionalheaders[key]);
         if (headers.hasOwnProperty(key)) {
@@ -145,11 +122,9 @@ export class RestCallHandlerService {
       //console.log(httpOptions);
       dataresponse = this.http.post(restCallUrl, {}, httpOptions);
       return dataresponse;
+    } else {
+      console.log("Session Expire")
     }
-    else {
-      console.log("Postwithparamenter")
-    }
-
   }
 
   public postWithImage(url: string, imageFile: any): Observable<any> {
@@ -165,11 +140,26 @@ export class RestCallHandlerService {
         },
       })
       return dataresponse;
+    } else {
+      console.log("Session Expire")
     }
-    else {
-      console.log("postWithImage")
-    }
+  }
 
+
+  public postFormData(url: string, fd: any): Observable<any> {
+    var isSessionExpired = this.dataShare.validateSession();
+    if (!isSessionExpired) {
+      var restCallUrl = this.restAPIUrlService.getRestCallUrl(url);
+      var authToken = this.dataShare.getAuthorizationToken();
+      var dataresponse = this.http.post(restCallUrl, fd, {
+        headers: {
+          'Authorization': authToken
+        },
+      })
+      return dataresponse;
+    } else {
+      console.log("Session Expire")
+    }
   }
 
   public postWithData(url: string, data: String, requestParams?: Object, additionalheaders?: Object): Observable<any> {
@@ -206,27 +196,8 @@ export class RestCallHandlerService {
       //console.log(httpOptions);
       dataresponse = this.http.post(restCallUrl, data, httpOptions);
       return dataresponse;
-    }
-    else {
-      console.log("postFormData")
-    }
-
-  }
-
-  public postFormData(url: string, fd: any): Observable<any> {
-    var isSessionExpired = this.dataShare.validateSession();
-    if (!isSessionExpired) {
-      var restCallUrl = this.restAPIUrlService.getRestCallUrl(url);
-      var authToken = this.dataShare.getAuthorizationToken();
-      var dataresponse = this.http.post(restCallUrl, fd, {
-        headers: {
-          'Authorization': authToken
-        },
-      })
-      return dataresponse;
-    }
-    else {
-      console.log("postFormData")
+    } else {
+      console.log("Session Expire")
     }
   }
 
