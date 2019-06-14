@@ -15,15 +15,17 @@
  ******************************************************************************/
 package com.cognizant.devops.platforminsights.core;
 
-import org.apache.spark.SparkConf;
-import org.apache.spark.api.java.JavaSparkContext;
+/*
+ * import org.apache.spark.SparkConf;
+ * import org.apache.spark.api.java.JavaSparkContext;
+ */
 
 import com.cognizant.devops.platforminsights.configs.ConfigConstants;
 
 public class JavaSparkContextProvider {
-	private static final JavaSparkContext s_sparkContext = buildContext();
+	//private static final JavaSparkContext s_sparkContext = buildContext();
 	
-	public static JavaSparkContext getJavaSparkContext(){
+	/*public static JavaSparkContext getJavaSparkContext(){
 		return s_sparkContext;
 	}
 	
@@ -45,5 +47,5 @@ public class JavaSparkContextProvider {
 		//context.cancelAllJobs();
 		s_sparkContext.stop();
 		s_sparkContext.close();
-	}
+	}*/
 }

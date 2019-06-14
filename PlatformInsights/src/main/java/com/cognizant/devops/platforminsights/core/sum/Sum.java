@@ -13,30 +13,26 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  ******************************************************************************/
-package com.cognizant.devops.platforminsights.core.count;
+package com.cognizant.devops.platforminsights.core.sum;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Map;
 
-// import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-
-// @JsonIgnoreProperties(ignoreUnknown = true)
-public class Terms  implements Serializable {
-
+public class Sum implements Serializable{
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = 3432476245073319779L;
+	private static final long serialVersionUID = -4941480846446243329L;
 	
-	public Terms() {}
-	
-	private ArrayList<Map<String,Object>> buckets = new ArrayList<>();
-	
-	public ArrayList<Map<String,Object>> getBuckets() {
-		return buckets;
+	public Sum(Long total, Long num) {
+		total_ = total;
+		num_ = num;
 	}
-	public void setBuckets(ArrayList<Map<String,Object>> buckets) {
-		this.buckets = buckets;
+	public Long total_;
+	public Long num_;
+	public Long avg() {
+		if(total_ == 0){
+			return 0l;
+		}
+		return total_;
 	}
 }

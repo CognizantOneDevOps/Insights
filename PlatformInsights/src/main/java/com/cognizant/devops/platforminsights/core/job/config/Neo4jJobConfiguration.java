@@ -20,15 +20,16 @@ import java.util.Map;
 
 import com.cognizant.devops.platformcommons.core.enums.ExecutionActions;
 import com.cognizant.devops.platformcommons.core.enums.JobSchedule;
-import com.cognizant.devops.platforminsights.datamodel.KPIDefinition;
+import com.cognizant.devops.platforminsights.datamodel.Neo4jKPIDefinition;
 
-public class SparkJobConfiguration implements Serializable{
+public class Neo4jJobConfiguration implements Serializable{
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 6358715096290467554L;
 	//private KPIDefinition kpiDefinition; //Spark Elastic search doesn't seem to like nested custom object. 
-	private Map<String,String> kpiDefinition;
+	// private Map<String,String> kpiDefinition;
+	Neo4jKPIDefinition kpiDefinition;
 	private String id;
 	private String name;
 	private String schedule;
@@ -73,16 +74,22 @@ public class SparkJobConfiguration implements Serializable{
 		this.isActive = isActive;
 	}
 
-	public Map<String,String> getKpiDefinition() {
+	public Neo4jKPIDefinition getKpiDefinition() {
 		return kpiDefinition;
 	}
 	
-	public void setKpiDefinition(Map<String,String> kpiDefinition) {
+	public void setKpiDefinition(Neo4jKPIDefinition kpiDefinition) {
 		this.kpiDefinition = kpiDefinition;
 	}
 	
 	public static long getSerialversionuid() {
 		return serialVersionUID;
+	}
+
+	@Override
+	public String toString() {
+		return "Neo4jJobConfiguration [kpiDefinition=" + kpiDefinition + ", id=" + id + ", name=" + name + ", schedule="
+				+ schedule + ", nextRun=" + nextRun + ", lastRunTime=" + lastRunTime + ", isActive=" + isActive + "]";
 	}
 	
 	/**
@@ -90,8 +97,8 @@ public class SparkJobConfiguration implements Serializable{
 	 * @param kpiDetails
 	 * @return
 	 */
-	public KPIDefinition getKpiDefinition(Map<String,String> kpiDetails) {
-		KPIDefinition kpiDef = new KPIDefinition();
+	/*public Neo4jKPIDefinition getKpiDefinition(Map<String, String> kpiDetails) {
+		Neo4jKPIDefinition kpiDef = new Neo4jKPIDefinition();
 		kpiDef.setKpiID(Integer.valueOf(kpiDetails.get("kpiID")));
 		kpiDef.setName(kpiDetails.get("name"));
 		kpiDef.setExpectedTrend(kpiDetails.get("expectedTrend"));
@@ -113,15 +120,9 @@ public class SparkJobConfiguration implements Serializable{
 		kpiDef.setToolName(kpiDetails.get("toolName"));
 		kpiDef.setDbType(kpiDetails.get("dbType"));
 		kpiDef.setDataQuery(kpiDetails.get("dataQuery"));
-		kpiDef.setEsquery(kpiDetails.get("esquery"));
-		kpiDef.setEsResource(kpiDetails.get("esresource"));
+		kpiDef.setNeo4jQuery(kpiDetails.get("neo4jQuery"));
+		kpiDef.setNeo4jLabel(kpiDetails.get("neo4jLabel"));
 		
 		return kpiDef;
-	}
-
-	@Override
-	public String toString() {
-		return "SparkJobConfiguration [kpiDefinition=" + kpiDefinition + ", id=" + id + ", name=" + name + ", schedule="
-				+ schedule + ", nextRun=" + nextRun + ", lastRunTime=" + lastRunTime + ", isActive=" + isActive + "]";
-	}
+	}*/
 }

@@ -29,8 +29,8 @@ import org.quartz.impl.StdSchedulerFactory;
 import com.cognizant.devops.platformcommons.config.ApplicationConfigCache;
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
+import com.cognizant.devops.platforminsights.core.InferenceJobExecutor;
 import com.cognizant.devops.platforminsights.core.InsightsStatusProvider;
-import com.cognizant.devops.platforminsights.core.SparkJobExecutor;
 
 /**
  * Engine execution will start from Application. 1. Load the iSight config 2.
@@ -55,16 +55,26 @@ public class PlatformInsightsSparkApplication {
 		ApplicationConfigProvider.performSystemCheck();
 				
 		// Subscribe for desired events.
-		JobDetail sparkAggrgatorJob = JobBuilder.newJob(SparkJobExecutor.class)
+		/*JobDetail sparkAggrgatorJob = JobBuilder.newJob(SparkJobExecutor.class)
 				.withIdentity("SparkJobExecutorModule", "iSightSpark")
 				.build();
-
+		
 		Trigger sparkAggregatorTrigger = TriggerBuilder.newTrigger()
 				.withIdentity("SparkJobExecutorModuleTrigger", "iSightSpark")
 				.startNow()
 				.withSchedule(SimpleScheduleBuilder.simpleSchedule()
 						.withIntervalInSeconds(defaultInterval)
 						.repeatForever())
+				.build();*/
+
+		JobDetail inferenceAggrgatorJob = JobBuilder.newJob(InferenceJobExecutor.class)
+				.withIdentity("InferenceEngineJobExecutorModule", "iSightInferenceEngine")
+				.build();
+
+		Trigger inferenceAggregatorTrigger = TriggerBuilder.newTrigger()
+				.withIdentity("InferenceEngineJobExecutorModuleTrigger", "iSightInferenceEngine").startNow()
+				.withSchedule(
+						SimpleScheduleBuilder.simpleSchedule().withIntervalInSeconds(defaultInterval).repeatForever())
 				.build();
 
 		// Tell quartz to schedule the job using our trigger
@@ -72,7 +82,8 @@ public class PlatformInsightsSparkApplication {
 		try {
 			scheduler = new StdSchedulerFactory().getScheduler();
 			scheduler.start();
-			scheduler.scheduleJob(sparkAggrgatorJob, sparkAggregatorTrigger);
+			//scheduler.scheduleJob(sparkAggrgatorJob, sparkAggregatorTrigger);
+			scheduler.scheduleJob(inferenceAggrgatorJob, inferenceAggregatorTrigger);
 			log.debug("Job has been scheduled with interval of - "+defaultInterval);
 			//Insight status to DB
 		} catch (SchedulerException e) {

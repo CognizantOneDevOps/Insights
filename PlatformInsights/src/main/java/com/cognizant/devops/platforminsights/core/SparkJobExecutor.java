@@ -15,7 +15,12 @@
  ******************************************************************************/
 package com.cognizant.devops.platforminsights.core;
 
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.Reader;
 import java.io.Serializable;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -32,11 +37,19 @@ import com.cognizant.devops.platformcommons.core.enums.ExecutionActions;
 import com.cognizant.devops.platformcommons.core.util.InsightsUtils;
 import com.cognizant.devops.platforminsights.core.avg.AverageActionImpl;
 import com.cognizant.devops.platforminsights.core.count.CountActionImpl;
+import com.cognizant.devops.platforminsights.core.job.config.Neo4jJobConfiguration;
 import com.cognizant.devops.platforminsights.core.job.config.SparkJobConfigHandler;
 import com.cognizant.devops.platforminsights.core.job.config.SparkJobConfiguration;
 import com.cognizant.devops.platforminsights.core.minmax.MinMaxActionImpl;
+import com.cognizant.devops.platforminsights.core.sum.SumActionImpl;
 import com.cognizant.devops.platforminsights.datamodel.KPIDefinition;
 import com.cognizant.devops.platforminsights.exception.InsightsSparkJobFailedException;
+import com.google.gson.Gson;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
+import com.google.gson.reflect.TypeToken;
+
+
 
 /**
  * 
@@ -50,6 +63,7 @@ public class SparkJobExecutor implements Job,Serializable{
 	 */
 	private static final Logger log = LogManager.getLogger(SparkJobExecutor.class);
 	private static final long serialVersionUID = -4343203105485076004L;
+	@Override
 	public void execute(JobExecutionContext context) {
 		try {
 			startExecution();
@@ -64,37 +78,40 @@ public class SparkJobExecutor implements Job,Serializable{
 		//ApplicationConfigCache.loadConfigCache();
 		SparkJobConfigHandler configHandler = new SparkJobConfigHandler();
 		try {
+
 			List<SparkJobConfiguration> jobs = configHandler.loadJobsFromES();
-			
-			log.debug("Counting the number of Spark jobs. Count:  "+jobs.size());
-			List<SparkJobConfiguration> updatedJobs = new ArrayList<>();
-			
-				for(SparkJobConfiguration job : jobs){
-					try {
-						if(!(job.isActive() && isJobScheduledToRun(job.getLastRunTime(),job.getSchedule()))) {
-							continue;
-						}
-						executeJob(job);
-						configHandler.updateNextRun(job);
-						job.setLastRunTime(InsightsUtils.getLastRunTime(job.getSchedule()));
-						updatedJobs.add(job);
-					} catch (Exception e) {
-						log.error(e.getMessage(), e);
+
+			log.debug("Counting the number of Spark jobs. Count:  " + jobs.size());
+			List<SparkJobConfiguration> updatedJobs = new ArrayList<SparkJobConfiguration>();
+
+			for (SparkJobConfiguration job : jobs) {
+				try {
+					if (!(job.isActive() && isJobScheduledToRun(job.getLastRunTime(), job.getSchedule()))) {
+						continue;
 					}
+					executeJob(job);
+					configHandler.updateNextRun(job);
+					job.setLastRunTime(InsightsUtils.getLastRunTime(job.getSchedule()));
+					updatedJobs.add(job);
+				} catch (Exception e) {
+					log.error(e.getMessage(), e);
 				}
-				if(updatedJobs.size() > 0) {
-					if(ApplicationConfigProvider.getInstance().getEmailConfiguration().getSendEmailEnabled()) {
-						sendEmail();
-					}
-					configHandler.updateJobsInES(jobs);
+			}
+			if (updatedJobs.size() > 0) {
+				if (ApplicationConfigProvider.getInstance().getEmailConfiguration().getSendEmailEnabled()) {
+					sendEmail();
 				}
+				configHandler.updateJobsInES(jobs);
+			}
 		} catch (Exception e) {
 			log.error(e.getMessage(), e);
-			throw new JobExecutionException("Platform Insights Spark Application not started "+e.getMessage());
+			throw new JobExecutionException("Platform Insights Spark Application not started " + e.getMessage());
 			//InsightsStatusProvider.createInsightStatusNode("Platform Insights Spark Application not started "+e.getMessage(), PlatformServiceConstants.FAILURE);
 		}
 	}
-	
+
+
+
 	private void sendEmail() {
 		log.debug("Sending email from SparkJobExecutor...");
 		AlertEmailJobExecutor exe=new AlertEmailJobExecutor();
@@ -119,6 +136,11 @@ public class SparkJobExecutor implements Job,Serializable{
 			BaseActionImpl impl = new MinMaxActionImpl(kpiDefinition);
 			impl.execute();
 		}
+		else if(ExecutionActions.SUM == kpiDefinition.getAction()){
+			log.debug("KPI action found as SUM");
+			BaseActionImpl impl = new SumActionImpl(kpiDefinition);
+			impl.execute();
+		}
 	}
 	
 	private boolean isJobScheduledToRun(Long lastRun, String jobSchedule) {
@@ -126,5 +148,5 @@ public class SparkJobExecutor implements Job,Serializable{
 		Long lastRunSinceDays = InsightsUtils.getDurationBetweenDatesInDays(lastRun);
 		return InsightsUtils.isAfterRange(jobSchedule, lastRunSinceDays);
 	}
-
+	
 }
