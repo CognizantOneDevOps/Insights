@@ -44,7 +44,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 public class BulkUploadService {
 
-private static final BulkUploadService dataProcessorUtil = new BulkUploadService();
+private static final BulkUploadService bulkUploadService = new BulkUploadService();
 	private static final Logger log = LogManager.getLogger(BulkUploadService.class);
 
 	private BulkUploadService() {
@@ -52,10 +52,10 @@ private static final BulkUploadService dataProcessorUtil = new BulkUploadService
 	}
 
 	public static BulkUploadService getInstance() {
-		return dataProcessorUtil;
+		return bulkUploadService;
 	}
 
-	public boolean createBusinessHierarchyMetaData(MultipartFile file) throws InsightsCustomException {
+	public boolean createBulkUploadMetaData(MultipartFile file,String toolName) throws InsightsCustomException {
 
 		File csvfile = null;
 		boolean status = false;
@@ -71,7 +71,7 @@ private static final BulkUploadService dataProcessorUtil = new BulkUploadService
 			Neo4jDBHandler dbHandler = new Neo4jDBHandler();
 			Map<String, Integer> headerMap = csvParser.getHeaderMap();
 			dbHandler.executeCypherQuery("CREATE CONSTRAINT ON (n:METADATA) ASSERT n.metadata_id  IS UNIQUE");
-			String query = "UNWIND {props} AS properties " + "CREATE (n:METADATA:DATATAGGING) " + "SET n = properties";
+			String query = "UNWIND {props} AS properties " + "CREATE (n:METADATA:BULKUPLOAD2) " + "SET n = properties";
 			status = parseCsvRecords(status, csvParser, dbHandler, headerMap, query);
 
 		} catch (FileNotFoundException e) {
@@ -92,21 +92,18 @@ private static final BulkUploadService dataProcessorUtil = new BulkUploadService
 			Map<String, Integer> headerMap, String query)
 			throws IOException, GraphDBException, InsightsCustomException {
 		List<JsonObject> nodeProperties = new ArrayList<>();
-		List<String> combo = new ArrayList<>();
-		getCurrentRecords(combo, dbHandler);
+		
+		
 		int record = 0;
 		for (CSVRecord csvRecord : csvParser.getRecords()) {
-			
-			
-			
-			
+						
 			
 			JsonObject json = getHierachyDetails(csvRecord, headerMap);
 			record = record + 1;
 			json.addProperty(DatataggingConstants.METADATA_ID, Instant.now().getNano() + record);
 			json.addProperty(DatataggingConstants.CREATIONDATE, Instant.now().toEpochMilli());
 			nodeProperties.add(json);
-			updateComboList(combo, json);
+			
 		}
 		JsonObject graphResponse = dbHandler.bulkCreateNodes(nodeProperties, null, query);
 		if (graphResponse.get(DatataggingConstants.RESPONSE).getAsJsonObject().get(DatataggingConstants.ERRORS)
@@ -138,39 +135,12 @@ private static final BulkUploadService dataProcessorUtil = new BulkUploadService
 		return json;
 	}
 
-	private void getCurrentRecords(List<String> combo, Neo4jDBHandler dbHandler) throws GraphDBException {
-		String cypherQuery = " MATCH (n :METADATA:DATATAGGING)  RETURN n";
-		GraphResponse graphResponse = dbHandler.executeCypherQuery(cypherQuery);
-		JsonArray rows = graphResponse.getJson().get("results").getAsJsonArray().get(0).getAsJsonObject().get("data")
-				.getAsJsonArray();
-		JsonArray asJsonArray = rows.getAsJsonArray();
-		buildExistingBuToolCombinationList(combo, asJsonArray);
-	}
+	
 
-	private void buildExistingBuToolCombinationList(List<String> combo, JsonArray array) {
-		for (JsonElement element : array) {
-			JsonElement jsonElement = element.getAsJsonObject().get("row").getAsJsonArray().get(0);
-			JsonObject jsonObject = jsonElement.getAsJsonObject();
-			combo.add(getUniqueString(jsonObject));
-		}
-	}
+	
 
-	private void updateComboList(List<String> combo, JsonObject json) throws InsightsCustomException {
-		String comboStr = getUniqueString(json);
-
-		if (combo.contains(comboStr)) {
-			throw new InsightsCustomException("Duplicate Business Hierarchy..");
-		}
-		combo.add(comboStr);
-	}
-
-	private String getUniqueString(JsonObject jsonObject) {
-		return jsonObject.get(DatataggingConstants.LEVEL1).getAsString() + "_"
-				+ jsonObject.get(DatataggingConstants.LEVEL2).getAsString() + "_"
-				+ jsonObject.get(DatataggingConstants.LEVEL3).getAsString() + "_"
-				+ jsonObject.get(DatataggingConstants.LEVEL4).getAsString() + "_"
-				+ jsonObject.get(DatataggingConstants.TOOL_NAME).getAsString();
-	}
+	
+	
 
 	private File convertToFile(MultipartFile multipartFile) throws IOException {
 		File file = new File(multipartFile.getOriginalFilename());
