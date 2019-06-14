@@ -22,9 +22,11 @@ import java.util.Map;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.apache.spark.api.java.JavaPairRDD;
-import org.apache.spark.api.java.JavaRDD;
-import org.elasticsearch.spark.rdd.api.java.JavaEsSpark;
+/*
+ * import org.apache.spark.api.java.JavaPairRDD;
+ * import org.apache.spark.api.java.JavaRDD;
+ */
+// import org.elasticsearch.spark.rdd.api.java.JavaEsSpark;
 
 import com.cognizant.devops.platformcommons.core.util.InsightsUtils;
 import com.cognizant.devops.platforminsights.configs.ConfigConstants;
@@ -54,23 +56,24 @@ public class SparkJobConfigHandler {
 		/*json = json.replace("__start__", String.valueOf(InsightsUtils.getStartEpochTime()));
 		json = json.replace("__end__", String.valueOf(InsightsUtils.getEndEpochTime()));*/
 		jobConf.put("es.query", json);
-		JavaPairRDD<String,Map<String,Object>> esRDD = JavaEsSpark.esRDD(JavaSparkContextProvider.getJavaSparkContext(), jobConf);
-		JavaRDD<SparkJobConfiguration> jobsRDD = esRDD.map(new SparkJobMapFunction());
+		//JavaPairRDD<String,Map<String,Object>> esRDD = JavaEsSpark.esRDD(JavaSparkContextProvider.getJavaSparkContext(), jobConf);
+		//JavaRDD<SparkJobConfiguration> jobsRDD = esRDD.map(new SparkJobMapFunction());
 		log.debug("Loading jobs from Elasticsearch complete");
-		log.debug("  jobsRDD.collect() "+jobsRDD.collect().size());
-		return jobsRDD.collect();
+		//log.debug("  jobsRDD.collect() "+jobsRDD.collect().size());
+		//return jobsRDD.collect();
+		return null;
 	}
 	
 	public void updateJobsInES(List<SparkJobConfiguration> jobs){
 		log.debug("Updating jobs in Elasticsearch");
-		JavaRDD<SparkJobConfiguration> jobsRDD = JavaSparkContextProvider.getJavaSparkContext().parallelize(jobs);
+		//JavaRDD<SparkJobConfiguration> jobsRDD = JavaSparkContextProvider.getJavaSparkContext().parallelize(jobs);
 		Map<String, String> updateJobConf = new HashMap<String, String>();
 		updateJobConf.put("es.write.operation", "update");
 		updateJobConf.put("es.mapping.id", "id");
 		updateJobConf.put("es.resource", ConfigConstants.SPARK_ES_CONFIGINDEX);
 		updateJobConf.put("es.nodes", ConfigConstants.SPARK_ES_HOST);
 		updateJobConf.put("es.port", ConfigConstants.SPARK_ES_PORT);
-		JavaEsSpark.saveToEs(jobsRDD, updateJobConf);
+		//JavaEsSpark.saveToEs(jobsRDD, updateJobConf);
 	}
 	
 	public void saveJobResultInES(Map<String, Object> result){
@@ -81,12 +84,12 @@ public class SparkJobConfigHandler {
 	
 	public void saveJobResultInES(List<Map<String, Object>> resultList){
 		log.debug("Saving jobs in Elasticsearch. ResultList size - "+resultList.size());
-		JavaRDD<Map<String, Object>> resultRDD = JavaSparkContextProvider.getJavaSparkContext().parallelize(resultList);
+		//JavaRDD<Map<String, Object>> resultRDD = JavaSparkContextProvider.getJavaSparkContext().parallelize(resultList);
 		Map<String, String> updateJobConf = new HashMap<String, String>();
 		updateJobConf.put("es.resource", ConfigConstants.SPARK_ES_RESULTINDEX);
 		updateJobConf.put("es.nodes", ConfigConstants.SPARK_ES_HOST);
 		updateJobConf.put("es.port", ConfigConstants.SPARK_ES_PORT);
-		JavaEsSpark.saveToEs(resultRDD, updateJobConf);
+		//JavaEsSpark.saveToEs(resultRDD, updateJobConf);
 	}
 	
 	

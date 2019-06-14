@@ -17,22 +17,22 @@ package com.cognizant.devops.platforminsights.core.function;
 
 import java.util.Map;
 
-import org.apache.spark.api.java.function.Function;
+// import org.apache.spark.api.java.function.Function;
 
-import scala.Tuple2;
+// import scala.Tuple2;
 
-public class ESAverageMapFunction  implements Function<Tuple2<String, Map<String, Object>>, Map<String, Object>>{
+public class ESAverageMapFunction { // implements Function<Tuple2<String, Map<String, Object>>, Map<String, Object>>
 
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 8848970844000999881L;
 
-	@Override
+	/*@Override
 	public Map<String, Object> call(Tuple2<String, Map<String, Object>> v1) throws Exception {
 		Map<String, Object> data = v1._2;
 		System.out.println(data.toString());
 		return data;
-	}
+	}*/
 
 }

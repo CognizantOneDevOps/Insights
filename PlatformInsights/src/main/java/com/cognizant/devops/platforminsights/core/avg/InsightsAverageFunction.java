@@ -16,28 +16,28 @@
 package com.cognizant.devops.platforminsights.core.avg;
 
 import java.io.Serializable;
-
-import org.apache.spark.api.java.function.PairFunction;
-
-import scala.Tuple2;
+/*
+ * import org.apache.spark.api.java.function.PairFunction;
+ * import scala.Tuple2;
+ */
 
 /**
  * This averages the output against a key like project id. Avg time per project id
  * @author 180852
  *
  */
-public class InsightsAverageFunction implements PairFunction<Tuple2<String, Tuple2<Long, Integer>>,String,Long>,Serializable {
+public class InsightsAverageFunction implements Serializable { //PairFunction<Tuple2<String, Tuple2<Long, Integer>>,String,Long>,
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 501293508044055060L;
 
-	@Override
-    public Tuple2<String, Long> call(Tuple2<String, Tuple2<Long, Integer>> tuple) {
-    	Tuple2<Long, Integer> val = tuple._2;
-        Long total = val._1;
-        Integer count = val._2;
-        Tuple2<String, Long> averagePair = new Tuple2<String, Long>(tuple._1, total / count);
-        return averagePair;
-    }
+	/*@Override
+	public Tuple2<String, Long> call(Tuple2<String, Tuple2<Long, Integer>> tuple) {
+		Tuple2<Long, Integer> val = tuple._2;
+	    Long total = val._1;
+	    Integer count = val._2;
+	    Tuple2<String, Long> averagePair = new Tuple2<String, Long>(tuple._1, total / count);
+	    return averagePair;
+	}*/
 }

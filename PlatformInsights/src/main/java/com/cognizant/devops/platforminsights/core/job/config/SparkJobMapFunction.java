@@ -17,24 +17,24 @@ package com.cognizant.devops.platforminsights.core.job.config;
 
 import java.util.Map;
 
-import org.apache.spark.api.java.function.Function;
+// import org.apache.spark.api.java.function.Function;
 
 import com.google.gson.Gson;
 
-import scala.Tuple2;
+// import scala.Tuple2;
 
-public class SparkJobMapFunction implements Function<Tuple2<String,Map<String,Object>>, SparkJobConfiguration> {
+public class SparkJobMapFunction { //implements Function<Tuple2<String,Map<String,Object>>, SparkJobConfiguration>
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = -6572694321006877098L;
 
-	@Override
+	/*@Override
 	public SparkJobConfiguration call(Tuple2<String, Map<String, Object>> v1) throws Exception {
 		Map<String, Object> data = v1._2;
 		Gson gson = new Gson();
 		SparkJobConfiguration model = gson.fromJson(gson.toJson(data), SparkJobConfiguration.class);
 		model.setId(v1._1);
 		return model;
-	}
+	}*/
 }

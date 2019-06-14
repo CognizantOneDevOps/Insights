@@ -13,30 +13,20 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  ******************************************************************************/
-package com.cognizant.devops.platforminsights.core.count;
+package com.cognizant.devops.platforminsights.core.sum;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Map;
+// import org.apache.spark.api.java.function.Function2;
 
-// import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-
-// @JsonIgnoreProperties(ignoreUnknown = true)
-public class Terms  implements Serializable {
-
+public class AddToSum { //implements Function2<Sum, Long, Sum>
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = 3432476245073319779L;
-	
-	public Terms() {}
-	
-	private ArrayList<Map<String,Object>> buckets = new ArrayList<>();
-	
-	public ArrayList<Map<String,Object>> getBuckets() {
-		return buckets;
-	}
-	public void setBuckets(ArrayList<Map<String,Object>> buckets) {
-		this.buckets = buckets;
-	}
+	private static final long serialVersionUID = 9101790569868798420L;
+
+	/*@Override
+	public Sum call(Sum a, Long x) {
+		a.total_ += x.longValue();
+		a.num_ += 1;
+		return a;
+	}*/
 }

@@ -26,17 +26,27 @@ import org.apache.logging.log4j.Logger;
 import com.cognizant.devops.platformcommons.dal.elasticsearch.ElasticSearchDBHandler;
 import com.cognizant.devops.platforminsights.configs.ConfigConstants;
 import com.cognizant.devops.platforminsights.core.BaseActionImpl;
+import com.cognizant.devops.platforminsights.core.function.Neo4jDBImp;
 import com.cognizant.devops.platforminsights.datamodel.KPIDefinition;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.cognizant.devops.platforminsights.datamodel.Neo4jKPIDefinition;
+import com.google.gson.Gson;
+/*
+ * import com.fasterxml.jackson.databind.DeserializationFeature;
+ * import com.fasterxml.jackson.databind.ObjectMapper;
+ */
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 public class CountActionImpl extends BaseActionImpl {
 
 	private static final Logger log = LogManager.getLogger(CountActionImpl.class);
+	Gson gson = new Gson();
 	public CountActionImpl(KPIDefinition kpiDefinition) {
 		super(kpiDefinition);
+	}
+
+	public CountActionImpl(Neo4jKPIDefinition neo4jKpiDefinition) {
+		super(neo4jKpiDefinition);
 	}
 
 	@Override
@@ -50,9 +60,10 @@ public class CountActionImpl extends BaseActionImpl {
 				log.debug("GroupBy found True. Entering GroupBy method + Query -"+esQuery);
 				JsonObject jsonObj = esDBHandler.queryES(ConfigConstants.SPARK_ES_HOST+":"+ConfigConstants.SPARK_ES_PORT+"/"+kpiDefinition.getEsResource()+"/_search?size=0&filter_path=aggregations", esQuery);
 				String jsonObjStr = jsonObj.toString();
-				ObjectMapper mapper = new ObjectMapper();
-	              mapper.enable(DeserializationFeature.ACCEPT_EMPTY_STRING_AS_NULL_OBJECT);
-	              ESResultMapper eSResultMapper = mapper.readValue(jsonObjStr, ESResultMapper.class);				
+				/*ObjectMapper mapper = new ObjectMapper();
+				  mapper.enable(DeserializationFeature.ACCEPT_EMPTY_STRING_AS_NULL_OBJECT);
+				  ESResultMapper eSResultMapper = mapper.readValue(jsonObjStr, ESResultMapper.class);*/
+				ESResultMapper eSResultMapper = gson.fromJson(jsonObjStr, ESResultMapper.class);
 	              ArrayList<Map<String, Object>> AggregatedArrayMap = eSResultMapper.getAggregations().getTerms().getBuckets();
 				
 				int bucketLen = AggregatedArrayMap.size();
@@ -88,4 +99,20 @@ public class CountActionImpl extends BaseActionImpl {
 		}
 		return resultMap;
 	}
+
+	@Override
+	protected void executeNeo4jGraphQuery() {
+		//if (kpiDefinition.getDbType().equalsIgnoreCase("neo4j")) {
+		try {
+			Neo4jDBImp graphDb = new Neo4jDBImp(neo4jKpiDefinition);
+			List<Map<String, Object>> graphResposne = graphDb.getNeo4jResult();
+			log.debug(" graphResposne  " + graphResposne);
+			saveResultInNeo4j(graphResposne);
+
+		} catch (Exception e) {
+			log.error("Sum calculation job failed for kpiID - " + kpiDefinition.getKpiID(), e);
+		}
+		//}
+	}
+
 }

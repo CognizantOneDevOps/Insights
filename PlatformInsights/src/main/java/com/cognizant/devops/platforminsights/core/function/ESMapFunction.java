@@ -19,13 +19,13 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Map;
 
-import org.apache.spark.api.java.function.Function;
+// import org.apache.spark.api.java.function.Function;
 
 import com.cognizant.devops.platforminsights.datamodel.KPIDefinition;
 
-import scala.Tuple2;
+// import scala.Tuple2;
 
-public class ESMapFunction implements Function<Tuple2<String, Map<String, Object>>, Long> {
+public class ESMapFunction { //implements Function<Tuple2<String, Map<String, Object>>, Long>
 	/**
 	 * 
 	 */
@@ -55,17 +55,17 @@ public class ESMapFunction implements Function<Tuple2<String, Map<String, Object
 		}
 	}
 
-	@Override
-	public Long call(Tuple2<String, Map<String, Object>> tuple) throws Exception {
-		Map<String, Object> data = tuple._2;
-		if (avgField != null) {
-			return (Long) data.get(avgField);
-		} else if (timeFormat != null && !(data.get(endTimeField) instanceof Long)) {
-				return getTime((String)data.get(endTimeField)) - getTime((String)data.get(startTimeField));
-		} else {
-			return ((Long) data.get(endTimeField) - (Long) data.get(startTimeField));
-		}
-	}
+	/*	@Override
+		public Long call(Tuple2<String, Map<String, Object>> tuple) throws Exception {
+			Map<String, Object> data = tuple._2;
+			if (avgField != null) {
+				return (Long) data.get(avgField);
+			} else if (timeFormat != null && !(data.get(endTimeField) instanceof Long)) {
+					return getTime((String)data.get(endTimeField)) - getTime((String)data.get(startTimeField));
+			} else {
+				return ((Long) data.get(endTimeField) - (Long) data.get(startTimeField));
+			}
+		}*/
 	
 	private Long getTime(String time) {
 	

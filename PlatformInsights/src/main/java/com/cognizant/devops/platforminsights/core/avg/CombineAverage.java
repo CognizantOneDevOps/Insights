@@ -15,15 +15,15 @@
  ******************************************************************************/
 package com.cognizant.devops.platforminsights.core.avg;
 
-import org.apache.spark.api.java.function.Function2;
+// import org.apache.spark.api.java.function.Function2;
 
-public class CombineAverage implements Function2<Average, Average, Average>{
+public class CombineAverage { //implements Function2<Average, Average, Average>
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 3620814382510494699L;
 
-	@Override
+	//@Override
 	public Average call(Average a, Average b) {
 		a.total_ += b.total_;
 		a.num_ += b.num_;

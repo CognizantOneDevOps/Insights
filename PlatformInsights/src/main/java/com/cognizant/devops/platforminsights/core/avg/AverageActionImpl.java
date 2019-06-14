@@ -15,22 +15,23 @@
  ******************************************************************************/
 package com.cognizant.devops.platforminsights.core.avg;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.apache.spark.api.java.JavaPairRDD;
-import org.apache.spark.api.java.JavaRDD;
+/*
+ * import org.apache.spark.api.java.JavaPairRDD;
+ * import org.apache.spark.api.java.JavaRDD;
+ */
 
 import com.cognizant.devops.platforminsights.core.BaseActionImpl;
-import com.cognizant.devops.platforminsights.core.function.ESMapFunction;
+import com.cognizant.devops.platforminsights.core.function.Neo4jDBImp;
 import com.cognizant.devops.platforminsights.datamodel.KPIDefinition;
+import com.cognizant.devops.platforminsights.datamodel.Neo4jKPIDefinition;
 import com.cognizant.devops.platforminsights.exception.InsightsSparkJobFailedException;
 
-import scala.Tuple2;
+// import scala.Tuple2;
 
 public class AverageActionImpl extends BaseActionImpl {
 	
@@ -40,11 +41,15 @@ public class AverageActionImpl extends BaseActionImpl {
 		super(kpiDefinition);
 	}
 
+	public AverageActionImpl(Neo4jKPIDefinition neo4jKpiDefinition) {
+		super(neo4jKpiDefinition);
+	}
+
 	@Override
 	protected Map<String, Object> execute() throws InsightsSparkJobFailedException {
 		log.debug("Calculating KPI Average");
 		
-		try {
+		/*try {
 			if(kpiDefinition.isGroupBy()) {
 				log.debug("GroupBy found true. Entering GroupBy method");
 				JavaRDD<Map<String, Object>> data =  esRDD.values();
@@ -78,8 +83,23 @@ public class AverageActionImpl extends BaseActionImpl {
 		} catch (Exception e) {
 			log.error("Average calculation job failed for kpiID - "+kpiDefinition.getKpiID(), e);
 			throw new InsightsSparkJobFailedException("Average calculation job failed for kpiID - "+kpiDefinition.getKpiID(), e);
-		}
+		}*/
 		return null;
+	}
+
+	@Override
+	protected void executeNeo4jGraphQuery() {
+		//if (kpiDefinition.getDbType().equalsIgnoreCase("neo4j")) {
+		try {
+			Neo4jDBImp graphDb = new Neo4jDBImp(neo4jKpiDefinition);
+			List<Map<String, Object>> graphResposne = graphDb.getNeo4jResult();
+			log.debug(" graphResposne  " + graphResposne);
+			saveResultInNeo4j(graphResposne);
+
+		} catch (Exception e) {
+			log.error("Sum calculation job failed for kpiID - " + kpiDefinition.getKpiID(), e);
+		}
+		//}
 	}
 
 }
