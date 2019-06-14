@@ -138,8 +138,43 @@ module ISightApp {
             };
         })
 
-        .config(['$routeProvider', '$compileProvider',
-            function ($routeProvider, $compileProvider) {
+        .provider('tokenCSRFInterceptor', ['$httpProvider', function ($httpProvider) {
+            var headerName = 'XSRF-TOKEN';
+            var cookieName = 'XSRF-TOKEN';
+            var allowedMethods = ['GET', 'POST'];
+
+            this.setHeaderName = function (n) {
+                headerName = n;
+            }
+            this.setCookieName = function (n) {
+                cookieName = n;
+            }
+            this.setAllowedMethods = function (n) {
+                allowedMethods = n;
+            }
+            this.$get = ['$cookies', function ($cookies) {
+                return {
+                    'request': function (config) {
+                        //console.log(config.headers);
+                        //if (allowedMethods.indexOf(config.method) === -1) {
+                        // do something on success
+                        var xsrfToken = $cookies.get($httpProvider.defaults.xsrfCookieName);
+                        //console.log(xsrfToken);
+                        config.headers[$httpProvider.defaults.xsrfHeaderName] = xsrfToken;
+                        //}
+                        //console.log(config.headers);
+                        return config;
+                    }
+                }
+            }];
+        }])
+
+        .config(['$routeProvider', '$compileProvider', '$httpProvider',
+            function ($routeProvider, $compileProvider, $httpProvider) {
+                $httpProvider.defaults.xsrfCookieName = 'XSRF-TOKEN';
+                $httpProvider.defaults.xsrfHeaderName = 'XSRF-TOKEN';
+                $httpProvider.interceptors.push('tokenCSRFInterceptor');
+                $httpProvider.defaults.withCredentials = true;
                 $routeProvider.
                     when('/InSights/pipeline', {
                         templateUrl: './dist/modules/pipeline/view/pipelineView.html',
@@ -237,8 +272,9 @@ module ISightApp {
                     });
                 $compileProvider.aHrefSanitizationWhitelist(/^\s*(https?|ftp|mailto|tel|file|blob):|data:image\//);
             }]
-        ).run(function (restEndpointService: IRestEndpointService, authenticationService: IAuthenticationService, $cookies) {
+        ).run(function (restEndpointService: IRestEndpointService, authenticationService: IAuthenticationService, $cookies, $http) {
             restEndpointService.getServiceHost();
+            $http.defaults.headers.common['XSRF-TOKEN'] = $cookies.get('XSRF-TOKEN');
             /*angular.element(document).ready(function() {
                 var authToken = $cookies.get('Authorization');
                 var msg = '';
@@ -247,4 +283,5 @@ module ISightApp {
 
             });*/
         });
+
 }

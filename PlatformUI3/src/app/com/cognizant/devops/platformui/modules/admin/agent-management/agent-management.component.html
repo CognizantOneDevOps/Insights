@@ -32,44 +32,46 @@
   <div class="arrange-horizontally">
 
     <label class="mainText"> Select Tool </label>
-    <mat-select [(ngModel)]="selectTool" [style.width.%]="21" (ngModelChange)="selectToolAgent(selectTool)" name="selectTool"
-      required placeholder="Select Tool" class="form-control-select">
+    <mat-select [(ngModel)]="selectTool" [style.width.%]="21" (ngModelChange)="selectToolAgent(selectTool)"
+      name="selectTool" required placeholder="Select Tool" class="form-control-select">
       <mat-option *ngFor="let data of agentNameList" [value]="data" style="color:#0033A0">
         {{data}}
       </mat-option>
-      </mat-select>
+    </mat-select>
 
-      <h2 class="labelInfo">(Please select Tool to see status of ONLY the TOOL)</h2>
+    <h2 class="labelInfo">(Please select Tool to see status of ONLY the TOOL)</h2>
 
-      <div class="btnAlign">
-        <button mat-icon-button (click)="addAgentData()">
+    <div class="btnAlign">
+      <button mat-icon-button (click)="addAgentData()">
         <mat-icon title="Add Agent" class="mat-icon material-icons">
           add_circle
         </mat-icon>
         <mat-icon svgIcon="lineInButton" class="mat-icon material-icons">
         </mat-icon>
       </button>
-        <button mat-icon-button (click)="agentStartStopAction('START')" [disabled]="runDisableStatus=='START' || runDisableStatus==''">
+      <button mat-icon-button (click)="agentStartStopAction('START')"
+        [disabled]="runDisableStatus=='START' || runDisableStatus==''">
         <mat-icon title=" Start " class="mat-icon material-icons ">
           play_circle_filled
         </mat-icon>
       </button>
-        <button mat-icon-button (click)="agentStartStopAction('STOP')" [disabled]="runDisableStatus=='STOP' || runDisableStatus==''">
+      <button mat-icon-button (click)="agentStartStopAction('STOP')"
+        [disabled]="runDisableStatus=='STOP' || runDisableStatus==''">
         <mat-icon title="Stop " class="mat-icon material-icons ">
           fiber_manual_record
         </mat-icon>
       </button>
-        <button mat-icon-button [disabled]="buttonDisableStatus" (click)="editAgent()">
+      <button mat-icon-button [disabled]="buttonDisableStatus" (click)="editAgent()">
         <mat-icon title="Edit " class="mat-icon material-icons">
           edit
         </mat-icon>
       </button>
-        <button mat-icon-button [disabled]="runDisableStatus!='STOP'" (click)="uninstallAgent()">
+      <button mat-icon-button [disabled]="runDisableStatus!='STOP'" (click)="uninstallAgent()">
         <mat-icon title="Delete " class="mat-icon material-icons">
           delete
         </mat-icon>
       </button>
-      </div>
+    </div>
   </div>
 
   <div>
@@ -122,6 +124,7 @@
     </mat-radio-group>
   </div>
   <div [hidden]="!showDetail">
-    <mat-paginator #paginator [pageSize]="MAX_ROWS_PER_TABLE" showFirstLastButtons class="paginationStyle"></mat-paginator>
+    <mat-paginator #paginator [pageSize]="MAX_ROWS_PER_TABLE" showFirstLastButtons class="paginationStyle">
+    </mat-paginator>
   </div>
 </div>
