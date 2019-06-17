@@ -54,7 +54,7 @@ export class HealthCheckService implements IHealthCheckService {
         headers_object = headers_object.append("Authorization", authToken);
         let params = new HttpParams();
         params = params.append("logFileName", fileName + ".log");
-        return this.httpClient.get("/PlatformAuditService/traceability/getReportLog", { headers: headers_object, responseType: 'blob', params });
+        return this.httpClient.get("/PlatformService/traceability/getReportLog", { headers: headers_object, responseType: 'blob', params });
     }
 
 }
