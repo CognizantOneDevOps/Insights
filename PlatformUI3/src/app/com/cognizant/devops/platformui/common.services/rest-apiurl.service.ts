@@ -156,6 +156,10 @@ export class RestAPIurlService implements IRestAPIUrlService {
         //this.addEndPoint("INSIGHTS_GET", '/PlatformService/insights/inferences');
         //this.addEndPoint("UPLOAD_HIERARCHY_DETAILS", '/PlatformService/admin/hierarchyDetails/uploadHierarchyDetails');
 
+
+        this.addEndPoint("UPLOAD_FILE", '/PlatformService/admin/bulkupload/uploadToolData');
+
+
     }
 
     public addEndPoint(name: String, url: String) {
