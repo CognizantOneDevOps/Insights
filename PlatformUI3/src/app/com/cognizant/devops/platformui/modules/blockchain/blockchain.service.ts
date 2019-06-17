@@ -57,7 +57,7 @@ export class BlockChainService implements IBlockChainService {
 
     exportToPdf(pdfData): Observable<Blob> {
         var authToken = this.dataShare.getAuthorizationToken();
-        var EXPORT_TO_PDF = "/PlatformAuditService/traceability/getAuditReport";
+        var EXPORT_TO_PDF = "/PlatformService/traceability/getAuditReport";
         let params = new HttpParams();
         params = params.append("pdfName", "Traceability_report.pdf");
         var headers_object = new HttpHeaders();
