@@ -23,6 +23,8 @@ import java.util.Map;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import com.cognizant.devops.platformcommons.core.enums.JobSchedule;
+import com.cognizant.devops.platformcommons.core.util.InsightsUtils;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphResponse;
 import com.cognizant.devops.platformcommons.dal.neo4j.Neo4jDBHandler;
 import com.cognizant.devops.platforminsights.core.BaseActionImpl;
@@ -51,13 +53,15 @@ public class Neo4jDBImp extends BaseActionImpl {
 			log.debug("Database type found to be Neo4j");
 			String graphQuery = neo4jKpiDefinition.getNeo4jQuery();
 			log.debug(graphQuery);
+			graphQuery = getNeo4jQueryWithDates(neo4jKpiDefinition.getSchedule(), graphQuery);
+			log.debug("graphQuery with date " + graphQuery);
 			GraphResponse graphResp = graphDBHandler.executeCypherQuery(graphQuery);
 			log.debug(graphResp.getJson());
 			JsonArray graphJsonResult = graphResp.getJson().getAsJsonArray("results");
 			Map<String, Object> resultMap = new HashMap<>();
 			String groupByFieldVal = "";
 			String groupByFieldValResult = "";
-
+			log.debug("Number of record return by query ==== " + graphJsonResult.size());
 			for (JsonElement obj : graphJsonResult) {
 				JsonObject innerJson = obj.getAsJsonObject();
 				JsonArray data = innerJson.getAsJsonArray("data");
@@ -99,6 +103,15 @@ public class Neo4jDBImp extends BaseActionImpl {
 	protected void executeNeo4jGraphQuery() {
 		// TODO Auto-generated method stub
 
+	}
+
+	protected String getNeo4jQueryWithDates(JobSchedule schedule, String Neo4jQuery) {
+
+		Long fromDate = InsightsUtils.getDataFromTime(schedule.name());
+		Neo4jQuery = Neo4jQuery.replace("__dataFromTime__", fromDate.toString());
+		Long toDate = InsightsUtils.getDataToTime(schedule.name());
+		Neo4jQuery = Neo4jQuery.replace("__dataToTime__", toDate.toString());
+		return Neo4jQuery;
 	}
 
 }
