@@ -310,5 +310,28 @@ th[_ngcontent-c15]:last-child{
   height: 35%
 }
 
+.sectionSubHeading{
+    font-size: 13px;
+    color: #00B140; 
+}
+.mat-cell-value-single{
+    font-size: 13px;
+    height: 40px;
+    text-align: left;
+    font-family: inherit;
+    padding-left: 10px;
+    padding-right: 10px;
+
+    /* padding: 6px 12px;
+    font-size: 13px;
+    background-color: white;
+    background-image: none;
+    border: 1px solid #ccc;
+    border-radius: 4px; */
+}
+.input{
+    height: 50px !important;
+}
+
 
 
