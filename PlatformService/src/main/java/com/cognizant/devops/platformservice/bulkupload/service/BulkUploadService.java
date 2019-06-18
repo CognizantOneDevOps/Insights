@@ -64,7 +64,7 @@ public class BulkUploadService {
 		return bulkUploadService;
 	}
 
-	public boolean createBulkUploadMetaData(MultipartFile file,String toolName) throws InsightsCustomException {
+	public boolean createBulkUploadMetaData(MultipartFile file,String toolName , String label) throws InsightsCustomException {
 
 		File csvfile = null;
 		boolean status = false;
@@ -80,7 +80,7 @@ public class BulkUploadService {
 			Neo4jDBHandler dbHandler = new Neo4jDBHandler();
 			Map<String, Integer> headerMap = csvParser.getHeaderMap();
 			
-			String query = "UNWIND {props} AS properties " + "CREATE (n:"+ toolName.toUpperCase()+":CSVDATA) " + "SET n = properties"; 
+			String query = "UNWIND {props} AS properties " + "CREATE (n:"+label.toUpperCase()+":"+ toolName.toUpperCase()+":CSVDATA) " + "SET n = properties"; 
 			status = parseCsvRecords(status, csvParser, dbHandler, headerMap, query);
 
 		} catch (FileNotFoundException e) {
@@ -102,15 +102,10 @@ public class BulkUploadService {
 			throws IOException, GraphDBException, InsightsCustomException {
 		List<JsonObject> nodeProperties = new ArrayList<>();
 		
-		
-		//int record = 0;
 		for (CSVRecord csvRecord : csvParser.getRecords()) {
 						
 			
 			JsonObject json = getToolFileDetails(csvRecord, headerMap);
-		//	record = record + 1;
-			//json.addProperty(DatataggingConstants.METADATA_ID, Instant.now().getNano() + record);
-			//json.addProperty(DatataggingConstants.CREATIONDATE, Instant.now().toEpochMilli());
 			nodeProperties.add(json);
 			
 		}
@@ -133,7 +128,9 @@ public class BulkUploadService {
 		JsonObject json = new JsonObject();
 		for (Map.Entry<String, Integer> header : headerMap.entrySet()) {
 			log.debug(header);
-			if (header.getKey() != null ) {
+			log.error(DatataggingConstants.METADATA_ID);
+			if(DatataggingConstants.METADATA_ID.equalsIgnoreCase(header.getKey())
+			&&(header.getKey() != null )) {
 				log.error("HEADER"+header.getKey());
 				if (record.get(header.getValue()) != null && !record.get(header.getValue()).isEmpty()) {
 					json.addProperty(header.getKey(), Integer.valueOf(record.get(header.getValue())));
