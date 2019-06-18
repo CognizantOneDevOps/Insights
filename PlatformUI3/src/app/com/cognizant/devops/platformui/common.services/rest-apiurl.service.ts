@@ -158,6 +158,7 @@ export class RestAPIurlService implements IRestAPIUrlService {
 
 
         this.addEndPoint("UPLOAD_FILE", '/PlatformService/admin/bulkupload/uploadToolData');
+        this.addEndPoint("TOOLNAME_LABELNAME_JSON", '/PlatformService/admin/bulkupload/getToolJson');
 
 
     }
