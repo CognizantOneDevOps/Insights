@@ -25,6 +25,7 @@ import { DataSharedService } from '@insights/common/data-shared-service';
 import { count } from 'rxjs/operators';
 import { FormGroup, FormBuilder, Validators, FormControl, FormArray, NgForm } from '@angular/forms'
 import { BulkUploadService } from './bulkupload.service';
+import { MatAutocompleteModule, MatInputModule } from '@angular/material';
 //import { Control} from '@angular/common';
 
 @Component({
@@ -45,6 +46,7 @@ export class BulkUploadComponent implements OnInit {
     toolNameSaveEnable: boolean = false;
     fileNameSaveEnable: boolean = false;
     refresh: boolean = false;
+
     dataarr = []
     constructor(private fb: FormBuilder, private router: Router, private dialog: MatDialog, public messageDialog: MessageDialogService, private dataShare: DataSharedService, private bulkuploadService: BulkUploadService) {
 
@@ -77,23 +79,58 @@ export class BulkUploadComponent implements OnInit {
     async getOsVersionTools() {
         var self = this;
 
-        self.toolsArr = [];
-        this.toolVersionData = await this.bulkuploadService.getDocRootAgentVersionTools()
-        console.log(this.toolVersionData.data)
-        for (var value in this.toolVersionData.data) {
-            this.versionList.push(value);
-            this.decsendinglist = this.versionList.sort();
-            this.decsendinglist = this.decsendinglist.reverse();
+        try {
+
+            self.toolsArr = [];
+
+            //this.relationmappingLabels = [];
+
+            console.log("new")
+            let toollabelresponse = await this.bulkuploadService.loadUiServiceLocation()
+            console.log(toollabelresponse)
+            // console.log("Line 182" + correlationresponse);
+            if (toollabelresponse.status == "success") {
+                this.toolsArr = toollabelresponse.data;
+
+            }
+            // console.log("Line 186" + this.corelationResponseMaster);
+            for (var element of this.toolsArr) {
+                console.log(this.toolsArr)
+                var toolName = (element.toolName);
+                var labelName = (element.labelName.toolName);
+                // var detailProp = '<b>' + element.source.toolName + '</b>:' + element.source.fields[0] + ':<b>' + element.destination.toolName + '</b>:' + element.destination.fields[0];
+                //element['prop'] = detailProp;
+                // let relationLabel = new RelationLabel(destinationToolName, sourceToolName, element.relationName, detailProp);
+                //console.log(element);
+                /*  this.relationmappingLabels.push(relationLabel);
+                 // this.displayDataSource.push(relationLabel);
+                 this.destinationcheck.push(destinationToolName);
+                 this.sourcecheck.push(sourceToolName); */
+            }
+            // console.log("Line 198" + this.displayDataSource);
+            //this.dataComponentColumns = ['radio', 'relationName'];
         }
-
-        var version = this.decsendinglist[0];
-        console.log(this.versionList)
-        console.log(this.decsendinglist)
-        console.log(version)
-        this.toolsArr = this.toolVersionData.data[version];
-        console.log(this.toolsArr)
-
+        catch (error) {
+            console.log(error);
+        }
     }
+
+    /*  this.toolVersionData = await this.bulkuploadService.getDocRootAgentVersionTools()
+     console.log(this.toolVersionData.data)
+     for (var value in this.toolVersionData.data) {
+         this.versionList.push(value);
+         this.decsendinglist = this.versionList.sort();
+         this.decsendinglist = this.decsendinglist.reverse();
+     }
+ 
+     var version = this.decsendinglist[0];
+     console.log(this.versionList)
+     console.log(this.decsendinglist)
+     console.log(version)
+     this.toolsArr = this.toolVersionData.data[version];
+     console.log(this.toolsArr) */
+
+
 
 
     onFileChanged(event) {
@@ -130,7 +167,7 @@ export class BulkUploadComponent implements OnInit {
 
         var rowcount = 0;
         const fd = new FormData();
-        var ToolName = this.rows.value.toolName;
+        var tool = this.rows.value.toolName;
         for (let data of this.rows.value) {
             console.log(data)
             //this.dataarr.push(data)
@@ -161,7 +198,7 @@ export class BulkUploadComponent implements OnInit {
             fd.append('file', this.selectedFile, this.selectedFile.name);
             console.log(this.selectedFile)
             console.log(this.selectedFile.name)
-            //let upload = await this.bulkuploadService.uploadFile(fd, ToolName);
+            let upload = await this.bulkuploadService.uploadFile(fd, tool);
             this.messageDialog.showApplicationsMessage("You have successfully uploaded the file to Neo4J", "SUCCESS");
         }
         else {
