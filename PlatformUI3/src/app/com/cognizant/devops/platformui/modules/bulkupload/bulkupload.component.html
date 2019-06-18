@@ -24,15 +24,35 @@
 
     <div class="orangeStripCss"></div>
 
-    <div layout layout-align="left" class="sectionHeadingStyleWithoutButton">
+    <!-- <div layout layout-align="left" class="sectionHeadingStyleWithoutButton">
         <div layout>&nbsp;Bulk Upload (Please note you may upload UPTO 5 .csv files of maximum 2 MB ONE AT A TIME.)
         </div>
+    </div> -->
+    <div layout layout-align="left" class="sectionHeadingStyle">
+        <div layout> &nbsp; Bulk Upload
+            <span class="sectionSubHeading"> (Please note you may upload UPTO 5 .csv files of maximum 2 MB ONE AT A TIME.) </span>
+        </div>
     </div>
-    <button mat-icon-button (click)="savedata()">
+    <div class="btnAlign">
+        <button mat-icon-button (click)="uploadFile()" [disabled]="!toolNameSaveEnable">
+            <mat-icon title="Upload File " class="mat-icon material-icons">
+                cloud_upload
+            </mat-icon>
+        </button>
+        <button mat-icon-button (click)="saveData()" [disabled]="!toolNameSaveEnable">
+            <mat-icon title="Save " class="mat-icon material-icons">
+                save </mat-icon>
+        </button>
+        <button mat-icon-button (click)="Refresh()" [disabled]="!toolNameSaveEnable" [disabled]="!refresh">
+            <mat-icon title="Cancel " class="mat-icon material-icons">
+                cancel </mat-icon>
+        </button>
+    </div>
+    <!-- <button mat-icon-button (click)="savedata()">
         <mat-icon title="Save " class="mat-icon material-icons ">
             save
         </mat-icon>
-    </button>
+    </button> -->
     <div>
         <div class="inputWidth">
 
@@ -78,21 +98,19 @@
                             <td>
 
                                 <div>
-                                    <mat-select required [formControl]="row.get('toolName')" name="selectedTool" class="form-control"
-                                        placeholder="Select Tool" style="width:150px;">
-                                        <mat-option *ngFor=" let tool of toolsArr | keyvalue" value="{{tool.value}}">{{tool.value}}</mat-option>
+                                    <mat-select required [formControl]="row.get('toolName')" name="selectedTool" class="form-control" placeholder="Select Tool"
+                                        style="width:150px;" color="primary">
+                                        <mat-option *ngFor=" let tool of toolsArr | keyvalue" value="{{tool.value}}" (click)="toolNameenableSave()">{{tool.value}}</mat-option>
                                     </mat-select>
                                 </div>
 
                             </td>
                             <td>
-                                <input type="file" class="form-control" required [formControl]="row.get('fileName')">
+                                <input type="file" class="mat-cell-value-single" required [formControl]="row.get('fileName')" (change)="onFileChanged($event)"
+                                    (click)="fileNameenableSave()" style="padding:0 15px 0 15px;">
                             </td>
 
                         </tr>
-
-
-
 
 
                     </tbody>
