@@ -40,6 +40,12 @@ export class BulkUploadComponent implements OnInit {
     toolVersionData: any;
     versionList = [];
     decsendinglist = [];
+    selectedFile: File = null;
+    queryForm: FormGroup;
+    toolNameSaveEnable: boolean = false;
+    fileNameSaveEnable: boolean = false;
+    refresh: boolean = false;
+    dataarr = []
     constructor(private fb: FormBuilder, private router: Router, private dialog: MatDialog, public messageDialog: MessageDialogService, private dataShare: DataSharedService, private bulkuploadService: BulkUploadService) {
 
         this.rows = this.fb.array([]);
@@ -66,9 +72,7 @@ export class BulkUploadComponent implements OnInit {
             fileName: null
         });
     }
-    savedata() {
-        console.log(this.rows.value)
-    }
+
 
     async getOsVersionTools() {
         var self = this;
@@ -92,4 +96,76 @@ export class BulkUploadComponent implements OnInit {
     }
 
 
+    onFileChanged(event) {
+        this.selectedFile = <File>event.target.files[0];
+        /* this.queryForm.patchValue({
+          queryPath: this.selectedFile.name
+        }) */
+        console.log(this.selectedFile);
+    }
+
+    toolNameenableSave() {
+        this.toolNameSaveEnable = true;
+    }
+    fileNameenableSave() {
+        this.fileNameSaveEnable = true;
+    }
+
+    Refresh() {
+
+        this.toolNameSaveEnable = true;
+        this.refresh = false;
+
+
+    }
+    cancelFileUpload() {
+        /* 
+         this.fileUploadSuccessMessage = "";
+         this.fileUploadErrorMessage = ""; */
+    }
+    uploadFile() {
+        this.toolNameSaveEnable = true;
+    }
+    async saveData() {
+
+        var rowcount = 0;
+        const fd = new FormData();
+        var ToolName = this.rows.value.toolName;
+        for (let data of this.rows.value) {
+            console.log(data)
+            //this.dataarr.push(data)
+            //console.log(this.dataarr.indexOf[]
+            if ((data.toolName == null)) {
+
+                if (data.fileName == null) {
+                    rowcount = 0
+                    break;
+                }
+                else {
+                    console.log(data.toolName)
+                    rowcount = rowcount + 1;
+                    break;
+                }
+                //this.messageDialog.showApplicationsMessage("You have successfully uploaded the file to Neo4J", "SUCCESS");
+
+            }
+            else if (data.fileName == null) {
+                console.log(data.toolName)
+                rowcount = rowcount + 1;
+                break;
+
+            }
+        }
+        if (rowcount == 0) {
+
+            fd.append('file', this.selectedFile, this.selectedFile.name);
+            console.log(this.selectedFile)
+            console.log(this.selectedFile.name)
+            //let upload = await this.bulkuploadService.uploadFile(fd, ToolName);
+            this.messageDialog.showApplicationsMessage("You have successfully uploaded the file to Neo4J", "SUCCESS");
+        }
+        else {
+            this.messageDialog.showApplicationsMessage("Please select ToolName/", "ERROR");
+        }
+    }
 }

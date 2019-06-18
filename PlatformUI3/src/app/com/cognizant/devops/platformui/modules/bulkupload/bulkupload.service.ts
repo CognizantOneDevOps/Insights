@@ -30,5 +30,9 @@ export class BulkUploadService implements IBulkUploadService {
     getDocRootAgentVersionTools(): Promise<any> {
         return this.restCallHandlerService.get("DOCROOT_AGENT_VERSION_TOOLS");
     }
+
+    /* uploadFile(formData, ToolName): Promise<any> {
+        return this.restCallHandlerService.postFormData("UPLOAD_FILE", formData).toPromise();
+    } */
 }
 
