@@ -30,11 +30,27 @@ public class InsightsBulkUpload {
 		boolean status = false;
 		
 		status = BulkUploadService.getInstance().createBulkUploadMetaData(file,toolName);
-		log.error("HELLO");
+		
         log.error(file);
         log.error(status);
         log.error(PlatformServiceUtil.buildSuccessResponse());
 		return PlatformServiceUtil.buildSuccessResponse();
 
 	}
+	
+	@RequestMapping(value = "/getToolJson", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+	public @ResponseBody JsonObject getToolJson() throws IOException, InsightsCustomException {
+		Object details = null;
+		try {
+			details = BulkUploadService.getInstance().getToolDetailJson();
+			log.debug("FILE"+details);
+		}catch (InsightsCustomException e) {
+			return PlatformServiceUtil.buildFailureResponse(e.toString());
+		}
+		log.error(PlatformServiceUtil.buildSuccessResponseWithData(details));
+		return PlatformServiceUtil.buildSuccessResponseWithData(details);
+		//return PlatformServiceUtil.buildSuccessResponseWithData(details);
+	}
+	
+	
 }
