@@ -26,14 +26,18 @@ public class InsightsBulkUpload {
 	//private JsonObject asJsonObject;
 	
 	@RequestMapping(value = "/uploadToolData", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-	public @ResponseBody JsonObject uploadToolData(@RequestParam("file") MultipartFile file, @RequestParam String toolName ) throws InsightsCustomException {
+	public @ResponseBody JsonObject uploadToolData(@RequestParam("file") MultipartFile file, @RequestParam String toolName ,@RequestParam String label ) throws InsightsCustomException {
 		boolean status = false;
+		 log.error("FILENAME......."+ file);
+	       log.error("FILENAME......."+ toolName);
+	       log.error("FILENAME......."+ label);
 		
-		status = BulkUploadService.getInstance().createBulkUploadMetaData(file,toolName);
+		status = BulkUploadService.getInstance().createBulkUploadMetaData(file,toolName,label);
 		
-        log.error(file);
-        log.error(status);
-        log.error(PlatformServiceUtil.buildSuccessResponse());
+        
+       log.error("FILENAME......."+ file);
+       log.error("FILENAME......."+ toolName);
+       log.error("FILENAME......."+ label);
 		return PlatformServiceUtil.buildSuccessResponse();
 
 	}
@@ -43,7 +47,7 @@ public class InsightsBulkUpload {
 		Object details = null;
 		try {
 			details = BulkUploadService.getInstance().getToolDetailJson();
-			log.debug("FILE"+details);
+			log.debug("FILE");
 		}catch (InsightsCustomException e) {
 			return PlatformServiceUtil.buildFailureResponse(e.toString());
 		}
