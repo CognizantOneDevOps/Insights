@@ -29,7 +29,7 @@ import com.cognizant.devops.platforminsights.core.BaseActionImpl;
 import com.cognizant.devops.platforminsights.core.function.Neo4jDBImp;
 import com.cognizant.devops.platforminsights.datamodel.KPIDefinition;
 import com.cognizant.devops.platforminsights.datamodel.Neo4jKPIDefinition;
-import com.cognizant.devops.platforminsights.exception.InsightsSparkJobFailedException;
+import com.cognizant.devops.platforminsights.exception.InsightsJobFailedException;
 
 // import scala.Tuple2;
 
@@ -46,7 +46,7 @@ public class AverageActionImpl extends BaseActionImpl {
 	}
 
 	@Override
-	protected Map<String, Object> execute() throws InsightsSparkJobFailedException {
+	protected Map<String, Object> execute() throws InsightsJobFailedException {
 		log.debug("Calculating KPI Average");
 		
 		/*try {

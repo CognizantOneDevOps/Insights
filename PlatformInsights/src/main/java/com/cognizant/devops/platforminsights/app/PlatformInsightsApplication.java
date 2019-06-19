@@ -36,11 +36,11 @@ import com.cognizant.devops.platforminsights.core.InsightsStatusProvider;
  * Engine execution will start from Application. 1. Load the iSight config 2.
  * Initialize Publisher and subscriber modules 3. Initialize Correlation Module.
  */
-public class PlatformInsightsSparkApplication {
-	private static Logger log = LogManager.getLogger(PlatformInsightsSparkApplication.class);
+public class PlatformInsightsApplication {
+	private static Logger log = LogManager.getLogger(PlatformInsightsApplication.class);
 	
 	private static int defaultInterval = 600;
-	private PlatformInsightsSparkApplication(){
+	private PlatformInsightsApplication(){
 		
 	}
 	

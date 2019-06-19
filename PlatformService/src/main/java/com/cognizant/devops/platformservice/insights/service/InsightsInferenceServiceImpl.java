@@ -25,6 +25,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -39,6 +40,12 @@ import com.cognizant.devops.platformcommons.core.enums.KPITrends;
 import com.cognizant.devops.platformcommons.core.enums.ResultOutputType;
 import com.cognizant.devops.platformcommons.core.util.InsightsUtils;
 import com.cognizant.devops.platformcommons.dal.elasticsearch.ElasticSearchDBHandler;
+import com.cognizant.devops.platformcommons.dal.neo4j.GraphResponse;
+import com.cognizant.devops.platformcommons.dal.neo4j.Neo4jDBHandler;
+import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
+import com.google.common.collect.Multiset.Entry;
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
 @Service("insightsInferenceService")
@@ -62,16 +69,17 @@ public class InsightsInferenceServiceImpl implements InsightsInferenceService {
 	private List<InsightsInference> getInferences(String schedule) {
 		List<InsightsInference> inferences = new ArrayList<>(5);
 
-		List<InferenceResult> results = new LinkedList<>();
+		List<InferenceResult> results = new ArrayList<InferenceResult>();
 		try {
-
+			results = getInferenceDataFromNeo4j(schedule.toUpperCase());
 			//resultDataList = getInferenceData(resultDataList, schedule);
-			results = getInferenceData(schedule);
+			//results = getInferenceData(schedule);
 
 		} catch (Exception e) {
 			log.error("Problem getting Spark results", e);
 			return inferences;
 		}
+
 		Map<String, List<InsightsInferenceDetail>> tempMap = getSortedByVector(schedule,results);
 
 		Set<String> vectorKeys = tempMap.keySet();
@@ -89,10 +97,12 @@ public class InsightsInferenceServiceImpl implements InsightsInferenceService {
 	private Map<String, List<InsightsInferenceDetail>> getSortedByVector(String schedule,List<InferenceResult> results) {
 
 		Map<String, List<InsightsInferenceDetail>> tempMap = new HashMap<>();
-
+		log.debug(" results  " + results);
 		for (InferenceResult inferenceResult : results) {
+			log.debug("  inferenceResult  " + inferenceResult);
 			List<InferenceResultDetails> inferenceResultDetailsList = inferenceResult.getDetails();
 			InferenceResultDetails resultFirstData = inferenceResultDetailsList.get(0);
+			log.debug("resultFirstData  " + resultFirstData);
 				String trend = "No Change";
 				KPISentiment sentiment = KPISentiment.NEUTRAL;
 				Object[] values = new Object[2];
@@ -110,7 +120,7 @@ public class InsightsInferenceServiceImpl implements InsightsInferenceService {
 						continue;
 					}
 					InferenceResultDetails result2 = inferenceResultDetailsList.get(1);
-
+				log.debug("  result2 " + result2);
 					sentiment = getSentiment(result2.getResult(),
 							resultFirstData.getResult(),
 							resultFirstData.getExpectedTrend());
@@ -135,7 +145,7 @@ public class InsightsInferenceServiceImpl implements InsightsInferenceService {
 						vector,	kpiID, sentiment, schedule, values,
 						isComparison, resultOutputType);
 
-				
+			log.debug("  inferenceText  " + inferenceText);
 				List<ResultSetModel> resultValues = new ArrayList<ResultSetModel>();
 				for (InferenceResultDetails details : inferenceResultDetailsList) {
 					ResultSetModel model = new ResultSetModel();
@@ -181,7 +191,7 @@ public class InsightsInferenceServiceImpl implements InsightsInferenceService {
 	private List<InferenceResult> getInferenceData(String inputSchedule) throws Exception {
 		String esQuery = getQuery();
 
-		esQuery = getUpdatedQueryWithDate(esQuery, inputSchedule, 5); // Since
+		esQuery = getUpdatedQueryWithDate(esQuery, inputSchedule, 5000); // Since
 																		// should
 																		// come
 																		// from
@@ -197,7 +207,7 @@ public class InsightsInferenceServiceImpl implements InsightsInferenceService {
 				.getSparkElasticSearchResultIndex();
 		JsonObject jsonObj = esDBHandler.queryES(
 				sparkElasticSearchHost+":"+sparkElasticSearchPort+"/"+sparkElasticSearchResultIndex+"/_search?filter_path=aggregations", esQuery);
-		
+		log.debug(" ES query result " + jsonObj);
 		List<InferenceResult> inferenceResults = JsonToObjectConverter.getInferenceResult(jsonObj);
 
 		return inferenceResults;
@@ -336,5 +346,138 @@ public class InsightsInferenceServiceImpl implements InsightsInferenceService {
 		esQuery = esQuery.replace("__ToDate__", InsightsUtils.getTodayTime().toString());
 		esQuery = esQuery.replace("__schedule__", schedule);
 		return esQuery;
+	}
+
+	private String getNeo4jQueryWithDates(String inputSchedule) {
+
+		String cypherQuery = "MATCH (n:INFERENCE:RESULTS) where exists(n.kpiID) AND n.schedule= '" + inputSchedule
+				+ "' RETURN n.kpiID,n.name,n.vector,"
+				+ " n.expectedTrend,n.result,n.schedule,n.action,n.resultTime,n.resultTimeX,n.toolName,n.resultOutPutType,"
+				+ " n.isComparisionKpi, n.isGroupBy,'' as groupByName ,'' as groupByFieldVal order by n.kpiID,n.resultTime desc"; //and n.vector='BUILD'
+
+		return cypherQuery;
+	}
+
+	private List<InferenceResult> getInferenceDataFromNeo4j(String inputSchedule) throws Exception {
+		List<InferenceResult> inferenceResults = null;
+		Neo4jDBHandler graphDBHandler = new Neo4jDBHandler();
+		try {
+			String graphQuery = getNeo4jQueryWithDates(inputSchedule);
+			log.debug(" graphQuery  " + graphQuery);
+			GraphResponse graphResp = graphDBHandler.executeCypherQuery(graphQuery);
+			log.debug(graphResp.getJson());
+			JsonArray errorMessage = graphResp.getJson().getAsJsonArray("errors");
+			if (errorMessage.size() >= 1) {
+				String errorMessageText = errorMessage.get(0).getAsJsonObject().get("message").getAsString();
+				log.error(" error while executing neo4j query and error is '" + errorMessageText + " '");
+				throw new InsightsCustomException(errorMessageText);
+			}
+			JsonArray graphJsonResult = graphResp.getJson().getAsJsonArray("results");
+			log.debug(" graphJsonResult  " + graphJsonResult.toString());
+			inferenceResults = parseNeo4jResponse(graphJsonResult, graphResp);
+		} catch (Exception e) {
+			log.error(" error while executing neo4j query in getInferenceDataFromNeo4j  " + e.getCause()
+					+ e.getMessage());
+		}
+
+		return inferenceResults;
+
+	}
+
+	private List<InferenceResult> parseNeo4jResponse(JsonArray graphJsonResult, GraphResponse response) {
+
+		List<InferenceResult> inferenceResults = new ArrayList<InferenceResult>(0);
+		List<InferenceResultDetails> inferenceDetailList = new ArrayList<InferenceResultDetails>(0);
+
+		try {
+			int size = response.getNodes().size();
+			List<Map<String, String>> propertyList = new ArrayList<Map<String, String>>();
+			log.debug("arg0  size " + size);
+			for (int i = 0; i < size; i++) {
+				String json = new Gson().toJson(response.getNodes().get(i).getPropertyMap());
+				//log.debug(json);
+				propertyList.add(response.getNodes().get(i).getPropertyMap());
+			}
+			propertyList.forEach(map -> {
+				log.debug("property " + map.toString());
+			});
+
+			JsonArray inferenceData = graphJsonResult.get(0).getAsJsonObject().get("data").getAsJsonArray(); //.get(0).getAsJsonObject().get("row").getAsJsonArray()
+			log.debug(" inferenceData  " + inferenceData.toString());
+			
+
+			/*Iterator<JsonElement> iterator = kpiData.iterator().next().getAsJsonObject().get("row").getAsJsonArray()
+					.iterator();//.next().getAsJsonArray().iterator()
+			while (iterator.hasNext()) {
+			
+				String element = iterator.next().getAsString();
+				log.debug(" inferenceData 2 " + element);
+			
+			}*/
+
+			for (int i = 0; i < inferenceData.size(); i++) {
+
+				InferenceResultDetails inferenceDetails = new InferenceResultDetails();
+
+
+				log.debug(" inferenceData  " + inferenceData.get(i).getAsJsonObject());
+
+				JsonArray rowArraykpiData = inferenceData.get(i).getAsJsonObject().get("row").getAsJsonArray();
+
+				log.debug(" rowArray " + rowArraykpiData.toString());
+
+				inferenceDetails.setKpiID(rowArraykpiData.get(0).getAsLong());
+				inferenceDetails.setName(rowArraykpiData.get(1).getAsString());
+				inferenceDetails.setVector(rowArraykpiData.get(2).getAsString());
+				inferenceDetails.setExpectedTrend(rowArraykpiData.get(3).getAsString());
+				inferenceDetails.setResult(Long.parseLong(rowArraykpiData.get(4).getAsString()));
+				inferenceDetails.setSchedule(rowArraykpiData.get(5).getAsString());
+				inferenceDetails.setAction(rowArraykpiData.get(6).getAsString());
+				inferenceDetails.setResultTime(rowArraykpiData.get(7).getAsLong());
+				if (!rowArraykpiData.get(8).isJsonNull()) {
+					inferenceDetails.setToolName(rowArraykpiData.get(8).getAsString());
+				}
+
+				if (rowArraykpiData.get(9) != null && !rowArraykpiData.get(9).isJsonNull()) {
+					inferenceDetails.setIsComparisionKpi(rowArraykpiData.get(9).getAsBoolean());
+				}
+				
+				if (!rowArraykpiData.get(10).isJsonNull() && rowArraykpiData.get(10).getAsBoolean()) {
+					inferenceDetails.setIsGroupBy(rowArraykpiData.get(10).getAsBoolean());
+					inferenceDetails.setGroupByName(rowArraykpiData.get(11).getAsString());
+					inferenceDetails.setGroupByFieldVal(rowArraykpiData.get(12).getAsString());
+				} else {
+					inferenceDetails.setIsGroupBy(Boolean.FALSE);
+				}
+				/*details.add(inferenceDetails);*/
+				inferenceDetailList.add(inferenceDetails);
+			}
+
+			Map<Long, List<InferenceResultDetails>> kpiInferenceResulGrouped = inferenceDetailList.stream()
+					.collect(Collectors.groupingBy(kpi -> kpi.getKpiID()));
+
+			log.debug(" kpiInferenceResulGrouped " + kpiInferenceResulGrouped);
+
+			/*studlistGrouped.forEach(map -> {
+				log.debug("property " + map.toString());
+			});*/
+
+			for (Map.Entry<Long, List<InferenceResultDetails>> kipInferanceResult : kpiInferenceResulGrouped
+					.entrySet()) {
+				InferenceResult ir = new InferenceResult();
+				ir.setKpiID(kipInferanceResult.getKey());
+				ir.setDetails(kipInferanceResult.getValue());
+				ir.setTotalDocuments((long) kipInferanceResult.getValue().size());
+				inferenceResults.add(ir);
+			}
+
+			/*detail.setDetails(details);
+			results.add(inferenceresult);*/
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		return inferenceResults;
 	}
 }

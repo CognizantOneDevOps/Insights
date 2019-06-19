@@ -30,7 +30,7 @@ import com.cognizant.devops.platformcommons.dal.neo4j.Neo4jDBHandler;
 import com.cognizant.devops.platforminsights.core.BaseActionImpl;
 import com.cognizant.devops.platforminsights.datamodel.KPIDefinition;
 import com.cognizant.devops.platforminsights.datamodel.Neo4jKPIDefinition;
-import com.cognizant.devops.platforminsights.exception.InsightsSparkJobFailedException;
+import com.cognizant.devops.platforminsights.exception.InsightsJobFailedException;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -50,17 +50,23 @@ public class Neo4jDBImp extends BaseActionImpl {
 		Neo4jDBHandler graphDBHandler = new Neo4jDBHandler();
 		List<Map<String, Object>> resultList = new ArrayList<>();
 		try {
-			log.debug("Database type found to be Neo4j");
 			String graphQuery = neo4jKpiDefinition.getNeo4jQuery();
-			log.debug(graphQuery);
+			log.debug("Database type found to be Neo4j  === " + graphQuery);
 			graphQuery = getNeo4jQueryWithDates(neo4jKpiDefinition.getSchedule(), graphQuery);
-			log.debug("graphQuery with date " + graphQuery);
+			log.debug("graphQuery with date === " + graphQuery);
 			GraphResponse graphResp = graphDBHandler.executeCypherQuery(graphQuery);
 			log.debug(graphResp.getJson());
+			JsonArray errorMessage = graphResp.getJson().getAsJsonArray("errors");
+			if (errorMessage.size() >= 1) {
+				String errorMessageText = errorMessage.get(0).getAsJsonObject().get("message").getAsString();
+				log.error(" Neo4j query execution error for job '" + neo4jKpiDefinition.getName() + "' and error is '"
+						+ errorMessageText + " '");
+				throw new InsightsJobFailedException(errorMessageText);
+			}
 			JsonArray graphJsonResult = graphResp.getJson().getAsJsonArray("results");
 			Map<String, Object> resultMap = new HashMap<>();
 			String groupByFieldVal = "";
-			String groupByFieldValResult = "";
+			Long groupByFieldValResult = 0L;
 			log.debug("Number of record return by query ==== " + graphJsonResult.size());
 			for (JsonElement obj : graphJsonResult) {
 				JsonObject innerJson = obj.getAsJsonObject();
@@ -68,9 +74,14 @@ public class Neo4jDBImp extends BaseActionImpl {
 				for (JsonElement dataObj : data) {
 					JsonObject row = dataObj.getAsJsonObject();
 					JsonArray rowData = row.getAsJsonArray("row");
-					log.debug("rowData " + rowData);
+					log.debug("rowData " + rowData + "  rowData.get(0)  " + rowData.get(0) + " "
+							+ rowData.get(0).isJsonNull());
 					if (rowData.size() == 1) {
-						resultMap = getResultMapNeo4j(rowData.getAsString(), "");
+						if (!rowData.get(0).isJsonNull()) {
+							resultMap = getResultMapNeo4j(rowData.get(0).getAsLong(), "");//AsString()
+						} else {
+							log.debug("rowData result is null " + rowData);
+						}
 					} else {
 						int i = 0;
 						for (JsonElement key : rowData) {
@@ -79,12 +90,16 @@ public class Neo4jDBImp extends BaseActionImpl {
 								groupByFieldVal = key.getAsString();
 								i++;
 							} else {
-								groupByFieldValResult = key.getAsString();
+								groupByFieldValResult = key.getAsLong();
 							}
 						}
 						resultMap = getResultMapNeo4j(groupByFieldValResult, groupByFieldVal);
 					}
-					resultList.add(resultMap);
+					if (!resultMap.isEmpty()) {
+						resultList.add(resultMap);
+					} else {
+						log.debug(" No result calulated ....");
+					}
 				}
 			}
 		} catch (Exception e) {
@@ -94,7 +109,7 @@ public class Neo4jDBImp extends BaseActionImpl {
 	}
 
 	@Override
-	protected Map<String, Object> execute() throws InsightsSparkJobFailedException {
+	protected Map<String, Object> execute() throws InsightsJobFailedException {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -105,13 +120,25 @@ public class Neo4jDBImp extends BaseActionImpl {
 
 	}
 
-	protected String getNeo4jQueryWithDates(JobSchedule schedule, String Neo4jQuery) {
-
+	protected String getNeo4jQueryWithDates(JobSchedule schedule, String neo4jQuery) {
 		Long fromDate = InsightsUtils.getDataFromTime(schedule.name());
-		Neo4jQuery = Neo4jQuery.replace("__dataFromTime__", fromDate.toString());
 		Long toDate = InsightsUtils.getDataToTime(schedule.name());
-		Neo4jQuery = Neo4jQuery.replace("__dataToTime__", toDate.toString());
-		return Neo4jQuery;
+		String whereClause = " WHERE '" + neo4jKpiDefinition.getStartTimeField() + "' > '" + fromDate + "' AND '"
+				+ neo4jKpiDefinition.getStartTimeField() + "' < '" + toDate + "'";
+		if (neo4jQuery.contains("WHERE")) {
+			neo4jQuery = neo4jQuery.replace("WHERE", whereClause + " AND ");
+		} else if (neo4jQuery.contains("RETURN") && !neo4jQuery.equalsIgnoreCase("where")) {
+			neo4jQuery = neo4jQuery.replace("RETURN", whereClause + " RETURN  ");
+		} /*else if (neo4jQuery.equals("return") && !neo4jQuery.equalsIgnoreCase("where")) {
+			neo4jQuery = neo4jQuery.replace("return", whereClause + " return  ");
+			} else if (neo4jQuery.equals("where")) {
+			neo4jQuery = neo4jQuery.replace("where", " WHERE '" + whereClause + " and ");
+			} */
+		/*
+		Neo4jQuery = Neo4jQuery.replace("__dataFromTime__", fromDate.toString());
+		
+		Neo4jQuery = Neo4jQuery.replace("__dataToTime__", toDate.toString());*/
+		return neo4jQuery;
 	}
 
 }

@@ -38,7 +38,7 @@ import com.cognizant.devops.platforminsights.core.function.Neo4jDBImp;
 import com.cognizant.devops.platforminsights.core.job.config.SparkJobConfigHandler;
 import com.cognizant.devops.platforminsights.datamodel.KPIDefinition;
 import com.cognizant.devops.platforminsights.datamodel.Neo4jKPIDefinition;
-import com.cognizant.devops.platforminsights.exception.InsightsSparkJobFailedException;
+import com.cognizant.devops.platforminsights.exception.InsightsJobFailedException;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -53,6 +53,7 @@ public abstract class BaseActionImpl {
 	Neo4jDBHandler dbHandler = new Neo4jDBHandler();
 	Gson gson = new Gson();
 	JsonParser jsonParser = new JsonParser();
+	private  static final String TIMEZONE = "GMT";
 
 	public BaseActionImpl(KPIDefinition kpiDefinition) {
 		this.kpiDefinition = kpiDefinition;
@@ -88,17 +89,17 @@ public abstract class BaseActionImpl {
 		//esRDD = JavaEsSpark.esRDD(sparkContext, jobConf);
 	}
 
-	protected Map<String, Object> getResultMapNeo4j(String result, String groupByValue) {
+	protected Map<String, Object> getResultMapNeo4j(Long result, String groupByValue) {
 		Map<String, Object> resultMap = new HashMap<>();
 		resultMap.put(KPIJobResultAttributes.KPIID.toString(), neo4jKpiDefinition.getKpiID());
 		resultMap.put(KPIJobResultAttributes.NAME.toString(), neo4jKpiDefinition.getName());
 		resultMap.put(KPIJobResultAttributes.EXPECTEDTREND.toString(), neo4jKpiDefinition.getExpectedTrend());
 		resultMap.put(KPIJobResultAttributes.ISGROUPBY.toString(), neo4jKpiDefinition.isGroupBy());
-		if (neo4jKpiDefinition.getResultOutPutType() == "number") {
-			resultMap.put(KPIJobResultAttributes.RESULT.toString(), Long.parseLong(result));
-		} else {
+		/*if (neo4jKpiDefinition.getResultOutPutType() == "number") {
 			resultMap.put(KPIJobResultAttributes.RESULT.toString(), result);
-		}
+		} else {*/
+			resultMap.put(KPIJobResultAttributes.RESULT.toString(), result);
+		/*}*/
 		resultMap.put(KPIJobResultAttributes.VECTOR.toString(), neo4jKpiDefinition.getVector());
 		resultMap.put(KPIJobResultAttributes.TOOLNAME.toString(), neo4jKpiDefinition.getToolName());
 		resultMap.put(KPIJobResultAttributes.SCHEDULE.toString(), neo4jKpiDefinition.getSchedule().name());
@@ -111,7 +112,7 @@ public abstract class BaseActionImpl {
 			resultMap.put(KPIJobResultAttributes.GROUPBYFIELDVAL.toString(), groupByValue);
 		}
 		resultMap.put(KPIJobResultAttributes.RESULTTIME.toString(), InsightsUtils.getTodayTime());
-		// resultMap.put(KPIJobResultAttributes.RESULTTIMEX.toString(),InsightsUtils.getTodayTimeX());
+		resultMap.put(KPIJobResultAttributes.RESULTTIMEX.toString(), InsightsUtils.getUtcTime(TIMEZONE));
 		return resultMap;
 	}
 
@@ -134,11 +135,11 @@ public abstract class BaseActionImpl {
 			resultMap.put(KPIJobResultAttributes.GROUPBYFIELDVAL.toString(), groupByValue);
 		}
 		resultMap.put(KPIJobResultAttributes.RESULTTIME.toString(), InsightsUtils.getTodayTime());
-		// resultMap.put(KPIJobResultAttributes.RESULTTIMEX.toString(),InsightsUtils.getTodayTimeX());
+		//resultMap.put(KPIJobResultAttributes.RESULTTIMEX.toString(), InsightsUtils.getTodayTimeX());
 		return resultMap;
 	}
 
-	protected abstract Map<String, Object> execute() throws InsightsSparkJobFailedException;
+	protected abstract Map<String, Object> execute() throws InsightsJobFailedException;
 
 	protected abstract void executeNeo4jGraphQuery();
 
@@ -163,18 +164,23 @@ public abstract class BaseActionImpl {
 
 	protected void saveResultInNeo4j(List<Map<String, Object>> resultList) {
 		try {
-			String cypherQuery = "UNWIND {props} AS properties CREATE (n:INFERENCE:DATA) set n=properties return count(n)";
-			List<JsonObject> dataList = new ArrayList<JsonObject>();
-			log.debug("Saving jobs in Neo4j. ResultList size - " + resultList.size());
-			String resultJson = gson.toJson(resultList);
-			log.debug("resultJson  ==== " + resultJson);
-			for (Map<String, Object> resultMapObject : resultList) {
-				String resultMapJsonObject = gson.toJson(resultMapObject);
-				JsonElement jsonElement = jsonParser.parse(resultMapJsonObject);
-				dataList.add(jsonElement.getAsJsonObject());
+			if (!resultList.isEmpty()) {
+				String cypherQuery = "UNWIND {props} AS properties CREATE (n:INFERENCE:RESULTS) set n=properties return count(n)"; //DATA
+				List<JsonObject> dataList = new ArrayList<JsonObject>();
+				log.debug("Saving jobs in Neo4j. ResultList size :  " + resultList.size());
+				String resultJson = gson.toJson(resultList);
+				log.debug("resultJson  ==== " + resultJson);
+				for (Map<String, Object> resultMapObject : resultList) {
+					String resultMapJsonObject = gson.toJson(resultMapObject);
+					JsonElement jsonElement = jsonParser.parse(resultMapJsonObject);
+					dataList.add(jsonElement.getAsJsonObject());
+				}
+				log.debug("Saving jobs in Neo4j. dataList size : " + dataList.size());
+				JsonObject graphResponse = dbHandler.executeQueryWithData(cypherQuery, dataList);
+				log.debug(" graphResponse  " + graphResponse);
+			} else {
+				log.error(" No result to store in neo4j for job : " + neo4jKpiDefinition.getName());
 			}
-			JsonObject graphResponse = dbHandler.executeQueryWithData(cypherQuery, dataList);
-			log.debug(" graphResponse  " + graphResponse);
 		} catch (GraphDBException | NullPointerException e) {
 			log.error("Error while saving neo4j record " + e.getMessage());
 		} catch (Exception e) {

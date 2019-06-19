@@ -30,7 +30,7 @@ import org.mockito.junit.MockitoRule;
 
 import com.cognizant.devops.platformcommons.config.ApplicationConfigCache;
 import com.cognizant.devops.platforminsights.configs.ConfigConstants;
-import com.cognizant.devops.platforminsights.exception.InsightsSparkJobFailedException;
+import com.cognizant.devops.platforminsights.exception.InsightsJobFailedException;
 
 public class MinMaxActionImplTest {
 	@Mock
@@ -45,7 +45,7 @@ public class MinMaxActionImplTest {
 	}
 	
 	@Test
-	public void testExecute() throws InsightsSparkJobFailedException {
+	public void testExecute() throws InsightsJobFailedException {
 		load();
 		assertEquals("9200", ConfigConstants.SPARK_ES_PORT);
 		
