@@ -15,18 +15,22 @@
  ******************************************************************************/
 package com.cognizant.devops.platforminsights.exception;
 
-public class InsightsSparkJobFailedException extends Exception {
+public class InsightsJobFailedException extends Exception {
 
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 6316320975074662792L;
 
-	public InsightsSparkJobFailedException() {
+	public InsightsJobFailedException() {
 		super();
 	}
 	
-	public InsightsSparkJobFailedException(String message,Throwable t) {
+	public InsightsJobFailedException(String message,Throwable t) {
 		super(message,t);
+	}
+
+	public InsightsJobFailedException(String message) {
+		super(message);
 	}
 }

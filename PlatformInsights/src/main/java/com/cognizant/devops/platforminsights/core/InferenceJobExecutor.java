@@ -24,7 +24,7 @@ import com.cognizant.devops.platforminsights.core.sum.SumActionImpl;
 // import
 // com.cognizant.devops.platforminsights.core.job.config.Neo4jJobConfiguration;
 import com.cognizant.devops.platforminsights.datamodel.Neo4jKPIDefinition;
-import com.cognizant.devops.platforminsights.exception.InsightsSparkJobFailedException;
+import com.cognizant.devops.platforminsights.exception.InsightsJobFailedException;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
@@ -84,30 +84,26 @@ public class InferenceJobExecutor implements Job, Serializable {
 		return jobs;
 	}
 
-	private void executeJob(Neo4jKPIDefinition neo4jKpiDefinition) throws InsightsSparkJobFailedException {
-
+	private void executeJob(Neo4jKPIDefinition neo4jKpiDefinition) throws InsightsJobFailedException {
+		log.debug(" KPI action found as ==== " + neo4jKpiDefinition.getAction() + " KPI Name is ==== "
+				+ neo4jKpiDefinition.getName());
 		if (!neo4jKpiDefinition.getNeo4jQuery().equalsIgnoreCase("")) {
 			if (ExecutionActions.AVERAGE == neo4jKpiDefinition.getAction()) {
-				log.debug("KPI action found as AVERAGE");
 				BaseActionImpl impl = new AverageActionImpl(neo4jKpiDefinition);
 				impl.executeNeo4jGraphQuery();
 			} else if (ExecutionActions.COUNT == neo4jKpiDefinition.getAction()) {
-				log.debug("KPI action found as COUNT");
 				BaseActionImpl impl = new CountActionImpl(neo4jKpiDefinition);
 				impl.executeNeo4jGraphQuery();
 			} else if (ExecutionActions.MINMAX == neo4jKpiDefinition.getAction()) {
-				log.debug("KPI action found as MINMAX");
 				BaseActionImpl impl = new MinMaxActionImpl(neo4jKpiDefinition);
 				impl.executeNeo4jGraphQuery();
 			} else if (ExecutionActions.SUM == neo4jKpiDefinition.getAction()) {
-				log.debug("KPI action found as SUM");
 				BaseActionImpl impl = new SumActionImpl(neo4jKpiDefinition);
 				impl.executeNeo4jGraphQuery();
 			} else {
 				log.error(" No calculation methon defined for KIP " + neo4jKpiDefinition.getName() + " With Id "
 						+ +neo4jKpiDefinition.getKpiID());
 			}
-
 		} else {
 			log.error(" No neo4j query defined for KPI " + neo4jKpiDefinition.getName() + " With Id "
 					+ neo4jKpiDefinition.getKpiID());

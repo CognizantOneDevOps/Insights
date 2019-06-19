@@ -25,7 +25,7 @@ public interface PlatformServiceConstants {
 	String DATA = "data";
 	String INVALID_REQUEST = "Invalid request";
 	String INVALID_RESPONSE_DATA = "Invalid response data";
-	String INVALID_REQUEST_ORIGIN = " Invalid Access-Control-Allow-Origin";
+	String INVALID_REQUEST_ORIGIN = " Invalid Access-Control-Allow-Origin,Please make sure that your host is in trusted host list";
 	String INVALID_FILE = "Invalid file";
 	String INVALID_TOKEN = "Invalid Autharization Token";
 	String TRANSFORMATION_DECODED = new String(Base64.getDecoder().decode(ConfigOptions.TRANSFORMATION_ENCODED.getBytes()));

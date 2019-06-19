@@ -63,10 +63,6 @@ public class CorrelationBuilderServiceImpl implements CorrelationBuilderService 
 		return config;
 	} 
 	
-	
-	
-	
-	
 	@Override
 	public Object getNeo4jJson() throws InsightsCustomException {
 		// TODO Auto-generated method stub

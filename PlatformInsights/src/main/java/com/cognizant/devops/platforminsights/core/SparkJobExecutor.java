@@ -43,7 +43,7 @@ import com.cognizant.devops.platforminsights.core.job.config.SparkJobConfigurati
 import com.cognizant.devops.platforminsights.core.minmax.MinMaxActionImpl;
 import com.cognizant.devops.platforminsights.core.sum.SumActionImpl;
 import com.cognizant.devops.platforminsights.datamodel.KPIDefinition;
-import com.cognizant.devops.platforminsights.exception.InsightsSparkJobFailedException;
+import com.cognizant.devops.platforminsights.exception.InsightsJobFailedException;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
@@ -118,7 +118,7 @@ public class SparkJobExecutor implements Job,Serializable{
 		exe.sendMail();
 	}
 
-	private void executeJob(SparkJobConfiguration job)  throws InsightsSparkJobFailedException{
+	private void executeJob(SparkJobConfiguration job)  throws InsightsJobFailedException{
 		
 		KPIDefinition kpiDefinition = job.getKpiDefinition(job.getKpiDefinition());
 		

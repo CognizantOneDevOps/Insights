@@ -28,7 +28,7 @@ import com.cognizant.devops.platforminsights.core.BaseActionImpl;
 import com.cognizant.devops.platforminsights.core.function.Neo4jDBImp;
 import com.cognizant.devops.platforminsights.datamodel.KPIDefinition;
 import com.cognizant.devops.platforminsights.datamodel.Neo4jKPIDefinition;
-import com.cognizant.devops.platforminsights.exception.InsightsSparkJobFailedException;
+import com.cognizant.devops.platforminsights.exception.InsightsJobFailedException;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
@@ -44,7 +44,7 @@ public class MinMaxActionImpl extends BaseActionImpl {
 	}
 
 	@Override
-	protected Map<String, Object> execute()  throws InsightsSparkJobFailedException {
+	protected Map<String, Object> execute()  throws InsightsJobFailedException {
 		Map<String, Object> resultMap = new HashMap<>();
 		ElasticSearchDBHandler esDBHandler = new ElasticSearchDBHandler();
 		try {
@@ -64,7 +64,7 @@ public class MinMaxActionImpl extends BaseActionImpl {
 			saveResult(resultMap);
 		}catch (Exception e) {
 			log.error("Exception while running Minimum and Maximum operation -- "+ kpiDefinition.getKpiID()+": "+kpiDefinition.getName(), e);
-			throw new InsightsSparkJobFailedException("Exception while running Minimum and Maximum operation -- "+ kpiDefinition.getKpiID()+": "+kpiDefinition.getName(), e);
+			throw new InsightsJobFailedException("Exception while running Minimum and Maximum operation -- "+ kpiDefinition.getKpiID()+": "+kpiDefinition.getName(), e);
 		}
 		return resultMap;
 	}
