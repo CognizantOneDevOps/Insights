@@ -19,6 +19,7 @@ import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
 import com.cognizant.devops.platformcommons.core.enums.ExecutionActions;
 import com.cognizant.devops.platforminsights.core.avg.AverageActionImpl;
 import com.cognizant.devops.platforminsights.core.count.CountActionImpl;
+import com.cognizant.devops.platforminsights.core.function.Neo4jDBImp;
 import com.cognizant.devops.platforminsights.core.minmax.MinMaxActionImpl;
 import com.cognizant.devops.platforminsights.core.sum.SumActionImpl;
 // import
@@ -50,9 +51,15 @@ public class InferenceJobExecutor implements Job, Serializable {
 		log.debug("Starting Spark Jobs Execution");
 		try {
 
-			List<Neo4jKPIDefinition> jobs = readKPIJobsFromFile();
+			Neo4jDBImp neo4jImpl = new Neo4jDBImp();
 
-			for (Neo4jKPIDefinition neo4jJob : jobs) {
+			//List<Neo4jKPIDefinition> jobs = readKPIJobsFromFile();
+
+			List<Neo4jKPIDefinition> jobsFromNeo4j = neo4jImpl.readKPIJobsFromNeo4j();
+
+			log.debug("  jobsFromNeo4j " + jobsFromNeo4j);
+
+			for (Neo4jKPIDefinition neo4jJob : jobsFromNeo4j) {
 				log.debug(" Job Detail " + neo4jJob);
 				executeJob(neo4jJob);
 			}

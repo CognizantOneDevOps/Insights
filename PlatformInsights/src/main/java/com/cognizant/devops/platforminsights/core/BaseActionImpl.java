@@ -70,6 +70,10 @@ public abstract class BaseActionImpl {
 		// saveResult(result);
 	}
 
+	public BaseActionImpl() {
+
+	}
+
 	public BaseActionImpl(Neo4jKPIDefinition neo4jKpiDefinition) {
 		this.neo4jKpiDefinition = neo4jKpiDefinition;
 	}
