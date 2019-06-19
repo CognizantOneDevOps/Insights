@@ -23,38 +23,31 @@ import com.google.gson.JsonObject;
 @RequestMapping("/admin/bulkupload")
 public class InsightsBulkUpload {
 	static Logger log = LogManager.getLogger(GraphDBService.class.getName());
-	//private JsonObject asJsonObject;
-	
+	// private JsonObject asJsonObject;
+
+	@Autowired
+	BulkUploadService bulkUploadService;
+
 	@RequestMapping(value = "/uploadToolData", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-	public @ResponseBody JsonObject uploadToolData(@RequestParam("file") MultipartFile file, @RequestParam String toolName ,@RequestParam String label ) throws InsightsCustomException {
+	public @ResponseBody JsonObject uploadToolData(@RequestParam("file") MultipartFile file,
+			@RequestParam String toolName, @RequestParam String label) throws InsightsCustomException {
 		boolean status = false;
-		 log.error("FILENAME......."+ file);
-	       log.error("FILENAME......."+ toolName);
-	       log.error("FILENAME......."+ label);
-		
-		status = BulkUploadService.getInstance().createBulkUploadMetaData(file,toolName,label);
-		
-        
-       log.error("FILENAME......."+ file);
-       log.error("FILENAME......."+ toolName);
-       log.error("FILENAME......."+ label);
+		status = bulkUploadService.createBulkUploadMetaData(file, toolName, label);
 		return PlatformServiceUtil.buildSuccessResponse();
 
 	}
-	
+
 	@RequestMapping(value = "/getToolJson", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 	public @ResponseBody JsonObject getToolJson() throws IOException, InsightsCustomException {
 		Object details = null;
 		try {
-			details = BulkUploadService.getInstance().getToolDetailJson();
-			log.debug("FILE");
-		}catch (InsightsCustomException e) {
+			details = bulkUploadService.getToolDetailJson();
+		} catch (InsightsCustomException e) {
 			return PlatformServiceUtil.buildFailureResponse(e.toString());
 		}
 		log.error(PlatformServiceUtil.buildSuccessResponseWithData(details));
 		return PlatformServiceUtil.buildSuccessResponseWithData(details);
-		//return PlatformServiceUtil.buildSuccessResponseWithData(details);
+		// return PlatformServiceUtil.buildSuccessResponseWithData(details);
 	}
-	
-	
+
 }
