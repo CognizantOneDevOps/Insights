@@ -42,11 +42,12 @@
                 cancel </mat-icon>
         </button>
     </div>
+
     <div class="bulkuploadtablecss">
         <div class="showTable" style="text-align: left; padding: 10px;">
             <div>
                 <span class="mainHeaderText">Bulk Upload</span>
-                <span class="infoHeaderText">(Please note: No changes can made to a file or the file cannot be retreived once it is uploaded</span>
+                <span class="infoHeaderText">(Please note: No changes can made to a file or the file cannot be retreived once it is uploaded)</span>
             </div>
         </div>
         <div class="col-md-2">
@@ -57,24 +58,24 @@
                             <td style="padding:0 15px 0 15px;">Tool
                             </td>
                             <td>
-                                <div>
+                                <div style="padding-top: 10px;">
                                     <mat-select [(ngModel)]="selectedTool" required [formControl]="row.get('toolName')" name="selectedTool" class="form-control"
-                                        (ngModelChange)="onToolSelect(selectedTool)" placeholder="Select Tool" style="width:150px;"
+                                        (ngModelChange)="onToolSelect(selectedTool)" placeholder="Select Tool" style="width:150px; margin-left: -30px"
                                         color="primary">
                                         <mat-option *ngFor=" let tool of toolsArr | keyvalue" value="{{tool.value}}" (click)="toolNameenableSave()">{{tool.value}}</mat-option>
                                     </mat-select>
                                 </div>
                             </td>
                             <td>
-                                <div>
+                                <div style="padding-top: 10px;">
                                     Label
                                     <input type="text" [(ngModel)]="labelsArr" (click)="toolNameenableSave()" required [formControl]="row.get('labelName')" name="lableName"
-                                        class="form-control" style="width:150px;" value="{{labelsArr}}">
+                                        class="form-control" style="width:220px;" value="{{labelsArr}}">
                                 </div>
                             </td>
-                            <td>
-                                <input type="file" class="form-control" class="mat-cell-value-single" required [formControl]="row.get('fileName')" name="selectedFile"
-                                    (change)="onFileChanged($event)" (click)="fileNameenableSave()" style="padding:0 15px 0 15px;">
+                            <td style="padding-top: 15px;">
+                                <input type="file" class="mat-cell-value-single" required [formControl]="row.get('fileName')" name="selectedFile" (change)="onFileChanged($event)"
+                                    (click)="fileNameenableSave()" style="width:220px;">
                             </td>
                         </tr>
                     </tbody>

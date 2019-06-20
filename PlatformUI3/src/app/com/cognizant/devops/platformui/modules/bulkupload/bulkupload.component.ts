@@ -172,7 +172,7 @@ export class BulkUploadComponent implements OnInit {
             this.messageDialog.showApplicationsMessage("You have successfully uploaded the file to Neo4J", "SUCCESS");
         }
         else {
-            this.messageDialog.showApplicationsMessage("Please select all the fields", "ERROR");
+            this.messageDialog.showApplicationsMessage("Please select file", "ERROR");
         }
     }
 
