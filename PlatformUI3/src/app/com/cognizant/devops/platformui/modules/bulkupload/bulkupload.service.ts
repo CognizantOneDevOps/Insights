@@ -31,12 +31,11 @@ export class BulkUploadService implements IBulkUploadService {
         return this.restCallHandlerService.get("DOCROOT_AGENT_VERSION_TOOLS");
     }
 
-    uploadFile(formData: any, tool): Promise<any> {
-        return this.restCallHandlerService.postFormDataWithParameter("UPLOAD_FILE", formData, { 'toolName': tool }).toPromise();;
+    uploadFile(formData: any, toolName: string, labelName: string): Promise<any> {
+        return this.restCallHandlerService.postFormDataWithParameter("UPLOAD_FILE", formData, { 'toolName': toolName, 'label': labelName }).toPromise();;
 
     }
     loadUiServiceLocation(): Promise<any> {
-        console.log("hello")
         return this.restCallHandlerService.get("TOOLNAME_LABELNAME_JSON");
 
     }
