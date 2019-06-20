@@ -281,16 +281,16 @@
         </div>
       </div>
 
-      <table>
-        <tbody style="display: grid; max-height: 38vh ;border-spacing:0px !important;; border-collapse: none !important">
+      <table class="tableMainCss">
+        <tbody style="display: grid; max-height: 38vh ;">
           <tr>
 
-            <td class="AddUserColTextCss" style="border-spacing:0px !important;; border-collapse: none !important">
+            <td class="AddUserColTextCss">
               <div>
 
               </div>
             </td>
-            <td class="AddUserColTextCss" style="border-spacing:0px !important;; border-collapse: none !important">
+            <td class="AddUserColTextCss">
 
             </td>
 
@@ -309,11 +309,10 @@
               <!--  <label class="label-control">Items</label>
         <br> -->
 
-              <table style="margin-top: 10px;">
+              <table style="margin-top: 10px;" class="tableMainCss">
 
                 <tbody>
-                  <tr class="AddUserColTextCss" style="border-spacing:0px !important;; border-collapse: none !important"
-                    *ngFor="let row of rows?.controls;let index = index;">
+                  <tr class="AddUserColTextCss" *ngFor="let row of rows?.controls;let index = index;">
                     <td style="border-spacing:0px !important;padding:0 15px 0 15px;">Access Group </td>
                     <td style="border-spacing:0px !important;">
                       <mat-select [disabled]="!assignuserSaveEnable" required placeholder="Select Access Group"
