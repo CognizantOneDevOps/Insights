@@ -5,5 +5,4 @@
 */target/*
 *.log
 *.gitignore
-*/PlatformAuditing/*
-*/PlatformAuditEngine/*
+*.gitattributes
