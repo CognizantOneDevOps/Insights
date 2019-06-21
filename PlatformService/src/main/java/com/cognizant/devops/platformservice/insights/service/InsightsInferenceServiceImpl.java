@@ -2,14 +2,14 @@
  * Copyright 2017 Cognizant Technology Solutions
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
- * use this file except in compliance with the License.  You may obtain a copy
+ * use this file except in compliance with the License. You may obtain a copy
  * of the License at
  * 
- *   http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
  * License for the specific language governing permissions and limitations under
  * the License.
  ******************************************************************************/
@@ -19,7 +19,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -43,7 +42,6 @@ import com.cognizant.devops.platformcommons.dal.elasticsearch.ElasticSearchDBHan
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphResponse;
 import com.cognizant.devops.platformcommons.dal.neo4j.Neo4jDBHandler;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
-import com.google.common.collect.Multiset.Entry;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -52,7 +50,7 @@ import com.google.gson.JsonObject;
 public class InsightsInferenceServiceImpl implements InsightsInferenceService {
 
 	private static final Logger log = LogManager.getLogger(InsightsInferenceServiceImpl.class);
-	
+
 	@Autowired
 	private ReloadableResourceBundleMessageSource messageSource;
 
@@ -63,16 +61,20 @@ public class InsightsInferenceServiceImpl implements InsightsInferenceService {
 
 	@Override
 	public List<InsightsInference> getInferenceDetails(String schedule) {
-		return getInferences(schedule);
+		return getInferences(schedule, "");
 	}
 
-	private List<InsightsInference> getInferences(String schedule) {
+	@Override
+	public List<InsightsInference> getInferenceDetailsVectorWise(String schedule, String vectorType) {
+		return getInferences(schedule, vectorType);
+	}
+
+	private List<InsightsInference> getInferences(String schedule, String vectorType) {
 		List<InsightsInference> inferences = new ArrayList<>(5);
 
 		List<InferenceResult> results = new ArrayList<InferenceResult>();
 		try {
-			results = getInferenceDataFromNeo4j(schedule.toUpperCase());
-			//resultDataList = getInferenceData(resultDataList, schedule);
+			results = getInferenceDataFromNeo4j(schedule.toUpperCase(), vectorType);
 			//results = getInferenceData(schedule);
 
 		} catch (Exception e) {
@@ -80,7 +82,7 @@ public class InsightsInferenceServiceImpl implements InsightsInferenceService {
 			return inferences;
 		}
 
-		Map<String, List<InsightsInferenceDetail>> tempMap = getSortedByVector(schedule,results);
+		Map<String, List<InsightsInferenceDetail>> tempMap = getSortedByVector(schedule, results);
 
 		Set<String> vectorKeys = tempMap.keySet();
 		for (String vector : vectorKeys) {
@@ -94,82 +96,82 @@ public class InsightsInferenceServiceImpl implements InsightsInferenceService {
 		return inferences;
 	}
 
-	private Map<String, List<InsightsInferenceDetail>> getSortedByVector(String schedule,List<InferenceResult> results) {
+	private Map<String, List<InsightsInferenceDetail>> getSortedByVector(String schedule,
+			List<InferenceResult> results) {
 
 		Map<String, List<InsightsInferenceDetail>> tempMap = new HashMap<>();
-		log.debug(" results  " + results);
+		//log.debug(" results  " + results);
 		for (InferenceResult inferenceResult : results) {
-			log.debug("  inferenceResult  " + inferenceResult);
+			//log.debug("  inferenceResult  " + inferenceResult);
 			List<InferenceResultDetails> inferenceResultDetailsList = inferenceResult.getDetails();
 			InferenceResultDetails resultFirstData = inferenceResultDetailsList.get(0);
-			log.debug("resultFirstData  " + resultFirstData);
-				String trend = "No Change";
-				KPISentiment sentiment = KPISentiment.NEUTRAL;
-				Object[] values = new Object[2];
-				if (! resultFirstData.getIsComparisionKpi()) {
+			//log.debug("resultFirstData  " + resultFirstData);
+			String trend = "No Change";
+			KPISentiment sentiment = KPISentiment.NEUTRAL;
+			Object[] values = new Object[2];
+			if (!resultFirstData.getIsComparisionKpi()) {
 
-					if (resultFirstData.getIsGroupBy()) {
-						values[0] = resultFirstData.getGroupByFieldVal();
-					} else {
-						values[0] = resultFirstData.getResult();
-					}
-					values[1] = resultFirstData.getResult();
-
+				if (resultFirstData.getIsGroupBy()) {
+					values[0] = resultFirstData.getGroupByFieldVal();
 				} else {
-					if(inferenceResultDetailsList.size() < 2){
-						continue;
-					}
-					InferenceResultDetails result2 = inferenceResultDetailsList.get(1);
-				log.debug("  result2 " + result2);
-					sentiment = getSentiment(result2.getResult(),
-							resultFirstData.getResult(),
-							resultFirstData.getExpectedTrend());
-
 					values[0] = resultFirstData.getResult();
-					values[1] = result2.getResult();
-
-					trend = getTrend(values[0],values[1]);
-
 				}
-				
-				Long kpiID = resultFirstData.getKpiID();
-				String inferenceName = resultFirstData.getName();
-				String action =  resultFirstData.getAction();
-				String jobSchedule = resultFirstData.getSchedule();
-				String resultOutputType = resultFirstData.getResultOutPutType();
-				boolean isComparison = resultFirstData.getIsComparisionKpi();
-				Date lastRunDate = new Date(resultFirstData.getResultTime());
-				String vector = resultFirstData.getVector();
-				
-				String inferenceText = getInferenceText(inferenceName,
-						vector,	kpiID, sentiment, schedule, values,
-						isComparison, resultOutputType);
+				values[1] = resultFirstData.getResult();
 
-			log.debug("  inferenceText  " + inferenceText);
-				List<ResultSetModel> resultValues = new ArrayList<ResultSetModel>();
-				for (InferenceResultDetails details : inferenceResultDetailsList) {
-					ResultSetModel model = new ResultSetModel();
-					model.setValue(details.getResult());
-					model.setResultDate(new Date(details.getResultTime()));
-					resultValues.add(model);
+			} else {
+				if (inferenceResultDetailsList.size() < 2) {
+					continue;
 				}
-				Collections.reverse(resultValues);
-				List<InsightsInferenceDetail> detailsList = getInferenceDetails(inferenceName, sentiment, action, trend,
-						inferenceText, jobSchedule, lastRunDate, resultValues, kpiID);
-				if (tempMap.get(vector) != null) {
-					tempMap.get(vector).addAll(detailsList);
-				} else {
-					tempMap.put(vector, detailsList);
-				}
-				//return tempMap;
+				InferenceResultDetails result2 = inferenceResultDetailsList.get(1);
+				//log.debug("  result2 " + result2);
+				sentiment = getSentiment(result2.getResult(), resultFirstData.getResult(),
+						resultFirstData.getExpectedTrend());
+
+				values[0] = resultFirstData.getResult();
+				values[1] = result2.getResult();
+
+				trend = getTrend(values[0], values[1]);
+
+			}
+
+			Long kpiID = resultFirstData.getKpiID();
+			String inferenceName = resultFirstData.getName();
+			String action = resultFirstData.getAction();
+			String jobSchedule = resultFirstData.getSchedule();
+			String resultOutputType = resultFirstData.getResultOutPutType();
+			boolean isComparison = resultFirstData.getIsComparisionKpi();
+			Date lastRunDate = new Date(resultFirstData.getResultTime());
+			String vector = resultFirstData.getVector();
+
+			String inferenceText = getInferenceText(inferenceName, vector, kpiID, sentiment, schedule, values,
+					isComparison, resultOutputType);
+
+			//log.debug("  inferenceText  " + inferenceText);
+			List<ResultSetModel> resultValues = new ArrayList<ResultSetModel>();
+			for (InferenceResultDetails details : inferenceResultDetailsList) {
+				ResultSetModel model = new ResultSetModel();
+				model.setValue(details.getResult());
+				model.setResultDate(new Date(details.getResultTime()));
+				resultValues.add(model);
+			}
+			Collections.reverse(resultValues);
+			List<InsightsInferenceDetail> detailsList = getInferenceDetails(inferenceName, sentiment, action, trend,
+					inferenceText, jobSchedule, lastRunDate, resultValues, kpiID);
+			if (tempMap.get(vector) != null) {
+				tempMap.get(vector).addAll(detailsList);
+			} else {
+				tempMap.put(vector, detailsList);
+			}
+			//return tempMap;
 		}
-			
+
 		return tempMap;
 
 	}
 
 	private List<InsightsInferenceDetail> getInferenceDetails(String name, KPISentiment sentiment, String action,
-			String trend, String inferenceLine, String jobSchedule, Date lastRunDate, List<ResultSetModel> result, Long kpiID) {
+			String trend, String inferenceLine, String jobSchedule, Date lastRunDate, List<ResultSetModel> result,
+			Long kpiID) {
 
 		List<InsightsInferenceDetail> details = new ArrayList<>(10);
 
@@ -192,11 +194,11 @@ public class InsightsInferenceServiceImpl implements InsightsInferenceService {
 		String esQuery = getQuery();
 
 		esQuery = getUpdatedQueryWithDate(esQuery, inputSchedule, 5000); // Since
-																		// should
-																		// come
-																		// from
-																		// config
-																		// file
+																			// should
+																			// come
+																			// from
+																			// config
+																			// file
 
 		ElasticSearchDBHandler esDBHandler = new ElasticSearchDBHandler();
 		String sparkElasticSearchHost = ApplicationConfigProvider.getInstance().getSparkConfigurations()
@@ -205,14 +207,14 @@ public class InsightsInferenceServiceImpl implements InsightsInferenceService {
 				.getSparkElasticSearchPort();
 		String sparkElasticSearchResultIndex = ApplicationConfigProvider.getInstance().getSparkConfigurations()
 				.getSparkElasticSearchResultIndex();
-		JsonObject jsonObj = esDBHandler.queryES(
-				sparkElasticSearchHost+":"+sparkElasticSearchPort+"/"+sparkElasticSearchResultIndex+"/_search?filter_path=aggregations", esQuery);
+		JsonObject jsonObj = esDBHandler.queryES(sparkElasticSearchHost + ":" + sparkElasticSearchPort + "/"
+				+ sparkElasticSearchResultIndex + "/_search?filter_path=aggregations", esQuery);
 		log.debug(" ES query result " + jsonObj);
 		List<InferenceResult> inferenceResults = JsonToObjectConverter.getInferenceResult(jsonObj);
 
 		return inferenceResults;
 	}
-	
+
 	private String getInferenceText(String inferenceName, String vector, Long kpiId, KPISentiment sentiment,
 			String schedule, Object[] values, boolean isComparison, String resultOutputType) {
 		boolean zeroVal = false;
@@ -221,29 +223,27 @@ public class InsightsInferenceServiceImpl implements InsightsInferenceService {
 		String messageId = "";
 		String msgZeroCode = "";
 		if (isComparison) {
-			if(values[0] instanceof Long && values[1] instanceof Long){
-				if((Long)values[0] == 0 && (Long)values[1] > 0){
-						zeroVal = true;	
-						currentZeroVal = true;
-					}
-				else if((Long)values[0] > 0 && (Long)values[1] >= 0){
+			if (values[0] instanceof Long && values[1] instanceof Long) {
+				if ((Long) values[0] == 0 && (Long) values[1] > 0) {
+					zeroVal = true;
+					currentZeroVal = true;
+				} else if ((Long) values[0] > 0 && (Long) values[1] >= 0) {
 					if (resultOutputType.toLowerCase().contains(ResultOutputType.TIMERESULTOUTPUT.toString())) {
 						Long result = (Long) values[0];
 						Long secVal = TimeUnit.MILLISECONDS.toSeconds(result.longValue());//(Long) values[i] / 1000.0f;
 						values[0] = secVal;
-						
+
 						result = (Long) values[1];
 						secVal = TimeUnit.MILLISECONDS.toSeconds(result.longValue());
 						values[1] = secVal;
 					}
-					if((Long)values[0] > 0 && (Long)values[1] == 0){
+					if ((Long) values[0] > 0 && (Long) values[1] == 0) {
 						zeroVal = true;
 						previousZeroVal = true;
 					}
-					}
-				else if((Long)values[0] == 0 && (Long)values[1] == 0){
-					zeroVal =false;
-				}	
+				} else if ((Long) values[0] == 0 && (Long) values[1] == 0) {
+					zeroVal = false;
+				}
 			}
 		} else {
 			messageId = vector.toLowerCase() + "." + kpiId + "." + KPISentiment.NEUTRAL.toString() + "."
@@ -251,16 +251,15 @@ public class InsightsInferenceServiceImpl implements InsightsInferenceService {
 		}
 
 		if (zeroVal) {
-			if(currentZeroVal){
-			msgZeroCode = InsightsMessageEnum.CURRENTZEROVALMSG.toString();		
-			messageId = vector.toLowerCase() + "." + kpiId + "." + sentiment.toString() + "."
-							+ schedule.toLowerCase() + "." + msgZeroCode;
-			}
-			else if(previousZeroVal){
-				msgZeroCode = InsightsMessageEnum.PREVIOUSVALZERO.toString();		
+			if (currentZeroVal) {
+				msgZeroCode = InsightsMessageEnum.CURRENTZEROVALMSG.toString();
 				messageId = vector.toLowerCase() + "." + kpiId + "." + sentiment.toString() + "."
-								+ schedule.toLowerCase() + "." + msgZeroCode;
-				}			
+						+ schedule.toLowerCase() + "." + msgZeroCode;
+			} else if (previousZeroVal) {
+				msgZeroCode = InsightsMessageEnum.PREVIOUSVALZERO.toString();
+				messageId = vector.toLowerCase() + "." + kpiId + "." + sentiment.toString() + "."
+						+ schedule.toLowerCase() + "." + msgZeroCode;
+			}
 
 		} else {
 			messageId = vector.toLowerCase() + "." + kpiId + "." + sentiment.toString() + "." + schedule.toLowerCase();
@@ -333,12 +332,6 @@ public class InsightsInferenceServiceImpl implements InsightsInferenceService {
 				+ "            \"sort\": {\r\n" + "              \"resultTime\": {\r\n"
 				+ "                \"order\": \"desc\"\r\n" + "              }\r\n" + "            }\r\n"
 				+ "          }\r\n" + "        }\r\n" + "      }\r\n" + "    }\r\n" + "  }\r\n" + "}";
-		// return "{ \"query\": { \"filtered\": { \"query\": { \"term\": {
-		// \"vector\": \"build\" } }, \"filter\": { \"bool\": { \"must\": [
-		// {\"term\":{\"aggregatedResult\":true}},{ \"range\": { \"resultTime\":
-		// { \"gte\": \"__FromDate__\", \"lte\": \"__ToDate__\", \"format\":
-		// \"epoch_millis\" } } } ] } } } }},\"sort\": { \"resultTime\": {
-		// \"order\": \"desc\" }}";
 	}
 
 	private String getUpdatedQueryWithDate(String esQuery, String schedule, Integer since) {
@@ -348,24 +341,28 @@ public class InsightsInferenceServiceImpl implements InsightsInferenceService {
 		return esQuery;
 	}
 
-	private String getNeo4jQueryWithDates(String inputSchedule) {
+	private String getNeo4jQueryWithDates(String inputSchedule, String vectorType) {
 
 		String cypherQuery = "MATCH (n:INFERENCE:RESULTS) where exists(n.kpiID) AND n.schedule= '" + inputSchedule
-				+ "' RETURN n.kpiID,n.name,n.vector,"
+				+ "' ";
+		if (!"".equalsIgnoreCase(vectorType)) {
+			cypherQuery = cypherQuery + " and n.vector='" + vectorType + "' ";
+		}
+		cypherQuery = cypherQuery + "RETURN n.kpiID,n.name,n.vector,"
 				+ " n.expectedTrend,n.result,n.schedule,n.action,n.resultTime,n.resultTimeX,n.toolName,n.resultOutPutType,"
-				+ " n.isComparisionKpi, n.isGroupBy,'' as groupByName ,'' as groupByFieldVal order by n.kpiID,n.resultTime desc"; //and n.vector='BUILD'
+				+ " n.isComparisionKpi, n.isGroupBy,'' as groupByName ,'' as groupByFieldVal order by n.kpiID,n.resultTime desc";
 
 		return cypherQuery;
 	}
 
-	private List<InferenceResult> getInferenceDataFromNeo4j(String inputSchedule) throws Exception {
+	private List<InferenceResult> getInferenceDataFromNeo4j(String inputSchedule, String vectorType) throws Exception {
 		List<InferenceResult> inferenceResults = null;
 		Neo4jDBHandler graphDBHandler = new Neo4jDBHandler();
 		try {
-			String graphQuery = getNeo4jQueryWithDates(inputSchedule);
+			String graphQuery = getNeo4jQueryWithDates(inputSchedule, vectorType);
 			log.debug(" graphQuery  " + graphQuery);
 			GraphResponse graphResp = graphDBHandler.executeCypherQuery(graphQuery);
-			log.debug(graphResp.getJson());
+			//log.debug(graphResp.getJson());
 			JsonArray errorMessage = graphResp.getJson().getAsJsonArray("errors");
 			if (errorMessage.size() >= 1) {
 				String errorMessageText = errorMessage.get(0).getAsJsonObject().get("message").getAsString();
@@ -373,7 +370,7 @@ public class InsightsInferenceServiceImpl implements InsightsInferenceService {
 				throw new InsightsCustomException(errorMessageText);
 			}
 			JsonArray graphJsonResult = graphResp.getJson().getAsJsonArray("results");
-			log.debug(" graphJsonResult  " + graphJsonResult.toString());
+			//log.debug(" graphJsonResult  " + graphJsonResult.toString());
 			inferenceResults = parseNeo4jResponse(graphJsonResult, graphResp);
 		} catch (Exception e) {
 			log.error(" error while executing neo4j query in getInferenceDataFromNeo4j  " + e.getCause()
@@ -381,7 +378,6 @@ public class InsightsInferenceServiceImpl implements InsightsInferenceService {
 		}
 
 		return inferenceResults;
-
 	}
 
 	private List<InferenceResult> parseNeo4jResponse(JsonArray graphJsonResult, GraphResponse response) {
@@ -390,42 +386,13 @@ public class InsightsInferenceServiceImpl implements InsightsInferenceService {
 		List<InferenceResultDetails> inferenceDetailList = new ArrayList<InferenceResultDetails>(0);
 
 		try {
-			int size = response.getNodes().size();
-			List<Map<String, String>> propertyList = new ArrayList<Map<String, String>>();
-			log.debug("arg0  size " + size);
-			for (int i = 0; i < size; i++) {
-				String json = new Gson().toJson(response.getNodes().get(i).getPropertyMap());
-				//log.debug(json);
-				propertyList.add(response.getNodes().get(i).getPropertyMap());
-			}
-			propertyList.forEach(map -> {
-				log.debug("property " + map.toString());
-			});
-
 			JsonArray inferenceData = graphJsonResult.get(0).getAsJsonObject().get("data").getAsJsonArray(); //.get(0).getAsJsonObject().get("row").getAsJsonArray()
-			log.debug(" inferenceData  " + inferenceData.toString());
-			
-
-			/*Iterator<JsonElement> iterator = kpiData.iterator().next().getAsJsonObject().get("row").getAsJsonArray()
-					.iterator();//.next().getAsJsonArray().iterator()
-			while (iterator.hasNext()) {
-			
-				String element = iterator.next().getAsString();
-				log.debug(" inferenceData 2 " + element);
-			
-			}*/
-
+			//log.debug(" inferenceData  " + inferenceData.toString());
 			for (int i = 0; i < inferenceData.size(); i++) {
-
 				InferenceResultDetails inferenceDetails = new InferenceResultDetails();
-
-
-				log.debug(" inferenceData  " + inferenceData.get(i).getAsJsonObject());
-
+				//log.debug(" inferenceData  " + inferenceData.get(i).getAsJsonObject());
 				JsonArray rowArraykpiData = inferenceData.get(i).getAsJsonObject().get("row").getAsJsonArray();
-
-				log.debug(" rowArray " + rowArraykpiData.toString());
-
+				//log.debug(" rowArray " + rowArraykpiData.toString());
 				inferenceDetails.setKpiID(rowArraykpiData.get(0).getAsLong());
 				inferenceDetails.setName(rowArraykpiData.get(1).getAsString());
 				inferenceDetails.setVector(rowArraykpiData.get(2).getAsString());
@@ -437,11 +404,9 @@ public class InsightsInferenceServiceImpl implements InsightsInferenceService {
 				if (!rowArraykpiData.get(8).isJsonNull()) {
 					inferenceDetails.setToolName(rowArraykpiData.get(8).getAsString());
 				}
-
 				if (rowArraykpiData.get(9) != null && !rowArraykpiData.get(9).isJsonNull()) {
 					inferenceDetails.setIsComparisionKpi(rowArraykpiData.get(9).getAsBoolean());
 				}
-				
 				if (!rowArraykpiData.get(10).isJsonNull() && rowArraykpiData.get(10).getAsBoolean()) {
 					inferenceDetails.setIsGroupBy(rowArraykpiData.get(10).getAsBoolean());
 					inferenceDetails.setGroupByName(rowArraykpiData.get(11).getAsString());
@@ -449,7 +414,6 @@ public class InsightsInferenceServiceImpl implements InsightsInferenceService {
 				} else {
 					inferenceDetails.setIsGroupBy(Boolean.FALSE);
 				}
-				/*details.add(inferenceDetails);*/
 				inferenceDetailList.add(inferenceDetails);
 			}
 
@@ -457,10 +421,6 @@ public class InsightsInferenceServiceImpl implements InsightsInferenceService {
 					.collect(Collectors.groupingBy(kpi -> kpi.getKpiID()));
 
 			log.debug(" kpiInferenceResulGrouped " + kpiInferenceResulGrouped);
-
-			/*studlistGrouped.forEach(map -> {
-				log.debug("property " + map.toString());
-			});*/
 
 			for (Map.Entry<Long, List<InferenceResultDetails>> kipInferanceResult : kpiInferenceResulGrouped
 					.entrySet()) {
@@ -470,14 +430,9 @@ public class InsightsInferenceServiceImpl implements InsightsInferenceService {
 				ir.setTotalDocuments((long) kipInferanceResult.getValue().size());
 				inferenceResults.add(ir);
 			}
-
-			/*detail.setDetails(details);
-			results.add(inferenceresult);*/
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			log.error(" Error while parsing neo4j responce " + e.getCause() + e.getMessage());
 		}
-
 		return inferenceResults;
 	}
 }

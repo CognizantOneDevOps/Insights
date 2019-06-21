@@ -90,7 +90,7 @@ public class InsightsEmailService {
 		HttpEntity<String> response = restTemplate.exchange(restUrl,HttpMethod.GET,entity,String.class);
 		JsonParser parser = new JsonParser(); 
 		JsonObject resultJson=new JsonObject();
-		resultJson= (JsonObject) parser.parse(response.getBody()).getAsJsonObject();
+		resultJson= parser.parse(response.getBody()).getAsJsonObject();
 		LOG.debug("Insights inference details received from service");
 		return resultJson;
 	}
@@ -172,8 +172,6 @@ public class InsightsEmailService {
 		} catch (UnsupportedEncodingException e) {
 			System.out.println(e.toString());
 		} catch (MessagingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		}
 	   */
 	}
