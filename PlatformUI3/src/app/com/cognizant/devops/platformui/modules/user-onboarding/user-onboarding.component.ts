@@ -23,7 +23,9 @@ import { AddGroupMessageDialog } from '@insights/app/modules/user-onboarding/add
 import { MessageDialogService } from '@insights/app/modules/application-dialog/message-dialog-service';
 import { DataSharedService } from '@insights/common/data-shared-service';
 import { Router, ActivatedRoute, ParamMap, NavigationExtras } from '@angular/router';
-import { FormGroup, FormBuilder, Validators, FormControl, FormArray, NgForm } from '@angular/forms'
+import { FormGroup, FormBuilder, Validators, FormControl, FormArray, NgForm } from '@angular/forms';
+import { HomeComponent } from '@insights/app/modules/home/home.component';
+
 @Component({
   selector: 'app-user-onboarding',
   templateUrl: './user-onboarding.component.html',
@@ -39,6 +41,7 @@ export class UserOnboardingComponent implements OnInit {
   assignuserSaveEnable: boolean = false
   showAddUserDetail: boolean = false;
   showAssignUserDetail: boolean = false;
+  showCancel: boolean = false;
   showThrobber: boolean = false;
   adminOrgDataArray = [];
   orgNameArray = [];
@@ -50,6 +53,7 @@ export class UserOnboardingComponent implements OnInit {
   role: any;
   pass: string
   username: string
+  searchUser: string
   email: string
   names: string;
   isEmailIncorrect: boolean = false;
@@ -96,7 +100,7 @@ export class UserOnboardingComponent implements OnInit {
     { value: 'Viewer', name: 'Viewer' }
   ];
 
-  constructor(private fb: FormBuilder, private router: Router, private userOnboardingService: UserOnboardingService, private sanitizer: DomSanitizer,
+  constructor(private fb: FormBuilder, public router: Router, private userOnboardingService: UserOnboardingService, private sanitizer: DomSanitizer,
     public dialog: MatDialog, public messageDialog: MessageDialogService, private dataShare: DataSharedService) {
     var self = this;
     this.rows = this.fb.array([]);
@@ -403,7 +407,7 @@ export class UserOnboardingComponent implements OnInit {
     this.adduserSaveEnable = false;
     this.addSelected = false;
     this.assignSelected = false;
-    this.showDetail2 = false;
+    this.showDetail2 = true;
     this.addRadioSelected = false;
     this.assignRadioSelected = false;
     this.assignuserSaveEnable = false;
@@ -411,6 +415,10 @@ export class UserOnboardingComponent implements OnInit {
     this.username = null;
     this.email = null;
     this.names = null;
+    this.searchOrgForUser = null;
+    console.log(this.rows.value)
+    this.searchUser = null;
+
 
   }
   adduserenableSave() {
@@ -422,6 +430,7 @@ export class UserOnboardingComponent implements OnInit {
     this.addRadioSelected = true;
     this.assignRadioSelected = false;
     this.assignuserSaveEnable = false;
+    this.searchOrgForUser = null;
 
   }
   assignuserenableSave() {
@@ -433,6 +442,11 @@ export class UserOnboardingComponent implements OnInit {
     this.showDetail2 = true;
     this.assignRadioSelected = true;
     this.addRadioSelected = false;
+    this.pass = null;
+    this.username = null;
+    this.email = null;
+    this.names = null;
+    this.searchUser = null;
   }
 
   searchData(searchUser, selectedAdminOrg) {
@@ -571,10 +585,22 @@ export class UserOnboardingComponent implements OnInit {
     }
   }
   addGlobalUser() {
+    this.showCancel = true;
     this.showAssignUserDetail = true;
     this.showAddUserDetail = true;
     this.showDetail = false;
     this.showDetail2 = false
+  }
+
+  /*Method to redirect to Configuration | Group & Users Management page*/
+  redirectToLandingPage() {
+
+    this.Refresh();
+    this.showAssignUserDetail = false;
+    this.showAddUserDetail = false;
+    this.showDetail = true;
+    this.showDetail2 = true;
+    this.showCancel = false;
   }
 }
 
