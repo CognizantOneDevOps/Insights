@@ -15,11 +15,14 @@ import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 
+import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
 import com.cognizant.devops.platformcommons.core.enums.ExecutionActions;
+import com.cognizant.devops.platformcommons.core.util.InsightsUtils;
 import com.cognizant.devops.platforminsights.core.avg.AverageActionImpl;
 import com.cognizant.devops.platforminsights.core.count.CountActionImpl;
 import com.cognizant.devops.platforminsights.core.function.Neo4jDBImp;
+import com.cognizant.devops.platforminsights.core.job.config.SparkJobConfiguration;
 import com.cognizant.devops.platforminsights.core.minmax.MinMaxActionImpl;
 import com.cognizant.devops.platforminsights.core.sum.SumActionImpl;
 // import
@@ -56,12 +59,32 @@ public class InferenceJobExecutor implements Job, Serializable {
 			//List<Neo4jKPIDefinition> jobs = readKPIJobsFromFile();
 
 			List<Neo4jKPIDefinition> jobsFromNeo4j = neo4jImpl.readKPIJobsFromNeo4j();
-
+			List<Neo4jKPIDefinition> updatedJobs = new ArrayList<Neo4jKPIDefinition>();
 			log.debug("  jobsFromNeo4j " + jobsFromNeo4j);
 
 			for (Neo4jKPIDefinition neo4jJob : jobsFromNeo4j) {
-				log.debug(" Job Detail " + neo4jJob);
-				executeJob(neo4jJob);
+				try {
+					if (!(neo4jJob.isActive()
+							&& isJobScheduledToRun(neo4jJob.getLastRunTime(), neo4jJob.getSchedule().toString()))) {
+						log.debug(" Job not run because last run time is less than scheduled " + neo4jJob.getName()
+								+ "  kpiId " + neo4jJob.getKpiID());
+						continue;
+					}
+
+					log.debug(" Job Detail " + neo4jJob);
+					executeJob(neo4jJob);
+					updatedJobs.add(neo4jJob);
+				} catch (Exception e) {
+					log.error(e.getMessage(), e);
+				}
+			}
+
+			if (updatedJobs.size() > 0) {
+				/*if (ApplicationConfigProvider.getInstance().getEmailConfiguration().getSendEmailEnabled()) {
+					sendEmail();
+				}*/
+				//configHandler.updateJobsInES(jobs);
+				neo4jImpl.updateJobLastRun(updatedJobs);
 			}
 		} catch (Exception e) {
 			log.error(e.getMessage(), e);
@@ -116,5 +139,13 @@ public class InferenceJobExecutor implements Job, Serializable {
 					+ neo4jKpiDefinition.getKpiID());
 		}
 	}
+
+	private boolean isJobScheduledToRun(Long lastRun, String jobSchedule) {
+
+		Long lastRunSinceDays = InsightsUtils.getDurationBetweenDatesInDays(lastRun);
+		log.debug(" lastRunSinceDays  " + lastRunSinceDays + " jobSchedule  " + jobSchedule);
+		return InsightsUtils.isAfterRange(jobSchedule, lastRunSinceDays);
+	}
+
 
 }
