@@ -59,7 +59,7 @@
 
       </button>
       <button *ngIf="!showAddUserDetail " mat-icon-button (click)="addGlobalUser()">
-        <mat-icon title="Add Global User" class="mat-icon material-icons">
+        <mat-icon title="Add User to Current/Selected Access Group" class="mat-icon material-icons">
           person_add
         </mat-icon>
       </button>
@@ -106,11 +106,15 @@
         </mat-icon>
       </button>
 
-      <button mat-icon-button [disabled]="">
+      <button mat-icon-button [disabled]="!showCancel">
         <mat-icon title="Cancel " class="mat-icon material-icons" (click)="Refresh()">
           cancel </mat-icon>
       </button>
 
+      <button mat-icon-button [disabled]="!showCancel"> 
+        <mat-icon svgIcon="redirect_icon" title="Redirect To Landing Page" class="mat-icon material-icons" (click)="redirectToLandingPage()">
+          refresh </mat-icon>
+      </button>
     </div>
     <div *ngIf=" showDetail ">
 
@@ -330,8 +334,9 @@
 
                     <td style="border-spacing:0px !important; border-collapse: none !important">
 
-                      <mat-select required placeholder="Select Role" [formControl]="row.get('role')" [ngClass]="{  'input-disabled' : readOnlyOrg ,  'form-control': !readOnlyOrg}"
-                        [style.width.px]="100 " name="role5">
+                      <mat-select [disabled]="!assignuserSaveEnable" required placeholder="Select Role" [formControl]="row.get('role')"
+                        [ngClass]="{  'input-disabled' : readOnlyOrg ,  'form-control': !readOnlyOrg}" [style.width.px]="100 "
+                        name="role5">
                         <mat-option *ngFor=" let record of roleRecord " [value]="record.value ">
                           {{record.name}}
                         </mat-option>
