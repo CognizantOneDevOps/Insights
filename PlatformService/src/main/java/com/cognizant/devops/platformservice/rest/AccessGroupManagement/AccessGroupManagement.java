@@ -111,6 +111,34 @@ public class AccessGroupManagement {
 		return PlatformServiceUtil
 				.buildSuccessResponseWithData(new JsonParser().parse(response.getEntity(String.class)));
 	}
+	@RequestMapping(value= "/searchUser" , method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+	public @ResponseBody JsonObject searchUser(@RequestBody String name) 
+	{
+		String apiUrlName = ApplicationConfigProvider.getInstance().getGrafana().getGrafanaEndpoint()+ "/api/users/lookup?loginOrEmail=" + name;
+		String message = null;
+		ClientResponse responsename = callgrafana(apiUrlName, null, "get");
+		JsonObject jsonResponseName = new JsonParser().parse(responsename.getEntity(String.class))
+				.getAsJsonObject();
+       
+		int userId= jsonResponseName.get("id").getAsInt();
+		
+		if (jsonResponseName.get("id") != null) {
+			String apiUrl = ApplicationConfigProvider.getInstance().getGrafana().getGrafanaEndpoint()+"/api/users/"+userId+"/orgs";
+			Map<String, String> headers = new HashMap<String, String>();
+			headers.put("Authorization", buildAuthenticationHeader());
+			ClientResponse response = RestHandler.doGet(apiUrl, null, headers);
+			return PlatformServiceUtil.buildSuccessResponseWithData(new JsonParser().parse(response.getEntity(String.class)));
+		}
+		else
+		{
+			message="User Not Found";
+			return PlatformServiceUtil.buildSuccessResponseWithData(message);
+			
+		}
+		
+
+	}
+	
 
 	@RequestMapping(value = "/assignUser", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 	public @ResponseBody JsonObject assignUser(@RequestBody String assignUserdata) {

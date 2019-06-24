@@ -281,7 +281,7 @@
         </div>
       </div>
 
-      <table>
+  <table class="tableMainCss">
         <tbody style="display: grid; max-height: 38vh ;border-spacing:0px !important;; border-collapse: none !important">
           <tr>
 
@@ -296,7 +296,7 @@
 
             <input [disabled]="!assignuserSaveEnable" type="text" class="searchbox" [(ngModel)]='searchOrgForUser'
               [value]="searchOrgForUser" required placeholder=" Search by Login ID">
-            <button mat-icon-button (click)="searchData(searchOrgForUser,selectedAdminOrg)">
+            <button mat-icon-button (click)="searchUserInAssign(searchOrgForUser)">
               <mat-icon title="Search" class="mat-icon material-icons">
                 search
               </mat-icon>
@@ -309,7 +309,7 @@
               <!--  <label class="label-control">Items</label>
         <br> -->
 
-              <table style="margin-top: 10px;">
+              <table style="margin-top: 10px;"  class="tableMainCss">
 
                 <tbody>
                   <tr class="AddUserColTextCss" style="border-spacing:0px !important;; border-collapse: none !important"
