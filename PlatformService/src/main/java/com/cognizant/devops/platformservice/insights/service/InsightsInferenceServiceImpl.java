@@ -100,12 +100,9 @@ public class InsightsInferenceServiceImpl implements InsightsInferenceService {
 			List<InferenceResult> results) {
 
 		Map<String, List<InsightsInferenceDetail>> tempMap = new HashMap<>();
-		//log.debug(" results  " + results);
 		for (InferenceResult inferenceResult : results) {
-			//log.debug("  inferenceResult  " + inferenceResult);
 			List<InferenceResultDetails> inferenceResultDetailsList = inferenceResult.getDetails();
 			InferenceResultDetails resultFirstData = inferenceResultDetailsList.get(0);
-			//log.debug("resultFirstData  " + resultFirstData);
 			String trend = "No Change";
 			KPISentiment sentiment = KPISentiment.NEUTRAL;
 			Object[] values = new Object[2];
@@ -123,17 +120,13 @@ public class InsightsInferenceServiceImpl implements InsightsInferenceService {
 					continue;
 				}
 				InferenceResultDetails result2 = inferenceResultDetailsList.get(1);
-				//log.debug("  result2 " + result2);
 				sentiment = getSentiment(result2.getResult(), resultFirstData.getResult(),
 						resultFirstData.getExpectedTrend());
 
 				values[0] = resultFirstData.getResult();
 				values[1] = result2.getResult();
-
 				trend = getTrend(values[0], values[1]);
-
 			}
-
 			Long kpiID = resultFirstData.getKpiID();
 			String inferenceName = resultFirstData.getName();
 			String action = resultFirstData.getAction();
@@ -146,7 +139,7 @@ public class InsightsInferenceServiceImpl implements InsightsInferenceService {
 			String inferenceText = getInferenceText(inferenceName, vector, kpiID, sentiment, schedule, values,
 					isComparison, resultOutputType);
 
-			//log.debug("  inferenceText  " + inferenceText);
+			log.debug("  inferenceText  " + inferenceText);
 			List<ResultSetModel> resultValues = new ArrayList<ResultSetModel>();
 			for (InferenceResultDetails details : inferenceResultDetailsList) {
 				ResultSetModel model = new ResultSetModel();
@@ -162,7 +155,6 @@ public class InsightsInferenceServiceImpl implements InsightsInferenceService {
 			} else {
 				tempMap.put(vector, detailsList);
 			}
-			//return tempMap;
 		}
 
 		return tempMap;
@@ -193,12 +185,7 @@ public class InsightsInferenceServiceImpl implements InsightsInferenceService {
 	private List<InferenceResult> getInferenceData(String inputSchedule) throws Exception {
 		String esQuery = getQuery();
 
-		esQuery = getUpdatedQueryWithDate(esQuery, inputSchedule, 5000); // Since
-																			// should
-																			// come
-																			// from
-																			// config
-																			// file
+		esQuery = getUpdatedQueryWithDate(esQuery, inputSchedule, 5); // Since  should  come  from  config  file
 
 		ElasticSearchDBHandler esDBHandler = new ElasticSearchDBHandler();
 		String sparkElasticSearchHost = ApplicationConfigProvider.getInstance().getSparkConfigurations()
@@ -341,17 +328,17 @@ public class InsightsInferenceServiceImpl implements InsightsInferenceService {
 		return esQuery;
 	}
 
-	private String getNeo4jQueryWithDates(String inputSchedule, String vectorType) {
-
+	private String getNeo4jQueryWithDates(String inputSchedule, String vectorType, Integer since) {
 		String cypherQuery = "MATCH (n:INFERENCE:RESULTS) where exists(n.kpiID) AND n.schedule= '" + inputSchedule
 				+ "' ";
+		cypherQuery = cypherQuery + " AND resultTime >  '" + InsightsUtils.getDataFromTime(inputSchedule, since)
+				+ "' resultTime < " + InsightsUtils.getTodayTime().toString() + "'";
 		if (!"".equalsIgnoreCase(vectorType)) {
 			cypherQuery = cypherQuery + " and n.vector='" + vectorType + "' ";
 		}
 		cypherQuery = cypherQuery + "RETURN n.kpiID,n.name,n.vector,"
 				+ " n.expectedTrend,n.result,n.schedule,n.action,n.resultTime,n.resultTimeX,n.toolName,n.resultOutPutType,"
 				+ " n.isComparisionKpi, n.isGroupBy,'' as groupByName ,'' as groupByFieldVal order by n.kpiID,n.resultTime desc";
-
 		return cypherQuery;
 	}
 
@@ -359,7 +346,7 @@ public class InsightsInferenceServiceImpl implements InsightsInferenceService {
 		List<InferenceResult> inferenceResults = null;
 		Neo4jDBHandler graphDBHandler = new Neo4jDBHandler();
 		try {
-			String graphQuery = getNeo4jQueryWithDates(inputSchedule, vectorType);
+			String graphQuery = getNeo4jQueryWithDates(inputSchedule, vectorType, 5);
 			log.debug(" graphQuery  " + graphQuery);
 			GraphResponse graphResp = graphDBHandler.executeCypherQuery(graphQuery);
 			//log.debug(graphResp.getJson());
@@ -417,12 +404,12 @@ public class InsightsInferenceServiceImpl implements InsightsInferenceService {
 				inferenceDetailList.add(inferenceDetails);
 			}
 
-			Map<Long, List<InferenceResultDetails>> kpiInferenceResulGrouped = inferenceDetailList.stream()
+			Map<Long, List<InferenceResultDetails>> kpiInferenceResultGrouped = inferenceDetailList.stream()
 					.collect(Collectors.groupingBy(kpi -> kpi.getKpiID()));
 
-			log.debug(" kpiInferenceResulGrouped " + kpiInferenceResulGrouped);
+			log.debug(" kpiInferenceResulGrouped " + kpiInferenceResultGrouped);
 
-			for (Map.Entry<Long, List<InferenceResultDetails>> kipInferanceResult : kpiInferenceResulGrouped
+			for (Map.Entry<Long, List<InferenceResultDetails>> kipInferanceResult : kpiInferenceResultGrouped
 					.entrySet()) {
 				InferenceResult ir = new InferenceResult();
 				ir.setKpiID(kipInferanceResult.getKey());
