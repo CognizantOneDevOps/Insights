@@ -70,7 +70,7 @@ public class InsightsInferenceServiceImpl implements InsightsInferenceService {
 	}
 
 	private List<InsightsInference> getInferences(String schedule, String vectorType) {
-		List<InsightsInference> inferences = new ArrayList<>(5);
+		List<InsightsInference> inferences = new ArrayList<>(0);
 
 		List<InferenceResult> results = new ArrayList<InferenceResult>();
 		try {
@@ -78,7 +78,7 @@ public class InsightsInferenceServiceImpl implements InsightsInferenceService {
 			//results = getInferenceData(schedule);
 
 		} catch (Exception e) {
-			log.error("Problem getting Spark results", e);
+			log.error("Problem getting results", e);
 			return inferences;
 		}
 
@@ -331,8 +331,8 @@ public class InsightsInferenceServiceImpl implements InsightsInferenceService {
 	private String getNeo4jQueryWithDates(String inputSchedule, String vectorType, Integer since) {
 		String cypherQuery = "MATCH (n:INFERENCE:RESULTS) where exists(n.kpiID) AND n.schedule= '" + inputSchedule
 				+ "' ";
-		cypherQuery = cypherQuery + " AND resultTime >  '" + InsightsUtils.getDataFromTime(inputSchedule, since)
-				+ "' resultTime < " + InsightsUtils.getTodayTime().toString() + "'";
+		cypherQuery = cypherQuery + " AND n.resultTime >  " + InsightsUtils.getDataFromTime(inputSchedule, since)
+				+ " AND n.resultTime < " + InsightsUtils.getTodayTime().toString();//+ "'"
 		if (!"".equalsIgnoreCase(vectorType)) {
 			cypherQuery = cypherQuery + " and n.vector='" + vectorType + "' ";
 		}
@@ -349,7 +349,6 @@ public class InsightsInferenceServiceImpl implements InsightsInferenceService {
 			String graphQuery = getNeo4jQueryWithDates(inputSchedule, vectorType, 5);
 			log.debug(" graphQuery  " + graphQuery);
 			GraphResponse graphResp = graphDBHandler.executeCypherQuery(graphQuery);
-			//log.debug(graphResp.getJson());
 			JsonArray errorMessage = graphResp.getJson().getAsJsonArray("errors");
 			if (errorMessage.size() >= 1) {
 				String errorMessageText = errorMessage.get(0).getAsJsonObject().get("message").getAsString();
@@ -362,6 +361,7 @@ public class InsightsInferenceServiceImpl implements InsightsInferenceService {
 		} catch (Exception e) {
 			log.error(" error while executing neo4j query in getInferenceDataFromNeo4j  " + e.getCause()
 					+ e.getMessage());
+			throw e;
 		}
 
 		return inferenceResults;
