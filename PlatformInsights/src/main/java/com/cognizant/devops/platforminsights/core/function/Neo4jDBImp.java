@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -27,7 +28,6 @@ import com.cognizant.devops.platformcommons.core.enums.ExecutionActions;
 import com.cognizant.devops.platformcommons.core.enums.JobSchedule;
 import com.cognizant.devops.platformcommons.core.enums.KPIJobResultAttributes;
 import com.cognizant.devops.platformcommons.core.util.InsightsUtils;
-import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBException;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphResponse;
 import com.cognizant.devops.platformcommons.dal.neo4j.Neo4jDBHandler;
 import com.cognizant.devops.platformcommons.dal.neo4j.NodeData;
@@ -186,23 +186,36 @@ public class Neo4jDBImp extends BaseActionImpl {
 	}
 
 	public void updateJobLastRun(List<Neo4jKPIDefinition> jobUpdateList) {
-		//String[] queryArray = new String[jobUpdateList.size()];
+
 		try {
-			for (Neo4jKPIDefinition neo4jKPIDefinition : jobUpdateList) {
-				String updateCypherQuery = prepareLastRunQuery(neo4jKPIDefinition.getKpiID(),
-						neo4jKPIDefinition.getSchedule().toString());
+			Map<String, List<Neo4jKPIDefinition>> kpiInferenceResultGroupedOnScheduled = jobUpdateList.stream()
+					.collect(Collectors.groupingBy(kpi -> kpi.getSchedule().toString()));
+			for (Map.Entry<String, List<Neo4jKPIDefinition>> kipInferanceResult : kpiInferenceResultGroupedOnScheduled
+					.entrySet()) {
+				StringBuffer sbWhereClause = new StringBuffer();
+				sbWhereClause.append("[");
+				log.debug(" Scheduled  " + kipInferanceResult.getKey() + "  List   " + kipInferanceResult.getValue());
+				for (Neo4jKPIDefinition neo4jKPIDefinition : kipInferanceResult.getValue()) {
+					sbWhereClause.append("'").append(neo4jKPIDefinition.getKpiID().toString()).append("'").append(",");
+				}
+				sbWhereClause.setLength(sbWhereClause.length() - 1);
+				sbWhereClause.append("]");
+				String updateCypherQuery = prepareLastRunQuery(sbWhereClause.toString(),
+						kipInferanceResult.getKey().toString());
+				log.debug(" query of updated job group wise  " + updateCypherQuery);
 				GraphResponse updateGraphResponse = graphDBHandler.executeCypherQuery(updateCypherQuery);
 			}
+
 		} catch (Exception e) {
 			log.error(" Error while updateJobLastRun  " + e.getMessage());
 		}
 
 	}
 
-	public String prepareLastRunQuery(Integer kpiId, String schedule) {
+	public String prepareLastRunQuery(String kpiIds, String schedule) {
 		Long currentEpochTime = InsightsUtils.getLastRunTime(schedule);
-		String query = " MATCH (n:INFERENCE:CONFIG) where n.kpiID ='" + kpiId + "'  SET n.lastRunTime='"
-				+ currentEpochTime + "'";
+		String query = " MATCH (n:INFERENCE:CONFIG) where n.kpiID in " + kpiIds + "  SET n.lastRunTime='"
+				+ currentEpochTime + "' RETURN count(n)";
 		log.debug(" last run update quey " + query);
 		return query;
 	}
