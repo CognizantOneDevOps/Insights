@@ -211,6 +211,13 @@ export class UserOnboardingComponent implements OnInit {
     }
   }
 
+  searchUserInAssign(searchOrgForUserAssign) {
+    this.userOnboardingService.getUsersOrganisation(searchOrgForUserAssign).then(function (usersResponseData1) {
+      console.log(usersResponseData1);
+    });
+
+  }
+
 
   clubProperties(jsonData, isArray) {
     if (isArray) {
