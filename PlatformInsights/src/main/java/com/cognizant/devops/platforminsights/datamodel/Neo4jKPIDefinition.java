@@ -39,7 +39,6 @@ public class Neo4jKPIDefinition implements Serializable {
 	private String durationField;
 	private String resultOutPutType;
 	private boolean isComparisionKpi;
-
 	private boolean isGroupBy;
 	private String vector;
 	private String toolName;
@@ -47,11 +46,9 @@ public class Neo4jKPIDefinition implements Serializable {
 	private String groupByField;
 	private String averageField;
 	private String sumCalculationField;
-
 	private String dbType;
 	private String dataQuery;
 	private String neo4jQuery;
-
 	private String neo4jLabel;
 	private String nextRun;
 	private Long lastRunTime;

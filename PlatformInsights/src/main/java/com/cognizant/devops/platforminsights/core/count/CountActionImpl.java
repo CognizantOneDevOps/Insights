@@ -55,9 +55,9 @@ public class CountActionImpl extends BaseActionImpl {
 		ElasticSearchDBHandler esDBHandler = new ElasticSearchDBHandler();
 		try {
 			String esQuery = getEsQueryWithDates(kpiDefinition.getSchedule(),kpiDefinition.getEsquery());
-			log.debug("Counting KPIs");
+			//log.debug("Counting KPIs");
 			if(kpiDefinition.isGroupBy()) {
-				log.debug("GroupBy found True. Entering GroupBy method + Query -"+esQuery);
+				//log.debug("GroupBy found True. Entering GroupBy method + Query -"+esQuery);
 				JsonObject jsonObj = esDBHandler.queryES(ConfigConstants.SPARK_ES_HOST+":"+ConfigConstants.SPARK_ES_PORT+"/"+kpiDefinition.getEsResource()+"/_search?size=0&filter_path=aggregations", esQuery);
 				String jsonObjStr = jsonObj.toString();
 				/*ObjectMapper mapper = new ObjectMapper();
@@ -68,14 +68,14 @@ public class CountActionImpl extends BaseActionImpl {
 				
 				int bucketLen = AggregatedArrayMap.size();
 				if (bucketLen == 0){
-					log.debug("Bucket found to be NULL");					
+					//log.debug("Bucket found to be NULL");					
 					resultMap = getResultMap(0L, "No records were found");
 					saveResult(resultMap);
 					return resultMap;
 				}
 				List<Map<String, Object>> resultList = new ArrayList<>();
 				for(Map<String, Object> element : AggregatedArrayMap){
-					log.debug("Counting KPI result");
+					//log.debug("Counting KPI result");
 					Object [] keys = element.keySet().toArray();
 					
 					String key = (String)keys[0];
@@ -106,7 +106,6 @@ public class CountActionImpl extends BaseActionImpl {
 		try {
 			Neo4jDBImp graphDb = new Neo4jDBImp(neo4jKpiDefinition);
 			List<Map<String, Object>> graphResposne = graphDb.getNeo4jResult();
-			log.debug(" graphResposne  " + graphResposne);
 			saveResultInNeo4j(graphResposne);
 
 		} catch (Exception e) {

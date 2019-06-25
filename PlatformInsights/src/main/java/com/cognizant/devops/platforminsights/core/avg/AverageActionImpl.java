@@ -47,7 +47,7 @@ public class AverageActionImpl extends BaseActionImpl {
 
 	@Override
 	protected Map<String, Object> execute() throws InsightsJobFailedException {
-		log.debug("Calculating KPI Average");
+		//log.debug("Calculating KPI Average");
 		
 		/*try {
 			if(kpiDefinition.isGroupBy()) {
@@ -93,7 +93,6 @@ public class AverageActionImpl extends BaseActionImpl {
 		try {
 			Neo4jDBImp graphDb = new Neo4jDBImp(neo4jKpiDefinition);
 			List<Map<String, Object>> graphResposne = graphDb.getNeo4jResult();
-			log.debug(" graphResposne  " + graphResposne);
 			saveResultInNeo4j(graphResposne);
 
 		} catch (Exception e) {

@@ -34,6 +34,8 @@ import org.springframework.stereotype.Service;
 
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.core.enums.ExecutionActions;
+import com.cognizant.devops.platformcommons.core.enums.JobSchedule;
+import com.cognizant.devops.platformcommons.core.enums.KPIJobResultAttributes;
 import com.cognizant.devops.platformcommons.core.enums.KPISentiment;
 import com.cognizant.devops.platformcommons.core.enums.KPITrends;
 import com.cognizant.devops.platformcommons.core.enums.ResultOutputType;
@@ -41,6 +43,7 @@ import com.cognizant.devops.platformcommons.core.util.InsightsUtils;
 import com.cognizant.devops.platformcommons.dal.elasticsearch.ElasticSearchDBHandler;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphResponse;
 import com.cognizant.devops.platformcommons.dal.neo4j.Neo4jDBHandler;
+import com.cognizant.devops.platformcommons.dal.neo4j.NodeData;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
@@ -182,11 +185,11 @@ public class InsightsInferenceServiceImpl implements InsightsInferenceService {
 		return details;
 	}
 
-	private List<InferenceResult> getInferenceData(String inputSchedule) throws Exception {
+	/*private List<InferenceResult> getInferenceData(String inputSchedule) throws Exception {
 		String esQuery = getQuery();
-
+	
 		esQuery = getUpdatedQueryWithDate(esQuery, inputSchedule, 5); // Since  should  come  from  config  file
-
+	
 		ElasticSearchDBHandler esDBHandler = new ElasticSearchDBHandler();
 		String sparkElasticSearchHost = ApplicationConfigProvider.getInstance().getSparkConfigurations()
 				.getSparkElasticSearchHost();
@@ -198,9 +201,9 @@ public class InsightsInferenceServiceImpl implements InsightsInferenceService {
 				+ sparkElasticSearchResultIndex + "/_search?filter_path=aggregations", esQuery);
 		log.debug(" ES query result " + jsonObj);
 		List<InferenceResult> inferenceResults = JsonToObjectConverter.getInferenceResult(jsonObj);
-
+	
 		return inferenceResults;
-	}
+	}*/
 
 	private String getInferenceText(String inferenceName, String vector, Long kpiId, KPISentiment sentiment,
 			String schedule, Object[] values, boolean isComparison, String resultOutputType) {
@@ -336,9 +339,7 @@ public class InsightsInferenceServiceImpl implements InsightsInferenceService {
 		if (!"".equalsIgnoreCase(vectorType)) {
 			cypherQuery = cypherQuery + " and n.vector='" + vectorType + "' ";
 		}
-		cypherQuery = cypherQuery + "RETURN n.kpiID,n.name,n.vector,"
-				+ " n.expectedTrend,n.result,n.schedule,n.action,n.resultTime,n.resultTimeX,n.toolName,n.resultOutPutType,"
-				+ " n.isComparisionKpi, n.isGroupBy,'' as groupByName ,'' as groupByFieldVal order by n.kpiID,n.resultTime desc";
+		cypherQuery = cypherQuery + " RETURN n ";
 		return cypherQuery;
 	}
 
@@ -356,7 +357,6 @@ public class InsightsInferenceServiceImpl implements InsightsInferenceService {
 				throw new InsightsCustomException(errorMessageText);
 			}
 			JsonArray graphJsonResult = graphResp.getJson().getAsJsonArray("results");
-			//log.debug(" graphJsonResult  " + graphJsonResult.toString());
 			inferenceResults = parseNeo4jResponse(graphJsonResult, graphResp);
 		} catch (Exception e) {
 			log.error(" error while executing neo4j query in getInferenceDataFromNeo4j  " + e.getCause()
@@ -367,43 +367,18 @@ public class InsightsInferenceServiceImpl implements InsightsInferenceService {
 		return inferenceResults;
 	}
 
-	private List<InferenceResult> parseNeo4jResponse(JsonArray graphJsonResult, GraphResponse response) {
+	private List<InferenceResult> parseNeo4jResponse(JsonArray graphJsonResult, GraphResponse graphResp) {
 
 		List<InferenceResult> inferenceResults = new ArrayList<InferenceResult>(0);
 		List<InferenceResultDetails> inferenceDetailList = new ArrayList<InferenceResultDetails>(0);
 
 		try {
-			JsonArray inferenceData = graphJsonResult.get(0).getAsJsonObject().get("data").getAsJsonArray(); //.get(0).getAsJsonObject().get("row").getAsJsonArray()
-			//log.debug(" inferenceData  " + inferenceData.toString());
-			for (int i = 0; i < inferenceData.size(); i++) {
-				InferenceResultDetails inferenceDetails = new InferenceResultDetails();
-				//log.debug(" inferenceData  " + inferenceData.get(i).getAsJsonObject());
-				JsonArray rowArraykpiData = inferenceData.get(i).getAsJsonObject().get("row").getAsJsonArray();
-				//log.debug(" rowArray " + rowArraykpiData.toString());
-				inferenceDetails.setKpiID(rowArraykpiData.get(0).getAsLong());
-				inferenceDetails.setName(rowArraykpiData.get(1).getAsString());
-				inferenceDetails.setVector(rowArraykpiData.get(2).getAsString());
-				inferenceDetails.setExpectedTrend(rowArraykpiData.get(3).getAsString());
-				inferenceDetails.setResult(Long.parseLong(rowArraykpiData.get(4).getAsString()));
-				inferenceDetails.setSchedule(rowArraykpiData.get(5).getAsString());
-				inferenceDetails.setAction(rowArraykpiData.get(6).getAsString());
-				inferenceDetails.setResultTime(rowArraykpiData.get(7).getAsLong());
-				if (!rowArraykpiData.get(8).isJsonNull()) {
-					inferenceDetails.setToolName(rowArraykpiData.get(8).getAsString());
-				}
-				if (rowArraykpiData.get(9) != null && !rowArraykpiData.get(9).isJsonNull()) {
-					inferenceDetails.setIsComparisionKpi(rowArraykpiData.get(9).getAsBoolean());
-				}
-				if (!rowArraykpiData.get(10).isJsonNull() && rowArraykpiData.get(10).getAsBoolean()) {
-					inferenceDetails.setIsGroupBy(rowArraykpiData.get(10).getAsBoolean());
-					inferenceDetails.setGroupByName(rowArraykpiData.get(11).getAsString());
-					inferenceDetails.setGroupByFieldVal(rowArraykpiData.get(12).getAsString());
-				} else {
-					inferenceDetails.setIsGroupBy(Boolean.FALSE);
-				}
-				inferenceDetailList.add(inferenceDetails);
-			}
 
+			List<NodeData> nodesList = graphResp.getNodes();
+			for (NodeData nodeData : nodesList) {
+				InferenceResultDetails nodemapping = mapNodeData(nodeData);
+				inferenceDetailList.add(nodemapping);
+			}
 			Map<Long, List<InferenceResultDetails>> kpiInferenceResultGrouped = inferenceDetailList.stream()
 					.collect(Collectors.groupingBy(kpi -> kpi.getKpiID()));
 
@@ -421,5 +396,29 @@ public class InsightsInferenceServiceImpl implements InsightsInferenceService {
 			log.error(" Error while parsing neo4j responce " + e.getCause() + e.getMessage());
 		}
 		return inferenceResults;
+	}
+
+	private InferenceResultDetails mapNodeData(NodeData node) {
+		InferenceResultDetails neo4jDef = new InferenceResultDetails();
+		neo4jDef.setKpiID(Long.parseLong(node.getPropertyMap().get(KPIJobResultAttributes.KPIID.toString())));
+		neo4jDef.setName(node.getPropertyMap().get(KPIJobResultAttributes.NAME.toString()));
+		neo4jDef.setVector(node.getPropertyMap().get(KPIJobResultAttributes.VECTOR.toString()));
+		neo4jDef.setExpectedTrend(node.getPropertyMap().get(KPIJobResultAttributes.EXPECTEDTREND.toString()));
+		neo4jDef.setResult(Long.parseLong(node.getPropertyMap().get(KPIJobResultAttributes.RESULT.toString())));
+		neo4jDef.setSchedule(node.getPropertyMap().get(KPIJobResultAttributes.SCHEDULE.toString()));
+		neo4jDef.setAction(node.getPropertyMap().get(KPIJobResultAttributes.ACTION.toString()));
+		neo4jDef.setResultTime(Long.parseLong(node.getPropertyMap().get(KPIJobResultAttributes.RESULTTIME.toString())));
+		neo4jDef.setToolName(node.getPropertyMap().get(KPIJobResultAttributes.TOOLNAME.toString()));
+		neo4jDef.setIsComparisionKpi(
+				Boolean.parseBoolean(node.getPropertyMap().get(KPIJobResultAttributes.ISCOMPARISIONKPI.toString())));
+		neo4jDef.setIsGroupBy(
+				Boolean.parseBoolean(node.getPropertyMap().get(KPIJobResultAttributes.ISGROUPBY.toString())));
+		neo4jDef.setGroupByName(node.getPropertyMap().get(KPIJobResultAttributes.GROUPBYFIELDNAME.toString()));
+		neo4jDef.setGroupByField(node.getPropertyMap().get(KPIJobResultAttributes.GROUPBYFIELDID.toString()));
+		neo4jDef.setGroupByFieldVal(node.getPropertyMap().get(KPIJobResultAttributes.GROUPBYFIELDVAL.toString()));
+		neo4jDef.setResultOutPutType(node.getPropertyMap().get(KPIJobResultAttributes.RESULTOUTPUTTYPE.toString()));
+		neo4jDef.setResultTimeX(node.getPropertyMap().get(KPIJobResultAttributes.RESULTTIMEX.toString()));
+
+		return neo4jDef;
 	}
 }

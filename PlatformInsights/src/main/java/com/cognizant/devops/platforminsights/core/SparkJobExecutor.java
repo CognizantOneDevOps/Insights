@@ -121,23 +121,18 @@ public class SparkJobExecutor implements Job,Serializable{
 	private void executeJob(SparkJobConfiguration job)  throws InsightsJobFailedException{
 		
 		KPIDefinition kpiDefinition = job.getKpiDefinition(job.getKpiDefinition());
-		
+		log.debug(" KPI action found as ==== " + kpiDefinition.getAction() + " KPI Name is ==== "
+				+ kpiDefinition.getName());
 		if(ExecutionActions.AVERAGE == kpiDefinition.getAction()){
-			log.debug("KPI action found as AVERAGE");
 			BaseActionImpl impl = new AverageActionImpl(kpiDefinition);
 			impl.execute();
 		} else if(ExecutionActions.COUNT == kpiDefinition.getAction()){
-			log.debug("KPI action found as COUNT");
 			BaseActionImpl impl = new CountActionImpl(kpiDefinition);
 			impl.execute();
-		}
-		else if(ExecutionActions.MINMAX == kpiDefinition.getAction()){
-			log.debug("KPI action found as MINMAX");
+		} else if (ExecutionActions.MINMAX == kpiDefinition.getAction()) {
 			BaseActionImpl impl = new MinMaxActionImpl(kpiDefinition);
 			impl.execute();
-		}
-		else if(ExecutionActions.SUM == kpiDefinition.getAction()){
-			log.debug("KPI action found as SUM");
+		} else if (ExecutionActions.SUM == kpiDefinition.getAction()) {
 			BaseActionImpl impl = new SumActionImpl(kpiDefinition);
 			impl.execute();
 		}

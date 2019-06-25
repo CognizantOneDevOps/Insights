@@ -34,6 +34,7 @@ public class InferenceResultDetails {
 	private Long resultTime;
 	private String resultTimeX;
 	
+
 	public Long getKpiID() {
 		return kpiID;
 	}
