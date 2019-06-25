@@ -1,0 +1,10 @@
+[
+  {
+    "httpRequest": {
+      "path": "/git"
+    },
+    "httpResponse": {
+      "body": "My Git Response"
+    }
+  }
+]
