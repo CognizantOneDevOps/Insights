@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -60,10 +61,9 @@ public class Neo4jDBImp extends BaseActionImpl {
 		List<Map<String, Object>> resultList = new ArrayList<>();
 		try {
 			String graphQuery = neo4jKpiDefinition.getNeo4jQuery();
-			//graphQuery = getNeo4jQueryWithDates(neo4jKpiDefinition.getSchedule(), graphQuery);
-			log.debug("Database type found to be Neo4j and graphQuery with date is=== " + graphQuery);
+			graphQuery = getNeo4jQueryWithDates(neo4jKpiDefinition.getSchedule(), graphQuery);
+			log.debug("Database type found to be Neo4j and graphQuery with date is === " + graphQuery);
 			GraphResponse graphResp = graphDBHandler.executeCypherQuery(graphQuery);
-			log.debug(graphResp.getJson());
 			JsonArray errorMessage = graphResp.getJson().getAsJsonArray("errors");
 			if (errorMessage.size() >= 1) {
 				String errorMessageText = errorMessage.get(0).getAsJsonObject().get("message").getAsString();
@@ -103,7 +103,7 @@ public class Neo4jDBImp extends BaseActionImpl {
 					if (!resultMap.isEmpty()) {
 						resultList.add(resultMap);
 					} else {
-						log.debug(" No result calulated ....");
+						log.debug(" No result calculated ....");
 					}
 				}
 			}
@@ -128,10 +128,11 @@ public class Neo4jDBImp extends BaseActionImpl {
 		Long toDate = InsightsUtils.getDataToTime(schedule.name());
 		String whereClause = " WHERE '" + neo4jKpiDefinition.getStartTimeField() + "' > '" + fromDate + "' AND '"
 				+ neo4jKpiDefinition.getStartTimeField() + "' < '" + toDate + "'";
-		if (neo4jQuery.contains("WHERE")) {
-			neo4jQuery = neo4jQuery.replace("WHERE", whereClause + " AND ");
-		} else if (neo4jQuery.contains("RETURN") && !neo4jQuery.equalsIgnoreCase("where")) {
-			neo4jQuery = neo4jQuery.replace("RETURN", whereClause + " RETURN  ");
+		if (StringUtils.containsIgnoreCase(neo4jQuery, "WHERE")) {
+			neo4jQuery = StringUtils.replaceIgnoreCase(neo4jQuery, "WHERE", whereClause + " AND ");
+		} else if (StringUtils.containsIgnoreCase(neo4jQuery, "RETURN")
+				&& !StringUtils.containsIgnoreCase(neo4jQuery, "WHERE")) {
+			neo4jQuery = StringUtils.replaceIgnoreCase(neo4jQuery, "RETURN", whereClause + " RETURN  ");
 		}
 		return neo4jQuery;
 	}
@@ -140,9 +141,7 @@ public class Neo4jDBImp extends BaseActionImpl {
 		List<Neo4jKPIDefinition> jobs = new ArrayList<Neo4jKPIDefinition>(0);
 		try {
 			String graphQuery = "MATCH (n:INFERENCE:CONFIG) RETURN n";
-			log.debug("Database type found to be Neo4j  === " + graphQuery);
 			GraphResponse graphResp = graphDBHandler.executeCypherQuery(graphQuery);
-			log.debug(graphResp.getJson());
 			List<NodeData> nodesList = graphResp.getNodes();
 			for (NodeData nodeData : nodesList) {
 				Neo4jKPIDefinition nodemapping = mapNodeData(nodeData);
@@ -167,7 +166,7 @@ public class Neo4jDBImp extends BaseActionImpl {
 		neo4jDef.setExpectedTrend(node.getPropertyMap().get(KPIJobResultAttributes.EXPECTEDTREND.toString()));
 		neo4jDef.setGroupBy(
 				Boolean.parseBoolean(node.getPropertyMap().get(KPIJobResultAttributes.ISGROUPBY.toString())));
-		neo4jDef.setGroupByField(node.getPropertyMap().get(KPIJobResultAttributes.GROUPBYFIELD.toString()));
+		neo4jDef.setGroupByField(node.getPropertyMap().get(KPIJobResultAttributes.GROUPBYFIELDID.toString()));
 		neo4jDef.setGroupByFieldName(node.getPropertyMap().get(KPIJobResultAttributes.GROUPBYFIELDNAME.toString()));
 		neo4jDef.setLastRunTime(
 				Long.parseLong(node.getPropertyMap().get(KPIJobResultAttributes.LASTRUNTIME.toString())));
@@ -202,7 +201,6 @@ public class Neo4jDBImp extends BaseActionImpl {
 				sbWhereClause.append("]");
 				String updateCypherQuery = prepareLastRunQuery(sbWhereClause.toString(),
 						kipInferanceResult.getKey().toString());
-				log.debug(" query of updated job group wise  " + updateCypherQuery);
 				GraphResponse updateGraphResponse = graphDBHandler.executeCypherQuery(updateCypherQuery);
 			}
 
@@ -216,7 +214,7 @@ public class Neo4jDBImp extends BaseActionImpl {
 		Long currentEpochTime = InsightsUtils.getLastRunTime(schedule);
 		String query = " MATCH (n:INFERENCE:CONFIG) where n.kpiID in " + kpiIds + "  SET n.lastRunTime='"
 				+ currentEpochTime + "' RETURN count(n)";
-		log.debug(" last run update quey " + query);
+		log.debug(" last run update quey for scheduled " + schedule + "   " + query);
 		return query;
 	}
 

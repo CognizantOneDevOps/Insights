@@ -43,7 +43,7 @@ public class InferenceJobExecutor implements Job, Serializable {
 			Neo4jDBImp neo4jImpl = new Neo4jDBImp();
 			List<Neo4jKPIDefinition> jobsFromNeo4j = neo4jImpl.readKPIJobsFromNeo4j();
 			List<Neo4jKPIDefinition> updatedJobs = new ArrayList<Neo4jKPIDefinition>();
-			log.debug("  jobsFromNeo4j " + jobsFromNeo4j);
+			//log.debug("  jobsFromNeo4j " + jobsFromNeo4j);
 			for (Neo4jKPIDefinition neo4jJob : jobsFromNeo4j) {
 				try {
 					if (!(neo4jJob.isActive()
@@ -51,10 +51,11 @@ public class InferenceJobExecutor implements Job, Serializable {
 						log.debug(" Job not run because last run time is less than scheduled " + neo4jJob.getName()
 								+ "  kpiId " + neo4jJob.getKpiID());
 						continue;
+					} else {
+						log.debug(" Run Job Detail " + neo4jJob);
+						executeJob(neo4jJob);
+						updatedJobs.add(neo4jJob);
 					}
-					log.debug(" Job Detail " + neo4jJob);
-					executeJob(neo4jJob);
-					updatedJobs.add(neo4jJob);
 				} catch (Exception e) {
 					log.error(e.getMessage(), e);
 				}

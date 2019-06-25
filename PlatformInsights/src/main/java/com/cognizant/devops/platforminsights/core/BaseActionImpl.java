@@ -171,17 +171,15 @@ public abstract class BaseActionImpl {
 			if (!resultList.isEmpty()) {
 				String cypherQuery = "UNWIND {props} AS properties CREATE (n:INFERENCE:RESULTS) set n=properties return count(n)"; //DATA
 				List<JsonObject> dataList = new ArrayList<JsonObject>();
-				log.debug("Saving jobs in Neo4j. ResultList size :  " + resultList.size());
+				//log.debug("Saving jobs in Neo4j. ResultList size :  " + resultList.size());
 				String resultJson = gson.toJson(resultList);
-				log.debug("resultJson  ==== " + resultJson);
+				//log.debug("resultJson  ==== " + resultJson);
 				for (Map<String, Object> resultMapObject : resultList) {
 					String resultMapJsonObject = gson.toJson(resultMapObject);
 					JsonElement jsonElement = jsonParser.parse(resultMapJsonObject);
 					dataList.add(jsonElement.getAsJsonObject());
 				}
-				log.debug("Saving jobs in Neo4j. dataList size : " + dataList.size());
 				JsonObject graphResponse = dbHandler.executeQueryWithData(cypherQuery, dataList);
-				log.debug(" graphResponse  " + graphResponse);
 			} else {
 				log.error(" No result to store in neo4j for job : " + neo4jKpiDefinition.getName());
 			}
