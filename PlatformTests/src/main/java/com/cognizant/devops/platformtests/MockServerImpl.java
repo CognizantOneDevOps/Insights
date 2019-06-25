@@ -15,8 +15,6 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.mockserver.client.MockServerClient;
 
 import com.google.gson.Gson;
@@ -29,8 +27,6 @@ import com.google.gson.reflect.TypeToken;
  *
  */
 public class MockServerImpl {
-	
-	private static Logger log = LogManager.getLogger(MockServerImpl.class);
 	
 	public static void main(String[] args) {
 		
@@ -64,7 +60,6 @@ public class MockServerImpl {
 						);
 		}
 		System.out.println("Mock Server Started");
-		log.debug("Mock");
 	 }
 	
 	/**
