@@ -14,8 +14,8 @@
 # the License.
 #-------------------------------------------------------------------------------
 '''
-Created on Jun 16, 2016
-@author: 593714
+Created on Jun 13, 2019
+@author: 368419
 '''
 
 from __future__ import unicode_literals
@@ -27,19 +27,11 @@ import json, ast
 
 
 class AwsCodePipelineAgent(BaseAgent):
-    def process(self):
+    def process(self):       
         startFrom = self.config.get("startFrom", '')
         startFrom = parser.parse(startFrom)
         startFrom = startFrom.strftime('%Y-%m-%dT%H:%M:%S')
-        since = self.tracking.get('lastupdated', None)
-        if since == None:
-            lastUpdated = startFrom
-        else:
-            lastUpdated = since
-            since = parser.parse(since)
-            since = since.strftime('%Y-%m-%dT%H:%M:%S')
-            pattern = '%Y-%m-%dT%H:%M:%S'
-            since = int(time.mktime(time.strptime(since, pattern)))
+        
         accesskey = self.config.get("awsAccesskey", '')
         secretkey = self.config.get("awsSecretkey", '')
         regionName = self.config.get("awsRegion", '')
@@ -55,14 +47,14 @@ class AwsCodePipelineAgent(BaseAgent):
             res = str(response['pipelines'][n]['name'])
             pipeline.append(res)
         pipeline=list(set(pipeline))
+        
         for value in pipeline:            
             response = client.list_pipeline_executions(
                  pipelineName=value
-                 )
-            
-            injectData = {}
-            tracking_data = []
+                 )           
+                       
             since = self.tracking.get(value,None)
+            
             if since == None:
                 lastUpdated = startFrom
             else:
@@ -70,12 +62,14 @@ class AwsCodePipelineAgent(BaseAgent):
                 since = since.strftime('%Y-%m-%dT%H:%M:%S')
                 lastUpdated = since
            
-            if len(response['pipelineExecutionSummaries']) > 0:
-                date = str(response['pipelineExecutionSummaries'][0]['lastUpdateTime'])
-                date = parser.parse(date)
-                date = date.strftime('%Y-%m-%dT%H:%M:%S')
-                if since == None or date > since:                   
-                   for response in response['pipelineExecutionSummaries']:                       
+            if len(response['pipelineExecutionSummaries']) > 0:            
+                injectData = {}
+                tracking_data = []                                
+                for response in response['pipelineExecutionSummaries']:  
+                   date = str(response['lastUpdateTime'])
+                   date = parser.parse(date)
+                   date = date.strftime('%Y-%m-%dT%H:%M:%S')                                      
+                   if since == None or date > since:
                        injectData['pipelineName'] = value
                        injectData['status'] = str(response['status'])
                        injectData['jobId'] = str(response['pipelineExecutionId'])
@@ -87,10 +81,7 @@ class AwsCodePipelineAgent(BaseAgent):
                        injectData['startTime'] = start_f
                        pattern = '%Y-%m-%dT%H:%M:%S'
                        epoch = int(time.mktime(time.strptime(start_e,pattern)))
-                       injectData['startTimeepoch'] = epoch
-                       date = str(response['lastUpdateTime'])
-                       date = parser.parse(date)
-                       date = date.strftime('%Y-%m-%dT%H:%M:%S')
+                       injectData['startTimeepoch'] = epoch                   
                        injectData['lastUpdateTime'] = date
                        pattern = '%Y-%m-%dT%H:%M:%S'
                        date = int(time.mktime(time.strptime(date,pattern)))
@@ -98,11 +89,10 @@ class AwsCodePipelineAgent(BaseAgent):
                        string = ast.literal_eval(json.dumps(injectData))
                        tracking_data.append(string)
                        seq = [x['lastUpdateTime'] for x in tracking_data]
-                       fromDateTime = max(seq)
-                else:                   
-                   fromDateTime = lastUpdated
-            self.tracking[value] = fromDateTime            
-            if tracking_data!=[]:                
+                       lastUpdated = max(seq)                     
+            self.tracking[value] = lastUpdated  
+                      
+            if tracking_data!=[]:
                 self.publishToolsData(tracking_data)
                 self.updateTrackingJson(self.tracking)
 if __name__ == "__main__":
