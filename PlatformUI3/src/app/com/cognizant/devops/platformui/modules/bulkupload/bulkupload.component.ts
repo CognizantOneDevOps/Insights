@@ -25,7 +25,7 @@ import { DataSharedService } from '@insights/common/data-shared-service';
 import { count } from 'rxjs/operators';
 import { FormGroup, FormBuilder, Validators, FormControl, FormArray, NgForm } from '@angular/forms'
 import { BulkUploadService } from './bulkupload.service';
-import { MatAutocompleteModule, MatInputModule } from '@angular/material';
+import { MatAutocompleteModule, MatInputModule, MatProgressBarModule, ProgressBarModule } from '@angular/material';
 import { element } from '../../../../../../../../node_modules/@angular/core/src/render3/instructions';
 //import { Control} from '@angular/common';
 
@@ -39,7 +39,7 @@ export class BulkUploadComponent implements OnInit {
 
     rows: FormArray;
     toolsArr = [];
-    labelsArr: any;
+    labelsArr = [];
     toolsDetail = [];
     toolVersionData: any;
     versionList = [];
@@ -49,15 +49,20 @@ export class BulkUploadComponent implements OnInit {
     fileNameSaveEnable: boolean = false;
     refresh: boolean = false;
     selectedTool = [];
+    selectedLabel = [];
     lableName = [];
     labelName: any;
+    uploadForm: FormGroup;
+    successIconEnable: boolean = false;
+    failIconEnable: boolean = false;
 
     dataarr = []
     constructor(private fb: FormBuilder, private router: Router, private dialog: MatDialog, public messageDialog: MessageDialogService, private dataShare: DataSharedService, private bulkuploadService: BulkUploadService) {
 
         this.rows = this.fb.array([]);
-        for (let number of [1]) {
+        for (let number of [1, 2, 3, 4, 5]) {
             this.rows.push(this.createItemFormGroup());
+
         }
     }
     ngOnInit() {
@@ -66,14 +71,17 @@ export class BulkUploadComponent implements OnInit {
     onAddRow() {
 
         this.rows.push(this.createItemFormGroup());
+        console.log(this.rows.value)
 
     }
     createItemFormGroup(): FormGroup {
-
+        const fileFormData = new FormData();
         return this.fb.group({
             toolName: null,
             labelName: null,
-            fileName: null
+            fileName: null,
+            fileFormData: null,
+            status: null
         });
     }
     async getLabelTools() {
@@ -88,17 +96,18 @@ export class BulkUploadComponent implements OnInit {
             for (var element of this.toolsDetail) {
                 var toolName = (element.toolName);
                 var labelName = (element.label);
-                console.log(labelName)
+                //  console.log(labelName)
                 this.toolsArr.push(toolName);
             }
         }
         catch (error) {
-            console.log(error);
+            //  console.log(error);
         }
     }
 
-    onFileChanged(event) {
+    onFileChanged(event, row) {
         this.selectedFile = <File>event.target.files[0];
+        row.value.fileFormData = <File>event.target.files[0];
     }
     toolNameenableSave() {
         this.toolNameSaveEnable = true;
@@ -115,64 +124,134 @@ export class BulkUploadComponent implements OnInit {
     uploadFile() {
         this.toolNameSaveEnable = true;
     }
-    onToolSelect(toolname): void {
+    onToolSelect(toolname, index, row): void {
+        //console.log(row.value)
+        for (let element of this.rows.value) {
+            // console.log(element);
+        }
         var self = this;
         if (toolname === undefined) {
         }
         else {
-            for (let key of this.toolsDetail) {
-                console.log(key)
-                console.log(this.toolsArr)
-                if (key.toolName = toolname) {
-                    var labelname = this.toolsArr.indexOf(toolname)
-                    console.log(labelname)
-                    this.labelsArr = this.toolsDetail[labelname].label;
-                    console.log(this.labelsArr)
-                }
+            var i = 0;
+            // for (let key of this.toolsDetail) {
 
-            }
+            //  console.log(key)
+            //  console.log(this.toolsArr)
+            // if (key.toolName = toolname) {
+            var labelnameIndex = this.toolsArr.indexOf(toolname)
+            console.log(labelnameIndex)
+
+            this.labelsArr[index] = this.toolsDetail[labelnameIndex].label;
+            row.value.labelName = this.toolsDetail[labelnameIndex].label;
+            // i = i + 1;
+            //  }
+
+            // }
+            //this.labelsArr.push(this.toolsDetail[labelnameIndex].label);
+            console.log(this.labelsArr)
 
         }
-
+        //console.log(row.value)
 
     }
     async saveData() {
 
         var rowcount = 0;
-        const fd = new FormData();
+
+        console.log(this.fileNameSaveEnable)
+        console.log(this.rows.value);
         for (let element of this.rows.value) {
+            console.log(element);
+            var fd = new FormData();
             var toolName = (element.toolName);
             var labelName = (element.labelName);
             var fileName = element.fileName;
+            console.log(element.fileName)
+
+            var bytes = element.fileFormData["size"];
+            var testFileExt = this.checkFile(element.fileFormData, ".csv");
+            element.status = 'Pending';
+            var fileData = element.fileFormData;
             if ((toolName == null)) {
                 if (element.fileName == null) {
                     rowcount = 0
                     break;
                 }
                 else {
-                    console.log(element.toolName)
+                    // console.log(element.toolName)
                     rowcount = rowcount + 1;
                     break;
                 }
 
             }
             else if (element.fileName == null) {
-                console.log(element.toolName)
+                // console.log(element.toolName)
                 rowcount = rowcount + 1;
                 break;
 
             }
-        }
-        if (rowcount == 0) {
 
-            fd.append('file', this.selectedFile, this.selectedFile.name);
-            console.log(this.selectedFile)
-            console.log(this.selectedFile.name)
-            let upload = await this.bulkuploadService.uploadFile(fd, toolName, labelName);
-            this.messageDialog.showApplicationsMessage("You have successfully uploaded the file to Neo4J", "SUCCESS");
+            if (rowcount == 0) {
+
+                if (bytes > 1048576) {
+                    // this.size = true
+                    this.messageDialog.showApplicationsMessage("Please select a of file size less than 2MB.", "ERROR");
+                    element.status = 'Fail'
+                } else if (!testFileExt) {
+                    this.messageDialog.showApplicationsMessage("Please select a valid .CSV file", "ERROR");
+                    element.status = 'Fail'
+                }
+                else {
+                    fd.append('file', fileData, fileData.name);
+                    //   console.log(this.selectedFile)
+                    //  console.log(this.selectedFile.name)
+                    setTimeout(() => {
+                        //self.showThrobber = false;
+                        //self.router.navigate(['/InSights/Home']);
+                        ''
+                    }, 2000);
+
+
+                    let upload = await this.bulkuploadService.uploadFile(fd, toolName, labelName);
+                    console.log(upload)
+                    if (upload.status == 'success') {
+                        element.status = 'Success'
+                        this.messageDialog.showApplicationsMessage("You have successfully uploaded the file to Neo4J", "SUCCESS");
+                        // this.successIconEnable = true;
+
+                    }
+                    else {
+                        element.status = 'Fail'
+                        //  this.failIconEnable = true;
+                    }
+                }
+
+
+
+
+
+
+
+
+            }
+            else {
+                this.messageDialog.showApplicationsMessage("Please select file", "ERROR");
+            }
         }
-        else {
-            this.messageDialog.showApplicationsMessage("Please select file", "ERROR");
+
+    }
+
+    checkFile(sender, validExts) {
+        if (sender) {
+            var fileExt = sender.name;
+            fileExt = fileExt.substring(fileExt.lastIndexOf('.'));
+            fileExt = fileExt.toLowerCase();
+            if (validExts.indexOf(fileExt) < 0 && fileExt != "") {
+                return false;
+            } else {
+                return true;
+            }
         }
     }
 
