@@ -268,7 +268,7 @@ public class InferenceConfigDefinition implements Serializable {
 
 	@Override
 	public String toString() {
-		return "Neo4jKPIDefinition [kpiID=" + kpiID + ", name=" + name + ", expectedTrend=" + expectedTrend
+		return "KPIDefinition [kpiID=" + kpiID + ", name=" + name + ", expectedTrend=" + expectedTrend
 				+ ", action=" + action + ", schedule=" + schedule + ", startTimeField=" + startTimeField
 				+ ", endTimeField=" + endTimeField + ", aggregatedResult=" + aggregatedResult + ", timeFormat="
 				+ timeFormat + ", durationField=" + durationField + ", resultOutPutType=" + resultOutPutType

@@ -30,7 +30,6 @@ import org.mockito.junit.MockitoRule;
 
 import com.cognizant.devops.platformcommons.config.ApplicationConfigCache;
 import com.cognizant.devops.platforminsights.configs.ConfigConstants;
-import com.cognizant.devops.platforminsights.core.CountActionImpl;
 
 public class CountActionImplTest {
 	@Mock

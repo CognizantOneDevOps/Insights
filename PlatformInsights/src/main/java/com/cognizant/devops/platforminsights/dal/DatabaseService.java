@@ -1,4 +1,4 @@
-package com.cognizant.devops.platforminsights.core.function;
+package com.cognizant.devops.platforminsights.dal;
 
 import java.util.List;
 import java.util.Map;
