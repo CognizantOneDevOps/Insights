@@ -415,6 +415,7 @@ export class UserOnboardingComponent implements OnInit {
     this.username = null;
     this.email = null;
     this.names = null;
+    this.role = null;
     this.searchOrgForUser = null;
     console.log(this.rows.value)
     this.searchUser = null;
@@ -602,6 +603,13 @@ export class UserOnboardingComponent implements OnInit {
     this.showDetail2 = true;
     this.showCancel = false;
   }
+
+  trackEvent = function(event) {
+    if(event.key === 'Enter') {
+      this.searchData(this.searchUser, this.selectedAdminOrg)
+    }
+  }
+
 }
 
 
