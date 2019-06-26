@@ -20,12 +20,12 @@ import java.io.Serializable;
 import com.cognizant.devops.platformcommons.core.enums.ExecutionActions;
 import com.cognizant.devops.platformcommons.core.enums.JobSchedule;
 
-public class KPIDefinition implements Serializable {
+public class InferenceConfigDefinition implements Serializable {
 
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = -7825944051938279127L;
+	private static final long serialVersionUID = -7825944051560318074L;
 
 	private Integer kpiID;
 	private String name;
@@ -39,7 +39,6 @@ public class KPIDefinition implements Serializable {
 	private String durationField;
 	private String resultOutPutType;
 	private boolean isComparisionKpi;
-
 	private boolean isGroupBy;
 	private String vector;
 	private String toolName;
@@ -47,12 +46,13 @@ public class KPIDefinition implements Serializable {
 	private String groupByField;
 	private String averageField;
 	private String sumCalculationField;
-
 	private String dbType;
 	private String dataQuery;
-	private String esquery;
-
-	private String esResource;
+	private String neo4jQuery;
+	private String neo4jLabel;
+	private String nextRun;
+	private Long lastRunTime;
+	private boolean isActive;
 
 	public Integer getKpiID() {
 		return kpiID;
@@ -158,6 +158,22 @@ public class KPIDefinition implements Serializable {
 		this.isGroupBy = isGroupBy;
 	}
 
+	public String getVector() {
+		return vector;
+	}
+
+	public void setVector(String vector) {
+		this.vector = vector;
+	}
+
+	public String getToolName() {
+		return toolName;
+	}
+
+	public void setToolName(String toolName) {
+		this.toolName = toolName;
+	}
+
 	public String getGroupByFieldName() {
 		return groupByFieldName;
 	}
@@ -190,22 +206,6 @@ public class KPIDefinition implements Serializable {
 		this.sumCalculationField = sumCalculationField;
 	}
 
-	public String getVector() {
-		return vector;
-	}
-
-	public void setVector(String vector) {
-		this.vector = vector;
-	}
-
-	public String getToolName() {
-		return toolName;
-	}
-
-	public void setToolName(String toolName) {
-		this.toolName = toolName;
-	}
-
 	public String getDbType() {
 		return dbType;
 	}
@@ -222,19 +222,61 @@ public class KPIDefinition implements Serializable {
 		this.dataQuery = dataQuery;
 	}
 
-	public String getEsquery() {
-		return esquery;
+	public String getNeo4jQuery() {
+		return neo4jQuery;
 	}
 
-	public void setEsquery(String esquery) {
-		this.esquery = esquery;
+	public void setNeo4jQuery(String neo4jquery) {
+		this.neo4jQuery = neo4jquery;
 	}
 
-	public String getEsResource() {
-		return esResource;
+	public String getNeo4jLabel() {
+		return neo4jLabel;
 	}
 
-	public void setEsResource(String esResource) {
-		this.esResource = esResource;
+	public void setNeo4jLabel(String neo4jLabel) {
+		this.neo4jLabel = neo4jLabel;
 	}
+
+	public static long getSerialversionuid() {
+		return serialVersionUID;
+	}
+
+	public String getNextRun() {
+		return nextRun;
+	}
+
+	public void setNextRun(String nextRun) {
+		this.nextRun = nextRun;
+	}
+
+	public Long getLastRunTime() {
+		return lastRunTime;
+	}
+
+	public void setLastRunTime(Long lastRunTime) {
+		this.lastRunTime = lastRunTime;
+	}
+
+	public boolean isActive() {
+		return isActive;
+	}
+
+	public void setActive(boolean isActive) {
+		this.isActive = isActive;
+	}
+
+	@Override
+	public String toString() {
+		return "Neo4jKPIDefinition [kpiID=" + kpiID + ", name=" + name + ", expectedTrend=" + expectedTrend
+				+ ", action=" + action + ", schedule=" + schedule + ", startTimeField=" + startTimeField
+				+ ", endTimeField=" + endTimeField + ", aggregatedResult=" + aggregatedResult + ", timeFormat="
+				+ timeFormat + ", durationField=" + durationField + ", resultOutPutType=" + resultOutPutType
+				+ ", isComparisionKpi=" + isComparisionKpi + ", isGroupBy=" + isGroupBy + ", vector=" + vector
+				+ ", toolName=" + toolName + ", groupByFieldName=" + groupByFieldName + ", groupByField=" + groupByField
+				+ ", averageField=" + averageField + ", sumCalculationField=" + sumCalculationField + ", dbType="
+				+ dbType + ", dataQuery=" + dataQuery + ", neo4jQuery=" + neo4jQuery + ", neo4jLabel=" + neo4jLabel
+				+ ", nextRun=" + nextRun + ", lastRunTime=" + lastRunTime + ", isActive=" + isActive + "]";
+	}
+
 }

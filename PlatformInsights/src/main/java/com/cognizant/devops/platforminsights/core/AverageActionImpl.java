@@ -13,26 +13,28 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  ******************************************************************************/
-package com.cognizant.devops.platforminsights.core.function;
+package com.cognizant.devops.platforminsights.core;
 
-import java.util.Map;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
-// import org.apache.spark.api.java.function.Function;
+import com.cognizant.devops.platforminsights.datamodel.InferenceConfigDefinition;
+import com.cognizant.devops.platforminsights.exception.InsightsJobFailedException;
 
-// import scala.Tuple2;
 
-public class ESAverageMapFunction { // implements Function<Tuple2<String, Map<String, Object>>, Map<String, Object>>
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 8848970844000999881L;
+public class AverageActionImpl extends BaseActionImpl {
+	
+	private static Logger log = LogManager.getLogger(AverageActionImpl.class);
 
-	/*@Override
-	public Map<String, Object> call(Tuple2<String, Map<String, Object>> v1) throws Exception {
-		Map<String, Object> data = v1._2;
-		System.out.println(data.toString());
-		return data;
-	}*/
+	public AverageActionImpl(InferenceConfigDefinition neo4jKpiDefinition) {
+		super(neo4jKpiDefinition);
+	}
+
+
+	@Override
+	protected void execute() throws InsightsJobFailedException {
+		executeNeo4jGraphQuery();
+	}
 
 }

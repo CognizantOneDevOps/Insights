@@ -18,14 +18,5 @@ package com.cognizant.devops.platforminsights.configs;
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 
 public interface ConfigConstants {
-	String APP_NAME = ApplicationConfigProvider.getInstance().getSparkConfigurations().getAppName();
-	String MASTER = ApplicationConfigProvider.getInstance().getSparkConfigurations().getMaster();
-	String SPARK_EXECUTOR_MEMORY = ApplicationConfigProvider.getInstance().getSparkConfigurations().getSparkExecutorMemory();
-	String SPARK_ES_HOST = ApplicationConfigProvider.getInstance().getSparkConfigurations().getSparkElasticSearchHost();
-	String SPARK_ES_PORT = ApplicationConfigProvider.getInstance().getSparkConfigurations().getSparkElasticSearchPort();
-	String SPARK_ES_CONFIGINDEX = ApplicationConfigProvider.getInstance().getSparkConfigurations().getSparkElasticSearchConfigIndex();
-	String SPARK_ES_RESULTINDEX = ApplicationConfigProvider.getInstance().getSparkConfigurations().getSparkElasticSearchResultIndex();
-	String KPISIZE = ApplicationConfigProvider.getInstance().getSparkConfigurations().getKpiSize();
-	Long SPARK_RESULT_SINCE = ApplicationConfigProvider.getInstance().getSparkConfigurations().getSparkResultSince();
-	String SPARK_TIMEZONE = ApplicationConfigProvider.getInstance().getInsightsTimeZone();
+
 }

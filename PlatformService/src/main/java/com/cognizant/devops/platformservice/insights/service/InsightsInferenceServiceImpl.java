@@ -339,7 +339,7 @@ public class InsightsInferenceServiceImpl implements InsightsInferenceService {
 		if (!"".equalsIgnoreCase(vectorType)) {
 			cypherQuery = cypherQuery + " and n.vector='" + vectorType + "' ";
 		}
-		cypherQuery = cypherQuery + " RETURN n ";
+		cypherQuery = cypherQuery + " RETURN n  order by n.kpiID,n.resultTime desc ";
 		return cypherQuery;
 	}
 

@@ -13,12 +13,9 @@ import org.quartz.JobExecutionException;
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
 import com.cognizant.devops.platformcommons.core.enums.ExecutionActions;
 import com.cognizant.devops.platformcommons.core.util.InsightsUtils;
-import com.cognizant.devops.platforminsights.core.avg.AverageActionImpl;
-import com.cognizant.devops.platforminsights.core.count.CountActionImpl;
-import com.cognizant.devops.platforminsights.core.function.Neo4jDBImp;
-import com.cognizant.devops.platforminsights.core.minmax.MinMaxActionImpl;
-import com.cognizant.devops.platforminsights.core.sum.SumActionImpl;
-import com.cognizant.devops.platforminsights.datamodel.Neo4jKPIDefinition;
+import com.cognizant.devops.platforminsights.core.function.DatabaseService;
+import com.cognizant.devops.platforminsights.core.function.Neo4jDBImpl;
+import com.cognizant.devops.platforminsights.datamodel.InferenceConfigDefinition;
 import com.cognizant.devops.platforminsights.exception.InsightsJobFailedException;
 
 public class InferenceJobExecutor implements Job, Serializable {
@@ -40,15 +37,16 @@ public class InferenceJobExecutor implements Job, Serializable {
 	private void startExecution() throws JobExecutionException {
 		log.debug("Starting Spark Jobs Execution");
 		try {
-			Neo4jDBImp neo4jImpl = new Neo4jDBImp();
-			List<Neo4jKPIDefinition> jobsFromNeo4j = neo4jImpl.readKPIJobsFromNeo4j();
-			List<Neo4jKPIDefinition> updatedJobs = new ArrayList<Neo4jKPIDefinition>();
+			DatabaseService neo4jImpl = new Neo4jDBImpl();
+			List<InferenceConfigDefinition> jobsFromNeo4j = neo4jImpl.readKPIJobs();
+			List<InferenceConfigDefinition> updatedJobs = new ArrayList<InferenceConfigDefinition>();
 			//log.debug("  jobsFromNeo4j " + jobsFromNeo4j);
-			for (Neo4jKPIDefinition neo4jJob : jobsFromNeo4j) {
+			for (InferenceConfigDefinition neo4jJob : jobsFromNeo4j) {
 				try {
 					if (!(neo4jJob.isActive()
 							&& isJobScheduledToRun(neo4jJob.getLastRunTime(), neo4jJob.getSchedule().toString()))) {
-						log.debug(" Job not run because last run time is less than scheduled " + neo4jJob.getName()
+						log.debug(" Job not run because last run time is greater than scheduled Time"
+								+ neo4jJob.getName()
 								+ "  kpiId " + neo4jJob.getKpiID());
 						continue;
 					} else {
@@ -71,22 +69,22 @@ public class InferenceJobExecutor implements Job, Serializable {
 		}
 	}
 
-	private void executeJob(Neo4jKPIDefinition neo4jKpiDefinition) throws InsightsJobFailedException {
+	private void executeJob(InferenceConfigDefinition neo4jKpiDefinition) throws InsightsJobFailedException {
 		log.debug(" KPI action found as ==== " + neo4jKpiDefinition.getAction() + " KPI Name is ==== "
 				+ neo4jKpiDefinition.getName());
 		if (!neo4jKpiDefinition.getNeo4jQuery().equalsIgnoreCase("")) {
 			if (ExecutionActions.AVERAGE == neo4jKpiDefinition.getAction()) {
 				BaseActionImpl impl = new AverageActionImpl(neo4jKpiDefinition);
-				impl.executeNeo4jGraphQuery();
+				impl.execute();
 			} else if (ExecutionActions.COUNT == neo4jKpiDefinition.getAction()) {
 				BaseActionImpl impl = new CountActionImpl(neo4jKpiDefinition);
-				impl.executeNeo4jGraphQuery();
+				impl.execute();
 			} else if (ExecutionActions.MINMAX == neo4jKpiDefinition.getAction()) {
 				BaseActionImpl impl = new MinMaxActionImpl(neo4jKpiDefinition);
-				impl.executeNeo4jGraphQuery();
+				impl.execute();
 			} else if (ExecutionActions.SUM == neo4jKpiDefinition.getAction()) {
 				BaseActionImpl impl = new SumActionImpl(neo4jKpiDefinition);
-				impl.executeNeo4jGraphQuery();
+				impl.execute();
 			} else {
 				log.error(" No calculation methon defined for KIP " + neo4jKpiDefinition.getName() + " With Id "
 						+ +neo4jKpiDefinition.getKpiID());
