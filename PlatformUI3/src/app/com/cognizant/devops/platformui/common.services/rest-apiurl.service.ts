@@ -86,18 +86,18 @@ export class RestAPIurlService implements IRestAPIUrlService {
         this.addEndPoint("INSIGHTS_LOG", '/PlatformService/insights/log');
 
         //Audit Reporting
-        this.addEndPoint("GET_ALL_ASSETS", '/PlatformAuditService/traceability/getAllAssets');
-        this.addEndPoint("GET_ASSET_INFO", '/PlatformAuditService/traceability/getAssetInfo');
-        this.addEndPoint("GET_ASSET_HISTORY", '/PlatformAuditService/traceability/getAssetHistory');
-        this.addEndPoint("EXPORT_TO_PDF", '/PlatformAuditService/traceability/getAuditReport');
-        this.addEndPoint("GET_PROCESS_JSON", '/PlatformAuditService/traceability/getProcessFlow');
+        this.addEndPoint("GET_ALL_ASSETS", '/PlatformService/traceability/getAllAssets');
+        this.addEndPoint("GET_ASSET_INFO", '/PlatformService/traceability/getAssetInfo');
+        this.addEndPoint("GET_ASSET_HISTORY", '/PlatformService/traceability/getAssetHistory');
+        this.addEndPoint("EXPORT_TO_PDF", '/PlatformService/traceability/getAuditReport');
+        this.addEndPoint("GET_PROCESS_JSON", '/PlatformService/traceability/getProcessFlow');
 
         this.addEndPoint("CREATE_UPDATE_CYPHER_QUERY", '/PlatformService/blockchain/queryBuilder/createQuery');
         this.addEndPoint("FETCH_CYPHER_QUERY", '/PlatformService/blockchain/queryBuilder/fetchQueries');
         this.addEndPoint("DELETE_CYPHER_QUERY", '/PlatformService/blockchain/queryBuilder/deleteQuery');
         this.addEndPoint("UPLOAD_QUERY_FILE", '/PlatformService/blockchain/queryBuilder/uploadFile');
         this.addEndPoint("DOWNLOAD_CYPHER_QUERY", '/PlatformService/blockchain/queryBuilder/getFileContents');
-        this.addEndPoint("TEST_QUERY", '/PlatformAuditService/traceability/testQuery');
+        this.addEndPoint("TEST_QUERY", '/PlatformService/traceability/testQuery');
         this.addEndPoint("CO_RELATIONSHIP_JSON", '/PlatformService/admin/correlationbuilder/getCorrelationJson');
         this.addEndPoint("CO_RELATIONSHIP_JSON_NEO4J", '/PlatformService/admin/correlationbuilder/getNeo4jJson');
         this.addEndPoint("SAVE_RELATIONSHIP_JSON", '/PlatformService/admin/correlationbuilder/saveConfig');

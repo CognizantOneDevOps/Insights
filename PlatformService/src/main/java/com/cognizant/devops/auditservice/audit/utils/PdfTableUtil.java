@@ -442,8 +442,9 @@ public class PdfTableUtil {
 		float yStart = yStartNewPage;
 		float bottomMargin = 70;
 
-		ClassLoader classLoader = getClass().getClassLoader();
-		File staticFile = new File(classLoader.getResource("static/static.xml").getFile());
+		//ClassLoader classLoader = getClass().getClassLoader();
+		//File staticFile = new File(classLoader.getResource("static/static.xml").getFile());
+		File staticFile = new File(PDF_PATH+"static/static.xml").getAbsoluteFile();
 		JAXBContext jaxbContext = JAXBContext.newInstance(PdfStaticContent.class);
 
 		Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
