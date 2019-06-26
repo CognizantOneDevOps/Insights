@@ -5,6 +5,3 @@
 */target/*
 *.log
 *.gitignore
-*/PlatformAuditing/*
-*/PlatformAuditEngine/*
-*/PlatformService/src/main/java/com/cognizant/devops/auditservice/*
