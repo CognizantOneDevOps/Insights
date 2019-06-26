@@ -62,7 +62,7 @@ public class Neo4jDBImpl implements DatabaseService {
 		List<Map<String, Object>> resultList = new ArrayList<>();
 		try {
 			String graphQuery = inferenceConfigDefinition.getNeo4jQuery();
-			//graphQuery = getNeo4jQueryWithDates(inferenceConfigDefinition.getSchedule(), graphQuery);
+			graphQuery = getNeo4jQueryWithDates(inferenceConfigDefinition.getSchedule(), graphQuery);
 			log.debug("Database type found to be Neo4j and graphQuery with date is === " + graphQuery);
 			GraphResponse graphResp = graphDBHandler.executeCypherQuery(graphQuery);
 			JsonArray errorMessage = graphResp.getJson().getAsJsonArray("errors");
