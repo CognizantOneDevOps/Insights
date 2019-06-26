@@ -101,9 +101,7 @@ export class UserOnboardingComponent implements OnInit {
     { value: 'Viewer', name: 'Viewer' }
   ];
 
-  constructor(private fb: FormBuilder, public router: Router, private userOnboardingService: UserOnboardingService, private sanitizer: DomSanitizer,
-    public dialog: MatDialog, public messageDialog: MessageDialogService, private dataShare: DataSharedService) {
-    var self = this;
+  userForm() {
     this.rows = this.fb.array([]);
     for (let number of [1, 2, 3, 4, 5]) {
       if (number % 2 == 0) {
@@ -115,6 +113,11 @@ export class UserOnboardingComponent implements OnInit {
       this.rows.push(this.createItemFormGroup(this.rowcss));
       // console.log(this.rowcss)
     }
+  }
+  constructor(private fb: FormBuilder, public router: Router, private userOnboardingService: UserOnboardingService, private sanitizer: DomSanitizer,
+    public dialog: MatDialog, public messageDialog: MessageDialogService, private dataShare: DataSharedService) {
+    var self = this;
+    this.userForm();
     this.framesize = window.frames.innerHeight;
     var orgId2 = this.dataShare.getStoragedProperty("orgId");
     var receiveMessage = function (evt) {
@@ -458,6 +461,8 @@ export class UserOnboardingComponent implements OnInit {
     this.searchOrgForUser = null;
     console.log(this.rows.value)
     this.searchUser = null;
+    this.showCancel = false;
+    this.userForm();
 
 
   }
@@ -471,6 +476,7 @@ export class UserOnboardingComponent implements OnInit {
     this.assignRadioSelected = false;
     this.assignuserSaveEnable = false;
     this.searchOrgForUser = null;
+    this.showCancel = true;
 
   }
   assignuserenableSave() {
@@ -487,6 +493,7 @@ export class UserOnboardingComponent implements OnInit {
     this.email = null;
     this.names = null;
     this.searchUser = null;
+    this.showCancel = true;
   }
 
   searchData(searchUser, selectedAdminOrg) {
@@ -625,11 +632,12 @@ export class UserOnboardingComponent implements OnInit {
     }
   }
   addGlobalUser() {
-    this.showCancel = true;
+    //this.showCancel = true;
     this.showAssignUserDetail = true;
     this.showAddUserDetail = true;
     this.showDetail = false;
-    this.showDetail2 = false
+    this.showDetail2 = false;
+    
   }
 
   /*Method to redirect to Configuration | Group & Users Management page*/
