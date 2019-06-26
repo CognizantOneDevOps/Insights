@@ -23,7 +23,7 @@ import org.apache.logging.log4j.Logger;
 import com.cognizant.devops.platformcommons.core.enums.JobSchedule;
 import com.cognizant.devops.platformcommons.core.util.InsightsUtils;
 import com.cognizant.devops.platformcommons.dal.neo4j.Neo4jDBHandler;
-import com.cognizant.devops.platforminsights.core.function.Neo4jDBImpl;
+import com.cognizant.devops.platforminsights.dal.Neo4jDBImpl;
 import com.cognizant.devops.platforminsights.datamodel.InferenceConfigDefinition;
 import com.cognizant.devops.platforminsights.exception.InsightsJobFailedException;
 import com.google.gson.Gson;
@@ -33,7 +33,7 @@ public abstract class BaseActionImpl {
 
 	private static Logger log = LogManager.getLogger(BaseActionImpl.class);
 
-	protected InferenceConfigDefinition neo4jKpiDefinition;
+	protected InferenceConfigDefinition kpiDefinition;
 	Neo4jDBHandler dbHandler = new Neo4jDBHandler();
 	Gson gson = new Gson();
 	JsonParser jsonParser = new JsonParser();
@@ -42,8 +42,8 @@ public abstract class BaseActionImpl {
 
 	}
 
-	public BaseActionImpl(InferenceConfigDefinition neo4jKpiDefinition) {
-		this.neo4jKpiDefinition = neo4jKpiDefinition;
+	public BaseActionImpl(InferenceConfigDefinition kpiDefinition) {
+		this.kpiDefinition = kpiDefinition;
 	}
 
 
@@ -59,17 +59,14 @@ public abstract class BaseActionImpl {
 	}
 
 	protected void executeNeo4jGraphQuery() {
-		//if (kpiDefinition.getDbType().equalsIgnoreCase("neo4j")) {
 		try {
-			Neo4jDBImpl graphDb = new Neo4jDBImpl(neo4jKpiDefinition);
+			Neo4jDBImpl graphDb = new Neo4jDBImpl(kpiDefinition);
 			List<Map<String, Object>> graphResposne = graphDb.getResult();
-			//log.debug(" graphResposne  " + graphResposne);
 			graphDb.saveResult(graphResposne);
 
 		} catch (Exception e) {
-			log.error("Sum calculation job failed for kpiID - " + neo4jKpiDefinition.getKpiID(), e);
+			log.error("Sum calculation job failed for kpiID - " + kpiDefinition.getKpiID(), e);
 		}
-		//}
 	}
 
 	protected Map<String, Object> executeESQuery() {

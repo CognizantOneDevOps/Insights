@@ -13,20 +13,27 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  ******************************************************************************/
-package com.cognizant.devops.platforminsights.core.avg;
+package com.cognizant.devops.platforminsights.core.count;
 
-// import org.apache.spark.api.java.function.Function2;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
-public class CombineAverage { //implements Function2<Average, Average, Average>
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 3620814382510494699L;
+import com.cognizant.devops.platforminsights.core.BaseActionImpl;
+import com.cognizant.devops.platforminsights.datamodel.InferenceConfigDefinition;
+import com.cognizant.devops.platforminsights.exception.InsightsJobFailedException;
 
-	//@Override
-	public Average call(Average a, Average b) {
-		a.total_ += b.total_;
-		a.num_ += b.num_;
-		return a;
+public class CountActionImpl extends BaseActionImpl {
+
+	private static final Logger log = LogManager.getLogger(CountActionImpl.class);
+
+
+	public CountActionImpl(InferenceConfigDefinition kpiDefinition) {
+		super(kpiDefinition);
 	}
+
+	@Override
+	protected void execute() throws InsightsJobFailedException {
+		executeNeo4jGraphQuery();
+	}
+
 }

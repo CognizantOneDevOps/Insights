@@ -29,30 +29,6 @@
 			<artifactId>gson</artifactId>
 			<version>2.8.5</version>
 		</dependency>
-
-		<!-- <dependency>
-			<groupId>org.elasticsearch</groupId>
-			<artifactId>elasticsearch-spark-20_2.11</artifactId>
-			<version>5.6.16</version>
-		</dependency> -->
-		<!-- <dependency>
-			<groupId>graphframes</groupId>
-			<artifactId>graphframes</artifactId>
-			<version>0.7.0-spark2.4-s_2.11</version>
-		</dependency> -->
-
-		<!-- <dependency>
-			<groupId>neo4j-contrib</groupId>
-			<artifactId>neo4j-spark-connector</artifactId>
-			<version>2.4.0-M6</version>
-		</dependency> -->
-
-		<!-- <dependency>
-			<groupId>org.apache.spark</groupId>
-			<artifactId>spark-sql_2.11</artifactId>
-			<version>2.4.3</version>
-		</dependency> -->
-
 		<dependency>
 			<groupId>org.quartz-scheduler</groupId>
 			<artifactId>quartz</artifactId>
@@ -64,7 +40,6 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
-
 		<dependency>
 			<groupId>com.mchange</groupId>
 			<artifactId>c3p0</artifactId>
@@ -80,40 +55,11 @@
 			<artifactId>log4j-api</artifactId>
 			<version>2.11.2</version>
 		</dependency>
-		<!-- <dependency> <groupId>com.cognizant.devops</groupId> <artifactId>PlatformCommons</artifactId> 
-			<version>5.1</version> </dependency> -->
 		<dependency>
 			<groupId>org.apache.logging.log4j</groupId>
 			<artifactId>log4j-core</artifactId>
 			<version>2.11.2</version>
 		</dependency>
-		<!-- <dependency>
-			<groupId>org.apache.zookeeper</groupId>
-			<artifactId>zookeeper</artifactId>
-			<version>3.4.14</version>
-		</dependency> -->
-		
-		<!-- <dependency>
-		    <groupId>org.apache.spark</groupId>
-		    <artifactId>spark-core_2.12</artifactId>
-		    <version>2.4.3</version>
-		</dependency> -->
-		
-		<!-- <dependency> <groupId>com.fasterxml.jackson.core</groupId> <artifactId>jackson-databind</artifactId> 
-			<version>2.9.8</version> </dependency> -->
-		<!-- <dependency>
-			<groupId>org.apache.spark</groupId>
-			<artifactId>spark-streaming_2.12</artifactId>
-			<version>2.4.3</version>
-		</dependency> -->
-		<!-- <dependency> <groupId>org.apache.spark</groupId> <artifactId>spark-streaming_2.12</artifactId> -->
-		<!--<version>1.5.1</version> -->
-		<!-- <version>2.4.1</version> <exclusions> <exclusion> <groupId>org.apache.hadoop</groupId> 
-			<artifactId>hadoop-client</artifactId> </exclusion> </exclusions> </dependency> -->
-		<!-- https://mvnrepository.com/artifact/org.apache.hadoop/hadoop-mapreduce-client-core -->
-		<!-- <dependency> <groupId>org.apache.hadoop</groupId> <artifactId>hadoop-client</artifactId> 
-			<version>3.2.0</version> </dependency> -->
-
 		<dependency>
 			<groupId>org.mockito</groupId>
 			<artifactId>mockito-all</artifactId>
@@ -126,65 +72,11 @@
 			<version>4.12</version>
 			<scope>test</scope>
 		</dependency>
-		<!-- <dependency>
-			<groupId>org.mockito</groupId>
-			<artifactId>mockito-core</artifactId>
-			<version>2.26.0</version>
-			<scope>test</scope>
-		</dependency> -->
-		<!-- <dependency>
-			<groupId>org.apache.velocity</groupId>
-			<artifactId>velocity</artifactId>
-			<version>1.7</version>
-		</dependency> -->
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-web</artifactId>
 			<version>${spring.version}</version>
 		</dependency>
-		<!-- 
-		<dependency>
-			<groupId>com.fasterxml.jackson.core</groupId>
-			<artifactId>jackson-databind</artifactId>
-			<version>2.9.9</version>
-		</dependency>
-		<dependency>
-			<groupId>com.fasterxml.jackson.core</groupId>
-			<artifactId>jackson-annotations</artifactId>
-			<version>2.9.9</version>
-		</dependency>
-		<dependency>
-			<groupId>com.fasterxml.jackson.core</groupId>
-			<artifactId>jackson-core</artifactId>
-			<version>2.9.9</version>
-		</dependency> -->
-		<!-- <dependency>
-			<groupId>net.java.dev.jets3t</groupId>
-			<artifactId>jets3t</artifactId>
-			<version>0.9.4</version>
-			<exclusions>
-				<exclusion>
-					<groupId>org.bouncycastle</groupId>
-					<artifactId>bcprov-jdk15on</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>org.apache.httpcomponents</groupId>
-					<artifactId>httpclient</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>org.apache.httpcomponents</groupId>
-					<artifactId>httpcore</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency> -->
-
-		<!-- <dependency>
-			<groupId>org.bouncycastle</groupId>
-			<artifactId>bcprov-jdk15on</artifactId>
-			<version>1.61</version>
-		</dependency> -->
-		<!-- <dependency> <groupId>org.apache.httpcomponents</groupId> <artifactId>httpclient</artifactId> 
-			<version>4.5.8</version> </dependency> -->
 		<dependency>
 			<groupId>com.cognizant.devops</groupId>
 			<artifactId>PlatformCommons</artifactId>
@@ -196,27 +88,7 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
-		<!-- <dependency>
-			<groupId>org.scala-lang.modules</groupId>
-			<artifactId>scala-xml_2.11</artifactId>
-			<version>1.2.0</version>
-		</dependency>
-		<dependency>
-			<groupId>com.fasterxml.jackson.module</groupId>
-			<artifactId>jackson-module-scala_2.11</artifactId>
-			<version>2.9.9</version>
-		</dependency> -->
-
-
 	</dependencies>
-
-	<!-- <repositories>
-		<repository>
-			<id>SparkPackagesRepo</id>
-			<url>http://dl.bintray.com/spark-packages/maven</url>
-		</repository>
-	</repositories> -->
-
 	<build>
 		<!-- <finalName>PlatformInsights</finalName> -->
 		<plugins>

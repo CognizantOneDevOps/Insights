@@ -13,8 +13,12 @@ import org.quartz.JobExecutionException;
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
 import com.cognizant.devops.platformcommons.core.enums.ExecutionActions;
 import com.cognizant.devops.platformcommons.core.util.InsightsUtils;
-import com.cognizant.devops.platforminsights.core.function.DatabaseService;
-import com.cognizant.devops.platforminsights.core.function.Neo4jDBImpl;
+import com.cognizant.devops.platforminsights.core.avg.AverageActionImpl;
+import com.cognizant.devops.platforminsights.core.count.CountActionImpl;
+import com.cognizant.devops.platforminsights.core.minmax.MinMaxActionImpl;
+import com.cognizant.devops.platforminsights.core.sum.SumActionImpl;
+import com.cognizant.devops.platforminsights.dal.DatabaseService;
+import com.cognizant.devops.platforminsights.dal.Neo4jDBImpl;
 import com.cognizant.devops.platforminsights.datamodel.InferenceConfigDefinition;
 import com.cognizant.devops.platforminsights.exception.InsightsJobFailedException;
 
@@ -69,29 +73,29 @@ public class InferenceJobExecutor implements Job, Serializable {
 		}
 	}
 
-	private void executeJob(InferenceConfigDefinition neo4jKpiDefinition) throws InsightsJobFailedException {
-		log.debug(" KPI action found as ==== " + neo4jKpiDefinition.getAction() + " KPI Name is ==== "
-				+ neo4jKpiDefinition.getName());
-		if (!neo4jKpiDefinition.getNeo4jQuery().equalsIgnoreCase("")) {
-			if (ExecutionActions.AVERAGE == neo4jKpiDefinition.getAction()) {
-				BaseActionImpl impl = new AverageActionImpl(neo4jKpiDefinition);
+	private void executeJob(InferenceConfigDefinition kpiDefinition) throws InsightsJobFailedException {
+		log.debug(" KPI action found as ==== " + kpiDefinition.getAction() + " KPI Name is ==== "
+				+ kpiDefinition.getName());
+		if (!kpiDefinition.getNeo4jQuery().equalsIgnoreCase("")) {
+			if (ExecutionActions.AVERAGE == kpiDefinition.getAction()) {
+				BaseActionImpl impl = new AverageActionImpl(kpiDefinition);
 				impl.execute();
-			} else if (ExecutionActions.COUNT == neo4jKpiDefinition.getAction()) {
-				BaseActionImpl impl = new CountActionImpl(neo4jKpiDefinition);
+			} else if (ExecutionActions.COUNT == kpiDefinition.getAction()) {
+				BaseActionImpl impl = new CountActionImpl(kpiDefinition);
 				impl.execute();
-			} else if (ExecutionActions.MINMAX == neo4jKpiDefinition.getAction()) {
-				BaseActionImpl impl = new MinMaxActionImpl(neo4jKpiDefinition);
+			} else if (ExecutionActions.MINMAX == kpiDefinition.getAction()) {
+				BaseActionImpl impl = new MinMaxActionImpl(kpiDefinition);
 				impl.execute();
-			} else if (ExecutionActions.SUM == neo4jKpiDefinition.getAction()) {
-				BaseActionImpl impl = new SumActionImpl(neo4jKpiDefinition);
+			} else if (ExecutionActions.SUM == kpiDefinition.getAction()) {
+				BaseActionImpl impl = new SumActionImpl(kpiDefinition);
 				impl.execute();
 			} else {
-				log.error(" No calculation methon defined for KIP " + neo4jKpiDefinition.getName() + " With Id "
-						+ +neo4jKpiDefinition.getKpiID());
+				log.error(" No calculation methon defined for KIP " + kpiDefinition.getName() + " With Id "
+						+ +kpiDefinition.getKpiID());
 			}
 		} else {
-			log.error(" No neo4j query defined for KPI " + neo4jKpiDefinition.getName() + " With Id "
-					+ neo4jKpiDefinition.getKpiID());
+			log.error(" No neo4j query defined for KPI " + kpiDefinition.getName() + " With Id "
+					+ kpiDefinition.getKpiID());
 		}
 	}
 	private boolean isJobScheduledToRun(Long lastRun, String jobSchedule) {

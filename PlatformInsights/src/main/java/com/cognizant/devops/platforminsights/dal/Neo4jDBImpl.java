@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  ******************************************************************************/
-package com.cognizant.devops.platforminsights.core.function;
+package com.cognizant.devops.platforminsights.dal;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -62,7 +62,7 @@ public class Neo4jDBImpl implements DatabaseService {
 		List<Map<String, Object>> resultList = new ArrayList<>();
 		try {
 			String graphQuery = inferenceConfigDefinition.getNeo4jQuery();
-			graphQuery = getNeo4jQueryWithDates(inferenceConfigDefinition.getSchedule(), graphQuery);
+			//graphQuery = getNeo4jQueryWithDates(inferenceConfigDefinition.getSchedule(), graphQuery);
 			log.debug("Database type found to be Neo4j and graphQuery with date is === " + graphQuery);
 			GraphResponse graphResp = graphDBHandler.executeCypherQuery(graphQuery);
 			JsonArray errorMessage = graphResp.getJson().getAsJsonArray("errors");
@@ -156,8 +156,8 @@ public class Neo4jDBImpl implements DatabaseService {
 				StringBuffer sbWhereClause = new StringBuffer();
 				sbWhereClause.append("[");
 				log.debug(" Scheduled  " + kipInferanceResult.getKey() + "  List   " + kipInferanceResult.getValue());
-				for (InferenceConfigDefinition neo4jKPIDefinition : kipInferanceResult.getValue()) {
-					sbWhereClause.append("'").append(neo4jKPIDefinition.getKpiID().toString()).append("'").append(",");
+				for (InferenceConfigDefinition kpiDefinition : kipInferanceResult.getValue()) {
+					sbWhereClause.append("'").append(kpiDefinition.getKpiID().toString()).append("'").append(",");
 				}
 				sbWhereClause.setLength(sbWhereClause.length() - 1);
 				sbWhereClause.append("]");
