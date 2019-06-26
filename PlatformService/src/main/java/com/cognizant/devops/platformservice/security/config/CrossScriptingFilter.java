@@ -96,6 +96,7 @@ public class CrossScriptingFilter implements Filter {
 			}
 			//LOG.debug(" host information ===== " + host);
 			if (!ApplicationConfigProvider.getInstance().getTrustedHosts().contains(host)) {
+				LOG.error(" Invalid request " + PlatformServiceConstants.INVALID_REQUEST_ORIGIN);
 				throw new RuntimeException(PlatformServiceConstants.INVALID_REQUEST_ORIGIN);
 			}
 			response.setHeader(HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN, origin);

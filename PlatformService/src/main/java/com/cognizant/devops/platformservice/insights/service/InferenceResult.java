@@ -48,4 +48,9 @@ public class InferenceResult {
 		this.details = details;
 	}
 
+	@Override
+	public String toString() {
+		return "InferenceResult [kpiID=" + kpiID + ", totalDocuments=" + totalDocuments + ", details=" + details + "]";
+	}
+
 }

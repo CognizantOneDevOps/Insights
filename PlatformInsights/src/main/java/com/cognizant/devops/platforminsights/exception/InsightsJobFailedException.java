@@ -13,33 +13,24 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  ******************************************************************************/
-package com.cognizant.devops.platforminsights.core.count;
+package com.cognizant.devops.platforminsights.exception;
 
-import java.io.Serializable;
-
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-
-@JsonIgnoreProperties(ignoreUnknown = true)
-public class Aggregations  implements Serializable {
+public class InsightsJobFailedException extends Exception {
 
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = -4203632629479173465L;
-	
-	//private Long count;
-	private Terms terms;
-	
-/*	public Long getCount() {
-		return count;
+	private static final long serialVersionUID = 6316320975074662792L;
+
+	public InsightsJobFailedException() {
+		super();
 	}
-	public void setCount(Long count) {
-		this.count = count;
-	}*/
-	public Terms getTerms() {
-		return terms;
+	
+	public InsightsJobFailedException(String message,Throwable t) {
+		super(message,t);
 	}
-	public void setTerms(Terms terms) {
-		this.terms = terms;
+
+	public InsightsJobFailedException(String message) {
+		super(message);
 	}
 }
