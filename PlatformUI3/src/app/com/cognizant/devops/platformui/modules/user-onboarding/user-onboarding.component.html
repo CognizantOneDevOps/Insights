@@ -169,7 +169,7 @@
 
     <div class="adduserCol">
       <div class="showTable" style="text-align: center; padding: 8px;">
-        <div style="margin-right: 110px;">
+        <div>
           <mat-radio-group>
             <mat-radio-button [checked]="addRadioSelected" [value]="element1" color="primary" (click)=adduserenableSave()>
             </mat-radio-button>
@@ -191,7 +191,7 @@
             </td>
             <td class="AddUserColTextCss">
               <mat-select [disabled]="!adduserSaveEnable" [(ngModel)]="selectedAdminOrg" [style.height.px]="20"
-                [style.width.%]="260" name="selectedAdminOrg" [ngClass]="{  'input-disabled' : readOnlyOrg ,  'form-control': !readOnlyOrg}">
+                [style.width.%]="380" name="selectedAdminOrg" [ngClass]="{  'input-disabled' : readOnlyOrg ,  'form-control': !readOnlyOrg}">
 
                 <mat-option *ngFor="let record of adminOrgDataArray" [value]="record">
                   {{record.name}}
@@ -200,7 +200,7 @@
             </td>
 
             <input [disabled]="!adduserSaveEnable" type="text" class="searchbox" [(ngModel)]='searchUser' [value]="searchuser"
-              required placeholder=" Search by Login ID or E-mail Address">
+              required placeholder=" Search by Login ID or E-mail Address" (keydown)="trackEvent($event)">
             <button mat-icon-button (click)="searchData(searchUser,selectedAdminOrg) ">
               <mat-icon title="Search" class="mat-icon material-icons">
                 search
@@ -257,7 +257,7 @@
 
             <td>
               <mat-select [disabled]="!adduserSaveEnable" style="margin-left: 45px;" [(ngModel)]="role "
-                [style.width.%]="200 " name="{{role}}" required placeholder=" Select a Role" [ngClass]="{ 'input-disabled' : !isSaveEnable  , 'form-control': isSaveEnable} ">
+                [style.width.%]="200 " name="{{role}}" required placeholder=" Select a Role"  [ngClass]="{ 'input-disabled' : !isSaveEnable  , 'form-control': isSaveEnable} ">
                 <mat-option *ngFor=" let record of roleRecord " [value]="record.value ">
                   {{record.name}}
                 </mat-option>
@@ -275,7 +275,7 @@
 
     <div class="assignUserCol">
       <div class="showTable" style="text-align: center; padding: 20px;">
-        <div style="margin-right: 110px;">
+        <div>
           <mat-radio-group>
             <mat-radio-button [checked]="assignRadioSelected" [value]="element2" color="primary" (click)=assignuserenableSave()>
             </mat-radio-button>
@@ -285,7 +285,7 @@
         </div>
       </div>
 
-  <table class="tableMainCss">
+      <table class="tableMainCss">
         <tbody style="display: grid; max-height: 38vh ;border-spacing:0px !important;; border-collapse: none !important">
           <tr>
 
@@ -299,7 +299,7 @@
             </td>
 
             <input [disabled]="!assignuserSaveEnable" type="text" class="searchbox" [(ngModel)]='searchOrgForUser'
-              [value]="searchOrgForUser" required placeholder=" Search by Login ID">
+              [value]="searchOrgForUser" required placeholder=" Search by Login ID" (keydown)="trackEvent($event)">
             <button mat-icon-button (click)="searchUserInAssign(searchOrgForUser)">
               <mat-icon title="Search" class="mat-icon material-icons">
                 search
