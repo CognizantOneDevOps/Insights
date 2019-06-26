@@ -13,8 +13,24 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  ******************************************************************************/
-package com.cognizant.devops.platforminsights.datamodel;
+package com.cognizant.devops.platforminsights.core;
 
-public interface SentimentInterface{
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
+import com.cognizant.devops.platforminsights.datamodel.InferenceConfigDefinition;
+import com.cognizant.devops.platforminsights.exception.InsightsJobFailedException;
+
+public class MinMaxActionImpl extends BaseActionImpl {
+
+	private static final Logger log = LogManager.getLogger(MinMaxActionImpl.class);
+
+	public MinMaxActionImpl(InferenceConfigDefinition neo4jKpiDefinition) {
+		super(neo4jKpiDefinition);
+	}
+
+	@Override
+	protected void execute() throws InsightsJobFailedException {
+		executeNeo4jGraphQuery();
+	}
 }

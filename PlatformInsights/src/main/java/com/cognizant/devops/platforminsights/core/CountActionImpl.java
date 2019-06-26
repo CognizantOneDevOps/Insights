@@ -13,11 +13,26 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  ******************************************************************************/
-package com.cognizant.devops.platforminsights.datamodel;
+package com.cognizant.devops.platforminsights.core;
 
-public abstract class BaseModel{
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
-private String entityName;
+import com.cognizant.devops.platforminsights.datamodel.InferenceConfigDefinition;
+import com.cognizant.devops.platforminsights.exception.InsightsJobFailedException;
 
+public class CountActionImpl extends BaseActionImpl {
+
+	private static final Logger log = LogManager.getLogger(CountActionImpl.class);
+
+
+	public CountActionImpl(InferenceConfigDefinition neo4jKpiDefinition) {
+		super(neo4jKpiDefinition);
+	}
+
+	@Override
+	protected void execute() throws InsightsJobFailedException {
+		executeNeo4jGraphQuery();
+	}
 
 }

@@ -13,30 +13,25 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  ******************************************************************************/
-package com.cognizant.devops.platforminsights.core.count;
+package com.cognizant.devops.platforminsights.core;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Map;
+import org.apache.log4j.Logger;
 
-// import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.cognizant.devops.platforminsights.datamodel.InferenceConfigDefinition;
+import com.cognizant.devops.platforminsights.exception.InsightsJobFailedException;
 
-// @JsonIgnoreProperties(ignoreUnknown = true)
-public class Terms  implements Serializable {
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 3432476245073319779L;
-	
-	public Terms() {}
-	
-	private ArrayList<Map<String,Object>> buckets = new ArrayList<>();
-	
-	public ArrayList<Map<String,Object>> getBuckets() {
-		return buckets;
+public class SumActionImpl extends BaseActionImpl {
+
+	private static Logger log = Logger.getLogger(SumActionImpl.class);
+
+
+	public SumActionImpl(InferenceConfigDefinition neo4jKpiDefinition) {
+		super(neo4jKpiDefinition);
 	}
-	public void setBuckets(ArrayList<Map<String,Object>> buckets) {
-		this.buckets = buckets;
+
+	@Override
+	protected void execute() throws InsightsJobFailedException {
+		executeNeo4jGraphQuery();
 	}
 }

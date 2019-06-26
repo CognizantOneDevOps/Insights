@@ -35,8 +35,8 @@ import com.google.gson.JsonObject;
 
 public class SparkJobMapFunctionTest {
 
-	@Mock
-	SparkJobMapFunction sparkJobMap;
+	//@Mock
+	//SparkJobMapFunction sparkJobMap;
 	
 	@Rule
 	public MockitoRule rule = MockitoJUnit.rule();

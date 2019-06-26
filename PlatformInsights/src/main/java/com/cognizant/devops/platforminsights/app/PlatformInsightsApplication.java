@@ -48,24 +48,10 @@ public class PlatformInsightsApplication {
 		if(args.length > 0){
 			defaultInterval = Integer.valueOf(args[0]);
 		}
-
 		// Load isight config
 		ApplicationConfigCache.loadConfigCache();
 		// Create Default users
 		ApplicationConfigProvider.performSystemCheck();
-				
-		// Subscribe for desired events.
-		/*JobDetail sparkAggrgatorJob = JobBuilder.newJob(SparkJobExecutor.class)
-				.withIdentity("SparkJobExecutorModule", "iSightSpark")
-				.build();
-		
-		Trigger sparkAggregatorTrigger = TriggerBuilder.newTrigger()
-				.withIdentity("SparkJobExecutorModuleTrigger", "iSightSpark")
-				.startNow()
-				.withSchedule(SimpleScheduleBuilder.simpleSchedule()
-						.withIntervalInSeconds(defaultInterval)
-						.repeatForever())
-				.build();*/
 
 		JobDetail inferenceAggrgatorJob = JobBuilder.newJob(InferenceJobExecutor.class)
 				.withIdentity("InferenceEngineJobExecutorModule", "iSightInferenceEngine")
@@ -77,15 +63,12 @@ public class PlatformInsightsApplication {
 						SimpleScheduleBuilder.simpleSchedule().withIntervalInSeconds(defaultInterval).repeatForever())
 				.build();
 
-		// Tell quartz to schedule the job using our trigger
 		Scheduler scheduler;
 		try {
 			scheduler = new StdSchedulerFactory().getScheduler();
 			scheduler.start();
-			//scheduler.scheduleJob(sparkAggrgatorJob, sparkAggregatorTrigger);
 			scheduler.scheduleJob(inferenceAggrgatorJob, inferenceAggregatorTrigger);
 			log.debug("Job has been scheduled with interval of - "+defaultInterval);
-			//Insight status to DB
 		} catch (SchedulerException e) {
 			log.error("Exception in Sparkjob schedular",e);
 			InsightsStatusProvider.getInstance().createInsightStatusNode("Platform Insights Spark Application not started ", PlatformServiceConstants.FAILURE);
