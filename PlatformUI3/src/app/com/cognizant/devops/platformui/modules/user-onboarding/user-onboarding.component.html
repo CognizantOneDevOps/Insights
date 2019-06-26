@@ -36,7 +36,7 @@
 
   <div *ngIf=" showDetail ">
     <label class="mainText"> Current Access Group </label>
-    <mat-select [(ngModel)]="selectedAdminOrg" [style.height.px]="20" [style.width.%]="20" (ngModelChange)="loadUsersInfo(selectedAdminOrg)"
+    <mat-select [(ngModel)]="selectedAdminOrg" placeholder="Select Access Group" [style.height.px]="20" [style.width.%]="20" (ngModelChange)="loadUsersInfo(selectedAdminOrg)"
       name="selectedAdminOrg" [ngClass]="{  'input-disabled' : readOnlyOrg ,  'form-control': !readOnlyOrg}">
 
       <mat-option *ngFor="let record of adminOrgDataArray" [value]="record">
@@ -320,7 +320,7 @@
                     *ngFor="let row of rows?.controls;let index = index;">
                     <td style="border-spacing:0px !important;padding:0 15px 0 15px;">Access Group </td>
                     <td style="border-spacing:0px !important;">
-                      <mat-select [disabled]="!assignuserSaveEnable" required placeholder="Select Access Group"
+                      <mat-select [disabled]="!assignuserSaveEnable" required placeholder="Select Access Group" 
                         [formControl]="row.get('org')" [style.width.px]="100 " [style.height.px]="20" [style.width.px]="160"
                         name="selectOrgForUser5" [ngClass]="{  'input-disabled' : readOnlyOrg ,  'form-control': !readOnlyOrg}">
 
