@@ -71,7 +71,7 @@ public class AccessGroupManagement {
 	public JsonObject getOrgs() {
 		log.debug("\n\nInside getOrgs method call");
 		String apiUrl = ApplicationConfigProvider.getInstance().getGrafana().getGrafanaEndpoint() + "/api/orgs";
-		log.debug("getOrgs API is: " + apiUrl);
+		//log.debug("getOrgs API is: " + apiUrl);
 		Map<String, String> headers = new HashMap<String, String>();
 		headers.put("Authorization", buildAuthenticationHeader());
 		ClientResponse response = RestHandler.doGet(apiUrl, null, headers);

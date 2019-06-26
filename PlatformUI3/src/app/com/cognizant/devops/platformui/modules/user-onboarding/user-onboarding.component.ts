@@ -54,6 +54,7 @@ export class UserOnboardingComponent implements OnInit {
   pass: string
   username: string
   searchUser: string
+  newresponse: string = "";
   email: string
   names: string;
   isEmailIncorrect: boolean = false;
@@ -216,8 +217,39 @@ export class UserOnboardingComponent implements OnInit {
   }
 
   searchUserInAssign(searchOrgForUserAssign) {
+    var self = this;
     this.userOnboardingService.getUsersOrganisation(searchOrgForUserAssign).then(function (usersResponseData1) {
       console.log(usersResponseData1);
+
+      //this.newresponse = " ";
+
+      //  this.newresponse = usersResponseData1.data;
+      if (usersResponseData1.data.length > 0) {
+        // self.newresponse = "User Found."
+        for (var element of usersResponseData1.data) {
+          console.log(element.name)
+
+          self.newresponse = self.newresponse + " " + element.name;
+
+        }
+        self.newresponse = "User Found in Organisation " + self.newresponse;
+
+      }
+      else {
+        self.newresponse = "User Found.";
+      }
+
+      console.log(self.newresponse)
+      if (usersResponseData1.data == "User Not Found") {
+        self.messageDialog.showApplicationsMessage("User not found", "ERROR");
+        self.newresponse = "";
+
+      }
+      else {
+
+        self.messageDialog.showApplicationsMessage(self.newresponse, "SUCCESS");
+        self.newresponse = "";
+      }
     });
 
   }
