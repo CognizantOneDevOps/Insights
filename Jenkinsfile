@@ -11,7 +11,7 @@ gitCommitID = sh (
 	checkout scm	
 	}
 // All single and double quotes in this file are used in a certain format.Do not alter in any step build
-	//ApacheLicense Check in java and Python files
+	//ApacheLicense Check in java and Python files . License for Enterprise -. check? 
 	/*
 	stage ('LicenseCheck') {
            checkout scm
