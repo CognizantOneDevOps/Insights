@@ -175,10 +175,6 @@
     margin-left: 5px;
 }
 
-tr:nth-child(odd) td {
-    background-color: #ffffff;
-}
-
 tr:nth-child(even)  {
     background-color: #E1E3E7;
     border-color: #E1E3E7
