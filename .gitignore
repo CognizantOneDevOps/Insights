@@ -4,8 +4,4 @@
 *.settings*
 */target/*
 *.log
-<<<<<<< HEAD
 *.gitignore
-=======
-*.gitignore
->>>>>>> 57595fde720fb159a5482200f99752a158103cab
