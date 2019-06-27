@@ -66,7 +66,6 @@
 					<include>*.properties</include>
 					<include>**/*.properties</include>
 					<include>**/*.xml</include>
-					<include>**/*.p12</include>
 				</includes>
 				<filtering>true</filtering>
 			</resource>
@@ -89,13 +88,13 @@
 		<dependency>
 			<groupId>com.cognizant.devops</groupId>
 			<artifactId>PlatformCommons</artifactId>
-			<version>5.2</version>
+			<version>5.1</version>
 		</dependency>
 
 		<dependency>
 			<groupId>com.cognizant.devops</groupId>
 			<artifactId>PlatformDAL</artifactId>
-			<version>5.2</version>
+			<version>5.1</version>
 		</dependency>
 
 		<dependency>
@@ -264,73 +263,13 @@
 		<dependency>
 			<groupId>com.cognizant.devops</groupId>
 			<artifactId>PlatformCommons</artifactId>
-			<version>5.2</version>
+			<version>5.1</version>
 			<exclusions>
 				<exclusion>
 					<groupId>org.apache.logging.log4j</groupId>
 					<artifactId>log4j</artifactId>
 				</exclusion>
 			</exclusions>
-		</dependency>
-		
-		<dependency>
-			<groupId>com.google.code.gson</groupId>
-			<artifactId>gson</artifactId>
-			<version>2.5</version>
-		</dependency>
-		
-		<dependency>
-			<groupId>com.cognizant.devops</groupId>
-			<artifactId>PlatformAuditing</artifactId>
-			<version>0.1</version>
-		</dependency>
-		
-		<dependency>
-			<groupId>com.github.dhorions</groupId>
-			<artifactId>boxable</artifactId>
-			<version>1.5</version>
-			<exclusions>
-                		<exclusion>
-                    			<groupId>com.google.guava</groupId>
-                    			<artifactId>guava</artifactId>
-                		</exclusion>
-            		</exclusions>
-		</dependency>
-		
-		<dependency>
-			<groupId>org.bouncycastle</groupId>
-			<artifactId>bcprov-jdk15on</artifactId>
-			<version>1.60</version>
-		</dependency>
-
-		<dependency>
-			<groupId>org.bouncycastle</groupId>
-			<artifactId>bcmail-jdk15on</artifactId>
-			<version>1.60</version>
-		</dependency>
-
-		<dependency>
-			<groupId>org.bouncycastle</groupId>
-			<artifactId>bcpkix-jdk15on</artifactId>
-			<version>1.60</version>
-		</dependency>
-		
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-context</artifactId>
-			<version>${spring.version}</version>
-		</dependency>
-		
-		<dependency>
-			<groupId>ch.qos.logback</groupId>
-			<artifactId>logback-classic</artifactId>
-			<version>1.2.3</version>
-		</dependency>
-		
-		<dependency>
-			<groupId>com.sun.mail</groupId>
-			<artifactId>javax.mail</artifactId>
-			<version>1.6.0</version>
 		</dependency>
 		
 	</dependencies>
