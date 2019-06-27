@@ -238,7 +238,6 @@ public class BusinessMappingServiceImpl implements BusinessMappingService {
 			for (int i = 0; i < size; i++) {
 				propertyList.add(response.getNodes().get(i).getPropertyMap());
 			}
-			// propertyList.forEach(s => { System.out.println(s) }); =
 		} catch (GraphDBException e) {
 			log.error(e);
 			return PlatformServiceUtil.buildFailureResponse(ErrorMessage.DB_INSERTION_FAILED);

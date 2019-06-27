@@ -23,7 +23,9 @@ import { AddGroupMessageDialog } from '@insights/app/modules/user-onboarding/add
 import { MessageDialogService } from '@insights/app/modules/application-dialog/message-dialog-service';
 import { DataSharedService } from '@insights/common/data-shared-service';
 import { Router, ActivatedRoute, ParamMap, NavigationExtras } from '@angular/router';
-import { FormGroup, FormBuilder, Validators, FormControl, FormArray, NgForm } from '@angular/forms'
+import { FormGroup, FormBuilder, Validators, FormControl, FormArray, NgForm } from '@angular/forms';
+import { HomeComponent } from '@insights/app/modules/home/home.component';
+
 @Component({
   selector: 'app-user-onboarding',
   templateUrl: './user-onboarding.component.html',
@@ -39,6 +41,7 @@ export class UserOnboardingComponent implements OnInit {
   assignuserSaveEnable: boolean = false
   showAddUserDetail: boolean = false;
   showAssignUserDetail: boolean = false;
+  showCancel: boolean = false;
   showThrobber: boolean = false;
   adminOrgDataArray = [];
   orgNameArray = [];
@@ -50,6 +53,8 @@ export class UserOnboardingComponent implements OnInit {
   role: any;
   pass: string
   username: string
+  searchUser: string
+  newresponse: string = "";
   email: string
   names: string;
   isEmailIncorrect: boolean = false;
@@ -96,20 +101,10 @@ export class UserOnboardingComponent implements OnInit {
     { value: 'Viewer', name: 'Viewer' }
   ];
 
-  constructor(private fb: FormBuilder, private router: Router, private userOnboardingService: UserOnboardingService, private sanitizer: DomSanitizer,
+  constructor(private fb: FormBuilder, public router: Router, private userOnboardingService: UserOnboardingService, private sanitizer: DomSanitizer,
     public dialog: MatDialog, public messageDialog: MessageDialogService, private dataShare: DataSharedService) {
     var self = this;
-    this.rows = this.fb.array([]);
-    for (let number of [1, 2, 3, 4, 5]) {
-      if (number % 2 == 0) {
-        this.rowcss = false;
-      }
-      else {
-        this.rowcss = true;
-      }
-      this.rows.push(this.createItemFormGroup(this.rowcss));
-      // console.log(this.rowcss)
-    }
+    this.userForm();
     this.framesize = window.frames.innerHeight;
     var orgId2 = this.dataShare.getStoragedProperty("orgId");
     var receiveMessage = function (evt) {
@@ -165,6 +160,7 @@ export class UserOnboardingComponent implements OnInit {
     this.loadUsersInfo(this.selectedAdminOrg);
   }
 
+
   loadUsersInfo(selectedAdminOrg) {
     //console.log(selectedAdminOrg);
     this.isSaveEnable = false;
@@ -209,6 +205,54 @@ export class UserOnboardingComponent implements OnInit {
         this.isbuttonenabled = true;
       }
     }
+  }
+
+  userForm() {
+    this.rows = this.fb.array([]);
+    for (let number of [1, 2, 3, 4, 5]) {
+      if (number % 2 == 0) {
+        this.rowcss = false;
+      }
+      else {
+        this.rowcss = true;
+      }
+      this.rows.push(this.createItemFormGroup(this.rowcss));
+      // console.log(this.rowcss)
+    }
+  }
+
+  searchUserInAssign(searchOrgForUserAssign) {
+    var self = this;
+    this.userOnboardingService.getUsersOrganisation(searchOrgForUserAssign).then(function (usersResponseData1) {
+      console.log(usersResponseData1);
+
+      //this.newresponse = "";
+
+      //  this.newrenewresponsesponse = usersResponseData1.data;
+      if (usersResponseData1.data.length > 0) {
+        // self.newresponse = "User Found."
+        for (var element of usersResponseData1.data) {
+          self.newresponse = self.newresponse + element.name + ", ";
+        }
+        self.newresponse = self.newresponse.substring(0, self.newresponse.length - 2);
+        self.newresponse = "User found and Organisations name are : " + self.newresponse;
+
+      } else {
+        self.newresponse = "User Found and not yet assigned to any Organization.";
+      }
+
+      console.log(self.newresponse)
+      if (usersResponseData1.data == "User Not Found") {
+        self.messageDialog.showApplicationsMessage("User not found", "ERROR");
+        self.newresponse = "";
+
+      } else {
+
+        self.messageDialog.showApplicationsMessage(self.newresponse, "SUCCESS");
+        self.newresponse = "";
+      }
+    });
+
   }
 
 
@@ -337,7 +381,9 @@ export class UserOnboardingComponent implements OnInit {
   assignUser() {
     var requestjson = [];
     var orgArray = [];
-    var count = 0;
+    var repeatedOrgCount = 0;
+    var missingRole = 0;
+    var repeatedOrg = "";
     var userBMparameter;
     if (this.searchOrgForUser == undefined) {
       this.messageDialog.showApplicationsMessage("Please enter a Username or Login ID", "ERROR");
@@ -354,8 +400,6 @@ export class UserOnboardingComponent implements OnInit {
             // console.log("Index of " + orgArray.indexOf(data.org.orgId))
             var firstindex = orgArray.indexOf(data.org.orgId)
             var lastindex = orgArray.lastIndexOf(data.org.orgId)
-
-
             if (lastindex == firstindex) {
               var orgAssignData = {};
               orgAssignData['orgName'] = data.org.name;
@@ -363,38 +407,37 @@ export class UserOnboardingComponent implements OnInit {
               orgAssignData['roleName'] = data.role;
               orgAssignData['userName'] = this.searchOrgForUser;
               requestjson.push(orgAssignData);
+            } else {
+              repeatedOrg = repeatedOrg + data.org.name + ", "
+              repeatedOrgCount = repeatedOrgCount + 1;
             }
-            else {
-              this.messageDialog.showApplicationsMessage("Repeated selection of Organisation", "ERROR");
-              count = count + 1;
-              break;
-            }
-            if (count == 0) {
-              //console.log(requestjson);
-              userBMparameter = JSON.stringify(requestjson);
-              this.userOnboardingService.assignUser(userBMparameter)
-                .subscribe(data => {
-                  //  console.log(data);
-                  var userResponse2 = data.data;
-                  //  console.log(data.data)
-                  if (userResponse2 == "User does not exist.") {
-                    this.messageDialog.showApplicationsMessage(data.data, "ERROR")
-                  }
-                  else { this.messageDialog.showApplicationsMessage(data.data, "SUCCESS"); }
-
-                })
-            }
-          }
-          else {
-            this.messageDialog.showApplicationsMessage("Please select a Role", "ERROR");
+          } else {
+            missingRole = missingRole + 1;
           }
         }
-
       }
+
       if (orgcount == 0) {
         this.messageDialog.showApplicationsMessage("No Organisation selected", "ERROR");
+      } else if (missingRole > 0) {
+        this.messageDialog.showApplicationsMessage("Please select Role for Organisations ", "ERROR");
+      } else if (repeatedOrgCount > 0) {
+        repeatedOrg = repeatedOrg.slice(0, -2);
+        this.messageDialog.showApplicationsMessage("Repeated selection of Organisations : " + repeatedOrg, "ERROR");
+      } else if (orgcount > 0 && repeatedOrgCount == 0 && missingRole == 0) {
+        //console.log(requestjson);
+        userBMparameter = JSON.stringify(requestjson);
+        this.userOnboardingService.assignUser(userBMparameter)
+          .subscribe(data => {
+            var userResponse2 = data.data;
+            if (userResponse2 == "User does not exist.") {
+              this.messageDialog.showApplicationsMessage(data.data, "ERROR")
+            }
+            else {
+              this.messageDialog.showApplicationsMessage(data.data, "SUCCESS");
+            }
+          })
       }
-
     }
 
   }
@@ -403,7 +446,7 @@ export class UserOnboardingComponent implements OnInit {
     this.adduserSaveEnable = false;
     this.addSelected = false;
     this.assignSelected = false;
-    this.showDetail2 = false;
+    this.showDetail2 = true;
     this.addRadioSelected = false;
     this.assignRadioSelected = false;
     this.assignuserSaveEnable = false;
@@ -411,6 +454,13 @@ export class UserOnboardingComponent implements OnInit {
     this.username = null;
     this.email = null;
     this.names = null;
+    this.role = null;
+    this.searchOrgForUser = null;
+    console.log(this.rows.value)
+    this.searchUser = null;
+    this.showCancel = false;
+    this.userForm();
+
 
   }
   adduserenableSave() {
@@ -422,6 +472,8 @@ export class UserOnboardingComponent implements OnInit {
     this.addRadioSelected = true;
     this.assignRadioSelected = false;
     this.assignuserSaveEnable = false;
+    this.searchOrgForUser = null;
+    this.showCancel = true;
 
   }
   assignuserenableSave() {
@@ -433,6 +485,12 @@ export class UserOnboardingComponent implements OnInit {
     this.showDetail2 = true;
     this.assignRadioSelected = true;
     this.addRadioSelected = false;
+    this.pass = null;
+    this.username = null;
+    this.email = null;
+    this.names = null;
+    this.searchUser = null;
+    this.showCancel = true;
   }
 
   searchData(searchUser, selectedAdminOrg) {
@@ -571,11 +629,31 @@ export class UserOnboardingComponent implements OnInit {
     }
   }
   addGlobalUser() {
+    //this.showCancel = true;
     this.showAssignUserDetail = true;
     this.showAddUserDetail = true;
     this.showDetail = false;
-    this.showDetail2 = false
+    this.showDetail2 = false;
+
   }
+
+  /*Method to redirect to Configuration | Group & Users Management page*/
+  redirectToLandingPage() {
+
+    this.Refresh();
+    this.showAssignUserDetail = false;
+    this.showAddUserDetail = false;
+    this.showDetail = true;
+    this.showDetail2 = true;
+    this.showCancel = false;
+  }
+
+  trackEvent = function (event) {
+    if (event.key === 'Enter') {
+      this.searchData(this.searchUser, this.selectedAdminOrg)
+    }
+  }
+
 }
 
 
