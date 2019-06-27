@@ -7,7 +7,7 @@ gitCommitID = sh (
     returnStdout: true
 ).trim()
 // All single and double quotes in this file are used in a certain format.Do not alter in any step
-	//ApacheLicense Check in java and Python files
+	//ApacheLicense Check in java and Python files. Enabled for OSS modules license check.
 	stage ('LicenseCheck') {
            checkout scm
     	   def commit = sh (returnStdout: true, script: '''var=''
