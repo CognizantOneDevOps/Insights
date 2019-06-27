@@ -95,6 +95,7 @@ export class RelationshipBuilderComponent implements OnInit {
   displayDataSource = [];
   toolsDatasource = [];
   toolSourceDataSource = [];
+  radioRefresh:boolean= true;
 
   constructor(private router: Router, private relationshipBuilderService: RelationshipBuilderService, private dialog: MatDialog, public messageDialog: MessageDialogService, private dataShare: DataSharedService) {
     this.dataDictionaryInfo();
@@ -303,6 +304,7 @@ export class RelationshipBuilderComponent implements OnInit {
     this.buttonOn = false;
     this.selectedAgent1 = "";
     this.dataDictionaryInfo();
+    this.radioRefresh=false;
   }
 
   relationDelete() {

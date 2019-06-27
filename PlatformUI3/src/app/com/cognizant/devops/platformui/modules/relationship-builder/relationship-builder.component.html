@@ -104,7 +104,7 @@
                   <label class="SubHeading">Display Co-Relation</label>
                 </td>
                 <td>
-                  <button style="margin-left: 40px" mat-raised-button (click)="showDetailsDialog()"
+                  <button style="margin-left: 40px; margin-right: -1px" mat-raised-button (click)="showDetailsDialog()"
                     class="configureBut">View
                     Correlation.json
                   </button>
@@ -128,7 +128,7 @@
 
             <td mat-cell *matCellDef="let element " style="width: 15% !important;padding-left: 11px  !important;">
               <mat-radio-group [(ngModel)]="deleteRelation">
-                <mat-radio-button [value]="element" color="primary" (click)="enableDelete()"></mat-radio-button>
+                <mat-radio-button [value]="element" [checked]="radioRefresh" color="primary" (click)="enableDelete()"></mat-radio-button>
               </mat-radio-group>
             </td>
           </ng-container>
@@ -159,7 +159,7 @@
       </div>
       <input type="text" class="inputcss" #newName [(ngModel)]='listFilter' [value]="searchValue" required
         placeholder="   Please input a Co-Relation name">
-      <button mat-raised-button
+      <button style="margin-left: 14%" mat-raised-button
         [disabled]="(noShowDetail||noShowDetail2||!selectedAgent1 || !selectedAgent2||buttonOn) "
         (click)="showDetailsDialogForNeo4j(selectedAgent1,selectedAgent2)" class="Neo4jDataButtonCss">Click to see the
         exsisting Co-Relations in Neo4j</button>
