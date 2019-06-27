@@ -89,7 +89,8 @@
                             <mat-icon svgIcon="healthcheck_success_status" *ngIf="(row.value.status =='Success' )"
                                 [ngStyle]="{color: '#00B140', height: '20px', width: '20px'}">
                             </mat-icon>
-                            <mat-icon svgIcon="healthcheck_failure_status" *ngIf="(row.value.status =='Fail' )"
+
+                            <mat-icon svgIcon="healthcheck_failure_status" matTooltip="{{toolTipMessage}}" *ngIf="(row.value.status =='Fail' )"
                                 [ngStyle]="{color: '#FF8F1C', height: '20px', width: '20px'}">
                             </mat-icon>
                         </td>
