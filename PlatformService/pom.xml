@@ -94,7 +94,7 @@
 		<dependency>
 			<groupId>com.cognizant.devops</groupId>
 			<artifactId>PlatformDAL</artifactId>
-			<version>5.1</version>
+			<version>5.2</version>
 		</dependency>
 
 		<dependency>
@@ -263,7 +263,7 @@
 		<dependency>
 			<groupId>com.cognizant.devops</groupId>
 			<artifactId>PlatformCommons</artifactId>
-			<version>5.1</version>
+			<version>5.2</version>
 			<exclusions>
 				<exclusion>
 					<groupId>org.apache.logging.log4j</groupId>
