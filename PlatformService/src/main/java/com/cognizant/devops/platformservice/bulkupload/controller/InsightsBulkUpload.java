@@ -23,31 +23,40 @@ import com.google.gson.JsonObject;
 @RequestMapping("/admin/bulkupload")
 public class InsightsBulkUpload {
 	static Logger log = LogManager.getLogger(GraphDBService.class.getName());
-	// private JsonObject asJsonObject;
+	 private JsonObject asJsonObject;
 
 	@Autowired
 	BulkUploadService bulkUploadService;
 
 	@RequestMapping(value = "/uploadToolData", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	public @ResponseBody JsonObject uploadToolData(@RequestParam("file") MultipartFile file,
-			@RequestParam String toolName, @RequestParam String label) throws InsightsCustomException {
+			@RequestParam String toolName, @RequestParam String label) {
 		boolean status = false;
+		try
+		{
+		
 		status = bulkUploadService.createBulkUploadMetaData(file, toolName, label);
 		return PlatformServiceUtil.buildSuccessResponse();
+			}
+	
+		catch(Exception e)
+		{
+			
+			return PlatformServiceUtil.buildFailureResponse(e.getMessage());
+		}
 
 	}
 
 	@RequestMapping(value = "/getToolJson", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public @ResponseBody JsonObject getToolJson() throws IOException, InsightsCustomException {
+	public @ResponseBody JsonObject getToolJson()  {
 		Object details = null;
 		try {
 			details = bulkUploadService.getToolDetailJson();
+			return PlatformServiceUtil.buildSuccessResponseWithData(details);
 		} catch (InsightsCustomException e) {
 			return PlatformServiceUtil.buildFailureResponse(e.toString());
 		}
-		log.error(PlatformServiceUtil.buildSuccessResponseWithData(details));
-		return PlatformServiceUtil.buildSuccessResponseWithData(details);
-		// return PlatformServiceUtil.buildSuccessResponseWithData(details);
+	
 	}
 
 }
