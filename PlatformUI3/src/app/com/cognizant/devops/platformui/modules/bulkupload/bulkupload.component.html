@@ -29,11 +29,11 @@
         </div>
     </div>
     <div class="btnAlign">
-        <button mat-icon-button (click)="uploadFile()" [disabled]="!toolNameSaveEnable">
+        <!--  <button mat-icon-button (click)="uploadFile()" [disabled]="!toolNameSaveEnable">
             <mat-icon title="Upload File " class="mat-icon material-icons">
                 cloud_upload
             </mat-icon>
-        </button>
+        </button> -->
         <button mat-icon-button (click)="saveData()" [disabled]="!toolNameSaveEnable">
             <mat-icon title="Save " class="mat-icon material-icons">
                 save </mat-icon>
@@ -69,7 +69,7 @@
                             </div>
                         </td>
                         <td>
-                            <div style="padding-top: 10px;">
+                            <div style="padding-top: 10px;margin-bottom: 10px;">
                                 Label
                                 <input type="text" [(ngModel)]="row.value.labelName" (click)="toolNameenableSave()"
                                     readonly [formControl]="row.get('labelName')" name="selectedLabel" class="input-disabled"
@@ -77,11 +77,11 @@
                             </div>
                         </td>
                         <td style="padding-top: 15px;">
-                            <input type="file" class="mat-cell-value-single" required [formControl]="row.get('fileName')"
+                            <input #myInput type="file" class="mat-cell-value-single" required [formControl]="row.get('fileName')"
                                 name="selectedFile" (change)="onFileChanged($event,row)" style="width:220px;">
                         </td>
                         <td>
-                            <mat-progress-bar mode="indeterminate" *ngIf="(row.value.status =='Pending' )" style="width:100px;margin-right: 50px;"></mat-progress-bar>
+                            <mat-progress-bar mode="indeterminate" *ngIf="(row.value.status =='Pending' )" style="margin-right: 50px;"></mat-progress-bar>
                         </td>
 
                         <td>

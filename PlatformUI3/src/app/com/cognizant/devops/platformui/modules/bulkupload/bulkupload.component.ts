@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  ******************************************************************************/
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ElementRef, ViewChild } from '@angular/core';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 import { RelationLabel } from '@insights/app/modules/relationship-builder/relationship-builder.label';
 import { from } from 'rxjs';
@@ -36,6 +36,8 @@ import { element } from '../../../../../../../../node_modules/@angular/core/src/
 })
 
 export class BulkUploadComponent implements OnInit {
+    @ViewChild('myInput')
+    myFileDiv: ElementRef;
 
     rows: FormArray;
     toolsArr = [];
@@ -50,7 +52,9 @@ export class BulkUploadComponent implements OnInit {
     refresh: boolean = false;
     selectedTool = [];
     selectedLabel = [];
+    fileToBeUploaded: FormData;
     lableName = [];
+
     toolTipMessage: string = "";
     labelName: any;
     uploadForm: FormGroup;
@@ -59,7 +63,7 @@ export class BulkUploadComponent implements OnInit {
 
     dataarr = []
     constructor(private fb: FormBuilder, private router: Router, private dialog: MatDialog, public messageDialog: MessageDialogService, private dataShare: DataSharedService, private bulkuploadService: BulkUploadService) {
-
+        this.userForm();
         this.rows = this.fb.array([]);
         for (let number of [1, 2, 3, 4, 5]) {
             this.rows.push(this.createItemFormGroup());
@@ -68,6 +72,14 @@ export class BulkUploadComponent implements OnInit {
     }
     ngOnInit() {
         this.getLabelTools();
+    }
+    userForm() {
+        this.rows = this.fb.array([]);
+        for (let number of [1, 2, 3, 4, 5]) {
+
+            this.rows.push(this.createItemFormGroup());
+            // console.log(this.rowcss)
+        }
     }
     onAddRow() {
 
@@ -119,8 +131,27 @@ export class BulkUploadComponent implements OnInit {
 
     Refresh() {
 
-        this.toolNameSaveEnable = true;
+        this.toolNameSaveEnable = false;
         this.refresh = false;
+        this.selectedTool = [];
+        this.labelsArr = [];
+        this.userForm();
+        this.refresh = false;
+        // document.getElementById("uploadCaptureInputFile").value = "";
+
+        // this.myFileDiv.nativeElement.value = "";
+        //nativeElement.value = "";
+
+        //  console.log(this.selectedTool)
+        /*  this.selectedTool = [];
+         this.labelsArr = [];s
+         this.fileToBeUploaded = null; */
+        // this.Refresh.
+        // this.rows.push(this.createItemFormGroup());
+        console.log(this.rows.value)
+        var index = 0;
+
+
     }
     uploadFile() {
         this.toolNameSaveEnable = true;
@@ -171,28 +202,25 @@ export class BulkUploadComponent implements OnInit {
             var labelName = (element.labelName);
             var fileName = element.fileName;
             // console.log(element.fileFormData)
-            if (toolName != null && labelName != null && element.fileFormData) {
+            if (toolName != null && labelName != null && element.fileFormData != null && element.fileName != null) {
                 if (element.status == "Success") {
                     continue;
                 }
-
-
                 numberOfValidEntries = numberOfValidEntries + 1;
                 var bytes = element.fileFormData["size"];
                 var testFileExt = this.checkFile(element.fileFormData, ".csv");
                 element.status = 'Pending';
                 var fileData = element.fileFormData;
                 if ((toolName == null)) {
-                    if (element.fileName == null) {
-
+                    if (element.fileData == null) {
                         rowcount = 0
                         break;
                     }
-                    else {
+                    /* else {
                         // console.log(element.toolName)
                         rowcount = rowcount + 1;
                         break;
-                    }
+                    } */
 
                 }
                 else if (element.fileName == null) {
@@ -201,6 +229,8 @@ export class BulkUploadComponent implements OnInit {
                     break;
 
                 }
+
+
 
                 if (rowcount == 0) {
 

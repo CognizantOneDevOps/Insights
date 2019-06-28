@@ -41,7 +41,7 @@ public class InsightsBulkUpload {
 	
 		catch(Exception e)
 		{
-			
+			log.error(e.getMessage());
 			return PlatformServiceUtil.buildFailureResponse(e.getMessage());
 		}
 
