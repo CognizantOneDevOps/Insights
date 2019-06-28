@@ -87,9 +87,15 @@ public class BulkUploadService {
 			log.debug("Exception while creating csv on server", ex.getMessage());
 			throw new InsightsCustomException(ex.getMessage());
 
-		} catch (Exception e) {
+		}
+		catch(ArrayIndexOutOfBoundsException e) {
+			log.error("Error in file.", e);
+			throw new InsightsCustomException("Error in file.");
+		}
+		
+		catch (Exception e) {
 			status = false;
-			log.error("IOException in uploading csv file", e);
+			log.error("Error in uploading csv file", e);
 			throw new InsightsCustomException(e.getMessage());
 			// e.printStackTrace();
 		}
@@ -106,15 +112,15 @@ public class BulkUploadService {
 
 		for (CSVRecord csvRecord : csvParser.getRecords()) {
 			// int numberOfRecordInRow = csvRecord.
-			log.debug(csvRecord.toString());
-			log.debug(" numberOfRecordsHEader " + numberOfRecords + "  numberOfRecordInRow  "
-					+ csvRecord.getRecordNumber() + "  csvRecord size " + csvRecord.size());
+		//	log.debug(csvRecord.toString());
+			/*log.debug(" numberOfRecordsHEader " + numberOfRecords + "  numberOfRecordInRow  "
+					+ csvRecord.getRecordNumber() + "  csvRecord size " + csvRecord.size()); */
 			try {
 				JsonObject json = getToolFileDetails(csvRecord, headerMap);
 				nodeProperties.add(json);
 			} catch (Exception e) {
 				log.error(e);
-				return false;
+				throw new InsightsCustomException(e.getMessage());
 			}
 
 		}
