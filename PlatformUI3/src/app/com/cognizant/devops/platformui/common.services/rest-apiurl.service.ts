@@ -46,6 +46,7 @@ export class RestAPIurlService implements IRestAPIUrlService {
         this.addEndPoint("ORG_CREATE", '/PlatformService/admin/userMgmt/createOrg');
         this.addEndPoint("USER_CREATE", '/PlatformService/accessGrpMgmt/addUserInOrg');
         this.addEndPoint("ASSIGN_USER", '/PlatformService/accessGrpMgmt/assignUser');
+        this.addEndPoint("USER_ORG_SEARCH", '/PlatformService/accessGrpMgmt/searchUser');
 
         this.addEndPoint("ACCESS_GROUP_MANAGEMENT_GET_ORGS", '/PlatformService/accessGrpMgmt/getOrgs');
         this.addEndPoint("ACCESS_GROUP_MANAGEMENT_GET_CURRENT_USER_ORGS", '/PlatformService/accessGrpMgmt/getCurrentUserOrgs');

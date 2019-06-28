@@ -83,6 +83,9 @@ export class UserOnboardingService implements IUserOnboardingService {
     assignUser(assignUserList: string) {
         return this.restHandler.postWithData("ASSIGN_USER", assignUserList, "", { 'Content-Type': 'application/json' })
     }
+    getUsersOrganisation(userName: string) {
+        return this.restHandler.postWithData("USER_ORG_SEARCH", userName, "", { 'Content-Type': 'application/x-www-form-urlencoded' }).toPromise();
+    }
 
 
 }

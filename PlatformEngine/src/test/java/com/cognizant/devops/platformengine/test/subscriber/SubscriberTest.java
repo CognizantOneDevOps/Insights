@@ -87,9 +87,7 @@ public class SubscriberTest {
 			neo4jDBHandler.executeCypherQuery("Match (n:CONFIG:TEST) delete n");
 			neo4jDBHandler.executeCypherQuery("Match (n:TEST_SCM:TEST_GIT) delete n");			
 		} catch (GraphDBException e) {
-			e.printStackTrace();
 		} catch (Exception e) {
-			e.printStackTrace();
 		}
 	}
 */

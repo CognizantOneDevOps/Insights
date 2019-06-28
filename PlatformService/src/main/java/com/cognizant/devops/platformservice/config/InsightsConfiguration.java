@@ -125,7 +125,6 @@ public final class InsightsConfiguration {
 		} catch (IOException e) {
 			log.error("Unable to read resources : layouts.", e);
 		} catch (NullPointerException e) {
-			e.printStackTrace();
 			log.error("Unable to read resources : layouts.", e);
 		}
 		return availabelLayouts;

@@ -148,7 +148,7 @@ public class InsightsAgentConfiguration {
 		} catch (InsightsCustomException e) {
 			return PlatformServiceUtil.buildFailureResponse(e.toString());
 		}
-		return PlatformServiceUtil.buildSuccessResponseWithData(details);
+		return PlatformServiceUtil.buildSuccessResponseWithHtmlData(details);
 
 	}
 
