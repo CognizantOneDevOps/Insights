@@ -3,12 +3,12 @@
 
 	<Appenders>
 		<Console name="Console" target="SYSTEM_OUT">
-			<PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss} [%t] %-5p:: %m%n" />
+			<PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss} %p [%t]:%c{3}.%M()%L %-5p:: %m%n" />
 		</Console>
  
 		<RollingFile name="RollingFile" filename="${env:INSIGHTS_HOME}/logs/PlatformInsights/platforminsights.log"
 			filepattern="${env:INSIGHTS_HOME}/logs/PlatformInsights/platforminsights.log">
-			<PatternLayout pattern="%d{dd MMM yyyy HH:mm:ss,SSS} %p [%t]:%c{3}.%M()%L - %m%n" />
+			<PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss} %p [%t]:%c{3}.%M()%L %-5p:: %m%n" />
 			<Policies>
 				<SizeBasedTriggeringPolicy size="10 MB" />
 			</Policies>
@@ -18,10 +18,6 @@
 	</Appenders>
 	
 	<Loggers>
-		<Logger name="com.cognizant" level="debug">
-				<AppenderRef ref="RollingFile" />
-				<AppenderRef ref="Console" />
-		</Logger>
 		<Logger name="org.apache.spark" level="debug">
 				<AppenderRef ref="RollingFile" />
 				<AppenderRef ref="Console" />
