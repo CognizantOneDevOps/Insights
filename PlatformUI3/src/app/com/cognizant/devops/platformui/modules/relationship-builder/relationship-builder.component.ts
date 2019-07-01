@@ -305,6 +305,7 @@ export class RelationshipBuilderComponent implements OnInit {
     this.selectedAgent1 = "";
     this.dataDictionaryInfo();
     this.radioRefresh=false;
+    this.deleteRelation="";
   }
 
   relationDelete() {
@@ -314,7 +315,7 @@ export class RelationshipBuilderComponent implements OnInit {
     //  console.log(this.deleteRelation);
     var dialogmessage = "You are deleting a Co-Relation " + "<b>" + this.deleteRelation.relationName + "</b>" + ". The action of deleting a Co-Relation CANNOT be UNDONE. Moreover deleting an existing Co-Relation may impact other functionalities. Are you sure you want to DELETE the Co-Relation <b>" + this.deleteRelation.relationName + "</b> ?";
     const dialogRef = this.messageDialog.showConfirmationMessage(title, dialogmessage, this.deleteRelation.relationName, "ALERT", "40%");
-
+    var nameDelete = this.deleteRelation.relationName;
     dialogRef.afterClosed().subscribe(result => {
       if (result == 'yes') {
         this.deleteRelationArray = [];
