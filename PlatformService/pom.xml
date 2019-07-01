@@ -333,6 +333,14 @@
 			<version>1.6.0</version>
 		</dependency>
 		
+		<!-- TestNg Dependency  -->
+		<dependency>
+			<groupId>org.testng</groupId>
+			<artifactId>testng</artifactId>
+			<version>${testng.version}</version>
+			<scope>test</scope>
+		</dependency>
+		
 	</dependencies>
 	<properties>
 		<jersey.version>2.28</jersey.version>
@@ -340,6 +348,7 @@
 		<spring.version>5.1.5.RELEASE</spring.version>
         <spring.security.version>5.1.5.RELEASE</spring.security.version>
 		<junit.version>4.12</junit.version>
+		<testng.version>6.8.7</testng.version>
 	</properties>
 	<profiles>
 		<profile>
