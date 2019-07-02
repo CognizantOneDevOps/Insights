@@ -13,9 +13,12 @@ import java.io.IOException;
 import java.io.Reader;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import org.mockserver.client.MockServerClient;
+import org.mockserver.model.Parameter;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
@@ -27,6 +30,8 @@ import com.google.gson.reflect.TypeToken;
  *
  */
 public class MockServerImpl {
+	
+	String FILE_SEPERATOR 	= File.separator;
 	
 	public static void main(String[] args) {
 		
@@ -41,23 +46,39 @@ public class MockServerImpl {
 	public void startMockServerWithExpectations() {
 		List<MockRequest> mockRequests 	= new ArrayList<>();
 		MockServerClient mockServer 	= startClientAndServer(1080);
-		final File requestsFolder 		= new File("D:\\InSights_Windows\\Mock_Json");
+		String folderPath				= System.getenv("INSIGHTS_HOME") + FILE_SEPERATOR +
+										  ".InSights" +FILE_SEPERATOR + "Mock_Json";   
+		final File requestsFolder 		= new File(folderPath);
 		
 		for (final File currFile : requestsFolder.listFiles()) {
 			mockRequests = readMockRequestsfromJson(mockRequests, currFile);
 		};
 		
-		for (int requestIndex = 0; requestIndex < mockRequests.size(); requestIndex++) {
+		Iterator<MockRequest> mockIterator = mockRequests.iterator();
+		while (mockIterator.hasNext()) {
+			
+			MockRequest request 			= mockIterator.next();
+			List<Parameter> parameterList 	= new ArrayList<>();
+			
+			if(request.getParameters() != null) {
+				for (Map.Entry<String,String> paramEntry : request.getParameters().entrySet()) {
+					
+					Parameter param = new Parameter(paramEntry.getKey(), paramEntry.getValue());
+					parameterList.add(param);
+				}
+			}
+			
 			mockServer
-				.when(
-						request()
-						.withPath(mockRequests.get(requestIndex).getPath())
-						)
-				.respond(
-						response()
-						.withStatusCode(200)
-						.withBody(mockRequests.get(requestIndex).getResponse())
-						);
+			.when(
+					request()
+					.withPath(request.getPath())
+					.withQueryStringParameters(parameterList)
+				)
+			.respond(
+					response()
+					.withStatusCode(200)
+					.withBody(request.getResponse().toString())
+					);
 		}
 		System.out.println("Mock Server Started");
 	 }
@@ -86,7 +107,8 @@ public class MockServerImpl {
         } catch (IOException e) {
         	System.out.println("Error while reading mock requests from file " + fileToRead.getName());
         }
-        mockRequests.addAll(requests);
+        if(requests != null)
+        	mockRequests.addAll(requests);
         return mockRequests;
 	}
 
