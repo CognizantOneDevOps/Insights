@@ -615,6 +615,7 @@ export class UserOnboardingComponent implements OnInit {
                   self.showApplicationMessage = "Unable create Organization";
                   self.messageDialog.showApplicationsMessage("Unable to Create Organization", "WARN");
                 }
+                self.getApplicationDetail();
               });
             self.loadUsersInfo(this.selectedAdminOrg);
             setTimeout(() => {
