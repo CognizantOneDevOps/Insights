@@ -36,11 +36,21 @@
         </button> -->
         <button mat-icon-button (click)="saveData()" [disabled]="!toolNameSaveEnable">
             <mat-icon title="Save " class="mat-icon material-icons">
-                save </mat-icon>
+                cloud_upload </mat-icon>
         </button>
         <button mat-icon-button (click)="Refresh()" [disabled]="!toolNameSaveEnable" [disabled]="!refresh">
             <mat-icon title="Cancel " class="mat-icon material-icons">
                 cancel </mat-icon>
+        </button>
+        <button mat-icon-button>
+            <mat-icon title="Please ensure that the .CSV file is in correct format to avoid failure in uploading the file. For example
+
+In the header do not use quotes. 
+In textual data do not use spaces. E.g. run time, instead use run_time.
+In textual data do not use any special charters such as !,@,#,$ etc. E.g. 95%, instead use 95_percent.
+Please ensure there is consistency in the header while uploading data for same Tool to avoid data mismatch.
+ Please Note: Uploading incorrect data or inconsistent data may impact creation of Dashboards and other functionalities."
+                class=" mat-icon material-icons ">help</mat-icon>
         </button>
     </div>
 
@@ -60,9 +70,10 @@
                         </td>
                         <td>
                             <div style="padding-top: 10px;">
-                                <mat-select [(ngModel)]="selectedTool[index]" required [formControl]="row.get('toolName')"
-                                    name="selectedTool" class="form-control" (ngModelChange)="onToolSelect(selectedTool[index],index,row)"
-                                    placeholder="Select Tool" style="width:150px; margin-left: -30px" color="primary">
+                                <mat-select [disabled]="row.value.status =='Success'" [(ngModel)]="selectedTool[index]"
+                                    required [formControl]="row.get('toolName')" name="selectedTool" class="form-control"
+                                    (ngModelChange)="onToolSelect(selectedTool[index],index,row)" placeholder="Select Tool"
+                                    style="width:150px; margin-left: -30px" color="primary">
                                     <mat-option *ngFor=" let tool of toolsArr | keyvalue" value="{{tool.value}}"
                                         (click)="toolNameenableSave()">{{tool.value}}</mat-option>
                                 </mat-select>
