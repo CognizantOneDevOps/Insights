@@ -54,7 +54,7 @@ gitCommitID = sh (
 	
 	//Below step will be enabled in next release to include security analysis.
 	stage ('Insight_PS_IQ') {	
-	sh 'mvn com.sonatype.clm:clm-maven-plugin:evaluate -Dclm.applicationId=Insights -P enterprise'
+	sh 'mvn com.sonatype.clm:clm-maven-plugin:evaluate -Dclm.applicationId=Insights'
    	}
 
 	stage ('Insight_PS_CodeAnalysis') {
