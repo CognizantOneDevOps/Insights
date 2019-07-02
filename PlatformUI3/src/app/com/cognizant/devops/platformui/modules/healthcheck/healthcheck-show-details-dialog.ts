@@ -19,6 +19,7 @@ import { MatDialog, MatDialogRef, MAT_DIALOG_DATA, MatPaginator, MatTableDataSou
 import { RestCallHandlerService } from '@insights/common/rest-call-handler.service';
 import { HealthCheckService } from './healthcheck.service';
 import { TitleCasePipe } from '@angular/common';
+import { DatePipe } from '@angular/common';
 
 
 @Component({
@@ -37,6 +38,7 @@ export class ShowDetailsDialog implements OnInit {
   agentDetailedNode = [];
   agentDetailedDatasource = new MatTableDataSource([]);
   headerArrayDisplay = [];
+  date:any;
   masterHeader = new Map<String, String>();
   finalHeaderToShow = new Map<String, String>();
   @ViewChild(MatPaginator) paginator: MatPaginator;
@@ -45,7 +47,7 @@ export class ShowDetailsDialog implements OnInit {
   constructor(public dialogRef: MatDialogRef<ShowDetailsDialog>,
     @Inject(MAT_DIALOG_DATA) public data: any,
     private restCallHandlerService: RestCallHandlerService,
-    private healthCheckService: HealthCheckService, private titlecase: TitleCasePipe) {
+    private healthCheckService: HealthCheckService, private titlecase: TitleCasePipe, public datePipe: DatePipe) {
     this.fillMasterHeaderData();
   }
 
@@ -84,7 +86,10 @@ export class ShowDetailsDialog implements OnInit {
             for (var node in dataNodes) {
               if (node == "propertyMap") {
                 var obj = dataNodes[node];
-
+                this.date = new Date();
+                if (typeof obj["inSightsTimeX"] !== "undefined") {
+                  obj["inSightsTimeX"] = this.datePipe.transform(this.date, 'yyyy-MM-dd HH:mm:ss');
+                }
                 if (typeof obj["status"] !== "undefined") {
                   obj["status"] = this.titlecase.transform(obj["status"]);
                 }
