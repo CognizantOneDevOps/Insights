@@ -54,7 +54,7 @@ export class BulkUploadComponent implements OnInit {
     selectedLabel = [];
     fileToBeUploaded: FormData;
     lableName = [];
-
+    questionmark: string = "";
     toolTipMessage: string = "";
     labelName: any;
     uploadForm: FormGroup;
@@ -64,6 +64,9 @@ export class BulkUploadComponent implements OnInit {
     dataarr = []
     constructor(private fb: FormBuilder, private router: Router, private dialog: MatDialog, public messageDialog: MessageDialogService, private dataShare: DataSharedService, private bulkuploadService: BulkUploadService) {
         this.userForm();
+        //  this.questionmark = "Please ensure that the .CSV file is in correct format to avoid failure in uploading the file. For example" + '<br> <b>' + "In the header do not use quotes.+In textual data do not use spaces.E.g.run time, instead use run_time"
+
+
         this.rows = this.fb.array([]);
         for (let number of [1, 2, 3, 4, 5]) {
             this.rows.push(this.createItemFormGroup());
@@ -141,6 +144,8 @@ export class BulkUploadComponent implements OnInit {
 
         // this.myFileDiv.nativeElement.value = "";
         //nativeElement.value = "";
+        this.myFileDiv.nativeElement.disabled = true;
+        this.myFileDiv.nativeElement.disabled;
 
         //  console.log(this.selectedTool)
         /*  this.selectedTool = [];
@@ -189,6 +194,8 @@ export class BulkUploadComponent implements OnInit {
     }
     async saveData() {
 
+        var title = "Cancel Changes";
+        var dialogmessage = "Are you sure you want to discard your changes?";
         var rowcount = 0;
         var successCount = 0;
         var numberOfValidEntries = 0;
@@ -236,13 +243,13 @@ export class BulkUploadComponent implements OnInit {
 
                     if (bytes > 2097152) {
                         // this.size = true
-                        // this.messageDialog.showApplicationsMessage("Please select a of file size less than 2MB.", "ERROR");
+                        this.messageDialog.showApplicationsMessage("Please select a of file size less than 2MB.", "ERROR");
                         element.status = 'Fail';
                         this.toolTipMessage = "File Size greater than 2 MB.";
                         console.log(this.toolTipMessage);
                         break;
                     } else if (!testFileExt) {
-                        // this.messageDialog.showApplicationsMessage("Please select a valid .CSV file", "ERROR");
+                        this.messageDialog.showApplicationsMessage("Please select a valid .CSV file", "ERROR");
                         element.status = 'Fail'
                         this.toolTipMessage = "Incorrect file format.";
                         break;
@@ -256,13 +263,15 @@ export class BulkUploadComponent implements OnInit {
                             //self.router.navigate(['/InSights/Home']);
                             ''
                         }, 2000);
-
-
+                        console.log(toolName);
+                        // const dialogRef = this.messageDialog.showConfirmationMessage(title, dialogmessage, "", "ALERT", "30%");
                         let upload = await this.bulkuploadService.uploadFile(fd, toolName, labelName);
                         console.log(upload)
                         this.toolTipMessage = upload.message;
+                        console.log(this.toolTipMessage)
                         if (upload.status == 'success') {
                             element.status = 'Success'
+                            this.myFileDiv.nativeElement.disabled = true;
                             successCount = successCount + 1;
 
                             // this.successIconEnable = true;
@@ -270,6 +279,7 @@ export class BulkUploadComponent implements OnInit {
                         }
                         else {
                             element.status = 'Fail'
+                            this.messageDialog.showApplicationsMessage("Something went wrong in uploading the file.Please check the format and try again.", "ERROR");
                             //  this.failIconEnable = true;
                             break;
                         }
