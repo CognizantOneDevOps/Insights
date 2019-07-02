@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+<suite name = "Suite1">
+   <test name = "test1">
+      <classes>
+         <class name = "com.cognizant.devops.platformservice.rest.about.AboutServiceTest"/>
+      </classes>
+   </test>
+</suite>
