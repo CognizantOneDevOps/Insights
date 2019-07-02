@@ -69,6 +69,7 @@ export class BulkUploadComponent implements OnInit {
 
         this.rows = this.fb.array([]);
         for (let number of [1, 2, 3, 4, 5]) {
+
             this.rows.push(this.createItemFormGroup());
 
         }
@@ -123,6 +124,7 @@ export class BulkUploadComponent implements OnInit {
 
     onFileChanged(event, row) {
         this.selectedFile = <File>event.target.files[0];
+        console.log(this.selectedFile.name)
         row.value.fileFormData = <File>event.target.files[0];
     }
     toolNameenableSave() {
@@ -194,109 +196,142 @@ export class BulkUploadComponent implements OnInit {
     }
     async saveData() {
 
-        var title = "Cancel Changes";
-        var dialogmessage = "Are you sure you want to discard your changes?";
-        var rowcount = 0;
-        var successCount = 0;
-        var numberOfValidEntries = 0;
-        console.log(this.fileNameSaveEnable)
-        console.log(this.rows.value);
-        for (let element of this.rows.value) {
-            // this.toolTipMessage = "";
-            console.log(element);
-            var fd = new FormData();
-            var toolName = (element.toolName);
-            var labelName = (element.labelName);
-            var fileName = element.fileName;
-            // console.log(element.fileFormData)
-            if (toolName != null && labelName != null && element.fileFormData != null && element.fileName != null) {
-                if (element.status == "Success") {
-                    continue;
-                }
-                numberOfValidEntries = numberOfValidEntries + 1;
-                var bytes = element.fileFormData["size"];
-                var testFileExt = this.checkFile(element.fileFormData, ".csv");
-                element.status = 'Pending';
-                var fileData = element.fileFormData;
-                if ((toolName == null)) {
-                    if (element.fileData == null) {
-                        rowcount = 0
-                        break;
-                    }
-                    /* else {
-                        // console.log(element.toolName)
-                        rowcount = rowcount + 1;
-                        break;
-                    } */
+        var title = "Upload the Data";
+        var dialogmessage = "Are you sure you want to upload the data to Neo4j?";
 
-                }
-                else if (element.fileName == null) {
-                    // console.log(element.toolName)
-                    rowcount = rowcount + 1;
-                    break;
+        const dialogRef = this.messageDialog.showConfirmationMessage(title, dialogmessage, "", "ALERT", "40%");
 
-                }
+        dialogRef.afterClosed().subscribe(result => {
+            if (result == 'yes') {
+
+                var failcount = 0;
+                var rowcount = 0;
+                var successCount = 0;
+                var numberOfValidEntries = 0;
+                console.log(this.fileNameSaveEnable)
+                console.log(this.rows.value);
+                for (let element of this.rows.value) {
+                    // this.toolTipMessage = "";
+                    console.log(element);
+                    var fd = new FormData();
+                    var toolName = (element.toolName);
+                    var labelName = (element.labelName);
+                    var fileName = element.fileName;
+                    // console.log(element.fileFormData)
+                    if (toolName != null && labelName != null && element.fileFormData != null && element.fileName != null) {
+                        if (element.status == "Success") {
+                            continue;
+                        }
+                        numberOfValidEntries = numberOfValidEntries + 1;
+                        var bytes = element.fileFormData["size"];
+                        var testFileExt = this.checkFile(element.fileFormData, ".csv");
+                        element.status = 'Pending';
+                        var fileData = element.fileFormData;
+                        if ((toolName == null)) {
+                            if (element.fileData == null) {
+                                rowcount = 0
+                                break;
+                            }
+                            /* else {
+                                // console.log(element.toolName)
+                                rowcount = rowcount + 1;
+                                break;
+                            } */
+
+                        }
+                        else if (element.fileName == null) {
+                            // console.log(element.toolName)
+                            rowcount = rowcount + 1;
+                            break;
+
+                        }
 
 
 
-                if (rowcount == 0) {
+                        if (rowcount == 0) {
 
-                    if (bytes > 2097152) {
-                        // this.size = true
-                        this.messageDialog.showApplicationsMessage("Please select a of file size less than 2MB.", "ERROR");
-                        element.status = 'Fail';
-                        this.toolTipMessage = "File Size greater than 2 MB.";
-                        console.log(this.toolTipMessage);
-                        break;
-                    } else if (!testFileExt) {
-                        this.messageDialog.showApplicationsMessage("Please select a valid .CSV file", "ERROR");
-                        element.status = 'Fail'
-                        this.toolTipMessage = "Incorrect file format.";
-                        break;
-                    }
-                    else {
-                        fd.append('file', fileData, fileData.name);
-                        //   console.log(this.selectedFile)
-                        //  console.log(this.selectedFile.name)
-                        setTimeout(() => {
-                            //self.showThrobber = false;
-                            //self.router.navigate(['/InSights/Home']);
-                            ''
-                        }, 2000);
-                        console.log(toolName);
-                        // const dialogRef = this.messageDialog.showConfirmationMessage(title, dialogmessage, "", "ALERT", "30%");
-                        let upload = await this.bulkuploadService.uploadFile(fd, toolName, labelName);
-                        console.log(upload)
-                        this.toolTipMessage = upload.message;
-                        console.log(this.toolTipMessage)
-                        if (upload.status == 'success') {
-                            element.status = 'Success'
-                            this.myFileDiv.nativeElement.disabled = true;
-                            successCount = successCount + 1;
+                            if (bytes > 2097152) {
+                                // this.size = true
+                                this.messageDialog.showApplicationsMessage("Please select a of file size less than 2MB.", "ERROR");
+                                element.status = 'Fail';
+                                failcount = failcount + 1;
+                                this.toolTipMessage = "File Size greater than 2 MB.";
+                                console.log(this.toolTipMessage);
+                                break;
+                            } else if (!testFileExt) {
+                                this.messageDialog.showApplicationsMessage("Please select a valid .CSV file", "ERROR");
+                                element.status = 'Fail'
+                                failcount = failcount + 1;
+                                this.toolTipMessage = "Incorrect file format.";
+                                break;
+                            }
+                            else {
+                                fd.append('file', fileData, fileData.name);
+                                //   console.log(this.selectedFile)
+                                //  console.log(this.selectedFile.name)
+                                setTimeout(() => {
+                                    //self.showThrobber = false;
+                                    //self.router.navigate(['/InSights/Home']);
+                                    ''
+                                }, 2000);
+                                console.log(toolName);
+                                // const dialogRef = this.messageDialog.showConfirmationMessage(title, dialogmessage, "", "ALERT", "30%");
+                                this.bulkuploadService.uploadFile(fd, toolName, labelName).then(
+                                    (upload) => {
+                                        // let upload = await this.bulkuploadService.uploadFile(fd, toolName, labelName);
+                                        console.log(upload)
+                                        this.toolTipMessage = upload.message;
+                                        // console.log(this.toolTipMessage)
+                                        if (upload.status == 'success') {
+                                            element.status = 'Success'
+                                            //this.myFileDiv.nativeElement.disabled = true;
+                                            console.log(this.myFileDiv.nativeElement.disabled)
+                                            successCount = successCount + 1;
 
-                            // this.successIconEnable = true;
+                                            // this.successIconEnable = true;
+
+                                        }
+                                        else {
+                                            element.status = 'Fail'
+                                            failcount = failcount + 1;
+                                            var errorMessage = "Something went wrong in uploading the file, " + this.selectedFile.name + ". Please check the format and try again."
+                                            this.messageDialog.showApplicationsMessage(errorMessage, "ERROR");
+                                            //  this.failIconEnable = true;
+                                            //break;
+                                        }
+                                    });
+                            }
 
                         }
                         else {
-                            element.status = 'Fail'
-                            this.messageDialog.showApplicationsMessage("Something went wrong in uploading the file.Please check the format and try again.", "ERROR");
-                            //  this.failIconEnable = true;
-                            break;
+                            this.messageDialog.showApplicationsMessage("Please select a file.", "ERROR");
+                            failcount = failcount + 1;
+                            element.status == 'Fail';
                         }
                     }
+                    else if (toolName != null && labelName != null && element.fileFormData == null && element.fileName == null) {
+                        numberOfValidEntries = numberOfValidEntries - 1;
+                        element.status == 'Fail';
+                        failcount = failcount + 1;
+                        var messageinPopUp = "Please select a File for " + element.toolName;
+                        this.messageDialog.showApplicationsMessage(messageinPopUp, "ERROR");
+                        break;
+                    }
+                    else {
+                        break;
+                    }
+                    if (element.status == 'Fail' && failcount != 0) {
+                        failcount = failcount + 1;
+                        break;
+                    }
+                }
 
+                if (successCount == numberOfValidEntries && failcount == 0) {
+                    this.messageDialog.showApplicationsMessage("You have successfully uploaded the file to Neo4J", "SUCCESS");
                 }
-                else {
-                    this.messageDialog.showApplicationsMessage("Please select file", "ERROR");
-                }
+
             }
-            else {
-                break;
-            }
-        }
-        if (successCount == numberOfValidEntries) {
-            this.messageDialog.showApplicationsMessage("You have successfully uploaded the file to Neo4J", "SUCCESS");
-        }
+        });
 
     }
 
