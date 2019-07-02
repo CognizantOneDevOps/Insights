@@ -19,14 +19,19 @@ import java.io.IOException;
 import java.util.Enumeration;
 import java.util.Properties;
 
-import org.junit.Test;
 
 import com.cognizant.devops.platformservice.properties.config.GetPropertyValues;
 import com.google.gson.JsonObject;
 
+import org.springframework.test.context.ContextConfiguration;
+import org.testng.Assert;
+import org.testng.annotations.Test;
+
+@Test
+@ContextConfiguration(locations = { "classpath:spring-test-config.xml" })
 public class AboutServiceTest {
 
-	@Test
+	@Test(priority=1)
 	public void testLoadProperties() {
 		JsonObject jsonObj = new JsonObject();
 		Properties properties = null;
@@ -42,7 +47,7 @@ public class AboutServiceTest {
 			String key = (String) e.nextElement();
 			jsonObj.addProperty(key, properties.getProperty(key));
 		}
-
+		System.out.println(" About test case with Test ng");
 	}
 
 	
