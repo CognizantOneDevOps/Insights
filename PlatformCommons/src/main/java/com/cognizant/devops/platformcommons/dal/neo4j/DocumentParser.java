@@ -147,11 +147,7 @@ public class DocumentParser {
 				content.append(line);
 			}
 		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		}
 		JsonParser parser = new JsonParser();
 		JsonElement jsonData = parser.parse(content.toString());
