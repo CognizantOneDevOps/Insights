@@ -38,7 +38,6 @@ export class ShowDetailsDialog implements OnInit {
   agentDetailedNode = [];
   agentDetailedDatasource = new MatTableDataSource([]);
   headerArrayDisplay = [];
-  date:any;
   masterHeader = new Map<String, String>();
   finalHeaderToShow = new Map<String, String>();
   @ViewChild(MatPaginator) paginator: MatPaginator;
@@ -86,9 +85,8 @@ export class ShowDetailsDialog implements OnInit {
             for (var node in dataNodes) {
               if (node == "propertyMap") {
                 var obj = dataNodes[node];
-                this.date = new Date();
                 if (typeof obj["inSightsTimeX"] !== "undefined") {
-                  obj["inSightsTimeX"] = this.datePipe.transform(this.date, 'yyyy-MM-dd HH:mm:ss');
+                  obj["inSightsTimeX"] = this.datePipe.transform(obj["inSightsTimeX"], 'yyyy-MM-dd HH:mm:ss');
                 }
                 if (typeof obj["status"] !== "undefined") {
                   obj["status"] = this.titlecase.transform(obj["status"]);

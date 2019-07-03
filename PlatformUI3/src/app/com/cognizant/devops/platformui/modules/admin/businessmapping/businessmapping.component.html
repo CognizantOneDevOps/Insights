@@ -138,11 +138,10 @@
               required>
           </td>
         </ng-container>
-
         <!-- Label Column -->
         <ng-container matColumnDef="propertyLabel">
           <th mat-header-cell *matHeaderCellDef class="tableHeaderCss"> Business Mapping Label </th>
-           <td mat-cell style="vertical-align: top;padding-top:10px" *matCellDef="let element;let i=index" [attr.rowspan]="getRowSpan('label',i)"
+           <td mat-cell  class="tableCss" *matCellDef="let element;let i=index" [attr.rowspan]="getRowSpan('label',i)"
             [style.display]="getRowSpan( 'label', i) ? '' : 'none' ">
             <input [(ngModel)]="label" #labelText="ngModel" name="label" placeholder="Input a name for the Business Mapping Label" [ngClass]="{ 'input-disabled-label' :false ,'form-control-label': true} "
               required>
