@@ -11,7 +11,7 @@ gitCommitID = sh (
 	checkout scm	
 	}
 // All single and double quotes in this file are used in a certain format.Do not alter in any step build
-	//ApacheLicense Check in java and Python files . License for Enterprise -. check? 
+	//ApacheLicense Check in java and Python files . License for Enterprise.
 	/*
 	stage ('LicenseCheck') {
            checkout scm
@@ -54,7 +54,7 @@ gitCommitID = sh (
 	
 	//Below step will be enabled in next release to include security analysis.
 	/*stage ('Insight_PS_IQ') {	
-	sh 'mvn com.sonatype.clm:clm-maven-plugin:evaluate -Dclm.applicationId=Insights -P enterprise'
+	sh 'mvn com.sonatype.clm:clm-maven-plugin:evaluate -Dclm.applicationId=Insights'
    	}*/
 
 	stage ('Insight_PS_CodeAnalysis') {
