@@ -448,7 +448,6 @@ export class BusinessMappingComponent implements OnInit {
     var self = this;
     if (this.selectedMappingAgent.uuid != undefined || this.selectedMappingAgent.uuid != "") {
       var title = "Delete Business Mapping Label";
-      /*var dialogmessage = "Are you sure do you want to delete Business Mapping Label <b>" + this.selectedMappingAgent.businessmappinglabel + "</b>? <br><b>'PLEASE NOTE THIS ACTION CANNOT BE UNDONE.'</b><br><br>Please Note: <b>" + this.selectedMappingAgent.businessmappinglabel + "</b> deleted will be retained in the previously gathered data. However, if you create a new Business Mapping Label with the same name, it may impact other functionalities.";*/
        var dialogmessage = "<b>PLEASE NOTE</b> <br>Deleting Business Mapping Label <b>" + this.selectedMappingAgent.businessmappinglabel + "</b>, this action <b>CANNOT BE UNDONE.</b><br>Once Business Mapping Label<b> " + this.selectedMappingAgent.businessmappinglabel + "</b> is deleted, data related to  will be retained in the previously gathered data. However, if you create a new Business Mapping Label with the same name, it may impact other functionalities.</b><br><br>Are you sure, do you want to Delete Business Mapping Label <b>" + this.selectedMappingAgent.businessmappinglabel + "</b>?";
       const dialogRef = this.messageDialog.showConfirmationMessage(title, dialogmessage, "", "ALERT", "42%");
       dialogRef.afterClosed().subscribe(result => {
