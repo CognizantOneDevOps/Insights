@@ -25,13 +25,14 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
 
+
 /**
  * @author 668284
  *
  */
 public class MockServerImpl {
 	
-	String FILE_SEPERATOR 	= File.separator;
+	private static final String FILE_SEPERATOR 	= File.separator;
 	
 	public static void main(String[] args) {
 		
@@ -44,17 +45,10 @@ public class MockServerImpl {
 	 * expectations from the given Paths and Response in the individual tool's json.
 	 */
 	public void startMockServerWithExpectations() {
-		List<MockRequest> mockRequests 	= new ArrayList<>();
-		MockServerClient mockServer 	= startClientAndServer(1080);
-		String folderPath				= System.getenv("INSIGHTS_HOME") + FILE_SEPERATOR +
-										  ".InSights" +FILE_SEPERATOR + "Mock_Json";   
-		final File requestsFolder 		= new File(folderPath);
+		MockServerClient mockServer 		= startClientAndServer(1080);
+		List<MockRequest> mockRequests 		= getAllMockRequestsFromJson();
 		
-		for (final File currFile : requestsFolder.listFiles()) {
-			mockRequests = readMockRequestsfromJson(mockRequests, currFile);
-		};
-		
-		Iterator<MockRequest> mockIterator = mockRequests.iterator();
+		Iterator<MockRequest> mockIterator 	= mockRequests.iterator();
 		while (mockIterator.hasNext()) {
 			
 			MockRequest request 			= mockIterator.next();
@@ -63,7 +57,7 @@ public class MockServerImpl {
 			if(request.getParameters() != null) {
 				for (Map.Entry<String,String> paramEntry : request.getParameters().entrySet()) {
 					
-					Parameter param = new Parameter(paramEntry.getKey(), paramEntry.getValue());
+					Parameter param 		= new Parameter(paramEntry.getKey(), paramEntry.getValue());
 					parameterList.add(param);
 				}
 			}
@@ -93,22 +87,31 @@ public class MockServerImpl {
 	 *            File from which mock requests to be read.
 	 * @return mockRequests List
 	 */
-	private List<MockRequest> readMockRequestsfromJson(List<MockRequest> mockRequests, File fileToRead) {
-        JsonElement objObject = null;
-        Gson gson = new Gson();
-        JsonParser parser = new JsonParser();
-        Type type = new TypeToken<List<MockRequest>>() {}.getType();
-        List<MockRequest> requests = new ArrayList<MockRequest>();
-        try {
-	        File fileName = new File(fileToRead.getPath());
-	        Reader jsonFileReader = new FileReader(fileName);
-	        objObject = parser.parse(jsonFileReader);
-	        requests = gson.fromJson(objObject, type);
-        } catch (IOException e) {
-        	System.out.println("Error while reading mock requests from file " + fileToRead.getName());
-        }
-        if(requests != null)
-        	mockRequests.addAll(requests);
+	private List<MockRequest> getAllMockRequestsFromJson() {
+		List<MockRequest> mockRequests	= new ArrayList<>();
+		String folderPath				= System.getenv("INSIGHTS_HOME") + FILE_SEPERATOR + "mock_json";   
+		final File requestsFolder 		= new File(folderPath);
+		
+		for (final File currFile : requestsFolder.listFiles()) {
+			
+			JsonElement objObject 		= null;
+			Gson gson 					= new Gson();
+			JsonParser parser 			= new JsonParser();
+			Type type 					= new TypeToken<List<MockRequest>>() {}.getType();
+			List<MockRequest> requests 	= new ArrayList<MockRequest>();
+			
+			try {
+				File fileName 			= new File(currFile.getPath());
+				Reader jsonFileReader 	= new FileReader(fileName);
+				objObject 				= parser.parse(jsonFileReader);
+				requests 				= gson.fromJson(objObject, type);
+			} catch (IOException e) {
+				System.out.println("Error while reading mock requests from file " + currFile.getName());
+			}
+			if(requests != null)
+				mockRequests.addAll(requests);
+		};
+		
         return mockRequests;
 	}
 
