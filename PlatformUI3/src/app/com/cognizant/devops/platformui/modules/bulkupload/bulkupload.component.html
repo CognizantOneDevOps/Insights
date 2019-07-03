@@ -67,20 +67,20 @@
             <table class="tableMainCss">
                 <tbody>
                     <tr *ngFor="let row of rows.controls;let index = index;">
-                        <td style="padding:0 15px 0 15px;">Tool
-                        </td>
-                        <td>
-                            <div style="padding-top: 10px;">
+                        <td style="width: 30%">
+
+                            <div style="padding-top: 10px;margin-bottom: 10px;margin-left: 10px;">
+                                Tool
                                 <mat-select [disabled]="row.value.status =='Success'" [(ngModel)]="selectedTool[index]"
                                     required [formControl]="row.get('toolName')" name="selectedTool" class="form-control"
                                     (ngModelChange)="onToolSelect(selectedTool[index],index,row)" placeholder="Select Tool"
-                                    style="width:150px; margin-left: -30px" color="primary">
+                                    style="width:150px;" color="primary">
                                     <mat-option *ngFor=" let tool of toolsArr | keyvalue" value="{{tool.value}}"
                                         (click)="toolNameenableSave()">{{tool.value}}</mat-option>
                                 </mat-select>
                             </div>
                         </td>
-                        <td>
+                        <td style="width: 40%">
                             <div style="padding-top: 10px;margin-bottom: 10px;">
                                 Label
                                 <input type="text" [(ngModel)]="row.value.labelName" (click)="toolNameenableSave()"
@@ -88,20 +88,26 @@
                                     style="width:220px;" value="{{labelsArr[index]}}">
                             </div>
                         </td>
-                        <td style="padding-top: 15px;">
-                            <input #myInput type="file" class="mat-cell-value-single" required [formControl]="row.get('fileName')"
-                                name="selectedFile" (change)="onFileChanged($event,row)" style="width:250px;">
+                        <td style="padding-top: 15px; width: 20%">
+                            <div>
+                                <input #myInput type="file" class="mat-cell-value-single" required [formControl]="row.get('fileName')"
+                                    name="selectedFile" (change)="onFileChanged($event,row)" style="width:250px;">
+                            </div>
                         </td>
-                        <td>
-                            <mat-progress-bar mode="indeterminate" *ngIf="(row.value.status =='Pending' )" style="margin-right: 50px"></mat-progress-bar>
-                            <!--   {{row.value.status }} -->
-                            <mat-icon svgIcon="healthcheck_success_status" *ngIf="(row.value.status =='Success' )"
-                                [ngStyle]="{color: '#00B140', height: '20px', width: '20px'}">
-                            </mat-icon>
+                        <td style="width: 10%">
+                            <div>
 
-                            <mat-icon svgIcon="healthcheck_failure_status" matTooltip="{{row.value.tooltipmessage}}"
-                                *ngIf="(row.value.status =='Fail' )" [ngStyle]="{color: '#FF8F1C', height: '20px', width: '20px'}">
-                            </mat-icon>
+
+                                <mat-progress-bar mode="indeterminate" *ngIf="(row.value.status =='Pending' )" style="margin-right: 5px"></mat-progress-bar>
+                                <!--   {{row.value.status }} -->
+                                <mat-icon svgIcon="healthcheck_success_status" *ngIf="(row.value.status =='Success' )"
+                                    [ngStyle]="{color: '#00B140', height: '20px', width: '20px'}">
+                                </mat-icon>
+
+                                <mat-icon svgIcon="healthcheck_failure_status" matTooltip="{{row.value.tooltipmessage}}"
+                                    *ngIf="(row.value.status =='Fail' )" [ngStyle]="{color: '#FF8F1C', height: '20px', width: '20px'}">
+                                </mat-icon>
+                            </div>
                         </td>
                     </tr>
 
