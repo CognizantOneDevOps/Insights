@@ -24,8 +24,8 @@
     <div class="orangeStripCss"></div>
     <div layout layout-align="left" class="sectionHeadingStyle">
         <div layout> &nbsp; Bulk Upload
-            <span class="sectionSubHeading"> (Please note you may upload UPTO 5 .csv files of maximum 2 MB ONE AT A
-                TIME.) </span>
+            <span class="sectionSubHeading"> (Please note you may upload UPTO 5 .CSV files of maximum 2 MB ONE AT A
+                TIME) </span>
         </div>
     </div>
     <div class="btnAlign">
@@ -45,11 +45,12 @@
         <button mat-icon-button>
             <mat-icon title="Please ensure that the .CSV file is in correct format to avoid failure in uploading the file. For example
 
-In the header do not use quotes. 
-In textual data do not use spaces. E.g. run time, instead use run_time.
-In textual data do not use any special charters such as !,@,#,$ etc. E.g. 95%, instead use 95_percent.
-Please ensure there is consistency in the header while uploading data for same Tool to avoid data mismatch.
- Please Note: Uploading incorrect data or inconsistent data may impact creation of Dashboards and other functionalities."
+- In the header do not use quotes. 
+- In textual data do not use spaces. E.g. run time, instead use run_time
+- In textual data do not use any special charters such as !,@,#,$ etc. E.g. 95%, instead use 95_percent
+- Please ensure there is consistency in the header while uploading data for same Tool to avoid data mismatch
+
+  Please Note: Uploading incorrect data or inconsistent data may impact creation of Dashboards and other functionalities"
                 class=" mat-icon material-icons ">help</mat-icon>
         </button>
     </div>
@@ -89,20 +90,17 @@ Please ensure there is consistency in the header while uploading data for same T
                         </td>
                         <td style="padding-top: 15px;">
                             <input #myInput type="file" class="mat-cell-value-single" required [formControl]="row.get('fileName')"
-                                name="selectedFile" (change)="onFileChanged($event,row)" style="width:220px;">
+                                name="selectedFile" (change)="onFileChanged($event,row)" style="width:250px;">
                         </td>
                         <td>
-                            <mat-progress-bar mode="indeterminate" *ngIf="(row.value.status =='Pending' )" style="margin-right: 50px;"></mat-progress-bar>
-                        </td>
-
-                        <td>
+                            <mat-progress-bar mode="indeterminate" *ngIf="(row.value.status =='Pending' )" style="margin-right: 50px"></mat-progress-bar>
                             <!--   {{row.value.status }} -->
                             <mat-icon svgIcon="healthcheck_success_status" *ngIf="(row.value.status =='Success' )"
                                 [ngStyle]="{color: '#00B140', height: '20px', width: '20px'}">
                             </mat-icon>
 
-                            <mat-icon svgIcon="healthcheck_failure_status" matTooltip="{{toolTipMessage}}" *ngIf="(row.value.status =='Fail' )"
-                                [ngStyle]="{color: '#FF8F1C', height: '20px', width: '20px'}">
+                            <mat-icon svgIcon="healthcheck_failure_status" matTooltip="{{row.value.tooltipmessage}}"
+                                *ngIf="(row.value.status =='Fail' )" [ngStyle]="{color: '#FF8F1C', height: '20px', width: '20px'}">
                             </mat-icon>
                         </td>
                     </tr>

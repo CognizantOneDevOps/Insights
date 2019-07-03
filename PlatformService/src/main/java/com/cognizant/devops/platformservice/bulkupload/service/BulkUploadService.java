@@ -72,7 +72,7 @@ public class BulkUploadService {
 			}
 			
 			else {
-				throw new InsightsCustomException("Invalid ile format.");
+				throw new InsightsCustomException("Invalid file format.");
 			}
 			 
 				
@@ -85,18 +85,18 @@ public class BulkUploadService {
 
 		} */catch (IOException ex) {
 			log.debug("Exception while creating csv on server", ex.getMessage());
-			throw new InsightsCustomException(ex.getMessage());
+			throw new InsightsCustomException("Exception while creating csv on server");
 
 		}
 		catch(ArrayIndexOutOfBoundsException e) {
 			log.error("Error in file.", e);
-			throw new InsightsCustomException("Error in file.");
+			throw new InsightsCustomException("Error in File Format");
 		}
 		
 		catch (Exception e) {
 			status = false;
 			log.error("Error in uploading csv file", e);
-			throw new InsightsCustomException(e.getMessage());
+			throw new InsightsCustomException("Error in uploading csv file");
 			// e.printStackTrace();
 		}
 		return status;
@@ -118,9 +118,15 @@ public class BulkUploadService {
 			try {
 				JsonObject json = getToolFileDetails(csvRecord, headerMap);
 				nodeProperties.add(json);
-			} catch (Exception e) {
+			} 
+			catch(ArrayIndexOutOfBoundsException e) {
+				log.error("Error in file.", e);
+				throw new InsightsCustomException("Error in File Format");
+			}
+			
+			catch (Exception e) {
 				log.error(e);
-				throw new InsightsCustomException(e.getMessage());
+				throw new InsightsCustomException("Error in uploading csv file");
 			}
 
 		}
@@ -137,7 +143,7 @@ public class BulkUploadService {
 		}
 	}
 
-	private JsonObject getToolFileDetails(CSVRecord record, Map<String, Integer> headerMap) {
+	private JsonObject getToolFileDetails(CSVRecord record, Map<String, Integer> headerMap)throws InsightsCustomException {
 		JsonObject json = new JsonObject();
 		for (Map.Entry<String, Integer> header : headerMap.entrySet()) {
 			if (header.getKey() != null) {
@@ -156,7 +162,7 @@ public class BulkUploadService {
 					json.addProperty(header.getKey(), record.get(header.getValue()));
 				} catch (Exception e) {
 					log.error("Error " + e + " at Header Key..." + header.getKey());
-					throw e;
+					throw new InsightsCustomException("Error " + e + " at Header Key..." + header.getKey());
 				}
 			}
 		}
