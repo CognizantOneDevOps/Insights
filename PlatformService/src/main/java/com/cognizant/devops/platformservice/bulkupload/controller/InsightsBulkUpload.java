@@ -32,6 +32,7 @@ public class InsightsBulkUpload {
 	public @ResponseBody JsonObject uploadToolData(@RequestParam("file") MultipartFile file,
 			@RequestParam String toolName, @RequestParam String label) {
 		boolean status = false;
+		String messageToBePassed="";
 		try
 		{
 		
@@ -53,10 +54,11 @@ public class InsightsBulkUpload {
 		try {
 			details = bulkUploadService.getToolDetailJson();
 			return PlatformServiceUtil.buildSuccessResponseWithData(details);
-		} catch (InsightsCustomException e) {
+		} 
+		catch (InsightsCustomException e) {
 			return PlatformServiceUtil.buildFailureResponse(e.toString());
 		}
-	
-	}
+		
 
+}
 }
