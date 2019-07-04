@@ -20,6 +20,9 @@
 		<version>5.2</version>
 		<groupId>com.cognizant.devops</groupId>
 	</parent>
+	
+	<groupId>com.cognizant.devops</groupId>
+	<version>5.3-SNAPSHOT</version>
 
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>PlatformMockServer</artifactId>
@@ -90,8 +93,6 @@
 			<scope>provided</scope>
 		</dependency>
 
-
-
 		<!-- Spring 3 dependencies -->
 
 		<dependency>
@@ -99,8 +100,6 @@
 			<artifactId>spring-web</artifactId>
 			<version>${spring.version}</version>
 		</dependency>
-
-
 
 		<dependency>
 			<groupId>org.slf4j</groupId>
@@ -128,13 +127,10 @@
 			<version>2.5</version>
 		</dependency>
 		
-				
 	</dependencies>
 	
 	<properties>
 		<spring.version>5.1.6.RELEASE</spring.version>
 	</properties>
-
-	<version>5.2</version>
-	<groupId>com.cognizant.devops</groupId>
+	
 </project>
