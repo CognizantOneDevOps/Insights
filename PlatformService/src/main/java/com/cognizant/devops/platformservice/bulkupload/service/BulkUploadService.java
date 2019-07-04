@@ -55,17 +55,16 @@ import com.google.gson.JsonParser;
 @Service("bulkUploadService")
 public class BulkUploadService {
 	private static final Logger log = LogManager.getLogger(BulkUploadService.class);
-
 	public boolean uploadDataInDatabase(MultipartFile file, String toolName, String label)
 			throws InsightsCustomException, IOException {
-
 		File csvfile = null;
+		long filesizeMaxValue = 2097152;
 		boolean status = false;
 		String originalFilename = file.getOriginalFilename();
 		String fileExt = FilenameUtils.getExtension(originalFilename);
 		try {
 			if (fileExt.equalsIgnoreCase("csv")) {
-				if (file.getSize() < 2097152) {
+				if (file.getSize() < filesizeMaxValue) {
 					csvfile = convertToFile(file);
 					CSVFormat format = CSVFormat.newFormat(',').withHeader();
 					Reader reader = new FileReader(csvfile);
@@ -118,12 +117,10 @@ public class BulkUploadService {
 				log.error("Error in file.", ex);
 				throw new InsightsCustomException("Error in File Format");
 			}
-
 			catch (Exception e) {
 				log.error(e);
 				throw new InsightsCustomException(e.getMessage());
 			}
-
 		}
 		JsonObject graphResponse = dbHandler.bulkCreateNodes(nodeProperties, null, query);
 			if (graphResponse.get(DatataggingConstants.RESPONSE).getAsJsonObject().get(DatataggingConstants.ERRORS)
@@ -155,11 +152,9 @@ public class BulkUploadService {
 	}
 	private File convertToFile(MultipartFile multipartFile) throws IOException {
 		File file = new File(multipartFile.getOriginalFilename());
-
 		try (FileOutputStream fos = new FileOutputStream(file)) {
 			fos.write(multipartFile.getBytes());
 		}
-
 		return file;
 	}
 	public Object getToolDetailJson() throws InsightsCustomException {
@@ -171,7 +166,6 @@ public class BulkUploadService {
 		try (Stream<Path> paths = Files.find(dir, Integer.MAX_VALUE,
 				(path, attrs) -> attrs.isRegularFile() && path.toString().endsWith(ConfigOptions.TOOLDETAIL_TEMPLATE));
 				FileReader reader = new FileReader(paths.limit(1).findFirst().get().toFile())) {
-
 			JsonParser parser = new JsonParser();
 			Object obj = parser.parse(reader);
 			config = obj;
@@ -181,9 +175,7 @@ public class BulkUploadService {
 		} catch (Exception e) {
 			log.error("Error in reading csv file", e.getMessage());
 			throw new InsightsCustomException("Error in reading csv file");
-		
-		}
+				}
 		return config;
 	}
-
 }

@@ -88,16 +88,17 @@
                                     style="width:220px;" value="{{labelsArr[index]}}">
                             </div>
                         </td>
+
                         <td style="padding-top: 15px; width: 20%">
                             <div>
                                 <input #myInput type="file" class="mat-cell-value-single" required [formControl]="row.get('fileName')"
-                                    name="selectedFile" (change)="onFileChanged($event,row)" style="width:250px;">
+                                    [attr.disabled]=" row.value.status =='Success'  ? '' :  disabled" name="
+                                    selectedFile"
+                                    (change)="onFileChanged($event,row)" style="width:250px;">
                             </div>
                         </td>
                         <td style="width: 10%">
                             <div>
-
-
                                 <mat-progress-bar mode="indeterminate" *ngIf="(row.value.status =='Pending' )" style="margin-right: 5px"></mat-progress-bar>
                                 <!--   {{row.value.status }} -->
                                 <mat-icon svgIcon="healthcheck_success_status" *ngIf="(row.value.status =='Success' )"
