@@ -30,7 +30,7 @@
 				<version>3.0.0-M3</version>
 				<configuration>
 					<suiteXmlFiles>
-						<suiteXmlFile>src/main/resources/testng.xml</suiteXmlFile>
+						<suiteXmlFile>src/test/resources/testng.xml</suiteXmlFile>
 					</suiteXmlFiles>
 					<!-- <forkMode>pertest</forkMode> <argLine>-Xms512m -Xmx1024m</argLine> -->
 				</configuration>
