@@ -17,7 +17,7 @@
 	<!-- adding a comment to test poll -6 -->
 	<parent>
 		<artifactId>PlatformParent</artifactId>
-		<version>5.2</version>
+		<version>5.3-SNAPSHOT</version>
 		<groupId>com.cognizant.devops</groupId>
 	</parent>
 	
