@@ -53,7 +53,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
 @Service("bulkUploadService")
-public class BulkUploadService {
+public class BulkUploadService implements IBulkUpload{
 	private static final Logger log = LogManager.getLogger(BulkUploadService.class);
 	public boolean uploadDataInDatabase(MultipartFile file, String toolName, String label)
 			throws InsightsCustomException, IOException {
@@ -89,7 +89,7 @@ public class BulkUploadService {
 			log.error("Error in file.", ex);
 			throw new InsightsCustomException("Error in File Format");
 		} catch (ArrayIndexOutOfBoundsException e) {
-			log.error("Error in file.", e);
+			log.error("Error in file.", e.getMessage());
 			throw new InsightsCustomException("Error in File Format");
 		}
 		catch (Exception e) {
