@@ -135,6 +135,9 @@ public class Neo4jDBImpl implements DatabaseService {
 			String graphQuery = "MATCH (n:INFERENCE:CONFIG) RETURN n";
 			GraphResponse graphResp = graphDBHandler.executeCypherQuery(graphQuery);
 			List<NodeData> nodesList = graphResp.getNodes();
+			if (nodesList.size() == 0) {
+				log.debug("No KPI define in database");
+			}
 			for (NodeData nodeData : nodesList) {
 				InferenceConfigDefinition nodemapping = mapNodeDataToInferenceConfigDefinition(nodeData);
 				jobs.add(nodemapping);
