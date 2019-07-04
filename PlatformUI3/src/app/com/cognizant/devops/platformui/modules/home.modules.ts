@@ -81,8 +81,6 @@ import { BulkUploadService } from '@insights/app/modules/bulkupload/bulkupload.s
 
 
 
-
-
 @NgModule({
   declarations: [
     HomeComponent,
