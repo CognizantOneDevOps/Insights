@@ -16,19 +16,16 @@
 	<version>5.3-SNAPSHOT</version>
 	<name>PlatformParent</name>
 
-	<modules>
-				<module>PlatformAuditEngine</module>
-			    <module>PlatformAuditing</module>
-				<module>PlatformCommons</module>
-				<module>PlatformDAL</module>
-				<module>PlatformService</module>
-				<module>PlatformEngine</module>				
-				<module>PlatformUI3</module>
-				<module>PlatformInsights</module>
-				
-				
-				
-				<module>PlatformMockServer</module>
+	<modules>		
+		<module>PlatformCommons</module>
+		<module>PlatformDAL</module>
+		<module>PlatformAuditing</module>
+		<module>PlatformAuditEngine</module>
+		<module>PlatformService</module>
+		<module>PlatformEngine</module>				
+		<module>PlatformUI3</module>
+		<module>PlatformInsights</module>
+		<module>PlatformMockServer</module>
 	</modules>
 			
 	<dependencies>
