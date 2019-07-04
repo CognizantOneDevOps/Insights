@@ -91,7 +91,7 @@
 
                         <td style="padding-top: 15px; width: 20%">
                             <div>
-                                <input #myInput type="file" class="mat-cell-value-single" required [formControl]="row.get('fileName')"
+                                <input type="file" class="mat-cell-value-single" required [formControl]="row.get('fileName')"
                                     [attr.disabled]=" row.value.status =='Success'  ? '' :  disabled" name="
                                     selectedFile"
                                     (change)="onFileChanged($event,row)" style="width:250px;">

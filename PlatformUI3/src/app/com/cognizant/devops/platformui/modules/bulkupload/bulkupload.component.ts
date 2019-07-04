@@ -32,8 +32,6 @@ import { MatAutocompleteModule, MatInputModule, MatProgressBarModule } from '@an
     styleUrls: ['./bulkupload.component.css', './../home.module.css']
 })
 export class BulkUploadComponent implements OnInit {
-    @ViewChild('myInput')
-    myFileDiv: ElementRef;
     rows: FormArray;
     toolsArr = [];
     labelsArr = [];
@@ -179,13 +177,11 @@ export class BulkUploadComponent implements OnInit {
                             if (bytes > 2097152) {
                                 element.status = 'Fail';
                                 failcount = failcount + 1;
-                                this.myFileDiv.nativeElement.disabled = false;
                                 element.tooltipmessage = "File Size greater than 2 MB."
                                 this.toolTipMessage = "File Size greater than 2 MB.";
                             } else if (!testFileExt) {
                                 element.status = 'Fail'
                                 failcount = failcount + 1;
-                                this.myFileDiv.nativeElement.disabled = false;
                                 element.tooltipmessage = "Incorrect file format.";
                                 this.toolTipMessage = "Incorrect file format.";
                             }
@@ -206,7 +202,6 @@ export class BulkUploadComponent implements OnInit {
                                 else {
                                     element.status = 'Fail'
                                     failcount = failcount + 1;
-                                    this.myFileDiv.nativeElement.disabled = false;
                                     this.toolTipMessage = upload.message
                                     element.tooltipmessage = this.toolTipMessage
                                     //break;
@@ -218,7 +213,7 @@ export class BulkUploadComponent implements OnInit {
                             this.toolTipMessage = "No File Selected"
                             element.tooltipmessage = "No File Selected"
                             element.status == 'Fail';
-                            this.myFileDiv.nativeElement.disabled = false;
+
                         }
                     }
                     else if (toolName != null && labelName != null && element.fileFormData == null && element.fileName == null) {
@@ -226,7 +221,6 @@ export class BulkUploadComponent implements OnInit {
                         element.status = 'Fail';
                         failcount = failcount + 1;
                         this.toolTipMessage = "No File Selected"
-                        this.myFileDiv.nativeElement.disabled = false;
                         element.tooltipmessage = this.toolTipMessage
                     }
                     else {
