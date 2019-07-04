@@ -114,15 +114,17 @@ public class ApplicationConfigCache {
 	private static boolean initialize(String json) {
 		try {
 			Gson gson = new Gson();
+			JsonParser parser = new JsonParser();
+			JsonElement parsedJson = parser.parse(json);
 			JsonElement jsonElement = new JsonParser().parse(json);
 			if(jsonElement != null && jsonElement.isJsonObject()){
 				ApplicationConfigProvider config = gson.fromJson(jsonElement.getAsJsonObject(), ApplicationConfigProvider.class);
 				ApplicationConfigProvider.updateConfig(config);
 			}
 		} catch (JsonIOException e) {
-			log.error(e);
+			log.error(ConfigOptions.CONFIG_FILE + " is not formatted,Json parsing issue in file " + e);
 		} catch (JsonSyntaxException e) {
-			log.error(e);
+			log.error(ConfigOptions.CONFIG_FILE + " is not formatted,Json parsing issue in file " + e);
 		}
 		return false;
 	}
