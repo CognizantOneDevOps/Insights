@@ -611,10 +611,12 @@ export class UserOnboardingComponent implements OnInit {
                   self.isSaveEnable = false;
                   self.showApplicationMessage = createOrgResponse.message;
                   self.messageDialog.showApplicationsMessage(createOrgResponse.message, "SUCCESS");
+                  self.getApplicationDetail();
                 } else {
                   self.showApplicationMessage = "Unable create Organization";
                   self.messageDialog.showApplicationsMessage("Unable to Create Organization", "WARN");
                 }
+                
               });
             self.loadUsersInfo(this.selectedAdminOrg);
             setTimeout(() => {
