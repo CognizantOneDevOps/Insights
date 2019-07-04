@@ -1,3 +1,18 @@
+/*******************************************************************************
+ *  * Copyright 2017 Cognizant Technology Solutions
+ *  * 
+ *  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ *  * use this file except in compliance with the License.  You may obtain a copy
+ *  * of the License at
+ *  * 
+ *  *   http://www.apache.org/licenses/LICENSE-2.0
+ *  * 
+ *  * Unless required by applicable law or agreed to in writing, software
+ *  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ *  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ *  * License for the specific language governing permissions and limitations under
+ *  * the License.
+ *******************************************************************************/
 package com.cognizant.devops.platformservice.bulkupload.controller;
 
 import java.io.IOException;
@@ -22,38 +37,37 @@ import com.google.gson.JsonObject;
 @RestController
 @RequestMapping("/admin/bulkupload")
 public class InsightsBulkUpload {
- static Logger log = LogManager.getLogger(GraphDBService.class.getName());
- private JsonObject asJsonObject;
+    static Logger log = LogManager.getLogger(GraphDBService.class.getName());
+    private JsonObject asJsonObject;
 
- @Autowired
- BulkUploadService bulkUploadService;
+    @Autowired
+    BulkUploadService bulkUploadService;
 
- @RequestMapping(value = "/uploadToolData", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
- public @ResponseBody JsonObject uploadToolData(@RequestParam("file") MultipartFile file,
-  @RequestParam String toolName, @RequestParam String label) {
-  boolean status = false;
-  
-  try {
+    @RequestMapping(value = "/uploadToolData", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public @ResponseBody JsonObject uploadToolData(@RequestParam("file") MultipartFile file,
+        @RequestParam String toolName, @RequestParam String label) {
+        boolean status = false;
+        try {
+            status = bulkUploadService.uploadDataInDatabase(file, toolName, label);
+            return PlatformServiceUtil.buildSuccessResponse();
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            return PlatformServiceUtil.buildFailureResponse(e.getMessage());
+        }
+    }
 
-   status = bulkUploadService.createBulkUploadMetaData(file, toolName, label);
-   return PlatformServiceUtil.buildSuccessResponse();
-  } catch (Exception e) {
-   log.error(e.getMessage());
-   return PlatformServiceUtil.buildFailureResponse(e.getMessage());
-  }
-
- }
-
- @RequestMapping(value = "/getToolJson", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
- public @ResponseBody JsonObject getToolJson() {
-  Object details = null;
-  try {
-   details = bulkUploadService.getToolDetailJson();
-   return PlatformServiceUtil.buildSuccessResponseWithData(details);
-  } catch (InsightsCustomException e) {
-   return PlatformServiceUtil.buildFailureResponse(e.toString());
-  }
-
-
- }
+    @RequestMapping(value = "/getToolJson", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    public @ResponseBody JsonObject getToolJson() {
+        Object details = null;
+        try {
+            details = bulkUploadService.getToolDetailJson();
+            return PlatformServiceUtil.buildSuccessResponseWithData(details);
+        } catch (InsightsCustomException e) {
+            log.error(e.getMessage());
+            return PlatformServiceUtil.buildFailureResponse(e.toString());
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            return PlatformServiceUtil.buildFailureResponse(e.getMessage());
+        }
+    }
 }
