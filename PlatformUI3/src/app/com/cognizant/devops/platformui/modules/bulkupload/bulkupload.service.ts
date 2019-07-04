@@ -20,6 +20,8 @@ import { Observable } from 'rxjs';
 
 export interface IBulkUploadService {
     getDocRootAgentVersionTools(): Promise<any>;
+    loadUiServiceLocation(): Promise<any>;
+    uploadFile(formData: any, toolName: string, labelName: string): Promise<any>;
 }
 
 @Injectable()
