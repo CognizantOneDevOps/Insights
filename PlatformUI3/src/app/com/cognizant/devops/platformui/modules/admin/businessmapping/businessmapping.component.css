@@ -227,3 +227,8 @@ td.mat-cell{
   color:#FF8F1C;
   padding:2px
 }
+.tableCss{
+    vertical-align: top;
+    padding-top:10px;
+
+}

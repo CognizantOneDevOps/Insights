@@ -38,7 +38,7 @@
 
 .inputcss {
     font-size: 14px !important;
-    margin-left: 25px;
+   margin-left: 18px;
     width: 240px;
     margin-top: 10px
 }
@@ -181,7 +181,7 @@ td {
     font-size: 18px;
     color: #0033A0;
     font-weight: bold;
-    margin-left: 1px;
+    margin-left: -1px;
     margin-top: 21px;
 }
 

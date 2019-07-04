@@ -18,6 +18,8 @@ import { Component, OnInit, Inject, ViewChild } from '@angular/core';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA, MatPaginator, MatTableDataSource } from '@angular/material';
 import { RestCallHandlerService } from '@insights/common/rest-call-handler.service';
 import { HealthCheckService } from './healthcheck.service';
+import { TitleCasePipe } from '@angular/common';
+import { DatePipe } from '@angular/common';
 
 
 @Component({
@@ -44,7 +46,7 @@ export class ShowDetailsDialog implements OnInit {
   constructor(public dialogRef: MatDialogRef<ShowDetailsDialog>,
     @Inject(MAT_DIALOG_DATA) public data: any,
     private restCallHandlerService: RestCallHandlerService,
-    private healthCheckService: HealthCheckService) {
+    private healthCheckService: HealthCheckService, private titlecase: TitleCasePipe, public datePipe: DatePipe) {
     this.fillMasterHeaderData();
   }
 
@@ -59,7 +61,7 @@ export class ShowDetailsDialog implements OnInit {
 
   fillMasterHeaderData() {
     this.masterHeader.set("execId", "Execution ID");
-    this.masterHeader.set("inSightsTimeX", "Execution Time("+this.data.timeZone+")");
+    this.masterHeader.set("inSightsTimeX", "Execution Time ("+this.data.timeZone+")");
     this.masterHeader.set("status", "Status");
     this.masterHeader.set("message", "Message");
   }
@@ -83,6 +85,12 @@ export class ShowDetailsDialog implements OnInit {
             for (var node in dataNodes) {
               if (node == "propertyMap") {
                 var obj = dataNodes[node];
+                if (typeof obj["inSightsTimeX"] !== "undefined") {
+                  obj["inSightsTimeX"] = this.datePipe.transform(obj["inSightsTimeX"], 'yyyy-MM-dd HH:mm:ss');
+                }
+                if (typeof obj["status"] !== "undefined") {
+                  obj["status"] = this.titlecase.transform(obj["status"]);
+                }
                 if (typeof obj["message"] !== "undefined") {
                   obj["message"] = obj["message"].slice(0, 100);
                 }

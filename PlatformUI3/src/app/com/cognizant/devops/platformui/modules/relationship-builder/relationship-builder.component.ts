@@ -95,6 +95,7 @@ export class RelationshipBuilderComponent implements OnInit {
   displayDataSource = [];
   toolsDatasource = [];
   toolSourceDataSource = [];
+  radioRefresh:boolean= true;
 
   constructor(private router: Router, private relationshipBuilderService: RelationshipBuilderService, private dialog: MatDialog, public messageDialog: MessageDialogService, private dataShare: DataSharedService) {
     this.dataDictionaryInfo();
@@ -303,6 +304,8 @@ export class RelationshipBuilderComponent implements OnInit {
     this.buttonOn = false;
     this.selectedAgent1 = "";
     this.dataDictionaryInfo();
+    this.radioRefresh=false;
+    this.deleteRelation="";
   }
 
   relationDelete() {
@@ -312,7 +315,7 @@ export class RelationshipBuilderComponent implements OnInit {
     //  console.log(this.deleteRelation);
     var dialogmessage = "You are deleting a Co-Relation " + "<b>" + this.deleteRelation.relationName + "</b>" + ". The action of deleting a Co-Relation CANNOT be UNDONE. Moreover deleting an existing Co-Relation may impact other functionalities. Are you sure you want to DELETE the Co-Relation <b>" + this.deleteRelation.relationName + "</b> ?";
     const dialogRef = this.messageDialog.showConfirmationMessage(title, dialogmessage, this.deleteRelation.relationName, "ALERT", "40%");
-
+    var relationName = this.deleteRelation.relationName;
     dialogRef.afterClosed().subscribe(result => {
       if (result == 'yes') {
         this.deleteRelationArray = [];
@@ -327,7 +330,7 @@ export class RelationshipBuilderComponent implements OnInit {
           (corelationResponse2) => {
             if (corelationResponse2.status == "success") {
               this.getCorrelation();
-              var dialogmessage = "<b>" + this.deleteRelation.relationName + "</b> deleted successfully from Correlation.json."
+              var dialogmessage = "<b>" + relationName + "</b> deleted successfully from Correlation.json."
               this.messageDialog.showApplicationsMessage(dialogmessage, "SUCCESS");
             }
           });
