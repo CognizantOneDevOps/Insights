@@ -53,11 +53,14 @@ public class MockServerImpl {
 	}
 	
 	/**
-	 * This function will read all json files from Mock_Json folder and create
-	 * expectations from the given Paths and Response in the individual tool's json.
+	 * This function will read all json files from getAllMockRequestsFromJson method
+	 * and create expectations from the given Paths and Response in the individual
+	 * tool's json.
 	 */
 	public void startMockServerWithExpectations() {
+		// Starting mock server on port 1080.
 		MockServerClient mockServer 		= startClientAndServer(1080);
+		// Reading mock requests from multiple JSON files.
 		List<MockRequest> mockRequests 		= getAllMockRequestsFromJson();
 		
 		Iterator<MockRequest> mockIterator 	= mockRequests.iterator();
@@ -66,6 +69,7 @@ public class MockServerImpl {
 			MockRequest request 			= mockIterator.next();
 			List<Parameter> parameterList 	= new ArrayList<>();
 			
+			// checking if the request has any parameters.
 			if(request.getParameters() != null) {
 				for (Map.Entry<String,String> paramEntry : request.getParameters().entrySet()) {
 					
@@ -74,6 +78,7 @@ public class MockServerImpl {
 				}
 			}
 			
+			// Creating mock Expectation 
 			mockServer
 			.when(
 					request()
@@ -93,10 +98,6 @@ public class MockServerImpl {
 	 * This function will read all {@link MockRequest} from json file and appends it
 	 * to the mockRequests list.
 	 * 
-	 * @param mockRequests
-	 *            List of all mock requests gathered from individual json files.
-	 * @param fileToRead
-	 *            File from which mock requests to be read.
 	 * @return mockRequests List
 	 */
 	private List<MockRequest> getAllMockRequestsFromJson() {
