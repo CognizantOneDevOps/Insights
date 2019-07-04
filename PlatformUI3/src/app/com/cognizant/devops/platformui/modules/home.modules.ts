@@ -60,8 +60,7 @@ import { ApplicationMessageDialog } from '@insights/app/modules/application-dial
 import { AddGroupMessageDialog } from '@insights/app/modules/user-onboarding/add-group-message-dialog';
 import { MessageDialogService } from '@insights/app/modules/application-dialog/message-dialog-service';
 import { BlockChainService } from '@insights/app/modules/blockchain/blockchain.service';
-import { DatePipe } from '@angular/common';
-import { TitleCasePipe } from '@angular/common';
+import { DatePipe, TitleCasePipe } from '@angular/common';
 import { UserOnboardingService } from '@insights/app/modules/user-onboarding/user-onboarding-service';
 import { StorageServiceModule } from 'ngx-webstorage-service';
 import { LogoSettingComponent } from '@insights/app/modules/settings/logo-setting/logo-setting.component';
