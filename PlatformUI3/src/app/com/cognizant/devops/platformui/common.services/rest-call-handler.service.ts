@@ -162,6 +162,46 @@ export class RestCallHandlerService {
     }
   }
 
+
+  public postFormDataWithParameter(url: string, data: any, requestParams?: Object, additionalheaders?: Object): Observable<any> {
+    var isSessionExpired = this.dataShare.validateSession();
+    if (!isSessionExpired) {
+      var restCallUrl = this.restAPIUrlService.getRestCallUrl(url);
+      //console.log(restCallUrl);
+      var dataresponse;
+      let headers;
+      var authToken = this.dataShare.getAuthorizationToken();
+
+      let params = new HttpParams();
+
+      for (var key in requestParams) {
+        // console.log(key + " " + requestParams[key]);
+        if (requestParams.hasOwnProperty(key)) {
+          params = params.set(key, requestParams[key]);
+        }
+      }
+
+      headers = new HttpHeaders();
+      headers = headers.set('Authorization', authToken);
+
+      for (var key in additionalheaders) {
+        //console.log(key + " " + additionalheaders[key]);
+        if (headers.hasOwnProperty(key)) {
+          headers = headers.set(key, additionalheaders[key]);
+        }
+      }
+      var httpOptions = {
+        headers: headers,
+        params: params
+      }
+      //console.log(httpOptions);
+      dataresponse = this.http.post(restCallUrl, data, httpOptions);
+      return dataresponse;
+    } else {
+      console.log("Session Expire")
+    }
+  }
+
   public postWithData(url: string, data: String, requestParams?: Object, additionalheaders?: Object): Observable<any> {
     var isSessionExpired = this.dataShare.validateSession();
     if (!isSessionExpired) {
@@ -214,6 +254,7 @@ export class RestCallHandlerService {
     }
     return false;
   }
+
 
   private constructGetUrl(url: string, requestParams: Object) {
     var selectedUrl = this.restAPIUrlService.getRestCallUrl(url); //url
