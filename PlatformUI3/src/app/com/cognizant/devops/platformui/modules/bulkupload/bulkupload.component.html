@@ -69,7 +69,7 @@
                     <tr *ngFor="let row of rows.controls;let index = index;">
                         <td style="width: 30%">
 
-                            <div style="padding-top: 10px;margin-bottom: 10px;margin-left: 10px;">
+                            <div class="toolColCss">
                                 Tool
                                 <mat-select [disabled]="row.value.status =='Success'" [(ngModel)]="selectedTool[index]"
                                     required [formControl]="row.get('toolName')" name="selectedTool" class="form-control"

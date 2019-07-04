@@ -226,6 +226,7 @@ export class BulkUploadComponent implements OnInit {
                                 // this.messageDialog.showApplicationsMessage("Please select a of file size less than 2MB.", "ERROR");
                                 element.status = 'Fail';
                                 failcount = failcount + 1;
+                                this.myFileDiv.nativeElement.disabled = false;
                                 element.tooltipmessage = "File Size greater than 2 MB."
                                 this.toolTipMessage = "File Size greater than 2 MB.";
                                 //console.log(this.toolTipMessage);
@@ -234,6 +235,7 @@ export class BulkUploadComponent implements OnInit {
                                 // this.messageDialog.showApplicationsMessage("Please select a valid .CSV file", "ERROR");
                                 element.status = 'Fail'
                                 failcount = failcount + 1;
+                                this.myFileDiv.nativeElement.disabled = false;
                                 element.tooltipmessage = "Incorrect file format.";
                                 this.toolTipMessage = "Incorrect file format.";
                                 //console.log("Incorrect file format.")
@@ -265,7 +267,7 @@ export class BulkUploadComponent implements OnInit {
                                     element.status = 'Success'
                                     element.tooltipmessage = "success"
                                     //console.log("Success upload done")
-                                    //this.myFileDiv.nativeElement.disabled = true;
+                                    // this.myFileDiv.nativeElement.disabled = true;
                                     //  console.log(this.myFileDiv.nativeElement.disabled)
                                     successCount = successCount + 1;
                                     //console.log(successCount)
@@ -274,6 +276,7 @@ export class BulkUploadComponent implements OnInit {
                                 else {
                                     element.status = 'Fail'
                                     failcount = failcount + 1;
+                                    this.myFileDiv.nativeElement.disabled = false;
                                     // var errorMessage = "Something went wrong in uploading the file, " + element.fileFormData.name + ". Please check the format and try again."
                                     //  var errorMessage = "Failed to Upload the Data.Please click on the icon for more details."
                                     // this.messageDialog.showApplicationsMessage(errorMessage, "ERROR");
@@ -293,6 +296,7 @@ export class BulkUploadComponent implements OnInit {
                             this.toolTipMessage = "No File Selected"
                             element.tooltipmessage = "No File Selected"
                             element.status == 'Fail';
+                            this.myFileDiv.nativeElement.disabled = false;
                             //console.log("Problem in file select")
                         }
                     }
@@ -302,6 +306,7 @@ export class BulkUploadComponent implements OnInit {
                         failcount = failcount + 1;
                         //  var messageinPopUp = "Please select a File for " + element.toolName;
                         this.toolTipMessage = "No File Selected"
+                        this.myFileDiv.nativeElement.disabled = false;
                         element.tooltipmessage = this.toolTipMessage
                         // console.log(".......some uploadding fole miss")
                         // this.messageDialog.showApplicationsMessage(messageinPopUp, "ERROR");
