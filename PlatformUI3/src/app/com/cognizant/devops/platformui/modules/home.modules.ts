@@ -74,7 +74,6 @@ import { ShowJsonDialog } from '@insights/app/modules/relationship-builder/show-
 import { from } from 'rxjs';
 import { RelationshipBuilderComponent } from '@insights/app/modules/relationship-builder/relationship-builder.component';
 import { RelationshipBuilderService } from '@insights/app/modules/relationship-builder/relationship-builder.service';
-
 import { BulkUploadComponent } from '@insights/app/modules/bulkupload/bulkupload.component';
 import { BulkUploadService } from '@insights/app/modules/bulkupload/bulkupload.service';
 
