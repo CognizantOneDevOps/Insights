@@ -13,25 +13,31 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  ******************************************************************************/
-package com.cognizant.devops.platformauditing.api;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
+package com.cognizant.devops.platformauditing.hyperledger.user;
 
-public interface InsightsAudit {
+import org.hyperledger.fabric.sdk.Enrollment;
 
-	public String getAssetHistory(String primaryId);
-	
-	public String getAssetInfo(String assetId);
+import java.io.Serializable;
+import java.security.PrivateKey;
 
-	public String getAllAssets(String startDate, String endDate, String toolName);
+//Enrollment metadata
+public class CertificationAuthorityEnrollment implements Enrollment, Serializable {
+	private static final long serialVersionUID = 550416591376968096L;
+	private PrivateKey key;
+	private String cert;
 
-	public boolean insertToolData(JsonObject input);
+	public CertificationAuthorityEnrollment(PrivateKey pkey, String signedPem) {
+		this.key = pkey;
+		this.cert = signedPem;
+	}
 
-	public boolean insertChangeLogData(JsonObject input);
+	public PrivateKey getKey() {
+		return key;
+	}
 
-	public boolean insertJiraNode(JsonObject input, JsonArray changelogArray);
-
-	public JsonObject getProcessFlow();
+	public String getCert() {
+		return cert;
+	}
 
 }
