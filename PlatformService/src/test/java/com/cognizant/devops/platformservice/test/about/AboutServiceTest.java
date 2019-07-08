@@ -13,26 +13,30 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  ******************************************************************************/
-package com.cognizant.devops.platformservice.rest.about;
+package com.cognizant.devops.platformservice.test.about;
 
 import java.io.IOException;
 import java.util.Enumeration;
 import java.util.Properties;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.springframework.test.context.ContextConfiguration;
+import org.testng.annotations.Test;
 
 import com.cognizant.devops.platformservice.properties.config.GetPropertyValues;
+import com.cognizant.devops.platformservice.test.testngInitializer.TestngInitializerTest;
 import com.google.gson.JsonObject;
-
-import org.springframework.test.context.ContextConfiguration;
-import org.testng.Assert;
-import org.testng.annotations.Test;
 
 @Test
 @ContextConfiguration(locations = { "classpath:spring-test-config.xml" })
 public class AboutServiceTest {
 
-	@Test(priority=1)
+	static Logger log = LogManager.getLogger(TestngInitializerTest.class);
+	
+	@Test
 	public void testLoadProperties() {
+		
 		JsonObject jsonObj = new JsonObject();
 		Properties properties = null;
 		try {
@@ -47,9 +51,7 @@ public class AboutServiceTest {
 			String key = (String) e.nextElement();
 			jsonObj.addProperty(key, properties.getProperty(key));
 		}
-		System.out.println(" About test case with Test ng");
+		System.out.println(" Test ng for AboutService");
 	}
-
 	
-
 }
