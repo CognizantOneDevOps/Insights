@@ -73,8 +73,8 @@ public class HealthStatus {
 			log.debug("After Platform Service================");
 			/*Insights Inference health check*/	
 			hostEndPoint = ServiceStatusConstants.INSIGHTS_INFERENCE_MASTER_HOST;
-			apiUrl = hostEndPoint+"/jobs";
-			JsonObject inferenceServStatus = getComponentStatus("PlatformInsightSpark",apiUrl);//getClientResponse(hostEndPoint, apiUrl, ServiceStatusConstants.Service,"");
+			apiUrl = hostEndPoint;
+			JsonObject inferenceServStatus = getComponentStatus("PlatformInsight", "");
 			servicesHealthStatus.add(ServiceStatusConstants.InsightsInference, inferenceServStatus);
 			log.debug("After inferance engine================");
 			/*Neo4j health check*/
@@ -125,10 +125,6 @@ public class HealthStatus {
 		}
 		return servicesAgentsHealthStatus;
 	}
-
-
-
-
 
 	@RequestMapping(value = "/detailHealth", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 	public @ResponseBody JsonObject loadAgentsHealth(@RequestParam String category, @RequestParam String tool,@RequestParam String agentId){
@@ -260,16 +256,8 @@ public class HealthStatus {
 					successResponse="Response not received from Neo4j";
 					returnObject=buildFailureResponse(successResponse.toString(), "-", ServiceStatusConstants.Service,version);
 				}
-			}else if(serviceType.equalsIgnoreCase("PlatformInsightSpark")) {
-				try {
-					serviceResponse=apiCallElasticsearch.search(apiUrl);
-				} catch (Exception e) {
-					successResponse="Unable to connect URL "+apiUrl;
-					status=PlatformServiceConstants.FAILURE;
-				}
-				log.info(" PlatformInsightSpark service response "+serviceResponse);
+			} else if (serviceType.equalsIgnoreCase("PlatformInsight")) {
 				graphResponse = loadHealthData("HEALTH:INSIGHTS",serviceType,"");
-				log.debug(" graphResponse message arg 0  "+graphResponse);
 				if(graphResponse !=null ) {
 					if(graphResponse.getNodes().size() > 0 ) {
 						successResponse=graphResponse.getNodes().get(0).getPropertyMap().get("message");;
@@ -284,7 +272,7 @@ public class HealthStatus {
 					status=PlatformServiceConstants.FAILURE;
 				}
 
-				if(status.equalsIgnoreCase(PlatformServiceConstants.SUCCESS) && !("").equalsIgnoreCase(serviceResponse)) {
+				if (status.equalsIgnoreCase(PlatformServiceConstants.SUCCESS)) {
 					returnObject=buildSuccessResponse(successResponse.toString(), apiUrl, ServiceStatusConstants.Service,version);
 				}else {
 					returnObject=buildFailureResponse(successResponse.toString(), apiUrl, ServiceStatusConstants.Service,version);

@@ -112,6 +112,11 @@
     height: 40px;
 }
 
+.tableMainCss {
+    border-collapse:collapse !important;
+    border-spacing: 0px;
+} 
+
 .showTable {
     background-color: #00B140;
     color: white;
@@ -173,10 +178,6 @@
     text-align: left !important;
     vertical-align: middle;
     margin-left: 5px;
-}
-
-tr:nth-child(odd) td {
-    background-color: #ffffff;
 }
 
 tr:nth-child(even)  {
