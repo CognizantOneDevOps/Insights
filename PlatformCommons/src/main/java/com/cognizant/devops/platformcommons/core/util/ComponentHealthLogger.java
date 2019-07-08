@@ -15,7 +15,6 @@
  ******************************************************************************/
 package com.cognizant.devops.platformcommons.core.util;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -26,19 +25,18 @@ import java.util.TimeZone;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
 import com.google.gson.JsonObject;
 
 public abstract class ComponentHealthLogger {
-	public final String DATE_TIME_FORMAT = "yyyy-MM-dd'T'HH:mm:ss'Z'";
-	public final  SimpleDateFormat  dtf = new SimpleDateFormat(DATE_TIME_FORMAT);
+	
 	private static final Logger log = LogManager.getLogger(ComponentHealthLogger.class);
+	private  static final String TIMEZONE = "GMT";
 	
 	public boolean createComponentStatusNode(String label,String version,String message,String status,Map<String,String> parameter){
 		JsonObject response = null;
 		try {
-			dtf.setTimeZone(TimeZone.getTimeZone(ApplicationConfigProvider.getInstance().getInsightsTimeZone()));
+			String utcdate = InsightsUtils.getUtcTime(TIMEZONE);
 			List<JsonObject> dataList = new ArrayList<JsonObject>();
 			List<String> labels = new ArrayList<String>();
 			labels.addAll(Arrays.asList(label.split(":")));
@@ -46,7 +44,7 @@ public abstract class ComponentHealthLogger {
 			jsonObj.addProperty("version", version==null?"-":version);
 			jsonObj.addProperty("message", message);
 			jsonObj.addProperty("inSightsTime",System.currentTimeMillis());
-			jsonObj.addProperty("inSightsTimeX", dtf.format(new Date()));
+			jsonObj.addProperty("inSightsTimeX", utcdate);
 			jsonObj.addProperty(PlatformServiceConstants.STATUS,status);
 			for (Map.Entry<String,String> entry: parameter.entrySet()){
 				jsonObj.addProperty(entry.getKey(), entry.getValue());

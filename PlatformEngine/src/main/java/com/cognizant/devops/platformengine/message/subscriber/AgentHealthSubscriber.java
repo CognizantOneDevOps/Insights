@@ -52,6 +52,8 @@ public class AgentHealthSubscriber extends EngineSubscriberResponseHandler{
 		List<JsonObject> dataList = new ArrayList<JsonObject>();
 		JsonElement json = new JsonParser().parse(message);
 		String agentId="";
+		String toolName="";
+		String categoryName="";
 		if(json.isJsonArray()){
 			JsonArray asJsonArray = json.getAsJsonArray();
 			for(JsonElement e : asJsonArray){
@@ -61,9 +63,18 @@ public class AgentHealthSubscriber extends EngineSubscriberResponseHandler{
 						agentId=jsonObject.get("agentId").getAsString();
 					}
 					//log.debug("agentId   === "+agentId);
-					if(labels.size()>1){
-						jsonObject.addProperty("category", labels.get(0));
-						jsonObject.addProperty("toolName", labels.get(1));						
+					if(jsonObject.has("toolName")) {
+							toolName =jsonObject.get("toolName").getAsString();
+							jsonObject.addProperty("toolName",toolName);
+							categoryName =jsonObject.get("categoryName").getAsString();
+							jsonObject.addProperty("category",categoryName);
+					}
+				
+					else {
+						if(labels.size()>1){
+							jsonObject.addProperty("category", labels.get(0));
+							jsonObject.addProperty("toolName", labels.get(1));						
+						}
 					}
 					dataList.add(jsonObject);
 				}

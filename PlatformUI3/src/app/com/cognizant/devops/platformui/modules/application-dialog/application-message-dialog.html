@@ -57,6 +57,10 @@
     <div class="textPadding" [style.color]="colorCode" [innerHTML]="data.message"> </div>
 </mat-dialog-content>
 
-<mat-dialog-actions class="mat-dialog-actions-button">
+<mat-dialog-actions *ngIf="!isRedirect" class="mat-dialog-actions-button">
     <button mat-raised-button (click)="onCloseClick()">OK</button>
+</mat-dialog-actions>
+
+<mat-dialog-actions *ngIf="isRedirect" class="mat-dialog-actions-button">
+    <button mat-raised-button (click)="onOkClick()">OK</button>
 </mat-dialog-actions>

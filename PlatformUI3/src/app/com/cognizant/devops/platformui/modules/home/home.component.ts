@@ -82,10 +82,7 @@ export class HomeComponent implements OnInit {
   aboutPageURL = "https://onedevops.atlassian.net/wiki/spaces/OI/pages/218936/Release+Notes";
   helpPageURL = "https://onedevops.atlassian.net/wiki/spaces/OI/overview";
   ngOnInit() {
-    this.insightsCustomerLogo = this.dataShare.getCustomerLogo();
-    if (this.insightsCustomerLogo == "DefaultLogo") {
-      this.insightsCustomerLogo = "";//icons/svg/homePage/Customer_Logo.png
-    }
+    this.loadCustomerLogo();
   }
 
   constructor(private grafanaService: GrafanaAuthenticationService,
@@ -97,7 +94,7 @@ export class HomeComponent implements OnInit {
     if (this.depth === undefined) {
       this.depth = 0;
     }
-    this.grafanaService.validateSession();
+    this.loadCustomerLogo();
     this.isValidUser = true;
     this.framesize = window.frames.innerHeight;
     this.leftNavWidthInPer = 20;
@@ -117,6 +114,15 @@ export class HomeComponent implements OnInit {
 
   onMenuClick() {
     this.isExpanded = !this.isExpanded
+  }
+
+  loadCustomerLogo() {
+    this.insightsCustomerLogo = this.dataShare.getCustomerLogo();
+    //console.log(this.insightsCustomerLogo);
+    if (this.insightsCustomerLogo == "DefaultLogo") {
+      this.insightsCustomerLogo = "";
+    }
+    //console.log(this.insightsCustomerLogo);
   }
 
   public async getInformationFromGrafana() {
@@ -188,38 +194,26 @@ export class HomeComponent implements OnInit {
   onItemSelected(item: NavItem) {
     this.selectedItem = item;
     this.displayLandingPage = false;
-    this.isToolbarDisplay = item.isToolbarDisplay
+    this.isToolbarDisplay = item.isToolbarDisplay;
 
-    if (!item.children || !item.children.length) {
-      if (item.iconName == 'grafanaOrg') {
-        this.selectedOrg = (this.selectedItem == undefined ? '' : this.selectedItem.displayName);
-        this.selectedOrgName = this.getSelectedOrgName(this.selectedOrg);
-        this.switchOrganizations(item.orgId, item.route, this.selectedOrgName);
-      } else if (item.displayName == 'About') {
-        // window.open(this.aboutPageURL, "_blank");
-        let aboutDialogRef = this.dialog.open(AboutDialog, {
-          panelClass: 'healthcheck-show-details-dialog-container',
-          height: '50%',
-          width: '30%',
-          disableClose: true,
-        });
-        /* aboutDialogRef.afterClosed().subscribe(result => {
-           if (result == 'yes') {
-             this.router.navigateByUrl('InSights/Home/healthcheck', { skipLocationChange: true });
-           }
-         });*/
-      } else if (item.displayName == 'Help') {
-        window.open(this.helpPageURL, "_blank");
-      } else if (item.displayName == 'Logout') {
-        this.logout();
-      } else {
-        this.router.navigateByUrl(item.route, { skipLocationChange: true });
+    var isSessionExpired = this.dataShare.validateSession();
+    if (!isSessionExpired) {
+      if (!item.children || !item.children.length) {
+        if (item.iconName == 'grafanaOrg') {
+          this.selectedOrg = (this.selectedItem == undefined ? '' : this.selectedItem.displayName);
+          this.selectedOrgName = this.getSelectedOrgName(this.selectedOrg);
+          this.switchOrganizations(item.orgId, item.route, this.selectedOrgName);
+        } else if (item.displayName == 'About') {
+          this.about();
+        } else if (item.displayName == 'Help') {
+          window.open(this.helpPageURL, "_blank");
+        } else if (item.displayName == 'Logout') {
+          this.logout();
+        } else {
+          this.router.navigateByUrl(item.route, { skipLocationChange: true });
+        }
       }
-    } /*else {
-      if (item.displayName == 'grafana') {
-        console.log("in grafana");
-      }
-    }*/
+    }
   }
 
   public loadMenuItem() {
@@ -232,46 +226,34 @@ export class HomeComponent implements OnInit {
         title: "Click on Organization to see various Org's Dashboards",
         isToolbarDisplay: true,//false
         children: this.navOrgList
-        /*[
-          {
-            displayName: 'Grafana: ',
-            iconName: 'grafana',
-            isAdminMenu: false,
-            isToolbarDisplay: false,
-            showMenu: true,
-            children: this.navOrgList
-          },
-          {
-            displayName: 'ML Capabilities',
-            iconName: 'feature',
-            route: 'InSights/Home/grafanadashboard/100',
-            isToolbarDisplay: true,
-            isAdminMenu: true
-          },
-          {
-            displayName: 'InSights',
-            iconName: 'feature',
-            route: 'InSights/Home/grafanadashboard/900',
-            isToolbarDisplay: true,
-            isAdminMenu: true
-          },
-          {
-            displayName: 'DevOps Maturity',
-            iconName: 'feature',
-            route: 'InSights/Home/grafanadashboard/300',
-            isToolbarDisplay: true,
-            isAdminMenu: true
-          }
-        ]*/
       },
       {
         displayName: 'Audit Reporting',
         iconName: 'feature',
-        route: 'InSights/Home/blockchain',
-        isToolbarDisplay: true,
+        isAdminMenu: true,
         showMenu: InsightsInitService.showAuditReporting,
-        title: "Audit Reporting",
-        isAdminMenu: true
+        title: "Audit Report and search assets",
+        isToolbarDisplay: true,//false
+        children: [
+          {
+            displayName: 'Search Assets',
+            iconName: 'feature',
+            route: 'InSights/Home/blockchain',
+            isToolbarDisplay: true,
+            showMenu: InsightsInitService.showAuditReporting,
+            title: "Search Assets",
+            isAdminMenu: true
+          },
+          {
+            displayName: 'Query Builder',
+            iconName: 'feature',
+            route: 'InSights/Home/querybuilder',
+            isToolbarDisplay: true,
+            showMenu: InsightsInitService.showAuditReporting,
+            title: "Query Builder",
+            isAdminMenu: true
+          }
+        ]
       },
       {
         displayName: 'Playlist',
@@ -318,6 +300,15 @@ export class HomeComponent implements OnInit {
             isAdminMenu: true
           },
           {
+            displayName: 'Bulk Upload',
+            iconName: 'feature',
+            route: 'InSights/Home/bulkupload',
+            isToolbarDisplay: true,
+            showMenu: true,
+            title: "Bulk Upload",
+            isAdminMenu: true
+          },
+          {
             displayName: 'Business Mapping',
             iconName: 'feature',
             route: 'InSights/Home/businessmapping',
@@ -332,6 +323,15 @@ export class HomeComponent implements OnInit {
             isToolbarDisplay: true,
             showMenu: true,
             title: "Group & Users",
+            isAdminMenu: true
+          },
+          {
+            displayName: 'Co-Relation Builder',
+            iconName: 'feature',
+            route: 'InSights/Home/relationship-builder',
+            isToolbarDisplay: true,
+            showMenu: true,
+            title: "Relationship-Builder",
             isAdminMenu: true
           },
           {
@@ -398,18 +398,28 @@ export class HomeComponent implements OnInit {
     // construct a form with hidden inputs, targeting the iframe
     var form = document.createElement("form");
     form.target = uniqueString;
-    this.config.getGrafanaHost1().then(function (response) {
+    if (this.config.getGrafanaHost()) {
       form.action = InsightsInitService.grafanaHost + "/logout";
       form.method = "GET";
       document.body.appendChild(form);
       form.submit();
-    });
+    }
     this.grafanaService.logout()
       .then(function (data) {
         //console.log(data);
       });
     this.deleteAllPreviousCookies();
     this.router.navigate(['/login']);
+  }
+
+  public about(): void {
+    var self = this;
+    let aboutDialogRef = this.dialog.open(AboutDialog, {
+      panelClass: 'healthcheck-show-details-dialog-container',
+      height: '50%',
+      width: '30%',
+      disableClose: true,
+    });
   }
 
   switchOrganizations(orgId, route, orgName) {

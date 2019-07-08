@@ -1,0 +1,161 @@
+<!--
+*******************************************************************************
+ * Copyright 2017 Cognizant Technology Solutions
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License.  You may obtain a copy
+ * of the License at
+ * 
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ ****************************************************************************** -->
+<div class="pageCss">
+    <div layout layout-align="left" class="titleStyle">
+        <div>Audit Reporting |
+            <a class="greenTitleTxt">Query Builder</a>
+        </div>
+    </div>
+
+    <div class="orangeStripCss"></div>
+
+    <div layout layout-align="left" class="section">
+        <div layout>&nbsp; {{subTitleName}}
+            <span class="sectionSubHeading"> {{subTitleInfoText}} </span>
+        </div>
+    </div>
+
+    <div style="display: flex; justify-content: center; align-items: center">
+        <div class="loading-indicator">
+            <mat-progress-spinner [diameter]="100" *ngIf="showThrobber" color="primary" mode="indeterminate">
+            </mat-progress-spinner>
+        </div>
+    </div>
+
+
+
+
+    <div class="arrange-horizontally button-row">
+        <p class="mandatory">PLEASE NOTE: All fields are mandatory.</p>
+        <!-- <button mat-icon-button>
+            <mat-icon title="Add Custom Report" class="mat-icon material-icons">
+                add_circle
+            </mat-icon>
+            <mat-icon svgIcon="lineInButton" class="mat-icon material-icons">
+            </mat-icon>
+        </button>
+
+        <button mat-icon-button>
+            <mat-icon title="Save " class="mat-icon material-icons">
+                save
+            </mat-icon>
+        </button> -->
+
+    </div>
+
+
+
+    <div class="formBorder">
+        <h1>Build a Query (Please provide accurate information for seamless execution)</h1>
+        <div class="form">
+            <form [formGroup]="queryForm">
+                <div class="arrange-horizontally button-row">
+                    <div class="labelWidth">
+                        <label class="labelText">Name of the Query
+                            <span style="color:#ff0000">* </span>
+                            <mat-icon title="Unique Report name" class="mat-icon-button mat-icon material-icons mat-icon-font-size">info</mat-icon>
+                        </label>
+                    </div>
+                    <div class="inputWidth">
+                        <input type="text" class="form-control" formControlName="reportname" placeholder="Please input Name of the Query">
+                    </div>
+                </div>
+                <div class="arrange-horizontally button-row">
+                    <div class="labelWidth">
+                        <label class="labelText">Frequency
+                            <span style="color:#ff0000">* </span>
+                            <mat-icon title="You may select frequency as daily, weekly, fortnightly, monthly to execute the Query)" class="mat-icon-button mat-icon material-icons mat-icon-font-size">info</mat-icon>
+                        </label>
+                    </div>
+                    <div class="inputWidth">
+                        <mat-select formControlName="frequency" class="form-control" placeholder="Please select a Frequency">
+                            <mat-option *ngFor="let key of frequencyList" value="{{key}}">{{key}}</mat-option>
+                        </mat-select>
+                    </div>
+                </div>
+                <div class="arrange-horizontally button-row">
+                    <div class="labelWidth">
+                        <label class="labelText">Subscribers
+                            <span style="color:#ff0000">* </span>
+                            <mat-icon title="Please provide valid email address. You may use ‘,‘ to provide multiple email address" class="mat-icon-button mat-icon material-icons mat-icon-font-size">info</mat-icon>
+                        </label>
+                    </div>
+                    <div class="inputWidth">
+                        <input type="text" dir-email class="form-control" formControlName="subscribers" placeholder="Please provide an Email address">
+                    </div>
+                </div>
+                <div class="arrange-horizontally button-row">
+                    <div class="labelWidth">
+                        <label class="labelText">Query
+                            <span style="color:#ff0000">* </span>
+                            <mat-icon title="Please select source of data for generating report" class="mat-icon-button mat-icon material-icons mat-icon-font-size">info</mat-icon>
+                        </label>
+                    </div>
+                    <div class="inputWidth">
+                        <mat-radio-group style="margin-left: 2%;" formControlName="querytype">
+                            <mat-radio-button value="CYPHER" color="primary"></mat-radio-button><span class="query">CYPHER</span>
+                            <mat-radio-button value="LEDGER" color="primary"></mat-radio-button><span class="query">CYPHER and HYPERLEDGER</span>
+                        </mat-radio-group>
+                    </div>
+                </div>
+                <div class="arrange-horizontally button-row">
+                    <div class="labelWidth">
+                        <label class="labelText">Upload Query
+                            <span style="color:#ff0000">* </span>
+                            <mat-icon title="Upload Cypher query with proper syntax" class="mat-icon-button mat-icon material-icons mat-icon-font-size">info</mat-icon>
+                        </label>
+                    </div>
+                    <div class="inputWidth">
+                        <span *ngIf="this.receivedParam.type ==='add'">
+                                <input type="file" class="form-control" (change)="onFileChanged($event)">
+                        </span>
+                        <span *ngIf="this.receivedParam.type ==='update'">
+                                <span *ngIf="this.showFile">
+                                    <input type="file" class="form-control" (change)="onFileChanged($event)">
+                                </span>
+                                <span *ngIf="!this.showFile">
+                                    <p>
+                                        <span style="font-size: 14px;margin-left: 10px;text-decoration: underline;cursor: pointer;" (click)="downloadFile()">{{queryForm.get('queryPath').value}}</span>
+                                        <span>
+                                            <button mat-icon-button (click)="editFile()">
+                                                <mat-icon title="Edit " class="mat-icon material-icons">edit</mat-icon>
+                                            </button>
+                                        </span>
+                                    </p>
+                                </span>
+                        </span>
+                    </div>
+                </div>
+
+                <div style="width:98%;">
+                    <button mat-raised-button [disabled]="!queryForm.valid" (click)="saveData(btnValue)" class="configureBut" style="width:150px;">
+                        {{btnValue | uppercase }}
+                    </button>
+                    <button mat-raised-button (click)="cancelChange(btnValue)" class="configureBut" style="width:150px;padding-left: 10px;padding-right: 10px;">
+                        CANCEL
+                    </button>
+                    <br>
+                </div>
+                <br>
+            </form>
+        </div>
+    </div>
+
+
+    <!-- <p>{{queryForm.status}}</p> -->
+
+</div>

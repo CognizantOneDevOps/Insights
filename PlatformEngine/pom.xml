@@ -12,14 +12,14 @@
 	<parent>
 		<artifactId>PlatformParent</artifactId>
 		<groupId>com.cognizant.devops</groupId>
-		<version>5.0</version>
+		<version>5.3-SNAPSHOT</version>
 	</parent>
 
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.cognizant.devops</groupId>
 	<artifactId>PlatformEngine</artifactId>
 	<packaging>jar</packaging>
-	<version>5.0</version>
+	<version>5.3-SNAPSHOT</version>
 	<name>PlatformEngine</name>
 	<url>http://maven.apache.org</url>
 
@@ -29,47 +29,47 @@
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
-			<version>3.8.1</version>
+			<version>4.12</version>
 			<scope>test</scope>
 		</dependency>
 
 		<dependency>
 			<groupId>com.google.code.gson</groupId>
 			<artifactId>gson</artifactId>
-			<version>2.5</version>
+			<version>2.8.5</version>
 		</dependency>
 		<dependency>
 			<groupId>com.sun.jersey</groupId>
 			<artifactId>jersey-client</artifactId>
-			<version>1.19</version>
+			<version>1.19.4</version>
 		</dependency>
 
 		<dependency>
 			<groupId>com.rabbitmq</groupId>
 			<artifactId>amqp-client</artifactId>
-			<version>5.5.0</version>
-		</dependency> 
+			<version>5.7.0</version>
+		</dependency>
 
 		<dependency>
 			<groupId>org.apache.logging.log4j</groupId>
 			<artifactId>log4j-api</artifactId>
-			<version>2.5</version>
+			<version>2.11.2</version>
 		</dependency>
 
 		<dependency>
 			<groupId>org.apache.logging.log4j</groupId>
 			<artifactId>log4j-core</artifactId>
-			<version>2.5</version>
+			<version>2.11.2</version>
 		</dependency>
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-api</artifactId>
-			<version>1.7.5</version>
+			<version>1.7.26</version>
 		</dependency>
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-log4j12</artifactId>
-			<version>1.7.25</version>
+			<version>1.7.26</version>
 			<exclusions>
 				<exclusion>
 					<groupId>org.slf4j</groupId>
@@ -85,7 +85,7 @@
 		<dependency>
 			<groupId>com.cognizant.devops</groupId>
 			<artifactId>PlatformCommons</artifactId>
-			<version>5.0</version>
+			<version>5.3-SNAPSHOT</version>
 			<exclusions>
 				<exclusion>
 					<groupId>org.apache.logging.log4j</groupId>
@@ -97,29 +97,40 @@
 		<dependency>
 			<groupId>com.cognizant.devops</groupId>
 			<artifactId>PlatformDAL</artifactId>
-			<version>5.0</version>
+			<version>5.3-SNAPSHOT</version>
 		</dependency>
-
 		<dependency>
 			<groupId>org.quartz-scheduler</groupId>
 			<artifactId>quartz</artifactId>
-			<version>2.2.1</version>
+			<version>2.3.1</version>
+			<exclusions>
+				<exclusion>
+					<groupId>com.mchange</groupId>
+					<artifactId>c3p0</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/com.mchange/c3p0 -->
+		<dependency>
+			<groupId>com.mchange</groupId>
+			<artifactId>c3p0</artifactId>
+			<version>0.9.5.4</version>
 		</dependency>
 		<dependency>
 			<groupId>org.quartz-scheduler</groupId>
 			<artifactId>quartz-jobs</artifactId>
-			<version>2.2.1</version>
+			<version>2.3.1</version>
 		</dependency>
 
 		<dependency>
 			<groupId>org.hibernate</groupId>
 			<artifactId>hibernate-core</artifactId>
-			<version>5.2.2.Final</version>
+			<version>5.4.2.Final</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-csv</artifactId>
-			<version>1.5</version>
+			<version>1.6</version>
 		</dependency>
 	</dependencies>
 	<build>

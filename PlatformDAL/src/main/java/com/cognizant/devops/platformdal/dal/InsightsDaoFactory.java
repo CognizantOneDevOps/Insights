@@ -15,11 +15,16 @@
  ******************************************************************************/
 package com.cognizant.devops.platformdal.dal;
 
+import java.util.List;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.neo4j.driver.v1.StatementResult;
+
 import com.cognizant.devops.platformcommons.config.ApplicationConfigCache;
 import com.cognizant.devops.platformcommons.dal.neo4j.Neo4jDBHandler;
 
 public class InsightsDaoFactory implements InsightsDaoFactoryInterface {
-
 	private static final InsightsDaoFactoryInterface insightsDaoFactory = new InsightsDaoFactory();
 	
 	private InsightsDaoFactory() {
@@ -41,20 +46,17 @@ public class InsightsDaoFactory implements InsightsDaoFactoryInterface {
 	
 	public static void main(String [] args) {
 		ApplicationConfigCache.loadConfigCache();
-		
+		//System.out.println("Testing start....");
 		try (GraphDBConnection connection = GraphDBConnection.getInstance()){
 			BaseGraphDBHandler dbHandler = getInstance().getNeo4jBoltDBHandler();
 			//dbHandler.write("CREATE (n:NEWDALTEST) return n");
-			dbHandler.read("MATCH (n:NEWDALTEST) return n LIMIT 10");
-			System.out.println("Testing end....");
+			StatementResult st =  dbHandler.read("MATCH (n:GIT:DATA) return n LIMIT 10");
+			List<InsightsGraphNode> node =  dbHandler.getNodes("MATCH (n:GIT:DATA) return n LIMIT 10");
+			//System.out.println("Testing end....");
 			//dbHandler.write("MATCH (n:NEWDALTEST) delete n");
 			//dbHandler.close();
 		} catch (DataDeleteException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		}catch (Exception e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
 		}
 		/*
 		List<String> queries = new ArrayList<>();
@@ -88,7 +90,7 @@ public class InsightsDaoFactory implements InsightsDaoFactoryInterface {
 		
 		dbHandler.read("MATCH (n) DETACH DELETE n");*/ 
 		
-		System.exit(0);
+		//System.exit(0);
 	}
 
 }

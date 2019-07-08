@@ -29,17 +29,17 @@
 # Install Java
 echo "#################### Installing Java with Env Variable ####################"
 cd /opt/
-wget  https://platform.cogdevops.com/insights_install/installationScripts/latest/RHEL/java/jdk-8u151-linux-x64.tar.gz
-tar xzf jdk-8u151-linux-x64.tar.gz
-export JAVA_HOME=/opt/jdk1.8.0_151
-echo JAVA_HOME=/opt/jdk1.8.0_151  | tee -a /etc/environment
-echo "export" JAVA_HOME=/opt/jdk1.8.0_151 | tee -a /etc/profile
-export JRE_HOME=/opt/jdk1.8.0_151/jre
-echo JRE_HOME=/opt/jdk1.8.0_151/jre | tee -a /etc/environment
-echo "export" JRE_HOME=/opt/jdk1.8.0_151/jre | tee -a /etc/profile
-export PATH=$PATH:/opt/jdk1.8.0_151/bin:/opt/jdk1.8.0_151/jre/bin
-echo PATH=$PATH:/opt/jdk1.8.0_151/bin:/opt/jdk1.8.0_151/jre/bin | tee -a /etc/environment
-update-alternatives --install /usr/bin/java java /opt/jdk1.8.0_151/bin/java 20000
+wget  https://platform.cogdevops.com/insights_install/installationScripts/latest/RHEL/java/jdk-8u211-linux-x64.tar.gz
+tar xzf jdk-8u211-linux-x64.tar.gz
+export JAVA_HOME=/opt/jdk1.8.0_211
+echo JAVA_HOME=/opt/jdk1.8.0_211  | tee -a /etc/environment
+echo "export" JAVA_HOME=/opt/jdk1.8.0_211 | tee -a /etc/profile
+export JRE_HOME=/opt/jdk1.8.0_211/jre
+echo JRE_HOME=/opt/jdk1.8.0_211/jre | tee -a /etc/environment
+echo "export" JRE_HOME=/opt/jdk1.8.0_211/jre | tee -a /etc/profile
+export PATH=$PATH:/opt/jdk1.8.0_211/bin:/opt/jdk1.8.0_211/jre/bin
+echo PATH=$PATH:/opt/jdk1.8.0_211/bin:/opt/jdk1.8.0_211/jre/bin | tee -a /etc/environment
+update-alternatives --install /usr/bin/java java /opt/jdk1.8.0_211/bin/java 20000
 sudo -E source /etc/environment
 sudo -E source /etc/profile
 

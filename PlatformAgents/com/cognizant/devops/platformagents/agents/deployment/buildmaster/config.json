@@ -1,0 +1,62 @@
+{
+  "mqConfig": {
+    "user": "iSight",
+    "password": "iSight",
+    "host": "127.0.0.1",
+    "exchange": "iSight",
+    "agentControlXchg": "iAgent"
+  },
+  "subscribe": {
+    "config": "DEPLOYMENT.BUILDMASTER.config"
+  },
+  "publish": {
+    "data": "DEPLOYMENT.BUILDMASTER.DATA",
+    "health": "DEPLOYMENT.BUILDMASTER.HEALTH"
+  },
+  "communication": {
+    "type": "REST",
+    "sslVerify": false,
+    "responseType": "JSON"
+  },
+  "dynamicTemplate": {
+    "timeFieldMapping": {
+      "startDate": "%Y-%m-%d"
+    },
+    "applicationIds": [],
+     "responseTemplate": {
+				"Application_Id": "applicatonId",
+                "Application_Name": "applicationName",
+                "Build_Number": "buildNumber",
+                "BuildStatus_Name": "buildStatus",
+                "Release_Number": "releaseNumber",
+				"ReleaseStatus_Name": "releaseStatus",
+				"Release_Name": "releaseName",
+				"Current_ExecutionStatus_Name": "status",
+				"Current_Environment_Name": "environment"
+    }
+
+  },
+  "agentId": "",
+  "toolCategory": "DEPLOYMENT",
+  "enableDataValidation": true,
+  "useResponseTemplate": false,
+  "isEpochTimeFormat": true,
+  "apiKey": "apiKey",
+  "endpoint": "endpoint",
+  "userid": "userid",
+  "passwd": "passwd",
+  "useAllBuildsApi": false,
+  "runSchedule": 30,
+  "toolsTimeZone": "Asia/Kolkata",
+  "insightsTimeZone": "Asia/Kolkata",
+  "timeStampField": "lastUpdated",
+  "timeStampFormat": "%Y-%m-%dT%H:%M:%S",
+  "StartFrom": "2018-01-01 00:01:00",
+  "isDebugAllowed": false,
+  "enableValueArray": false,
+  "loggingSetting": {
+    "logLevel": "WARN",
+    "maxBytes": 5000000,
+    "backupCount": 1000
+  }
+}

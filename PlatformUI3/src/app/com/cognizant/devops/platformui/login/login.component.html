@@ -68,13 +68,16 @@
           <div class="validCredTextCss" layout>Sign in with valid credentials</div>
           <div layout="column" style="width: 360px;">
 
-            <mat-icon svgIcon="user-icon-active" class="actvIcoCss" [ngStyle]="{height: '17px', width: '17px'}"></mat-icon>
+            <mat-icon svgIcon="user-icon-active" class="actvIcoCss" [ngStyle]="{height: '17px', width: '17px'}">
+            </mat-icon>
             &nbsp;
-            <mat-form-field layout class="md-block containerMargin" [ngClass]="{'wrnTxt': loginForm.controls['username'].errors && !loginForm.controls['username'].pristine}">
-              <input matInput name="username" required placeholder="User Name" class="inputGreyTextCss activeCss" type="text" formControlName="username"
-              />
+            <mat-form-field layout class="md-block containerMargin"
+              [ngClass]="{'wrnTxt': loginForm.controls['username'].errors && !loginForm.controls['username'].pristine}">
+              <input matInput htmlEscape="true" name="username" required placeholder="User Name" class="inputGreyTextCss activeCss"
+                type="text" formControlName="username" />
             </mat-form-field>
-            <div *ngIf="loginForm.controls['username'].errors && !loginForm.controls['username'].pristine" [ngStyle]="{'width':'190px','padding-left':'35px'}">
+            <div *ngIf="loginForm.controls['username'].errors && !loginForm.controls['username'].pristine"
+              [ngStyle]="{'width':'190px','padding-left':'35px'}">
               <div class="wrnTxt">Please enter a valid Username.</div>
             </div>
             <br>
@@ -82,12 +85,15 @@
             <mat-icon svgIcon="password-icon-active" [ngStyle]="{height: '20px', width: '16px'}"></mat-icon>
 
             &nbsp;
-            <mat-form-field [ngClass]="{'error': loginForm.controls['password'].errors && !loginForm.controls['password'].pristine}">
-              <input matInput placeholder="Password" type="password" name="password" required class="inputGreyTextCss activeCss" formControlName="password"
-                autocomplete="new-password" />
+            <mat-form-field
+              [ngClass]="{'error': loginForm.controls['password'].errors && !loginForm.controls['password'].pristine}">
+              <input matInput htmlEscape="true" placeholder="Password" type="password" name="password" required
+                class="inputGreyTextCss activeCss" formControlName="password" autocomplete="new-password" />
             </mat-form-field>
-            <div *ngIf="loginForm.controls['password'].errors && !loginForm.controls['password'].pristine" [ngStyle]="{'width':'190px','padding-left':'35px'}">
-              <div class="wrnTxt" [hidden]="!loginForm.controls['password'].errors.required">Please enter a valid password.
+            <div *ngIf="loginForm.controls['password'].errors && !loginForm.controls['password'].pristine"
+              [ngStyle]="{'width':'190px','padding-left':'35px'}">
+              <div class="wrnTxt" [hidden]="!loginForm.controls['password'].errors.required">Please enter a valid
+                password.
               </div>
             </div>
             <div id="invalidMsg" class="errTxt" ng-if="loginController.isLoginError">
@@ -96,7 +102,8 @@
           </div>
           <mat-card-actions layout="row" class="buttonMar" layout-align="center center">
             <div flex="60" flex-offset="15" class="logOnBtnAlign">
-              <button mat-button class="md-raised md-primary sigBtnCss" [disabled]="loginForm.invalid" (click)="userAuthentication()">LOG
+              <button mat-button class="md-raised md-primary sigBtnCss" [disabled]="loginForm.invalid"
+                (click)="userAuthentication()">LOG
                 ON</button>
               <!--  <span ng-show="loginController.showThrobber" style="vertical-align: super;">  
                 <mat-progress-spinner style="display: inline;" diameter="30" mode="indeterminate"></mat-progress-spinner></span> -->

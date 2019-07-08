@@ -150,11 +150,13 @@ public class BusinessMappingServiceImpl implements BusinessMappingService {
 		}
 	}
 
-	/* 
-	 * Fetches all tools and property details configured for a particular Business Hierarchy
-	 * Provides all four levels as an input to that method
-	 * (non-Javadoc)
-	 * @see com.cognizant.devops.platformservice.businessmapping.service.BusinessMappingService#getHierarchyProperties(java.lang.String, java.lang.String, java.lang.String, java.lang.String)
+	/*
+	 * Fetches all tools and property details configured for a particular Business
+	 * Hierarchy Provides all four levels as an input to that method (non-Javadoc)
+	 * 
+	 * @see com.cognizant.devops.platformservice.businessmapping.service.
+	 * BusinessMappingService#getHierarchyProperties(java.lang.String,
+	 * java.lang.String, java.lang.String, java.lang.String)
 	 */
 	@Override
 	public JsonObject getHierarchyProperties(String level1, String level2, String level3, String level4)
@@ -199,23 +201,23 @@ public class BusinessMappingServiceImpl implements BusinessMappingService {
 		try {
 			Neo4jDBHandler dbHandler = new Neo4jDBHandler();
 			dbHandler.executeCypherQuery("CREATE CONSTRAINT ON (n:METADATA) ASSERT n.metadata_id  IS UNIQUE");
-			String query = "UNWIND {props} AS properties " + "CREATE (n:METADATA:BUSINESSMAPPING) " + "SET n = properties"; //DATATAGGING
-			JsonParser parser = new JsonParser(); 
+			String query = "UNWIND {props} AS properties " + "CREATE (n:METADATA:BUSINESSMAPPING) "
+					+ "SET n = properties"; // DATATAGGING
+			JsonParser parser = new JsonParser();
 			JsonObject json = (JsonObject) parser.parse(agentMappingJson);
-			log.debug("arg0  "+json);
+			log.debug("arg0  " + json);
 			nodeProperties.add(json);
-			//String properties = json.get("properties").getAsString();//msg String
-			//log.debug("arg0 "+properties);
+			// String properties = json.get("properties").getAsString();//msg String
+			// log.debug("arg0 "+properties);
 			JsonObject graphResponse = dbHandler.bulkCreateNodes(nodeProperties, null, query);
 			if (graphResponse.get(DatataggingConstants.RESPONSE).getAsJsonObject().get(DatataggingConstants.ERRORS)
 					.getAsJsonArray().size() > 0) {
 				log.error(graphResponse);
-				//return "success";
+				// return "success";
 			}
 		} catch (GraphDBException e) {
 			// TODO Auto-generated catch block
 			log.error(e);
-			e.printStackTrace();
 			return PlatformServiceUtil.buildFailureResponse(e.getMessage());
 		}
 		// TODO Auto-generated method stub
@@ -228,20 +230,19 @@ public class BusinessMappingServiceImpl implements BusinessMappingService {
 		String query = "MATCH (n:METADATA:BUSINESSMAPPING) where n.toolName ='" + agentName
 				+ "' return n order by n.inSightsTime desc"; // 'GIT'
 		GraphResponse response;
-		List<Map<String,String>> propertyList= new ArrayList<Map<String,String>>();
+		List<Map<String, String>> propertyList = new ArrayList<Map<String, String>>();
 		try {
 			response = dbHandler.executeCypherQuery(query);
 			int size = response.getNodes().size();
-			log.debug("arg0  size "+size);
-			for(int i=0;i<size ; i++) {
+			log.debug("arg0  size " + size);
+			for (int i = 0; i < size; i++) {
 				propertyList.add(response.getNodes().get(i).getPropertyMap());
 			}
-			//propertyList.forEach(s => {  System.out.println(s)  }); =
 		} catch (GraphDBException e) {
 			log.error(e);
 			return PlatformServiceUtil.buildFailureResponse(ErrorMessage.DB_INSERTION_FAILED);
 		}
-		return PlatformServiceUtil.buildSuccessResponseWithData(propertyList); //response.getNodes()
+		return PlatformServiceUtil.buildSuccessResponseWithData(propertyList); // response.getNodes()
 	}
 
 	@Override
@@ -249,56 +250,51 @@ public class BusinessMappingServiceImpl implements BusinessMappingService {
 		List<JsonObject> nodeProperties = new ArrayList<>();
 		try {
 			Neo4jDBHandler dbHandler = new Neo4jDBHandler();
-			JsonParser parser = new JsonParser(); 
+			JsonParser parser = new JsonParser();
 			JsonObject json = (JsonObject) parser.parse(agentMappingJson);
-			String uuid= json.get("uuid").getAsString();
-			log.debug("arg0 uuid  "+uuid);
-			JsonArray asJsonArray = getCurrentRecords(uuid,dbHandler);
-			log.debug("arg0  "+asJsonArray);
-			String replaceString=agentMappingJson.replaceAll("\\\"(\\w+)\\\"\\:","$1:");
-			String updateCypherQuery = " MATCH (n :METADATA:BUSINESSMAPPING {uuid:'"+uuid+"'})SET n ="+replaceString+" RETURN n";
-			log.debug("to replace"+updateCypherQuery);
+			String uuid = json.get("uuid").getAsString();
+			log.debug("arg0 uuid  " + uuid);
+			JsonArray asJsonArray = getCurrentRecords(uuid, dbHandler);
+			log.debug("arg0  " + asJsonArray);
+			String replaceString = agentMappingJson.replaceAll("\\\"(\\w+)\\\"\\:", "$1:");
+			String updateCypherQuery = " MATCH (n :METADATA:BUSINESSMAPPING {uuid:'" + uuid + "'})SET n ="
+					+ replaceString + " RETURN n";
+			log.debug("to replace" + updateCypherQuery);
 			GraphResponse updateGraphResponse = dbHandler.executeCypherQuery(updateCypherQuery);
 			log.debug(updateGraphResponse);
 		} catch (Exception e) {
-			// TODO Auto-generated catch block  GraphDB
+			// TODO Auto-generated catch block GraphDB
 			log.error(e);
-			e.printStackTrace();
 			return PlatformServiceUtil.buildFailureResponse(e.getMessage());
 		}
 		// TODO Auto-generated method stub
 		return PlatformServiceUtil.buildSuccessResponse();
 	}
-	
+
 	private JsonArray getCurrentRecords(String uuid, Neo4jDBHandler dbHandler) throws GraphDBException {
-		String cypherQuery = " MATCH (n :METADATA:BUSINESSMAPPING) WHERE n.uuid='"+uuid+"'  RETURN n";
+		String cypherQuery = " MATCH (n :METADATA:BUSINESSMAPPING) WHERE n.uuid='" + uuid + "'  RETURN n";
 		GraphResponse graphResponse = dbHandler.executeCypherQuery(cypherQuery);
 		JsonArray rows = graphResponse.getJson().get("results").getAsJsonArray().get(0).getAsJsonObject().get("data")
 				.getAsJsonArray();
 		JsonArray asJsonArray = rows.getAsJsonArray();
 		return asJsonArray;
-		/*buildExistingBuToolCombinationList(combo, asJsonArray);DATATAGGING*/
+		/* buildExistingBuToolCombinationList(combo, asJsonArray);DATATAGGING */
 	}
 
 	@Override
 	public JsonObject deleteToolsMappingLabel(String uuid) {
 		Neo4jDBHandler dbHandler = new Neo4jDBHandler();
-		GraphResponse graphresponce=new GraphResponse();
+		GraphResponse graphresponce = new GraphResponse();
 		try {
-		/*JsonObject json = (JsonObject) parser.parse(agentMappingJson);
-		String uuid= json.get("uuid").getAsString();  your changes*/
-		//log.debug("arg0 uuid  "+uuid);
-		String cypherQuery = "MATCH (n:METADATA:BUSINESSMAPPING) where n.uuid= '"+uuid+"'  detach delete n";
-		//log.debug(cypherQuery);
-		graphresponce=  dbHandler.executeCypherQuery(cypherQuery);
-		//log.debug(graphresponce);
-	} catch (Exception e) {
-		// TODO Auto-generated catch block  GraphDB
-		e.printStackTrace();
-		return PlatformServiceUtil.buildFailureResponse(e.getMessage());
-	}
-	// TODO Auto-generated method stub
-	return PlatformServiceUtil.buildSuccessResponseWithData(graphresponce);
+
+			String cypherQuery = "MATCH (n:METADATA:BUSINESSMAPPING) where n.uuid= '" + uuid + "'  detach delete n";
+			graphresponce = dbHandler.executeCypherQuery(cypherQuery);
+
+		} catch (Exception e) {
+			return PlatformServiceUtil.buildFailureResponse(e.getMessage());
+		}
+		// TODO Auto-generated method stub
+		return PlatformServiceUtil.buildSuccessResponseWithData(graphresponce);
 	}
 
 }

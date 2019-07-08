@@ -20,6 +20,7 @@ import { BlockChainService } from '@insights/app/modules/blockchain/blockchain.s
 import { animate, state, style, transition, trigger } from '@angular/animations';
 import { AssetData } from '@insights/app/modules/blockchain/blockchain.component';
 import {saveAs as importedSaveAs} from "file-saver"; 
+import { InsightsInitService } from '../../common.services/insights-initservice';
 
 export interface AssetHistoryData {
     assetID: string;
@@ -65,16 +66,18 @@ export class AssetDetailsDialog implements OnInit {
     searchInput = '';
     innerObjAsset = {};
     expandObjects = [];
+    order = [];
     
     constructor(public dialogRef: MatDialogRef<AssetDetailsDialog>,
         @Inject(MAT_DIALOG_DATA) public parentData: any,
         private blockChainService: BlockChainService,
         private changeDet: ChangeDetectorRef) {
-
+            
     }
 
     ngOnInit() {
         this.assetID = this.parentData.assetID;
+        this.order = this.parentData.tools;
         this.fillMasterHeaderData();
         this.getAssetHistoryDetails();
     }
@@ -168,10 +171,10 @@ export class AssetDetailsDialog implements OnInit {
     exportToPdf() {        
         this.blockChainService.exportToPdf(this.pdfData)
             .subscribe((data) => {
-                var pdfFileName = 'Traceability_report.pdf';
-                importedSaveAs(data, pdfFileName);
+                var pdfFileName = 'Traceability_report.pdf';
+                importedSaveAs(data);
             },
-            error => {
+            error => {
                 console.log(error);
                 });              
     }
@@ -202,7 +205,7 @@ export class AssetDetailsDialog implements OnInit {
                 custMap[x.toolName] = lst
             }
         });
-        console.log(custMap);
+        console.log("custMap",custMap);
 
         let orderlst = [];
         let clst = custMap;
@@ -224,12 +227,14 @@ export class AssetDetailsDialog implements OnInit {
                     } else {
                         let checkFinal = false;
                         orderlst.forEach((b) => {
-                            b.child.forEach(k => {
-                                if (k.point.assetID === s.assetID) {
-                                    b.child.push({ point: s });
-                                    checkFinal = true;
-                                }
-                            })
+                            if (b.point === s.toolName) {
+                                b.child.forEach(k => {
+                                    if (!checkFinal && k.point.assetID === s.assetID) {
+                                        b.child.push({ point: s });
+                                        checkFinal = true;
+                                    }
+                                })
+                            }
                         })
                         if (!checkFinal) {
                             let obj = {
@@ -243,9 +248,11 @@ export class AssetDetailsDialog implements OnInit {
             })
         })
 
-        console.log(orderlst);
-        let processorder = ["JIRA", "GIT", "JENKINS", "NEXUS"];
-        processorder.forEach(p => {
+        console.log("orderlst",orderlst);
+        console.log("processorder",this.order);
+        
+       // let processorder = ["JIRA", "GIT", "JENKINS", "NEXUS"];
+       this.order.forEach(p => {
             orderlst.forEach(a => {
                 if (p === a.point) {
                     this.list.push(a);

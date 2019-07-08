@@ -29,17 +29,16 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class SpringAuthorityProvider implements UserDetailsContextMapper {
-	
+
 	@Autowired
 	private HttpServletRequest httpRequest;
 	
 	@Override
-	public UserDetails mapUserFromContext(DirContextOperations ctx, String userName, Collection<? extends GrantedAuthority> authority) {
+	public UserDetails mapUserFromContext(DirContextOperations ctx, String userName,Collection<? extends GrantedAuthority> authority) {
 		return GrafanaUserDetailsUtil.getUserDetails(httpRequest);
 	}
 
 	@Override
 	public void mapUserToContext(UserDetails arg0, DirContextAdapter arg1) {
-		// TODO Auto-generated method stub
 	}
 }

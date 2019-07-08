@@ -41,14 +41,17 @@ import com.google.gson.JsonParser;
 @RequestMapping("/datasource/inference")
 public class InferenceDataProviderController{
 
-	private static Logger LOG = LogManager.getLogger(InsightsInferenceController.class);
+	private static Logger LOG = LogManager.getLogger(InferenceDataProviderController.class);
 
 	@Autowired
 	InsightsInferenceService insightsInferenceService;
 
 	@RequestMapping(value = "/data", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 	public JsonArray getInferenceData(HttpServletRequest request) {
+		LOG.debug(
+				" inside getInferenceData call /datasource/inference/data ============================================== ");
 		String input = null;
+		List<InsightsInference> inferences = null;
 		try {
 			input = request.getReader().lines().collect(Collectors.joining(System.lineSeparator()));
 		} catch (Exception e) {
@@ -59,7 +62,13 @@ public class InferenceDataProviderController{
 		for(JsonElement jsonElemFromDS: inferenceInputFromPanel.getAsJsonArray()) 
 		{
 			String schedule = jsonElemFromDS.getAsJsonObject().get("vectorSchedule").getAsString();
-			List<InsightsInference> inferences = insightsInferenceService.getInferenceDetails(schedule);
+			String vectorType = jsonElemFromDS.getAsJsonObject().get("vectorType").getAsString();
+			LOG.debug(" for vector type " + vectorType);
+			if (vectorType == null || "".equalsIgnoreCase(vectorType)) {
+				inferences = insightsInferenceService.getInferenceDetails(schedule);
+			} else {
+				inferences = insightsInferenceService.getInferenceDetailsVectorWise(schedule, vectorType);
+			}
 			JsonObject responseOutputFromES = PlatformServiceUtil.buildSuccessResponseWithData(inferences);
 			for(JsonElement jsonElemES : responseOutputFromES.get("data").getAsJsonArray())
 			{

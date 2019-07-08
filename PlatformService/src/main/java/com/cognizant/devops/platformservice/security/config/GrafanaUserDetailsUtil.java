@@ -32,30 +32,39 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
+import com.cognizant.devops.platformcommons.core.util.ValidationUtils;
 import com.cognizant.devops.platformcommons.dal.rest.RestHandler;
+import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
+import com.cognizant.devops.platformservice.rest.util.PlatformServiceUtil;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.sun.jersey.api.client.ClientResponse;
 
+
 public class GrafanaUserDetailsUtil {
 	private static final Logger log = LogManager.getLogger(GrafanaUserDetailsUtil.class);
 
 	public static UserDetails getUserDetails(HttpServletRequest httpRequest) {
-		log.debug("\n\nInside getUserDetails function call!");
+		log.debug(" Inside getUserDetails function call!");
 		ApplicationConfigProvider.performSystemCheck();
-		String authHeader = httpRequest.getHeader("Authorization");
-		Cookie[] requestCookies = httpRequest.getCookies();
-		//log.debug("\nCookies:\n" + requestCookies);
+		String token = ValidationUtils.cleanXSS(httpRequest.getHeader("Authorization")); //authHeader
+		//log.debug("  Authorization ===== " + token);
+		String authHeader = ValidationUtils.extactAutharizationToken(token);
+		//log.debug(" authTokenDecrypt  ========= " + authHeader);
+
+		Cookie[] requestCookies = PlatformServiceUtil.validateCookies(httpRequest.getCookies());
 		Map<String, String> grafanaResponseCookies = new HashMap<String, String>();
 		Map<String, String> cookieMap = new HashMap<String, String>();
 		if (requestCookies != null) {
 			for (Cookie cookie : requestCookies) {
-				cookieMap.put(cookie.getName(), cookie.getValue());
+				//log.debug(" cookie " + cookie.getName() + " " + cookie.getValue());
+				cookieMap.put(ValidationUtils.cleanXSS(cookie.getName()),
+						ValidationUtils.cleanXSS(cookie.getValue()) + "; HttpOnly");
+				cookie.setHttpOnly(true);
 			}
 		}
-		//log.debug("\nCookies Map:\n" + cookieMap);
 		String userName = null;
 		String credential = null;
 		// Validate if the Logged in user is same as that of grafana logged in user
@@ -64,14 +73,12 @@ public class GrafanaUserDetailsUtil {
 			String[] authTokens = decodedAuthHeader.split(":");
 			userName = authTokens[0];
 			credential = authTokens[1];
+			//log.debug(" userName " + userName + " credential " + credential);
 			String grafanaUser = cookieMap.get("grafana_user");
 			String grafanaSession = cookieMap.get("grafana_sess");
-			//log.debug("Insights User Name is: " + userName);
-			//log.debug("Grafana's User Name is: " + grafanaUser);
 			if (userName.equals(grafanaUser) && grafanaSession != null) {
 				log.debug("LDAP user is found. Insights username matches Grafana's username");
 				grafanaResponseCookies.putAll(cookieMap);
-				//log.debug("Grafana's resposne cookies are: " + grafanaResponseCookies);
 				if ((grafanaResponseCookies.get("grafanaOrg") == null
 						|| grafanaResponseCookies.get("grafanaOrg").isEmpty())
 						&& (grafanaResponseCookies.get("grafanaRole") == null
@@ -80,31 +87,33 @@ public class GrafanaUserDetailsUtil {
 					Map<String, String> headers = new HashMap<String, String>();
 					StringBuffer grafanaCookie = new StringBuffer();
 					for (Map.Entry<String, String> cookie : grafanaResponseCookies.entrySet()) {
-						grafanaCookie.append(cookie.getKey()).append("=").append(cookie.getValue()).append(";");
+						grafanaCookie.append(cookie.getKey()).append("=").append(cookie.getValue())
+								.append("; HttpOnly");
 					}
 					headers.put("Cookie", grafanaCookie.toString());
 					String grafanaCurrentOrg = getGrafanaCurrentOrg(headers);
 					grafanaResponseCookies.put("grafanaOrg", grafanaCurrentOrg);
 					String grafanaCurrentOrgRole = getCurrentOrgRole(headers, grafanaCurrentOrg);
 					grafanaResponseCookies.put("grafanaRole", grafanaCurrentOrgRole);
-					//log.debug("Re-initilized Grafana response cookies are: " + grafanaResponseCookies);
 				}
 			} else {
 				log.debug("Grafana's native user found! Establishing valid garafna session");
 				List<NewCookie> cookies = getValidGrafanaSession(authTokens[0], authTokens[1]);
-				log.debug("Fetching cookies: " + cookies);
 				StringBuffer grafanaCookie = new StringBuffer();
 				for (NewCookie cookie : cookies) {
-					grafanaResponseCookies.put(cookie.getName(), cookie.getValue());
-					grafanaCookie.append(cookie.getName()).append("=").append(cookie.getValue()).append(";");
+					String value = ValidationUtils.cleanXSS(cookie.getValue());
+					grafanaResponseCookies.put(
+							ValidationUtils.cleanXSS(cookie.getName()), value);
+					grafanaCookie.append(cookie.getName()).append("=").append(value).append("; HttpOnly");
 				}
 				Map<String, String> headers = new HashMap<String, String>();
 				headers.put("Cookie", grafanaCookie.toString());
 				String grafanaCurrentOrg = getGrafanaCurrentOrg(headers);
-				grafanaResponseCookies.put("grafanaOrg", grafanaCurrentOrg);
+				grafanaResponseCookies.put("grafanaOrg",
+						ValidationUtils.cleanXSS(grafanaCurrentOrg));
 				String grafanaCurrentOrgRole = getCurrentOrgRole(headers, grafanaCurrentOrg);
-				grafanaResponseCookies.put("grafanaRole", grafanaCurrentOrgRole);
-				log.debug("The Grafana cookies are: " + grafanaResponseCookies);
+				grafanaResponseCookies.put("grafanaRole",
+						ValidationUtils.cleanXSS(grafanaCurrentOrgRole));
 			}
 			List<GrantedAuthority> mappedAuthorities = new ArrayList<GrantedAuthority>();
 			String grafanaRole = grafanaResponseCookies.get("grafanaRole");
@@ -115,14 +124,19 @@ public class GrafanaUserDetailsUtil {
 				mappedAuthorities.add(SpringAuthorityUtil.getSpringAuthorityRole(grafanaRole));
 			}
 
-			httpRequest.setAttribute("responseHeaders", grafanaResponseCookies);
-			if (ApplicationConfigProvider.getInstance().isEnableNativeUsers()) {
-				return new User(userName, credential, true, true, true, true, mappedAuthorities);
-			} else {
-				return new User(userName, "", true, true, true, true, mappedAuthorities);
+			for (Map.Entry<String, String> cookie : grafanaResponseCookies.entrySet()) {
+				cookie.setValue(ValidationUtils.cleanXSS(cookie.getValue()));
 			}
+
+			httpRequest.setAttribute("responseHeaders", grafanaResponseCookies);
+			/*if (ApplicationConfigProvider.getInstance().isEnableNativeUsers()) {*/
+				return new User(userName, credential, true, true, true, true,
+						mappedAuthorities);
+			/*} else {
+				return new User(userName, "", true, true, true, true, mappedAuthorities);
+			}*/
 		} catch (Exception e) {
-			log.error(e);
+			log.error(e.getMessage());
 		}
 		log.debug("No user details were found!");
 		return null;
@@ -132,11 +146,9 @@ public class GrafanaUserDetailsUtil {
 		log.debug("\nInside getCurrentOrgRole function call!");
 		String userOrgsApiUrl = ApplicationConfigProvider.getInstance().getGrafana().getGrafanaEndpoint()
 				+ "/api/user/orgs";
-		//log.debug("Fetching User's Organizations at: " + userOrgsApiUrl);
 		ClientResponse grafanaCurrentOrgResponse = RestHandler.doGet(userOrgsApiUrl, null, headers);
 		JsonArray grafanaOrgs = new JsonParser().parse(grafanaCurrentOrgResponse.getEntity(String.class))
 				.getAsJsonArray();
-		//log.debug("User's current organization ID is: " + grafanaCurrentOrg);
 		String grafanaCurrentOrgRole = null;
 		for (JsonElement org : grafanaOrgs) {
 			if (grafanaCurrentOrg.equals(org.getAsJsonObject().get("orgId").toString())) {
@@ -144,31 +156,32 @@ public class GrafanaUserDetailsUtil {
 				break;
 			}
 		}
-		log.debug("User's current org role is: " + grafanaCurrentOrgRole);
 		return grafanaCurrentOrgRole;
 	}
 
 	private static String getGrafanaCurrentOrg(Map<String, String> headers) {
 		log.debug("Inside getGrafanaCurrentOrg method call");
 		String loginApiUrl = ApplicationConfigProvider.getInstance().getGrafana().getGrafanaEndpoint() + "/api/user";
-		//log.debug("Fetching user's detail at: " + loginApiUrl);
 		ClientResponse grafanaCurrentOrgResponse = RestHandler.doGet(loginApiUrl, null, headers);
 		JsonObject responseJson = new JsonParser().parse(grafanaCurrentOrgResponse.getEntity(String.class))
 				.getAsJsonObject();
-		log.debug("Response obtained after client call is: " + responseJson);
 		String grafanaCurrentOrg = responseJson.get("orgId").toString();
-		log.debug("User's current Org is: " + grafanaCurrentOrg);
 		return grafanaCurrentOrg;
 	}
 
-	private static List<NewCookie> getValidGrafanaSession(String userName, String password) {
+	private static List<NewCookie> getValidGrafanaSession(String userName, String password)
+			throws InsightsCustomException {
 		log.debug("Inside getValidGrafanaSession method call");
 		JsonObject loginRequestParams = new JsonObject();
 		loginRequestParams.addProperty("user", userName);
 		loginRequestParams.addProperty("password", password);
 		String loginApiUrl = ApplicationConfigProvider.getInstance().getGrafana().getGrafanaEndpoint() + "/login";
-		log.debug("Fetching valid session at: " + loginApiUrl);
 		ClientResponse grafanaLoginResponse = RestHandler.doPost(loginApiUrl, loginRequestParams, null);
+		if (grafanaLoginResponse.getStatus() != 200) {
+			throw new InsightsCustomException(" Unauthorized Access ==== ");
+		}
 		return grafanaLoginResponse.getCookies();
 	}
+
+
 }
