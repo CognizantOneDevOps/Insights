@@ -20,4 +20,6 @@ import java.util.List;
 public interface InsightsInferenceService {
 
 	public List<InsightsInference> getInferenceDetails(String schedule);
+
+	public List<InsightsInference> getInferenceDetailsVectorWise(String schedule, String vector);
 }

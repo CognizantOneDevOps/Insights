@@ -16,6 +16,7 @@
 
 import { Component, OnInit, Inject } from '@angular/core';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
+import { Router, NavigationExtras } from '@angular/router';
 
 @Component({
     selector: 'application-message-dialog',
@@ -27,9 +28,14 @@ export class ApplicationMessageDialog implements OnInit {
     colorCode: String;
     dialogTitle: String;
     svgCustomIcon: String;
+    isRedirect: boolean = false;
 
-    constructor(public dialogRef: MatDialogRef<ApplicationMessageDialog>, @Inject(MAT_DIALOG_DATA) public data: any) {
+    constructor(public dialogRef: MatDialogRef<ApplicationMessageDialog>, @Inject(MAT_DIALOG_DATA) public data: any, public router: Router) {
 
+        if (data.values == true) {
+            this.isRedirect = true;
+
+        }
         if (data.type == 'SUCCESS') {
             this.colorCode = "#000000";
             this.dialogTitle = "Success";
@@ -54,5 +60,10 @@ export class ApplicationMessageDialog implements OnInit {
 
     closeShowDetailsDialog(): void {
         this.dialogRef.close();
+    }
+    onOkClick(): void {
+        this.dialogRef.close()
+        this.router.navigateByUrl('/login');
+
     }
 }

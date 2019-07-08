@@ -34,6 +34,16 @@ export class UserOnboardingService implements IUserOnboardingService {
         return this.restHandler.get("ACCESS_GROUP_MANAGEMENT_GET_CURRENT_USER_ORGS");
     }
 
+
+    getUser(): Promise<any> {
+        return this.restHandler.get("ACCESS_GROUP_MANAGEMENT_GET_USERS");
+    }
+
+    getCurrentOrgRole(): Promise<any> {
+        return this.restHandler.get("ACCESS_GROUP_MANAGEMENT_GET_USERS_ORGS")
+    }
+
+
     getOrganizationUsers(orgId: number): Promise<any> {
         return this.restHandler.postWithParameter("ORG_USERS_GET", { "orgId": orgId }, { 'Content-Type': 'application/x-www-form-urlencoded' }).toPromise();
     }
@@ -61,6 +71,22 @@ export class UserOnboardingService implements IUserOnboardingService {
     createOrg(orgName: string): Promise<any> {
         return this.restHandler.postWithParameter("ORG_CREATE", { "orgName": orgName }, { 'Content-Type': 'application/x-www-form-urlencoded' }).toPromise();
     }
+
+    /*  addUserInOrg(name: string, email: string, userName: string, role: string, orgId: number, orgName: string, pass: string) {
+         return this.restHandler.postWithParameter("USER_CREATE", { "orgId": orgId, "name": name, "email": email, "role": role, "userName": userName, "orgName": orgName, "password": pass }, { 'Content-Type': 'application/x-www-form-urlencoded' })
+     }
+  */
+
+    addUserInOrg(userPropertyList: string) {
+        return this.restHandler.postWithData("USER_CREATE", userPropertyList, "", { 'Content-Type': 'application/x-www-form-urlencoded' })
+    }
+    assignUser(assignUserList: string) {
+        return this.restHandler.postWithData("ASSIGN_USER", assignUserList, "", { 'Content-Type': 'application/json' })
+    }
+    getUsersOrganisation(userName: string) {
+        return this.restHandler.postWithData("USER_ORG_SEARCH", userName, "", { 'Content-Type': 'application/x-www-form-urlencoded' }).toPromise();
+    }
+
 
 }
 

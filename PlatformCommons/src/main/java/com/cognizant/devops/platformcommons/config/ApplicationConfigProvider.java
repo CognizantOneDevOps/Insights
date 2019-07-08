@@ -30,12 +30,12 @@ public class ApplicationConfigProvider implements Serializable {
 	private static ApplicationConfigProvider instance = new ApplicationConfigProvider();
 	private EndpointData endpointData = new EndpointData();
 	private SparkConfigurations sparkConfigurations = new SparkConfigurations();
-	private LDAPConfiguration ldapConfiguration = new LDAPConfiguration();
+	//private LDAPConfiguration ldapConfiguration = new LDAPConfiguration();
 	private GraphData graph = new GraphData();
 	private GrafanaData grafana = new GrafanaData();
 	private MessageQueueDataModel messageQueue = new MessageQueueDataModel();
 	private String insightsServiceURL;
-	private boolean disableAuth = false;
+	//private boolean disableAuth = false;
 	private String insightsTimeZone = "US/Central";
 	private PostgreData postgre;
 	private String userId;
@@ -45,7 +45,7 @@ public class ApplicationConfigProvider implements Serializable {
 	private Date refreshTime;
 	private List<String> trustedHosts = new ArrayList<String>(3);
 	private boolean enableOnlineDatatagging = false;
-	private boolean enableNativeUsers;
+	//private boolean enableNativeUsers = true;
 
 	private EmailConfiguration emailConfiguration = new EmailConfiguration();
 	private CorrelationConfig correlations;
@@ -89,13 +89,13 @@ public class ApplicationConfigProvider implements Serializable {
 		this.sparkConfigurations = sparkConfigurations;
 	}
 
-	public LDAPConfiguration getLdapConfiguration() {
+	/*public LDAPConfiguration getLdapConfiguration() {
 		return ldapConfiguration;
 	}
-
+	
 	public void setLdapConfiguration(LDAPConfiguration ldapConfiguration) {
 		this.ldapConfiguration = ldapConfiguration;
-	}
+	}*/
 
 	public MessageQueueDataModel getMessageQueue() {
 		return messageQueue;
@@ -121,13 +121,13 @@ public class ApplicationConfigProvider implements Serializable {
 		this.grafana = grafana;
 	}
 
-	public boolean isDisableAuth() {
+	/*public boolean isDisableAuth() {
 		return disableAuth;
 	}
-
+	
 	public void setDisableAuth(boolean disableAuth) {
 		this.disableAuth = disableAuth;
-	}
+	}*/
 
 	public String getInsightsTimeZone() {
 		return insightsTimeZone;
@@ -201,13 +201,13 @@ public class ApplicationConfigProvider implements Serializable {
 		this.proxyPort = proxyPort;
 	}
 
-	public boolean isEnableNativeUsers() {
+	/*public boolean isEnableNativeUsers() {
 		return enableNativeUsers;
 	}
-
+	
 	public void setEnableNativeUsers(boolean enableNativeUsers) {
 		this.enableNativeUsers = enableNativeUsers;
-	}
+	}*/
 
 	public List<String> getTrustedHosts() {
 		return trustedHosts;

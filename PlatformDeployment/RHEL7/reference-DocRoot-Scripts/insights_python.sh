@@ -19,7 +19,8 @@ sudo mkdir python && cd python && sudo wget https://platform.cogdevops.com/insig
 sudo tar -zxf Python-2.7.11.tgz && cd Python-2.7.11 && sudo yum install gcc -y && sudo ./configure --prefix=/opt/
 sudo make install && cd .. && sudo wget https://platform.cogdevops.com/insights_install/installationScripts/latest/RHEL/python/get-pip.py
 sudo python get-pip.py
-sudo pip install pika requests apscheduler python-dateutil xmltodict pytz requests_ntlm
+sudo pip install pika==0.12.0
+sudo pip install requests apscheduler python-dateutil xmltodict pytz requests_ntlm boto3
 #sudo mkdir /opt/insightsagents
 #cd /opt/insightsagents
 #export INSIGHTS_AGENT_HOME=`pwd`

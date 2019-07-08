@@ -203,6 +203,7 @@ public class HierarchyDetailsService {
 		return PlatformServiceUtil.buildSuccessResponseWithData(hierarchyList);
 	}
 
+	@Deprecated
 	@RequestMapping(value = "/uploadHierarchyDetails", headers = ("content-type=multipart/*"), method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	public @ResponseBody JsonObject uploadHierarchyDetails(@RequestParam("file") MultipartFile file,
 			@RequestParam String action) {

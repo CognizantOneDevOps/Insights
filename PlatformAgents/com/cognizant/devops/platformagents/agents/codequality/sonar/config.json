@@ -1,7 +1,5 @@
 {
- 
- 
-  "mqConfig": {
+ "mqConfig": {
     "exchange": "iSight",
     "host": "127.0.0.1",
     "password": "iSight",
@@ -15,7 +13,11 @@
   "subscribe": {
     "config": "CODEQUALITY.SONAR.config"
   },
-  "toolCategory" : "CODEQUALITY",
+  "communication": {
+    "type": "REST",
+    "sslVerify": true,
+    "responseType": "JSON"
+  },
   "dynamicTemplate" : {
   		"timeFieldMapping" : {
 			"startDate" : "%Y-%m-%d"
@@ -23,6 +25,7 @@
   		"metrics" : ["alert_status", "complexity", "coverage", "new_coverage"]
   },
   "agentId" : "",
+  "toolCategory" : "CODEQUALITY",
   "toolName": "SONAR",
   "runSchedule": 30,
   "enableDataValidation": true,
@@ -31,13 +34,12 @@
   "password":"admin",
   "timeMachineapi": "no",
   "timeStampFormat": "%Y-%m-%dT%H:%M:%S",
-  "startFrom": "2015-10-10 00:01:01",
+  "startFrom": "2019-01-01T00:01:01",
   "toolsTimeZone": "Asia/Kolkata",
   "useResponseTemplate": false,
   "isDebugAllowed": false,
   "enableValueArray": false,
   "isEpochTimeFormat" : false,
-  
   "baseUrl": "http://127.0.0.1:9000/sonar/",
   "loggingSetting": {
     	"logLevel": "WARN",

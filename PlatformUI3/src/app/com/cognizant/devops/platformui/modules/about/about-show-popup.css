@@ -178,17 +178,14 @@ mat-dialog-content::-webkit-scrollbar-track {
 }
 
 .aboutLogo {
-	display: flex; justify-content: center;
+	display: flex; 
+	justify-content: center;
 }
 
 .heading1 {
 	color: #0033a0;
 	font-size: 14pt;
     padding-bottom: 10px;
-}
-
-.insightsLogo {
-	text-align: left;
 }
 
 .heading2 {
@@ -221,8 +218,8 @@ mat-dialog-content::-webkit-scrollbar-track {
 }
 
 .insightLogo {
-	padding-top: 10px;
-    cursor: pointer;
+	padding-top: 10px !important;
+	cursor: pointer !important;
 }
 
 .arrange-horizontally-Dialog {

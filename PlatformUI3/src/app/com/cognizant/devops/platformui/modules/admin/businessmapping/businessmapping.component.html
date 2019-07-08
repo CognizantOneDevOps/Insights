@@ -31,13 +31,14 @@
   </div>
   <div class="arrange-horizontally">
     <label class="mainText"> Select Tool </label>
-    <mat-select [(ngModel)]="selectedAgent" [style.height.px]="20" [style.width.%]="21" (ngModelChange)="getAgentMappingDetail(selectedAgent)"
-      name="selectedAgent" required placeholder="Select Tool" [ngClass]="{  'input-disabled' :false  ,  'form-control': true}">
+    <mat-select [(ngModel)]="selectedAgent" [style.height.px]="20" [style.width.%]="21"
+      (ngModelChange)="getAgentMappingDetail(selectedAgent)" name="selectedAgent" required placeholder="Select Tool"
+      [ngClass]="{  'input-disabled' :false  ,  'form-control': true}">
       <mat-option *ngFor="let data of agentList" [value]="data" style="color:#0033A0">
         {{data.toolName}}
       </mat-option>
-      </mat-select>
-      <h2 class="labelInfo">(Please select a Tool to see the properties and create a Business Mapping Label)</h2>
+    </mat-select>
+    <h2 class="labelInfo">(Please select a Tool to see the properties and create a Business Mapping Label)</h2>
   </div>
 
   <div class="subHeadingStyle" *ngIf="subHeading!='' ">
@@ -50,14 +51,14 @@
   <div *ngIf="(selectedAgent!=undefined)">
     <div class="btnAlign">
       <button mat-icon-button (click)="addAgentLabelData()" [disabled]="(selectedAgent==undefined)||disableAdd">
-        <mat-icon title="Add Agent Label " class="mat-icon material-icons">
+        <mat-icon title="Click to create a new Business Mapping Label " class="mat-icon material-icons">
           add_circle
         </mat-icon>
         <mat-icon svgIcon="lineInButton" class="mat-icon material-icons">
         </mat-icon>
       </button>
       <button mat-icon-button (click)="editData()" [disabled]="!isEditData || (selectedMappingAgent==undefined)">
-        <mat-icon title="Edit " class="mat-icon material-icons "> 
+        <mat-icon title="Edit " class="mat-icon material-icons ">
           edit
         </mat-icon>
       </button>
@@ -67,10 +68,10 @@
         </mat-icon>
       </button>
       <button mat-icon-button [disabled]="!isEditData || (selectedMappingAgent==undefined)" (click)="deleteMapping()">
-        <mat-icon title="Delete " class="mat-icon material-icons" >
+        <mat-icon title="Delete " class="mat-icon material-icons">
           delete
         </mat-icon>
-     </button>
+      </button>
     </div>
 
     <div *ngIf="isListView">
@@ -86,10 +87,12 @@
           <!-- OS Column -->
           <ng-container matColumnDef="mappinglabel">
             <th mat-header-cell *matHeaderCellDef class="tableHeaderCss">Business Mapping Label</th>
-            <td mat-cell class="listTable" *matCellDef="let element" style="width:20% !important"> {{element.businessmappinglabel}} </td>
+            <td mat-cell class="listTable" *matCellDef="let element" style="width:20% !important">
+              {{element.businessmappinglabel}} </td>
           </ng-container>
           <ng-container matColumnDef="properties">
-            <th mat-header-cell *matHeaderCellDef class="tableHeaderCss"> {{selectedAgent.toolName}} Properties ( Property Name : Property Value)</th>
+            <th mat-header-cell *matHeaderCellDef class="tableHeaderCss"> {{selectedAgent.toolName}} Properties (
+              Property Name : Property Value)</th>
             <td mat-cell class="listTable" *matCellDef="let element" style="width:51% !important ">
               <div [innerHTML]="element.propertiesString">
               </div>
@@ -109,11 +112,13 @@
       <table mat-table [dataSource]="agentPropertyDataSource" class="mat-elevation-z8 ">
         <ng-container matColumnDef="checkbox">
           <th mat-header-cell *matHeaderCellDef class="tableHeaderCss" style="width:10% !important ">
-            <mat-checkbox (change)="$event ? masterToggle() : null" [checked]="selection.hasValue() && isAllSelected()" [indeterminate]="selection.hasValue() && !isAllSelected() ">
+            <mat-checkbox (change)="$event ? masterToggle() : null" [checked]="selection.hasValue() && isAllSelected()"
+              [indeterminate]="selection.hasValue() && !isAllSelected() ">
             </mat-checkbox>
           </th>
           <td mat-cell *matCellDef="let row" style="width:10% !important">
-            <mat-checkbox (click)="$event.stopPropagation() " (change)="$event ? selection.toggle(row) : null" [checked]="selection.isSelected(row)">
+            <mat-checkbox (click)="$event.stopPropagation() " (change)="$event ? selection.toggle(row) : null"
+              [checked]="selection.isSelected(row)">
             </mat-checkbox>
           </td>
         </ng-container>
@@ -128,24 +133,27 @@
         <ng-container matColumnDef="propertyValue">
           <th mat-header-cell *matHeaderCellDef class="tableHeaderCss"> {{selectedAgent.toolName}} Property Value </th>
           <td mat-cell style="padding-top:10px;margin-left: 0px" *matCellDef="let element">
-            <input [(ngModel)]="element.value" ref-value="ngModel" name="{{element.value}}" [ngClass]="{ 'input-disabled' : !element.editProperties  ,'form-control': element.editProperties} "
+            <input [(ngModel)]="element.value" ref-value="ngModel" name="{{element.value}}"
+              [ngClass]="{ 'input-disabled' : !element.editProperties  ,'form-control': element.editProperties} "
               required>
           </td>
         </ng-container>
-
         <!-- Label Column -->
         <ng-container matColumnDef="propertyLabel">
           <th mat-header-cell *matHeaderCellDef class="tableHeaderCss"> Business Mapping Label </th>
-          <td mat-cell *matCellDef="let element;let i=index" [attr.rowspan]="getRowSpan('label',i)" [style.display]="getRowSpan( 'label', i) ? '' : 'none' ">
+           <td mat-cell  class="tableCss" *matCellDef="let element;let i=index" [attr.rowspan]="getRowSpan('label',i)"
+            [style.display]="getRowSpan( 'label', i) ? '' : 'none' ">
+            <input [(ngModel)]="label" #labelText="ngModel" name="label" placeholder="Input a name for the Business Mapping Label" [ngClass]="{ 'input-disabled-label' :false ,'form-control-label': true} "
+              required>
+            <br>
+<br>
             <span>Guidelines to create the Business Mapping Label:
               <ol>
                 <li>Label should be seperated by a colon ':'</li>
                 <li>Label name should not contain 'space'</li>
-                <li>Only '_' , '-' special characters are allowed</li> 
-              </ol>   
+                <li>Only '_' , '-' special characters are allowed</li>
+              </ol>
             </span>
-            <input [(ngModel)]="label" #labelText="ngModel" name="label" placeholder="Input a name for the Business Mapping Label" [ngClass]="{ 'input-disabled-label' :false ,'form-control-label': true} "
-              required>
           </td>
         </ng-container>
         <tr mat-header-row *matHeaderRowDef="displayedToolColumns"></tr>
@@ -153,7 +161,8 @@
         </tr>
       </table>
       <div *ngIf="noToolsPropertyData" class="noToolsData">
-        No properties were found for the selected Tool <b> {{selectedAgent.toolName}} </b>. Please go to the Agent Management
+        No properties were found for the selected Tool <b> {{selectedAgent.toolName}} </b>. Please go to the Agent
+        Management
         section to Edit or Update the selected Tool <b> {{selectedAgent.toolName}} </b> to add tool properties.
       </div>
     </div>

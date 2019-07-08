@@ -16,13 +16,18 @@
 package com.cognizant.devops.platformcommons.constants;
 
 import java.io.File;
+import java.time.Instant;
 
 public interface ConfigOptions {
 	String CONFIG_DIR = ".InSights";
 	String CONFIG_FILE = "server-config.json";
 	String TOOLS_CONFIG_FILE = "toolsConfig.json";
 	String CORRELATION_TEMPLATE = "correlation.json";
+	String TOOLDETAIL_TEMPLATE ="toolDetail.json";
+	String NEO4J_TEMPLATE = "neo4jdata.json";
+	String CORRELATION = "correlation"+Instant.now().toEpochMilli()+".json";
 	String DATA_ENRICHMENT_TEMPLATE = "data-enrichment.json";
+	String BLOCKCHAIN_CONFIG_FILE = "blockchainConfig.json";
 	String ENDPOINT_DATA = "endpointData";
 	String USER_DATA = "userData";
 	String PROPERTY_USER_HOME = "user.home";
@@ -33,6 +38,7 @@ public interface ConfigOptions {
 	String FILE_SEPERATOR = File.separator;
 	//String CONFIG_FILE_RESOLVED_PATH = System.getProperty(ConfigOptions.PROPERTY_USER_HOME) + "\\" + ConfigOptions.CONFIG_DIR + "\\" + ConfigOptions.CONFIG_FILE;
 	String CONFIG_FILE_RESOLVED_PATH = System.getenv().get(INSIGHTS_HOME) + FILE_SEPERATOR + ConfigOptions.CONFIG_DIR + FILE_SEPERATOR + ConfigOptions.CONFIG_FILE;
+	String BLOCKCHAIN_CONFIG_FILE_RESOLVED_PATH = System.getenv().get(INSIGHTS_HOME) + FILE_SEPERATOR + ConfigOptions.CONFIG_DIR + FILE_SEPERATOR + ConfigOptions.BLOCKCHAIN_CONFIG_FILE;
 	String CORRELATION_FILE_RESOLVED_PATH = System.getenv().get(INSIGHTS_HOME) + FILE_SEPERATOR + ConfigOptions.CONFIG_DIR + FILE_SEPERATOR + ConfigOptions.CORRELATION_TEMPLATE;
 	String TOOLS_CONFIG_FILE_RESOLVED_PATH = System.getProperty(ConfigOptions.PROPERTY_USER_HOME) + FILE_SEPERATOR + ConfigOptions.CONFIG_DIR + FILE_SEPERATOR + ConfigOptions.TOOLS_CONFIG_FILE;
 	String DATA_ENRICHMENT_FILE_RESOLVED_PATH = System.getenv().get(INSIGHTS_HOME) + FILE_SEPERATOR + ConfigOptions.CONFIG_DIR + FILE_SEPERATOR + ConfigOptions.DATA_ENRICHMENT_TEMPLATE;
@@ -59,5 +65,8 @@ public interface ConfigOptions {
 	String CSV_FORMAT = "CSV";
 	String JSON_FORMAT = "JSON";
 	String OFFLINE_DATA_PROCESSING_FOLDER = "data-enrichment";
+	String QUERY_DATA_PROCESSING_FOLDER = "Audit-report";
 	String OFFLINE_DATA_PROCESSING_RESOLVED_PATH = System.getenv().get(INSIGHTS_HOME) + FILE_SEPERATOR + ConfigOptions.CONFIG_DIR + FILE_SEPERATOR + ConfigOptions.OFFLINE_DATA_PROCESSING_FOLDER;
+	String QUERY_DATA_PROCESSING_RESOLVED_PATH = System.getenv().get(INSIGHTS_HOME) + FILE_SEPERATOR + ConfigOptions.CONFIG_DIR + FILE_SEPERATOR + ConfigOptions.QUERY_DATA_PROCESSING_FOLDER;
+
 }

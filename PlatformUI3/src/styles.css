@@ -77,5 +77,15 @@ body {
 
 }
 
+.showjson-dialog-container .mat-dialog-container {
+  padding: 0px !important;
+  margin: 0px !important;
+  border-radius:15px;
+  background-color: #e1e3e7  !important;
+  overflow: hidden !important;
+}
+
+
+
 
 

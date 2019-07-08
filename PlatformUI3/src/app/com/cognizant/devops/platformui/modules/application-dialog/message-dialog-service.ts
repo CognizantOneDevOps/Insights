@@ -17,46 +17,58 @@ import { Component, OnInit, Injectable } from '@angular/core';
 import { ApplicationMessageDialog } from '@insights/app/modules/application-dialog/application-message-dialog';
 import { ConfirmationMessageDialog } from '@insights/app/modules/application-dialog/confirmation-message-dialog';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
+import { DataSharedService } from '@insights/common/data-shared-service';
 
 
 @Injectable()
 export class MessageDialogService {
 
-    constructor(public dialog: MatDialog) {
+    constructor(public dialog: MatDialog, private dataShare: DataSharedService) {
 
     }
 
     public showApplicationsMessage(message, type): MatDialogRef<ApplicationMessageDialog> {
-        const dialogRef = this.dialog.open(ApplicationMessageDialog, {
-            panelClass: 'DialogBox',
-            width: '40%',
-            height: '32%',
-            disableClose: true,
-            data: {
-                title: "Message",
-                message: message,
-                type: type
-            }
-        });
-        return dialogRef;
+        var isSessionExpired = this.dataShare.validateSession();
+        if (!isSessionExpired) {
+            const dialogRef = this.dialog.open(ApplicationMessageDialog, {
+                panelClass: 'DialogBox',
+                width: '40%',
+                height: '32%',
+                disableClose: true,
+                data: {
+                    title: "Message",
+                    message: message,
+                    type: type
+                }
+            });
+            return dialogRef;
+        }
+        else {
+            console.log("Session Expire")
+        }
     }
 
     public showConfirmationMessage(title, message, value, type, height): MatDialogRef<ConfirmationMessageDialog> {
-        const dialogRef = this.dialog.open(ConfirmationMessageDialog, {
-            panelClass: 'DialogBox',
-            width: '45%',
-            height: height,
-            disableClose: true,
-            data: {
-                title: title,
-                message: message,
-                value: value,
-                type: type,
-                height: height
+        var isSessionExpired = this.dataShare.validateSession();
+        if (!isSessionExpired) {
+            const dialogRef = this.dialog.open(ConfirmationMessageDialog, {
+                panelClass: 'DialogBox',
+                width: '45%',
+                height: height,
+                disableClose: true,
+                data: {
+                    title: title,
+                    message: message,
+                    value: value,
+                    type: type,
+                    height: height
 
-            }
-        });
-        return dialogRef;
+                }
+            });
+            return dialogRef;
+        }
+        else {
+            console.log("Session Expire")
+        }
     }
-
 }

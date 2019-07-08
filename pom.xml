@@ -13,9 +13,21 @@
 	<groupId>com.cognizant.devops</groupId>
 	<artifactId>PlatformParent</artifactId>
 	<packaging>pom</packaging>
-	<version>5.0</version>
+	<version>5.3-SNAPSHOT</version>
 	<name>PlatformParent</name>
 
+	<modules>		
+		<module>PlatformCommons</module>
+		<module>PlatformDAL</module>
+		<module>PlatformAuditing</module>
+		<module>PlatformAuditEngine</module>
+		<module>PlatformService</module>
+		<module>PlatformEngine</module>				
+		<module>PlatformUI3</module>
+		<module>PlatformInsights</module>
+		<module>PlatformMockServer</module>
+	</modules>
+			
 	<dependencies>
 		<dependency>
 			<groupId>junit</groupId>
@@ -31,13 +43,13 @@
 		<dependency>
 			<groupId>org.apache.logging.log4j</groupId>
 			<artifactId>log4j-api</artifactId>
-			<version>2.5</version>
+			<version>2.11.2</version>
 		</dependency>
 
 		<dependency>
 			<groupId>org.apache.logging.log4j</groupId>
 			<artifactId>log4j-core</artifactId>
-			<version>2.5</version>
+			<version>2.11.1</version>
 		</dependency>
 		<dependency>
 			<groupId>com.google.code.gson</groupId>
@@ -45,15 +57,6 @@
 			<version>2.5</version>
 		</dependency>
 	</dependencies>
-	<modules>
-		<module>PlatformCommons</module>
-		<module>PlatformDAL</module>
-		<module>PlatformService</module>
-		<module>PlatformEngine</module>
-		<module>PlatformUI2.0</module>
-		<module>PlatformUI3</module>
-		<module>PlatformInsights</module>
-	</modules>
 
 	<build>
 		<plugins>
@@ -89,22 +92,16 @@
 		<url>https://bitbucket.org/atlassian/stash-auto-unapprove-plugin</url>
 		<tag>InSights-2.11.0.0</tag>
 	</scm>
-
-	<!-- <distributionManagement> <repository> <id>InSightsArtifactsREL</id> 
-		<name>InSightsArtifactsREL</name> <url>http://localhost:9005/nexus/content/repositories/InSightsArtifactsREL/</url> 
-		</repository> <snapshotRepository> <id>InSightsArtifacts</id> <name>InSightsArtifacts</name> 
-		<url>http://localhost:9005/nexus/content/repositories/InSightsArtifacts/</url> 
-		</snapshotRepository> </distributionManagement> -->
-
-       <distributionManagement>
-		<repository> 
-		<id>nexus</id>		
-			<url>http://insightsplatformnexusrepo.cogdevops.com:8001/nexus/content/repositories/InsightsRelease</url> 
-		</repository>
-		<snapshotRepository>
-			<id>nexus</id>
-			<url>http://insightsplatformnexusrepo.cogdevops.com:8001/nexus/content/repositories/buildonInsights</url>
-		</snapshotRepository>
+	
+	<distributionManagement>
+				<repository> 
+				<id>nexus</id>		
+					<url>https://repo.cogdevops.com/repository/InsightsEnterpriseRelease</url>
+				</repository>
+				<snapshotRepository>
+					<id>nexus</id>
+					<url>https://repo.cogdevops.com/repository/buildonInsightsEnterprise</url>
+				</snapshotRepository>
 	</distributionManagement>
 	
 	<profiles>
@@ -162,8 +159,6 @@
 					</plugin>
 				</plugins>
 			</reporting>
-		</profile>
+		</profile>		
 	</profiles>
-
-
 </project>

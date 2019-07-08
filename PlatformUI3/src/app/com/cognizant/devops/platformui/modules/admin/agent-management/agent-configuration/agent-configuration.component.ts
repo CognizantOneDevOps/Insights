@@ -338,10 +338,16 @@ export class AgentConfigurationComponent implements OnInit {
 
       self.configData = "";
       self.configData = JSON.stringify(self.updatedConfigParamdata);
+      var agentAPIRequestJson = {};
       //console.log(this.configData)
       if (actionType == "Update") {
 
-        var updateAgentRes = await self.agentService.updateAgent(this.selectedAgentKey, self.configData, self.selectedTool, self.selectedVersion, self.selectedOS)
+        agentAPIRequestJson['agentId'] = this.selectedAgentKey
+        agentAPIRequestJson['configJson'] = self.configData
+        agentAPIRequestJson['toolName'] = self.selectedTool
+        agentAPIRequestJson['agentVersion'] = self.selectedVersion
+        agentAPIRequestJson['osversion'] = self.selectedOS
+        var updateAgentRes = await self.agentService.updateAgentV2(JSON.stringify(agentAPIRequestJson));
 
         self.agentConfigstatus = updateAgentRes.status;
         //console.log(updateAgentRes);
@@ -356,7 +362,12 @@ export class AgentConfigurationComponent implements OnInit {
         }
       } else {
 
-        var registerAgentRes = await self.agentService.registerAgent(self.selectedTool, self.selectedVersion, self.selectedOS, self.configData, self.trackingUploadedFileContentStr)
+        agentAPIRequestJson['toolName'] = self.selectedTool
+        agentAPIRequestJson['agentVersion'] = self.selectedVersion
+        agentAPIRequestJson['osversion'] = self.selectedOS
+        agentAPIRequestJson['configJson'] = self.configData
+        agentAPIRequestJson['trackingDetails'] = self.trackingUploadedFileContentStr
+        var registerAgentRes = await self.agentService.registerAgentV2(JSON.stringify(agentAPIRequestJson));
         self.agentConfigstatus = registerAgentRes.status;
         //console.log(registerAgentRes);
         if (registerAgentRes.status == "success") {
