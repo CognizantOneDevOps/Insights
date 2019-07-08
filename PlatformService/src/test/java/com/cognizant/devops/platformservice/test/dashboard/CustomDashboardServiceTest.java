@@ -1,3 +1,4 @@
+package com.cognizant.devops.platformservice.test.dashboard;
 /*******************************************************************************
  * Copyright 2017 Cognizant Technology Solutions
  * 
@@ -12,7 +13,7 @@
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
  * License for the specific language governing permissions and limitations under
  * the License.
- ******************************************************************************/
+ ******************************************************************************//*
 package com.cognizant.devops.platformservice.rest.dashboard;
 
 
@@ -92,3 +93,4 @@ public class CustomDashboardServiceTest {
         assertEquals("Should return FAILURE","failure",jsonObj.get("status").getAsString());    }
     
 }
+*/

@@ -1,3 +1,4 @@
+package com.cognizant.devops.platformservice.test.agentConfiguration;
 /*******************************************************************************
  * Copyright 2017 Cognizant Technology Solutions
  * 
@@ -12,7 +13,7 @@
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
  * License for the specific language governing permissions and limitations under
  * the License.
- ******************************************************************************/
+ ******************************************************************************//*
 package com.cognizant.devops.platformservice.rest.agentConfiguration;
 
 import static org.junit.Assert.assertEquals;
@@ -133,3 +134,4 @@ public class ToolsConfigTest  {
         assertEquals("Should return failure","failure",jsonObj.get("status").getAsString());	       
     	}
 }
+*/
