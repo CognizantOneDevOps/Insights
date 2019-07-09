@@ -32,7 +32,11 @@ export class WebHookService implements IWebHookService {
         return this.restCallHandlerService.postWithParameter("SAVE_DATA_WEBHOOK_CONFIG", { 'webhookname': webhookname, 'toolName': toolName, 'eventname': eventname, 'dataformat': dataformat, 'mqchannel': mqchannel, 'subscribestatus': subscribestatus }, { 'Content-Type': 'application/x-www-form-urlencoded' }).toPromise();
     }
 
-    /* listDatapurgingdata(label: string): Promise<any> {
-        return this.restCallHandlerService.get("LIST_DATAPURGING_SETTING", { 'settingsType': label });
-    } */
+    loadwebhookServices(): Promise<any> {
+        return this.restCallHandlerService.get("LIST_WEBHOOK");
+    }
+    webhookUninstall(webhookname: string): Promise<any> {
+        console.log("entered")
+        return this.restCallHandlerService.postWithParameter("DELETE_WEBHOOK", { 'webhookname': webhookname }, { 'Content-Type': 'application/x-www-form-urlencoded' }).toPromise();
+    }
 }
