@@ -80,13 +80,15 @@ case "$1" in
      echo "InSightsGitLabAgent stopped"
      echo "InSightsGitLabAgent starting"
      cd $INSIGHTS_AGENT_HOME/PlatformAgents/gitlab
-     python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.scm.gitlab.GitLabAgent import GitLabAgent; GitLabAgent()" &
+     echo $python_version
+     detectPythonVersion "$python_version"
      echo "InSightsGitLabAgent started"
     else
      echo "InSightsGitLabAgent already in stopped state"
      echo "InSightsGitLabAgent starting"
      cd $INSIGHTS_AGENT_HOME/PlatformAgents/gitlab
-     python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.scm.gitlab.GitLabAgent import GitLabAgent; GitLabAgent()" &
+     echo $python_version
+     detectPythonVersion "$python_version"
      echo "InSightsGitLabAgent started"
     fi
     ;;

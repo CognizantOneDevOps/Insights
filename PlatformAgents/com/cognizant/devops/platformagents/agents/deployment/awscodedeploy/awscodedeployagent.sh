@@ -79,13 +79,15 @@ case "$1" in
      echo "InSightsAwsCodeDeployAgent stopped"
      echo "InSightsAwsCodeDeployAgent starting"
      cd $INSIGHTS_AGENT_HOME/PlatformAgents/awscodedeploy
-     python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.deployment.awscodedeploy.AwsCodeDeployAgent import AwsCodeDeployAgent; AwsCodeDeployAgent()" &
+     echo $python_version
+     detectPythonVersion "$python_version"
      echo "InSightsAwsCodeDeployAgent started"
     else
      echo "InSightsAwsCodeDeployAgent already in stopped state"
      echo "InSightsAwsCodeDeployAgent starting"
      cd $INSIGHTS_AGENT_HOME/PlatformAgents/awscodedeploy
-     python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.deployment.awscodedeploy.AwsCodeDeployAgent import AwsCodeDeployAgent; AwsCodeDeployAgent()" &
+     echo $python_version
+     detectPythonVersion "$python_version"
      echo "InSightsAwsCodeDeployAgent started"
     fi
     ;;

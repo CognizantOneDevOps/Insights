@@ -80,13 +80,15 @@ case "$1" in
      echo "InSightsSvnAgent stopped"
      echo "InSightsSvnAgent starting"
      cd $INSIGHTS_AGENT_HOME/PlatformAgents/svn
-     python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.scm.svn.svnAgent import svnAgent; svnAgent()" &
+     echo $python_version
+     detectPythonVersion "$python_version"
      echo "InSightsSvnAgent started"
     else
      echo "InSightsSvnAgent already in stopped state"
      echo "InSightsSvnAgent starting"
      cd $INSIGHTS_AGENT_HOME/PlatformAgents/svn
-     python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.scm.svn.svnAgent import svnAgent; svnAgent()" &
+     echo $python_version
+     detectPythonVersion "$python_version"
      echo "InSightsSvnAgent started"
     fi
     ;;
