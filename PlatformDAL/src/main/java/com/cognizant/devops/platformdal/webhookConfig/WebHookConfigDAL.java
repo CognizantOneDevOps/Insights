@@ -8,7 +8,9 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.hibernate.query.Query;
 
+import com.cognizant.devops.platformdal.agentConfig.AgentConfig;
 import com.cognizant.devops.platformdal.core.BaseDAL;
+import com.cognizant.devops.platformdal.settingsconfig.SettingsConfiguration;
 
 
 public class WebHookConfigDAL  extends BaseDAL{
@@ -45,5 +47,46 @@ public class WebHookConfigDAL  extends BaseDAL{
 		terminateSession();
 		terminateSessionFactory();
 		return Boolean.TRUE;
+	}
+	
+	
+	public List<WebHookConfig> getAllWebHookConfigurations() {
+		Query<WebHookConfig> createQuery = getSession().createQuery("FROM WebHookConfig WH", WebHookConfig.class);
+		List<WebHookConfig> result = createQuery.getResultList();
+		terminateSession();
+		terminateSessionFactory();
+		return result;
+	}
+	
+	
+	
+	
+	
+	public WebHookConfig loadWebHookConfiguration(String webhookName) {
+		Query<WebHookConfig> loadQuery = getSession().createQuery("FROM WebHookConfig SC WHERE SC.webhookName = :webhookName", WebHookConfig.class);
+		loadQuery.setParameter("webhookName", webhookName);
+		List<WebHookConfig> results = loadQuery.getResultList();
+		WebHookConfig webhookConfiguration = null;
+		if (results != null && !results.isEmpty()) {
+			webhookConfiguration = results.get(0);
+		}
+		terminateSession();
+		terminateSessionFactory();
+		return webhookConfiguration;
+	}
+	
+	
+	public List<WebHookConfig> deleteWebhookConfigurations(String webhookName) {
+		Query<WebHookConfig> createQuery = getSession().createQuery(
+				"FROM WebHookConfig a WHERE a.webhookName = :webhookName",
+				WebHookConfig.class);
+		createQuery.setParameter("webhookName", webhookName);
+		WebHookConfig webhookConfig = createQuery.getSingleResult();
+		getSession().beginTransaction();
+		getSession().delete(webhookConfig);
+		getSession().getTransaction().commit();
+		terminateSession();
+		terminateSessionFactory();
+		return getAllWebHookConfigurations();
 	}
 }

@@ -9,8 +9,13 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
+import com.cognizant.devops.platformdal.settingsconfig.SettingsConfiguration;
+import com.cognizant.devops.platformdal.webhookConfig.WebHookConfig;
+import com.cognizant.devops.platformservice.agentmanagement.service.AgentConfigTO;
 import com.cognizant.devops.platformservice.rest.neo4j.GraphDBService;
 import com.cognizant.devops.platformservice.rest.util.PlatformServiceUtil;
+import com.cognizant.devops.platformservice.webhook.service.WebHookConfigTO;
 import com.cognizant.devops.platformservice.webhook.service.WebHookService;
 import com.google.gson.JsonObject;
 import org.apache.logging.log4j.LogManager;
@@ -60,4 +65,27 @@ public class WebHookController {
 			return PlatformServiceUtil.buildFailureResponse("Unable to save or update Setting Configuration for the request");
 		} 
 	  	}
+	
+	
+	@RequestMapping(value = "/loadwebhookConfiguration", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+	public @ResponseBody JsonObject getRegisteredAgents() {
+		List<WebHookConfigTO> webhookList;
+		try {
+			webhookList = webhookConfigurationService.getRegisteredWebHooks();
+		} catch (InsightsCustomException e) {
+			return PlatformServiceUtil.buildFailureResponse(e.toString());
+		}
+		return PlatformServiceUtil.buildSuccessResponseWithData(webhookList);
+	}
+	
+	@RequestMapping(value = "/uninstallWebHook", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+	public @ResponseBody JsonObject uninstallAgent(@RequestParam String webhookname) {
+		String message = null;
+		try {
+			message = webhookConfigurationService.uninstallWebhook(webhookname);
+		} catch (InsightsCustomException e) {
+			return PlatformServiceUtil.buildFailureResponse(e.toString());
+		}
+		return PlatformServiceUtil.buildSuccessResponseWithData(message);
+	}
 }
