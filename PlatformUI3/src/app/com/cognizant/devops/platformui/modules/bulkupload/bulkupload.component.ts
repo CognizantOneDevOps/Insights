@@ -148,6 +148,7 @@ export class BulkUploadComponent implements OnInit {
                 var failcount = 0;
                 var rowcount = 0;
                 var successCount = 0;
+                var successtool = ""
                 var numberOfValidEntries = 0;
                 for (let element of this.rows.value) {
                     var fd = new FormData();
@@ -198,6 +199,8 @@ export class BulkUploadComponent implements OnInit {
                                     element.status = 'Success'
                                     element.tooltipmessage = "success"
                                     successCount = successCount + 1;
+                                    successtool = successtool + element.toolName + ", ";
+
                                 }
                                 else {
                                     element.status = 'Fail'
@@ -227,8 +230,12 @@ export class BulkUploadComponent implements OnInit {
                         break;
                     }
                 }
-                if (successCount == numberOfValidEntries && failcount == 0) {
-                    this.messageDialog.showApplicationsMessage("You have successfully uploaded the file to Neo4J", "SUCCESS");
+                if (successCount == numberOfValidEntries && failcount == 0 && successCount != 0) {
+                    successtool = successtool.slice(0, -2);
+                    this.messageDialog.showApplicationsMessage("You have successfully uploaded the file to Neo4J for " + successtool, "SUCCESS");
+                }
+                else if (successCount == numberOfValidEntries && failcount == 0 && successCount == 0) {
+                    this.messageDialog.showApplicationsMessage("Something went wrong in selecting file", "ERROR");
                 }
                 else {
                     var errorMessage = "Failed to Upload the Data for some files.Please click on the failure icon for more details."
