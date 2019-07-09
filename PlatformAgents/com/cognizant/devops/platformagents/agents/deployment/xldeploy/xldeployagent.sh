@@ -80,13 +80,15 @@ case "$1" in
      echo "InSightsXLDeployAgent stopped"
      echo "InSightsXLDeployAgent starting"
      cd $INSIGHTS_AGENT_HOME/PlatformAgents/xldeploy
-     python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.deployment.xldeploy.XLDeployAgent import XLDeployAgent; XLDeployAgent()" &
+     echo $python_version
+     detectPythonVersion "$python_version"
      echo "InSightsXLDeployAgent started"
     else
      echo "InSightsXLDeployAgent already in stopped state"
      echo "InSightsXLDeployAgent starting"
      cd $INSIGHTS_AGENT_HOME/PlatformAgents/xldeploy
-     python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.deployment.xldeploy.XLDeployAgent import XLDeployAgent; XLDeployAgent()" &
+     echo $python_version
+     detectPythonVersion "$python_version"
      echo "InSightsXLDeployAgent started"
     fi
     ;;

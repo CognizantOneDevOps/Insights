@@ -79,13 +79,15 @@ case "$1" in
      echo "InSightsRundeckAgent stopped"
      echo "InSightsRundeckAgent starting"
      cd $INSIGHTS_AGENT_HOME/PlatformAgents/rundeck
-     python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.deplyment.rundeck.RundeckAgent import RundeckAgent; RundeckAgent()" &
+     echo $python_version
+     detectPythonVersion "$python_version"
      echo "InSightsRundeckAgent started"
     else
      echo "InSightsRundeckAgent already in stopped state"
      echo "InSightsRundeckAgent starting"
      cd $INSIGHTS_AGENT_HOME/PlatformAgents/rundeck
-     python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.deplyment.rundeck.RundeckAgent import RundeckAgent; RundeckAgent()" &
+     echo $python_version
+     detectPythonVersion "$python_version"
      echo "InSightsRundeckAgent started"
     fi
     ;;
