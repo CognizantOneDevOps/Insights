@@ -1,9 +1,23 @@
+/*******************************************************************************
+ * Copyright 2017 Cognizant Technology Solutions
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License.  You may obtain a copy
+ * of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ ******************************************************************************/
 package com.cognizant.devops.platformauditing.hyperledger.user;
 
 import com.cognizant.devops.platformauditing.util.LoadFile;
 import com.google.gson.JsonObject;
 import org.apache.logging.log4j.LogManager;
-import org.hyperledger.fabric.sdk.exception.CryptoException;
 
 import javax.xml.bind.DatatypeConverter;
 import java.io.*;
@@ -17,16 +31,14 @@ import java.security.spec.PKCS8EncodedKeySpec;
 
 public class UserUtil {
 	private static final org.apache.logging.log4j.Logger LOG = LogManager.getLogger(UserUtil.class.getName());
-	/**
-	 * Serialize user
-	 * 
-	 * @param userContext
-	 * @throws Exception
-	 */
 	private static JsonObject Config= LoadFile.getConfig();
-	public static void writeUserContext(UserContext userContext) throws Exception {
-		String directoryPath = Config.get("USER_SER_PATH").getAsString() + userContext.getAffiliation();
-		String filePath = directoryPath + "/" + userContext.getName() + ".ser";
+
+	/*
+	Write the user context into the path specified as USER_SER_PATH as a .ser file
+	 */
+	public static void writeUserContext(BCUserContext BCUserContext) throws Exception {
+		String directoryPath = Config.get("USER_SER_PATH").getAsString() + BCUserContext.getAffiliation();
+		String filePath = directoryPath + "/" + BCUserContext.getName() + ".ser";
 		File directory = new File(directoryPath);
 		if (!directory.exists())
 			directory.mkdirs();
@@ -35,21 +47,16 @@ public class UserUtil {
 		ObjectOutputStream out = new ObjectOutputStream(file);
 
 		// Method for serialization of object
-		out.writeObject(userContext);
+		out.writeObject(BCUserContext);
 
 		out.close();
 		file.close();
 	}
 
-	/**
-	 * Deserialize user
-	 * 
-	 * @param affiliation
-	 * @param username
-	 * @return
-	 * @throws Exception
+	/*
+	Read the user context stored as .ser file from the USER_SER_PATH
 	 */
-	public static UserContext readUserContext(String affiliation, String username) throws Exception {
+	public static BCUserContext readUserContext(String affiliation, String username) throws Exception {
 		String filePath = Config.get("USER_SER_PATH") + affiliation + "/" + username + ".ser";
 		File file = new File(filePath);
 		if (file.exists()) {
@@ -58,7 +65,7 @@ public class UserUtil {
 			ObjectInputStream in = new ObjectInputStream(fileStream);
 
 			// Method for deserialization of object
-			UserContext uContext = (UserContext) in.readObject();
+			BCUserContext uContext = (BCUserContext) in.readObject();
 
 			in.close();
 			fileStream.close();
@@ -68,22 +75,13 @@ public class UserUtil {
 		return null;
 	}
 
-	/**
-	 * Create enrollment from key and certificate files.
-	 * 
-	 * @param keyFolderPath
-	 * @param keyFileName
-	 * @param certFileName
-	 * @return
-	 * @throws IOException
-	 * @throws NoSuchAlgorithmException
-	 * @throws InvalidKeySpecException
-	 * @throws CryptoException
+	/*
+	 Create enrollment from key and certificate files
 	 */
-	public static CAEnrollment getEnrollment(String keyFolderPath,  String keyFileName,  String certFolderPath, String certFileName)
-			throws IOException, NoSuchAlgorithmException, InvalidKeySpecException, CryptoException {
-		PrivateKey key = null;
-		String certificate = null;
+	public static CertificationAuthorityEnrollment getEnrollment(String keyFolderPath, String keyFileName, String certFolderPath, String certFileName)
+			throws IOException, NoSuchAlgorithmException, InvalidKeySpecException {
+		PrivateKey key;
+		String certificate;
 		InputStream isKey = null;
 		BufferedReader brKey = null;
 
@@ -106,14 +104,19 @@ public class UserUtil {
 			KeyFactory kf = KeyFactory.getInstance("EC");
 			key = kf.generatePrivate(keySpec);
 		} finally {
-			isKey.close();
-			brKey.close();
+			if (isKey != null) {
+				isKey.close();
+			}
+			if (brKey != null) {
+				brKey.close();
+			}
 		}
 
-		CAEnrollment enrollment = new CAEnrollment(key, certificate);
-		return enrollment;
+		return new CertificationAuthorityEnrollment(key, certificate);
 	}
-	
+	/*
+	Clean up the USER_SER_PATH
+	 */
 	public static void cleanUp() {
 		String directoryPath = Config.get("USER_SER_PATH").getAsString();
 		File directory = new File(directoryPath);
