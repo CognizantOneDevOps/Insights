@@ -79,19 +79,6 @@ public class PdfSignUtil extends PdfCreateSignatureBase
 	private static final String PDF_PATH = System.getenv().get("INSIGHTS_HOME") + File.separator + ConfigOptions.CONFIG_DIR + File.separator + "Pdf" + File.separator;
 	private static final String TARGET_PDF = "target/Traceability_report.pdf";
 	
-	
-	/**
-	 * Initialize the signature creator with a keystore (pkcs12) and pin that
-	 * should be used for the signature.
-	 *
-	 * @param keystore is a pkcs12 keystore.
-	 * @param pin is the pin for the keystore / private key
-	 * @throws KeyStoreException if the keystore has not been initialized (loaded)
-	 * @throws NoSuchAlgorithmException if the algorithm for recovering the key cannot be found
-	 * @throws UnrecoverableKeyException if the given password is wrong
-	 * @throws CertificateException if the certificate is not valid as signing time
-	 * @throws IOException if no certificate could be found
-	 */
 	public PdfSignUtil(KeyStore keystore, char[] pin)
 			throws KeyStoreException, UnrecoverableKeyException, NoSuchAlgorithmException, IOException, CertificateException
 	{
@@ -100,33 +87,6 @@ public class PdfSignUtil extends PdfCreateSignatureBase
 
 	public PdfSignUtil() {
 		super();
-	}
-
-	public File getImageFile()
-	{
-		return imageFile;
-	}
-
-	public void setImageFile(File imageFile)
-	{
-		this.imageFile = imageFile;
-	}
-
-	public boolean isLateExternalSigning()
-	{
-		return lateExternalSigning;
-	}
-
-	/**
-	 * Set late external signing. Enable this if you want to activate the demo code where the
-	 * signature is kept and added in an extra step without using PDFBox methods. This is disabled
-	 * by default.
-	 *
-	 * @param lateExternalSigning
-	 */
-	public void setLateExternalSigning(boolean lateExternalSigning)
-	{
-		this.lateExternalSigning = lateExternalSigning;
 	}
 
 	/**
@@ -451,6 +411,26 @@ public class PdfSignUtil extends PdfCreateSignatureBase
 			e.printStackTrace();
 		}
 		return signdoc;
+	}
+	
+	public File getImageFile()
+	{
+		return imageFile;
+	}
+
+	public void setImageFile(File imageFile)
+	{
+		this.imageFile = imageFile;
+	}
+
+	public boolean isLateExternalSigning()
+	{
+		return lateExternalSigning;
+	}
+
+	public void setLateExternalSigning(boolean lateExternalSigning)
+	{
+		this.lateExternalSigning = lateExternalSigning;
 	}
 
 	/**
