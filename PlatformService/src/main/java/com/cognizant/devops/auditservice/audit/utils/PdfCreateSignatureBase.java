@@ -1,21 +1,19 @@
-package com.cognizant.devops.auditservice.audit.utils;
-
-/*
- * Copyright 2015 The Apache Software Foundation.
+/*******************************************************************************
+ * Copyright 2017 Cognizant Technology Solutions
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License.  You may obtain a copy
+ * of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ ******************************************************************************/
+package com.cognizant.devops.auditservice.audit.utils;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -40,11 +38,11 @@ import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 import org.bouncycastle.operator.jcajce.JcaDigestCalculatorProviderBuilder;
 
 
-public abstract class CreateSignatureBase implements SignatureInterface
+public abstract class PdfCreateSignatureBase implements SignatureInterface
 {
     private PrivateKey privateKey;
-    private Certificate[] certificateChain;
-    private String tsaUrl;
+    private Certificate[] certificates;
+    private String timeStampUrl;
     private boolean externalSigning;
 
     /**
@@ -59,12 +57,9 @@ public abstract class CreateSignatureBase implements SignatureInterface
      * @throws CertificateException if the certificate is not valid as signing time
      * @throws IOException if no certificate could be found
      */
-    public CreateSignatureBase(KeyStore keystore, char[] pin)
+    public PdfCreateSignatureBase(KeyStore keystore, char[] pin)
             throws KeyStoreException, UnrecoverableKeyException, NoSuchAlgorithmException, IOException, CertificateException
     {
-        // grabs the first alias from the keystore and get the private key. An
-        // alternative method or constructor could be used for setting a specific
-        // alias that should be used.
         Enumeration<String> aliases = keystore.aliases();
         String alias;
         Certificate cert = null;
@@ -77,14 +72,12 @@ public abstract class CreateSignatureBase implements SignatureInterface
             {
                 continue;
             }
-            setCertificateChain(certChain);
+            setCertificates(certChain);
             cert = certChain[0];
             if (cert instanceof X509Certificate)
             {
-                // avoid expired certificate
                 ((X509Certificate) cert).checkValidity();
-                
-                SigUtils.checkCertificateUsage((X509Certificate) cert);
+                SignatureUtils.checkCertificateUsage((X509Certificate) cert);
             }
             break;
         }
@@ -94,38 +87,13 @@ public abstract class CreateSignatureBase implements SignatureInterface
             throw new IOException("Could not find certificate");
         }
     }
-
-    public CreateSignatureBase() {
-		// TODO Auto-generated constructor stub
-	}
-
-	public final void setPrivateKey(PrivateKey privateKey)
-    {
-        this.privateKey = privateKey;
-    }
-
-    public final void setCertificateChain(final Certificate[] certificateChain)
-    {
-        this.certificateChain = certificateChain;
-    }
     
-    public Certificate[] getCertificateChain()
-    	    {
-    	        return certificateChain;
-    	    }
-
-    public void setTsaUrl(String tsaUrl)
-    {
-        this.tsaUrl = tsaUrl;
-    }
-
+    
     /**
      * SignatureInterface implementation.
      *
      * This method will be called from inside of the pdfbox and create the PKCS #7 signature.
      * The given InputStream contains the bytes that are given by the byte range.
-     *
-     * This method is for internal use only.
      *
      * Use your favorite cryptographic library to implement PKCS #7 signature creation.
      *
@@ -133,19 +101,18 @@ public abstract class CreateSignatureBase implements SignatureInterface
      */
     public byte[] sign(InputStream content) throws IOException
     {
-        // cannot be done private (interface)
         try
         {
             CMSSignedDataGenerator gen = new CMSSignedDataGenerator();
-            X509Certificate cert = (X509Certificate) certificateChain[0];
+            X509Certificate cert = (X509Certificate) certificates[0];
             ContentSigner sha1Signer = new JcaContentSignerBuilder("SHA256WithRSA").build(privateKey);
             gen.addSignerInfoGenerator(new JcaSignerInfoGeneratorBuilder(new JcaDigestCalculatorProviderBuilder().build()).build(sha1Signer, cert));
-            gen.addCertificates(new JcaCertStore(Arrays.asList(certificateChain)));
-            CMSProcessableInputStream msg = new CMSProcessableInputStream(content);
+            gen.addCertificates(new JcaCertStore(Arrays.asList(certificates)));
+            BountyInputStream msg = new BountyInputStream(content);
             CMSSignedData signedData = gen.generate(msg, false);
-            if (tsaUrl != null && tsaUrl.length() > 0)
+            if (timeStampUrl != null && timeStampUrl.length() > 0)
             {
-                ValidationTimeStamp validation = new ValidationTimeStamp(tsaUrl);
+                ValidateTS validation = new ValidateTS(timeStampUrl);
                 signedData = validation.addSignedTimeStamp(signedData);
             }
             return signedData.getEncoded();
@@ -156,14 +123,30 @@ public abstract class CreateSignatureBase implements SignatureInterface
         }
     }
 
-    /**
-     * Set if external signing scenario should be used.
-     * If {@code false}, SignatureInterface would be used for signing.
-     * <p>
-     *     Default: {@code false}
-     * </p>
-     * @param externalSigning {@code true} if external signing should be performed
-     */
+    public PdfCreateSignatureBase() {
+		// TODO Auto-generated constructor stub
+	}
+
+	public final void setPrivateKey(PrivateKey privateKey)
+    {
+        this.privateKey = privateKey;
+    }
+
+    public final void setCertificates(final Certificate[] certificates)
+    {
+        this.certificates = certificates;
+    }
+    
+    public Certificate[] getCertificates()
+    {
+    	return certificates;
+    }
+
+    public void setTimeStampUrl(String timeStampUrl)
+    {
+        this.timeStampUrl = timeStampUrl;
+    }
+
     public void setExternalSigning(boolean externalSigning)
     {
         this.externalSigning = externalSigning;

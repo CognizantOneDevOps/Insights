@@ -1,3 +1,18 @@
+/*******************************************************************************
+ * Copyright 2017 Cognizant Technology Solutions
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License.  You may obtain a copy
+ * of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ ******************************************************************************/
 package com.cognizant.devops.auditservice.audit.utils;
 
 import java.io.IOException;
@@ -23,26 +38,16 @@ import org.bouncycastle.cms.CMSSignedData;
 import org.bouncycastle.cms.SignerInformation;
 import org.bouncycastle.cms.SignerInformationStore;
 
-/**
- * This class wraps the TSAClient and the work that has to be done with it. Like Adding Signed
- * TimeStamps to a signature, or creating a CMS timestamp attribute (with a signed timestamp)
- *
- */
-public class ValidationTimeStamp
+public class ValidateTS
 {
-    private TSAClient tsaClient;
+    private TimeStampingAuthorityClient timeStampingAuthorityClient;
 
-    /**
-     * @param tsaUrl The url where TS-Request will be done.
-     * @throws NoSuchAlgorithmException
-     * @throws MalformedURLException
-     */
-    public ValidationTimeStamp(String tsaUrl) throws NoSuchAlgorithmException, MalformedURLException
+    public ValidateTS(String tsaUrl) throws NoSuchAlgorithmException, MalformedURLException
     {
         if (tsaUrl != null)
         {
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
-            this.tsaClient = new TSAClient(new URL(tsaUrl), null, null, digest);
+            this.timeStampingAuthorityClient = new TimeStampingAuthorityClient(new URL(tsaUrl), null, null, digest);
         }
     }
 
@@ -55,7 +60,7 @@ public class ValidationTimeStamp
      */
     public byte[] getTimeStampToken(InputStream content) throws IOException
     {
-        return tsaClient.getTimeStampToken(IOUtils.toByteArray(content));
+        return timeStampingAuthorityClient.getTimeStampToken(IOUtils.toByteArray(content));
     }
 
     /**
@@ -100,7 +105,7 @@ public class ValidationTimeStamp
             vector = unsignedAttributes.toASN1EncodableVector();
         }
 
-        byte[] token = tsaClient.getTimeStampToken(signer.getSignature());
+        byte[] token = timeStampingAuthorityClient.getTimeStampToken(signer.getSignature());
         ASN1ObjectIdentifier oid = PKCSObjectIdentifiers.id_aa_signatureTimeStampToken;
         ASN1Encodable signatureTimeStamp = new Attribute(oid,
                 new DERSet(ASN1Primitive.fromByteArray(token)));

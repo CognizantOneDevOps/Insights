@@ -1,3 +1,18 @@
+/*******************************************************************************
+ * Copyright 2017 Cognizant Technology Solutions
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License.  You may obtain a copy
+ * of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ ******************************************************************************/
 package com.cognizant.devops.auditservice.audit.utils;
 
 
@@ -50,16 +65,8 @@ import org.bouncycastle.asn1.x500.style.BCStyle;
 import org.bouncycastle.asn1.x500.style.IETFUtils;
 
 import com.cognizant.devops.platformcommons.constants.ConfigOptions;
-/**
- * This is a second example for visual signing a pdf. It doesn't use the "design pattern" influenced
- * PDVisibleSignDesigner, and doesn't create its complex multilevel forms described in the Adobe
- * document
- * <a href="https://www.adobe.com/content/dam/acom/en/devnet/acrobat/pdfs/PPKAppearances.pdf">Digital
- * Signature Appearances</a>, because this isn't required by the PDF specification. See the
- * discussion in December 2017 in PDFBOX-3198.
- *
- */
-public class PdfSignUtil extends CreateSignatureBase
+
+public class PdfSignUtil extends PdfCreateSignatureBase
 {
 	private static final Logger log = LogManager.getLogger(PdfSignUtil.class.getName());
 	
@@ -91,16 +98,9 @@ public class PdfSignUtil extends CreateSignatureBase
 		super(keystore, pin);
 	}
 
-
-
-
 	public PdfSignUtil() {
-		// TODO Auto-generated constructor stub
 		super();
 	}
-
-
-
 
 	public File getImageFile()
 	{
@@ -161,7 +161,7 @@ public class PdfSignUtil extends CreateSignatureBase
 			throw new IOException("Document for signing does not exist");
 		}
 
-		setTsaUrl(tsaUrl);
+		setTimeStampUrl(tsaUrl);
 
 		// creating output document and prepare the IO streams.
 
@@ -172,21 +172,17 @@ public class PdfSignUtil extends CreateSignatureBase
 		ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
 		protectDoc.save(byteArrayOutputStream);
 		PDDocument doc = PDDocument.load(byteArrayOutputStream.toByteArray(),"12345");
-		int accessPermissions = SigUtils.getMDPPermission(doc);
+		int accessPermissions = SignatureUtils.getMDPPermission(doc);
 		if (accessPermissions == 1)
 		{
 			//fos.close();
 			throw new IllegalStateException("No changes to the document are permitted due to DocMDP transform parameters dictionary");
 		}
-		// Note that PDFBox has a bug that visual signing on certified files with permission 2
-		// doesn't work properly, see PDFBOX-3699. As long as this issue is open, you may want to
-		// be careful with such files.
 
 		PDSignature signature = null;
 		PDAcroForm acroForm = doc.getDocumentCatalog().getAcroForm();
 		PDRectangle rect = null;
 
-		// sign a PDF with an existing empty signature, as created by the CreateEmptySignatureForm example.
 		if (acroForm != null)
 		{
 			signature = findExistingSignature(acroForm, signatureFieldName);
@@ -198,7 +194,6 @@ public class PdfSignUtil extends CreateSignatureBase
 
 		if (signature == null)
 		{
-			// create signature dictionary
 			signature = new PDSignature();
 		}
 
@@ -207,54 +202,33 @@ public class PdfSignUtil extends CreateSignatureBase
 			rect = createSignatureRectangle(doc, humanRect);
 		}
 
-		// Optional: certify
-		// can be done only if version is at least 1.5 and if not already set
-		// doing this on a PDF/A-1b file fails validation by Adobe preflight (PDFBOX-3821)
-		// PDF/A-1b requires PDF version 1.4 max, so don't increase the version on such files.
 		if (doc.getVersion() >= 1.5f && accessPermissions == 0)
 		{
-			SigUtils.setMDPPermission(doc, signature, 2);
+			SignatureUtils.setMDPPermission(doc, signature, 2);
 		}
 
 		if (acroForm != null && acroForm.getNeedAppearances())
 		{
-			// PDFBOX-3738 NeedAppearances true results in visible signature becoming invisible 
-			// with Adobe Reader
 			if (acroForm.getFields().isEmpty())
 			{
-				// we can safely delete it if there are no fields
 				acroForm.getCOSObject().removeItem(COSName.NEED_APPEARANCES);
-				// note that if you've set MDP permissions, the removal of this item
-				// may result in Adobe Reader claiming that the document has been changed.
-				// and/or that field content won't be displayed properly.
-				// ==> decide what you prefer and adjust your code accordingly.
 			}
 			else
 			{
 				log.info("/NeedAppearances is set, signature may be ignored by Adobe Reader");
 			}
 		}
-		// default filter
 		signature.setFilter(PDSignature.FILTER_ADOBE_PPKLITE);
-
-		// subfilter for basic and PAdES Part 2 signatures
 		signature.setSubFilter(PDSignature.SUBFILTER_ADBE_PKCS7_DETACHED);
-
 		signature.setName("Insights");
 		signature.setLocation("Location");
 		signature.setReason("Asset Audit Report");
-
-		// the signing date, needed for valid signature
 		signature.setSignDate(Calendar.getInstance());
-
-		// do not set SignatureInterface instance, if external signing used
 		SignatureInterface signatureInterface = isExternalSigning() ? null : this;
-		// register signature dictionary and sign interface
 		signatureOptions = new SignatureOptions();
 		signatureOptions.setVisualSignature(createVisualSignatureTemplate(doc, doc.getNumberOfPages()-1, rect, signature));
 		signatureOptions.setPage(doc.getNumberOfPages()-1);
 		doc.addSignature(signature, signatureInterface, signatureOptions);
-		// write incremental (only for signing purpose)
 		//doc.saveIncremental(fos);
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		doc.saveIncremental(baos);
@@ -273,7 +247,6 @@ public class PdfSignUtil extends CreateSignatureBase
 		PDPage page = doc.getPage(doc.getNumberOfPages()-1);
 		PDRectangle pageRect = page.getCropBox();
 		PDRectangle rect = new PDRectangle();
-		// signing should be at the same position regardless of page rotation.
 		switch (page.getRotation())
 		{
 		case 90:
@@ -305,7 +278,6 @@ public class PdfSignUtil extends CreateSignatureBase
 		return rect;
 	}
 
-	// create a template PDF document with empty signature and return it as a stream.
 	private InputStream createVisualSignatureTemplate(PDDocument srcDoc, int pageNum, PDRectangle rect, PDSignature signature) throws IOException
 	{
 		PDDocument doc = new PDDocument();
@@ -323,7 +295,6 @@ public class PdfSignUtil extends CreateSignatureBase
 
 		widget.setRectangle(rect);
 
-		// from PDVisualSigBuilder.createHolderForm()
 		PDStream stream = new PDStream(doc);
 		PDFormXObject form = new PDFormXObject(stream);
 		PDResources res = new PDResources();
@@ -354,7 +325,6 @@ public class PdfSignUtil extends CreateSignatureBase
 		form.setBBox(bbox);
 		PDFont font = PDType1Font.HELVETICA_BOLD;
 
-		// from PDVisualSigBuilder.createAppearanceDictionary()
 		PDAppearanceDictionary appearance = new PDAppearanceDictionary();
 		appearance.getCOSObject().setDirect(true);
 		PDAppearanceStream appearanceStream = new PDAppearanceStream(form.getCOSObject());
@@ -362,28 +332,21 @@ public class PdfSignUtil extends CreateSignatureBase
 		widget.setAppearance(appearance);
 
 		PDPageContentStream cs = new PDPageContentStream(doc, appearanceStream);
-		// for 90Â° and 270Â° scale ratio of width / height
-		// not really sure about this
-		// why does scale have no effect when done in the form matrix???
 		if (initialScale != null)
 		{
 			cs.transform(initialScale);
 		}
 
-		// show background (just for debugging, to see the rect size + position)
 		cs.setNonStrokingColor(Color.WHITE);
 		cs.addRect(-5000, -5000, 10000, 10000);
 		cs.fill();
 
-		// show background image
-		// save and restore graphics if the image is too large and needs to be scaled
 		cs.saveGraphicsState();
 		cs.transform(Matrix.getScaleInstance(0.25f, 0.25f));
 		PDImageXObject img = PDImageXObject.createFromFileByExtension(imageFile, doc);
 		cs.drawImage(img, 0, 0);
 		cs.restoreGraphicsState();
 
-		// show text
 		float fontSize = 6;
 		float leading = fontSize * 1.5f;
 		cs.beginText();
@@ -391,7 +354,7 @@ public class PdfSignUtil extends CreateSignatureBase
 		cs.setNonStrokingColor(Color.black);
 		cs.newLineAtOffset(fontSize, height - leading);
 		cs.setLeading(leading);
-		X509Certificate cert = (X509Certificate) getCertificateChain()[0];
+		X509Certificate cert = (X509Certificate) getCertificates()[0];
 		X500Name x500Name = new X500Name(cert.getSubjectX500Principal().getName());
 		RDN cn = x500Name.getRDNs(BCStyle.CN)[0];
 		String name = IETFUtils.valueToString(cn.getFirst().getValue());
@@ -407,15 +370,12 @@ public class PdfSignUtil extends CreateSignatureBase
 		cs.showText("Date :"+date);
 		cs.endText();
 
-		// no need to set annotations and /P entry
-
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		cs.close();
 		doc.save(baos);
 		return new ByteArrayInputStream(baos.toByteArray());
 	}
 
-	// Find an existing signature (assumed to be empty). You will usually not need this.
 	private PDSignature findExistingSignature(PDAcroForm acroForm, String sigFieldName)
 	{
 		PDSignature signature = null;
@@ -425,14 +385,10 @@ public class PdfSignUtil extends CreateSignatureBase
 			signatureField = (PDSignatureField) acroForm.getField(sigFieldName);
 			if (signatureField != null)
 			{
-				// retrieve signature dictionary
 				signature = signatureField.getSignature();
 				if (signature == null)
 				{
 					signature = new PDSignature();
-					// after solving PDFBOX-3524
-					// signatureField.setValue(signature)
-					// until then:
 					signatureField.getCOSObject().setItem(COSName.V, signature);
 				}
 				else
@@ -488,11 +444,6 @@ public class PdfSignUtil extends CreateSignatureBase
 			log.info("signedDocumentFile sign--"+signedDocumentFile.getName());
 			signing.setExternalSigning(externalSig);
 
-			// Set the signature rectangle
-			// Although PDF coordinates start from the bottom, humans start from the top.
-			// So a human would want to position a signature (x,y) units from the
-			// top left of the displayed page, and the field has a horizontal width and a vertical height
-			// regardless of page rotation.
 			Rectangle2D humanRect = new Rectangle2D.Float(100, 200, 150, 50);
 			log.info("--Signining PDF---");
 			signdoc = signing.signPDF(doc, signedDocumentFile, humanRect, tsaUrl, "Signature1");
@@ -519,7 +470,7 @@ public class PdfSignUtil extends CreateSignatureBase
 	public static void main(String[] args) throws KeyStoreException, CertificateException,
 	IOException, NoSuchAlgorithmException, UnrecoverableKeyException
 	{
-		PdfSignUtil ps = new PdfSignUtil();
+		//PdfSignUtil ps = new PdfSignUtil();
 		//ps.digitalSign("test.pdf");
 	}
 	/**
