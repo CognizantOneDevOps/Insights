@@ -88,4 +88,16 @@ public class WebHookController {
 		}
 		return PlatformServiceUtil.buildSuccessResponseWithData(message);
 	}
+	
+	@RequestMapping(value = "/updateWebhook", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+	public @ResponseBody JsonObject updateAgent(@RequestParam String webhookname, @RequestParam String toolName,
+			@RequestParam String eventname,@RequestParam String dataformat,@RequestParam String mqchannel, @RequestParam Boolean subscribestatus) {
+		String message = null;
+		try {
+			message = webhookConfigurationService.updateWebHook(webhookname,toolName,eventname,dataformat,mqchannel,subscribestatus); 
+		} catch (InsightsCustomException e) {
+			return PlatformServiceUtil.buildFailureResponse(e.toString());
+		}
+		return PlatformServiceUtil.buildSuccessResponseWithData(message);
+	}
 }
