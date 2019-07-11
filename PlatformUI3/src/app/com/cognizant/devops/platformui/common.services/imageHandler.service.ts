@@ -77,6 +77,7 @@ export class ImageHandlerService implements IImageHandlerService {
         this.addImage('ic_about_logo', "icons/svg/ic_about_logo.svg");
         this.addImage('ic_Insights_default_logo', "icons/svg/landingPage/Insights_Logo.png");
         this.addImage('redirect_icon', "icons/svg/userOnboarding/sharp-supervised_user_circle-24px.svg");
+        this.addImage('unsubscribe_webhook', "icons/svg/webhook/WebhookUnsubscribe.svg");
 
     }
 

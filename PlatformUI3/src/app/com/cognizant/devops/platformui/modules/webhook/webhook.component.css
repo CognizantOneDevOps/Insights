@@ -30,6 +30,17 @@ table,mat-table {
     text-align: left;
 }
 
+.svgIcon path {
+  fill: #ff0000;
+}
+.svgIconCss
+{
+    color: #0033A0 !important;
+    height: 15px;
+    width: 15px;
+    margin-bottom: 7px;
+    fill: #ff0000 !important
+}
 
 .mat-cell {
     font-size: 13px;
