@@ -13,16 +13,31 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  ******************************************************************************/
-package com.cognizant.devops.auditservice.audit.service;
 
-import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
-import com.google.gson.JsonObject;
-import org.springframework.stereotype.Service;
+package com.cognizant.devops.platformauditing.hyperledger.user;
 
-//@Service("auditService")
-public interface AuditService {
-    public JsonObject searchAuditLogByAsset(String assetId) throws InsightsCustomException;
-    public JsonObject searchAuditLogByDate(String startDate, String endDate, String toolName) throws InsightsCustomException;
-    public JsonObject getAssetHistory(String assetId) throws InsightsCustomException;
-    public JsonObject getProcessFlow() throws InsightsCustomException;
+import org.hyperledger.fabric.sdk.Enrollment;
+
+import java.io.Serializable;
+import java.security.PrivateKey;
+
+//Enrollment metadata
+public class CertificationAuthorityEnrollment implements Enrollment, Serializable {
+	private static final long serialVersionUID = 550416591376968096L;
+	private PrivateKey key;
+	private String cert;
+
+	public CertificationAuthorityEnrollment(PrivateKey pkey, String signedPem) {
+		this.key = pkey;
+		this.cert = signedPem;
+	}
+
+	public PrivateKey getKey() {
+		return key;
+	}
+
+	public String getCert() {
+		return cert;
+	}
+
 }
