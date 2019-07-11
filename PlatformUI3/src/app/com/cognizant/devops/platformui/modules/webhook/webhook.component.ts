@@ -18,13 +18,14 @@ import { WebHookService } from '@insights/app/modules/webhook/webhook.service';
 import { ShowJsonDialog } from '@insights/app/modules/relationship-builder/show-correlationjson';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 import { from } from 'rxjs';
-import { Router } from "@angular/router";
+import { Router, NavigationExtras } from "@angular/router";
 import { ActivatedRoute } from '@angular/router';
 import { MessageDialogService } from '@insights/app/modules/application-dialog/message-dialog-service';
 import { MatTableDataSource, MatPaginator } from '@angular/material';
 import { DataSharedService } from '@insights/common/data-shared-service';
 import { BulkUploadService } from '@insights/app/modules/bulkupload/bulkupload.service'
 import { count } from 'rxjs/operators';
+import { ApplicationMessageDialog } from '../application-dialog/application-message-dialog';
 //import { Control} from '@angular/common';
 export interface DataType {
     value: string;
@@ -39,6 +40,7 @@ export interface DataType {
 export class WebHookComponent implements OnInit {
 
     toolsArr = [];
+    toolvalue: String = null;
     toolsDetail = [];
     showAddWebHook: boolean = false;
     showWebhook: boolean = true;
@@ -50,6 +52,18 @@ export class WebHookComponent implements OnInit {
     showDetail: boolean = false;
     showConfirmMessage: string;
     selectedWebhook: any;
+    webhookparameter = {};
+    webhookName: any;
+    selectedTool: any;
+    eventToSubscribe: any;
+    mqchannel: any;
+    dataformat: any;
+    actionType: any;
+    statussubscribe: boolean = false;
+    enableDelete: boolean = false;
+    enableRefresh: boolean = false;
+    enableEdit: boolean = false;
+
     @ViewChild(MatPaginator) paginator: MatPaginator;
 
     dataformats: DataType[] = [
@@ -68,7 +82,13 @@ export class WebHookComponent implements OnInit {
         this.showAddWebHook = true;
         this.showWebhook = false;
     }
-
+    enableButtons() {
+        if (this.showAddWebHook == false) {
+            this.enableDelete = true;
+            this.enableEdit = true;
+        }
+        this.enableRefresh = true;
+    }
 
 
     public async getRegisteredWebHooks() {
@@ -87,10 +107,26 @@ export class WebHookComponent implements OnInit {
                     this.webhookNameList.push(data.webhookName);
                 }
             }
-            //console.log(this.agentListDatasource);
+            var counter = 0;
+            for (var element of this.webhookDatasource.data) {
+                if (counter < this.webhookDatasource.data.length) {
+                    console.log(this.webhookDatasource.data[counter].toolName)
+                    console.log(this.webhookDatasource.data[counter].subscribeStatus);
+                    if (this.webhookDatasource.data[counter].subscribeStatus == true) {
+                        this.webhookDatasource.data[counter].subscribeStatus = 'SUBSCRIBED'
+                    }
+                    else {
+                        this.webhookDatasource.data[counter].subscribeStatus = 'UNSUBSCRIBED'
+                    }
+                    counter = counter + 1;
+                }
+                else {
+                    break;
+                }
+            }
             self.showDetail = true;
             //console.log(this.agentNameList);
-            this.displayedColumns = ['radio', 'WebHookName', 'ToolName', 'EventName', 'DataType', 'MqChannel'];
+            this.displayedColumns = ['radio', 'WebHookName', 'ToolName', 'EventName', 'DataType', 'MqChannel', 'Status'];
             setTimeout(() => {
                 this.showConfirmMessage = "";
             }, 3000);
@@ -104,6 +140,7 @@ export class WebHookComponent implements OnInit {
     list() {
         this.showWebhook = true;
         this.showAddWebHook = false;
+        this.getRegisteredWebHooks();
     }
     async getLabelTools() {
         var self = this;
@@ -128,6 +165,51 @@ export class WebHookComponent implements OnInit {
     }
 
 
+
+    actionSubscribeOrUnsubscribe(status, selectedWebhook) {
+        var self = this;
+        if (status == true) {
+            this.statussubscribe = true;
+            this.webhookService.updateforWebHook(this.selectedWebhook.webhookName, this.selectedWebhook.toolName, this.selectedWebhook.eventName, this.selectedWebhook.dataFormat, this.selectedWebhook.mqChannel, this.statussubscribe)
+                .then(function (data) {
+                    console.log("WeBhook " + data);
+                    if (data.status == "success") {
+                        self.messageDialog.showApplicationsMessage("Webhook Subscribed Successfully!", "SUCCESS");
+                        self.getRegisteredWebHooks();
+                    } else {
+
+                    }
+
+                })
+        }
+        else {
+            this.statussubscribe = false;
+            this.webhookService.updateforWebHook(this.selectedWebhook.webhookName, this.selectedWebhook.toolName, this.selectedWebhook.eventName, this.selectedWebhook.dataFormat, this.selectedWebhook.mqChannel, this.statussubscribe)
+                .then(function (data) {
+                    console.log("WeBhook " + data);
+                    if (data.status == "success in unsubscribed") {
+                        self.messageDialog.showApplicationsMessage("Webhook Unsubscribed Successfully!", "SUCCESS");
+                        self.getRegisteredWebHooks();
+                    } else {
+
+                    }
+
+                })
+        }
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
     saveData(webhookName, selectedTool, eventToSubscribe, dataformat, mqchannel) {
         console.log(webhookName)
         console.log(selectedTool)
@@ -135,29 +217,50 @@ export class WebHookComponent implements OnInit {
         console.log(dataformat)
         console.log(mqchannel)
         var self = this;
-        var statussubscribe = true;
-        this.webhookService.saveDataforWebHook(webhookName, selectedTool, eventToSubscribe, dataformat, mqchannel, statussubscribe)
-            .then(function (data) {
-                console.log("WeBhook " + data);
-                if (data.status == "success") {
-                    //self.showConfirmMessage = "Settings saved successfully";
-                    /* self.showApplicationMessage = "Settings saved successfully"
-                    self.messageDialog.showApplicationsMessage("Settings saved successfully", "SUCCESS"); */
-                } else {
-                    /* self.showConfirmMessage = "Failed to save settings";
-                    self.showApplicationMessage = "Failed to save settings"
-                    self.messageDialog.showApplicationsMessage("Failed to save settings", "ERROR"); */
-                }
+        console.log(this.statussubscribe)
+        //var statussubscribe = false;
+        if (this.actionType == 'edit') {
 
-            })
+            this.webhookService.updateforWebHook(webhookName, selectedTool, eventToSubscribe, dataformat, mqchannel, this.statussubscribe)
+                .then(function (data) {
+                    console.log("WeBhook " + data);
+                    if (data.status == "success") {
 
+                        self.messageDialog.showApplicationsMessage("Webhook saved successfully.", "SUCCESS");
+                        self.list();
+                    } else {
+
+                        self.messageDialog.showApplicationsMessage("Failed to save Webhook", "ERROR");
+                    }
+
+                })
+
+        }
+        else {
+            this.webhookService.saveDataforWebHook(webhookName, selectedTool, eventToSubscribe, dataformat, mqchannel, false)
+                .then(function (data) {
+                    console.log("WeBhook " + data);
+                    if (data.status == "success") {
+                        self.messageDialog.showApplicationsMessage("WebHook saved successfully", "SUCCESS");
+                        self.list();
+
+
+                    } else {
+
+                        this.list();
+
+                        self.messageDialog.showApplicationsMessage("Failed to save the webhook", "ERROR");
+                    }
+
+                })
+        }
     }
     uninstallWebHook() {
         var self = this;
         //console.log("uninstall agent " + JSON.stringify(this.selectedAgent));
 
         var title = "Delete WebHook";
-        var dialogmessage = "<br> <br> Do you want to uninstall <b> " + self.selectedWebhook.webhookName + " </b> on <b> </b> ? ";
+        var dialogmessage = "Do you want to uninstall <b> " + self.selectedWebhook.webhookName + " </b>  <b> </b> ? ";
         const dialogRef = self.messageDialog.showConfirmationMessage(title, dialogmessage, this.selectedWebhook.toolName, "ALERT", "40%");
 
         dialogRef.afterClosed().subscribe(result => {
@@ -171,6 +274,28 @@ export class WebHookComponent implements OnInit {
                 });
             }
         });
+    }
+
+
+    async editAgent() {
+        var isSessionExpired = this.dataShare.validateSession();
+        if (!isSessionExpired) {
+            console.log(this.selectedWebhook);
+            this.webhookName = this.selectedWebhook.webhookName;
+            this.selectedTool = this.selectedWebhook.toolName;
+            this.eventToSubscribe = this.selectedWebhook.eventName
+            this.mqchannel = this.selectedWebhook.mqChannel;
+            this.dataformat = this.selectedWebhook.dataFormat;
+            if (this.selectedWebhook.subscribeStatus == 'SUBSCRIBED') {
+                this.statussubscribe = true;
+            }
+            else {
+                this.statussubscribe = false;
+            }
+            this.actionType = "edit";
+            this.addWebHook();
+
+        }
     }
 }
 
