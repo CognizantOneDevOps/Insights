@@ -11,10 +11,8 @@ gitCommitID = sh (
 	checkout scm	
 	}
 // All single and double quotes in this file are used in a certain format.Do not alter in any step build
-	//ApacheLicense Check in java and Python files . License for Enterprise.
-	/*
-	stage ('LicenseCheck') {
-           checkout scm
+	//ApacheLicense Check in java and Python files . License for Enterprise.	
+	stage ('LicenseCheck') {          
     	   def commit = sh (returnStdout: true, script: '''var=''
 	for file in $(find . -print | grep -i -e .*[.]java -e .*[.]py -e .*[.]sh -e .*[.]bat | grep -Eiv "*__init__.py*" )
 	do
@@ -43,7 +41,7 @@ gitCommitID = sh (
     		}
   	} //License Check ends	
 	
-	*/
+	
    // Platform Service Starts
 	try{
 	//Build for the pom profile enterprise
