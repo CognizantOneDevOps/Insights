@@ -19,21 +19,22 @@ public class WebHookService implements IWebHook {
 	// @Override
 
 	public Boolean saveWebHookConfiguration(String webhookname, String toolName, String eventname, String dataformat,
-			String mqchannel, Boolean subscribestatus) {
-
+			String mqchannel, Boolean subscribestatus,String responseTemplate) throws InsightsCustomException {
+try {
 		WebHookConfig webHookConfig = populateWebHookConfiguration(webhookname, toolName, eventname, dataformat,
-				mqchannel, subscribestatus);
-
-		log.error(webHookConfig.getDataFormat());
-		log.error(webHookConfig.getEventName());
-		log.error(webHookConfig.getWebHookName());
-		log.error(webHookConfig.getMQChannel());
-		log.error(webHookConfig.getSubscribeStatus());
+				mqchannel, subscribestatus,responseTemplate);
 		WebHookConfigDAL webhookConfigurationDAL = new WebHookConfigDAL();
-
 		return webhookConfigurationDAL.saveWebHookConfiguration(webHookConfig);
 
-	}
+	} catch(InsightsCustomException e) {
+		
+		throw new InsightsCustomException(e.getMessage());
+	} 
+ catch(Exception e)
+  {
+	 throw new InsightsCustomException(e.getMessage());
+	  
+  }}
 
 	public List<WebHookConfigTO> getRegisteredWebHooks() throws InsightsCustomException {
 		WebHookConfigDAL webhookConfigDAL = new WebHookConfigDAL();
@@ -60,17 +61,17 @@ public class WebHookService implements IWebHook {
 	}
 
 	private WebHookConfig populateWebHookConfiguration(String webhookname, String toolName, String eventname,
-			String dataformat, String mqchannel, Boolean subscribestatus) {
+			String dataformat, String mqchannel, Boolean subscribestatus,String responseTemplate ) {
 		WebHookConfig webhookConfiguration = new WebHookConfig();
 
 		// String updatedSettingsJson = updateNextRunTimeValue(settingsJson);
 		webhookConfiguration.setDataFormat(dataformat);
 		webhookConfiguration.setEventName(eventname);
 		webhookConfiguration.setToolName(toolName);
-		;
 		webhookConfiguration.setMQChannel(mqchannel);
 		webhookConfiguration.setWebHookName(webhookname);
 		webhookConfiguration.setSubscribeStatus(subscribestatus);
+		webhookConfiguration.setResponseTemplate(responseTemplate);
 		return webhookConfiguration;
 	}
 
@@ -87,19 +88,22 @@ public class WebHookService implements IWebHook {
 		return SUCCESS;
 	}
 
-	public String updateWebHook(String webhookname, String toolName, String eventname, String dataformat,
-			String mqchannel, Boolean subscribestatus) throws InsightsCustomException {
-		Boolean status;
+	public Boolean updateWebHook(String webhookname, String toolName, String eventname, String dataformat,
+			String mqchannel, Boolean subscribestatus,String responseTemplate) throws InsightsCustomException {
+		//Boolean status;
 		try {
 
-			status = saveWebHookConfiguration(webhookname, toolName, eventname, dataformat, mqchannel, subscribestatus);
-
+		WebHookConfig webHookConfig = populateWebHookConfiguration(webhookname, toolName, eventname, dataformat,
+					mqchannel, subscribestatus,responseTemplate);
+			WebHookConfigDAL webhookConfigurationDAL = new WebHookConfigDAL();
+		//	log.error(status);
+			return webhookConfigurationDAL.updateWebHookConfiguration(webHookConfig);
 		} catch (Exception e) {
 			log.error("Error updating the webhook", e);
 			throw new InsightsCustomException(e.toString());
 		}
 
-		return SUCCESS;
+		
 	}
 
 }
