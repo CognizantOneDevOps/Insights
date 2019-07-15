@@ -1,7 +1,5 @@
 package com.cognizant.devops.platformdal.webhookConfig;
 
-import java.util.Date;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -20,6 +18,9 @@ public class WebHookConfig {
 
 	@Column(name = "SUBSCRIBE_STATUS")
 	private Boolean subscribeStatus;
+	
+	@Column(name = "RESPONSE_TEMPLATE")
+	private String responseTemplate;
 	
 	@Column(name = "TOOL_NAME")
 	private String toolName;
@@ -98,6 +99,13 @@ public class WebHookConfig {
 	}
 	
 	
+	public String getResponseTemplate() {
+		return responseTemplate;
+	}
+
+	public void setResponseTemplate(String responseTemplate) {
+		this.responseTemplate = responseTemplate;
+	}
 	
 
 	

@@ -1,7 +1,6 @@
 package com.cognizant.devops.platformservice.webhook.service;
 
 import java.io.Serializable;
-import java.util.Date;
 
 public class WebHookConfigTO implements Serializable  {
 	
@@ -23,6 +22,8 @@ private Boolean subscribeStatus;
 private String eventName;
 
 private String dataFormat;
+
+private String responseTemplate;
 
 public int getId() {
 	return id;
@@ -83,5 +84,14 @@ public String getWebHookName() {
 public void setWebHookName(String webhookName) {
 	this.webhookName = webhookName;
 }
+public String getResponseTemplate() {
+	return responseTemplate;
+}
+
+public void setResponseTemplate(String responseTemplate) {
+	this.responseTemplate = responseTemplate;
+}
+
+
 
 }
