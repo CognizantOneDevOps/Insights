@@ -21,18 +21,25 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.web.servlet.ServletComponentScan;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.ComponentScan;
 
 import com.cognizant.devops.platformcommons.config.ApplicationConfigCache;
 
-@ServletComponentScan
+
 @SpringBootApplication
 @ComponentScan(basePackages = { "com.cognizant.devops.platforminsightswebhook" })
+@ServletComponentScan
 public class WebHookAppStarter {
 	private static Logger LOG = LogManager.getLogger(WebHookAppStarter.class);
     public static void main(String[] args) {
-		LOG.info(" Inside Webhook Message Publisher ... ");
+		LOG.debug(" Inside Webhook Message Publisher ... ");
     	ApplicationConfigCache.loadConfigCache();
-        SpringApplication.run(WebHookAppStarter.class, args);
+		ApplicationContext applicationContext = SpringApplication.run(WebHookAppStarter.class, args);
+		// SpringApplication.run(WebHookAppStarter.class, args);
+
+		for (String name : applicationContext.getBeanDefinitionNames()) {
+			System.out.println(" aa ==================== " + name);
+		}
     }
 } 

@@ -20,9 +20,16 @@
 		<Logger name="com.cognizant" level="debug"> 
 				<AppenderRef ref="RollingFile" />
 		</Logger>
+		<Logger name="Console" level="debug">
+				<AppenderRef ref="Console" />
+		</Logger>
+		<Logger name="org.springframework.boot" level="error"> 
+				<AppenderRef ref="RollingFile" />
+				<AppenderRef ref="Console" />
+		</Logger>
 		<Root level="debug">
 			<AppenderRef ref="RollingFile" />
 			<AppenderRef ref="Console" />
-		</Root>
+		</Root>	
 	</Loggers>
 </Configuration>
