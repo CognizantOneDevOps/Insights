@@ -265,6 +265,7 @@ th[_ngcontent-c15]:last-child{
 .mat-dialog-actions-button{
     float: right;
     padding-right: 25px;
+    padding-top: 30px
 }
 
 .warningText{
