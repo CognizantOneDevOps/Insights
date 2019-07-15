@@ -22,6 +22,7 @@ public class MessageQueueDataModel implements Serializable{
 	private String user;
 	private String password;
 	private int prefetchCount=10;
+	private String webHookRoutingKey;
 	
 	public String getHost() {
 		return host;
