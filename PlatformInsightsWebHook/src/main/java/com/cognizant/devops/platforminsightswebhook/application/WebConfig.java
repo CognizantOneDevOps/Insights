@@ -22,19 +22,26 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 
+import com.cognizant.devops.platforminsightswebhook.config.WebHookMessagePublisher;
 import com.cognizant.devops.platforminsightswebhook.events.WebHookHandlerServlet;
 
 @Configuration
 @ComponentScan(basePackages = { "com.cognizant.devops.platforminsightswebhook.*" })
 public class WebConfig {
+
 	@Bean
-	public ServletRegistrationBean<HttpServlet> webhookServlet() {
-		ServletRegistrationBean<HttpServlet> servRegBean = new ServletRegistrationBean<>();
-		WebHookHandlerServlet webhookEvent = new WebHookHandlerServlet();
-		servRegBean.setServlet(webhookEvent);
-		servRegBean.addUrlMappings("/webhookEvent/*");
-		servRegBean.setLoadOnStartup(1);
-		return servRegBean;
+	public WebHookMessagePublisher webhookmessagepublisher() {
+		return new WebHookMessagePublisher();
+	}
+
+	@Bean
+		public ServletRegistrationBean<HttpServlet> webhookServlet() {
+			ServletRegistrationBean<HttpServlet> servRegBean = new ServletRegistrationBean<>();
+			WebHookHandlerServlet webhookEvent = new WebHookHandlerServlet();
+			servRegBean.setServlet(webhookEvent);
+			servRegBean.addUrlMappings("/webhookEvent/*");
+			servRegBean.setLoadOnStartup(1);
+			return servRegBean;
 	}
 
 }

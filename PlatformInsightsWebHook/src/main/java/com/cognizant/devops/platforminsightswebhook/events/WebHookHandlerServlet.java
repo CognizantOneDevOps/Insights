@@ -27,10 +27,15 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import com.cognizant.devops.platforminsightswebhook.config.WebHookMessagePublisher;
+import org.springframework.beans.factory.annotation.Autowired;
 
+import com.cognizant.devops.platforminsightswebhook.config.WebHookMessagePublisher;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 
 /**
  * Servlet implementation class GitEvent
@@ -43,134 +48,114 @@ public class WebHookHandlerServlet extends HttpServlet {
 	private static Logger LOG = LogManager.getLogger(WebHookHandlerServlet.class);
 
 	//@Autowired
-	WebHookMessagePublisher webhookmessagepublisher = new WebHookMessagePublisher();
-    
-    @Override
+	WebHookMessagePublisher webhookmessagepublisher = new WebHookMessagePublisher();// 
+
+	@Override
 	public void init() throws ServletException {
 		try {
 			LOG.debug(" In server init .... initilizeMq ");
 			webhookmessagepublisher.initilizeMq();
 		} catch (Exception e) {
 			LOG.error("Error while initilize mq " + e.getMessage());
-			e.printStackTrace();
+			LOG.error(e.getMessage());
 		}
-    }
-
+	}
 
 	/**
-	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
+	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse
+	 *      response)
 	 */
 	@Override
-	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		// TODO Auto-generated method stub
+	protected void doGet(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
 		LOG.debug(" In only doGet not post Git ");
-
 		try {
-			
+
 			long millis = System.currentTimeMillis();
-			String res = getBody(request);
+			String res = getBody(request).toString();
 			LOG.debug("Current time in millis: after getBody  " + (System.currentTimeMillis() - millis));
 			millis = System.currentTimeMillis();
-			//LOG.debug(res);
-			//LOG.debug(request.getContentType());
-			
-			System.out.print(" before publish " + (System.currentTimeMillis() - millis));
+			LOG.debug(" before publish " + (System.currentTimeMillis() - millis));
 
 			webhookmessagepublisher.publishEventAction(res.getBytes());
-			
+
 			long requestTime = (System.currentTimeMillis() - millis);
 			allrequestTime = allrequestTime + requestTime;
 			LOG.debug("Current time in millis: " + requestTime + "  allrequestTime  " + allrequestTime);
-
-			//doGet(request, response);
-			
-			} catch (TimeoutException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+		} catch (Exception e) {
+			LOG.error("Error while adding data in Mq in doget method ");
+		}
 		response.getWriter().append("Served at: ").append(request.getContextPath());
 	}
 
 	/**
-	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
+	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse
+	 *      response)
 	 */
 	@Override
-	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		// TODO Auto-generated method stub
+	protected void doPost(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
 		try {
-			//LOG.debug("In do post ");
-			Enumeration<String> parameterNames = request.getParameterNames();
+			LOG.debug("In do post ");
 
-			while (parameterNames.hasMoreElements()) {
-
-				String paramName = parameterNames.nextElement();
-				//LOG.debug(" paramName " + paramName);
-
-				String[] paramValues = request.getParameterValues(paramName);
-				for (int i = 0; i < paramValues.length; i++) {
-					String paramValue = paramValues[i];
-					//LOG.debug(" paramValues " + paramValue);
-				}
-
-			}
-
-		long millis = System.currentTimeMillis();
-		String res = getBody(request);
-			//System.out.print("Current time in millis: after getBody  "+(System.currentTimeMillis()-millis));
-		millis = System.currentTimeMillis();
+			long millis = System.currentTimeMillis();
+			String res = getBody(request).toString();
+			LOG.debug("Current time in millis: after getBody  " + (System.currentTimeMillis() - millis));
+			millis = System.currentTimeMillis();
 			//LOG.debug(res);
 			//LOG.debug(request.getContentType());
-		
-			System.out.print(" before publish " + (System.currentTimeMillis() - millis));
-
+			LOG.debug(" before publish " + (System.currentTimeMillis() - millis));
 			webhookmessagepublisher.publishEventAction(res.getBytes());//webHookMessagePublisher
-		
 			long requestTime = (System.currentTimeMillis() - millis);
 			allrequestTime = allrequestTime + requestTime;
 			LOG.debug(" Current time in millis: " + requestTime + "  allrequestTime  " + allrequestTime);
-		//doGet(request, response);
-		
 		} catch (TimeoutException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOG.error(e.getMessage());
 		}
 	}
 
-	public String getBody(HttpServletRequest request) throws IOException {
+	public JsonObject getBody(HttpServletRequest request) throws IOException {
 
-	    String body = null;
-	    StringBuilder stringBuilder = new StringBuilder();
-	    BufferedReader bufferedReader = null;
-	    
-	    try {
-	        InputStream inputStream = request.getInputStream();
-	        if (inputStream != null) {
-	            bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
-	            char[] charBuffer = new char[128];
-	            int bytesRead = -1;
-	            while ((bytesRead = bufferedReader.read(charBuffer)) > 0) {
-	                stringBuilder.append(charBuffer, 0, bytesRead);
-	            }
-	        } else {
-	            stringBuilder.append("");
-	        }
-		} catch (Exception ex) {
-			ex.printStackTrace();
-	        throw ex;
-	    } finally {
-	        if (bufferedReader != null) {
-	            try {
-	                bufferedReader.close();
-	            } catch (IOException ex) {
-	                throw ex;
-	            }
-	        }
-	    }
+		String bodymessage = null;
+		StringBuilder stringBuilder = new StringBuilder();
+		BufferedReader bufferedReader = null;
+		JsonObject responceJson = null;
+		try (BufferedReader reader = request.getReader()) {
+			if (reader == null) {
+				return null;
+			}
+			String line;
+			while ((line = reader.readLine()) != null) {
+				stringBuilder.append(line);
+			}
+		} catch (final Exception e) {
+			LOG.error("Could not obtain the saml request body from the http request", e);
+			return null;
+		}
 
-	    body = stringBuilder.toString();
-	   return body;
+		bodymessage = stringBuilder.toString();
+		LOG.debug("bodymessage" + bodymessage);
+		JsonElement element = new JsonParser().parse(bodymessage);
+		LOG.debug("  element  " + element);
+		responceJson = element.getAsJsonObject();
+
+		StringBuilder paramDetail = new StringBuilder();
+		Enumeration<String> parameterNames = request.getParameterNames();
+
+		while (parameterNames.hasMoreElements()) {
+			String paramName = parameterNames.nextElement();
+			String[] paramValues = request.getParameterValues(paramName);
+			for (int i = 0; i < paramValues.length; i++) {
+				String paramValue = paramValues[i];
+				paramDetail.append(paramName + ":" + paramValue + ",\n");
+				responceJson.addProperty(paramName, paramValue);
+			}
+		}
+		LOG.debug("Request Parameter  " + paramDetail.toString());
+
+		return responceJson;
 	}
-	
+
 	@Override
 	public void destroy() {
 		webhookmessagepublisher.releaseMqConnetion();
