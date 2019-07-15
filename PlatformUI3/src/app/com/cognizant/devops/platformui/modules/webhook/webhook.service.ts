@@ -28,13 +28,13 @@ export class WebHookService implements IWebHookService {
     constructor(private restCallHandlerService: RestCallHandlerService) {
     }
 
-    saveDataforWebHook(webhookname: string, toolName: string, eventname: string, dataformat: string, mqchannel: string, subscribestatus: boolean): Promise<any> {
-        return this.restCallHandlerService.postWithParameter("SAVE_DATA_WEBHOOK_CONFIG", { 'webhookname': webhookname, 'toolName': toolName, 'eventname': eventname, 'dataformat': dataformat, 'mqchannel': mqchannel, 'subscribestatus': subscribestatus }, { 'Content-Type': 'application/x-www-form-urlencoded' }).toPromise();
+    saveDataforWebHook(webhookname: string, toolName: string, eventname: string, dataformat: string, mqchannel: string, subscribestatus: boolean, responseTemplate: string): Promise<any> {
+        return this.restCallHandlerService.postWithParameter("SAVE_DATA_WEBHOOK_CONFIG", { 'webhookname': webhookname, 'toolName': toolName, 'eventname': eventname, 'dataformat': dataformat, 'mqchannel': mqchannel, 'subscribestatus': subscribestatus, 'responseTemplate': responseTemplate }, { 'Content-Type': 'application/x-www-form-urlencoded' }).toPromise();
     }
 
 
-    updateforWebHook(webhookname: string, toolName: string, eventname: string, dataformat: string, mqchannel: string, subscribestatus: boolean): Promise<any> {
-        return this.restCallHandlerService.postWithParameter("UPDATE_WEBHOOK", { 'webhookname': webhookname, 'toolName': toolName, 'eventname': eventname, 'dataformat': dataformat, 'mqchannel': mqchannel, 'subscribestatus': subscribestatus }, { 'Content-Type': 'application/x-www-form-urlencoded' }).toPromise();
+    updateforWebHook(webhookname: string, toolName: string, eventname: string, dataformat: string, mqchannel: string, subscribestatus: boolean, responseTemplate: string): Promise<any> {
+        return this.restCallHandlerService.postWithParameter("UPDATE_WEBHOOK", { 'webhookname': webhookname, 'toolName': toolName, 'eventname': eventname, 'dataformat': dataformat, 'mqchannel': mqchannel, 'subscribestatus': subscribestatus, 'responseTemplate': responseTemplate }, { 'Content-Type': 'application/x-www-form-urlencoded' }).toPromise();
     }
 
     loadwebhookServices(): Promise<any> {
