@@ -38,7 +38,7 @@ public class SystemStatusMain {
 		//for (int i = 0; i < 4000; i++) {
 		//System.out.println(" request number " + i);
 			jerseyPostClientWithAuthentication(
-				"http://localhost:8981/PlatformInsightsWebHook/webhookEvent?webHookName=GIT_commit_comment",
+				"http://localhost:8981/PlatformInsightsWebHook/insightsDevOpsWebHook?webHookName=GIT_commit_comment",
 				null, null, null, data);//Git 34.236.204.95 GitEvent /EventSubscriber
 		//}
 		System.out.println(" Run Event Subscriber complete .....");

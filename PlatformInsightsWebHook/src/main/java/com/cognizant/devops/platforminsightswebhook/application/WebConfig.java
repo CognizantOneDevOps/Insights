@@ -22,7 +22,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 
-import com.cognizant.devops.platforminsightswebhook.config.WebHookMessagePublisher;
 import com.cognizant.devops.platforminsightswebhook.events.WebHookHandlerServlet;
 
 @Configuration
@@ -34,7 +33,7 @@ public class WebConfig {
 			ServletRegistrationBean<HttpServlet> servRegBean = new ServletRegistrationBean<>();
 			WebHookHandlerServlet webhookEvent = new WebHookHandlerServlet();
 			servRegBean.setServlet(webhookEvent);
-			servRegBean.addUrlMappings("/webhookEvent/*");
+		servRegBean.addUrlMappings("/insightsDevOpsWebHook/*");
 			servRegBean.setLoadOnStartup(1);
 			return servRegBean;
 	}

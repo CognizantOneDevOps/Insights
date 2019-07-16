@@ -17,7 +17,6 @@ package com.cognizant.devops.platforminsightswebhook.config;
 
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeoutException;
 
@@ -26,8 +25,6 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Component;
 
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
-import com.cognizant.devops.platformdal.webhookConfig.WebHookConfig;
-import com.cognizant.devops.platformdal.webhookConfig.WebHookConfigDAL;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
@@ -45,8 +42,23 @@ public class WebHookMessagePublisher {
 
 
 	public WebHookMessagePublisher() {
-		this.exchangeName = ApplicationConfigProvider.getInstance().getAgentDetails().getAgentExchange(); //"iSight";
-		this.routingKey = "WEBHOOK_EVENTDATA";//ApplicationConfigProvider.getInstance().getMessageQueue().
+		this.exchangeName = ApplicationConfigProvider.getInstance().getAgentDetails().getAgentExchange();
+		this.routingKey = "WEBHOOK_EVENTDATA";
+	}
+
+	public void initilizeMq() {
+		try {
+			factory = new ConnectionFactory();
+			factory.setHost(ApplicationConfigProvider.getInstance().getMessageQueue().getHost());
+			factory.setUsername(ApplicationConfigProvider.getInstance().getMessageQueue().getUser());
+			factory.setPassword(ApplicationConfigProvider.getInstance().getMessageQueue().getPassword());
+			connection = factory.newConnection();
+			channel = connection.createChannel();
+			channel.exchangeDeclare(exchangeName, WebHookConstants.EXCHANGE_TYPE, true);
+		} catch (Exception e) {
+			LOG.error("Error while initilize mq " + e.getMessage());
+		}
+
 	}
 
 	public void publishEventAction(byte[] data, String webHookName) throws TimeoutException, IOException {
@@ -58,22 +70,6 @@ public class WebHookMessagePublisher {
 			channel.queueBind(webHookName, exchangeName, webHookName);
 			channel.basicPublish(exchangeName, webHookName, null, data);
 		}
-	}
-
-	public void initilizeMq() throws TimeoutException {
-		try {
-			factory = new ConnectionFactory();
-			factory.setHost(ApplicationConfigProvider.getInstance().getMessageQueue().getHost());//"localhost"
-			factory.setUsername(ApplicationConfigProvider.getInstance().getMessageQueue().getUser());//"iSight"
-			factory.setPassword(ApplicationConfigProvider.getInstance().getMessageQueue().getPassword());//"iSight"
-			connection = factory.newConnection();
-			channel = connection.createChannel();
-			channel.exchangeDeclare(exchangeName, "topic", true);
-		} catch (Exception e) {
-			LOG.error(e.getMessage());
-			e.printStackTrace();
-		}
-
 	}
 
 	public void releaseMqConnetion() {

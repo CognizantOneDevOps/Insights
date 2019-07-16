@@ -32,34 +32,31 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import com.cognizant.devops.platforminsightswebhook.config.WebHookConstants;
 import com.cognizant.devops.platforminsightswebhook.config.WebHookMessagePublisher;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
 /**
- * Servlet implementation class GitEvent
+ * Servlet implementation class to receive webhook data from tool
  */
 
-@WebServlet(urlPatterns = "/webhookEvent/*", loadOnStartup = 1)
+@WebServlet(urlPatterns = "/insightsDevOpsWebHook/*", loadOnStartup = 1)
 public class WebHookHandlerServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private Long allrequestTime = 0L;
 	private static Logger LOG = LogManager.getLogger(WebHookHandlerServlet.class);
-	private final String REQUEST_PARAM_KEY_WEBHOOKNAME = "webHookName";
+	
 
 	//@Autowired
 	WebHookMessagePublisher webhookmessagepublisher = new WebHookMessagePublisher();//    
 
 	@Override
 	public void init() throws ServletException {
-		try {
-			LOG.debug(" In server init .... initilizeMq ");
-			webhookmessagepublisher.initilizeMq();
-		} catch (Exception e) {
-			LOG.error("Error while initilize mq " + e.getMessage());
-			LOG.error(e.getMessage());
-		}
+		LOG.debug(" In server init .... initilizeMq ");
+		webhookmessagepublisher.initilizeMq();
+
 	}
 
 	/**
@@ -97,7 +94,7 @@ public class WebHookHandlerServlet extends HttpServlet {
 		long millis = System.currentTimeMillis();
 		JsonObject dataWithReqParam = getBody(request);
 		if (dataWithReqParam != null) {
-			String webHookName = dataWithReqParam.get(REQUEST_PARAM_KEY_WEBHOOKNAME).getAsString();
+			String webHookName = dataWithReqParam.get(WebHookConstants.REQUEST_PARAM_KEY_WEBHOOKNAME).getAsString();
 			String res = dataWithReqParam.toString();
 			long afterBodyParsing = (System.currentTimeMillis() - millis);
 			webhookmessagepublisher.publishEventAction(res.getBytes(), webHookName);

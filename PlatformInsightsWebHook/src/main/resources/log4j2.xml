@@ -17,12 +17,12 @@
  
 	</Appenders>
 		<Loggers>
-		<Logger name="com.cognizant" level="debug"> 
+	<!-- 	<Logger name="com.cognizant" level="debug"> 
 				<AppenderRef ref="RollingFile" />
 		</Logger>
 		<Logger name="Console" level="debug">
 				<AppenderRef ref="Console" />
-		</Logger>
+		</Logger> -->
 		<Logger name="org.springframework.boot" level="error"> 
 				<AppenderRef ref="RollingFile" />
 				<AppenderRef ref="Console" />
