@@ -46,9 +46,10 @@ public class WebHookHandlerServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private Long allrequestTime = 0L;
 	private static Logger LOG = LogManager.getLogger(WebHookHandlerServlet.class);
+	private final String REQUEST_PARAM_KEY_WEBHOOKNAME = "webHookName";
 
 	//@Autowired
-	WebHookMessagePublisher webhookmessagepublisher = new WebHookMessagePublisher();// 
+	WebHookMessagePublisher webhookmessagepublisher = new WebHookMessagePublisher();//    
 
 	@Override
 	public void init() throws ServletException {
@@ -70,18 +71,7 @@ public class WebHookHandlerServlet extends HttpServlet {
 			throws ServletException, IOException {
 		LOG.debug(" In only doGet not post Git ");
 		try {
-
-			long millis = System.currentTimeMillis();
-			String res = getBody(request).toString();
-			LOG.debug("Current time in millis: after getBody  " + (System.currentTimeMillis() - millis));
-			millis = System.currentTimeMillis();
-			LOG.debug(" before publish " + (System.currentTimeMillis() - millis));
-
-			webhookmessagepublisher.publishEventAction(res.getBytes());
-
-			long requestTime = (System.currentTimeMillis() - millis);
-			allrequestTime = allrequestTime + requestTime;
-			LOG.debug("Current time in millis: " + requestTime + "  allrequestTime  " + allrequestTime);
+			processRequest(request);
 		} catch (Exception e) {
 			LOG.error("Error while adding data in Mq in doget method ");
 		}
@@ -97,20 +87,27 @@ public class WebHookHandlerServlet extends HttpServlet {
 			throws ServletException, IOException {
 		try {
 			LOG.debug("In do post ");
-
-			long millis = System.currentTimeMillis();
-			String res = getBody(request).toString();
-			LOG.debug("Current time in millis: after getBody  " + (System.currentTimeMillis() - millis));
-			millis = System.currentTimeMillis();
-			//LOG.debug(res);
-			//LOG.debug(request.getContentType());
-			LOG.debug(" before publish " + (System.currentTimeMillis() - millis));
-			webhookmessagepublisher.publishEventAction(res.getBytes());//webHookMessagePublisher
-			long requestTime = (System.currentTimeMillis() - millis);
-			allrequestTime = allrequestTime + requestTime;
-			LOG.debug(" Current time in millis: " + requestTime + "  allrequestTime  " + allrequestTime);
+			processRequest(request);
 		} catch (TimeoutException e) {
 			LOG.error(e.getMessage());
+		}
+	}
+
+	private void processRequest(HttpServletRequest request) throws IOException, TimeoutException {
+		long millis = System.currentTimeMillis();
+		JsonObject dataWithReqParam = getBody(request);
+		if (dataWithReqParam != null) {
+			String webHookName = dataWithReqParam.get(REQUEST_PARAM_KEY_WEBHOOKNAME).getAsString();
+			String res = dataWithReqParam.toString();
+			long afterBodyParsing = (System.currentTimeMillis() - millis);
+			webhookmessagepublisher.publishEventAction(res.getBytes(), webHookName);
+			long requestTime = (System.currentTimeMillis() - millis);
+			allrequestTime = allrequestTime + requestTime;
+			LOG.debug(
+					"webHookName {}  Current time in millis: afterBodyParsing {}  finalProcess {} with all time allrequestTime {} ",
+					webHookName, afterBodyParsing, requestTime, allrequestTime);
+		} else {
+			LOG.debug(" Request body is null ");
 		}
 	}
 
@@ -118,7 +115,6 @@ public class WebHookHandlerServlet extends HttpServlet {
 
 		String bodymessage = null;
 		StringBuilder stringBuilder = new StringBuilder();
-		BufferedReader bufferedReader = null;
 		JsonObject responceJson = null;
 		try (BufferedReader reader = request.getReader()) {
 			if (reader == null) {
@@ -129,30 +125,25 @@ public class WebHookHandlerServlet extends HttpServlet {
 				stringBuilder.append(line);
 			}
 		} catch (final Exception e) {
-			LOG.error("Could not obtain the saml request body from the http request", e);
+			LOG.error("unable to read data from request body from the http request", e);
 			return null;
 		}
-
-		bodymessage = stringBuilder.toString();
-		LOG.debug("bodymessage" + bodymessage);
-		JsonElement element = new JsonParser().parse(bodymessage);
-		LOG.debug("  element  " + element);
-		responceJson = element.getAsJsonObject();
-
-		StringBuilder paramDetail = new StringBuilder();
-		Enumeration<String> parameterNames = request.getParameterNames();
-
-		while (parameterNames.hasMoreElements()) {
-			String paramName = parameterNames.nextElement();
-			String[] paramValues = request.getParameterValues(paramName);
-			for (int i = 0; i < paramValues.length; i++) {
-				String paramValue = paramValues[i];
-				paramDetail.append(paramName + ":" + paramValue + ",\n");
-				responceJson.addProperty(paramName, paramValue);
+		if (stringBuilder.length() > 1) {
+			bodymessage = stringBuilder.toString();
+			JsonElement element = new JsonParser().parse(bodymessage);
+			responceJson = element.getAsJsonObject();
+			StringBuilder paramDetail = new StringBuilder();
+			Enumeration<String> parameterNames = request.getParameterNames();
+			while (parameterNames.hasMoreElements()) {
+				String paramName = parameterNames.nextElement();
+				String[] paramValues = request.getParameterValues(paramName);
+				for (int i = 0; i < paramValues.length; i++) {
+					String paramValue = paramValues[i];
+					paramDetail.append(paramName + ":" + paramValue + ",\n");
+					responceJson.addProperty(paramName, paramValue);
+				}
 			}
 		}
-		LOG.debug("Request Parameter  " + paramDetail.toString());
-
 		return responceJson;
 	}
 

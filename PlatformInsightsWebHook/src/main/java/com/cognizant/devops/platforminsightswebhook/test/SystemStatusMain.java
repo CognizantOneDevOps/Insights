@@ -15,6 +15,9 @@
  ******************************************************************************/
 package com.cognizant.devops.platforminsightswebhook.test;
 
+import org.springframework.beans.factory.annotation.Autowired;
+
+import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import com.sun.jersey.api.client.Client;
@@ -25,6 +28,9 @@ import sun.misc.BASE64Encoder;
 
 public class SystemStatusMain {
 
+	@Autowired
+	private Gson gson;
+
 	public static void main(String[] args) {
 		System.out.println(" Run Event Subscriber .....");
 		SystemStatusMain ssm = new SystemStatusMain();
@@ -32,7 +38,8 @@ public class SystemStatusMain {
 		//for (int i = 0; i < 4000; i++) {
 		//System.out.println(" request number " + i);
 			jerseyPostClientWithAuthentication(
-				"http://localhost:8981/PlatformInsightsWebHook/webhookEvent?Toolname=GIT", null, null, null, data);//Git 34.236.204.95 GitEvent /EventSubscriber
+				"http://localhost:8981/PlatformInsightsWebHook/webhookEvent?webHookName=GIT_commit_comment",
+				null, null, null, data);//Git 34.236.204.95 GitEvent /EventSubscriber
 		//}
 		System.out.println(" Run Event Subscriber complete .....");
 

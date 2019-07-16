@@ -30,12 +30,7 @@ import com.cognizant.devops.platforminsightswebhook.events.WebHookHandlerServlet
 public class WebConfig {
 
 	@Bean
-	public WebHookMessagePublisher webhookmessagepublisher() {
-		return new WebHookMessagePublisher();
-	}
-
-	@Bean
-		public ServletRegistrationBean<HttpServlet> webhookServlet() {
+	public ServletRegistrationBean<HttpServlet> webhookServlet() {
 			ServletRegistrationBean<HttpServlet> servRegBean = new ServletRegistrationBean<>();
 			WebHookHandlerServlet webhookEvent = new WebHookHandlerServlet();
 			servRegBean.setServlet(webhookEvent);
@@ -43,5 +38,4 @@ public class WebConfig {
 			servRegBean.setLoadOnStartup(1);
 			return servRegBean;
 	}
-
 }

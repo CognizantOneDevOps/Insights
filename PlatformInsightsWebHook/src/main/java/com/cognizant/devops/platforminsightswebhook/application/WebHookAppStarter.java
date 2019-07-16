@@ -38,8 +38,8 @@ public class WebHookAppStarter {
 		ApplicationContext applicationContext = SpringApplication.run(WebHookAppStarter.class, args);
 		// SpringApplication.run(WebHookAppStarter.class, args);
 
-		for (String name : applicationContext.getBeanDefinitionNames()) {
+		/*for (String name : applicationContext.getBeanDefinitionNames()) {
 			System.out.println(" aa ==================== " + name);
-		}
+		}*/
     }
 } 
