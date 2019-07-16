@@ -23,6 +23,7 @@ public interface ConfigOptions {
 	String CONFIG_FILE = "server-config.json";
 	String TOOLS_CONFIG_FILE = "toolsConfig.json";
 	String CORRELATION_TEMPLATE = "correlation.json";
+	String TOOLDETAIL_TEMPLATE ="toolDetail.json";
 	String NEO4J_TEMPLATE = "neo4jdata.json";
 	String CORRELATION = "correlation"+Instant.now().toEpochMilli()+".json";
 	String DATA_ENRICHMENT_TEMPLATE = "data-enrichment.json";

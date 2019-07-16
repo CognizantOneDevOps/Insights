@@ -180,7 +180,7 @@ export class HomeComponent implements OnInit {
         navItemobj.displayName = orgDtl.name;
         navItemobj.iconName = 'grafanaOrg';
         navItemobj.route = 'InSights/Home/grafanadashboard/' + orgDtl.orgId;
-        navItemobj.isToolbarDisplay = true;//false
+        navItemobj.isToolbarDisplay = false;
         navItemobj.showIcon = false;
         navItemobj.isAdminMenu = false;
         navItemobj.orgId = orgDtl.orgId;
@@ -224,7 +224,7 @@ export class HomeComponent implements OnInit {
         isAdminMenu: false,
         showMenu: true,
         title: "Click on Organization to see various Org's Dashboards",
-        isToolbarDisplay: true,//false
+        isToolbarDisplay: false,
         children: this.navOrgList
       },
       {
@@ -259,7 +259,7 @@ export class HomeComponent implements OnInit {
         displayName: 'Playlist',
         iconName: 'feature',
         route: 'InSights/Home/playlist',
-        isToolbarDisplay: true,//false
+        isToolbarDisplay: false,
         showMenu: true,
         title: "Playlist",
         isAdminMenu: false
@@ -297,6 +297,15 @@ export class HomeComponent implements OnInit {
             isToolbarDisplay: true,
             showMenu: true,
             title: "Agent Management",
+            isAdminMenu: true
+          },
+          {
+            displayName: 'Bulk Upload',
+            iconName: 'feature',
+            route: 'InSights/Home/bulkupload',
+            isToolbarDisplay: true,
+            showMenu: true,
+            title: "Bulk Upload",
             isAdminMenu: true
           },
           {
