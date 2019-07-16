@@ -1,3 +1,18 @@
+/*******************************************************************************
+ * Copyright 2017 Cognizant Technology Solutions
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License.  You may obtain a copy
+ * of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ ******************************************************************************/
 package com.cognizant.devops.auditservice.audit.utils;
 
 import java.io.IOException;
@@ -20,12 +35,9 @@ import org.bouncycastle.tsp.TimeStampRequestGenerator;
 import org.bouncycastle.tsp.TimeStampResponse;
 import org.bouncycastle.tsp.TimeStampToken;
 
-/**
- * Time Stamping Authority (TSA) Client [RFC 3161].
- */
-public class TSAClient
+public class TimeStampingAuthorityClient
 {
-    private static final Log LOG = LogFactory.getLog(TSAClient.class);
+    private static final Log LOG = LogFactory.getLog(TimeStampingAuthorityClient.class);
 
     private final URL url;
     private final String username;
@@ -39,7 +51,7 @@ public class TSAClient
      * @param password password of TSA
      * @param digest the message digest to use
      */
-    public TSAClient(URL url, String username, String password, MessageDigest digest)
+    public TimeStampingAuthorityClient(URL url, String username, String password, MessageDigest digest)
     {
         this.url = url;
         this.username = username;
@@ -98,7 +110,6 @@ public class TSAClient
     {
         LOG.debug("Opening connection to TSA server");
 
-        // todo: support proxy servers
         URLConnection connection = url.openConnection();
         connection.setDoOutput(true);
         connection.setDoInput(true);

@@ -112,6 +112,11 @@
     height: 40px;
 }
 
+.tableMainCss {
+    border-collapse:collapse !important;
+    border-spacing: 0px;
+} 
+
 .showTable {
     background-color: #00B140;
     color: white;
