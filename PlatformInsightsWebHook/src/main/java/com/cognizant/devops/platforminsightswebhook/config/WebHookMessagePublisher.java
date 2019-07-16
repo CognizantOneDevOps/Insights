@@ -16,11 +16,18 @@
 package com.cognizant.devops.platforminsightswebhook.config;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeoutException;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Component;
 
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
+import com.cognizant.devops.platformdal.webhookConfig.WebHookConfig;
+import com.cognizant.devops.platformdal.webhookConfig.WebHookConfigDAL;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
@@ -28,11 +35,13 @@ import com.rabbitmq.client.ConnectionFactory;
 @Component("webhookmessagepublisher")
 public class WebHookMessagePublisher {
 
+	private static Logger LOG = LogManager.getLogger(WebHookMessagePublisher.class);
 	private ConnectionFactory factory;
 	private Channel channel;
 	private Connection connection;
 	String exchangeName;
 	String routingKey;
+	Map<String, String> mqMappingMap = new HashMap<String, String>(0);
 
 
 	public WebHookMessagePublisher() {
@@ -40,18 +49,19 @@ public class WebHookMessagePublisher {
 		this.routingKey = "WEBHOOK_EVENTDATA";//ApplicationConfigProvider.getInstance().getMessageQueue().
 	}
 
-	public void publishEventAction(byte[] data) throws TimeoutException, IOException {
+	public void publishEventAction(byte[] data, String webHookName) throws TimeoutException, IOException {
+		/*if (channel == null) {
+			initilizeMq();
+		}*/
 		if (channel != null) {
-			channel.basicPublish(exchangeName, routingKey, null, data);
+			channel.queueDeclare(webHookName, true, false, false, null);
+			channel.queueBind(webHookName, exchangeName, webHookName);
+			channel.basicPublish(exchangeName, webHookName, null, data);
 		}
 	}
 
 	public void initilizeMq() throws TimeoutException {
-
 		try {
-			//String hostPath = env.getProperty("mq.host");
-			//System.out.println("  hostPath  " + hostPath);
-
 			factory = new ConnectionFactory();
 			factory.setHost(ApplicationConfigProvider.getInstance().getMessageQueue().getHost());//"localhost"
 			factory.setUsername(ApplicationConfigProvider.getInstance().getMessageQueue().getUser());//"iSight"
@@ -59,10 +69,8 @@ public class WebHookMessagePublisher {
 			connection = factory.newConnection();
 			channel = connection.createChannel();
 			channel.exchangeDeclare(exchangeName, "topic", true);
-			channel.queueDeclare(routingKey, true, false, false, null);
-			channel.queueBind(routingKey, exchangeName, routingKey);
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
+			LOG.error(e.getMessage());
 			e.printStackTrace();
 		}
 
@@ -75,12 +83,14 @@ public class WebHookMessagePublisher {
 				connection.close();
 			}
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOG.error(e.getMessage());
 		} catch (TimeoutException e) {
-			// TODO Auto-generated catch block
+			LOG.error(e.getMessage());
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
+
+
 
 }

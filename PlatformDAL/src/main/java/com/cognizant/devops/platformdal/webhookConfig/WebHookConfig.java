@@ -121,6 +121,13 @@ public class WebHookConfig {
 	public void setResponseTemplate(String responseTemplate) {
 		this.responseTemplate = responseTemplate;
 	}
+
+	@Override
+	public String toString() {
+		return "WebHookConfig [id=" + id + ", subscribeStatus=" + subscribeStatus + ", responseTemplate="
+				+ responseTemplate + ", toolName=" + toolName + ", eventName=" + eventName + ", dataFormat="
+				+ dataFormat + ", mqChannel=" + mqChannel + ", webhookName=" + webhookName + "]";
+	}
 	
 
 	
