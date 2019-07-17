@@ -14,7 +14,7 @@
 # the License.
 #-------------------------------------------------------------------------------
 #! /bin/sh
-# /etc/init.d/__AGENT_KEY__
+# /etc/init.d/__AGENT_KEY__ 
 
 ### BEGIN INIT INFO
 # Provides: Runs a Python script on startup
@@ -29,63 +29,81 @@
 
 #export INSIGHTS_AGENT_HOME=/home/ec2-user/insightsagents
 source /etc/profile
+python_version="$(python -V 2>&1)"
+detectPythonVersion()
+{
+     if echo "$1" | grep -q "Python 2"; then
+      echo "Detected python 2 version";
+      python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.alm.qtest.QtestAgent import QtestAgent; QtestAgent()" &
+     elif echo "$1" | grep -q "Python 3"; then
+      echo "Detected python 3 version";
+      python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.alm.qtest.QtestAgent3 import QtestAgent; QtestAgent()" &
+     else
+      echo "python version not supported"
+	  exit 1;
+     fi
+
+}
 
 case "$1" in
   start)
     if [[ $(ps aux | grep '__PS_KEY__' | awk '{print $2}') ]]; then
-     echo "InSightsQTESTAgent already running"
+     echo "InSightsQtestAgent already running"
     else
-     echo "Starting InSightsQTESTAgent"
+     echo "Starting InSightsQtestAgent"
      cd $INSIGHTS_AGENT_HOME/PlatformAgents/qtest
-     python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.alm.qtest.QtestAgent import QtestAgent; QtestAgent()" &
+	 echo $python_version
+     detectPythonVersion "$python_version"
     fi
     if [[ $(ps aux | grep '__PS_KEY__' | awk '{print $2}') ]]; then
-     echo "InSightsQTESTAgent Started Sucessfully"
+     echo "InSightsQtestAgent Started Sucessfully"
     else
-     echo "InSightsQTESTAgent Failed to Start"
+     echo "InSightsQtestAgent Failed to Start"
     fi
     ;;
   stop)
-    echo "Stopping InSightsQTESTAgent"
+    echo "Stopping InSightsQtestAgent"
     if [[ $(ps aux | grep '__PS_KEY__' | awk '{print $2}') ]]; then
      sudo kill -9 $(ps aux | grep '__PS_KEY__' | awk '{print $2}')
     else
-     echo "InSightsQTESTAgent already in stopped state"
+     echo "InSightsQtestAgent already in stopped state"
     fi
     if [[ $(ps aux | grep '__PS_KEY__' | awk '{print $2}') ]]; then
-     echo "InSightsQTESTAgent Failed to Stop"
+     echo "InSightsQtestAgent Failed to Stop"
     else
-     echo "InSightsQTESTAgent Stopped"
+     echo "InSightsQtestAgent Stopped"
     fi
     ;;
   restart)
-    echo "Restarting InSightsQTESTAgent"
+    echo "Restarting InSightsQtestAgent"
     if [[ $(ps aux | grep '__PS_KEY__' | awk '{print $2}') ]]; then
-     echo "InSightsQTESTAgent stopping"
+     echo "InSightsQtestAgent stopping"
      sudo kill -9 $(ps aux | grep '__PS_KEY__' | awk '{print $2}')
-     echo "InSightsQTESTAgent stopped"
-     echo "InSightsQTESTAgent starting"
+     echo "InSightsQtestAgent stopped"
+     echo "InSightsQtestAgent starting"
      cd $INSIGHTS_AGENT_HOME/PlatformAgents/qtest
-     python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.alm.qtest.QtestAgent import QtestAgent; QtestAgent()" &
-     echo "InSightsQTESTAgent started"
+	 echo $python_version
+     detectPythonVersion "$python_version"
+     echo "InSightsQtestAgent started"
     else
-     echo "InSightsQTESTAgent already in stopped state"
-     echo "InSightsQTESTAgent starting"
+     echo "InSightsQtestAgent already in stopped state"
+     echo "InSightsQtestAgent starting"
      cd $INSIGHTS_AGENT_HOME/PlatformAgents/qtest
-     python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.alm.qtest.QtestAgent import QtestAgent; QtestAgent()" &
-     echo "InSightsQTESTAgent started"
+	 echo $python_version
+     detectPythonVersion "$python_version"
+     echo "InSightsQtestAgent started"
     fi
     ;;
   status)
-    echo "Checking the Status of InSightsQTESTAgent"
+    echo "Checking the Status of InSightsQtestAgent"
     if [[ $(ps aux | grep '__PS_KEY__' | awk '{print $2}') ]]; then
-     echo "InSightsQTESTAgent is running"
+     echo "InSightsQtestAgent is running"
     else
-     echo "InSightsQTESTAgent is stopped"
+     echo "InSightsQtestAgent is stopped"
     fi
     ;;
   *)
-    echo "Usage: /etc/init.d/__AGENT_KEY__ {start|stop|restart|status}"
+    echo "Usage: /etc/init.d/__AGENT_KEY__  {start|stop|restart|status}"
     exit 1
     ;;
 esac
