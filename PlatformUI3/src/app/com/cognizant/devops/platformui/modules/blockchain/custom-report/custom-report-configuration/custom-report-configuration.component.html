@@ -129,7 +129,7 @@
                                 </span>
                                 <span *ngIf="!this.showFile">
                                     <p>
-                                        <span style="font-size: 14px;margin-left: 10px;text-decoration: underline;cursor: pointer;" (click)="downloadFile()">{{queryForm.get('queryPath').value}}</span>
+                                        <span style="font-size: 14px;margin-left: 10px;text-decoration: underline;cursor: pointer;" (click)="downloadFile(queryForm)">{{queryForm.get('queryPath').value}}</span>
                                         <span>
                                             <button mat-icon-button (click)="editFile()">
                                                 <mat-icon title="Edit " class="mat-icon material-icons">edit</mat-icon>
