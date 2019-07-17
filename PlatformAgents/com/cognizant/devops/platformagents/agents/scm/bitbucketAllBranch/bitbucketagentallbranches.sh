@@ -80,13 +80,15 @@ case "$1" in
      echo "InSightsBitBucketAgent stopped"
      echo "InSightsBitBucketAgent starting"
      cd $INSIGHTS_AGENT_HOME/PlatformAgents/bitbucket
-     python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.scm.bitbucketAllBranch.BitBucketAgentAllBranches import BitBucketAgentAllBranches; BitBucketAgentAllBranches()" &
+     echo $python_version
+     detectPythonVersion "$python_version"
      echo "InSightsBitBucketAgent started"
     else
      echo "InSightsBitBucketAgent already in stopped state"
      echo "InSightsBitBucketAgent starting"
      cd $INSIGHTS_AGENT_HOME/PlatformAgents/bitbucket
-     python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.scm.bitbucketAllBranch.BitBucketAgentAllBranches import BitBucketAgentAllBranches; BitBucketAgentAllBranches()" &
+     echo $python_version
+     detectPythonVersion "$python_version"
      echo "InSightsBitBucketAgent started"
     fi
     ;;

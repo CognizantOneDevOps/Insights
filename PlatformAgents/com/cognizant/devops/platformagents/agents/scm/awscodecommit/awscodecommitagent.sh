@@ -80,13 +80,15 @@ case "$1" in
      echo "InSightsAwsCodeCommitAgent stopped"
      echo "InSightsAwsCodeCommitAgent starting"
      cd $INSIGHTS_AGENT_HOME/PlatformAgents/awscodecommit
-     python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.deployment.awscodecommit.AwsCodeCommitAgent import AwsCodeCommitAgent; AwsCodeCommitAgent()" &
+     echo $python_version
+     detectPythonVersion "$python_version"
      echo "InSightsAwsCodeCommitAgent started"
     else
      echo "InSightsAwsCodeCommitAgent already in stopped state"
      echo "InSightsAwsCodeCommitAgent starting"
      cd $INSIGHTS_AGENT_HOME/PlatformAgents/awscodecommit
-     python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.deployment.awscodecommit.AwsCodeCommitAgent import AwsCodeCommitAgent; AwsCodeCommitAgent()" &
+     echo $python_version
+     detectPythonVersion "$python_version"
      echo "InSightsAwsCodeCommitAgent started"
     fi
     ;;

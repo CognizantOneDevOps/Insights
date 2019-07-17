@@ -80,13 +80,15 @@ case "$1" in
      echo "InSightsSnowAgent stopped"
      echo "InSightsSnowAgent starting"
      cd $INSIGHTS_AGENT_HOME/PlatformAgents/snow
-     python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.itsm.snow.snowAgent import snowAgent; snowAgent()" &
+     echo $python_version
+     detectPythonVersion "$python_version"
      echo "InSightsSnowAgent started"
     else
      echo "InSightsSnowAgent already in stopped state"
      echo "InSightsSnowAgent starting"
      cd $INSIGHTS_AGENT_HOME/PlatformAgents/snow
-     python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.itsm.snow.snowAgent import snowAgent; snowAgent()" &
+     echo $python_version
+     detectPythonVersion "$python_version"
      echo "InSightsSnowAgent started"
     fi
     ;;

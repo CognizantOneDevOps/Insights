@@ -79,13 +79,15 @@ case "$1" in
      echo "InSightsAwsCodePipelineAgent stopped"
      echo "InSightsAwsCodePipelineAgent starting"
      cd $INSIGHTS_AGENT_HOME/PlatformAgents/awscodepipeline
-     python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.deployment.awscodepipeline.AwsCodePipelineAgent import AwsCodePipelineAgent; AwsCodePipelineAgent()" &
+     echo $python_version
+     detectPythonVersion "$python_version"
      echo "InSightsAwsCodePipelineAgent started"
     else
      echo "InSightsAwsCodePipelineAgent already in stopped state"
      echo "InSightsAwsCodePipelineAgent starting"
      cd $INSIGHTS_AGENT_HOME/PlatformAgents/awscodepipeline
-     python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.deployment.awscodepipeline.AwsCodePipelineAgent import AwsCodePipelineAgent; AwsCodePipelineAgent()" &
+     echo $python_version
+     detectPythonVersion "$python_version"
      echo "InSightsAwsCodePipelineAgent started"
     fi
     ;;
