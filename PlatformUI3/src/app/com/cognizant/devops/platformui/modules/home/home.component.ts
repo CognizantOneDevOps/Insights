@@ -309,7 +309,7 @@ export class HomeComponent implements OnInit {
             isAdminMenu: true
           },
           {
-            displayName: 'WebHook Configuration',
+            displayName: 'Webhook Configuration',
             iconName: 'feature',
             route: 'InSights/Home/webhook',
             isToolbarDisplay: true,
