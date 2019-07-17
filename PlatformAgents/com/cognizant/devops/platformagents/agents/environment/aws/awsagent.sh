@@ -80,13 +80,15 @@ case "$1" in
      echo "InSightsAwsAgent stopped"
      echo "InSightsAwsAgent starting"
      cd $INSIGHTS_AGENT_HOME/PlatformAgents/aws
-     python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.environment.aws.AwsAgent import AwsAgent; AwsAgent()" &
+     echo $python_version
+     detectPythonVersion "$python_version"
      echo "InSightsAwsAgent started"
     else
      echo "InSightsAwsAgent already in stopped state"
      echo "InSightsAwsAgent starting"
      cd $INSIGHTS_AGENT_HOME/PlatformAgents/aws
-     python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.environment.aws.AwsAgent import AwsAgent; AwsAgent()" &
+     echo $python_version
+     detectPythonVersion "$python_version"
      echo "InSightsAwsAgent started"
     fi
     ;;

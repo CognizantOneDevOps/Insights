@@ -18,7 +18,7 @@ Created on May 9, 2018
 
 @author: 476693
 '''
-from ....core.BaseAgent3 import BaseAgent
+from ....core.BaseAgent import BaseAgent
 import time
 import requests
 import json
