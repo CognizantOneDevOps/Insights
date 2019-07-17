@@ -15,8 +15,13 @@
  ******************************************************************************/
 package com.cognizant.devops.platforminsightswebhook.test;
 
+import java.util.Random;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import com.cognizant.devops.platforminsightswebhook.config.WebHookMessagePublisher;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
@@ -27,21 +32,25 @@ import com.sun.jersey.api.client.WebResource;
 import sun.misc.BASE64Encoder;
 
 public class SystemStatusMain {
-
+	private static Logger LOG = LogManager.getLogger(SystemStatusMain.class);
 	@Autowired
 	private Gson gson;
 
 	public static void main(String[] args) {
-		System.out.println(" Run Event Subscriber .....");
+		LOG.debug(" Run Event Subscriber .....");
 		SystemStatusMain ssm = new SystemStatusMain();
 		String data = ssm.createMessage();
-		//for (int i = 0; i < 4000; i++) {
-		//System.out.println(" request number " + i);
+		String[] arr = { "GIT_commit_comment", "GIT_push_event", "GIT_event", "GIT_Watches", "GIT_Watches2" };
+		Random r = new Random();
+		for (int i = 0; i < 4000; i++) {
+			int randomNumber = r.nextInt(arr.length);
+			String webHookName = arr[randomNumber];
+			LOG.debug(" webHookName ==== " + webHookName + "==== request number ====" + i);
 			jerseyPostClientWithAuthentication(
-				"http://localhost:8981/PlatformInsightsWebHook/insightsDevOpsWebHook?webHookName=GIT_commit_comment",
-				null, null, null, data);//Git 34.236.204.95 GitEvent /EventSubscriber
-		//}
-		System.out.println(" Run Event Subscriber complete .....");
+					"http://localhost:8981/PlatformInsightsWebHook/insightsDevOpsWebHook?webHookName=" + webHookName,
+					null, null, null, data);
+		}
+		LOG.debug(" Run Event Subscriber complete .....");
 
 	}
 
@@ -72,7 +81,7 @@ public class SystemStatusMain {
 			System.out.print(" response code " + response.getStatus() + "  output  " + output);
 		} catch (Exception e) {
 			e.printStackTrace();
-			System.out.println(" error while getGetting  jerseyPostClientWithAuthentication " + e.getMessage());
+			LOG.debug(" error while getGetting  jerseyPostClientWithAuthentication " + e.getMessage());
 			throw new RuntimeException(
 					"Failed : error while getGetting jerseyPostClientWithAuthentication : " + e.getMessage());
 		} finally {

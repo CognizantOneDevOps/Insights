@@ -45,18 +45,26 @@ import com.google.gson.JsonParser;
 @WebServlet(urlPatterns = "/insightsDevOpsWebHook/*", loadOnStartup = 1)
 public class WebHookHandlerServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-	private Long allrequestTime = 0L;
 	private static Logger LOG = LogManager.getLogger(WebHookHandlerServlet.class);
 	
 
 	//@Autowired
-	WebHookMessagePublisher webhookmessagepublisher = new WebHookMessagePublisher();//    
+	WebHookMessagePublisher webhookmessagepublisher = new WebHookMessagePublisher();
 
+	public WebHookHandlerServlet(WebHookMessagePublisher webhookmessagepublisher) {
+		this.webhookmessagepublisher = webhookmessagepublisher;
+	}
+	
+	/**
+	 * Used to initilize Rabbitq Connection
+	 */
 	@Override
 	public void init() throws ServletException {
 		LOG.debug(" In server init .... initilizeMq ");
 		webhookmessagepublisher.initilizeMq();
+	}
 
+	public WebHookHandlerServlet() {
 	}
 
 	/**
@@ -70,7 +78,7 @@ public class WebHookHandlerServlet extends HttpServlet {
 		try {
 			processRequest(request);
 		} catch (Exception e) {
-			LOG.error("Error while adding data in Mq in doget method ");
+			LOG.error("Error while adding data in Mq in doget method " + e.getMessage());
 		}
 		response.getWriter().append("Served at: ").append(request.getContextPath());
 	}
@@ -87,27 +95,37 @@ public class WebHookHandlerServlet extends HttpServlet {
 			processRequest(request);
 		} catch (TimeoutException e) {
 			LOG.error(e.getMessage());
+		} catch (Exception e) {
+			LOG.error("Error while adding data in Mq in doPost method " + e.getMessage());
 		}
 	}
 
+	/**
+	 * used to process request and add data in RabbitMq
+	 * 
+	 * @param request
+	 * @throws IOException
+	 * @throws TimeoutException
+	 */
 	private void processRequest(HttpServletRequest request) throws IOException, TimeoutException {
-		long millis = System.currentTimeMillis();
 		JsonObject dataWithReqParam = getBody(request);
 		if (dataWithReqParam != null) {
-			String webHookName = dataWithReqParam.get(WebHookConstants.REQUEST_PARAM_KEY_WEBHOOKNAME).getAsString();
+			String webHookMqChannelName = WebHookConstants.MQ_CHANNEL_PREFIX
+					.concat(dataWithReqParam.get(WebHookConstants.REQUEST_PARAM_KEY_WEBHOOKNAME).getAsString());
 			String res = dataWithReqParam.toString();
-			long afterBodyParsing = (System.currentTimeMillis() - millis);
-			webhookmessagepublisher.publishEventAction(res.getBytes(), webHookName);
-			long requestTime = (System.currentTimeMillis() - millis);
-			allrequestTime = allrequestTime + requestTime;
-			LOG.debug(
-					"webHookName {}  Current time in millis: afterBodyParsing {}  finalProcess {} with all time allrequestTime {} ",
-					webHookName, afterBodyParsing, requestTime, allrequestTime);
+			webhookmessagepublisher.publishEventAction(res.getBytes(), webHookMqChannelName);
 		} else {
 			LOG.debug(" Request body is null ");
 		}
 	}
 
+	/**
+	 * This method used to create json sstring from request body
+	 * 
+	 * @param request
+	 * @return
+	 * @throws IOException
+	 */
 	public JsonObject getBody(HttpServletRequest request) throws IOException {
 
 		String bodymessage = null;
@@ -144,6 +162,9 @@ public class WebHookHandlerServlet extends HttpServlet {
 		return responceJson;
 	}
 
+	/**
+	 * Used to release rabbitMq connection
+	 */
 	@Override
 	public void destroy() {
 		webhookmessagepublisher.releaseMqConnetion();
