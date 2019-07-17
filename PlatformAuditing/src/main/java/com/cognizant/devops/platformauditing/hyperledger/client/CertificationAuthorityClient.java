@@ -1,3 +1,18 @@
+/*******************************************************************************
+ * Copyright 2017 Cognizant Technology Solutions
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License.  You may obtain a copy
+ * of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ ******************************************************************************/
 package com.cognizant.devops.platformauditing.hyperledger.client;
 
 import java.lang.reflect.InvocationTargetException;
@@ -15,49 +30,33 @@ import org.hyperledger.fabric.sdk.security.CryptoSuite;
 import org.hyperledger.fabric_ca.sdk.HFCAClient;
 import org.hyperledger.fabric_ca.sdk.RegistrationRequest;
 
-import com.cognizant.devops.platformauditing.hyperledger.user.UserContext;
+import com.cognizant.devops.platformauditing.hyperledger.user.BCUserContext;
 import com.cognizant.devops.platformauditing.hyperledger.user.UserUtil;
 
-public class CAClient {
+public class CertificationAuthorityClient {
 
 	String caUrl;
 	Properties caProperties;
 
 	HFCAClient instance;
 
-	UserContext adminContext;
+	BCUserContext adminContext;
 	
-	private static final Logger LOG = LogManager.getLogger(CAClient.class);
+	private static final Logger LOG = LogManager.getLogger(CertificationAuthorityClient.class);
 	JsonObject Config= LoadFile.getConfig();
 
-	public UserContext getAdminUserContext() {
+	public BCUserContext getAdminUserContext() {
 		return adminContext;
 	}
 
-	/**
-	 * Set the admin user context for registering and enrolling users.
-	 *
-	 * @param userContext
+	/*
+	 Set the admin user context for registering and enrolling users
 	 */
-	public void setAdminUserContext(UserContext userContext) {
-		this.adminContext = userContext;
+	public void setAdminUserContext(BCUserContext BCUserContext) {
+		this.adminContext = BCUserContext;
 	}
 
-	/**
-	 * Constructor
-	 *
-	 * @param caUrl
-	 * @param caProperties
-	 * @throws MalformedURLException
-	 * @throws InvocationTargetException
-	 * @throws NoSuchMethodException
-	 * @throws InvalidArgumentException
-	 * @throws CryptoException
-	 * @throws ClassNotFoundException
-	 * @throws InstantiationException
-	 * @throws IllegalAccessException
-	 */
-	public CAClient(String caUrl, Properties caProperties) throws MalformedURLException, IllegalAccessException, InstantiationException, ClassNotFoundException, CryptoException, InvalidArgumentException, NoSuchMethodException, InvocationTargetException {
+	public CertificationAuthorityClient(String caUrl, Properties caProperties) throws MalformedURLException, IllegalAccessException, InstantiationException, ClassNotFoundException, CryptoException, InvalidArgumentException, NoSuchMethodException, InvocationTargetException {
 		this.caUrl = caUrl;
 		this.caProperties = caProperties;
 		init();
@@ -73,19 +72,14 @@ public class CAClient {
 		return instance;
 	}
 
-	/**
-	 * Enroll admin user.
-	 *
-	 * @param username
-	 * @param password
-	 * @return
-	 * @throws Exception
+	/*
+	 * Enroll admin user
 	 */
-	public UserContext enrollAdminUser(String username, String password) throws Exception {
-		UserContext userContext = UserUtil.readUserContext(adminContext.getAffiliation(), username);
-		if (userContext != null) {
+	public BCUserContext enrollAdminUser(String username, String password) throws Exception {
+		BCUserContext BCUserContext = UserUtil.readUserContext(adminContext.getAffiliation(), username);
+		if (BCUserContext != null) {
 			LOG.debug("CA -" + caUrl + " admin is already enrolled.");
-			return userContext;
+			return BCUserContext;
 		}
 		Enrollment adminEnrollment = instance.enroll(username, password);
 		adminContext.setEnrollment(adminEnrollment);
@@ -94,17 +88,12 @@ public class CAClient {
 		return adminContext;
 	}
 
-	/**
-	 * Register user.
-	 *
-	 * @param username
-	 * @param organization
-	 * @return
-	 * @throws Exception
+	/*
+	 * Register user
 	 */
 	public String registerUser(String username, String organization) throws Exception {
-		UserContext userContext = UserUtil.readUserContext(adminContext.getAffiliation(), username);
-		if (userContext != null) {
+		BCUserContext BCUserContext = UserUtil.readUserContext(adminContext.getAffiliation(), username);
+		if (BCUserContext != null) {
 			LOG.debug("CA -" + caUrl +" User " + username+ " is already registered.");
 			return null;
 		}
@@ -114,19 +103,14 @@ public class CAClient {
 		return enrollmentSecret;
 	}
 
-	/**
-	 * Enroll user.
-	 *
-	 * @param user
-	 * @param secret
-	 * @return
-	 * @throws Exception
+	/*
+	 * Enroll user
 	 */
-	public UserContext enrollUser(UserContext user, String secret) throws Exception {
-		UserContext userContext = UserUtil.readUserContext(adminContext.getAffiliation(), user.getName());
-		if (userContext != null) {
+	public BCUserContext enrollUser(BCUserContext user, String secret) throws Exception {
+		BCUserContext BCUserContext = UserUtil.readUserContext(adminContext.getAffiliation(), user.getName());
+		if (BCUserContext != null) {
 			LOG.debug("CA -" + caUrl + " User " + user.getName()+" is already enrolled");
-			return userContext;
+			return BCUserContext;
 		}
 		Enrollment enrollment = instance.enroll(user.getName(), secret);
 		user.setEnrollment(enrollment);
@@ -136,13 +120,15 @@ public class CAClient {
 	}
 
 
+	/*
+	Read the user context from the .ser file or get enrollment from the key and cert files(initialization)
+	 */
 
-
-	public UserContext getUserContext(UserContext user) throws Exception {
-		UserContext userContext = UserUtil.readUserContext(user.getAffiliation(), user.getName());
-		if (userContext != null) {
+	public BCUserContext getUserContext(BCUserContext user) throws Exception {
+		BCUserContext BCUserContext = UserUtil.readUserContext(user.getAffiliation(), user.getName());
+		if (BCUserContext != null) {
 			LOG.debug("CA -" + caUrl + " User " + user.getName() +" is already enrolled");
-			return userContext;
+			return BCUserContext;
 		}
 		LOG.debug("==============Inside getUserContext===========");
 		Enrollment enrollment = UserUtil.getEnrollment(Config.get("USER_KEYSTORE_PATH").getAsString(), Config.get("USER_KEYSTORE_NAME").getAsString(), Config.get("USER_SIGNCERT_PATH").getAsString(), Config.get("USER_SIGNCERT_NAME").getAsString());
@@ -152,13 +138,13 @@ public class CAClient {
 		return user;	
 	}
 	
-	public UserContext getUserContext(String userId) throws Exception {
-        UserContext userContext = new UserContext();
-        userContext.setName(userId);
-        userContext.setAffiliation(Config.get("USER_ORG").getAsString());
-        userContext.setMspId(Config.get("USER_ORG_MSP").getAsString());
+	public BCUserContext getUserContext(String userId) throws Exception {
+        BCUserContext BCUserContext = new BCUserContext();
+        BCUserContext.setName(userId);
+        BCUserContext.setAffiliation(Config.get("USER_ORG").getAsString());
+        BCUserContext.setMspId(Config.get("USER_ORG_MSP").getAsString());
         
-        return getUserContext(userContext);
+        return getUserContext(BCUserContext);
 	}
 
 

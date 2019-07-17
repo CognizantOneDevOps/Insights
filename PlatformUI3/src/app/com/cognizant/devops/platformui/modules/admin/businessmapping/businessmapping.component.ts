@@ -448,8 +448,8 @@ export class BusinessMappingComponent implements OnInit {
     var self = this;
     if (this.selectedMappingAgent.uuid != undefined || this.selectedMappingAgent.uuid != "") {
       var title = "Delete Business Mapping Label";
-       var dialogmessage = "<b>PLEASE NOTE</b> <br>Deleting Business Mapping Label <b>" + this.selectedMappingAgent.businessmappinglabel + "</b>, this action <b>CANNOT BE UNDONE.</b><br>Once Business Mapping Label<b> " + this.selectedMappingAgent.businessmappinglabel + "</b> is deleted, data related to  will be retained in the previously gathered data. However, if you create a new Business Mapping Label with the same name, it may impact other functionalities.</b><br><br>Are you sure, do you want to Delete Business Mapping Label <b>" + this.selectedMappingAgent.businessmappinglabel + "</b>?";
-      const dialogRef = this.messageDialog.showConfirmationMessage(title, dialogmessage, "", "ALERT", "42%");
+       var dialogmessage = "<b>PLEASE NOTE:</b><br><br>Deleting Business Mapping Label <b>" + this.selectedMappingAgent.businessmappinglabel + "</b>, this action <b>CANNOT BE UNDONE.</b><br><br>Once Business Mapping Label<b> " + this.selectedMappingAgent.businessmappinglabel + "</b> is deleted, data related to  will be retained in the previously gathered data. However, if you create a new Business Mapping Label with the same name, it may impact other functionalities.</b><br><br>Are you sure, do you want to Delete Business Mapping Label <b>" + this.selectedMappingAgent.businessmappinglabel + "</b>?";
+      const dialogRef = this.messageDialog.showConfirmationMessage(title, dialogmessage, "", "ALERT", "");
       dialogRef.afterClosed().subscribe(result => {
         if (result == 'yes') {
           this.businessMappingService.deleteToolMapping(this.selectedMappingAgent.uuid)
