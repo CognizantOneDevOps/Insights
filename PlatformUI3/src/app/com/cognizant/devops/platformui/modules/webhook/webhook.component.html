@@ -46,197 +46,154 @@
             </button>
             <button *ngIf="enableWebhookicon" mat-icon-button (click)="list()">
                 <mat-icon svgIcon="webhook" title="List Existing WebHooks" class="mat-icon material-icons">
-
                 </mat-icon>
             </button>
-            <button [disabled]="!enablesubscribe" mat-icon-button (click)="actionSubscribeOrUnsubscribe( true,selectedWebhook)">
+            <button [disabled]="!enablesubscribe" mat-icon-button
+                (click)="actionSubscribeOrUnsubscribe( true,selectedWebhook)">
                 <mat-icon title="Save" class="mat-icon material-icons">
                     rss_feed
                 </mat-icon>
             </button>
 
-            <button [disabled]="!enableunsubscribe" *ngIf="!enableunsubscribe" mat-icon-button (click)="actionSubscribeOrUnsubscribe( false,selectedWebhook)">
+            <button [disabled]="!enableunsubscribe" *ngIf="!enableunsubscribe" mat-icon-button
+                (click)="actionSubscribeOrUnsubscribe( false,selectedWebhook)">
                 <mat-icon class="svgIconCss" svgIcon="unsubscribe_webhookDeactive">
                 </mat-icon>
             </button>
 
-            <button *ngIf="enableunsubscribe" mat-icon-button (click)="actionSubscribeOrUnsubscribe( false,selectedWebhook)">
+            <button *ngIf="enableunsubscribe" mat-icon-button
+                (click)="actionSubscribeOrUnsubscribe( false,selectedWebhook)">
                 <mat-icon class="svgIconCss" svgIcon="unsubscribe_webhook">
                 </mat-icon>
             </button>
-
-
-
             <button mat-icon-button (click)="editWebhook()" [disabled]="!enableEdit">
                 <mat-icon title="Edit" class="mat-icon material-icons">
                     <!--usingBtnCss usingBtnCss-->
                     edit
                 </mat-icon>
             </button>
-            <button [disabled]="!showAddWebHook" mat-icon-button (click)="saveData(webhookName, selectedTool, eventToSubscribe, dataformat, mqchannel,responseTemplate)">
+            <button [disabled]="!showAddWebHook" mat-icon-button
+                (click)="saveData(webhookName, selectedTool, eventToSubscribe, dataformat, mqchannel,responseTemplate)">
                 <mat-icon title="Save" class="mat-icon material-icons">
                     save
                 </mat-icon>
             </button>
-
             <button mat-icon-button (click)="uninstallWebHook()" [disabled]="!enableDelete">
                 <mat-icon title="Delete" class="mat-icon material-icons">
                     delete
                 </mat-icon>
             </button>
-
             <button mat-icon-button (click)="Refresh()" [disabled]="!enableRefresh">
                 <mat-icon title="Refresh" class="mat-icon material-icons">
                     cancel
                 </mat-icon>
             </button>
-
         </div>
 
         <div *ngIf="showWebhook">
             <mat-radio-group [(ngModel)]="selectedWebhook">
-                <table mat-table [dataSource]="webhookDatasource" class="mat-elevation-z8" style="margin-top:2% !important">
+                <table mat-table [dataSource]="webhookDatasource" class="mat-elevation-z8"
+                    style="margin-top:2% !important">
                     <!-- Radio Button Column -->
-
                     <ng-container matColumnDef="radio">
                         <th mat-header-cell *matHeaderCellDef class="tableHeaderCss"></th>
                         <td mat-cell *matCellDef="let element " style="width:5% !important">
-                            <mat-radio-button [value]="element" [checked]="refreshRadio" color="primary" (click)="enableButtons(element)"></mat-radio-button>
+                            <mat-radio-button [value]="element" [checked]="refreshRadio" color="primary"
+                                (click)="enableButtons(element)"></mat-radio-button>
                         </td>
-                        <!-- [checked]="radioRefresh" -->
                     </ng-container>
-
                     <ng-container matColumnDef="WebHookName">
-                        <th mat-header-cell *matHeaderCellDef class="tableHeaderCss">WebHook Name</th>
-                        <td mat-cell *matCellDef="let element" style="width:15% !important">
+                        <th mat-header-cell *matHeaderCellDef class="tableHeaderCss">Webhook Name</th>
+                        <td mat-cell *matCellDef="let element" style="width:20% !important">
                             {{element.webhookName}}
                         </td>
                     </ng-container>
-
-
-
                     <ng-container matColumnDef="ToolName">
                         <th mat-header-cell *matHeaderCellDef class="tableHeaderCss">Tool Name</th>
                         <td mat-cell *matCellDef="let element" style="width:15% !important">
                             {{element.toolName}}
                         </td>
                     </ng-container>
-
                     <ng-container matColumnDef="EventName">
                         <th mat-header-cell *matHeaderCellDef class="tableHeaderCss">Events</th>
-                        <td mat-cell *matCellDef="let element" style="width:10% !important">
+                        <td mat-cell *matCellDef="let element" style="width:15% !important">
                             {{element.eventName}}
                         </td>
                     </ng-container>
-
                     <ng-container matColumnDef="DataType">
                         <th mat-header-cell *matHeaderCellDef class="tableHeaderCss">Data Format</th>
-                        <td mat-cell *matCellDef="let element" style="width:10% !important">
+                        <td mat-cell *matCellDef="let element" style="width:15% !important">
                             {{element.dataFormat}} </td>
                     </ng-container>
-
                     <ng-container matColumnDef="MqChannel">
                         <th mat-header-cell *matHeaderCellDef class="tableHeaderCss">MQ Channel</th>
-                        <td mat-cell *matCellDef="let element" style="width:20% !important">
+                        <td mat-cell *matCellDef="let element" style="width:15% !important">
                             {{element.mqChannel}} </td>
                     </ng-container>
-
                     <ng-container matColumnDef="Status">
                         <th mat-header-cell *matHeaderCellDef class="tableHeaderCss">Subscription Status</th>
                         <td mat-cell *matCellDef="let element" style="width:15% !important">
                             {{element.subscribeStatus}} </td>
                     </ng-container>
-
-
-
                     <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
                     <tr mat-row *matRowDef="let row; columns: displayedColumns;"> </tr>
                 </table>
             </mat-radio-group>
         </div>
 
-
-
-
-
-
         <div *ngIf="showAddWebHook">
             <table class="mat-elevation-z8 mat-table">
                 <thead>
                     <tr class="mat-header-row" layout-align="start start">
-                        <th colspan="3" class="tableHeaderCss mat-header-cell" style="height:40px;border-radius: 10px 10px 0 0;padding-left: 15px;padding-right: 65px">
+                        <th colspan="3" class="tableHeaderCss mat-header-cell"
+                            style="height:40px;border-radius: 10px 10px 0 0;padding-left: 15px;padding-right: 65px">
                             <span class="mainHeaderText">Add details to Configure a Webhook</span>
                             <span class="infoHeaderText">(Please provide accurate details to Configure a Webhook.
                                 Fields marked "*" are mandatory)
                             </span>
-
                         </th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr class="mat-row">
-                        <td class="mat-cell" style="width:15%;padding: 0px 0px 0px 15px ;height: 60px;">
+                    <tr class="mat-row-webhook">
+                        <td class="mat-cell" class="columnName">
                             <span class="mainText">Webhook Name</span>
                             <span style="color:#ff0000;">*</span>
-
                         </td>
-                        <td style="width: 30%">
-
-                            <input [disabled]="disableInputFields" type="text" [(ngModel)]="webhookName" (click)="toolNameenableSave()"
-                                name="webhookName" style="width:250px; font-size: 15px !important;padding-left: 10px;">
-
-
-
-
+                        <td class="columnComponent">
+                            <input maxlength="40" [disabled]="disableInputFields"
+                                [ngClass]="{  'input-disabled' : disableInputFields ,  'form-control': !disableInputFields}"
+                                type="text" [(ngModel)]="webhookName" name="webhookName">
                         </td>
                         <td>
                             <span class="infoText">Please input a logical Webhook Name to make it simplier to
                                 identify</span>
-
                         </td>
                     </tr>
-
-
-                    <tr class="mat-row">
-                        <td class="mat-cell" style="width:15%;padding: 0px 0px 0px 15px ;height: 60px;">
+                    <tr class="mat-row-webhook">
+                        <td class="mat-cell" class="columnName">
                             <span class="mainText">Select Tool</span>
                             <span style="color:#ff0000;">*</span>
-
                         </td>
-                        <td style="width: 10%">
-                            <div style="padding-top: 10px;margin-bottom: 10px;">
-
-                                <!--   <input type="text" [(ngModel)]="webhookName" (click)="toolNameenableSave()" name="webhookName"
-                                    style="width:250px;"> -->
-
-
-                                <mat-select [(ngModel)]="selectedTool" required name="selectedTool" class="form-control"
-                                    placeholder="Select Tool" style="width:230px;" color="primary">
-                                    <mat-option *ngFor=" let tool of toolsArr | keyvalue" value="{{tool.value}}">{{tool.value}}</mat-option>
-                                </mat-select>
-                            </div>
+                        <td class="columnComponent">
+                            <mat-select [(ngModel)]="selectedTool" required name="selectedTool" class="form-control"
+                                placeholder="Select Tool" color="primary">
+                                <mat-option *ngFor=" let tool of toolsArr | keyvalue" value="{{tool.value}}">
+                                    {{tool.value}}</mat-option>
+                            </mat-select>
                         </td>
                         <td>
                             <span class="infoText">Please select a Tool to Configure a Webhook </span>
                         </td>
                     </tr>
-
-
-
-
-
-                    <tr class="mat-row">
-                        <td class="mat-cell" style="width:15%;padding: 0px 0px 0px 15px ;height: 60px;">
+                    <tr class="mat-row-webhook">
+                        <td class="mat-cell" class="columnName">
                             <span class="mainText">Event to Subscribe</span>
                             <span style="color:#ff0000;">*</span>
-
                         </td>
-                        <td style="width: 10%">
-                            <div style="padding-top: 10px;margin-bottom: 10px;">
-
-                                <input type="text" [(ngModel)]="eventToSubscribe" (click)="toolNameenableSave()" name="eventToSubscribe"
-                                    style="width:250px; font-size: 15px !important;padding-left: 10px;">
-                            </div>
+                        <td class="columnComponent">
+                            <input type="text" class="form-control" [(ngModel)]="eventToSubscribe"
+                                name="eventToSubscribe">
                         </td>
                         <td>
                             <span class="infoText">Please Ensure that the <b>Event Name </b>is an <b>exact match
@@ -245,22 +202,18 @@
                                 <b>Producers Event</b> </span>
                         </td>
                     </tr>
-                    <tr class="mat-row">
-                        <td class="mat-cell" style="width:15%;padding: 0px 0px 0px 15px ;height: 60px;">
+                    <tr class="mat-row-webhook">
+                        <td class="mat-cell" class="columnName">
                             <span class="mainText">Data Format</span>
                             <span style="color:#ff0000;">*</span>
-
                         </td>
-                        <td style="width: 10%">
-                            <div style="padding-top: 10px;margin-bottom: 10px;">
-
-                                <mat-select [(ngModel)]="dataformat" required name="dataformat" class="form-control"
-                                    placeholder="Select Data Format" style="width:230px;" color="primary">
-                                    <mat-option *ngFor="let dataformat of dataformats" [value]="dataformat.value">
-                                        {{dataformat.viewValue}}
-                                    </mat-option>
-                                </mat-select>
-                            </div>
+                        <td class="columnComponent">
+                            <mat-select [(ngModel)]="dataformat" required name="dataformat" class="form-control"
+                                placeholder="Select Data Format" color="primary">
+                                <mat-option *ngFor="let dataformat of dataformats" [value]="dataformat.value">
+                                    {{dataformat.viewValue}}
+                                </mat-option>
+                            </mat-select>
                         </td>
                         <td>
                             <span class="infoText">Please select either a JSON file or Application\Application.txt
@@ -268,50 +221,32 @@
                                 as Data Format </span>
                         </td>
                     </tr>
-
-                    <tr class="mat-row">
-                        <td class="mat-cell" style="width:15%;padding: 0px 0px 0px 15px ;height: 60px;">
+                    <tr class="mat-row-webhook">
+                        <td class="mat-cell" class="columnName">
                             <span class="mainText">MQ Channel</span>
                             <span style="color:#ff0000;">*</span>
-
                         </td>
-                        <td style="width: 10%">
-                            <div style="padding-top: 10px;margin-bottom: 10px;">
-
-                                <input type="text" [(ngModel)]="mqchannel" (click)="toolNameenableSave()" name="mqchannel"
-                                    style="width:250px; font-size: 15px !important;padding-left: 10px;">
-                            </div>
+                        <td class="columnComponent">
+                            <input disabled class="input-disabled" type="text" [(ngModel)]="webhookName"
+                                name="mqchannel">
                         </td>
                         <td>
                             <span class="infoText">Please select a MQ Channel Name for pushing the Data </span>
                         </td>
                     </tr>
-
-
-
-
-                    <tr class="mat-row">
-                        <td class="mat-cell" style="width:15%;padding: 0px 0px 0px 15px ;height: 60px;">
+                    <tr class="mat-row-webhook">
+                        <td class="mat-cell" class="columnName">
                             <span class="mainText">Response Template</span>
                             <span style="color:#ff0000;">*</span>
-
                         </td>
-                        <td style="width: 10%">
-                            <div style="padding-top: 10px;margin-bottom: 10px;">
-
-                                <input [(ngModel)]="responseTemplate" name="responseTemplate" [ngClass]="form-control-label"
-                                    required>
-                            </div>
+                        <td class="columnComponent">
+                            <textarea [(ngModel)]="responseTemplate" name="responseTemplate" class="frmTxtarea"
+                                required></textarea>
                         </td>
                         <td>
                             <span class="infoText">Please select a MQ Channel Name for pushing the Data </span>
                         </td>
                     </tr>
-
-
                 </tbody>
             </table>
-
-
-
         </div>
