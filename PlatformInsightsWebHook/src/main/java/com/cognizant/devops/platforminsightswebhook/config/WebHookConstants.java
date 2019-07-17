@@ -19,4 +19,5 @@ public interface WebHookConstants {
 
 	public static final String REQUEST_PARAM_KEY_WEBHOOKNAME = "webHookName";
 	public static final String EXCHANGE_TYPE = "topic";
+	public static final String MQ_CHANNEL_PREFIX = "IPW_";
 }

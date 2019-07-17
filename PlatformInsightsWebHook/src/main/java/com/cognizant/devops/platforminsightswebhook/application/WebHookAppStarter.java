@@ -36,10 +36,5 @@ public class WebHookAppStarter {
 		LOG.debug(" Inside Webhook Message Publisher ... ");
     	ApplicationConfigCache.loadConfigCache();
 		ApplicationContext applicationContext = SpringApplication.run(WebHookAppStarter.class, args);
-		// SpringApplication.run(WebHookAppStarter.class, args);
-
-		/*for (String name : applicationContext.getBeanDefinitionNames()) {
-			System.out.println(" aa ==================== " + name);
-		}*/
-    }
+	}
 } 

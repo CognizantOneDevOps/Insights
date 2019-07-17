@@ -34,11 +34,10 @@ public class WebHookMessagePublisher {
 
 	private static Logger LOG = LogManager.getLogger(WebHookMessagePublisher.class);
 	private ConnectionFactory factory;
-	private Channel channel;
 	private Connection connection;
 	String exchangeName;
 	String routingKey;
-	Map<String, String> mqMappingMap = new HashMap<String, String>(0);
+	Map<String, Channel> mqMappingMap = new HashMap<String, Channel>(0);
 
 
 	public WebHookMessagePublisher() {
@@ -47,35 +46,44 @@ public class WebHookMessagePublisher {
 	}
 
 	public void initilizeMq() {
+		LOG.debug(" In initilizeMq ======== ");
 		try {
 			factory = new ConnectionFactory();
 			factory.setHost(ApplicationConfigProvider.getInstance().getMessageQueue().getHost());
 			factory.setUsername(ApplicationConfigProvider.getInstance().getMessageQueue().getUser());
 			factory.setPassword(ApplicationConfigProvider.getInstance().getMessageQueue().getPassword());
 			connection = factory.newConnection();
-			channel = connection.createChannel();
-			channel.exchangeDeclare(exchangeName, WebHookConstants.EXCHANGE_TYPE, true);
 		} catch (Exception e) {
 			LOG.error("Error while initilize mq " + e.getMessage());
 		}
 
 	}
 
-	public void publishEventAction(byte[] data, String webHookName) throws TimeoutException, IOException {
-		/*if (channel == null) {
-			initilizeMq();
-		}*/
-		if (channel != null) {
-			channel.queueDeclare(webHookName, true, false, false, null);
-			channel.queueBind(webHookName, exchangeName, webHookName);
-			channel.basicPublish(exchangeName, webHookName, null, data);
+	public void publishEventAction(byte[] data, String webHookMqChannelName) throws TimeoutException, IOException {
+
+		Channel channel;
+		if (mqMappingMap.containsKey(webHookMqChannelName)) {
+			channel = mqMappingMap.get(webHookMqChannelName);
+			channel.basicPublish(exchangeName, webHookMqChannelName, null, data);
+		} else {
+			channel = connection.createChannel();
+			channel.exchangeDeclare(exchangeName, WebHookConstants.EXCHANGE_TYPE, true);
+			channel.queueDeclare(webHookMqChannelName, true, false, false, null);
+			channel.queueBind(webHookMqChannelName, exchangeName, webHookMqChannelName);
+			mqMappingMap.put(webHookMqChannelName, channel);
 		}
 	}
 
 	public void releaseMqConnetion() {
 		try {
-			if (channel != null && connection != null) {
-				channel.close();
+			LOG.info(" In releaseMqConnetion ");
+			for (Map.Entry<String, Channel> entry : mqMappingMap.entrySet()) {
+				Channel channel = entry.getValue();
+				if (channel != null && connection != null) {
+					channel.close();
+				}
+			}
+			if (connection != null) {
 				connection.close();
 			}
 		} catch (IOException e) {
@@ -83,10 +91,7 @@ public class WebHookMessagePublisher {
 		} catch (TimeoutException e) {
 			LOG.error(e.getMessage());
 		} catch (Exception e) {
-			e.printStackTrace();
+			LOG.error(e.getMessage());
 		}
 	}
-
-
-
 }
