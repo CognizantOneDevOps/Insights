@@ -128,6 +128,17 @@ tr.mat-footer-row, tr.mat-row-webhook {
     transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
 }
 
+.frmTxtarea {
+    width: 90%;
+    height: 200px;
+    font-size: 14px;
+    padding-left: 2px;
+    border: 1px !important;
+    border-style: solid !important;
+    border-color: #9e9a9a !important;
+    border-bottom-color: #9e9a9a !important;
+}
+
 .mat-select-value{
     color: #9e9a9a;
 }
@@ -203,16 +214,7 @@ td.mat-cell{
     border-bottom-style: none;
 }
 
-.frmTxtarea {
-    width: 90%;
-    height: 200px;
-    font-size: 14px;
-    padding-left: 2px;
-    border: 1px !important;
-    border-style: solid !important;
-    border-color: #9e9a9a !important;
-    border-bottom-color: #9e9a9a !important;
-}
+
 
 .columnName {
     width: 15%;
@@ -221,6 +223,10 @@ td.mat-cell{
 
 .columnComponent{
     width: 40%;
+}
+
+.asteriskText{
+    color:#ff0000;
 }
 
 

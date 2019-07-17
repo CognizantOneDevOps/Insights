@@ -230,7 +230,6 @@ export class WebHookComponent implements OnInit {
         else if (selectedTool == "") {
             this.messageDialog.showApplicationsMessage("Please select a Tool ", "ERROR");
         }
-
         else if (eventToSubscribe == "") {
             this.messageDialog.showApplicationsMessage("Please select an Event to Subscribe ", "ERROR");
         }
@@ -242,23 +241,15 @@ export class WebHookComponent implements OnInit {
         }
         else if (responseTemplate == "") {
             this.messageDialog.showApplicationsMessage("Please enter Response Template ", "ERROR");
-        }
-
-
-        else {
-
-
-
+        } else {
             var checkname = this.regex.test(webhookName);
             if (!checkname) {
                 webhookName = undefined;
                 this.messageDialog.showApplicationsMessage("Please enter valid name, and it contains only alphanumeric character and underscore ", "ERROR");
             }
             else {
-
                 if (this.actionType == 'edit') {
                     var title = "Update " + webhookName;
-
                     var dialogmessage = " You have updated Webhook <b>" + webhookName + "</b> .Do you want continue? "
                     const dialogRef = this.messageDialog.showConfirmationMessage(title, dialogmessage, "", "ALERT", "40%");
 
@@ -338,7 +329,9 @@ export class WebHookComponent implements OnInit {
             this.selectedTool = this.selectedWebhook.toolName;
             this.eventToSubscribe = this.selectedWebhook.eventName
             this.mqchannel = this.selectedWebhook.mqChannel;
-            this.responseTemplate = this.selectedWebhook.responseTemplate;
+            if (this.selectedWebhook.responseTemplate != undefined) {
+                this.responseTemplate = this.selectedWebhook.responseTemplate;
+            }
             this.dataformat = this.selectedWebhook.dataFormat;
             if (this.selectedWebhook.subscribeStatus == 'Subscribed') {
                 this.statussubscribe = true;
@@ -372,5 +365,8 @@ export class WebHookComponent implements OnInit {
         if (this.showAddWebHook == false) {
             this.enableaddWebhook = true;
         }
+    }
+    changeMqChannel() {
+        this.mqchannel = this.webhookName;
     }
 }
