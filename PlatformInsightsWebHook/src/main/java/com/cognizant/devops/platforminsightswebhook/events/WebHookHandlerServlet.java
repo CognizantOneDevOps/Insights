@@ -91,7 +91,7 @@ public class WebHookHandlerServlet extends HttpServlet {
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		try {
-			LOG.debug("In do post ");
+			//LOG.debug("In do post ");
 			processRequest(request);
 		} catch (TimeoutException e) {
 			LOG.error(e.getMessage());
@@ -114,6 +114,7 @@ public class WebHookHandlerServlet extends HttpServlet {
 					.concat(dataWithReqParam.get(WebHookConstants.REQUEST_PARAM_KEY_WEBHOOKNAME).getAsString());
 			String res = dataWithReqParam.toString();
 			webhookmessagepublisher.publishEventAction(res.getBytes(), webHookMqChannelName);
+			LOG.debug(" Data successfully published in webhook name as " + webHookMqChannelName);
 		} else {
 			LOG.debug(" Request body is null ");
 		}
