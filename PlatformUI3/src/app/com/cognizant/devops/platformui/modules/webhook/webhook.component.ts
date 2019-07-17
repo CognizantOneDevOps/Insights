@@ -223,7 +223,7 @@ export class WebHookComponent implements OnInit {
     }
     saveData(webhookName, selectedTool, eventToSubscribe, dataformat, mqchannel, responseTemplate) {
         var self = this;
-
+        var webhookAPIRequestJson = {};
         if (webhookName == "") {
             this.messageDialog.showApplicationsMessage("Please select a Webhook Name ", "ERROR");
         }
@@ -256,7 +256,17 @@ export class WebHookComponent implements OnInit {
                     dialogRef.afterClosed().subscribe(result => {
                         if (result == 'yes') {
 
-                            this.webhookService.updateforWebHook(webhookName, selectedTool, eventToSubscribe, dataformat, mqchannel, this.statussubscribe, responseTemplate)
+
+                            webhookAPIRequestJson['toolName'] = self.selectedTool
+                            webhookAPIRequestJson['eventToSubscribe'] = self.eventToSubscribe
+                            webhookAPIRequestJson['webhookName'] = self.webhookName
+                            webhookAPIRequestJson['dataformat'] = self.dataformat
+                            webhookAPIRequestJson['mqchannel'] = self.mqchannel
+                            webhookAPIRequestJson['responseTemplate'] = self.responseTemplate
+                            webhookAPIRequestJson['statussubscribe'] = this.statussubscribe
+                            console.log(JSON.stringify(webhookAPIRequestJson))
+
+                            this.webhookService.updateforWebHook(JSON.stringify(webhookAPIRequestJson))
                                 .then(function (data) {
                                     console.log("WeBhook " + data.status);
                                     if (data.status == "success") {
@@ -279,7 +289,19 @@ export class WebHookComponent implements OnInit {
 
                     dialogRef.afterClosed().subscribe(result => {
                         if (result == 'yes') {
-                            this.webhookService.saveDataforWebHook(webhookName, selectedTool, eventToSubscribe, dataformat, mqchannel, false, responseTemplate)
+
+                            webhookAPIRequestJson['toolName'] = self.selectedTool
+                            webhookAPIRequestJson['eventToSubscribe'] = self.eventToSubscribe
+                            webhookAPIRequestJson['webhookName'] = self.webhookName
+                            webhookAPIRequestJson['dataformat'] = self.dataformat
+                            webhookAPIRequestJson['mqchannel'] = self.mqchannel
+                            webhookAPIRequestJson['responseTemplate'] = self.responseTemplate
+                            webhookAPIRequestJson['statussubscribe'] = false
+                            console.log(self.responseTemplate)
+                            console.log(JSON.stringify(webhookAPIRequestJson))
+
+
+                            this.webhookService.saveDataforWebHook(JSON.stringify(webhookAPIRequestJson))
                                 .then(function (response) {
                                     console.log("WeBhook " + response.status);
                                     if (response.status == "success") {
