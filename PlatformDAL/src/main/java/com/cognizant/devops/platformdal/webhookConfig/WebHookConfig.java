@@ -128,9 +128,4 @@ public class WebHookConfig {
 				+ responseTemplate + ", toolName=" + toolName + ", eventName=" + eventName + ", dataFormat="
 				+ dataFormat + ", mqChannel=" + mqChannel + ", webhookName=" + webhookName + "]";
 	}
-	
-
-	
-
-
 }
