@@ -44,9 +44,7 @@ public class WebHookController {
 
 	@RequestMapping(value = "/webhookConfiguration", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 	public @ResponseBody JsonObject saveSettingsConfiguration(@RequestBody String registerWebhookJson) {
-
 		try {
-
 			JsonParser parser = new JsonParser();
 			JsonObject registerWebhookjson = (JsonObject) parser.parse(registerWebhookJson);
 			String toolName = registerWebhookjson.get("toolName").getAsString();
@@ -58,14 +56,12 @@ public class WebHookController {
 			Boolean statussubscribe = registerWebhookjson.get("statussubscribe").getAsBoolean();
 			Boolean result = webhookConfigurationService.saveWebHookConfiguration(webhookName, toolName,
 					eventToSubscribe, dataformat, mqchannel, statussubscribe, responseTemplate);
-
 			return PlatformServiceUtil.buildSuccessResponse();
 		} catch (InsightsCustomException e) {
 			return PlatformServiceUtil.buildFailureResponse("Webhook name already exists.");
 		} catch (Exception e) {
 			return PlatformServiceUtil
 					.buildFailureResponse("Unable to save or update Setting Configuration for the request");
-
 		}
 	}
 
@@ -93,11 +89,7 @@ public class WebHookController {
 
 	@RequestMapping(value = "/updateWebhook", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 	public @ResponseBody JsonObject updateWebhook(@RequestBody String registerWebhookJson) {
-		// String message = null;
 		try {
-			
-			
-			
 			JsonParser parser = new JsonParser();
 			JsonObject registerWebhookjson = (JsonObject) parser.parse(registerWebhookJson);
 			String toolName = registerWebhookjson.get("toolName").getAsString();

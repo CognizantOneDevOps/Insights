@@ -2,14 +2,14 @@
  * Copyright 2017 Cognizant Technology Solutions
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
- * use this file except in compliance with the License.  You may obtain a copy
+ * use this file except in compliance with the License. You may obtain a copy
  * of the License at
  * 
- *   http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
  * License for the specific language governing permissions and limitations under
  * the License.
  ******************************************************************************/
@@ -31,25 +31,22 @@ import com.cognizant.devops.platformdal.webhookConfig.WebHookConfigDAL;
 public class WebHookService implements IWebHook {
 	private static final Logger log = LogManager.getLogger(WebHookService.class);
 	private static final String SUCCESS = "SUCCESS";
-	// @Override
 
+	@Override
 	public Boolean saveWebHookConfiguration(String webhookname, String toolName, String eventname, String dataformat,
-			String mqchannel, Boolean subscribestatus,String responseTemplate) throws InsightsCustomException {
-try {
-		WebHookConfig webHookConfig = populateWebHookConfiguration(webhookname, toolName, eventname, dataformat,
-				mqchannel, subscribestatus,responseTemplate);
-		WebHookConfigDAL webhookConfigurationDAL = new WebHookConfigDAL();
-		return webhookConfigurationDAL.saveWebHookConfiguration(webHookConfig);
+			String mqchannel, Boolean subscribestatus, String responseTemplate) throws InsightsCustomException {
+		try {
+			WebHookConfig webHookConfig = populateWebHookConfiguration(webhookname, toolName, eventname, dataformat,
+					mqchannel, subscribestatus, responseTemplate);
+			WebHookConfigDAL webhookConfigurationDAL = new WebHookConfigDAL();
+			return webhookConfigurationDAL.saveWebHookConfiguration(webHookConfig);
+		} catch (InsightsCustomException e) {
 
-	} catch(InsightsCustomException e) {
-		
-		throw new InsightsCustomException(e.getMessage());
-	} 
- catch(Exception e)
-  {
-	 throw new InsightsCustomException(e.getMessage());
-	  
-  }}
+			throw new InsightsCustomException(e.getMessage());
+		} catch (Exception e) {
+			throw new InsightsCustomException(e.getMessage());
+		}
+	}
 
 	public List<WebHookConfigTO> getRegisteredWebHooks() throws InsightsCustomException {
 		WebHookConfigDAL webhookConfigDAL = new WebHookConfigDAL();
@@ -76,10 +73,8 @@ try {
 	}
 
 	private WebHookConfig populateWebHookConfiguration(String webhookname, String toolName, String eventname,
-			String dataformat, String mqchannel, Boolean subscribestatus,String responseTemplate ) {
+			String dataformat, String mqchannel, Boolean subscribestatus, String responseTemplate) {
 		WebHookConfig webhookConfiguration = new WebHookConfig();
-
-		// String updatedSettingsJson = updateNextRunTimeValue(settingsJson);
 		webhookConfiguration.setDataFormat(dataformat);
 		webhookConfiguration.setEventName(eventname);
 		webhookConfiguration.setToolName(toolName);
@@ -92,7 +87,6 @@ try {
 
 	public String uninstallWebhook(String webhookname) throws InsightsCustomException {
 		try {
-
 			WebHookConfigDAL webhookConfigDAL = new WebHookConfigDAL();
 			webhookConfigDAL.deleteWebhookConfigurations(webhookname);
 		} catch (Exception e) {
@@ -104,21 +98,18 @@ try {
 	}
 
 	public Boolean updateWebHook(String webhookname, String toolName, String eventname, String dataformat,
-			String mqchannel, Boolean subscribestatus,String responseTemplate) throws InsightsCustomException {
+			String mqchannel, Boolean subscribestatus, String responseTemplate) throws InsightsCustomException {
 		//Boolean status;
 		try {
-
-		WebHookConfig webHookConfig = populateWebHookConfiguration(webhookname, toolName, eventname, dataformat,
-					mqchannel, subscribestatus,responseTemplate);
+			WebHookConfig webHookConfig = populateWebHookConfiguration(webhookname, toolName, eventname, dataformat,
+					mqchannel, subscribestatus, responseTemplate);
 			WebHookConfigDAL webhookConfigurationDAL = new WebHookConfigDAL();
-		//	log.error(status);
+			//	log.error(status);
 			return webhookConfigurationDAL.updateWebHookConfiguration(webHookConfig);
 		} catch (Exception e) {
 			log.error("Error updating the webhook", e);
 			throw new InsightsCustomException(e.toString());
 		}
-
-		
 	}
 
 }

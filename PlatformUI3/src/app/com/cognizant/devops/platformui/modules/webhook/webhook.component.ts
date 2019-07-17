@@ -70,6 +70,7 @@ export class WebHookComponent implements OnInit {
     enableaddWebhook: boolean = true;
     disableInputFields: boolean = false;
     refreshRadio: boolean = false;
+    mqChannelPrefix = "IPW_";
     regex = new RegExp("^[a-zA-Z0-9_]*$");
     @ViewChild(MatPaginator) paginator: MatPaginator;
     dataformats: DataType[] = [
@@ -255,8 +256,6 @@ export class WebHookComponent implements OnInit {
 
                     dialogRef.afterClosed().subscribe(result => {
                         if (result == 'yes') {
-
-
                             webhookAPIRequestJson['toolName'] = self.selectedTool
                             webhookAPIRequestJson['eventToSubscribe'] = self.eventToSubscribe
                             webhookAPIRequestJson['webhookName'] = self.webhookName
@@ -265,14 +264,11 @@ export class WebHookComponent implements OnInit {
                             webhookAPIRequestJson['responseTemplate'] = self.responseTemplate
                             webhookAPIRequestJson['statussubscribe'] = this.statussubscribe
                             console.log(JSON.stringify(webhookAPIRequestJson))
-
                             this.webhookService.updateforWebHook(JSON.stringify(webhookAPIRequestJson))
                                 .then(function (data) {
                                     console.log("WeBhook " + data.status);
                                     if (data.status == "success") {
-
                                         self.messageDialog.showApplicationsMessage("Changes made to <b>" + webhookName + "</b> are saved successfully.", "SUCCESS");
-
                                         self.list();
                                         self.radioRefresh = false;
                                     } else {
@@ -286,10 +282,8 @@ export class WebHookComponent implements OnInit {
                     var title = "Save " + webhookName;
                     var dialogmessage = " You have created a new Webhook <b>" + webhookName + "</b> .Do you want continue? "
                     const dialogRef = this.messageDialog.showConfirmationMessage(title, dialogmessage, "", "ALERT", "40%");
-
                     dialogRef.afterClosed().subscribe(result => {
                         if (result == 'yes') {
-
                             webhookAPIRequestJson['toolName'] = self.selectedTool
                             webhookAPIRequestJson['eventToSubscribe'] = self.eventToSubscribe
                             webhookAPIRequestJson['webhookName'] = self.webhookName
@@ -299,8 +293,6 @@ export class WebHookComponent implements OnInit {
                             webhookAPIRequestJson['statussubscribe'] = false
                             console.log(self.responseTemplate)
                             console.log(JSON.stringify(webhookAPIRequestJson))
-
-
                             this.webhookService.saveDataforWebHook(JSON.stringify(webhookAPIRequestJson))
                                 .then(function (response) {
                                     console.log("WeBhook " + response.status);
@@ -389,6 +381,6 @@ export class WebHookComponent implements OnInit {
         }
     }
     changeMqChannel() {
-        this.mqchannel = this.webhookName;
+        this.mqchannel = this.mqChannelPrefix + this.webhookName;
     }
 }

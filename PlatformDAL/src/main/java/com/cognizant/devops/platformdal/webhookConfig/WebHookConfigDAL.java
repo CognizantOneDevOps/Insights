@@ -25,7 +25,7 @@ import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformdal.core.BaseDAL;
 
 
-public class WebHookConfigDAL  extends BaseDAL{
+public class WebHookConfigDAL extends BaseDAL {
 	private static final Logger log = LogManager.getLogger(	WebHookConfigDAL.class);
 	public Boolean updateWebHookConfiguration(WebHookConfig webhookConfiguration) {
 		log.error("webhookConfiguration");
@@ -61,10 +61,7 @@ public class WebHookConfigDAL  extends BaseDAL{
 		terminateSessionFactory();
 		return Boolean.TRUE;
 	}
-	
-	
-	
-	
+
 	public Boolean saveWebHookConfiguration(WebHookConfig webhookConfiguration) throws InsightsCustomException {
 		log.error("webhookConfiguration");
 		log.error(webhookConfiguration.getDataFormat());
@@ -79,7 +76,6 @@ public class WebHookConfigDAL  extends BaseDAL{
 		if(resultList != null && !resultList.isEmpty()){
 			webhookConfig = resultList.get(0);
 		}
-		
 		getSession().beginTransaction();
 		if (webhookConfig != null) {
 			
@@ -94,7 +90,6 @@ public class WebHookConfigDAL  extends BaseDAL{
 		return Boolean.TRUE;
 	}
 	
-	
 	public List<WebHookConfig> getAllWebHookConfigurations() {
 		Query<WebHookConfig> createQuery = getSession().createQuery("FROM WebHookConfig WH", WebHookConfig.class);
 		List<WebHookConfig> result = createQuery.getResultList();
@@ -102,10 +97,6 @@ public class WebHookConfigDAL  extends BaseDAL{
 		terminateSessionFactory();
 		return result;
 	}
-	
-	
-	
-	
 	
 	public WebHookConfig loadWebHookConfiguration(String webhookName) {
 		Query<WebHookConfig> loadQuery = getSession().createQuery("FROM WebHookConfig SC WHERE SC.webhookName = :webhookName", WebHookConfig.class);
@@ -119,7 +110,6 @@ public class WebHookConfigDAL  extends BaseDAL{
 		terminateSessionFactory();
 		return webhookConfiguration;
 	}
-	
 	
 	public List<WebHookConfig> deleteWebhookConfigurations(String webhookName) {
 		Query<WebHookConfig> createQuery = getSession().createQuery(
