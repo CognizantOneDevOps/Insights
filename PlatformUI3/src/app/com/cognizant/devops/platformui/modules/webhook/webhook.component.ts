@@ -189,10 +189,19 @@ export class WebHookComponent implements OnInit {
         }
     }
     actionSubscribeOrUnsubscribe(status, selectedWebhook) {
+        var webhookAPIRequestJson = {};
+        webhookAPIRequestJson['toolName'] = this.selectedWebhook.toolName
+        webhookAPIRequestJson['eventToSubscribe'] = this.selectedWebhook.eventName
+        webhookAPIRequestJson['webhookName'] = this.selectedWebhook.webhookName,
+            webhookAPIRequestJson['dataformat'] = this.selectedWebhook.dataFormat
+        webhookAPIRequestJson['mqchannel'] = this.selectedWebhook.mqChannel
+        webhookAPIRequestJson['responseTemplate'] = this.selectedWebhook.responseTemplate
+
         var self = this;
         if (status == true) {
+            webhookAPIRequestJson['statussubscribe'] = true
             this.statussubscribe = true;
-            this.webhookService.updateforWebHook(this.selectedWebhook.webhookName, this.selectedWebhook.toolName, this.selectedWebhook.eventName, this.selectedWebhook.dataFormat, this.selectedWebhook.mqChannel, this.statussubscribe, this.selectedTool.responseTemplate)
+            this.webhookService.updateforWebHook(JSON.stringify(webhookAPIRequestJson))
                 .then(function (data) {
                     //  console.log("WeBhook " + data);
                     if (data.status == "success") {
@@ -208,7 +217,8 @@ export class WebHookComponent implements OnInit {
         }
         else {
             this.statussubscribe = false;
-            this.webhookService.updateforWebHook(this.selectedWebhook.webhookName, this.selectedWebhook.toolName, this.selectedWebhook.eventName, this.selectedWebhook.dataFormat, this.selectedWebhook.mqChannel, this.statussubscribe, this.selectedTool.responseTemplate)
+            webhookAPIRequestJson['statussubscribe'] = false;
+            this.webhookService.updateforWebHook(JSON.stringify(webhookAPIRequestJson))
                 .then(function (data) {
                     // console.log("WeBhook " + data);
                     if (data.status == "success") {
