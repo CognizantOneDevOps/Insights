@@ -116,8 +116,8 @@ public class MockServerImpl {
 			
 			String mockFileName = currFile.getName();
 			String fileExtension = mockFileName.substring(mockFileName.lastIndexOf(".")); 
-			if(fileExtension.equals(".json")) {
-				System.out.println(mockFileName + "is not a json file");
+			if(!fileExtension.equals(".json")) {
+				System.out.println(mockFileName + " is not a json file");
 				continue;
 			}
 			
