@@ -48,21 +48,18 @@
                 <mat-icon svgIcon="webhook" title="List Existing WebHooks" class="mat-icon material-icons">
                 </mat-icon>
             </button>
-            <button [disabled]="!enablesubscribe" mat-icon-button
-                (click)="actionSubscribeOrUnsubscribe( true,selectedWebhook)">
+            <button [disabled]="!enablesubscribe" mat-icon-button (click)="actionSubscribeOrUnsubscribe( true,selectedWebhook)">
                 <mat-icon title="Subscribe" class="mat-icon material-icons">
                     rss_feed
                 </mat-icon>
             </button>
 
-            <button [disabled]="!enableunsubscribe" *ngIf="!enableunsubscribe" mat-icon-button
-                (click)="actionSubscribeOrUnsubscribe( false,selectedWebhook)">
+            <button [disabled]="!enableunsubscribe" *ngIf="!enableunsubscribe" mat-icon-button (click)="actionSubscribeOrUnsubscribe( false,selectedWebhook)">
                 <mat-icon class="svgIconCss" title="Unsubscribe" svgIcon="unsubscribe_webhookDeactive">
                 </mat-icon>
             </button>
 
-            <button *ngIf="enableunsubscribe" mat-icon-button
-                (click)="actionSubscribeOrUnsubscribe( false,selectedWebhook)">
+            <button *ngIf="enableunsubscribe" mat-icon-button (click)="actionSubscribeOrUnsubscribe( false,selectedWebhook)">
                 <mat-icon class="svgIconCss" title="Unsubscribe" svgIcon="unsubscribe_webhook">
                 </mat-icon>
             </button>
@@ -71,8 +68,7 @@
                     edit
                 </mat-icon>
             </button>
-            <button [disabled]="!showAddWebHook" mat-icon-button
-                (click)="saveData(webhookName, selectedTool, eventToSubscribe, dataformat, mqchannel,responseTemplate)">
+            <button [disabled]="!showAddWebHook" mat-icon-button (click)="saveData(webhookName, selectedTool, eventToSubscribe, dataformat, mqchannel,responseTemplate)">
                 <mat-icon title="Save" class="mat-icon material-icons">
                     save
                 </mat-icon>
@@ -91,14 +87,12 @@
 
         <div *ngIf="showWebhook">
             <mat-radio-group [(ngModel)]="selectedWebhook">
-                <table mat-table [dataSource]="webhookDatasource" class="mat-elevation-z8"
-                    style="margin-top:2% !important">
+                <table mat-table [dataSource]="webhookDatasource" class="mat-elevation-z8" style="margin-top:2% !important">
                     <!-- Radio Button Column -->
                     <ng-container matColumnDef="radio">
                         <th mat-header-cell *matHeaderCellDef class="tableHeaderCss"></th>
                         <td mat-cell *matCellDef="let element " style="width:5% !important">
-                            <mat-radio-button [value]="element" [checked]="refreshRadio" color="primary"
-                                (click)="enableButtons(element)"></mat-radio-button>
+                            <mat-radio-button [value]="element" [checked]="refreshRadio" color="primary" (click)="enableButtons(element)"></mat-radio-button>
                         </td>
                     </ng-container>
                     <ng-container matColumnDef="WebHookName">
@@ -144,8 +138,7 @@
             <table class="mat-elevation-z8 mat-table">
                 <thead>
                     <tr class="mat-header-row" layout-align="start start">
-                        <th colspan="3" class="tableHeaderCss mat-header-cell"
-                            style="height:40px;border-radius: 10px 10px 0 0;padding-left: 15px;padding-right: 65px">
+                        <th colspan="3" class="tableHeaderCss mat-header-cell" style="height:40px;border-radius: 10px 10px 0 0;padding-left: 15px;padding-right: 65px">
                             <span class="mainHeaderText">Add details to Configure a Webhook</span>
                             <span class="infoHeaderText">(Please provide accurate details to Configure a Webhook.
                                 Fields marked "*" are mandatory)
@@ -160,10 +153,8 @@
                             <span style="color:#ff0000;">*</span>
                         </td>
                         <td class="columnComponent">
-                            <input maxlength="40" [disabled]="disableInputFields"
-                                [ngClass]="{'input-disabled' : disableInputFields ,  'form-control': !disableInputFields}"
-                                type="text" [(ngModel)]="webhookName" name="webhookName"
-                                (ngModelChange)="changeMqChannel()">
+                            <input maxlength="40" [disabled]="disableInputFields" [ngClass]="{'input-disabled' : disableInputFields ,  'form-control': !disableInputFields}"
+                                type="text" [(ngModel)]="webhookName" name="webhookName" (ngModelChange)="changeMqChannel()">
                         </td>
                         <td>
                             <span class="infoText">Please input a logical Webhook Name to make it simplier to
@@ -192,8 +183,7 @@
                             <span class="asteriskText">*</span>
                         </td>
                         <td class="columnComponent">
-                            <input type="text" class="form-control" [(ngModel)]="eventToSubscribe"
-                                name="eventToSubscribe">
+                            <input maxlength="40" type="text" class="form-control" [(ngModel)]="eventToSubscribe" name="eventToSubscribe">
                         </td>
                         <td>
                             <span class="infoText">Please Ensure that the <b>Event Name </b>is an <b>exact match
