@@ -12,47 +12,47 @@
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
  * License for the specific language governing permissions and limitations under
  * the License.
- ******************************************************************************//*
-package com.cognizant.devops.platformservice.rest.health;
+ ******************************************************************************/
+package com.cognizant.devops.platformservice.test.health;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import org.testng.annotations.Test;
+import org.testng.Assert;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
 
-
-import org.junit.Test;
-
-import com.cognizant.devops.platformservice.rest.utility.ServiceTestConstants;
-import com.cognizant.devops.platformservice.rest.utility.ServiceTestUtilities;
+import com.cognizant.devops.platformservice.test.utility.ServiceTestConstants;
+import com.cognizant.devops.platformservice.test.utility.ServiceTestUtilities;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
-
-public class AgentHealthServiceTest  {
+@Test
+@ContextConfiguration(locations = { "classpath:spring-test-config.xml" })
+public class AgentHealthServiceTest extends AbstractTestNGSpringContextTests {
 	
   
-    
-    @Test //Test to load all Agents Health
-    public void testLoadAllAgentsHealth() {//succesful API call
+  
+    @Test (priority = 1)//Test to load all Agents Health
+    public void  testLoadAllAgentsHealth() {//succesful API call
     	String requestPath = "/agent/globalHealth";
         JsonObject jsonObj = ServiceTestUtilities.makeServiceRequest(requestPath,ServiceTestConstants.GET_REQUEST,null);
         JsonObject obj= (JsonObject) jsonObj.get("data");  
         JsonArray jsonDataArry = (JsonArray) obj.get("nodes");  
-    	assertEquals("Should return SUCCESS(API call)","success",jsonObj.get("status").getAsString());
-        assertNotNull(jsonDataArry);//Returns list of nodes
+        Assert.assertEquals("Should return SUCCESS(API call)","success",jsonObj.get("status").getAsString());
+        Assert.assertNotNull(jsonDataArry);//Returns list of nodes
     }
     
 
-    @Test //Test to check Health details of Individual Agent
+    @Test (priority = 2) //Test to check Health details of Individual Agent
     public void testLoadAgentsHealth() {//succesful API call
     	String requestPath = "/agent/health?category=CI&tool=JENKINS";
         JsonObject jsonObj = ServiceTestUtilities.makeServiceRequest(requestPath,ServiceTestConstants.GET_REQUEST,null);
         JsonObject obj= (JsonObject) jsonObj.get("data");  
         JsonArray jsonDataArry = (JsonArray) obj.get("nodes");  
-    	assertEquals("Should return SUCCESS(API call)","success",jsonObj.get("status").getAsString());
-        assertNotNull(jsonDataArry);//Returns list of nodes
+    	Assert.assertEquals("Should return SUCCESS(API call)","success",jsonObj.get("status").getAsString());
+    	Assert.assertNotNull(jsonDataArry);//Returns list of nodes
     }
     
-    @Test //Test to check Health details of Individual Agent when Category or Tool Name is entered wrong
+    /*@Test //Test to check Health details of Individual Agent when Category or Tool Name is entered wrong
     public void testLoadAgentsHealthWrong() {//succesful API call
     	String requestPath = "/agent/health?category=xyz&tool=JENKINS";
         JsonObject jsonObj = ServiceTestUtilities.makeServiceRequest(requestPath,ServiceTestConstants.GET_REQUEST,null);
@@ -85,7 +85,6 @@ public class AgentHealthServiceTest  {
     	String requestPath = "/agent/health?category=xyz&tool=JENKINS";
         JsonObject jsonObj = ServiceTestUtilities.makeServiceRequest(requestPath,ServiceTestConstants.POST_REQUEST,null);
         assertEquals("Should return failure","failure",jsonObj.get("status").getAsString());
-    }
+    }*/
 
 }
-*/
