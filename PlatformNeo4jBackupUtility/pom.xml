@@ -157,6 +157,12 @@
 										<include>neo4j.properties</include>
 									</includes>
 								</resource>
+								<resource>
+									<directory>.</directory>
+									<includes>
+										<include>neo4j.properties</include>
+									</includes>
+								</resource>
 							</resources>
 						</configuration>
 					</execution>
