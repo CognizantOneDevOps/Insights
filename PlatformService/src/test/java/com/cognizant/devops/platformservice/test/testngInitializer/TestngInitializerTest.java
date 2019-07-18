@@ -7,6 +7,7 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
 import org.springframework.test.context.web.WebAppConfiguration;
+import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 
 import com.cognizant.devops.platformcommons.config.ApplicationConfigCache;
@@ -18,7 +19,7 @@ public class TestngInitializerTest extends AbstractTestNGSpringContextTests{
 	
 	static Logger log = LogManager.getLogger(TestngInitializerTest.class);
 	
-	@Test()
+	@BeforeTest
 	public void testOnStartup() throws ServletException {
 		ApplicationConfigCache.loadConfigCache();
 		System.out.println("Testng initializer class to load Config Cache");
