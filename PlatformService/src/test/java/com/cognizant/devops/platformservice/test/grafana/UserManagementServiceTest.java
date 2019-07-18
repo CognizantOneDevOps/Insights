@@ -12,32 +12,35 @@
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
  * License for the specific language governing permissions and limitations under
  * the License.
- ******************************************************************************//*
-package com.cognizant.devops.platformservice.rest.grafana;
+ ******************************************************************************/
+package com.cognizant.devops.platformservice.test.grafana;
 
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
+import org.testng.Assert;
+import org.testng.annotations.Test;
 
-import org.junit.Test;
-
-
-import com.cognizant.devops.platformservice.rest.utility.ServiceTestConstants;
-import com.cognizant.devops.platformservice.rest.utility.ServiceTestUtilities;
+import com.cognizant.devops.platformservice.test.utility.ServiceTestConstants;
+import com.cognizant.devops.platformservice.test.utility.ServiceTestUtilities;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
-public class UserManagementServiceTest  {
+@Test
+@ContextConfiguration(locations = { "classpath:spring-test-config.xml" })
+public class UserManagementServiceTest extends AbstractTestNGSpringContextTests {
 	
-  
-    
+	//@Autowired
+	//ServiceTestUtilities serviceTestUtilities;
+	
     @Test //When all the users are fetched successfully
     public void testGetAllUsers() {//succesful API call
     	String requestPath = "/userMgmt/getAllUsers";
         JsonObject jsonObj = ServiceTestUtilities.makeServiceRequest(requestPath,ServiceTestConstants.GET_REQUEST,null);
         JsonArray jsonDataArry = (JsonArray) jsonObj.get("data");  
-    	assertEquals("Should return SUCCESS(API call) with Users data","success",jsonObj.get("status").getAsString());
-        assertNotNull(jsonDataArry);//Returns list of Users(NOT NULL)
+    	Assert.assertEquals("Should return SUCCESS(API call) with Users data","success",jsonObj.get("status").getAsString());
+    	Assert.assertNotNull(jsonDataArry);//Returns list of Users(NOT NULL)
     }
     
     @Test //When all the Organization names are fetched successfully
@@ -45,11 +48,11 @@ public class UserManagementServiceTest  {
     	String requestPath = "/userMgmt/getOrgs";
         JsonObject jsonObj = ServiceTestUtilities.makeServiceRequest(requestPath,ServiceTestConstants.GET_REQUEST,null);
         JsonArray jsonDataArry = (JsonArray) jsonObj.get("data");  
-    	assertEquals("Should return SUCCESS(API call) with Organizations","success",jsonObj.get("status").getAsString());
-        assertNotNull(jsonDataArry);//Returns list of Organizations (NOT NULL)
+        Assert.assertEquals("Should return SUCCESS(API call) with Organizations","success",jsonObj.get("status").getAsString());
+        Assert.assertNotNull(jsonDataArry);//Returns list of Organizations (NOT NULL)
     }
     
-    
+    /*
     @Test //When user details are fetched successfully(Returns User details)
     public void testGetUser() {//succesful API call
     	String requestPath = "/userMgmt/getUser";
@@ -97,6 +100,5 @@ public class UserManagementServiceTest  {
     	String requestPath = "/userMgmt/getCurrentUserOrgs";
         JsonObject jsonObj = ServiceTestUtilities.makeServiceRequest(requestPath,ServiceTestConstants.POST_REQUEST,null);
         assertEquals("Should return failure","failure",jsonObj.get("status").getAsString());
-    }
+    }*/
 }
-*/

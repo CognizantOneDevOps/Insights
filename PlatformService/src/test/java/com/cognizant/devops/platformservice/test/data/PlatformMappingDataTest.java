@@ -12,8 +12,8 @@
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
  * License for the specific language governing permissions and limitations under
  * the License.
- ******************************************************************************//*
-package com.cognizant.devops.platformservice.rest.data;
+ ******************************************************************************/
+package com.cognizant.devops.platformservice.test.data;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -21,8 +21,8 @@ import static org.junit.Assert.assertNotNull;
 import org.junit.Test;
 
 
-import com.cognizant.devops.platformservice.rest.utility.ServiceTestConstants;
-import com.cognizant.devops.platformservice.rest.utility.ServiceTestUtilities;
+import com.cognizant.devops.platformservice.test.utility.ServiceTestConstants;
+import com.cognizant.devops.platformservice.test.utility.ServiceTestUtilities;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
@@ -128,4 +128,3 @@ public class PlatformMappingDataTest {
         assertEquals("Should return failure","failure",jsonObj.get("status").getAsString());
     }
 }
-*/
