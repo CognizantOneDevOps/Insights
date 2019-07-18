@@ -211,11 +211,11 @@ export class CustomReportConfigComponent implements OnInit {
   }
 
 
-  downloadFile() {
+  downloadFile(queryForm) {
     console.log(this.receivedParam);
     this.queryBuilderService.downloadFile(this.receivedParam.data.querypath).subscribe((data) => {
       console.log(data);
-      importedSaveAs(data);
+      importedSaveAs(data, queryForm.get('queryPath').value);
     },
     error => {
       console.log(error);

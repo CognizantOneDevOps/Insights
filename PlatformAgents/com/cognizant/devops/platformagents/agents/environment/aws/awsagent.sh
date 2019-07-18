@@ -27,6 +27,21 @@
 ### END INIT INFO
 #export INSIGHTS_AGENT_HOME=/home/ec2-user/insightsagents
 source /etc/profile
+python_version="$(python -V 2>&1)"
+detectPythonVersion()
+{
+     if echo "$1" | grep -q "Python 2"; then
+      echo "Detected python 2 version";
+      python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.environment.aws.AwsAgent import AwsAgent; AwsAgent()" &
+     elif echo "$1" | grep -q "Python 3"; then
+      echo "Detected python 3 version";
+      python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.environment.aws.AwsAgent3 import AwsAgent; AwsAgent()" &
+     else
+      echo "python version not supported"
+      exit 1;
+     fi
+
+}
 
 case "$1" in
   start)
@@ -35,7 +50,8 @@ case "$1" in
     else
      echo "Starting InSightsAwsAgent"
      cd $INSIGHTS_AGENT_HOME/PlatformAgents/aws
-     python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.environment.aws.AwsAgent import AwsAgent; AwsAgent()" &
+     echo $python_version
+     detectPythonVersion "$python_version"
     fi
     if [[ $(ps aux | grep '__PS_KEY__' | awk '{print $2}') ]]; then
      echo "InSightsAwsAgent Started Sucessfully"
@@ -64,13 +80,15 @@ case "$1" in
      echo "InSightsAwsAgent stopped"
      echo "InSightsAwsAgent starting"
      cd $INSIGHTS_AGENT_HOME/PlatformAgents/aws
-     python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.environment.aws.AwsAgent import AwsAgent; AwsAgent()" &
+     echo $python_version
+     detectPythonVersion "$python_version"
      echo "InSightsAwsAgent started"
     else
      echo "InSightsAwsAgent already in stopped state"
      echo "InSightsAwsAgent starting"
      cd $INSIGHTS_AGENT_HOME/PlatformAgents/aws
-     python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.environment.aws.AwsAgent import AwsAgent; AwsAgent()" &
+     echo $python_version
+     detectPythonVersion "$python_version"
      echo "InSightsAwsAgent started"
     fi
     ;;
