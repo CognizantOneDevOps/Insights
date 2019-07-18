@@ -30,6 +30,8 @@ public class MockRequest {
 	
 	private List<JsonObject> response;
 	
+	private  boolean isResponseJson;
+	
 	private Map<String,String> parameters;  
 
 	/**
@@ -61,6 +63,20 @@ public class MockRequest {
 	}
 
 	/**
+	 * @return the isResponseJson
+	 */
+	public boolean isResponseJson() {
+		return isResponseJson;
+	}
+
+	/**
+	 * @param isResponseJson the isResponseJson to set
+	 */
+	public void setResponseJson(boolean isResponseJson) {
+		this.isResponseJson = isResponseJson;
+	}
+
+	/**
 	 * @return the parameters
 	 */
 	public Map<String, String> getParameters() {
@@ -73,5 +89,4 @@ public class MockRequest {
 	public void setParameters(Map<String, String> parameters) {
 		this.parameters = parameters;
 	}
-	
 }
