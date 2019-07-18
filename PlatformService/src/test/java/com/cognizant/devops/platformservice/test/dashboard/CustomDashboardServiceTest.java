@@ -1,4 +1,3 @@
-package com.cognizant.devops.platformservice.test.dashboard;
 /*******************************************************************************
  * Copyright 2017 Cognizant Technology Solutions
  * 
@@ -13,8 +12,8 @@ package com.cognizant.devops.platformservice.test.dashboard;
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
  * License for the specific language governing permissions and limitations under
  * the License.
- ******************************************************************************//*
-package com.cognizant.devops.platformservice.rest.dashboard;
+ ******************************************************************************/
+package com.cognizant.devops.platformservice.test.dashboard;
 
 
 import static org.junit.Assert.assertEquals;
@@ -24,8 +23,8 @@ import static org.junit.Assert.assertNotEquals;
 import org.junit.Test;
 
 
-import com.cognizant.devops.platformservice.rest.utility.ServiceTestConstants;
-import com.cognizant.devops.platformservice.rest.utility.ServiceTestUtilities;
+import com.cognizant.devops.platformservice.test.utility.ServiceTestConstants;
+import com.cognizant.devops.platformservice.test.utility.ServiceTestUtilities;
 import com.google.gson.JsonObject;
 
 public class CustomDashboardServiceTest {
@@ -93,4 +92,3 @@ public class CustomDashboardServiceTest {
         assertEquals("Should return FAILURE","failure",jsonObj.get("status").getAsString());    }
     
 }
-*/
