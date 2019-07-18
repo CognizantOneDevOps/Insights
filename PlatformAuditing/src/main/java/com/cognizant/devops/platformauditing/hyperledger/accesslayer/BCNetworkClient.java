@@ -1,12 +1,27 @@
+/*******************************************************************************
+ * Copyright 2017 Cognizant Technology Solutions
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License.  You may obtain a copy
+ * of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ ******************************************************************************/
 package com.cognizant.devops.platformauditing.hyperledger.accesslayer;
 
 import com.cognizant.devops.platformauditing.commons.ChainCodeMethods;
-import com.cognizant.devops.platformauditing.hyperledger.user.UserUtil;
-import com.cognizant.devops.platformauditing.util.LoadFile;
-import com.cognizant.devops.platformauditing.hyperledger.client.CAClient;
+import com.cognizant.devops.platformauditing.hyperledger.client.CertificationAuthorityClient;
 import com.cognizant.devops.platformauditing.hyperledger.events.BlockEventCapture;
 import com.cognizant.devops.platformauditing.hyperledger.events.ChaincodeEventCapture;
-import com.cognizant.devops.platformauditing.hyperledger.user.UserContext;
+import com.cognizant.devops.platformauditing.hyperledger.user.BCUserContext;
+import com.cognizant.devops.platformauditing.hyperledger.user.UserUtil;
+import com.cognizant.devops.platformauditing.util.LoadFile;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import org.apache.logging.log4j.LogManager;
@@ -17,7 +32,6 @@ import org.hyperledger.fabric.sdk.exception.InvalidArgumentException;
 import org.hyperledger.fabric.sdk.exception.ProposalException;
 import org.hyperledger.fabric.sdk.exception.TransactionException;
 import org.hyperledger.fabric.sdk.security.CryptoSuite;
-import org.hyperledger.fabric_ca.sdk.HFCAClient;
 
 import java.io.File;
 import java.nio.file.Files;
@@ -36,12 +50,12 @@ public class BCNetworkClient {
     private static final String EXPECTED_EVENT_NAME = "InstantiateSuccess";
     private static final Logger LOG = LogManager.getLogger(BCNetworkClient.class);
     private static HFClient client = null;
-    private static HFCAClient hfcaClient = null;
     private static Channel channel = null;
-    private static UserContext userContext = null;
+    private static BCUserContext BCUserContext = null;
     private static JsonObject Config;
     private static volatile BCNetworkClient bcNetworkClient;
     private static boolean TLSEnabled;
+
     static {
         try {
             Config = LoadFile.getConfig();
@@ -55,22 +69,21 @@ public class BCNetworkClient {
         UserUtil.cleanUp();
         TLSEnabled = Config.get("TLS_ENABLED").getAsBoolean();
         //get user context
-        if(TLSEnabled) {
+        if (TLSEnabled) {
             Properties properties = new Properties();
             Path certpath = Paths.get(Config.get("USER_CA_TLSCERT").getAsString());
             properties.put("pemBytes", Files.readAllBytes(certpath));
-            userContext = new CAClient(Config.get("CA_URL").getAsString(), properties).getUserContext(Config.get("USER_NAME").getAsString());
-        }
-        else
-            userContext = new CAClient(Config.get("CA_URL").getAsString(), null).getUserContext(Config.get("USER_NAME").getAsString());
-        LOG.debug(userContext.getName());
+            BCUserContext = new CertificationAuthorityClient(Config.get("CA_URL").getAsString(), properties).getUserContext(Config.get("USER_NAME").getAsString());
+        } else
+            BCUserContext = new CertificationAuthorityClient(Config.get("CA_URL").getAsString(), null).getUserContext(Config.get("USER_NAME").getAsString());
+        LOG.debug(BCUserContext.getName());
 
         client = HFClient.createNewInstance();
         //set crypto suite
         CryptoSuite cryptoSuite = CryptoSuite.Factory.getCryptoSuite();
         client.setCryptoSuite(cryptoSuite);
         // set user context
-        client.setUserContext(userContext);
+        client.setUserContext(BCUserContext);
         // get HFC channel using the client
         channel = createChannel();
         channel.initialize();
@@ -83,13 +96,6 @@ public class BCNetworkClient {
 
     /**
      * Query Blockchain for a date range
-     * <p>
-     * <p>
-     * The HF Client
-     *
-     * @throws ProposalException
-     * @throws InvalidArgumentException
-     * @throws TransactionException
      */
     public String getAllAssetsByDates(String[] queryArgs)
             throws ProposalException, InvalidArgumentException {
@@ -98,24 +104,22 @@ public class BCNetworkClient {
 
     /**
      * Query Blockchain for an asset Id
-     * <p>
-     * <p>
-     * The HF Client
-     *
-     * @throws ProposalException
-     * @throws InvalidArgumentException
-     * @throws TransactionException
      */
     public String getAssetDetails(String[] queryArgs)
             throws ProposalException, InvalidArgumentException {
         return queryBlockChain(ChainCodeMethods.GETASSETDETAILS, queryArgs);
     }
 
+    /**
+     * Query Blockchain for an asset history
+     */
     public String getAssetHistory(String[] queryArgs)
             throws ProposalException, InvalidArgumentException {
         return queryBlockChain(ChainCodeMethods.GETASSETHISTORY, queryArgs);
     }
-
+    /**
+     * Invoke Blockchain for creating a record
+     */
     public JsonObject createBCNode(String[] functionArgs)
             throws Exception {
         Vector<ChaincodeEventCapture> chaincodeEvents = new Vector<>(); // list to capture chaincode events
@@ -130,11 +134,6 @@ public class BCNetworkClient {
 
     /**
      * Query a transaction by id.
-     *
-     * @param txnId
-     * @return
-     * @throws ProposalException
-     * @throws InvalidArgumentException
      */
     //future scope
     public TransactionInfo queryByTransactionId(String txnId) throws ProposalException, InvalidArgumentException {
@@ -179,12 +178,6 @@ public class BCNetworkClient {
 
     /**
      * Invoke blockchain query
-     * <p>
-     * <p>
-     * The HF Client
-     *
-     * @throws ProposalException
-     * @throws InvalidArgumentException
      */
     private String queryBlockChain(String functionName, String[] queryArgs)
             throws ProposalException, InvalidArgumentException {
@@ -207,19 +200,12 @@ public class BCNetworkClient {
 
     /**
      * Initialize and get HF channel
-     * <p>
-     * <p>
-     * The HFC client
-     *
-     * @return Initialized channel
-     * @throws InvalidArgumentException
-     * @throws TransactionException
      */
     private Channel createChannel() throws InvalidArgumentException, TransactionException {
         Peer peer = null;
         Orderer orderer = null;
         EventHub eventHub = null;
-        if(TLSEnabled) {
+        if (TLSEnabled) {
             File clientCert;
             File clientKey;
             File cert = Paths.get(Config.get("PEER_ORG_TLSPEM").getAsString()).toFile();
@@ -247,8 +233,7 @@ public class BCNetworkClient {
             orderer_properties.setProperty("negotiationType", "TLS");
             //end TLS
             orderer = client.newOrderer(Config.get("ORDERER_NAME").getAsString(), Config.get("ORDERER_URL").getAsString(), orderer_properties);
-        }
-        else{
+        } else {
             peer = client.newPeer(Config.get("PEER_NAME").getAsString(), Config.get("PEER_URL").getAsString());
             eventHub = client.newEventHub(Config.get("EVENTHUB_NAME").getAsString(), Config.get("EVENTHUB_URL").getAsString());
             orderer = client.newOrderer(Config.get("ORDERER_NAME").getAsString(), Config.get("ORDERER_URL").getAsString());
@@ -286,12 +271,10 @@ public class BCNetworkClient {
 
     /**
      * Initialize and get Query Request object
-     *
-     * @throws InvalidArgumentException
      */
 
     private TransactionProposalRequest getTransactionProposalRequest(String functionName, String[] funcArgs) throws InvalidArgumentException {
-        TransactionProposalRequest request = TransactionProposalRequest.newInstance(userContext);
+        TransactionProposalRequest request = TransactionProposalRequest.newInstance(BCUserContext);
         ChaincodeID ccid = ChaincodeID.newBuilder().setName(Config.get("CHAINCODE_NAME").getAsString()).build();
         request.setChaincodeLanguage(TransactionRequest.Type.NODE);
         request.setChaincodeID(ccid);

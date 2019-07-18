@@ -14,7 +14,7 @@
 # the License.
 #-------------------------------------------------------------------------------
 #! /bin/sh
-# /etc/init.d/__AGENT_KEY__
+# /etc/init.d/__AGENT_KEY__ 
 
 ### BEGIN INIT INFO
 # Provides: Runs a Python script on startup
@@ -25,8 +25,25 @@
 # Short-Description: Simple script to run python program at boot
 # Description: Runs a python program at boot
 ### END INIT INFO
+
+
 #export INSIGHTS_AGENT_HOME=/home/ec2-user/insightsagents
 source /etc/profile
+python_version="$(python -V 2>&1)"
+detectPythonVersion()
+{
+     if echo "$1" | grep -q "Python 2"; then
+      echo "Detected python 2 version";
+      python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.alm.pivotalTracker.PivotalTrackerAgent import PivotalTrackerAgent; PivotalTrackerAgent()" &
+     elif echo "$1" | grep -q "Python 3"; then
+      echo "Detected python 3 version";
+      python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.alm.pivotalTracker.PivotalTrackerAgent3 import PivotalTrackerAgent; PivotalTrackerAgent()" &
+     else
+      echo "python version not supported"
+	  exit 1;
+     fi
+
+}
 
 case "$1" in
   start)
@@ -35,7 +52,8 @@ case "$1" in
     else
      echo "Starting InSightsPivotalTrackerAgent"
      cd $INSIGHTS_AGENT_HOME/PlatformAgents/pivotalTracker
-     python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.alm.pivotalTracker.PivotalTrackerAgent import PivotalTrackerAgent; PivotalTrackerAgent()" &
+	 echo $python_version
+     detectPythonVersion "$python_version"
     fi
     if [[ $(ps aux | grep '__PS_KEY__' | awk '{print $2}') ]]; then
      echo "InSightsPivotalTrackerAgent Started Sucessfully"
@@ -64,13 +82,15 @@ case "$1" in
      echo "InSightsPivotalTrackerAgent stopped"
      echo "InSightsPivotalTrackerAgent starting"
      cd $INSIGHTS_AGENT_HOME/PlatformAgents/pivotalTracker
-     python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.alm.pivotalTracker.PivotalTrackerAgent import PivotalTrackerAgent; PivotalTrackerAgent()" &
+	 echo $python_version
+     detectPythonVersion "$python_version"
      echo "InSightsPivotalTrackerAgent started"
     else
      echo "InSightsPivotalTrackerAgent already in stopped state"
      echo "InSightsPivotalTrackerAgent starting"
      cd $INSIGHTS_AGENT_HOME/PlatformAgents/pivotalTracker
-     python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.alm.pivotalTracker.PivotalTrackerAgent import PivotalTrackerAgent; PivotalTrackerAgent()" &
+	 echo $python_version
+     detectPythonVersion "$python_version"
      echo "InSightsPivotalTrackerAgent started"
     fi
     ;;
@@ -83,7 +103,7 @@ case "$1" in
     fi
     ;;
   *)
-    echo "Usage: /etc/init.d/__AGENT_KEY__ {start|stop|restart|status}"
+    echo "Usage: /etc/init.d/__AGENT_KEY__  {start|stop|restart|status}"
     exit 1
     ;;
 esac
