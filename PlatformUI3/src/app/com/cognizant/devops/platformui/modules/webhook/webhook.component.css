@@ -181,6 +181,12 @@ tr.mat-footer-row, tr.mat-row-webhook {
     color:  white;
     
 }
+td.mat-cell:first-of-type{
+    padding-left: 10px !important;
+}
+td.mat-cell:last-of-type{
+    padding-right: 10px !important;
+}
 
 .infoHeaderText{
     font-size: 11px;
