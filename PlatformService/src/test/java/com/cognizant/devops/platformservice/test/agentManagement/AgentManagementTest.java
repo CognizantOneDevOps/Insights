@@ -48,7 +48,7 @@ public class AgentManagementTest{
 	}
  	
 	/*Method to get the available list of agents in the system. */
-	@Test
+	@Test(priority = 1)
 	public void testGetSystemAvailableAgentList() throws InsightsCustomException {
 		AgentManagementServiceImpl agentManagementServiceImpl = new AgentManagementServiceImpl();
 		Map<String, ArrayList<String>> availableAgents = agentManagementServiceImpl.getSystemAvailableAgentList();
@@ -59,7 +59,7 @@ public class AgentManagementTest{
 		
 	}
 	
-	@Test
+	@Test(priority = 2)
 	public void testGetRegisteredAgents() throws InsightsCustomException {
 		AgentConfigDAL agentConfigDAL = new AgentConfigDAL();
 		List<AgentConfig> agentConfigList = agentConfigDAL.getAllDataAgentConfigurations();
@@ -70,7 +70,7 @@ public class AgentManagementTest{
 		
 	}
 	
-	@Test
+	@Test(priority = 3)
 	public void testGetRegisteredAgentsWithAgentPresent() throws InsightsCustomException {
 		AgentConfigDAL agentConfigDAL = new AgentConfigDAL();
 		List<AgentConfig> agentConfigList = agentConfigDAL.getAllAgentConfigurations();
@@ -81,30 +81,12 @@ public class AgentManagementTest{
 		
 	}
 	
-	@Test 
+	@Test (priority = 4)
 	public void testGetRegisteredAgentsWithAgentCall() throws InsightsCustomException {
 		AgentManagementServiceImpl agentManagementServiceImpl = new AgentManagementServiceImpl();
 		List<AgentConfigTO> agentList = agentManagementServiceImpl.getRegisteredAgents();
 		System.out.println("Get Registered  agents" + agentList.size());
 		Assert.assertNotNull(agentList); 
-		
-	}
-	
-	@Test(expectedExceptions = InsightsCustomException.class)
-	public void testUninstallAgent() throws InsightsCustomException{
-		
-		String agentId = "agentId";
-		String toolName = "toolName";
-		String osversion = "osversion";
-		String expectedOutCome = "SUCCESS"; 
-
-		AgentManagementServiceImpl agentManagementServiceImpl = new AgentManagementServiceImpl();
-		String response = agentManagementServiceImpl.uninstallAgent(agentId, toolName, osversion);
-		//AgentConfigDAL agentConfigDAL = new AgentConfigDAL();
-		//agentConfigDAL.deleteAgentConfigurations(agentId);
-		 
-		Assert.assertNull(response);
-		Assert.assertEquals(expectedOutCome, response);
 		
 	}
 	
@@ -149,5 +131,33 @@ public class AgentManagementTest{
 		Assert.assertNotNull(response);
 		
 		Assert.assertEquals(response, expectedOutput);
+	}
+	
+	@Test(expectedExceptions = InsightsCustomException.class)
+	public void testUninstallAgent() throws InsightsCustomException{
+		
+		String agentId = "agentId";
+		String toolName = "toolName";
+		String osversion = "osversion";
+		String expectedOutCome = "SUCCESS"; 
+
+		AgentManagementServiceImpl agentManagementServiceImpl = new AgentManagementServiceImpl();
+		String response = agentManagementServiceImpl.uninstallAgent(agentId, toolName, osversion);
+		//AgentConfigDAL agentConfigDAL = new AgentConfigDAL();
+		//agentConfigDAL.deleteAgentConfigurations(agentId);
+		 
+		Assert.assertNull(response);
+		Assert.assertEquals(expectedOutCome, response);
+		
+	}
+	
+	@Test 
+	public void deleteAgentConfigurations() {
+		
+		String agentKey = "agentKey";
+		AgentConfigDAL agentConfigDAL = new AgentConfigDAL();
+		List<AgentConfig> result = agentConfigDAL.deleteAgentConfigurations(agentKey);
+		
+		Assert.assertFalse(result.isEmpty());
 	}
 }
