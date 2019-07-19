@@ -14,4 +14,18 @@ License for the specific language governing permissions and limitations under
 the License.
 :comment
 pushd %INSIGHTS_AGENT_HOME%\PlatformAgents\nexus
-python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.artifactmanagement.nexus.NexusAgent import NexusAgent; NexusAgent()"
+setlocal ENABLEDELAYEDEXPANSION
+for /f "delims=" %%i in ('python -V ^2^>^&^1') do (
+   set PYTHON_VERSION=%%i
+   if "!PYTHON_VERSION:~0,8!" EQU "Python 2" ( 
+      echo Detected python 2 version
+	  python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.artifactmanagement.nexus.NexusAgent import NexusAgent; NexusAgent()"
+   ) else (
+      if "!PYTHON_VERSION:~0,8!" EQU "Python 3" ( 
+         echo Detected python 3 version
+		 python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.artifactmanagement.nexus.NexusAgent3 import NexusAgent; NexusAgent()"
+      ) else ( 
+         echo python version not supported 
+      )
+   )
+)
