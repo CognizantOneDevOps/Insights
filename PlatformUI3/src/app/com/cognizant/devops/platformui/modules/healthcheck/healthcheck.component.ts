@@ -141,7 +141,7 @@ export class HealthCheckComponent implements OnInit {
             this.dataComponentDataSource.push(element);
           }
         }
-        this.dataComponentColumns = ['serverName', 'ipAddress', 'version', 'status', 'info'];
+        this.dataComponentColumns = ['serverName', 'ipAddress', 'version', 'info', 'status'];
         this.servicesColumns = ['serverName', 'ipAddress', 'version', 'status', 'details'];
       }
     } catch (error) {
