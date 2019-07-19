@@ -1,7 +1,9 @@
 package com.cognizant.devops.platformservice.test.agentManagement;
 
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -15,12 +17,35 @@ import com.cognizant.devops.platformdal.agentConfig.AgentConfig;
 import com.cognizant.devops.platformdal.agentConfig.AgentConfigDAL;
 import com.cognizant.devops.platformservice.agentmanagement.service.AgentConfigTO;
 import com.cognizant.devops.platformservice.agentmanagement.service.AgentManagementServiceImpl;
+import com.google.gson.Gson;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 
 @Test
 @ContextConfiguration(locations = { "classpath:spring-test-config.xml" })
 public class AgentManagementTest{
 	
 	private static final String UNINSTALL_AGENT = AGENTACTION.UNINSTALL.name();
+	
+	@Test(expectedExceptions = InsightsCustomException.class)
+	public void testRegisterAgent() throws InsightsCustomException{
+		
+		String toolName = "TOOL_NAME";
+		String agentVersion = "AGENT_VERSION";
+		String osversion = "OS_VERSION";
+		String configDetails = "CONFIG_DETAILS";
+		String trackingDetails = "TRACKING_DETAILS";
+		
+		String expectedOutcome = "SUCCESS";
+		
+		AgentManagementServiceImpl agentManagementServiceImpl = new AgentManagementServiceImpl();
+		String response = agentManagementServiceImpl.registerAgent(toolName, agentVersion, osversion, configDetails, 
+																	trackingDetails);
+		
+		Assert.assertNotNull(response);
+		Assert.assertEquals(expectedOutcome, response);
+		
+	}
  	
 	/*Method to get the available list of agents in the system. */
 	@Test
@@ -65,30 +90,64 @@ public class AgentManagementTest{
 		
 	}
 	
-	@Test
-	public void testUninstallAgent() {
-		AgentManagementServiceImpl agentManagementServiceImpl = new AgentManagementServiceImpl();
+	@Test(expectedExceptions = InsightsCustomException.class)
+	public void testUninstallAgent() throws InsightsCustomException{
+		
 		String agentId = "agentId";
 		String toolName = "toolName";
 		String osversion = "osversion";
-		//String unInstallAgent = agentManagementServiceImpl.
-		//preparingUninstallAgent(UNINSTALL_AGENT, agentId, toolName, osversion);
-		AgentConfigDAL agentConfigDAL = new AgentConfigDAL();
-		agentConfigDAL.deleteAgentConfigurations(agentId);
+		String expectedOutCome = "SUCCESS"; 
+
+		AgentManagementServiceImpl agentManagementServiceImpl = new AgentManagementServiceImpl();
+		String response = agentManagementServiceImpl.uninstallAgent(agentId, toolName, osversion);
+		//AgentConfigDAL agentConfigDAL = new AgentConfigDAL();
+		//agentConfigDAL.deleteAgentConfigurations(agentId);
 		 
-		Assert.assertNull(agentConfigDAL.getAgentConfigurations(agentId));
+		Assert.assertNull(response);
+		Assert.assertEquals(expectedOutCome, response);
 		
 	}
 	
-	/*private void preparingUninstallAgent(String action, String agentId, String toolName, String osversion) {
+	@Test
+	public void testSaveAgentConfigFromUI() throws InsightsCustomException {
 		
-		Map<String, Object> headers = new HashMap<>();
-		headers.put("osType", osversion);
-		headers.put("agentToolName", toolName);
-		headers.put("agentId", agentId);
-		headers.put("action", action);
+		Date updateDate = Timestamp.valueOf(LocalDateTime.now());
 		
-		//String appConfig = ApplicationConfigProvider.getInstance().getAgentDetails().getAgentPkgQueue();
-	}*/
+		String agentId = "agentId";
+		String toolName = "toolName";
+		String osversion = "osversion";
+		String agentVersion = "agentVersion";
+		String configDetails = "configDetails";
+		
+		Gson gson = new Gson();
+		JsonElement jsonElement = gson.fromJson(configDetails.trim(), JsonElement.class);
+		JsonObject json = jsonElement.getAsJsonObject();
+		json.addProperty("osversion", osversion);
+		json.addProperty("agentVersion", agentVersion);
+		json.addProperty("toolName", toolName.toUpperCase());
+		
+		AgentConfigDAL agentConfigDAL = new AgentConfigDAL();
+		boolean response = agentConfigDAL.saveAgentConfigFromUI(agentId, json.get("toolCategory").getAsString(), 
+				toolName, json, agentVersion, osversion, updateDate);
+		
+		Assert.assertTrue(response);
+	}
 	
+	@Test
+	public void testStartStopAgentForStartAction() throws InsightsCustomException {
+		
+		String agentId = "agentId";
+		String toolName = "toolName";
+		String osversion = "osversion";
+		String action = AGENTACTION.START.getValue();
+		
+		System.out.println("action " + action);
+		String expectedOutput = "SUCCESS";
+		AgentManagementServiceImpl agentManagementServiceImpl = new AgentManagementServiceImpl();
+		String response = agentManagementServiceImpl.startStopAgent(agentId, toolName, osversion, action);
+		System.out.println("response " + response);
+		Assert.assertNotNull(response);
+		
+		Assert.assertEquals(response, expectedOutput);
+	}
 }
