@@ -11,7 +11,7 @@
     <plugins>
       <plugin>
         <artifactId>maven-shade-plugin</artifactId>
-        <version>2.3</version>
+        <version>2.4.3</version>
         <executions>
           <execution>
             <phase>package</phase>
@@ -21,10 +21,9 @@
             <configuration>
               <transformers>
                 <transformer>
-                  <manifestEntries>
-                    <Main-Class>com.cognizant.devops.platformneo4jbackuputility.app.Application</Main-Class>
-                  </manifestEntries>
+                  <mainClass>com.cognizant.devops.platformneo4jbackuputility.app.Application</mainClass>
                 </transformer>
+                <transformer />
               </transformers>
               <filters>
                 <filter>
@@ -34,7 +33,6 @@
                     <exclude>META-INF/*.DSA</exclude>
                     <exclude>META-INF/*.RSA</exclude>
                     <exclude>server-config.json</exclude>
-                    <exclude>log4j2.xml</exclude>
                   </excludes>
                 </filter>
               </filters>
@@ -59,6 +57,7 @@
                   <directory>src/main/resources</directory>
                   <includes>
                     <include>log4j2.xml</include>
+                    <include>**/*.csv</include>
                     <include>neo4j.properties</include>
                   </includes>
                   <filtering>true</filtering>
@@ -67,6 +66,12 @@
                   <directory>/target/</directory>
                   <includes>
                     <include>${project.name}.jar</include>
+                    <include>neo4j.properties</include>
+                  </includes>
+                </resource>
+                <resource>
+                  <directory>.</directory>
+                  <includes>
                     <include>neo4j.properties</include>
                   </includes>
                 </resource>

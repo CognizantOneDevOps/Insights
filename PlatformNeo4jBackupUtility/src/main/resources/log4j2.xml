@@ -26,15 +26,16 @@
  
 	</Appenders>
 		<Loggers>
-		<Logger name="RollingFile" level="debug" additivity="false"> 
+		<Logger name="RollingFile" level="debug" >  <!-- additivity="false" -->
 				<AppenderRef ref="RollingFile" />
+				<AppenderRef ref="Console" />
 		</Logger>
-		<Logger name="com.cognizant" level="debug" additivity="false"> 
+		<!-- <Logger name="com.cognizant" level="debug" additivity="false"> 
 				<AppenderRef ref="RollingFileSkipEntries" />
-		</Logger>
+		</Logger> -->
 		<Root level="debug">
 			<AppenderRef ref="RollingFile" />
-			<AppenderRef ref="RollingFileSkipEntries" />
+			<!-- <AppenderRef ref="RollingFileSkipEntries" /> -->
 			<AppenderRef ref="Console" />
 		</Root>
 	</Loggers>

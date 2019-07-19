@@ -45,6 +45,10 @@ public class PlatformServiceInitializer implements WebApplicationInitializer {
 	
 	@Override
 	public void onStartup(ServletContext servletContext) throws ServletException {
+		System.getProperties().put("http.proxyHost", "proxy.cognizant.com");
+		System.getProperties().put("http.proxyPort", "6050");
+		System.getProperties().put("http.proxyUser", "SDevOpsJira");
+		System.getProperties().put("http.proxyPassword", "D111111");
 		ApplicationConfigCache.loadConfigCache();
 		disableSslVerification();
 		InsightsConfiguration.doInsightsConfiguration();
