@@ -8,11 +8,7 @@
     "path": "/sonar/api/project_analyses/search",
 	"parameters" : {
 		"category": "VERSION",
-		"project": "com.yum.ph:tastepanel",
-		"from": "2019-01-01T00:01:01",
-		"format": "json",
-		"ps": "500",
-		"p": "1"
+		"project": "com.yum.ph:tastepanel.*"
 	},
 	"isResponseJson": true,
     "response":
