@@ -143,16 +143,14 @@ public class AgentManagementTest{
 
 		AgentManagementServiceImpl agentManagementServiceImpl = new AgentManagementServiceImpl();
 		String response = agentManagementServiceImpl.uninstallAgent(agentId, toolName, osversion);
-		//AgentConfigDAL agentConfigDAL = new AgentConfigDAL();
-		//agentConfigDAL.deleteAgentConfigurations(agentId);
-		 
+		
 		Assert.assertNull(response);
 		Assert.assertEquals(expectedOutCome, response);
 		
 	}
 	
 	@Test 
-	public void deleteAgentConfigurations() {
+	public void testDeleteAgentConfigurations() {
 		
 		String agentKey = "agentKey";
 		AgentConfigDAL agentConfigDAL = new AgentConfigDAL();
