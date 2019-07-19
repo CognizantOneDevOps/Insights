@@ -116,29 +116,16 @@
           <!-- IP Address:Port Column -->
           <ng-container matColumnDef="ipAddress">
             <th mat-header-cell *matHeaderCellDef class="tableHeaderCss">IP Address:Port</th>
-            <td mat-cell *matCellDef="let key" style="width:15% !important"> {{key.endPoint}} </td>
+            <td mat-cell *matCellDef="let key" style="width:19% !important"> {{key.endPoint}} </td>
           </ng-container>
 
           <!-- Version Column -->
           <ng-container matColumnDef="version">
             <th mat-header-cell *matHeaderCellDef class="tableHeaderCss">Version</th>
-            <td mat-cell *matCellDef="let key" style="width:41% !important"> {{key.version}} </td>
+            <td mat-cell *matCellDef="let key" style="width:40% !important"> {{key.version}} </td>
           </ng-container>
 
-          <!-- Status Column -->
-          <ng-container matColumnDef="status">
-            <th mat-header-cell *matHeaderCellDef class="tableHeaderCss">Status</th>
-            <td mat-cell *matCellDef="let key" style="width:10% !important">
-              <mat-icon svgIcon="healthcheck_success_status" *ngIf="key.status =='success'"
-                [ngStyle]="{color: '#00B140', height: '20px', width: '20px'}">
-              </mat-icon>
-              <mat-icon svgIcon="healthcheck_failure_status" *ngIf="key.status =='failure'"
-                [ngStyle]="{color: '#FF8F1C', height: '20px', width: '20px'}">
-              </mat-icon>
-            </td>
-          </ng-container>
-
-          <!-- Additional Column -->
+          !-- Additional Column -->
           <ng-container matColumnDef="info">
             <th mat-header-cell *matHeaderCellDef class="tableHeaderCss">Additional Information</th>
             <td mat-cell *matCellDef="let key" style="width:19% !important">
@@ -148,8 +135,22 @@
             </td>
           </ng-container>
 
-          <tr mat-header-row *matHeaderRowDef="dataComponentColumns" class="tableHeaderCss" style="height:40px"></tr>
-          <tr mat-row *matRowDef="let row; columns: dataComponentColumns;"></tr>
+          <!-- Status Column -->
+          <ng-container matColumnDef="status">
+            <th mat-header-cell *matHeaderCellDef class="tableHeaderCss">Status</th>
+            <td mat-cell *matCellDef="let key" style="width:6% !important">
+              <mat-icon svgIcon="healthcheck_success_status" *ngIf="key.status =='success'"
+                [ngStyle]="{color: '#00B140', height: '20px', width: '20px'}">
+              </mat-icon>
+              <mat-icon svgIcon="healthcheck_failure_status" *ngIf="key.status =='failure'"
+                [ngStyle]="{color: '#FF8F1C', height: '20px', width: '20px'}">
+              </mat-icon>
+            </td>
+          </ng-container>
+
+          < <tr mat-header-row *matHeaderRowDef="dataComponentColumns" class="tableHeaderCss" style="height:40px">
+            </tr>
+            <tr mat-row *matRowDef="let row; columns: dataComponentColumns;"></tr>
         </table>
       </div>
       <!-- Displays Progress spinner and Error message for service failure-->
