@@ -19,9 +19,7 @@ import static java.util.Arrays.asList;
 import static java.util.Collections.emptySet;
 
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.lang.reflect.Field;
 import java.util.Collection;
 import java.util.Collections;
@@ -59,29 +57,9 @@ import org.neo4j.unsafe.batchinsert.internal.FileSystemClosingBatchInserter;
 public class StoreCopy {
 
     private static final Label[] NO_LABELS = new Label[0];
-	private static Logger LOG = LogManager.getLogger("RollingFile");//StoreCopy.class
+	private static Logger LOG = LogManager.getLogger("RollingFile");
 
-	private static Logger LOG_SKIPENTRIES = LogManager.getLogger("RollingFileSkipEntries");
-
-	/*  public static void main(String[] args) throws Exception {
-	    if (args.length < 2) {
-	        System.err.println("Usage: StoryCopy source target [rel,types,to,ignore] [properties,to,ignore] [labels,to,ignore] [labels,to,delete]");
-	        return;
-	    }
-	    Properties properties = new Properties();
-	    properties.load(new FileReader("neo4j.properties"));
-	    String sourceDir = getArgument(args,0,properties,"source_db_dir");
-	    String targetDir = getArgument(args,1,properties,"target_db_dir");
-	
-	    Set<String> ignoreRelTypes = splitToSet(getArgument(args,2,properties,"rel_types_to_ignore"));
-	    Set<String> ignoreProperties = splitToSet(getArgument(args,3,properties,"properties_to_ignore"));
-	    Set<String> ignoreLabels = splitToSet(getArgument(args,4,properties,"labels_to_ignore"));
-	    Set<String> deleteNodesWithLabels = splitToSet(getArgument(args,5,properties,"labels_to_delete"));
-	    String keepNodeIdsParam = getArgument(args, 6, properties, "keep_node_ids");
-	    boolean keepNodeIds = !("false".equalsIgnoreCase(keepNodeIdsParam));
-	    System.out.printf("Copying from %s to %s ingoring rel-types %s ignoring properties %s ignoring labels %s removing nodes with labels %s keep node ids %s %n", sourceDir, targetDir, ignoreRelTypes, ignoreProperties,ignoreLabels, deleteNodesWithLabels,keepNodeIds);
-	    copyStore(sourceDir, targetDir, ignoreRelTypes, ignoreProperties,ignoreLabels,deleteNodesWithLabels, keepNodeIds);
-	}*/
+	//private static Logger LOG_SKIPENTRIES = LogManager.getLogger("RollingFileSkipEntries");
 
 	public static String getArgument(String[] args, int index, Properties properties, String key) {
         if (args.length > index) return args[index];
@@ -103,7 +81,7 @@ public class StoreCopy {
         final File target = new File(targetDir);
         final File source = new File(sourceDir);
 		LOG.debug("Inside copyStore");
-		LOG_SKIPENTRIES.debug("Inside copyStore");
+		//LOG_SKIPENTRIES.debug("Inside copyStore");
         if (target.exists()) {
             // FileUtils.deleteRecursively(target);
 			throw new IllegalArgumentException("Target Directory already exists " + target);
