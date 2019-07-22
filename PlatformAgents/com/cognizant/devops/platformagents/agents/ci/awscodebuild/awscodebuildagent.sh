@@ -34,10 +34,10 @@ detectPythonVersion()
 {
      if echo "$1" | grep -q "Python 2"; then
       echo "Detected python 2 version";
-      python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.alm.awscodebuild.AwsCodeBuild import AwsCodeBuild; AwsCodeBuild()" &
+      python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.ci.awscodebuild.AwsCodeBuildAgent import AwsCodeBuildAgent; AwsCodeBuildAgent()" &
      elif echo "$1" | grep -q "Python 3"; then
       echo "Detected python 3 version";
-      python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.alm.awscodebuild.AwsCodeBuild3 import AwsCodeBuild; AwsCodeBuild()" &
+      python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.ci.awscodebuild.AwsCodeBuildAgent3 import AwsCodeBuildAgent; AwsCodeBuildAgent()" &
      else
       echo "python version not supported"
 	  exit 1;
