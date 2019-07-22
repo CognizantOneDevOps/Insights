@@ -16,9 +16,7 @@
 package com.cognizant.devops.platformneo4jbackuputility.app;
 
 import java.io.FileInputStream;
-import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.Properties;
 import java.util.Set;
 
@@ -30,15 +28,12 @@ import com.cognizant.devops.platformneo4jbackuputility.neo4j.tool.StoreCopy;
 public class Application {
 	private static Logger LOG = LogManager.getLogger("RollingFile");
 
-	private static Logger LOG_SKIPENTRIES = LogManager.getLogger("RollingFileSkipEntries");
+	//private static Logger LOG_SKIPENTRIES = LogManager.getLogger("RollingFileSkipEntries");
 	static Properties properties = new Properties();
 	public static void main(String[] args) throws Exception {
 		LOG.debug(" Neo4j data backup /store backup start  ");
-		LOG_SKIPENTRIES.debug("  Neo4j data backup /store backup start ");
+		//LOG_SKIPENTRIES.debug("  Neo4j data backup /store backup start ");
 		getPropValues();
-		/*InputStream input = null;
-		input = new FileInputStream("./config/config.properties");
-		properties.load(new FileReader("./neo4j.properties"));*/
 		String sourceDir = StoreCopy.getArgument(args, 0, properties, "source_db_dir");
 		String targetDir = StoreCopy.getArgument(args, 1, properties, "target_db_dir");
 		LOG.debug(" targetDir  " + targetDir);
@@ -86,8 +81,6 @@ public class Application {
 				}
 			}
 		}
-		// get the property value and return it
-		// return properties;
 	}
 
 }
