@@ -34,13 +34,13 @@ detectPythonVersion()
 {
      if echo "$1" | grep -q "Python 2"; then
       echo "Detected python 2 version";
-      python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.alm.teamcity.TeamCityAgent import TeamCityAgent; TeamCityAgent()" &
+      python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.ci.teamcity.TeamCityAgent import TeamCityAgent; TeamCityAgent()" &
      elif echo "$1" | grep -q "Python 3"; then
       echo "Detected python 3 version";
-      python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.alm.teamcity.TeamCityAgent3 import TeamCityAgent; TeamCityAgent()" &
+      python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.ci.teamcity.TeamCityAgent3 import TeamCityAgent; TeamCityAgent()" &
      else
       echo "python version not supported"
-	  exit 1;
+      exit 1;
      fi
 
 }
