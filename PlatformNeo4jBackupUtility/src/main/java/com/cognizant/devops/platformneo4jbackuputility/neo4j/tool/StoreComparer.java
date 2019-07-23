@@ -1,5 +1,7 @@
 package com.cognizant.devops.platformneo4jbackuputility.neo4j.tool;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.neo4j.graphdb.*;
 import org.neo4j.graphdb.factory.GraphDatabaseFactory;
 import org.neo4j.helpers.collection.Iterables;
@@ -14,7 +16,7 @@ import static java.util.Arrays.asList;
 import static java.util.Collections.emptySet;
 
 public class StoreComparer {
-
+	private static Logger LOG = LogManager.getLogger(StoreComparer.class);
     @SuppressWarnings("unchecked")
     public static Map<String, String> config() {
         return (Map) MapUtil.map(
@@ -31,14 +33,15 @@ public class StoreComparer {
 
     public static void main(String[] args) throws Exception {
         if (args.length < 2) {
-            System.err.println("Usage: StoreComparer source target [rel,types,to,ignore] [properties,to,ignore]");
+			LOG.error("Usage: StoreComparer source target [rel,types,to,ignore] [properties,to,ignore]");
             return;
         }
         String sourceDir = args[0];
         String targetDir = args[1];
         Set<String> ignoreRelTypes = splitOptionIfExists(args, 2);
         Set<String> ignoreProperties = splitOptionIfExists(args, 3);
-        System.out.printf("Copying from %s to %s ingoring rel-types %s ignoring properties %s %n", sourceDir, targetDir, ignoreRelTypes, ignoreProperties);
+		LOG.debug("Copying from {} to {} ingoring rel-types {} ignoring properties {} ", sourceDir, targetDir,
+				ignoreRelTypes, ignoreProperties);
         compareStore(sourceDir, targetDir, ignoreRelTypes, ignoreProperties);
     }
 
@@ -73,11 +76,11 @@ public class StoreComparer {
         final Statistics sourceStatistics = count(sourceDb, ignoreRelTypes, ignoreProperties);
         final Statistics targetStatistics = count(targetDb, ignoreRelTypes, ignoreProperties);
         if (!sourceStatistics.equals(targetStatistics)) {
-            System.err.println("Count difference");
-            System.err.println("Source " + sourceStatistics);
-            System.err.println("Target " + targetStatistics);
+			LOG.error("Count difference");
+			LOG.error("Source " + sourceStatistics);
+			LOG.error("Target " + targetStatistics);
         }
-        System.out.println("\n comparing of " + "counts" + " took " + (System.currentTimeMillis() - time) + " ms.");
+		LOG.debug("\n comparing of " + "counts" + " took " + (System.currentTimeMillis() - time) + " ms.");
     }
 
     private static Statistics count(GraphDatabaseService db, Set<String> ignoreRelTypes, Set<String> ignoreProperties) {
@@ -91,8 +94,10 @@ public class StoreComparer {
                 statistics.relationshipCount++;
                 statistics.relationshipPropertyCount += countProperties(ignoreProperties, rel);
                 count++;
-                if (count % 1000 == 0) System.out.print(".");
-                if (count % 100000 == 0) System.out.println(" " + count);
+				if (count % 1000 == 0)
+					LOG.debug(".");
+				if (count % 100000 == 0)
+					LOG.debug(" " + count);
             }
         }
         return statistics;
@@ -126,11 +131,14 @@ public class StoreComparer {
                 final Relationship targetRel = getTargetRel(targetDb, node.getId(), rel.getOtherNode(node).getId(), rel.getType());
                 compareProperties(rel, targetRel,ignoreProperties);
                 count++;
-                if (count % 1000 == 0) System.out.print(".");
-                if (count % 100000 == 0) System.out.println(" " + count);
+				if (count % 1000 == 0)
+					//LOG.debug(".");
+					if (count % 100000 == 0) {
+					//LOG.debug(" " + count);
+					}
             }
         }
-        System.out.println("\n copying of " + count + " relationships took " + (System.currentTimeMillis() - time) + " ms.");
+		LOG.debug("\n copying of " + count + " relationships took " + (System.currentTimeMillis() - time) + " ms.");
     }
 
     private static Relationship getTargetRel(GraphDatabaseService gdb,long startNodeId, long endNodeId, RelationshipType relType) {
@@ -148,13 +156,14 @@ public class StoreComparer {
         keys2.removeAll(ignoreProperties);
         keys1.removeAll(ignoreProperties);
         if (!keys1.equals(keys2)) {
-            System.err.println("On " + pc1 + " != " + pc2 + " properties mismatch " + keys1 + " != " + keys2);
+			LOG.error("On " + pc1 + " != " + pc2 + " properties mismatch " + keys1 + " != " + keys2);
         }
         for (String prop : keys1) {
             final Object value1 = pc1.getProperty(prop);
             final Object value2 = pc2.getProperty(prop);
             if (!equals(value1, value2)) {
-                System.err.println("On " + pc1 + " != " + pc2 + " property " + prop + " mismatch " + toString(value1) + " != " + toString(value2));
+				LOG.error("On " + pc1 + " != " + pc2 + " property " + prop + " mismatch " + toString(value1) + " != "
+						+ toString(value2));
             }
         }
     }
@@ -188,11 +197,13 @@ public class StoreComparer {
         for (Node node : sourceDb.getAllNodes()) {
             compareProperties(node, targetDb.getNodeById(node.getId()), ignoreProperties);
             count++;
-            if (count % 1000 == 0) System.out.print(".");
-            if (count % 100000 == 0) System.out.println(" " + count);
+			if (count % 1000 == 0)
+				LOG.debug(".");
+			if (count % 100000 == 0)
+				LOG.debug(" " + count);
         }
 
-        System.out.println("\n comparing of " + count + " nodes took " + (System.currentTimeMillis() - time) + " ms.");
+		LOG.debug("\n comparing of " + count + " nodes took " + (System.currentTimeMillis() - time) + " ms.");
     }
 
     private static Map<String, Object> getProperties(PropertyContainer pc, Set<String> ignoreProperties) {
@@ -218,19 +229,20 @@ public class StoreComparer {
             Statistics that = (Statistics) o;
 
             if (nodeCount != that.nodeCount) {
-                System.err.println("nodes " + nodeCount + " != " + that.nodeCount);
+				LOG.error("nodes " + nodeCount + " != " + that.nodeCount);
                 return false;
             }
             if (nodeProperties != that.nodeProperties) {
-                System.err.println("nodeProperties " + nodeProperties + " != " + that.nodeProperties);
+				LOG.error("nodeProperties " + nodeProperties + " != " + that.nodeProperties);
                 return false;
             }
             if (relationshipCount != that.relationshipCount) {
-                System.err.println("relationshipCount " + relationshipCount + " != " + that.relationshipCount);
+				LOG.error("relationshipCount " + relationshipCount + " != " + that.relationshipCount);
                 return false;
             }
             if (relationshipPropertyCount != that.relationshipPropertyCount) {
-                System.err.println("relationshipPropertyCount " + relationshipPropertyCount + " != " + that.relationshipPropertyCount);
+				LOG.error("relationshipPropertyCount " + relationshipPropertyCount + " != "
+						+ that.relationshipPropertyCount);
                 return false;
             }
             return true;

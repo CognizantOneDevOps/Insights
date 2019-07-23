@@ -31,7 +31,7 @@ public class StoreCopy {
 
     private static final Label[] NO_LABELS = new Label[0];
 	//private static PrintWriter logs;
-	private static Logger LOG = LogManager.getLogger("RollingFile");
+	private static Logger LOG = LogManager.getLogger(StoreCopy.class);
 	//private static Logger LOG_SKIPENTRIES = LogManager.getLogger("RollingFileSkipEntries");
 
 	public static String getArgument(String[] args, int index, Properties properties, String key) {
@@ -159,12 +159,12 @@ public class StoreCopy {
             }
             if (relId % 500000 == 0) {
                 flusher.flush();
-				LOG.debug(" {} / {} ({}%%) unused {} removed {}%n", relId, highestRelId, percent(relId, highestRelId),
+				LOG.debug(" {} / {} ({}%) unused {} removed {} ", relId, highestRelId, percent(relId, highestRelId),
 						notFound, removed);
             }
         }
         time = Math.max(1,(System.currentTimeMillis() - time)/1000);
-		LOG.debug(" {} / {} ({}%%) unused {} removed {}%n", relId, highestRelId, percent(relId, highestRelId), notFound,
+		LOG.debug(" {} / {} ({}%) unused {} removed {}", relId, highestRelId, percent(relId, highestRelId), notFound,
 				removed);
     }
 
@@ -245,13 +245,13 @@ public class StoreCopy {
             if (node % 500000 == 0) {
                 flusher.flush();
 				//logs.flush();
-				LOG.debug(" {} / {} ({}%%) unused {} removed {} %n", node, highestNodeId, percent(node, highestNodeId),
+				LOG.debug(" {} / {} ({}%) unused {} removed {} ", node, highestNodeId, percent(node, highestNodeId),
 						notFound, removed);
             }
         }
         time = Math.max(1,(System.currentTimeMillis() - time)/1000);
 		LOG.debug(
-				"%n copying of {} node records took {} seconds ({} rec/s). Unused Records {} ({}%%). Removed Records {} ({}%%).%n",
+				"%n copying of {} node records took {} seconds ({} rec/s). Unused Records {} ({}%). Removed Records {} ({}%).",
                 node, time, node/time, notFound, percent(notFound,node),removed, percent(removed,node));
         return copiedNodes;
     }

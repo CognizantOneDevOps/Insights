@@ -1,5 +1,7 @@
 package com.cognizant.devops.platformneo4jbackuputility.neo4j.tool;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.factory.GraphDatabaseFactory;
@@ -29,7 +31,7 @@ import java.util.*;
  */
 public class DomainAnalyzer {
 	private static GraphDatabaseService graphDb;
-
+	private static Logger LOG = LogManager.getLogger(DomainAnalyzer.class);
 
     static class Sample {
         public final Node node;
@@ -47,7 +49,8 @@ public class DomainAnalyzer {
         public void incEmpty() {
             emptyCount++;
         }
-        public String toString() {
+        @Override
+		public String toString() {
             StringBuilder sb = new StringBuilder("count: ").append(count).append(" empty: ").append(emptyCount).append(" node: ").append(node.getId()).append("\n");
             for (String property : node.getPropertyKeys()) {
                 final Object value = node.getProperty(property);
@@ -89,10 +92,11 @@ public class DomainAnalyzer {
                 sample.inc();
             }
             count++;
-            if (count % 100000 == 0) System.out.println("count = " + count + " sample "+sample);
+			if (count % 100000 == 0)
+				LOG.debug("count = " + count + " sample " + sample);
         }
         time = System.currentTimeMillis() - time;
-        System.out.println(" count " + count + " took " + time + " types " + statistics.size() + "\n" + statistics);
+		LOG.debug(" count " + count + " took " + time + " types " + statistics.size() + "\n" + statistics);
 		graphDb.shutdown();
 	}
 }
