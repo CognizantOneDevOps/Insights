@@ -1,42 +1,9 @@
-/*******************************************************************************
- * Copyright 2017 Cognizant Technology Solutions
- * 
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not
- * use this file except in compliance with the License. You may obtain a copy
- * of the License at
- * 
- * http://www.apache.org/licenses/LICENSE-2.0
- * 
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
- * License for the specific language governing permissions and limitations under
- * the License.
- ******************************************************************************/
 package com.cognizant.devops.platformneo4jbackuputility.neo4j.tool;
 
-import static java.util.Arrays.asList;
-import static java.util.Collections.emptySet;
-
-import java.io.File;
-import java.io.IOException;
-import java.lang.reflect.Field;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Set;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.neo4j.collection.primitive.Primitive;
-import org.neo4j.collection.primitive.PrimitiveLongLongMap;
-import org.neo4j.graphdb.Label;
-import org.neo4j.graphdb.PropertyContainer;
-import org.neo4j.graphdb.RelationshipType;
-import org.neo4j.graphdb.factory.GraphDatabaseFactory;
+import org.eclipse.collections.api.map.primitive.LongLongMap;
+import org.eclipse.collections.api.map.primitive.MutableLongLongMap;
+import org.eclipse.collections.impl.map.mutable.primitive.LongLongHashMap;
+import org.neo4j.graphdb.*;
 import org.neo4j.helpers.Exceptions;
 import org.neo4j.helpers.collection.Iterables;
 import org.neo4j.helpers.collection.MapUtil;
@@ -45,20 +12,26 @@ import org.neo4j.io.fs.FileUtils;
 import org.neo4j.kernel.impl.store.id.IdGeneratorFactory;
 import org.neo4j.kernel.impl.store.id.IdType;
 import org.neo4j.kernel.internal.GraphDatabaseAPI;
-import org.neo4j.unsafe.batchinsert.BatchInserter;
-import org.neo4j.unsafe.batchinsert.BatchInserters;
-import org.neo4j.unsafe.batchinsert.BatchRelationship;
-import org.neo4j.unsafe.batchinsert.internal.BatchInserterImpl;
-import org.neo4j.unsafe.batchinsert.internal.DirectRecordAccess;
-import org.neo4j.unsafe.batchinsert.internal.DirectRecordAccessSet;
-import org.neo4j.unsafe.batchinsert.internal.FileSystemClosingBatchInserter;
+import org.neo4j.unsafe.batchinsert.*;
+import org.neo4j.unsafe.batchinsert.internal.*;
+import org.neo4j.values.storable.Value;
+import org.neo4j.graphdb.factory.*;
 
+import java.io.*;
+import java.lang.reflect.Field;
+import java.util.*;
+
+import static java.util.Arrays.asList;
+import static java.util.Collections.emptySet;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class StoreCopy {
 
     private static final Label[] NO_LABELS = new Label[0];
+	//private static PrintWriter logs;
 	private static Logger LOG = LogManager.getLogger("RollingFile");
-
 	//private static Logger LOG_SKIPENTRIES = LogManager.getLogger("RollingFileSkipEntries");
 
 	public static String getArgument(String[] args, int index, Properties properties, String key) {
@@ -81,7 +54,6 @@ public class StoreCopy {
         final File target = new File(targetDir);
         final File source = new File(sourceDir);
 		LOG.debug("Inside copyStore");
-		//LOG_SKIPENTRIES.debug("Inside copyStore");
         if (target.exists()) {
             // FileUtils.deleteRecursively(target);
 			throw new IllegalArgumentException("Target Directory already exists " + target);
@@ -96,17 +68,17 @@ public class StoreCopy {
 				System.getProperty("dbms.pagecache.memory.source", pageCacheSize)));
         Flusher flusher = getFlusher(sourceDb);
 
-		PrimitiveLongLongMap copiedNodeIds = copyNodes(sourceDb, targetDb, ignoreProperties, ignoreLabels,
-				deleteNodesWithLabels, highestIds.first(), flusher, stableNodeIds);
+		LongLongMap copiedNodeIds = copyNodes(sourceDb, targetDb, ignoreProperties, ignoreLabels, deleteNodesWithLabels,
+				highestIds.first(), flusher, stableNodeIds);
         copyRelationships(sourceDb, targetDb, ignoreRelTypes, ignoreProperties, copiedNodeIds, highestIds.other(), flusher);
         targetDb.shutdown();
         try {
             sourceDb.shutdown();
         } catch (Exception e) {
-			LOG.debug(String.format("Noncritical error closing the source database:%n%s", Exceptions.stringify(e)));
+			LOG.debug("Noncritical error closing the source database:%n {} ", e.getMessage());
         }
-		//logs.close();
-        if (stableNodeIds) copyIndex(source, target);
+		if (stableNodeIds)
+			copyIndex(source, target);
     }
 
 	private static Flusher getFlusher(BatchInserter db) {
@@ -156,7 +128,7 @@ public class StoreCopy {
     }
 
 	private static void copyRelationships(BatchInserter sourceDb, BatchInserter targetDb, Set<String> ignoreRelTypes,
-			Set<String> ignoreProperties, PrimitiveLongLongMap copiedNodeIds, long highestRelId, Flusher flusher) {
+			Set<String> ignoreProperties, LongLongMap copiedNodeIds, long highestRelId, Flusher flusher) {
         long time = System.currentTimeMillis();
         long relId = 0;
         long notFound = 0;
@@ -192,9 +164,8 @@ public class StoreCopy {
             }
         }
         time = Math.max(1,(System.currentTimeMillis() - time)/1000);
-		LOG.debug(
-				"%n copying of {} relationship records took {} seconds ({} rec/s). Unused Records {} ({}%%) Removed Records {} ({}%%)%n",
-                relId, time, relId/time, notFound, percent(notFound,relId),removed, percent(removed,relId));
+		LOG.debug(" {} / {} ({}%%) unused {} removed {}%n", relId, highestRelId, percent(relId, highestRelId), notFound,
+				removed);
     }
 
 	private static int percent(Number part, Number total) {
@@ -221,13 +192,14 @@ public class StoreCopy {
     }
 
 	private static boolean createRelationship(BatchInserter targetDb, BatchInserter sourceDb, BatchRelationship rel,
-			Set<String> ignoreProperties, PrimitiveLongLongMap copiedNodeIds) {
+			Set<String> ignoreProperties, LongLongMap copiedNodeIds) {
         long startNodeId = copiedNodeIds.get(rel.getStartNode());
         long endNodeId = copiedNodeIds.get(rel.getEndNode());
         if (startNodeId == -1L || endNodeId == -1L) return false;
         final RelationshipType type = rel.getType();
         try {
             Map<String, Object> props = getProperties(sourceDb.getRelationshipProperties(rel.getId()), ignoreProperties);
+			//            if (props.isEmpty()) props = Collections.<String,Object>singletonMap("old_id",rel.getId()); else props.put("old_id",rel.getId());
             targetDb.createRelationship(startNodeId, endNodeId, type, props);
             return true;
         } catch (Exception e) {
@@ -236,10 +208,10 @@ public class StoreCopy {
         }
     }
 
-	private static PrimitiveLongLongMap copyNodes(BatchInserter sourceDb, BatchInserter targetDb,
-			Set<String> ignoreProperties, Set<String> ignoreLabels, Set<String> deleteNodesWithLabels,
-			long highestNodeId, Flusher flusher, boolean stableNodeIds) {
-        PrimitiveLongLongMap copiedNodes = Primitive.offHeapLongLongMap();
+	private static LongLongMap copyNodes(BatchInserter sourceDb, BatchInserter targetDb, Set<String> ignoreProperties,
+			Set<String> ignoreLabels, Set<String> deleteNodesWithLabels, long highestNodeId, Flusher flusher,
+			boolean stableNodeIds) {
+		MutableLongLongMap copiedNodes = stableNodeIds ? new LongLongHashMap() : new LongLongHashMap(10_000_000);
         long time = System.currentTimeMillis();
         long node = 0;
         long notFound = 0;
@@ -261,9 +233,6 @@ public class StoreCopy {
                 } else {
                     notFound++;
                 }
-				/*if(targetDb.nodeExists(node)) {
-					LOG.debug("node exist in target db " + node);
-				}*/
             } catch (Exception e) {
                 if (e instanceof org.neo4j.kernel.impl.store.InvalidRecordException && e.getMessage().endsWith("not in use")) {
                     notFound++;
@@ -271,7 +240,7 @@ public class StoreCopy {
             }
             node++;
             if (node % 10000 == 0) {
-				//LOG.debug(".");
+				//LOG.debug("node 10000 ");
             }
             if (node % 500000 == 0) {
                 flusher.flush();
@@ -324,4 +293,5 @@ public class StoreCopy {
 		LOG.debug("{}.{} {}", pc, property, message);
     }
 }
+
 
