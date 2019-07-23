@@ -1,5 +1,7 @@
 package com.cognizant.devops.platformneo4jbackuputility.neo4j.tool;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.neo4j.graphdb.*;
 import org.neo4j.graphdb.factory.GraphDatabaseFactory;
 import org.neo4j.helpers.collection.MapUtil;
@@ -13,6 +15,7 @@ import java.util.*;
  * @since 28.07.11
  */
 public class PropertyAnalyzer {
+	private static Logger LOG = LogManager.getLogger(PropertyAnalyzer.class);
     static class PropertyInfo {
         String name;
         int count;
@@ -107,9 +110,9 @@ public class PropertyAnalyzer {
                withoutProps += analyzeProperties(props, relationship);
             }
             if (nodes % 1000 == 0) {
-                System.out.print(".");
+				LOG.debug(".");
                 if (nodes % 100000 == 0)
-                    System.out.println(" "+nodes);
+					LOG.debug(" " + nodes);
             }
         }
         db.shutdown();
@@ -135,14 +138,14 @@ public class PropertyAnalyzer {
     }
 
     private static void outputEmptyCounts(int withoutProps, Map<String, PropertyInfo> props, int nodes, int rels) {
-        System.out.println();
-        int emptyCount=0, allCount = 0;
+		int emptyCount = 0, allCount = 0;
         for (PropertyInfo info : props.values()) {
             emptyCount += info.getEmptyCount();
             allCount += info.getCount();
-            System.out.println(info);
+			LOG.debug(info);
         }
-        System.out.printf("%d of %d empty properties %d nodes %d rels pc w/o props %d%n", emptyCount, allCount,nodes,rels,withoutProps);
+		LOG.debug("%d of %d empty properties %d nodes %d rels pc w/o props %d%n", emptyCount, allCount, nodes, rels,
+				withoutProps);
     }
 
     private static boolean isDefaultValue(Object property) {
@@ -159,7 +162,7 @@ public class PropertyAnalyzer {
         if (property instanceof byte[]) return ((byte[])property).length==0;
         if (property instanceof float[]) return ((float[])property).length==0;
         if (property instanceof double[]) return ((double[])property).length==0;
-        System.out.println("property = " + property);
+		LOG.debug("property = " + property);
         return false;
     }
 }

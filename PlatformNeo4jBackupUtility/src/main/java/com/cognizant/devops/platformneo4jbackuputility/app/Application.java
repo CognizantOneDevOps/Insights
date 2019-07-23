@@ -26,13 +26,10 @@ import org.apache.logging.log4j.Logger;
 import com.cognizant.devops.platformneo4jbackuputility.neo4j.tool.StoreCopy;
 
 public class Application {
-	private static Logger LOG = LogManager.getLogger("RollingFile");
-
-	//private static Logger LOG_SKIPENTRIES = LogManager.getLogger("RollingFileSkipEntries");
+	private static Logger LOG = LogManager.getLogger(Application.class);
 	static Properties properties = new Properties();
 	public static void main(String[] args) throws Exception {
 		LOG.debug(" Neo4j data backup /store backup start  ");
-		//LOG_SKIPENTRIES.debug("  Neo4j data backup /store backup start ");
 		getPropValues();
 		String sourceDir = StoreCopy.getArgument(args, 0, properties, "source_db_dir");
 		String targetDir = StoreCopy.getArgument(args, 1, properties, "target_db_dir");
@@ -40,24 +37,25 @@ public class Application {
 		if (sourceDir.equalsIgnoreCase("") || targetDir.equalsIgnoreCase("")) {
 			LOG.error("Please select source and target dir");
 			throw new IllegalArgumentException("Please provide source and target dir");
+		} else {
+			Set<String> ignoreRelTypes = StoreCopy
+					.splitToSet(StoreCopy.getArgument(args, 2, properties, "rel_types_to_ignore"));
+			Set<String> ignoreProperties = StoreCopy
+					.splitToSet(StoreCopy.getArgument(args, 3, properties, "properties_to_ignore"));
+			Set<String> ignoreLabels = StoreCopy
+					.splitToSet(StoreCopy.getArgument(args, 4, properties, "labels_to_ignore"));
+			Set<String> deleteNodesWithLabels = StoreCopy
+					.splitToSet(StoreCopy.getArgument(args, 5, properties, "labels_to_delete"));
+			String keepNodeIdsParam = StoreCopy.getArgument(args, 6, properties, "keep_node_ids");
+			boolean keepNodeIds = !("false".equalsIgnoreCase(keepNodeIdsParam));
+			LOG.debug(
+					"Copying from {} to {} ingoring rel-types {} ignoring properties {} ignoring labels {} removing nodes with labels {} keep node ids {} ",
+					sourceDir, targetDir, ignoreRelTypes, ignoreProperties, ignoreLabels, deleteNodesWithLabels,
+					keepNodeIds);
+			StoreCopy.copyStore(sourceDir, targetDir, ignoreRelTypes, ignoreProperties, ignoreLabels,
+					deleteNodesWithLabels, keepNodeIds);
+			LOG.debug(" Neo4j data backup /store backup completed  ");
 		}
-
-		Set<String> ignoreRelTypes = StoreCopy
-				.splitToSet(StoreCopy.getArgument(args, 2, properties, "rel_types_to_ignore"));
-		Set<String> ignoreProperties = StoreCopy
-				.splitToSet(StoreCopy.getArgument(args, 3, properties, "properties_to_ignore"));
-		Set<String> ignoreLabels = StoreCopy.splitToSet(StoreCopy.getArgument(args, 4, properties, "labels_to_ignore"));
-		Set<String> deleteNodesWithLabels = StoreCopy
-				.splitToSet(StoreCopy.getArgument(args, 5, properties, "labels_to_delete"));
-		String keepNodeIdsParam = StoreCopy.getArgument(args, 6, properties, "keep_node_ids");
-		boolean keepNodeIds = !("false".equalsIgnoreCase(keepNodeIdsParam));
-		LOG.debug(
-				"Copying from %s to %s ingoring rel-types %s ignoring properties %s ignoring labels %s removing nodes with labels %s keep node ids %s %n",
-				sourceDir, targetDir, ignoreRelTypes, ignoreProperties, ignoreLabels, deleteNodesWithLabels,
-				keepNodeIds);
-		StoreCopy.copyStore(sourceDir, targetDir, ignoreRelTypes, ignoreProperties, ignoreLabels, deleteNodesWithLabels,
-				keepNodeIds);
-		LOG.debug(" Neo4j data backup /store backup completed  ");
 	}
 
 	public static void getPropValues() throws IOException {
@@ -77,7 +75,7 @@ public class Application {
 				try {
 					input.close();
 				} catch (IOException e) {
-					e.printStackTrace();
+					LOG.error("Unable to read property file");
 				}
 			}
 		}

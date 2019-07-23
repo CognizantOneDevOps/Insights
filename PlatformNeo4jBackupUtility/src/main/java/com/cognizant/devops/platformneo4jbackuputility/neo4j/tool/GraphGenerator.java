@@ -1,13 +1,15 @@
 package com.cognizant.devops.platformneo4jbackuputility.neo4j.tool;
 
+import java.io.File;
+import java.util.Arrays;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.Transaction;
 import org.neo4j.graphdb.factory.GraphDatabaseFactory;
-
-import java.io.File;
-import java.util.Arrays;
 
 /**
  * @author mh
@@ -15,6 +17,7 @@ import java.util.Arrays;
  */
 public class GraphGenerator {
     public static final int MILLION = 1000 * 1000;
+	private static Logger LOG = LogManager.getLogger(GraphGenerator.class);
 
     public static void main(String[] args) {
         final GraphDatabaseService gdb = new GraphDatabaseFactory().newEmbeddedDatabase(new File("target/data"));
@@ -36,11 +39,11 @@ public class GraphGenerator {
                 }
                 last = node;
                 if ((i % 100) == 0) {
-                    System.out.print(".");
+					LOG.debug(".");
                     if ((i % 10000) == 0) {
                         tx.success();
                         tx.close();
-                        System.out.println(" " + i);
+						LOG.debug(" " + i);
                         tx = graphdb.beginTx();
                     }
                 }
@@ -49,8 +52,7 @@ public class GraphGenerator {
             tx.success();
             tx.close();
         }
-        System.out.println();
         long delta = (System.currentTimeMillis() - cpuTime);
-        System.out.println("create-db delta = " + delta);
+		LOG.debug("create-db delta = " + delta);
     }
 }
