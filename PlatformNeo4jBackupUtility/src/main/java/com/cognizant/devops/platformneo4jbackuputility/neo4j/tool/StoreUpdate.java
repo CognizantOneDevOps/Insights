@@ -12,7 +12,8 @@ import java.util.Map;
  * @since 21.12.11
  */
 public class StoreUpdate {
-    public static Map<String, String> config() {
+	@SuppressWarnings("unchecked")
+	public static Map<String, String> config() {
         //noinspection unchecked
         return (Map) MapUtil.map(
                 "neostore.nodestore.db.mapped_memory", "100M",
