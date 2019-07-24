@@ -23,7 +23,6 @@ public class MessageQueueDataModel implements Serializable{
 	private String password;
 	private int prefetchCount=10;
 	
-
 	public String getHost() {
 		return host;
 	}
