@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.cognizant.devops</groupId>
 	<artifactId>PlatformNeo4jBackupUtility</artifactId>
-	<version>5.3-SNAPSHOT</version>
+	<version>5.3</version>
 	<name>PlatformNeo4jBackupUtility</name>
 	<description>PlatformNeo4jBackupUtility Project used to run as utility which do Neo4j backup and other activity</description>
 	<properties>
