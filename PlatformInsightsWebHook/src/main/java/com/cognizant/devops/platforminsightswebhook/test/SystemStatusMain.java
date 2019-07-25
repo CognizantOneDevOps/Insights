@@ -80,7 +80,7 @@ public class SystemStatusMain {
 			}
 			System.out.print(" response code " + response.getStatus() + "  output  " + output);
 		} catch (Exception e) {
-			e.printStackTrace();
+			//e.printStackTrace();
 			LOG.debug(" error while getGetting  jerseyPostClientWithAuthentication " + e.getMessage());
 			throw new RuntimeException(
 					"Failed : error while getGetting jerseyPostClientWithAuthentication : " + e.getMessage());
