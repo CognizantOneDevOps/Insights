@@ -141,7 +141,7 @@
                         <th colspan="3" class="tableHeaderCss mat-header-cell" style="height:40px;border-radius: 10px 10px 0 0;padding-left: 15px;padding-right: 65px">
                             <span class="mainHeaderText">Add details to Configure a Webhook</span>
                             <span class="infoHeaderText">(Please provide accurate details to Configure a Webhook.
-                                Fields marked "*" are mandatory)
+                                Fields marked "<span style="color:#ff0000;">*</span>" are mandatory)
                             </span>
                         </th>
                     </tr>
@@ -195,7 +195,7 @@
                     <tr class="mat-row-webhook">
                         <td class="mat-cell" class="columnName">
                             <span class="mainText">Data Format</span>
-                            <span class="asteriskText">*</span>
+                            <!-- <span class="asteriskText">*</span> -->
                         </td>
                         <td class="columnComponent">
                             <mat-select [(ngModel)]="dataformat" required name="dataformat" class="form-control"

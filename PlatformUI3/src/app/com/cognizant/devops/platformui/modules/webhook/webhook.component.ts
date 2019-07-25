@@ -241,9 +241,9 @@ export class WebHookComponent implements OnInit {
         else if (selectedTool == "") {
             this.messageDialog.showApplicationsMessage("Please select a Tool ", "ERROR");
         }
-        else if (eventToSubscribe == "") {
+       /*  else if (eventToSubscribe == "") {
             this.messageDialog.showApplicationsMessage("Please select an Event to Subscribe ", "ERROR");
-        }
+        } */
         else if (dataformat == "") {
             this.messageDialog.showApplicationsMessage("Please select a Data Format ", "ERROR");
         }
@@ -344,6 +344,7 @@ export class WebHookComponent implements OnInit {
         });
     }
     async editWebhook() {
+        this.enableEdit = false;
         var isSessionExpired = this.dataShare.validateSession();
         this.enableDelete = false;
         if (!isSessionExpired) {
