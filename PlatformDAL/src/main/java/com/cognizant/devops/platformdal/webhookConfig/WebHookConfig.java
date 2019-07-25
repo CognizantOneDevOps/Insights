@@ -34,7 +34,7 @@ public class WebHookConfig {
 	@Column(name = "SUBSCRIBE_STATUS")
 	private Boolean subscribeStatus;
 	
-	@Column(name = "RESPONSE_TEMPLATE")
+	@Column(name = "RESPONSE_TEMPLATE",length = 5000)
 	private String responseTemplate;
 	
 	@Column(name = "TOOL_NAME")
