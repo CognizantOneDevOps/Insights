@@ -99,12 +99,12 @@ public class WebHookService implements IWebHook {
 
 	public Boolean updateWebHook(String webhookname, String toolName, String eventname, String dataformat,
 			String mqchannel, Boolean subscribestatus, String responseTemplate) throws InsightsCustomException {
-		//Boolean status;
+		// Boolean status;
 		try {
 			WebHookConfig webHookConfig = populateWebHookConfiguration(webhookname, toolName, eventname, dataformat,
 					mqchannel, subscribestatus, responseTemplate);
 			WebHookConfigDAL webhookConfigurationDAL = new WebHookConfigDAL();
-			//	log.error(status);
+			// log.error(status);
 			return webhookConfigurationDAL.updateWebHookConfiguration(webHookConfig);
 		} catch (Exception e) {
 			log.error("Error updating the webhook", e);
