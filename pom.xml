@@ -26,6 +26,7 @@
 		<module>PlatformUI3</module>
 		<module>PlatformInsights</module>
 		<module>PlatformInsightsWebHook</module>
+		<module>PlatformWebhookEngine</module>
 	</modules>
 			
 	<dependencies>
