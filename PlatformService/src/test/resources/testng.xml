@@ -5,7 +5,7 @@
 	<test name = "PlatformServiceTest">
       <classes>
           <class name = "com.cognizant.devops.platformservice.test.testngInitializer.TestngInitializerTest"/>
-        <class name = "com.cognizant.devops.platformservice.test.about.AboutServiceTest"/>
+        	<class name = "com.cognizant.devops.platformservice.test.about.AboutServiceTest"/>
           <class name = "com.cognizant.devops.platformservice.test.agentManagement.AgentManagementTest"/>
       </classes>
 	 </test>
