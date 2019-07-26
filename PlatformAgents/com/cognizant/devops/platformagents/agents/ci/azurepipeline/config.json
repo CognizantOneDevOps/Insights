@@ -1,0 +1,74 @@
+{
+  "mqConfig": {
+    "user": "iSight",
+    "password": "iSight",
+    "host": "127.0.0.1",
+    "exchange": "iSight",
+    "agentControlXchg": "iAgent"
+  },
+  "subscribe": {
+    "config": "CI.AZUREPIPELINE.config"
+  },
+  "publish": {
+    "data": "CI.AZUREPIPELINE.DATA",
+    "health": "CI.AZUREPIPELINE.HEALTH"
+  },
+  "communication": {
+    "type": "REST",
+    "sslVerify": false,
+    "responseType": "JSON"
+  },
+  "dynamicTemplate": {
+    "timeFieldMapping": {
+      "startDate": "%Y-%m-%d"
+    },
+    "responseTemplate": {
+      "result": "result",
+      "id": "buildId",
+      "sourceVersion": "sourceVersion",
+	  "sourceBranch": "sourceBranch",
+      "queueTime": "queuedDate",
+      "reason": "manual",
+      "requestedBy": {
+        "displayName": "ciAuthorName",
+        "uniqueName": "ciAuthor"
+      },
+      "status": "status",
+      "repository": {
+        "type": "repositoryType",
+		"name": "repositoryName"
+      },
+      "buildNumber": "buildNumber",
+      "startTime": "startDate",
+      "finishTime": "finishDate",
+      "definition": {
+        "name": "buildDefinitionName"
+      },
+      "url": "buildUrl",
+      "priority": "priority"
+    }
+  },
+  "agentId" : "",
+  "toolCategory": "CI",
+  "toolsTimeZone": "Asia/Kolkata",
+  "insightsTimeZone": "Asia/Kolkata",
+  "enableDataValidation": true,
+  "isDebugAllowed": false,
+  "enableValueArray": false,
+  "useResponseTemplate": true,
+  "runSchedule": 30,
+  "auth": "NTLM",
+  "userID": "user",
+  "passwd": "auth token",
+  "baseUrl": "https://<vsts-hostname>",
+  "collectionName": "myorganization",
+  "timeStampField": "startDate",
+  "timeStampFormat": "%Y-%m-%dT%H:%M:%S",
+  "isEpochTimeFormat": false,
+  "startFrom": "2017-01-01 01:01:01",
+  "loggingSetting": {
+    "logLevel": "WARN",
+    "maxBytes": 5000000,
+    "backupCount": 1000
+  }
+}
