@@ -48,15 +48,16 @@ public class AgentManagementTest extends AgentDummyData{
 	public void testRegisterAgent() throws InsightsCustomException {
 		
 		JsonObject json = getProperties();
-		
+		ApplicationConfigProvider.getInstance().getAgentDetails().setUnzipPath("C://Shubhangi");
+		AgentManagementServiceImpl agentServiceImpl = new AgentManagementServiceImpl();
 		String expectedOutcome = "SUCCESS";
 		System.out.println(agentDummyData.toolName);
 		
-		String response = agentManagementServiceImpl.registerAgent(agentDummyData.toolName, 
+		String response = agentServiceImpl.registerAgent(agentDummyData.toolName, 
 							agentDummyData.agentVersion, agentDummyData.osversion, 
 							agentDummyData.configDetails, agentDummyData.trackingDetails);
 		
-		String response1 = agentManagementServiceImpl.registerAgent("@d#", 
+		String response1 = agentServiceImpl.registerAgent("@d#", 
 				agentDummyData.agentVersion, agentDummyData.osversion, 
 				agentDummyData.configDetails, agentDummyData.trackingDetails);
 		
@@ -102,7 +103,7 @@ public class AgentManagementTest extends AgentDummyData{
 	@Test
 	public void testGetSystemAvailableAgentListForOfflineRegistration() throws InsightsCustomException {
 		AgentManagementServiceImpl agentImpl = new AgentManagementServiceImpl();
-		ApplicationConfigProvider.getInstance().getAgentDetails().setOnlineRegistration(true);
+		ApplicationConfigProvider.getInstance().getAgentDetails().setOnlineRegistration(false);
 		Map<String, ArrayList<String>> availableAgents = agentImpl.getSystemAvailableAgentList();
 		Assert.assertNotNull(availableAgents);
 		Assert.assertTrue(availableAgents.size() > 0);
