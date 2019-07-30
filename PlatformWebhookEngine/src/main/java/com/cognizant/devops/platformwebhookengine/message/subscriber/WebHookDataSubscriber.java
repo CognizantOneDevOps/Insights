@@ -65,6 +65,7 @@ public class WebHookDataSubscriber extends EngineSubscriberResponseHandler {
 		String keyRT = "";
 		String keyMqInitial;
 		String keyRTInitial;
+		Object valueRT;
 		String removeString = "";
 		Neo4jDBHandler dbHandler = new Neo4jDBHandler();
 		String message = new String(body, MessageConstants.MESSAGE_ENCODING);
@@ -77,19 +78,25 @@ public class WebHookDataSubscriber extends EngineSubscriberResponseHandler {
 		JsonParser parser = new JsonParser();
 		JsonElement json = (JsonElement) parser.parse(message);
 		// log.debug(json);
-		JsonElement responseTemplateJson = (JsonElement) parser.parse(responseTemplate);
+		// JsonElement responseTemplateJson = (JsonElement)
+		// parser.parse(responseTemplate);
 
 		// String flattenedJson =
 		// JsonFlattener.flatten(responseTemplateJson.toString());
 		// log.debug("\n=====Simple Flatten===== \n" + flattenedJson);
-		Map<String, Object> responseTemplateflattenedJsonMap = JsonFlattener
-				.flattenAsMap(responseTemplateJson.toString());
+		/*
+		 * Map<String, Object> responseTemplateflattenedJsonMap = JsonFlattener
+		 * .flattenAsMap(responseTemplateJson.toString());
+		 */
+
 		// log.debug("\n=====Simple Flatten===== \n" +
 		// responseTemplateflattenedJsonMap);
 
 		Map<String, Object> rabbitMqflattenedJsonMap = JsonFlattener.flattenAsMap(json.toString());
-		System.out.println("Size of the rabbit mq json.." + rabbitMqflattenedJsonMap.size());
+		// System.out.println("Size of the rabbit mq json.." +
+		// rabbitMqflattenedJsonMap.size());
 		Map<String, Object> finalJson = new HashMap<String, Object>();
+		JsonObject neo4jjson = new JsonObject();
 		// log.debug("\n=====Simple Flatten===== \n" + rabbitMqflattenedJsonMap);
 		char b1;
 		char b2;
@@ -103,14 +110,14 @@ public class WebHookDataSubscriber extends EngineSubscriberResponseHandler {
 			for (int i = 0; i < l1; i++) {
 				b1 = keyMqInitial.charAt(i);
 				keyMq = keyMqInitial;
-				System.out.print(b1);
+				// System.out.print(b1);
 				if (b1 == '[') {
 					hault = true;
 				} else if (b1 == ']') {
 					hault = false;
 
 					removeString = removeString.substring(1);
-					log.error(removeString);
+					// log.error(removeString);
 					keyMq = keyMqInitial.replaceAll(removeString, "");
 					// System.out.println("keyMq"+keyMq);
 					removeString = "";
@@ -121,44 +128,62 @@ public class WebHookDataSubscriber extends EngineSubscriberResponseHandler {
 				}
 
 			}
+			String value = responseTemplate;
+			// value = value.substring(1, value.length()-1); //remove curly brackets
+			String[] keyValuePairs = value.split(","); // split the string to creat key-value pairs
+			Map<String, String> map = new HashMap<>();
 
-			for (Map.Entry<String, Object> insideEntry : responseTemplateflattenedJsonMap.entrySet()) {
-				keyRTInitial = insideEntry.getKey();
-				System.out.println(keyRTInitial);
-				int l2 = keyRTInitial.length();
-				log.error("Length of the key of Response Template" + l2);
-				for (int i = 0; i < l2; i++) {
-					b1 = keyRTInitial.charAt(i);
-					keyRT = keyRTInitial;
+			for (String pair : keyValuePairs) // iterate over the pairs
+			{
+				String[] entry1 = pair.split("="); // split the pairs to get key and value
+				map.put(entry1[0].trim(), entry1[1].trim());
 
-					if (b1 == '[') {
-						hault = true;
-					} else if (b1 == ']') {
-						hault = false;
+				// add them to the hashmap and trim whitespaces
 
-						removeString = removeString.substring(1);
-						keyRT = keyRTInitial.replaceAll(removeString, "");
-						System.out.println("Final string after the removal of index in response template " + keyRT);
-						removeString = "";
-					}
-
-					if (hault) {
-						removeString = removeString + b1;
-					}
-
-				}
 				Boolean testResult;
-				System.out.println("bEFORE Compare...keyRT" + keyRT);
-				System.out.println("bEFORE Compare...keyMQ" + keyMq);
-				testResult = keyMq.equals(keyRT);
+				// System.out.println("bEFORE Compare...keyRT" + keyRT);
+				// System.out.println("bEFORE Compare...keyMQ" + keyMq);
+				testResult = keyMq.equals(entry1[0].trim());
 				// log.error(testResult);
 
 				if (testResult) {
-					finalJson.put(keyRTInitial, entry.getValue());
-					System.out.println(finalJson);
+					// finalJson.put(keyRTInitial, entry.getValue());
+					finalJson.put(entry1[1].trim(), entry.getValue());
+					// System.out.println(finalJson);
 				}
-
 			}
+
+			/*
+			 * for (Map.Entry<String, Object> insideEntry :
+			 * responseTemplateflattenedJsonMap.entrySet()) { keyRTInitial =
+			 * insideEntry.getKey(); valueRT=insideEntry.getValue();
+			 * //System.out.println(keyRTInitial); int l2 = keyRTInitial.length();
+			 * //log.error("Length of the key of Response Template" + l2); for (int i = 0; i
+			 * < l2; i++) { b1 = keyRTInitial.charAt(i); keyRT = keyRTInitial;
+			 * 
+			 * if (b1 == '[') { hault = true; } else if (b1 == ']') { hault = false;
+			 * 
+			 * removeString = removeString.substring(1); keyRT =
+			 * keyRTInitial.replaceAll(removeString, ""); //System.out.
+			 * println("Final string after the removal of index in response template " +
+			 * keyRT); removeString = ""; }
+			 * 
+			 * if (hault) { removeString = removeString + b1; }
+			 * 
+			 * } Boolean testResult; //System.out.println("bEFORE Compare...keyRT" + keyRT);
+			 * //System.out.println("bEFORE Compare...keyMQ" + keyMq); testResult =
+			 * keyMq.equals(keyRT); // log.error(testResult);
+			 * 
+			 * if (testResult) { // finalJson.put(keyRTInitial, entry.getValue());
+			 * finalJson.put(valueRT.toString(), entry.getValue());
+			 * //System.out.println(finalJson); } Gson prettyGson = new
+			 * GsonBuilder().setPrettyPrinting().create(); String stringtoContinue =
+			 * prettyGson.toJson(entry.getValue()); JsonObject json2 = (JsonObject)
+			 * parser.parse(stringtoContinue); neo4jjson.add(valueRT.toString(), json2);
+			 * 
+			 * }
+			 */
+
 		}
 		// sGsonBuilder gsonMapBuilder = new GsonBuilder();
 		/*
@@ -169,7 +194,7 @@ public class WebHookDataSubscriber extends EngineSubscriberResponseHandler {
 		 */
 		Gson prettyGson = new GsonBuilder().setPrettyPrinting().create();
 		String prettyJson = prettyGson.toJson(finalJson);
-		System.out.println("second method" + prettyJson);
+		// System.out.println("second method" + prettyJson);
 		String nestedJson = JsonUnflattener.unflatten(prettyJson);
 		System.out.println("\n=====Unflatten it back to original JSON===== \n" + nestedJson);
 
