@@ -74,7 +74,7 @@ export class WebHookComponent implements OnInit {
     regex = new RegExp("^[a-zA-Z0-9_]*$");
     @ViewChild(MatPaginator) paginator: MatPaginator;
     dataformats: DataType[] = [
-        { value: 'text', viewValue: 'Text' },
+
         { value: 'json', viewValue: 'Json' },
     ];
     constructor(private router: Router, private bulkuploadService: BulkUploadService, private webhookService: WebHookService, private dialog: MatDialog, public messageDialog: MessageDialogService, private dataShare: DataSharedService) {
@@ -241,12 +241,12 @@ export class WebHookComponent implements OnInit {
         else if (selectedTool == "") {
             this.messageDialog.showApplicationsMessage("Please select a Tool ", "ERROR");
         }
-       /*  else if (eventToSubscribe == "") {
-            this.messageDialog.showApplicationsMessage("Please select an Event to Subscribe ", "ERROR");
-        } */
-        else if (dataformat == "") {
+        /*  else if (eventToSubscribe == "") {
+             this.messageDialog.showApplicationsMessage("Please select an Event to Subscribe ", "ERROR");
+         } */
+        /* else if (dataformat == "") {
             this.messageDialog.showApplicationsMessage("Please select a Data Format ", "ERROR");
-        }
+        } */
         else if (mqchannel == "") {
             this.messageDialog.showApplicationsMessage("Please select a MQ Channel ", "ERROR");
         }
@@ -314,7 +314,7 @@ export class WebHookComponent implements OnInit {
                                         self.messageDialog.showApplicationsMessage("<b>" + webhookName + "</b> already exists. Please try again with a new name.", "ERROR");
                                     }
                                     else {
-                                        self.list();
+                                        //self.list();
                                         self.messageDialog.showApplicationsMessage("Failed to save the webhook", "ERROR");
                                     }
                                 })
