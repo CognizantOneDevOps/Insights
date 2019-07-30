@@ -34,10 +34,10 @@ detectPythonVersion()
 {
      if echo "$1" | grep -q "Python 2"; then
       echo "Detected python 2 version";
-      python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.alm.cirlcleci.CircleAgent import CircleAgent; CircleAgent()" &
+      python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.ci.circleci.CircleAgent import CircleAgent; CircleAgent()" &
      elif echo "$1" | grep -q "Python 3"; then
       echo "Detected python 3 version";
-      python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.alm.cirlcleci.CircleAgent3 import CircleAgent; CircleAgent()" &
+      python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.ci.circleci.CircleAgent3 import CircleAgent; CircleAgent()" &
      else
       echo "python version not supported"
 	  exit 1;
