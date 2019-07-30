@@ -34,10 +34,10 @@ detectPythonVersion()
 {
      if echo "$1" | grep -q "Python 2"; then
       echo "Detected python 2 version";
-      python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.alm.dynatrace.DynatraceAgent import DynatraceAgent; DynatraceAgent()" &
+      python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.appmonitoring.dynatrace.DynatraceAgent import DynatraceAgent; DynatraceAgent()" &
      elif echo "$1" | grep -q "Python 3"; then
       echo "Detected python 3 version";
-      python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.alm.dynatrace.DynatraceAgent3 import DynatraceAgent; DynatraceAgent()" &
+      python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.appmonitoring.dynatrace.DynatraceAgent3 import DynatraceAgent; DynatraceAgent()" &
      else
       echo "python version not supported"
 	  exit 1;
