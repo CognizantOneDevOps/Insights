@@ -22,10 +22,10 @@ import requests
 from requests.auth import HTTPBasicAuth
 import json
 import copy
-from ....agents.ci.jenkins.JenkinsAgent3 import JenkinsAgent
+from .JenkinsAgent3 import JenkinsAgent
 
 
-class JenkinsLogParserAgent(JenkinsAgent):         
+class JenkinsLogParserAgent(BaseAgent):         
     
     def processLogParsing(self, buildDetails):
         dataList = []
