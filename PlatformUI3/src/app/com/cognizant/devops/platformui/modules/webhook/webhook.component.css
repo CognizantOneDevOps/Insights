@@ -61,6 +61,17 @@ table,mat-table {
     fill: #ff0000 !important
 }
 
+
+.svgIconCssCopyClipboard
+{
+    color: #0033A0 !important;
+    height: 20px;
+    width: 40px;
+    margin-bottom: 7px;
+    fill: #0033A0 !important
+}
+
+
 .mat-cell {
     font-size: 14px;
     height: 40px;

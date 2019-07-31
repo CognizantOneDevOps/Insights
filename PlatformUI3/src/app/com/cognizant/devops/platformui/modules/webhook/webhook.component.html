@@ -78,6 +78,11 @@
                     delete
                 </mat-icon>
             </button>
+            <button mat-icon-button>
+                <mat-icon class="svgIconCssCopyClipboard" (click)="copyInputMessage(selectedWebhook)" [ngxClipboard]="value_to_copy"
+                    [title]="textToCopy" svgIcon="webhookCopyClipboard">
+                </mat-icon>
+            </button>
             <button mat-icon-button (click)="Refresh()" [disabled]="!enableRefresh">
                 <mat-icon title="Refresh" class="mat-icon material-icons">
                     cancel
