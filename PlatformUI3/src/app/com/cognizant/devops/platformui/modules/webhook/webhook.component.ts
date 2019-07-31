@@ -26,6 +26,8 @@ import { DataSharedService } from '@insights/common/data-shared-service';
 import { BulkUploadService } from '@insights/app/modules/bulkupload/bulkupload.service'
 import { count } from 'rxjs/operators';
 import { ApplicationMessageDialog } from '../application-dialog/application-message-dialog';
+import { InsightsInitService } from '@insights/common/insights-initservice';
+import { ClipboardService } from 'ngx-clipboard'
 //import { Control} from '@angular/common';
 export interface DataType {
     value: string;
@@ -60,6 +62,7 @@ export class WebHookComponent implements OnInit {
     responseTemplate: any;
     dataformat: any;
     actionType: any;
+    textToCopy: String;
     statussubscribe: boolean = false;
     enableDelete: boolean = false;
     enableRefresh: boolean = false;
@@ -77,11 +80,19 @@ export class WebHookComponent implements OnInit {
 
         { value: 'json', viewValue: 'Json' },
     ];
-    constructor(private router: Router, private bulkuploadService: BulkUploadService, private webhookService: WebHookService, private dialog: MatDialog, public messageDialog: MessageDialogService, private dataShare: DataSharedService) {
+    constructor(private router: Router, private _clipboardService: ClipboardService, private bulkuploadService: BulkUploadService, private initservice: InsightsInitService, private webhookService: WebHookService, private dialog: MatDialog, public messageDialog: MessageDialogService, private dataShare: DataSharedService) {
         this.getLabelTools();
         this.getRegisteredWebHooks();
+
     }
     ngOnInit() {
+    }
+
+    setWebhookUrl(selectedWebhookEnable) {
+        var hostname = this.initservice.getWebhookHost();
+        var value_to_copy = hostname + "/webhook/PlatformInsightsWebHook/insightsDevOpsWebHook?webHookName=" + selectedWebhookEnable.webhookName;
+        console.log(value_to_copy)
+        this.textToCopy = value_to_copy;
     }
     addWebHook() {
         this.showAddWebHook = true;
@@ -102,6 +113,7 @@ export class WebHookComponent implements OnInit {
             this.enableEdit = true;
             this.radioRefresh = true;
             this.enableaddWebhook = false;
+            this.setWebhookUrl(selectedWebhookEnable);
             //console.log(selectedWebhookEnable)
             if (selectedWebhookEnable.subscribeStatus == 'Unsubscribed') {
                 this.enableunsubscribe = false;
@@ -231,6 +243,21 @@ export class WebHookComponent implements OnInit {
                     }
                 })
         }
+    }
+
+    copyInputMessage(inputElement) {
+
+        console.log("First " + this.textToCopy)
+        var hostname = this.initservice.getWebhookHost();
+        var value_to_copy = hostname + "/webhook/PlatformInsightsWebHook/insightsDevOpsWebHook?webHookName=" + inputElement.webhookName;
+        console.log(value_to_copy)
+        this.textToCopy = value_to_copy;
+        console.log("Second" + this.textToCopy);
+        this._clipboardService.copyFromContent(value_to_copy);
+
+
+
+        //  inputElement.webhookName.setSelec
     }
     saveData(webhookName, selectedTool, eventToSubscribe, dataformat, mqchannel, responseTemplate) {
         var self = this;
