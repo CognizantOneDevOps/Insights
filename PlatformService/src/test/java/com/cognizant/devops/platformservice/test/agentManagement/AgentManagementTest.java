@@ -1,8 +1,5 @@
 package com.cognizant.devops.platformservice.test.agentManagement;
 
-import java.io.IOException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
@@ -10,7 +7,6 @@ import java.util.Map;
 
 import org.springframework.test.context.ContextConfiguration;
 import org.testng.Assert;
-import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
@@ -20,7 +16,6 @@ import com.cognizant.devops.platformdal.agentConfig.AgentConfig;
 import com.cognizant.devops.platformdal.agentConfig.AgentConfigDAL;
 import com.cognizant.devops.platformservice.agentmanagement.service.AgentConfigTO;
 import com.cognizant.devops.platformservice.agentmanagement.service.AgentManagementServiceImpl;
-import com.cognizant.devops.platformservice.agentmanagement.util.AgentManagementUtil;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -48,7 +43,7 @@ public class AgentManagementTest extends AgentDummyData{
 	public void testRegisterAgent() throws InsightsCustomException {
 		
 		JsonObject json = getProperties();
-		ApplicationConfigProvider.getInstance().getAgentDetails().setUnzipPath("C://Shubhangi");
+		ApplicationConfigProvider.getInstance().getAgentDetails().setUnzipPath("C://Agents//unzip");
 		AgentManagementServiceImpl agentServiceImpl = new AgentManagementServiceImpl();
 		String expectedOutcome = "SUCCESS";
 		System.out.println(agentDummyData.toolName);
@@ -57,13 +52,32 @@ public class AgentManagementTest extends AgentDummyData{
 							agentDummyData.agentVersion, agentDummyData.osversion, 
 							agentDummyData.configDetails, agentDummyData.trackingDetails);
 		
-		String response1 = agentServiceImpl.registerAgent("@d#", 
+		/*String response1 = agentServiceImpl.registerAgent("@d#", 
 				agentDummyData.agentVersion, agentDummyData.osversion, 
-				agentDummyData.configDetails, agentDummyData.trackingDetails);
-		
+				agentDummyData.configDetails, agentDummyData.trackingDetails);*/
 		
 		Assert.assertEquals(expectedOutcome, response);
+		
+		List<AgentConfigTO>  registeredAgents = agentServiceImpl.getRegisteredAgents();
+		for (AgentConfigTO agentConfig : registeredAgents) {
+			Assert.assertTrue(agentConfig.equals("git"));
+		}
+		
 	}
+	
+	/*@Test(expectedExceptions = InsightsCustomException.class) 
+	public void testRegisterAgentInSystem() throws InsightsCustomException {
+		
+		JsonObject json = getProperties();
+		ApplicationConfigProvider.getInstance().getAgentDetails().setUnzipPath("C://Agents//unzip");
+		AgentManagementServiceImpl agentServiceImpl = new AgentManagementServiceImpl();
+		
+		String response = agentServiceImpl.registerAgent(agentDummyData.toolName, 
+							agentDummyData.agentVersion, agentDummyData.osversion, 
+							agentDummyData.configDetails, agentDummyData.trackingDetails);
+		System.out.println(agentServiceImpl.getSystemAvailableAgentList());
+		
+	}*/
 	
 	@Test(expectedExceptions = InsightsCustomException.class) 
 	public void testRegisterAgentWithEmptyTrackingDetails() throws InsightsCustomException {
@@ -77,19 +91,6 @@ public class AgentManagementTest extends AgentDummyData{
 		
 	}
 	
-	@Test(expectedExceptions = Exception.class) 
-	public void testRegisterAgentWithPath() throws InsightsCustomException, IOException {
-		
-		Path sourceFolderPath = Paths.get(ApplicationConfigProvider.getInstance().getAgentDetails().getUnzipPath(),
-				agentDummyData.agentId);
-		Path zipPath = Paths.get(ApplicationConfigProvider.getInstance().getAgentDetails().getUnzipPath(),
-				agentDummyData.agentId + ".zip");
-		Path agentZipPath = null;
-		agentZipPath = AgentManagementUtil.getInstance().getAgentZipFolder(sourceFolderPath, zipPath);
-		Assert.assertNotNull(agentZipPath);
-		
-	}
- 	
 	/*Method to get the available list of agents in the system. */
 	@Test
 	public void testGetSystemAvailableAgentList() throws InsightsCustomException {
@@ -97,7 +98,18 @@ public class AgentManagementTest extends AgentDummyData{
 		Map<String, ArrayList<String>> availableAgents = agentImpl.getSystemAvailableAgentList();
 		Assert.assertNotNull(availableAgents);
 		Assert.assertTrue(availableAgents.size() > 0);
+		Assert.assertTrue(availableAgents.containsKey("v5.0"));
+		Assert.assertTrue(availableAgents.containsKey("v5.2"));
 		
+		for (Map.Entry<String, ArrayList<String>> entry : availableAgents.entrySet()) {
+			
+		    if(entry.getKey().equals("v5.2") || entry.getKey().equals("v5.0")){
+			    ArrayList<String> toolNameList = entry.getValue();
+			    Assert.assertTrue(toolNameList.size() > 0);
+			    Assert.assertTrue(toolNameList.contains("git"));
+		    }
+		}
+	
 	}
 	
 	@Test
@@ -105,8 +117,20 @@ public class AgentManagementTest extends AgentDummyData{
 		AgentManagementServiceImpl agentImpl = new AgentManagementServiceImpl();
 		ApplicationConfigProvider.getInstance().getAgentDetails().setOnlineRegistration(false);
 		Map<String, ArrayList<String>> availableAgents = agentImpl.getSystemAvailableAgentList();
+		
 		Assert.assertNotNull(availableAgents);
 		Assert.assertTrue(availableAgents.size() > 0);
+		Assert.assertTrue(availableAgents.containsKey("v5.2"));
+		
+		for (Map.Entry<String, ArrayList<String>> entry : availableAgents.entrySet()) {
+			
+		    if(entry.getKey().equals("v5.2")){
+			    ArrayList<String> toolNameList = entry.getValue();
+			    Assert.assertTrue(toolNameList.size()>0);
+			    Assert.assertTrue(toolNameList.contains("git"));
+			    Assert.assertTrue(toolNameList.contains("pivotalTracker"));
+		    }
+		}
 		
 	}
 	
@@ -202,16 +226,38 @@ public class AgentManagementTest extends AgentDummyData{
 	
 	@Test(expectedExceptions = InsightsCustomException.class)
 	public void testGetToolRawConfigFile() throws InsightsCustomException {
-		String version ="version";
-		String tool = "tool";
-		String expectedOutcome = "Tool_CONFIG";
+		String version ="v5.2";
+		String tool = "pivotalTracker";
+		ApplicationConfigProvider.getInstance().getAgentDetails().setOnlineRegistration(true);
+		ApplicationConfigProvider.getInstance().getAgentDetails().setUnzipPath("C://Agents//unzip");
+		ApplicationConfigProvider.getInstance().getAgentDetails().setOfflineAgentPath("C://Agents//offline");
+		AgentManagementServiceImpl impl = new AgentManagementServiceImpl();
+		String configJson = impl.getToolRawConfigFile(version, tool);
+		
+		Assert.assertNotNull(configJson);
+		
+		Gson gson = new Gson();
+		JsonElement jsonElement = gson.fromJson(configJson.trim(), JsonElement.class);
+		JsonObject json = jsonElement.getAsJsonObject();
+		Assert.assertEquals(json.get("toolCategory"), "ALM");
+	}
+	
+	@Test(expectedExceptions = InsightsCustomException.class)
+	public void testGetToolRawConfigFileForOfflineRegistration() throws InsightsCustomException {
+		String version ="v5.2";
+		String tool = "pivotalTracker";
+		String expectedOutcome = "{\"mqConfig\":{\"user\":\"iSight\",\"password\":\"iSight\",\"host\":\"127.0.0.1\",\"exchange\":\"iSight\",\"agentControlXchg\":\"iAgent\"},\"subscribe\":{\"config\":\"ALM.PIVOTALTRACKER.config\",\"agentCtrlQueue\":\"pivotal_agent\"},\"publish\":{\"data\":\"ALM.PIVOTALTRACKER.DATA\",\"health\":\"ALM.PIVOTALTRACKER.HEALTH\"},\"communication\":{\"type\":\"REST\",\"sslVerify\":false,\"responseType\":\"JSON\"},\"dynamicTemplate\":{\"timeFieldMapping\":{\"startDate\":\"%Y-%m-%d\"},\"responseTemplate\":{\"id\":\"storyId\",\"created_at\":\"createdAt\",\"story_type\":\"storyType\",\"name\":\"storyName\",\"current_state\":\"currentStoryState\"},\"relationMetadata\":{\"labels\":[\"LATEST\"],\"relation\":{\"properties\":[\"iterationNumber\",\"projectId\",\"storyId\",\"backLog\",\"cycleTime\",\"rejectionRate\"],\"name\":\"ITERATION_HAS_ISSUES\",\"source\":{\"constraints\":[\"projectId\",\"storyId\"]},\"destination\":{\"constraints\":[\"iterationNumber\"]}}},\"storyMetadata\":{\"labels\":[\"STORY\"],\"dataUpdateSupported\":true,\"uniqueKey\":[\"projectId\",\"storyId\"]}},\"agentId\":\"pivotal_agent\",\"auth\":\"base64\",\"runSchedule\":30,\"toolCategory\":\"ALM\",\"enableValueArray\":false,\"enableDataValidation\":true,\"useResponseTemplate\":true,\"userid\":\"dsfd\",\"passwd\":\"fedfvdv\",\"token\":\"vdvdv\",\"baseEndPoint\":\"https://www.pivotaltracker.com\",\"startFrom\":\"2015-11-29 12:17:45\",\"toolsTimeZone\":\"Asia/Kolkata\",\"timeStampField\":\"createdAt\",\"timeStampFormat\":\"%Y-%m-%dT%H:%M:%SZ\",\"isEpochTimeFormat\":false,\"isDebugAllowed\":true,\"loggingSetting\":{\"logLevel\":\"WARN\",\"maxBytes\":5000000,\"backupCount\":1000},\"osversion\":\"windows\",\"agentVersion\":\"v5.2\",\"toolName\":\"PIVOTALTRACKER\"}";
 		ApplicationConfigProvider.getInstance().getAgentDetails().setOnlineRegistration(false);
-		ApplicationConfigProvider.getInstance().getAgentDetails().setUnzipPath("C://Shubhangi//");
-		ApplicationConfigProvider.getInstance().getAgentDetails().setOfflineAgentPath("C://Shubhangi//version//tools");
+		ApplicationConfigProvider.getInstance().getAgentDetails().setUnzipPath("C://Agents//unzip");
+		ApplicationConfigProvider.getInstance().getAgentDetails().setOfflineAgentPath("C://Agents//offline");
 		AgentManagementServiceImpl impl = new AgentManagementServiceImpl();
 		String configJson = impl.getToolRawConfigFile(version, tool);
 		
 		Assert.assertEquals(configJson, expectedOutcome);
+		Gson gson = new Gson();
+		JsonElement jsonElement = gson.fromJson(configJson.trim(), JsonElement.class);
+		JsonObject json = jsonElement.getAsJsonObject();
+		Assert.assertEquals(json.get("toolCategory"), "ALM");
 		
 	}
 	
@@ -254,7 +300,7 @@ public class AgentManagementTest extends AgentDummyData{
 	@Test(expectedExceptions = InsightsCustomException.class)
 	public void testUpdateAgent() throws InsightsCustomException {
 		
-		ApplicationConfigProvider.getInstance().getAgentDetails().setUnzipPath("C:/Shubhangi/");
+		ApplicationConfigProvider.getInstance().getAgentDetails().setUnzipPath("C://Agents//unzip");
 		ApplicationConfigProvider.getInstance().getAgentDetails().setOnlineRegistration(true);;
 		agentManagementServiceImpl.updateAgent("JENKINS_123", configDetails, toolName, agentVersion, osversion);
 	}
