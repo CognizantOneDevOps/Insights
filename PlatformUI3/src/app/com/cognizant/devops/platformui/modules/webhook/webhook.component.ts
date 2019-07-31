@@ -62,6 +62,7 @@ export class WebHookComponent implements OnInit {
     responseTemplate: any;
     dataformat: any;
     actionType: any;
+    value_to_copy: any;
     textToCopy: String;
     statussubscribe: boolean = false;
     enableDelete: boolean = false;
