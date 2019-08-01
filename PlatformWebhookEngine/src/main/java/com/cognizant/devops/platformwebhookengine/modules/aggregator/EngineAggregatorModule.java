@@ -81,7 +81,7 @@ public class EngineAggregatorModule implements Job {
 					//String nodeLabels = ":LATEST:" + dataRoutingKey.replace(".", ":");
 					try {
 						//graphDBHandler.executeCypherQuery("MERGE (n" + nodeLabels + ") return n");
-						registry.put(dataRoutingKey, new WebHookDataSubscriber(dataRoutingKey,responseTemplate));
+						registry.put(dataRoutingKey, new WebHookDataSubscriber(dataRoutingKey,responseTemplate,toolName));
 					}
 					catch (Exception e) {
 						log.error("Unable to add subscriber for routing key: "+e);
