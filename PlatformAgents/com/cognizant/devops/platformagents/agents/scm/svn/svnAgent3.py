@@ -49,7 +49,7 @@ class SvnAgent(BaseAgent):
             self.trackingData()
             self.publishData()
             if self.data != []:
-                print self.data
+                print(self.data)
                 self.publishToolsData(self.data)
             self.updateTrackingJson(self.trackingdata) 
         except Exception as e:

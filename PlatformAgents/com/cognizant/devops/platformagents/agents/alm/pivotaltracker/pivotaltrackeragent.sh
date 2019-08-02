@@ -34,10 +34,10 @@ detectPythonVersion()
 {
      if echo "$1" | grep -q "Python 2"; then
       echo "Detected python 2 version";
-      python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.alm.pivotalTracker.PivotalTrackerAgent import PivotalTrackerAgent; PivotalTrackerAgent()" &
+      python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.alm.pivotaltracker.PivotalTrackerAgent import PivotalTrackerAgent; PivotalTrackerAgent()" &
      elif echo "$1" | grep -q "Python 3"; then
       echo "Detected python 3 version";
-      python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.alm.pivotalTracker.PivotalTrackerAgent3 import PivotalTrackerAgent; PivotalTrackerAgent()" &
+      python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.alm.pivotaltracker.PivotalTrackerAgent3 import PivotalTrackerAgent; PivotalTrackerAgent()" &
      else
       echo "python version not supported"
 	  exit 1;
@@ -51,7 +51,7 @@ case "$1" in
      echo "InSightsPivotalTrackerAgent already running"
     else
      echo "Starting InSightsPivotalTrackerAgent"
-     cd $INSIGHTS_AGENT_HOME/PlatformAgents/pivotalTracker
+     cd $INSIGHTS_AGENT_HOME/PlatformAgents/pivotaltracker
 	 echo $python_version
      detectPythonVersion "$python_version"
     fi
@@ -81,14 +81,14 @@ case "$1" in
      sudo kill -9 $(ps aux | grep '__PS_KEY__' | awk '{print $2}')
      echo "InSightsPivotalTrackerAgent stopped"
      echo "InSightsPivotalTrackerAgent starting"
-     cd $INSIGHTS_AGENT_HOME/PlatformAgents/pivotalTracker
+     cd $INSIGHTS_AGENT_HOME/PlatformAgents/pivotaltracker
 	 echo $python_version
      detectPythonVersion "$python_version"
      echo "InSightsPivotalTrackerAgent started"
     else
      echo "InSightsPivotalTrackerAgent already in stopped state"
      echo "InSightsPivotalTrackerAgent starting"
-     cd $INSIGHTS_AGENT_HOME/PlatformAgents/pivotalTracker
+     cd $INSIGHTS_AGENT_HOME/PlatformAgents/pivotaltracker
 	 echo $python_version
      detectPythonVersion "$python_version"
      echo "InSightsPivotalTrackerAgent started"
