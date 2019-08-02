@@ -33,51 +33,51 @@ import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformwebhookengine.modules.aggregator.EngineAggregatorModule;
 
 public class Application {
-private static Logger log = LogManager.getLogger(Application.class.getName());
-	
-	private static int defaultInterval = 600;
-	private Application(){
-		
-	}
+    private static Logger log = LogManager.getLogger(Application.class.getName());
 
-	public static void main(String[] args) throws Exception{
-		if(args.length > 0){
-			defaultInterval = Integer.valueOf(args[0]);
-		}
-		try {
-			// Load insight configuration
-			ApplicationConfigCache.loadConfigCache();
-			
-			ApplicationConfigProvider.performSystemCheck();
-			
-			// Subscribe for desired events.
-			
-			JobDetail aggrgatorJob = JobBuilder.newJob(EngineAggregatorModule.class)
-					.withIdentity("EngineAggregatorModule", "iSight").build();
-           
-			Trigger aggregatorTrigger = TriggerBuilder.newTrigger()
-					.withIdentity("EngineAggregatorModuleTrigger", "iSight")
-					.startNow()
-					.withSchedule(SimpleScheduleBuilder.simpleSchedule()
-							.withIntervalInSeconds(defaultInterval)
-							.repeatForever())
-					.build();
-			
-			
-			Scheduler scheduler;
-			
-			scheduler = new StdSchedulerFactory().getScheduler();
-			scheduler.start();
-		    scheduler.scheduleJob(aggrgatorJob, aggregatorTrigger);
-			//EngineStatusLogger.getInstance().createEngineStatusNode("Platform Engine Service Started ",PlatformServiceConstants.SUCCESS);
-	
-		} catch (SchedulerException e) {
-		//EngineStatusLogger.getInstance().createEngineStatusNode("Platform Engine Service not running due to Scheduler Exception "+e.getMessage(),PlatformServiceConstants.FAILURE);
-		log.error(e);
-	}catch (Exception e) {
-		//EngineStatusLogger.getInstance().createEngineStatusNode("Platform Engine Service not running "+e.getMessage(),PlatformServiceConstants.FAILURE);
-		log.error(e);
-	}
+    private static int defaultInterval = 600;
+    private Application() {
+
+    }
+
+    public static void main(String[] args) throws Exception {
+        if (args.length > 0) {
+            defaultInterval = Integer.valueOf(args[0]);
+        }
+        try {
+            // Load insight configuration
+            ApplicationConfigCache.loadConfigCache();
+
+            ApplicationConfigProvider.performSystemCheck();
+
+            // Subscribe for desired events.
+
+            JobDetail aggrgatorJob = JobBuilder.newJob(EngineAggregatorModule.class)
+                .withIdentity("EngineAggregatorModule", "iSight").build();
+
+            Trigger aggregatorTrigger = TriggerBuilder.newTrigger()
+                .withIdentity("EngineAggregatorModuleTrigger", "iSight")
+                .startNow()
+                .withSchedule(SimpleScheduleBuilder.simpleSchedule()
+                    .withIntervalInSeconds(defaultInterval)
+                    .repeatForever())
+                .build();
+
+
+            Scheduler scheduler;
+
+            scheduler = new StdSchedulerFactory().getScheduler();
+            scheduler.start();
+            scheduler.scheduleJob(aggrgatorJob, aggregatorTrigger);
+            //EngineStatusLogger.getInstance().createEngineStatusNode("Platform Engine Service Started ",PlatformServiceConstants.SUCCESS);
+
+        } catch (SchedulerException e) {
+            //EngineStatusLogger.getInstance().createEngineStatusNode("Platform Engine Service not running due to Scheduler Exception "+e.getMessage(),PlatformServiceConstants.FAILURE);
+            log.error(e);
+        } catch (Exception e) {
+            //EngineStatusLogger.getInstance().createEngineStatusNode("Platform Engine Service not running "+e.getMessage(),PlatformServiceConstants.FAILURE);
+            log.error(e);
+        }
+    }
+
 }
-
-	}
