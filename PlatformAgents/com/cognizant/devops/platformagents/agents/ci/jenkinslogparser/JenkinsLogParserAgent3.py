@@ -25,7 +25,7 @@ import copy
 from .JenkinsAgent3 import JenkinsAgent
 
 
-class JenkinsLogParserAgent(BaseAgent):         
+class JenkinsLogParserAgent(JenkinsAgent):         
     
     def processLogParsing(self, buildDetails):
         dataList = []

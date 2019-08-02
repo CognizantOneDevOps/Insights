@@ -27,6 +27,21 @@
 ### END INIT INFO
 #export INSIGHTS_AGENT_HOME=/home/ec2-user/insightsagents
 source /etc/profile
+python_version="$(python -V 2>&1)"
+detectPythonVersion()
+{
+     if echo "$1" | grep -q "Python 2"; then
+      echo "Detected python 2 version";
+      python -c "from com.cognizant.devops.platformagents.agents.agentdaemon.AgentDaemonExecutor import AgentDaemonExecutor; AgentDaemonExecutor()" &
+     elif echo "$1" | grep -q "Python 3"; then
+      echo "Detected python 3 version";
+      python -c "from com.cognizant.devops.platformagents.agents.agentdaemon.AgentDaemonExecutor3 import AgentDaemonExecutor; AgentDaemonExecutor()" &
+     else
+      echo "python version not supported"
+	  exit 1;
+     fi
+
+}
 
 case "$1" in
   start)
@@ -35,7 +50,8 @@ case "$1" in
     else
      echo "Starting InSightsDaemonAgent"
      cd $INSIGHTS_AGENT_HOME/AgentDaemon
-     python -c "from com.cognizant.devops.platformagents.agents.agentdaemon.AgentDaemonExecutor import AgentDaemonExecutor; AgentDaemonExecutor()" &
+     echo $python_version
+     detectPythonVersion "$python_version"
     fi
     if [[ $(ps aux | grep '[a]gentdaemon.AgentDaemonExecutor' | awk '{print $2}') ]]; then
      echo "InSightsDaemonAgent Started Sucessfully"
@@ -64,13 +80,15 @@ case "$1" in
      echo "InSightsDaemonAgent stopped"
      echo "InSightsDaemonAgent starting"
      cd $INSIGHTS_AGENT_HOME/AgentDaemon
-     python -c "from com.cognizant.devops.platformagents.agents.agentdaemon.AgentDaemonExecutor import AgentDaemonExecutor; AgentDaemonExecutor()" &
+     echo $python_version
+     detectPythonVersion "$python_version"
      echo "InSightsDaemonAgent started"
     else
      echo "InSightsDaemonAgent already in stopped state"
      echo "InSightsDaemonAgent starting"
      cd $INSIGHTS_AGENT_HOME/AgentDaemon
-     python -c "from com.cognizant.devops.platformagents.agents.agentdaemon.AgentDaemonExecutor import AgentDaemonExecutor; AgentDaemonExecutor()" &
+     echo $python_version
+     detectPythonVersion "$python_version"
      echo "InSightsDaemonAgent started"
     fi
     ;;

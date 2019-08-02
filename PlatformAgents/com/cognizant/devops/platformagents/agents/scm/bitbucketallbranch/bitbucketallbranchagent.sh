@@ -14,7 +14,7 @@
 # the License.
 #-------------------------------------------------------------------------------
 #! /bin/sh
-# /etc/init.d/__AGENT_KEY__ 
+# /etc/init.d/__AGENT_KEY__
 
 ### BEGIN INIT INFO
 # Provides: Runs a Python script on startup
@@ -25,8 +25,6 @@
 # Short-Description: Simple script to run python program at boot
 # Description: Runs a python program at boot
 ### END INIT INFO
-
-
 #export INSIGHTS_AGENT_HOME=/home/ec2-user/insightsagents
 source /etc/profile
 python_version="$(python -V 2>&1)"
@@ -34,13 +32,13 @@ detectPythonVersion()
 {
      if echo "$1" | grep -q "Python 2"; then
       echo "Detected python 2 version";
-      python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.ci.circleci.CircleAgent import CircleAgent; CircleAgent()" &
+      python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.scm.bitbucketAllBranch.BitBucketAgentAllBranches  import BitBucketAgentAllBranches; BitBucketAgentAllBranches()" &
      elif echo "$1" | grep -q "Python 3"; then
       echo "Detected python 3 version";
-      python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.ci.circleci.CircleAgent3 import CircleAgent; CircleAgent()" &
+      python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.scm.bitbucketAllBranch.BitBucketAgentAllBranches3  import BitBucketAgentAllBranches; BitBucketAgentAllBranches()" &
      else
       echo "python version not supported"
-	  exit 1;
+      exit 1;
      fi
 
 }
@@ -48,62 +46,62 @@ detectPythonVersion()
 case "$1" in
   start)
     if [[ $(ps aux | grep '__PS_KEY__' | awk '{print $2}') ]]; then
-     echo "InSightsCircleAgent already running"
+     echo "InSightsBitBucketAgent already running"
     else
-     echo "Starting InSightsCircleAgent"
-     cd $INSIGHTS_AGENT_HOME/PlatformAgents/circleci
-	 echo $python_version
+     echo "Starting InSightsBitBucketAgent"
+     cd $INSIGHTS_AGENT_HOME/PlatformAgents/bitbucket
+     echo $python_version
      detectPythonVersion "$python_version"
     fi
     if [[ $(ps aux | grep '__PS_KEY__' | awk '{print $2}') ]]; then
-     echo "InSightsCircleAgent Started Sucessfully"
+     echo "InSightsBitBucketAgent Started Sucessfully"
     else
-     echo "InSightsCircleAgent Failed to Start"
+     echo "InSightsBitBucketAgent Failed to Start"
     fi
     ;;
   stop)
-    echo "Stopping InSightsCircleAgent"
+    echo "Stopping InSightsBitBucketAgent"
     if [[ $(ps aux | grep '__PS_KEY__' | awk '{print $2}') ]]; then
      sudo kill -9 $(ps aux | grep '__PS_KEY__' | awk '{print $2}')
     else
-     echo "InSightsCircleAgent already in stopped state"
+     echo "InSIghtsBitBucketAgent already in stopped state"
     fi
     if [[ $(ps aux | grep '__PS_KEY__' | awk '{print $2}') ]]; then
-     echo "InSightsCircleAgent Failed to Stop"
+     echo "InSightsBitBucketAgent Failed to Stop"
     else
-     echo "InSightsCircleAgent Stopped"
+     echo "InSightsBitBucketAgent Stopped"
     fi
     ;;
   restart)
-    echo "Restarting InSightsCircleAgent"
+    echo "Restarting InSightsBitBucketAgent"
     if [[ $(ps aux | grep '__PS_KEY__' | awk '{print $2}') ]]; then
-     echo "InSightsCircleAgent stopping"
+     echo "InSightsBitBucketAgent stopping"
      sudo kill -9 $(ps aux | grep '__PS_KEY__' | awk '{print $2}')
-     echo "InSightsCircleAgent stopped"
-     echo "InSightsCircleAgent starting"
-     cd $INSIGHTS_AGENT_HOME/PlatformAgents/circleci
-	 echo $python_version
+     echo "InSightsBitBucketAgent stopped"
+     echo "InSightsBitBucketAgent starting"
+     cd $INSIGHTS_AGENT_HOME/PlatformAgents/bitbucket
+     echo $python_version
      detectPythonVersion "$python_version"
-     echo "InSightsCircleAgent started"
+     echo "InSightsBitBucketAgent started"
     else
-     echo "InSightsCircleAgent already in stopped state"
-     echo "InSightsCircleAgent starting"
-     cd $INSIGHTS_AGENT_HOME/PlatformAgents/circleci
-	 echo $python_version
+     echo "InSightsBitBucketAgent already in stopped state"
+     echo "InSightsBitBucketAgent starting"
+     cd $INSIGHTS_AGENT_HOME/PlatformAgents/bitbucket
+     echo $python_version
      detectPythonVersion "$python_version"
-     echo "InSightsCircleAgent started"
+     echo "InSightsBitBucketAgent started"
     fi
     ;;
   status)
-    echo "Checking the Status of InSightsCircleAgent"
+    echo "Checking the Status of InSightsBitBucketAgent"
     if [[ $(ps aux | grep '__PS_KEY__' | awk '{print $2}') ]]; then
-     echo "InSightsCircleAgent is running"
+     echo "InSightsBitBucketAgent is running"
     else
-     echo "InSightsCircleAgent is stopped"
+     echo "InSightsBitBucketAgent is stopped"
     fi
     ;;
   *)
-    echo "Usage: /etc/init.d/__AGENT_KEY__  {start|stop|restart|status}"
+    echo "Usage: /etc/init.d/__AGENT_KEY__ {start|stop|restart|status}"
     exit 1
     ;;
 esac
