@@ -34,69 +34,63 @@ import com.cognizant.devops.platformwebhookengine.message.factory.EngineSubscrib
 import com.cognizant.devops.platformwebhookengine.message.subscriber.WebHookDataSubscriber;
 
 public class EngineAggregatorModule implements Job {
-	private static Logger log = LogManager.getLogger(EngineAggregatorModule.class.getName());
-	private static Map<String, EngineSubscriberResponseHandler> registry = new HashMap<String, EngineSubscriberResponseHandler>();
+    private static Logger log = LogManager.getLogger(EngineAggregatorModule.class.getName());
+    private static Map < String, EngineSubscriberResponseHandler > registry = new HashMap < String, EngineSubscriberResponseHandler > ();
 
 
-	@Override
-	public void execute(JobExecutionContext context) throws JobExecutionException {
-		ApplicationConfigProvider.performSystemCheck();
-		Neo4jDBHandler graphDBHandler = new Neo4jDBHandler();
-		WebHookConfigDAL webhookConfigDal = new WebHookConfigDAL();
-		List<WebHookConfig> allWebhookConfigurations = webhookConfigDal.getAllWebHookConfigurations();
-		//boolean enableOnlineDatatagging = ApplicationConfigProvider.getInstance().isEnableOnlineDatatagging();
-		Map<String, List<WebhookMappingData>> webhookMappinMap = new HashMap<String, List<WebhookMappingData>>(0);
-		//if (enableOnlineDatatagging) {
-			//webhookMappinMap = getMetaData(graphDBHandler);
-	//	}
-		for (WebHookConfig webhookConfig : allWebhookConfigurations) {
-			String webhookname = webhookConfig.getWebHookName().toUpperCase();
-			String toolName = webhookConfig.getToolName().toUpperCase();
-			Boolean subscribeStatus = webhookConfig.getSubscribeStatus();
-			
-			
-			log.debug(toolName);
-			List<WebhookMappingData> webhookMappingList = webhookMappinMap.get(webhookname);
-			if (webhookMappingList == null) {
-				webhookMappingList = new ArrayList<WebhookMappingData>(0);
-			}
-			if(subscribeStatus == true)
-			{
-				registerAggragators(webhookConfig, graphDBHandler, toolName, webhookMappingList);}
-		}
-	}
-	private void registerAggragators(WebHookConfig webhookConfig, Neo4jDBHandler graphDBHandler, String toolName,
-			List<WebhookMappingData> webhookMappingList) {
-		try {
-			
-			String dataRoutingKey = webhookConfig.getMQChannel();
-			String responseTemplate = webhookConfig.getResponseTemplate();
-		      log.debug(" dataRoutingKey " + dataRoutingKey + "  Tool Info " + toolName);
-		      
-		
-		
-		
-		      if (dataRoutingKey != null && !registry.containsKey(dataRoutingKey)) {
-					// Make sure that default health node is initialized
-					//String nodeLabels = ":LATEST:" + dataRoutingKey.replace(".", ":");
-					try {
-						//graphDBHandler.executeCypherQuery("MERGE (n" + nodeLabels + ") return n");
-						registry.put(dataRoutingKey, new WebHookDataSubscriber(dataRoutingKey,responseTemplate,toolName));
-					}
-					catch (Exception e) {
-						log.error("Unable to add subscriber for routing key: "+e);
-						
-					}
-		
-		}
-		}
-			 catch (Exception e) {
-					log.error("Unable to add subscriber for routing key: "+e);
-					
-				}
-				
-			
-		
-	}
-	}
-	
+    @Override
+    public void execute(JobExecutionContext context) throws JobExecutionException {
+        ApplicationConfigProvider.performSystemCheck();
+        Neo4jDBHandler graphDBHandler = new Neo4jDBHandler();
+        WebHookConfigDAL webhookConfigDal = new WebHookConfigDAL();
+        List < WebHookConfig > allWebhookConfigurations = webhookConfigDal.getAllWebHookConfigurations();
+        //boolean enableOnlineDatatagging = ApplicationConfigProvider.getInstance().isEnableOnlineDatatagging();
+        Map < String, List < WebhookMappingData >> webhookMappinMap = new HashMap < String, List < WebhookMappingData >> (0);
+        //if (enableOnlineDatatagging) {
+        //webhookMappinMap = getMetaData(graphDBHandler);
+        //	}
+        for (WebHookConfig webhookConfig: allWebhookConfigurations) {
+            String webhookname = webhookConfig.getWebHookName().toUpperCase();
+            String toolName = webhookConfig.getToolName().toUpperCase();
+            Boolean subscribeStatus = webhookConfig.getSubscribeStatus();
+
+
+            log.debug(toolName);
+            List < WebhookMappingData > webhookMappingList = webhookMappinMap.get(webhookname);
+            if (webhookMappingList == null) {
+                webhookMappingList = new ArrayList < WebhookMappingData > (0);
+            }
+            if (subscribeStatus == true) {
+                registerAggragators(webhookConfig, graphDBHandler, toolName, webhookMappingList);
+            }
+        }
+    }
+    private void registerAggragators(WebHookConfig webhookConfig, Neo4jDBHandler graphDBHandler, String toolName,
+        List < WebhookMappingData > webhookMappingList) {
+        try {
+
+            String dataRoutingKey = webhookConfig.getMQChannel();
+            String responseTemplate = webhookConfig.getResponseTemplate();
+            log.debug(" dataRoutingKey " + dataRoutingKey + "  Tool Info " + toolName);
+
+            if (dataRoutingKey != null && !registry.containsKey(dataRoutingKey)) {
+                // Make sure that default health node is initialized
+                //String nodeLabels = ":LATEST:" + dataRoutingKey.replace(".", ":");
+                try {
+                    //graphDBHandler.executeCypherQuery("MERGE (n" + nodeLabels + ") return n");
+                    registry.put(dataRoutingKey, new WebHookDataSubscriber(dataRoutingKey, responseTemplate, toolName));
+                } catch (Exception e) {
+                    log.error("Unable to add subscriber for routing key: " + e);
+
+                }
+
+            }
+        } catch (Exception e) {
+            log.error("Unable to add subscriber for routing key: " + e);
+
+        }
+
+
+
+    }
+}
