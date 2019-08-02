@@ -55,7 +55,7 @@ public class EngineAggregatorModule implements Job {
 			Boolean subscribeStatus = webhookConfig.getSubscribeStatus();
 			
 			
-			log.error(toolName);
+			log.debug(toolName);
 			List<WebhookMappingData> webhookMappingList = webhookMappinMap.get(webhookname);
 			if (webhookMappingList == null) {
 				webhookMappingList = new ArrayList<WebhookMappingData>(0);
