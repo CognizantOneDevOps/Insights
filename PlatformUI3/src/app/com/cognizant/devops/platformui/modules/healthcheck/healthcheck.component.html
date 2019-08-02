@@ -46,7 +46,7 @@
           </ng-container>
           <!-- Tool Instance Id Column -->
           <ng-container matColumnDef="agentKey">
-            <th mat-header-cell *matHeaderCellDef class="tableHeaderCss"> Instance Id </th>
+            <th mat-header-cell *matHeaderCellDef class="tableHeaderCss"> Instance ID</th>
             <td mat-cell *matCellDef="let element"> {{element.agentId}} </td>
           </ng-container>
           <!-- Category Column -->
@@ -110,25 +110,35 @@
           <!-- Server Column -->
           <ng-container matColumnDef="serverName">
             <th mat-header-cell *matHeaderCellDef class="tableHeaderCss">Name</th>
-            <td mat-cell *matCellDef="let key" style="width:200px !important"> {{key.serverName}} </td>
+            <td mat-cell *matCellDef="let key" style="width:15% !important"> {{key.serverName}} </td>
           </ng-container>
 
           <!-- IP Address:Port Column -->
           <ng-container matColumnDef="ipAddress">
             <th mat-header-cell *matHeaderCellDef class="tableHeaderCss">IP Address:Port</th>
-            <td mat-cell *matCellDef="let key"> {{key.endPoint}} </td>
+            <td mat-cell *matCellDef="let key" style="width:19% !important"> {{key.endPoint}} </td>
           </ng-container>
 
           <!-- Version Column -->
           <ng-container matColumnDef="version">
             <th mat-header-cell *matHeaderCellDef class="tableHeaderCss">Version</th>
-            <td mat-cell *matCellDef="let key"> {{key.version}} </td>
+            <td mat-cell *matCellDef="let key" style="width:40% !important"> {{key.version}} </td>
+          </ng-container>
+
+          !-- Additional Column -->
+          <ng-container matColumnDef="info">
+            <th mat-header-cell *matHeaderCellDef class="tableHeaderCss">Additional Information</th>
+            <td mat-cell *matCellDef="let key" style="width:19% !important">
+              <div *ngIf="key.serverName=='Neo4j'">
+                <span>Total DB Size : {{key.totalDBSize}} </span>
+              </div>
+            </td>
           </ng-container>
 
           <!-- Status Column -->
           <ng-container matColumnDef="status">
             <th mat-header-cell *matHeaderCellDef class="tableHeaderCss">Status</th>
-            <td mat-cell *matCellDef="let key">
+            <td mat-cell *matCellDef="let key" style="width:6% !important">
               <mat-icon svgIcon="healthcheck_success_status" *ngIf="key.status =='success'"
                 [ngStyle]="{color: '#00B140', height: '20px', width: '20px'}">
               </mat-icon>
@@ -138,8 +148,9 @@
             </td>
           </ng-container>
 
-          <tr mat-header-row *matHeaderRowDef="dataComponentColumns" class="tableHeaderCss" style="height:40px"></tr>
-          <tr mat-row *matRowDef="let row; columns: dataComponentColumns;"></tr>
+          < <tr mat-header-row *matHeaderRowDef="dataComponentColumns" class="tableHeaderCss" style="height:40px">
+            </tr>
+            <tr mat-row *matRowDef="let row; columns: dataComponentColumns;"></tr>
         </table>
       </div>
       <!-- Displays Progress spinner and Error message for service failure-->
@@ -217,7 +228,9 @@
     <!-- Report logs -->
     <mat-tab label="Report logs" class="healthcheck-tab-style" *ngIf="showReportLog">
       <div layout layout-align="left" class="sectionHeadingStyleWithoutButton">
-        <div layout>&nbsp; Report Logs</div>
+        <div layout>&nbsp; Report Logs
+          <span class="sectionSubHeading">(The log file will be saved as .xml file, the destination folder of your
+            choice)</span></div>
       </div>
 
       <div id="reportLogs" layout-align="center center" class="tableContainerStyle" *ngIf="showContent">

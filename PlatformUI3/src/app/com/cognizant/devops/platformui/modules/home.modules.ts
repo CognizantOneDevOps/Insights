@@ -60,7 +60,7 @@ import { ApplicationMessageDialog } from '@insights/app/modules/application-dial
 import { AddGroupMessageDialog } from '@insights/app/modules/user-onboarding/add-group-message-dialog';
 import { MessageDialogService } from '@insights/app/modules/application-dialog/message-dialog-service';
 import { BlockChainService } from '@insights/app/modules/blockchain/blockchain.service';
-import { DatePipe } from '@angular/common';
+import { DatePipe, TitleCasePipe } from '@angular/common';
 import { UserOnboardingService } from '@insights/app/modules/user-onboarding/user-onboarding-service';
 import { StorageServiceModule } from 'ngx-webstorage-service';
 import { LogoSettingComponent } from '@insights/app/modules/settings/logo-setting/logo-setting.component';
@@ -74,6 +74,8 @@ import { ShowJsonDialog } from '@insights/app/modules/relationship-builder/show-
 import { from } from 'rxjs';
 import { RelationshipBuilderComponent } from '@insights/app/modules/relationship-builder/relationship-builder.component';
 import { RelationshipBuilderService } from '@insights/app/modules/relationship-builder/relationship-builder.service';
+import { BulkUploadComponent } from '@insights/app/modules/bulkupload/bulkupload.component';
+import { BulkUploadService } from '@insights/app/modules/bulkupload/bulkupload.service';
 
 
 
@@ -107,7 +109,8 @@ import { RelationshipBuilderService } from '@insights/app/modules/relationship-b
     CustomReportComponent,
     CustomReportConfigComponent,
     ShowJsonDialog,
-    RelationshipBuilderComponent
+    RelationshipBuilderComponent,
+    BulkUploadComponent
   ],
   imports: [
     HomeRouting,
@@ -144,8 +147,10 @@ import { RelationshipBuilderService } from '@insights/app/modules/relationship-b
     LogoSettingService,
     BlockChainService,
     DatePipe,
+    TitleCasePipe,
     QueryBuilderService,
-    RelationshipBuilderService
+    RelationshipBuilderService,
+    BulkUploadService
   ]
 })
 

@@ -13,9 +13,20 @@
 	<groupId>com.cognizant.devops</groupId>
 	<artifactId>PlatformParent</artifactId>
 	<packaging>pom</packaging>
-	<version>5.1</version>
+	<version>5.3-SNAPSHOT</version>
 	<name>PlatformParent</name>
 
+	<modules>		
+		<module>PlatformCommons</module>
+		<module>PlatformDAL</module>
+		<module>PlatformAuditing</module>
+		<module>PlatformAuditEngine</module>
+		<module>PlatformService</module>
+		<module>PlatformEngine</module>				
+		<module>PlatformUI3</module>
+		<module>PlatformInsights</module>
+	</modules>
+			
 	<dependencies>
 		<dependency>
 			<groupId>junit</groupId>
@@ -82,14 +93,14 @@
 	</scm>
 	
 	<distributionManagement>
-		<repository> 
-						<id>nexus</id>                
-						<url>https://repo.cogdevops.com/repository/InsightsRelease</url> 
-		</repository>
-		<snapshotRepository>
-						<id>nexus</id>
-						<url>https://repo.cogdevops.com/repository/buildonInsights</url>
-		</snapshotRepository>
+				<repository> 
+				<id>nexus</id>		
+					<url>https://repo.cogdevops.com/repository/InsightsEnterpriseRelease</url>
+				</repository>
+				<snapshotRepository>
+					<id>nexus</id>
+					<url>https://repo.cogdevops.com/repository/buildonInsightsEnterprise</url>
+				</snapshotRepository>
 	</distributionManagement>
 	
 	<profiles>
@@ -147,59 +158,6 @@
 					</plugin>
 				</plugins>
 			</reporting>
-		</profile>
-		<profile>
-			<id>enterprise</id>
-			<activation>
-				<activeByDefault>false</activeByDefault>
-			</activation>
-		        <modules>
-				<module>PlatformAuditEngine</module>
-			    <module>PlatformAuditing</module>
-				<module>PlatformCommons</module>
-				<module>PlatformDAL</module>
-				<module>PlatformService</module>
-				<module>PlatformEngine</module>				
-				<module>PlatformUI3</module>
-				<module>PlatformInsights</module>				
-			</modules>
-			<distributionManagement>
-				<repository> 
-				<id>nexus</id>		
-					<url>https://repo.cogdevops.com/repository/InsightsEnterpriseRelease</url>
-				</repository>
-				<snapshotRepository>
-					<id>nexus</id>
-					<url>https://repo.cogdevops.com/repository/buildonInsightsEnterprise</url>
-				</snapshotRepository>
-			</distributionManagement>
-		</profile>
-		<profile>
-			<id>oss</id>
-			<activation>
-				<activeByDefault>false</activeByDefault>
-			</activation>
-		    <modules>
-				<module>PlatformCommons</module>
-				<module>PlatformDAL</module>
-				<module>PlatformService</module>
-				<module>PlatformEngine</module>
-				<module>PlatformUI2.0</module>
-				<module>PlatformUI3</module>
-				<module>PlatformInsights</module>
-			</modules>
-			<distributionManagement>
-				<repository> 
-				<id>nexus</id>		
-					<url>https://repo.cogdevops.com/repository/InsightsRelease</url>
-				</repository>
-				<snapshotRepository>
-					<id>nexus</id>
-					<url>https://repo.cogdevops.com/repository/buildonInsights</url>
-				</snapshotRepository>
-			</distributionManagement>
-		</profile>
+		</profile>		
 	</profiles>
-
-
 </project>

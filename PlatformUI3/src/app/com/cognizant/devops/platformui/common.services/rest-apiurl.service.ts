@@ -46,6 +46,7 @@ export class RestAPIurlService implements IRestAPIUrlService {
         this.addEndPoint("ORG_CREATE", '/PlatformService/admin/userMgmt/createOrg');
         this.addEndPoint("USER_CREATE", '/PlatformService/accessGrpMgmt/addUserInOrg');
         this.addEndPoint("ASSIGN_USER", '/PlatformService/accessGrpMgmt/assignUser');
+        this.addEndPoint("USER_ORG_SEARCH", '/PlatformService/accessGrpMgmt/searchUser');
 
         this.addEndPoint("ACCESS_GROUP_MANAGEMENT_GET_ORGS", '/PlatformService/accessGrpMgmt/getOrgs');
         this.addEndPoint("ACCESS_GROUP_MANAGEMENT_GET_CURRENT_USER_ORGS", '/PlatformService/accessGrpMgmt/getCurrentUserOrgs');
@@ -105,6 +106,8 @@ export class RestAPIurlService implements IRestAPIUrlService {
         this.addEndPoint("AGENT_REGISTERV2", '/PlatformService/admin/agentConfiguration/2.0/registerAgent');
         this.addEndPoint("AGENT_UPDATEV2", '/PlatformService/admin/agentConfiguration/2.0/updateAgent');
 
+        this.addEndPoint("UPLOAD_FILE", '/PlatformService/admin/bulkupload/uploadToolData');
+        this.addEndPoint("TOOLNAME_LABELNAME_JSON", '/PlatformService/admin/bulkupload/getToolJson');
         //this.addEndPoint("USER_GET", '/PlatformService/admin/userMgmt/getUser');
         //this.addEndPoint("CURRENT_USER_ORG", '/PlatformService/admin/userMgmt/getCurrentUserOrgs');
         //this.addEndPoint("SWITCH_USER_ORG", '/PlatformService/admin/userMgmt/switchUserOrg');
@@ -155,7 +158,6 @@ export class RestAPIurlService implements IRestAPIUrlService {
         //this.addEndPoint("USER_ROLE_INORG_UPDATE", '/PlatformService/admin/userMgmt/updateUserRoleInOrg');
         //this.addEndPoint("INSIGHTS_GET", '/PlatformService/insights/inferences');
         //this.addEndPoint("UPLOAD_HIERARCHY_DETAILS", '/PlatformService/admin/hierarchyDetails/uploadHierarchyDetails');
-
     }
 
     public addEndPoint(name: String, url: String) {
