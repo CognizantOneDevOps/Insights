@@ -84,16 +84,14 @@ public class AgentManagementTest extends AgentDummyData{
 		
 	}
 	
-	/*@Test(priority = 3, expectedExceptions = InsightsCustomException.class)
+	@Test(priority = 3)
 	public void testGetToolRawConfigFile() throws InsightsCustomException {
 		System.out.println("2. toolRaw Config");
-		try {
-			
 			String version ="v5.2";
-			String tool = "pivotalTracker";
+			String tool = "git";
 			ApplicationConfigProvider.getInstance().getAgentDetails().setOnlineRegistration(true);
-			ApplicationConfigProvider.getInstance().getAgentDetails().setUnzipPath("C://Agents//unzip");
-			ApplicationConfigProvider.getInstance().getAgentDetails().setOfflineAgentPath("C://Agents//offline");
+			//ApplicationConfigProvider.getInstance().getAgentDetails().setUnzipPath("C://Users//668059//Documents//Agents//unzip");
+			//ApplicationConfigProvider.getInstance().getAgentDetails().setOfflineAgentPath("C://Users//668059//Documents//Agents//offline");
 			AgentManagementServiceImpl impl = new AgentManagementServiceImpl();
 			String configJson = impl.getToolRawConfigFile(version, tool);
 			
@@ -102,25 +100,18 @@ public class AgentManagementTest extends AgentDummyData{
 			JsonElement jsonElement = gson.fromJson(configJson.trim(), JsonElement.class);
 			JsonObject json = jsonElement.getAsJsonObject();
 			Assert.assertNotNull(json);
-			Assert.assertEquals(json.get("toolCategory").getAsString(), "ALM");
-		} catch(Exception e) {
-			System.out.println("Error updating and installing agent" + e);
-			e.printStackTrace();
-			throw new InsightsCustomException(e.toString());
-		}
+			Assert.assertEquals(json.get("toolCategory").getAsString(), "SCM");
 	}
 	
-	@Test(priority = 4, expectedExceptions = InsightsCustomException.class)
+	@Test(priority = 4)
 	public void testGetToolRawConfigFileForOfflineRegistration() throws InsightsCustomException {
 		System.out.println("2.1 toolRaw Config");
-		try {
-			
 			String version ="v5.2";
 			String tool = "pivotalTracker";
 			//String expectedOutcome = "{\"mqConfig\":{\"user\":\"iSight\",\"password\":\"iSight\",\"host\":\"127.0.0.1\",\"exchange\":\"iSight\",\"agentControlXchg\":\"iAgent\"},\"subscribe\":{\"config\":\"ALM.PIVOTALTRACKER.config\",\"agentCtrlQueue\":\"pivotal_agent\"},\"publish\":{\"data\":\"ALM.PIVOTALTRACKER.DATA\",\"health\":\"ALM.PIVOTALTRACKER.HEALTH\"},\"communication\":{\"type\":\"REST\",\"sslVerify\":false,\"responseType\":\"JSON\"},\"dynamicTemplate\":{\"timeFieldMapping\":{\"startDate\":\"%Y-%m-%d\"},\"responseTemplate\":{\"id\":\"storyId\",\"created_at\":\"createdAt\",\"story_type\":\"storyType\",\"name\":\"storyName\",\"current_state\":\"currentStoryState\"},\"relationMetadata\":{\"labels\":[\"LATEST\"],\"relation\":{\"properties\":[\"iterationNumber\",\"projectId\",\"storyId\",\"backLog\",\"cycleTime\",\"rejectionRate\"],\"name\":\"ITERATION_HAS_ISSUES\",\"source\":{\"constraints\":[\"projectId\",\"storyId\"]},\"destination\":{\"constraints\":[\"iterationNumber\"]}}},\"storyMetadata\":{\"labels\":[\"STORY\"],\"dataUpdateSupported\":true,\"uniqueKey\":[\"projectId\",\"storyId\"]}},\"agentId\":\"pivotal_agent\",\"auth\":\"base64\",\"runSchedule\":30,\"toolCategory\":\"ALM\",\"enableValueArray\":false,\"enableDataValidation\":true,\"useResponseTemplate\":true,\"userid\":\"dsfd\",\"passwd\":\"fedfvdv\",\"token\":\"vdvdv\",\"baseEndPoint\":\"https://www.pivotaltracker.com\",\"startFrom\":\"2015-11-29 12:17:45\",\"toolsTimeZone\":\"Asia/Kolkata\",\"timeStampField\":\"createdAt\",\"timeStampFormat\":\"%Y-%m-%dT%H:%M:%SZ\",\"isEpochTimeFormat\":false,\"isDebugAllowed\":true,\"loggingSetting\":{\"logLevel\":\"WARN\",\"maxBytes\":5000000,\"backupCount\":1000},\"osversion\":\"windows\",\"agentVersion\":\"v5.2\",\"toolName\":\"PIVOTALTRACKER\"}";
 			ApplicationConfigProvider.getInstance().getAgentDetails().setOnlineRegistration(false);
-			ApplicationConfigProvider.getInstance().getAgentDetails().setUnzipPath("C://Agents//unzip");
-			ApplicationConfigProvider.getInstance().getAgentDetails().setOfflineAgentPath("C://Agents//offline");
+			//ApplicationConfigProvider.getInstance().getAgentDetails().setUnzipPath("C://Users//668059//Documents//Agents//unzip");
+			//ApplicationConfigProvider.getInstance().getAgentDetails().setOfflineAgentPath("C://Users//668059//Documents//Agents//offline");
 			AgentManagementServiceImpl impl = new AgentManagementServiceImpl();
 			String configJson = impl.getToolRawConfigFile(version, tool);
 			
@@ -131,19 +122,13 @@ public class AgentManagementTest extends AgentDummyData{
 			Assert.assertNotNull(json);
 			Assert.assertEquals(json.get("toolCategory").getAsString(), "ALM");
 			
-		}  catch(Exception e) {
-			System.out.println("Error updating and installing agent" + e);
-			e.printStackTrace();
-			throw new InsightsCustomException(e.toString());
-		}
-	}*/
+	}
 	
-	@Test(priority = 5, expectedExceptions = InsightsCustomException.class) 
+	@Test(priority = 5) 
 	public void testRegisterAgent() throws InsightsCustomException {
 		System.out.println("3.Register Agent");
-		try {
 			JsonObject json = getProperties();
-			ApplicationConfigProvider.getInstance().getAgentDetails().setUnzipPath("C://Agents//unzip");
+			//ApplicationConfigProvider.getInstance().getAgentDetails().setUnzipPath("C://Users//668059//Documents//Agents//unzip");
 			AgentManagementServiceImpl agentServiceImpl = new AgentManagementServiceImpl();
 			String expectedOutcome = "SUCCESS";
 			
@@ -157,21 +142,13 @@ public class AgentManagementTest extends AgentDummyData{
 			
 			Assert.assertEquals(expectedOutcome, response);
 			
-			/*List<AgentConfigTO>  registeredAgents = agentServiceImpl.getRegisteredAgents();
-			for (AgentConfigTO agentConfig : registeredAgents) {
-				Assert.assertTrue(agentConfig.equals("git"));
-			}*/
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		
 	}
 	
-	@Test(priority = 6, expectedExceptions = InsightsCustomException.class) 
+	@Test(priority = 6) 
 	public void testRegisterAgentInDatabase() throws InsightsCustomException {
 		System.out.println("3.1 Register Agent");
 		JsonObject json = getProperties();
-		ApplicationConfigProvider.getInstance().getAgentDetails().setUnzipPath("C://Agents//unzip");
+		//ApplicationConfigProvider.getInstance().getAgentDetails().setUnzipPath("C://Users//668059//Documents//Agents//unzip");
 		AgentManagementServiceImpl agentServiceImpl = new AgentManagementServiceImpl();
 		
 		List<AgentConfigTO>  registeredAgents = agentServiceImpl.getRegisteredAgents();
@@ -180,7 +157,7 @@ public class AgentManagementTest extends AgentDummyData{
 		}
 	}
 	
-	/*@Test(expectedExceptions = InsightsCustomException.class) 
+	/*@Test
 	public void testRegisterAgentWithEmptyTrackingDetails() throws InsightsCustomException {
 		System.out.println("3.2 Register Agent");
 		String expectedOutcome = "SUCCESS";
@@ -218,23 +195,23 @@ public class AgentManagementTest extends AgentDummyData{
 		Assert.assertTrue(response);
 	}*/
 	 
-	@Test(priority = 8, expectedExceptions = InsightsCustomException.class)
+	@Test(priority = 8)
 	public void testStartStopAgentForStartAction() throws InsightsCustomException {
 		System.out.println("6.Start ");
 		String action = "START";
-		
+		AgentManagementServiceImpl agentServiceImpl = new AgentManagementServiceImpl();
 		String expectedOutput = "SUCCESS";
-		String response = agentManagementServiceImpl.startStopAgent(agentDummyData.agentId, agentDummyData.toolName,
+		String response = agentServiceImpl.startStopAgent(agentDummyData.agentId, agentDummyData.toolName,
 							agentDummyData.osversion, action);
 		Assert.assertNotNull(response);
 		Assert.assertEquals(response, expectedOutput);
 	}
 	
-	@Test(priority = 9, expectedExceptions = InsightsCustomException.class)
+	@Test(priority = 9)
 	public void testStartStopAgentForStopAction() throws InsightsCustomException {
 		System.out.println("7.Stop ");
 		String action = "STOP";
-		
+		AgentManagementServiceImpl agentServiceImpl = new AgentManagementServiceImpl();
 		String expectedOutput = "SUCCESS";
 		String response = agentManagementServiceImpl.startStopAgent(agentDummyData.agentId, agentDummyData.toolName, 
 																					agentDummyData.osversion, action);
@@ -242,7 +219,7 @@ public class AgentManagementTest extends AgentDummyData{
 		Assert.assertEquals(response, expectedOutput);
 	}
 	
-	@Test(priority = 10, expectedExceptions = InsightsCustomException.class)
+	@Test(priority = 10)
 	public void testStartStopAgentForNoAction() throws InsightsCustomException {
 		System.out.println("8. No Action ");
 		String action = "REGISTER";
@@ -282,7 +259,7 @@ public class AgentManagementTest extends AgentDummyData{
 	
 	
 	
-	@Test (priority = 12, expectedExceptions = InsightsCustomException.class)
+	@Test (priority = 12)
 	public void getAgentDetails() throws InsightsCustomException {
 		System.out.println("11. Get Agent details");
 		AgentConfig agentConfig = new AgentConfig();
@@ -295,7 +272,7 @@ public class AgentManagementTest extends AgentDummyData{
 		
 	}
 	
-	@Test (priority = 13, expectedExceptions = InsightsCustomException.class)
+	@Test (priority = 13)
 	public void getAgentDetailsForException() throws InsightsCustomException {
 		System.out.println("11.1 Get Agent details");
 		AgentConfig agentConfig = new AgentConfig();
@@ -303,17 +280,17 @@ public class AgentManagementTest extends AgentDummyData{
 		AgentConfigTO agentConfigDetails = agentManagementServiceImpl.getAgentDetails(agentDummyData.agentId);
 	}
 	
-	@Test(priority = 14, expectedExceptions = InsightsCustomException.class)
+	@Test(priority = 14)
 	public void testUpdateAgent() throws InsightsCustomException {
 		System.out.println("12. UPdate");
-		ApplicationConfigProvider.getInstance().getAgentDetails().setUnzipPath("C://Agents//unzip");
+		//ApplicationConfigProvider.getInstance().getAgentDetails().setUnzipPath("C://Users//668059//Documents//Agents//unzip");
 		ApplicationConfigProvider.getInstance().getAgentDetails().setOnlineRegistration(true);
 		AgentManagementServiceImpl agentManagementServiceImpl = new AgentManagementServiceImpl();
 		agentManagementServiceImpl.updateAgent(agentDummyData.agentId, configDetails, agentDummyData.toolName, 
 																agentDummyData.agentVersion, agentDummyData.osversion);
 	}
 	
-	@Test(priority = 15, expectedExceptions = InsightsCustomException.class)
+	@Test(priority = 15)
 	public void testUninstallAgent() throws InsightsCustomException{
 		System.out.println("13. Uninstall");
 		String expectedOutCome = "SUCCESS"; 
