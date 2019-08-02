@@ -65,6 +65,7 @@ public class WebHookDataSubscriber extends EngineSubscriberResponseHandler {
 		InsightsWebhookParserInterface webHookParser = InsightsWebhookParserFactory.getParserInstance(toolName);
 		List<JsonObject> toolData = webHookParser.parseToolData(responseTemplate, message);
 		log.debug(toolData);
+		getChannel().basicAck(envelope.getDeliveryTag(), true);
 		// Insert into Neo4j
 		try {
 			JsonObject graphResponse = dbHandler.bulkCreateNodes(toolData, null, query);
@@ -100,7 +101,7 @@ public class WebHookDataSubscriber extends EngineSubscriberResponseHandler {
 				// log.debug("Null value" + jsonArray);
 			}
 		} else {
-			log.error(jsonElement);
+			log.debug(jsonElement);
 			JsonObject jsonObject = jsonElement.getAsJsonObject();
 			log.debug(jsonObject);
 			if (!jsonObject.isJsonNull()) {
@@ -134,7 +135,7 @@ public class WebHookDataSubscriber extends EngineSubscriberResponseHandler {
 		if (entry.getValue().isJsonArray()) {
 			processJson(entry.getValue());
 		} else if (!entry.getValue().isJsonNull()) {
-			log.error("Entered the not null conditionss");
+			log.debug("Entered the not null conditionss");
 			JsonObject jsonObjectInternal = entry.getValue().getAsJsonObject();
 			for (Map.Entry<String, JsonElement> entryAgain : jsonObjectInternal.entrySet()) {
 				if (entry.getValue().isJsonArray()) {
