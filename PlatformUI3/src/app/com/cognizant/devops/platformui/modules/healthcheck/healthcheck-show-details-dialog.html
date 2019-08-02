@@ -34,8 +34,7 @@
             <ng-container *ngFor="let header of finalHeaderToShow | keyvalue" matColumnDef="{{header.key}}">
                 <th mat-header-cell *matHeaderCellDef [ngClass]="{'tableDynamicHeaderCss' :(header.key=='inSightsTimeX' || header.key=='status'),'tableExceIdHeaderCss':(header.key=='execId'),'tableMessageHeaderCss':true}">{{header.value}}</th>
                 <td mat-cell style="padding-top:2px;padding-bottom:2px; line-height: 1.7em;" *matCellDef="let element">
-                    {{ header.key=='inSightsTimeX' ? (element[header.key] | date:'yyyy-MM-dd HH:mm:ss') :
-                    element[header.key]}}</td>
+                    {{element[header.key]}}</td>
             </ng-container>
             <tr mat-header-row *matHeaderRowDef="headerArrayDisplay" class="tableHeaderCss"></tr>
             <tr mat-row *matRowDef="let row; columns: headerArrayDisplay;"></tr>
