@@ -99,7 +99,7 @@ class RallyAgent(BaseAgent):
                          logging.debug("artifactListResCount 8 ==== " + str(artifactListResCount))
                      except Exception as ex:
                          artifactListResCount=0  
-                         logging.error(ex)
+                         self.publishHealthDataForExceptions(self, ex)
                      for artifact in range(0, artifactListResCount):
                        try:  
                            artifactListData = artifactListRes['QueryResult']['Results'][artifact]
@@ -180,7 +180,7 @@ class RallyAgent(BaseAgent):
                                         injectArtifactData[key] = 0
                                data.append(injectArtifactData)
                        except Exception as ex:
-                            logging.error(ex) 
+                            self.publishHealthDataForExceptions(self,ex)
                      pageNum = 20 + pageNum
             ''' Section used to get all iteration inforamtion  '''
             for Workspace in range(0, len(specificWorkspaceList)):
@@ -204,8 +204,8 @@ class RallyAgent(BaseAgent):
                     else:
                          iterationCount = iterationListRes['QueryResult']['PageSize']
                 except Exception as ex:
-                     iterationCount=0  
-                     logging.error(ex)     
+                     iterationCount=0 
+                     self.publishHealthDataForExceptions(self, ex) 
                 for iterationRes in range(0, iterationCount):
                     try:
                         iterationListData = iterationListRes['QueryResult']['Results'][iterationRes]
@@ -230,7 +230,7 @@ class RallyAgent(BaseAgent):
                         injectIterationData['iterationID'] = int(iterationId)
                         data_iteration = data_iteration + self.parseResponse(responseTemplate, iterationRes, injectIterationData)
                     except Exception as ex:
-                        logging.error(ex)
+                        self.publishHealthDataForExceptions(self, ex)
                 pageNum = 20 + pageNum
             
             ''' Section used to get all release inforamtion  '''
@@ -257,7 +257,7 @@ class RallyAgent(BaseAgent):
                          releaseCount = releaseListRes['QueryResult']['PageSize']
                 except Exception as ex:
                      releaseCount=0  
-                     logging.error(ex)
+                     self.publishHealthDataForExceptions(self, ex)
                 for releaseRes in range(0, releaseCount):
                     try:
                         releaseListData = releaseListRes['QueryResult']['Results'][releaseRes]
@@ -282,10 +282,10 @@ class RallyAgent(BaseAgent):
                         injectReleaseData['releaseID'] = int(releaseId)
                         data_release = data_release + self.parseResponse(responseTemplate, releaseRes, injectReleaseData)
                     except Exception as ex:
-                        logging.error(ex)
+                        self.publishHealthDataForExceptions(self, ex)
                 pageNum = 20 + pageNum
         except Exception as ex:
-            logging.error(ex)     
+            self.publishHealthDataForExceptions(self, ex)
         logging.debug(" publish data  ==== " )
         self.publishToolsData(data, storyMetadata)
         self.publishToolsData(data_iteration, relationMetadata)
