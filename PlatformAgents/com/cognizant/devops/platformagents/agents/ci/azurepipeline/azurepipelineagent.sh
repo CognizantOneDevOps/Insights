@@ -14,7 +14,7 @@
 # the License.
 #-------------------------------------------------------------------------------
 #! /bin/sh
-# /etc/init.d/__AGENT_KEY__ 
+# /etc/init.d/__AGENT_KEY__
 
 ### BEGIN INIT INFO
 # Provides: Runs a Python script on startup
@@ -25,8 +25,6 @@
 # Short-Description: Simple script to run python program at boot
 # Description: Runs a python program at boot
 ### END INIT INFO
-
-
 #export INSIGHTS_AGENT_HOME=/home/ec2-user/insightsagents
 source /etc/profile
 python_version="$(python -V 2>&1)"
@@ -34,10 +32,10 @@ detectPythonVersion()
 {
      if echo "$1" | grep -q "Python 2"; then
       echo "Detected python 2 version";
-      python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.alm.pivotaltracker.PivotalTrackerAgent import PivotalTrackerAgent; PivotalTrackerAgent()" &
+      python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.ci.azurepipeline.AzurePipelineAgent import AzurePipelineAgent; AzurePipelineAgent()" &
      elif echo "$1" | grep -q "Python 3"; then
       echo "Detected python 3 version";
-      python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.alm.pivotaltracker.PivotalTrackerAgent3 import PivotalTrackerAgent; PivotalTrackerAgent()" &
+      python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.ci.azurepipeline.AzurePipelineAgent3 import AzurePipelineAgent; AzurePipelineAgent()" &
      else
       echo "python version not supported"
 	  exit 1;
@@ -48,62 +46,62 @@ detectPythonVersion()
 case "$1" in
   start)
     if [[ $(ps aux | grep '__PS_KEY__' | awk '{print $2}') ]]; then
-     echo "InSightsPivotalTrackerAgent already running"
+     echo "InSightsAzurePipelineAgent already running"
     else
-     echo "Starting InSightsPivotalTrackerAgent"
-     cd $INSIGHTS_AGENT_HOME/PlatformAgents/pivotaltracker
-	 echo $python_version
+     echo "Starting InSightsAzurePipelineAgent"
+     cd $INSIGHTS_AGENT_HOME/PlatformAgents/azurepipeline
+     echo $python_version
      detectPythonVersion "$python_version"
     fi
     if [[ $(ps aux | grep '__PS_KEY__' | awk '{print $2}') ]]; then
-     echo "InSightsPivotalTrackerAgent Started Sucessfully"
+     echo "InSightsAzurePipelineAgent Started Sucessfully"
     else
-     echo "InSightsPivotalTrackerAgent Failed to Start"
+     echo "InSightsAzurePipelineAgent Failed to Start"
     fi
     ;;
   stop)
-    echo "Stopping InSightsPivotalTrackerAgent"
+    echo "Stopping InSightsAzurePipelineAgent"
     if [[ $(ps aux | grep '__PS_KEY__' | awk '{print $2}') ]]; then
      sudo kill -9 $(ps aux | grep '__PS_KEY__' | awk '{print $2}')
     else
-     echo "InSightsPivotalTrackerAgent already in stopped state"
+     echo "InSightsAzurePipelineAgent already in stopped state"
     fi
     if [[ $(ps aux | grep '__PS_KEY__' | awk '{print $2}') ]]; then
-     echo "InSightsPivotalTrackerAgent Failed to Stop"
+     echo "InSightsAzurePipelineAgent Failed to Stop"
     else
-     echo "InSightsPivotalTrackerAgent Stopped"
+     echo "InSightsAzurePipelineAgent Stopped"
     fi
     ;;
   restart)
-    echo "Restarting InSightsPivotalTrackerAgent"
+    echo "Restarting InSightsAzurePipelineAgent"
     if [[ $(ps aux | grep '__PS_KEY__' | awk '{print $2}') ]]; then
-     echo "InSightsPivotalTrackerAgent stopping"
+     echo "InSightsAzurePipelineAgent stopping"
      sudo kill -9 $(ps aux | grep '__PS_KEY__' | awk '{print $2}')
-     echo "InSightsPivotalTrackerAgent stopped"
-     echo "InSightsPivotalTrackerAgent starting"
-     cd $INSIGHTS_AGENT_HOME/PlatformAgents/pivotaltracker
-	 echo $python_version
+     echo "InSightsAzurePipelineAgent stopped"
+     echo "InSightsAzurePipelineAgent starting"
+     cd $INSIGHTS_AGENT_HOME/PlatformAgents/azurepipeline
+    echo $python_version
      detectPythonVersion "$python_version"
-     echo "InSightsPivotalTrackerAgent started"
+     echo "InSightsAzurePipelineAgent started"
     else
-     echo "InSightsPivotalTrackerAgent already in stopped state"
-     echo "InSightsPivotalTrackerAgent starting"
-     cd $INSIGHTS_AGENT_HOME/PlatformAgents/pivotaltracker
-	 echo $python_version
+     echo "InSightsAzurePipelineAgent already in stopped state"
+     echo "InSightsAzurePipelineAgent starting"
+     cd $INSIGHTS_AGENT_HOME/PlatformAgents/azurepipeline
+     echo $python_version
      detectPythonVersion "$python_version"
-     echo "InSightsPivotalTrackerAgent started"
+     echo "InSightsAzurePipelineAgent started"
     fi
     ;;
   status)
-    echo "Checking the Status of InSightsPivotalTrackerAgent"
+    echo "Checking the Status of InSightsAzurePipelineAgent"
     if [[ $(ps aux | grep '__PS_KEY__' | awk '{print $2}') ]]; then
-     echo "InSightsPivotalTrackerAgent is running"
+     echo "InSightsAzurePipelineAgent is running"
     else
-     echo "InSightsPivotalTrackerAgent is stopped"
+     echo "InSightsAzurePipelineAgent is stopped"
     fi
     ;;
   *)
-    echo "Usage: /etc/init.d/__AGENT_KEY__  {start|stop|restart|status}"
+    echo "Usage: /etc/init.d/__AGENT_KEY__ {start|stop|restart|status}"
     exit 1
     ;;
 esac
