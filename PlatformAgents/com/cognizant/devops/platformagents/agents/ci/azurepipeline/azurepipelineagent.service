@@ -1,5 +1,5 @@
 [Unit]
-Description=Ubuntu azurepipelineAgent Service
+Description=Ubuntu azurepipelineagent Service
 
 [Service]
 Type=forking
