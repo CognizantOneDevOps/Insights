@@ -60,7 +60,7 @@
   "auth": "NTLM",
   "userID": "user",
   "passwd": "auth token",
-  "baseUrl": "https://<vsts-hostname>",
+  "baseUrl": "https://<Azure-hostname>",
   "collectionName": "myorganization",
   "timeStampField": "startDate",
   "timeStampFormat": "%Y-%m-%dT%H:%M:%S",
