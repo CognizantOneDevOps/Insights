@@ -1,0 +1,9 @@
+[Unit]
+Description=Ubuntu azurepipelineagent Service
+
+[Service]
+Type=forking
+ExecStart=/bin/bash /opt/insightsagents/PlatformAgents/azurepipeline/__AGENT_KEY__/__AGENT_KEY__.sh
+
+[Install]
+WantedBy=multi-user.target
