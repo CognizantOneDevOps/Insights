@@ -15,16 +15,16 @@
 #-------------------------------------------------------------------------------
 '''
 Created on Jun 18, 2018
-
 @author: 476693
 '''
 
 
 from dateutil import parser
-from ....core.BaseAgent3 import BaseAgent
+from ....core.BaseAgent import BaseAgent
 import json
 import datetime
 import time
+import logging.handlers
 
 class RallyAgent(BaseAgent):
     def process(self):
@@ -32,137 +32,267 @@ class RallyAgent(BaseAgent):
         passwd = self.config.get("passwd", '')
         baseUrl = self.config.get("baseUrl", '')
         pageSize = self.config.get("dataSize", '')
+        accesstoken = self.config.get("accesstoken", '')
         storyMetadata = self.config.get('dynamicTemplate', {}).get('storyMetadata', None)
         relationMetadata = self.config.get('dynamicTemplate', {}).get('relationMetadata', None)
-        specificWorkspaceList = self.config.get('dynamicTemplate', {}).get('specificWorkspaceList', None)
+        releaseMetadata = self.config.get('dynamicTemplate', {}).get('releaseMetadata', None)
+        specificWorkspaceConfigList = self.config.get('dynamicTemplate', {}).get('specificWorkspaceList', None)
         startFrom = self.config.get("startFrom", '')
         startFrom = parser.parse(startFrom)
         startFrom = startFrom.strftime('%Y-%m-%dT%H:%M:%SZ')
         responseTemplate = self.getResponseTemplate()
+        trackingDetails = {}
+        data_iteration = []
+        data_release = []
         data = []
         injectIterationData = {}
         injectArtifactData = {}
         ts = time.time()
-        if len(specificWorkspaceList) ==0:
-         specificWorkspaceList = []
-         subscriptionListUrl = baseUrl+"subscription"
-         subscriptionListRes = self.getResponse(subscriptionListUrl, 'GET', userid, passwd, None)
-         subscriptionUrl=subscriptionListRes['Subscription']['_ref']
-         subspaceworkspace=subscriptionUrl+"/Workspaces"
-         subWorkspaceRes= self.getResponse(subspaceworkspace, 'GET', userid, passwd, None)
-         for i in range (0,len(subWorkspaceRes['QueryResult']['Results'])):
-             specificWorkspaceList.append( subWorkspaceRes['QueryResult']['Results'][i]['_ref'])
-        trackingDetails = self.tracking.get('LastUpdatedDate', None)
+        specificWorkspaceList=[]
+        if len(specificWorkspaceConfigList) == 0:
+             specificWorkspaceList = []
+             subscriptionListUrl = baseUrl + "subscription"
+             logging.debug(" subscriptionListUrl ==== " + subscriptionListUrl)
+             subscriptionListRes = self.getResponse(subscriptionListUrl, 'GET', accesstoken, '', None)
+             subscriptionUrl = subscriptionListRes['Subscription']['_ref']
+             subspaceworkspace = subscriptionUrl + "/Workspaces"
+             logging.debug("  subspaceworkspace ==== " + subspaceworkspace)
+             subWorkspaceRes = self.getResponse(subspaceworkspace, 'GET', accesstoken, '', None)
+             # logging.debug(subWorkspaceRes)
+             for i in range (0, len(subWorkspaceRes['QueryResult']['Results'])):
+                 specificWorkspaceList.append(subWorkspaceRes['QueryResult']['Results'][i]['_ref'])
+        else:
+            for workspaceConfigUrl in specificWorkspaceConfigList:
+                logging.debug("workspaceConfigUrl from config ==== "+workspaceConfigUrl)
+                specificWorkspaceList.append(workspaceConfigUrl)
+        trackingDetails = self.tracking.get('LastUpdatedDate', None)        
         if trackingDetails is None:
             lastUpdated = startFrom
         else:
             lastUpdated = trackingDetails
         artifactTypeList = self.config.get('dynamicTemplate', {}).get('artifactType', None)
         arr = self.config.get('dynamicTemplate', {}).get('storyResponseTemplate', None)
-        for i in range(0, len(specificWorkspaceList)):
-            workspaceUrl = specificWorkspaceList[i]
-            artifactListUrl = baseUrl+"artifact?workspace="+workspaceUrl+"&query=(LastUpdateDate > "+lastUpdated+")&fetch=true"
-            responseTemplate = self.getResponseTemplate()
-            pageNum = 1
-            fetchNextPage = True
-            while fetchNextPage:
-             artifactListRes = self.getResponse(artifactListUrl+'&pagesize='+str(pageSize)+'&start='+str(pageNum), 'GET', userid, passwd, None)
-             if len(artifactListRes['QueryResult']['Results']) == 0:
-                fetchNextPage = False
-                break
-             if len(artifactListRes['QueryResult']['Results']) < 20:
-                 artifactListResCount=len(artifactListRes['QueryResult']['Results'])
-             else:
-                 artifactListResCount=artifactListRes['QueryResult']['PageSize']
-             for artifact in range(0,artifactListResCount):
-               artifactListData = artifactListRes['QueryResult']['Results'][artifact]
-               artifactUrl= artifactListData['_ref']
-               artifactType= artifactListData['_type']
-               artifactRes = self.getResponse(artifactUrl, 'GET', userid, passwd, None)               
-               if artifactType in artifactTypeList:
-                   injectArtifactData = {}
-                   injectArtifactData['name']=artifactListData['Name']
-                   injectArtifactData['type']= artifactListData['_type']
-                   injectArtifactData['formattedID']= artifactListData['FormattedID']
-                   injectArtifactData['description']=artifactListData['Description']
-                   injectArtifactData['creationDate']=artifactListData['CreationDate']
-                   injectArtifactData['workspace']=artifactListData['Workspace']['_refObjectName']
-                   workspaceUrl=artifactListData['Workspace']['_ref']
-                   workspaceRef = workspaceUrl.split("/")
-                   workspaceReflen= len(workspaceRef)
-                   injectArtifactData['workspaceID']= int(workspaceRef[workspaceReflen-1])
-                   injectArtifactData['projectName']=artifactListData['Project']['_refObjectName']
-                   projectUrl=artifactListData['Project']['_ref']
-                   projectRef = projectUrl.split("/")
-                   projectReflen= len(projectRef)
-                   injectArtifactData['projectID']= int(projectRef[projectReflen-1])
-                   injectArtifactData['lastUpdateDate']=artifactListData['LastUpdateDate']
-                   if artifactListData.get('Iteration') and artifactListData['Iteration'] != None :
-                    injectArtifactData['iterationName']=artifactListData['Iteration']['_refObjectName']
-                    iterationRef = artifactListData['Iteration']['_ref'].split("/")
-                    iterationReflen= len(iterationRef)
-                    iterationID= iterationRef[iterationReflen-1]
-                    injectArtifactData['iterationID']=int(iterationID)
-                   else :
-                    injectArtifactData['iterationID'] = 0
-                   if artifactListData.get('Release') and artifactListData['Release'] != None:
-                    injectArtifactData['releaseName']=artifactListData['Release']['_refObjectName']
-                    ReleaseUrl=artifactListData['Release']['_ref']
-                    ReleasetRes = self.getResponse(ReleaseUrl, 'GET', userid, passwd, None)
-                    for Release in ReleasetRes:
-                      injectArtifactData['releasePlanEstimate']=ReleasetRes['Release']['PlanEstimate']
-                      injectArtifactData['releasePlannedVelocity']=ReleasetRes['Release']['PlannedVelocity']
-                      injectArtifactData['releaseDate']=ReleasetRes['Release']['ReleaseDate']
-                      injectArtifactData['releaseStartDate']=ReleasetRes['Release']['ReleaseStartDate']             
-                   else :
-                     injectArtifactData['Release'] = 0
-                   for key in arr:
-                       if ':' in key:
-                        if key.split(":")[0] in artifactListData:
-                         injectArtifactData[key.split(":")[0]] = artifactListData.get(key.split(":")[0],None).get(key.split(":")[1],None)
-                       else:
-                         injectArtifactData[key] = artifactListData.get(key,None)
-                   data.append(injectArtifactData)      
-             pageNum = 20 + pageNum
-        data_iteration = []
-        for Workspace in range(0, len(specificWorkspaceList)):
-           workspaceUrl = specificWorkspaceList[Workspace]
-           iterationListUrl = baseUrl+"iteration?workspace="+workspaceUrl+"&query=&fetch=true"
-           pageNum = 1
-           fetchNextPage = True
-           while fetchNextPage:
-            iterationListRes=self.getResponse(iterationListUrl+'?pagesize='+str(pageSize)+'&start='+str(pageNum), 'GET', userid, passwd, None)
-            if len(iterationListRes['QueryResult']['Results']) == 0:
-                fetchNextPage = False
-                break
-            if len(iterationListRes['QueryResult']['Results']) < 20:
-                 iterationCount=len(iterationListRes['QueryResult']['Results'])
-            else:
-                 iterationCount=iterationListRes['QueryResult']['PageSize']
-            for iterationRes in range(0,iterationCount):
-                   iterationListData = iterationListRes['QueryResult']['Results'][iterationRes]
-                   iterationUrl= iterationListData['_ref']
-                   iterationType= iterationListData['_type']
-                   iterationRes = self.getResponse(iterationUrl, 'GET', userid, passwd, None)
-                   injectIterationData = {}
-                   workspaceUrl=iterationRes['Iteration']['Workspace']['_ref']
-                   workspaceRef = workspaceUrl.split("/")
-                   workspaceReflen= len(workspaceRef)
-                   projectUrl=iterationRes['Iteration']['Project']['_ref']
-                   projectRef = projectUrl.split("/")
-                   projectReflen= len(projectRef)
-                   iterationRef = iterationRes['Iteration']['_ref']
-                   iterationReflen= len(iterationRef)
-                   iterationID= iterationRef[iterationReflen-1]
-                   responseTemplate = self.config.get('dynamicTemplate', {}).get('iterationResponseTemplate', None)
-                   injectIterationData['workspaceID']= int(workspaceRef[workspaceReflen-1])
-                   injectIterationData['projectID']= int(projectRef[projectReflen-1])
-                   injectIterationData['iterationID']=int(iterationID)
-                   data_iteration = data_iteration + self.parseResponse(responseTemplate, iterationRes, injectIterationData)
-            pageNum = 1 + pageNum
+        logging.debug(" specificWorkspaceList ==== " + str(len(specificWorkspaceList)))
+        try:
+            for i in range(0, len(specificWorkspaceList)):
+                workspaceUrl = str(specificWorkspaceList[i])
+                logging.debug("workspaceUrl ==== " + workspaceUrl)
+                artifactListUrl = baseUrl + "artifact?workspace=" + workspaceUrl + "&query=(LastUpdateDate > " + lastUpdated + ")&fetch=true"
+                logging.debug(" artifactListUrl   ==== " + artifactListUrl)
+                responseTemplate = self.getResponseTemplate()
+                pageNum = 1
+                fetchNextPage = True
+                while fetchNextPage:
+                     logging.debug(" artifactListUrl  ==== " + artifactListUrl)
+                     artifactListUrlPage = artifactListUrl + '&pagesize=' + str(pageSize) + '&start=' + str(pageNum)
+                     logging.debug(" artifactListUrlPage  ==== " + artifactListUrlPage)
+                     try:
+                         artifactListRes = self.getResponse(artifactListUrlPage, 'GET', accesstoken, '', None)
+                         logging.debug(" artifactListRes record count  ==== " + str(artifactListRes['QueryResult']['TotalResultCount']))
+                         if len(artifactListRes['QueryResult']['Results']) == 0:
+                            fetchNextPage = False
+                            break
+                         if len(artifactListRes['QueryResult']['Results']) < 20:
+                             artifactListResCount = len(artifactListRes['QueryResult']['Results'])
+                         else:
+                             artifactListResCount = artifactListRes['QueryResult']['PageSize']
+                         logging.debug("artifactListResCount 8 ==== " + str(artifactListResCount))
+                     except Exception as ex:
+                         artifactListResCount=0  
+                         self.publishHealthDataForExceptions(self, ex)
+                     for artifact in range(0, artifactListResCount):
+                       try:  
+                           artifactListData = artifactListRes['QueryResult']['Results'][artifact]
+                           artifactUrl = artifactListData['_ref']
+                           artifactType = artifactListData['_type']
+                           projectUrl = artifactListData['Project']['_ref']
+                           projectRef = projectUrl.split("/")
+                           projectReflen = len(projectRef)
+                           projectId = int(projectRef[projectReflen - 1])
+                           logging.debug("artifact ====" + str(artifact) + " projectId ==== " + str(projectId) + " artifactType ==== " + artifactType + " artifactUrl  ==== " + artifactUrl + "  FormattedID  "+artifactListData['FormattedID'])
+                           # artifactRes = self.getResponse(artifactUrl, 'GET', accesstoken, '', None)               
+                           if (artifactType in artifactTypeList):
+                               injectArtifactData = {}
+                               injectArtifactData['name'] = artifactListData['Name']
+                               injectArtifactData['type'] = artifactListData['_type']
+                               injectArtifactData['formattedID'] = artifactListData['FormattedID']
+                               injectArtifactData['referenceURL'] = artifactUrl
+                               injectArtifactData['description'] = artifactListData['Description']
+                               injectArtifactData['creationDate'] = artifactListData['CreationDate']
+                               injectArtifactData['workspaceName'] = artifactListData['Workspace']['_refObjectName']
+                               workspaceUrl = artifactListData['Workspace']['_ref']
+                               workspaceRef = workspaceUrl.split("/")
+                               workspaceReflen = len(workspaceRef)
+                               injectArtifactData['workspaceID'] = int(workspaceRef[workspaceReflen - 1])
+                               injectArtifactData['projectName'] = artifactListData['Project']['_refObjectName']
+                               injectArtifactData['projectID'] = projectId
+                               injectArtifactData['lastUpdateDate'] = artifactListData['LastUpdateDate']
+                               logging.debug("Tag Count ==== " + str(artifactListData['Tags']['Count']))
+                               if artifactListData['Tags']:
+                                   if artifactListData['Tags']['Count'] != 0:
+                                        tagVal = artifactListData['Tags']['_tagsNameArray'][0]
+                                        logging.debug("Tag Value tagVal ==== " + str(tagVal))
+                                        val = tagVal.get('Name')
+                                        injectArtifactData['tagName'] = val
+                                        logging.debug("Tag Value ==== " + val)
+                               if artifactListData.get('Iteration') and artifactListData['Iteration'] != None :
+                                injectArtifactData['iterationName'] = artifactListData['Iteration']['_refObjectName']
+                                logging.debug("iterationRef  ==== " + artifactListData['Iteration']['_ref'])
+                                iterationRef = artifactListData['Iteration']['_ref'].split("/")
+                                iterationReflen = len(iterationRef)
+                                iterationId = iterationRef[iterationReflen - 1]
+                                injectArtifactData['iterationID'] = int(iterationId)
+                               else :
+                                injectArtifactData['iterationID'] = 0
+                                injectArtifactData['iterationName'] = 0
+                               if artifactListData.get('Release') and artifactListData['Release'] != None:
+                                injectArtifactData['releaseName'] = artifactListData['Release']['_refObjectName']
+                                logging.debug(" releaseName artifact ==== " + str(artifactListData['Release']['_refObjectName']))
+                                ReleaseUrl = artifactListData['Release']['_ref']
+                                logging.debug(" ReleaseUrl artifact ==== " + ReleaseUrl)
+                                ReleasetRes = self.getResponse(ReleaseUrl, 'GET', accesstoken, '', None)
+                                for Release in ReleasetRes:
+                                  injectArtifactData['releasePlanEstimate'] = ReleasetRes['Release']['PlanEstimate']
+                                  injectArtifactData['releasePlannedVelocity'] = ReleasetRes['Release']['PlannedVelocity']
+                                  injectArtifactData['releaseDate'] = ReleasetRes['Release']['ReleaseDate']
+                                  injectArtifactData['releaseStartDate'] = ReleasetRes['Release']['ReleaseStartDate']
+                                  injectArtifactData['releaseID'] = ReleasetRes['Release']['ObjectID']
+                               else :
+                                 injectArtifactData['Release'] = 0
+                                 injectArtifactData['releaseName'] = 0
+                               for key in arr:
+                                   if ':' in key:
+                                    #if key.split(":")[0] in artifactListData:
+                                      keyMainTag =artifactListData.get(key.split(":")[0], None)
+                                      if keyMainTag is not None:
+                                          propertyValue = keyMainTag.get(key.split(":")[1], None)
+                                          if propertyValue is not None:  
+                                            injectArtifactData[key.split(":")[0]] = propertyValue
+                                          else:
+                                            injectArtifactData[key.split(":")[0]] = 0
+                                      else:
+                                         injectArtifactData[key.split(":")[0]] = 0
+                                   else:
+                                     value = artifactListData.get(key, None)
+                                     if value is not None:
+                                        injectArtifactData[key] = value
+                                     else:
+                                        injectArtifactData[key] = 0
+                               data.append(injectArtifactData)
+                       except Exception as ex:
+                            self.publishHealthDataForExceptions(self,ex)
+                     pageNum = 20 + pageNum
+            ''' Section used to get all iteration inforamtion  '''
+            for Workspace in range(0, len(specificWorkspaceList)):
+               workspaceUrl = specificWorkspaceList[Workspace]
+               iterationListUrl = baseUrl + "iteration?workspace=" + workspaceUrl + "&fetch=true"
+               logging.debug(" iterationListUrl ==== " + iterationListUrl)
+               pageNum = 1
+               fetchNextPage = True
+               while fetchNextPage:
+                iterationListUrlPage = iterationListUrl + '?pagesize=' + str(pageSize) + '&start=' + str(pageNum)
+                logging.debug(" iterationListUrlPage ==== " + iterationListUrlPage)
+                try:
+                    iterationListRes = self.getResponse(iterationListUrlPage, 'GET', accesstoken, '', None)
+                    logging.debug(" iterationListRes length  ==== "+str(len(iterationListRes['QueryResult']['Results'])))
+                    if len(iterationListRes['QueryResult']['Results']) == 0:
+                        logging.debug(" iterationListUrlPage is empty  ==== ")
+                        fetchNextPage = False
+                        break
+                    if len(iterationListRes['QueryResult']['Results']) < 20:
+                         iterationCount = len(iterationListRes['QueryResult']['Results'])
+                    else:
+                         iterationCount = iterationListRes['QueryResult']['PageSize']
+                except Exception as ex:
+                     iterationCount=0 
+                     self.publishHealthDataForExceptions(self, ex) 
+                for iterationRes in range(0, iterationCount):
+                    try:
+                        iterationListData = iterationListRes['QueryResult']['Results'][iterationRes]
+                        iterationUrl = iterationListData['_ref']
+                        iterationType = iterationListData['_type']
+                        logging.debug(" iterationUrl ==== " + iterationUrl)
+                        iterationRes = self.getResponse(iterationUrl, 'GET', accesstoken, '', None)
+                        injectIterationData = {}
+                        workspaceUrl = iterationRes['Iteration']['Workspace']['_ref']
+                        workspaceRef = workspaceUrl.split("/")
+                        workspaceReflen = len(workspaceRef)
+                        projectUrl = iterationRes['Iteration']['Project']['_ref']
+                        projectRef = projectUrl.split("/")
+                        projectReflen = len(projectRef)
+                        iterationRef = iterationRes['Iteration']['_ref'].split("/")
+                        iterationReflen = len(iterationRef)
+                        iterationId = iterationRef[iterationReflen - 1]
+                        responseTemplate = self.config.get('dynamicTemplate', {}).get('iterationResponseTemplate', None)
+                        injectIterationData['projectName'] = iterationRes['Iteration']['Project']['_refObjectName']
+                        injectIterationData['workspaceID'] = int(workspaceRef[workspaceReflen - 1])
+                        injectIterationData['projectID'] = int(projectRef[projectReflen - 1])
+                        injectIterationData['iterationID'] = int(iterationId)
+                        data_iteration = data_iteration + self.parseResponse(responseTemplate, iterationRes, injectIterationData)
+                    except Exception as ex:
+                        self.publishHealthDataForExceptions(self, ex)
+                pageNum = 20 + pageNum
+            
+            ''' Section used to get all release inforamtion  '''
+            logging.debug(" Before release code ==== " +str(len(specificWorkspaceList)))
+            for workspaceRelease in range(0, len(specificWorkspaceList)):
+               workspaceUrl = specificWorkspaceList[workspaceRelease]
+               releaseListUrl = baseUrl + "release?workspace=" + workspaceUrl + "&fetch=true"
+               logging.debug(" releaseListUrl ==== " + releaseListUrl)
+               pageNum = 1
+               fetchNextPage = True
+               while fetchNextPage:
+                releaseListUrlPage = releaseListUrl + '?pagesize=' + str(pageSize) + '&start=' + str(pageNum)
+                logging.debug(" releaseListUrlPage ==== " + releaseListUrlPage)
+                try:
+                    releaseListRes = self.getResponse(releaseListUrlPage, 'GET', accesstoken, '', None)
+                    logging.debug(" releaseListRes length  ==== "+str(len(releaseListRes['QueryResult']['Results'])))
+                    if len(releaseListRes['QueryResult']['Results']) == 0:
+                        logging.debug(" releaseListUrlPage is empty  ==== ")
+                        fetchNextPage = False
+                        break
+                    if len(releaseListRes['QueryResult']['Results']) < 20:
+                         releaseCount = len(releaseListRes['QueryResult']['Results'])
+                    else:
+                         releaseCount = releaseListRes['QueryResult']['PageSize']
+                except Exception as ex:
+                     releaseCount=0  
+                     self.publishHealthDataForExceptions(self, ex)
+                for releaseRes in range(0, releaseCount):
+                    try:
+                        releaseListData = releaseListRes['QueryResult']['Results'][releaseRes]
+                        releaseUrl = releaseListData['_ref']
+                        releaseType = releaseListData['_type']
+                        logging.debug(" releaseUrl ==== " + releaseUrl)
+                        releaseRes = self.getResponse(releaseUrl, 'GET', accesstoken, '', None)
+                        injectReleaseData = {}
+                        workspaceUrl = releaseRes['Release']['Workspace']['_ref']
+                        workspaceRef = workspaceUrl.split("/")
+                        workspaceReflen = len(workspaceRef)
+                        projectUrl = releaseRes['Release']['Project']['_ref']
+                        projectRef = projectUrl.split("/")
+                        projectReflen = len(projectRef)
+                        releaseRef = releaseRes['Release']['_ref'].split("/")
+                        releaseReflen = len(releaseRef)
+                        releaseId = releaseRef[releaseReflen - 1]
+                        responseTemplate = self.config.get('dynamicTemplate', {}).get('releaseResponseTemplate', None)
+                        injectReleaseData['projectName'] = releaseRes['Release']['Project']['_refObjectName']
+                        injectReleaseData['workspaceID'] = int(workspaceRef[workspaceReflen - 1])
+                        injectReleaseData['projectID'] = int(projectRef[projectReflen - 1])
+                        injectReleaseData['releaseID'] = int(releaseId)
+                        data_release = data_release + self.parseResponse(responseTemplate, releaseRes, injectReleaseData)
+                    except Exception as ex:
+                        self.publishHealthDataForExceptions(self, ex)
+                pageNum = 20 + pageNum
+        except Exception as ex:
+            self.publishHealthDataForExceptions(self, ex)
+        logging.debug(" publish data  ==== " )
         self.publishToolsData(data, storyMetadata)
         self.publishToolsData(data_iteration, relationMetadata)
+        self.publishToolsData(data_release, releaseMetadata)
         self.tracking['LastUpdatedDate'] = datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%dT%H:%M:%SZ')
+        logging.debug(" publish data complete ==== " )
         self.updateTrackingJson(self.tracking)
+
 if __name__ == "__main__":
     RallyAgent()       
