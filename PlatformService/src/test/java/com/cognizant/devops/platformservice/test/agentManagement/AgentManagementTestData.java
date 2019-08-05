@@ -4,7 +4,7 @@ import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.Date;
 
-public class AgentDummyData {
+public class AgentManagementTestData {
 
 	String toolName = "git";
 	
