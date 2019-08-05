@@ -11,10 +11,8 @@ gitCommitID = sh (
 	checkout scm	
 	}
 // All single and double quotes in this file are used in a certain format.Do not alter in any step build
-	//ApacheLicense Check in java and Python files . License for Enterprise.
-	/*
-	stage ('LicenseCheck') {
-           checkout scm
+	//ApacheLicense Check in java and Python files . License for Enterprise.	
+	stage ('LicenseCheck') {          
     	   def commit = sh (returnStdout: true, script: '''var=''
 	for file in $(find . -print | grep -i -e .*[.]java -e .*[.]py -e .*[.]sh -e .*[.]bat | grep -Eiv "*__init__.py*" )
 	do
@@ -35,7 +33,7 @@ gitCommitID = sh (
 		sh 'cat files.txt'
 		echo "*****************************************************************************************************************"
 		echo "#################################################################################################################"
-    		slackSend channel: '#insightsjenkins', color: 'good', message: "Insights Enterprise Build Failed BuildFailed for commitID - *$gitCommitID*, Branch - *$branchName* because Apache License is not updated in few files. \n List of files can be found at the bottom of the page @ https://buildon.cogdevops.com/buildon/HistoricCIWebController?commitId=$gitCommitID",  teamDomain: 'insightscogdevops',  token: slackToken
+    		slackSend channel: '#insightsjenkins', color: 'good', message: "Insights Enterprise Build Failed for commitID - *$gitCommitID*, Branch - *$branchName* because Apache License is not updated in few files. \n List of files can be found at the bottom of the page @ https://buildon.cogdevops.com/buildon/HistoricCIWebController?commitId=$gitCommitID",  teamDomain: 'insightscogdevops',  token: slackToken
     		sh 'rm -rf files.txt'
     		sh 'exit 1'
 	} else {
@@ -43,13 +41,13 @@ gitCommitID = sh (
     		}
   	} //License Check ends	
 	
-	*/
+	
    // Platform Service Starts
 	try{
-	//Build for the pom profile enterprise
+	//Build
   	stage ('Insight_PS_Build') {
         sh 'cd /var/jenkins/jobs/$commitID/workspace/PlatformUI3 && npm install'
-	sh 'cd /var/jenkins/jobs/$commitID/workspace && mvn clean install -DskipTests -P enterprise'
+	sh 'cd /var/jenkins/jobs/$commitID/workspace && mvn clean install -DskipTests'
 	   }	
 	
 	//Below step will be enabled in next release to include security analysis.
@@ -58,15 +56,15 @@ gitCommitID = sh (
    	}*/
 
 	stage ('Insight_PS_CodeAnalysis') {
-		sh 'mvn sonar:sonar -Dmaven.test.failure.ignore=true -DskipTests=true -Dsonar.sources=src/main/java -pl !PlatformUI3 -P enterprise'		
+		sh 'mvn sonar:sonar -Dmaven.test.failure.ignore=true -DskipTests=true -Dsonar.sources=src/main/java -pl !PlatformUI3'		
         }		
         
         stage ('Insight_PUI3_CodeAnalysis') {		
-		sh 'cd /var/jenkins/jobs/$commitID/workspace/PlatformUI3 && mvn sonar:sonar -Dmaven.test.failure.ignore=true -DskipTests=true -Dsonar.sources=src/app/com/cognizant/devops/platformui/modules -Dsonar.language=js -Dsonar.javascript.file.suffixes=.ts -P enterprise'
+		sh 'cd /var/jenkins/jobs/$commitID/workspace/PlatformUI3 && mvn sonar:sonar -Dmaven.test.failure.ignore=true -DskipTests=true -Dsonar.sources=src/app/com/cognizant/devops/platformui/modules -Dsonar.language=js -Dsonar.javascript.file.suffixes=.ts'
 	}
 		
 	stage ('Insight_PS_NexusUpload') {		
-		sh 'mvn clean deploy -DskipTests -P enterprise'		
+		sh 'mvn clean deploy -DskipTests'		
 		}
 	
 	}

@@ -21,7 +21,10 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.cognizant.devops.platformcommons.dal.neo4j.Neo4jDBHandler;
+import com.google.gson.Gson;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
@@ -84,5 +87,42 @@ public  class SystemStatus {
 			}
 		}
         return output;
+	}
+
+	public static String jerseyPostClientWithAuthentication(String url, String name, String password,
+			String authtoken, String data) {
+		String output;
+		String authStringEnc;
+		ClientResponse response = null;
+		try {
+			if (authtoken == null) {
+				String authString = name + ":" + password;
+				authStringEnc = new BASE64Encoder().encode(authString.getBytes());
+			} else {
+				authStringEnc = authtoken;
+			}
+			JsonParser parser = new JsonParser();
+			JsonElement dataJson = parser.parse(data);//new Gson().fromJson(data, JsonElement.class)
+			Client restClient = Client.create();
+			WebResource webResource = restClient.resource(url);
+			response = webResource.accept("application/json")
+					//.header("Authorization", "Basic " + authStringEnc)
+					.post(ClientResponse.class, dataJson.toString());//"{aa}"
+			if (response.getStatus() != 200) {
+				throw new RuntimeException("Failed : HTTP error code : " + response.getStatus());
+			} else {
+				output = response.getEntity(String.class);
+			}
+			System.out.print(" response code " + response.getStatus() + "  output  " + output);
+		} catch (Exception e) {
+			System.out.println(" error while getGetting  jerseyPostClientWithAuthentication " + e.getMessage());
+			throw new RuntimeException(
+					"Failed : error while getGetting jerseyPostClientWithAuthentication : " + e.getMessage());
+		} finally {
+			if (response != null) {
+				response.close();
+			}
+		}
+		return output;
 	}
 }

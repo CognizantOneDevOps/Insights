@@ -14,7 +14,7 @@
 # the License.
 #-------------------------------------------------------------------------------
 #! /bin/sh
-# /etc/init.d/__AGENT_KEY__
+# /etc/init.d/__AGENT_KEY__ 
 
 ### BEGIN INIT INFO
 # Provides: Runs a Python script on startup
@@ -29,6 +29,21 @@
 
 #export INSIGHTS_AGENT_HOME=/home/ec2-user/insightsagents
 source /etc/profile
+python_version="$(python -V 2>&1)"
+detectPythonVersion()
+{
+     if echo "$1" | grep -q "Python 2"; then
+      echo "Detected python 2 version";
+      python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.artifactmanagement.artifactory.ArtifactoryAgent import ArtifactoryAgent; ArtifactoryAgent()" &
+     elif echo "$1" | grep -q "Python 3"; then
+      echo "Detected python 3 version";
+      python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.artifactmanagement.artifactory.ArtifactoryAgent3 import ArtifactoryAgent; ArtifactoryAgent()" &
+     else
+      echo "python version not supported"
+	  exit 1;
+     fi
+
+}
 
 case "$1" in
   start)
@@ -37,7 +52,8 @@ case "$1" in
     else
      echo "Starting InSightsArtifactoryAgent"
      cd $INSIGHTS_AGENT_HOME/PlatformAgents/artifactory
-     python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.artifactmanagement.artifactory.ArtifactoryAgent import ArtifactoryAgent; ArtifactoryAgent()" &
+	 echo $python_version
+     detectPythonVersion "$python_version"
     fi
     if [[ $(ps aux | grep '__PS_KEY__' | awk '{print $2}') ]]; then
      echo "InSightsArtifactoryAgent Started Sucessfully"
@@ -66,13 +82,15 @@ case "$1" in
      echo "InSightsArtifactoryAgent stopped"
      echo "InSightsArtifactoryAgent starting"
      cd $INSIGHTS_AGENT_HOME/PlatformAgents/artifactory
-     python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.artifactmanagement.artifactory.ArtifactoryAgent import ArtifactoryAgent; ArtifactoryAgent()" &
+	 echo $python_version
+     detectPythonVersion "$python_version"
      echo "InSightsArtifactoryAgent started"
     else
      echo "InSightsArtifactoryAgent already in stopped state"
      echo "InSightsArtifactoryAgent starting"
      cd $INSIGHTS_AGENT_HOME/PlatformAgents/artifactory
-     python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.artifactmanagement.artifactory.ArtifactoryAgent import ArtifactoryAgent; ArtifactoryAgent()" &
+	 echo $python_version
+     detectPythonVersion "$python_version"
      echo "InSightsArtifactoryAgent started"
     fi
     ;;
@@ -85,7 +103,7 @@ case "$1" in
     fi
     ;;
   *)
-    echo "Usage: /etc/init.d/__AGENT_KEY__ {start|stop|restart|status}"
+    echo "Usage: /etc/init.d/__AGENT_KEY__  {start|stop|restart|status}"
     exit 1
     ;;
 esac

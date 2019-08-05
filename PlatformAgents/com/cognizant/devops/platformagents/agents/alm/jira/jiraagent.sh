@@ -29,6 +29,21 @@
 
 #export INSIGHTS_AGENT_HOME=/home/ec2-user/insightsagents
 source /etc/profile
+python_version="$(python -V 2>&1)"
+detectPythonVersion()
+{
+     if echo "$1" | grep -q "Python 2"; then
+      echo "Detected python 2 version";
+      python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.alm.jira.JiraAgent import JiraAgent; JiraAgent()" &
+     elif echo "$1" | grep -q "Python 3"; then
+      echo "Detected python 3 version";
+      python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.alm.jira.JiraAgent3 import JiraAgent; JiraAgent()" &
+     else
+      echo "python version not supported"
+	  exit 1;
+     fi
+
+}
 
 case "$1" in
   start)
@@ -37,7 +52,8 @@ case "$1" in
     else
      echo "Starting InSightsJiraAgent"
      cd $INSIGHTS_AGENT_HOME/PlatformAgents/jira
-     python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.alm.jira.JiraAgent import JiraAgent; JiraAgent()" &
+	 echo $python_version
+     detectPythonVersion "$python_version"
     fi
     if [[ $(ps aux | grep '__PS_KEY__' | awk '{print $2}') ]]; then
      echo "InSightsJiraAgent Started Sucessfully"
@@ -66,13 +82,15 @@ case "$1" in
      echo "InSightsJiraAgent stopped"
      echo "InSightsJiraAgent starting"
      cd $INSIGHTS_AGENT_HOME/PlatformAgents/jira
-     python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.alm.jira.JiraAgent import JiraAgent; JiraAgent()" &
+	 echo $python_version
+     detectPythonVersion "$python_version"
      echo "InSightsJiraAgent started"
     else
      echo "InSightsJiraAgent already in stopped state"
      echo "InSightsJiraAgent starting"
      cd $INSIGHTS_AGENT_HOME/PlatformAgents/jira
-     python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.alm.jira.JiraAgent import JiraAgent; JiraAgent()" &
+	 echo $python_version
+     detectPythonVersion "$python_version"
      echo "InSightsJiraAgent started"
     fi
     ;;
