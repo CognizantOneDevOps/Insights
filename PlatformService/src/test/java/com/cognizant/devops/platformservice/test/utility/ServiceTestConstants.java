@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  ******************************************************************************/
-package com.cognizant.devops.platformservice.rest.utility;
+package com.cognizant.devops.platformservice.test.utility;
 
 public interface ServiceTestConstants {
 	String SUCCESS_RESPONSE = "SUCCESS";
