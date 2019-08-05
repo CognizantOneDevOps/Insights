@@ -49,7 +49,7 @@ class SvnAgent(BaseAgent):
             self.trackingData()
             self.publishData()
             if self.data != []:
-                print self.data
+                print(self.data)
                 self.publishToolsData(self.data)
             self.updateTrackingJson(self.trackingdata) 
         except Exception as e:
@@ -58,14 +58,14 @@ class SvnAgent(BaseAgent):
     def trackingData(self):
         with open(self.trackingFilePath, 'r') as config_file:    
             self.tracking = json.load(config_file)
-        for k,v in self.tracking.items():
+        for k,v in list(self.tracking.items()):
             for i in self.repoList:
                 if i==k:
                     self.existingrepo.append(i)
         for i in self.repoList:
             if i not in self.existingrepo:
                 self.newrepo.append(i)
-        print self.newrepo, self.existingrepo
+        print(self.newrepo, self.existingrepo)
             
     def publishData(self):
         self.trackingdata = {}

@@ -13,17 +13,17 @@ WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
 License for the specific language governing permissions and limitations under
 the License.
 :comment
-pushd %INSIGHTS_AGENT_HOME%\PlatformAgents\cirlcleci
+pushd %INSIGHTS_AGENT_HOME%\PlatformAgents\circleci
 setlocal ENABLEDELAYEDEXPANSION
 for /f "delims=" %%i in ('python -V ^2^>^&^1') do (
    set PYTHON_VERSION=%%i
    if "!PYTHON_VERSION:~0,8!" EQU "Python 2" ( 
       echo Detected python 2 version
-	  python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.alm.cirlcleci.CircleAgent import CircleAgent; CircleAgent()"
+	  python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.ci.circleci.CircleAgent import CircleAgent; CircleAgent()"
    ) else (
       if "!PYTHON_VERSION:~0,8!" EQU "Python 3" ( 
          echo Detected python 3 version
-		 python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.alm.cirlcleci.CircleAgent3 import CircleAgent; CircleAgent()"
+		 python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.ci.circleci.CircleAgent3 import CircleAgent; CircleAgent()"
       ) else ( 
          echo python version not supported 
       )
