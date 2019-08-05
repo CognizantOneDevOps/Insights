@@ -78,9 +78,14 @@
                     delete
                 </mat-icon>
             </button>
-            <button mat-icon-button>
+            <button *ngIf="enableDelete" mat-icon-button>
                 <mat-icon class="svgIconCssCopyClipboard" (click)="copyInputMessage(selectedWebhook)" [ngxClipboard]="value_to_copy"
-                    [title]="textToCopy" svgIcon="webhookCopyClipboard">
+                    title="Copy the Webhook Url to Clipboard" svgIcon="webhookCopyClipboard">
+                </mat-icon>
+            </button>
+            <button disabled *ngIf="!enableDelete" mat-icon-button>
+                <mat-icon class="svgIconCssCopyClipboardDisable" (click)="copyInputMessage(selectedWebhook)"
+                    [ngxClipboard]="value_to_copy" svgIcon="webhookCopyClipboard">
                 </mat-icon>
             </button>
             <button mat-icon-button (click)="Refresh()" [disabled]="!enableRefresh">
