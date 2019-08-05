@@ -43,6 +43,7 @@ class AwsCodePipelineAgent(BaseAgent):
         response = client.list_pipelines()
         length = len(response['pipelines'])
         pipeline = []
+        tracking_data = [] 
         for n in range(0,length):
             res = str(response['pipelines'][n]['name'])
             pipeline.append(res)
@@ -63,8 +64,7 @@ class AwsCodePipelineAgent(BaseAgent):
                 lastUpdated = since
            
             if len(response['pipelineExecutionSummaries']) > 0:            
-                injectData = {}
-                tracking_data = []                                
+                injectData = {}                                               
                 for response in response['pipelineExecutionSummaries']:  
                    date = str(response['lastUpdateTime'])
                    date = parser.parse(date)
