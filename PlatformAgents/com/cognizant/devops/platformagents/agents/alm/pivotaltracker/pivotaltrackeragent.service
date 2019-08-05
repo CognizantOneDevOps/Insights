@@ -3,7 +3,7 @@ Description=Ubuntu PivotalTrackerAgent Service
 
 [Service]
 Type=forking
-ExecStart=/bin/bash /opt/insightsagents/PlatformAgents/pivotalTracker/__AGENT_KEY__/__AGENT_KEY__.sh
+ExecStart=/bin/bash /opt/insightsagents/PlatformAgents/pivotaltracker/__AGENT_KEY__/__AGENT_KEY__.sh
 
 [Install]
 WantedBy=multi-user.target

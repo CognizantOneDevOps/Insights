@@ -34,10 +34,10 @@ detectPythonVersion()
 {
      if echo "$1" | grep -q "Python 2"; then
       echo "Detected python 2 version";
-      python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.alm.cirlcleci.CircleAgent import CircleAgent; CircleAgent()" &
+      python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.ci.circleci.CircleAgent import CircleAgent; CircleAgent()" &
      elif echo "$1" | grep -q "Python 3"; then
       echo "Detected python 3 version";
-      python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.alm.cirlcleci.CircleAgent3 import CircleAgent; CircleAgent()" &
+      python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.ci.circleci.CircleAgent3 import CircleAgent; CircleAgent()" &
      else
       echo "python version not supported"
 	  exit 1;
@@ -51,7 +51,7 @@ case "$1" in
      echo "InSightsCircleAgent already running"
     else
      echo "Starting InSightsCircleAgent"
-     cd $INSIGHTS_AGENT_HOME/PlatformAgents/cirlcleci
+     cd $INSIGHTS_AGENT_HOME/PlatformAgents/circleci
 	 echo $python_version
      detectPythonVersion "$python_version"
     fi
@@ -81,14 +81,14 @@ case "$1" in
      sudo kill -9 $(ps aux | grep '__PS_KEY__' | awk '{print $2}')
      echo "InSightsCircleAgent stopped"
      echo "InSightsCircleAgent starting"
-     cd $INSIGHTS_AGENT_HOME/PlatformAgents/cirlcleci
+     cd $INSIGHTS_AGENT_HOME/PlatformAgents/circleci
 	 echo $python_version
      detectPythonVersion "$python_version"
      echo "InSightsCircleAgent started"
     else
      echo "InSightsCircleAgent already in stopped state"
      echo "InSightsCircleAgent starting"
-     cd $INSIGHTS_AGENT_HOME/PlatformAgents/cirlcleci
+     cd $INSIGHTS_AGENT_HOME/PlatformAgents/circleci
 	 echo $python_version
      detectPythonVersion "$python_version"
      echo "InSightsCircleAgent started"

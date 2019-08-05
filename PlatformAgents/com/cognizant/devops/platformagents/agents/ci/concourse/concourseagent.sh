@@ -34,10 +34,10 @@ detectPythonVersion()
 {
      if echo "$1" | grep -q "Python 2"; then
       echo "Detected python 2 version";
-      python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.alm.concourse.ConcourseAgent import ConcourseAgent; ConcourseAgent()" &
+      python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.ci.concourse.ConcourseAgent import ConcourseAgent; ConcourseAgent()" &
      elif echo "$1" | grep -q "Python 3"; then
       echo "Detected python 3 version";
-      python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.alm.concourse.ConcourseAgent3 import ConcourseAgent; ConcourseAgent()" &
+      python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.ci.concourse.ConcourseAgent3 import ConcourseAgent; ConcourseAgent()" &
      else
       echo "python version not supported"
 	  exit 1;
