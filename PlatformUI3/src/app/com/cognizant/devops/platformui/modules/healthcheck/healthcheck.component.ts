@@ -141,7 +141,7 @@ export class HealthCheckComponent implements OnInit {
             this.dataComponentDataSource.push(element);
           }
         }
-        this.dataComponentColumns = ['serverName', 'ipAddress', 'version', 'status'];
+        this.dataComponentColumns = ['serverName', 'ipAddress', 'version', 'info', 'status'];
         this.servicesColumns = ['serverName', 'ipAddress', 'version', 'status', 'details'];
       }
     } catch (error) {
@@ -231,10 +231,16 @@ export class HealthCheckComponent implements OnInit {
   }
 
   downloadLog(logfile) {
-    //console.log("download starts for ", logfile);
+    console.log("download starts for ", logfile);
     this.healthCheckService.downloadLog(logfile).subscribe((data) => {
       //console.log(data);
-      importedSaveAs(data, logfile);
+      //importedSaveAs(data, logfile);
+      console.log(data);
+      if (data.size > 0) {
+        importedSaveAs(data, logfile);
+      } else {
+        alert("Please run the corresponding report once!");
+      }
     }, error => {
       console.log(error);
     });
