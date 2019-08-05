@@ -7,7 +7,6 @@
 	the specific language governing permissions and limitations under the License. -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-	<!-- adding a comment to test poll -6 -->
 	<parent>
 		<artifactId>PlatformParent</artifactId>
 		<groupId>com.cognizant.devops</groupId>
@@ -18,11 +17,9 @@
 	<artifactId>PlatformService</artifactId>
 	<groupId>com.cognizant.devops</groupId>
 	<packaging>war</packaging>
-	<!-- <version>5.3-SNAPSHOT</version> -->
 	<name>PlatformService</name>
 
 	<build>
-		<!-- <finalName>PlatformService</finalName> -->
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -32,7 +29,6 @@
 					<suiteXmlFiles>
 						<suiteXmlFile>src/test/resources/testng.xml</suiteXmlFile>
 					</suiteXmlFiles>
-					<!-- <forkMode>pertest</forkMode> <argLine>-Xms512m -Xmx1024m</argLine> -->
 				</configuration>
 			</plugin>
 			<plugin>
@@ -40,8 +36,6 @@
 				<artifactId>maven-war-plugin</artifactId>
 				<version>2.3</version>
 				<configuration>
-					<!-- <manifest> <addDefaultImplementationEntries>true</addDefaultImplementationEntries> 
-						<addDefaultSpecificationEntries>true</addDefaultSpecificationEntries> </manifest> -->
 					<archive>
 						<manifestEntries>
 							<Specification-Title>${project.name}</Specification-Title>
@@ -122,8 +116,6 @@
 		<dependency>
 			<groupId>org.glassfish.jersey.containers</groupId>
 			<artifactId>jersey-container-servlet-core</artifactId>
-			<!-- use the following artifactId if you don't need servlet 2.x compatibility -->
-			<!-- artifactId>jersey-container-servlet</artifactId -->
 		</dependency>
 
 		<!-- Spring 3 dependencies -->
@@ -164,8 +156,6 @@
 			<version>${spring.security.version}</version>
 		</dependency>
 
-		<!-- <dependency> <groupId>org.springframework.ldap</groupId> <artifactId>spring-ldap-core</artifactId> 
-			<version>2.3.2.RELEASE</version> </dependency> -->
 		<!-- added for junit testing -->
 		<dependency>
 			<groupId>junit</groupId>
@@ -282,24 +272,23 @@
 			<artifactId>boxable</artifactId>
 			<version>1.5</version>
 			<exclusions>
-                		<exclusion>
-                    			<groupId>com.google.guava</groupId>
-                    			<artifactId>guava</artifactId>
-                		</exclusion>
-                		<exclusion>
-                    			<groupId>org.apache.pdfbox</groupId>
-                    			<artifactId>pdfbox</artifactId>
-                		</exclusion>
-            		</exclusions>
+           		<exclusion>
+           			<groupId>com.google.guava</groupId>
+           			<artifactId>guava</artifactId>
+           		</exclusion>
+           		<exclusion>
+	      			<groupId>org.apache.pdfbox</groupId>
+	      			<artifactId>pdfbox</artifactId>
+           		</exclusion>
+       		</exclusions>
 		</dependency>
 
 	<!-- https://mvnrepository.com/artifact/org.apache.pdfbox/pdfbox -->
-	<dependency>
-		<groupId>org.apache.pdfbox</groupId>
-		<artifactId>pdfbox</artifactId>
-		<version>2.0.15</version>
-	</dependency>
-		
+		<dependency>
+			<groupId>org.apache.pdfbox</groupId>
+			<artifactId>pdfbox</artifactId>
+			<version>2.0.15</version>
+		</dependency>
 		
 		<dependency>
 			<groupId>org.bouncycastle</groupId>
@@ -367,11 +356,6 @@
 		<spring.security.version>5.1.5.RELEASE</spring.security.version>
 		<junit.version>4.12</junit.version>
 		<testng.version>6.8.7</testng.version>
-		
-		<!--  Embedded PostgreSql -->
-		
-		<postgres.version>42.1.1</postgres.version>
- 		<pg-embedded.version>0.7.1</pg-embedded.version>
 	</properties>
 	<profiles>
 		<profile>
