@@ -13,14 +13,14 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  ******************************************************************************/
-package com.cognizant.devops.platformservice.rest.es;
+package com.cognizant.devops.platformservice.test.es;
 
 import static org.junit.Assert.*;
 
 import org.junit.Test;
 
-import com.cognizant.devops.platformservice.rest.utility.ServiceTestConstants;
-import com.cognizant.devops.platformservice.rest.utility.ServiceTestUtilities;
+import com.cognizant.devops.platformservice.test.utility.ServiceTestConstants;
+import com.cognizant.devops.platformservice.test.utility.ServiceTestUtilities;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
