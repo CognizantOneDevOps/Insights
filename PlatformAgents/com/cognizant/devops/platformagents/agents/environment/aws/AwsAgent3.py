@@ -68,10 +68,10 @@ class AwsAgent(BaseAgent):
                     tracklist["size"]=size
                     tracklist["launchTime"]=i.launch_time
                     tracklist["state"]=i.state
-		    if i.state == "running":
-		        tracklist["runTime"]=("%d years %d months %d days %d hours" % (years, months, days, hours))
-		    else:
-			pass
+                if i.state == "running":
+                    tracklist["runTime"]=("%d years %d months %d days %d hours" % (years, months, days, hours))
+                else:
+                    pass
                     tracking_data.append(tracklist)
         if tracking_data!=[]:
             self.publishToolsData(tracking_data)

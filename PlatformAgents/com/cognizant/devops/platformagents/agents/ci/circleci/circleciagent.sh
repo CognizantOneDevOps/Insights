@@ -51,7 +51,7 @@ case "$1" in
      echo "InSightsCircleAgent already running"
     else
      echo "Starting InSightsCircleAgent"
-     cd $INSIGHTS_AGENT_HOME/PlatformAgents/cirlcleci
+     cd $INSIGHTS_AGENT_HOME/PlatformAgents/circleci
 	 echo $python_version
      detectPythonVersion "$python_version"
     fi
@@ -81,14 +81,14 @@ case "$1" in
      sudo kill -9 $(ps aux | grep '__PS_KEY__' | awk '{print $2}')
      echo "InSightsCircleAgent stopped"
      echo "InSightsCircleAgent starting"
-     cd $INSIGHTS_AGENT_HOME/PlatformAgents/cirlcleci
+     cd $INSIGHTS_AGENT_HOME/PlatformAgents/circleci
 	 echo $python_version
      detectPythonVersion "$python_version"
      echo "InSightsCircleAgent started"
     else
      echo "InSightsCircleAgent already in stopped state"
      echo "InSightsCircleAgent starting"
-     cd $INSIGHTS_AGENT_HOME/PlatformAgents/cirlcleci
+     cd $INSIGHTS_AGENT_HOME/PlatformAgents/circleci
 	 echo $python_version
      detectPythonVersion "$python_version"
      echo "InSightsCircleAgent started"

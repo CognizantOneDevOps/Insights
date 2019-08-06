@@ -21,7 +21,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
 
-@ComponentScan(basePackages = {"com.cognizant.devops.platformservice"})
+@ComponentScan(basePackages = {"com.cognizant.devops.platformservice.*"})
 @Configuration
 // @EnableWebMvc
 public class ContentConfig  {
