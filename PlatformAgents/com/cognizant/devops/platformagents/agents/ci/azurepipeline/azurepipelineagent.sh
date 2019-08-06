@@ -32,13 +32,13 @@ detectPythonVersion()
 {
      if echo "$1" | grep -q "Python 2"; then
       echo "Detected python 2 version";
-      python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.scm.bitbucketallbranch.BitBucketAgentAllBranches  import BitBucketAgentAllBranches; BitBucketAgentAllBranches()" &
+      python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.ci.azurepipeline.AzurePipelineAgent import AzurePipelineAgent; AzurePipelineAgent()" &
      elif echo "$1" | grep -q "Python 3"; then
       echo "Detected python 3 version";
-      python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.scm.bitbucketallbranch.BitBucketAgentAllBranches3  import BitBucketAgentAllBranches; BitBucketAgentAllBranches()" &
+      python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.ci.azurepipeline.AzurePipelineAgent3 import AzurePipelineAgent; AzurePipelineAgent()" &
      else
       echo "python version not supported"
-      exit 1;
+	  exit 1;
      fi
 
 }
@@ -46,58 +46,58 @@ detectPythonVersion()
 case "$1" in
   start)
     if [[ $(ps aux | grep '__PS_KEY__' | awk '{print $2}') ]]; then
-     echo "InSightsBitBucketAgent already running"
+     echo "InSightsAzurePipelineAgent already running"
     else
-     echo "Starting InSightsBitBucketAgent"
-     cd $INSIGHTS_AGENT_HOME/PlatformAgents/bitbucketallbranch
+     echo "Starting InSightsAzurePipelineAgent"
+     cd $INSIGHTS_AGENT_HOME/PlatformAgents/azurepipeline
      echo $python_version
      detectPythonVersion "$python_version"
     fi
     if [[ $(ps aux | grep '__PS_KEY__' | awk '{print $2}') ]]; then
-     echo "InSightsBitBucketAgent Started Sucessfully"
+     echo "InSightsAzurePipelineAgent Started Sucessfully"
     else
-     echo "InSightsBitBucketAgent Failed to Start"
+     echo "InSightsAzurePipelineAgent Failed to Start"
     fi
     ;;
   stop)
-    echo "Stopping InSightsBitBucketAgent"
+    echo "Stopping InSightsAzurePipelineAgent"
     if [[ $(ps aux | grep '__PS_KEY__' | awk '{print $2}') ]]; then
      sudo kill -9 $(ps aux | grep '__PS_KEY__' | awk '{print $2}')
     else
-     echo "InSIghtsBitBucketAgent already in stopped state"
+     echo "InSightsAzurePipelineAgent already in stopped state"
     fi
     if [[ $(ps aux | grep '__PS_KEY__' | awk '{print $2}') ]]; then
-     echo "InSightsBitBucketAgent Failed to Stop"
+     echo "InSightsAzurePipelineAgent Failed to Stop"
     else
-     echo "InSightsBitBucketAgent Stopped"
+     echo "InSightsAzurePipelineAgent Stopped"
     fi
     ;;
   restart)
-    echo "Restarting InSightsBitBucketAgent"
+    echo "Restarting InSightsAzurePipelineAgent"
     if [[ $(ps aux | grep '__PS_KEY__' | awk '{print $2}') ]]; then
-     echo "InSightsBitBucketAgent stopping"
+     echo "InSightsAzurePipelineAgent stopping"
      sudo kill -9 $(ps aux | grep '__PS_KEY__' | awk '{print $2}')
-     echo "InSightsBitBucketAgent stopped"
-     echo "InSightsBitBucketAgent starting"
-     cd $INSIGHTS_AGENT_HOME/PlatformAgents/bitbucketallbranch
-     echo $python_version
+     echo "InSightsAzurePipelineAgent stopped"
+     echo "InSightsAzurePipelineAgent starting"
+     cd $INSIGHTS_AGENT_HOME/PlatformAgents/azurepipeline
+    echo $python_version
      detectPythonVersion "$python_version"
-     echo "InSightsBitBucketAgent started"
+     echo "InSightsAzurePipelineAgent started"
     else
-     echo "InSightsBitBucketAgent already in stopped state"
-     echo "InSightsBitBucketAgent starting"
-     cd $INSIGHTS_AGENT_HOME/PlatformAgents/bitbucketallbranch
+     echo "InSightsAzurePipelineAgent already in stopped state"
+     echo "InSightsAzurePipelineAgent starting"
+     cd $INSIGHTS_AGENT_HOME/PlatformAgents/azurepipeline
      echo $python_version
      detectPythonVersion "$python_version"
-     echo "InSightsBitBucketAgent started"
+     echo "InSightsAzurePipelineAgent started"
     fi
     ;;
   status)
-    echo "Checking the Status of InSightsBitBucketAgent"
+    echo "Checking the Status of InSightsAzurePipelineAgent"
     if [[ $(ps aux | grep '__PS_KEY__' | awk '{print $2}') ]]; then
-     echo "InSightsBitBucketAgent is running"
+     echo "InSightsAzurePipelineAgent is running"
     else
-     echo "InSightsBitBucketAgent is stopped"
+     echo "InSightsAzurePipelineAgent is stopped"
     fi
     ;;
   *)
