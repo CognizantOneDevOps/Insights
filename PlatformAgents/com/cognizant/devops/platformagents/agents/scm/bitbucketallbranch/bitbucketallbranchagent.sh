@@ -32,10 +32,10 @@ detectPythonVersion()
 {
      if echo "$1" | grep -q "Python 2"; then
       echo "Detected python 2 version";
-      python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.scm.bitbucketAllBranch.BitBucketAgentAllBranches  import BitBucketAgentAllBranches; BitBucketAgentAllBranches()" &
+      python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.scm.bitbucketallbranch.BitBucketAgentAllBranches  import BitBucketAgentAllBranches; BitBucketAgentAllBranches()" &
      elif echo "$1" | grep -q "Python 3"; then
       echo "Detected python 3 version";
-      python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.scm.bitbucketAllBranch.BitBucketAgentAllBranches3  import BitBucketAgentAllBranches; BitBucketAgentAllBranches()" &
+      python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.scm.bitbucketallbranch.BitBucketAgentAllBranches3  import BitBucketAgentAllBranches; BitBucketAgentAllBranches()" &
      else
       echo "python version not supported"
       exit 1;
@@ -49,7 +49,7 @@ case "$1" in
      echo "InSightsBitBucketAgent already running"
     else
      echo "Starting InSightsBitBucketAgent"
-     cd $INSIGHTS_AGENT_HOME/PlatformAgents/bitbucket
+     cd $INSIGHTS_AGENT_HOME/PlatformAgents/bitbucketallbranch
      echo $python_version
      detectPythonVersion "$python_version"
     fi
@@ -79,14 +79,14 @@ case "$1" in
      sudo kill -9 $(ps aux | grep '__PS_KEY__' | awk '{print $2}')
      echo "InSightsBitBucketAgent stopped"
      echo "InSightsBitBucketAgent starting"
-     cd $INSIGHTS_AGENT_HOME/PlatformAgents/bitbucket
+     cd $INSIGHTS_AGENT_HOME/PlatformAgents/bitbucketallbranch
      echo $python_version
      detectPythonVersion "$python_version"
      echo "InSightsBitBucketAgent started"
     else
      echo "InSightsBitBucketAgent already in stopped state"
      echo "InSightsBitBucketAgent starting"
-     cd $INSIGHTS_AGENT_HOME/PlatformAgents/bitbucket
+     cd $INSIGHTS_AGENT_HOME/PlatformAgents/bitbucketallbranch
      echo $python_version
      detectPythonVersion "$python_version"
      echo "InSightsBitBucketAgent started"
