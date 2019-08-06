@@ -17,6 +17,7 @@
 	<artifactId>PlatformService</artifactId>
 	<groupId>com.cognizant.devops</groupId>
 	<packaging>war</packaging>
+	<version>5.3-SNAPSHOT</version>
 	<name>PlatformService</name>
 
 	<build>
