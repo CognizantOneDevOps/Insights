@@ -53,6 +53,7 @@ export class BulkUploadComponent implements OnInit {
     uploadForm: FormGroup;
     successIconEnable: boolean = false;
     failIconEnable: boolean = false;
+    showConfirmationPopup:boolean=true;
     dataarr = []
     constructor(private fb: FormBuilder, private router: Router, private dialog: MatDialog, public messageDialog: MessageDialogService, private dataShare: DataSharedService, private bulkuploadService: BulkUploadService) {
         this.userForm();
@@ -138,6 +139,61 @@ export class BulkUploadComponent implements OnInit {
             this.labelsArr[index] = this.toolsDetail[labelnameIndex].label;
             row.value.labelName = this.toolsDetail[labelnameIndex].label;
         }
+    }
+    validation(){
+        this.showConfirmationPopup = true;               
+        for(let element of this.rows.value)
+        {
+          var message=null;
+          var fd = new FormData();
+          var toolName = (element.toolName);
+          var labelName = (element.labelName);
+            var fileName = element.fileName;                             
+           if (toolName == null && labelName == null && element.fileFormData == null && element.fileName == null) {                        
+                    continue;                 
+           } 
+           else {
+           if(element.toolName == null)
+           {
+              element.status='Fail'
+              message = "No tool selected ";
+              element.tooltipmessage = "No tool selected";
+            
+            }else if( element.fileName == null)
+            {
+                element.status='Fail';
+                message = message + "No File Selected";
+                element.tooltipmessage = "No File Selected";
+                this.showConfirmationPopup = false;               
+            }
+            else if(element.toolName!= null && element.fileName!= null)
+            {
+                 var bytes = element.fileFormData["size"];
+                 var testFileExt = this.checkFile(element.fileFormData, ".csv");
+                
+                  if (bytes > 2097152) {
+                                element.status = 'Fail';
+                                element.tooltipmessage = "File Size greater than 2 MB."
+                                this.toolTipMessage = "File Size greater than 2 MB.";
+                                this.showConfirmationPopup=false;
+                            } else if (!testFileExt) {
+                                element.status = 'Fail'
+                                element.tooltipmessage = "Incorrect file format.";
+                                this.toolTipMessage = "Incorrect file format.";  
+                                this.showConfirmationPopup=false;                         
+                            }                       
+             }
+           }
+            if(message !=null){
+                this.showConfirmationPopup = false;
+                element.toolTipMessage = message;                   
+              }
+        }
+        if(this.showConfirmationPopup)
+        { 
+            this.saveData();
+        }
+       
     }
     async saveData() {
         var title = "Upload the Data";
