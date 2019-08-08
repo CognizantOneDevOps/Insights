@@ -29,6 +29,6 @@ sudo rm -rf PlatformService.war
 cd apache-tomcat-8.5.27
 sudo chmod -R 777 /opt/apache-tomcat-8.5.27
 cd /etc/systemd/system
-sudo https://raw.githubusercontent.com/CognizantOneDevOps/Insights/master/PlatformDeployment/UBUNTU/Tomcat.service
+sudo wget https://platform.cogdevops.com/insights_install/installationScripts/latest/Ubuntu/scripts/Tomcat.service
 sudo systemctl enable Tomcat.service
 sudo systemctl start Tomcat
