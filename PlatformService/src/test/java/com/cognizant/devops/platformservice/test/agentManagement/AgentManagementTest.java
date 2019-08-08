@@ -153,18 +153,6 @@ public class AgentManagementTest extends AgentManagementTestData{
 		}
 	}
 	
-	@Test
-	public void testRegisterAgentWithEmptyTrackingDetails() throws InsightsCustomException {
-
-		String expectedOutcome = "SUCCESS";
-		String response = agentManagementServiceImpl.registerAgent(agentManagementTestData.toolName, 
-							agentManagementTestData.agentVersion, agentManagementTestData.osversion, 
-							agentManagementTestData.configDetails, null);
-		
-		Assert.assertEquals(expectedOutcome, response);
-		
-	}
-	
 	@Test(priority = 7)
 	public void testGetRegisteredAgents() throws InsightsCustomException {
 		
