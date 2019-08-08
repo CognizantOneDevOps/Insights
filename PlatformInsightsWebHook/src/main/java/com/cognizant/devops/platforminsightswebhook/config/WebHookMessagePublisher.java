@@ -60,17 +60,23 @@ public class WebHookMessagePublisher {
 	}
 
 	public void publishEventAction(byte[] data, String webHookMqChannelName) throws TimeoutException, IOException {
-
-		Channel channel;
-		if (mqMappingMap.containsKey(webHookMqChannelName)) {
-			channel = mqMappingMap.get(webHookMqChannelName);
-			channel.basicPublish(exchangeName, webHookMqChannelName, null, data);
-		} else {
-			channel = connection.createChannel();
-			channel.exchangeDeclare(exchangeName, WebHookConstants.EXCHANGE_TYPE, true);
-			channel.queueDeclare(webHookMqChannelName, true, false, false, null);
-			channel.queueBind(webHookMqChannelName, exchangeName, webHookMqChannelName);
-			mqMappingMap.put(webHookMqChannelName, channel);
+		try {
+			Channel channel;
+			if (mqMappingMap.containsKey(webHookMqChannelName)) {
+				channel = mqMappingMap.get(webHookMqChannelName);
+				channel.basicPublish(exchangeName, webHookMqChannelName, null, data);
+				LOG.debug(" data published in queue " + webHookMqChannelName);
+			} else {
+				channel = connection.createChannel();
+				channel.exchangeDeclare(exchangeName, WebHookConstants.EXCHANGE_TYPE, true);
+				channel.queueDeclare(webHookMqChannelName, true, false, false, null);
+				channel.queueBind(webHookMqChannelName, exchangeName, webHookMqChannelName);
+				channel.basicPublish(exchangeName, webHookMqChannelName, null, data);
+				LOG.debug(" data published first time in queue " + webHookMqChannelName);
+				mqMappingMap.put(webHookMqChannelName, channel);
+			}
+		} catch (Exception e) {
+			LOG.error("Error while publishEventAction " + e.getMessage());
 		}
 	}
 
