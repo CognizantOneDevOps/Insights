@@ -10,17 +10,6 @@
 		<param-value>true</param-value>
 	</context-param>
 	
-	<!-- <listener>
-     	<listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
-	</listener> -->
-
-	<!-- <context-param>
-	    <param-name>contextConfigLocation</param-name>
-	    <param-value>
-	        classpath:spring-test-config.xml
-	    </param-value>
-	</context-param> -->
-	
 	 <error-page>
 		<error-code>404</error-code>
 		<location>/Error404.jsp</location>
