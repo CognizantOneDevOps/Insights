@@ -22,7 +22,7 @@
 				<AppenderRef ref="RollingFile" />
 		</Logger>
 
-		<Logger name="Console" level="debug">
+		<Logger name="com.cognizant" level="debug">
 				<AppenderRef ref="Console" />
 		</Logger>
 		<Root level="debug">

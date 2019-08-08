@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="WARN">
+ 
+	<Appenders>
+		<Console name="Console" target="SYSTEM_OUT">
+			<PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss} %p [%t]:%c{3}.%M()%L %-5p:: %m%n" />
+		</Console>
+ 
+		<RollingFile name="RollingFile" filename="${env:INSIGHTS_HOME}/logs/PlatformMockServer/PlatformMockServer.log"
+			filepattern="${env:INSIGHTS_HOME}/logs/PlatformMockServer/log4j_PlatformMockServer.log">
+			<PatternLayout pattern="%d{dd MMM yyyy HH:mm:ss,SSS} %p [%t]:%c{3}.%M()%L - %m%n" />
+			<Policies>
+				<SizeBasedTriggeringPolicy size="10 MB" />
+			</Policies>
+			<DefaultRolloverStrategy max="20" />
+		</RollingFile>
+		
+	</Appenders>
+	
+	<Loggers>
+		<Logger name="RollingFile" level="debug">
+				<AppenderRef ref="RollingFile" />
+				<AppenderRef ref="Console" />
+		</Logger>
+		<!-- <Logger name="Console" level="debug">
+				
+		</Logger> -->
+		<Root level="debug">
+			<AppenderRef ref="RollingFile" />
+			<AppenderRef ref="Console" />
+		</Root>
+		
+	</Loggers>
+
+</Configuration>

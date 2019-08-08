@@ -14,7 +14,7 @@
 # the License.
 #-------------------------------------------------------------------------------
 #! /bin/sh
-# /etc/init.d/__AGENT_KEY__
+# /etc/init.d/__AGENT_KEY__ 
 
 ### BEGIN INIT INFO
 # Provides: Runs a Python script on startup
@@ -29,63 +29,81 @@
 
 #export INSIGHTS_AGENT_HOME=/home/ec2-user/insightsagents
 source /etc/profile
+python_version="$(python -V 2>&1)"
+detectPythonVersion()
+{
+     if echo "$1" | grep -q "Python 2"; then
+      echo "Detected python 2 version";
+      python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.alm.hp.HpAlmAgent import HpAlmAgent; HpAlmAgent()" &
+     elif echo "$1" | grep -q "Python 3"; then
+      echo "Detected python 3 version";
+      python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.alm.hp.HpAlmAgent3 import HpAlmAgent; HpAlmAgent()" &
+     else
+      echo "python version not supported"
+	  exit 1;
+     fi
+
+}
 
 case "$1" in
   start)
     if [[ $(ps aux | grep '__PS_KEY__' | awk '{print $2}') ]]; then
-     echo "InSightsHpAgent already running"
+     echo "InSightsHpAlmAgent already running"
     else
-     echo "Starting InSightsHpAgent"
+     echo "Starting InSightsHpAlmAgent"
      cd $INSIGHTS_AGENT_HOME/PlatformAgents/hp
-     python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.alm.hp.HpAlmAgent import HpAlmAgent; HpAlmAgent()" &
+	 echo $python_version
+     detectPythonVersion "$python_version"
     fi
     if [[ $(ps aux | grep '__PS_KEY__' | awk '{print $2}') ]]; then
-     echo "InSightsHpAgent Started Sucessfully"
+     echo "InSightsHpAlmAgent Started Sucessfully"
     else
-     echo "InSightsHpAgent Failed to Start"
+     echo "InSightsHpAlmAgent Failed to Start"
     fi
     ;;
   stop)
-    echo "Stopping InSightsHpAgent"
+    echo "Stopping InSightsHpAlmAgent"
     if [[ $(ps aux | grep '__PS_KEY__' | awk '{print $2}') ]]; then
      sudo kill -9 $(ps aux | grep '__PS_KEY__' | awk '{print $2}')
     else
-     echo "InSightsHpAgent already in stopped state"
+     echo "InSightsHpAlmAgent already in stopped state"
     fi
     if [[ $(ps aux | grep '__PS_KEY__' | awk '{print $2}') ]]; then
-     echo "InSightsHpAgent Failed to Stop"
+     echo "InSightsHpAlmAgent Failed to Stop"
     else
-     echo "InSightsHpAgent Stopped"
+     echo "InSightsHpAlmAgent Stopped"
     fi
     ;;
   restart)
-    echo "Restarting InSightsHpAgent"
+    echo "Restarting InSightsHpAlmAgent"
     if [[ $(ps aux | grep '__PS_KEY__' | awk '{print $2}') ]]; then
-     echo "InSightsHpAgent stopping"
+     echo "InSightsHpAlmAgent stopping"
      sudo kill -9 $(ps aux | grep '__PS_KEY__' | awk '{print $2}')
-     echo "InSightsHpAgent stopped"
-     echo "InSightsHpAgent starting"
+     echo "InSightsHpAlmAgent stopped"
+     echo "InSightsHpAlmAgent starting"
      cd $INSIGHTS_AGENT_HOME/PlatformAgents/hp
-     python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.alm.hp.HpAlmAgent import HpAlmAgent; HpAlmAgent()" &
-     echo "InSightsHpAgent started"
+	 echo $python_version
+     detectPythonVersion "$python_version"
+     echo "InSightsHpAlmAgent started"
     else
-     echo "InSightsHpAgent already in stopped state"
-     echo "InSightsHpAgent starting"
+     echo "InSightsHpAlmAgent already in stopped state"
+     echo "InSightsHpAlmAgent starting"
      cd $INSIGHTS_AGENT_HOME/PlatformAgents/hp
-     python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.alm.hp.HpAlmAgent import HpAlmAgent; HpAlmAgent()" &
-     echo "InSightsHpAgent started"
+	 echo $python_version
+     detectPythonVersion "$python_version"
+     echo "InSightsHpAlmAgent started"
     fi
     ;;
   status)
-    echo "Checking the Status of InSightsHpAgent"
+    echo "Checking the Status of InSightsHpAlmAgent"
     if [[ $(ps aux | grep '__PS_KEY__' | awk '{print $2}') ]]; then
-     echo "InSightsHpAgent is running"
+     echo "InSightsHpAlmAgent is running"
     else
-     echo "InSightsHpAgent is stopped"
+     echo "InSightsHpAlmAgent is stopped"
     fi
     ;;
   *)
-    echo "Usage: /etc/init.d/__AGENT_KEY__ {start|stop|restart|status}"
+    echo "Usage: /etc/init.d/__AGENT_KEY__  {start|stop|restart|status}"
     exit 1
     ;;
 esac

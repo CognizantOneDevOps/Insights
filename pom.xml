@@ -25,7 +25,6 @@
 		<module>PlatformEngine</module>				
 		<module>PlatformUI3</module>
 		<module>PlatformInsights</module>
-		<module>PlatformMockServer</module>
 	</modules>
 			
 	<dependencies>

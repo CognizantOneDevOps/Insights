@@ -29,6 +29,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.mockserver.client.MockServerClient;
 import org.mockserver.model.Parameter;
 
@@ -37,7 +39,6 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
 
-
 /**
  * @author 668284
  *
@@ -45,9 +46,9 @@ import com.google.gson.reflect.TypeToken;
 public class MockServerImpl {
 	
 	private static final String FILE_SEPERATOR 	= File.separator;
+	static Logger log = LogManager.getLogger(MockServerImpl.class.getName());
 	
 	public static void main(String[] args) {
-		
 		MockServerImpl mock= new MockServerImpl();
 		mock.startMockServerWithExpectations();
 	}
@@ -59,21 +60,28 @@ public class MockServerImpl {
 	 */
 	public void startMockServerWithExpectations() {
 		// Starting mock server on port 1080.
-		MockServerClient mockServer 		= startClientAndServer(1080);
+		MockServerClient mockServer = startClientAndServer(1080);
 		// Reading mock requests from multiple JSON files.
-		List<MockRequest> mockRequests 		= getAllMockRequestsFromJson();
+		List<MockRequest> mockRequests = getAllMockRequestsFromJson();
+		String response = null;
 		
-		Iterator<MockRequest> mockIterator 	= mockRequests.iterator();
+		Iterator<MockRequest> mockIterator = mockRequests.iterator();
 		while (mockIterator.hasNext()) {
 			
-			MockRequest request 			= mockIterator.next();
-			List<Parameter> parameterList 	= new ArrayList<>();
+			MockRequest request = mockIterator.next();
+			List<Parameter> parameterList = new ArrayList<>();
+			
+			if(request.isResponseJson()) {
+				response = request.getResponse().get(0).toString();
+			} else {
+				response = request.getResponse().toString();	
+			}
 			
 			// checking if the request has any parameters.
 			if(request.getParameters() != null) {
 				for (Map.Entry<String,String> paramEntry : request.getParameters().entrySet()) {
 					
-					Parameter param 		= new Parameter(paramEntry.getKey(), paramEntry.getValue());
+					Parameter param = new Parameter(paramEntry.getKey(), paramEntry.getValue());
 					parameterList.add(param);
 				}
 			}
@@ -88,10 +96,12 @@ public class MockServerImpl {
 			.respond(
 					response()
 					.withStatusCode(200)
-					.withBody(request.getResponse().toString())
+					.withBody(response)
 					);
+			
+			log.debug("Expectation created for the path {} with query string parmeters {}",request.getPath(),parameterList);
 		}
-		System.out.println("Mock Server Started");
+		log.info("Mock Server Started");
 	 }
 	
 	/**
@@ -101,25 +111,33 @@ public class MockServerImpl {
 	 * @return mockRequests List
 	 */
 	private List<MockRequest> getAllMockRequestsFromJson() {
-		List<MockRequest> mockRequests	= new ArrayList<>();
-		String folderPath				= System.getenv("INSIGHTS_HOME") + FILE_SEPERATOR + "mock_json";   
-		final File requestsFolder 		= new File(folderPath);
+		List<MockRequest> mockRequests = new ArrayList<>();
+		String folderPath = System.getenv("INSIGHTS_HOME") + FILE_SEPERATOR + "mock_json";   
+		final File requestsFolder = new File(folderPath);
+		Gson gson = new Gson();
+		JsonParser parser = new JsonParser();
+		Type type = new TypeToken<List<MockRequest>>() {}.getType();
 		
 		for (final File currFile : requestsFolder.listFiles()) {
 			
-			JsonElement objObject 		= null;
-			Gson gson 					= new Gson();
-			JsonParser parser 			= new JsonParser();
-			Type type 					= new TypeToken<List<MockRequest>>() {}.getType();
-			List<MockRequest> requests 	= new ArrayList<MockRequest>();
+			String mockFileName = currFile.getName();
+			String fileExtension = mockFileName.substring(mockFileName.lastIndexOf(".")); 
+			if(!fileExtension.equals(".json")) {
+				log.error(mockFileName + " is not a json file");
+				continue;
+			}
+			
+			JsonElement objObject = null;
+			List<MockRequest> requests = new ArrayList<MockRequest>();
 			
 			try {
-				File fileName 			= new File(currFile.getPath());
-				Reader jsonFileReader 	= new FileReader(fileName);
-				objObject 				= parser.parse(jsonFileReader);
-				requests 				= gson.fromJson(objObject, type);
+				log.info("Reading {} file for mock requests",mockFileName);
+				File mockFile = new File(currFile.getPath());
+				Reader jsonFileReader = new FileReader(mockFile);
+				objObject = parser.parse(jsonFileReader);
+				requests = gson.fromJson(objObject, type);
 			} catch (IOException e) {
-				System.out.println("Error while reading mock requests from file " + currFile.getName());
+				log.error("Error while reading mock requests from file " + mockFileName);
 			}
 			if(requests != null)
 				mockRequests.addAll(requests);
