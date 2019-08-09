@@ -74,7 +74,7 @@ public class WebHookHandlerServlet extends HttpServlet {
 	@Override
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-		LOG.debug(" In only doGet not post Git ");
+		LOG.debug(" In only doGet not in post  ");
 		try {
 			processRequest(request);
 		} catch (Exception e) {
@@ -91,7 +91,7 @@ public class WebHookHandlerServlet extends HttpServlet {
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		try {
-			//LOG.debug("In do post ");
+			LOG.debug("In do post ");
 			processRequest(request);
 		} catch (TimeoutException e) {
 			LOG.error(e.getMessage());
@@ -109,10 +109,12 @@ public class WebHookHandlerServlet extends HttpServlet {
 	 */
 	private void processRequest(HttpServletRequest request) throws IOException, TimeoutException {
 		JsonObject dataWithReqParam = getBody(request);
+		//LOG.debug(" request body in post " + dataWithReqParam);
 		if (dataWithReqParam != null) {
 			String webHookMqChannelName = WebHookConstants.MQ_CHANNEL_PREFIX
 					.concat(dataWithReqParam.get(WebHookConstants.REQUEST_PARAM_KEY_WEBHOOKNAME).getAsString());
 			String res = dataWithReqParam.toString();
+			LOG.debug(" Final Json after adding parameter " + res);
 			webhookmessagepublisher.publishEventAction(res.getBytes(), webHookMqChannelName);
 			LOG.debug(" Data successfully published in webhook name as " + webHookMqChannelName);
 		} else {
