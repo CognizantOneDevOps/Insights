@@ -24,17 +24,17 @@ import org.apache.logging.log4j.Logger;
 import com.cognizant.devops.platformcommons.core.util.ComponentHealthLogger;
 //import com.cognizant.devops.platformwebhookengine.modules.users.EngineUsersModule;
 
-public class EngineStatusLogger extends ComponentHealthLogger {
-	private static Logger log = LogManager.getLogger(EngineStatusLogger.class.getName());
-	static EngineStatusLogger instance = null;
+public class WebhookEngineStatusLogger extends ComponentHealthLogger {
+	private static Logger log = LogManager.getLogger(WebhookEngineStatusLogger.class.getName());
+	static WebhookEngineStatusLogger instance = null;
 
-	private EngineStatusLogger() {
+	private WebhookEngineStatusLogger() {
 
 	}
 
-	public static EngineStatusLogger getInstance() {
+	public static WebhookEngineStatusLogger getInstance() {
 		if (instance == null) {
-			instance = new EngineStatusLogger();
+			instance = new WebhookEngineStatusLogger();
 		}
 		return instance;
 	}
@@ -42,7 +42,7 @@ public class EngineStatusLogger extends ComponentHealthLogger {
 	public boolean createEngineStatusNode(String message, String status) {
 	try {
 			String version = "";
-			version = EngineStatusLogger.class.getPackage().getImplementationVersion();
+			version = WebhookEngineStatusLogger.class.getPackage().getImplementationVersion();
 			log.debug(" Engine version " + version);
 			Map<String, String> extraParameter = new HashMap<String, String>(0);
 			createComponentStatusNode("HEALTH:WEBHOOKENGINE", version, message, status, extraParameter);

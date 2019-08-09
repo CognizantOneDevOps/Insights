@@ -45,7 +45,7 @@ public class WebHookConfigDAL extends BaseDAL {
 		getSession().beginTransaction();
 		if (webhookConfig != null) {
 			webhookConfig.setDataFormat(webhookConfiguration.getDataFormat());
-			webhookConfig.setEventName(webhookConfiguration.getEventName());
+			webhookConfig.setLabelName(webhookConfiguration.getLabelName());
 			webhookConfig.setWebHookName(webhookConfiguration.getWebHookName());
 			webhookConfig.setToolName(webhookConfiguration.getToolName());
 			webhookConfig.setMQChannel(webhookConfiguration.getMQChannel());

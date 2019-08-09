@@ -40,8 +40,8 @@ public class WebHookConfig {
 	@Column(name = "TOOL_NAME")
 	private String toolName;
 	
-	@Column(name = "EVENT_TO_SUBSCRIBE")
-	private String eventName;
+	@Column(name = "LABEL_NAME")
+	private String labelName;
 	
 	@Column(name = "DATA_FORMAT")
 	private String dataFormat;
@@ -79,12 +79,12 @@ public class WebHookConfig {
 	}
 
 	
-	public String getEventName() {
-		return eventName;
+	public String getLabelName() {
+		return labelName;
 	}
 
-	public void setEventName(String eventname) {
-		this.eventName = eventname;
+	public void setLabelName(String labelName) {
+		this.labelName = labelName;
 	}
 	
 	
@@ -125,7 +125,7 @@ public class WebHookConfig {
 	@Override
 	public String toString() {
 		return "WebHookConfig [id=" + id + ", subscribeStatus=" + subscribeStatus + ", responseTemplate="
-				+ responseTemplate + ", toolName=" + toolName + ", eventName=" + eventName + ", dataFormat="
+				+ responseTemplate + ", toolName=" + toolName + ", labelName=" + labelName + ", dataFormat="
 				+ dataFormat + ", mqChannel=" + mqChannel + ", webhookName=" + webhookName + "]";
 	}
 }
