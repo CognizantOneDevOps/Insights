@@ -45,17 +45,13 @@ public class Application {
             defaultInterval = Integer.valueOf(args[0]);
         }
         try {
-            // Load insight configuration
+      
             ApplicationConfigCache.loadConfigCache();
 
             ApplicationConfigProvider.performSystemCheck();
 
-            // Subscribe for desired events.
-            System.out.println("Ready to enterJob Detail...");
             JobDetail aggrgatorJob = JobBuilder.newJob(EngineAggregatorModule.class)
                 .withIdentity("EngineAggregatorModule", "iSight").build();
-            
-            System.out.println("Ready to enter trigger...");
             
             Trigger aggregatorTrigger = TriggerBuilder.newTrigger()
                 .withIdentity("EngineAggregatorModuleTrigger", "iSight")
@@ -65,16 +61,10 @@ public class Application {
                     .repeatForever())
                 .build();
 
-            System.out.println("Exit trigger...");
             Scheduler scheduler;
-
-            System.out.println("Ready to enter schdeluer...");
-            
             scheduler = new StdSchedulerFactory().getScheduler();
             scheduler.start();
             scheduler.scheduleJob(aggrgatorJob, aggregatorTrigger);
-            
-            System.out.println("Ready to enter Status Logger...");
             EngineStatusLogger.getInstance().createEngineStatusNode("Platform Engine Service Started ",PlatformServiceConstants.SUCCESS);
 
         } catch (SchedulerException e) {
