@@ -108,6 +108,16 @@ public class HealthStatus {
 			JsonObject jsonPlatformEngineStatus = getComponentStatus("PlatformEngine","");
 			servicesHealthStatus.add(ServiceStatusConstants.PlatformEngine, jsonPlatformEngineStatus);
 			log.debug("After Platform Engine================");
+			
+			hostEndPoint = ServiceStatusConstants.PlatformWebhookEngine;
+			apiUrl = hostEndPoint;
+			JsonObject jsonPlatformWebhookEngineStatus = getComponentStatus("PlatformWebhookEngine","");
+			servicesHealthStatus.add(ServiceStatusConstants.PlatformWebhookEngine, jsonPlatformWebhookEngineStatus);
+			
+			hostEndPoint = "Platform WebhookSubscriber";
+			apiUrl = hostEndPoint;
+			JsonObject jsonPlatformWebhookSubscriberStatus = getComponentStatus("PlatformWebhookSubscriber","");
+			servicesHealthStatus.add("Platform WebhookSubscriber",jsonPlatformWebhookSubscriberStatus);
 	
 			log.debug(" servicesHealthStatus "+servicesHealthStatus.toString());
 		}catch(Exception e) {
@@ -138,7 +148,13 @@ public class HealthStatus {
 		StringBuffer label = new StringBuffer("HEALTH");
 		if(category.equalsIgnoreCase(ServiceStatusConstants.PlatformEngine)) {
 			label.append(":").append("ENGINE");
-		}else if(category.equalsIgnoreCase(ServiceStatusConstants.InsightsInference)) {
+		}else if(category.equalsIgnoreCase(ServiceStatusConstants.PlatformWebhookEngine)) {
+			label.append(":").append("WEBHOOKENGINE");
+		}
+		else if(category.equalsIgnoreCase("Platform WebhookSubscriber")) {
+			label.append(":").append("WEBHOOKSUBSCRIBER");
+		}
+		else if(category.equalsIgnoreCase(ServiceStatusConstants.InsightsInference)) {
 			label.append(":").append("INSIGHTS");
 		}else {
 			label.append(":").append(category);
@@ -263,7 +279,50 @@ public class HealthStatus {
 					successResponse="Response not received from Neo4j";
 					returnObject=buildFailureResponse(successResponse.toString(), "-", ServiceStatusConstants.Service,version);
 				}
-			} else if (serviceType.equalsIgnoreCase("PlatformInsight")) {
+			}
+			else if(serviceType.equalsIgnoreCase("PlatformWebhookSubscriber")) {
+				graphResponse = loadHealthData("HEALTH:WEBHOOKSUBSCRIBER",serviceType,"");
+				if(graphResponse !=null ) {
+					if(graphResponse.getNodes().size() > 0 ) {
+						successResponse=graphResponse.getNodes().get(0).getPropertyMap().get("message");;
+						version=graphResponse.getNodes().get(0).getPropertyMap().get("version");
+						status=graphResponse.getNodes().get(0).getPropertyMap().get("status");
+						if(status.equalsIgnoreCase(PlatformServiceConstants.SUCCESS)) {
+							returnObject=buildSuccessResponse(successResponse.toString(), "-", ServiceStatusConstants.Service,version);
+						}else {
+							returnObject=buildFailureResponse(successResponse.toString(), "-", ServiceStatusConstants.Service,version);
+						}
+					}else {
+						successResponse="Node list is empty in response not received from Neo4j";
+						returnObject=buildFailureResponse(successResponse.toString(), "-", ServiceStatusConstants.Service,version);
+					}
+				}else {
+					successResponse="Response not received from Neo4j";
+					returnObject=buildFailureResponse(successResponse.toString(), "-", ServiceStatusConstants.Service,version);
+				}
+			}
+			
+			else if(serviceType.equalsIgnoreCase("PlatformWebhookEngine")) {
+				graphResponse = loadHealthData("HEALTH:WEBHOOKENGINE",serviceType,"");
+				if(graphResponse !=null ) {
+					if(graphResponse.getNodes().size() > 0 ) {
+						successResponse=graphResponse.getNodes().get(0).getPropertyMap().get("message");;
+						version=graphResponse.getNodes().get(0).getPropertyMap().get("version");
+						status=graphResponse.getNodes().get(0).getPropertyMap().get("status");
+						if(status.equalsIgnoreCase(PlatformServiceConstants.SUCCESS)) {
+							returnObject=buildSuccessResponse(successResponse.toString(), "-", ServiceStatusConstants.Service,version);
+						}else {
+							returnObject=buildFailureResponse(successResponse.toString(), "-", ServiceStatusConstants.Service,version);
+						}
+					}else {
+						successResponse="Node list is empty in response not received from Neo4j";
+						returnObject=buildFailureResponse(successResponse.toString(), "-", ServiceStatusConstants.Service,version);
+					}
+				}else {
+					successResponse="Response not received from Neo4j";
+					returnObject=buildFailureResponse(successResponse.toString(), "-", ServiceStatusConstants.Service,version);
+				}
+			}else if (serviceType.equalsIgnoreCase("PlatformInsight")) {
 				graphResponse = loadHealthData("HEALTH:INSIGHTS",serviceType,"");
 				if(graphResponse !=null ) {
 					if(graphResponse.getNodes().size() > 0 ) {

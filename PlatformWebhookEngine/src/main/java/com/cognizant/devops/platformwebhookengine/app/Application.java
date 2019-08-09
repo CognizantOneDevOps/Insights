@@ -28,8 +28,8 @@ import org.quartz.impl.StdSchedulerFactory;
 
 import com.cognizant.devops.platformcommons.config.ApplicationConfigCache;
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
-
-
+import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
+import com.cognizant.devops.platformwebhookengine.message.core.EngineStatusLogger;
 import com.cognizant.devops.platformwebhookengine.modules.aggregator.EngineAggregatorModule;
 
 public class Application {
@@ -51,10 +51,12 @@ public class Application {
             ApplicationConfigProvider.performSystemCheck();
 
             // Subscribe for desired events.
-
+            System.out.println("Ready to enterJob Detail...");
             JobDetail aggrgatorJob = JobBuilder.newJob(EngineAggregatorModule.class)
                 .withIdentity("EngineAggregatorModule", "iSight").build();
-
+            
+            System.out.println("Ready to enter trigger...");
+            
             Trigger aggregatorTrigger = TriggerBuilder.newTrigger()
                 .withIdentity("EngineAggregatorModuleTrigger", "iSight")
                 .startNow()
@@ -63,19 +65,23 @@ public class Application {
                     .repeatForever())
                 .build();
 
-
+            System.out.println("Exit trigger...");
             Scheduler scheduler;
 
+            System.out.println("Ready to enter schdeluer...");
+            
             scheduler = new StdSchedulerFactory().getScheduler();
             scheduler.start();
             scheduler.scheduleJob(aggrgatorJob, aggregatorTrigger);
-            //EngineStatusLogger.getInstance().createEngineStatusNode("Platform Engine Service Started ",PlatformServiceConstants.SUCCESS);
+            
+            System.out.println("Ready to enter Status Logger...");
+            EngineStatusLogger.getInstance().createEngineStatusNode("Platform Engine Service Started ",PlatformServiceConstants.SUCCESS);
 
         } catch (SchedulerException e) {
-            //EngineStatusLogger.getInstance().createEngineStatusNode("Platform Engine Service not running due to Scheduler Exception "+e.getMessage(),PlatformServiceConstants.FAILURE);
+            EngineStatusLogger.getInstance().createEngineStatusNode("Platform Engine Service not running due to Scheduler Exception "+e.getMessage(),PlatformServiceConstants.FAILURE);
             log.error(e);
         } catch (Exception e) {
-            //EngineStatusLogger.getInstance().createEngineStatusNode("Platform Engine Service not running "+e.getMessage(),PlatformServiceConstants.FAILURE);
+            EngineStatusLogger.getInstance().createEngineStatusNode("Platform Engine Service not running "+e.getMessage(),PlatformServiceConstants.FAILURE);
             log.error(e);
         }
     }
