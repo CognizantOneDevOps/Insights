@@ -54,7 +54,7 @@ public class InsightsGeneralParser implements InsightsWebhookParserInterface {
             keyMqInitial = entry.getKey();
             int l1 = keyMqInitial.length();
             // System.out.println(l1);
-            for (int i = 0; i < l1; i++) {
+          /*  for (int i = 0; i < l1; i++) {
                 b1 = keyMqInitial.charAt(i);
                 keyMq = keyMqInitial;
                 // System.out.print(b1);
@@ -70,9 +70,9 @@ public class InsightsGeneralParser implements InsightsWebhookParserInterface {
 
                 if (hault) {
                     removeString = removeString + b1;
-                }
+q                }
 
-            }
+            }*/
             String value = responseTemplate;
             // value = value.substring(1, value.length()-1); //remove curly brackets
             String[] keyValuePairs = value.split(","); // split the string to creat key-value pairs
@@ -84,7 +84,7 @@ public class InsightsGeneralParser implements InsightsWebhookParserInterface {
               
                 Boolean testResult;
                 
-                testResult = keyMq.equals(entry1[0].trim());
+                testResult = keyMqInitial.equals(entry1[0].trim());
                 // log.error(testResult);
 
                 if (testResult) {

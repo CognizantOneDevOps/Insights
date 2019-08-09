@@ -55,7 +55,7 @@ public class EngineAggregatorModule implements Job {
             Boolean subscribeStatus = webhookConfig.getSubscribeStatus();
 
 
-            log.debug(toolName);
+           // log.debug(toolName);
             List < WebhookMappingData > webhookMappingList = webhookMappinMap.get(webhookname);
             if (webhookMappingList == null) {
                 webhookMappingList = new ArrayList < WebhookMappingData > (0);
@@ -71,7 +71,7 @@ public class EngineAggregatorModule implements Job {
 
             String dataRoutingKey = webhookConfig.getMQChannel();
             String responseTemplate = webhookConfig.getResponseTemplate();
-            log.debug(" dataRoutingKey " + dataRoutingKey + "  Tool Info " + toolName);
+           // log.debug(" dataRoutingKey " + dataRoutingKey + "  Tool Info " + toolName);
 
             if (dataRoutingKey != null && !registry.containsKey(dataRoutingKey)) {
                 // Make sure that default health node is initialized
