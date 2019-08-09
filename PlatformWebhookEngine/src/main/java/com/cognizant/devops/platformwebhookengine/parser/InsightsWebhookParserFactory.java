@@ -21,7 +21,7 @@ public class InsightsWebhookParserFactory {
 		{
 			if(toolName.equals("SONAR"))
 			{
-				return new InsightsGeneralParser();
+				return null;
 			}
 			else {
 			return new InsightsGeneralParser();
