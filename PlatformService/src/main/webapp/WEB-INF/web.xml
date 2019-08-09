@@ -10,6 +10,7 @@
 		<param-value>true</param-value>
 	</context-param>
 	
+<<<<<<< .mine
 	<!-- <listener>
      	<listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
 	</listener> -->
@@ -21,6 +22,19 @@
 	    </param-value>
 	</context-param> -->
 	
+=======
+
+
+
+
+
+
+
+
+
+
+
+>>>>>>> .theirs
 	 <error-page>
 		<error-code>404</error-code>
 		<location>/Error404.jsp</location>
