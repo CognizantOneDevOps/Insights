@@ -25,6 +25,9 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.ComponentScan;
 
 import com.cognizant.devops.platformcommons.config.ApplicationConfigCache;
+import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
+import com.cognizant.devops.platforminsightswebhook.message.core.SubscriberStatusLogger;
+
 
 
 @SpringBootApplication
@@ -36,5 +39,6 @@ public class WebHookAppStarter {
 		LOG.debug(" Inside Webhook Message Publisher ... ");
     	ApplicationConfigCache.loadConfigCache();
 		ApplicationContext applicationContext = SpringApplication.run(WebHookAppStarter.class, args);
+		SubscriberStatusLogger.getInstance().createSubsriberStatusNode("Platform Webhook Subscriber Service Started ",PlatformServiceConstants.SUCCESS);
 	}
 } 
