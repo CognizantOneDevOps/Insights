@@ -16,16 +16,17 @@
 package com.cognizant.devops.platformwebhookengine.parser;
 
 public class InsightsWebhookParserFactory {
-	
-		public static InsightsWebhookParserInterface getParserInstance(String toolName)
-		{
-			if(toolName.equals("SONAR"))
-			{
-				return null;
-			}
-			else {
+
+	/**
+	 * This Factory will undergo changes based on Tool specific parsers. For now we are
+	 * assuming all tools will support Generic approach.
+	 * 
+	 * @param toolName
+	 * @return
+	 */
+	public static InsightsWebhookParserInterface getParserInstance(String toolName) {
+		
 			return new InsightsGeneralParser();
-			}
-		}
-	
+	}
+
 }

@@ -70,15 +70,12 @@ public class EngineAggregatorModule implements Job {
         try {
 
             String dataRoutingKey = webhookConfig.getMQChannel();
+            String labelName = webhookConfig.getLabelName();
             String responseTemplate = webhookConfig.getResponseTemplate();
-           // log.debug(" dataRoutingKey " + dataRoutingKey + "  Tool Info " + toolName);
 
             if (dataRoutingKey != null && !registry.containsKey(dataRoutingKey)) {
-                // Make sure that default health node is initialized
-                //String nodeLabels = ":LATEST:" + dataRoutingKey.replace(".", ":");
                 try {
-                    //graphDBHandler.executeCypherQuery("MERGE (n" + nodeLabels + ") return n");
-                    registry.put(dataRoutingKey, new WebHookDataSubscriber(dataRoutingKey, responseTemplate, toolName));
+                    registry.put(dataRoutingKey, new WebHookDataSubscriber(dataRoutingKey, responseTemplate, toolName,labelName));
                 } catch (Exception e) {
                     log.error("Unable to add subscriber for routing key: " + e);
 

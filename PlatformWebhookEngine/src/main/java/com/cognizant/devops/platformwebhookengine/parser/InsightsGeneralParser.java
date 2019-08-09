@@ -15,6 +15,8 @@
  *******************************************************************************/
 package com.cognizant.devops.platformwebhookengine.parser;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -23,7 +25,6 @@ import java.util.Map;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
 import com.github.wnameless.json.flattener.JsonFlattener;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -33,56 +34,57 @@ import com.google.gson.JsonParser;
 
 public class InsightsGeneralParser implements InsightsWebhookParserInterface {
 	private static Logger log = LogManager.getLogger(InsightsGeneralParser.class.getName());
-    public List < JsonObject > parseToolData(String responseTemplate, String toolData) {
 
-       try {
-        String keyMqInitial;
-       
-        JsonParser parser = new JsonParser();
-        List < JsonObject > retrunJsonList = new ArrayList < JsonObject > (0);
-        JsonElement json = (JsonElement) parser.parse(toolData);
-        Map < String, Object > rabbitMqflattenedJsonMap = JsonFlattener.flattenAsMap(json.toString());
-        Map < String, Object > finalJson = new HashMap < String, Object > ();
-        for (Map.Entry < String, Object > entry: rabbitMqflattenedJsonMap.entrySet()) {
-            keyMqInitial = entry.getKey();
-            String value = responseTemplate;
-            String[] keyValuePairs = value.split(","); // split the string to creat key-value pairs
-            for (String pair: keyValuePairs) // iterate over the pairs
-            {
-                String[] entry1 = pair.split("="); // split the pairs to get key and value
-                Boolean testResult;
-                testResult = keyMqInitial.equals(entry1[0].trim());
-                if (testResult) {
-                    finalJson.put(entry1[1].trim(), entry.getValue());
-                
-                }
-            }
+	public List<JsonObject> parseToolData(String responseTemplate, String toolData) {
 
-        }
-       
-        Gson prettyGson = new GsonBuilder().setPrettyPrinting().create();
-        JsonParser parse = new JsonParser();
-        finalJson.put("source", "webhook");
-        String prettyJson = prettyGson.toJson(finalJson);
-        JsonElement element = parse.parse(prettyJson);
-        retrunJsonList.add(element.getAsJsonObject());
-      //  String nestedJson = JsonUnflattener.unflatten(prettyJson);
-        
-        return retrunJsonList;
-       }
-       catch(Exception e)
-       {
-    	   log.error(e);
-    	   List<JsonObject> list = new ArrayList<JsonObject>();
-    	  
-    	   for(JsonObject jsonResponse: list) {
-    		   jsonResponse.addProperty(PlatformServiceConstants.STATUS, PlatformServiceConstants.FAILURE);
-      		   jsonResponse.addProperty(PlatformServiceConstants.MESSAGE, e.getMessage());
-    	   } 		 		
-   		
-   		return list;
-    	  
-       }
-    }
+		try {
+			String keyMqInitial;
+
+			JsonParser parser = new JsonParser();
+			List<JsonObject> retrunJsonList = new ArrayList<JsonObject>(0);
+			Map<String, Object> finalJson = new HashMap<String, Object>();
+			
+			JsonElement json = (JsonElement) parser.parse(toolData);
+			Map<String, Object> rabbitMqflattenedJsonMap = JsonFlattener.flattenAsMap(json.toString());
+			
+			Map<String, String> responseTemplateMap = getResponseTemplateMap(responseTemplate);
+			
+			for (Map.Entry<String, String> entry : responseTemplateMap.entrySet()) {
+				keyMqInitial = entry.getKey();
+				Object toolValue = rabbitMqflattenedJsonMap.get(keyMqInitial);
+				finalJson.put(entry.getValue(), toolValue);
+			}
+
+			
+			finalJson.put("source", "webhook");
+			DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd");
+			LocalDateTime now = LocalDateTime.now();
+			finalJson.put("inSightsTimeX", dtf.format(now));
+			
+			Gson prettyGson = new GsonBuilder().setPrettyPrinting().create();
+			String prettyJson = prettyGson.toJson(finalJson);
+			JsonElement element = parser.parse(prettyJson);
+			
+			retrunJsonList.add(element.getAsJsonObject());
+
+			return retrunJsonList;
+		} catch (Exception e) {
+			log.error(e);
+			throw e;
+		}
+	}
+
+	private Map<String, String> getResponseTemplateMap(String responseTemplate) {
+
+		Map<String, String> responseTemplateMap = new HashMap<>();
+		String value = responseTemplate;
+		String[] keyValuePairs = value.split(","); // split the string to creat key-value pairs
+		for (String pair : keyValuePairs) // iterate over the pairs
+		{
+			String[] dataKeyMapper = pair.split("="); // split the pairs to get key and value
+			responseTemplateMap.put(dataKeyMapper[0], dataKeyMapper[1]);
+		}
+		return responseTemplateMap;
+	}
 
 }

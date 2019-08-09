@@ -29,7 +29,7 @@ import org.quartz.impl.StdSchedulerFactory;
 import com.cognizant.devops.platformcommons.config.ApplicationConfigCache;
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
-import com.cognizant.devops.platformwebhookengine.message.core.EngineStatusLogger;
+import com.cognizant.devops.platformwebhookengine.message.core.WebhookEngineStatusLogger;
 import com.cognizant.devops.platformwebhookengine.modules.aggregator.EngineAggregatorModule;
 
 public class Application {
@@ -65,13 +65,13 @@ public class Application {
             scheduler = new StdSchedulerFactory().getScheduler();
             scheduler.start();
             scheduler.scheduleJob(aggrgatorJob, aggregatorTrigger);
-            EngineStatusLogger.getInstance().createEngineStatusNode("Platform Engine Service Started ",PlatformServiceConstants.SUCCESS);
+            WebhookEngineStatusLogger.getInstance().createEngineStatusNode("Platform Engine Service Started ",PlatformServiceConstants.SUCCESS);
 
         } catch (SchedulerException e) {
-            EngineStatusLogger.getInstance().createEngineStatusNode("Platform Engine Service not running due to Scheduler Exception "+e.getMessage(),PlatformServiceConstants.FAILURE);
+            WebhookEngineStatusLogger.getInstance().createEngineStatusNode("Platform Engine Service not running due to Scheduler Exception "+e.getMessage(),PlatformServiceConstants.FAILURE);
             log.error(e);
         } catch (Exception e) {
-            EngineStatusLogger.getInstance().createEngineStatusNode("Platform Engine Service not running "+e.getMessage(),PlatformServiceConstants.FAILURE);
+            WebhookEngineStatusLogger.getInstance().createEngineStatusNode("Platform Engine Service not running "+e.getMessage(),PlatformServiceConstants.FAILURE);
             log.error(e);
         }
     }
