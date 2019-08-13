@@ -49,7 +49,7 @@ case "$1" in
      echo "InSightsBitBucketAgent already running"
     else
      echo "Starting InSightsBitBucketAgent"
-     cd $INSIGHTS_AGENT_HOME/PlatformAgents/bitbucket
+     cd $INSIGHTS_AGENT_HOME/PlatformAgents/bitbucketallbranch
      echo $python_version
      detectPythonVersion "$python_version"
     fi
@@ -79,14 +79,14 @@ case "$1" in
      sudo kill -9 $(ps aux | grep '__PS_KEY__' | awk '{print $2}')
      echo "InSightsBitBucketAgent stopped"
      echo "InSightsBitBucketAgent starting"
-     cd $INSIGHTS_AGENT_HOME/PlatformAgents/bitbucket
+     cd $INSIGHTS_AGENT_HOME/PlatformAgents/bitbucketallbranch
      echo $python_version
      detectPythonVersion "$python_version"
      echo "InSightsBitBucketAgent started"
     else
      echo "InSightsBitBucketAgent already in stopped state"
      echo "InSightsBitBucketAgent starting"
-     cd $INSIGHTS_AGENT_HOME/PlatformAgents/bitbucket
+     cd $INSIGHTS_AGENT_HOME/PlatformAgents/bitbucketallbranch
      echo $python_version
      detectPythonVersion "$python_version"
      echo "InSightsBitBucketAgent started"
