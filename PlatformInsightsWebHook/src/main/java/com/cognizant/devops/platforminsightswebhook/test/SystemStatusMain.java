@@ -40,7 +40,7 @@ public class SystemStatusMain {
 		LOG.debug(" Run Event Subscriber .....");
 		SystemStatusMain ssm = new SystemStatusMain();
 		String data = ssm.createMessage();
-		String[] arr = { "git_all" };
+		String[] arr = { "git_test" };
 		Random r = new Random();
 		for (int i = 0; i < 4000; i++) {
 			int randomNumber = r.nextInt(arr.length);

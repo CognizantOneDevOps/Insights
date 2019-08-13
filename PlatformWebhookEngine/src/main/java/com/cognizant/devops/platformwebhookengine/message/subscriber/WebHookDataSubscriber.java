@@ -43,14 +43,16 @@ public class WebHookDataSubscriber extends EngineSubscriberResponseHandler {
 	String responseTemplate;
 	String toolName;
 	String labelName;
+	String webhookName;
 	JsonElement responseTemplateJson;
 
-	public WebHookDataSubscriber(String routingKey, String responseTemplate, String toolName,String labelName) throws Exception {
+	public WebHookDataSubscriber(String routingKey, String responseTemplate, String toolName,String labelName,String webhookName) throws Exception {
 		super(routingKey);
 
 		this.responseTemplate = responseTemplate;
 		this.toolName = toolName;
 		this.labelName=labelName;
+		this.webhookName=webhookName;
 
 	}
 
@@ -65,7 +67,7 @@ public class WebHookDataSubscriber extends EngineSubscriberResponseHandler {
 			
 			String message = new String(body, MessageConstants.MESSAGE_ENCODING);
 			InsightsWebhookParserInterface webHookParser = InsightsWebhookParserFactory.getParserInstance(toolName);
-			List<JsonObject> toolData = webHookParser.parseToolData(responseTemplate, message);
+			List<JsonObject> toolData = webHookParser.parseToolData(responseTemplate, message,toolName,labelName,webhookName);
 			
 			Neo4jDBHandler dbHandler = new Neo4jDBHandler();
 			String query = "UNWIND {props} AS properties " + "CREATE (n:" + labelName.toUpperCase() + ") "

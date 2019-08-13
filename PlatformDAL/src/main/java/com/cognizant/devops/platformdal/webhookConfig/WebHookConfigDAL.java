@@ -102,12 +102,14 @@ public class WebHookConfigDAL extends BaseDAL {
 		Query<WebHookConfig> loadQuery = getSession().createQuery("FROM WebHookConfig SC WHERE SC.webhookName = :webhookName", WebHookConfig.class);
 		loadQuery.setParameter("webhookName", webhookName);
 		List<WebHookConfig> results = loadQuery.getResultList();
+		log.debug(results);
 		WebHookConfig webhookConfiguration = null;
 		if (results != null && !results.isEmpty()) {
 			webhookConfiguration = results.get(0);
 		}
 		terminateSession();
 		terminateSessionFactory();
+		log.debug(webhookConfiguration);
 		return webhookConfiguration;
 	}
 	

@@ -41,11 +41,13 @@ export interface DataType {
 export class WebHookComponent implements OnInit {
     toolsArr = [];
     toolvalue: String = null;
+    labelsArr = [];
     toolsDetail = [];
     showAddWebHook: boolean = false;
     enableWebhookicon: boolean = false;
     showWebhook: boolean = true;
     showMessage: string;
+    labelDisplay: string;
     displayedColumns = [];
     webhookNameList: any = [];
     webhookDatasource = new MatTableDataSource
@@ -102,7 +104,7 @@ export class WebHookComponent implements OnInit {
         this.enableaddWebhook = false;
         this.webhookName = "";
         this.selectedTool = "";
-        this.eventToSubscribe = ""
+        this.labelDisplay = ""
         this.mqchannel = "";
         this.responseTemplate = "";
         this.dataformat = ""
@@ -131,6 +133,7 @@ export class WebHookComponent implements OnInit {
         var self = this;
         this.webhookNameList = [];
         this.webhookList = await self.webhookService.loadwebhookServices();
+        console.log(this.webhookList);
         if (this.webhookList != null && this.webhookList.status == 'success') {
             this.webhookDatasource.data = this.webhookList.data.sort((a, b) => a.webhookName > b.webhookName);
             this.webhookDatasource.paginator = this.paginator;
@@ -161,7 +164,7 @@ export class WebHookComponent implements OnInit {
             }
             self.showDetail = true;
             //console.log(this.agentNameList);
-            this.displayedColumns = ['radio', 'WebHookName', 'ToolName', 'EventName', 'DataType', 'MqChannel', 'Status'];
+            this.displayedColumns = ['radio', 'WebHookName', 'ToolName', 'LabelName', 'DataType', 'MqChannel', 'Status'];
             setTimeout(() => {
                 this.showConfirmMessage = "";
             }, 3000);
@@ -169,6 +172,7 @@ export class WebHookComponent implements OnInit {
             self.showMessage = "Something wrong with Service.Please try again.";
             self.messageDialog.showApplicationsMessage("Something wrong with Service.Please try again.", "ERROR");
         }
+        console.log(this.webhookDatasource.data);
     }
     list() {
         this.showWebhook = true;
@@ -182,6 +186,17 @@ export class WebHookComponent implements OnInit {
         this.enablesubscribe = false;
         this.enableunsubscribe = false;
     }
+    onToolSelect(toolname): void {
+        var self = this;
+        if (toolname === undefined) {
+        }
+        else {
+            var i = 0;
+            var labelnameIndex = this.toolsArr.indexOf(toolname)
+            this.labelDisplay = this.labelsArr[labelnameIndex];
+
+        }
+    }
     async getLabelTools() {
         var self = this;
         try {
@@ -190,10 +205,12 @@ export class WebHookComponent implements OnInit {
             if (toollabelresponse.status == "success") {
                 this.toolsDetail = toollabelresponse.data;
             }
+            console.log(this.toolsDetail)
             for (var element of this.toolsDetail) {
                 var toolName = (element.toolName);
                 var labelName = (element.label);
                 this.toolsArr.push(toolName);
+                this.labelsArr.push(labelName);
                 //  console.log(this.toolsArr)
             }
         }
@@ -204,7 +221,7 @@ export class WebHookComponent implements OnInit {
     actionSubscribeOrUnsubscribe(status, selectedWebhook) {
         var webhookAPIRequestJson = {};
         webhookAPIRequestJson['toolName'] = this.selectedWebhook.toolName
-        webhookAPIRequestJson['eventToSubscribe'] = this.selectedWebhook.eventName
+        webhookAPIRequestJson['labelDisplay'] = this.selectedWebhook.labelDisplay
         webhookAPIRequestJson['webhookName'] = this.selectedWebhook.webhookName,
             webhookAPIRequestJson['dataformat'] = this.selectedWebhook.dataFormat
         webhookAPIRequestJson['mqchannel'] = this.selectedWebhook.mqChannel
@@ -216,7 +233,7 @@ export class WebHookComponent implements OnInit {
             this.statussubscribe = true;
             this.webhookService.updateforWebHook(JSON.stringify(webhookAPIRequestJson))
                 .then(function (data) {
-                    //  console.log("WeBhook " + data);
+                    console.log("WeBhook " + data);
                     if (data.status == "success") {
 
                         self.messageDialog.showApplicationsMessage("You have subscribed to " + "<b> " + self.selectedWebhook.webhookName + "</b> successfully. You may unsubscribe by clicking the Unsubscribe icon later.", "SUCCESS");
@@ -260,7 +277,7 @@ export class WebHookComponent implements OnInit {
 
         //  inputElement.webhookName.setSelec
     }
-    saveData(webhookName, selectedTool, eventToSubscribe, dataformat, mqchannel, responseTemplate) {
+    saveData(webhookName, selectedTool, labelDisplay, dataformat, mqchannel, responseTemplate) {
         var self = this;
         var webhookAPIRequestJson = {};
         if (webhookName == "") {
@@ -295,7 +312,7 @@ export class WebHookComponent implements OnInit {
                     dialogRef.afterClosed().subscribe(result => {
                         if (result == 'yes') {
                             webhookAPIRequestJson['toolName'] = self.selectedTool
-                            webhookAPIRequestJson['eventToSubscribe'] = self.eventToSubscribe
+                            webhookAPIRequestJson['labelDisplay'] = self.labelDisplay
                             webhookAPIRequestJson['webhookName'] = self.webhookName
                             webhookAPIRequestJson['dataformat'] = self.dataformat
                             webhookAPIRequestJson['mqchannel'] = self.mqchannel
@@ -323,7 +340,7 @@ export class WebHookComponent implements OnInit {
                     dialogRef.afterClosed().subscribe(result => {
                         if (result == 'yes') {
                             webhookAPIRequestJson['toolName'] = self.selectedTool
-                            webhookAPIRequestJson['eventToSubscribe'] = self.eventToSubscribe
+                            webhookAPIRequestJson['labelDisplay'] = self.labelDisplay
                             webhookAPIRequestJson['webhookName'] = self.webhookName
                             webhookAPIRequestJson['dataformat'] = self.dataformat
                             webhookAPIRequestJson['mqchannel'] = self.mqchannel
@@ -380,7 +397,7 @@ export class WebHookComponent implements OnInit {
             this.disableInputFields = true;
             this.webhookName = this.selectedWebhook.webhookName;
             this.selectedTool = this.selectedWebhook.toolName;
-            this.eventToSubscribe = this.selectedWebhook.eventName
+            this.labelDisplay = this.selectedWebhook.labelDisplay;
             this.mqchannel = this.selectedWebhook.mqChannel;
             if (this.selectedWebhook.responseTemplate != undefined) {
                 this.responseTemplate = this.selectedWebhook.responseTemplate;
@@ -409,7 +426,7 @@ export class WebHookComponent implements OnInit {
         this.selectedWebhook = "";
         this.webhookName = "";
         this.selectedTool = "";
-        this.eventToSubscribe = "";
+        this.labelDisplay = "";
         this.dataformat = "";
         this.mqchannel = "";
         this.responseTemplate = "";

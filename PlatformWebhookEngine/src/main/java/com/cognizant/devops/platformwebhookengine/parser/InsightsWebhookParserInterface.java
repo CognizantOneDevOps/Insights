@@ -23,5 +23,5 @@ import com.google.gson.JsonObject;
 
 public interface InsightsWebhookParserInterface {
 
-	public List<JsonObject> parseToolData(String responseTemplate,String toolData);
+	public List<JsonObject> parseToolData(String responseTemplate,String toolData,String toolName,String labelName,String webhookName);
 }
