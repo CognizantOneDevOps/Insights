@@ -34,7 +34,7 @@ private String mqChannel;
 
 private Boolean subscribeStatus;
 
-private String eventName;
+private String labelDisplay;
 
 private String dataFormat;
 
@@ -66,12 +66,12 @@ public void setToolName(String toolName) {
 }
 
 
-public String getEventName() {
-	return eventName;
+public String getLabelName() {
+	return labelDisplay;
 }
 
-public void setEventName(String eventname) {
-	this.eventName = eventname;
+public void setLabelName(String labelDisplay) {
+	this.labelDisplay = labelDisplay;
 }
 
 

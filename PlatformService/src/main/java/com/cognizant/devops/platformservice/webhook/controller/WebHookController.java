@@ -48,14 +48,14 @@ public class WebHookController {
 			JsonParser parser = new JsonParser();
 			JsonObject registerWebhookjson = (JsonObject) parser.parse(registerWebhookJson);
 			String toolName = registerWebhookjson.get("toolName").getAsString();
-			String eventToSubscribe = registerWebhookjson.get("eventToSubscribe").getAsString();
+			String labelDisplay = registerWebhookjson.get("labelDisplay").getAsString();
 			String webhookName = registerWebhookjson.get("webhookName").getAsString();
 			String dataformat = registerWebhookjson.get("dataformat").getAsString();
 			String mqchannel = registerWebhookjson.get("mqchannel").getAsString();
 			String responseTemplate = registerWebhookjson.get("responseTemplate").getAsString();
 			Boolean statussubscribe = registerWebhookjson.get("statussubscribe").getAsBoolean();
 			Boolean result = webhookConfigurationService.saveWebHookConfiguration(webhookName, toolName,
-					eventToSubscribe, dataformat, mqchannel, statussubscribe, responseTemplate);
+					labelDisplay, dataformat, mqchannel, statussubscribe, responseTemplate);
 			return PlatformServiceUtil.buildSuccessResponse();
 		} catch (InsightsCustomException e) {
 			return PlatformServiceUtil.buildFailureResponse("Webhook name already exists.");
@@ -70,6 +70,7 @@ public class WebHookController {
 		List<WebHookConfigTO> webhookList;
 		try {
 			webhookList = webhookConfigurationService.getRegisteredWebHooks();
+			log.debug("My List....."+webhookList);
 		} catch (InsightsCustomException e) {
 			return PlatformServiceUtil.buildFailureResponse(e.toString());
 		}
@@ -93,7 +94,7 @@ public class WebHookController {
 			JsonParser parser = new JsonParser();
 			JsonObject registerWebhookjson = (JsonObject) parser.parse(registerWebhookJson);
 			String toolName = registerWebhookjson.get("toolName").getAsString();
-			String eventToSubscribe = registerWebhookjson.get("eventToSubscribe").getAsString();
+			String labelDisplay = registerWebhookjson.get("labelDisplay").getAsString();
 			String webhookName = registerWebhookjson.get("webhookName").getAsString();
 			String dataformat = registerWebhookjson.get("dataformat").getAsString();
 			String mqchannel = registerWebhookjson.get("mqchannel").getAsString();
@@ -101,7 +102,7 @@ public class WebHookController {
 			Boolean statussubscribe = registerWebhookjson.get("statussubscribe").getAsBoolean();
 			
 			Boolean result = webhookConfigurationService.updateWebHook(webhookName, toolName,
-					eventToSubscribe, dataformat, mqchannel, statussubscribe, responseTemplate);
+					labelDisplay, dataformat, mqchannel, statussubscribe, responseTemplate);
 			log.error(result);
 		} catch (InsightsCustomException e) {
 			return PlatformServiceUtil.buildFailureResponse(e.toString());

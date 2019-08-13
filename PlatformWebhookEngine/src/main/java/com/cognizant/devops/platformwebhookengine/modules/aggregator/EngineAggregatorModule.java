@@ -71,11 +71,12 @@ public class EngineAggregatorModule implements Job {
 
             String dataRoutingKey = webhookConfig.getMQChannel();
             String labelName = webhookConfig.getLabelName();
+            String webhookName = webhookConfig.getWebHookName();
             String responseTemplate = webhookConfig.getResponseTemplate();
 
             if (dataRoutingKey != null && !registry.containsKey(dataRoutingKey)) {
                 try {
-                    registry.put(dataRoutingKey, new WebHookDataSubscriber(dataRoutingKey, responseTemplate, toolName,labelName));
+                    registry.put(dataRoutingKey, new WebHookDataSubscriber(dataRoutingKey, responseTemplate, toolName,labelName,webhookName));
                 } catch (Exception e) {
                     log.error("Unable to add subscriber for routing key: " + e);
 

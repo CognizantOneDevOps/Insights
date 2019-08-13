@@ -33,10 +33,10 @@ public class WebHookService implements IWebHook {
 	private static final String SUCCESS = "SUCCESS";
 
 	@Override
-	public Boolean saveWebHookConfiguration(String webhookname, String toolName, String eventname, String dataformat,
+	public Boolean saveWebHookConfiguration(String webhookname, String toolName, String labelDisplay, String dataformat,
 			String mqchannel, Boolean subscribestatus, String responseTemplate) throws InsightsCustomException {
 		try {
-			WebHookConfig webHookConfig = populateWebHookConfiguration(webhookname, toolName, eventname, dataformat,
+			WebHookConfig webHookConfig = populateWebHookConfiguration(webhookname, toolName, labelDisplay, dataformat,
 					mqchannel, subscribestatus, responseTemplate);
 			WebHookConfigDAL webhookConfigurationDAL = new WebHookConfigDAL();
 			return webhookConfigurationDAL.saveWebHookConfiguration(webHookConfig);
@@ -72,11 +72,11 @@ public class WebHookService implements IWebHook {
 		return webhookConfigurationDAL.loadWebHookConfiguration(webhookName);
 	}
 
-	private WebHookConfig populateWebHookConfiguration(String webhookname, String toolName, String eventname,
+	private WebHookConfig populateWebHookConfiguration(String webhookname, String toolName, String labelDisplay,
 			String dataformat, String mqchannel, Boolean subscribestatus, String responseTemplate) {
 		WebHookConfig webhookConfiguration = new WebHookConfig();
 		webhookConfiguration.setDataFormat(dataformat);
-		webhookConfiguration.setEventName(eventname);
+		webhookConfiguration.setLabelName(labelDisplay);
 		webhookConfiguration.setToolName(toolName);
 		webhookConfiguration.setMQChannel(mqchannel);
 		webhookConfiguration.setWebHookName(webhookname);
@@ -107,7 +107,7 @@ public class WebHookService implements IWebHook {
 			// log.error(status);
 			return webhookConfigurationDAL.updateWebHookConfiguration(webHookConfig);
 		} catch (Exception e) {
-			log.error("Error updating the webhook", e);
+			log.error("Error in updating the webhook", e);
 			throw new InsightsCustomException(e.toString());
 		}
 	}

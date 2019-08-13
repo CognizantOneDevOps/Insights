@@ -16,6 +16,7 @@
 package com.cognizant.devops.platformwebhookengine.parser;
 
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -35,7 +36,7 @@ import com.google.gson.JsonParser;
 public class InsightsGeneralParser implements InsightsWebhookParserInterface {
 	private static Logger log = LogManager.getLogger(InsightsGeneralParser.class.getName());
 
-	public List<JsonObject> parseToolData(String responseTemplate, String toolData) {
+	public List<JsonObject> parseToolData(String responseTemplate, String toolData,String toolName,String labelName,String webhookName) {
 
 		try {
 			String keyMqInitial;
@@ -57,10 +58,13 @@ public class InsightsGeneralParser implements InsightsWebhookParserInterface {
 
 			
 			finalJson.put("source", "webhook");
-			DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd");
+			DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
 			LocalDateTime now = LocalDateTime.now();
 			finalJson.put("inSightsTimeX", dtf.format(now));
-			
+			finalJson.put("toolName", toolName);
+			finalJson.put("webhookName", webhookName);
+			finalJson.put("labelName", labelName);
+			finalJson.put("insightsTime", ZonedDateTime.now().toInstant().toEpochMilli());
 			Gson prettyGson = new GsonBuilder().setPrettyPrinting().create();
 			String prettyJson = prettyGson.toJson(finalJson);
 			JsonElement element = parser.parse(prettyJson);
