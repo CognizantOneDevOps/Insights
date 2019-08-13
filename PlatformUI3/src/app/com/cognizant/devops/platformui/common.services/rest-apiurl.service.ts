@@ -34,6 +34,7 @@ export class RestAPIurlService implements IRestAPIUrlService {
         this.addEndPoint("HEALTH_TOOL", '/PlatformService/admin/health/detailHealth');
         this.addEndPoint("INSIGHTS_COMP_STATUS", '/PlatformService/admin/health/globalHealth');
         this.addEndPoint("AGENT_COMP_STATUS", '/PlatformService/admin/health/globalAgentsHealth');
+        this.addEndPoint("AGENTS_FAILURE_DETAILS", '/PlatformService/admin/health/getAgentFailureDetails');
 
         this.addEndPoint("LOGOUT", '/PlatformService/user/logout');
         this.addEndPoint("GRAPANA_CURRENT_ROLE_ORG", '/PlatformService/user/getCurrentOrgAndRole');

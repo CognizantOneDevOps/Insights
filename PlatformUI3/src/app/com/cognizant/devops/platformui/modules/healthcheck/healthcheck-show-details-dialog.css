@@ -197,3 +197,32 @@ mat-dialog-content::-webkit-scrollbar-track {
 	text-align: center;
     width:250px !important;
 }
+
+ /* Styles for tab labels */
+ ::ng-deep .healthcheck-tab-style .mat-tab-label {     
+     background-color: transparent;
+     color: #0033A0;
+     font-size: 18px;
+     font-family: inherit;
+     opacity: 1.0;
+ }
+ 
+ /* Styles for the active tab label */
+ ::ng-deep .healthcheck-tab-style .mat-tab-label-active {
+    color: #00B140;
+    font-weight:bold;
+    font-size: 18px;    
+    background-color: transparent;
+    font-family: inherit;
+ }
+
+ ::ng-deep .healthcheck-tab-style .mat-tab-header {
+    border-bottom-style: none !important;  
+    
+ }
+ 
+ /* Styles for the ink bar */
+ ::ng-deep .healthcheck-tab-style .mat-ink-bar {
+     background-color: #00B140 !important;
+
+ }  
