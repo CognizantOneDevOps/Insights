@@ -5,10 +5,11 @@
 	<test name = "PlatformServiceTest">
       <classes>
           <class name = "com.cognizant.devops.platformservice.test.testngInitializer.TestngInitializerTest"/>
-        	<class name = "com.cognizant.devops.platformservice.test.about.AboutServiceTest"/>
+         <class name = "com.cognizant.devops.platformservice.test.about.AboutServiceTest"/>
           <class name = "com.cognizant.devops.platformservice.test.agentManagement.AgentManagementTest"/>
+          <class name = "com.cognizant.devops.platformservice.test.CorrelationBuilder.CorrelationBuilderTest"/>
       </classes>
 	 </test>
-	<!-- <test name = "AboutTest"> <classes> </classes> </test> <test name = 
-		"AgentManagementTest"> <classes> </classes> </test> --> 
+	     <test name = "AboutTest"> <classes> </classes> </test> <test name = 
+		"AgentManagementTest"> <classes> </classes> </test> 
 </suite>
