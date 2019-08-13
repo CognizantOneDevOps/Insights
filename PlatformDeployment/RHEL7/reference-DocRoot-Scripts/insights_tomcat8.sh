@@ -22,7 +22,7 @@ sudo wget https://platform.cogdevops.com/insights_install/installationScripts/la
 sudo tar -zxvf apache-tomcat-8.5.27.tar.gz
 sudo cp -R ./app /opt/apache-tomcat-8.5.27/webapps
 #sudo cp -R app /opt/apache-tomcat-8.5.27/webapps
-sudo rm -rf InSightsUI3
+sudo rm -rf PlatformUI3
 sudo cp PlatformService.war /opt/apache-tomcat-8.5.27/webapps
 sudo rm -rf PlatformService.war
 cd apache-tomcat-8.5.27
