@@ -21,7 +21,6 @@ import java.util.List;
 import java.util.Map;
 
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
-import com.google.gson.JsonObject;
 
 public interface AgentManagementService {
 
