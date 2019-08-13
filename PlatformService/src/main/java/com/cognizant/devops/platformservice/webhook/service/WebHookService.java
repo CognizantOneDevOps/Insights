@@ -67,11 +67,7 @@ public class WebHookService implements IWebHook {
 		return webhookList;
 	}
 
-	public WebHookConfig loadWebHookConfiguration(String webhookName) {
-		WebHookConfigDAL webhookConfigurationDAL = new WebHookConfigDAL();
-		return webhookConfigurationDAL.loadWebHookConfiguration(webhookName);
-	}
-
+	
 	private WebHookConfig populateWebHookConfiguration(String webhookname, String toolName, String labelDisplay,
 			String dataformat, String mqchannel, Boolean subscribestatus, String responseTemplate) {
 		WebHookConfig webhookConfiguration = new WebHookConfig();

@@ -70,7 +70,7 @@ public class WebHookController {
 		List<WebHookConfigTO> webhookList;
 		try {
 			webhookList = webhookConfigurationService.getRegisteredWebHooks();
-			log.debug("My List....."+webhookList);
+			//log.debug(webhookList);
 		} catch (InsightsCustomException e) {
 			return PlatformServiceUtil.buildFailureResponse(e.toString());
 		}
