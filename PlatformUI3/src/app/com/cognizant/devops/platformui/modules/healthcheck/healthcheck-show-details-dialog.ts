@@ -37,9 +37,12 @@ export class ShowDetailsDialog implements OnInit {
   resultsLength: number = 6;
   agentDetailedNode = [];
   agentDetailedDatasource = new MatTableDataSource([]);
+  agentFailureDetailsDatasource = new MatTableDataSource([]);
+  agentFailureRecords = [];
   headerArrayDisplay = [];
   masterHeader = new Map<String, String>();
   finalHeaderToShow = new Map<String, String>();
+  displayedColumns: string[] = ['inSightsTimeX', 'message'];
   @ViewChild(MatPaginator) paginator: MatPaginator;
   headerSet = new Set();
 
@@ -52,6 +55,7 @@ export class ShowDetailsDialog implements OnInit {
 
   ngOnInit() {
     this.loadDetailsDialogInfo();
+    this.loadAgentFailureDetails();
     this.detailType = this.data.detailType;
   }
 
@@ -72,6 +76,7 @@ export class ShowDetailsDialog implements OnInit {
     this.checkResponseData = true;
     this.healthCheckService.loadHealthConfigurations(this.data.toolName, this.data.categoryName, this.data.agentId)
       .then((data) => {
+        console.log(">>>> loadHealthConfigurations Results received >>>>>");
         this.showThrobber = false;
         this.showContent = !this.showThrobber;
         var dataArray = data.data.nodes;
@@ -110,7 +115,46 @@ export class ShowDetailsDialog implements OnInit {
         }
       });
 
+      /*this.healthCheckService.getAgentsFailureDetails(this.data.toolName, this.data.categoryName, this.data.agentId)
+      .then((data) => {
+        // Method body
+        console.debug(">>>> Failure Results received >>>>>");
+        console.debug(data.data.nodes)
+
+       }); */
   }
+
+  loadAgentFailureDetails():void {
+     this.healthCheckService.getAgentFailureDetails(this.data.toolName, this.data.categoryName, this.data.agentId)
+      .then((data) => {
+        // Method body
+        console.log(">>>> Failure Results received >>>>>");
+        console.log(data.data.nodes)
+        var failureRecords = data.data.nodes;
+        if (failureRecords != undefined) {
+          for (var key in failureRecords) {
+            var dataNodes = failureRecords[key];
+            for (var node in dataNodes) {
+              if (node == "propertyMap") {
+                var obj = dataNodes[node];
+                if (typeof obj["inSightsTimeX"] !== "undefined") {
+                  obj["inSightsTimeX"] = this.datePipe.transform(obj["inSightsTimeX"], 'yyyy-MM-dd HH:mm:ss');
+                }
+                
+                if (typeof obj["message"] !== "undefined") {
+                  obj["message"] = obj["message"];
+                }
+                this.agentFailureRecords.push(obj);
+              }
+            } 
+          }
+          this.agentFailureDetailsDatasource.data = this.agentFailureRecords;
+        }         
+
+       });
+  }
+  
+
 
   showSelectedField(): void {
     //Define sequence of headerSet according to mater array and remove unwanted header 
