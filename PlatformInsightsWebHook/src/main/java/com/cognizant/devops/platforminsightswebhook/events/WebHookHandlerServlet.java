@@ -161,6 +161,7 @@ public class WebHookHandlerServlet extends HttpServlet {
 					responceJson.addProperty(paramName, paramValue);
 				}
 			}
+			responceJson.addProperty("iswebhookdata", Boolean.TRUE);
 		}
 		return responceJson;
 	}
