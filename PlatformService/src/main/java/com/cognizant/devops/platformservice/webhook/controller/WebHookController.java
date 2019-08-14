@@ -54,8 +54,8 @@ public class WebHookController {
 			String mqchannel = registerWebhookjson.get("mqchannel").getAsString();
 			String responseTemplate = registerWebhookjson.get("responseTemplate").getAsString();
 			Boolean statussubscribe = registerWebhookjson.get("statussubscribe").getAsBoolean();
-			Boolean result = webhookConfigurationService.saveWebHookConfiguration(webhookName, toolName,
-					labelDisplay, dataformat, mqchannel, statussubscribe, responseTemplate);
+			Boolean result = webhookConfigurationService.saveWebHookConfiguration(webhookName, toolName, labelDisplay,
+					dataformat, mqchannel, statussubscribe, responseTemplate);
 			return PlatformServiceUtil.buildSuccessResponse();
 		} catch (InsightsCustomException e) {
 			return PlatformServiceUtil.buildFailureResponse("Webhook name already exists.");
@@ -70,7 +70,7 @@ public class WebHookController {
 		List<WebHookConfigTO> webhookList;
 		try {
 			webhookList = webhookConfigurationService.getRegisteredWebHooks();
-			//log.debug(webhookList);
+			// log.debug(webhookList);
 		} catch (InsightsCustomException e) {
 			return PlatformServiceUtil.buildFailureResponse(e.toString());
 		}
@@ -100,13 +100,15 @@ public class WebHookController {
 			String mqchannel = registerWebhookjson.get("mqchannel").getAsString();
 			String responseTemplate = registerWebhookjson.get("responseTemplate").getAsString();
 			Boolean statussubscribe = registerWebhookjson.get("statussubscribe").getAsBoolean();
-			
-			Boolean result = webhookConfigurationService.updateWebHook(webhookName, toolName,
-					labelDisplay, dataformat, mqchannel, statussubscribe, responseTemplate);
-			log.error(result);
+
+			Boolean result = webhookConfigurationService.updateWebHook(webhookName, toolName, labelDisplay, dataformat,
+					mqchannel, statussubscribe, responseTemplate);
+			if(result==false) {
+				return PlatformServiceUtil.buildFailureResponse("Update Failed.");
+			}
 		} catch (InsightsCustomException e) {
 			return PlatformServiceUtil.buildFailureResponse(e.toString());
 		}
-		return PlatformServiceUtil.buildSuccessResponseWithData("Success update");
+		return PlatformServiceUtil.buildSuccessResponse();
 	}
 }
