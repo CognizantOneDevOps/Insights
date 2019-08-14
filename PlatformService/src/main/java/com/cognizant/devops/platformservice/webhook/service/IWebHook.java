@@ -15,10 +15,17 @@
  ******************************************************************************/
 package com.cognizant.devops.platformservice.webhook.service;
 
+import java.util.List;
+
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 
 public interface IWebHook {
 
 	public Boolean saveWebHookConfiguration(String webhookname,String toolName,String eventname,String dataformat,String mqchannel,Boolean subscribestatus, String responseTemplate) throws InsightsCustomException;
 	//public WebHookConfig loadWebHookConfiguration(String settingsType);
+	public List<WebHookConfigTO> getRegisteredWebHooks() throws InsightsCustomException;
+	public String uninstallWebhook(String webhookname) throws InsightsCustomException;
+	public Boolean updateWebHook(String webhookname, String toolName, String eventname, String dataformat,
+			String mqchannel, Boolean subscribestatus, String responseTemplate) throws InsightsCustomException ;
+	
 }
