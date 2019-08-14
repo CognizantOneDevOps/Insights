@@ -245,7 +245,8 @@ public class AccessGroupManagement {
 		// log.debug("getOrgs API is: " + userPropertyList);
 		try {
 			JsonParser parser = new JsonParser();
-			JsonObject updateAgentJson = (JsonObject) parser.parse(userPropertyList);
+			String validatedResponse = ValidationUtils.cleanXSS(userPropertyList);
+			JsonObject updateAgentJson = (JsonObject) parser.parse(validatedResponse);
 			int orgId = updateAgentJson.get("orgId").getAsInt();
 			String name = updateAgentJson.get("name").getAsString();
 			String email = updateAgentJson.get("email").getAsString();
