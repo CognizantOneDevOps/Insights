@@ -34,11 +34,6 @@ public class WebhookServiceTest extends WebHookService{
 		WebHookService webhookserviceImp = new WebHookService();
 		Boolean webhookcheck = webhookserviceImp.saveWebHookConfiguration(webhookTestData.webhookname,webhookTestData.toolName,webhookTestData.labelDisplay, webhookTestData.dataformat, webhookTestData.mqchannel, webhookTestData.subscribestatus, webhookTestData.responseTemplate);
 		Boolean expectedOutcome = true;
-		Assert.assertNotNull(webhookTestData.webhookname);
-		Assert.assertNotNull(webhookTestData.toolName);
-		Assert.assertNotNull(webhookTestData.labelDisplay);
-		Assert.assertNotNull(webhookTestData.mqchannel);
-		Assert.assertTrue(webhookTestData.subscribestatus);
 		Assert.assertEquals(webhookcheck, expectedOutcome);
 	}
 	
@@ -67,11 +62,6 @@ public class WebhookServiceTest extends WebHookService{
 		WebHookService webhookserviceImp = new WebHookService();
 		Boolean webhookcheck = webhookserviceImp.updateWebHook(webhookTestData.webhookname,webhookTestData.toolName,webhookTestData.labelDisplay, webhookTestData.dataformat, webhookTestData.mqchannel, webhookTestData.subscribestatus, webhookTestData.responseTemplate);
 		Boolean expectedOutcome = true;
-		Assert.assertNotNull(webhookTestData.webhookname);
-		Assert.assertNotNull(webhookTestData.toolName);
-		Assert.assertNotNull(webhookTestData.labelDisplay);
-		Assert.assertNotNull(webhookTestData.mqchannel);
-		Assert.assertTrue(webhookTestData.subscribestatus);
 		Assert.assertEquals(webhookcheck, expectedOutcome);
 	}
 	

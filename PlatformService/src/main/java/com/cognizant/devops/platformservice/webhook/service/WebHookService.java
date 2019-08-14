@@ -67,7 +67,6 @@ public class WebHookService implements IWebHook {
 		return webhookList;
 	}
 
-	
 	private WebHookConfig populateWebHookConfiguration(String webhookname, String toolName, String labelDisplay,
 			String dataformat, String mqchannel, Boolean subscribestatus, String responseTemplate) {
 		WebHookConfig webhookConfiguration = new WebHookConfig();
@@ -95,13 +94,17 @@ public class WebHookService implements IWebHook {
 
 	public Boolean updateWebHook(String webhookname, String toolName, String eventname, String dataformat,
 			String mqchannel, Boolean subscribestatus, String responseTemplate) throws InsightsCustomException {
-		// Boolean status;
+		Boolean status = false;
 		try {
 			WebHookConfig webHookConfig = populateWebHookConfiguration(webhookname, toolName, eventname, dataformat,
 					mqchannel, subscribestatus, responseTemplate);
 			WebHookConfigDAL webhookConfigurationDAL = new WebHookConfigDAL();
-			// log.error(status);
-			return webhookConfigurationDAL.updateWebHookConfiguration(webHookConfig);
+			status = webhookConfigurationDAL.updateWebHookConfiguration(webHookConfig);
+			if (status == true) {
+				return true;
+			} else {
+				throw new InsightsCustomException("Update Failed.");
+			}
 		} catch (Exception e) {
 			log.error("Error in updating the webhook", e);
 			throw new InsightsCustomException(e.toString());
