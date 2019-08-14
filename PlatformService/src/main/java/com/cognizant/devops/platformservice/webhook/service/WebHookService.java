@@ -100,15 +100,11 @@ public class WebHookService implements IWebHook {
 					mqchannel, subscribestatus, responseTemplate);
 			WebHookConfigDAL webhookConfigurationDAL = new WebHookConfigDAL();
 			status = webhookConfigurationDAL.updateWebHookConfiguration(webHookConfig);
-			if (status == true) {
-				return true;
-			} else {
-				throw new InsightsCustomException("Update Failed.");
-			}
 		} catch (Exception e) {
 			log.error("Error in updating the webhook", e);
 			throw new InsightsCustomException(e.toString());
 		}
+		return status;
 	}
 
 }
