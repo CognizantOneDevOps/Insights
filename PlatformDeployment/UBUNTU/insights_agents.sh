@@ -36,4 +36,4 @@ sudo chmod +x installdaemonagent.sh
 sudo mkdir /opt/agent20
 sudo mkdir /opt/agent20/download
 sudo chmod -R 777 /opt/agent20
-sudo ./installdaemonagent.sh ubuntu
+./installdaemonagent.sh ubuntu
