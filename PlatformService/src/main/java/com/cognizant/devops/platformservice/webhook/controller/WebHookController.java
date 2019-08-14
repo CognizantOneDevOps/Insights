@@ -103,6 +103,9 @@ public class WebHookController {
 
 			Boolean result = webhookConfigurationService.updateWebHook(webhookName, toolName, labelDisplay, dataformat,
 					mqchannel, statussubscribe, responseTemplate);
+			if(result==false) {
+				return PlatformServiceUtil.buildFailureResponse("Update Failed.");
+			}
 		} catch (InsightsCustomException e) {
 			return PlatformServiceUtil.buildFailureResponse(e.toString());
 		}
