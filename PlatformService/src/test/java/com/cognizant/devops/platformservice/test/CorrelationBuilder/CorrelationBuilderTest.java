@@ -20,6 +20,10 @@ import org.testng.annotations.Test;
 
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformservice.correlationbuilder.service.CorrelationBuilderServiceImpl;
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 
 @Test
 public class CorrelationBuilderTest extends CorrelationBuilderTestData {
@@ -27,22 +31,34 @@ public class CorrelationBuilderTest extends CorrelationBuilderTestData {
 	public static final CorrelationBuilderTestData correlationBuilderTestData = new CorrelationBuilderTestData();
 	public static final CorrelationBuilderServiceImpl correlationBuilderImpl = new CorrelationBuilderServiceImpl();
 
-	@Test(priority = 1)
+	@Test(priority = 2)
 	public void testGetCorrelationJson() throws InsightsCustomException {
 
-		String expectedOutcome = correlationBuilderImpl.getCorrelationJson().toString();
-		Assert.assertNotNull(expectedOutcome);
-		Assert.assertFalse(expectedOutcome.toString().isEmpty());
-		Assert.assertTrue(expectedOutcome.length() > 0);
+		String actualOutCome = correlationBuilderImpl.getCorrelationJson().toString();
+		
+		Assert.assertEquals(actualOutCome, correlationBuilderTestData.getConfigDetails);		
+		Assert.assertTrue(correlationBuilderTestData.getConfigDetails.length()>0);
+	
 
 	}
 
-	@Test(priority = 2)
-	public void testSaveConfig() throws InsightsCustomException {
-		String config = "succcess";
-		CorrelationBuilderTestData test = new CorrelationBuilderTestData();
-		String response = correlationBuilderImpl.saveConfig(test.configDetails);
+	@Test(priority = 1)
+	public void testGetSaveConfig() throws InsightsCustomException {
+		String config = "succcess";		
+		String response = correlationBuilderImpl.saveConfig(correlationBuilderTestData.saveDataConfig);
 		Assert.assertEquals(config, response);
 	}
-
+	
+	@Test(priority = 3)
+	public void testUpdateJsonConfig() throws InsightsCustomException {
+		String config = "succcess";
+		String response = correlationBuilderImpl.saveConfig(correlationBuilderTestData.UpdateConfigDetails);
+		Assert.assertEquals(config, response);
+	}
+	@Test(priority = 4)
+	public void testDeleteJsonConfig() throws InsightsCustomException {
+		String config = "succcess";
+		String response = correlationBuilderImpl.saveConfig(correlationBuilderTestData.DeleteConfigDetails);
+		Assert.assertEquals(config, response);
+	}
 }
