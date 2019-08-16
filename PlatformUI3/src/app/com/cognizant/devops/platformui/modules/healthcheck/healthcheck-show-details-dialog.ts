@@ -43,8 +43,10 @@ export class ShowDetailsDialog implements OnInit {
   masterHeader = new Map<String, String>();
   finalHeaderToShow = new Map<String, String>();
   displayedColumns: string[] = ['inSightsTimeX', 'message'];
-  @ViewChild(MatPaginator) paginator: MatPaginator;
+  //@ViewChild(MatPaginator) allStatusPaginator: MatPaginator;
+  @ViewChild(MatPaginator) failureStatusPaginator: MatPaginator;
   headerSet = new Set();
+  showAgentDetailDialog: boolean = false;
 
   constructor(public dialogRef: MatDialogRef<ShowDetailsDialog>,
     @Inject(MAT_DIALOG_DATA) public data: any,
@@ -60,12 +62,13 @@ export class ShowDetailsDialog implements OnInit {
   }
 
   ngAfterViewInit() {
-    this.agentDetailedDatasource.paginator = this.paginator;
+    this.agentFailureDetailsDatasource.paginator = this.failureStatusPaginator;
+    //this.agentDetailedDatasource.paginator = this.allStatusPaginator;
   }
 
   fillMasterHeaderData() {
     this.masterHeader.set("execId", "Execution ID");
-    this.masterHeader.set("inSightsTimeX", "Execution Time ("+this.data.timeZone+")");
+    this.masterHeader.set("inSightsTimeX", "Execution Time (" + this.data.timeZone + ")");
     this.masterHeader.set("status", "Status");
     this.masterHeader.set("message", "Message");
   }
@@ -85,6 +88,14 @@ export class ShowDetailsDialog implements OnInit {
           if (dataArray.length === 0 && this.data.detailType != "Platform Service") {
             this.checkResponseData = false;
           }
+          
+          if (this.detailType == "Platform Service" || this.detailType == "Insights Inference Engine" 
+                    || this.detailType == "Platform Engine") {
+             this.showAgentDetailDialog = false;
+          } else {
+             this.showAgentDetailDialog = true;
+          }
+         
           for (var key in dataArray) {
             var dataNodes = dataArray[key];
             for (var node in dataNodes) {
@@ -110,22 +121,14 @@ export class ShowDetailsDialog implements OnInit {
             }
           }
           this.agentDetailedDatasource.data = this.agentDetailedNode;
-          this.agentDetailedDatasource.paginator = this.paginator;
+          //this.agentDetailedDatasource.paginator = this.allStatusPaginator;
           this.showSelectedField();
         }
       });
-
-      /*this.healthCheckService.getAgentsFailureDetails(this.data.toolName, this.data.categoryName, this.data.agentId)
-      .then((data) => {
-        // Method body
-        console.debug(">>>> Failure Results received >>>>>");
-        console.debug(data.data.nodes)
-
-       }); */
   }
 
-  loadAgentFailureDetails():void {
-     this.healthCheckService.getAgentFailureDetails(this.data.toolName, this.data.categoryName, this.data.agentId)
+  loadAgentFailureDetails(): void {
+    this.healthCheckService.getAgentFailureDetails(this.data.toolName, this.data.categoryName, this.data.agentId)
       .then((data) => {
         // Method body
         console.log(">>>> Failure Results received >>>>>");
@@ -140,20 +143,21 @@ export class ShowDetailsDialog implements OnInit {
                 if (typeof obj["inSightsTimeX"] !== "undefined") {
                   obj["inSightsTimeX"] = this.datePipe.transform(obj["inSightsTimeX"], 'yyyy-MM-dd HH:mm:ss');
                 }
-                
+
                 if (typeof obj["message"] !== "undefined") {
                   obj["message"] = obj["message"];
                 }
                 this.agentFailureRecords.push(obj);
               }
-            } 
+            }
           }
           this.agentFailureDetailsDatasource.data = this.agentFailureRecords;
-        }         
+          this.agentFailureDetailsDatasource.paginator = this.failureStatusPaginator;
+        }
 
-       });
+      });
   }
-  
+
 
 
   showSelectedField(): void {

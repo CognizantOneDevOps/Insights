@@ -41,10 +41,10 @@
                     <tr mat-header-row *matHeaderRowDef="headerArrayDisplay" class="tableHeaderCss"></tr>
                     <tr mat-row *matRowDef="let row; columns: headerArrayDisplay;"></tr>
                 </table>
-            <!--<mat-paginator #paginator pageSize="8"> </mat-paginator>-->
+               <!-- <mat-paginator #allStatusPaginator [pageSize]="10" showFirstLastButtons class="paginationStyle"> </mat-paginator>-->
             </mat-dialog-content>
         </mat-tab>
-        <mat-tab label="Last Failures Details"> 
+        <mat-tab label="Last Failures Details" *ngIf="showAgentDetailDialog"> 
             <table mat-table [dataSource]="agentFailureDetailsDatasource" >
                 <!-- Date/Time Column -->
                 <ng-container matColumnDef="inSightsTimeX">
@@ -60,6 +60,7 @@
                 <tr mat-header-row *matHeaderRowDef="displayedColumns" class="tableHeaderCss"></tr>
                 <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
             </table>
+            <mat-paginator #failureStatusPaginator [pageSize]="8" showFirstLastButtons class="paginationStyle"></mat-paginator>
         </mat-tab>         
     </mat-tab-group>        
 
