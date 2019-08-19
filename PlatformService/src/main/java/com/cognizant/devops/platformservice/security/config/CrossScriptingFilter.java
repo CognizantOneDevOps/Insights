@@ -65,23 +65,23 @@ public class CrossScriptingFilter implements Filter {
 			RequestWrapper requestMapper = new RequestWrapper(httpRequest,
 					httpResponce);
 			chain.doFilter(requestMapper, httpResponce);
-			//LOG.debug("Completed .. in CrossScriptingFilter");
+			LOG.debug("Completed .. in CrossScriptingFilter");
 
 		} catch (Exception e) {
-			LOG.error("Invalid request in CrossScriptingFilter");
-			String msg = PlatformServiceUtil.buildFailureResponse("Invalid request").toString();
+			LOG.error("Invalid request in CrossScriptingFilter " + e.getMessage());
+			String msg = PlatformServiceUtil.buildFailureResponse("Invalid request" + e.getMessage()).toString();
 			httpResponce.setContentType("application/json");
 			httpResponce.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			httpResponce.getWriter().write(msg);
 			httpResponce.getWriter().flush();
 			httpResponce.getWriter().close();
 		}
-		// LOG.info("Out doFilter CrossScriptingFilter ...............");
+		LOG.info("Out doFilter CrossScriptingFilter ...............");
 	}
 	
 	
 	public void writeHeaders(HttpServletRequest request, HttpServletResponse response) {
-		//LOG.debug(" Write Header in CrossScriptingFilter ============ ");
+		LOG.debug(" Write Header in CrossScriptingFilter ============ ");
 		response.setStatus(HttpServletResponse.SC_OK);
 		try {
 			String origin = request.getHeader(HttpHeaders.ORIGIN);
@@ -122,5 +122,6 @@ public class CrossScriptingFilter implements Filter {
 				response.addCookie(cookie);
         	}
         }
+		LOG.debug(" Write Header in CrossScriptingFilter ============ Completed");
 	}
 }
