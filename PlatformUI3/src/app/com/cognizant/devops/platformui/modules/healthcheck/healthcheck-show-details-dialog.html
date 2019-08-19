@@ -30,7 +30,7 @@
 </div>
 <div *ngIf="checkResponseData" class="scrollData">
     <mat-tab-group color="primary" class="healthcheck-tab-style">
-        <mat-tab label="Latest Sucees/Failure Details"> 
+        <mat-tab label="Latest Status Details"> 
             <mat-dialog-content *ngIf="showContent" style="margin:0;padding: 0">
                 <table mat-table [dataSource]="agentDetailedDatasource">
                     <ng-container *ngFor="let header of finalHeaderToShow | keyvalue" matColumnDef="{{header.key}}">
@@ -44,7 +44,7 @@
                <!-- <mat-paginator #allStatusPaginator [pageSize]="10" showFirstLastButtons class="paginationStyle"> </mat-paginator>-->
             </mat-dialog-content>
         </mat-tab>
-        <mat-tab label="Last Failures Details" *ngIf="showAgentDetailDialog"> 
+        <mat-tab label="Last Failure Details" *ngIf="showAgentDetailDialog"> 
             <table mat-table [dataSource]="agentFailureDetailsDatasource" >
                 <!-- Date/Time Column -->
                 <ng-container matColumnDef="inSightsTimeX">
