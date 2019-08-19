@@ -37,8 +37,14 @@ export class InferenceCtrl extends MetricsPanelCtrl {
 		this.addEditorTab('Options', './editor.html', 2);
 	}
 	onRender() {
-		google = window['google'];
-		google.charts.load('current', { packages: ['corechart'] });
+		/* google = window['google'];
+		google.charts.load('current', { packages: ['corechart'] }); */
+		if ($('#googleChartLoaderScript').length === 0) {
+            google = window['google'];
+			google.charts.load('46', { packages: ['corechart', 'charteditor','gantt'] });
+        }else{
+			google = window['google'];
+		} 
 	}
 	onDataReceived(dataList) {
 		this.uiResponseArr = [];
@@ -158,7 +164,9 @@ export class InferenceCtrl extends MetricsPanelCtrl {
 		// this.arr.push(this.filterData(x));
 		var data = new google.visualization.DataTable();
 		var data = google.visualization.arrayToDataTable(this.filterData(x));
-
+		if ($('#googleChartLoaderScript').length === 0) {
+				google.charts.load('46', { packages: ['corechart', 'charteditor','gantt'] });
+		} 
 		google.charts.setOnLoadCallback(this.drawCharts.bind(this));
 		// Instantiate and draw the chart.
 		var chartType = this.panel.targets[0].chartType;
