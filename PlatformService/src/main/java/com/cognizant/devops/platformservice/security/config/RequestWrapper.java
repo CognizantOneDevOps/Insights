@@ -50,6 +50,7 @@ public final class RequestWrapper extends HttpServletRequestWrapper {
 	 */
 	@Override
 	public String[] getParameterValues(String parameter) {
+		log.debug("In getParameterValues .....");
 		String[] values = super.getParameterValues(parameter);
 		if (values == null) {
 			return null;
@@ -60,15 +61,12 @@ public final class RequestWrapper extends HttpServletRequestWrapper {
 			encodedValues[i] = ValidationUtils.cleanXSS(values[i]);
 		}
 
-		// log.debug("arg0 message " + request.getRequestURI() + " " +
-		// request.toString());
 		Enumeration<String> parameterNames = request.getParameterNames();
 		while (parameterNames.hasMoreElements()) {
 			String paramName = parameterNames.nextElement();
 			String paramValues = ValidationUtils.cleanXSS(request.getParameter(paramName));
-			// log.debug("arg0 ==== paramValues " + paramValues + " " + paramName);
 		}
-
+		log.debug("In getParameterValues ==== Completed ");
 		return encodedValues;
 	}
 
@@ -78,12 +76,12 @@ public final class RequestWrapper extends HttpServletRequestWrapper {
 	 */
 	@Override
 	public String getParameter(String parameter) {
-		// log.debug("In getParameter .. parameter .......");
+		log.debug("In getParameter ");
 		String value = super.getParameter(parameter);
 		if (value == null) {
 			return null;
 		}
-		// log.info("In getParameter RequestWrapper ........ value .......");
+		log.info("In getParameter RequestWrapper ==== Completed");
 		return ValidationUtils.cleanXSS(value);
 	}
 
@@ -94,11 +92,11 @@ public final class RequestWrapper extends HttpServletRequestWrapper {
 	 */
 	@Override
 	public String getHeader(String name) {
-		// log.debug("In getHeader .. parameter .......");
+		log.debug("In getHeader");
 		String value = super.getHeader(name);
 		if (value == null)
 			return null;
-		// log.info("In getHeader RequestWrapper ........... value ....");
+		log.info("In getHeader RequestWrapper ==== complated ");
 		return ValidationUtils.cleanXSS(value);
 	}
 
@@ -109,16 +107,15 @@ public final class RequestWrapper extends HttpServletRequestWrapper {
 	 */
 
 	public void validatAllHeaders() {
-		// log.debug("In All validatAllHeaders .. parameter .......");
+		log.debug("In validatAllHeaders ");
 		Enumeration<String> headerNames = request.getHeaderNames();
 
 		while (headerNames.hasMoreElements()) {
 			String headerName = headerNames.nextElement();
 			String headersValue = request.getHeader(headerName);
-			// log.info("In validatAllHeaders RequestWrapper headersValue " + headersValue +
-			// " headerName " + headerName);
 			String headerValue = ValidationUtils.cleanXSS(headersValue);
 		}
+		log.debug("In validatAllHeaders ==== Complated");
 	}
 
 	/**
@@ -127,10 +124,11 @@ public final class RequestWrapper extends HttpServletRequestWrapper {
 	 */
 	//@Override
 	public Cookie[] getValidateCookies() {
-		// log.debug(" in RequestWrapper cookies =============== ");
+		log.debug(" in RequestWrapper cookies ==== ");
 		Cookie[] cookies = null;
 		cookies = PlatformServiceUtil.validateCookies(request.getCookies());
+		log.debug(" in RequestWrapper cookies ==== Complated ");
 		return cookies;
 	}
-	
+
 }
