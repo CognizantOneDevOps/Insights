@@ -69,7 +69,10 @@ public class CrossScriptingFilter implements Filter {
 
 		} catch (Exception e) {
 			LOG.error("Invalid request in CrossScriptingFilter " + e.getMessage());
-			String msg = PlatformServiceUtil.buildFailureResponse("Invalid request" + e.getMessage()).toString();
+			String msg = PlatformServiceUtil
+					.buildFailureResponse(
+							"Invalid request,Someting is wrong in cookies,Header or Parameter" + e.getMessage())
+					.toString();
 			httpResponce.setContentType("application/json");
 			httpResponce.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			httpResponce.getWriter().write(msg);
