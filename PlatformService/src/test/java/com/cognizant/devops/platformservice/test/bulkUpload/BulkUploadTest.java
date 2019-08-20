@@ -47,21 +47,42 @@ public class BulkUploadTest extends BulkUploadTestData {
 
 		Assert.assertEquals(response, true);
 		Assert.assertFalse(multipartFile.isEmpty());
-		Assert.assertTrue(multipartFile.getSize() < 2097152);
+		Assert.assertTrue(multipartFile.getSize() < filesizeMaxValue);
 
 	}
 
 	@Test(priority = 3, expectedExceptions = InsightsCustomException.class)
-	public void testUploadDataInDatabaseException() throws InsightsCustomException, IOException {
+	public void testFileSizeException() throws InsightsCustomException, IOException {
 
-		FileInputStream input = new FileInputStream(fileNull);
-		MultipartFile multipartFile = new MockMultipartFile("file", fileNull.getName(), "text/plain",
+		FileInputStream input = new FileInputStream(fileSize);
+		MultipartFile multipartFile = new MockMultipartFile("file", fileSize.getName(), "text/plain",
 				IOUtils.toByteArray(input));
 
-		boolean response = bulkUploadService.uploadDataInDatabase(multipartFile, bulkUploadTestData.toolNameNull,
-				bulkUploadTestData.labelNull);
+		boolean response = bulkUploadService.uploadDataInDatabase(multipartFile, bulkUploadTestData.toolName,
+				bulkUploadTestData.label);
 
-		Assert.assertEquals(response, false);
+	}
+
+	@Test(priority = 4, expectedExceptions = InsightsCustomException.class)
+	public void testIncorrectFileException() throws InsightsCustomException, IOException {
+
+		FileInputStream input = new FileInputStream(incorrectDataFile);
+		MultipartFile multipartFile = new MockMultipartFile("file", incorrectDataFile.getName(), "text/plain",
+				IOUtils.toByteArray(input));
+
+		boolean response = bulkUploadService.uploadDataInDatabase(multipartFile, bulkUploadTestData.toolName,
+				bulkUploadTestData.label);
+
+	}
+
+	@Test(priority = 5, expectedExceptions = InsightsCustomException.class)
+	public void testFileFormatException() throws InsightsCustomException, IOException {
+		FileInputStream input = new FileInputStream(fileFormat);
+		MultipartFile multipartFile = new MockMultipartFile("file", fileFormat.getName(), "text/plain",
+				IOUtils.toByteArray(input));
+
+		boolean response = bulkUploadService.uploadDataInDatabase(multipartFile, bulkUploadTestData.toolName,
+				bulkUploadTestData.label);
 
 	}
 
