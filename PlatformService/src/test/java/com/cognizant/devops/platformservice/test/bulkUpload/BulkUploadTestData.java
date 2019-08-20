@@ -20,14 +20,17 @@ import java.io.File;
 
 public class BulkUploadTestData {
 
+	ClassLoader classLoader = ClassLoader.getSystemClassLoader();
+
 	String toolJson = "[{ \"toolName\":\"GIT\",\"label\":\"SCM:GIT:DATA\"}]";
 
-	File file = new File("GIT.csv");
+	File file = new File(classLoader.getResource("BulkUploadTest_GIT.csv").getFile());
 	String toolName = "GIT";
 	String label = "SCM:GIT:DATA";
+	long filesizeMaxValue = 2097152;
 
-	File fileNull = new File("JENKINS.csv");
-	String toolNameNull = null;
-	String labelNull = null;
+	File fileSize = new File(classLoader.getResource("BulkUploadTest_Size.csv").getFile());
+	File fileFormat = new File(classLoader.getResource("BulkUploadTest_GIT.txt").getFile());
+	File incorrectDataFile = new File(classLoader.getResource("BulkUploadTest_JIRA.csv").getFile());
 
 }
