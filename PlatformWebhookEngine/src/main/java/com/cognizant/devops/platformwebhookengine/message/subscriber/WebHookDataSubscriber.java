@@ -2,14 +2,14 @@
  * Copyright 2017 Cognizant Technology Solutions
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
- * use this file except in compliance with the License.  You may obtain a copy
+ * use this file except in compliance with the License. You may obtain a copy
  * of the License at
  * 
- *   http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
  * License for the specific language governing permissions and limitations under
  * the License.
  ******************************************************************************/
@@ -46,48 +46,48 @@ public class WebHookDataSubscriber extends EngineSubscriberResponseHandler {
 	String webhookName;
 	JsonElement responseTemplateJson;
 
-	public WebHookDataSubscriber(String routingKey, String responseTemplate, String toolName,String labelName,String webhookName) throws Exception {
+	public WebHookDataSubscriber(String routingKey, String responseTemplate, String toolName, String labelName,
+			String webhookName) throws Exception {
 		super(routingKey);
 
 		this.responseTemplate = responseTemplate;
 		this.toolName = toolName;
-		this.labelName=labelName;
-		this.webhookName=webhookName;
+		this.labelName = labelName;
+		this.webhookName = webhookName;
 
 	}
 
 	List<WebhookMappingData> webhookMappingList = new ArrayList<WebhookMappingData>(0);
 
+	@Override
 	public void handleDelivery(String consumerTag, Envelope envelope, BasicProperties properties, byte[] body)
 			throws IOException {
-
-		
 		// Insert into Neo4j
 		try {
-			
+
 			String message = new String(body, MessageConstants.MESSAGE_ENCODING);
 			InsightsWebhookParserInterface webHookParser = InsightsWebhookParserFactory.getParserInstance(toolName);
-			List<JsonObject> toolData = webHookParser.parseToolData(responseTemplate, message,toolName,labelName,webhookName);
-			
+			List<JsonObject> toolData = webHookParser.parseToolData(responseTemplate, message, toolName, labelName,
+					webhookName);
+
 			Neo4jDBHandler dbHandler = new Neo4jDBHandler();
 			String query = "UNWIND {props} AS properties " + "CREATE (n:" + labelName.toUpperCase() + ") "
 					+ "SET n = properties";
 			dbHandler.bulkCreateNodes(toolData, null, query);
+			getChannel().basicAck(envelope.getDeliveryTag(), false);
 		} catch (GraphDBException e) {
-			WebhookEngineStatusLogger.getInstance().createEngineStatusNode("Exception while inserting Webhook Node in DB "+e.getMessage(),PlatformServiceConstants.FAILURE);
+			WebhookEngineStatusLogger.getInstance().createEngineStatusNode(
+					"Exception while inserting Webhook Node in DB " + e.getMessage(), PlatformServiceConstants.FAILURE);
 			log.error(e);
-		}catch (Exception e) {
+		} catch (Exception e) {
 			log.error(e);
-			WebhookEngineStatusLogger.getInstance().createEngineStatusNode("Exception while pasring or DB issues "+e.getMessage(),PlatformServiceConstants.FAILURE);
+			WebhookEngineStatusLogger.getInstance().createEngineStatusNode(
+					"Exception while pasring or DB issues " + e.getMessage(), PlatformServiceConstants.FAILURE);
 		}
 	}
 
-	
-	//Unused code, kept for future reference
 	private void processJson(JsonElement jsonElement) {
 		List<JsonElement> list = new ArrayList<JsonElement>();
-		// {"results":[{"columns":["n"],"data":[{"row":[{"name":"Test
-		// me"}]},{"row":[{"name":"Test me"}]}]}],"errors":[]}
 		if (jsonElement.isJsonNull()) {
 			log.debug("Null value " + jsonElement);
 		} else if (jsonElement.isJsonArray()) {
