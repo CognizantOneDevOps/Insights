@@ -1,3 +1,4 @@
+#!/bin/bash
 #-------------------------------------------------------------------------------
 # Copyright 2017 Cognizant Technology Solutions
 #   
@@ -15,37 +16,18 @@
 #-------------------------------------------------------------------------------
 # install erlang
 #echo "#################### Installing Erlang , required for Rabbit MQ ####################"
-#sudo mkdir erlang && cd erlang
-#sudo wget https://platform.cogdevops.com/insights_install/installationScripts/latest/RHEL/rabbitmq/erlang-20.0.5-1.el6.x86_64.rpm
-#sudo yum install -y erlang-20.0.5-1.el6.x86_64.rpm
-#echo "#################### Installing Rabbit MQ with configs and user creation ####################"
-#sudo mkdir rabbitmq && cd rabbitmq
-#sudo wget https://platform.cogdevops.com/insights_install/installationScripts/latest/RHEL/rabbitmq/rabbitmq-server-3.6.5-1.noarch.rpm
-#sudo rpm --import http://platform.cogdevops.com/insights_install/installationScripts/latest/RHEL/rabbitmq/rabbitmq-signing-key-public.asc
-#sudo yum install -y rabbitmq-server-3.6.5-1.noarch.rpm
-#sudo wget https://platform.cogdevops.com/insights_install/installationScripts/latest/RHEL/rabbitmq/RabbitMQ-3.6.5.zip
-#sudo unzip RabbitMQ-3.6.5.zip && cd RabbitMQ-3.6.5 && sudo cp rabbitmq.config /etc/rabbitmq/
-#sudo chkconfig rabbitmq-server on && sudo service rabbitmq-server start
-#sudo rabbitmq-plugins enable rabbitmq_management
-#sleep 15
-#curl -X PUT -u guest:guest -H "Content-Type: application/json" -d '{"password":"iSight","tags":"administrator"}' "http://localhost:15672/api/users/iSight"
-#sleep 15
-#curl -X PUT -u guest:guest -H "Content-Type: application/json" -d '{"configure":".*","write":".*","read":".*"}' "http://localhost:15672/api/permissions/%2f/iSight"
-
-#-------------------------------------------------------------------------------------------------
 
 mkdir erlang && cd erlang
 wget https://platform.cogdevops.com/insights_install/installationScripts/latest/RHEL/rabbitmq/erlang-20.0.5-1.el6.x86_64.rpm
-apt-get install alien dpkg-dev debhelper build-essential
-alien erlang-20.0.5-1.el6.x86_64.rpm
-dpkg -i erlang_20.0.5-2_amd64.deb
+sudo apt-get -y install alien dpkg-dev debhelper build-essential
+sudo alien erlang-20.0.5-1.el6.x86_64.rpm
+sudo dpkg -i erlang_20.0.5-2_amd64.deb
 mkdir rabbitmq && cd rabbitmq
-echo "deb http://www.rabbitmq.com/debian/ testing main" >> /etc/apt/sources.list
-curl http://www.rabbitmq.com/rabbitmq-signing-key-public.asc | sudo apt-key add -
-curl http://www.rabbitmq.com/rabbitmq-signing-key-public.asc | apt-key add -
-apt-get install rabbitmq-server
+echo "deb http://www.rabbitmq.com/debian/ testing main" | sudo tee -a /etc/apt/sources.list
+wget -O- https://www.rabbitmq.com/rabbitmq-release-signing-key.asc | sudo apt-key add -
+sudo apt-get -y install rabbitmq-server
 sleep 15
-rabbitmq-plugins enable rabbitmq_management
+sudo rabbitmq-plugins enable rabbitmq_management
 sleep 15
 curl -X PUT -u guest:guest -H "Content-Type: application/json" -d '{"password":"iSight","tags":"administrator"}' "http://localhost:15672/api/users/iSight"
 sleep 15
