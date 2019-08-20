@@ -35,6 +35,17 @@ public class BulkUploadTest extends BulkUploadTestData {
 	public static final BulkUploadService bulkUploadService = new BulkUploadService();
 	public static final BulkUploadTestData bulkUploadTestData = new BulkUploadTestData();
 
+	@Test(priority = 1)
+	public void testGetToolDetailJson() throws InsightsCustomException {
+
+		String response = bulkUploadService.getToolDetailJson().toString();
+
+		Assert.assertNotNull(response);
+		Assert.assertTrue(response.length() > 0);
+		Assert.assertNotNull(bulkUploadTestData.toolJson);
+
+	}
+
 	@Test(priority = 2)
 	public void testUploadDataInDatabase() throws InsightsCustomException, IOException {
 
@@ -83,19 +94,6 @@ public class BulkUploadTest extends BulkUploadTestData {
 
 		boolean response = bulkUploadService.uploadDataInDatabase(multipartFile, bulkUploadTestData.toolName,
 				bulkUploadTestData.label);
-
-	}
-
-	@Test(priority = 1)
-	public void testGetToolDetailJson() throws InsightsCustomException {
-
-		String response = bulkUploadService.getToolDetailJson().toString();
-
-		Assert.assertNotNull(response);
-		Assert.assertTrue(response.length() > 0);
-		Assert.assertNotNull(bulkUploadTestData.toolJson);
-		Assert.assertNotNull(bulkUploadTestData.toolName, "GIT");
-		Assert.assertNotNull(bulkUploadTestData.label, "SCM:GIT:DATA");
 
 	}
 
