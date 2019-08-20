@@ -14,13 +14,13 @@
 # License for the specific language governing permissions and limitations under
 # the License.
 #-------------------------------------------------------------------------------
-# Install customized Grafana V4.6.2
+# Install customized Grafana V5.2.2
 echo "#################### Installing Grafana (running as BG process) ####################"
 sudo mkdir grafana
 cd grafana
-#export GRAFANA_HOME=`pwd`
-#sudo echo GRAFANA_HOME=`pwd` | sudo tee -a /etc/environment
-#sudo echo "export" GRAFANA_HOME=`pwd` | sudo tee -a /etc/profile
+export GRAFANA_HOME=`pwd`
+sudo echo GRAFANA_HOME=`pwd` | sudo tee -a /etc/environment
+sudo echo "export" GRAFANA_HOME=`pwd` | sudo tee -a /etc/profile
 source /etc/environment
 source /etc/profile
 sudo wget https://platform.cogdevops.com/insights_install/installationScripts/latest/RHEL/grafana/grafana-5.2.2.tar.gz

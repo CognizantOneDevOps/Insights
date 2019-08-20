@@ -15,14 +15,14 @@
 #-------------------------------------------------------------------------------
 echo "#################### Installing Tomcat8 ####################"
 cd /opt
-sudo wget https://platform.cogdevops.com/insights_install/release/latest/InSightsUI3.zip -O InSightsUI3.zip
-sudo unzip InSightsUI3.zip && sudo rm -rf InSightsUI3.zip
+sudo wget https://platform.cogdevops.com/insights_install/release/latest/PlatformUI3.zip -O PlatformUI3.zip
+sudo unzip PlatformUI3.zip && sudo rm -rf PlatformUI3.zip
 sudo wget https://platform.cogdevops.com/insights_install/release/latest/PlatformService.war -O PlatformService.war
 sudo wget https://platform.cogdevops.com/insights_install/installationScripts/latest/RHEL/tomcat/apache-tomcat-8.5.27.tar.gz
 sudo tar -zxvf apache-tomcat-8.5.27.tar.gz
 sudo cp -R ./app /opt/apache-tomcat-8.5.27/webapps
 #sudo cp -R app /opt/apache-tomcat-8.5.27/webapps
-sudo rm -rf InSightsUI3
+sudo rm -rf PlatformUI3
 sudo cp PlatformService.war /opt/apache-tomcat-8.5.27/webapps
 sudo rm -rf PlatformService.war
 cd apache-tomcat-8.5.27
