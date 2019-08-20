@@ -115,6 +115,7 @@ public class HealthStatus {
 
 			log.debug(" servicesHealthStatus " + servicesHealthStatus.toString());
 		} catch (Exception e) {
+			log.error(e.getMessage());
 			PlatformServiceUtil.buildFailureResponse(e.getMessage());
 		}
 		return servicesHealthStatus;
@@ -129,6 +130,7 @@ public class HealthStatus {
 			servicesAgentsHealthStatus.add(ServiceStatusConstants.Agents, jsonAgentStatus);
 			log.debug(" servicesAgentsHealthStatus  " + servicesAgentsHealthStatus);
 		} catch (Exception e) {
+			log.error(e.getMessage());
 			PlatformServiceUtil.buildFailureResponse(e.getMessage());
 		}
 		return servicesAgentsHealthStatus;
@@ -202,6 +204,7 @@ public class HealthStatus {
 			}
 		} catch (Exception e) {
 			log.error("Error while capturing health check at " + apiUrl, e);
+			log.error(e.getMessage());
 			strResponse = "Error while capturing health check at " + apiUrl;
 			returnResponse = buildFailureResponse(strResponse, hostEndPoint, displayType, version);
 		}
@@ -319,7 +322,7 @@ public class HealthStatus {
 				returnObject = buildAgentResponse(status, successResponse, graphResponse);
 			}
 		} catch (Exception e) {
-			log.error(e);
+			log.error(e.getMessage());
 		}
 		return returnObject;
 	}
@@ -344,7 +347,7 @@ public class HealthStatus {
 			Neo4jDBHandler dbHandler = new Neo4jDBHandler();
 			graphResponse = dbHandler.executeCypherQuery(query);
 		} catch (Exception e) {
-			log.error(e);
+			log.error(e.getMessage());
 			graphResponse = new GraphResponse();
 		}
 		return graphResponse;
@@ -435,6 +438,7 @@ public class HealthStatus {
 				returnSize = humanReadableByteCount(totalStoreSize, Boolean.FALSE);
 			}
 		} catch (Exception e) {
+			log.error(e.getMessage());
 			log.error(" Error while geeting neo4j Size");
 		}
 		return returnSize;
@@ -482,7 +486,7 @@ public class HealthStatus {
 			GraphResponse response = dbHandler.executeCypherQuery(query);
 			return PlatformServiceUtil.buildSuccessResponseWithData(response);
 		} catch (Exception e) {
-			log.error(e);
+			log.error(e.getMessage());
 			return PlatformServiceUtil.buildFailureResponse(ErrorMessage.DB_INSERTION_FAILED);
 		}
 	}

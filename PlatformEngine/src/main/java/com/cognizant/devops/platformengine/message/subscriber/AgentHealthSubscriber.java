@@ -46,7 +46,6 @@ public class AgentHealthSubscriber extends EngineSubscriberResponseHandler{
 		Neo4jDBHandler dbHandler = new Neo4jDBHandler();
 		String message = new String(body, MessageConstants.MESSAGE_ENCODING);
 		String routingKey = envelope.getRoutingKey();
-		//routingKey=routingKey.replace("_", ".");
 		log.debug(consumerTag+" [x] Received '" + routingKey + "':'" + message + "'");
 		List<String> labels = Arrays.asList(routingKey.split(MessageConstants.ROUTING_KEY_SEPERATOR));
 		List<JsonObject> dataList = new ArrayList<JsonObject>();
@@ -64,7 +63,6 @@ public class AgentHealthSubscriber extends EngineSubscriberResponseHandler{
 					if(jsonObject.has("agentId")) {
 						agentId=jsonObject.get("agentId").getAsString();
 					}
-					//log.debug("agentId   === "+agentId);
 					if(jsonObject.has("toolName")) {
 							toolName =jsonObject.get("toolName").getAsString();
 							jsonObject.addProperty("toolName",toolName);
@@ -96,13 +94,13 @@ public class AgentHealthSubscriber extends EngineSubscriberResponseHandler{
 			}
 			try {
 				String healthLabels = ":LATEST:"+routingKey.replace(".", ":");
-				createHealthNodes(dbHandler, routingKey, dataList, agentId, healthLabels,10,false);
+				createHealthNodes(dbHandler, routingKey, dataList, agentId, healthLabels,10);
 				
 				if(isFailure) {
 					String failureLabels = routingKey.replace(".", ":");
 					failureLabels = failureLabels.replace("HEALTH", "HEALTH_FAILURE");
-					String healthFailureLabels = ":"+ failureLabels ;
-					createHealthNodes(dbHandler, routingKey, failedDataList, agentId, healthFailureLabels,20,true);					
+					String healthFailureLabels = ":LATEST:"+ failureLabels ;
+					createHealthNodes(dbHandler, routingKey, failedDataList, agentId, healthFailureLabels,20);					
 				}				
 				getChannel().basicAck(envelope.getDeliveryTag(), false);
 			} catch (GraphDBException e) {
@@ -120,7 +118,7 @@ public class AgentHealthSubscriber extends EngineSubscriberResponseHandler{
 	 * @throws GraphDBException
 	 */
 	private void createHealthNodes(Neo4jDBHandler dbHandler, String routingKey, List<JsonObject> dataList,
-			String agentId, String nodeLabels, int nodeCount,boolean isHealthFailureNode) throws GraphDBException {
+			String agentId, String nodeLabels, int nodeCount) throws GraphDBException {
 		String healthQuery;
 		// For Sequential/successive agent health publishing where agentId is not null
 		if(!agentId.equalsIgnoreCase("")) {
@@ -130,10 +128,7 @@ public class AgentHealthSubscriber extends EngineSubscriberResponseHandler{
 			healthQuery = healthQuery + " OPTIONAL MATCH (old) <-[:UPDATED_TO*"+ nodeCount +"]-(purge)  where old.agentId='"+agentId+"'";
 			healthQuery = healthQuery + " CREATE (new"+ nodeLabels +" {props}) ";
 			healthQuery = healthQuery + " MERGE  (new)<-[r:UPDATED_TO]-(old)";
-			// HEALTH_FAILURE Node won't have LATEST label, this check is to remove Latest label only from HEALTH node
-			if(!isHealthFailureNode) {
-				healthQuery = healthQuery + " REMOVE old:LATEST";				
-			}
+			healthQuery = healthQuery + " REMOVE old:LATEST";				
 			healthQuery = healthQuery + " detach delete purge ";
 			healthQuery = healthQuery + " return old,new";
 
@@ -144,10 +139,7 @@ public class AgentHealthSubscriber extends EngineSubscriberResponseHandler{
 			healthQuery = healthQuery + " OPTIONAL MATCH (old) <-[:UPDATED_TO*"+ nodeCount +"]-(purge) ";
 			healthQuery = healthQuery + " CREATE (new" + nodeLabels + " {props})";
 			healthQuery = healthQuery + " MERGE  (new)<-[r:UPDATED_TO]-(old)";
-			// HEALTH_FAILURE Node won't have LATEST label, this check is to remove Latest label only from HEALTH node
-			if(!isHealthFailureNode) {
-				healthQuery = healthQuery + " REMOVE old:LATEST";				
-			}
+			healthQuery = healthQuery + " REMOVE old:LATEST";				
 			healthQuery = healthQuery + " detach delete purge ";
 			healthQuery = healthQuery + " return old,new";
 		}			
@@ -155,11 +147,9 @@ public class AgentHealthSubscriber extends EngineSubscriberResponseHandler{
 		JsonObject graphResponse = dbHandler.executeQueryWithData(healthQuery, dataList);
 		if(graphResponse.get("response").getAsJsonObject().get("results").getAsJsonArray().get(0).getAsJsonObject().get("data")
 				.getAsJsonArray().size() == 0) {
-			//log.debug("arg0 === data not present ====== " );
 			healthQuery="";
 			healthQuery = healthQuery + " CREATE (new"+nodeLabels+" {props})";
 			JsonObject graphResponse1 = dbHandler.executeQueryWithData(healthQuery, dataList);
-			//log.debug("arg1 ====== "+graphResponse1.get("response"));
 		}
 		if(graphResponse.get("response").getAsJsonObject().get("errors").getAsJsonArray().size() > 0){
 			log.error("Unable to insert health nodes for routing key: "+routingKey+", error occured: "+graphResponse);
