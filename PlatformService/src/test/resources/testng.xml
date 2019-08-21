@@ -1,15 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 
-<suite name = "Suite" >
-	<test name = "PlatformServiceTest">
-      <classes>
-          <class name = "com.cognizant.devops.platformservice.test.testngInitializer.TestngInitializerTest"/>
-        	<class name = "com.cognizant.devops.platformservice.test.about.AboutServiceTest"/>
-          <class name = "com.cognizant.devops.platformservice.test.agentManagement.AgentManagementTest"/>
-           <class name = "com.cognizant.devops.platformservice.test.webhook.WebhookServiceTest"/>
-      </classes>
-	 </test>
-	<!-- <test name = "AboutTest"> <classes> </classes> </test> <test name = 
-		"AgentManagementTest"> <classes> </classes> </test> --> 
+<suite name="Suite">
+	<test name="PlatformServiceTest">
+		<classes>
+			<class
+				name="com.cognizant.devops.platformservice.test.testngInitializer.TestngInitializerTest" />
+			<class
+				name="com.cognizant.devops.platformservice.test.about.AboutServiceTest" />
+			<class
+				name="com.cognizant.devops.platformservice.test.agentManagement.AgentManagementTest" />
+			<class
+				name="com.cognizant.devops.platformservice.test.CorrelationBuilder.CorrelationBuilderTest" />
+			<class
+				name="com.cognizant.devops.platformservice.test.bulkUpload.BulkUploadTest" />
+			<class name = "com.cognizant.devops.platformservice.test.webhook.WebhookServiceTest"/>
+		</classes>
+	</test>
 </suite>
