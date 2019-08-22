@@ -93,6 +93,7 @@ export class UserOnboardingComponent implements OnInit {
   rows: FormArray;
   itemForm: FormGroup;
   searchOrgForUser: string;
+  regex2 = new RegExp("^[a-zA-Z0-9_]*$");
   regex = new RegExp("(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+.[a-zA-Z0-9-.]+$)")
   additionalProperties = ['name', 'email', 'username', 'password', 'role', 'org'];
   roleRecord = [
@@ -312,6 +313,10 @@ export class UserOnboardingComponent implements OnInit {
     userBMparameter = JSON.stringify(this.userPropertyList);
     //console.log(userBMparameter)
     var checkname = this.regex.test(email);
+    var checkid = this.regex2.test(username);
+    if (!checkid) {
+      this.isUsernameIncorrect = true;
+    }
     if (!checkname) {
       this.isEmailIncorrect = true;
     }
@@ -338,7 +343,7 @@ export class UserOnboardingComponent implements OnInit {
           //console.log(data.data)
           // console.log(data.data["message"])
           // console.log(JSON.stringify(data.data.message))
-          //console.log(userResponse)
+          console.log(userResponse)
           if (userResponse == "User created") {
             this.messageDialog.showApplicationsMessage("User has been added.", "SUCCESS");
           }
@@ -446,6 +451,12 @@ export class UserOnboardingComponent implements OnInit {
     this.adduserSaveEnable = false;
     this.addSelected = false;
     this.assignSelected = false;
+    this.isEmailIncorrect = false;
+    this.isNameIncorrect = false;
+    this.isOrgIncorrect = false;
+    this.isPasswordIncorrect = false;
+    this.isUsernameIncorrect = false;
+    this.isRoleIncorrect = false;
     this.showDetail2 = true;
     this.addRadioSelected = false;
     this.assignRadioSelected = false;
@@ -616,7 +627,7 @@ export class UserOnboardingComponent implements OnInit {
                   self.showApplicationMessage = "Unable create Organization";
                   self.messageDialog.showApplicationsMessage("Unable to Create Organization", "WARN");
                 }
-                
+
               });
             self.loadUsersInfo(this.selectedAdminOrg);
             setTimeout(() => {
