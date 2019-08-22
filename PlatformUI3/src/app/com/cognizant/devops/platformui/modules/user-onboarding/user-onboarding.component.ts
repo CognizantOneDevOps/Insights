@@ -257,6 +257,41 @@ export class UserOnboardingComponent implements OnInit {
   }
 
 
+  searchUserInAddUser(searchOrgForUserAssign) {
+    var self = this;
+    this.userOnboardingService.getUsersOrganisation(searchOrgForUserAssign).then(function (usersResponseData1) {
+      console.log(usersResponseData1);
+
+      //this.newresponse = "";
+
+      //  this.newrenewresponsesponse = usersResponseData1.data;
+      if (usersResponseData1.data.length > 0) {
+        // self.newresponse = "User Found."
+        for (var element of usersResponseData1.data) {
+          self.newresponse = self.newresponse + element.name + ", ";
+        }
+        self.newresponse = self.newresponse.substring(0, self.newresponse.length - 2);
+        self.newresponse = "User Found.Please use Assign User Functionality for adding the user to different Orgs."
+
+      } else {
+        self.newresponse = "User Found.Please use Assign User Functionality for adding the user to different Orgs.";
+      }
+
+      console.log(self.newresponse)
+      if (usersResponseData1.data == "User Not Found") {
+        self.messageDialog.showApplicationsMessage("User not found", "ERROR");
+        self.newresponse = "";
+
+      } else {
+
+        self.messageDialog.showApplicationsMessage(self.newresponse, "SUCCESS");
+        self.newresponse = "";
+      }
+    });
+
+  }
+
+
   clubProperties(jsonData, isArray) {
     if (isArray) {
       var length = jsonData.length;
@@ -335,50 +370,50 @@ export class UserOnboardingComponent implements OnInit {
     if (!this.isRoleIncorrect && !this.isNameIncorrect && !this.isPasswordIncorrect && !this.isUsernameIncorrect && !this.isEmailIncorrect) {
       this.userOnboardingService.addUserInOrg(userBMparameter)
         .subscribe(data => {
-          // console.log(data)
-          // console.log(data.data)
-          // console.log(typeof (data.data))
-          // console.log(JSON.parse(data.data).message)
-          var userResponse = JSON.parse(data.data).message;
-          //console.log(data.data)
-          // console.log(data.data["message"])
-          // console.log(JSON.stringify(data.data.message))
-          console.log(userResponse)
-          if (userResponse == "User created") {
-            this.messageDialog.showApplicationsMessage("User has been added.", "SUCCESS");
+          if (data.status == "success") {
+            var userResponse = JSON.parse(data.data).message;
+            if (data.status == "failure") {
+              this.messageDialog.showApplicationsMessage("Adding user failed.", "ERROR");
+            }
+            if (userResponse == "User created") {
+              this.messageDialog.showApplicationsMessage("User has been added.", "SUCCESS");
+            }
+            else if (userResponse == "Organization user updated") {
+              this.messageDialog.showApplicationsMessage("User has been added.", "SUCCESS");
+            }
+            else if (userResponse == "User added to organization") {
+              this.messageDialog.showApplicationsMessage("User has been added.", "SUCCESS");
+            }
+            else if (userResponse == "Email already exists") {
+              this.messageDialog.showApplicationsMessage(userResponse, "ERROR");
+            }
+            else if (userResponse == "Username already exists") {
+              this.messageDialog.showApplicationsMessage(userResponse, "ERROR");
+            }
+            else if (userResponse == "User exists in currrent org with same role") {
+              this.messageDialog.showApplicationsMessage(userResponse, "ERROR");
+            }
+            else if (userResponse == "Password is missing or too short") {
+              this.messageDialog.showApplicationsMessage(userResponse, "ERROR");
+            }
+            else if (userResponse == "failed to create user") {
+              this.messageDialog.showApplicationsMessage("Failed to create User.Please try again", "ERROR");
+            }
+            else if (userResponse = "User exists in currrent org with different role") {
+              var title = "ERROR";
+              //  console.log(this.deleteRelation);
+              var dialogmessage = userResponse + ". Are you sure you want to update the role?"
+              const dialogRef = this.messageDialog.showConfirmationMessage(title, dialogmessage, this.role, "ALERT", "40%");
+              dialogRef.afterClosed().subscribe(result => {
+                if (result == 'yes') {
+                  this.showDetail = true;
+                  this.showAddUserDetail = false;
+                }
+              })
+            }
           }
-          else if (userResponse == "Organization user updated") {
-            this.messageDialog.showApplicationsMessage("User has been added.", "SUCCESS");
-          }
-          else if (userResponse == "User added to organization") {
-            this.messageDialog.showApplicationsMessage("User has been added.", "SUCCESS");
-          }
-          else if (userResponse == "Email already exists") {
-            this.messageDialog.showApplicationsMessage(userResponse, "ERROR");
-          }
-          else if (userResponse == "Username already exists") {
-            this.messageDialog.showApplicationsMessage(userResponse, "ERROR");
-          }
-          else if (userResponse == "User exists in currrent org with same role") {
-            this.messageDialog.showApplicationsMessage(userResponse, "ERROR");
-          }
-          else if (userResponse == "Password is missing or too short") {
-            this.messageDialog.showApplicationsMessage(userResponse, "ERROR");
-          }
-          else if (userResponse == "failed to create user") {
-            this.messageDialog.showApplicationsMessage("Failed to create User.Please try again", "ERROR");
-          }
-          else if (userResponse = "User exists in currrent org with different role") {
-            var title = "ERROR";
-            //  console.log(this.deleteRelation);
-            var dialogmessage = userResponse + ". Are you sure you want to update the role?"
-            const dialogRef = this.messageDialog.showConfirmationMessage(title, dialogmessage, this.role, "ALERT", "40%");
-            dialogRef.afterClosed().subscribe(result => {
-              if (result == 'yes') {
-                this.showDetail = true;
-                this.showAddUserDetail = false;
-              }
-            })
+          else {
+            this.messageDialog.showApplicationsMessage("Failed to create user.Please try again.", "ERROR");
           }
         })
     }
@@ -574,9 +609,10 @@ export class UserOnboardingComponent implements OnInit {
             });
           self.loadUsersInfo(this.selectedAdminOrg);
         }
-        this.loadUsersInfo(this.selectedAdminOrg);
+
       });
     }
+    //this.loadUsersInfo(this.selectedAdminOrg);
   }
 
   async saveData() {
@@ -654,6 +690,7 @@ export class UserOnboardingComponent implements OnInit {
   redirectToLandingPage() {
 
     this.Refresh();
+    this.loadUsersInfo(this.selectedAdminOrg);
     this.showAssignUserDetail = false;
     this.showAddUserDetail = false;
     this.showDetail = true;

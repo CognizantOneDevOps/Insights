@@ -36,9 +36,8 @@
 
   <div *ngIf=" showDetail ">
     <label class="mainText"> Current Access Group </label>
-    <mat-select [(ngModel)]="selectedAdminOrg" placeholder="Select Access Group" [style.height.px]="20"
-      [style.width.%]="20" (ngModelChange)="loadUsersInfo(selectedAdminOrg)" name="selectedAdminOrg"
-      [ngClass]="{  'input-disabled' : readOnlyOrg ,  'form-control': !readOnlyOrg}">
+    <mat-select [(ngModel)]="selectedAdminOrg" placeholder="Select Access Group" [style.height.px]="20" [style.width.%]="20"
+      (ngModelChange)="loadUsersInfo(selectedAdminOrg)" name="selectedAdminOrg" [ngClass]="{  'input-disabled' : readOnlyOrg ,  'form-control': !readOnlyOrg}">
 
       <mat-option *ngFor="let record of adminOrgDataArray" [value]="record">
         {{record.name}}
@@ -46,7 +45,8 @@
     </mat-select>
     <div class="filterGroupCSS" *ngIf=" showDetail ">
       <input matInput (keyup)="applyFilter($event.target.value)" placeholder="Search by Login ID or Email Address
-          " [style.height.px]="20" [style.width.%]="90" class="form-control">
+          "
+        [style.height.px]="20" [style.width.%]="90" class="form-control">
     </div>
   </div>
 
@@ -82,8 +82,7 @@
         </mat-icon>
       </button>
 
-      <button *ngIf="adduserSaveEnable" mat-icon-button (click)="saveUser(names,email,username,pass)"
-        [disabled]="!adduserSaveEnable">
+      <button *ngIf="adduserSaveEnable" mat-icon-button (click)="saveUser(names,email,username,pass)" [disabled]="!adduserSaveEnable">
         <mat-icon title="Save " class="mat-icon material-icons ">
           save
         </mat-icon>
@@ -113,8 +112,7 @@
       </button>
 
       <button mat-icon-button [disabled]="!showCancel">
-        <mat-icon svgIcon="redirect_icon" title="Redirect To Landing Page" class="mat-icon material-icons"
-          (click)="redirectToLandingPage()">
+        <mat-icon svgIcon="redirect_icon" title="Redirect To Landing Page" class="mat-icon material-icons" (click)="redirectToLandingPage()">
           refresh </mat-icon>
       </button>
     </div>
@@ -149,7 +147,8 @@
             <th mat-header-cell *matHeaderCellDef class="tableHeaderCss ">User Role in Access Group</th>
             <td mat-cell *matCellDef="let element ">
               <mat-select [(ngModel)]="element.role " [style.width.%]="80 " name="{{element.role}}
-                   " required placeholder="Select number of records " [disabled]="isSelectedUserId!=element.userId "
+                   "
+                required placeholder="Select number of records " [disabled]="isSelectedUserId!=element.userId "
                 [ngClass]="{ 'input-disabled' : !isSaveEnable  , 'form-control': isSaveEnable} ">
                 <mat-option *ngFor=" let record of roleRecord " [value]="record.value ">
                   {{record.name}}
@@ -172,8 +171,7 @@
       <div class="showTable" style="text-align: center; padding: 8px;">
         <div>
           <mat-radio-group>
-            <mat-radio-button [checked]="addRadioSelected" [value]="element1" color="primary"
-              (click)=adduserenableSave()>
+            <mat-radio-button [checked]="addRadioSelected" [value]="element1" color="primary" (click)=adduserenableSave()>
             </mat-radio-button>
 
           </mat-radio-group>
@@ -193,8 +191,7 @@
             </td>
             <td class="AddUserColTextCss">
               <mat-select [disabled]="!adduserSaveEnable" [(ngModel)]="selectedAdminOrg" [style.height.px]="20"
-                [style.width.%]="380" name="selectedAdminOrg"
-                [ngClass]="{  'input-disabled' : readOnlyOrg ,  'form-control': !readOnlyOrg}">
+                [style.width.%]="380" name="selectedAdminOrg" [ngClass]="{  'input-disabled' : readOnlyOrg ,  'form-control': !readOnlyOrg}">
 
                 <mat-option *ngFor="let record of adminOrgDataArray" [value]="record">
                   {{record.name}}
@@ -202,10 +199,9 @@
               </mat-select>
             </td>
 
-            <input [disabled]="!adduserSaveEnable" type="text" class="searchbox" [(ngModel)]='searchUser'
-              [value]="searchuser" required placeholder=" Search by Login ID or E-mail Address"
-              (keydown)="trackEvent($event)">
-            <button mat-icon-button (click)="searchData(searchUser,selectedAdminOrg) ">
+            <input [disabled]="!adduserSaveEnable" type="text" class="searchbox" [(ngModel)]='searchUser' [value]="searchuser"
+              required placeholder=" Search by Login ID" (keydown)="trackEvent($event)">
+            <button mat-icon-button (click)="searchUserInAddUser(searchUser)">
               <mat-icon title="Search" class="mat-icon material-icons">
                 search
               </mat-icon>
@@ -237,9 +233,9 @@
 
           <tr class="dat-row2">
 
-            <td class="AddUserColTextCss" style=" width:30px;">Username</td>
+            <td class="AddUserColTextCss" style=" width:0px;">Login ID</td>
             <td>
-              <input [disabled]="!adduserSaveEnable" type="text" style="margin-left: 11px;" class="inputcss"
+              <input [disabled]="!adduserSaveEnable" type="text" style="margin-left: 25px;" class="inputcss"
                 [(ngModel)]='username' [value]="searchValue" required placeholder=" Input a Username">
             </td>
             <td *ngIf="isUsernameIncorrect" class="wrnTxt">Please enter a valid Username.</td>
@@ -261,8 +257,7 @@
 
             <td>
               <mat-select [disabled]="!adduserSaveEnable" style="margin-left: 45px;" [(ngModel)]="role "
-                [style.width.%]="200 " name="{{role}}" required placeholder=" Select a Role"
-                [ngClass]="{ 'input-disabled' : !isSaveEnable  , 'form-control': isSaveEnable} ">
+                [style.width.%]="200 " name="{{role}}" required placeholder=" Select a Role" [ngClass]="{ 'input-disabled' : !isSaveEnable  , 'form-control': isSaveEnable} ">
                 <mat-option *ngFor=" let record of roleRecord " [value]="record.value ">
                   {{record.name}}
                 </mat-option>
@@ -282,8 +277,7 @@
       <div class="showTable" style="text-align: center; padding: 20px;">
         <div>
           <mat-radio-group>
-            <mat-radio-button [checked]="assignRadioSelected" [value]="element2" color="primary"
-              (click)=assignuserenableSave()>
+            <mat-radio-button [checked]="assignRadioSelected" [value]="element2" color="primary" (click)=assignuserenableSave()>
             </mat-radio-button>
 
           </mat-radio-group>
@@ -327,12 +321,10 @@
                     <td style="border-spacing:0px !important;padding:0 15px 0 15px;">Access Group </td>
                     <td style="border-spacing:0px !important;">
                       <mat-select [disabled]="!assignuserSaveEnable" required placeholder="Select Access Group"
-                        [formControl]="row.get('org')" [style.width.px]="100 " [style.height.px]="20"
-                        [style.width.px]="160" name="selectOrgForUser5"
-                        [ngClass]="{  'input-disabled' : readOnlyOrg ,  'form-control': !readOnlyOrg}">
+                        [formControl]="row.get('org')" [style.width.px]="100 " [style.height.px]="20" [style.width.px]="160"
+                        name="selectOrgForUser5" [ngClass]="{  'input-disabled' : readOnlyOrg ,  'form-control': !readOnlyOrg}">
 
-                        <mat-option [disabled]="!assignuserSaveEnable" *ngFor="let record of adminOrgDataArray"
-                          [value]="record">
+                        <mat-option [disabled]="!assignuserSaveEnable" *ngFor="let record of adminOrgDataArray" [value]="record">
                           {{record.name}}
                         </mat-option>
                       </mat-select>
@@ -342,10 +334,9 @@
 
                     <td style="border-spacing:0px !important; border-collapse: none !important">
 
-                      <mat-select [disabled]="!assignuserSaveEnable" required placeholder="Select Role"
-                        [formControl]="row.get('role')"
-                        [ngClass]="{  'input-disabled' : readOnlyOrg ,  'form-control': !readOnlyOrg}"
-                        [style.width.px]="100 " name="role5">
+                      <mat-select [disabled]="!assignuserSaveEnable" required placeholder="Select Role" [formControl]="row.get('role')"
+                        [ngClass]="{  'input-disabled' : readOnlyOrg ,  'form-control': !readOnlyOrg}" [style.width.px]="100 "
+                        name="role5">
                         <mat-option *ngFor=" let record of roleRecord " [value]="record.value ">
                           {{record.name}}
                         </mat-option>
