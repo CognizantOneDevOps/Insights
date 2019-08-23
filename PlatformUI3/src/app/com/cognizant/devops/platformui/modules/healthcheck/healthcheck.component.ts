@@ -82,8 +82,8 @@ export class HealthCheckComponent implements OnInit {
       if (this.agentResponse != null) {
         this.showThrobberAgent = false;
         this.showContentAgent = !this.showThrobberAgent;
-        for (var key in this.agentResponse) {
-          var element = this.agentResponse[key];
+        for (var key in this.agentResponse.data) {
+          var element = this.agentResponse.data[key];
           element.serverName = key;
           if (element.type == 'Agents') {
             this.agentNodes = element.agentNodes;
@@ -129,11 +129,11 @@ export class HealthCheckComponent implements OnInit {
       this.showContent = !this.showThrobber;
       this.healthResponse = await this.healthCheckService.loadServerHealthConfiguration();
       if (this.healthResponse != null) {
-        //console.log(this.healthResponse);
+        console.log(this.healthResponse);
         this.showThrobber = false;
         this.showContent = !this.showThrobber;
-        for (var key in this.healthResponse) {
-          var element = this.healthResponse[key];
+        for (var key in this.healthResponse.data) {
+          var element = this.healthResponse.data[key];
           element.serverName = key;
           if (element.type == 'Service') {
             this.servicesDataSource.push(element);

@@ -15,8 +15,18 @@
  ******************************************************************************/
 package com.cognizant.devops.platformcommons.core.util;
 
+import java.io.IOException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.KeyGenerator;
+import javax.crypto.NoSuchPaddingException;
+import javax.crypto.SealedObject;
+import javax.crypto.SecretKey;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -162,8 +172,9 @@ public class ValidationUtils {
 		return value;
 	}
 
-	public static String extactAutharizationToken(String authHeaderToken)   {
+	public static String extactAutharizationToken(String authHeaderTokenReq) {
 		String authTokenDecrypt = "";
+		String authHeaderToken = ValidationUtils.cleanXSS(authHeaderTokenReq);
 		log.debug("In Authorization token processing ");
 		try {
 			//log.debug(" authHeaderToken String " + authHeaderToken);
@@ -186,6 +197,51 @@ public class ValidationUtils {
 		}
 		log.debug("In Authorization token processing Complated ");
 		return authTokenDecrypt;
+	}
+
+	public static String getSealedObject(String userValue) {
+		String encryptedData = AES256Cryptor.encrypt(userValue, "123456$#@$^@1ERF");
+		return encryptedData;
+	}
+
+	public static String getDeSealedObject(String encryptedData) {
+		String decryptedData = AES256Cryptor.decrypt(encryptedData, "123456$#@$^@1ERF");
+		return decryptedData;
+	}
+
+	/**
+	 * Validate response data which doesnot contain any HTML String
+	 * 
+	 * @param JsonObject
+	 *            data
+	 * @return JsonObject
+	 */
+	public static JsonObject replaceHTMLContentFormString(JsonObject data) {
+		String strRegEx = "<[^>]*>";
+		String jsonString = "";
+		JsonObject json = null;
+
+		// log.debug(" validateStringForHTMLContent string before " + data);
+
+		if (data instanceof JsonObject) {
+			jsonString = data.toString();
+			// log.debug(" validateStringForHTMLContent after assigment " + jsonString);
+			if (jsonString != null) {
+				jsonString = jsonString.replaceAll(strRegEx, "");
+				// replace &nbsp; with space
+				jsonString = jsonString.replace("&nbsp;", " ");
+				// replace &amp; with &
+				jsonString = jsonString.replace("&amp;", "&");
+			}
+			/*if (!jsonString.equalsIgnoreCase(data.toString())) {
+				log.error(" Invilid response data ");
+				json = null;*/
+			//} else {
+				json = new Gson().fromJson(jsonString, JsonObject.class);
+			//}
+			// log.debug(" validateStringForHTMLContent after " + jsonString);
+		}
+		return json;
 	}
 
 }

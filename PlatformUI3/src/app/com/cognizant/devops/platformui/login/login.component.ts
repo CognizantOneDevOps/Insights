@@ -108,7 +108,7 @@ export class LoginComponent implements OnInit, ILoginComponent {
       this.loginService.loginUserAuthentication(this.username, this.password)
         .then((data) => {
           var grafcookies = data.data;
-          if (data.status === 'SUCCESS') {
+          if (data.status === 'success') { //SUCCESS
             self.showThrobber = false;
             var date = new Date();
 

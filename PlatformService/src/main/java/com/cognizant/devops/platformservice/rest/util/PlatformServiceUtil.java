@@ -58,6 +58,7 @@ public class PlatformServiceUtil {
 		jsonResponse.addProperty(PlatformServiceConstants.STATUS, PlatformServiceConstants.SUCCESS);
 		jsonResponse.add(PlatformServiceConstants.DATA, new Gson().toJsonTree(data));
 		JsonObject validatedData = ValidationUtils.validateStringForHTMLContent(jsonResponse);
+		//JsonObject validatedData = ValidationUtils.replaceHTMLContentFormString(jsonResponse);
 		if (validatedData == null) {
 			validatedData = buildFailureResponse(PlatformServiceConstants.INVALID_RESPONSE_DATA);
 		}
