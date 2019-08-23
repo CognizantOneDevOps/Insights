@@ -56,6 +56,7 @@
 					<include>*.properties</include>
 					<include>**/*.properties</include>
 					<include>**/*.xml</include>
+					<include>**/*.p12</include>
 				</includes>
 				<filtering>true</filtering>
 			</resource>
@@ -196,6 +197,12 @@
 			<artifactId>commons-csv</artifactId>
 			<version>1.6</version>
 		</dependency>
+		
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-compress</artifactId>
+			<version>1.18</version>
+		</dependency>
 
 		<dependency>
 			<groupId>org.jsoup</groupId>
@@ -259,6 +266,12 @@
 			<groupId>com.google.code.gson</groupId>
 			<artifactId>gson</artifactId>
 			<version>2.5</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.cognizant.devops</groupId>
+			<artifactId>PlatformAuditing</artifactId>
+			<version>6.0</version>
 		</dependency>
 
 		<dependency>
@@ -326,12 +339,6 @@
 			<artifactId>testng</artifactId>
 			<version>${testng.version}</version>
 			<scope>test</scope>
-		</dependency>
-		
-		<dependency>
-			<groupId>org.apache.commons</groupId>
-			<artifactId>commons-compress</artifactId>
-			<version>1.18</version>
 		</dependency>
 
 		<dependency>
