@@ -24,8 +24,9 @@ sudo yum install bzip2-devel -y
 sudo yum install libffi-devel -y
 sudo ./configure --enable-optimizations
 sudo make altinstall
-ln -s /opt/python/Python-3.7.4/python /usr/bin/python3
-sudo python3 -m pip install pika==0.12.0
-sudo python3 -m pip install requests apscheduler python-dateutil xmltodict pytz requests_ntlm boto3
-python3 --version
+rm -f /usr/bin/python
+ln -s /opt/python/Python-3.7.4/python /usr/bin/python
+sudo python -m pip install pika==0.12.0
+sudo python -m pip install requests apscheduler python-dateutil xmltodict pytz requests_ntlm boto3
+python --version
 sleep 5
