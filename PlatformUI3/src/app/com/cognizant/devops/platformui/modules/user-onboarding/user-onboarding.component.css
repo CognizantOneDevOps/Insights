@@ -112,6 +112,11 @@
     height: 40px;
 }
 
+.tableMainCss {
+    border-collapse:collapse !important;
+    border-spacing: 0px;
+} 
+
 .showTable {
     background-color: #00B140;
     color: white;
@@ -265,6 +270,7 @@ th[_ngcontent-c15]:last-child{
 .mat-dialog-actions-button{
     float: right;
     padding-right: 25px;
+    padding-top: 30px
 }
 
 .warningText{

@@ -15,6 +15,49 @@
  * the License.
  ******************************************************************************
  -->
+ <style>
+ .theme-light {
+	 .gf-form-checkbox {
+		background: #fff;
+		border: none;
+	 }
+  }
+ 
+  .theme-dark {
+	 .gf-form-checkbox {
+		background: #09090b;
+		border: none;
+	}
+ }
+ 
+  .gf-form-checkbox {
+     position: relative;
+     display: -webkit-box;
+     display: -webkit-flex;
+     display: -ms-flexbox;
+     display: flex;
+     width: 12%;
+     height: 35px;
+     border: none;
+     -webkit-box-align: center;
+     -webkit-align-items: center;
+     -ms-flex-align: center;
+     align-items: center;
+     -webkit-box-pack: center;
+     -webkit-justify-content: center;
+     -ms-flex-pack: center;
+     justify-content: center;
+  }
+
+  .panel-editor__right {
+	  height: fit-content;
+	  margin-bottom:30px;
+   }
+
+   .panel-wrapper.panel-wrapper--edit {
+	   height: auto !important;		
+	}
+ </style>
 <query-editor-row query-ctrl="ctrl" class="generic-datasource-query-row" has-text-edit-mode="true">
   <div class="gf-form" ng-if="ctrl.target.rawQuery">
     <textarea class="gf-form-input" rows="5" ng-model="ctrl.target.target" spellcheck="false" ng-blur="ctrl.onChangeInternal()"

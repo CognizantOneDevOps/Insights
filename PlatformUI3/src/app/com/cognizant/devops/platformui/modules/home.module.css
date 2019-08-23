@@ -228,13 +228,13 @@ mat-radio-button.mat-accent .mat-radio-inner-circle {
 
  .gridheadercenter{    
     font-weight: bold;
-    font-size: 1.82vmax;
+    font-size: 1.5vmax;
     text-decoration: none;
     color: white; 
     width: 120%;
-    text-align: center;
     padding-top: 8px;
     margin-right: 30px;
+    margin-left: 6px;
 }
 .iframeCss {
     overflow-y:auto !important;
@@ -276,21 +276,22 @@ tr.mat-header-row {
 
 .mat-dialog-actions-button{
     float: right;
-    padding-right: 30px;
+    padding-right: 20px;
     color: #5C068C;
-    /*margin-bottom: 20px;*/
-    padding-top: 0px;
-    padding-bottom: 21px
+    padding-bottom: 40px;
+    padding-top:18px
 }
 .textPadding{
-  padding-left:30px ;
+  padding-left:20px ;
   height: 35%;
-  padding-right:30px;
+  padding-right:20px;
+  font-size:15px;
 }
 
 .textPaddingConf{
-     padding-left:30px ;
-     padding-right: 50px;
+     padding-left:20px ;
+     padding-right: 20px;
+     font-size: 15px
 }
 
 .dialogHeaderBackground{
@@ -308,7 +309,7 @@ tr.mat-header-row {
     display: inline;
 }
 .closeIconCss{
-    padding-right: 30px;
+    padding-right: 17px;
     width: 20%
 }
 
@@ -326,11 +327,12 @@ tr.mat-header-row {
     fill: white !important;
     height: 50px !important;
     width: 40px !important; 
-    padding-left: 30px;
+    padding-left: 25px;
 }
-/*.AppDialogIconCss{
-    margin-top: -10px !important;
-}*/
+.AppDialogIconCss{
+    /*margin-top: -10px !important;*/
+    margin-left:-10px
+}
 .arrange-horizontally-Dialog {
     -webkit-box-orient: horizontal;
     -webkit-box-direction: normal;

@@ -1,0 +1,121 @@
+<!--
+*******************************************************************************
+ * Copyright 2019 Cognizant Technology Solutions
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License.  You may obtain a copy
+ * of the License at
+ * 
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ ****************************************************************************** -->
+<div class="pageCss">
+
+    <div layout layout-align="left" class="titleStyle">
+        <div>Configuration |
+            <a class="greenTitleTxt">Bulk Upload </a>
+        </div>
+    </div>
+    <div class="orangeStripCss"></div>
+    <div layout layout-align="left" class="sectionHeadingStyle">
+        <div layout> &nbsp; Bulk Upload
+            <span class="sectionSubHeading"> (Please note you may upload UPTO 5 .CSV files of maximum 2 MB ONE AT A
+                TIME) </span>
+        </div>
+    </div>
+    <div class="btnAlign">
+        <!--  <button mat-icon-button (click)="uploadFile()" [disabled]="!toolNameSaveEnable">
+            <mat-icon title="Upload File " class="mat-icon material-icons">
+                cloud_upload
+            </mat-icon>
+        </button> -->
+        <button mat-icon-button (click)="validation()" [disabled]="!toolNameSaveEnable">
+            <mat-icon title="Save " class="mat-icon material-icons">
+                cloud_upload </mat-icon>
+        </button>
+        <button mat-icon-button (click)="Refresh()" [disabled]="!toolNameSaveEnable" [disabled]="!refresh">
+            <mat-icon title="Cancel " class="mat-icon material-icons">
+                cancel </mat-icon>
+        </button>
+        <button mat-icon-button>
+            <mat-icon title="Please ensure that the .CSV file is in correct format to avoid failure in uploading the file. For example
+
+- In the header do not use quotes. 
+- In textual data do not use spaces. E.g. run time, instead use run_time
+- Please ensure there is consistency in the header while uploading data for same Tool to avoid data mismatch
+
+  Please Note: Uploading incorrect data or inconsistent data may impact creation of Dashboards and other functionalities"
+                class=" mat-icon material-icons ">help</mat-icon>
+        </button>
+    </div>
+
+    <div class="bulkuploadtablecss">
+        <div class="showTable" style="text-align: left; padding: 10px;">
+            <div>
+                <span class="mainHeaderText">Bulk Upload</span>
+                <span class="infoHeaderText">(Please note: No changes can made to a file or the file cannot be
+                    retreived once it is uploaded)</span>
+            </div>
+        </div>
+        <div class="col-md-2" [formGroup]="uploadForm">
+            <table class="tableMainCss">
+                <tbody>
+                    <tr *ngFor="let row of rows.controls;let index = index;">
+                        <td style="width: 30%">
+
+                            <div class="toolColCss">
+                                Tool
+                                <mat-select [disabled]="row.value.status =='Success'" [(ngModel)]="selectedTool[index]"
+                                    required [formControl]="row.get('toolName')" name="selectedTool" class="form-control"
+                                    (ngModelChange)="onToolSelect(selectedTool[index],index,row)" placeholder="Select Tool"
+                                    style="width:150px;" color="primary">
+                                    <mat-option *ngFor=" let tool of toolsArr | keyvalue" value="{{tool.value}}"
+                                        (click)="toolNameenableSave()">{{tool.value}}</mat-option>
+                                </mat-select>
+                            </div>
+                        </td>
+                        <td style="width: 40%">
+                            <div style="padding-top: 10px;margin-bottom: 10px;">
+                                Label
+                                <input type="text" [(ngModel)]="row.value.labelName" (click)="toolNameenableSave()"
+                                    readonly [formControl]="row.get('labelName')" name="selectedLabel" class="input-disabled"
+                                    style="width:220px;" value="{{labelsArr[index]}}">
+                            </div>
+                        </td>
+
+                        <td style="padding-top: 15px; width: 20%">
+                            <div>
+                                <input type="file" class="mat-cell-value-single" required [formControl]="row.get('fileName')"
+                                    [attr.disabled]=" row.value.status =='Success'  ? '' :  disabled" name="
+                                    selectedFile"
+                                    (change)="onFileChanged($event,row)" style="width:250px;">
+                            </div>
+                        </td>
+                        <td style="width: 10%">
+                            <div>
+                                <mat-progress-bar mode="indeterminate" *ngIf="(row.value.status =='Pending' )" style="margin-right: 5px"></mat-progress-bar>
+                                <!--   {{row.value.status }} -->
+                                <mat-icon svgIcon="healthcheck_success_status" *ngIf="(row.value.status =='Success' )"
+                                    [ngStyle]="{color: '#00B140', height: '20px', width: '20px'}">
+                                </mat-icon>
+
+                                <mat-icon svgIcon="healthcheck_failure_status" matTooltip="{{row.value.tooltipmessage}}"
+                                    *ngIf="(row.value.status =='Fail' )" [ngStyle]="{color: '#FF8F1C', height: '20px', width: '20px'}">
+                                </mat-icon>
+                            </div>
+                        </td>
+                    </tr>
+
+
+
+
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

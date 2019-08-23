@@ -18,6 +18,7 @@ package com.cognizant.devops.platformservice.rest.health;
 import java.io.IOException;
 import java.util.Iterator;
 
+import org.apache.commons.logging.Log;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.http.MediaType;
@@ -40,8 +41,10 @@ import com.cognizant.devops.platformcommons.dal.neo4j.NodeData;
 import com.cognizant.devops.platformdal.dal.PostgresMetadataHandler;
 import com.cognizant.devops.platformservice.rest.util.PlatformServiceUtil;
 import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.google.gson.JsonSyntaxException;
 
 @RestController
 @RequestMapping("/admin/health")
@@ -73,8 +76,8 @@ public class HealthStatus {
 			log.debug("After Platform Service================");
 			/*Insights Inference health check*/	
 			hostEndPoint = ServiceStatusConstants.INSIGHTS_INFERENCE_MASTER_HOST;
-			apiUrl = hostEndPoint+"/jobs";
-			JsonObject inferenceServStatus = getComponentStatus("PlatformInsightSpark",apiUrl);//getClientResponse(hostEndPoint, apiUrl, ServiceStatusConstants.Service,"");
+			apiUrl = hostEndPoint;
+			JsonObject inferenceServStatus = getComponentStatus("PlatformInsight", "");
 			servicesHealthStatus.add(ServiceStatusConstants.InsightsInference, inferenceServStatus);
 			log.debug("After inferance engine================");
 			/*Neo4j health check*/
@@ -126,10 +129,6 @@ public class HealthStatus {
 		return servicesAgentsHealthStatus;
 	}
 
-
-
-
-
 	@RequestMapping(value = "/detailHealth", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 	public @ResponseBody JsonObject loadAgentsHealth(@RequestParam String category, @RequestParam String tool,@RequestParam String agentId){
 		if(StringUtils.isEmpty(category) || StringUtils.isEmpty(tool)){
@@ -167,24 +166,28 @@ public class HealthStatus {
 			if( serviceResponse !=null && !("").equalsIgnoreCase(serviceResponse)){
 				strResponse = "Response successfully recieved from "+apiUrl;
 				log.info("response: "+serviceResponse);
-
 				if(serviceType.equalsIgnoreCase(ServiceStatusConstants.Neo4j)) {
 					json=(JsonObject) jsonParser.parse(serviceResponse);
 					version=json.get("neo4j_version").getAsString();
+					String totalDBSize = getNeo4jDBSize(hostEndPoint, username, password, authToken);
+					returnResponse = buildSuccessResponse(strResponse, hostEndPoint, displayType, version);
+					returnResponse.addProperty("totalDBSize", totalDBSize);
 				}else if(serviceType.equalsIgnoreCase(ServiceStatusConstants.RabbitMq)) {
 					json=(JsonObject) jsonParser.parse(serviceResponse);
 					version="RabbitMq version "+json.get("rabbitmq_version").getAsString() + "\n Erlang version "+ json.get("erlang_version").getAsString();
-				}else if(serviceType.equalsIgnoreCase(ServiceStatusConstants.ES)) { //0
+					returnResponse = buildSuccessResponse(strResponse, hostEndPoint, displayType, version);
+				} else if (serviceType.equalsIgnoreCase(ServiceStatusConstants.ES)) {
 					json=(JsonObject) jsonParser.parse(serviceResponse);
 					JsonObject versionElasticsearch=(JsonObject) json.get("version");
 					if(versionElasticsearch!=null) {
 						version=versionElasticsearch.get("number").getAsString();
 					}
+					returnResponse = buildSuccessResponse(strResponse, hostEndPoint, displayType, version);
 				}else if(serviceType.equalsIgnoreCase(ServiceStatusConstants.PgSQL)) {
 					PostgresMetadataHandler pgdbHandler =new PostgresMetadataHandler();
 					version =pgdbHandler.getPostgresDBVersion();
+					returnResponse = buildSuccessResponse(strResponse, hostEndPoint, displayType, version);
 				}
-				returnResponse= buildSuccessResponse(strResponse, hostEndPoint, displayType,version);
 			}else {
 				strResponse="Response not received from service "+apiUrl;
 				returnResponse= buildFailureResponse(strResponse, hostEndPoint, displayType,version);
@@ -260,16 +263,8 @@ public class HealthStatus {
 					successResponse="Response not received from Neo4j";
 					returnObject=buildFailureResponse(successResponse.toString(), "-", ServiceStatusConstants.Service,version);
 				}
-			}else if(serviceType.equalsIgnoreCase("PlatformInsightSpark")) {
-				try {
-					serviceResponse=apiCallElasticsearch.search(apiUrl);
-				} catch (Exception e) {
-					successResponse="Unable to connect URL "+apiUrl;
-					status=PlatformServiceConstants.FAILURE;
-				}
-				log.info(" PlatformInsightSpark service response "+serviceResponse);
+			} else if (serviceType.equalsIgnoreCase("PlatformInsight")) {
 				graphResponse = loadHealthData("HEALTH:INSIGHTS",serviceType,"");
-				log.debug(" graphResponse message arg 0  "+graphResponse);
 				if(graphResponse !=null ) {
 					if(graphResponse.getNodes().size() > 0 ) {
 						successResponse=graphResponse.getNodes().get(0).getPropertyMap().get("message");;
@@ -284,7 +279,7 @@ public class HealthStatus {
 					status=PlatformServiceConstants.FAILURE;
 				}
 
-				if(status.equalsIgnoreCase(PlatformServiceConstants.SUCCESS) && !("").equalsIgnoreCase(serviceResponse)) {
+				if (status.equalsIgnoreCase(PlatformServiceConstants.SUCCESS)) {
 					returnObject=buildSuccessResponse(successResponse.toString(), apiUrl, ServiceStatusConstants.Service,version);
 				}else {
 					returnObject=buildFailureResponse(successResponse.toString(), apiUrl, ServiceStatusConstants.Service,version);
@@ -389,6 +384,46 @@ public class HealthStatus {
 		return jsonResponse;
 	}
 
+	private String getNeo4jDBSize(String hostEndPoint, String username, String password, String authToken) {
+		long totalStoreSize = 0L;
+		String returnSize = "";
+		try {
+			String apiUrlForSize = hostEndPoint
+					+ "/db/manage/server/jmx/domain/org.neo4j/instance%3Dkernel%230%2Cname%3DStore+sizes";
+			String serviceNeo4jResponse = SystemStatus.jerseyGetClientWithAuthentication(apiUrlForSize, username,
+					password, authToken);
+			log.debug("serviceNeo4jResponse ======  " + serviceNeo4jResponse);
 
+			JsonElement object = new JsonParser().parse(serviceNeo4jResponse);
+			if (object.isJsonArray()) {
+				if (object.getAsJsonArray().get(0).getAsJsonObject().get("attributes").isJsonArray()) {
+					JsonArray beans = object.getAsJsonArray().get(0).getAsJsonObject().get("attributes")
+							.getAsJsonArray();
+					for (JsonElement jsonElement : beans) {
+						if (jsonElement.getAsJsonObject().get("name").getAsString()
+								.equalsIgnoreCase("TotalStoreSize")) {
+							totalStoreSize = jsonElement.getAsJsonObject().get("value").getAsLong();
+						}
+					}
+				}
+			}
+			log.debug(" info totalStoreSize  ==== " + totalStoreSize);
+			if (totalStoreSize > 0) {
+				returnSize = humanReadableByteCount(totalStoreSize, Boolean.FALSE);
+			}
+		} catch (Exception e) {
+			log.error(" Error while geeting neo4j Size");
+		}
+		return returnSize;
+	}
+
+	public static String humanReadableByteCount(long bytes, boolean si) {
+		int unit = si ? 1000 : 1024;
+		if (bytes < unit)
+			return bytes + " B";
+		int exp = (int) (Math.log(bytes) / Math.log(unit));
+		String pre = (si ? "kMGTPE" : "KMGTPE").charAt(exp - 1) + (si ? "" : "i");
+		return String.format("%.1f %sB", bytes / Math.pow(unit, exp), pre);
+	}
 
 }
