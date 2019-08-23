@@ -16,12 +16,14 @@
 package com.cognizant.devops.platformservice.correlationbuilder.service;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.NoSuchElementException;
 import java.util.stream.Stream;
 
 import org.apache.logging.log4j.LogManager;
@@ -37,7 +39,7 @@ import com.google.gson.JsonParser;
 
 @Service("correlationBuilderService")
 public class CorrelationBuilderServiceImpl implements CorrelationBuilderService {
-	private static Logger log = LogManager.getLogger(AgentManagementServiceImpl.class);
+	private static Logger log = LogManager.getLogger(CorrelationBuilderServiceImpl.class);
 	
 	@Override
 	public Object getCorrelationJson() throws InsightsCustomException {
@@ -107,18 +109,35 @@ public class CorrelationBuilderServiceImpl implements CorrelationBuilderService 
 		Path source = Paths.get(System.getenv().get("INSIGHTS_HOME") + File.separator + ConfigOptions.CONFIG_DIR+File.separator+ConfigOptions.CORRELATION_TEMPLATE);
 	    Path target = Paths.get(System.getenv().get("INSIGHTS_HOME") + File.separator + ConfigOptions.CONFIG_DIR+File.separator+ConfigOptions.CORRELATION);
 	    try {
+	    	if (source.toFile().exists()) {
 	        Files.copy(source, target);
+	    	}
 	    } catch (IOException e1) {
 	        e1.printStackTrace();
 	    }
-		try (Stream<Path> paths = Files.find(dir, Integer.MAX_VALUE,
-				(path, attrs) -> attrs.isRegularFile() && path.toString().endsWith(ConfigOptions.CORRELATION_TEMPLATE))) {
-
+		try  {
+			Stream<Path> paths = Files.find(dir, Integer.MAX_VALUE,
+					(path, attrs) -> attrs.isRegularFile() && path.toString().endsWith(ConfigOptions.CORRELATION_TEMPLATE));
 			configFile = paths.limit(1).findFirst().get().toFile();
-		} catch (IOException e1) {
+		}
+		catch(NoSuchElementException e)
+		{
+			try {
+				Files.createFile(source);
+				Stream<Path> paths = Files.find(dir, Integer.MAX_VALUE,
+						(path, attrs) -> attrs.isRegularFile() && path.toString().endsWith(ConfigOptions.CORRELATION_TEMPLATE));
+				configFile = paths.limit(1).findFirst().get().toFile();
+			}
+			catch (IOException ioe) {
+	            throw new RuntimeException(
+	              "creation is not possible.", ioe);
+	        }
+		}
+		catch (IOException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
+		
 		log.debug("  arg0 " + configFile);
 		try (FileWriter file = new FileWriter(configFile)) {
 			file.write(correlationJson.toString());
@@ -126,6 +145,7 @@ public class CorrelationBuilderServiceImpl implements CorrelationBuilderService 
 		} catch (IOException e) {
 			log.error(e);
 		} 
+		
 		return "succcess";
 
 	}
