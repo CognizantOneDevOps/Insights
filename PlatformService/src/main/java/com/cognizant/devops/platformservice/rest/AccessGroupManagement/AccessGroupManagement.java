@@ -252,7 +252,7 @@ public class AccessGroupManagement {
 			String email = updateAgentJson.get("email").getAsString();
 			String userName = updateAgentJson.get("userName").getAsString();
 			String role = updateAgentJson.get("role").getAsString();
-			String password = updateAgentJson.get("password").getAsString();
+			String password = ValidationUtils.getSealedObject(updateAgentJson.get("password").getAsString());
 			String orgName = updateAgentJson.get("orgName").getAsString();
 			String apiUrlName = ApplicationConfigProvider.getInstance().getGrafana().getGrafanaEndpoint()
 					+ "/api/users/lookup?loginOrEmail=" + name;
@@ -348,7 +348,7 @@ public class AccessGroupManagement {
 					requestCreate.addProperty("login", userName);
 					requestCreate.addProperty("email", email);
 					requestCreate.addProperty("role", role);
-					requestCreate.addProperty("password", password);
+					requestCreate.addProperty("password", ValidationUtils.getDeSealedObject(password));
 					ClientResponse responseCreate = callgrafana(apiUrlCreate, requestCreate, "post");
 
 					JsonObject jsonResponse = new JsonParser().parse(responseCreate.getEntity(String.class))

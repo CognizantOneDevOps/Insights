@@ -113,7 +113,7 @@ public class HealthStatus {
 		}catch(Exception e) {
 			PlatformServiceUtil.buildFailureResponse(e.getMessage());
 		}
-		return servicesHealthStatus;	
+		return PlatformServiceUtil.buildSuccessResponseWithData(servicesHealthStatus);
 	}
 	@RequestMapping(value = "/globalAgentsHealth", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 	public @ResponseBody JsonObject getAgentsHealthStatus() {
@@ -126,7 +126,7 @@ public class HealthStatus {
 		}catch(Exception e) {
 			PlatformServiceUtil.buildFailureResponse(e.getMessage());
 		}
-		return servicesAgentsHealthStatus;
+		return PlatformServiceUtil.buildSuccessResponseWithData(servicesAgentsHealthStatus);
 	}
 
 	@RequestMapping(value = "/detailHealth", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
@@ -349,7 +349,7 @@ public class HealthStatus {
 			while(agentnodeIterator.hasNext()) {
 				NodeData node =agentnodeIterator.next();
 				insightTimeX=node.getPropertyMap().get("inSightsTimeX");;
-				message=node.getPropertyMap().get("message");;
+				//message=node.getPropertyMap().get("message");;
 				toolcategory=node.getPropertyMap().get("category");;
 				toolName=node.getPropertyMap().get("toolName");
 				if(node.getPropertyMap().containsKey("agentId")) {
@@ -365,7 +365,7 @@ public class HealthStatus {
 				jsonResponse2.addProperty("agentId", agentId);
 				jsonResponse2.addProperty("inSightsTimeX", insightTimeX);
 				jsonResponse2.addProperty(PlatformServiceConstants.STATUS, agentstatus);
-				jsonResponse2.addProperty(PlatformServiceConstants.MESSAGE, message);
+				//jsonResponse2.addProperty(PlatformServiceConstants.MESSAGE, message);
 				jsonResponse2.addProperty("category", toolcategory);
 				agentNode.add(jsonResponse2);
 			}

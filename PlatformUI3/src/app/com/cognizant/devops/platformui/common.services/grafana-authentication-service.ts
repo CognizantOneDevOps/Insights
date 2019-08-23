@@ -24,7 +24,7 @@ import { DataSharedService } from '@insights/common/data-shared-service';
 export interface IAuthenticationService {
     getAuthentication(authToken: string, msg: string): void;
     logout(): Promise<any>;
-    getGrafanaCurrentOrgAndRole(): Promise<any>;
+    // getGrafanaCurrentOrgAndRole(): Promise<any>;
     getCurrentUserOrgs(): Promise<any>;
     getUsers(): Promise<any>;
 }
@@ -55,10 +55,10 @@ export class GrafanaAuthenticationService implements IAuthenticationService {
         return restHandler.get("LOGOUT");
     }
 
-    public getGrafanaCurrentOrgAndRole(): Promise<any> {
+    /* public getGrafanaCurrentOrgAndRole(): Promise<any> {
         var restHandler = this.restCallHandlerService;
         return restHandler.get("GRAPANA_CURRENT_ROLE_ORG");
-    }
+    } */
 
     public getCurrentUserOrgs(): Promise<any> {
         var restHandler = this.restCallHandlerService;

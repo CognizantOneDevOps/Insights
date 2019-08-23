@@ -61,9 +61,9 @@ public class CrossScriptingFilter implements Filter {
 		HttpServletResponse httpResponce = (HttpServletResponse) response;
 		HttpServletRequest httpRequest = (HttpServletRequest) request;
 		try {
-			writeHeaders(httpRequest, httpResponce);
 			RequestWrapper requestMapper = new RequestWrapper(httpRequest,
 					httpResponce);
+			writeHeaders(httpRequest, httpResponce);
 			chain.doFilter(requestMapper, httpResponce);
 			LOG.debug("Completed .. in CrossScriptingFilter");
 
