@@ -99,7 +99,7 @@ public class ValidationUtils {
 				jsonString = jsonString.replace("&amp;", "&");
 			}
 			if (!jsonString.equalsIgnoreCase(data.toString())) {
-				log.debug(" Invilid response data ");
+				log.error(" Invilid response data ");
 				json = null;
 			}else {
 				json = new Gson().fromJson(jsonString, JsonObject.class);
@@ -137,6 +137,7 @@ public class ValidationUtils {
 	 */
 	public static String cleanXSS(String value) {
 		Boolean isXSSPattern = Boolean.FALSE;
+		String valueWithXSSPattern = "";
 		// log.debug("In cleanXSS RequestWrapper ..............." + value);
 		if (value != null || !("").equals(value)) {
 			try {
@@ -145,14 +146,16 @@ public class ValidationUtils {
 					Matcher m = scriptPattern.matcher(value);
 					if (m.find()) {
 						isXSSPattern = true;
+						valueWithXSSPattern = value;
 						break;
 					}
 				}
 				if (isXSSPattern) {
+					log.error("Invalid pattern found in data value ==== " + valueWithXSSPattern);
 					throw new RuntimeException(PlatformServiceConstants.INVALID_REQUEST);
 				}
 			} catch (RuntimeException e) {
-				log.error("Invalid pattern found in data value ==== " + value);
+				log.error("Invalid pattern found in data value ==== " + valueWithXSSPattern);
 				throw new RuntimeException(PlatformServiceConstants.INVALID_REQUEST);
 			}
 		}
@@ -161,8 +164,9 @@ public class ValidationUtils {
 
 	public static String extactAutharizationToken(String authHeaderToken)   {
 		String authTokenDecrypt = "";
+		log.debug("In Authorization token processing ");
 		try {
-			log.debug(" authHeaderToken String " + authHeaderToken);
+			//log.debug(" authHeaderToken String " + authHeaderToken);
 			if (!authHeaderToken.startsWith("Basic ")) {
 
 				String auth = authHeaderToken.substring(0, authHeaderToken.length() - 15);
@@ -180,6 +184,7 @@ public class ValidationUtils {
 			log.error(" InsightsCustomException Invalid Autharization Token " + e.getMessage());
 			throw new RuntimeException(PlatformServiceConstants.INVALID_TOKEN);
 		}
+		log.debug("In Authorization token processing Complated ");
 		return authTokenDecrypt;
 	}
 

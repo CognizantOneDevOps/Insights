@@ -152,7 +152,7 @@ var addStyleTag = function () {
 		var style = "<style type=\"text/css\">" +
 			".sidemenu {display : none !important;}\n" +
 			".main-view{position:absolute;width:100%;-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;)}\n" +
-			".scroll-canvas{position:relative;width:100%;overflow:auto;height:100%;-webkit-overflow-scrolling:touch}\n" +
+			".scroll-canvas{position:fixed;width:100%;overflow:auto;-webkit-overflow-scrolling:touch}\n" +
 			".navbar-brand-btn {display : none !important;}\n" +
 			".page-header-canvas {display : none !important;}\n" +
 			".search-item-dash-home {display : none !important;}" +

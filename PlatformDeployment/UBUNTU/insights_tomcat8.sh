@@ -1,3 +1,4 @@
+#!/bin/bash
 #-------------------------------------------------------------------------------
 # Copyright 2017 Cognizant Technology Solutions
 #   
@@ -15,23 +16,19 @@
 #-------------------------------------------------------------------------------
 echo "#################### Installing Tomcat8 ####################"
 cd /opt
-wget https://platform.cogdevops.com/insights_install/release/latest/InSightsUI.zip -O InSightsUI.zip
-unzip InSightsUI.zip && rm -rf InSightsUI.zip
-wget https://platform.cogdevops.com/insights_install/release/latest/PlatformService.war -O PlatformService.war
-wget https://platform.cogdevops.com/insights_install/installationScripts/latest/RHEL/tomcat/apache-tomcat-8.5.27.tar.gz
-tar -zxvf apache-tomcat-8.5.27.tar.gz
-cp -R ./app /opt/apache-tomcat-8.5.27/webapps
+sudo wget https://platform.cogdevops.com/insights_install/release/latest/PlatformUI3.zip -O PlatformUI3.zip
+sudo unzip PlatformUI3.zip && sudo rm -rf PlatformUI3.zip
+sudo wget https://platform.cogdevops.com/insights_install/release/latest/PlatformService.war -O PlatformService.war
+sudo wget https://platform.cogdevops.com/insights_install/installationScripts/latest/RHEL/tomcat/apache-tomcat-8.5.27.tar.gz
+sudo tar -zxvf apache-tomcat-8.5.27.tar.gz
+sudo cp -R ./app /opt/apache-tomcat-8.5.27/webapps
 #sudo cp -R app /opt/apache-tomcat-8.5.27/webapps
-rm -rf InSightsUI
-cp PlatformService.war /opt/apache-tomcat-8.5.27/webapps
-rm -rf PlatformService.war
+sudo rm -rf PlatformUI3
+sudo cp PlatformService.war /opt/apache-tomcat-8.5.27/webapps
+sudo rm -rf PlatformService.war
 cd apache-tomcat-8.5.27
-chmod -R 777 /opt/apache-tomcat-8.5.27
-cd /etc/init.d/
-wget https://platform.cogdevops.com/insights_install/installationScripts/latest/RHEL/initscripts/Tomcat8.sh
-mv Tomcat8.sh Tomcat8
-chmod +x Tomcat8
+sudo chmod -R 777 /opt/apache-tomcat-8.5.27
 cd /etc/systemd/system
-wget https://raw.githubusercontent.com/CognizantOneDevOps/Insights/UbuntuInstallationScripts/Deployment/UBUNTU/Tomcat.service
-systemctl enable Tomcat.service
-systemctl start Tomcat.service
+sudo wget https://platform.cogdevops.com/insights_install/installationScripts/latest/Ubuntu/scripts/Tomcat.service
+sudo systemctl enable Tomcat.service
+sudo systemctl start Tomcat

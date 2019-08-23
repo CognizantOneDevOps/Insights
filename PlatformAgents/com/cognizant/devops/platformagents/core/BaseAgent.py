@@ -19,17 +19,20 @@ Created on Jun 16, 2016
 @author: 146414
 '''
 
-import json
-from .MessageQueueProvider import MessageFactory
-from .CommunicationFacade import CommunicationFacade
-from apscheduler.schedulers.blocking import BlockingScheduler
-import sys
-import os.path
-import uuid
 from datetime import datetime
-from pytz import timezone
+import json
 import logging.handlers
+import os.path
+import sys
 import time
+import uuid
+
+from apscheduler.schedulers.blocking import BlockingScheduler
+from pytz import timezone
+
+from .CommunicationFacade import CommunicationFacade
+from .MessageQueueProvider import MessageFactory
+
 
 class BaseAgent(object):
        
@@ -381,13 +384,19 @@ class BaseAgent(object):
             self.publishHealthData(self.generateHealthData())
             
         except Exception as ex:
-            self.publishHealthData(self.generateHealthData(ex=ex))
-            logging.error(ex)
-            self.logIndicator(self.EXECUTION_ERROR, self.config.get('isDebugAllowed', False))
+            self.publishHealthDataForExceptions(self,ex)
         finally:
             '''If agent receive the STOP command, Python program should exit gracefully after current data collection is complete.  '''
             if self.shouldAgentRun == False:
                 os._exit(0)
+    '''
+        This method publishes health node for an exception and 
+        Writes exception inside log file of corresponding Agent 
+    '''
+    def publishHealthDataForExceptions(self, ex):
+        self.publishHealthData(self.generateHealthData(ex=ex))
+        logging.error(ex)
+        self.logIndicator(self.EXECUTION_ERROR, self.config.get('isDebugAllowed', False))
         
     def executeAgentExtensions(self):
         if hasattr(self, 'extensions'):

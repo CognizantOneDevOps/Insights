@@ -27,7 +27,21 @@
 ### END INIT INFO
 #export INSIGHTS_AGENT_HOME=/home/ec2-user/insightsagents
 source /etc/profile
+python_version="$(python -V 2>&1)"
+detectPythonVersion()
+{
+     if echo "$1" | grep -q "Python 2"; then
+      echo "Detected python 2 version";
+      python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.deployment.awscodedeploy.AwsCodeDeployAgent import AwsCodeDeployAgent; AwsCodeDeployAgent()" &
+     elif echo "$1" | grep -q "Python 3"; then
+      echo "Detected python 3 version";
+      python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.deployment.awscodedeploy.AwsCodeDeployAgent3 import AwsCodeDeployAgent; AwsCodeDeployAgent()" &
+     else
+      echo "python version not supported"
+      exit 1;
+     fi
 
+}
 case "$1" in
   start)
     if [[ $(ps aux | grep '__PS_KEY__' | awk '{print $2}') ]]; then
@@ -35,7 +49,8 @@ case "$1" in
     else
      echo "Starting InSightsAwsCodeDeployAgent"
      cd $INSIGHTS_AGENT_HOME/PlatformAgents/awscodedeploy
-     python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.deployment.awscodedeploy.AwsCodeDeployAgent import AwsCodeDeployAgent; AwsCodeDeployAgent()" &
+	 echo $python_version
+     detectPythonVersion "$python_version"
     fi
     if [[ $(ps aux | grep '__PS_KEY__' | awk '{print $2}') ]]; then
      echo "InSightsAwsCodeDeployAgent Started Sucessfully"
@@ -64,13 +79,15 @@ case "$1" in
      echo "InSightsAwsCodeDeployAgent stopped"
      echo "InSightsAwsCodeDeployAgent starting"
      cd $INSIGHTS_AGENT_HOME/PlatformAgents/awscodedeploy
-     python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.deployment.awscodedeploy.AwsCodeDeployAgent import AwsCodeDeployAgent; AwsCodeDeployAgent()" &
+     echo $python_version
+     detectPythonVersion "$python_version"
      echo "InSightsAwsCodeDeployAgent started"
     else
      echo "InSightsAwsCodeDeployAgent already in stopped state"
      echo "InSightsAwsCodeDeployAgent starting"
      cd $INSIGHTS_AGENT_HOME/PlatformAgents/awscodedeploy
-     python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.deployment.awscodedeploy.AwsCodeDeployAgent import AwsCodeDeployAgent; AwsCodeDeployAgent()" &
+     echo $python_version
+     detectPythonVersion "$python_version"
      echo "InSightsAwsCodeDeployAgent started"
     fi
     ;;

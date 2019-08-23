@@ -14,7 +14,7 @@
 # the License.
 #-------------------------------------------------------------------------------
 #! /bin/sh
-# /etc/init.d/__AGENT_KEY__
+# /etc/init.d/__AGENT_KEY__ 
 
 ### BEGIN INIT INFO
 # Provides: Runs a Python script on startup
@@ -25,65 +25,85 @@
 # Short-Description: Simple script to run python program at boot
 # Description: Runs a python program at boot
 ### END INIT INFO
+
+
 #export INSIGHTS_AGENT_HOME=/home/ec2-user/insightsagents
 source /etc/profile
+python_version="$(python -V 2>&1)"
+detectPythonVersion()
+{
+     if echo "$1" | grep -q "Python 2"; then
+      echo "Detected python 2 version";
+      python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.ci.awscodebuild.AwsCodeBuildAgent import AwsCodeBuildAgent; AwsCodeBuildAgent()" &
+     elif echo "$1" | grep -q "Python 3"; then
+      echo "Detected python 3 version";
+      python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.ci.awscodebuild.AwsCodeBuildAgent3 import AwsCodeBuildAgent; AwsCodeBuildAgent()" &
+     else
+      echo "python version not supported"
+	  exit 1;
+     fi
+
+}
 
 case "$1" in
   start)
     if [[ $(ps aux | grep '__PS_KEY__' | awk '{print $2}') ]]; then
-     echo "InSightsAwsCodeBuildAgent already running"
+     echo "InSightsAwsCodeBuild already running"
     else
-     echo "Starting InSightsAwsCodeBuildAgent"
+     echo "Starting InSightsAwsCodeBuild"
      cd $INSIGHTS_AGENT_HOME/PlatformAgents/awscodebuild
-     python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.ci.awscodebuild.AwsCodeBuildAgent import AwsCodeBuildAgent; AwsCodeBuildAgent()" &
+	 echo $python_version
+     detectPythonVersion "$python_version"
     fi
     if [[ $(ps aux | grep '__PS_KEY__' | awk '{print $2}') ]]; then
-     echo "InSightsAwsCodeBuildAgent Started Sucessfully"
+     echo "InSightsAwsCodeBuild Started Sucessfully"
     else
-     echo "InSightsAwsCodeBuildAgent Failed to Start"
+     echo "InSightsAwsCodeBuild Failed to Start"
     fi
     ;;
   stop)
-    echo "Stopping InSightsAwsCodeBuildAgent"
+    echo "Stopping InSightsAwsCodeBuild"
     if [[ $(ps aux | grep '__PS_KEY__' | awk '{print $2}') ]]; then
      sudo kill -9 $(ps aux | grep '__PS_KEY__' | awk '{print $2}')
     else
-     echo "InSIghtsUCDAgent already in stopped state"
+     echo "InSightsAwsCodeBuild already in stopped state"
     fi
     if [[ $(ps aux | grep '__PS_KEY__' | awk '{print $2}') ]]; then
-     echo "InSightsAwsCodeBuildAgent Failed to Stop"
+     echo "InSightsAwsCodeBuild Failed to Stop"
     else
-     echo "InSightsAwsCodeBuildAgent Stopped"
+     echo "InSightsAwsCodeBuild Stopped"
     fi
     ;;
   restart)
-    echo "Restarting InSightsAwsCodeBuildAgent"
+    echo "Restarting InSightsAwsCodeBuild"
     if [[ $(ps aux | grep '__PS_KEY__' | awk '{print $2}') ]]; then
-     echo "InSightsAwsCodeBuildAgent stopping"
+     echo "InSightsAwsCodeBuild stopping"
      sudo kill -9 $(ps aux | grep '__PS_KEY__' | awk '{print $2}')
-     echo "InSightsAwsCodeBuildAgent stopped"
-     echo "InSightsAwsCodeBuildAgent starting"
+     echo "InSightsAwsCodeBuild stopped"
+     echo "InSightsAwsCodeBuild starting"
      cd $INSIGHTS_AGENT_HOME/PlatformAgents/awscodebuild
-     python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.ci.awscodebuild.AwsCodeBuildAgent import AwsCodeBuildAgent; AwsCodeBuildAgent()" &
-     echo "InSightsAwsCodeBuildAgent started"
+	 echo $python_version
+     detectPythonVersion "$python_version"
+     echo "InSightsAwsCodeBuild started"
     else
-     echo "InSightsAwsCodeBuildAgent already in stopped state"
-     echo "InSightsAwsCodeBuildAgent starting"
+     echo "InSightsAwsCodeBuild already in stopped state"
+     echo "InSightsAwsCodeBuild starting"
      cd $INSIGHTS_AGENT_HOME/PlatformAgents/awscodebuild
-     python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.ci.awscodebuild.AwsCodeBuildAgent import AwsCodeBuildAgent; AwsCodeBuildAgent()" &
-     echo "InSightsAwsCodeBuildAgent started"
+	 echo $python_version
+     detectPythonVersion "$python_version"
+     echo "InSightsAwsCodeBuild started"
     fi
     ;;
   status)
-    echo "Checking the Status of InSightsAwsCodeBuildAgent"
+    echo "Checking the Status of InSightsAwsCodeBuild"
     if [[ $(ps aux | grep '__PS_KEY__' | awk '{print $2}') ]]; then
-     echo "InSightsAwsCodeBuildAgent is running"
+     echo "InSightsAwsCodeBuild is running"
     else
-     echo "InSightsAwsCodeBuildAgent is stopped"
+     echo "InSightsAwsCodeBuild is stopped"
     fi
     ;;
   *)
-    echo "Usage: /etc/init.d/__AGENT_KEY__ {start|stop|restart|status}"
+    echo "Usage: /etc/init.d/__AGENT_KEY__  {start|stop|restart|status}"
     exit 1
     ;;
 esac

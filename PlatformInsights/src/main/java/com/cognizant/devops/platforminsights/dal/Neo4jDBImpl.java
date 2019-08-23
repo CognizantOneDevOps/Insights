@@ -117,8 +117,8 @@ public class Neo4jDBImpl implements DatabaseService {
 	protected String getNeo4jQueryWithDates(JobSchedule schedule, String neo4jQuery) {
 		Long fromDate = InsightsUtils.getDataFromTime(schedule.name());
 		Long toDate = InsightsUtils.getDataToTime(schedule.name());
-		String whereClause = " WHERE '" + inferenceConfigDefinition.getStartTimeField() + "' > '" + fromDate + "' AND '"
-				+ inferenceConfigDefinition.getStartTimeField() + "' < '" + toDate + "'";
+		String whereClause = " WHERE n." + inferenceConfigDefinition.getStartTimeField() + " > " + fromDate + " AND n."
+				+ inferenceConfigDefinition.getStartTimeField() + " < " + toDate;
 		if (StringUtils.containsIgnoreCase(neo4jQuery, "WHERE")) {
 			neo4jQuery = StringUtils.replaceIgnoreCase(neo4jQuery, "WHERE", whereClause + " AND ");
 		} else if (StringUtils.containsIgnoreCase(neo4jQuery, "RETURN")
@@ -135,6 +135,9 @@ public class Neo4jDBImpl implements DatabaseService {
 			String graphQuery = "MATCH (n:INFERENCE:CONFIG) RETURN n";
 			GraphResponse graphResp = graphDBHandler.executeCypherQuery(graphQuery);
 			List<NodeData> nodesList = graphResp.getNodes();
+			if (nodesList.size() == 0) {
+				log.debug("No KPI define in database");
+			}
 			for (NodeData nodeData : nodesList) {
 				InferenceConfigDefinition nodemapping = mapNodeDataToInferenceConfigDefinition(nodeData);
 				jobs.add(nodemapping);
