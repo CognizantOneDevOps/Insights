@@ -28,10 +28,10 @@
     <mat-progress-spinner [diameter]="100" *ngIf="showThrobber" color="primary" mode="indeterminate">
     </mat-progress-spinner>
 </div>
-<div *ngIf="checkResponseData" class="scrollData">
-    <mat-tab-group color="primary" class="healthcheck-tab-style">
+<div *ngIf="checkResponseData" class="scrollData" >
+    <mat-tab-group color="primary" class="healthcheck-agent-detail-tab-style">
         <mat-tab label="Latest Status Details"> 
-            <mat-dialog-content *ngIf="showContent" style="margin:0;padding: 0">
+            <mat-dialog-content *ngIf="showContent" style="margin:0;padding: 0" >
                 <table mat-table [dataSource]="agentDetailedDatasource">
                     <ng-container *ngFor="let header of finalHeaderToShow | keyvalue" matColumnDef="{{header.key}}">
                         <th mat-header-cell *matHeaderCellDef [ngClass]="{'tableDynamicHeaderCss' :(header.key=='inSightsTimeX' || header.key=='status'),'tableExceIdHeaderCss':(header.key=='execId'),'tableMessageHeaderCss':true}">{{header.value}}</th>
@@ -41,26 +41,26 @@
                     <tr mat-header-row *matHeaderRowDef="headerArrayDisplay" class="tableHeaderCss"></tr>
                     <tr mat-row *matRowDef="let row; columns: headerArrayDisplay;"></tr>
                 </table>
-               <!-- <mat-paginator #allStatusPaginator [pageSize]="10" showFirstLastButtons class="paginationStyle"> </mat-paginator>-->
             </mat-dialog-content>
         </mat-tab>
-        <mat-tab label="Last Failure Details" *ngIf="showAgentDetailDialog"> 
+        <mat-tab label="Last Failure Details" *ngIf="showAgentFailureTab"> 
             <table mat-table [dataSource]="agentFailureDetailsDatasource" >
                 <!-- Date/Time Column -->
                 <ng-container matColumnDef="inSightsTimeX">
-                    <th mat-header-cell *matHeaderCellDef  class="tableMessageHeaderCss"> Execution Time ({{this.data.timeZone}}) </th>
-                    <td mat-cell *matCellDef="let element"> {{element.inSightsTimeX}} </td>
+                    <th mat-header-cell *matHeaderCellDef  
+                            class="tableLastFailureHeaderCss"> Execution Time ({{this.data.timeZone}}) </th>
+                    <td mat-cell *matCellDef="let element" > {{element.inSightsTimeX}} </td>
                 </ng-container>
                 <!-- Message Column -->
                 <ng-container matColumnDef="message">
-                    <th mat-header-cell *matHeaderCellDef  class="tableMessageHeaderCss"> Message </th>
-                    <td mat-cell *matCellDef="let element"> {{element.message}} </td>
-                </ng-container>           
-
+                    <th mat-header-cell *matHeaderCellDef  class="tableLastFailureHeaderCss"> Message </th>
+                    <td mat-cell *matCellDef="let element" 
+                                 [matTooltip]="element.message" matTooltipPosition="above"
+                                > {{element.message.slice(0, 100)}} </td>
+                </ng-container>
                 <tr mat-header-row *matHeaderRowDef="displayedColumns" class="tableHeaderCss"></tr>
                 <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
             </table>
-            <mat-paginator #failureStatusPaginator [pageSize]="8" showFirstLastButtons class="paginationStyle"></mat-paginator>
         </mat-tab>         
     </mat-tab-group>        
 

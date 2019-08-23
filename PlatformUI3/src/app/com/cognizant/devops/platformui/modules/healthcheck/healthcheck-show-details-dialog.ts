@@ -43,10 +43,9 @@ export class ShowDetailsDialog implements OnInit {
   masterHeader = new Map<String, String>();
   finalHeaderToShow = new Map<String, String>();
   displayedColumns: string[] = ['inSightsTimeX', 'message'];
-  //@ViewChild(MatPaginator) allStatusPaginator: MatPaginator;
-  @ViewChild(MatPaginator) failureStatusPaginator: MatPaginator;
+  //@ViewChild(MatPaginator) allStatusPaginator: MatPaginator;  
   headerSet = new Set();
-  showAgentDetailDialog: boolean = false;
+  showAgentFailureTab: boolean = false;
 
   constructor(public dialogRef: MatDialogRef<ShowDetailsDialog>,
     @Inject(MAT_DIALOG_DATA) public data: any,
@@ -61,8 +60,7 @@ export class ShowDetailsDialog implements OnInit {
     this.detailType = this.data.detailType;
   }
 
-  ngAfterViewInit() {
-    this.agentFailureDetailsDatasource.paginator = this.failureStatusPaginator;
+  ngAfterViewInit() {    
     //this.agentDetailedDatasource.paginator = this.allStatusPaginator;
   }
 
@@ -78,8 +76,7 @@ export class ShowDetailsDialog implements OnInit {
     this.showContent = !this.showThrobber;
     this.checkResponseData = true;
     this.healthCheckService.loadHealthConfigurations(this.data.toolName, this.data.categoryName, this.data.agentId)
-      .then((data) => {
-        console.log(">>>> loadHealthConfigurations Results received >>>>>");
+      .then((data) => {        
         this.showThrobber = false;
         this.showContent = !this.showThrobber;
         var dataArray = data.data.nodes;
@@ -91,9 +88,9 @@ export class ShowDetailsDialog implements OnInit {
           
           if (this.detailType == "Platform Service" || this.detailType == "Insights Inference Engine" 
                     || this.detailType == "Platform Engine") {
-             this.showAgentDetailDialog = false;
+             this.showAgentFailureTab = false;
           } else {
-             this.showAgentDetailDialog = true;
+             this.showAgentFailureTab = true;
           }
          
           for (var key in dataArray) {
@@ -120,8 +117,7 @@ export class ShowDetailsDialog implements OnInit {
               }
             }
           }
-          this.agentDetailedDatasource.data = this.agentDetailedNode;
-          //this.agentDetailedDatasource.paginator = this.allStatusPaginator;
+          this.agentDetailedDatasource.data = this.agentDetailedNode;          
           this.showSelectedField();
         }
       });
@@ -130,9 +126,7 @@ export class ShowDetailsDialog implements OnInit {
   loadAgentFailureDetails(): void {
     this.healthCheckService.getAgentFailureDetails(this.data.toolName, this.data.categoryName, this.data.agentId)
       .then((data) => {
-        // Method body
-        console.log(">>>> Failure Results received >>>>>");
-        console.log(data.data.nodes)
+        // Method body       
         var failureRecords = data.data.nodes;
         if (failureRecords != undefined) {
           for (var key in failureRecords) {
@@ -151,8 +145,7 @@ export class ShowDetailsDialog implements OnInit {
               }
             }
           }
-          this.agentFailureDetailsDatasource.data = this.agentFailureRecords;
-          this.agentFailureDetailsDatasource.paginator = this.failureStatusPaginator;
+          this.agentFailureDetailsDatasource.data = this.agentFailureRecords;          
         }
 
       });
