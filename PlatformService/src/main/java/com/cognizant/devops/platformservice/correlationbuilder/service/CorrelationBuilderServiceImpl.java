@@ -129,8 +129,7 @@ public class CorrelationBuilderServiceImpl implements CorrelationBuilderService 
 				configFile = paths.limit(1).findFirst().get().toFile();
 			}
 			catch (IOException ioe) {
-	            throw new RuntimeException(
-	              "creation is not possible.", ioe);
+	            throw new InsightsCustomException("creation is not possible.");
 	        }
 		}
 		catch (IOException e1) {
