@@ -50,7 +50,6 @@
 		<module>PlatformDAL</module>
 		<module>PlatformService</module>
 		<module>PlatformEngine</module>
-		<module>PlatformUI2.0</module>
 		<module>PlatformUI3</module>
 		<module>PlatformInsights</module>
 	</modules>
