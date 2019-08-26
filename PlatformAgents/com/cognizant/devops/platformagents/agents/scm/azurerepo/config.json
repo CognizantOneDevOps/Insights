@@ -7,11 +7,11 @@
     "agentControlXchg": "iAgent"
   },
   "subscribe": {
-    "config": "SCM.AZUREREPOS.config"
+    "config": "SCM.AZUREREPO.config"
   },
   "publish": {
-    "data": "SCM.AZUREREPOS.DATA",
-    "health": "SCM.AZUREREPOS.HEALTH"
+    "data": "SCM.AZUREREPO.DATA",
+    "health": "SCM.AZUREREPO.HEALTH"
   },
   "communication": {
     "type": "REST",
