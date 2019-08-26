@@ -20,10 +20,10 @@ Created on Jun 1, 2019
 '''
 from dateutil import parser
 import datetime
-from BaseAgent import BaseAgent
+from ....core.BaseAgent import BaseAgent
 import logging
 
-class AzureReposAgent(BaseAgent):
+class AzureRepoAgent(BaseAgent):
     def process(self):
         UserID = self.config.get("userID", '')
         Passwd = self.config.get("passwd", '')
@@ -145,7 +145,7 @@ class AzureReposAgent(BaseAgent):
     def updateTrackingForBranch(self, trackingDetails, branchName, latestCommit):
         updatetimestamp = latestCommit["author"]["date"]
         dt = parser.parse(updatetimestamp)
-        fromDateTime = dt + datetime.timedelta(seconds=0o1)
+        fromDateTime = dt + datetime.timedelta(seconds=01)
         fromDateTime = fromDateTime.strftime('%Y-%m-%dT%H:%M:%SZ')
         trackingDetails[branchName] = { 'latestCommitDate' : fromDateTime, 'latestCommitId' : latestCommit["commitId"]}
     def updateTrackingForBranchCreateDelete(self, trackingDetails, repoName, branchName, lastCommitDate, lastCommitId):
@@ -160,4 +160,4 @@ class AzureReposAgent(BaseAgent):
         self.publishToolsData(data_branch_delete, branchMetadata)
 
 if __name__ == "__main__":
-    AzureReposAgent()
+    AzureRepoAgent()

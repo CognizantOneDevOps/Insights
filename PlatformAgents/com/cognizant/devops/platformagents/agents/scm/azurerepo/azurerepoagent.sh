@@ -33,10 +33,10 @@ detectPythonVersion()
 {
      if echo "$1" | grep -q "Python 2"; then
       echo "Detected python 2 version";
-      python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.scm.azurerepos.AzureReposAgent import AzureReposAgent; AzureReposAgent()" &
+      python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.scm.azurerepo.AzureRepoAgent import AzureRepoAgent; AzureRepoAgent()" &
      elif echo "$1" | grep -q "Python 3"; then
       echo "Detected python 3 version";
-      python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.scm.azurerepos.AzureReposAgent3 import AzureReposAgent; AzureReposAgent()" &
+      python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.scm.azurerepo.AzureRepoAgent3 import AzureRepoAgent; AzureRepoAgent()" &
      else
       echo "python version not supported"
 	  exit 1;
@@ -47,58 +47,58 @@ detectPythonVersion()
 case "$1" in
   start)
     if [[ $(ps aux | grep '__PS_KEY__' | awk '{print $2}') ]]; then
-     echo "InSightsAzureReposAgent already running"
+     echo "InSightsAzureRepoAgent already running"
     else
-     echo "Starting InSightsAzureReposAgent"
-     cd $INSIGHTS_AGENT_HOME/PlatformAgents/azurerepos
+     echo "Starting InSightsAzureRepoAgent"
+     cd $INSIGHTS_AGENT_HOME/PlatformAgents/azurerepo
 	 echo $python_version
      detectPythonVersion "$python_version"
     fi
     if [[ $(ps aux | grep '__PS_KEY__' | awk '{print $2}') ]]; then
-     echo "InSightsAzureReposAgent Started Sucessfully"
+     echo "InSightsAzureRepoAgent Started Sucessfully"
     else
-     echo "InSightsAzureReposAgent Failed to Start"
+     echo "InSightsAzureRepoAgent Failed to Start"
     fi
     ;;
   stop)
-    echo "Stopping InSightsAzureReposAgent"
+    echo "Stopping InSightsAzureRepoAgent"
     if [[ $(ps aux | grep '__PS_KEY__' | awk '{print $2}') ]]; then
      sudo kill -9 $(ps aux | grep '__PS_KEY__' | awk '{print $2}')
     else
-     echo "InSightsAzureReposAgent already in stopped state"
+     echo "InSightsAzureRepoAgent already in stopped state"
     fi
     if [[ $(ps aux | grep '[g]it1001.com' | awk '{print $2}') ]]; then
-     echo "InSightsAzureReposAgent Failed to Stop"
+     echo "InSightsAzureRepoAgent Failed to Stop"
     else
-     echo "InSightsAzureReposAgent Stopped"
+     echo "InSightsAzureRepoAgent Stopped"
     fi
     ;;
   restart)
-    echo "Restarting InSightsAzureReposAgent"
+    echo "Restarting InSightsAzureRepoAgent"
     if [[ $(ps aux | grep '__PS_KEY__' | awk '{print $2}') ]]; then
-     echo "InSightsAzureReposAgent stopping"
+     echo "InSightsAzureRepoAgent stopping"
      sudo kill -9 $(ps aux | grep '__PS_KEY__' | awk '{print $2}')
-     echo "InSightsAzureReposAgent stopped"
-     echo "InSightsAzureReposAgent starting"
-     cd $INSIGHTS_AGENT_HOME/PlatformAgents/azurerepos
+     echo "InSightsAzureRepoAgent stopped"
+     echo "InSightsAzureRepoAgent starting"
+     cd $INSIGHTS_AGENT_HOME/PlatformAgents/azurerepo
      echo $python_version
      detectPythonVersion "$python_version"
-     echo "InSightsAzureReposAgent started"
+     echo "InSightsAzureRepoAgent started"
     else
-     echo "InSightsAzureReposAgent already in stopped state"
-     echo "InSightsAzureReposAgent starting"
-     cd $INSIGHTS_AGENT_HOME/PlatformAgents/azurerepos
+     echo "InSightsAzureRepoAgent already in stopped state"
+     echo "InSightsAzureRepoAgent starting"
+     cd $INSIGHTS_AGENT_HOME/PlatformAgents/azurerepo
      echo $python_version
      detectPythonVersion "$python_version"
-     echo "InSightsAzureReposAgent started"
+     echo "InSightsAzureRepoAgent started"
     fi
     ;;
   status)
-    echo "Checking the Status of InSightsAzureReposAgent"
+    echo "Checking the Status of InSightsAzureRepoAgent"
     if [[ $(ps aux | grep '__PS_KEY__' | awk '{print $2}') ]]; then
-     echo "InSightsAzureReposAgent is running"
+     echo "InSightsAzureRepoAgent is running"
     else
-     echo "InSightsAzureReposAgent is stopped"
+     echo "InSightsAzureRepoAgent is stopped"
     fi
     ;;
   *)
