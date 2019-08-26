@@ -347,7 +347,7 @@ public class InsightsInferenceServiceImpl implements InsightsInferenceService {
 		List<InferenceResult> inferenceResults = null;
 		Neo4jDBHandler graphDBHandler = new Neo4jDBHandler();
 		try {
-			String graphQuery = getNeo4jQueryWithDates(inputSchedule, vectorType, 5);
+			String graphQuery = getNeo4jQueryWithDates(inputSchedule, vectorType, 5000);
 			log.debug(" graphQuery  " + graphQuery);
 			GraphResponse graphResp = graphDBHandler.executeCypherQuery(graphQuery);
 			JsonArray errorMessage = graphResp.getJson().getAsJsonArray("errors");
