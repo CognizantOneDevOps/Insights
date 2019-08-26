@@ -1,0 +1,61 @@
+{
+  "mqConfig": {
+    "user": "iSight",
+    "password": "iSight",
+    "host": "127.0.0.1",
+    "exchange": "iSight",
+    "agentControlXchg": "iAgent"
+  },
+  "subscribe": {
+    "config": "SCM.AZUREREPOS.config"
+  },
+  "publish": {
+    "data": "SCM.AZUREREPOS.DATA",
+    "health": "SCM.AZUREREPOS.HEALTH"
+  },
+  "communication": {
+    "type": "REST",
+    "sslVerify": true,
+    "responseType": "JSON"
+  },
+  "dynamicTemplate": {
+    "timeFieldMapping": {
+      "startDate": "%Y-%m-%d"
+    },
+    "responseTemplate": {
+      "commitId": "commitId",
+      "comment": "message",
+      "author": {
+        "name": "authorName",
+        "email": "authorEmail",
+        "date": "commitTime"
+      }
+    }
+  },
+  "agentId": "",
+  "enableBranches": true,
+  "enableDataValidation": true,
+  "enableBrancheDeletion": true,
+  "toolCategory": "SCM",
+  "toolsTimeZone": "GMT",
+  "insightsTimeZone": "UTC",
+  "enableValueArray": false,
+  "useResponseTemplate": true,
+  "auth": "base64",
+  "runSchedule": 30,
+  "timeStampField": "commitTime",
+  "timeStampFormat": "%Y-%m-%dT%H:%M:%SZ",
+  "isEpochTimeFormat": false,
+  "startFrom": "2015-01-01 00:00:00",
+  "userID": "",
+  "passwd": "",
+  "accessToken": "accesstoken",
+  "getRepos": "https://dev.azure.com/<organization>/<project>/_apis/git/repositories",
+  "commitsBaseEndPoint": "https://dev.azure.com/<organization>/<project>/_apis/git/repositories/",
+  "isDebugAllowed": false,
+  "loggingSetting": {
+    "logLevel": "INFO",
+    "maxBytes": 5000000,
+    "backupCount": 1000
+  }
+}
