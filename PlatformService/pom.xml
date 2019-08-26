@@ -10,14 +10,14 @@
 	<parent>
 		<artifactId>PlatformParent</artifactId>
 		<groupId>com.cognizant.devops</groupId>
-		<version>6.0</version>
+		<version>6.1-SNAPSHOT</version>
 	</parent>
 
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>PlatformService</artifactId>
 	<groupId>com.cognizant.devops</groupId>
 	<packaging>war</packaging>
-	<version>6.0</version>
+	<version>6.1-SNAPSHOT</version>
 	<name>PlatformService</name>
 
 	<build>
@@ -79,13 +79,13 @@
 		<dependency>
 			<groupId>com.cognizant.devops</groupId>
 			<artifactId>PlatformCommons</artifactId>
-			<version>6.0</version>
+			<version>6.1-SNAPSHOT</version>
 		</dependency>
 
 		<dependency>
 			<groupId>com.cognizant.devops</groupId>
 			<artifactId>PlatformDAL</artifactId>
-			<version>6.0</version>
+			<version>6.1-SNAPSHOT</version>
 		</dependency>
 
 		<dependency>
@@ -253,7 +253,7 @@
 		<dependency>
 			<groupId>com.cognizant.devops</groupId>
 			<artifactId>PlatformCommons</artifactId>
-			<version>6.0</version>
+			<version>6.1-SNAPSHOT</version>
 			<exclusions>
 				<exclusion>
 					<groupId>org.apache.logging.log4j</groupId>
@@ -271,7 +271,7 @@
 		<dependency>
 			<groupId>com.cognizant.devops</groupId>
 			<artifactId>PlatformAuditing</artifactId>
-			<version>6.0</version>
+			<version>6.1-SNAPSHOT</version>
 		</dependency>
 
 		<dependency>
