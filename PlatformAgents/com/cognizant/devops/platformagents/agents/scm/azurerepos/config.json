@@ -41,7 +41,7 @@
   "insightsTimeZone": "UTC",
   "enableValueArray": false,
   "useResponseTemplate": true,
-  "auth": "base64",
+  "auth": "NTLM",
   "runSchedule": 30,
   "timeStampField": "commitTime",
   "timeStampFormat": "%Y-%m-%dT%H:%M:%SZ",
