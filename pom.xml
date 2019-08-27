@@ -13,20 +13,9 @@
 	<groupId>com.cognizant.devops</groupId>
 	<artifactId>PlatformParent</artifactId>
 	<packaging>pom</packaging>
-	<version>5.3-SNAPSHOT</version>
+	<version>6.1-SNAPSHOT</version>
 	<name>PlatformParent</name>
 
-	<modules>		
-		<module>PlatformCommons</module>
-		<module>PlatformDAL</module>
-		<module>PlatformAuditing</module>
-		<module>PlatformAuditEngine</module>
-		<module>PlatformService</module>
-		<module>PlatformEngine</module>				
-		<module>PlatformUI3</module>
-		<module>PlatformInsights</module>
-	</modules>
-			
 	<dependencies>
 		<dependency>
 			<groupId>junit</groupId>
@@ -56,7 +45,16 @@
 			<version>2.5</version>
 		</dependency>
 	</dependencies>
-
+		<modules>		
+		<module>PlatformCommons</module>
+		<module>PlatformDAL</module>
+		<module>PlatformAuditing</module>
+		<module>PlatformAuditEngine</module>
+		<module>PlatformService</module>
+		<module>PlatformEngine</module>				
+		<module>PlatformUI3</module>
+		<module>PlatformInsights</module>
+	</modules>
 	<build>
 		<plugins>
 			<plugin>
