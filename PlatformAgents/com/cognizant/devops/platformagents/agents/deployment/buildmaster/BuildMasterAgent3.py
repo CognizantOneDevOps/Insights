@@ -14,7 +14,7 @@
 # the License.
 #-------------------------------------------------------------------------------
 
-from __future__ import unicode_literals
+
 from ....core.BaseAgent3 import BaseAgent
 from dateutil import parser
 

@@ -251,7 +251,7 @@ class QtestAgent (BaseAgent):
         try:
             for project in trackingDetails:
                 projectTrackingDetails = trackingDetails.get(project)
-                almEntities = sorted(projectTrackingDetails.keys(), reverse=True)
+                almEntities = sorted(list(projectTrackingDetails.keys()), reverse=True)
                 testCaseIds = list()
                 for almEntity in almEntities:
                     data = list()
