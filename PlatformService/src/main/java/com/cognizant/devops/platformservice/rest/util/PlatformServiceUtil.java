@@ -138,15 +138,11 @@ public class PlatformServiceUtil {
 				//check directory
 				log.debug("canonical path check done--" + path);
 				String parts[] = path.split(Pattern.quote(File.separator));
-				System.out.println("Total paths --"+parts.length);
 				for(int i=0;i<parts.length;i++){
-					System.out.println(parts[i]);
 					if(!parts[i].equals("") && Pattern.compile("^[a-zA-Z0-9_.:\\-]+").matcher(parts[i]).matches()){
 						valid = true;
-						System.out.println("true");
 						continue;
 					}else {
-						System.out.println("false");
 						return false;
 					}
 				}
