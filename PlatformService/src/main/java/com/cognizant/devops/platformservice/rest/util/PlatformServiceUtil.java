@@ -15,21 +15,24 @@
  ******************************************************************************/
 package com.cognizant.devops.platformservice.rest.util;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.servlet.http.Cookie;
 import javax.ws.rs.core.MediaType;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
 import com.cognizant.devops.platformcommons.core.util.ValidationUtils;
-import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.sun.jersey.api.client.Client;
@@ -41,6 +44,7 @@ public class PlatformServiceUtil {
 	private static final String[] SET_VALUES = new String[] { "grafanaOrg", "grafana_user", "grafanaRole",
 			"grafana_remember", "grafana_sess", "XSRF-TOKEN", "JSESSIONID","grafana_session" };
 	private static final Set<String> masterCookiesList = new HashSet<String>(Arrays.asList(SET_VALUES));
+	private final static String FILE_VALIDATOR = "^([a-zA-Z0-9_.\\s-])+(.json)$";
 	private PlatformServiceUtil(){
 		
 	}
@@ -117,5 +121,56 @@ public class PlatformServiceUtil {
 			log.warn("No cookies founds");
 		}
 		return cookiesArray;
+	}
+	
+	/**
+	 * Check path for canonical and directory traversal.
+	 * @param path
+	 * @return
+	 */
+	public static boolean checkValidPath(String path) {
+		boolean valid = false;
+		try {
+			log.debug("path " + path);
+			log.debug("canonical path " + new File(path).getCanonicalPath());
+			//check for canonical path
+			if(path.equals(new File(path).getCanonicalPath())){
+				//check directory
+				log.debug("canonical path check done--" + path);
+				String parts[] = path.split(Pattern.quote(File.separator));
+				System.out.println("Total paths --"+parts.length);
+				for(int i=0;i<parts.length;i++){
+					System.out.println(parts[i]);
+					if(!parts[i].equals("") && Pattern.compile("^[a-zA-Z0-9_.:\\-]+").matcher(parts[i]).matches()){
+						valid = true;
+						System.out.println("true");
+						continue;
+					}else {
+						System.out.println("false");
+						return false;
+					}
+				}
+			}else {
+				log.debug("canonical path check failed--" + path);
+			}
+		} catch (Exception e) {
+			log.error("Not a valid path -- "+e.getStackTrace());
+		}
+		return valid;
+	}
+	
+	public static boolean validateFile(MultipartFile file) {
+		try {
+			final Pattern pattern = Pattern.compile(FILE_VALIDATOR, Pattern.MULTILINE);
+			final Matcher matcher = pattern.matcher(file.getOriginalFilename());
+
+			if(matcher.find()) {
+				log.debug("File name is Valid for regex -- "+FILE_VALIDATOR);
+				return true;
+			} 
+		} catch (Exception e) {
+			log.error("Not a valid path -- "+e.getStackTrace());
+		}
+		return false;
 	}
 }
