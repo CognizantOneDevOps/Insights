@@ -28,5 +28,6 @@ sed -i -e "s/.*serviceHost.*/    \"serviceHost\": \"$myextip\",/g" /opt/apache-t
 sed -i -e "s/.*grafanaHost.*/    \"grafanaHost\": \"$myextip\/grafana\"/g" /opt/apache-tomcat-8.5.27/webapps/app/config/uiConfig.json
 cd /opt/grafana/conf
 wget http://platform.cogdevops.com/insights_install/installationScripts/latest/RHEL/httpd/custom.ini
-apachectl -k start
+systemctl restart httpd.service
 service grafana restart
+service tomcat restart
