@@ -39,7 +39,7 @@ import com.sun.jersey.api.client.WebResource;
 public class PlatformServiceUtil {
 	private static final Logger log = LogManager.getLogger(PlatformServiceUtil.class);
 	private static final String[] SET_VALUES = new String[] { "grafanaOrg", "grafana_user", "grafanaRole",
-			"grafana_remember", "grafana_sess", "XSRF-TOKEN", "JSESSIONID" };
+			"grafana_remember", "grafana_sess", "XSRF-TOKEN", "JSESSIONID","grafana_session" };
 	private static final Set<String> masterCookiesList = new HashSet<String>(Arrays.asList(SET_VALUES));
 	private PlatformServiceUtil(){
 		

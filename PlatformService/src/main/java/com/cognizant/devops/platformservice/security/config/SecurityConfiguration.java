@@ -47,7 +47,7 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 
-@ComponentScan(basePackages = {"com.cognizant.devops.platformservice","com.cognizant.devops.auditservice"})
+@ComponentScan(basePackages = {"com.cognizant.devops.platformservice","com.cognizant.devops.auditservice","com.cognizant.devops.platformservice.test"})
 @Configuration
 @EnableWebSecurity
 @EnableWebMvc
