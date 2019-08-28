@@ -101,8 +101,10 @@ public class AgentHealthSubscriber extends EngineSubscriberResponseHandler{
 					failureLabels = failureLabels.replace("HEALTH", "HEALTH_FAILURE");
 					String healthFailureLabels = ":LATEST_FAILURE:"+ failureLabels ;
 					createHealthNodes(dbHandler, routingKey, failedDataList, agentId, healthFailureLabels,20,"LATEST_FAILURE");					
-				}				
+				}
+				
 				getChannel().basicAck(envelope.getDeliveryTag(), false);
+				
 			} catch (GraphDBException e) {
 				log.error(e);
 			}
