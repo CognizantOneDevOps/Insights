@@ -233,15 +233,21 @@ public class ValidationUtils {
 				// replace &amp; with &
 				jsonString = jsonString.replace("&amp;", "&");
 			}
-			/*if (!jsonString.equalsIgnoreCase(data.toString())) {
-				log.error(" Invilid response data ");
-				json = null;*/
-			//} else {
 				json = new Gson().fromJson(jsonString, JsonObject.class);
-			//}
-			// log.debug(" validateStringForHTMLContent after " + jsonString);
 		}
 		return json;
+	}
+
+	public String validateResponseBody(String inputData) {
+		String outputData = null;
+		try {
+			outputData = ValidationUtils.cleanXSS(inputData);
+		} catch (RuntimeException e) {
+			log.error("validate Response Body has some issue " + e.getMessage());
+			throw new RuntimeException(PlatformServiceConstants.INVALID_REQUEST);
+		}
+		return outputData;
+
 	}
 
 }
