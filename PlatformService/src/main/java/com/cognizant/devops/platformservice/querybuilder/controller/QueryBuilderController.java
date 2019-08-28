@@ -96,8 +96,9 @@ public class QueryBuilderController {
 	public JsonObject uploadFile(@RequestBody MultipartFile file) {
 		String message = "";
 		try {
-			boolean checkValidFile = PlatformServiceUtil.validateFile(file);
-			if(checkValidFile){
+			boolean checkValidFile = PlatformServiceUtil.validateFile(file.getOriginalFilename());
+			boolean isValid = PlatformServiceUtil.checkFileForHTML(new String(file.getBytes()));
+			if(checkValidFile && isValid){
 				Path rootLocation = Paths.get(ConfigOptions.QUERY_DATA_PROCESSING_RESOLVED_PATH);
 				Log.debug("File Obj -- "+file);
 				String fileName = file.getOriginalFilename();
@@ -109,6 +110,8 @@ public class QueryBuilderController {
 					message = "Upload failed, fail has invalid format! ";
 					return PlatformServiceUtil.buildFailureResponse(message);
 				}
+			}else {
+				return PlatformServiceUtil.buildFailureResponse("Invalid file content. ");
 			}
 		} catch (Exception e) {
 			message = "FAIL to upload " + file.getOriginalFilename() + "!";
@@ -127,15 +130,20 @@ public class QueryBuilderController {
 			if(validPath){
 				Log.debug("Path to download -- "+path);
 				byte[] fileContent = Files.readAllBytes(Paths.get(new File(path).getCanonicalPath()));
-				HttpHeaders headers = new HttpHeaders();
-				headers.setContentType(MediaType.parseMediaType("application/json"));
-				headers.add("Access-Control-Allow-Methods", "POST");
-				headers.add("Access-Control-Allow-Headers", "Content-Type");
-				headers.add("Content-Disposition", "attachment; filename="+Paths.get(new File(path).getCanonicalPath()).getFileName());
-				headers.add("Cache-Control", "no-cache, no-store, must-revalidate,post-check=0, pre-check=0");
-				headers.add("Pragma", "no-cache");
-				headers.add("Expires", "0");
-				response = new ResponseEntity<>(fileContent, headers, HttpStatus.OK);
+				boolean isValid = PlatformServiceUtil.checkFileForHTML(new String(fileContent));
+				if(isValid) {
+					HttpHeaders headers = new HttpHeaders();
+					headers.setContentType(MediaType.parseMediaType("application/json"));
+					headers.add("Access-Control-Allow-Methods", "POST");
+					headers.add("Access-Control-Allow-Headers", "Content-Type");
+					headers.add("Content-Disposition", "attachment; filename="+Paths.get(new File(path).getCanonicalPath()).getFileName());
+					headers.add("Cache-Control", "no-cache, no-store, must-revalidate,post-check=0, pre-check=0");
+					headers.add("Pragma", "no-cache");
+					headers.add("Expires", "0");
+					response = new ResponseEntity<>(fileContent, headers, HttpStatus.OK);
+				}else {
+					throw new Exception("Invalid file content -- "+new String(fileContent));
+				}
 			}else{
 				throw new Exception("Invalid path -- "+path);
 			}
