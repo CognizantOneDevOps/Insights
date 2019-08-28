@@ -14,6 +14,8 @@
 				name="com.cognizant.devops.platformservice.test.CorrelationBuilder.CorrelationBuilderTest" />
 			<class
 				name="com.cognizant.devops.platformservice.test.bulkUpload.BulkUploadTest" />
+			<class
+				name="com.cognizant.devops.platformservice.test.grafanaUser.GrafanaUserDetailsTest" />
 		</classes>
 	</test>
 </suite>
