@@ -86,38 +86,36 @@ public class CorrelationBuilderServiceImpl implements CorrelationBuilderService 
 		JsonObject json = (JsonObject) parser.parse(config);
 		if (json.has("data")) {
 			correlationJson = json.get("data").getAsJsonArray();
-		Path dir = Paths.get(configFilePath);
-		Path source = Paths.get(System.getenv().get("INSIGHTS_HOME") + File.separator + ConfigOptions.CONFIG_DIR
-				+ File.separator + ConfigOptions.CORRELATION_TEMPLATE);
-		Path target = Paths.get(System.getenv().get("INSIGHTS_HOME") + File.separator + ConfigOptions.CONFIG_DIR
-				+ File.separator + ConfigOptions.CORRELATION);
-		
-		try {
-			if (source.toFile().exists()) {
-				Files.copy(source, target);
-			} else {
-				Files.createFile(source);
+			Path dir = Paths.get(configFilePath);
+			Path source = Paths.get(System.getenv().get("INSIGHTS_HOME") + File.separator + ConfigOptions.CONFIG_DIR
+					+ File.separator + ConfigOptions.CORRELATION_TEMPLATE);
+			Path target = Paths.get(System.getenv().get("INSIGHTS_HOME") + File.separator + ConfigOptions.CONFIG_DIR
+					+ File.separator + ConfigOptions.CORRELATION);
+
+			try {
+				if (source.toFile().exists()) {
+					Files.copy(source, target);
+				} else {
+					Files.createFile(source);
+				}
+			} catch (IOException e1) {
+				log.error("Fail to Copy or create file. " + e1.getMessage().toString());
 			}
-		} catch (IOException e1) {
-			log.error("Fail to Copy or create file. "+e1.getMessage().toString());
-		}
 
-		try {
+			try {
 
-			Stream<Path> paths = Files.find(dir, Integer.MAX_VALUE, (path, attrs) -> attrs.isRegularFile()
-					&& path.toString().endsWith(ConfigOptions.CORRELATION_TEMPLATE));
-			configFile = paths.limit(1).findFirst().get().toFile();
-		 FileWriter file = new FileWriter(configFile);
-			file.write(correlationJson.toString());
-			file.flush();
-		} catch (Exception e) {
-			log.error(e);
-		}
+				Stream<Path> paths = Files.find(dir, Integer.MAX_VALUE, (path, attrs) -> attrs.isRegularFile()
+						&& path.toString().endsWith(ConfigOptions.CORRELATION_TEMPLATE));
+				configFile = paths.limit(1).findFirst().get().toFile();
+				FileWriter file = new FileWriter(configFile);
+				file.write(correlationJson.toString());
+				file.flush();
+			} catch (Exception e) {
+				log.error("Creation of co-relation failed."+e.getMessage().toString());
+			}
 
-		return PlatformServiceConstants.SUCCESS;
-		}
-		else
-		{
+			return PlatformServiceConstants.SUCCESS;
+		} else {
 			return PlatformServiceConstants.FAILURE;
 		}
 	}
