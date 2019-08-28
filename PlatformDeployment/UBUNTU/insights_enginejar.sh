@@ -1,3 +1,4 @@
+#!/bin/bash
 #-------------------------------------------------------------------------------
 # Copyright 2017 Cognizant Technology Solutions
 #   
@@ -16,14 +17,13 @@
 # get insights engine jar
 # get insights engine jar
 echo "#################### Getting Insights Engine Jar ####################"
-mkdir /opt/insightsengine
-cd /opt/insightsengine
+sudo mkdir /opt/insightsengine
+sudo cd /opt/insightsengine
 export INSIGHTS_ENGINE=`pwd`
-echo INSIGHTS_ENGINE=`pwd` | tee -a /etc/environment
-echo "export" INSIGHTS_ENGINE=`pwd` | tee -a /etc/profile
-sudo -E source /etc/environment
-sudo -E source /etc/profile
-wget https://platform.cogdevops.com/insights_install/installationScripts/latest/RHEL/artifacts/PlatformEngine.jar -O PlatformEngine.jar
+echo INSIGHTS_ENGINE=`pwd` | sudo tee -a /etc/environment
+echo "export" INSIGHTS_ENGINE=`pwd` | sudo tee -a /etc/profile
+source /etc/environment
+source /etc/profile
+sudo wget https://platform.cogdevops.com/insights_install/release/latest/PlatformEngine.jar -O PlatformEngine.jar
 sleep 2
-nohup java -jar PlatformEngine.jar &
-
+sudo nohup java -jar PlatformEngine.jar &
