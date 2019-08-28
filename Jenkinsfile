@@ -44,7 +44,7 @@ gitCommitID = sh (
 	
    // Platform Service Starts
 	try{
-	//Build. Test Build 5.3-SNAPSHOT
+	//Build
   	stage ('Insight_PS_Build') {
         sh 'cd /var/jenkins/jobs/$commitID/workspace/PlatformUI3 && npm install'
 	sh 'cd /var/jenkins/jobs/$commitID/workspace && mvn clean install -DskipTests'

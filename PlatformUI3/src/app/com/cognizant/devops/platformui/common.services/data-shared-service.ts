@@ -69,6 +69,10 @@ export class DataSharedService {
     return this.storage.get("Authorization");
   }
 
+  public removeAuthorization() {
+    this.storage.remove('Authorization');
+  }
+
   public setSessionExpirationTime(timeDashboardSessionExpiration: any) {
     this.storage.set("dashboardSessionExpiration", timeDashboardSessionExpiration);
   }
