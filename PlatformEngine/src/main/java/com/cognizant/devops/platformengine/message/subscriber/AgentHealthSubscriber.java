@@ -94,13 +94,13 @@ public class AgentHealthSubscriber extends EngineSubscriberResponseHandler{
 			}
 			try {
 				String healthLabels = ":LATEST:"+routingKey.replace(".", ":");
-				createHealthNodes(dbHandler, routingKey, dataList, agentId, healthLabels,10);
+				createHealthNodes(dbHandler, routingKey, dataList, agentId, healthLabels,10,"LATEST");
 				
 				if(isFailure) {
 					String failureLabels = routingKey.replace(".", ":");
 					failureLabels = failureLabels.replace("HEALTH", "HEALTH_FAILURE");
-					String healthFailureLabels = ":LATEST:"+ failureLabels ;
-					createHealthNodes(dbHandler, routingKey, failedDataList, agentId, healthFailureLabels,20);					
+					String healthFailureLabels = ":LATEST_FAILURE:"+ failureLabels ;
+					createHealthNodes(dbHandler, routingKey, failedDataList, agentId, healthFailureLabels,20,"LATEST_FAILURE");					
 				}				
 				getChannel().basicAck(envelope.getDeliveryTag(), false);
 			} catch (GraphDBException e) {
@@ -118,7 +118,7 @@ public class AgentHealthSubscriber extends EngineSubscriberResponseHandler{
 	 * @throws GraphDBException
 	 */
 	private void createHealthNodes(Neo4jDBHandler dbHandler, String routingKey, List<JsonObject> dataList,
-			String agentId, String nodeLabels, int nodeCount) throws GraphDBException {
+			String agentId, String nodeLabels, int nodeCount, String latestLabel) throws GraphDBException {
 		String healthQuery;
 		// For Sequential/successive agent health publishing where agentId is not null
 		if(!agentId.equalsIgnoreCase("")) {
@@ -128,7 +128,7 @@ public class AgentHealthSubscriber extends EngineSubscriberResponseHandler{
 			healthQuery = healthQuery + " OPTIONAL MATCH (old) <-[:UPDATED_TO*"+ nodeCount +"]-(purge)  where old.agentId='"+agentId+"'";
 			healthQuery = healthQuery + " CREATE (new"+ nodeLabels +" {props}) ";
 			healthQuery = healthQuery + " MERGE  (new)<-[r:UPDATED_TO]-(old)";
-			healthQuery = healthQuery + " REMOVE old:LATEST";				
+			healthQuery = healthQuery + " REMOVE old:" + latestLabel;				
 			healthQuery = healthQuery + " detach delete purge ";
 			healthQuery = healthQuery + " return old,new";
 
@@ -139,7 +139,7 @@ public class AgentHealthSubscriber extends EngineSubscriberResponseHandler{
 			healthQuery = healthQuery + " OPTIONAL MATCH (old) <-[:UPDATED_TO*"+ nodeCount +"]-(purge) ";
 			healthQuery = healthQuery + " CREATE (new" + nodeLabels + " {props})";
 			healthQuery = healthQuery + " MERGE  (new)<-[r:UPDATED_TO]-(old)";
-			healthQuery = healthQuery + " REMOVE old:LATEST";				
+			healthQuery = healthQuery + " REMOVE old:" + latestLabel;				
 			healthQuery = healthQuery + " detach delete purge ";
 			healthQuery = healthQuery + " return old,new";
 		}			
