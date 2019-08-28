@@ -93,7 +93,7 @@ export class UserOnboardingComponent implements OnInit {
   rows: FormArray;
   itemForm: FormGroup;
   searchOrgForUser: string;
-  regex2 = new RegExp("^[a-zA-Z0-9_]*$");
+  usernameRegex = new RegExp("^[a-zA-Z0-9_]*$");
   regex = new RegExp("(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+.[a-zA-Z0-9-.]+$)")
   additionalProperties = ['name', 'email', 'username', 'password', 'role', 'org'];
   roleRecord = [
@@ -348,7 +348,7 @@ export class UserOnboardingComponent implements OnInit {
     userBMparameter = JSON.stringify(this.userPropertyList);
     //console.log(userBMparameter)
     var checkname = this.regex.test(email);
-    var checkid = this.regex2.test(username);
+    var checkid = this.usernameRegex.test(username);
     if (!checkid) {
       this.isUsernameIncorrect = true;
     }
