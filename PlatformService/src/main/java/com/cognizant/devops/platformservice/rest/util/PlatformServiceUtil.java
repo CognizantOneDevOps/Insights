@@ -29,7 +29,6 @@ import javax.ws.rs.core.MediaType;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.springframework.web.multipart.MultipartFile;
 
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
 import com.cognizant.devops.platformcommons.core.util.ValidationUtils;
@@ -44,7 +43,8 @@ public class PlatformServiceUtil {
 	private static final String[] SET_VALUES = new String[] { "grafanaOrg", "grafana_user", "grafanaRole",
 			"grafana_remember", "grafana_sess", "XSRF-TOKEN", "JSESSIONID","grafana_session" };
 	private static final Set<String> masterCookiesList = new HashSet<String>(Arrays.asList(SET_VALUES));
-	private final static String FILE_VALIDATOR = "^([a-zA-Z0-9_.\\s-])+(.json)$";
+	private final static String JSON_FILE_VALIDATOR = "^([a-zA-Z0-9_.\\s-])+(.json)$";
+	private final static String LOG_FILE_VALIDATOR = "^([a-zA-Z0-9_.\\s-])+(.log)$";
 	private PlatformServiceUtil(){
 		
 	}
@@ -155,18 +155,36 @@ public class PlatformServiceUtil {
 		return valid;
 	}
 	
-	public static boolean validateFile(MultipartFile file) {
+	public static boolean validateFile(String filename) {
+		final Pattern pattern;
 		try {
-			final Pattern pattern = Pattern.compile(FILE_VALIDATOR, Pattern.MULTILINE);
-			final Matcher matcher = pattern.matcher(file.getOriginalFilename());
+			if(filename.contains(".json")) {
+				pattern = Pattern.compile(JSON_FILE_VALIDATOR);
+			}else {
+				pattern = Pattern.compile(LOG_FILE_VALIDATOR);
+			}
+			final Matcher matcher = pattern.matcher(filename);
 
 			if(matcher.find()) {
-				log.debug("File name is Valid for regex -- "+FILE_VALIDATOR);
+				log.debug("File name is Valid for regex -- "+filename);
 				return true;
 			} 
 		} catch (Exception e) {
 			log.error("Not a valid path -- "+e.getStackTrace());
 		}
 		return false;
+	}
+
+	public static boolean checkFileForHTML(String fileContent) {
+		String strRegEx = "<[^>]*>";
+		String replacedContent = "";
+		if (fileContent != null) {
+			replacedContent = fileContent.replaceAll(strRegEx, "").replace("&nbsp;", " ").replace("&amp;", "&");
+		}
+		if (!replacedContent.equalsIgnoreCase(fileContent)) {
+			log.error(" Invalid response data ");
+			return false;
+		}
+		return true;
 	}
 }
