@@ -255,7 +255,7 @@ public class AccessGroupManagement {
 			String password = updateAgentJson.get("password").getAsString();
 			String orgName = updateAgentJson.get("orgName").getAsString();
 			String apiUrlName = ApplicationConfigProvider.getInstance().getGrafana().getGrafanaEndpoint()
-					+ "/api/users/lookup?loginOrEmail=" + name;
+					+ "/api/users/lookup?loginOrEmail=" + userName;
 
 			ClientResponse responsename = callgrafana(apiUrlName, null, "get");
 			JsonObject jsonResponseName = new JsonParser().parse(responsename.getEntity(String.class))
