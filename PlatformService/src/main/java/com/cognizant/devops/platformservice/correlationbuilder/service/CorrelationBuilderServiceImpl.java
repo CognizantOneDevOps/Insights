@@ -86,13 +86,12 @@ public class CorrelationBuilderServiceImpl implements CorrelationBuilderService 
 		JsonObject json = (JsonObject) parser.parse(config);
 		if (json.has("data")) {
 			correlationJson = json.get("data").getAsJsonArray();
-		}
-
 		Path dir = Paths.get(configFilePath);
 		Path source = Paths.get(System.getenv().get("INSIGHTS_HOME") + File.separator + ConfigOptions.CONFIG_DIR
 				+ File.separator + ConfigOptions.CORRELATION_TEMPLATE);
 		Path target = Paths.get(System.getenv().get("INSIGHTS_HOME") + File.separator + ConfigOptions.CONFIG_DIR
 				+ File.separator + ConfigOptions.CORRELATION);
+		
 		try {
 			if (source.toFile().exists()) {
 				Files.copy(source, target);
@@ -108,19 +107,19 @@ public class CorrelationBuilderServiceImpl implements CorrelationBuilderService 
 			Stream<Path> paths = Files.find(dir, Integer.MAX_VALUE, (path, attrs) -> attrs.isRegularFile()
 					&& path.toString().endsWith(ConfigOptions.CORRELATION_TEMPLATE));
 			configFile = paths.limit(1).findFirst().get().toFile();
-		} catch (IOException ioe) {
-			throw new InsightsCustomException("relation creation is not possible."+ ioe.getMessage());
-		}
-
-		try (FileWriter file = new FileWriter(configFile)) {
+		 FileWriter file = new FileWriter(configFile);
 			file.write(correlationJson.toString());
 			file.flush();
-		} catch (IOException e) {
+		} catch (Exception e) {
 			log.error(e);
 		}
 
 		return PlatformServiceConstants.SUCCESS;
-
+		}
+		else
+		{
+			return PlatformServiceConstants.FAILURE;
+		}
 	}
 
 }
