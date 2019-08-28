@@ -375,27 +375,14 @@ export class UserOnboardingComponent implements OnInit {
             if (data.status == "failure") {
               this.messageDialog.showApplicationsMessage("Adding user failed.", "ERROR");
             }
-            if (userResponse == "User created") {
+            if (userResponse == "User created" || "Organization user updated" || "User added to organization") {
               this.messageDialog.showApplicationsMessage("User has been added.", "SUCCESS");
             }
-            else if (userResponse == "Organization user updated") {
-              this.messageDialog.showApplicationsMessage("User has been added.", "SUCCESS");
-            }
-            else if (userResponse == "User added to organization") {
-              this.messageDialog.showApplicationsMessage("User has been added.", "SUCCESS");
-            }
-            else if (userResponse == "Email already exists") {
+
+            else if (userResponse == "Email already exists" || "Username already exists" || "User exists in currrent org with same role" || "Password is missing or too short") {
               this.messageDialog.showApplicationsMessage(userResponse, "ERROR");
             }
-            else if (userResponse == "Username already exists") {
-              this.messageDialog.showApplicationsMessage(userResponse, "ERROR");
-            }
-            else if (userResponse == "User exists in currrent org with same role") {
-              this.messageDialog.showApplicationsMessage(userResponse, "ERROR");
-            }
-            else if (userResponse == "Password is missing or too short") {
-              this.messageDialog.showApplicationsMessage(userResponse, "ERROR");
-            }
+
             else if (userResponse == "failed to create user") {
               this.messageDialog.showApplicationsMessage("Failed to create User.Please try again", "ERROR");
             }
