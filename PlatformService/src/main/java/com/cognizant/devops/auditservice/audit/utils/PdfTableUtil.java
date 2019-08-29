@@ -24,6 +24,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
 import java.text.DateFormat;
+import java.text.Normalizer;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -61,6 +62,9 @@ import be.quodlibet.boxable.utils.FontUtils;
 import be.quodlibet.boxable.utils.ImageUtils;
 import be.quodlibet.boxable.utils.PDStreamUtils;
 import com.cognizant.devops.platformcommons.constants.ConfigOptions;
+import org.owasp.esapi.ESAPI;
+import org.owasp.esapi.errors.IntrusionException;
+import org.owasp.esapi.errors.ValidationException;
 /**
  * Pdf Table creation with Boxable API.
  * Function consists to write , protect and digitally sign the Doc.
@@ -193,22 +197,30 @@ public class PdfTableUtil {
 	private List<String[]> formatAsset(List<Map> assetList) {
 		List<String[]> assetResults = new ArrayList<String[]>();
 		//for(Map asset:assetList){
-		for(int i=0;i<assetList.size();i++){
-			String[] assetArray = new String[10];
-			//assetArray[0] = String.valueOf(i+1);
-			assetArray[0] = checkEmpty(String.valueOf(assetList.get(i).get("assetID")));
-			assetArray[1] = checkEmpty(String.valueOf(assetList.get(i).get("toolName")));
-			assetArray[2] = checkEmpty(String.valueOf(assetList.get(i).get("author")));
-			assetArray[3] = checkEmpty(String.valueOf(assetList.get(i).get("phase")));
-			assetArray[4] = checkEmpty(String.valueOf(assetList.get(i).get("toolstatus")));
-			assetArray[5] = checkEmpty(String.valueOf(assetList.get(i).get("timestamp")));
-			assetArray[6] = checkEmpty(String.valueOf(assetList.get(i).get("environment")));
-			assetArray[7] = checkEmpty(String.valueOf(assetList.get(i).get("author")));
-			assetArray[8] = checkEmpty(String.valueOf(assetList.get(i).get("lastUpdatedTime")));
-			assetArray[9] = checkEmpty(String.valueOf(assetList.get(i).get("evidence")));
-			assetResults.add(assetArray);
+		CharSequence cs = String.valueOf(assetList.size());
+		int rp1 =  Integer.parseInt(Normalizer.normalize(cs, Normalizer.Form.NFKC));
+		int rp;
+		try {
+			rp = ESAPI.validator().getValidInteger("RequestParameter", Integer.toString(assetList.size()), 0,rp1,true);
+			log.info("Normalized Asset size --"+rp);
+			for(int i=0;i<rp;i++){
+				String[] assetArray = new String[10];
+				//assetArray[0] = String.valueOf(i+1);
+				assetArray[0] = checkEmpty(String.valueOf(assetList.get(i).get("assetID")));
+				assetArray[1] = checkEmpty(String.valueOf(assetList.get(i).get("toolName")));
+				assetArray[2] = checkEmpty(String.valueOf(assetList.get(i).get("author")));
+				assetArray[3] = checkEmpty(String.valueOf(assetList.get(i).get("phase")));
+				assetArray[4] = checkEmpty(String.valueOf(assetList.get(i).get("toolstatus")));
+				assetArray[5] = checkEmpty(String.valueOf(assetList.get(i).get("timestamp")));
+				assetArray[6] = checkEmpty(String.valueOf(assetList.get(i).get("environment")));
+				assetArray[7] = checkEmpty(String.valueOf(assetList.get(i).get("author")));
+				assetArray[8] = checkEmpty(String.valueOf(assetList.get(i).get("lastUpdatedTime")));
+				assetArray[9] = checkEmpty(String.valueOf(assetList.get(i).get("evidence")));
+				assetResults.add(assetArray);
+			}
+		} catch (IntrusionException | ValidationException e1) {
+			e1.printStackTrace();
 		}
-
 		Collections.sort(assetResults, new Comparator<String[]>() {
 			@Override
 			public int compare(String[] item1, String[] item2) {
