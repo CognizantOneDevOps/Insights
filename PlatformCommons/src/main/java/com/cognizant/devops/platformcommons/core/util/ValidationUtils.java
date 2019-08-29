@@ -91,7 +91,7 @@ public class ValidationUtils {
 	 *            data
 	 * @return JsonObject
 	 */
-	public static JsonObject validateStringForHTMLContent(JsonObject data) {
+	public static JsonObject validateJSONForHTMLContent(JsonObject data) {
 		String strRegEx = "<[^>]*>";
 		String jsonString = "";
 		JsonObject json = null;
@@ -117,6 +117,34 @@ public class ValidationUtils {
 			// log.debug(" validateStringForHTMLContent after " + jsonString);
 		}
 		return json;
+	}
+
+	public static Boolean validateStringForHTMLContent(String data) {
+		String strRegEx = "<[^>]*>";
+		String modifiedString = "";
+		Boolean hasHTML = Boolean.FALSE;
+	
+		// log.debug(" validateStringForHTMLContent string before " + data);
+	
+		if (data instanceof String) {
+			modifiedString = data;
+			// log.debug(" validateStringForHTMLContent after assigment " + jsonString);
+			if (modifiedString != null) {
+				modifiedString = modifiedString.replaceAll(strRegEx, "");
+				// replace &nbsp; with space
+				modifiedString = modifiedString.replace("&nbsp;", " ");
+				// replace &amp; with &
+				modifiedString = modifiedString.replace("&amp;", "&");
+			}
+			if (!modifiedString.equalsIgnoreCase(data.toString())) {
+				log.error(" Invilid response data ");
+				log.error("Invalid html pattern found in data value validateStringForHTMLContent ==== ");
+				hasHTML = Boolean.TRUE;
+				//throw new RuntimeException(PlatformServiceConstants.INVALID_REQUEST);
+			}
+			// log.debug(" validateStringForHTMLContent after " + jsonString);
+		}
+		return hasHTML;
 	}
 
 	/**
@@ -162,6 +190,38 @@ public class ValidationUtils {
 				}
 				if (isXSSPattern) {
 					log.error("Invalid pattern found in data value ==== " + valueWithXSSPattern);
+					throw new RuntimeException(PlatformServiceConstants.INVALID_REQUEST);
+				}
+			} catch (RuntimeException e) {
+				log.error("Invalid pattern found in data value ==== " + valueWithXSSPattern);
+				throw new RuntimeException(PlatformServiceConstants.INVALID_REQUEST);
+			}
+		}
+		return value;
+	}
+
+	public static String cleanXSSWithHTMLCheck(String value) {
+		Boolean isXSSPattern = Boolean.FALSE;
+		String valueWithXSSPattern = "";
+		// log.debug("In cleanXSS RequestWrapper ..............." + value);
+		if (value != null || !("").equals(value)) {
+			try {
+				Boolean hasHTML = validateStringForHTMLContent(value);
+				if (hasHTML) {
+					isXSSPattern = true;
+				} else {
+					// match sections that match a pattern
+					for (Pattern scriptPattern : patterns) {
+						Matcher m = scriptPattern.matcher(value);
+						if (m.find()) {
+							isXSSPattern = true;
+							valueWithXSSPattern = value;
+							break;
+						}
+					}
+				}
+				if (isXSSPattern) {
+					//log.error("Invalid pattern found in data value ==== " + valueWithXSSPattern);
 					throw new RuntimeException(PlatformServiceConstants.INVALID_REQUEST);
 				}
 			} catch (RuntimeException e) {
@@ -238,13 +298,14 @@ public class ValidationUtils {
 		return json;
 	}
 
-	public String validateResponseBody(String inputData) {
+	public static String validateResponseBody(String inputData) {
+		log.debug(" In validateResponseBody ==== ");
 		String outputData = null;
 		try {
-			outputData = ValidationUtils.cleanXSS(inputData);
+			outputData = ValidationUtils.cleanXSSWithHTMLCheck(inputData);
 		} catch (RuntimeException e) {
-			log.error("validate Response Body has some issue " + e.getMessage());
-			throw new RuntimeException(PlatformServiceConstants.INVALID_REQUEST);
+			log.error("validate Response Body has some issue === " + e.getMessage());
+			throw new RuntimeException(PlatformServiceConstants.INVALID_REQUEST_BODY);
 		}
 		return outputData;
 

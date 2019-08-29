@@ -21,12 +21,14 @@ import { DataSharedService } from '@insights/common/data-shared-service';
 export class AuthService {
     constructor(private dataShare: DataSharedService) { }
     public isAuthenticated(): boolean {
-        var isSessionActive = false;
+        var isAuthenticated = undefined;
         const token = this.dataShare.getAuthorizationToken();
-        console.log(" token " + token);
-        if (token !== null || token != undefined) {
-            isSessionActive = true;
+        //console.log(" token " + token);
+        if (token == null || token == undefined) {
+            isAuthenticated = false;
+        } else if (token != null && token != undefined) {
+            isAuthenticated = true
         }
-        return isSessionActive;
+        return isAuthenticated;
     }
 }

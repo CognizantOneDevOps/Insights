@@ -25,9 +25,11 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Service;
 
 import com.cognizant.devops.platformcommons.constants.ErrorMessage;
+import com.cognizant.devops.platformcommons.core.util.ValidationUtils;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBException;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphResponse;
 import com.cognizant.devops.platformcommons.dal.neo4j.Neo4jDBHandler;
+import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformservice.businessmapping.constants.BusinessMappingConstants;
 import com.cognizant.devops.platformservice.businessmapping.model.Node;
 import com.cognizant.devops.platformservice.rest.datatagging.constants.DatataggingConstants;
@@ -199,16 +201,15 @@ public class BusinessMappingServiceImpl implements BusinessMappingService {
 	public JsonObject saveToolsMappingLabel(String agentMappingJson) {
 		List<JsonObject> nodeProperties = new ArrayList<>();
 		try {
+			String validatedResponse = ValidationUtils.validateResponseBody(agentMappingJson);
 			Neo4jDBHandler dbHandler = new Neo4jDBHandler();
 			dbHandler.executeCypherQuery("CREATE CONSTRAINT ON (n:METADATA) ASSERT n.metadata_id  IS UNIQUE");
 			String query = "UNWIND {props} AS properties " + "CREATE (n:METADATA:BUSINESSMAPPING) "
 					+ "SET n = properties"; // DATATAGGING
 			JsonParser parser = new JsonParser();
-			JsonObject json = (JsonObject) parser.parse(agentMappingJson);
+			JsonObject json = (JsonObject) parser.parse(validatedResponse);
 			log.debug("arg0  " + json);
 			nodeProperties.add(json);
-			// String properties = json.get("properties").getAsString();//msg String
-			// log.debug("arg0 "+properties);
 			JsonObject graphResponse = dbHandler.bulkCreateNodes(nodeProperties, null, query);
 			if (graphResponse.get(DatataggingConstants.RESPONSE).getAsJsonObject().get(DatataggingConstants.ERRORS)
 					.getAsJsonArray().size() > 0) {
@@ -216,11 +217,9 @@ public class BusinessMappingServiceImpl implements BusinessMappingService {
 				// return "success";
 			}
 		} catch (GraphDBException e) {
-			// TODO Auto-generated catch block
 			log.error(e);
 			return PlatformServiceUtil.buildFailureResponse(e.getMessage());
 		}
-		// TODO Auto-generated method stub
 		return PlatformServiceUtil.buildSuccessResponse();
 	}
 
@@ -249,9 +248,10 @@ public class BusinessMappingServiceImpl implements BusinessMappingService {
 	public JsonObject editToolsMappingLabel(String agentMappingJson) {
 		List<JsonObject> nodeProperties = new ArrayList<>();
 		try {
+			String validatedResponse = ValidationUtils.validateResponseBody(agentMappingJson);
 			Neo4jDBHandler dbHandler = new Neo4jDBHandler();
 			JsonParser parser = new JsonParser();
-			JsonObject json = (JsonObject) parser.parse(agentMappingJson);
+			JsonObject json = (JsonObject) parser.parse(validatedResponse);
 			String uuid = json.get("uuid").getAsString();
 			log.debug("arg0 uuid  " + uuid);
 			JsonArray asJsonArray = getCurrentRecords(uuid, dbHandler);
@@ -263,11 +263,9 @@ public class BusinessMappingServiceImpl implements BusinessMappingService {
 			GraphResponse updateGraphResponse = dbHandler.executeCypherQuery(updateCypherQuery);
 			log.debug(updateGraphResponse);
 		} catch (Exception e) {
-			// TODO Auto-generated catch block GraphDB
 			log.error(e);
 			return PlatformServiceUtil.buildFailureResponse(e.getMessage());
 		}
-		// TODO Auto-generated method stub
 		return PlatformServiceUtil.buildSuccessResponse();
 	}
 
@@ -278,7 +276,6 @@ public class BusinessMappingServiceImpl implements BusinessMappingService {
 				.getAsJsonArray();
 		JsonArray asJsonArray = rows.getAsJsonArray();
 		return asJsonArray;
-		/* buildExistingBuToolCombinationList(combo, asJsonArray);DATATAGGING */
 	}
 
 	@Override
@@ -293,7 +290,6 @@ public class BusinessMappingServiceImpl implements BusinessMappingService {
 		} catch (Exception e) {
 			return PlatformServiceUtil.buildFailureResponse(e.getMessage());
 		}
-		// TODO Auto-generated method stub
 		return PlatformServiceUtil.buildSuccessResponseWithData(graphresponce);
 	}
 

@@ -69,8 +69,8 @@ public class InsightsCorrelationBuilder {
 	@RequestMapping(value = "/saveConfig", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 	public @ResponseBody JsonObject saveConfig(@RequestBody String configDetails) {
 		String message = null;
-		String configDeatilsValidate = ValidationUtils.cleanXSS(configDetails);
 		try {
+			String configDeatilsValidate = ValidationUtils.validateResponseBody(configDetails);
 			message = correlationBuilderService.saveConfig(configDeatilsValidate);
 		} catch (InsightsCustomException e) {
 			return PlatformServiceUtil.buildFailureResponse(e.toString());
