@@ -65,13 +65,13 @@ public class Application {
             scheduler = new StdSchedulerFactory().getScheduler();
             scheduler.start();
             scheduler.scheduleJob(aggrgatorJob, aggregatorTrigger);
-            WebhookEngineStatusLogger.getInstance().createEngineStatusNode("Platform Engine Service Started ",PlatformServiceConstants.SUCCESS);
+            WebhookEngineStatusLogger.getInstance().createEngineStatusNode("Platform Webhook Engine Service Started ",PlatformServiceConstants.SUCCESS);
 
         } catch (SchedulerException e) {
-            WebhookEngineStatusLogger.getInstance().createEngineStatusNode("Platform Engine Service not running due to Scheduler Exception "+e.getMessage(),PlatformServiceConstants.FAILURE);
+            WebhookEngineStatusLogger.getInstance().createEngineStatusNode("Platform Webhook Engine Service not running due to Scheduler Exception "+e.getMessage(),PlatformServiceConstants.FAILURE);
             log.error(e);
         } catch (Exception e) {
-            WebhookEngineStatusLogger.getInstance().createEngineStatusNode("Platform Engine Service not running "+e.getMessage(),PlatformServiceConstants.FAILURE);
+            WebhookEngineStatusLogger.getInstance().createEngineStatusNode("Platform Webhook Engine Service not running "+e.getMessage(),PlatformServiceConstants.FAILURE);
             log.error(e);
         }
     }
