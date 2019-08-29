@@ -139,7 +139,11 @@ public class PlatformServiceUtil {
 				log.debug("canonical path check done--" + path);
 				String parts[] = path.split(Pattern.quote(File.separator));
 				for(int i=0;i<parts.length;i++){
-					if(!parts[i].equals("") && Pattern.compile("^[a-zA-Z0-9_.:\\-]+").matcher(parts[i]).matches()){
+					if(i==0 && parts[0].equals("")) {
+						valid = true;
+						continue;
+					}
+					else if(!parts[i].equals("") && Pattern.compile("^[a-zA-Z0-9_.:\\-]+").matcher(parts[i]).matches()){
 						valid = true;
 						continue;
 					}else {
