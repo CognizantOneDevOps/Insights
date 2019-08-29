@@ -34,6 +34,8 @@ import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.Calendar;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -78,6 +80,7 @@ public class PdfSignUtil extends PdfCreateSignatureBase
 	private File imageFile;
 	private static final String PDF_PATH = System.getenv().get("INSIGHTS_HOME") + File.separator + ConfigOptions.CONFIG_DIR + File.separator + "Pdf" + File.separator;
 	private static final String TARGET_PDF = "target/Traceability_report.pdf";
+	private final String PDF_NAME_VALIDATOR = "^([a-zA-Z0-9_.\\s-])+(.pdf)$";
 	
 	public PdfSignUtil(KeyStore keystore, char[] pin)
 			throws KeyStoreException, UnrecoverableKeyException, NoSuchAlgorithmException, IOException, CertificateException
@@ -391,26 +394,48 @@ public class PdfSignUtil extends PdfCreateSignatureBase
 			KeyStore keystore = KeyStore.getInstance("PKCS12");
 			char[] pin = PIN_PROTECT.toCharArray();
 			keystore.load(new FileInputStream(ksFile), pin);
-			File documentFile = new File(pdfName==null ? TARGET_PDF : pdfName);
-			log.info("documentFile name sign--"+documentFile.getName());
-			log.info("documentFile path sign--"+documentFile.getAbsolutePath());
-			PdfSignUtil signing = new PdfSignUtil(keystore, pin.clone());
-			signing.setImageFile(new File(PDF_PATH+DIGI_IMG).getAbsoluteFile());
-			File signedDocumentFile;
-			//String name = documentFile.getName();
-			String name = pdfName;
-			String substring = name.substring(0, name.lastIndexOf('.'));
-			signedDocumentFile = new File(documentFile.getParent(), substring + "_signed.pdf");
-			log.info("signedDocumentFile sign--"+signedDocumentFile.getName());
-			signing.setExternalSigning(externalSig);
+			boolean valid = checkValidFile(pdfName);
+			if(valid){
+				File documentFile = new File(pdfName==null ? TARGET_PDF : pdfName);
+				log.info("documentFile name sign--"+documentFile.getName());
+				log.info("documentFile path sign--"+documentFile.getAbsolutePath());
+				PdfSignUtil signing = new PdfSignUtil(keystore, pin.clone());
+				signing.setImageFile(new File(PDF_PATH+DIGI_IMG).getAbsoluteFile());
+				File signedDocumentFile;
+				//String name = documentFile.getName();
+				String name = pdfName;
+				String substring = name.substring(0, name.lastIndexOf('.'));
+				signedDocumentFile = new File(documentFile.getParent(), substring + "_signed.pdf");
+				log.info("signedDocumentFile sign--"+signedDocumentFile.getName());
+				signing.setExternalSigning(externalSig);
 
-			Rectangle2D humanRect = new Rectangle2D.Float(100, 200, 150, 50);
-			log.info("--Signining PDF---");
-			signdoc = signing.signPDF(doc, signedDocumentFile, humanRect, tsaUrl, "Signature1");
+				Rectangle2D humanRect = new Rectangle2D.Float(100, 200, 150, 50);
+				log.info("--Signining PDF---");
+				signdoc = signing.signPDF(doc, signedDocumentFile, humanRect, tsaUrl, "Signature1");
+			}else{
+				log.info("PDF name is not valid for Regex -- "+PDF_NAME_VALIDATOR);
+			}
 		}catch(Exception e){
 			e.printStackTrace();
 		}
 		return signdoc;
+	}
+	
+	/**
+	 * Checks for pdf name
+	 * @param pdfName
+	 * @return validname
+	 */
+	private boolean checkValidFile(String pdfName) {
+		final Pattern pattern = Pattern.compile(PDF_NAME_VALIDATOR, Pattern.MULTILINE);
+		final Matcher matcher = pattern.matcher(pdfName);
+
+		if(matcher.find()) {
+		    log.debug("File name is Valid for regex -- "+PDF_NAME_VALIDATOR);
+		    return true;
+		} 
+		
+		return false;
 	}
 	
 	public File getImageFile()

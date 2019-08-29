@@ -15,39 +15,27 @@
  ******************************************************************************/
 package com.cognizant.devops.auditservice.audit.utils;
 
-import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
-import com.google.gson.*;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.Map;
+import java.util.TimeZone;
+
+import javax.ws.rs.core.MediaType;
+
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import com.google.gson.JsonPrimitive;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
 
-import javax.ws.rs.core.MediaType;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.*;
-
 
 public class AuditServiceUtil {
-
-    public static JsonObject buildFailureResponse(String message) {
-        JsonObject jsonResponse = new JsonObject();
-        jsonResponse.addProperty(PlatformServiceConstants.STATUS, PlatformServiceConstants.FAILURE);
-        jsonResponse.addProperty(PlatformServiceConstants.MESSAGE, message);
-        return jsonResponse;
-    }
-
-    public static JsonObject buildSuccessResponseWithData(JsonElement data) {
-        JsonObject jsonResponse = new JsonObject();
-        jsonResponse.addProperty(PlatformServiceConstants.STATUS, PlatformServiceConstants.SUCCESS);
-        jsonResponse.add(PlatformServiceConstants.DATA, new Gson().toJsonTree(data));
-        return jsonResponse;
-    }
-
-    public static JsonObject buildSuccessResponse() {
-        JsonObject jsonResponse = new JsonObject();
-        jsonResponse.addProperty(PlatformServiceConstants.STATUS, PlatformServiceConstants.SUCCESS);
-        return jsonResponse;
-    }
 
     public static ClientResponse publishConfigChanges(String host, int port, JsonObject requestJson) {
         WebResource resource = Client.create()
