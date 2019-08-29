@@ -19,6 +19,7 @@ import { MatIconRegistry } from '@angular/material/icon';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatTreeModule } from '@angular/material/tree';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { ClipboardModule } from 'ngx-clipboard';
 import {
     MatButtonModule,
     MatMenuModule,
@@ -37,7 +38,8 @@ import {
     MatRadioModule,
     MatPaginatorModule,
     MatSortModule,
-    MatProgressBarModule
+    MatProgressBarModule,
+
 
 } from '@angular/material';
 
@@ -65,6 +67,7 @@ import {
         MatSortModule,
         MatTooltipModule,
         MatProgressBarModule,
+        ClipboardModule
 
 
     ],
