@@ -372,14 +372,12 @@ export class UserOnboardingComponent implements OnInit {
         .subscribe(data => {
           if (data.status == "success") {
             var userResponse = JSON.parse(data.data).message;
-            if (data.status == "failure") {
-              this.messageDialog.showApplicationsMessage("Adding user failed.", "ERROR");
-            }
-            if (userResponse == "User created" || "Organization user updated" || "User added to organization") {
+
+            if (userResponse == "User created" || userResponse == "Organization user updated" || userResponse == "User added to organization") {
               this.messageDialog.showApplicationsMessage("User has been added.", "SUCCESS");
             }
 
-            else if (userResponse == "Email already exists" || "Username already exists" || "User exists in currrent org with same role" || "Password is missing or too short") {
+            else if (userResponse == "Email already exists" || userResponse == "Username already exists" || userResponse == "User exists in currrent org with same role" || userResponse == "Password is missing or too short") {
               this.messageDialog.showApplicationsMessage(userResponse, "ERROR");
             }
 
