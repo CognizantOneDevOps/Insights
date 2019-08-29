@@ -28,6 +28,7 @@ export class InsightsInitService {
     location: Location;
     static serviceHost: String;
     static grafanaHost: String;
+    static webhookHost: String;
     static agentsOsList = {};
     static configDesc = {};
     static showAuditReporting = false;
@@ -67,6 +68,12 @@ export class InsightsInitService {
             InsightsInitService.grafanaHost = UIConfigResponse.grafanaHost;
         }
 
+        if (UIConfigResponse.webhookHost == undefined && InsightsInitService.webhookHost == undefined) {
+            InsightsInitService.webhookHost = window.location.protocol;
+        } else {
+            InsightsInitService.webhookHost = UIConfigResponse.webhookHost;
+        }
+
         InsightsInitService.agentsOsList = UIConfigResponse.agentsOsList;
         InsightsInitService.showAuditReporting = UIConfigResponse.showAuditReporting;
     }
@@ -86,6 +93,11 @@ export class InsightsInitService {
 
     public getGrafanaHost(): String {
         return InsightsInitService.grafanaHost;
+    };
+
+    public getWebhookHost(): String {
+        console.log(InsightsInitService.webhookHost);
+        return InsightsInitService.webhookHost;
     };
 
     public getAgentsOsList(): any {
