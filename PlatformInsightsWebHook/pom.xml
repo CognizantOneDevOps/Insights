@@ -5,7 +5,6 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>PlatformInsightsWebHook</groupId>
 	<artifactId>PlatformInsightsWebHook</artifactId>
-	<version>5.3-SNAPSHOT</version>
 	<packaging>jar</packaging>
 	<name>PlatformInsightsWebHook</name>
 	<description>PlatformInsightsWebHook for webhook testing</description>
@@ -13,7 +12,7 @@
 	<parent>
 		<artifactId>PlatformParent</artifactId>
 		<groupId>com.cognizant.devops</groupId>
-		<version>5.3-SNAPSHOT</version>
+		<version>6.1-SNAPSHOT</version>
 	</parent>
 	<properties>
 		<!-- <java.version>9</java.version> -->
@@ -67,7 +66,7 @@
 		<dependency>
 			<groupId>com.cognizant.devops</groupId>
 			<artifactId>PlatformCommons</artifactId>
-			<version>5.3-SNAPSHOT</version>
+			<version>6.1-SNAPSHOT</version>
 			<exclusions>
 				<exclusion>
 					<groupId>org.apache.logging.log4j</groupId>
@@ -84,7 +83,7 @@
 		<dependency>
 			<groupId>com.cognizant.devops</groupId>
 			<artifactId>PlatformDAL</artifactId>
-			<version>5.3-SNAPSHOT</version>
+			<version>6.1-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>log4j</groupId>
@@ -137,4 +136,5 @@
 			</plugin>
 		</plugins>
 	</build>
+	<version>6.1-SNAPSHOT</version>
 </project>
