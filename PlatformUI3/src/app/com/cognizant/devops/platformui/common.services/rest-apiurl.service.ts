@@ -110,7 +110,7 @@ export class RestAPIurlService implements IRestAPIUrlService {
         this.addEndPoint("UPLOAD_FILE", '/PlatformService/admin/bulkupload/uploadToolData');
         this.addEndPoint("TOOLNAME_LABELNAME_JSON", '/PlatformService/admin/bulkupload/getToolJson');
 
-        this.addEndPoint("SAVE_DATA_WEBHOOK_CONFIG", '/PlatformService/admin/webhook/webhookConfiguration');
+        this.addEndPoint("SAVE_DATA_WEBHOOK_CONFIG", '/PlatformService/admin/webhook/saveWebhook');
         this.addEndPoint("LIST_WEBHOOK", '/PlatformService/admin/webhook/loadwebhookConfiguration');
         this.addEndPoint("DELETE_WEBHOOK", '/PlatformService/admin/webhook/uninstallWebHook');
         this.addEndPoint("UPDATE_WEBHOOK", '/PlatformService/admin/webhook/updateWebhook');
