@@ -42,8 +42,8 @@ public class WebHookController {
 	@Autowired
 	WebHookService webhookConfigurationService;
 
-	@RequestMapping(value = "/webhookConfiguration", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public @ResponseBody JsonObject saveSettingsConfiguration(@RequestBody String registerWebhookJson) {
+	@RequestMapping(value = "/saveWebhook", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+	public @ResponseBody JsonObject saveWebhook(@RequestBody String registerWebhookJson) {
 		try {
 			JsonParser parser = new JsonParser();
 			JsonObject registerWebhookjson = (JsonObject) parser.parse(registerWebhookJson);
@@ -66,7 +66,7 @@ public class WebHookController {
 	}
 
 	@RequestMapping(value = "/loadwebhookConfiguration", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public @ResponseBody JsonObject getRegisteredAgents() {
+	public @ResponseBody JsonObject getRegisteredWebHooks() {
 		List<WebHookConfigTO> webhookList;
 		try {
 			webhookList = webhookConfigurationService.getRegisteredWebHooks();

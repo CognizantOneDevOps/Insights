@@ -43,7 +43,7 @@ public class WebhookEngineStatusLogger extends ComponentHealthLogger {
 	try {
 			String version = "";
 			version = WebhookEngineStatusLogger.class.getPackage().getImplementationVersion();
-			log.debug(" Engine version " + version);
+			log.debug("Platform Webhook Engine version " + version);
 			Map<String, String> extraParameter = new HashMap<String, String>(0);
 			createComponentStatusNode("HEALTH:WEBHOOKENGINE", version, message, status, extraParameter);
 		} catch (Exception e) {
