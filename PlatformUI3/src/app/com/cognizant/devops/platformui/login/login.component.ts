@@ -65,6 +65,7 @@ export class LoginComponent implements OnInit, ILoginComponent {
   ngOnInit() {
     this.createAndValidateForm();
     this.dataShare.storeTimeZone();
+    this.dataShare.removeAuthorization();
   }
 
   public createAndValidateForm() {

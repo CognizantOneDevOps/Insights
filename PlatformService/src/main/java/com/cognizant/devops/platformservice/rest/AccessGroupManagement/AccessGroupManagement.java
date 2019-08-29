@@ -116,8 +116,9 @@ public class AccessGroupManagement {
 	}
 
 	@RequestMapping(value = "/searchUser", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public @ResponseBody JsonObject searchUser(@RequestBody String name) {
+	public @ResponseBody JsonObject searchUser(@RequestBody String reqname) {
 		try {
+			String name = ValidationUtils.validateResponseBody(reqname);
 			String apiUrlName = ApplicationConfigProvider.getInstance().getGrafana().getGrafanaEndpoint()
 					+ "/api/users/lookup?loginOrEmail=" + name;
 			String message = null;
@@ -143,14 +144,12 @@ public class AccessGroupManagement {
 	}
 
 	@RequestMapping(value = "/assignUser", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public @ResponseBody JsonObject assignUser(@RequestBody String assignUserdata) {
-		// log.debug(assignUserdata);
+	public @ResponseBody JsonObject assignUser(@RequestBody String reqassignUserdata) {
 		String message = " ";
-		JsonParser parser = new JsonParser();
-		JsonElement updateAgentJson = parser.parse(assignUserdata);
-
 		try {
-
+			String assignUserdata = ValidationUtils.validateResponseBody(reqassignUserdata);
+			JsonParser parser = new JsonParser();
+			JsonElement updateAgentJson = parser.parse(assignUserdata);
 			if (updateAgentJson.isJsonArray()) {
 				JsonArray arrayOfOrg = updateAgentJson.getAsJsonArray();
 				int size = arrayOfOrg.size();
@@ -190,15 +189,10 @@ public class AccessGroupManagement {
 						message = message + "Org" + ": " + orgName + " " + responseorg.getEntity(String.class);
 
 					}
-
 				}
-
 			}
 			return PlatformServiceUtil.buildSuccessResponseWithData(message);
-
-		}
-
-		catch (Exception e) {
+		}catch (Exception e) {
 			return PlatformServiceUtil.buildFailureResponse(e.toString());
 		}
 
@@ -240,12 +234,13 @@ public class AccessGroupManagement {
 	// ADD USER :-
 
 	@RequestMapping(value = "/addUserInOrg", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public @ResponseBody JsonObject addUser(@RequestBody String userPropertyList) {
+	public @ResponseBody JsonObject addUser(@RequestBody String requserPropertyList) {
 		String message = null;
 		// log.debug("getOrgs API is: " + userPropertyList);
 		try {
+			String userPropertyList = ValidationUtils.validateResponseBody(requserPropertyList);
 			JsonParser parser = new JsonParser();
-			String validatedResponse = ValidationUtils.cleanXSS(userPropertyList);
+			String validatedResponse = ValidationUtils.validateResponseBody(userPropertyList);
 			JsonObject updateAgentJson = (JsonObject) parser.parse(validatedResponse);
 			int orgId = updateAgentJson.get("orgId").getAsInt();
 			String name = updateAgentJson.get("name").getAsString();

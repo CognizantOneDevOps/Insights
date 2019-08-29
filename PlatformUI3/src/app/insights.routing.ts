@@ -24,7 +24,7 @@ const appRoutes: Routes = [
   { path: '', pathMatch: 'full', redirectTo: 'login' },
   { path: 'login', component: LoginComponent },
   { path: '**', component: PageNotFoundComponent },
-  { path: 'Insights/Home', loadChildren: '@insights/app/modules/home.modules#HomeModules', canLoad: [AuthGuard] }
+  { path: 'Insights/Home', loadChildren: '@insights/app/modules/home.modules#HomeModules', canActivate: [AuthGuard] }
 ];
 
 export const InsightsModuleRouting: ModuleWithProviders = RouterModule.forRoot(appRoutes, { useHash: true });//{ useHash: true  , onSameUrlNavigation: 'reload', enableTracing: true }
