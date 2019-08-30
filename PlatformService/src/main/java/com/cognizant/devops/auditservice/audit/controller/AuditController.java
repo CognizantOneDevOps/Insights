@@ -22,6 +22,8 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -37,12 +39,19 @@ import org.springframework.web.bind.annotation.RestController;
 import com.cognizant.devops.auditservice.audit.report.AuditReportScheduler;
 import com.cognizant.devops.auditservice.audit.service.AuditService;
 import com.cognizant.devops.auditservice.audit.service.PdfWriter;
-import com.cognizant.devops.auditservice.audit.utils.AuditServiceUtil;
+import com.cognizant.devops.platformservice.querybuilder.controller.QueryBuilderController;
+import com.cognizant.devops.platformservice.rest.util.PlatformServiceUtil;
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 
 @RestController
 @RequestMapping("traceability")
 public class AuditController {
+	
+	private static Logger Log = LogManager.getLogger(AuditController.class);
 
     @Autowired
     AuditService auditServiceImpl;
@@ -57,11 +66,11 @@ public class AuditController {
         try {
             response = auditServiceImpl.searchAuditLogByAsset(assetId);
             if (response.getAsJsonPrimitive("statusCode").getAsString().equals("200"))
-                return AuditServiceUtil.buildSuccessResponseWithData(response.getAsJsonArray("data"));
+                return PlatformServiceUtil.buildSuccessResponseWithData(response.getAsJsonArray("data"));
             else
-                return AuditServiceUtil.buildFailureResponse(response.getAsJsonPrimitive("data").getAsString());
+                return PlatformServiceUtil.buildFailureResponse(response.getAsJsonPrimitive("data").getAsString());
         } catch (Exception e) {
-            return AuditServiceUtil.buildFailureResponse(e.toString());
+            return PlatformServiceUtil.buildFailureResponse(e.toString());
         }
     }
 
@@ -72,11 +81,11 @@ public class AuditController {
         try {
             response = auditServiceImpl.searchAuditLogByDate(startDate, endDate, toolName);
             if (response.getAsJsonPrimitive("statusCode").getAsString().equals("200"))
-                return AuditServiceUtil.buildSuccessResponseWithData(response.getAsJsonArray("data"));
+                return PlatformServiceUtil.buildSuccessResponseWithData(response.getAsJsonArray("data"));
             else
-                return AuditServiceUtil.buildFailureResponse(response.getAsJsonPrimitive("data").getAsString());
+                return PlatformServiceUtil.buildFailureResponse(response.getAsJsonPrimitive("data").getAsString());
         } catch (Exception e) {
-            return AuditServiceUtil.buildFailureResponse(e.toString());
+            return PlatformServiceUtil.buildFailureResponse(e.toString());
         }
     }
 
@@ -87,11 +96,11 @@ public class AuditController {
         try {
             response = auditServiceImpl.getAssetHistory(assetId);
             if (response.getAsJsonPrimitive("statusCode").getAsString().equals("200"))
-                return AuditServiceUtil.buildSuccessResponseWithData(response.getAsJsonArray("data"));
+                return PlatformServiceUtil.buildSuccessResponseWithData(response.getAsJsonArray("data"));
             else
-                return AuditServiceUtil.buildFailureResponse(response.getAsJsonPrimitive("data").getAsString());
+                return PlatformServiceUtil.buildFailureResponse(response.getAsJsonPrimitive("data").getAsString());
         } catch (Exception e) {
-            return AuditServiceUtil.buildFailureResponse(e.toString());
+            return PlatformServiceUtil.buildFailureResponse(e.toString());
         }
     }
     
@@ -105,19 +114,36 @@ public class AuditController {
 	public ResponseEntity<byte[]> getAuditReport(@RequestBody Map assetsResults,@RequestParam String pdfName) {
 		ResponseEntity<byte[]>  response = null;
 		try {
-			List<Map> assetList = (List<Map>) assetsResults.get("data");
-			byte[] fileContent = pdfWriterImpl.generatePdf(assetList, pdfName);
-			HttpHeaders headers = new HttpHeaders();
-		    headers.setContentType(MediaType.parseMediaType("application/pdf"));
-			headers.add("Access-Control-Allow-Methods", "POST");
-			headers.add("Access-Control-Allow-Headers", "Content-Type");
-			headers.add("Content-Disposition", "attachment; filename="+pdfName);
-			headers.add("Cache-Control", "no-cache, no-store, must-revalidate,post-check=0, pre-check=0");
-			headers.add("Pragma", "no-cache");
-			headers.add("Expires", "0");
-		    response = new ResponseEntity<>(fileContent, headers, HttpStatus.OK);
+			boolean validInput = false;
+	        String jsonStr =  new Gson().toJson(assetsResults);
+	        JsonParser jsonParser = new JsonParser(); 
+			JsonElement jsonElements = jsonParser.parse(jsonStr);
+			JsonObject jsonObject = jsonElements.getAsJsonObject();
+			JsonArray jsonarray = jsonObject.get("data").getAsJsonArray();
+			for(JsonElement jsonelement: jsonarray) {
+				JsonObject element = jsonelement.getAsJsonObject();
+				if(element.has("timestamp") && element.get("timestamp")!=null &&
+						element.get("timestamp").getAsString()!="") {
+					validInput = true;
+				}
+			}
+			if(validInput) {
+				List<Map> assetList = (List<Map>) assetsResults.get("data");
+				byte[] fileContent = pdfWriterImpl.generatePdf(assetList, pdfName);
+				HttpHeaders headers = new HttpHeaders();
+				headers.setContentType(MediaType.parseMediaType("application/pdf"));
+				headers.add("Access-Control-Allow-Methods", "POST");
+				headers.add("Access-Control-Allow-Headers", "Content-Type");
+				headers.add("Content-Disposition", "attachment; filename="+pdfName);
+				headers.add("Cache-Control", "no-cache, no-store, must-revalidate,post-check=0, pre-check=0");
+				headers.add("Pragma", "no-cache");
+				headers.add("Expires", "0");
+				response = new ResponseEntity<>(fileContent, headers, HttpStatus.OK);
+			}else {
+				throw new Exception("Invalid Response from Ledger , No timestamp found!");
+			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			Log.error("Error, Failed to download pdf -- " + pdfName, e.getMessage());
 		}
 		return response;
 	}
@@ -130,7 +156,7 @@ public class AuditController {
         try {
             response = auditServiceImpl.getProcessFlow();
         } catch (Exception e) {
-            return AuditServiceUtil.buildFailureResponse(e.toString());
+            return PlatformServiceUtil.buildFailureResponse(e.toString());
         }
         return response;
     }
@@ -149,17 +175,25 @@ public class AuditController {
 			//String path = ConfigOptions.REPORT_LOGS_PATH + ConfigOptions.FILE_SEPERATOR + logFileName;
 			System.out.println("Report log path -- "+path);
 			System.out.println("Log File Name -- "+Paths.get(new File(path).getAbsolutePath()).getFileName());
-			byte[] fileContent = Files.readAllBytes(Paths.get(new File(path).getAbsolutePath()));
-			HttpHeaders headers = new HttpHeaders();
-			headers.setContentType(MediaType.TEXT_PLAIN);
-			headers.add("Access-Control-Allow-Methods", "POST");
-			headers.add("Content-Disposition", "attachment; filename="+logFileName);
-			headers.add("Cache-Control", "no-cache, no-store, must-revalidate,post-check=0, pre-check=0");
-			headers.add("Pragma", "no-cache");
-			headers.add("Expires", "0");
-		    response = new ResponseEntity<>(fileContent, headers, HttpStatus.OK);
+			boolean checkValidFile = PlatformServiceUtil.validateFile(logFileName);
+			if(checkValidFile) {
+				byte[] fileContent = Files.readAllBytes(Paths.get(new File(path).getAbsolutePath()));
+				boolean isValid = PlatformServiceUtil.checkFileForHTML(new String(fileContent));
+				if(isValid) {
+					HttpHeaders headers = new HttpHeaders();
+					headers.setContentType(MediaType.TEXT_PLAIN);
+					headers.add("Access-Control-Allow-Methods", "POST");
+					headers.add("Content-Disposition", "attachment; filename="+logFileName);
+					headers.add("Cache-Control", "no-cache, no-store, must-revalidate,post-check=0, pre-check=0");
+					headers.add("Pragma", "no-cache");
+					headers.add("Expires", "0");
+					response = new ResponseEntity<>(fileContent, headers, HttpStatus.OK);
+				}else {
+					throw new Exception("Invalid file content -- "+new String(fileContent));
+				}
+			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			Log.error("Error, Failed to download Log file -- " + logFileName, e.getMessage());
 		}
 		return response;
 	}

@@ -77,6 +77,12 @@ export class ImageHandlerService implements IImageHandlerService {
         this.addImage('ic_about_logo', "icons/svg/ic_about_logo.svg");
         this.addImage('ic_Insights_default_logo', "icons/svg/landingPage/Insights_Logo.png");
         this.addImage('redirect_icon', "icons/svg/userOnboarding/sharp-supervised_user_circle-24px.svg");
+        this.addImage('unsubscribe_webhook', "icons/svg/webhook/WebhookUnsubscribe.svg");
+        this.addImage('unsubscribe_webhookDeactive', "icons/svg/webhook/WebhookUnsubscribe-Deactivated.svg");
+        this.addImage('webhook', "icons/svg/webhook/WebHook.svg");
+        this.addImage('webhookDeactive', "icons/svg/webhook/WebHookDetactivate.svg");
+        this.addImage('webhookCopyClipboard', "icons/svg/webhook/CopyClipboard.svg");
+
 
     }
 

@@ -62,7 +62,7 @@ public class UserUtil {
 		if (file.exists()) {
 			// Reading the object from a file
 			FileInputStream fileStream = new FileInputStream(filePath);
-			ObjectInputStream in = new ObjectInputStream(fileStream);
+			ObjectInputStream in = new LookAheadObjectInputStream(fileStream);
 
 			// Method for deserialization of object
 			BCUserContext uContext = (BCUserContext) in.readObject();
