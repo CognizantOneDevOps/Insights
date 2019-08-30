@@ -25,7 +25,7 @@ public interface ConfigOptions {
 	String CORRELATION_TEMPLATE = "correlation.json";
 	String TOOLDETAIL_TEMPLATE ="toolDetail.json";
 	String NEO4J_TEMPLATE = "neo4jdata.json";
-	String CORRELATION = "correlation"+Instant.now().toEpochMilli()+".json";
+	String CORRELATION = "correlation"+System.currentTimeMillis() +".json";
 	String DATA_ENRICHMENT_TEMPLATE = "data-enrichment.json";
 	String BLOCKCHAIN_CONFIG_FILE = "blockchainConfig.json";
 	String ENDPOINT_DATA = "endpointData";

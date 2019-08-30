@@ -41,7 +41,7 @@ public class TimeStampingAuthorityClient
 
     private final URL url;
     private final String username;
-    private final String password;
+    private final String pwd;
     private final MessageDigest digest;
 
     /**
@@ -55,7 +55,7 @@ public class TimeStampingAuthorityClient
     {
         this.url = url;
         this.username = username;
-        this.password = password;
+        this.pwd = null;
         this.digest = digest;
     }
 
@@ -69,6 +69,11 @@ public class TimeStampingAuthorityClient
     public byte[] getTimeStampToken(byte[] messageImprint) throws IOException
     {
         digest.reset();
+        SecureRandom saltRandom = new SecureRandom();
+        byte[] salt = new byte[16];
+        saltRandom.nextBytes(salt);
+        LOG.info("salt updated to digest");
+        digest.update(salt);
         byte[] hash = digest.digest(messageImprint);
 
         // 32-bit cryptographic nonce
@@ -117,9 +122,9 @@ public class TimeStampingAuthorityClient
 
         LOG.debug("Established connection to TSA server");
 
-        if (username != null && password != null && !username.isEmpty() && !password.isEmpty())
+        if (username != null && pwd != null && !username.isEmpty() && !pwd.isEmpty())
         {
-            connection.setRequestProperty(username, password);
+            connection.setRequestProperty(username, pwd);
         }
 
         // read response

@@ -32,6 +32,13 @@ import com.cognizant.devops.platformcommons.dal.neo4j.Neo4jDBHandler;
 import com.cognizant.devops.platformservice.rest.util.PlatformServiceUtil;
 import com.google.gson.JsonObject;
 
+/**
+ * This class is being used by Health Check functionality of PlatformUI2.0
+ * This code is required to support Insights old UI
+ * No code should be added here for PlatformUI3
+ * 
+ * 
+ */
 @RestController
 @RequestMapping("/admin/agent")
 public class AgentHealthService {

@@ -22,6 +22,7 @@ import java.net.URLEncoder;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -195,12 +196,14 @@ public class AuditReportScheduler {
 		JsonObject jsonObject = null;
 		try{
 			String username = ApplicationConfigProvider.getInstance().getUserId();
-			String password = ApplicationConfigProvider.getInstance().getPassword();
+			final char[] password = ApplicationConfigProvider.getInstance().getPassword().toCharArray();
+			String pwd = new String(password);
+			Arrays.fill(password, ' ');
 			String url = ApplicationConfigProvider.getInstance().getInsightsServiceURL()
 					+QUERY_BUILDER_FETCH_QUERIES;
 			log.info("Report API - "+url);
 			String reports = SystemStatus.jerseyGetClientWithAuthentication(url, 
-					username == null ? "admin" : username, password== null ? "admin" : password, null);
+					username == null ? "admin" : username, password== null ? "admin" : pwd, null);
 			//String reports = "{\"status\":\"success\",\"data\":[{\"id\":89,\"reportName\":\"JIRA\",\"frequency\":\"Daily\",\"subscribers\":\"757943@cognizant.com\",\"querypath\":\"C:\\InSights_Windows_v4.3\\Server2\\INSIGHTS_HOME\\.InSights\\Audit-report\\ProcessJiraChangeHistoryRecords.json\"}]}";
 			log.debug("Report List from QUERY_BUILDER  -"+reports);
 			JsonParser jsonParser = new JsonParser(); 
