@@ -27,7 +27,7 @@ sed -i -e "s|${myextip}:3000|${myextip}\/grafana|g" /usr/INSIGHTS_HOME/.InSights
 sed -i -e "s/.*serviceHost.*/    \"serviceHost\": \"$myextip\",/g" /opt/apache-tomcat-8.5.27/webapps/app/config/uiConfig.json
 sed -i -e "s/.*grafanaHost.*/    \"grafanaHost\": \"$myextip\/grafana\"/g" /opt/apache-tomcat-8.5.27/webapps/app/config/uiConfig.json
 cd /opt/grafana/conf
-wget http://platform.cogdevops.com/insights_install/installationScripts/latest/RHEL/httpd/custom.ini
+wget https://platform.cogdevops.com/insights_install/installationScripts/latest/RHEL/httpd/grafana/custom.ini
 systemctl restart httpd.service
 service grafana restart
 service tomcat restart
