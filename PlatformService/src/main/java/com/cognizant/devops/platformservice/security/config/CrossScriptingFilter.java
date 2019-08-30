@@ -20,12 +20,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Map;
 
-import javax.servlet.Filter;
 import javax.servlet.FilterChain;
-import javax.servlet.FilterConfig;
-import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -33,38 +28,25 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.http.HttpHeaders;
+import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
-import com.cognizant.devops.platformservice.customsettings.CustomAppSettings;
 import com.cognizant.devops.platformservice.rest.util.PlatformServiceUtil;
 
-public class CrossScriptingFilter implements Filter {
-	private static Logger LOG = LogManager.getLogger(CustomAppSettings.class);
-	private FilterConfig filterConfig;
+public class CrossScriptingFilter extends OncePerRequestFilter {
+	private static Logger LOG = LogManager.getLogger(CrossScriptingFilter.class);
 
 	@Override
-	public void init(FilterConfig filterConfig) throws ServletException {
-		this.filterConfig = filterConfig;
-	}
+	protected void doFilterInternal(HttpServletRequest httpRequest, HttpServletResponse httpResponce,
+			FilterChain filterChain) {
+		LOG.info("Inside Filter == CrossScriptingFilter ...............");
 
-	@Override
-	public void destroy() {
-		this.filterConfig = null;
-	}
-
-	@Override
-	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
-			throws IOException, ServletException {
-		//LOG.info("In doFilter CrossScriptingFilter ...............");
-
-		HttpServletResponse httpResponce = (HttpServletResponse) response;
-		HttpServletRequest httpRequest = (HttpServletRequest) request;
 		try {
 			RequestWrapper requestMapper = new RequestWrapper(httpRequest,
 					httpResponce);
 			writeHeaders(httpRequest, httpResponce);
-			chain.doFilter(requestMapper, httpResponce);
+			filterChain.doFilter(requestMapper, httpResponce);
 			LOG.debug("Completed .. in CrossScriptingFilter");
 
 		} catch (Exception e) {
@@ -75,9 +57,14 @@ public class CrossScriptingFilter implements Filter {
 					.toString();
 			httpResponce.setContentType("application/json");
 			httpResponce.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			httpResponce.getWriter().write(msg);
-			httpResponce.getWriter().flush();
-			httpResponce.getWriter().close();
+			try {
+				httpResponce.getWriter().write(msg);
+				httpResponce.getWriter().flush();
+				httpResponce.getWriter().close();
+			} catch (IOException e1) {
+				LOG.error("Error while writing log message in CrossScriptingFilter ");
+			}
+
 		}
 		LOG.info("Out doFilter CrossScriptingFilter ...............");
 	}

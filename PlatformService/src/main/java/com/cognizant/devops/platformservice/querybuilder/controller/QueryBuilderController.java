@@ -88,7 +88,7 @@ public class QueryBuilderController {
 	public @ResponseBody JsonObject deleteQuery(@RequestBody String reportName){
 		String message = null;
 		try{
-			String validatedResponse = ValidationUtils.validateResponseBody(reportName);
+			String validatedResponse = ValidationUtils.validateRequestBody(reportName);
 			message = queryBuilderService.deleteQuery(validatedResponse);
 		}catch(Exception e){
 			return PlatformServiceUtil.buildFailureResponse(e.toString());

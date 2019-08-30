@@ -172,7 +172,7 @@ export class LoginComponent implements OnInit, ILoginComponent {
           } else if (data.status == 404) {
             self.logMsg = "Server Not found"
           } else if (data.status == 401) {
-            self.logMsg = "Unauthorized Access"
+            self.logMsg = "Invalid Credentials" //Unauthorized Access
           } else {
             self.logMsg = "Internal server error";
           }

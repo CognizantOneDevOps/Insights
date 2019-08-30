@@ -298,13 +298,13 @@ public class ValidationUtils {
 		return json;
 	}
 
-	public static String validateResponseBody(String inputData) {
-		log.debug(" In validateResponseBody ==== ");
+	public static String validateRequestBody(String inputData) {
+		log.debug(" In validateRequestBody ==== ");
 		String outputData = null;
 		try {
 			outputData = ValidationUtils.cleanXSSWithHTMLCheck(inputData);
 		} catch (RuntimeException e) {
-			log.error("validate Response Body has some issue === " + e.getMessage());
+			log.error("validate Request Body has some issue === " + e.getMessage());
 			throw new RuntimeException(PlatformServiceConstants.INVALID_REQUEST_BODY);
 		}
 		return outputData;

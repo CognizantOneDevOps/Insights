@@ -13,12 +13,10 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.filter.GenericFilterBean;
 
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
-import com.cognizant.devops.platformservice.customsettings.CustomAppSettings;
 import com.cognizant.devops.platformservice.rest.util.PlatformServiceUtil;
 
 /*********************************************************************************
@@ -38,23 +36,20 @@ import com.cognizant.devops.platformservice.rest.util.PlatformServiceUtil;
  *******************************************************************************/
 
 public class AdvanceAuthenticationFilter extends GenericFilterBean {
-	private static Logger LOG = LogManager.getLogger(CustomAppSettings.class);
+	private static Logger LOG = LogManager.getLogger(AdvanceAuthenticationFilter.class);
 
 	@Override
 	public void doFilter(final ServletRequest request, final ServletResponse response, final FilterChain chain)
 			throws IOException, ServletException {
-		//LOG.debug(" Inside AdvanceAuthenticationFilter ==== ");
+		LOG.debug(" Inside Filter == AdvanceAuthenticationFilter ==== ");
 		HttpServletResponse httpResponce = (HttpServletResponse) response;
 		final HttpServletRequest httpRequest = (HttpServletRequest) request;
 		try {
-			//LOG.debug(" AdvanceAuthenticationFilter Url " + httpRequest.getRequestURL().toString());
 			UserDetails user = GrafanaUserDetailsUtil.getUserDetails(httpRequest);
 			if (user == null) {
 				LOG.error(" InsightsCustomException Invalid Autharization Token ");
 				throw new RuntimeException(PlatformServiceConstants.INVALID_TOKEN);
 			} else {
-				//LOG.debug("inside AdvanceAuthenticationFilter arg0 athentication for user " + user.getUsername() + "   "
-						//+ user.getPassword());
 				final UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(user,
 						null, user.getAuthorities());
 				SecurityContextHolder.getContext().setAuthentication(authentication);
@@ -62,7 +57,8 @@ public class AdvanceAuthenticationFilter extends GenericFilterBean {
 			}
 		} catch (Exception e) {
 			LOG.error("Invalid request in AdvanceAuthenticationFilter");
-			String msg = PlatformServiceUtil.buildFailureResponse("Unauthorized Access..").toString();
+			String msg = PlatformServiceUtil.buildFailureResponse("Unauthorized Access ,Invalid Credentials..")
+					.toString();
 			httpResponce.setContentType("application/json");
 			httpResponce.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 			httpResponce.getWriter().write(msg);
