@@ -62,11 +62,6 @@ public class AccessGroupManagement {
 	@Autowired
 	private HttpServletRequest httpRequest;
 
-	public void setHttpRequest(HttpServletRequest httpRequest) {
-
-		this.httpRequest = httpRequest;
-	}
-
 	@RequestMapping(value = "/getOrgs", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 	public JsonObject getOrgs() {
 		log.debug("\n\nInside getOrgs method call");

@@ -37,9 +37,4 @@ public class GroupsAndUserTestData {
 	String assignUserData = "[{\"orgName\":\"Insight_Org\",\"orgId\":2,\"roleName\":\"Viewer\",\"userName\":\"userTest\"}]";
 	String expectedSearchData = "{\"status\":\"success\",\"data\":[{\"orgId\":2,\"name\":\"Insight_Org\",\"role\":\"Editor\"},{\"orgId\":14,\"name\":\"Insights285\",\"role\":\"Editor\"},{\"orgId\":1,\"name\":\"Main Org.\",\"role\":\"Viewer\"},{\"orgId\":4,\"name\":\"T-Demo\",\"role\":\"Viewer\"}]}";
 
-	Cookie[] cookies = { new Cookie("grafanaOrg", "1"), new Cookie("grafanaRole", "Admin"),
-			new Cookie("grafana_remember", "a42b47d74674138224c1f542ec7041fb6b359b7aa9081503460f7335f5315af310"),
-			new Cookie("grafana_sess", "c6c5958051893fc6"),
-			new Cookie("XSRF-TOKEN", "token") };
-
 }
