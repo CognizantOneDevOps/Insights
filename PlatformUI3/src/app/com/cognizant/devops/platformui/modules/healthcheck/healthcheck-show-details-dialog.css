@@ -197,3 +197,47 @@ mat-dialog-content::-webkit-scrollbar-track {
 	text-align: center;
     width:250px !important;
 }
+
+.tableLastFailureHeaderCss {
+    background-color: grey;   
+    color: white;
+    font-size: 14px !important;
+    height: 40px !important;
+    margin: 0px;
+    padding:0px;
+    letter-spacing: .010em;
+    line-height: 1.2em;
+	text-align: center;
+    width:150px !important;
+}
+
+ /* Styles for tab labels */
+ ::ng-deep .healthcheck-agent-detail-tab-style .mat-tab-label {     
+     background-color: transparent;
+     color: #0033A0;
+     font-size: 14px;
+     font-family: Open Sans !important;
+     opacity: 1.0;
+ }
+ 
+ /* Styles for the active tab label */
+ ::ng-deep .healthcheck-agent-detail-tab-style .mat-tab-label-active {
+    color: #00B140;
+    font-weight:bold;
+    font-size: 14px;    
+    background-color: transparent;
+    font-family: Open Sans !important;
+ }
+
+ ::ng-deep .healthcheck-agent-detail-tab-style .mat-tab-header {
+    border-bottom-style: none !important;      
+ } 
+ /* Styles for the ink bar */
+ ::ng-deep .healthcheck-agent-detail-tab-style .mat-ink-bar {
+     background-color: #00B140 !important;
+ }  
+  .paginationStyle {
+      font-family: Open Sans !important;
+      font-size: 14px !important; 
+      background-color: #DEDBDB;
+  }
