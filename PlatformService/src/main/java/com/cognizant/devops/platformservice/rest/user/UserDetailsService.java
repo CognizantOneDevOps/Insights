@@ -165,12 +165,12 @@ public class UserDetailsService {
 	 */
 	@RequestMapping(value = "/authenticate", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 	@ResponseBody
-	public ServiceResponse authenticateUser(HttpServletRequest request) {
-		ServiceResponse response = new ServiceResponse();
-		response.setStatus(ConfigOptions.SUCCESS_RESPONSE);
-		response.setData(request.getAttribute("responseHeaders"));
-		request.getSession().setMaxInactiveInterval(30 * 60);
-		return response;
+	public JsonObject authenticateUser(HttpServletRequest request) {
+		Map<String, String> responseHeadersgrafanaAttr = (Map<String, String>) request.getAttribute("responseHeaders");
+		for (Map.Entry<String, String> entry : responseHeadersgrafanaAttr.entrySet()) {
+			ValidationUtils.cleanXSS(entry.getValue());
+		}
+		return PlatformServiceUtil.buildSuccessResponseWithData(responseHeadersgrafanaAttr);
 	}
 
 	@RequestMapping(value = "/logout", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
@@ -259,10 +259,10 @@ public class UserDetailsService {
 		return PlatformServiceUtil.buildSuccessResponseWithData(userPortfolioDAL.getUserPortfolio(userId));
 	}
 
-	@RequestMapping(value = "/getCurrentOrgAndRole", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+	/*@RequestMapping(value = "/getCurrentOrgAndRole", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 	public @ResponseBody JsonObject getCurrentOrgAndRole(HttpServletRequest httpRequest) {
 		String authHeader = ValidationUtils.extactAutharizationToken(httpRequest.getHeader("Authorization"));
-
+	
 		log.debug(" authTokenDecrypt  ========= " + authHeader);
 		Map<String, String> grafanaResponseCookies = new HashMap<String, String>();
 		JsonObject grafanaOrgRoleDataJsonObj = new JsonObject();
@@ -289,7 +289,7 @@ public class UserDetailsService {
 			log.error("Unable to get the User Role for current org.", e);
 		}
 		return grafanaOrgRoleDataJsonObj;
-	}
+	}*/
 
 	private String getCurrentOrgRole(Map<String, String> headers, String grafanaCurrentOrg) {
 		String userOrgsApiUrl = ApplicationConfigProvider.getInstance().getGrafana().getGrafanaEndpoint()

@@ -19,15 +19,13 @@ echo "#################### Installing Neo4j with configs and user creation #####
 sudo sed  -i '$ a root   soft    nofile  40000' /etc/security/limits.conf
 sudo sed  -i '$ a root   hard    nofile  40000' /etc/security/limits.conf
 source /etc/environment
-mkdir NEO4J_HOME
+cd /opt
+sudo mkdir NEO4J_HOME
 cd NEO4J_HOME
-wget http://platform.cogdevops.com/insights_install/installationScripts/latest/RHEL/neo4j/neo4j-community-3.3.0-unix.tar.gz
-tar -xf neo4j-community-3.3.0-unix.tar.gz
-wget http://platform.cogdevops.com/insights_install/installationScripts/latest/RHEL/neo4j/Neo4j-3.3.0.zip
-unzip Neo4j-3.3.0.zip
-cp Neo4j-3.3.0/conf/neo4j.conf neo4j-community-3.3.0/conf
-cp -R Neo4j-3.3.0/plugins neo4j-community-3.3.0/
-cd neo4j-community-3.3.0
+sudo wget https://platform.cogdevops.com/insights_install/installationScripts/latest/Ubuntu/packages/neo4j/neo4j-Insights.tar.gz
+sudo tar -xzf neo4j-Insights.tar.gz
+sudo chmod -R 755 neo4j-Insights
+cd neo4j-Insights
 sleep 20
 ./bin/neo4j start
 sleep 40
@@ -35,7 +33,7 @@ curl -X POST -u neo4j:neo4j -H "Content-Type: application/json" -d '{"password":
 sleep 10
 cd ..
 export NEO4J_INIT_HOME=`pwd`
-echo NEO4J_INIT_HOME=`pwd` | sudo tee -a /etc/environment
-echo "export" NEO4J_INIT_HOME=`pwd` | sudo tee -a /etc/profile
+sudo echo NEO4J_INIT_HOME=`pwd` | sudo tee -a /etc/environment
+sudo echo "export" NEO4J_INIT_HOME=`pwd` | sudo tee -a /etc/profile
 source /etc/environment
 source /etc/profile

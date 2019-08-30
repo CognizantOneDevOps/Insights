@@ -69,6 +69,7 @@ public  class SystemStatus {
     			authStringEnc=authtoken;
     		}
 			Client restClient = Client.create();
+			restClient.setConnectTimeout(5001);
 			WebResource webResource = restClient.resource(url);
 			response= webResource.accept("application/json")
 			                                 .header("Authorization", "Basic " + authStringEnc)
@@ -104,6 +105,7 @@ public  class SystemStatus {
 			JsonParser parser = new JsonParser();
 			JsonElement dataJson = parser.parse(data);//new Gson().fromJson(data, JsonElement.class)
 			Client restClient = Client.create();
+			restClient.setConnectTimeout(5001);
 			WebResource webResource = restClient.resource(url);
 			response = webResource.accept("application/json")
 					//.header("Authorization", "Basic " + authStringEnc)

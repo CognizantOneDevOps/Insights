@@ -49,10 +49,8 @@ public class GrafanaUserDetailsUtil {
 	public static UserDetails getUserDetails(HttpServletRequest httpRequest) {
 		log.debug(" Inside getUserDetails function call!");
 		ApplicationConfigProvider.performSystemCheck();
-		String token = ValidationUtils.cleanXSS(httpRequest.getHeader("Authorization")); //authHeader
-		//log.debug("  Authorization ===== " + token);
+		String token = ValidationUtils.cleanXSS(httpRequest.getHeader("Authorization"));
 		String authHeader = ValidationUtils.extactAutharizationToken(token);
-		//log.debug(" authTokenDecrypt  ========= " + authHeader);
 
 		Cookie[] requestCookies = PlatformServiceUtil.validateCookies(httpRequest.getCookies());
 		Map<String, String> grafanaResponseCookies = new HashMap<String, String>();
@@ -178,7 +176,7 @@ public class GrafanaUserDetailsUtil {
 		String loginApiUrl = ApplicationConfigProvider.getInstance().getGrafana().getGrafanaEndpoint() + "/login";
 		ClientResponse grafanaLoginResponse = RestHandler.doPost(loginApiUrl, loginRequestParams, null);
 		if (grafanaLoginResponse.getStatus() != 200) {
-			throw new InsightsCustomException(" Unauthorized Access ==== ");
+			throw new InsightsCustomException(" user or password is incorrect ==== ");
 		}
 		return grafanaLoginResponse.getCookies();
 	}
