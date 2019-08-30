@@ -20,7 +20,7 @@ Created on Jun 1, 2019
 '''
 from dateutil import parser
 import datetime
-from BaseAgent import BaseAgent
+from ....core.BaseAgent3 import BaseAgent
 import logging
 
 class AzureRepoAgent(BaseAgent):
