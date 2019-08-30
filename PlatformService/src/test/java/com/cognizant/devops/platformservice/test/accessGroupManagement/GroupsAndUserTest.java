@@ -35,17 +35,6 @@ public class GroupsAndUserTest {
 	MockHttpServletRequest httpRequest = new MockHttpServletRequest();
 
 	@Test(priority = 1)
-	public void testGetCurrentUserOrgs() throws InsightsCustomException {
-
-		httpRequest.setCookies(groupsAndUserTestData.cookies);
-
-		accessGroupManagement.setHttpRequest(httpRequest);
-
-		Object Actualrespone = accessGroupManagement.getCurrentUserOrgs();
-
-	}
-
-	@Test(priority = 2)
 	public void testGetOrgUsers() throws InsightsCustomException {
 
 		httpRequest.addHeader("Authorization", groupsAndUserTestData.authorization);
@@ -54,7 +43,7 @@ public class GroupsAndUserTest {
 
 	}
 
-	@Test(priority = 3)
+	@Test(priority = 2)
 	public void testCreateOrg() throws InsightsCustomException {
 
 		httpRequest.addHeader("Authorization", groupsAndUserTestData.authorization);
@@ -63,14 +52,14 @@ public class GroupsAndUserTest {
 
 	}
 
-	@Test(priority = 4)
+	@Test(priority = 3)
 	public void testAddUser() throws InsightsCustomException {
 
 		Object Actualrespone = accessGroupManagement.addUser(groupsAndUserTestData.userPropertyListAdmin);
 
 	}
 
-	@Test(priority = 5)
+	@Test(priority = 4)
 	public void testSearchUser() throws InsightsCustomException {
 
 		String Actualrespone = accessGroupManagement.searchUser(groupsAndUserTestData.userName).toString();
@@ -79,27 +68,27 @@ public class GroupsAndUserTest {
 
 	}
 
-	@Test(priority = 6)
+	@Test(priority = 5)
 	public void testassignUser() throws InsightsCustomException {
 
 		Object Actualrespone = accessGroupManagement.assignUser(groupsAndUserTestData.assignUserData);
 
 	}
 
-	@Test(priority = 7)
+	@Test(priority = 6)
 	public void testAddUserEditor() throws InsightsCustomException {
 
 		Object Actualrespone = accessGroupManagement.addUser(groupsAndUserTestData.userPropertyListEditor);
 
 	}
 
-	@Test(priority = 8)
+	@Test(priority = 7)
 	public void testAddUserViewer() throws InsightsCustomException {
 
 		Object Actualrespone = accessGroupManagement.addUser(groupsAndUserTestData.userPropertyListViewer);
 	}
 
-	@Test(priority = 9)
+	@Test(priority = 8)
 	public void testEditOrganizationUser() throws InsightsCustomException {
 
 		String Actualrespone = userManagementService.editOrganizationUser(groupsAndUserTestData.orgId,
@@ -107,7 +96,7 @@ public class GroupsAndUserTest {
 
 	}
 
-	@Test(priority = 10)
+	@Test(priority = 9)
 	public void testDeleteOrganizationUser() throws InsightsCustomException {
 
 		String Actualrespone = userManagementService.deleteOrganizationUser(groupsAndUserTestData.orgId,
