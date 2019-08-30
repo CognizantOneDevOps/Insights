@@ -16,6 +16,8 @@
 				name="com.cognizant.devops.platformservice.test.bulkUpload.BulkUploadTest" />
 			<class
 				name="com.cognizant.devops.platformservice.test.grafanaUser.GrafanaUserDetailsTest" />
+			<class
+				name="com.cognizant.devops.platformservice.test.accessGroupManagement.GroupsAndUserTest" />
 		</classes>
 	</test>
 </suite>
