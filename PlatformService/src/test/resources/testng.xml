@@ -14,7 +14,12 @@
 				name="com.cognizant.devops.platformservice.test.CorrelationBuilder.CorrelationBuilderTest" />
 			<class
 				name="com.cognizant.devops.platformservice.test.bulkUpload.BulkUploadTest" />
-			<class name = "com.cognizant.devops.platformservice.test.webhook.WebhookServiceTest"/>
+			<class
+				name="com.cognizant.devops.platformservice.test.webhook.WebhookServiceTest" />
+			<class
+				name="com.cognizant.devops.platformservice.test.grafanaUser.GrafanaUserDetailsTest" />
+			<class
+				name="com.cognizant.devops.platformservice.test.accessGroupManagement.GroupsAndUserTest" />
 		</classes>
 	</test>
 </suite>
