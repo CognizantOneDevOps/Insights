@@ -201,7 +201,7 @@ public class BusinessMappingServiceImpl implements BusinessMappingService {
 	public JsonObject saveToolsMappingLabel(String agentMappingJson) {
 		List<JsonObject> nodeProperties = new ArrayList<>();
 		try {
-			String validatedResponse = ValidationUtils.validateResponseBody(agentMappingJson);
+			String validatedResponse = ValidationUtils.validateRequestBody(agentMappingJson);
 			Neo4jDBHandler dbHandler = new Neo4jDBHandler();
 			dbHandler.executeCypherQuery("CREATE CONSTRAINT ON (n:METADATA) ASSERT n.metadata_id  IS UNIQUE");
 			String query = "UNWIND {props} AS properties " + "CREATE (n:METADATA:BUSINESSMAPPING) "
@@ -248,7 +248,7 @@ public class BusinessMappingServiceImpl implements BusinessMappingService {
 	public JsonObject editToolsMappingLabel(String agentMappingJson) {
 		List<JsonObject> nodeProperties = new ArrayList<>();
 		try {
-			String validatedResponse = ValidationUtils.validateResponseBody(agentMappingJson);
+			String validatedResponse = ValidationUtils.validateRequestBody(agentMappingJson);
 			Neo4jDBHandler dbHandler = new Neo4jDBHandler();
 			JsonParser parser = new JsonParser();
 			JsonObject json = (JsonObject) parser.parse(validatedResponse);

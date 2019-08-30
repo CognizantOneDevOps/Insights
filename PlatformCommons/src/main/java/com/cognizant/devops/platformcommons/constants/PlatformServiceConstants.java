@@ -24,7 +24,7 @@ public interface PlatformServiceConstants {
 	String MESSAGE = "message";
 	String DATA = "data";
 	String INVALID_REQUEST = "Invalid request";
-	String INVALID_REQUEST_BODY = "Invalid request,Please check request body for API";
+	String INVALID_REQUEST_BODY = "Invalid request,Please check Request Body Or Request Payload of API";
 	String INVALID_RESPONSE_DATA_HTML = "Invalid response data,Response might be contain some Html tag";
 	String INVALID_RESPONSE_DATA = "Invalid response data while parsing response data";
 	String INVALID_REQUEST_ORIGIN = " Invalid Access-Control-Allow-Origin,Please make sure that your host is in trusted host list";

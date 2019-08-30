@@ -70,7 +70,7 @@ public class InsightsCorrelationBuilder {
 	public @ResponseBody JsonObject saveConfig(@RequestBody String configDetails) {
 		String message = null;
 		try {
-			String configDeatilsValidate = ValidationUtils.validateResponseBody(configDetails);
+			String configDeatilsValidate = ValidationUtils.validateRequestBody(configDetails);
 			message = correlationBuilderService.saveConfig(configDeatilsValidate);
 		} catch (InsightsCustomException e) {
 			return PlatformServiceUtil.buildFailureResponse(e.toString());

@@ -118,7 +118,7 @@ public class AccessGroupManagement {
 	@RequestMapping(value = "/searchUser", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 	public @ResponseBody JsonObject searchUser(@RequestBody String reqname) {
 		try {
-			String name = ValidationUtils.validateResponseBody(reqname);
+			String name = ValidationUtils.validateRequestBody(reqname);
 			String apiUrlName = ApplicationConfigProvider.getInstance().getGrafana().getGrafanaEndpoint()
 					+ "/api/users/lookup?loginOrEmail=" + name;
 			String message = null;
@@ -147,7 +147,7 @@ public class AccessGroupManagement {
 	public @ResponseBody JsonObject assignUser(@RequestBody String reqassignUserdata) {
 		String message = " ";
 		try {
-			String assignUserdata = ValidationUtils.validateResponseBody(reqassignUserdata);
+			String assignUserdata = ValidationUtils.validateRequestBody(reqassignUserdata);
 			JsonParser parser = new JsonParser();
 			JsonElement updateAgentJson = parser.parse(assignUserdata);
 			if (updateAgentJson.isJsonArray()) {
@@ -238,10 +238,9 @@ public class AccessGroupManagement {
 		String message = null;
 		// log.debug("getOrgs API is: " + userPropertyList);
 		try {
-			String userPropertyList = ValidationUtils.validateResponseBody(requserPropertyList);
+			String userPropertyList = ValidationUtils.validateRequestBody(requserPropertyList);
 			JsonParser parser = new JsonParser();
-			String validatedResponse = ValidationUtils.validateResponseBody(userPropertyList);
-			JsonObject updateAgentJson = (JsonObject) parser.parse(validatedResponse);
+			JsonObject updateAgentJson = (JsonObject) parser.parse(userPropertyList);
 			int orgId = updateAgentJson.get("orgId").getAsInt();
 			String name = updateAgentJson.get("name").getAsString();
 			String email = updateAgentJson.get("email").getAsString();
