@@ -1,32 +1,3 @@
-#-------------------------------------------------------------------------------
-# Copyright 2017 Cognizant Technology Solutions
-#   
-# Licensed under the Apache License, Version 2.0 (the "License"); you may not
-# use this file except in compliance with the License.  You may obtain a copy
-# of the License at
-# 
-#   http://www.apache.org/licenses/LICENSE-2.0
-# 
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
-# WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
-# License for the specific language governing permissions and limitations under
-# the License.
-#-------------------------------------------------------------------------------
-#  Copyright 2017 Cognizant Technology Solutions
-#  
-#  Licensed under the Apache License, Version 2.0 (the "License"); you may not
-#  use this file except in compliance with the License.  You may obtain a copy
-#  of the License at
-#  
-#    http://www.apache.org/licenses/LICENSE-2.0
-#  
-#  Unless required by applicable law or agreed to in writing, software
-#  distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
-#  WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
-#  License for the specific language governing permissions and limitations under
-#  the License.
-
 echo "Enter the Offline Folder location"
 read DIRECTORY
 if [ -d "$DIRECTORY" ]; then
@@ -69,23 +40,23 @@ if [ -d "$DIRECTORY" ]; then
 				echo "Java"
 				echo "#################### Installing Java with Env Variable ####################"
 				cd /opt/
-				cp $DIRECTORY/Offline_Installation/Java/jdk-8u211-linux-x64.tar.gz  ./
-				tar xzf jdk-8u211-linux-x64.tar.gz
-				export JAVA_HOME=/opt/jdk1.8.0_211
-				echo JAVA_HOME=/opt/jdk1.8.0_211  |  tee -a /etc/environment
-				echo "export" JAVA_HOME=/opt/jdk1.8.0_211 |  tee -a /etc/profile
-				export JRE_HOME=/opt/jdk1.8.0_211/jre
-				echo JRE_HOME=/opt/jdk1.8.0_211/jre |  tee -a /etc/environment
-				echo "export" JRE_HOME=/opt/jdk1.8.0_211/jre |  tee -a /etc/profile
-				export PATH=$PATH:/opt/jdk1.8.0_211/bin:/opt/jdk1.8.0_211/jre/bin
-				echo PATH=$PATH:/opt/jdk1.8.0_211/bin:/opt/jdk1.8.0_211/jre/bin |  tee -a /etc/environment
-				alternatives --install /usr/bin/java java /opt/jdk1.8.0_211/bin/java 20000
-				update-alternatives --install "/usr/bin/java" "java" "/opt/jdk1.8.0_211/bin/java" 1
-				update-alternatives --install "/usr/bin/javac" "javac" "/opt/jdk1.8.0_211/bin/javac" 1
-				update-alternatives --install "/usr/bin/javaws" "javaws" "/opt/jdk1.8.0_211/bin/javaws" 1
-				update-alternatives --set java /opt/jdk1.8.0_211/bin/java
-				update-alternatives --set javac /opt/jdk1.8.0_211/bin/javac
-				update-alternatives --set javaws /opt/jdk1.8.0_211/bin/javaws
+				cp $DIRECTORY/Offline_Installation/Java/jdklinux.tar.gz  ./
+				tar xzf jdklinux.tar.gz
+				export JAVA_HOME=/opt/jdklinux
+				echo JAVA_HOME=/opt/jdklinux  |  tee -a /etc/environment
+				echo "export" JAVA_HOME=/opt/jdklinux |  tee -a /etc/profile
+				export JRE_HOME=/opt/jdklinux/jre
+				echo JRE_HOME=/opt/jdklinux/jre |  tee -a /etc/environment
+				echo "export" JRE_HOME=/opt/jdklinux/jre |  tee -a /etc/profile
+				export PATH=$PATH:/opt/jdklinux/bin:/opt/jdklinux/jre/bin
+				echo PATH=$PATH:/opt/jdklinux/bin:/opt/jdklinux/jre/bin |  tee -a /etc/environment
+				alternatives --install /usr/bin/java java /opt/jdklinux/bin/java 20000
+				update-alternatives --install "/usr/bin/java" "java" "/opt/jdklinux/bin/java" 1
+				update-alternatives --install "/usr/bin/javac" "javac" "/opt/jdklinux/bin/javac" 1
+				update-alternatives --install "/usr/bin/javaws" "javaws" "/opt/jdklinux/bin/javaws" 1
+				update-alternatives --set java /opt/jdklinux/bin/java
+				update-alternatives --set javac /opt/jdklinux/bin/javac
+				update-alternatives --set javaws /opt/jdklinux/bin/javaws
 				source /etc/environment
 				source /etc/profile
 				sleep 20
@@ -96,11 +67,11 @@ if [ -d "$DIRECTORY" ]; then
 				cd /opt/
 				mkdir elasticsearch
 				cd elasticsearch
-				cp $DIRECTORY/Offline_Installation/Elasticsearch/elasticsearch-5.6.4.rpm ./
-				rpm -Uvh elasticsearch-5.6.4.rpm
-				cp -R  $DIRECTORY/Offline_Installation/Elasticsearch/ElasticSearch-5.6.4/ ./
-				cp ElasticSearch-5.6.4/elasticsearch.yml /etc/elasticsearch/elasticsearch.yml
-				cp ElasticSearch-5.6.4/log4j2.properties /etc/elasticsearch/log4j2.properties
+				cp $DIRECTORY/Offline_Installation/Elasticsearch/elasticsearch.rpm ./
+				rpm -Uvh elasticsearch.rpm
+				cp -R  $DIRECTORY/Offline_Installation/Elasticsearch/ElasticSearch/ ./
+				cp ElasticSearch/elasticsearch.yml /etc/elasticsearch/elasticsearch.yml
+				cp ElasticSearch/log4j2.properties /etc/elasticsearch/log4j2.properties
 				systemctl daemon-reload
 				systemctl enable elasticsearch.service
 				systemctl start elasticsearch.service
@@ -118,17 +89,15 @@ if [ -d "$DIRECTORY" ]; then
 				source /etc/environment
 				mkdir NEO4J_HOME
 				cd NEO4J_HOME
-				cp $DIRECTORY/Offline_Installation/Neo4j/neo4j-community-3.3.0-unix.tar.gz ./
-				tar -xf neo4j-community-3.3.0-unix.tar.gz
-				cp -R  $DIRECTORY/Offline_Installation/Neo4j/Neo4j-3.3.0/ ./
-				cp Neo4j-3.3.0/conf/neo4j.conf neo4j-community-3.3.0/conf
-				cp -R Neo4j-3.3.0/plugins neo4j-community-3.3.0/ ./
-				cd neo4j-community-3.3.0
+				cp $DIRECTORY/Offline_Installation/Neo4j/neo4j-Insights.tar.gz ./
+				tar -xf neo4j-Insights.tar.gz
+				chmod -R 755 neo4j-Insights
+				cd neo4j-Insights
 				./bin/neo4j start
 				sleep 40
 				curl -X POST -u neo4j:neo4j -H "Content-Type: application/json" -d '{"password":"C0gnizant@1"}' http://localhost:7474/user/neo4j/password
 				sleep 10
-				cd ..
+				cd ../
 				export NEO4J_INIT_HOME=`pwd`
 				echo NEO4J_INIT_HOME=`pwd` |  tee -a /etc/environment
 				echo "export" NEO4J_INIT_HOME=`pwd` |  tee -a /etc/profile
@@ -149,10 +118,7 @@ if [ -d "$DIRECTORY" ]; then
 				echo "Postgres"
 				echo "#################### Installing Postgres with configs , Databases and Roles ####################"
 				cd /opt/
-				rpm -i  $DIRECTORY/Offline_Installation/Postgres/postgresql95-libs-9.5.13-1PGDG.rhel7.x86_64.rpm
-				rpm -i  $DIRECTORY/Offline_Installation/Postgres/postgresql95-9.5.13-1PGDG.rhel7.x86_64.rpm
-				rpm -i  $DIRECTORY/Offline_Installation/Postgres/postgresql95-server-9.5.13-1PGDG.rhel7.x86_64.rpm
-				rpm -i  $DIRECTORY/Offline_Installation/Postgres/postgresql95-contrib-9.5.13-1PGDG.rhel7.x86_64.rpm
+				rpm -ivh  $DIRECTORY/Offline_Installation/Postgres/*.rpm
 				/usr/pgsql-9.5/bin/postgresql95-setup initdb
 				systemctl enable postgresql-9.5.service
 				chkconfig postgresql-9.5 on
@@ -172,11 +138,10 @@ if [ -d "$DIRECTORY" ]; then
 				cd /opt/
 				mkdir grafana
 				cd grafana
-				cp $DIRECTORY/Offline_Installation/Grafana/grafana-5.2.2.tar.gz ./
-				tar -zxvf grafana-5.2.2.tar.gz
-				cp $DIRECTORY/Offline_Installation/Grafana/ldap.toml ./grafana-5.2.2/conf/ldap.toml
-				cp $DIRECTORY/Offline_Installation/Grafana/defaults.ini ./grafana-5.2.2/conf/defaults.ini
-				cd grafana-5.2.2
+				cp $DIRECTORY/Offline_Installation/Grafana/grafana.tar.gz ./
+				tar -zxvf grafana.tar.gz
+				cp $DIRECTORY/Offline_Installation/Grafana/ldap.toml ./conf/ldap.toml
+				cp $DIRECTORY/Offline_Installation/Grafana/defaults.ini ./conf/defaults.ini
 				nohup ./bin/grafana-server &
 				echo $! > grafana-pid.txt
 				sleep 10
@@ -201,37 +166,22 @@ if [ -d "$DIRECTORY" ]; then
 		{
 				echo "#################### Installing Python 2.7.11 with Virtual Env ####################"
 				cd /opt/
-				mkdir python && cd python
-				cp $DIRECTORY/Offline_Installation/Python/Python-2.7.11.tgz ./
-				tar -zxf Python-2.7.11.tgz && cd Python-2.7.11
-				rpm -i $DIRECTORY/Offline_Installation/Python/gcc-2.96-113.src.rpm
+				cp -R $DIRECTORY/Offline_Installation/Python/python_dependencies ./
+				cd python_dependencies
+				rpm -Uvh *.rpm 
+				cd ../ && rm -rf python_dependencies
+				echo $(pwd)
+				cp $DIRECTORY/Offline_Installation/Python/Python.tar.gz ./
+				tar -zxf Python.tar.gz && cd Python
+				./configure --enable-optimizations
+				make altinstall
+				rm -f /usr/bin/python
+				ln -s /opt/Python/python /usr/bin/python
+				python --version
 				cp $DIRECTORY/Offline_Installation/Python/Libraries/pip-18.0-py2.py3-none-any.whl ./
 				python pip-18.0-py2.py3-none-any.whl/pip install --no-index pip-18.0-py2.py3-none-any.whl
-				pip install $DIRECTORY/Offline_Installation/Python/Libraries/futures-3.2.0-py2-none-any.whl
-				pip install $DIRECTORY/Offline_Installation/Python/Libraries/funcsigs-1.0.2-py2.py3-none-any.whl
-				pip install $DIRECTORY/Offline_Installation/Python/Libraries/six-1.11.0-py2.py3-none-any.whl
-				pip install $DIRECTORY/Offline_Installation/Python/Libraries/setuptools-40.0.0-py2.py3-none-any.whl
-				pip install $DIRECTORY/Offline_Installation/Python/Libraries/pytz-2018.5-py2.py3-none-any.whl
-				pip install $DIRECTORY/Offline_Installation/Python/Libraries/tzlocal-1.5.1.tar.gz
-				pip install $DIRECTORY/Offline_Installation/Python/Libraries/ntlm_auth-1.2.0-py2.py3-none-any.whl
-				pip install $DIRECTORY/Offline_Installation/Python/Libraries/pycparser-2.18.tar.gz
-				pip install $DIRECTORY/Offline_Installation/Python/Libraries/asn1crypto-0.24.0-py2.py3-none-any.whl
-				pip install $DIRECTORY/Offline_Installation/Python/Libraries/cffi-1.11.5-cp27-cp27mu-manylinux1_x86_64.whl
-				pip install $DIRECTORY/Offline_Installation/Python/Libraries/idna-2.7-py2.py3-none-any.whl
-				pip install $DIRECTORY/Offline_Installation/Python/Libraries/enum34-1.1.6-py2-none-any.whl
-				pip install $DIRECTORY/Offline_Installation/Python/Libraries/cryptography-2.3-cp27-cp27mu-manylinux1_x86_64.whl
-				pip install $DIRECTORY/Offline_Installation/Python/Libraries/APScheduler-3.5.1-py2.py3-none-any.whl
-				pip install $DIRECTORY/Offline_Installation/Python/Libraries/requests_ntlm-1.1.0-py2.py3-none-any.whl
-				pip install $DIRECTORY/Offline_Installation/Python/Libraries/pika-0.12.0-py2.py3-none-any.whl
-				pip install $DIRECTORY/Offline_Installation/Python/Libraries/python_dateutil-2.7.3-py2.py3-none-any.whl
-				pip install $DIRECTORY/Offline_Installation/Python/Libraries/xmltodict-0.11.0-py2.py3-none-any.whl
-				pip install $DIRECTORY/Offline_Installation/Python/Libraries/certifi-2018.4.16-py2.py3-none-any.whl
-				pip install $DIRECTORY/Offline_Installation/Python/Libraries/chardet-3.0.4-py2.py3-none-any.whl
-				pip install $DIRECTORY/Offline_Installation/Python/Libraries/urllib3-1.23-py2.py3-none-any.whl
-				cp $DIRECTORY/Offline_Installation/Python/Libraries/requests-2.19.1-py2.py3-none-any.whl ./
-				pip install --no-index --find-links requests-2.19.1-py2.py3-none-any.whl requests
-				pip install $DIRECTORY/Offline_Installation/Python/Libraries/boto3-1.9.124-py2.py3-none-any.whl
-				pip install $DIRECTORY/Offline_Installation/Python/Libraries/ipaddress-1.0.22-py2.py3-none-any.whl
+				ln -s /usr/local/bin/pip /bin/pip
+				pip install $DIRECTORY/Offline_Installation/Python/Libraries/*.whl
 				source /etc/environment
 				source /etc/profile
 				sleep 5
@@ -242,13 +192,13 @@ if [ -d "$DIRECTORY" ]; then
 				echo "#################### Installing Erlang , required for Rabbit MQ ####################"
 				cd /opt/
 				mkdir erlang && cd erlang
-				rpm -i $DIRECTORY/Offline_Installation/Rabbitmq/erlang-20.0.5-1.el6.x86_64.rpm
+				rpm -i $DIRECTORY/Offline_Installation/Rabbitmq/erlang.rpm
 				echo "#################### Installing Rabbit MQ with configs and user creation ####################"
 				mkdir rabbitmq && cd rabbitmq
-				rpm -i $DIRECTORY/Offline_Installation/Rabbitmq/rabbitmq-server-3.6.1-1.noarch.rpm
+				rpm -i $DIRECTORY/Offline_Installation/Rabbitmq/rabbitmq-server.noarch.rpm
 				cp $DIRECTORY/Offline_Installation/Rabbitmq/rabbitmq-signing-key-public.asc ./
-				cp  -R $DIRECTORY/Offline_Installation/Rabbitmq/RabbitMQ-3.6.5/ ./
-				cd RabbitMQ-3.6.5  && cp rabbitmq.config /etc/rabbitmq/
+				cp  -R $DIRECTORY/Offline_Installation/Rabbitmq/RabbitMQ/ ./
+				cd RabbitMQ  && cp rabbitmq.config /etc/rabbitmq/
 				chkconfig rabbitmq-server on &&  service rabbitmq-server start
 				rabbitmq-plugins enable rabbitmq_management
 				sleep 15
@@ -263,12 +213,12 @@ if [ -d "$DIRECTORY" ]; then
 				else
 						echo "#################### Installing Tomcat8 ####################"
 						cd /opt
-						cp $DIRECTORY/Offline_Installation/Tomcat8/apache-tomcat-8.5.27.tar.gz ./
-						tar -zxvf apache-tomcat-8.5.27.tar.gz
-						cp -R $DIRECTORY/Offline_Installation/Insights_artifacts/uiApp/app /opt/apache-tomcat-8.5.27/webapps
-						cp $DIRECTORY/Offline_Installation/Insights_artifacts/serviceWar/PlatformService.war /opt/apache-tomcat-8.5.27/webapps
-						cd apache-tomcat-8.5.27
-						chmod -R 777 /opt/apache-tomcat-8.5.27
+						cp $DIRECTORY/Offline_Installation/Tomcat8/apache-tomcat.tar.gz ./
+						tar -zxvf apache-tomcat.tar.gz
+						cp -R $DIRECTORY/Offline_Installation/Insights_artifacts/uiApp/app /opt/apache-tomcat/webapps
+						cp $DIRECTORY/Offline_Installation/Insights_artifacts/serviceWar/PlatformService.war /opt/apache-tomcat/webapps
+						cd apache-tomcat
+						chmod -R 777 /opt/apache-tomcat
 						cd /etc/init.d/
 						cp $DIRECTORY/Offline_Installation/Tomcat8/Tomcat8.sh Tomcat8
 						chmod +x Tomcat8
