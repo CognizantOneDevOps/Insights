@@ -35,5 +35,5 @@ cd ..
 export NEO4J_INIT_HOME=`pwd`
 sudo echo NEO4J_INIT_HOME=`pwd` | sudo tee -a /etc/environment
 sudo echo "export" NEO4J_INIT_HOME=`pwd` | sudo tee -a /etc/profile
-source /etc/environment
-source /etc/profile
+. /etc/environment
+. /etc/profile
