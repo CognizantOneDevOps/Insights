@@ -21,8 +21,8 @@ cd insightsagents
 export INSIGHTS_AGENT_HOME=`pwd`
 echo INSIGHTS_AGENT_HOME=`pwd` |sudo tee -a /etc/environment
 echo "export" INSIGHTS_AGENT_HOME=`pwd` |sudo tee -a /etc/profile
-source /etc/environment
-source /etc/profile
+. /etc/environment
+. /etc/profile
 sudo mkdir AgentDaemon
 sudo mkdir PlatformAgents
 chmod -R 755 AgentDaemon

@@ -16,14 +16,16 @@
 #-------------------------------------------------------------------------------
 # install postgresql
 echo "#################### Installing Postgres with configs , Databases and Roles ####################"
-sudo apt-get -y install postgresql
-wget http://platform.cogdevops.com/insights_install/installationScripts/latest/RHEL/postgres/pg_hba.conf
+wget https://platform.cogdevops.com/insights_install/installationScripts/latest/Ubuntu/packages/postgres/postgres.zip
+unzip postgres.zip
+cd postgres
+sudo dpkg -i *.deb
 sudo cp pg_hba.conf /etc/postgresql/9.5/main/
 sudo systemctl stop postgresql.service
 sleep 15
 sudo systemctl start postgresql.service
 sudo useradd grafana
 sudo usermod --password C0gnizant@1 grafana
-wget http://platform.cogdevops.com/insights_install/installationScripts/latest/RHEL/postgres/dbscript.sql
 chmod +x dbscript.sql
 psql -U postgres -f dbscript.sql
+rm -rf postgres*
