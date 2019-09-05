@@ -15,8 +15,18 @@
  ******************************************************************************/
 package com.cognizant.devops.platformcommons.core.util;
 
+import java.io.IOException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.KeyGenerator;
+import javax.crypto.NoSuchPaddingException;
+import javax.crypto.SealedObject;
+import javax.crypto.SecretKey;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -81,7 +91,7 @@ public class ValidationUtils {
 	 *            data
 	 * @return JsonObject
 	 */
-	public static JsonObject validateStringForHTMLContent(JsonObject data) {
+	public static JsonObject validateJSONForHTMLContent(JsonObject data) {
 		String strRegEx = "<[^>]*>";
 		String jsonString = "";
 		JsonObject json = null;
@@ -107,6 +117,34 @@ public class ValidationUtils {
 			// log.debug(" validateStringForHTMLContent after " + jsonString);
 		}
 		return json;
+	}
+
+	public static Boolean validateStringForHTMLContent(String data) {
+		String strRegEx = "<[^>]*>";
+		String modifiedString = "";
+		Boolean hasHTML = Boolean.FALSE;
+	
+		// log.debug(" validateStringForHTMLContent string before " + data);
+	
+		if (data instanceof String) {
+			modifiedString = data;
+			// log.debug(" validateStringForHTMLContent after assigment " + jsonString);
+			if (modifiedString != null) {
+				modifiedString = modifiedString.replaceAll(strRegEx, "");
+				// replace &nbsp; with space
+				modifiedString = modifiedString.replace("&nbsp;", " ");
+				// replace &amp; with &
+				modifiedString = modifiedString.replace("&amp;", "&");
+			}
+			if (!modifiedString.equalsIgnoreCase(data.toString())) {
+				log.error(" Invilid response data ");
+				log.error("Invalid html pattern found in data value validateStringForHTMLContent ==== ");
+				hasHTML = Boolean.TRUE;
+				//throw new RuntimeException(PlatformServiceConstants.INVALID_REQUEST);
+			}
+			// log.debug(" validateStringForHTMLContent after " + jsonString);
+		}
+		return hasHTML;
 	}
 
 	/**
@@ -162,8 +200,41 @@ public class ValidationUtils {
 		return value;
 	}
 
-	public static String extactAutharizationToken(String authHeaderToken)   {
+	public static String cleanXSSWithHTMLCheck(String value) {
+		Boolean isXSSPattern = Boolean.FALSE;
+		String valueWithXSSPattern = "";
+		// log.debug("In cleanXSS RequestWrapper ..............." + value);
+		if (value != null || !("").equals(value)) {
+			try {
+				Boolean hasHTML = validateStringForHTMLContent(value);
+				if (hasHTML) {
+					isXSSPattern = true;
+				} else {
+					// match sections that match a pattern
+					for (Pattern scriptPattern : patterns) {
+						Matcher m = scriptPattern.matcher(value);
+						if (m.find()) {
+							isXSSPattern = true;
+							valueWithXSSPattern = value;
+							break;
+						}
+					}
+				}
+				if (isXSSPattern) {
+					//log.error("Invalid pattern found in data value ==== " + valueWithXSSPattern);
+					throw new RuntimeException(PlatformServiceConstants.INVALID_REQUEST);
+				}
+			} catch (RuntimeException e) {
+				log.error("Invalid pattern found in data value ==== " + valueWithXSSPattern);
+				throw new RuntimeException(PlatformServiceConstants.INVALID_REQUEST);
+			}
+		}
+		return value;
+	}
+
+	public static String extactAutharizationToken(String authHeaderTokenReq) {
 		String authTokenDecrypt = "";
+		String authHeaderToken = ValidationUtils.cleanXSS(authHeaderTokenReq);
 		log.debug("In Authorization token processing ");
 		try {
 			//log.debug(" authHeaderToken String " + authHeaderToken);
@@ -186,6 +257,58 @@ public class ValidationUtils {
 		}
 		log.debug("In Authorization token processing Complated ");
 		return authTokenDecrypt;
+	}
+
+	public static String getSealedObject(String userValue) {
+		String encryptedData = AES256Cryptor.encrypt(userValue, "123456$#@$^@1ERF");
+		return encryptedData;
+	}
+
+	public static String getDeSealedObject(String encryptedData) {
+		String decryptedData = AES256Cryptor.decrypt(encryptedData, "123456$#@$^@1ERF");
+		return decryptedData;
+	}
+
+	/**
+	 * Validate response data which doesnot contain any HTML String
+	 * 
+	 * @param JsonObject
+	 *            data
+	 * @return JsonObject
+	 */
+	public static JsonObject replaceHTMLContentFormString(JsonObject data) {
+		String strRegEx = "<[^>]*>";
+		String jsonString = "";
+		JsonObject json = null;
+
+		// log.debug(" validateStringForHTMLContent string before " + data);
+
+		if (data instanceof JsonObject) {
+			jsonString = data.toString();
+			// log.debug(" validateStringForHTMLContent after assigment " + jsonString);
+			if (jsonString != null) {
+				jsonString = jsonString.replaceAll(strRegEx, "");
+				// replace &nbsp; with space
+				jsonString = jsonString.replace("&nbsp;", " ");
+				// replace &amp; with &
+				jsonString = jsonString.replace("&amp;", "&");
+			}
+				json = new Gson().fromJson(jsonString, JsonObject.class);
+		}
+		return json;
+	}
+
+	public static String validateRequestBody(String inputData) {
+		log.debug(" In validateRequestBody ==== ");
+		String outputData = null;
+		try {
+			outputData = ValidationUtils.cleanXSSWithHTMLCheck(inputData);
+		} catch (RuntimeException e) {
+			log.error("validate Request Body has some issue === " + e.getMessage());
+			throw new RuntimeException(PlatformServiceConstants.INVALID_REQUEST_BODY);
+		}
+		return outputData;
+
 	}
 
 }

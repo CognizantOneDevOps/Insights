@@ -45,18 +45,13 @@ import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.config.GrafanaData;
 import com.cognizant.devops.platformcommons.core.util.ValidationUtils;
 import com.cognizant.devops.platformcommons.dal.rest.RestHandler;
-import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
-import com.cognizant.devops.platformdal.grafana.user.UserDAL;
 import com.cognizant.devops.platformservice.rest.util.PlatformServiceUtil;
 import com.cognizant.devops.platformservice.security.config.SpringAuthorityUtil;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import com.google.gson.JsonSyntaxException;
-import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.ClientResponse;
-import com.sun.jersey.api.client.UniformInterfaceException;
 
 @RestController
 @RequestMapping("/accessGrpMgmt")
@@ -116,8 +111,9 @@ public class AccessGroupManagement {
 	}
 
 	@RequestMapping(value = "/searchUser", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public @ResponseBody JsonObject searchUser(@RequestBody String name) {
+	public @ResponseBody JsonObject searchUser(@RequestBody String reqname) {
 		try {
+			String name = ValidationUtils.validateRequestBody(reqname);
 			String apiUrlName = ApplicationConfigProvider.getInstance().getGrafana().getGrafanaEndpoint()
 					+ "/api/users/lookup?loginOrEmail=" + name;
 			String message = null;
@@ -143,14 +139,12 @@ public class AccessGroupManagement {
 	}
 
 	@RequestMapping(value = "/assignUser", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public @ResponseBody JsonObject assignUser(@RequestBody String assignUserdata) {
-		// log.debug(assignUserdata);
+	public @ResponseBody JsonObject assignUser(@RequestBody String reqassignUserdata) {
 		String message = " ";
-		JsonParser parser = new JsonParser();
-		JsonElement updateAgentJson = parser.parse(assignUserdata);
-
 		try {
-
+			String assignUserdata = ValidationUtils.validateRequestBody(reqassignUserdata);
+			JsonParser parser = new JsonParser();
+			JsonElement updateAgentJson = parser.parse(assignUserdata);
 			if (updateAgentJson.isJsonArray()) {
 				JsonArray arrayOfOrg = updateAgentJson.getAsJsonArray();
 				int size = arrayOfOrg.size();
@@ -190,15 +184,10 @@ public class AccessGroupManagement {
 						message = message + "Org" + ": " + orgName + " " + responseorg.getEntity(String.class);
 
 					}
-
 				}
-
 			}
 			return PlatformServiceUtil.buildSuccessResponseWithData(message);
-
-		}
-
-		catch (Exception e) {
+		}catch (Exception e) {
 			return PlatformServiceUtil.buildFailureResponse(e.toString());
 		}
 
@@ -240,19 +229,19 @@ public class AccessGroupManagement {
 	// ADD USER :-
 
 	@RequestMapping(value = "/addUserInOrg", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public @ResponseBody JsonObject addUser(@RequestBody String userPropertyList) {
+	public @ResponseBody JsonObject addUser(@RequestBody String requserPropertyList) {
 		String message = null;
 		// log.debug("getOrgs API is: " + userPropertyList);
 		try {
+			String userPropertyList = ValidationUtils.validateRequestBody(requserPropertyList);
 			JsonParser parser = new JsonParser();
-			String validatedResponse = ValidationUtils.cleanXSS(userPropertyList);
-			JsonObject updateAgentJson = (JsonObject) parser.parse(validatedResponse);
+			JsonObject updateAgentJson = (JsonObject) parser.parse(userPropertyList);
 			int orgId = updateAgentJson.get("orgId").getAsInt();
 			String name = updateAgentJson.get("name").getAsString();
 			String email = updateAgentJson.get("email").getAsString();
 			String userName = updateAgentJson.get("userName").getAsString();
 			String role = updateAgentJson.get("role").getAsString();
-			String password = updateAgentJson.get("password").getAsString();
+			String password = ValidationUtils.getSealedObject(updateAgentJson.get("password").getAsString());
 			String orgName = updateAgentJson.get("orgName").getAsString();
 			String apiUrlName = ApplicationConfigProvider.getInstance().getGrafana().getGrafanaEndpoint()
 					+ "/api/users/lookup?loginOrEmail=" + userName;
@@ -348,7 +337,7 @@ public class AccessGroupManagement {
 					requestCreate.addProperty("login", userName);
 					requestCreate.addProperty("email", email);
 					requestCreate.addProperty("role", role);
-					requestCreate.addProperty("password", password);
+					requestCreate.addProperty("password", ValidationUtils.getDeSealedObject(password));
 					ClientResponse responseCreate = callgrafana(apiUrlCreate, requestCreate, "post");
 
 					JsonObject jsonResponse = new JsonParser().parse(responseCreate.getEntity(String.class))

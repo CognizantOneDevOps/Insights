@@ -35,8 +35,7 @@ import { CustomReportConfigComponent } from '@insights/app/modules/blockchain/cu
 import { RelationshipBuilderComponent } from '@insights/app/modules/relationship-builder/relationship-builder.component';
 import { BulkUploadComponent } from '@insights/app/modules/bulkupload/bulkupload.component';
 import { WebHookComponent } from '@insights/app/modules/webhook/webhook.component';
-
-
+import { AuthGuardService as AuthGuard } from '@insights/common/auth-guard.service';
 const homeRoutes: Routes = [
   {
     path: 'InSights/Home', component: HomeComponent,
@@ -60,7 +59,8 @@ const homeRoutes: Routes = [
       { path: 'relationship-builder', component: RelationshipBuilderComponent },
       { path: 'bulkupload', component: BulkUploadComponent },
       { path: 'webhook', component: WebHookComponent }
-    ]
+    ],
+    canActivate: [AuthGuard]
   }
 ];
 
