@@ -88,11 +88,12 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 				.antMatchers("/configure/loadConfigFromResources").permitAll()
 				.antMatchers("/**").authenticated() //.permitAll()
 				.and().exceptionHandling().accessDeniedHandler(springAccessDeniedHandler).and().httpBasic().disable()
-				.addFilterBefore(tokenFilter, BasicAuthenticationFilter.class) // .disable()  .authenticationEntryPoint(springAuthenticationEntryPoint) .and() .and()
-				.headers().frameOptions().sameOrigin().and().sessionManagement().maximumSessions(1).and()
-				.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED).and().csrf().ignoringAntMatchers(CSRF_IGNORE)
-				.csrfTokenRepository(csrfTokenRepository()).and()
+				.addFilterBefore(new CrossScriptingFilter(), BasicAuthenticationFilter.class)
+				.csrf().ignoringAntMatchers(CSRF_IGNORE).csrfTokenRepository(csrfTokenRepository()).and()
 				.addFilterAfter(new CustomCsrfFilter(), CsrfFilter.class)
+				.addFilterBefore(tokenFilter, BasicAuthenticationFilter.class)
+				.headers().frameOptions().sameOrigin().and().sessionManagement().maximumSessions(1).and()
+				.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
 		;
 	
 	}

@@ -65,6 +65,7 @@ export class LoginComponent implements OnInit, ILoginComponent {
   ngOnInit() {
     this.createAndValidateForm();
     this.dataShare.storeTimeZone();
+    this.dataShare.removeAuthorization();
   }
 
   public createAndValidateForm() {
@@ -108,7 +109,7 @@ export class LoginComponent implements OnInit, ILoginComponent {
       this.loginService.loginUserAuthentication(this.username, this.password)
         .then((data) => {
           var grafcookies = data.data;
-          if (data.status === 'SUCCESS') {
+          if (data.status === 'success') { //SUCCESS
             self.showThrobber = false;
             var date = new Date();
 
@@ -171,7 +172,7 @@ export class LoginComponent implements OnInit, ILoginComponent {
           } else if (data.status == 404) {
             self.logMsg = "Server Not found"
           } else if (data.status == 401) {
-            self.logMsg = "Unauthorized Access"
+            self.logMsg = "Invalid Credentials" //Unauthorized Access
           } else {
             self.logMsg = "Internal server error";
           }
