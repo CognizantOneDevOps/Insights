@@ -34,6 +34,7 @@ export class RestAPIurlService implements IRestAPIUrlService {
         this.addEndPoint("HEALTH_TOOL", '/PlatformService/admin/health/detailHealth');
         this.addEndPoint("INSIGHTS_COMP_STATUS", '/PlatformService/admin/health/globalHealth');
         this.addEndPoint("AGENT_COMP_STATUS", '/PlatformService/admin/health/globalAgentsHealth');
+        this.addEndPoint("AGENTS_FAILURE_DETAILS", '/PlatformService/admin/health/getAgentFailureDetails');
 
         this.addEndPoint("LOGOUT", '/PlatformService/user/logout');
         this.addEndPoint("GRAPANA_CURRENT_ROLE_ORG", '/PlatformService/user/getCurrentOrgAndRole');
@@ -108,6 +109,11 @@ export class RestAPIurlService implements IRestAPIUrlService {
 
         this.addEndPoint("UPLOAD_FILE", '/PlatformService/admin/bulkupload/uploadToolData');
         this.addEndPoint("TOOLNAME_LABELNAME_JSON", '/PlatformService/admin/bulkupload/getToolJson');
+
+        this.addEndPoint("SAVE_DATA_WEBHOOK_CONFIG", '/PlatformService/admin/webhook/saveWebhook');
+        this.addEndPoint("LIST_WEBHOOK", '/PlatformService/admin/webhook/loadwebhookConfiguration');
+        this.addEndPoint("DELETE_WEBHOOK", '/PlatformService/admin/webhook/uninstallWebHook');
+        this.addEndPoint("UPDATE_WEBHOOK", '/PlatformService/admin/webhook/updateWebhook');
         //this.addEndPoint("USER_GET", '/PlatformService/admin/userMgmt/getUser');
         //this.addEndPoint("CURRENT_USER_ORG", '/PlatformService/admin/userMgmt/getCurrentUserOrgs');
         //this.addEndPoint("SWITCH_USER_ORG", '/PlatformService/admin/userMgmt/switchUserOrg');

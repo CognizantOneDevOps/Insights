@@ -29,6 +29,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.cognizant.devops.platformcommons.core.util.ValidationUtils;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformservice.agentmanagement.service.AgentConfigTO;
 import com.cognizant.devops.platformservice.agentmanagement.service.AgentManagementService;
@@ -61,8 +62,9 @@ public class InsightsAgentConfiguration {
 		String message = null;
 
 		try {
+			String validatedResponse = ValidationUtils.validateRequestBody(registerAgentJson);
 			JsonParser parser = new JsonParser();
-			JsonObject registerAgentjson = (JsonObject) parser.parse(registerAgentJson);
+			JsonObject registerAgentjson = (JsonObject) parser.parse(validatedResponse);
 			String toolName = registerAgentjson.get("toolName").getAsString();
 			String agentVersion = registerAgentjson.get("agentVersion").getAsString();
 			String osversion = registerAgentjson.get("osversion").getAsString();
@@ -104,8 +106,9 @@ public class InsightsAgentConfiguration {
 	public @ResponseBody JsonObject updateAgent(@RequestBody String updateAgentJsonRequest) {
 		String message = null;
 		try {
+			String validatedResponse = ValidationUtils.validateRequestBody(updateAgentJsonRequest);
 			JsonParser parser = new JsonParser();
-			JsonObject updateAgentJson = (JsonObject) parser.parse(updateAgentJsonRequest);
+			JsonObject updateAgentJson = (JsonObject) parser.parse(validatedResponse);
 			String agentId = updateAgentJson.get("agentId").getAsString();
 			String toolName = updateAgentJson.get("toolName").getAsString();
 			String agentVersion = updateAgentJson.get("agentVersion").getAsString();
