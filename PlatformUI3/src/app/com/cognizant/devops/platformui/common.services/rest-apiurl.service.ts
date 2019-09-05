@@ -37,7 +37,7 @@ export class RestAPIurlService implements IRestAPIUrlService {
 
         this.addEndPoint("LOGOUT", '/PlatformService/user/logout');
         this.addEndPoint("GRAPANA_CURRENT_ROLE_ORG", '/PlatformService/user/getCurrentOrgAndRole');
-        this.addEndPoint("ORGS_GET", '/PlatformService/admin/userMgmt/getOrgs');
+        //this.addEndPoint("ORGS_GET", '/PlatformService/admin/userMgmt/getOrgs');
 
         this.addEndPoint("USER_AUTHNTICATE", '/PlatformService/user/authenticate');
 
@@ -48,7 +48,7 @@ export class RestAPIurlService implements IRestAPIUrlService {
         this.addEndPoint("ASSIGN_USER", '/PlatformService/accessGrpMgmt/assignUser');
         this.addEndPoint("USER_ORG_SEARCH", '/PlatformService/accessGrpMgmt/searchUser');
 
-        this.addEndPoint("ACCESS_GROUP_MANAGEMENT_GET_ORGS", '/PlatformService/accessGrpMgmt/getOrgs');
+        //this.addEndPoint("ACCESS_GROUP_MANAGEMENT_GET_ORGS", '/PlatformService/accessGrpMgmt/getOrgs');
         this.addEndPoint("ACCESS_GROUP_MANAGEMENT_GET_CURRENT_USER_ORGS", '/PlatformService/accessGrpMgmt/getCurrentUserOrgs');
         this.addEndPoint("ACCESS_GROUP_MANAGEMENT_SWITCH_ORGS", '/PlatformService/accessGrpMgmt/switchUserOrg');
         this.addEndPoint("ACCESS_GROUP_MANAGEMENT_GET_USERS", '/PlatformService/accessGrpMgmt/getUser');
