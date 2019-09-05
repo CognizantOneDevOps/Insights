@@ -28,6 +28,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.cognizant.devops.platformcommons.core.util.ValidationUtils;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformservice.rest.util.PlatformServiceUtil;
 import com.cognizant.devops.platformservice.webhook.service.WebHookConfigTO;
@@ -45,8 +46,9 @@ public class WebHookController {
 	@RequestMapping(value = "/saveWebhook", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 	public @ResponseBody JsonObject saveWebhook(@RequestBody String registerWebhookJson) {
 		try {
+			String validatedResponse = ValidationUtils.validateRequestBody(registerWebhookJson);
 			JsonParser parser = new JsonParser();
-			JsonObject registerWebhookjson = (JsonObject) parser.parse(registerWebhookJson);
+			JsonObject registerWebhookjson = (JsonObject) parser.parse(validatedResponse);
 			String toolName = registerWebhookjson.get("toolName").getAsString();
 			String labelDisplay = registerWebhookjson.get("labelDisplay").getAsString();
 			String webhookName = registerWebhookjson.get("webhookName").getAsString();
@@ -91,8 +93,9 @@ public class WebHookController {
 	@RequestMapping(value = "/updateWebhook", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 	public @ResponseBody JsonObject updateWebhook(@RequestBody String registerWebhookJson) {
 		try {
+			String validatedResponse = ValidationUtils.validateRequestBody(registerWebhookJson);
 			JsonParser parser = new JsonParser();
-			JsonObject registerWebhookjson = (JsonObject) parser.parse(registerWebhookJson);
+			JsonObject registerWebhookjson = (JsonObject) parser.parse(validatedResponse);
 			String toolName = registerWebhookjson.get("toolName").getAsString();
 			String labelDisplay = registerWebhookjson.get("labelDisplay").getAsString();
 			String webhookName = registerWebhookjson.get("webhookName").getAsString();

@@ -42,6 +42,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.cognizant.devops.platformcommons.constants.ConfigOptions;
+import com.cognizant.devops.platformcommons.core.util.ValidationUtils;
 import com.cognizant.devops.platformdal.queryBuilder.QueryBuilderConfig;
 import com.cognizant.devops.platformservice.querybuilder.service.QueryBuilderService;
 import com.cognizant.devops.platformservice.rest.util.PlatformServiceUtil;
@@ -72,6 +73,9 @@ public class QueryBuilderController {
 		String message = null;
 		Log.debug("object is --"+queryObj);
 		try{
+			for (Map.Entry<String, String> reqParamQuery : queryObj.entrySet()) {
+				ValidationUtils.cleanXSS(reqParamQuery.getValue());
+			}
 			message = queryBuilderService.saveOrUpdateQuery(queryObj.get("reportName"), queryObj.get("frequency"), queryObj.get("subscribers"), 
 					queryObj.get("fileName"), queryObj.get("queryType"), queryObj.get("user"));
 		}catch(Exception e){
@@ -84,7 +88,8 @@ public class QueryBuilderController {
 	public @ResponseBody JsonObject deleteQuery(@RequestBody String reportName){
 		String message = null;
 		try{
-			message = queryBuilderService.deleteQuery(reportName);
+			String validatedResponse = ValidationUtils.validateRequestBody(reportName);
+			message = queryBuilderService.deleteQuery(validatedResponse);
 		}catch(Exception e){
 			return PlatformServiceUtil.buildFailureResponse(e.toString());
 		}

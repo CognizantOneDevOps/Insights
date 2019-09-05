@@ -127,7 +127,7 @@ public class HealthStatus {
 		}catch(Exception e) {
 			PlatformServiceUtil.buildFailureResponse(e.getMessage());
 		}
-		return servicesHealthStatus;
+		return PlatformServiceUtil.buildSuccessResponseWithData(servicesHealthStatus);
 	}
 
 	@RequestMapping(value = "/globalAgentsHealth", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
@@ -142,7 +142,7 @@ public class HealthStatus {
 			log.error(e.getMessage());
 			PlatformServiceUtil.buildFailureResponse(e.getMessage());
 		}
-		return servicesAgentsHealthStatus;
+		return PlatformServiceUtil.buildSuccessResponseWithData(servicesAgentsHealthStatus);
 	}
 
 	@RequestMapping(value = "/detailHealth", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
@@ -449,7 +449,7 @@ public class HealthStatus {
 				jsonResponse2.addProperty("agentId", agentId);
 				jsonResponse2.addProperty("inSightsTimeX", insightTimeX);
 				jsonResponse2.addProperty(PlatformServiceConstants.STATUS, agentstatus);
-				jsonResponse2.addProperty(PlatformServiceConstants.MESSAGE, message);
+				//jsonResponse2.addProperty(PlatformServiceConstants.MESSAGE, message);
 				jsonResponse2.addProperty("category", toolcategory);
 				agentNode.add(jsonResponse2);
 			}

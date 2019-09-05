@@ -418,6 +418,8 @@ export class HomeComponent implements OnInit {
         //console.log(data);
       });
     this.deleteAllPreviousCookies();
+    this.dataShare.setAuthorizationToken(undefined);
+    this.dataShare.removeAuthorization()
     this.router.navigate(['/login']);
   }
 
