@@ -47,6 +47,7 @@ public class PlatformServiceInitializer implements WebApplicationInitializer {
 	public void onStartup(ServletContext servletContext) throws ServletException {
 		ApplicationConfigCache.loadConfigCache();
 		disableSslVerification();
+
 		InsightsConfiguration.doInsightsConfiguration();
 		servletContext.addFilter("CrossScriptingFilter", CrossScriptingFilter.class).addMappingForUrlPatterns(null,
 				false, "/*");
