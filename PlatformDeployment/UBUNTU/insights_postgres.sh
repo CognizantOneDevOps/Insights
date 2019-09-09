@@ -17,6 +17,7 @@
 # install postgresql
 echo "#################### Installing Postgres with configs , Databases and Roles ####################"
 wget https://platform.cogdevops.com/insights_install/installationScripts/latest/Ubuntu/packages/postgres/postgres.zip
+sleep 5
 unzip postgres.zip
 cd postgres
 sudo dpkg -i *.deb

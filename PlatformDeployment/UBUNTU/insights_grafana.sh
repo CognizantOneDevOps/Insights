@@ -18,7 +18,7 @@ echo "#################### Installing Grafana (running as BG process) ##########
 sudo mkdir grafana
 cd grafana
 sudo wget https://platform.cogdevops.com/insights_install/installationScripts/latest/Ubuntu/packages/grafana/grafana.tar.gz 
-sudo tar -zxvf grafana.tar.gz
+sudo tar -zxf grafana.tar.gz
 export GRAFANA_HOME=`pwd`
 sudo echo GRAFANA_HOME=`pwd` | sudo tee -a /etc/environment
 sudo echo "export" GRAFANA_HOME=`pwd` | sudo tee -a /etc/profile
@@ -29,7 +29,6 @@ sudo cp ldap.toml $GRAFANA_HOME/conf/ldap.toml
 sudo wget https://platform.cogdevops.com/insights_install/installationScripts/latest/Ubuntu/packages/grafana/defaults.ini
 sudo cp defaults.ini $GRAFANA_HOME/conf/defaults.ini
 sudo nohup ./bin/grafana-server &
-sudo echo $! > grafana-pid.txt
 sleep 10
 curl -X POST -u admin:admin -H "Content-Type: application/json" -d '{"name":"PowerUser","email":"PowerUser@PowerUser.com","login":"PowerUser","password":"C0gnizant@1"}' http://localhost:3000/api/admin/users
 sleep 10

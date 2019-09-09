@@ -23,7 +23,7 @@ sudo dpkg -i *.deb
 mkdir rabbitmq && cd rabbitmq
 echo "deb http://www.rabbitmq.com/debian/ testing main" | sudo tee -a /etc/apt/sources.list
 wget -O- https://platform.cogdevops.com/insights_install/installationScripts/latest/Ubuntu/packages/rabbitmq/rabbitmq-release-signing-key.asc | sudo apt-key add -
-https://platform.cogdevops.com/insights_install/installationScripts/latest/Ubuntu/packages/rabbitmq/rabbitmq-server.deb
+wget https://platform.cogdevops.com/insights_install/installationScripts/latest/Ubuntu/packages/rabbitmq/rabbitmq-server.deb
 sudo dpkg -i rabbitmq-server.deb
 sleep 15
 wget https://platform.cogdevops.com/insights_install/installationScripts/latest/Ubuntu/packages/rabbitmq/RabbitMQ.zip

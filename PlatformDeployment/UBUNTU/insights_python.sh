@@ -17,13 +17,18 @@
 # Python 2.7.11
 
 echo "#################### Installing Python 2.7.11 with Virtual Env ####################"
-sudo wget https://platform.cogdevops.com/insights_install/installationScripts/latest/Ubuntu/packages/python/dependencies.zip
-sudo unzip dependencies.zip
-cd dependencies
-sudo dpkg -i *.deb
+#sudo wget https://platform.cogdevops.com/insights_install/installationScripts/latest/Ubuntu/packages/python/dependencies.zip
+#sudo unzip dependencies.zip
+#cd dependencies
+#sudo dpkg -i *.deb
 sudo mkdir /opt/python && cd /opt/python && sudo wget https://platform.cogdevops.com/insights_install/installationScripts/latest/Ubuntu/packages/python/Python.tar.gz 
 sudo tar -zxf Python.tar.gz
 cd Python
+sudo apt-get install gcc -y
+sudo apt-get install libssl-dev -y
+sudo apt-get install bzip2-dev -y
+sudo apt-get install libffi-dev -y
+sudo apt-get install make -y
 sudo ./configure --enable-optimizations
 sudo make altinstall
 sudo rm -f /usr/bin/python
