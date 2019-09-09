@@ -14,14 +14,17 @@
 # the License.
 #-------------------------------------------------------------------------------
 # Pythonecho "#################### Installing Python with Virtual Env ####################"
-sudo wget https://platform.cogdevops.com/insights_install/installationScripts/latest/RHEL/python/python_dependencies.zip
-sudo unzip python_dependencies.zip && cd python_dependencies
-sudo rpm -Uvh *.rpm
+#sudo wget https://platform.cogdevops.com/insights_install/installationScripts/latest/RHEL/python/python_dependencies.zip
+#sudo unzip python_dependencies.zip && cd python_dependencies
+#sudo rpm -Uvh *.rpm
 cd /opt
 sudo wget https://platform.cogdevops.com/insights_install/installationScripts/latest/RHEL/python/Python.tar.gz
 sudo tar -zxf Python.tar.gz
 cd Python
-echo $(pwd)
+sudo yum install gcc -y
+sudo yum install openssl-devel -y 
+sudo yum install bzip2-devel -y  
+sudo yum install libffi-devel -y
 sudo ./configure --enable-optimizations
 sudo make altinstall
 sudo rm -f /usr/bin/python

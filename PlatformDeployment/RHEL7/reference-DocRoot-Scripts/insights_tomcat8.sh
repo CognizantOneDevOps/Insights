@@ -31,4 +31,6 @@ sudo wget https://platform.cogdevops.com/insights_install/installationScripts/la
 sudo mv Tomcat8.sh Tomcat8
 sudo chmod +x Tomcat8
 sudo chkconfig Tomcat8 on
+sleep 10
+sudo service Tomcat8 stop
 sudo service Tomcat8 start

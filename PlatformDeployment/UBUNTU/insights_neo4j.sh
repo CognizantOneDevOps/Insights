@@ -18,7 +18,7 @@
 echo "#################### Installing Neo4j with configs and user creation ####################"
 sudo sed  -i '$ a root   soft    nofile  40000' /etc/security/limits.conf
 sudo sed  -i '$ a root   hard    nofile  40000' /etc/security/limits.conf
-source /etc/environment
+. /etc/environment
 cd /opt
 sudo mkdir NEO4J_HOME
 cd NEO4J_HOME
@@ -27,7 +27,7 @@ sudo tar -xzf neo4j-Insights.tar.gz
 sudo chmod -R 755 neo4j-Insights
 cd neo4j-Insights
 sleep 20
-./bin/neo4j start
+sudo ./bin/neo4j start
 sleep 40
 curl -X POST -u neo4j:neo4j -H "Content-Type: application/json" -d '{"password":"C0gnizant@1"}' http://localhost:7474/user/neo4j/password
 sleep 10

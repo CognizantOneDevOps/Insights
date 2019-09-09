@@ -29,7 +29,7 @@ cd neo4j-Insights
 sleep 20
 ./bin/neo4j start
 sleep 40
-curl -X POST -u neo4j:neo4j -H "Content-Type: application/json" -d '{"password":"C0gnizant@1"}' http://localhost:7474/user/neo4j/password
+#curl -X POST -u neo4j:neo4j -H "Content-Type: application/json" -d '{"password":"C0gnizant@1"}' http://localhost:7474/user/neo4j/password
 sleep 10
 cd ..
 export NEO4J_INIT_HOME=`pwd`
