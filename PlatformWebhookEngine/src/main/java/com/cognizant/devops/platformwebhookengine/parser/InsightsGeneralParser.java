@@ -82,7 +82,7 @@ public class InsightsGeneralParser implements InsightsWebhookParserInterface {
 	private Map<String, String> getResponseTemplateMap(String responseTemplate) {
 
 		Map<String, String> responseTemplateMap = new HashMap<>();
-		String value = responseTemplate.replace("\n", "");
+		String value = responseTemplate.replace("\n", "").replace("\r", "");
 		String[] keyValuePairs = value.split(","); // split the string to creat key-value pairs
 		for (String pair : keyValuePairs) // iterate over the pairs
 		{
