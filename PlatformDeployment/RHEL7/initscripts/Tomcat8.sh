@@ -26,7 +26,7 @@
 # Short-Description: Simple script to run Tomcat program at boot
 # Description: Runs a Tomcat program at boot
 ### END INIT INFO
-TOMCAT_HOME="/opt/apache-tomcat-8.5.27/bin"
+TOMCAT_HOME="/opt/apache-tomcat/bin"
 case "$1" in
   start)
     if [[ $(ps aux | grep '[t]omcat' | awk '{print $2}') ]]; then
