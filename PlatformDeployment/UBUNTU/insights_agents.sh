@@ -21,8 +21,8 @@ cd insightsagents
 export INSIGHTS_AGENT_HOME=`pwd`
 echo INSIGHTS_AGENT_HOME=`pwd` |sudo tee -a /etc/environment
 echo "export" INSIGHTS_AGENT_HOME=`pwd` |sudo tee -a /etc/profile
-source /etc/environment
-source /etc/profile
+. /etc/environment
+. /etc/profile
 sudo mkdir AgentDaemon
 sudo mkdir PlatformAgents
 chmod -R 755 AgentDaemon
@@ -36,4 +36,4 @@ sudo chmod +x installdaemonagent.sh
 sudo mkdir /opt/agent20
 sudo mkdir /opt/agent20/download
 sudo chmod -R 777 /opt/agent20
-./installdaemonagent.sh ubuntu
+sudo ./installdaemonagent.sh ubuntu
