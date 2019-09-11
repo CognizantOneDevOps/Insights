@@ -1,3 +1,4 @@
+#!/bin/bash
 #-------------------------------------------------------------------------------
 # Copyright 2017 Cognizant Technology Solutions
 #   
@@ -22,13 +23,13 @@ cd /opt
 sudo mkdir NEO4J_HOME
 cd NEO4J_HOME
 sudo wget https://platform.cogdevops.com/insights_install/installationScripts/latest/RHEL/neo4j/neo4j-Insights.tar.gz
-sudo tar -xf neo4j-Insights.tar.gz
+sudo tar -xzf neo4j-Insights.tar.gz
 sudo chmod -R 755 neo4j-Insights
 cd neo4j-Insights
 sleep 20
-sudo ./bin/neo4j start
+./bin/neo4j start
 sleep 40
-curl -X POST -u neo4j:neo4j -H "Content-Type: application/json" -d '{"password":"C0gnizant@1"}' http://localhost:7474/user/neo4j/password
+#curl -X POST -u neo4j:neo4j -H "Content-Type: application/json" -d '{"password":"C0gnizant@1"}' http://localhost:7474/user/neo4j/password
 sleep 10
 cd ..
 export NEO4J_INIT_HOME=`pwd`
@@ -36,4 +37,3 @@ sudo echo NEO4J_INIT_HOME=`pwd` | sudo tee -a /etc/environment
 sudo echo "export" NEO4J_INIT_HOME=`pwd` | sudo tee -a /etc/profile
 source /etc/environment
 source /etc/profile
-

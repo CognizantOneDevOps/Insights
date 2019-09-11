@@ -17,17 +17,16 @@ cd /opt
 sudo yum install httpd -y
 cd /etc/httpd/conf
 rm -f httpd.conf
-wget https://platform.cogdevops.com/insights_install/installationScripts/latest/RHEL/httpd/RHEL/http/httpd.conf
+wget https://platform.cogdevops.com/insights_install/installationScripts/latest/RHEL/httpd/httpd.conf
 cd /etc/httpd/conf.d
 rm -f httpd-vhosts.conf
-wget https://platform.cogdevops.com/insights_install/installationScripts/latest/RHEL/httpd/RHEL/http/httpd-vhosts.conf
+wget http://platform.cogdevops.com/insights_install/installationScripts/latest/RHEL/httpd/vhostFile/httpd-vhosts.conf
 myextip=$(wget -qO- icanhazip.com)
 echo $myextip
 sed -i -e "s|${myextip}:3000|${myextip}\/grafana|g" /usr/INSIGHTS_HOME/.InSights/server-config.json
 sed -i -e "s/.*serviceHost.*/    \"serviceHost\": \"$myextip\",/g" /opt/apache-tomcat-8.5.27/webapps/app/config/uiConfig.json
 sed -i -e "s/.*grafanaHost.*/    \"grafanaHost\": \"$myextip\/grafana\"/g" /opt/apache-tomcat-8.5.27/webapps/app/config/uiConfig.json
 cd /opt/grafana/conf
-wget https://platform.cogdevops.com/insights_install/installationScripts/latest/RHEL/httpd/grafana/custom.ini
-systemctl restart httpd.service
+wget http://platform.cogdevops.com/insights_install/installationScripts/latest/RHEL/httpd/custom.ini
+apachectl -k start
 service grafana restart
-service tomcat restart
