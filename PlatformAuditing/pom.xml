@@ -5,9 +5,10 @@
 	under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES 
 	OR CONDITIONS OF ANY KIND, either express or implied. See the License for 
 	the specific language governing permissions and limitations under the License. -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-	
+
 	<parent>
 		<artifactId>PlatformParent</artifactId>
 		<groupId>com.cognizant.devops</groupId>
@@ -44,11 +45,43 @@
 			<artifactId>log4j-core</artifactId>
 			<version>2.11.1</version>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>org.hyperledger.fabric-sdk-java</groupId>
 			<artifactId>fabric-sdk-java</artifactId>
 			<version>1.4.4</version>
+			<exclusions>
+				<exclusion>
+				 	<groupId>io.grpc</groupId>
+    				<artifactId>grpc-netty</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+
+		<dependency>
+			<groupId>io.netty</groupId>
+			<artifactId>netty-codec-http2</artifactId>
+			<version>4.1.39.Final</version>
+		</dependency>
+		<dependency>
+			<groupId>io.netty</groupId>
+			<artifactId>netty-common</artifactId>
+			<version>4.1.39.Final</version>
+		</dependency>
+		<dependency>
+		    <groupId>io.grpc</groupId>
+		    <artifactId>grpc-netty</artifactId>
+		    <version>1.23.0</version>
+		    <exclusions>
+		    	<exclusion>
+					<groupId>io.netty</groupId>
+					<artifactId>netty-common</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>io.netty</groupId>
+					<artifactId>netty-codec-http2</artifactId>
+				</exclusion>
+		    </exclusions>
 		</dependency>
 		<dependency>
 			<groupId>com.cognizant.devops</groupId>
@@ -79,7 +112,7 @@
 						<goals>
 							<goal>shade</goal>
 						</goals>
-						<configuration>	
+						<configuration>
 							<filters>
 								<filter>
 									<artifact>*:*</artifact>
@@ -87,8 +120,8 @@
 										<exclude>log4j.properties</exclude>
 										<exclude>server-config.json</exclude>
 										<exclude>META-INF/*.SF</exclude>
-                                    						<exclude>META-INF/*.DSA</exclude>
-                                    						<exclude>META-INF/*.RSA</exclude>
+										<exclude>META-INF/*.DSA</exclude>
+										<exclude>META-INF/*.RSA</exclude>
 									</excludes>
 								</filter>
 							</filters>

@@ -24,12 +24,12 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.quartz.Job;
-import org.quartz.JobExecutionContext;
+
 
 import java.io.IOException;
+import java.util.TimerTask;
 
-public class JiraProcessingExecutor implements Job {
+public class JiraProcessingExecutor extends TimerTask {
     private static Logger LOG = LogManager.getLogger(JiraProcessingExecutor.class);
 
 
@@ -44,7 +44,7 @@ public class JiraProcessingExecutor implements Job {
     private static util utilObj = new util();
 
     @Override
-    public void execute(JobExecutionContext jobExecutionContext) {
+	public void run() {
         LOG.info("Blockchain Processing Executer jira module is getting executed");
         
         JiraNodeExtraction();

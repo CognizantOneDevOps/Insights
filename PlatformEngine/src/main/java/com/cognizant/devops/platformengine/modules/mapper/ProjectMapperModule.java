@@ -16,12 +16,10 @@
 package com.cognizant.devops.platformengine.modules.mapper;
 
 import java.util.List;
+import java.util.TimerTask;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.quartz.Job;
-import org.quartz.JobExecutionContext;
-import org.quartz.JobExecutionException;
 
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBException;
@@ -29,12 +27,12 @@ import com.cognizant.devops.platformcommons.dal.neo4j.Neo4jDBHandler;
 import com.cognizant.devops.platformdal.mapping.projects.ProjectMapping;
 import com.cognizant.devops.platformdal.mapping.projects.ProjectMappingDAL;
 import com.cognizant.devops.platformengine.message.core.EngineStatusLogger;
-import com.cognizant.devops.platformengine.modules.users.EngineUsersModule;
 
-public class ProjectMapperModule implements Job {
+public class ProjectMapperModule extends TimerTask {
 	private static Logger log = LogManager.getLogger(ProjectMapperModule.class.getName());
 
-	public void execute(JobExecutionContext context) throws JobExecutionException {
+	@Override
+	public void run() {
 		executeProjectMapping();
 	}
 

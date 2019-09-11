@@ -25,14 +25,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TimerTask;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.quartz.Job;
-import org.quartz.JobExecutionContext;
-import org.quartz.JobExecutionException;
 
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.constants.ConfigOptions;
@@ -51,13 +49,14 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
-public class DataPurgingExecutor implements Job {
+public class DataPurgingExecutor extends TimerTask {
 
 	private static Logger log = LogManager.getLogger(DataPurgingExecutor.class.getName());
 	private static final String DATE_TIME_FORMAT = "yyyy/MM/dd hh:mm a";
 	private static final double MAXIMUM_BACKUP_FILE_SIZE = 5.0000d;
 
-	public void execute(JobExecutionContext context) throws JobExecutionException {
+	@Override
+	public void run() {
 		if (ApplicationConfigProvider.getInstance().isEnableOnlineBackup() && checkDataPurgingJobSchedule()) {
 			performDataPurging();
 			EngineStatusLogger.getInstance().createEngineStatusNode("Data Purginig completed",

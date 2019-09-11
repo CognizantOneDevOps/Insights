@@ -351,7 +351,22 @@
 			<groupId>org.owasp.esapi</groupId>
 			<artifactId>esapi</artifactId>
 			<version>2.2.0.0</version>
+			<exclusions>
+           		<exclusion>
+           			<groupId>commons-beanutils</groupId>
+    				<artifactId>commons-beanutils</artifactId>
+           		</exclusion>
+           		<exclusion>
+	           		<groupId>org.apache-extras.beanshell</groupId>
+				    <artifactId>bsh</artifactId>
+			    </exclusion>
+       		</exclusions>
 		</dependency> 
+		<dependency>
+		    <groupId>commons-beanutils</groupId>
+		    <artifactId>commons-beanutils</artifactId>
+		    <version>1.9.4</version>
+		</dependency>
 			
 	</dependencies>
 	<properties>
@@ -360,7 +375,7 @@
 		<spring.version>5.1.5.RELEASE</spring.version>
 		<spring.security.version>5.1.5.RELEASE</spring.security.version>
 		<junit.version>4.12</junit.version>
-		<testng.version>6.8.7</testng.version>
+		<testng.version>7.0.0</testng.version>
 	</properties>
 	<profiles>
 		<profile>

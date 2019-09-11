@@ -27,15 +27,13 @@ import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.TimerTask;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.core.config.plugins.convert.TypeConverters.CronExpressionConverter;
 import org.apache.logging.log4j.core.util.CronExpression;
-import org.quartz.Job;
-import org.quartz.JobExecutionContext;
-import org.quartz.JobExecutionException;
 
 import com.cognizant.devops.platformcommons.config.ApplicationConfigCache;
 import com.cognizant.devops.platformcommons.constants.ConfigOptions;
@@ -67,14 +65,14 @@ import com.google.gson.stream.JsonWriter;
  * @author 368419
  *
  */
-public class OfflineDataProcessingExecutor implements Job {
+public class OfflineDataProcessingExecutor extends TimerTask {
 	private static Logger log = LogManager.getLogger(OfflineDataProcessingExecutor.class);
 	private static final String DATE_TIME_FORMAT = "yyyy/MM/dd hh:mm a";
 	private static final String JSON_FILE_EXTENSION = "json";
 	private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DATE_TIME_FORMAT).withZone(InsightsUtils.zoneId);
 
 	@Override
-	public void execute(JobExecutionContext context) throws JobExecutionException {
+	public void run() {
 		executeOfflineProcessing();
 		EngineStatusLogger.getInstance().createEngineStatusNode("Offline Data Procesing completed",PlatformServiceConstants.SUCCESS);
 	}

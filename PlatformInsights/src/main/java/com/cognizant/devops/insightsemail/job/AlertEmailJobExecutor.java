@@ -18,14 +18,12 @@ package com.cognizant.devops.insightsemail.job;
 
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
+import java.util.TimerTask;
 
 import javax.mail.MessagingException;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.quartz.Job;
-import org.quartz.JobExecutionContext;
-import org.quartz.JobExecutionException;
 
 import com.cognizant.devops.insightsemail.core.InsightsEmailService;
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
@@ -33,7 +31,7 @@ import com.cognizant.devops.platformcommons.config.EmailConfiguration;
 import com.cognizant.devops.platformcommons.core.email.Mail;
 
 
-public class AlertEmailJobExecutor implements Job,Serializable {
+public class AlertEmailJobExecutor extends TimerTask {
 
 	/**
 	 * 
@@ -42,7 +40,7 @@ public class AlertEmailJobExecutor implements Job,Serializable {
 	private static final Logger log = LogManager.getLogger(AlertEmailJobExecutor.class);
 
 	@Override
-	public void execute(JobExecutionContext context) throws JobExecutionException {
+	public void run() {
 		sendMail();
 	}
 
