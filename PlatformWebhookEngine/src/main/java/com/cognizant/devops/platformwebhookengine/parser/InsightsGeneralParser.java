@@ -36,6 +36,7 @@ import com.google.gson.JsonParser;
 public class InsightsGeneralParser implements InsightsWebhookParserInterface {
 	private static Logger log = LogManager.getLogger(InsightsGeneralParser.class.getName());
 
+	@Override 
 	public List<JsonObject> parseToolData(String responseTemplate, String toolData,String toolName,String labelName,String webhookName) {
 
 		try {
@@ -81,7 +82,7 @@ public class InsightsGeneralParser implements InsightsWebhookParserInterface {
 	private Map<String, String> getResponseTemplateMap(String responseTemplate) {
 
 		Map<String, String> responseTemplateMap = new HashMap<>();
-		String value = responseTemplate;
+		String value = responseTemplate.replace("\n", "").replace("\r", "");
 		String[] keyValuePairs = value.split(","); // split the string to creat key-value pairs
 		for (String pair : keyValuePairs) // iterate over the pairs
 		{
