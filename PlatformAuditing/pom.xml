@@ -59,6 +59,10 @@
 					<groupId>org.apache.commons</groupId>
 					<artifactId>commons-compress</artifactId>
 				</exclusion>
+				<exclusion>
+					<groupId>commons-codec</groupId>
+		    		<artifactId>commons-codec</artifactId>
+				</exclusion>
 			</exclusions>
 		</dependency>
 
@@ -91,6 +95,11 @@
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-compress</artifactId>
 			<version>1.19</version>
+		</dependency>
+		<dependency>
+		    <groupId>commons-codec</groupId>
+		    <artifactId>commons-codec</artifactId>
+		    <version>1.13</version>
 		</dependency>
 		
 		<dependency>
