@@ -129,7 +129,7 @@ export class HealthCheckComponent implements OnInit {
       this.showContent = !this.showThrobber;
       this.healthResponse = await this.healthCheckService.loadServerHealthConfiguration();
       if (this.healthResponse != null) {
-        console.log(this.healthResponse);
+        //console.log(this.healthResponse);
         this.showThrobber = false;
         this.showContent = !this.showThrobber;
         for (var key in this.healthResponse.data) {
