@@ -76,11 +76,6 @@
 	</dependencyManagement>
 
 	<dependencies>
-		<dependency>
-			<groupId>com.cognizant.devops</groupId>
-			<artifactId>PlatformCommons</artifactId>
-			<version>6.1-SNAPSHOT</version>
-		</dependency>
 
 		<dependency>
 			<groupId>com.cognizant.devops</groupId>
@@ -110,7 +105,7 @@
 		<dependency>
 			<groupId>commons-codec</groupId>
 			<artifactId>commons-codec</artifactId>
-			<version>1.12</version>
+			<version>1.13</version>
 		</dependency>
 
 
@@ -259,9 +254,13 @@
 					<groupId>org.apache.logging.log4j</groupId>
 					<artifactId>log4j</artifactId>
 				</exclusion>
+				<exclusion>
+					<groupId>commons-codec</groupId>
+		    		<artifactId>commons-codec</artifactId>
+				</exclusion>
 			</exclusions>
 		</dependency>
-
+		
 		<dependency>
 			<groupId>com.google.code.gson</groupId>
 			<artifactId>gson</artifactId>
