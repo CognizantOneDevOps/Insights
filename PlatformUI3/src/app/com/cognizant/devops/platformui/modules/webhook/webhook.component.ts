@@ -78,6 +78,7 @@ export class WebHookComponent implements OnInit {
     refreshRadio: boolean = false;
     mqChannelPrefix = "IPW_";
     regex = new RegExp("^[a-zA-Z0-9_]*$");
+    //regexlabel = new RegExp("^\\d+(:([A-Za-z]+|\\d+)){2}$")
     @ViewChild(MatPaginator) paginator: MatPaginator;
     dataformats: DataType[] = [
 
@@ -109,6 +110,7 @@ export class WebHookComponent implements OnInit {
         this.responseTemplate = "";
         this.dataformat = ""
         this.enableRefresh = true;
+        this.disableInputFields = false;
     }
     enableButtons(selectedWebhookEnable) {
         if (this.showAddWebHook == false) {
@@ -278,6 +280,8 @@ export class WebHookComponent implements OnInit {
         //  inputElement.webhookName.setSelec
     }
     saveData(webhookName, selectedTool, labelDisplay, dataformat, mqchannel, responseTemplate) {
+        var checkLabel;
+        var checkname;
         var self = this;
         var webhookAPIRequestJson = {};
         if (webhookName == "") {
@@ -286,9 +290,9 @@ export class WebHookComponent implements OnInit {
         else if (selectedTool == "") {
             this.messageDialog.showApplicationsMessage("Please select a Tool ", "ERROR");
         }
-        /*  else if (eventToSubscribe == "") {
-             this.messageDialog.showApplicationsMessage("Please select an Event to Subscribe ", "ERROR");
-         } */
+        else if (labelDisplay == "") {
+            this.messageDialog.showApplicationsMessage("Please select a Label Name ", "ERROR");
+        }
         /* else if (dataformat == "") {
             this.messageDialog.showApplicationsMessage("Please select a Data Format ", "ERROR");
         } */
@@ -298,11 +302,18 @@ export class WebHookComponent implements OnInit {
         else if (responseTemplate == "") {
             this.messageDialog.showApplicationsMessage("Please enter Response Template ", "ERROR");
         } else {
-            var checkname = this.regex.test(webhookName);
+            checkname = this.regex.test(webhookName);
+            // checkLabel = this.regexlabel.test(labelDisplay);
+            console.log(checkLabel)
             if (!checkname) {
                 webhookName = undefined;
                 this.messageDialog.showApplicationsMessage("Please enter valid name, and it contains only alphanumeric character and underscore ", "ERROR");
             }
+            /*  else if (!checkLabel) {
+                 labelDisplay = undefined;
+                 this.messageDialog.showApplicationsMessage("Please enter valid label name, and it contains only alphanumeric character and colon (:) ", "ERROR");
+ 
+             } */
             else {
                 if (this.actionType == 'edit') {
                     var title = "Update " + webhookName;
