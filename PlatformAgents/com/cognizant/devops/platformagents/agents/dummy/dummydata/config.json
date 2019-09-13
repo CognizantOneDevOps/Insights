@@ -45,5 +45,6 @@
   "runSchedule": 30,
   "useResponseTemplate": true,
   "timeStampField":"lastUpdated",
-  "startFrom": "2016-10-10 00:01"
+  "startFrom": "2016-10-10 00:01",
+  "dataCount": 10
 }
