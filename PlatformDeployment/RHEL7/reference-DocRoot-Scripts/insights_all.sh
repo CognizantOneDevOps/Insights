@@ -14,6 +14,8 @@
 # the License.
 #-------------------------------------------------------------------------------
 echo "Get required env varidables for Insights"
+sudo yum install wget -y
+sudo yum install unzip -y
 wget https://platform.cogdevops.com/insights_install/installationScripts/latest/RHEL/scripts/insights_first.sh -O insights_first.sh  && sh insights_first.sh
 echo "Installing Java"
 wget https://platform.cogdevops.com/insights_install/installationScripts/latest/RHEL/scripts/insights_java.sh -O insights_java.sh && sh insights_java.sh
