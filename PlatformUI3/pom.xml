@@ -13,6 +13,13 @@
 	<artifactId>PlatformUI3</artifactId>
 	<version>6.1-SNAPSHOT</version>
 	<name>PlatformUI3</name>
+	<dependencies>
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-compress</artifactId>
+			<version>1.19</version>
+		</dependency>
+	</dependencies>
 	
 <build>
     <plugins>
@@ -35,7 +42,13 @@
       <plugin>
         <groupId>com.github.eirslett</groupId>
         <artifactId>frontend-maven-plugin</artifactId>
-        <version>1.6</version>
+        <version>1.8.0</version>
+<!--         <exclusions>
+        	<exclusion>
+				<groupId>org.apache.commons</groupId>
+				<artifactId>commons-compress</artifactId>
+			</exclusion>
+        </exclusions> -->
         <executions>
           <execution>
             <id>install node and npm</id>
