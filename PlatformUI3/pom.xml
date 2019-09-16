@@ -5,7 +5,6 @@
 	<parent>
 		<artifactId>PlatformParent</artifactId>
 		<groupId>com.cognizant.devops</groupId>
-		<!--<relativePath>../../pom.xml</relativePath> -->
 		<version>6.1-SNAPSHOT</version>
 	</parent>
 
@@ -48,7 +47,6 @@
 					</execution>
 				</executions>
 			</plugin>
-
 			<plugin>
 				<artifactId>maven-clean-plugin</artifactId>
 				<version>2.5</version>
@@ -67,23 +65,7 @@
 			<plugin>
 				<groupId>com.github.eirslett</groupId>
 				<artifactId>frontend-maven-plugin</artifactId>
-				<version>1.8.0</version>
-				<!-- <configuration>
-					<excludeGroupIds>org.apache.commons</excludeGroupIds>
-					<excludes>
-						<exclude>
-							<groupId>org.apache.commons</groupId>
-							<artifactId>commons-compress</artifactId>
-						</exclude>
-					</excludes>
-				</configuration> -->
-				<!-- <dependencies>
-					<dependency>
-						<groupId>org.apache.commons</groupId>
-						<artifactId>commons-compress</artifactId>
-						<version>1.19</version>
-					</dependency>
-				</dependencies> -->
+				<version>1.8.1-SNAPSHOT</version>
 				<executions>
 					<execution>
 						<id>install node and npm</id>
@@ -95,7 +77,6 @@
 							<npmVersion>6.3.0</npmVersion>
 						</configuration>
 					</execution>
-
 					<execution>
 						<id>npm run build</id>
 						<goals>
@@ -105,7 +86,6 @@
 							<arguments>run build</arguments>
 						</configuration>
 					</execution>
-
 				</executions>
 			</plugin>
 			<plugin>
