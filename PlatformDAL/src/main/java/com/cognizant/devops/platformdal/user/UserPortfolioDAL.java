@@ -15,32 +15,10 @@
  ******************************************************************************/
 package com.cognizant.devops.platformdal.user;
 
-import java.util.List;
-
-import org.hibernate.query.Query;
-
 import com.cognizant.devops.platformdal.core.BaseDAL;
 
 public class UserPortfolioDAL extends BaseDAL{
-	public boolean addUserPortfolio(int orgId, int userId, UserPortfolioEnum portfolio){
-		UserPortfolio userPortfolio = new UserPortfolio();
-		userPortfolio.setOrgId(orgId);
-		userPortfolio.setUserId(userId);
-		userPortfolio.setPortfolio(portfolio);
-		getSession().beginTransaction();
-		getSession().save(userPortfolio);
-		getSession().getTransaction().commit();
-		terminateSession();
-		terminateSessionFactory();
-		return true;
-	}
 	
-	public List<UserPortfolio> getUserPortfolio(int userId){
-		Query<UserPortfolio> createQuery = getSession().createQuery("FROM UserPortfolio U WHERE U.userId = :userId", UserPortfolio.class);
-		createQuery.setParameter("userId", userId);
-		List<UserPortfolio> result = createQuery.getResultList();
-		terminateSession();
-		terminateSessionFactory();
-		return result;
-	}
+	
+
 }
