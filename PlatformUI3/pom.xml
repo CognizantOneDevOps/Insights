@@ -17,17 +17,6 @@
 	<name>PlatformUI3</name>
 	<dependencies>
 		<dependency>
-			<groupId>com.github.eirslett</groupId>
-			<artifactId>frontend-maven-plugin</artifactId>
-			<version>1.8.0</version>
-			<exclusions>
-				<exclusion>
-					<groupId>org.apache.commons</groupId>
-					<artifactId>commons-compress</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-compress</artifactId>
 			<version>1.19</version>
@@ -36,6 +25,29 @@
 
 	<build>
 		<plugins>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-install-plugin</artifactId>
+				<version>3.0.0-M1</version>
+				<configuration>
+					<groupId>com.github.eirslett</groupId>
+					<artifactId>frontend-maven-plugin</artifactId>
+					<version>1.8.1</version>
+					<packaging>jar</packaging>
+					<file>${basedir}/jar/frontend-maven-plugin-1.8.1-SNAPSHOT.jar</file>
+					<generatePom>true</generatePom>
+				</configuration>
+				<executions>
+					<execution>
+						<id>install-jar-lib</id>
+						<goals>
+							<goal>install-file</goal>
+						</goals>
+						<phase>validate</phase>
+					</execution>
+				</executions>
+			</plugin>
 
 			<plugin>
 				<artifactId>maven-clean-plugin</artifactId>
@@ -56,22 +68,22 @@
 				<groupId>com.github.eirslett</groupId>
 				<artifactId>frontend-maven-plugin</artifactId>
 				<version>1.8.0</version>
-				<configuration>
-				<excludeGroupIds>org.apache.commons</excludeGroupIds>
+				<!-- <configuration>
+					<excludeGroupIds>org.apache.commons</excludeGroupIds>
 					<excludes>
 						<exclude>
 							<groupId>org.apache.commons</groupId>
 							<artifactId>commons-compress</artifactId>
 						</exclude>
 					</excludes>
-				</configuration>
-				<dependencies>
+				</configuration> -->
+				<!-- <dependencies>
 					<dependency>
 						<groupId>org.apache.commons</groupId>
 						<artifactId>commons-compress</artifactId>
 						<version>1.19</version>
 					</dependency>
-				</dependencies>
+				</dependencies> -->
 				<executions>
 					<execution>
 						<id>install node and npm</id>
