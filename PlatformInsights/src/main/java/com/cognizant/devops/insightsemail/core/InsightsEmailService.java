@@ -27,7 +27,6 @@ import java.util.ArrayList;
 import javax.mail.MessagingException;
 import javax.net.ssl.SSLContext;
 
-import org.apache.commons.codec.binary.Base64;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.conn.ssl.SSLContexts;
 import org.apache.http.conn.ssl.TrustStrategy;
@@ -52,6 +51,8 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+
+import sun.misc.BASE64Encoder;
 
 public class InsightsEmailService {
 	
@@ -79,7 +80,7 @@ public class InsightsEmailService {
 		String credential = ApplicationConfigProvider.getInstance().getUserId()+":"+
 				ApplicationConfigProvider.getInstance().getPassword();
 		byte[] credsBytes = credential.getBytes();
-		byte[] base64CredsBytes = Base64.encodeBase64(credsBytes);
+		byte[] base64CredsBytes = new BASE64Encoder().encode(credsBytes).getBytes();
 		String base64Creds = new String(base64CredsBytes);
 		HttpHeaders headers = new HttpHeaders();
 		headers.set(EmailConstants.ACCEPT, MediaType.APPLICATION_JSON_UTF8_VALUE);
