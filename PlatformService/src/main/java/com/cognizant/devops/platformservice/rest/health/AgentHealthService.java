@@ -44,39 +44,5 @@ import com.google.gson.JsonObject;
 public class AgentHealthService {
 	static Logger log = LogManager.getLogger(AgentHealthService.class.getName());
 	
-	@RequestMapping(value = "/globalHealth", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public @ResponseBody JsonObject loadAllAgentsHealth(){
-		StringBuffer label = new StringBuffer(":HEALTH:LATEST");
-		return loadHealthData(label.toString());
-	}
 	
-	@RequestMapping(value = "/health", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public @ResponseBody JsonObject loadAgentsHealth(@RequestParam String category, @RequestParam String tool){
-		if(StringUtils.isEmpty(category) || StringUtils.isEmpty(tool)){
-			return PlatformServiceUtil.buildFailureResponse(ErrorMessage.CATEGORY_AND_TOOL_NAME_NOT_SPECIFIED);
-		}
-		log.debug(" message tool name "+category+"  "+tool);
-		StringBuffer label = new StringBuffer(":HEALTH");
-		if(category.equalsIgnoreCase(ServiceStatusConstants.PlatformEngine)) {
-			label.append(":").append("ENGINE");
-		}else if(category.equalsIgnoreCase(ServiceStatusConstants.InsightsInference)) {
-			label.append(":").append("INSIGHTS");
-		}else {
-			label.append(":").append(category);
-			label.append(":").append(tool);	
-		}
-		return loadHealthData(label.toString());
-	}
-
-	private JsonObject loadHealthData(String label) {
-		String query = "MATCH (n"+label+") where n.inSightsTime IS NOT NULL return n order by n.inSightsTime DESC limit 100";
-		try { 
-			Neo4jDBHandler dbHandler = new Neo4jDBHandler();
-			GraphResponse response = dbHandler.executeCypherQuery(query);
-			return PlatformServiceUtil.buildSuccessResponseWithData(response);
-		} catch (Exception e) {
-			log.error(e);
-			return PlatformServiceUtil.buildFailureResponse(ErrorMessage.DB_INSERTION_FAILED);
-		}
-	}
 }

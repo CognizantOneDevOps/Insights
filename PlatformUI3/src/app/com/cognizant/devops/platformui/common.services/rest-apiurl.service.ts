@@ -38,7 +38,7 @@ export class RestAPIurlService implements IRestAPIUrlService {
 
         this.addEndPoint("LOGOUT", '/PlatformService/user/logout');
         this.addEndPoint("GRAPANA_CURRENT_ROLE_ORG", '/PlatformService/user/getCurrentOrgAndRole');
-        this.addEndPoint("ORGS_GET", '/PlatformService/admin/userMgmt/getOrgs');
+        //this.addEndPoint("ORGS_GET", '/PlatformService/admin/userMgmt/getOrgs');
 
         this.addEndPoint("USER_AUTHNTICATE", '/PlatformService/user/authenticate');
 
@@ -49,7 +49,7 @@ export class RestAPIurlService implements IRestAPIUrlService {
         this.addEndPoint("ASSIGN_USER", '/PlatformService/accessGrpMgmt/assignUser');
         this.addEndPoint("USER_ORG_SEARCH", '/PlatformService/accessGrpMgmt/searchUser');
 
-        this.addEndPoint("ACCESS_GROUP_MANAGEMENT_GET_ORGS", '/PlatformService/accessGrpMgmt/getOrgs');
+        //this.addEndPoint("ACCESS_GROUP_MANAGEMENT_GET_ORGS", '/PlatformService/accessGrpMgmt/getOrgs');
         this.addEndPoint("ACCESS_GROUP_MANAGEMENT_GET_CURRENT_USER_ORGS", '/PlatformService/accessGrpMgmt/getCurrentUserOrgs');
         this.addEndPoint("ACCESS_GROUP_MANAGEMENT_SWITCH_ORGS", '/PlatformService/accessGrpMgmt/switchUserOrg');
         this.addEndPoint("ACCESS_GROUP_MANAGEMENT_GET_USERS", '/PlatformService/accessGrpMgmt/getUser');
@@ -114,10 +114,7 @@ export class RestAPIurlService implements IRestAPIUrlService {
         this.addEndPoint("LIST_WEBHOOK", '/PlatformService/admin/webhook/loadwebhookConfiguration');
         this.addEndPoint("DELETE_WEBHOOK", '/PlatformService/admin/webhook/uninstallWebHook');
         this.addEndPoint("UPDATE_WEBHOOK", '/PlatformService/admin/webhook/updateWebhook');
-        //this.addEndPoint("USER_GET", '/PlatformService/admin/userMgmt/getUser');
-        //this.addEndPoint("CURRENT_USER_ORG", '/PlatformService/admin/userMgmt/getCurrentUserOrgs');
-        //this.addEndPoint("SWITCH_USER_ORG", '/PlatformService/admin/userMgmt/switchUserOrg');
-        //this.addEndPoint("USER_SEARCH", '/PlatformService/user/search');
+  
 
         //this.addEndPoint("ENTITY_DEFINITION_ADD", '/PlatformService/admin/dataTagging/addEntityDefinition');
         //this.addEndPoint("ENTITY_DEFINITION_REMOVE", '/PlatformService/admin/dataTagging/removeEntityDefinition');

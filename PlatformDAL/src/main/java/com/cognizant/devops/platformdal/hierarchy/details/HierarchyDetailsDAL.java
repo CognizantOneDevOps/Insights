@@ -33,25 +33,6 @@ public class HierarchyDetailsDAL extends BaseDAL {
 		return true;
 	}
 
-	public HierarchyDetails fetchHierarchyDetails(String hierarchyName) {
-		Query<HierarchyDetails> createQuery = getSession().createQuery(
-				"FROM HierarchyDetails HD WHERE HD.hierarchyName = :hierarchyName",
-				HierarchyDetails.class);
-		createQuery.setParameter("hierarchyName", hierarchyName);
-		HierarchyDetails resultSet = createQuery.getSingleResult();
-		terminateSession();
-		terminateSessionFactory();
-		return resultSet;
-	}
-	
-	public List<HierarchyDetails> fetchHierarchyDetailsByLevelName(String levelName) {
-		Query<HierarchyDetails> createQuery = getSession().createQuery("SELECT DISTINCT HD.levelName = :levelName from HierarchyDetails HD",HierarchyDetails.class);
-		List<HierarchyDetails> resultList = createQuery.getResultList();
-		terminateSession();
-		terminateSessionFactory();
-		return resultList;
-	}
-	
 	public List<String> fetchDistinctHierarchyName() {
 		Query<String> createQuery = getSession().createQuery("SELECT DISTINCT HD.hierarchyName FROM HierarchyDetails HD",String.class);
 		List<String> resultList = createQuery.getResultList();

@@ -32,62 +32,7 @@ public class EntityDefinitionDAL extends BaseDAL {
 		return resultList;
 	}
 
-	public boolean saveEntityDefinition(int rowId, String levelName, String entityName) {
-		Query<EntityDefinition> createQuery = getSession().createQuery(
-				"FROM EntityDefinition a WHERE a.levelName = :levelName AND a.entityName = :entityName AND a.rowId = :rowId",
-				EntityDefinition.class);
-		createQuery.setParameter("levelName", levelName);
-		createQuery.setParameter("entityName", entityName);
-		createQuery.setParameter("rowId", rowId);
-		List<EntityDefinition> resultList = createQuery.getResultList();
-		EntityDefinition entityDefinition = null;
-		if (resultList.size() > 0) {
-			entityDefinition = resultList.get(0);
-		}
-		getSession().beginTransaction();
-		if (entityDefinition == null) {
-			entityDefinition = new EntityDefinition();
-			entityDefinition.setLevelName(levelName);
-			entityDefinition.setEntityName(entityName);
-			entityDefinition.setRowId(rowId);
-			getSession().save(entityDefinition);
-		}
-		// in else need to write update logic
-		getSession().getTransaction().commit();
-		terminateSession();
-		terminateSessionFactory();
-		return true;
-	}
 
-	public EntityDefinition getEntityDefinition(String levelName, String entityName) {
-		Query<EntityDefinition> createQuery = getSession().createQuery(
-				"FROM EntityDefinition a WHERE a.levelName = :levelName AND a.entityName = :entityName",
-				EntityDefinition.class);
-		createQuery.setParameter("levelName", levelName);
-		createQuery.setParameter("entityName", entityName);
-		EntityDefinition entityDefinition = null;
-		try {
-			entityDefinition = createQuery.getSingleResult();
-		} catch (Exception e) {
-			throw new RuntimeException("Exception while retrieving data"+e);
-		}
-		terminateSession();
-		terminateSessionFactory();
-		return entityDefinition;
-	}
 
-	public boolean deleteEntityDefinition(String levelName, String entityName) {
-		Query<EntityDefinition> createQuery = getSession().createQuery(
-				"FROM EntityDefinition a WHERE a.levelName = :levelName AND a.entityName = :entityName",
-				EntityDefinition.class);
-		createQuery.setParameter("levelName", levelName);
-		createQuery.setParameter("entityName", entityName);
-		EntityDefinition entityDefinition = createQuery.getSingleResult();
-		getSession().beginTransaction();
-		getSession().delete(entityDefinition);
-		getSession().getTransaction().commit();
-		terminateSession();
-		terminateSessionFactory();
-		return true;
-	}
+	
 }
