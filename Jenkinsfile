@@ -45,7 +45,7 @@ gitCommitID = sh (
 	// Doxygen build steps
 	stage ('Doxygen_generate_report'){
 		sh 'cd /var/jenkins/jobs/$commitID/workspace && mvn doxygen:report'
-		sh 'cd /var/jenkins/jobs/$commitID/workspace/target && zip -r Doxygen.zip html'	
+		sh 'cd /var/jenkins/jobs/$commitID/workspace/target && zip -r Doxygen.zip doxygen'	
 	}
 	
    // Platform Service Starts
