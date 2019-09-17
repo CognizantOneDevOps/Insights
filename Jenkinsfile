@@ -1,4 +1,4 @@
-env.dockerimagename="devopsbasservice/buildonframework:insightsPUI3"
+env.dockerimagename="devopsbasservice/buildonframework:insightsdoxygen"
 node {
 
 //Parse commitID (E.g, buildon-abc1234 to abc1234)
@@ -41,6 +41,12 @@ gitCommitID = sh (
     		}
   	} //License Check ends	
 	
+	
+	// Doxygen build steps
+	stage ('Doxygen_generate_report'){
+		sh 'cd /var/jenkins/jobs/$commitID/workspace && mvn doxygen:report'
+		sh 'cd /var/jenkins/jobs/$commitID/workspace/target && zip -r Doxygen.zip html'	
+	}
 	
    // Platform Service Starts
 	try{
