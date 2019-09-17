@@ -72,7 +72,21 @@ gitCommitID = sh (
 	stage ('Insight_PS_NexusUpload') {		
 		sh 'mvn clean deploy -DskipTests'		
 		}
-	
+	stage ('Doxygen_NexusUpload') {	
+		sh "cd /var/jenkins/jobs/$commitID/workspace/PlatformInsights && mvn -B help:evaluate -Dexpression=project.version | grep -e '^[^[]' > /var/jenkins/jobs/$commitID/workspace/PlatformInsights/version"
+       		pomversion=readFile("/var/jenkins/jobs/$commitID/workspace/PlatformInsights/version").trim()  //Get version from pom.xml to form the nexus repo URL
+		if(pomversion.contains("SNAPSHOT")){
+			NEXUSREPO="https://repo.cogdevops.com/repository/buildonInsightsEnterprise"
+		sh "curl -u $NexusUsername:$NexusPassword -s ${NEXUSREPO}/com/cognizant/devops/PlatformParent/${pomversion}/maven-metadata.xml  | grep -oP '(?<=<artifactId>).*?(?=</artifactId>)|(?<=<version>).*?(?=</version>)|(?<=<timestamp>).*?(?=</timestamp>)|(?<=<buildNumber>).*?(?=</buildNumber>)|(?<=<classifier>).*?(?=</classifier>)' | paste -sd- - | sed 's/-SNAPSHOT//g' | sed 's/--/-/g' | sed 's/\$/.jar/' > /var/jenkins/jobs/$commitID/workspace/DO_artifact"
+		}
+		else {
+		
+		    NEXUSREPO="https://repo.cogdevops.com/repository/InsightsEnterpriseRelease"
+		sh "curl -u $NexusUsername:$NexusPassword -s ${NEXUSREPO}/com/cognizant/devops/PlatformParent/maven-metadata.xml  | grep -oP '(?<=<artifactId>).*?(?=</artifactId>)|(?<=<release>).*?(?=</release>)|(?<=<timestamp>).*?(?=</timestamp>)|(?<=<buildNumber>).*?(?=</buildNumber>)|(?<=<classifier>).*?(?=</classifier>)' | paste -sd- - | sed 's/-SNAPSHOT//g' | sed 's/--/-/g' | sed 's/\$/.jar/' > /var/jenkins/jobs/$commitID/workspace/DO_artifact"
+		}
+		DO_artifactName=readFile("/var/jenkins/jobs/$commitID/workspace/DO_artifact").trim()
+		sh "mvn deploy:deploy-file -DgroupId=com.cognizant.devops -DartifactId=PlatformParent -Dversion=${pomversion} -Dpackaging=zip Dfile=Doxygen.zip -DrepositoryId=nexus -Durl=${NEXUSREPO}
+	}
 	}
 	catch (err){
 		
