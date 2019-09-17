@@ -49,21 +49,6 @@ gitCommitID = sh (
 		sh 'cd /var/jenkins/jobs/$commitID/workspace && mvn doxygen:report'
 		sh 'cd /var/jenkins/jobs/$commitID/workspace/target && zip -r Doxygen.zip doxygen'	
 	}
-	stage ('Doxygen_NexusUpload') {	
-		sh "cd /var/jenkins/jobs/$commitID/workspace/PlatformInsights && mvn -B help:evaluate -Dexpression=project.version | grep -e '^[^[]' > /var/jenkins/jobs/$commitID/workspace/PlatformInsights/version"
-       		pomversion=readFile("/var/jenkins/jobs/$commitID/workspace/PlatformInsights/version").trim()  //Get version from pom.xml to form the nexus repo URL
-		if(pomversion.contains("SNAPSHOT")){
-			NEXUSREPO="https://repo.cogdevops.com/repository/buildonInsightsEnterprise"
-		sh "curl -u $NexusUsername:$NexusPassword -s ${NEXUSREPO}/com/cognizant/devops/PlatformParent/${pomversion}/maven-metadata.xml  | grep -oP '(?<=<artifactId>).*?(?=</artifactId>)|(?<=<version>).*?(?=</version>)|(?<=<timestamp>).*?(?=</timestamp>)|(?<=<buildNumber>).*?(?=</buildNumber>)|(?<=<classifier>).*?(?=</classifier>)' | paste -sd- - | sed 's/-SNAPSHOT//g' | sed 's/--/-/g' | sed 's/\$/.jar/' > /var/jenkins/jobs/$commitID/workspace/DO_artifact"
-		}
-		else {
-		
-		    NEXUSREPO="https://repo.cogdevops.com/repository/InsightsEnterpriseRelease"
-		sh "curl -u $NexusUsername:$NexusPassword -s ${NEXUSREPO}/com/cognizant/devops/PlatformParent/maven-metadata.xml  | grep -oP '(?<=<artifactId>).*?(?=</artifactId>)|(?<=<release>).*?(?=</release>)|(?<=<timestamp>).*?(?=</timestamp>)|(?<=<buildNumber>).*?(?=</buildNumber>)|(?<=<classifier>).*?(?=</classifier>)' | paste -sd- - | sed 's/-SNAPSHOT//g' | sed 's/--/-/g' | sed 's/\$/.jar/' > /var/jenkins/jobs/$commitID/workspace/DO_artifact"
-		}
-		DO_artifactName=readFile("/var/jenkins/jobs/$commitID/workspace/DO_artifact").trim()
-		sh "mvn deploy:deploy-file -DgroupId=com.cognizant.devops -DartifactId=PlatformParent -Dversion=${pomversion} -Dpackaging=zip -Dfile=/var/jenkins/jobs/${commitID}/workspace/target/Doxygen.zip -DrepositoryId=nexus -Durl=${NEXUSREPO}"
-	}
 		
 	//Build
   	stage ('Insight_PS_Build') {
@@ -87,10 +72,25 @@ gitCommitID = sh (
 	stage ('Insight_PS_NexusUpload') {		
 		sh 'mvn clean deploy -DskipTests'		
 		}
+	stage ('Doxygen_NexusUpload') {	
+		sh "cd /var/jenkins/jobs/$commitID/workspace/PlatformInsights && mvn -B help:evaluate -Dexpression=project.version | grep -e '^[^[]' > /var/jenkins/jobs/$commitID/workspace/PlatformInsights/version"
+       		pomversion=readFile("/var/jenkins/jobs/$commitID/workspace/PlatformInsights/version").trim()  //Get version from pom.xml to form the nexus repo URL
+		if(pomversion.contains("SNAPSHOT")){
+			NEXUSREPO="https://repo.cogdevops.com/repository/buildonInsightsEnterprise"
+		sh "curl -u $NexusUsername:$NexusPassword -s ${NEXUSREPO}/com/cognizant/devops/PlatformParent/${pomversion}/maven-metadata.xml  | grep -oP '(?<=<artifactId>).*?(?=</artifactId>)|(?<=<version>).*?(?=</version>)|(?<=<timestamp>).*?(?=</timestamp>)|(?<=<buildNumber>).*?(?=</buildNumber>)|(?<=<classifier>).*?(?=</classifier>)' | paste -sd- - | sed 's/-SNAPSHOT//g' | sed 's/--/-/g' | sed 's/\$/.jar/' > /var/jenkins/jobs/$commitID/workspace/DO_artifact"
+		}
+		else {
+		
+		    NEXUSREPO="https://repo.cogdevops.com/repository/InsightsEnterpriseRelease"
+		sh "curl -u $NexusUsername:$NexusPassword -s ${NEXUSREPO}/com/cognizant/devops/PlatformParent/maven-metadata.xml  | grep -oP '(?<=<artifactId>).*?(?=</artifactId>)|(?<=<release>).*?(?=</release>)|(?<=<timestamp>).*?(?=</timestamp>)|(?<=<buildNumber>).*?(?=</buildNumber>)|(?<=<classifier>).*?(?=</classifier>)' | paste -sd- - | sed 's/-SNAPSHOT//g' | sed 's/--/-/g' | sed 's/\$/.jar/' > /var/jenkins/jobs/$commitID/workspace/DO_artifact"
+		}
+		DO_artifactName=readFile("/var/jenkins/jobs/$commitID/workspace/DO_artifact").trim()
+		sh "mvn deploy:deploy-file -DgroupId=com.cognizant.devops -DartifactId=PlatformParent -Dversion=${pomversion} -Dpackaging=zip -Dfile=/var/jenkins/jobs/${commitID}/workspace/target/Doxygen.zip -DrepositoryId=nexus -Durl=${NEXUSREPO}"
+	}
 	}
 	catch (err){
 		
-	slackSend channel: '#insightsjenkins', color: 'bad', message: "Insights Enterprise Build Failed for commitID - *$gitCommitID*, Branch - *$branchName* \n Build Log can be found @ https://buildon.cogdevops.com/buildon/HistoricCIWebController?commitId=$gitCommitID", teamDomain: "insightscogdevops", token: slackToken
+	/*slackSend channel: '#insightsjenkins', color: 'bad', message: "Insights Enterprise Build Failed for commitID - *$gitCommitID*, Branch - *$branchName* \n Build Log can be found @ https://buildon.cogdevops.com/buildon/HistoricCIWebController?commitId=$gitCommitID", teamDomain: "insightscogdevops", token: slackToken*/
 	sh 'exit 1'
 	}	
 	// Platform Service Ends	   
@@ -182,6 +182,6 @@ gitCommitID = sh (
 		PUI3_artifact="${NEXUSREPO}/com/cognizant/devops/PlatformUI3/${pomUI3version}/${PUI3_artifactName}"
 	
 	
-   	    slackSend channel: '#insightsjenkins', color: 'good', message: "New Insights Enterprise artifacts are uploaded to Nexus for commitID : *${env.commitID}* ,Branch - *${env.branchName}* \n *PlatformService* ${PS_artifact} \n *PlatformEngine* ${PE_artifact} \n *PlatformAuditEngine* ${PAE_artifact} \n *PlatformInsights*  ${PI_artifact} \n *PlatformUI3* ${PUI3_artifact}", teamDomain: 'insightscogdevops', token: slackToken // "*" is for making the text bold in slack notification
+   	    /*slackSend channel: '#insightsjenkins', color: 'good', message: "New Insights Enterprise artifacts are uploaded to Nexus for commitID : *${env.commitID}* ,Branch - *${env.branchName}* \n *PlatformService* ${PS_artifact} \n *PlatformEngine* ${PE_artifact} \n *PlatformAuditEngine* ${PAE_artifact} \n *PlatformInsights*  ${PI_artifact} \n *PlatformUI3* ${PUI3_artifact}", teamDomain: 'insightscogdevops', token: slackToken // "*" is for making the text bold in slack notification*/
   	}
 }
