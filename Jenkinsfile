@@ -85,7 +85,7 @@ gitCommitID = sh (
 		sh "curl -u $NexusUsername:$NexusPassword -s ${NEXUSREPO}/com/cognizant/devops/PlatformParent/maven-metadata.xml  | grep -oP '(?<=<artifactId>).*?(?=</artifactId>)|(?<=<release>).*?(?=</release>)|(?<=<timestamp>).*?(?=</timestamp>)|(?<=<buildNumber>).*?(?=</buildNumber>)|(?<=<classifier>).*?(?=</classifier>)' | paste -sd- - | sed 's/-SNAPSHOT//g' | sed 's/--/-/g' | sed 's/\$/.jar/' > /var/jenkins/jobs/$commitID/workspace/DO_artifact"
 		}
 		DO_artifactName=readFile("/var/jenkins/jobs/$commitID/workspace/DO_artifact").trim()
-		sh "cd /var/jenkins/jobs/$commitID/workspace/target && mvn deploy:deploy-file -DgroupId=com.cognizant.devops -DartifactId=PlatformParent -Dversion=${pomversion} -Dpackaging=zip Dfile=Doxygen.zip -DrepositoryId=nexus -Durl=${NEXUSREPO}"
+		sh "mvn deploy:deploy-file "-DgroupId=com.cognizant.devops" "-DartifactId=PlatformParent" "-Dversion=${pomversion}" "-Dpackaging=zip" "-Dfile=/var/jenkins/jobs/$commitID/workspace/target/Doxygen.zip" "-DrepositoryId=nexus" "-Durl=${NEXUSREPO}""
 	}
 	}
 	catch (err){
