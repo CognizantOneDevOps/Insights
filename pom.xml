@@ -99,6 +99,26 @@
                         <plugin>
                                 <groupId>com.soebes.maven.plugins</groupId>
                                 <artifactId>doxygen-maven-plugin</artifactId>
+                                <configuration>
+                                        <projectName>"Insights Code Documentation"</projectName>
+                                        <projectNumber>${project.version}</projectNumber>
+                                        <optimizeOutputJava>true</optimizeOutputJava>
+                                        <javadocAutobrief>true</javadocAutobrief>
+                                        <extractAll>true</extractAll>
+                                        <extractStatic>true</extractStatic>
+                                        <recursive>true</recursive>
+                                        <exclude>.git</exclude>
+                                        <recursive>true</recursive>
+                                        <haveGraph>true</haveGraph>
+                                        <generateLatex>false</generateLatex>
+                                        <generateHtml>true</generateHtml>
+                                        <input>${project.basedir}</input>
+                                        <outputDirectory>${basedir}/target</outputDirectory>
+                                        <inlineSources>true</inlineSources>
+                                        <haveDot>true</haveDot>
+                                        <callGraph>true</callGraph>
+                                        <callerGraph>true</callerGraph>
+                                </configuration>
                                 <version>1.1.0</version>
                         </plugin>
                 </plugins>
