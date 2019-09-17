@@ -40,26 +40,26 @@ gitCommitID = sh (
     		echo 'License is up to date'
     		}
   	} //License Check ends	
+
 	
-	
+   // Platform Service Starts
+	try{
 	// Doxygen build steps
 	stage ('Doxygen_generate_report'){
 		sh 'cd /var/jenkins/jobs/$commitID/workspace && mvn doxygen:report'
 		sh 'cd /var/jenkins/jobs/$commitID/workspace/target && zip -r Doxygen.zip doxygen'	
 	}
-	
-   // Platform Service Starts
-	try{
+		
 	//Build
-  	stage ('Insight_PS_Build') {
+  	/*stage ('Insight_PS_Build') {
         sh 'cd /var/jenkins/jobs/$commitID/workspace/PlatformUI3 && npm install'
 	sh 'cd /var/jenkins/jobs/$commitID/workspace && mvn clean install -DskipTests'
 	   }	
 	
 	//Below step will be enabled in next release to include security analysis.
-	/*stage ('Insight_PS_IQ') {	
+	stage ('Insight_PS_IQ') {	
 	sh 'mvn com.sonatype.clm:clm-maven-plugin:evaluate -Dclm.applicationId=Insights'
-   	} */
+   	} 
 
 	stage ('Insight_PS_CodeAnalysis') {
 		sh 'mvn sonar:sonar -Dmaven.test.failure.ignore=true -DskipTests=true -Dsonar.sources=src/main/java -pl !PlatformUI3'		
@@ -71,7 +71,7 @@ gitCommitID = sh (
 		
 	stage ('Insight_PS_NexusUpload') {		
 		sh 'mvn clean deploy -DskipTests'		
-		}
+		}*/
 	stage ('Doxygen_NexusUpload') {	
 		sh "cd /var/jenkins/jobs/$commitID/workspace/PlatformInsights && mvn -B help:evaluate -Dexpression=project.version | grep -e '^[^[]' > /var/jenkins/jobs/$commitID/workspace/PlatformInsights/version"
        		pomversion=readFile("/var/jenkins/jobs/$commitID/workspace/PlatformInsights/version").trim()  //Get version from pom.xml to form the nexus repo URL
@@ -96,7 +96,7 @@ gitCommitID = sh (
 	// Platform Service Ends	   
 	   
         //Send Notification to Slack Channel
-	stage ('SlackNotification') {
+	/*stage ('SlackNotification') {
 	
 	//Framing Nexus URL for artifact uploaded to Nexus with unique timestamp
 		//PlatformService and PlatformAuditService version
@@ -183,5 +183,5 @@ gitCommitID = sh (
 	
 	
    	    slackSend channel: '#insightsjenkins', color: 'good', message: "New Insights Enterprise artifacts are uploaded to Nexus for commitID : *${env.commitID}* ,Branch - *${env.branchName}* \n *PlatformService* ${PS_artifact} \n *PlatformEngine* ${PE_artifact} \n *PlatformAuditEngine* ${PAE_artifact} \n *PlatformInsights*  ${PI_artifact} \n *PlatformUI3* ${PUI3_artifact}", teamDomain: 'insightscogdevops', token: slackToken // "*" is for making the text bold in slack notification
-  	}
+  	}*/
 }
