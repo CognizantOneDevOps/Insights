@@ -54,7 +54,7 @@ gitCommitID = sh (
   	/*stage ('Insight_PS_Build') {
         sh 'cd /var/jenkins/jobs/$commitID/workspace/PlatformUI3 && npm install'
 	sh 'cd /var/jenkins/jobs/$commitID/workspace && mvn clean install -DskipTests'
-	   }	
+	   }*/	
 	
 	//Below step will be enabled in next release to include security analysis.
 	stage ('Insight_PS_IQ') {	
@@ -71,7 +71,7 @@ gitCommitID = sh (
 		
 	stage ('Insight_PS_NexusUpload') {		
 		sh 'mvn clean deploy -DskipTests'		
-		}*/
+		}
 	stage ('Doxygen_NexusUpload') {	
 		sh "cd /var/jenkins/jobs/$commitID/workspace/PlatformInsights && mvn -B help:evaluate -Dexpression=project.version | grep -e '^[^[]' > /var/jenkins/jobs/$commitID/workspace/PlatformInsights/version"
        		pomversion=readFile("/var/jenkins/jobs/$commitID/workspace/PlatformInsights/version").trim()  //Get version from pom.xml to form the nexus repo URL
@@ -85,7 +85,7 @@ gitCommitID = sh (
 		sh "curl -u $NexusUsername:$NexusPassword -s ${NEXUSREPO}/com/cognizant/devops/PlatformParent/maven-metadata.xml  | grep -oP '(?<=<artifactId>).*?(?=</artifactId>)|(?<=<release>).*?(?=</release>)|(?<=<timestamp>).*?(?=</timestamp>)|(?<=<buildNumber>).*?(?=</buildNumber>)|(?<=<classifier>).*?(?=</classifier>)' | paste -sd- - | sed 's/-SNAPSHOT//g' | sed 's/--/-/g' | sed 's/\$/.jar/' > /var/jenkins/jobs/$commitID/workspace/DO_artifact"
 		}
 		DO_artifactName=readFile("/var/jenkins/jobs/$commitID/workspace/DO_artifact").trim()
-		sh "mvn deploy:deploy-file -DgroupId=com.cognizant.devops -DartifactId=PlatformParent -Dversion=${pomversion} -Dpackaging=zip -Dfile=/var/jenkins/jobs/${commitID}/workspace/target/Doxygen.zip -DrepositoryId=nexus -Durl=${NEXUSREPO}"
+		sh "mvn deploy:deploy-file -DgroupId=com.cognizant.devops -DartifactId=Doxygen -Dversion=${pomversion} -Dpackaging=zip -Dfile=/var/jenkins/jobs/${commitID}/workspace/target/Doxygen.zip -DrepositoryId=nexus -Durl=${NEXUSREPO}"
 	}
 	}
 	catch (err){
@@ -96,7 +96,7 @@ gitCommitID = sh (
 	// Platform Service Ends	   
 	   
         //Send Notification to Slack Channel
-	/*stage ('SlackNotification') {
+	stage ('SlackNotification') {
 	
 	//Framing Nexus URL for artifact uploaded to Nexus with unique timestamp
 		//PlatformService and PlatformAuditService version
@@ -183,5 +183,5 @@ gitCommitID = sh (
 	
 	
    	    slackSend channel: '#insightsjenkins', color: 'good', message: "New Insights Enterprise artifacts are uploaded to Nexus for commitID : *${env.commitID}* ,Branch - *${env.branchName}* \n *PlatformService* ${PS_artifact} \n *PlatformEngine* ${PE_artifact} \n *PlatformAuditEngine* ${PAE_artifact} \n *PlatformInsights*  ${PI_artifact} \n *PlatformUI3* ${PUI3_artifact}", teamDomain: 'insightscogdevops', token: slackToken // "*" is for making the text bold in slack notification
-  	}*/
+  	}
 }
