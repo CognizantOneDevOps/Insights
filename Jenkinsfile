@@ -14,7 +14,7 @@ gitCommitID = sh (
 	//ApacheLicense Check in java and Python files . License for Enterprise..	
 	stage ('LicenseCheck') {          
     	   def commit = sh (returnStdout: true, script: '''var=''
-	for file in $(find . -print | grep -i -e .*[.]java -e .*[.]py -e .*[.]sh -e .*[.]bat | grep -Eiv "*__init__.py*" )
+	for file in $(find . -print | grep -i -e .*[.]java -e .*[.]py -e .*[.]sh -e .*[.]bat | grep -Eiv "*__init__.py*" | grep -Eiv "*.sha1" )
 	do
    	    if grep -q "Apache License" $file; then
         	updated="License is updated $file" ##Dummy line
