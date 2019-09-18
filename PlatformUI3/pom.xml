@@ -53,9 +53,9 @@
 						<configuration>
 					<groupId>com.github.eirslett</groupId>
 					<artifactId>frontend-maven-plugin</artifactId>
-					<version>1.8.1-SNAPSHOT</version>
+					<version>1.8.1</version>
 					<packaging>jar</packaging>
-					<file>${basedir}/jar/frontend-maven-plugin-1.8.1-SNAPSHOT.jar</file>
+					<file>${basedir}/jar/frontend-maven-plugin-1.8.1.jar</file>
 					<generatePom>true</generatePom>
 				</configuration>
 					</execution>
@@ -78,7 +78,7 @@
 			<plugin>
 				<groupId>com.github.eirslett</groupId>
 				<artifactId>frontend-maven-plugin</artifactId>
-				<version>1.8.1-SNAPSHOT</version>
+				<version>1.8.1</version>
 				<executions>
 					<execution>
 						<id>install node and npm</id>
