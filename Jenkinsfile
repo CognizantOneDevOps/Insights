@@ -75,7 +75,7 @@ gitCommitID = sh (
 	stage ('Doxygen_NexusUpload') {	
 		sh "cd /var/jenkins/jobs/$commitID/workspace && mvn -B help:evaluate -Dexpression=project.version | grep -e '^[^[]' > /var/jenkins/jobs/$commitID/workspace/version"
        		doxyversion=readFile("/var/jenkins/jobs/$commitID/workspace/version").trim()  //Get version from pom.xml to form the nexus repo URL
-		if(pomversion.contains("SNAPSHOT")){
+		if(doxyversion.contains("SNAPSHOT")){
 			NEXUSREPO="https://repo.cogdevops.com/repository/buildonInsightsEnterprise"
 		}
 		else {
