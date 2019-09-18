@@ -205,17 +205,6 @@ public class AccessGroupManagement {
 				.buildSuccessResponseWithData(new JsonParser().parse(response.getEntity(String.class)));
 	}
 
-	@RequestMapping(value = "/createOrg", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public String createOrg(@RequestParam String orgName) {
-		String apiUrl = ApplicationConfigProvider.getInstance().getGrafana().getGrafanaEndpoint() + "/api/orgs";
-		JsonObject request = new JsonObject();
-		request.addProperty("name", orgName);
-		Map<String, String> headers = new HashMap<String, String>();
-		headers.put("Authorization", buildAuthenticationHeader());
-		ClientResponse response = RestHandler.doPost(apiUrl, request, headers);
-		return response.getEntity(String.class);
-	}
-
 	@RequestMapping(value = "/getUser", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 	public JsonObject getUser() {
 		String apiUrl = ApplicationConfigProvider.getInstance().getGrafana().getGrafanaEndpoint() + "/api/user";

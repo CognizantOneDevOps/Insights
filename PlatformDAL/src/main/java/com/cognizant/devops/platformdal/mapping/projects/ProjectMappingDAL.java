@@ -44,15 +44,6 @@ public class ProjectMappingDAL extends BaseDAL{
 		return resultList;
 	}
 	
-	public List<ProjectMapping> fetchProjectMappingByHierarchy(String hierarchyName){
-		Query<ProjectMapping> createQuery = getSession().createQuery(
-				"FROM ProjectMapping PM WHERE PM.hierarchyName = :hierarchyName", ProjectMapping.class);
-		createQuery.setParameter("hierarchyName", hierarchyName);
-		List<ProjectMapping> resultList = createQuery.getResultList();
-		terminateSession();
-		terminateSessionFactory();
-		return resultList;
-	}
 	
 	public List<ProjectMapping> fetchAllProjectMapping(){
 		Query<ProjectMapping> createQuery = getSession().createQuery(
@@ -71,41 +62,5 @@ public class ProjectMappingDAL extends BaseDAL{
 		terminateSessionFactory();
 		return true;
 	}
-	
-	public boolean removeProjectMapping(int orgId) {
-		Query<ProjectMapping> createQuery = getSession().createQuery(
-				"FROM ProjectMapping a WHERE a.orgId = :orgId",
-				ProjectMapping.class);
-		createQuery.setParameter("orgId", orgId);
-		List<ProjectMapping> resultList = createQuery.getResultList();
-		//ProjectMapping projectMapping = createQuery.getSingleResult();
-		for (ProjectMapping projectMapping : resultList) {
-			getSession().beginTransaction();
-			getSession().delete(projectMapping);
-			getSession().getTransaction().commit();
-			terminateSession();
-			terminateSessionFactory();
-		}
-		return true;
-	}
-	
-	public boolean deleteToolCOnfiguration(int orgId, String toolName, String category, int rowId) {
-		Query<ProjectMapping> createQuery = getSession().createQuery(
-				"FROM ProjectMapping a WHERE a.orgId = :orgId AND a.toolName = :toolName AND a.category = :category AND a.rowId = :rowId",
-				ProjectMapping.class);
-		createQuery.setParameter("orgId", orgId);
-		createQuery.setParameter("toolName", toolName);
-		createQuery.setParameter("category", category);
-		createQuery.setParameter("rowId", rowId);
-		//ProjectMapping projectMapping = createQuery.getSingleResult();
-		List<ProjectMapping> resultList = createQuery.getResultList();
-		for (ProjectMapping projectMapping : resultList) {
-		getSession().beginTransaction();
-		getSession().delete(projectMapping);
-		getSession().getTransaction().commit();
-		terminateSession();
-		terminateSessionFactory();
-		}
-		return true;
-	}
+
 }
