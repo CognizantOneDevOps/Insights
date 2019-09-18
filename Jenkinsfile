@@ -1,4 +1,4 @@
-env.dockerimagename="devopsbasservice/buildonframework:insightsdoxygen"
+env.dockerimagename="devopsbasservice/buildonframework:insightsPUI3-Doxygen"
 node {
 
 //Parse commitID (E.g, buildon-abc1234 to abc1234)
