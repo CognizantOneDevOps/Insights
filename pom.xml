@@ -49,6 +49,7 @@
 		<module>PlatformCommons</module>
 		<module>PlatformDAL</module>
 		<module>PlatformAuditing</module>
+		<module>PlatformInsightsWebHook</module>
 		<module>PlatformAuditEngine</module>
 		<module>PlatformService</module>
 		<module>PlatformEngine</module>				

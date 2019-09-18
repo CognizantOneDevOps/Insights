@@ -1,0 +1,163 @@
+{
+  "mqConfig": {
+    "user": "iSight",
+    "password": "iSight",
+    "host": "127.0.0.1",
+    "exchange": "iSight",
+    "agentControlXchg": "iAgent"
+  },
+  "subscribe": {
+    "config": "ALM.AZUREBOARD.config"
+  },
+  "publish": {
+    "data": "ALM.AZUREBOARD.DATA",
+    "health": "ALM.AZUREBOARD.HEALTH"
+  },
+  "communication": {
+    "type": "REST",
+    "sslVerify": true,
+    "responseType": "JSON"
+  },
+  "dynamicTemplate": {
+    "timeFieldMapping": {
+      "createdTime": "%Y-%m-%dT%H:%M:%S",
+      "startDate": "%Y-%m-%d",
+      "creationDate":"%Y-%m-%dT%H:%M:%S",
+      "resolutiondate":"%Y-%m-%dT%H:%M:%S",
+      "changeDate":"%Y-%m-%dT%H:%M:%S",
+      "sprintStartDate":"%Y-%m-%dT%H:%M:%S",
+      "sprintEndDate":"%Y-%m-%dT%H:%M:%S",
+      "sprintCompleteDate":"%Y-%m-%dT%H:%M:%S",
+      "releaseDate":"%Y-%m-%d",
+      "userStartDate":"%d/%b/%y",
+      "userReleaseDate":"%d/%b/%y",
+      "duedate":"%Y-%m-%d"
+    },
+    "responseTemplate": {
+      "id": "key",
+      "fields": {
+        "System.WorkItemType": "issueType",
+        "System.ChangedDate": "lastUpdated",
+        "System.CreatedDate": "createdTime",
+        "System.TeamProject": "projectName",
+        "Microsoft.VSTS.Scheduling.Effort": "storyPoint",
+        "System.AreaPath": "teamName",
+        "System.Title": "title",
+        "System.Description": "description",
+        "System.CreatedBy": {
+          "displayName": "creator"
+        },
+        "Microsoft.VSTS.Common.Priority": "priority",
+        "System.AssignedTo": {
+          "displayName": "assignee"
+        },
+        "System.State": "status",
+        "System.IterationPath": "sprint"
+      }
+    },
+    "extensions": {
+      "sprints": {
+        "runSchedule": 720,
+        "boardApiUrl": "##/rest/agile/1.0/board",
+        "teamApiUrl": "https://dev.azure.com/<organization>/_apis/teams?api-version=5.0-preview.2",
+        "sprintApiUrl": "https://dev.azure.com/<organization>/<projectName>/<<team>>/_apis/work/teamsettings/iterations?api-version=5.0",
+        "sprintResponseTemplate": {
+          "id": "sprintId",
+          "state": "state",
+          "name": "sprintName",
+          "path": "sprintPath",
+          "attributes": {
+            "startDate": "sprintStartDate",
+            "finishDate": "sprintEndDate",
+            "timeFrame": "timeFrame"
+          }
+        },
+        "sprintMetadata": {
+          "labels": ["SPRINT"],
+          "dataUpdateSupported": true,
+          "uniqueKey": ["sprintId"]
+        }
+      }
+    }
+  },
+  "agentId": "",
+  "toolCategory": "ALM",
+  "enableSprintReport": false,
+  "enableDataValidation": true,
+  "sprintField": "sprintField",
+  "enableValueArray": true,
+  "isDebugAllowed": false,
+  "runSchedule": 30,
+  "sprintRetrivalSchedule": 360,
+  "dataFetchCount": 1000,
+  "userid": "",
+  "passwd": "<access token>",
+  "baseUrl": "https://dev.azure.com/<organization>/",
+  "wiqlUrl": "https://dev.azure.com/<organization>/_apis/wit/wiql?timePrecision=true&api-version=5.1",
+  "projectName": "<PROJECTNAME>",
+  "changeLog": {
+    "fields": [
+      "System.AssignedTo",
+      "System.IterationLevel1",
+      "System.IterationLevel2",
+      "System.State",
+      "Microsoft.VSTS.Common.Priority",
+      "System.Id",
+      "System.TeamProject",
+      "System.WorkItemType",
+      "Microsoft.VSTS.Scheduling.CompletedWork",
+      "Microsoft.VSTS.Common.AcceptanceCriteria",
+      "System.Description",
+      "System.Title",
+      "Microsoft.VSTS.Scheduling.Effort",
+      "Microsoft.VSTS.Scheduling.RemainingWork",
+      "Microsoft.VSTS.Scheduling.OriginalEstimate",
+      "Microsoft.VSTS.Scheduling.CompletedWork",
+      "revisedDate",
+      "revisedBy",
+      "System.AuthorizedDate",
+      "System.ChangedDate",
+      "System.RevisedDate",
+      "url",
+      "Microsoft.VSTS.Common.StateChangeDate",
+      "System.Rev",
+      "System.CommentCount",
+      "System.IterationPath",
+      "System.History"
+    ],
+    "metadata": {
+      "labels": [
+        "CHANGE_LOG"
+      ],
+      "dataUpdateSupported": true,
+      "uniqueKey": [
+        "issueKey",
+        "changeId",
+        "changedfield"
+      ]
+    },
+    "responseTemplate": {
+      "id": "changeId",
+      "rev": "rev",
+      "revisedBy": {
+        "id": "authorId",
+        "uniqueName": "authorEmail",
+        "displayName": "authorName"
+      },
+      "revisedDate": "changeDate"
+    }
+  },
+  "startFrom": "2019-01-01 00:00",
+  "toolsTimeZone": "UTC",
+  "insightsTimeZone": "Asia/Kolkata",
+  "useResponseTemplate": true,
+  "timeStampField": "lastUpdated",
+  "timeStampFormat": "%Y-%m-%dT%H:%M:%S",
+  "isEpochTimeFormat": false,
+
+  "loggingSetting": {
+    "logLevel": "WARN",
+    "maxBytes": 5000000,
+    "backupCount": 1000
+  }
+}
