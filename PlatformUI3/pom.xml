@@ -15,18 +15,25 @@
 	<version>6.1-SNAPSHOT</version>
 	<name>PlatformUI3</name>
 	
-		
+	<repositories>
+		<repository>
+			<id>project.local</id>
+			<name>project</name>
+			<url>file:${project.basedir}/jar</url>
+		</repository>
+	</repositories>
+	
 <pluginRepositories>
     <pluginRepository>
      	<id>project.local</id>
 			<name>project</name>
 			<url>file:${project.basedir}/jar</url>
-        <releases>
+        <!-- <releases>
             <enabled>true</enabled>
         </releases>
         <snapshots>
             <enabled>true</enabled>
-        </snapshots>
+        </snapshots> -->
     </pluginRepository>
 </pluginRepositories>
 	<dependencies>
