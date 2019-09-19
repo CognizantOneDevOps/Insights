@@ -22,17 +22,11 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 
-//import com.cognizant.devops.platforminsightswebhook.config.WebHookMessagePublisher;
 import com.cognizant.devops.platforminsightswebhook.events.WebHookHandlerServlet;
 
 @Configuration
 @ComponentScan(basePackages = { "com.cognizant.devops.platforminsightswebhook.*" })
 public class WebConfig {
-
-	/*@Bean
-	public WebHookMessagePublisher webhookmessagepublisher() {
-		return new WebHookMessagePublisher();
-	}*/
 
 	@Bean
 	public ServletRegistrationBean<HttpServlet> webhookServlet() {
