@@ -60,7 +60,7 @@
         "runSchedule": 720,
         "boardApiUrl": "##/rest/agile/1.0/board",
         "teamApiUrl": "https://dev.azure.com/<organization>/_apis/teams?api-version=5.0-preview.2",
-        "sprintApiUrl": "https://dev.azure.com/<organization>/<projectName>/<<team>>/_apis/work/teamsettings/iterations?api-version=5.0",
+        "sprintApiUrl": "https://dev.azure.com/<organization>/<projectName>/teamName/_apis/work/teamsettings/iterations?api-version=5.0",
         "sprintResponseTemplate": {
           "id": "sprintId",
           "state": "state",
@@ -77,6 +77,58 @@
           "dataUpdateSupported": true,
           "uniqueKey": ["sprintId"]
         }
+      }
+    },
+	"changeLog": {
+	  "fields": [
+        "System.AssignedTo",
+        "System.IterationLevel1",
+        "System.IterationLevel2",
+        "System.State",
+        "Microsoft.VSTS.Common.Priority",
+        "System.Id",
+        "System.TeamProject",
+        "System.WorkItemType",
+        "Microsoft.VSTS.Scheduling.CompletedWork",
+        "Microsoft.VSTS.Common.AcceptanceCriteria",
+        "System.Description",
+        "System.Title",
+        "Microsoft.VSTS.Scheduling.Effort",
+        "Microsoft.VSTS.Scheduling.RemainingWork",
+        "Microsoft.VSTS.Scheduling.OriginalEstimate",
+        "Microsoft.VSTS.Scheduling.CompletedWork",
+        "revisedDate",
+        "revisedBy",
+        "System.AuthorizedDate",
+        "System.ChangedDate",
+        "System.RevisedDate",
+        "url",
+        "Microsoft.VSTS.Common.StateChangeDate",
+        "System.Rev",
+        "System.CommentCount",
+        "System.IterationPath",
+        "System.History"
+      ],
+      "metadata": {
+        "labels": [
+          "CHANGE_LOG"
+        ],
+        "dataUpdateSupported": true,
+        "uniqueKey": [
+          "issueKey",
+          "changeId",
+          "changedfield"
+        ]
+      },
+      "responseTemplate": {
+        "id": "changeId",
+        "rev": "rev",
+        "revisedBy": {
+          "id": "authorId",
+          "uniqueName": "authorEmail",
+          "displayName": "authorName"
+        },
+        "revisedDate": "changeDate"
       }
     }
   },
@@ -95,58 +147,6 @@
   "baseUrl": "https://dev.azure.com/<organization>/",
   "wiqlUrl": "https://dev.azure.com/<organization>/_apis/wit/wiql?timePrecision=true&api-version=5.1",
   "projectName": "<PROJECTNAME>",
-  "changeLog": {
-    "fields": [
-      "System.AssignedTo",
-      "System.IterationLevel1",
-      "System.IterationLevel2",
-      "System.State",
-      "Microsoft.VSTS.Common.Priority",
-      "System.Id",
-      "System.TeamProject",
-      "System.WorkItemType",
-      "Microsoft.VSTS.Scheduling.CompletedWork",
-      "Microsoft.VSTS.Common.AcceptanceCriteria",
-      "System.Description",
-      "System.Title",
-      "Microsoft.VSTS.Scheduling.Effort",
-      "Microsoft.VSTS.Scheduling.RemainingWork",
-      "Microsoft.VSTS.Scheduling.OriginalEstimate",
-      "Microsoft.VSTS.Scheduling.CompletedWork",
-      "revisedDate",
-      "revisedBy",
-      "System.AuthorizedDate",
-      "System.ChangedDate",
-      "System.RevisedDate",
-      "url",
-      "Microsoft.VSTS.Common.StateChangeDate",
-      "System.Rev",
-      "System.CommentCount",
-      "System.IterationPath",
-      "System.History"
-    ],
-    "metadata": {
-      "labels": [
-        "CHANGE_LOG"
-      ],
-      "dataUpdateSupported": true,
-      "uniqueKey": [
-        "issueKey",
-        "changeId",
-        "changedfield"
-      ]
-    },
-    "responseTemplate": {
-      "id": "changeId",
-      "rev": "rev",
-      "revisedBy": {
-        "id": "authorId",
-        "uniqueName": "authorEmail",
-        "displayName": "authorName"
-      },
-      "revisedDate": "changeDate"
-    }
-  },
   "startFrom": "2019-01-01 00:00",
   "toolsTimeZone": "UTC",
   "insightsTimeZone": "Asia/Kolkata",
