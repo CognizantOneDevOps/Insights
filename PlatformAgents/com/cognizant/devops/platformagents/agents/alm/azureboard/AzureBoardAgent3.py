@@ -44,7 +44,7 @@ class AzureBoardAgent(BaseAgent):
             projectName + "' AND [System.ChangedDate] > '" + \
             lastUpdated + "' order by [System.ChangedDate] asc\"}"
 
-        changeLog = self.config.get('changeLog', None)
+        changeLog = self.config.get('dynamicTemplate', {}).get('changeLog', None)
         headers = {'Content-Type': 'application/json'}
 
         if changeLog:
