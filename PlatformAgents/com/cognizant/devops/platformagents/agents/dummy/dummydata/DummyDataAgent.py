@@ -151,15 +151,12 @@ class DummyDataAgent(BaseAgent):
         flag = 1
         # To save the data count in tracking.json
         script_dir = os.path.dirname(__file__)
-        print(script_dir)
         file_path = os.path.join(script_dir, 'config.json')
-        print(file_path)
         # Input your system path to tracking.json of DummyAgent          
         with open(file_path, "r") as jsonFile:  # Open the JSON file for reading
             data = json.load(jsonFile)  # Read the JSON into the buffer
         print'Starting Agent!'
         currentDT = datetime.datetime.now()
-        print(currentDT)
         record_count = 0  
         total_record_count = 0
         while flag == 1:	
@@ -169,7 +166,6 @@ class DummyDataAgent(BaseAgent):
             jenkins_data = []
             sonar_data = []
             sprint_data = []
-            print(jira_data)
             # Run-time calculated variables
             currentDT = datetime.datetime.now()
             time_tuple = time.strptime(currentDT.strftime('%Y-%m-%d %H:%M:%S'), '%Y-%m-%d %H:%M:%S')
@@ -181,7 +177,6 @@ class DummyDataAgent(BaseAgent):
             time_start = (random.randint(100, 500))
             time_end = (random.randint(501, 800))
             
-            print('Jira Started ....')
             # jira_count =[]
             jira_count = 0
             jira_keyArr = [] 
@@ -222,12 +217,12 @@ class DummyDataAgent(BaseAgent):
                     jira_sprintArr.append(randonSprintStringId)
                
             jiraMetadata = {"labels" : ["JIRA"]}
-            print(len(jira_data))
+            #print(len(jira_data))
             total_record_count =total_record_count + len(jira_data)
             self.publishToolsData(jira_data, jiraMetadata)
                            
-            print(jira_keyArr)
-            print(jira_sprintArr)
+            #print(jira_keyArr)
+            #print(jira_sprintArr)
             
             # sprint json configurations
             for sprint in jira_sprintArr:
@@ -239,13 +234,13 @@ class DummyDataAgent(BaseAgent):
                 sprint_data.append(sprintSample)
 
             metadata = {"labels" : ["SPRINT"]}
-            print(len(sprint_data))
+            #print(len(sprint_data))
             total_record_count =total_record_count + len(sprint_data)
             self.publishToolsData(sprint_data, metadata)
             
-            print('GIT Started ....')
-            print(jira_keyArr)
-            print(len(jira_keyArr))
+            #print('GIT Started ....')
+            #print(jira_keyArr)
+            #print(len(jira_keyArr))
             git = 0
             git_CommitArr = []
             for jirakey in jira_keyArr: 
@@ -273,13 +268,13 @@ class DummyDataAgent(BaseAgent):
                    git_CommitArr.append(gitSample)                 
                    git_data.append(gitSample)
             gitMetadata = {"labels" : ["GIT"]}
-            print(len(git_data))
+            #print(len(git_data))
             total_record_count =total_record_count + len(git_data)
             self.publishToolsData(git_data, gitMetadata)
             
-            print('Jenkins Started ....')
+            #print('Jenkins Started ....')
             #print(git_CommitArr)
-            print(len(git_CommitArr))
+            #print(len(git_CommitArr))
             jenkins_count = 0 
             jenkins_keyArr = [] 
             for rangeNumber in range(0, len(git_CommitArr)) :
@@ -314,13 +309,13 @@ class DummyDataAgent(BaseAgent):
                 jenkins_keyArr.append(jenkinsSample)
                 jenkins_data.append(jenkinsSample)
             jenkinsMetadata = {"labels" : ["JENKINS"]}
-            print(len(jenkins_data))
+            #print(len(jenkins_data))
             total_record_count =total_record_count + len(jenkins_data)
             self.publishToolsData(jenkins_data, jenkinsMetadata)
             
             print('Sonar Started ....')
             #print(jenkins_keyArr)
-            print(len(jenkins_keyArr))
+            #print(len(jenkins_keyArr))
             sonar_count = 0 
             for rangeNumber in range(0, len(jenkins_keyArr))  :
                 jenkinsSampleData = jenkins_keyArr[rangeNumber]
@@ -352,7 +347,7 @@ class DummyDataAgent(BaseAgent):
                 sonar_data.append(sonarSample)				
 
             sonarMetadata = {"labels" : ["SONAR"]}
-            print(len(sonar_data))
+            #print(len(sonar_data))
             total_record_count =total_record_count + len(sonar_data)
             self.publishToolsData(sonar_data, sonarMetadata)
         
@@ -368,7 +363,7 @@ class DummyDataAgent(BaseAgent):
         currentCompletedDT = datetime.datetime.now()
         print('Start Time      '+ str(currentDT))
         print('Completed Time  ==== '+ str(currentCompletedDT))
-        print('Total Record count '+str(total_record_count))
+        #print('Total Record count '+str(total_record_count))
                 
 if __name__ == "__main__":
     DummyDataAgent()       
