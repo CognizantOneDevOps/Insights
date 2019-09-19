@@ -139,6 +139,7 @@
 				<artifactId>spring-boot-maven-plugin</artifactId>
 				<version>2.1.8.RELEASE</version>
 				<configuration>
+					<excludeGroupIds>org.codehaus.plexus</excludeGroupIds>
 						<excludes>
 							<exclusion>
 							<groupId>org.codehaus.plexus</groupId>
