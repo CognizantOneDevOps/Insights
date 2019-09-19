@@ -100,32 +100,15 @@
 			<version>6.1-SNAPSHOT</version>
 		</dependency>
 		<dependency>
-			<groupId>org.quartz-scheduler</groupId>
-			<artifactId>quartz</artifactId>
-			<version>2.3.1</version>
-			<exclusions>
-				<exclusion>
-					<groupId>com.mchange</groupId>
-					<artifactId>c3p0</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-		<dependency>
-			<groupId>org.quartz-scheduler</groupId>
-			<artifactId>quartz-jobs</artifactId>
-			<version>2.3.1</version>
-		</dependency>
-
-		<dependency>
 			<groupId>org.hibernate</groupId>
 			<artifactId>hibernate-core</artifactId>
 			<version>5.4.2.Final</version>
 		</dependency>
 		<dependency>
-	<groupId>com.github.wnameless</groupId>
-	<artifactId>json-flattener</artifactId>
-	<version>0.2.2</version>
-    </dependency>
+			<groupId>com.github.wnameless</groupId>
+			<artifactId>json-flattener</artifactId>
+			<version>0.2.2</version>
+		</dependency>
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-csv</artifactId>
@@ -133,7 +116,7 @@
 		</dependency>
 	</dependencies>
 	<build>
-		<!-- <finalName>PlatformEngine</finalName> -->
+		<finalName>PlatformWebhookEngine</finalName>
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>

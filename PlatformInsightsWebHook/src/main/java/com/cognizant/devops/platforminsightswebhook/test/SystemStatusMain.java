@@ -19,27 +19,23 @@ import java.util.Random;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
-
-import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
 
-import sun.misc.BASE64Encoder;
+// import sun.misc.BASE64Encoder;
 
 public class SystemStatusMain {
 	private static Logger LOG = LogManager.getLogger(SystemStatusMain.class);
-	@Autowired
-	private Gson gson;
+
 
 	public static void main(String[] args) {
 		LOG.debug(" Run Event Subscriber .....");
 		SystemStatusMain ssm = new SystemStatusMain();
 		String data = ssm.createMessage();
-		String[] arr = { "git_test" };
+		String[] arr = { "git_test", "GIT_push" };
 		Random r = new Random();
 		for (int i = 0; i < 4000; i++) {
 			int randomNumber = r.nextInt(arr.length);
@@ -61,10 +57,11 @@ public class SystemStatusMain {
 		try {
 			if (authtoken == null) {
 				String authString = name + ":" + password;
-				authStringEnc = new BASE64Encoder().encode(authString.getBytes());
+				authStringEnc = "bnVsbDpudWxs";//new BASE64Encoder().encode(authString.getBytes())
 			} else {
 				authStringEnc = authtoken;
 			}
+			//LOG.debug("authStringEnc ====" + authStringEnc);
 			JsonParser parser = new JsonParser();
 			JsonElement dataJson = parser.parse(data);//new Gson().fromJson(data, JsonElement.class)
 			Client restClient = Client.create();
