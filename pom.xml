@@ -108,11 +108,12 @@
                                         <extractStatic>true</extractStatic>
                                         <recursive>true</recursive>
                                         <exclude>.git</exclude>
+                                        <excludePatterns>auditservice</excludePatterns>
                                         <recursive>true</recursive>
                                         <haveGraph>true</haveGraph>
                                         <generateLatex>false</generateLatex>
                                         <generateHtml>true</generateHtml>
-                                        <input>${project.basedir}</input>
+                                        <input>${project.basedir}/PlatformAgents ${project.basedir}/PlatformCommons ${project.basedir}/PlatformDAL ${project.basedir}/PlatformDeployment ${project.basedir}/PlatformEngine ${project.basedir}/PlatformGrafanaPlugins ${project.basedir}/PlatformInsights ${project.basedir}/PlatformInsightsWebHook ${project.basedir}/PlatformMockServer ${project.basedir}/PlatformService ${project.basedir}/PlatformUI3 ${project.basedir}/PlatformWebhookEngine</input>
                                         <outputDirectory>${basedir}/DoxygenReport</outputDirectory>
                                         <inlineSources>true</inlineSources>
                                         <haveDot>true</haveDot>
