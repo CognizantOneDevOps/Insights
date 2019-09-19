@@ -75,13 +75,10 @@ gitCommitID = sh (
 	stage ('Doxygen_NexusUpload') {	
 		sh "cd /var/jenkins/jobs/$commitID/workspace && mvn -B help:evaluate -Dexpression=project.version | grep -e '^[^[]' > /var/jenkins/jobs/$commitID/workspace/version"
        		doxyversion=readFile("/var/jenkins/jobs/$commitID/workspace/version").trim()  //Get version from pom.xml to form the nexus repo URL
-		if(doxyversion.contains("SNAPSHOT")){
-			NEXUSREPO="https://repo.cogdevops.com/repository/buildonInsightsEnterprise"
-		}
-		else {
+		if(!doxyversion.contains("SNAPSHOT")){
 			NEXUSREPO="https://repo.cogdevops.com/repository/InsightsEnterpriseRelease"
+			sh "mvn deploy:deploy-file -DgroupId=com.cognizant.devops -DartifactId=PlatformDoxygen -Dversion=${doxyversion} -Dpackaging=zip -Dfile=/var/jenkins/jobs/${commitID}/workspace/DoxygenReport/Doxygen.zip -DrepositoryId=nexus -Durl=${NEXUSREPO}"
 		}
-		sh "mvn deploy:deploy-file -DgroupId=com.cognizant.devops -DartifactId=PlatformDoxygen -Dversion=${doxyversion} -Dpackaging=zip -Dfile=/var/jenkins/jobs/${commitID}/workspace/DoxygenReport/Doxygen.zip -DrepositoryId=nexus -Durl=${NEXUSREPO}"
 	}
 	}
 	catch (err){
