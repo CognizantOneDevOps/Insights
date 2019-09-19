@@ -20,7 +20,7 @@ Created on Dec 28, 2017
 '''
 from dateutil import parser
 import datetime
-from ....core.BaseAgent import BaseAgent
+from BaseAgent import BaseAgent
 import logging
 import time
 import calendar
@@ -95,7 +95,7 @@ class DummyDataAgent(BaseAgent):
             }
         
         # Jira variables
-        jira_status = ['Open', 'Backlog', 'To Do', 'In Progress', 'Canceled', 'Done', 'Closed']
+        jira_status = ['Open', 'Backlog', 'To Do', 'In Progress', 'Canceled', 'Done', 'Closed', 'Reopen']
         jira_priority = ['Low', 'Medium', 'High']
         jira_issuetype = ['Story', 'Task', 'Sub-task', 'Bug', 'Epic', 'User Story']
         jira_creator = ['Akshay', 'Mayank', 'Vishwajit', 'Prajakta', 'Vishal']
@@ -106,18 +106,19 @@ class DummyDataAgent(BaseAgent):
         state = ['start', 'closed', 'finish', 'deliver']
         Priority = ['2', '3', '4', '5']	
         Author_Name = ['HAri', 'Dhrubaj', 'Akshay', 'Tommy']
-        resolution = ['Done', 'Completed']
-        storyPoints = ['1', '3', '5', '7']
-        alm_ID = ['a23', 'a33', 'a44', 'a55']
+        resolution = ['Done', 'Completed', 'Reopen']
+        storyPoints = ['1', '2', '3', '5', '8', '13']
+        #alm_ID = ['a23', 'a33', 'a44', 'a55']
         progressTimeSec = ['1232', '32342', '2323']
         assigneeID = ['1231212', '2345253', '234234', '1342323']
         assigneeEmail = ['hari@cognizant.com', 'sashikala@cognizant.com', 'drubaj@cognizant.com', 'kalaivani@cognizant.com']
+        tool_Name = ['JIRA']
         
         # Sprint variables
 
         sprint_Name = ['Adoption', 'UIEnhance', 'Three', 'Testphase']	
         state = ['start', 'closed', 'finish', 'deliver']
-        issue_Type = ['Bug', 'Sprint Bug', 'SIT Bug', 'Performance Bug', 'Regression Bug']
+        issue_Type = ['Bug', 'Sprint_Bug', 'SIT_Bug', 'Performance_Bug', 'Regression_Bug']
         
         # GIT variables
         repo = ['Insights', 'InsightsDemo', 'InsightsTest', 'InsightsTest']
@@ -140,9 +141,15 @@ class DummyDataAgent(BaseAgent):
         sonar_key = ['payment1', 'Mobile1', 'Claim', 'agent']
         project_id = ['1', '2', '3', '4']
         resourceKey = ['09', '099', '89', '32']
+        sonar_quality_gate_Status = ['SUCCESS', 'FAILED']
+        sonar_coverage = ['35','50','70','85']
+        sonar_complexity = ['35','50','70','85','100','125']
+        sonar_duplicate = ['15','25','45','60']
+        sonar_techdepth = ['3','5','17','25','21']
+        
         dataCount = self.config.get("dataCount")
         flag = 1
-        # To save the data count in config.json
+        # To save the data count in tracking.json
         script_dir = os.path.dirname(__file__)
         print(script_dir)
         file_path = os.path.join(script_dir, 'config.json')
@@ -202,11 +209,12 @@ class DummyDataAgent(BaseAgent):
                 jiraSample['projectName'] = random.choice(jira_project_name)
                 jiraSample['resolution'] = random.choice(resolution)
                 jiraSample['storyPoints'] = random.choice(storyPoints)
-                jiraSample['almID'] = randonjirakey
                 jiraSample['progressTimeSec'] = random.choice(progressTimeSec)
                 jiraSample['assigneeID'] = random.choice(assigneeID)
                 jiraSample['assigneeEmail'] = random.choice(assigneeEmail)
                 jiraSample['authorName'] = random.choice(Author_Name)
+                jiraSample['toolName'] = "JIRA"
+                jiraSample['categoryName'] = "ALM"
                 jira_count += 1
                 jira_data.append(jiraSample)
                 jira_keyArr.append(randonjirakey)
@@ -243,7 +251,7 @@ class DummyDataAgent(BaseAgent):
             for jirakey in jira_keyArr: 
                 git_count = 0
                 #print(jirakey)                
-                while git_count != 50 : 
+                while git_count != 25 : 
                    randonGitCommitId = 'CM-' + str(''.join([random.choice(string.digits) for n in xrange(10)])) 
                    # GIT json configurations    10 2
                    git_time = (time_epoch + time_start)
@@ -259,6 +267,8 @@ class DummyDataAgent(BaseAgent):
                    gitSample['repoName'] = random.choice(repo)
                    gitSample['message'] = 'This commit is associated with jira-key : ' + str(jirakey)
                    gitSample['commitId'] = randonGitCommitId
+                   gitSample['toolName'] = "GIT"
+                   gitSample['categoryName'] = "SCM"
                    git_count += 1   
                    git_CommitArr.append(gitSample)                 
                    git_data.append(gitSample)
@@ -289,7 +299,7 @@ class DummyDataAgent(BaseAgent):
                 jenkinsSample['endTime'] = jenkins_endTime
                 jenkinsSample['duration'] = jenkins_endTime - jenkins_startTime
                 jenkinsSample['status'] = random.choice(status)
-                jenkinsSample['sprintID'] = random.choice(sprint)
+                #jenkinsSample['sprintID'] = random.choice(sprint)
                 jenkinsSample['buildNumber'] = randomJenkineBuildNumber
                 jenkinsSample['jobName'] = random.choice(job_name)
                 jenkinsSample['projectName'] = random.choice(project_name)
@@ -299,9 +309,11 @@ class DummyDataAgent(BaseAgent):
                 jenkinsSample['result'] = random.choice(result)
                 jenkinsSample['master'] = random.choice(master)
                 jenkinsSample['scmcommitId'] = gitSampleData['commitId']
+                jenkinsSample['toolName'] = "JENKINS"
+                jenkinsSample['categoryName'] = "CI"
                 jenkins_keyArr.append(jenkinsSample)
                 jenkins_data.append(jenkinsSample)
-            jenkinsMetadata = {"labels" : ["JENKINS5"]}
+            jenkinsMetadata = {"labels" : ["JENKINS"]}
             print(len(jenkins_data))
             total_record_count =total_record_count + len(jenkins_data)
             self.publishToolsData(jenkins_data, jenkinsMetadata)
@@ -323,13 +335,20 @@ class DummyDataAgent(BaseAgent):
                 sonarSample['inSightsTimeX'] = sonar_date.strftime("%Y-%m-%d" + 'T' + "%H:%M:%S" + 'Z')
                 sonarSample['inSightsTime'] = sonar_endTime
                 sonarSample['projectname'] = random.choice(project)
-                sonarSample['ProjectID'] = random.choice(project_id)
+                sonarSample['ProjectID'] = random.choice(projectId)
                 sonarSample['ProjectKey'] = random.choice(sonar_key)
                 sonarSample['resourceKey'] = random.choice(resourceKey)
                 sonarSample['inSightsTime'] = random.choice(resourceKey)
                 sonarSample['jenkineBuildNumber'] = jenkinsSampleData['buildNumber']
                 sonarSample['inSightsTimeX'] = random.choice(resourceKey)
                 sonarSample['sonarKey']=ramdomSonarKey
+                sonarSample['sonarQualityGateStatus']= random.choice(sonar_quality_gate_Status)
+                sonarSample['sonarCoverage']= random.choice(sonar_coverage)
+                sonarSample['sonarComplexity']= random.choice(sonar_complexity)
+                sonarSample['sonarDuplicateCode']= random.choice(sonar_duplicate)
+                sonarSample['sonarTechDepth']= random.choice(sonar_techdepth)
+                sonarSample['toolName'] = "SONAR"
+                sonarSample['categoryName'] = "CODEQUALITY"
                 sonar_data.append(sonarSample)				
 
             sonarMetadata = {"labels" : ["SONAR"]}
@@ -347,7 +366,7 @@ class DummyDataAgent(BaseAgent):
                 print("Dummy Agent Processing Completed .....")
         
         currentCompletedDT = datetime.datetime.now()
-        print('Start Time      ==== '+ str(currentDT))
+        print('Start Time      '+ str(currentDT))
         print('Completed Time  ==== '+ str(currentCompletedDT))
         print('Total Record count '+str(total_record_count))
                 
