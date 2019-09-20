@@ -45,6 +45,16 @@
 							<Specification-Version>${project.version}</Specification-Version>
 						</manifestEntries>
 					</archive>
+					<includeSystemScope>true</includeSystemScope>
+					<webResources>
+                    <resource>
+                        <directory>jar/</directory>
+                        <targetPath>WEB-INF/lib</targetPath>
+                        <includes>
+                            <include>testng-7.0.1.jar</include>
+                        </includes>
+                    </resource>
+                </webResources>
 				</configuration>
 			</plugin>
 		</plugins>
@@ -411,7 +421,7 @@
 							<url>http://insightsrheldev.cogdevops.com:8000/manager/text</url>
 							<server>tomcat</server>
 							<path>/PlatformService</path>
-
+							<includeSystemScope>true</includeSystemScope>
 						</configuration>
 					</plugin>
 				</plugins>

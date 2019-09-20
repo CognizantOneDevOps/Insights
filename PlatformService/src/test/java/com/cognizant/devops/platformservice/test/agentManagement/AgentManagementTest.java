@@ -56,6 +56,7 @@ public class AgentManagementTest extends AgentManagementTestData{
 	public void testGetSystemAvailableAgentList() throws InsightsCustomException {
 		
 		AgentManagementServiceImpl agentServiceImpl = new AgentManagementServiceImpl();
+		ApplicationConfigProvider.getInstance().getAgentDetails().setOnlineRegistration(true);
 		Map<String, ArrayList<String>> availableAgents = agentServiceImpl.getSystemAvailableAgentList();
 		Assert.assertNotNull(availableAgents);
 		Assert.assertTrue(availableAgents.size() > 0);
