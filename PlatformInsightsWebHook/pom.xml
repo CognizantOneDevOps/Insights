@@ -17,6 +17,14 @@
 	<version>6.1-SNAPSHOT</version>
 	<description>PlatformInsightsWebHook for webhook testing</description>
 
+	<repositories>
+		<repository>
+			<id>project.local</id>
+			<name>project</name>
+			<url>file:${project.basedir}/jar</url>
+		</repository>
+	</repositories>
+
 
 	<properties>
 		<!-- <java.version>9</java.version> -->
@@ -67,13 +75,6 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
-		<!-- <dependency> <groupId>org.springframework.boot</groupId> <artifactId>spring-boot-starter-tomcat</artifactId> 
-			<version>${spring.version}</version> <scope>compile</scope> </dependency> -->
-		<!-- <dependency> <groupId>org.springframework.boot</groupId> <artifactId>spring-boot-starter</artifactId> 
-			<version>${spring.version}</version> <exclusions> exclude logback , add log4j2 
-			<exclusion> <groupId>org.springframework.boot</groupId> <artifactId>spring-boot-starter-logging</artifactId> 
-			</exclusion> <exclusion> <groupId>org.apache.commons</groupId> <artifactId>commons-compress</artifactId> 
-			</exclusion> </exclusions> </dependency> -->
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-compress</artifactId>
@@ -130,45 +131,40 @@
 			<artifactId>amqp-client</artifactId>
 			<version>5.7.0</version>
 		</dependency>
-		<!-- <dependency>
-				<groupId>org.springframework.boot</groupId>
-				<artifactId>spring-boot-maven-plugin</artifactId>
-				<version>2.1.8.RELEASE</version>
-					<exclusions>
-							<exclusion>
-							<groupId>org.codehaus.plexus</groupId>
-							<artifactId>plexus-io</artifactId>
-						</exclusion>
-						<exclusion>
-							<groupId>org.springframework.boot</groupId>
-							<artifactId>spring-boot-starter-logging</artifactId>
-						</exclusion>
-						<exclusion>
-							<groupId>org.apache.commons</groupId>
-							<artifactId>commons-compress</artifactId>
-						</exclusion>
-						<exclusion>
-							<groupId>org.springframework.boot</groupId>
-							<artifactId>spring-boot-loader-tools</artifactId>
-						</exclusion>
-						<exclusion>
-							 <groupId>org.codehaus.plexus</groupId>
-    							<artifactId>plexus-archiver</artifactId>
-						</exclusion>
-					</exclusions>
-		</dependency> -->
 	</dependencies>
 	<build>
 		<finalName>PlatformInsightsWebHook</finalName>
 		<plugins>
 			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-install-plugin</artifactId>
+				<version>3.0.0-M1</version>
+				<executions>
+					<execution>
+						<id>install-jar-lib</id>
+						<goals>
+							<goal>install-file</goal>
+						</goals>
+						<phase>install</phase>
+						<configuration>
+							<groupId>org.springframework.boot</groupId>
+							<artifactId>spring-boot-maven-plugin</artifactId>
+							<version>2.1.9</version>
+							<packaging>jar</packaging>
+							<file>${basedir}/jar/spring-boot-maven-plugin-2.1.9.jar</file>
+							<generatePom>true</generatePom>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
-				<version>2.1.8.RELEASE</version>
+				<version>2.1.9</version>
 				<configuration>
 					<excludeGroupIds>org.codehaus.plexus</excludeGroupIds>
-						<excludes>
-							<exclude>
+					<excludes>
+						<exclude>
 							<groupId>org.codehaus.plexus</groupId>
 							<artifactId>plexus-io</artifactId>
 						</exclude>
@@ -185,8 +181,8 @@
 							<artifactId>spring-boot-loader-tools</artifactId>
 						</exclude>
 						<exclude>
-							 <groupId>org.codehaus.plexus</groupId>
-    							<artifactId>plexus-archiver</artifactId>
+							<groupId>org.codehaus.plexus</groupId>
+							<artifactId>plexus-archiver</artifactId>
 						</exclude>
 					</excludes>
 					<dependency>
@@ -214,52 +210,6 @@
 					</execution>
 				</executions>
 			</plugin>
-
-			<!-- <plugin> <groupId>org.apache.maven.plugins</groupId> <artifactId>maven-shade-plugin</artifactId> 
-				<version>2.3</version> <executions> <execution> <phase>package</phase> <goals> 
-				<goal>shade</goal> </goals> <configuration> <transformers> <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer"> 
-				<manifestEntries> <Main-Class>com.cognizant.devops.platforminsightswebhook.application.WebHookAppStarter</Main-Class> 
-				</manifestEntries> </transformer> </transformers> <finalName>${project.name}${project.version}</finalName> 
-				<filters> <filter> <artifact>*:*</artifact> <excludes> <exclude>log4j.properties</exclude> 
-				<exclude>server-config.json</exclude> </excludes> </filter> </filters> </configuration> 
-				</execution> </executions> </plugin> <plugin> <artifactId>maven-resources-plugin</artifactId> 
-				<version>2.4.3</version> <executions> <execution> <id>copy-resources</id> 
-				<phase>package</phase> <goals> <goal>copy-resources</goal> </goals> <configuration> 
-				<outputDirectory>${project.basedir}/target</outputDirectory> <resources> 
-				<resource> <directory>src/main/resources</directory> <includes> <include>log4j2.xml</include> 
-				<include>**/*.csv</include> <include>application.properties</include> </includes> 
-				<filtering>true</filtering> </resource> <resource> <directory>/target/</directory> 
-				<includes> <include>${project.name}.jar</include> </includes> </resource> 
-				</resources> </configuration> </execution> </executions> </plugin> -->
-			<!-- <plugin> <groupId>org.apache.maven.plugins</groupId> <artifactId>maven-dependency-plugin</artifactId> 
-				<executions> <execution> <id>copy-dependencies</id> <phase>prepare-package</phase> 
-				<goals> <goal>copy-dependencies</goal> </goals> <configuration> <outputDirectory> 
-				${project.build.directory}/libs </outputDirectory> </configuration> </execution> 
-				</executions> </plugin> <plugin> <groupId>org.apache.maven.plugins</groupId> 
-				<artifactId>maven-jar-plugin</artifactId> <configuration> <archive> <manifest> 
-				<addClasspath>true</addClasspath> <classpathPrefix>libs/</classpathPrefix> 
-				<mainClass> com.cognizant.devops.platforminsightswebhook.application.WebHookAppStarter 
-				</mainClass> </manifest> </archive> </configuration> </plugin> <plugin> <groupId>org.apache.maven.plugins</groupId> 
-				<artifactId>maven-assembly-plugin</artifactId> <executions> <execution> <phase>package</phase> 
-				<goals> <goal>single</goal> </goals> <configuration> <archive> <manifest> 
-				<mainClass> com.cognizant.devops.platforminsightswebhook.application.WebHookAppStarter 
-				</mainClass> </manifest> </archive> <descriptorRefs> <descriptorRef>jar-with-dependencies</descriptorRef> 
-				</descriptorRefs> <transformers> <transformer implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer"> 
-				<resource>META-INF/spring.factories</resource> </transformer> </transformers> 
-				</configuration> </execution> </executions> </plugin> -->
-			<!-- <plugin> <groupId>org.apache.maven.plugins</groupId> <artifactId>maven-shade-plugin</artifactId> 
-				<executions> <execution> <goals> <goal>shade</goal> </goals> <configuration> 
-				<shadedArtifactAttached>true</shadedArtifactAttached> <transformers> <transformer 
-				implementation= "org.apache.maven.plugins.shade.resource.ManifestResourceTransformer"> 
-				<mainClass> com.cognizant.devops.platforminsightswebhook.application.WebHookAppStarter</mainClass> 
-				</transformer> </transformers> </configuration> </execution> </executions> 
-				</plugin> -->
-			<!-- <plugin> <groupId>org.apache.tomcat.maven</groupId> <artifactId>tomcat7-maven-plugin</artifactId> 
-				<version>2.0</version> <executions> <execution> <id>tomcat-run</id> <goals> 
-				<goal>exec-war-only</goal> </goals> <phase>package</phase> <configuration> 
-				<path>/PlatformInsightsWebHook</path> <enableNaming>false</enableNaming> 
-				<finalName>PlatformInsightsWebHook.jar</finalName> <charset>utf-8</charset> 
-				</configuration> </execution> </executions> </plugin> -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-jar-plugin</artifactId>
