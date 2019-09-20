@@ -149,14 +149,14 @@
 					</execution>
 				</executions>
 			</plugin> -->
-			<plugin>
+			<!-- <plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 				<version>2.1.8.RELEASE</version>
 				<configuration>
-			<!-- 	<configuration>
+				<configuration>
 							<localRepositoryPath>${project.build.directory}/jar</localRepositoryPath>
-						</configuration> -->
+						</configuration>
 					<excludeGroupIds>org.codehaus.plexus</excludeGroupIds>
 					<excludes>
 						<exclude>
@@ -204,7 +204,7 @@
 						</goals>
 					</execution>
 				</executions>
-			</plugin>
+			</plugin> -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-jar-plugin</artifactId>
