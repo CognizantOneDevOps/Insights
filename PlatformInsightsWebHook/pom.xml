@@ -130,17 +130,11 @@
 			<artifactId>amqp-client</artifactId>
 			<version>5.7.0</version>
 		</dependency>
-	</dependencies>
-	<build>
-		<finalName>PlatformInsightsWebHook</finalName>
-		<plugins>
-			<plugin>
+		<!-- <dependency>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 				<version>2.1.8.RELEASE</version>
-				<configuration>
-					<excludeGroupIds>org.codehaus.plexus</excludeGroupIds>
-						<excludes>
+					<exclusions>
 							<exclusion>
 							<groupId>org.codehaus.plexus</groupId>
 							<artifactId>plexus-io</artifactId>
@@ -157,6 +151,43 @@
 							<groupId>org.springframework.boot</groupId>
 							<artifactId>spring-boot-loader-tools</artifactId>
 						</exclusion>
+						<exclusion>
+							 <groupId>org.codehaus.plexus</groupId>
+    							<artifactId>plexus-archiver</artifactId>
+						</exclusion>
+					</exclusions>
+		</dependency> -->
+	</dependencies>
+	<build>
+		<finalName>PlatformInsightsWebHook</finalName>
+		<plugins>
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+				<version>2.1.8.RELEASE</version>
+				<configuration>
+					<excludeGroupIds>org.codehaus.plexus</excludeGroupIds>
+						<excludes>
+							<exclude>
+							<groupId>org.codehaus.plexus</groupId>
+							<artifactId>plexus-io</artifactId>
+						</exclude>
+						<exclude>
+							<groupId>org.springframework.boot</groupId>
+							<artifactId>spring-boot-starter-logging</artifactId>
+						</exclude>
+						<exclude>
+							<groupId>org.apache.commons</groupId>
+							<artifactId>commons-compress</artifactId>
+						</exclude>
+						<exclude>
+							<groupId>org.springframework.boot</groupId>
+							<artifactId>spring-boot-loader-tools</artifactId>
+						</exclude>
+						<exclude>
+							 <groupId>org.codehaus.plexus</groupId>
+    							<artifactId>plexus-archiver</artifactId>
+						</exclude>
 					</excludes>
 					<dependency>
 						<groupId>org.apache.commons</groupId>
