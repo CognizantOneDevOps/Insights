@@ -21,59 +21,7 @@
 	<version>6.1-SNAPSHOT</version>
 	<name>PlatformService</name>
 
-	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-surefire-plugin</artifactId>
-				<version>3.0.0-M3</version>
-				<configuration>
-					<useSystemClassLoader>false</useSystemClassLoader>
-					<suiteXmlFiles>
-						<suiteXmlFile>src/test/resources/testng.xml</suiteXmlFile>
-					</suiteXmlFiles>
-				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-war-plugin</artifactId>
-				<version>2.3</version>
-				<configuration>
-					<archive>
-						<manifestEntries>
-							<Specification-Title>${project.name}</Specification-Title>
-							<Specification-Version>${project.version}</Specification-Version>
-						</manifestEntries>
-					</archive>
-					<includeSystemScope>true</includeSystemScope>
-					<webResources>
-                    <resource>
-                        <directory>jar/</directory>
-                        <targetPath>WEB-INF/lib</targetPath>
-                        <includes>
-                            <include>testng-7.0.1.jar</include>
-                        </includes>
-                    </resource>
-                </webResources>
-				</configuration>
-			</plugin>
-		</plugins>
-		<resources>
-			<resource>
-				<directory>src/main/resources</directory>
-				<includes>
-					<include>**/*.md</include>
-					<include>**/*.json</include>
-					<include>version.properties</include>
-					<include>*.properties</include>
-					<include>**/*.properties</include>
-					<include>**/*.xml</include>
-					<include>**/*.p12</include>
-				</includes>
-				<filtering>true</filtering>
-			</resource>
-		</resources>
-	</build>
+
 
 	<repositories>
 		<repository>
@@ -412,8 +360,43 @@
 
 			<build>
 				<plugins>
-
+	
+					
 					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-war-plugin</artifactId>
+						<version>2.3</version>
+						<configuration>
+							<archive>
+								<manifestEntries>
+									<Specification-Title>${project.name}</Specification-Title>
+									<Specification-Version>${project.version}</Specification-Version>
+								</manifestEntries>
+							</archive>
+							<includeSystemScope>true</includeSystemScope>
+							<!-- <webResources>
+								<resource>
+									<directory>${project.baseurl}/jar/org/testng/testng/7.0.1</directory>
+									<targetPath>WEB-INF/lib</targetPath>
+									<includes>
+										<include>testng-7.0.1.jar</include>
+									</includes>
+								</resource>
+							</webResources> -->
+						</configuration>
+					</plugin>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-surefire-plugin</artifactId>
+						<version>3.0.0-M3</version>
+						<configuration>
+							<useSystemClassLoader>false</useSystemClassLoader>
+							<suiteXmlFiles>
+								<suiteXmlFile>src/test/resources/testng.xml</suiteXmlFile>
+							</suiteXmlFiles>
+						</configuration>
+					</plugin>
+					<!-- <plugin>
 						<groupId>org.apache.tomcat.maven</groupId>
 						<artifactId>tomcat7-maven-plugin</artifactId>
 						<version>2.2</version>
@@ -423,8 +406,23 @@
 							<path>/PlatformService</path>
 							<includeSystemScope>true</includeSystemScope>
 						</configuration>
-					</plugin>
+					</plugin> -->
 				</plugins>
+				<resources>
+					<resource>
+						<directory>src/main/resources</directory>
+						<includes>
+							<include>**/*.md</include>
+							<include>**/*.json</include>
+							<include>version.properties</include>
+							<include>*.properties</include>
+							<include>**/*.properties</include>
+							<include>**/*.xml</include>
+							<include>**/*.p12</include>
+						</includes>
+						<filtering>true</filtering>
+					</resource>
+				</resources>
 			</build>
 		</profile>
 	</profiles>
