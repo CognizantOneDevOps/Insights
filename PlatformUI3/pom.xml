@@ -14,7 +14,7 @@
 	<artifactId>PlatformUI3</artifactId>
 	<version>6.1-SNAPSHOT</version>
 	<name>PlatformUI3</name>
-	
+
 	<repositories>
 		<repository>
 			<id>project.local</id>
@@ -22,20 +22,16 @@
 			<url>file:${project.basedir}/jar</url>
 		</repository>
 	</repositories>
-	
-<pluginRepositories>
-    <pluginRepository>
-     	<id>project.local</id>
+
+	<pluginRepositories>
+		<pluginRepository>
+			<id>project.local</id>
 			<name>project</name>
 			<url>file:${project.basedir}/jar</url>
-        <!-- <releases>
-            <enabled>true</enabled>
-        </releases>
-        <snapshots>
-            <enabled>true</enabled>
-        </snapshots> -->
-    </pluginRepository>
-</pluginRepositories>
+			<!-- <releases> <enabled>true</enabled> </releases> <snapshots> <enabled>true</enabled> 
+				</snapshots> -->
+		</pluginRepository>
+	</pluginRepositories>
 	<dependencies>
 		<dependency>
 			<groupId>org.apache.commons</groupId>
@@ -49,7 +45,6 @@
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-install-plugin</artifactId>
 				<version>3.0.0-M1</version>
-				
 				<executions>
 					<execution>
 						<id>install-jar-lib</id>
@@ -58,13 +53,13 @@
 						</goals>
 						<phase>install</phase>
 						<configuration>
-					<groupId>com.github.eirslett</groupId>
-					<artifactId>frontend-maven-plugin</artifactId>
-					<version>1.8.1</version>
-					<packaging>jar</packaging>
-					<file>${basedir}/jar/frontend-maven-plugin-1.8.1.jar</file>
-					<generatePom>true</generatePom>
-				</configuration>
+							<groupId>com.github.eirslett</groupId>
+							<artifactId>frontend-maven-plugin</artifactId>
+							<version>1.8.1</version>
+							<packaging>jar</packaging>
+							<file>${basedir}/jar/frontend-maven-plugin-1.8.1.jar</file>
+							<generatePom>true</generatePom>
+						</configuration>
 					</execution>
 				</executions>
 			</plugin>
