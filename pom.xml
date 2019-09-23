@@ -58,6 +58,15 @@
 		<module>PlatformWebhookEngine</module>
 	</modules>
 	<build>
+	        <pluginManagement>
+                        <plugins>
+                               <plugin>
+                                      <groupId>com.soebes.maven.plugins</groupId>
+                                      <artifactId>doxygen-maven-plugin</artifactId>
+                                      <version>1.1.0</version>
+                               </plugin>
+                         </plugins>
+                </pluginManagement>
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -83,8 +92,44 @@
 					<autoVersionSubmodules>true</autoVersionSubmodules>
 				</configuration>
 			</plugin>
+			<plugin>
+                                <groupId>com.soebes.maven.plugins</groupId>
+                                <artifactId>doxygen-maven-plugin</artifactId>
+                                <configuration>
+                                        <projectName>"Insights Code Documentation"</projectName>
+                                        <projectNumber>${project.version}</projectNumber>
+                                        <optimizeOutputJava>true</optimizeOutputJava>
+                                        <javadocAutobrief>true</javadocAutobrief>
+                                        <extractAll>true</extractAll>
+                                        <extractStatic>true</extractStatic>
+                                        <recursive>true</recursive>
+                                        <exclude>.git</exclude>
+                                        <excludePatterns>auditservice</excludePatterns>
+                                        <recursive>true</recursive>
+                                        <haveGraph>true</haveGraph>
+                                        <generateLatex>false</generateLatex>
+                                        <generateHtml>true</generateHtml>
+                                        <input>${project.basedir}/PlatformAgents ${project.basedir}/PlatformCommons ${project.basedir}/PlatformDAL ${project.basedir}/PlatformDeployment ${project.basedir}/PlatformEngine ${project.basedir}/PlatformGrafanaPlugins ${project.basedir}/PlatformInsights ${project.basedir}/PlatformInsightsWebHook ${project.basedir}/PlatformMockServer ${project.basedir}/PlatformService ${project.basedir}/PlatformUI3 ${project.basedir}/PlatformWebhookEngine</input>
+                                        <outputDirectory>${basedir}/DoxygenReport</outputDirectory>
+                                        <inlineSources>true</inlineSources>
+                                        <haveDot>true</haveDot>
+                                        <callGraph>true</callGraph>
+                                        <callerGraph>true</callerGraph>
+                                        <searchengine>true</searchengine>
+                                </configuration>
+                                <version>1.1.0</version>
+                        </plugin>
 		</plugins>
 	</build>
+	<reporting>
+                <plugins>
+                  <plugin>
+                        <groupId>com.soebes.maven.plugins</groupId>
+                        <artifactId>doxygen-maven-plugin</artifactId>
+                        <version>1.1.0</version>
+                  </plugin>
+                </plugins>
+        </reporting>
 	<scm>
 		<connection>scm:git:http://localhost:7990/scm/dev/devopsplatform.git</connection>
 		<developerConnection>scm:git:http://localhost:7990/scm/dev/devopsplatform.git</developerConnection>

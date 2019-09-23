@@ -1,4 +1,4 @@
-env.dockerimagename="devopsbasservice/buildonframework:insightsPUI3"
+env.dockerimagename="devopsbasservice/buildonframework:insightsPUI3-Doxygen"
 node {
 
 //Parse commitID (E.g, buildon-abc1234 to abc1234)
@@ -40,10 +40,16 @@ gitCommitID = sh (
     		echo 'License is up to date'
     		}
   	} //License Check ends	
-	
+
 	
    // Platform Service Starts
 	try{
+	// Doxygen Report
+	stage ('Doxygen_generate_report'){
+		sh 'cd /var/jenkins/jobs/$commitID/workspace && mvn doxygen:report'
+		sh 'cd /var/jenkins/jobs/$commitID/workspace/DoxygenReport && zip -r Doxygen.zip doxygen'	
+	}
+		
 	//Build
   	stage ('Insight_PS_Build') {
         sh 'cd /var/jenkins/jobs/$commitID/workspace/PlatformUI3 && npm install'
@@ -66,7 +72,14 @@ gitCommitID = sh (
 	stage ('Insight_PS_NexusUpload') {		
 		sh 'mvn clean deploy -DskipTests'		
 		}
-	
+	stage ('Doxygen_NexusUpload') {	
+		sh "cd /var/jenkins/jobs/$commitID/workspace && mvn -B help:evaluate -Dexpression=project.version | grep -e '^[^[]' > /var/jenkins/jobs/$commitID/workspace/version"
+       		doxyversion=readFile("/var/jenkins/jobs/$commitID/workspace/version").trim()  //Get version from pom.xml to form the nexus repo URL
+		if(!doxyversion.contains("SNAPSHOT")){
+			NEXUSREPO="https://repo.cogdevops.com/repository/InsightsEnterpriseRelease"
+			sh "mvn deploy:deploy-file -DgroupId=com.cognizant.devops -DartifactId=PlatformDoxygen -Dversion=${doxyversion} -Dpackaging=zip -Dfile=/var/jenkins/jobs/${commitID}/workspace/DoxygenReport/Doxygen.zip -DrepositoryId=nexus -Durl=${NEXUSREPO}"
+		}
+	}
 	}
 	catch (err){
 		
