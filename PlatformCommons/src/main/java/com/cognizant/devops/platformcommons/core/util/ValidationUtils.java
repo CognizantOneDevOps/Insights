@@ -15,18 +15,8 @@
  ******************************************************************************/
 package com.cognizant.devops.platformcommons.core.util;
 
-import java.io.IOException;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import javax.crypto.Cipher;
-import javax.crypto.IllegalBlockSizeException;
-import javax.crypto.KeyGenerator;
-import javax.crypto.NoSuchPaddingException;
-import javax.crypto.SealedObject;
-import javax.crypto.SecretKey;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -37,7 +27,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 
 public class ValidationUtils {
-	private static final Logger log = LogManager.getLogger(ComponentHealthLogger.class);
+	private static final Logger log = LogManager.getLogger(ValidationUtils.class);
 	private static Pattern agentNamePattern = Pattern.compile("[^A-Za-z]", Pattern.CASE_INSENSITIVE);
 	private static Pattern CRLF = Pattern.compile("(\r\n|\r|\n|\n\r)");
 	private static Pattern agentIdPattern = Pattern.compile("[^A-Za-z0-9\\_]", Pattern.CASE_INSENSITIVE);
@@ -176,7 +166,7 @@ public class ValidationUtils {
 	public static String cleanXSS(String value) {
 		Boolean isXSSPattern = Boolean.FALSE;
 		String valueWithXSSPattern = "";
-		// log.debug("In cleanXSS RequestWrapper ..............." + value);
+		log.debug("In cleanXSS RequestWrapper ..............." + value);
 		if (value != null || !("").equals(value)) {
 			try {
 				// match sections that match a pattern
