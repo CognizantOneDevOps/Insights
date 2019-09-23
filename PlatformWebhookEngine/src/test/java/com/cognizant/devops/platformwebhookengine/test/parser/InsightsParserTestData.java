@@ -16,6 +16,10 @@ public class InsightsParserTestData {
 	String incorrectToolData="tooldata=incorrcet";
 	DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
 	LocalDateTime now = LocalDateTime.now();
+	String commitId= "\"86ef096bb924674a69cd2198e2964b76aa75d88b\"";
+	String authorName = "\"Surbhi Gupta\"";
+	String message ="\"Update Hello\"";
+	String timestamp= "\"2019-09-16T04:52:25Z\"";
 	//String expectedOutput ="{\n  \"commitTime\": \"2019-09-16T04:52:25Z\",\n  \"authorName\": \"Surbhi Gupta\",\n  \"insightsTime\": 1568614762684,\n  \"webhookName\": \"git_demo\",\n  \"commitId\": \"86ef096bb924674a69cd2198e2964b76aa75d88b\",\n  \"source\": \"webhook\",\n  \"labelName\": \"SCM:GIT7:DATA\",\n  \"inSightsTimeX\": \"2019/09/16 06:19:22\",\n  \"message\": \"Update Hello\",\n  \"uuid\": \"ecbd1e20-d849-11e9-afcf-0a8b07e92402\",\n  \"toolName\": \"GIT\"\n}";
 	//String toolData2 = "{\n\"head_commit\": {\n\"id\": \"86ef096bb924674a69cd2198e2964b76aa75d88b\",\n    \"tree_id\": \"d1face44ae7151dfaf6387b5eaf3075419583dcc\",\n    \"distinct\": true,\n    \"message\": \"Update Hello\",\n    \"timestamp\": \"2019-09-16T04:52:25Z\",\n    \"url\": \"4b76aa75d88b\",\n    \"author\": {\n      \"name\": \"Surbhi Gupta\",\n      \"email\": \"46189557+Surbhi546@users.noreply.github.com\",\n      \"username\": \"Surbhi546\"\n    }\n}";
 //    String toolData="{\n\"head_commit\": {\n    \"id\": \"86ef096bb924674a69cd2198e2964b76aa75d88b\",\n    \"tree_id\": \"d1face44ae7151dfaf6387b5eaf3075419583dcc\",\n    \"distinct\": true,\n    \"message\": \"Update Hello\",\n    \"timestamp\": \"2019-09-16T04:52:25Z\",\n    \"url\": \"4b76aa75d88b\",\n    \"author\": {\n      \"name\": \"Surbhi Gupta\",\n      \"email\": \"46189557+Surbhi546@users.noreply.github.com\",\n      \"username\": \"Surbhi546\"\n    }\n}\n}";

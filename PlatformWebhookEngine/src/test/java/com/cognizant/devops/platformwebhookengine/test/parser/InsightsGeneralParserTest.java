@@ -25,33 +25,38 @@ public class InsightsGeneralParserTest extends InsightsParserTestData {
 		List<JsonObject> response = generalparser.parseToolData(testdata.responseTemplate, toolData, testdata.toolName,
 				testdata.labelName, testdata.webhookName);
 		JsonParser parser = new JsonParser();
-	   /* List<JsonObject> retrunJsonList = new ArrayList<JsonObject>(0);
-	Gson prettyGson = new GsonBuilder().setPrettyPrinting().create();
-	String prettyJson = prettyGson.toJson(expectedOutput);
-	JsonElement element = parser.parse(prettyJson);
-	retrunJsonList.add(element.getAsJsonObject());*/
-		//Assert.assertSame(response,testdata.expectedOutput);
-		//List<JsonObject> participantJsonList = testdata.expectedOutput.readValue(jsonString, new TypeReference<List<JsonObject>>(){})
-		StringBuilder builder = new StringBuilder(response.toString());
-		builder.deleteCharAt(response.toString().length() - 1);
-		builder.deleteCharAt(0);
-			
-		Assert.assertEquals(builder,testdata.expectedOutput);
-		
+		/*
+		 * List<JsonObject> retrunJsonList = new ArrayList<JsonObject>(0); Gson
+		 * prettyGson = new GsonBuilder().setPrettyPrinting().create(); String
+		 * prettyJson = prettyGson.toJson(expectedOutput); JsonElement element =
+		 * parser.parse(prettyJson); retrunJsonList.add(element.getAsJsonObject());
+		 */
+		// Assert.assertSame(response,testdata.expectedOutput);
+		// List<JsonObject> participantJsonList =
+		// testdata.expectedOutput.readValue(jsonString, new
+		// TypeReference<List<JsonObject>>(){})
+		String commitId = response.get(0).get("commitId").toString();
+		String authorName = response.get(0).get("authorName").toString();
+		String message = response.get(0).get("message").toString();
+
+		Assert.assertEquals(commitId, testdata.commitId);
+		Assert.assertEquals(authorName, testdata.authorName);
+		Assert.assertEquals(message, testdata.message);
+
+		/*
+		 * StringBuilder builder = new StringBuilder(response.toString());
+		 * builder.deleteCharAt(response.toString().length() - 1);
+		 * builder.deleteCharAt(0);
+		 * 
+		 * Assert.assertEquals(builder,testdata.expectedOutput);
+		 */
 
 	}
-	
+
 	@Test(priority = 2, expectedExceptions = Exception.class)
-	public void testGetToolDetailJsonWithExceptions() throws InsightsCustomException
-	{
-		List<JsonObject> response = generalparser.parseToolData(testdata.responseTemplate, incorrectToolData, testdata.toolName,
-				testdata.labelName, "");
+	public void testGetToolDetailJsonWithExceptions() throws InsightsCustomException {
+		List<JsonObject> response = generalparser.parseToolData(testdata.responseTemplate, incorrectToolData,
+				testdata.toolName, testdata.labelName, "");
 	}
-	  @Test(priority = 3)
-	  public void testforMain()  throws Exception
-	  {
-		  
-		       
-	  }
 
 }
