@@ -6,7 +6,8 @@
 	under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES 
 	OR CONDITIONS OF ANY KIND, either express or implied. See the License for 
 	the specific language governing permissions and limitations under the License. -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<!-- adding a comment to test poll -6 -->
 	<modelVersion>4.0.0</modelVersion>
@@ -27,7 +28,7 @@
 			<groupId>log4j</groupId>
 			<artifactId>log4j</artifactId>
 			<version>1.2.17</version>
-		</dependency>			
+		</dependency>
 		<dependency>
 			<groupId>org.apache.logging.log4j</groupId>
 			<artifactId>log4j-api</artifactId>
@@ -45,28 +46,28 @@
 			<version>2.5</version>
 		</dependency>
 	</dependencies>
-		<modules>		
+	<modules>
 		<module>PlatformCommons</module>
 		<module>PlatformDAL</module>
 		<module>PlatformAuditing</module>
-		<!-- <module>PlatformInsightsWebHook</module> -->
+		<module>PlatformInsightsWebHook</module>
 		<module>PlatformAuditEngine</module>
 		<module>PlatformService</module>
-		<module>PlatformEngine</module>				
-		<module>PlatformUI3</module>
+		<module>PlatformEngine</module>
 		<module>PlatformInsights</module>
 		<module>PlatformWebhookEngine</module>
+		<module>PlatformUI3</module>
 	</modules>
 	<build>
-	        <pluginManagement>
-                        <plugins>
-                               <plugin>
-                                      <groupId>com.soebes.maven.plugins</groupId>
-                                      <artifactId>doxygen-maven-plugin</artifactId>
-                                      <version>1.1.0</version>
-                               </plugin>
-                         </plugins>
-                </pluginManagement>
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<groupId>com.soebes.maven.plugins</groupId>
+					<artifactId>doxygen-maven-plugin</artifactId>
+					<version>1.1.0</version>
+				</plugin>
+			</plugins>
+		</pluginManagement>
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -93,87 +94,96 @@
 				</configuration>
 			</plugin>
 			<plugin>
-                                <groupId>com.soebes.maven.plugins</groupId>
-                                <artifactId>doxygen-maven-plugin</artifactId>
-                                <configuration>
-                                        <projectName>"Insights Code Documentation"</projectName>
-                                        <projectNumber>${project.version}</projectNumber>
-                                        <optimizeOutputJava>true</optimizeOutputJava>
-                                        <javadocAutobrief>true</javadocAutobrief>
-                                        <extractAll>true</extractAll>
-                                        <extractStatic>true</extractStatic>
-                                        <recursive>true</recursive>
-                                        <exclude>.git</exclude>
-                                        <excludePatterns>auditservice</excludePatterns>
-                                        <recursive>true</recursive>
-                                        <haveGraph>true</haveGraph>
-                                        <generateLatex>false</generateLatex>
-                                        <generateHtml>true</generateHtml>
-                                        <input>${project.basedir}/PlatformAgents ${project.basedir}/PlatformCommons ${project.basedir}/PlatformDAL ${project.basedir}/PlatformDeployment ${project.basedir}/PlatformEngine ${project.basedir}/PlatformGrafanaPlugins ${project.basedir}/PlatformInsights ${project.basedir}/PlatformInsightsWebHook ${project.basedir}/PlatformMockServer ${project.basedir}/PlatformService ${project.basedir}/PlatformUI3 ${project.basedir}/PlatformWebhookEngine</input>
-                                        <outputDirectory>${basedir}/DoxygenReport</outputDirectory>
-                                        <inlineSources>true</inlineSources>
-                                        <haveDot>true</haveDot>
-                                        <callGraph>true</callGraph>
-                                        <callerGraph>true</callerGraph>
-                                        <searchengine>true</searchengine>
-                                </configuration>
-                                <version>1.1.0</version>
-                        </plugin>
+				<groupId>com.soebes.maven.plugins</groupId>
+				<artifactId>doxygen-maven-plugin</artifactId>
+				<configuration>
+					<projectName>"Insights Code Documentation"</projectName>
+					<projectNumber>${project.version}</projectNumber>
+					<optimizeOutputJava>true</optimizeOutputJava>
+					<javadocAutobrief>true</javadocAutobrief>
+					<extractAll>true</extractAll>
+					<extractStatic>true</extractStatic>
+					<recursive>true</recursive>
+					<exclude>.git</exclude>
+					<excludePatterns>auditservice</excludePatterns>
+					<recursive>true</recursive>
+					<haveGraph>true</haveGraph>
+					<generateLatex>false</generateLatex>
+					<generateHtml>true</generateHtml>
+					<input>${project.basedir}/PlatformAgents
+						${project.basedir}/PlatformCommons ${project.basedir}/PlatformDAL
+						${project.basedir}/PlatformDeployment
+						${project.basedir}/PlatformEngine
+						${project.basedir}/PlatformGrafanaPlugins
+						${project.basedir}/PlatformInsights
+						${project.basedir}/PlatformInsightsWebHook
+						${project.basedir}/PlatformMockServer
+						${project.basedir}/PlatformService ${project.basedir}/PlatformUI3
+						${project.basedir}/PlatformWebhookEngine</input>
+					<outputDirectory>${basedir}/DoxygenReport</outputDirectory>
+					<inlineSources>true</inlineSources>
+					<haveDot>true</haveDot>
+					<callGraph>true</callGraph>
+					<callerGraph>true</callerGraph>
+					<searchengine>true</searchengine>
+				</configuration>
+				<version>1.1.0</version>
+			</plugin>
 		</plugins>
 	</build>
 	<reporting>
-                <plugins>
-                  <plugin>
-                        <groupId>com.soebes.maven.plugins</groupId>
-                        <artifactId>doxygen-maven-plugin</artifactId>
-                        <version>1.1.0</version>
-                  </plugin>
-                </plugins>
-        </reporting>
+		<plugins>
+			<plugin>
+				<groupId>com.soebes.maven.plugins</groupId>
+				<artifactId>doxygen-maven-plugin</artifactId>
+				<version>1.1.0</version>
+			</plugin>
+		</plugins>
+	</reporting>
 	<scm>
 		<connection>scm:git:http://localhost:7990/scm/dev/devopsplatform.git</connection>
 		<developerConnection>scm:git:http://localhost:7990/scm/dev/devopsplatform.git</developerConnection>
 		<url>https://bitbucket.org/atlassian/stash-auto-unapprove-plugin</url>
 		<tag>InSights-2.11.0.0</tag>
 	</scm>
-	
+
 	<distributionManagement>
-				<repository> 
-				<id>nexus</id>		
-					<url>https://repo.cogdevops.com/repository/InsightsEnterpriseRelease</url>
-				</repository>
-				<snapshotRepository>
-					<id>nexus</id>
-					<url>https://repo.cogdevops.com/repository/buildonInsightsEnterprise</url>
-				</snapshotRepository>
+		<repository>
+			<id>nexus</id>
+			<url>https://repo.cogdevops.com/repository/InsightsEnterpriseRelease</url>
+		</repository>
+		<snapshotRepository>
+			<id>nexus</id>
+			<url>https://repo.cogdevops.com/repository/buildonInsightsEnterprise</url>
+		</snapshotRepository>
 	</distributionManagement>
-	
+
 	<profiles>
 		<profile>
-                <id>NexusUpload</id>
-                <activation>
-                  <activeByDefault>false</activeByDefault>
-                </activation>             
+			<id>NexusUpload</id>
+			<activation>
+				<activeByDefault>false</activeByDefault>
+			</activation>
 
-                <build>
-                 <plugins>
-                        <plugin>
-                        <artifactId>maven-deploy-plugin</artifactId>
-                   <version>2.8.1</version>
-                   <executions>
-                          <execution>
-                                 <id>default-deploy</id>
-                                 <phase>deploy</phase>
-                                 <goals>
-                                        <goal>deploy</goal>
-                                 </goals>
-                          </execution>
-                   </executions>
+			<build>
+				<plugins>
+					<plugin>
+						<artifactId>maven-deploy-plugin</artifactId>
+						<version>2.8.1</version>
+						<executions>
+							<execution>
+								<id>default-deploy</id>
+								<phase>deploy</phase>
+								<goals>
+									<goal>deploy</goal>
+								</goals>
+							</execution>
+						</executions>
 
-                </plugin>
-                </plugins>
-                </build>
-        </profile>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
 		<profile>
 			<id>RunCobertura</id>
 			<activation>
@@ -203,6 +213,7 @@
 					</plugin>
 				</plugins>
 			</reporting>
-		</profile>		
+		</profile>
 	</profiles>
 </project>
+		

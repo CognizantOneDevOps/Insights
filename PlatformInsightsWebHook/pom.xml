@@ -153,10 +153,24 @@
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 				<version>2.1.8.RELEASE</version>
+				<inherited>false</inherited>
+				<dependencies>
+					<dependency>
+						<groupId>org.apache.commons</groupId>
+						<artifactId>commons-compress</artifactId>
+						<version>1.19</version>
+					</dependency>
+					<dependency>
+						<groupId>commons-codec</groupId>
+						<artifactId>commons-codec</artifactId>
+						<version>1.13</version>
+					</dependency>
+
+				</dependencies>
 				<configuration>
-				<configuration>
+			<!-- 	<configuration>
 							<localRepositoryPath>${project.build.directory}/jar</localRepositoryPath>
-						</configuration>
+						</configuration> -->
 					<excludeGroupIds>org.codehaus.plexus</excludeGroupIds>
 					<excludes>
 						<exclude>
