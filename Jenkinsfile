@@ -176,6 +176,6 @@ gitCommitID = sh (
 		PWE_artifact="${NEXUSREPO}/com/cognizant/devops/PlatformWebhookEngine/${pomversionWebhookEngine}/${PWE_artifactName}"
 	
 	
-   	    slackSend channel: '#insightsjenkins', color: 'good', message: "New Insights Enterprise artifacts are uploaded to Nexus for commitID : *${env.commitID}* ,Branch - *${env.branchName}* \n *PlatformService* ${PS_artifact} \n *PlatformEngine* ${PE_artifact} \n *PlatformAuditEngine* ${PAE_artifact} \n *PlatformInsights*  ${PI_artifact} \n *PlatformUI3* ${PUI3_artifact} \n *PlatformEngine* ${PWE_artifact}", teamDomain: 'insightscogdevops', token: slackToken // "*" is for making the text bold in slack notification
+   	    slackSend channel: '#insightsjenkins', color: 'good', message: "New Insights Enterprise artifacts are uploaded to Nexus for commitID : *${env.commitID}* ,Branch - *${env.branchName}* \n *PlatformService* ${PS_artifact} \n *PlatformEngine* ${PE_artifact} \n *PlatformAuditEngine* ${PAE_artifact} \n *PlatformInsights*  ${PI_artifact} \n *PlatformUI3* ${PUI3_artifact} \n *PlatformWebhookEngine* ${PWE_artifact}", teamDomain: 'insightscogdevops', token: slackToken // "*" is for making the text bold in slack notification
   	}
 }
