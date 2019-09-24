@@ -43,13 +43,13 @@
 			<groupId>com.cognizant.devops</groupId>
 			<artifactId>PlatformAuditing</artifactId>
 			<version>6.1-SNAPSHOT</version>
-                        <scope>provided</scope>
+                        <!-- <scope>provided</scope> -->
 		</dependency>
 		<dependency>
 			<groupId>com.cognizant.devops</groupId>
 			<artifactId>PlatformCommons</artifactId>
 			<version>6.1-SNAPSHOT</version>
-                        <scope>provided</scope>
+                        <!-- <scope>provided</scope> -->
 		</dependency>
 		<!-- https://mvnrepository.com/artifact/org.apache.commons/commons-io -->
 		<dependency>
