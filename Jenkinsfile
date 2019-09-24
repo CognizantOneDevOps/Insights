@@ -116,7 +116,7 @@ gitCommitID = sh (
 		sh "curl -u $NexusUsername:$NexusPassword -s ${NEXUSREPO}/com/cognizant/devops/PlatformEngine/${pomversionEngine}/maven-metadata.xml  | grep -oP '(?<=<artifactId>).*?(?=</artifactId>)|(?<=<version>).*?(?=</version>)|(?<=<timestamp>).*?(?=</timestamp>)|(?<=<buildNumber>).*?(?=</buildNumber>)|(?<=<classifier>).*?(?=</classifier>)' | paste -sd- - | sed 's/-SNAPSHOT//g' | sed 's/--/-/g' | sed 's/\$/.jar/' > /var/jenkins/jobs/$commitID/workspace/PlatformEngine/PE_artifact"
 		
 		//get artifact info (artifactID,classifier,timestamp, buildnumber,version) from maven-metadata.xml
-		sh "curl -u $NexusUsername:$NexusPassword -s ${NEXUSREPO}/com/cognizant/devops/PlatformEngine/${pomversionWebhookEngine}/maven-metadata.xml  | grep -oP '(?<=<artifactId>).*?(?=</artifactId>)|(?<=<version>).*?(?=</version>)|(?<=<timestamp>).*?(?=</timestamp>)|(?<=<buildNumber>).*?(?=</buildNumber>)|(?<=<classifier>).*?(?=</classifier>)' | paste -sd- - | sed 's/-SNAPSHOT//g' | sed 's/--/-/g' | sed 's/\$/.jar/' > /var/jenkins/jobs/$commitID/workspace/PlatformWebhookEngine/PE_artifact"
+		sh "curl -u $NexusUsername:$NexusPassword -s ${NEXUSREPO}/com/cognizant/devops/PlatformWebhookEngine/${pomversionWebhookEngine}/maven-metadata.xml  | grep -oP '(?<=<artifactId>).*?(?=</artifactId>)|(?<=<version>).*?(?=</version>)|(?<=<timestamp>).*?(?=</timestamp>)|(?<=<buildNumber>).*?(?=</buildNumber>)|(?<=<classifier>).*?(?=</classifier>)' | paste -sd- - | sed 's/-SNAPSHOT//g' | sed 's/--/-/g' | sed 's/\$/.jar/' > /var/jenkins/jobs/$commitID/workspace/PlatformWebhookEngine/PE_artifact"
 		
 		//get artifact info (artifactID,classifier,timestamp, buildnumber,version) from maven-metadata.xml
 		sh "curl -u $NexusUsername:$NexusPassword -s ${NEXUSREPO}/com/cognizant/devops/PlatformInsights/${pomversion}/maven-metadata.xml  | grep -oP '(?<=<artifactId>).*?(?=</artifactId>)|(?<=<version>).*?(?=</version>)|(?<=<timestamp>).*?(?=</timestamp>)|(?<=<buildNumber>).*?(?=</buildNumber>)|(?<=<classifier>).*?(?=</classifier>)' | paste -sd- - | sed 's/-SNAPSHOT//g' | sed 's/--/-/g' | sed 's/\$/.jar/' > /var/jenkins/jobs/$commitID/workspace/PlatformInsights/PI_artifact"
@@ -172,8 +172,8 @@ gitCommitID = sh (
 		PUI3_artifact="${NEXUSREPO}/com/cognizant/devops/PlatformUI3/${pomUI3version}/${PUI3_artifactName}"
 		
 		//Platform WebhookEngine
-		PE_artifactName=readFile("/var/jenkins/jobs/$commitID/workspace/PlatformWebhookEngine/PWE_artifact").trim()
-		PE_artifact="${NEXUSREPO}/com/cognizant/devops/PlatformWebhookEngine/${pomversionWebhookEngine}/${PWE_artifactName}"
+		PWE_artifactName=readFile("/var/jenkins/jobs/$commitID/workspace/PlatformWebhookEngine/PWE_artifact").trim()
+		PWE_artifact="${NEXUSREPO}/com/cognizant/devops/PlatformWebhookEngine/${pomversionWebhookEngine}/${PWE_artifactName}"
 	
 	
    	    slackSend channel: '#insightsjenkins', color: 'good', message: "New Insights Enterprise artifacts are uploaded to Nexus for commitID : *${env.commitID}* ,Branch - *${env.branchName}* \n *PlatformService* ${PS_artifact} \n *PlatformEngine* ${PE_artifact} \n *PlatformAuditEngine* ${PAE_artifact} \n *PlatformInsights*  ${PI_artifact} \n *PlatformUI3* ${PUI3_artifact} \n *PlatformEngine* ${PWE_artifact}", teamDomain: 'insightscogdevops', token: slackToken // "*" is for making the text bold in slack notification
