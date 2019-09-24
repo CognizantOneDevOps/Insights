@@ -49,6 +49,7 @@
 			<groupId>com.cognizant.devops</groupId>
 			<artifactId>PlatformDAL</artifactId>
 			<version>6.1-SNAPSHOT</version>
+                        <scope>provided</scope>
 		</dependency>
 
 		<dependency>
@@ -217,16 +218,7 @@
 			<groupId>com.cognizant.devops</groupId>
 			<artifactId>PlatformCommons</artifactId>
 			<version>6.1-SNAPSHOT</version>
-			<exclusions>
-				<exclusion>
-					<groupId>org.apache.logging.log4j</groupId>
-					<artifactId>log4j</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>commons-codec</groupId>
-					<artifactId>commons-codec</artifactId>
-				</exclusion>
-			</exclusions>
+                        <scope>provided</scope>
 		</dependency>
 
 		<dependency>
@@ -239,6 +231,7 @@
 			<groupId>com.cognizant.devops</groupId>
 			<artifactId>PlatformAuditing</artifactId>
 			<version>6.1-SNAPSHOT</version>
+                        <scope>provided</scope>
 		</dependency>
 
 		<dependency>

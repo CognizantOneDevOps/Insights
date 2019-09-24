@@ -70,12 +70,7 @@
 			<groupId>com.cognizant.devops</groupId>
 			<artifactId>PlatformCommons</artifactId>
 			<version>6.1-SNAPSHOT</version>
-			<exclusions>
-				<exclusion>
-					<groupId>org.apache.logging.log4j</groupId>
-					<artifactId>log4j</artifactId>
-				</exclusion>
-			</exclusions>
+                        <scope>provided</scope>
 		</dependency>
 	</dependencies>
 	<build>
