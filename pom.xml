@@ -118,7 +118,8 @@
 						${project.basedir}/PlatformInsights
 						${project.basedir}/PlatformInsightsWebHook
 						${project.basedir}/PlatformMockServer
-						${project.basedir}/PlatformService ${project.basedir}/PlatformUI3
+						${project.basedir}/PlatformService 
+						${project.basedir}/PlatformUI3
 						${project.basedir}/PlatformWebhookEngine</input>
 					<outputDirectory>${basedir}/DoxygenReport</outputDirectory>
 					<inlineSources>true</inlineSources>
