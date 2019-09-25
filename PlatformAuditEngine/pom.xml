@@ -158,7 +158,7 @@
 							<goal>unpack-dependencies</goal>
 						</goals>
 						<configuration>
-							<includeGroupIds>com.cognizant.devops</includeGroupIds>
+							<includeScope>provided</includeScope>
 							<outputDirectory>${project.build.directory}/classes</outputDirectory>
 						</configuration>
 					</execution>
