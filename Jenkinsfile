@@ -129,7 +129,7 @@ gitCommitID = sh (
        		pomUI3version=readFile("/var/jenkins/jobs/$commitID/workspace/PlatformUI3/version").trim()  
 		
 		// $NexusUsername and $NexusPassword are set as env in buildon.py and values should be specified in buildon.properties
-		if(pomversionService.contains("SNAPSHOT") && pomversionInsightsWebHook.contains("SNAPSHOT") pomversionWebhookEngine.contains("SNAPSHOT") && pomversionEngine.contains("SNAPSHOT") && pomversion.contains("SNAPSHOT") && pomversionAuditEngine.contains("SNAPSHOT") && pomUI3version.contains("SNAPSHOT")){
+		if(pomversionService.contains("SNAPSHOT") && pomversionInsightsWebHook.contains("SNAPSHOT") && pomversionWebhookEngine.contains("SNAPSHOT") && pomversionEngine.contains("SNAPSHOT") && pomversion.contains("SNAPSHOT") && pomversionAuditEngine.contains("SNAPSHOT") && pomUI3version.contains("SNAPSHOT")){
 		
 			NEXUSREPO="https://repo.cogdevops.com/repository/buildonInsightsEnterprise"
 			
@@ -178,7 +178,7 @@ gitCommitID = sh (
 				
 		}	
 		
-        //Platform Service
+                //Platform Service
 		PS_artifactName=readFile("/var/jenkins/jobs/$commitID/workspace/PlatformService/PS_artifact").trim()
 		PS_artifact="${NEXUSREPO}/com/cognizant/devops/PlatformService/${pomversionService}/${PS_artifactName}"			
 		
