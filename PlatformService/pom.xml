@@ -224,7 +224,6 @@
 			<groupId>com.cognizant.devops</groupId>
 			<artifactId>PlatformAuditing</artifactId>
 			<version>6.1-SNAPSHOT</version>
-			<scope>provided</scope>
 		</dependency>
 		
 		<dependency>

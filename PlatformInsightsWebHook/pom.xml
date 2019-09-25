@@ -17,9 +17,6 @@
 	<version>6.1-SNAPSHOT</version>
 	<description>PlatformInsightsWebHook for webhook testing</description>
 
-	<!-- <repositories> <repository> <id>project.local</id> <name>project</name> 
-		<url>file:${project.basedir}/jar</url> </repository> </repositories> -->
-
 	<properties>
 		<!-- <java.version>9</java.version> 2.1.8.RELEASE -->
 		<java.version>1.8</java.version>
@@ -43,7 +40,6 @@
 					<artifactId>spring-boot-starter-logging</artifactId>
 				</exclusion>
 			</exclusions>
-			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.commons</groupId>
@@ -59,7 +55,12 @@
 			<groupId>com.cognizant.devops</groupId>
 			<artifactId>PlatformCommons</artifactId>
 			<version>6.1-SNAPSHOT</version>
-			<scope>provided</scope>
+			<exclusions>
+				<exclusion>
+					<groupId>org.apache.logging.log4j</groupId>
+					<artifactId>log4j</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>com.google.code.gson</groupId>
@@ -71,7 +72,6 @@
 			<groupId>com.cognizant.devops</groupId>
 			<artifactId>PlatformDAL</artifactId>
 			<version>6.1-SNAPSHOT</version>
-			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>log4j</groupId>
