@@ -103,14 +103,11 @@ gitCommitID = sh (
 		//PlatformWebhookEngine version
 		sh "cd /var/jenkins/jobs/$commitID/workspace/PlatformWebhookEngine && mvn -B help:evaluate -Dexpression=project.version | grep -e '^[^[]' > /var/jenkins/jobs/$commitID/workspace/PlatformWebhookEngine/version"
 	    	pomversionWebhookEngine=readFile("/var/jenkins/jobs/$commitID/workspace/PlatformWebhookEngine/version").trim()  //Get version from pom.xml to form the nexus repo URL
-		
-		
-		
+				
 		//PlatformWebhookSubscriber version
 		sh "cd /var/jenkins/jobs/$commitID/workspace/PlatformInsightsWebHook && mvn -B help:evaluate -Dexpression=project.version | grep -e '^[^[]' > /var/jenkins/jobs/$commitID/workspace/PlatformInsightsWebHook/version"
 	    	pomversionInsightsWebHook=readFile("/var/jenkins/jobs/$commitID/workspace/PlatformInsightsWebHook/version").trim()  //Get version from pom.xml to form the nexus repo URL
-		
-		
+				
 		//PlatformInsights version
 			//Framing Nexus URL for artifact uploaded to Nexus with unique timestamp
 		sh "cd /var/jenkins/jobs/$commitID/workspace/PlatformInsights && mvn -B help:evaluate -Dexpression=project.version | grep -e '^[^[]' > /var/jenkins/jobs/$commitID/workspace/PlatformInsights/version"
@@ -177,7 +174,7 @@ gitCommitID = sh (
 				
 		}	
 		
-                //Platform Service
+        //Platform Service
 		PS_artifactName=readFile("/var/jenkins/jobs/$commitID/workspace/PlatformService/PS_artifact").trim()
 		PS_artifact="${NEXUSREPO}/com/cognizant/devops/PlatformService/${pomversionService}/${PS_artifactName}"			
 		

@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-
 <suite name="Suite">
 	<test name="PlatformWebhookEngineTest">
 		<classes>
-		<class
+			<class
 				name="com.cognizant.devops.platformwebhookengine.test.parser.InsightsGeneralParserTest" />
 		</classes>
 	</test>
