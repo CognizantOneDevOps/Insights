@@ -51,11 +51,9 @@ gitCommitID = sh (
 	}
 		
 	//Build
-  	stage ('Insight_PS_Build') {
-	echo 'Build Started'
+  	stage ('Insight_PS_Build') {	
         sh 'cd /var/jenkins/jobs/$commitID/workspace/PlatformUI3 && npm install'
-	sh 'cd /var/jenkins/jobs/$commitID/workspace && mvn clean install -DskipTests'
-	echo 'Build Success'
+	sh 'cd /var/jenkins/jobs/$commitID/workspace && mvn clean install -DskipTests'	
 	   }	
 	
 	//Below step will be enabled in next release to include security analysis..
@@ -71,10 +69,8 @@ gitCommitID = sh (
 		sh 'cd /var/jenkins/jobs/$commitID/workspace/PlatformUI3 && mvn sonar:sonar -Dmaven.test.failure.ignore=true -DskipTests=true -Dsonar.sources=src/app/com/cognizant/devops/platformui/modules -Dsonar.language=js -Dsonar.javascript.file.suffixes=.ts'
 	}
 		
-	stage ('Insight_PS_NexusUpload') {
-        echo 'Nexus Upload'	
-		sh 'mvn clean deploy -DskipTests'	
-        echo 'Nexus Uploaded..'		
+	stage ('Insight_PS_NexusUpload') {       	
+		sh 'mvn clean deploy -DskipTests'	       	
 		}
 	stage ('Doxygen_NexusUpload') {	
 		sh "cd /var/jenkins/jobs/$commitID/workspace && mvn -B help:evaluate -Dexpression=project.version | grep -e '^[^[]' > /var/jenkins/jobs/$commitID/workspace/version"
