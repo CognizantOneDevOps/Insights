@@ -46,12 +46,6 @@
 	<dependencies>
 
 		<dependency>
-			<groupId>com.cognizant.devops</groupId>
-			<artifactId>PlatformDAL</artifactId>
-			<version>6.1-SNAPSHOT</version>
-		</dependency>
-
-		<dependency>
 			<groupId>javax.servlet</groupId>
 			<artifactId>javax.servlet-api</artifactId>
 			<version>4.0.1</version>
@@ -212,13 +206,8 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
-
-		<dependency>
-			<groupId>com.cognizant.devops</groupId>
-			<artifactId>PlatformCommons</artifactId>
-			<version>6.1-SNAPSHOT</version>
-		</dependency>
-
+		
+		
 		<dependency>
 			<groupId>com.google.code.gson</groupId>
 			<artifactId>gson</artifactId>
@@ -227,7 +216,20 @@
 
 		<dependency>
 			<groupId>com.cognizant.devops</groupId>
+			<artifactId>PlatformCommons</artifactId>
+			<version>6.1-SNAPSHOT</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.cognizant.devops</groupId>
 			<artifactId>PlatformAuditing</artifactId>
+			<version>6.1-SNAPSHOT</version>
+			<scope>provided</scope>
+		</dependency>
+		
+		<dependency>
+			<groupId>com.cognizant.devops</groupId>
+			<artifactId>PlatformDAL</artifactId>
 			<version>6.1-SNAPSHOT</version>
 		</dependency>
 
