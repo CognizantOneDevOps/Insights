@@ -193,6 +193,6 @@ gitCommitID = sh (
 		PUI3_artifact="${NEXUSREPO}/com/cognizant/devops/PlatformUI3/${pomUI3version}/${PUI3_artifactName}"
 	
 	
-   	    slackSend channel: '#insightsjenkins', color: 'good', message: "New Insights Enterprise artifacts are uploaded to Nexus for commitID : *${env.commitID}* ,Branch - *${env.branchName}* \n *PlatformService* ${PS_artifact} \n *PlatformEngine* ${PE_artifact} \n *PlatformAuditEngine* ${PAE_artifact} \n *PlatformInsights*  ${PI_artifact} \n *PlatformUI3* ${PUI3_artifact}", teamDomain: 'insightscogdevops', token: slackToken // "*" is for making the text bold in slack notification
+   	    slackSend channel: '#insightsjenkins', color: 'good', message: "New Insights Enterprise artifacts are uploaded to Nexus for commitID : *${env.commitID}* ,Branch - *${env.branchName}* \n *PlatformService* ${PS_artifact} \n *PlatformEngine* ${PE_artifact} \n *PlatformAuditEngine* ${PAE_artifact} \n *PlatformInsights*  ${PI_artifact} \n  *PlatformWebhookEngine* ${PWE_artifact} \n *PlatformUI3* ${PUI3_artifact}", teamDomain: 'insightscogdevops', token: slackToken // "*" is for making the text bold in slack notification
   	}
 }
