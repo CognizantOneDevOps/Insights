@@ -86,14 +86,12 @@
 			<groupId>com.cognizant.devops</groupId>
 			<artifactId>PlatformCommons</artifactId>
 			<version>6.1-SNAPSHOT</version>
-			<scope>provided</scope>
 		</dependency>
 
 		<dependency>
 			<groupId>com.cognizant.devops</groupId>
 			<artifactId>PlatformDAL</artifactId>
 			<version>6.1-SNAPSHOT</version>
-			<scope>provided</scope>
 		</dependency>
 
 		<dependency>
@@ -129,16 +127,7 @@
 									</manifestEntries>
 								</transformer>
 							</transformers>
-							<!-- <includes>
-							  <include>**</include>
-							</includes> -->
-							<!-- <includeGroupIds>com.cognizant.devops</includeGroupIds> -->
-							<!-- <outputDirectory>
-								${project.build.directory}/lib
-							</outputDirectory> -->
 							<finalName>${project.name}${project.version}</finalName>
-							<!-- <shadedArtifactAttached>true</shadedArtifactAttached>
-							<shadedClassifierName>jar-with-dependencies</shadedClassifierName> -->
 							<filters>
 								<filter>
 									<artifact>*:*</artifact>
@@ -185,68 +174,6 @@
 					</execution>
 				</executions>
 			</plugin>
-		<!-- 	<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-dependency-plugin</artifactId>
-				<version>3.1.1</version>
-				<executions>
-					<execution>
-						<id>copy-dependencies</id>
-						<phase>install</phase>
-						<goals>
-							<goal>copy-dependencies</goal>
-						</goals>
-						<configuration>
-							<includeGroupIds>com.cognizant.devops</includeGroupIds>
-							<outputDirectory>
-								${project.build.directory}/lib
-							</outputDirectory>
-							configure the plugin here
-						</configuration>
-					</execution>
-				</executions>
-			</plugin> -->
-			<plugin>
-				<artifactId>maven-dependency-plugin</artifactId>
-				<executions>
-					<execution>
-						<id>unpack-dependencies</id>
-						<phase>prepare-package</phase>
-						<goals>
-							<goal>unpack-dependencies</goal>
-						</goals>
-						<configuration>
-							<includeScope>provided</includeScope>
-							<outputDirectory>${project.build.directory}/classes</outputDirectory>
-						</configuration>
-					</execution>
-		
-				</executions>
-			</plugin>
-<!-- 			<plugin>
-				<artifactId>maven-assembly-plugin</artifactId>
-				<configuration>
-					<descriptorRefs>
-						<descriptorRef>jar-with-dependencies</descriptorRef>
-					</descriptorRefs>
-					<archive>
-						<manifest>
-							<mainClass>com.cognizant.devops.platformengine.app.Application</mainClass>
-							  <addClasspath>true</addClasspath>
-              				 <classpathPrefix>../lib/</classpathPrefix>
-						</manifest>
-					</archive>
-				</configuration>
-				<executions>
-					<execution>
-						<id>make-assembly</id>
-						<phase>package</phase>
-						<goals>
-							<goal>single</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin> -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-jar-plugin</artifactId>
@@ -260,7 +187,6 @@
 					</archive>
 				</configuration>
 			</plugin>
-
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
@@ -271,7 +197,6 @@
 					<target>1.8</target>
 				</configuration>
 			</plugin>
-
 		</plugins>
 	</build>
 </project>
