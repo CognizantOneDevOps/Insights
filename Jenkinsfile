@@ -191,7 +191,7 @@ gitCommitID = sh (
 		
 		//Platform Webhook Subscriber
 		PIW_artifactName=readFile("/var/jenkins/jobs/$commitID/workspace/PlatformInsightsWebHook/PIW_artifact").trim()
-		PIW_artifact="${NEXUSREPO}/com/cognizant/devops/PlatformEngine/${pomversionInsightsWebHook}/${PIW_artifactName}"
+		PIW_artifact="${NEXUSREPO}/com/cognizant/devops/PlatformInsightsWebHook/${pomversionInsightsWebHook}/${PIW_artifactName}"
 		
 		//Platform WebhookEngine
 		PWE_artifactName=readFile("/var/jenkins/jobs/$commitID/workspace/PlatformWebhookEngine/PWE_artifact").trim()
