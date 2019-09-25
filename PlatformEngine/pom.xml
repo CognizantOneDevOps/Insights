@@ -23,7 +23,9 @@
 	<name>PlatformEngine</name>
 	<url>http://maven.apache.org</url>
 
-
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+	</properties>
 
 	<dependencies>
 		<dependency>
@@ -127,7 +129,7 @@
 									</manifestEntries>
 								</transformer>
 							</transformers>
-							<finalName>${project.name}${project.version}</finalName>
+							<!-- <finalName>${project.name}${project.version}</finalName> -->
 							<filters>
 								<filter>
 									<artifact>*:*</artifact>
