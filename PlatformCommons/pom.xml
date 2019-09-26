@@ -66,9 +66,19 @@
 			<artifactId>commons-io</artifactId>
 			<version>1.3.2</version>
 		</dependency>
+
+		<!-- TestNg Dependency -->
+		<dependency>
+			<groupId>org.testng</groupId>
+			<artifactId>testng</artifactId>
+			<version>${testng.version}</version>
+			<scope>system</scope>
+			<systemPath>${project.basedir}/jar/testng-7.0.1.jar</systemPath>
+		</dependency>
 	</dependencies>
 
 	<properties>
+		<testng.version>7.0.1</testng.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
 </project>
