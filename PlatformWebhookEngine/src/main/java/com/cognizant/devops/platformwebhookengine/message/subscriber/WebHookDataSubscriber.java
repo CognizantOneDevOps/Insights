@@ -69,11 +69,16 @@ public class WebHookDataSubscriber extends EngineSubscriberResponseHandler {
 			InsightsWebhookParserInterface webHookParser = InsightsWebhookParserFactory.getParserInstance(toolName);
 			List<JsonObject> toolData = webHookParser.parseToolData(responseTemplate, message, toolName, labelName,
 					webhookName);
-
-			Neo4jDBHandler dbHandler = new Neo4jDBHandler();
-			String query = "UNWIND {props} AS properties " + "CREATE (n:" + labelName.toUpperCase() + ") "
-					+ "SET n = properties";
-			dbHandler.bulkCreateNodes(toolData, null, query);
+			if (!toolData.isEmpty()) {
+				Neo4jDBHandler dbHandler = new Neo4jDBHandler();
+				String query = "UNWIND {props} AS properties " + "CREATE (n:" + labelName.toUpperCase() + ") "
+						+ "SET n = properties";
+				dbHandler.bulkCreateNodes(toolData, null, query);
+			} else {
+				log.error("Unmatched Response Template found for " + webhookName);
+				WebhookEngineStatusLogger.getInstance().createEngineStatusNode(
+						"No Webhook Nodes are inserted in DB for " + webhookName, PlatformServiceConstants.FAILURE);
+			}
 			getChannel().basicAck(envelope.getDeliveryTag(), false);
 		} catch (GraphDBException e) {
 			WebhookEngineStatusLogger.getInstance().createEngineStatusNode(
