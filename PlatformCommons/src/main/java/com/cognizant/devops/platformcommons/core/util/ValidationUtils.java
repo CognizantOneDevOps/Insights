@@ -166,7 +166,7 @@ public class ValidationUtils {
 	public static String cleanXSS(String value) {
 		Boolean isXSSPattern = Boolean.FALSE;
 		String valueWithXSSPattern = "";
-		log.debug("In cleanXSS RequestWrapper ..............." + value);
+		//log.debug("In cleanXSS RequestWrapper ..............." + value);
 		if (value != null || !("").equals(value)) {
 			try {
 				// match sections that match a pattern
