@@ -73,8 +73,13 @@ public class OfflineDataProcessingExecutor extends TimerTask {
 
 	@Override
 	public void run() {
-		executeOfflineProcessing();
-		EngineStatusLogger.getInstance().createEngineStatusNode("Offline Data Procesing completed",PlatformServiceConstants.SUCCESS);
+		try {
+			executeOfflineProcessing();
+			EngineStatusLogger.getInstance().createEngineStatusNode("Offline Data Procesing completed",PlatformServiceConstants.SUCCESS);
+		} catch (Exception e) {
+			EngineStatusLogger.getInstance().createEngineStatusNode("Offline Data Procesing has some issue",
+					PlatformServiceConstants.FAILURE);
+		}
 	}
 
 	public int executeOfflineProcessing() {

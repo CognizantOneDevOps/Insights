@@ -36,13 +36,21 @@ public class EngineCorrelatorModule extends TimerTask {
 	@Override
 	public void run() {
 		log.debug(" EngineCorrelatorModule start  ====");
-		if(!isCorrelationExecutionInProgress) {
-			isCorrelationExecutionInProgress = true;
-			CorrelationExecutor correlationsExecutor = new CorrelationExecutor();
-			correlationsExecutor.execute();
-			isCorrelationExecutionInProgress = false;
-			EngineStatusLogger.getInstance().createEngineStatusNode("Correlation Execution Completed",PlatformServiceConstants.SUCCESS);
+		try {
+			if(!isCorrelationExecutionInProgress) {
+				isCorrelationExecutionInProgress = true;
+				CorrelationExecutor correlationsExecutor = new CorrelationExecutor();
+				correlationsExecutor.execute();
+				isCorrelationExecutionInProgress = false;
+			}
+			EngineStatusLogger.getInstance().createEngineStatusNode("Correlation Execution Completed",
+					PlatformServiceConstants.SUCCESS);
+		} catch (Exception e) {
+			log.error("Error in correlation module " + e.getMessage());
+			EngineStatusLogger.getInstance().createEngineStatusNode("Correlation Execution has some issue  ",
+					PlatformServiceConstants.FAILURE);
 		}
+
 		log.debug(" EngineCorrelatorModule Completed ====");
 	}
 }
