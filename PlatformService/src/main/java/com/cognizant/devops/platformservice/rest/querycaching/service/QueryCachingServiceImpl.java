@@ -84,10 +84,10 @@ public class QueryCachingServiceImpl implements QueryCachingService {
 				stringBuilder = stringBuilder
 						.append(iterator.next().getAsJsonObject().get(QueryCachingConstants.STATEMENT).getAsString())
 						.append(QueryCachingConstants.NEW_STATEMENT);
-				checkModifier = validateModifierKeywords(stringBuilder.toString());
+				/*checkModifier = validateModifierKeywords(stringBuilder.toString());
 				if (checkModifier) {
 					return null;
-				}
+				}*/
 			}
 			String[] queriesArray = stringBuilder.toString().split(QueryCachingConstants.NEW_STATEMENT);
 			response = Neo4jDbHandler.executeCypherQueryMultiple(queriesArray);
@@ -135,13 +135,13 @@ public class QueryCachingServiceImpl implements QueryCachingService {
 
 				Iterator<JsonElement> iterator = requestJson.get(QueryCachingConstants.STATEMENTS).getAsJsonArray()
 						.iterator();
-				boolean checkModifier = false;
+				//boolean checkModifier = false;
 				while (iterator.hasNext()) {
 					statement = iterator.next().getAsJsonObject().get(QueryCachingConstants.STATEMENT).getAsString();
-					checkModifier = validateModifierKeywords(statement);
+					/*checkModifier = validateModifierKeywords(statement);
 					if (checkModifier) {
 						return null;
-					}
+					}*/
 					String statementWithoutTime = getStatementWithoutTime(statement, startTimeStr, endTimeStr);
 					tempStatementsCombination.append(statementWithoutTime);
 				}
