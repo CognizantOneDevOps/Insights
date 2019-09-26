@@ -55,7 +55,7 @@ public class InsightsGeneralParserTest extends InsightsParserTestData {
 				testdata.toolName, testdata.labelName, "");
 	}
 	@Test(priority = 3)
-	public void testNullJson() throws InsightsCustomException {
+	public void testUnmatchedResponseTemplate() throws InsightsCustomException {
 		List<JsonObject> nullresponse = generalparser.parseToolData(testdata.fieldNotFoundinToolData, testdata.toolData,
 				testdata.toolName, testdata.labelName, testdata.webhookName);
 		String responseTest = nullresponse.get(0).toString();
