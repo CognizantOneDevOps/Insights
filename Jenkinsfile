@@ -6,7 +6,7 @@ node {
 		script: 'echo $commitID | cut -d "-" -f2',
 		returnStdout: true
 	).trim()
-		
+	echo gitCommitID
 	stage('SCM Checkout') {
 		checkout scm	
 	}
@@ -205,15 +205,8 @@ node {
 		PUI3_artifactName=readFile("/var/jenkins/jobs/$commitID/workspace/PlatformUI3/PUI3_artifact").trim()
 		PUI3_artifact="${NEXUSREPO}/com/cognizant/devops/PlatformUI3/${pomUI3version}/${PUI3_artifactName}"
 	
-		slackSend channel: '#insightsjenkins', color: 'good', message: "Insights Enterprise Build Success for commitID - *${env.commitID}*, Branch - *${env.branchName}*  \n Build Log can be found @ https://buildon.cogdevops.com/buildon/HistoricCIWebController?commitId=${env.commitID}", teamDomain: "insightscogdevops", token: slackToken
-   	    slackSend channel: '#insightsjenkins', color: 'good', message: "New Insights Enterprise artifacts are uploaded to Nexus for commitID : *${env.commitID}* ,Branch - *${env.branchName}* \n 
-		   *PlatformService* ${PS_artifact} \n 
-		   *PlatformUI3* ${PUI3_artifact} \n
-		   *PlatformEngine* ${PE_artifact} \n 
-		   *PlatformAuditEngine* ${PAE_artifact} \n 
-		   *PlatformInsights*  ${PI_artifact} \n  
-		   *PlatformInsightsWebHook* ${PIW_artifact} \n 
-		   *PlatformWebhookEngine* ${PWE_artifact}"
-		   , teamDomain: 'insightscogdevops', token: slackToken // "*" is for making the text bold in slack notification
+		slackSend channel: '#insightsjenkins', color: 'good', message: "Insights Enterprise Build Success for commitID - *${env.commitID}*, Branch - *${env.branchName}*  \n Build Log can be found @ https://buildon.cogdevops.com/buildon/HistoricCIWebController?commitId=$gitCommitID", teamDomain: "insightscogdevops", token: slackToken
+		
+   	    slackSend channel: '#insightsjenkins', color: 'good', message: "New Insights Enterprise artifacts are uploaded to Nexus for commitID : *${env.commitID}* ,Branch - *${env.branchName}* \n *PlatformService* ${PS_artifact} \n *PlatformUI3* ${PUI3_artifact} \n *PlatformEngine* ${PE_artifact} \n *PlatformAuditEngine* ${PAE_artifact} \n *PlatformInsights*  ${PI_artifact} \n *PlatformInsightsWebhook* ${PIW_artifact} \n *PlatformWebhookEngine* ${PWE_artifact}", teamDomain: 'insightscogdevops', token: slackToken // "*" is for making the text bold in slack notification
   	}
 }
