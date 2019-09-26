@@ -17,10 +17,6 @@
  
 	</Appenders>
 		<Loggers>
-		<Logger name="org.springframework.boot" level="error"> 
-				<AppenderRef ref="RollingFile" />
-				<AppenderRef ref="Console" />
-		</Logger>
 		<Root level="debug">
 			<AppenderRef ref="RollingFile" />
 			<AppenderRef ref="Console" />

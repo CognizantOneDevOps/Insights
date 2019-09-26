@@ -79,7 +79,7 @@ public class AgentDataSubscriber extends EngineSubscriberResponseHandler{
 		boolean enableOnlineDatatagging = ApplicationConfigProvider.getInstance().isEnableOnlineDatatagging();
 		Neo4jDBHandler dbHandler = new Neo4jDBHandler();
 		String message = new String(body, MessageConstants.MESSAGE_ENCODING);
-		log.warn(" Received message ==== " + message);
+		//log.warn(" Received message ==== " + message);
 		String routingKey = envelope.getRoutingKey();
 		// routingKey = routingKey.replaceAll("_", ".");
 		log.debug("Routing key in data " + routingKey);
