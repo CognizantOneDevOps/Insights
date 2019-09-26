@@ -36,8 +36,9 @@ import com.google.gson.JsonParser;
 public class InsightsGeneralParser implements InsightsWebhookParserInterface {
 	private static Logger log = LogManager.getLogger(InsightsGeneralParser.class.getName());
 
-	@Override 
-	public List<JsonObject> parseToolData(String responseTemplate, String toolData,String toolName,String labelName,String webhookName) {
+	@Override
+	public List<JsonObject> parseToolData(String responseTemplate, String toolData, String toolName, String labelName,
+			String webhookName) {
 
 		try {
 			String keyMqInitial;
@@ -45,31 +46,33 @@ public class InsightsGeneralParser implements InsightsWebhookParserInterface {
 			JsonParser parser = new JsonParser();
 			List<JsonObject> retrunJsonList = new ArrayList<JsonObject>(0);
 			Map<String, Object> finalJson = new HashMap<String, Object>();
-			
+
 			JsonElement json = (JsonElement) parser.parse(toolData);
 			Map<String, Object> rabbitMqflattenedJsonMap = JsonFlattener.flattenAsMap(json.toString());
-			
+
 			Map<String, String> responseTemplateMap = getResponseTemplateMap(responseTemplate);
-			
+
 			for (Map.Entry<String, String> entry : responseTemplateMap.entrySet()) {
 				keyMqInitial = entry.getKey();
 				Object toolValue = rabbitMqflattenedJsonMap.get(keyMqInitial);
-				finalJson.put(entry.getValue(), toolValue);
+				if (toolValue != null)
+					finalJson.put(entry.getValue(), toolValue);
 			}
 
-			
-			finalJson.put("source", "webhook");
-			DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
-			LocalDateTime now = LocalDateTime.now();
-			finalJson.put("inSightsTimeX", dtf.format(now));
-			finalJson.put("toolName", toolName);
-			finalJson.put("webhookName", webhookName);
-			finalJson.put("labelName", labelName);
-			finalJson.put("insightsTime", ZonedDateTime.now().toInstant().toEpochMilli());
+			if (!finalJson.isEmpty()) {
+				finalJson.put("source", "webhook");
+				DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
+				LocalDateTime now = LocalDateTime.now();
+				finalJson.put("inSightsTimeX", dtf.format(now));
+				finalJson.put("toolName", toolName);
+				finalJson.put("webhookName", webhookName);
+				finalJson.put("labelName", labelName);
+				finalJson.put("insightsTime", ZonedDateTime.now().toInstant().toEpochMilli());
+			}
+
 			Gson prettyGson = new GsonBuilder().setPrettyPrinting().create();
 			String prettyJson = prettyGson.toJson(finalJson);
 			JsonElement element = parser.parse(prettyJson);
-			
 			retrunJsonList.add(element.getAsJsonObject());
 
 			return retrunJsonList;

@@ -17,9 +17,6 @@
  
 	</Appenders>
 		<Loggers>
-		<Logger name="com.cognizant" level="debug"> 
-				<AppenderRef ref="RollingFile" />
-		</Logger>
 		<Root level="debug">
 			<AppenderRef ref="RollingFile" />
 			<AppenderRef ref="Console" />
