@@ -1,17 +1,17 @@
-#-------------------------------------------------------------------------------
-# Copyright 2017 Cognizant Technology Solutions
-#   
-# Licensed under the Apache License, Version 2.0 (the "License"); you may not
-# use this file except in compliance with the License.  You may obtain a copy
-# of the License at
-# 
-#   http://www.apache.org/licenses/LICENSE-2.0
-# 
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
-# WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
-# License for the specific language governing permissions and limitations under
-# the License.
+#-------------------------------------------------------------------------------	
+# Copyright 2017 Cognizant Technology Solutions	
+#   	
+# Licensed under the Apache License, Version 2.0 (the "License"); you may not	
+# use this file except in compliance with the License.  You may obtain a copy	
+# of the License at	
+# 	
+#   http://www.apache.org/licenses/LICENSE-2.0	
+# 	
+# Unless required by applicable law or agreed to in writing, software	
+# distributed under the License is distributed on an "AS IS" BASIS, WITHOUT	
+# WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the	
+# License for the specific language governing permissions and limitations under	
+# the License.	
 #-------------------------------------------------------------------------------
 echo "Enter the Offline Folder location"
 read DIRECTORY
@@ -107,11 +107,6 @@ if [ -d "$DIRECTORY" ]; then
 				cp $DIRECTORY/Offline_Installation/Neo4j/neo4j-Insights.tar.gz ./
 				tar -xf neo4j-Insights.tar.gz
 				chmod -R 755 neo4j-Insights
-				cd neo4j-Insights
-				./bin/neo4j start
-				sleep 40
-				curl -X POST -u neo4j:neo4j -H "Content-Type: application/json" -d '{"password":"C0gnizant@1"}' http://localhost:7474/user/neo4j/password
-				sleep 10
 				cd ../
 				export NEO4J_INIT_HOME=`pwd`
 				echo NEO4J_INIT_HOME=`pwd` |  tee -a /etc/environment
@@ -120,13 +115,12 @@ if [ -d "$DIRECTORY" ]; then
 				source /etc/profile
 				cd /etc/init.d/
 				cp $DIRECTORY/Offline_Installation/Neo4j/Neo4j.sh Neo4j
-				[[ -z "${NEO4J_INIT_HOME}" ]] && MyVar=sudo env | grep NEO4J_INIT_HOME | cut -d'=' -f2 || MyVar="${NEO4J_INIT_HOME}"
-				sed -i -e "s|neo4j_envValue|${MyVar}|g" ./Neo4j
-
 				chmod +x Neo4j
 				chkconfig Neo4j on
 				service Neo4j start
 				sleep 20
+				curl -X POST -u neo4j:neo4j -H "Content-Type: application/json" -d '{"password":"C0gnizant@1"}' http://localhost:7474/user/neo4j/password
+                                sleep 10
 		}
 		installPostgres()
 		{
@@ -168,10 +162,7 @@ if [ -d "$DIRECTORY" ]; then
 				source /etc/environment
 				source /etc/profile
 				cd /etc/init.d/
-				cp $DIRECTORY/Offline_Installation/Grafana/Grafana5.sh Grafana
-				[[ -z "${GRAFANA_HOME}" ]] && GRAFANA_HOME_VAR=sudo env | grep GRAFANA_HOME | cut -d'=' -f2 || GRAFANA_HOME_VAR="${GRAFANA_HOME}"
-				echo $GRAFANA_HOME_VAR
-				sed -i -e "s|grafana_envValue|${GRAFANA_HOME_VAR}|g" ./Grafana
+				cp $DIRECTORY/Offline_Installation/Grafana/Grafana.sh Grafana
 				chmod +x Grafana
 				chkconfig Grafana on
 				service Grafana start
@@ -183,7 +174,35 @@ if [ -d "$DIRECTORY" ]; then
 				cd /opt/
 				cp -R $DIRECTORY/Offline_Installation/Python/python_dependencies ./
 				cd python_dependencies
-				rpm -Uvh *.rpm 
+				rpm -Uvh mpfr-3.1.1-4.el7.x86_64.rpm
+				rpm -Uvh libmpc-1.0.1-3.el7.x86_64.rpm
+				rpm -Uvh cpp-4.8.5-39.el7.x86_64.rpm
+				rpm -Uvh glibc-2.17-292.el7.x86_64.rpm glibc-common-2.17-292.el7.x86_64.rpm
+				rpm -Uvh kernel-headers-3.10.0-1062.el7.x86_64.rpm
+				rpm -Uvh glibc-headers-2.17-292.el7.x86_64.rpm
+				rpm -Uvh glibc-devel-2.17-292.el7.x86_64.rpm
+				rpm -Uvh libgcc-4.8.5-39.el7.x86_64.rpm
+				rpm -Uvh libgomp-4.8.5-39.el7.x86_64.rpm
+				rpm -Uvh gcc-4.8.5-39.el7.x86_64.rpm
+				rpm -Uvh keyutils-libs-devel-1.5.8-3.el7.x86_64.rpm
+				rpm -Uvh libcom_err-1.42.9-16.el7.x86_64.rpm e2fsprogs-libs-1.42.9-16.el7.x86_64.rpm libss-1.42.9-16.el7.x86_64.rpm e2fsprogs-1.42.9-16.el7.x86_64.rpm
+				rpm -Uvh libcom_err-devel-1.42.9-16.el7.x86_64.rpm
+				rpm -Uvh libkadm5-1.15.1-37.el7_6.x86_64.rpm
+				rpm -Uvh libsepol-2.5-10.el7.x86_64.rpm
+				rpm -Uvh libsepol-devel-2.5-10.el7.x86_64.rpm
+				rpm -Uvh pcre-8.32-17.el7.x86_64.rpm
+				rpm -Uvh pcre-devel-8.32-17.el7.x86_64.rpm
+				rpm -Uvh libselinux-2.5-14.1.el7.x86_64.rpm libselinux-python-2.5-14.1.el7.x86_64.rpm libselinux-utils-2.5-14.1.el7.x86_64.rpm
+				rpm -Uvh libselinux-devel-2.5-14.1.el7.x86_64.rpm
+				rpm -Uvh libverto-devel-0.2.5-4.el7.x86_64.rpm
+				rpm -Uvh krb5-libs-1.15.1-37.el7_6.x86_64.rpm
+				rpm -Uvh krb5-devel-1.15.1-37.el7_6.x86_64.rpm
+				rpm -Uvh openssl-1.0.2k-19.el7.x86_64.rpm openssl-libs-1.0.2k-19.el7.x86_64.rpm
+				rpm -Uvh zlib-1.2.7-18.el7.x86_64.rpm
+				rpm -Uvh zlib-devel-1.2.7-18.el7.x86_64.rpm
+				rpm -Uvh openssl-devel-1.0.2k-19.el7.x86_64.rpm
+				rpm -Uvh bzip2-devel-1.0.6-13.el7.x86_64.rpm
+				rpm -Uvh libffi-devel-3.0.13-18.el7.x86_64.rpm 
 				cd ../ && rm -rf python_dependencies
 				echo $(pwd)
 				cp $DIRECTORY/Offline_Installation/Python/Python.tar.gz ./
@@ -196,7 +215,34 @@ if [ -d "$DIRECTORY" ]; then
 				cp $DIRECTORY/Offline_Installation/Python/Libraries/pip-18.0-py2.py3-none-any.whl ./
 				python pip-18.0-py2.py3-none-any.whl/pip install --no-index pip-18.0-py2.py3-none-any.whl
 				ln -s /usr/local/bin/pip /bin/pip
-				pip install $DIRECTORY/Offline_Installation/Python/Libraries/*.whl
+				pip install $DIRECTORY/Offline_Installation/Python/Libraries/futures-3.3.0-py2-none-any.whl
+				pip install $DIRECTORY/Offline_Installation/Python/Libraries/funcsigs-1.0.2-py2.py3-none-any.whl
+				pip install $DIRECTORY/Offline_Installation/Python/Libraries/six-1.11.0-py2.py3-none-any.whl
+				pip install $DIRECTORY/Offline_Installation/Python/Libraries/setuptools-40.0.0-py2.py3-none-any.whl
+				pip install $DIRECTORY/Offline_Installation/Python/Libraries/pytz-2018.5-py2.py3-none-any.whl
+				pip install $DIRECTORY/Offline_Installation/Python/Libraries/tzlocal-1.5.1.tar.gz
+				pip install $DIRECTORY/Offline_Installation/Python/Libraries/ntlm_auth-1.2.0-py2.py3-none-any.whl
+				pip install $DIRECTORY/Offline_Installation/Python/Libraries/pycparser-2.18.tar.gz
+				pip install $DIRECTORY/Offline_Installation/Python/Libraries/asn1crypto-0.24.0-py2.py3-none-any.whl
+				pip install $DIRECTORY/Offline_Installation/Python/Libraries/idna-2.7-py2.py3-none-any.whl
+				pip install $DIRECTORY/Offline_Installation/Python/Libraries/enum34-1.1.6-py2-none-any.whl
+				pip install $DIRECTORY/Offline_Installation/Python/Libraries/cffi-1.12.3-cp37-cp37m-manylinux1_x86_64.whl
+				pip install $DIRECTORY/Offline_Installation/Python/Libraries/cryptography-2.7-cp34-abi3-manylinux1_x86_64.whl
+				pip install $DIRECTORY/Offline_Installation/Python/Libraries/urllib3-1.25.5-py2.py3-none-any.whl
+				pip install $DIRECTORY/Offline_Installation/Python/Libraries/certifi-2019.9.11-py2.py3-none-any.whl
+				pip install $DIRECTORY/Offline_Installation/Python/Libraries/chardet-3.0.4-py2.py3-none-any.whl
+				pip install $DIRECTORY/Offline_Installation/Python/Libraries/requests-2.22.0-py2.py3-none-any.whl
+				pip install $DIRECTORY/Offline_Installation/Python/Libraries/APScheduler-3.5.1-py2.py3-none-any.whl
+				pip install $DIRECTORY/Offline_Installation/Python/Libraries/requests_ntlm-1.1.0-py2.py3-none-any.whl
+				pip install $DIRECTORY/Offline_Installation/Python/Libraries/pika-0.12.0-py2.py3-none-any.whl
+				pip install $DIRECTORY/Offline_Installation/Python/Libraries/python_dateutil-2.7.3-py2.py3-none-any.whl
+				pip install $DIRECTORY/Offline_Installation/Python/Libraries/xmltodict-0.11.0-py2.py3-none-any.whl
+				pip install $DIRECTORY/Offline_Installation/Python/Libraries/jmespath-0.9.4-py2.py3-none-any.whl
+				pip install $DIRECTORY/Offline_Installation/Python/Libraries/docutils-0.15.2-py3-none-any.whl
+				pip install $DIRECTORY/Offline_Installation/Python/Libraries/botocore-1.12.234-py2.py3-none-any.whl
+				pip install $DIRECTORY/Offline_Installation/Python/Libraries/s3transfer-0.2.1-py2.py3-none-any.whl
+				pip install $DIRECTORY/Offline_Installation/Python/Libraries/boto3-1.9.124-py2.py3-none-any.whl
+				pip install $DIRECTORY/Offline_Installation/Python/Libraries/ipaddress-1.0.22-py2.py3-none-any.whl
 				source /etc/environment
 				source /etc/profile
 				sleep 5
