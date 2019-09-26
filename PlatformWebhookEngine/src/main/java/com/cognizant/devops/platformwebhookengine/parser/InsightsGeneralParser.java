@@ -68,12 +68,11 @@ public class InsightsGeneralParser implements InsightsWebhookParserInterface {
 				finalJson.put("webhookName", webhookName);
 				finalJson.put("labelName", labelName);
 				finalJson.put("insightsTime", ZonedDateTime.now().toInstant().toEpochMilli());
+				Gson prettyGson = new GsonBuilder().setPrettyPrinting().create();
+				String prettyJson = prettyGson.toJson(finalJson);
+				JsonElement element = parser.parse(prettyJson);
+				retrunJsonList.add(element.getAsJsonObject());
 			}
-
-			Gson prettyGson = new GsonBuilder().setPrettyPrinting().create();
-			String prettyJson = prettyGson.toJson(finalJson);
-			JsonElement element = parser.parse(prettyJson);
-			retrunJsonList.add(element.getAsJsonObject());
 
 			return retrunJsonList;
 		} catch (Exception e) {
