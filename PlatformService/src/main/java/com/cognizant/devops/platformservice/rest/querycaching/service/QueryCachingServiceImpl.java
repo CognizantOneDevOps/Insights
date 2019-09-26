@@ -79,7 +79,7 @@ public class QueryCachingServiceImpl implements QueryCachingService {
 		try {
 			StringBuilder stringBuilder = new StringBuilder();
 			Iterator<JsonElement> iterator = json.get(QueryCachingConstants.STATEMENTS).getAsJsonArray().iterator();
-			boolean checkModifier = false;
+			//boolean checkModifier = false;
 			while (iterator.hasNext()) {
 				stringBuilder = stringBuilder
 						.append(iterator.next().getAsJsonObject().get(QueryCachingConstants.STATEMENT).getAsString())
