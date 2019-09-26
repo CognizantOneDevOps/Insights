@@ -26,9 +26,10 @@ if [ -d "$DIRECTORY" ]; then
 		7) Python
 		8) RabbitMQ
 		9) Tomcat8
-		10) Agents
+		10) EngineJar
 		11) Elasticsearch
-		12) EngineJar"
+		12) Agents
+		13) InsightsWebHook"
 		installInsightsHome()
 		{
 				echo "InsightsHome"
@@ -331,9 +332,32 @@ if [ -d "$DIRECTORY" ]; then
 						source /etc/profile
 						cp $DIRECTORY/Offline_Installation/Insights_artifacts/engineJar/PlatformEngine.jar ./
 						sleep 2
-						#nohup java -jar PlatformEngine.jar &
+						nohup java -jar PlatformEngine.jar &
 				fi
 		}
+		installWebHook()
+                {
+                                if [[ -z "${INSIGHTS_HOME}" ]]; then
+                                                installInsightsHome
+                                else
+                                                echo "WebHook"
+                                                echo "#################### Getting Insights WebHook Jar ####################"
+						sudo mkdir /opt/insightsWebHook
+						cd /opt/insightsWebHook
+						export INSIGHTS_WEBHOOK=`pwd`
+						sudo echo INSIGHTS_WEBHOOK=`pwd` | sudo tee -a /etc/environment
+						sudo echo "export" INSIGHTS_WEBHOOK=`pwd` | sudo tee -a /etc/profile
+						source /etc/environment
+						source /etc/profile
+						cp $DIRECTORY/Offline_Installation/Insights_artifacts/WebHook/PlatformInsightsWebHook.jar
+						sleep 2
+						sudo nohup java -jar PlatformInsightsWebHook.jar &
+						sleep 10
+						cp $DIRECTORY/Offline_Installation/Insights_artifacts/WebHook/PlatformWebhookEngine.jar
+						sleep 2
+						sudo nohup java -jar PlatformWebhookEngine.jar &
+                                fi
+                }
 		while :
 		do
 				read INPUT_STRING
@@ -379,9 +403,9 @@ if [ -d "$DIRECTORY" ]; then
 										rabbitMQStatus="RabbitMQ is dowm"
 								fi
 								installTomcat8
-								installAgents
-					installElasticsearch
 								installEngineJar
+								installElasticsearch
+								installAgents
 								break
 						;;
 						2)
@@ -417,7 +441,7 @@ if [ -d "$DIRECTORY" ]; then
 								break
 						;;
 						10)
-								installAgents
+								installEngineJar
 								break
 						;;
 						11)
@@ -425,9 +449,13 @@ if [ -d "$DIRECTORY" ]; then
 								break
 						;;
 						12)
-								installEngineJar
+								installAgents
 								break
 						;;
+						13)
+                                                                installWebHook
+                                                                break
+                                                ;;
 				esac
 		done
 		status()
