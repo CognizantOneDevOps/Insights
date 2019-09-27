@@ -20,15 +20,15 @@ import com.cognizant.devops.platformauditing.blockchaindatacollection.modules.bl
 import com.cognizant.devops.platformcommons.config.ApplicationConfigCache;
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
+import java.util.Timer;
+import java.util.TimerTask;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.quartz.*;
-import org.quartz.impl.StdSchedulerFactory;
-
 
 /**
- * Engine execution will start from Application. 1. Load the iSight config 2.
- * Initialize Publisher and subscriber modules 3. Initialize Correlation Module.
+ * Engine execution will start from Application.
+ * 1. Load the iSight config
+ * 2. Initialize BlockChain and JiraProcessing Module.
  */
 public class Application {
     private static Logger log = LogManager.getLogger(Application.class.getName());
@@ -53,44 +53,18 @@ public class Application {
 
             ApplicationConfigProvider.performSystemCheck();
 
-
             // Schedule the BlockChainExecuter job
-            JobDetail blockChainProcessingJob = JobBuilder.newJob(PlatformAuditProcessingExecutor.class)
-                    .withIdentity("BlockChainProcessingExecutor", "iSight")
-                    .build();
+			Timer timerBlockChainProcessing = new Timer("BlockChainProcessingExecutor");
+			TimerTask blockChainProcessingTrigger = new PlatformAuditProcessingExecutor();
+			timerBlockChainProcessing.schedule(blockChainProcessingTrigger, 0, blockchainEngineInterval * 1000);
 
-            Trigger blockChainProcessingTrigger = TriggerBuilder.newTrigger()
-                    .withIdentity("blockChainProcessingExecutorTrigger", "iSight")
-                    .startNow()
-                    .withSchedule(SimpleScheduleBuilder.simpleSchedule()
-                            .withIntervalInSeconds(blockchainEngineInterval)
-                            .repeatForever())
-                    .build();
+			//Schedule the jira executor job
+			Timer timerJiraProcessing = new Timer("JiraProcessingExecutor");
+			TimerTask jiraProcessingTrigger = new JiraProcessingExecutor();
+			timerJiraProcessing.schedule(jiraProcessingTrigger, 0, jiraEngineInterval * 1000);
 
-            //Schedule the jira executor job
-            JobDetail jiraProcessingJob = JobBuilder.newJob(JiraProcessingExecutor.class)
-                    .withIdentity("BlockChainChangelogProcessingExecutor", "iSight")
-                    .build();
-
-            Trigger jiraProcessingTrigger = TriggerBuilder.newTrigger()
-                    .withIdentity("blockChainChangelogProcessingExecutorTrigger", "iSight")
-                    .startNow()
-                    .withSchedule(SimpleScheduleBuilder.simpleSchedule()
-                            .withIntervalInSeconds(jiraEngineInterval)
-                            .repeatForever())
-                    .build();
-            // Tell quartz to schedule the job using our trigger
-            Scheduler scheduler;
-
-            scheduler = new StdSchedulerFactory().getScheduler();
-            scheduler.start();
-            scheduler.scheduleJob(blockChainProcessingJob, blockChainProcessingTrigger);
-            scheduler.scheduleJob(jiraProcessingJob, jiraProcessingTrigger);
             log.info("PlatformAudit Engine Service Started ", PlatformServiceConstants.SUCCESS);
-        } catch (SchedulerException e) {
-            log.info("PlatformAudit Engine Service not running due to Scheduler Exception " + e.getMessage(), PlatformServiceConstants.FAILURE);
-            log.error(e);
-        } catch (Exception e) {
+		} catch (Exception e) {
             log.info("PlatformAudit Engine Service not running " + e.getMessage(), PlatformServiceConstants.FAILURE);
             log.error(e);
         }

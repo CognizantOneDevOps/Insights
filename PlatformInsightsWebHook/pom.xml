@@ -2,55 +2,39 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
-	<groupId>com.cognizant.devops</groupId>
-	<artifactId>PlatformInsightsWebHook</artifactId>
-	<packaging>jar</packaging>
-	<name>PlatformInsightsWebHook</name>
-	<description>PlatformInsightsWebHook for webhook testing</description>
-	<url>http://maven.apache.org</url>
 
 	<parent>
 		<artifactId>PlatformParent</artifactId>
 		<groupId>com.cognizant.devops</groupId>
 		<version>6.1-SNAPSHOT</version>
 	</parent>
+
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>com.cognizant.devops</groupId>
+	<artifactId>PlatformInsightsWebHook</artifactId>
+	<packaging>jar</packaging>
+	<name>PlatformInsightsWebHook</name>
+	<version>6.1-SNAPSHOT</version>
+	<description>PlatformInsightsWebHook for webhook testing</description>
+	<url>http://maven.apache.org</url>
+
 	<properties>
-		<!-- <java.version>9</java.version> -->
+		<!-- <java.version>9</java.version> 2.1.8.RELEASE -->
 		<java.version>1.8</java.version>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<spring.version>2.1.6.RELEASE</spring.version>
 		<project.name>PlatformInsights</project.name>
 	</properties>
 	<dependencies>
 		<dependency>
-			<!-- Import dependency management from Spring Boot -->
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-dependencies</artifactId>
-			<version>${spring.version}</version>
-			<type>pom</type>
+			<groupId>javax.servlet</groupId>
+			<artifactId>javax.servlet-api</artifactId>
+			<version>3.1.0</version>
+			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
-			<version>${spring.version}</version>
-			<!-- Exclude the default Jackson dependency -->
-			<exclusions>
-				<exclusion>
-					<groupId>org.springframework.boot</groupId>
-					<artifactId>spring-boot-starter-json</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-devtools</artifactId>
-			<version>${spring.version}</version>
-			<optional>true</optional>
-		</dependency>
-		<!-- exclude logback , add log4j2 -->
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter</artifactId>
 			<version>${spring.version}</version>
 			<exclusions>
 				<exclusion>
@@ -58,6 +42,11 @@
 					<artifactId>spring-boot-starter-logging</artifactId>
 				</exclusion>
 			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-compress</artifactId>
+			<version>1.19</version>
 		</dependency>
 		<dependency>
 			<groupId>com.sun.jersey</groupId>
@@ -114,6 +103,9 @@
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 				<version>${spring.version}</version>
+				<configuration>
+					<excludeTransitive>true</excludeTransitive>
+				</configuration>
 				<executions>
 					<execution>
 						<goals>
@@ -137,5 +129,4 @@
 			</plugin>
 		</plugins>
 	</build>
-	<version>6.1-SNAPSHOT</version>
 </project>

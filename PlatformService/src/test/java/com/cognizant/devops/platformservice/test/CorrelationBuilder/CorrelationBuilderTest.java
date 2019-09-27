@@ -29,7 +29,7 @@ public class CorrelationBuilderTest extends CorrelationBuilderTestData {
 
 	@Test(priority = 1)
 	public void testGetSaveConfig() throws InsightsCustomException {
-		String config = "succcess";
+		String config = "success";
 		String response = correlationBuilderImpl.saveConfig(correlationBuilderTestData.saveDataConfig);
 		Assert.assertEquals(config, response);
 	}
@@ -45,14 +45,14 @@ public class CorrelationBuilderTest extends CorrelationBuilderTestData {
 
 	@Test(priority = 3)
 	public void testUpdateJsonConfig() throws InsightsCustomException {
-		String config = "succcess";
+		String config = "success";
 		String response = correlationBuilderImpl.saveConfig(correlationBuilderTestData.UpdateConfigDetails);
 		Assert.assertEquals(config, response);
 	}
 
 	@Test(priority = 4)
 	public void testDeleteJsonConfig() throws InsightsCustomException {
-		String config = "succcess";
+		String config = "success";
 		String response = correlationBuilderImpl.saveConfig(correlationBuilderTestData.DeleteConfigDetails);
 		Assert.assertEquals(config, response);
 	}

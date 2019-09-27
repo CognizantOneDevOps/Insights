@@ -18,12 +18,10 @@ package com.cognizant.devops.platforminsights.core;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.TimerTask;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.quartz.Job;
-import org.quartz.JobExecutionContext;
-import org.quartz.JobExecutionException;
 
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
 import com.cognizant.devops.platformcommons.core.enums.ExecutionActions;
@@ -37,24 +35,27 @@ import com.cognizant.devops.platforminsights.dal.Neo4jDBImpl;
 import com.cognizant.devops.platforminsights.datamodel.InferenceConfigDefinition;
 import com.cognizant.devops.platforminsights.exception.InsightsJobFailedException;
 
-public class InferenceJobExecutor implements Job, Serializable {
+public class InferenceJobExecutor extends TimerTask implements Serializable {
 	private static final Logger log = LogManager.getLogger(InferenceJobExecutor.class);
 	private static final long serialVersionUID = -4343203101560318074L;
 
 	@Override
-	public void execute(JobExecutionContext context) throws JobExecutionException {
+	public void run() {
+		log.debug("Starting KPI Jobs Execution , In run method of InferenceJobExecutor ====");
 		try {
 			startExecution();
 			InsightsStatusProvider.getInstance().createInsightStatusNode(
 					"Platform Insights Inference Application started Successfully", PlatformServiceConstants.SUCCESS);
-		} catch (JobExecutionException e) {
+		} catch (Exception e) {
+			log.error("Platform Insights Inference Application not started " + e.getMessage());
 			InsightsStatusProvider.getInstance().createInsightStatusNode(
 					"message Exception occur while Job Execution " + e.getMessage(), PlatformServiceConstants.FAILURE);
+			throw new RuntimeException("Platform Insights Inference Application not started " + e.getMessage());
 		}
 	}
 
-	private void startExecution() throws JobExecutionException {
-		log.debug("Starting Spark Jobs Execution");
+	private void startExecution() {
+		log.debug("Starting Jobs Execution");
 		try {
 			DatabaseService neo4jImpl = new Neo4jDBImpl();
 			List<InferenceConfigDefinition> jobsFromNeo4j = neo4jImpl.readKPIJobs();
@@ -84,7 +85,7 @@ public class InferenceJobExecutor implements Job, Serializable {
 			log.error(e.getMessage(), e);
 			InsightsStatusProvider.getInstance().createInsightStatusNode(
 					"Platform Insights Inference  not started job " + e.getMessage(), PlatformServiceConstants.FAILURE);
-			throw new JobExecutionException("Platform Insights Inference Application not started " + e.getMessage());
+			throw new RuntimeException("Platform Insights Inference Application not started " + e.getMessage());
 		}
 	}
 
