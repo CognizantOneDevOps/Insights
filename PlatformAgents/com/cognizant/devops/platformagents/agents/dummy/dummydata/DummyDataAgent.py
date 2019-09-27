@@ -20,7 +20,7 @@ Created on Dec 28, 2017
 '''
 from dateutil import parser
 import datetime
-from BaseAgent import BaseAgent
+from core.BaseAgent import BaseAgent
 import logging
 import time
 import calendar
@@ -34,7 +34,7 @@ class DummyDataAgent(BaseAgent):
 
     def process(self):
     
-        print("DummyDataAgent  ")      
+        #print("DummyDataAgent  ")      
         jiraSample = {
             "jiraStatus":"Completed",
             "jiraProjectName":"Knowledge Transfer",
@@ -112,7 +112,6 @@ class DummyDataAgent(BaseAgent):
         progressTimeSec = ['1232', '32342', '2323']
         assigneeID = ['1231212', '2345253', '234234', '1342323']
         assigneeEmail = ['hari@cognizant.com', 'sashikala@cognizant.com', 'drubaj@cognizant.com', 'kalaivani@cognizant.com']
-        tool_Name = ['JIRA']
         
         # Sprint variables
 
@@ -151,12 +150,15 @@ class DummyDataAgent(BaseAgent):
         flag = 1
         # To save the data count in tracking.json
         script_dir = os.path.dirname(__file__)
+        #print(script_dir)
         file_path = os.path.join(script_dir, 'config.json')
+        print(file_path)
         # Input your system path to tracking.json of DummyAgent          
         with open(file_path, "r") as jsonFile:  # Open the JSON file for reading
             data = json.load(jsonFile)  # Read the JSON into the buffer
         print'Starting Agent!'
         currentDT = datetime.datetime.now()
+        #print(currentDT)
         record_count = 0  
         total_record_count = 0
         while flag == 1:	
@@ -166,6 +168,7 @@ class DummyDataAgent(BaseAgent):
             jenkins_data = []
             sonar_data = []
             sprint_data = []
+            #print(jira_data)
             # Run-time calculated variables
             currentDT = datetime.datetime.now()
             time_tuple = time.strptime(currentDT.strftime('%Y-%m-%d %H:%M:%S'), '%Y-%m-%d %H:%M:%S')
@@ -177,6 +180,7 @@ class DummyDataAgent(BaseAgent):
             time_start = (random.randint(100, 500))
             time_end = (random.randint(501, 800))
             
+            print('Jira Started ....')
             # jira_count =[]
             jira_count = 0
             jira_keyArr = [] 
@@ -221,8 +225,8 @@ class DummyDataAgent(BaseAgent):
             total_record_count =total_record_count + len(jira_data)
             self.publishToolsData(jira_data, jiraMetadata)
                            
-            #print(jira_keyArr)
-            #print(jira_sprintArr)
+            print(jira_keyArr)
+            print(jira_sprintArr)
             
             # sprint json configurations
             for sprint in jira_sprintArr:
@@ -246,7 +250,7 @@ class DummyDataAgent(BaseAgent):
             for jirakey in jira_keyArr: 
                 git_count = 0
                 #print(jirakey)                
-                while git_count != 25 : 
+                while git_count != 50 : 
                    randonGitCommitId = 'CM-' + str(''.join([random.choice(string.digits) for n in xrange(10)])) 
                    # GIT json configurations    10 2
                    git_time = (time_epoch + time_start)
@@ -256,11 +260,12 @@ class DummyDataAgent(BaseAgent):
                    gitSample['gitCommiTime'] = git_date.strftime("%Y-%m-%d" + 'T' + "%H:%M:%S" + 'Z')
                    gitSample['inSightsTime'] = git_time
                    gitSample['gitCommitId'] = randomStr
-                   gitSample['jiraKey'] = jirakey
+                   if git_count < 26 :
+                   	gitSample['jiraKey'] = jirakey
+                    gitSample['message'] = 'This commit is associated with jira-key : ' + str(jirakey)		   
                    gitSample['gitReponame'] = random.choice(repo)
                    gitSample['gitAuthorName'] = random.choice(author)
                    gitSample['repoName'] = random.choice(repo)
-                   gitSample['message'] = 'This commit is associated with jira-key : ' + str(jirakey)
                    gitSample['commitId'] = randonGitCommitId
                    gitSample['toolName'] = "GIT"
                    gitSample['categoryName'] = "SCM"
@@ -272,7 +277,7 @@ class DummyDataAgent(BaseAgent):
             total_record_count =total_record_count + len(git_data)
             self.publishToolsData(git_data, gitMetadata)
             
-            #print('Jenkins Started ....')
+            print('Jenkins Started ....')
             #print(git_CommitArr)
             #print(len(git_CommitArr))
             jenkins_count = 0 
@@ -303,7 +308,9 @@ class DummyDataAgent(BaseAgent):
                 jenkinsSample['buildUrl'] = random.choice(buildUrl)
                 jenkinsSample['result'] = random.choice(result)
                 jenkinsSample['master'] = random.choice(master)
-                jenkinsSample['scmcommitId'] = gitSampleData['commitId']
+                if rangeNumber < 30 :
+                 jenkinsSample['scmcommitId'] = gitSampleData['commitId']
+
                 jenkinsSample['toolName'] = "JENKINS"
                 jenkinsSample['categoryName'] = "CI"
                 jenkins_keyArr.append(jenkinsSample)
@@ -334,7 +341,8 @@ class DummyDataAgent(BaseAgent):
                 sonarSample['ProjectKey'] = random.choice(sonar_key)
                 sonarSample['resourceKey'] = random.choice(resourceKey)
                 sonarSample['inSightsTime'] = random.choice(resourceKey)
-                sonarSample['jenkineBuildNumber'] = jenkinsSampleData['buildNumber']
+                if rangeNumber < 25 :
+	                sonarSample['jenkineBuildNumber'] = jenkinsSampleData['buildNumber']
                 sonarSample['inSightsTimeX'] = random.choice(resourceKey)
                 sonarSample['sonarKey']=ramdomSonarKey
                 sonarSample['sonarQualityGateStatus']= random.choice(sonar_quality_gate_Status)
@@ -354,15 +362,15 @@ class DummyDataAgent(BaseAgent):
             print 'Published data: ', record_count
             record_count += 1
                 
-            time.sleep(1)        
+            time.sleep(40)      
 
             if(dataCount == record_count):
                 flag = 0
                 print("Dummy Agent Processing Completed .....")
         
         currentCompletedDT = datetime.datetime.now()
-        print('Start Time      '+ str(currentDT))
-        print('Completed Time  ==== '+ str(currentCompletedDT))
+        #print('Start Time      '+ str(currentDT))
+        #print('Completed Time  ==== '+ str(currentCompletedDT))
         #print('Total Record count '+str(total_record_count))
                 
 if __name__ == "__main__":
