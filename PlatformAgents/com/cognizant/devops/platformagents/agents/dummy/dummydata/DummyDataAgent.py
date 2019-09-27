@@ -261,7 +261,7 @@ class DummyDataAgent(BaseAgent):
                    gitSample['inSightsTime'] = git_time
                    gitSample['gitCommitId'] = randomStr
                    if git_count < 26 :
-                   	gitSample['jiraKey'] = jirakey
+                    gitSample['jiraKey'] = jirakey
                     gitSample['message'] = 'This commit is associated with jira-key : ' + str(jirakey)		   
                    gitSample['gitReponame'] = random.choice(repo)
                    gitSample['gitAuthorName'] = random.choice(author)
@@ -342,7 +342,7 @@ class DummyDataAgent(BaseAgent):
                 sonarSample['resourceKey'] = random.choice(resourceKey)
                 sonarSample['inSightsTime'] = random.choice(resourceKey)
                 if rangeNumber < 25 :
-	                sonarSample['jenkineBuildNumber'] = jenkinsSampleData['buildNumber']
+	             sonarSample['jenkineBuildNumber'] = jenkinsSampleData['buildNumber']
                 sonarSample['inSightsTimeX'] = random.choice(resourceKey)
                 sonarSample['sonarKey']=ramdomSonarKey
                 sonarSample['sonarQualityGateStatus']= random.choice(sonar_quality_gate_Status)
