@@ -15,17 +15,12 @@
  ******************************************************************************/
 
 package com.cognizant.devops.platformwebhookengine.app;
+
+import java.util.Timer;
+import java.util.TimerTask;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.quartz.JobBuilder;
-import org.quartz.JobDetail;
-import org.quartz.Scheduler;
-import org.quartz.SchedulerException;
-import org.quartz.SimpleScheduleBuilder;
-import org.quartz.Trigger;
-import org.quartz.TriggerBuilder;
-import org.quartz.impl.StdSchedulerFactory;
-
 import com.cognizant.devops.platformcommons.config.ApplicationConfigCache;
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
@@ -35,14 +30,14 @@ import com.cognizant.devops.platformwebhookengine.modules.aggregator.EngineAggre
 public class Application {
     private static Logger log = LogManager.getLogger(Application.class.getName());
 
-    private static int defaultInterval = 600;
+	private static int defaultIntervalInSec = 600;
     private Application() {
 
     }
 
     public static void main(String[] args) throws Exception {
         if (args.length > 0) {
-            defaultInterval = Integer.valueOf(args[0]);
+			defaultIntervalInSec = Integer.valueOf(args[0]);
         }
         try {
       
@@ -50,27 +45,13 @@ public class Application {
 
             ApplicationConfigProvider.performSystemCheck();
 
-            JobDetail aggrgatorJob = JobBuilder.newJob(EngineAggregatorModule.class)
-                .withIdentity("EngineAggregatorModule", "iSight").build();
-            
-            Trigger aggregatorTrigger = TriggerBuilder.newTrigger()
-                .withIdentity("EngineAggregatorModuleTrigger", "iSight")
-                .startNow()
-                .withSchedule(SimpleScheduleBuilder.simpleSchedule()
-                    .withIntervalInSeconds(defaultInterval)
-                    .repeatForever())
-                .build();
+			Timer timerWebhookEngineJobExecutorModule = new Timer("WebhookEngineJobExecutorModule");
+			TimerTask webhookAggregatorTrigger = new EngineAggregatorModule();
+			timerWebhookEngineJobExecutorModule.schedule(webhookAggregatorTrigger, 0, defaultIntervalInSec * 1000);
 
-            Scheduler scheduler;
-            scheduler = new StdSchedulerFactory().getScheduler();
-            scheduler.start();
-            scheduler.scheduleJob(aggrgatorJob, aggregatorTrigger);
             WebhookEngineStatusLogger.getInstance().createEngineStatusNode("Platform Webhook Engine Service Started ",PlatformServiceConstants.SUCCESS);
 
-        } catch (SchedulerException e) {
-            WebhookEngineStatusLogger.getInstance().createEngineStatusNode("Platform Webhook Engine Service not running due to Scheduler Exception "+e.getMessage(),PlatformServiceConstants.FAILURE);
-            log.error(e);
-        } catch (Exception e) {
+		} catch (Exception e) {
             WebhookEngineStatusLogger.getInstance().createEngineStatusNode("Platform Webhook Engine Service not running "+e.getMessage(),PlatformServiceConstants.FAILURE);
             log.error(e);
         }

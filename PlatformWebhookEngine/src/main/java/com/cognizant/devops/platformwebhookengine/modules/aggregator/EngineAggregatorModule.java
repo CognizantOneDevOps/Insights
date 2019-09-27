@@ -18,12 +18,10 @@ package com.cognizant.devops.platformwebhookengine.modules.aggregator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TimerTask;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.quartz.Job;
-import org.quartz.JobExecutionContext;
-import org.quartz.JobExecutionException;
 
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
@@ -34,12 +32,13 @@ import com.cognizant.devops.platformwebhookengine.message.core.WebhookEngineStat
 import com.cognizant.devops.platformwebhookengine.message.factory.EngineSubscriberResponseHandler;
 import com.cognizant.devops.platformwebhookengine.message.subscriber.WebHookDataSubscriber;
 
-public class EngineAggregatorModule implements Job {
+public class EngineAggregatorModule extends TimerTask {
 	private static Logger log = LogManager.getLogger(EngineAggregatorModule.class.getName());
 	private static Map<String, EngineSubscriberResponseHandler> registry = new HashMap<String, EngineSubscriberResponseHandler>();
 
 	@Override
-	public void execute(JobExecutionContext context) throws JobExecutionException {
+	public void run() {
+		log.debug(" Webhook Engine started ==== ");
 		ApplicationConfigProvider.performSystemCheck();
 		Neo4jDBHandler graphDBHandler = new Neo4jDBHandler();
 		WebHookConfigDAL webhookConfigDal = new WebHookConfigDAL();
@@ -48,13 +47,12 @@ public class EngineAggregatorModule implements Job {
 			String webhookname = webhookConfig.getWebHookName().toUpperCase();
 			String toolName = webhookConfig.getToolName().toUpperCase();
 			Boolean subscribeStatus = webhookConfig.getSubscribeStatus();
-
 			log.debug("Webhook Detail {}  subscribed Status {}", webhookname, subscribeStatus);
-
 			if (subscribeStatus == true) {
 				registerAggragators(webhookConfig, graphDBHandler, toolName);
 			}
 		}
+		log.debug(" Webhook Engine completed ==== ");
 	}
 
 	private void registerAggragators(WebHookConfig webhookConfig, Neo4jDBHandler graphDBHandler, String toolName) {
