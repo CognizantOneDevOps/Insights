@@ -38,7 +38,7 @@ public class InsightsGeneralParserTest extends InsightsParserTestData {
 
 		List<JsonObject> response = generalparser.parseToolData(testdata.responseTemplate, toolData, testdata.toolName,
 				testdata.labelName, testdata.webhookName);
-		
+
 		String commitId = response.get(0).get("commitId").toString();
 		String authorName = response.get(0).get("authorName").toString();
 		String message = response.get(0).get("message").toString();
@@ -46,7 +46,6 @@ public class InsightsGeneralParserTest extends InsightsParserTestData {
 		Assert.assertEquals(authorName, testdata.authorName);
 		Assert.assertEquals(message, testdata.message);
 
-		
 	}
 
 	@Test(priority = 2, expectedExceptions = Exception.class)
@@ -54,13 +53,15 @@ public class InsightsGeneralParserTest extends InsightsParserTestData {
 		List<JsonObject> response = generalparser.parseToolData(testdata.responseTemplate, incorrectToolData,
 				testdata.toolName, testdata.labelName, "");
 	}
+
 	@Test(priority = 3)
 	public void testUnmatchedResponseTemplate() throws InsightsCustomException {
 		List<JsonObject> nullresponse = generalparser.parseToolData(testdata.fieldNotFoundinToolData, testdata.toolData,
 				testdata.toolName, testdata.labelName, testdata.webhookName);
-		String responseTest = nullresponse.get(0).toString();
+		System.out.print(nullresponse.toString());
+		String responseTest = nullresponse.toString();
 		responseTest = responseTest.substring(1, responseTest.length() - 1); // remove curly brackets
 		Assert.assertEquals(responseTest, "");
-		}
+	}
 
 }
