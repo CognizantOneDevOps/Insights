@@ -304,6 +304,14 @@ public class InsightsUtils {
 		return now.toEpochSecond();
 	}
 
+	public static Long getSystemTimeInNanoSeconds() {
+		return System.nanoTime();
+	}
+
+	public static Long getCurrentTimeInEpochMilliSeconds() {
+		return System.currentTimeMillis();
+	}
+
 	public static Long addVarianceTime(long inputTime, long varianceSeconds) {
 		Long varianceTime = inputTime + varianceSeconds;
 		ZonedDateTime fromInput = ZonedDateTime.ofInstant(Instant.ofEpochSecond(varianceTime), zoneId);
