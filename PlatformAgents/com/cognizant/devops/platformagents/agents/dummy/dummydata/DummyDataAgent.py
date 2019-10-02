@@ -228,12 +228,15 @@ class DummyDataAgent(BaseAgent):
                     randonjirakey = 'LS-' + str(''.join([random.choice(string.digits) for n in xrange(10)]))
                     randonSprintStringId = 'ST-' + str(''.join([random.choice(string.digits) for n in xrange(3)]))
                     #print(randonSprintStringId)
-                    # Jira json configurations   2 15
-                    time_offset_jira = (random.randint(11, 30))
+                    # Jira json configurations
+                    time_offset_jira = (random.randint(01, 24))
+                    time_offset = (random.randint(101, 800))
+                    jira_date =(currentDate + datetime.timedelta(hours=time_offset_jira,seconds=time_offset))
+                    print(' jira date '+str(jira_date))
                     jiraSample ={}
-                    jiraSample['inSightsTimeX'] = currentDate.strftime("%Y-%m-%dT%H:%M:%SZ")
-                    jiraSample['jiraUpdated'] = (currentDate + datetime.timedelta(days=time_offset_jira)).strftime("%Y-%m-%dT%H:%M:%SZ")
-                    jiraSample['creationDate'] = currentDate.strftime("%Y-%m-%dT%H:%M:%SZ")
+                    jiraSample['inSightsTimeX'] = jira_date.strftime("%Y-%m-%dT%H:%M:%SZ")
+                    jiraSample['jiraUpdated'] = (jira_date + datetime.timedelta(days=time_offset_jira)).strftime("%Y-%m-%dT%H:%M:%SZ")
+                    jiraSample['creationDate'] = jira_date.strftime("%Y-%m-%dT%H:%M:%SZ")
                     jiraSample['inSightsTime'] = time_epoch
                     jiraSample['jiraCreator'] = random.choice(jira_creator)
                     jiraSample['jiraPriority'] = random.choice(jira_priority)
@@ -257,7 +260,7 @@ class DummyDataAgent(BaseAgent):
                     jira_count += 1
                     jira_data.append(jiraSample)
                     #print(jiraSample)
-                    jira_keyArr.append(randonjirakey)
+                    jira_keyArr.append(jiraSample)
                     #if randonSprintStringId not in jira_sprintArr:
                     #    jira_sprintArr.append(randonSprintStringId)
                 except Exception as ex:
@@ -277,26 +280,27 @@ class DummyDataAgent(BaseAgent):
             #print(len(jira_keyArr))
             git = 0
             git_CommitArr = []
-            for jirakey in jira_keyArr: 
+            for rangeNumber in range(0, len(jira_keyArr)) :
                 git_count = 0
-                print(jirakey)                
+                #print(jirakey)
+                jiraSampleData=jira_keyArr[rangeNumber]
                 while git_count != 50 : 
                    randonGitCommitId = 'CM-' + str(''.join([random.choice(string.digits) for n in xrange(10)])) 
                    time_offset = (random.randint(101, 800))
                    # GIT json configurations    10 2
                    #print("GIT 1")
-                   git_date = (currentDate + datetime.timedelta(seconds=time_offset))
+                   git_date = (datetime.datetime.strptime(jiraSampleData['inSightsTimeX'],"%Y-%m-%dT%H:%M:%SZ") + datetime.timedelta(seconds=time_offset))
                    git_datetime_epoch = int(time.mktime(git_date.timetuple()))
                    #print(git_datetime_epoch)
-                   #print('GIT Date '+str(git_date))
+                   print('GIT Date '+str(git_date))
                    gitSample = {}
                    gitSample['inSightsTimeX'] = git_date.strftime("%Y-%m-%dT%H:%M:%SZ")
                    gitSample['gitCommiTime'] = git_date.strftime("%Y-%m-%dT%H:%M:%SZ")
                    gitSample['inSightsTime'] = git_datetime_epoch
                    gitSample['gitCommitId'] = randomStr
                    if git_count < 26 :
-                       gitSample['jiraKey'] = jirakey
-                       gitSample['message'] = 'This commit is associated with jira-key : ' + str(jirakey)
+                       gitSample['jiraKey'] = jiraSampleData['jiraKey']
+                       gitSample['message'] = 'This commit is associated with jira-key : ' + str(jiraSampleData['jiraKey'])
                    gitSample['gitReponame'] = random.choice(repo)
                    gitSample['gitAuthorName'] = random.choice(author)
                    gitSample['repoName'] = random.choice(repo)
