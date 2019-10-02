@@ -348,7 +348,8 @@ class BaseAgent(object):
             scheduler = self.scheduler
             schedulerStatus = self.config.get('schedulerStatus', None)
             if schedulerStatus == 'UPDATE_SCHEDULE':
-                self.scheduledJob.reschedule('interval', seconds=60*self.runSchedule)
+                print("No Need to run again for dummy agent")
+                #self.scheduledJob.reschedule('interval', seconds=60*self.runSchedule)
             elif schedulerStatus == 'STOP':
                 scheduler.shutdown()
             elif schedulerStatus == 'PAUSE':

@@ -18,7 +18,7 @@ Created on Jun 15, 2016
 
 @author: 146414
 '''
-from RestCommunicationFacade import RestCommunicationFacade
+from com.cognizant.devops.platformagents.core.RestCommunicationFacade import RestCommunicationFacade
 class CommunicationFacade(object):
     def __init__(self):
         self = self
