@@ -182,7 +182,8 @@ class DummyDataAgent(BaseAgent):
                 #if sprint not in globle_sprintArr :
                 sprintStartDate = sprintEndDate
                 sprintEndDate=(sprintStartDate + datetime.timedelta(days=sprintDay))
-                self.printLog(sprint +'  '+str(sprintStartDate) +'  '+str(sprintEndDate), False)
+                if createSprintData:
+                    self.printLog(sprint +'  '+str(sprintStartDate) +'  '+str(sprintEndDate), False)
                 sprintSample['sprintName'] = random.choice(sprint_Name)
                 sprintSample['sprintId'] = sprint
                 sprintSample['state'] = random.choice(state)
@@ -223,20 +224,21 @@ class DummyDataAgent(BaseAgent):
             time_end = (random.randint(501, 800))
             
             self.printLog('Jira Started .... ', False)
-            # jira_count =[] 50
+            # jira_count =[] 
             jira_count = 0
             jira_keyArr = [] 
             jira_sprintArr = [] 
-            while jira_count != 1 :
+            while jira_count != 50 :
                 try:
                     randonjirakey = 'LS-' + str(''.join([random.choice(string.digits) for n in xrange(10)]))
                     randonSprintStringId = 'ST-' + str(''.join([random.choice(string.digits) for n in xrange(3)]))
                     #print(randonSprintStringId)
-                    # Jira json configurations
+                    #Jira json configurations
                     time_offset_jira = (random.randint(01, 24))
                     time_offset = (random.randint(101, 800))
                     jira_date =(currentDate + datetime.timedelta(hours=time_offset_jira,seconds=time_offset))
-                    self.printLog(' jira date '+str(jira_date), False)
+                    sprintNumber =random.choice(globle_sprintArr)
+                    self.printLog('sprintNumber '+sprintNumber+' jira date '+str(jira_date), False)
                     jiraSample ={}
                     jiraSample['inSightsTimeX'] = jira_date.strftime("%Y-%m-%dT%H:%M:%SZ")
                     jiraSample['jiraUpdated'] = (jira_date + datetime.timedelta(days=time_offset_jira)).strftime("%Y-%m-%dT%H:%M:%SZ")
@@ -245,7 +247,7 @@ class DummyDataAgent(BaseAgent):
                     jiraSample['jiraCreator'] = random.choice(jira_creator)
                     jiraSample['jiraPriority'] = random.choice(jira_priority)
                     jiraSample['jiraIssueType'] = random.choice(jira_issuetype)
-                    jiraSample['sprintId'] = random.choice(globle_sprintArr)
+                    jiraSample['sprintId'] = sprintNumber
                     jiraSample['jiraStatus'] = random.choice(jira_status)            
                     jiraSample['fixVersions'] = random.choice(jira_version)        
                     jiraSample['issueType'] = random.choice(issue_Type)
@@ -286,9 +288,9 @@ class DummyDataAgent(BaseAgent):
             git_CommitArr = []
             for rangeNumber in range(0, len(jira_keyArr)) :
                 git_count = 0
-                #print(jirakey) 50
+                #print(jirakey)
                 jiraSampleData=jira_keyArr[rangeNumber]
-                while git_count !=  5: 
+                while git_count !=  50: 
                    randonGitCommitId = 'CM-' + str(''.join([random.choice(string.digits) for n in xrange(10)])) 
                    time_offset = (random.randint(101, 800))
                    # GIT json configurations    10 2
@@ -302,7 +304,7 @@ class DummyDataAgent(BaseAgent):
                    gitSample['gitCommiTime'] = git_date.strftime("%Y-%m-%dT%H:%M:%SZ")
                    gitSample['inSightsTime'] = git_datetime_epoch
                    gitSample['gitCommitId'] = randomStr
-                   if git_count < 26 :
+                   if git_count < 1260 :
                        gitSample['jiraKey'] = jiraSampleData['jiraKey']
                        gitSample['message'] = 'This commit is associated with jira-key : ' + str(jiraSampleData['jiraKey'])
                    gitSample['gitReponame'] = random.choice(repo)
@@ -356,7 +358,7 @@ class DummyDataAgent(BaseAgent):
                     jenkinsSample['result'] = random.choice(result)
                     jenkinsSample['master'] = random.choice(master)
                     jenkinsSample['jenkins_date']=str(jenkins_date)
-                    if rangeNumber < 30 :
+                    if rangeNumber < 1260 :
                      jenkinsSample['scmcommitId'] = gitSampleData['commitId']
                     jenkinsSample['toolName'] = "JENKINS"
                     jenkinsSample['categoryName'] = "CI"
@@ -395,7 +397,7 @@ class DummyDataAgent(BaseAgent):
                     sonarSample['ProjectID'] = random.choice(projectId)
                     sonarSample['ProjectKey'] = random.choice(sonar_key)
                     sonarSample['resourceKey'] = random.choice(resourceKey)
-                    if rangeNumber < 25 :
+                    if rangeNumber < 1260 :
                         sonarSample['jenkineBuildNumber'] = jenkinsSampleData['buildNumber']
                     sonarSample['sonarKey']=ramdomSonarKey
                     sonarSample['sonarQualityGateStatus']= random.choice(sonar_quality_gate_Status)
@@ -435,7 +437,7 @@ class DummyDataAgent(BaseAgent):
                     rundeckSample['endTime'] = rundeck_endTime.strftime("%Y-%m-%dT%H:%M:%SZ")
                     rundeckSample['status'] = random.choice(status)
                     rundeckSample['environment'] = random.choice(rundeck_env)
-                    if rangeNumber < 25 :
+                    if rangeNumber < 1260 :
                         rundeckSample['jenkineBuildNumber'] = jenkinsSampleData['buildNumber']               
                     rundeckSample['toolName'] = "RUNDECK"
                     rundeckSample['categoryName'] = "DEPLOYMENT"
