@@ -79,15 +79,15 @@ public class QueryCachingServiceImpl implements QueryCachingService {
 		try {
 			StringBuilder stringBuilder = new StringBuilder();
 			Iterator<JsonElement> iterator = json.get(QueryCachingConstants.STATEMENTS).getAsJsonArray().iterator();
-			boolean checkModifier = false;
+			//boolean checkModifier = false;
 			while (iterator.hasNext()) {
 				stringBuilder = stringBuilder
 						.append(iterator.next().getAsJsonObject().get(QueryCachingConstants.STATEMENT).getAsString())
 						.append(QueryCachingConstants.NEW_STATEMENT);
-				checkModifier = validateModifierKeywords(stringBuilder.toString());
+				/*checkModifier = validateModifierKeywords(stringBuilder.toString());
 				if (checkModifier) {
 					return null;
-				}
+				}*/
 			}
 			String[] queriesArray = stringBuilder.toString().split(QueryCachingConstants.NEW_STATEMENT);
 			response = Neo4jDbHandler.executeCypherQueryMultiple(queriesArray);
@@ -135,13 +135,13 @@ public class QueryCachingServiceImpl implements QueryCachingService {
 
 				Iterator<JsonElement> iterator = requestJson.get(QueryCachingConstants.STATEMENTS).getAsJsonArray()
 						.iterator();
-				boolean checkModifier = false;
+				//boolean checkModifier = false;
 				while (iterator.hasNext()) {
 					statement = iterator.next().getAsJsonObject().get(QueryCachingConstants.STATEMENT).getAsString();
-					checkModifier = validateModifierKeywords(statement);
+					/*checkModifier = validateModifierKeywords(statement);
 					if (checkModifier) {
 						return null;
-					}
+					}*/
 					String statementWithoutTime = getStatementWithoutTime(statement, startTimeStr, endTimeStr);
 					tempStatementsCombination.append(statementWithoutTime);
 				}
@@ -184,14 +184,24 @@ public class QueryCachingServiceImpl implements QueryCachingService {
 					JsonObject saveCache = new JsonObject();
 
 					JsonObject graphResponse = null;
+					Long beforeQueryExecutionTime = InsightsUtils.getSystemTimeInNanoSeconds();
 					graphResponse = getNeo4jDatasourceResults(requestPayload);
+					String statements = requestJson.get(QueryCachingConstants.STATEMENTS).getAsJsonArray().toString();
+					Long afterQueryExecutionTime = InsightsUtils.getSystemTimeInNanoSeconds();
+					Long queryExecutionTimeInNanoSec = (afterQueryExecutionTime - beforeQueryExecutionTime);
 					saveCache.addProperty(QueryCachingConstants.QUERY_HASH, queryHash);
 					saveCache.addProperty(QueryCachingConstants.CACHING_TYPE, cachingType);
 					saveCache.addProperty(QueryCachingConstants.CACHING_VALUE, cachingValue);
 					saveCache.addProperty(QueryCachingConstants.START_TIME_RANGE, startTime);
 					saveCache.addProperty(QueryCachingConstants.END_TIME_RANGE, endTime);
+					saveCache.addProperty(QueryCachingConstants.START_TIME_IN_MS, startTime * 1000);
+					saveCache.addProperty(QueryCachingConstants.END_TIME_IN_MS, endTime * 1000);
+					saveCache.addProperty(QueryCachingConstants.CYPHER_QUERY, statements);
 					saveCache.addProperty(QueryCachingConstants.CACHE_RESULT, graphResponse.toString());
-					saveCache.addProperty(QueryCachingConstants.CREATION_TIME, currentTime);
+					saveCache.addProperty(QueryCachingConstants.CREATION_TIME, InsightsUtils.getCurrentTimeInSeconds());
+					saveCache.addProperty(QueryCachingConstants.QUERY_EXECUTION_TIME, queryExecutionTimeInNanoSec);
+					saveCache.addProperty(QueryCachingConstants.NEO4J_RESULT_CREATION_TIME,
+							InsightsUtils.getCurrentTimeInEpochMilliSeconds());
 
 					esDbHandler.queryES(sourceESCacheUrl, saveCache.toString());
 					log.debug("\n\nSaving Fetched Neo4j Results Into Elasticsearch!");
