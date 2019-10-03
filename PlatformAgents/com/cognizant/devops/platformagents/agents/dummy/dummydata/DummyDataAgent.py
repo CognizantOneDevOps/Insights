@@ -33,7 +33,7 @@ class DummyDataAgent(BaseAgent):
 
     def process(self):
     
-        print("DummyDataAgent processing started ")      
+        self.printLog("DummyDataAgent processing started ",True)      
         jiraSample = {
             "jiraStatus":"Completed",
             "jiraProjectName":"Knowledge Transfer",
@@ -150,18 +150,19 @@ class DummyDataAgent(BaseAgent):
         dataCount = self.config.get("dataCount")
         start_date_days = self.config.get("start_date_days")
         sleepTime= self.config.get("sleepTime")
+        createSprintData= self.config.get("createSprintData", False)
         currentDate= datetime.datetime.now() - datetime.timedelta(days=start_date_days)    
-        print(currentDate)
+        self.printLog(currentDate,True)
         flag = 1
         # To save the data count in tracking.json
         script_dir = os.path.dirname(__file__)
         #print(script_dir)
         file_path = os.path.join(script_dir, 'config.json')
-        print(file_path)
+        self.printLog(file_path, False)
         # Input your system path to tracking.json of DummyAgent          
         with open(file_path, "r") as jsonFile:  # Open the JSON file for reading
             data = json.load(jsonFile)  # Read the JSON into the buffer
-        print('Starting Agent!')
+        #self.printLog('Starting Agent!')
         #currentDT = datetime.datetime.now()
         #print(currentDT)
         record_count = 0  
@@ -169,32 +170,35 @@ class DummyDataAgent(BaseAgent):
         globle_sprintArr = []
         sprint_data = []
         
-        print('Jira sprint Started .... 50')
+        
+        self.printLog('Jira sprint Started .... 50', False)
         # sprint json configurations
         sprintEndDate=currentDate
         sprintDay=7
-        for rangeNumber in range(0, 150) :
-            sprint = 'ST-' + str(rangeNumber)
-            try:
+        numberOfSprint=150
+        try:
+            for rangeNumber in range(0,numberOfSprint ) :
+                sprint = 'ST-' + str(rangeNumber)
                 #if sprint not in globle_sprintArr :
-                    sprintStartDate = sprintEndDate
-                    sprintEndDate=(sprintStartDate + datetime.timedelta(days=sprintDay))
-                    print(sprint +'  '+str(sprintStartDate) +'  '+str(sprintEndDate))
-                    sprintSample['sprintName'] = random.choice(sprint_Name)
-                    sprintSample['sprintId'] = sprint
-                    sprintSample['state'] = random.choice(state)
-                    sprintSample['issueType'] = random.choice(issue_Type)
-                    sprintSample['sprintStartDate'] =sprintStartDate.strftime("%Y-%m-%dT%H:%M:%SZ")
-                    sprintSample['sprintEndDate'] = sprintEndDate.strftime("%Y-%m-%dT%H:%M:%SZ")
-                    sprint_data.append(sprintSample)
-                    globle_sprintArr.append(sprint)
-                    #print(sprintSample)
-            except Exception as ex:
-                print(ex)
-        metadata = {"labels" : ["Sprint"]}
-        print(len(sprint_data))
-        total_record_count =total_record_count + len(sprint_data)
-        self.publishToolsData(sprint_data, metadata)
+                sprintStartDate = sprintEndDate
+                sprintEndDate=(sprintStartDate + datetime.timedelta(days=sprintDay))
+                self.printLog(sprint +'  '+str(sprintStartDate) +'  '+str(sprintEndDate), False)
+                sprintSample['sprintName'] = random.choice(sprint_Name)
+                sprintSample['sprintId'] = sprint
+                sprintSample['state'] = random.choice(state)
+                sprintSample['issueType'] = random.choice(issue_Type)
+                sprintSample['sprintStartDate'] =sprintStartDate.strftime("%Y-%m-%dT%H:%M:%SZ")
+                sprintSample['sprintEndDate'] = sprintEndDate.strftime("%Y-%m-%dT%H:%M:%SZ")
+                sprint_data.append(sprintSample)
+                globle_sprintArr.append(sprint)
+                #print(sprintSample)
+            if createSprintData:
+                metadata = {"labels" : ["Sprint"]}
+                #self.printLog(len(sprint_data), False)
+                total_record_count =total_record_count + len(sprint_data)
+                self.publishToolsData(sprint_data, metadata)
+        except Exception as ex:
+                self.printLog(ex,True)
         
         while flag == 1 :
             jira_data = []
@@ -206,7 +210,7 @@ class DummyDataAgent(BaseAgent):
             #print(jira_data)
             # Run-time calculated variables
             currentDT = datetime.datetime.now()
-            print('currentDate '+str(currentDate))
+            self.printLog('currentDate '+str(currentDate),True)
             time_tuple = time.strptime(currentDate.strftime('%Y-%m-%d %H:%M:%S'), '%Y-%m-%d %H:%M:%S')
             #print(time_tuple)
             time_epoch = time.mktime(time_tuple)
@@ -218,12 +222,12 @@ class DummyDataAgent(BaseAgent):
             time_start = (random.randint(100, 500))
             time_end = (random.randint(501, 800))
             
-            print('Jira Started .... ')
-            # jira_count =[]
+            self.printLog('Jira Started .... ', False)
+            # jira_count =[] 50
             jira_count = 0
             jira_keyArr = [] 
             jira_sprintArr = [] 
-            while jira_count !=  50:
+            while jira_count != 1 :
                 try:
                     randonjirakey = 'LS-' + str(''.join([random.choice(string.digits) for n in xrange(10)]))
                     randonSprintStringId = 'ST-' + str(''.join([random.choice(string.digits) for n in xrange(3)]))
@@ -232,7 +236,7 @@ class DummyDataAgent(BaseAgent):
                     time_offset_jira = (random.randint(01, 24))
                     time_offset = (random.randint(101, 800))
                     jira_date =(currentDate + datetime.timedelta(hours=time_offset_jira,seconds=time_offset))
-                    print(' jira date '+str(jira_date))
+                    self.printLog(' jira date '+str(jira_date), False)
                     jiraSample ={}
                     jiraSample['inSightsTimeX'] = jira_date.strftime("%Y-%m-%dT%H:%M:%SZ")
                     jiraSample['jiraUpdated'] = (jira_date + datetime.timedelta(days=time_offset_jira)).strftime("%Y-%m-%dT%H:%M:%SZ")
@@ -264,7 +268,7 @@ class DummyDataAgent(BaseAgent):
                     #if randonSprintStringId not in jira_sprintArr:
                     #    jira_sprintArr.append(randonSprintStringId)
                 except Exception as ex:
-                    print(ex)
+                    self.printLog(ex,True)
             jiraMetadata = {"labels" : ["ALM"], "labels" : ["JIRA"]}
             #print(len(jira_data))
             total_record_count =total_record_count + len(jira_data)
@@ -275,16 +279,16 @@ class DummyDataAgent(BaseAgent):
             
             
             
-            print('GIT Started .... ')
+            self.printLog('GIT Started .... ', False)
             #print(jira_keyArr)
             #print(len(jira_keyArr))
             git = 0
             git_CommitArr = []
             for rangeNumber in range(0, len(jira_keyArr)) :
                 git_count = 0
-                #print(jirakey)
+                #print(jirakey) 50
                 jiraSampleData=jira_keyArr[rangeNumber]
-                while git_count != 50 : 
+                while git_count !=  5: 
                    randonGitCommitId = 'CM-' + str(''.join([random.choice(string.digits) for n in xrange(10)])) 
                    time_offset = (random.randint(101, 800))
                    # GIT json configurations    10 2
@@ -292,7 +296,7 @@ class DummyDataAgent(BaseAgent):
                    git_date = (datetime.datetime.strptime(jiraSampleData['inSightsTimeX'],"%Y-%m-%dT%H:%M:%SZ") + datetime.timedelta(seconds=time_offset))
                    git_datetime_epoch = int(time.mktime(git_date.timetuple()))
                    #print(git_datetime_epoch)
-                   print('GIT Date '+str(git_date))
+                   self.printLog(' jirakey '+ jiraSampleData['jiraKey'] +' jira Date '+jiraSampleData['inSightsTimeX'] +'  GIT Date '+str(git_date), False)
                    gitSample = {}
                    gitSample['inSightsTimeX'] = git_date.strftime("%Y-%m-%dT%H:%M:%SZ")
                    gitSample['gitCommiTime'] = git_date.strftime("%Y-%m-%dT%H:%M:%SZ")
@@ -317,7 +321,7 @@ class DummyDataAgent(BaseAgent):
             total_record_count =total_record_count + len(git_data)
             self.publishToolsData(git_data, gitMetadata)
             
-            print('Jenkins Started ....')
+            self.printLog('Jenkins Started ....', False)
             #print(git_CommitArr)
             #print(len(git_CommitArr))
             jenkins_count = 0 
@@ -331,7 +335,7 @@ class DummyDataAgent(BaseAgent):
                     randomJenkineBuildNumber = str(''.join([random.choice(string.digits) for n in xrange(10)]))
                     #print('a jenkine key '+randomJenkineBuildNumber +'  '+gitSampleData['inSightsTimeX']) #+'  '+gitSample['git_date']
                     jenkins_date = (datetime.datetime.strptime(gitSampleData['inSightsTimeX'],"%Y-%m-%dT%H:%M:%SZ") + datetime.timedelta(seconds=120))
-                    print('Jenkine Date '+str(jenkins_date))
+                    self.printLog('GIT Commit Id '+gitSampleData['commitId']+'  GIT Date '+ gitSampleData['inSightsTimeX'] +' Jenkine Date '+str(jenkins_date), False)
                     jenkins_startTime = (jenkins_date)
                     jenkins_endTime = (jenkins_date + datetime.timedelta(seconds=time_offset))
                     jenkine_epochtime=int(time.mktime(jenkins_date.timetuple()))
@@ -360,13 +364,13 @@ class DummyDataAgent(BaseAgent):
                     jenkins_keyArr.append(jenkinsSample)
                     jenkins_data.append(jenkinsSample)
                 except Exception as ex:
-                    print(ex)
+                    self.printLog(ex,True)
             jenkinsMetadata = {"labels" : ["CI"], "labels" : ["JENKINS"]}
-            print(len(jenkins_data))
+            #self.printLog(len(jenkins_data), False)
             total_record_count =total_record_count + len(jenkins_data)
             self.publishToolsData(jenkins_data, jenkinsMetadata)
             
-            print('Sonar Started ....')
+            self.printLog('Sonar Started ....', False)
             #print(jenkins_keyArr)
             #print(len(jenkins_keyArr))
             sonar_count = 0 
@@ -378,7 +382,7 @@ class DummyDataAgent(BaseAgent):
                 ramdomSonarKey =str(''.join([random.choice(string.digits) for n in xrange(10)]))
                 sonar_date = (datetime.datetime.strptime(jenkinsSampleData['inSightsTimeX'],"%Y-%m-%dT%H:%M:%SZ") + datetime.timedelta(seconds=120))
                 time_offset = (random.randint(101, 800))
-                print('Sonar Date '+str(sonar_date))
+                self.printLog('Jenkine build number '+jenkinsSampleData['buildNumber']+' Jenkine Date '+jenkinsSampleData['inSightsTimeX']+' Sonar Date '+str(sonar_date), False)
                 try:
                     sonar_startTime = sonar_date.strftime("%Y-%m-%dT%H:%M:%SZ")
                     sonar_endTime = (sonar_date + datetime.timedelta(seconds=time_offset)).strftime("%Y-%m-%dT%H:%M:%SZ")
@@ -403,14 +407,14 @@ class DummyDataAgent(BaseAgent):
                     sonarSample['categoryName'] = "CODEQUALITY"
                     sonar_data.append(sonarSample)
                 except Exception as ex:
-                    print(ex)
+                    self.printLog(ex,True)
                 #print(sonarSample)
             sonarMetadata = {"labels" : ["CODEQUALITY"], "labels" : ["SONAR"]}
             #print(len(sonar_data))
             total_record_count =total_record_count + len(sonar_data)
             self.publishToolsData(sonar_data, sonarMetadata)
             
-            print('Rundeck Started ....')
+            self.printLog('Rundeck Started ....', False)
             #print(jenkins_keyArr)
             #print(len(jenkins_keyArr))
             Rundeck_count = 0 
@@ -421,7 +425,7 @@ class DummyDataAgent(BaseAgent):
                     #print(jenkinsSampleData['buildNumber'])
                     rundeck_date = (datetime.datetime.strptime(jenkinsSampleData['inSightsTimeX'],"%Y-%m-%dT%H:%M:%SZ") + datetime.timedelta(seconds=120))
                     time_offset = (random.randint(101, 800))
-                    print('Runduck Date '+str(rundeck_date))
+                    self.printLog('Jenkine build number '+jenkinsSampleData['buildNumber']+' Jenkine Date '+jenkinsSampleData['inSightsTimeX']+' Runduck Date '+str(rundeck_date), False)
                     rundeck_startTime = rundeck_date
                     rundeck_endTime = (rundeck_date + datetime.timedelta(seconds=time_offset))
                     rundeckSample = {}
@@ -438,13 +442,13 @@ class DummyDataAgent(BaseAgent):
                     rundeck_data.append(rundeckSample)
                     #print(rundeckSample)
                 except Exception as ex:
-                    print(ex)
+                    self.printLog(ex,True)
             RundeckMetadata = {"labels" : ["DEPLOYMENT"], "labels" : ["RUNDECK"]}
             #print(len(rundeck_data))
             total_record_count =total_record_count + len(rundeck_data)
             self.publishToolsData(rundeck_data, RundeckMetadata)
         
-            print('Published data: ', record_count)
+            self.printLog('Published data: '+ str(record_count),True)
             record_count += 1
             currentDate += datetime.timedelta(days=1)
             #print(currentDate)
@@ -455,10 +459,10 @@ class DummyDataAgent(BaseAgent):
                 flag = 0
        
         currentCompletedDT = datetime.datetime.now()
-        print('Start Time      '+ str(currentDT))
-        print('Completed Time  ==== '+ str(currentCompletedDT))
-        print('Total Record count '+str(total_record_count))
-        print("Dummy Agent Processing Completed .....")
+        self.printLog('Start Time      '+ str(currentDT),True)
+        self.printLog('Completed Time  ==== '+ str(currentCompletedDT),True)
+        self.printLog('Total Record count '+str(total_record_count),True)
+        self.printLog("Dummy Agent Processing Completed .....",True)
                 
 if __name__ == "__main__":
     DummyDataAgent() 
