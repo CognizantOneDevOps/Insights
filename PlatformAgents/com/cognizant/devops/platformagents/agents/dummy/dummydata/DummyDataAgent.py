@@ -74,7 +74,7 @@ class DummyDataAgent(BaseAgent):
           "startTime": 1508341610,
           "projectName": "PaymentServices",
           "inSightsTimeX": "2017-10-18T15:46:50Z",
-          "status": "Failure",
+          "status": "Success",
           "toolName": "JENKINS",
           "projectID": "1002"
         }
@@ -222,7 +222,7 @@ class DummyDataAgent(BaseAgent):
             
             time_start = (random.randint(100, 500))
             time_end = (random.randint(501, 800))
-            
+            publish_message_count_loop=""
             self.printLog('Jira Started .... ', False)
             # jira_count =[] 
             jira_count = 0
@@ -272,10 +272,9 @@ class DummyDataAgent(BaseAgent):
                 except Exception as ex:
                     self.printLog(ex,True)
             jiraMetadata = {"labels" : ["ALM"], "labels" : ["JIRA"]}
-            #print(len(jira_data))
             total_record_count =total_record_count + len(jira_data)
             self.publishToolsData(jira_data, jiraMetadata)
-                           
+            publish_message_count_loop=publish_message_count_loop+' Jira Data='+str(len(jira_data))
             #print(jira_keyArr)
             #print(jira_sprintArr)
             
@@ -304,7 +303,7 @@ class DummyDataAgent(BaseAgent):
                    gitSample['gitCommiTime'] = git_date.strftime("%Y-%m-%dT%H:%M:%SZ")
                    gitSample['inSightsTime'] = git_datetime_epoch
                    gitSample['gitCommitId'] = randomStr
-                   if git_count < 1260 :
+                   if git_count < 2001 :
                        gitSample['jiraKey'] = jiraSampleData['jiraKey']
                        gitSample['message'] = 'This commit is associated with jira-key : ' + str(jiraSampleData['jiraKey'])
                    gitSample['gitReponame'] = random.choice(repo)
@@ -322,6 +321,7 @@ class DummyDataAgent(BaseAgent):
             #print(len(git_data))
             total_record_count =total_record_count + len(git_data)
             self.publishToolsData(git_data, gitMetadata)
+            publish_message_count_loop=publish_message_count_loop+' GIT Data='+str(len(git_data))
             
             self.printLog('Jenkins Started ....', False)
             #print(git_CommitArr)
@@ -341,13 +341,14 @@ class DummyDataAgent(BaseAgent):
                     jenkins_startTime = (jenkins_date)
                     jenkins_endTime = (jenkins_date + datetime.timedelta(seconds=time_offset))
                     jenkine_epochtime=int(time.mktime(jenkins_date.timetuple()))
+                    jenkine_status =random.choice(status)
                     jenkinsSample = {}
                     jenkinsSample['inSightsTimeX'] = (jenkins_date).strftime("%Y-%m-%dT%H:%M:%SZ")
                     jenkinsSample['inSightsTime'] = jenkine_epochtime
                     jenkinsSample['startTime'] = jenkins_startTime.strftime("%Y-%m-%dT%H:%M:%SZ")
                     jenkinsSample['endTime'] = jenkins_endTime.strftime("%Y-%m-%dT%H:%M:%SZ")
                     jenkinsSample['duration'] = (jenkins_endTime - jenkins_startTime).seconds
-                    jenkinsSample['status'] = random.choice(status)
+                    jenkinsSample['status'] = jenkine_status
                     #jenkinsSample['sprintID'] = random.choice(sprint)
                     jenkinsSample['buildNumber'] = randomJenkineBuildNumber
                     jenkinsSample['jobName'] = random.choice(job_name)
@@ -358,12 +359,13 @@ class DummyDataAgent(BaseAgent):
                     jenkinsSample['result'] = random.choice(result)
                     jenkinsSample['master'] = random.choice(master)
                     jenkinsSample['jenkins_date']=str(jenkins_date)
-                    if rangeNumber < 1260 :
-                     jenkinsSample['scmcommitId'] = gitSampleData['commitId']
+                    if rangeNumber < 2001 :
+                        jenkinsSample['scmcommitId'] = gitSampleData['commitId']
                     jenkinsSample['toolName'] = "JENKINS"
                     jenkinsSample['categoryName'] = "CI"
                     #print(jenkinsSample)
-                    jenkins_keyArr.append(jenkinsSample)
+                    if jenkine_status=="Success":
+                        jenkins_keyArr.append(jenkinsSample)
                     jenkins_data.append(jenkinsSample)
                 except Exception as ex:
                     self.printLog(ex,True)
@@ -371,10 +373,12 @@ class DummyDataAgent(BaseAgent):
             #self.printLog(len(jenkins_data), False)
             total_record_count =total_record_count + len(jenkins_data)
             self.publishToolsData(jenkins_data, jenkinsMetadata)
+            publish_message_count_loop=publish_message_count_loop+' Jenkins Data='+str(len(jenkins_data))
             
             self.printLog('Sonar Started ....', False)
             #print(jenkins_keyArr)
-            #print(len(jenkins_keyArr))
+            jenkine_success_build =len(jenkins_keyArr)
+            self.printLog('Jenkine Array size for success build '+str(jenkine_success_build),True)
             sonar_count = 0 
             for rangeNumber in range(0, len(jenkins_keyArr))  :
                 jenkinsSampleData = jenkins_keyArr[rangeNumber]
@@ -397,7 +401,7 @@ class DummyDataAgent(BaseAgent):
                     sonarSample['ProjectID'] = random.choice(projectId)
                     sonarSample['ProjectKey'] = random.choice(sonar_key)
                     sonarSample['resourceKey'] = random.choice(resourceKey)
-                    if rangeNumber < 1260 :
+                    if rangeNumber < (jenkine_success_build - 200) :
                         sonarSample['jenkineBuildNumber'] = jenkinsSampleData['buildNumber']
                     sonarSample['sonarKey']=ramdomSonarKey
                     sonarSample['sonarQualityGateStatus']= random.choice(sonar_quality_gate_Status)
@@ -415,6 +419,7 @@ class DummyDataAgent(BaseAgent):
             #print(len(sonar_data))
             total_record_count =total_record_count + len(sonar_data)
             self.publishToolsData(sonar_data, sonarMetadata)
+            publish_message_count_loop=publish_message_count_loop+' Sonar Data='+str(len(sonar_data))
             
             self.printLog('Rundeck Started ....', False)
             #print(jenkins_keyArr)
@@ -437,7 +442,7 @@ class DummyDataAgent(BaseAgent):
                     rundeckSample['endTime'] = rundeck_endTime.strftime("%Y-%m-%dT%H:%M:%SZ")
                     rundeckSample['status'] = random.choice(status)
                     rundeckSample['environment'] = random.choice(rundeck_env)
-                    if rangeNumber < 1260 :
+                    if rangeNumber < (jenkine_success_build - 200) :
                         rundeckSample['jenkineBuildNumber'] = jenkinsSampleData['buildNumber']               
                     rundeckSample['toolName'] = "RUNDECK"
                     rundeckSample['categoryName'] = "DEPLOYMENT"
@@ -449,8 +454,9 @@ class DummyDataAgent(BaseAgent):
             #print(len(rundeck_data))
             total_record_count =total_record_count + len(rundeck_data)
             self.publishToolsData(rundeck_data, RundeckMetadata)
+            publish_message_count_loop=publish_message_count_loop+' Rundeck Data='+str(len(rundeck_data))
         
-            self.printLog('Published data: '+ str(record_count),True)
+            self.printLog('Published data: '+ str(record_count) + " Details "+publish_message_count_loop,True)
             record_count += 1
             currentDate += datetime.timedelta(days=1)
             #print(currentDate)
