@@ -24,6 +24,7 @@ sudo echo GRAFANA_HOME=`pwd` | sudo tee -a /etc/environment
 sudo echo "export" GRAFANA_HOME=`pwd` | sudo tee -a /etc/profile
 . /etc/environment
 . /etc/profile
+cd grafana
 sudo wget https://platform.cogdevops.com/insights_install/installationScripts/latest/Ubuntu/packages/grafana/ldap.toml
 sudo cp ldap.toml $GRAFANA_HOME/conf/ldap.toml
 sudo wget https://platform.cogdevops.com/insights_install/installationScripts/latest/Ubuntu/packages/grafana/defaults.ini
