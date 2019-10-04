@@ -14,7 +14,7 @@
     "responseType": "JSON"
   },
   "loggingSetting": {
-    "logLevel": "WARN",
+    "logLevel": "DEBUG",
 	"maxBytes" : 5000000,
 	"backupCount" : 1000
   },
@@ -29,7 +29,7 @@
     "data": "DUMMY.DUMMYDATA.DATA",
     "health": "DUMMY.DUMMYDATA.HEALTH"
   },
-  "isDebugAllowed": false,
+  "isDebugAllowed": true,
   "subscribe": {
     "config": "DUMMY.DUMMYDATA.config"
   },
@@ -42,9 +42,12 @@
   "toolsTimeZone": "GMT",
   "isEpochTimeFormat" : false,
   
-  "runSchedule": 30,
+  "runSchedule": 3000,
   "useResponseTemplate": true,
   "timeStampField":"lastUpdated",
   "startFrom": "2016-10-10 00:01",
-  "dataCount": 10
+  "dataCount": 1,
+  "start_date_days":550,
+  "sleepTime":10,
+  "createSprintData":true
 }
