@@ -176,6 +176,9 @@ public class GrafanaUserDetailsUtil {
 		String loginApiUrl = ApplicationConfigProvider.getInstance().getGrafana().getGrafanaEndpoint() + "/login";
 		ClientResponse grafanaLoginResponse = RestHandler.doPost(loginApiUrl, loginRequestParams, null);
 		if (grafanaLoginResponse.getStatus() != 200) {
+			String response = grafanaLoginResponse.getEntity(String.class);
+			log.error("unable to getValidGrafanaSession ==== " + grafanaLoginResponse.getStatus() + "   response  "
+					+ response);
 			throw new InsightsCustomException(" user or password is incorrect ==== ");
 		}
 		return grafanaLoginResponse.getCookies();

@@ -42,6 +42,7 @@ import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.UniformInterfaceException;
 
+@Deprecated
 public final class InsightsConfiguration {
 	
 	//private static Logger log = LogManager.getLogger(InsightsConfiguration.class);
@@ -136,6 +137,7 @@ public final class InsightsConfiguration {
 		headers.put("Authorization", buildAuthenticationHeader());
 		String apiUrl = grafanaBaseUrl + "/api/datasources";
 		ClientResponse response = RestHandler.doGet(apiUrl, null, headers);
+		log.debug("Datasources apiUrl ==== " + apiUrl);
 		try {
 			JsonElement responceElement = new JsonParser().parse(response.getEntity(String.class));
 			if(responceElement.isJsonArray()) {
@@ -145,7 +147,7 @@ public final class InsightsConfiguration {
 					return;
 				}
 			}else {
-				log.info("Datasources are not configured.");
+				log.debug("Datasources are not configured.");
 				RestHandler.doPost(apiUrl, buildElasticSearchDataSourceRequest(), headers);
 				RestHandler.doPost(apiUrl, buildNeo4jDataSourceRequest(), headers);
 				return;
@@ -156,6 +158,8 @@ public final class InsightsConfiguration {
 			log.error("Datasouce not configured "+e.getMessage());
 		} catch (UniformInterfaceException e) {
 			log.error("Datasouce not configured "+e.getMessage());
+		} catch (Exception e) {
+			log.error("Datasouce not configured " + e);
 		}
 	}
 
