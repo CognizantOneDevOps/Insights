@@ -104,14 +104,5 @@ public class ToolsLayoutDAL extends BaseDAL{
 		return resultList;
 	}
 	
-	public List<String> getToolCategoryNames(String toolName) {
-		Query<String> createQuery = getSession().createQuery(
-				"SELECT DISTINCT TL.toolCategory FROM ToolsLayout TL WHERE TL.toolName = :toolName",
-				String.class);
-		createQuery.setParameter("toolName", toolName);
-		List<String> resultList = createQuery.getResultList();
-		terminateSession();
-		terminateSessionFactory();
-		return resultList;
-	}
+	
 }

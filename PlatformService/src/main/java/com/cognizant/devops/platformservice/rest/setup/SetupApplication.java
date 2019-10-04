@@ -83,7 +83,7 @@ public class SetupApplication {
 			return "{ \"message\": \"LDAPUser is null\"}";
 		}
 		ApplicationConfigProvider applicationConfig = ApplicationConfigProvider.getInstance();
-		applicationConfig.setLdapConfiguration(userData);
+		//applicationConfig.setLdapConfiguration(userData);
 		ApplicationConfigCache.updateConfigCahe();
 		return "{ message: \"User configured successfully\"}";
 	}

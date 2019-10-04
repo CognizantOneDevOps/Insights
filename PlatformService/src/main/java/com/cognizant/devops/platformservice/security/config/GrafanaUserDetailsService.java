@@ -20,9 +20,13 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.factory.PasswordEncoderFactories;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -34,7 +38,17 @@ public class GrafanaUserDetailsService implements UserDetailsService {
 	
 	@Override
 	public UserDetails loadUserByUsername(String login) throws UsernameNotFoundException {
-		return GrafanaUserDetailsUtil.getUserDetails(request);
+		BCryptPasswordEncoder encoder = passwordEncoder();
+		PasswordEncoder encoder1 = PasswordEncoderFactories.createDelegatingPasswordEncoder();
+		UserDetails user = GrafanaUserDetailsUtil.getUserDetails(request);
+		return new org.springframework.security.core.userdetails.User(user.getUsername(),
+				encoder.encode(user.getPassword()), user.getAuthorities());
+	}
+	
+	
+	@Bean
+	public BCryptPasswordEncoder passwordEncoder() {
+		return new BCryptPasswordEncoder();
 	}
 
 }

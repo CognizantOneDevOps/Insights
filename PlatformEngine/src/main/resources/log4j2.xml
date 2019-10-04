@@ -3,12 +3,12 @@
  
 	<Appenders>
 		<Console name="Console" target="SYSTEM_OUT">
-			<PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss} [%t] %-5p:: %m%n" />
+			<PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss} %p [%t]:%c{3}.%M()%L %-5p:: %m%n" />
 		</Console>
  
 		<RollingFile name="RollingFile" filename="${env:INSIGHTS_HOME}/logs/PlatformEngine/PlatformEngine.log"
 			filepattern="${env:INSIGHTS_HOME}/logs/PlatformEngine/log4j_PlatformEngine.log">
-			<PatternLayout pattern="%d{dd MMM yyyy HH:mm:ss,SSS} %p [%t]:%c{3}.%M()%L - %m%n" />
+			<PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss} %p [%t]:%c{3}.%M()%L %-5p:: %m%n" />
 			<Policies>
 				<SizeBasedTriggeringPolicy size="10 MB" />
 			</Policies>
@@ -17,11 +17,9 @@
  
 	</Appenders>
 		<Loggers>
-		<Logger name="com.cognizant" level="debug">
-				<AppenderRef ref="RollingFile" />
-		</Logger>
-		<Root level="error">
+		<Root level="debug">
 			<AppenderRef ref="RollingFile" />
+			<AppenderRef ref="Console" />
 		</Root>
 	</Loggers>
 </Configuration>

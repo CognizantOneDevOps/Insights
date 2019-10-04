@@ -272,7 +272,7 @@ public class ServicesHealthStatus {
 				
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			log.error("Error while getting component status "+e.getMessage());
 		}
 		return returnObject;
 	}

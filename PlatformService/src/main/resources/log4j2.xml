@@ -3,7 +3,7 @@
  
 	<Appenders>
 		<Console name="Console" target="SYSTEM_OUT">
-			<PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss} [%t] %-5p:: %m%n" />
+			<PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss} %p [%t]:%c{3}.%M()%L %-5p:: %m%n" />
 		</Console>
  
 		<RollingFile name="RollingFile" filename="${env:INSIGHTS_HOME}/logs/PlatformService/PlatformService.log"
@@ -14,16 +14,13 @@
 			</Policies>
 			<DefaultRolloverStrategy max="20" />
 		</RollingFile>
- 
+		
 	</Appenders>
 	
 	<Loggers>
-		<Logger name="com.cognizant" level="debug">
-				<AppenderRef ref="RollingFile" />
-		</Logger>
-		<Logger name="org" level="error">
-				<AppenderRef ref="RollingFile" />
-		</Logger>
-	</Loggers>
-
+             <Root level="debug">
+                     <AppenderRef ref="RollingFile" />
+                     <AppenderRef ref="Console" />
+              </Root>
+      </Loggers>
 </Configuration>

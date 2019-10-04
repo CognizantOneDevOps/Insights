@@ -36,6 +36,7 @@
      "lastUpdated": "lastUpdated"
   }
 },
+   "agentId" : "",
   "auth": "base64",
   "enableValueArray": false,
   "enableDataValidation": true,
@@ -48,6 +49,7 @@
   "timeStampField":"nex_lastupdated",
   "timeStampFormat":"%Y%m%d%H%M%S",
   "isEpochTimeFormat" : false,
+  
   "toolsTimeZone" : "GMT",
   "insightsTimeZone" : "Asia/Kolkata",
   "isDebugAllowed" : false,

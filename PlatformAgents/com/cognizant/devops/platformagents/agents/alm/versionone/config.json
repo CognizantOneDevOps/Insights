@@ -26,6 +26,7 @@
                         "LastUpdateDate": "LastUpdateDate"
                 }
   },
+  "agentId" :"",
   "runSchedule": 30,
   "toolCategory" : "ALM",
   "userid": "userid",
@@ -39,6 +40,7 @@
   "timeStampField":"LastUpdated",
   "timeStampFormat":"%Y-%m-%dT%H:%M:%S",
   "isEpochTimeFormat" : false,
+  
   "isDebugAllowed" : false,
   "enableDataValidation": true,
   "loggingSetting" : {

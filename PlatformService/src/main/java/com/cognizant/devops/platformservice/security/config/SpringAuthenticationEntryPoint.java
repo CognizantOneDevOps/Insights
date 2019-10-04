@@ -28,6 +28,8 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.stereotype.Component;
 
+import com.cognizant.devops.platformservice.rest.util.PlatformServiceUtil;
+
 @Component
 public class SpringAuthenticationEntryPoint implements AuthenticationEntryPoint {
 	static Logger log = LogManager.getLogger(SpringAuthenticationEntryPoint.class.getName());
@@ -36,7 +38,8 @@ public class SpringAuthenticationEntryPoint implements AuthenticationEntryPoint 
 	public void commence(HttpServletRequest request, HttpServletResponse response,
 			AuthenticationException authException) throws IOException, ServletException {
 		log.error(authException);
-		String msg = "{ \"error\" : { \"message\" : \"Invalid Credentials\"}}";
+		//String msg = "{ \"error\" : { \"message\" : \"Invalid Credentials\"}}";
+		String msg = PlatformServiceUtil.buildFailureResponse("Invalid Credentials").toString();
 		PrintWriter writer = response.getWriter();
 		writer.write(msg);
 		writer.flush();

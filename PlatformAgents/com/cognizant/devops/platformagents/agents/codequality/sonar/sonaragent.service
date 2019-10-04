@@ -1,0 +1,9 @@
+[Unit]
+Description=Ubuntu SonarAgent Service
+
+[Service]
+Type=forking
+ExecStart=/bin/bash /opt/insightsagents/PlatformAgents/sonar/__AGENT_KEY__/__AGENT_KEY__.sh
+
+[Install]
+WantedBy=multi-user.target

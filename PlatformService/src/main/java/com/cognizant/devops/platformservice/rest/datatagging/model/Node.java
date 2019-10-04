@@ -18,6 +18,7 @@ package com.cognizant.devops.platformservice.rest.datatagging.model;
 import java.util.ArrayList;
 import java.util.List;
 
+@Deprecated
 public class Node implements Comparable<Node> {
 
     private Node parent = null;

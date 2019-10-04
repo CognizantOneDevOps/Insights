@@ -20,7 +20,7 @@ Created on Jun 28, 2016
 '''
 import urllib2
 import xmltodict
-from com.cognizant.devops.platformagents.core.BaseAgent import BaseAgent
+from ....core.BaseAgent import BaseAgent
 
 class NexusAgent(BaseAgent):
     def process(self):

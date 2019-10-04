@@ -32,7 +32,9 @@ public class InferenceResultDetails {
 	private String expectedTrend;
 	private Long result;
 	private Long resultTime;
+	private String resultTimeX;
 	
+
 	public Long getKpiID() {
 		return kpiID;
 	}
@@ -122,5 +124,22 @@ public class InferenceResultDetails {
 	}
 	public void setResultTime(Long resultTime) {
 		this.resultTime = resultTime;
+	}
+
+	public String getResultTimeX() {
+		return resultTimeX;
+	}
+
+	public void setResultTimeX(String resultTimeX) {
+		this.resultTimeX = resultTimeX;
+	}
+	@Override
+	public String toString() {
+		return "InferenceResultDetails [kpiID=" + kpiID + ", name=" + name + ", action=" + action + ", schedule="
+				+ schedule + ", vector=" + vector + ", toolName=" + toolName + ", isComparisionKpi=" + isComparisionKpi
+				+ ", resultOutPutType=" + resultOutPutType + ", isGroupBy=" + isGroupBy + ", groupByName=" + groupByName
+				+ ", groupByField=" + groupByField + ", groupByFieldVal=" + groupByFieldVal + ", expectedTrend="
+				+ expectedTrend + ", result=" + result + ", resultTime=" + resultTime + ", resultTimeX=" + resultTimeX
+				+ "]";
 	}
 }

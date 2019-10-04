@@ -33,32 +33,39 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.web.WebApplicationInitializer;
 
 import com.cognizant.devops.platformcommons.config.ApplicationConfigCache;
+import com.cognizant.devops.platformservice.security.config.CrossScriptingFilter;
 /**
  * 
  * @author 146414
  * This class will initialize the config.json.
  */
-public class PlatformServiceInitializer implements WebApplicationInitializer  {
+public class PlatformServiceInitializer implements WebApplicationInitializer {
 	static Logger log = LogManager.getLogger(PlatformServiceInitializer.class.getName());
 
+	
 	@Override
 	public void onStartup(ServletContext servletContext) throws ServletException {
 		ApplicationConfigCache.loadConfigCache();
 		disableSslVerification();
 		InsightsConfiguration.doInsightsConfiguration();
+		servletContext.addFilter("CrossScriptingFilter", CrossScriptingFilter.class).addMappingForUrlPatterns(null,
+				false, "/*");
 	}
-	
+
 	private static void disableSslVerification() {
 	    try
 	    {
 	        // Create a trust manager that does not validate certificate chains
 	        TrustManager[] trustAllCerts = new TrustManager[] {new X509TrustManager() {
-	            public java.security.cert.X509Certificate[] getAcceptedIssuers() {
+	            @Override
+				public java.security.cert.X509Certificate[] getAcceptedIssuers() {
 	                return null;
 	            }
-	            public void checkClientTrusted(X509Certificate[] certs, String authType) {
+	            @Override
+				public void checkClientTrusted(X509Certificate[] certs, String authType) {
 	            }
-	            public void checkServerTrusted(X509Certificate[] certs, String authType) {
+	            @Override
+				public void checkServerTrusted(X509Certificate[] certs, String authType) {
 	            }
 	        }
 	        };
@@ -70,7 +77,8 @@ public class PlatformServiceInitializer implements WebApplicationInitializer  {
 
 	        // Create all-trusting host name verifier
 	        HostnameVerifier allHostsValid = new HostnameVerifier() {
-	            public boolean verify(String hostname, SSLSession session) {
+	            @Override
+				public boolean verify(String hostname, SSLSession session) {
 	                return true;
 	            }
 	        };
@@ -83,4 +91,5 @@ public class PlatformServiceInitializer implements WebApplicationInitializer  {
 	    	log.error(e);
 	    }
 	}
+
 }

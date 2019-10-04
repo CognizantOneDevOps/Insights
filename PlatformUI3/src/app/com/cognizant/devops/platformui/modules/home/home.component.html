@@ -1,0 +1,107 @@
+<!--
+*******************************************************************************
+ * Copyright 2019 Cognizant Technology Solutions
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License.  You may obtain a copy
+ * of the License at
+ * 
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ ****************************************************************************** -->
+
+<div class="container">
+  <mat-sidenav-container autosize fullscreen>
+    <mat-sidenav #sidenav class="sidenav" [style.height.%]="100" [style.width.%]="isExpanded ? leftNavWidthInPer:leftNavMinWidthInPer"
+      height="50%" mode="side" opened="true" autosize="true">
+      <div class="logoSetting">
+        <table class="logoTable">
+          <tr *ngIf="isExpanded">
+            <td>
+              <img mat-card-image align="left" (click)="showLandingPage()" height="51px" width="195px" src='icons/svg/homePage/Insights.png'
+                alt="Cognizant Insights log" class="insightLogo" />
+            </td>
+            <td>
+              <mat-icon (click)="onMenuClick()" class="material-icons-menu">menu</mat-icon>
+            </td>
+          </tr>
+          <tr *ngIf="!isExpanded" style="margin:auto;display:table-row;margin-right:auto;margin-left:30px;height:100%;">
+            <a (click)="onMenuClick()">
+              <img mat-card-image class="feviconIcon" height="40px" width="40px" align="center" src='icons/svg/homePage/menu_white_36.png'
+              />
+            </a>
+            <!--<mat-icon class="material-icons-menu">menu</mat-icon>-->
+          </tr>
+        </table>
+      </div>
+      <div class="headingPage">
+        <table class="headingTable">
+          <tr class="mat-line-heading" *ngIf="isExpanded">
+            <span title="{{userName}}"> Welcome: {{userName}} </span>
+          </tr>
+          <tr class="mat-line-heading" *ngIf="isExpanded">
+            <td class="arrange-horizontally-roledetail" [style.width.px]="leftNavWidthpx">
+              Role: <span class="roleName" title="You are the {{userRole}} for ({{selectedOrg}})"> {{userRole}}  <span class="orgNameInRole"> ({{selectedOrgName}}) </span></span>
+            </td>
+          </tr>
+          <tr *ngIf="!isExpanded">
+            <img mat-card-image class="feviconIcon" (click)="showLandingPage()" height="40px" align="center" src='icons/svg/homePage/Insights_Fevicon.png'
+            />
+            <!-- Insights_Fevicon.svg -->
+          </tr>
+        </table>
+      </div>
+      <div class="menu">
+        <table class="navtable">
+          <tbody>
+            <tr>
+              <mat-nav-list>
+                <app-menu-list-item *ngFor="let item of getNavItemsByFilter()" [item]="item" [depth]="depth" [isExpanded]="isExpanded" [selectedOrg]="selectedOrg"
+                  [showAdminTab]="showAdminTab" [leftNavWidthpx]="leftNavWidthpx"></app-menu-list-item>
+              </mat-nav-list>
+            </tr>
+        </table>
+      </div>
+      <div class="bottomnavg">
+        <div class="bottomButton">
+          <mat-nav-list *ngIf="isExpanded" class="arrange-horizontally-bottombutton">
+            <ng-container *ngFor="let itemBottom of navItemsBottom">
+              <a [attr.title]="itemBottom.title" mat-list-item class="mat-list-item-bottom" (click)="onItemSelected(itemBottom)">
+                <p matLine *ngIf="isExpanded" class="mat-line-bottom mat-list-text-bottom ">{{itemBottom.displayName}}</p>
+              </a>
+            </ng-container>
+          </mat-nav-list>
+          <mat-nav-list *ngIf="!isExpanded" class="navItemImageForCollpases">
+            <a *ngIf="!isExpanded" title="Logout" class="mat-list-item-bottom" (click)="logout()">
+              <img mat-card-image class="mat-icon ng-tns-c10-10 material-icons ng-star-inserted" height="24px" align="center" src='icons/svg/homePage/logout.png'
+              />
+            </a>
+          </mat-nav-list>
+        </div>
+        <div class="customerLogo" *ngIf="isExpanded">
+          <img mat-card-image align="left" height="67px" width="250px" class="customerLogoImage" [src]="insightsCustomerLogo" />
+        </div>
+        <div class="textCopyright" *ngIf="isExpanded">
+          © 2019 Cognizant Technologies Solutions Limited.
+          <br>All rights reserved.
+        </div>
+      </div>
+      </mat-sidenav>
+      <mat-sidenav-content class="mat-drawer-content">
+        <mat-toolbar *ngIf="isToolbarDisplay">
+          <span class="fill-remaining-space"></span>
+          <img height="31px" width="469px" align="right" src='icons/svg/homePage/PoweredBy.png' alt="Powered By Cognizant OneDevOps | Insights"
+            style="margin:auto;" />
+        </mat-toolbar>
+        <div>
+          <router-outlet></router-outlet>
+          <app-landing-page *ngIf="displayLandingPage" [isExpanded]="isExpanded"></app-landing-page>
+        </div>
+      </mat-sidenav-content>
+  </mat-sidenav-container>
+</div>

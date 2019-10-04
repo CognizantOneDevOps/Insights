@@ -20,7 +20,7 @@ Created on Jun 28, 2016
 '''
 #from time import mktime
 from dateutil import parser
-from com.cognizant.devops.platformagents.core.BaseAgent import BaseAgent
+from ....core.BaseAgent import BaseAgent
 
 class BitBucketCloudAgent(BaseAgent):
     def process(self):

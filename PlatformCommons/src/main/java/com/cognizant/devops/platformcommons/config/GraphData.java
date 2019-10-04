@@ -21,6 +21,7 @@ public class GraphData implements Serializable{
 	private String endpoint;
 	private String authToken;
 	private String boltEndPoint;
+	private Integer connectionExpiryTimeOut;
 	private Integer maxIdleConnections;
 	
 	public String getEndpoint() {
@@ -46,5 +47,11 @@ public class GraphData implements Serializable{
 	}
 	public void setMaxIdleConnections(Integer maxIdleConnections) {
 		this.maxIdleConnections = maxIdleConnections;
+	}
+	public Integer getConnectionExpiryTimeOut() {
+		return connectionExpiryTimeOut;
+	}
+	public void setConnectionExpiryTimeOut(Integer connectionExpiryTimeOut) {
+		this.connectionExpiryTimeOut = connectionExpiryTimeOut;
 	}
 }

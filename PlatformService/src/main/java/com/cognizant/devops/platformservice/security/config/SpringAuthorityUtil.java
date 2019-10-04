@@ -26,7 +26,7 @@ public class SpringAuthorityUtil {
 		try{
 			return SpringAuthority.valueOf(grafanaCurrentOrgRole.replaceAll("\\s", "_"));
 		}catch (Exception e) {
-			log.error("Unable to find grafana role in Spring Authority.", e);
+			log.error("Unable to find grafana role in Spring Authority.", e.getMessage());
 		}
 		return SpringAuthority.valueOf("Viewer");
 	}

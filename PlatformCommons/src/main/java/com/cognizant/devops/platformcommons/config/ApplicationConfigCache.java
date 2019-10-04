@@ -64,7 +64,7 @@ public class ApplicationConfigCache {
 	public static boolean loadConfigCache() {
 		if(System.getenv().get(ConfigOptions.INSIGHTS_HOME) == null){
 			log.error("INSIGHTS_HOME environment variable is not set.");
-			System.exit(0);
+			// System.exit(0);
 		}
 		File configFile = new File(ConfigOptions.CONFIG_FILE_RESOLVED_PATH);
 		StringBuffer json = new StringBuffer();
@@ -114,15 +114,17 @@ public class ApplicationConfigCache {
 	private static boolean initialize(String json) {
 		try {
 			Gson gson = new Gson();
+			JsonParser parser = new JsonParser();
+			JsonElement parsedJson = parser.parse(json);
 			JsonElement jsonElement = new JsonParser().parse(json);
 			if(jsonElement != null && jsonElement.isJsonObject()){
 				ApplicationConfigProvider config = gson.fromJson(jsonElement.getAsJsonObject(), ApplicationConfigProvider.class);
 				ApplicationConfigProvider.updateConfig(config);
 			}
 		} catch (JsonIOException e) {
-			log.error(e);
+			log.error(ConfigOptions.CONFIG_FILE + " is not formatted,Json parsing issue in file " + e);
 		} catch (JsonSyntaxException e) {
-			log.error(e);
+			log.error(ConfigOptions.CONFIG_FILE + " is not formatted,Json parsing issue in file " + e);
 		}
 		return false;
 	}

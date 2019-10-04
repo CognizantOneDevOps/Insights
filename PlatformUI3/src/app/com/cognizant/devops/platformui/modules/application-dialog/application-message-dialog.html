@@ -1,0 +1,66 @@
+<!--
+*******************************************************************************
+ * Copyright 2019 Cognizant Technology Solutions
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License.  You may obtain a copy
+ * of the License at
+ * 
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ ****************************************************************************** -->
+<!-- <div class="dialogHeaderBackground">
+    <table style="border-spacing:2px; height:100%; width: 100%">
+        <tr>
+            <td>
+                <mat-icon class="colouricon" [svgIcon]="svgCustomIcon" [ngStyle]="{height: '40px', width: '40px'}"></mat-icon>
+            </td>
+            <td>
+
+                <span class="gridheaderleft">{{dialogTitle}}</span>
+
+            </td>
+            <td>
+                <div layout layout-align="right" style="height:30px;text-align: right; color:white;margin:0px;padding: 0px 25px">
+                    <a (click)="closeShowDetailsDialog()" style="text-align: right;">
+                        <mat-icon svgIcon="close_dialog" [ngStyle]="{'width': '30px', 'height': '30px'}">
+                        </mat-icon>
+                    </a>
+                </div>
+            </td>
+        </tr>
+    </table>
+</div> -->
+
+
+<div [style.height.%]="25" class="arrange-horizontally-Dialog">
+    <div width="30%" class="AppDialogIconCss">
+        <mat-icon class="colouricon" [svgIcon]="svgCustomIcon"></mat-icon>
+    </div>
+    <div class="gridheadercenter">
+        {{dialogTitle}}
+    </div>
+    <div class="closeIconCss">
+        <a (click)="closeShowDetailsDialog()">
+            <mat-icon class="closeiconConf" svgIcon="close_dialog">
+            </mat-icon>
+        </a>
+    </div>
+</div>
+
+<mat-dialog-content [style.height.%]="35">
+    <div class="textPadding" [style.color]="colorCode" [innerHTML]="data.message"> </div>
+</mat-dialog-content>
+
+<mat-dialog-actions *ngIf="!isRedirect" class="mat-dialog-actions-button">
+    <button mat-raised-button (click)="onCloseClick()">OK</button>
+</mat-dialog-actions>
+
+<mat-dialog-actions *ngIf="isRedirect" class="mat-dialog-actions-button">
+    <button mat-raised-button (click)="onOkClick()">OK</button>
+</mat-dialog-actions>

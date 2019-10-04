@@ -22,17 +22,20 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.cognizant.devops.platformcommons.core.util.ValidationUtils;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformservice.agentmanagement.service.AgentConfigTO;
 import com.cognizant.devops.platformservice.agentmanagement.service.AgentManagementService;
 import com.cognizant.devops.platformservice.rest.util.PlatformServiceUtil;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 
 @RestController
 @RequestMapping("/admin/agentConfiguration")
@@ -46,6 +49,27 @@ public class InsightsAgentConfiguration {
 			@RequestParam String osversion, @RequestParam String configDetails, @RequestParam String trackingDetails) {
 		String message = null;
 		try {
+			message = agentManagementService.registerAgent(toolName, agentVersion, osversion, configDetails,
+					trackingDetails);
+		} catch (InsightsCustomException e) {
+			return PlatformServiceUtil.buildFailureResponse(e.toString());
+		}
+		return PlatformServiceUtil.buildSuccessResponseWithData(message);
+	}
+
+	@RequestMapping(value = "/2.0/registerAgent", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+	public @ResponseBody JsonObject registerAgentV2(@RequestBody String registerAgentJson) {
+		String message = null;
+
+		try {
+			String validatedResponse = ValidationUtils.validateRequestBody(registerAgentJson);
+			JsonParser parser = new JsonParser();
+			JsonObject registerAgentjson = (JsonObject) parser.parse(validatedResponse);
+			String toolName = registerAgentjson.get("toolName").getAsString();
+			String agentVersion = registerAgentjson.get("agentVersion").getAsString();
+			String osversion = registerAgentjson.get("osversion").getAsString();
+			String configDetails = registerAgentjson.get("configJson").getAsString();
+			String trackingDetails = registerAgentjson.get("trackingDetails").getAsString();
 			message = agentManagementService.registerAgent(toolName, agentVersion, osversion, configDetails,
 					trackingDetails);
 		} catch (InsightsCustomException e) {
@@ -78,11 +102,30 @@ public class InsightsAgentConfiguration {
 		return PlatformServiceUtil.buildSuccessResponseWithData(message);
 	}
 
-	@RequestMapping(value = "/startStopAgent", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public @ResponseBody JsonObject startStopAgent(@RequestParam String agentId, @RequestParam String action) {
+	@RequestMapping(value = "/2.0/updateAgent", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+	public @ResponseBody JsonObject updateAgent(@RequestBody String updateAgentJsonRequest) {
 		String message = null;
 		try {
-			message = agentManagementService.startStopAgent(agentId, action);
+			String validatedResponse = ValidationUtils.validateRequestBody(updateAgentJsonRequest);
+			JsonParser parser = new JsonParser();
+			JsonObject updateAgentJson = (JsonObject) parser.parse(validatedResponse);
+			String agentId = updateAgentJson.get("agentId").getAsString();
+			String toolName = updateAgentJson.get("toolName").getAsString();
+			String agentVersion = updateAgentJson.get("agentVersion").getAsString();
+			String osversion = updateAgentJson.get("osversion").getAsString();
+			String configDetails = updateAgentJson.get("configJson").getAsString();
+			message = agentManagementService.updateAgent(agentId, configDetails, toolName, agentVersion, osversion);
+		} catch (InsightsCustomException e) {
+			return PlatformServiceUtil.buildFailureResponse(e.toString());
+		}
+		return PlatformServiceUtil.buildSuccessResponseWithData(message);
+	}
+
+	@RequestMapping(value = "/startStopAgent", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+	public @ResponseBody JsonObject startStopAgent(@RequestParam String agentId, @RequestParam String toolName, @RequestParam String osversion, @RequestParam String action) {
+		String message = null;
+		try {
+			message = agentManagementService.startStopAgent(agentId, toolName, osversion, action);
 		} catch (InsightsCustomException e) {
 			return PlatformServiceUtil.buildFailureResponse(e.toString());
 		}
@@ -108,7 +151,7 @@ public class InsightsAgentConfiguration {
 		} catch (InsightsCustomException e) {
 			return PlatformServiceUtil.buildFailureResponse(e.toString());
 		}
-		return PlatformServiceUtil.buildSuccessResponseWithData(details);
+		return PlatformServiceUtil.buildSuccessResponseWithHtmlData(details);
 
 	}
 

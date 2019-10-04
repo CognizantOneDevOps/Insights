@@ -36,6 +36,8 @@
 	    }
 	  } 
   },
+"agentId": "",
+
 "auth": "NTLM",
 "toolCategory" : "SCM",
 "toolsTimeZone" : "Asia/Kolkata",
@@ -50,6 +52,7 @@
 "timeStampField":"commitDate",
 "timeStampFormat":"%Y-%m-%dT%H:%M:%S",
 "isEpochTimeFormat" : false,
+
 "startFrom" : "2017-01-01 01:01:01",
 "isDebugAllowed" : false,
 "loggingSetting" : {

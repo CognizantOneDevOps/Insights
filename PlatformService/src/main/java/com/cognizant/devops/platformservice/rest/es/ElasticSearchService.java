@@ -105,26 +105,7 @@ public class ElasticSearchService {
 					}
 				}
 			}
-			/*
-			 * ElasticSearchDBHandler dbHandler = new ElasticSearchDBHandler();
-			 * String url =
-			 * ApplicationConfigProvider.getInstance().getEndpointData().
-			 * getElasticSearchEndpoint()
-			 * +"/.kibana/dashboard/_search?fields=_id,title"; JsonElement
-			 * response = new JsonParser().parse(dbHandler.search(url));
-			 * if(response.isJsonObject()){ JsonObject jsonObject =
-			 * response.getAsJsonObject(); JsonArray jsonArray =
-			 * jsonObject.get("hits").getAsJsonObject().get("hits").
-			 * getAsJsonArray(); for(JsonElement entry : jsonArray){ JsonObject
-			 * data = entry.getAsJsonObject(); DashboardModel model = new
-			 * DashboardModel(); model.setId(data.get("_id").getAsString());
-			 * model.setTitle(data.get("fields").getAsJsonObject().get("title").
-			 * getAsJsonArray().get(0).getAsString());
-			 * model.setUrl(ApplicationConfigProvider.getInstance().
-			 * getEndpointData().getKibanaEndpoint()+"/app/kibana#/dashboard/"+
-			 * model.getId()+"?embed=true");
-			 * dashboardResponse.addDashboard(model); } }
-			 */
+
 		} catch (Exception e) {
 			log.error(e);
 		}
@@ -139,38 +120,6 @@ public class ElasticSearchService {
 				+ "/neo4j-index/_search?from=" + from + "&size=" + size + "&q=*" + query + "*";
 		return new GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create()
 				.toJson(new JsonParser().parse(dbHandler.search(url)));
-	}
-
-	@RequestMapping(value = "/copyKibana", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public String copyKibanaIndex(@RequestParam String from, @RequestParam String to) {
-		if (from == null || to == null || to.contains("localhost:9200")) {
-			return "Invalid Params";
-		}
-		ElasticSearchDBHandler dbHandler = new ElasticSearchDBHandler();
-		String dashboardFromUrl = from + "/.kibana/dashboard/_search?q=*&size=10000&from=0";
-		String dashboardToUrl = to + "/.kibana/dashboard/";
-		JsonObject dashboards = dbHandler.loadVisualization(dashboardFromUrl);
-		copyKibanaType(dashboards, dashboardToUrl);
-		// dbHandler.cloneVisualizations(dashboardToUrl, dashboards);
-
-		String visualizationsFromUrl = from + "/.kibana/visualization/_search?q=*&size=10000&from=0";
-		String visualizationsToUrl = to + "/.kibana/visualization/";
-		JsonObject visualizations = dbHandler.loadVisualization(visualizationsFromUrl);
-		copyKibanaType(visualizations, visualizationsToUrl);
-		// dbHandler.cloneVisualizations(visualizationsToUrl, visualizations);
-		return "Data Cloned";
-	}
-
-	private void copyKibanaType(JsonObject data, String baseUrl) {
-		ElasticSearchDBHandler dbHandler = new ElasticSearchDBHandler();
-		if (null != data.get("hits")) {
-			JsonArray asJsonArray = data.get("hits").getAsJsonObject().get("hits").getAsJsonArray();
-			for (JsonElement vizEle : asJsonArray) {
-				JsonObject viz = vizEle.getAsJsonObject();
-				dbHandler.cloneVisualizations(baseUrl + viz.get("_id").getAsString(),
-						viz.get("_source").getAsJsonObject());
-			}
-		}
 	}
 
 	private String grafanaUrl(String baseUrl) {

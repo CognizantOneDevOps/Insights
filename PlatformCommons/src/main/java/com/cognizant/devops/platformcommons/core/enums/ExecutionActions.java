@@ -16,5 +16,5 @@
 package com.cognizant.devops.platformcommons.core.enums;
 
 public enum ExecutionActions {
-	AVERAGE, COUNT, MINMAX
+	AVERAGE, COUNT, MINMAX, SUM
 }

@@ -20,7 +20,7 @@ Created on Jun 16, 2016
 '''
 from dateutil import parser
 import datetime
-from com.cognizant.devops.platformagents.core.BaseAgent import BaseAgent
+from ....core.BaseAgent import BaseAgent
 import logging
 
 class GitAgent(BaseAgent):

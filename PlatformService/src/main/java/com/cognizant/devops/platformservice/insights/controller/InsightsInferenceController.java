@@ -46,7 +46,7 @@ public class InsightsInferenceController{
 
 	@RequestMapping(value = "/inferences", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 	public  JsonObject getInferences( @RequestParam(value = "schedule", required = false, defaultValue = "DAILY")String schedule,String accessGroup) {
-		
+		LOG.debug(" inside getInferences call ============================================== ");
 		List<InsightsInference> inferences = insightsInferenceService.getInferenceDetails(schedule);
 		return PlatformServiceUtil.buildSuccessResponseWithData(inferences);
 

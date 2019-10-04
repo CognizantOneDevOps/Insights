@@ -16,15 +16,16 @@
 # install erlang
 echo "#################### Installing Erlang , required for Rabbit MQ ####################"
 sudo mkdir erlang && cd erlang
-sudo wget https://platform.cogdevops.com/insights_install/installationScripts/latest/RHEL/rabbitmq/erlang-20.0.5-1.el6.x86_64.rpm
-sudo yum install -y erlang-20.0.5-1.el6.x86_64.rpm
+sudo wget https://platform.cogdevops.com/insights_install/installationScripts/latest/RHEL/rabbitmq/erlang.rpm
+sudo rpm -ivh erlang.rpm
 echo "#################### Installing Rabbit MQ with configs and user creation ####################"
 sudo mkdir rabbitmq && cd rabbitmq
-sudo wget https://platform.cogdevops.com/insights_install/installationScripts/latest/RHEL/rabbitmq/rabbitmq-server-3.6.5-1.noarch.rpm
-sudo rpm --import https://platform.cogdevops.com/insights_install/installationScripts/latest/RHEL/rabbitmq/rabbitmq-signing-key-public.asc
-sudo yum install -y rabbitmq-server-3.6.5-1.noarch.rpm
-sudo wget https://platform.cogdevops.com/insights_install/installationScripts/latest/RHEL/rabbitmq/RabbitMQ-3.6.5.zip
-sudo unzip RabbitMQ-3.6.5.zip && cd RabbitMQ-3.6.5 && sudo cp rabbitmq.config /etc/rabbitmq/
+sudo wget https://platform.cogdevops.com/insights_install/installationScripts/latest/RHEL/rabbitmq/rabbitmq-server.noarch.rpm
+sudo wget https://platform.cogdevops.com/insights_install/installationScripts/latest/RHEL/rabbitmq/socat-1.7.3.2-2.el7.x86_64.rpm
+sudo rpm --import https://platform.cogdevops.com/insights_install/installationScripts/latest/RHEL/rabbitmq/rabbitmq-release-signing-key.asc
+sudo rpm -ivh *.rpm
+sudo wget https://platform.cogdevops.com/insights_install/installationScripts/latest/RHEL/rabbitmq/RabbitMQ.zip
+sudo unzip RabbitMQ.zip && cd RabbitMQ && sudo cp rabbitmq.config /etc/rabbitmq/
 sudo chkconfig rabbitmq-server on && sudo service rabbitmq-server start
 sudo rabbitmq-plugins enable rabbitmq_management
 sleep 15

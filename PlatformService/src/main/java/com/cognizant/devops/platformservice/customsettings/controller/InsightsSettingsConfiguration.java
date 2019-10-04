@@ -33,6 +33,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
 import com.cognizant.devops.platformdal.icon.Icon;
 import com.cognizant.devops.platformdal.icon.IconDAL;
 import com.cognizant.devops.platformdal.settingsconfig.SettingsConfiguration;
@@ -73,26 +74,30 @@ public class InsightsSettingsConfiguration {
 		InputStream inputStream = null;
 		String originalFilename = file.getOriginalFilename();
 		String fileExt = FilenameUtils.getExtension(originalFilename);
-		byte[] imageBytes = null;
-		try {
-			inputStream = new BufferedInputStream(file.getInputStream());
-			imageBytes = IOUtils.toByteArray(inputStream);
-		} catch (IOException e) {
-			LOG.error("Unable to upload custom logo",e);
+		if (fileExt.equalsIgnoreCase("png") && file.getSize() < 1048576) {
+			byte[] imageBytes = null;
+			try {
+				inputStream = new BufferedInputStream(file.getInputStream());
+				imageBytes = IOUtils.toByteArray(inputStream);
+			} catch (IOException e) {
+				LOG.error("Unable to upload custom logo", e);
+			}
+			Icon icon = new Icon();
+			icon.setIconId("logo");
+			icon.setImage(imageBytes);
+			icon.setFileName(originalFilename);
+			icon.setImageType(fileExt);
+			IconDAL dal = new IconDAL();
+			dal.addEntityData(icon);
+			String base64 = Base64.getEncoder().encodeToString(imageBytes);
+			ImageResponse imgResp = new ImageResponse();
+			imgResp.setEncodedString(base64);
+			imgResp.setImageType(fileExt);
+			return PlatformServiceUtil.buildSuccessResponseWithData(imgResp);
+		} else {
+			LOG.error("Invalid file  " + file.getName() + "  With extension  " + fileExt + " size " + file.getSize());
+			return PlatformServiceUtil.buildFailureResponse(PlatformServiceConstants.INVALID_FILE);
 		}
-			
-		Icon icon = new Icon();
-		icon.setIconId("logo");
-		icon.setImage(imageBytes);
-		icon.setFileName(originalFilename);
-		icon.setImageType(fileExt);
-		IconDAL dal = new IconDAL();
-		dal.addEntityData(icon);
-		String base64 = Base64.getEncoder().encodeToString(imageBytes);
-		ImageResponse imgResp = new ImageResponse();
-		imgResp.setEncodedString(base64);
-		imgResp.setImageType(fileExt);
-		return PlatformServiceUtil.buildSuccessResponseWithData(imgResp);
 	}
 
 

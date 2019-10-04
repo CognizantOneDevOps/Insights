@@ -149,7 +149,7 @@ public class OfflineDataProcessingExecutorTest extends TestCase {
     public void testIsQueryScheduledToRun() {
     	Long runSchedule = 720L;
     	String lastRunTime = "2018/07/16 05:50 PM";
-    	assertTrue(executor.isQueryScheduledToRun(runSchedule, lastRunTime));   			
+    	assertTrue(executor.isQueryScheduledToRun(runSchedule, lastRunTime, null));   			
     }
     
     /**
@@ -158,7 +158,7 @@ public class OfflineDataProcessingExecutorTest extends TestCase {
     public void testIsQueryScheduledToRunNegative() {
     	Long runSchedule = 720L;
     	String lastRunTime = "2018/07/17 04:50 PM";
-    	assertFalse(executor.isQueryScheduledToRun(runSchedule, lastRunTime));   			    	
+    	assertFalse(executor.isQueryScheduledToRun(runSchedule, lastRunTime, null));   			    	
     }
 
 }

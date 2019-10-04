@@ -1,0 +1,234 @@
+/*******************************************************************************
+ * Copyright 2019 Cognizant Technology Solutions
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License.  You may obtain a copy
+ * of the License at
+ * 
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ ******************************************************************************/
+
+
+
+.display-tree-invisible {
+    display: none;
+  }
+  
+.disable-list-style ul,
+.disable-list-style li {
+    margin-top: 0;
+    margin-bottom: 0;
+    list-style-type: none;
+}
+.noToolsData{
+    min-height:10vh;
+    background-color: white;
+    text-align: center;
+    border-radius: 0px 0px 10px 10px;
+    padding-top: 20px;
+}
+.linkTxt {  
+  cursor: pointer;
+}
+
+.mainText{
+    font-size: 14px;
+    color:  #00b140;
+    font-weight:bold;
+    vertical-align: middle;
+    width: 10%;
+    overflow: auto; 
+    padding-top: 8px;
+}
+
+.form-control {
+    padding: 6px 12px;
+    font-size: 13px;
+    background-color: white;
+    background-image: none;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
+    box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
+    -webkit-transition: border-color ease-in-out .15s,-webkit-box-shadow ease-in-out .15s;
+    -o-transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
+    transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
+    margin-left: 5px;
+    margin-bottom: 5px;
+    width: 80%;
+}
+
+.form-control-label {
+    padding: 6px 12px;
+    font-size: 13px;
+    background-color: white;
+    background-image: none;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
+    box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
+    -webkit-transition: border-color ease-in-out .15s,-webkit-box-shadow ease-in-out .15s;
+    -o-transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
+    transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
+    margin-left: 5px;
+    margin-bottom: 5px;
+    height: 100px;
+    width: 80%;
+}
+
+.input-disabled{
+    color: rgba(0,0,0,.38);
+    background-color:#e1e3e7;
+    display: block;
+    width: 60%;
+    padding: 6px 12px;
+    font-size: 13px;
+    background-image: none;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
+    box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
+    -webkit-transition: border-color ease-in-out .15s,-webkit-box-shadow ease-in-out .15s;
+    -o-transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
+    transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
+    width: 80%;
+}
+
+.input-disabled-label{
+    color: rgba(0,0,0,.38);
+    background-color:#e1e3e7;
+    display: block;
+    width: 60%;
+    padding: 6px 12px;
+    font-size: 13px;
+    background-image: none;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
+    box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
+    -webkit-transition: border-color ease-in-out .15s,-webkit-box-shadow ease-in-out .15s;
+    -o-transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
+    transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
+    height: 100px;
+    width: 80%;
+}
+
+.searchBtnStyle { 
+    vertical-align: center;
+    background-color: #0033A0;
+    color: white;
+    border: 1px solid #0033A0;
+    border-radius: 10px 10px 10px 10px;
+    padding: 5px;
+    font-size: 13px;
+}
+
+.btnAlign{
+    margin-right: 7px; 
+    float: right;
+}
+
+.arrange-horizontally {
+    -webkit-box-orient: horizontal;
+    -webkit-box-direction: normal;
+    -webkit-flex-direction: row;
+    flex-direction: row;
+    box-sizing: border-box;
+    display: -webkit-box;
+    display: -webkit-flex;
+    height: 40px;
+    margin-left: 7px;
+    margin-top: 10px;
+}
+
+.labelInfo{
+  font-size:13px;
+  padding-left: 10px;
+  color: black
+}
+
+.material-icons-action-button {
+    font-family: 'Material Icons';
+    font-weight: normal;
+    font-style: normal;
+    font-size: 24px;
+    line-height: 1;
+    letter-spacing: normal;
+    text-transform: none;
+    display: inline-block;
+    white-space: nowrap;
+    word-wrap: normal;
+    direction: ltr;
+    color: #0033A0
+}
+
+.input:nth-child(odd){
+    background-color:#FFFFFF !important;
+}
+
+.mat-row:nth-child(even){
+    background-color:#FFFFFF !important;
+}
+
+.mat-row:nth-child(odd){
+    background-color:#FFFFFF !important;
+}
+
+td.mat-cell{
+    border-bottom-width: 0px;
+    border-bottom-style: solid;
+}
+
+.listTable{
+    border-bottom-width: 1px !important;
+    border-bottom-style: solid !important;
+    padding-top:2px;
+    padding-bottom:2px;
+     line-height: 1.7em;
+}
+
+.subHeadingStyle{
+    background-color: #0033A0;
+    margin-top: 20px;
+    height: 30px;
+    border: 1px solid #0033A0;
+    border-radius: 10px 10px 10px 10px;
+    vertical-align: middle;
+}
+
+.subLabelInfo{
+  padding-left: 10px;
+  font-size:15px;
+  padding-left: 10px;
+  color: white;
+  padding-top: 5px;
+}
+
+::ng-deep .mat-checkbox-checked.mat-accent .mat-checkbox-background{
+    background-color: #5c068c !important;
+}
+
+::ng-deep .mat-checkbox-indeterminate.mat-accent .mat-checkbox-background{
+    background-color: #5c068c !important;
+}
+
+.wrnTxt{
+  color: #ff8f1c !important;
+  font-size: 13px !important;
+}
+
+.propertiesLabel{
+  color:#FF8F1C;
+  padding:2px
+}
+.tableCss{
+    vertical-align: top;
+    padding-top:10px;
+
+}

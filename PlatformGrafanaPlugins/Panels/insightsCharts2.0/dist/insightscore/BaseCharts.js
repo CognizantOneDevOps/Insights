@@ -39,12 +39,12 @@ System.register(['jquery', 'angular'], function(exports_1) {
                         //Check if the container is loaded. Once loaded, then initiate the google charts loader.
                         if (containerElem && google && google.charts) {
                             if (isEditChart) {
-                                google.charts.load('45', { 'packages': ['corechart', 'charteditor'] });
+                                google.charts.load('46', { 'packages': ['corechart', 'charteditor'] });
                                 google.charts.setOnLoadCallback(this.executeEditChart.bind(this));
                             }
                             else {
                                 if (this.chartModel.chartOptions) {
-                                    google.charts.load('45', { 'packages': ['corechart'] });
+                                    google.charts.load('46', { 'packages': ['corechart'] });
                                     google.charts.setOnLoadCallback(this.executeRenderChart.bind(this));
                                 }
                             }

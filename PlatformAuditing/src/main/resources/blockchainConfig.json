@@ -1,0 +1,56 @@
+{
+
+  "CA_URL" : "https://localhost:7054",
+
+  "ORDERER_NAME" : "orderer.cogdevops.com",
+
+  "ORDERER_URL" : "grpcs://localhost:7050",
+
+  "CHANNEL_NAME" : "mychannel",
+
+  "PEER_NAME" : "peer0.org1.cogdevops.com",
+
+  "PEER_URL" : "grpcs://localhost:7051",
+
+  "EVENTHUB_NAME" : "eventhub01",
+
+  "EVENTHUB_URL" : "grpcs://localhost:7051",
+
+  "CHAINCODE_NAME" : "insightsAudit",
+
+  "CHAINCODE_PATH" : "/chaincode/src/node",
+
+  "CHAINCODE_VERSION" : "1.0",
+
+  "USER_ORG" : "org1",
+
+  "USER_ORG_MSP" :"Org1MSP",
+
+  "USER_NAME" : "sampleuser",
+
+  "USER_KEYSTORE_PATH" : "FABRIC_HOME/ledger/ca.org1.cogdevops.com/msp/keystore",
+
+  "USER_KEYSTORE_NAME" : "123456789123456789123456789123456789123456789_sk",
+
+  "USER_SIGNCERT_PATH" : "FABRIC_HOME/ledger/ca.org1.cogdevops.com/msp/signcerts",
+
+  "USER_SIGNCERT_NAME" : "cert.pem",
+
+  "USER_SER_PATH" : "FABRIC_HOME/SDKFiles/users/",
+
+  "TLS_ENABLED" : true,
+
+  "USER_CA_TLSCERT" : "FABRIC_HOME/crypto-config/peerOrganizations/org1.cogdevops.com/ca/ca.org1.cogdevops.com-cert.pem",
+
+  "PEER_ORG_TLSPEM": "FABRIC_HOME/crypto-config/peerOrganizations/org1.cogdevops.com/tlsca/tlsca.org1.cogdevops.com-cert.pem",
+
+  "PEER_CLIENT_TLSCERT": "FABRIC_HOME/crypto-config/peerOrganizations/org1.cogdevops.com/users/User1@org1.cogdevops.com/tls/client.crt",
+
+  "PEER_CLIENT_TLSKEY": "FABRIC_HOME/crypto-config/peerOrganizations/org1.cogdevops.com/users/User1@org1.cogdevops.com/tls/client.key",
+
+  "ORDERER_TLS_PEM": "FABRIC_HOME/crypto-config/ordererOrganizations/cogdevops.com/orderers/orderer.cogdevops.com/msp/tlscacerts/tlsca.cogdevops.com-cert.pem",
+
+  "DATAMODEL_JSON_PATH" : "FABRIC_HOME/SDKFiles/datamodel.json",
+
+  "PROCESS_JSON_PATH" : "FABRIC_HOME/SDKFiles/Process.json"
+}

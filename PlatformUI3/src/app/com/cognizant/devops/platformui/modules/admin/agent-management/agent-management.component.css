@@ -1,0 +1,443 @@
+/*******************************************************************************
+ * Copyright 2019 Cognizant Technology Solutions
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License.  You may obtain a copy
+ * of the License at
+ * 
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ ******************************************************************************/
+
+.loading-indicator {
+  position: fixed;
+  z-index: 999;
+  height: 2em;
+  width: 2em;
+  overflow: show;
+  margin: auto;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+ }
+ 
+ .labelInfo{
+  font-size:13px;
+  padding-left: 10px;
+  color: black;
+}
+
+ 
+th:first-child { border-radius: 10px 0 0 0; }
+th:last-child { border-radius: 0 10px 0 0; }
+
+tr:last-child td:first-child { border-radius: 0 0 0 10px; }
+tr:last-child td:last-child { border-radius: 0 0 10px 0; }
+
+/*tr:nth-child(4n+0) {
+    background: #CCC;
+}
+
+tr:nth-child(3n+0) {
+    background: #999;
+}*/
+
+.mat-table {
+    font-family: inherit !important;  
+}
+
+.mat-table tbody{
+    background: unset !important;
+}
+
+.dynamic-table{
+    margin-bottom: 30px;
+    border-radius: 10px !important;
+}
+
+tr.mat-footer-row, tr.mat-row-dynamic{
+    height: 40px !important;
+    text-align: left !important;
+    vertical-align: middle;
+    width: 50%;
+}
+
+.dynamicTableHeaderCss {
+    background-color: #00B140;   
+    color: white;
+    font-size: 15px;
+    height: 40px;
+    margin: 0px;
+    padding:0px;
+    text-align: center;
+    font-weight: bold;
+}
+
+
+/*tr.mat-row-dynamic:nth-child(even){
+    background-color:#e1e3e7;
+}*/
+
+/*.mat-row-dynamic-data:nth-child(odd){
+    background-color:#FFFFFF;
+}
+*/
+.mat-row-dynamic-data{
+    height: 40px !important;
+    text-align: left !important;
+    vertical-align: middle;
+    width: inherit
+}
+
+.mat-row-upload-data{
+    height: 40px !important;
+    text-align: left !important;
+    vertical-align: middle;
+    margin-left: 15px;
+}
+
+.mat-row-icon-button{
+    height: 60px !important;
+    text-align: left !important;
+    vertical-align: middle;
+    width: inherit;
+    margin-right: 21px;
+    float: right;
+}
+
+.mat-cell-value-dynamic-data{
+    font-size: 13px;
+    height: 40px;
+    text-align: left;
+    font-family: inherit;
+    width: 100%;
+    padding-right: 10px;
+}
+.mat-button{
+	font-family: inherit !important; 
+    font-size: 15px;
+    font-weight: 500;
+    min-width: 50px;
+}
+
+.mat-cell-header{
+    font-size: 16px;
+    height: 40px;
+    text-align: left;
+    font-family: inherit;
+    width: 40%;
+    padding-left: 10px;
+    text-transform: capitalize;
+}
+
+.mat-cell-header-single{
+    font-size: 16px;
+    height: 40px;
+    text-align: left;
+    font-family: inherit;
+    padding-left: 4px;
+    margin-left: 19px;
+}
+
+.mat-cell-value{
+    font-size: 13px;
+    height: 40px;
+    text-align: left;
+    font-family: inherit;
+    width: 200px;
+    padding-left: 10px;
+    padding-right: 10px;
+    width: 80%;
+}
+
+.mat-cell-value-single{
+    font-size: 13px;
+    height: 40px;
+    text-align: left;
+    font-family: inherit;
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+.upload-main-text{
+    font-size: 16px;
+    color:  #00b140;
+    vertical-align:sub;
+    width: 10%;
+}
+
+.dynamic-table-body{
+    width: inherit;
+}
+
+.tableDiv{
+    padding-left: 20px;
+    padding-right: 20px;
+}
+
+.btnAlign{
+    /* margin-right: 1px;  */
+    float: right;
+    margin-left: 140px;
+}
+
+.mat-icon-message{
+    color: #ff4c4c;
+    height: 15px;
+    width: 15px;
+}
+
+.confirmation-message{
+    color: #ff4c4c;
+    text-align: center;
+    font-size: 20px;
+    padding-left: 25px;
+}
+
+.form-control {
+    display: block;
+    width: 100%;
+    padding: 6px 12px;
+    font-size: 14px;
+    line-height: 1.42857143;
+    color: #555;
+    background-color: #fff;
+    background-image: none;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    margin-left: 10px;
+}
+
+.form-control-select {
+    display: block;
+    padding-top: 6px;
+    padding-right: 12px;
+    padding-bottom: 6px;
+    padding-left: 12px;
+    font-size: 14px;
+    line-height: 1.42857143;
+    color: #555;
+    background-color: #fff;
+    background-image: none;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    margin-left: 10px;
+}
+
+.arrange-horizontally {
+    -webkit-box-orient: horizontal;
+    -webkit-box-direction: normal;
+    -webkit-flex-direction: row;
+    flex-direction: row;
+    box-sizing: border-box;
+    display: -webkit-box;
+    display: -webkit-flex;
+    margin-top: 10px;
+    height: 40px;
+}
+
+.button-row{
+    margin-bottom: 10px;
+}
+
+.form{
+    box-sizing: border-box;
+}
+
+.configureBut {
+    float: right;
+    background-color: #00B140 ;
+    margin-bottom: 10px;
+    margin-left: 10px;
+}
+
+.configureButIcon{
+    float: right;
+    margin-left: 10px;
+    margin-right: inherit;
+    font-size: 50px !important;
+}
+
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+::-webkit-scrollbar-thumb {
+    background-image: initial;
+    background-position-x: initial;
+    background-position-y: initial;
+    background-size: initial;
+    background-attachment: initial;
+    background-origin: initial;
+    background-clip: initial;
+    background-color: #cab7b7;
+}
+
+::-webkit-scrollbar-track {
+    border-radius: 10px;
+}
+
+
+
+.dataHead {
+    font-size: 14px !important;
+    color: black !important;
+    font-weight: 600
+}
+
+.theadCss {
+    font-size: 16px !important;
+    background-color:  #00B140 !important;
+}
+
+.tableHeader {
+    padding-top: 18px;
+    padding-bottom: 18px;
+}
+
+.tableHeadingStyle {
+    font-size: 16px;   
+    color: black;
+}
+
+.agentlistLabel {
+    vertical-align: middle !important;
+    text-transform: capitalize;
+    width: 25% !important;
+}
+
+.inputBoxCont {
+    border: 1px !important;
+    border-style: solid !important;
+    border-color: #9e9a9a  !important;
+    border-bottom-color: #9e9a9a !important;
+    background-color: white !important;
+    text-align: left !important;
+    height: 28px !important;
+    box-sizing: initial !important;
+    max-width: 100%;
+    font-size: 14px;
+    padding-left: 5px;
+    width: inherit;
+}
+
+.frmTxtarea {
+    width: 100%;
+    height: 200px;
+    font-size: 14px;
+    padding-left: 2px;
+    border: 1px !important;
+    border-style: solid !important;
+    border-color: #9e9a9a !important;
+    border-bottom-color: #9e9a9a !important;
+}
+
+.layout-row > .flex-30 {
+    -webkit-box-flex: 1;
+    -webkit-flex: 1 1 100%;
+    flex: 1 1 100%;
+    max-width: 30%;
+    max-height: 100%;
+    box-sizing: border-box;
+}
+
+.tbody tr {
+    height: 60px;
+    width: 100%;
+    background-color: white !important;
+    margin-bottom: 5px !important;
+}
+
+.agentConfigTable{
+    -webkit-box-orient: horizontal;
+    -webkit-box-direction: normal;
+    -webkit-flex-direction: row;
+    flex-direction: row;
+    box-sizing: border-box;
+    display: -webkit-box;
+    display: -webkit-flex;
+}
+
+
+.others{
+    -webkit-box-orient: horizontal;
+    -webkit-box-direction: normal;
+    -webkit-flex-direction: row;
+    flex-direction: row;
+    box-sizing: border-box;
+    display: -webkit-box;
+    display: -webkit-flex;
+}
+
+.mat-dialog-title {
+    margin: 0 0 10px;
+    display: block;
+    text-align: center;
+    color: #00B140;
+    font-family: inherit;
+}
+
+.mat-button-dialog {
+    font-family: inherit !important;
+    font-size: 15px;
+    font-weight: 500;
+    background-color: yellowgreen;
+    min-width: 50px;
+}
+
+.mat-dialog-content{
+    margin-top: 10px
+}
+
+.mat-dialog-actions{
+    float: center;
+}
+
+.arrange-vertically
+{
+    margin-top: 3px;
+}
+
+.mainText{
+    font-size: 15px;
+    color:  #00b140;
+    font-weight:bold;
+    vertical-align:sub;
+    width: 10%;
+    padding-left: 19px;
+    padding-top: 10px;
+}
+.input-file {
+    -webkit-appearance: initial;
+    background-color: initial;
+    padding: initial;
+    border: initial;
+    align-items: baseline;
+    color: #0033A0;
+    text-align: start;
+    height: 30px;
+}
+
+/* .mat-button-focus-overlay {
+   background-color:unset !important;
+  }
+
+  .mat-icon-button:focus{
+    box-shadow: 0 0 unset !important;
+    transition:none !important;
+    background-color: unset !important;
+    -webkit-tap-highlight-color:unset !important;
+}*/
+
+
+
+
+
+

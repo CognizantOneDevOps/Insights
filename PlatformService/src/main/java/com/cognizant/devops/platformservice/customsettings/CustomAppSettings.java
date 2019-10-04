@@ -44,8 +44,8 @@ public class CustomAppSettings {
 
 	private static Logger LOG = LogManager.getLogger(CustomAppSettings.class);
 
-	@Autowired
-	private HttpServletRequest request;
+	/*@Autowired
+	private HttpServletRequest request;*/
 
 	
 	

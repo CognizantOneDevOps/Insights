@@ -14,6 +14,8 @@
 # the License.
 #-------------------------------------------------------------------------------
 echo "Get required env varidables for Insights"
+sudo yum install wget -y
+sudo yum install unzip -y
 wget https://platform.cogdevops.com/insights_install/installationScripts/latest/RHEL/scripts/insights_first.sh -O insights_first.sh  && sh insights_first.sh
 echo "Installing Java"
 wget https://platform.cogdevops.com/insights_install/installationScripts/latest/RHEL/scripts/insights_java.sh -O insights_java.sh && sh insights_java.sh
@@ -24,7 +26,7 @@ wget https://platform.cogdevops.com/insights_install/installationScripts/latest/
 echo "Install Postgres"
 wget https://platform.cogdevops.com/insights_install/installationScripts/latest/RHEL/scripts/insights_postgres.sh -O insights_postgres.sh && sh insights_postgres.sh
 echo "Install Grafana"
-wget https://platform.cogdevops.com/insights_install/installationScripts/latest/RHEL/scripts/insights_grafana5.sh -O insights_grafana5.sh && sh insights_grafana5.sh
+wget https://platform.cogdevops.com/insights_install/installationScripts/latest/RHEL/scripts/insights_grafana.sh -O insights_grafana.sh && sh insights_grafana.sh
 echo "Install Python 2.7.11 with required libraries needed for Insights"
 wget https://platform.cogdevops.com/insights_install/installationScripts/latest/RHEL/scripts/insights_python.sh -O insights_python.sh && sh insights_python.sh
 echo "Install Erlang and RabbitMQ"

@@ -14,12 +14,12 @@
 # the License.
 #-------------------------------------------------------------------------------
 echo "Set up Agent_Daemon"
-cd /opt/ && mkdir insightsagents
+cd /opt/ && sudo mkdir insightsagents
 chmod -R 755 insightsagents/
 cd insightsagents
 export INSIGHTS_AGENT_HOME=`pwd`
-echo INSIGHTS_AGENT_HOME=`pwd` | tee -a /etc/environment
-echo "export" INSIGHTS_AGENT_HOME=`pwd` | tee -a /etc/profile
+echo INSIGHTS_AGENT_HOME=`pwd` |sudo tee -a /etc/environment
+echo "export" INSIGHTS_AGENT_HOME=`pwd` |sudo tee -a /etc/profile
 sudo mkdir AgentDaemon
 sudo mkdir PlatformAgents
 chmod -R 755 AgentDaemon
@@ -35,5 +35,5 @@ sudo chmod +x installdaemonagent.sh
 sudo mkdir /opt/agent20
 sudo mkdir /opt/agent20/download
 sudo chmod -R 777 /opt/agent20
-sh ./installdaemonagent.sh Linux
+sudo sh installdaemonagent.sh Linux
 

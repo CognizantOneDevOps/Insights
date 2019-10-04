@@ -25,15 +25,17 @@ import java.time.Duration;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
+import java.util.TimerTask;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.quartz.Job;
-import org.quartz.JobExecutionContext;
-import org.quartz.JobExecutionException;
+import org.apache.logging.log4j.core.config.plugins.convert.TypeConverters.CronExpressionConverter;
+import org.apache.logging.log4j.core.util.CronExpression;
 
+import com.cognizant.devops.platformcommons.config.ApplicationConfigCache;
 import com.cognizant.devops.platformcommons.constants.ConfigOptions;
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
 import com.cognizant.devops.platformcommons.core.util.InsightsUtils;
@@ -42,7 +44,6 @@ import com.cognizant.devops.platformcommons.dal.neo4j.GraphResponse;
 import com.cognizant.devops.platformcommons.dal.neo4j.Neo4jDBHandler;
 import com.cognizant.devops.platformengine.message.core.EngineStatusLogger;
 import com.cognizant.devops.platformengine.modules.offlinedataprocessing.model.DataEnrichmentModel;
-import com.cognizant.devops.platformengine.modules.users.EngineUsersModule;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
@@ -64,15 +65,21 @@ import com.google.gson.stream.JsonWriter;
  * @author 368419
  *
  */
-public class OfflineDataProcessingExecutor implements Job {
+public class OfflineDataProcessingExecutor extends TimerTask {
 	private static Logger log = LogManager.getLogger(OfflineDataProcessingExecutor.class);
 	private static final String DATE_TIME_FORMAT = "yyyy/MM/dd hh:mm a";
 	private static final String JSON_FILE_EXTENSION = "json";
+	private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DATE_TIME_FORMAT).withZone(InsightsUtils.zoneId);
 
 	@Override
-	public void execute(JobExecutionContext context) throws JobExecutionException {
-		executeOfflineProcessing();
-		EngineStatusLogger.getInstance().createEngineStatusNode("Offline Data Procesing completed",PlatformServiceConstants.SUCCESS);
+	public void run() {
+		try {
+			executeOfflineProcessing();
+			EngineStatusLogger.getInstance().createEngineStatusNode("Offline Data Procesing completed",PlatformServiceConstants.SUCCESS);
+		} catch (Exception e) {
+			EngineStatusLogger.getInstance().createEngineStatusNode("Offline Data Procesing has some issue",
+					PlatformServiceConstants.FAILURE);
+		}
 	}
 
 	public int executeOfflineProcessing() {
@@ -129,7 +136,7 @@ public class OfflineDataProcessingExecutor implements Job {
 						continue;
 					}
 					if (isQueryScheduledToRun(dataEnrichmentModel.getRunSchedule(),
-							dataEnrichmentModel.getLastExecutionTime())) {
+							dataEnrichmentModel.getLastExecutionTime(), dataEnrichmentModel.getCronSchedule())) {
 						Boolean successFlag = executeCypherQuery(cypherQuery, dataEnrichmentModel);
 						//Checks if query execution fails due to some exception, don't update lastExecutionTime 
 						if (successFlag) {
@@ -218,27 +225,41 @@ public class OfflineDataProcessingExecutor implements Job {
 	 * @param lastRunTime
 	 * @return
 	 */
-	public Boolean isQueryScheduledToRun(Long runSchedule, String lastRunTime) {
+	public Boolean isQueryScheduledToRun(Long runSchedule, String lastRunTime, String cronSchedule) {
 		// if lastExecutionTime property is not added in the json file, we'll
 		// execute the query by default
-		if (lastRunTime == null) {
+		if (lastRunTime == null && (cronSchedule == null || cronSchedule.trim().length() == 0)) {
 			return Boolean.TRUE;
 		}
-		DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DATE_TIME_FORMAT).withZone(InsightsUtils.zoneId);
 		ZonedDateTime dateTime = null;
 		ZonedDateTime now = ZonedDateTime.now(InsightsUtils.zoneId);
 		Long timeDifferenceInMinutes = null;
-		if (!lastRunTime.isEmpty()) {
+		if (lastRunTime != null && !lastRunTime.isEmpty()) {
 			dateTime = ZonedDateTime.parse(lastRunTime, formatter);
 		}
-		if (dateTime != null && now != null) {
-			Duration d = Duration.between(dateTime, now);
-			timeDifferenceInMinutes = d.abs().toMinutes();
-		}
-		if (timeDifferenceInMinutes > runSchedule) {
-			return Boolean.TRUE;
+		if(cronSchedule != null && cronSchedule.trim().length() > 0) {
+			try {
+				//"0 0 0 1 * ?"
+				CronExpression convert = new CronExpressionConverter().convert(cronSchedule);
+				if(dateTime == null) {
+					dateTime = now.minusDays(1); //If the last run time not present, compare the cron time against last 24 hours.
+				}
+				Date cronDate = convert.getNextValidTimeAfter(Date.from(dateTime.toInstant()));
+				if(cronDate.before(new Date())) {
+					return Boolean.TRUE;
+				}
+			} catch (Exception e) {
+				log.error("Unable to parse the CRON expression: "+cronSchedule, e);
+			}
+		}else {
+			if (dateTime != null && now != null) {
+				Duration d = Duration.between(dateTime, now);
+				timeDifferenceInMinutes = d.abs().toMinutes();
+			}
+			if (timeDifferenceInMinutes > runSchedule) {
+				return Boolean.TRUE;
+			}
 		}
 		return Boolean.FALSE;
 	}
-	
 }

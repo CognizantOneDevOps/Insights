@@ -23,6 +23,7 @@
 			"startDate" : "%Y-%m-%d"
   		}
    },	
+   "agentId" : "",
   "toolCategory": "ENVIRONMENT",
   "enableDataValidation": true,
   "toolsTimeZone": "GMT",
@@ -33,6 +34,7 @@
   "timeStampField": "launchTime",
   "timeStampFormat": "epoch",
   "isEpochTimeFormat" : false,
+  
   "pattern": "%Y-%m-%dT%H:%M:%S.%fZ",
   "dynamicTemplate": {
     "vpc_id": [

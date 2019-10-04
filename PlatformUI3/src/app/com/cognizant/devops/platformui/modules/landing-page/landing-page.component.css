@@ -1,0 +1,203 @@
+/*
+*******************************************************************************
+ * Copyright 2019 Cognizant Technology Solutions
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License.  You may obtain a copy
+ * of the License at
+ * 
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License. 
+ */
+
+.overflow1 {
+	max-height: 98%;
+	overflow-x: hidden;
+	overflow-y: hidden;
+}
+
+.headerdiv {
+	margin-top: 55px;
+	text-align: center;
+}
+
+.landingpageCssExpand {
+	overflow-x: hidden;
+	overflow-y: hidden;
+	
+}
+
+.landingpageCssCollapse {
+	overflow-x: hidden;
+	overflow-y: hidden;
+	 margin-left: 100px;
+	 margin-right: 100px;
+}
+
+.textcenter {
+	text-align: center;
+}
+
+​
+
+.fullscreenDiv {
+	background-color: white;
+	width: 100%;
+	height: auto;
+	bottom: 0px;
+	top: 0px;
+	left: 0;
+	position: absolute;
+}
+
+.bulletCss {
+	width: 5px;
+	height: 5px;
+	background-color: #0033A0;
+	border-radius: 50%;
+	text-align: right;
+}
+
+ul {
+	list-style: none;
+}
+
+ul li::before {
+	content: "\2022";
+	color: #0033A0;
+	font-weight: bold;
+	display: inline-block;
+	width: 1em;
+	margin-left: -1em;
+}
+
+.textCss {
+	color: #0033A0;
+	font-size: 25pt;
+	width: 400px;
+	margin-top: -25px
+}
+
+.textCssSmall {
+	color: #0033A0;
+	font-size: 13pt;
+	width: 400px;
+	margin-top: -25px
+}
+
+.BlackCss {
+	color: black;
+	font-size: 13pt;
+	width: 400px;
+	margin-top: -25px
+}
+
+.BlackCssColumn {
+	text-align: initial;
+	color: black;
+	font-size: 10.5pt;
+	width: 400px;
+	margin-top: -30pt;
+}
+
+.heading1 {
+	color: #00B140;
+	font-size: 25pt;
+}
+
+.heading2 {
+	color: #00B140;
+	font-size: 13pt;
+}
+
+.middleTextExpand {
+	color: #00B140;
+	font-size: 13pt;
+	padding-left: 192px;
+}
+
+.middleTextCollapse {
+	color: #00B140;
+	font-size: 13pt;
+	padding-left: 97px;
+}
+
+.bottomgreencode {
+	color: #00B140;
+	font-size: 13pt;
+	text-align: center;
+	margin-top: -100px;
+	/* margin-bottom: 500px; */
+	overflow: hidden;
+}
+
+sup {
+	vertical-align: super;
+	font-size: 18px;
+}
+
+.BlueColumn1 {
+	color: #0033A0;
+	font-size: 11pt;
+	margin-left: 140px;
+	margin-bottom: 10px;
+}
+
+.BlueColumn2 {
+	color: #0033A0;
+	font-size: 11pt;
+	margin-left: 292px;
+	margin-bottom: 10px;
+}
+
+.column-image {
+	position: absolute;
+	margin-bottom: 0px;
+	margin-top: 0px;
+	margin-left: 560px;
+	display: flex;
+	justify-content: left;
+}
+
+.topTxtCss {
+	margin-bottom: 5px;
+	margin-top: 5px;
+	display: inline-flex;
+	justify-content: left;
+	margin-left: 100px;
+}
+
+.shiftright {
+	padding-left: 50px;
+}
+
+@media screen and (max-width : 1366px) and (min-width: 600px)
+{
+  .table-text {
+    color: #00B140;
+    text-align: left;
+    margin-left: 9%;
+  }
+
+  .tableSection{
+    margin-left: -2%;
+  }
+}
+
+@media screen and (max-width: 1920px) and (min-width: 1380px)
+{
+  .table-text {
+    color: #00B140;
+    text-align: left;
+    margin-left: 20.5%;
+  }
+
+  .tableSection{
+    margin-left: 12.5%;
+  }
+}

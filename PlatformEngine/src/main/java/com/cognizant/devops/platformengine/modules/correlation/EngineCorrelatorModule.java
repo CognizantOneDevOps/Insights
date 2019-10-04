@@ -15,13 +15,13 @@
  ******************************************************************************/
 package com.cognizant.devops.platformengine.modules.correlation;
 
-import org.quartz.Job;
-import org.quartz.JobExecutionContext;
-import org.quartz.JobExecutionException;
+import java.util.TimerTask;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
 import com.cognizant.devops.platformengine.message.core.EngineStatusLogger;
-import com.cognizant.devops.platformengine.modules.users.EngineUsersModule;
 /**
  * 
  * @author Vishal Ganjare (vganjare)
@@ -29,16 +29,28 @@ import com.cognizant.devops.platformengine.modules.users.EngineUsersModule;
  * Entry point for correlation executor.
  *
  */
-public class EngineCorrelatorModule implements Job{
+public class EngineCorrelatorModule extends TimerTask {
 	private static boolean isCorrelationExecutionInProgress = false;
+	private static Logger log = LogManager.getLogger(EngineCorrelatorModule.class.getName());
 	
-	public void execute(JobExecutionContext context) throws JobExecutionException {
-		if(!isCorrelationExecutionInProgress) {
-			isCorrelationExecutionInProgress = true;
-			CorrelationExecutor correlationsExecutor = new CorrelationExecutor();
-			correlationsExecutor.execute();
-			isCorrelationExecutionInProgress = false;
-			EngineStatusLogger.getInstance().createEngineStatusNode("Correlation Execution Completed",PlatformServiceConstants.SUCCESS);
+	@Override
+	public void run() {
+		log.debug(" EngineCorrelatorModule start  ====");
+		try {
+			if(!isCorrelationExecutionInProgress) {
+				isCorrelationExecutionInProgress = true;
+				CorrelationExecutor correlationsExecutor = new CorrelationExecutor();
+				correlationsExecutor.execute();
+				isCorrelationExecutionInProgress = false;
+			}
+			EngineStatusLogger.getInstance().createEngineStatusNode("Correlation Execution Completed",
+					PlatformServiceConstants.SUCCESS);
+		} catch (Exception e) {
+			log.error("Error in correlation module " + e.getMessage());
+			EngineStatusLogger.getInstance().createEngineStatusNode("Correlation Execution has some issue  ",
+					PlatformServiceConstants.FAILURE);
 		}
+
+		log.debug(" EngineCorrelatorModule Completed ====");
 	}
 }
