@@ -1,0 +1,482 @@
+
+/********************************************************************************
+ * Copyright 2019 Cognizant Technology Solutions
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License.  You may obtain a copy
+ * of the License at
+ * 
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ ****************************************************************************** */
+
+:host ::ng-deep {
+  display: block;
+  font-size: 16px;
+  font-weight:400;
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  color: #393838;
+}
+
+.sidenav-container {
+  flex: 1;
+  color: #393838;
+}
+
+.sidenav{
+  color: white;
+}
+
+.white-icon {
+  fill: green;
+  fill: white;
+}
+
+.mat-list-item {
+  color: #bfbfbf;
+  opacity: 0.8;
+  font-size: 16px;
+  height: 30px !important;
+  font-family: inherit;
+}
+
+.mat-nav-list{
+  color: white;
+  opacity: 0.9;
+  font-size: 16px;
+  padding-top: 1px !important;
+  padding-bottom: 1px !important;
+  font-family:inherit;
+  height: 30px !important;
+
+}
+
+.mat-list-item-ripple{
+  height: 30px
+}
+
+.mat-list-item.active {
+  font-size: 18px !important;
+  font-weight:bolder !important;
+  color:#bfbfbf !important;
+  background-color: #0033A0;
+  font-family: inherit;
+}
+
+.mat-line.active{
+  color: #bfbfbf !important;
+  font-weight:900 !important;
+  font-size: inherit !important;
+  opacity: 1.0 !important;
+  filter: brightness(100%),contrast(100%) !important;
+  background-color: #0033A0;
+  font-family: inherit;
+}
+
+.mat-line{
+  color: #bfbfbf !important;
+  opacity: 0.8;
+  padding: 2px !important;
+  font-size: inherit !important;
+  font-family: inherit;
+}
+
+.mat-line-bottom{
+  color: #bfbfbf !important;
+  opacity: 0.8;
+  padding: 2px !important;
+  font-size: 14px !important;
+  font-family: inherit;
+}
+
+.mat-line-heading{
+  color: #bfbfbf !important;
+  opacity: 0.8;
+  padding-top: 0px !important;
+  padding-right: 5px !important;
+  padding-bottom: 0px !important;
+  margin-bottom: 15px!important;
+  margin-top :15px !important;
+  font-size: 16px;
+  height: 30px !important;
+}
+
+.headingTable{
+  height:100%; 
+  width: 100%;
+  padding-left: 16px !important;
+  padding-right: 16px !important;
+}
+
+.logoTable{
+  height:100%; 
+  width: 100%;
+  padding-left: 16px !important;
+  padding-right: 16px !important; 
+}
+
+.roleName{
+  color: white !important;
+  font-size: 17px!important;
+  font-weight: bold;
+  padding-left: 5px;
+}
+
+.arrange-horizontally-roledetail {
+    -webkit-box-orient: horizontal;
+    -webkit-box-direction: normal;
+    -webkit-flex-direction: row;
+    flex-direction: row;
+    box-sizing: border-box;
+    display: -webkit-box;
+    display: -webkit-flex;
+    white-space: nowrap;
+}
+.arrange-horizontally-bottombutton{
+    -webkit-box-orient: horizontal;
+    -webkit-box-direction: normal;
+    -webkit-flex-direction: row;
+    flex-direction: row;
+    box-sizing: border-box;
+    display: -webkit-box;
+    display: -webkit-flex;
+    white-space: nowrap !important;
+    padding-bottom: 10px !important;
+}
+.bottomButton{
+    border-bottom-style:solid;
+    border-bottom-color:#9e9a9a;
+    border-bottom-width:2px;
+    border-top-style: solid;
+    border-color:#9e9a9a;
+    border-top-width: 2px;
+    padding-bottom: 5px;
+    padding-top: 5px;
+    height: 21%;
+}
+.customerLogo{
+  height: 50%;
+  padding-top: 15px;
+  padding-bottom: 15px;
+  padding-left: 10px;
+  padding-right: 8px;
+  align-content: center;
+}
+
+.customerLogoImage{
+  display:flex;
+  margin:auto;
+  display:table-row;
+  margin-right:auto;
+  margin-left:auto;
+}
+
+.textCopyright{
+  height: 19%;
+  border-top-style: solid;
+  border-top-color:#9e9a9a;
+  border-top-width: 2px;
+  padding-bottom: 10px;
+  color: #9e9a9a;
+  font-size: 10px;
+  padding-top: 10px;
+  text-align: center;
+  padding-left: 1
+}
+
+.orgNameInRole{
+  color: white !important;
+  font-size: 15px!important;
+  font-weight: bold;
+  padding-left: 1px;
+}
+
+.mat-list-text{
+  font-weight:500; 
+  font-size: 16px;
+  font-family: inherit;
+}
+
+.mat-list-text-bottom{
+  font-weight:500; 
+  font-size: 13px;
+  font-family: inherit;
+}
+
+.mat-list-item-content{
+  height: 30px !important; 
+  font-family: inherit;
+  padding-top: 0px;
+  padding-right: 0px !important;
+  padding-bottom: 0px;
+  padding-left: 0px !important;
+}
+
+.mat-list-item-bottom{
+    padding-top: 0px !important;
+    padding-right: 0px !important;
+    padding-bottom: 0px !important;
+    padding-left: 0px !important;
+    border-right-style: solid;
+    border-right-width: 2px;
+    border-right-color: #9e9a9a;
+}
+
+
+.mat-list-item-bottom:last-child{
+    border-right-style: solid;
+    border-right-width: 0px;
+    border-right-color: #9e9a9a;
+}
+
+.bottomMenuLine{
+  border-right-style: solid;
+}
+
+.mat-line-child{
+  color: #f7f3f3 !important;
+  opacity: 0.8;
+  padding: 2px !important;
+}
+
+.mat-drawer{
+  background:#383737;
+  overflow-x: hidden;
+  overflow-y: hidden;
+  /*bottom: -150px;*/
+}
+
+.mat-drawer-content,mat-sidenav-content {
+    z-index: 1;
+    height: 100%;
+    background-color: #dedbdb;
+}
+
+.webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+.mat-toolbar {
+  opacity: 0.9;
+  background: #1e2028;
+  color: white;
+  padding-right: 25px;
+  height:55px !important;
+}
+
+.mat-toolbar-row, .mat-toolbar-single-row {
+    height: 40px;
+}
+
+.mat-card-image,.mat-card-image:first-child{
+ align-items: center;
+ width: auto;
+ margin-top: 0px;
+}
+
+.sidenav-content {
+  display: flex;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  background-color: #393838;
+  opacity: 0.9;
+}
+
+.toolbar {
+    z-index: 1;
+}
+
+.mat-icon{
+  align-items: flex-end;
+  cursor: pointer;
+}
+
+.fill-remaining-space {
+  /* This fills the remaining space, by using flexbox. 
+     Every toolbar row uses a flexbox row layout. */
+  flex: 1 1 auto;
+  text-align: right;
+}
+
+.routeIcon {
+  margin-right: 4px;
+}
+
+.active-class { 
+  color: red; 
+}
+
+
+
+.navtable{
+  table-layout: auto;
+  width: 100%;
+}
+
+
+
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+::-webkit-scrollbar-thumb {
+    background-image: initial;
+    background-position-x: initial;
+    background-position-y: initial;
+    background-size: initial;
+    background-attachment: initial;
+    background-origin: initial;
+    background-clip: initial;
+    background-color: #676666;
+}
+
+::-webkit-scrollbar-track {
+    border-radius: 10px;
+}
+
+.routeroutlet{
+  margin-right: 16px !important;
+  margin-left: 16px !important;
+}
+.navItemImageForCollpases{
+  margin-left: 30px;
+  margin-top: 8px;
+}
+
+@media screen and (max-width : 1366px) and (min-width: 600px)
+{
+  .logoSetting{
+    margin-top: 2px;
+    height: 10%;
+  }
+
+  .headingPage{
+    height: 10%;
+    padding-bottom: 10px;
+    border-bottom-style:solid;
+    border-bottom-color:#9e9a9a;
+    border-bottom-width:2px;
+  }
+
+  .bottomnavg {
+    flex-direction: column !important;
+    bottom: 0 !important;
+    display: flex;
+    width: 100%;
+    overflow: hidden;
+    height:30%;
+  }
+
+  .menu{
+    width: 100%;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    height: 48%;
+  }
+
+  .mat-divider{
+    border-top-color: #9e9a9a;
+    margin-top:5px; 
+    height: 1%
+  }
+
+  .material-icons-menu {
+    font-family: 'Material Icons';
+    font-weight: normal;
+    font-style: normal;
+    font-size: 35px;
+    line-height: 1;
+    letter-spacing: normal;
+    text-transform: none;
+    display: inline-block;
+    white-space: nowrap;
+    word-wrap: normal;
+    direction: ltr;
+}
+}
+
+@media screen and (max-width: 1920px) and (min-width: 1380px)
+{
+  .logoSetting{
+    margin-left: 16px;
+    margin-right: 26px;
+    margin-top: 2px;
+    height: 8%;
+  }
+
+  .headingPage{
+    height: 7%;
+    border-bottom-style:solid;
+    border-color:#9e9a9a;
+    border-bottom-width:2px;
+  }
+
+  .bottomnavg {
+    flex-direction: column !important;
+    bottom: 0 !important;
+    display: flex;
+    width: 100%;
+    overflow: hidden;
+    height:24%;
+  }
+
+  .menu{
+    width: 100%;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    height: 60%;
+  }
+
+  .mat-divider{
+    border-top-color: #9e9a9a;
+    margin-top:10px; 
+    height: 1%
+  }
+
+  .material-icons-menu {
+    font-family: 'Material Icons';
+    font-weight: normal;
+    font-style: normal;
+    font-size: 35px;
+    line-height: 1;
+    letter-spacing: normal;
+    text-transform: none;
+    display: inline-block;
+    white-space: nowrap;
+    word-wrap: normal;
+    direction: ltr;
+    margin-left: 13px;
+}
+}
+.feviconIcon{
+  margin:auto;
+  display:block;
+  align-items: center;
+  cursor: pointer;
+}
+.insightLogo{
+  margin:auto;
+  display:table-row;
+  margin-right:auto;
+  margin-left:auto;
+  cursor: pointer;
+}
+
+

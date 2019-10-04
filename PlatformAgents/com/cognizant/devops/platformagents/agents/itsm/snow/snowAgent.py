@@ -25,7 +25,7 @@ import os
 import requests
 from dateutil import parser
 import datetime, time
-from core.BaseAgent import BaseAgent
+from ....core.BaseAgent import BaseAgent
 import logging.handlers
 
 class snowAgent(BaseAgent):

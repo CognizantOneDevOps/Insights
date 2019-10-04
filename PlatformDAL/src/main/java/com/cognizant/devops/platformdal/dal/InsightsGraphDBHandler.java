@@ -18,8 +18,11 @@ package com.cognizant.devops.platformdal.dal;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
-import org.apache.commons.collections.IteratorUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.neo4j.driver.internal.value.NodeValue;
 import org.neo4j.driver.internal.value.RelationshipValue;
 import org.neo4j.driver.v1.Record;
@@ -31,6 +34,8 @@ import org.neo4j.driver.v1.types.Node;
 import org.neo4j.driver.v1.types.Relationship;
 
 public class InsightsGraphDBHandler implements BaseGraphDBHandler {
+	private static final Logger log = LogManager.getLogger(InsightsGraphDBHandler.class);
+
 
 	public InsightsGraphDBHandler() {
 	}
@@ -187,7 +192,7 @@ public class InsightsGraphDBHandler implements BaseGraphDBHandler {
 		while(result.hasNext()) {
 			Record record = result.next();
 			Iterable<String> keys = record.keys();
-			System.out.println(keys);
+			log.debug(keys);
 			Iterator<String> keyItr = keys.iterator();
 			Node node =  null;
 			Relationship relation = null;
@@ -200,7 +205,13 @@ public class InsightsGraphDBHandler implements BaseGraphDBHandler {
 					node = ((NodeValue)o).asNode();
 					graphNode = new InsightsGraphNode();
 					
-					graphNode.setLabels(IteratorUtils.toList(node.labels().iterator()));
+					Iterable<String> nodeLabel = node.labels(); //.iterator()
+					List<String> labelList =(List<String>) StreamSupport
+							.stream(nodeLabel.spliterator(), false)
+							.collect(Collectors.toList());
+					
+					log.debug(" labelList ==== "+labelList.toString()); 				
+					graphNode.setLabels(labelList);
 					graphNode.setPropertyMap(node.asMap());
 					
 					if(relation != null && node.id() == relation.startNodeId()) {

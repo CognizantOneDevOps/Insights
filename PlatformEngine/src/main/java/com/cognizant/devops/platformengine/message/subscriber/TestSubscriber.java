@@ -22,7 +22,6 @@ public class TestSubscriber {
 			AgentDataSubscriber sb = new AgentDataSubscriber("#");
 			//MessagePublisherFactory.publish("VISHAL.GANJARE", "This is my data");
 		} catch (Exception e) {
-			e.printStackTrace();
 		}
 	}*/
 

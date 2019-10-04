@@ -37,72 +37,11 @@ import com.google.gson.JsonObject;
 public class EntityDefinitionService {
 	static Logger log = LogManager.getLogger(GraphDBService.class.getName());
 
-	@RequestMapping(value = "/addEntityDefinition", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public JsonObject addEntityDefinition(@RequestParam int rowId, @RequestParam String levelName, @RequestParam String entityName) {
-		EntityDefinitionDAL entityDefinitionDAL = new EntityDefinitionDAL();
-		boolean status = entityDefinitionDAL.saveEntityDefinition(rowId, levelName, entityName);
-		if (status) {
-			return PlatformServiceUtil.buildSuccessResponse();
-		} else {
-			return PlatformServiceUtil.buildFailureResponse("Unable to add Entity Definition for the request");
-		}
-	}
-
-	@RequestMapping(value = "/removeEntityDefinition", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public @ResponseBody JsonObject removeEntityDefinition(@RequestParam String levelName,
-			@RequestParam String entityName) {
-		EntityDefinitionDAL entityDefinitionDAL = new EntityDefinitionDAL();
-		return PlatformServiceUtil
-				.buildSuccessResponseWithData(entityDefinitionDAL.deleteEntityDefinition(levelName, entityName));
-	}
-
-	@RequestMapping(value = "/fetchEntityDefinition", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public @ResponseBody JsonObject fetchEntityDefinition(@RequestParam String levelName,
-			@RequestParam String entityName) {
-		EntityDefinitionDAL entityDefinitionDAL = new EntityDefinitionDAL();
-		EntityDefinition results = entityDefinitionDAL.getEntityDefinition(levelName, entityName);
-		return PlatformServiceUtil.buildSuccessResponseWithData(results);
-	}
-
 	@RequestMapping(value = "/fetchAllEntityDefinition", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 	public @ResponseBody JsonObject fetchAllEntityDefinition() {
 		EntityDefinitionDAL entityDefinitionDAL = new EntityDefinitionDAL();
 		List<EntityDefinition> results = entityDefinitionDAL.fetchAllEntityDefination();
 		return PlatformServiceUtil.buildSuccessResponseWithData(results);
 	}
-
-	//Hierarchy Mapping
-	/*@RequestMapping(value = "/addHierarchyMapping", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public JsonObject addHierarchyMapping(@RequestParam int rowId, @RequestParam String hierarchyName, @RequestParam String orgName, @RequestParam int orgId) {
-		HierarchyMappingDAL hierarchyMappingDAL = new HierarchyMappingDAL();
-		boolean status = hierarchyMappingDAL.saveHierarchyMapping(rowId, hierarchyName, orgName, orgId);
-		if (status) {
-			return PlatformServiceUtil.buildSuccessResponse();
-		} else {
-			return PlatformServiceUtil.buildFailureResponse("Unable to add Entity Definition for the request");
-		}
-	}
-
-	@RequestMapping(value = "/removeHierarchyMapping", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public @ResponseBody JsonObject removeHierarchyMapping(@RequestParam String hierarchyName,
-			@RequestParam String orgName) {
-		HierarchyMappingDAL hierarchyMappingDAL = new HierarchyMappingDAL();
-		return PlatformServiceUtil
-				.buildSuccessResponseWithData(hierarchyMappingDAL.deleteHierarchyMapping(hierarchyName, orgName));
-	}
-
-	@RequestMapping(value = "/fetchHierarchyMapping", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public @ResponseBody JsonObject fetchHierarchyMapping(@RequestParam String hierarchyName) {
-		HierarchyMappingDAL hierarchyMappingDAL = new HierarchyMappingDAL();
-		List<String> hierarchyList = hierarchyMappingDAL.getHierarchyMapping(hierarchyName);
-		return PlatformServiceUtil.buildSuccessResponseWithData(hierarchyList);
-	}
-
-	@RequestMapping(value = "/fetchAllHierarchyMapping", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public @ResponseBody JsonObject fetchAllHierarchyMapping() {
-		HierarchyMappingDAL hierarchyMappingDAL = new HierarchyMappingDAL();
-		List<HierarchyMapping> results = hierarchyMappingDAL.fetchAllHierarchyMapping();
-		return PlatformServiceUtil.buildSuccessResponseWithData(results);
-	}*/
 
 }

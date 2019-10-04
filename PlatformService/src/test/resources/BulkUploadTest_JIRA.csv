@@ -1,0 +1,331 @@
+summary,key,issueType,status,projectKey,resolution,assignee,created,creationTimeEpoch,lastUpdated,updatedTimeEpoch,resolved,resolutionTimeEpoch,FixVersion,dueDate,description,environment,originalEstimate,timeSpent,acceptanceCriteria,closedDate,epicKey,priority,sprintName,storyPoints
+CUP APIs related to User site,CMAE-3918,Task,Closed,CMAE,Fixed,AF59001,1/10/2019 6:19,1547101140,1/18/2019 2:49,1547779740,1/16/2019 20:56,1547672160,1/24/2019,,CUP APIs related to User site,,,50400,"(a)    An API that will return all the sites for a user (site id, site name, site type and isActive status).
+(b)    An API that will add user to the site(s).
+(c)    An API that will remove user from a site(s).",1/16/2019 20:56,,,Care Bears -PI-5.2,3
+Generate error reports for AE to CUP Member migration job,CMAE-3847,Task,Closed,CMAE,Fixed,AF38482,1/3/2019 20:36,1546547760,2/21/2019 19:40,1550778000,1/16/2019 16:04,1547654640,1/17/2019,,* Generate error reports for AE to CUP Member migration job,,,,* Generate error reports for AE to CUP Member migration job,2/21/2019 19:40,CMIS-2715,,Care Bears -PI-5.2,3
+Migrate AE auths with GUID in RFPRV/RTPRV/AUTFC columns into CUP,CMAE-3846,Task,Closed,CMAE,Fixed,AF38482,1/3/2019 20:35,1546547700,1/16/2019 20:39,1547671140,1/16/2019 20:39,1547671140,1/17/2019,1/16/2019 0:00,* Migrate AE auths with GUID in RFPRV/RTPRV/AUTFC columns into CUP,,,,* Migrate AE auths with GUID in RFPRV/RTPRV/AUTFC columns into CUP,1/16/2019 20:39,CMIS-2715,,Care Bears -PI-5.2,3
+AE-CUP migration -  Auth tables data validation,CMAE-3845,Task,Closed,CMAE,Fixed,AF76835,1/3/2019 20:25,1546547100,1/16/2019 18:34,1547663640,1/16/2019 18:34,1547663640,1/17/2019,1/16/2019 0:00,"Perform AE-CUP migration - Auth tables data validation
+
+ 
+
+{color:#000000}Auth Status{color}
+
+{color:#000000}Auth Reason{color}
+
+{color:#000000}AuthtypeAuthCategoryAssociation{color}
+
+{color:#000000}AuthGuidelineQuestion{color}
+
+{color:#000000}AuthGuidelineQuestionOption{color}
+
+{color:#000000}AuthGuidelineResponse{color}
+
+{color:#000000}AuthGuidelineResponseOption{color}",,,,"AE tables should get successfully migrated to CUP :-
+
+ 
+
+{color:#000000}Auth Status{color}
+
+{color:#000000}Auth Reason{color}
+
+{color:#000000}AuthtypeAuthCategoryAssociation{color}
+
+{color:#000000}AuthGuidelineQuestion{color}
+
+{color:#000000}AuthGuidelineQuestionOption{color}
+
+{color:#000000}AuthGuidelineResponse{color}
+
+{color:#000000}AuthGuidelineResponseOption{color}",1/16/2019 18:34,CMIS-2715,,Care Bears -PI-5.2,5
+Alter Memberproduct with latest changes,CMAE-3844,Task,Closed,CMAE,Fixed,AF76141,1/3/2019 18:26,1546539960,1/16/2019 18:50,1547664600,1/16/2019 18:50,1547664600,1/17/2019,1/16/2019 0:00,Incorporate new logic changes for EDH-CUP migration of member product.,,,,,1/16/2019 18:50,CMIS-2715,,Care Bears -PI-5.2,2
+Changes related to Auth Audit event issue,CMAE-3843,Task,Closed,CMAE,Fixed,AF65307,1/3/2019 9:16,1546506960,1/16/2019 20:57,1547672220,1/16/2019 20:57,1547672220,1/17/2019,,Changes related to Auth Audit event issue,,,,Changes related to Auth Audit event issue,1/16/2019 20:57,CMIS-2376,,Care Bears -PI-5.2,3
+Incorporate missing details from EDH Claim and Elig History APIs ,CMAE-3841,Task,Closed,CMAE,Fixed,AF59494,1/3/2019 2:22,1546482120,2/21/2019 19:40,1550778000,1/16/2019 19:59,1547668740,1/17/2019,,Incorporate missing details from EDH Claim and Elig History APIs,,,,Incorporate missing details from EDH Claim and Elig History APIs,2/21/2019 19:40,CMIS-2382,,Care Bears -PI-5.2,3
+Show the default access permissions of an external user in UI ,CMAE-3840,Task,Closed,CMAE,Fixed,AF59001,1/3/2019 2:21,1546482060,1/18/2019 2:44,1547779440,1/10/2019 6:40,1547102400,1/17/2019,,Show the default access permissions of an external user in UI,,,28800,"Add External user ( Even before batch job pulls the external user ) by Admin person within the time gap of 30 mins which is the usual batch frequency , in this case, we will show the default access permissions of an external user in UI and user can override the access permission and then Save it 
+Add External user ( After batch job pulls the external user ) by Admin person after the time gap of 30 mins, in this case, we will show an error message saying external user already exist and Admin user has to go to Modify screen. ",1/10/2019 6:40,CMIS-2380,,Care Bears -PI-5.2,2
+IMPLEMENT Auth audit event for the batch auth extract,CMAE-3834,Task,Closed,CMAE,Fixed,AF61537,1/3/2019 2:11,1546481460,1/16/2019 7:01,1547622060,1/16/2019 7:01,1547622060,1/17/2019,,IMPLEMENT Auth audit event for the batch auth extract,,,,IMPLEMENT Auth audit event for the batch auth extract,1/16/2019 7:01,CMIS-2376,,Care Bears -PI-5.2,5
+Automation task for Overall Search in CUP using Member ID,CMAE-3816,Test,Closed,CMAE,Fixed,AF72642,1/2/2019 7:08,1546412880,1/16/2019 4:52,1547614320,1/16/2019 4:52,1547614320,1/17/2019,,Automation task for Overall Search in CUP using Member ID,,,,Automation task for Overall Search in CUP using Member ID,1/16/2019 4:52,CMIS-2376,,Care Bears -PI-5.2,3
+Automation task for Notes Repository for a Patient in CUP - Add New Note,CMAE-3815,Test,Closed,CMAE,Fixed,AF75174,1/2/2019 7:07,1546412820,1/16/2019 4:52,1547614320,1/16/2019 4:52,1547614320,1/17/2019,,Automation task for Notes Repository for a Patient in CUP - Add New Note,,,,Automation task for Notes Repository for a Patient in CUP - Add New Note,1/16/2019 4:52,CMIS-2374,,Care Bears -PI-5.2,3
+Automation task for Additional validations in Member Search,CMAE-3814,Test,Closed,CMAE,Fixed,AF63281,1/2/2019 7:05,1546412700,1/11/2019 5:55,1547186100,1/11/2019 5:54,1547186040,1/17/2019,,Automation task for Additional validations in Member Search,,,,Automation task for Additional validations in Member Search,1/11/2019 5:55,CMIS-2374,,Care Bears -PI-5.2,3
+Test member benefits SP to check for subgroup inclusion,CMAE-3792,Task,Closed,CMAE,Fixed,AF76141,12/28/2018 7:58,1545983880,1/16/2019 20:14,1547669640,1/16/2019 20:14,1547669640,1/17/2019,,Test member benefits SP to check for subgroup inclusion,,,,Test member benefits SP to check for subgroup inclusion,1/16/2019 20:14,CMIS-2376,,Care Bears -PI-5.2,
+Support to EDH team,CMAE-3788,Task,Closed,CMAE,Fixed,AF55838,12/28/2018 7:54,1545983640,1/16/2019 20:12,1547669520,1/16/2019 20:12,1547669520,1/17/2019,,Support to EDH team,,,,Support to EDH team,1/16/2019 20:12,CMIS-2382,,Care Bears -PI-5.2,
+Support to Provider Portal,CMAE-3787,Task,Closed,CMAE,Fixed,AF55838,12/28/2018 7:54,1545983640,1/16/2019 20:11,1547669460,1/16/2019 20:11,1547669460,1/17/2019,,Support to Provider Portal,,,,Support to Provider Portal,1/16/2019 20:11,CMIS-2382,,Care Bears -PI-5.2,
+Reports Remediation - 3 reports,CMAE-3782,Task,Closed,CMAE,Fixed,AF76141,12/28/2018 7:52,1545983520,1/16/2019 19:37,1547667420,1/16/2019 19:37,1547667420,1/17/2019,,Reports Remediation - 3 reports,,,,"Reports in BI center will henceforth use CUP data for generation.
+To check if reports can pull data with existing logic (max upto 5% deviation from current logic is allowed). If logic is incorrect or needs major change, sync up with Sudhir and execute the necessary changes",1/16/2019 19:37,CMIS-2379,,Care Bears -PI-5.2,8
+Batch job to add default access permission and ensure exclude message access ,CMAE-3736,Task,Closed,CMAE,Fixed,AF59001,12/19/2018 7:22,1545204120,1/18/2019 2:39,1547779140,1/16/2019 20:55,1547672100,1/17/2019,,Batch job to add default access permission and ensure exclude message access,,86400,144000,Batch job to add default access permission and ensure exclude message access,1/16/2019 20:55,CMIS-2380,,Care Bears -PI-5.2,2
+Scheduling of migration jobs in Tidal,CMAE-3680,Task,Closed,CMAE,Fixed,AF38482,12/6/2018 17:30,1544117400,1/16/2019 16:04,1547654640,1/16/2019 16:04,1547654640,12/27/2018,,"Scheduling automated jobs for regularly migrating AE and EDH data into CUP. List of jobs to be scheduled:-
+ * Member
+ * Provider
+ * Authorization guideline
+ * Protocol
+ * Authorization",,,,"Following jobs should be successfully scheduled for daily or weekly run.
+ * Member
+ * Provider
+ * Authorization guideline
+ * Protocol
+ * Authorization
+
+ ",1/16/2019 16:04,CMIS-2380,,Care Bears -PI-5.2,3
+Hide termination date for current year plans in AE,CMAE-3623,Story,Ready For Release,CMAE,Meets Acceptance Criteria,AC72669,11/29/2018 15:23,1543504980,2/21/2019 3:09,1550718540,1/16/2019 20:54,1547672040,1/24/2019,,"as an AE user
+
+I want to view member current year plan info without seeing a term date of 12/31/2018
+
+so that I can avoid using the future effective plan",,,,when I check a member's eligibility I will not see a termination date on the current year's plan,,CMIS-2374,,Care Bears -PI-5.2,
+Map access permission for all AE users  in CUP through User migration Jobs,CMAE-3504,Task,Closed,CMAE,Fixed,AF65307,10/29/2018 2:03,1540778580,1/16/2019 20:55,1547672100,1/16/2019 20:55,1547672100,1/17/2019,,Map access permission for all AE users  in CUP through User migration Jobs,,,,Map access permission for all AE users  in CUP through User migration Jobs,1/16/2019 20:55,CMIS-2380,,Care Bears -PI-5.2,2
+Ability to perform changes to Print letter screen,CMAE-2429,Story,Ready For Release,CMAE,Meets Acceptance Criteria,AF68978,6/6/2018 15:47,1528300020,2/21/2019 3:15,1550718900,1/16/2019 19:54,1547668440,1/17/2019,,Ability to perform changes to Print letter screen,,,,"Print Letters Aging,Member Approval & Letters should not be listed once print is done",,CMIS-2377,,Care Bears -PI-5.2,3
+Ability to manage delete functionality for CUP messages,CMAE-2426,Story,Ready For Release,CMAE,Meets Acceptance Criteria,AF59493,6/6/2018 15:46,1528299960,2/21/2019 3:11,1550718660,1/16/2019 19:53,1547668380,1/17/2019,,Ability to manage delete functionality for CUP messages,,,,"path: Member Messages
+
+Auth messages
+
+Claim messages
+
+Overall messages
+
+Given that i am a user of CUP application,
+
+When i navigate to above paths,
+
+Then the following should happen:
+ * If a message is deleted from 'Inbox' and if the same message is present in both Inbox and Sent Messages, then message should be deleted only in 'Inbox'
+ * If a message is deleted from 'Sent Messages' and if the same message is present in  both Inbox and Sent Messages, then message should be deleted only in 'Sent Messages'",,CMIS-2380,,Care Bears -PI-5.2,5
+Ability to perform Cosmetic changes in Print letters,CMAE-2378,Story,Ready For Release,CMAE,Meets Acceptance Criteria,AF68978,6/6/2018 9:29,1528277340,2/21/2019 3:08,1550718480,1/16/2019 19:54,1547668440,1/17/2019,,Ability to perform Cosmetic changes in Print letters,,,,"Cosmetic changes in Print letters
+- Change Print Standard Letters to Print Standard Approval Letters 
+- Change Print Expedited Letters to Print Expedited Approval Letters",,CMIS-2377,,Care Bears -PI-5.2,1
+Ability to edit a document under manage document configuration,CMAE-1897,Story,Ready For Release,CMAE,Meets Acceptance Criteria,AF43550,4/27/2018 8:27,1524817620,2/21/2019 3:14,1550718840,1/16/2019 19:34,1547667240,1/17/2019,,Ability to edit a document under manage document configuration,,,57600,"Given that i am a user of CUP application,
+
+When I navigate to 'Manage Documents' and click on View/Edit Document,
+
+Then the following should happen:
+ * The Upload documents pane should be renamed to 'Edit Document' pane
+ * Document Name field should be grayed out
+ * Rest all fields should be editable and mandatory
+ * Upadte button
+ * Cancel button
+
+ ",,CMIS-2380,,Care Bears -PI-5.2,2
+Ability to view 'Document configuration' tabs under Admin,CMAE-1412,Story,Ready For Release,CMAE,Meets Acceptance Criteria,AF43550,3/30/2018 6:23,1522390980,2/21/2019 3:12,1550718720,1/16/2019 19:33,1547667180,1/17/2019,,Ability to view 'Document configuration' tabs under Admin,,,10800,"Given that I am a user of CUP application,
+
+When I navigate to Admin menu,
+
+Then I should be able to view the following:
+ * 'Document Configuration' tab in between 'Denial Reason Configuration' and 'Letter Configuration'.
+ * Following 2 tabs should be displayed under 'Document Configuration':
+ ** Manage Documents
+ ** Search Documents",,CMIS-2380,,Care Bears -PI-5.2,1
+Ability to Show recently selected data across all the fields in CUP,CMAE-1411,Story,Ready For Release,CMAE,Meets Acceptance Criteria,AF67174,3/30/2018 6:23,1522390980,2/21/2019 3:15,1550718900,1/16/2019 15:48,1547653680,1/17/2019,,Ability to Show recently selected data across all the fields in CUP,,,,"Given that I am a CM user
+When I navigate to auth entry screen and open provider search from ref from, ref to or specialty
+Then
+- As I start typing, I should be able to see matching historical search terms in each of the respective fields. E.g. Provider ID should show any earlier search terms I made in this field. Provider name also should show a drop down of matching search terms that I have used in earlier searches
+- These search terms should be those that I have made and not from any other user
+- Also, these search terms should be persisted and should not be cleared once I close the browser or close the application",,CMIS-2376,,Care Bears -PI-5.2,3
+Ability to display grid under 'Reference tab next to help under L1 menu,CMAE-1386,Story,Ready For Release,CMAE,Meets Acceptance Criteria,AF68978,3/30/2018 6:17,1522390620,2/21/2019 3:07,1550718420,1/16/2019 19:53,1547668380,1/17/2019,,Ability to display a 'Reference tab next to help under L1 menu,,,,"Given that i am a user of CUP application,
+
+when i navigate to CUP application,
+
+Then i should be able to see 'Reference' tab next to 'Help' tab under L1 menu.
+
+Clicking in 'Reference' tab should populate a grid with following 'Read-only' columns:
+ * Download
+ * Document Name
+ * Document Type
+ * Document Size
+ * Uploaded date
+ * All the 'Active' documents should be displayed in the grid
+
+ ",,CMIS-2380,,Care Bears -PI-5.2,2
+Ability to search a document using Search filters,CMAE-1385,Story,Ready For Release,CMAE,Meets Acceptance Criteria,AF43550,3/30/2018 6:17,1522390620,2/21/2019 3:09,1550718540,1/16/2019 19:34,1547667240,1/17/2019,,Ability to search a document using Search filters,,,28800,"Given that I am a Caremore user
+
+When I navigate to Admin menu and click on 'Search Documents' under 'Document Configuration',
+
+Then I should be able to perform the following:
+ * Clicking on 'Search' button should populate the results based on the data provided in the search field filters
+ * The Search filters should follow 'AND' condition, that is, search results should match ALL the filter criteria provided by the user",,CMIS-2380,,Care Bears -PI-5.2,1
+Ability to display search document tab,CMAE-1384,Story,Ready For Release,CMAE,Meets Acceptance Criteria,AF43550,3/30/2018 6:17,1522390620,2/21/2019 3:09,1550718540,1/16/2019 19:34,1547667240,1/17/2019,,Ability to display search document tab,,,18000,"Given that I am a Caremore user
+
+When I navigate to Admin menu and click on 'Search Documents' under 'Document Configuration',
+
+Then I should be able to view the following filters in the 'Search Documents' pane:
+ * Document Name
+ * Document type
+ * User Role
+ * From Date
+ * To Date
+ * Search button
+ * Clear All Button
+
+All the search filter fields should be non-mandatory
+
+Clicking on Search should fetch the required results
+
+Clciking on 'Clear All' should clear all the search filter fields
+
+ ",,CMIS-2380,,Care Bears -PI-5.2,1
+Ability to download/preview a document under View Document pane,CMAE-1383,Story,Ready For Release,CMAE,Meets Acceptance Criteria,AF43550,3/30/2018 6:17,1522390620,2/21/2019 3:07,1550718420,1/16/2019 19:34,1547667240,1/17/2019,,Ability to download/preview a document under View Document pane,,,28800,"Given that I am a user of CUP application,
+
+When I navigate to Admin menu and click on 'Manage Documents' under 'Document Configuration', 
+
+then i should be able to peform the following under 'View Document' pane:
+ * View all uploaded files as individual rows in the 'View Documents' pane
+ * No pagination options should be present in the view pane. It should be an infinite scroll similar to auth notes
+ * Clicking on the preview icon in any row should open that document in a seperate tab to view
+ * Click on download icon under the 'Download' column to save the document to the local system
+ * *Note: DOC,DOCX,XLS and XLSX File Formats cannot be previewed directly in chrome and IE 11 browser. They have to be downloaded. Also in IE the preview would not open in a new tab directly. This is browser behavior. Only images and PDFs can be downloaded and opened directly in a new tab*",,CMIS-2380,,Care Bears -PI-5.2,1
+Ability to delete an added document under View document pane ,CMAE-1364,Story,Ready For Release,CMAE,Meets Acceptance Criteria,AF43550,3/30/2018 6:17,1522390620,2/21/2019 3:14,1550718840,1/16/2019 19:34,1547667240,1/17/2019,,Ability to delete an added document under View document pane,,,28800,"Given that I am a user of CUP application,
+
+When I navigate to Admin menu and click on 'Manage Documents' under 'Document Configuration', 
+
+then i should be able to peform the following under 'View Document' pane:
+ * The details under 'View Document' pane should be read-only
+ * I should only be able to Preview, Download, Delete an uploaded document
+ * If i click on 'Delete' icon, then i should be abel to view a popup with following message: ""Do you really want to delete the document""? with a Yes/No button.
+ ** Clicking on 'Yes' should Delete the row entirely and shift the records.
+ ** Clicking on 'No' should retain the record",,CMIS-2380,,Care Bears -PI-5.2,1
+Ability to Add a document in Add document pane,CMAE-1342,Story,Ready For Release,CMAE,Meets Acceptance Criteria,AF43550,3/30/2018 6:16,1522390560,2/21/2019 3:11,1550718660,1/16/2019 19:34,1547667240,1/17/2019,,Ability to Add a document in Add document pane,,,28800,"Given that I am a user of CUP application,
+
+When I navigate to Admin menu and click on 'Manage Documents' under 'Document Configuration', 
+
+then i should be able to peform the following:
+ * Upload Document Pane should have following validations:
+ ** Document Name (_mandatory_, similar to 'File Name' in Attachments)
+ ** Description ( _mandatory,_ similar to ' Description' in Attachments)
+ ** Document Type (_mandatory,_ dropdown similar to 'Attachment type' in Attachments)
+ ** User Role ( _mandatory,_ multi-select dropdown)
+ ** Active (_optional,_ checked by default)
+ ** Upload
+ ** Clear
+ * Clicking on Upload should save the data and create a new row in the View Documents pane
+ * clicking on Clear should clear all the fields in the 'Upload Documents' pane",,CMIS-2380,,Care Bears -PI-5.2,5
+Ability to view Upload & View panes under manage documents,CMAE-1340,Story,Ready For Release,CMAE,Meets Acceptance Criteria,AF43550,3/30/2018 6:16,1522390560,2/21/2019 3:15,1550718900,1/16/2019 19:34,1547667240,1/17/2019,,Ability to view Add & View/modify panes under manage documents,,,28800,"Given that I am a user of CUP application,
+
+When I navigate to Admin menu and click on 'Manage Documents' under 'Document Configuration', 
+
+then i should be able to view the following:
+ * Upload Document Pane with following fields:
+ ** Document Name 
+ ** Description 
+ ** Document Type 
+ ** User Role 
+ ** Active 
+ * View Document Pane with following fields
+ ** Delete
+ ** Download
+ ** Preview
+ ** Active
+ ** Document Name
+ ** Description
+ ** File Size
+ ** Document Type
+ ** User Role
+ ** Uploaded By
+ ** Uploaded Date",,CMIS-2380,,Care Bears -PI-5.2,1
+Ability to show all active records and latest terminated record in Member search,CMAE-400,Story,Ready For Release,CMAE,Meets Acceptance Criteria,AF60744,1/10/2018 2:16,1515550560,2/21/2019 3:13,1550718780,1/16/2019 19:53,1547668380,1/17/2019,,Ability to show all active records and latest terminated record in Member search,,,,"Given that I am a user of CUP application,
+
+when I navigate to Member Search tab and perform a search,
+
+Then i should be able to view the following :
+ * The filtred member search results based on the search parameters should display :
+ ** All active records for a member
+ ** latest termed record for a member
+
+ ",,CMIS-2374,,Care Bears -PI-5.2,5
+Ability to download a document under Reference tab,CMAE-399,Story,Ready For Release,CMAE,Meets Acceptance Criteria,AF68978,1/10/2018 2:10,1515550200,2/21/2019 3:13,1550718780,1/16/2019 19:53,1547668380,1/17/2019,,Ability to download a document under Reference tab,,,,"Given that I am a user of CUP application,
+
+When I navigate to Reference tab, 
+
+then i should be able to peform the following under 'View Document' pane:
+ * View all uploaded files as individual rows in the 'View Documents' pane
+ * Click on download icon under the 'Download' column to save the document to the local system
+ * *Note: DOC,DOCX,XLS and XLSX File Formats cannot be previewed directly in chrome and IE 11 browser. They have to be downloaded. Also in IE the preview would not open in a new tab directly. This is browser behavior. Only images and PDFs can be opened directly in a new tab*
+ *",,CMIS-2380,,Care Bears -PI-5.2,5
+Ability to print selected denied auth letters using Print letters button,CMAE-381,Story,Ready For Release,CMAE,Meets Acceptance Criteria,AF91439,1/8/2018 0:32,1515371520,2/21/2019 3:05,1550718300,1/16/2019 15:48,1547653680,1/17/2019,,Ability to print selected denied auth letters using Print letters button,,,,"Given that I am a UM reviewer
+
+When I login to CUP and navigate to CUP-> Worklist> Letters Worklist–> Print Denial Letters
+
+Then
+ * Display the worklist in the following way:
+ ** Authorization Number with aging
+ ** Below each authorization show the following details
+ *** Print 
+ *** Recipient type
+ *** Letter recipient
+ *** Letter Template
+ *** Delivery Channel
+ *** Delivery Status
+ * Also have a checkbox at authorization level and letter level
+ * When I turn on the checkbox at auth level, turn it on for all the letters below 
+ *  except those in LETTER_GENERATION_INITIATED status.
+ * For letters in this status the checkbox should be disabled i.e. I should not be able to select these letters for printing
+ * Selecting the required authorizations/letters from this worklist and clicking on Print will display a loading icon till the time all the letters are merged. If the merge is successful, the combined file should be named as *Username_datetime_AuthLetters.pdf* and downloaded to the local system. User can open this letter and print from local printer
+ * If the merge is unsuccessful, display a message 'Letter cannot be printed. Please retry' with an OK button. User should be redirected back to the worklist for printing the letters again.",,CMIS-2377,,Care Bears -PI-5.2,5
+Ability to show network status in provider search screen,CMAE-48,Story,Ready For Release,CMAE,Meets Acceptance Criteria,AF59494,9/19/2017 7:34,1505806440,2/21/2019 3:16,1550718960,1/16/2019 18:27,1547663220,1/17/2019,,Ability to show network status in provider search screen,,,,"Given that I am a CM user
+When I open the provider search from ref from, ref to or facility fields in auth entry and auth modification screens (ref from, ref to, facility, admitting provider)
+Then
+- Display a new column 'Network Status' to the right of 'Distance Column' in the search results
+- This column should show an 'i' icon for each row of the provider result
+- Hovering on this icon should fetch the network status for the provider in that row
+- Once this provider is selected, the same network status must be shown in the appropriate field (ref from, ref to, facility) in auth modification screen
+- Also, include the network status icon for the Admitting Provider field in concurrent worklists. This provider should have the 'i' icon both at the field level as well as in the search screen",,CMIS-2376,,Care Bears -PI-5.2,3
+Ability to show a message to the user that session has expired and revert to login screen if CUP times out,CMAE-40,Story,Ready For Release,CMAE,Meets Acceptance Criteria,AF63274,9/19/2017 6:32,1505802720,2/21/2019 3:16,1550718960,1/16/2019 15:48,1547653680,1/17/2019,,Ability to show a message to the user that session has expired and revert to login screen if CUP times out,,,,"Given that I am a CM user
+When I have logged into CUP and my session is expiring
+Then
+- If no action is performed at the end of 25 minutes I should be able to see a message 'You session is expiring in 5 minutes. Please click the OK button to keep the session active' with an OK button. CLicking on OK reactivates the session.
+- If user does not act on this message, I should be able to see a message regardless of the page I am in as 'Session has expired. Please login again' with an OK button.
+- On clicking OK, the login page should be displayed for the user to sign in again",,CMIS-2380,,Care Bears -PI-5.2,3
+Ability to remove retro from auth category hover,CMAE-36,Story,Ready For Release,CMAE,Meets Acceptance Criteria,AF67174,9/19/2017 6:15,1505801700,2/21/2019 3:14,1550718840,1/16/2019 18:27,1547663220,1/17/2019,,Ability to remove retro from auth category hover,,,,"Given that I am a CM user
+When I login to CUP and navigate to auth entry, auth modification screens and hover on auth category
+Then I should not be able to see the 'Retro: 30 Days' line in this hover. This line should be removed",,CMIS-2375,,Care Bears -PI-5.2,3
+"For external users, hide received date/time on auth entry and auth modification screens",CMAE-35,Story,Ready For Release,CMAE,Meets Acceptance Criteria,AF63274,9/19/2017 6:12,1505801520,2/21/2019 3:14,1550718840,1/16/2019 15:48,1547653680,1/17/2019,,"For external users, hide received date/time on auth entry and auth modification screens",,,,"Given that I am an external user of CUP (PCP, Specialist etc.)
+When I login to CUP and open the auth entry/auth review/auth summary/auth modification screen
+Then
+- I should not be able to see the received date time field in the screen",,CMIS-2376,,Care Bears -PI-5.2,3
+Ability to remove the patient checkin field on member details,CMAE-31,Story,Ready For Release,CMAE,Meets Acceptance Criteria,AF67174,9/19/2017 5:57,1505800620,2/21/2019 3:06,1550718360,1/16/2019 18:27,1547663220,1/17/2019,,Ability to remove the patient checkin field on member details,,,,"Given that I am a CM user
+When I navigate to auth summary and auth modification screens
+Then I should not be able to see the 'Patient Check In' field under member details section. This field should be removed",,CMIS-2374,,Care Bears -PI-5.2,3
+Ability to make changes in auth template configuration,CMAE-26,Story,Ready For Release,CMAE,Meets Acceptance Criteria,AF67174,9/19/2017 3:29,1505791740,2/21/2019 3:05,1550718300,1/16/2019 18:27,1547663220,1/17/2019,,Ability to make changes in auth template configuration,,,,"Given that I am an admin usre 
+ When I navigate to auth template configuration screen and add or modify an existing record
+ Then
+ - I should not be able to see the following fields:
+ ** Referred from, service start date, service end date for all 4 types of Auth
+ ** Last seen date for service request auths
+ ** Estimated admit date for inpatient auth
+ - These fields should be removed from the configuration form",,CMIS-2380,,Care Bears -PI-5.2,3
+Ability to map Geocode in Provider Search,CMAE-22,Story,Ready For Release,CMAE,Meets Acceptance Criteria,AF59001,9/14/2017 6:06,1505369160,2/21/2019 3:07,1550718420,1/16/2019 15:48,1547653680,1/17/2019,,Ability to map Geocode in Provider Search,,,840,"Given that I am a CM user
+When I open the provider search screen (ref from, ref to, facility, admitting provider) from auth entry, auth modification screens
+Then
+- When I select a specialty, the default region and neighborhood fields should be emptied. The neighborhood as per geocode mapping sheet should be populated.
+- Also, as per the geocode mapping the appropriate distance should be defaulted in the distance field
+- Searching with these values should return the appropriate results. If I click clear all, the default values should be applied i.e. member zipcode/city, region, neighborhood and distance of 25 miles",,CMIS-2376,,Care Bears -PI-5.2,3
+Ability to include a date range in general auth search instead of 'in the last_ days',CMAE-19,Story,Ready For Release,CMAE,Meets Acceptance Criteria,AF68978,9/13/2017 9:16,1505294160,2/21/2019 3:14,1550718840,1/16/2019 15:48,1547653680,1/17/2019,,Ability to include a date range in general auth search instead of 'in the last_ days',,,,"Given that I am a CM user
+When I navigate to General--> Authorizations--> Search all authorizations
+Then
+- The 'Date Submitted' label should be changed to 'Date Submitted Between' 
+- Remove today, yesterday and within last <> days options
+- Have two date fields: Start Date, End date. These fields should be date pickers and by default blank
+- The allowed format is mm/dd/yyyy. End Date should always be greater than or equal to Start date. Else, show a warning message End Date cannot be less than Start Date'
+- Also, the maximum difference between Start and End dates should be 365. Do not allow user to select a data more than 365 days from start date. Show a disclaimer below the date fields as 'End Date cannot be greater than 365 days from Start Date'
+- Also, if user enters either a start or end date and clicks search. show a mandatory validation message for the other date field
+- Once the proper dates are provided and user clicks on Search, display all those authorizations whose Submitted Date was between the Start and End Dates (inclusive of those dates)",,CMIS-2376,,Care Bears -PI-5.2,3
+Ability to view Active Status Health Alerts (member alerts)in red color in member dashboard,CMAE-17,Story,Ready For Release,CMAE,Meets Acceptance Criteria,AF67173,9/13/2017 7:56,1505289360,2/21/2019 3:14,1550718840,1/16/2019 18:27,1547663220,1/17/2019,,Ability to view Active Status Health Alerts (member alerts)in red color in member dashboard,,,,"Given that I am a CM user
+When I nagivate to member dashboard 
+Then
+- The member health alerts should be displayed in red color
+- All the active member health alerts added via the member health notes screen and displayed in the member alerts section should be displayed in red color",,CMIS-2374,,Care Bears -PI-5.2,2
+Ability to provide User access permissions for Document management,CMAE-16,Story,Ready For Release,CMAE,Meets Acceptance Criteria,AF43550,9/13/2017 7:42,1505288520,2/21/2019 3:07,1550718420,1/16/2019 19:34,1547667240,1/17/2019,,Ability to provide User access permissions for Document management,,,28800,"Given that I am a user of CUP application,
+
+When I navigate to User Access permission (Add/Edit User Access) under Admin,
+
+Then I should be able to view the following under Admin Access:
+ * 'Can Configure Document Configuration' checkbox should be displayed under Admin Access
+ * If i check this checkbox, then i should be able to view 'Document Configuration' tab under Admin tab
+ * Unchecking this permission should hide the 'Document configuration' tab under Admin
+
+ ",,CMIS-2380,,Care Bears -PI-5.2,1
+"Ability to use atleast 2 search fields for non PCP, specialist users",CMAE-12,Story,Ready For Release,CMAE,Meets Acceptance Criteria,AF63274,9/12/2017 2:33,1505183580,2/21/2019 3:11,1550718660,1/16/2019 15:48,1547653680,1/17/2019,,"Ability to use atleast 2 search fields for non PCP, specialist users",,,,"Given that I am a non PCP or a Specialist user of CUP
+When I navigate to member search
+Then I should be able to see that
+- Atleast two fields out of member id, last name, DOB are mandatory to perform the search
+- It can be a combination of member id and last name OR member id and DOB or Last name and DOB
+- The disclaimer message and validation message in the member search screen should be changed accordingly based on the user type logging in",,CMIS-2374,,Care Bears -PI-5.2,3
+"Ability to use only 1 member search field for Internal Users, PCP, CCC",CMAE-10,Story,Ready For Release,CMAE,Meets Acceptance Criteria,AF67173,9/11/2017 8:55,1505120100,2/21/2019 3:14,1550718840,1/16/2019 18:27,1547663220,1/17/2019,,"Ability to use only 1 member search field for Internal Users, PCP, CCC",,,,"Given that I am an internal or PCP or CCC user of CUP
+When I navigate to member search
+Then I should be able to see that
+- Atleast one field out of member id, last name, DOB is mandatory to perform the search",,CMIS-2374,,Care Bears -PI-5.2,2

@@ -17,6 +17,11 @@ package com.cognizant.devops.platformcommons.exception;
 
 public class InsightsCustomException extends Exception {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
 	public InsightsCustomException(String message) {
 		 super(message);
 	}

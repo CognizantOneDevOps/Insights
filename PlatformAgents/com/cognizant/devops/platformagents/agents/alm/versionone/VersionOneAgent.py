@@ -22,7 +22,7 @@ Created on Jul 6, 2017
 # Optimization and Pagination might be required. This is the first cut working agent with incremental fetch
 
 from dateutil import parser
-from com.cognizant.devops.platformagents.core.BaseAgent import BaseAgent
+from ....core.BaseAgent import BaseAgent
 from urllib import quote
 import time
 import json,ast

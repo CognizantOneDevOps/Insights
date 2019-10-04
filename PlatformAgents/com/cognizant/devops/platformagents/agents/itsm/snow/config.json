@@ -32,6 +32,7 @@
 			}
 	  }
 	},
+	"agentId" : "",
 	"toolCategory" : "ITSM",
 	"toolsTimeZone" : "GMT",
 	"insightsTimeZone" : "Asia/Kolkata",
@@ -43,6 +44,7 @@
 	"timeStampField":"commitTime",
 	"timeStampFormat":"%Y-%m-%d %H:%M:%S",
 	"isEpochTimeFormat" : false,
+	
 	"startFrom" : "2017-07-23 15:00:25",
 	"CR_Url": "/api/now/table/change_request?sysparm_display_value=true&sysparm_exclude_reference_link=true&sysparm_fields=number%2Capproval%2Crisk%2Ccategory%2Csys_id%2Copened_at%2Csys_updated_by%2Csys_updated_on%2Ccmdb_ci%2Crequested_by_date%2Copened_by%2Cassigned_to%2Cpriority%2Cimpact%2Csys_created_by%2Csys_mod_count%2Ctype%2Creason%2Cassignment_group%2Cdue_date%2Curgency%2Ccorrelation_id%2Creview_status%2Cshort_description%2Cphase%2Cstate&sysparm_query=sys_id%3D",
 	"CR_Approval_Url":	"/api/now/table/sysapproval_approver?sysparm_display_value=true&sysparm_fields=sysapproval%2Csys_updated_by%2Csys_id%2Cstate%2Cdue_date%2Csys_updated_on%2Csys_created_on&sysparm_query=sysapproval%3D",

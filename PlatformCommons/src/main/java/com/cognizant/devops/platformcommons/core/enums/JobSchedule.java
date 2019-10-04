@@ -32,4 +32,8 @@ public enum JobSchedule {
 	    public String toString() {
 	        return this.getValue();
 	    }
+
+	void setValue(String value) {
+		this.value = value;
+	}
 }

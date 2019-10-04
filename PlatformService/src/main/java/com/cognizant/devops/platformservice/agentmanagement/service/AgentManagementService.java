@@ -21,7 +21,6 @@ import java.util.List;
 import java.util.Map;
 
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
-import com.google.gson.JsonObject;
 
 public interface AgentManagementService {
 
@@ -30,7 +29,7 @@ public interface AgentManagementService {
 
 	public String uninstallAgent(String agentId, String toolName, String osversion) throws InsightsCustomException;
 
-	public String startStopAgent(String agentId, String action) throws InsightsCustomException;
+	public String startStopAgent(String agentId, String toolName, String osversion, String action) throws InsightsCustomException;
 
 	public String updateAgent(String agentId, String configDetails, String toolName, String agentVersion,
 			String osversion) throws InsightsCustomException;

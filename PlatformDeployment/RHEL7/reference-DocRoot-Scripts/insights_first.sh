@@ -16,6 +16,8 @@
 # Set InSights Home
 # Set InSights Home
 echo "#################### Setting up Insights Home ####################"
+sudo yum install wget -y
+sudo yum install unzip -y
 cd /usr
 sudo mkdir INSIGHTS_HOME
 cd INSIGHTS_HOME
@@ -31,3 +33,4 @@ source /etc/profile
 myextip=$(wget -qO- icanhazip.com)
 echo $myextip
 sed -i -e "s|localhost:3000|${myextip}:3000|g" /usr/INSIGHTS_HOME/.InSights/server-config.json
+sed -i -e "s|hostip|${myextip}|g" /usr/INSIGHTS_HOME/.InSights/server-config.json

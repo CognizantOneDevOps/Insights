@@ -65,12 +65,13 @@
 		  }
 	    }
 	},
- "toolCategory" : "SCM",
+  "agentId": "",
+  "toolCategory" : "SCM",
   "auth": "base64",
   "runSchedule": 5,
   "toolsTimeZone" : "Asia/Kolkata",
   "insightsTimeZone" : "Asia/Kolkata",
-  "startFrom" : "2016-10-10 15:46:33",
+  "startFrom" : "2019-03-01 15:46:33",
   "enableDataValidation": true,
   "useResponseTemplate" : true,
   "userID": "userID",
@@ -78,6 +79,7 @@
   "timeStampField":"commitTime",
   "timeStampFormat": "%Y-%m-%dT%H:%M:%S",
   "isEpochTimeFormat" : false,
+  
   "enableValueArray": false,
   "baseEndPoint": "https://api.bitbucket.org/2.0/repositories/repoid",
   "isDebugAllowed" : false,

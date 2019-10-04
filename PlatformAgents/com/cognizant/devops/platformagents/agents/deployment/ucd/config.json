@@ -32,6 +32,7 @@
 		"user": "user"
 	  }
   },
+  "agentId" : "",
   "toolCategory" : "DEPLOYMENT",
   "runSchedule": 30,
   "enableDataValidation": true,
@@ -46,6 +47,7 @@
   "timeStampField": "date",
   "timeStampFormat":"%Y-%m-%dT%H:%M:%S",
   "isEpochTimeFormat": true,
+  
   "isDebugAllowed" : false,
   "enableValueArray": false,
   "loggingSetting" : {

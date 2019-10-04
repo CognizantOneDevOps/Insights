@@ -1,5 +1,5 @@
 {
-  "baseExtractionPath":"extractionpath",
+  "baseExtractionPath":"/opt/insightsagents/PlatformAgents",
   "insightsTimeZone": "Asia/Kolkata",
   "loggingSetting": {
     "logLevel": "WARN"

@@ -1,0 +1,27 @@
+{
+  "compileOnSave": false,
+  "compilerOptions": {
+    "outDir": "./dist/out-tsc",
+    "sourceMap": true,
+    "declaration": false,
+    "moduleResolution": "node",
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "target": "es5",
+    "typeRoots": [
+      "node_modules/@types"
+    ],
+    "lib": [
+      "es2017",
+      "dom"
+    ],
+    "module": "es2015",
+    "baseUrl": "src",
+    "paths": {
+      "@insights/common/*": ["app/com/cognizant/devops/platformui/common.services/*"],
+	  "@insights/app/modules/*": ["app/com/cognizant/devops/platformui/modules/*"],
+	  "@insights/app/login/*": ["app/com/cognizant/devops/platformui/login/*"],
+	  "@insights/app/*": ["app/*"]
+	}
+  }
+}

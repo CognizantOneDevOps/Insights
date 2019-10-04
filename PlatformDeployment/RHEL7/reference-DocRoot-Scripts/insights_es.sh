@@ -17,12 +17,12 @@
 echo "#################### Installing Eleastic Search with configs ####################"
 sudo mkdir elasticsearch
 cd elasticsearch
-sudo wget https://platform.cogdevops.com/insights_install/installationScripts/latest/RHEL/es/elasticsearch-5.6.4.rpm
-sudo rpm -Uvh elasticsearch-5.6.4.rpm
-sudo wget https://platform.cogdevops.com/insights_install/installationScripts/latest/RHEL/es/ElasticSearch-5.6.4.zip
-sudo unzip ElasticSearch-5.6.4.zip
-sudo cp ElasticSearch-5.6.4/elasticsearch.yml /etc/elasticsearch/elasticsearch.yml
-sudo cp ElasticSearch-5.6.4/log4j2.properties /etc/elasticsearch/log4j2.properties
+sudo wget https://platform.cogdevops.com/insights_install/installationScripts/latest/RHEL/es/elasticsearch.rpm
+sudo rpm -Uvh elasticsearch.rpm
+sudo wget https://platform.cogdevops.com/insights_install/installationScripts/latest/RHEL/es/ElasticSearch.zip
+sudo unzip ElasticSearch.zip
+sudo cp ElasticSearch/elasticsearch.yml /etc/elasticsearch/elasticsearch.yml
+sudo cp ElasticSearch/log4j2.properties /etc/elasticsearch/log4j2.properties
 sudo systemctl daemon-reload
 sudo systemctl enable elasticsearch.service
 sudo systemctl start elasticsearch.service

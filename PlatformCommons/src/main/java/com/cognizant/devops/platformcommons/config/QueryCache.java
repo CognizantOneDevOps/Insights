@@ -25,6 +25,15 @@ public class QueryCache implements Serializable {
 	private static final long serialVersionUID = -11994006968623059L;
 
 	private String esCacheIndex;
+	private int purgeEsResultsBefore;
+
+	public int getPurgeEsResultsBefore() {
+		return purgeEsResultsBefore;
+	}
+
+	public void setPurgeEsResultsBefore(int purgeEsResultsBefore) {
+		this.purgeEsResultsBefore = purgeEsResultsBefore;
+	}
 
 	public String getEsCacheIndex() {
 		return esCacheIndex;

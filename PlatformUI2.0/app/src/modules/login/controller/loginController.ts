@@ -72,7 +72,6 @@ module ISightApp {
                             date.setTime(date.getTime() + (minutes * 60 * 1000));
                             self.$cookies.put('Authorization', token, { expires: date });
                             self.$cookies.put('DashboardSessionExpiration', new Date(new Date().getTime() + 86400 * 1000));
-                            this.cookies = "";
                             for (var key in grafcookies) {
                                 //this.cookies += key+ '=' +grafcookies[key];
                                 self.$cookies.put(key, grafcookies[key], { expires: date });

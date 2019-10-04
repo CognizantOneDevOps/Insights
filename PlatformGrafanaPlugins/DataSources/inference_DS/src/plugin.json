@@ -1,0 +1,23 @@
+{
+  "type": "datasource",
+  "name": "Inference",
+  "id": "Inference",
+
+  "includes": [
+    
+  ],
+
+  "metrics": true,
+  "annotations": false,
+
+  "info": {
+    "author": {
+      "name": "Vishal Ganjare",
+      "url": ""
+    },
+    "logos": {
+      "small": "img/Inference.png",
+      "large": "img/Inference.png"
+    }
+  }
+}

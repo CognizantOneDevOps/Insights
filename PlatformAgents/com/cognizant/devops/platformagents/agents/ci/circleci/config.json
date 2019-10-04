@@ -33,6 +33,7 @@
 	    "queued_at": "Build_date"
 	  }  
   },
+  "agentId" : "",
   "useResponseTemplate" : true,
   "enableDataValidation": true,
   "toolCategory" : "CI",

@@ -1,0 +1,57 @@
+<!--
+*******************************************************************************
+ * Copyright 2019 Cognizant Technology Solutions
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License.  You may obtain a copy
+ * of the License at
+ * 
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ ****************************************************************************** -->
+<div class="dialogHeaderBackground">
+    <table style="border-spacing:2px; height:100%; width: 100%">
+        <tr>
+            <td>
+                <span class="dialogheader">Confirm Access Group Name</span>
+            </td>
+            <td>
+                <div layout layout-align="right" style="height:30px;text-align: right; color:white;margin:0px;padding: 0px 10px;">
+                    <a (click)="closeShowDetailsDialog()" style="text-align: right;">
+                        <mat-icon svgIcon="close_dialog" [ngStyle]="{'width': '30px', 'height': '30px'}">
+                        </mat-icon>
+                    </a>
+                </div>
+            </td>
+        </tr>
+    </table>
+</div>
+
+<mat-dialog-content class="contentBodyCss">
+    <label class="dialogText"> Access Group Name </label>
+    <input [(ngModel)]="accessGroupName" name="accessGroupName" [style.height.px]="30" [style.width.%]="55" class="form-control"
+        placeholder="Please input an Access Group Name" required>
+    <br>
+    <div class="textPaddingInfo">
+        <span class="messageText" *ngIf="message!=''">{{message}}</span>
+        <span class="warningText">
+            <br> Once the Access Group name is added you will not be able to RENAME or <br>DELETE the
+            Access Group.
+            <br>Adding an Access Group cannot be REVERTED.
+        </span>
+        <br>
+        <span style="font-weight: bold;">
+            <br> Are you sure you want to create New Access Group <b> {{accessGroupName}} </b>?
+        </span>
+    </div>
+</mat-dialog-content>
+
+<mat-dialog-actions class="mat-dialog-actions-button">
+    <button mat-raised-button (click)="dialogRef.close('no')">NO</button>
+    <button mat-raised-button (click)="onYesClick()">YES</button>
+</mat-dialog-actions>

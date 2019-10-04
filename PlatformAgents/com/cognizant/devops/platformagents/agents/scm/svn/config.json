@@ -18,6 +18,7 @@
     	"sslVerify": true,
     	"responseType": "JSON" 
 	},
+	"agentId" : "",
 	"toolCategory" : "SCM",
 	"toolsTimeZone" : "GMT",
 	"insightsTimeZone" : "Asia/Kolkata",
@@ -29,6 +30,7 @@
 	"timeStampField":"commitTime",
 	"timeStampFormat":"%Y-%m-%d %H:%M:%S.%f",
 	"isEpochTimeFormat" : false,
+	
 	"startFrom" : "2016-10-10 15:46:33.000000",
 	"dynamicTemplate": {
 		"timeFieldMapping" : {

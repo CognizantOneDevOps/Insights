@@ -23,6 +23,9 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAdjusters;
+import java.util.Date;
+import java.text.SimpleDateFormat;
+import java.util.TimeZone;
 
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.core.enums.JobSchedule;
@@ -34,6 +37,7 @@ public class InsightsUtils {
 
 	private static String sparkTimezone = ApplicationConfigProvider.getInstance().getInsightsTimeZone();
 	public static ZoneId zoneId = ZoneId.of(sparkTimezone);
+	public static String DATE_TIME_FORMAT = "yyyy-MM-dd'T'HH:mm:ss'Z'";
 
 	public static long getDataFromTime(String schedule) {
 		Long time = null;
@@ -300,6 +304,14 @@ public class InsightsUtils {
 		return now.toEpochSecond();
 	}
 
+	public static Long getSystemTimeInNanoSeconds() {
+		return System.nanoTime();
+	}
+
+	public static Long getCurrentTimeInEpochMilliSeconds() {
+		return System.currentTimeMillis();
+	}
+
 	public static Long addVarianceTime(long inputTime, long varianceSeconds) {
 		Long varianceTime = inputTime + varianceSeconds;
 		ZonedDateTime fromInput = ZonedDateTime.ofInstant(Instant.ofEpochSecond(varianceTime), zoneId);
@@ -339,6 +351,12 @@ public class InsightsUtils {
 		LocalDateTime now = LocalDateTime.now();
 		DateTimeFormatter dtf = DateTimeFormatter.ofPattern(formatPattern);
 		return dtf.format(now);
+	}
+	
+	public static String getUtcTime(String timezone) {
+		SimpleDateFormat  dtf = new SimpleDateFormat(DATE_TIME_FORMAT);
+		dtf.setTimeZone(TimeZone.getTimeZone(timezone));
+		return  dtf.format(new Date());
 	}
 
 	/**

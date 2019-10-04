@@ -15,92 +15,66 @@
  ******************************************************************************/
 package com.cognizant.devops.platforminsights.core;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.apache.spark.api.java.JavaPairRDD;
-import org.apache.spark.api.java.JavaSparkContext;
-import org.elasticsearch.spark.rdd.api.java.JavaEsSpark;
-
-import com.cognizant.devops.platformcommons.core.enums.ExecutionActions;
 import com.cognizant.devops.platformcommons.core.enums.JobSchedule;
-import com.cognizant.devops.platformcommons.core.enums.KPIJobResultAttributes;
 import com.cognizant.devops.platformcommons.core.util.InsightsUtils;
-import com.cognizant.devops.platforminsights.core.job.config.SparkJobConfigHandler;
-import com.cognizant.devops.platforminsights.datamodel.KPIDefinition;
-import com.cognizant.devops.platforminsights.exception.InsightsSparkJobFailedException;
+import com.cognizant.devops.platformcommons.dal.neo4j.Neo4jDBHandler;
+import com.cognizant.devops.platforminsights.dal.Neo4jDBImpl;
+import com.cognizant.devops.platforminsights.datamodel.InferenceConfigDefinition;
+import com.cognizant.devops.platforminsights.exception.InsightsJobFailedException;
+import com.google.gson.Gson;
+import com.google.gson.JsonParser;
 
 public abstract class BaseActionImpl {
-	
+
 	private static Logger log = LogManager.getLogger(BaseActionImpl.class);
-	protected JavaPairRDD<String,Map<String,Object>> esRDD;
-	protected KPIDefinition kpiDefinition;
-	
-	public BaseActionImpl(KPIDefinition kpiDefinition){
+
+	protected InferenceConfigDefinition kpiDefinition;
+	Neo4jDBHandler dbHandler = new Neo4jDBHandler();
+	Gson gson = new Gson();
+	JsonParser jsonParser = new JsonParser();
+
+	public BaseActionImpl() {
+
+	}
+
+	public BaseActionImpl(InferenceConfigDefinition kpiDefinition) {
 		this.kpiDefinition = kpiDefinition;
-		if(ExecutionActions.AVERAGE == kpiDefinition.getAction()){
-			buildSparkJob(kpiDefinition);
-		}
-		//Map<String, Object> result = execute();
-		//saveResult(result);
 	}
-	
-	private void buildSparkJob(KPIDefinition kpiDefinition){
-		Map<String, String> jobConf = new HashMap<String, String>();
-		String esQuery = kpiDefinition.getEsquery();
-		esQuery = getEsQueryWithDates(kpiDefinition.getSchedule(),esQuery);
-		log.debug("KPI query - "+esQuery);
-		jobConf.put("es.query", esQuery);
-		jobConf.put("es.resource", kpiDefinition.getEsResource());
-		jobConf.put("es.index.read.missing.as.empty", Boolean.TRUE.toString());
-		JavaSparkContext sparkContext = JavaSparkContextProvider.getJavaSparkContext();
-		esRDD = JavaEsSpark.esRDD(sparkContext, jobConf);
-	}
-	
-	protected Map<String, Object> getResultMap(Long result,String groupByValue){
-		Map<String, Object> resultMap = new HashMap<>();
-		resultMap.put(KPIJobResultAttributes.KPIID.toString(), kpiDefinition.getKpiID());
-		resultMap.put(KPIJobResultAttributes.NAME.toString(), kpiDefinition.getName());
-		resultMap.put(KPIJobResultAttributes.EXPECTEDTREND.toString(), kpiDefinition.getExpectedTrend());
-		resultMap.put(KPIJobResultAttributes.ISGROUPBY.toString(), kpiDefinition.isGroupBy());
-		resultMap.put(KPIJobResultAttributes.RESULT.toString(),result);
-		resultMap.put(KPIJobResultAttributes.VECTOR.toString(),kpiDefinition.getVector());
-		resultMap.put(KPIJobResultAttributes.TOOLNAME.toString(), kpiDefinition.getToolName());
-		resultMap.put(KPIJobResultAttributes.SCHEDULE.toString(), kpiDefinition.getSchedule().name());
-		resultMap.put(KPIJobResultAttributes.ACTION.toString(), kpiDefinition.getAction().name());
-		resultMap.put(KPIJobResultAttributes.RESULTOUTPUTTYPE.toString(), kpiDefinition.getResultOutPutType());
-		resultMap.put(KPIJobResultAttributes.ISCOMPARISIONKPI.toString(), kpiDefinition.isComparisionKpi());
-		if(kpiDefinition.isGroupBy()) {
-			resultMap.put(KPIJobResultAttributes.GROUPBYFIELDNAME.toString(), kpiDefinition.getGroupByFieldName());
-			resultMap.put(KPIJobResultAttributes.GROUPBYFIELDID.toString(), kpiDefinition.getGroupByField());
-			resultMap.put(KPIJobResultAttributes.GROUPBYFIELDVAL.toString(),groupByValue);
-		}
-		resultMap.put(KPIJobResultAttributes.RESULTTIME.toString(),InsightsUtils.getTodayTime());
-		//resultMap.put(KPIJobResultAttributes.RESULTTIMEX.toString(),InsightsUtils.getTodayTimeX());
-		return resultMap;
-	}
-	
-	protected abstract Map<String, Object> execute() throws InsightsSparkJobFailedException;
-	
-	protected void saveResult(Map<String, Object> result){
-		SparkJobConfigHandler configHandler = new SparkJobConfigHandler();
-		configHandler.saveJobResultInES(result);
-	}
-	
-	protected void saveResult(List<Map<String, Object>> resultList){
-		SparkJobConfigHandler configHandler = new SparkJobConfigHandler();
-		configHandler.saveJobResultInES(resultList);
-	}
-	
+
+
+	protected abstract void execute() throws InsightsJobFailedException;
+
 	protected String getEsQueryWithDates(JobSchedule schedule, String esQuery) {
-		
+
 		Long fromDate = InsightsUtils.getDataFromTime(schedule.name());
 		esQuery = esQuery.replace("__dataFromTime__", fromDate.toString());
 		Long toDate = InsightsUtils.getDataToTime(schedule.name());
 		esQuery = esQuery.replace("__dataToTime__", toDate.toString());
 		return esQuery;
 	}
+
+	protected void executeNeo4jGraphQuery() {
+		try {
+			Neo4jDBImpl graphDb = new Neo4jDBImpl(kpiDefinition);
+			List<Map<String, Object>> graphResposne = graphDb.getResult();
+			graphDb.saveResult(graphResposne);
+
+		} catch (Exception e) {
+			log.error("Sum calculation job failed for kpiID - " + kpiDefinition.getKpiID(), e);
+		}
+	}
+
+	protected Map<String, Object> executeESQuery() {
+		return null;
+
+	}
+
+
+
+
 }

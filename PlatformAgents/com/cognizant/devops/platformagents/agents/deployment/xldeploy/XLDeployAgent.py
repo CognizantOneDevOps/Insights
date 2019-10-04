@@ -22,7 +22,7 @@ Created on Oct 13, 2016
 import json
 import datetime
 from datetime import timedelta
-from com.cognizant.devops.platformagents.core.BaseAgent import BaseAgent
+from ....core.BaseAgent import BaseAgent
 
 class XLDeployAgent(BaseAgent):
     def process(self):

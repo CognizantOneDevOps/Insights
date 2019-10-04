@@ -38,7 +38,6 @@ public class TestServlet extends HttpServlet {
 			writer.println("It works");
 			writer.close();
 		} catch (Exception e) {
-			e.printStackTrace();
 		}
 	}
 }
