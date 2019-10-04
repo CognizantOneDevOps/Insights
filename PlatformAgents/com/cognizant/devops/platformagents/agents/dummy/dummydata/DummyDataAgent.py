@@ -271,7 +271,7 @@ class DummyDataAgent(BaseAgent):
                     #    jira_sprintArr.append(randonSprintStringId)
                 except Exception as ex:
                     self.printLog(ex,True)
-            jiraMetadata = {"labels" : ["ALM"], "labels" : ["JIRA"]}
+            jiraMetadata = {"labels" : ["JIRA"]}
             total_record_count =total_record_count + len(jira_data)
             self.publishToolsData(jira_data, jiraMetadata)
             publish_message_count_loop=publish_message_count_loop+' Jira Data='+str(len(jira_data))
@@ -369,7 +369,7 @@ class DummyDataAgent(BaseAgent):
                     jenkins_data.append(jenkinsSample)
                 except Exception as ex:
                     self.printLog(ex,True)
-            jenkinsMetadata = {"labels" : ["CI"], "labels" : ["JENKINS"]}
+            jenkinsMetadata = {"labels" : ["JENKINS"]}
             #self.printLog(len(jenkins_data), False)
             total_record_count =total_record_count + len(jenkins_data)
             self.publishToolsData(jenkins_data, jenkinsMetadata)
@@ -415,7 +415,7 @@ class DummyDataAgent(BaseAgent):
                 except Exception as ex:
                     self.printLog(ex,True)
                 #print(sonarSample)
-            sonarMetadata = {"labels" : ["CODEQUALITY"], "labels" : ["SONAR"]}
+            sonarMetadata = {"labels" : ["SONAR"]}
             #print(len(sonar_data))
             total_record_count =total_record_count + len(sonar_data)
             self.publishToolsData(sonar_data, sonarMetadata)
@@ -450,7 +450,7 @@ class DummyDataAgent(BaseAgent):
                     #print(rundeckSample)
                 except Exception as ex:
                     self.printLog(ex,True)
-            RundeckMetadata = {"labels" : ["DEPLOYMENT"], "labels" : ["RUNDECK"]}
+            RundeckMetadata = {"labels" : ["RUNDECK"]}
             #print(len(rundeck_data))
             total_record_count =total_record_count + len(rundeck_data)
             self.publishToolsData(rundeck_data, RundeckMetadata)
