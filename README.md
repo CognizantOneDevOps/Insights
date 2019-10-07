@@ -17,9 +17,7 @@ For information on the latest features and updates please refer to the below men
 
 Latest Major Release Updates :  
 
-Major Release v5.0 - 
-Major enhancements to Agent management framework to support multiple instances of same tool. 
-All agent activties can now be performed via UI.
-New intuitive UI using latest Angular 6 technology.
-New textual inference Grafana panel.
-Business mapping design change which enables you to tag nodes with specific labels so as to group DevOps Metrics based on Product/Program/Portfolio
+Major Release v6.0 - 
+Grafana upgraded to 6.1
+Bulk data upload facility
+
