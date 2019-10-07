@@ -313,7 +313,7 @@ export class HomeComponent implements OnInit {
             iconName: 'feature',
             route: 'InSights/Home/webhook',
             isToolbarDisplay: true,
-            showMenu: true,
+            showMenu: InsightsInitService.showAuditReporting,
             title: "WebHook",
             isAdminMenu: true
           },
