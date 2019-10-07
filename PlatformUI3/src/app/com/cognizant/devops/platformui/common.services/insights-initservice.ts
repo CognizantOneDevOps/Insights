@@ -32,6 +32,8 @@ export class InsightsInitService {
     static agentsOsList = {};
     static configDesc = {};
     static showAuditReporting = false;
+    static showWebhookConfiguration = false;
+    static showBusinessMapping = true;
 
     constructor(location: Location, private http: HttpClient,
         private imageHandler: ImageHandlerService, private logger: LogService) {
@@ -76,6 +78,8 @@ export class InsightsInitService {
 
         InsightsInitService.agentsOsList = UIConfigResponse.agentsOsList;
         InsightsInitService.showAuditReporting = UIConfigResponse.showAuditReporting;
+        InsightsInitService.showWebhookConfiguration = UIConfigResponse.showWebhookConfiguration;
+        InsightsInitService.showBusinessMapping = UIConfigResponse.showBusinessMapping;
     }
 
     private loadImageHandler() {
