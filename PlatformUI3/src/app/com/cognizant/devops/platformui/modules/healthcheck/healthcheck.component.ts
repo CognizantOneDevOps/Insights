@@ -137,7 +137,7 @@ export class HealthCheckComponent implements OnInit {
           element.serverName = key;
           if (element.type == 'Service') {
             if (element.serverName.indexOf('Webhook') >= 0) {
-              if (InsightsInitService.showAuditReporting) {
+              if (InsightsInitService.showWebhookConfiguration) {
                 this.servicesDataSource.push(element);
               }
             } else {
