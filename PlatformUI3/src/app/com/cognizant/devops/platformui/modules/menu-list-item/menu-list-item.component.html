@@ -29,7 +29,7 @@
   </span>
   </a>
   <div *ngIf="expanded && isExpanded">
-    <app-menu-list-item [style.width.px]="leftNavWidthpx" *ngFor="let child of item.children" [item]="child" [depth]="depth+1"
+    <app-menu-list-item [style.width.px]="leftNavWidthpx" *ngFor="let child of getNavItemsChildernByFilter(item.children)" [item]="child" [depth]="depth+1"
       [isExpanded]="isExpanded" [selectedOrg]="selectedOrg" [showAdminTab]="showAdminTab" [leftNavWidthpx]="leftNavWidthpx">
       </app-menu-list-item>
   </div>
