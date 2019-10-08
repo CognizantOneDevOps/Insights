@@ -19,15 +19,13 @@ cd /opt
 sudo wget https://platform.cogdevops.com/insights_install/release/latest/PlatformUI3.zip -O PlatformUI3.zip
 sudo unzip PlatformUI3.zip && sudo rm -rf PlatformUI3.zip
 sudo wget https://platform.cogdevops.com/insights_install/release/latest/PlatformService.war -O PlatformService.war
-sudo wget https://platform.cogdevops.com/insights_install/installationScripts/latest/RHEL/tomcat/apache-tomcat-8.5.27.tar.gz
-sudo tar -zxvf apache-tomcat-8.5.27.tar.gz
-sudo cp -R ./app /opt/apache-tomcat-8.5.27/webapps
-#sudo cp -R app /opt/apache-tomcat-8.5.27/webapps
-sudo rm -rf PlatformUI3
-sudo cp PlatformService.war /opt/apache-tomcat-8.5.27/webapps
+sudo wget https://platform.cogdevops.com/insights_install/installationScripts/latest/Ubuntu/packages/tomcat/apache-tomcat.tar.gz
+sudo tar -zxvf apache-tomcat.tar.gz
+sudo cp -R ./app /opt/apache-tomcat/webapps
+sudo cp PlatformService.war /opt/apache-tomcat/webapps
 sudo rm -rf PlatformService.war
-cd apache-tomcat-8.5.27
-sudo chmod -R 777 /opt/apache-tomcat-8.5.27
+cd apache-tomcat
+sudo chmod -R 777 /opt/apache-tomcat
 cd /etc/systemd/system
 sudo wget https://platform.cogdevops.com/insights_install/installationScripts/latest/Ubuntu/scripts/Tomcat.service
 sudo systemctl enable Tomcat.service

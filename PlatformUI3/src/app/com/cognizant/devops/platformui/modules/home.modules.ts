@@ -76,6 +76,8 @@ import { RelationshipBuilderComponent } from '@insights/app/modules/relationship
 import { RelationshipBuilderService } from '@insights/app/modules/relationship-builder/relationship-builder.service';
 import { BulkUploadComponent } from '@insights/app/modules/bulkupload/bulkupload.component';
 import { BulkUploadService } from '@insights/app/modules/bulkupload/bulkupload.service';
+import { WebHookComponent } from '@insights/app/modules/webhook/webhook.component';
+import { WebHookService } from '@insights/app/modules/webhook/webhook.service';
 
 
 
@@ -110,7 +112,8 @@ import { BulkUploadService } from '@insights/app/modules/bulkupload/bulkupload.s
     CustomReportConfigComponent,
     ShowJsonDialog,
     RelationshipBuilderComponent,
-    BulkUploadComponent
+    BulkUploadComponent,
+    WebHookComponent
   ],
   imports: [
     HomeRouting,
@@ -150,7 +153,8 @@ import { BulkUploadService } from '@insights/app/modules/bulkupload/bulkupload.s
     TitleCasePipe,
     QueryBuilderService,
     RelationshipBuilderService,
-    BulkUploadService
+    BulkUploadService,
+    WebHookService
   ]
 })
 

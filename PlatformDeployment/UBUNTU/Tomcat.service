@@ -4,8 +4,8 @@ Description=Ubuntu Tomcat Service
 
 [Service]
 Type=forking
-ExecStart=/opt/apache-tomcat-8.5.27/bin/startup.sh
-ExecStop=/opt/apache-tomcat-8.5.27/bin/shutdown.sh
+ExecStart=/opt/apache-tomcat/bin/startup.sh
+ExecStop=/opt/apache-tomcat/bin/shutdown.sh
 
 [Install]
 WantedBy=multi-user.target

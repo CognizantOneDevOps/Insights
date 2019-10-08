@@ -11,7 +11,7 @@ gitCommitID = sh (
 	stage ('LicenseCheck') {
            checkout scm
     	   def commit = sh (returnStdout: true, script: '''var=''
-	for file in $(find . -print | grep -i -e .*[.]java -e .*[.]py -e .*[.]sh -e .*[.]bat | grep -Eiv "*__init__.py*" )
+	for file in $(find . -print | grep -i -e .*[.]java -e .*[.]py -e .*[.]sh -e .*[.]bat | grep -Eiv "*__init__.py*" | grep -Eiv "*.sha1" )
 	do
    	    if grep -q "Apache License" $file; then
         	updated="License is updated $file" ##Dummy line
@@ -45,10 +45,6 @@ gitCommitID = sh (
 	sh 'cd /var/jenkins/jobs/$commitID/workspace && mvn clean install -DskipTests'
 	   }	
 	
-	//Below step will be enabled in next release to include security analysis.
-	/*stage ('Insight_PS_IQ') {	
-	sh 'mvn com.sonatype.clm:clm-maven-plugin:evaluate -Dclm.applicationId=Insights'
-   	}*/
 
 	stage ('Insight_PS_CodeAnalysis') {
 		sh 'mvn sonar:sonar -Dmaven.test.failure.ignore=true -DskipTests=true -Dsonar.sources=src/main/java -pl !PlatformUI3'

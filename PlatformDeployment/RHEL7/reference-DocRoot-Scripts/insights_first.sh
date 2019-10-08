@@ -16,6 +16,8 @@
 # Set InSights Home
 # Set InSights Home
 echo "#################### Setting up Insights Home ####################"
+sudo yum install wget -y
+sudo yum install unzip -y
 cd /usr
 sudo mkdir INSIGHTS_HOME
 cd INSIGHTS_HOME

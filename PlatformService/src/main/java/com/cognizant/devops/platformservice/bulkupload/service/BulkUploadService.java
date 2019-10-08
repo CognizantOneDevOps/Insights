@@ -17,19 +17,18 @@
 package com.cognizant.devops.platformservice.bulkupload.service;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.Reader;
-import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Stream;
+
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
@@ -38,23 +37,19 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-import java.util.stream.Stream;
+
+import com.cognizant.devops.platformcommons.constants.ConfigOptions;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBException;
-import com.cognizant.devops.platformcommons.dal.neo4j.GraphResponse;
 import com.cognizant.devops.platformcommons.dal.neo4j.Neo4jDBHandler;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
-import com.cognizant.devops.platformcommons.constants.ConfigOptions;
-import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
 import com.cognizant.devops.platformservice.rest.datatagging.constants.DatataggingConstants;
-import com.cognizant.devops.platformservice.rest.util.PlatformServiceUtil;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
 @Service("bulkUploadService")
-public class BulkUploadService implements IBulkUpload{
+public class BulkUploadService implements IBulkUpload {
 	private static final Logger log = LogManager.getLogger(BulkUploadService.class);
+
 	public boolean uploadDataInDatabase(MultipartFile file, String toolName, String label)
 			throws InsightsCustomException, IOException {
 		File csvfile = null;
@@ -77,12 +72,10 @@ public class BulkUploadService implements IBulkUpload{
 				} else {
 					throw new InsightsCustomException("File is exceeding the size.");
 				}
-			}
-			else {
+			} else {
 				throw new InsightsCustomException("Invalid file format.");
 			}
-		}
-		catch (IOException ex) {
+		} catch (IOException ex) {
 			log.debug("Exception while creating csv on server", ex.getMessage());
 			throw new InsightsCustomException("Exception while creating csv on server");
 		} catch (InsightsCustomException ex) {
@@ -91,21 +84,18 @@ public class BulkUploadService implements IBulkUpload{
 		} catch (ArrayIndexOutOfBoundsException e) {
 			log.error("Error in file.", e.getMessage());
 			throw new InsightsCustomException("Error in File Format");
-		}
-		catch (Exception e) {
+		} catch (Exception e) {
 			status = false;
 			log.error("Error in uploading csv file", e.getMessage());
 			throw new InsightsCustomException("Error in uploading csv file");
-				}
+		}
 		return status;
 	}
 
-	
 	private boolean parseCsvRecords(CSVParser csvParser, Neo4jDBHandler dbHandler, Map<String, Integer> headerMap,
 			String query)
 			throws IOException, GraphDBException, InsightsCustomException, ArrayIndexOutOfBoundsException {
 		List<JsonObject> nodeProperties = new ArrayList<>();
-		int numberOfRecords = headerMap.size();
 		for (CSVRecord csvRecord : csvParser.getRecords()) {
 			try {
 				JsonObject json = getToolFileDetails(csvRecord, headerMap);
@@ -116,14 +106,13 @@ public class BulkUploadService implements IBulkUpload{
 			} catch (ArrayIndexOutOfBoundsException ex) {
 				log.error("Error in file.", ex);
 				throw new InsightsCustomException("Error in File Format");
-			}
-			catch (Exception e) {
+			} catch (Exception e) {
 				log.error(e);
 				throw new InsightsCustomException(e.getMessage());
 			}
 		}
 		JsonObject graphResponse = dbHandler.bulkCreateNodes(nodeProperties, null, query);
-			if (graphResponse.get(DatataggingConstants.RESPONSE).getAsJsonObject().get(DatataggingConstants.ERRORS)
+		if (graphResponse.get(DatataggingConstants.RESPONSE).getAsJsonObject().get(DatataggingConstants.ERRORS)
 				.getAsJsonArray().size() > 0) {
 			return false;
 		} else {
@@ -141,8 +130,7 @@ public class BulkUploadService implements IBulkUpload{
 				} catch (ArrayIndexOutOfBoundsException ex) {
 					log.error("Error in file.", ex.getMessage());
 					throw new InsightsCustomException("Error in File Format");
-				}
-				catch (Exception e) {
+				} catch (Exception e) {
 					log.error("Error " + e + " at Header Key..." + header.getKey());
 					throw new InsightsCustomException("Error " + e + " at Header Key..." + header.getKey());
 				}
@@ -150,6 +138,7 @@ public class BulkUploadService implements IBulkUpload{
 		}
 		return json;
 	}
+
 	private File convertToFile(MultipartFile multipartFile) throws IOException {
 		File file = new File(multipartFile.getOriginalFilename());
 		try (FileOutputStream fos = new FileOutputStream(file)) {
@@ -157,9 +146,10 @@ public class BulkUploadService implements IBulkUpload{
 		}
 		return file;
 	}
+
 	public Object getToolDetailJson() throws InsightsCustomException {
 		// TODO Auto-generated method stub
-		// Path dir = Paths.get(filePath);
+		
 		String agentPath = System.getenv().get("INSIGHTS_HOME") + File.separator + ConfigOptions.CONFIG_DIR;
 		Path dir = Paths.get(agentPath);
 		Object config = null;
@@ -175,7 +165,7 @@ public class BulkUploadService implements IBulkUpload{
 		} catch (Exception e) {
 			log.error("Error in reading csv file", e.getMessage());
 			throw new InsightsCustomException("Error in reading csv file");
-				}
+		}
 		return config;
 	}
 }

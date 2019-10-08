@@ -29,17 +29,15 @@ import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.util.WebUtils;
 
-import com.cognizant.devops.platformservice.customsettings.CustomAppSettings;
-
 public class CustomCsrfFilter extends OncePerRequestFilter {
 
 	public static final String CSRF_COOKIE_NAME = "XSRF-TOKEN";
-	private static Logger LOG = LogManager.getLogger(CustomAppSettings.class);
+	private static Logger LOG = LogManager.getLogger(CustomCsrfFilter.class);
 
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
 			throws ServletException, IOException {
-
+		LOG.debug(" Inside Filter == CustomCsrfFilter token ");
 		CsrfToken csrf = (CsrfToken) request.getAttribute(CsrfToken.class.getName());
 		// LOG.debug(" arg0 CsrfToken " + CsrfToken.class.getName() + " " + csrf);
 		if (csrf != null) {

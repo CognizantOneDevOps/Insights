@@ -25,7 +25,12 @@ if (environment.production) {
   enableProdMode();
   if (window) {
     window.console.log = function () { };
+    window.onbeforeunload = function () { return "Back button is not available!"; window.history.forward(1); };
   }
+}
+
+if (environment) {
+  window.onbeforeunload = function () { return "Back button is not available!"; window.history.forward(1); };
 }
 
 platformBrowserDynamic().bootstrapModule(InsightsAppModule)

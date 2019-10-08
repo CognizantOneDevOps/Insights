@@ -46,8 +46,7 @@ export class GrafanaDashboardComponent implements OnInit {
     selectedDashboard: GrafanaDashboardMode;
     dashboards = [];
     constructor(private route: ActivatedRoute, private router: Router,
-        private sanitizer: DomSanitizer, private grafanadashboardservice: GrafanaDashboardService,
-        private grafanaService: GrafanaAuthenticationService, private cookieService: CookieService) {
+        private sanitizer: DomSanitizer, private grafanadashboardservice: GrafanaDashboardService, private cookieService: CookieService) {
         var self = this;
         this.framesize = window.frames.innerHeight;
 

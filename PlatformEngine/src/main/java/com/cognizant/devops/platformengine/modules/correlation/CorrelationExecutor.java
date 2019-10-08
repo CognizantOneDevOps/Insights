@@ -70,6 +70,7 @@ public class CorrelationExecutor {
 				return;
 			}
 			for(Correlation correlation: correlations) {
+				log.debug(" Correlation started for " + correlation.getRelationName());
 				applyFieldIndices(correlation);
 				updateNodesMissingCorrelationFields(correlation.getDestination());
 				int availableRecords = 1;
@@ -78,9 +79,12 @@ public class CorrelationExecutor {
 					availableRecords = sourceDataList.size();
 					if(sourceDataList.size() > 0) {
 						executeCorrelations(correlation, sourceDataList, correlation.getRelationName());
+					} else {
+						log.debug("No record found for Correlation of " + correlation.getRelationName());
 					}
 				}
 				removeRawLabel(correlation.getDestination());
+				log.debug(" Correlation end for " + correlation.getRelationName());
 			}
 		}else {
 			log.error("Correlation configuration is not provided.");

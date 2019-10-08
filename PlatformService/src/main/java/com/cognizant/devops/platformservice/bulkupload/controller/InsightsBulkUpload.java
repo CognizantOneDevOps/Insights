@@ -15,30 +15,27 @@
  *******************************************************************************/
 package com.cognizant.devops.platformservice.bulkupload.controller;
 
-import java.io.IOException;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformservice.bulkupload.service.BulkUploadService;
-import com.cognizant.devops.platformservice.rest.neo4j.GraphDBService;
 import com.cognizant.devops.platformservice.rest.util.PlatformServiceUtil;
 import com.google.gson.JsonObject;
 
 @RestController
 @RequestMapping("/admin/bulkupload")
 public class InsightsBulkUpload {
-    static Logger log = LogManager.getLogger(GraphDBService.class.getName());
-    private JsonObject asJsonObject;
+    static Logger log = LogManager.getLogger(InsightsBulkUpload.class.getName());
+    
 
     @Autowired
     BulkUploadService bulkUploadService;
@@ -64,7 +61,7 @@ public class InsightsBulkUpload {
             return PlatformServiceUtil.buildSuccessResponseWithData(details);
         } catch (InsightsCustomException e) {
             log.error(e.getMessage());
-            return PlatformServiceUtil.buildFailureResponse(e.toString());
+            return PlatformServiceUtil.buildFailureResponse(e.getMessage());
         } catch (Exception e) {
             log.error(e.getMessage());
             return PlatformServiceUtil.buildFailureResponse(e.getMessage());

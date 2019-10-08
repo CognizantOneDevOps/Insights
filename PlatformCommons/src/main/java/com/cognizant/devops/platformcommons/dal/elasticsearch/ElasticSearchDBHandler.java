@@ -58,27 +58,6 @@ public class ElasticSearchDBHandler {
 		return "Done";
 	}
 
-	public JsonObject loadVisualization(String sourceESUrl) {
-
-		JsonObject result = new JsonObject();
-		ClientResponse response = null;
-
-		try {
-			WebResource resource = Client.create().resource(sourceESUrl);
-			response = resource.accept(MediaType.APPLICATION_JSON).type(MediaType.APPLICATION_JSON)
-					.get(ClientResponse.class);
-			result = new JsonParser().parse(response.getEntity(String.class)).getAsJsonObject();
-		} catch (Exception e) {
-			log.error("Exception while getting data from ES", e);
-		} finally {
-			if (response != null) {
-				response.close();
-			}
-		}
-
-		return result;
-	}
-
 	public JsonObject queryES(String sourceESUrl, String query) throws Exception {
 
 		ClientResponse response = null;
@@ -126,38 +105,7 @@ public class ElasticSearchDBHandler {
 			System.out.println(output.get("name"));
 			System.out.println(output.get("action"));
 
-			// resultMap.put(kpiDefinition.getName(),
-			// Long.valueOf(element.getAsJsonObject().get("avg_duration").getAsJsonObject().get("value").getAsLong()));
-			/*
-			 * Long avg =
-			 * Long.valueOf(output.get("avg_output").getAsJsonObject().get("value").
-			 * getAsLong()); String groupByValue = output.get("key").getAsString();
-			 */
-
 		}
 
-		// System.out.println(str);
-		/*
-		 * JsonObject visualization = elasticSearchDBHandler.loadVisualization(
-		 * "http://localhost:9200/.kibana/dashboard/_search?q=*&size=10000&from=0");
-		 * String baseUrl = "http://localhost:9200/.kibana/dashboard/"; JsonArray
-		 * asJsonArray =
-		 * visualization.get("hits").getAsJsonObject().get("hits").getAsJsonArray();
-		 * for(JsonElement vizEle : asJsonArray){ JsonObject viz =
-		 * vizEle.getAsJsonObject(); elasticSearchDBHandler.cloneVisualizations(baseUrl
-		 * + viz.get("_id").getAsString(), viz.get("_source").getAsJsonObject()); }
-		 */
-
-		/*
-		 * for(Map.Entry<String, JsonElement> confEntry : jsonObj.entrySet()){
-		 * JsonElement value = confEntry.getValue();
-		 * System.out.println(confEntry.getKey()); System.out.println(value.toString());
-		 * }
-		 */
-		/*
-		 * JsonArray asJsonArray = jsonObj.get("aggregations"); for(JsonElement vizEle :
-		 * asJsonArray){ JsonObject viz = vizEle.getAsJsonObject();
-		 * System.out.println(viz.get("avg_jen_Duration")); }
-		 */
 	}
 }

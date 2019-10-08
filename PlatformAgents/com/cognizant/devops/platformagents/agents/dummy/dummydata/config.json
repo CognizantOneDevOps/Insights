@@ -1,0 +1,53 @@
+{
+  "dynamicTemplate": {
+  	  "timeFieldMapping" : {
+			"startDate" : "%Y-%m-%d"
+  		},
+	  "responseTemplate": {
+	    "sha": "dummyData"
+	  }     
+  },
+  "insightsTimeZone": "Asia/Kolkata",
+  "communication": {
+    "type": "REST",
+    "sslVerify": true,
+    "responseType": "JSON"
+  },
+  "loggingSetting": {
+    "logLevel": "DEBUG",
+	"maxBytes" : 5000000,
+	"backupCount" : 1000
+  },
+  "mqConfig": {
+    "host": "127.0.0.1",
+    "password": "iSight",
+    "user": "iSight",
+    "exchange": "iSight",
+    "agentControlXchg":"iAgent"
+  },
+  "publish": {
+    "data": "DUMMY.DUMMYDATA.DATA",
+    "health": "DUMMY.DUMMYDATA.HEALTH"
+  },
+  "isDebugAllowed": true,
+  "subscribe": {
+    "config": "DUMMY.DUMMYDATA.config"
+  },
+  "agentId" : "",
+  "toolCategory" : "DUMMY",
+  "enableBranches": false,
+  "enableDataValidation": true,
+  "enableValueArray": false,
+  "timeStampFormat": "%Y-%m-%dT%H:%M:%SZ",
+  "toolsTimeZone": "GMT",
+  "isEpochTimeFormat" : false,
+  
+  "runSchedule": 3000,
+  "useResponseTemplate": true,
+  "timeStampField":"lastUpdated",
+  "startFrom": "2016-10-10 00:01",
+  "dataCount": 1,
+  "start_date_days":550,
+  "sleepTime":10,
+  "createSprintData":true
+}

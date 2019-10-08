@@ -309,10 +309,20 @@ export class HomeComponent implements OnInit {
             isAdminMenu: true
           },
           {
+            displayName: 'Webhook Configuration',
+            iconName: 'feature',
+            route: 'InSights/Home/webhook',
+            isToolbarDisplay: true,
+            showMenu: InsightsInitService.showWebhookConfiguration,
+            title: "WebHook",
+            isAdminMenu: true
+          },
+          {
             displayName: 'Business Mapping',
             iconName: 'feature',
             route: 'InSights/Home/businessmapping',
             isToolbarDisplay: true,
+            showMenu: InsightsInitService.showBusinessMapping,
             title: "Business Mapping",
             isAdminMenu: true
           },
@@ -409,6 +419,8 @@ export class HomeComponent implements OnInit {
         //console.log(data);
       });
     this.deleteAllPreviousCookies();
+    this.dataShare.setAuthorizationToken(undefined);
+    this.dataShare.removeAuthorization()
     this.router.navigate(['/login']);
   }
 

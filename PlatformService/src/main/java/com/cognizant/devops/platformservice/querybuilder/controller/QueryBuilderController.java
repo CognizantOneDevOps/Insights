@@ -42,6 +42,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.cognizant.devops.platformcommons.constants.ConfigOptions;
+import com.cognizant.devops.platformcommons.core.util.ValidationUtils;
 import com.cognizant.devops.platformdal.queryBuilder.QueryBuilderConfig;
 import com.cognizant.devops.platformservice.querybuilder.service.QueryBuilderService;
 import com.cognizant.devops.platformservice.rest.util.PlatformServiceUtil;
@@ -72,6 +73,9 @@ public class QueryBuilderController {
 		String message = null;
 		Log.debug("object is --"+queryObj);
 		try{
+			for (Map.Entry<String, String> reqParamQuery : queryObj.entrySet()) {
+				ValidationUtils.cleanXSS(reqParamQuery.getValue());
+			}
 			message = queryBuilderService.saveOrUpdateQuery(queryObj.get("reportName"), queryObj.get("frequency"), queryObj.get("subscribers"), 
 					queryObj.get("fileName"), queryObj.get("queryType"), queryObj.get("user"));
 		}catch(Exception e){
@@ -84,7 +88,8 @@ public class QueryBuilderController {
 	public @ResponseBody JsonObject deleteQuery(@RequestBody String reportName){
 		String message = null;
 		try{
-			message = queryBuilderService.deleteQuery(reportName);
+			String validatedResponse = ValidationUtils.validateRequestBody(reportName);
+			message = queryBuilderService.deleteQuery(validatedResponse);
 		}catch(Exception e){
 			return PlatformServiceUtil.buildFailureResponse(e.toString());
 		}
@@ -96,16 +101,22 @@ public class QueryBuilderController {
 	public JsonObject uploadFile(@RequestBody MultipartFile file) {
 		String message = "";
 		try {
-			Path rootLocation = Paths.get(ConfigOptions.QUERY_DATA_PROCESSING_RESOLVED_PATH);
-			Log.debug("File Obj -- "+file);
-			String fileName = file.getOriginalFilename();
-			String extension = FilenameUtils.getExtension(fileName);
-			if (fileName != null && !fileName.isEmpty() && "json".equalsIgnoreCase(extension)) {
-				Files.copy(file.getInputStream(),rootLocation.resolve(file.getOriginalFilename()),StandardCopyOption.REPLACE_EXISTING);
-				message = "You successfully uploaded " + file.getOriginalFilename() + "!";
-			}else{
-				message = "Upload failed, fail has invalid format! ";
-				return PlatformServiceUtil.buildFailureResponse(message);
+			boolean checkValidFile = PlatformServiceUtil.validateFile(file.getOriginalFilename());
+			boolean isValid = PlatformServiceUtil.checkFileForHTML(new String(file.getBytes()));
+			if(checkValidFile && isValid){
+				Path rootLocation = Paths.get(ConfigOptions.QUERY_DATA_PROCESSING_RESOLVED_PATH);
+				Log.debug("File Obj -- "+file);
+				String fileName = file.getOriginalFilename();
+				String extension = FilenameUtils.getExtension(fileName);
+				if (fileName != null && !fileName.isEmpty() && "json".equalsIgnoreCase(extension)) {
+					Files.copy(file.getInputStream(),rootLocation.resolve(file.getOriginalFilename()),StandardCopyOption.REPLACE_EXISTING);
+					message = "You successfully uploaded " + file.getOriginalFilename() + "!";
+				}else{
+					message = "Upload failed, fail has invalid format! ";
+					return PlatformServiceUtil.buildFailureResponse(message);
+				}
+			}else {
+				return PlatformServiceUtil.buildFailureResponse("Invalid file content. ");
 			}
 		} catch (Exception e) {
 			message = "FAIL to upload " + file.getOriginalFilename() + "!";
@@ -120,17 +131,27 @@ public class QueryBuilderController {
 	public ResponseEntity<byte[]> getFileContents(@RequestParam("path") String path) {
 		ResponseEntity<byte[]>  response = null;
 		try {
-			Log.debug("Path to download -- "+path);
-			byte[] fileContent = Files.readAllBytes(Paths.get(new File(path).getAbsolutePath()));
-			HttpHeaders headers = new HttpHeaders();
-		    headers.setContentType(MediaType.parseMediaType("application/json"));
-			headers.add("Access-Control-Allow-Methods", "POST");
-			headers.add("Access-Control-Allow-Headers", "Content-Type");
-			headers.add("Content-Disposition", "attachment; filename="+Paths.get(new File(path).getAbsolutePath()).getFileName());
-			headers.add("Cache-Control", "no-cache, no-store, must-revalidate,post-check=0, pre-check=0");
-			headers.add("Pragma", "no-cache");
-			headers.add("Expires", "0");
-		    response = new ResponseEntity<>(fileContent, headers, HttpStatus.OK);
+			boolean validPath = PlatformServiceUtil.checkValidPath(path);
+			if(validPath){
+				Log.debug("Path to download -- "+path);
+				byte[] fileContent = Files.readAllBytes(Paths.get(new File(path).getCanonicalPath()));
+				boolean isValid = PlatformServiceUtil.checkFileForHTML(new String(fileContent));
+				if(isValid) {
+					HttpHeaders headers = new HttpHeaders();
+					headers.setContentType(MediaType.parseMediaType("application/json"));
+					headers.add("Access-Control-Allow-Methods", "POST");
+					headers.add("Access-Control-Allow-Headers", "Content-Type");
+					headers.add("Content-Disposition", "attachment; filename="+Paths.get(new File(path).getCanonicalPath()).getFileName());
+					headers.add("Cache-Control", "no-cache, no-store, must-revalidate,post-check=0, pre-check=0");
+					headers.add("Pragma", "no-cache");
+					headers.add("Expires", "0");
+					response = new ResponseEntity<>(fileContent, headers, HttpStatus.OK);
+				}else {
+					throw new Exception("Invalid file content -- "+new String(fileContent));
+				}
+			}else{
+				throw new Exception("Invalid path -- "+path);
+			}
 		} catch (Exception e) {
 			Log.error("Error, Failed to download from " + path, e.getMessage());
 		}

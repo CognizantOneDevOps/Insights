@@ -27,11 +27,10 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.cognizant.devops.platformcommons.core.util.ValidationUtils;
-import com.cognizant.devops.platformservice.customsettings.CustomAppSettings;
 import com.cognizant.devops.platformservice.rest.util.PlatformServiceUtil;
 
 public final class RequestWrapper extends HttpServletRequestWrapper {
-	private static Logger log = LogManager.getLogger(CustomAppSettings.class);
+	private static Logger log = LogManager.getLogger(RequestWrapper.class);
 	HttpServletRequest request;
 	HttpServletResponse response;
 	Boolean validationStatus = false;
@@ -40,41 +39,32 @@ public final class RequestWrapper extends HttpServletRequestWrapper {
 		super(servletRequest);
 		this.request = servletRequest;
 		this.response = servletResponse;
-		getValidateCookies();
 		validatAllHeaders();
+		inValidateAllCookies();
+		validateAllParameter();
 	}
 
 	/**
 	 * Apply the XSS filter to the parameters
 	 * @param parameters
 	 */
-	@Override
-	public String[] getParameterValues(String parameter) {
+	public void validateAllParameter() {
 		log.debug("In getParameterValues .....");
-		String[] values = super.getParameterValues(parameter);
-		if (values == null) {
-			return null;
-		}
-		int count = values.length;
-		String[] encodedValues = new String[count];
-		for (int i = 0; i < count; i++) {
-			encodedValues[i] = ValidationUtils.cleanXSS(values[i]);
-		}
 
 		Enumeration<String> parameterNames = request.getParameterNames();
 		while (parameterNames.hasMoreElements()) {
-			String paramName = parameterNames.nextElement();
+			String paramName = ValidationUtils.cleanXSS(parameterNames.nextElement());
 			String paramValues = ValidationUtils.cleanXSS(request.getParameter(paramName));
+			//log.debug("In validateAllParameter getParameterValues .....{}  ==== {}", paramName, paramValues);
 		}
-		log.debug("In getParameterValues ==== Completed ");
-		return encodedValues;
+		log.debug("In validateAllParameter ==== Completed ");
 	}
 
 	/**
 	 * Apply the XSS filter to the parameter
 	 * @param parameters
 	 */
-	@Override
+	/*@Override
 	public String getParameter(String parameter) {
 		log.debug("In getParameter ");
 		String value = super.getParameter(parameter);
@@ -83,36 +73,37 @@ public final class RequestWrapper extends HttpServletRequestWrapper {
 		}
 		log.info("In getParameter RequestWrapper ==== Completed");
 		return ValidationUtils.cleanXSS(value);
-	}
+	}*/
 
 	/**
 	 * Apply the XSS filter to the super Header
 	 * 
 	 * @param parameters
 	 */
-	@Override
+	/*@Override
 	public String getHeader(String name) {
-		log.debug("In getHeader");
 		String value = super.getHeader(name);
+		log.debug("In getHeader " + name + " value " + value);
 		if (value == null)
 			return null;
 		log.info("In getHeader RequestWrapper ==== complated ");
 		return ValidationUtils.cleanXSS(value);
-	}
+	}*/
 
 	/**
 	 * Apply the XSS filter to the all Headers
 	 * 
 	 * @param parameters
 	 */
-
 	public void validatAllHeaders() {
 		log.debug("In validatAllHeaders ");
 		Enumeration<String> headerNames = request.getHeaderNames();
 
 		while (headerNames.hasMoreElements()) {
+
 			String headerName = headerNames.nextElement();
 			String headersValue = request.getHeader(headerName);
+			//log.debug("In validatAllHeaders " + headerName + " headersValue " + headersValue);
 			String headerValue = ValidationUtils.cleanXSS(headersValue);
 		}
 		log.debug("In validatAllHeaders ==== Complated");
@@ -122,9 +113,8 @@ public final class RequestWrapper extends HttpServletRequestWrapper {
 	 * Validate request cookies from XSS and HTTP_Response_Splitting
 	 * @param parameters
 	 */
-	//@Override
-	public Cookie[] getValidateCookies() {
-		log.debug(" in RequestWrapper cookies ==== ");
+	public Cookie[] inValidateAllCookies() {
+		log.debug(" in RequestWrapper get cookies ==== ");
 		Cookie[] cookies = null;
 		cookies = PlatformServiceUtil.validateCookies(request.getCookies());
 		log.debug(" in RequestWrapper cookies ==== Complated ");

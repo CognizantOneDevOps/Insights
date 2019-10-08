@@ -1,11 +1,13 @@
 {
 	"showBusinessMapping": true,
 	"showAuditReporting": false,
+	"showWebhookConfiguration": false,
 	"agentsOsList": {
 		"Windows": "windows",
 		"RHEL/CentOS": "linux",
 		"Ubuntu": "Ubuntu"
 	},
 	"serviceHost": "http://localhost:8080",
-	"grafanaHost": "http://localhost:3000"
+	"grafanaHost": "http://localhost:3000",
+	"webhookHost": "http://localhost"
 }

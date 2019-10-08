@@ -62,11 +62,15 @@ export class DataSharedService {
     var auth_uuid = uuid();
     auth_uuid = auth_uuid.substring(0, 15);
     var auth = this.encryptData(auth_uuid, strAuthorization) + auth_uuid;
-    this.storage.set("Authorization", auth); // strAuthorization
+    this.storage.set("Authorization", auth);
   }
 
   public getAuthorizationToken() {
     return this.storage.get("Authorization");
+  }
+
+  public removeAuthorization() {
+    this.storage.remove('Authorization');
   }
 
   public setSessionExpirationTime(timeDashboardSessionExpiration: any) {

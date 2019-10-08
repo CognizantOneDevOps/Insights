@@ -29,7 +29,7 @@ sudo cp ldap.toml $GRAFANA_HOME/conf/ldap.toml
 sudo wget https://platform.cogdevops.com/insights_install/installationScripts/latest/RHEL/grafana/defaults.ini
 sudo cp defaults.ini $GRAFANA_HOME/conf/defaults.ini
 sudo nohup ./bin/grafana-server &
-echo $! > grafana-pid.txt
+sudo echo $! > grafana-pid.txt
 sleep 10
 curl -X POST -u admin:admin -H "Content-Type: application/json" -d '{"name":"PowerUser","email":"PowerUser@PowerUser.com","login":"PowerUser","password":"C0gnizant@1"}' http://localhost:3000/api/admin/users
 sleep 10

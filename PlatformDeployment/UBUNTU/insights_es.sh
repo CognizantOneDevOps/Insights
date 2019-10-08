@@ -18,12 +18,15 @@
 echo "#################### Installing Eleastic Search with configs ####################"
 mkdir elasticsearch
 cd elasticsearch
-wget https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-5.6.4.deb
-sudo dpkg -i elasticsearch-5.6.4.deb
-wget http://platform.cogdevops.com/insights_install/installationScripts/latest/RHEL/es/ElasticSearch-5.6.4.zip
-unzip ElasticSearch-5.6.4.zip
-sudo cp ElasticSearch-5.6.4/elasticsearch.yml /etc/elasticsearch/elasticsearch.yml
-sudo cp ElasticSearch-5.6.4/log4j2.properties /etc/elasticsearch/log4j2.properties
-sudo service elasticsearch start
+wget https://platform.cogdevops.com/insights_install/installationScripts/latest/Ubuntu/packages/elasticsearch/elasticsearch.deb
+sudo dpkg -i elasticsearch.deb
+wget https://platform.cogdevops.com/insights_install/installationScripts/latest/Ubuntu/packages/elasticsearch/ElasticSearch.zip
+unzip ElasticSearch.zip
+sudo cp ElasticSearch/elasticsearch.yml /etc/elasticsearch/elasticsearch.yml
+sudo cp ElasticSearch/log4j2.properties /etc/elasticsearch/log4j2.properties
+sudo systemctl daemon-reload
+sudo systemctl enable elasticsearch.service
+sudo systemctl start elasticsearch.service
 sleep 20
-curl -X PUT 'localhost:9200/_template/neo4j-*' -d '{"order" : 0, "template": "neo4j-*","settings": {"index.number_of_shards": "5"},"mappings": {"_default_": {"dynamic_templates": [{"string_fields" : {"mapping" : {"index" : "analyzed","omit_norms" : true,"type" : "string","fields" : {"raw" : {"ignore_above" : 256,"index" : "not_analyzed","type" : "string"}}},"match_mapping_type" : "string","match" : "*"}}]}},"aliases": {}}}'
+curl -XPUT 'localhost:9200/_template/neo4j-*' -d '{"order" : 0, "template": "neo4j-*","settings": {"index.number_of_shards": "5"},"mappings": {"_default_": {"dynamic_templates": [{"string_fields" : {"mapping" : {"index" : "analyzed","omit_norms" : true,"type" : "string","fields" : {"raw" : {"ignore_above" : 256,"index" : "not_analyzed","type" : "string"}}},"match_mapping_type" : "string","match" : "*"}}]}},"aliases": {}}}'
+rm -rf elasticsearch

@@ -83,7 +83,12 @@ export class CustomReportConfigComponent implements OnInit {
       this.showThrobber = false;
       console.log('in update', this.receivedParam);
       const { data } = this.receivedParam;
-      const queryPath = data.querypath.slice().split('\\').pop();
+      let queryPath;
+      if(data.querypath.includes('\\')){
+        queryPath = data.querypath.slice().split('\\').pop();
+      }else{
+        queryPath = data.querypath.slice().split('/').pop();
+      }
       const datas = {
         reportname: [{value: data.reportName, disabled: true}, Validators.required],
         frequency: [data.frequency, Validators.required],

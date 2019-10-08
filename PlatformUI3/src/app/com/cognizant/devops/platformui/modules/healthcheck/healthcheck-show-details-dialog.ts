@@ -37,11 +37,15 @@ export class ShowDetailsDialog implements OnInit {
   resultsLength: number = 6;
   agentDetailedNode = [];
   agentDetailedDatasource = new MatTableDataSource([]);
+  agentFailureDetailsDatasource = new MatTableDataSource([]);
+  agentFailureRecords = [];
   headerArrayDisplay = [];
   masterHeader = new Map<String, String>();
   finalHeaderToShow = new Map<String, String>();
-  @ViewChild(MatPaginator) paginator: MatPaginator;
+  displayedColumns: string[] = ['inSightsTimeX', 'message'];
+  //@ViewChild(MatPaginator) allStatusPaginator: MatPaginator;  
   headerSet = new Set();
+  showAgentFailureTab: boolean = false;
 
   constructor(public dialogRef: MatDialogRef<ShowDetailsDialog>,
     @Inject(MAT_DIALOG_DATA) public data: any,
@@ -52,16 +56,17 @@ export class ShowDetailsDialog implements OnInit {
 
   ngOnInit() {
     this.loadDetailsDialogInfo();
+    this.loadAgentFailureDetails();
     this.detailType = this.data.detailType;
   }
 
-  ngAfterViewInit() {
-    this.agentDetailedDatasource.paginator = this.paginator;
+  ngAfterViewInit() {    
+    //this.agentDetailedDatasource.paginator = this.allStatusPaginator;
   }
 
   fillMasterHeaderData() {
     this.masterHeader.set("execId", "Execution ID");
-    this.masterHeader.set("inSightsTimeX", "Execution Time ("+this.data.timeZone+")");
+    this.masterHeader.set("inSightsTimeX", "Execution Time (" + this.data.timeZone + ")");
     this.masterHeader.set("status", "Status");
     this.masterHeader.set("message", "Message");
   }
@@ -71,7 +76,7 @@ export class ShowDetailsDialog implements OnInit {
     this.showContent = !this.showThrobber;
     this.checkResponseData = true;
     this.healthCheckService.loadHealthConfigurations(this.data.toolName, this.data.categoryName, this.data.agentId)
-      .then((data) => {
+      .then((data) => {        
         this.showThrobber = false;
         this.showContent = !this.showThrobber;
         var dataArray = data.data.nodes;
@@ -80,6 +85,14 @@ export class ShowDetailsDialog implements OnInit {
           if (dataArray.length === 0 && this.data.detailType != "Platform Service") {
             this.checkResponseData = false;
           }
+          
+          if (this.detailType == "Platform Service" || this.detailType == "Insights Inference Engine" 
+                    || this.detailType == "Platform Engine") {
+             this.showAgentFailureTab = false;
+          } else {
+             this.showAgentFailureTab = true;
+          }
+         
           for (var key in dataArray) {
             var dataNodes = dataArray[key];
             for (var node in dataNodes) {
@@ -104,13 +117,41 @@ export class ShowDetailsDialog implements OnInit {
               }
             }
           }
-          this.agentDetailedDatasource.data = this.agentDetailedNode;
-          this.agentDetailedDatasource.paginator = this.paginator;
+          this.agentDetailedDatasource.data = this.agentDetailedNode;          
           this.showSelectedField();
         }
       });
-
   }
+
+  loadAgentFailureDetails(): void {
+    this.healthCheckService.getAgentFailureDetails(this.data.toolName, this.data.categoryName, this.data.agentId)
+      .then((data) => {
+        // Method body       
+        var failureRecords = data.data.nodes;
+        if (failureRecords != undefined) {
+          for (var key in failureRecords) {
+            var dataNodes = failureRecords[key];
+            for (var node in dataNodes) {
+              if (node == "propertyMap") {
+                var obj = dataNodes[node];
+                if (typeof obj["inSightsTimeX"] !== "undefined") {
+                  obj["inSightsTimeX"] = this.datePipe.transform(obj["inSightsTimeX"], 'yyyy-MM-dd HH:mm:ss');
+                }
+
+                if (typeof obj["message"] !== "undefined") {
+                  obj["message"] = obj["message"];
+                }
+                this.agentFailureRecords.push(obj);
+              }
+            }
+          }
+          this.agentFailureDetailsDatasource.data = this.agentFailureRecords;          
+        }
+
+      });
+  }
+
+
 
   showSelectedField(): void {
     //Define sequence of headerSet according to mater array and remove unwanted header 

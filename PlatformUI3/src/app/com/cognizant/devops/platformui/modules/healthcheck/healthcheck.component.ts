@@ -82,8 +82,8 @@ export class HealthCheckComponent implements OnInit {
       if (this.agentResponse != null) {
         this.showThrobberAgent = false;
         this.showContentAgent = !this.showThrobberAgent;
-        for (var key in this.agentResponse) {
-          var element = this.agentResponse[key];
+        for (var key in this.agentResponse.data) {
+          var element = this.agentResponse.data[key];
           element.serverName = key;
           if (element.type == 'Agents') {
             this.agentNodes = element.agentNodes;
@@ -132,11 +132,17 @@ export class HealthCheckComponent implements OnInit {
         //console.log(this.healthResponse);
         this.showThrobber = false;
         this.showContent = !this.showThrobber;
-        for (var key in this.healthResponse) {
-          var element = this.healthResponse[key];
+        for (var key in this.healthResponse.data) {
+          var element = this.healthResponse.data[key];
           element.serverName = key;
           if (element.type == 'Service') {
-            this.servicesDataSource.push(element);
+            if (element.serverName.indexOf('Webhook') >= 0) {
+              if (InsightsInitService.showWebhookConfiguration) {
+                this.servicesDataSource.push(element);
+              }
+            } else {
+              this.servicesDataSource.push(element);
+            }
           } else if (element.type == 'Database') {
             this.dataComponentDataSource.push(element);
           }
@@ -159,7 +165,7 @@ export class HealthCheckComponent implements OnInit {
         var detailType = categoryName;
       } else {
         var rtoolName = toolName.charAt(0).toUpperCase() + toolName.slice(1).toLowerCase();
-        var filePath = "${INSIGHTS_HOME}/logs/PlatformAgent/log_" + rtoolName + "Agent.log";
+        var filePath = "${INSIGHTS_HOME}/logs/PlatformAgent/log_" + agentId + "Agent.log";
         var detailType = rtoolName;
       }
       let showDetailsDialog = this.dialog.open(ShowDetailsDialog, {

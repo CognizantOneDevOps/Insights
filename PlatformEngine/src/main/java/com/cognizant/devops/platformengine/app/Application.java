@@ -2,29 +2,24 @@
  * Copyright 2017 Cognizant Technology Solutions
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
- * use this file except in compliance with the License.  You may obtain a copy
+ * use this file except in compliance with the License. You may obtain a copy
  * of the License at
  * 
- *   http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
  * License for the specific language governing permissions and limitations under
  * the License.
  ******************************************************************************/
 package com.cognizant.devops.platformengine.app;
 
+import java.util.Timer;
+import java.util.TimerTask;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.quartz.JobBuilder;
-import org.quartz.JobDetail;
-import org.quartz.Scheduler;
-import org.quartz.SchedulerException;
-import org.quartz.SimpleScheduleBuilder;
-import org.quartz.Trigger;
-import org.quartz.TriggerBuilder;
-import org.quartz.impl.StdSchedulerFactory;
 
 import com.cognizant.devops.platformcommons.config.ApplicationConfigCache;
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
@@ -37,109 +32,67 @@ import com.cognizant.devops.platformengine.modules.mapper.ProjectMapperModule;
 import com.cognizant.devops.platformengine.modules.offlinedataprocessing.OfflineDataProcessingExecutor;
 
 /**
- * Engine execution will start from Application. 1. Load the iSight config 2.
- * Initialize Publisher and subscriber modules 3. Initialize Correlation Module.
+ * Engine execution will start from Application.
+ * 1. Load the iSight config
+ * 2. Initialize Publisher and subscriber modules which receive data from tool
+ * 3. Initialize Correlation Module.
+ * 4. Initialize ProjectMapperModule Module
+ * 5. Initialize DataPurgingExecutor Module
+ * 6. Initialize OfflineDataProcessingExecutor Module
+ * 7. Log Engine Health data in DB
  */
 public class Application {
 	private static Logger log = LogManager.getLogger(Application.class.getName());
-	
-	private static int defaultInterval = 600;
-	private Application(){
-		
+
+	private static int defaultIntervalInSec = 600;
+
+	private Application() {
+
 	}
-	
+
 	public static void main(String[] args) {
-		if(args.length > 0){
-			defaultInterval = Integer.valueOf(args[0]);
+		if (args.length > 0) {
+			defaultIntervalInSec = Integer.valueOf(args[0]);
 		}
 		try {
 			// Load insight configuration
 			ApplicationConfigCache.loadConfigCache();
-			
+
 			ApplicationConfigProvider.performSystemCheck();
-			
-			// Subscribe for desired events.
-			JobDetail aggrgatorJob = JobBuilder.newJob(EngineAggregatorModule.class)
-					.withIdentity("EngineAggregatorModule", "iSight")
-					.build();
-	
-			Trigger aggregatorTrigger = TriggerBuilder.newTrigger()
-					.withIdentity("EngineAggregatorModuleTrigger", "iSight")
-					.startNow()
-					.withSchedule(SimpleScheduleBuilder.simpleSchedule()
-							.withIntervalInSeconds(defaultInterval)
-							.repeatForever())
-					.build();
+
+			// Subscribe for desired events. This used to consume data from tool queue
+			Timer timerEngineAggregator = new Timer("EngineAggregatorModule");
+			TimerTask engineAggregatorModuleTrigger = new EngineAggregatorModule();
+			timerEngineAggregator.schedule(engineAggregatorModuleTrigger, 0, defaultIntervalInSec * 1000);
 
 			// Schedule the Correlation Module.
-			JobDetail correlationJob = JobBuilder.newJob(EngineCorrelatorModule.class)
-					.withIdentity("EngineCorrelatorModule", "iSight")
-					.build();
-	
-			Trigger correlationTrigger = TriggerBuilder.newTrigger()
-					.withIdentity("EngineCorrelatorModuleTrigger", "iSight")
-					.startNow()
-					.withSchedule(SimpleScheduleBuilder.simpleSchedule()
-							.withIntervalInSeconds(defaultInterval)
-							.repeatForever())
-					.build();
-			
+			Timer timerEngineCorrelatorModule = new Timer("EngineCorrelatorModule");
+			TimerTask engineCorrelatorModuleTrigger = new EngineCorrelatorModule();
+			timerEngineCorrelatorModule.schedule(engineCorrelatorModuleTrigger, 0, defaultIntervalInSec * 1000);
+
 			// Schedule the Project Mapping Module.
-			JobDetail projectMappingJob = JobBuilder.newJob(ProjectMapperModule.class)
-					.withIdentity("ProjectMapperModule", "iSight")
-					.build();
-	
-			Trigger projectMappingTrigger = TriggerBuilder.newTrigger()
-					.withIdentity("ProjectMapperModuleTrigger", "iSight")
-					.startNow()
-					.withSchedule(SimpleScheduleBuilder.simpleSchedule()
-							.withIntervalInSeconds(defaultInterval)
-							.repeatForever())
-					.build();
+			Timer timerProjectMapperModule = new Timer("ProjectMapperModule");
+			TimerTask projectMapperModuleTrigger = new ProjectMapperModule();
+			timerProjectMapperModule.schedule(projectMapperModuleTrigger, 0, defaultIntervalInSec * 1000);
+
 			// Schedule the DataPurging Executor Job
-			JobDetail dataPurgingJob = JobBuilder.newJob(DataPurgingExecutor.class)
-					.withIdentity("DataPurgingExecutor", "iSight")
-					.build();
-	
-			Trigger dataPurgingTrigger = TriggerBuilder.newTrigger()
-					.withIdentity("DataPurgingExecutorTrigger", "iSight")
-					.startNow()
-					.withSchedule(SimpleScheduleBuilder.simpleSchedule()
-							.withIntervalInSeconds(defaultInterval)
-							.repeatForever())
-					.build();
-			
+			Timer timerDataPurgingExecutor = new Timer("DataPurgingExecutor");
+			TimerTask dataPurgingExecutorTrigger = new DataPurgingExecutor();
+			timerDataPurgingExecutor.schedule(dataPurgingExecutorTrigger, 0, defaultIntervalInSec * 1000);
+
 			// Schedule the OfflineDataProcessingExecutor job
-			JobDetail offlineDataProcessingJob = JobBuilder.newJob(OfflineDataProcessingExecutor.class)
-					.withIdentity("OfflineDataProcessingExecutor", "iSight")
-					.build();
-	
-			Trigger offlineDataProcessingTrigger = TriggerBuilder.newTrigger()
-					.withIdentity("OfflineDataProcessingExecutorTrigger", "iSight")
-					.startNow()
-					.withSchedule(SimpleScheduleBuilder.simpleSchedule()
-							.withIntervalInSeconds(defaultInterval)
-							.repeatForever())
-					.build();
-	
-			// Tell quartz to schedule the job using our trigger
-			Scheduler scheduler;
-		
-			scheduler = new StdSchedulerFactory().getScheduler();
-			scheduler.start();
-			scheduler.scheduleJob(aggrgatorJob, aggregatorTrigger);
-			scheduler.scheduleJob(correlationJob, correlationTrigger);
-			scheduler.scheduleJob(projectMappingJob, projectMappingTrigger);
-			scheduler.scheduleJob(dataPurgingJob, dataPurgingTrigger);
-			scheduler.scheduleJob(offlineDataProcessingJob, offlineDataProcessingTrigger);
-			EngineStatusLogger.getInstance().createEngineStatusNode("Platform Engine Service Started ",PlatformServiceConstants.SUCCESS);
-		} catch (SchedulerException e) {
-			EngineStatusLogger.getInstance().createEngineStatusNode("Platform Engine Service not running due to Scheduler Exception "+e.getMessage(),PlatformServiceConstants.FAILURE);
-			log.error(e);
-		}catch (Exception e) {
-			EngineStatusLogger.getInstance().createEngineStatusNode("Platform Engine Service not running "+e.getMessage(),PlatformServiceConstants.FAILURE);
+			Timer timerOfflineDataProcessingExecutor = new Timer("OfflineDataProcessingExecutor");
+			TimerTask offlineDataProcessingExecutorTrigger = new OfflineDataProcessingExecutor();
+			timerOfflineDataProcessingExecutor.schedule(offlineDataProcessingExecutorTrigger, 0,
+					defaultIntervalInSec * 1000);
+
+			EngineStatusLogger.getInstance().createEngineStatusNode("Platform Engine Service Started ",
+					PlatformServiceConstants.SUCCESS);
+		} catch (Exception e) {
+			EngineStatusLogger.getInstance().createEngineStatusNode(
+					"Platform Engine Service not running " + e.getMessage(), PlatformServiceConstants.FAILURE);
 			log.error(e);
 		}
 	}
-	
+
 }

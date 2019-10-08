@@ -25,7 +25,6 @@ class AzurePipelineAgent(BaseAgent):
         BaseUrl = self.config.get("baseUrl", '')
         UserID = self.config.get("userID", '')
         Passwd = self.config.get("passwd", '')
-        Auth = self.config.get("auth", '')
         collectionName = self.config.get("collectionName", '')
         getProjectUrl = BaseUrl+ "/" + collectionName +"/_apis/projects"
         responseTemplate = self.getResponseTemplate()
@@ -44,11 +43,11 @@ class AzurePipelineAgent(BaseAgent):
                 startFrom = startFrom+1
             else:
                 startFrom = 1
-            for build in range(startFrom, bCount+1):
-                buildDetailUrl = getBuildsUrl+ "/" + str(build)
-                buildDetail= self.getResponse(buildDetailUrl, 'GET', UserID, Passwd, None)
-                data += self.parseResponse(responseTemplate, buildDetail, injectData)
-            self.tracking[projectName] = bCount
+            for buildIterator in range(0, bCount):
+                buildDetail = builds['value'][buildIterator]
+                if buildDetail['id'] > startFrom:
+                    data += self.parseResponse(responseTemplate, buildDetail, injectData)
+            self.tracking[projectName] = buildDetail['id']
         if data != []:
             self.publishToolsData(data)
             self.updateTrackingJson(self.tracking)

@@ -15,11 +15,14 @@
  ******************************************************************************/
 package com.cognizant.devops.platformservice.rest.util;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.servlet.http.Cookie;
 import javax.ws.rs.core.MediaType;
@@ -29,7 +32,6 @@ import org.apache.logging.log4j.Logger;
 
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
 import com.cognizant.devops.platformcommons.core.util.ValidationUtils;
-import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.sun.jersey.api.client.Client;
@@ -41,6 +43,8 @@ public class PlatformServiceUtil {
 	private static final String[] SET_VALUES = new String[] { "grafanaOrg", "grafana_user", "grafanaRole",
 			"grafana_remember", "grafana_sess", "XSRF-TOKEN", "JSESSIONID","grafana_session" };
 	private static final Set<String> masterCookiesList = new HashSet<String>(Arrays.asList(SET_VALUES));
+	private final static String JSON_FILE_VALIDATOR = "^([a-zA-Z0-9_.\\s-])+(.json)$";
+	private final static String LOG_FILE_VALIDATOR = "^([a-zA-Z0-9_.\\s-])+(.log)$";
 	private PlatformServiceUtil(){
 		
 	}
@@ -57,7 +61,8 @@ public class PlatformServiceUtil {
 		JsonObject jsonResponse = new JsonObject();
 		jsonResponse.addProperty(PlatformServiceConstants.STATUS, PlatformServiceConstants.SUCCESS);
 		jsonResponse.add(PlatformServiceConstants.DATA, new Gson().toJsonTree(data));
-		JsonObject validatedData = ValidationUtils.validateStringForHTMLContent(jsonResponse);
+		//JsonObject validatedData = ValidationUtils.validateStringForHTMLContent(jsonResponse);
+		JsonObject validatedData = ValidationUtils.replaceHTMLContentFormString(jsonResponse);
 		if (validatedData == null) {
 			validatedData = buildFailureResponse(PlatformServiceConstants.INVALID_RESPONSE_DATA);
 		}
@@ -117,5 +122,74 @@ public class PlatformServiceUtil {
 			log.warn("No cookies founds");
 		}
 		return cookiesArray;
+	}
+	
+	/**
+	 * Check path for canonical and directory traversal.
+	 * @param path
+	 * @return
+	 */
+	public static boolean checkValidPath(String path) {
+		boolean valid = false;
+		try {
+			log.debug("path " + path);
+			log.debug("canonical path " + new File(path).getCanonicalPath());
+			//check for canonical path
+			if(path.equals(new File(path).getCanonicalPath())){
+				//check directory
+				log.debug("canonical path check done--" + path);
+				String parts[] = path.split(Pattern.quote(File.separator));
+				for(int i=0;i<parts.length;i++){
+					if(i==0 && parts[0].equals("")) {
+						valid = true;
+						continue;
+					}
+					else if(!parts[i].equals("") && Pattern.compile("^[a-zA-Z0-9_.:\\-]+").matcher(parts[i]).matches()){
+						valid = true;
+						continue;
+					}else {
+						return false;
+					}
+				}
+			}else {
+				log.debug("canonical path check failed--" + path);
+			}
+		} catch (Exception e) {
+			log.error("Not a valid path -- "+e.getStackTrace());
+		}
+		return valid;
+	}
+	
+	public static boolean validateFile(String filename) {
+		final Pattern pattern;
+		try {
+			if(filename.contains(".json")) {
+				pattern = Pattern.compile(JSON_FILE_VALIDATOR);
+			}else {
+				pattern = Pattern.compile(LOG_FILE_VALIDATOR);
+			}
+			final Matcher matcher = pattern.matcher(filename);
+
+			if(matcher.find()) {
+				log.debug("File name is Valid for regex -- "+filename);
+				return true;
+			} 
+		} catch (Exception e) {
+			log.error("Not a valid path -- "+e.getStackTrace());
+		}
+		return false;
+	}
+
+	public static boolean checkFileForHTML(String fileContent) {
+		String strRegEx = "<[^>]*>";
+		String replacedContent = "";
+		if (fileContent != null) {
+			replacedContent = fileContent.replaceAll(strRegEx, "").replace("&nbsp;", " ").replace("&amp;", "&");
+		}
+		if (!replacedContent.equalsIgnoreCase(fileContent)) {
+			log.error(" Invalid response data ");
+			return false;
+		}
+		return true;
 	}
 }

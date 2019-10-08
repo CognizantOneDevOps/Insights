@@ -33,6 +33,7 @@ import com.cognizant.devops.platformdal.queryBuilder.QueryBuilderConfig;
 import com.cognizant.devops.platformdal.settingsconfig.SettingsConfiguration;
 import com.cognizant.devops.platformdal.tools.layout.ToolsLayout;
 import com.cognizant.devops.platformdal.user.UserPortfolio;
+import com.cognizant.devops.platformdal.webhookConfig.WebHookConfig;
 
 public class PlatformDALSessionFactoryProvider {
 	private static SessionFactory sessionFactory;
@@ -58,6 +59,7 @@ public class PlatformDALSessionFactoryProvider {
 			configuration.addAnnotatedClass(Icon.class);
 			configuration.addAnnotatedClass(SettingsConfiguration.class);
 			configuration.addAnnotatedClass(QueryBuilderConfig.class);
+			configuration.addAnnotatedClass(WebHookConfig.class);
 			PostgreData postgre = ApplicationConfigProvider.getInstance().getPostgre();
 			if(postgre != null){
 				configuration.setProperty("hibernate.connection.username", postgre.getUserName());

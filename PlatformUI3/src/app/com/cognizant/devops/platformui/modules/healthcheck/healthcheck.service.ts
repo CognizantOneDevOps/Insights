@@ -24,6 +24,7 @@ export interface IHealthCheckService {
     loadServerHealthConfiguration(): Promise<any>;
     loadHealthConfigurations(toolName: string, toolCategory: string, agentId: String): Promise<any>;
     downloadLog(fileName: string): Observable<any>;
+    getAgentFailureDetails(toolName: string, toolCategory: string, agentId: String): Promise<any>;
 }
 
 
@@ -55,6 +56,11 @@ export class HealthCheckService implements IHealthCheckService {
         let params = new HttpParams();
         params = params.append("logFileName", fileName + ".log");
         return this.httpClient.get("/PlatformService/traceability/getReportLog", { headers: headers_object, responseType: 'blob', params });
+    }
+
+       getAgentFailureDetails(toolName: string, toolCategory: string, agentId: String): Promise<any> {
+        var restHandler = this.restCallHandlerService;
+        return restHandler.get("AGENTS_FAILURE_DETAILS", { 'tool': toolName, 'category': toolCategory, 'agentId': agentId });
     }
 
 }

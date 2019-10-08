@@ -16,16 +16,22 @@
 # Install Java
 echo "#################### Installing Java with Env Variable ####################"
 cd /opt/
-sudo wget  https://platform.cogdevops.com/insights_install/installationScripts/latest/RHEL/java/jdk-8u211-linux-x64.tar.gz
-sudo tar xzf jdk-8u211-linux-x64.tar.gz
-export JAVA_HOME=/opt/jdk1.8.0_211
-echo JAVA_HOME=/opt/jdk1.8.0_211  | sudo tee -a /etc/environment
-echo "export" JAVA_HOME=/opt/jdk1.8.0_211 | sudo tee -a /etc/profile
-export JRE_HOME=/opt/jdk1.8.0_211/jre
-echo JRE_HOME=/opt/jdk1.8.0_211/jre | sudo tee -a /etc/environment
-echo "export" JRE_HOME=/opt/jdk1.8.0_211/jre | sudo tee -a /etc/profile
-export PATH=$PATH:/opt/jdk1.8.0_211/bin:/opt/jdk1.8.0_211/jre/bin
-echo PATH=$PATH:/opt/jdk1.8.0_211/bin:/opt/jdk1.8.0_211/jre/bin | sudo tee -a /etc/environment
-sudo update-alternatives --install /usr/bin/java java /opt/jdk1.8.0_211/bin/java 20000
-source /etc/environment
-source /etc/profile
+sudo wget https://platform.cogdevops.com/insights_install/installationScripts/latest/Ubuntu/packages/java/jdklinux.tar.gz
+sudo tar xzf jdklinux.tar.gz
+export JAVA_HOME=/opt/jdklinux
+echo JAVA_HOME=/opt/jdklinux  | sudo tee -a /etc/environment
+echo "export" JAVA_HOME=/opt/jdklinux | sudo tee -a /etc/profile
+export JRE_HOME=/opt/jdklinux/jre
+echo JRE_HOME=/opt/jdklinux/jre | sudo tee -a /etc/environment
+echo "export" JRE_HOME=/opt/jdklinux/jre | sudo tee -a /etc/profile
+export PATH=$PATH:/opt/jdklinux/bin:/opt/jdklinux/jre/bin
+echo PATH=$PATH:/opt/jdklinux/bin:/opt/jdklinux/jre/bin | sudo tee -a /etc/environment
+sudo update-alternatives --install /usr/bin/java java /opt/jdklinux/bin/java 20000
+sudo update-alternatives --install "/usr/bin/java" "java" "/opt/jdklinux/bin/java" 1
+sudo update-alternatives --install "/usr/bin/javac" "javac" "/opt/jdklinux/bin/javac" 1
+sudo update-alternatives --install "/usr/bin/javaws" "javaws" "/opt/jdklinux/bin/javaws" 1
+sudo update-alternatives --set java /opt/jdklinux/bin/java
+sudo update-alternatives --set javac /opt/jdklinux/bin/javac
+sudo update-alternatives --set javaws /opt/jdklinux/bin/javaws
+. /etc/environment
+. /etc/profile
