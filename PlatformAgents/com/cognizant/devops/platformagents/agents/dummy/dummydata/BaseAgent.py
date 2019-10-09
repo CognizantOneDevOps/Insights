@@ -99,6 +99,14 @@ class BaseAgent(object):
         handler.setFormatter(formatter)
         logging.getLogger().setLevel(loggingSetting.get('logLevel',logging.WARN))
         logging.getLogger().addHandler(handler)
+      
+    def printLog(self,message,printOnConsole=False):
+        try:
+            logging.debug('==== '+str(message))
+            if printOnConsole:
+                print(str(message))
+        except Exception as ex:
+            logging.error(ex)
     
     def setupLocalCache(self):
         self.dataRoutingKey = str(self.config.get('publish').get('data'))
@@ -213,7 +221,7 @@ class BaseAgent(object):
                 data = self.validateData(data)
             self.addExecutionId(data, self.executionId)
             self.addTimeStampField(data, timeStampField, timeStampFormat, isEpochTime)
-            logging.info(data)
+            #logging.info(data)
             self.messageFactory.publish(self.dataRoutingKey, data, self.config.get('dataBatchSize', 100), metadata)
             self.logIndicator(self.PUBLISH_START, self.config.get('isDebugAllowed', False))
             
@@ -348,7 +356,8 @@ class BaseAgent(object):
             scheduler = self.scheduler
             schedulerStatus = self.config.get('schedulerStatus', None)
             if schedulerStatus == 'UPDATE_SCHEDULE':
-                self.scheduledJob.reschedule('interval', seconds=60*self.runSchedule)
+                print("No Need to run again for dummy agent")
+                #self.scheduledJob.reschedule('interval', seconds=60*self.runSchedule)
             elif schedulerStatus == 'STOP':
                 scheduler.shutdown()
             elif schedulerStatus == 'PAUSE':
@@ -383,6 +392,7 @@ class BaseAgent(object):
             self.publishHealthData(self.generateHealthData())
             
         except Exception as ex:
+            logging.error(ex)
             self.publishHealthDataForExceptions(self,ex)
         finally:
             '''If agent receive the STOP command, Python program should exit gracefully after current data collection is complete.  '''

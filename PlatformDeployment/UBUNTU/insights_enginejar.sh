@@ -24,6 +24,7 @@ echo INSIGHTS_ENGINE=`pwd` | sudo tee -a /etc/environment
 echo "export" INSIGHTS_ENGINE=`pwd` | sudo tee -a /etc/profile
 . /etc/environment
 . /etc/profile
+sudo cd /opt/insightsengine
 sudo wget https://platform.cogdevops.com/insights_install/release/latest/PlatformEngine.jar -O PlatformEngine.jar
 sleep 2
 sudo nohup java -jar PlatformEngine.jar &
