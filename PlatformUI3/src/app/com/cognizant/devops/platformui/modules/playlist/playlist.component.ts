@@ -40,7 +40,7 @@ export class PlaylistComponent implements OnInit {
     }
     window.addEventListener('message', receiveMessage, false);
     console.log(this.framesize);
-    self.playListUrl = sanitizer.bypassSecurityTrustResourceUrl(InsightsInitService.grafanaHost + '/dashboard/script/iSight_ui3_Grafana6.js?url=' + InsightsInitService.grafanaHost + '/playlists');
+    self.playListUrl = sanitizer.bypassSecurityTrustResourceUrl(InsightsInitService.grafanaHost + '/dashboard/script/iSight_ui3.js?url=' + InsightsInitService.grafanaHost + '/playlists');
 
   }
 
