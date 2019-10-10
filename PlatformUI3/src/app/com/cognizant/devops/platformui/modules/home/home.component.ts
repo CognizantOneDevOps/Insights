@@ -180,7 +180,7 @@ export class HomeComponent implements OnInit {
         navItemobj.displayName = orgDtl.name;
         navItemobj.iconName = 'grafanaOrg';
         navItemobj.route = 'InSights/Home/grafanadashboard/' + orgDtl.orgId;
-        navItemobj.isToolbarDisplay = false;
+        navItemobj.isToolbarDisplay = true;
         navItemobj.showIcon = false;
         navItemobj.isAdminMenu = false;
         navItemobj.orgId = orgDtl.orgId;
@@ -259,7 +259,7 @@ export class HomeComponent implements OnInit {
         displayName: 'Playlist',
         iconName: 'feature',
         route: 'InSights/Home/playlist',
-        isToolbarDisplay: false,
+        isToolbarDisplay: true,
         showMenu: true,
         title: "Playlist",
         isAdminMenu: false
