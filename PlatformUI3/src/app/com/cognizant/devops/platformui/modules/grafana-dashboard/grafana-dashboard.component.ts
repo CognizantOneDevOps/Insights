@@ -48,7 +48,8 @@ export class GrafanaDashboardComponent implements OnInit {
     constructor(private route: ActivatedRoute, private router: Router,
         private sanitizer: DomSanitizer, private grafanadashboardservice: GrafanaDashboardService, private cookieService: CookieService) {
         var self = this;
-        this.framesize = window.frames.innerHeight - 5;
+        var offset = 55 + 5; // 55 px is tool bar size and 5px is app-grafana-dashboard height
+        this.framesize = window.frames.innerHeight - offset;
         console.log(" self.framesize inner height " + self.framesize);
         var receiveMessage = function (evt) {
             var height = parseInt(evt.data);
