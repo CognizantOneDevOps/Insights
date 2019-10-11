@@ -54,6 +54,14 @@ export class MenuListItemComponent implements OnInit {
   ngOnInit() {
 
   }
+  
+   getNavItemsChildernByFilter(navChildItems) {
+    return navChildItems.filter(item => (
+      item.showMenu == true
+    )
+    );
+  }
+
 
   onItemSelected(item: NavItem) {
     if (item.children && item.children.length) {

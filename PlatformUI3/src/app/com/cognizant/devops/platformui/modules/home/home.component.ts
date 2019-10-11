@@ -313,7 +313,7 @@ export class HomeComponent implements OnInit {
             iconName: 'feature',
             route: 'InSights/Home/webhook',
             isToolbarDisplay: true,
-            showMenu: true,
+            showMenu: InsightsInitService.showWebhookConfiguration,
             title: "WebHook",
             isAdminMenu: true
           },
@@ -322,6 +322,7 @@ export class HomeComponent implements OnInit {
             iconName: 'feature',
             route: 'InSights/Home/businessmapping',
             isToolbarDisplay: true,
+            showMenu: InsightsInitService.showBusinessMapping,
             title: "Business Mapping",
             isAdminMenu: true
           },
