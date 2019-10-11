@@ -48,7 +48,7 @@ export class GrafanaDashboardComponent implements OnInit {
     constructor(private route: ActivatedRoute, private router: Router,
         private sanitizer: DomSanitizer, private grafanadashboardservice: GrafanaDashboardService, private cookieService: CookieService) {
         var self = this;
-        var offset = 5; // 55 px is tool bar size and 5px is app-grafana-dashboard height true 55 +
+        var offset = 5; // 5px is app-grafana-dashboard height true
         this.framesize = window.frames.innerHeight - offset;
         console.log(" self.framesize inner height " + self.framesize);
         var receiveMessage = function (evt) {
@@ -120,7 +120,7 @@ export class GrafanaDashboardComponent implements OnInit {
         //console.log("parseDashboards complate 1")
         console.log(this.selectedDashboard);
         if (this.selectedDashboard != undefined) {
-            this.selectedDashboard.iframeUrl = this.selectedDashboard.iframeUrl.replace("iSight.js", "iSight_ui3");
+            this.selectedDashboard.iframeUrl = this.selectedDashboard.iframeUrl.replace("iSight.js", "iSight_ui3.js");
             this.dashboardUrl = this.sanitizer.bypassSecurityTrustResourceUrl(this.selectedDashboard.iframeUrl);
         } else {
             this.dashboardUrl = this.sanitizer.bypassSecurityTrustResourceUrl(InsightsInitService.grafanaHost + '/dashboard/script/iSight_ui3.js?url=' + InsightsInitService.grafanaHost + '/?orgId=' + this.orgId);// 1/?orgId=3 3/d/DrPYuKJmz/dynatrace-data?orgId=
