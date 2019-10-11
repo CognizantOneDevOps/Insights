@@ -1,0 +1,698 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": "-- Grafana --",
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "editable": true,
+  "gnetId": null,
+  "graphTooltip": 0,
+  "id": 7,
+  "links": [],
+  "panels": [
+    {
+      "datasource": "Neo4j-Caching",
+      "editable": true,
+      "error": false,
+      "gridPos": {
+        "h": 7,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "id": 1,
+      "links": [],
+      "targets": [
+        {
+          "cacheVariance": 5,
+          "checkQuery": false,
+          "rawQuery": true,
+          "refId": "A",
+          "rescache": true,
+          "selectionval": "Variance Time",
+          "target": "match (n:DATA) where exists(n.toolName) WITH distinct n.toolName as toolNames, keys(n) as key unwind key as keys WITH toolNames, collect(distinct keys) as key WITH {toolNames: toolNames, key: key} as data return collect(data) as data"
+        }
+      ],
+      "title": "Panel Title",
+      "toolsInsightsPanelCtrl": {
+        "selectedSeq": [
+          "JIRA",
+          "BITBUCKET",
+          "JENKINS",
+          "SONAR",
+          "RUNDECK",
+          "TESTING",
+          "LOADRUNNER"
+        ],
+        "selectedToolsSeq": [
+          "JIRA",
+          "BITBUCKET",
+          "JENKINS",
+          "SONAR",
+          "RUNDECK",
+          "TESTING",
+          "LOADRUNNER"
+        ],
+        "toolDetailMappingJson": [
+          {
+            "fields": [
+              {
+                "fieldName": "toolName",
+                "headerName": ""
+              },
+              {
+                "fieldName": "jiraKey",
+                "headerName": ""
+              },
+              {
+                "fieldName": "execId",
+                "headerName": ""
+              },
+              {
+                "fieldName": "uuid",
+                "headerName": ""
+              },
+              {
+                "fieldName": "gitCommitId",
+                "headerName": ""
+              },
+              {
+                "fieldName": "commitId",
+                "headerName": ""
+              },
+              {
+                "fieldName": "categoryName",
+                "headerName": ""
+              },
+              {
+                "fieldName": "gitCommiTime",
+                "headerName": ""
+              },
+              {
+                "fieldName": "repoName",
+                "headerName": ""
+              },
+              {
+                "fieldName": "gitAuthorName",
+                "headerName": ""
+              },
+              {
+                "fieldName": "inSightsTimeX",
+                "headerName": ""
+              },
+              {
+                "fieldName": "inSightsTime",
+                "headerName": ""
+              },
+              {
+                "fieldName": "message",
+                "headerName": ""
+              },
+              {
+                "fieldName": "gitReponame",
+                "headerName": ""
+              },
+              {
+                "fieldName": "correlationTime",
+                "headerName": ""
+              },
+              {
+                "fieldName": "maxCorrelationTime",
+                "headerName": ""
+              }
+            ],
+            "toolName": "GIT"
+          },
+          {
+            "fields": [
+              {
+                "fieldName": "endTime",
+                "headerName": ""
+              },
+              {
+                "fieldName": "startTime",
+                "headerName": ""
+              },
+              {
+                "fieldName": "buildUrl",
+                "headerName": ""
+              },
+              {
+                "fieldName": "projectID",
+                "headerName": ""
+              },
+              {
+                "fieldName": "result",
+                "headerName": ""
+              },
+              {
+                "fieldName": "jenkins_date",
+                "headerName": ""
+              },
+              {
+                "fieldName": "scmcommitId",
+                "headerName": ""
+              },
+              {
+                "fieldName": "environment",
+                "headerName": ""
+              },
+              {
+                "fieldName": "buildNumber",
+                "headerName": ""
+              },
+              {
+                "fieldName": "master",
+                "headerName": ""
+              },
+              {
+                "fieldName": "projectName",
+                "headerName": ""
+              },
+              {
+                "fieldName": "duration",
+                "headerName": ""
+              },
+              {
+                "fieldName": "toolName",
+                "headerName": ""
+              },
+              {
+                "fieldName": "jobName",
+                "headerName": ""
+              },
+              {
+                "fieldName": "execId",
+                "headerName": ""
+              },
+              {
+                "fieldName": "uuid",
+                "headerName": ""
+              },
+              {
+                "fieldName": "inSightsTimeX",
+                "headerName": ""
+              },
+              {
+                "fieldName": "inSightsTime",
+                "headerName": ""
+              },
+              {
+                "fieldName": "status",
+                "headerName": ""
+              },
+              {
+                "fieldName": "categoryName",
+                "headerName": ""
+              },
+              {
+                "fieldName": "correlationTime",
+                "headerName": ""
+              },
+              {
+                "fieldName": "maxCorrelationTime",
+                "headerName": ""
+              }
+            ],
+            "toolName": "JENKINS"
+          },
+          {
+            "fields": [
+              {
+                "fieldName": "jiraCreator",
+                "headerName": ""
+              },
+              {
+                "fieldName": "progressTimeSec",
+                "headerName": ""
+              },
+              {
+                "fieldName": "authorName",
+                "headerName": ""
+              },
+              {
+                "fieldName": "projectName",
+                "headerName": ""
+              },
+              {
+                "fieldName": "jiraUpdated",
+                "headerName": ""
+              },
+              {
+                "fieldName": "resolution",
+                "headerName": ""
+              },
+              {
+                "fieldName": "jiraStatus",
+                "headerName": ""
+              },
+              {
+                "fieldName": "creationDate",
+                "headerName": ""
+              },
+              {
+                "fieldName": "assigneeEmail",
+                "headerName": ""
+              },
+              {
+                "fieldName": "jiraIssueType",
+                "headerName": ""
+              },
+              {
+                "fieldName": "fixVersions",
+                "headerName": ""
+              },
+              {
+                "fieldName": "assigneeID",
+                "headerName": ""
+              },
+              {
+                "fieldName": "jiraKey",
+                "headerName": ""
+              },
+              {
+                "fieldName": "jiraPriority",
+                "headerName": ""
+              },
+              {
+                "fieldName": "storyId",
+                "headerName": ""
+              },
+              {
+                "fieldName": "storyPoints",
+                "headerName": ""
+              },
+              {
+                "fieldName": "Priority",
+                "headerName": ""
+              },
+              {
+                "fieldName": "execId",
+                "headerName": ""
+              },
+              {
+                "fieldName": "sprintId",
+                "headerName": ""
+              },
+              {
+                "fieldName": "categoryName",
+                "headerName": ""
+              },
+              {
+                "fieldName": "toolName",
+                "headerName": ""
+              },
+              {
+                "fieldName": "uuid",
+                "headerName": ""
+              },
+              {
+                "fieldName": "inSightsTimeX",
+                "headerName": ""
+              },
+              {
+                "fieldName": "inSightsTime",
+                "headerName": ""
+              },
+              {
+                "fieldName": "issueType",
+                "headerName": ""
+              }
+            ],
+            "toolName": "JIRA"
+          },
+          {
+            "fields": [
+              {
+                "fieldName": "jenkineBuildNumber",
+                "headerName": ""
+              },
+              {
+                "fieldName": "endTime",
+                "headerName": ""
+              },
+              {
+                "fieldName": "startTime",
+                "headerName": ""
+              },
+              {
+                "fieldName": "categoryName",
+                "headerName": ""
+              },
+              {
+                "fieldName": "toolName",
+                "headerName": ""
+              },
+              {
+                "fieldName": "execId",
+                "headerName": ""
+              },
+              {
+                "fieldName": "uuid",
+                "headerName": ""
+              },
+              {
+                "fieldName": "inSightsTimeX",
+                "headerName": ""
+              },
+              {
+                "fieldName": "inSightsTime",
+                "headerName": ""
+              },
+              {
+                "fieldName": "status",
+                "headerName": ""
+              },
+              {
+                "fieldName": "environment",
+                "headerName": ""
+              },
+              {
+                "fieldName": "correlationTime",
+                "headerName": ""
+              },
+              {
+                "fieldName": "maxCorrelationTime",
+                "headerName": ""
+              }
+            ],
+            "toolName": "RUNDECK"
+          },
+          {
+            "fields": [
+              {
+                "fieldName": "sonarKey",
+                "headerName": ""
+              },
+              {
+                "fieldName": "sonarTechDepth",
+                "headerName": ""
+              },
+              {
+                "fieldName": "sonarCoverage",
+                "headerName": ""
+              },
+              {
+                "fieldName": "projectname",
+                "headerName": ""
+              },
+              {
+                "fieldName": "sonarDuplicateCode",
+                "headerName": ""
+              },
+              {
+                "fieldName": "ProjectID",
+                "headerName": ""
+              },
+              {
+                "fieldName": "sonarComplexity",
+                "headerName": ""
+              },
+              {
+                "fieldName": "jenkineBuildNumber",
+                "headerName": ""
+              },
+              {
+                "fieldName": "resourceKey",
+                "headerName": ""
+              },
+              {
+                "fieldName": "endTime",
+                "headerName": ""
+              },
+              {
+                "fieldName": "startTime",
+                "headerName": ""
+              },
+              {
+                "fieldName": "categoryName",
+                "headerName": ""
+              },
+              {
+                "fieldName": "ProjectKey",
+                "headerName": ""
+              },
+              {
+                "fieldName": "execId",
+                "headerName": ""
+              },
+              {
+                "fieldName": "uuid",
+                "headerName": ""
+              },
+              {
+                "fieldName": "inSightsTimeX",
+                "headerName": ""
+              },
+              {
+                "fieldName": "inSightsTime",
+                "headerName": ""
+              },
+              {
+                "fieldName": "sonarQualityGateStatus",
+                "headerName": ""
+              },
+              {
+                "fieldName": "toolName",
+                "headerName": ""
+              },
+              {
+                "fieldName": "correlationTime",
+                "headerName": ""
+              },
+              {
+                "fieldName": "maxCorrelationTime",
+                "headerName": ""
+              }
+            ],
+            "toolName": "SONAR"
+          }
+        ],
+        "toolsDetailJson": {
+          "BITBUCKET": [
+            {
+              "fieldName": "bit_Jira_Key",
+              "headerName": ""
+            },
+            {
+              "fieldName": "bit_commitId",
+              "headerName": ""
+            },
+            {
+              "fieldName": "bit_reponame",
+              "headerName": ""
+            },
+            {
+              "fieldName": "bit_authorName",
+              "headerName": ""
+            },
+            {
+              "fieldName": "bit_authorEmail",
+              "headerName": ""
+            },
+            {
+              "fieldName": "inSightsTimeX",
+              "headerName": ""
+            }
+          ],
+          "JENKINS": [
+            {
+              "fieldName": "jen_BuildNumber",
+              "headerName": ""
+            },
+            {
+              "fieldName": "jen_SCMCommitId",
+              "headerName": ""
+            },
+            {
+              "fieldName": "jen_RundeckJobId",
+              "headerName": ""
+            },
+            {
+              "fieldName": "jen_ProjectName",
+              "headerName": ""
+            },
+            {
+              "fieldName": "jen_Result",
+              "headerName": ""
+            },
+            {
+              "fieldName": "inSightsTimeX",
+              "headerName": ""
+            }
+          ],
+          "JIRA": [
+            {
+              "fieldName": "jir_jirakey",
+              "headerName": ""
+            },
+            {
+              "fieldName": "jir_projectname",
+              "headerName": ""
+            },
+            {
+              "fieldName": "jir_priority",
+              "headerName": ""
+            },
+            {
+              "fieldName": "jir_status",
+              "headerName": ""
+            },
+            {
+              "fieldName": "inSightsTimeX",
+              "headerName": ""
+            }
+          ],
+          "LOADRUNNER": [
+            {
+              "fieldName": "jobName",
+              "headerName": ""
+            },
+            {
+              "fieldName": "buildNumber",
+              "headerName": ""
+            },
+            {
+              "fieldName": "transactionName",
+              "headerName": ""
+            },
+            {
+              "fieldName": "virtualUsers",
+              "headerName": ""
+            },
+            {
+              "fieldName": "slaViolationStatus",
+              "headerName": ""
+            },
+            {
+              "fieldName": "slaViolationCount",
+              "headerName": ""
+            }
+          ],
+          "RUNDECK": [
+            {
+              "fieldName": "run_ExecutionId",
+              "headerName": ""
+            },
+            {
+              "fieldName": "run_JobId",
+              "headerName": ""
+            },
+            {
+              "fieldName": "run_JobName",
+              "headerName": ""
+            },
+            {
+              "fieldName": "run_ProjectName",
+              "headerName": ""
+            },
+            {
+              "fieldName": "run_Status",
+              "headerName": ""
+            },
+            {
+              "fieldName": "inSightsTimeX",
+              "headerName": ""
+            }
+          ],
+          "SONAR": [
+            {
+              "fieldName": "resourcekey",
+              "headerName": ""
+            },
+            {
+              "fieldName": "complexity",
+              "headerName": ""
+            },
+            {
+              "fieldName": "coverage",
+              "headerName": ""
+            },
+            {
+              "fieldName": "duplicated_blocks",
+              "headerName": ""
+            },
+            {
+              "fieldName": "new_violations",
+              "headerName": ""
+            },
+            {
+              "fieldName": "inSightsTimeX",
+              "headerName": ""
+            }
+          ],
+          "TESTING": [
+            {
+              "fieldName": "Requirement_ID",
+              "headerName": ""
+            },
+            {
+              "fieldName": "Enviornment",
+              "headerName": ""
+            },
+            {
+              "fieldName": "Test_Cases",
+              "headerName": ""
+            },
+            {
+              "fieldName": "Defects",
+              "headerName": ""
+            },
+            {
+              "fieldName": "Test_Case_Status",
+              "headerName": ""
+            }
+          ]
+        }
+      },
+      "type": "toolsinsights"
+    }
+  ],
+  "schemaVersion": 18,
+  "style": "dark",
+  "tags": [],
+  "templating": {
+    "list": []
+  },
+  "time": {
+    "from": "now-1y",
+    "to": "now"
+  },
+  "timepicker": {
+    "refresh_intervals": [
+      "5s",
+      "10s",
+      "30s",
+      "1m",
+      "5m",
+      "15m",
+      "30m",
+      "1h",
+      "2h",
+      "1d"
+    ],
+    "time_options": [
+      "5m",
+      "15m",
+      "1h",
+      "6h",
+      "12h",
+      "24h",
+      "2d",
+      "7d",
+      "30d"
+    ]
+  },
+  "timezone": "browser",
+  "title": "Tracebility Dashboard",
+  "uid": "000000039",
+  "version": 15
+}

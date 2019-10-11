@@ -1,0 +1,2320 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": "-- Grafana --",
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "editable": true,
+  "gnetId": null,
+  "graphTooltip": 0,
+  "id": 6,
+  "iteration": 1570787149288,
+  "links": [
+    {
+      "icon": "external link",
+      "tags": [],
+      "targetBlank": true,
+      "type": "link",
+      "url": "http://www.bing.com"
+    },
+    {
+      "icon": "external link",
+      "tags": [],
+      "type": "dashboards"
+    },
+    {
+      "icon": "external link",
+      "includeVars": true,
+      "keepTime": true,
+      "tags": [],
+      "targetBlank": true,
+      "title": "testdash",
+      "tooltip": "testdash",
+      "type": "link",
+      "url": ""
+    }
+  ],
+  "panels": [
+    {
+      "cacheTimeout": null,
+      "colorBackground": false,
+      "colorValue": false,
+      "colors": [
+        "#299c46",
+        "#1f78c1",
+        "#d44a3a"
+      ],
+      "datasource": "Neo4j-Caching",
+      "format": "none",
+      "gauge": {
+        "maxValue": 100,
+        "minValue": 0,
+        "show": false,
+        "thresholdLabels": false,
+        "thresholdMarkers": true
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 0,
+        "y": 0
+      },
+      "id": 31,
+      "interval": null,
+      "links": [],
+      "mappingType": 1,
+      "mappingTypes": [
+        {
+          "name": "value to text",
+          "value": 1
+        },
+        {
+          "name": "range to text",
+          "value": 2
+        }
+      ],
+      "maxDataPoints": 100,
+      "nullPointMode": "connected",
+      "nullText": null,
+      "postfix": "",
+      "postfixFontSize": "50%",
+      "prefix": "",
+      "prefixFontSize": "50%",
+      "rangeMaps": [
+        {
+          "from": "null",
+          "text": "N/A",
+          "to": "null"
+        }
+      ],
+      "sparkline": {
+        "fillColor": "rgba(31, 118, 189, 0.18)",
+        "full": false,
+        "lineColor": "rgb(31, 120, 193)",
+        "show": false
+      },
+      "tableColumn": "",
+      "targets": [
+        {
+          "cacheVariance": 5,
+          "checkQuery": false,
+          "rawQuery": true,
+          "refId": "A",
+          "rescache": true,
+          "selectionval": "Variance Time",
+          "target": "match (n:JIRA) where n.sprintId in $SprintID return DISTINCT n.sprintId",
+          "timeSeries": true
+        }
+      ],
+      "thresholds": "",
+      "title": "SprintID",
+      "type": "singlestat",
+      "valueFontSize": "80%",
+      "valueMaps": [
+        {
+          "op": "=",
+          "text": "N/A",
+          "value": "null"
+        }
+      ],
+      "valueName": "avg"
+    },
+    {
+      "cacheTimeout": null,
+      "colorBackground": false,
+      "colorValue": true,
+      "colors": [
+        "#299c46",
+        "#508642",
+        "#d44a3a"
+      ],
+      "datasource": "Neo4j-Caching",
+      "format": "none",
+      "gauge": {
+        "maxValue": 100,
+        "minValue": 0,
+        "show": false,
+        "thresholdLabels": false,
+        "thresholdMarkers": true
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 4,
+        "y": 0
+      },
+      "id": 32,
+      "interval": null,
+      "links": [],
+      "mappingType": 1,
+      "mappingTypes": [
+        {
+          "name": "value to text",
+          "value": 1
+        },
+        {
+          "name": "range to text",
+          "value": 2
+        }
+      ],
+      "maxDataPoints": 100,
+      "nullPointMode": "connected",
+      "nullText": null,
+      "postfix": "",
+      "postfixFontSize": "50%",
+      "prefix": "",
+      "prefixFontSize": "50%",
+      "rangeMaps": [
+        {
+          "from": "null",
+          "text": "N/A",
+          "to": "null"
+        }
+      ],
+      "sparkline": {
+        "fillColor": "rgba(31, 118, 189, 0.18)",
+        "full": false,
+        "lineColor": "rgb(31, 120, 193)",
+        "show": false
+      },
+      "tableColumn": "",
+      "targets": [
+        {
+          "cacheVariance": 5,
+          "checkQuery": false,
+          "rawQuery": true,
+          "refId": "A",
+          "rescache": true,
+          "selectionval": "Variance Time",
+          "target": "match (n:JIRA) where n.sprintId in $SprintID return count(n) as Count",
+          "timeSeries": true
+        }
+      ],
+      "thresholds": "",
+      "title": "User Story",
+      "type": "singlestat",
+      "valueFontSize": "80%",
+      "valueMaps": [
+        {
+          "op": "=",
+          "text": "N/A",
+          "value": "null"
+        }
+      ],
+      "valueName": "avg"
+    },
+    {
+      "cacheTimeout": null,
+      "colorBackground": false,
+      "colorValue": false,
+      "colors": [
+        "#299c46",
+        "rgba(237, 129, 40, 0.89)",
+        "#d44a3a"
+      ],
+      "datasource": "Neo4j-Caching",
+      "format": "none",
+      "gauge": {
+        "maxValue": 100,
+        "minValue": 0,
+        "show": false,
+        "thresholdLabels": false,
+        "thresholdMarkers": true
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 3,
+        "x": 8,
+        "y": 0
+      },
+      "id": 33,
+      "interval": null,
+      "links": [],
+      "mappingType": 1,
+      "mappingTypes": [
+        {
+          "name": "value to text",
+          "value": 1
+        },
+        {
+          "name": "range to text",
+          "value": 2
+        }
+      ],
+      "maxDataPoints": 100,
+      "nullPointMode": "connected",
+      "nullText": null,
+      "postfix": "",
+      "postfixFontSize": "50%",
+      "prefix": "",
+      "prefixFontSize": "50%",
+      "rangeMaps": [
+        {
+          "from": "null",
+          "text": "N/A",
+          "to": "null"
+        }
+      ],
+      "sparkline": {
+        "fillColor": "rgba(31, 118, 189, 0.18)",
+        "full": false,
+        "lineColor": "rgb(31, 120, 193)",
+        "show": false
+      },
+      "tableColumn": "",
+      "targets": [
+        {
+          "cacheVariance": 5,
+          "checkQuery": false,
+          "rawQuery": true,
+          "refId": "A",
+          "rescache": true,
+          "selectionval": "Variance Time",
+          "target": "match (a:JIRA)-[r:FROM_JIRA_TO_GIT]->(b:GIT) where a.sprintId in $SprintID with count(DISTINCT b.commitId) as Count  return Count",
+          "timeSeries": true
+        }
+      ],
+      "thresholds": "",
+      "title": "SCM Commits",
+      "type": "singlestat",
+      "valueFontSize": "80%",
+      "valueMaps": [
+        {
+          "op": "=",
+          "text": "N/A",
+          "value": "null"
+        }
+      ],
+      "valueName": "avg"
+    },
+    {
+      "cacheTimeout": null,
+      "colorBackground": false,
+      "colorValue": false,
+      "colors": [
+        "#299c46",
+        "rgba(237, 129, 40, 0.89)",
+        "#d44a3a"
+      ],
+      "datasource": "Neo4j-Caching",
+      "format": "none",
+      "gauge": {
+        "maxValue": 100,
+        "minValue": 0,
+        "show": false,
+        "thresholdLabels": false,
+        "thresholdMarkers": true
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 3,
+        "x": 11,
+        "y": 0
+      },
+      "id": 34,
+      "interval": null,
+      "links": [],
+      "mappingType": 1,
+      "mappingTypes": [
+        {
+          "name": "value to text",
+          "value": 1
+        },
+        {
+          "name": "range to text",
+          "value": 2
+        }
+      ],
+      "maxDataPoints": 100,
+      "nullPointMode": "connected",
+      "nullText": null,
+      "postfix": "",
+      "postfixFontSize": "50%",
+      "prefix": "",
+      "prefixFontSize": "50%",
+      "rangeMaps": [
+        {
+          "from": "null",
+          "text": "N/A",
+          "to": "null"
+        }
+      ],
+      "sparkline": {
+        "fillColor": "rgba(31, 118, 189, 0.18)",
+        "full": false,
+        "lineColor": "rgb(31, 120, 193)",
+        "show": false
+      },
+      "tableColumn": "",
+      "targets": [
+        {
+          "cacheVariance": 5,
+          "checkQuery": false,
+          "rawQuery": true,
+          "refId": "A",
+          "rescache": true,
+          "selectionval": "Variance Time",
+          "target": "match (a:JIRA)-[r:FROM_JIRA_TO_GIT]->(b:GIT) where a.sprintId in $SprintID with count(b) as Count match (a:JIRA)-[r:FROM_JIRA_TO_GIT]->(b:GIT) where a.sprintId in $SprintID return count(b)+Count as Total",
+          "timeSeries": true
+        }
+      ],
+      "thresholds": "",
+      "title": "Files Committed",
+      "type": "singlestat",
+      "valueFontSize": "80%",
+      "valueMaps": [
+        {
+          "op": "=",
+          "text": "N/A",
+          "value": "null"
+        }
+      ],
+      "valueName": "avg"
+    },
+    {
+      "cacheTimeout": null,
+      "colorBackground": false,
+      "colorValue": true,
+      "colors": [
+        "#299c46",
+        "#1f78c1",
+        "#d44a3a"
+      ],
+      "datasource": "Neo4j-Caching",
+      "format": "none",
+      "gauge": {
+        "maxValue": 100,
+        "minValue": 0,
+        "show": false,
+        "thresholdLabels": false,
+        "thresholdMarkers": true
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 14,
+        "y": 0
+      },
+      "id": 35,
+      "interval": null,
+      "links": [],
+      "mappingType": 1,
+      "mappingTypes": [
+        {
+          "name": "value to text",
+          "value": 1
+        },
+        {
+          "name": "range to text",
+          "value": 2
+        }
+      ],
+      "maxDataPoints": 100,
+      "nullPointMode": "connected",
+      "nullText": null,
+      "postfix": "",
+      "postfixFontSize": "50%",
+      "prefix": "",
+      "prefixFontSize": "50%",
+      "rangeMaps": [
+        {
+          "from": "null",
+          "text": "N/A",
+          "to": "null"
+        }
+      ],
+      "sparkline": {
+        "fillColor": "rgba(31, 118, 189, 0.18)",
+        "full": false,
+        "lineColor": "rgb(31, 120, 193)",
+        "show": false
+      },
+      "tableColumn": "",
+      "targets": [
+        {
+          "cacheVariance": 5,
+          "checkQuery": false,
+          "rawQuery": true,
+          "refId": "A",
+          "rescache": true,
+          "selectionval": "Variance Time",
+          "target": "MATCH (n:JIRA)-[:FROM_JIRA_TO_GIT]->(m:GIT)  WHERE n.sprintId IN $SprintID WITH distinct m as git\nMATCH (git)-[:FROM_GIT_TO_JENKINS]->(n:JENKINS) with distinct n.buildNumber as buildNumber return count(buildNumber) as Count",
+          "timeSeries": true
+        }
+      ],
+      "thresholds": "",
+      "title": "CI Builds",
+      "type": "singlestat",
+      "valueFontSize": "80%",
+      "valueMaps": [
+        {
+          "op": "=",
+          "text": "N/A",
+          "value": "null"
+        }
+      ],
+      "valueName": "avg"
+    },
+    {
+      "cacheTimeout": null,
+      "colorBackground": false,
+      "colorValue": true,
+      "colors": [
+        "#299c46",
+        "#1f78c1",
+        "#d44a3a"
+      ],
+      "datasource": "Neo4j-Caching",
+      "format": "none",
+      "gauge": {
+        "maxValue": 100,
+        "minValue": 0,
+        "show": false,
+        "thresholdLabels": false,
+        "thresholdMarkers": true
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 3,
+        "x": 18,
+        "y": 0
+      },
+      "id": 36,
+      "interval": null,
+      "links": [],
+      "mappingType": 1,
+      "mappingTypes": [
+        {
+          "name": "value to text",
+          "value": 1
+        },
+        {
+          "name": "range to text",
+          "value": 2
+        }
+      ],
+      "maxDataPoints": 100,
+      "nullPointMode": "connected",
+      "nullText": null,
+      "postfix": "",
+      "postfixFontSize": "50%",
+      "prefix": "",
+      "prefixFontSize": "50%",
+      "rangeMaps": [
+        {
+          "from": "null",
+          "text": "N/A",
+          "to": "null"
+        }
+      ],
+      "sparkline": {
+        "fillColor": "rgba(31, 118, 189, 0.18)",
+        "full": false,
+        "lineColor": "rgb(31, 120, 193)",
+        "show": false
+      },
+      "tableColumn": "",
+      "targets": [
+        {
+          "cacheVariance": 5,
+          "checkQuery": false,
+          "rawQuery": true,
+          "refId": "A",
+          "rescache": true,
+          "selectionval": "Variance Time",
+          "target": "MATCH (n:JIRA)-[:FROM_JIRA_TO_GIT]->(m:GIT)  WHERE n.sprintId IN $SprintID WITH distinct m as git\nMATCH (git)-[:FROM_GIT_TO_JENKINS]->(n:JENKINS) WITH distinct n as jenkins\nMATCH (jenkins)-[:FROM_JENKINS_TO_RUNDECK]->(n:RUNDECK) with distinct n.jenkineBuildNumber as Deployments return count(Deployments )",
+          "timeSeries": true
+        }
+      ],
+      "thresholds": "",
+      "title": "Deployment",
+      "type": "singlestat",
+      "valueFontSize": "80%",
+      "valueMaps": [
+        {
+          "op": "=",
+          "text": "N/A",
+          "value": "null"
+        }
+      ],
+      "valueName": "avg"
+    },
+    {
+      "cacheTimeout": null,
+      "colorBackground": false,
+      "colorValue": false,
+      "colors": [
+        "#299c46",
+        "rgba(237, 129, 40, 0.89)",
+        "#d44a3a"
+      ],
+      "datasource": "Neo4j-Caching",
+      "format": "none",
+      "gauge": {
+        "maxValue": 100,
+        "minValue": 0,
+        "show": false,
+        "thresholdLabels": false,
+        "thresholdMarkers": true
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 3,
+        "x": 21,
+        "y": 0
+      },
+      "id": 37,
+      "interval": null,
+      "links": [],
+      "mappingType": 1,
+      "mappingTypes": [
+        {
+          "name": "value to text",
+          "value": 1
+        },
+        {
+          "name": "range to text",
+          "value": 2
+        }
+      ],
+      "maxDataPoints": 100,
+      "nullPointMode": "connected",
+      "nullText": null,
+      "postfix": "",
+      "postfixFontSize": "50%",
+      "prefix": "",
+      "prefixFontSize": "50%",
+      "rangeMaps": [
+        {
+          "from": "null",
+          "text": "N/A",
+          "to": "null"
+        }
+      ],
+      "sparkline": {
+        "fillColor": "rgba(31, 118, 189, 0.18)",
+        "full": false,
+        "lineColor": "rgb(31, 120, 193)",
+        "show": false
+      },
+      "tableColumn": "",
+      "targets": [
+        {
+          "cacheVariance": 5,
+          "checkQuery": false,
+          "rawQuery": true,
+          "refId": "A",
+          "rescache": true,
+          "selectionval": "Variance Time",
+          "target": "match (a:JIRA)-[r:FROM_JIRA_TO_GIT]->(b:GIT) where a.sprintId in $SprintID return count(DISTINCT b.gitAuthorName) as Count",
+          "timeSeries": true
+        }
+      ],
+      "thresholds": "",
+      "title": "Developers",
+      "type": "singlestat",
+      "valueFontSize": "80%",
+      "valueMaps": [
+        {
+          "op": "=",
+          "text": "N/A",
+          "value": "null"
+        }
+      ],
+      "valueName": "avg"
+    },
+    {
+      "cacheTimeout": null,
+      "colorBackground": false,
+      "colorValue": true,
+      "colors": [
+        "#299c46",
+        "#FF0000",
+        "#d44a3a"
+      ],
+      "datasource": "Neo4j",
+      "format": "none",
+      "gauge": {
+        "maxValue": 100,
+        "minValue": 0,
+        "show": false,
+        "thresholdLabels": false,
+        "thresholdMarkers": true
+      },
+      "gridPos": {
+        "h": 6,
+        "w": 3,
+        "x": 0,
+        "y": 4
+      },
+      "id": 38,
+      "interval": null,
+      "links": [],
+      "mappingType": 1,
+      "mappingTypes": [
+        {
+          "name": "value to text",
+          "value": 1
+        },
+        {
+          "name": "range to text",
+          "value": 2
+        }
+      ],
+      "maxDataPoints": 100,
+      "nullPointMode": "connected",
+      "nullText": null,
+      "postfix": "",
+      "postfixFontSize": "50%",
+      "prefix": "",
+      "prefixFontSize": "50%",
+      "rangeMaps": [
+        {
+          "from": "null",
+          "text": "N/A",
+          "to": "null"
+        }
+      ],
+      "sparkline": {
+        "fillColor": "rgba(31, 118, 189, 0.18)",
+        "full": false,
+        "lineColor": "rgb(31, 120, 193)",
+        "show": false
+      },
+      "tableColumn": "",
+      "targets": [
+        {
+          "checkQuery": false,
+          "rawQuery": true,
+          "refId": "A",
+          "target": "match (n:DEFECTS) where n.SprintID in $SprintID return count(n) as Count",
+          "timeSeries": true
+        }
+      ],
+      "thresholds": "",
+      "title": "Defects",
+      "type": "singlestat",
+      "valueFontSize": "80%",
+      "valueMaps": [
+        {
+          "op": "=",
+          "text": "N/A",
+          "value": "null"
+        }
+      ],
+      "valueName": "avg"
+    },
+    {
+      "columns": [],
+      "datasource": "Neo4j",
+      "fontSize": "100%",
+      "gridPos": {
+        "h": 6,
+        "w": 5,
+        "x": 3,
+        "y": 4
+      },
+      "id": 40,
+      "links": [],
+      "pageSize": null,
+      "scroll": true,
+      "showHeader": true,
+      "sort": {
+        "col": 0,
+        "desc": true
+      },
+      "styles": [
+        {
+          "alias": "Time",
+          "dateFormat": "YYYY-MM-DD HH:mm:ss",
+          "pattern": "Time",
+          "type": "date"
+        },
+        {
+          "alias": "",
+          "colorMode": null,
+          "colors": [
+            "rgba(245, 54, 54, 0.9)",
+            "rgba(237, 129, 40, 0.89)",
+            "rgba(50, 172, 45, 0.97)"
+          ],
+          "decimals": 2,
+          "pattern": "/.*/",
+          "thresholds": [],
+          "type": "number",
+          "unit": "short"
+        }
+      ],
+      "targets": [
+        {
+          "checkQuery": false,
+          "rawQuery": true,
+          "refId": "A",
+          "table": true,
+          "target": "match (n:DEFECTS) where n.SprintID in $SprintID return DISTINCT n.DefectDuring as Type, count(n) as Count order by Count desc"
+        }
+      ],
+      "title": "Defects Type",
+      "transform": "table",
+      "type": "table"
+    },
+    {
+      "datasource": "Neo4j-Caching",
+      "editable": true,
+      "error": false,
+      "gridPos": {
+        "h": 6,
+        "w": 10,
+        "x": 8,
+        "y": 4
+      },
+      "id": 16,
+      "insightsPanelData": {
+        "chartOptions": {
+          "backgroundColor": {
+            "fill": "#ffffff"
+          },
+          "booleanRole": "certainty",
+          "hAxis": {
+            "maxValue": null,
+            "minValue": null,
+            "useFormatFromData": true,
+            "viewWindow": null,
+            "viewWindowMode": null
+          },
+          "height": 371,
+          "isStacked": false,
+          "legacyScatterChartLabels": true,
+          "legend": "none",
+          "vAxes": [
+            {
+              "maxValue": null,
+              "minValue": null,
+              "title": null,
+              "useFormatFromData": true,
+              "viewWindow": {
+                "max": null,
+                "min": null
+              }
+            },
+            {
+              "maxValue": null,
+              "minValue": null,
+              "useFormatFromData": true,
+              "viewWindow": {
+                "max": null,
+                "min": null
+              }
+            }
+          ],
+          "width": 600
+        },
+        "chartType": "ColumnChart",
+        "insightsChartEditorModel": {
+          "targets": [
+            {
+              "columnModel": [
+                {
+                  "name": "Developer",
+                  "type": "string"
+                },
+                {
+                  "name": "Count",
+                  "type": "number"
+                }
+              ],
+              "id": "A"
+            }
+          ]
+        }
+      },
+      "links": [],
+      "targets": [
+        {
+          "cacheVariance": 5,
+          "checkQuery": false,
+          "hide": false,
+          "rawQuery": true,
+          "refId": "A",
+          "rescache": true,
+          "selectionval": "Variance Time",
+          "target": "match (a:JIRA)-[r:FROM_JIRA_TO_GIT]->(b:GIT)  where a.sprintId in $SprintID return DISTINCT b.gitAuthorName as Developer, count(DISTINCT b.gitCommitId) as Count order by Count desc limit 5"
+        }
+      ],
+      "title": "Top Commit Users",
+      "type": "insightscharts"
+    },
+    {
+      "datasource": "Neo4j",
+      "editable": true,
+      "error": false,
+      "gridPos": {
+        "h": 6,
+        "w": 6,
+        "x": 18,
+        "y": 4
+      },
+      "id": 21,
+      "insightsPanelData": {
+        "chartOptions": {
+          "backgroundColor": {
+            "fill": "#fbfbfb"
+          },
+          "booleanRole": "certainty",
+          "hAxis": {
+            "logScale": false,
+            "maxValue": null,
+            "minValue": null,
+            "useFormatFromData": true,
+            "viewWindow": {
+              "max": null,
+              "min": null
+            }
+          },
+          "height": 371,
+          "isStacked": true,
+          "legacyScatterChartLabels": true,
+          "legend": "none",
+          "vAxes": [
+            {
+              "maxValue": null,
+              "minValue": null,
+              "useFormatFromData": true,
+              "viewWindow": null,
+              "viewWindowMode": null
+            },
+            {
+              "useFormatFromData": true
+            }
+          ],
+          "width": 600
+        },
+        "chartType": "BarChart",
+        "insightsChartEditorModel": {
+          "targets": [
+            {
+              "columnModel": [
+                {
+                  "name": "Developer",
+                  "type": "string"
+                },
+                {
+                  "name": "Count",
+                  "type": "number"
+                }
+              ],
+              "id": "A"
+            }
+          ]
+        }
+      },
+      "links": [],
+      "targets": [
+        {
+          "checkQuery": false,
+          "rawQuery": true,
+          "refId": "A",
+          "target": "match (a:DEFECTS) where a.SprintID in $SprintID return DISTINCT a.AssignedTo as Developer, count(a.DefectID) as Count order by Count desc limit 5"
+        }
+      ],
+      "title": "Defect Assignees",
+      "type": "insightscharts"
+    },
+    {
+      "cacheTimeout": null,
+      "colorBackground": false,
+      "colorValue": false,
+      "colors": [
+        "#299c46",
+        "#1f78c1",
+        "#d44a3a"
+      ],
+      "datasource": "Neo4j-Caching",
+      "format": "none",
+      "gauge": {
+        "maxValue": 100,
+        "minValue": 0,
+        "show": false,
+        "thresholdLabels": false,
+        "thresholdMarkers": true
+      },
+      "gridPos": {
+        "h": 7,
+        "w": 4,
+        "x": 0,
+        "y": 10
+      },
+      "id": 41,
+      "interval": null,
+      "links": [],
+      "mappingType": 1,
+      "mappingTypes": [
+        {
+          "name": "value to text",
+          "value": 1
+        },
+        {
+          "name": "range to text",
+          "value": 2
+        }
+      ],
+      "maxDataPoints": 100,
+      "nullPointMode": "connected",
+      "nullText": null,
+      "postfix": "",
+      "postfixFontSize": "50%",
+      "prefix": "",
+      "prefixFontSize": "50%",
+      "rangeMaps": [
+        {
+          "from": "null",
+          "text": "N/A",
+          "to": "null"
+        }
+      ],
+      "sparkline": {
+        "fillColor": "rgba(31, 118, 189, 0.18)",
+        "full": false,
+        "lineColor": "rgb(31, 120, 193)",
+        "show": false
+      },
+      "tableColumn": "",
+      "targets": [
+        {
+          "cacheVariance": 5,
+          "checkQuery": false,
+          "rawQuery": true,
+          "refId": "A",
+          "rescache": true,
+          "selectionval": "Variance Time",
+          "target": "MATCH (n:JIRA)-[:FROM_JIRA_TO_GIT]->(m:GIT)  WHERE n.sprintId IN $SprintID WITH distinct m as git\nMATCH (git)-[:FROM_GIT_TO_JENKINS]->(n:JENKINS) with distinct n.duration  as Duration return ceil(avg(toInt(Duration ))) as AvgTimeInSecs",
+          "timeSeries": true
+        }
+      ],
+      "thresholds": "",
+      "title": "Average Time In Seconds",
+      "type": "singlestat",
+      "valueFontSize": "80%",
+      "valueMaps": [
+        {
+          "op": "=",
+          "text": "N/A",
+          "value": "null"
+        }
+      ],
+      "valueName": "avg"
+    },
+    {
+      "datasource": "Neo4j-Caching",
+      "gridPos": {
+        "h": 7,
+        "w": 5,
+        "x": 4,
+        "y": 10
+      },
+      "id": 44,
+      "insightsPanelData": {
+        "chartOptions": {
+          "backgroundColor": "#fbfbfb",
+          "booleanRole": "certainty",
+          "greenFrom": 0,
+          "greenTo": 60,
+          "hAxis": {
+            "maxValue": null,
+            "minValue": null,
+            "useFormatFromData": true,
+            "viewWindow": {
+              "max": null,
+              "min": null
+            }
+          },
+          "height": 371,
+          "legacyScatterChartLabels": true,
+          "max": 300,
+          "min": 0,
+          "redFrom": 200,
+          "redTo": 300,
+          "vAxes": [
+            {
+              "maxValue": null,
+              "minValue": null,
+              "useFormatFromData": true,
+              "viewWindow": {
+                "max": null,
+                "min": null
+              }
+            },
+            {
+              "maxValue": null,
+              "minValue": null,
+              "useFormatFromData": true,
+              "viewWindow": {
+                "max": null,
+                "min": null
+              }
+            }
+          ],
+          "width": 600,
+          "yellowFrom": 60,
+          "yellowTo": 200
+        },
+        "chartType": "Gauge",
+        "insightsChartEditorModel": {
+          "targets": [
+            {
+              "columnModel": [
+                {
+                  "name": "Build",
+                  "type": "number"
+                }
+              ],
+              "id": "A"
+            }
+          ]
+        }
+      },
+      "links": [],
+      "targets": [
+        {
+          "cacheVariance": 5,
+          "checkQuery": false,
+          "rawQuery": true,
+          "refId": "A",
+          "rescache": true,
+          "selectionval": "Variance Time",
+          "target": "MATCH (n:JIRA)-[:FROM_JIRA_TO_GIT]->(m:GIT)  WHERE n.sprintId IN $SprintID WITH distinct m as git\nMATCH (git)-[:FROM_GIT_TO_JENKINS]->(n:JENKINS) with distinct n.duration  as Duration return ceil(max(toInt(Duration ))) as Build"
+        }
+      ],
+      "title": "Max. Build Time in Secs",
+      "type": "insightscharts"
+    },
+    {
+      "datasource": "Neo4j-Caching",
+      "editable": true,
+      "error": false,
+      "gridPos": {
+        "h": 7,
+        "w": 15,
+        "x": 9,
+        "y": 10
+      },
+      "id": 26,
+      "insightsPanelData": {
+        "chartOptions": {
+          "backgroundColor": {
+            "fill": "#fbfbfb"
+          },
+          "booleanRole": "certainty",
+          "hAxis": {
+            "maxValue": null,
+            "minValue": null,
+            "useFormatFromData": true,
+            "viewWindow": null,
+            "viewWindowMode": null
+          },
+          "height": 371,
+          "isStacked": true,
+          "legacyScatterChartLabels": true,
+          "legend": "right",
+          "series": {
+            "0": {
+              "color": "#cc0000"
+            },
+            "1": {
+              "color": "#6aa84f"
+            }
+          },
+          "vAxes": [
+            {
+              "logScale": false,
+              "maxValue": null,
+              "minValue": null,
+              "useFormatFromData": true,
+              "viewWindow": {
+                "max": null,
+                "min": null
+              }
+            },
+            {
+              "logScale": false,
+              "maxValue": null,
+              "minValue": null,
+              "useFormatFromData": true,
+              "viewWindow": {
+                "max": null,
+                "min": null
+              }
+            }
+          ],
+          "width": 600
+        },
+        "chartType": "ColumnChart",
+        "insightsChartEditorModel": {
+          "joinInstructions": "return google.visualization.data.join(dataTables[0], dataTables[1], 'full', [[0, 0]], [1], [1]);",
+          "targets": [
+            {
+              "columnModel": [
+                {
+                  "name": "inSightsTimeX",
+                  "type": "date"
+                },
+                {
+                  "name": "Failed",
+                  "type": "number"
+                }
+              ],
+              "id": "B"
+            },
+            {
+              "columnModel": [
+                {
+                  "name": "inSightsTimeX",
+                  "type": "date"
+                },
+                {
+                  "name": "Success",
+                  "type": "number"
+                }
+              ],
+              "id": "C"
+            }
+          ],
+          "transformInstrctions": "var formatter3 = new google.visualization.DateFormat({ pattern: \"dd-MMM-yy\" });\nvar testFunction = function (val) {\n        return new Date(formatter3.formatValue(val));\n};\nvar result = google.visualization.data.group(data,\n        [{ column: 0, modifier: testFunction, type: 'date' }],\n        [{ 'column': 1, 'aggregation': google.visualization.data.sum, 'type': 'number' },\n        { 'column': 2, 'aggregation': google.visualization.data.sum, 'type': 'number' }]);\nreturn result;"
+        }
+      },
+      "links": [],
+      "targets": [
+        {
+          "cacheVariance": 5,
+          "checkQuery": false,
+          "rawQuery": true,
+          "refId": "B",
+          "rescache": true,
+          "selectionval": "Variance Time",
+          "target": "MATCH (n:JIRA)-[:FROM_JIRA_TO_GIT]->(m:GIT)  WHERE n.sprintId in $SprintID WITH distinct m as git\nMATCH (git)-[:FROM_GIT_TO_JENKINS]->(n:JENKINS) WHERE n.status=\"Failure\" WITH distinct n.buildNumber as buildNumber  return buildNumber.inSightsTimeX as inSightsTimeX, count(buildNumber) as Failed order by inSightsTimeX"
+        },
+        {
+          "cacheVariance": 5,
+          "rawQuery": true,
+          "refId": "C",
+          "rescache": true,
+          "selectionval": "Variance Time",
+          "target": "MATCH (n:JIRA)-[:FROM_JIRA_TO_GIT]->(m:GIT)  WHERE n.sprintId in $SprintID WITH distinct m as git\nMATCH (git)-[:FROM_GIT_TO_JENKINS]->(n:JENKINS) WHERE n.status=\"Success\" WITH distinct n.buildNumber as buildNumber  return buildNumber.inSightsTimeX as inSightsTimeX, count(status) as Success order by inSightsTimeX"
+        }
+      ],
+      "title": "CI Build Trend by Status",
+      "type": "insightscharts"
+    },
+    {
+      "cacheTimeout": null,
+      "colorBackground": false,
+      "colorValue": false,
+      "colors": [
+        "#299c46",
+        "#1f78c1",
+        "#d44a3a"
+      ],
+      "datasource": "Neo4j",
+      "decimals": null,
+      "format": "d",
+      "gauge": {
+        "maxValue": 100,
+        "minValue": 0,
+        "show": false,
+        "thresholdLabels": false,
+        "thresholdMarkers": true
+      },
+      "gridPos": {
+        "h": 7,
+        "w": 4,
+        "x": 0,
+        "y": 17
+      },
+      "id": 42,
+      "interval": null,
+      "links": [],
+      "mappingType": 1,
+      "mappingTypes": [
+        {
+          "name": "value to text",
+          "value": 1
+        },
+        {
+          "name": "range to text",
+          "value": 2
+        }
+      ],
+      "maxDataPoints": 100,
+      "nullPointMode": "connected",
+      "nullText": null,
+      "postfix": "",
+      "postfixFontSize": "50%",
+      "prefix": "",
+      "prefixFontSize": "50%",
+      "rangeMaps": [
+        {
+          "from": "null",
+          "text": "N/A",
+          "to": "null"
+        }
+      ],
+      "sparkline": {
+        "fillColor": "rgba(31, 118, 189, 0.18)",
+        "full": false,
+        "lineColor": "rgb(31, 120, 193)",
+        "show": false
+      },
+      "tableColumn": "",
+      "targets": [
+        {
+          "checkQuery": false,
+          "rawQuery": true,
+          "refId": "A",
+          "target": "match (n:RUNDECK) where n.jenkineBuildNumber in $buildNumber return ceil(avg(toInt(n.jenkineBuildNumber))) as AvgTimeInSecs",
+          "timeSeries": true
+        }
+      ],
+      "thresholds": "",
+      "title": "Average Time In Seconds",
+      "type": "singlestat",
+      "valueFontSize": "80%",
+      "valueMaps": [
+        {
+          "op": "=",
+          "text": "N/A",
+          "value": "null"
+        }
+      ],
+      "valueName": "avg"
+    },
+    {
+      "datasource": "Neo4j",
+      "editable": true,
+      "error": false,
+      "gridPos": {
+        "h": 7,
+        "w": 5,
+        "x": 4,
+        "y": 17
+      },
+      "id": 29,
+      "insightsPanelData": {
+        "chartOptions": {
+          "backgroundColor": "#fbfbfb",
+          "booleanRole": "certainty",
+          "greenFrom": 0,
+          "greenTo": 60,
+          "hAxis": {
+            "maxValue": null,
+            "minValue": null,
+            "useFormatFromData": true,
+            "viewWindow": {
+              "max": null,
+              "min": null
+            }
+          },
+          "height": 371,
+          "legacyScatterChartLabels": true,
+          "max": 300,
+          "min": 0,
+          "redFrom": 200,
+          "redTo": 300,
+          "vAxes": [
+            {
+              "maxValue": null,
+              "minValue": null,
+              "useFormatFromData": true,
+              "viewWindow": {
+                "max": null,
+                "min": null
+              }
+            },
+            {
+              "maxValue": null,
+              "minValue": null,
+              "useFormatFromData": true,
+              "viewWindow": {
+                "max": null,
+                "min": null
+              }
+            }
+          ],
+          "width": 600,
+          "yellowFrom": 60,
+          "yellowTo": 200
+        },
+        "chartType": "Gauge",
+        "insightsChartEditorModel": {
+          "targets": [
+            {
+              "columnModel": [
+                {
+                  "name": "Deploy",
+                  "type": "number"
+                }
+              ],
+              "id": "A"
+            }
+          ]
+        }
+      },
+      "links": [],
+      "targets": [
+        {
+          "checkQuery": false,
+          "rawQuery": true,
+          "refId": "A",
+          "target": "match (n:RUNDECK) where n.jenkineBuildNumber in $buildNumber return ceil(max(toInt(n.duration))) as Deploy",
+          "timeSeries": false
+        }
+      ],
+      "title": "Max. Deploy Time in Secs",
+      "type": "insightscharts"
+    },
+    {
+      "datasource": "Neo4j-Caching",
+      "editable": true,
+      "error": false,
+      "gridPos": {
+        "h": 7,
+        "w": 15,
+        "x": 9,
+        "y": 17
+      },
+      "id": 27,
+      "insightsPanelData": {
+        "chartOptions": {
+          "backgroundColor": {
+            "fill": "#fbfbfb"
+          },
+          "booleanRole": "certainty",
+          "domainAxis": {
+            "direction": 1
+          },
+          "hAxis": {
+            "maxValue": null,
+            "minValue": null,
+            "useFormatFromData": true,
+            "viewWindow": null,
+            "viewWindowMode": null
+          },
+          "height": 218,
+          "isStacked": true,
+          "legacyScatterChartLabels": true,
+          "legend": "right",
+          "series": {
+            "0": {
+              "color": "#cc0000"
+            },
+            "1": {
+              "color": "#6aa84f"
+            }
+          },
+          "vAxes": [
+            {
+              "logScale": false,
+              "maxValue": null,
+              "minValue": null,
+              "useFormatFromData": true,
+              "viewWindow": {
+                "max": null,
+                "min": null
+              }
+            },
+            {
+              "logScale": false,
+              "maxValue": null,
+              "minValue": null,
+              "useFormatFromData": true,
+              "viewWindow": {
+                "max": null,
+                "min": null
+              }
+            }
+          ],
+          "width": "100%"
+        },
+        "chartType": "ColumnChart",
+        "insightsChartEditorModel": {
+          "joinInstructions": "return google.visualization.data.join(dataTables[0], dataTables[1], 'full', [[0, 0]], [1], [1]);",
+          "targets": [
+            {
+              "columnModel": [
+                {
+                  "name": "inSightsTimeX",
+                  "type": "date"
+                },
+                {
+                  "name": "Failed",
+                  "type": "number"
+                }
+              ],
+              "id": "A"
+            },
+            {
+              "columnModel": [
+                {
+                  "name": "inSightsTimeX",
+                  "type": "date"
+                },
+                {
+                  "name": "Success",
+                  "type": "number"
+                }
+              ],
+              "id": "B"
+            }
+          ],
+          "transformInstrctions": "var formatter3 = new google.visualization.DateFormat({ pattern: \"dd-MMM-yy\" });\nvar testFunction = function (val) {\n        return new Date(formatter3.formatValue(val));\n};\nvar result = google.visualization.data.group(data,\n        [{ column: 0, modifier: testFunction, type: 'date' }],\n        [{ 'column': 1, 'aggregation': google.visualization.data.sum, 'type': 'number' },\n        { 'column': 2, 'aggregation': google.visualization.data.sum, 'type': 'number' }]);\nreturn result;"
+        }
+      },
+      "links": [],
+      "targets": [
+        {
+          "cacheVariance": 5,
+          "checkQuery": false,
+          "rawQuery": true,
+          "refId": "A",
+          "rescache": true,
+          "selectionval": "Variance Time",
+          "target": "MATCH (n:JIRA)-[:FROM_JIRA_TO_GIT]->(m:GIT)  WHERE n.sprintId IN $SprintID WITH distinct m as git\nMATCH (git)-[:FROM_GIT_TO_JENKINS]->(n:JENKINS) WITH distinct n as jenkins\nMATCH (jenkins)-[:FROM_JENKINS_TO_RUNDECK]->(n:RUNDECK) where n.status='Failure' with distinct n.jenkineBuildNumber as Deployments return n.inSightsTimeX as inSightsTimeX, count(Deployments) as Failed order by inSightsTimeX"
+        },
+        {
+          "cacheVariance": 5,
+          "rawQuery": true,
+          "refId": "B",
+          "rescache": true,
+          "selectionval": "Variance Time",
+          "target": "MATCH (n:JIRA)-[:FROM_JIRA_TO_GIT]->(m:GIT)  WHERE n.sprintId IN $SprintID WITH distinct m as git\nMATCH (git)-[:FROM_GIT_TO_JENKINS]->(n:JENKINS) WITH distinct n as jenkins\nMATCH (jenkins)-[:FROM_JENKINS_TO_RUNDECK]->(n:RUNDECK) where n.status='Success' with distinct n.jenkineBuildNumber as Deployments return n.inSightsTimeX as inSightsTimeX, count(Deployments) as Success order by inSightsTimeX"
+        }
+      ],
+      "title": "Deployment Trend by Status",
+      "type": "insightscharts"
+    }
+  ],
+  "refresh": false,
+  "schemaVersion": 18,
+  "style": "dark",
+  "tags": [],
+  "templating": {
+    "list": [
+      {
+        "allValue": null,
+        "current": {
+          "text": "ST-102",
+          "value": "ST-102"
+        },
+        "datasource": "Neo4j",
+        "definition": "MATCH (n:JIRA) RETURN n.sprintId",
+        "hide": 0,
+        "includeAll": false,
+        "label": null,
+        "multi": false,
+        "name": "SprintID",
+        "options": [
+          {
+            "selected": true,
+            "text": "ST-102",
+            "value": "ST-102"
+          },
+          {
+            "selected": false,
+            "text": "ST-98",
+            "value": "ST-98"
+          },
+          {
+            "selected": false,
+            "text": "ST-34",
+            "value": "ST-34"
+          },
+          {
+            "selected": false,
+            "text": "ST-50",
+            "value": "ST-50"
+          },
+          {
+            "selected": false,
+            "text": "ST-15",
+            "value": "ST-15"
+          },
+          {
+            "selected": false,
+            "text": "ST-134",
+            "value": "ST-134"
+          },
+          {
+            "selected": false,
+            "text": "ST-76",
+            "value": "ST-76"
+          },
+          {
+            "selected": false,
+            "text": "ST-22",
+            "value": "ST-22"
+          },
+          {
+            "selected": false,
+            "text": "ST-116",
+            "value": "ST-116"
+          },
+          {
+            "selected": false,
+            "text": "ST-88",
+            "value": "ST-88"
+          },
+          {
+            "selected": false,
+            "text": "ST-11",
+            "value": "ST-11"
+          },
+          {
+            "selected": false,
+            "text": "ST-36",
+            "value": "ST-36"
+          },
+          {
+            "selected": false,
+            "text": "ST-108",
+            "value": "ST-108"
+          },
+          {
+            "selected": false,
+            "text": "ST-46",
+            "value": "ST-46"
+          },
+          {
+            "selected": false,
+            "text": "ST-61",
+            "value": "ST-61"
+          },
+          {
+            "selected": false,
+            "text": "ST-39",
+            "value": "ST-39"
+          },
+          {
+            "selected": false,
+            "text": "ST-138",
+            "value": "ST-138"
+          },
+          {
+            "selected": false,
+            "text": "ST-58",
+            "value": "ST-58"
+          },
+          {
+            "selected": false,
+            "text": "ST-100",
+            "value": "ST-100"
+          },
+          {
+            "selected": false,
+            "text": "ST-125",
+            "value": "ST-125"
+          },
+          {
+            "selected": false,
+            "text": "ST-12",
+            "value": "ST-12"
+          },
+          {
+            "selected": false,
+            "text": "ST-63",
+            "value": "ST-63"
+          },
+          {
+            "selected": false,
+            "text": "ST-129",
+            "value": "ST-129"
+          },
+          {
+            "selected": false,
+            "text": "ST-126",
+            "value": "ST-126"
+          },
+          {
+            "selected": false,
+            "text": "ST-80",
+            "value": "ST-80"
+          },
+          {
+            "selected": false,
+            "text": "ST-38",
+            "value": "ST-38"
+          },
+          {
+            "selected": false,
+            "text": "ST-110",
+            "value": "ST-110"
+          },
+          {
+            "selected": false,
+            "text": "ST-142",
+            "value": "ST-142"
+          },
+          {
+            "selected": false,
+            "text": "ST-72",
+            "value": "ST-72"
+          },
+          {
+            "selected": false,
+            "text": "ST-53",
+            "value": "ST-53"
+          },
+          {
+            "selected": false,
+            "text": "ST-74",
+            "value": "ST-74"
+          },
+          {
+            "selected": false,
+            "text": "ST-133",
+            "value": "ST-133"
+          },
+          {
+            "selected": false,
+            "text": "ST-86",
+            "value": "ST-86"
+          },
+          {
+            "selected": false,
+            "text": "ST-54",
+            "value": "ST-54"
+          },
+          {
+            "selected": false,
+            "text": "ST-77",
+            "value": "ST-77"
+          },
+          {
+            "selected": false,
+            "text": "ST-40",
+            "value": "ST-40"
+          },
+          {
+            "selected": false,
+            "text": "ST-79",
+            "value": "ST-79"
+          },
+          {
+            "selected": false,
+            "text": "ST-144",
+            "value": "ST-144"
+          },
+          {
+            "selected": false,
+            "text": "ST-60",
+            "value": "ST-60"
+          },
+          {
+            "selected": false,
+            "text": "ST-47",
+            "value": "ST-47"
+          },
+          {
+            "selected": false,
+            "text": "ST-94",
+            "value": "ST-94"
+          },
+          {
+            "selected": false,
+            "text": "ST-68",
+            "value": "ST-68"
+          },
+          {
+            "selected": false,
+            "text": "ST-57",
+            "value": "ST-57"
+          },
+          {
+            "selected": false,
+            "text": "ST-31",
+            "value": "ST-31"
+          },
+          {
+            "selected": false,
+            "text": "ST-2",
+            "value": "ST-2"
+          },
+          {
+            "selected": false,
+            "text": "ST-114",
+            "value": "ST-114"
+          },
+          {
+            "selected": false,
+            "text": "ST-104",
+            "value": "ST-104"
+          },
+          {
+            "selected": false,
+            "text": "ST-25",
+            "value": "ST-25"
+          },
+          {
+            "selected": false,
+            "text": "ST-91",
+            "value": "ST-91"
+          },
+          {
+            "selected": false,
+            "text": "ST-87",
+            "value": "ST-87"
+          },
+          {
+            "selected": false,
+            "text": "ST-10",
+            "value": "ST-10"
+          },
+          {
+            "selected": false,
+            "text": "ST-124",
+            "value": "ST-124"
+          },
+          {
+            "selected": false,
+            "text": "ST-118",
+            "value": "ST-118"
+          },
+          {
+            "selected": false,
+            "text": "ST-120",
+            "value": "ST-120"
+          },
+          {
+            "selected": false,
+            "text": "ST-45",
+            "value": "ST-45"
+          },
+          {
+            "selected": false,
+            "text": "ST-18",
+            "value": "ST-18"
+          },
+          {
+            "selected": false,
+            "text": "ST-65",
+            "value": "ST-65"
+          },
+          {
+            "selected": false,
+            "text": "ST-82",
+            "value": "ST-82"
+          },
+          {
+            "selected": false,
+            "text": "ST-149",
+            "value": "ST-149"
+          },
+          {
+            "selected": false,
+            "text": "ST-137",
+            "value": "ST-137"
+          },
+          {
+            "selected": false,
+            "text": "ST-67",
+            "value": "ST-67"
+          },
+          {
+            "selected": false,
+            "text": "ST-43",
+            "value": "ST-43"
+          },
+          {
+            "selected": false,
+            "text": "ST-132",
+            "value": "ST-132"
+          },
+          {
+            "selected": false,
+            "text": "ST-136",
+            "value": "ST-136"
+          },
+          {
+            "selected": false,
+            "text": "ST-56",
+            "value": "ST-56"
+          },
+          {
+            "selected": false,
+            "text": "ST-93",
+            "value": "ST-93"
+          },
+          {
+            "selected": false,
+            "text": "ST-147",
+            "value": "ST-147"
+          },
+          {
+            "selected": false,
+            "text": "ST-55",
+            "value": "ST-55"
+          },
+          {
+            "selected": false,
+            "text": "ST-127",
+            "value": "ST-127"
+          },
+          {
+            "selected": false,
+            "text": "ST-140",
+            "value": "ST-140"
+          },
+          {
+            "selected": false,
+            "text": "ST-148",
+            "value": "ST-148"
+          },
+          {
+            "selected": false,
+            "text": "ST-75",
+            "value": "ST-75"
+          },
+          {
+            "selected": false,
+            "text": "ST-28",
+            "value": "ST-28"
+          },
+          {
+            "selected": false,
+            "text": "ST-35",
+            "value": "ST-35"
+          },
+          {
+            "selected": false,
+            "text": "ST-48",
+            "value": "ST-48"
+          },
+          {
+            "selected": false,
+            "text": "ST-78",
+            "value": "ST-78"
+          },
+          {
+            "selected": false,
+            "text": "ST-69",
+            "value": "ST-69"
+          },
+          {
+            "selected": false,
+            "text": "ST-9",
+            "value": "ST-9"
+          },
+          {
+            "selected": false,
+            "text": "ST-66",
+            "value": "ST-66"
+          },
+          {
+            "selected": false,
+            "text": "ST-103",
+            "value": "ST-103"
+          },
+          {
+            "selected": false,
+            "text": "ST-131",
+            "value": "ST-131"
+          },
+          {
+            "selected": false,
+            "text": "ST-51",
+            "value": "ST-51"
+          },
+          {
+            "selected": false,
+            "text": "ST-122",
+            "value": "ST-122"
+          },
+          {
+            "selected": false,
+            "text": "ST-59",
+            "value": "ST-59"
+          },
+          {
+            "selected": false,
+            "text": "ST-113",
+            "value": "ST-113"
+          },
+          {
+            "selected": false,
+            "text": "ST-71",
+            "value": "ST-71"
+          },
+          {
+            "selected": false,
+            "text": "ST-29",
+            "value": "ST-29"
+          },
+          {
+            "selected": false,
+            "text": "ST-119",
+            "value": "ST-119"
+          },
+          {
+            "selected": false,
+            "text": "ST-19",
+            "value": "ST-19"
+          },
+          {
+            "selected": false,
+            "text": "ST-117",
+            "value": "ST-117"
+          },
+          {
+            "selected": false,
+            "text": "ST-115",
+            "value": "ST-115"
+          },
+          {
+            "selected": false,
+            "text": "ST-130",
+            "value": "ST-130"
+          },
+          {
+            "selected": false,
+            "text": "ST-139",
+            "value": "ST-139"
+          },
+          {
+            "selected": false,
+            "text": "ST-1",
+            "value": "ST-1"
+          },
+          {
+            "selected": false,
+            "text": "ST-73",
+            "value": "ST-73"
+          },
+          {
+            "selected": false,
+            "text": "ST-27",
+            "value": "ST-27"
+          },
+          {
+            "selected": false,
+            "text": "ST-5",
+            "value": "ST-5"
+          },
+          {
+            "selected": false,
+            "text": "ST-90",
+            "value": "ST-90"
+          },
+          {
+            "selected": false,
+            "text": "ST-112",
+            "value": "ST-112"
+          },
+          {
+            "selected": false,
+            "text": "ST-96",
+            "value": "ST-96"
+          },
+          {
+            "selected": false,
+            "text": "ST-83",
+            "value": "ST-83"
+          },
+          {
+            "selected": false,
+            "text": "ST-6",
+            "value": "ST-6"
+          },
+          {
+            "selected": false,
+            "text": "ST-23",
+            "value": "ST-23"
+          },
+          {
+            "selected": false,
+            "text": "ST-135",
+            "value": "ST-135"
+          },
+          {
+            "selected": false,
+            "text": "ST-41",
+            "value": "ST-41"
+          },
+          {
+            "selected": false,
+            "text": "ST-0",
+            "value": "ST-0"
+          },
+          {
+            "selected": false,
+            "text": "ST-143",
+            "value": "ST-143"
+          },
+          {
+            "selected": false,
+            "text": "ST-26",
+            "value": "ST-26"
+          },
+          {
+            "selected": false,
+            "text": "ST-42",
+            "value": "ST-42"
+          },
+          {
+            "selected": false,
+            "text": "ST-44",
+            "value": "ST-44"
+          },
+          {
+            "selected": false,
+            "text": "ST-95",
+            "value": "ST-95"
+          },
+          {
+            "selected": false,
+            "text": "ST-81",
+            "value": "ST-81"
+          },
+          {
+            "selected": false,
+            "text": "ST-89",
+            "value": "ST-89"
+          },
+          {
+            "selected": false,
+            "text": "ST-21",
+            "value": "ST-21"
+          },
+          {
+            "selected": false,
+            "text": "ST-30",
+            "value": "ST-30"
+          },
+          {
+            "selected": false,
+            "text": "ST-64",
+            "value": "ST-64"
+          },
+          {
+            "selected": false,
+            "text": "ST-92",
+            "value": "ST-92"
+          },
+          {
+            "selected": false,
+            "text": "ST-32",
+            "value": "ST-32"
+          },
+          {
+            "selected": false,
+            "text": "ST-145",
+            "value": "ST-145"
+          },
+          {
+            "selected": false,
+            "text": "ST-128",
+            "value": "ST-128"
+          },
+          {
+            "selected": false,
+            "text": "ST-85",
+            "value": "ST-85"
+          },
+          {
+            "selected": false,
+            "text": "ST-24",
+            "value": "ST-24"
+          },
+          {
+            "selected": false,
+            "text": "ST-37",
+            "value": "ST-37"
+          },
+          {
+            "selected": false,
+            "text": "ST-106",
+            "value": "ST-106"
+          },
+          {
+            "selected": false,
+            "text": "ST-49",
+            "value": "ST-49"
+          },
+          {
+            "selected": false,
+            "text": "ST-70",
+            "value": "ST-70"
+          },
+          {
+            "selected": false,
+            "text": "ST-4",
+            "value": "ST-4"
+          },
+          {
+            "selected": false,
+            "text": "ST-101",
+            "value": "ST-101"
+          },
+          {
+            "selected": false,
+            "text": "ST-111",
+            "value": "ST-111"
+          },
+          {
+            "selected": false,
+            "text": "ST-7",
+            "value": "ST-7"
+          },
+          {
+            "selected": false,
+            "text": "ST-8",
+            "value": "ST-8"
+          },
+          {
+            "selected": false,
+            "text": "ST-105",
+            "value": "ST-105"
+          },
+          {
+            "selected": false,
+            "text": "ST-107",
+            "value": "ST-107"
+          },
+          {
+            "selected": false,
+            "text": "ST-99",
+            "value": "ST-99"
+          },
+          {
+            "selected": false,
+            "text": "ST-123",
+            "value": "ST-123"
+          },
+          {
+            "selected": false,
+            "text": "ST-14",
+            "value": "ST-14"
+          },
+          {
+            "selected": false,
+            "text": "ST-141",
+            "value": "ST-141"
+          },
+          {
+            "selected": false,
+            "text": "ST-52",
+            "value": "ST-52"
+          },
+          {
+            "selected": false,
+            "text": "ST-16",
+            "value": "ST-16"
+          },
+          {
+            "selected": false,
+            "text": "ST-17",
+            "value": "ST-17"
+          },
+          {
+            "selected": false,
+            "text": "ST-97",
+            "value": "ST-97"
+          },
+          {
+            "selected": false,
+            "text": "ST-121",
+            "value": "ST-121"
+          },
+          {
+            "selected": false,
+            "text": "ST-13",
+            "value": "ST-13"
+          },
+          {
+            "selected": false,
+            "text": "ST-62",
+            "value": "ST-62"
+          },
+          {
+            "selected": false,
+            "text": "ST-146",
+            "value": "ST-146"
+          },
+          {
+            "selected": false,
+            "text": "ST-20",
+            "value": "ST-20"
+          },
+          {
+            "selected": false,
+            "text": "ST-3",
+            "value": "ST-3"
+          },
+          {
+            "selected": false,
+            "text": "ST-109",
+            "value": "ST-109"
+          },
+          {
+            "selected": false,
+            "text": "ST-84",
+            "value": "ST-84"
+          },
+          {
+            "selected": false,
+            "text": "ST-33",
+            "value": "ST-33"
+          }
+        ],
+        "query": "MATCH (n:JIRA) RETURN n.sprintId",
+        "refresh": 0,
+        "regex": "",
+        "skipUrlSync": false,
+        "sort": 0,
+        "tagValuesQuery": "",
+        "tags": [],
+        "tagsQuery": "",
+        "type": "query",
+        "useTags": false
+      }
+    ]
+  },
+  "time": {
+    "from": "now-1y",
+    "to": "now"
+  },
+  "timepicker": {
+    "refresh_intervals": [
+      "5s",
+      "10s",
+      "30s",
+      "1m",
+      "5m",
+      "15m",
+      "30m",
+      "1h",
+      "2h",
+      "1d"
+    ],
+    "time_options": [
+      "5m",
+      "15m",
+      "1h",
+      "6h",
+      "12h",
+      "24h",
+      "2d",
+      "7d",
+      "30d"
+    ]
+  },
+  "timezone": "browser",
+  "title": "Sprint Score Card",
+  "uid": "000000028",
+  "version": 57
+}
