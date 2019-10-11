@@ -1,0 +1,1517 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": "-- Grafana --",
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "editable": true,
+  "gnetId": null,
+  "graphTooltip": 0,
+  "id": 3,
+  "iteration": 1570787086521,
+  "links": [],
+  "panels": [
+    {
+      "content": "",
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "id": 29,
+      "links": [],
+      "mode": "markdown",
+      "title": "SCM",
+      "type": "text"
+    },
+    {
+      "columns": [],
+      "fontSize": "100%",
+      "gridPos": {
+        "h": 4,
+        "w": 8,
+        "x": 0,
+        "y": 1
+      },
+      "id": 60,
+      "links": [],
+      "pageSize": null,
+      "scroll": true,
+      "showHeader": true,
+      "sort": {
+        "col": 0,
+        "desc": true
+      },
+      "styles": [
+        {
+          "alias": "Time",
+          "dateFormat": "YYYY-MM-DD HH:mm:ss",
+          "pattern": "Time",
+          "type": "date"
+        },
+        {
+          "alias": "",
+          "colorMode": null,
+          "colors": [
+            "rgba(245, 54, 54, 0.9)",
+            "rgba(237, 129, 40, 0.89)",
+            "rgba(50, 172, 45, 0.97)"
+          ],
+          "decimals": 2,
+          "pattern": "/.*/",
+          "thresholds": [],
+          "type": "number",
+          "unit": "short"
+        }
+      ],
+      "targets": [
+        {
+          "checkQuery": false,
+          "rawQuery": true,
+          "refId": "A",
+          "table": true,
+          "target": "MATCH (n:GIT) where exists(n.repoType) and n.Portfolio in $Portfolio  RETURN n.repoType as RepoType, count(n.repoType) as Count , n.Portfolio as Portfolio"
+        }
+      ],
+      "title": "Repo Type in $Portfolio",
+      "transform": "table",
+      "type": "table"
+    },
+    {
+      "cacheTimeout": null,
+      "colorBackground": true,
+      "colorValue": false,
+      "colors": [
+        "#299c46",
+        "rgba(237, 129, 40, 0.89)",
+        "#d44a3a"
+      ],
+      "datasource": "Neo4j-Caching",
+      "format": "none",
+      "gauge": {
+        "maxValue": 100,
+        "minValue": 0,
+        "show": false,
+        "thresholdLabels": false,
+        "thresholdMarkers": true
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 5,
+        "x": 8,
+        "y": 1
+      },
+      "id": 62,
+      "interval": null,
+      "links": [],
+      "mappingType": 1,
+      "mappingTypes": [
+        {
+          "name": "value to text",
+          "value": 1
+        },
+        {
+          "name": "range to text",
+          "value": 2
+        }
+      ],
+      "maxDataPoints": 100,
+      "nullPointMode": "connected",
+      "nullText": null,
+      "postfix": "",
+      "postfixFontSize": "50%",
+      "prefix": "",
+      "prefixFontSize": "50%",
+      "rangeMaps": [
+        {
+          "from": "null",
+          "text": "N/A",
+          "to": "null"
+        }
+      ],
+      "sparkline": {
+        "fillColor": "rgba(31, 118, 189, 0.18)",
+        "full": false,
+        "lineColor": "rgb(31, 120, 193)",
+        "show": false
+      },
+      "tableColumn": "",
+      "targets": [
+        {
+          "cacheVariance": 5,
+          "checkQuery": false,
+          "rawQuery": true,
+          "refId": "A",
+          "rescache": true,
+          "selectionval": "Variance Time",
+          "table": true,
+          "target": "MATCH (n:GIT:DATA) where ?START_TIME?<=n.inSightsTime <=?END_TIME? with distinct labels(n) as l \nwith l as l,\ncount(l) as count\nunwind l as ScmTools\nwith ScmTools,sum(count) as count\nwhere not ScmTools in ['SCM', 'DATA', 'RAW'] return sum(count)",
+          "timeSeries": true
+        }
+      ],
+      "thresholds": "0,1",
+      "title": "Scm Tool Count",
+      "type": "singlestat",
+      "valueFontSize": "80%",
+      "valueMaps": [
+        {
+          "op": "=",
+          "text": "N/A",
+          "value": "null"
+        }
+      ],
+      "valueName": "avg"
+    },
+    {
+      "cacheTimeout": null,
+      "colorBackground": false,
+      "colorValue": false,
+      "colors": [
+        "#299c46",
+        "rgba(237, 129, 40, 0.89)",
+        "#d44a3a"
+      ],
+      "datasource": "Neo4j-Caching",
+      "format": "none",
+      "gauge": {
+        "maxValue": 100,
+        "minValue": 0,
+        "show": false,
+        "thresholdLabels": false,
+        "thresholdMarkers": true
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 5,
+        "x": 13,
+        "y": 1
+      },
+      "id": 48,
+      "interval": null,
+      "links": [],
+      "mappingType": 1,
+      "mappingTypes": [
+        {
+          "name": "value to text",
+          "value": 1
+        },
+        {
+          "name": "range to text",
+          "value": 2
+        }
+      ],
+      "maxDataPoints": 100,
+      "nullPointMode": "connected",
+      "nullText": null,
+      "postfix": "",
+      "postfixFontSize": "50%",
+      "prefix": "",
+      "prefixFontSize": "50%",
+      "rangeMaps": [
+        {
+          "from": "null",
+          "text": "N/A",
+          "to": "null"
+        }
+      ],
+      "sparkline": {
+        "fillColor": "rgba(31, 118, 189, 0.18)",
+        "full": false,
+        "lineColor": "rgb(31, 120, 193)",
+        "show": false
+      },
+      "tableColumn": "",
+      "targets": [
+        {
+          "cacheVariance": 5,
+          "checkQuery": false,
+          "rawQuery": true,
+          "refId": "A",
+          "rescache": true,
+          "selectionval": "Variance Time",
+          "target": "MATCH (n:JIRA{sprintId:\"ST-102\"})-[:FROM_JIRA_TO_GIT]->(m:GIT) where ?START_TIME?<=n.inSightsTime <=?END_TIME? WITH distinct n.jiraKey as jiraKey   return count(jiraKey )",
+          "timeSeries": true
+        }
+      ],
+      "thresholds": "",
+      "title": "SCM Commits",
+      "type": "singlestat",
+      "valueFontSize": "80%",
+      "valueMaps": [
+        {
+          "op": "=",
+          "text": "N/A",
+          "value": "null"
+        }
+      ],
+      "valueName": "avg"
+    },
+    {
+      "cacheTimeout": null,
+      "colorBackground": true,
+      "colorValue": false,
+      "colors": [
+        "#299c46",
+        "rgba(237, 129, 40, 0.89)",
+        "#d44a3a"
+      ],
+      "datasource": "Neo4j-Caching",
+      "format": "none",
+      "gauge": {
+        "maxValue": 100,
+        "minValue": 0,
+        "show": false,
+        "thresholdLabels": false,
+        "thresholdMarkers": true
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 18,
+        "y": 1
+      },
+      "id": 56,
+      "interval": null,
+      "links": [],
+      "mappingType": 1,
+      "mappingTypes": [
+        {
+          "name": "value to text",
+          "value": 1
+        },
+        {
+          "name": "range to text",
+          "value": 2
+        }
+      ],
+      "maxDataPoints": 100,
+      "nullPointMode": "connected",
+      "nullText": null,
+      "postfix": "",
+      "postfixFontSize": "50%",
+      "prefix": "",
+      "prefixFontSize": "50%",
+      "rangeMaps": [
+        {
+          "from": "null",
+          "text": "N/A",
+          "to": "null"
+        }
+      ],
+      "sparkline": {
+        "fillColor": "rgba(31, 118, 189, 0.18)",
+        "full": false,
+        "lineColor": "rgb(31, 120, 193)",
+        "show": false
+      },
+      "tableColumn": "",
+      "targets": [
+        {
+          "cacheVariance": 5,
+          "checkQuery": false,
+          "rawQuery": true,
+          "refId": "A",
+          "rescache": true,
+          "selectionval": "Variance Time",
+          "target": "MATCH (n:JENKINS:DATA) where ?START_TIME?<=n.inSightsTime <=?END_TIME? and exists(n.buildNumber) and not()-[]->() return count(n) as orphanCommits",
+          "timeSeries": true
+        }
+      ],
+      "thresholds": "0.1,1",
+      "title": "Orphan Commits ",
+      "type": "singlestat",
+      "valueFontSize": "80%",
+      "valueMaps": [
+        {
+          "op": "=",
+          "text": "N/A",
+          "value": "null"
+        }
+      ],
+      "valueName": "avg"
+    },
+    {
+      "content": "",
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 5
+      },
+      "id": 30,
+      "links": [],
+      "mode": "markdown",
+      "title": "CI & CD",
+      "type": "text"
+    },
+    {
+      "cacheTimeout": null,
+      "colorBackground": false,
+      "colorValue": false,
+      "colors": [
+        "#299c46",
+        "rgba(237, 129, 40, 0.89)",
+        "#d44a3a"
+      ],
+      "datasource": "Neo4j-Caching",
+      "format": "none",
+      "gauge": {
+        "maxValue": 100,
+        "minValue": 0,
+        "show": false,
+        "thresholdLabels": false,
+        "thresholdMarkers": true
+      },
+      "gridPos": {
+        "h": 6,
+        "w": 3,
+        "x": 0,
+        "y": 6
+      },
+      "id": 35,
+      "interval": null,
+      "links": [],
+      "mappingType": 1,
+      "mappingTypes": [
+        {
+          "name": "value to text",
+          "value": 1
+        },
+        {
+          "name": "range to text",
+          "value": 2
+        }
+      ],
+      "maxDataPoints": 100,
+      "nullPointMode": "connected",
+      "nullText": null,
+      "postfix": "",
+      "postfixFontSize": "50%",
+      "prefix": "",
+      "prefixFontSize": "50%",
+      "rangeMaps": [
+        {
+          "from": "null",
+          "text": "N/A",
+          "to": "null"
+        }
+      ],
+      "sparkline": {
+        "fillColor": "rgba(31, 118, 189, 0.18)",
+        "full": false,
+        "lineColor": "rgb(31, 120, 193)",
+        "show": false
+      },
+      "tableColumn": "",
+      "targets": [
+        {
+          "cacheVariance": 5,
+          "checkQuery": false,
+          "rawQuery": true,
+          "refId": "A",
+          "rescache": true,
+          "selectionval": "Variance Time",
+          "target": "MATCH (n:JIRA{sprintId:\"ST-102\"})-[:FROM_JIRA_TO_GIT]->(m:GIT)  WITH distinct m as git\nMATCH (git)-[:FROM_GIT_TO_JENKINS]->(n:JENKINS) with distinct n.buildNumber as jenkins return count(jenkins)",
+          "timeSeries": true
+        }
+      ],
+      "thresholds": "",
+      "title": "CI Builds",
+      "type": "singlestat",
+      "valueFontSize": "100%",
+      "valueMaps": [
+        {
+          "op": "=",
+          "text": "N/A",
+          "value": "null"
+        }
+      ],
+      "valueName": "avg"
+    },
+    {
+      "cacheTimeout": null,
+      "colorBackground": false,
+      "colorValue": false,
+      "colors": [
+        "#299c46",
+        "rgba(237, 129, 40, 0.89)",
+        "#d44a3a"
+      ],
+      "datasource": "Neo4j",
+      "format": "none",
+      "gauge": {
+        "maxValue": 100,
+        "minValue": 0,
+        "show": false,
+        "thresholdLabels": false,
+        "thresholdMarkers": true
+      },
+      "gridPos": {
+        "h": 6,
+        "w": 4,
+        "x": 3,
+        "y": 6
+      },
+      "id": 40,
+      "interval": null,
+      "links": [],
+      "mappingType": 1,
+      "mappingTypes": [
+        {
+          "name": "value to text",
+          "value": 1
+        },
+        {
+          "name": "range to text",
+          "value": 2
+        }
+      ],
+      "maxDataPoints": 100,
+      "nullPointMode": "connected",
+      "nullText": null,
+      "postfix": "",
+      "postfixFontSize": "50%",
+      "prefix": "",
+      "prefixFontSize": "50%",
+      "rangeMaps": [
+        {
+          "from": "null",
+          "text": "N/A",
+          "to": "null"
+        }
+      ],
+      "sparkline": {
+        "fillColor": "rgba(31, 118, 189, 0.18)",
+        "full": false,
+        "lineColor": "rgb(31, 120, 193)",
+        "show": false
+      },
+      "tableColumn": "",
+      "targets": [
+        {
+          "cacheVariance": 5,
+          "checkQuery": false,
+          "rawQuery": true,
+          "refId": "A",
+          "rescache": true,
+          "selectionval": "Variance Time",
+          "table": false,
+          "target": "MATCH (n:JIRA)-[:FROM_JIRA_TO_GIT]->(m:GIT)  WHERE n.sprintId IN $sprintId WITH distinct m as git\nMATCH (git)-[:FROM_GIT_TO_JENKINS]->(n:JENKINS) with distinct n.duration  as Duration return ceil(avg(toInt(Duration ))) as AvgTimeInSecs",
+          "timeSeries": true
+        }
+      ],
+      "thresholds": "",
+      "title": "Avg. Build Time in Secs",
+      "type": "singlestat",
+      "valueFontSize": "80%",
+      "valueMaps": [
+        {
+          "op": "=",
+          "text": "N/A",
+          "value": "null"
+        }
+      ],
+      "valueName": "avg"
+    },
+    {
+      "cacheTimeout": null,
+      "colorBackground": false,
+      "colorValue": false,
+      "colors": [
+        "#299c46",
+        "rgba(237, 129, 40, 0.89)",
+        "#d44a3a"
+      ],
+      "datasource": "Neo4j_Local",
+      "format": "none",
+      "gauge": {
+        "maxValue": 100,
+        "minValue": 0,
+        "show": false,
+        "thresholdLabels": false,
+        "thresholdMarkers": true
+      },
+      "gridPos": {
+        "h": 6,
+        "w": 3,
+        "x": 7,
+        "y": 6
+      },
+      "id": 53,
+      "interval": null,
+      "links": [],
+      "mappingType": 1,
+      "mappingTypes": [
+        {
+          "name": "value to text",
+          "value": 1
+        },
+        {
+          "name": "range to text",
+          "value": 2
+        }
+      ],
+      "maxDataPoints": 100,
+      "nullPointMode": "connected",
+      "nullText": null,
+      "postfix": "",
+      "postfixFontSize": "50%",
+      "prefix": "",
+      "prefixFontSize": "50%",
+      "rangeMaps": [
+        {
+          "from": "null",
+          "text": "N/A",
+          "to": "null"
+        }
+      ],
+      "sparkline": {
+        "fillColor": "rgba(31, 118, 189, 0.18)",
+        "full": false,
+        "lineColor": "rgb(31, 120, 193)",
+        "show": false
+      },
+      "tableColumn": "",
+      "targets": [
+        {
+          "checkQuery": false,
+          "hide": false,
+          "rawQuery": true,
+          "refId": "A",
+          "target": "MATCH (n2:RUNDECK)  WHERE ()-[:RUNDECK_TRG_BY_JENKINS]->(n2:RUNDECK)  return count(n2) as ManualDeployment",
+          "timeSeries": true
+        }
+      ],
+      "thresholds": "",
+      "title": "CI Builds With CD",
+      "type": "singlestat",
+      "valueFontSize": "100%",
+      "valueMaps": [
+        {
+          "op": "=",
+          "text": "N/A",
+          "value": "null"
+        }
+      ],
+      "valueName": "total"
+    },
+    {
+      "cacheTimeout": null,
+      "colorBackground": true,
+      "colorValue": false,
+      "colors": [
+        "#299c46",
+        "rgba(237, 129, 40, 0.89)",
+        "#d44a3a"
+      ],
+      "datasource": "Neo4j-Caching",
+      "format": "s",
+      "gauge": {
+        "maxValue": 100,
+        "minValue": 0,
+        "show": false,
+        "thresholdLabels": false,
+        "thresholdMarkers": true
+      },
+      "gridPos": {
+        "h": 6,
+        "w": 3,
+        "x": 10,
+        "y": 6
+      },
+      "id": 57,
+      "interval": null,
+      "links": [],
+      "mappingType": 1,
+      "mappingTypes": [
+        {
+          "name": "value to text",
+          "value": 1
+        },
+        {
+          "name": "range to text",
+          "value": 2
+        }
+      ],
+      "maxDataPoints": 100,
+      "nullPointMode": "connected",
+      "nullText": null,
+      "postfix": "",
+      "postfixFontSize": "50%",
+      "prefix": "",
+      "prefixFontSize": "50%",
+      "rangeMaps": [
+        {
+          "from": "null",
+          "text": "N/A",
+          "to": "null"
+        }
+      ],
+      "sparkline": {
+        "fillColor": "rgba(31, 118, 189, 0.18)",
+        "full": false,
+        "lineColor": "rgb(31, 120, 193)",
+        "show": false
+      },
+      "tableColumn": "",
+      "targets": [
+        {
+          "cacheVariance": 5,
+          "checkQuery": false,
+          "hide": false,
+          "rawQuery": true,
+          "refId": "A",
+          "rescache": true,
+          "selectionval": "Variance Time",
+          "target": "MATCH (n2:JENKINS:DATA) where ?START_TIME?<=n2.inSightsTime <=?END_TIME? and exists(n2.buildNumber) and exists(n2.buildUrl)  return count(n2)",
+          "timeSeries": true
+        }
+      ],
+      "thresholds": "0.3,1",
+      "title": "Broken Build",
+      "type": "singlestat",
+      "valueFontSize": "100%",
+      "valueMaps": [
+        {
+          "op": "=",
+          "text": "N/A",
+          "value": "null"
+        }
+      ],
+      "valueName": "total"
+    },
+    {
+      "datasource": "Neo4j",
+      "editable": true,
+      "error": false,
+      "gridPos": {
+        "h": 6,
+        "w": 11,
+        "x": 13,
+        "y": 6
+      },
+      "id": 33,
+      "insightsPanelData": {
+        "chartOptions": {
+          "backgroundColor": {
+            "fill": "#fbfbfb"
+          },
+          "booleanRole": "certainty",
+          "hAxis": {
+            "maxValue": null,
+            "minValue": null,
+            "useFormatFromData": true,
+            "viewWindow": null,
+            "viewWindowMode": null
+          },
+          "height": 218,
+          "isStacked": true,
+          "legacyScatterChartLabels": true,
+          "legend": "right",
+          "series": {
+            "0": {
+              "color": "#cc0000"
+            },
+            "1": {
+              "color": "#6aa84f"
+            }
+          },
+          "vAxes": [
+            {
+              "logScale": false,
+              "maxValue": null,
+              "minValue": null,
+              "useFormatFromData": true,
+              "viewWindow": {
+                "max": null,
+                "min": null
+              }
+            },
+            {
+              "logScale": false,
+              "maxValue": null,
+              "minValue": null,
+              "useFormatFromData": true,
+              "viewWindow": {
+                "max": null,
+                "min": null
+              }
+            }
+          ],
+          "width": "100%"
+        },
+        "chartType": "ColumnChart",
+        "insightsChartEditorModel": {
+          "joinInstructions": "return google.visualization.data.join(dataTables[0], dataTables[1], 'full', [[0, 0]], [1], [1]);",
+          "targets": [
+            {
+              "columnModel": [
+                {
+                  "name": "inSightsTimeX",
+                  "type": "date"
+                },
+                {
+                  "name": "Failed",
+                  "type": "number"
+                }
+              ],
+              "id": "B"
+            },
+            {
+              "columnModel": [
+                {
+                  "name": "inSightsTimeX",
+                  "type": "date"
+                },
+                {
+                  "name": "Success",
+                  "type": "number"
+                }
+              ],
+              "id": "C"
+            }
+          ],
+          "transformInstrctions": "var formatter3 = new google.visualization.DateFormat({ pattern: \"dd-MMM-yy\" });\nvar testFunction = function (val) {\n        return new Date(formatter3.formatValue(val));\n};\nvar result = google.visualization.data.group(data,\n        [{ column: 0, modifier: testFunction, type: 'date' }],\n        [{ 'column': 1, 'aggregation': google.visualization.data.sum, 'type': 'number' },\n        { 'column': 2, 'aggregation': google.visualization.data.sum, 'type': 'number' }]);\nreturn result;"
+        }
+      },
+      "links": [],
+      "targets": [
+        {
+          "checkQuery": false,
+          "rawQuery": true,
+          "refId": "B",
+          "table": true,
+          "target": "match (n:JENKINS) where n.status='Failure' AND n.buildNumber in $buildNumber return n.inSightsTimeX as inSightsTimeX, count(n) as Failed order by inSightsTimeX",
+          "timeSeries": true
+        },
+        {
+          "rawQuery": true,
+          "refId": "C",
+          "table": true,
+          "target": "match (n:JENKINS) where n.status='Success' AND n.buildNumber in $buildNumber return n.inSightsTimeX as inSightsTimeX, count(n) as Success order by inSightsTimeX",
+          "timeSeries": true
+        }
+      ],
+      "title": "CI Build Trend by Status",
+      "type": "insightscharts"
+    },
+    {
+      "cacheTimeout": null,
+      "colorBackground": false,
+      "colorValue": true,
+      "colors": [
+        "#299c46",
+        "#1f78c1",
+        "#d44a3a"
+      ],
+      "datasource": "Neo4j-Caching",
+      "format": "none",
+      "gauge": {
+        "maxValue": 100,
+        "minValue": 0,
+        "show": false,
+        "thresholdLabels": false,
+        "thresholdMarkers": true
+      },
+      "gridPos": {
+        "h": 7,
+        "w": 3,
+        "x": 0,
+        "y": 12
+      },
+      "id": 46,
+      "interval": null,
+      "links": [],
+      "mappingType": 1,
+      "mappingTypes": [
+        {
+          "name": "value to text",
+          "value": 1
+        },
+        {
+          "name": "range to text",
+          "value": 2
+        }
+      ],
+      "maxDataPoints": 100,
+      "nullPointMode": "connected",
+      "nullText": null,
+      "postfix": "",
+      "postfixFontSize": "50%",
+      "prefix": "",
+      "prefixFontSize": "50%",
+      "rangeMaps": [
+        {
+          "from": "null",
+          "text": "N/A",
+          "to": "null"
+        }
+      ],
+      "sparkline": {
+        "fillColor": "rgba(31, 118, 189, 0.18)",
+        "full": false,
+        "lineColor": "rgb(31, 120, 193)",
+        "show": false
+      },
+      "tableColumn": "",
+      "targets": [
+        {
+          "cacheVariance": 5,
+          "checkQuery": false,
+          "rawQuery": true,
+          "refId": "A",
+          "rescache": true,
+          "selectionval": "Variance Time",
+          "target": "MATCH (n:JIRA)-[:FROM_JIRA_TO_GIT]->(m:GIT)  WHERE n.sprintId IN $sprintId WITH distinct m as git\nMATCH (git)-[:FROM_GIT_TO_JENKINS]->(n:JENKINS) WITH distinct n as jenkins\nMATCH (jenkins)-[:FROM_JENKINS_TO_RUNDECK]->(n:RUNDECK) with distinct n.jenkineBuildNumber as Deployments return count(Deployments) as Count",
+          "timeSeries": true
+        }
+      ],
+      "thresholds": "",
+      "title": "Deployment",
+      "type": "singlestat",
+      "valueFontSize": "80%",
+      "valueMaps": [
+        {
+          "op": "=",
+          "text": "N/A",
+          "value": "null"
+        }
+      ],
+      "valueName": "avg"
+    },
+    {
+      "datasource": "Neo4j",
+      "editable": true,
+      "error": false,
+      "gridPos": {
+        "h": 7,
+        "w": 4,
+        "x": 3,
+        "y": 12
+      },
+      "id": 44,
+      "insightsPanelData": {
+        "chartOptions": {
+          "backgroundColor": "#fbfbfb",
+          "booleanRole": "certainty",
+          "greenFrom": 0,
+          "greenTo": 60,
+          "hAxis": {
+            "maxValue": null,
+            "minValue": null,
+            "useFormatFromData": true,
+            "viewWindow": {
+              "max": null,
+              "min": null
+            }
+          },
+          "height": 371,
+          "legacyScatterChartLabels": true,
+          "max": 300,
+          "min": 0,
+          "redFrom": 200,
+          "redTo": 300,
+          "vAxes": [
+            {
+              "maxValue": null,
+              "minValue": null,
+              "useFormatFromData": true,
+              "viewWindow": {
+                "max": null,
+                "min": null
+              }
+            },
+            {
+              "maxValue": null,
+              "minValue": null,
+              "useFormatFromData": true,
+              "viewWindow": {
+                "max": null,
+                "min": null
+              }
+            }
+          ],
+          "width": 600,
+          "yellowFrom": 60,
+          "yellowTo": 200
+        },
+        "chartType": "Gauge",
+        "insightsChartEditorModel": {
+          "targets": [
+            {
+              "columnModel": [
+                {
+                  "name": "Deploy",
+                  "type": "number"
+                }
+              ],
+              "id": "A"
+            }
+          ]
+        }
+      },
+      "links": [],
+      "targets": [
+        {
+          "checkQuery": false,
+          "rawQuery": true,
+          "refId": "A",
+          "target": "match (n:RUNDECK) where n.jenkineBuildNumber in $jenkineBuildNumber return ceil(avg(toInt(n.jenkineBuildNumber))) as Deploy"
+        }
+      ],
+      "title": "Avg. Deploy Time in Secs",
+      "type": "insightscharts"
+    },
+    {
+      "cacheTimeout": null,
+      "colorBackground": true,
+      "colorValue": false,
+      "colors": [
+        "#299c46",
+        "rgba(237, 129, 40, 0.89)",
+        "#d44a3a"
+      ],
+      "datasource": "Neo4j",
+      "format": "none",
+      "gauge": {
+        "maxValue": 100,
+        "minValue": 0,
+        "show": false,
+        "thresholdLabels": false,
+        "thresholdMarkers": true
+      },
+      "gridPos": {
+        "h": 7,
+        "w": 3,
+        "x": 7,
+        "y": 12
+      },
+      "id": 54,
+      "interval": null,
+      "links": [],
+      "mappingType": 1,
+      "mappingTypes": [
+        {
+          "name": "value to text",
+          "value": 1
+        },
+        {
+          "name": "range to text",
+          "value": 2
+        }
+      ],
+      "maxDataPoints": 100,
+      "nullPointMode": "connected",
+      "nullText": null,
+      "postfix": "",
+      "postfixFontSize": "50%",
+      "prefix": "",
+      "prefixFontSize": "50%",
+      "rangeMaps": [
+        {
+          "from": "null",
+          "text": "N/A",
+          "to": "null"
+        }
+      ],
+      "sparkline": {
+        "fillColor": "rgba(31, 118, 189, 0.18)",
+        "full": false,
+        "lineColor": "rgb(31, 120, 193)",
+        "show": false
+      },
+      "tableColumn": "",
+      "targets": [
+        {
+          "checkQuery": false,
+          "hide": false,
+          "rawQuery": true,
+          "refId": "A",
+          "target": "MATCH (n2:RUNDECK)  WHERE NOT ()-[:FROM_JENKINS_TO_RUNDECK]->(n2:RUNDECK)  return count(n2) as ManualDeployment",
+          "timeSeries": true
+        }
+      ],
+      "thresholds": "10,15",
+      "title": "Manual Deployment",
+      "type": "singlestat",
+      "valueFontSize": "100%",
+      "valueMaps": [
+        {
+          "op": "=",
+          "text": "N/A",
+          "value": "null"
+        }
+      ],
+      "valueName": "total"
+    },
+    {
+      "datasource": "Neo4j",
+      "editable": true,
+      "error": false,
+      "gridPos": {
+        "h": 7,
+        "w": 14,
+        "x": 10,
+        "y": 12
+      },
+      "id": 42,
+      "insightsPanelData": {
+        "chartOptions": {
+          "backgroundColor": {
+            "fill": "#fbfbfb"
+          },
+          "booleanRole": "certainty",
+          "domainAxis": {
+            "direction": 1
+          },
+          "hAxis": {
+            "maxValue": null,
+            "minValue": null,
+            "useFormatFromData": true,
+            "viewWindow": null,
+            "viewWindowMode": null
+          },
+          "height": 218,
+          "isStacked": true,
+          "legacyScatterChartLabels": true,
+          "legend": "right",
+          "series": {
+            "0": {
+              "color": "#cc0000"
+            },
+            "1": {
+              "color": "#6aa84f"
+            }
+          },
+          "vAxes": [
+            {
+              "logScale": false,
+              "maxValue": null,
+              "minValue": null,
+              "useFormatFromData": true,
+              "viewWindow": {
+                "max": null,
+                "min": null
+              }
+            },
+            {
+              "logScale": false,
+              "maxValue": null,
+              "minValue": null,
+              "useFormatFromData": true,
+              "viewWindow": {
+                "max": null,
+                "min": null
+              }
+            }
+          ],
+          "width": "100%"
+        },
+        "chartType": "ColumnChart",
+        "insightsChartEditorModel": {
+          "joinInstructions": "return google.visualization.data.join(dataTables[0], dataTables[1], 'full', [[0, 0]], [1], [1]);",
+          "targets": [
+            {
+              "columnModel": [
+                {
+                  "name": "inSightsTimeX",
+                  "type": "date"
+                },
+                {
+                  "name": "Failed",
+                  "type": "number"
+                }
+              ],
+              "id": "A"
+            },
+            {
+              "columnModel": [
+                {
+                  "name": "inSightsTimeX",
+                  "type": "date"
+                },
+                {
+                  "name": "Success",
+                  "type": "number"
+                }
+              ],
+              "id": "B"
+            }
+          ],
+          "transformInstrctions": "var formatter3 = new google.visualization.DateFormat({ pattern: \"dd-MMM-yy\" });\nvar testFunction = function (val) {\n        return new Date(formatter3.formatValue(val));\n};\nvar result = google.visualization.data.group(data,\n        [{ column: 0, modifier: testFunction, type: 'date' }],\n        [{ 'column': 1, 'aggregation': google.visualization.data.sum, 'type': 'number' },\n        { 'column': 2, 'aggregation': google.visualization.data.sum, 'type': 'number' }]);\nreturn result;"
+        }
+      },
+      "links": [],
+      "targets": [
+        {
+          "checkQuery": false,
+          "rawQuery": true,
+          "refId": "A",
+          "table": false,
+          "target": "match (n:RUNDECK) where n.status='Failure' AND n.jenkineBuildNumber in $jenkineBuildNumber return n.inSightsTimeX as inSightsTimeX, count(n) as Failed order by inSightsTimeX",
+          "timeSeries": false
+        },
+        {
+          "rawQuery": true,
+          "refId": "B",
+          "table": false,
+          "target": "match (n:RUNDECK) where n.status='Success' AND n.jenkineBuildNumber in $jenkineBuildNumber return n.inSightsTimeX as inSightsTimeX, count(n) as Success order by inSightsTimeX",
+          "timeSeries": false
+        }
+      ],
+      "title": "Deployment Trend by Status",
+      "type": "insightscharts"
+    },
+    {
+      "content": "",
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 19
+      },
+      "id": 52,
+      "links": [],
+      "mode": "markdown",
+      "title": "CODEQUALITY",
+      "type": "text"
+    },
+    {
+      "cacheTimeout": null,
+      "colorBackground": false,
+      "colorValue": false,
+      "colors": [
+        "#299c46",
+        "rgba(237, 129, 40, 0.89)",
+        "#d44a3a"
+      ],
+      "datasource": "Neo4j-Caching",
+      "format": "none",
+      "gauge": {
+        "maxValue": 100,
+        "minValue": 0,
+        "show": false,
+        "thresholdLabels": false,
+        "thresholdMarkers": true
+      },
+      "gridPos": {
+        "h": 6,
+        "w": 3,
+        "x": 0,
+        "y": 20
+      },
+      "id": 50,
+      "interval": null,
+      "links": [],
+      "mappingType": 1,
+      "mappingTypes": [
+        {
+          "name": "value to text",
+          "value": 1
+        },
+        {
+          "name": "range to text",
+          "value": 2
+        }
+      ],
+      "maxDataPoints": 100,
+      "nullPointMode": "connected",
+      "nullText": null,
+      "postfix": "",
+      "postfixFontSize": "50%",
+      "prefix": "",
+      "prefixFontSize": "50%",
+      "rangeMaps": [
+        {
+          "from": "null",
+          "text": "N/A",
+          "to": "null"
+        }
+      ],
+      "sparkline": {
+        "fillColor": "rgba(31, 118, 189, 0.18)",
+        "full": false,
+        "lineColor": "rgb(31, 120, 193)",
+        "show": false
+      },
+      "tableColumn": "",
+      "targets": [
+        {
+          "cacheVariance": 5,
+          "checkQuery": false,
+          "rawQuery": true,
+          "refId": "A",
+          "rescache": true,
+          "selectionval": "Variance Time",
+          "table": true,
+          "target": "match(n:SONAR:DATA) where ?START_TIME?<=n.inSightsTime <=?END_TIME? return count(distinct(n)) as total",
+          "timeSeries": true
+        }
+      ],
+      "thresholds": "",
+      "title": "Total Codequality Execution",
+      "type": "singlestat",
+      "valueFontSize": "80%",
+      "valueMaps": [
+        {
+          "op": "=",
+          "text": "N/A",
+          "value": "null"
+        }
+      ],
+      "valueName": "avg"
+    },
+    {
+      "cacheTimeout": null,
+      "colorBackground": true,
+      "colorValue": false,
+      "colors": [
+        "#299c46",
+        "rgba(237, 129, 40, 0.89)",
+        "#d44a3a"
+      ],
+      "datasource": "Neo4j-Caching",
+      "format": "none",
+      "gauge": {
+        "maxValue": 100,
+        "minValue": 0,
+        "show": false,
+        "thresholdLabels": false,
+        "thresholdMarkers": true
+      },
+      "gridPos": {
+        "h": 6,
+        "w": 3,
+        "x": 3,
+        "y": 20
+      },
+      "id": 58,
+      "interval": null,
+      "links": [],
+      "mappingType": 1,
+      "mappingTypes": [
+        {
+          "name": "value to text",
+          "value": 1
+        },
+        {
+          "name": "range to text",
+          "value": 2
+        }
+      ],
+      "maxDataPoints": 100,
+      "nullPointMode": "connected",
+      "nullText": null,
+      "postfix": "",
+      "postfixFontSize": "50%",
+      "prefix": "",
+      "prefixFontSize": "50%",
+      "rangeMaps": [
+        {
+          "from": "null",
+          "text": "N/A",
+          "to": "null"
+        }
+      ],
+      "sparkline": {
+        "fillColor": "rgba(31, 118, 189, 0.18)",
+        "full": false,
+        "lineColor": "rgb(31, 120, 193)",
+        "show": false
+      },
+      "tableColumn": "",
+      "targets": [
+        {
+          "cacheVariance": 5,
+          "checkQuery": false,
+          "hide": false,
+          "rawQuery": true,
+          "refId": "A",
+          "rescache": true,
+          "selectionval": "Variance Time",
+          "target": "MATCH (n:SONAR) \nwhere  EXISTS( ()-[:FROM_JENKINS_TO_SONAR]-(n:SONAR) ) and tofloat(n.inSightsTime)>=?START_TIME? AND tofloat(n.inSightsTime)<?END_TIME?\nreturn count(n) as Related",
+          "timeSeries": true
+        }
+      ],
+      "thresholds": "95,100",
+      "title": "Codequality Execution with CI",
+      "type": "singlestat",
+      "valueFontSize": "100%",
+      "valueMaps": [
+        {
+          "op": "=",
+          "text": "N/A",
+          "value": "null"
+        }
+      ],
+      "valueName": "total"
+    },
+    {
+      "aliasColors": {},
+      "bars": false,
+      "dashLength": 10,
+      "dashes": false,
+      "datasource": "Neo4j",
+      "editable": true,
+      "error": false,
+      "fill": 1,
+      "grid": {},
+      "gridPos": {
+        "h": 6,
+        "w": 18,
+        "x": 6,
+        "y": 20
+      },
+      "id": 37,
+      "legend": {
+        "alignAsTable": true,
+        "avg": false,
+        "current": false,
+        "max": false,
+        "min": false,
+        "rightSide": true,
+        "show": true,
+        "total": true,
+        "values": true
+      },
+      "lines": true,
+      "linewidth": 2,
+      "links": [],
+      "nullPointMode": "connected",
+      "percentage": false,
+      "pointradius": 5,
+      "points": false,
+      "renderer": "flot",
+      "seriesOverrides": [],
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
+      "targets": [
+        {
+          "checkQuery": false,
+          "refId": "A"
+        }
+      ],
+      "thresholds": [],
+      "timeFrom": null,
+      "timeRegions": [],
+      "timeShift": null,
+      "title": "CI Without Code Quality",
+      "tooltip": {
+        "msResolution": true,
+        "shared": true,
+        "sort": 0,
+        "value_type": "cumulative"
+      },
+      "type": "graph",
+      "xaxis": {
+        "buckets": null,
+        "mode": "time",
+        "name": null,
+        "show": true,
+        "values": []
+      },
+      "yaxes": [
+        {
+          "format": "short",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": true
+        },
+        {
+          "format": "short",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": true
+        }
+      ],
+      "yaxis": {
+        "align": false,
+        "alignLevel": null
+      }
+    }
+  ],
+  "schemaVersion": 18,
+  "style": "dark",
+  "tags": [],
+  "templating": {
+    "list": [
+      {
+        "allValue": null,
+        "current": {
+          "tags": [],
+          "text": "ST-102",
+          "value": [
+            "ST-102"
+          ]
+        },
+        "hide": 0,
+        "includeAll": true,
+        "label": null,
+        "multi": true,
+        "name": "sprintId",
+        "options": [
+          {
+            "selected": false,
+            "text": "All",
+            "value": "$__all"
+          },
+          {
+            "selected": true,
+            "text": "ST-102",
+            "value": "ST-102"
+          }
+        ],
+        "query": "ST-102",
+        "skipUrlSync": false,
+        "type": "custom"
+      }
+    ]
+  },
+  "time": {
+    "from": "now-2y",
+    "to": "now"
+  },
+  "timepicker": {
+    "refresh_intervals": [
+      "5s",
+      "10s",
+      "30s",
+      "1m",
+      "5m",
+      "15m",
+      "30m",
+      "1h",
+      "2h",
+      "1d"
+    ],
+    "time_options": [
+      "5m",
+      "15m",
+      "1h",
+      "6h",
+      "12h",
+      "24h",
+      "2d",
+      "7d",
+      "30d"
+    ]
+  },
+  "timezone": "",
+  "title": "Build Maturity",
+  "uid": "YFvyL5Umk",
+  "version": 46
+}
