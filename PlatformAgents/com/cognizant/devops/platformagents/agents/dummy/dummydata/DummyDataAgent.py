@@ -180,6 +180,7 @@ class DummyDataAgent(BaseAgent):
             for rangeNumber in range(0,numberOfSprint ) :
                 sprint = 'ST-' + str(rangeNumber)
                 #if sprint not in globle_sprintArr :
+                sprintSample = {}
                 sprintStartDate = sprintEndDate
                 sprintEndDate=(sprintStartDate + datetime.timedelta(days=sprintDay))
                 if createSprintData:
