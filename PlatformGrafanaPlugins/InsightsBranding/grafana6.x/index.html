@@ -27,7 +27,7 @@
 
   <style>
     .preloader {
-      height: 100%;
+      height: 90%;
       flex-direction: column;
       display: flex;
       justify-content: center;
@@ -189,17 +189,24 @@
     <sidemenu class="sidemenu"></sidemenu>
     <app-notifications-list class="page-alert-list"></app-notifications-list>
     <dashboard-search></dashboard-search>
-
-    <div class="main-view">
-      <div style="background-color:#1e2028; padding-right:25px; padding-top:10px; padding-bottom:10px;font-family:Tahoma, San Serif; 		text-align: right;">
-        <span style="font-size:24px !important; color:#dddbdb;border-style: none;padding: 0px;">Powered by</span>
-        <span style="font-size:x-large !important; color:#ffffff;  border-style: none;padding: 0px;font-weight: 600;">Cognizant </span>
-        <span style="font-size:x-large !important; color:#ffffff;  border-style: none;padding: 0px;"> OneDevOps<sup style="font-size: 41%;vertical-align: super;">TM</sup> | Insights</span>
+	
+    <div class="main-view" style="height: calc(100% - 45px);" > 
+	
+	 <div style="background-color:#1e2028; padding-right:25px; padding-top:5px; padding-bottom:5px;font-family:Tahoma, San Serif; 		text-align: right;">
+        <span style="font-size:22px !important; color:#dddbdb;border-style: none;padding: 0px;">Powered by</span>
+        <span style="font-size:22px !important; color:#ffffff;  border-style: none;padding: 0px;font-weight: 600;">Cognizant </span>
+        <span style="font-size:22px !important; color:#ffffff;  border-style: none;padding: 0px;"> OneDevOps<sup style="font-size: 41%;vertical-align: super;">TM</sup> | Insights</span>
       </div>
       <div class="scroll-canvas">
-        <div ng-view></div>
-
+		
+        <div ng-view>
+		
+      </div>
+		
+		</div>
+		
         <footer class="footer">
+		
           <div class="text-center">
             <ul>
               <li>
