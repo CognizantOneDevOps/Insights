@@ -30,7 +30,7 @@ export class PlaylistComponent implements OnInit {
   constructor(private restCallHandlerService: RestCallHandlerService, private sanitizer: DomSanitizer) {
     var self = this;
     self.setScrollBarPosition();
-    var offset = 5; //  5px is app-grafana-dashboard height
+    var offset = 1; // 5 5px is app-grafana-dashboard height
     this.framesize = window.frames.innerHeight - offset;
 
     var receiveMessage = function (evt) {
