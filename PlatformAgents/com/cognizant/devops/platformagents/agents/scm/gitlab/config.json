@@ -1,88 +1,134 @@
 {
-	"mqConfig" : {
-		"user" : "iSight", 
-		"password" : "iSight", 
-		"host" : "127.0.0.1", 
-		"exchange" : "iSight",
-    		"agentControlXchg":"iAgent"
+	"mqConfig": {
+		"user": "iSight",
+		"password": "iSight",
+		"host": "127.0.0.1",
+		"exchange": "iSight",
+		"agentControlXchg": "iAgent"
 	},
-	"subscribe" : {
-		"config" : "SCM.GITLAB.config"
+	"subscribe": {
+		"config": "SCM.GITLAB.config"
 	},
-	"publish" : {
-		"data" : "SCM.GITLAB.DATA",
-		"health" : "SCM.GITLAB.HEALTH"
+	"publish": {
+		"data": "SCM.GITLAB.DATA",
+		"health": "SCM.GITLAB.HEALTH"
 	},
-	"communication":{
-		"type" : "REST" 
+	"communication": {
+		"type": "REST",
+		"sslVerify":false,
+		"responseType": "JSON"
 	},
-        "dynamicTemplate": {
-	"restrictedProjects" : ["projects_name"],
-	"responseTemplate" : {
-		"id" : "commitId",
-                "title" : "title",
-                "created_at" : "commitTime",
-                "message" : "message",
-                "committer_name" : "committerName",
-                "committer_email" : "committerEmail",
-                "author_email" : "authorEmail"
-	},
-	"responseTemplateMerge" : {
-		"id" : "Id",
-                "target_branch" : "targetBranch",
-                "source_branch" : "sourceBranch",
-                "project_id" : "projectId",
-                "title" : "name",
-                "state" : "state",
-                "updated_at" : "updatedAt",
-		"author" : {
-				"username" : "author",
-				"id" : "authorId"
+	"dynamicTemplate": {
+		"restrictedProjects": [
+			"projects_name"
+		],
+		"responseTemplate": {
+			"id": "commitId",
+			"title": "title",
+			"created_at": "commitTime",
+			"message": "message",
+			"committer_name": "committerName",
+			"committer_email": "committerEmail",
+			"author_email": "authorEmail"
+		},
+		"responseTemplateMerge": {
+			"id": "Id",
+			"target_branch": "targetBranch",
+			"source_branch": "sourceBranch",
+			"project_id": "projectId",
+			"title": "name",
+			"state": "state",
+			"updated_at": "updatedAt",
+			"author": {
+				"username": "author",
+				"id": "authorId"
+			},
+			"assignee": {
+				"username": "assignee"
+			}
+		},
+		"responseTemplateTag": {
+			"message": "message",
+			"name": "name",
+			"release": "release",
+			"commit": {
+				"message": "commitMessage",
+				"id": "tagCommitId",
+				"author_name": "commitName",
+				"committer_email": "commitEmail"
+			}
+		},
+		"relationMetadata": {
+			"relation": {
+				"properties": [
+					"commitId",
+					"projectName",
+					"projectId",
+					"branchName"
+				],
+				"name": "BRANCH_HAS_COMMITS_GITLAB",
+				"source": {
+					"constraints": [
+						"commitId"
+					]
 				},
-		"assignee" : {
-				"username" : "assignee"
+				"destination": {
+					"constraints": [
+						"branchName",
+						"projectName"
+					]
 				}
+			}
+		},
+		"commitMetadata": {
+			"dataUpdateSupported": true,
+			"uniqueKey": [
+				"commitId"
+			]
+		},
+		"tagMetadata": {
+			"labels": [
+				"TAG_GITLAB"
+			]
+		},
+		"mergeMetadata": {
+			"labels": [
+				"MERGE_GITLAB"
+			]
+		},
+		"branchDeleteMetadata": {
+			"labels": [
+				"METADATA"
+			],
+			"dataUpdateSupported": true,
+			"uniqueKey": [
+				"branchName",
+				"projectName"
+			]
+		}
 	},
-	"responseTemplateTag" : {
-		"message" : "message",
-		"name" : "name",
-                "release" : "release",
-		"commit" : {
-				"message" : "commitMessage",
-				"id" : "tagCommitId",
-				"author_name" : "commitName",
-				"committer_email" : "commitEmail"
-				}
+	"timeFieldMapping": {
+		"commitTime": "%Y-%m-%dT%H:%M:%S."
 	},
-        "relationMetadata" : {"relation":{"properties":["commitId","projectName","projectId","branchName"],"name":"BRANCH_HAS_COMMITS_GITLAB","source":{"constraints":["commitId"]},"destination":{"constraints":["branchName","projectName"]}}},
-        "commitMetadata" : {"dataUpdateSupported" : true,"uniqueKey":["commitId"]},
-        "tagMetadata" : {"labels" : ["TAG_GITLAB"]},
-        "mergeMetadata" : {"labels" : ["MERGE_GITLAB"]},
-	"branchDeleteMetadata" : {"labels" : ["METADATA"], "dataUpdateSupported" : true,"uniqueKey":["branchName", "projectName"]}
-        },
-	 "timeFieldMapping" : {
-		"commitTime" : "%Y-%m-%dT%H:%M:%S."
-	},
-	"agentId" : "",
-	"enableBranches" : true,
-	"enableMerge" : false,
-	"enableGroup" : true,
-	"enableCommitRelation" : true,
-	"toolsTimeZone" : "GMT",
-	"toolCategory" : "SCM",
-	"insightsTimeZone" : "Asia/Kolkata",
-	"useResponseTemplate" : true,
+	"agentId": "",
+	"enableBranches": true,
+	"enableMerge": false,
+	"enableGroup": true,
+	"enableCommitRelation": true,
+	"toolsTimeZone": "GMT",
+	"toolCategory": "SCM",
+	"insightsTimeZone": "Asia/Kolkata",
+	"useResponseTemplate": true,
 	"enableDataValidation": true,
-	"auth" : "base64",
-	"runSchedule" : 30,
-	"timeStampField" : "commitTime",
-	"timeStampFormat" :"%Y-%m-%dT%H:%M:%S.",
-	"StartFrom" : "2017-03-03 15:46:33",
-	"AccessToken" : "",
-	"GetProjects" : "",
-	"isDebugAllowed" : false,
-	
-	"loggingSetting" : {
-		"logLevel" : "WARN"
+	"auth": "base64",
+	"runSchedule": 30,
+	"timeStampField": "commitTime",
+	"timeStampFormat": "%Y-%m-%dT%H:%M:%S.",
+	"startFrom": "2017-03-03 15:46:33",
+	"accessToken": "",
+	"getProjects": "",
+	"isDebugAllowed": false,
+	"loggingSetting": {
+		"logLevel": "WARN"
 	}
 }

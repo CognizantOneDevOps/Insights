@@ -26,64 +26,71 @@ from ....core.BaseAgent3 import BaseAgent
 from datetime import datetime, timedelta
 import time
 class ArtifactoryAgent(BaseAgent):
+
     def process(self):
         user = self.config.get("UserID", '')
         passwd = self.config.get("Passwd", '')
         BaseUrl = self.config.get("BaseUrl", '')
         FirstEndPoint = self.config.get("FirstEndPoint", '')
-        repo_list_url=BaseUrl+'repositories'
-        json_headers = {"Content-Type":"application/json","Accept":"application/json"}
-        list_of_repos=requests.get(repo_list_url, auth=HTTPBasicAuth(user, passwd), headers=json_headers).json()
+        self.startDate = None
+        if self.tracking == {}:
+            self.startFrom = self.config.get("startFrom", '')
+            self.startDate = int(time.mktime(time.strptime(self.startFrom, '%Y-%m-%d %H:%M:%S')))
+        else:
+            self.since = self.tracking['since']
+            self.startDate = int(time.mktime(time.strptime(self.since, '%Y-%m-%d %H:%M:%S')))
+        useResponseTemplate = self.config.get("useResponseTemplate", False)
+        if useResponseTemplate:
+            self.response_template = self.getResponseTemplate()
+        else:
+            self.response_template = ['repo', 'path', 'created', 'createdBy', 'lastModified', 'modifiedBy', 'lastUpdated', 'uri', 'downloadUri' , 'mimeType', 'size']
+        repo_list_url = BaseUrl + 'repositories'
+        json_headers = {"Content-Type":"application/json", "Accept":"application/json"}
+        list_of_repos = self.getResponse(repo_list_url, 'GET', user, passwd, None, reqHeaders=json_headers)
         with open(self.trackingFilePath, 'r') as config_file:
             self.tracking = json.load(config_file)
         self.data = []
-        self.tracking_Data={}
+        self.tracking_Data = {}
         for length in range(len(list_of_repos)):
-            nexturl=[]
-            repo_name=list_of_repos[length]['key']
-            master_repo_url=FirstEndPoint+repo_name
+            nexturl = []
+            repo_name = list_of_repos[length]['key']
+            master_repo_url = FirstEndPoint + repo_name
             nexturl.append(master_repo_url)
-            while nexturl!= []:
-                child_url=[]
+            while nexturl != []:
+                child_url = []
                 for url in nexturl:
-                    nextrepo=[]
-                    next_response=requests.get(url, auth=HTTPBasicAuth(user, passwd), headers=json_headers)
-                    if next_response.status_code == 200:
-                        next_response=next_response.json()
+                    nextrepo = []
+                    next_response = self.getResponse(url, 'GET', user, passwd, None, reqHeaders=json_headers)
+                    if next_response is not None:
+                        print(next_response)
                         for length in range(len(next_response['children'])):
-                            repos=next_response['children'][length]['uri']
+                            repos = next_response['children'][length]['uri']
                             nextrepo.append(repos)
                         for repo in nextrepo:
-                            child_link=url+repo
-                            child_reponse=requests.get(child_link, auth=HTTPBasicAuth(user, passwd), headers=json_headers)
-                            if child_reponse.status_code == 200:
-                                child_reponse=child_reponse.json()
+                            child_link = url + repo
+                            child_reponse = self.getResponse(child_link, 'GET', user, passwd, None, reqHeaders=json_headers)
+                            if child_reponse is not None:
                                 if 'children' not in child_reponse:
                                     self.response(child_link, child_reponse)
                                 else:
                                     child_url.append(child_link)
-                nexturl=child_url
+                nexturl = child_url
         self.publishToolsData(self.data)
-        since=datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        self.tracking_Data['since']=since
+        since = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        self.tracking_Data['since'] = since
         self.updateTrackingJson(self.tracking_Data)
 
     def response(self, url, response):
-        response_data={}
-        response_template=['repo', 'path', 'created', 'createdBy', 'lastModified', 'modifiedBy', 'lastUpdated', 'uri', 'downloadUri' ,'mimeType', 'size']
-        for temp in response_template:
-            response_data[temp]=response[temp]
-        if self.tracking == {}:
-            self.data.append(response_data)
-        else:
-            since=self.tracking['since']
-            since = int(time.mktime(time.strptime(since, '%Y-%m-%d %H:%M:%S')))
-            lastupdated=response_data['lastUpdated']
-           # lastupdated=lastupdated.replace('-05:00','')
-            lastupdated = lastupdated[:-10]
-            lastupdated=int(time.mktime(time.strptime(lastupdated, '%Y-%m-%dT%H:%M:%S')))
-            if since < lastupdated:
-                self.data.append(response_data)
+        response_data = {}
+        for temp in self.response_template:
+            response_data[self.response_template[temp]] = response[temp]
+        lastupdated = response_data['lastUpdated']
+        # lastupdated=lastupdated.replace('-05:00','')
+        lastupdated = lastupdated[:-10]
+        lastupdated = int(time.mktime(time.strptime(lastupdated, '%Y-%m-%dT%H:%M:%S')))
+        if self.startDate < lastupdated:
+                self.data.append(response_data)           
+
 
 if __name__ == "__main__":
     ArtifactoryAgent()
