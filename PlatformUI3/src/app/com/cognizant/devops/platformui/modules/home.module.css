@@ -236,14 +236,7 @@ mat-radio-button.mat-accent .mat-radio-inner-circle {
     margin-right: 30px;
     margin-left: 6px;
 }
-.iframeCss {
-    overflow-y:auto !important;
-    overflow-x: hidden !important;
-    border-width: 0px !important;
-    border-style:hidden !important;
-    border-color:unset;
-    border-image: unset;
-}
+
 
 .titleStyle {    
     margin-top:16px;
