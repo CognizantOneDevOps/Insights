@@ -5,6 +5,8 @@ import org.openqa.selenium.firefox.FirefoxBinary;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxOptions;
 
+import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
+
 public class DriverFactory {
 
 
@@ -23,7 +25,7 @@ public class DriverFactory {
 		@Override
 		protected WebDriver initialValue()
 		{
-			System.setProperty("webdriver.gecko.driver", "C:\\Drivers\\geckodriver.exe");
+			System.setProperty("webdriver.gecko.driver", ApplicationConfigProvider.getInstance().getDriverLocation());
 			FirefoxBinary firefoxBinary = new FirefoxBinary();
 			firefoxBinary.addCommandLineOptions("--headless");
 			FirefoxOptions firefoxOptions = new FirefoxOptions();
