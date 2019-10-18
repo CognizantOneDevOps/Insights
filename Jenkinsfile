@@ -1,4 +1,4 @@
-env.dockerimagename="devopsbasservice/buildonframework:insightsPUI3-Doxygen"
+env.dockerimagename="devopsbasservice/buildonframework:jenkinsVersionUpdate"
 node {
 
 	//Parse commitID (E.g, buildon-abc1234 to abc1234)
