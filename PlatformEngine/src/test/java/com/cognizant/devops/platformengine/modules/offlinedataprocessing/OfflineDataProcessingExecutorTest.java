@@ -27,6 +27,7 @@ import java.io.File;
 import com.cognizant.devops.platformcommons.config.ApplicationConfigCache;
 import com.cognizant.devops.platformcommons.constants.ConfigOptions;
 import com.cognizant.devops.platformcommons.core.util.InsightsUtils;
+import com.cognizant.devops.platformengine.modules.offlinedataprocessing.model.DataEnrichmentModel;
 
 
 /**
@@ -37,7 +38,7 @@ import com.cognizant.devops.platformcommons.core.util.InsightsUtils;
  */
 public class OfflineDataProcessingExecutorTest {
 	
-/*	OfflineDataProcessingExecutor executor = null;
+	OfflineDataProcessingExecutor executor = null;
 
 	@BeforeMethod
 	protected void setUp() throws Exception {
@@ -49,29 +50,29 @@ public class OfflineDataProcessingExecutorTest {
 	protected void tearDown() throws Exception {
 	}
 	
-    *//**
+    /**
      * Positive test case for executeOfflineProcessing()
      * Checks no. of json files inside  data-enrichment folder
-     *//*
-    @Test
+     **/
+  /*  @Test
 	public void testExecuteOfflineProcessing() {
     	AssertJUnit.assertEquals(5, executor.executeOfflineProcessing());		
 	}
-    
-    *//**
+    */
+    /**
      * Negative test case for executeOfflineProcessing()
      * Checks no. of json files inside  data-enrichment folder
-     *//*
+     */
     @Test
 	public void testExecuteOfflineProcessingNegative() {
     	AssertJUnit.assertNotSame(6, executor.executeOfflineProcessing());		
 	}
     
-    *//**
+    /**
      * Positive test case for hasJsonFileExtension() method
      * Checks whether input file has json extension or not
      * 
-     *//*
+     */
     @Test
 	public void testHasJsonFileExtension() {
     	String fileName = "data-enrichment.JSON";
@@ -80,11 +81,11 @@ public class OfflineDataProcessingExecutorTest {
     }   
    
     
-    *//**
+    /*
      * Negative test case for hasJsonFileExtension() method
      * Checks whether input file has json extension or not
      * 
-     *//*
+     */
     @Test
 	public void testHasJsonFileExtensionNegative() {
     	String fileName = "neo4j_import_json.py";
@@ -92,9 +93,9 @@ public class OfflineDataProcessingExecutorTest {
     	AssertJUnit.assertEquals(Boolean.FALSE, hasJsonFileExtension);
     }
     
-    *//**
+    /*
      * Positive test case for processOfflineConfiguration() method
-     *//*
+     */
     @Test
 	public void testProcessOfflineConfiguration() {
     	File configFile = new File(ConfigOptions.OFFLINE_DATA_PROCESSING_RESOLVED_PATH + ConfigOptions.FILE_SEPERATOR + ConfigOptions.DATA_ENRICHMENT_TEMPLATE);
@@ -102,19 +103,19 @@ public class OfflineDataProcessingExecutorTest {
     	assertTrue(resultFlag);    	
     }
     
-    *//**
+    /**
      * Negative test case for processOfflineConfiguration() method
-     *//*
-    @Test
+     */
+   /* @Test
 	public void testProcessOfflineConfigurationNegative() {
     	File configFile = new File(ConfigOptions.OFFLINE_DATA_PROCESSING_RESOLVED_PATH + ConfigOptions.FILE_SEPERATOR + "data-enrichment - Copy (3).json");
     	Boolean resultFlag = executor.processOfflineConfiguration(configFile);
     	assertFalse(resultFlag);    	
-    }
+    }*/
     
-    *//**
+   /**
      * Positive test case for updateLastExecutionTime() method
-     *//*
+     */
     @Test
 	public void testUpdateLastExecutionTime() {
     	DataEnrichmentModel dataEnrichmentModel = new DataEnrichmentModel();
@@ -124,9 +125,9 @@ public class OfflineDataProcessingExecutorTest {
     	AssertJUnit.assertEquals(currentTime, resultModel.getLastExecutionTime());    	
     }
     
-    *//**
+    /**
      * Negative test case for updateLastExecutionTime() method
-     *//*
+     */
     @Test
 	public void testUpdateLastExecutionTimeNegative() {
     	DataEnrichmentModel dataEnrichmentModel = new DataEnrichmentModel();
@@ -136,9 +137,9 @@ public class OfflineDataProcessingExecutorTest {
     	AssertJUnit.assertNotSame(randomTime, resultModel.getLastExecutionTime());    	
     }
     
-    *//**
+    /**
      * Positive test case for executeCypherQuery() method
-     *//*
+     */
     @Test
 	public void testExecuteCypherQuery() {
     	String cypherQuery = "MATCH (n:ALM) where not exists (n.processed) with n limit 100 set n.processed=true return count(n)";
@@ -147,10 +148,10 @@ public class OfflineDataProcessingExecutorTest {
     	assertTrue(resultFlag);    	
     }
     
-    *//**
+    /**
      * Negative test case for executeCypherQuery() method
      * 
-     *//*
+     */
     @Test
 	public void testExecuteCypherQueryNegative() {
     	String cypherQuery = "MATCH (n:ALM) where not exists (n.processed) with n limit 100 set n.processed=true return n";
@@ -159,9 +160,9 @@ public class OfflineDataProcessingExecutorTest {
     	assertFalse(resultFlag);    
     }
     
-    *//**
+  /**
      * Positive test case for isQueryScheduledToRun() method
-     *//*
+     */
     @Test
 	public void testIsQueryScheduledToRun() {
     	Long runSchedule = 720L;
@@ -169,10 +170,10 @@ public class OfflineDataProcessingExecutorTest {
     	assertTrue(executor.isQueryScheduledToRun(runSchedule, lastRunTime, null));   			
     }
     
-    *//**
+  /**
      * Negative test case for isQueryScheduledToRun() method
-     *//*
-    @Test
+     */
+  /*  @Test
 	public void testIsQueryScheduledToRunNegative() {
     	Long runSchedule = 720L;
     	String lastRunTime = "2018/07/17 04:50 PM";

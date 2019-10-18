@@ -25,15 +25,24 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<testng.version>7.0.1</testng.version>
 	</properties>
 
+	<repositories>
+		<repository>
+			<id>project.local</id>
+			<name>project</name>
+			<url>file://${project.basedir}/jar</url>
+		</repository>
+	</repositories>
+
 	<dependencies>
-		<dependency>
+		<!-- <dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 			<version>4.12</version>
 			<scope>test</scope>
-		</dependency>
+		</dependency> -->
 
 		<dependency>
 			<groupId>com.google.code.gson</groupId>
@@ -97,12 +106,15 @@
 		</dependency>
 
 		<!-- https://mvnrepository.com/artifact/org.testng/testng -->
+		
 		<dependency>
-		    <groupId>org.testng</groupId>
-		    <artifactId>testng</artifactId>
-		    <version>6.14.3</version>
-		    <scope>test</scope>
+			<groupId>org.testng</groupId>
+			<artifactId>testng</artifactId>
+			<version>7.0.1</version>
+			<scope>system</scope>
+	    	<systemPath>${project.basedir}/jar/testng-7.0.1.jar</systemPath>
 		</dependency>
+
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-io</artifactId>
@@ -129,6 +141,17 @@
 	<build>
 		<!-- <finalName>PlatformEngine</finalName> -->
 		<plugins>
+		
+		<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<version>2.12.4</version>
+				<configuration>
+					<suiteXmlFiles>
+						<suiteXmlFile>src/test/resources/testng.xml</suiteXmlFile>
+					</suiteXmlFiles>
+				</configuration>
+			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-shade-plugin</artifactId>
@@ -181,6 +204,7 @@
 									<includes>
 										<include>log4j2.xml</include>
 										<include>**/*.csv</include>
+										<include>**/*.jar</include>
 									</includes>
 									<filtering>true</filtering>
 								</resource>
