@@ -78,8 +78,8 @@
 	"timeStampField" : "commitTime",
 	"timeStampFormat" :"%Y-%m-%dT%H:%M:%S.",
 	"StartFrom" : "2017-03-03 15:46:33",
-	"AccessToken" : "",
-	"GetProjects" : "",
+	"accessToken" : "",
+	"getProjects" : "",
 	"isDebugAllowed" : false,
 	
 	"loggingSetting" : {
