@@ -72,7 +72,7 @@ public class WebhookServiceTest extends WebHookService {
 
 	}
 
-	@Test(priority = 5, expectedExceptions = InsightsCustomException.class)
+	@Test(priority = 6, expectedExceptions = InsightsCustomException.class)
 	public void testUninstallWebhookForException() throws InsightsCustomException {
 
 		String expectedOutCome = "No entity found for query";
