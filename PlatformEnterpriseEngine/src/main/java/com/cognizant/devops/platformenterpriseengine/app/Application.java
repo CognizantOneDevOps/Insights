@@ -13,13 +13,16 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  ******************************************************************************/
-package com.cognizant.devops.platformauditing.blockchaindatacollection.app;
+package com.cognizant.devops.platformenterpriseengine.app;
 
-import com.cognizant.devops.platformauditing.blockchaindatacollection.modules.blockchainprocessing.JiraProcessingExecutor;
-import com.cognizant.devops.platformauditing.blockchaindatacollection.modules.blockchainprocessing.PlatformAuditProcessingExecutor;
+import com.cognizant.devops.platformenterpriseengine.platformauditing.blockchaindatacollection.modules.blockchainprocessing.JiraProcessingExecutor;
+import com.cognizant.devops.platformenterpriseengine.platformauditing.blockchaindatacollection.modules.blockchainprocessing.PlatformAuditProcessingExecutor;
 import com.cognizant.devops.platformcommons.config.ApplicationConfigCache;
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
+import com.cognizant.devops.platformenterpriseengine.message.core.EnterpriseEngineStatusLogger;
+import com.cognizant.devops.platformenterpriseengine.platformwebhookengine.modules.aggregator.EngineAggregatorModule;
+
 import java.util.Timer;
 import java.util.TimerTask;
 import org.apache.logging.log4j.LogManager;
@@ -35,6 +38,7 @@ public class Application {
 
     private static int blockchainEngineInterval = 250;
     private static int jiraEngineInterval = 250;
+	private static int defaultIntervalInSec = 600;
 
     private Application() {
 
@@ -64,7 +68,18 @@ public class Application {
 			timerJiraProcessing.schedule(jiraProcessingTrigger, 0, jiraEngineInterval * 1000);
 
             log.info("PlatformAudit Engine Service Started ", PlatformServiceConstants.SUCCESS);
+            
+            //Schedule WebhookEngine job
+            Timer timerWebhookEngineJobExecutorModule = new Timer("WebhookEngineJobExecutorModule");
+			TimerTask webhookAggregatorTrigger = new EngineAggregatorModule();
+			timerWebhookEngineJobExecutorModule.schedule(webhookAggregatorTrigger, 0, defaultIntervalInSec * 1000);
+
+			EnterpriseEngineStatusLogger.getInstance().createEngineStatusNode("Platform Enterprise Engine Service Started ",PlatformServiceConstants.SUCCESS);
+            
 		} catch (Exception e) {
+			EnterpriseEngineStatusLogger.getInstance().createEngineStatusNode(
+					"Platform Enterprise Engine Service not running " + e.getMessage(), PlatformServiceConstants.FAILURE);
+			log.error(e);
             log.info("PlatformAudit Engine Service not running " + e.getMessage(), PlatformServiceConstants.FAILURE);
             log.error(e);
         }
