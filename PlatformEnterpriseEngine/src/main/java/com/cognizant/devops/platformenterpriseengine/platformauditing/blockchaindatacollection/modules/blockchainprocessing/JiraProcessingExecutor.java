@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  ******************************************************************************/
-package com.cognizant.devops.platformauditing.blockchaindatacollection.modules.blockchainprocessing;
+package com.cognizant.devops.platformenterpriseengine.platformauditing.blockchaindatacollection.modules.blockchainprocessing;
 
 import com.cognizant.devops.platformauditing.api.InsightsAuditImpl;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBException;
