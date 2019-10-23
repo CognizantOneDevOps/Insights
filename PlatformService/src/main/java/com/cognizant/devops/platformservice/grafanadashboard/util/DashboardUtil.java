@@ -1,4 +1,4 @@
-package com.cognizant.devops.auditservice.audit.utils;
+package com.cognizant.devops.platformservice.grafanadashboard.util;
 
 import java.awt.AWTException;
 import java.awt.Color;

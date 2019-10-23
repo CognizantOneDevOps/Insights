@@ -1,4 +1,4 @@
-package com.cognizant.devops.auditservice.audit.service;
+package com.cognizant.devops.platformservice.grafanadashboard.service;
 
 public interface DashboardService {
 
