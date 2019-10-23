@@ -156,8 +156,8 @@
 			<groupId>org.testng</groupId>
 			<artifactId>testng</artifactId>
 			<version>${testng.version}</version>
-			<scope>system</scope>
-			<systemPath>${project.basedir}/jar/testng-7.0.1.jar</systemPath>
+			<!-- <scope>system</scope>
+			<systemPath>${project.basedir}/jar/testng-7.0.1.jar</systemPath> -->
 		</dependency>
 		
 		<dependency>
@@ -239,6 +239,7 @@
 										<include>log4j2.xml</include>
 										<include>**/*.csv</include>
 										<include>**/*.jar</include>
+										<include>OpenSource Credit Document v1.0.docx</include>
 									</includes>
 									<filtering>true</filtering>
 								</resource>
