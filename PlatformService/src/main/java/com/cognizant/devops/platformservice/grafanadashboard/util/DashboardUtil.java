@@ -150,7 +150,7 @@ public class DashboardUtil {
 			} 
 		});
 		List<WebElement> eleq = driver.findElements(By.cssSelector(".react-grid-item.react-draggable.react-resizable"));
-		System.out.println(eleq.size());
+		Log.info("Total panels - "+eleq.size());
 		JavascriptExecutor js = ((JavascriptExecutor) driver);
 		for(WebElement e: eleq){
 			Log.info("Panel --"+e);
