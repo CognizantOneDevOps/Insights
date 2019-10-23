@@ -12,12 +12,9 @@
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
  * License for the specific language governing permissions and limitations under
- * the License.
+ * the License.     
  ****************************************************************************** -->
-<mat-card>
-  <mat-card-content>
-    <div>
-      <iframe class="iframeCss" [style.height.px]="framesize" [style.width.%]="100" [src]="dashboardUrl" fscrolling="no"></iframe>
-    </div>
-  </mat-card-content>
-</mat-card>
+<ng-container>
+  <iframe class="iframeCss" frameborder="0" marginwidth=0 marginheight=0 frameborder=0 style="margin-bottom:-5px"
+    [style.height.px]="framesize" [style.width.%]="100" [src]="dashboardUrl"></iframe>
+</ng-container>
