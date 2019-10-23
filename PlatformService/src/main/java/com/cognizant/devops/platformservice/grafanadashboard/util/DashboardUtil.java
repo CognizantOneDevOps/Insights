@@ -181,7 +181,8 @@ public class DashboardUtil {
 			Log.info("eleWidth--"+eleWidth);
 			int eleHeight = container.getSize().getHeight();
 			Log.info("eleHeight--"+eleHeight);
-			FileUtils.copyFile(screenshot, new File(d.toString().replace(":", "_")+".png"));
+			/** Allows to save panel screenshot - enable it to debug **/
+			//FileUtils.copyFile(screenshot, new File(d.toString().replace(":", "_")+".png"));
 			BufferedImage eleScreenshot= fullImg.getSubimage(point.getX(), point.getY(),
 					eleWidth, eleHeight);
 			imageList.add(eleScreenshot);
