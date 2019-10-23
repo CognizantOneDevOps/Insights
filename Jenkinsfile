@@ -186,7 +186,7 @@ node {
 		PIW_artifact="${NEXUSREPO}/com/cognizant/devops/PlatformInsightsWebHook/${pomversionInsightsWebHook}/${PIW_artifactName}"
 		
 		//Platform EnterpriseEngine
-		PEE_artifactName=readFile("/var/jenkins/jobs/$commitID/workspace/PlatformEnterpriseEngine/PWE_artifact").trim()
+		PEE_artifactName=readFile("/var/jenkins/jobs/$commitID/workspace/PlatformEnterpriseEngine/PEE_artifact").trim()
 		PEE_artifact="${NEXUSREPO}/com/cognizant/devops/PlatformEnterpriseEngine/${pomversionEnterpriseEngine}/${PEE_artifactName}"
 		
 		//Platform Insights
