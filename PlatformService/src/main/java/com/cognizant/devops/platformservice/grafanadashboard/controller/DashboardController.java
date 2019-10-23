@@ -1,4 +1,4 @@
-package com.cognizant.devops.auditservice.audit.controller;
+package com.cognizant.devops.platformservice.grafanadashboard.controller;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.cognizant.devops.auditservice.audit.service.DashboardService;
+import com.cognizant.devops.platformservice.grafanadashboard.service.DashboardService;
 
 @RestController
 @RequestMapping("/traceability")
@@ -44,7 +44,6 @@ public class DashboardController {
 			response = new ResponseEntity<byte[]>(fileContent, headers, HttpStatus.OK);
 			Log.info("PDf generation completed !!");
 		} catch (Exception e) {
-			e.printStackTrace();
 			Log.error("Error, Failed to download Dashboard .. ", e.getMessage());
 		}
 		return response;

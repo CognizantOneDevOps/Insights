@@ -1,4 +1,4 @@
-package com.cognizant.devops.auditservice.audit.utils;
+package com.cognizant.devops.platformservice.grafanadashboard.util;
 
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.firefox.FirefoxBinary;

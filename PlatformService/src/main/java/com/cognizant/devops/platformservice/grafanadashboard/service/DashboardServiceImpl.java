@@ -1,8 +1,8 @@
-package com.cognizant.devops.auditservice.audit.service;
+package com.cognizant.devops.platformservice.grafanadashboard.service;
 
 import org.springframework.stereotype.Service;
 
-import com.cognizant.devops.auditservice.audit.utils.DashboardUtil;
+import com.cognizant.devops.platformservice.grafanadashboard.util.DashboardUtil;
 
 @Service
 public class DashboardServiceImpl implements DashboardService{
