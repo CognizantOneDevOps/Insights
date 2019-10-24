@@ -64,5 +64,6 @@ public class PublishEventTest {
 		channel = connection.createChannel();
 		channel.queuePurge("IPW_WebhookTest");
 		connection.close();		
+		webHookMessagePublisher.releaseMqConnetion();
   }
 }
