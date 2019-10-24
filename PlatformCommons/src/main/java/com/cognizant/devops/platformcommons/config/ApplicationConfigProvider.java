@@ -54,6 +54,7 @@ public class ApplicationConfigProvider implements Serializable {
 	private AgentDetails agentDetails = new AgentDetails();
 
 	private QueryCache queryCache = new QueryCache();
+	private String driverLocation;
 
 	private ApplicationConfigProvider() {
 		this.refreshTime = new Date(new Date().getTime() - 86400000);
@@ -263,6 +264,14 @@ public class ApplicationConfigProvider implements Serializable {
 
 	public void setEnableOnlineDatatagging(boolean enableOnlineDatatagging) {
 		this.enableOnlineDatatagging = enableOnlineDatatagging;
+	}
+
+	public String getDriverLocation() {
+		return driverLocation;
+	}
+
+	public void setDriverLocation(String driverLocation) {
+		this.driverLocation = driverLocation;
 	}
 
 }
