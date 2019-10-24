@@ -14,7 +14,9 @@
 		"health" : "SCM.GITLAB.HEALTH"
 	},
 	"communication":{
-		"type" : "REST" 
+		"type" : "REST", 
+		"sslVerify": true,
+    	"responseType": "JSON"
 	},
         "dynamicTemplate": {
 	"restrictedProjects" : ["projects_name"],
