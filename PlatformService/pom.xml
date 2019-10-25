@@ -206,8 +206,8 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
-		
-		
+
+
 		<dependency>
 			<groupId>com.google.code.gson</groupId>
 			<artifactId>gson</artifactId>
@@ -225,7 +225,7 @@
 			<artifactId>PlatformAuditing</artifactId>
 			<version>6.2-SNAPSHOT</version>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>com.cognizant.devops</groupId>
 			<artifactId>PlatformDAL</artifactId>
@@ -306,7 +306,7 @@
 			<version>1.48</version>
 		</dependency>
 
-	
+
 		<dependency>
 			<groupId>org.owasp.esapi</groupId>
 			<artifactId>esapi</artifactId>
@@ -331,12 +331,12 @@
 			<artifactId>commons-beanutils</artifactId>
 			<version>1.9.4</version>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>org.seleniumhq.selenium</groupId>
 			<artifactId>selenium-java</artifactId>
 			<version>3.141.59</version>
-		</dependency> 
+		</dependency>
 
 		<dependency>
 			<groupId>org.seleniumhq.selenium</groupId>
@@ -385,7 +385,7 @@
 						<artifactId>maven-surefire-plugin</artifactId>
 						<version>2.19.1</version>
 						<configuration>
-								<suiteXmlFiles>
+							<suiteXmlFiles>
 								<suiteXmlFile>src/test/resources/testng.xml</suiteXmlFile>
 							</suiteXmlFiles>
 						</configuration>

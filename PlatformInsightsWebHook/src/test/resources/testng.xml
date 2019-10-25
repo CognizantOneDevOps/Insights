@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
 <suite name="WebhookInsightsSuite">
-  <test name="InsightsWebhookTestCases">
-    <classes>
-      <class name="com.cognizant.devops.platforminsightswebhook.test.PublishEventTest"/>
-
-   
-    </classes>
-  </test> 
+	<test name="InsightsWebhookTestCases">
+		<classes>
+			<class
+				name="com.cognizant.devops.platforminsightswebhook.test.PublishEventTest" />
+		</classes>
+	</test>
 </suite> 
