@@ -15,13 +15,12 @@
  ******************************************************************************/
 package com.cognizant.devops.platformenterpriseengine.app;
 
-import com.cognizant.devops.platformenterpriseengine.platformauditing.blockchaindatacollection.modules.blockchainprocessing.JiraProcessingExecutor;
-import com.cognizant.devops.platformenterpriseengine.platformauditing.blockchaindatacollection.modules.blockchainprocessing.PlatformAuditProcessingExecutor;
+//import com.cognizant.devops.platformenterpriseengine.platformauditing.blockchaindatacollection.modules.blockchainprocessing.JiraProcessingExecutor;
+//import com.cognizant.devops.platformenterpriseengine.platformauditing.blockchaindatacollection.modules.blockchainprocessing.PlatformAuditProcessingExecutor;
 import com.cognizant.devops.platformcommons.config.ApplicationConfigCache;
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
 import com.cognizant.devops.platformenterpriseengine.message.core.EnterpriseEngineStatusLogger;
-
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -55,25 +54,32 @@ public class Application {
 			ApplicationConfigCache.loadConfigCache();
 
 			ApplicationConfigProvider.performSystemCheck();
+			// if(ApplicationConfigProvider.getInstance().isEnableAuditEngine()) {
 
 			// Schedule the BlockChainExecuter job
 			Timer timerBlockChainProcessing = new Timer("BlockChainProcessingExecutor");
-			TimerTask blockChainProcessingTrigger = new PlatformAuditProcessingExecutor();
-			timerBlockChainProcessing.schedule(blockChainProcessingTrigger, 0, blockchainEngineInterval * 1000);
+			// TimerTask blockChainProcessingTrigger = new
+			// PlatformAuditProcessingExecutor();
+			Class blockChainProcessingTrigger = Class.forName(
+					"com.cognizant.devops.platformenterpriseengine.platformauditing.blockchaindatacollection.modules.blockchainprocessing.PlatformAuditProcessingExecutor");
+			TimerTask blockChainTimer = (TimerTask) blockChainProcessingTrigger.newInstance();
+			timerBlockChainProcessing.schedule(blockChainTimer, 0, blockchainEngineInterval * 1000);
 
 			// Schedule the jira executor job
 			Timer timerJiraProcessing = new Timer("JiraProcessingExecutor");
-			TimerTask jiraProcessingTrigger = new JiraProcessingExecutor();
-			timerJiraProcessing.schedule(jiraProcessingTrigger, 0, jiraEngineInterval * 1000);
+			// TimerTask jiraProcessingTrigger = new JiraProcessingExecutor();
+			Class jiraProcessingTrigger = Class.forName(
+					"com.cognizant.devops.platformenterpriseengine.platformauditing.blockchaindatacollection.modules.blockchainprocessing.JiraProcessingExecutor");
+			TimerTask jiraProcessingTimer = (TimerTask) jiraProcessingTrigger.newInstance();
+			timerJiraProcessing.schedule(jiraProcessingTimer, 0, jiraEngineInterval * 1000);
 
 			log.info("PlatformAudit Engine Service Started ", PlatformServiceConstants.SUCCESS);
 
 			// Schedule WebhookEngine job
 			Timer timerWebhookEngineJobExecutorModule = new Timer("WebhookEngineJobExecutorModule");
-			Class webhookAggregatorTrigger = Class
-					.forName("com.cognizant.devops.platformenterpriseengine.platformwebhookengine.modules.aggregator.EngineAggregatorModule");
+			Class webhookAggregatorTrigger = Class.forName(
+					"com.cognizant.devops.platformenterpriseengine.platformwebhookengine.modules.aggregator.WebHookEngineAggregatorModule");
 			TimerTask webHookTimer = (TimerTask) webhookAggregatorTrigger.newInstance();
-
 			timerWebhookEngineJobExecutorModule.schedule(webHookTimer, 0, defaultIntervalInSec * 1000);
 
 			EnterpriseEngineStatusLogger.getInstance().createEngineStatusNode(

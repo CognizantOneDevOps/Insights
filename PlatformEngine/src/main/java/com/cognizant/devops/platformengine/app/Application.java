@@ -32,14 +32,11 @@ import com.cognizant.devops.platformengine.modules.mapper.ProjectMapperModule;
 import com.cognizant.devops.platformengine.modules.offlinedataprocessing.OfflineDataProcessingExecutor;
 
 /**
- * Engine execution will start from Application.
- * 1. Load the iSight config
- * 2. Initialize Publisher and subscriber modules which receive data from tool
- * 3. Initialize Correlation Module.
- * 4. Initialize ProjectMapperModule Module
- * 5. Initialize DataPurgingExecutor Module
- * 6. Initialize OfflineDataProcessingExecutor Module
- * 7. Log Engine Health data in DB
+ * Engine execution will start from Application. 1. Load the iSight config 2.
+ * Initialize Publisher and subscriber modules which receive data from tool 3.
+ * Initialize Correlation Module. 4. Initialize ProjectMapperModule Module 5.
+ * Initialize DataPurgingExecutor Module 6. Initialize
+ * OfflineDataProcessingExecutor Module 7. Log Engine Health data in DB
  */
 public class Application {
 	private static Logger log = LogManager.getLogger(Application.class.getName());
