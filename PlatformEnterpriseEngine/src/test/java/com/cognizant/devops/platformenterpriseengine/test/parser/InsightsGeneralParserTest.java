@@ -22,7 +22,7 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
-import com.cognizant.devops.platformenterpriseengine.platformwebhookengine.modules.aggregator.EngineAggregatorModule;
+import com.cognizant.devops.platformenterpriseengine.platformwebhookengine.modules.aggregator.WebHookEngineAggregatorModule;
 import com.cognizant.devops.platformenterpriseengine.platformwebhookengine.parser.InsightsGeneralParser;
 import com.google.gson.JsonObject;
 
@@ -31,7 +31,7 @@ import com.google.gson.JsonObject;
 public class InsightsGeneralParserTest extends InsightsParserTestData {
 	public static final InsightsGeneralParser generalparser = new InsightsGeneralParser();
 	public static final InsightsParserTestData testdata = new InsightsParserTestData();
-	EngineAggregatorModule testapp = new EngineAggregatorModule();
+	WebHookEngineAggregatorModule testapp = new WebHookEngineAggregatorModule();
 
 	@Test(priority = 1)
 	public void testGetToolDetailJson() throws InsightsCustomException {

@@ -32,8 +32,8 @@ import com.cognizant.devops.platformenterpriseengine.message.core.EnterpriseEngi
 import com.cognizant.devops.platformenterpriseengine.platformwebhookengine.message.factory.EngineSubscriberResponseHandler;
 import com.cognizant.devops.platformenterpriseengine.platformwebhookengine.message.subscriber.WebHookDataSubscriber;
 
-public class EngineAggregatorModule extends TimerTask {
-	private static Logger log = LogManager.getLogger(EngineAggregatorModule.class.getName());
+public class WebHookEngineAggregatorModule extends TimerTask {
+	private static Logger log = LogManager.getLogger(WebHookEngineAggregatorModule.class.getName());
 	private static Map<String, EngineSubscriberResponseHandler> registry = new HashMap<String, EngineSubscriberResponseHandler>();
 
 	@Override
