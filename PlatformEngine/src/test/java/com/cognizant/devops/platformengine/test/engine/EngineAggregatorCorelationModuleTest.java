@@ -117,7 +117,7 @@ public class EngineAggregatorCorelationModuleTest {
 	public void testCorrelation() {
 
 		Neo4jDBHandler dbHandler = new Neo4jDBHandler();
-		String query = "MATCH (p:DATA {toolName:'GIT'}), (q:DATA {toolName:'JENKINS'}) RETURN EXISTS( (p)-[:TEST_FROM_GIT_TO_JENKINS]->(q))";
+		String query = "MATCH (p:DATA {commitId:'CM-7569369619'}), (q:DATA {scmcommitId:'CM-7569369619'}) RETURN distinct  EXISTS( (p)-[:TEST_FROM_GIT_TO_JENKINS]->(q))";
 		GraphResponse neo4jResponse;
 		try {
 
