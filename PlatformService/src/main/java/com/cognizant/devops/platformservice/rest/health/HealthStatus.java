@@ -113,10 +113,10 @@ public class HealthStatus {
 			servicesHealthStatus.add(ServiceStatusConstants.PlatformEngine, jsonPlatformEngineStatus);
 			log.debug("After Platform Engine================");
 			
-			hostEndPoint = ServiceStatusConstants.PlatformEnterpriseEngine;
+			hostEndPoint = ServiceStatusConstants.PlatformEngine;
 			apiUrl = hostEndPoint;
 			JsonObject jsonPlatformWebhookEngineStatus = getComponentStatus("PlatformWebhookEngine","");
-			servicesHealthStatus.add(ServiceStatusConstants.PlatformEnterpriseEngine, jsonPlatformWebhookEngineStatus);
+			servicesHealthStatus.add(ServiceStatusConstants.PlatformEngine, jsonPlatformWebhookEngineStatus);
 			
 			hostEndPoint = "Platform WebhookSubscriber";
 			apiUrl = hostEndPoint;
@@ -155,9 +155,11 @@ public class HealthStatus {
 		StringBuffer label = new StringBuffer("HEALTH");
 		if (category.equalsIgnoreCase(ServiceStatusConstants.PlatformEngine)) {
 			label.append(":").append("ENGINE");
-		}else if(category.equalsIgnoreCase(ServiceStatusConstants.PlatformEnterpriseEngine)) {
-			label.append(":").append("WEBHOOKENGINE");
-		}
+		} /*
+			 * else
+			 * if(category.equalsIgnoreCase(ServiceStatusConstants.PlatformEnterpriseEngine)
+			 * ) { label.append(":").append("WEBHOOKENGINE"); }
+			 */
 		else if(category.equalsIgnoreCase("Platform WebhookSubscriber")) {
 			label.append(":").append("WEBHOOKSUBSCRIBER");
 		}
