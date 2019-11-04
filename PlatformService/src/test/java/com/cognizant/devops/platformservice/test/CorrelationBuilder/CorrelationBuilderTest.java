@@ -29,7 +29,7 @@ public class CorrelationBuilderTest extends CorrelationBuilderTestData {
 
 	public static final CorrelationBuilderTestData correlationBuilderTestData = new CorrelationBuilderTestData();
 	public static final CorrelationBuilderServiceImpl correlationBuilderImpl = new CorrelationBuilderServiceImpl();
-
+	
 	@Test(priority = 1)
 	public void testGetSaveConfig() throws InsightsCustomException {
 		String config = "success";
@@ -63,7 +63,7 @@ public class CorrelationBuilderTest extends CorrelationBuilderTestData {
 	@AfterTest
 	public void cleanUP() throws IOException {
 		String resetConfigData = "[{\"destination\":{\"toolName\":\"JENKINS\",\"toolCategory\":\"CI\",\"fields\":[\"scmcommitId\"]},\"source\":{\"toolName\":\"GIT\",\"toolCategory\":\"SCM\",\"fields\":[\"commitId\"]},\"relationName\":\"TEST_FROM_GIT_TO_JENKINS\"}]";
-		correlationBuilderImpl.resetConfig(resetConfigData);
+		CorrelationBuilderTestData.resetConfig(resetConfigData);
 
 	}
 }
