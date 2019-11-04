@@ -45,8 +45,9 @@ public class ApplicationConfigProvider implements Serializable {
 	private Date refreshTime;
 	private List<String> trustedHosts = new ArrayList<String>(3);
 	private boolean enableOnlineDatatagging = false;
-	private boolean enableAuditEngine = false;
-	private boolean enableWebHookEngine = false;
+	private boolean enableAuditEngine = true;
+	private boolean enableWebHookEngine = true;
+	private SchedulerConfigData schedulerConfigData = new SchedulerConfigData();
 
 	// private boolean enableNativeUsers = true;
 
@@ -256,12 +257,6 @@ public class ApplicationConfigProvider implements Serializable {
 	public QueryCache getQueryCache() {
 		return queryCache;
 	}
-	public boolean isEnableAuditEngine() {
-		return enableAuditEngine;
-	}
-	public boolean isEnableWebHookEngine() {
-		return enableWebHookEngine;
-	}
 
 	public void setQueryCache(QueryCache queryCache) {
 		this.queryCache = queryCache;
@@ -271,8 +266,24 @@ public class ApplicationConfigProvider implements Serializable {
 		this.enableOnlineDatatagging = enableOnlineDatatagging;
 	}
 
+	public SchedulerConfigData getSchedulerConfigData() {
+		return schedulerConfigData;
+	}
+
+	public void setSchedulerConfigData(SchedulerConfigData schedulerConfigData) {
+		this.schedulerConfigData = schedulerConfigData;
+	}
+
+	public boolean isEnableAuditEngine() {
+		return enableAuditEngine;
+	}
+
 	public void setEnableAuditEngine(boolean enableAuditEngine) {
 		this.enableAuditEngine = enableAuditEngine;
+	}
+
+	public boolean isEnableWebHookEngine() {
+		return enableWebHookEngine;
 	}
 
 	public void setEnableWebHookEngine(boolean enableWebHookEngine) {
