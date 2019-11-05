@@ -45,19 +45,15 @@ public class ApplicationConfigProvider implements Serializable {
 	private Date refreshTime;
 	private List<String> trustedHosts = new ArrayList<String>(3);
 	private boolean enableOnlineDatatagging = false;
-	private boolean enableAuditEngine = true;
-	private boolean enableWebHookEngine = true;
-	private SchedulerConfigData schedulerConfigData = new SchedulerConfigData();
-
-	// private boolean enableNativeUsers = true;
-
 	private EmailConfiguration emailConfiguration = new EmailConfiguration();
 	private CorrelationConfig correlations;
 	private boolean enableFieldIndex;
 	private boolean enableOnlineBackup = false;
 	private AgentDetails agentDetails = new AgentDetails();
-
 	private QueryCache queryCache = new QueryCache();
+	private boolean enableAuditEngine = false;
+	private boolean enableWebHookEngine = false;
+	private SchedulerConfigData schedulerConfigData = new SchedulerConfigData();
 
 	private ApplicationConfigProvider() {
 		this.refreshTime = new Date(new Date().getTime() - 86400000);
@@ -289,5 +285,17 @@ public class ApplicationConfigProvider implements Serializable {
 	public void setEnableWebHookEngine(boolean enableWebHookEngine) {
 		this.enableWebHookEngine = enableWebHookEngine;
 	}
+
+	/*
+	 * public boolean isEnableAuditEngine() { return enableAuditEngine; }
+	 * 
+	 * public void setEnableAuditEngine(boolean enableAuditEngine) {
+	 * this.enableAuditEngine = enableAuditEngine; }
+	 * 
+	 * public boolean isEnableWebHookEngine() { return enableWebHookEngine; }
+	 * 
+	 * public void setEnableWebHookEngine(boolean enableWebHookEngine) {
+	 * this.enableWebHookEngine = enableWebHookEngine; }
+	 */
 
 }
