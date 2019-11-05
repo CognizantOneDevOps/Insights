@@ -13,10 +13,13 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  ******************************************************************************/
-package com.cognizant.devops.engines.platformwebhookengine.test.engine;
+package com.cognizant.devops.platformwebhookengine.test.engine;
 
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
 import java.util.Map;
+import java.util.Properties;
 import java.util.concurrent.TimeoutException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -30,18 +33,27 @@ import com.cognizant.devops.platformcommons.dal.neo4j.Neo4jDBHandler;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformdal.webhookConfig.WebHookConfig;
 import com.cognizant.devops.platformdal.webhookConfig.WebHookConfigDAL;
-import com.cognizant.devops.engines.platformwebhookengine.modules.aggregator.WebHookEngineAggregatorModule;
+import com.cognizant.devops.platformwebhookengine.modules.aggregator.EngineAggregatorModule;
 
 public class WebhookEngineTest {
 
 	private static Logger log = LogManager.getLogger(WebhookEngineTest.class.getName());
 	WebHookConfigDAL webhookConfigDAL= new WebHookConfigDAL();
 	WebHookConfig webhookConfig = new WebHookConfig();
+    private FileReader reader=null;
+	private Properties p =null;
 		
 	@BeforeTest
-	public void onInit()
+	public void onInit() throws IOException
 	{
 		ApplicationConfigCache.loadConfigCache();
+		
+		reader=new FileReader("src/test/resources/Properties.prop");  
+	      
+		p=new Properties();  
+		
+		p.load(reader);		
+		
 		log.debug("Test Data flow has been created successfully");
 	}
 	
@@ -65,14 +77,14 @@ public class WebhookEngineTest {
 		webhookConfig.setToolName(EngineTestData.toolName);
 		webhookConfig.setWebHookName(EngineTestData.webhookName);
 		webhookConfig.setSubscribeStatus(true);
-		webhookConfig.setDataFormat("JSON");
+		webhookConfig.setDataFormat(p.getProperty("dataFormat"));
 		webhookConfigDAL.saveWebHookConfiguration(webhookConfig);
 		Thread.sleep(1000);
 	}	
 	@Test(priority=3)
 	public void testEngine()
 	{
-		WebHookEngineAggregatorModule em = new WebHookEngineAggregatorModule();
+		EngineAggregatorModule em = new EngineAggregatorModule();
 		em.run();
 	}
 	
@@ -82,13 +94,13 @@ public class WebhookEngineTest {
 		 * Test GIT node is created *
 		 */
 		@SuppressWarnings("rawtypes")
-		Map map = EngineTestData.readNeo4JData("DATA", "commitId");
+		Map map = EngineTestData.readNeo4JData(p.getProperty("nodeName"), p.getProperty("compareFlag"));
 		/* Assert on commitId */
-		Assert.assertEquals("86ef096bb924674a69cd2198e2964b76aa75d88b", map.get("commitId"));
+		Assert.assertEquals(p.getProperty("gitCommitId"), map.get("commitId"));
 		/* Assert on toolname */
-		Assert.assertEquals("GIT", map.get("toolName"));
+		Assert.assertEquals(p.getProperty("toolName"), map.get("toolName"));
 		/* Assert on categoryName */
-		Assert.assertEquals("git_demo", map.get("webhookName"));
+		Assert.assertEquals(p.getProperty("webhookName"), map.get("webhookName"));
 	}
 	
 	
@@ -98,7 +110,7 @@ public class WebhookEngineTest {
 	public void cleanUp() {
 
 		/* Cleaning Postgre */
-		webhookConfigDAL.deleteWebhookConfigurations("git_demo");
+		webhookConfigDAL.deleteWebhookConfigurations(p.getProperty("webhookName"));
 		/* Cleaning Neo4J */
 		Neo4jDBHandler dbHandler = new Neo4jDBHandler();
 		String query = "MATCH (p:DATA) where p.webhookName='git_demo' delete p";
