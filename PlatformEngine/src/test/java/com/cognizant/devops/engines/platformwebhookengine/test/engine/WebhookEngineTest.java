@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  ******************************************************************************/
-package com.cognizant.devops.platformwebhookengine.test.engine;
+package com.cognizant.devops.engines.platformwebhookengine.test.engine;
 
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -33,7 +33,7 @@ import com.cognizant.devops.platformcommons.dal.neo4j.Neo4jDBHandler;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformdal.webhookConfig.WebHookConfig;
 import com.cognizant.devops.platformdal.webhookConfig.WebHookConfigDAL;
-import com.cognizant.devops.platformwebhookengine.modules.aggregator.EngineAggregatorModule;
+import com.cognizant.devops.engines.platformwebhookengine.modules.aggregator.WebHookEngineAggregatorModule;
 
 public class WebhookEngineTest {
 
@@ -84,7 +84,7 @@ public class WebhookEngineTest {
 	@Test(priority=3)
 	public void testEngine()
 	{
-		EngineAggregatorModule em = new EngineAggregatorModule();
+		WebHookEngineAggregatorModule em = new WebHookEngineAggregatorModule();
 		em.run();
 	}
 	
