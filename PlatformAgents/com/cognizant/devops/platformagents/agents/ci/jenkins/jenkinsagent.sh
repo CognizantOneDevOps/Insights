@@ -32,7 +32,7 @@ detectPythonVersion()
 {
      if echo "$1" | grep -q "Python 2"; then
       echo "Detected python 2 version";
-      python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.ci.jenkins.JenkinsAgent import JenkinsAgent; JenkinAgent()" &
+      python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.ci.jenkins.JenkinsAgent import JenkinsAgent; JenkinsAgent()" &
      elif echo "$1" | grep -q "Python 3"; then
       echo "Detected python 3 version";
       python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.ci.jenkins.JenkinsAgent3 import JenkinsAgent; JenkinsAgent()" &
