@@ -51,9 +51,15 @@ public class ApplicationConfigProvider implements Serializable {
 	private boolean enableOnlineBackup = false;
 	private AgentDetails agentDetails = new AgentDetails();
 	private QueryCache queryCache = new QueryCache();
+<<<<<<< .mine
 	private boolean enableAuditEngine = false;
 	private boolean enableWebHookEngine = false;
 	private SchedulerConfigData schedulerConfigData = new SchedulerConfigData();
+=======
+	private String driverLocation;
+
+
+>>>>>>> .theirs
 
 	private ApplicationConfigProvider() {
 		this.refreshTime = new Date(new Date().getTime() - 86400000);
@@ -262,6 +268,7 @@ public class ApplicationConfigProvider implements Serializable {
 		this.enableOnlineDatatagging = enableOnlineDatatagging;
 	}
 
+<<<<<<< .mine
 	public SchedulerConfigData getSchedulerConfigData() {
 		return schedulerConfigData;
 	}
@@ -298,4 +305,42 @@ public class ApplicationConfigProvider implements Serializable {
 	 * this.enableWebHookEngine = enableWebHookEngine; }
 	 */
 
+=======
+	public String getDriverLocation() {
+		return driverLocation;
+	}
+
+	public void setDriverLocation(String driverLocation) {
+		this.driverLocation = driverLocation;
+	}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+>>>>>>> .theirs
 }

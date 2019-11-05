@@ -1,4 +1,4 @@
-env.dockerimagename="devopsbasservice/buildonframework:insightsPUI3-Doxygen"
+env.dockerimagename="devopsbasservice/buildonframework:insightsPUI3-JenkinsUpgradeV201"
 node {
 
 	//Parse commitID (E.g, buildon-abc1234 to abc1234)
@@ -30,7 +30,7 @@ node {
 			
 			if (fileExists('files.txt')) {
 				echo "#################################################################################################################"
-				echo "**********************LICENSE IS NOT UPDATED IN THE FOLLOWING LIST OF COMMA SEPARATED FILES *********************"
+				echo "***********************LICENSE IS NOT UPDATED IN THE FOLLOWING LIST OF COMMA SEPARATED FILES *********************"
 				sh 'cat files.txt'
 				echo "*****************************************************************************************************************"
 				echo "#################################################################################################################"
