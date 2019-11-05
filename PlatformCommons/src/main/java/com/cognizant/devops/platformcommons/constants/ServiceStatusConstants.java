@@ -34,7 +34,8 @@ public interface ServiceStatusConstants {
 	String Service = "Service";
 	String DemonAgent="Demon Agent";
 	String PlatformWebhookSubscriber="Platform WebhookSubscriber";
-	//String PlatformEnterpriseEngine="Platform Enterprise Engine";
+	String PlatformWebhookEngine="Platform WebhookEngine";
+	String PlatformAuditEngine="Platform AuditEngine";
 	String PlatformEngine="Platform Engine";
 	String RabbitMq="RabbitMQ";
 	String Agents="Agents";
