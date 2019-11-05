@@ -180,7 +180,7 @@ class RallyAgent(BaseAgent):
                                         injectArtifactData[key] = 0
                                data.append(injectArtifactData)
                        except Exception as ex:
-                            self.publishHealthDataForExceptions(self,ex)
+                            self.publishHealthDataForExceptions(ex)
                      pageNum = 20 + pageNum
             ''' Section used to get all iteration inforamtion  '''
             for Workspace in range(0, len(specificWorkspaceList)):
