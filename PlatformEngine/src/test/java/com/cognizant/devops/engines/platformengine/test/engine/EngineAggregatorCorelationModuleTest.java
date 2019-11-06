@@ -15,7 +15,10 @@
  ******************************************************************************/
 package com.cognizant.devops.engines.platformengine.test.engine;
 
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.Map;
+import java.util.Properties;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -35,25 +38,36 @@ import com.cognizant.devops.engines.platformengine.modules.correlation.EngineCor
 
 
 public class EngineAggregatorCorelationModuleTest {
-
 	private static Logger log = LogManager.getLogger(EngineAggregatorCorelationModuleTest.class.getName());
 
 	private AgentConfigDAL agentConfigDAL = new AgentConfigDAL();
-
+	
+	private FileReader reader=null;
+	
+	private Properties p =null;
+	   	      
+	  
 	@BeforeTest
-	public void onInit() throws InterruptedException {
+	public void onInit() throws InterruptedException, IOException {
 
 		ApplicationConfigCache.loadConfigCache();
+	
+		reader=new FileReader("src/test/resources/Properties.prop");  
+	      
+		p=new Properties();  
+		
+		p.load(reader);		
+				
 		/*
 		 * Insert Test Data into Postgre *
 		 */
 
-		agentConfigDAL.saveAgentConfigFromUI("GITTEST8800", EngineTestData.gitToolCategory, "git",
+		agentConfigDAL.saveAgentConfigFromUI(p.getProperty("gitAgentId"), EngineTestData.gitToolCategory, "git",
 				EngineTestData.getJsonObject(EngineTestData.gitConfig), EngineTestData.agentVersion,
 				EngineTestData.osversion, EngineTestData.updateDate);
 		/******************************************************************************************/
 
-		agentConfigDAL.saveAgentConfigFromUI("JENKINSTEST8800", EngineTestData.jenkinToolCategory, "jenkins",
+		agentConfigDAL.saveAgentConfigFromUI(p.getProperty("jenkinsAgentId"), EngineTestData.jenkinToolCategory, "jenkins",
 				EngineTestData.getJsonObject(EngineTestData.jenkinsConfig), EngineTestData.agentVersion,
 				EngineTestData.osversion, EngineTestData.updateDate);
 
@@ -91,25 +105,25 @@ public class EngineAggregatorCorelationModuleTest {
 		 * Test GIT node is created *
 		 */
 		@SuppressWarnings("rawtypes")
-		Map map = EngineTestData.readNeo4JData("SCM:GIT:DATA", "commitId");
+		Map map = EngineTestData.readNeo4JData(p.getProperty("gitDataNodeName"), "commitId");
 		/* Assert on commitId */
-		Assert.assertEquals("CM-7569369619", map.get("commitId"));
+		Assert.assertEquals(p.getProperty("gitCommitId"), map.get("commitId"));
 		/* Assert on toolname */
-		Assert.assertEquals("GIT", map.get("toolName"));
+		Assert.assertEquals(p.getProperty("gitToolName"), map.get("toolName"));
 		/* Assert on categoryName */
-		Assert.assertEquals("SCM", map.get("categoryName"));
+		Assert.assertEquals(p.getProperty("gitCategoryName"), map.get("categoryName"));
 
 		/*
 		 * Test Jenkins node is created *
 		 */
 
-		map = EngineTestData.readNeo4JData("CI:JENKINS:DATA", "scmcommitId");
+		map = EngineTestData.readNeo4JData(p.getProperty("jenkinsDataNodeName"), "scmcommitId");
 		/* Assert on commitId */
-		Assert.assertEquals("CM-7569369619", map.get("scmcommitId"));
+		Assert.assertEquals(p.getProperty("jenkinsCommitId"), map.get("scmcommitId"));
 		/* Assert on toolname */
-		Assert.assertEquals("JENKINS", map.get("toolName"));
+		Assert.assertEquals(p.getProperty("jenkinsToolName"), map.get("toolName"));
 		/* Assert on categoryName */
-		Assert.assertEquals("CI", map.get("categoryName"));
+		Assert.assertEquals(p.getProperty("jenkinsCategoryName"), map.get("categoryName"));
 
 	}
 
@@ -117,11 +131,13 @@ public class EngineAggregatorCorelationModuleTest {
 	public void testCorrelation() {
 
 		Neo4jDBHandler dbHandler = new Neo4jDBHandler();
-		String query = "MATCH (p:DATA {toolName:'GIT'}), (q:DATA {toolName:'JENKINS'}) RETURN EXISTS( (p)-[:TEST_FROM_GIT_TO_JENKINS]->(q))";
+		String query = "MATCH (p:DATA {commitId:'CM-7569369619'}), (q:DATA {scmcommitId:'CM-7569369619'}) RETURN distinct  EXISTS( (p)-[:TEST_FROM_GIT_TO_JENKINS]->(q))";
 		GraphResponse neo4jResponse;
 		try {
 
 			neo4jResponse = dbHandler.executeCypherQuery(query);
+			
+		
 
 			String finalJson = neo4jResponse.getJson().get("results").getAsJsonArray().get(0).getAsJsonObject()
 					.get("data").getAsJsonArray().get(0).getAsJsonObject().get("row").toString().replace("[", "")
