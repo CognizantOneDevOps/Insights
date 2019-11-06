@@ -10,7 +10,7 @@ node {
 	stage('SCM Checkout') {
 		checkout scm	
 	}
-	//
+	
 	// All single and double quotes in this file are used in a certain format.Do not alter in any step build
 	//ApacheLicense Check in java and Python files .	
 	stage ('LicenseCheck') {          
@@ -116,8 +116,7 @@ node {
 		
 		// $NexusUsername and $NexusPassword are set as env in buildon.py and values should be specified in buildon.properties
 		if(pomversionService.contains("SNAPSHOT") && pomversionInsightsWebHook.contains("SNAPSHOT") 
-			&& pomversionEnterpriseEngine.contains("SNAPSHOT") && pomversionEngine.contains("SNAPSHOT") 
-			&& pomversion.contains("SNAPSHOT") && pomUI3version.contains("SNAPSHOT")){
+			&& pomversionEngine.contains("SNAPSHOT") && pomversion.contains("SNAPSHOT") && pomUI3version.contains("SNAPSHOT")){
 		
 			NEXUSREPO="https://repo.cogdevops.com/repository/buildonInsightsEnterprise"
 				
@@ -130,8 +129,7 @@ node {
 			//get artifact info (artifactID,classifier,timestamp, buildnumber,version) from maven-metadata.xml
 			sh "curl -u $NexusUsername:$NexusPassword -s ${NEXUSREPO}/com/cognizant/devops/PlatformInsightsWebHook/${pomversionInsightsWebHook}/maven-metadata.xml  | grep -oP '(?<=<artifactId>).*?(?=</artifactId>)|(?<=<version>).*?(?=</version>)|(?<=<timestamp>).*?(?=</timestamp>)|(?<=<buildNumber>).*?(?=</buildNumber>)|(?<=<classifier>).*?(?=</classifier>)' | paste -sd- - | sed 's/-SNAPSHOT//g' | sed 's/--/-/g' | sed 's/\$/.jar/' > /var/jenkins/jobs/$commitID/workspace/PlatformInsightsWebHook/PIW_artifact"
 			
-			//get artifact info (artifactID,classifier,timestamp, buildnumber,version) from maven-metadata.xml
-			sh "curl -u $NexusUsername:$NexusPassword -s ${NEXUSREPO}/com/cognizant/devops/PlatformEnterpriseEngine/${pomversionEnterpriseEngine}/maven-metadata.xml  | grep -oP '(?<=<artifactId>).*?(?=</artifactId>)|(?<=<version>).*?(?=</version>)|(?<=<timestamp>).*?(?=</timestamp>)|(?<=<buildNumber>).*?(?=</buildNumber>)|(?<=<classifier>).*?(?=</classifier>)' | paste -sd- - | sed 's/-SNAPSHOT//g' | sed 's/--/-/g' | sed 's/\$/.jar/' > /var/jenkins/jobs/$commitID/workspace/PlatformEnterpriseEngine/PEE_artifact"
+		
 			
 			//get artifact info (artifactID,classifier,timestamp, buildnumber,version) from maven-metadata.xml
 			sh "curl -u $NexusUsername:$NexusPassword -s ${NEXUSREPO}/com/cognizant/devops/PlatformInsights/${pomversion}/maven-metadata.xml  | grep -oP '(?<=<artifactId>).*?(?=</artifactId>)|(?<=<version>).*?(?=</version>)|(?<=<timestamp>).*?(?=</timestamp>)|(?<=<buildNumber>).*?(?=</buildNumber>)|(?<=<classifier>).*?(?=</classifier>)' | paste -sd- - | sed 's/-SNAPSHOT//g' | sed 's/--/-/g' | sed 's/\$/.jar/' > /var/jenkins/jobs/$commitID/workspace/PlatformInsights/PI_artifact"
@@ -149,8 +147,6 @@ node {
 			//get artifact info (artifactID,classifier,timestamp, buildnumber,version) from maven-metadata.xml
 			sh "curl -u $NexusUsername:$NexusPassword -s ${NEXUSREPO}/com/cognizant/devops/PlatformEngine/maven-metadata.xml  | grep -oP '(?<=<artifactId>).*?(?=</artifactId>)|(?<=<release>).*?(?=</release>)|(?<=<timestamp>).*?(?=</timestamp>)|(?<=<buildNumber>).*?(?=</buildNumber>)|(?<=<classifier>).*?(?=</classifier>)' | paste -sd- - | sed 's/-SNAPSHOT//g' | sed 's/--/-/g' | sed 's/\$/.jar/' > /var/jenkins/jobs/$commitID/workspace/PlatformEngine/PE_artifact"
 			
-			//get artifact info (artifactID,classifier,timestamp, buildnumber,version) from maven-metadata.xml
-			sh "curl -u $NexusUsername:$NexusPassword -s ${NEXUSREPO}/com/cognizant/devops/PlatformEnterpriseEngine/maven-metadata.xml  | grep -oP '(?<=<artifactId>).*?(?=</artifactId>)|(?<=<release>).*?(?=</release>)|(?<=<timestamp>).*?(?=</timestamp>)|(?<=<buildNumber>).*?(?=</buildNumber>)|(?<=<classifier>).*?(?=</classifier>)' | paste -sd- - | sed 's/-SNAPSHOT//g' | sed 's/--/-/g' | sed 's/\$/.jar/' > /var/jenkins/jobs/$commitID/workspace/PlatformEnterpriseEngine/PEE_artifact"
 			
 			//get artifact info (artifactID,classifier,timestamp, buildnumber,version) from maven-metadata.xml
 			sh "curl -u $NexusUsername:$NexusPassword -s ${NEXUSREPO}/com/cognizant/devops/PlatformInsightsWebHook/maven-metadata.xml  | grep -oP '(?<=<artifactId>).*?(?=</artifactId>)|(?<=<release>).*?(?=</release>)|(?<=<timestamp>).*?(?=</timestamp>)|(?<=<buildNumber>).*?(?=</buildNumber>)|(?<=<classifier>).*?(?=</classifier>)' | paste -sd- - | sed 's/-SNAPSHOT//g' | sed 's/--/-/g' | sed 's/\$/.jar/' > /var/jenkins/jobs/$commitID/workspace/PlatformInsightsWebHook/PIW_artifact"
