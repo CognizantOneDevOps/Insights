@@ -10,6 +10,7 @@ node {
 	stage('SCM Checkout') {
 		checkout scm	
 	}
+	//
 	// All single and double quotes in this file are used in a certain format.Do not alter in any step build
 	//ApacheLicense Check in java and Python files .	
 	stage ('LicenseCheck') {          
