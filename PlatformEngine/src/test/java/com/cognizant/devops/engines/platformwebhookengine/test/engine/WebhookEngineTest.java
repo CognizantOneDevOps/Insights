@@ -96,7 +96,7 @@ public class WebhookEngineTest {
 		@SuppressWarnings("rawtypes")
 		Map map = EngineTestData.readNeo4JData(p.getProperty("nodeName"), p.getProperty("compareFlag"));
 		/* Assert on commitId */
-		Assert.assertEquals(p.getProperty("gitCommitId"), map.get("commitId"));
+		Assert.assertEquals(p.getProperty("gitwebhookCommitId"), map.get("commitId"));
 		/* Assert on toolname */
 		Assert.assertEquals(p.getProperty("toolName"), map.get("toolName"));
 		/* Assert on categoryName */
