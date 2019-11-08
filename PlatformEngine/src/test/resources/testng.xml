@@ -1,15 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
 <suite name="EngineSuite">
-  <test name="PlatformEngineTestCases">
+  <test name="EngineTestCases">
     <classes>
-      <class name="com.cognizant.devops.engines.platformengine.modules.offlinedataprocessing.OfflineDataProcessingExecutorTest"/>
-      <class name="com.cognizant.devops.engines.platformengine.test.engine.EngineAggregatorCorelationModuleTest"/>
+      <class name="com.cognizant.devops.platformengine.modules.offlinedataprocessing.OfflineDataProcessingExecutorTest"/>
+<!--       <class name="com.cognizant.devops.platformengine.test.subscriberdata.TestEngineDataSubscriber"/> -->
+     <class name="com.cognizant.devops.platformengine.test.engine.EngineAggregatorCorelationModuleTest"/>
     </classes>
   </test> <!-- TestCases -->
-  <test name="PlatformWebhookEngineTest">
-		<classes>
-			<class name="com.cognizant.devops.engines.platformwebhookengine.test.parser.InsightsGeneralParserTest" />
-		</classes>
-	</test>
 </suite> <!-- EngineSuite -->

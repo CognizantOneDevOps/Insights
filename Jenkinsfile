@@ -10,7 +10,6 @@ node {
 	stage('SCM Checkout') {
 		checkout scm	
 	}
-	
 	// All single and double quotes in this file are used in a certain format.Do not alter in any step build
 	//ApacheLicense Check in java and Python files .	
 	stage ('LicenseCheck') {          
@@ -100,6 +99,10 @@ node {
 		//PlatformEngine version
 		sh "cd /var/jenkins/jobs/$commitID/workspace/PlatformEngine && mvn -B help:evaluate -Dexpression=project.version | grep -e '^[^[]' > /var/jenkins/jobs/$commitID/workspace/PlatformEngine/version"
 	    	pomversionEngine=readFile("/var/jenkins/jobs/$commitID/workspace/PlatformEngine/version").trim()  //Get version from pom.xml to form the nexus repo URL
+		
+		//PlatformWebhookEngine version
+		sh "cd /var/jenkins/jobs/$commitID/workspace/PlatformWebhookEngine && mvn -B help:evaluate -Dexpression=project.version | grep -e '^[^[]' > /var/jenkins/jobs/$commitID/workspace/PlatformWebhookEngine/version"
+	    	pomversionWebhookEngine=readFile("/var/jenkins/jobs/$commitID/workspace/PlatformWebhookEngine/version").trim()  //Get version from pom.xml to form the nexus repo URL
 				
 		//PlatformWebhookSubscriber version
 		sh "cd /var/jenkins/jobs/$commitID/workspace/PlatformInsightsWebHook && mvn -B help:evaluate -Dexpression=project.version | grep -e '^[^[]' > /var/jenkins/jobs/$commitID/workspace/PlatformInsightsWebHook/version"
@@ -109,14 +112,20 @@ node {
 		//Framing Nexus URL for artifact uploaded to Nexus with unique timestamp
 		sh "cd /var/jenkins/jobs/$commitID/workspace/PlatformInsights && mvn -B help:evaluate -Dexpression=project.version | grep -e '^[^[]' > /var/jenkins/jobs/$commitID/workspace/PlatformInsights/version"
        		pomversion=readFile("/var/jenkins/jobs/$commitID/workspace/PlatformInsights/version").trim()  //Get version from pom.xml to form the nexus repo URL	   	    
-			
+
+		//PlatformAuditEngine version
+		sh "cd /var/jenkins/jobs/$commitID/workspace/PlatformAuditEngine && mvn -B help:evaluate -Dexpression=project.version | grep -e '^[^[]' > /var/jenkins/jobs/$commitID/workspace/PlatformAuditEngine/version"
+	    	pomversionAuditEngine=readFile("/var/jenkins/jobs/$commitID/workspace/PlatformAuditEngine/version").trim()	
+		
 		//Framing Nexus URL for artifact uploaded to Nexus with unique timestamp													
 		sh "cd /var/jenkins/jobs/$commitID/workspace/PlatformUI3 && mvn -B help:evaluate -Dexpression=project.version | grep -e '^[^[]' > /var/jenkins/jobs/$commitID/workspace/PlatformUI3/version"
        		pomUI3version=readFile("/var/jenkins/jobs/$commitID/workspace/PlatformUI3/version").trim()  
 		
 		// $NexusUsername and $NexusPassword are set as env in buildon.py and values should be specified in buildon.properties
 		if(pomversionService.contains("SNAPSHOT") && pomversionInsightsWebHook.contains("SNAPSHOT") 
-			&& pomversionEngine.contains("SNAPSHOT") && pomversion.contains("SNAPSHOT") && pomUI3version.contains("SNAPSHOT")){
+			&& pomversionWebhookEngine.contains("SNAPSHOT") && pomversionEngine.contains("SNAPSHOT") 
+			&& pomversion.contains("SNAPSHOT") && pomversionAuditEngine.contains("SNAPSHOT") 
+			&& pomUI3version.contains("SNAPSHOT")){
 		
 			NEXUSREPO="https://repo.cogdevops.com/repository/buildonInsightsEnterprise"
 				
@@ -129,11 +138,15 @@ node {
 			//get artifact info (artifactID,classifier,timestamp, buildnumber,version) from maven-metadata.xml
 			sh "curl -u $NexusUsername:$NexusPassword -s ${NEXUSREPO}/com/cognizant/devops/PlatformInsightsWebHook/${pomversionInsightsWebHook}/maven-metadata.xml  | grep -oP '(?<=<artifactId>).*?(?=</artifactId>)|(?<=<version>).*?(?=</version>)|(?<=<timestamp>).*?(?=</timestamp>)|(?<=<buildNumber>).*?(?=</buildNumber>)|(?<=<classifier>).*?(?=</classifier>)' | paste -sd- - | sed 's/-SNAPSHOT//g' | sed 's/--/-/g' | sed 's/\$/.jar/' > /var/jenkins/jobs/$commitID/workspace/PlatformInsightsWebHook/PIW_artifact"
 			
-		
+			//get artifact info (artifactID,classifier,timestamp, buildnumber,version) from maven-metadata.xml
+			sh "curl -u $NexusUsername:$NexusPassword -s ${NEXUSREPO}/com/cognizant/devops/PlatformWebhookEngine/${pomversionWebhookEngine}/maven-metadata.xml  | grep -oP '(?<=<artifactId>).*?(?=</artifactId>)|(?<=<version>).*?(?=</version>)|(?<=<timestamp>).*?(?=</timestamp>)|(?<=<buildNumber>).*?(?=</buildNumber>)|(?<=<classifier>).*?(?=</classifier>)' | paste -sd- - | sed 's/-SNAPSHOT//g' | sed 's/--/-/g' | sed 's/\$/.jar/' > /var/jenkins/jobs/$commitID/workspace/PlatformWebhookEngine/PWE_artifact"
 			
 			//get artifact info (artifactID,classifier,timestamp, buildnumber,version) from maven-metadata.xml
 			sh "curl -u $NexusUsername:$NexusPassword -s ${NEXUSREPO}/com/cognizant/devops/PlatformInsights/${pomversion}/maven-metadata.xml  | grep -oP '(?<=<artifactId>).*?(?=</artifactId>)|(?<=<version>).*?(?=</version>)|(?<=<timestamp>).*?(?=</timestamp>)|(?<=<buildNumber>).*?(?=</buildNumber>)|(?<=<classifier>).*?(?=</classifier>)' | paste -sd- - | sed 's/-SNAPSHOT//g' | sed 's/--/-/g' | sed 's/\$/.jar/' > /var/jenkins/jobs/$commitID/workspace/PlatformInsights/PI_artifact"
 
+			//get artifact info (artifactID,classifier,timestamp, buildnumber,version) from maven-metadata.xml
+			sh "curl -u $NexusUsername:$NexusPassword -s ${NEXUSREPO}/com/cognizant/devops/PlatformAuditEngine/${pomversionAuditEngine}/maven-metadata.xml  | grep -oP '(?<=<artifactId>).*?(?=</artifactId>)|(?<=<version>).*?(?=</version>)|(?<=<timestamp>).*?(?=</timestamp>)|(?<=<buildNumber>).*?(?=</buildNumber>)|(?<=<classifier>).*?(?=</classifier>)' | paste -sd- - | sed 's/-SNAPSHOT//g' | sed 's/--/-/g' | sed 's/\$/.jar/' > /var/jenkins/jobs/$commitID/workspace/PlatformAuditEngine/PAE_artifact"		
+			
 			//get artifact info (artifactID,classifier,timestamp, buildnumber,version) from maven-metadata.xml
 			sh "curl -u $NexusUsername:$NexusPassword -s ${NEXUSREPO}/com/cognizant/devops/PlatformUI3/${pomUI3version}/maven-metadata.xml  | grep -oP '(?<=<artifactId>).*?(?=</artifactId>)|(?<=<version>).*?(?=</version>)|(?<=<timestamp>).*?(?=</timestamp>)|(?<=<buildNumber>).*?(?=</buildNumber>)|(?<=<classifier>).*?(?=</classifier>)' | paste -sd- - | sed 's/-SNAPSHOT//g' | sed 's/--/-/g' | sed 's/\$/.zip/' > /var/jenkins/jobs/$commitID/workspace/PlatformUI3/PUI3_artifact"
 		
@@ -147,12 +160,17 @@ node {
 			//get artifact info (artifactID,classifier,timestamp, buildnumber,version) from maven-metadata.xml
 			sh "curl -u $NexusUsername:$NexusPassword -s ${NEXUSREPO}/com/cognizant/devops/PlatformEngine/maven-metadata.xml  | grep -oP '(?<=<artifactId>).*?(?=</artifactId>)|(?<=<release>).*?(?=</release>)|(?<=<timestamp>).*?(?=</timestamp>)|(?<=<buildNumber>).*?(?=</buildNumber>)|(?<=<classifier>).*?(?=</classifier>)' | paste -sd- - | sed 's/-SNAPSHOT//g' | sed 's/--/-/g' | sed 's/\$/.jar/' > /var/jenkins/jobs/$commitID/workspace/PlatformEngine/PE_artifact"
 			
+			//get artifact info (artifactID,classifier,timestamp, buildnumber,version) from maven-metadata.xml
+			sh "curl -u $NexusUsername:$NexusPassword -s ${NEXUSREPO}/com/cognizant/devops/PlatformWebhookEngine/maven-metadata.xml  | grep -oP '(?<=<artifactId>).*?(?=</artifactId>)|(?<=<release>).*?(?=</release>)|(?<=<timestamp>).*?(?=</timestamp>)|(?<=<buildNumber>).*?(?=</buildNumber>)|(?<=<classifier>).*?(?=</classifier>)' | paste -sd- - | sed 's/-SNAPSHOT//g' | sed 's/--/-/g' | sed 's/\$/.jar/' > /var/jenkins/jobs/$commitID/workspace/PlatformWebhookEngine/PWE_artifact"
 			
 			//get artifact info (artifactID,classifier,timestamp, buildnumber,version) from maven-metadata.xml
 			sh "curl -u $NexusUsername:$NexusPassword -s ${NEXUSREPO}/com/cognizant/devops/PlatformInsightsWebHook/maven-metadata.xml  | grep -oP '(?<=<artifactId>).*?(?=</artifactId>)|(?<=<release>).*?(?=</release>)|(?<=<timestamp>).*?(?=</timestamp>)|(?<=<buildNumber>).*?(?=</buildNumber>)|(?<=<classifier>).*?(?=</classifier>)' | paste -sd- - | sed 's/-SNAPSHOT//g' | sed 's/--/-/g' | sed 's/\$/.jar/' > /var/jenkins/jobs/$commitID/workspace/PlatformInsightsWebHook/PIW_artifact"
 			
 			//get artifact info (artifactID,classifier,timestamp, buildnumber,version) from maven-metadata.xml
 			sh "curl -u $NexusUsername:$NexusPassword -s ${NEXUSREPO}/com/cognizant/devops/PlatformInsights/maven-metadata.xml  | grep -oP '(?<=<artifactId>).*?(?=</artifactId>)|(?<=<release>).*?(?=</release>)|(?<=<timestamp>).*?(?=</timestamp>)|(?<=<buildNumber>).*?(?=</buildNumber>)|(?<=<classifier>).*?(?=</classifier>)' | paste -sd- - | sed 's/-SNAPSHOT//g' | sed 's/--/-/g' | sed 's/\$/.jar/' > /var/jenkins/jobs/$commitID/workspace/PlatformInsights/PI_artifact"
+			
+			//get artifact info (artifactID,classifier,timestamp, buildnumber,version) from maven-metadata.xml
+			sh "curl -u $NexusUsername:$NexusPassword -s ${NEXUSREPO}/com/cognizant/devops/PlatformAuditEngine/maven-metadata.xml  | grep -oP '(?<=<artifactId>).*?(?=</artifactId>)|(?<=<release>).*?(?=</release>)|(?<=<timestamp>).*?(?=</timestamp>)|(?<=<buildNumber>).*?(?=</buildNumber>)|(?<=<classifier>).*?(?=</classifier>)' | paste -sd- - | sed 's/-SNAPSHOT//g' | sed 's/--/-/g' | sed 's/\$/.jar/' > /var/jenkins/jobs/$commitID/workspace/PlatformAuditEngine/PAE_artifact"	
 			
 			//get artifact info (artifactID,classifier,timestamp, buildnumber,version) from maven-metadata.xml
 			sh "curl -u $NexusUsername:$NexusPassword -s ${NEXUSREPO}/com/cognizant/devops/PlatformUI3/maven-metadata.xml  | grep -oP '(?<=<artifactId>).*?(?=</artifactId>)|(?<=<release>).*?(?=</release>)|(?<=<timestamp>).*?(?=</timestamp>)|(?<=<buildNumber>).*?(?=</buildNumber>)|(?<=<classifier>).*?(?=</classifier>)' | paste -sd- - | sed 's/-SNAPSHOT//g' | sed 's/--/-/g' | sed 's/\$/.zip/' > /var/jenkins/jobs/$commitID/workspace/PlatformUI3/PUI3_artifact"	
@@ -171,14 +189,22 @@ node {
 		PIW_artifactName=readFile("/var/jenkins/jobs/$commitID/workspace/PlatformInsightsWebHook/PIW_artifact").trim()
 		PIW_artifact="${NEXUSREPO}/com/cognizant/devops/PlatformInsightsWebHook/${pomversionInsightsWebHook}/${PIW_artifactName}"
 		
+		//Platform WebhookEngine
+		PWE_artifactName=readFile("/var/jenkins/jobs/$commitID/workspace/PlatformWebhookEngine/PWE_artifact").trim()
+		PWE_artifact="${NEXUSREPO}/com/cognizant/devops/PlatformWebhookEngine/${pomversionWebhookEngine}/${PWE_artifactName}"
+		
 		//Platform Insights
 		PI_artifactName=readFile("/var/jenkins/jobs/$commitID/workspace/PlatformInsights/PI_artifact").trim()
 		PI_artifact="${NEXUSREPO}/com/cognizant/devops/PlatformInsights/${pomversion}/${PI_artifactName}"
+		
+		//PlatformAuditEngine
+		PAE_artifactName=readFile("/var/jenkins/jobs/$commitID/workspace/PlatformAuditEngine/PAE_artifact").trim()
+		PAE_artifact="${NEXUSREPO}/com/cognizant/devops/PlatformAuditEngine/${pomversionAuditEngine}/${PAE_artifactName}"
 		
 		//Platform UI 3
 		PUI3_artifactName=readFile("/var/jenkins/jobs/$commitID/workspace/PlatformUI3/PUI3_artifact").trim()
 		PUI3_artifact="${NEXUSREPO}/com/cognizant/devops/PlatformUI3/${pomUI3version}/${PUI3_artifactName}"
 		
-   	    slackSend channel: '#insightsjenkins', color: 'good', message: "Insights Enterprise Build Success. \n New artifacts are uploaded to Nexus for commitID : *${env.commitID}* ,Branch - *${env.branchName}* \n *PlatformService* ${PS_artifact} \n *PlatformUI3* ${PUI3_artifact} \n *PlatformEngine* ${PE_artifact} \n *PlatformInsights*  ${PI_artifact} \n *PlatformInsightsWebhook* ${PIW_artifact} \n\n *For detail Build Log can be found @* https://buildon.cogdevops.com/buildon/HistoricCIWebController?commitId=$gitCommitID", teamDomain: 'insightscogdevops', token: slackToken // "*" is for making the text bold in slack notification
+   	    slackSend channel: '#insightsjenkins', color: 'good', message: "Insights Enterprise Build Success. \n New artifacts are uploaded to Nexus for commitID : *${env.commitID}* ,Branch - *${env.branchName}* \n *PlatformService* ${PS_artifact} \n *PlatformUI3* ${PUI3_artifact} \n *PlatformEngine* ${PE_artifact} \n *PlatformAuditEngine* ${PAE_artifact} \n *PlatformInsights*  ${PI_artifact} \n *PlatformInsightsWebhook* ${PIW_artifact} \n *PlatformWebhookEngine* ${PWE_artifact} \n\n *For detail Build Log can be found @* https://buildon.cogdevops.com/buildon/HistoricCIWebController?commitId=$gitCommitID", teamDomain: 'insightscogdevops', token: slackToken // "*" is for making the text bold in slack notification
 	}
 }
