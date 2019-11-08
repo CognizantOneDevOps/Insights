@@ -106,26 +106,17 @@ public class HealthStatus {
 					ServiceStatusConstants.RabbitMq, Boolean.TRUE, username, password, authToken);
 			servicesHealthStatus.add(ServiceStatusConstants.RabbitMq, rabbitMq);
 			log.debug("After Rabbit Mq================");
-			/* Platform Engine Health Check */
+			/* Patform Engine Health Check */
 			hostEndPoint = ServiceStatusConstants.PlatformEngine;
 			apiUrl = hostEndPoint;
 			JsonObject jsonPlatformEngineStatus = getComponentStatus("PlatformEngine", "");
 			servicesHealthStatus.add(ServiceStatusConstants.PlatformEngine, jsonPlatformEngineStatus);
 			log.debug("After Platform Engine================");
 			
-			if(ApplicationConfigProvider.getInstance().isEnableWebHookEngine()) {
-				hostEndPoint = ServiceStatusConstants.PlatformWebhookEngine;
-				apiUrl = hostEndPoint;
-				JsonObject jsonPlatformWebhookEngineStatus = getComponentStatus("PlatformWebhookEngine","");
-				servicesHealthStatus.add(ServiceStatusConstants.PlatformWebhookEngine, jsonPlatformWebhookEngineStatus);
-			}
-			
-			if(ApplicationConfigProvider.getInstance().isEnableAuditEngine()) {
-				hostEndPoint = ServiceStatusConstants.PlatformAuditEngine;
-				apiUrl = hostEndPoint;
-				JsonObject jsonPlatformAuditEngineStatus = getComponentStatus("PlatformAuditEngine","");
-				servicesHealthStatus.add(ServiceStatusConstants.PlatformAuditEngine, jsonPlatformAuditEngineStatus);
-			}
+			hostEndPoint = ServiceStatusConstants.PlatformWebhookEngine;
+			apiUrl = hostEndPoint;
+			JsonObject jsonPlatformWebhookEngineStatus = getComponentStatus("PlatformWebhookEngine","");
+			servicesHealthStatus.add(ServiceStatusConstants.PlatformWebhookEngine, jsonPlatformWebhookEngineStatus);
 			
 			hostEndPoint = "Platform WebhookSubscriber";
 			apiUrl = hostEndPoint;
@@ -164,13 +155,13 @@ public class HealthStatus {
 		StringBuffer label = new StringBuffer("HEALTH");
 		if (category.equalsIgnoreCase(ServiceStatusConstants.PlatformEngine)) {
 			label.append(":").append("ENGINE");
-		} else if (category.equalsIgnoreCase(ServiceStatusConstants.PlatformWebhookEngine)) { 
-			label.append(":").append("WEBHOOKENGINE"); 
-		}else if (category.equalsIgnoreCase(ServiceStatusConstants.PlatformAuditEngine)) { 
-			label.append(":").append("AUDITENGINE"); 
-		} else if(category.equalsIgnoreCase("Platform WebhookSubscriber")) {
+		}else if(category.equalsIgnoreCase(ServiceStatusConstants.PlatformWebhookEngine)) {
+			label.append(":").append("WEBHOOKENGINE");
+		}
+		else if(category.equalsIgnoreCase("Platform WebhookSubscriber")) {
 			label.append(":").append("WEBHOOKSUBSCRIBER");
-		} else if(category.equalsIgnoreCase(ServiceStatusConstants.InsightsInference)) {
+		}
+		else if(category.equalsIgnoreCase(ServiceStatusConstants.InsightsInference)) {
 			label.append(":").append("INSIGHTS");
 		} else {
 			label.append(":").append(category);
@@ -329,26 +320,6 @@ public class HealthStatus {
 			
 			else if(serviceType.equalsIgnoreCase("PlatformWebhookEngine")) {
 				graphResponse = loadHealthData("HEALTH:WEBHOOKENGINE",serviceType,"");
-				if(graphResponse !=null ) {
-					if(graphResponse.getNodes().size() > 0 ) {
-						successResponse=graphResponse.getNodes().get(0).getPropertyMap().get("message");;
-						version=graphResponse.getNodes().get(0).getPropertyMap().get("version");
-						status=graphResponse.getNodes().get(0).getPropertyMap().get("status");
-						if(status.equalsIgnoreCase(PlatformServiceConstants.SUCCESS)) {
-							returnObject=buildSuccessResponse(successResponse.toString(), "-", ServiceStatusConstants.Service,version);
-						}else {
-							returnObject=buildFailureResponse(successResponse.toString(), "-", ServiceStatusConstants.Service,version);
-						}
-					}else {
-						successResponse="Node list is empty in response not received from Neo4j";
-						returnObject=buildFailureResponse(successResponse.toString(), "-", ServiceStatusConstants.Service,version);
-					}
-				}else {
-					successResponse="Response not received from Neo4j";
-					returnObject=buildFailureResponse(successResponse.toString(), "-", ServiceStatusConstants.Service,version);
-				}
-			}else if(serviceType.equalsIgnoreCase("PlatformAuditEngine")) {
-				graphResponse = loadHealthData("HEALTH:AUDITENGINE",serviceType,"");
 				if(graphResponse !=null ) {
 					if(graphResponse.getNodes().size() > 0 ) {
 						successResponse=graphResponse.getNodes().get(0).getPropertyMap().get("message");;
