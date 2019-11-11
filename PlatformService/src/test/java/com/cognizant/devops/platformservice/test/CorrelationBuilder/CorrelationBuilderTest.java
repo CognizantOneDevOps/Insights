@@ -15,7 +15,10 @@
  ******************************************************************************/
 package com.cognizant.devops.platformservice.test.CorrelationBuilder;
 
+import java.io.IOException;
+
 import org.testng.Assert;
+import org.testng.annotations.AfterTest;
 import org.testng.annotations.Test;
 
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
@@ -26,7 +29,7 @@ public class CorrelationBuilderTest extends CorrelationBuilderTestData {
 
 	public static final CorrelationBuilderTestData correlationBuilderTestData = new CorrelationBuilderTestData();
 	public static final CorrelationBuilderServiceImpl correlationBuilderImpl = new CorrelationBuilderServiceImpl();
-
+	
 	@Test(priority = 1)
 	public void testGetSaveConfig() throws InsightsCustomException {
 		String config = "success";
@@ -55,5 +58,12 @@ public class CorrelationBuilderTest extends CorrelationBuilderTestData {
 		String config = "success";
 		String response = correlationBuilderImpl.saveConfig(correlationBuilderTestData.DeleteConfigDetails);
 		Assert.assertEquals(config, response);
+	}
+
+	@AfterTest
+	public void cleanUP() throws IOException {
+		String resetConfigData = "[{\"destination\":{\"toolName\":\"JENKINS\",\"toolCategory\":\"CI\",\"fields\":[\"scmcommitId\"]},\"source\":{\"toolName\":\"GIT\",\"toolCategory\":\"SCM\",\"fields\":[\"commitId\"]},\"relationName\":\"TEST_FROM_GIT_TO_JENKINS\"}]";
+		CorrelationBuilderTestData.resetConfig(resetConfigData);
+
 	}
 }

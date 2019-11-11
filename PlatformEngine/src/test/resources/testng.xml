@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
+<suite name="EngineSuite">
+  <test name="EngineTestCases">
+    <classes>
+      <class name="com.cognizant.devops.platformengine.modules.offlinedataprocessing.OfflineDataProcessingExecutorTest"/>
+<!--       <class name="com.cognizant.devops.platformengine.test.subscriberdata.TestEngineDataSubscriber"/> -->
+     <class name="com.cognizant.devops.platformengine.test.engine.EngineAggregatorCorelationModuleTest"/>
+    </classes>
+  </test> <!-- TestCases -->
+</suite> <!-- EngineSuite -->
