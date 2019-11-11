@@ -24,3 +24,27 @@
     margin-top: 0;
 }
 
+.app-grafana-dashboard{
+    height: 0px;
+    font-size: 0px;
+    border:0px;
+}
+
+.border iframe {
+    border: none;
+    margin: 0;
+    padding: 0;
+    opacity: 0.8;
+    display:block; /* Add this */
+}
+
+.iframeCss {
+    overflow-y:auto !important;
+    overflow-x: hidden !important;
+    border-width: 0px !important;
+    border-style:hidden !important;
+    border-color:unset;
+    border-image: unset;
+    display:block;
+}
+

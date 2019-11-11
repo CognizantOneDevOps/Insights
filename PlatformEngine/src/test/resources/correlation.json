@@ -1,0 +1,22 @@
+[
+
+{
+  "destination": {
+      "toolName": "JENKINS",
+	  "toolCategory": "CI",
+      "fields": [
+        "scmcommitId"
+      ]
+    },
+    "source": {
+      "toolName" : "GIT",
+	  "toolCategory": "SCM",
+      "fields": [
+        "commitId"
+      ]
+    },
+    "relationName" : "TEST_FROM_GIT_TO_JENKINS"
+  }
+ 
+]
+
