@@ -51,11 +51,9 @@
 		<module>PlatformDAL</module>
 		<module>PlatformAuditing</module>
 		<module>PlatformInsightsWebHook</module>
-		<module>PlatformAuditEngine</module>
 		<module>PlatformService</module>
 		<module>PlatformEngine</module>
 		<module>PlatformInsights</module>
-		<module>PlatformWebhookEngine</module>
 		<module>PlatformUI3</module>
 	</modules>
 	<build>
