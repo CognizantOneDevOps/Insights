@@ -1,7 +1,7 @@
 {
 	"showBusinessMapping": true,
 	"showAuditReporting": false,
-	"showWebhookConfiguration": false,
+	"showWebhookConfiguration": true,
 	"agentsOsList": {
 		"Windows": "windows",
 		"RHEL/CentOS": "linux",
