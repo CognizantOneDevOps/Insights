@@ -1,6 +1,0 @@
-toolName=GIT
-gitCommitId=86ef096bb924674a69cd2198e2964b76aa75d88b
-webhookName=git_demo
-dataFormat=JSON
-nodeName=DATA
-compareFlag=commitId
