@@ -89,7 +89,7 @@ public class InsightsGeneralParser implements InsightsWebhookParserInterface {
 		for (String pair : keyValuePairs) // iterate over the pairs
 		{
 			String[] dataKeyMapper = pair.split("="); // split the pairs to get key and value
-			responseTemplateMap.put(dataKeyMapper[0], dataKeyMapper[1]);
+			responseTemplateMap.put(dataKeyMapper[0].trim(), dataKeyMapper[1].trim());
 		}
 		return responseTemplateMap;
 	}
