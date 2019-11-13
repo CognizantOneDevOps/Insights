@@ -197,7 +197,8 @@ class JenkinsAgent(BaseAgent):
             return injectData
         configXmlUrl = url+"config.xml"
         auth = HTTPBasicAuth(self.userid, self.passwd)
-        xmlResponse = requests.get(configXmlUrl, auth=auth)
+        sslVerify = self.config.get("communication", '').get("sslVerify")
+        xmlResponse = requests.get(configXmlUrl, auth=auth, verify=False)
         root = ET.fromstring(xmlResponse.text.encode('UTF-8').strip())
         rootTag = root.tag
         rootTagLen = len(rootTag) + 1
