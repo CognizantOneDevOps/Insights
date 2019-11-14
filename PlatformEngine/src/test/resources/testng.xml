@@ -5,7 +5,7 @@
     <classes>
       <class name="com.cognizant.devops.engines.platformengine.test.engine.EngineAggregatorCorelationModuleTest"/>
     </classes>
-  </test> <!-- TestCases -->
+  </test>
   <test name="PlatformWebhookEngineTest">
 		<classes>
 			<class name="com.cognizant.devops.engines.platformwebhookengine.test.parser.InsightsGeneralParserTest" />
