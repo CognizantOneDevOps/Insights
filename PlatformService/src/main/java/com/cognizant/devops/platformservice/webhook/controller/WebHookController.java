@@ -59,7 +59,11 @@ public class WebHookController {
 			Boolean result = webhookConfigurationService.saveWebHookConfiguration(webhookName, toolName, labelDisplay,
 					dataformat, mqchannel, statussubscribe, responseTemplate);
 			return PlatformServiceUtil.buildSuccessResponse();
-		} catch (InsightsCustomException e) {
+		} catch (ArrayIndexOutOfBoundsException e) {
+			return PlatformServiceUtil.buildFailureResponse("Incorrect Response Template");
+		}  
+		
+		catch (InsightsCustomException e) {
 			return PlatformServiceUtil.buildFailureResponse("Webhook name already exists.");
 		} catch (Exception e) {
 			return PlatformServiceUtil
