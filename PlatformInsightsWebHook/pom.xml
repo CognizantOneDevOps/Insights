@@ -164,7 +164,7 @@
 								<resource>
 									<directory>src/main/resources</directory>
 									<includes>
-									<include>OpenSource Credit Document v1.0.docx</include>
+									<include>OneDevOpInsights v2.16 OpenSource Credit Document v1.0.pdf</include>
 									</includes>
 									<filtering>true</filtering>
 								</resource>
