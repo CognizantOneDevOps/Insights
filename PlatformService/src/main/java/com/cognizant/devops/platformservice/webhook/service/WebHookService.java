@@ -16,7 +16,9 @@
 package com.cognizant.devops.platformservice.webhook.service;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -36,13 +38,25 @@ public class WebHookService implements IWebHook {
 	public Boolean saveWebHookConfiguration(String webhookname, String toolName, String labelDisplay, String dataformat,
 			String mqchannel, Boolean subscribestatus, String responseTemplate) throws InsightsCustomException {
 		try {
+			
+			Map<String, String> responseTemplateMap = new HashMap<>();
+			String value = responseTemplate;
+			String[] keyValuePairs = value.split(","); // split the string to creat key-value pairs
+			for (String pair : keyValuePairs) // iterate over the pairs
+			{
+				String[] dataKeyMapper = pair.split("="); // split the pairs to get key and value
+				responseTemplateMap.put(dataKeyMapper[0].trim(), dataKeyMapper[1].trim());
+			}
 			WebHookConfig webHookConfig = populateWebHookConfiguration(webhookname, toolName, labelDisplay, dataformat,
 					mqchannel, subscribestatus, responseTemplate);
+		
 			WebHookConfigDAL webhookConfigurationDAL = new WebHookConfigDAL();
 			return webhookConfigurationDAL.saveWebHookConfiguration(webHookConfig);
 		} catch (InsightsCustomException e) {
-
 			throw new InsightsCustomException(e.getMessage());
+		} catch (ArrayIndexOutOfBoundsException e) {
+			log.error(e);
+			throw new ArrayIndexOutOfBoundsException(e.getMessage());
 		} catch (Exception e) {
 			throw new InsightsCustomException(e.getMessage());
 		}
