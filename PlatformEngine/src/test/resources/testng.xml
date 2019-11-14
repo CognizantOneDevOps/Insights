@@ -10,6 +10,7 @@
   <test name="PlatformWebhookEngineTest">
 		<classes>
 			<class name="com.cognizant.devops.engines.platformwebhookengine.test.parser.InsightsGeneralParserTest" />
+			<class name="com.cognizant.devops.engines.platformwebhookengine.test.engine.WebhookEngineTest" />
 		</classes>
 	</test>
 </suite> <!-- EngineSuite -->
