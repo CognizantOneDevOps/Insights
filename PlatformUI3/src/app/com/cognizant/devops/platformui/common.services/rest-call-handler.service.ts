@@ -19,6 +19,7 @@ import { Observable } from 'rxjs'
 import { RestAPIurlService } from '@insights/common/rest-apiurl.service'
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { DataSharedService } from '@insights/common/data-shared-service';
+import 'rxjs/Rx';
 
 @Injectable()
 export class RestCallHandlerService {
@@ -241,6 +242,50 @@ export class RestCallHandlerService {
     }
   }
 
+  public postWithAgentData(url: string, data: String, requestParams?: Object, additionalheaders?: Object): Observable<any> {
+    var isSessionExpired = this.dataShare.validateSession();
+    if (!isSessionExpired) {
+      var restCallUrl = this.restAPIUrlService.getRestCallUrl(url);
+      //console.log(restCallUrl);
+      var dataresponse;
+      let headers;
+      var authToken = this.dataShare.getAuthorizationToken();
+
+      let params = new HttpParams();
+
+      for (var key in requestParams) {
+        // console.log(key + " " + requestParams[key]);
+        if (requestParams.hasOwnProperty(key)) {
+          params = params.set(key, requestParams[key]);
+        }
+      }
+
+      headers = new HttpHeaders();
+      headers = headers.set('Authorization', authToken);
+
+      for (var key in additionalheaders) {
+        //console.log(key + " " + additionalheaders[key]);
+        if (headers.hasOwnProperty(key)) {
+          headers = headers.set(key, additionalheaders[key]);
+        }
+      }
+      var httpOptions = {
+        headers: headers,
+        params: params
+      }
+      //console.log(httpOptions);
+      dataresponse = this.http.post(restCallUrl, data, httpOptions)
+                        .catch(this.handleError);              
+      return dataresponse;
+    } else {
+      console.log("Session Expired")
+    }
+  }
+
+  private handleError(error: any) {
+    console.error('An error occurred', error);
+    return Observable.of(false);
+  }
   private extend(obj: Object, src: Object) {
     for (var key in src) {
       if (src.hasOwnProperty(key)) obj[key] = src[key];

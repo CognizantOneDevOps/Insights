@@ -83,11 +83,11 @@ export class AgentService implements IAgentService {
     }
 
     registerAgentV2(registerAgentJson: string): Promise<any> {
-        return this.restCallHandlerService.postWithData("AGENT_REGISTERV2", registerAgentJson, "", { 'Content-Type': 'application/x-www-form-urlencoded' }).toPromise();;
+        return this.restCallHandlerService.postWithAgentData("AGENT_REGISTERV2", registerAgentJson, "", { 'Content-Type': 'application/x-www-form-urlencoded' }).toPromise();;
     }
 
     updateAgentV2(agentMappingJson: string): Promise<any> {
-        return this.restCallHandlerService.postWithData("AGENT_UPDATEV2", agentMappingJson, "", { 'Content-Type': 'application/x-www-form-urlencoded' }).toPromise();;
+        return this.restCallHandlerService.postWithAgentData("AGENT_UPDATEV2", agentMappingJson, "", { 'Content-Type': 'application/x-www-form-urlencoded' }).toPromise();;
     }
 
 }
