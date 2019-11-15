@@ -70,7 +70,7 @@ export class AgentConfigurationComponent implements OnInit {
   subTitleName: string;
   subTitleInfoText: string;
   @ViewChild('fileInput') myFileDiv: ElementRef;
-  regex = new RegExp("^[a-zA-Z0-9_]*$", 'gi');///[ !@#$%^&*()+\=\[\]{};'"\\|,.<>\/?]/
+  regex = new RegExp("[a-zA-Z0-9_]*", 'gi');
 
   constructor(public config: InsightsInitService, public agentService: AgentService,
     private router: Router, private route: ActivatedRoute,
