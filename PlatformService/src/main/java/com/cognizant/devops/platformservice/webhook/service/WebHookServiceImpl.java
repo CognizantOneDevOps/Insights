@@ -19,45 +19,53 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.StringTokenizer;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformdal.webhookConfig.WebHookConfig;
 import com.cognizant.devops.platformdal.webhookConfig.WebHookConfigDAL;
 
 @Service("webhookConfigurationService")
-public class WebHookService implements IWebHook {
-	private static final Logger log = LogManager.getLogger(WebHookService.class);
+public class WebHookServiceImpl implements IWebHook {
+	private static final Logger log = LogManager.getLogger(WebHookServiceImpl.class);
 	private static final String SUCCESS = "SUCCESS";
 
 	@Override
 	public Boolean saveWebHookConfiguration(String webhookname, String toolName, String labelDisplay, String dataformat,
 			String mqchannel, Boolean subscribestatus, String responseTemplate) throws InsightsCustomException {
 		try {
-			
+			// Below code is for Response Template Format Check
 			Map<String, String> responseTemplateMap = new HashMap<>();
 			String value = responseTemplate;
-			String[] keyValuePairs = value.split(","); // split the string to creat key-value pairs
-			for (String pair : keyValuePairs) // iterate over the pairs
-			{
-				String[] dataKeyMapper = pair.split("="); // split the pairs to get key and value
+			StringTokenizer st = new StringTokenizer(responseTemplate, ",");
+			while (st.hasMoreTokens()) {
+				String keyValuePairs = st.nextToken();
+				int count = StringUtils.countOccurrencesOf(keyValuePairs, "=");
+				if (count > 1) {
+					throw new InsightsCustomException("Incorrect Response template");
+				}
+				String[] dataKeyMapper = keyValuePairs.split("=");
 				responseTemplateMap.put(dataKeyMapper[0].trim(), dataKeyMapper[1].trim());
 			}
+			// Saving the data into the database
 			WebHookConfig webHookConfig = populateWebHookConfiguration(webhookname, toolName, labelDisplay, dataformat,
 					mqchannel, subscribestatus, responseTemplate);
-		
 			WebHookConfigDAL webhookConfigurationDAL = new WebHookConfigDAL();
 			return webhookConfigurationDAL.saveWebHookConfiguration(webHookConfig);
 		} catch (InsightsCustomException e) {
+			log.error(e.getMessage());
 			throw new InsightsCustomException(e.getMessage());
 		} catch (ArrayIndexOutOfBoundsException e) {
 			log.error(e);
 			throw new ArrayIndexOutOfBoundsException(e.getMessage());
 		} catch (Exception e) {
+			log.error(e.getMessage());
 			throw new InsightsCustomException(e.getMessage());
 		}
 	}
