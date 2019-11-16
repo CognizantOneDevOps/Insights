@@ -16,34 +16,52 @@
 package com.cognizant.devops.platformservice.webhook.service;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.StringTokenizer;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformdal.webhookConfig.WebHookConfig;
 import com.cognizant.devops.platformdal.webhookConfig.WebHookConfigDAL;
 
 @Service("webhookConfigurationService")
-public class WebHookService implements IWebHook {
-	private static final Logger log = LogManager.getLogger(WebHookService.class);
+public class WebHookServiceImpl implements IWebHook {
+	private static final Logger log = LogManager.getLogger(WebHookServiceImpl.class);
 	private static final String SUCCESS = "SUCCESS";
 
 	@Override
 	public Boolean saveWebHookConfiguration(String webhookname, String toolName, String labelDisplay, String dataformat,
 			String mqchannel, Boolean subscribestatus, String responseTemplate) throws InsightsCustomException {
 		try {
+			// Below code is for Response Template Format Check
+			StringTokenizer st = new StringTokenizer(responseTemplate, ",");
+			while (st.hasMoreTokens()) {
+				String keyValuePairs = st.nextToken();
+				int count = StringUtils.countOccurrencesOf(keyValuePairs, "=");
+				if (count != 1) {
+					throw new InsightsCustomException("Incorrect Response template");
+				}
+			}
+			// Saving the data into the database
 			WebHookConfig webHookConfig = populateWebHookConfiguration(webhookname, toolName, labelDisplay, dataformat,
 					mqchannel, subscribestatus, responseTemplate);
 			WebHookConfigDAL webhookConfigurationDAL = new WebHookConfigDAL();
 			return webhookConfigurationDAL.saveWebHookConfiguration(webHookConfig);
 		} catch (InsightsCustomException e) {
-
+			log.error(e.getMessage());
 			throw new InsightsCustomException(e.getMessage());
+		} catch (ArrayIndexOutOfBoundsException e) {
+			log.error(e);
+			throw new ArrayIndexOutOfBoundsException(e.getMessage());
 		} catch (Exception e) {
+			log.error(e.getMessage());
 			throw new InsightsCustomException(e.getMessage());
 		}
 	}
