@@ -24,7 +24,7 @@ import com.cognizant.devops.platformservice.webhook.service.WebHookServiceImpl;
 
 @Test
 @ContextConfiguration(locations = { "classpath:spring-test-config.xml" })
-public class WebhookServiceTest extends WebHookServiceImpl {
+public class WebhookServiceTest {
 	public static final WebHookServiceImpl webhookServiceImp = new WebHookServiceImpl();
 	public static final WebhookServiceTestData webhookTestData = new WebhookServiceTestData();
 
