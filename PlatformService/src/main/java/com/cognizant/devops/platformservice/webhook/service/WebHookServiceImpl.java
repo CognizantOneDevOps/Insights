@@ -41,17 +41,13 @@ public class WebHookServiceImpl implements IWebHook {
 			String mqchannel, Boolean subscribestatus, String responseTemplate) throws InsightsCustomException {
 		try {
 			// Below code is for Response Template Format Check
-			Map<String, String> responseTemplateMap = new HashMap<>();
-			String value = responseTemplate;
 			StringTokenizer st = new StringTokenizer(responseTemplate, ",");
 			while (st.hasMoreTokens()) {
 				String keyValuePairs = st.nextToken();
 				int count = StringUtils.countOccurrencesOf(keyValuePairs, "=");
-				if (count > 1) {
+				if (count != 1) {
 					throw new InsightsCustomException("Incorrect Response template");
 				}
-				String[] dataKeyMapper = keyValuePairs.split("=");
-				responseTemplateMap.put(dataKeyMapper[0].trim(), dataKeyMapper[1].trim());
 			}
 			// Saving the data into the database
 			WebHookConfig webHookConfig = populateWebHookConfiguration(webhookname, toolName, labelDisplay, dataformat,
