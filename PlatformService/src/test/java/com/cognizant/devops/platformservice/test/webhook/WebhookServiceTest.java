@@ -30,8 +30,7 @@ public class WebhookServiceTest {
 
 	@Test(priority = 1, expectedExceptions = InsightsCustomException.class)
 	public void testsaveWebHookConfiguration() throws InsightsCustomException {
-		WebHookServiceImpl webhookserviceImp = new WebHookServiceImpl();
-		Boolean webhookcheck = webhookserviceImp.saveWebHookConfiguration("git_webhook", webhookTestData.toolName,
+		Boolean webhookcheck = webhookServiceImp.saveWebHookConfiguration("git_webhook", webhookTestData.toolName,
 				webhookTestData.labelDisplay, webhookTestData.dataformat, webhookTestData.mqchannel,
 				webhookTestData.subscribestatus, webhookTestData.responseTemplate);
 		Boolean expectedOutcome = true;
@@ -40,8 +39,7 @@ public class WebhookServiceTest {
 
 	@Test(priority = 2)
 	public void testsaveWebHookConfigurationWithoutException() throws InsightsCustomException {
-		WebHookServiceImpl webhookserviceImp = new WebHookServiceImpl();
-		Boolean webhookcheck = webhookserviceImp.saveWebHookConfiguration(webhookTestData.webhookname,
+		Boolean webhookcheck = webhookServiceImp.saveWebHookConfiguration(webhookTestData.webhookname,
 				webhookTestData.toolName, webhookTestData.labelDisplay, webhookTestData.dataformat,
 				webhookTestData.mqchannel, webhookTestData.subscribestatus, webhookTestData.responseTemplate);
 		Boolean expectedOutcome = true;
@@ -56,8 +54,8 @@ public class WebhookServiceTest {
 
 	@Test(priority = 4)
 	public void testupdateWebHookConfiguration() throws InsightsCustomException {
-		WebHookServiceImpl webhookserviceImp = new WebHookServiceImpl();
-		Boolean webhookcheck = webhookserviceImp.updateWebHook(webhookTestData.webhookname, webhookTestData.toolName,
+
+		Boolean webhookcheck = webhookServiceImp.updateWebHook(webhookTestData.webhookname, webhookTestData.toolName,
 				webhookTestData.labelDisplay, webhookTestData.dataformat, webhookTestData.mqchannel,
 				webhookTestData.subscribestatus, "head_commit.message=message,head_commit.timestamp=commitTime");
 		Assert.assertTrue(webhookcheck);
@@ -65,7 +63,6 @@ public class WebhookServiceTest {
 
 	@Test(priority = 5)
 	public void testUninstallWebhook() throws InsightsCustomException {
-
 		String expectedOutCome = "SUCCESS";
 		String response = webhookServiceImp.uninstallWebhook(webhookTestData.webhookname);
 		Assert.assertEquals(expectedOutCome, response);
@@ -74,7 +71,6 @@ public class WebhookServiceTest {
 
 	@Test(priority = 6, expectedExceptions = InsightsCustomException.class)
 	public void testUninstallWebhookForException() throws InsightsCustomException {
-
 		String expectedOutCome = "No entity found for query";
 		String response = webhookServiceImp.uninstallWebhook("12345fghj");
 		Assert.assertEquals(expectedOutCome, response);
