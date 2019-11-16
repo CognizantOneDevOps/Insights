@@ -74,12 +74,12 @@ public class WebHookDataSubscriber extends EngineSubscriberResponseHandler {
 				String query = "UNWIND {props} AS properties " + "CREATE (n:" + labelName.toUpperCase() + ") "
 						+ "SET n = properties";
 				dbHandler.bulkCreateNodes(toolData, null, query);
+				getChannel().basicAck(envelope.getDeliveryTag(), false);
 			} else {
 				log.error("Unmatched Response Template found for " + webhookName);
 				EngineStatusLogger.getInstance().createEngineStatusNode(
 						"No Webhook Nodes are inserted in DB for " + webhookName, PlatformServiceConstants.FAILURE);
 			}
-			getChannel().basicAck(envelope.getDeliveryTag(), false);
 		} catch (GraphDBException e) {
 			EngineStatusLogger.getInstance().createEngineStatusNode(
 					"Exception while inserting Webhook Node in DB " + e.getMessage(), PlatformServiceConstants.FAILURE);
