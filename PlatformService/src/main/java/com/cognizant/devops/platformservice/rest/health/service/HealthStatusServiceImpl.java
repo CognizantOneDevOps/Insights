@@ -2,18 +2,18 @@
  * Copyright 2017 Cognizant Technology Solutions
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
- * use this file except in compliance with the License.  You may obtain a copy
+ * use this file except in compliance with the License. You may obtain a copy
  * of the License at
  * 
- *   http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
  * License for the specific language governing permissions and limitations under
  * the License.
  ******************************************************************************/
-package com.cognizant.devops.platformservice.rest.health;
+package com.cognizant.devops.platformservice.rest.health.service;
 
 import java.io.IOException;
 import java.util.Iterator;
@@ -21,14 +21,13 @@ import java.util.Iterator;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.http.MediaType;
+import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
 
-import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.constants.ErrorMessage;
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
 import com.cognizant.devops.platformcommons.constants.ServiceStatusConstants;
@@ -38,149 +37,21 @@ import com.cognizant.devops.platformcommons.dal.neo4j.GraphResponse;
 import com.cognizant.devops.platformcommons.dal.neo4j.Neo4jDBHandler;
 import com.cognizant.devops.platformcommons.dal.neo4j.NodeData;
 import com.cognizant.devops.platformdal.dal.PostgresMetadataHandler;
+import com.cognizant.devops.platformservice.rest.health.HealthStatusController;
 import com.cognizant.devops.platformservice.rest.util.PlatformServiceUtil;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
-@RestController
-@RequestMapping("/admin/health")
-public class HealthStatus {
-
+@Service("healthStatusService")
+public class HealthStatusServiceImpl implements HealthStatusService {
+	static Logger log = LogManager.getLogger(HealthStatusServiceImpl.class);
 	private static final String VERSION = "version";
 	private static final String HOST_ENDPOINT = "endPoint";
-	private static final String PLATFORM_SERVICE_VERSION_FILE = "version.properties";
 
-	static Logger log = LogManager.getLogger(HealthStatus.class.getName());
-
-	@RequestMapping(value = "/globalHealth", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public @ResponseBody JsonObject getHealthStatus() {
-		JsonObject servicesHealthStatus = new JsonObject();
-		String username = null;
-		String password = null;
-		String authToken = null;
-		try {
-			String hostEndPoint = "";
-			String apiUrl = "";
-			hostEndPoint = ServiceStatusConstants.POSTGRESQL_HOST;
-			apiUrl = hostEndPoint;
-			JsonObject postgreStatus = getClientResponse(hostEndPoint, apiUrl, ServiceStatusConstants.DB,
-					ServiceStatusConstants.PgSQL, Boolean.FALSE, username, password, authToken);
-			servicesHealthStatus.add(ServiceStatusConstants.PgSQL, postgreStatus);
-			log.debug("After Postgres================");
-			/* PlatformService health check */
-			hostEndPoint = ServiceStatusConstants.PLATFORM_SERVICE_HOST;
-			JsonObject platformServStatus = getVersionDetails(PLATFORM_SERVICE_VERSION_FILE, hostEndPoint,
-					ServiceStatusConstants.Service);
-			servicesHealthStatus.add(ServiceStatusConstants.PlatformService, platformServStatus);
-			log.debug("After Platform Service================");
-			/* Insights Inference health check */
-			hostEndPoint = ServiceStatusConstants.INSIGHTS_INFERENCE_MASTER_HOST;
-			apiUrl = hostEndPoint;
-			JsonObject inferenceServStatus = getComponentStatus("PlatformInsight", "");
-			servicesHealthStatus.add(ServiceStatusConstants.InsightsInference, inferenceServStatus);
-			log.debug("After inferance engine================");
-			/* Neo4j health check */
-			hostEndPoint = ServiceStatusConstants.NEO4J_HOST;
-			apiUrl = hostEndPoint + "/db/data/";
-			authToken = ApplicationConfigProvider.getInstance().getGraph().getAuthToken();
-			JsonObject neo4jStatus = getClientResponse(hostEndPoint, apiUrl, ServiceStatusConstants.DB,
-					ServiceStatusConstants.Neo4j, Boolean.TRUE, username, password, authToken);
-			servicesHealthStatus.add(ServiceStatusConstants.Neo4j, neo4jStatus);
-			log.debug("After Neo4j================");
-			/* Elastic Search health check */
-			hostEndPoint = ServiceStatusConstants.ES_HOST;
-			apiUrl = hostEndPoint;
-			JsonObject EsStatus = getClientResponse(hostEndPoint, apiUrl, ServiceStatusConstants.DB,
-					ServiceStatusConstants.ES, Boolean.FALSE, username, password, authToken);
-			servicesHealthStatus.add(ServiceStatusConstants.ES, EsStatus);
-			log.debug("After ElasticSearch================");
-			/* Rabbit Mq health check */
-			hostEndPoint = ServiceStatusConstants.RABBIT_MQ;
-			apiUrl = hostEndPoint + "/api/overview";
-			authToken = null;
-			username = ApplicationConfigProvider.getInstance().getMessageQueue().getUser();
-			password = ApplicationConfigProvider.getInstance().getMessageQueue().getPassword();
-			JsonObject rabbitMq = getClientResponse(hostEndPoint, apiUrl, ServiceStatusConstants.DB,
-					ServiceStatusConstants.RabbitMq, Boolean.TRUE, username, password, authToken);
-			servicesHealthStatus.add(ServiceStatusConstants.RabbitMq, rabbitMq);
-			log.debug("After Rabbit Mq================");
-			/* Platform Engine Health Check */
-			hostEndPoint = ServiceStatusConstants.PlatformEngine;
-			apiUrl = hostEndPoint;
-			JsonObject jsonPlatformEngineStatus = getComponentStatus("PlatformEngine", "");
-			servicesHealthStatus.add(ServiceStatusConstants.PlatformEngine, jsonPlatformEngineStatus);
-			log.debug("After Platform Engine================");
-			
-			if(ApplicationConfigProvider.getInstance().isEnableWebHookEngine()) {
-				hostEndPoint = ServiceStatusConstants.PlatformWebhookEngine;
-				apiUrl = hostEndPoint;
-				JsonObject jsonPlatformWebhookEngineStatus = getComponentStatus("PlatformWebhookEngine","");
-				servicesHealthStatus.add(ServiceStatusConstants.PlatformWebhookEngine, jsonPlatformWebhookEngineStatus);
-			}
-			
-			if(ApplicationConfigProvider.getInstance().isEnableAuditEngine()) {
-				hostEndPoint = ServiceStatusConstants.PlatformAuditEngine;
-				apiUrl = hostEndPoint;
-				JsonObject jsonPlatformAuditEngineStatus = getComponentStatus("PlatformAuditEngine","");
-				servicesHealthStatus.add(ServiceStatusConstants.PlatformAuditEngine, jsonPlatformAuditEngineStatus);
-			}
-			
-			hostEndPoint = "Platform WebhookSubscriber";
-			apiUrl = hostEndPoint;
-			JsonObject jsonPlatformWebhookSubscriberStatus = getComponentStatus("PlatformWebhookSubscriber","");
-			servicesHealthStatus.add("Platform WebhookSubscriber",jsonPlatformWebhookSubscriberStatus);
-	
-			log.debug(" servicesHealthStatus "+servicesHealthStatus.toString());
-		}catch(Exception e) {
-			PlatformServiceUtil.buildFailureResponse(e.getMessage());
-		}
-		return PlatformServiceUtil.buildSuccessResponseWithData(servicesHealthStatus);
-	}
-
-	@RequestMapping(value = "/globalAgentsHealth", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public @ResponseBody JsonObject getAgentsHealthStatus() {
-		String hostEndPoint = ServiceStatusConstants.Agents;
-		JsonObject servicesAgentsHealthStatus = new JsonObject();
-		try {
-			JsonObject jsonAgentStatus = getComponentStatus("Agents", "");
-			servicesAgentsHealthStatus.add(ServiceStatusConstants.Agents, jsonAgentStatus);
-			log.debug(" servicesAgentsHealthStatus  " + servicesAgentsHealthStatus);
-		} catch (Exception e) {
-			log.error(e.getMessage());
-			PlatformServiceUtil.buildFailureResponse(e.getMessage());
-		}
-		return PlatformServiceUtil.buildSuccessResponseWithData(servicesAgentsHealthStatus);
-	}
-
-	@RequestMapping(value = "/detailHealth", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public @ResponseBody JsonObject loadAgentsHealth(@RequestParam String category, @RequestParam String tool,
-			@RequestParam String agentId) {
-		if (StringUtils.isEmpty(category) || StringUtils.isEmpty(tool)) {
-			return PlatformServiceUtil.buildFailureResponse(ErrorMessage.CATEGORY_AND_TOOL_NAME_NOT_SPECIFIED);
-		}
-		log.debug(" message tool name " + category + "  " + tool + "  " + agentId);
-		StringBuffer label = new StringBuffer("HEALTH");
-		if (category.equalsIgnoreCase(ServiceStatusConstants.PlatformEngine)) {
-			label.append(":").append("ENGINE");
-		} else if (category.equalsIgnoreCase(ServiceStatusConstants.PlatformWebhookEngine)) { 
-			label.append(":").append("WEBHOOKENGINE"); 
-		}else if (category.equalsIgnoreCase(ServiceStatusConstants.PlatformAuditEngine)) { 
-			label.append(":").append("AUDITENGINE"); 
-		} else if(category.equalsIgnoreCase("Platform WebhookSubscriber")) {
-			label.append(":").append("WEBHOOKSUBSCRIBER");
-		} else if(category.equalsIgnoreCase(ServiceStatusConstants.InsightsInference)) {
-			label.append(":").append("INSIGHTS");
-		} else {
-			label.append(":").append(category);
-			label.append(":").append(tool);
-		}
-		GraphResponse response = loadHealthData(label.toString(), ServiceStatusConstants.Agents, agentId);
-		return PlatformServiceUtil.buildSuccessResponseWithHtmlData(response);
-	}
-
-	private JsonObject getClientResponse(String hostEndPoint, String apiUrl, String displayType, String serviceType,
+	@Override
+	public JsonObject getClientResponse(String hostEndPoint, String apiUrl, String displayType, String serviceType,
 			boolean isRequiredAuthentication, String username, String password, String authToken) {
 		JsonObject returnResponse = null;
 		String strResponse = "";
@@ -235,12 +106,13 @@ public class HealthStatus {
 		return returnResponse;
 	}
 
-	private JsonObject getVersionDetails(String fileName, String hostEndPoint, String type) throws IOException {
+	@Override
+	public JsonObject getVersionDetails(String fileName, String hostEndPoint, String type) throws IOException {
 
 		String version = "";
 		String strResponse = "";
 		if (version.equalsIgnoreCase("")) {
-			version = HealthStatus.class.getPackage().getSpecificationVersion();
+			version = HealthStatusController.class.getPackage().getSpecificationVersion();
 			strResponse = "Version captured as " + version;
 			return buildSuccessResponse(strResponse, hostEndPoint, type, version);
 		} else {
@@ -270,7 +142,8 @@ public class HealthStatus {
 		return jsonResponse;
 	}
 
-	private JsonObject getComponentStatus(String serviceType, String apiUrl) {
+	@Override
+	public JsonObject getComponentStatus(String serviceType, String apiUrl) {
 		String successResponse = "";
 		String version = "";
 		String status = "";
@@ -280,7 +153,32 @@ public class HealthStatus {
 		ElasticSearchDBHandler apiCallElasticsearch = new ElasticSearchDBHandler();
 		try {
 			if (serviceType.equalsIgnoreCase("PlatformEngine")) {
-				graphResponse = loadHealthData("HEALTH:ENGINE", serviceType, "");
+				graphResponse = loadHealthData("HEALTH:ENGINE", serviceType, "", 1);
+				if (graphResponse != null) {
+					if (graphResponse.getNodes().size() > 0) {
+						successResponse = graphResponse.getNodes().get(0).getPropertyMap().get("message");
+						;
+						version = graphResponse.getNodes().get(0).getPropertyMap().get("version");
+						status = graphResponse.getNodes().get(0).getPropertyMap().get("status");
+						if (status.equalsIgnoreCase(PlatformServiceConstants.SUCCESS)) {
+							returnObject = buildSuccessResponse(successResponse.toString(), "-",
+									ServiceStatusConstants.Service, version);
+						} else {
+							returnObject = buildFailureResponse(successResponse.toString(), "-",
+									ServiceStatusConstants.Service, version);
+						}
+					} else {
+						successResponse = "Node list is empty in response not received from Neo4j";
+						returnObject = buildFailureResponse(successResponse.toString(), "-",
+								ServiceStatusConstants.Service, version);
+					}
+				} else {
+					successResponse = "Response not received from Neo4j";
+					returnObject = buildFailureResponse(successResponse.toString(), "-", ServiceStatusConstants.Service,
+							version);
+				}
+			} else if (serviceType.equalsIgnoreCase("PlatformWebhookSubscriber")) {
+				graphResponse = loadHealthData("HEALTH:WEBHOOKSUBSCRIBER", serviceType, "", 1);
 				if (graphResponse != null) {
 					if (graphResponse.getNodes().size() > 0) {
 						successResponse = graphResponse.getNodes().get(0).getPropertyMap().get("message");
@@ -305,70 +203,59 @@ public class HealthStatus {
 							version);
 				}
 			}
-			else if(serviceType.equalsIgnoreCase("PlatformWebhookSubscriber")) {
-				graphResponse = loadHealthData("HEALTH:WEBHOOKSUBSCRIBER",serviceType,"");
-				if(graphResponse !=null ) {
-					if(graphResponse.getNodes().size() > 0 ) {
-						successResponse=graphResponse.getNodes().get(0).getPropertyMap().get("message");;
-						version=graphResponse.getNodes().get(0).getPropertyMap().get("version");
-						status=graphResponse.getNodes().get(0).getPropertyMap().get("status");
-						if(status.equalsIgnoreCase(PlatformServiceConstants.SUCCESS)) {
-							returnObject=buildSuccessResponse(successResponse.toString(), "-", ServiceStatusConstants.Service,version);
-						}else {
-							returnObject=buildFailureResponse(successResponse.toString(), "-", ServiceStatusConstants.Service,version);
+
+			else if (serviceType.equalsIgnoreCase("PlatformWebhookEngine")) {
+				graphResponse = loadHealthData("HEALTH:WEBHOOKENGINE", serviceType, "", 1);
+				if (graphResponse != null) {
+					if (graphResponse.getNodes().size() > 0) {
+						successResponse = graphResponse.getNodes().get(0).getPropertyMap().get("message");
+						;
+						version = graphResponse.getNodes().get(0).getPropertyMap().get("version");
+						status = graphResponse.getNodes().get(0).getPropertyMap().get("status");
+						if (status.equalsIgnoreCase(PlatformServiceConstants.SUCCESS)) {
+							returnObject = buildSuccessResponse(successResponse.toString(), "-",
+									ServiceStatusConstants.Service, version);
+						} else {
+							returnObject = buildFailureResponse(successResponse.toString(), "-",
+									ServiceStatusConstants.Service, version);
 						}
-					}else {
-						successResponse="Node list is empty in response not received from Neo4j";
-						returnObject=buildFailureResponse(successResponse.toString(), "-", ServiceStatusConstants.Service,version);
+					} else {
+						successResponse = "Node list is empty in response not received from Neo4j";
+						returnObject = buildFailureResponse(successResponse.toString(), "-",
+								ServiceStatusConstants.Service, version);
 					}
-				}else {
-					successResponse="Response not received from Neo4j";
-					returnObject=buildFailureResponse(successResponse.toString(), "-", ServiceStatusConstants.Service,version);
+				} else {
+					successResponse = "Response not received from Neo4j";
+					returnObject = buildFailureResponse(successResponse.toString(), "-", ServiceStatusConstants.Service,
+							version);
 				}
-			}
-			
-			else if(serviceType.equalsIgnoreCase("PlatformWebhookEngine")) {
-				graphResponse = loadHealthData("HEALTH:WEBHOOKENGINE",serviceType,"");
-				if(graphResponse !=null ) {
-					if(graphResponse.getNodes().size() > 0 ) {
-						successResponse=graphResponse.getNodes().get(0).getPropertyMap().get("message");;
-						version=graphResponse.getNodes().get(0).getPropertyMap().get("version");
-						status=graphResponse.getNodes().get(0).getPropertyMap().get("status");
-						if(status.equalsIgnoreCase(PlatformServiceConstants.SUCCESS)) {
-							returnObject=buildSuccessResponse(successResponse.toString(), "-", ServiceStatusConstants.Service,version);
-						}else {
-							returnObject=buildFailureResponse(successResponse.toString(), "-", ServiceStatusConstants.Service,version);
+			} else if (serviceType.equalsIgnoreCase("PlatformAuditEngine")) {
+				graphResponse = loadHealthData("HEALTH:AUDITENGINE", serviceType, "", 1);
+				if (graphResponse != null) {
+					if (graphResponse.getNodes().size() > 0) {
+						successResponse = graphResponse.getNodes().get(0).getPropertyMap().get("message");
+						;
+						version = graphResponse.getNodes().get(0).getPropertyMap().get("version");
+						status = graphResponse.getNodes().get(0).getPropertyMap().get("status");
+						if (status.equalsIgnoreCase(PlatformServiceConstants.SUCCESS)) {
+							returnObject = buildSuccessResponse(successResponse.toString(), "-",
+									ServiceStatusConstants.Service, version);
+						} else {
+							returnObject = buildFailureResponse(successResponse.toString(), "-",
+									ServiceStatusConstants.Service, version);
 						}
-					}else {
-						successResponse="Node list is empty in response not received from Neo4j";
-						returnObject=buildFailureResponse(successResponse.toString(), "-", ServiceStatusConstants.Service,version);
+					} else {
+						successResponse = "Node list is empty in response not received from Neo4j";
+						returnObject = buildFailureResponse(successResponse.toString(), "-",
+								ServiceStatusConstants.Service, version);
 					}
-				}else {
-					successResponse="Response not received from Neo4j";
-					returnObject=buildFailureResponse(successResponse.toString(), "-", ServiceStatusConstants.Service,version);
+				} else {
+					successResponse = "Response not received from Neo4j";
+					returnObject = buildFailureResponse(successResponse.toString(), "-", ServiceStatusConstants.Service,
+							version);
 				}
-			}else if(serviceType.equalsIgnoreCase("PlatformAuditEngine")) {
-				graphResponse = loadHealthData("HEALTH:AUDITENGINE",serviceType,"");
-				if(graphResponse !=null ) {
-					if(graphResponse.getNodes().size() > 0 ) {
-						successResponse=graphResponse.getNodes().get(0).getPropertyMap().get("message");;
-						version=graphResponse.getNodes().get(0).getPropertyMap().get("version");
-						status=graphResponse.getNodes().get(0).getPropertyMap().get("status");
-						if(status.equalsIgnoreCase(PlatformServiceConstants.SUCCESS)) {
-							returnObject=buildSuccessResponse(successResponse.toString(), "-", ServiceStatusConstants.Service,version);
-						}else {
-							returnObject=buildFailureResponse(successResponse.toString(), "-", ServiceStatusConstants.Service,version);
-						}
-					}else {
-						successResponse="Node list is empty in response not received from Neo4j";
-						returnObject=buildFailureResponse(successResponse.toString(), "-", ServiceStatusConstants.Service,version);
-					}
-				}else {
-					successResponse="Response not received from Neo4j";
-					returnObject=buildFailureResponse(successResponse.toString(), "-", ServiceStatusConstants.Service,version);
-				}
-			}else if (serviceType.equalsIgnoreCase("PlatformInsight")) {
-				graphResponse = loadHealthData("HEALTH:INSIGHTS", serviceType, "");
+			} else if (serviceType.equalsIgnoreCase("PlatformInsight")) {
+				graphResponse = loadHealthData("HEALTH:INSIGHTS", serviceType, "", 1);
 				if (graphResponse != null) {
 					if (graphResponse.getNodes().size() > 0) {
 						successResponse = graphResponse.getNodes().get(0).getPropertyMap().get("message");
@@ -393,7 +280,7 @@ public class HealthStatus {
 				}
 
 			} else if (serviceType.equalsIgnoreCase("Agents")) {
-				graphResponse = loadHealthData("HEALTH:LATEST", serviceType, "");
+				graphResponse = loadHealthData("HEALTH:LATEST", serviceType, "", 100);
 				if (graphResponse != null) {
 					if (graphResponse.getNodes().size() > 0) {
 						status = PlatformServiceConstants.SUCCESS;
@@ -414,13 +301,14 @@ public class HealthStatus {
 		return returnObject;
 	}
 
-	private GraphResponse loadHealthData(String label, String type, String agentId) {
+	@Override
+	public GraphResponse loadHealthData(String label, String type, String agentId, int limitOfRow) {
 
-		int limitOfRow = 1;
+		//int limitOfRow = 1;
 		String query = "";
-		if (type.equalsIgnoreCase("Agents")) {
+		/*if (type.equalsIgnoreCase("Agents")) {
 			limitOfRow = 10;
-		}
+		}*/
 		if (agentId.equalsIgnoreCase("")) {
 			query = "MATCH (n:" + label
 					+ ") where n.inSightsTime IS NOT NULL RETURN n order by n.inSightsTime DESC LIMIT " + limitOfRow;
@@ -540,14 +428,8 @@ public class HealthStatus {
 		return String.format("%.1f %sB", bytes / Math.pow(unit, exp), pre);
 	}
 
-	@RequestMapping(value = "/getAgentFailureDetails", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public @ResponseBody JsonObject getAgentFailureDetails(@RequestParam String category, @RequestParam String tool,
-			@RequestParam String agentId) {
-		log.debug("############ inside getAgentFailureDetails  -----");
-		return createAgentFailureHealthLabel(category, tool, agentId);
-	}
-
-	private JsonObject createAgentFailureHealthLabel(String category, String tool, String agentId) {
+	@Override
+	public JsonObject createAgentFailureHealthLabel(String category, String tool, String agentId) {
 		log.debug(" message tool name " + category + "  " + tool);
 		StringBuilder label = new StringBuilder("HEALTH_FAILURE");
 		if (StringUtils.isEmpty(category) || StringUtils.isEmpty(tool)) {
@@ -556,17 +438,18 @@ public class HealthStatus {
 			label.append(":").append(category);
 			label.append(":").append(tool);
 		}
-		return loadAgentsFailureHealthData(label.toString(), agentId);
+		return loadAgentsFailureHealthData(label.toString(), agentId, 20);
 	}
 
-	private JsonObject loadAgentsFailureHealthData(String nodeLabel, String agentId) {
+	private JsonObject loadAgentsFailureHealthData(String nodeLabel, String agentId, int limitOfRow) {
 		String query = "";
 
 		if (agentId.equalsIgnoreCase("")) {
-			query = "MATCH (n:" + nodeLabel + ") where n.inSightsTime IS NOT NULL RETURN n order by n.inSightsTime DESC";
+			query = "MATCH (n:" + nodeLabel
+					+ ") where n.inSightsTime IS NOT NULL RETURN n order by n.inSightsTime DESC LIMIT " + limitOfRow;
 		} else if (!agentId.equalsIgnoreCase("")) {
 			query = "MATCH (n:" + nodeLabel + ") where n.inSightsTime IS NOT NULL and n.agentId ='" + agentId
-					+ "' RETURN n order by n.inSightsTime DESC";
+					+ "' RETURN n order by n.inSightsTime DESC LIMIT " + limitOfRow;
 		}
 		try {
 			Neo4jDBHandler dbHandler = new Neo4jDBHandler();
