@@ -155,6 +155,7 @@ public class HealthStatusController {
 	@RequestMapping(value = "/detailHealth", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 	public @ResponseBody JsonObject loadAgentsHealth(@RequestParam String category, @RequestParam String tool,
 			@RequestParam String agentId) {
+		int MAX_RECORD = 10;
 		if (StringUtils.isEmpty(category) || StringUtils.isEmpty(tool)) {
 			return PlatformServiceUtil.buildFailureResponse(ErrorMessage.CATEGORY_AND_TOOL_NAME_NOT_SPECIFIED);
 		}
@@ -175,7 +176,7 @@ public class HealthStatusController {
 			label.append(":").append(tool);
 		}
 		GraphResponse response = healthStatusService.loadHealthData(label.toString(), ServiceStatusConstants.Agents,
-				agentId, 10);
+				agentId, MAX_RECORD);
 		return PlatformServiceUtil.buildSuccessResponseWithHtmlData(response);
 	}
 
