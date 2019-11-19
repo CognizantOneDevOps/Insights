@@ -97,7 +97,7 @@ public class InsightsAuditImpl implements InsightsAudit {
                 return true;
             }
         } catch (Exception e) {
-            e.printStackTrace();
+			LOG.error(e);
             return false;
         }
     }
@@ -136,7 +136,7 @@ public class InsightsAuditImpl implements InsightsAudit {
                 return true;
             }
         } catch (Exception e) {
-            e.printStackTrace();
+			LOG.error(e);
             return false;
         }
     }
@@ -162,7 +162,7 @@ public class InsightsAuditImpl implements InsightsAudit {
                 return true;
             }
         } catch (Exception e) {
-            e.printStackTrace();
+			LOG.error(e);
             return false;
         }
 

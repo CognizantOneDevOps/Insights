@@ -61,7 +61,7 @@ public class BCNetworkClient {
             Config = LoadFile.getConfig();
             bcNetworkClient = new BCNetworkClient();
         } catch (Exception e) {
-            e.printStackTrace();
+			LOG.error(e);
         }
     }
 
