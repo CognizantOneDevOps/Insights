@@ -21,6 +21,11 @@ import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.Map;
 import java.util.concurrent.TimeoutException;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import com.cognizant.devops.engines.Application;
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.config.MessageQueueDataModel;
 import com.cognizant.devops.platformcommons.constants.MessageConstants;
@@ -38,7 +43,7 @@ import com.rabbitmq.client.ConnectionFactory;
 import com.rabbitmq.client.AMQP.Exchange.DeclareOk;
 
 public class EngineTestData {
-
+	private static Logger log = LogManager.getLogger(EngineTestData.class);
 	public static String gitConfig = "{\"mqConfig\":{\"user\":\"iSight\",\"password\":\"iSight\",\"host\":\"127.0.0.1\",\"exchange\":\"iSight\",\"agentControlXchg\":\"iAgent\"},\"subscribe\":{\"config\":\"SCM.GIT.config\",\"agentCtrlQueue\":\"GITTEST8800\"},\"publish\":{\"data\":\"SCM.GIT.DATA\",\"health\":\"SCM.GIT.HEALTH\"},\"communication\":{\"type\":\"REST\",\"sslVerify\":true,\"responseType\":\"JSON\"},\"dynamicTemplate\":{\"timeFieldMapping\":{\"startDate\":\"%Y-%m-%d\"},\"responseTemplate\":{\"sha\":\"commitId\",\"commit\":{\"message\":\"message\",\"author\":{\"name\":\"authorName\",\"date\":\"commitTime\"}}}},\"agentId\":\"GITTEST8800\",\"enableBranches\":false,\"enableBrancheDeletion\":false,\"enableDataValidation\":true,\"toolCategory\":\"SCM\",\"toolsTimeZone\":\"GMT\",\"insightsTimeZone\":\"Asia/Kolkata\",\"enableValueArray\":false,\"useResponseTemplate\":true,\"auth\":\"base64\",\"runSchedule\":30,\"timeStampField\":\"commitTime\",\"timeStampFormat\":\"%Y-%m-%dT%H:%M:%SZ\",\"isEpochTimeFormat\":false,\"startFrom\":\"2019-03-01 15:46:33\",\"accessToken\":\"516ca7fc8ea0fc649f7e058406fba0f321883357\",\"getRepos\":\"https://api.github.com/users/SanketCTSI/repos\",\"commitsBaseEndPoint\":\"https://api.github.com/repos/SanketCTSI/\",\"isDebugAllowed\":false,\"loggingSetting\":{\"logLevel\":\"WARN\",\"maxBytes\":5000000,\"backupCount\":1000},\"osversion\":\"windows\",\"agentVersion\":\"v6.0\",\"toolName\":\"GIT\"}";
 	public static String jenkinsConfig = "{\"mqConfig\":{\"user\":\"iSight\",\"password\":\"iSight\",\"host\":\"127.0.0.1\",\"exchange\":\"iSight\",\"agentControlXchg\":\"iAgent\"},\"subscribe\":{\"config\":\"CI.JENKINS.config\",\"agentCtrlQueue\":\"JENKINSTEST8800\"},\"publish\":{\"data\":\"CI.JENKINS.DATA\",\"health\":\"CI.JENKINS.HEALTH\"},\"communication\":{\"type\":\"REST\",\"sslVerify\":true,\"responseType\":\"JSON\"},\"dynamicTemplate\":{\"timeFieldMapping\":{\"startDate\":\"%Y-%m-%d\"},\"responseTemplate\":{\"actions\":[{\"causes\":[{\"shortDescription\":\"shortDescription\"}]},{\"remoteUrls\":[\"scmUrl\"]},{\"url\":\"sonarUrl\"}],\"changeSet\":{\"items\":[{\"commitId\":\"scmCommitId\",\"author\":{\"fullName\":\"scmAuthor\"},\"date\":\"buildDate\"}],\"kind\":\"scmKind\"},\"duration\":\"duration\",\"id\":\"buildNumber\",\"number\":\"number\",\"result\":\"result\",\"timestamp\":\"buildTimestamp\",\"url\":\"buildUrl\"}},\"jobDetails\":{\"rundeckJobId\":\"maven2-moduleset/publishers/org.jenkinsci.plugins.rundeck.RundeckNotifier/jobId\",\"scmRemoteUrl\":\"maven2-moduleset/scm/userRemoteConfigs/hudson.plugins.git.UserRemoteConfig/url\",\"nexusRepoUrl\":\"maven2-moduleset/publishers/hudson.maven.RedeployPublisher/url\",\"groupId\":\"maven2-moduleset/rootModule/groupId\",\"artifactId\":\"maven2-moduleset/rootModule/artifactId\"},\"agentId\":\"JENKINSTEST8800\",\"toolCategory\":\"CI\",\"toolsTimeZone\":\"Asia/Kolkata\",\"enableDataValidation\":true,\"useResponseTemplate\":true,\"useAllBuildsApi\":true,\"isDebugAllowed\":false,\"enableValueArray\":false,\"userid\":\"username\",\"passwd\":\"password\",\"runSchedule\":30,\"baseUrl\":\"http://127.0.0.1:8080/\",\"jenkinsMasters\":{\"master1\":\"http://127.0.0.1:8080/\",\"master2\":\"http://127.0.0.1:8080/\"},\"timeStampField\":\"buildTimestamp\",\"timeStampFormat\":\"epoch\",\"isEpochTimeFormat\":true,\"startFrom\":\"2019-03-01 15:46:33\",\"loggingSetting\":{\"logLevel\":\"WARN\",\"maxBytes\":5000000,\"backupCount\":1000},\"osversion\":\"windows\",\"agentVersion\":\"v6.0\",\"toolName\":\"JENKINS\"}";
 	public static String rabbitMQGITTestPlayload = "{\"data\": [{\"inSightsTime\": 1539497182, \"execId\": \"5f84de70-ee48-11e9-b674-020c9a7827b8\", \"categoryName\": \"SCM\", \"jiraKey\": \"LS-7345942999\", \"toolName\": \"GIT\", \"commitId\": \"CM-7569369619\", \"inSightsTimeX\": \"2018-10-14T06:06:22Z\", \"gitCommitId\": \"2YW2jPX3ve45xWaTjjPxUC2lS9D7d0bK\", \"gitAuthorName\": \"Mayank\", \"gitReponame\": \"InsightsTest\", \"gitCommiTime\": \"2018-10-14T06:06:22Z\", \"message\": \"This commit is associated with jira-key : LS-7345942999\", \"repoName\": \"InsightsTest\"}], \"metadata\": {\"labels\": [\"GIT5\"]}}";
@@ -77,11 +82,9 @@ public class EngineTestData {
 			connection = factory.newConnection();
 			channel = connection.createChannel();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			log.error(e);
 		} catch (TimeoutException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			log.error(e);
 		}
 
 		String message = new GsonBuilder().disableHtmlEscaping().create().toJson(playload);
@@ -107,7 +110,7 @@ public class EngineTestData {
 				channel.basicPublish(exchangeName, routingKey, null, message.getBytes());
 				connection.close();
 			} catch (IOException e1) {
-				e1.printStackTrace();
+				log.error(e1);
 			}
 
 		}
@@ -140,7 +143,7 @@ public class EngineTestData {
 	    map = gson.fromJson(finalJson, Map.class);
 		}
 		catch (GraphDBException e) {
-         e.printStackTrace();		
+			log.error(e);
 		} 
 		return map;				
 	  

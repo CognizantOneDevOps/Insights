@@ -102,7 +102,6 @@ public class Application {
 				TimerTask blockChainTimer = (TimerTask) blockChainProcessingTrigger.newInstance();
 				timerBlockChainProcessing.schedule(blockChainTimer, 0, 
 								ApplicationConfigProvider.getInstance().getSchedulerConfigData().getAuditEngineInterval() * 60 * 1000);
-	
 				// Schedule the jira executor job
 				Timer timerJiraProcessing = new Timer("JiraProcessingExecutor");
 				Class jiraProcessingTrigger = Class.forName(
@@ -110,8 +109,12 @@ public class Application {
 				TimerTask jiraProcessingTimer = (TimerTask) jiraProcessingTrigger.newInstance();
 				timerJiraProcessing.schedule(jiraProcessingTimer, 0, 
 								ApplicationConfigProvider.getInstance().getSchedulerConfigData().getAuditEngineInterval() * 1000);
-				
+				EngineStatusLogger.getInstance().createAuditStatusNode("Platform AuditEngine Service started ",
+						PlatformServiceConstants.SUCCESS);
 			} catch(ClassNotFoundException e) {
+				EngineStatusLogger.getInstance().createAuditStatusNode(
+						"Platform AuditEngine Service not running as it is not subscribed " + e.getMessage(),
+						PlatformServiceConstants.FAILURE);
 				log.error(e);
 			} catch(Exception e) {
 				EngineStatusLogger.getInstance().createAuditStatusNode("Platform AuditEngine Service not running " + e.getMessage(), 
@@ -131,12 +134,16 @@ public class Application {
 				TimerTask webHookTimer = (TimerTask) webhookAggregatorTrigger.newInstance();
 				timerWebhookEngineJobExecutorModule.schedule(webHookTimer, 0, 
 						ApplicationConfigProvider.getInstance().getSchedulerConfigData().getWebhookEngineInterval() * 60 * 1000);
-		
+				EngineStatusLogger.getInstance().createWebhookEngineStatusNode(
+						"Platform WebhookEngine Service started. ", PlatformServiceConstants.SUCCESS);
 			} catch(ClassNotFoundException e) { 
+				EngineStatusLogger.getInstance().createWebhookEngineStatusNode(
+						"Platform WebhookEngine Service not running as it is not subscribed " + e.getMessage(),
+						PlatformServiceConstants.FAILURE);
 				log.error(e);
 			} catch(Exception e) {
 				EngineStatusLogger.getInstance().createWebhookEngineStatusNode("Platform WebhookEngine Service not running " + e.getMessage(),
-					  																							PlatformServiceConstants.FAILURE);
+						PlatformServiceConstants.FAILURE);
 				log.error(e);
 			}
 		}

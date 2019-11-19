@@ -96,7 +96,7 @@ public class JiraProcessingExecutor extends TimerTask {
         } catch (GraphDBException | IOException e) {
             LOG.error("Error occured while loading the destination data ", e);
         } catch (Exception e) {
-            e.printStackTrace();
+			LOG.error(e);
         }
 
     }
