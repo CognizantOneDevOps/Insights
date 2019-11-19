@@ -20,13 +20,8 @@ import java.util.Iterator;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.cognizant.devops.platformcommons.constants.ErrorMessage;
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
@@ -304,11 +299,7 @@ public class HealthStatusServiceImpl implements HealthStatusService {
 	@Override
 	public GraphResponse loadHealthData(String label, String type, String agentId, int limitOfRow) {
 
-		//int limitOfRow = 1;
 		String query = "";
-		/*if (type.equalsIgnoreCase("Agents")) {
-			limitOfRow = 10;
-		}*/
 		if (agentId.equalsIgnoreCase("")) {
 			query = "MATCH (n:" + label
 					+ ") where n.inSightsTime IS NOT NULL RETURN n order by n.inSightsTime DESC LIMIT " + limitOfRow;

@@ -23,6 +23,11 @@ import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.Map;
 import java.util.concurrent.TimeoutException;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import com.cognizant.devops.engines.platformauditing.blockchaindatacollection.modules.blockchainprocessing.JiraProcessingExecutor;
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.config.MessageQueueDataModel;
 import com.cognizant.devops.platformcommons.constants.MessageConstants;
@@ -44,6 +49,7 @@ public class EngineTestData {
 	/*
 	 * Webhook test data
 	 */
+	private static Logger LOG = LogManager.getLogger(EngineTestData.class);
 
 	public static String responseTemplate = "head_commit.id=commitId,head_commit.message=message,head_commit.timestamp=commitTime,head_commit.author.name=authorName";
 	public static String toolName = "GIT";
@@ -106,7 +112,7 @@ public class EngineTestData {
 				channel.basicPublish(exchangeName, routingKey, null, message.getBytes());
 				connection.close();
 			} catch (IOException e1) {
-				e1.printStackTrace();
+				LOG.error(e1);
 			}
 
 		}
@@ -135,7 +141,7 @@ public class EngineTestData {
 	    map = gson.fromJson(finalJson, Map.class);
 		}
 		catch (GraphDBException e) {
-         e.printStackTrace();		
+			LOG.error(e);
 		} 
 		return map;				
 	}

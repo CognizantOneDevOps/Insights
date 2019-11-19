@@ -89,7 +89,7 @@ public class ChaincodeEventCapture {
                             //Logger.getLogger(ChaincodeEventCapture.class.getName()).log(Level.INFO, (j + " second"));
                             Thread.sleep(100); // wait for the events for one tenth of second.
                         } catch (InterruptedException e) {
-                            e.printStackTrace();
+							LOG.error(e);
                         }
                     }
                 }
