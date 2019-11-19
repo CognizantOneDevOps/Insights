@@ -66,10 +66,10 @@ public class WebHookEngineAggregatorModule extends TimerTask {
 					registry.put(dataRoutingKey, new WebHookDataSubscriber(dataRoutingKey, responseTemplate, toolName,
 							labelName, webhookName));
 					log.debug("Webhook {} subscribed successfully ", webhookName);
-					EngineStatusLogger.getInstance().createEngineStatusNode(
+					EngineStatusLogger.getInstance().createWebhookEngineStatusNode(
 							"Webhook " + webhookName + " subscribed successfully ", PlatformServiceConstants.SUCCESS);
 				} catch (Exception e) {
-					EngineStatusLogger.getInstance().createEngineStatusNode(
+					EngineStatusLogger.getInstance().createWebhookEngineStatusNode(
 							"Unable to subscribed Webhook " + webhookName + " Error Detail :" + e.getMessage(),
 							PlatformServiceConstants.FAILURE);
 					log.error("Unable to add subscriber for routing key: " + e);
@@ -77,7 +77,7 @@ public class WebHookEngineAggregatorModule extends TimerTask {
 				}
 			}
 		} catch (Exception e) {
-			EngineStatusLogger.getInstance().createEngineStatusNode(
+			EngineStatusLogger.getInstance().createWebhookEngineStatusNode(
 					"Unable to subscribed Webhook " + webhookName + " Error Detail :" + e.getMessage(),
 					PlatformServiceConstants.FAILURE);
 			log.error("Unable to add subscriber for routing key: " + e);
