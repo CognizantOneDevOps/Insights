@@ -21,8 +21,24 @@
     position: relative;
     padding:0px;
 }
-
 .mat-card-content>:first-child, .mat-card>:first-child {
     margin-top: 0;
+}
+.border iframe {
+    border: none;
+    margin: 0;
+    padding: 0;
+    opacity: 0.8;
+    display:block; /* Add this */
+}
+
+.iframeCss {
+    overflow-y:auto !important;
+    overflow-x: hidden !important;
+    border-width: 0px !important;
+    border-style:hidden !important;
+    border-color:unset;
+    border-image: unset;
+    display:block;
 }
 

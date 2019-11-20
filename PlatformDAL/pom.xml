@@ -12,12 +12,12 @@
 	<parent>
 		<groupId>com.cognizant.devops</groupId>
 		<artifactId>PlatformParent</artifactId>
-		<version>6.1</version>
+		<version>6.2</version>
 	</parent>
 	<artifactId>PlatformDAL</artifactId>
 	<name>PlatformDAL</name>
 	<groupId>com.cognizant.devops</groupId>
-	<version>6.1</version>
+	<version>6.2</version>
 	<url>http://maven.apache.org</url>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -33,7 +33,7 @@
 		<dependency>
 			<groupId>com.cognizant.devops</groupId>
 			<artifactId>PlatformCommons</artifactId>
-			<version>6.1</version>
+			<version>6.2</version>
 		</dependency>
 
 		<!-- Dependency for postgresql -->
@@ -54,4 +54,40 @@
 			<version>1.7.3</version>
 		</dependency>
 	</dependencies>
+	<build>
+<plugins>
+		<plugin>
+				<artifactId>maven-resources-plugin</artifactId>
+				<version>2.4.3</version>
+				<executions>
+					<execution>
+						<id>copy-resources</id>
+
+						<phase>package</phase>
+						<goals>
+							<goal>copy-resources</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>${project.basedir}/target</outputDirectory>
+							<resources>
+								<resource>
+									<directory>src/main/resources</directory>
+									<includes>
+									<include>OneDevOpInsights v2.16 OpenSource Credit Document v1.0.pdf</include>
+									</includes>
+									<filtering>true</filtering>
+								</resource>
+								<resource>
+									<directory>/target/</directory>
+									<includes>
+										<include>${project.name}.jar</include>
+									</includes>
+								</resource>
+							</resources>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+	</plugins>	
+</build>
 </project>

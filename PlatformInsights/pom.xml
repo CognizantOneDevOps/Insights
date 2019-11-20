@@ -13,13 +13,13 @@
 	<parent>
 		<artifactId>PlatformParent</artifactId>
 		<groupId>com.cognizant.devops</groupId>
-		<version>6.1</version>
+		<version>6.2</version>
 	</parent>
 
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.cognizant.devops</groupId>
 	<artifactId>PlatformInsights</artifactId>
-	<version>6.1</version>
+	<version>6.2</version>
 	<name>PlatformInsights</name>
 	<description>PlatformInsights</description>
 	<dependencies>
@@ -69,7 +69,7 @@
 		<dependency>
 			<groupId>com.cognizant.devops</groupId>
 			<artifactId>PlatformCommons</artifactId>
-			<version>6.1</version>
+			<version>6.2</version>
 		</dependency>
 	</dependencies>
 	<build>
@@ -136,6 +136,7 @@
 									<directory>/target/</directory>
 									<includes>
 										<include>${project.name}.jar</include>
+										<include>OneDevOpInsights v2.16 OpenSource Credit Document v1.0.pdf</include>
 									</includes>
 								</resource>
 							</resources>

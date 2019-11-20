@@ -1,4 +1,4 @@
-env.dockerimagename="devopsbasservice/buildonframework:insightsPUI3-Doxygen"
+env.dockerimagename="devopsbasservice/buildonframework:insightsPUI3-JenkinsUpgradeV201"
 node {
 
 	//Parse commitID (E.g, buildon-abc1234 to abc1234)
@@ -110,7 +110,7 @@ node {
 		sh "cd /var/jenkins/jobs/$commitID/workspace/PlatformUI3 && mvn -B help:evaluate -Dexpression=project.version | grep -e '^[^[]' > /var/jenkins/jobs/$commitID/workspace/PlatformUI3/version"
        		pomUI3version=readFile("/var/jenkins/jobs/$commitID/workspace/PlatformUI3/version").trim()  
 		
-		if(pomversionService.contains("SNAPSHOT") && pomversionEngine.contains("SNAPSHOT") && pomversion.contains("SNAPSHOT") && pomUIversion.contains("SNAPSHOT") && pomUI3version.contains("SNAPSHOT")){
+		if(pomversionService.contains("SNAPSHOT") && pomversionEngine.contains("SNAPSHOT") && pomversion.contains("SNAPSHOT") && pomUI3version.contains("SNAPSHOT")){
 		
 			NEXUSREPO="https://repo.cogdevops.com/repository/buildonInsights"
 			
@@ -124,7 +124,7 @@ node {
 		sh "curl -s ${NEXUSREPO}/com/cognizant/devops/PlatformInsights/${pomversion}/maven-metadata.xml  | grep -oP '(?<=<artifactId>).*?(?=</artifactId>)|(?<=<version>).*?(?=</version>)|(?<=<timestamp>).*?(?=</timestamp>)|(?<=<buildNumber>).*?(?=</buildNumber>)|(?<=<classifier>).*?(?=</classifier>)' | paste -sd- - | sed 's/-SNAPSHOT//g' | sed 's/--/-/g' | sed 's/\$/.jar/' > /var/jenkins/jobs/$commitID/workspace/PlatformInsights/PI_artifact"
 		
 		//get artifact info (artifactID,classifier,timestamp, buildnumber,version) from maven-metadata.xml
-	   	sh "curl -s ${NEXUSREPO}/com/cognizant/devops/PlatformUI3/${pomUIversion}/maven-metadata.xml  | grep -oP '(?<=<artifactId>).*?(?=</artifactId>)|(?<=<version>).*?(?=</version>)|(?<=<timestamp>).*?(?=</timestamp>)|(?<=<buildNumber>).*?(?=</buildNumber>)|(?<=<classifier>).*?(?=</classifier>)' | paste -sd- - | sed 's/-SNAPSHOT//g' | sed 's/--/-/g' | sed 's/\$/.zip/' > /var/jenkins/jobs/$commitID/workspace/PlatformUI3/PUI3_artifact"		
+	   	sh "curl -s ${NEXUSREPO}/com/cognizant/devops/PlatformUI3/${pomUI3version}/maven-metadata.xml  | grep -oP '(?<=<artifactId>).*?(?=</artifactId>)|(?<=<version>).*?(?=</version>)|(?<=<timestamp>).*?(?=</timestamp>)|(?<=<buildNumber>).*?(?=</buildNumber>)|(?<=<classifier>).*?(?=</classifier>)' | paste -sd- - | sed 's/-SNAPSHOT//g' | sed 's/--/-/g' | sed 's/\$/.zip/' > /var/jenkins/jobs/$commitID/workspace/PlatformUI3/PUI3_artifact"		
 		
 		
 		} else {

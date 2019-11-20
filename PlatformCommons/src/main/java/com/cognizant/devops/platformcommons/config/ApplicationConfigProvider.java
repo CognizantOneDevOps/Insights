@@ -30,12 +30,12 @@ public class ApplicationConfigProvider implements Serializable {
 	private static ApplicationConfigProvider instance = new ApplicationConfigProvider();
 	private EndpointData endpointData = new EndpointData();
 	private SparkConfigurations sparkConfigurations = new SparkConfigurations();
-	//private LDAPConfiguration ldapConfiguration = new LDAPConfiguration();
+	// private LDAPConfiguration ldapConfiguration = new LDAPConfiguration();
 	private GraphData graph = new GraphData();
 	private GrafanaData grafana = new GrafanaData();
 	private MessageQueueDataModel messageQueue = new MessageQueueDataModel();
 	private String insightsServiceURL;
-	//private boolean disableAuth = false;
+	// private boolean disableAuth = false;
 	private String insightsTimeZone = "US/Central";
 	private PostgreData postgre;
 	private String userId;
@@ -45,15 +45,16 @@ public class ApplicationConfigProvider implements Serializable {
 	private Date refreshTime;
 	private List<String> trustedHosts = new ArrayList<String>(3);
 	private boolean enableOnlineDatatagging = false;
-	//private boolean enableNativeUsers = true;
-
 	private EmailConfiguration emailConfiguration = new EmailConfiguration();
 	private CorrelationConfig correlations;
 	private boolean enableFieldIndex;
 	private boolean enableOnlineBackup = false;
 	private AgentDetails agentDetails = new AgentDetails();
-
 	private QueryCache queryCache = new QueryCache();
+	private boolean enableAuditEngine = false;
+	private boolean enableWebHookEngine = false;
+	private SchedulerConfigData schedulerConfigData = new SchedulerConfigData();
+	private String driverLocation;
 
 	private ApplicationConfigProvider() {
 		this.refreshTime = new Date(new Date().getTime() - 86400000);
@@ -89,13 +90,12 @@ public class ApplicationConfigProvider implements Serializable {
 		this.sparkConfigurations = sparkConfigurations;
 	}
 
-	/*public LDAPConfiguration getLdapConfiguration() {
-		return ldapConfiguration;
-	}
-	
-	public void setLdapConfiguration(LDAPConfiguration ldapConfiguration) {
-		this.ldapConfiguration = ldapConfiguration;
-	}*/
+	/*
+	 * public LDAPConfiguration getLdapConfiguration() { return ldapConfiguration; }
+	 * 
+	 * public void setLdapConfiguration(LDAPConfiguration ldapConfiguration) {
+	 * this.ldapConfiguration = ldapConfiguration; }
+	 */
 
 	public MessageQueueDataModel getMessageQueue() {
 		return messageQueue;
@@ -121,13 +121,12 @@ public class ApplicationConfigProvider implements Serializable {
 		this.grafana = grafana;
 	}
 
-	/*public boolean isDisableAuth() {
-		return disableAuth;
-	}
-	
-	public void setDisableAuth(boolean disableAuth) {
-		this.disableAuth = disableAuth;
-	}*/
+	/*
+	 * public boolean isDisableAuth() { return disableAuth; }
+	 * 
+	 * public void setDisableAuth(boolean disableAuth) { this.disableAuth =
+	 * disableAuth; }
+	 */
 
 	public String getInsightsTimeZone() {
 		return insightsTimeZone;
@@ -201,13 +200,12 @@ public class ApplicationConfigProvider implements Serializable {
 		this.proxyPort = proxyPort;
 	}
 
-	/*public boolean isEnableNativeUsers() {
-		return enableNativeUsers;
-	}
-	
-	public void setEnableNativeUsers(boolean enableNativeUsers) {
-		this.enableNativeUsers = enableNativeUsers;
-	}*/
+	/*
+	 * public boolean isEnableNativeUsers() { return enableNativeUsers; }
+	 * 
+	 * public void setEnableNativeUsers(boolean enableNativeUsers) {
+	 * this.enableNativeUsers = enableNativeUsers; }
+	 */
 
 	public List<String> getTrustedHosts() {
 		return trustedHosts;
@@ -265,4 +263,35 @@ public class ApplicationConfigProvider implements Serializable {
 		this.enableOnlineDatatagging = enableOnlineDatatagging;
 	}
 
+	public SchedulerConfigData getSchedulerConfigData() {
+		return schedulerConfigData;
+	}
+
+	public void setSchedulerConfigData(SchedulerConfigData schedulerConfigData) {
+		this.schedulerConfigData = schedulerConfigData;
+	}
+
+	public boolean isEnableAuditEngine() {
+		return enableAuditEngine;
+	}
+
+	public void setEnableAuditEngine(boolean enableAuditEngine) {
+		this.enableAuditEngine = enableAuditEngine;
+	}
+
+	public boolean isEnableWebHookEngine() {
+		return enableWebHookEngine;
+	}
+
+	public void setEnableWebHookEngine(boolean enableWebHookEngine) {
+		this.enableWebHookEngine = enableWebHookEngine;
+	}
+
+	public String getDriverLocation() {
+		return driverLocation;
+	}
+
+	public void setDriverLocation(String driverLocation) {
+		this.driverLocation = driverLocation;
+	}
 }

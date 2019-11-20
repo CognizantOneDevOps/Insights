@@ -20,57 +20,60 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
-import com.cognizant.devops.platformservice.webhook.service.WebHookService;
+import com.cognizant.devops.platformservice.webhook.service.WebHookServiceImpl;
 
 @Test
 @ContextConfiguration(locations = { "classpath:spring-test-config.xml" })
-public class WebhookServiceTest extends WebHookService{
-	public static final WebHookService webhookServiceImp =
-			new WebHookService();
+public class WebhookServiceTest {
+	public static final WebHookServiceImpl webhookServiceImp = new WebHookServiceImpl();
 	public static final WebhookServiceTestData webhookTestData = new WebhookServiceTestData();
 
 	@Test(priority = 1, expectedExceptions = InsightsCustomException.class)
 	public void testsaveWebHookConfiguration() throws InsightsCustomException {
-		WebHookService webhookserviceImp = new WebHookService();
-		Boolean webhookcheck = webhookserviceImp.saveWebHookConfiguration("git_webhook",webhookTestData.toolName,webhookTestData.labelDisplay, webhookTestData.dataformat, webhookTestData.mqchannel, webhookTestData.subscribestatus, webhookTestData.responseTemplate);
+		Boolean webhookcheck = webhookServiceImp.saveWebHookConfiguration("git_webhook", webhookTestData.toolName,
+				webhookTestData.labelDisplay, webhookTestData.dataformat, webhookTestData.mqchannel,
+				webhookTestData.subscribestatus, webhookTestData.responseTemplate);
 		Boolean expectedOutcome = true;
 		Assert.assertEquals(webhookcheck, expectedOutcome);
 	}
 
 	@Test(priority = 2)
 	public void testsaveWebHookConfigurationWithoutException() throws InsightsCustomException {
-		WebHookService webhookserviceImp = new WebHookService();
-		Boolean webhookcheck = webhookserviceImp.saveWebHookConfiguration(webhookTestData.webhookname,webhookTestData.toolName,webhookTestData.labelDisplay, webhookTestData.dataformat, webhookTestData.mqchannel, webhookTestData.subscribestatus, webhookTestData.responseTemplate);
+		Boolean webhookcheck = webhookServiceImp.saveWebHookConfiguration(webhookTestData.webhookname,
+				webhookTestData.toolName, webhookTestData.labelDisplay, webhookTestData.dataformat,
+				webhookTestData.mqchannel, webhookTestData.subscribestatus, webhookTestData.responseTemplate);
 		Boolean expectedOutcome = true;
 		Assert.assertEquals(webhookcheck, expectedOutcome);
 	}
-	
+
 	@Test(priority = 3)
 	public void testgetRegisteredWebHooks() throws InsightsCustomException {
-		
-		Assert.assertFalse(webhookServiceImp.getRegisteredWebHooks().isEmpty());		
+
+		Assert.assertFalse(webhookServiceImp.getRegisteredWebHooks().isEmpty());
 	}
+
 	@Test(priority = 4)
-	public void testUninstallWebhook() throws InsightsCustomException{
-
-		String expectedOutCome = "SUCCESS"; 
-		String response = webhookServiceImp.uninstallWebhook(webhookTestData.webhookname);
-		Assert.assertEquals(expectedOutCome, response);
-		
-	}
-	@Test(priority = 5, expectedExceptions = InsightsCustomException.class)
-	public void testUninstallWebhookForException() throws InsightsCustomException{
-
-		String expectedOutCome =  "No entity found for query";
-		String response = webhookServiceImp.uninstallWebhook(webhookTestData.webhookname);
-		Assert.assertEquals(expectedOutCome, response);
-	}
-	@Test(priority = 6)
 	public void testupdateWebHookConfiguration() throws InsightsCustomException {
-		WebHookService webhookserviceImp = new WebHookService();
-		Boolean webhookcheck = webhookserviceImp.updateWebHook(webhookTestData.webhookname,webhookTestData.toolName,webhookTestData.labelDisplay, webhookTestData.dataformat, webhookTestData.mqchannel, webhookTestData.subscribestatus, "head_commit.message=message,head_commit.timestamp=commitTime");
+
+		Boolean webhookcheck = webhookServiceImp.updateWebHook(webhookTestData.webhookname, webhookTestData.toolName,
+				webhookTestData.labelDisplay, webhookTestData.dataformat, webhookTestData.mqchannel,
+				webhookTestData.subscribestatus, "head_commit.message=message,head_commit.timestamp=commitTime");
 		Assert.assertTrue(webhookcheck);
 	}
-	
-	
+
+	@Test(priority = 5)
+	public void testUninstallWebhook() throws InsightsCustomException {
+		String expectedOutCome = "SUCCESS";
+		String response = webhookServiceImp.uninstallWebhook(webhookTestData.webhookname);
+		Assert.assertEquals(expectedOutCome, response);
+
+	}
+
+	@Test(priority = 6, expectedExceptions = InsightsCustomException.class)
+	public void testUninstallWebhookForException() throws InsightsCustomException {
+		String expectedOutCome = "No entity found for query";
+		String response = webhookServiceImp.uninstallWebhook("12345fghj");
+		Assert.assertEquals(expectedOutCome, response);
+	}
+
 }

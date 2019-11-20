@@ -1,0 +1,17 @@
+gitAgentId=GITTEST8800
+jenkinsAgentId=JENKINSTEST8800
+gitToolName=GIT
+gitCategoryName=SCM
+gitCommitId=CM-7569369619
+gitDataNodeName=SCM:GIT:DATA
+jenkinsToolName=JENKINS
+jenkinsCategoryName=CI
+jenkinsCommitId=CM-7569369619
+jenkinsDataNodeName=CI:JENKINS:DATA
+jenkinsTogitRelationshipName=TEST_FROM_GIT_TO_JENKINS
+toolName=GIT
+gitwebhookCommitId=86ef096bb924674a69cd2198e2964b76aa75d88b
+webhookName=git_demo
+dataFormat=JSON
+nodeName=DATA
+compareFlag=commitId

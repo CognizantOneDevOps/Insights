@@ -6,14 +6,15 @@
 	under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES 
 	OR CONDITIONS OF ANY KIND, either express or implied. See the License for 
 	the specific language governing permissions and limitations under the License. -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<!-- adding a comment to test poll -6 -->
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.cognizant.devops</groupId>
 	<artifactId>PlatformParent</artifactId>
 	<packaging>pom</packaging>
-	<version>6.1</version>
+	<version>6.2</version>
 	<name>PlatformParent</name>
 
 	<dependencies>
@@ -27,7 +28,7 @@
 			<groupId>log4j</groupId>
 			<artifactId>log4j</artifactId>
 			<version>1.2.17</version>
-		</dependency>			
+		</dependency>
 		<dependency>
 			<groupId>org.apache.logging.log4j</groupId>
 			<artifactId>log4j-api</artifactId>
@@ -50,11 +51,10 @@
 		<module>PlatformDAL</module>
 		<module>PlatformService</module>
 		<module>PlatformEngine</module>
-		<module>PlatformUI3</module>
 		<module>PlatformInsights</module>
+		<module>PlatformUI3</module>
 	</modules>
-
-		<build>
+	<build>
 		<pluginManagement>
 			<plugins>
 				<plugin>
@@ -115,8 +115,7 @@
 						${project.basedir}/PlatformInsights
 						${project.basedir}/PlatformMockServer
 						${project.basedir}/PlatformService 
-						${project.basedir}/PlatformUI3
-						</input>
+						${project.basedir}/PlatformUI3</input>
 					<outputDirectory>${basedir}/DoxygenReport</outputDirectory>
 					<inlineSources>true</inlineSources>
 					<haveDot>true</haveDot>
@@ -143,44 +142,44 @@
 		<url>https://bitbucket.org/atlassian/stash-auto-unapprove-plugin</url>
 		<tag>InSights-2.11.0.0</tag>
 	</scm>
-	
+
 	<distributionManagement>
 		<repository> 
-						<id>nexus</id>                
-						<url>https://repo.cogdevops.com/repository/InsightsRelease</url> 
+			<id>nexus</id>                
+			<url>https://repo.cogdevops.com/repository/InsightsRelease</url> 
 		</repository>
 		<snapshotRepository>
-						<id>nexus</id>
-						<url>https://repo.cogdevops.com/repository/buildonInsights</url>
+			<id>nexus</id>
+			<url>https://repo.cogdevops.com/repository/buildonInsights</url>
 		</snapshotRepository>
 	</distributionManagement>
-	
+
 	<profiles>
 		<profile>
-                <id>NexusUpload</id>
-                <activation>
-                  <activeByDefault>false</activeByDefault>
-                </activation>             
+			<id>NexusUpload</id>
+			<activation>
+				<activeByDefault>false</activeByDefault>
+			</activation>
 
-                <build>
-                 <plugins>
-                        <plugin>
-                        <artifactId>maven-deploy-plugin</artifactId>
-                   <version>2.8.1</version>
-                   <executions>
-                          <execution>
-                                 <id>default-deploy</id>
-                                 <phase>deploy</phase>
-                                 <goals>
-                                        <goal>deploy</goal>
-                                 </goals>
-                          </execution>
-                   </executions>
+			<build>
+				<plugins>
+					<plugin>
+						<artifactId>maven-deploy-plugin</artifactId>
+						<version>2.8.1</version>
+						<executions>
+							<execution>
+								<id>default-deploy</id>
+								<phase>deploy</phase>
+								<goals>
+									<goal>deploy</goal>
+								</goals>
+							</execution>
+						</executions>
 
-                </plugin>
-                </plugins>
-                </build>
-        </profile>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
 		<profile>
 			<id>RunCobertura</id>
 			<activation>
@@ -212,6 +211,5 @@
 			</reporting>
 		</profile>
 	</profiles>
-
-
 </project>
+		

@@ -37,8 +37,7 @@ class GitLabAgent(BaseAgent):
         startFrom = self.config.get("startFrom", '')
         startFrom = parser.parse(startFrom)
         enableBranches = self.config.get("enableBranches", False)
-        enableCommitRelation = self.config.get("enableCommitRelation", False)
-        projects = self.getResponse(getProjectsUrl, 'GET', None, None, None)
+        enableCommitRelation = self.config.get("enableCommitRelation", False)        
         restricted_projects = self.config.get('dynamicTemplate', {}).get("restrictedProjects", None)
         getGroupsUrl = baseUrl+"/groups?private_token="+accessToken
         groups = self.getResponse(getGroupsUrl, 'GET', None, None, None)

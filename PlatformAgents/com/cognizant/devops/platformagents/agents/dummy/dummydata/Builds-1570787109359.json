@@ -1,0 +1,821 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": "-- Grafana --",
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "editable": true,
+  "gnetId": null,
+  "graphTooltip": 0,
+  "id": 2,
+  "links": [],
+  "panels": [
+    {
+      "datasource": "Neo4j",
+      "gridPos": {
+        "h": 8,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "happy_img": "public/plugins/Inference_panel/img/happy.svg",
+      "id": 15,
+      "links": [],
+      "open": false,
+      "primary": 103,
+      "sad_img": "public/plugins/Inference_panel/img/sad.svg",
+      "scrollable": true,
+      "showHoverChart": false,
+      "showNoDataMessage": "No Data Found",
+      "targets": [
+        {
+          "checkQuery": false,
+          "rawQuery": true,
+          "refId": "A"
+        }
+      ],
+      "textColor": "black",
+      "title": "Build Inference",
+      "type": "inference_panel"
+    },
+    {
+      "cacheTimeout": null,
+      "colorBackground": false,
+      "colorValue": false,
+      "colors": [
+        "#299c46",
+        "rgba(237, 129, 40, 0.89)",
+        "#d44a3a"
+      ],
+      "datasource": "Neo4j",
+      "format": "none",
+      "gauge": {
+        "maxValue": 100,
+        "minValue": 0,
+        "show": false,
+        "thresholdLabels": false,
+        "thresholdMarkers": true
+      },
+      "gridPos": {
+        "h": 7,
+        "w": 4,
+        "x": 0,
+        "y": 8
+      },
+      "id": 13,
+      "interval": null,
+      "links": [],
+      "mappingType": 1,
+      "mappingTypes": [
+        {
+          "name": "value to text",
+          "value": 1
+        },
+        {
+          "name": "range to text",
+          "value": 2
+        }
+      ],
+      "maxDataPoints": 100,
+      "nullPointMode": "connected",
+      "nullText": null,
+      "postfix": "",
+      "postfixFontSize": "50%",
+      "prefix": "",
+      "prefixFontSize": "50%",
+      "rangeMaps": [
+        {
+          "from": "null",
+          "text": "N/A",
+          "to": "null"
+        }
+      ],
+      "sparkline": {
+        "fillColor": "rgba(31, 118, 189, 0.18)",
+        "full": false,
+        "lineColor": "rgb(31, 120, 193)",
+        "show": false
+      },
+      "tableColumn": "",
+      "targets": [
+        {
+          "cacheVariance": 5,
+          "checkQuery": false,
+          "rawQuery": true,
+          "refId": "A",
+          "rescache": false,
+          "selectionval": "Variance Time",
+          "table": true,
+          "target": "MATCH (n:JENKINS:DATA) RETURN count(n.scmcommitId) as TotalCommits",
+          "timeSeries": true
+        }
+      ],
+      "thresholds": "",
+      "title": "Total Commits",
+      "type": "singlestat",
+      "valueFontSize": "80%",
+      "valueMaps": [
+        {
+          "op": "=",
+          "text": "N/A",
+          "value": "null"
+        }
+      ],
+      "valueName": "total"
+    },
+    {
+      "aliasColors": {},
+      "bars": false,
+      "dashLength": 10,
+      "dashes": false,
+      "datasource": "Neo4j",
+      "editable": true,
+      "error": false,
+      "fill": 1,
+      "gridPos": {
+        "h": 7,
+        "w": 20,
+        "x": 4,
+        "y": 8
+      },
+      "id": 2,
+      "interval": "1d",
+      "legend": {
+        "alignAsTable": true,
+        "avg": false,
+        "current": false,
+        "max": false,
+        "min": false,
+        "rightSide": true,
+        "show": true,
+        "total": true,
+        "values": true
+      },
+      "lines": true,
+      "linewidth": 1,
+      "links": [],
+      "nullPointMode": "connected",
+      "percentage": false,
+      "pointradius": 5,
+      "points": false,
+      "renderer": "flot",
+      "seriesOverrides": [],
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
+      "targets": [
+        {
+          "bucketAggs": [
+            {
+              "fake": true,
+              "field": "CommitUserName",
+              "id": "3",
+              "settings": {
+                "order": "asc",
+                "orderBy": "_term",
+                "size": "10"
+              },
+              "type": "terms"
+            },
+            {
+              "field": "inSightsTimeX",
+              "id": "2",
+              "settings": {
+                "interval": "auto",
+                "min_doc_count": 0,
+                "trimEdges": 0
+              },
+              "type": "date_histogram"
+            }
+          ],
+          "checkQuery": false,
+          "dsType": "elasticsearch",
+          "metrics": [
+            {
+              "field": "select field",
+              "id": "1",
+              "type": "count"
+            }
+          ],
+          "query": "_type:SCM",
+          "rawQuery": true,
+          "refId": "A",
+          "timeField": "inSightsTimeX"
+        }
+      ],
+      "thresholds": [],
+      "timeFrom": null,
+      "timeRegions": [],
+      "timeShift": null,
+      "title": "No. of Commits/Developer",
+      "tooltip": {
+        "msResolution": false,
+        "shared": true,
+        "sort": 0,
+        "value_type": "individual"
+      },
+      "type": "graph",
+      "xaxis": {
+        "buckets": null,
+        "mode": "time",
+        "name": null,
+        "show": true,
+        "values": []
+      },
+      "yaxes": [
+        {
+          "format": "short",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": true
+        },
+        {
+          "format": "short",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": true
+        }
+      ],
+      "yaxis": {
+        "align": false,
+        "alignLevel": null
+      }
+    },
+    {
+      "cacheTimeout": null,
+      "colorBackground": false,
+      "colorValue": false,
+      "colors": [
+        "#299c46",
+        "rgba(237, 129, 40, 0.89)",
+        "#d44a3a"
+      ],
+      "datasource": "Neo4j",
+      "format": "none",
+      "gauge": {
+        "maxValue": 100,
+        "minValue": 0,
+        "show": false,
+        "thresholdLabels": false,
+        "thresholdMarkers": true
+      },
+      "gridPos": {
+        "h": 7,
+        "w": 4,
+        "x": 0,
+        "y": 15
+      },
+      "id": 11,
+      "interval": null,
+      "links": [],
+      "mappingType": 1,
+      "mappingTypes": [
+        {
+          "name": "value to text",
+          "value": 1
+        },
+        {
+          "name": "range to text",
+          "value": 2
+        }
+      ],
+      "maxDataPoints": 100,
+      "nullPointMode": "connected",
+      "nullText": null,
+      "postfix": "",
+      "postfixFontSize": "50%",
+      "prefix": "",
+      "prefixFontSize": "50%",
+      "rangeMaps": [
+        {
+          "from": "null",
+          "text": "N/A",
+          "to": "null"
+        }
+      ],
+      "sparkline": {
+        "fillColor": "rgba(31, 118, 189, 0.18)",
+        "full": false,
+        "lineColor": "rgb(31, 120, 193)",
+        "show": false
+      },
+      "tableColumn": "",
+      "targets": [
+        {
+          "bucketAggs": [
+            {
+              "field": "inSightsTimeX",
+              "id": "2",
+              "settings": {
+                "interval": "auto",
+                "min_doc_count": 0,
+                "trimEdges": 0
+              },
+              "type": "date_histogram"
+            }
+          ],
+          "cacheVariance": 5,
+          "checkQuery": false,
+          "metrics": [
+            {
+              "field": "CommitUserID",
+              "id": "1",
+              "meta": {},
+              "settings": {},
+              "type": "count"
+            }
+          ],
+          "query": "_type:SPKDATA AND SPKtoolName:JENKINS",
+          "rawQuery": true,
+          "refId": "A",
+          "rescache": false,
+          "selectionval": "Variance Time",
+          "table": true,
+          "target": "MATCH (n:JENKINS:DATA) RETURN count(n.buildNumber) as TotalCommits",
+          "timeField": "inSightsTimeX",
+          "timeSeries": true
+        }
+      ],
+      "thresholds": "",
+      "title": "Total Builds",
+      "type": "singlestat",
+      "valueFontSize": "80%",
+      "valueMaps": [
+        {
+          "op": "=",
+          "text": "N/A",
+          "value": "null"
+        }
+      ],
+      "valueName": "total"
+    },
+    {
+      "cacheTimeout": null,
+      "colorBackground": false,
+      "colorValue": true,
+      "colors": [
+        "#299c46",
+        "#1f78c1",
+        "#d44a3a"
+      ],
+      "datasource": "Neo4j",
+      "format": "none",
+      "gauge": {
+        "maxValue": 100,
+        "minValue": 0,
+        "show": false,
+        "thresholdLabels": false,
+        "thresholdMarkers": true
+      },
+      "gridPos": {
+        "h": 7,
+        "w": 4,
+        "x": 4,
+        "y": 15
+      },
+      "id": 12,
+      "interval": null,
+      "links": [],
+      "mappingType": 1,
+      "mappingTypes": [
+        {
+          "name": "value to text",
+          "value": 1
+        },
+        {
+          "name": "range to text",
+          "value": 2
+        }
+      ],
+      "maxDataPoints": 100,
+      "nullPointMode": "connected",
+      "nullText": null,
+      "postfix": "",
+      "postfixFontSize": "50%",
+      "prefix": "",
+      "prefixFontSize": "50%",
+      "rangeMaps": [
+        {
+          "from": "null",
+          "text": "N/A",
+          "to": "null"
+        }
+      ],
+      "sparkline": {
+        "fillColor": "rgba(31, 118, 189, 0.18)",
+        "full": false,
+        "lineColor": "rgb(31, 120, 193)",
+        "show": false
+      },
+      "tableColumn": "",
+      "targets": [
+        {
+          "bucketAggs": [
+            {
+              "field": "inSightsTimeX",
+              "id": "2",
+              "settings": {
+                "interval": "auto",
+                "min_doc_count": 0,
+                "trimEdges": 0
+              },
+              "type": "date_histogram"
+            }
+          ],
+          "cacheVariance": 5,
+          "checkQuery": false,
+          "hide": false,
+          "metrics": [
+            {
+              "field": "CommitUserID",
+              "id": "1",
+              "meta": {},
+              "settings": {},
+              "type": "count"
+            }
+          ],
+          "query": "_type:SPKDATA AND SPKtoolName:JENKINS",
+          "rawQuery": true,
+          "refId": "A",
+          "rescache": false,
+          "selectionval": "Variance Time",
+          "target": "match (n:JENKINS) where n.toolName=\"JENKINS\" return ceil(avg(toInt(n.duration/60))) as AvgTimeInSecs",
+          "timeField": "inSightsTimeX",
+          "timeSeries": true
+        }
+      ],
+      "thresholds": "",
+      "title": "Average Build Time(s)",
+      "type": "singlestat",
+      "valueFontSize": "80%",
+      "valueMaps": [
+        {
+          "op": "=",
+          "text": "N/A",
+          "value": "null"
+        }
+      ],
+      "valueName": "total"
+    },
+    {
+      "aliasColors": {},
+      "bars": false,
+      "dashLength": 10,
+      "dashes": false,
+      "datasource": "Neo4j",
+      "editable": true,
+      "error": false,
+      "fill": 1,
+      "gridPos": {
+        "h": 7,
+        "w": 16,
+        "x": 8,
+        "y": 15
+      },
+      "id": 6,
+      "legend": {
+        "alignAsTable": true,
+        "avg": false,
+        "current": false,
+        "max": false,
+        "min": false,
+        "rightSide": true,
+        "show": true,
+        "total": true,
+        "values": true
+      },
+      "lines": true,
+      "linewidth": 1,
+      "links": [],
+      "nullPointMode": "connected",
+      "percentage": false,
+      "pointradius": 5,
+      "points": false,
+      "renderer": "flot",
+      "seriesOverrides": [],
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
+      "targets": [
+        {
+          "checkQuery": false,
+          "refId": "A"
+        }
+      ],
+      "thresholds": [],
+      "timeFrom": null,
+      "timeRegions": [],
+      "timeShift": null,
+      "title": "Build Frequency",
+      "tooltip": {
+        "msResolution": false,
+        "shared": true,
+        "sort": 0,
+        "value_type": "individual"
+      },
+      "type": "graph",
+      "xaxis": {
+        "buckets": null,
+        "mode": "time",
+        "name": null,
+        "show": true,
+        "values": []
+      },
+      "yaxes": [
+        {
+          "format": "short",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": true
+        },
+        {
+          "format": "short",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": true
+        }
+      ],
+      "yaxis": {
+        "align": false,
+        "alignLevel": null
+      }
+    },
+    {
+      "datasource": "Neo4j",
+      "editable": true,
+      "error": false,
+      "gridPos": {
+        "h": 7,
+        "w": 18,
+        "x": 0,
+        "y": 22
+      },
+      "id": 8,
+      "insightsPanelData": {
+        "chartOptions": {
+          "backgroundColor": {
+            "fill": "#fbfbfb"
+          },
+          "booleanRole": "certainty",
+          "hAxis": {
+            "maxValue": null,
+            "minValue": null,
+            "useFormatFromData": true,
+            "viewWindow": null,
+            "viewWindowMode": null
+          },
+          "height": 218,
+          "isStacked": false,
+          "legacyScatterChartLabels": true,
+          "legend": "right",
+          "series": {
+            "0": {
+              "color": "#cc4125"
+            },
+            "1": {
+              "color": "#6aa84f"
+            }
+          },
+          "vAxes": [
+            {
+              "maxValue": null,
+              "minValue": null,
+              "useFormatFromData": true,
+              "viewWindow": {
+                "max": null,
+                "min": null
+              }
+            },
+            {
+              "maxValue": null,
+              "minValue": null,
+              "useFormatFromData": true,
+              "viewWindow": {
+                "max": null,
+                "min": null
+              }
+            }
+          ],
+          "width": "100%"
+        },
+        "chartType": "ColumnChart",
+        "insightsChartEditorModel": {
+          "joinInstructions": "return google.visualization.data.join(dataTables[0], dataTables[1], 'full', [[0, 0]], [1], [1]);",
+          "targets": [
+            {
+              "columnModel": [
+                {
+                  "name": "inSightsTimeX",
+                  "type": "date"
+                },
+                {
+                  "name": "Failed",
+                  "type": "number"
+                }
+              ],
+              "id": "A"
+            },
+            {
+              "columnModel": [
+                {
+                  "name": "inSightsTimeX",
+                  "type": "date"
+                },
+                {
+                  "name": "Success",
+                  "type": "number"
+                }
+              ],
+              "id": "B"
+            },
+            {
+              "columnModel": [
+                {
+                  "name": "inSightsTimeX",
+                  "type": "date"
+                },
+                {
+                  "name": "Abort",
+                  "type": "number"
+                }
+              ],
+              "id": "C"
+            }
+          ],
+          "transformInstrctions": "var formatter3 = new google.visualization.DateFormat({ pattern: \"dd-MMM-yy\" });\nvar testFunction = function (val) {\n        return new Date(formatter3.formatValue(val));\n};\nvar result = google.visualization.data.group(data,\n        [{ column: 0, modifier: testFunction, type: 'date' }],\n        [{ 'column': 1, 'aggregation': google.visualization.data.sum, 'type': 'number' },\n        { 'column': 2, 'aggregation': google.visualization.data.sum, 'type': 'number' }]);\nreturn result;"
+        }
+      },
+      "links": [],
+      "targets": [
+        {
+          "checkQuery": false,
+          "hide": false,
+          "rawQuery": true,
+          "refId": "B",
+          "table": false,
+          "target": "match (n:JENKINS) where n.status=\"Success\" AND n.toolName=\"JENKINS\" return n.inSightsTimeX as inSightsTimeX, count(n) as Success order by  inSightsTimeX",
+          "timeSeries": false
+        },
+        {
+          "checkQuery": false,
+          "rawQuery": true,
+          "refId": "A",
+          "table": false,
+          "target": "match (n:JENKINS) where n.status=\"Failure\" AND n.toolName=\"JENKINS\" return n.inSightsTimeX as inSightsTimeX, count(n) as Failed order by  inSightsTimeX",
+          "timeSeries": false
+        },
+        {
+          "rawQuery": true,
+          "refId": "C",
+          "table": false,
+          "target": "match (n:JENKINS) where n.status=\"Aborted\" AND n.toolName=\"JENKINS\" return n.inSightsTimeX as inSightsTimeX, count(n) as Abort order by  inSightsTimeX",
+          "timeSeries": false
+        }
+      ],
+      "title": "Build Success vs Failure",
+      "type": "insightscharts"
+    },
+    {
+      "datasource": "Neo4j",
+      "editable": true,
+      "error": false,
+      "gridPos": {
+        "h": 7,
+        "w": 6,
+        "x": 18,
+        "y": 22
+      },
+      "id": 9,
+      "insightsPanelData": {
+        "chartOptions": {
+          "backgroundColor": {
+            "fill": "#fbfbfb"
+          },
+          "booleanRole": "certainty",
+          "hAxis": {
+            "maxValue": null,
+            "minValue": null,
+            "useFormatFromData": true,
+            "viewWindow": {
+              "max": null,
+              "min": null
+            }
+          },
+          "height": 218,
+          "is3D": false,
+          "legacyScatterChartLabels": true,
+          "pieHole": 0,
+          "vAxes": [
+            {
+              "maxValue": null,
+              "minValue": null,
+              "useFormatFromData": true,
+              "viewWindow": {
+                "max": null,
+                "min": null
+              }
+            },
+            {
+              "maxValue": null,
+              "minValue": null,
+              "useFormatFromData": true,
+              "viewWindow": {
+                "max": null,
+                "min": null
+              }
+            }
+          ],
+          "width": "100%"
+        },
+        "chartType": "PieChart",
+        "insightsChartEditorModel": {
+          "targets": [
+            {
+              "columnModel": [
+                {
+                  "name": "Status",
+                  "type": "string"
+                },
+                {
+                  "name": "Count",
+                  "type": "number"
+                }
+              ],
+              "id": "A"
+            }
+          ]
+        }
+      },
+      "links": [],
+      "targets": [
+        {
+          "cacheVariance": 5,
+          "checkQuery": false,
+          "rawQuery": true,
+          "refId": "A",
+          "rescache": false,
+          "selectionval": "Variance Time",
+          "target": "match (n:DATA)  where n.toolName=\"JENKINS\" return DISTINCT n.status as Status,count(n) as Count"
+        }
+      ],
+      "title": "Build Status",
+      "type": "insightscharts"
+    }
+  ],
+  "refresh": false,
+  "schemaVersion": 18,
+  "style": "dark",
+  "tags": [],
+  "templating": {
+    "list": []
+  },
+  "time": {
+    "from": "now-1y",
+    "to": "now"
+  },
+  "timepicker": {
+    "refresh_intervals": [
+      "5s",
+      "10s",
+      "30s",
+      "1m",
+      "5m",
+      "15m",
+      "30m",
+      "1h",
+      "2h",
+      "1d"
+    ],
+    "time_options": [
+      "5m",
+      "15m",
+      "1h",
+      "6h",
+      "12h",
+      "24h",
+      "2d",
+      "7d",
+      "30d"
+    ]
+  },
+  "timezone": "browser",
+  "title": "Builds",
+  "uid": "X8hPcLtik",
+  "version": 14
+}

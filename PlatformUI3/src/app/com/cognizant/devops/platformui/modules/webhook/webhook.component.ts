@@ -332,13 +332,12 @@ export class WebHookComponent implements OnInit {
                             console.log(JSON.stringify(webhookAPIRequestJson))
                             this.webhookService.updateforWebHook(JSON.stringify(webhookAPIRequestJson))
                                 .then(function (data) {
-                                    console.log("WeBhook " + data.status);
                                     if (data.status == "success") {
                                         self.messageDialog.showApplicationsMessage("Changes made to <b>" + webhookName + "</b> are saved successfully.", "SUCCESS");
                                         self.list();
                                         self.radioRefresh = false;
                                     } else {
-                                        self.messageDialog.showApplicationsMessage("Failed to save Webhook", "ERROR");
+                                        self.messageDialog.showApplicationsMessage("Failed to save Webhook.Please check logs.", "ERROR");
                                     }
                                 })
                         }
@@ -369,9 +368,13 @@ export class WebHookComponent implements OnInit {
                                     } else if (response.message == "Webhook name already exists.") {
                                         self.messageDialog.showApplicationsMessage("<b>" + webhookName + "</b> already exists. Please try again with a new name.", "ERROR");
                                     }
+                                    else if (response.message == "Incorrect Response Template") {
+                                        //self.list();
+                                        self.messageDialog.showApplicationsMessage("Incorrect Response Template.", "ERROR");
+                                    }
                                     else {
                                         //self.list();
-                                        self.messageDialog.showApplicationsMessage("Failed to save the webhook", "ERROR");
+                                        self.messageDialog.showApplicationsMessage("Failed to save the webhook.Please check logs.", "ERROR");
                                     }
                                 })
                         }

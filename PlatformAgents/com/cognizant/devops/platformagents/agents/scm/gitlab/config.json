@@ -14,7 +14,9 @@
 		"health" : "SCM.GITLAB.HEALTH"
 	},
 	"communication":{
-		"type" : "REST" 
+		"type" : "REST", 
+		"sslVerify": true,
+    	"responseType": "JSON"
 	},
         "dynamicTemplate": {
 	"restrictedProjects" : ["projects_name"],
@@ -77,9 +79,9 @@
 	"runSchedule" : 30,
 	"timeStampField" : "commitTime",
 	"timeStampFormat" :"%Y-%m-%dT%H:%M:%S.",
-	"StartFrom" : "2017-03-03 15:46:33",
-	"AccessToken" : "",
-	"GetProjects" : "",
+	"startFrom" : "2017-03-03 15:46:33",
+	"accessToken" : "",
+	"getProjects" : "",
 	"isDebugAllowed" : false,
 	
 	"loggingSetting" : {

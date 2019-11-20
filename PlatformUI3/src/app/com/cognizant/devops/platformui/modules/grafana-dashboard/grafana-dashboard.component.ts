@@ -48,14 +48,16 @@ export class GrafanaDashboardComponent implements OnInit {
     constructor(private route: ActivatedRoute, private router: Router,
         private sanitizer: DomSanitizer, private grafanadashboardservice: GrafanaDashboardService, private cookieService: CookieService) {
         var self = this;
-        this.framesize = window.frames.innerHeight;
-
+        var offset = 1; // 5px is app-grafana-dashboard height true 5
+        this.framesize = window.frames.innerHeight; //- offset
+        console.log(" self.framesize inner height " + self.framesize);
         var receiveMessage = function (evt) {
             var height = parseInt(evt.data);
             if (!isNaN(height)) {
                 self.framesize = (evt.data + 20);
             }
         }
+        console.log(" self.framesize " + self.framesize);
         window.addEventListener('message', receiveMessage, false);
     }
 
@@ -74,7 +76,7 @@ export class GrafanaDashboardComponent implements OnInit {
 
     setScrollBarPosition() {
         var self = this;
-        //console.log("In scroll function ");
+        console.log("In scroll function ");
         this.framesize = window.frames.innerHeight;
         var receiveMessage = function (evt) {
             var height = parseInt(evt.data);
@@ -116,10 +118,8 @@ export class GrafanaDashboardComponent implements OnInit {
             //console.log("No dashboard found");
         }
         //console.log("parseDashboards complate 1")
-
-        //console.log(this.selectedDashboard);
+        console.log(this.selectedDashboard);
         if (this.selectedDashboard != undefined) {
-
             this.selectedDashboard.iframeUrl = this.selectedDashboard.iframeUrl.replace("iSight.js", "iSight_ui3.js");
             this.dashboardUrl = this.sanitizer.bypassSecurityTrustResourceUrl(this.selectedDashboard.iframeUrl);
         } else {
@@ -127,7 +127,7 @@ export class GrafanaDashboardComponent implements OnInit {
             //console.log("No dashboard found,set default dashboardUrl");
         }
         //console.log(this.dashboardUrl);
-        this.setScrollBarPosition();
+        // this.setScrollBarPosition();
         //console.log("parseDashboards complate 11")
     }
 
@@ -138,7 +138,7 @@ export class GrafanaDashboardComponent implements OnInit {
         //console.log(self.dashboardTitle);
         //if (dashboard.dashboardUrl) {
         self.selectedDashboard.iframeUrl = dashboard.iframeUrl;
-        self.setScrollBarPosition();
+        //self.setScrollBarPosition();
         //}
         //console.log(self.selectedDashboard.iframeUrl);
     };

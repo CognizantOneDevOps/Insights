@@ -32,7 +32,7 @@ import com.cognizant.devops.platformcommons.core.util.ValidationUtils;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformservice.rest.util.PlatformServiceUtil;
 import com.cognizant.devops.platformservice.webhook.service.WebHookConfigTO;
-import com.cognizant.devops.platformservice.webhook.service.WebHookService;
+import com.cognizant.devops.platformservice.webhook.service.WebHookServiceImpl;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
@@ -41,7 +41,7 @@ import com.google.gson.JsonParser;
 public class WebHookController {
 	static Logger log = LogManager.getLogger(WebHookController.class.getName());
 	@Autowired
-	WebHookService webhookConfigurationService;
+	WebHookServiceImpl webhookConfigurationService;
 
 	@RequestMapping(value = "/saveWebhook", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 	public @ResponseBody JsonObject saveWebhook(@RequestBody String registerWebhookJson) {
@@ -59,8 +59,14 @@ public class WebHookController {
 			Boolean result = webhookConfigurationService.saveWebHookConfiguration(webhookName, toolName, labelDisplay,
 					dataformat, mqchannel, statussubscribe, responseTemplate);
 			return PlatformServiceUtil.buildSuccessResponse();
+		} catch (ArrayIndexOutOfBoundsException e) {
+			return PlatformServiceUtil.buildFailureResponse("Incorrect Response Template");
 		} catch (InsightsCustomException e) {
-			return PlatformServiceUtil.buildFailureResponse("Webhook name already exists.");
+			if (e.getMessage() == "Incorrect Response template") {
+				return PlatformServiceUtil.buildFailureResponse("Incorrect Response Template");
+			} else {
+				return PlatformServiceUtil.buildFailureResponse("Webhook name already exists.");
+			}
 		} catch (Exception e) {
 			return PlatformServiceUtil
 					.buildFailureResponse("Unable to save or update Setting Configuration for the request");
@@ -106,7 +112,7 @@ public class WebHookController {
 
 			Boolean result = webhookConfigurationService.updateWebHook(webhookName, toolName, labelDisplay, dataformat,
 					mqchannel, statussubscribe, responseTemplate);
-			if(result==false) {
+			if (result == false) {
 				return PlatformServiceUtil.buildFailureResponse("Update Failed.");
 			}
 		} catch (InsightsCustomException e) {

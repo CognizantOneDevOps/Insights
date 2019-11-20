@@ -30,7 +30,8 @@ export class PlaylistComponent implements OnInit {
   constructor(private restCallHandlerService: RestCallHandlerService, private sanitizer: DomSanitizer) {
     var self = this;
     self.setScrollBarPosition();
-    this.framesize = window.frames.innerHeight;
+    var offset = 1; // 5 5px is app-grafana-dashboard height
+    this.framesize = window.frames.innerHeight; //- offset
 
     var receiveMessage = function (evt) {
       var height = parseInt(evt.data);
@@ -41,7 +42,6 @@ export class PlaylistComponent implements OnInit {
     window.addEventListener('message', receiveMessage, false);
     console.log(this.framesize);
     self.playListUrl = sanitizer.bypassSecurityTrustResourceUrl(InsightsInitService.grafanaHost + '/dashboard/script/iSight_ui3.js?url=' + InsightsInitService.grafanaHost + '/playlists');
-
   }
 
   setScrollBarPosition() {
@@ -61,7 +61,7 @@ export class PlaylistComponent implements OnInit {
   ngOnInit() {
     //console.log("playlist init");
     var self = this;
-    self.setScrollBarPosition();
+    //self.setScrollBarPosition();
   }
 
 }
