@@ -76,6 +76,7 @@ export class HomeComponent implements OnInit {
   leftNavMinWidthInPer: number;
   leftNavWidthpx: number;
   displayLandingPage: boolean = false;
+  landingpagecheck: number = 1;
   currentUserOrgs: any;
   userResponse: any;
   insightsCustomerLogo: any;
@@ -204,6 +205,15 @@ export class HomeComponent implements OnInit {
           this.selectedOrgName = this.getSelectedOrgName(this.selectedOrg);
           this.switchOrganizations(item.orgId, item.route, this.selectedOrgName);
         } else if (item.displayName == 'About') {
+          if (this.landingpagecheck == 1) {
+            this.displayLandingPage = true;
+            this.landingpagecheck = 0;
+
+          }
+          else {
+
+            this.displayLandingPage = false;
+          }
           this.about();
         } else if (item.displayName == 'Help') {
           window.open(this.helpPageURL, "_blank");
@@ -473,8 +483,10 @@ export class HomeComponent implements OnInit {
     // console.log("ByUrl " + this.router.url);
     // console.log(this.router.isActive(this.router.url, true))
     this.router.navigate(['InSights/Home'], { skipLocationChange: true });
+    this.landingpagecheck = this.landingpagecheck + 1;
     this.displayLandingPage = true;
     this.isToolbarDisplay = true;
+    console.log("landing page check.... " + this.landingpagecheck)
   }
 
   getSelectedOrgName(orgSelectedName): String {
