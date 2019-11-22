@@ -44,6 +44,7 @@ public class WebHookServiceImpl implements IWebHook {
 			StringTokenizer st = new StringTokenizer(responseTemplate, ",");
 			while (st.hasMoreTokens()) {
 				String keyValuePairs = st.nextToken();
+				log.debug("testing.."+keyValuePairs);
 				int count = StringUtils.countOccurrencesOf(keyValuePairs, "=");
 				if (count != 1) {
 					throw new InsightsCustomException("Incorrect Response template");
@@ -51,8 +52,8 @@ public class WebHookServiceImpl implements IWebHook {
 				else
 				{
 					String[] dataKeyMapper = keyValuePairs.split("=");
-					System.out.println(dataKeyMapper[0].length() + " , " + dataKeyMapper[1].length());
-					System.out.println(dataKeyMapper[0].trim() + " , " + dataKeyMapper[1].trim()); 
+					log.debug(dataKeyMapper[0].length() + " , " + dataKeyMapper[1].length());
+					log.debug(dataKeyMapper[0].trim() + " , " + dataKeyMapper[1].trim()); 
 				}
 			}
 			// Saving the data into the database
