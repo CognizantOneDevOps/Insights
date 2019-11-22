@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.StringTokenizer;
 
 import org.apache.logging.log4j.LogManager;
@@ -47,6 +48,11 @@ public class WebHookServiceImpl implements IWebHook {
 				int count = StringUtils.countOccurrencesOf(keyValuePairs, "=");
 				if (count != 1) {
 					throw new InsightsCustomException("Incorrect Response template");
+				} else {
+					StringTokenizer stt = new StringTokenizer(keyValuePairs, "=");
+					while (stt.hasMoreTokens()) {
+						String newkeyValuePairs = st.nextToken();
+					}
 				}
 			}
 			// Saving the data into the database
@@ -60,6 +66,9 @@ public class WebHookServiceImpl implements IWebHook {
 		} catch (ArrayIndexOutOfBoundsException e) {
 			log.error(e);
 			throw new ArrayIndexOutOfBoundsException(e.getMessage());
+		} catch (NoSuchElementException e) {
+			log.error(e.getMessage());
+			throw new InsightsCustomException("Incorrect Response template");
 		} catch (Exception e) {
 			log.error(e.getMessage());
 			throw new InsightsCustomException(e.getMessage());
