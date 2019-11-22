@@ -392,7 +392,6 @@ export class AgentConfigurationComponent implements OnInit {
         self.messageDialog.showApplicationsMessage(this.agentConfigstatus, "ERROR");
       }
     }
-    agentId = oldAgentId;
   }
 
   sendStatusMsg(Msg): void {

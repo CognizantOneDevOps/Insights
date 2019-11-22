@@ -76,7 +76,6 @@ export class HomeComponent implements OnInit {
   leftNavMinWidthInPer: number;
   leftNavWidthpx: number;
   displayLandingPage: boolean = false;
-  landingpagecheck: number = 1;
   currentUserOrgs: any;
   userResponse: any;
   insightsCustomerLogo: any;
