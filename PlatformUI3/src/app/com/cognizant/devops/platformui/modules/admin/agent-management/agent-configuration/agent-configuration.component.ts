@@ -325,12 +325,7 @@ export class AgentConfigurationComponent implements OnInit {
       if (agentId != oldAgentId) {
         self.messageDialog.showApplicationsMessage("You are not allow to change AgentId while update ", "ERROR");
         agentId = undefined;
-      } else if (!checkAgentId) {
-        //console.log(this.regex);
-        agentId = undefined;
-        self.messageDialog.showApplicationsMessage("Please enter valid agentId, and only contain alphanumeric character and underscore ", "ERROR");
       }
-
     }
 
     if (this.updatedConfigParamdata && agentId != undefined) {
