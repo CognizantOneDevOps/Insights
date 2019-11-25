@@ -193,23 +193,25 @@ export class HomeComponent implements OnInit {
 
   onItemSelected(item: NavItem) {
     this.selectedItem = item;
-    this.displayLandingPage = false;
     this.isToolbarDisplay = item.isToolbarDisplay;
-
     var isSessionExpired = this.dataShare.validateSession();
     if (!isSessionExpired) {
       if (!item.children || !item.children.length) {
         if (item.iconName == 'grafanaOrg') {
+          this.displayLandingPage = false;
           this.selectedOrg = (this.selectedItem == undefined ? '' : this.selectedItem.displayName);
           this.selectedOrgName = this.getSelectedOrgName(this.selectedOrg);
           this.switchOrganizations(item.orgId, item.route, this.selectedOrgName);
         } else if (item.displayName == 'About') {
           this.about();
         } else if (item.displayName == 'Help') {
+          this.displayLandingPage = false;
           window.open(this.helpPageURL, "_blank");
         } else if (item.displayName == 'Logout') {
+          this.displayLandingPage = false;
           this.logout();
         } else {
+          this.displayLandingPage = false;
           this.router.navigateByUrl(item.route, { skipLocationChange: true });
         }
       }

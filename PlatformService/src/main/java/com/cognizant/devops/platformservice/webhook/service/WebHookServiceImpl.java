@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.StringTokenizer;
 
 import org.apache.logging.log4j.LogManager;
@@ -40,13 +41,19 @@ public class WebHookServiceImpl implements IWebHook {
 	public Boolean saveWebHookConfiguration(String webhookname, String toolName, String labelDisplay, String dataformat,
 			String mqchannel, Boolean subscribestatus, String responseTemplate) throws InsightsCustomException {
 		try {
-			// Below code is for Response Template Format Check
 			StringTokenizer st = new StringTokenizer(responseTemplate, ",");
 			while (st.hasMoreTokens()) {
 				String keyValuePairs = st.nextToken();
+				log.debug("testing.."+keyValuePairs);
 				int count = StringUtils.countOccurrencesOf(keyValuePairs, "=");
 				if (count != 1) {
 					throw new InsightsCustomException("Incorrect Response template");
+				}
+				else
+				{
+					String[] dataKeyMapper = keyValuePairs.split("=");
+					log.debug(dataKeyMapper[0].length() + " , " + dataKeyMapper[1].length());
+					log.debug(dataKeyMapper[0].trim() + " , " + dataKeyMapper[1].trim()); 
 				}
 			}
 			// Saving the data into the database
@@ -60,6 +67,9 @@ public class WebHookServiceImpl implements IWebHook {
 		} catch (ArrayIndexOutOfBoundsException e) {
 			log.error(e);
 			throw new ArrayIndexOutOfBoundsException(e.getMessage());
+		} catch (NoSuchElementException e) {
+			log.error(e.getMessage());
+			throw new InsightsCustomException("Incorrect Response template");
 		} catch (Exception e) {
 			log.error(e.getMessage());
 			throw new InsightsCustomException(e.getMessage());
