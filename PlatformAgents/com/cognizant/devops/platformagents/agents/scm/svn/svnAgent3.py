@@ -30,8 +30,8 @@ import logging.handlers
 
 class SvnAgent(BaseAgent):
     def get_login(self, realm, username, may_save ):
-        username = self.config.get("username", '')
-        password = self.config.get("password", '')
+        username = self.getCredential("userid")
+        password = self.getCredential("passwd")
         return True, username, password, False
 
     def process(self):

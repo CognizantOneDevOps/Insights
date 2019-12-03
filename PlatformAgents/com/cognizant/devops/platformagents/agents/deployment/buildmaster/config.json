@@ -1,4 +1,10 @@
 {
+  "vault": {
+		"getFromVault": false,
+		"secretEngine":"insights-kv",
+		"readToken":"token",
+		"vaultUrl":"http://10.224.90.35:3000/v1/"
+	},
   "mqConfig": {
     "user": "iSight",
     "password": "iSight",
@@ -54,6 +60,7 @@
   "StartFrom": "2018-01-01 00:01:00",
   "isDebugAllowed": false,
   "enableValueArray": false,
+  "agentSecretDetails": ["userid","passwd"],
   "loggingSetting": {
     "logLevel": "WARN",
     "maxBytes": 5000000,

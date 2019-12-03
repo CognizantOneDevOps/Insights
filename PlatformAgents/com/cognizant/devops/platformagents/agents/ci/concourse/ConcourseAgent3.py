@@ -24,8 +24,8 @@ import json
 class ConcourseAgent(BaseAgent):
     def process(self):
         BaseUrl = self.config.get("BaseUrl", '')
-        UserID = self.config.get("UserID", '')
-        Passwd = self.config.get("Passwd", '')
+        UserID = self.getCredential("userid")
+        Passwd = self.getCredential("passwd")
         #responseTemplate = self.config.get("responseTemplate", '')
         responseTemplate = self.getResponseTemplate()
         trackingFilePath = 'tracking.json'

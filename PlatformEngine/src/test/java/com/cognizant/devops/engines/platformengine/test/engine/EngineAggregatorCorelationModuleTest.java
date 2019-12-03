@@ -64,12 +64,12 @@ public class EngineAggregatorCorelationModuleTest {
 
 		agentConfigDAL.saveAgentConfigFromUI(p.getProperty("gitAgentId"), EngineTestData.gitToolCategory, "git",
 				EngineTestData.getJsonObject(EngineTestData.gitConfig), EngineTestData.agentVersion,
-				EngineTestData.osversion, EngineTestData.updateDate);
+				EngineTestData.osversion, EngineTestData.updateDate, false);
 		/******************************************************************************************/
 
 		agentConfigDAL.saveAgentConfigFromUI(p.getProperty("jenkinsAgentId"), EngineTestData.jenkinToolCategory, "jenkins",
 				EngineTestData.getJsonObject(EngineTestData.jenkinsConfig), EngineTestData.agentVersion,
-				EngineTestData.osversion, EngineTestData.updateDate);
+				EngineTestData.osversion, EngineTestData.updateDate, false);
 
 		Thread.sleep(1000);
 

@@ -25,14 +25,14 @@ import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 public interface AgentManagementService {
 
 	public String registerAgent(String toolName, String agentVersion, String osversion, String configDetails,
-			String trackingDetails) throws InsightsCustomException;
+			String trackingDetails, boolean vault) throws InsightsCustomException;
 
 	public String uninstallAgent(String agentId, String toolName, String osversion) throws InsightsCustomException;
 
 	public String startStopAgent(String agentId, String toolName, String osversion, String action) throws InsightsCustomException;
 
 	public String updateAgent(String agentId, String configDetails, String toolName, String agentVersion,
-			String osversion) throws InsightsCustomException;
+			String osversion, boolean vault) throws InsightsCustomException;
 
 	// This is used during Agent registration, provide list of Agents, with version
 	// from docroot.

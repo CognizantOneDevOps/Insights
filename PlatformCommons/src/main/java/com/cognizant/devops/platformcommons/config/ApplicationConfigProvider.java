@@ -55,6 +55,7 @@ public class ApplicationConfigProvider implements Serializable {
 	private boolean enableWebHookEngine = false;
 	private SchedulerConfigData schedulerConfigData = new SchedulerConfigData();
 	private String driverLocation;
+	private Vault vault = new Vault();
 
 	private ApplicationConfigProvider() {
 		this.refreshTime = new Date(new Date().getTime() - 86400000);
@@ -294,4 +295,14 @@ public class ApplicationConfigProvider implements Serializable {
 	public void setDriverLocation(String driverLocation) {
 		this.driverLocation = driverLocation;
 	}
+
+	public Vault getVault() {
+		return vault;
+	}
+
+	public void setVault(Vault vault) {
+		this.vault = vault;
+	}
+	
+	
 }

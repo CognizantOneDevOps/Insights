@@ -20,11 +20,12 @@ Created on 12 April 2017
 '''
 from ....core.BaseAgent3 import BaseAgent
 from datetime import datetime
+import json
 class BambooAgent(BaseAgent):
     def process(self):        
         BaseUrl = self.config.get("baseUrl", None)
-        UserID = self.config.get("userid", None)
-        Passwd = self.config.get("passwd", None)
+        UserID = self.getCredential("userid")
+        Passwd = self.getCredential("passwd")
         enableAllBranches = self.config.get("enableAllBranches", None)
         getCollectionUrl = BaseUrl + "rest/api/latest/"       
         buildsURL = getCollectionUrl +"plan.json"

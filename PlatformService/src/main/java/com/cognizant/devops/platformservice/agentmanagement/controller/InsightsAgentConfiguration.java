@@ -50,7 +50,7 @@ public class InsightsAgentConfiguration {
 		String message = null;
 		try {
 			message = agentManagementService.registerAgent(toolName, agentVersion, osversion, configDetails,
-					trackingDetails);
+					trackingDetails, false);
 		} catch (InsightsCustomException e) {
 			return PlatformServiceUtil.buildFailureResponse(e.toString());
 		}
@@ -70,8 +70,9 @@ public class InsightsAgentConfiguration {
 			String osversion = registerAgentjson.get("osversion").getAsString();
 			String configDetails = registerAgentjson.get("configJson").getAsString();
 			String trackingDetails = registerAgentjson.get("trackingDetails").getAsString();
+			boolean vault = registerAgentjson.get("vault").getAsBoolean();
 			message = agentManagementService.registerAgent(toolName, agentVersion, osversion, configDetails,
-					trackingDetails);
+					trackingDetails, vault);
 		} catch (InsightsCustomException e) {
 			return PlatformServiceUtil.buildFailureResponse(e.toString());
 		}
@@ -95,7 +96,7 @@ public class InsightsAgentConfiguration {
 			@RequestParam String toolName, @RequestParam String agentVersion, @RequestParam String osversion) {
 		String message = null;
 		try {
-			message = agentManagementService.updateAgent(agentId, configJson, toolName, agentVersion, osversion);
+			message = agentManagementService.updateAgent(agentId, configJson, toolName, agentVersion, osversion, false);
 		} catch (InsightsCustomException e) {
 			return PlatformServiceUtil.buildFailureResponse(e.toString());
 		}
@@ -114,7 +115,8 @@ public class InsightsAgentConfiguration {
 			String agentVersion = updateAgentJson.get("agentVersion").getAsString();
 			String osversion = updateAgentJson.get("osversion").getAsString();
 			String configDetails = updateAgentJson.get("configJson").getAsString();
-			message = agentManagementService.updateAgent(agentId, configDetails, toolName, agentVersion, osversion);
+			boolean vault = updateAgentJson.get("vault").getAsBoolean();
+			message = agentManagementService.updateAgent(agentId, configDetails, toolName, agentVersion, osversion, vault);
 		} catch (InsightsCustomException e) {
 			return PlatformServiceUtil.buildFailureResponse(e.toString());
 		}

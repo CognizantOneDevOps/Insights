@@ -27,6 +27,7 @@ from dateutil import parser
 import datetime, time
 from ....core.BaseAgent3 import BaseAgent
 import logging.handlers
+import json
 
 class snowAgent(BaseAgent):
     warnings.filterwarnings('ignore') 
@@ -39,8 +40,8 @@ class snowAgent(BaseAgent):
             self.IN_sysid_url = self.config.get("IN_sysid_url", '')
             self.IN_Url = self.config.get("IN_Url", '')
             self.IN_Approval_Url = self.config.get("IN_Approval_Url", '')
-            self.username = self.config.get("username", '')
-            self.password = self.config.get("password", '')
+            self.username = self.getCredential("userid")
+            self.password = self.getCredential("passwd")
             self.tracking_time={}
             self.CR_sys_id=[]
             self.IN_sys_id=[]

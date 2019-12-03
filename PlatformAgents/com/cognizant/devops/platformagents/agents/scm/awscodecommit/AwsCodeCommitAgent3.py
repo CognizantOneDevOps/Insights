@@ -23,14 +23,14 @@ import boto3
 import time
 from ....core.BaseAgent3 import BaseAgent
 from datetime import datetime, timedelta
-
+import json
 
 class AwsCodeCommitAgent(BaseAgent):
     def process(self):
         data = []
-        accesskey = self.config.get("awsAccesskey", '')
-        secretkey = self.config.get("awsSecretkey", '')
-        regionName = self.config.get("awsRegion", '')
+        accesskey = self.getCredential("awsAccesskey")
+        secretkey = self.getCredential("awsSecretkey")
+        regionName = self.getCredential("awsRegion")
         client = boto3.client('codecommit',
                               aws_access_key_id=accesskey,
                               aws_secret_access_key=secretkey,

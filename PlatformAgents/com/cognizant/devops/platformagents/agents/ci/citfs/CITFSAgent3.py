@@ -19,12 +19,13 @@ Created on 12 April 2017
 @author: 446620
 '''
 from ....core.BaseAgent3 import BaseAgent
+import json
 
 class CITFSAgent(BaseAgent):
     def process(self):
         BaseUrl = self.config.get("baseUrl", '')
-        UserID = self.config.get("userID", '')
-        Passwd = self.config.get("passwd", '')
+        UserID = self.getCredential("userid")
+        Passwd = self.getCredential("passwd")
         Auth = self.config.get("auth", '')
         getCollectionsUrl = BaseUrl+"/_apis/projectcollections"
         collections = self.getResponse(getCollectionsUrl, 'GET', UserID, Passwd, None, authType=Auth)

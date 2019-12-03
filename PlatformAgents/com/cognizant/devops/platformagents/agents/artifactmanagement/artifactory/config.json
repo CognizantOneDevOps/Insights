@@ -1,4 +1,10 @@
 {
+	"vault": {
+		"getFromVault": false,
+		"secretEngine":"insights-kv",
+		"readToken":"token",
+		"vaultUrl":"http://10.224.90.35:3000/v1/"
+	},
 	"mqConfig": {
 		"user": "iSight",
 		"password": "iSight",
@@ -42,8 +48,8 @@
 	"enableDataValidation": true,
 	"useResponseTemplate": true,
 	"runSchedule": 5,
-	"UserID": "admin",
-	"Passwd": "password",
+	"userid": "admin",
+	"passwd": "password",
 	"toolCategory": "ARTIFACTMANAGEMENT",
 	"BaseUrl": "http://localhost:8081/artifactory/api/",
 	"timeStampField": "nex_lastupdated",
@@ -53,6 +59,7 @@
 	"toolsTimeZone": "GMT",
 	"insightsTimeZone": "Asia/Kolkata",
 	"isDebugAllowed": false,
+	"agentSecretDetails": ["userid","passwd"],
 	"FirstEndPoint": "http://localhost:8081/artifactory/api/storage/",
 	"loggingSetting": {
 		"logLevel": "WARN",

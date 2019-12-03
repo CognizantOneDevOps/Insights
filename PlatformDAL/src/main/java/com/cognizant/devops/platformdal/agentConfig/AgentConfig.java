@@ -68,7 +68,8 @@ public class AgentConfig {
 	@Column(name = "AGENT_KEY", unique = true, nullable = false)
 	private String agentKey;
 	
-	
+	@Column(name= "IS_VAULT_ENABLE")
+	private Boolean vault;
 	
 	public int getId() {
 		return id;
@@ -179,4 +180,14 @@ public class AgentConfig {
 	public void setAgentKey(String agentKey) {
 		this.agentKey = agentKey;
 	}
+
+	public Boolean getVault() {
+		return vault;
+	}
+
+	public void setVault(Boolean vault) {
+		this.vault = vault;
+	}
+	
+	
 }

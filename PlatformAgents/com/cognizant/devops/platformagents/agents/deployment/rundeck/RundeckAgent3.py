@@ -22,10 +22,12 @@ from time import mktime
 from dateutil import parser
 from ....core.BaseAgent3 import BaseAgent
 
+import json
+
 class RundeckAgent(BaseAgent):
     def process(self):
         getProjects = self.config.get("baseEndPoint", '')
-        authtoken = self.config.get("authtoken", '')
+        authtoken = self.getCredential("authtoken")
         ExecutionsBaseEndPoint = self.config.get("executionsBaseEndPoint", '')
         startFrom = self.config.get("startFrom", '')
         startFrom = parser.parse(startFrom)

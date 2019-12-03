@@ -1,4 +1,10 @@
 {
+  "vault": {
+    "getFromVault": false,
+    "secretEngine":"insights-kv",
+    "readToken":"token",
+    "vaultUrl":"http://10.224.90.35:3000/v1/"
+  },
   "mqConfig": {
     "user": "iSight",
     "password": "iSight",
@@ -49,12 +55,12 @@
  "runSchedule": 5,
  "toolsTimeZone" : "Asia/Kolkata",
  "isEpochTimeFormat" : false,
- 
+ "agentSecretDetails": ["userid","passwd"],
  "enableValueArray": false,
  "timeStampFormat":"%Y-%m-%dT%H:%M:%S",
  "timeStampField":"startDate",
  "useResponseTemplate" : true,
- "userID": "userid",
+ "userid": "userid",
  "passwd": "passwd",
   "baseEndPoint": "http://127.0.0.1:4516/deployit",
   "isDebugAllowed" : false,
