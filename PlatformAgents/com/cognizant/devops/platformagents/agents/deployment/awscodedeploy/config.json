@@ -1,4 +1,10 @@
 {
+  "vault": {
+		"getFromVault": false,
+		"secretEngine":"insights-kv",
+		"readToken":"token",
+		"vaultUrl":"http://10.224.90.35:3000/v1/"
+	},
   "mqConfig": {
     "user": "iSight",
     "password": "iSight",
@@ -37,7 +43,7 @@
   "timeStampField": "deploymentTime",
   "timeStampFormat": "%Y-%m-%dT%H:%M:%SZ",
   "isEpochTimeFormat": false,
-  
+  "agentSecretDetails": ["awsAccesskey","awsSecretkey","awsRegion"],
   "awsAccesskey": "#accesskey",
   "awsSecretkey": "#seccretkey",
   "awsRegion": "#region",

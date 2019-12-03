@@ -67,10 +67,11 @@ public class AgentConfigDAL extends BaseDAL {
 	 * @param agentVersion
 	 * @param osversion
 	 * @param updateDate
+	 * @param vault 
 	 * @return
 	 */
 	public boolean saveAgentConfigFromUI(String agentId, String toolCategory, String toolName, 
-			JsonObject agentJson, String agentVersion, String osversion, Date updateDate) {
+			JsonObject agentJson, String agentVersion, String osversion, Date updateDate, boolean vault) {
 		
 		Query<AgentConfig> createQuery = getSession().createQuery(
 				"FROM AgentConfig a WHERE a.toolName = :toolName  AND a.agentKey = :agentId",
@@ -84,11 +85,11 @@ public class AgentConfigDAL extends BaseDAL {
 		}
 		getSession().beginTransaction();
 		if (agentConfig != null) {
-			setAgentConfigValues(agentConfig, toolCategory, agentId, toolName, agentJson, agentVersion, osversion, updateDate);
+			setAgentConfigValues(agentConfig, toolCategory, agentId, toolName, agentJson, agentVersion, osversion, updateDate, vault);
 			getSession().update(agentConfig);
 		} else {
 			agentConfig = new AgentConfig();
-			setAgentConfigValues(agentConfig, toolCategory, agentId, toolName, agentJson, agentVersion, osversion, updateDate);
+			setAgentConfigValues(agentConfig, toolCategory, agentId, toolName, agentJson, agentVersion, osversion, updateDate, vault);
 			getSession().save(agentConfig);
 		}
 		getSession().getTransaction().commit();
@@ -114,7 +115,7 @@ public class AgentConfigDAL extends BaseDAL {
 	}
 
 	private void setAgentConfigValues(AgentConfig agentConfig,String toolCategory,String agentId, String toolName, JsonObject agentJson, 
-			String agentVersion, String osversion, Date updateDate) {
+			String agentVersion, String osversion, Date updateDate, boolean vault) {
 		
 		agentConfig.setToolCategory(toolCategory.toUpperCase());
 		agentConfig.setToolName(toolName);
@@ -124,6 +125,7 @@ public class AgentConfigDAL extends BaseDAL {
 		agentConfig.setUpdatedDate(updateDate);
 		agentConfig.setAgentKey(agentId);
 		agentConfig.setAgentStatus(AGENTACTION.START.name());
+		agentConfig.setVault(vault);
 	}
 
 	// for update action i.e. Insert

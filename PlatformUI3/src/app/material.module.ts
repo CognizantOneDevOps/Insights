@@ -39,6 +39,7 @@ import {
     MatPaginatorModule,
     MatSortModule,
     MatProgressBarModule,
+    MatSlideToggleModule,
 
 
 } from '@angular/material';
@@ -67,7 +68,8 @@ import {
         MatSortModule,
         MatTooltipModule,
         MatProgressBarModule,
-        ClipboardModule
+        ClipboardModule,
+        MatSlideToggleModule
 
 
     ],

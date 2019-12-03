@@ -1,4 +1,10 @@
 {
+  "vault": {
+    "getFromVault": false,
+    "secretEngine":"insights-kv",
+    "readToken":"token",
+    "vaultUrl":"http://10.224.90.35:3000/v1/"
+  },
   "mqConfig": {
     "user": "iSight",
     "password": "iSight",
@@ -58,7 +64,7 @@
   "useResponseTemplate": true,
   "runSchedule": 30,
   "auth": "NTLM",
-  "userID": "user",
+  "userid": "user",
   "passwd": "auth token",
   "baseUrl": "https://<Azure-hostname>",
   "collectionName": "myorganization",
@@ -66,6 +72,7 @@
   "timeStampFormat": "%Y-%m-%dT%H:%M:%S",
   "isEpochTimeFormat": false,
   "startFrom": "2017-01-01 01:01:01",
+  "agentSecretDetails": ["userid","passwd"],
   "loggingSetting": {
     "logLevel": "WARN",
     "maxBytes": 5000000,

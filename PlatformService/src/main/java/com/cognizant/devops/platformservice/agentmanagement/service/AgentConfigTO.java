@@ -48,6 +48,7 @@ public class AgentConfigTO implements Serializable {
 	
 	private String agentKey;
 	
+	private boolean vault;
 	
 	
 	public int getId() {
@@ -145,4 +146,14 @@ public class AgentConfigTO implements Serializable {
 	public void setAgentKey(String agentKey) {
 		this.agentKey = agentKey;
 	}
+
+	public boolean isVault() {
+		return vault;
+	}
+
+	public void setVault(boolean vault) {
+		this.vault = vault;
+	}
+	
+	
 }

@@ -90,6 +90,9 @@
           <tr class="mat-header-row" layout-align="start start">
             <th colspan="3" class="dynamicTableHeaderCss mat-header-cell" style="height:40px;border-radius: 10px 10px 0 0;">
               <span class="mainHeaderText">Others</span>
+              <mat-slide-toggle [(ngModel)]="vault" class="vault-toggle" [color]="color" name="vault">
+                Store credentials to Vault
+               </mat-slide-toggle>
             </th>
           </tr>
         </thead>

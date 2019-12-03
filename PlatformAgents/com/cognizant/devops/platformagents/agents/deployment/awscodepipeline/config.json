@@ -1,4 +1,10 @@
 {
+  "vault": {
+    "getFromVault": false,
+    "secretEngine":"insights-kv",
+    "readToken":"token",
+    "vaultUrl":"http://10.224.90.35:3000/v1/"
+  },
   "mqConfig": {
     "user": "iSight",
     "password": "iSight",
@@ -42,6 +48,7 @@
   "isEpochTimeFormat": false,  
   "startFrom": "2016-10-10 15:46:33",
   "isDebugAllowed": false,
+  "agentSecretDetails": ["awsAccesskey","awsSecretkey","awsRegion"],
   "loggingSetting": {
     "logLevel": "WARN",
     "maxBytes": 5000000,

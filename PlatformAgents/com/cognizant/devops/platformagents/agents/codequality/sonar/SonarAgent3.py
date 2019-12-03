@@ -23,6 +23,8 @@ from datetime import datetime
 from datetime import timedelta
 from ....core.BaseAgent3 import BaseAgent
 
+import json
+
 class SonarAgent(BaseAgent):
     def process(self):
         baseUrl = self.config.get("baseUrl", '')
@@ -31,8 +33,8 @@ class SonarAgent(BaseAgent):
         startFrom = parser.parse(startFrom)
         timeStampFormat = self.config.get('timeStampFormat')
         startFrom = startFrom.strftime(timeStampFormat)
-        userId = self.config.get("userId", None)
-        password = self.config.get("password", None)
+        userId = self.getCredential("userid")
+        password = self.getCredential("passwd")
         timeMachineapi = self.config.get("timeMachineapi", '')
         sonarProjects = self.getResponse(projectsUrl, 'GET', userId, password, None)
         metrics = self.config.get('dynamicTemplate', {}).get("metrics", '')

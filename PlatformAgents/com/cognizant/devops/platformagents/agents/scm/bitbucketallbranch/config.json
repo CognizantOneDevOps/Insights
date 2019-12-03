@@ -1,4 +1,10 @@
 {
+  "vault": {
+    "getFromVault": false,
+    "secretEngine":"insights-kv",
+    "readToken":"token",
+    "vaultUrl":"http://10.224.90.35:3000/v1/"
+  },
   "mqConfig": {
     "user": "iSight",
     "password": "iSight",
@@ -69,14 +75,14 @@
   "scanAllBranches" : false,
   "scanPullRequests": true,
   "auth": "base64",
-  "userID": "",
+  "userid": "",
   "passwd": "",
   "timeStampField":"createdTime",
   "timeStampFormat":"%Y-%m-%dT%H:%M:%S",
   "isEpochTimeFormat" : true,
   "baseEndPoint": "http://127.0.0.1:7990/rest/api/1.0/projects/",
   "isDebugAllowed" : false,
-  
+  "agentSecretDetails": ["userid","passwd"],
   "loggingSetting" : {
         "logLevel" : "WARN",
 		"maxBytes" : 5000000,

@@ -153,7 +153,7 @@ public class AgentManagementTest extends AgentManagementTestData{
 		
 		String response = agentServiceImpl.registerAgent(agentManagementTestData.toolName, 
 							agentManagementTestData.agentVersion, agentManagementTestData.osversion, 
-							agentManagementTestData.configDetails, agentManagementTestData.trackingDetails);
+							agentManagementTestData.configDetails, agentManagementTestData.trackingDetails, false);
 		
 		Assert.assertEquals(expectedOutcome, response);
 			
@@ -263,7 +263,7 @@ public class AgentManagementTest extends AgentManagementTestData{
 		ApplicationConfigProvider.getInstance().getAgentDetails().setOnlineRegistration(true);
 		AgentManagementServiceImpl agentManagementServiceImpl = new AgentManagementServiceImpl();
 		agentManagementServiceImpl.updateAgent(agentManagementTestData.agentId, configDetails, agentManagementTestData.toolName, 
-																agentManagementTestData.agentVersion, agentManagementTestData.osversion);
+																agentManagementTestData.agentVersion, agentManagementTestData.osversion, false);
 	}
 	
 	@Test(priority = 16)

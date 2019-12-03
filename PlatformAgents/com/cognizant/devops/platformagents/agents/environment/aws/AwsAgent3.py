@@ -31,8 +31,8 @@ import logging.handlers
 class AwsAgent(BaseAgent):
     def process(self):
         try:
-            self.id = self.config.get("access_key_id", None)
-            self.key = self.config.get("secret_access_key", None)
+            self.id = self.getCredential("access_key_id")
+            self.key = self.getCredential("secret_access_key")
             self.vpcid = self.config.get('dynamicTemplate', {}).get("vpc_id", None)
         except Exception as e:
             logging.error(e)

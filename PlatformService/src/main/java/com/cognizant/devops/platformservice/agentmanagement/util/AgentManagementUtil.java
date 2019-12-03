@@ -18,6 +18,7 @@ package com.cognizant.devops.platformservice.agentmanagement.util;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
@@ -43,6 +44,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.util.FileCopyUtils;
 
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
@@ -138,5 +140,17 @@ public class AgentManagementUtil {
 
 	private  boolean buildDirectory(File file) {
 		return file.exists() || file.mkdirs();
+	}
+	
+	public JsonObject convertFileToJSON(File configFile) throws IOException {
+		JsonObject jsonObject = new JsonObject();
+		JsonParser parser = new JsonParser();
+		try {
+			JsonElement jsonElement = parser.parse(new FileReader(configFile));
+			jsonObject = jsonElement.getAsJsonObject();
+		} catch (FileNotFoundException e) {
+			throw new IOException("No Such file found -- " + configFile);
+		} 
+		return jsonObject;
 	}
 }

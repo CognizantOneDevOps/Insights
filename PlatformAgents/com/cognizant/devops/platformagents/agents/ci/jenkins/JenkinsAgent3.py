@@ -20,6 +20,7 @@ Created on Jun 22, 2016
 '''
 from time import mktime
 from dateutil import parser
+import json
 import requests
 import xml.etree.ElementTree as ET
 from requests.auth import HTTPBasicAuth
@@ -27,8 +28,8 @@ from ....core.BaseAgent3 import BaseAgent
 
 class JenkinsAgent(BaseAgent):
     def process(self):
-        self.userid = self.config.get("userid", '')
-        self.passwd = self.config.get("passwd", '')
+        self.userid = self.getCredential("userid")
+        self.passwd = self.getCredential("passwd")
         self.BaseUrl = self.config.get("baseUrl", '')
         startFrom = self.config.get("startFrom", '')
         startFrom = parser.parse(startFrom)
