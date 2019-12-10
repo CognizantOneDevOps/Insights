@@ -13,39 +13,17 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  ******************************************************************************/
-package com.cognizant.devops.platformcommons.config;
+package com.cognizant.devops.platformservice.traceabilitydashboard.constants;
 
-import java.io.Serializable;
-
-public class Vault implements Serializable{
-
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
+public final class TraceabilityConstants {
 	
-	private String vaultEndPoint;
-	private String secretEngine;
-	private String vaultToken;
+	public static final Long PIPELINE_CACHE_EXPIRY_IN_SEC =1200l ;
+	public static final Long MASTER_CACHE_EXPIRY_IN_SEC=1360l;
+	public static final Long PIPELINE_CACHE_HEAP_SIZE_BYTES=1000000l;
+	public static final Long MASTER_CACHE_HEAP_SIZE_BYTES=10000000l;
+	public static final String DATAMODEL_FILE_NAME ="datamodel.json";
+	public static final String DATAMODEL_FOLDER_NAME=".InSights";
+	public static final String ENV_VAR_NAME="INSIGHTS_HOME";
 	
-	
-	public String getVaultEndPoint() {
-		return vaultEndPoint;
-	}
-	public void setVaultEndPoint(String vaultEndPoint) {
-		this.vaultEndPoint = vaultEndPoint;
-	}
-	public String getSecretEngine() {
-		return secretEngine;
-	}
-	public void setSecretEngine(String secretEngine) {
-		this.secretEngine = secretEngine;
-	}
-	public String getVaultToken() {
-		return vaultToken;
-	}
-	public void setVaultToken(String vaultToken) {
-		this.vaultToken = vaultToken;
-	}
 
 }

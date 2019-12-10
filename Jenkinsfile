@@ -44,7 +44,7 @@ node {
   	} //License Check ends	
 
 	
-   // Platform Service Starts
+   // Platform Service Starts.
 	try{
 		// Doxygen Report
 		stage ('Doxygen_generate_report'){
@@ -63,7 +63,7 @@ node {
 			sh 'mvn com.sonatype.clm:clm-maven-plugin:evaluate -Dclm.applicationId=Insights'
 		} 
 
-		stage ('Insight_PS_CodeAnalysis') {
+        stage ('Insight_PS_CodeAnalysis') {
 			sh 'mvn sonar:sonar -Dmaven.test.failure.ignore=true -DskipTests=true -Dsonar.sources=src/main/java -pl !PlatformUI3'		
 		}	
 
