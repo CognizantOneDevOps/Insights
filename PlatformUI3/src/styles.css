@@ -40,6 +40,15 @@ body {
   overflow: hidden;
 }
 
+
+.traceablity-show-details-dialog-container .mat-dialog-container {
+  padding: 0px !important;
+  margin: 0px !important;
+  border-radius:15px;
+  overflow: hidden;
+}
+
+
 .head_class{
   background-color: #f0f0f0
 }

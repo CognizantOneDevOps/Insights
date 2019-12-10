@@ -187,6 +187,17 @@ export class HomeComponent implements OnInit {
         navItemobj.title = orgDtl.name;
         this.navOrgList.push(navItemobj);
       }
+
+      var navItemobj = new NavItem();
+      navItemobj.displayName = 'Traceability Dashboard';
+      navItemobj.iconName = 'traceability';
+      navItemobj.route = 'InSights/Home/traceability';
+      navItemobj.isToolbarDisplay = true;
+      navItemobj.showIcon = true;
+      navItemobj.isAdminMenu = false;
+      navItemobj.title = "traceability";
+
+      this.navOrgList.push(navItemobj);
     }
   }
 
@@ -255,6 +266,7 @@ export class HomeComponent implements OnInit {
             title: "Query Builder",
             isAdminMenu: true
           }
+
         ]
       },
       {
@@ -284,6 +296,7 @@ export class HomeComponent implements OnInit {
         title: "Health Check",
         isAdminMenu: true
       },
+
       {
         displayName: 'Configuration',
         iconName: 'admin',
@@ -364,6 +377,7 @@ export class HomeComponent implements OnInit {
             title: "Data Archival",
             isAdminMenu: true
           }
+
         ]
       }
     ];

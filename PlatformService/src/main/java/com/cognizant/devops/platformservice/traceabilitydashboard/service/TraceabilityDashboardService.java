@@ -13,39 +13,16 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  ******************************************************************************/
-package com.cognizant.devops.platformcommons.config;
+package com.cognizant.devops.platformservice.traceabilitydashboard.service;
 
-import java.io.Serializable;
+import java.util.List;
 
-public class Vault implements Serializable{
+import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
+import com.google.gson.JsonObject;
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
-	
-	private String vaultEndPoint;
-	private String secretEngine;
-	private String vaultToken;
-	
-	
-	public String getVaultEndPoint() {
-		return vaultEndPoint;
-	}
-	public void setVaultEndPoint(String vaultEndPoint) {
-		this.vaultEndPoint = vaultEndPoint;
-	}
-	public String getSecretEngine() {
-		return secretEngine;
-	}
-	public void setSecretEngine(String secretEngine) {
-		this.secretEngine = secretEngine;
-	}
-	public String getVaultToken() {
-		return vaultToken;
-	}
-	public void setVaultToken(String vaultToken) {
-		this.vaultToken = vaultToken;
-	}
-
+public interface TraceabilityDashboardService {
+	 public JsonObject getPipeline(String toolName,String fieldName,String fieldValue) throws InsightsCustomException;
+	 public List<JsonObject> getToolSummary(String toolName, String cacheKey) throws InsightsCustomException;
+	 public List<String> getAvailableTools() throws InsightsCustomException;
+	 public List<String> getToolKeyset(String toolName) throws InsightsCustomException;   
 }
