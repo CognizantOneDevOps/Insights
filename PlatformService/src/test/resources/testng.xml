@@ -3,6 +3,7 @@
 
 <suite name="Suite">
 	<test name="PlatformServiceTest">
+		<parameter name="pipelinetestflag" value="false" />
 		<classes>
 			<class
 				name="com.cognizant.devops.platformservice.test.testngInitializer.TestngInitializerTest" />
@@ -20,6 +21,8 @@
 				name="com.cognizant.devops.platformservice.test.grafanaUser.GrafanaUserDetailsTest" />
 			<class
 				name="com.cognizant.devops.platformservice.test.accessGroupManagement.GroupsAndUserTest" />
+			<class
+				name="com.cognizant.devops.platformservice.test.traceabilitydashboard.TraceabilityDashboardTest" />
 		</classes>
 	</test>
 </suite>
