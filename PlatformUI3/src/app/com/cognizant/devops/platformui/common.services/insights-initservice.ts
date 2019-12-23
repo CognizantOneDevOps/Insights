@@ -34,6 +34,7 @@ export class InsightsInitService {
     static showAuditReporting = false;
     static showWebhookConfiguration = false;
     static showBusinessMapping = true;
+    static enableInsightsBranding = true;
 
     constructor(location: Location, private http: HttpClient,
         private imageHandler: ImageHandlerService, private logger: LogService) {
@@ -80,6 +81,7 @@ export class InsightsInitService {
         InsightsInitService.showAuditReporting = UIConfigResponse.showAuditReporting;
         InsightsInitService.showWebhookConfiguration = UIConfigResponse.showWebhookConfiguration;
         InsightsInitService.showBusinessMapping = UIConfigResponse.showBusinessMapping;
+        InsightsInitService.enableInsightsBranding = UIConfigResponse.enableInsightsBranding
     }
 
     private loadImageHandler() {
