@@ -27,8 +27,8 @@ from ....core.BaseAgent import BaseAgent
 class XLDeployAgent(BaseAgent):
     def process(self):
         BaseEndPoint = self.config.get("baseEndPoint", '')
-        UserId = self.config.get("userID", '')
-        Passwd = self.config.get("passwd", '')
+        UserId = self.getCredential("userid")
+        Passwd = self.getCredential("passwd")
         begindate = self.tracking.get("begindate", '')
         listtasksurl = BaseEndPoint+"/tasks/v2/export?begindate="+begindate
         try:

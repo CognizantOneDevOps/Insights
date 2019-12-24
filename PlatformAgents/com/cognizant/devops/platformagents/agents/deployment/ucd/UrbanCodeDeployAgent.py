@@ -28,8 +28,8 @@ from ....core.BaseAgent import BaseAgent
 
 class UrbanCodeDeployAgent(BaseAgent):
     def process(self):
-        userid = self.config.get("userid", '')
-        passwd = self.config.get("passwd", '')
+        userid = self.getCredential("userid")
+        passwd = self.getCredential("passwd")
         baseUrl = self.config.get("baseUrl", '')
         reportType = self.config.get("reportType", '')
         startFrom = self.config.get("startFrom", '')

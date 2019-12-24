@@ -25,8 +25,8 @@ import time
 
 class CircleAgent(BaseAgent):
     def process(self):
-        userid = self.config.get("userid", '')
-        passwd = self.config.get("passwd", '')
+        userid = self.getCredential("userid")
+        passwd = self.getCredential("passwd")
         BaseUrl = self.config.get("baseUrl", '')
         Project = self.config.get("project", '')
         token = self.config.get("token", '')

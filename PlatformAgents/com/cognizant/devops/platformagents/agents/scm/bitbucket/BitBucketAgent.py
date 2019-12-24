@@ -36,8 +36,8 @@ from ....core.BaseAgent import BaseAgent
 class BitBucketAgent(BaseAgent):
     def process(self):
         self.baseEndPoint = self.config.get("baseEndPoint", '')
-        self.userId = self.config.get("userID", '')
-        self.passwd = self.config.get("passwd", '')
+        self.userId = self.getCredential("userid")
+        self.passwd = self.getCredential("passwd")
         self.scanAllBranches = self.config.get("scanAllBranches", False)
         self.scanPullRequests = self.config.get("scanPullRequests", False)
         self.scanReleaseBranches = self.config.get("scanReleaseBranches", False)
