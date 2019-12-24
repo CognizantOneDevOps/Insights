@@ -3,7 +3,6 @@
 
 <suite name="Suite">
 	<test name="PlatformServiceTest">
-		<parameter name="pipelinetestflag" value="false" />
 		<classes>
 			<class
 				name="com.cognizant.devops.platformservice.test.testngInitializer.TestngInitializerTest" />
