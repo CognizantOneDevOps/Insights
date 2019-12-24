@@ -23,8 +23,8 @@ from datetime import datetime
 class BambooAgent(BaseAgent):
     def process(self):        
         BaseUrl = self.config.get("baseUrl", None)
-        UserID = self.config.get("userid", None)
-        Passwd = self.config.get("passwd", None)
+        UserID = self.getCredential("userid")
+        Passwd = self.getCredential("passwd")
         enableAllBranches = self.config.get("enableAllBranches", None)
         getCollectionUrl = BaseUrl + "rest/api/latest/"       
         buildsURL = getCollectionUrl +"plan.json"

@@ -30,8 +30,8 @@ from ....core.BaseAgent import BaseAgent
 class AzureBoardAgent(BaseAgent):
 
     def process(self):
-        self.userid = self.config.get("userid", '')
-        self.passwd = self.config.get("passwd", '')
+        self.userid = self.getCredential("userid")
+        self.passwd = self.getCredential("passwd")
         baseUrl = self.config.get("baseUrl", '')
         wiqlUrl = self.config.get("wiqlUrl", '')
 

@@ -33,7 +33,7 @@ class DynatraceAgent(BaseAgent):
         print("Inside process")
         try:
             self.headers = {"Accept":"application/json","charset":"utf-8"}
-            self.apiToken = self.config.get("apiToken", None)
+            self.apiToken = self.getCredential("apiToken")
             self.start = self.tracking.get('lastFetchTime',None)
             self.end = int(time.time()*1000.0)
             trackingDetails = {}

@@ -41,9 +41,9 @@ class AwsCodeDeployAgent(BaseAgent):
             since = since.strftime('%Y-%m-%dT%H:%M:%S')
             pattern = '%Y-%m-%dT%H:%M:%S'
             since = int(time.mktime(time.strptime(since, pattern)))
-        accesskey = self.config.get("awsAccesskey", '')
-        secretkey = self.config.get("awsSecretkey", '')
-        regionName = self.config.get("awsRegion", '')
+        accesskey = self.getCredential("awsAccesskey")
+        secretkey = self.getCredential("awsSecretkey")
+        regionName = self.getCredential("awsRegion")
         #print("before client")
         client = boto3.client('codedeploy',
                               aws_access_key_id=accesskey,
