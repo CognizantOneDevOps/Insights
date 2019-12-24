@@ -27,8 +27,8 @@ from datetime import datetime, timedelta
 import time
 class ArtifactoryAgent(BaseAgent):
     def process(self):
-        user = self.config.get("UserID", '')
-        passwd = self.config.get("Passwd", '')
+        user = self.getCredential("userid")
+        passwd = self.getCredential("passwd")
         BaseUrl = self.config.get("BaseUrl", '')
         FirstEndPoint = self.config.get("FirstEndPoint", '')
         self.startDate = None

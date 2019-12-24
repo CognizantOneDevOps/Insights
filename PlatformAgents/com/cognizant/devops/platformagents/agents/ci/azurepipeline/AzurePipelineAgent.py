@@ -23,8 +23,8 @@ from ....core.BaseAgent import BaseAgent
 class AzurePipelineAgent(BaseAgent):
     def process(self):
         BaseUrl = self.config.get("baseUrl", '')
-        UserID = self.config.get("userID", '')
-        Passwd = self.config.get("passwd", '')
+        UserID = self.getCredential("userid")
+        Passwd = self.getCredential("passwd")
         collectionName = self.config.get("collectionName", '')
         getProjectUrl = BaseUrl+ "/" + collectionName +"/_apis/projects"
         responseTemplate = self.getResponseTemplate()

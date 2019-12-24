@@ -21,6 +21,7 @@ Created on Jun 16, 2016
 
 from datetime import datetime
 import json
+import requests
 import logging.handlers
 import os.path
 import sys
@@ -48,6 +49,7 @@ class BaseAgent(object):
     def setupAgent(self):
         self.resolveConfigPath()
         self.loadConfig()
+        self.fetchAgentCredentials()
         self.setupLogging()
         self.loadTrackingConfig()
         self.loadCommunicationFacade()
@@ -59,6 +61,32 @@ class BaseAgent(object):
         self.scheduleExtensions()
         self.execute()
         self.scheduleAgent()
+
+    def fetchAgentCredentials(self):
+        self.vaultFlag = self.config.get("vault").get("getFromVault", False)
+        if self.vaultFlag:
+            VaultCredentials = self.loadVaultCredentials()
+            self.vaultJson = VaultCredentials.json()
+        if "errors" in self.vaultJson:
+            raise ValueError('BaseAgent: unable to fetchCredentials')
+
+    def getCredential(self,key):
+        if self.vaultFlag:
+            return self.vaultJson["data"]["data"][key]
+        else:
+            return self.config.get(key, None)
+
+    def loadVaultCredentials(self):
+        agentId=self.config.get("agentId", '')
+        readTokenValue=self.config.get("vault").get("readToken", '')
+        secretEngine=self.config.get("vault").get("secretEngine", '')
+        vaultUrl=self.config.get("vault").get("vaultUrl", '')
+        reqHeaders = {'Accept':'application/json','X-Vault-Token':readTokenValue}
+        agentCredential = requests.get(vaultUrl+secretEngine+"/data/"+agentId, auth=None, headers=reqHeaders, data=None,proxies=None, verify=None)
+        # agentCredential=os.popen("curl -X GET -H 'X-Vault-Token: "+readTokenValue+"\'"+" -s "+vaultUrl+secretEngine+"/data/"+agentId).read()
+        if "errors" in agentCredential:
+            raise ValueError('BaseAgent: unable to load Vault Credentials')
+        return agentCredential
         
     
     def resolveConfigPath(self):
