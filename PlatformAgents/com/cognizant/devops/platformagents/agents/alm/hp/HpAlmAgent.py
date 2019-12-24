@@ -24,8 +24,8 @@ import logging
 
 class HpAlmAgent(BaseAgent):
     def getHpAlmSSOHeader(self, baseEndPoint):
-        userid = self.config.get('userid')
-        passwd = self.config.get('passwd')
+        userid = self.getCredential("userid")
+        passwd = self.getCredential("passwd")
         authEndPoint = baseEndPoint + '/qcbin/authentication-point/authenticate' 
         responseTupple = {}
         reqHeaders = {
