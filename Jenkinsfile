@@ -87,7 +87,8 @@ node {
 		slackSend channel: '#insightsjenkins', color: 'bad', message: "Insights Enterprise Build Failed for commitID - *$gitCommitID*, Branch - *$branchName* \n Build Log can be found @ https://buildon.cogdevops.com/buildon/HistoricCIWebController?commitId=$gitCommitID", teamDomain: "insightscogdevops", token: slackToken
 		sh 'exit 1'
 	}	
-	// Platform Service Ends	   
+	// Platform Service Ends
+	//Dummy commit to trigger build.
 	   
     //Send Notification to Slack Channel
 	stage ('SlackNotification') {
