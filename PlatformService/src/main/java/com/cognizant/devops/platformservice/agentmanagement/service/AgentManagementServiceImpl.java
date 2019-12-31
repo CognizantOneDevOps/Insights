@@ -139,7 +139,7 @@ public class AgentManagementServiceImpl implements AgentManagementService {
 
 			String fileName = agentId + ZIPEXTENSION;
 			sendAgentPackage(data, AGENTACTION.REGISTER.name(), fileName, agentId, toolName, osversion);
-			//performAgentAction(agentId, toolName, osversion, AGENTACTION.START.name(),agentId);
+			performAgentAction(agentId, toolName, osversion, AGENTACTION.START.name(),agentId);
 
 			// Delete tracking.json
 			if (!trackingDetails.isEmpty()) {
