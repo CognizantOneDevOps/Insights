@@ -67,8 +67,8 @@ class BaseAgent(object):
         if self.vaultFlag:
             VaultCredentials = self.loadVaultCredentials()
             self.vaultJson = VaultCredentials.json()
-        if "errors" in self.vaultJson:
-            raise ValueError('BaseAgent: unable to fetchCredentials')
+            if "errors" in self.vaultJson:
+                raise ValueError('BaseAgent: unable to fetchCredentials')
 
     def getCredential(self,key):
         if self.vaultFlag:
