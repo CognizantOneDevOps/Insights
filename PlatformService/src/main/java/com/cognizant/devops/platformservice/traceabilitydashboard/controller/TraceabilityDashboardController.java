@@ -39,7 +39,8 @@ public class TraceabilityDashboardController {
 	@ResponseBody
 	public JsonObject getToolSummary(@RequestParam String toolName, @RequestParam String cacheKey) {
 		try {
-			return PlatformServiceUtil.buildSuccessResponseWithData(traceabilityDashboardServiceImpl.getToolSummary(toolName, cacheKey));
+			return PlatformServiceUtil
+					.buildSuccessResponseWithData(traceabilityDashboardServiceImpl.getToolSummary(toolName, cacheKey));
 		} catch (Exception e) {
 			return PlatformServiceUtil.buildSuccessResponseWithData("Unable to load data from cache");
 		}
@@ -55,7 +56,8 @@ public class TraceabilityDashboardController {
 			return PlatformServiceUtil.buildFailureResponse(e.toString());
 		}
 
-	}	
+	}
+
 	@RequestMapping(value = "/getToolKeyset", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 	@ResponseBody
 	public JsonObject getToolKeyset(@RequestParam String toolName) {
@@ -67,16 +69,17 @@ public class TraceabilityDashboardController {
 		}
 
 	}
+
 	@RequestMapping(value = "/getPipeline", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 	@ResponseBody
 	public JsonObject getPipeline(@RequestParam String toolName, @RequestParam String fieldName,
 			@RequestParam String fieldValue) {
 		try {
 			JsonObject response = traceabilityDashboardServiceImpl.getPipeline(toolName, fieldName, fieldValue);
-			return PlatformServiceUtil.buildSuccessResponseWithData(response.getAsJsonArray("data"));
+			return PlatformServiceUtil.buildSuccessResponseWithData(response);
 		} catch (InsightsCustomException e) {
-				return PlatformServiceUtil.buildFailureResponse(e.toString());
-			}
-			
+			return PlatformServiceUtil.buildFailureResponse(e.toString());
 		}
+
+	}
 }

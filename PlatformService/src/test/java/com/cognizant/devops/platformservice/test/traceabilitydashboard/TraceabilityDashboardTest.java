@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  ******************************************************************************/
-package com.cognizant.devops.platformservice.test.traceabilitydashboard;
+package com.cognizant.devops.platformservice.test.traceabilitydashboard; 
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -74,13 +74,14 @@ public class TraceabilityDashboardTest {
 		Assert.assertNotEquals(0, service.getToolKeyset(testTools.get(0)).size());
 	}
 
+	
 	@Test(priority = 4)
-	public void testPipelineResponse() {
+	public void testPipelineResponse() throws InsightsCustomException {
 		JsonObject resp = new JsonObject();
 		try {
 			  resp = service.getPipeline(TreceabilityTestData.toolName, TreceabilityTestData.fieldName,
 					TreceabilityTestData.fieldVal);
-			  if(resp.get("data").getAsJsonArray().size()==0)
+			  if(resp.get("pipeline").getAsJsonArray().size()==0)
 			  {
 				  throw new InsightsCustomException("data not found");
 			  }
@@ -88,21 +89,32 @@ public class TraceabilityDashboardTest {
 		    	log.debug("skipped this test case as required data not found" );
 			throw new SkipException("skipped this test case as required data not found");
 		}
-		Assert.assertNotEquals(0, resp.get("data").getAsJsonArray().size());
+		Assert.assertNotEquals(0, resp.get("pipeline").getAsJsonArray().size());
 	}
-
-	@Test(priority = 5)
-	public void testPipelineResponseWithIncorrectData() {
-
+	
+	@Test(priority =5)
+	public void testSummaryResponse() throws InsightsCustomException
+	{
 		JsonObject resp = new JsonObject();
 		try {
-			resp = service.getPipeline(TreceabilityTestData.toolName, TreceabilityTestData.fieldName,
-					TreceabilityTestData.incorrectFieldVal);
-		} catch (InsightsCustomException e) {
-		  log.debug("skipped this test case as required data not found");
-		  throw new SkipException("skipped this test case as required data not found");
+			  resp = service.getPipeline(TreceabilityTestData.toolName, TreceabilityTestData.fieldName,
+					TreceabilityTestData.fieldVal);
+			  if(resp.get("summary").getAsJsonArray().size()==0)
+			  {
+				  throw new InsightsCustomException("summary data not found");
+			  }
+		    } catch (InsightsCustomException e) {
+		    	log.debug("skipped this test case as required data not found" );
+			throw new SkipException("skipped this test case as required data not found");
 		}
-		Assert.assertEquals(0, resp.get("data").getAsJsonArray().size());
+		Assert.assertNotEquals(0, resp.get("summary").getAsJsonArray().size());
+	}
+
+	@Test(priority = 6)
+	public void testPipelineResponseWithIncorrectData() throws InsightsCustomException {
+		JsonObject resp = service.getPipeline(TreceabilityTestData.toolName, TreceabilityTestData.fieldName,
+				TreceabilityTestData.incorrectFieldVal);
+		Assert.assertEquals(0, resp.get("pipeline").getAsJsonArray().size());
 	}
 
 }

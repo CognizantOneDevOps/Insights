@@ -1,12 +1,8 @@
 import { Component, OnInit } from '@angular/core';
-
 import { TraceabiltyService } from './traceablity-builder.service';
-import { strictEqual } from 'assert';
 import { MatTableDataSource, MatSort, MatPaginator, MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 import { ShowTraceabiltyDetailsDialog } from './traceabilty-show-details-dialog';
-import { async } from 'q';
 import { MessageDialogService } from '@insights/app/modules/application-dialog/message-dialog-service';
-import { element } from '@angular/core/src/render3/instructions';
 
 @Component({
     selector: 'app-traceabilitydashboard',
@@ -32,7 +28,8 @@ export class TraceabilityDashboardCompenent implements OnInit {
     fieldValue: string;
     str: string;
     fieldPlaceVal: string;
-
+    resultSummary: any;
+    toolSummaryArray = [];
     constructor(private dialog: MatDialog, public messageDialog: MessageDialogService, private traceablityService: TraceabiltyService) {
     }
 
@@ -48,6 +45,8 @@ export class TraceabilityDashboardCompenent implements OnInit {
     }
 
     getDetails() {
+        this.list = [];
+        this.toolSummaryArray = [];
         this.getAssetHistoryDetails(this.selectedTool, this.selectedField, this.fieldValue);
 
     }
@@ -55,15 +54,16 @@ export class TraceabilityDashboardCompenent implements OnInit {
     getAssetHistoryDetails(toolName: string, toolField: string, toolValue: string) {
         this.isDatainProgress = true;
         this.cachestring = toolName + "." + toolField + "." + toolValue;
+        var self = this;
         this.traceablityService.getAssetHistory(toolName, toolField, toolValue)
             .then((data) => {
                 if (data.status == "success") {
-                    if (data.data.length != 0) {
-                        for (var element of data.data) {
+                    if (data.data.pipeline.length != 0) {
+                        for (var element of data.data.pipeline) {
                             this.order[(element.order) - 1] = element.toolName;
                         }
 
-                        let result = data.data;
+                        let result = data.data.pipeline;
                         let historyData = [];
                         result.map((resultmap) => {
                             Object.keys(resultmap).forEach(element => {
@@ -77,29 +77,49 @@ export class TraceabilityDashboardCompenent implements OnInit {
                         this.traceabilityData = data;
                         this.workflow();
                         this.isDatainProgress = false;
-                    }
-                    else {
-                        this.messageDialog.showApplicationsMessage("Data not present for the entered input.", "ERROR");
+                    } else {
+                        this.messageDialog.showApplicationsMessage("no data present for the given input.", "ERROR");
                         this.isDatainProgress = false;
                     }
-                }
+                    if (data.data.summary.length > 0) {
 
+                        this.toolSummaryArray = [];
+                        var tempArr = []
+                        for (let orderredTool in this.order) {
+                            var toolName = this.order[orderredTool]
+                            var toolData = data.data.summary[0][toolName]
+                            if (toolData != undefined) {
+                                tempArr.push(toolData)
+                            }
+                        }
+                        var summaryLen = tempArr.length;
+                        for (let index = 0; index < summaryLen; index++) {
+                            var object = tempArr[index]
+                            var obejctString = JSON.stringify(object);
+                            var objectLen = obejctString.split(",").length
+                            for (var i = 0; i < objectLen; i++) {
+                                this.toolSummaryArray.push(tempArr[index][i])
+                            }
+                        }
+
+                    }
+                }
                 else {
                     this.messageDialog.showApplicationsMessage(data.message, "ERROR");
                     this.isDatainProgress = false;
                 }
             });
+
     }
 
     workflow() {
         this.drawPipe();
 
     }
-
     drawPipe() {
         this.list = [];
         let custMap = {};
-        this.traceabilityData.data.map(element => {
+        this.traceabilityData.data.pipeline.map(element => {
             element["moddate"] = new Date(element.timestamp);
             if (custMap[element.toolName]) {
                 let list = [...custMap[element.toolName]];
@@ -200,7 +220,6 @@ export class TraceabilityDashboardCompenent implements OnInit {
         self.isToolSelected = true;
         self.isFieldSelected = false;
     }
-
     FieldOnChange(key, type): void {
         this.fieldValue = null;
         var self = this;
