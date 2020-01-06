@@ -15,138 +15,164 @@
  * the License.
  ****************************************************************************** -->
 <div class="pageCss">
-  <div layout layout-align="left" class="titleStyle">
-    <div>
-      <a class="greenTitleTxt">Traceability Dashboard </a>
-    </div>
-  </div>
+	<div layout layout-align="left" class="titleStyle">
+		<div>
+			<a class="greenTitleTxt">Traceability Dashboard </a>
+		</div>
+	</div>
 
-  <div class="orangeStripCss"></div>
-  <form #frmagentconfig="ngForm" class="form">
-    <div class="arrange-horizontally button-row">
-      <div>
-        <mat-select required [(ngModel)]="selectedTool" name="selectedTool" class="form-control" placeholder="Select Tool"
-          (ngModelChange)="toolOnChange()" style="width:150px;">
-          <mat-option *ngFor="let tool of tools | keyvalue" value="{{tool.value}}">{{tool.value}}</mat-option>
-        </mat-select>
-      </div>
-      <div>
-        <mat-select *ngIf="isToolSelected" required [(ngModel)]="selectedField" name="selectedField" class="form-control"
-          placeholder="Select Field" (ngModelChange)="FieldOnChange(selectedField, btnValue)" style="width:150px;">
-          <mat-option *ngFor="let key of fieldList" value="{{key}}">{{key}}</mat-option>
-        </mat-select>
-      </div>
-      <div>
-        <input type="text" placeholder="{{fieldPlaceVal}}" class="form-control" [(ngModel)]="fieldValue" name="toolFieldValue">
-      </div>
-      <div style="margin-left: 30px">
-        <button mat-raised-button (click)="getDetails()" [disabled]="frmagentconfig.invalid || fieldValue == null"
-          class="configureBut" style="width:150px;padding-left: 10px;padding-right: 10px;">
-          Submit
-        </button>
-        <br>
-      </div>
+	<div class="orangeStripCss"></div>
+	<form #frmagentconfig="ngForm" class="form">
+		<div class="arrange-horizontally button-row">
+			<div>
+				<mat-select required [(ngModel)]="selectedTool" name="selectedTool" class="form-control"
+					placeholder="Select Tool" (ngModelChange)="toolOnChange()" style="width:150px;">
+					<mat-option *ngFor="let tool of tools | keyvalue" value="{{tool.value}}">{{tool.value}}</mat-option>
+				</mat-select>
+			</div>
+			<div>
+				<mat-select *ngIf="isToolSelected" required [(ngModel)]="selectedField" name="selectedField"
+					class="form-control" placeholder="Select Field"
+					(ngModelChange)="FieldOnChange(selectedField, btnValue)" style="width:150px;">
+					<mat-option *ngFor="let key of fieldList" value="{{key}}">{{key}}</mat-option>
+				</mat-select>
+			</div>
+			<div>
+				<input type="text" placeholder="{{fieldPlaceVal}}" class="form-control" [(ngModel)]="fieldValue"
+					name="toolFieldValue">
+			</div>
+			<div style="margin-left: 30px">
+				<button mat-raised-button (click)="getDetails()"
+					[disabled]="frmagentconfig.invalid || fieldValue == null" class="configureBut"
+					style="width: 150px; padding-left: 10px; padding-right: 10px;">
+					Submit</button>
+				<br>
+			</div>
 
-    </div>
-    <div style="display: flex; justify-content: center; align-items: center">
-      <div class="loading-indicator">
-          <mat-progress-spinner *ngIf="isDatainProgress" [diameter]="100" color="primary" mode="indeterminate">
-        </mat-progress-spinner> 
-      </div>
-    </div>
-    <br>
-  </form>
-  <div>
-    <div class="PWGx-PipelineGraph" style="position: relative; overflow: auto;margin-left: -40px;">
-      <svg [attr.width.px]="(253.75 + ((list.length) * 120))" [attr.height.px]="125 + (pipeheight * 70) + 300">
+		</div>
+		<div style="display: flex; justify-content: center; align-items: center">
+			<div class="loading-indicator">
+				<mat-progress-spinner *ngIf="isDatainProgress" [diameter]="100" color="primary" mode="indeterminate">
+				</mat-progress-spinner>
+			</div>
+		</div>
+		<br>
+	</form>
+	<div>
+		<div class="PWGx-PipelineGraph" style="position: relative; overflow: auto; margin-left: -40px;">
+			<svg [attr.width.px]="(253.75 + ((list.length) * 120))" [attr.height.px]="320">
 
-        <g transform="translate(40,55)" class="PWGx-pipeline-node" *ngIf="list[0]?.child?.length >= 2">
-          <circle r="7" class="PWGx-pipeline-node-terminal"></circle>
-        </g>
-        <g transform="translate(60,55)" class="PWGx-pipeline-node" *ngIf="list?.length == 1 && list[0]?.child?.length == 1">
-          <circle r="7" class="PWGx-pipeline-node-terminal"></circle>
-          <circle r="19" class="PWGx-pipeline-node-hittarget" fill-opacity="0" stroke="none"></circle>
-        </g>
-        <g transform="translate(60,55)" class="PWGx-pipeline-node" *ngIf="list?.length > 1 && list[0]?.child?.length == 1">
-          <circle r="7" class="PWGx-pipeline-node-terminal"></circle>
-          <circle r="19" class="PWGx-pipeline-node-hittarget" fill-opacity="0" stroke="none"></circle>
-        </g>
-        <!-- end -->
-        <g [attr.transform]="'translate(' + (253.75 + ((list.length-1) * 120)) + ',55)'" class="PWGx-pipeline-node">
-          <circle r="7" class="PWGx-pipeline-node-terminal"></circle>
-          <circle r="19" class="PWGx-pipeline-node-hittarget" fill-opacity="0" stroke="none"></circle>
-        </g>
+				<g transform="translate(40,55)" class="PWGx-pipeline-node" *ngIf="list[0]?.child?.length >= 2">
+					<circle r="7" class="PWGx-pipeline-node-terminal"></circle>
+				</g>
+				<g transform="translate(60,55)" class="PWGx-pipeline-node"
+					*ngIf="list?.length > 1 && list[0]?.child?.length == 1">
+					<circle r="7" class="PWGx-pipeline-node-terminal"></circle>
+					<circle r="19" class="PWGx-pipeline-node-hittarget" fill-opacity="0" stroke="none"></circle>
+				</g>
+				<!-- end -->
+				<g [attr.transform]="'translate(' + (253.75 + ((list.length-1) * 120)) + ',55)'"
+					class="PWGx-pipeline-node" *ngIf="list?.length > 1 && list[0]?.child?.length == 1">
+					<circle r="7" class="PWGx-pipeline-node-terminal"></circle>
+					<circle r="19" class="PWGx-pipeline-node-hittarget" fill-opacity="0" stroke="none"></circle>
+				</g>
+				<!-- first lines -->
+				<line class="PWGx-pipeline-connector" *ngFor="let item of list; let i = index" stroke-width="3.5"
+					x1="65.25" y1="55" x2="133.75" y2="55"></line>
+				<!-- lines -->
+				<g *ngFor="let item of list; let i = index">
+					<line class="PWGx-pipeline-connector" stroke-width="3.5" [attr.x1]="154.25 + ((i)*120)" y1="55"
+						[attr.x2]="253.75 + ((i)*120)" y2="55"></line>
+					<!-- left paths -->
+					<path class="PWGx-pipeline-connector"
+						*ngFor="let item of item?.child | slice:1:item?.child?.length; let j = index;"
+						stroke-width="3.5"
+						[attr.d]="'M ' + (154.25 + ((i-1)*120)) + ' 55 l 49.75 0 c 12 0 12 12 12 12 l 0  ' + (46 + (j*70)) +' c 0 12 12 12 12 12 l 25.75 0'"
+						fill="none"></path>
+					<!-- right paths -->
+					<path class="PWGx-pipeline-connector"
+						*ngFor="let item of item?.child | slice:1:item?.child?.length; let j = index;"
+						stroke-width="3.5"
+						[attr.d]="'M ' + (154.75 + ((i)*120)) + ' '+ (125 + (j*70))  +' l 25.75 0 c 12 0 12 -12 12 -12 l 0  ' + (-46 - (j*70)) +' c 0 -12 12 -12 12 -12 l 49.75 0'"
+						fill="none"></path>
+				</g>
+				<!-- points -->
+				<g *ngFor="let item of list; let i = index">
+					<!-- top points -->
+					<g [attr.transform]="'translate(' + (144 + (i*120)) + ', 55)'" class="PWGx-pipeline-node"
+						(mouseenter)="eventGet(i)">
+						<!--(mouseout)="eventLeave()"-->
+						<a class="second_popup" data-toggle="modal" data-target="#myModal2">
+							<g class="PWGx-svgResultStatusSolid">
+								<circle cx="0" cy="0" r="12" class="halo" stroke-width="3.5"></circle>
+								<circle cx="0" cy="0" r="12" class="statusColor circle-bg success"></circle>
+								<g class="PWGx-result-status-glyph">
+									<polygon
+										points="-2.00 2.80 -4.80 0.00 -5.73 0.933 -2.00 4.67 6.00 -3.33 5.07 -4.27">
+									</polygon>
+								</g>
+							</g>
+							<g class="PWGx-svgResultStatusSolid" *ngIf="item?.child[0]?.point?.toolstatus == 'FAILURE'">
+								<circle cx="0" cy="0" r="12" class="halo" stroke-width="3.5"></circle>
+								<circle cx="0" cy="0" r="12" class="statusColor circle-bg failure"></circle>
+								<g class="PWGx-result-status-glyph">
+									<polygon
+										points="4.67 -3.73 3.73 -4.67 0 -0.94 -3.73 -4.67 -4.67 -3.73 -0.94 0 -4.67 3.73 -3.73 4.67 0 0.94 3.73 4.67 4.67 3.73 0.94 0">
+									</polygon>
+								</g>
+							</g>
+							<circle r="19" class="PWGx-pipeline-node-hittarget" fill-opacity="0" stroke="none"
+								cursor="pointer"></circle>
+						</a> </g>
+					<!-- child points -->
+					<g [attr.transform]="'translate(' + (144 + (i*120)) + ',' + (125 + (j * 70)) + ')'"
+						*ngFor="let item of item?.child | slice:1:item?.child?.length; let j = index;"
+						class="PWGx-pipeline-node" (mouseenter)="eventGet(i+'-'+j)">
+						<!-- (mouseout)="eventLeave()"> -->
+						<g class="PWGx-svgResultStatusSolid" (mouseleave)="eventLeave()">
+							<circle cx="0" cy="0" r="12" class="halo" stroke-width="3.5"></circle>
+							<circle cx="0" cy="0" r="12" class="statusColor circle-bg success"></circle>
+							<g class="PWGx-result-status-glyph">
+								<polygon points="-2.00 2.80 -4.80 0.00 -5.73 0.933 -2.00 4.67 6.00 -3.33 5.07 -4.27">
+								</polygon>
+							</g>
+						</g>
+						<g class="PWGx-svgResultStatusSolid" *ngIf="item?.point?.toolstatus == 'FAILURE'"
+							(mouseleave)="eventLeave()">
+							<circle cx="0" cy="0" r="12" class="halo" stroke-width="3.5"></circle>
+							<circle cx="0" cy="0" r="12" class="statusColor circle-bg failure"></circle>
+							<g class="PWGx-result-status-glyph">
+								<polygon
+									points="4.67 -3.73 3.73 -4.67 0 -0.94 -3.73 -4.67 -4.67 -3.73 -0.94 0 -4.67 3.73 -3.73 4.67 0 0.94 3.73 4.67 4.67 3.73 0.94 0">
+								</polygon>
+							</g>
+						</g>
+						<circle r="19" class="PWGx-pipeline-node-hittarget" fill-opacity="0" stroke="none"
+							cursor="pointer"></circle>
+					</g>
+				</g>
 
-        <!-- first lines -->
-        <line class="PWGx-pipeline-connector" *ngFor="let item of list; let i = index" stroke-width="3.5" x1="65.25" y1="55"
-          x2="133.75" y2="55"></line>
-        <!-- lines -->
-        <g *ngFor="let item of list; let i = index">
-          <line class="PWGx-pipeline-connector" stroke-width="3.5" [attr.x1]="154.25 + ((i)*120)" y1="55" [attr.x2]="253.75 + ((i)*120)"
-            y2="55"></line>
-          <!-- left paths -->
-          <path class="PWGx-pipeline-connector" *ngFor="let item of item?.child | slice:1:item?.child?.length; let j = index;"
-            stroke-width="3.5" [attr.d]="'M ' + (154.25 + ((i-1)*120)) + ' 55 l 49.75 0 c 12 0 12 12 12 12 l 0  ' + (46 + (j*70)) +' c 0 12 12 12 12 12 l 25.75 0'"
-            fill="none"></path>
-          <!-- right paths -->
-          <path class="PWGx-pipeline-connector" *ngFor="let item of item?.child | slice:1:item?.child?.length; let j = index;"
-            stroke-width="3.5" [attr.d]="'M ' + (154.75 + ((i)*120)) + ' '+ (125 + (j*70))  +' l 25.75 0 c 12 0 12 -12 12 -12 l 0  ' + (-46 - (j*70)) +' c 0 -12 12 -12 12 -12 l 49.75 0'"
-            fill="none"></path>
-        </g>
-        <!-- points -->
-        <g *ngFor="let item of list; let i = index">
-          <!-- top points -->
-          <g [attr.transform]="'translate(' + (144 + (i*120)) + ', 55)'" class="PWGx-pipeline-node" (mouseenter)="eventGet(i)">
-            <!--(mouseout)="eventLeave()"-->
-            <a class="second_popup" data-toggle="modal" data-target="#myModal2">
-              <g class="PWGx-svgResultStatusSolid">
-                <circle cx="0" cy="0" r="12" class="halo" stroke-width="3.5"></circle>
-                <circle cx="0" cy="0" r="12" class="statusColor circle-bg success"></circle>
-                <g class="PWGx-result-status-glyph">
-                  <polygon points="-2.00 2.80 -4.80 0.00 -5.73 0.933 -2.00 4.67 6.00 -3.33 5.07 -4.27"></polygon>
-                </g>
-              </g>
-              <g class="PWGx-svgResultStatusSolid" *ngIf="item?.child[0]?.point?.toolstatus == 'FAILURE'">
-                <circle cx="0" cy="0" r="12" class="halo" stroke-width="3.5"></circle>
-                <circle cx="0" cy="0" r="12" class="statusColor circle-bg failure"></circle>
-                <g class="PWGx-result-status-glyph">
-                  <polygon points="4.67 -3.73 3.73 -4.67 0 -0.94 -3.73 -4.67 -4.67 -3.73 -0.94 0 -4.67 3.73 -3.73 4.67 0 0.94 3.73 4.67 4.67 3.73 0.94 0">
-                  </polygon>
-                </g>
-              </g>
-              <circle r="19" class="PWGx-pipeline-node-hittarget" fill-opacity="0" stroke="none" cursor="pointer"></circle>
-            </a> </g>
-          <!-- child points -->
-          <g [attr.transform]="'translate(' + (144 + (i*120)) + ',' + (125 + (j * 70)) + ')'" *ngFor="let item of item?.child | slice:1:item?.child?.length; let j = index;"
-            class="PWGx-pipeline-node" (mouseenter)="eventGet(i+'-'+j)">
-            <!-- (mouseout)="eventLeave()"> -->
-            <g class="PWGx-svgResultStatusSolid" (mouseleave)="eventLeave()">
-              <circle cx="0" cy="0" r="12" class="halo" stroke-width="3.5"></circle>
-              <circle cx="0" cy="0" r="12" class="statusColor circle-bg success"></circle>
-              <g class="PWGx-result-status-glyph">
-                <polygon points="-2.00 2.80 -4.80 0.00 -5.73 0.933 -2.00 4.67 6.00 -3.33 5.07 -4.27"></polygon>
-              </g>
-            </g>
-            <g class="PWGx-svgResultStatusSolid" *ngIf="item?.point?.toolstatus == 'FAILURE'" (mouseleave)="eventLeave()">
-              <circle cx="0" cy="0" r="12" class="halo" stroke-width="3.5"></circle>
-              <circle cx="0" cy="0" r="12" class="statusColor circle-bg failure"></circle>
-              <g class="PWGx-result-status-glyph">
-                <polygon points="4.67 -3.73 3.73 -4.67 0 -0.94 -3.73 -4.67 -4.67 -3.73 -0.94 0 -4.67 3.73 -3.73 4.67 0 0.94 3.73 4.67 4.67 3.73 0.94 0">
-                </polygon>
-              </g>
-            </g>
-            <circle r="19" class="PWGx-pipeline-node-hittarget" fill-opacity="0" stroke="none" cursor="pointer"></circle>
-          </g>
-        </g>
-      </svg>
-      <div *ngFor="let item of list; let i = index">
-        <div class="TruncatingLabel PWGx-pipeline-big-label" title="Click here to see more details" class="letter-fix"
-          [ngStyle]="{'left': (144 + (i*120)) + 'px'}">
-          <a class="link" (click)="showDetailsDialog(item.point)"> <b style="color:#0033A0">{{item.point}}
-              ( {{item.count}} ) </b> </a></div>
-        <div *ngFor="let ite of item?.child; let j = index" class="TruncatingLabel PWGx-pipeline-small-label" [title]="ite.point"
-          style="overflow-wrap: break-word; top: 70px; left: 219px; position: absolute; width: 89px; max-height: 39px; text-align: center;"
-          [style.top]="(70 * (j+1)) + 'px'" [style.left]="(94 + (i*120)) + 'px'">{{ite.point.toolstatus}}</div>
-        <!-- <div class="TruncatingLabel PWGx-pipeline-big-label" title="End" style="overflow: hidden; overflow-wrap: break-word; position: absolute; width: 113px; max-height: 35px; text-align: center; margin-left: -57px; top: 15px; left: 948px;">End</div> -->
-      </div>
-    </div>
+			</svg>
+			<div class="summarylist" style="margin-left: 35px;">
+				<ul>
+					<li style="color: #0033A0" *ngFor="let element of toolSummaryArray">{{element}}</li>
+				</ul>
+			</div>
+			<div *ngFor="let item of list; let i = index">
+				<div class="TruncatingLabel PWGx-pipeline-big-label" title="Click here to see more details"
+					class="letter-fix" [ngStyle]="{'left': (144 + (i*120)) + 'px'}">
+					<a class="link" (click)="showDetailsDialog(item.point)"> <b style="color: #0033A0">{{item.point}} (
+						{{item.count}} ) </b>
+					</a>
+				</div>
+				<div *ngFor="let ite of item?.child; let j = index" class="TruncatingLabel PWGx-pipeline-small-label"
+					[title]="ite.point"
+					style="overflow-wrap: break-word; top: 70px; left: 219px; position: absolute; width: 89px; max-height: 39px; text-align: center;"
+					[style.top]="(70 * (j+1)) + 'px'" [style.left]="(94 + (i*120)) + 'px'">{{ite.point.toolstatus}}
+				</div>
+				<!-- <div class="TruncatingLabel PWGx-pipeline-big-label" title="End" style="overflow: hidden; overflow-wrap: break-word; position: absolute; width: 113px; max-height: 35px; text-align: center; margin-left: -57px; top: 15px; left: 948px;">End</div> -->
+			</div>
+		</div>
+
+	</div>
+</div>
