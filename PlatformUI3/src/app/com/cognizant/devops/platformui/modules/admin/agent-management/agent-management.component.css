@@ -425,6 +425,11 @@ tr.mat-footer-row, tr.mat-row-dynamic{
     height: 30px;
 }
 
+.vault-toggle {
+    position: absolute;
+    right: 50px;
+}
+
 /* .mat-button-focus-overlay {
    background-color:unset !important;
   }

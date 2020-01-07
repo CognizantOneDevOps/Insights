@@ -21,6 +21,7 @@ Created on Jun 22, 2016
 from datetime import datetime as dateTime2
 import datetime
 import copy
+import json
 
 from dateutil import parser
 
@@ -30,8 +31,8 @@ from ....core.BaseAgent3 import BaseAgent
 class JiraAgent(BaseAgent):
         
     def process(self):
-        self.userid = self.config.get("userid", '')
-        self.passwd = self.config.get("passwd", '')
+        self.userid = self.getCredential("userid")
+        self.passwd = self.getCredential("passwd")
         baseUrl = self.config.get("baseUrl", '')
         startFrom = self.config.get("startFrom", '')
         lastUpdated = self.tracking.get("lastupdated", startFrom)

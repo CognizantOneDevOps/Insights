@@ -22,11 +22,12 @@ from dateutil import parser
 import datetime
 from ....core.BaseAgent3 import BaseAgent
 import logging
+import json
 
 class AzureRepoAgent(BaseAgent):
     def process(self):
-        UserID = self.config.get("userID", '')
-        Passwd = self.config.get("passwd", '')
+        UserID = self.getCredential("userid")
+        Passwd = self.getCredential("passwd")
         Auth = self.config.get("auth", '')
         getRepos = self.config.get("getRepos", '')
         accessToken = self.config.get("accessToken", '')

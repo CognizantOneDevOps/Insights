@@ -21,11 +21,12 @@ Created on Jun 22, 2016
 from ....core.BaseAgent3 import BaseAgent
 import xml.etree.ElementTree as ET
 import logging
+import json
 
 class HpAlmAgent(BaseAgent):
     def getHpAlmSSOHeader(self, baseEndPoint):
-        userid = self.config.get('userid')
-        passwd = self.config.get('passwd')
+        self.userid = self.getCredential("userid")
+        self.passwd = self.getCredential("passwd")
         authEndPoint = baseEndPoint + '/qcbin/authentication-point/authenticate' 
         responseTupple = {}
         reqHeaders = {

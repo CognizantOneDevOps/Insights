@@ -24,8 +24,8 @@ from ....core.BaseAgent import BaseAgent
 class TeamCityAgent(BaseAgent):
     def process(self):
         BaseUrl = self.config.get("baseUrl", '')
-        UserID = self.config.get("userID", '')
-        Passwd = self.config.get("passwd", '')
+        UserID = self.getCredential("userid")
+        Passwd = self.getCredential("passwd")
         if not self.tracking.get("sinceBuild",None):
             getBuildsUrl = BaseUrl + '/httpAuth/app/rest/builds/'
         else:

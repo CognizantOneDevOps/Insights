@@ -28,11 +28,11 @@ import logging.handlers
 
 class RallyAgent(BaseAgent):
     def process(self):
-        userid = self.config.get("userid", '')
-        passwd = self.config.get("passwd", '')
+        userid = self.getCredential("userid")
+        passwd = self.getCredential("passwd")
         baseUrl = self.config.get("baseUrl", '')
         pageSize = self.config.get("dataSize", '')
-        accesstoken = self.config.get("accesstoken", '')
+        accesstoken = self.getCredential("accesstoken")
         storyMetadata = self.config.get('dynamicTemplate', {}).get('storyMetadata', None)
         relationMetadata = self.config.get('dynamicTemplate', {}).get('relationMetadata', None)
         releaseMetadata = self.config.get('dynamicTemplate', {}).get('releaseMetadata', None)

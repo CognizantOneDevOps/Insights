@@ -51,7 +51,7 @@ export class HomeComponent implements OnInit {
   userRole: String = '';
   userCurrentOrg: string = '';
   showAdminTab: boolean = false;
-  isToolbarDisplay: boolean = true;
+  isToolbarDisplay: boolean = InsightsInitService.enableInsightsBranding;
   showBusinessMapping: boolean = false;
   isValidUser: boolean = false;
   iframeStyle = 'width:100%; height:500px;';
@@ -187,29 +187,42 @@ export class HomeComponent implements OnInit {
         navItemobj.title = orgDtl.name;
         this.navOrgList.push(navItemobj);
       }
+
+      var navItemobj = new NavItem();
+      navItemobj.displayName = 'Traceability Dashboard';
+      navItemobj.iconName = 'traceability';
+      navItemobj.route = 'InSights/Home/traceability';
+      navItemobj.isToolbarDisplay = InsightsInitService.enableInsightsBranding;
+      navItemobj.showIcon = true;
+      navItemobj.isAdminMenu = false;
+      navItemobj.title = "traceability";
+
+      this.navOrgList.push(navItemobj);
     }
   }
 
 
   onItemSelected(item: NavItem) {
     this.selectedItem = item;
-    this.displayLandingPage = false;
     this.isToolbarDisplay = item.isToolbarDisplay;
-
     var isSessionExpired = this.dataShare.validateSession();
     if (!isSessionExpired) {
       if (!item.children || !item.children.length) {
         if (item.iconName == 'grafanaOrg') {
+          this.displayLandingPage = false;
           this.selectedOrg = (this.selectedItem == undefined ? '' : this.selectedItem.displayName);
           this.selectedOrgName = this.getSelectedOrgName(this.selectedOrg);
           this.switchOrganizations(item.orgId, item.route, this.selectedOrgName);
         } else if (item.displayName == 'About') {
           this.about();
         } else if (item.displayName == 'Help') {
+          this.displayLandingPage = false;
           window.open(this.helpPageURL, "_blank");
         } else if (item.displayName == 'Logout') {
+          this.displayLandingPage = false;
           this.logout();
         } else {
+          this.displayLandingPage = false;
           this.router.navigateByUrl(item.route, { skipLocationChange: true });
         }
       }
@@ -224,7 +237,7 @@ export class HomeComponent implements OnInit {
         isAdminMenu: false,
         showMenu: true,
         title: "Click on Organization to see various Org's Dashboards",
-        isToolbarDisplay: false,
+        isToolbarDisplay: InsightsInitService.enableInsightsBranding,
         children: this.navOrgList
       },
       {
@@ -233,13 +246,13 @@ export class HomeComponent implements OnInit {
         isAdminMenu: true,
         showMenu: InsightsInitService.showAuditReporting,
         title: "Audit Report and search assets",
-        isToolbarDisplay: true,//false
+        isToolbarDisplay: InsightsInitService.enableInsightsBranding,
         children: [
           {
             displayName: 'Search Assets',
             iconName: 'feature',
             route: 'InSights/Home/blockchain',
-            isToolbarDisplay: true,
+            isToolbarDisplay: InsightsInitService.enableInsightsBranding,
             showMenu: InsightsInitService.showAuditReporting,
             title: "Search Assets",
             isAdminMenu: true
@@ -248,11 +261,12 @@ export class HomeComponent implements OnInit {
             displayName: 'Query Builder',
             iconName: 'feature',
             route: 'InSights/Home/querybuilder',
-            isToolbarDisplay: true,
+            isToolbarDisplay: InsightsInitService.enableInsightsBranding,
             showMenu: InsightsInitService.showAuditReporting,
             title: "Query Builder",
             isAdminMenu: true
           }
+
         ]
       },
       {
@@ -268,7 +282,7 @@ export class HomeComponent implements OnInit {
         displayName: 'Data Dictionary',
         iconName: 'datadictionary',
         route: 'InSights/Home/datadictionary',
-        isToolbarDisplay: true,
+        isToolbarDisplay: InsightsInitService.enableInsightsBranding,
         showMenu: true,
         title: "Data Dictionary",
         isAdminMenu: false
@@ -277,15 +291,16 @@ export class HomeComponent implements OnInit {
         displayName: 'Health Check',
         iconName: 'feature',
         route: 'InSights/Home/healthcheck',
-        isToolbarDisplay: true,
+        isToolbarDisplay: InsightsInitService.enableInsightsBranding,
         showMenu: true,
         title: "Health Check",
         isAdminMenu: true
       },
+
       {
         displayName: 'Configuration',
         iconName: 'admin',
-        isToolbarDisplay: true,
+        isToolbarDisplay: InsightsInitService.enableInsightsBranding,
         isAdminMenu: true,
         title: "Configuration",
         showMenu: true,
@@ -294,7 +309,7 @@ export class HomeComponent implements OnInit {
             displayName: 'Agent Management',
             iconName: 'feature',
             route: 'InSights/Home/agentmanagement',
-            isToolbarDisplay: true,
+            isToolbarDisplay: InsightsInitService.enableInsightsBranding,
             showMenu: true,
             title: "Agent Management",
             isAdminMenu: true
@@ -303,7 +318,7 @@ export class HomeComponent implements OnInit {
             displayName: 'Bulk Upload',
             iconName: 'feature',
             route: 'InSights/Home/bulkupload',
-            isToolbarDisplay: true,
+            isToolbarDisplay: InsightsInitService.enableInsightsBranding,
             showMenu: true,
             title: "Bulk Upload",
             isAdminMenu: true
@@ -312,7 +327,7 @@ export class HomeComponent implements OnInit {
             displayName: 'Webhook Configuration',
             iconName: 'feature',
             route: 'InSights/Home/webhook',
-            isToolbarDisplay: true,
+            isToolbarDisplay: InsightsInitService.enableInsightsBranding,
             showMenu: InsightsInitService.showWebhookConfiguration,
             title: "WebHook",
             isAdminMenu: true
@@ -321,7 +336,7 @@ export class HomeComponent implements OnInit {
             displayName: 'Business Mapping',
             iconName: 'feature',
             route: 'InSights/Home/businessmapping',
-            isToolbarDisplay: true,
+            isToolbarDisplay: InsightsInitService.enableInsightsBranding,
             showMenu: InsightsInitService.showBusinessMapping,
             title: "Business Mapping",
             isAdminMenu: true
@@ -330,7 +345,7 @@ export class HomeComponent implements OnInit {
             displayName: 'Group & Users',
             iconName: 'feature',
             route: 'InSights/Home/accessGroupManagement',
-            isToolbarDisplay: true,
+            isToolbarDisplay: InsightsInitService.enableInsightsBranding,
             showMenu: true,
             title: "Group & Users",
             isAdminMenu: true
@@ -339,7 +354,7 @@ export class HomeComponent implements OnInit {
             displayName: 'Co-Relation Builder',
             iconName: 'feature',
             route: 'InSights/Home/relationship-builder',
-            isToolbarDisplay: true,
+            isToolbarDisplay: InsightsInitService.enableInsightsBranding,
             showMenu: true,
             title: "Relationship-Builder",
             isAdminMenu: true
@@ -348,7 +363,7 @@ export class HomeComponent implements OnInit {
             displayName: 'Logo Setting',
             iconName: 'feature',
             route: 'InSights/Home/logoSetting',
-            isToolbarDisplay: true,
+            isToolbarDisplay: InsightsInitService.enableInsightsBranding,
             showMenu: true,
             title: "Logo Setting",
             isAdminMenu: true
@@ -357,11 +372,12 @@ export class HomeComponent implements OnInit {
             displayName: 'Data Archival',
             iconName: 'feature',
             route: 'InSights/Home/dataarchiving',
-            isToolbarDisplay: true,
+            isToolbarDisplay: InsightsInitService.enableInsightsBranding,
             showMenu: true,
             title: "Data Archival",
             isAdminMenu: true
           }
+
         ]
       }
     ];
@@ -383,7 +399,7 @@ export class HomeComponent implements OnInit {
       }, {
         displayName: 'Logout',
         iconName: 'logout',
-        route: 'login', //loggedout
+        route: 'login',
         isToolbarDisplay: false,
         showIcon: true,
         title: "Logout",
@@ -474,7 +490,7 @@ export class HomeComponent implements OnInit {
     // console.log(this.router.isActive(this.router.url, true))
     this.router.navigate(['InSights/Home'], { skipLocationChange: true });
     this.displayLandingPage = true;
-    this.isToolbarDisplay = true;
+    this.isToolbarDisplay = InsightsInitService.enableInsightsBranding;
   }
 
   getSelectedOrgName(orgSelectedName): String {

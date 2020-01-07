@@ -36,6 +36,7 @@ import { RelationshipBuilderComponent } from '@insights/app/modules/relationship
 import { BulkUploadComponent } from '@insights/app/modules/bulkupload/bulkupload.component';
 import { WebHookComponent } from '@insights/app/modules/webhook/webhook.component';
 import { AuthGuardService as AuthGuard } from '@insights/common/auth-guard.service';
+import { TraceabilityDashboardCompenent} from '@insights/app/modules/traceability/traceability-builder.component';
 const homeRoutes: Routes = [
   {
     path: 'InSights/Home', component: HomeComponent,
@@ -58,7 +59,8 @@ const homeRoutes: Routes = [
       { path: 'reportconfiguration', component: CustomReportConfigComponent },
       { path: 'relationship-builder', component: RelationshipBuilderComponent },
       { path: 'bulkupload', component: BulkUploadComponent },
-      { path: 'webhook', component: WebHookComponent }
+      { path: 'webhook', component: WebHookComponent },
+      { path : 'traceability' ,component: TraceabilityDashboardCompenent}
     ],
     canActivate: [AuthGuard]
   }

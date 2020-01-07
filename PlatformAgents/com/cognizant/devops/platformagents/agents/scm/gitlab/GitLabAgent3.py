@@ -27,7 +27,7 @@ class GitLabAgent(BaseAgent):
     def process(self):
         baseUrl = self.config.get("getProjects", '')
         baseUrl = baseUrl + '/api/v4'
-        accessToken = self.config.get("accessToken", '')
+        accessToken = self.getCredential("accessToken")
         commitsBaseEndPoint = self.config.get("CommitsBaseEndPoint", '')
         relationMetadata = self.config.get('dynamicTemplate', {}).get('relationMetadata', None)
         commitMetadata = self.config.get('dynamicTemplate', {}).get('commitMetadata', None)

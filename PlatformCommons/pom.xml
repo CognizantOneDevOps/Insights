@@ -12,14 +12,14 @@
 	<parent>
 		<artifactId>PlatformParent</artifactId>
 		<groupId>com.cognizant.devops</groupId>
-		<version>6.2</version>
+		<version>6.3</version>
 	</parent>
 
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>com.cognizant.devops</groupId>
 	<artifactId>PlatformCommons</artifactId>
-	<version>6.2</version>
+	<version>6.3</version>
 	<packaging>jar</packaging>
 
 	<name>PlatformCommons</name>
@@ -82,7 +82,7 @@
 								<resource>
 									<directory>src/main/resources</directory>
 									<includes>
-									<include>OneDevOpInsights v2.16 OpenSource Credit Document v1.0.pdf</include>
+									<include>OneDevOpInsights v2.17 OpenSource Credit Document v1.0.pdf</include>
 									</includes>
 									<filtering>true</filtering>
 								</resource>

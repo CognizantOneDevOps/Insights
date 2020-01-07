@@ -17,14 +17,15 @@
 
 from ....core.BaseAgent3 import BaseAgent
 from dateutil import parser
+import json
 
 class BuildMasterAgent(BaseAgent):
     def process(self):
         startFrom = self.config.get("StartFrom", '')
         apiKey = str(self.config.get("apiKey", ''))
         baseurl = self.config.get("endpoint", '')
-        userid = self.config.get("userid", '')
-        passwd = self.config.get("passwd", '')
+        userid = self.getCredential("userid")
+        passwd = self.getCredential("passwd")
         appIds = self.config.get('dynamicTemplate', {}).get('applicationIds', [])
         timeStampFormat = self.config.get('timeStampFormat')
         responseTemplate = self.config.get('dynamicTemplate', {}).get('responseTemplate', None)

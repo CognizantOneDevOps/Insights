@@ -23,8 +23,8 @@ from ....core.BaseAgent import BaseAgent
 class CITFSAgent(BaseAgent):
     def process(self):
         BaseUrl = self.config.get("baseUrl", '')
-        UserID = self.config.get("userID", '')
-        Passwd = self.config.get("passwd", '')
+        UserID = self.getCredential("userid")
+        Passwd = self.getCredential("passwd")
         Auth = self.config.get("auth", '')
         getCollectionsUrl = BaseUrl+"/_apis/projectcollections"
         collections = self.getResponse(getCollectionsUrl, 'GET', UserID, Passwd, None, authType=Auth)

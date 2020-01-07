@@ -78,8 +78,9 @@ import { BulkUploadComponent } from '@insights/app/modules/bulkupload/bulkupload
 import { BulkUploadService } from '@insights/app/modules/bulkupload/bulkupload.service';
 import { WebHookComponent } from '@insights/app/modules/webhook/webhook.component';
 import { WebHookService } from '@insights/app/modules/webhook/webhook.service';
-
-
+import { TraceabilityDashboardCompenent } from '@insights/app/modules/traceability/traceability-builder.component';
+import { TraceabiltyService } from '@insights/app/modules/traceability/traceablity-builder.service';
+import { ShowTraceabiltyDetailsDialog } from '@insights/app/modules/traceability/traceabilty-show-details-dialog';
 
 
 
@@ -93,6 +94,7 @@ import { WebHookService } from '@insights/app/modules/webhook/webhook.service';
     PageNotFoundComponent,
     HealthCheckComponent,
     ShowDetailsDialog,
+    ShowTraceabiltyDetailsDialog,
     AboutDialog,
     AgentManagementComponent,
     DatadictionaryComponent,
@@ -113,7 +115,10 @@ import { WebHookService } from '@insights/app/modules/webhook/webhook.service';
     ShowJsonDialog,
     RelationshipBuilderComponent,
     BulkUploadComponent,
-    WebHookComponent
+    WebHookComponent,
+    TraceabilityDashboardCompenent,
+
+
   ],
   imports: [
     HomeRouting,
@@ -129,6 +134,7 @@ import { WebHookService } from '@insights/app/modules/webhook/webhook.service';
   ],
   entryComponents: [
     ShowDetailsDialog,
+    ShowTraceabiltyDetailsDialog,
     AboutDialog,
     ConfirmationMessageDialog,
     ApplicationMessageDialog,
@@ -154,7 +160,8 @@ import { WebHookService } from '@insights/app/modules/webhook/webhook.service';
     QueryBuilderService,
     RelationshipBuilderService,
     BulkUploadService,
-    WebHookService
+    WebHookService,
+    TraceabiltyService
   ]
 })
 

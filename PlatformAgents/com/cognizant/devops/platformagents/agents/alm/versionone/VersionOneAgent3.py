@@ -29,8 +29,8 @@ import json,ast
 
 class VersionOneAgent(BaseAgent):
     def process(self):
-        userid = self.config.get("userid", '')
-        passwd = self.config.get("passwd", '')
+        userid = self.getCredential("userid")
+        passwd = self.getCredential("passwd")
         baseUrl = self.config.get("baseUrl", '')
         project = self.config.get("project", '')
         startFrom = self.config.get("startFrom", '')

@@ -1,4 +1,10 @@
 {
+  "vault": {
+    "getFromVault": false,
+    "secretEngine":"insights-kv",
+    "readToken":"token",
+    "vaultUrl":"http://10.224.90.35:3000/v1/"
+  },
   "mqConfig": {
     "user": "iSight",
     "password": "iSight",
@@ -47,9 +53,10 @@
   "timeStampFormat": "%Y-%m-%dT%H:%M:%SZ",
   "isEpochTimeFormat": false,
   "startFrom": "2015-01-01 00:00:00",
-  "userID": "",
+  "userid": "",
   "passwd": "",
   "accessToken": "accesstoken",
+  "agentSecretDetails": ["userid","passwd"],
   "getRepos": "https://dev.azure.com/<organization>/<project>/_apis/git/repositories",
   "commitsBaseEndPoint": "https://dev.azure.com/<organization>/<project>/_apis/git/repositories/",
   "isDebugAllowed": false,

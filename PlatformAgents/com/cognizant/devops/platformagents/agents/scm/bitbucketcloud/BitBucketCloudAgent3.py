@@ -22,11 +22,13 @@ Created on Jun 28, 2016
 from dateutil import parser
 from ....core.BaseAgent3 import BaseAgent
 
+import json
+
 class BitBucketCloudAgent(BaseAgent):
     def process(self):
         BaseEndPoint = self.config.get("baseEndPoint", '')
-        UserId = self.config.get("userID", '')
-        Passwd = self.config.get("passwd", '')
+        UserId = self.getCredential("userid")
+        Passwd = self.getCredential("passwd")
         startFrom = self.config.get("startFrom", '')
         startFromLen = len(startFrom)
         startFrom = parser.parse(startFrom)

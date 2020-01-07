@@ -24,12 +24,13 @@ import requests, json
 from requests.auth import HTTPBasicAuth
 from ....core.BaseAgent3 import BaseAgent
 from datetime import datetime, timedelta
+import json
 import time
 class ArtifactoryAgent(BaseAgent):
 
     def process(self):
-        user = self.config.get("UserID", '')
-        passwd = self.config.get("Passwd", '')
+        user = self.getCredential("userid")
+        passwd = self.getCredential("passwd")
         BaseUrl = self.config.get("BaseUrl", '')
         FirstEndPoint = self.config.get("FirstEndPoint", '')
         self.startDate = None

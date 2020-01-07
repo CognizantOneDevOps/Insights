@@ -1,4 +1,10 @@
 {
+  "vault": {
+    "getFromVault": false,
+    "secretEngine":"insights-kv",
+    "readToken":"token",
+    "vaultUrl":"http://10.224.90.35:3000/v1/"
+  },
  "mqConfig": {
     "exchange": "iSight",
     "host": "127.0.0.1",
@@ -30,8 +36,8 @@
   "runSchedule": 30,
   "enableDataValidation": true,
   "timeStampField": "metricdate",
-  "userId":"admin",
-  "password":"admin",
+  "userid":"admin",
+  "passwd":"admin",
   "timeMachineapi": "no",
   "timeStampFormat": "%Y-%m-%dT%H:%M:%S",
   "startFrom": "2019-01-01T00:01:01",
@@ -41,6 +47,7 @@
   "enableValueArray": false,
   "isEpochTimeFormat" : false,
   "baseUrl": "http://127.0.0.1:9000/sonar/",
+  "agentSecretDetails": ["userid","passwd"],
   "loggingSetting": {
     	"logLevel": "WARN",
 		"maxBytes" : 5000000,

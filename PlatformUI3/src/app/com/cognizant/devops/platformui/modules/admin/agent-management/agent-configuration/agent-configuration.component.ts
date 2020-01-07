@@ -20,7 +20,7 @@ import { Router, ActivatedRoute, ParamMap, NavigationExtras } from '@angular/rou
 import { AgentConfigItem } from '@insights/app/modules/admin/agent-management/agent-configuration/agentConfigItem';
 import { AdminComponent } from '@insights/app/modules/admin/admin.component';
 import { MessageDialogService } from '@insights/app/modules/application-dialog/message-dialog-service';
-
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 
 @Component({
   selector: 'app-agent-configuration',
@@ -71,6 +71,8 @@ export class AgentConfigurationComponent implements OnInit {
   subTitleInfoText: string;
   @ViewChild('fileInput') myFileDiv: ElementRef;
   regex = new RegExp("[a-zA-Z0-9_]*", 'gi');
+  color = 'accent';
+  vault = false;
 
   constructor(public config: InsightsInitService, public agentService: AgentService,
     private router: Router, private route: ActivatedRoute,
@@ -253,7 +255,7 @@ export class AgentConfigurationComponent implements OnInit {
 
   getAgentConfigItems(filtername: any) {
     if (filtername == 'object') {
-      return this.agentConfigItems.filter(item => (item.type == filtername && item.key != 'dynamicTemplate'));
+      return this.agentConfigItems.filter(item => (item.type == filtername && item.key != 'dynamicTemplate'  && item.key != 'vault' && item.key != 'agentSecretDetails'));
     } else if (filtername == 'dynamicTemplate') {
       return this.agentConfigItems.filter(item => item.key == 'dynamicTemplate');
     } else {
@@ -276,6 +278,7 @@ export class AgentConfigurationComponent implements OnInit {
         this.defaultConfigdata = JSON.parse(agentData.data.agentJson);
         this.getconfigDataParsed(this.defaultConfigdata);
         this.configLabelMerge();
+        this.vault = agentData.data.vault;
       } else {
         self.showThrobber = false;
         self.showMessage = "Something wrong with service, Please try again";
@@ -294,7 +297,9 @@ export class AgentConfigurationComponent implements OnInit {
     this.updatedConfigParamdata = {};
 
     for (let configParamData of this.agentConfigItems) {
-      if (configParamData.key != "dynamicTemplate" && configParamData.type == "object") {
+      if(configParamData.key == "agentSecretDetails"){
+        this.updatedConfigParamdata["agentSecretDetails"]  = configParamData.value;
+      }else if (configParamData.key != "dynamicTemplate" && configParamData.type == "object") {
         this.item = {};
         for (let configinnerData of configParamData.children) {
           this.item[configinnerData.key] = this.checkDatatype(configinnerData.value);
@@ -325,12 +330,7 @@ export class AgentConfigurationComponent implements OnInit {
       if (agentId != oldAgentId) {
         self.messageDialog.showApplicationsMessage("You are not allow to change AgentId while update ", "ERROR");
         agentId = undefined;
-      } else if (!checkAgentId) {
-        //console.log(this.regex);
-        agentId = undefined;
-        self.messageDialog.showApplicationsMessage("Please enter valid agentId, and only contain alphanumeric character and underscore ", "ERROR");
       }
-
     }
 
     if (this.updatedConfigParamdata && agentId != undefined) {
@@ -347,6 +347,7 @@ export class AgentConfigurationComponent implements OnInit {
         agentAPIRequestJson['toolName'] = self.selectedTool
         agentAPIRequestJson['agentVersion'] = self.selectedVersion
         agentAPIRequestJson['osversion'] = self.selectedOS
+        agentAPIRequestJson['vault'] = this.vault
         var updateAgentRes = await self.agentService.updateAgentV2(JSON.stringify(agentAPIRequestJson));
 
         self.agentConfigstatus = updateAgentRes.status;
@@ -367,6 +368,7 @@ export class AgentConfigurationComponent implements OnInit {
         agentAPIRequestJson['osversion'] = self.selectedOS
         agentAPIRequestJson['configJson'] = self.configData
         agentAPIRequestJson['trackingDetails'] = self.trackingUploadedFileContentStr
+        agentAPIRequestJson['vault'] = this.vault
         var registerAgentRes = await self.agentService.registerAgentV2(JSON.stringify(agentAPIRequestJson));
         self.agentConfigstatus = registerAgentRes.status;
         //console.log(registerAgentRes);

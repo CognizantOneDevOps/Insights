@@ -24,8 +24,8 @@ from ....core.BaseAgent3 import BaseAgent
 
 class NexusAgent(BaseAgent):
     def process(self):
-        UserID = self.config.get("userID", '')
-        Passwd = self.config.get("passwd", '')
+        UserID = self.getCredential("userid")
+        Passwd = self.getCredential("passwd")
         BaseUrl = self.config.get("baseUrl", '')
         FirstEndPoint = self.config.get("firstEndPoint", '')
         nexIDs = self.getResponse(FirstEndPoint, 'GET', UserID, Passwd, None)

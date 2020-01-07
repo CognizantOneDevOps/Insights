@@ -87,6 +87,12 @@ export class RestAPIurlService implements IRestAPIUrlService {
         this.addEndPoint("DATA_DICTIONARY_TOOLS_RELATIONSHIPS", '/PlatformService/datadictionary/getToolsRelationshipAndProperties');
         this.addEndPoint("INSIGHTS_LOG", '/PlatformService/insights/log');
 
+        //Traceablity Dashboard
+        this.addEndPoint("GET_DETAILS", '/PlatformService/traceabilitydashboard/getPipeline');
+        this.addEndPoint("GET_TOOL_DETAILS", '/PlatformService/traceabilitydashboard/getToolSummary');
+        this.addEndPoint("GET_TOOL_LIST", '/PlatformService/traceabilitydashboard/getAvailableTools');
+        this.addEndPoint("GET_TOOL_KEYSET", '/PlatformService/traceabilitydashboard/getToolKeyset');
+
         //Audit Reporting
         this.addEndPoint("GET_ALL_ASSETS", '/PlatformService/traceability/getAllAssets');
         this.addEndPoint("GET_ASSET_INFO", '/PlatformService/traceability/getAssetInfo');
@@ -114,7 +120,7 @@ export class RestAPIurlService implements IRestAPIUrlService {
         this.addEndPoint("LIST_WEBHOOK", '/PlatformService/admin/webhook/loadwebhookConfiguration');
         this.addEndPoint("DELETE_WEBHOOK", '/PlatformService/admin/webhook/uninstallWebHook');
         this.addEndPoint("UPDATE_WEBHOOK", '/PlatformService/admin/webhook/updateWebhook');
-  
+
 
         //this.addEndPoint("ENTITY_DEFINITION_ADD", '/PlatformService/admin/dataTagging/addEntityDefinition');
         //this.addEndPoint("ENTITY_DEFINITION_REMOVE", '/PlatformService/admin/dataTagging/removeEntityDefinition');

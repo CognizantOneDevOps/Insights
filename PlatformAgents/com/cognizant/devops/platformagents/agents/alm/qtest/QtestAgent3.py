@@ -24,8 +24,8 @@ class QtestAgent (BaseAgent):
 
     def process(self):
         baseUrl = self.config.get('baseUrl', '')
-        userName = self.config.get('username', '')
-        password = self.config.get('password', '')
+        userName = self.getCredential('userid')
+        password = self.getCredential('passwd')
         startFrom = self.config.get('startFrom') + '+00:00'
         startFromDate = parser.parse(startFrom, ignoretz=True)
         pageSize = self.config.get('responsePageSize', 100)

@@ -1,4 +1,10 @@
 {
+  "vault": {
+		"getFromVault": false,
+		"secretEngine":"insights-kv",
+		"readToken":"token",
+		"vaultUrl":"http://10.224.90.35:3000/v1/"
+	},
   "mqConfig": {
     "user": "iSight",
     "password": "iSight",
@@ -40,16 +46,17 @@
 "useResponseTemplate" : true,
 "enableDataValidation": true,
 "runSchedule": 30,
- "isDebugAllowed" : false,
- "enableValueArray": false,
-"UserID": "userid",
-"Passwd": "password",
+"isDebugAllowed" : false,
+"enableValueArray": false,
+"userid": "userid",
+"passwd": "password",
 "BaseUrl": "#BaseUrl",
 "TeamName": "people-sched",
 "timeStampField":"startDate",
 "timeStampFormat":"%Y-%m-%dT%H:%M:%S",
 "isEpochTimeFormat" : false,
 "StartFrom" : "2017-01-01 01:01:01",
+"agentSecretDetails": ["userid","passwd"],
 "loggingSetting" : {
 		"logLevel" : "WARN",
 		"maxBytes" : 5000000,

@@ -27,8 +27,8 @@ from dateutil import parser
 
 class PivotalTrackerAgent(BaseAgent):
     def process(self):
-        userid = self.config.get("userid", '')
-        passwd = self.config.get("passwd", '')
+        userid = self.getCredential("userid")
+        passwd = self.getCredential("passwd")
         relationMetadata = self.config.get('dynamicTemplate', {}).get('relationMetadata', None)
         storyMetadata = self.config.get('dynamicTemplate', {}).get('storyMetadata', None)
         baseEndPoint = self.config.get('baseEndPoint', '')
