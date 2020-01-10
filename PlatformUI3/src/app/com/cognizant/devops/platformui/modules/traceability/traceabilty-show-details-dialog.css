@@ -177,7 +177,7 @@ mat-dialog-content::-webkit-scrollbar-track {
     letter-spacing: .010em;
     line-height: 1.2em;
 	text-align: center;
-    width:150px !important;
+    width:250px !important;
 }
 
 .tableMessageHeaderCss {

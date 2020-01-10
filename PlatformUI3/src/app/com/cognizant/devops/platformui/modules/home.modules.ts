@@ -81,6 +81,7 @@ import { WebHookService } from '@insights/app/modules/webhook/webhook.service';
 import { TraceabilityDashboardCompenent } from '@insights/app/modules/traceability/traceability-builder.component';
 import { TraceabiltyService } from '@insights/app/modules/traceability/traceablity-builder.service';
 import { ShowTraceabiltyDetailsDialog } from '@insights/app/modules/traceability/traceabilty-show-details-dialog';
+import { AddPropertyDialog } from './relationship-builder/add-propertydialog';
 
 
 
@@ -117,6 +118,8 @@ import { ShowTraceabiltyDetailsDialog } from '@insights/app/modules/traceability
     BulkUploadComponent,
     WebHookComponent,
     TraceabilityDashboardCompenent,
+    AddPropertyDialog
+
 
 
   ],
@@ -130,7 +133,8 @@ import { ShowTraceabiltyDetailsDialog } from '@insights/app/modules/traceability
     MaterialModule,
     SharedServices,
     MatDatepickerModule,
-    StorageServiceModule
+    StorageServiceModule,
+   // AddPropertyDialog
   ],
   entryComponents: [
     ShowDetailsDialog,
@@ -140,7 +144,8 @@ import { ShowTraceabiltyDetailsDialog } from '@insights/app/modules/traceability
     ApplicationMessageDialog,
     AddGroupMessageDialog,
     AssetDetailsDialog,
-    ShowJsonDialog
+    ShowJsonDialog,
+    AddPropertyDialog
   ],
 
   providers: [
