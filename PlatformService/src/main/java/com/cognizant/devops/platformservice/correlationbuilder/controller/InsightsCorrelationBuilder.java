@@ -15,8 +15,6 @@
  ******************************************************************************/
 package com.cognizant.devops.platformservice.correlationbuilder.controller;
 
-import java.io.IOException;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +24,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
-
 import com.cognizant.devops.platformcommons.core.util.ValidationUtils;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformservice.correlationbuilder.service.CorrelationBuilderService;
@@ -39,9 +36,8 @@ public class InsightsCorrelationBuilder {
 	static Logger log = LogManager.getLogger(InsightsCorrelationBuilder.class.getName());
 	@Autowired
 	CorrelationBuilderService correlationBuilderService;
-
 	@RequestMapping(value = "/getCorrelationJson", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public @ResponseBody JsonObject getCorrelationJson() throws IOException, InsightsCustomException {
+	public @ResponseBody JsonObject getCorrelationJson() {
 		Object details = null;
 		try {
 			details = correlationBuilderService.getCorrelationJson();
@@ -50,20 +46,16 @@ public class InsightsCorrelationBuilder {
 		}
 
 		return PlatformServiceUtil.buildSuccessResponseWithData(details);
-
 	}
-
 	@RequestMapping(value = "/getNeo4jJson", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public @ResponseBody JsonObject getNeo4jJson() throws IOException, InsightsCustomException {
-		Object details = null;
+	public @ResponseBody JsonObject getNeo4jJson() {
+		JsonObject details = new JsonObject();
 		try {
 			details = correlationBuilderService.getNeo4jJson();
 		} catch (InsightsCustomException e) {
 			return PlatformServiceUtil.buildFailureResponse(e.toString());
-		}
-		
-		return PlatformServiceUtil.buildSuccessResponseWithData(details);
-		
+		}		
+		return PlatformServiceUtil.buildSuccessResponseWithData(details);		
 	}
 
 	@RequestMapping(value = "/saveConfig", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
@@ -73,8 +65,31 @@ public class InsightsCorrelationBuilder {
 			String configDeatilsValidate = ValidationUtils.validateRequestBody(configDetails);
 			message = correlationBuilderService.saveConfig(configDeatilsValidate);
 		} catch (InsightsCustomException e) {
+			return PlatformServiceUtil.buildFailureResponse(e.getMessage());
+		}
+		return PlatformServiceUtil.buildSuccessResponseWithData(message); 
+	} 
+	@RequestMapping(value = "/updateCorrelation", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+	public @ResponseBody JsonObject updateCorrelation(@RequestBody String configDetails) {
+		String message = null;
+		try {
+			String configDeatilsValidate = ValidationUtils.validateRequestBody(configDetails);
+			message = correlationBuilderService.updateCorrelation(configDeatilsValidate);
+		} catch (InsightsCustomException e) {
 			return PlatformServiceUtil.buildFailureResponse(e.toString());
 		}
 		return PlatformServiceUtil.buildSuccessResponseWithData(message);
 	}
+	@RequestMapping(value = "/deleteCorrelation", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+	public @ResponseBody JsonObject deleteCorrelation(@RequestBody String configDetails) {
+		String message = null;
+		try {
+			String configDeatilsValidate = ValidationUtils.validateRequestBody(configDetails);
+			message = correlationBuilderService.deleteCorrelation(configDeatilsValidate);
+		} catch (InsightsCustomException e) {
+			return PlatformServiceUtil.buildFailureResponse(e.toString());
+		}
+		return PlatformServiceUtil.buildSuccessResponseWithData(message);
+	}
+	
 }

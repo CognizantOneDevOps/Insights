@@ -13,72 +13,55 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  ******************************************************************************/
-/*package com.cognizant.devops.engines.platformengine.modules.correlation.model;
+package com.cognizant.devops.platformservice.correlationbuilder.service;
 
-*//**
-	* @author Vishal Ganjare (vganjare)
-	*//*
-		public class Correlation {
-		private CorrelationNode source;
-		private CorrelationNode destination;
-		private String relationName;
-		public CorrelationNode getSource() {
-			return source;
-		}
-		public void setSource(CorrelationNode source) {
-			this.source = source;
-		}
-		public CorrelationNode getDestination() {
-			return destination;
-		}
-		public void setDestination(CorrelationNode destination) {
-			this.destination = destination;
-		}
-		public String getRelationName() {
-			return relationName;
-		}
-		public void setRelationName(String relationName) {
-			this.relationName = relationName;
-		}
-		}*/
-
-package com.cognizant.devops.engines.platformengine.modules.correlation.model;
-
-public class Correlation {
-	private CorrelationNode source;
-	private CorrelationNode destination;
+public class CorrelationJson {
+	private CorrelationNode  source;
+	private CorrelationNode  destination;
 	private String relationName;
-
+	private String[] relationship_properties;
+	private boolean enableCorrelation= true;
+	
+	
 	public CorrelationNode getSource() {
 		return source;
 	}
-
 	public void setSource(CorrelationNode source) {
 		this.source = source;
 	}
-
 	public CorrelationNode getDestination() {
 		return destination;
 	}
-
 	public void setDestination(CorrelationNode destination) {
 		this.destination = destination;
 	}
-
 	public String getRelationName() {
 		return relationName;
 	}
-
+	public void setPropertyList(String[] relationship_properties) {
+		this.relationship_properties = relationship_properties;
+	}
+	public String[] getPropertyList() {
+		return relationship_properties;
+	}
 	public void setRelationName(String relationName) {
 		this.relationName = relationName;
 	}
-
+	public boolean isEnableCorrelation() {
+		return enableCorrelation;
+	}
+	public void setEnableCorrelation(boolean enableCorrelation) {
+		this.enableCorrelation = enableCorrelation;
+	}
+	
 	@Override
 	public String toString() {
 		return "CorrelationJson [source=" + source + ", destination=" + destination + ", relationName=" + relationName
-				+ ", getSource()=" + getSource() + ", getDestination()=" + getDestination() + ", getRelationName()="
-				+ getRelationName() + ", getClass()=" + getClass() + ", hashCode()=" + hashCode() + ", toString()="
+				+ ", correlationFlag=" + enableCorrelation + ", getSource()=" + getSource() + ", getDestination()="
+				+ getDestination() + ", getRelationName()=" + getRelationName() + ", getPropertyList()=" + getPropertyList() + ", isCorrelationFlag()="
+				+ isEnableCorrelation() + ", getClass()=" + getClass() + ", hashCode()=" + hashCode() + ", toString()="
 				+ super.toString() + "]";
 	}
-
-}
+	
+	
+	}

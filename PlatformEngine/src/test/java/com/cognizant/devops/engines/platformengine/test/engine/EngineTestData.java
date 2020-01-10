@@ -60,6 +60,8 @@ public class EngineTestData {
 	public static String agentVersion = "v6.0";
 	public static String gitToolCategory = "SCM";
 	public static String jenkinToolCategory = "CI";
+	public static String gitLabelName = "CI";
+	public static String jenkinLabelName = "CI";
 
 	public static JsonObject getJsonObject(String jsonString) {
 		Gson gson = new Gson();

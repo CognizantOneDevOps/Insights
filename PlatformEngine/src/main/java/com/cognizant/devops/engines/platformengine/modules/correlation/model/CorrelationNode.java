@@ -16,57 +16,82 @@
 package com.cognizant.devops.engines.platformengine.modules.correlation.model;
 
 import java.util.List;
+
 /**
  * @author Vishal Ganjare (vganjare)
  *
  */
+
 public class CorrelationNode {
 	private String toolName;
-	private String almkeyPattern="-";
+	private String almkeyPattern = "-";
 	private List<String> fields;
-	private String toolCategory=null;
-	private boolean enrichAlmData=false;
-	private String almKeyProcessedIndex="jiraKeyProcessed";
-	private String almKeysIndex="jiraKeys";
+	private String toolCategory = null;
+	private String labelName = "";
+	private boolean enrichAlmData = false;
+	private String almKeyProcessedIndex = "jiraKeyProcessed";
+	private String almKeysIndex = "jiraKeys";
+
 	public String getToolName() {
 		return toolName;
 	}
+
 	public void setToolName(String toolName) {
 		this.toolName = toolName;
 	}
+
 	public String getAlmkeyPattern() {
 		return almkeyPattern;
 	}
+
 	public void setAlmkeyPattern(String almkeyPattern) {
 		this.almkeyPattern = almkeyPattern;
 	}
+
 	public List<String> getFields() {
 		return fields;
 	}
+
 	public void setFields(List<String> fields) {
 		this.fields = fields;
 	}
+
 	public String getToolCategory() {
 		return toolCategory;
 	}
+
 	public void setToolCategory(String toolCategory) {
 		this.toolCategory = toolCategory;
 	}
+
+	public String getLabelName() {
+		return labelName;
+	}
+
+	public void setLabelName(String labelName) {
+		this.labelName = labelName;
+	}
+
 	public boolean isEnrichAlmData() {
 		return enrichAlmData;
 	}
+
 	public void setEnrichAlmData(boolean enrichAlmData) {
 		this.enrichAlmData = enrichAlmData;
 	}
+
 	public String getAlmKeyProcessedIndex() {
 		return almKeyProcessedIndex;
 	}
+
 	public void setAlmKeyProcessedIndex(String almKeyProcessedIndex) {
 		this.almKeyProcessedIndex = almKeyProcessedIndex;
 	}
+
 	public String getAlmKeysIndex() {
 		return almKeysIndex;
 	}
+
 	public void setAlmKeysIndex(String almKeysIndex) {
 		this.almKeysIndex = almKeysIndex;
 	}
