@@ -2,8 +2,8 @@
   "vault": {
 	"getFromVault": false,
 	"secretEngine":"insights-kv",
-	"readToken":"<vault_secret_token>",
-	"vaultUrl":"http://<Vault_Host>:<port>/v1/"
+	"readToken":"vault_secret_token",
+	"vaultUrl":"http://Vault_Host:port/v1/"
   }, 
   "mqConfig": {
     "user": "iSight",
