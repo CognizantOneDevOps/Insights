@@ -87,7 +87,7 @@ export class ShowDetailsDialog implements OnInit {
           }
           
           if (this.detailType == "Platform Service" || this.detailType == "Insights Inference Engine" 
-                    || this.detailType == "Platform Engine") {
+                    || this.detailType == "Platform Engine" || this.detailType == "Platform WebhookSubscriber" || this.detailType == "Platform WebhookEngine") {
              this.showAgentFailureTab = false;
           } else {
              this.showAgentFailureTab = true;
