@@ -35,7 +35,7 @@ import { HomeComponent } from '@insights/app/modules/home/home.component';
 export class GrafanaDashboardComponent implements OnInit {
     orgId: string;
     routeParameter: Observable<any>;
-    dashboardUrl: SafeResourceUrl = 'http://localhost:3000/?orgId=1';
+    dashboardUrl: SafeResourceUrl ;
     iSightDashboards = [];
     dashboardTitle: string;
     selectedOrgUrl: string;

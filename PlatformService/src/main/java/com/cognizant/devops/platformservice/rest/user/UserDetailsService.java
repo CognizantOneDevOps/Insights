@@ -15,20 +15,29 @@
  ******************************************************************************/
 package com.cognizant.devops.platformservice.rest.user;
 
-import java.util.Base64;
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-import javax.ws.rs.core.NewCookie;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.ldap.DefaultSpringSecurityContextSource;
+import org.springframework.security.providers.ExpiringUsernameAuthenticationToken;
+import org.springframework.security.saml.SAMLCredential;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -36,10 +45,15 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.constants.ConfigOptions;
+import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
 import com.cognizant.devops.platformcommons.core.util.ValidationUtils;
 import com.cognizant.devops.platformcommons.dal.rest.RestHandler;
+import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformservice.core.ServiceResponse;
 import com.cognizant.devops.platformservice.rest.util.PlatformServiceUtil;
+import com.cognizant.devops.platformservice.security.config.AuthenticationUtils;
+import com.cognizant.devops.platformservice.security.config.SpringAuthorityUtil;
+import com.cognizant.devops.platformservice.security.config.TokenProviderUtility;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -51,18 +65,125 @@ import com.sun.jersey.api.client.ClientResponse;
 public class UserDetailsService {
 	private static Logger log = LogManager.getLogger(UserDetailsService.class.getName());
 
-	private DefaultSpringSecurityContextSource contextSource;
-
+	@Autowired
+	private HttpServletRequest httpRequest;
+	
+	@Autowired 
+	private TokenProviderUtility tokenProviderUtility;
+	
 	@RequestMapping(value = "/authenticate", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 	@ResponseBody
 	public JsonObject authenticateUser(HttpServletRequest request) {
+		log.debug("Inside authenticateUser ");
 		Map<String, String> responseHeadersgrafanaAttr = (Map<String, String>) request.getAttribute("responseHeaders");
 		for (Map.Entry<String, String> entry : responseHeadersgrafanaAttr.entrySet()) {
 			ValidationUtils.cleanXSS(entry.getValue());
 	}
 		return PlatformServiceUtil.buildSuccessResponseWithData(responseHeadersgrafanaAttr);
 	}
+	
+	@RequestMapping(value = "/insightsso/authenticateSSO", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+	@ResponseBody
+	public ResponseEntity<Object> authenticateSSOUser() throws InsightsCustomException {
 
+		log.debug("Inside authenticateSSOUser");
+		Map<String, String> headersGrafana = new HashMap<String, String>();
+		HttpHeaders httpHeaders = new HttpHeaders();
+		try {
+			SecurityContext context = SecurityContextHolder.getContext();
+			Authentication auth = context.getAuthentication();
+			SAMLCredential credentials = (SAMLCredential)auth.getCredentials();
+			//Object userDetails = auth.getDetails();
+			//Object principal = auth.getPrincipal();
+			String userid = credentials.getNameID().getValue();
+			String givenname = credentials.getAttributeAsString("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/givenname");
+
+			httpHeaders.add("insights-sso-token", userid);
+			httpHeaders.add("insights-user-fullname", givenname);
+			
+			//String grafanaCookie = PlatformServiceUtil.getUserCookiesFromAttribute(httpRequest);
+			headersGrafana.put(AuthenticationUtils.GRAFANA_WEBAUTH_USERKEY, userid);
+			headersGrafana.put(AuthenticationUtils.GRAFANA_WEBAUTH_USERKEY_NAME, userid);
+			headersGrafana.put(AuthenticationUtils.HEADER_COOKIES_KEY, "username="+userid);
+			//headersGrafana =PlatformServiceUtil.prepareGrafanaHeader(httpRequest);
+			Map<String, String> grafanaResponseCookies = new HashMap<String, String>();
+			String grafanaCurrentOrg = getGrafanaCurrentOrg(headersGrafana);
+			grafanaResponseCookies.put("grafanaOrg", grafanaCurrentOrg);
+			httpHeaders.add("grafanaOrg", grafanaCurrentOrg);
+			String grafanaCurrentOrgRole = getCurrentOrgRole(headersGrafana, grafanaCurrentOrg);
+			grafanaResponseCookies.put("grafanaRole", grafanaCurrentOrgRole);
+			httpHeaders.add("grafanaRole", grafanaCurrentOrgRole);
+
+			grafanaResponseCookies.put(AuthenticationUtils.GRAFANA_WEBAUTH_USERKEY, userid);
+			httpRequest.setAttribute("responseHeaders", httpHeaders.toSingleValueMap());
+			httpHeaders.add(AuthenticationUtils.GRAFANA_WEBAUTH_USERKEY, userid);
+			
+			URI uri = new URI(ApplicationConfigProvider.getInstance().getSingleSignOnConfig().getRelayStateUrl());//+"/1"
+		    
+		    httpHeaders.setLocation(uri);
+			
+		} catch (InsightsCustomException e) {
+			log.error("Error in authenticate SSO User " + e);
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(PlatformServiceConstants.GRAFANA_LOGIN_ISSUE);
+		} catch (Exception e) {
+			log.error("Error in authenticate SSO User " + e);
+			String msg = "Error while login using sso, For detail Please check log file ";
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(msg);
+		}
+		
+	    return new ResponseEntity<>(httpHeaders, HttpStatus.SEE_OTHER);
+	}
+	
+	@RequestMapping(value = "/insightsso/getUserDetail", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+	public @ResponseBody JsonObject getUserDetail() {
+
+		log.debug("Inside getUserDetail");
+		Map<String, String> headersGrafana = new HashMap<String, String>();
+		
+		JsonObject jsonResponse = new JsonObject();
+
+		try {
+			SecurityContext context = SecurityContextHolder.getContext();
+			Authentication auth = context.getAuthentication();
+			SAMLCredential credentials = (SAMLCredential)auth.getCredentials();
+			Object principal = auth.getPrincipal();
+			String userid = credentials.getNameID().getValue();
+			String givenname = credentials.getAttributeAsString("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/givenname");
+			
+			//String grafanaCookie = PlatformServiceUtil.getUserCookiesFromAttribute(httpRequest);
+			headersGrafana.put(AuthenticationUtils.GRAFANA_WEBAUTH_USERKEY, userid);
+			//headersGrafana =PlatformServiceUtil.prepareGrafanaHeader(httpRequest);
+			headersGrafana.put(AuthenticationUtils.GRAFANA_WEBAUTH_USERKEY_NAME, userid);
+			headersGrafana.put(AuthenticationUtils.HEADER_COOKIES_KEY, "username="+userid);
+			String grafanaCurrentOrg = getGrafanaCurrentOrg(headersGrafana);
+			jsonResponse.addProperty("grafanaOrg", grafanaCurrentOrg);
+			String grafanaCurrentOrgRole = getCurrentOrgRole(headersGrafana, grafanaCurrentOrg);
+			jsonResponse.addProperty("grafanaRole", grafanaCurrentOrgRole);
+
+			jsonResponse.addProperty("insights-sso-token", userid);
+			jsonResponse.addProperty("insights-sso-givenname", givenname);
+			
+			String jToken = tokenProviderUtility.createToken(userid);
+			jsonResponse.addProperty("jtoken", jToken);
+			
+			//set Authority to spring context
+			List<GrantedAuthority> updatedAuthorities = new ArrayList<GrantedAuthority>();
+			updatedAuthorities.add(SpringAuthorityUtil.getSpringAuthorityRole(grafanaCurrentOrgRole));
+
+			Date expDate = new Date(System.currentTimeMillis() + 60 * 60 * 1000);
+			ExpiringUsernameAuthenticationToken autharization = new ExpiringUsernameAuthenticationToken(expDate, principal, auth.getCredentials(), updatedAuthorities);
+			SecurityContextHolder.getContext().setAuthentication(autharization);
+			Authentication auth2 = SecurityContextHolder.getContext().getAuthentication();
+			auth2.getAuthorities().forEach( a -> log.debug("GrantedAuthority  "+a.getAuthority().toString()));
+
+			httpRequest.setAttribute("responseHeaders", jsonResponse);
+		} catch (Exception e) {
+			log.error("Error in SSO Cookie " + e);
+			return PlatformServiceUtil.buildFailureResponse("Error in SSO Cookie " + e);
+		}
+	    return PlatformServiceUtil.buildSuccessResponseWithData(jsonResponse);
+	}
+	
 	@RequestMapping(value = "/logout", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 	@ResponseBody
 	public ServiceResponse logout(HttpServletRequest request) {
@@ -76,6 +197,7 @@ public class UserDetailsService {
 		grafanaHeaders.put("grafanaRole", null);
 		grafanaHeaders.put("grafana_user", null);
 		grafanaHeaders.put("grafana_sess", null);
+		grafanaHeaders.put("grafana_session", null);
 		// To Do : get a service to do a Grafana Logout
 		request.setAttribute("responseHeaders", grafanaHeaders);
 		ServiceResponse response = new ServiceResponse();
@@ -83,40 +205,9 @@ public class UserDetailsService {
 		return response;
 	}
 
-	/*@RequestMapping(value = "/getCurrentOrgAndRole", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public @ResponseBody JsonObject getCurrentOrgAndRole(HttpServletRequest httpRequest) {
-		String authHeader = ValidationUtils.extactAutharizationToken(httpRequest.getHeader("Authorization"));
-		log.debug(" authTokenDecrypt  ========= " + authHeader);
-		Map<String, String> grafanaResponseCookies = new HashMap<String, String>();
-		JsonObject grafanaOrgRoleDataJsonObj = new JsonObject();
-		try {
-			String decodedAuthHeader = new String(Base64.getDecoder().decode(authHeader.split(" ")[1]), "UTF-8");
-			String[] authTokens = decodedAuthHeader.split(":");
-			List<NewCookie> cookies = getValidGrafanaSession(authTokens[0], authTokens[1]);
-			StringBuffer grafanaCookie = new StringBuffer();
-			for (NewCookie cookie : cookies) {
-				grafanaResponseCookies.put(cookie.getName(), cookie.getValue());
-				grafanaCookie.append(cookie.getName()).append("=").append(cookie.getValue()).append(";");
-			}
-			Map<String, String> headers = new HashMap<String, String>();
-			headers.put("Cookie", grafanaCookie.toString());
-			// String grafanaCurrentOrg = getGrafanaCurrentOrg(headers);
-			JsonObject response = getGrafanaUserResponse(headers);
-			String grafanaCurrentOrg = response.get("orgId").toString();
-			String grafanaUserName = response.get("name").toString();
-			String grafanaCurrentOrgRole = getCurrentOrgRole(headers, grafanaCurrentOrg);
-			grafanaOrgRoleDataJsonObj.addProperty("grafanaCurrentOrg", grafanaCurrentOrg);
-			grafanaOrgRoleDataJsonObj.addProperty("grafanaCurrentOrgRole", grafanaCurrentOrgRole);
-			grafanaOrgRoleDataJsonObj.addProperty("userName", grafanaUserName);
-		} catch (Exception e) {
-			log.error("Unable to get the User Role for current org.", e);
-		}
-		return grafanaOrgRoleDataJsonObj;
-	}*/
 
 	private String getCurrentOrgRole(Map<String, String> headers, String grafanaCurrentOrg) {
-		String userOrgsApiUrl = ApplicationConfigProvider.getInstance().getGrafana().getGrafanaEndpoint()
-				+ "/api/user/orgs";
+		String userOrgsApiUrl = PlatformServiceUtil.getGrafanaURL("/api/user/orgs");
 		ClientResponse grafanaCurrentOrgResponse = RestHandler.doGet(userOrgsApiUrl, null, headers);
 		JsonArray grafanaOrgs = new JsonParser().parse(grafanaCurrentOrgResponse.getEntity(String.class))
 				.getAsJsonArray();
@@ -130,30 +221,17 @@ public class UserDetailsService {
 		return grafanaCurrentOrgRole;
 	}
 
-	private String getGrafanaCurrentOrg(Map<String, String> headers) {
-		String loginApiUrl = ApplicationConfigProvider.getInstance().getGrafana().getGrafanaEndpoint() + "/api/user";
+	private String getGrafanaCurrentOrg(Map<String, String> headers) throws InsightsCustomException {
+		String loginApiUrl = PlatformServiceUtil.getGrafanaURL("/api/user");
 		ClientResponse grafanaCurrentOrgResponse = RestHandler.doGet(loginApiUrl, null, headers);
 		JsonObject responseJson = new JsonParser().parse(grafanaCurrentOrgResponse.getEntity(String.class))
 				.getAsJsonObject();
+		log.debug(" Current user detail ==== "+responseJson);
+		String loginId = responseJson.get("login").toString();
+		if(loginId ==null || loginId.contains("(null)")) {
+			throw new InsightsCustomException(PlatformServiceConstants.GRAFANA_LOGIN_ISSUE);
+		}
 		String grafanaCurrentOrg = responseJson.get("orgId").toString();
 		return grafanaCurrentOrg;
-	}
-
-	private JsonObject getGrafanaUserResponse(Map<String, String> headers) {
-		String loginApiUrl = ApplicationConfigProvider.getInstance().getGrafana().getGrafanaEndpoint() + "/api/user";
-		ClientResponse grafanaCurrentOrgResponse = RestHandler.doGet(loginApiUrl, null, headers);
-		JsonObject responseJson = new JsonParser().parse(grafanaCurrentOrgResponse.getEntity(String.class))
-				.getAsJsonObject();
-		return responseJson;
-
-	}
-
-	private List<NewCookie> getValidGrafanaSession(String userName, String password) {
-		JsonObject loginRequestParams = new JsonObject();
-		loginRequestParams.addProperty("user", userName);
-		loginRequestParams.addProperty("password", password);
-		String loginApiUrl = ApplicationConfigProvider.getInstance().getGrafana().getGrafanaEndpoint() + "/login";
-		ClientResponse grafanaLoginResponse = RestHandler.doPost(loginApiUrl, loginRequestParams, null);
-		return grafanaLoginResponse.getCookies();
 	}
 }

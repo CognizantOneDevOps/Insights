@@ -15,31 +15,48 @@
  ******************************************************************************/
 package com.cognizant.devops.platformservice.security.config;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.springframework.web.servlet.support.AbstractAnnotationConfigDispatcherServletInitializer;
+import java.util.Collection;
 
-import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
-import com.cognizant.devops.platformservice.content.config.ContentConfig;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
-public class SpringMvcInitializer extends AbstractAnnotationConfigDispatcherServletInitializer {
-	
-	private static Logger LOG = LogManager.getLogger(SpringMvcInitializer.class);
+public class SamlUserDetails implements UserDetails {
+
+	private static final long serialVersionUID = -4067518472055845768L;
 
 	@Override
-	protected Class<?>[] getRootConfigClasses() {
-		LOG.debug("In SpringMvcInitializer  ");
-		return new Class[] { InsightsSecurityConfigurationAdapter.class,ContentConfig.class }; 
-	}
-
-	@Override
-	protected Class<?>[] getServletConfigClasses() {
+	public Collection<? extends GrantedAuthority> getAuthorities() {
 		return null;
 	}
 
 	@Override
-	protected String[] getServletMappings() {
-		return new String[] { "/*" };
+	public String getPassword() {
+		return null;
 	}
 
-}
+	@Override
+	public String getUsername() {
+		return null;
+	}
+
+	@Override
+	public boolean isAccountNonExpired() {
+		return false;
+	}
+
+	@Override
+	public boolean isAccountNonLocked() {
+		return false;
+	}
+
+	@Override
+	public boolean isCredentialsNonExpired() {
+		return false;
+	}
+
+	@Override
+	public boolean isEnabled() {
+		return false;
+	}
+       
+   }

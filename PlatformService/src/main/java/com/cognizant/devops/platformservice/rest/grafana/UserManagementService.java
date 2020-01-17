@@ -15,15 +15,9 @@
  ******************************************************************************/
 package com.cognizant.devops.platformservice.rest.grafana;
 
-import java.io.UnsupportedEncodingException;
-import java.util.Base64;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.core.NewCookie;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -35,10 +29,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
-import com.cognizant.devops.platformcommons.config.GrafanaData;
-import com.cognizant.devops.platformcommons.core.util.ValidationUtils;
 import com.cognizant.devops.platformcommons.dal.rest.RestHandler;
-import com.cognizant.devops.platformdal.grafana.user.UserDAL;
 import com.cognizant.devops.platformservice.rest.util.PlatformServiceUtil;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -48,7 +39,6 @@ import com.sun.jersey.api.client.ClientResponse;
 @RequestMapping("/admin/userMgmt")
 public class UserManagementService {
 	private static Logger log = LogManager.getLogger(UserManagementService.class.getName());
-	private static String authHeader = null;
 
 	@Autowired
 	private HttpServletRequest httpRequest;
@@ -57,8 +47,7 @@ public class UserManagementService {
 	public JsonObject getOrgUsers(@RequestParam int orgId) {
 		String apiUrl = ApplicationConfigProvider.getInstance().getGrafana().getGrafanaEndpoint() + "/api/orgs/" + orgId
 				+ "/users";
-		Map<String, String> headers = new HashMap<String, String>();
-		headers.put("Authorization", buildAuthenticationHeader());
+		Map<String, String> headers = PlatformServiceUtil.prepareGrafanaHeader(httpRequest);
 		ClientResponse response = RestHandler.doGet(apiUrl, null, headers);
 		return PlatformServiceUtil
 				.buildSuccessResponseWithData(new JsonParser().parse(response.getEntity(String.class)));
@@ -69,8 +58,7 @@ public class UserManagementService {
 		String apiUrl = ApplicationConfigProvider.getInstance().getGrafana().getGrafanaEndpoint() + "/api/orgs";
 		JsonObject request = new JsonObject();
 		request.addProperty("name", orgName);
-		Map<String, String> headers = new HashMap<String, String>();
-		headers.put("Authorization", buildAuthenticationHeader());
+		Map<String, String> headers = PlatformServiceUtil.prepareGrafanaHeader(httpRequest);
 		ClientResponse response = RestHandler.doPost(apiUrl, request, headers);
 		return response.getEntity(String.class);
 	}
@@ -83,8 +71,7 @@ public class UserManagementService {
 		log.debug("API URL is: " + apiUrl);
 		JsonObject request = new JsonObject();
 		request.addProperty("role", role);
-		Map<String, String> headers = new HashMap<String, String>();
-		headers.put("Authorization", buildAuthenticationHeader());
+		Map<String, String> headers = PlatformServiceUtil.prepareGrafanaHeader(httpRequest);
 		ClientResponse response = RestHandler.doPatch(apiUrl, request, headers);
 		return response.getEntity(String.class);
 	}
@@ -96,65 +83,8 @@ public class UserManagementService {
 				+ "/users/" + userId;
 		log.debug("API URL is: " + apiUrl);
 		JsonObject request = new JsonObject();
-		Map<String, String> headers = new HashMap<String, String>();
-		headers.put("Authorization", buildAuthenticationHeader());
+		Map<String, String> headers = PlatformServiceUtil.prepareGrafanaHeader(httpRequest);
 		ClientResponse response = RestHandler.doDelete(apiUrl, request, headers);
 		return response.getEntity(String.class);
-	}
-
-	private String getUserCookies() {
-		Cookie[] cookies = PlatformServiceUtil.validateCookies(httpRequest.getCookies());
-		StringBuffer grafanaCookie = new StringBuffer();
-		if (cookies != null) {
-			for (Cookie cookie : cookies) {
-				grafanaCookie.append(cookie.getName()).append("=").append(cookie.getValue()).append("; HttpOnly");
-			}
-		} else {
-			try {
-				String authHeader = ValidationUtils.extactAutharizationToken(httpRequest.getHeader("Authorization"));
-				// log.debug(" authTokenDecrypt ========= " + authHeader);
-				String decodedAuthHeader = new String(Base64.getDecoder().decode(authHeader.split(" ")[1]), "UTF-8");
-				String[] authTokens = decodedAuthHeader.split(":");
-				JsonObject loginRequestParams = new JsonObject();
-				loginRequestParams.addProperty("user", authTokens[0]);
-				loginRequestParams.addProperty("password", authTokens[1]);
-				String loginApiUrl = ApplicationConfigProvider.getInstance().getGrafana().getGrafanaEndpoint()
-						+ "/login";
-				ClientResponse grafanaLoginResponse = RestHandler.doPost(loginApiUrl, loginRequestParams, null);
-				List<NewCookie> cookies2 = grafanaLoginResponse.getCookies();
-				for (NewCookie cookie : cookies2) {
-					grafanaCookie.append(cookie.getName()).append("=").append(cookie.getValue()).append(";");
-				}
-			} catch (UnsupportedEncodingException e) {
-				log.error("Unable to get grafana session.", e);
-			}
-			/*
-			 * Object attribute = httpRequest.getAttribute("responseHeaders"); if(attribute
-			 * != null){ Map<String, String> responseHeaders = (Map)attribute;
-			 * for(Map.Entry<String, String> entry : responseHeaders.entrySet()){
-			 * grafanaCookie.append(entry.getKey()).append("=").append(entry.getValue()).
-			 * append(";"); } }
-			 */
-		}
-
-		return grafanaCookie.toString();
-	}
-
-	private List<NewCookie> getValidGrafanaSession(String userName, String password) {
-		JsonObject loginRequestParams = new JsonObject();
-		loginRequestParams.addProperty("user", userName);
-		loginRequestParams.addProperty("password", password);
-		String loginApiUrl = ApplicationConfigProvider.getInstance().getGrafana().getGrafanaEndpoint() + "/login";
-		ClientResponse grafanaLoginResponse = RestHandler.doPost(loginApiUrl, loginRequestParams, null);
-		return grafanaLoginResponse.getCookies();
-	}
-
-	private String buildAuthenticationHeader() {
-		GrafanaData grafana = ApplicationConfigProvider.getInstance().getGrafana();
-		if (authHeader == null) {
-			authHeader = "Basic " + Base64.getEncoder()
-					.encodeToString((grafana.getAdminUserName() + ":" + grafana.getAdminUserPassword()).getBytes());
-		}
-		return authHeader;
 	}
 }

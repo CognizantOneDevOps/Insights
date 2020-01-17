@@ -17,15 +17,16 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs'
 import { RestAPIurlService } from '@insights/common/rest-apiurl.service'
-import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpParams, HttpErrorResponse } from '@angular/common/http';
 import { DataSharedService } from '@insights/common/data-shared-service';
 import 'rxjs/Rx';
+import { MessageDialogService } from '@insights/app/modules/application-dialog/message-dialog-service';
 
 @Injectable()
 export class RestCallHandlerService {
   asyncResult: any;
   constructor(private http: HttpClient, private restAPIUrlService: RestAPIurlService,
-    private dataShare: DataSharedService) {
+    private dataShare: DataSharedService, public messageDialog: MessageDialogService) {
 
   }
 
@@ -33,18 +34,30 @@ export class RestCallHandlerService {
 
     var isSessionExpired = this.dataShare.validateSession();
     if (!isSessionExpired) {
-      var dataresponse;
       var authToken = this.dataShare.getAuthorizationToken();
+      var webAuthToken = this.dataShare.getWebAuthToken();
       const headers = new HttpHeaders()
-        .set("Authorization", authToken);
+        .set("Authorization", authToken)
+        .set("user", webAuthToken);
       var restCallUrl = this.constructGetUrl(url, requestParams);
-      this.asyncResult = await this.http.get(restCallUrl, { headers }).toPromise();
-      //console.log(this.asyncResult)
+      this.asyncResult = await this.http.get(restCallUrl, { headers, withCredentials: true })
+        .toPromise().catch(err => { this.handleTokenError(err) });
       return this.asyncResult;
     }
     else {
       console.log("SessionTimedout")
     }
+  }
+
+  public async getSSO(url: string, requestParams?: Object, additionalheaders?: Object): Promise<any> {
+    var authToken = this.dataShare.getAuthorizationToken();
+    var webAuthToken = this.dataShare.getWebAuthToken();
+    const headers = new HttpHeaders()
+      .set("Authorization", authToken)
+    var restCallUrl = this.constructGetUrl(url, requestParams);
+    console.log("restCallUrl " + restCallUrl);
+    this.asyncResult = await this.http.get(restCallUrl, { headers, withCredentials: true }).toPromise();
+    return this.asyncResult;
   }
 
   public post(url: string, requestParams?: Object, additionalheaders?: Object): Observable<any> {
@@ -54,12 +67,13 @@ export class RestCallHandlerService {
     }
     if (!isSessionExpired) {
       var restCallUrl = this.restAPIUrlService.getRestCallUrl(url);
-      //console.log(restCallUrl);
       var dataresponse;
       var headers;
       var authToken = this.dataShare.getAuthorizationToken();
+      var webAuthToken = this.dataShare.getWebAuthToken();
       var defaultHeader = {
-        'Authorization': authToken
+        'Authorization': authToken,
+        'user': webAuthToken
       };
       if (this.checkValidObject(additionalheaders)) {
         headers = this.extend(defaultHeader, additionalheaders);
@@ -70,11 +84,11 @@ export class RestCallHandlerService {
       var allData = {
         method: 'POST',
         headers: headers,
+        withCredentials: true,
         transformRequest: function (data) {
           if (data && Object.keys(data).length !== 0 && data.constructor == Object) {
             var postParameter = '';
             for (var key in data) {
-              //console.log(key+""+ requestParams[key]);
               if (data.hasOwnProperty(key)) {
                 postParameter = postParameter.concat(key + '=' + requestParams[key] + '&');
               }
@@ -85,7 +99,6 @@ export class RestCallHandlerService {
           return;
         }
       }
-      //console.log(allData)
       dataresponse = this.http.post(restCallUrl, {}, allData);
       return dataresponse;
     } else {
@@ -97,21 +110,21 @@ export class RestCallHandlerService {
     var isSessionExpired = this.dataShare.validateSession();
     if (!isSessionExpired) {
       var restCallUrl = this.restAPIUrlService.getRestCallUrl(url);
-      //console.log(restCallUrl);
       var dataresponse;
       let headers;
       var authToken = this.dataShare.getAuthorizationToken();
+      var webAuthToken = this.dataShare.getWebAuthToken();
       let params = new HttpParams();
       for (var key in requestParams) {
-        // console.log(key + " " + requestParams[key]);
         if (requestParams.hasOwnProperty(key)) {
           params = params.set(key, requestParams[key]);
         }
       }
       headers = new HttpHeaders();
       headers = headers.set('Authorization', authToken);
+      headers = headers.set('user', webAuthToken);
+
       for (var key in additionalheaders) {
-        //console.log(key + " " + additionalheaders[key]);
         if (headers.hasOwnProperty(key)) {
           headers = headers.set(key, additionalheaders[key]);
         }
@@ -120,8 +133,7 @@ export class RestCallHandlerService {
         headers: headers,
         params: params
       }
-      //console.log(httpOptions);
-      dataresponse = this.http.post(restCallUrl, {}, httpOptions);
+      dataresponse = this.http.post(restCallUrl, {}, httpOptions).catch((e: any) => Observable.throw(this.handleTokenError(e)));
       return dataresponse;
     } else {
       console.log("Session Expire")
@@ -135,28 +147,31 @@ export class RestCallHandlerService {
       var fd = new FormData();
       fd.append("file", imageFile);
       var authToken = this.dataShare.getAuthorizationToken();
+      var webAuthToken = this.dataShare.getWebAuthToken();
       var dataresponse = this.http.post(restCallUrl, fd, {
         headers: {
-          'Authorization': authToken
+          'Authorization': authToken,
+          'user': webAuthToken
         },
-      })
+      }).catch((e: any) => Observable.throw(this.handleTokenError(e)))
       return dataresponse;
     } else {
       console.log("Session Expire")
     }
   }
 
-
   public postFormData(url: string, fd: any): Observable<any> {
     var isSessionExpired = this.dataShare.validateSession();
     if (!isSessionExpired) {
       var restCallUrl = this.restAPIUrlService.getRestCallUrl(url);
       var authToken = this.dataShare.getAuthorizationToken();
+      var webAuthToken = this.dataShare.getWebAuthToken();
       var dataresponse = this.http.post(restCallUrl, fd, {
         headers: {
-          'Authorization': authToken
+          'Authorization': authToken,
+          'user': webAuthToken
         },
-      })
+      }).catch((e: any) => Observable.throw(this.handleTokenError(e)))
       return dataresponse;
     } else {
       console.log("Session Expire")
@@ -168,15 +183,12 @@ export class RestCallHandlerService {
     var isSessionExpired = this.dataShare.validateSession();
     if (!isSessionExpired) {
       var restCallUrl = this.restAPIUrlService.getRestCallUrl(url);
-      //console.log(restCallUrl);
       var dataresponse;
       let headers;
       var authToken = this.dataShare.getAuthorizationToken();
-
+      var webAuthToken = this.dataShare.getWebAuthToken();
       let params = new HttpParams();
-
       for (var key in requestParams) {
-        // console.log(key + " " + requestParams[key]);
         if (requestParams.hasOwnProperty(key)) {
           params = params.set(key, requestParams[key]);
         }
@@ -184,9 +196,9 @@ export class RestCallHandlerService {
 
       headers = new HttpHeaders();
       headers = headers.set('Authorization', authToken);
+      headers = headers.set('user', webAuthToken);
 
       for (var key in additionalheaders) {
-        //console.log(key + " " + additionalheaders[key]);
         if (headers.hasOwnProperty(key)) {
           headers = headers.set(key, additionalheaders[key]);
         }
@@ -195,7 +207,6 @@ export class RestCallHandlerService {
         headers: headers,
         params: params
       }
-      //console.log(httpOptions);
       dataresponse = this.http.post(restCallUrl, data, httpOptions);
       return dataresponse;
     } else {
@@ -207,15 +218,13 @@ export class RestCallHandlerService {
     var isSessionExpired = this.dataShare.validateSession();
     if (!isSessionExpired) {
       var restCallUrl = this.restAPIUrlService.getRestCallUrl(url);
-      //console.log(restCallUrl);
       var dataresponse;
       let headers;
       var authToken = this.dataShare.getAuthorizationToken();
-
+      var webAuthToken = this.dataShare.getWebAuthToken();
       let params = new HttpParams();
 
       for (var key in requestParams) {
-        // console.log(key + " " + requestParams[key]);
         if (requestParams.hasOwnProperty(key)) {
           params = params.set(key, requestParams[key]);
         }
@@ -223,9 +232,8 @@ export class RestCallHandlerService {
 
       headers = new HttpHeaders();
       headers = headers.set('Authorization', authToken);
-
+      headers = headers.set('user', webAuthToken);
       for (var key in additionalheaders) {
-        //console.log(key + " " + additionalheaders[key]);
         if (headers.hasOwnProperty(key)) {
           headers = headers.set(key, additionalheaders[key]);
         }
@@ -234,7 +242,6 @@ export class RestCallHandlerService {
         headers: headers,
         params: params
       }
-      //console.log(httpOptions);
       dataresponse = this.http.post(restCallUrl, data, httpOptions);
       return dataresponse;
     } else {
@@ -246,15 +253,13 @@ export class RestCallHandlerService {
     var isSessionExpired = this.dataShare.validateSession();
     if (!isSessionExpired) {
       var restCallUrl = this.restAPIUrlService.getRestCallUrl(url);
-      //console.log(restCallUrl);
       var dataresponse;
       let headers;
       var authToken = this.dataShare.getAuthorizationToken();
-
+      var webAuthToken = this.dataShare.getWebAuthToken();
       let params = new HttpParams();
 
       for (var key in requestParams) {
-        // console.log(key + " " + requestParams[key]);
         if (requestParams.hasOwnProperty(key)) {
           params = params.set(key, requestParams[key]);
         }
@@ -262,9 +267,8 @@ export class RestCallHandlerService {
 
       headers = new HttpHeaders();
       headers = headers.set('Authorization', authToken);
-
+      headers = headers.set('user', webAuthToken);
       for (var key in additionalheaders) {
-        //console.log(key + " " + additionalheaders[key]);
         if (headers.hasOwnProperty(key)) {
           headers = headers.set(key, additionalheaders[key]);
         }
@@ -273,12 +277,34 @@ export class RestCallHandlerService {
         headers: headers,
         params: params
       }
-      //console.log(httpOptions);
-      dataresponse = this.http.post(restCallUrl, data, httpOptions)
-                        .catch(this.handleError);              
-      return dataresponse;
+      dataresponse = this.http.post(restCallUrl, data, httpOptions).catch((e: any) => Observable.throw(this.handleTokenError(e)));
+       return dataresponse;
     } else {
       console.log("Session Expired")
+    }
+  }
+
+  handleTokenError(error: HttpErrorResponse) {
+    console.log("Inside handleTokenError in rest-call-Handle.service ")
+    console.log(error.status);
+    if (error.status === 400) {
+      console.error('An error occurred', error);
+      //this.messageDialog.showApplicationsMessage(" Bad Request, Please check Platform service log for detail ", "ERROR");
+    } else if (error.status === 401) {
+      console.error('An error occurred', error);
+      //this.messageDialog.showApplicationsMessage("Unauthorized Access ", "ERROR")
+    } else if (error.status === 402) {
+      console.error('An error occurred', error);
+      //this.messageDialog.showApplicationsMessage(" Something went wrong while processing request, Please check Platform service log for detail ", "ERROR");
+    } else if (error.status === 403) {
+      console.error('An error occurred', error);
+      //this.messageDialog.showApplicationsMessage(" server understood the request but refused to fulfill it, Please check Platform service log for detail ", "ERROR");
+    } else if (error.status === 510) {
+      console.error('Token Expire , you need to relogin', error);
+      this.messageDialog.showApplicationsMessage(" Your session has expired, you will be logged off", "WARN");
+    } else {
+      console.error('An error occurred', error);
+      //this.messageDialog.showApplicationsMessage(" Something went wrong while processing request, Please check Platform service log for detail ", "ERROR");
     }
   }
 

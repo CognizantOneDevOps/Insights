@@ -31,14 +31,12 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.filter.GenericFilterBean;
 
-import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
+import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformservice.rest.util.PlatformServiceUtil;
-
-
 
 public class AdvanceAuthenticationFilter extends GenericFilterBean {
 	private static Logger LOG = LogManager.getLogger(AdvanceAuthenticationFilter.class);
-	
+
 	@Override
 	public void doFilter(final ServletRequest request, final ServletResponse response, final FilterChain chain)
 			throws IOException, ServletException {
@@ -46,25 +44,28 @@ public class AdvanceAuthenticationFilter extends GenericFilterBean {
 		HttpServletResponse httpResponce = (HttpServletResponse) response;
 		final HttpServletRequest httpRequest = (HttpServletRequest) request;
 		try {
-			UserDetails user = GrafanaUserDetailsUtil.getUserDetails(httpRequest);
-			if (user == null) {
-				LOG.error(" InsightsCustomException Invalid Autharization Token ");
-				throw new RuntimeException(PlatformServiceConstants.INVALID_TOKEN);
+			if (!ApplicationConfigProvider.getInstance().isEnableSSO()) {
+				UserDetails user = GrafanaUserDetailsUtil.getUserDetails(httpRequest);
+				if (user == null) {
+					LOG.error(" InsightsCustomException Invalid Autharization Token ");
+					// throw new RuntimeException(PlatformServiceConstants.INVALID_TOKEN);
+					// httpResponce.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid authentication.");
+					// AuthenticationUtils.setResponseMessage(httpResponce,HttpServletResponse.SC_UNAUTHORIZED, msg);
+					// return;
+				} else {
+					final UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
+							user, null, user.getAuthorities());
+					SecurityContextHolder.getContext().setAuthentication(authentication);
+				}
 			} else {
-				final UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(user,
-						null, user.getAuthorities());
-				SecurityContextHolder.getContext().setAuthentication(authentication);
-				chain.doFilter(request, response);
+				LOG.debug(" SSO is enabled so exiting from AdvanceAuthenticationFilter .... ");
 			}
+			chain.doFilter(request, response);
 		} catch (Exception e) {
 			LOG.error("Invalid request in AdvanceAuthenticationFilter");
 			String msg = PlatformServiceUtil.buildFailureResponse("Unauthorized Access ,Invalid Credentials..")
 					.toString();
-			httpResponce.setContentType("application/json");
-			httpResponce.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-			httpResponce.getWriter().write(msg);
-			httpResponce.getWriter().flush();
-			httpResponce.getWriter().close();
+			AuthenticationUtils.setResponseMessage(httpResponce, HttpServletResponse.SC_UNAUTHORIZED, msg);
 		}
 	}
 }

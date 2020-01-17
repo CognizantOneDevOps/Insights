@@ -24,6 +24,7 @@ import { MatDialog, MatDialogRef } from '@angular/material';
 import { ApplicationMessageDialog } from '@insights/app/modules/application-dialog/application-message-dialog';
 import * as CryptoJS from 'crypto-js';
 import { v4 as uuid } from 'uuid';
+import { InsightsInitService } from '@insights/common/insights-initservice';
 
 @Injectable()
 export class DataSharedService {
@@ -58,11 +59,35 @@ export class DataSharedService {
     this.storage.set("userName", userName);
   }
 
+  public getUserName() {
+    return this.storage.get("userName");
+  }
+
+  public setSSOUserName(ssouserName: String) {
+    this.storage.set("SsoUserName", ssouserName);
+  }
+
+  public getSSOUserName() {
+    return this.storage.get("SsoUserName")
+  }
+
   public setAuthorizationToken(strAuthorization: string) {
-    var auth_uuid = uuid();
-    auth_uuid = auth_uuid.substring(0, 15);
-    var auth = this.encryptData(auth_uuid, strAuthorization) + auth_uuid;
-    this.storage.set("Authorization", auth);
+    if (InsightsInitService.ssoEnabled) {
+      this.storage.set("Authorization", strAuthorization);
+    } else {
+      var auth_uuid = uuid();
+      auth_uuid = auth_uuid.substring(0, 15);
+      var auth = this.encryptData(auth_uuid, strAuthorization) + auth_uuid;
+      this.storage.set("Authorization", auth);
+    }
+  }
+
+  public getWebAuthToken() {
+    return this.storage.get("SSO-USER");
+  }
+
+  public setWebAuthToken(strWebAuth: string) {
+    this.storage.set("SSO-USER", strWebAuth);
   }
 
   public getAuthorizationToken() {
@@ -73,22 +98,10 @@ export class DataSharedService {
     this.storage.remove('Authorization');
   }
 
-  public setSessionExpirationTime(timeDashboardSessionExpiration: any) {
-    this.storage.set("dashboardSessionExpiration", timeDashboardSessionExpiration);
-  }
-
-  public getSessionExpirationTime() {
-    return this.storage.get("dashboardSessionExpiration");
-  }
-
   public setOrgAndRole(orgName: String, orgId: any, role: String) {
     this.storage.set("userRole", role);
     this.storage.set("orgName", orgName);
     this.storage.set("orgId", orgId);
-  }
-
-  public getUserName() {
-    return this.storage.get("userName");
   }
 
   public getTimeZone() {
@@ -106,7 +119,6 @@ export class DataSharedService {
 
   public storeTimeZone() {
     var date = new Date();
-    //const timeZoneOffset = date.getTimezoneOffset(); " ==== " + timeZoneOffset +
     var zone = this.datePipe.transform(date, 'ZZZZ')
     var zoneOffset = zone.slice(3, zone.length);
     var dateStr = new Date().toTimeString();
@@ -114,16 +126,13 @@ export class DataSharedService {
     var timezone = parts[1];
     this.storage.set("timeZone", timezone);
     this.storage.set("timeZoneOffSet", zone);
-    //console.log(this.storage.get("timeZone"));
   }
 
   public convertDateToZone(dateStr: string): string {
     var date = new Date(dateStr);
     var zone = this.storage.get("timeZone");
     var zoneOffset = this.storage.get("timeZoneOffSet");
-    //var utcDate = this.datePipe.transform(date, 'yyyy-MM-ddTHH:mm:ssZ', '+0000');
-    var dateWithTimeZone = this.datePipe.transform(date, 'yyyy-MM-ddTHH:mm:ssZ', zoneOffset);//  '+0530' utcDate
-    //console.log(date + " ==== " + zone + " ==== " + zoneOffset + " ==== " + dateWithTimeZone + " ====  " + + " ====  " + dateWithTimeZone.toString());
+    var dateWithTimeZone = this.datePipe.transform(date, 'yyyy-MM-ddTHH:mm:ssZ', zoneOffset);
     return dateWithTimeZone;
   }
 
@@ -131,37 +140,38 @@ export class DataSharedService {
     var date = new Date();
     var minutes = 30;
     date.setTime(date.getTime() + (minutes * 60 * 1000));
-    var dateDashboardSessionExpiration = date.getTime();
-    this.storage.set("dateDashboardSessionExpiration", dateDashboardSessionExpiration);
+    var dateSessionExpiration = date.getTime();
+    this.storage.set("dateSessionExpiration", dateSessionExpiration);
   }
 
   public validateSession(): boolean {
     var authToken = this.getAuthorizationToken();
     this.sessionExpireMessage = "The existing session has expired. You will be redirected to the home page. Request you to Login again to continue using Insights. Thank you!";
-    var sessionStorageDateDashboardSessionExpiration = this.storage.get('dateDashboardSessionExpiration')
+    var varDateSessionExpiration = this.storage.get('dateSessionExpiration')
     if (authToken === undefined) {
       this.storage.remove('Authorization');
       this.router.navigate(['/login']);
     } else {
-      var dashboardSessionExpirationTime = new Date(this.storage.get('dateDashboardSessionExpiration'));
-      var date = new Date();
-      // console.log(dashboardSessionExpirationTime + "  ===== " + date);
-      if (sessionStorageDateDashboardSessionExpiration == undefined) {
-        this.clearSessionData()
-        return true;
-      }
-      if ((dashboardSessionExpirationTime < date)) {
-        var dialogRef = this.sessionExpiredMessage(this.sessionExpireMessage, "WARN", true);
-        this.clearSessionData()
-        return true;
-
-      } else {
-        //console.log("session present");
-        var minutes = 30;
-        date.setTime(date.getTime() + (minutes * 60 * 1000));
-        this.storage.set('Authorization', authToken);
-        this.setSession()
-        return false;
+      if (!InsightsInitService.ssoEnabled) {
+        var varDateSessionExpirationTime = new Date(this.storage.get('dateSessionExpiration'));
+        var date = new Date();
+        // console.log(dashboardSessionExpirationTime + "  ===== " + date);
+        if (varDateSessionExpiration == undefined) {
+          this.clearSessionData()
+          return true;
+        }
+        if ((varDateSessionExpirationTime < date)) {
+          var dialogRef = this.sessionExpiredMessage(this.sessionExpireMessage, "WARN", true);
+          this.clearSessionData()
+          return true;
+        } else {
+          //console.log("session present");
+          var minutes = 30;
+          date.setTime(date.getTime() + (minutes * 60 * 1000));
+          this.storage.set('Authorization', authToken);
+          this.setSession()
+          return false;
+        }
       }
     }
   }
@@ -181,7 +191,6 @@ export class DataSharedService {
 
   //Method used only for session expired
   public sessionExpiredMessage(message, type, values): MatDialogRef<ApplicationMessageDialog> {
-    //console.log(" in sessionExpiredMessage ")
     const dialogRef = this.dialog.open(ApplicationMessageDialog, {
       panelClass: 'DialogBox',
       width: '40%',
@@ -197,6 +206,7 @@ export class DataSharedService {
 
     return dialogRef;
   }
+
   public encryptData(keys, value): string {
     var encryptedValue = CryptoJS.AES.encrypt(value, keys);
     return encryptedValue.toString();

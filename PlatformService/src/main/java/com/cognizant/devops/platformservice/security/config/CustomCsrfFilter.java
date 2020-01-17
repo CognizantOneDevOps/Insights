@@ -31,7 +31,6 @@ import org.springframework.web.util.WebUtils;
 
 public class CustomCsrfFilter extends OncePerRequestFilter {
 
-	public static final String CSRF_COOKIE_NAME = "XSRF-TOKEN";
 	private static Logger LOG = LogManager.getLogger(CustomCsrfFilter.class);
 
 	@Override
@@ -41,12 +40,12 @@ public class CustomCsrfFilter extends OncePerRequestFilter {
 		CsrfToken csrf = (CsrfToken) request.getAttribute(CsrfToken.class.getName());
 		// LOG.debug(" arg0 CsrfToken " + CsrfToken.class.getName() + " " + csrf);
 		if (csrf != null) {
-			Cookie cookie = WebUtils.getCookie(request, CSRF_COOKIE_NAME);
+			Cookie cookie = WebUtils.getCookie(request, AuthenticationUtils.CSRF_COOKIE_NAME);
 			String token = csrf.getToken();
 
 			// LOG.debug(" arg0 CsrfToken value " + token);
 			if (cookie == null || token != null && !token.equals(cookie.getValue())) {
-				cookie = new Cookie(CSRF_COOKIE_NAME, token);
+				cookie = new Cookie(AuthenticationUtils.CSRF_COOKIE_NAME, token);
 				cookie.setPath("/");
 				response.addCookie(cookie);
 			}

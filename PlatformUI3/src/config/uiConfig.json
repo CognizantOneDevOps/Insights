@@ -2,6 +2,7 @@
 	"showBusinessMapping": true,
 	"showAuditReporting": false,
 	"showWebhookConfiguration": true,
+	"ssoEnabled": false,
 	"enableInsightsBranding": true,
 	"agentsOsList": {
 		"Windows": "windows",
