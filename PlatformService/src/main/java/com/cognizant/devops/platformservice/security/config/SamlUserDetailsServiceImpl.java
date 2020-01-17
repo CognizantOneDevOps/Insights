@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2019 Cognizant Technology Solutions
+ * Copyright 2017 Cognizant Technology Solutions
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License.  You may obtain a copy
@@ -13,18 +13,16 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  ******************************************************************************/
+package com.cognizant.devops.platformservice.security.config;
 
-import { Component } from '@angular/core';
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.saml.SAMLCredential;
+import org.springframework.security.saml.userdetails.SAMLUserDetailsService;
 
-@Component({
-  selector: 'insights-root',
-  templateUrl: './insights.component.html',
-  styleUrls: ['./insights.component.css']
-})
+public class SamlUserDetailsServiceImpl implements SAMLUserDetailsService {
 
-export class InsightsAppComponent {
-  title = 'PlatformUI3';
-  constructor() {
-    console.log("App Module Check");
-  }
+    @Override
+    public Object loadUserBySAML(SAMLCredential credential) throws UsernameNotFoundException {
+        return new SamlUserDetails();
+    }
 }

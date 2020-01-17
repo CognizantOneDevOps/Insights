@@ -61,36 +61,6 @@ public final class RequestWrapper extends HttpServletRequestWrapper {
 	}
 
 	/**
-	 * Apply the XSS filter to the parameter
-	 * @param parameters
-	 */
-	/*@Override
-	public String getParameter(String parameter) {
-		log.debug("In getParameter ");
-		String value = super.getParameter(parameter);
-		if (value == null) {
-			return null;
-		}
-		log.info("In getParameter RequestWrapper ==== Completed");
-		return ValidationUtils.cleanXSS(value);
-	}*/
-
-	/**
-	 * Apply the XSS filter to the super Header
-	 * 
-	 * @param parameters
-	 */
-	/*@Override
-	public String getHeader(String name) {
-		String value = super.getHeader(name);
-		log.debug("In getHeader " + name + " value " + value);
-		if (value == null)
-			return null;
-		log.info("In getHeader RequestWrapper ==== complated ");
-		return ValidationUtils.cleanXSS(value);
-	}*/
-
-	/**
 	 * Apply the XSS filter to the all Headers
 	 * 
 	 * @param parameters
@@ -103,8 +73,13 @@ public final class RequestWrapper extends HttpServletRequestWrapper {
 
 			String headerName = headerNames.nextElement();
 			String headersValue = request.getHeader(headerName);
-			//log.debug("In validatAllHeaders " + headerName + " headersValue " + headersValue);
-			String headerValue = ValidationUtils.cleanXSS(headersValue);
+			log.debug("In validatAllHeaders " + headerName + " headersValue " + headersValue);
+			/* try { */
+				String headerValue = ValidationUtils.cleanXSS(headersValue);
+			/*} catch (Exception e) {
+				log.error(" Error while validatAllHeaders , for header name "+headerName);
+				throw new RuntimeException(PlatformServiceConstants.INVALID_REQUEST);
+			}*/
 		}
 		log.debug("In validatAllHeaders ==== Complated");
 	}

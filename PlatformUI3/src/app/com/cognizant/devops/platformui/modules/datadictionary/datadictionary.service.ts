@@ -40,7 +40,7 @@ export class DataDictionaryService implements IDataDictionaryService {
 
     loadToolProperties(toolName: string, categoryName: string): Promise<any> {
         var restHandler = this.restCallHandlerService;
-        return restHandler.get("DATA_DICTIONARY_TOOL_PROPERTIES", { 'toolName': toolName, 'categoryName': categoryName });
+        return restHandler.get("DATA_DICTIONARY_TOOL_PROPERTIES", { 'labelName': toolName, 'categoryName': categoryName });
     }
 
     loadToolsRelationshipAndProperties(startToolName: string, startToolCategory: string, endToolName: string, endToolCatergory: string):Promise<any> {

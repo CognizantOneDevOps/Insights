@@ -21,8 +21,6 @@
 	<version>6.4-SNAPSHOT</version>
 	<name>PlatformService</name>
 
-
-
 	<repositories>
 		<repository>
 			<id>project.local</id>
@@ -70,7 +68,6 @@
 			<version>1.13</version>
 		</dependency>
 
-
 		<dependency>
 			<groupId>org.glassfish.jersey.containers</groupId>
 			<artifactId>jersey-container-servlet-core</artifactId>
@@ -81,12 +78,14 @@
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-core</artifactId>
 			<version>${spring.version}</version>
-		</dependency>   
+		</dependency>
+
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-context-support</artifactId>
 			<version>${spring.version}</version>
 		</dependency>
+
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-web</artifactId>
@@ -102,6 +101,7 @@
 			<groupId>org.springframework.security</groupId>
 			<artifactId>spring-security-web</artifactId>
 			<version>${spring.security.version}</version>
+
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.security</groupId>
@@ -348,6 +348,23 @@
 			<artifactId>selenium-firefox-driver</artifactId>
 			<version>3.141.59</version>
 		</dependency>
+		<!-- https://mvnrepository.com/artifact/org.opensaml/opensaml -->
+		<dependency>
+			<groupId>org.opensaml</groupId>
+			<artifactId>opensaml</artifactId>
+			<version>2.6.4</version>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/org.springframework.security.extensions/spring-security-saml2-core -->
+		<dependency>
+			<groupId>org.springframework.security.extensions</groupId>
+			<artifactId>spring-security-saml2-core</artifactId>
+			<version>1.0.9.RELEASE</version>
+		</dependency>
+		<dependency>
+			<groupId>com.nimbusds</groupId>
+			<artifactId>nimbus-jose-jwt</artifactId>
+			<version>8.2.1</version>
+		</dependency>
 	</dependencies>
 	<properties>
 		<jersey.version>2.28</jersey.version>
@@ -357,66 +374,51 @@
 		<junit.version>4.12</junit.version>
 		<testng.version>7.0.1</testng.version>
 	</properties>
-	<profiles>
-		<profile>
-			<id>tomcatDeployment</id>
-			<activation>
-				<activeByDefault>false</activeByDefault>
-			</activation>
 
-			<build>
-				<plugins>
-
-
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-war-plugin</artifactId>
-						<version>2.3</version>
-						<configuration>
-							<archive>
-								<manifestEntries>
-									<Specification-Title>${project.name}</Specification-Title>
-									<Specification-Version>${project.version}</Specification-Version>
-								</manifestEntries>
-							</archive>
-							<includeSystemScope>true</includeSystemScope>
-							<!-- <webResources> <resource> <directory>${project.baseurl}/jar/org/testng/testng/7.0.1</directory> 
-								<targetPath>WEB-INF/lib</targetPath> <includes> <include>testng-7.0.1.jar</include> 
-								</includes> </resource> </webResources> -->
-						</configuration>
-					</plugin>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-surefire-plugin</artifactId>
-						<version>2.19.1</version>
-						<configuration>
-							<suiteXmlFiles>
-								<suiteXmlFile>src/test/resources/testng.xml</suiteXmlFile>
-							</suiteXmlFiles>
-						</configuration>
-					</plugin>
-					<!-- <plugin> <groupId>org.apache.tomcat.maven</groupId> <artifactId>tomcat7-maven-plugin</artifactId> 
-						<version>2.2</version> <configuration> <url>http://insightsrheldev.cogdevops.com:8000/manager/text</url> 
-						<server>tomcat</server> <path>/PlatformService</path> <includeSystemScope>true</includeSystemScope> 
-						</configuration> </plugin> -->
-				</plugins>
-				<resources>
-					<resource>
-						<directory>src/main/resources</directory>
-						<includes>
-							<include>**/*.md</include>
-							<include>**/*.json</include>
-							<include>version.properties</include>
-							<include>*.properties</include>
-							<include>**/*.properties</include>
-							<include>**/*.xml</include>
-							<include>**/*.p12</include>
-							<include>OneDevOpInsights v2.17 OpenSource Credit Document v1.0.pdf</include>
-						</includes>
-						<filtering>true</filtering>
-					</resource>
-				</resources>
-			</build>
-		</profile>
-	</profiles>
+	<build>
+		<finalName>PlatformService</finalName>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-war-plugin</artifactId>
+				<version>2.3</version>
+				<configuration>
+					<archive>
+						<manifestEntries>
+							<Specification-Title>${project.name}</Specification-Title>
+							<Specification-Version>${project.version}</Specification-Version>
+						</manifestEntries>
+					</archive>
+					<includeSystemScope>true</includeSystemScope>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<version>2.19.1</version>
+				<configuration>
+					<suiteXmlFiles>
+						<suiteXmlFile>src/test/resources/testng.xml</suiteXmlFile>
+					</suiteXmlFiles>
+				</configuration>
+			</plugin>
+		</plugins>
+		<resources>
+			<resource>
+				<directory>src/main/resources</directory>
+				<includes>
+					<include>**/*.md</include>
+					<include>**/*.json</include>
+					<include>version.properties</include>
+					<include>*.properties</include>
+					<include>**/*.properties</include>
+					<include>**/*.xml</include>
+					<include>**/*.p12</include>
+					<include>OneDevOpInsights v2.17 OpenSource Credit Document v1.0.pdf</include>
+				</includes>
+				<filtering>true</filtering>
+			</resource>
+		</resources>
+	</build>
+	
 </project>

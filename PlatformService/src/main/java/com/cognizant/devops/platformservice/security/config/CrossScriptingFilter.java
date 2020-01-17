@@ -15,9 +15,6 @@
  ******************************************************************************/
 package com.cognizant.devops.platformservice.security.config;
 
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.Map;
 
 import javax.servlet.FilterChain;
@@ -33,6 +30,8 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
 import com.cognizant.devops.platformservice.rest.util.PlatformServiceUtil;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 
 public class CrossScriptingFilter extends OncePerRequestFilter {
 	private static Logger LOG = LogManager.getLogger(CrossScriptingFilter.class);
@@ -43,28 +42,29 @@ public class CrossScriptingFilter extends OncePerRequestFilter {
 		LOG.info("Inside Filter == CrossScriptingFilter ...............");
 
 		try {
-			RequestWrapper requestMapper = new RequestWrapper(httpRequest,
-					httpResponce);
+			RequestWrapper requestMapper = new RequestWrapper(httpRequest,httpResponce);
 			writeHeaders(httpRequest, httpResponce);
 			filterChain.doFilter(requestMapper, httpResponce);
 			LOG.debug("Completed .. in CrossScriptingFilter");
 
 		} catch (Exception e) {
-			LOG.error("Invalid request in CrossScriptingFilter " + e.getMessage());
-			String msg = PlatformServiceUtil
-					.buildFailureResponse(
-							"Invalid request,Someting is wrong in cookies,Header or Parameter" + e.getMessage())
-					.toString();
-			httpResponce.setContentType("application/json");
-			httpResponce.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			try {
-				httpResponce.getWriter().write(msg);
-				httpResponce.getWriter().flush();
-				httpResponce.getWriter().close();
-			} catch (IOException e1) {
-				LOG.error("Error while writing log message in CrossScriptingFilter ");
+			String msg;
+			if (e.getMessage().contains("InsightsCustomException")) {
+				LOG.error("Invalid request in InsightsCustomException CrossScriptingFilter " + e.getMessage());
+				JsonParser parser =new JsonParser();
+				JsonObject element = parser.parse(e.getMessage()).getAsJsonObject();
+				msg = PlatformServiceUtil.buildFailureResponse(
+								"InsightsCustomException Invalid request,Someting is wrong in cookies,Header or Parameter"
+										+ e.getMessage() + " status " + element.get("StatusCode"))
+						.toString();
+				AuthenticationUtils.setResponseMessage(httpResponce, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, msg);
+			} else {
+				LOG.error("Invalid request in CrossScriptingFilter " + e.getMessage());
+				msg = PlatformServiceUtil.buildFailureResponse(
+								"Invalid request,Someting is wrong in cookies,Header or Parameter" + e.getMessage())
+						.toString();
+				AuthenticationUtils.setResponseMessage(httpResponce, HttpServletResponse.SC_BAD_REQUEST, msg);
 			}
-
 		}
 		LOG.info("Out doFilter CrossScriptingFilter ...............");
 	}
@@ -73,21 +73,19 @@ public class CrossScriptingFilter extends OncePerRequestFilter {
 	public void writeHeaders(HttpServletRequest request, HttpServletResponse response) {
 		LOG.debug(" Write Header in CrossScriptingFilter ============ ");
 		response.setStatus(HttpServletResponse.SC_OK);
-		try {
 			String origin = request.getHeader(HttpHeaders.ORIGIN);
-			String referer = request.getHeader(HttpHeaders.REFERER);
-			String host = "";
-			if (request.getHeader(HttpHeaders.REFERER) != null) {
-				URL url = new URL(referer);
-				host = url.getHost();
-			} else {
-				URL url = new URL(origin);
-				host = url.getHost();
+			String host =AuthenticationUtils.getHost(request);
+			LOG.debug(" host and origin information ===== " + host + " origin "+origin);
+			if(host==null) {
+				LOG.error(" Invalid request " + PlatformServiceConstants.HOST_NOT_FOUND);
+				AuthenticationUtils.setResponseMessage(response, AuthenticationUtils.INFORMATION_MISMATCH, PlatformServiceConstants.HOST_NOT_FOUND);
+				return;
 			}
-			//LOG.debug(" host information ===== " + host);
 			if (!ApplicationConfigProvider.getInstance().getTrustedHosts().contains(host)) {
 				LOG.error(" Invalid request " + PlatformServiceConstants.INVALID_REQUEST_ORIGIN);
-				throw new RuntimeException(PlatformServiceConstants.INVALID_REQUEST_ORIGIN);
+				AuthenticationUtils.setResponseMessage(response, AuthenticationUtils.INFORMATION_MISMATCH, PlatformServiceConstants.INVALID_REQUEST_ORIGIN);
+				//throw new RuntimeException(PlatformServiceConstants.INVALID_REQUEST_ORIGIN);
+				return;
 			}
 			response.setHeader(HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN, origin);
 			response.setHeader(HttpHeaders.ACCESS_CONTROL_ALLOW_HEADERS,
@@ -97,16 +95,14 @@ public class CrossScriptingFilter extends OncePerRequestFilter {
 			response.setHeader(HttpHeaders.ACCESS_CONTROL_ALLOW_CREDENTIALS, "true");
 			// 463188 - Response Headers for Control: no-cache, no-store header
 			response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate"); // HTTP 1.1
-		} catch (MalformedURLException e) {
-			LOG.error("error while writing header in CrossScriptingFilter "+e.getMessage());
-		}
+
         //Set the response headers for grafana details.
         Object attribute = request.getAttribute("responseHeaders");
         if(attribute != null){
         	Map<String, String> grafanaHeaders = (Map<String, String>)attribute;
         	for(Map.Entry<String, String> entry : grafanaHeaders.entrySet()){
 				Cookie cookie = new Cookie(entry.getKey(), entry.getValue());
-				// cookie.setHttpOnly(true); //3
+				cookie.setHttpOnly(true);
 				cookie.setMaxAge(60 * 30);
 				cookie.setPath("/");
 				response.addCookie(cookie);

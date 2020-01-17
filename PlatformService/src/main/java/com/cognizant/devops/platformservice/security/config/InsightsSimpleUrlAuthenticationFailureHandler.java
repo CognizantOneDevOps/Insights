@@ -16,32 +16,32 @@
 package com.cognizant.devops.platformservice.security.config;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.web.AuthenticationEntryPoint;
-import org.springframework.stereotype.Component;
+import org.springframework.security.web.DefaultRedirectStrategy;
+import org.springframework.security.web.RedirectStrategy;
+import org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler;
 
-import com.cognizant.devops.platformservice.rest.util.PlatformServiceUtil;
+public class InsightsSimpleUrlAuthenticationFailureHandler extends SimpleUrlAuthenticationFailureHandler {
 
-@Component
-public class SpringAuthenticationEntryPoint implements AuthenticationEntryPoint {
-	static Logger log = LogManager.getLogger(SpringAuthenticationEntryPoint.class.getName());
+	private String defaultFailureUrl;
+	private RedirectStrategy redirectStrategy = new DefaultRedirectStrategy();
+	
+	public InsightsSimpleUrlAuthenticationFailureHandler(String defaultFailureUrl) {
+		super(defaultFailureUrl);
+		this.defaultFailureUrl = defaultFailureUrl;
+	}
+	
+	public void onAuthenticationFailure(HttpServletRequest request,
+			HttpServletResponse response, AuthenticationException exception)
+			throws IOException, ServletException {
 
-	@Override
-	public void commence(HttpServletRequest request, HttpServletResponse response,
-			AuthenticationException authException) throws IOException, ServletException {
-		log.error(authException);
-		String msg = PlatformServiceUtil.buildFailureResponse("Invalid Credentials").toString();
-		PrintWriter writer = response.getWriter();
-		writer.write(msg);
-		writer.flush();
-		writer.close();
+			saveException(request, exception);
+			logger.debug("Redirecting to " + defaultFailureUrl);
+			redirectStrategy.sendRedirect(request, response, defaultFailureUrl);
 	}
 }

@@ -28,9 +28,11 @@ public interface PlatformServiceConstants {
 	String INVALID_RESPONSE_DATA_HTML = "Invalid response data,Response might be contain some Html tag";
 	String INVALID_RESPONSE_DATA = "Invalid response data while parsing response data";
 	String INVALID_REQUEST_ORIGIN = " Invalid Access-Control-Allow-Origin,Please make sure that your host is in trusted host list";
+	String HOST_NOT_FOUND="Unable to find valid host information ";
 	String INVALID_FILE = "Invalid file";
 	String INVALID_TOKEN = "Invalid Autharization Token";
 	String TRANSFORMATION_DECODED = new String(Base64.getDecoder().decode(ConfigOptions.TRANSFORMATION_ENCODED.getBytes()));
 	String SP_DECODED = new String(Base64.getDecoder().decode(ConfigOptions.SP_ENCODED.getBytes()));
 	String RSA_DECODED = new String(Base64.getDecoder().decode(ConfigOptions.RSA_ENCODED.getBytes()));
+	String GRAFANA_LOGIN_ISSUE="Unable to connect to Grafana";
 }

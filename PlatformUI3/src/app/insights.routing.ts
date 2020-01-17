@@ -17,14 +17,16 @@
 import { Routes, RouterModule } from '@angular/router';
 import { ModuleWithProviders } from '@angular/core';
 import { LoginComponent } from '@insights/app/login/login.component';
+import { SSOLoginComponent } from './com/cognizant/devops/platformui/ssologin/ssologin.component';
 import { PageNotFoundComponent } from '@insights/app/modules/page-not-found/page-not-found.component';
 import { AuthGuardService as AuthGuard } from '@insights/common/auth-guard.service';
 
 const appRoutes: Routes = [
   { path: '', pathMatch: 'full', redirectTo: 'login' },
   { path: 'login', component: LoginComponent },
+  { path: 'ssologin', component: SSOLoginComponent },
   { path: '**', component: PageNotFoundComponent },
-  { path: 'Insights/Home', loadChildren: '@insights/app/modules/home.modules#HomeModules', canActivate: [AuthGuard] }
+  { path: 'Insights/Home', loadChildren: '@insights/app/modules/home.modules#HomeModules', canActivate: [AuthGuard]  }
 ];
 
-export const InsightsModuleRouting: ModuleWithProviders = RouterModule.forRoot(appRoutes, { useHash: true });//{ useHash: true  , onSameUrlNavigation: 'reload', enableTracing: true }
+export const InsightsModuleRouting: ModuleWithProviders = RouterModule.forRoot(appRoutes, { useHash: true });//{ useHash: true  , onSameUrlNavigation: 'reload' , enableTracing: true }

@@ -34,6 +34,7 @@ export class InsightsInitService {
     static showAuditReporting = false;
     static showWebhookConfiguration = false;
     static showBusinessMapping = true;
+    static ssoEnabled = false;
     static enableInsightsBranding = true;
 
     constructor(location: Location, private http: HttpClient,
@@ -81,6 +82,7 @@ export class InsightsInitService {
         InsightsInitService.showAuditReporting = UIConfigResponse.showAuditReporting;
         InsightsInitService.showWebhookConfiguration = UIConfigResponse.showWebhookConfiguration;
         InsightsInitService.showBusinessMapping = UIConfigResponse.showBusinessMapping;
+        InsightsInitService.ssoEnabled = UIConfigResponse.ssoEnabled;
         InsightsInitService.enableInsightsBranding = UIConfigResponse.enableInsightsBranding
     }
 

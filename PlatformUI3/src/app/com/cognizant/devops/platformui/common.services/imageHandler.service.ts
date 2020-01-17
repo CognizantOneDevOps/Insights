@@ -96,9 +96,9 @@ export class ImageHandlerService implements IImageHandlerService {
     public addImage(name: string, imagePath: String) {
         if (!this.imageMap.has(name)) {
             this.imageMap.set(name, imagePath);
-        } else {
+        } /* else {
             throw new Error('imagePath with same name already exists ' + name);
-        }
+        } */
     }
     public getImagePath(imageKey: String) {
         if (!this.imageMap.has(imageKey)) {

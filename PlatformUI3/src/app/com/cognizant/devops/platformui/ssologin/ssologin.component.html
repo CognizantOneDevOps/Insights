@@ -1,5 +1,5 @@
-<!--/*
-*******************************************************************************
+<!-- 
+ *******************************************************************************
  * Copyright 2019 Cognizant Technology Solutions
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
@@ -13,5 +13,14 @@
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
  * License for the specific language governing permissions and limitations under
  * the License.
- *******************************************************************************/-->
-<router-outlet></router-outlet>
+ ******************************************************************************
+ -->
+<p>
+    please wait while we log you in ....
+</p>
+<div *ngIf="showThrobber">
+    <div class="loading-indicator">
+        <mat-progress-spinner [diameter]="50" style="margin:0 auto;" color="primary" mode="indeterminate">
+        </mat-progress-spinner>
+    </div>
+</div>

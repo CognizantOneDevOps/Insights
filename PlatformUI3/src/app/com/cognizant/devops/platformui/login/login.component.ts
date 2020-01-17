@@ -19,14 +19,15 @@ import { LoginService } from '@insights/app/login/login.service';
 import { InsightsInitService } from '@insights/common/insights-initservice';
 import { RestAPIurlService } from '@insights/common/rest-apiurl.service'
 import { RestCallHandlerService } from '@insights/common/rest-call-handler.service';
-import { CookieService } from 'ngx-cookie-service';
-import { Router, ActivatedRoute } from '@angular/router';
+import { CookieService } from 'ngx-cookie';
+import { Router, ActivatedRoute, ParamMap } from '@angular/router';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
-import { CommonModule, DatePipe } from '@angular/common';
+import { DatePipe } from '@angular/common';
 import { LogService } from '@insights/common/log-service';
 import { DataSharedService } from '@insights/common/data-shared-service';
 import { ImageHandlerService } from '@insights/common/imageHandler.service';
-
+import { MessageDialogService } from '@insights/app/modules/application-dialog/message-dialog-service';
+import { GrafanaAuthenticationService } from '@insights/common/grafana-authentication-service';
 
 export interface ILoginComponent {
   createAndValidateForm(): void;
@@ -42,7 +43,6 @@ export interface ILoginComponent {
 })
 export class LoginComponent implements OnInit, ILoginComponent {
 
-  self;
   logMsg: string;
   isLoginError: boolean;
   isDisabled: boolean;
@@ -54,18 +54,34 @@ export class LoginComponent implements OnInit, ILoginComponent {
   resourceImage: any;
   loginForm: FormGroup;
   imageAlt: String = "";
+  ssoEnable: boolean = false;
 
   constructor(private loginService: LoginService, private restAPIUrlService: RestAPIurlService,
     private restCallHandlerService: RestCallHandlerService, private cookieService: CookieService,
     private router: Router, private logger: LogService, private dataShare: DataSharedService,
-    private datePipe: DatePipe, private imageHandeler: ImageHandlerService) {
-    this.getAsyncData();
+    private datePipe: DatePipe, private imageHandeler: ImageHandlerService,
+    private route: ActivatedRoute, public messageDialog: MessageDialogService,
+    private grafanaService: GrafanaAuthenticationService, ) {
+    var self = this;
+    console.log(" in login constructer")
   }
 
   ngOnInit() {
-    this.createAndValidateForm();
-    this.dataShare.storeTimeZone();
-    this.dataShare.removeAuthorization();
+    var self = this
+    console.log("Is sso enabled " + InsightsInitService.ssoEnabled)
+    if (InsightsInitService.ssoEnabled) {
+      console.log(" SSO is enable calling saml login");
+      this.dataShare.storeTimeZone();
+      this.ssoEnable = InsightsInitService.ssoEnabled;
+      this.loginService.loginSSO();
+    } else {
+      console.log("Continue on login page ")
+      this.getAsyncData();
+      this.createAndValidateForm();
+      this.dataShare.storeTimeZone();
+      this.dataShare.removeAuthorization();
+      this.dataShare.setWebAuthToken("-");
+    }
   }
 
   public createAndValidateForm() {
@@ -77,8 +93,8 @@ export class LoginComponent implements OnInit, ILoginComponent {
 
   async getAsyncData() {
     try {
-      var restCallUrl = this.restAPIUrlService.getRestCallUrl("GET_LOGO_IMAGE");
-      this.resourceImage = await this.restCallHandlerService.getJSON(restCallUrl);
+
+      this.resourceImage = await this.grafanaService.getLogoImage();
       this.dataShare.removeCustomerLogoFromSesssion()
       if (this.resourceImage.data.encodedString.length > 0) {
         this.imageSrc = 'data:image/jpg;base64,' + this.resourceImage.data.encodedString;
@@ -90,12 +106,11 @@ export class LoginComponent implements OnInit, ILoginComponent {
         this.dataShare.uploadOrFetchLogo("DefaultLogo");
       }
     } catch (error) {
-      //console.log(error);
+      console.log(error);
     }
   }
 
   public userAuthentication(): void {
-    //console.log(this.loginForm.value.username);
     this.username = this.loginForm.value.username;
     this.password = this.loginForm.value.password;
     if (this.username === '' || this.password === '') {
@@ -106,22 +121,23 @@ export class LoginComponent implements OnInit, ILoginComponent {
       this.showThrobber = true;
       var token = 'Basic ' + btoa(this.username + ":" + this.password);
       this.dataShare.setAuthorizationToken(token);
+
       this.loginService.loginUserAuthentication(this.username, this.password)
         .then((data) => {
           var grafcookies = data.data;
           if (data.status === 'success') { //SUCCESS
             self.showThrobber = false;
             var date = new Date();
-
-            var dateDashboardSessionExpiration = new Date(new Date().getTime() + 86400 * 1000);
             var minutes = 30;
             date.setTime(date.getTime() + (minutes * 60 * 1000));
+
             this.dataShare.setAuthorizationToken(token);
             this.dataShare.setSession();
             this.cookies = "";
             for (var key in grafcookies) {
-              this.cookieService.set(key, grafcookies[key], date);
+              this.cookieService.put(key, grafcookies[key], { storeUnencoded: true, path: '/', expires: date });
             }
+
             var uniqueString = "grfanaLoginIframe";
             var iframe = document.createElement("iframe");
             iframe.id = uniqueString;
@@ -186,8 +202,7 @@ export class LoginComponent implements OnInit, ILoginComponent {
   deleteAllPreviousCookies(): void {
     let allCookies = this.cookieService.getAll();
     for (let key of Object.keys(allCookies)) {
-      this.cookieService.delete(key);
+      this.cookieService.remove(key);
     }
   }
-
 }

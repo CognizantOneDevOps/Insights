@@ -179,13 +179,15 @@ public class ValidationUtils {
 					}
 				}
 				if (isXSSPattern) {
-					log.error("Invalid pattern found in data value ==== " + valueWithXSSPattern);
+					log.error("Invalid pattern found in data value ******  " + valueWithXSSPattern);
 					throw new RuntimeException(PlatformServiceConstants.INVALID_REQUEST);
 				}
 			} catch (RuntimeException e) {
 				log.error("Invalid pattern found in data value ==== " + valueWithXSSPattern);
 				throw new RuntimeException(PlatformServiceConstants.INVALID_REQUEST);
 			}
+		}else {
+			log.debug("In cleanXSS , value is empty ");
 		}
 		return value;
 	}
