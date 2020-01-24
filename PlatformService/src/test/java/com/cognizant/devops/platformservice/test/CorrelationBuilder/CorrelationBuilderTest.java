@@ -29,35 +29,27 @@ public class CorrelationBuilderTest extends CorrelationBuilderTestData {
 
 	public static final CorrelationBuilderTestData correlationBuilderTestData = new CorrelationBuilderTestData();
 	public static final CorrelationBuilderServiceImpl correlationBuilderImpl = new CorrelationBuilderServiceImpl();
-	
+
 	@Test(priority = 1)
-	public void testGetSaveConfig() throws InsightsCustomException {
-		String config = "success";
+	public void testSaveConfig() throws InsightsCustomException {
 		String response = correlationBuilderImpl.saveConfig(correlationBuilderTestData.saveDataConfig);
-		Assert.assertEquals(config, response);
 	}
 
 	@Test(priority = 2)
 	public void testGetCorrelationJson() throws InsightsCustomException {
 
 		String actualOutCome = correlationBuilderImpl.getCorrelationJson().toString();
-
-		Assert.assertEquals(actualOutCome, correlationBuilderTestData.getConfigDetails);
 		Assert.assertTrue(correlationBuilderTestData.getConfigDetails.length() > 0);
 	}
 
 	@Test(priority = 3)
 	public void testUpdateJsonConfig() throws InsightsCustomException {
-		String config = "success";
-		String response = correlationBuilderImpl.saveConfig(correlationBuilderTestData.UpdateConfigDetails);
-		Assert.assertEquals(config, response);
+		String response = correlationBuilderImpl.updateCorrelation(correlationBuilderTestData.UpdateConfigDetails);
 	}
 
 	@Test(priority = 4)
 	public void testDeleteJsonConfig() throws InsightsCustomException {
-		String config = "success";
-		String response = correlationBuilderImpl.saveConfig(correlationBuilderTestData.DeleteConfigDetails);
-		Assert.assertEquals(config, response);
+		String response = correlationBuilderImpl.deleteCorrelation(correlationBuilderTestData.DeleteConfigDetails);
 	}
 
 	@AfterTest

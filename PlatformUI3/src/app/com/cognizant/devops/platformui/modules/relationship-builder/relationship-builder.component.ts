@@ -552,7 +552,7 @@ export class RelationshipBuilderComponent implements OnInit {
             var toolname = res[0];
             var toolcatergory = res[1];
             var labelName = res[2];
-            this.AddDestination = { 'destinationToolName': toolname, 'destinationToolCategory': toolcatergory, 'destinationLabelName': labelName, 'destinationFields': this.fieldDestProp };
+            this.AddDestination = { 'toolName': toolname, 'toolCategory': toolcatergory, 'labelName': labelName, 'fields': this.fieldDestProp };
             //FOR SOURCE 
             for (var i of this.selectsourceproperty.selected) {
               this.fieldSourceProp.push(i);
@@ -564,7 +564,7 @@ export class RelationshipBuilderComponent implements OnInit {
             var toolname1 = res1[0];
             var toolcatergory1 = res1[1];
             var labelName1 = res1[2];
-            this.AddSource = { 'sourceToolName': toolname1, 'sourceToolCategory': toolcatergory1, 'sourceLabelName': labelName1, 'sourceFields': this.fieldSourceProp };
+            this.AddSource = { 'toolName': toolname1, 'toolCategory': toolcatergory1, 'labelName': labelName1, 'fields': this.fieldSourceProp };
             var newData = {
               'destination': this.AddDestination, 'source': this.AddSource, 'relationName': this.finalRelationName, 'relationship_properties': this.propertyList
             }

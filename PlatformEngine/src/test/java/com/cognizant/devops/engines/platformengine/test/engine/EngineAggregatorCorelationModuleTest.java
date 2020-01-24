@@ -149,7 +149,7 @@ public class EngineAggregatorCorelationModuleTest {
 		}
 	}
 
-	@AfterTest
+   @AfterTest
 	public void cleanUp() {
 
 		/* Cleaning Postgre */

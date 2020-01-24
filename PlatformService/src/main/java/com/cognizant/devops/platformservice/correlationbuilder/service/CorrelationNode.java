@@ -22,81 +22,45 @@ import java.util.List;
  *
  */
 public class CorrelationNode {
-	private String sourceToolName = null;
-	private String sourceToolCategory = null;
-	private String sourceLabelName;
-	private String destinationToolName;
-	private String destinationToolCategory;
-	private String destinationLabelName;
-	private List<String> sourceFields;
-	private List<String> destinationFields;
+	private String toolName;
 	private String toolCategory = null;
+	private String labelName = "";
+	private List<String> fields;
 	private boolean enrichAlmData = false;
+	private String almkeyPattern = "-";
 	private String almKeyProcessedIndex = "jiraKeyProcessed";
 	private String almKeysIndex = "jiraKeys";
 
-	public List<String> getSourceFields() {
-		return sourceFields;
+	public String getToolName() {
+		return toolName;
 	}
 
-	public void setSourceFields(List<String> sourceFields) {
-		this.sourceFields = sourceFields;
+	public void setToolName(String toolName) {
+		this.toolName = toolName;
 	}
 
-	public List<String> getDestinationFields() {
-		return destinationFields;
+	public String getToolCategory() {
+		return toolCategory;
 	}
 
-	public void setDestinationFields(List<String> destinationFields) {
-		this.destinationFields = destinationFields;
+	public void setToolCategory(String toolCategory) {
+		this.toolCategory = toolCategory;
 	}
 
-	public String getSourceToolName() {
-		return sourceToolName;
+	public String getLabelName() {
+		return labelName;
 	}
 
-	public void setSourceToolName(String sourceToolName) {
-		this.sourceToolName = sourceToolName;
+	public void setLabelName(String labelName) {
+		this.labelName = labelName;
 	}
 
-	public String getSourceToolCategory() {
-		return sourceToolCategory;
+	public List<String> getFields() {
+		return fields;
 	}
 
-	public void setSourceToolCategory(String sourcetoolCategory) {
-		this.sourceToolCategory = sourcetoolCategory;
-	}
-
-	public String getSourceLabelName() {
-		return sourceLabelName;
-	}
-
-	public void setSourceLabelName(String sourceLabelName) {
-		this.sourceLabelName = sourceLabelName;
-	}
-
-	public String getDestinationToolName() {
-		return destinationToolName;
-	}
-
-	public void setDestinationToolName(String destinationToolName) {
-		this.destinationToolName = destinationToolName;
-	}
-
-	public String getDestinationToolCategory() {
-		return destinationToolCategory;
-	}
-
-	public void setDestinationToolCategory(String destinationToolCategory) {
-		this.destinationToolCategory = destinationToolCategory;
-	}
-
-	public String getDestinationLabelName() {
-		return destinationLabelName;
-	}
-
-	public void setDestinationLabelName(String destinationLabelName) {
-		this.destinationLabelName = destinationLabelName;
+	public void setFields(List<String> fields) {
+		this.fields = fields;
 	}
 
 	public boolean isEnrichAlmData() {
@@ -123,13 +87,15 @@ public class CorrelationNode {
 		this.almKeysIndex = almKeysIndex;
 	}
 
-	@Override
-	public String toString() {
-		return "CorrelationNode [sourceToolName=" + sourceToolName + ", sourceToolCategory=" + sourceToolCategory
-				+ ", sourceLabelName=" + sourceLabelName + ", sourceFields=" + sourceFields + ", destinationToolName="
-				+ destinationToolName + ", destinationToolCategory=" + destinationToolCategory
-				+ ", destinationLabelName=" + destinationLabelName + ", destinationFields=" + destinationFields
-				+ ", toolCategory=" + toolCategory + ", enrichAlmData=" + enrichAlmData + ", almKeyProcessedIndex="
-				+ almKeyProcessedIndex + ", almKeysIndex=" + almKeysIndex + "]";
-	}
+	
+	 /** @Override public String toString() { return
+	 * "CorrelationNode [sourceToolName=" + sourceToolName + ", sourceToolCategory="
+	 * + sourceToolCategory + ", sourceLabelName=" + sourceLabelName +
+	 * ", sourceFields=" + sourceFields + ", destinationToolName=" +
+	 * destinationToolName + ", destinationToolCategory=" + destinationToolCategory
+	 * + ", destinationLabelName=" + destinationLabelName + ", destinationFields=" +
+	 * destinationFields + ", toolCategory=" + toolCategory + ", enrichAlmData=" +
+	 * enrichAlmData + ", almKeyProcessedIndex=" + almKeyProcessedIndex +
+	 * ", almKeysIndex=" + almKeysIndex + "]"; }*/
+	 
 }

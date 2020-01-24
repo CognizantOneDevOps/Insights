@@ -21,14 +21,6 @@
 	<version>6.4-SNAPSHOT</version>
 	<name>PlatformService</name>
 
-	<repositories>
-		<repository>
-			<id>project.local</id>
-			<name>project</name>
-			<url>file:///${project.basedir}/jar</url>
-		</repository>
-	</repositories>
-
 	<dependencyManagement>
 		<dependencies>
 			<dependency>
@@ -297,14 +289,12 @@
 		</dependency>
 
 		<!-- TestNg Dependency -->
+
 		<dependency>
 			<groupId>org.testng</groupId>
 			<artifactId>testng</artifactId>
-			<version>${testng.version}</version>
-			<scope>system</scope>
-			<systemPath>${project.basedir}/jar/testng-7.0.1.jar</systemPath>
+			<version>7.1.0</version>
 		</dependency>
-
 		<dependency>
 			<groupId>com.beust</groupId>
 			<artifactId>jcommander</artifactId>
@@ -420,5 +410,5 @@
 			</resource>
 		</resources>
 	</build>
-	
+
 </project>
