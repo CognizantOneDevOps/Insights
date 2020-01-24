@@ -46,11 +46,17 @@
 			<version>2.11.1</version>
 		</dependency>
 
-		<dependency>
-			<groupId>org.hyperledger.fabric-sdk-java</groupId>
-			<artifactId>fabric-sdk-java</artifactId>
-			<version>1.4.4</version>
-		</dependency>
+	<dependency>
+		<groupId>org.hyperledger.fabric-sdk-java</groupId>
+		<artifactId>fabric-sdk-java</artifactId>
+		<version>1.4.4</version>
+		<exclusions>
+			<exclusion>
+				<groupId>log4j</groupId>
+				<artifactId>log4j</artifactId>
+			</exclusion>
+		</exclusions>
+	</dependency>
 		<dependency>
 			<groupId>com.cognizant.devops</groupId>
 			<artifactId>PlatformCommons</artifactId>
