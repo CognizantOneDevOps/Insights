@@ -84,17 +84,30 @@ public class CorrelationBuilderServiceImpl implements CorrelationBuilderService 
 		for (CorrelationJson correlation : correlations) {
 
 			CorrelationConfiguration correlationConfig = new CorrelationConfiguration();
-			correlationConfig.setSourceToolName(correlation.getSource().getSourceToolName());
-			correlationConfig.setSourceToolCategory(correlation.getSource().getSourceToolCategory());
-			correlationConfig.setSourceLabelName(correlation.getSource().getSourceLabelName());
-			correlationConfig.setSourceFields(String.join(",", correlation.getSource().getSourceFields()));
-			correlationConfig.setDestinationToolName(correlation.getDestination().getDestinationToolName());
-			correlationConfig.setDestinationToolCategory(correlation.getDestination().getDestinationToolCategory());
-			correlationConfig.setDestinationLabelName(correlation.getDestination().getDestinationLabelName());
-			correlationConfig
-					.setDestinationFields(String.join(",", correlation.getDestination().getDestinationFields()));
+			correlationConfig.setSourceToolName(correlation.getSource().getToolName());
+			correlationConfig.setSourceToolCategory(correlation.getSource().getToolCategory());
+			if (correlation.getSource().getLabelName().isEmpty()) {
+				correlationConfig.setSourceLabelName(correlation.getSource().getToolName());
+			} else {
+				correlationConfig.setSourceLabelName(correlation.getSource().getLabelName());
+			}
+			correlationConfig.setSourceFields(String.join(",", correlation.getSource().getFields()));
+			correlationConfig.setDestinationToolName(correlation.getDestination().getToolName());
+			correlationConfig.setDestinationToolCategory(correlation.getDestination().getToolCategory());
+			correlationConfig.setDestinationLabelName(correlation.getDestination().getLabelName());
+			if (correlation.getDestination().getLabelName().isEmpty()) {
+				correlationConfig.setDestinationLabelName(correlation.getDestination().getToolName());
+			} else {
+				correlationConfig.setDestinationLabelName(correlation.getDestination().getLabelName());
+			}
+			correlationConfig.setDestinationFields(String.join(",", correlation.getDestination().getFields()));
 			correlationConfig.setRelationName(correlation.getRelationName());
+			if(correlation.getPropertyList()==null) {
+				correlationConfig.setPropertyList("");
+			}
+			else {				
 			correlationConfig.setPropertyList(String.join(",", correlation.getPropertyList()));
+			}
 			correlationConfig.setEnableCorrelation(correlation.isEnableCorrelation());
 			correlationConfigList.add(correlationConfig);
 		}

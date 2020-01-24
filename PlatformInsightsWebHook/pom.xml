@@ -27,22 +27,11 @@
 		<project.name>PlatformInsights</project.name>
 	</properties>
 
-	<repositories>
-		<repository>
-			<id>project.local</id>
-			<name>project</name>
-			<url>file:///${project.basedir}/jar</url>
-		</repository>
-	</repositories>
-
 	<dependencies>
-
 		<dependency>
 			<groupId>org.testng</groupId>
 			<artifactId>testng</artifactId>
-			<version>${testng.version}</version>
-			<scope>system</scope>
-			<systemPath>${project.basedir}/jar/testng-7.0.1.jar</systemPath>
+			<version>7.1.0</version>
 		</dependency>
 		<dependency>
 			<groupId>javax.servlet</groupId>

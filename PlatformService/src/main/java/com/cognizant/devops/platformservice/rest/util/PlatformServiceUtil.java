@@ -265,7 +265,7 @@ public class PlatformServiceUtil {
 	}
 
 
-	private static Map<String, String> getGrafanaCookies(HttpServletRequest httpRequest)
+	public static Map<String, String> getGrafanaCookies(HttpServletRequest httpRequest)
 			throws UnsupportedEncodingException {
 		Map<String, String> requestCookies  = new HashMap<String, String>(0);
 		String authHeader = ValidationUtils.extactAutharizationToken(httpRequest.getHeader("Authorization"));

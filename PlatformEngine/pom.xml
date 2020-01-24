@@ -22,18 +22,10 @@
 	<version>6.4-SNAPSHOT</version>
 	<name>PlatformEngine</name>
 	<url>http://maven.apache.org</url>
-	
-	<repositories>
-		<repository>
-			<id>project.local</id>
-			<name>project</name>
-			<url>file:///${project.basedir}/jar</url>
-		</repository>
-	</repositories>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<testng.version>7.0.1</testng.version>
-        <spring.version>5.1.5.RELEASE</spring.version>
+		<spring.version>5.1.5.RELEASE</spring.version>
 	</properties>
 
 	<dependencies>
@@ -133,13 +125,11 @@
 			<version>${spring.version}</version>
 			<scope>test</scope>
 		</dependency>
-
 		<dependency>
 			<groupId>org.testng</groupId>
 			<artifactId>testng</artifactId>
-			<version>7.0.1</version>
-			<scope>system</scope>
-			<systemPath>${project.basedir}/jar/testng-7.0.1.jar</systemPath>
+			<version>7.1.0</version>
+
 		</dependency>
 
 		<dependency>
@@ -165,7 +155,7 @@
 			<artifactId>hibernate-core</artifactId>
 			<version>5.4.2.Final</version>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>com.google.code.gson</groupId>
 			<artifactId>gson</artifactId>
@@ -310,7 +300,8 @@
 										<include>log4j2.xml</include>
 										<include>**/*.csv</include>
 										<include>**/*.jar</include>
-										<include>OneDevOpInsights v2.17 OpenSource Credit Document v1.0.pdf</include>
+										<include>OneDevOpInsights v2.17 OpenSource Credit Document
+											v1.0.pdf</include>
 									</includes>
 									<filtering>true</filtering>
 								</resource>

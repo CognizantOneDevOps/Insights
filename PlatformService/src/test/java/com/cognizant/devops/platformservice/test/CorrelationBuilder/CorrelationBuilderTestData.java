@@ -29,22 +29,22 @@ public class CorrelationBuilderTestData {
 
 	String saveDataConfig = "{\"data\":[{\"destination\":{\"toolName\":\"JIRA\",\"toolCategory\":\"ALM\",\"fields\":[\"jir_priority\"]},\"source\":{\"toolName\":\"BITBUCKET\",\"toolCategory\":\"SCM\",\"fields\":[\"bit_commiTime\"]},\"relationName\":\"FROM_BITBUCKET_TO_JIRA_test\"}]}";
 	String getConfigDetails = "[{\"destination\":{\"toolName\":\"JIRA\",\"toolCategory\":\"ALM\",\"fields\":[\"jir_priority\"]},\"source\":{\"toolName\":\"BITBUCKET\",\"toolCategory\":\"SCM\",\"fields\":[\"bit_commiTime\"]},\"relationName\":\"FROM_BITBUCKET_TO_JIRA_test\"}]";
-	String UpdateConfigDetails = "{\"data\":[{\"destination\":{\"toolName\":\"JIRA\",\"toolCategory\":\"ALM\",\"fields\":[\"jir_priority\"]},\"source\":{\"toolName\":\"BITBUCKET\",\"toolCategory\":\"SCM\",\"fields\":[\"bit_commiTime\"]},\"relationName\":\"FROM_BITBUCKET_TO_JIRA_test\"},{\"destination\":{\"toolName\":\"GIT\",\"toolCategory\":\"SCM\",\"fields\":[\"\"]},\"source\":{\"toolName\":\"JENKINS\",\"toolCategory\":\"CI\",\"fields\":[\"\"]},\"relationName\":\"FROM_JENKINS_TO_GIT_new\"},{\"destination\":{\"toolName\":\"JIRA\",\"toolCategory\":\"ALM\",\"fields\":[\"\"]},\"source\":{\"toolName\":\"PIVOTALTRACKER\",\"toolCategory\":\"ALM\",\"fields\":[\"storyId\"]},\"relationName\":\"FROM_PIVOTALTRACKER_TO_JIRA_new_test\"}]}";
-	String DeleteConfigDetails = "{\"data\":[{\"destination\":{\"toolName\":\"JIRA\",\"toolCategory\":\"ALM\",\"fields\":[\"jir_priority\"]},\"source\":{\"toolName\":\"BITBUCKET\",\"toolCategory\":\"SCM\",\"fields\":[\"bit_commiTime\"]},\"relationName\":\"FROM_BITBUCKET_TO_JIRA_test\"}]}";
+	String UpdateConfigDetails = "{\"relationName\":\"FROM_BITBUCKET_TO_JIRA_test\",\"correlationFlag\":true}";
+	String DeleteConfigDetails = "{\"relationName\":\"FROM_BITBUCKET_TO_JIRA_test\",\"correlationFlag\":false}";
 
 	public static void resetConfig(String configDetails) throws IOException {
 		// TODO Auto-generated method stub
-		
+
 		String configFilePath = System.getenv().get("INSIGHTS_HOME") + File.separator + ConfigOptions.CONFIG_DIR;
-		File configFile=null;
+		File configFile = null;
 		Path dir = Paths.get(configFilePath);
-		Stream<Path> paths = Files.find(dir, Integer.MAX_VALUE, (path, attrs) -> attrs.isRegularFile()
-				&& path.toString().endsWith(ConfigOptions.CORRELATION_TEMPLATE));
+		Stream<Path> paths = Files.find(dir, Integer.MAX_VALUE,
+				(path, attrs) -> attrs.isRegularFile() && path.toString().endsWith(ConfigOptions.CORRELATION_TEMPLATE));
 		configFile = paths.limit(1).findFirst().get().toFile();
 		FileWriter file = new FileWriter(configFile);
 		file.write(configDetails);
 		file.flush();
 		file.close();
-		
+
 	}
 }
