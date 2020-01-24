@@ -15,17 +15,12 @@
  ******************************************************************************/
 package com.cognizant.devops.platforminsights.core.sum;
 
-import org.apache.log4j.Logger;
-
 import com.cognizant.devops.platforminsights.core.BaseActionImpl;
 import com.cognizant.devops.platforminsights.datamodel.InferenceConfigDefinition;
 import com.cognizant.devops.platforminsights.exception.InsightsJobFailedException;
 
 
 public class SumActionImpl extends BaseActionImpl {
-
-	private static Logger log = Logger.getLogger(SumActionImpl.class);
-
 
 	public SumActionImpl(InferenceConfigDefinition kpiDefinition) {
 		super(kpiDefinition);
