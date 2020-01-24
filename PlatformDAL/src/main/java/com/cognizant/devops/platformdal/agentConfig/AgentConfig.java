@@ -193,6 +193,9 @@ public class AgentConfig {
 	}
 
 	public Boolean getVault() {
+		if(this.vault == null) {
+			return false;
+		}
 		return vault;
 	}
 
