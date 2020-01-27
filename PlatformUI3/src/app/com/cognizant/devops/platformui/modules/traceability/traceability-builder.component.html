@@ -112,7 +112,8 @@
 									</polygon>
 								</g>
 							</g>
-							<g class="PWGx-svgResultStatusSolid" *ngIf="item?.child[0]?.point?.toolstatus == 'FAILURE'">
+							<g class="PWGx-svgResultStatusSolid"
+								*ngIf="item?.child[0]?.point?.toolstatus.indexOf('F')>-1">
 								<circle cx="0" cy="0" r="12" class="halo" stroke-width="3.5"></circle>
 								<circle cx="0" cy="0" r="12" class="statusColor circle-bg failure"></circle>
 								<g class="PWGx-result-status-glyph">
@@ -137,7 +138,7 @@
 								</polygon>
 							</g>
 						</g>
-						<g class="PWGx-svgResultStatusSolid" *ngIf="item?.point?.toolstatus == 'FAILURE'"
+						<g class="PWGx-svgResultStatusSolid" *ngIf="item?.point?.toolstatus.indexOf('F') > -1"
 							(mouseleave)="eventLeave()">
 							<circle cx="0" cy="0" r="12" class="halo" stroke-width="3.5"></circle>
 							<circle cx="0" cy="0" r="12" class="statusColor circle-bg failure"></circle>
@@ -153,6 +154,10 @@
 				</g>
 
 			</svg>
+			<div class="timelag" style="margin-left: 33%;" *ngIf="isEnable">
+				<b class="hyperlink" (click)="showTimeDetailsDialog()"><u class="timelinetext">Advance View</u></b>
+			</div>
+
 			<div class="summarylist" style="margin-left: 35px;">
 				<ul>
 					<li style="color: #0033A0" *ngFor="let element of toolSummaryArray">{{element}}</li>
@@ -161,8 +166,8 @@
 			<div *ngFor="let item of list; let i = index">
 				<div class="TruncatingLabel PWGx-pipeline-big-label" title="Click here to see more details"
 					class="letter-fix" [ngStyle]="{'left': (144 + (i*120)) + 'px'}">
-					<a class="link" (click)="showDetailsDialog(item.point)"> <b style="color: #0033A0">{{item.point}} (
-						{{item.count}} ) </b>
+					<a class="link" (click)="showDetailsDialog(item.point)"><u class="timelinetext">{{item.point}}(
+							{{item.count}} ) </u>
 					</a>
 				</div>
 				<div *ngFor="let ite of item?.child; let j = index" class="TruncatingLabel PWGx-pipeline-small-label"
@@ -170,7 +175,6 @@
 					style="overflow-wrap: break-word; top: 70px; left: 219px; position: absolute; width: 89px; max-height: 39px; text-align: center;"
 					[style.top]="(70 * (j+1)) + 'px'" [style.left]="(94 + (i*120)) + 'px'">{{ite.point.toolstatus}}
 				</div>
-				<!-- <div class="TruncatingLabel PWGx-pipeline-big-label" title="End" style="overflow: hidden; overflow-wrap: break-word; position: absolute; width: 113px; max-height: 35px; text-align: center; margin-left: -57px; top: 15px; left: 948px;">End</div> -->
 			</div>
 		</div>
 

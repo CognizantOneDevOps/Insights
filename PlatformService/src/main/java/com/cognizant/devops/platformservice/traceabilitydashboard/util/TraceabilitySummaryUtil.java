@@ -19,115 +19,179 @@ import java.text.DateFormat;
 import java.text.MessageFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.TimeZone;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.TimeUnit;
+import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
-
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import com.cognizant.devops.platformcommons.core.util.InsightsUtils;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
 public class TraceabilitySummaryUtil {
 
-	public static String TimeDiffrence(String operandName, String operandValue, List<JsonObject> toolRespPayload,
-			String message) throws ParseException {
+	static Logger log = LogManager.getLogger(TraceabilitySummaryUtil.class.getName());
+	final static String PATTERN ="[\\[\\](){}\"\\\"\"]";
+
+	public static String calTimeDiffrence(String operandName, List<JsonObject> toolRespPayload, String message)
+			throws ParseException {
 		int totalCount = toolRespPayload.size();
-		if (totalCount >= 0) {
-			if (toolRespPayload.get(0).has(operandName)) {
-				int numOfUniqueAuthers = (int) toolRespPayload.stream()
-						.filter(distinctByKey(payload -> payload.get("author").toString().replaceAll("\"", "")))
-						.count();
-				String firstCommitTime = toolRespPayload.get(0).get(operandName).toString().replaceAll("\"", "");
-				String lastCommitTime = toolRespPayload.get(totalCount - 1).get(operandName).toString().replaceAll("\"",
-						"");
-				SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy hh:mm:ss");
-				Date firstDate = sdf.parse(epochToHumanDate(firstCommitTime));
-				Date secondDate = sdf.parse(epochToHumanDate(lastCommitTime));
-				long diffInMillies = Math.abs(firstDate.getTime() - secondDate.getTime());
-				long days = TimeUnit.DAYS.convert(diffInMillies, TimeUnit.MILLISECONDS);
-				long hours = TimeUnit.MILLISECONDS.toHours(diffInMillies)
-						- TimeUnit.DAYS.toHours(TimeUnit.MILLISECONDS.toDays(diffInMillies));
-				long minutes = TimeUnit.MILLISECONDS.toMinutes(diffInMillies)
-						- TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(diffInMillies));
-				long yrs = 0;
-				long month = 0;
-				String duration;
-				if (days > 365) {
-					yrs = days / 365;
-					days = days - (365 * yrs);
-					if (days >= 30) // Calculate month
-					{
-						month = days / 30;
-						days = days - (month * 30);
-					}
-					duration = yrs + " Yrs " + month + "Month(s) " + days + " Days " + hours + " Hrs " + minutes
-							+ " Mins";
-				} else if (days >= 30 && days < 365) // Calculate month
-				{
-					month = days / 30;
-					days = days - (month * 30);
-					duration = month + "Month(s) " + days + " Days " + hours + " Hrs " + minutes + " Mins";
-				} else {
-					duration = days + " Days " + hours + " Hrs " + minutes + " Mins";
-				}
-				MessageFormat mf = new MessageFormat(message);
-				String msg = mf.format(new Object[] { duration, numOfUniqueAuthers }).replaceAll("\"", "");
-				return msg;
-			}
+		if (totalCount >= 0 && toolRespPayload.get(0).has(operandName)) {
+			int numOfUniqueAuthers = (int) toolRespPayload.stream()
+					.filter(distinctByKey(payload -> payload.get("author").getAsString())).count();
+			String firstCommitTime = toolRespPayload.get(0).get(operandName).getAsString();
+			String lastCommitTime = toolRespPayload.get(totalCount - 1).get(operandName).getAsString();
+			SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy hh:mm:ss");
+			Date firstDate = sdf.parse(epochToHumanDate(firstCommitTime));
+			Date secondDate = sdf.parse(epochToHumanDate(lastCommitTime));
+			long diffInMillies = Math.abs(firstDate.getTime() - secondDate.getTime());
+			String duration = InsightsUtils.getDateTimeFromEpoch(diffInMillies);
+			MessageFormat mf = new MessageFormat(message);
+			return mf.format(new Object[] { duration, numOfUniqueAuthers });
 		}
+
 		return "";
 
 	}
 
-	public static String SUM(String operandName, String operandValue, List<JsonObject> toolRespPayload,
+	public static String calSUM(String operandName, String operandValue, List<JsonObject> toolRespPayload,
 			String message) {
-
 		int totalCount = toolRespPayload.size();
 		if (totalCount >= 0) {
 			if (toolRespPayload.get(0).has(operandName)) {
 				int count = (int) toolRespPayload.stream()
-						.filter(payload -> payload.get(operandName).toString().replace("\"", "").equals(operandValue))
-						.count();
+						.filter(payload -> payload.get(operandName).getAsString().equals(operandValue)).count();
 				int rem = totalCount - count;
 				MessageFormat mf = new MessageFormat(message);
-				String msg = mf.format(new Object[] { count, rem }).replaceAll("\"", "");
-				return msg;
+				return mf.format(new Object[] { count, rem });
 			}
 		}
 		return "";
 
 	}
 
-	public static String Percentage(String operandName, String operandValue, List<JsonObject> toolRespPayload,
+	public static String calPercentage(String operandName, String operandValue, List<JsonObject> toolRespPayload,
 			String message) {
 		int totalCount = toolRespPayload.size();
-		if (totalCount >= 0) {
-			if (toolRespPayload.get(0).has(operandName)) {
-				int count = (int) toolRespPayload.stream()
-						.filter(payload -> payload.get(operandName).toString().replace("\"", "").equals(operandValue))
-						.count();
-				int perc = (count * 100) / totalCount;
-				MessageFormat mf = new MessageFormat(message);
-				String msg = mf.format(new Object[] { perc, totalCount }).replaceAll("\"", "");
-				return msg;
-			}
+		if (totalCount >= 0 && toolRespPayload.get(0).has(operandName)) {
+			int count = (int) toolRespPayload.stream()
+					.filter(payload -> payload.get(operandName).getAsString().equals(operandValue)).count();
+			int perc = (count * 100) / totalCount;
+			MessageFormat mf = new MessageFormat(message);
+			return mf.format(new Object[] { perc, totalCount });
 		}
+
 		return "";
 
 	}
+
 	public static <T> Predicate<T> distinctByKey(Function<? super T, Object> keyExtractor) {
 		Map<Object, Boolean> map = new ConcurrentHashMap<>();
 		return t -> map.putIfAbsent(keyExtractor.apply(t), Boolean.TRUE) == null;
 	}
+
 	private static String epochToHumanDate(String epochtime) {
 		Long epoch = Long.valueOf(epochtime.split("\\.", 2)[0]);
 		Date date = new Date(epoch * 1000L);
 		DateFormat format = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
-		format.setTimeZone(TimeZone.getTimeZone("Etc/UTC"));
 		return format.format(date);
+	}
+
+	public static JsonObject timelag(HashMap<String, List<JsonObject>> map, JsonObject dataModel) {
+
+		HashMap<String, Long> timelagMap = new HashMap<>();
+		JsonObject timelagObject = new JsonObject();
+		map.forEach(new BiConsumer<String, List<JsonObject>>() {
+			public void accept(String toolName, List<JsonObject> payload) {
+				JsonObject toolJson = dataModel.get(toolName).getAsJsonObject();				
+				if (toolJson.has("timelagParam")) {
+					JsonArray timelagArray = toolJson.get("timelagParam").getAsJsonArray();
+					int timelagArraySize = timelagArray.size();
+					if (timelagArraySize == 1) {
+						String timelagParam = timelagArray.get(0).toString().replaceAll(PATTERN, "")
+								.split(",")[0];
+						if (calTimelag(timelagParam, payload) != -1)
+							timelagMap.put(toolName, calTimelag(timelagParam, payload));
+					} else if (timelagArraySize == 2) {
+						String timelagParam1 = timelagArray.get(0).toString().replaceAll(PATTERN, "")
+								.split(":")[0];
+						String timelagParam2 = timelagArray.get(1).toString().replaceAll(PATTERN, "")
+								.split(":")[0];
+						if (calTimelag(timelagParam1, timelagParam2, payload) != -1)
+							timelagMap.put(toolName, calTimelag(timelagParam1, timelagParam2, payload));
+
+					}
+				}
+			}
+
+		});
+
+		timelagMap.forEach(
+				(toolName, time) -> timelagObject.addProperty(toolName, InsightsUtils.getDateTimeFromEpoch(time)));
+
+		return timelagObject;
+	}
+
+	public static long calTimelag(String timelagParam1, String timelagParam2, List<JsonObject> payload) {
+
+		List<Long> epoch = new ArrayList<>();
+		String startTime = "";
+		String endTime = "";
+		for (JsonObject eachObject : payload) {
+			if (eachObject.has(timelagParam1)) {
+				startTime = eachObject.get(timelagParam1).getAsString();
+			}
+			if (eachObject.has(timelagParam2)) {
+				endTime = eachObject.get(timelagParam2).getAsString();
+			}
+			if (!startTime.equals("") && !endTime.equals("")) {
+				Long timeDiff = InsightsUtils.getEpochTime(endTime) - InsightsUtils.getEpochTime(startTime);
+				epoch.add(timeDiff);
+			}
+		}
+		int size = epoch.size();
+		List<Long> epochTimeList = new ArrayList<>();
+		for (int i = 0; i < size; i++) {
+			if (i != size - 1) {
+				long firstElement = epoch.get(i);
+				long secondElement = epoch.get(i + 1);
+				epochTimeList.add(Math.abs(firstElement - secondElement));
+			}
+		}
+		if (!epochTimeList.isEmpty()) {
+			return (long) epochTimeList.stream().mapToLong(val -> val).average().getAsDouble();
+		}
+		return -1;
+
+	}
+
+	public static long calTimelag(String timelagParam, List<JsonObject> payload) {
+		List<Long> epoch = new ArrayList<>();
+		for (JsonObject eachObject : payload) {
+			if (eachObject.has(timelagParam)) {
+				String commitTime = eachObject.get(timelagParam).getAsString();
+				epoch.add(InsightsUtils.getEpochTime(commitTime));
+			}
+		}
+		int size = epoch.size();
+		List<Long> epochTimeList = new ArrayList<>();
+		for (int i = 0; i < size; i++) {
+			if (i != size - 1) {
+				long firstElement = epoch.get(i);
+				long secondElement = epoch.get(i + 1);
+				epochTimeList.add(firstElement - secondElement);
+			}
+		}
+		if (!epochTimeList.isEmpty()) {
+			return (long) epochTimeList.stream().mapToLong(val -> val).average().getAsDouble();
+		}
+		return -1;
 	}
 
 }
