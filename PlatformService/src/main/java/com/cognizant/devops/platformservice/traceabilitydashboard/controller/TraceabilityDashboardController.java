@@ -78,7 +78,7 @@ public class TraceabilityDashboardController {
 			JsonObject response = traceabilityDashboardServiceImpl.getPipeline(toolName, fieldName, fieldValue);
 			return PlatformServiceUtil.buildSuccessResponseWithData(response);
 		} catch (InsightsCustomException e) {
-			return PlatformServiceUtil.buildFailureResponse(e.toString());
+			return PlatformServiceUtil.buildFailureResponse(e.getMessage()); 
 		}
 
 	}

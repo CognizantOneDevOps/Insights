@@ -39,10 +39,10 @@ public class TraceabilityDashboardTest {
 
 	private static final Logger log = LogManager.getLogger(TraceabilityDashboardTest.class);
 	TraceabilityDashboardService service;
-	List<String> testTools = new ArrayList<String>();
+	List<String> testTools = new ArrayList<>();
 
 	@BeforeMethod
-	public void beforeMethod() {
+	public void beforeMethod() throws InsightsCustomException {
 		service = new TraceabilityDashboardServiceImpl();
 		ApplicationConfigCache.loadConfigCache();
 	}

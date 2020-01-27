@@ -16,22 +16,21 @@
 
 import { Component, OnInit, Inject, ViewChild } from '@angular/core';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA, MatPaginator, MatTableDataSource } from '@angular/material';
-import { RestCallHandlerService } from '@insights/common/rest-call-handler.service';
 import { TraceabiltyService } from './traceablity-builder.service';
-import { TitleCasePipe } from '@angular/common';
 import { DatePipe } from '@angular/common';
-import { CommonModule } from '@angular/common';
 import { DataSharedService } from '@insights/common/data-shared-service';
-import { QueryBuilderService } from '../blockchain/custom-report/custom-report-service';
-import { MessageDialogService } from '../application-dialog/message-dialog-service';
-import { saveAs as importedSaveAs } from "file-saver";
 
-
+export interface TimelagElement {
+    toolname: string;
+    average: string;
+}
 @Component({
     selector: 'traceabilty-show-details-dialog',
     templateUrl: './traceablilty-show-details-dialog.html',
     styleUrls: ['./traceabilty-show-details-dialog.css']
 })
+
+
 export class ShowTraceabiltyDetailsDialog implements OnInit {
     showContent: boolean;
     MAX_ROWS_PER_TABLE = 10;
@@ -54,33 +53,55 @@ export class ShowTraceabiltyDetailsDialog implements OnInit {
     masterHeader = new Map<String, String>();
     finalHeaderToShow = new Map<String, String>();
     displayedColumns: string[] = ['inSightsTimeX', 'message'];
-    //@ViewChild(MatPaginator) allStatusPaginator: MatPaginator;  
     headerSet = new Set();
     showAgentFailureTab: boolean = false;
-
+    timeZone: string = "";
+    showToolDetailProp: boolean = true;
+    timelagArray = [];
+    columnsToDisplay: string[] = ['ToolName', 'Average Time'];
+    timelagDataSource = new MatTableDataSource([]);
 
     constructor(public dialogRef: MatDialogRef<ShowTraceabiltyDetailsDialog>,
         @Inject(MAT_DIALOG_DATA) public data: any,
-        private traceabiltyService: TraceabiltyService, public datePipe: DatePipe) {
+        private traceabiltyService: TraceabiltyService, public datePipe: DatePipe,
+        public dataShare: DataSharedService) {
     }
 
     ngOnInit() {
-        this.gettooldetails();
-        this.agentDetailedDatasource.paginator = this.paginator
+        this.showToolDetailProp = this.data.showToolDetail;
+
+        if (this.showToolDetailProp) {
+            this.gettooldetails();
+            this.agentDetailedDatasource.paginator = this.paginator
+        }
+        else if (!this.showToolDetailProp) {
+            this.getTimelagdetails();
+        }
+        this.timeZone = this.dataShare.getTimeZone()
     }
+
+    getTimelagdetails() {
+        this.timelagArray["average"] = this.data.dataArr
+        this.timelagDataSource = this.data.dataArr
+
+    }
+
     gettooldetails() {
         this.traceabiltyService.getAsssetDetails(this.data.toolName, this.data.cachestring)
             .then((response) => {
                 for (var x of response.data) {
                     console.log("Response data to check..", response.data)
                     var obj = x;
+
                     for (let key in x) {
+
                         if (key == 'uuid' || key == 'count' || key == 'toolName') {
                             if (key == 'toolName')
                                 this.dispplaytoolname = obj[key];
                             continue;
                         }
                         if (typeof obj["inSightsTimeX"] !== "undefined") {
+
                             obj["inSightsTimeX"] = this.datePipe.transform(obj["inSightsTimeX"], 'yyyy-MM-dd HH:mm:ss');
                         }
                         this.finalHeaderToShow.set(key, obj[key]);
@@ -103,7 +124,7 @@ export class ShowTraceabiltyDetailsDialog implements OnInit {
     }
 
     ngAfterViewInit() {
-        //this.agentDetailedDatasource.paginator = this.allStatusPaginator;
+
     }
 
     showSelectedField(): void {

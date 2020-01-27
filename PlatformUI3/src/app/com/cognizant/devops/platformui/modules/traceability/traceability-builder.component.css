@@ -15,53 +15,54 @@
  ******************************************************************************/
 
 .loading-indicator {
-  position: fixed;
-  z-index: 999;
-  height: 2em;
-  width: 2em;
-  overflow: show;
-  margin: auto;
-  top: 0;
-  left: 0;
-  bottom: 0;
-  right: 0;
- }
- 
- .labelInfo{
-  font-size:13px;
-  padding-left: 10px;
-  color: black;
+    position: fixed;
+    z-index: 999;
+    height: 2em;
+    width: 2em;
+    overflow: show;
+    margin: auto;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
 }
 
- 
-th:first-child { border-radius: 10px 0 0 0; }
-th:last-child { border-radius: 0 10px 0 0; }
-
-tr:last-child td:first-child { border-radius: 0 0 0 10px; }
-tr:last-child td:last-child { border-radius: 0 0 10px 0; }
-
-/*tr:nth-child(4n+0) {
-    background: #CCC;
+.labelInfo {
+    font-size: 13px;
+    padding-left: 10px;
+    color: black;
 }
 
-tr:nth-child(3n+0) {
-    background: #999;
-}*/
+th:first-child {
+    border-radius: 10px 0 0 0;
+}
+
+th:last-child {
+    border-radius: 0 10px 0 0;
+}
+
+tr:last-child td:first-child {
+    border-radius: 0 0 0 10px;
+}
+
+tr:last-child td:last-child {
+    border-radius: 0 0 10px 0;
+}
 
 .mat-table {
-    font-family: inherit !important;  
+    font-family: inherit !important;
 }
 
-.mat-table tbody{
+.mat-table tbody {
     background: unset !important;
 }
 
-.dynamic-table{
+.dynamic-table {
     margin-bottom: 30px;
     border-radius: 10px !important;
 }
 
-tr.mat-footer-row, tr.mat-row-dynamic{
+tr.mat-footer-row, tr.mat-row-dynamic {
     height: 40px !important;
     text-align: left !important;
     vertical-align: middle;
@@ -69,40 +70,31 @@ tr.mat-footer-row, tr.mat-row-dynamic{
 }
 
 .dynamicTableHeaderCss {
-    background-color: #00B140;   
+    background-color: #00B140;
     color: white;
     font-size: 15px;
     height: 40px;
     margin: 0px;
-    padding:0px;
+    padding: 0px;
     text-align: center;
     font-weight: bold;
 }
 
-
-/*tr.mat-row-dynamic:nth-child(even){
-    background-color:#e1e3e7;
-}*/
-
-/*.mat-row-dynamic-data:nth-child(odd){
-    background-color:#FFFFFF;
-}
-*/
-.mat-row-dynamic-data{
+.mat-row-dynamic-data {
     height: 40px !important;
     text-align: left !important;
     vertical-align: middle;
     width: inherit
 }
 
-.mat-row-upload-data{
+.mat-row-upload-data {
     height: 40px !important;
     text-align: left !important;
     vertical-align: middle;
     margin-left: 15px;
 }
 
-.mat-row-icon-button{
+.mat-row-icon-button {
     height: 60px !important;
     text-align: left !important;
     vertical-align: middle;
@@ -111,7 +103,7 @@ tr.mat-footer-row, tr.mat-row-dynamic{
     float: right;
 }
 
-.mat-cell-value-dynamic-data{
+.mat-cell-value-dynamic-data {
     font-size: 13px;
     height: 40px;
     text-align: left;
@@ -119,14 +111,15 @@ tr.mat-footer-row, tr.mat-row-dynamic{
     width: 100%;
     padding-right: 10px;
 }
-.mat-button{
-	font-family: inherit !important; 
+
+.mat-button {
+    font-family: inherit !important;
     font-size: 15px;
     font-weight: 500;
     min-width: 50px;
 }
 
-.mat-cell-header{
+.mat-cell-header {
     font-size: 16px;
     height: 40px;
     text-align: left;
@@ -136,7 +129,7 @@ tr.mat-footer-row, tr.mat-row-dynamic{
     text-transform: capitalize;
 }
 
-.mat-cell-header-single{
+.mat-cell-header-single {
     font-size: 16px;
     height: 40px;
     text-align: left;
@@ -145,7 +138,7 @@ tr.mat-footer-row, tr.mat-row-dynamic{
     margin-left: 19px;
 }
 
-.mat-cell-value{
+.mat-cell-value {
     font-size: 13px;
     height: 40px;
     text-align: left;
@@ -156,7 +149,7 @@ tr.mat-footer-row, tr.mat-row-dynamic{
     width: 80%;
 }
 
-.mat-cell-value-single{
+.mat-cell-value-single {
     font-size: 13px;
     height: 40px;
     text-align: left;
@@ -165,39 +158,38 @@ tr.mat-footer-row, tr.mat-row-dynamic{
     padding-right: 10px;
 }
 
-.upload-main-text{
+.upload-main-text {
     font-size: 16px;
-    color:  #00b140;
-    vertical-align:sub;
+    color: #00b140;
+    vertical-align: sub;
     width: 10%;
 }
 
-.dynamic-table-body{
+.dynamic-table-body {
     width: inherit;
 }
 
-.tableDiv{
+.tableDiv {
     padding-left: 20px;
     padding-right: 20px;
 }
 
-/deep/ .mat-paginator-icon{
-  width: 21px !important;
+.mat-paginator-icon {
+    width: 21px !important;
 }
 
-.btnAlign{
-    /* margin-right: 1px;  */
+.btnAlign {
     float: right;
     margin-left: 140px;
 }
 
-.mat-icon-message{
+.mat-icon-message {
     color: #ff4c4c;
     height: 15px;
     width: 15px;
 }
 
-.confirmation-message{
+.confirmation-message {
     color: #ff4c4c;
     text-align: center;
     font-size: 20px;
@@ -246,22 +238,22 @@ tr.mat-footer-row, tr.mat-row-dynamic{
     height: 40px;
 }
 
-.button-row{
+.button-row {
     margin-bottom: 10px;
 }
 
-.form{
+.form {
     box-sizing: border-box;
 }
 
 .configureBut {
     float: right;
-    background-color: #00B140 ;
+    background-color: #00B140;
     margin-bottom: 10px;
     margin-left: 10px;
 }
 
-.configureButIcon{
+.configureButIcon {
     float: right;
     margin-left: 10px;
     margin-right: inherit;
@@ -288,8 +280,6 @@ tr.mat-footer-row, tr.mat-row-dynamic{
     border-radius: 10px;
 }
 
-
-
 .dataHead {
     font-size: 14px !important;
     color: black !important;
@@ -298,7 +288,7 @@ tr.mat-footer-row, tr.mat-row-dynamic{
 
 .theadCss {
     font-size: 16px !important;
-    background-color:  #00B140 !important;
+    background-color: #00B140 !important;
 }
 
 .tableHeader {
@@ -307,7 +297,7 @@ tr.mat-footer-row, tr.mat-row-dynamic{
 }
 
 .tableHeadingStyle {
-    font-size: 16px;   
+    font-size: 16px;
     color: black;
 }
 
@@ -320,7 +310,7 @@ tr.mat-footer-row, tr.mat-row-dynamic{
 .inputBoxCont {
     border: 1px !important;
     border-style: solid !important;
-    border-color: #9e9a9a  !important;
+    border-color: #9e9a9a !important;
     border-bottom-color: #9e9a9a !important;
     background-color: white !important;
     text-align: left !important;
@@ -343,7 +333,7 @@ tr.mat-footer-row, tr.mat-row-dynamic{
     border-bottom-color: #9e9a9a !important;
 }
 
-.layout-row > .flex-30 {
+.layout-row>.flex-30 {
     -webkit-box-flex: 1;
     -webkit-flex: 1 1 100%;
     flex: 1 1 100%;
@@ -359,7 +349,7 @@ tr.mat-footer-row, tr.mat-row-dynamic{
     margin-bottom: 5px !important;
 }
 
-.agentConfigTable{
+.agentConfigTable {
     -webkit-box-orient: horizontal;
     -webkit-box-direction: normal;
     -webkit-flex-direction: row;
@@ -369,8 +359,7 @@ tr.mat-footer-row, tr.mat-row-dynamic{
     display: -webkit-flex;
 }
 
-
-.others{
+.others {
     -webkit-box-orient: horizontal;
     -webkit-box-direction: normal;
     -webkit-flex-direction: row;
@@ -396,28 +385,28 @@ tr.mat-footer-row, tr.mat-row-dynamic{
     min-width: 50px;
 }
 
-.mat-dialog-content{
+.mat-dialog-content {
     margin-top: 10px
 }
 
-.mat-dialog-actions{
+.mat-dialog-actions {
     float: center;
 }
 
-.arrange-vertically
-{
+.arrange-vertically {
     margin-top: 3px;
 }
 
-.mainText{
+.mainText {
     font-size: 15px;
-    color:  #00b140;
-    font-weight:bold;
-    vertical-align:sub;
+    color: #00b140;
+    font-weight: bold;
+    vertical-align: sub;
     width: 10%;
     padding-left: 19px;
     padding-top: 10px;
 }
+
 .input-file {
     -webkit-appearance: initial;
     background-color: initial;
@@ -429,56 +418,55 @@ tr.mat-footer-row, tr.mat-row-dynamic{
     height: 30px;
 }
 
-.PWGx-pipeline-node-terminal{
-	fill: #949393;
+.PWGx-pipeline-node-terminal {
+    fill: #949393;
 }
 
 .PWGx-pipeline-connector {
-	stroke :#949393
+    stroke: #949393
 }
 
-.PWGx-svgResultStatusSolid{
-	transform: translateZ(0);
+.PWGx-svgResultStatusSolid {
+    transform: translateZ(0);
 }
 
-circle.halo{
-	stroke: white;
-	fill:none;
+circle.halo {
+    stroke: white;
+    fill: none;
 }
 
-.PWGx-svgResultStatusSolid > circle.statusColor.success {
-	fill : #00B140;
+.PWGx-svgResultStatusSolid>circle.statusColor.success {
+    fill: #00B140;
 }
 
 .PWGx-result-status-glyph {
-	stroke: none;
-	fill:#fff;
+    stroke: none;
+    fill: #fff;
 }
 
-.PWGx-svgResultStatusSolid > circle.statusColor.failure {
-		fill: #d54c53;
+.PWGx-svgResultStatusSolid>circle.statusColor.failure {
+    fill: #d54c53;
 }
 
 * {
     font-family: Open Sans;
 }
 
-:not(svg), :not(foreignObject) > svg {
+:not(svg), :not(foreignObject)>svg {
     transform-origin: 0px 0px;
 }
 
 .letter-fix {
-	/* overflow: hidden; */
-	overflow-wrap: break-word;
-	position: absolute;
-	width: 113px;
-	max-height: 35px;
-	text-align: center;
-	margin-left: -57px;
-	top: 15px;
-	font-size:13px;
+    overflow-wrap: break-word;
+    position: absolute;
+    width: 113px;
+    max-height: 35px;
+    text-align: center;
+    margin-left: -57px;
+    top: 15px;
+    font-size: 13px;
 }
-  
+
 .model-position {
     /* overflow: hidden; */
     overflow-wrap: break-word;
@@ -491,53 +479,62 @@ circle.halo{
     z-index: 999;
     background-color: #ffffff;
 }
+
 .margin_auto {
-	 margin: auto;
+    margin: auto;
 }
 
-.PWGx-pipeline-small-label{
-	font-size:55%;
+.PWGx-pipeline-small-label {
+    font-size: 55%;
 }
 
-.link{
+.link {
     cursor: pointer;
-}
-button.link { background:none;border:none; }
-.PWGx-PipelineGraph-container * {
-	box-sizing: border-box;
+    font-weight: bold;
+    color: #0033A0;
 }
 
-	
+.hyperlink .timelinetext {
+    font-weight: bold;
+    cursor: pointer;
+    color: #0033A0;
+}
+
+button.link {
+    background: none;
+    border: none;
+}
+
+.PWGx-PipelineGraph-container * {
+    box-sizing: border-box;
+}
+
 .dialog-model {
     position: absolute;
     top: 10px;
     margin: auto;
     border: 3px solid #0033a0;
     width: auto;
-    /* right: 0;
-    left: 0; */
     box-shadow: 0px 0px 8px 0px black;
-    border-radius: 5px; 
+    border-radius: 5px;
     font-size: 12px;
-    background : #ffffff;
+    background: #ffffff;
 }
 
 .dialog-model h4 {
-  background: #0033a0;
-  margin: 0;
-  /* padding: 10px; */
-  color: #ffffff;
-  text-align: center;
-  padding: 8px;
+    background: #0033a0;
+    margin: 0;
+    color: #ffffff;
+    text-align: center;
+    padding: 8px;
 }
 
 .dialog-model h4 span {
-  /* float: right; */
-  cursor: pointer;
-  font-size: 12px;
-  position: absolute;
-  right: 5px;
-  top: 5px;
+    cursor: pointer;
+    font-size: 12px;
+    position: absolute;
+    right: 5px;
+    top: 5px;
 }
 
 .dialog-model .body-content {
