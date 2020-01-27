@@ -151,7 +151,45 @@
 			        "uniqueKey" : ["projectKey", "projectId"]
 			    }
 			 }
- 		}
+ 		},
+ 	"changeLog": {
+		"fields": [
+			"assignee",
+			"Sprint",
+			"status",
+			"Story Points",
+			"Key",
+			"Rank",
+			"project",
+			"issuetype",
+			"Version",
+			"Fix Version",
+			"timespent",
+			"Link",
+			"Acceptance Criteria",
+			"description"
+		],
+		"metadata": {
+			"labels": [
+				"CHANGE_LOG"
+			],
+			"dataUpdateSupported": true,
+			"uniqueKey": [
+				"issueKey",
+				"changeId",
+				"changedfield"
+			]
+		},
+		"responseTemplate": {
+			"id": "changeId",
+			"author": {
+				"name": "authorId",
+				"emailAddress": "authorEmail",
+				"displayName": "authorName"
+			},
+			"created": "changeDate"
+		}
+	}
   },
   "agentId": "",
   "toolCategory" : "ALM",
