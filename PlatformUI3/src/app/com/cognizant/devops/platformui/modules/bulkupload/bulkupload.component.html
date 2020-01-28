@@ -62,7 +62,7 @@
                     retreived once it is uploaded)</span>
             </div>
         </div>
-        <div class="col-md-2" [formGroup]="uploadForm">
+        <div [formGroup]="uploadForm">
             <table class="tableMainCss">
                 <tbody>
                     <tr *ngFor="let row of rows.controls;let index = index;">

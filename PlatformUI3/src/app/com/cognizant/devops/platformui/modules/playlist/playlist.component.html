@@ -14,5 +14,6 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  ****************************************************************************** -->
-<iframe class="iframeCss" [(style.height.px)]="framesize" [style.width.%]="100" [src]="playListUrl"
-  scrolling="no"></iframe>
+<div class="embed-responsive">
+  <iframe class="iframeCss embed-responsive-item" [src]="playListUrl" scrolling="no"></iframe>
+</div>

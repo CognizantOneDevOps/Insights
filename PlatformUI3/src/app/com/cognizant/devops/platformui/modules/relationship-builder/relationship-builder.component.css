@@ -566,7 +566,7 @@ th {
 
 .divTablesHeadingLeft {
 	font-size: 16px;
-	margin-top: 40px;
+	margin-top: 15%;
 	margin-bottom: 6px;
 	text-align: left;
 	/* width: 100vh; */
@@ -596,8 +596,6 @@ table tr:last-child td:last-child {
 	color: #0033A0;
 	/*  font-weight:bold; */
 	vertical-align: sub;
-	width: 10%;
-	overflow: auto;
 	font-family: inherit;
 	margin-left: 80px;
 	/* margin-left: 500px; */

@@ -15,6 +15,7 @@
  * the License.     
  ****************************************************************************** -->
 <ng-container>
-  <iframe class="iframeCss" frameborder="0" marginwidth=0 marginheight=0 frameborder=0 style="margin-bottom:-5px"
-    [style.height.px]="framesize" [style.width.%]="100" [src]="dashboardUrl"></iframe>
+  <div class="embed-responsive">
+    <iframe class="iframeCss embed-responsive-item" frameborder="0" marginwidth=0 marginheight=0 frameborder=0 [src]="dashboardUrl"></iframe>
+  </div>
 </ng-container>

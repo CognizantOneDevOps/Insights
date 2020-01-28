@@ -145,6 +145,8 @@
     display: -webkit-box;
     display: -webkit-flex;
     white-space: nowrap;
+    border-top: 0px;
+    padding-top: 0px;
 }
 .arrange-horizontally-bottombutton{
     -webkit-box-orient: horizontal;
@@ -166,14 +168,12 @@
     border-top-width: 2px;
     padding-bottom: 5px;
     padding-top: 5px;
-    height: 21%;
 }
 .customerLogo{
-  height: 50%;
-  padding-top: 15px;
-  padding-bottom: 15px;
+  padding-top: 10px;
+  padding-bottom: 10px;
   padding-left: 10px;
-  padding-right: 8px;
+  padding-right: 10px;
   align-content: center;
 }
 
@@ -193,7 +193,7 @@
   padding-bottom: 10px;
   color: #9e9a9a;
   font-size: 10px;
-  padding-top: 10px;
+  /*padding-top: 10px;*/
   text-align: center;
   padding-left: 1
 }
@@ -360,11 +360,9 @@
   margin-top: 8px;
 }
 
-@media screen and (max-width : 1366px) and (min-width: 600px)
-{
+
   .logoSetting{
-    margin-top: 2px;
-    height: 10%;
+    margin-left: 10px;
   }
 
   .headingPage{
@@ -410,61 +408,9 @@
     word-wrap: normal;
     direction: ltr;
 }
-}
 
-@media screen and (max-width: 1920px) and (min-width: 1380px)
-{
-  .logoSetting{
-    margin-left: 16px;
-    margin-right: 26px;
-    margin-top: 2px;
-    height: 8%;
-  }
 
-  .headingPage{
-    height: 7%;
-    border-bottom-style:solid;
-    border-color:#9e9a9a;
-    border-bottom-width:2px;
-  }
 
-  .bottomnavg {
-    flex-direction: column !important;
-    bottom: 0 !important;
-    display: flex;
-    width: 100%;
-    overflow: hidden;
-    height:24%;
-  }
-
-  .menu{
-    width: 100%;
-    overflow-y: auto !important;
-    overflow-x: hidden !important;
-    height: 60%;
-  }
-
-  .mat-divider{
-    border-top-color: #9e9a9a;
-    margin-top:10px; 
-    height: 1%
-  }
-
-  .material-icons-menu {
-    font-family: 'Material Icons';
-    font-weight: normal;
-    font-style: normal;
-    font-size: 35px;
-    line-height: 1;
-    letter-spacing: normal;
-    text-transform: none;
-    display: inline-block;
-    white-space: nowrap;
-    word-wrap: normal;
-    direction: ltr;
-    margin-left: 13px;
-}
-}
 .feviconIcon{
   margin:auto;
   display:block;
@@ -479,4 +425,6 @@
   cursor: pointer;
 }
 
-
+.table td, .table th {
+	border-top: 0px;
+  }
