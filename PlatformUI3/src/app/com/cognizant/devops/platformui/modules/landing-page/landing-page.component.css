@@ -131,8 +131,8 @@ ul li::before {
 	color: #00B140;
 	font-size: 13pt;
 	text-align: center;
-	margin-top: -100px;
-	/* margin-bottom: 500px; */
+	/*margin-top: -100px;
+	 margin-bottom: 500px; */
 	overflow: hidden;
 }
 
@@ -157,9 +157,8 @@ sup {
 
 .column-image {
 	position: absolute;
-	margin-bottom: 0px;
-	margin-top: 0px;
-	margin-left: 560px;
+	margin: 0px;
+	margin-left: 56%;
 	display: flex;
 	justify-content: left;
 }
@@ -200,4 +199,27 @@ sup {
   .tableSection{
     margin-left: 12.5%;
   }
+}
+
+.table td, .table th {
+	border-top: 0px;
+  }
+
+  .landing-home td {
+    font-size: 10.5pt;
+	padding-bottom: 0px;
+  }
+
+.landing-home td span {
+	display: list-item;
+	list-style-type: disc;
+}
+
+.landing-home td:nth-child(1) {
+	margin-right : -30px;
+}
+
+.landing-home td:nth-child(2) {
+	border-left: 1px solid orange;
+	padding-left: 30px;
 }

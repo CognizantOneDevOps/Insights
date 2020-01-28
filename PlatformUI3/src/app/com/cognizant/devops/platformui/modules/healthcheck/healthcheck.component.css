@@ -132,3 +132,7 @@ tr.mat-footer-row, tr.mat-row {
     text-decoration-color: blue;
     cursor: pointer;
 }
+
+.matTableBorder {
+    border-collapse: separate;
+}

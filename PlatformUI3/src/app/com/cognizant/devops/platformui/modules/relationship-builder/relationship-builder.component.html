@@ -27,14 +27,14 @@
         <div style="margin-left: -43px; margin-top: 22px;">
           <label class="mainText" style="margin-left: 50px"> Select
             Source Tool </label>
-          <mat-select [(ngModel)]="selectedSourceTool" style="margin-left: 35px" [style.height.px]="20" [style.width.%]="14"
+          <mat-select [(ngModel)]="selectedSourceTool" style="margin-left: 35px" [style.width.%]="14"
             name="selectedSourceTool" (ngModelChange)="selectLabelforsource(selectedSourceTool)" required placeholder="
                Select Source Tool"
             [ngClass]="{  'input-disabled' : readChange ,  'form-control': !readChange}">
             <mat-option [disabled]="data1 === selectedSourceTool" *ngFor="let data1 of responseDataSource" [value]="data1"
               style="color:rgb(55, 61, 73)"> {{data1}} </mat-option>
           </mat-select>
-          <mat-select [(ngModel)]="selectedSourceLabel" [style.height.px]="20" [style.width.%]="14"
+          <mat-select [(ngModel)]="selectedSourceLabel" [style.width.%]="14"
             [style.margin-left.%]="2" (ngModelChange)="loadAgent1Info(selectedSourceLabel)" name="selectedLabels"
             required placeholder="Select Source Label" [ngClass]="{  'input-disabled' : readChange2 ,  'form-control': !readChange2}">
             <mat-option [disabled]="data2 === selectedDestinationTool" *ngFor="let data2 of labelSourceListDatasourceSelected"
@@ -45,12 +45,12 @@
         <div style="margin-left: -77px; margin-top: 22px;">
           <label class="mainText"> Select Destination Tool </label>
           <mat-select [(ngModel)]="selectedDestinationTool" (ngModelChange)="selectLabelfordestination(selectedDestinationTool)"
-            [style.height.px]="20" [style.width.%]="14" name="selectedDestinationTool" required placeholder="Select Destination Tool"
+            [style.width.%]="14" name="selectedDestinationTool" required placeholder="Select Destination Tool"
             [ngClass]="{  'input-disabled' : readChange ,  'form-control': !readChange}">
             <mat-option *ngFor="let data2 of responseDataSource" [value]="data2" style="color:rgb(55, 61, 73)">
               {{data2}} </mat-option>
           </mat-select>
-          <mat-select [(ngModel)]="selectedDestinationLabel" [style.height.px]="20" [style.width.%]="14"
+          <mat-select [(ngModel)]="selectedDestinationLabel" [style.width.%]="14"
             [style.margin-left.%]="1.5" (ngModelChange)="loadAgent1Info2(selectedDestinationLabel)" name="selectedDestinationLabel"
             required placeholder="Select Destination label" [ngClass]="{  'input-disabled' : readChange2 ,  'form-control': !readChange2}">
             <mat-option *ngFor="let data1 of labelDestListDatasourceSelected" [value]="data1" style="color:#0033A0">
@@ -140,7 +140,7 @@
       </div>
     </div>
     <div class="column1">
-      <div class="showTable" style="text-align: center; padding: 5px; height: 65px;">
+      <div class="showTable" style="text-align: center; padding: 5px;">
         <b>&nbsp; Tool Properties</b> (Please select Tool Properties to
         build a Co-Relation) <br> <a style="font-size: 13px">
           (Please Note: A prefix "FROM_SOURCETOOL_TO_DESTINATIONTOOL_" <br>

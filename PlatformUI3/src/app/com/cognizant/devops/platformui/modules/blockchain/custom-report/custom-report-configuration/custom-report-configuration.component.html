@@ -36,34 +36,15 @@
         </div>
     </div>
 
-
-
-
-    <div class="arrange-horizontally button-row">
+    <div class="arrange-horizontally">
         <p class="mandatory">PLEASE NOTE: All fields are mandatory.</p>
-        <!-- <button mat-icon-button>
-            <mat-icon title="Add Custom Report" class="mat-icon material-icons">
-                add_circle
-            </mat-icon>
-            <mat-icon svgIcon="lineInButton" class="mat-icon material-icons">
-            </mat-icon>
-        </button>
-
-        <button mat-icon-button>
-            <mat-icon title="Save " class="mat-icon material-icons">
-                save
-            </mat-icon>
-        </button> -->
-
     </div>
 
-
-
     <div class="formBorder">
-        <h1>Build a Query (Please provide accurate information for seamless execution)</h1>
+        <p class="headStyle">Build a Query (Please provide accurate information for seamless execution)</p>
         <div class="form">
             <form [formGroup]="queryForm">
-                <div class="arrange-horizontally button-row">
+                <div class="arrange-horizontally">
                     <div class="labelWidth">
                         <label class="labelText">Name of the Query
                             <span style="color:#ff0000">* </span>
@@ -74,7 +55,7 @@
                         <input type="text" class="form-control" formControlName="reportname" placeholder="Please input Name of the Query">
                     </div>
                 </div>
-                <div class="arrange-horizontally button-row">
+                <div class="arrange-horizontally">
                     <div class="labelWidth">
                         <label class="labelText">Frequency
                             <span style="color:#ff0000">* </span>
@@ -87,7 +68,7 @@
                         </mat-select>
                     </div>
                 </div>
-                <div class="arrange-horizontally button-row">
+                <div class="arrange-horizontally">
                     <div class="labelWidth">
                         <label class="labelText">Subscribers
                             <span style="color:#ff0000">* </span>
@@ -98,7 +79,7 @@
                         <input type="text" dir-email class="form-control" formControlName="subscribers" placeholder="Please provide an Email address">
                     </div>
                 </div>
-                <div class="arrange-horizontally button-row">
+                <div class="arrange-horizontally">
                     <div class="labelWidth">
                         <label class="labelText">Query
                             <span style="color:#ff0000">* </span>
@@ -112,7 +93,7 @@
                         </mat-radio-group>
                     </div>
                 </div>
-                <div class="arrange-horizontally button-row">
+                <div class="arrange-horizontally">
                     <div class="labelWidth">
                         <label class="labelText">Upload Query
                             <span style="color:#ff0000">* </span>
@@ -142,10 +123,10 @@
                 </div>
 
                 <div style="width:98%;">
-                    <button mat-raised-button [disabled]="!queryForm.valid" (click)="saveData(btnValue)" class="configureBut" style="width:150px;">
+                    <button mat-raised-button [disabled]="!queryForm.valid" (click)="saveData(btnValue)" class="configureBut" style="width:150px;margin-top: -2%;">
                         {{btnValue | uppercase }}
                     </button>
-                    <button mat-raised-button (click)="cancelChange(btnValue)" class="configureBut" style="width:150px;padding-left: 10px;padding-right: 10px;">
+                    <button mat-raised-button (click)="cancelChange(btnValue)" class="configureBut" style="width:150px;padding-left: 10px;padding-right: 10px;margin-top: -2%;">
                         CANCEL
                     </button>
                     <br>

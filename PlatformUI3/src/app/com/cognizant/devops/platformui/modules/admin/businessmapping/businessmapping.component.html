@@ -31,7 +31,7 @@
   </div>
   <div class="arrange-horizontally">
     <label class="mainText"> Select Tool </label>
-    <mat-select [(ngModel)]="selectedAgent" [style.height.px]="20" [style.width.%]="21"
+    <mat-select [(ngModel)]="selectedAgent" [style.width.%]="21"
       (ngModelChange)="getAgentMappingDetail(selectedAgent)" name="selectedAgent" required placeholder="Select Tool"
       [ngClass]="{  'input-disabled' :false  ,  'form-control': true}">
       <mat-option *ngFor="let data of agentList" [value]="data" style="color:#0033A0">
