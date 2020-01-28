@@ -70,16 +70,12 @@ public class TraceabilityDashboardServiceImpl implements TraceabilityDashboardSe
 	String cacheKey;
 	static final String PATTERN = "[\\[\\](){}\"\\\"\"]";
 	static final String DATE_PATTERN = "MM/dd/yyyy HH:mm:ss";
-	static JsonObject dataModel = null;
+    JsonObject dataModel = null;
 	static final String DATA_MODEL_FILE_RESOLVED_PATH = System.getenv().get(TraceabilityConstants.ENV_VAR_NAME)
 			+ File.separator + TraceabilityConstants.DATAMODEL_FOLDER_NAME + File.separator
 			+ TraceabilityConstants.DATAMODEL_FILE_NAME;
 
-	public TraceabilityDashboardServiceImpl() throws InsightsCustomException {
-		if (dataModel == null) {
-			loadDatamodel();
-		}
-	}
+	
 
 	private static final Logger LOG = LogManager.getLogger(TraceabilityDashboardServiceImpl.class.getName());
 	{
@@ -108,12 +104,12 @@ public class TraceabilityDashboardServiceImpl implements TraceabilityDashboardSe
 
 	}
 
-	private static void loadDatamodel() throws InsightsCustomException {
+	private void loadDatamodel() throws InsightsCustomException {
 		try {
 			dataModel = (JsonObject) new JsonParser().parse(new FileReader(DATA_MODEL_FILE_RESOLVED_PATH));
 			LOG.debug("Datamodel.json is present and loaded properly");
 		} catch (FileNotFoundException e) {
-			LOG.error("issue with datamodel.json file");
+			LOG.error("datamodel.json not present in Insights home directory");
 			throw new InsightsCustomException("datamodel.json not present in Insights home directory");
 		} catch (JsonSyntaxException e) {
 			throw new InsightsCustomException("datamodel.json is not formatted");
@@ -496,7 +492,7 @@ public class TraceabilityDashboardServiceImpl implements TraceabilityDashboardSe
 			try {
 				/* Load JsonObject from DataModel.json for processing */
 				/* check if it is already loaded */
-
+			
 				HashMap<String, List<String>> uplinkMap = new HashMap<>();
 				HashMap<String, List<String>> downlinkMap = new HashMap<>();
 				HashMap<String, String> toolsListMap = new HashMap<>();
@@ -593,6 +589,7 @@ public class TraceabilityDashboardServiceImpl implements TraceabilityDashboardSe
 
 	@Override
 	public List<String> getToolKeyset(String toolName) throws InsightsCustomException {
+		loadDatamodel();	
 		final String FILTER = "uifilter";
 		List<String> tools = new ArrayList<>();
 		JsonObject toolObject = dataModel.getAsJsonObject(toolName);
