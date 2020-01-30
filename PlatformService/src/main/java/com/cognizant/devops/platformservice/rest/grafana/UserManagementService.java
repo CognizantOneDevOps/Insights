@@ -43,7 +43,7 @@ public class UserManagementService {
 	@Autowired
 	private HttpServletRequest httpRequest;
 
-	@RequestMapping(value = "/getOrgUsers", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+	@RequestMapping(value = "/getOrgUsers", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	public JsonObject getOrgUsers(@RequestParam int orgId) {
 		String apiUrl = ApplicationConfigProvider.getInstance().getGrafana().getGrafanaEndpoint() + "/api/orgs/" + orgId
 				+ "/users";
@@ -53,7 +53,7 @@ public class UserManagementService {
 				.buildSuccessResponseWithData(new JsonParser().parse(response.getEntity(String.class)));
 	}
 
-	@RequestMapping(value = "/createOrg", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+	@RequestMapping(value = "/createOrg", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	public String createOrg(@RequestParam String orgName) {
 		String apiUrl = ApplicationConfigProvider.getInstance().getGrafana().getGrafanaEndpoint() + "/api/orgs";
 		JsonObject request = new JsonObject();
@@ -63,7 +63,7 @@ public class UserManagementService {
 		return response.getEntity(String.class);
 	}
 
-	@RequestMapping(value = "/editOrganizationUser", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+	@RequestMapping(value = "/editOrganizationUser", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	public String editOrganizationUser(@RequestParam int orgId, @RequestParam int userId, @RequestParam String role) {
 		log.debug("\n\nInside editOrganizationUser method call");
 		String apiUrl = ApplicationConfigProvider.getInstance().getGrafana().getGrafanaEndpoint() + "/api/orgs/" + orgId
@@ -76,9 +76,9 @@ public class UserManagementService {
 		return response.getEntity(String.class);
 	}
 
-	@RequestMapping(value = "/deleteOrganizationUser", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+	@RequestMapping(value = "/deleteOrganizationUser", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	public String deleteOrganizationUser(@RequestParam int orgId, @RequestParam int userId, @RequestParam String role) {
-		log.debug("\n\nInside editOrganizationUser method call");
+		log.debug("\n\nInside deleteOrganizationUser method call");
 		String apiUrl = ApplicationConfigProvider.getInstance().getGrafana().getGrafanaEndpoint() + "/api/orgs/" + orgId
 				+ "/users/" + userId;
 		log.debug("API URL is: " + apiUrl);

@@ -78,19 +78,19 @@ export class SSOLoginComponent implements OnInit {
           if (value == "" || value == undefined) {
             console.log("value is not define for cookie " + key);
           } else {
-            if (key != "jtoken") {
+            if (key != "jtoken" && key !="postLogoutURL" && key !="insights-sso-givenname") {
               this.cookieService.put(key, value, { storeUnencoded: true, path: '/' })
             }
             if (key == "insights-sso-token") {
               //var token = 'Basic ' + btoa(this.username + ":" + this.password);
               this.dataShare.setWebAuthToken(resData["insights-sso-token"]);
               this.cookieService.put("username", resData["insights-sso-token"], { storeUnencoded: true, path: '/' });
-            }
-            if (key == "jtoken") {
+            } else if (key == "jtoken") {
               this.dataShare.setAuthorizationToken(resData["jtoken"]);
-            }
-            if (key == "insights-sso-givenname") {
+            } else if (key == "insights-sso-givenname") {
               this.dataShare.setSSOUserName(resData["insights-sso-givenname"]);
+            } else if (key == "postLogoutURL") {
+              this.dataShare.setSSOLogoutURL(resData["postLogoutURL"]);
             }
           }
         }

@@ -178,27 +178,6 @@
 			<artifactId>log4j-core</artifactId>
 			<version>2.11.2</version>
 		</dependency>
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-api</artifactId>
-			<version>1.7.26</version>
-		</dependency>
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-log4j12</artifactId>
-			<version>1.7.26</version>
-			<exclusions>
-				<exclusion>
-					<groupId>org.slf4j</groupId>
-					<artifactId>slf4j-log4j12</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>log4j</groupId>
-					<artifactId>log4j</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-
 
 		<dependency>
 			<groupId>com.google.code.gson</groupId>
@@ -289,6 +268,17 @@
 			<groupId>org.testng</groupId>
 			<artifactId>testng</artifactId>
 			<version>7.1.0</version>
+			<exclusions>
+				<exclusion>
+				    <groupId>org.yaml</groupId>
+    				<artifactId>snakeyaml</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+		    <groupId>org.yaml</groupId>
+		    <artifactId>snakeyaml</artifactId>
+		    <version>1.25</version>
 		</dependency>
 		<dependency>
 			<groupId>com.beust</groupId>
@@ -362,8 +352,8 @@
 	<properties>
 		<jersey.version>2.28</jersey.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<spring.version>5.1.5.RELEASE</spring.version>
-		<spring.security.version>5.1.5.RELEASE</spring.security.version>
+		<spring.version>5.2.3.RELEASE</spring.version>
+		<spring.security.version>5.2.1.RELEASE</spring.security.version>
 		<junit.version>4.12</junit.version>
 		<testng.version>7.0.1</testng.version>
 	</properties>

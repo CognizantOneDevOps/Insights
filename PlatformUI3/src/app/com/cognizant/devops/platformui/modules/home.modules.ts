@@ -119,9 +119,6 @@ import { AddPropertyDialog } from './relationship-builder/add-propertydialog';
     WebHookComponent,
     TraceabilityDashboardCompenent,
     AddPropertyDialog
-
-
-
   ],
   imports: [
     HomeRouting,
@@ -133,8 +130,7 @@ import { AddPropertyDialog } from './relationship-builder/add-propertydialog';
     MaterialModule,
     SharedServices,
     MatDatepickerModule,
-    StorageServiceModule,
-   // AddPropertyDialog
+    StorageServiceModule
   ],
   entryComponents: [
     ShowDetailsDialog,

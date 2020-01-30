@@ -16,6 +16,7 @@
 package com.cognizant.devops.platformservice.rest.user;
 
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -67,22 +68,23 @@ public class UserDetailsService {
 
 	@Autowired
 	private HttpServletRequest httpRequest;
-	
-	@Autowired 
+
+	@Autowired
 	private TokenProviderUtility tokenProviderUtility;
-	
-	@RequestMapping(value = "/authenticate", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+
+	@RequestMapping(value = "/authenticate", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
 	public JsonObject authenticateUser(HttpServletRequest request) {
 		log.debug("Inside authenticateUser ");
+		@SuppressWarnings("unchecked")
 		Map<String, String> responseHeadersgrafanaAttr = (Map<String, String>) request.getAttribute("responseHeaders");
 		for (Map.Entry<String, String> entry : responseHeadersgrafanaAttr.entrySet()) {
 			ValidationUtils.cleanXSS(entry.getValue());
-	}
+		}
 		return PlatformServiceUtil.buildSuccessResponseWithData(responseHeadersgrafanaAttr);
 	}
-	
-	@RequestMapping(value = "/insightsso/authenticateSSO", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+
+	@RequestMapping(value = "/insightsso/authenticateSSO", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
 	public ResponseEntity<Object> authenticateSSOUser() throws InsightsCustomException {
 
@@ -92,20 +94,17 @@ public class UserDetailsService {
 		try {
 			SecurityContext context = SecurityContextHolder.getContext();
 			Authentication auth = context.getAuthentication();
-			SAMLCredential credentials = (SAMLCredential)auth.getCredentials();
-			//Object userDetails = auth.getDetails();
-			//Object principal = auth.getPrincipal();
+			SAMLCredential credentials = (SAMLCredential) auth.getCredentials();
 			String userid = credentials.getNameID().getValue();
-			String givenname = credentials.getAttributeAsString("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/givenname");
+			String givenname = credentials
+					.getAttributeAsString("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/givenname");
 
 			httpHeaders.add("insights-sso-token", userid);
 			httpHeaders.add("insights-user-fullname", givenname);
-			
-			//String grafanaCookie = PlatformServiceUtil.getUserCookiesFromAttribute(httpRequest);
+
 			headersGrafana.put(AuthenticationUtils.GRAFANA_WEBAUTH_USERKEY, userid);
 			headersGrafana.put(AuthenticationUtils.GRAFANA_WEBAUTH_USERKEY_NAME, userid);
-			headersGrafana.put(AuthenticationUtils.HEADER_COOKIES_KEY, "username="+userid);
-			//headersGrafana =PlatformServiceUtil.prepareGrafanaHeader(httpRequest);
+			headersGrafana.put(AuthenticationUtils.HEADER_COOKIES_KEY, "username=" + userid);
 			Map<String, String> grafanaResponseCookies = new HashMap<String, String>();
 			String grafanaCurrentOrg = getGrafanaCurrentOrg(headersGrafana);
 			grafanaResponseCookies.put("grafanaOrg", grafanaCurrentOrg);
@@ -117,44 +116,44 @@ public class UserDetailsService {
 			grafanaResponseCookies.put(AuthenticationUtils.GRAFANA_WEBAUTH_USERKEY, userid);
 			httpRequest.setAttribute("responseHeaders", httpHeaders.toSingleValueMap());
 			httpHeaders.add(AuthenticationUtils.GRAFANA_WEBAUTH_USERKEY, userid);
-			
-			URI uri = new URI(ApplicationConfigProvider.getInstance().getSingleSignOnConfig().getRelayStateUrl());//+"/1"
-		    
-		    httpHeaders.setLocation(uri);
-			
+
+			URI uri = new URI(ApplicationConfigProvider.getInstance().getSingleSignOnConfig().getRelayStateUrl());// +"/1"
+
+			httpHeaders.setLocation(uri);
+
 		} catch (InsightsCustomException e) {
 			log.error("Error in authenticate SSO User " + e);
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(PlatformServiceConstants.GRAFANA_LOGIN_ISSUE);
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+					.body(PlatformServiceConstants.GRAFANA_LOGIN_ISSUE);
 		} catch (Exception e) {
 			log.error("Error in authenticate SSO User " + e);
 			String msg = "Error while login using sso, For detail Please check log file ";
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(msg);
 		}
-		
-	    return new ResponseEntity<>(httpHeaders, HttpStatus.SEE_OTHER);
+
+		return new ResponseEntity<>(httpHeaders, HttpStatus.SEE_OTHER);//success
 	}
-	
-	@RequestMapping(value = "/insightsso/getUserDetail", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+
+	@RequestMapping(value = "/insightsso/getUserDetail", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	public @ResponseBody JsonObject getUserDetail() {
 
 		log.debug("Inside getUserDetail");
 		Map<String, String> headersGrafana = new HashMap<String, String>();
-		
+
 		JsonObject jsonResponse = new JsonObject();
 
 		try {
 			SecurityContext context = SecurityContextHolder.getContext();
 			Authentication auth = context.getAuthentication();
-			SAMLCredential credentials = (SAMLCredential)auth.getCredentials();
+			SAMLCredential credentials = (SAMLCredential) auth.getCredentials();
 			Object principal = auth.getPrincipal();
 			String userid = credentials.getNameID().getValue();
-			String givenname = credentials.getAttributeAsString("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/givenname");
-			
-			//String grafanaCookie = PlatformServiceUtil.getUserCookiesFromAttribute(httpRequest);
+			String givenname = credentials
+					.getAttributeAsString("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/givenname");
+
 			headersGrafana.put(AuthenticationUtils.GRAFANA_WEBAUTH_USERKEY, userid);
-			//headersGrafana =PlatformServiceUtil.prepareGrafanaHeader(httpRequest);
 			headersGrafana.put(AuthenticationUtils.GRAFANA_WEBAUTH_USERKEY_NAME, userid);
-			headersGrafana.put(AuthenticationUtils.HEADER_COOKIES_KEY, "username="+userid);
+			headersGrafana.put(AuthenticationUtils.HEADER_COOKIES_KEY, "username=" + userid);
 			String grafanaCurrentOrg = getGrafanaCurrentOrg(headersGrafana);
 			jsonResponse.addProperty("grafanaOrg", grafanaCurrentOrg);
 			String grafanaCurrentOrgRole = getCurrentOrgRole(headersGrafana, grafanaCurrentOrg);
@@ -162,29 +161,31 @@ public class UserDetailsService {
 
 			jsonResponse.addProperty("insights-sso-token", userid);
 			jsonResponse.addProperty("insights-sso-givenname", givenname);
-			
+			jsonResponse.addProperty("postLogoutURL", ApplicationConfigProvider.getInstance().getSingleSignOnConfig().getPostLogoutURL());
+
 			String jToken = tokenProviderUtility.createToken(userid);
 			jsonResponse.addProperty("jtoken", jToken);
-			
-			//set Authority to spring context
+
+			// set Authority to spring context
 			List<GrantedAuthority> updatedAuthorities = new ArrayList<GrantedAuthority>();
 			updatedAuthorities.add(SpringAuthorityUtil.getSpringAuthorityRole(grafanaCurrentOrgRole));
 
 			Date expDate = new Date(System.currentTimeMillis() + 60 * 60 * 1000);
-			ExpiringUsernameAuthenticationToken autharization = new ExpiringUsernameAuthenticationToken(expDate, principal, auth.getCredentials(), updatedAuthorities);
+			ExpiringUsernameAuthenticationToken autharization = new ExpiringUsernameAuthenticationToken(expDate,
+					principal, auth.getCredentials(), updatedAuthorities);
 			SecurityContextHolder.getContext().setAuthentication(autharization);
 			Authentication auth2 = SecurityContextHolder.getContext().getAuthentication();
-			auth2.getAuthorities().forEach( a -> log.debug("GrantedAuthority  "+a.getAuthority().toString()));
+			auth2.getAuthorities().forEach(a -> log.debug("GrantedAuthority  " + a.getAuthority().toString()));
 
 			httpRequest.setAttribute("responseHeaders", jsonResponse);
 		} catch (Exception e) {
 			log.error("Error in SSO Cookie " + e);
 			return PlatformServiceUtil.buildFailureResponse("Error in SSO Cookie " + e);
 		}
-	    return PlatformServiceUtil.buildSuccessResponseWithData(jsonResponse);
+		return PlatformServiceUtil.buildSuccessResponseWithData(jsonResponse);
 	}
-	
-	@RequestMapping(value = "/logout", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+
+	@RequestMapping(value = "/logout", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
 	public ServiceResponse logout(HttpServletRequest request) {
 		HttpSession session = request.getSession(false);
@@ -199,12 +200,53 @@ public class UserDetailsService {
 		grafanaHeaders.put("grafana_sess", null);
 		grafanaHeaders.put("grafana_session", null);
 		// To Do : get a service to do a Grafana Logout
+
 		request.setAttribute("responseHeaders", grafanaHeaders);
 		ServiceResponse response = new ServiceResponse();
 		response.setStatus(ConfigOptions.SUCCESS_RESPONSE);
 		return response;
 	}
 
+	@RequestMapping(value = "/insightsso/logout", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@ResponseBody
+	public JsonObject logoutSSO() {
+		try {
+			HttpSession session = httpRequest.getSession(false);
+			String auth_token = ValidationUtils.cleanXSS(httpRequest.getHeader("Authorization"));
+			//log.debug(" auth token === " + auth_token);
+			
+			Map<String, String> grafanaHeaders = new HashMap<String, String>();
+			grafanaHeaders.put("grafanaOrg", null);
+			grafanaHeaders.put("grafanaRole", null);
+			grafanaHeaders.put("grafana_user", null);
+			grafanaHeaders.put("grafana_sess", null);
+			grafanaHeaders.put("grafana_session", null);
+			// To Do : get a service to do a Grafana Logout
+	
+			// Remove token
+			Boolean isTokenRemoved = tokenProviderUtility.deleteToken(auth_token);
+			
+			if(isTokenRemoved) {
+				httpRequest.setAttribute("responseHeaders", grafanaHeaders);
+				SecurityContextHolder.clearContext();
+				if (session != null) {
+					session.invalidate();
+				}
+			}
+			log.debug("Logout URL response done");
+		} catch (URISyntaxException e) {
+			log.error("Error in logoutSSO User " + e);
+			return PlatformServiceUtil.buildFailureResponse(PlatformServiceConstants.INVALID_REQUEST);
+		} catch (InsightsCustomException e) {
+			log.error("Error in logoutSSO User " + e);
+			return PlatformServiceUtil.buildFailureResponse(PlatformServiceConstants.INVALID_REQUEST);
+		} catch (Exception e) {
+			log.error("Error in logoutSSO User " + e);
+			String msg = "Error while login using sso, For detail Please check log file ";
+			return PlatformServiceUtil.buildFailureResponse(msg);
+		}
+		return PlatformServiceUtil.buildSuccessResponse();
+	}
 
 	private String getCurrentOrgRole(Map<String, String> headers, String grafanaCurrentOrg) {
 		String userOrgsApiUrl = PlatformServiceUtil.getGrafanaURL("/api/user/orgs");
@@ -226,9 +268,9 @@ public class UserDetailsService {
 		ClientResponse grafanaCurrentOrgResponse = RestHandler.doGet(loginApiUrl, null, headers);
 		JsonObject responseJson = new JsonParser().parse(grafanaCurrentOrgResponse.getEntity(String.class))
 				.getAsJsonObject();
-		log.debug(" Current user detail ==== "+responseJson);
+		log.debug(" Current user detail ==== " + responseJson);
 		String loginId = responseJson.get("login").toString();
-		if(loginId ==null || loginId.contains("(null)")) {
+		if (loginId == null || loginId.contains("(null)")) {
 			throw new InsightsCustomException(PlatformServiceConstants.GRAFANA_LOGIN_ISSUE);
 		}
 		String grafanaCurrentOrg = responseJson.get("orgId").toString();

@@ -22,11 +22,8 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.httpclient.HttpStatus;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.springframework.http.MediaType;
-import org.springframework.security.authentication.AccountExpiredException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
@@ -63,13 +60,13 @@ public class InsightsAuthenticationFilter extends AbstractAuthenticationProcessi
 					.toString();
 			AuthenticationUtils.setResponseMessage(response, HttpServletResponse.SC_BAD_REQUEST, msg);
 		}
-
+		
 		SecurityContext context = SecurityContextHolder.getContext();
+		
 		Authentication auth = context.getAuthentication();
 		if (auth != null) {
 
-			auth.getAuthorities().forEach(b -> Log
-					.debug("In InsightsAuthenticationFilter GrantedAuthority ==== " + b.getAuthority().toString()));
+			//auth.getAuthorities().forEach(b -> Log.debug("In InsightsAuthenticationFilter GrantedAuthority ==== " + b.getAuthority().toString()));
 			SAMLCredential credentials = (SAMLCredential) auth.getCredentials();
 			InsightsAuthenticationToken jwtAuthenticationToken = new InsightsAuthenticationToken(auth_token,
 					auth.getDetails(), credentials, auth.getAuthorities());
@@ -77,7 +74,7 @@ public class InsightsAuthenticationFilter extends AbstractAuthenticationProcessi
 					.debug("In InsightsAuthenticationToken GrantedAuthority ==== " + b.getAuthority().toString()));
 			return getAuthenticationManager().authenticate(jwtAuthenticationToken);
 		} else {
-			AuthenticationUtils.setResponseMessage(response, AuthenticationUtils.SECURITY_CONTEXT_CODE, " No authentication in Security Context ");
+			AuthenticationUtils.setResponseMessage(response, AuthenticationUtils.SECURITY_CONTEXT_CODE, "Authentication not successful ,Please relogin ");
 			return null;
 		}
 	}
@@ -101,7 +98,7 @@ public class InsightsAuthenticationFilter extends AbstractAuthenticationProcessi
 			AuthenticationUtils.setResponseMessage(response, AuthenticationUtils.TOKEN_EXPIRE_CODE, "Token Expire ");
 		} else {
 			// SecurityContextHolder.clearContext();
-			AuthenticationUtils.setResponseMessage(response, HttpStatus.SC_UNAUTHORIZED, "Token Expire ");
+			AuthenticationUtils.setResponseMessage(response,AuthenticationUtils.UNAUTHORISE, "Authentication not successful, Please relogin ");
 		}
 	}
 }

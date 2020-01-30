@@ -34,6 +34,8 @@ import { LoginComponent } from '@insights/app/login/login.component';
 import { AuthInterceptor } from '@insights/common/rest-api-setting';
 import { SSOLoginComponent } from './com/cognizant/devops/platformui/ssologin/ssologin.component';
 import { CookieModule } from 'ngx-cookie';
+import { LogoutHandlerComponent } from '@insights/app/com/cognizant/devops/platformui/logout-handler/logout-handler.component.ts';
+
 
 export function initializeApp(initConfig: InsightsInitService) {
   return () => initConfig.initMethods();
@@ -43,7 +45,8 @@ export function initializeApp(initConfig: InsightsInitService) {
   declarations: [
     InsightsAppComponent,
     LoginComponent,
-    SSOLoginComponent
+    SSOLoginComponent,
+    LogoutHandlerComponent
   ],
   imports: [
     InsightsModuleRouting,

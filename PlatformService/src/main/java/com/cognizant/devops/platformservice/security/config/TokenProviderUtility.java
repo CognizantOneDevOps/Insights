@@ -34,9 +34,7 @@ import org.ehcache.config.units.MemoryUnit;
 import org.ehcache.spi.loaderwriter.CacheWritingException;
 import org.springframework.security.access.AuthorizationServiceException;
 import org.springframework.security.authentication.AccountExpiredException;
-import org.springframework.security.authentication.AccountStatusException;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Repository;
 
@@ -168,8 +166,8 @@ public class TokenProviderUtility {
 			//log.debug("cognizant.com  " + signedJWT.getJWTClaimsSet().getIssuer());
 			//log.debug("Exceperation Time after  " + signedJWT.getJWTClaimsSet().getExpirationTime());
 			log.debug("Check date of token with current date "
-					+ new Date().before(signedJWT.getJWTClaimsSet().getExpirationTime()));
-			validateTokenDate = new Date().before(signedJWT.getJWTClaimsSet().getExpirationTime());
+					+ new Date().before(signedJWT.getJWTClaimsSet().getExpirationTime()));//after
+			validateTokenDate = new Date().before(signedJWT.getJWTClaimsSet().getExpirationTime());//after
 
 		} catch (Exception e) {
 			log.error(e);
@@ -199,12 +197,17 @@ public class TokenProviderUtility {
 		return isVerify;
 	}
 
-	public boolean deleteToken(String csrfToken) throws Exception {
+	public boolean deleteToken(String csrfauthToken) throws Exception {
 		Boolean isTokenRemoved = Boolean.FALSE;
 		try {
-			String key = TokenProviderUtility.tokenCache.get(csrfToken);
-			if (key != null) {
-				TokenProviderUtility.tokenCache.remove(key);
+			SignedJWT signedJWT = SignedJWT.parse(csrfauthToken);
+			JWSVerifier verifier =  new MACVerifier(signingKey);
+			Boolean isVerify=signedJWT.verify(verifier);
+
+			String id = signedJWT.getJWTClaimsSet().getJWTID();
+			String key = TokenProviderUtility.tokenCache.get(id);
+			if (key != null && isVerify) {
+				TokenProviderUtility.tokenCache.remove(id);
 				isTokenRemoved = Boolean.TRUE;
 			}
 		} catch (Exception e) {

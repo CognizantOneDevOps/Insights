@@ -30,6 +30,9 @@ import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
 import com.amazonaws.services.lambda.runtime.events.KinesisAnalyticsInputPreprocessingResponse;
@@ -42,7 +45,7 @@ import com.google.gson.JsonParser;
 
 
 public class LambdaFunctionHandler implements RequestHandler<KinesisFirehoseEvent, KinesisAnalyticsInputPreprocessingResponse> {
-
+	private static Logger log = LogManager.getLogger(LambdaFunctionHandler.class);
 	/**
 	 * Get the Kinesis event, De-serialize the event and get event Body and URL
 	 * @param KinesisFirehoseEvent
@@ -86,13 +89,14 @@ public class LambdaFunctionHandler implements RequestHandler<KinesisFirehoseEven
 						transRecords.add(transRecord);
 					}
 				} catch (IOException e) {
-					context.getLogger().log("Error ouccured while send message to WebHook endpoint" + e.toString());
+					log.error(e);
+					log.error("Error ouccured while send message to WebHook endpoint" + e.toString());
 				}
 			}
 			else {
 				Record transRecord = new Record(record.getRecordId(), Result.Ok, bufferData);
 				transRecords.add(transRecord);
-				context.getLogger().log("could not connect to WebHook endpoint tool : " + tool + "url : " + url );
+				log.error("could not connect to WebHook endpoint tool : " + tool + "url : " + url );
 			}
 
 		}

@@ -22,11 +22,8 @@ import { DataSharedService } from '@insights/common/data-shared-service';
 import { RestAPIurlService } from '@insights/common/rest-apiurl.service'
 
 export interface IAuthenticationService {
-    getAuthentication(authToken: string, msg: string): void;
-    logout(): Promise<any>;
     getCurrentUserOrgs(): Promise<any>;
     getUsers(): Promise<any>;
-    ssoLogout();
     getLogoImage(): Promise<any>;
 }
 
@@ -39,25 +36,6 @@ export class GrafanaAuthenticationService implements IAuthenticationService {
         private dataShare: DataSharedService, private restCallHandlerService: RestCallHandlerService,
         private restAPIUrlService: RestAPIurlService) {
     }
-
-    public getAuthentication(authToken: string, msg: string): void {
-        if (authToken === undefined) {
-            console.log("auth token")
-            // this.router.navigate(['/login']);
-        } else {
-            var msg = "auth token exists";
-        }
-    }
-
-    public logout(): Promise<any> {
-        var restHandler = this.restCallHandlerService;
-        return restHandler.get("LOGOUT");
-    }
-
-    /* public getGrafanaCurrentOrgAndRole(): Promise<any> {
-        var restHandler = this.restCallHandlerService;
-        return restHandler.get("GRAPANA_CURRENT_ROLE_ORG");
-    } */
 
     public getCurrentUserOrgs(): Promise<any> {
         var restHandler = this.restCallHandlerService;
@@ -80,14 +58,9 @@ export class GrafanaAuthenticationService implements IAuthenticationService {
         return restHandler.get("ACCESS_GROUP_MANAGEMENT_GET_USERS");
     }
 
-    public ssoLogout() {
-        var restHandler = this.restCallHandlerService;
-        var url = this.restAPIUrlService.getRestCallUrl("SSO_URL_LOGOUT");
-        setTimeout(() => window.location.replace(url), 100);
-    }
-
     public getLogoImage(): any {
         var restCallUrl = this.restAPIUrlService.getRestCallUrl("GET_LOGO_IMAGE");
         return this.restCallHandlerService.getJSON(restCallUrl);
     }
+
 }

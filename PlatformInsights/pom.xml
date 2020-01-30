@@ -170,7 +170,7 @@
 		</resources>
 	</build>
 	<properties>
-		<spring.version>5.1.6.RELEASE</spring.version>
+		<spring.version>5.2.3.RELEASE</spring.version>
 		<project.name>PlatformInsights</project.name>
 	</properties>
 	<profiles>

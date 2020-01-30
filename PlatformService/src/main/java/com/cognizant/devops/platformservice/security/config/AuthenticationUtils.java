@@ -18,6 +18,7 @@ package com.cognizant.devops.platformservice.security.config;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
@@ -35,10 +36,11 @@ import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 public class AuthenticationUtils {
 	private static Logger Log = LogManager.getLogger(AuthenticationUtils.class);
 	
-	public final static int TOKEN_EXPIRE_CODE = 510;
-	public final static int SECURITY_CONTEXT_CODE = 511;
-	public final static int INFORMATION_MISMATCH=512;
+	public final static int TOKEN_EXPIRE_CODE = 810;
+	public final static int SECURITY_CONTEXT_CODE = 811;
+	public final static int INFORMATION_MISMATCH=812;
 	public final static int TOKEN_TIME = 60;
+	public final static int UNAUTHORISE = 814;
 	public final static String GRAFANA_WEBAUTH_USERKEY = "X-WEBAUTH-USER";
 	public final static String GRAFANA_WEBAUTH_HEADER_KEY = "user";
 	public final static String GRAFANA_WEBAUTH_USERKEY_NAME = "username";
@@ -85,4 +87,18 @@ public class AuthenticationUtils {
 			return null;
 		}
 	}
+	
+	public static String getLogoutURL(HttpServletRequest httpRequest,int logoutCode,String message)  {
+		try {
+			String url = URLEncoder.encode(ApplicationConfigProvider.getInstance().getSingleSignOnConfig().getPostLogoutURL(),"UTF-8");
+			String returnLogoutStr= String.format("%s/#/logout/%s?logout_url=%s&message=%s",ApplicationConfigProvider.getInstance().getInsightsServiceURL(),logoutCode,url,message); 
+			Log.debug("Logout URL ++++ "+returnLogoutStr);
+			return returnLogoutStr;
+		} catch (Exception e) {
+			Log.error("Unable to retrive logout information ");
+			return null;
+		}
+		
+	}
+	
 }

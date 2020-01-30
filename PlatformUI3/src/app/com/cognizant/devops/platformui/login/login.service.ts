@@ -53,4 +53,24 @@ export class LoginService {
         var url = this.restAPIUrlService.getRestCallUrl("SSO_URL");
         setTimeout(() => window.location.replace(url), 10);
     }
+   
+    public ssoInsightsLogout(): any {
+         return this.restCallHandlerService.getSSO("SSO_INSIGHTS_URL_LOGOUT");
+        //setTimeout(() => window.location.replace(url), 100);
+    }
+    
+    public singleLogoutSSO(url) {
+        console.log(" Inside singleLogoutSSO ");
+        setTimeout(() => window.location.replace(url), 10);
+    }
+    
+    public logoutSSO() {
+        console.log(" Inside logoutSSO ");
+        var singleurl = this.restAPIUrlService.getRestCallUrl("SSO_URL_LOGOUT");
+        setTimeout(() => window.location.replace(singleurl), 10);
+    }
+
+    public logout(): Promise<any> {
+        return this.restCallHandlerService.get("LOGOUT");
+    }
 }
