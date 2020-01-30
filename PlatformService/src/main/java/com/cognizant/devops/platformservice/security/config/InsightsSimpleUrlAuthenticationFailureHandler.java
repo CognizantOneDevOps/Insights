@@ -21,13 +21,15 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.DefaultRedirectStrategy;
 import org.springframework.security.web.RedirectStrategy;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler;
 
 public class InsightsSimpleUrlAuthenticationFailureHandler extends SimpleUrlAuthenticationFailureHandler {
-
+	private static Logger Log = LogManager.getLogger(InsightsSimpleUrlAuthenticationFailureHandler.class);
 	private String defaultFailureUrl;
 	private RedirectStrategy redirectStrategy = new DefaultRedirectStrategy();
 	
@@ -39,9 +41,12 @@ public class InsightsSimpleUrlAuthenticationFailureHandler extends SimpleUrlAuth
 	public void onAuthenticationFailure(HttpServletRequest request,
 			HttpServletResponse response, AuthenticationException exception)
 			throws IOException, ServletException {
-
+			String logoutURL =AuthenticationUtils.getLogoutURL(request,AuthenticationUtils.UNAUTHORISE,"Unauthorized request , Authentication not successful ");
+			
+			Log.debug(" logoutURL  in InsightsSimpleUrlAuthenticationFailureHandler ==== "+defaultFailureUrl +"  "+logoutURL);
+			
 			saveException(request, exception);
-			logger.debug("Redirecting to " + defaultFailureUrl);
-			redirectStrategy.sendRedirect(request, response, defaultFailureUrl);
+			redirectStrategy.sendRedirect(request, response, logoutURL);
+			
 	}
 }

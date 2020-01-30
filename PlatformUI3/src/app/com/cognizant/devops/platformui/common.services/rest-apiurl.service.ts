@@ -133,7 +133,8 @@ export class RestAPIurlService implements IRestAPIUrlService {
         //SSO API
         this.addEndPoint("SSO_URL", '/PlatformService/saml/login');
         this.addEndPoint("SSO_DETAIL", '/PlatformService/user/insightsso/getUserDetail');
-        this.addEndPoint("SSO_URL_LOGOUT", '/PlatformService/saml/logout');
+        this.addEndPoint("SSO_INSIGHTS_URL_LOGOUT", '/PlatformService/user/insightsso/logout');
+        this.addEndPoint("SSO_URL_LOGOUT", '/PlatformService/saml/logout');//
     }
 
     public addEndPoint(name: String, url: String) {

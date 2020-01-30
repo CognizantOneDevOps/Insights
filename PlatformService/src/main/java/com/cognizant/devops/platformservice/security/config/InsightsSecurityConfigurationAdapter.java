@@ -25,7 +25,6 @@ import java.util.Map;
 import java.util.Timer;
 
 import javax.servlet.Filter;
-import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager;
@@ -168,6 +167,7 @@ public class InsightsSecurityConfigurationAdapter extends WebSecurityConfigurerA
 			.antMatchers("/error").permitAll()
 			.antMatchers("/admin/**").access("hasAuthority('Admin')")
 			.antMatchers("/saml/**").permitAll()
+			//.antMatchers("/logout").permitAll()
 			.anyRequest().authenticated();
 
 			http.logout().logoutSuccessUrl("/");
@@ -271,7 +271,7 @@ public class InsightsSecurityConfigurationAdapter extends WebSecurityConfigurerA
 	@Conditional(InsightsBeanInitializationCondition.class)
 	public SimpleUrlAuthenticationFailureHandler authenticationFailureHandler() {
 		LOG.debug(" Inside authenticationFailureHandler ==== ");
-		return new InsightsSimpleUrlAuthenticationFailureHandler(singleSignOnConfig.getPostLogoutURL());
+		return new InsightsSimpleUrlAuthenticationFailureHandler("/insightsso/logout");
 	}
 
 	@Bean
@@ -314,8 +314,9 @@ public class InsightsSecurityConfigurationAdapter extends WebSecurityConfigurerA
 	public SimpleUrlLogoutSuccessHandler successLogoutHandler() {
 		LOG.debug(" Inside successLogoutHandler ==== ");
 		SimpleUrlLogoutSuccessHandler simpleUrlLogoutSuccessHandler = new SimpleUrlLogoutSuccessHandler();
-		simpleUrlLogoutSuccessHandler.setDefaultTargetUrl(singleSignOnConfig.getPostLogoutURL());
+		simpleUrlLogoutSuccessHandler.setDefaultTargetUrl("/user/insightsso/logout");
 		simpleUrlLogoutSuccessHandler.setAlwaysUseDefaultTargetUrl(true);
+		//simpleUrlLogoutSuccessHandler.setRedirectStrategy(redirectStrategy); //		RedirectStrategy
 		return simpleUrlLogoutSuccessHandler;
 	}
 

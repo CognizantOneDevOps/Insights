@@ -22,7 +22,7 @@
 		<!-- <java.version>9</java.version> 2.1.8.RELEASE -->
 		<java.version>1.8</java.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<spring.version>2.1.6.RELEASE</spring.version>
+		<spring.version>2.2.4.RELEASE</spring.version>
 		<testng.version>7.0.1</testng.version>
 		<project.name>PlatformInsights</project.name>
 	</properties>
@@ -32,6 +32,17 @@
 			<groupId>org.testng</groupId>
 			<artifactId>testng</artifactId>
 			<version>7.1.0</version>
+			<exclusions>
+				<exclusion>
+				    <groupId>org.yaml</groupId>
+    				<artifactId>snakeyaml</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+		    <groupId>org.yaml</groupId>
+		    <artifactId>snakeyaml</artifactId>
+		    <version>1.25</version>
 		</dependency>
 		<dependency>
 			<groupId>javax.servlet</groupId>

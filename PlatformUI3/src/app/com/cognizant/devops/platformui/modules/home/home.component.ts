@@ -25,6 +25,7 @@ import { DataSharedService } from '@insights/common/data-shared-service';
 import { AboutDialog } from '@insights/app/modules/about/about-show-popup';
 import { MatDialog } from '@angular/material';
 import { ImageHandlerService } from '@insights/common/imageHandler.service';
+import { MessageDialogService } from '@insights/app/modules/application-dialog/message-dialog-service';
 
 @Component({
   selector: 'app-home',
@@ -84,13 +85,14 @@ export class HomeComponent implements OnInit {
   constructor(private grafanaService: GrafanaAuthenticationService,
     private cookieService: CookieService, private config: InsightsInitService,
     public router: Router, private dataShare: DataSharedService,
-    private dialog: MatDialog, private imageHandeler: ImageHandlerService, ) {
+    private dialog: MatDialog, private imageHandeler: ImageHandlerService,
+    public messageDialog: MessageDialogService ) {
     console.log("Home page constructer ");
     this.displayLandingPage = true;
     if (this.depth === undefined) {
       this.depth = 0;
     }
-    this.loadCustomerLogo();
+    
     this.isValidUser = true;
     this.framesize = window.frames.innerHeight;
     this.leftNavWidthInPer = 20;
@@ -437,33 +439,10 @@ export class HomeComponent implements OnInit {
   }
 
   public logout(): void {
-    var self = this;
-    var uniqueString = "grfanaLoginIframe";
-    var iframe = document.createElement("iframe");
-    iframe.id = uniqueString;
-    document.body.appendChild(iframe);
-    iframe.style.display = "none";
-    iframe.contentWindow.name = uniqueString;
-    // construct a form with hidden inputs, targeting the iframe
-    var form = document.createElement("form");
-    form.target = uniqueString;
-    if (this.config.getGrafanaHost()) {
-      form.action = InsightsInitService.grafanaHost + "/logout";
-      form.method = "GET";
-      document.body.appendChild(form);
-      form.submit();
-    }
-    this.grafanaService.logout()
-      .then(function (data) {
-        //console.log(data);
-      });
-    this.deleteAllPreviousCookies();
-    this.dataShare.setAuthorizationToken(undefined);
-    this.dataShare.removeAuthorization()
-    if (InsightsInitService.ssoEnabled) {
-      this.grafanaService.ssoLogout();
-    } else {
-      this.router.navigate(['/login']);
+    if(InsightsInitService.ssoEnabled){
+      this.router.navigate(['/logout/2']);
+    }else{
+      this.router.navigate(['/logout/1']);
     }
   }
 
@@ -506,13 +485,6 @@ export class HomeComponent implements OnInit {
         this.messageDialog.showApplicationsMessage(" Error while Organizantion change ,Please try again later ", "ERROR");
       }
     });
-  }
-
-  deleteAllPreviousCookies(): void {
-    let allCookies = this.cookieService.getAll();
-    for (let key of Object.keys(allCookies)) {
-      this.cookieService.delete(key);
-    }
   }
 
   showLandingPage() {

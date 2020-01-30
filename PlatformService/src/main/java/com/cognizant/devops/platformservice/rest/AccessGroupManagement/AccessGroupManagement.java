@@ -66,7 +66,7 @@ public class AccessGroupManagement {
 	@Autowired
 	private HttpServletRequest httpRequest;
 
-	@RequestMapping(value = "/getOrgs", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+	@RequestMapping(value = "/getOrgs", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	public JsonObject getOrgs() {
 		log.debug("\n\nInside getOrgs method call");
 		String apiUrl = PlatformServiceUtil.getGrafanaURL("/api/orgs");
@@ -77,7 +77,7 @@ public class AccessGroupManagement {
 				.buildSuccessResponseWithData(new JsonParser().parse(response.getEntity(String.class)));
 	}
 
-	@RequestMapping(value = "/switchUserOrg", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+	@RequestMapping(value = "/switchUserOrg", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	public JsonObject switchUserOrg(@RequestParam int orgId) {
 		log.debug("\n\nInside switchUserOrg method call, and the Org ID is: " + orgId);
 
@@ -123,15 +123,14 @@ public class AccessGroupManagement {
 				.buildSuccessResponseWithData(new JsonParser().parse(response.getEntity(String.class)));
 	}
 
-	@RequestMapping(value = "/searchUser", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+	@RequestMapping(value = "/searchUser", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	public @ResponseBody JsonObject searchUser(@RequestBody String reqname) {
 		try {
 			String name = ValidationUtils.validateRequestBody(reqname);
 
 			Map<String, String> grafanaHeader = PlatformServiceUtil.prepareGrafanaHeader(httpRequest);
 
-			String apiUrlName = PlatformServiceUtil.getGrafanaURL("/api/users/lookup?loginOrEmail=" + name)
-					;
+			String apiUrlName = PlatformServiceUtil.getGrafanaURL("/api/users/lookup?loginOrEmail=" + name);
 			String message = null;
 			ClientResponse responsename = callgrafana(apiUrlName, null,RequestMethod.GET.toString(),grafanaHeader);
 			JsonObject jsonResponseName = new JsonParser().parse(responsename.getEntity(String.class))
@@ -151,7 +150,7 @@ public class AccessGroupManagement {
 		}
 	}
 
-	@RequestMapping(value = "/assignUser", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+	@RequestMapping(value = "/assignUser", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	public @ResponseBody JsonObject assignUser(@RequestBody String reqassignUserdata) {
 		String message = " ";
 		try {
@@ -196,7 +195,7 @@ public class AccessGroupManagement {
 		}
 	}
 
-	@RequestMapping(value = "/getCurrentUserOrgs", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+	@RequestMapping(value = "/getCurrentUserOrgs", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	public JsonObject getCurrentUserOrgs() {
 		Map<String, String> headers = PlatformServiceUtil.prepareGrafanaHeader(httpRequest);
 		String apiUrl = PlatformServiceUtil.getGrafanaURL("/api/user/orgs");
@@ -206,7 +205,7 @@ public class AccessGroupManagement {
 				.buildSuccessResponseWithData(new JsonParser().parse(response.getEntity(String.class)));
 	}
 
-	@RequestMapping(value = "/getUser", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+	@RequestMapping(value = "/getUser", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	public JsonObject getUser() throws InsightsCustomException {
 		try {
 			String apiUrl = PlatformServiceUtil.getGrafanaURL("/api/user");
@@ -229,7 +228,7 @@ public class AccessGroupManagement {
 		}
 	}
 
-	@RequestMapping(value = "/getCurrentUserWithOrgs", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+	@RequestMapping(value = "/getCurrentUserWithOrgs", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	public JsonObject getCurrentUserWithOrgs() {
 
 		JsonObject responseJson = new JsonObject();
@@ -253,7 +252,7 @@ public class AccessGroupManagement {
 
 	
 
-	@RequestMapping(value = "/addUserInOrg", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+	@RequestMapping(value = "/addUserInOrg", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	public @ResponseBody JsonObject addUser(@RequestBody String requserPropertyList) {
 		String message = null;
 		// log.debug("getOrgs API is: " + userPropertyList);
@@ -404,7 +403,7 @@ public class AccessGroupManagement {
 		return null;
 	}
 
-	@RequestMapping(value = "/getGrafanaVersion", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+	@RequestMapping(value = "/getGrafanaVersion", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	public JsonObject getGrafanaVersion() {
 		JsonObject grafanaVersionJson = new JsonObject();
 		String grafanaVersion = ApplicationConfigProvider.getInstance().getGrafana().getGrafanaVersion();
@@ -445,7 +444,7 @@ public class AccessGroupManagement {
 	}
 
 
-	@RequestMapping(value = "/dashboards", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+	@RequestMapping(value = "/dashboards", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	public String loadDashboardData() {
 		DashboardResponse dashboardResponse = new DashboardResponse();
 		try {

@@ -68,7 +68,23 @@ export class DataSharedService {
   }
 
   public getSSOUserName() {
-    return this.storage.get("SsoUserName")
+    return this.storage.get("SsoUserName");
+  }
+
+  public setSSOLogoutURL(logoutURL: String) {
+    this.storage.set("SSOLogoutUrl", logoutURL);
+  }
+
+  public getSSOLogoutURL() {
+    return this.storage.get("SSOLogoutUrl");
+  }
+
+  public getWebAuthToken() {
+    return this.storage.get("SSO-USER");
+  }
+
+  public setWebAuthToken(strWebAuth: string) {
+    this.storage.set("SSO-USER", strWebAuth);
   }
 
   public setAuthorizationToken(strAuthorization: string) {
@@ -82,20 +98,13 @@ export class DataSharedService {
     }
   }
 
-  public getWebAuthToken() {
-    return this.storage.get("SSO-USER");
-  }
-
-  public setWebAuthToken(strWebAuth: string) {
-    this.storage.set("SSO-USER", strWebAuth);
-  }
-
   public getAuthorizationToken() {
     return this.storage.get("Authorization");
   }
 
   public removeAuthorization() {
     this.storage.remove('Authorization');
+    this.storage.remove('SSO-USER');
   }
 
   public setOrgAndRole(orgName: String, orgId: any, role: String) {
@@ -150,7 +159,9 @@ export class DataSharedService {
     var varDateSessionExpiration = this.storage.get('dateSessionExpiration')
     if (authToken === undefined) {
       this.storage.remove('Authorization');
-      this.router.navigate(['/login']);
+      if(!InsightsInitService.ssoEnabled){
+        this.router.navigate(['/login']);
+      }
     } else {
       if (!InsightsInitService.ssoEnabled) {
         var varDateSessionExpirationTime = new Date(this.storage.get('dateSessionExpiration'));

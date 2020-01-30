@@ -21,12 +21,14 @@ import { HttpClient, HttpHeaders, HttpParams, HttpErrorResponse } from '@angular
 import { DataSharedService } from '@insights/common/data-shared-service';
 import 'rxjs/Rx';
 import { MessageDialogService } from '@insights/app/modules/application-dialog/message-dialog-service';
+import { Router, NavigationExtras   } from '@angular/router';
 
 @Injectable()
 export class RestCallHandlerService {
   asyncResult: any;
   constructor(private http: HttpClient, private restAPIUrlService: RestAPIurlService,
-    private dataShare: DataSharedService, public messageDialog: MessageDialogService) {
+    private dataShare: DataSharedService, public messageDialog: MessageDialogService, 
+    private router: Router) {
 
   }
 
@@ -55,7 +57,7 @@ export class RestCallHandlerService {
     const headers = new HttpHeaders()
       .set("Authorization", authToken)
     var restCallUrl = this.constructGetUrl(url, requestParams);
-    console.log("restCallUrl " + restCallUrl);
+    //console.log("restCallUrl " + restCallUrl);
     this.asyncResult = await this.http.get(restCallUrl, { headers, withCredentials: true }).toPromise();
     return this.asyncResult;
   }
@@ -287,24 +289,17 @@ export class RestCallHandlerService {
   handleTokenError(error: HttpErrorResponse) {
     console.log("Inside handleTokenError in rest-call-Handle.service ")
     console.log(error.status);
-    if (error.status === 400) {
-      console.error('An error occurred', error);
-      //this.messageDialog.showApplicationsMessage(" Bad Request, Please check Platform service log for detail ", "ERROR");
-    } else if (error.status === 401) {
-      console.error('An error occurred', error);
-      //this.messageDialog.showApplicationsMessage("Unauthorized Access ", "ERROR")
-    } else if (error.status === 402) {
-      console.error('An error occurred', error);
-      //this.messageDialog.showApplicationsMessage(" Something went wrong while processing request, Please check Platform service log for detail ", "ERROR");
-    } else if (error.status === 403) {
-      console.error('An error occurred', error);
-      //this.messageDialog.showApplicationsMessage(" server understood the request but refused to fulfill it, Please check Platform service log for detail ", "ERROR");
-    } else if (error.status === 510) {
-      console.error('Token Expire , you need to relogin', error);
-      this.messageDialog.showApplicationsMessage(" Your session has expired, you will be logged off", "WARN");
+    if (error.status === 810 || error.status === 811 || error.status === 812 || error.status === 814) {
+      console.error(error);
+      let navigationExtras: NavigationExtras = {
+        skipLocationChange: true,
+        queryParams: {
+          "message": error.error
+        }
+      };
+      this.router.navigate(['/logout/'+error.status],navigationExtras);
     } else {
       console.error('An error occurred', error);
-      //this.messageDialog.showApplicationsMessage(" Something went wrong while processing request, Please check Platform service log for detail ", "ERROR");
     }
   }
 
