@@ -236,7 +236,7 @@ mat-radio-button.mat-accent .mat-radio-inner-circle {
 	text-decoration: none;
 	color: white;
 	width: 120%;
-	padding-top: 8px;
+	padding-top: 4px;
 	margin-right: 30px;
 	margin-left: 6px;
 }
@@ -325,7 +325,7 @@ tr.mat-header-row {
 	display: inline-block;
 	fill: white !important;
 	height: 50px !important;
-	width: 40px !important;
+	width: 60px !important;
 	padding-left: 25px;
 }
 

@@ -80,7 +80,7 @@
 	color: #0033A0;
 	font-size: 20px;
 	width: 400px;
-	margin-top: -25px
+	display: list-item;
 }
 
 .middleTextColr {
@@ -273,7 +273,7 @@ md-icon {
 .customerLogoImage {
 	height: 67px;
 	width: 253px;
-	margin-left: 41%;
+	margin-left: 20%;
 	display: flex;
 	vertical-align: center;
 	margin-bottom: 40px;
@@ -286,4 +286,32 @@ md-icon {
 	margin-top: -44px;
 	display: flex;
 	vertical-align: center;
+}
+
+.table {
+	width: 100%;
+    margin-bottom: 1rem;
+    color: #212529;
+    margin-top: 6rem;
+}
+
+.table td, .table th {
+    padding: .75rem;
+    vertical-align: top;
+    border-top: 2px solid #0033a0;
+    padding-block-start: 5%;
+    border-bottom: 4px solid #00b140;
+}
+
+	
+.table-middle-line {
+	position: absolute;
+    height: 70%;
+    width: 1px;
+    background-color: purple;
+    right: 0;
+    left: 25px;
+    margin: auto;
+    bottom: 0;
+    top: 0;
 }

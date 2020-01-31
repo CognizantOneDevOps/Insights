@@ -196,6 +196,7 @@ mat-dialog-content::-webkit-scrollbar-track {
 .aboutText {
 	font-size: 10pt;
 	margin-left: 20px;
+	padding-top: 10px;
 }
 
 .aboutText1 {
