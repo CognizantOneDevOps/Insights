@@ -19,6 +19,12 @@
 		"data" : "SCM.GIT.DATA",
 		"health" : "SCM.GIT.HEALTH"
 	},
+    "enrichData":{ 
+      "isEnrichmentRequired":true,
+      "sourceProperty":"message",
+      "keyPattern":"-",
+      "targetProperty":"key"
+   },
 	"communication":{
 		"type" : "REST",
     	"sslVerify": true,

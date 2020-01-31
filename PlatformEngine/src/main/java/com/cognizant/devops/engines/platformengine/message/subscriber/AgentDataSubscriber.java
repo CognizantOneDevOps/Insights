@@ -24,6 +24,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.StringTokenizer;
 import java.util.TreeMap;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
@@ -59,10 +61,17 @@ public class AgentDataSubscriber extends EngineSubscriberResponseHandler {
 	private String category;
 	private String toolName;
 	private String labelName;
+	private String targetProperty;
+	private String keyPattern;
+	private String sourceProperty;
+	private Boolean isEnrichmentRequired;
+	private static Pattern p = Pattern.compile("((?<!([A-Z]{1,10})-?)(#|)+[A-Z]+(-|.)\\d+)");
 	List<BusinessMappingData> businessMappingList = new ArrayList<BusinessMappingData>(0);
 
 	public AgentDataSubscriber(String routingKey, boolean dataUpdateSupported, String uniqueKey, String category,
-			String labelName, String toolName, List<BusinessMappingData> businessMappingList) throws Exception {
+			String labelName, String toolName, List<BusinessMappingData> businessMappingList,
+			boolean isEnrichmentRequired, String targetProperty, String keyPattern, String sourceProperty)
+			throws Exception {
 		super(routingKey);
 		this.dataUpdateSupported = dataUpdateSupported;
 		this.uniqueKey = uniqueKey;
@@ -70,6 +79,10 @@ public class AgentDataSubscriber extends EngineSubscriberResponseHandler {
 		this.toolName = toolName;
 		this.labelName = labelName;
 		this.businessMappingList = businessMappingList;
+		this.isEnrichmentRequired = isEnrichmentRequired;
+		this.targetProperty = targetProperty;
+		this.keyPattern = keyPattern;
+		this.sourceProperty = sourceProperty;
 	}
 
 	public void setMappingData(List<BusinessMappingData> businessMappingList) {
@@ -91,8 +104,8 @@ public class AgentDataSubscriber extends EngineSubscriberResponseHandler {
 			labels.addAll(Arrays.asList(routingKey.split(MessageConstants.ROUTING_KEY_SEPERATOR)));
 		} else {
 			labels.add(this.category.toUpperCase());
-			labels.add(this.labelName); // THis is middle part of routing key (ALM:JIRA_PROJECT:DATA), so it will be //
-										// JIRA_PROJECT
+			labels.add(this.toolName.toUpperCase());
+			labels.add(this.labelName);
 			labels.add("DATA");
 		}
 
@@ -136,17 +149,30 @@ public class AgentDataSubscriber extends EngineSubscriberResponseHandler {
 
 		if (json.isJsonArray()) {
 			JsonArray asJsonArray = json.getAsJsonArray();
+			JsonObject dataWithproperty;
 			for (JsonElement e : asJsonArray) {
 				if (e.isJsonObject()) {
+					dataWithproperty = e.getAsJsonObject();
+					// Below Code has the ability to add derived properties as part of Nodes
+					if (this.isEnrichmentRequired) {
+						if (e.getAsJsonObject().has(sourceProperty)) {
+							JsonElement sourceElem = e.getAsJsonObject().get(sourceProperty);
+							String enrichedData = enrichData(sourceElem, keyPattern);
+							if (enrichedData != null) {
+								dataWithproperty.addProperty(targetProperty, enrichedData);
+							}
+						}
+
+					}
 					if (enableOnlineDatatagging) {
-						JsonObject jsonWithLabel = applyDataTagging(e.getAsJsonObject());
+						JsonObject jsonWithLabel = applyDataTagging(dataWithproperty);
 						if (jsonWithLabel != null) {
 							dataList.add(jsonWithLabel);// finalJson
 						} else {
-							dataList.add(e.getAsJsonObject());
+							dataList.add(dataWithproperty);
 						}
 					} else {
-						dataList.add(e.getAsJsonObject());
+						dataList.add(dataWithproperty);
 					}
 				}
 			}
@@ -193,6 +219,25 @@ public class AgentDataSubscriber extends EngineSubscriberResponseHandler {
 		String resultJson = new Gson().toJson(finalobj);
 		JsonObject finalJson = (JsonObject) jsonParser.parse(resultJson);
 		return finalJson;
+	}
+
+	private String enrichData(JsonElement dataJson, String keyPattern) {
+		String enrichDataValue = null;
+		if (dataJson.isJsonPrimitive()) {
+			String message = dataJson.getAsString();
+			while (message.contains(keyPattern)) {
+				Matcher m = p.matcher(message);
+				if (m.find()) {
+					enrichDataValue = (m.group());
+					message = message.replaceAll(m.group(), "");
+				} else {
+					break;
+				}
+			}
+		}
+
+		return enrichDataValue;
+
 	}
 
 	private JsonObject applyDataTagging(JsonObject asJsonObject) {

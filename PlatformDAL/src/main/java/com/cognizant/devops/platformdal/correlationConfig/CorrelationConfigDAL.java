@@ -67,13 +67,12 @@ public class CorrelationConfigDAL extends BaseDAL {
 		terminateSessionFactory();
 		return Boolean.TRUE;
 	}
-	public Boolean deleteCorrelationConfig(String relationName, Boolean flag) {
+	public Boolean deleteCorrelationConfig(String relationName) {
 		Query<CorrelationConfiguration> createQuery = getSession().createQuery(
 				"FROM CorrelationConfiguration CC WHERE CC.relationName = :relationName",
 				CorrelationConfiguration.class);
 		createQuery.setParameter("relationName", relationName);		
 		List<CorrelationConfiguration> resultList = createQuery.getResultList();
-		System.out.println();
 		CorrelationConfiguration correlationConfig = null;
 		if (resultList.size() > 0) {
 			correlationConfig = resultList.get(0);

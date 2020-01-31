@@ -44,9 +44,9 @@ public class CorrelationBuilderServiceImpl implements CorrelationBuilderService 
 	private static Logger log = LogManager.getLogger(CorrelationBuilderServiceImpl.class);
 
 	@Override
-	public Object getCorrelationJson() throws InsightsCustomException {
+	public List<CorrelationConfiguration> getCorrelationJson() throws InsightsCustomException {
 		CorrelationConfigDAL correlationConfigDAL = new CorrelationConfigDAL();
-		List<CorrelationConfiguration> correlationList = null;
+		List<CorrelationConfiguration> correlationList = new ArrayList<>();
 		try {
 			correlationList = correlationConfigDAL.getAllCorrelations();
 		} catch (Exception e) {
@@ -76,83 +76,68 @@ public class CorrelationBuilderServiceImpl implements CorrelationBuilderService 
 	}
 
 	@Override
-	public String saveConfig(String config) throws InsightsCustomException {
+	public Boolean saveConfig(String config) throws InsightsCustomException {
 
-		List<CorrelationJson> correlations = loadCorrelations(config);
-
-		List<CorrelationConfiguration> correlationConfigList = new ArrayList<CorrelationConfiguration>();
-		for (CorrelationJson correlation : correlations) {
-
-			CorrelationConfiguration correlationConfig = new CorrelationConfiguration();
-			correlationConfig.setSourceToolName(correlation.getSource().getToolName());
-			correlationConfig.setSourceToolCategory(correlation.getSource().getToolCategory());
-			if (correlation.getSource().getLabelName().isEmpty()) {
-				correlationConfig.setSourceLabelName(correlation.getSource().getToolName());
-			} else {
-				correlationConfig.setSourceLabelName(correlation.getSource().getLabelName());
-			}
-			correlationConfig.setSourceFields(String.join(",", correlation.getSource().getFields()));
-			correlationConfig.setDestinationToolName(correlation.getDestination().getToolName());
-			correlationConfig.setDestinationToolCategory(correlation.getDestination().getToolCategory());
+		CorrelationJson correlation = loadCorrelation(config);
+		CorrelationConfiguration correlationConfig = new CorrelationConfiguration();
+		correlationConfig.setSourceToolName(correlation.getSource().getToolName());
+		correlationConfig.setSourceToolCategory(correlation.getSource().getToolCategory());
+		if (null == correlation.getSource().getLabelName()) {
+			correlationConfig.setSourceLabelName(correlation.getSource().getToolName());
+		} else {
+			correlationConfig.setSourceLabelName(correlation.getSource().getLabelName());
+		}
+		correlationConfig.setSourceFields(String.join(",", correlation.getSource().getFields()));
+		correlationConfig.setDestinationToolName(correlation.getDestination().getToolName());
+		correlationConfig.setDestinationToolCategory(correlation.getDestination().getToolCategory());
+		correlationConfig.setDestinationLabelName(correlation.getDestination().getLabelName());
+		if (null == correlation.getDestination().getLabelName()) {
+			correlationConfig.setDestinationLabelName(correlation.getDestination().getToolName());
+		} else {
 			correlationConfig.setDestinationLabelName(correlation.getDestination().getLabelName());
-			if (correlation.getDestination().getLabelName().isEmpty()) {
-				correlationConfig.setDestinationLabelName(correlation.getDestination().getToolName());
-			} else {
-				correlationConfig.setDestinationLabelName(correlation.getDestination().getLabelName());
-			}
-			correlationConfig.setDestinationFields(String.join(",", correlation.getDestination().getFields()));
-			correlationConfig.setRelationName(correlation.getRelationName());
-			if(correlation.getPropertyList()==null) {
-				correlationConfig.setPropertyList("");
-			}
-			else {				
+		}
+		correlationConfig.setDestinationFields(String.join(",", correlation.getDestination().getFields()));
+		correlationConfig.setRelationName(correlation.getRelationName());		
+		if (correlation.getPropertyList().length>0) {
 			correlationConfig.setPropertyList(String.join(",", correlation.getPropertyList()));
-			}
-			correlationConfig.setEnableCorrelation(correlation.isEnableCorrelation());
-			correlationConfigList.add(correlationConfig);
 		}
+		correlationConfig.setEnableCorrelation(correlation.isEnableCorrelation());
+		correlationConfig.setSelfRelation(correlation.getSelfRelation());
 
 		CorrelationConfigDAL correlationConfigDAL = new CorrelationConfigDAL();
-		for (CorrelationConfiguration saveCorrelationJson : correlationConfigList) {
-			correlationConfigDAL.saveCorrelationConfig(saveCorrelationJson);
-		}
-		return config;
+		return correlationConfigDAL.saveCorrelationConfig(correlationConfig);
+		
 
 	}
 
 	@Override
-	public String updateCorrelation(String configDetails) throws InsightsCustomException {
+	public Boolean updateCorrelationStatus(String flagDeatils) throws InsightsCustomException {
 
 		JsonParser parser = new JsonParser();
-		JsonObject json = (JsonObject) parser.parse(configDetails);
+		JsonObject json = (JsonObject) parser.parse(flagDeatils);
 		String relationName = json.get("relationName").getAsString();
 		Boolean flag = json.get("correlationFlag").getAsBoolean();
 		CorrelationConfigDAL correlationConfigDAL = new CorrelationConfigDAL();
-		correlationConfigDAL.updateCorrelationConfig(relationName, flag);
-		return configDetails;
+		return correlationConfigDAL.updateCorrelationConfig(relationName, flag);
+		
 	}
 
 	@Override
-	public String deleteCorrelation(String configDetails) throws InsightsCustomException {
+	public Boolean deleteCorrelation(String relationName) throws InsightsCustomException {
 
 		JsonParser parser = new JsonParser();
-		JsonObject json = (JsonObject) parser.parse(configDetails);
-		String relationName = json.get("relationName").getAsString();
-		Boolean flag = json.get("correlationFlag").getAsBoolean();
+		JsonObject json = (JsonObject) parser.parse(relationName);
+		String relationNameValue = json.get("relationName").getAsString();
 		CorrelationConfigDAL correlationConfigDAL = new CorrelationConfigDAL();
-		correlationConfigDAL.deleteCorrelationConfig(relationName, flag);
-
-		return configDetails;
+		return correlationConfigDAL.deleteCorrelationConfig(relationNameValue);
+		
 	}
 
-	private List<CorrelationJson> loadCorrelations(String config) {
-		JsonArray correlationJson = new JsonArray();
+	private CorrelationJson loadCorrelation(String config) {
 		JsonParser parser = new JsonParser();
 		JsonObject json = (JsonObject) parser.parse(config);
-		correlationJson = json.get("data").getAsJsonArray();
-		CorrelationJson[] correlationArray = new Gson().fromJson(correlationJson, CorrelationJson[].class);
-		List<CorrelationJson> correlations = Arrays.asList(correlationArray);
-		return correlations;
+		CorrelationJson correlation = new Gson().fromJson(json, CorrelationJson.class);
+		return correlation;
 	}
 
 }

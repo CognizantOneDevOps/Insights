@@ -78,19 +78,31 @@ public class EngineAggregatorModule extends TimerTask {
 
 	private void registerAggragators(AgentConfig agentConfig, Neo4jDBHandler graphDBHandler, String toolName,
 			List<BusinessMappingData> businessMappingList) {
+			Boolean isEnrichmentRequired= false;
+		String targetProperty="";
+		String keyPattern="";
+		String sourceProperty ="";
 		try {
 			JsonObject config = (JsonObject) new JsonParser().parse(agentConfig.getAgentJson());
 			JsonObject json = config.get("publish").getAsJsonObject();
 			String dataRoutingKey = json.get("data").getAsString();
-
+			Boolean hasenrichTool = config.has("enrichData");
+			
+			
+			if (hasenrichTool) {
+				JsonObject enrichTool = config.get("enrichData").getAsJsonObject();
+				isEnrichmentRequired = enrichTool.get("isEnrichmentRequired").getAsBoolean();
+				targetProperty = enrichTool.get("targetProperty").getAsString();
+				keyPattern = enrichTool.get("keyPattern").getAsString();
+				sourceProperty = enrichTool.get("sourceProperty").getAsString();
+			}
 			log.debug(" dataRoutingKey " + dataRoutingKey + "  Tool Info " + toolName);
 
 			if (dataRoutingKey != null && !registry.containsKey(dataRoutingKey)) {
 				try {
-					registry.put(dataRoutingKey,
-							new AgentDataSubscriber(dataRoutingKey, agentConfig.isDataUpdateSupported(),
-									agentConfig.getUniqueKey(), agentConfig.getToolCategory(),
-									agentConfig.getLabelName(), toolName, businessMappingList));
+					registry.put(dataRoutingKey, new AgentDataSubscriber(dataRoutingKey,agentConfig.isDataUpdateSupported(), agentConfig.getUniqueKey(),
+							agentConfig.getToolCategory(), agentConfig.getLabelName(), toolName, businessMappingList,isEnrichmentRequired, targetProperty,
+							keyPattern,sourceProperty));
 				} catch (Exception e) {
 					log.error("Unable to add subscriber for routing key: " + dataRoutingKey, e);
 					EngineStatusLogger.getInstance().createEngineStatusNode(
@@ -159,11 +171,10 @@ public class EngineAggregatorModule extends TimerTask {
 		try {
 			GraphResponse toolResponse = dbHandler
 					.executeCypherQuery("MATCH (n:METADATA:BUSINESSMAPPING) return collect(distinct n.toolName)");
-					JsonArray arrayToolRegistred = toolResponse.getJson().get("results").getAsJsonArray().get(0)
+			JsonArray arrayToolRegistred = toolResponse.getJson().get("results").getAsJsonArray().get(0)
 					.getAsJsonObject().get("data").getAsJsonArray().get(0).getAsJsonObject().get("row").getAsJsonArray()
 					.get(0).getAsJsonArray();
 
-			
 			// arrayToolRegistred
 			for (JsonElement registedTool : arrayToolRegistred) {
 				String toolName = registedTool.toString().replaceAll("\"", "");
@@ -173,7 +184,7 @@ public class EngineAggregatorModule extends TimerTask {
 				nodes = response.getNodes();
 				List<BusinessMappingData> toolDataList = new ArrayList<BusinessMappingData>(0);
 				for (NodeData node : nodes) {
-				
+
 					BusinessMappingData toolData = new BusinessMappingData();
 					String jsonString = gson.toJson(node);
 					String businessMappingLabel = node.getPropertyMap().get("businessmappinglabel");

@@ -23,10 +23,10 @@ import java.util.List;
  */
 public class CorrelationNode {
 	private String toolName;
-	private String toolCategory = null;
-	private String labelName = "";
+	private String toolCategory;
+	private String labelName ;
 	private List<String> fields;
-	private boolean enrichAlmData = false;
+	private boolean enrichAlmData;
 	private String almkeyPattern = "-";
 	private String almKeyProcessedIndex = "jiraKeyProcessed";
 	private String almKeysIndex = "jiraKeys";

@@ -16,7 +16,7 @@
    *******************************************************************************-->
 <div class="arrange-horizontally-Dialog" style="padding: 0px">
     <div class="gridheadercenter">
-        <pre style="font-family: inherit; font-size: 23px; margin-top: -7px;">{{title}}</pre>
+        <pre class="showDialogHeadingCss">{{title}}</pre>
     </div>
     <div class="closeIconCss">
         <a (click)="closeShowDetailsDialog()">
@@ -30,7 +30,7 @@
         <tr>
             <th><span style="margin-left: 70px;" class="dot"></span></th>
             <th style="width: 0px !important">
-                <hr style="width: 500px; margin-top: 0px;" size=8 noshade>
+                <hr style="width: 500px; height: 3px;" size=10 noshade>
             </th>
             <td style="margin-right: 100px;"><span class="dot" style="margin-left: 0px"></span></td>
         </tr>
@@ -41,8 +41,8 @@
                 <div (mouseover)="sourceText=true" (mouseout)="sourceText=false">
                     <span class="BlueColumnLeft"><b>{{source}}</b> </span>
                     <div *ngIf="sourceText" class="dialog-model">
-                        <h4>
-                            Source Fields <span (click)="showModel = null">x</span>
+                        <h4 style="font-size:13px;">
+                            Source Fields <span (click)="showModel = null"></span>
                         </h4>
                         <div class="body-content">
                             <p class="multi_lines_text" [innerHTML]="sourceformattedString"></p>
@@ -56,8 +56,8 @@
                 <div (mouseover)="destText=true" (mouseout)="destText=false">
                     <span class="BlueColumnRight"><b>{{destination}}</b> </span>
                     <div *ngIf="destText" class="dialog-modelDest">
-                        <h4>
-                            Destination Fields<span (click)="showModel = null">x</span>
+                        <h4 style="font-size:13px;">
+                            Destination Fields<span (click)="showModel = null"></span>
                         </h4>
                         <div class="body-content">
                             <p class="multi_lines_text" [innerHTML]="destformattedString"></p>

@@ -59,7 +59,6 @@ export class RelationshipBuilderComponent implements OnInit {
   corrprop = [];
   fieldDestProp = [];
   fieldSourceProp = [];
-  saveRelationArray = [];
   selectedProperty2: any;
   selectedProperty1: any;
   selectedSourceTool: any;
@@ -111,6 +110,7 @@ export class RelationshipBuilderComponent implements OnInit {
   correaltionFlag: boolean = true;
   flag: boolean = false;
   displayedToolColumns: any = []
+  selfRelation = false;
   labelListDatasourceSelected: any = [];
   selectsourceproperty: any = new SelectionModel(true, []);
   selectdestinationproperty: any = new SelectionModel(true, []);
@@ -121,7 +121,10 @@ export class RelationshipBuilderComponent implements OnInit {
     this.displayedToolColumns = ['checkbox', 'toolproperties']
     this.isSaveEnabled = true;
   }
-
+  /*  setToggle(selfRelation) {
+     console.log(selfRelation);
+     this.selfRelation = selfRelation;
+   } */
 
   ngOnInit() {
   }
@@ -257,7 +260,6 @@ export class RelationshipBuilderComponent implements OnInit {
       this.flagcolour = 2;
       this.displayDataSource = [];
       this.toolsDatasource = [];
-      this.saveRelationArray = [];
       this.toolSourceDataSource = [];
       this.corelationResponseMaster = [];
       let correlationresponse = await this.relationshipBuilderService.loadUiServiceLocation()
@@ -269,8 +271,8 @@ export class RelationshipBuilderComponent implements OnInit {
         var destinationToolName = (element.destinationToolName);
         var sourceToolName = (element.sourceToolName);
         var flag = (element.enableCorrelation);
-        var detailProp = '<b>' + element.sourceToolName + '</b>:' + element.sourceFields + ':<b>' + element.destinationToolName + '</b>:' + element.destinationFields;
-        let relationLabel = new RelationLabel(destinationToolName, sourceToolName, element.relationName, element.sourceFields, element.destinationFields, element.relationship_properties, flag);
+        //var detailProp = '<b>' + element.sourceToolName + '</b>:' + element.sourceFields + ':<b>' + element.destinationToolName + '</b>:' + element.destinationFields;
+        let relationLabel = new RelationLabel(destinationToolName, sourceToolName, element.relationName, element.sourceFields, element.destinationFields, element.relationship_properties, flag, this.selfRelation);
         this.relationmappingLabels.push(relationLabel);
         this.sourcecheck.push(sourceToolName);
       }
@@ -420,6 +422,9 @@ export class RelationshipBuilderComponent implements OnInit {
     this.isrefresh = false;
     this.buttonOn = false;
     this.selectedSourceTool = "";
+    this.selectedDestinationTool = ""
+    this.selectedSourceLabel = ""
+    this.selectedDestinationLabel = ""
     this.dataDictionaryInfo();
     this.radioRefresh = false;
     this.selectRelation = "";
@@ -435,7 +440,6 @@ export class RelationshipBuilderComponent implements OnInit {
       if (result == 'yes') {
         var finalJson = {};
         finalJson['relationName'] = relationName;
-        finalJson['correlationFlag'] = this.correlationFlag;
         var correlationJson = JSON.stringify(finalJson);
         this.relationshipBuilderService.deleteCorrelation(correlationJson).then(
           (corelationResponse2) => {
@@ -510,7 +514,7 @@ export class RelationshipBuilderComponent implements OnInit {
   }
 
   saveData(newName) {
-    this.saveRelationArray = [];
+
     this.isListView = true;
     this.isEditData = true;
     var counter = 0;
@@ -564,12 +568,15 @@ export class RelationshipBuilderComponent implements OnInit {
             var toolname1 = res1[0];
             var toolcatergory1 = res1[1];
             var labelName1 = res1[2];
+            if (toolname1 == toolname) {
+              this.selfRelation = true;
+            }
             this.AddSource = { 'toolName': toolname1, 'toolCategory': toolcatergory1, 'labelName': labelName1, 'fields': this.fieldSourceProp };
             var newData = {
-              'destination': this.AddDestination, 'source': this.AddSource, 'relationName': this.finalRelationName, 'relationship_properties': this.propertyList
+              'destination': this.AddDestination, 'source': this.AddSource, 'relationName': this.finalRelationName, 'relationship_properties': this.propertyList, 'selfRelation': this.selfRelation
             }
-            this.saveRelationArray.push(newData);
-            var addMappingJson = JSON.stringify({ 'data': this.saveRelationArray });
+
+            var addMappingJson = JSON.stringify(newData);
             this.relationshipBuilderService.saveCorrelationConfig(addMappingJson).then(
               (corelationResponse2) => {
                 if (corelationResponse2.status == "success") {
@@ -601,3 +608,4 @@ export class RelationshipBuilderComponent implements OnInit {
     }
   }
 }
+

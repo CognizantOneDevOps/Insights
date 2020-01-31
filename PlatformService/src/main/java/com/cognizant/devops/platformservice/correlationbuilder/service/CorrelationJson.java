@@ -21,6 +21,7 @@ public class CorrelationJson {
 	private String relationName;
 	private String[] relationship_properties;
 	private boolean enableCorrelation= true;
+	private boolean isselfRelation= false;
 	
 	
 	public CorrelationNode getSource() {
@@ -35,12 +36,19 @@ public class CorrelationJson {
 	public void setDestination(CorrelationNode destination) {
 		this.destination = destination;
 	}
+	public Boolean getSelfRelation() {
+		return isselfRelation;
+	}
+	public void setSelfRelation(Boolean isselfRelation) {
+		this.isselfRelation = isselfRelation;
+	}
 	public String getRelationName() {
 		return relationName;
 	}
 	public void setPropertyList(String[] relationship_properties) {
 		this.relationship_properties = relationship_properties;
 	}
+	
 	public String[] getPropertyList() {
 		return relationship_properties;
 	}
@@ -58,7 +66,7 @@ public class CorrelationJson {
 	public String toString() {
 		return "CorrelationJson [source=" + source + ", destination=" + destination + ", relationName=" + relationName
 				+ ", correlationFlag=" + enableCorrelation + ", getSource()=" + getSource() + ", getDestination()="
-				+ getDestination() + ", getRelationName()=" + getRelationName() + ", getPropertyList()=" + getPropertyList() + ", isCorrelationFlag()="
+				+ getDestination() + ", getRelationName()=" + getRelationName() + ",getselfRelation()=" + getSelfRelation() + ", getPropertyList()=" + getPropertyList() + ", isCorrelationFlag()="
 				+ isEnableCorrelation() + ", getClass()=" + getClass() + ", hashCode()=" + hashCode() + ", toString()="
 				+ super.toString() + "]";
 	}
