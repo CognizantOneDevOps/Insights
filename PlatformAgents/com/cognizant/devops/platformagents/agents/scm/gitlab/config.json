@@ -19,6 +19,12 @@
 		"data" : "SCM.GITLAB.DATA",
 		"health" : "SCM.GITLAB.HEALTH"
 	},
+    "enrichData":{ 
+      "isEnrichmentRequired":false,
+      "sourceProperty":"message",
+      "keyPattern":"-",
+      "targetProperty":"key"
+   },
 	"communication":{
 		"type" : "REST", 
 		"sslVerify": true,

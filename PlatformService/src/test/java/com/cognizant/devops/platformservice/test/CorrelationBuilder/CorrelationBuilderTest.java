@@ -32,7 +32,7 @@ public class CorrelationBuilderTest extends CorrelationBuilderTestData {
 
 	@Test(priority = 1)
 	public void testSaveConfig() throws InsightsCustomException {
-		String response = correlationBuilderImpl.saveConfig(correlationBuilderTestData.saveDataConfig);
+		Boolean response = correlationBuilderImpl.saveConfig(correlationBuilderTestData.saveDataConfig);
 	}
 
 	@Test(priority = 2)
@@ -44,12 +44,12 @@ public class CorrelationBuilderTest extends CorrelationBuilderTestData {
 
 	@Test(priority = 3)
 	public void testUpdateJsonConfig() throws InsightsCustomException {
-		String response = correlationBuilderImpl.updateCorrelation(correlationBuilderTestData.UpdateConfigDetails);
+		Boolean response = correlationBuilderImpl.updateCorrelationStatus(correlationBuilderTestData.UpdateConfigDetails);
 	}
 
 	@Test(priority = 4)
 	public void testDeleteJsonConfig() throws InsightsCustomException {
-		String response = correlationBuilderImpl.deleteCorrelation(correlationBuilderTestData.DeleteConfigDetails);
+		Boolean response = correlationBuilderImpl.deleteCorrelation(correlationBuilderTestData.DeleteConfigDetails);
 	}
 
 	@AfterTest

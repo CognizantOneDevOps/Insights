@@ -23,7 +23,7 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "\"INSIGHTS_CORRELATION_CONFIGURATION\"")
+@Table(name = "\"INSIGHTS_CORRELATION_CONFIGURATIONS\"")
 public class CorrelationConfiguration {
 	@Id
 	@Column(name = "ID", unique = true, nullable = false)
@@ -62,6 +62,9 @@ public class CorrelationConfiguration {
 
 	@Column(name = "RELATION_NAME", unique = true, nullable = false)
 	private String relationName;
+
+	@Column(name = "SELF_TOOL_RELATION")
+	private Boolean selfRelation;
 
 	public int getId() {
 		return id;
@@ -157,6 +160,14 @@ public class CorrelationConfiguration {
 
 	public void setEnableCorrelation(boolean enableCorrelation) {
 		this.enableCorrelation = enableCorrelation;
+	}
+
+	public Boolean getSelfRelation() {
+		return selfRelation;
+	}
+
+	public void setSelfRelation(Boolean selfRelation) {
+		this.selfRelation = selfRelation;
 	}
 
 }

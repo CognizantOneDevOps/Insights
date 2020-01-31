@@ -19,6 +19,12 @@
     "data": "SCM.BITBUCKET.DATA",
     "health": "SCM.BITBUCKET.HEALTH"
   },
+   "enrichData":{ 
+      "isEnrichmentRequired":false,
+      "sourceProperty":"message",
+      "keyPattern":"-",
+      "targetProperty":"key"
+   },
   "communication": {
     "type": "REST",
     "sslVerify": true,

@@ -59,7 +59,7 @@ public class CorrelationExecutor {
 	public void execute() {
 		CorrelationConfig correlationConfig = ApplicationConfigProvider.getInstance().getCorrelations();
 		if (correlationConfig != null) {
-			new DataExtractor().execute();
+			//new DataExtractor().execute();
 			loadCorrelationConfiguration(correlationConfig);
 
 			List<CorrelationConfiguration> correlations = getRelation();
