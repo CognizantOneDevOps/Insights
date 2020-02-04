@@ -52,7 +52,7 @@ export class LogoutHandlerComponent implements OnInit {
         this.logoutProcesingWithMassage();
       }
     });
-    this.logoutUrl=this.dataShare.getSSOLogoutURL();
+    //this.logoutUrl=this.dataShare.getSSOLogoutURL();
     //console.log("this.logoutUrl  "+this.logoutUrl);
   }
 
@@ -128,8 +128,12 @@ export class LogoutHandlerComponent implements OnInit {
         //console.log('The dialog was closed  ' + result);
         if (result == 'yes') {
           if(InsightsInitService.ssoEnabled){
-            //console.log(" logging out from sso " + self.logoutUrl);
-            self.loginService.singleLogoutSSO(self.logoutUrl);
+            console.error(" logging out from sso " + self.logoutUrl);
+            if(this.logoutUrl != undefined){
+              this.loginService.singleLogoutSSO(self.logoutUrl);
+            }else{
+              console.error("No logout URL found");
+            }
           }else{
             setTimeout(() => self.router.navigate(['/login']), 1);
           }
