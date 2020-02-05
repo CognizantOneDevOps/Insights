@@ -33,6 +33,7 @@ public class CorrelationBuilderTest extends CorrelationBuilderTestData {
 	@Test(priority = 1)
 	public void testSaveConfig() throws InsightsCustomException {
 		Boolean response = correlationBuilderImpl.saveConfig(correlationBuilderTestData.saveDataConfig);
+		Assert.assertTrue(response);
 	}
 
 	@Test(priority = 2)
@@ -44,12 +45,15 @@ public class CorrelationBuilderTest extends CorrelationBuilderTestData {
 
 	@Test(priority = 3)
 	public void testUpdateJsonConfig() throws InsightsCustomException {
-		Boolean response = correlationBuilderImpl.updateCorrelationStatus(correlationBuilderTestData.UpdateConfigDetails);
+		Boolean response = correlationBuilderImpl
+				.updateCorrelationStatus(correlationBuilderTestData.UpdateConfigDetails);
+		Assert.assertTrue(response);
 	}
 
 	@Test(priority = 4)
 	public void testDeleteJsonConfig() throws InsightsCustomException {
 		Boolean response = correlationBuilderImpl.deleteCorrelation(correlationBuilderTestData.DeleteConfigDetails);
+		Assert.assertTrue(response);
 	}
 
 	@AfterTest

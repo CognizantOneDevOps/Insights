@@ -15,13 +15,15 @@
  ******************************************************************************/
 package com.cognizant.devops.platformservice.correlationbuilder.service;
 
+import java.util.Arrays;
+
 public class CorrelationJson {
 	private CorrelationNode  source;
 	private CorrelationNode  destination;
 	private String relationName;
 	private String[] relationship_properties;
 	private boolean enableCorrelation= true;
-	private boolean isselfRelation= false;
+	private boolean isSelfRelation;
 	
 	
 	public CorrelationNode getSource() {
@@ -36,11 +38,11 @@ public class CorrelationJson {
 	public void setDestination(CorrelationNode destination) {
 		this.destination = destination;
 	}
-	public Boolean getSelfRelation() {
-		return isselfRelation;
+	public boolean isSelfRelation() {
+		return isSelfRelation;
 	}
-	public void setSelfRelation(Boolean isselfRelation) {
-		this.isselfRelation = isselfRelation;
+	public void setSelfRelation(boolean isSelfRelation) {
+		this.isSelfRelation = isSelfRelation;
 	}
 	public String getRelationName() {
 		return relationName;
@@ -62,14 +64,17 @@ public class CorrelationJson {
 		this.enableCorrelation = enableCorrelation;
 	}
 	
+	public String[] getRelationship_properties() {
+		return relationship_properties;
+	}
+	public void setRelationship_properties(String[] relationship_properties) {
+		this.relationship_properties = relationship_properties;
+	}
 	@Override
 	public String toString() {
 		return "CorrelationJson [source=" + source + ", destination=" + destination + ", relationName=" + relationName
-				+ ", correlationFlag=" + enableCorrelation + ", getSource()=" + getSource() + ", getDestination()="
-				+ getDestination() + ", getRelationName()=" + getRelationName() + ",getselfRelation()=" + getSelfRelation() + ", getPropertyList()=" + getPropertyList() + ", isCorrelationFlag()="
-				+ isEnableCorrelation() + ", getClass()=" + getClass() + ", hashCode()=" + hashCode() + ", toString()="
-				+ super.toString() + "]";
+				+ ", relationship_properties=" + Arrays.toString(relationship_properties) + ", enableCorrelation="
+				+ enableCorrelation + ", isSelfRelation=" + isSelfRelation + "]";
 	}
-	
-	
-	}
+
+}

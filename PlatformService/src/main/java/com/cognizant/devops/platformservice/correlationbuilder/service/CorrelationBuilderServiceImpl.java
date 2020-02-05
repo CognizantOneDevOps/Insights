@@ -102,7 +102,7 @@ public class CorrelationBuilderServiceImpl implements CorrelationBuilderService 
 			correlationConfig.setPropertyList(String.join(",", correlation.getPropertyList()));
 		}
 		correlationConfig.setEnableCorrelation(correlation.isEnableCorrelation());
-		correlationConfig.setSelfRelation(correlation.getSelfRelation());
+		correlationConfig.setSelfRelation(correlation.isSelfRelation());
 
 		CorrelationConfigDAL correlationConfigDAL = new CorrelationConfigDAL();
 		return correlationConfigDAL.saveCorrelationConfig(correlationConfig);
