@@ -18,15 +18,11 @@ import { RelationshipBuilderService } from '@insights/app/modules/relationship-b
 import { ShowJsonDialog } from '@insights/app/modules/relationship-builder/show-correlationjson';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 import { RelationLabel } from '@insights/app/modules/relationship-builder/relationship-builder.label';
-import { from } from 'rxjs';
 import { Router } from "@angular/router";
-import { ActivatedRoute } from '@angular/router';
 import { MessageDialogService } from '@insights/app/modules/application-dialog/message-dialog-service';
-import { MatTableDataSource } from '@angular/material';
 import { DataSharedService } from '@insights/common/data-shared-service';
-import { count } from 'rxjs/operators';
 import { AddPropertyDialog } from './add-propertydialog';
-import { SelectionModel } from '@angular/cdk/collections';
+
 @Component({
   selector: 'app-relationship-builder',
   templateUrl: './relationship-builder.component.html',
@@ -39,7 +35,7 @@ export class RelationshipBuilderComponent implements OnInit {
   flagcolour: any;
   element: any = undefined;
   readChange: boolean = false;
-  readChange2: boolean = false;
+  enableDropDown: boolean = false;
   deleteRelationArray = [];
   relationmappingLabels: RelationLabel[] = [];
   prefixname: string = '';
@@ -78,7 +74,7 @@ export class RelationshipBuilderComponent implements OnInit {
   agent2TableData: any;
   finalRelationName: string = '';
   showApplicationMessage: String = "";
-  listFilter: any;
+  relationshipName: any;
   showDetail: boolean = false;
   noShowDetail: boolean = false;
   noShowDetail2: boolean = false;
@@ -110,21 +106,14 @@ export class RelationshipBuilderComponent implements OnInit {
   correaltionFlag: boolean = true;
   flag: boolean = false;
   displayedToolColumns: any = []
-  selfRelation = false;
+  isSelfRelation: boolean = false;
   labelListDatasourceSelected: any = [];
-  selectsourceproperty: any = new SelectionModel(true, []);
-  selectdestinationproperty: any = new SelectionModel(true, []);
   labelSourceListDatasourceSelected: any = []
   constructor(private router: Router, private relationshipBuilderService: RelationshipBuilderService, private dialog: MatDialog, public messageDialog: MessageDialogService, private dataShare: DataSharedService) {
     this.dataDictionaryInfo();
     this.getCorrelation();
     this.displayedToolColumns = ['checkbox', 'toolproperties']
-    this.isSaveEnabled = true;
   }
-  /*  setToggle(selfRelation) {
-     console.log(selfRelation);
-     this.selfRelation = selfRelation;
-   } */
 
   ngOnInit() {
   }
@@ -171,7 +160,6 @@ export class RelationshipBuilderComponent implements OnInit {
         this.showDetail = true;
         this.noShowDetail = false;
         this.agent1TableData = usersResponseData1.data;
-
       } else {
         this.noShowDetail = true;
         this.showDetail = false;
@@ -272,7 +260,7 @@ export class RelationshipBuilderComponent implements OnInit {
         var sourceToolName = (element.sourceToolName);
         var flag = (element.enableCorrelation);
         //var detailProp = '<b>' + element.sourceToolName + '</b>:' + element.sourceFields + ':<b>' + element.destinationToolName + '</b>:' + element.destinationFields;
-        let relationLabel = new RelationLabel(destinationToolName, sourceToolName, element.relationName, element.sourceFields, element.destinationFields, element.relationship_properties, flag, this.selfRelation);
+        let relationLabel = new RelationLabel(destinationToolName, sourceToolName, element.relationName, element.sourceFields, element.destinationFields, element.relationship_properties, flag, element.isSelfRelation);
         this.relationmappingLabels.push(relationLabel);
         this.sourcecheck.push(sourceToolName);
       }
@@ -407,18 +395,20 @@ export class RelationshipBuilderComponent implements OnInit {
   }
 
   Refresh() {
+    this.fieldDestProp = [];
+    this.fieldSourceProp = [];
+    this.property1selected = false;
+    this.property2selected = false;
     this.showDetail = false;
     this.showDetail2 = false;
     this.agentDataSource = [];
     this.selectedProperty1 = "";
     this.selectedProperty2 = "";
-    this.selectdestinationproperty = "";
-    this.selectsourceproperty = "";
     this.searchValue = null;
     this.selectedRadio = "";
     this.isbuttonenabled = false;
     this.isSaveEnabled = false;
-    this.listFilter = "";
+    this.relationshipName = "";
     this.isrefresh = false;
     this.buttonOn = false;
     this.selectedSourceTool = "";
@@ -429,6 +419,8 @@ export class RelationshipBuilderComponent implements OnInit {
     this.radioRefresh = false;
     this.selectRelation = "";
     this.flagcolour = 2;
+    this.agent2TableData = [];
+    this.agent1TableData = [];
   }
 
   relationDelete() {
@@ -487,14 +479,16 @@ export class RelationshipBuilderComponent implements OnInit {
 
   }
 
-  enableSaveProperty1() {
+  enableSaveProperty1(row) {
+    this.fieldSourceProp.push(row);
     this.property1selected = true;
     if (this.property2selected == true) {
       this.isSaveEnabled = true;
     }
   }
 
-  enableSaveProperty2() {
+  enableSaveProperty2(row) {
+    this.fieldDestProp.push(row);
     this.property2selected = true;
     if (this.property1selected == true) {
       this.isSaveEnabled = true;
@@ -518,20 +512,20 @@ export class RelationshipBuilderComponent implements OnInit {
     this.isListView = true;
     this.isEditData = true;
     var counter = 0;
-    var checkname = this.regex.test(newName.value);
-    if (!checkname) {
+    var checkname = this.regex.test(newName);
+    if (newName == "" || newName == undefined || !checkname) {
       newName = undefined;
-      this.messageDialog.showApplicationsMessage("Please enter valid name, and it contains only alphanumeric character and underscore ", "ERROR");
+      this.messageDialog.showApplicationsMessage("Please enter valid name, and it should contain only alphanumeric characters and underscore ", "ERROR");
     }
     else if ((this.selectedDestinationLabel || this.selectedSourceLabel) == undefined) {
       this.messageDialog.showApplicationsMessage("Label Name cannot be null", "ERROR");
     }
-    else if ((this.selectsourceproperty.selected || this.selectdestinationproperty.selected) == "") {
+    else if ((this.fieldSourceProp || this.fieldDestProp) == []) {
       this.messageDialog.showApplicationsMessage("Fields value cannot be null", "ERROR");
     }
     else {
       this.prefixname = "FROM_" + this.selectedSourceLabel.toolName + "_TO_" + this.selectedDestinationLabel.toolName + "_";
-      this.finalRelationName = this.prefixname + newName.value;
+      this.finalRelationName = this.prefixname + newName;
       this.count = 0;
       for (var x in this.destinationcheck) {
         if ((this.destinationcheck[x] == this.selectedDestinationLabel.toolName) && (this.sourcecheck[x] == this.selectedSourceLabel.toolName)) {
@@ -541,41 +535,36 @@ export class RelationshipBuilderComponent implements OnInit {
       }
       if (this.count == 0) {
         var title = "Save Co-Relation";
-        var dialogmessage = "You are creating a new Co-Relation " + "<b>" + this.finalRelationName + "</b>" + " between <b>" + this.selectedSourceTool.toolName + "</b> and  <b> " + this.selectedDestinationTool.toolName + "</b> . Are you sure do you want to build the Co-Relation <b>" + this.finalRelationName + "</b> ?";
+        var dialogmessage = "You are creating a new Co-Relation " + "<b>" + this.finalRelationName + "</b>" + " between <b>" + this.selectedSourceLabel.toolName + "</b> and  <b> " + this.selectedDestinationLabel.toolName + "</b> . Are you sure do you want to build the Co-Relation <b>" + this.finalRelationName + "</b> ?";
         const dialogRef = this.messageDialog.showConfirmationMessage(title, dialogmessage, this.selectRelation, "ALERT", "40%");
         dialogRef.afterClosed().subscribe(result => {
           if (result == 'yes') {
             //DESTINATION
-            for (var j of this.selectdestinationproperty.selected) {
-              this.fieldDestProp.push(j);
-            }
+
             var res = [];
             for (var x in this.selectedDestinationLabel) {
               this.selectedDestinationLabel.hasOwnProperty(x) && res.push(this.selectedDestinationLabel[x])
             }
-            var toolname = res[0];
-            var toolcatergory = res[1];
-            var labelName = res[2];
-            this.AddDestination = { 'toolName': toolname, 'toolCategory': toolcatergory, 'labelName': labelName, 'fields': this.fieldDestProp };
+            var destToolname = res[0];
+            var destCategory = res[1];
+            var destLabel = res[2];
+            this.AddDestination = { 'toolName': destToolname, 'toolCategory': destCategory, 'labelName': destLabel, 'fields': this.fieldDestProp };
             //FOR SOURCE 
-            for (var i of this.selectsourceproperty.selected) {
-              this.fieldSourceProp.push(i);
-            }
+
             var res1 = [];
             for (var x in this.selectedSourceLabel) {
               this.selectedSourceLabel.hasOwnProperty(x) && res1.push(this.selectedSourceLabel[x])
             }
-            var toolname1 = res1[0];
-            var toolcatergory1 = res1[1];
-            var labelName1 = res1[2];
-            if (toolname1 == toolname) {
-              this.selfRelation = true;
+            var sourceToolName = res1[0];
+            var sourceCategory = res1[1];
+            var sourceLabel = res1[2];
+            if (sourceToolName == destToolname) {
+              this.isSelfRelation = true;
             }
-            this.AddSource = { 'toolName': toolname1, 'toolCategory': toolcatergory1, 'labelName': labelName1, 'fields': this.fieldSourceProp };
+            this.AddSource = { 'toolName': sourceToolName, 'toolCategory': sourceCategory, 'labelName': sourceLabel, 'fields': this.fieldSourceProp };
             var newData = {
-              'destination': this.AddDestination, 'source': this.AddSource, 'relationName': this.finalRelationName, 'relationship_properties': this.propertyList, 'selfRelation': this.selfRelation
-            }
-
+              'destination': this.AddDestination, 'source': this.AddSource, 'relationName': this.finalRelationName, 'relationship_properties': this.propertyList, 'isSelfRelation': this.isSelfRelation
+            };
             var addMappingJson = JSON.stringify(newData);
             this.relationshipBuilderService.saveCorrelationConfig(addMappingJson).then(
               (corelationResponse2) => {
@@ -583,10 +572,12 @@ export class RelationshipBuilderComponent implements OnInit {
                   this.getCorrelation();
                   var dialogmessage = "<b>" + this.finalRelationName + "</b> saved successfully."
                   this.messageDialog.showApplicationsMessage(dialogmessage, "SUCCESS");
+                  this.isSelfRelation = false;
                   this.Refresh();
                 }
                 else {
                   this.messageDialog.showApplicationsMessage(corelationResponse2.message, "ERROR");
+                  this.isSelfRelation = false;
                 }
               });
 

@@ -63,8 +63,8 @@ public class CorrelationConfiguration {
 	@Column(name = "RELATION_NAME", unique = true, nullable = false)
 	private String relationName;
 
-	@Column(name = "SELF_TOOL_RELATION")
-	private Boolean selfRelation;
+	@Column(name = "IS_SELF_TOOL_RELATION")
+	private boolean isSelfRelation = false;
 
 	public int getId() {
 		return id;
@@ -162,12 +162,11 @@ public class CorrelationConfiguration {
 		this.enableCorrelation = enableCorrelation;
 	}
 
-	public Boolean getSelfRelation() {
-		return selfRelation;
+	public boolean isSelfRelation() {
+		return isSelfRelation;
 	}
 
-	public void setSelfRelation(Boolean selfRelation) {
-		this.selfRelation = selfRelation;
+	public void setSelfRelation(boolean isSelfRelation) {
+		this.isSelfRelation = isSelfRelation;
 	}
-
 }

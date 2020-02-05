@@ -38,7 +38,7 @@
 
                     <mat-select [(ngModel)]="selectedSourceLabel" [style.width.%]="18" [style.margin-left.%]="2"
                         (ngModelChange)="loadAgent1Info(selectedSourceLabel)" name="selectedLabels" required
-                        placeholder="Select Source Label" [ngClass]="{  'input-disabled' : readChange2 ,  'form-control': !readChange2}">
+                        placeholder="Select Source Label" [ngClass]="{  'input-disabled' : enableDropDown ,  'form-control': !enableDropDown}">
                         <mat-option [disabled]="data2 === selectedDestinationTool" *ngFor="let data2 of labelSourceListDatasourceSelected"
                             [value]="data2" style="color:#0033A0">
                             {{data2.labelName}} </mat-option>
@@ -58,7 +58,7 @@
                     </mat-select>
                     <mat-select [(ngModel)]="selectedDestinationLabel" [style.width.%]="18" [style.margin-left.%]="1.5"
                         (ngModelChange)="loadAgent1Info2(selectedDestinationLabel)" name="selectedDestinationLabel"
-                        required placeholder="Select Destination Label" [ngClass]="{  'input-disabled' : readChange2 ,  'form-control': !readChange2}">
+                        required placeholder="Select Destination Label" [ngClass]="{  'input-disabled' : enableDropDown ,  'form-control': !enableDropDown}">
                         <mat-option *ngFor="let data1 of labelDestListDatasourceSelected" [value]="data1" style="color:#0033A0">
                             {{data1.labelName}} </mat-option>
                     </mat-select>
@@ -71,7 +71,7 @@
                 <mat-icon title="{{ (flag)? 'Disable Correlation' : 'Enable Correlation'}}" [ngClass]="{ 'flagTrue' : (flagcolour == 1) , 'flagFalse': (flagcolour == 0)}">
                     flag </mat-icon>
             </button>
-            <button mat-icon-button (click)="saveData(newName)" [disabled]="!isSaveEnabled || !listFilter">
+            <button mat-icon-button (click)="saveData(relationshipName)" [disabled]="!isSaveEnabled">
                 <mat-icon title="Save " class="mat-icon material-icons">
                     save </mat-icon>
             </button>
@@ -151,8 +151,7 @@
                 <b matTooltip="A prefix FROM_SOURCETOOL_TO_DESTINATIONTOOL_ will be added to the Co-Relation name you input">&nbsp;
                     Tool Properties</b>
             </div>
-            <input type="text" class="inputcss" #newName [(ngModel)]='listFilter' [value]="searchValue" required
-                placeholder="   Please input a Co-Relation name">
+            <input type="text" class="inputcss" [(ngModel)]='relationshipName' [value]="searchValue" required placeholder="   Please input a Co-Relation name">
             <button mat-raised-button [disabled]="(noShowDetail||noShowDetail2||!selectedSourceTool || !selectedDestinationTool||buttonOn) "
                 (click)="showDetailsDialogForNeo4j(selectedSourceTool,selectedDestinationTool)" class="Neo4jDataButtonCss">Co-Relations
                 in Neo4j</button>
@@ -182,8 +181,7 @@
                         <ng-container matColumnDef="checkbox">
                             <th mat-header-cell *matHeaderCellDef></th>
                             <td *matCellDef="let row">
-                                <mat-checkbox color="primary" (click)="$event.stopPropagation() " (change)="$event ? selectsourceproperty.toggle(row) : null"
-                                    [checked]="selectsourceproperty.isSelected(row)">
+                                <mat-checkbox color="primary" (click)="$event.stopPropagation() " (change)="enableSaveProperty1(row)">
                                 </mat-checkbox>
                             </td>
                         </ng-container>
@@ -209,8 +207,7 @@
                         <ng-container matColumnDef="checkbox">
                             <th mat-header-cell *matHeaderCellDef></th>
                             <td *matCellDef="let row">
-                                <mat-checkbox color="primary" (click)="$event.stopPropagation() " (change)="$event ? selectdestinationproperty.toggle(row) : null"
-                                    [checked]="selectdestinationproperty.isSelected(row)">
+                                <mat-checkbox color="primary" (click)="$event.stopPropagation() " (change)="enableSaveProperty2(row)">
                                 </mat-checkbox>
                             </td>
                         </ng-container>

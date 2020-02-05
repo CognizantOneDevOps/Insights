@@ -584,7 +584,7 @@ th {
 
 .agentTableDatacss {
 	display: grid;
-	max-height: 37vh;
+	max-height: 35vh;
 	overflow: auto;
 	font-size: 14px !important;
 	margin-left: 7px

@@ -27,10 +27,10 @@ import com.cognizant.devops.platformcommons.constants.ConfigOptions;
 
 public class CorrelationBuilderTestData {
 
-	String saveDataConfig = "{\"data\":[{\"destination\":{\"toolName\":\"JIRA\",\"toolCategory\":\"ALM\",\"fields\":[\"jir_priority\"]},\"source\":{\"toolName\":\"BITBUCKET\",\"toolCategory\":\"SCM\",\"fields\":[\"bit_commiTime\"]},\"relationName\":\"FROM_BITBUCKET_TO_JIRA_test\"}]}";
+	String saveDataConfig = "{\"destination\":{\"toolName\":\"PIVOTALTRACKER\",\"toolCategory\":\"ALM\",\"labelName\":\"PIVOTALTRACKER\",\"fields\":[\"projectId\"]},\"source\":{\"toolName\":\"PIVOTALTRACKER\",\"toolCategory\":\"ALM\",\"labelName\":\"PIVOTALTRACKER\",\"fields\":[\"storyId\"]},\"relationName\":\"FROM_PIVOTALTRACKER_TO_PIVOTALTRACKER_Testing\",\"relationship_properties\":[],\"selfRelation\":true}";
 	String getConfigDetails = "[{\"destination\":{\"toolName\":\"JIRA\",\"toolCategory\":\"ALM\",\"fields\":[\"jir_priority\"]},\"source\":{\"toolName\":\"BITBUCKET\",\"toolCategory\":\"SCM\",\"fields\":[\"bit_commiTime\"]},\"relationName\":\"FROM_BITBUCKET_TO_JIRA_test\"}]";
-	String UpdateConfigDetails = "{\"relationName\":\"FROM_BITBUCKET_TO_JIRA_test\",\"correlationFlag\":true}";
-	String DeleteConfigDetails = "{\"relationName\":\"FROM_BITBUCKET_TO_JIRA_test\",\"correlationFlag\":false}";
+	String UpdateConfigDetails = "{\"relationName\":\"FROM_PIVOTALTRACKER_TO_PIVOTALTRACKER_Testing\",\"correlationFlag\":true}";
+	String DeleteConfigDetails = "{\"relationName\":\"FROM_PIVOTALTRACKER_TO_PIVOTALTRACKER_Testing\",\"correlationFlag\":false}";
 
 	public static void resetConfig(String configDetails) throws IOException {
 		// TODO Auto-generated method stub

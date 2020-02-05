@@ -73,6 +73,9 @@ public class CorrelationExecutor {
 			}
 			for (CorrelationConfiguration correlation : correlations) {
 				log.debug(" Correlation started for " + correlation.getRelationName());
+				if(correlation.isSelfRelation()) {
+					continue;
+				}
 				updateNodesMissingCorrelationFields(correlation);
 				int availableRecords = 1;
 				while (availableRecords > 0) {
@@ -91,25 +94,6 @@ public class CorrelationExecutor {
 			log.error("Correlation configuration is not provided in server-config.json.");
 		}
 	}
-
-	/**
-	 * Identify the correlation fields and add index for these fields
-	 * 
-	 * @param correlation
-	 */
-	/*
-	 * private void applyFieldIndices(Correlation correlation) { CorrelationNode
-	 * source = correlation.getSource(); String sourceToolName =
-	 * source.getToolName(); List<String> sourceFields = source.getFields(); for
-	 * (String sourceField : sourceFields) {
-	 * Neo4jFieldIndexRegistry.getInstance().syncFieldIndex(sourceToolName,
-	 * sourceField); } CorrelationNode destination = correlation.getDestination();
-	 * String destinationToolName = destination.getToolName(); List<String>
-	 * destinationFields = destination.getFields(); for (String destinationField :
-	 * destinationFields) {
-	 * Neo4jFieldIndexRegistry.getInstance().syncFieldIndex(destinationToolName,
-	 * destinationField); } }
-	 */
 
 	/**
 	 * Update the destination node max time where the correlation fields are
@@ -157,6 +141,7 @@ public class CorrelationExecutor {
 	 * @return
 	 */
 	private List<JsonObject> loadDestinationData(CorrelationConfiguration correlation) {
+		log.debug(" In loadDestinationData, lastCorrelationTime " +lastCorrelationTime +" maxCorrelationTime  "+ maxCorrelationTime +" currentCorrelationTime "+currentCorrelationTime);
 		List<JsonObject> destinationDataList = null;
 		String destinationLabelName = correlation.getDestinationLabelName();
 		List<String> destinationFields = Arrays.asList(correlation.getDestinationFields().split("\\s*,\\s*"));
