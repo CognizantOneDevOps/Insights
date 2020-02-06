@@ -99,14 +99,14 @@ public class DataDictionaryServiceImpl implements DataDictionaryService {
 	}
 
 	@Override
-	public JsonObject getToolsRelationshipAndProperties(String startToolName, String startToolCategory,
-			String endToolName, String endToolCatergory) {
+	public JsonObject getToolsRelationshipAndProperties(String startLabelName, String startToolCategory,
+			String endLabelName, String endToolCatergory) {
 		JsonObject toolsRealtionJson = new JsonObject();
 		try {
 			String toolsRelationshipQuery = DataDictionaryConstants.GET_TOOLS_RELATIONSHIP_QUERY;
 			GraphResponse graphResponse = neo4jDBHandler.executeCypherQuery(toolsRelationshipQuery
-					.replace("__StartToolCategory__", startToolCategory).replace("__StartToolName__", startToolName)
-					.replace("__EndToolCategory__", endToolCatergory).replace("__EndToolName__", endToolName));
+					.replace("__StartToolCategory__", startToolCategory).replace("__StartLabelName__", startLabelName)
+					.replace("__EndToolCategory__", endToolCatergory).replace("__EndLabelName__", endLabelName));
 			JsonObject jsonResponse = graphResponse.getJson();
 			Iterator<JsonElement> iterator = jsonResponse.get("results").getAsJsonArray().iterator().next()
 					.getAsJsonObject().get("data").getAsJsonArray().iterator().next().getAsJsonObject().get("row")

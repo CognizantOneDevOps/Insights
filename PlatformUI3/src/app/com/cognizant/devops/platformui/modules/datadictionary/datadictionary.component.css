@@ -88,6 +88,8 @@ table tr:last-child td:last-child {
     vertical-align: sub;
     width: 10%;
     overflow: auto; 
+    min-width: 15%;
+    margin-bottom: 0%;
 }
 
 
