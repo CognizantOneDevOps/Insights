@@ -14,7 +14,7 @@
  * the License.
  ******************************************************************************/
 
-export class AgentMappingLabel {
+export class ToolLabelMapping {
     id: number;
     key: string;
     value: any;

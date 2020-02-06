@@ -21,6 +21,6 @@ import com.google.gson.JsonObject;
 public interface DataDictionaryService {
 	public JsonObject getToolsAndCategories();
 	public JsonObject getToolProperties( String labelName, String categoryName);
-	public JsonObject getToolsRelationshipAndProperties(String startToolName, String startToolCategory, String endToolName, String endToolCatergory);
+	public JsonObject getToolsRelationshipAndProperties(String startLabelName, String startToolCategory, String endLabelName, String endToolCatergory);
 	
 }
