@@ -41,7 +41,7 @@ class MessageFactory:
             connection = pika.BlockingConnection(pika.ConnectionParameters(credentials=credentials,host=self.host))
             channel = connection.channel()
             channel.exchange_declare(exchange=self.exchange, exchange_type='topic', durable=True)
-            channel.basic_consume(callback,queue=routingKey)
+            channel.basic_consume(routingKey,callback)
             channel.start_consuming()
         if seperateThread:
             _thread.start_new_thread(subscriberThread, ())

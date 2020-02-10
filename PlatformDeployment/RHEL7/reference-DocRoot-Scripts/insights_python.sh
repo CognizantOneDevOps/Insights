@@ -22,9 +22,9 @@ cd /opt
 sudo mkdir python && cd python && sudo wget https://platform.cogdevops.com/insights_install/installationScripts/latest/RHEL/python/Python-2.7.11.tgz
 sudo tar -zxf Python-2.7.11.tgz && cd Python-2.7.11 && sudo yum install gcc -y && sudo ./configure --prefix=/opt/
 sudo make install && cd .. && sudo wget https://platform.cogdevops.com/insights_install/installationScripts/latest/RHEL/python/get-pip.py
-python -version
+python --version
 sudo python get-pip.py
-sudo pip install pika==0.12.0
+sudo pip install pika==1.1.0
 sudo pip install requests apscheduler python-dateutil xmltodict pytz requests_ntlm boto3
 sleep 5
 
