@@ -64,16 +64,6 @@
 		</dependency>
 	</dependencies>
 	<build>
-		<resources>
-			<resource>
-				<filtering>true</filtering>
-				<directory>${project.basedir}/../</directory>
-				<targetPath>${project.build.directory}/classes/</targetPath>
-				<includes>
-					<include>OneDevOpInsights*.pdf</include>
-				</includes>
-			</resource>
-		</resources>
 		<plugins>
 			<plugin>
 				<artifactId>maven-resources-plugin</artifactId>
@@ -91,13 +81,45 @@
 								<resource>
 									<directory>/target/</directory>
 									<includes>
+										<include>${project.name}.jar</include>
+									</includes>
+								</resource>
+							</resources>
+						</configuration>
+					</execution>
+					<execution>
+						<id>copy-resources-root-home</id>
+						<phase>validate</phase>
+						<goals>
+							<goal>resources</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>${project.build.directory}</outputDirectory>
+							<resources>
+								<resource>
+									<directory>${project.basedir}/../</directory>
+									<filtering>true</filtering>
+									<includes>
 										<include>OneDevOpInsights*.pdf</include>
 									</includes>
 								</resource>
+							</resources>
+						</configuration>
+					</execution>
+					<execution>
+						<id>copy-resources-home-class</id>
+						<phase>validate</phase>
+						<goals>
+							<goal>resources</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>${project.build.directory}/classes/</outputDirectory>
+							<resources>
 								<resource>
-									<directory>/target/</directory>
+									<directory>${project.basedir}/target/</directory>
+									<filtering>true</filtering>
 									<includes>
-										<include>${project.name}.jar</include>
+										<include>OneDevOpInsights*.pdf</include>
 									</includes>
 								</resource>
 							</resources>
