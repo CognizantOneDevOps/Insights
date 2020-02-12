@@ -46,17 +46,17 @@
 			<version>2.11.1</version>
 		</dependency>
 
-	<dependency>
-		<groupId>org.hyperledger.fabric-sdk-java</groupId>
-		<artifactId>fabric-sdk-java</artifactId>
-		<version>1.4.4</version>
-		<exclusions>
-			<exclusion>
-				<groupId>log4j</groupId>
-				<artifactId>log4j</artifactId>
-			</exclusion>
-		</exclusions>
-	</dependency>
+		<dependency>
+			<groupId>org.hyperledger.fabric-sdk-java</groupId>
+			<artifactId>fabric-sdk-java</artifactId>
+			<version>1.4.4</version>
+			<exclusions>
+				<exclusion>
+					<groupId>log4j</groupId>
+					<artifactId>log4j</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
 		<dependency>
 			<groupId>com.cognizant.devops</groupId>
 			<artifactId>PlatformCommons</artifactId>
@@ -75,16 +75,6 @@
 
 	</dependencies>
 	<build>
-		<resources>
-			<resource>
-				<filtering>true</filtering>
-				<directory>${project.basedir}/../</directory>
-				<targetPath>${project.build.directory}/classes/</targetPath>
-				<includes>
-					<include>OneDevOpInsights*.pdf</include>
-				</includes>
-			</resource>
-		</resources>
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -115,12 +105,12 @@
 			</plugin>
 			<plugin>
 				<artifactId>maven-resources-plugin</artifactId>
-				<version>2.4.3</version>
+				<version>3.1.0</version>
 				<executions>
 					<execution>
 						<id>copy-resources</id>
 
-						<phase>package</phase>
+						<phase>validate</phase>
 						<goals>
 							<goal>copy-resources</goal>
 						</goals>
@@ -139,6 +129,44 @@
 									<directory>/target/</directory>
 									<includes>
 										<include>${project.name}.jar</include>
+									</includes>
+								</resource>
+							</resources>
+						</configuration>
+					</execution>
+					<execution>
+						<id>copy-resources-root-home</id>
+						<phase>validate</phase>
+						<goals>
+							<goal>resources</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>${project.build.directory}</outputDirectory>
+							<resources>
+								<resource>
+									<directory>${project.basedir}/../</directory>
+									<filtering>true</filtering>
+									<includes>
+										<include>OneDevOpInsights*.pdf</include>
+									</includes>
+								</resource>
+							</resources>
+						</configuration>
+					</execution>
+					<execution>
+						<id>copy-resources-home-class</id>
+						<phase>validate</phase>
+						<goals>
+							<goal>resources</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>${project.build.directory}/classes/</outputDirectory>
+							<resources>
+								<resource>
+									<directory>${project.basedir}/target/</directory>
+									<filtering>true</filtering>
+									<includes>
+										<include>OneDevOpInsights*.pdf</include>
 									</includes>
 								</resource>
 							</resources>
