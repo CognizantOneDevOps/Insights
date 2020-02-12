@@ -177,6 +177,7 @@ public class LambdaFunctionHandler implements RequestHandler<Object, String> {
 			responseCode = con.getResponseCode();
 		} catch (IOException e) {
 			logger.error("Error ouccured while send message to WebHook endpoint" + e.toString());
+			deleteObject = false;
 		}
 		return responseCode;
 
