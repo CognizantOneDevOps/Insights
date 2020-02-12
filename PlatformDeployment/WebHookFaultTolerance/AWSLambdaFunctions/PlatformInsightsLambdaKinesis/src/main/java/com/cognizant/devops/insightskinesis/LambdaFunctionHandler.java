@@ -91,6 +91,8 @@ public class LambdaFunctionHandler implements RequestHandler<KinesisFirehoseEven
 				} catch (IOException e) {
 					log.error(e);
 					log.error("Error ouccured while send message to WebHook endpoint" + e.toString());
+					Record transRecord = new Record(record.getRecordId(), Result.Ok, bufferData);
+					transRecords.add(transRecord);
 				}
 			}
 			else {
