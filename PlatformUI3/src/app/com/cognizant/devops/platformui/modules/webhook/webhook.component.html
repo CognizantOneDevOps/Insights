@@ -34,22 +34,22 @@
     <div>
         <div class="btnAlign">
             <button [disabled]="!enableaddWebhook" mat-icon-button (click)="addWebHook()">
-                <mat-icon title="Add New WebHook" class="mat-icon material-icons">
+                <mat-icon title="Add New WebHook" style="margin-top: 10%;" class="mat-icon material-icons">
                     <!--usingBtnCss usingBtnCss-->
                     add_circle
                 </mat-icon>
             </button>
             <button [disabled] *ngIf="!enableWebhookicon" mat-icon-button>
-                <mat-icon svgIcon="webhookDeactive" title="List Existing Webhooks" class="mat-icon material-icons">
+                <mat-icon svgIcon="webhookDeactive" title="List Existing Webhooks" style="margin-bottom: 20%;" class="mat-icon material-icons">
 
                 </mat-icon>
             </button>
             <button *ngIf="enableWebhookicon" mat-icon-button (click)="list()">
-                <mat-icon svgIcon="webhook" title="List Existing WebHooks" class="mat-icon material-icons">
+                <mat-icon svgIcon="webhook" title="List Existing WebHooks" style="margin-bottom: 20%;" class="mat-icon material-icons">
                 </mat-icon>
             </button>
             <button [disabled]="!enablesubscribe" mat-icon-button (click)="actionSubscribeOrUnsubscribe( true,selectedWebhook)">
-                <mat-icon title="Subscribe" class="mat-icon material-icons">
+                <mat-icon title="Subscribe" style="margin-top: 12%;" class="mat-icon material-icons">
                     rss_feed
                 </mat-icon>
             </button>
@@ -69,27 +69,27 @@
                 </mat-icon>
             </button>
             <button [disabled]="!showAddWebHook" mat-icon-button (click)="saveData(webhookName, selectedTool, labelDisplay, dataformat, mqchannel,responseTemplate)">
-                <mat-icon title="Save" class="mat-icon material-icons">
+                <mat-icon title="Save" style="margin-top: 12%;" class="mat-icon material-icons">
                     save
                 </mat-icon>
             </button>
             <button mat-icon-button (click)="uninstallWebHook()" [disabled]="!enableDelete">
-                <mat-icon title="Delete" class="mat-icon material-icons">
+                <mat-icon title="Delete" style="margin-bottom: -10%;"class="mat-icon material-icons">
                     delete
                 </mat-icon>
             </button>
             <button *ngIf="enableDelete" mat-icon-button>
-                <mat-icon class="svgIconCssCopyClipboard" (click)="copyInputMessage(selectedWebhook)" [ngxClipboard]="value_to_copy"
+                <mat-icon class="svgIconCssCopyClipboard" style="margin-top: 10%;" (click)="copyInputMessage(selectedWebhook)" [ngxClipboard]="value_to_copy"
                     title="Copy the Webhook Url to Clipboard" svgIcon="webhookCopyClipboard">
                 </mat-icon>
             </button>
             <button disabled *ngIf="!enableDelete" mat-icon-button>
-                <mat-icon class="svgIconCssCopyClipboardDisable" (click)="copyInputMessage(selectedWebhook)"
+                <mat-icon class="svgIconCssCopyClipboardDisable" style="margin-top: 10%;" (click)="copyInputMessage(selectedWebhook)"
                     [ngxClipboard]="value_to_copy" svgIcon="webhookCopyClipboard">
                 </mat-icon>
             </button>
             <button mat-icon-button (click)="Refresh()" [disabled]="!enableRefresh">
-                <mat-icon title="Refresh" class="mat-icon material-icons">
+                <mat-icon title="Refresh" style="margin-top: 10%;" class="mat-icon material-icons">
                     cancel
                 </mat-icon>
             </button>

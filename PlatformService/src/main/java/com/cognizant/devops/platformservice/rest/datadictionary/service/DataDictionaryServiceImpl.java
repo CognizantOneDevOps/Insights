@@ -63,7 +63,7 @@ public class DataDictionaryServiceImpl implements DataDictionaryService {
 			}
 			
 		} catch (Exception e) {
-			log.error("Error Caught while capturing Graph Response!" + e);
+			return PlatformServiceUtil.buildFailureResponse(e.toString());
 		}
 		return PlatformServiceUtil.buildSuccessResponseWithData(toolDetailArray);
 	}
@@ -93,7 +93,7 @@ public class DataDictionaryServiceImpl implements DataDictionaryService {
 			JsonArray keysArrayJson = parser.parse(keysArrayStr).getAsJsonArray();
 			toolKeysJson.add("data", keysArrayJson);
 		} catch (Exception e) {
-			log.error("Error Caught while capturing Graph Response!" + e);
+			return PlatformServiceUtil.buildFailureResponse(e.toString());
 		}
 		return PlatformServiceUtil.buildSuccessResponseWithData(toolKeysJson.get("data"));
 	}
@@ -118,7 +118,7 @@ public class DataDictionaryServiceImpl implements DataDictionaryService {
 			dataJson.add("properties", iterator.next().getAsJsonObject());
 			toolsRealtionJson.add("data", dataJson);
 		} catch (Exception e) {
-			log.error("Error Caught while capturing Graph Response!" + e);
+			return PlatformServiceUtil.buildFailureResponse(e.toString());
 		}
 		return PlatformServiceUtil.buildSuccessResponseWithData(toolsRealtionJson.get("data"));
 	}

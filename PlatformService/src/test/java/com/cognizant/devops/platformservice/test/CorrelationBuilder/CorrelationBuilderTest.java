@@ -37,21 +37,21 @@ public class CorrelationBuilderTest extends CorrelationBuilderTestData {
 	}
 
 	@Test(priority = 2)
-	public void testGetCorrelationJson() throws InsightsCustomException {
+	public void testGetAllCorrelations() throws InsightsCustomException {
 
-		String actualOutCome = correlationBuilderImpl.getCorrelationJson().toString();
+		String actualOutCome = correlationBuilderImpl.getAllCorrelations().toString();
 		Assert.assertTrue(correlationBuilderTestData.getConfigDetails.length() > 0);
 	}
 
 	@Test(priority = 3)
-	public void testUpdateJsonConfig() throws InsightsCustomException {
+	public void testUpdateCorrelationStatus() throws InsightsCustomException {
 		Boolean response = correlationBuilderImpl
 				.updateCorrelationStatus(correlationBuilderTestData.UpdateConfigDetails);
 		Assert.assertTrue(response);
 	}
 
 	@Test(priority = 4)
-	public void testDeleteJsonConfig() throws InsightsCustomException {
+	public void testDeleteCorrelation() throws InsightsCustomException {
 		Boolean response = correlationBuilderImpl.deleteCorrelation(correlationBuilderTestData.DeleteConfigDetails);
 		Assert.assertTrue(response);
 	}

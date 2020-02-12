@@ -21,7 +21,7 @@ import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.google.gson.JsonObject;
 import com.cognizant.devops.platformdal.correlationConfig.CorrelationConfiguration;
 public interface CorrelationBuilderService {	
-	public List<CorrelationConfiguration> getCorrelationJson() throws InsightsCustomException;
+	public List<CorrelationConfiguration> getAllCorrelations() throws InsightsCustomException;
 	public JsonObject getNeo4jJson() throws  InsightsCustomException;
 	public Boolean saveConfig(String configDetails)throws InsightsCustomException;
 	public Boolean deleteCorrelation(String relationName)throws InsightsCustomException;

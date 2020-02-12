@@ -46,7 +46,7 @@ public class InsightsCorrelationBuilder {
 	public @ResponseBody JsonObject getCorrelationJson() {
 		List<CorrelationConfiguration> details = new ArrayList<>();
 		try {
-			details = correlationBuilderService.getCorrelationJson();
+			details = correlationBuilderService.getAllCorrelations();
 		} catch (InsightsCustomException e) {
 			return PlatformServiceUtil.buildFailureResponse(e.getMessage());
 		}
