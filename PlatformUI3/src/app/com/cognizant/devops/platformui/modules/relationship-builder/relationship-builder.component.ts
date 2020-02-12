@@ -112,6 +112,7 @@ export class RelationshipBuilderComponent implements OnInit {
   constructor(private router: Router, private relationshipBuilderService: RelationshipBuilderService, private dialog: MatDialog, public messageDialog: MessageDialogService, private dataShare: DataSharedService) {
     this.dataDictionaryInfo();
     this.getCorrelation();
+    console.log(this.selectRelation)
     this.displayedToolColumns = ['checkbox', 'toolproperties']
   }
 
@@ -278,7 +279,7 @@ export class RelationshipBuilderComponent implements OnInit {
       this.clicked = true;
       this.buttonOn = true;
       this.showNoToolsSelectedForCorrelation = true
-      let usersResponseData3 = await this.relationshipBuilderService.loadToolsRelationshipAndProperties(data1.toolName, data1.categoryName, data1.labelName, data2.toolName, data2.categoryName, data2.labelName);
+      let usersResponseData3 = await this.relationshipBuilderService.loadToolsRelationshipAndProperties(data1.categoryName, data1.labelName, data2.categoryName, data2.labelName);
       if (usersResponseData3.data != undefined && usersResponseData3.status == "success") {
         if (usersResponseData3.data["relationName"] != undefined) {
           this.showDetail3 = true;
@@ -375,23 +376,23 @@ export class RelationshipBuilderComponent implements OnInit {
     )
   }
 
-
   showDetailsofCorrelation(selectedRelation) {
-    var isSessionExpired = this.dataShare.validateSession();
-    if (!isSessionExpired) {
-      let showJsonDialog = this.dialog.open(ShowJsonDialog, {
-        panelClass: 'showrelationship-dialog-container',
-        height: '500px',
-        width: '700px',
-        disableClose: true,
-        data:
-        {
-          message: selectedRelation,
-          title: "Relationship Details"
-        }
-
-      });
-    }
+    if (selectedRelation != undefined) {
+      var isSessionExpired = this.dataShare.validateSession();
+      if (!isSessionExpired) {
+        let showJsonDialog = this.dialog.open(ShowJsonDialog, {
+          panelClass: 'showrelationship-dialog-container',
+          height: '500px',
+          width: '700px',
+          disableClose: true,
+          data:
+          {
+            message: selectedRelation,
+            title: "Relationship Details"
+          }
+        });
+      }
+   }
   }
 
   Refresh() {

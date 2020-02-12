@@ -45,7 +45,7 @@ export class BusinessMappingComponent implements OnInit {
   isListView = false;
   noToolsData = false;
   disableAdd = false;
-  filteredToolList =[];
+  filteredToolList:any;
   label: String = undefined;
   toolPropertyList = {};
   selectedToolMappingLabels: ToolLabelMapping[] = [];
@@ -80,10 +80,10 @@ export class BusinessMappingComponent implements OnInit {
   async getToolInfo() {
     try {
       var dictResponse = await this.businessMappingService.loadToolsAndCategories();
-      //console.log(dictResponse);
+      this.filteredToolList = dictResponse.data;
       if (dictResponse != null) {
         for (var key in dictResponse.data) {
-          var toolname =dictResponse.data[key];
+          var toolname =dictResponse.data[key].toolName;
           if(this.toolList.indexOf(toolname)== -1){
             this.toolList.push(toolname);
           }
@@ -101,10 +101,10 @@ export class BusinessMappingComponent implements OnInit {
     this.selectedTool = selectedToolData;
     var self = this;
     this.labelSourceListDatasourceSelected = [];
-    this.toolList.filter(toolData => {
-      if (toolData.toolName == selectedToolData.toolName) {
+    this.filteredToolList.filter(toolData => {
+      if (toolData.toolName == selectedToolData) {
         if (toolData.labelName != null) {
-          this.labelSourceListDatasourceSelected.push(toolData)
+          self.labelSourceListDatasourceSelected.push(toolData)
         }
       }
     } );

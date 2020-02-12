@@ -44,7 +44,7 @@ public class CorrelationBuilderServiceImpl implements CorrelationBuilderService 
 	private static Logger log = LogManager.getLogger(CorrelationBuilderServiceImpl.class);
 
 	@Override
-	public List<CorrelationConfiguration> getCorrelationJson() throws InsightsCustomException {
+	public List<CorrelationConfiguration> getAllCorrelations() throws InsightsCustomException {
 		CorrelationConfigDAL correlationConfigDAL = new CorrelationConfigDAL();
 		List<CorrelationConfiguration> correlationList = new ArrayList<>();
 		try {

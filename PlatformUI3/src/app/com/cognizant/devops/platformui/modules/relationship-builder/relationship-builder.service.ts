@@ -62,9 +62,9 @@ export class RelationshipBuilderService implements IRelationshipBuilderService {
         return this.restCallHandlerService.get("DATA_DICTIONARY_TOOL_PROPERTIES", { 'labelName': labelName, 'categoryName': categoryName });
     }
 
-    loadToolsRelationshipAndProperties(startToolName: string, startToolCategory: string, startLabelName: string, endToolName: string, endToolCatergory: string, endLabelName: string): Promise<any> {
+    loadToolsRelationshipAndProperties(startToolCategory: string, startLabelName: string, endToolCatergory: string, endLabelName: string): Promise<any> {
 
-        return this.restCallHandlerService.get("DATA_DICTIONARY_TOOLS_RELATIONSHIPS", { 'startToolName': startToolName, 'startToolCategory': startToolCategory, 'startLabelName': startLabelName, 'endToolName': endToolName, 'endToolCatergory': endToolCatergory, 'endLabelName': endLabelName });
+        return this.restCallHandlerService.get("DATA_DICTIONARY_TOOLS_RELATIONSHIPS", {'startToolCategory': startToolCategory, 'startLabelName': startLabelName, 'endToolCatergory': endToolCatergory, 'endLabelName': endLabelName });
     }
 
 

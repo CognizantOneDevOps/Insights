@@ -153,7 +153,7 @@
             </div>
             <input type="text" class="inputcss" [(ngModel)]='relationshipName' [value]="searchValue" required placeholder="   Please input a Co-Relation name">
             <button mat-raised-button [disabled]="(noShowDetail||noShowDetail2||!selectedSourceTool || !selectedDestinationTool||buttonOn) "
-                (click)="showDetailsDialogForNeo4j(selectedSourceTool,selectedDestinationTool)" class="Neo4jDataButtonCss">Co-Relations
+                (click)="showDetailsDialogForNeo4j(selectedSourceLabel,selectedDestinationLabel)" class="Neo4jDataButtonCss">Co-Relations
                 in Neo4j</button>
             <button mat-raised-button (click)="showaddPropertyDialog()" class="PopertyButtonCss">Add Relationship
                 Properties</button>
@@ -179,14 +179,14 @@
                     </div>
                     <table *ngIf="showDetail" mat-table [dataSource]="agent1TableData" class="agentTableDatacss">
                         <ng-container matColumnDef="checkbox">
-                            <th mat-header-cell *matHeaderCellDef></th>
+                            <th mat-header-cell style="height:0% !important;" *matHeaderCellDef></th>
                             <td *matCellDef="let row">
                                 <mat-checkbox color="primary" (click)="$event.stopPropagation() " (change)="enableSaveProperty1(row)">
                                 </mat-checkbox>
                             </td>
                         </ng-container>
                         <ng-container matColumnDef="toolproperties">
-                            <th mat-header-cell *matHeaderCellDef></th>
+                            <th mat-header-cell style="height:0% !important;" *matHeaderCellDef></th>
                             <td *matCellDef="let element">{{element}}</td>
                         </ng-container>
                         <tr class="dat-row" mat-header-row *matHeaderRowDef="displayedToolColumns"></tr>

@@ -71,8 +71,8 @@
 
 .inputcss {
 	font-size: 14px !important;
-	margin-left: 18px;
-	width: 240px;
+	margin-left: 1%;
+	width: 45%;
 	margin-top: 10px
 }
 
@@ -249,6 +249,7 @@ th {
 	overflow: hidden;
 	text-overflow: ellipsis;
 	white-space: nowrap;
+	width: 0% !important
 }
 
 .SubHeading {
@@ -480,6 +481,7 @@ th {
 .Neo4jDataButtonCss[disabled] {
 	background-color: #9e9a9a !important;
 	color: #FFFFFF !important;
+	width: 22%;
 }
 
 .mat-dialog-actions-button {
@@ -513,6 +515,7 @@ th {
 	background-color: #0033A0 !important;
 	font-size: 11px;
 	margin-left: 6px;
+	width: 22%;
 }
 
 .PopertyButtonCss {

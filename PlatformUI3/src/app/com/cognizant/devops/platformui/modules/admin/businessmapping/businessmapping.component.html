@@ -35,7 +35,7 @@
       (ngModelChange)="selectLabel(selectedTool)" name="selectedTool" required placeholder="Select Tool"
       [ngClass]="{  'input-disabled' :false  ,  'form-control': true}">
       <mat-option *ngFor="let data of toolList" [value]="data" style="color:#0033A0">
-        {{data.toolName}}
+        {{data}}
       </mat-option>
     </mat-select>
     <mat-select [(ngModel)]="selectedLabel" [style.width.%]="21"
