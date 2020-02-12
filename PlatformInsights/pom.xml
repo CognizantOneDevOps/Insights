@@ -74,6 +74,16 @@
 	</dependencies>
 	<build>
 		<!-- <finalName>PlatformInsights</finalName> -->
+		<resources>
+			<resource>
+				<filtering>true</filtering>
+				<directory>${project.basedir}/../</directory>
+				<targetPath>${project.build.directory}/classes/</targetPath>
+				<includes>
+					<include>OneDevOpInsights*.pdf</include>
+				</includes>
+			</resource>
+		</resources>
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -87,7 +97,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-shade-plugin</artifactId>
-				<version>2.3</version>
+				<version>3.2.1</version>
 				<executions>
 					<execution>
 						<phase>package</phase>
@@ -103,7 +113,6 @@
 									</manifestEntries>
 								</transformer>
 							</transformers>
-							<!-- <finalName>${project.name}</finalName> -->
 							<filters>
 								<filter>
 									<artifact>*:*</artifact>
@@ -112,6 +121,11 @@
 										<exclude>META-INF/*.DSA</exclude>
 										<exclude>META-INF/*.RSA</exclude>
 									</excludes>
+								</filter>
+								<filter>
+									<includes>
+										<include>OneDevOpInsights*.pdf</include>
+									</includes>
 								</filter>
 							</filters>
 						</configuration>
@@ -136,7 +150,6 @@
 									<directory>/target/</directory>
 									<includes>
 										<include>${project.name}.jar</include>
-										<include>OneDevOpInsights v2.17 OpenSource Credit Document v1.0.pdf</include>
 									</includes>
 								</resource>
 							</resources>
@@ -159,15 +172,7 @@
 			</plugin>
 		</plugins>
 
-		<resources>
-			<resource>
-				<directory>src/main/resources</directory>
-				<includes>
-					<include>**/*.*</include>
-				</includes>
-				<filtering>true</filtering>
-			</resource>
-		</resources>
+
 	</build>
 	<properties>
 		<spring.version>5.2.3.RELEASE</spring.version>

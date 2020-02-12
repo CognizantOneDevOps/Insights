@@ -52,6 +52,7 @@
 		<module>PlatformUI3</module>
 		<module>PlatformDeployment/WebHookFaultTolerance/AWSLambdaFunctions/PlatformInsightsLambdaKinesis</module>
 		<module>PlatformDeployment/WebHookFaultTolerance/AWSLambdaFunctions/PlatformInsightsLambdaRetrieval</module>
+		<!--<module>PlatformDeployment/WebHookFaultTolerance/PlatformInsightsAzureWebhook</module>-->
 	</modules>
 	<build>
 		<pluginManagement>
