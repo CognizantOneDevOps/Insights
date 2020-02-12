@@ -24,6 +24,16 @@
 	<description>PlatformInsightsLambdaKinesis for webhook Fault Tolerance</description>
 
 	<build>
+		<resources>
+			<resource>
+				<filtering>true</filtering>
+				<directory>${project.basedir}/../../../../</directory>
+				<targetPath>${project.build.directory}/classes/</targetPath>
+				<includes>
+					<include>OneDevOpInsights*.pdf</include>
+				</includes>
+			</resource>
+		</resources>
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>

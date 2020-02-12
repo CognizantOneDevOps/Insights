@@ -270,15 +270,15 @@
 			<version>7.1.0</version>
 			<exclusions>
 				<exclusion>
-				    <groupId>org.yaml</groupId>
-    				<artifactId>snakeyaml</artifactId>
+					<groupId>org.yaml</groupId>
+					<artifactId>snakeyaml</artifactId>
 				</exclusion>
 			</exclusions>
 		</dependency>
 		<dependency>
-		    <groupId>org.yaml</groupId>
-		    <artifactId>snakeyaml</artifactId>
-		    <version>1.25</version>
+			<groupId>org.yaml</groupId>
+			<artifactId>snakeyaml</artifactId>
+			<version>1.25</version>
 		</dependency>
 		<dependency>
 			<groupId>com.beust</groupId>
@@ -360,11 +360,34 @@
 
 	<build>
 		<finalName>PlatformService</finalName>
+		<resources>
+			<resource>
+				<filtering>true</filtering><!-- if it is neccessary -->
+				<directory>${project.basedir}/../</directory><!-- from -->
+				<targetPath>${project.build.directory}</targetPath><!-- to -->
+				<includes><!-- what **/ -->
+					<include>OneDevOpInsights*.pdf</include>
+				</includes>
+			</resource>
+			<resource>
+				<directory>src/main/resources</directory>
+				<includes>
+					<include>**/*.md</include>
+					<include>**/*.json</include>
+					<include>version.properties</include>
+					<include>*.properties</include>
+					<include>**/*.properties</include>
+					<include>**/*.xml</include>
+					<include>**/*.p12</include>
+				</includes>
+				<filtering>true</filtering>
+			</resource>
+		</resources>
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-war-plugin</artifactId>
-				<version>2.3</version>
+				<version>3.2.3</version>
 				<configuration>
 					<archive>
 						<manifestEntries>
@@ -373,6 +396,15 @@
 						</manifestEntries>
 					</archive>
 					<includeSystemScope>true</includeSystemScope>
+					<webResources>
+						<resource>
+							<directory>${project.build.directory}</directory>
+							<targetPath>WEB-INF/../</targetPath>
+							<includes>
+								<include>**/*.pdf</include>
+							</includes>
+						</resource>
+					</webResources>
 				</configuration>
 			</plugin>
 			<plugin>
@@ -386,22 +418,7 @@
 				</configuration>
 			</plugin>
 		</plugins>
-		<resources>
-			<resource>
-				<directory>src/main/resources</directory>
-				<includes>
-					<include>**/*.md</include>
-					<include>**/*.json</include>
-					<include>version.properties</include>
-					<include>*.properties</include>
-					<include>**/*.properties</include>
-					<include>**/*.xml</include>
-					<include>**/*.p12</include>
-					<include>OneDevOpInsights v2.17 OpenSource Credit Document v1.0.pdf</include>
-				</includes>
-				<filtering>true</filtering>
-			</resource>
-		</resources>
+
 	</build>
 
 </project>

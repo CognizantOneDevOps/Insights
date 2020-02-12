@@ -29,7 +29,16 @@
 	</properties>
 
 	<build>
-		<!-- <finalName>PlatformEngine</finalName> -->
+		<resources>
+			<resource>
+				<filtering>true</filtering>
+				<directory>${project.basedir}/../</directory>
+				<targetPath>${project.build.directory}/classes/</targetPath>
+				<includes>
+					<include>OneDevOpInsights*.pdf</include>
+				</includes>
+			</resource>
+		</resources>
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -83,7 +92,6 @@
 									<includes>
 										<include>log4j2.xml</include>
 										<include>**/*.csv</include>
-										<include>OneDevOpInsights v2.17 OpenSource Credit Document v1.0.pdf</include>
 									</includes>
 									<filtering>true</filtering>
 								</resource>
