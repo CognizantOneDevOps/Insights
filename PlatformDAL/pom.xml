@@ -68,6 +68,10 @@
 							<goal>copy-resources</goal>
 						</goals>
 						<configuration>
+							<encoding>UTF-8</encoding>
+					        <nonFilteredFileExtensions>
+					          <nonFilteredFileExtension>pdf</nonFilteredFileExtension>
+					        </nonFilteredFileExtensions>
 							<outputDirectory>${project.basedir}/target</outputDirectory>
 							<resources>
 								<resource>
@@ -86,6 +90,10 @@
 							<goal>resources</goal>
 						</goals>
 						<configuration>
+							<encoding>UTF-8</encoding>
+					        <nonFilteredFileExtensions>
+					          <nonFilteredFileExtension>pdf</nonFilteredFileExtension>
+					        </nonFilteredFileExtensions>
 							<outputDirectory>${project.build.directory}</outputDirectory>
 							<resources>
 								<resource>

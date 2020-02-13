@@ -362,14 +362,6 @@
 		<finalName>PlatformService</finalName>
 		<resources>
 			<resource>
-				<filtering>true</filtering><!-- if it is neccessary -->
-				<directory>${project.basedir}/../</directory><!-- from -->
-				<targetPath>${project.build.directory}</targetPath><!-- to -->
-				<includes><!-- what **/ -->
-					<include>OneDevOpInsights*.pdf</include>
-				</includes>
-			</resource>
-			<resource>
 				<directory>src/main/resources</directory>
 				<includes>
 					<include>**/*.md</include>
@@ -385,10 +377,43 @@
 		</resources>
 		<plugins>
 			<plugin>
+				<artifactId>maven-resources-plugin</artifactId>
+				<version>3.1.0</version>
+				<executions>
+					<execution>
+						<id>copy-resources-home</id>
+						<phase>validate</phase>
+						<goals>
+							<goal>resources</goal>
+						</goals>
+						<configuration>
+							<encoding>UTF-8</encoding>
+							<nonFilteredFileExtensions>
+								<nonFilteredFileExtension>pdf</nonFilteredFileExtension>
+							</nonFilteredFileExtensions>
+							<outputDirectory>${project.build.directory}</outputDirectory>
+							<resources>
+								<resource>
+									<directory>${project.basedir}/../</directory>
+									<filtering>true</filtering>
+									<includes>
+										<include>OneDevOpInsights*.pdf</include>
+									</includes>
+								</resource>
+							</resources>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-war-plugin</artifactId>
 				<version>3.2.3</version>
 				<configuration>
+					<encoding>UTF-8</encoding>
+					<nonFilteredFileExtensions>
+						<nonFilteredFileExtension>pdf</nonFilteredFileExtension>
+					</nonFilteredFileExtensions>
 					<archive>
 						<manifestEntries>
 							<Specification-Title>${project.name}</Specification-Title>
