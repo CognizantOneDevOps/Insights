@@ -64,7 +64,7 @@ export class RelationshipBuilderService implements IRelationshipBuilderService {
 
     loadToolsRelationshipAndProperties(startToolCategory: string, startLabelName: string, endToolCatergory: string, endLabelName: string): Promise<any> {
 
-        return this.restCallHandlerService.get("DATA_DICTIONARY_TOOLS_RELATIONSHIPS", {'startToolCategory': startToolCategory, 'startLabelName': startLabelName, 'endToolCatergory': endToolCatergory, 'endLabelName': endLabelName });
+        return this.restCallHandlerService.get("DATA_DICTIONARY_TOOLS_RELATIONSHIPS", {'startLabelName': startLabelName, 'startToolCategory': startToolCategory, 'endLabelName': endLabelName, 'endToolCatergory': endToolCatergory});
     }
 
 

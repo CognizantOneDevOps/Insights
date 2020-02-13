@@ -151,10 +151,12 @@
                 <b matTooltip="A prefix FROM_SOURCETOOL_TO_DESTINATIONTOOL_ will be added to the Co-Relation name you input">&nbsp;
                     Tool Properties</b>
             </div>
-            <input type="text" class="inputcss" [(ngModel)]='relationshipName' [value]="searchValue" required placeholder="   Please input a Co-Relation name">
-            <button mat-raised-button [disabled]="(noShowDetail||noShowDetail2||!selectedSourceTool || !selectedDestinationTool||buttonOn) "
+            <input type="text" class="inputcss" [(ngModel)]='relationshipName' [value]="searchValue" required
+                placeholder="   Please input a Co-Relation name">
+            <!--  Co-Relations in Neo4j button is disabled,since it will be replaced By Relationship Additional Operation button's UI! -->
+            <!--  <button mat-raised-button [disabled]="(noShowDetail||noShowDetail2||!selectedSourceTool || !selectedDestinationTool||buttonOn) "
                 (click)="showDetailsDialogForNeo4j(selectedSourceLabel,selectedDestinationLabel)" class="Neo4jDataButtonCss">Co-Relations
-                in Neo4j</button>
+                in Neo4j</button>   -->
             <button mat-raised-button (click)="showaddPropertyDialog()" class="PopertyButtonCss">Add Relationship
                 Properties</button>
             <div class="overflowCSS">

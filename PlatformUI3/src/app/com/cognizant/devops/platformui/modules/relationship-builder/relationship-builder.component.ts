@@ -279,7 +279,7 @@ export class RelationshipBuilderComponent implements OnInit {
       this.clicked = true;
       this.buttonOn = true;
       this.showNoToolsSelectedForCorrelation = true
-      let usersResponseData3 = await this.relationshipBuilderService.loadToolsRelationshipAndProperties(data1.categoryName, data1.labelName, data2.categoryName, data2.labelName);
+      let usersResponseData3 = await this.relationshipBuilderService.loadToolsRelationshipAndProperties(data1.labelName, data1.categoryName, data2.labelName, data2.categoryName);
       if (usersResponseData3.data != undefined && usersResponseData3.status == "success") {
         if (usersResponseData3.data["relationName"] != undefined) {
           this.showDetail3 = true;
@@ -392,7 +392,7 @@ export class RelationshipBuilderComponent implements OnInit {
           }
         });
       }
-   }
+    }
   }
 
   Refresh() {
@@ -418,7 +418,7 @@ export class RelationshipBuilderComponent implements OnInit {
     this.selectedDestinationLabel = ""
     this.dataDictionaryInfo();
     this.radioRefresh = false;
-    this.selectRelation = "";
+    this.selectRelation = undefined;
     this.flagcolour = 2;
     this.agent2TableData = [];
     this.agent1TableData = [];
