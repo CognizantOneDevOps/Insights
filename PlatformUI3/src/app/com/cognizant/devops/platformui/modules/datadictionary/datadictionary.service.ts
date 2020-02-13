@@ -21,7 +21,7 @@ import { Observable } from 'rxjs';
 export interface IDataDictionaryService {
     loadToolsAndCategories(): Promise<any>;
     loadToolProperties(toolName: string, categoryName: string) : Promise<any>;
-    loadToolsRelationshipAndProperties(startToolName: string, startToolCategory: string, endToolName: string, endToolCatergory: string): Promise<any>;
+    loadToolsRelationshipAndProperties(startLabelName: string, startToolCategory: string, endLabelName: string, endToolCatergory: string): Promise<any>;
 }
 
 
