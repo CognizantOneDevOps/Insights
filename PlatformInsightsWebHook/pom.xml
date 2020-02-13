@@ -157,6 +157,10 @@
 							<goal>resources</goal>
 						</goals>
 						<configuration>
+							<encoding>UTF-8</encoding>
+							<nonFilteredFileExtensions>
+								<nonFilteredFileExtension>pdf</nonFilteredFileExtension>
+							</nonFilteredFileExtensions>
 							<outputDirectory>${project.build.directory}</outputDirectory>
 							<resources>
 								<resource>
@@ -176,6 +180,10 @@
 							<goal>resources</goal>
 						</goals>
 						<configuration>
+							<encoding>UTF-8</encoding>
+							<nonFilteredFileExtensions>
+								<nonFilteredFileExtension>pdf</nonFilteredFileExtension>
+							</nonFilteredFileExtensions>
 							<outputDirectory>${project.build.directory}/classes/</outputDirectory>
 							<resources>
 								<resource>
@@ -190,7 +198,7 @@
 					</execution>
 				</executions>
 			</plugin>
-<!-- 			<plugin>
+			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-jar-plugin</artifactId>
 				<version>2.3.2</version>
@@ -202,7 +210,7 @@
 						</manifest>
 					</archive>
 				</configuration>
-			</plugin> -->
+			</plugin>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
