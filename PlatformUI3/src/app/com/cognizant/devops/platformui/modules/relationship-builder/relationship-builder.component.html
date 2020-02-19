@@ -117,19 +117,24 @@
                         </tbody>
                     </table>
                     <span class="NoteCssFirst"><b>Please Note:</b></span> <span class="NoteCss"> Ensure that the
-                        properties selected to build </span><span class="NoteCssNext">Correlation <b>are indexed in
-                            Neo4j</b>
-                        for Optimal
-                        Performance.
+                        properties selected to <span style="margin-left: 2%;">build Correlation
+                            <b>are
+                                indexed
+                                in
+                                Neo4j</b>
+                            for Optimal
+                            <span style="margin-left: 2%;">Performance.</span>
+
+                        </span>
                     </span>
                 </div>
                 <!-- ending-->
             </div>
             <div class="divTablesHeadingLeft">
-                <table mat-table id="myTable" [dataSource]="relationmappingLabels">
-                    <ng-container style="margin-top: 15px;" matColumnDef="radio">
+                <table mat-table id="myTable" [dataSource]="relationmappingLabels" style="margin-top:19%">
+                    <ng-container matColumnDef="radio">
                         <td mat-cell *matCellDef="let element " class="radiobuttonCol">
-                            <mat-radio-group style="margin-top: 15px;" [(ngModel)]="selectRelation">
+                            <mat-radio-group [(ngModel)]="selectRelation">
                                 <mat-radio-button style="margin-top: 15px;" [value]="element" [checked]="radioRefresh"
                                     color="primary" (click)="enableDelete(element)"></mat-radio-button>
                             </mat-radio-group>
@@ -183,7 +188,7 @@
                         <ng-container matColumnDef="checkbox">
                             <th mat-header-cell style="height:0% !important;" *matHeaderCellDef></th>
                             <td *matCellDef="let row">
-                                <mat-checkbox color="primary" (click)="$event.stopPropagation() " (change)="enableSaveProperty1(row)">
+                                <mat-checkbox color="primary" (change)="saveSourceFields(row, $event)">
                                 </mat-checkbox>
                             </td>
                         </ng-container>
@@ -209,7 +214,7 @@
                         <ng-container matColumnDef="checkbox">
                             <th mat-header-cell *matHeaderCellDef></th>
                             <td *matCellDef="let row">
-                                <mat-checkbox color="primary" (click)="$event.stopPropagation() " (change)="enableSaveProperty2(row)">
+                                <mat-checkbox color="primary" (change)="saveDestinationFields(row,$event)">
                                 </mat-checkbox>
                             </td>
                         </ng-container>
