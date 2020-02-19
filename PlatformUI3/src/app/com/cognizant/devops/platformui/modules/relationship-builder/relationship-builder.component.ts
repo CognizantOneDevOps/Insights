@@ -39,9 +39,9 @@ export class RelationshipBuilderComponent implements OnInit {
   deleteRelationArray = [];
   relationmappingLabels: RelationLabel[] = [];
   prefixname: string = '';
-  property1selected: boolean = false;
+  sourcepropertySeleted: boolean = false;
   searchValue: string = '';
-  property2selected: boolean = false;
+  destinationPropertySeleted: boolean = false;
   isbuttonenabled: boolean = false;
   dictResponse: any;
   corelationResponseMaster = [];
@@ -398,8 +398,8 @@ export class RelationshipBuilderComponent implements OnInit {
   Refresh() {
     this.fieldDestProp = [];
     this.fieldSourceProp = [];
-    this.property1selected = false;
-    this.property2selected = false;
+    this.sourcepropertySeleted = false;
+    this.destinationPropertySeleted = false;
     this.showDetail = false;
     this.showDetail2 = false;
     this.agentDataSource = [];
@@ -477,21 +477,40 @@ export class RelationshipBuilderComponent implements OnInit {
     this.isbuttonenabled = true;
     this.isrefresh = true;
     this.disableCorrelation(deleteRelation);
-
   }
 
-  enableSaveProperty1(row) {
-    this.fieldSourceProp.push(row);
-    this.property1selected = true;
-    if (this.property2selected == true) {
+  saveSourceFields(row, $event) {
+    if ($event.checked == true) {
+      this.fieldSourceProp.push(row);
+    }
+    else {
+      var idx = this.fieldSourceProp.indexOf(row);
+      if (idx != -1) {
+        this.fieldSourceProp.splice(idx, 1); // The second parameter is the number of elements to remove.
+
+      }
+    }
+
+    this.sourcepropertySeleted = true;
+    if (this.destinationPropertySeleted == true) {
       this.isSaveEnabled = true;
     }
   }
 
-  enableSaveProperty2(row) {
-    this.fieldDestProp.push(row);
-    this.property2selected = true;
-    if (this.property1selected == true) {
+  saveDestinationFields(row, $event) {
+    if ($event.checked == true) {
+      this.fieldDestProp.push(row);
+    }
+    else {
+      var idx = this.fieldDestProp.indexOf(row);
+      if (idx != -1) {
+        this.fieldDestProp.splice(idx, 1); // The second parameter is the number of elements to remove.
+
+      }
+    }
+
+    this.destinationPropertySeleted = true;
+    if (this.sourcepropertySeleted == true) {
       this.isSaveEnabled = true;
     }
   }

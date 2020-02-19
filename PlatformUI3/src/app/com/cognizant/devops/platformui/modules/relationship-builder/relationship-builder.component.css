@@ -90,6 +90,7 @@
 	font-weight: bold;
 	width: 115% !important;
 	margin-top: 4%;
+	font-size: 1vw;
 }
 
 .tableTextgreyed {
@@ -256,7 +257,7 @@ th {
 	font-size: 18px;
 	color: #0033A0;
 	font-weight: bold;
-	margin-left: 3px;
+	margin-left: 3%;
 	margin-top: 21px;
 }
 
@@ -286,7 +287,7 @@ th {
 
 .NoteCssNext {
 	font-family: inherit;
-	font-size: 13.6px;
+	font-size: 1vw;
 	margin-left: 4px;
 }
 
@@ -616,14 +617,14 @@ th {
 
 .NoteCssFirst {
 	color: #00B140;
-	font-size: 15px;
+	font-size: 1.2vw;
 	font-family: inherit;
-	margin-left: 5px;
+	margin-left: 2%;
 }
 
 .NoteCss {
 	font-family: inherit;
-	font-size: 13.6px;
+	font-size: 1vw;
 }
 
 .column1 {
@@ -648,7 +649,7 @@ th {
 }
 
 .divTablesHeadingLeft {
-	font-size: 16px;
+	font-size: 1.3vw;
 	margin-top: 15%;
 	margin-bottom: 6px;
 	text-align: left;
