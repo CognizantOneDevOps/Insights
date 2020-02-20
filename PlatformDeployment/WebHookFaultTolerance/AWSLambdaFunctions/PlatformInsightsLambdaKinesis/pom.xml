@@ -12,14 +12,14 @@
 	<parent>
 		<artifactId>PlatformParent</artifactId>
 		<groupId>com.cognizant.devops</groupId>
-		<version>6.4</version>
+		<version>6.5-SNAPSHOT</version>
 		<relativePath>../../../../pom.xml</relativePath>
 	</parent>
 
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.cognizant.devops</groupId>
 	<artifactId>PlatformInsightsLambdaKinesis</artifactId>
-	<version>6.4</version>
+	<version>6.5-SNAPSHOT</version>
 	<packaging>jar</packaging>
 	<description>PlatformInsightsLambdaKinesis for webhook Fault Tolerance</description>
 
