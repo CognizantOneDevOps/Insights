@@ -29,35 +29,31 @@ public class CorrelationBuilderTest extends CorrelationBuilderTestData {
 
 	public static final CorrelationBuilderTestData correlationBuilderTestData = new CorrelationBuilderTestData();
 	public static final CorrelationBuilderServiceImpl correlationBuilderImpl = new CorrelationBuilderServiceImpl();
-	
+
 	@Test(priority = 1)
-	public void testGetSaveConfig() throws InsightsCustomException {
-		String config = "success";
-		String response = correlationBuilderImpl.saveConfig(correlationBuilderTestData.saveDataConfig);
-		Assert.assertEquals(config, response);
+	public void testSaveConfig() throws InsightsCustomException {
+		Boolean response = correlationBuilderImpl.saveConfig(correlationBuilderTestData.saveDataConfig);
+		Assert.assertTrue(response);
 	}
 
 	@Test(priority = 2)
-	public void testGetCorrelationJson() throws InsightsCustomException {
+	public void testGetAllCorrelations() throws InsightsCustomException {
 
-		String actualOutCome = correlationBuilderImpl.getCorrelationJson().toString();
-
-		Assert.assertEquals(actualOutCome, correlationBuilderTestData.getConfigDetails);
+		String actualOutCome = correlationBuilderImpl.getAllCorrelations().toString();
 		Assert.assertTrue(correlationBuilderTestData.getConfigDetails.length() > 0);
 	}
 
 	@Test(priority = 3)
-	public void testUpdateJsonConfig() throws InsightsCustomException {
-		String config = "success";
-		String response = correlationBuilderImpl.saveConfig(correlationBuilderTestData.UpdateConfigDetails);
-		Assert.assertEquals(config, response);
+	public void testUpdateCorrelationStatus() throws InsightsCustomException {
+		Boolean response = correlationBuilderImpl
+				.updateCorrelationStatus(correlationBuilderTestData.UpdateConfigDetails);
+		Assert.assertTrue(response);
 	}
 
 	@Test(priority = 4)
-	public void testDeleteJsonConfig() throws InsightsCustomException {
-		String config = "success";
-		String response = correlationBuilderImpl.saveConfig(correlationBuilderTestData.DeleteConfigDetails);
-		Assert.assertEquals(config, response);
+	public void testDeleteCorrelation() throws InsightsCustomException {
+		Boolean response = correlationBuilderImpl.deleteCorrelation(correlationBuilderTestData.DeleteConfigDetails);
+		Assert.assertTrue(response);
 	}
 
 	@AfterTest

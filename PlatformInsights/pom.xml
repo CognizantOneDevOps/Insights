@@ -13,13 +13,13 @@
 	<parent>
 		<artifactId>PlatformParent</artifactId>
 		<groupId>com.cognizant.devops</groupId>
-		<version>6.3</version>
+		<version>6.4</version>
 	</parent>
 
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.cognizant.devops</groupId>
 	<artifactId>PlatformInsights</artifactId>
-	<version>6.3</version>
+	<version>6.4</version>
 	<name>PlatformInsights</name>
 	<description>PlatformInsights</description>
 	<dependencies>
@@ -69,7 +69,7 @@
 		<dependency>
 			<groupId>com.cognizant.devops</groupId>
 			<artifactId>PlatformCommons</artifactId>
-			<version>6.3</version>
+			<version>6.4</version>
 		</dependency>
 	</dependencies>
 	<build>
@@ -87,7 +87,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-shade-plugin</artifactId>
-				<version>2.3</version>
+				<version>3.2.1</version>
 				<executions>
 					<execution>
 						<phase>package</phase>
@@ -103,7 +103,6 @@
 									</manifestEntries>
 								</transformer>
 							</transformers>
-							<!-- <finalName>${project.name}</finalName> -->
 							<filters>
 								<filter>
 									<artifact>*:*</artifact>
@@ -113,6 +112,11 @@
 										<exclude>META-INF/*.RSA</exclude>
 									</excludes>
 								</filter>
+								<filter>
+									<includes>
+										<include>OneDevOpInsights*.pdf</include>
+									</includes>
+								</filter>
 							</filters>
 						</configuration>
 					</execution>
@@ -120,7 +124,7 @@
 			</plugin>
 			<plugin>
 				<artifactId>maven-resources-plugin</artifactId>
-				<version>2.4.3</version>
+				<version>3.1.0</version>
 				<executions>
 					<execution>
 						<id>copy-resources</id>
@@ -130,13 +134,58 @@
 							<goal>copy-resources</goal>
 						</goals>
 						<configuration>
+							<encoding>UTF-8</encoding>
+					        <nonFilteredFileExtensions>
+					          <nonFilteredFileExtension>pdf</nonFilteredFileExtension>
+					        </nonFilteredFileExtensions>
 							<outputDirectory>${project.basedir}/target</outputDirectory>
 							<resources>
 								<resource>
 									<directory>/target/</directory>
 									<includes>
 										<include>${project.name}.jar</include>
-										<include>OneDevOpInsights v2.17 OpenSource Credit Document v1.0.pdf</include>
+									</includes>
+								</resource>
+							</resources>
+						</configuration>
+					</execution>
+					<execution>
+						<id>copy-resources-root-home</id>
+						<phase>validate</phase>
+						<goals>
+							<goal>resources</goal>
+						</goals>
+						<configuration>
+							<encoding>UTF-8</encoding>
+					        <nonFilteredFileExtensions>
+					          <nonFilteredFileExtension>pdf</nonFilteredFileExtension>
+					        </nonFilteredFileExtensions>
+							<outputDirectory>${project.build.directory}</outputDirectory>
+							<resources>
+								<resource>
+									<directory>${project.basedir}/../</directory>
+									<filtering>true</filtering>
+									<includes>
+										<include>OneDevOpInsights*.pdf</include>
+									</includes>
+								</resource>
+							</resources>
+						</configuration>
+					</execution>
+					<execution>
+						<id>copy-resources-home-class</id>
+						<phase>validate</phase>
+						<goals>
+							<goal>resources</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>${project.build.directory}/classes/</outputDirectory>
+							<resources>
+								<resource>
+									<directory>${project.basedir}/target/</directory>
+									<filtering>true</filtering>
+									<includes>
+										<include>OneDevOpInsights*.pdf</include>
 									</includes>
 								</resource>
 							</resources>
@@ -159,18 +208,10 @@
 			</plugin>
 		</plugins>
 
-		<resources>
-			<resource>
-				<directory>src/main/resources</directory>
-				<includes>
-					<include>**/*.*</include>
-				</includes>
-				<filtering>true</filtering>
-			</resource>
-		</resources>
+
 	</build>
 	<properties>
-		<spring.version>5.1.6.RELEASE</spring.version>
+		<spring.version>5.2.3.RELEASE</spring.version>
 		<project.name>PlatformInsights</project.name>
 	</properties>
 	<profiles>

@@ -15,16 +15,15 @@
  ******************************************************************************/
 package com.cognizant.devops.platformservice.correlationbuilder.service;
 
-import java.io.IOException;
+import java.util.List;
 
-import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.google.gson.JsonObject;
-
-public interface CorrelationBuilderService {
-	
-	public Object getCorrelationJson() throws IOException, InsightsCustomException;
-	public Object getNeo4jJson() throws IOException, InsightsCustomException;
-	public String saveConfig(String configDetails)throws InsightsCustomException;
-
+import com.cognizant.devops.platformdal.correlationConfig.CorrelationConfiguration;
+public interface CorrelationBuilderService {	
+	public List<CorrelationConfiguration> getAllCorrelations() throws InsightsCustomException;
+	public JsonObject getNeo4jJson() throws  InsightsCustomException;
+	public Boolean saveConfig(String configDetails)throws InsightsCustomException;
+	public Boolean deleteCorrelation(String relationName)throws InsightsCustomException;
+	public Boolean updateCorrelationStatus(String flagDeatils )throws InsightsCustomException;
 }

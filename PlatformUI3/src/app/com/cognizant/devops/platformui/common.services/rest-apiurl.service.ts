@@ -30,6 +30,7 @@ export class RestAPIurlService implements IRestAPIUrlService {
     }
     public initializeEndpoints() {
         //this.addEndPoint("ABOUT_READ", '/PlatformService/about/read');
+
         //For Health Check Page
         this.addEndPoint("HEALTH_TOOL", '/PlatformService/admin/health/detailHealth');
         this.addEndPoint("INSIGHTS_COMP_STATUS", '/PlatformService/admin/health/globalHealth');
@@ -42,21 +43,24 @@ export class RestAPIurlService implements IRestAPIUrlService {
 
         this.addEndPoint("USER_AUTHNTICATE", '/PlatformService/user/authenticate');
 
-        this.addEndPoint("SEARCH_DASHBOARD", '/PlatformService/search/dashboards');
+        this.addEndPoint("COOKIE_GRAFANA", '/PlatformService/user/cookiesForGrafana');
+
+        //Grafana Data Collection
+        //this.addEndPoint("ACCESS_GROUP_MANAGEMENT_GET_ORGS", '/PlatformService/accessGrpMgmt/getOrgs');
+        this.addEndPoint("ACCESS_GROUP_MANAGEMENT_GET_CURRENT_USER_ORGS", '/PlatformService/accessGrpMgmt/getCurrentUserOrgs');
+        this.addEndPoint("ACCESS_GROUP_MANAGEMENT_SWITCH_ORGS", '/PlatformService/accessGrpMgmt/switchUserOrg');
+        this.addEndPoint("ACCESS_GROUP_MANAGEMENT_GET_USERS", '/PlatformService/accessGrpMgmt/getUser');
+        this.addEndPoint("ACCESS_GROUP_MANAGEMENT_GET_USERS_WITH_ORGS", '/PlatformService/accessGrpMgmt/getCurrentUserWithOrgs');
+        this.addEndPoint("ACCESS_GROUP_MANAGEMENT_EDIT_ORGS_UESRS", '/PlatformService/admin/userMgmt/editOrganizationUser');
+        this.addEndPoint("ACCESS_GROUP_MANAGEMENT_DELETE_ORGS_UESRS", '/PlatformService/admin/userMgmt/deleteOrganizationUser');
+        this.addEndPoint("ACCESS_GROUP_MANAGEMENT_GET_USERS_ORGS", '/PlatformService/accessGrpMgmt/getCurrentOrgRole');
+        this.addEndPoint("GET_GRAFANA_VERSION", "/PlatformService/accessGrpMgmt/getGrafanaVersion");
+        this.addEndPoint("SEARCH_DASHBOARD", '/PlatformService/accessGrpMgmt/dashboards');
         this.addEndPoint("ORG_USERS_GET", '/PlatformService/admin/userMgmt/getOrgUsers');
         this.addEndPoint("ORG_CREATE", '/PlatformService/admin/userMgmt/createOrg');
         this.addEndPoint("USER_CREATE", '/PlatformService/accessGrpMgmt/addUserInOrg');
         this.addEndPoint("ASSIGN_USER", '/PlatformService/accessGrpMgmt/assignUser');
         this.addEndPoint("USER_ORG_SEARCH", '/PlatformService/accessGrpMgmt/searchUser');
-
-        //this.addEndPoint("ACCESS_GROUP_MANAGEMENT_GET_ORGS", '/PlatformService/accessGrpMgmt/getOrgs');
-        this.addEndPoint("ACCESS_GROUP_MANAGEMENT_GET_CURRENT_USER_ORGS", '/PlatformService/accessGrpMgmt/getCurrentUserOrgs');
-        this.addEndPoint("ACCESS_GROUP_MANAGEMENT_SWITCH_ORGS", '/PlatformService/accessGrpMgmt/switchUserOrg');
-        this.addEndPoint("ACCESS_GROUP_MANAGEMENT_GET_USERS", '/PlatformService/accessGrpMgmt/getUser');
-        this.addEndPoint("ACCESS_GROUP_MANAGEMENT_EDIT_ORGS_UESRS", '/PlatformService/admin/userMgmt/editOrganizationUser');
-        this.addEndPoint("ACCESS_GROUP_MANAGEMENT_DELETE_ORGS_UESRS", '/PlatformService/admin/userMgmt/deleteOrganizationUser');
-        this.addEndPoint("ACCESS_GROUP_MANAGEMENT_GET_USERS_ORGS", '/PlatformService/accessGrpMgmt/getCurrentOrgRole');
-        this.addEndPoint("GET_GRAFANA_VERSION", "/PlatformService/accessGrpMgmt/getGrafanaVersion");
 
         //Business Mapping module under Admin section
         this.addEndPoint("GET_ALL_HIERARCHY_DETAILS", '/PlatformService/admin/businessmapping/getAllHierarchyDetails');
@@ -73,6 +77,7 @@ export class RestAPIurlService implements IRestAPIUrlService {
         this.addEndPoint("SAVE_DATAPURGING_SETTING", '/PlatformService/admin/settings/saveSettingsConfiguration');
         this.addEndPoint("LIST_DATAPURGING_SETTING", '/PlatformService/admin/settings/loadSettingsConfiguration');
 
+        //Agent Configuration
         this.addEndPoint("AGENT_REGISTER", '/PlatformService/admin/agentConfiguration/registerAgent');
         this.addEndPoint("AGENT_UPDATE", '/PlatformService/admin/agentConfiguration/updateAgent');
         this.addEndPoint("AGENT_START_STOP", '/PlatformService/admin/agentConfiguration/startStopAgent');
@@ -81,7 +86,10 @@ export class RestAPIurlService implements IRestAPIUrlService {
         this.addEndPoint("DB_AGENTS_LIST", '/PlatformService/admin/agentConfiguration/getRegisteredAgents');
         this.addEndPoint("DB_AGENT_CONFIG_DETAILS", '/PlatformService/admin/agentConfiguration/getRegisteredAgentDetail');
         this.addEndPoint("AGENT_UNINSTALL", '/PlatformService/admin/agentConfiguration/uninstallAgent');
+        this.addEndPoint("AGENT_REGISTERV2", '/PlatformService/admin/agentConfiguration/2.0/registerAgent');
+        this.addEndPoint("AGENT_UPDATEV2", '/PlatformService/admin/agentConfiguration/2.0/updateAgent');
 
+        //Data Dictonary 
         this.addEndPoint("DATA_DICTIONARY_TOOLS_AND_CATEGORY", '/PlatformService/datadictionary/getToolsAndCategories');
         this.addEndPoint("DATA_DICTIONARY_TOOL_PROPERTIES", '/PlatformService/datadictionary/getToolProperties');
         this.addEndPoint("DATA_DICTIONARY_TOOLS_RELATIONSHIPS", '/PlatformService/datadictionary/getToolsRelationshipAndProperties');
@@ -109,64 +117,24 @@ export class RestAPIurlService implements IRestAPIUrlService {
         this.addEndPoint("CO_RELATIONSHIP_JSON", '/PlatformService/admin/correlationbuilder/getCorrelationJson');
         this.addEndPoint("CO_RELATIONSHIP_JSON_NEO4J", '/PlatformService/admin/correlationbuilder/getNeo4jJson');
         this.addEndPoint("SAVE_RELATIONSHIP_JSON", '/PlatformService/admin/correlationbuilder/saveConfig');
+        this.addEndPoint("UPDATE_RELATIONSHIP", '/PlatformService/admin/correlationbuilder/updateCorrelation');
+        this.addEndPoint("DELETE_RELATIONSHIP", '/PlatformService/admin/correlationbuilder/deleteCorrelation');
 
-        this.addEndPoint("AGENT_REGISTERV2", '/PlatformService/admin/agentConfiguration/2.0/registerAgent');
-        this.addEndPoint("AGENT_UPDATEV2", '/PlatformService/admin/agentConfiguration/2.0/updateAgent');
-
+        //Bulk Upload
         this.addEndPoint("UPLOAD_FILE", '/PlatformService/admin/bulkupload/uploadToolData');
         this.addEndPoint("TOOLNAME_LABELNAME_JSON", '/PlatformService/admin/bulkupload/getToolJson');
 
+        //webhook
         this.addEndPoint("SAVE_DATA_WEBHOOK_CONFIG", '/PlatformService/admin/webhook/saveWebhook');
         this.addEndPoint("LIST_WEBHOOK", '/PlatformService/admin/webhook/loadwebhookConfiguration');
         this.addEndPoint("DELETE_WEBHOOK", '/PlatformService/admin/webhook/uninstallWebHook');
         this.addEndPoint("UPDATE_WEBHOOK", '/PlatformService/admin/webhook/updateWebhook');
 
-
-        //this.addEndPoint("ENTITY_DEFINITION_ADD", '/PlatformService/admin/dataTagging/addEntityDefinition');
-        //this.addEndPoint("ENTITY_DEFINITION_REMOVE", '/PlatformService/admin/dataTagging/removeEntityDefinition');
-        //this.addEndPoint("ENTITY_DEFINITION_ALL", '/PlatformService/admin/dataTagging/fetchAllEntityDefinition');
-        //this.addEndPoint("ENTITY_BY_LEVEL", '/ALL_latformService/admin/dataTagging/fetchEntityDataByLevel');
-        //this.addEndPoint("ENTITY_DATA_ALL", '/PlatformService/admin/hierarchyDetails/fetchAllHierarchyDetails');
-
-        //this.addEndPoint("HIERARCHY_DETAILS_ADD", '/PlatformService/admin/hierarchyDetails/addHierarchyDetails');
-        //this.addEndPoint("HIERARCHY_DETAILS_REMOVE", '/PlatformService/admin/hierarchyDetails/removeHierarchyDetails');
-        //this.addEndPoint("HIERARCHY_DETAILS_GET", '/PlatformService/admin/hierarchyDetails/getHierarchyDetails');
-        //this.addEndPoint("HIERARCHY_DATA_ALL", '/PlatformService/admin/dataTagging/fetchAllHierarchyMapping');
-
-        //this.addEndPoint("HIERARCHY_MAPPING_ADD", '/PlatformService/admin/dataTagging/addHierarchyMapping');
-        //this.addEndPoint("HIERARCHY_MAPPING", '/PlatformService/admin/dataTagging/fetchHierarchyMapping');
-        //this.addEndPoint("HIERARCHY_MAPPING_REMOVE", '/PlatformService/admin/dataTagging/removeHierarchyMapping');
-
-
-        //this.addEndPoint("DB_DATA", '/PlatformService/db/data');
-
-        //this.addEndPoint("PROJECT_MAPPING_REMOVE", '/PlatformService/admin/data/removeProjectMapping');
-        //this.addEndPoint("PROJECT_MAPPING_ADD", '/PlatformService/admin/data/addProjectMapping');
-        //this.addEndPoint("PROJECT_MAPPING_BY_HIERARCHY", '/PlatformService/admin/data/fetchProjectMappingByHierarchy');
-        //this.addEndPoint("PROJECT_MAPPING_BY_ORGID", '/PlatformService/admin/data/fetchProjectMappingByOrgId');
-
-        //this.addEndPoint("TOOL_MAPPING_DELETE", '/PlatformService/admin/data/deleteToolMapping');
-        //this.addEndPoint("TOOL_NAME_GET", '/PlatformService/admin/mappingdata/tools');
-        //this.addEndPoint("MAPPING_DATA", '/PlatformService/admin/mappingdata/toolsField');
-        //this.addEndPoint("MAPPING_FIELD_VAL", '/PlatformService/admin/mappingdata/toolsFieldValue');
-        //this.addEndPoint("TOOL_CATEGORY", '/PlatformService/admin/mappingdata/toolsCategory');
-        //this.addEndPoint("PROJECT_MAPPING", '/PlatformService/admin/data/fetchAllProjectMapping');
-        //this.addEndPoint("DISTINCT_HIERARCHY", '/PlatformService/admin/hierarchyDetails/fetchDistinctHierarchyName');
-
-        //this.addEndPoint("TOOL_DATA_READ", '/PlatformService/admin/tools/read');
-        //this.addEndPoint("TOOL_CONFIG_SAVE", '/PlatformService/admin/toolsConfig/update');
-        //this.addEndPoint("TOOL_CONFIG_READ", '/PlatformService/admin/toolsConfig/read');
-        //this.addEndPoint("AGENT_CONFIG_DOWNLOAD", '/PlatformService/admin/toolsConfig/download');
-        //this.addEndPoint("TOOL_CONFIG_DELETE", '/PlatformService/admin/toolsConfig/delete');
-        //this.addEndPoint("TOOL_LAYOUT_READ", '/PlatformService/admin/toollayout/read');
-        //this.addEndPoint("ALL_TOOLS_CONFIGURATION_READ", '/PlatformService/admin/toolsConfig/readAll');
-        //this.addEndPoint("USER_ADD", '/PlatformService/admin/userMgmt/addUser');
-        //this.addEndPoint("ALL_USERS", '/PlatformService/admin/userMgmt/getAllUsers');
-        //this.addEndPoint("USER_TO_ORG_ADD", '/PlatformService/admin/userMgmt/addUserToOrg');
-        //this.addEndPoint("USER_ORG_DELETE", '/PlatformService/admin/userMgmt/removeUserFromOrg');
-        //this.addEndPoint("USER_ROLE_INORG_UPDATE", '/PlatformService/admin/userMgmt/updateUserRoleInOrg');
-        //this.addEndPoint("INSIGHTS_GET", '/PlatformService/insights/inferences');
-        //this.addEndPoint("UPLOAD_HIERARCHY_DETAILS", '/PlatformService/admin/hierarchyDetails/uploadHierarchyDetails');
+        //SSO API
+        this.addEndPoint("SSO_URL", '/PlatformService/saml/login');
+        this.addEndPoint("SSO_DETAIL", '/PlatformService/user/insightsso/getUserDetail');
+        this.addEndPoint("SSO_INSIGHTS_URL_LOGOUT", '/PlatformService/user/insightsso/logout');
+        this.addEndPoint("SSO_URL_LOGOUT", '/PlatformService/saml/logout');//
     }
 
     public addEndPoint(name: String, url: String) {
@@ -177,12 +145,10 @@ export class RestAPIurlService implements IRestAPIUrlService {
         }
     }
 
-
     public getRestCallUrl(moduleUrlKey: String) {
         if (!this.apiMap.has(moduleUrlKey)) {
             throw new Error("Url Mapping doesnt exist");
         }
-        //console.log(InsightsInitService.serviceHost.toString().concat(this.apiMap.get(moduleUrlKey).toString()));
         return InsightsInitService.serviceHost.toString().concat(this.apiMap.get(moduleUrlKey).toString());
     }
 }

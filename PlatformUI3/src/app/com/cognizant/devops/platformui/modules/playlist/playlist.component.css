@@ -42,3 +42,10 @@
     display:block;
 }
 
+.embed-responsive {
+    position: inherit;
+    display: block;
+    width: 100%;
+    padding: 0;
+    overflow: hidden;
+}

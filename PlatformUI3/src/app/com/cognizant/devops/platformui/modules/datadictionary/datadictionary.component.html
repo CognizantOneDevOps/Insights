@@ -20,30 +20,49 @@
         <a>Data Dictionary</a>
     </div>
     <div class="orangeStripCss"></div>
-    <div layout style="height: 60px;margin-left: 7px;">
-        <div layout="row" style="width: 100%;margin-top: 6px; height: 80%;">
-            <div layout layout-align="end center">
-                <label class="mainText"> Select Tools </label>
-                <mat-select [(ngModel)]="selectedAgent1"  [style.height.px]="20" [style.width.%]="10" (ngModelChange)="loadAgent1Info(selectedAgent1)"
-                name="selectedAgent1" required placeholder="Select Tool 1" [ngClass]="{  'input-disabled' : readChange ,  'form-control': !readChange}">
-                    <mat-option [disabled]="data1 === selectedAgent2" *ngFor="let data1 of agentDataSource" [value]="data1" style="color:#0033A0">
-                    {{data1.toolName}}
-                    </mat-option>
+    <!-- <div layout style="height: 8%;margin-left: 1%;">
+        <div layout="row" style="margin-top: 2%"> -->
+            <div style=" margin-top: 22px;">
+                <div> <!-- style="font-size: 14px;color:  #0033A0;font-weight:bold;" -->
+                    
+                  <label class="mainText">  Select Source Tool </label>
+                <mat-select [(ngModel)]="selectedSourceTool" [style.width.%]="17"
+                  name="selectedSourceTool" (ngModelChange)="selectLabelforsource(selectedSourceTool)" required placeholder="
+                     Select Source Tool"
+                  [ngClass]="{  'input-disabled' : readChange ,  'form-control': !readChange}">
+                  <mat-option [disabled]="data1 === selectedSourceTool" *ngFor="let data1 of responseDataSource" [value]="data1"
+                    style="color:rgb(55, 61, 73)"> {{data1}} </mat-option>
                 </mat-select>
-                <mat-select [(ngModel)]="selectedAgent2"  [style.height.px]="20" [style.width.%]="10" (ngModelChange)="loadAgent1Info2(selectedAgent2)"
-                name="selectedAgent2" required placeholder="Select Tool 2" [ngClass]="{  'input-disabled' : readChange2 ,  'form-control': !readChange2}">
-                    <mat-option [disabled]="data2 === selectedAgent1" *ngFor="let data2 of agentDataSource" [value]="data2" style="color:#0033A0">
-                    {{data2.toolName}}
-                    </mat-option>
+                <mat-select [(ngModel)]="selectedSourceLabel" [style.width.%]="17"
+                  [style.margin-left.%]="2" (ngModelChange)="loadAgent1Info(selectedSourceLabel)" name="selectedLabels"
+                  required placeholder="Select Source Label" [ngClass]="{  'input-disabled' : readChange2 ,  'form-control': !readChange2}">
+                  <mat-option [disabled]="data2 === selectedDestinationTool" *ngFor="let data2 of labelSourceListDatasourceSelected"
+                    [value]="data2" style="color:#0033A0">
+                    {{data2.labelName}} </mat-option>
+                </mat-select>
+              </div>
+              <div style="margin-top: 2%;">  
+                <label class="mainText"> Select Destination Tool </label>
+                <mat-select [(ngModel)]="selectedDestinationTool" (ngModelChange)="selectLabelfordestination(selectedDestinationTool)"
+                  [style.width.%]="17" name="selectedDestinationTool" required placeholder="Select Destination Tool"
+                  [ngClass]="{  'input-disabled' : readChange ,  'form-control': !readChange}">
+                  <mat-option *ngFor="let data2 of responseDataSource" [value]="data2" style="color:rgb(55, 61, 73)">
+                    {{data2}} </mat-option>
+                </mat-select>
+                <mat-select [(ngModel)]="selectedDestinationLabel" [style.width.%]="17"
+                  [style.margin-left.%]="2" (ngModelChange)="loadAgent1Info2(selectedDestinationLabel)" name="selectedDestinationLabel"
+                  required placeholder="Select Destination label" [ngClass]="{  'input-disabled' : readChange2 ,  'form-control': !readChange2}">
+                  <mat-option *ngFor="let data1 of labelDestListDatasourceSelected" [value]="data1" style="color:#0033A0">
+                    {{data1.labelName}} </mat-option>
                 </mat-select>
                 <div class="divider"></div>
-                <button [disabled]="(noShowDetail||noShowDetail2||!selectedAgent1 || !selectedAgent2||buttonOn) " style="outline:none;" class="searchBtnStyle" (click)="getCorrelation(selectedAgent1,selectedAgent2)">Click to show Correlation</button>
-                <h2 style="font-size:13px;display: inline-block;padding-left: 10px;color: black">(Please select Tool 1 and Tool 2 to see the Correlation)</h2>
-            </div>
+                <button [disabled]="(noShowDetail||noShowDetail2||!selectedSourceTool || !selectedDestinationTool||buttonOn) " style="outline:none;" class="searchBtnStyle" (click)="getCorrelation(selectedSourceLabel,selectedDestinationLabel)">Click to show Correlation</button>
+              </div >
         </div>  
-    </div>  
+   <!--      </div>
+    </div>   -->
     <div >
-        <div class="column1" style="margin-bottom: 1%;margin-left: 7px;border :white;border-radius: 10px;background-color:white;height: 69vh;">
+        <div class="column1" style="margin-bottom: 1%;margin-left: 7px;border :white;border-radius: 10px;background-color:white;height: 55vh;margin-top: 2%;">
             <div class="showTable" style="text-align: center; padding: 5px;">
                     <b>&nbsp; Tool Properties</b>
             </div>
@@ -59,11 +78,11 @@
                             </table>
                     <div *ngIf="showDetail" class="divTablesHeading">
                         <div ><b style="color:#0033A0;font-size: 18px;">{{agent1Tool}} Properties</b></div>
-                        <div style="color:#00B140;padding-top: 10px"> Label:<b>({{agent1Category}}:{{agent1Tool}})</b></div>
+                        <div style="color:#00B140;padding-top: 10px"> Label:<b>({{agent1LabelName}})</b></div>
                     </div>
                     <table *ngIf="showDetail" style="margin-left: 3%;">
-                        <tbody style="display:grid;max-height:50vh;overflow:auto;">
-                            <tr class="dat-row" *ngFor="let element of agent1TableData">
+                        <tbody style="display:grid;max-height:37vh;overflow:auto;">
+                            <tr class="dat-row" *ngFor="let element of tool1TableData">
                                 <td style="text-align:left;padding-left: 15px;padding-top: 8px;align-items: center;">{{element}}</td>
                             </tr>
                         </tbody>
@@ -73,11 +92,11 @@
                 <div   style="width:47%;display:inline-block;margin-left: 10px;vertical-align:top;">
                     <div *ngIf="showDetail2"  class="divTablesHeading">
                         <div><b style="color:#0033A0;font-size: 18px;">{{agent2Tool}} Properties</b></div>
-                        <div style="color:#00B140;padding-top:10px;"> Label:<b>({{agent2Category}}:{{agent2Tool}})</b></div>
+                        <div style="color:#00B140;padding-top:10px;"> Label:<b>({{agent2LabelName}})</b></div>
                     </div>
                     <table *ngIf="showDetail2" style="margin-left: 4%;">
-                        <tbody style="display:grid;max-height:50vh;overflow:auto;">
-                            <tr  class="dat-row"  *ngFor="let element of agent2TableData">
+                        <tbody style="display:grid;max-height:37vh;overflow:auto;">
+                            <tr  class="dat-row"  *ngFor="let element of tool2TableData">
                                 <td style="text-align:left;padding-left: 15px;padding-top: 8px;">{{element}}</td>
                             </tr>
                         </tbody>
@@ -95,7 +114,7 @@
             </div>
 
         </div>
-        <div class="column2" style="margin-bottom: 1%;margin-left:10px;margin-right: 7px;border :white;border-radius: 10px;background-color:white;height: 69vh;" >
+        <div class="column2" style="margin-bottom: 1%;margin-left:10px;margin-right: 7px;border :white;border-radius: 10px;background-color:white;height: 55vh;margin-top: 2%;" >
             <div  class="showTable" style="text-align: center; padding: 5px;" >
                 <b>&nbsp; Correlation Details</b>
             </div>
@@ -113,7 +132,7 @@
                     </div>
                     <div>
                         <div layout layout-align="center center" *ngIf="!relationPropertiesSize">
-                            <h1 class="dataDictionaryMessages">No Relationship Properties Found</h1>
+                           <!--  <h1 class="dataDictionaryMessages">No Relationship Properties Found</h1> -->
                         </div>
                         <table *ngIf="relationPropertiesSize" style="border-spacing:10px;">
                             <thead >

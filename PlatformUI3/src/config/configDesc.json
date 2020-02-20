@@ -1,9 +1,10 @@
-{
-	"desriptions": {
-		"mqConfig": "Message Queue Config",
-		"subscribe": "Subscribe",
-		"publish": "Publish",
-		"communication": "Communication",
-		"loggingSetting": " Logging Setting"
-	}
+{ 
+   "desriptions":{ 
+      "mqConfig": "Message Queue Config",
+      "subscribe": "Subscribe",
+      "publish": "Publish",
+      "communication": "Communication",
+      "loggingSetting": "Logging Setting",
+      "enrichData": "Enrich Data"
+   }
 }

@@ -38,12 +38,11 @@ import com.google.gson.JsonParser;
 public class TraceabilityDashboardTest {
 
 	private static final Logger log = LogManager.getLogger(TraceabilityDashboardTest.class);
-	TraceabilityDashboardService service;
-	List<String> testTools = new ArrayList<String>();
+	TraceabilityDashboardService service = new TraceabilityDashboardServiceImpl();
+	List<String> testTools = new ArrayList<>();
 
 	@BeforeMethod
-	public void beforeMethod() {
-		service = new TraceabilityDashboardServiceImpl();
+	public void beforeMethod() throws InsightsCustomException {		
 		ApplicationConfigCache.loadConfigCache();
 	}
 
@@ -71,7 +70,7 @@ public class TraceabilityDashboardTest {
 
 	@Test(priority = 3)
 	public void testToolKeySet() throws InsightsCustomException {
-		Assert.assertNotEquals(0, service.getToolKeyset(testTools.get(0)).size());
+		Assert.assertNotEquals(0, service.getToolKeyset("JIRA").size());
 	}
 
 	

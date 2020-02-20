@@ -48,8 +48,8 @@ export class BusinessMappingService implements IBusinessMappingService {
         return this.restHandler.get("DATA_DICTIONARY_TOOLS_AND_CATEGORY");
     }
 
-    loadToolProperties(toolName: string, categoryName: string): Promise<any> {
-        return this.restHandler.get("DATA_DICTIONARY_TOOL_PROPERTIES", { 'toolName': toolName, 'categoryName': categoryName });
+    loadToolProperties(labelName: string, categoryName: string): Promise<any> {
+        return this.restHandler.get("DATA_DICTIONARY_TOOL_PROPERTIES", { 'labelName': labelName, 'categoryName': categoryName });
     }
 
     saveToolMapping(agentMappingJson: String) {

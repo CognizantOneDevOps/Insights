@@ -13,31 +13,72 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  ******************************************************************************/
+/*package com.cognizant.devops.engines.platformengine.modules.correlation.model;
+
+*//**
+	* @author Vishal Ganjare (vganjare)
+	*//*
+		public class Correlation {
+		private CorrelationNode source;
+		private CorrelationNode destination;
+		private String relationName;
+		public CorrelationNode getSource() {
+			return source;
+		}
+		public void setSource(CorrelationNode source) {
+			this.source = source;
+		}
+		public CorrelationNode getDestination() {
+			return destination;
+		}
+		public void setDestination(CorrelationNode destination) {
+			this.destination = destination;
+		}
+		public String getRelationName() {
+			return relationName;
+		}
+		public void setRelationName(String relationName) {
+			this.relationName = relationName;
+		}
+		}*/
+
 package com.cognizant.devops.engines.platformengine.modules.correlation.model;
 
-/**
- * @author Vishal Ganjare (vganjare)
- */
 public class Correlation {
 	private CorrelationNode source;
 	private CorrelationNode destination;
 	private String relationName;
+
 	public CorrelationNode getSource() {
 		return source;
 	}
+
 	public void setSource(CorrelationNode source) {
 		this.source = source;
 	}
+
 	public CorrelationNode getDestination() {
 		return destination;
 	}
+
 	public void setDestination(CorrelationNode destination) {
 		this.destination = destination;
 	}
+
 	public String getRelationName() {
 		return relationName;
 	}
+
 	public void setRelationName(String relationName) {
 		this.relationName = relationName;
 	}
+
+	@Override
+	public String toString() {
+		return "CorrelationJson [source=" + source + ", destination=" + destination + ", relationName=" + relationName
+				+ ", getSource()=" + getSource() + ", getDestination()=" + getDestination() + ", getRelationName()="
+				+ getRelationName() + ", getClass()=" + getClass() + ", hashCode()=" + hashCode() + ", toString()="
+				+ super.toString() + "]";
+	}
+
 }

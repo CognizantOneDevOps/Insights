@@ -1,4 +1,3 @@
-
 /********************************************************************************
  * Copyright 2019 Cognizant Technology Solutions
  * 
@@ -13,36 +12,37 @@
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
  * License for the specific language governing permissions and limitations under
  * the License. */
- 
 
 table {
     width: 100%;
+    overflow: scroll;
 }
 
 .tableHeaderCss {
-    background-color: grey;   
+    background-color: grey;
     color: white;
     font-size: 14px !important;
     height: 40px !important;
     margin: 0px;
-    padding:0px;
+    padding: 0px;
     letter-spacing: .010em;
     line-height: 1.2em;
-	text-align: center;
+    text-align: center;
 }
 
 .loading-indicator {
-  position: fixed;
-  z-index: 999;
-  height: 2em;
-  width: 2em;
-  overflow: show;
-  margin: auto;
-  top: 0;
-  left: 0;
-  bottom: 0;
-  right: 0;
- }
+    position: fixed;
+    z-index: 999;
+    height: 2em;
+    width: 2em;
+    overflow: show;
+    margin: auto;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+}
+
 .tableFooterCss {
     color: #FF8F1C;
     margin-top: 30px;
@@ -57,30 +57,59 @@ tr:nth-child(even) td {
 }
 
 tr.mat-footer-row, tr.mat-row {
-    height: 30px !important;   
+    height: 30px !important;
     font-size: 12px !important;
 }
 
 td.mat-cell, td.mat-footer-cell, th.mat-header-cell {
-    height:30px !important; 
+    height: 30px !important;
     font-size: 12px !important;
     letter-spacing: .010em;
     line-height: 1.2em;
-	text-align: left;
+    text-align: left;
 }
+
+.timezoneText {
+    font-size: 12px !important;
+    letter-spacing: .010em;
+    line-height: 1.2em;
+    text-align: left;
+    margin-left: 10px;
+    margin-top: 5px;
+    color: #0033A0;
+}
+
+.timelagText {
+    font-size: 14px !important;
+    letter-spacing: .010em;
+    line-height: 1.2em;
+    margin-left: 10px;
+    margin-top: 5px;
+    color: #0033A0;
+}
+
+th.mat-header-cell {
+    color: #ffffff;
+}
+
 .mat-dialog-container, .mat-dialog {
     margin: 0 !important;
     padding: 0 !important;
 }
 
-ul{
-  position: relative;
-  padding: 0;
-  margin: 0;
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  align-items: center;
+.hyperlink {
+    color: #0033a0;
+    text-underline-position: below;
+}
+
+ul {
+    position: relative;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
 }
 
 li {
@@ -88,19 +117,43 @@ li {
     margin: 1px;
     padding: 5px;
 }
+
+.mat-cell, .mat-header-cell {
+    word-wrap: initial;
+    display: table-cell;
+    padding: 0px 10px;
+    line-break: unset;
+    width: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    vertical-align: middle;
+}
+
+.mat-row, .mat-header-row {
+    display: table-row;
+}
+
 li:last-child {
     position: absolute;
     top: 0;
     right: 0;
 }
-.titleStyle{
-    background-color: #FF8F1C; 
-    color:white;
-    margin:0;
-    padding-bottom:5px;
+
+.titleStyle {
+    background-color: #FF8F1C;
+    color: white;
+    margin: 0;
+    padding-bottom: 5px;
     padding-top: 5px;
     font-weight: bold;
-    border:3px solid #FF8F1C;
+    border: 3px solid #FF8F1C;
+}
+
+.mat-dialog-content {
+    overflow: scroll;
+    margin: 0px;
+    padding: 0px;
+    overflow-y: hidden;
 }
 
 mat-dialog-content::-webkit-scrollbar {
@@ -119,19 +172,6 @@ mat-dialog-content::-webkit-scrollbar-thumb {
     background-color: #676666;
 }
 
-mat-dialog-content::-webkit-scrollbar-track {
-    border-radius: 10px;
-}
-
-
-.mat-table{
-    font-family: inherit;
-}
-
-.mat-dialog-content{
-    display: unset;
-}
-    
 ::-webkit-scrollbar {
     width: 6px;
     height: 6px;
@@ -151,108 +191,192 @@ mat-dialog-content::-webkit-scrollbar-track {
 ::-webkit-scrollbar-track {
     border-radius: 10px;
 }
-.scrollData{
-    height:82%;
-    overflow-x:visible;    
+
+mat-dialog-content::-webkit-scrollbar-track {
+    border-radius: 10px;
+}
+
+.mat-table {
+    width: 100%;
+    max-width: 100%;
+    margin-bottom: 1rem;
+    display: table;
+    border-collapse: collapse;
+    margin: 0px;
+    font-family: inherit;
+}
+
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+::-webkit-scrollbar-thumb {
+    background-image: initial;
+    background-position-x: initial;
+    background-position-y: initial;
+    background-size: initial;
+    background-attachment: initial;
+    background-origin: initial;
+    background-clip: initial;
+    background-color: #676666;
+}
+
+::-webkit-scrollbar-track {
+    border-radius: 10px;
+}
+
+.scrollData {
+    height: 82%;
+    overflow-x: visible;
     padding-bottom: 10px;
 }
 
-.scrollData2{
-    height:82%;
-    overflow-x:auto;
+.scrollData2 {
+    height: 82%;
+    overflow-x: auto;
     padding-bottom: 10px;
 }
 
-
- ::ng-deep .mat-paginator-icon{
-  width: 21px !important;
+::ng-deep .mat-paginator-icon {
+    width: 21px !important;
 }
+
 .tableDynamicHeaderCss {
-    background-color: grey;   
+    background-color: grey;
     color: white;
     font-size: 14px !important;
     height: 40px !important;
     margin: 0px;
-    padding:0px;
+    padding: 0px;
     letter-spacing: .010em;
     line-height: 1.2em;
-	text-align: center;
-    width:150px !important;
+    text-align: center;
+    width: 150px !important;
 }
 
 .tableMessageHeaderCss {
-    background-color: grey;   
+    background-color: grey;
     color: white;
     font-size: 14px !important;
     height: 40px !important;
     margin: 0px;
-    padding:0px;
+    padding: 0px;
     letter-spacing: .010em;
     line-height: 1.2em;
-	text-align: center;
+    text-align: center;
 }
 
 .tableExceIdHeaderCss {
-    background-color: grey;   
+    background-color: grey;
     color: white;
     font-size: 14px !important;
     height: 40px !important;
     margin: 0px;
-    padding:0px;
+    padding: 0px;
     letter-spacing: .010em;
     line-height: 1.2em;
-	text-align: center;
-    width:250px !important;
+    text-align: center;
+    width: 250px !important;
 }
 
 .tableLastFailureHeaderCss {
-    background-color: grey;   
+    background-color: grey;
     color: white;
     font-size: 14px !important;
     height: 40px !important;
     margin: 0px;
-    padding:0px;
+    padding: 0px;
     letter-spacing: .010em;
     line-height: 1.2em;
-	text-align: center;
-    width:150px !important;
+    text-align: center;
+    width: 150px !important;
 }
 
- /* Styles for tab labels */
- ::ng-deep .healthcheck-agent-detail-tab-style .mat-tab-label {     
-     background-color: transparent;
-     color: #0033A0;
-     font-size: 14px;
-     font-family: Open Sans !important;
-     opacity: 1.0;
- }
- 
- /* Styles for the active tab label */
- ::ng-deep .healthcheck-agent-detail-tab-style .mat-tab-label-active {
+/* Styles for tab labels */
+
+::ng-deep .healthcheck-agent-detail-tab-style .mat-tab-label {
+    background-color: transparent;
+    color: #0033A0;
+    font-size: 14px;
+    font-family: Open Sans !important;
+    opacity: 1.0;
+}
+
+/* Styles for the active tab label */
+
+::ng-deep .healthcheck-agent-detail-tab-style .mat-tab-label-active {
     color: #00B140;
-    font-weight:bold;
-    font-size: 14px;    
+    font-weight: bold;
+    font-size: 14px;
     background-color: transparent;
     font-family: Open Sans !important;
- }
+}
 
- ::ng-deep .healthcheck-agent-detail-tab-style .mat-tab-header {
-    border-bottom-style: none !important;      
- } 
- /* Styles for the ink bar */
- ::ng-deep .healthcheck-agent-detail-tab-style .mat-ink-bar {
-     background-color: #00B140 !important;
- }  
+::ng-deep .healthcheck-agent-detail-tab-style .mat-tab-header {
+    border-bottom-style: none !important;
+}
 
-  ::ng-deep .mat-paginator-container
- {
-min-height: 0px !important;
- }
-  .paginationStyle {
-      font-family: Open Sans !important;
-      font-size: 12px !important; 
-      background-color: #DEDBDB;
-      margin-bottom: -10px;
-      width:-2px
-    
-  }
+/* Styles for the ink bar */
+
+::ng-deep .healthcheck-agent-detail-tab-style .mat-ink-bar {
+    background-color: #00B140 !important;
+}
+
+::ng-deep .mat-paginator-container {
+    min-height: 0px !important;
+}
+
+.mat-paginator {
+    background-color: #dedbdb;
+    margin-top: -8px;
+}
+
+.paginationStyle {
+    font-family: Open Sans !important;
+    font-size: 12px !important;
+    background-color: #DEDBDB;
+    margin-bottom: -10px;
+    width: -2px
+}
+
+.arrange-horizontally-Dialog {
+    -webkit-box-orient: horizontal;
+    -webkit-box-direction: normal;
+    -webkit-flex-direction: row;
+    flex-direction: row;
+    box-sizing: border-box;
+    display: -webkit-box;
+    display: -webkit-flex;
+    width: 100%;
+    background: #FF8F1C;
+}
+
+.gridheadercenter {
+    font-weight: bold;
+    font-size: 1.5vmax;
+    text-decoration: none;
+    color: white;
+    width: 120%;
+    margin-right: 30px;
+    margin-left: 6px;
+    text-align: center;
+    padding-top: 15px;
+}
+
+.closeIconCss {
+    padding-right: 17px;
+    text-align: center;
+    padding-top: 18px;
+    color: white !important;
+}
+
+.headerTimelag {
+    word-wrap: initial;
+    display: table-cell;
+    padding: 0px 10px;
+    line-break: unset;
+    white-space: nowrap;
+    overflow: hidden;
+    vertical-align: middle;
+}

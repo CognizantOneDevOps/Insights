@@ -216,7 +216,6 @@
   
   .form{
       box-sizing: border-box;
-      padding: 20px;
   }
   
   .configureBut {
@@ -393,6 +392,7 @@
     font-family: Open Sans;
     font-weight: bold;
     color: #FF8F1C;
+    padding-top: 1%;
   }
 
   .formBorder {
@@ -412,7 +412,6 @@
     font-size: 15px;
     font-weight: 700;
     vertical-align: sub;
-    width: 10%;
     padding: 5px;
   }
   
@@ -433,7 +432,6 @@
     border: 1px solid #0033A0;
     border-radius: 10px 10px 10px 10px;   
     vertical-align:center;
-    padding-top: 8px;
 }
 
 .mat-icon-font-size {
@@ -446,4 +444,12 @@
     font-family: Open Sans !important;
     font-size: 14px;
     margin-right: 3%;
+}
+
+.headStyle {
+    background: #00b140;
+    color: #fff;
+    padding: 6px;
+    font-family: Open Sans!important;
+    font-size: 16px;
 }

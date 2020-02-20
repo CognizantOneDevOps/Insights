@@ -19,19 +19,31 @@ export class RelationLabel {
     source: string;
     relationName: string;
     detailProp: string;
+    flag: boolean;
+    relationshipProp: string
+    destprop: string
+    sourceprop: string
+    selfRelation: boolean
 
-
-    public setData(destination, source, relationName, detailProp): void {
+    public setData(destination, source, relationName, sourceprop, destprop, relationshipProp, flag, selfRelation): void {
         this.destination = destination;
         this.source = source;
         this.relationName = relationName;
-        this.detailProp = detailProp;
+        this.flag = flag;
+        this.relationshipProp = relationshipProp
+        this.sourceprop = sourceprop
+        this.destprop = destprop;
+        this.selfRelation = selfRelation;
     }
-    constructor(destination, source, relationName, detailProp) {
+    constructor(destination, source, relationName, sourceprop, destprop, relationshipProp, flag, selfRelation) {
         this.destination = destination;
         this.source = source;
         this.relationName = relationName;
-        this.detailProp = detailProp;
+        this.sourceprop = sourceprop;
+        this.destprop = destprop;
+        this.flag = flag;
+        this.relationshipProp = relationshipProp;
+        this.selfRelation = selfRelation;
 
     }
 }

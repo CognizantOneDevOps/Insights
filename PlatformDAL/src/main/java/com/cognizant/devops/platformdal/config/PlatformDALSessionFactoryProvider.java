@@ -22,6 +22,7 @@ import org.hibernate.cfg.Configuration;
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.config.PostgreData;
 import com.cognizant.devops.platformdal.agentConfig.AgentConfig;
+import com.cognizant.devops.platformdal.correlationConfig.CorrelationConfiguration;
 import com.cognizant.devops.platformdal.dashboards.CustomDashboard;
 import com.cognizant.devops.platformdal.entity.definition.EntityDefinition;
 import com.cognizant.devops.platformdal.grafana.user.User;
@@ -60,6 +61,7 @@ public class PlatformDALSessionFactoryProvider {
 			configuration.addAnnotatedClass(SettingsConfiguration.class);
 			configuration.addAnnotatedClass(QueryBuilderConfig.class);
 			configuration.addAnnotatedClass(WebHookConfig.class);
+			configuration.addAnnotatedClass(CorrelationConfiguration.class);
 			PostgreData postgre = ApplicationConfigProvider.getInstance().getPostgre();
 			if(postgre != null){
 				configuration.setProperty("hibernate.connection.username", postgre.getUserName());

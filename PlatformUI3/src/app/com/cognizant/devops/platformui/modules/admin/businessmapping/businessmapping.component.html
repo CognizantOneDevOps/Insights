@@ -31,11 +31,18 @@
   </div>
   <div class="arrange-horizontally">
     <label class="mainText"> Select Tool </label>
-    <mat-select [(ngModel)]="selectedAgent" [style.height.px]="20" [style.width.%]="21"
-      (ngModelChange)="getAgentMappingDetail(selectedAgent)" name="selectedAgent" required placeholder="Select Tool"
+    <mat-select [(ngModel)]="selectedTool" [style.width.%]="21"
+      (ngModelChange)="selectLabel(selectedTool)" name="selectedTool" required placeholder="Select Tool"
       [ngClass]="{  'input-disabled' :false  ,  'form-control': true}">
-      <mat-option *ngFor="let data of agentList" [value]="data" style="color:#0033A0">
-        {{data.toolName}}
+      <mat-option *ngFor="let data of toolList" [value]="data" style="color:#0033A0">
+        {{data}}
+      </mat-option>
+    </mat-select>
+    <mat-select [(ngModel)]="selectedLabel" [style.width.%]="21"
+      (ngModelChange)="getToolMapping(selectedLabel)" name="selectedLabel" required placeholder="Select Label"
+      [ngClass]="{  'input-disabled' :false  ,  'form-control': true}">
+      <mat-option *ngFor="let data of labelSourceListDatasourceSelected" [value]="data" style="color:#0033A0">
+        {{data.labelName}}
       </mat-option>
     </mat-select>
     <h2 class="labelInfo">(Please select a Tool to see the properties and create a Business Mapping Label)</h2>
@@ -48,16 +55,16 @@
     </div>
   </div>
 
-  <div *ngIf="(selectedAgent!=undefined)">
+  <div *ngIf="(selectedLabel!=undefined)">
     <div class="btnAlign">
-      <button mat-icon-button (click)="addAgentLabelData()" [disabled]="(selectedAgent==undefined)||disableAdd">
+      <button mat-icon-button (click)="addToolLabelData()" [disabled]="(selectedLabel==undefined)||disableAdd">
         <mat-icon title="Click to create a new Business Mapping Label " class="mat-icon material-icons">
           add_circle
         </mat-icon>
         <mat-icon svgIcon="lineInButton" class="mat-icon material-icons">
         </mat-icon>
       </button>
-      <button mat-icon-button (click)="editData()" [disabled]="!isEditData || (selectedMappingAgent==undefined)">
+      <button mat-icon-button (click)="editData()" [disabled]="!isEditData || (selectedMappingTool==undefined)">
         <mat-icon title="Edit " class="mat-icon material-icons ">
           edit
         </mat-icon>
@@ -67,7 +74,7 @@
           save
         </mat-icon>
       </button>
-      <button mat-icon-button [disabled]="!isEditData || (selectedMappingAgent==undefined)" (click)="deleteMapping()">
+      <button mat-icon-button [disabled]="!isEditData || (selectedMappingTool==undefined)" (click)="deleteMapping()">
         <mat-icon title="Delete " class="mat-icon material-icons">
           delete
         </mat-icon>
@@ -75,8 +82,8 @@
     </div>
 
     <div *ngIf="isListView">
-      <mat-radio-group [(ngModel)]="selectedMappingAgent">
-        <table mat-table [dataSource]="agentDataSource" class="mat-elevation-z8 ">
+      <mat-radio-group [(ngModel)]="selectedMappingTool">
+        <table mat-table [dataSource]="toolDataSource" class="mat-elevation-z8 ">
           <!-- Radio Button Column -->
           <ng-container matColumnDef="radio">
             <th mat-header-cell *matHeaderCellDef class="tableHeaderCss" style="width:10% !important "></th>
@@ -91,7 +98,7 @@
               {{element.businessmappinglabel}} </td>
           </ng-container>
           <ng-container matColumnDef="properties">
-            <th mat-header-cell *matHeaderCellDef class="tableHeaderCss"> {{selectedAgent.toolName}} Properties (
+            <th mat-header-cell *matHeaderCellDef class="tableHeaderCss"> {{selectedTool.toolName}} Properties (
               Property Name : Property Value)</th>
             <td mat-cell class="listTable" *matCellDef="let element" style="width:51% !important ">
               <div [innerHTML]="element.propertiesString">
@@ -103,13 +110,13 @@
           <tr mat-row *matRowDef="let row; columns: displayedColumns;"> </tr>
         </table>
       </mat-radio-group>
-      <div *ngIf="agentDataSource.length == 0">No records found</div>
+      <div *ngIf="toolDataSource.length == 0">No records found</div>
     </div>
     <div *ngIf="noToolsData" class="noToolsData">
       Please click on <b>"ADD"</b> icon to create new labels
     </div>
     <div *ngIf="!isListView">
-      <table mat-table [dataSource]="agentPropertyDataSource" class="mat-elevation-z8 ">
+      <table mat-table [dataSource]="toolPropertyDataSource" class="mat-elevation-z8 ">
         <ng-container matColumnDef="checkbox">
           <th mat-header-cell *matHeaderCellDef class="tableHeaderCss" style="width:10% !important ">
             <mat-checkbox (change)="$event ? masterToggle() : null" [checked]="selection.hasValue() && isAllSelected()"
@@ -125,13 +132,13 @@
 
         <!--Properties  Column -->
         <ng-container matColumnDef="toolproperties">
-          <th mat-header-cell *matHeaderCellDef class="tableHeaderCss"> {{selectedAgent.toolName}} Property Name</th>
+          <th mat-header-cell *matHeaderCellDef class="tableHeaderCss"> {{selectedTool.toolName}} Property Name</th>
           <td mat-cell *matCellDef="let element"> {{element.key}} </td>
         </ng-container>
 
         <!-- Value Column -->
         <ng-container matColumnDef="propertyValue">
-          <th mat-header-cell *matHeaderCellDef class="tableHeaderCss"> {{selectedAgent.toolName}} Property Value </th>
+          <th mat-header-cell *matHeaderCellDef class="tableHeaderCss"> {{selectedTool.toolName}} Property Value </th>
           <td mat-cell style="padding-top:10px;margin-left: 0px" *matCellDef="let element">
             <input [(ngModel)]="element.value" ref-value="ngModel" name="{{element.value}}"
               [ngClass]="{ 'input-disabled' : !element.editProperties  ,'form-control': element.editProperties} "
@@ -161,9 +168,9 @@
         </tr>
       </table>
       <div *ngIf="noToolsPropertyData" class="noToolsData">
-        No properties were found for the selected Tool <b> {{selectedAgent.toolName}} </b>. Please go to the Agent
+        No properties were found for the selected Tool <b> {{selectedTool.toolName}} </b>. Please go to the Agent
         Management
-        section to Edit or Update the selected Tool <b> {{selectedAgent.toolName}} </b> to add tool properties.
+        section to Edit or Update the selected Tool <b> {{selectedTool.toolName}} </b> to add tool properties.
       </div>
     </div>
   </div>

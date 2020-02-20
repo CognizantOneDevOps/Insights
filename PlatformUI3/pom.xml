@@ -5,14 +5,14 @@
 	<parent>
 		<artifactId>PlatformParent</artifactId>
 		<groupId>com.cognizant.devops</groupId>
-		<version>6.3</version>
+		<version>6.4</version>
 	</parent>
 
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>com.cognizant.devops</groupId>
 	<artifactId>PlatformUI3</artifactId>
-	<version>6.3</version>
+	<version>6.4</version>
 	<name>PlatformUI3</name>
 
 	<repositories>
@@ -28,8 +28,6 @@
 			<id>project.local</id>
 			<name>project</name>
 			<url>file:${project.basedir}/jar</url>
-			<!-- <releases> <enabled>true</enabled> </releases> <snapshots> <enabled>true</enabled> 
-				</snapshots> -->
 		</pluginRepository>
 	</pluginRepositories>
 	<dependencies>
@@ -40,54 +38,17 @@
 		</dependency>
 	</dependencies>
 	<build>
+		<resources>
+			<resource>
+				<filtering>true</filtering>
+				<directory>${project.basedir}/../</directory>
+				<targetPath>${project.build.directory}</targetPath>
+				<includes>
+					<include>OneDevOpInsights*.pdf</include>
+				</includes>
+			</resource>
+		</resources>
 		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-install-plugin</artifactId>
-				<version>3.0.0-M1</version>
-				<inherited>false</inherited>
-				<dependencies>
-					<dependency>
-						<groupId>org.apache.commons</groupId>
-						<artifactId>commons-compress</artifactId>
-						<version>1.19</version>
-					</dependency>
-					<dependency>
-						<groupId>commons-codec</groupId>
-						<artifactId>commons-codec</artifactId>
-						<version>1.13</version>
-					</dependency>
-					<dependency>
-						<groupId>org.apache.maven.shared</groupId>
-						<artifactId>maven-artifact-transfer</artifactId>
-						<version>0.11.0</version>
-						<exclusions>
-							<exclusion>
-								<groupId>commons-codec</groupId>
-								<artifactId>commons-codec</artifactId>
-							</exclusion>
-						</exclusions>
-					</dependency>
-
-				</dependencies>
-				<executions>
-					<execution>
-						<id>install-jar-lib</id>
-						<goals>
-							<goal>install-file</goal>
-						</goals>
-						<phase>install</phase>
-						<configuration>
-							<groupId>com.github.eirslett</groupId>
-							<artifactId>frontend-maven-plugin</artifactId>
-							<version>1.8.1</version>
-							<packaging>jar</packaging>
-							<file>${basedir}/jar/frontend-maven-plugin-1.8.1.jar</file>
-							<generatePom>true</generatePom>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
 			<plugin>
 				<artifactId>maven-clean-plugin</artifactId>
 				<version>2.5</version>
@@ -105,32 +66,34 @@
 			<plugin>
 				<groupId>com.github.eirslett</groupId>
 				<artifactId>frontend-maven-plugin</artifactId>
-				<version>1.8.1</version>
+				<version>1.9.0</version>
 				<executions>
-				<!-- 	<execution>
-						<id>npm install</id>
-						<goals>
-							<goal>npm</goal>
-						</goals>
-
-						optional: default phase is "generate-resources"
-						<phase>generate-resources</phase>
-
-						<configuration>
-							optional: The default argument is actually "install", so unless 
-								you need to run some other npm command, you can remove this whole <configuration> 
-								section.
-							<arguments>install</arguments>
-						</configuration>
-					</execution> -->
 					<execution>
 						<id>install node and npm</id>
 						<goals>
 							<goal>install-node-and-npm</goal>
 						</goals>
+						<phase>generate-resources</phase>
+
 						<configuration>
+							<arguments>install</arguments>
 							<nodeVersion>v8.12.0</nodeVersion>
 							<npmVersion>6.3.0</npmVersion>
+							<bowerInheritsProxyConfigFromMaven>false</bowerInheritsProxyConfigFromMaven>
+						</configuration>
+					</execution>
+					<execution>
+						<id>npm install</id>
+						<goals>
+							<goal>npm</goal>
+						</goals>
+						<phase>generate-resources</phase>
+
+						<configuration>
+							<arguments>install</arguments>
+							<nodeVersion>v8.12.0</nodeVersion>
+							<npmVersion>6.3.0</npmVersion>
+							<bowerInheritsProxyConfigFromMaven>false</bowerInheritsProxyConfigFromMaven>
 						</configuration>
 					</execution>
 					<execution>
@@ -147,6 +110,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-assembly-plugin</artifactId>
+				<version>3.2.0</version>
 				<executions>
 					<execution>
 						<phase>package</phase>

@@ -11,25 +11,15 @@
 	<parent>
 		<artifactId>PlatformParent</artifactId>
 		<groupId>com.cognizant.devops</groupId>
-		<version>6.3</version>
+		<version>6.4</version>
 	</parent>
 
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>PlatformService</artifactId>
 	<groupId>com.cognizant.devops</groupId>
 	<packaging>war</packaging>
-	<version>6.3</version>
+	<version>6.4</version>
 	<name>PlatformService</name>
-
-
-
-	<repositories>
-		<repository>
-			<id>project.local</id>
-			<name>project</name>
-			<url>file:///${project.basedir}/jar</url>
-		</repository>
-	</repositories>
 
 	<dependencyManagement>
 		<dependencies>
@@ -70,7 +60,6 @@
 			<version>1.13</version>
 		</dependency>
 
-
 		<dependency>
 			<groupId>org.glassfish.jersey.containers</groupId>
 			<artifactId>jersey-container-servlet-core</artifactId>
@@ -81,12 +70,14 @@
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-core</artifactId>
 			<version>${spring.version}</version>
-		</dependency>   
+		</dependency>
+
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-context-support</artifactId>
 			<version>${spring.version}</version>
 		</dependency>
+
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-web</artifactId>
@@ -102,6 +93,7 @@
 			<groupId>org.springframework.security</groupId>
 			<artifactId>spring-security-web</artifactId>
 			<version>${spring.security.version}</version>
+
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.security</groupId>
@@ -177,11 +169,6 @@
 			<version>5.7.0</version>
 		</dependency>
 		<dependency>
-			<groupId>log4j</groupId>
-			<artifactId>log4j</artifactId>
-			<version>1.2.17</version>
-		</dependency>
-		<dependency>
 			<groupId>org.apache.logging.log4j</groupId>
 			<artifactId>log4j-api</artifactId>
 			<version>2.11.2</version>
@@ -191,27 +178,6 @@
 			<artifactId>log4j-core</artifactId>
 			<version>2.11.2</version>
 		</dependency>
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-api</artifactId>
-			<version>1.7.26</version>
-		</dependency>
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-log4j12</artifactId>
-			<version>1.7.26</version>
-			<exclusions>
-				<exclusion>
-					<groupId>org.slf4j</groupId>
-					<artifactId>slf4j-log4j12</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>log4j</groupId>
-					<artifactId>log4j</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-
 
 		<dependency>
 			<groupId>com.google.code.gson</groupId>
@@ -222,13 +188,13 @@
 		<dependency>
 			<groupId>com.cognizant.devops</groupId>
 			<artifactId>PlatformCommons</artifactId>
-			<version>6.3</version>
+			<version>6.4</version>
 		</dependency>
 
 		<dependency>
 			<groupId>com.cognizant.devops</groupId>
 			<artifactId>PlatformDAL</artifactId>
-			<version>6.3</version>
+			<version>6.4</version>
 		</dependency>
 
 		<dependency>
@@ -291,14 +257,23 @@
 		</dependency>
 
 		<!-- TestNg Dependency -->
+
 		<dependency>
 			<groupId>org.testng</groupId>
 			<artifactId>testng</artifactId>
-			<version>${testng.version}</version>
-			<scope>system</scope>
-			<systemPath>${project.basedir}/jar/testng-7.0.1.jar</systemPath>
+			<version>7.1.0</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.yaml</groupId>
+					<artifactId>snakeyaml</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
-
+		<dependency>
+			<groupId>org.yaml</groupId>
+			<artifactId>snakeyaml</artifactId>
+			<version>1.25</version>
+		</dependency>
 		<dependency>
 			<groupId>com.beust</groupId>
 			<artifactId>jcommander</artifactId>
@@ -323,6 +298,14 @@
 					<groupId>org.owasp.antisamy</groupId>
 					<artifactId>antisamy</artifactId>
 				</exclusion>
+				<exclusion>
+					<groupId>org.apache.logging.log4j</groupId>
+					<artifactId>log4j</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>log4j</groupId>
+					<artifactId>log4j</artifactId>
+				</exclusion>
 			</exclusions>
 		</dependency>
 		<dependency>
@@ -342,75 +325,119 @@
 			<artifactId>selenium-firefox-driver</artifactId>
 			<version>3.141.59</version>
 		</dependency>
+		<!-- https://mvnrepository.com/artifact/org.opensaml/opensaml -->
+		<dependency>
+			<groupId>org.opensaml</groupId>
+			<artifactId>opensaml</artifactId>
+			<version>2.6.4</version>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/org.springframework.security.extensions/spring-security-saml2-core -->
+		<dependency>
+			<groupId>org.springframework.security.extensions</groupId>
+			<artifactId>spring-security-saml2-core</artifactId>
+			<version>1.0.9.RELEASE</version>
+		</dependency>
+		<dependency>
+			<groupId>com.nimbusds</groupId>
+			<artifactId>nimbus-jose-jwt</artifactId>
+			<version>8.2.1</version>
+		</dependency>
 	</dependencies>
 	<properties>
 		<jersey.version>2.28</jersey.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<spring.version>5.1.5.RELEASE</spring.version>
-		<spring.security.version>5.1.5.RELEASE</spring.security.version>
+		<spring.version>5.2.3.RELEASE</spring.version>
+		<spring.security.version>5.2.1.RELEASE</spring.security.version>
 		<junit.version>4.12</junit.version>
 		<testng.version>7.0.1</testng.version>
 	</properties>
-	<profiles>
-		<profile>
-			<id>tomcatDeployment</id>
-			<activation>
-				<activeByDefault>false</activeByDefault>
-			</activation>
 
-			<build>
-				<plugins>
-
-
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-war-plugin</artifactId>
-						<version>2.3</version>
+	<build>
+		<finalName>PlatformService</finalName>
+		<resources>
+			<resource>
+				<directory>src/main/resources</directory>
+				<includes>
+					<include>**/*.md</include>
+					<include>**/*.json</include>
+					<include>version.properties</include>
+					<include>*.properties</include>
+					<include>**/*.properties</include>
+					<include>**/*.xml</include>
+					<include>**/*.p12</include>
+				</includes>
+				<filtering>true</filtering>
+			</resource>
+		</resources>
+		<plugins>
+			<plugin>
+				<artifactId>maven-resources-plugin</artifactId>
+				<version>3.1.0</version>
+				<executions>
+					<execution>
+						<id>copy-resources-home</id>
+						<phase>validate</phase>
+						<goals>
+							<goal>resources</goal>
+						</goals>
 						<configuration>
-							<archive>
-								<manifestEntries>
-									<Specification-Title>${project.name}</Specification-Title>
-									<Specification-Version>${project.version}</Specification-Version>
-								</manifestEntries>
-							</archive>
-							<includeSystemScope>true</includeSystemScope>
-							<!-- <webResources> <resource> <directory>${project.baseurl}/jar/org/testng/testng/7.0.1</directory> 
-								<targetPath>WEB-INF/lib</targetPath> <includes> <include>testng-7.0.1.jar</include> 
-								</includes> </resource> </webResources> -->
+							<encoding>UTF-8</encoding>
+							<nonFilteredFileExtensions>
+								<nonFilteredFileExtension>pdf</nonFilteredFileExtension>
+							</nonFilteredFileExtensions>
+							<outputDirectory>${project.build.directory}</outputDirectory>
+							<resources>
+								<resource>
+									<directory>${project.basedir}/../</directory>
+									<filtering>true</filtering>
+									<includes>
+										<include>OneDevOpInsights*.pdf</include>
+									</includes>
+								</resource>
+							</resources>
 						</configuration>
-					</plugin>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-surefire-plugin</artifactId>
-						<version>2.19.1</version>
-						<configuration>
-							<suiteXmlFiles>
-								<suiteXmlFile>src/test/resources/testng.xml</suiteXmlFile>
-							</suiteXmlFiles>
-						</configuration>
-					</plugin>
-					<!-- <plugin> <groupId>org.apache.tomcat.maven</groupId> <artifactId>tomcat7-maven-plugin</artifactId> 
-						<version>2.2</version> <configuration> <url>http://insightsrheldev.cogdevops.com:8000/manager/text</url> 
-						<server>tomcat</server> <path>/PlatformService</path> <includeSystemScope>true</includeSystemScope> 
-						</configuration> </plugin> -->
-				</plugins>
-				<resources>
-					<resource>
-						<directory>src/main/resources</directory>
-						<includes>
-							<include>**/*.md</include>
-							<include>**/*.json</include>
-							<include>version.properties</include>
-							<include>*.properties</include>
-							<include>**/*.properties</include>
-							<include>**/*.xml</include>
-							<include>**/*.p12</include>
-							<include>OneDevOpInsights v2.17 OpenSource Credit Document v1.0.pdf</include>
-						</includes>
-						<filtering>true</filtering>
-					</resource>
-				</resources>
-			</build>
-		</profile>
-	</profiles>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-war-plugin</artifactId>
+				<version>3.2.3</version>
+				<configuration>
+					<encoding>UTF-8</encoding>
+					<nonFilteredFileExtensions>
+						<nonFilteredFileExtension>pdf</nonFilteredFileExtension>
+					</nonFilteredFileExtensions>
+					<archive>
+						<manifestEntries>
+							<Specification-Title>${project.name}</Specification-Title>
+							<Specification-Version>${project.version}</Specification-Version>
+						</manifestEntries>
+					</archive>
+					<includeSystemScope>true</includeSystemScope>
+					<webResources>
+						<resource>
+							<directory>${project.build.directory}</directory>
+							<targetPath>WEB-INF/../</targetPath>
+							<includes>
+								<include>**/*.pdf</include>
+							</includes>
+						</resource>
+					</webResources>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<version>2.19.1</version>
+				<configuration>
+					<suiteXmlFiles>
+						<suiteXmlFile>src/test/resources/testng.xml</suiteXmlFile>
+					</suiteXmlFiles>
+				</configuration>
+			</plugin>
+		</plugins>
+
+	</build>
+
 </project>

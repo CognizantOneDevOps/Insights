@@ -1,36 +1,69 @@
 <!--
- *********************************************************************************
- * Copyright 2019 Cognizant Technology Solutions
- * 
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not
- * use this file except in compliance with the License.  You may obtain a copy
- * of the License at
- * 
- *   http://www.apache.org/licenses/LICENSE-2.0
- * 
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
- * License for the specific language governing permissions and limitations under
- * the License.
- *******************************************************************************-->
-
-<div class="arrange-horizontally-Dialog" style="padding:0px">
+   *********************************************************************************
+   * Copyright 2019 Cognizant Technology Solutions
+   * 
+   * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+   * use this file except in compliance with the License.  You may obtain a copy
+   * of the License at
+   * 
+   *   http://www.apache.org/licenses/LICENSE-2.0
+   * 
+   * Unless required by applicable law or agreed to in writing, software
+   * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+   * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+   * License for the specific language governing permissions and limitations under
+   * the License.
+   *******************************************************************************-->
+<div class="arrange-horizontally-Dialog" style="padding: 0px">
     <div class="gridheadercenter">
-        <pre style="font-family: inherit; font-size: 23px;margin-top: -7px;">{{title1}}</pre>
+        <pre class="showDialogHeadingCss">{{title}}</pre>
     </div>
-
-
-
     <div class="closeIconCss">
         <a (click)="closeShowDetailsDialog()">
-            <mat-icon class="closeiconConf" svgIcon="close_dialog">
-            </mat-icon>
+            <mat-icon class="closeiconConf" svgIcon="close_dialog"> </mat-icon>
         </a>
     </div>
 </div>
-<div class="scrollData">
-    <!-- <mat-dialog-content> -->
-    <pre class="mat-dialog-content-json" style="font-family: inherit; font-size: 14px">{{sample}}</pre>
-    <!--  </mat-dialog-content> -->
-</div>
+<div style="margin-top: 180px" class="scrollData">
+    <span class="Relationnamecss"><b>{{relationName}}</b></span>
+    <table>
+        <tr>
+            <th><span style="margin-left: 70px;" class="dot"></span></th>
+            <th style="width: 0px !important">
+                <hr style="width: 500px; height: 3px;" size=10 noshade>
+            </th>
+            <td style="margin-right: 100px;"><span class="dot" style="margin-left: 0px"></span></td>
+        </tr>
+    </table>
+    <table>
+        <tr>
+            <td>
+                <div (mouseover)="sourceText=true" (mouseout)="sourceText=false">
+                    <span class="BlueColumnLeft"><b>{{source}}</b> </span>
+                    <div *ngIf="sourceText" class="dialog-model">
+                        <h4 style="font-size:13px;">
+                            Source Fields <span (click)="showModel = null"></span>
+                        </h4>
+                        <div class="body-content">
+                            <p class="multi_lines_text" [innerHTML]="sourceformattedString"></p>
+                        </div>
+                    </div>
+                </div>
+            </td>
+            <td><span class="Relationspropertycss"><b>{{relationshipProp}}</b></span>
+            </td>
+            <td>
+                <div (mouseover)="destText=true" (mouseout)="destText=false">
+                    <span class="BlueColumnRight"><b>{{destination}}</b> </span>
+                    <div *ngIf="destText" class="dialog-modelDest">
+                        <h4 style="font-size:13px;">
+                            Destination Fields<span (click)="showModel = null"></span>
+                        </h4>
+                        <div class="body-content">
+                            <p class="multi_lines_text" [innerHTML]="destformattedString"></p>
+                        </div>
+                    </div>
+                </div>
+            </td>
+        </tr>
+    </table>

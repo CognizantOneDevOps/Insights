@@ -28,7 +28,7 @@
       </div>
       <div class="arrange-horizontally">
         <label class="mainText"> Select Tool </label>
-        <mat-select [(ngModel)]="selectAgentTool" [style.height.px]="20" [style.width.%]="21"
+        <mat-select [(ngModel)]="selectAgentTool" [style.width.%]="21"
           (ngModelChange)="selectToolAgent(selectAgentTool)" name="selectAgentTool" required placeholder="Select Tool"
           class="toolsBoxCss" [ngClass]="{  'input-disabled' :false  ,  'form-control': true}">
           <mat-option *ngFor="let data of agentNameList" [value]="data" style="color:#0033A0">
@@ -38,7 +38,7 @@
       </div>
       <div id="agentsTable" layout-align="center center" class="tableContainerStyle" *ngIf="showContentAgent">
         <!-- Insights Agents Table -->
-        <table mat-table [dataSource]="agentListDatasource">
+        <table mat-table [dataSource]="agentListDatasource" class="matTableBorder">
           <!-- Tool Column -->
           <ng-container matColumnDef="toolName">
             <th mat-header-cell *matHeaderCellDef class="tableHeaderCss"> Tool </th>
@@ -107,7 +107,7 @@
       </div>
 
       <div id="dataComponentTable" layout-align="center center" class="tableContainerStyle" *ngIf="showContent">
-        <table mat-table [dataSource]="dataComponentDataSource">
+        <table mat-table [dataSource]="dataComponentDataSource" class="matTableBorder">
           <!-- Server Column -->
           <ng-container matColumnDef="serverName">
             <th mat-header-cell *matHeaderCellDef class="tableHeaderCss">Name</th>
@@ -171,7 +171,7 @@
       </div>
 
       <div id="servicesTable" layout-align="center center" class="tableContainerStyle" *ngIf="showContent">
-        <table mat-table [dataSource]="servicesDataSource">
+        <table mat-table [dataSource]="servicesDataSource" class="matTableBorder">
           <!-- Server Column -->
           <ng-container matColumnDef="serverName">
             <th mat-header-cell *matHeaderCellDef class="tableHeaderCss">Name</th>
@@ -235,7 +235,7 @@
       </div>
 
       <div id="reportLogs" layout-align="center center" class="tableContainerStyle" *ngIf="showContent">
-        <table mat-table [dataSource]="reportLogsDataSource">
+        <table mat-table [dataSource]="reportLogsDataSource" class="matTableBorder">
           <!-- Server Column -->
           <ng-container matColumnDef="reportName">
             <th mat-header-cell *matHeaderCellDef class="tableHeaderCss">Report Name</th>

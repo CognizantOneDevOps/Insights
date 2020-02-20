@@ -15,15 +15,20 @@
  ******************************************************************************/
 package com.cognizant.devops.platformservice.security.config;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.web.servlet.support.AbstractAnnotationConfigDispatcherServletInitializer;
+
 import com.cognizant.devops.platformservice.content.config.ContentConfig;
 
 public class SpringMvcInitializer extends AbstractAnnotationConfigDispatcherServletInitializer {
+	
+	private static Logger LOG = LogManager.getLogger(SpringMvcInitializer.class);
 
 	@Override
 	protected Class<?>[] getRootConfigClasses() {
-		return new Class[] { SecurityConfiguration.class, ContentConfig.class }; 
-
+		LOG.debug("In SpringMvcInitializer  ");
+		return new Class[] { InsightsSecurityConfigurationAdapter.class,ContentConfig.class }; 
 	}
 
 	@Override

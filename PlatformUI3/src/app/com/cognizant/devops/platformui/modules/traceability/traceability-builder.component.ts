@@ -3,6 +3,7 @@ import { TraceabiltyService } from './traceablity-builder.service';
 import { MatTableDataSource, MatSort, MatPaginator, MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 import { ShowTraceabiltyDetailsDialog } from './traceabilty-show-details-dialog';
 import { MessageDialogService } from '@insights/app/modules/application-dialog/message-dialog-service';
+import { DataSharedService } from '@insights/common/data-shared-service';
 
 @Component({
     selector: 'app-traceabilitydashboard',
@@ -30,10 +31,16 @@ export class TraceabilityDashboardCompenent implements OnInit {
     fieldPlaceVal: string;
     resultSummary: any;
     toolSummaryArray = [];
-    constructor(private dialog: MatDialog, public messageDialog: MessageDialogService, private traceablityService: TraceabiltyService) {
+    timeZone: string = "";
+    toolTimelagArray = [];
+    isEnable = false;
+    timelagData: {}
+    constructor(private dialog: MatDialog, public messageDialog: MessageDialogService,
+        private traceablityService: TraceabiltyService, public dataShare: DataSharedService) {
     }
 
     ngOnInit() {
+        this.timeZone = this.dataShare.getTimeZone()
         this.isToolSelected = true;
         this.isFieldSelected = true;
         this.traceablityService.getAvailableTools()
@@ -43,10 +50,10 @@ export class TraceabilityDashboardCompenent implements OnInit {
                 }
             });
     }
-
     getDetails() {
         this.list = [];
         this.toolSummaryArray = [];
+        this.isEnable = false;
         this.getAssetHistoryDetails(this.selectedTool, this.selectedField, this.fieldValue);
 
     }
@@ -62,7 +69,6 @@ export class TraceabilityDashboardCompenent implements OnInit {
                         for (var element of data.data.pipeline) {
                             this.order[(element.order) - 1] = element.toolName;
                         }
-
                         let result = data.data.pipeline;
                         let historyData = [];
                         result.map((resultmap) => {
@@ -74,35 +80,50 @@ export class TraceabilityDashboardCompenent implements OnInit {
                             })
                             historyData.push(resultmap);
                         });
+                        if (data.data.summary.length > 0) {
+
+                            this.toolSummaryArray = [];
+                            var tempArr = []
+                            for (let orderredTool in this.order) {
+                                var toolName = this.order[orderredTool]
+                                var toolData = data.data.summary[0][toolName]
+                                if (toolData != undefined) {
+                                    tempArr.push(toolData)
+                                }
+                            }
+                            var summaryLen = tempArr.length;
+                            for (let index = 0; index < summaryLen; index++) {
+                                var object = tempArr[index]
+                                var obejctString = JSON.stringify(object);
+                                var objectLen = obejctString.split(",").length
+                                for (var i = 0; i < objectLen; i++) {
+                                    this.toolSummaryArray.push(tempArr[index][i])
+                                }
+                            }
+                        }
+                        if (data.data.timelag.length > 0) {
+                            var tempArr = []
+                            for (let orderredTool in this.order) {
+                                var toolName = this.order[orderredTool]
+                                let toolData = data.data.timelag[0][toolName]
+                                if (toolData != undefined) {
+                                    this.timelagData = { 'toolName': toolName, 'AverageTime': toolData }
+                                    tempArr.push(this.timelagData)
+                                }
+                            }
+                            this.toolTimelagArray = tempArr
+                            console.log(this.toolTimelagArray)
+                            this.isEnable = true;
+                        }
                         this.traceabilityData = data;
                         this.workflow();
                         this.isDatainProgress = false;
-                    } else {
-                        this.messageDialog.showApplicationsMessage("no data present for the given input.", "ERROR");
+                    } 
+                    else {
+                        this.messageDialog.showApplicationsMessage("no data found for the given input", "ERROR");
                         this.isDatainProgress = false;
                     }
-                    if (data.data.summary.length > 0) {
 
-                        this.toolSummaryArray = [];
-                        var tempArr = []
-                        for (let orderredTool in this.order) {
-                            var toolName = this.order[orderredTool]
-                            var toolData = data.data.summary[0][toolName]
-                            if (toolData != undefined) {
-                                tempArr.push(toolData)
-                            }
-                        }
-                        var summaryLen = tempArr.length;
-                        for (let index = 0; index < summaryLen; index++) {
-                            var object = tempArr[index]
-                            var obejctString = JSON.stringify(object);
-                            var objectLen = obejctString.split(",").length
-                            for (var i = 0; i < objectLen; i++) {
-                                this.toolSummaryArray.push(tempArr[index][i])
-                            }
-                        }
-
-                    }
                 }
                 else {
                     this.messageDialog.showApplicationsMessage(data.message, "ERROR");
@@ -230,9 +251,19 @@ export class TraceabilityDashboardCompenent implements OnInit {
     showDetailsDialog(toolName: string) {
         let showDetailsDialog = this.dialog.open(ShowTraceabiltyDetailsDialog, {
             panelClass: 'traceablity-show-details-dialog-container',
-            width: "900px",
+            width: '65%',
+            height: '70%',
             disableClose: true,
-            data: { toolName: toolName, cachestring: this.cachestring }
+            data: { toolName: toolName, cachestring: this.cachestring, showToolDetail: true }
+        });
+    }
+
+    showTimeDetailsDialog() {
+        let showDetailsDialog = this.dialog.open(ShowTraceabiltyDetailsDialog, {
+            panelClass: 'traceablity-timelag-dialog-container',
+            width: '40%',
+            disableClose: true,
+            data: { toolName: "toolName", dataArr: this.toolTimelagArray, showToolDetail: false }
         });
     }
 

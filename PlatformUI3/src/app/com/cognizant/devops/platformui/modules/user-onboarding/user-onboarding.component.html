@@ -36,7 +36,7 @@
 
   <div *ngIf=" showDetail ">
     <label class="mainText"> Current Access Group </label>
-    <mat-select [(ngModel)]="selectedAdminOrg" placeholder="Select Access Group" [style.height.px]="20" [style.width.%]="20"
+    <mat-select [(ngModel)]="selectedAdminOrg" placeholder="Select Access Group" [style.width.%]="20"
       (ngModelChange)="loadUsersInfo(selectedAdminOrg)" name="selectedAdminOrg" [ngClass]="{  'input-disabled' : readOnlyOrg ,  'form-control': !readOnlyOrg}">
 
       <mat-option *ngFor="let record of adminOrgDataArray" [value]="record">
@@ -44,22 +44,20 @@
       </mat-option>
     </mat-select>
     <div class="filterGroupCSS" *ngIf=" showDetail ">
-      <input matInput (keyup)="applyFilter($event.target.value)" placeholder="Search by Login ID or Email Address
-          "
-        [style.height.px]="20" [style.width.%]="90" class="form-control">
+      <input matInput (keyup)="applyFilter($event.target.value)" placeholder="Search by Login ID or Email Address" class="form-control">
     </div>
   </div>
 
   <div>
     <div class="btnAlign">
       <button mat-icon-button (click)="displayaccessGroupCreateField()">
-        <mat-icon title="Add New Access Group" class="mat-icon material-icons">
+        <mat-icon title="Add New Access Group" style="margin-top: 12%;" class="mat-icon material-icons">
           add_circle
         </mat-icon>
 
       </button>
       <button *ngIf="!showAddUserDetail " mat-icon-button (click)="addGlobalUser()">
-        <mat-icon title="Add User to Current/Selected Access Group" class="mat-icon material-icons">
+        <mat-icon title="Add User to Current/Selected Access Group" style="margin-top: 10%;" class="mat-icon material-icons">
           person_add
         </mat-icon>
       </button>
@@ -71,48 +69,48 @@
       </button>
 
       <button *ngIf="showDetail" mat-icon-button (click)="saveData() " [disabled]="!isSaveEnable ">
-        <mat-icon title="Save " class="mat-icon material-icons ">
+        <mat-icon title="Save " style="margin-top: 10%;" class="mat-icon material-icons ">
           save
         </mat-icon>
       </button>
 
       <button *ngIf="!showDetail2" mat-icon-button (click)="saveData() " [disabled]="!isSaveEnable ">
-        <mat-icon title="Save " class="mat-icon material-icons ">
+        <mat-icon title="Save " style="margin-top: 12%;" class="mat-icon material-icons ">
           save
         </mat-icon>
       </button>
 
       <button *ngIf="adduserSaveEnable" mat-icon-button (click)="saveUser(names,email,username,pass)" [disabled]="!adduserSaveEnable">
-        <mat-icon title="Save " class="mat-icon material-icons ">
+        <mat-icon title="Save " style="margin-top: 10%;" class="mat-icon material-icons ">
           save
         </mat-icon>
       </button>
 
       <button *ngIf="assignuserSaveEnable" mat-icon-button (click)="assignUser()" [disabled]="!assignuserSaveEnable">
-        <mat-icon title="Save " class="mat-icon material-icons ">
+        <mat-icon title="Save " style="margin-top: 10%;" class="mat-icon material-icons ">
           save
         </mat-icon>
       </button>
 
       <button mat-icon-button (click)="editUserData() " [disabled]="!isbuttonenabled || isSaveEnable ">
-        <mat-icon title="Edit " class="mat-icon material-icons ">
+        <mat-icon title="Edit " style="margin-top: 10%;" class="mat-icon material-icons ">
           edit
         </mat-icon>
       </button>
 
       <button mat-icon-button [disabled]="!isbuttonenabled || isSaveEnable " (click)="deleteOrgUser() ">
-        <mat-icon title="Delete Organization User " class="mat-icon material-icons ">
+        <mat-icon title="Delete Organization User " style="margin-top: 12%;" class="mat-icon material-icons ">
           delete
         </mat-icon>
       </button>
 
       <button mat-icon-button [disabled]="!showCancel">
-        <mat-icon title="Cancel " class="mat-icon material-icons" (click)="Refresh()">
+        <mat-icon title="Cancel " style="margin-top: 12%;" class="mat-icon material-icons" (click)="Refresh()">
           cancel </mat-icon>
       </button>
 
       <button mat-icon-button>
-        <mat-icon svgIcon="redirect_icon" title="Redirect To Landing Page" class="mat-icon material-icons" (click)="redirectToLandingPage()">
+        <mat-icon svgIcon="redirect_icon" title="Redirect To Landing Page" style="margin-bottom: 12%;" class="mat-icon material-icons" (click)="redirectToLandingPage()">
           refresh </mat-icon>
       </button>
     </div>
@@ -190,7 +188,7 @@
               </div>
             </td>
             <td class="AddUserColTextCss">
-              <mat-select [disabled]="!adduserSaveEnable" [(ngModel)]="selectedAdminOrg" [style.height.px]="20"
+              <mat-select [disabled]="!adduserSaveEnable" [(ngModel)]="selectedAdminOrg" [style.height.%]="10"
                 [style.width.%]="380" name="selectedAdminOrg" [ngClass]="{  'input-disabled' : readOnlyOrg ,  'form-control': !readOnlyOrg}">
 
                 <mat-option *ngFor="let record of adminOrgDataArray" [value]="record">
@@ -256,8 +254,8 @@
             <td class="AddUserColTextCss" style=" width:30px;">Role</td>
 
             <td>
-              <mat-select [disabled]="!adduserSaveEnable" style="margin-left: 45px;" [(ngModel)]="role "
-                [style.width.%]="200 " name="{{role}}" required placeholder=" Select a Role" [ngClass]="{ 'input-disabled' : !isSaveEnable  , 'form-control': isSaveEnable} ">
+              <mat-select [disabled]="!adduserSaveEnable" style="margin-left: 104%;" [(ngModel)]="role "
+                [style.width.%]="484 " name="{{role}}" required placeholder=" Select a Role" [ngClass]="{ 'input-disabled' : !isSaveEnable  , 'form-control': isSaveEnable} ">
                 <mat-option *ngFor=" let record of roleRecord " [value]="record.value ">
                   {{record.name}}
                 </mat-option>
@@ -309,7 +307,7 @@
             </button>
           </tr>
 
-          <div class="col-md-2" [formGroup]="addForm">
+          <div [formGroup]="addForm">
             <div class="form-group">
               <!--  <label class="label-control">Items</label>
         <br> -->
@@ -318,10 +316,10 @@
 
                 <tbody>
                   <tr class="AddUserColTextCss" *ngFor="let row of rows?.controls;let index = index;">
-                    <td style="border-spacing:0px !important;padding:0 15px 0 15px;">Access Group </td>
+                    <td style="border-spacing:0px !important;padding:0 15px 0 15px;width: 24%;">Access Group </td>
                     <td style="border-spacing:0px !important;">
                       <mat-select [disabled]="!assignuserSaveEnable" required placeholder="Select Access Group"
-                        [formControl]="row.get('org')" [style.width.px]="100 " [style.height.px]="20" [style.width.px]="160"
+                        [formControl]="row.get('org')" [style.height.%]="10" [style.width.%]="120"
                         name="selectOrgForUser5" [ngClass]="{  'input-disabled' : readOnlyOrg ,  'form-control': !readOnlyOrg}">
 
                         <mat-option [disabled]="!assignuserSaveEnable" *ngFor="let record of adminOrgDataArray" [value]="record">
@@ -330,12 +328,12 @@
                       </mat-select>
 
                     </td>
-                    <td style="padding:0 15px 0 15px;border-spacing:0px !important;">Role</td>
+                    <td style="padding:0 15px 0 50px;border-spacing:0px !important;width: 5%;">Role</td>
 
                     <td style="border-spacing:0px !important; border-collapse: none !important">
 
                       <mat-select [disabled]="!assignuserSaveEnable" required placeholder="Select Role" [formControl]="row.get('role')"
-                        [ngClass]="{  'input-disabled' : readOnlyOrg ,  'form-control': !readOnlyOrg}" [style.width.px]="100 "
+                        [ngClass]="{  'input-disabled' : readOnlyOrg ,  'form-control': !readOnlyOrg}" [style.width.%]="80 "
                         name="role5">
                         <mat-option *ngFor=" let record of roleRecord " [value]="record.value ">
                           {{record.name}}

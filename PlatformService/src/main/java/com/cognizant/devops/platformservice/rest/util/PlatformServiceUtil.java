@@ -16,22 +16,29 @@
 package com.cognizant.devops.platformservice.rest.util;
 
 import java.io.File;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
+import java.util.Base64;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.NewCookie;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
 import com.cognizant.devops.platformcommons.core.util.ValidationUtils;
+import com.cognizant.devops.platformcommons.dal.rest.RestHandler;
+import com.cognizant.devops.platformservice.security.config.AuthenticationUtils;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.sun.jersey.api.client.Client;
@@ -40,22 +47,11 @@ import com.sun.jersey.api.client.WebResource;
 
 public class PlatformServiceUtil {
 	private static final Logger log = LogManager.getLogger(PlatformServiceUtil.class);
-	private static final String[] SET_VALUES = new String[] { "grafanaOrg", "grafana_user", "grafanaRole",
-			"grafana_remember", "grafana_sess", "XSRF-TOKEN", "JSESSIONID","grafana_session" };
-	private static final Set<String> masterCookiesList = new HashSet<String>(Arrays.asList(SET_VALUES));
-	private final static String JSON_FILE_VALIDATOR = "^([a-zA-Z0-9_.\\s-])+(.json)$";
-	private final static String LOG_FILE_VALIDATOR = "^([a-zA-Z0-9_.\\s-])+(.log)$";
 	private PlatformServiceUtil(){
 		
 	}
 	
-	public static JsonObject buildFailureResponse(String message){
-		JsonObject jsonResponse = new JsonObject();
-		jsonResponse.addProperty(PlatformServiceConstants.STATUS, PlatformServiceConstants.FAILURE);
-		jsonResponse.addProperty(PlatformServiceConstants.MESSAGE, message);
-		return jsonResponse;
-	}
-	
+
 	public static JsonObject buildSuccessResponseWithData(Object data){
 
 		JsonObject jsonResponse = new JsonObject();
@@ -69,6 +65,21 @@ public class PlatformServiceUtil {
 		return validatedData;
 	}
 	
+	public static JsonObject buildFailureResponse(String message) {
+		JsonObject jsonResponse = new JsonObject();
+		jsonResponse.addProperty(PlatformServiceConstants.STATUS, PlatformServiceConstants.FAILURE);
+		jsonResponse.addProperty(PlatformServiceConstants.MESSAGE, message);
+		return jsonResponse;
+	}
+
+	public static JsonObject buildFailureResponseWithStatusCode(String message, String statusCode) {
+		JsonObject jsonResponse = new JsonObject();
+		jsonResponse.addProperty(PlatformServiceConstants.STATUS, PlatformServiceConstants.FAILURE);
+		jsonResponse.addProperty(PlatformServiceConstants.MESSAGE, message);
+		jsonResponse.addProperty("StatusCode", statusCode);
+		return jsonResponse;
+	}
+
 	public static JsonObject buildSuccessResponseWithHtmlData(Object data) {
 
 		JsonObject jsonResponse = new JsonObject();
@@ -102,8 +113,8 @@ public class PlatformServiceUtil {
 			// log.debug("Request Cookies length " + request_cookies.length);
 			for (int i = 0; i < request_cookies.length; i++) {
 				cookie = request_cookies[i];
-				//log.debug(" cookie " + cookie.getName() + " " + cookie.getValue());
-				if (masterCookiesList.contains(cookie.getName())) {
+				log.debug(" cookie " + cookie.getName() + " " + cookie.getValue());
+				if (AuthenticationUtils.MASTER_COOKIES_KEY_LIST.contains(cookie.getName())) {
 					cookie.setMaxAge(30 * 60);
 					cookie.setHttpOnly(true);
 					cookie.setValue(ValidationUtils.cleanXSS(cookie.getValue()));
@@ -124,6 +135,27 @@ public class PlatformServiceUtil {
 		return cookiesArray;
 	}
 	
+	public static Map<String, String> getRequestCookies(HttpServletRequest httpRequest) {
+		Map<String, String> cookieMap = new HashMap<String, String>(0);
+		Cookie cookie = null;
+		Cookie [] cookiesList = httpRequest.getCookies();
+		if (cookiesList != null) {
+			// log.debug("Request Cookies length " + request_cookies.length);
+			for (int i = 0; i < cookiesList.length; i++) {
+				cookie = cookiesList[i];
+				//log.debug(" cookie " + cookie.getName() + " " + cookie.getValue());
+				if (AuthenticationUtils.MASTER_COOKIES_KEY_LIST.contains(cookie.getName())) {
+					cookie.setMaxAge(30 * 60);
+					cookie.setHttpOnly(true);
+					cookie.setValue(ValidationUtils.cleanXSS(cookie.getValue()));
+					cookieMap.put(cookie.getName(),cookie.getValue().concat("; HttpOnly"));
+				} else {
+					log.debug("Cookie Name Not found in master cookies list name as " + cookie.getName());
+				}
+			}
+		} 
+		return cookieMap;
+	}
 	/**
 	 * Check path for canonical and directory traversal.
 	 * @param path
@@ -164,9 +196,9 @@ public class PlatformServiceUtil {
 		final Pattern pattern;
 		try {
 			if(filename.contains(".json")) {
-				pattern = Pattern.compile(JSON_FILE_VALIDATOR);
+				pattern = Pattern.compile(AuthenticationUtils.JSON_FILE_VALIDATOR);
 			}else {
-				pattern = Pattern.compile(LOG_FILE_VALIDATOR);
+				pattern = Pattern.compile(AuthenticationUtils.LOG_FILE_VALIDATOR);
 			}
 			final Matcher matcher = pattern.matcher(filename);
 
@@ -191,5 +223,93 @@ public class PlatformServiceUtil {
 			return false;
 		}
 		return true;
+	}
+	
+	/**
+	 * This Method is use prepare Grafana Header based on Request cookies and other value 
+	 * @return Map of Grafana Header
+	 */
+	public static  Map<String, String> prepareGrafanaHeader(HttpServletRequest httpRequest) {
+		Map<String, String> headers = new HashMap<String, String>();
+		if (ApplicationConfigProvider.getInstance().isEnableSSO()) {
+			String webAuthHeaderKey = ValidationUtils
+					.cleanXSS(httpRequest.getHeader(AuthenticationUtils.GRAFANA_WEBAUTH_HEADER_KEY));
+			log.debug(" x-webauth-user ==== " + webAuthHeaderKey);
+			headers.put(AuthenticationUtils.GRAFANA_WEBAUTH_USERKEY, webAuthHeaderKey);
+			headers.put(AuthenticationUtils.GRAFANA_WEBAUTH_USERKEY_NAME, webAuthHeaderKey);
+		}
+		String grafanaCookie = PlatformServiceUtil.getUserCookiesFromRequestCookies(httpRequest);
+		headers.put("Cookie", grafanaCookie);
+		return headers;
+	}
+	
+	/**
+	 * This method used to return grafana cookies string based on request cookies
+	 * @return string of cookies 
+	 */
+	public static String getUserCookiesFromRequestCookies(HttpServletRequest httpRequest) {
+		Map<String, String> requestCookies = PlatformServiceUtil.getRequestCookies(httpRequest);
+		if (requestCookies.isEmpty() || !requestCookies.containsKey(AuthenticationUtils.GRAFANA_SESSION_COOKIE_KEY)) {
+			if (!ApplicationConfigProvider.getInstance().isEnableSSO()) {
+				try {
+					requestCookies = getGrafanaCookies(httpRequest);
+				} catch (UnsupportedEncodingException e) {
+					log.error("Unable to get grafana session.", e);
+				}
+			}
+		}
+		String grafanaCookies = requestCookies.entrySet().stream().map(e -> e.getKey() + "=" + e.getValue())
+				.collect(Collectors.joining(";"));
+		log.debug(" grafanaCookies ==== " + grafanaCookies);
+		return grafanaCookies;
+	}
+
+
+	public static Map<String, String> getGrafanaCookies(HttpServletRequest httpRequest)
+			throws UnsupportedEncodingException {
+		Map<String, String> requestCookies  = new HashMap<String, String>(0);
+		String authHeader = ValidationUtils.extactAutharizationToken(httpRequest.getHeader("Authorization"));
+		String decodedAuthHeader = new String(Base64.getDecoder().decode(authHeader.split(" ")[1]),
+				"UTF-8");
+		String[] authTokens = decodedAuthHeader.split(":");
+		JsonObject loginRequestParams = new JsonObject();
+		loginRequestParams.addProperty("user", authTokens[0]);
+		loginRequestParams.addProperty("password", authTokens[1]);
+		String loginApiUrl =  PlatformServiceUtil.getGrafanaURL("/login");
+		ClientResponse grafanaLoginResponse = RestHandler.doPost(loginApiUrl, loginRequestParams, null);
+		List<NewCookie> cookies2 = grafanaLoginResponse.getCookies();
+		for (NewCookie cookie : cookies2) {
+			requestCookies.put(cookie.getName(),
+					ValidationUtils.cleanXSS(cookie.getValue()).concat("; HttpOnly"));
+		}
+		return requestCookies;
+	}
+	
+	public static String getGrafanaURL(String urlPart) {
+		return ApplicationConfigProvider.getInstance().getGrafana().getGrafanaEndpoint()+ urlPart;
+	}
+	
+	/**
+	 * Given the query param, search on the LDAP and return the valid user details.
+	 * 
+	 * @param query
+	 * @return
+	 */
+	
+	public static String getUserCookiesFromAttribute(HttpServletRequest httpRequest) {
+		Map<String, String> cookieMap = (Map<String, String>) httpRequest.getAttribute("responseHeaders");
+		if (cookieMap.isEmpty() || !cookieMap.containsKey(AuthenticationUtils.GRAFANA_SESSION_COOKIE_KEY)) {
+			if (!ApplicationConfigProvider.getInstance().isEnableSSO()) {
+				try {
+					cookieMap = getGrafanaCookies(httpRequest);
+				} catch (UnsupportedEncodingException e) {
+					log.error("Unable to get grafana session.", e);
+				}
+			}
+		}
+		String grafanaCookies = cookieMap.entrySet().stream().map(e -> e.getKey() + "=" + e.getValue())
+				.collect(Collectors.joining(";"));
+		log.debug(" grafanaCookies ==== " + grafanaCookies);
+		return grafanaCookies;
 	}
 }

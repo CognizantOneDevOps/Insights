@@ -35,7 +35,7 @@ export class UserOnboardingComponent implements OnInit {
 
   mainContentMinHeightWoSbTab: string = 'min-height:' + (window.innerHeight - 146 - 48) + 'px';
   iframeStyleAdd = "{'height': 1500 +'px '+ '!important' }";
-  userListUrl: SafeResourceUrl;
+
   framesize: any;
   adduserSaveEnable: boolean = false;
   assignuserSaveEnable: boolean = false
@@ -82,7 +82,6 @@ export class UserOnboardingComponent implements OnInit {
   showDetail: boolean = false;
   displayAccessGroupDetail: boolean = false;
   accessGroupName: String = "";
-  grafanaUrl: String = "";
   showApplicationMessage: String = "";
   selectedAdminOrg: any;
   isSelectedUserId: any = -1;

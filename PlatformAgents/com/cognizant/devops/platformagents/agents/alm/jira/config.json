@@ -2,8 +2,8 @@
   "vault": {
 	"getFromVault": false,
 	"secretEngine":"insights-kv",
-	"readToken":"token",
-	"vaultUrl":"http://10.224.90.35:3000/v1/"
+	"readToken":"vault_secret_token",
+	"vaultUrl":"http://Vault_Host:port/v1/"
   },
   "mqConfig": {
     "user": "iSight",
@@ -151,7 +151,45 @@
 			        "uniqueKey" : ["projectKey", "projectId"]
 			    }
 			 }
- 		}
+ 		},
+ 	"changeLog": {
+		"fields": [
+			"assignee",
+			"Sprint",
+			"status",
+			"Story Points",
+			"Key",
+			"Rank",
+			"project",
+			"issuetype",
+			"Version",
+			"Fix Version",
+			"timespent",
+			"Link",
+			"Acceptance Criteria",
+			"description"
+		],
+		"metadata": {
+			"labels": [
+				"CHANGE_LOG"
+			],
+			"dataUpdateSupported": true,
+			"uniqueKey": [
+				"issueKey",
+				"changeId",
+				"changedfield"
+			]
+		},
+		"responseTemplate": {
+			"id": "changeId",
+			"author": {
+				"name": "authorId",
+				"emailAddress": "authorEmail",
+				"displayName": "authorName"
+			},
+			"created": "changeDate"
+		}
+	}
   },
   "agentId": "",
   "toolCategory" : "ALM",

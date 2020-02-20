@@ -15,512 +15,756 @@
  ******************************************************************************/
 
 #search input[type=search].filled {
-    width: 200px;
-    padding-left: 32px;
-    color: black;
-    background-color: #fff;
-    cursor: auto;
+	width: 200px;
+	padding-left: 32px;
+	color: black;
+	background-color: #fff;
+	cursor: auto;
+}
+
+.radiobuttonCol {
+	width: 15% !important;
+	padding-left: 11px !important;
+}
+
+.ViewCorrelation {
+	margin-left: 140px;
+	height: 45px;
+	width: 35px
+}
+
+.selectDropDown {
+	width: 100%;
+	margin-top: 6px;
+	height: 80%;
+}
+
+.selectDropDownmenu {
+	margin-left: -43px;
+	margin-top: 22px;
+}
+
+.selfRelation-toggle {
+	position: absolute;
+	right: 300px;
+}
+
+.selfRelation-toggle-fontCSS {
+	font-family: inherit;
+	font-size: inherit;
+	color: #0033A0;
 }
 
 .mat-radio-button.mat-accent .mat-radio-outer-circle {
-    height: 14px !important;
-    width: 14px !important
+	height: 14px !important;
+	width: 14px !important
 }
 
 .mat-radio-button {
-    font-size: 14px !important;
+	font-size: 14px !important;
 }
 
 .RadioCss {
-    margin-left: 140px;
-    width: 20px;
+	margin-left: 140px;
+	width: 20px;
 }
 
 .inputcss {
-    font-size: 14px !important;
-   margin-left: 18px;
-    width: 240px;
-    margin-top: 10px
+	font-size: 14px !important;
+	margin-left: 1%;
+	width: 45%;
+	margin-top: 10px
 }
 
 .mainLoginInput::-moz-placeholder {
-    font-family: inherit;
+	font-family: inherit;
 }
 
 .mainTextInfo {
-    margin-left: -400px;
+	margin-left: -400px;
 }
 
 .tableText {
-    color: #0033A0;
-    font-family: inherit;
-    font-weight: bold;
-    width: 115% !important;
-    margin-top: 4%;
+	color: #0033A0;
+	font-family: inherit;
+	font-weight: bold;
+	width: 115% !important;
+	margin-top: 4%;
+	font-size: 1vw;
 }
 
 .tableTextgreyed {
-    color: #676666;
-    font-family: inherit;
-    font-weight: bold;
-    width: 115% !important;
+	color: #676666;
+	font-family: inherit;
+	font-weight: bold;
+	width: 115% !important;
+}
+
+.SelectFont {
+	margin-left: -77px;
+	margin-top: 22px;
 }
 
 .btnAlign {
-    /* margin-right: 1px;  */
-    position: absolute;
-    right: 10px;
-    top: 120px;
+	/* margin-right: 1px;  */
+	position: absolute;
+	right: 10px;
+	top: 140px;
 }
 
 mat-dialog-content::-webkit-scrollbar {
-    width: 6px;
-    height: 16px;
+	width: 6px;
+	height: 16px;
 }
 
 mat-dialog-content::-webkit-scrollbar-thumb {
-    background-image: initial;
-    background-position-x: initial;
-    background-position-y: initial;
-    background-size: initial;
-    background-attachment: initial;
-    background-origin: initial;
-    background-clip: initial;
-    background-color: #676666;
+	background-image: initial;
+	background-position-x: initial;
+	background-position-y: initial;
+	background-size: initial;
+	background-attachment: initial;
+	background-origin: initial;
+	background-clip: initial;
+	background-color: #676666;
 }
 
 mat-dialog-content::-webkit-scrollbar-track {
-    border-radius: 10px;
+	border-radius: 10px;
 }
 
 .arrange-horizontally {
-    -webkit-box-orient: horizontal;
-    -webkit-box-direction: normal;
-    -webkit-flex-direction: row;
-    flex-direction: row;
-    box-sizing: border-box;
-    display: -webkit-box;
-    display: -webkit-flex;
-    margin-top: 10px;
-    height: 40px;
+	-webkit-box-orient: horizontal;
+	-webkit-box-direction: normal;
+	-webkit-flex-direction: row;
+	flex-direction: row;
+	box-sizing: border-box;
+	display: -webkit-box;
+	display: -webkit-flex;
+	margin-top: 10px;
+	height: 40px;
 }
 
 .mat-dialog-content-json {
-    display: block;
-    padding-left: 24px;
-    overflow: auto;
-    -webkit-overflow-scrolling: touch;
+	display: block;
+	padding-left: 24px;
+	overflow: auto;
+	-webkit-overflow-scrolling: touch;
 }
 
 .scrollData {
-    height: 90%;
-    overflow-y: auto;
-    overflow-x: scroll;
-    padding-bottom: 10px;
+	height: 90%;
+	overflow-y: auto;
+	overflow-x: scroll;
+	padding-bottom: 10px;
 }
 
 ::-webkit-scrollbar {
-    width: 6px;
-    height: 16px;
+	width: 6px;
+	height: 16px;
 }
 
 ::-webkit-scrollbar-thumb {
-    background-image: initial;
-    background-position-x: initial;
-    background-position-y: initial;
-    background-size: initial;
-    background-attachment: initial;
-    background-origin: initial;
-    background-clip: initial;
-    background-color: #676666;
+	background-image: initial;
+	background-position-x: initial;
+	background-position-y: initial;
+	background-size: initial;
+	background-attachment: initial;
+	background-origin: initial;
+	background-clip: initial;
+	background-color: #676666;
 }
 
 ::-webkit-scrollbar-track {
-    border-radius: 10px;
+	border-radius: 10px;
+}
+
+.multi_lines_text {
+	white-space: pre-line;
 }
 
 .arrange-horizontally-Dialog {
-    -webkit-box-orient: horizontal;
-    -webkit-box-direction: normal;
-    -webkit-flex-direction: row;
-    flex-direction: row;
-    box-sizing: border-box;
-    display: -webkit-box;
-    display: -webkit-flex;
-    width: 100%;
-    background: #0033a0;
-    height: 40px;
+	-webkit-box-orient: horizontal;
+	-webkit-box-direction: normal;
+	-webkit-flex-direction: row;
+	flex-direction: row;
+	box-sizing: border-box;
+	display: -webkit-box;
+	display: -webkit-flex;
+	width: 100%;
+	background: #FF8F1C;
+	height: 40px;
+}
+
+.arrange-horizontally-DialogProperty {
+	-webkit-box-orient: horizontal;
+	-webkit-box-direction: normal;
+	-webkit-flex-direction: row;
+	flex-direction: row;
+	box-sizing: border-box;
+	display: -webkit-box;
+	display: -webkit-flex;
+	width: 100%;
+	background: #0033A0;
+	height: 40px;
 }
 
 .closeIconCss {
-    padding-right: 30px;
-    padding-top: 10px;
-    color: white;
+	padding-right: 30px;
+	padding-top: 10px;
+	color: white;
+}
+
+.showDialogHeadingCss {
+	font-family: inherit;
+	font-size: 23px;
+	margin-top: -7px;
+	color: white
+}
+
+.headingTextinDiaglog {
+	font-family: inherit;
+	font-size: 18px;
+	margin-top: -2px;
+	color: white;
 }
 
 .gridheadercenter {
-    font-weight: bold;
-    font-size: 18px;
-    text-decoration: none;
-    color: white;
-    width: 120%;
-    text-align: center;
-    padding-top: 8px;
-    margin-right: -10px;
+	font-weight: bold;
+	font-size: 18px;
+	text-decoration: none;
+	color: white;
+	width: 120%;
+	text-align: center;
+	padding-top: 8px;
+	margin-right: -10px;
 }
 
-th,
 td {
-    overflow: hidden;
-    width: 100px !important;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+	overflow: hidden;
+	width: 250px !important;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+th {
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	width: 0% !important
 }
 
 .SubHeading {
-    font-size: 18px;
-    color: #0033A0;
-    font-weight: bold;
-    margin-left: -1px;
-    margin-top: 21px;
+	font-size: 18px;
+	color: #0033A0;
+	font-weight: bold;
+	margin-left: 3%;
+	margin-top: 21px;
 }
 
 .orangeStripCssSmall {
-    background-color: #FF8F1C;
-    margin-left: 16px;
-    margin-right: 16px;
-    width: 294% !important;
-    height: 1px;
-    margin: 0 auto;
+	background-color: #FF8F1C;
+	margin-left: 16px;
+	margin-right: 16px;
+	width: 294% !important;
+	height: 1px;
+	margin: 0 auto;
 }
 
 .mat-table {
-    overflow: scroll;
-    width: 100%;
-    max-height: 50px
+	overflow: scroll;
+	width: 100%;
+	max-height: 50px
 }
 
 .ListFooter {
-    font-size: 10px;
+	font-size: 10px;
 }
 
 .NoteCss {
-    margin-top: -10px;
-    margin-bottom: 10px;
+	margin-top: -10px;
+	margin-bottom: 10px;
+}
+
+.NoteCssNext {
+	font-family: inherit;
+	font-size: 1vw;
+	margin-left: 4px;
 }
 
 .button .mat-raised-button {
-    border-top-left-radius: 0px !important;
-    border-top-right-radius: 0px !important;
-    border-bottom-right-radius: 0px !important;
-    border-bottom-left-radius: 0px !important;
-    color: #FFFFFF;
+	border-top-left-radius: 0px !important;
+	border-top-right-radius: 0px !important;
+	border-bottom-right-radius: 0px !important;
+	border-bottom-left-radius: 0px !important;
+	color: #FFFFFF;
 }
 
 .configureBut {
-    float: right;
-    background-color: #0033A0 !important;
-    margin-bottom: 8px;
-    margin-left: -150px;
-    /*  margin-top: 10px; */
-    margin-right: 10px;
-    border-radius: 0px !important;
-    height: 100%;
-    width: 150px;
-    padding-left: 10px;
-    padding-right: 10px;
-    border-top-left-radius: 0px !important;
-    border-top-right-radius: 0px !important;
-    border-bottom-right-radius: 0px !important;
-    border-bottom-left-radius: 0px !important;
-    font-size: 12px;
+	float: right;
+	background-color: #0033A0 !important;
+	margin-bottom: 8px;
+	margin-left: -150px;
+	/*  margin-top: 10px; */
+	margin-right: 10px;
+	border-radius: 0px !important;
+	height: 100%;
+	width: 150px;
+	padding-left: 10px;
+	padding-right: 10px;
+	border-top-left-radius: 0px !important;
+	border-top-right-radius: 0px !important;
+	border-bottom-right-radius: 0px !important;
+	border-bottom-left-radius: 0px !important;
+	font-size: 12px;
 }
 
 .input {
-    border-left-style: none !important;
-    border-right-style: none !important;
-    border-top-style: none !important;
-    font-size: none !important;
+	border-left-style: none !important;
+	border-right-style: none !important;
+	border-top-style: none !important;
+	font-size: none !important;
 }
 
 .mainDivContainer {
-    margin-left: 16px;
-    margin-right: 16px;
-    height: 90vh;
-    overflow: hidden;
+	margin-left: 16px;
+	margin-right: 16px;
+	height: 90vh;
+	overflow: hidden;
 }
 
 .divider {
-    width: 5px;
-    height: auto;
-    display: inline-block;
+	width: 5px;
+	height: auto;
+	display: inline-block;
 }
 
-.mat-cell,
-.mat-footer-cell,
-.mat-header-cell {
-    background-color: white !important;
-    border-bottom-style: none!important;
+.mat-cell, .mat-footer-cell, .mat-header-cell {
+	background-color: white !important;
+	border-bottom-style: none !important;
 }
 
-.td.mat-cell,
-td.mat-footer-cell,
-th.mat-header-cell {
-    border-bottom-style: none !important;
+.td.mat-cell, td.mat-footer-cell, th.mat-header-cell {
+	border-bottom-style: none !important;
 }
 
 .tableHeaderCssNew {
-    background-color: white;
-    color: #0033A0;
-    font-size: 15px;
-    height: 40px;
-    margin: 0px;
-    padding: 0px;
+	background-color: white;
+	color: #0033A0;
+	font-size: 15px;
+	height: 40px;
+	margin: 0px;
+	padding: 0px;
 }
 
 .column2 {
-    float: right;
-    width: 37%;
-    box-shadow: 0 2px 2px -3px rgba(0, 0, 0, .2), 0 8px 10px 1px rgba(0, 0, 0, .14), 0 3px 14px 2px rgba(0, 0, 0, .12);
-    -o-box-shadow: 2px 0 5px rgba(0, 0, 0, .2);
-    margin-bottom: 1%;
-    margin-right: 1px;
-    border: white;
-    border-radius: 10px;
-    background-color: white;
-    height: 69vh;
+	float: right;
+	width: 37%;
+	box-shadow: 0 2px 2px -3px rgba(0, 0, 0, .2), 0 8px 10px 1px rgba(0, 0, 0, .14), 0 3px 14px 2px rgba(0, 0, 0, .12);
+	-o-box-shadow: 2px 0 5px rgba(0, 0, 0, .2);
+	margin-bottom: 1%;
+	margin-right: 1px;
+	border: white;
+	border-radius: 10px;
+	background-color: white;
+	height: 60vh;
+}
+
+.BlueColumnLeft {
+	color: #0033A0;
+	font-size: 11pt;
+	margin-left: 40px;
+	margin-bottom: 10px;
+}
+
+.Relationnamecss {
+	color: #0033A0;
+	font-size: 11pt;
+	margin-left: 120px;
+	margin-bottom: 10px;
+}
+
+.dialog-model .body-content {
+	padding: 10px;
+}
+
+.dialog-modelDest .body-content {
+	padding: 10px;
+}
+
+.dialog-modelDest {
+	position: absolute;
+	top: 50px;
+	margin-top: 300px;
+	margin-left: -200px;
+	border: 3px solid #0033a0;
+	width: 250px;
+	height: 150px;
+	box-shadow: 0px 0px 8px 0px black;
+	border-radius: 5px;
+	font-size: 14px;
+	background: #ffffff;
+}
+
+.dialog-model {
+	position: absolute;
+	top: 50px;
+	margin-top: 300px;
+	margin-left: 200px;
+	/*   margin: auto; */
+	border: 3px solid #0033a0;
+	width: 250px;
+	height: 150px;
+	/* right: 0;
+    left: 0; */
+	box-shadow: 0px 0px 8px 0px black;
+	border-radius: 5px;
+	font-size: 14px;
+	background: #ffffff;
+}
+
+.dialog-model h4 {
+	background: #0033a0;
+	margin: 0;
+	/* padding: 10px; */
+	color: #ffffff;
+	text-align: center;
+	padding: 8px;
+}
+
+.dialog-modelDest h4 {
+	background: #0033a0;
+	margin: 0;
+	/* padding: 10px; */
+	color: #ffffff;
+	text-align: center;
+	padding: 8px;
+}
+
+.dialog-model h4 span {
+	/* float: right; */
+	cursor: pointer;
+	font-size: 12px;
+	position: absolute;
+	right: 5px;
+	top: 5px;
+}
+
+.dialog-modelDest h4 span {
+	/* float: right; */
+	cursor: pointer;
+	font-size: 12px;
+	position: absolute;
+	right: 5px;
+	top: 5px;
+}
+
+.dialog-model .body-content {
+	padding: 10px;
+}
+
+.dialog-modelDest .body-content {
+	padding: 10px;
+}
+
+.BlueColumnRight {
+	color: #0033A0;
+	font-size: 11pt;
+	margin-left: 100px;
+	margin-bottom: 10px;
+}
+
+.Relationspropertycss {
+	color: #0033A0;
+	font-size: 11pt;
+	margin-left: 12px;
 }
 
 .Neo4jDataButtonCss[disabled] {
-    background-color: #9e9a9a !important;
-    color: #FFFFFF !important;
+	background-color: #9e9a9a !important;
+	color: #FFFFFF !important;
+	width: 22%;
+}
+
+.mat-dialog-actions-button {
+	float: right;
+	padding-right: 10px;
+	padding-bottom: 20px;
+}
+
+.hr {
+	color: #676666;
+	width: 50%
+}
+
+.dot {
+	height: 25px;
+	width: 25px;
+	background-color: #676666;
+	border-radius: 50%;
+	display: inline-block;
+}
+
+.mat-raised-button {
+	background-color: #0033a0;
+	-webkit-text-fill-color: white;
+	margin-left: 10px;
+	border-radius: 10px;
+	min-width: 0px ! important;
 }
 
 .Neo4jDataButtonCss {
-      background-color: #0033A0 !important;
-    font-size: 11px;
-    margin-left: 60px;
+	background-color: #0033A0 !important;
+	font-size: 11px;
+	margin-left: 6px;
+	width: 22%;
+}
+
+.PopertyButtonCss {
+	background-color: #0033A0 !important;
+	font-size: 11px;
+	margin-left: 6px;
 }
 
 .MainTable {
-    width: 47%;
-    display: inline-block;
-    margin-left: 10px;
-    vertical-align: top;
+	width: 47%;
+	display: inline-block;
+	margin-left: 10px;
+	vertical-align: top;
 }
 
 .DestLabelCsss {
-    color: #00B140;
-    padding-top: 10px;
+	color: #00B140;
+	padding-top: 10px;
 }
 
 .ToolDestCss {
-    color: #0033A0;
-    font-size: 18px;
+	color: #0033A0;
+	font-size: 18px;
 }
 
 .categoryLabelcss {
-    color: #00B140;
-    padding-top: 10px
+	color: #00B140;
+	padding-top: 10px
 }
 
 .ToolHeadingCss {
-    color: #0033A0;
-    font-size: 18px;
+	color: #0033A0;
+	font-size: 18px;
 }
 
 .destCategory {
-    text-align: left;
-    color: #00B140;
-    padding-top: 10px;
-    font-size: 16px;
+	text-align: left;
+	color: #00B140;
+	padding-top: 10px;
+	font-size: 16px;
 }
 
 .categorycss {
-    text-align: left;
-    color: #00B140;
-    padding-top: 10px;
-    font-size: 16px;
+	text-align: left;
+	color: #00B140;
+	padding-top: 10px;
+	font-size: 16px;
 }
 
 .destToolCss {
-    color: #0033A0;
-    font-size: 18px;
-    text-align: left;
-    padding-top: 10px
+	color: #0033A0;
+	font-size: 18px;
+	text-align: left;
+	padding-top: 10px
 }
 
 .toollabel {
-    color: #0033A0;
-    font-size: 18px;
-    text-align: left;
-    padding-top: 10px
+	color: #0033A0;
+	font-size: 18px;
+	text-align: left;
+	padding-top: 10px
+}
+
+.overflowCSS {
+	height: 100%;
+	width: 100%;
+	overflow: visible;
+}
+
+.agentTableDatacss {
+	display: grid;
+	max-height: 35vh;
+	overflow: auto;
+	font-size: 14px !important;
+	margin-left: 7px
+}
+
+.propertydropDownCSS {
+	width: 47%;
+	display: inline-block;
+	margin-left: 8px;
+	vertical-align: top;
 }
 
 .showTable {
-    background-color: #00B140;
-    color: white;
-    border-radius: 10px 10px 0 0;
-    text-align: center;
+	background-color: #00B140;
+	color: white;
+	border-radius: 10px 10px 0 0;
+	text-align: center;
+	padding: 5px;
+	height: 40px;
 }
 
 .tableDiv {
-    overflow-X: hidden;
-    height: 100%;
+	overflow-X: hidden;
+	height: 100%;
 }
 
 .NoteCssFirst {
-    color: #00B140;
-    font-size: 15px;
-    font-family: inherit;
-    margin-left: 5px;
+	color: #00B140;
+	font-size: 1.2vw;
+	font-family: inherit;
+	margin-left: 2%;
 }
 
 .NoteCss {
-    font-family: inherit;
-    font-size: 13.6px;
+	font-family: inherit;
+	font-size: 1vw;
 }
 
 .column1 {
-    float: left;
-    width: 60%;
-    box-shadow: 0 2px 2px -3px rgba(0, 0, 0, .2), 0 8px 10px 1px rgba(0, 0, 0, .14), 0 3px 14px 2px rgba(0, 0, 0, .12);
-    -o-box-shadow: 2px 0 5px rgba(0, 0, 0, .2);
-    margin-bottom: 1%;
-    border: white;
-    border-radius: 10px;
-    background-color: white;
-    height: 69vh;
+	float: left;
+	width: 60%;
+	box-shadow: 0 2px 2px -3px rgba(0, 0, 0, .2), 0 8px 10px 1px rgba(0, 0, 0, .14), 0 3px 14px 2px rgba(0, 0, 0, .12);
+	-o-box-shadow: 2px 0 5px rgba(0, 0, 0, .2);
+	margin-bottom: 1%;
+	border: white;
+	border-radius: 10px;
+	background-color: white;
+	height: 60vh;
 }
 
 .divTablesHeading {
-    font-size: 16px;
-    margin-top: 10px;
-    margin-bottom: 6px;
-    text-align: left;
-    /* width: 100vh; */
-    padding-left: 15px;
+	font-size: 16px;
+	margin-top: 10px;
+	margin-bottom: 6px;
+	text-align: left;
+	/* width: 100vh; */
+	padding-left: 15px;
 }
 
 .divTablesHeadingLeft {
-    font-size: 16px;
-    margin-top: 40px;
-    margin-bottom: 6px;
-    text-align: left;
-    /* width: 100vh; */
+	font-size: 1.3vw;
+	margin-top: 15%;
+	margin-bottom: 6px;
+	text-align: left;
+	/* width: 100vh; */
 }
 
 .dat-row {
-    height: 40px !important;
-    text-align: left !important;
-    vertical-align: middle;
-    margin-left: 5px;
-}
-
-
-
-
-
-.dat-row:nth-child(even) {
-    background-color: #e1e3e7;
+	height: 40px !important;
+	text-align: left !important;
+	vertical-align: middle;
+	margin-left: 5px;
 }
 
 .dat-row:nth-child(odd) {
-    background-color: #FFFFFF;
+	background-color: #FFFFFF;
 }
 
 table tr:last-child td:first-child {
-    border-bottom-left-radius: 0px;
+	border-bottom-left-radius: 0px;
 }
 
 table tr:last-child td:last-child {
-    border-bottom-right-radius: 0px;
+	border-bottom-right-radius: 0px;
 }
 
 .mainText {
-    font-size: 16px;
-    color: #0033A0;
-    /*  font-weight:bold; */
-    vertical-align: sub;
-    width: 10%;
-    overflow: auto;
-    font-family: inherit;
-    margin-left: 80px;
-    /* margin-left: 500px; */
+	font-size: 16px;
+	color: #0033A0;
+	/*  font-weight:bold; */
+	vertical-align: sub;
+	font-family: inherit;
+	margin-left: 80px;
+	/* margin-left: 500px; */
 }
 
 .button[disabled] {
-    border: 0px !important;
-    background-color: white!important;
+	border: 0px !important;
+	background-color: white !important;
 }
 
 .button[disabled] .mat-raised-button {
-    color: #FFFFFF;
-    background-color: #676666;
+	color: #FFFFFF;
+	background-color: #676666;
 }
 
 .form-control {
-    padding: 6px 12px;
-    font-size: 13px;
-    background-color: white;
-    background-image: none;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075);
-    box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075);
-    -webkit-transition: border-color ease-in-out .15s, -webkit-box-shadow ease-in-out .15s;
-    -o-transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
-    transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
-    margin-left: 5px;
-    margin-bottom: 5px;
+	padding: 6px 12px;
+	font-size: 13px;
+	background-color: white;
+	background-image: none;
+	border: 1px solid #ccc;
+	border-radius: 4px;
+	-webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075);
+	box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075);
+	-webkit-transition: border-color ease-in-out .15s, -webkit-box-shadow ease-in-out .15s;
+	-o-transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
+	transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
+	margin-left: 5px;
+	margin-bottom: 5px;
 }
 
 .searchBtnStyle {
-    vertical-align: center;
-    background-color: #0033A0;
-    color: white;
-    border: 1px solid #0033A0;
-    border-radius: 10px 10px 10px 10px;
-    padding: 5px;
-    font-size: 13px;
+	vertical-align: center;
+	background-color: #0033A0;
+	color: white;
+	border: 1px solid #0033A0;
+	border-radius: 10px 10px 10px 10px;
+	padding: 5px;
+	font-size: 13px;
 }
 
 tbody::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
+	width: 6px;
+	height: 6px;
 }
 
 tbody::-webkit-scrollbar-thumb {
-    background-image: initial;
-    background-position-x: initial;
-    background-position-y: initial;
-    background-size: initial;
-    background-attachment: initial;
-    background-origin: initial;
-    background-clip: initial;
-    background-color: #676666;
+	background-image: initial;
+	background-position-x: initial;
+	background-position-y: initial;
+	background-size: initial;
+	background-attachment: initial;
+	background-origin: initial;
+	background-clip: initial;
+	background-color: #676666;
 }
 
 tbody::-webkit-scrollbar-track {
-    border-radius: 10px;
+	border-radius: 10px;
 }
 
 button[disabled] {
-    border: 0px;
-    background-color: transparent;
-    color: black;
+	border: 0px;
+	background-color: transparent;
+	color: black;
 }
 
 .dataDictionaryMessages {
-    margin-top: 70px;
-    text-align: center;
-    color: #0033A0;
-    font-size: 18px;
-    padding-top: 10px
+	margin-top: 70px;
+	text-align: center;
+	color: #0033A0;
+	font-size: 18px;
+	padding-top: 10px
 }
 
 .dat-rowNew {
-    background-color: white !important;
-    color: #0033A0 !important;
-    font-weight: bold !important;
+	background-color: white !important;
+	color: #0033A0 !important;
+	font-weight: bold !important;
+}
+
+.flagTrue {
+	color: green;
+}
+
+.flagFalse {
+	color: red
 }

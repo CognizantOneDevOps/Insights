@@ -33,10 +33,9 @@
 </div>
 
 <mat-dialog-content class="contentBodyCss">
-    <label class="dialogText"> Access Group Name </label>
-    <input [(ngModel)]="accessGroupName" name="accessGroupName" [style.height.px]="30" [style.width.%]="55" class="form-control"
+    <label class="dialogText" style="width: 30%;margin-top: 2%;"> Access Group Name </label>
+    <input [(ngModel)]="accessGroupName" name="accessGroupName" style="margin-left: 30%;margin-top: -5%;" [style.height.%]="10" [style.width.%]="55" class="form-control"
         placeholder="Please input an Access Group Name" required>
-    <br>
     <div class="textPaddingInfo">
         <span class="messageText" *ngIf="message!=''">{{message}}</span>
         <span class="warningText">

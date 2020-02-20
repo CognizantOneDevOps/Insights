@@ -53,7 +53,6 @@ public class EngineAggregatorModule extends TimerTask {
 	private static Logger log = LogManager.getLogger(EngineAggregatorModule.class.getName());
 	private static Map<String, EngineSubscriberResponseHandler> registry = new HashMap<String, EngineSubscriberResponseHandler>();
 
-
 	@Override
 	public void run() {
 		log.debug(" EngineAggregatorModule start ====");
@@ -77,22 +76,33 @@ public class EngineAggregatorModule extends TimerTask {
 		log.debug(" EngineAggregatorModule Completed ====");
 	}
 
-
 	private void registerAggragators(AgentConfig agentConfig, Neo4jDBHandler graphDBHandler, String toolName,
 			List<BusinessMappingData> businessMappingList) {
+			Boolean isEnrichmentRequired= false;
+		String targetProperty="";
+		String keyPattern="";
+		String sourceProperty ="";
 		try {
 			JsonObject config = (JsonObject) new JsonParser().parse(agentConfig.getAgentJson());
 			JsonObject json = config.get("publish").getAsJsonObject();
 			String dataRoutingKey = json.get("data").getAsString();
-
+			Boolean hasenrichTool = config.has("enrichData");
+			
+			
+			if (hasenrichTool) {
+				JsonObject enrichTool = config.get("enrichData").getAsJsonObject();
+				isEnrichmentRequired = enrichTool.get("isEnrichmentRequired").getAsBoolean();
+				targetProperty = enrichTool.get("targetProperty").getAsString();
+				keyPattern = enrichTool.get("keyPattern").getAsString();
+				sourceProperty = enrichTool.get("sourceProperty").getAsString();
+			}
 			log.debug(" dataRoutingKey " + dataRoutingKey + "  Tool Info " + toolName);
 
 			if (dataRoutingKey != null && !registry.containsKey(dataRoutingKey)) {
 				try {
-					registry.put(dataRoutingKey,
-							new AgentDataSubscriber(dataRoutingKey, agentConfig.isDataUpdateSupported(),
-									agentConfig.getUniqueKey(), agentConfig.getToolCategory(),
-									toolName, businessMappingList));
+					registry.put(dataRoutingKey, new AgentDataSubscriber(dataRoutingKey,agentConfig.isDataUpdateSupported(), agentConfig.getUniqueKey(),
+							agentConfig.getToolCategory(), agentConfig.getLabelName(), toolName, businessMappingList,isEnrichmentRequired, targetProperty,
+							keyPattern,sourceProperty));
 				} catch (Exception e) {
 					log.error("Unable to add subscriber for routing key: " + dataRoutingKey, e);
 					EngineStatusLogger.getInstance().createEngineStatusNode(
@@ -161,46 +171,28 @@ public class EngineAggregatorModule extends TimerTask {
 		try {
 			GraphResponse toolResponse = dbHandler
 					.executeCypherQuery("MATCH (n:METADATA:BUSINESSMAPPING) return collect(distinct n.toolName)");
-			// log.info("arg0 tool node responce " + gson.toJson(toolResponse));
-			JsonArray arrayToolRegistred= toolResponse.getJson().get("results").getAsJsonArray().get(0).getAsJsonObject().get("data")
-					.getAsJsonArray().get(0).getAsJsonObject().get("row").getAsJsonArray().get(0).getAsJsonArray();
-			
-			/* arrayToolRegistred.forEach(a -> log.info("tool info " + a)); */
+			JsonArray arrayToolRegistred = toolResponse.getJson().get("results").getAsJsonArray().get(0)
+					.getAsJsonObject().get("data").getAsJsonArray().get(0).getAsJsonObject().get("row").getAsJsonArray()
+					.get(0).getAsJsonArray();
+
 			// arrayToolRegistred
 			for (JsonElement registedTool : arrayToolRegistred) {
 				String toolName = registedTool.toString().replaceAll("\"", "");
-				/* log.info("tool info toolName " + toolName); */
-				GraphResponse response = dbHandler.executeCypherQuery(
-						"MATCH (n:METADATA:BUSINESSMAPPING) where n.toolName='" + toolName
+				GraphResponse response = dbHandler
+						.executeCypherQuery("MATCH (n:METADATA:BUSINESSMAPPING) where n.toolName='" + toolName
 								+ "' return n order by n.inSightsTime desc");
 				nodes = response.getNodes();
 				List<BusinessMappingData> toolDataList = new ArrayList<BusinessMappingData>(0);
 				for (NodeData node : nodes) {
-					// JsonElement json = new JsonParser().parse(node.getProperty("propertyMap"));
+
 					BusinessMappingData toolData = new BusinessMappingData();
 					String jsonString = gson.toJson(node);
-					/* log.info("arg0  node " + jsonString); */
 					String businessMappingLabel = node.getPropertyMap().get("businessmappinglabel");
-					/*
-					 * log.info("toolName  === " + toolName + "  businessMappingLabel === " +
-					 * businessMappingLabel);
-					 */
 					toolData.setToolName(toolName);
 					toolData.setBusinessMappingLabel(businessMappingLabel);
-
 					Map<String, String> propertyMap = node.getPropertyMap();
 					propertyMap.keySet().removeAll(additionalProperties);
-
 					toolData.setPropertyMap(propertyMap);
-					/* log.info("arg0 toolData  " + toolData); */
-					/*
-					 * StringBuilder labelVal=new StringBuilder(); StringBuilder key=new
-					 * StringBuilder(); nodepropertyMap=new HashMap<String,NodeData>();
-					 * nodepropertyMap.put(
-					 * StringUtils.stripEnd(labelVal.toString(),AgentDataConstants.COLON), node);
-					 * metaDataMap.put(StringUtils.stripEnd(key.toString(),AgentDataConstants.COLON)
-					 * , nodepropertyMap);
-					 */
 					toolDataList.add(toolData);
 				}
 				log.debug("arg0 toolDataList  " + toolDataList);

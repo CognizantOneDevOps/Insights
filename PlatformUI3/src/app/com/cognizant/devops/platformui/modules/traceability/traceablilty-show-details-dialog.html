@@ -15,27 +15,50 @@
  * the License.
  *******************************************************************************-->
 
-<div class="titleStyle">
-    <ul>
-        <li style="background-color: #FF8F1C;">Additional Details - {{dispplaytoolname}}</li>
-        <li (click)="closeShowDetailsDialog()" style="background-color: #FF8F1C;">
-            <mat-icon svgIcon="close_dialog" [ngStyle]="{'width': '20px', 'height': '20px','padding-right':'24px'}">
-            </mat-icon>
-        </li>
-    </ul>
-</div>
-<div class="scrollData">
-    <table mat-table [dataSource]="agentDetailedDatasource">
-        <ng-container *ngFor="let header of finalHeaderToShow | keyvalue" matColumnDef="{{header.key}}">
-            <th mat-header-cell *matHeaderCellDef [ngClass]="{'tableDynamicHeaderCss' :(header.key=='inSightsTimeX' || header.key=='status' || header.key=='projectName' || header.key=='toolstatus'),'tableExceIdHeaderCss':(header.key=='execId'|| header.key=='scmCommitId'),'tableMessageHeaderCss':true}">{{header.key}}</th>
-            <td mat-cell style="padding-top:2px;padding-bottom:2px; line-height: 1.7em;" *matCellDef="let element">
-                {{element[header.key]}}</td>
-        </ng-container>
-        <tr mat-header-row *matHeaderRowDef="headerArrayDisplay" class="tableHeaderCss"></tr>
-        <tr mat-row *matRowDef="let row; columns: headerArrayDisplay;"></tr>
+ <div [style.height.%]="12" class="arrange-horizontally-Dialog">
 
-    </table>
-    <div>
-        <mat-paginator #paginator pageSize="10" showFirstLastButtons class="paginationStyle"></mat-paginator>
+    <div class="gridheadercenter" *ngIf="!showToolDetailProp">
+        Timelag Details
+    </div>
+    <div class="gridheadercenter" *ngIf="showToolDetailProp">
+        Additional Details - {{dispplaytoolname}}
+    </div>
+    <div class="closeIconCss">
+        <a (click)="closeShowDetailsDialog()">
+            <mat-icon svgIcon="close_dialog"> </mat-icon>
+        </a>
     </div>
 </div>
+<mat-dialog-content [style.height.%]="78">
+    <div class="timelag mat-elevation-z4" style="text-align: center;" *ngIf="!showToolDetailProp">
+        <table mat-table [dataSource]="timelagDataSource" mat-elevation-z4>
+            <ng-container matColumnDef="ToolName">
+                <mat-header-cell *matHeaderCellDef style="width:40% !important" class="tableHeaderCss">ToolName
+                </mat-header-cell>
+                <mat-cell *matCellDef="let element" style="width:40% !important">{{element.toolName}}</mat-cell>
+            </ng-container>
+            <ng-container matColumnDef="Average Time">
+                <mat-header-cell *matHeaderCellDef style="width:40% !important" class="tableHeaderCss">Average Time
+                </mat-header-cell>
+                <mat-cell *matCellDef="let element" style="width:40% !important">{{element.AverageTime}}</mat-cell>
+            </ng-container>
+            <tr mat-header-row *matHeaderRowDef="columnsToDisplay" class="tableHeaderCss"></tr>
+            <tr mat-row *matRowDef="let row; columns: columnsToDisplay;"></tr>
+        </table>
+    </div>
+    <div *ngIf="showToolDetailProp">
+        <table mat-table [dataSource]="agentDetailedDatasource">
+            <ng-container *ngFor="let header of finalHeaderToShow | keyvalue" matColumnDef="{{header.key}}">
+                <th mat-header-cell *matHeaderCellDef>{{header.key}}</th>
+                <td mat-cell style="padding-top:2px;padding-bottom:2px; line-height: 1.7em;" *matCellDef="let element">
+                    {{element[header.key]}}</td>
+            </ng-container>
+            <tr mat-header-row *matHeaderRowDef="headerArrayDisplay" class="tableHeaderCss"></tr>
+            <tr mat-row *matRowDef="let row; columns: headerArrayDisplay;"></tr>
+        </table>
+    </div>
+</mat-dialog-content>
+<div *ngIf="showToolDetailProp" class="timezoneText" [style.height.%]="2"> Current Timezone : {{timeZone}} </div>
+<mat-paginator [style.height.%]="8" #paginator pageSize="10" *ngIf="showToolDetailProp" showFirstLastButtons
+    class="paginationStyle">
+</mat-paginator>

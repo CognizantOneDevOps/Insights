@@ -19,17 +19,16 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.cognizant.devops</groupId>
 	<artifactId>PlatformMockServer</artifactId>
-	<version>6.0</version>
+	<version>6.4</version>
 	<packaging>jar</packaging>
 	<name>PlatformMockServer</name>
 	<url>http://maven.apache.org</url>
-	
+
 	<properties>
 		<spring.version>5.1.6.RELEASE</spring.version>
 	</properties>
 
 	<build>
-		<!-- <finalName>PlatformEngine</finalName> -->
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -66,7 +65,7 @@
 			</plugin>
 			<plugin>
 				<artifactId>maven-resources-plugin</artifactId>
-				<version>2.4.3</version>
+				<version>3.1.0</version>
 				<executions>
 					<execution>
 						<id>copy-resources</id>
@@ -76,6 +75,10 @@
 							<goal>copy-resources</goal>
 						</goals>
 						<configuration>
+							<encoding>UTF-8</encoding>
+							<nonFilteredFileExtensions>
+								<nonFilteredFileExtension>pdf</nonFilteredFileExtension>
+							</nonFilteredFileExtensions>
 							<outputDirectory>${project.basedir}/target</outputDirectory>
 							<resources>
 								<resource>
@@ -83,7 +86,7 @@
 									<includes>
 										<include>log4j2.xml</include>
 										<include>**/*.csv</include>
-										<include>OneDevOpInsights v2.17 OpenSource Credit Document v1.0.pdf</include>
+										<include>**/*.json</include>
 									</includes>
 									<filtering>true</filtering>
 								</resource>
@@ -91,6 +94,48 @@
 									<directory>/target/</directory>
 									<includes>
 										<include>${project.name}.jar</include>
+									</includes>
+								</resource>
+							</resources>
+						</configuration>
+					</execution>
+					<execution>
+						<id>copy-resources-root-home</id>
+						<phase>validate</phase>
+						<goals>
+							<goal>resources</goal>
+						</goals>
+						<configuration>
+							<encoding>UTF-8</encoding>
+					        <nonFilteredFileExtensions>
+					          <nonFilteredFileExtension>pdf</nonFilteredFileExtension>
+					        </nonFilteredFileExtensions>
+							<outputDirectory>${project.build.directory}</outputDirectory>
+							<resources>
+								<resource>
+									<directory>${project.basedir}/../</directory>
+									<filtering>true</filtering>
+									<includes>
+										<include>OneDevOpInsights*.pdf</include>
+									</includes>
+								</resource>
+							</resources>
+						</configuration>
+					</execution>
+					<execution>
+						<id>copy-resources-home-class</id>
+						<phase>validate</phase>
+						<goals>
+							<goal>resources</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>${project.build.directory}/classes/</outputDirectory>
+							<resources>
+								<resource>
+									<directory>${project.basedir}/target/</directory>
+									<filtering>true</filtering>
+									<includes>
+										<include>OneDevOpInsights*.pdf</include>
 									</includes>
 								</resource>
 							</resources>
@@ -121,28 +166,28 @@
 					<target>1.8</target>
 				</configuration>
 			</plugin>
-			
+
 			<plugin>
-			  <artifactId>maven-assembly-plugin</artifactId>
-			  <configuration>
-			    <archive>
-			      <manifest>
-			        <mainClass>com.cognizant.devops.platformmockserver.MockServerImpl</mainClass>
-			      </manifest>
-			    </archive>
-			    <descriptorRefs>
-			      <descriptorRef>jar-with-dependencies</descriptorRef>
-			    </descriptorRefs>
-			  </configuration>
-			  <executions>
-			    <execution>
-			      <id>make-assembly</id> <!-- this is used for inheritance merges -->
-			      <phase>package</phase> <!-- bind to the packaging phase -->
-			      <goals>
-			        <goal>single</goal>
-			      </goals>
-			    </execution>
-			  </executions>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<configuration>
+					<archive>
+						<manifest>
+							<mainClass>com.cognizant.devops.platformmockserver.MockServerImpl</mainClass>
+						</manifest>
+					</archive>
+					<descriptorRefs>
+						<descriptorRef>jar-with-dependencies</descriptorRef>
+					</descriptorRefs>
+				</configuration>
+				<executions>
+					<execution>
+						<id>make-assembly</id> <!-- this is used for inheritance merges -->
+						<phase>package</phase> <!-- bind to the packaging phase -->
+						<goals>
+							<goal>single</goal>
+						</goals>
+					</execution>
+				</executions>
 			</plugin>
 
 		</plugins>
@@ -151,15 +196,15 @@
 	<dependencies>
 
 		<dependency>
-		     <groupId>org.mock-server</groupId>
-		     <artifactId>mockserver-netty</artifactId>
-		     <version>5.5.4</version>
+			<groupId>org.mock-server</groupId>
+			<artifactId>mockserver-netty</artifactId>
+			<version>5.5.4</version>
 		</dependency>
 		<dependency>
-		    <groupId>org.mock-server</groupId>
-		    <artifactId>mockserver-logging</artifactId>
-		    <version>5.3.0</version>
-		    <scope>runtime</scope>
+			<groupId>org.mock-server</groupId>
+			<artifactId>mockserver-logging</artifactId>
+			<version>5.3.0</version>
+			<scope>runtime</scope>
 		</dependency>
 		<dependency>
 			<groupId>javax.servlet</groupId>
@@ -175,11 +220,6 @@
 			<artifactId>spring-web</artifactId>
 			<version>${spring.version}</version>
 		</dependency>
-		<dependency>
-			<groupId>log4j</groupId>
-			<artifactId>log4j</artifactId>
-			<version>1.2.17</version>
-		</dependency>		
 		<dependency>
 			<groupId>org.apache.logging.log4j</groupId>
 			<artifactId>log4j-api</artifactId>
@@ -211,16 +251,16 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
-		
+
 		<!-- https://mvnrepository.com/artifact/ch.qos.logback/logback-classic -->
-		
-		
+
+
 		<dependency>
 			<groupId>com.google.code.gson</groupId>
 			<artifactId>gson</artifactId>
 			<version>2.5</version>
 		</dependency>
-		
+
 	</dependencies>
-	
+
 </project>

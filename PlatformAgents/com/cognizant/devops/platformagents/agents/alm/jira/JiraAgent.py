@@ -38,7 +38,7 @@ class JiraAgent(BaseAgent):
         responseTemplate = self.getResponseTemplate()
         fields = self.extractFields(responseTemplate)
         jiraIssuesUrl = baseUrl+"?jql=updated>='"+lastUpdated+"' ORDER BY updated ASC&maxResults="+str(self.config.get("dataFetchCount", 1000))+'&fields='+fields
-        changeLog = self.config.get('changeLog', None)
+        changeLog = self.config.get('dynamicTemplate', {}).get('changeLog', None)
         if changeLog:
             jiraIssuesUrl = jiraIssuesUrl + '&expand=changelog'
             changeLogFields = changeLog['fields']

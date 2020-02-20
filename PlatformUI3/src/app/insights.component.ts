@@ -16,7 +16,6 @@
 
 import { Component } from '@angular/core';
 
-
 @Component({
   selector: 'insights-root',
   templateUrl: './insights.component.html',
@@ -26,5 +25,6 @@ import { Component } from '@angular/core';
 export class InsightsAppComponent {
   title = 'PlatformUI3';
   constructor() {
+    console.log("App Module Check");
   }
 }

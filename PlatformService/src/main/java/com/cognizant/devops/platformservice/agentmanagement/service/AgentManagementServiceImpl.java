@@ -29,6 +29,7 @@ import java.sql.Timestamp;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -78,7 +79,7 @@ public class AgentManagementServiceImpl implements AgentManagementService {
 
 	private static final String ZIPEXTENSION = ".zip";
 	private static final String SUCCESS = "SUCCESS";
-	
+
 	String filePath = ApplicationConfigProvider.getInstance().getAgentDetails().getUnzipPath();
 
 	@Override
@@ -87,7 +88,7 @@ public class AgentManagementServiceImpl implements AgentManagementService {
 
 		try {
 			String agentId = null;
-			
+
 			Gson gson = new Gson();
 			JsonElement jelement = gson.fromJson(configDetails.trim(), JsonElement.class);
 			JsonObject json = jelement.getAsJsonObject();
@@ -95,52 +96,57 @@ public class AgentManagementServiceImpl implements AgentManagementService {
 			json.addProperty("agentVersion", agentVersion);
 			json.addProperty("toolName", toolName.toUpperCase());
 
-			
-			if(json.get("agentId") == null || json.get("agentId").getAsString().isEmpty()) {
+			String labelName = getLabelName(configDetails);
+			json.addProperty("labelName", labelName);
+
+			if (json.get("agentId") == null || json.get("agentId").getAsString().isEmpty()) {
 				agentId = getAgentkey(toolName);
 			} else {
 				agentId = json.get("agentId").getAsString();
 			}
 
 			if (ValidationUtils.checkAgentIdString(agentId)) {
-			   throw new InsightsCustomException("Agent Id has to be Alpha numeric with '_' as special character");
+				throw new InsightsCustomException("Agent Id has to be Alpha numeric with '_' as special character");
 			}
 
 			json.get("subscribe").getAsJsonObject().addProperty("agentCtrlQueue", agentId);
 			Date updateDate = Timestamp.valueOf(LocalDateTime.now());
 
-			
-			/** Create agent based folder and complete basic steps using agent instance
-			 *   1. Create folder with instance id (agent key)
-			 *   2. Copy all files from agent folder uder instance id folder
-			 *   3. Replace __AGENT_KEY__ with instance id in service file based on OS
-			 *   4. Rename InSights<agentName>Agent.sh to instanceId.sh name
-			 *   5. Use new path in rest of the steps for agent registration
+			/**
+			 * Create agent based folder and complete basic steps using agent instance 1.
+			 * Create folder with instance id (agent key) 2. Copy all files from agent
+			 * folder uder instance id folder 3. Replace __AGENT_KEY__ with instance id in
+			 * service file based on OS 4. Rename InSights<agentName>Agent.sh to
+			 * instanceId.sh name 5. Use new path in rest of the steps for agent
+			 * registration
 			 */
-			
-			setupAgentInstanceCreation(toolName, osversion,agentId);
-			
+
+			setupAgentInstanceCreation(toolName, osversion, agentId);
+
 			// Update tracking.json file
 			if (!trackingDetails.isEmpty()) {
 				JsonElement trackingJsonElement = gson.fromJson(trackingDetails.trim(), JsonElement.class);
 				JsonObject trackingDetailsJson = trackingJsonElement.getAsJsonObject();
-				updateTrackingJson(toolName, trackingDetailsJson,agentId);
+				updateTrackingJson(toolName, trackingDetailsJson, agentId);
 			}
-			
-			//Store secrets to vault based on agentsSecretDetails in config.json 
-			if(vault) {
-				log.debug("-- Store secrets to vault for Agent --"+agentId);
+
+			// Store secrets to vault based on agentsSecretDetails in config.json
+			if (vault) {
+				log.debug("-- Store secrets to vault for Agent --" + agentId);
 				prepareSecret(agentId, json);
 			}
 
 			// Create zip/tar file with updated config.json
-			Path agentZipPath = updateAgentConfig(toolName, json,agentId);
+			Path agentZipPath = updateAgentConfig(toolName, json, agentId);
 			byte[] data = Files.readAllBytes(agentZipPath);
 
 			String fileName = agentId + ZIPEXTENSION;
 			sendAgentPackage(data, AGENTACTION.REGISTER.name(), fileName, agentId, toolName, osversion);
-			//performAgentAction(agentId, toolName, osversion, AGENTACTION.START.name(),agentId);
 
+
+			performAgentAction(agentId, toolName, osversion, AGENTACTION.START.name(), agentId);
+
+			
 			// Delete tracking.json
 			if (!trackingDetails.isEmpty()) {
 				deleteTrackingJson(agentId);
@@ -148,8 +154,9 @@ public class AgentManagementServiceImpl implements AgentManagementService {
 
 			// register agent in DB
 			AgentConfigDAL agentConfigDAL = new AgentConfigDAL();
-			agentConfigDAL.saveAgentConfigFromUI(agentId, json.get("toolCategory").getAsString(), toolName, json,
-					agentVersion, osversion, updateDate, vault);
+
+			agentConfigDAL.saveAgentConfigFromUI(agentId, json.get("toolCategory").getAsString(), labelName, toolName,
+					json, agentVersion, osversion, updateDate, vault);
 
 		} catch (Exception e) {
 			log.error("Error while registering agent " + toolName, e);
@@ -158,8 +165,6 @@ public class AgentManagementServiceImpl implements AgentManagementService {
 
 		return SUCCESS;
 	}
-
-
 
 	@Override
 	public String uninstallAgent(String agentId, String toolName, String osversion) throws InsightsCustomException {
@@ -176,18 +181,19 @@ public class AgentManagementServiceImpl implements AgentManagementService {
 	}
 
 	@Override
-	public String startStopAgent(String agentId, String toolName, String osversion, String action) throws InsightsCustomException {
+	public String startStopAgent(String agentId, String toolName, String osversion, String action)
+			throws InsightsCustomException {
 		try {
 			String agentDaemonQueueName = ApplicationConfigProvider.getInstance().getAgentDetails().getAgentPkgQueue();
-			if(AGENTACTION.START.equals(AGENTACTION.valueOf(action))) {
-				performAgentAction(agentId, toolName, osversion, action,agentDaemonQueueName);
+			if (AGENTACTION.START.equals(AGENTACTION.valueOf(action))) {
+				performAgentAction(agentId, toolName, osversion, action, agentDaemonQueueName);
 			} else if (AGENTACTION.STOP.equals(AGENTACTION.valueOf(action)) && "WINDOWS".equalsIgnoreCase(osversion)) {
-				performAgentAction(agentId, toolName, osversion, action,agentDaemonQueueName);
+				performAgentAction(agentId, toolName, osversion, action, agentDaemonQueueName);
 			} else {
-				performAgentAction(agentId, toolName, osversion, action,agentId);
+				performAgentAction(agentId, toolName, osversion, action, agentId);
 			}
-			
-			//Update status in DB
+
+			// Update status in DB
 			AgentConfigDAL agentConfigDAL = new AgentConfigDAL();
 			agentConfigDAL.updateAgentRunningStatus(agentId, AGENTACTION.valueOf(action));
 
@@ -203,10 +209,16 @@ public class AgentManagementServiceImpl implements AgentManagementService {
 			String osversion, boolean vault) throws InsightsCustomException {
 
 		try {
+
+			// Get latest agent code
+			String labelName = null;
+			getToolRawConfigFile(agentVersion, toolName);
+			setupAgentInstanceCreation(toolName, osversion, agentId);
+
 			AgentConfigTO agentConfig = getAgentDetails(agentId);
 			String oldVersion = agentConfig.getAgentVersion();
-			log.debug("Previous Agent version ---"+agentConfig.getAgentVersion());
-			if(!oldVersion.equals(agentVersion)) {
+			log.debug("Previous Agent version ---" + agentConfig.getAgentVersion());
+			if (!oldVersion.equals(agentVersion)) {
 				// Get latest agent code
 				getToolRawConfigFile(agentVersion, toolName);
 				setupAgentInstanceCreation(toolName, osversion, agentId);
@@ -220,12 +232,12 @@ public class AgentManagementServiceImpl implements AgentManagementService {
 
 			Date updateDate = Timestamp.valueOf(LocalDateTime.now());
 
-			if(vault) {
+			if (vault) {
 				log.debug("--update Store secrets to vault --");
 				HashMap<String, Map<String, String>> dataMap = getToolbasedSecret(json, agentId);
 				updateSecrets(agentId, dataMap, json);
 			}
-			
+
 			Path agentZipPath = updateAgentConfig(toolName, json, agentId);
 
 			byte[] data = Files.readAllBytes(agentZipPath);
@@ -234,9 +246,12 @@ public class AgentManagementServiceImpl implements AgentManagementService {
 
 			sendAgentPackage(data, AGENTACTION.UPDATE.name(), fileName, agentId, toolName, osversion);
 
+			labelName = this.getLabelName(configDetails);
+
 			AgentConfigDAL agentConfigDAL = new AgentConfigDAL();
-			agentConfigDAL.saveAgentConfigFromUI(agentId, json.get("toolCategory").getAsString(), toolName, json,
-					agentVersion, osversion, updateDate, vault);
+
+			agentConfigDAL.saveAgentConfigFromUI(agentId, json.get("toolCategory").getAsString(), labelName, toolName,
+					json, agentVersion, osversion, updateDate, vault);
 
 		} catch (Exception e) {
 			log.error("Error updating and installing agent", e);
@@ -255,7 +270,7 @@ public class AgentManagementServiceImpl implements AgentManagementService {
 			agentList = new ArrayList<>(agentConfigList.size());
 			for (AgentConfig agentConfig : agentConfigList) {
 				AgentConfigTO to = new AgentConfigTO();
-				BeanUtils.copyProperties(agentConfig, to,new String[]{"agentJson","updatedDate","vault"});
+				BeanUtils.copyProperties(agentConfig, to, new String[] { "agentJson", "updatedDate", "vault" });
 				agentList.add(to);
 			}
 		} catch (Exception e) {
@@ -404,97 +419,96 @@ public class AgentManagementServiceImpl implements AgentManagementService {
 		return config;
 	}
 
-	/** Create agent based folder and complete basic steps using agent instance
-	 *   1. Create folder with instance id (agent key)
-	 *   2. Copy all files from agent folder uder instance id folder
-	 *   3. Replace __AGENT_KEY__ with instance id in service file based on OS
-	 *   4. Rename InSights<agentName>Agent.sh to instanceId.sh name
-	 *   5. Use new path in rest of the steps for agent registration
-	 * @throws IOException 
+	/**
+	 * Create agent based folder and complete basic steps using agent instance 1.
+	 * Create folder with instance id (agent key) 2. Copy all files from agent
+	 * folder uder instance id folder 3. Replace __AGENT_KEY__ with instance id in
+	 * service file based on OS 4. Rename InSights<agentName>Agent.sh to
+	 * instanceId.sh name 5. Use new path in rest of the steps for agent
+	 * registration
+	 * 
+	 * @throws IOException
 	 */
 	private void setupAgentInstanceCreation(String toolName, String osversion, String agentId) throws IOException {
 
 		Path toolUnzipPath = Paths.get(filePath + File.separator + toolName);
 		File instanceDir = new File(filePath + File.separator + agentId);
 
-	    if (!instanceDir.exists()) {
-	    	instanceDir.mkdir();
-	    }
-	    
-	    copyServiceFileToInstanceFolder(toolName,agentId,osversion);
-	    copyPythonCodeToInstanceFolder(toolName,agentId);
-	    
+		if (!instanceDir.exists()) {
+			instanceDir.mkdir();
+		}
+
+		copyServiceFileToInstanceFolder(toolName, agentId, osversion);
+		copyPythonCodeToInstanceFolder(toolName, agentId);
+
 	}
 
 	private void copyServiceFileToInstanceFolder(String toolName, String agentId, String osversion) throws IOException {
-		
+
 		Path sourceFilePath = Paths.get(filePath + File.separator + toolName);
 		Path destinationFilePath = Paths.get(filePath + File.separator + agentId);
-		
-		if("Windows".equalsIgnoreCase(osversion)) {
+
+		if ("Windows".equalsIgnoreCase(osversion)) {
 			Path destinationFile = destinationFilePath.resolve(agentId + ".bat");
-			Files.move(sourceFilePath.resolve(toolName + "agent.bat"),destinationFile,REPLACE_EXISTING);
-			addAgentKeyToServiceFile(destinationFile,agentId);
-		} 
-		else if ("linux".equalsIgnoreCase(osversion)) {
+			Files.move(sourceFilePath.resolve(toolName + "agent.bat"), destinationFile, REPLACE_EXISTING);
+			addAgentKeyToServiceFile(destinationFile, agentId);
+		} else if ("linux".equalsIgnoreCase(osversion)) {
 			Path destinationFile = destinationFilePath.resolve(agentId + ".sh");
-			Files.move(sourceFilePath.resolve(toolName + "agent.sh"),destinationFile,REPLACE_EXISTING);
-			addAgentKeyToServiceFile(destinationFile,agentId);
-			addProcessKeyToServiceFile(destinationFile,agentId);
+			Files.move(sourceFilePath.resolve(toolName + "agent.sh"), destinationFile, REPLACE_EXISTING);
+			addAgentKeyToServiceFile(destinationFile, agentId);
+			addProcessKeyToServiceFile(destinationFile, agentId);
 		} else if ("Ubuntu".equalsIgnoreCase(osversion)) {
 			Path destinationFile = destinationFilePath.resolve(agentId + ".sh");
-			Files.move(sourceFilePath.resolve(toolName + "agent.sh"),destinationFile,REPLACE_EXISTING);
-			addAgentKeyToServiceFile(destinationFile,agentId);
-			addProcessKeyToServiceFile(destinationFile,agentId);
-			
+			Files.move(sourceFilePath.resolve(toolName + "agent.sh"), destinationFile, REPLACE_EXISTING);
+			addAgentKeyToServiceFile(destinationFile, agentId);
+			addProcessKeyToServiceFile(destinationFile, agentId);
+
 			Path destinationServiceFile = destinationFilePath.resolve(agentId + ".service");
-			Files.move(sourceFilePath.resolve(toolName + "agent.service"),destinationServiceFile,REPLACE_EXISTING);
-			addAgentKeyToServiceFile(destinationServiceFile,agentId);
+			Files.move(sourceFilePath.resolve(toolName + "agent.service"), destinationServiceFile, REPLACE_EXISTING);
+			addAgentKeyToServiceFile(destinationServiceFile, agentId);
 		}
 	}
-	
+
 	private void copyPythonCodeToInstanceFolder(String toolName, String agentId) throws IOException {
-		
+
 		Path sourcePath = Paths.get(filePath + File.separator + toolName);
 		Path destinationPath = Paths.get(filePath + File.separator + agentId);
-		
-		//Copy __init__.py to agent instance folder, otherwise python code wont work
-		Files.copy(Paths.get(filePath + File.separator + toolName  + File.separator + "com"+ File.separator + "__init__.py"),
-					Paths.get(filePath + File.separator + agentId + File.separator + "__init__.py"), REPLACE_EXISTING);
-		
+
+		// Copy __init__.py to agent instance folder, otherwise python code wont work
+		Files.copy(
+				Paths.get(
+						filePath + File.separator + toolName + File.separator + "com" + File.separator + "__init__.py"),
+				Paths.get(filePath + File.separator + agentId + File.separator + "__init__.py"), REPLACE_EXISTING);
+
 		FileUtils.deleteDirectory(destinationPath.resolve("com").toFile());
-		
-		Files.move(sourcePath.resolve("com"),destinationPath.resolve("com"),REPLACE_EXISTING);
-		
+
+		Files.move(sourcePath.resolve("com"), destinationPath.resolve("com"), REPLACE_EXISTING);
+
 	}
 
 	private void addAgentKeyToServiceFile(Path destinationFile, String agentId) throws IOException {
 		try (Stream<String> lines = Files.lines(destinationFile)) {
-			   List<String> replaced = lines
-			       .map(line-> line.replaceAll("__AGENT_KEY__", agentId))
-			       .collect(Collectors.toList());
-			   Files.write(destinationFile, replaced);
-			}
-		
+			List<String> replaced = lines.map(line -> line.replaceAll("__AGENT_KEY__", agentId))
+					.collect(Collectors.toList());
+			Files.write(destinationFile, replaced);
+		}
+
 	}
-	
+
 	private void addProcessKeyToServiceFile(Path destinationFile, String agentId) throws IOException {
 		String psKey = getPSKey(agentId);
 		try (Stream<String> lines = Files.lines(destinationFile)) {
-			   List<String> replaced = lines
-			       .map(line-> line.replaceAll("__PS_KEY__", psKey))
-			       .collect(Collectors.toList());
-			   Files.write(destinationFile, replaced);
-			}
-		
+			List<String> replaced = lines.map(line -> line.replaceAll("__PS_KEY__", psKey))
+					.collect(Collectors.toList());
+			Files.write(destinationFile, replaced);
+		}
+
 	}
-	
+
 	private String getPSKey(String agentId) {
 		Character firstChar = agentId.charAt(0);
-		return "["+firstChar+"]"+ agentId.substring(1) + ".com";
+		return "[" + firstChar + "]" + agentId.substring(1) + ".com";
 	}
-
-
 
 	private Path updateAgentConfig(String toolName, JsonObject json, String agentId) throws IOException {
 		String configFilePath = filePath + File.separator + agentId;
@@ -555,7 +569,7 @@ public class AgentManagementServiceImpl implements AgentManagementService {
 	}
 
 	private String deleteTrackingJson(String agentId) throws IOException {
-		String trackingFilePath = filePath + File.separator	+ agentId;
+		String trackingFilePath = filePath + File.separator + agentId;
 		File trackingFile = null;
 		// Writing json to file
 		Path dir = Paths.get(trackingFilePath);
@@ -611,7 +625,8 @@ public class AgentManagementServiceImpl implements AgentManagementService {
 		publishAgentAction(agentDaemonQueueName, action.getBytes(), props);
 	}
 
-	private void performAgentAction(String agentId, String toolName, String osversion, String action,String queueName) throws TimeoutException, IOException {
+	private void performAgentAction(String agentId, String toolName, String osversion, String action, String queueName)
+			throws TimeoutException, IOException {
 		Map<String, Object> headers = new HashMap<>();
 		headers.put("osType", osversion);
 		headers.put("agentToolName", toolName);
@@ -619,7 +634,7 @@ public class AgentManagementServiceImpl implements AgentManagementService {
 		headers.put("action", action);
 
 		BasicProperties props = getBasicProperties(headers);
-		
+
 		publishAgentAction(queueName, action.getBytes(), props);
 	}
 
@@ -653,42 +668,56 @@ public class AgentManagementServiceImpl implements AgentManagementService {
 		return toolName + "_" + Instant.now().toEpochMilli();
 	}
 
+	private String getLabelName(String configDetails) {
+
+		Gson gson = new Gson();
+		JsonElement jelement = gson.fromJson(configDetails.trim(), JsonElement.class);
+		JsonObject json = jelement.getAsJsonObject();
+		String labelData = json.get("publish").getAsJsonObject().get("data").getAsString();
+		List<String> labelDataValue = Arrays.asList(labelData.split(MessageConstants.ROUTING_KEY_SEPERATOR));
+		return labelDataValue.get(1);
+
+	}
+
 	/**
 	 * Prepare vault based structure and store in vault.
+	 * 
 	 * @param agentId
 	 * @param json
-	 * @return 
+	 * @return
 	 * @throws InsightsCustomException
 	 * @throws RuntimeException
 	 * @throws ClientHandlerException
 	 * @throws UniformInterfaceException
-	 * @throws IOException 
+	 * @throws IOException
 	 */
 	private HashMap<String, Map<String, String>> prepareSecret(String agentId, JsonObject json)
 			throws InsightsCustomException, RuntimeException, IOException {
 		HashMap<String, Map<String, String>> dataMap = getToolbasedSecret(json, agentId);
 		ClientResponse vaultresponse = storeToVault(dataMap, agentId);
 		if (vaultresponse.getStatus() != 200) {
-			log.debug("vault response -- "+vaultresponse);
-			throw new RuntimeException("Failed : HTTP error code : "
-					+ vaultresponse.getStatus());
+			log.debug("vault response -- " + vaultresponse);
+			throw new RuntimeException("Failed : HTTP error code : " + vaultresponse.getStatus());
 		}
 		String output = vaultresponse.getEntity(String.class);
-		//log.debug("response.hasEntity()--"+output);
+		// log.debug("response.hasEntity()--"+output);
 		return dataMap;
 	}
-	
+
 	/**
-	 * fetches tool based secrets to be stored in vault from {agentSecretDetails} in config.json
+	 * fetches tool based secrets to be stored in vault from {agentSecretDetails} in
+	 * config.json
+	 * 
 	 * @param toolName
 	 * @param json
-	 * @param agentId 
+	 * @param agentId
 	 * @return dataMap
-	 * @throws IOException 
+	 * @throws IOException
 	 */
-	private HashMap<String, Map<String, String>> getToolbasedSecret(JsonObject json, String agentId) throws InsightsCustomException, IOException{
-		HashMap<String,Map<String,String>> dataMap = new HashMap<String, Map<String,String>>();
-		HashMap<String,String> secretMap = new HashMap<String, String>();
+	private HashMap<String, Map<String, String>> getToolbasedSecret(JsonObject json, String agentId)
+			throws InsightsCustomException, IOException {
+		HashMap<String, Map<String, String>> dataMap = new HashMap<String, Map<String, String>>();
+		HashMap<String, String> secretMap = new HashMap<String, String>();
 		String configFilePath = filePath + File.separator + agentId;
 		File configFile = null;
 		Path dir = Paths.get(configFilePath);
@@ -696,49 +725,51 @@ public class AgentManagementServiceImpl implements AgentManagementService {
 				(path, attrs) -> attrs.isRegularFile() && path.toString().endsWith("config.json"))) {
 			configFile = paths.limit(1).findFirst().get().toFile();
 		}
-		JsonObject  configObject = AgentManagementUtil.getInstance().convertFileToJSON(configFile);
+		JsonObject configObject = AgentManagementUtil.getInstance().convertFileToJSON(configFile);
 		JsonArray agentSecrets = configObject.get("agentSecretDetails").getAsJsonArray();
 
-		for(JsonElement secret:agentSecrets){
-			if(json.has(secret.getAsString())) {
+		for (JsonElement secret : agentSecrets) {
+			if (json.has(secret.getAsString())) {
 				secretMap.put(secret.getAsString(), json.get(secret.getAsString()).getAsString());
-				json.addProperty(secret.getAsString(),"*****");
-			}else {
+				json.addProperty(secret.getAsString(), "*****");
+			} else {
 				log.debug("No such secret in config.json ");
 			}
 		}
-		//TO Fetch during update
+		// TO Fetch during update
 		json.add("agentSecretDetails", agentSecrets);
-		//Add Vault creds to be used when running pyhton agents
+		// Add Vault creds to be used when running pyhton agents
 		JsonObject vaultObj = new JsonObject();
 		vaultObj.addProperty("getFromVault", true);
 		vaultObj.addProperty("secretEngine", ApplicationConfigProvider.getInstance().getVault().getSecretEngine());
 		vaultObj.addProperty("readToken", ApplicationConfigProvider.getInstance().getVault().getVaultToken());
 		vaultObj.addProperty("vaultUrl", ApplicationConfigProvider.getInstance().getVault().getVaultEndPoint());
 		json.add("vault", vaultObj);
-		log.debug("Updated Json without creds --"+json);
+		log.debug("Updated Json without creds --" + json);
 
-		dataMap.put("data",secretMap);
+		dataMap.put("data", secretMap);
 		return dataMap;
 	}
-	
+
 	/**
 	 * Stores userid/pwd/token and aws credentials in vault engine as per agent.
-	 * @param dataMap {eg: {"data":{"passwd":"password","userid":"userid"}}}
-	 * @param agentId 
+	 * 
+	 * @param dataMap
+	 *            {eg: {"data":{"passwd":"password","userid":"userid"}}}
+	 * @param agentId
 	 * @return vaultresponse
-	 * @throws InsightsCustomException 
+	 * @throws InsightsCustomException
 	 */
-	private ClientResponse storeToVault(HashMap<String, Map<String, String>> dataMap, String agentId) throws InsightsCustomException {
+	private ClientResponse storeToVault(HashMap<String, Map<String, String>> dataMap, String agentId)
+			throws InsightsCustomException {
 		ClientResponse vaultresponse = null;
 		try {
 			GsonBuilder gb = new GsonBuilder();
 			Gson gsonObject = gb.create();
 			String jsonobj = gsonObject.toJson(dataMap);
-			log.debug("Request body for vault -- "+jsonobj);
+			log.debug("Request body for vault -- " + jsonobj);
 			String url = ApplicationConfigProvider.getInstance().getVault().getVaultEndPoint()
-					+ApplicationConfigProvider.getInstance().getVault().getSecretEngine()
-					+"/data/"+agentId;
+					+ ApplicationConfigProvider.getInstance().getVault().getSecretEngine() + "/data/" + agentId;
 			log.debug(url);
 			WebResource resource = Client.create().resource(url);
 			vaultresponse = resource.type("application/json")
@@ -750,56 +781,57 @@ public class AgentManagementServiceImpl implements AgentManagementService {
 		}
 		return vaultresponse;
 	}
-	
+
 	/**
 	 * Compare vault secret with UI value and update the vault with new secrets
+	 * 
 	 * @param agentId
 	 * @param secretMap
-	 * @param json 
+	 * @param json
 	 * @throws InsightsCustomException
 	 */
-	private void updateSecrets(String agentId, HashMap<String, Map<String, String>> secretMap, JsonObject json) throws InsightsCustomException {
+	private void updateSecrets(String agentId, HashMap<String, Map<String, String>> secretMap, JsonObject json)
+			throws InsightsCustomException {
 		ClientResponse secret = fetchSecret(agentId);
-		if(secret.getStatus() == 200) {
+		if (secret.getStatus() == 200) {
 			String vaultresponse = secret.getEntity(String.class);
-			JsonObject vaultObject = new JsonParser().parse(vaultresponse).getAsJsonObject(); 
+			JsonObject vaultObject = new JsonParser().parse(vaultresponse).getAsJsonObject();
 			JsonObject vaultData = vaultObject.get("data").getAsJsonObject().get("data").getAsJsonObject();
 
-			//Modified secrets from UI
+			// Modified secrets from UI
 			Map<String, String> dataMap = secretMap.get("data");
 
-			//update secrets based on vault values
-			for(Entry<String, String> field : dataMap.entrySet()) {
-				if(vaultData.has(field.getKey()) && !field.getValue().contains("***")){
+			// update secrets based on vault values
+			for (Entry<String, String> field : dataMap.entrySet()) {
+				if (vaultData.has(field.getKey()) && !field.getValue().contains("***")) {
 					dataMap.put(field.getKey(), field.getValue());
-				}else if(vaultData.has(field.getKey())){
+				} else if (vaultData.has(field.getKey())) {
 					dataMap.put(field.getKey(), vaultData.get(field.getKey()).getAsString());
-				}else {
+				} else {
 					dataMap.put(field.getKey(), field.getValue());
 				}
 			}
-			if(!dataMap.isEmpty()) {
+			if (!dataMap.isEmpty()) {
 				updateVaultSecret(agentId, vaultData, dataMap);
 			}
-		}else {
-			log.debug("vault response -- "+secret);
-			throw new RuntimeException("Failed : HTTP error code : "
-					+ secret.getStatus());
+		} else {
+			log.debug("vault response -- " + secret);
+			throw new RuntimeException("Failed : HTTP error code : " + secret.getStatus());
 		}
 	}
-	
+
 	/**
 	 * fetches userid/pwd/token and aws credentials in vault engine as per agentID.
-	 * @param agentId 
+	 * 
+	 * @param agentId
 	 * @return vaultresponse
-	 * @throws InsightsCustomException 
+	 * @throws InsightsCustomException
 	 */
 	private ClientResponse fetchSecret(String agentId) throws InsightsCustomException {
 		ClientResponse vaultresponse = null;
 		try {
 			String url = ApplicationConfigProvider.getInstance().getVault().getVaultEndPoint()
-					+ApplicationConfigProvider.getInstance().getVault().getSecretEngine()
-					+"/data/"+agentId;
+					+ ApplicationConfigProvider.getInstance().getVault().getSecretEngine() + "/data/" + agentId;
 			log.debug(url);
 			WebResource resource = Client.create().resource(url);
 			vaultresponse = resource.type("application/json")
@@ -811,9 +843,11 @@ public class AgentManagementServiceImpl implements AgentManagementService {
 		}
 		return vaultresponse;
 	}
-	
+
 	/**
-	 * Checks if vault and UI has same secrets and creates new version if difference found.
+	 * Checks if vault and UI has same secrets and creates new version if difference
+	 * found.
+	 * 
 	 * @param agentId
 	 * @param vaultData
 	 * @param dataMap
@@ -822,22 +856,21 @@ public class AgentManagementServiceImpl implements AgentManagementService {
 	 * @throws ClientHandlerException
 	 * @throws UniformInterfaceException
 	 */
-	private void updateVaultSecret(String agentId, JsonObject vaultData, Map<String, String> dataMap) throws InsightsCustomException
-	{
+	private void updateVaultSecret(String agentId, JsonObject vaultData, Map<String, String> dataMap)
+			throws InsightsCustomException {
 		Gson gson = new Gson();
 		JsonObject uidata = gson.toJsonTree(dataMap).getAsJsonObject();
-		if(!dataMap.isEmpty() && !uidata.equals(vaultData)) {
-			HashMap<String,Map<String,String>> updateMap = new HashMap<String, Map<String,String>>();
+		if (!dataMap.isEmpty() && !uidata.equals(vaultData)) {
+			HashMap<String, Map<String, String>> updateMap = new HashMap<String, Map<String, String>>();
 			updateMap.put("data", dataMap);
 			ClientResponse updatedVaultResponse = storeToVault(updateMap, agentId);
 			if (updatedVaultResponse.getStatus() != 200) {
-				log.debug("updated vault response -- "+updatedVaultResponse);
-				throw new RuntimeException("Failed : HTTP error code : "
-						+ updatedVaultResponse.getStatus());
+				log.debug("updated vault response -- " + updatedVaultResponse);
+				throw new RuntimeException("Failed : HTTP error code : " + updatedVaultResponse.getStatus());
 			}
 			String output = updatedVaultResponse.getEntity(String.class);
-			//log.debug("updatedVaultResponse--"+output);
-		}else {
+			// log.debug("updatedVaultResponse--"+output);
+		} else {
 			log.debug("Secrets not modified !!");
 		}
 	}

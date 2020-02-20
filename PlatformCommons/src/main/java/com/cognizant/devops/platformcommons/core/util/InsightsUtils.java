@@ -24,14 +24,19 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAdjusters;
 import java.util.Date;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.TimeZone;
-
+import java.util.concurrent.TimeUnit;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.core.enums.JobSchedule;
 
+
 public class InsightsUtils {
 
+	static Logger log = LogManager.getLogger(InsightsUtils.class.getName());
 	private InsightsUtils() {
 	}
 
@@ -389,5 +394,45 @@ public class InsightsUtils {
 				InsightsUtils.zoneId);
 		Duration d = Duration.between(lastRunTimeInput, nextRunTimeInput);
 		return d.abs().toMillis();
+	}
+	
+	public static long getEpochTime(String datetime) {
+
+		SimpleDateFormat sdf = new SimpleDateFormat(DATE_TIME_FORMAT);
+		Date dt;
+		try {
+			dt = sdf.parse(datetime);			
+			return dt.getTime();
+
+		} catch (ParseException e) {
+			log.error(e.getMessage());
+			return 0;
+		}
+	}
+	
+	public static String getDateTimeFromEpoch(long milliseconds) {
+
+		String duration;
+		long days = TimeUnit.DAYS.convert(milliseconds, TimeUnit.MILLISECONDS);
+		long yrs = 0;
+		long month = 0;
+		if (days > 365) {
+			yrs = days / 365;
+			days = days - (365 * yrs);
+			if (days >= 30) // Calculate month
+			{
+				month = days / 30;
+				days = days - (month * 30);
+			}
+			duration = yrs + " Yrs " + month + "Month(s) " + days + " Days ";
+		} else if (days >= 30 && days < 365) // Calculate month
+		{
+			month = days / 30;
+			days = days - (month * 30);
+			duration = month + "Month(s) " + days + " Days ";
+		} else {
+			duration = days + " Days ";
+		} 
+		return duration;
 	}
 }

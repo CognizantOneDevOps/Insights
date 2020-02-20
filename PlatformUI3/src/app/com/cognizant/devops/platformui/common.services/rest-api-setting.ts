@@ -26,7 +26,9 @@ export class AuthInterceptor implements HttpInterceptor {
 
   intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
     let token = this.tokenExtractor.getToken() as string;
+    //console.log("token " + token)
     if (token !== null) {
+      //console.log("Inside token not null ");
       request = request.clone({
         setHeaders: { "XSRF-TOKEN": token }
       });
@@ -34,6 +36,7 @@ export class AuthInterceptor implements HttpInterceptor {
         withCredentials: true
       });
     } else {
+      //console.log("Inside token not null else  ");
       request = request.clone({
         withCredentials: true
       });

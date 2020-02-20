@@ -19,58 +19,43 @@
 
 @import "../node_modules/@angular/material/prebuilt-themes/deeppurple-amber.css";
 
-/*@import url('https://fonts.googleapis.com/css?family=Open+Sans');*/
-
 body { 
    font-family: Open Sans, Tahoma, San Serif, Helvitica;
    background-color: #f0f0f0;
    margin: 0;
 }
-
-/*.basic-container {
-  padding: 5px;
-}
-
-*/
-
 .healthcheck-show-details-dialog-container .mat-dialog-container {
   padding: 0px !important;
   margin: 0px !important;
   border-radius:15px;
   overflow: hidden;
 }
-
-
 .traceablity-show-details-dialog-container .mat-dialog-container {
   padding: 0px !important;
   margin: 0px !important;
   border-radius:15px;
   overflow: hidden;
+  overflow-y: hidden !important;
+  background-color: #dedbdb;
 }
-
-
+.traceablity-timelag-dialog-container .mat-dialog-container {
+  padding: 0px !important;
+  margin: 0px !important;
+  border-radius:15px;
+  overflow: hidden;
+  overflow-y: hidden !important;
+  background-color: #dedbdb;
+  max-height: fit-content;
+}
 .head_class{
   background-color: #f0f0f0
 }
-
-
-/*.colouricon {
-    background-repeat: no-repeat;
-    display: inline-block;
-    fill: white !important;
-    height: 24px;
-    width: 24px;
-    padding-left: 30px;
-}*/
-
 .AssetDetailsDialog .mat-dialog-container {
   padding: 0px !important;
   margin: 0px !important;
   border-radius:15px;
   overflow: hidden;
 }
-
-
 .DialogBox  .mat-dialog-container{
       
     border-radius: 10px !important ;
@@ -91,6 +76,12 @@ body {
   margin: 0px !important;
   border-radius:15px;
   background-color: #e1e3e7  !important;
+  overflow: hidden !important;
+}
+.showrelationship-dialog-container .mat-dialog-container {
+  padding: 0px !important;
+  margin: 0px !important;
+  border-radius: 15px;
   overflow: hidden !important;
 }
 

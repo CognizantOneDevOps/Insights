@@ -19,13 +19,12 @@ import { RestCallHandlerService } from '@insights/common/rest-call-handler.servi
 import { Location, LocationStrategy, PathLocationStrategy } from '@angular/common';
 import { Router, ActivatedRoute } from '@angular/router';
 import { DataSharedService } from '@insights/common/data-shared-service';
+import { RestAPIurlService } from '@insights/common/rest-apiurl.service'
 
 export interface IAuthenticationService {
-    getAuthentication(authToken: string, msg: string): void;
-    logout(): Promise<any>;
-    // getGrafanaCurrentOrgAndRole(): Promise<any>;
     getCurrentUserOrgs(): Promise<any>;
     getUsers(): Promise<any>;
+    getLogoImage(): Promise<any>;
 }
 
 
@@ -34,34 +33,18 @@ export class GrafanaAuthenticationService implements IAuthenticationService {
     response: any;
     location: Location;
     constructor(location: Location, private router: Router,
-        private dataShare: DataSharedService, private restCallHandlerService: RestCallHandlerService
-    ) {
-
-
+        private dataShare: DataSharedService, private restCallHandlerService: RestCallHandlerService,
+        private restAPIUrlService: RestAPIurlService) {
     }
-
-    public getAuthentication(authToken: string, msg: string): void {
-        if (authToken === undefined) {
-            this.router.navigate(['/login']);
-        } else {
-            var msg = "auth token exists";
-        }
-    }
-
-
-    public logout(): Promise<any> {
-        var restHandler = this.restCallHandlerService;
-        return restHandler.get("LOGOUT");
-    }
-
-    /* public getGrafanaCurrentOrgAndRole(): Promise<any> {
-        var restHandler = this.restCallHandlerService;
-        return restHandler.get("GRAPANA_CURRENT_ROLE_ORG");
-    } */
 
     public getCurrentUserOrgs(): Promise<any> {
         var restHandler = this.restCallHandlerService;
         return restHandler.get("ACCESS_GROUP_MANAGEMENT_GET_CURRENT_USER_ORGS");
+    }
+
+    public getCurrentUserWithOrgs(): Promise<any> {
+        var restHandler = this.restCallHandlerService;
+        return restHandler.get("ACCESS_GROUP_MANAGEMENT_GET_USERS_WITH_ORGS");
     }
 
     public switchUserOrg(orgId: number): Promise<any> {
@@ -70,7 +53,14 @@ export class GrafanaAuthenticationService implements IAuthenticationService {
     }
 
     public getUsers(): Promise<any> {
+        console.log("Inside getUsers");
         var restHandler = this.restCallHandlerService;
         return restHandler.get("ACCESS_GROUP_MANAGEMENT_GET_USERS");
     }
+
+    public getLogoImage(): any {
+        var restCallUrl = this.restAPIUrlService.getRestCallUrl("GET_LOGO_IMAGE");
+        return this.restCallHandlerService.getJSON(restCallUrl);
+    }
+
 }

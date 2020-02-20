@@ -27,7 +27,6 @@ import org.testng.annotations.AfterTest;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 
-
 import com.cognizant.devops.platformcommons.config.ApplicationConfigCache;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBException;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphResponse;
@@ -36,40 +35,39 @@ import com.cognizant.devops.platformdal.agentConfig.AgentConfigDAL;
 import com.cognizant.devops.engines.platformengine.modules.aggregator.EngineAggregatorModule;
 import com.cognizant.devops.engines.platformengine.modules.correlation.EngineCorrelatorModule;
 
-
 public class EngineAggregatorCorelationModuleTest {
 	private static Logger log = LogManager.getLogger(EngineAggregatorCorelationModuleTest.class.getName());
 
 	private AgentConfigDAL agentConfigDAL = new AgentConfigDAL();
-	
-	private FileReader reader=null;
-	
-	private Properties p =null;
-	   	      
-	  
+
+	private FileReader reader = null;
+
+	private Properties p = null;
+
 	@BeforeTest
 	public void onInit() throws InterruptedException, IOException {
 
 		ApplicationConfigCache.loadConfigCache();
-	
-		reader=new FileReader("src/test/resources/Properties.prop");  
-	      
-		p=new Properties();  
-		
-		p.load(reader);		
-				
+
+		reader = new FileReader("src/test/resources/Properties.prop");
+
+		p = new Properties();
+
+		p.load(reader);
+
 		/*
 		 * Insert Test Data into Postgre *
 		 */
 
-		agentConfigDAL.saveAgentConfigFromUI(p.getProperty("gitAgentId"), EngineTestData.gitToolCategory, "git",
-				EngineTestData.getJsonObject(EngineTestData.gitConfig), EngineTestData.agentVersion,
-				EngineTestData.osversion, EngineTestData.updateDate, false);
+
+		agentConfigDAL.saveAgentConfigFromUI(p.getProperty("gitAgentId"), EngineTestData.gitToolCategory,
+				EngineTestData.gitLabelName, "git", EngineTestData.getJsonObject(EngineTestData.gitConfig),
+				EngineTestData.agentVersion, EngineTestData.osversion, EngineTestData.updateDate, false);
 		/******************************************************************************************/
 
-		agentConfigDAL.saveAgentConfigFromUI(p.getProperty("jenkinsAgentId"), EngineTestData.jenkinToolCategory, "jenkins",
-				EngineTestData.getJsonObject(EngineTestData.jenkinsConfig), EngineTestData.agentVersion,
-				EngineTestData.osversion, EngineTestData.updateDate, false);
+		agentConfigDAL.saveAgentConfigFromUI(p.getProperty("jenkinsAgentId"), EngineTestData.jenkinToolCategory,
+				EngineTestData.jenkinLabelName, "jenkins", EngineTestData.getJsonObject(EngineTestData.jenkinsConfig),
+				EngineTestData.agentVersion, EngineTestData.osversion, EngineTestData.updateDate, false);
 
 		Thread.sleep(1000);
 
@@ -127,7 +125,7 @@ public class EngineAggregatorCorelationModuleTest {
 
 	}
 
-	@Test(priority=2) 
+	@Test(priority = 2)
 	public void testCorrelation() {
 
 		Neo4jDBHandler dbHandler = new Neo4jDBHandler();
@@ -136,15 +134,13 @@ public class EngineAggregatorCorelationModuleTest {
 		try {
 
 			neo4jResponse = dbHandler.executeCypherQuery(query);
-			
-		
 
 			String finalJson = neo4jResponse.getJson().get("results").getAsJsonArray().get(0).getAsJsonObject()
 					.get("data").getAsJsonArray().get(0).getAsJsonObject().get("row").toString().replace("[", "")
 					.replace("]", "");
 
 			/* Assert on Node Relationship */
-			
+
 			Assert.assertEquals("true", finalJson.toString());
 
 		} catch (GraphDBException e) {
@@ -153,7 +149,7 @@ public class EngineAggregatorCorelationModuleTest {
 		}
 	}
 
-	@AfterTest
+   @AfterTest
 	public void cleanUp() {
 
 		/* Cleaning Postgre */

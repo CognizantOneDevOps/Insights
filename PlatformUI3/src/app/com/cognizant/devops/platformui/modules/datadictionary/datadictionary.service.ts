@@ -21,7 +21,7 @@ import { Observable } from 'rxjs';
 export interface IDataDictionaryService {
     loadToolsAndCategories(): Promise<any>;
     loadToolProperties(toolName: string, categoryName: string) : Promise<any>;
-    loadToolsRelationshipAndProperties(startToolName: string, startToolCategory: string, endToolName: string, endToolCatergory: string): Promise<any>;
+    loadToolsRelationshipAndProperties(startLabelName: string, startToolCategory: string, endLabelName: string, endToolCatergory: string): Promise<any>;
 }
 
 
@@ -38,14 +38,14 @@ export class DataDictionaryService implements IDataDictionaryService {
         return restHandler.get("DATA_DICTIONARY_TOOLS_AND_CATEGORY");
     }
 
-    loadToolProperties(toolName: string, categoryName: string): Promise<any> {
+    loadToolProperties(labelName: string, categoryName: string): Promise<any> {
         var restHandler = this.restCallHandlerService;
-        return restHandler.get("DATA_DICTIONARY_TOOL_PROPERTIES", { 'toolName': toolName, 'categoryName': categoryName });
+        return restHandler.get("DATA_DICTIONARY_TOOL_PROPERTIES", { 'labelName': labelName, 'categoryName': categoryName });
     }
 
-    loadToolsRelationshipAndProperties(startToolName: string, startToolCategory: string, endToolName: string, endToolCatergory: string):Promise<any> {
+    loadToolsRelationshipAndProperties(startLabelName: string, startToolCategory: string, endLabelName: string, endToolCatergory: string):Promise<any> {
         var restHandler = this.restCallHandlerService;
-        return restHandler.get("DATA_DICTIONARY_TOOLS_RELATIONSHIPS", { 'startToolName': startToolName, 'startToolCategory': startToolCategory, 'endToolName': endToolName, 'endToolCatergory': endToolCatergory });
+        return restHandler.get("DATA_DICTIONARY_TOOLS_RELATIONSHIPS", { 'startLabelName': startLabelName, 'startToolCategory': startToolCategory, 'endLabelName': endLabelName, 'endToolCatergory': endToolCatergory });
     }
 
 }

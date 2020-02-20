@@ -14,7 +14,7 @@
 	<groupId>com.cognizant.devops</groupId>
 	<artifactId>PlatformParent</artifactId>
 	<packaging>pom</packaging>
-	<version>6.3</version>
+	<version>6.4</version>
 	<name>PlatformParent</name>
 
 	<dependencies>
@@ -23,11 +23,6 @@
 			<artifactId>junit</artifactId>
 			<version>3.8.1</version>
 			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>log4j</groupId>
-			<artifactId>log4j</artifactId>
-			<version>1.2.17</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.logging.log4j</groupId>
@@ -49,10 +44,11 @@
 	<modules>
 		<module>PlatformCommons</module>
 		<module>PlatformDAL</module>
-		<module>PlatformService</module>
+     	<module>PlatformService</module>
 		<module>PlatformEngine</module>
 		<module>PlatformInsights</module>
 		<module>PlatformUI3</module>
+		
 	</modules>
 	<build>
 		<pluginManagement>
@@ -153,7 +149,7 @@
 			<url>https://repo.cogdevops.com/repository/buildonInsights</url>
 		</snapshotRepository>
 	</distributionManagement>
-
+	
 	<profiles>
 		<profile>
 			<id>NexusUpload</id>

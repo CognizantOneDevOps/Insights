@@ -42,15 +42,14 @@ public class DataDictionaryController {
 	}
 
 	@RequestMapping(value = "/getToolProperties", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public JsonObject getToolProperties(@RequestParam String toolName, @RequestParam String categoryName) {
-		return dataDictionaryService.getToolProperties(toolName, categoryName);
+	public JsonObject getToolProperties(@RequestParam String labelName, @RequestParam String categoryName) {
+		return dataDictionaryService.getToolProperties(labelName, categoryName);
 	}
-
 	@RequestMapping(value = "/getToolsRelationshipAndProperties", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public JsonObject getToolsRelationshipAndProperties(@RequestParam String startToolName,
-			@RequestParam String startToolCategory, @RequestParam String endToolName,
+	public JsonObject getToolsRelationshipAndProperties(@RequestParam String startLabelName,
+			@RequestParam String startToolCategory, @RequestParam String endLabelName,
 			@RequestParam String endToolCatergory) {
-		return dataDictionaryService.getToolsRelationshipAndProperties(startToolName, startToolCategory, endToolName,
+		return dataDictionaryService.getToolsRelationshipAndProperties(startLabelName, startToolCategory, endLabelName,
 				endToolCatergory);
 	}
 }

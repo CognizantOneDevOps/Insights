@@ -15,7 +15,11 @@
   	"uptool":["null"],
 	"downtool":["GIT"],
     "uplink": "null",
-    "downlink": {"jiraKeys": "almAssetID"}
+    "downlink": [{"jiraKey": "jiraKey"}],
+	"statusArray":["In-Progress","Done","Accepted"],
+	"timelagParam":["statusArray"],
+	"uifilter":["jiraKey","projectName"]
+   
   },
   "GIT": {
     "uuid":"uuid",
@@ -33,7 +37,14 @@
 	"uptool":["JIRA"],
 	"downtool":["JENKINS"],
     "uplink": {"almAssetID": "jiraKeys"},
-    "downlink": {"scmCommitId": "scmAsetID"}
+    "downlink": [{"commitId": "scmcommitId"}],
+    "gitCommiTime":"gitCommiTime",
+    "timelagParam":["gitCommiTime"],
+	"messages" : [
+	{"Message":"Commit Information - Commits performed over a period of {0} by {1} unique developer(s)","Operation":"TIMEDIFF","OperandName":"timestamp","OperandValue":"" }		
+	],
+	"uifilter":["commitId"]
+	
   },
   "JENKINS": {
     "uuid": "uuid",
@@ -51,7 +62,17 @@
 	"uptool":["GIT"],
 	"downtool":["SONAR","RUNDECK"],
 	"uplink": {"scmAssetID": "scmCommitId"},
-    "downlink": {"codeQualityAssetID": "sonarTaskID", "artifactAssetID": "resourceKey", "deploymentAssetID": "deploymentId"}
+	"startTime":"startTime",
+	"endTime":"endTime",
+	"timelagParam":["startTime","endTime"],
+   	"messages" : [
+		{
+		"Message":"Build Information - {0} Passed {1} Failed",
+		"Operation":"SUM",
+		"OperandName":"toolstatus",
+		"OperandValue":"SUCCESS"}		
+	],
+	"uifilter":["buildNumber","projectName"]
   },
   "RUNDECK": {
     "uuid" : "uuid",
@@ -69,7 +90,13 @@
 	"uptool":["JENKINS"],
 	"downtool":["null"],
     "uplink": {"resourceKey": "artifactAssetID"},
-    "downlink": "null"
+	"startTime":"startTime",
+	"endTime":"endTime",
+	"timelagParam":["startTime","endTime"],
+   	"messages" : [
+		{"Message":"Deployment - {0} Successful Deployments  {1} Failed Deployments","Operation":"SUM","OperandName":"toolstatus","OperandValue":"Success"}		
+	],
+	"uifilter":["jenkineBuildNumber"]
   },
   
    "TESTING": {
@@ -86,9 +113,8 @@
     "timestamp": "inSightsTime",
 	"uptool":["RUNDECK"],
 	"downtool":["null"],
-    "uplink": {"resourceKey": "artifactAssetID"},
-    "downlink": "null"
-  },
+    "uplink": {"resourceKey": "artifactAssetID"}
+     },
   
   "LOADRUNNER": {
     "uuid" : "uuid",
@@ -104,9 +130,8 @@
     "timestamp": "inSightsTime",
 	"uptool":["JENKINS"],
 	"downtool":["null"],
-    "uplink": {"resourceKey": "artifactAssetID"},
-    "downlink": "null"
-  },
+    "uplink": {"resourceKey": "artifactAssetID"}
+    },
   "SONAR":{
     "uuid": "uuid",
 	"inSightsTimeX":"inSightsTimeX",
@@ -122,8 +147,11 @@
     "timestamp": "inSightsTime",
 	"uptool":["JENKIS"],
 	"downtool":["null"],
-    "uplink": {"sonarTaskID": "codeQualityAssetID"},
-    "downlink": "null"
+	"startTime":"startTime",
+	"endTime":"endTime",
+	"timelagParam":["startTime","endTime"],
+    "uplink": {"sonarTaskID": "codeQualityAssetID"}
+   
   },
   "UCD":{
     "uuid" : "uuid",
@@ -139,8 +167,8 @@
     "timestamp": "inSightsTime",
 	"uptool":["JENKIS"],
 	"downtool":["null"],
-    "uplink": {"deploymentId": "deploymentAssetID"},
-    "downlink": "null"
+    "uplink": {"deploymentId": "deploymentAssetID"}
+    
   },
   "CHANGELOG":{
     "uuid" : "uuid",

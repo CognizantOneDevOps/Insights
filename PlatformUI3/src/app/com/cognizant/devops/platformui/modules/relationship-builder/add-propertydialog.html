@@ -1,0 +1,60 @@
+<!--
+ *********************************************************************************
+ * Copyright 2019 Cognizant Technology Solutions
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License.  You may obtain a copy
+ * of the License at
+ * 
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ *******************************************************************************-->
+<div class="arrange-horizontally-DialogProperty" style="padding:0px">
+    <div class="gridheadercenter">
+        <pre class="headingTextinDiaglog">Please Add Relationship Properties</pre>
+    </div>
+    <div class="closeIconCss">
+        <a (click)="closeShowDetailsDialog()">
+            <mat-icon class="closeiconConf" svgIcon="close_dialog">
+            </mat-icon>
+        </a>
+    </div>
+</div>
+<div>
+    <pre style="color: #0033a0;font-family: inherit; font-size: 14px;margin-top: 20px;margin-left: 15px; margin-bottom: -20px;">
+    Property Name(s):
+    </pre>
+</div>
+<form [formGroup]="propertyForm">
+    <div formArrayName="property_points">
+        <div *ngFor="let item of property_points.controls; let pointIndex=index" [formGroupName]="pointIndex">
+            <label>
+                <input style=" margin-left: 30px; height: 20px;margin-top: 10px" formControlName="point" />
+            </label>
+            <button mat-icon-button (click)="addPropertyPoints()">
+                <mat-icon style="color: #0033a0" title="Add New Property" class="mat-icon material-icons">
+                    add_circle
+                </mat-icon>
+            </button>
+            <button mat-icon-button (click)="deletePropertyPoints(pointIndex)">
+                <mat-icon style="color: #0033a0" title="Add New Property" class="mat-icon material-icons">
+                    remove_circle
+                </mat-icon>
+            </button>
+        </div>
+        <div>
+            <mat-dialog-actions style="position: fixed; margin-left: 414px;top: 65%;" class="mat-dialog-actions-button">
+                <button mat-raised-button (click)="getFinalList()">Save</button>
+            </mat-dialog-actions>
+
+            <mat-dialog-actions style="position: fixed; margin-left: 330px;top: 65%;" class="mat-dialog-actions-button">
+                <button mat-raised-button (click)="closeShowDetailsDialog()">Cancel</button>
+            </mat-dialog-actions>
+        </div>
+    </div>
+</form>

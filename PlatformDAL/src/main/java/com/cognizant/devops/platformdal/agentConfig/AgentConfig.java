@@ -42,35 +42,38 @@ public class AgentConfig {
 	@Column(name = "TOOL_CATEGORY")
 	private String toolCategory;
 
-	@Column(name = "AGENT_JSON" ,length = 10000)
+	@Column(name = "LABEL_NAME")
+	private String labelName;
+
+	@Column(name = "AGENT_JSON", length = 10000)
 	private String agentJson;
 
 	@Column(name = "UPDATE_DATE")
 	private Date updatedDate;
-	
+
 	@Deprecated
 	@Column(name = "DATA_UPDATE_SUPPORTED")
 	private Boolean dataUpdateSupported = false;
-	
+
 	@Deprecated
 	@Column(name = "UNIQUE_KEY")
 	private String uniqueKey;
-	
+
 	@Column(name = "OS_VERSION")
 	private String osVersion;
-	
+
 	@Column(name = "AGENT_VERSION")
 	private String agentVersion;
-	
+
 	@Column(name = "AGENT_STATUS")
 	private String agentStatus;
-	
+
 	@Column(name = "AGENT_KEY", unique = true, nullable = false)
 	private String agentKey;
-	
-	@Column(name= "IS_VAULT_ENABLE")
+
+	@Column(name = "IS_VAULT_ENABLE")
 	private Boolean vault;
-	
+
 	public int getId() {
 		return id;
 	}
@@ -78,7 +81,7 @@ public class AgentConfig {
 	public void setId(int id) {
 		this.id = id;
 	}
-	
+
 	@Deprecated
 	public int getAgentId() {
 		return agentId;
@@ -103,6 +106,14 @@ public class AgentConfig {
 
 	public void setToolCategory(String toolCategory) {
 		this.toolCategory = toolCategory;
+	}
+
+	public String getLabelName() {
+		return labelName;
+	}
+
+	public void setLabelName(String labelName) {
+		this.labelName = labelName;
 	}
 
 	public String getAgentJson() {
@@ -182,12 +193,14 @@ public class AgentConfig {
 	}
 
 	public Boolean getVault() {
+		if(this.vault == null) {
+			return false;
+		}
 		return vault;
 	}
 
 	public void setVault(Boolean vault) {
 		this.vault = vault;
 	}
-	
-	
+
 }
