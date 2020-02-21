@@ -59,9 +59,9 @@ node {
 		}	
 		
 		//Below step is to include security analysis. License has expired. Therefore commented.
-		//stage ('Insight_PS_IQ') {	
-			//sh 'mvn com.sonatype.clm:clm-maven-plugin:evaluate -Dclm.applicationId=Insights'
-		//} 
+		stage ('Insight_PS_IQ') {	
+			sh 'mvn com.sonatype.clm:clm-maven-plugin:evaluate -Dclm.applicationId=Insights'
+		} 
 
         stage ('Insight_PS_CodeAnalysis') {
 			sh 'mvn sonar:sonar -Dmaven.test.failure.ignore=true -DskipTests=true -Dsonar.sources=src/main/java -pl !PlatformUI3'		
