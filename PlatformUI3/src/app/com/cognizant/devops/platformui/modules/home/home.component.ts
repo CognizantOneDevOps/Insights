@@ -390,7 +390,7 @@ export class HomeComponent implements OnInit {
             showMenu: true,
             title: "Logo Setting",
             isAdminMenu: true
-          },
+          }/*,
           {
             displayName: 'Data Archival',
             iconName: 'feature',
@@ -399,7 +399,7 @@ export class HomeComponent implements OnInit {
             showMenu: true,
             title: "Data Archival",
             isAdminMenu: true
-          }
+          }*/
         ]
       }
     ];

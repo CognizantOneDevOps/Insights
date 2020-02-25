@@ -74,8 +74,8 @@ export class RestAPIurlService implements IRestAPIUrlService {
         this.addEndPoint("UPLOAD_IMAGE", '/PlatformService/admin/settings/uploadCustomLogo');
         this.addEndPoint("GET_LOGO_IMAGE", '/PlatformService/settings/getLogoImage');
 
-        this.addEndPoint("SAVE_DATAPURGING_SETTING", '/PlatformService/admin/settings/saveSettingsConfiguration');
-        this.addEndPoint("LIST_DATAPURGING_SETTING", '/PlatformService/admin/settings/loadSettingsConfiguration');
+        //this.addEndPoint("SAVE_DATAPURGING_SETTING", '/PlatformService/admin/settings/saveSettingsConfiguration');
+        //this.addEndPoint("LIST_DATAPURGING_SETTING", '/PlatformService/admin/settings/loadSettingsConfiguration');
 
         //Agent Configuration
         this.addEndPoint("AGENT_REGISTER", '/PlatformService/admin/agentConfiguration/registerAgent');
