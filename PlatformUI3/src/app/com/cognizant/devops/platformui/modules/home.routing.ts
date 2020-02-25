@@ -24,7 +24,7 @@ import { PageNotFoundComponent } from '@insights/app/modules/page-not-found/page
 import { AgentManagementComponent } from '@insights/app/modules/admin/agent-management/agent-management.component';
 import { DatadictionaryComponent } from '@insights/app/modules/datadictionary/datadictionary.component';
 import { BusinessMappingComponent } from '@insights/app/modules/admin/businessmapping/businessmapping.component';
-import { DataArchivingComponent } from '@insights/app/modules/settings/dataarchiving/dataarchiving.component';
+//import { DataArchivingComponent } from '@insights/app/modules/settings/dataarchiving/dataarchiving.component';
 import { AgentConfigurationComponent } from '@insights/app/modules/admin/agent-management/agent-configuration/agent-configuration.component';
 import { BlockChainComponent } from '@insights/app/modules/blockchain/blockchain.component';
 import { UserOnboardingComponent } from '@insights/app/modules/user-onboarding/user-onboarding.component';
@@ -50,7 +50,7 @@ const homeRoutes: Routes = [
       { path: 'agentmanagement', component: AgentManagementComponent },
       { path: 'datadictionary', component: DatadictionaryComponent },
       { path: 'businessmapping', component: BusinessMappingComponent },
-      { path: 'dataarchiving', component: DataArchivingComponent },
+      //{ path: 'dataarchiving', component: DataArchivingComponent },
       { path: 'agentconfiguration', component: AgentConfigurationComponent },
       { path: 'accessGroupManagement', component: UserOnboardingComponent },
       { path: 'landingPage', component: LandingPageComponent },

@@ -41,7 +41,7 @@ import { AboutDialog } from '@insights/app/modules/about/about-show-popup';
 import { BlockChainComponent } from '@insights/app/modules/blockchain/blockchain.component';
 import { AgentManagementComponent } from '@insights/app/modules/admin/agent-management/agent-management.component';
 import { DatadictionaryComponent } from '@insights/app/modules/datadictionary/datadictionary.component';
-import { DataArchivingComponent } from '@insights/app/modules/settings/dataarchiving/dataarchiving.component';
+//import { DataArchivingComponent } from '@insights/app/modules/settings/dataarchiving/dataarchiving.component';
 import { GrafanaAuthenticationService } from '@insights/common/grafana-authentication-service';
 import { GrafanaDashboardService } from '@insights/app/modules/grafana-dashboard/grafana-dashboard-service';
 import { AgentService } from '@insights/app/modules/admin/agent-management/agent-management-service';
@@ -50,7 +50,7 @@ import { DataDictionaryService } from '@insights/app/modules/datadictionary/data
 
 import { BusinessMappingService } from '@insights/app/modules/admin/businessmapping/businessmapping.service';
 import { BusinessMappingComponent } from '@insights/app/modules/admin/businessmapping/businessmapping.component';
-import { DataArchivingService } from '@insights/app/modules/settings/dataarchiving/dataarchiving-service';
+//import { DataArchivingService } from '@insights/app/modules/settings/dataarchiving/dataarchiving-service';
 import { AgentConfigurationComponent } from '@insights/app/modules/admin/agent-management/agent-configuration/agent-configuration.component';
 
 import { UserOnboardingComponent } from '@insights/app/modules/user-onboarding/user-onboarding.component';
@@ -100,7 +100,7 @@ import { AddPropertyDialog } from './relationship-builder/add-propertydialog';
     AgentManagementComponent,
     DatadictionaryComponent,
     BusinessMappingComponent,
-    DataArchivingComponent,
+    //DataArchivingComponent,
     AgentConfigurationComponent,
     BlockChainComponent,
     UserOnboardingComponent,
@@ -151,7 +151,7 @@ import { AddPropertyDialog } from './relationship-builder/add-propertydialog';
     HealthCheckService,
     DataDictionaryService,
     BusinessMappingService,
-    DataArchivingService,
+    //DataArchivingService,
     UserOnboardingService,
     MessageDialogService,
     LogoSettingService,
