@@ -20,25 +20,27 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.web.servlet.ServletComponentScan;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.annotation.ComponentScan;
-
-import com.cognizant.devops.platformcommons.config.ApplicationConfigCache;
-import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
+import com.cognizant.devops.platforminsightswebhook.config.WebHookConstants;
 import com.cognizant.devops.platforminsightswebhook.message.core.SubscriberStatusLogger;
 
 
-
 @SpringBootApplication
-@ComponentScan(basePackages = { "com.cognizant.devops.platforminsightswebhook" })
 @ServletComponentScan
+@EnableConfigurationProperties(AppProperties.class)
 public class WebHookAppStarter {
 	private static Logger LOG = LogManager.getLogger(WebHookAppStarter.class);
     public static void main(String[] args) {
 		LOG.debug(" Inside Webhook Message Publisher ... ");
-    	ApplicationConfigCache.loadConfigCache();
 		ApplicationContext applicationContext = SpringApplication.run(WebHookAppStarter.class, args);
-		SubscriberStatusLogger.getInstance().createSubsriberStatusNode("Platform Webhook Subscriber Service Started ",PlatformServiceConstants.SUCCESS);
+		LOG.debug(" message Application Name " + applicationContext.getApplicationName() + " instance name "
+				+ AppProperties.instanceName);
+		SubscriberStatusLogger.getInstance()
+				.createSubsriberStatusNode(
+						" Service Started with instance name " + AppProperties.instanceName
+								+ " and context path as " + applicationContext.getApplicationName() + ".",
+				WebHookConstants.SUCCESS);
 	}
 } 

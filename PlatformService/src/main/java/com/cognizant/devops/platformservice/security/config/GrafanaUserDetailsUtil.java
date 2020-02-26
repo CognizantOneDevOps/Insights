@@ -99,6 +99,7 @@ public class GrafanaUserDetailsUtil {
 				List<NewCookie> cookies = getValidGrafanaSession(authTokens[0], authTokens[1]);
 				StringBuffer grafanaCookie = new StringBuffer();
 				for (NewCookie cookie : cookies) {
+					log.debug(" cookie.getValue()  " + cookie.getValue() + " Name " + cookie.getName());
 					String value = ValidationUtils.cleanXSS(cookie.getValue());
 					grafanaResponseCookies.put(
 							ValidationUtils.cleanXSS(cookie.getName()), value);
@@ -175,6 +176,8 @@ public class GrafanaUserDetailsUtil {
 		loginRequestParams.addProperty("password", password);
 		String loginApiUrl = ApplicationConfigProvider.getInstance().getGrafana().getGrafanaEndpoint() + "/login";
 		ClientResponse grafanaLoginResponse = RestHandler.doPost(loginApiUrl, loginRequestParams, null);
+		log.debug(" status code " + grafanaLoginResponse.getStatus() + "  loginApiUrl  " + loginApiUrl
+				+ " Grafana responce " + grafanaLoginResponse.getEntity(String.class));
 		if (grafanaLoginResponse.getStatus() != 200) {
 			String response = grafanaLoginResponse.getEntity(String.class);
 			log.error("unable to getValidGrafanaSession ==== " + grafanaLoginResponse.getStatus() + "   response  "

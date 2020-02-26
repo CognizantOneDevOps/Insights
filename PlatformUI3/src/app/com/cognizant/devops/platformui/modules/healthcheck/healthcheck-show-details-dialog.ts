@@ -60,7 +60,7 @@ export class ShowDetailsDialog implements OnInit {
     this.detailType = this.data.detailType;
   }
 
-  ngAfterViewInit() {    
+  ngAfterViewInit() {
     //this.agentDetailedDatasource.paginator = this.allStatusPaginator;
   }
 
@@ -76,7 +76,7 @@ export class ShowDetailsDialog implements OnInit {
     this.showContent = !this.showThrobber;
     this.checkResponseData = true;
     this.healthCheckService.loadHealthConfigurations(this.data.toolName, this.data.categoryName, this.data.agentId)
-      .then((data) => {        
+      .then((data) => {
         this.showThrobber = false;
         this.showContent = !this.showThrobber;
         var dataArray = data.data.nodes;
@@ -85,14 +85,14 @@ export class ShowDetailsDialog implements OnInit {
           if (dataArray.length === 0 && this.data.detailType != "Platform Service") {
             this.checkResponseData = false;
           }
-          
-          if (this.detailType == "Platform Service" || this.detailType == "Insights Inference Engine" 
-                    || this.detailType == "Platform Engine" || this.detailType == "Platform WebhookSubscriber" || this.detailType == "Platform WebhookEngine") {
-             this.showAgentFailureTab = false;
+
+          if (this.detailType == "Platform Service" || this.detailType == "Insights Inference Engine"
+            || this.detailType == "Platform Engine" || this.detailType == "Platform WebhookSubscriber" || this.detailType == "Platform WebhookEngine") {
+            this.showAgentFailureTab = false;
           } else {
-             this.showAgentFailureTab = true;
+            this.showAgentFailureTab = true;
           }
-         
+
           for (var key in dataArray) {
             var dataNodes = dataArray[key];
             for (var node in dataNodes) {
@@ -105,7 +105,7 @@ export class ShowDetailsDialog implements OnInit {
                   obj["status"] = this.titlecase.transform(obj["status"]);
                 }
                 if (typeof obj["message"] !== "undefined") {
-                  obj["message"] = obj["message"].slice(0, 100);
+                  obj["message"] = obj["message"].slice(0, 120);
                 }
                 this.agentDetailedNode.push(obj);
                 for (var attr in obj) {
@@ -117,7 +117,7 @@ export class ShowDetailsDialog implements OnInit {
               }
             }
           }
-          this.agentDetailedDatasource.data = this.agentDetailedNode;          
+          this.agentDetailedDatasource.data = this.agentDetailedNode;
           this.showSelectedField();
         }
       });
@@ -145,7 +145,7 @@ export class ShowDetailsDialog implements OnInit {
               }
             }
           }
-          this.agentFailureDetailsDatasource.data = this.agentFailureRecords;          
+          this.agentFailureDetailsDatasource.data = this.agentFailureRecords;
         }
 
       });

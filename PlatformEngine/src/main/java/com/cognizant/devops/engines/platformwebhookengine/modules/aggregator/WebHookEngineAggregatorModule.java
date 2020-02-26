@@ -31,10 +31,12 @@ import com.cognizant.devops.platformdal.webhookConfig.WebHookConfigDAL;
 import com.cognizant.devops.engines.platformengine.message.core.EngineStatusLogger;
 import com.cognizant.devops.engines.platformwebhookengine.message.factory.EngineSubscriberResponseHandler;
 import com.cognizant.devops.engines.platformwebhookengine.message.subscriber.WebHookDataSubscriber;
+import com.cognizant.devops.engines.platformwebhookengine.message.subscriber.WebhookHealthSubscriber;
 
 public class WebHookEngineAggregatorModule extends TimerTask {
 	private static Logger log = LogManager.getLogger(WebHookEngineAggregatorModule.class.getName());
 	private static Map<String, EngineSubscriberResponseHandler> registry = new HashMap<String, EngineSubscriberResponseHandler>();
+	private static String WEBHOOK_HEALTH_ROUTING_KEY = "WEBHOOKSUBSCRIBER_HEALTH";
 
 	@Override
 	public void run() {
@@ -51,9 +53,11 @@ public class WebHookEngineAggregatorModule extends TimerTask {
 			if (subscribeStatus == true) {
 				registerAggragators(webhookConfig, graphDBHandler, toolName);
 			}
+			registerWebhookHealthAggragators(WEBHOOK_HEALTH_ROUTING_KEY);
 		}
 		log.debug(" Webhook Engine completed ==== ");
 	}
+
 
 	private void registerAggragators(WebHookConfig webhookConfig, Neo4jDBHandler graphDBHandler, String toolName) {
 		String dataRoutingKey = webhookConfig.getMQChannel();
@@ -79,6 +83,25 @@ public class WebHookEngineAggregatorModule extends TimerTask {
 		} catch (Exception e) {
 			EngineStatusLogger.getInstance().createWebhookEngineStatusNode(
 					"Unable to subscribed Webhook " + webhookName + " Error Detail :" + e.getMessage(),
+					PlatformServiceConstants.FAILURE);
+			log.error("Unable to add subscriber for routing key: " + e);
+
+		}
+
+	}
+
+	private void registerWebhookHealthAggragators(String healthRoutingKey) {
+		try {
+			registry.put(healthRoutingKey,
+					new WebhookHealthSubscriber(healthRoutingKey));
+			log.debug("Webhook Health Queue {} subscribed successfully ", healthRoutingKey);
+			EngineStatusLogger.getInstance().createWebhookEngineStatusNode(
+					"Webhook  Health Queue " + healthRoutingKey + " subscribed successfully ",
+					PlatformServiceConstants.SUCCESS);
+		} catch (Exception e) {
+			EngineStatusLogger.getInstance().createWebhookEngineStatusNode(
+					"Unable to subscribed Webhook  Health Queue " + healthRoutingKey + " Error Detail :"
+							+ e.getMessage(),
 					PlatformServiceConstants.FAILURE);
 			log.error("Unable to add subscriber for routing key: " + e);
 
