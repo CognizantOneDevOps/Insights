@@ -17,19 +17,46 @@ package com.cognizant.devops.platforminsightswebhook.application;
 
 import javax.servlet.http.HttpServlet;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.boot.web.servlet.ServletRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.DependsOn;
+import org.springframework.core.annotation.Order;
 
+import com.cognizant.devops.platforminsightswebhook.config.WebHookMessagePublisher;
 import com.cognizant.devops.platforminsightswebhook.events.WebHookHandlerServlet;
 
 @Configuration
 @ComponentScan(basePackages = { "com.cognizant.devops.platforminsightswebhook.*" })
 public class WebConfig {
+	
+	private static Logger LOG = LogManager.getLogger(WebConfig.class);
 
+	@Bean(name = "appPropertiesLoad")
+	@Order(1)
+	public AppProperties appPropertiesLoad() {
+		LOG.debug(" AppProperties  Bean .....");
+		return new AppProperties();
+	}
+
+	/**
+	 * Used to initilize Rabbitq Connection
+	 * Webhook Servlet initilizition
+	 * 
+	 */
 	@Bean
+	@DependsOn("appPropertiesLoad")
 	public ServletRegistrationBean<HttpServlet> webhookServlet() {
+		LOG.debug(
+				" In webhookServlet  ======== instanceName ={} host = {} user = {} passcode = {} exchangeName= {} serverPort = {} context = {}",
+				AppProperties.instanceName, AppProperties.mqHost, AppProperties.mqUser, AppProperties.mqPassword,
+				AppProperties.mqExchangeName,
+				ServerProperties.port, ServerProperties.contextPath);
+		WebHookMessagePublisher.getInstance().initilizeMq();
+		LOG.debug(" start servelet registration in webhookServlet ");
 		ServletRegistrationBean<HttpServlet> servRegBean = new ServletRegistrationBean<>();
 		WebHookHandlerServlet webhookEvent = new WebHookHandlerServlet();
 		servRegBean.setServlet(webhookEvent);
@@ -37,4 +64,7 @@ public class WebConfig {
 		servRegBean.setLoadOnStartup(1);
 		return servRegBean;
 	}
+
+
+
 }

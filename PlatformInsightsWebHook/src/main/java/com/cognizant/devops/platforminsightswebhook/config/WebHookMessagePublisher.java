@@ -24,7 +24,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Component;
 
-import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
+import com.cognizant.devops.platforminsightswebhook.application.AppProperties;
+import com.cognizant.devops.platforminsightswebhook.message.core.SubscriberStatusLogger;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
@@ -39,27 +40,47 @@ public class WebHookMessagePublisher {
 	String routingKey;
 	Map<String, Channel> mqMappingMap = new HashMap<String, Channel>(0);
 
+	public static WebHookMessagePublisher webhookmessagepublisher;
 
-	public WebHookMessagePublisher() {
-		this.exchangeName = ApplicationConfigProvider.getInstance().getAgentDetails().getAgentExchange();
-		this.routingKey = "WEBHOOK_EVENTDATA";
+	public static WebHookMessagePublisher getInstance() {
+		if (webhookmessagepublisher == null) {
+			webhookmessagepublisher = new WebHookMessagePublisher();
+		}
+		return webhookmessagepublisher;
+	}
+
+	private WebHookMessagePublisher() {
+
 	}
 
 	public void initilizeMq() {
-		LOG.debug(" In initilizeMq ======== ");
+		LOG.debug(" In initilizeMq ======== host = {} user = {} passcode = {} exchangeName= {} ", AppProperties.mqHost,
+				AppProperties.mqUser, AppProperties.mqPassword, AppProperties.mqExchangeName);
 		try {
+			this.exchangeName = AppProperties.mqExchangeName;
+			this.routingKey = WebHookConstants.WEBHOOK_EVENTDATA;
 			factory = new ConnectionFactory();
-			factory.setHost(ApplicationConfigProvider.getInstance().getMessageQueue().getHost());
-			factory.setUsername(ApplicationConfigProvider.getInstance().getMessageQueue().getUser());
-			factory.setPassword(ApplicationConfigProvider.getInstance().getMessageQueue().getPassword());
+			factory.setHost(AppProperties.mqHost);
+			factory.setUsername(AppProperties.mqUser);
+			factory.setPassword(AppProperties.mqPassword);
 			connection = factory.newConnection();
+			SubscriberStatusLogger.getInstance()
+					.createSubsriberStatusNode(
+							" Instance Name " + AppProperties.instanceName
+							+ " : Connection with Rabbit Mq for host "
+							+ AppProperties.mqHost + " established successfully. ", WebHookConstants.SUCCESS);
 		} catch (Exception e) {
-			LOG.error("Error while initilize mq " + e.getMessage());
+			LOG.error("Error while initilize mq " + e);
+			SubscriberStatusLogger.getInstance().createSubsriberStatusNode(
+					"Platform Webhook Subscriber : problem in connection with Rabbit Mq host " + AppProperties.mqHost,
+					WebHookConstants.FAILURE);
+
 		}
 
 	}
 
 	public void publishEventAction(byte[] data, String webHookMqChannelName) throws TimeoutException, IOException {
+		LOG.debug(" Inside publishEventAction ==== ");
 		try {
 			Channel channel;
 			if (mqMappingMap.containsKey(webHookMqChannelName)) {
@@ -74,9 +95,29 @@ public class WebHookMessagePublisher {
 				channel.basicPublish(exchangeName, webHookMqChannelName, null, data);
 				LOG.debug(" data published first time in queue " + webHookMqChannelName);
 				mqMappingMap.put(webHookMqChannelName, channel);
+
 			}
+		} catch (IOException e) {
+			LOG.error("IOException Error while publishEventAction " + e);
+			throw e;
 		} catch (Exception e) {
-			LOG.error("Error while publishEventAction " + e.getMessage());
+			LOG.error("Error while publishEventAction " + e);
+		}
+	}
+
+	public void publishHealthData(byte[] data, String webHookHealthqueueName, String webHookHealthRoutingKey)
+			throws TimeoutException, IOException {
+		LOG.debug(" Inside publishHealthData ==== ");
+		try {
+			Channel channel;
+			channel = connection.createChannel();
+			channel.exchangeDeclare(exchangeName, WebHookConstants.EXCHANGE_TYPE, true);
+			channel.queueDeclare(webHookHealthqueueName, true, false, false, null);
+			channel.queueBind(webHookHealthqueueName, exchangeName, webHookHealthRoutingKey);
+			channel.basicPublish(exchangeName, webHookHealthRoutingKey, null, data);
+			LOG.debug(" Health data published first time in queue " + webHookHealthRoutingKey);
+		} catch (Exception e) {
+			LOG.error("Error while publishEventAction " + e);
 		}
 	}
 
@@ -98,6 +139,16 @@ public class WebHookMessagePublisher {
 			LOG.error(e.getMessage());
 		} catch (Exception e) {
 			LOG.error(e.getMessage());
+		}
+	}
+
+	public void purgeQueue(String queueName) {
+		try {
+			Channel channel;
+			channel = connection.createChannel();
+			channel.queuePurge(queueName);
+		} catch (Exception e) {
+			LOG.error("Error while purgeQueue " + e);
 		}
 	}
 }

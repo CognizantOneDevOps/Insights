@@ -92,18 +92,18 @@ public class ElasticSearchDBHandler {
 		JsonObject rootObj = jsonObj.get("hits").getAsJsonObject();
 
 		JsonArray array = rootObj.get("hits").getAsJsonArray();
-		System.out.println(jsonObj);
+		log.debug(jsonObj);
 		for (JsonElement element : array) {
 			JsonObject output = element.getAsJsonObject().get("_source").getAsJsonObject();
 
-			System.out.println(output.get("result"));
-			System.out.println(output.get("aggregatedResult"));
-			System.out.println(output.get("resultTime"));
-			System.out.println(output.get("schedule"));
-			System.out.println(output.get("groupByName"));
-			System.out.println(output.get("vector"));
-			System.out.println(output.get("name"));
-			System.out.println(output.get("action"));
+			log.debug(output.get("result"));
+			log.debug(output.get("aggregatedResult"));
+			log.debug(output.get("resultTime"));
+			log.debug(output.get("schedule"));
+			log.debug(output.get("groupByName"));
+			log.debug(output.get("vector"));
+			log.debug(output.get("name"));
+			log.debug(output.get("action"));
 
 		}
 

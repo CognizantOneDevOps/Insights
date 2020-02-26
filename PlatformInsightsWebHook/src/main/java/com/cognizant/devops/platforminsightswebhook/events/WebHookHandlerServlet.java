@@ -15,10 +15,10 @@
  ******************************************************************************/
 package com.cognizant.devops.platforminsightswebhook.events;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.Enumeration;
 import java.util.concurrent.TimeoutException;
+import java.util.stream.Collectors;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -43,23 +43,6 @@ import com.google.gson.JsonParser;
 public class WebHookHandlerServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private static Logger LOG = LogManager.getLogger(WebHookHandlerServlet.class);
-	
-
-	//@Autowired
-	WebHookMessagePublisher webhookmessagepublisher = new WebHookMessagePublisher();
-
-	public WebHookHandlerServlet(WebHookMessagePublisher webhookmessagepublisher) {
-		this.webhookmessagepublisher = webhookmessagepublisher;
-	}
-	
-	/**
-	 * Used to initilize Rabbitq Connection
-	 */
-	@Override
-	public void init() throws ServletException {
-		LOG.debug(" In server init .... initilizeMq ");
-		webhookmessagepublisher.initilizeMq();
-	}
 
 	public WebHookHandlerServlet() {
 	}
@@ -93,7 +76,8 @@ public class WebHookHandlerServlet extends HttpServlet {
 		} catch (TimeoutException e) {
 			LOG.error(e.getMessage());
 		} catch (Exception e) {
-			LOG.error("Error while adding data in Mq in doPost method " + e.getMessage());
+			e.printStackTrace();
+			LOG.error("Error while adding data in Mq in doPost method " + e);
 		}
 	}
 
@@ -112,10 +96,10 @@ public class WebHookHandlerServlet extends HttpServlet {
 					.concat(dataWithReqParam.get(WebHookConstants.REQUEST_PARAM_KEY_WEBHOOKNAME).getAsString());
 			String res = dataWithReqParam.toString();
 			LOG.debug(" Final Json after adding parameter " + res);
-			webhookmessagepublisher.publishEventAction(res.getBytes(), webHookMqChannelName);
+			WebHookMessagePublisher.getInstance().publishEventAction(res.getBytes(), webHookMqChannelName);
 			LOG.debug(" Data successfully published in webhook name as " + webHookMqChannelName);
 		} else {
-			LOG.debug(" Request body is null ");
+			LOG.debug(" Request body is empty ");
 		}
 	}
 
@@ -128,38 +112,31 @@ public class WebHookHandlerServlet extends HttpServlet {
 	 */
 	public JsonObject getBody(HttpServletRequest request) throws IOException {
 
-		String bodymessage = null;
-		StringBuilder stringBuilder = new StringBuilder();
+
 		JsonObject responceJson = null;
-		try (BufferedReader reader = request.getReader()) {
-			if (reader == null) {
-				return null;
+		try {
+			String bodymessage = request.getReader().lines().collect(Collectors.joining());
+			if (bodymessage.length() > 1) {
+				JsonElement element = new JsonParser().parse(bodymessage);
+				responceJson = element.getAsJsonObject();
+				StringBuilder paramDetail = new StringBuilder();
+				Enumeration<String> parameterNames = request.getParameterNames();
+				while (parameterNames.hasMoreElements()) {
+					String paramName = parameterNames.nextElement();
+					String[] paramValues = request.getParameterValues(paramName);
+					for (int i = 0; i < paramValues.length; i++) {
+						String paramValue = paramValues[i];
+						paramDetail.append(paramName + ":" + paramValue + ",\n");
+						responceJson.addProperty(paramName, paramValue);
+					}
+				}
+				responceJson.addProperty("iswebhookdata", Boolean.TRUE);
 			}
-			String line;
-			while ((line = reader.readLine()) != null) {
-				stringBuilder.append(line);
-			}
-		} catch (final Exception e) {
-			LOG.error("unable to read data from request body from the http request", e);
+		} catch (Exception e) {
+			LOG.error("unable to read data from request body from the http request ==== ", e);
 			return null;
 		}
-		if (stringBuilder.length() > 1) {
-			bodymessage = stringBuilder.toString();
-			JsonElement element = new JsonParser().parse(bodymessage);
-			responceJson = element.getAsJsonObject();
-			StringBuilder paramDetail = new StringBuilder();
-			Enumeration<String> parameterNames = request.getParameterNames();
-			while (parameterNames.hasMoreElements()) {
-				String paramName = parameterNames.nextElement();
-				String[] paramValues = request.getParameterValues(paramName);
-				for (int i = 0; i < paramValues.length; i++) {
-					String paramValue = paramValues[i];
-					paramDetail.append(paramName + ":" + paramValue + ",\n");
-					responceJson.addProperty(paramName, paramValue);
-				}
-			}
-			responceJson.addProperty("iswebhookdata", Boolean.TRUE);
-		}
+
 		return responceJson;
 	}
 
@@ -168,7 +145,7 @@ public class WebHookHandlerServlet extends HttpServlet {
 	 */
 	@Override
 	public void destroy() {
-		webhookmessagepublisher.releaseMqConnetion();
+		WebHookMessagePublisher.getInstance().releaseMqConnetion();
 	}
 
 }

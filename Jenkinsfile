@@ -58,7 +58,7 @@ node {
 			sh 'cd /var/jenkins/jobs/$commitID/workspace && mvn clean install -DskipTests'	
 		}	
 		
-		//Below step is to include security analysis. License has expired. Therefore commented.
+		//Below step is to include security analysis
 		stage ('Insight_PS_IQ') {	
 			sh 'mvn com.sonatype.clm:clm-maven-plugin:evaluate -Dclm.applicationId=Insights'
 		} 
