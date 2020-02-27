@@ -103,24 +103,26 @@ export class TraceabilityDashboardCompenent implements OnInit {
                         }
                         if (data.data.timelag.length > 0) {
                             var tempArr = []
-                            for (let orderredTool in this.order) {
-                                var toolName = this.order[orderredTool]
-                                let toolData = data.data.timelag[0][toolName]
-                                if (toolData != undefined) {
-                                    this.timelagData = { 'toolName': toolName, 'AverageTime': toolData }
+                            for (var element of data.data.timelag) {
+                                for (var key in element) {
+                                    this.timelagData = { 'Tools': key, 'HandoverTime': element[key] }
                                     tempArr.push(this.timelagData)
                                 }
                             }
+
                             this.toolTimelagArray = tempArr
+
+                            if (this.toolTimelagArray.length > 0) {
+                                this.isEnable = true;
+                            }
                             console.log(this.toolTimelagArray)
-                            this.isEnable = true;
                         }
                         this.traceabilityData = data;
                         this.workflow();
                         this.isDatainProgress = false;
-                    } 
+                    }
                     else {
-                        this.messageDialog.showApplicationsMessage("no data found for the given input", "ERROR");
+                        this.messageDialog.showApplicationsMessage("No data found for the given selection.", "ERROR");
                         this.isDatainProgress = false;
                     }
 

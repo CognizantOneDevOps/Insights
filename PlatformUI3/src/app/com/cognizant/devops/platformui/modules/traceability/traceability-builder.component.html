@@ -155,7 +155,7 @@
 
 			</svg>
 			<div class="timelag" style="margin-left: 33%;" *ngIf="isEnable">
-				<b class="hyperlink" (click)="showTimeDetailsDialog()"><u class="timelinetext">Advance View</u></b>
+				<b *ngIf="toolTimelagArray" class="hyperlink" (click)="showTimeDetailsDialog()"><u class="timelinetext">Advance View</u></b>
 			</div>
 
 			<div class="summarylist" style="margin-left: 35px;">
