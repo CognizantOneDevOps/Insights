@@ -430,7 +430,13 @@ public class InsightsUtils {
 			month = days / 30;
 			days = days - (month * 30);
 			duration = month + "Month(s) " + days + " Days ";
-		} else {
+		
+		}
+		else if (days<=1)
+		{
+			duration = "1 Day ";
+		}
+		else {
 			duration = days + " Days ";
 		} 
 		return duration;

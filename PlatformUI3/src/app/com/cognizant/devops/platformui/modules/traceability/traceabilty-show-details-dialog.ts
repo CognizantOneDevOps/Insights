@@ -58,7 +58,7 @@ export class ShowTraceabiltyDetailsDialog implements OnInit {
     timeZone: string = "";
     showToolDetailProp: boolean = true;
     timelagArray = [];
-    columnsToDisplay: string[] = ['ToolName', 'Average Time'];
+    columnsToDisplay: string[] = ['Tools', 'Handover Time'];
     timelagDataSource = new MatTableDataSource([]);
 
     constructor(public dialogRef: MatDialogRef<ShowTraceabiltyDetailsDialog>,
