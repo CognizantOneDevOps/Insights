@@ -76,7 +76,6 @@ public class WebHookHandlerServlet extends HttpServlet {
 		} catch (TimeoutException e) {
 			LOG.error(e.getMessage());
 		} catch (Exception e) {
-			e.printStackTrace();
 			LOG.error("Error while adding data in Mq in doPost method " + e);
 		}
 	}

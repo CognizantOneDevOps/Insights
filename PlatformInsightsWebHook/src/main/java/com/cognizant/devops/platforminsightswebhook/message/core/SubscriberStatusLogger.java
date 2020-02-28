@@ -23,7 +23,6 @@ import java.util.TimeZone;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.springframework.context.annotation.PropertySource;
 
 import com.cognizant.devops.platforminsightswebhook.application.AppProperties;
 import com.cognizant.devops.platforminsightswebhook.application.ServerProperties;
@@ -31,12 +30,10 @@ import com.cognizant.devops.platforminsightswebhook.config.WebHookConstants;
 import com.cognizant.devops.platforminsightswebhook.config.WebHookMessagePublisher;
 import com.google.gson.JsonObject;
 
-@PropertySource("file:.\\webhook_application.properties")
 public class SubscriberStatusLogger {
 
 	private static Logger log = LogManager.getLogger(SubscriberStatusLogger.class);
 	static SubscriberStatusLogger instance = null;
-
 
 	private SubscriberStatusLogger() {
 

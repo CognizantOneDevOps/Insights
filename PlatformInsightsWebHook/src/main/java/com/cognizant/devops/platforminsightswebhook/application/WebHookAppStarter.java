@@ -34,6 +34,15 @@ public class WebHookAppStarter {
 	private static Logger LOG = LogManager.getLogger(WebHookAppStarter.class);
     public static void main(String[] args) {
 		LOG.debug(" Inside Webhook Message Publisher ... ");
+		System.setProperty("properties.basedir", ".");
+		for (String argCommandLine : args) {
+			LOG.debug(argCommandLine);
+			if (argCommandLine.contains("config.file.location")) {
+				String[] argArray = argCommandLine.split("=");
+				System.setProperty("properties.basedir", argArray[1]);
+			}
+		}
+		LOG.debug(" Spring properties location  " + System.getProperty("properties.basedir"));
 		ApplicationContext applicationContext = SpringApplication.run(WebHookAppStarter.class, args);
 		LOG.debug(" message Application Name " + applicationContext.getApplicationName() + " instance name "
 				+ AppProperties.instanceName);
