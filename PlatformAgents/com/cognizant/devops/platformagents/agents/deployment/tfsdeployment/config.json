@@ -1,0 +1,92 @@
+{
+ 	"vault": {
+		"getFromVault": false,
+		"secretEngine":"insights-kv",
+		"readToken":"vault_secret_token",
+		"vaultUrl":"http://Vault_Host:port/v1/"
+	},
+  	"mqConfig": {
+    	"user": "iSight",
+    	"password": "iSight",
+    	"host": "127.0.0.1",
+    	"exchange": "iSight",
+    	"agentControlXchg":"iAgent"
+  	},
+  	"subscribe": {
+    	"config": "DEPLOYMENT.TFS.config"
+  	},
+  	"publish": {
+    	"data": "DEPLOYMENT.TFS.DATA",
+    	"health": "DEPLOYMENT.TFS.HEALTH"
+  	},
+  	"communication": {
+    	"type": "REST",
+    	"sslVerify": true,
+    	"responseType": "JSON"
+  	},
+ 	"dynamicTemplate": {
+   	  	"timeFieldMapping" : {
+			"startDate" : "%Y-%m-%d"
+  	   	},
+	  	"responseTemplate": {
+	    	"id": "releaseId",
+	    	"name": "releaseName",
+	    	"status": "status",
+	    	"createdOn": "createdOn",
+	    	"modifiedOn": "modifiedOn",
+	    	"createdBy": {
+		  		"displayName": "authorName",
+		  		"uniqueName": "authorUniqueName"
+	    	},
+	    	"releaseDefinition": {
+	    		"id": "definitionId",
+	    		"name": "definitionName"
+	    	},
+	    	"description": "description",
+	    	"reason": "reason",
+	    	"projectReference": {
+	    		"id": "projectId",
+	    		"name": "projectName"
+	    	},
+	    	"environments": [
+	    		{
+	    			"id": "environmentId",
+	    			"releaseId": "environmentReleaseId",
+	    			"name": "environmentName"
+	    			"status": "environmentStatus",
+	    			"environmentOptions": {
+	    				"emailNotificationType": "environmentEmailNotificationType",
+	    				"emailRecipients": "environmentEmailRecipients"
+	    			},
+	    			"owner": {
+	    				"displayName": "environmentOwnerName",
+		  				"uniqueName": "environmentOwnerUniqueName"
+	    			}
+	    		}
+	    	]
+	  	}
+  	},
+ 	"agentId" :"",
+	"toolCategory" : "DEPLOYMENT",
+	"enableDataValidation": true,
+ 	"isDebugAllowed" : false,
+	"enableValueArray": true,
+	"auth": "NTLM",
+	"toolsTimeZone" : "Asia/Kolkata",
+	"insightsTimeZone" : "Asia/Kolkata",
+	"useResponseTemplate" : true,
+	"runSchedule": 2,
+	"userid": "<USERNAME>",
+	"passwd": "<PERSONAL ACCESS TOKEN>",
+	"baseUrl": "http://hostname/tfs",
+	"timeStampField":"modifiedOn",
+	"timeStampFormat":"%Y-%m-%dT%H:%M:%S",
+	"isEpochTimeFormat" : false,
+	"startFrom" : "2017-01-01 01:01:01",
+	"agentSecretDetails": ["userid","passwd"],
+	"loggingSetting" : {
+		"logLevel" : "WARN",
+		"maxBytes" : 5000000,
+		"backupCount" : 1000
+ 	} 
+}
