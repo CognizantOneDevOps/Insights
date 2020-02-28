@@ -26,7 +26,7 @@ import com.cognizant.devops.platforminsightswebhook.config.WebHookConstants;
 
 @Configuration
 @ConfigurationProperties(prefix = "app")
-@PropertySource("file:.\\" + WebHookConstants.WEBHOOK_PROPERTY_FILE_NAME)
+@PropertySource("file:${properties.basedir}/" + WebHookConstants.WEBHOOK_PROPERTY_FILE_NAME)
 public class AppProperties {
 	private static Logger LOG = LogManager.getLogger(AppProperties.class);
 	
