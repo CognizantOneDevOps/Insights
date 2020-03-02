@@ -222,4 +222,9 @@ export class DataSharedService {
     var encryptedValue = CryptoJS.AES.encrypt(value, keys);
     return encryptedValue.toString();
   }
+  
+  public getCurrentYear() {
+    var Year = new Date().getFullYear();
+    return Year;
+  }
 }

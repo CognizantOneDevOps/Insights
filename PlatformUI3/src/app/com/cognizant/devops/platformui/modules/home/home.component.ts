@@ -79,6 +79,7 @@ export class HomeComponent implements OnInit {
   currentUserOrgsArray = []
   currentUserWithOrgs: any;
   insightsCustomerLogo: any;
+  year: any;
   aboutPageURL = "https://onedevops.atlassian.net/wiki/spaces/OI/pages/218936/Release+Notes";
   helpPageURL = "https://onedevops.atlassian.net/wiki/spaces/OI/overview";
 
@@ -113,6 +114,7 @@ export class HomeComponent implements OnInit {
   ngOnInit() {
     console.log("Home page constructer nginit ");
     this.loadCustomerLogo();
+    this.year = this.dataShare.getCurrentYear();
   }
 
   onMenuClick() {
