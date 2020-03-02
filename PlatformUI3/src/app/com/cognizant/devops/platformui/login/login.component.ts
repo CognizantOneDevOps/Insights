@@ -55,6 +55,7 @@ export class LoginComponent implements OnInit, ILoginComponent {
   loginForm: FormGroup;
   imageAlt: String = "";
   ssoEnable: boolean = false;
+  year: any;
 
   constructor(private loginService: LoginService, private restAPIUrlService: RestAPIurlService,
     private restCallHandlerService: RestCallHandlerService, private cookieService: CookieService,
@@ -82,6 +83,7 @@ export class LoginComponent implements OnInit, ILoginComponent {
       this.dataShare.removeAuthorization();
       this.dataShare.setWebAuthToken("-");
     }
+    this.year = this.dataShare.getCurrentYear();
   }
 
   public createAndValidateForm() {
