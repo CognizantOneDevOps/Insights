@@ -75,8 +75,12 @@ export class ShowJsonDialog implements OnInit {
         this.destprop = this.corelation.destprop;
         this.destText = false;
         this.sourceText = false;
-        this.destformattedString = this.destprop.split(",").join("\n")
-        this.sourceformattedString = this.sourceprop.split(",").join("\n")
+        if (this.destprop != null)  {
+            this.destformattedString = this.destprop.split(",").join("\n");
+        }
+        if (this.sourceprop != null) {            
+            this.sourceformattedString = this.sourceprop.split(",").join("\n")
+        }       
 
     }
 

@@ -101,25 +101,29 @@ public class DataDictionaryServiceImpl implements DataDictionaryService {
 	@Override
 	public JsonObject getToolsRelationshipAndProperties(String startLabelName, String startToolCategory,
 			String endLabelName, String endToolCatergory) {
-		JsonObject toolsRealtionJson = new JsonObject();
+		JsonArray toolsRealtionJson = new JsonArray();
 		try {
 			String toolsRelationshipQuery = DataDictionaryConstants.GET_TOOLS_RELATIONSHIP_QUERY;
 			GraphResponse graphResponse = neo4jDBHandler.executeCypherQuery(toolsRelationshipQuery
 					.replace("__StartToolCategory__", startToolCategory).replace("__StartLabelName__", startLabelName)
 					.replace("__EndToolCategory__", endToolCatergory).replace("__EndLabelName__", endLabelName));
 			JsonObject jsonResponse = graphResponse.getJson();
-			Iterator<JsonElement> iterator = jsonResponse.get("results").getAsJsonArray().iterator().next()
-					.getAsJsonObject().get("data").getAsJsonArray().iterator().next().getAsJsonObject().get("row")
-					.getAsJsonArray().iterator();
-
-			JsonObject dataJson = new JsonObject();
-			String relationName = iterator.next().getAsString();
-			dataJson.addProperty("relationName", relationName);
-			dataJson.add("properties", iterator.next().getAsJsonObject());
-			toolsRealtionJson.add("data", dataJson);
+			Iterator<JsonElement> dataIterator = jsonResponse.get("results").getAsJsonArray().iterator().next()
+					.getAsJsonObject().get("data").getAsJsonArray().iterator();		
+			
+			while (dataIterator.hasNext()) {
+				Iterator<JsonElement> rowIterator = dataIterator.next().getAsJsonObject().get("row")
+						.getAsJsonArray().iterator();
+				while (rowIterator.hasNext()) {
+					String relationName = rowIterator.next().getAsString();
+					JsonObject relationJson = new JsonObject();
+					relationJson.addProperty("relationName", relationName);
+					toolsRealtionJson.add(relationJson);
+				}
+			}
 		} catch (Exception e) {
 			return PlatformServiceUtil.buildFailureResponse(e.toString());
 		}
-		return PlatformServiceUtil.buildSuccessResponseWithData(toolsRealtionJson.get("data"));
-	}
+		return PlatformServiceUtil.buildSuccessResponseWithData(toolsRealtionJson);
+	}	
 }

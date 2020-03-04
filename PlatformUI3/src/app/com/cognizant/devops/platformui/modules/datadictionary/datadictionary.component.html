@@ -15,7 +15,7 @@
  * the License.
  ****************************************************************************** -->
 
-<div class="mainDivContainer" >
+ <div class="mainDivContainer" >
     <div layout layout-align="left" class="titleStyle">
         <a>Data Dictionary</a>
     </div>
@@ -118,35 +118,24 @@
             <div  class="showTable" style="text-align: center; padding: 5px;" >
                 <b>&nbsp; Correlation Details</b>
             </div>
-            <!--<div layout layout-align="center center" *ngIf="!showNoToolsSelectedForCorrelation">
-                <h1 class="dataDictionaryMessages">Please Select Tools To Check Correlations.</h1>
-            </div>-->
             <div *ngIf="clicked">
                 <div layout layout-align="center center" *ngIf="noShowDetailCorr">
                     <h1 class="dataDictionaryMessages">No Correlations found between the selected tools:<b style="color:#00B140;">({{agent1Tool}}:{{agent2Tool}})</b></h1>
                 </div>
-                <div *ngIf="showDetail3" style="margin-left:15px;margin-right: 15px">
-                    <div class="divTablesHeading">
-                        <div><b style="color:#0033A0;font-size: 18px;">Realtionship Name:</b></div>
-                        <div style="color:#00B140;padding-top: 10px;"><b>{{corrprop}}</b></div>
-                    </div>
-                    <div>
-                        <div layout layout-align="center center" *ngIf="!relationPropertiesSize">
-                           <!--  <h1 class="dataDictionaryMessages">No Relationship Properties Found</h1> -->
-                        </div>
-                        <table *ngIf="relationPropertiesSize" style="border-spacing:10px;">
-                            <thead >
-                                <tr class="dat-header-row">
-                                <th style="text-align:left;color:#0033A0">Property Name</th>
-                                <th style="text-align:left;color:#0033A0">Property Value</th>
-                                </tr>
-                            </thead>
-                            <tbody style="max-height:50vh;overflow:auto;">
-                                <tr class="dat-row"  *ngFor="let element of corrData | keyvalue">
-                                <td style="text-align:left;padding-left: 15px">{{element.key}}</td>
-                                <td style="text-align:left;padding-left: 15px">{{element.value}}</td>
-                                </tr>
-                            </tbody>
+                <div *ngIf="showDetail3" style="margin-left:15px;margin-right: 15px;margin-top: 15px;"> 
+                     <div><b style="color:#0033A0;font-size: 18px;">Relationship Name:</b></div> 
+                    <div class="divTablesHeadingLeft">
+                        <table mat-table id="myTable" [dataSource]="neo4jRelationMappingLabels">
+                            <ng-container style="margin-top: 15px;" matColumnDef="relationName">
+                                <td mat-cell *matCellDef="let element " class="radiobuttonCol">                            
+                                        <div style="color:#00B140;padding-top: 10px;cursor: pointer;font-size: 16px;"   
+                                        (click)="showDetailsofCorrelation(element)">
+                                            <b>{{element.relationName}}</b>
+                                        </div>
+                                </td>
+                            </ng-container>                    
+                             <tr mat-row *matRowDef="let row;columns: dataComponentColumns;">
+                            </tr> 
                         </table>
                     </div>
                 </div>
