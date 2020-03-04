@@ -20,11 +20,11 @@
 package com.cognizant.devops.insightskinesis;
 
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
@@ -46,6 +46,8 @@ import com.google.gson.JsonParser;
 
 public class LambdaFunctionHandler implements RequestHandler<KinesisFirehoseEvent, KinesisAnalyticsInputPreprocessingResponse> {
 	private static Logger log = LogManager.getLogger(LambdaFunctionHandler.class);
+	private static final int CONNECTION_TIMEOUT = Integer.valueOf(System.getenv("connectionTimeout"));
+	private static final boolean MAINTENANCE_MODE = Boolean.parseBoolean(System.getenv("maintenanceMode"));
 	/**
 	 * Get the Kinesis event, De-serialize the event and get event Body and URL
 	 * @param KinesisFirehoseEvent
@@ -66,15 +68,16 @@ public class LambdaFunctionHandler implements RequestHandler<KinesisFirehoseEven
 			String body = json.get("body").toString();
 			String tool = json.get("tool").getAsString();
 			String url = System.getenv(tool);
-			if (responseCode == 200 && url != null) {
-				try {
+			try {
+				if (responseCode == 200 && url != null && !MAINTENANCE_MODE) {
+					responseCode = 0;
 					URL insightsUrl = new URL(url);
 					HttpURLConnection con = (HttpURLConnection)insightsUrl.openConnection();
 					con.setRequestMethod("POST");
 					con.setRequestProperty("Content-Type", "application/json; utf-8");
 					con.setRequestProperty("Accept", "application/json");
 					con.setDoOutput(true);
-					con.setConnectTimeout(5000);
+					con.setConnectTimeout(CONNECTION_TIMEOUT);
 					OutputStream os = con.getOutputStream();
 					os.write(body.getBytes());
 					os.flush();
@@ -83,24 +86,20 @@ public class LambdaFunctionHandler implements RequestHandler<KinesisFirehoseEven
 					if (responseCode == 200) {
 						Record transRecord = new Record(record.getRecordId(), Result.Dropped, bufferData);
 						transRecords.add(transRecord);
+					} else {
+						log.error("Error while conecting URL " + url + " return response code " + responseCode);
 					}
-					else {
-						Record transRecord = new Record(record.getRecordId(), Result.Ok, bufferData);
-						transRecords.add(transRecord);
-					}
-				} catch (IOException e) {
-					log.error(e);
-					log.error("Error ouccured while send message to WebHook endpoint" + e.toString());
+				}
+			} catch (MalformedURLException e) {
+				log.error("Invalid URL fot the tool " + tool + " " + e.toString());
+			} catch (Exception e) {
+				log.error("Error connecting to URL " + url + " " + e.toString());
+			} finally {
+				if (responseCode != 200 || MAINTENANCE_MODE) {
 					Record transRecord = new Record(record.getRecordId(), Result.Ok, bufferData);
 					transRecords.add(transRecord);
 				}
 			}
-			else {
-				Record transRecord = new Record(record.getRecordId(), Result.Ok, bufferData);
-				transRecords.add(transRecord);
-				log.error("could not connect to WebHook endpoint tool : " + tool + "url : " + url );
-			}
-
 		}
 		transformedEvent.setRecords(transRecords);
 		return transformedEvent;
