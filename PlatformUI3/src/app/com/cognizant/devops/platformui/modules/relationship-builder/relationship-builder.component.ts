@@ -257,8 +257,8 @@ export class RelationshipBuilderComponent implements OnInit {
         this.relationmappingLabels = [];
       }
       for (var element of this.corelationResponseMaster) {
-        var destinationToolName = (element.destinationToolName);
-        var sourceToolName = (element.sourceToolName);
+        var destinationToolName = (element.destinationLabelName);
+        var sourceToolName = (element.sourceLabelName);
         var flag = (element.enableCorrelation);
         //var detailProp = '<b>' + element.sourceToolName + '</b>:' + element.sourceFields + ':<b>' + element.destinationToolName + '</b>:' + element.destinationFields;
         let relationLabel = new RelationLabel(destinationToolName, sourceToolName, element.relationName, element.sourceFields, element.destinationFields, element.relationship_properties, flag, element.isSelfRelation);
