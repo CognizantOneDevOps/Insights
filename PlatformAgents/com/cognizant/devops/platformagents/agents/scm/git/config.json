@@ -1,73 +1,132 @@
 {
 	"vault": {
 		"getFromVault": false,
-		"secretEngine":"insights-kv",
-		"readToken":"vault_secret_token",
-		"vaultUrl":"http://Vault_Host:port/v1/"
+		"secretEngine": "insights-kv",
+		"readToken": "vault_secret_token",
+		"vaultUrl": "http://Vault_Host:port/v1/"
 	},
-	"mqConfig" : {
-		"user" : "iSight", 
-		"password" : "iSight", 
-		"host" : "127.0.0.1", 
-		"exchange" : "iSight",
-		"agentControlXchg":"iAgent"
+	"mqConfig": {
+		"user": "iSight",
+		"password": "iSight",
+		"host": "127.0.0.1",
+		"exchange": "iSight",
+		"agentControlXchg": "iAgent"
 	},
-	"subscribe" : {
-		"config" : "SCM.GIT.config"
+	"enrichData": {
+		"isEnrichmentRequired": true,
+		"sourceProperty": "message",
+		"keyPattern": "-",
+		"targetProperty": "key"
 	},
-	"publish" : {
-		"data" : "SCM.GIT.DATA",
-		"health" : "SCM.GIT.HEALTH"
+	"subscribe": {
+		"config": "SCM.GIT.config"
 	},
-    "enrichData":{ 
-      "isEnrichmentRequired":true,
-      "sourceProperty":"message",
-      "keyPattern":"-",
-      "targetProperty":"key"
-   },
-	"communication":{
-		"type" : "REST",
-    	"sslVerify": true,
-    	"responseType": "JSON" 
+	"publish": {
+		"data": "SCM.GIT.DATA",
+		"health": "SCM.GIT.HEALTH"
+	},
+	"communication": {
+		"type": "REST",
+		"sslVerify": false,
+		"responseType": "JSON"
 	},
 	"dynamicTemplate": {
-	  "timeFieldMapping" : {
-		"startDate" : "%Y-%m-%d"
-  		},
-		"responseTemplate" : {
+		"timeFieldMapping": {
+			"startDate": "%Y-%m-%d",
+			"createdAt": "%Y-%m-%dT%H:%M:%SZ",
+			"updatedAt": "%Y-%m-%dT%H:%M:%SZ",
+			"closedAt": "%Y-%m-%dT%H:%M:%SZ",
+			"mergedAt": "%Y-%m-%dT%H:%M:%SZ",
+			"commitTime": "%Y-%m-%dT%H:%M:%SZ",
+			"since": "%Y-%m-%dT%H:%M:%SZ",
+			"until": "%Y-%m-%dT%H:%M:%SZ",
+			"consumptionTime": "%Y-%m-%dT%H:%M:%SZ"
+		},
+		"responseTemplate": {
 			"sha": "commitId",
-			"commit" : {
+			"commit": {
 				"message": "message",
-				"author" : {
+				"author": {
 					"name": "authorName",
 					"date": "commitTime"
 				}
 			}
+		},
+		"pullReqResponseTemplate": {
+			"number": "pullReqId",
+			"state": "pullReqState",
+			"head": {
+				"sha": "headSHA",
+				"ref": "originBranch",
+				"repo": {
+					"fork": "isForked"
+				}
+			},
+			"base": {
+				"sha": "baseSHA",
+				"ref": "baseBranch"
+			},
+			"isMerged": "isMerged",
+			"originBranchJiraKeys": "originBranchJiraKeys",
+			"merge_commit_sha": "mergedSHA",
+			"commit": "commit",
+			"created_at": "createdAt",
+			"updated_at": "updatedAt",
+			"closed_at": "closedAt",
+			"merged_at": "mergedAt"
+		},
+		"metaData": {
+			"branches": {
+				"dataUpdateSupported": true,
+				"uniqueKey": [
+					"repoName",
+					"gitType"
+				]
+			},
+			"pullRequest": {
+				"dataUpdateSupported": true,
+				"uniqueKey": [
+					"repoName",
+					"pullReqId",
+					"gitType"
+				]
+			},
+			"commits": {
+				"dataUpdateSupported": true,
+				"uniqueKey": [
+					"repoName",
+					"commitId",
+					"gitType"
+				]
+			}
 		}
 	},
 	"agentId": "",
-	"enableBranches" : false,
-	"enableBrancheDeletion" : false,
-	"enableDataValidation": true,	
-	"toolCategory" : "SCM",
-	"toolsTimeZone" : "GMT",
-	"insightsTimeZone" : "Asia/Kolkata",
+
+	"enableBranches": true,
+	"enableOptimizedDataRetrieval": true,
+	"enablePullReqCommitAPIDataRetrieval": true,
+	"enableBrancheDeletion": false,
+	"enableDataValidation": true,
+	"toolCategory": "SCM",
+	"toolsTimeZone": "GMT",
+	"insightsTimeZone": "Asia/Kolkata",
 	"enableValueArray": false,
-	"useResponseTemplate" : true,
-	"auth" : "base64",
-	"runSchedule" : 30,
-	"timeStampField":"commitTime",
-	"timeStampFormat":"%Y-%m-%dT%H:%M:%SZ",
-	"isEpochTimeFormat" : false,
+	"useResponseTemplate": true,
+	"auth": "base64",
+	"runSchedule": 30,
+	"timeStampField": "commitTime",
+	"timeStampFormat": "%Y-%m-%dT%H:%M:%SZ",
 	"agentSecretDetails": ["accessToken"],
-	"startFrom" : "2019-03-01 15:46:33",
-	"accessToken": "accesstoken",
-	"getRepos":"https://api.github.com/users/<USER_NAME>/repos",
-	"commitsBaseEndPoint":"https://api.github.com/repos/<REPO_NAME>/",
-	"isDebugAllowed" : false,
-	"loggingSetting" : {
-		"logLevel" : "WARN",
-		"maxBytes" : 5000000,
-		"backupCount" : 1000
+	"isEpochTimeFormat": false,
+	"startFrom": "2017-10-01 00:00:01",
+	"accessToken": "accessToken",
+	"getRepos": "https://api.github.com/users/<USER_NAME>/repos",
+	"commitsBaseEndPoint": "https://api.github.com/repos/<REPO_NAME>/",
+	"isDebugAllowed": false,
+	"loggingSetting": {
+		"logLevel": "WARN",
+		"maxBytes": 5000000,
+		"backupCount": 1000
 	}
 }
