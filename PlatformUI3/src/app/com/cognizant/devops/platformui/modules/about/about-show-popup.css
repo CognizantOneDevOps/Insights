@@ -238,8 +238,10 @@ mat-dialog-content::-webkit-scrollbar-track {
 
 .closeIconCss{
     padding-right: 30px;
-    padding-top: 10px;
 	color: white;
+	margin-top: auto;
+	margin-bottom: auto;
+	vertical-align: middle;
 	
     /* width: 20%; */
 }
@@ -251,6 +253,8 @@ mat-dialog-content::-webkit-scrollbar-track {
     color: white; 
     width: 120%;
     text-align: center;
-    padding-top: 8px;
-    margin-right: -10px;
+	margin-right: -10px;
+	margin-top: auto;
+	margin-bottom: auto;
+	vertical-align: middle;
 }
