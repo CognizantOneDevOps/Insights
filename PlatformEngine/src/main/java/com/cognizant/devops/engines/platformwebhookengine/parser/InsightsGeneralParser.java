@@ -15,17 +15,20 @@
  *******************************************************************************/
 package com.cognizant.devops.engines.platformwebhookengine.parser;
 
-import java.time.LocalDateTime;
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import com.cognizant.devops.engines.util.DataEnrichUtils;
+import com.cognizant.devops.platformcommons.core.enums.DerivedOperations;
+import com.cognizant.devops.platformcommons.core.util.InsightsUtils;
+import com.cognizant.devops.platformdal.webhookConfig.WebhookDerivedConfig;
 import com.github.wnameless.json.flattener.JsonFlattener;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -34,40 +37,75 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
 public class InsightsGeneralParser implements InsightsWebhookParserInterface {
-	private static Logger log = LogManager.getLogger(InsightsGeneralParser.class.getName());
+	private static Logger LOG = LogManager.getLogger(InsightsGeneralParser.class.getName());
 
 	@Override
 	public List<JsonObject> parseToolData(String responseTemplate, String toolData, String toolName, String labelName,
-			String webhookName) {
+			String webhookName, Set<WebhookDerivedConfig> webhookDerivedConfigs) {
 
 		try {
 			String keyMqInitial;
-
 			JsonParser parser = new JsonParser();
-			List<JsonObject> retrunJsonList = new ArrayList<JsonObject>(0);
-			Map<String, Object> finalJson = new HashMap<String, Object>();
-
-			JsonElement json = (JsonElement) parser.parse(toolData);
+			List<JsonObject> retrunJsonList = new ArrayList<>(0);
+			Map<String, Object> finalJson = new HashMap<>();
+			JsonElement json = parser.parse(toolData);
 			Map<String, Object> rabbitMqflattenedJsonMap = JsonFlattener.flattenAsMap(json.toString());
-
 			Map<String, String> responseTemplateMap = getResponseTemplateMap(responseTemplate);
-
 			for (Map.Entry<String, String> entry : responseTemplateMap.entrySet()) {
 				keyMqInitial = entry.getKey();
 				Object toolValue = rabbitMqflattenedJsonMap.get(keyMqInitial);
-				if (toolValue != null)
+				if (toolValue != null) {
 					finalJson.put(entry.getValue(), toolValue);
+				}
 			}
 
 			if (!finalJson.isEmpty()) {
 				finalJson.put("source", "webhook");
-				DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
-				LocalDateTime now = LocalDateTime.now();
-				finalJson.put("inSightsTimeX", dtf.format(now));
 				finalJson.put("toolName", toolName);
 				finalJson.put("webhookName", webhookName);
 				finalJson.put("labelName", labelName);
-				finalJson.put("insightsTime", ZonedDateTime.now().toInstant().toEpochMilli());
+				Iterator<WebhookDerivedConfig> iterator = webhookDerivedConfigs.iterator();
+				while (iterator.hasNext()) {
+					WebhookDerivedConfig webhookDerivedConfig = iterator.next();
+					String dateFormat = "";
+					String timeFieldValue = "";
+					boolean isEpochTime = false;
+					long epochTime = 0;
+					String dateTimeFromEpoch = "";
+					String operationName = webhookDerivedConfig.getOperationName();
+					JsonObject operationFieldsList = parser.parse(webhookDerivedConfig.getOperationFields())
+							.getAsJsonObject();
+					if (operationName.equalsIgnoreCase(DerivedOperations.INSIGHTSTIMEX.getValue())) {
+						isEpochTime = operationFieldsList.get("epochTime").getAsBoolean();
+						String timeFieldKey = operationFieldsList.get("timeField").getAsString();
+						timeFieldValue = fetchValuefromJson(timeFieldKey, finalJson);
+						if (!isEpochTime) {
+							dateFormat = operationFieldsList.get("timeFormat").getAsString();
+							epochTime = InsightsUtils.getEpochTime(timeFieldValue, dateFormat);
+							finalJson.put("inSightsTime", epochTime);
+							if (dateFormat.equals("yyyy-MM-dd'T'HH:mm:ss'Z'")) {
+								finalJson.put("inSightsTimeX", timeFieldValue);
+							} else {
+								dateTimeFromEpoch = InsightsUtils.insightsTimeXFormat(epochTime);
+								finalJson.put("inSightsTimeX", dateTimeFromEpoch);
+							}
+
+						} else {
+							finalJson.put("inSightsTime", timeFieldValue);
+							dateTimeFromEpoch = InsightsUtils.insightsTimeXFormat(Long.parseLong(timeFieldValue));
+							finalJson.put("inSightsTimeX", dateTimeFromEpoch);
+						}
+					} else if (operationName.equalsIgnoreCase(DerivedOperations.TIMEFIELDMAPPING.getValue())) {
+						String timeFieldKey = operationFieldsList.get("mappingTimeField").getAsString();
+						timeFieldValue = fetchValuefromJson(timeFieldKey, finalJson);
+						dateFormat = operationFieldsList.get("mappingTimeFormat").getAsString();
+						epochTime = InsightsUtils.getEpochTime(timeFieldValue, dateFormat);
+						finalJson.put(timeFieldKey + "_epoch", epochTime);
+					} else if (operationName.equalsIgnoreCase(DerivedOperations.DATAENRICHMENT.getValue())) {
+						processDataEnrichment(operationFieldsList, finalJson);
+					}
+				}
+
 				Gson prettyGson = new GsonBuilder().setPrettyPrinting().create();
 				String prettyJson = prettyGson.toJson(finalJson);
 				JsonElement element = parser.parse(prettyJson);
@@ -76,8 +114,39 @@ public class InsightsGeneralParser implements InsightsWebhookParserInterface {
 
 			return retrunJsonList;
 		} catch (Exception e) {
-			log.error(e);
+			LOG.error(e);
 			throw e;
+		}
+	}
+
+	/**
+	 * @param webhookDerivedConfig
+	 * @param parser
+	 * @param finalJson
+	 * @param rabbitMqflattenedJsonMap
+	 */
+
+	public String fetchValuefromJson(String timeFieldKey, Map<String, Object> finalJson) {
+		try {
+			String timeFieldValue = finalJson.get(timeFieldKey).toString();
+			return timeFieldValue;
+		} catch (Exception e) {
+			LOG.error("Failed to fetch the value of the field" + e.getMessage());
+			throw e;
+		}
+	}
+
+	public void processDataEnrichment(JsonObject jsonOperationField, Map<String, Object> finalJson) {
+		try {
+			String sourceFieldValue = finalJson.get(jsonOperationField.get("sourceProperty").getAsString()).toString();
+			String keyPattern = jsonOperationField.get("keyPattern").getAsString();
+			String targetProperty = jsonOperationField.get("targetProperty").getAsString();
+			String enrichedData = DataEnrichUtils.dataExtractor(sourceFieldValue, keyPattern);
+			if (enrichedData != null) {
+				finalJson.put(targetProperty, enrichedData);
+			}
+		} catch (Exception e) {
+			LOG.error(" Error while processDataEnrichment " + e);
 		}
 	}
 

@@ -45,4 +45,15 @@ export class WebHookService implements IWebHookService {
         console.log("entered")
         return this.restCallHandlerService.postWithParameter("DELETE_WEBHOOK", { 'webhookname': webhookname }, { 'Content-Type': 'application/x-www-form-urlencoded' }).toPromise();
     }
+
+    getSampleJSONResponse(): string {
+        //,{\"wid\":0,\"operationName\":\"dataEnrichment\",\"operationFields\":{\"sourceProperty\":\"\",\"keyPattern\":\"\",\"targetProperty\":\"\"},\"webhookName\":\"\"},
+        //{\"wid\":0,\"operationName\":\"timeFieldSeriesMapping\",\"operationFields\":{\"mappingTimeField\":\"\",\"epochTime\":false,\"mappingTimeFormat\":\"\"},\"webhookName\":\"\"}
+        let sampleStrJson = "[{\"wid\":-1,\"operationName\":\"insightsTimex\",\"operationFields\":{\"timeField\":\"\",\"epochTime\":false,\"timeFormat\":\"\"},\"webhookName\":\"\"}]";
+        return sampleStrJson;
+    }
+
+    updateforWebHookStatus(webhookMappingJson: string): Promise<any> {
+        return this.restCallHandlerService.postWithData("UPDATE_WEBHOOK_STATUS", webhookMappingJson, "", { 'Content-Type': 'application/x-www-form-urlencoded' }).toPromise();
+    }
 }

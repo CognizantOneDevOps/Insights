@@ -20,12 +20,16 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import com.cognizant.devops.platformcommons.constants.MessageConstants;
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBException;
 import com.cognizant.devops.platformcommons.dal.neo4j.Neo4jDBHandler;
+import com.cognizant.devops.platformdal.webhookConfig.WebHookConfig;
+import com.cognizant.devops.platformdal.webhookConfig.WebhookDerivedConfig;
 import com.cognizant.devops.engines.platformengine.message.core.EngineStatusLogger;
 import com.cognizant.devops.engines.platformwebhookengine.message.factory.EngineSubscriberResponseHandler;
 import com.cognizant.devops.engines.platformwebhookengine.modules.aggregator.WebhookMappingData;
@@ -39,25 +43,36 @@ import com.rabbitmq.client.Envelope;
 
 public class WebHookDataSubscriber extends EngineSubscriberResponseHandler {
 
-	private static Logger log = LogManager.getLogger(WebHookDataSubscriber.class.getName());
-	String responseTemplate;
-	String toolName;
-	String labelName;
-	String webhookName;
-	JsonElement responseTemplateJson;
+	private static Logger log = LogManager.getLogger(WebHookDataSubscriber.class);
+	
+	private String responseTemplate;
+	private String toolName;
+	private String labelName;
+	private String webhookName;
+	private Set<WebhookDerivedConfig> webhookDerivedConfig;
+	
 
 	public WebHookDataSubscriber(String routingKey, String responseTemplate, String toolName, String labelName,
-			String webhookName) throws Exception {
+			String webhookName, Set<WebhookDerivedConfig> webhookDerivedConfig) throws Exception {
 		super(routingKey);
 
 		this.responseTemplate = responseTemplate;
 		this.toolName = toolName;
 		this.labelName = labelName;
 		this.webhookName = webhookName;
-
+		this.webhookDerivedConfig = webhookDerivedConfig;
 	}
 
-	List<WebhookMappingData> webhookMappingList = new ArrayList<WebhookMappingData>(0);
+	public WebHookDataSubscriber(WebHookConfig webhookConfig) throws Exception {
+		super(webhookConfig.getMQChannel());
+		this.toolName = webhookConfig.getToolName();
+		this.labelName = webhookConfig.getLabelName();
+		this.webhookName = webhookConfig.getWebHookName();
+		this.responseTemplate = webhookConfig.getResponseTemplate();
+		this.webhookDerivedConfig = webhookConfig.getWebhookDerivedConfig();
+	}
+
+	List<WebhookMappingData> webhookMappingList = new ArrayList<>(0);
 
 	@Override
 	public void handleDelivery(String consumerTag, Envelope envelope, BasicProperties properties, byte[] body)
@@ -68,7 +83,7 @@ public class WebHookDataSubscriber extends EngineSubscriberResponseHandler {
 			String message = new String(body, MessageConstants.MESSAGE_ENCODING);
 			InsightsWebhookParserInterface webHookParser = InsightsWebhookParserFactory.getParserInstance(toolName);
 			List<JsonObject> toolData = webHookParser.parseToolData(responseTemplate, message, toolName, labelName,
-					webhookName);
+					webhookName,webhookDerivedConfig);
 			if (!toolData.isEmpty()) {
 				Neo4jDBHandler dbHandler = new Neo4jDBHandler();
 				String query = "UNWIND {props} AS properties " + "CREATE (n:" + labelName.toUpperCase() + ") "

@@ -29,8 +29,8 @@ import { LoginService } from '@insights/app/login/login.service';
 export class LogoutHandlerComponent implements OnInit {
 
   id: string;
-  receivedMessage: string ="";
-  logoutUrl:string;
+  receivedMessage: string = "";
+  logoutUrl: string;
 
   constructor(private route: ActivatedRoute, private router: Router,
     public messageDialog: MessageDialogService, private loginService: LoginService,
@@ -72,7 +72,7 @@ export class LogoutHandlerComponent implements OnInit {
       this.loginService.logout()
         .then(function (data) {
           console.log(data);
-          if(data.status=="SUCCESS"){
+          if (data.status == "SUCCESS") {
             setTimeout(() => self.router.navigate(['/login']), 1);
           }
         });
@@ -108,10 +108,10 @@ export class LogoutHandlerComponent implements OnInit {
       if (params["message"] != undefined) {
         self.receivedMessage = params["message"];
       }
-      if (params["logout_url"] !=undefined ) {
+      if (params["logout_url"] != undefined) {
         self.logoutUrl = params["logout_url"];
-      }else{
-        this.logoutUrl=this.dataShare.getSSOLogoutURL();
+      } else {
+        this.logoutUrl = this.dataShare.getSSOLogoutURL();
       }
       //console.log(this.receivedMessage);
       self.logoutProcessing(this.receivedMessage);
@@ -119,31 +119,31 @@ export class LogoutHandlerComponent implements OnInit {
   }
 
   public logoutProcessing(message: string) {
-    
+
     var self = this;
-    if (message != "" && message!=undefined) {
-      var msg = "There was error in application, Please login again or contact to your Administractor : "+message +"("+this.id+")";
+    if (message != "" && message != undefined) {
+      var msg = "There was error in application, Please login again or contact to your Administractor : " + message + "(" + this.id + ")";
       const dialogRef = this.messageDialog.showConfirmationMessage("Logout Message", msg, "ERROR", "ALERT", "30%")
       dialogRef.afterClosed().subscribe(result => {
         //console.log('The dialog was closed  ' + result);
         if (result == 'yes') {
-          if(InsightsInitService.ssoEnabled){
+          if (InsightsInitService.ssoEnabled) {
             console.error(" logging out from sso " + self.logoutUrl);
-            if(this.logoutUrl != undefined){
+            if (this.logoutUrl != undefined) {
               this.loginService.singleLogoutSSO(self.logoutUrl);
-            }else{
+            } else {
               console.error("No logout URL found");
             }
-          }else{
+          } else {
             setTimeout(() => self.router.navigate(['/login']), 1);
           }
           this.deleteAllPreviousCookiesAndSessionValue();
         }
       });
-    }else{
+    } else {
       this.deleteAllPreviousCookiesAndSessionValue();
     }
-}
+  }
 
   deleteAllPreviousCookiesAndSessionValue(): void {
     //console.log("deleteAllPreviousCookiesAndSessionValue  ==== ");

@@ -24,13 +24,15 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.StringTokenizer;
 import java.util.TreeMap;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import com.cognizant.devops.engines.platformengine.message.core.AgentDataConstants;
+import com.cognizant.devops.engines.platformengine.message.factory.EngineSubscriberResponseHandler;
+import com.cognizant.devops.engines.platformengine.modules.aggregator.BusinessMappingData;
+import com.cognizant.devops.engines.util.DataEnrichUtils;
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.constants.MessageConstants;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBException;
@@ -38,9 +40,6 @@ import com.cognizant.devops.platformcommons.dal.neo4j.GraphResponse;
 import com.cognizant.devops.platformcommons.dal.neo4j.Neo4jDBHandler;
 import com.cognizant.devops.platformcommons.dal.neo4j.Neo4jFieldIndexRegistry;
 import com.cognizant.devops.platformcommons.dal.neo4j.NodeData;
-import com.cognizant.devops.engines.platformengine.message.core.AgentDataConstants;
-import com.cognizant.devops.engines.platformengine.message.factory.EngineSubscriberResponseHandler;
-import com.cognizant.devops.engines.platformengine.modules.aggregator.BusinessMappingData;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -65,7 +64,6 @@ public class AgentDataSubscriber extends EngineSubscriberResponseHandler {
 	private String keyPattern;
 	private String sourceProperty;
 	private Boolean isEnrichmentRequired;
-	private static Pattern p = Pattern.compile("((?<!([A-Z]{1,10})-?)(#|)+[A-Z]+(-|.)\\d+)");
 	List<BusinessMappingData> businessMappingList = new ArrayList<BusinessMappingData>(0);
 
 	public AgentDataSubscriber(String routingKey, boolean dataUpdateSupported, String uniqueKey, String category,
@@ -154,15 +152,14 @@ public class AgentDataSubscriber extends EngineSubscriberResponseHandler {
 				if (e.isJsonObject()) {
 					dataWithproperty = e.getAsJsonObject();
 					// Below Code has the ability to add derived properties as part of Nodes
-					if (this.isEnrichmentRequired) {
-						if (e.getAsJsonObject().has(sourceProperty)) {
+					if (this.isEnrichmentRequired && e.getAsJsonObject().has(sourceProperty)) {
 							JsonElement sourceElem = e.getAsJsonObject().get(sourceProperty);
-							String enrichedData = enrichData(sourceElem, keyPattern);
-							if (enrichedData != null) {
-								dataWithproperty.addProperty(targetProperty, enrichedData);
+							if(sourceElem.isJsonPrimitive()) {
+								String enrichedData = DataEnrichUtils.dataExtractor(sourceElem.getAsString(), keyPattern);
+								if (enrichedData != null) {
+									dataWithproperty.addProperty(targetProperty, enrichedData);
+								}
 							}
-						}
-
 					}
 					if (enableOnlineDatatagging) {
 						JsonObject jsonWithLabel = applyDataTagging(dataWithproperty);
@@ -219,25 +216,6 @@ public class AgentDataSubscriber extends EngineSubscriberResponseHandler {
 		String resultJson = new Gson().toJson(finalobj);
 		JsonObject finalJson = (JsonObject) jsonParser.parse(resultJson);
 		return finalJson;
-	}
-
-	private String enrichData(JsonElement dataJson, String keyPattern) {
-		String enrichDataValue = null;
-		if (dataJson.isJsonPrimitive()) {
-			String message = dataJson.getAsString();
-			while (message.contains(keyPattern)) {
-				Matcher m = p.matcher(message);
-				if (m.find()) {
-					enrichDataValue = (m.group());
-					message = message.replaceAll(m.group(), "");
-				} else {
-					break;
-				}
-			}
-		}
-
-		return enrichDataValue;
-
 	}
 
 	private JsonObject applyDataTagging(JsonObject asJsonObject) {
