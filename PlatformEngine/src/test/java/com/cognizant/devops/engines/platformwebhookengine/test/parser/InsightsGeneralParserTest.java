@@ -37,7 +37,7 @@ public class InsightsGeneralParserTest extends InsightsParserTestData {
 	public void testGetToolDetailJson() throws InsightsCustomException {
 
 		List<JsonObject> response = generalparser.parseToolData(testdata.responseTemplate, toolData, testdata.toolName,
-				testdata.labelName, testdata.webhookName);
+				testdata.labelName, testdata.webhookName,testdata.getSetObject());
 
 		String commitId = response.get(0).get("commitId").toString();
 		String authorName = response.get(0).get("authorName").toString();
@@ -51,13 +51,13 @@ public class InsightsGeneralParserTest extends InsightsParserTestData {
 	@Test(priority = 2, expectedExceptions = Exception.class)
 	public void testGetToolDetailJsonWithExceptions() throws InsightsCustomException {
 		List<JsonObject> response = generalparser.parseToolData(testdata.responseTemplate, incorrectToolData,
-				testdata.toolName, testdata.labelName, "");
+				testdata.toolName, testdata.labelName, "",testdata.getSetObject());
 	}
 
 	@Test(priority = 3)
 	public void testUnmatchedResponseTemplate() throws InsightsCustomException {
 		List<JsonObject> nullresponse = generalparser.parseToolData(testdata.fieldNotFoundinToolData, testdata.toolData,
-				testdata.toolName, testdata.labelName, testdata.webhookName);
+				testdata.toolName, testdata.labelName, testdata.webhookName,testdata.getSetObject());
 		System.out.print(nullresponse.toString());
 		String responseTest = nullresponse.toString();
 		responseTest = responseTest.substring(1, responseTest.length() - 1); // remove curly brackets

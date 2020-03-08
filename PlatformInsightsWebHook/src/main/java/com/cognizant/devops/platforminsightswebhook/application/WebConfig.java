@@ -46,6 +46,8 @@ public class WebConfig {
 	 * Used to initilize Rabbitq Connection
 	 * Webhook Servlet initilizition
 	 * 
+	 * @throws Exception
+	 * 
 	 */
 	@Bean
 	@DependsOn("appPropertiesLoad")
@@ -55,7 +57,12 @@ public class WebConfig {
 				AppProperties.instanceName, AppProperties.mqHost, AppProperties.mqUser, AppProperties.mqPassword,
 				AppProperties.mqExchangeName,
 				ServerProperties.port, ServerProperties.contextPath);
-		WebHookMessagePublisher.getInstance().initilizeMq();
+		try {
+			WebHookMessagePublisher.getInstance().initilizeMq();
+		} catch (Exception e) {
+			LOG.error("Unable to connect to RabbitMQ, Please check RabbitMQ service ");
+			throw new RuntimeException("Unable to connect to RabbitMQ, Please check RabbitMQ service ");
+		}
 		LOG.debug(" start servelet registration in webhookServlet ");
 		ServletRegistrationBean<HttpServlet> servRegBean = new ServletRegistrationBean<>();
 		WebHookHandlerServlet webhookEvent = new WebHookHandlerServlet();

@@ -18,13 +18,16 @@ package com.cognizant.devops.platformservice.webhook.service;
 import java.util.List;
 
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
+import com.cognizant.devops.platformdal.webhookConfig.WebHookConfig;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 
 public interface IWebHook {
 
-	public Boolean saveWebHookConfiguration(String webhookname,String toolName,String eventname,String dataformat,String mqchannel,Boolean subscribestatus, String responseTemplate) throws InsightsCustomException;
-	public List<WebHookConfigTO> getRegisteredWebHooks() throws InsightsCustomException;
+	public  Boolean saveWebHookConfiguration(String webhookname,String toolName,String eventname,String dataformat,String mqchannel,Boolean subscribestatus, String responseTemplate,JsonArray derivedOperationsArray) throws InsightsCustomException;
+	public List<WebHookConfig> getRegisteredWebHooks() throws InsightsCustomException;
 	public String uninstallWebhook(String webhookname) throws InsightsCustomException;
 	public Boolean updateWebHook(String webhookname, String toolName, String eventname, String dataformat,
-			String mqchannel, Boolean subscribestatus, String responseTemplate) throws InsightsCustomException ;
+			String mqchannel, Boolean subscribestatus, String responseTemplate,JsonArray webhookDerivedOperations) throws InsightsCustomException ;
 	
 }

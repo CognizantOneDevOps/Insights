@@ -15,22 +15,35 @@
  ******************************************************************************/
 package com.cognizant.devops.platformdal.webhookConfig;
 
+import java.io.Serializable;
+import java.util.HashSet;
+import java.util.Set;
+
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 @Entity
 @Table(name = "WEBHOOK_CONFIGURATION")
-public class WebHookConfig {
+public class WebHookConfig implements Serializable{	
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 6788438109848406935L;
+
 	@Id
 	@Column(name = "ID", unique = true, nullable = false)
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private int id;
-
+	
 	@Column(name = "SUBSCRIBE_STATUS")
 	private Boolean subscribeStatus;
 	
@@ -41,17 +54,20 @@ public class WebHookConfig {
 	private String toolName;
 	
 	@Column(name = "LABEL_NAME")
-	private String labelName;
+	private String labelDisplay;
 	
 	@Column(name = "DATA_FORMAT")
 	private String dataFormat;
 
-	@Column(name = "MQ_CHANNEL")
+	@Column(name = "MQ_CHANNEL", nullable = false)
 	private String mqChannel;
 			
 	@Column(name = "WEBHOOK_NAME", unique = true, nullable = false)
 	private String webhookName;
 	
+	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
+    @JoinColumn(name="WEBHOOK_CONFIGID")
+    private Set<WebhookDerivedConfig> derivedOperations = new HashSet<>(0);
 	
 	public int getId() {
 		return id;
@@ -80,11 +96,11 @@ public class WebHookConfig {
 
 	
 	public String getLabelName() {
-		return labelName;
+		return labelDisplay;
 	}
 
-	public void setLabelName(String labelName) {
-		this.labelName = labelName;
+	public void setLabelName(String labelDisplay) {
+		this.labelDisplay = labelDisplay;
 	}
 	
 	
@@ -121,11 +137,21 @@ public class WebHookConfig {
 	public void setResponseTemplate(String responseTemplate) {
 		this.responseTemplate = responseTemplate;
 	}
+	
+
+
+	public Set<WebhookDerivedConfig> getWebhookDerivedConfig() {
+		return derivedOperations;
+	}
+
+	public void setWebhookDerivedConfig(Set<WebhookDerivedConfig> derivedOperations) {
+		this.derivedOperations = derivedOperations;
+	}
 
 	@Override
 	public String toString() {
 		return "WebHookConfig [id=" + id + ", subscribeStatus=" + subscribeStatus + ", responseTemplate="
-				+ responseTemplate + ", toolName=" + toolName + ", labelName=" + labelName + ", dataFormat="
+				+ responseTemplate + ", toolName=" + toolName + ", labelDisplay=" + labelDisplay + ", dataFormat="
 				+ dataFormat + ", mqChannel=" + mqChannel + ", webhookName=" + webhookName + "]";
 	}
 }

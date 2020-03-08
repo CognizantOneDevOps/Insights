@@ -129,6 +129,7 @@ export class RestAPIurlService implements IRestAPIUrlService {
         this.addEndPoint("LIST_WEBHOOK", '/PlatformService/admin/webhook/loadwebhookConfiguration');
         this.addEndPoint("DELETE_WEBHOOK", '/PlatformService/admin/webhook/uninstallWebHook');
         this.addEndPoint("UPDATE_WEBHOOK", '/PlatformService/admin/webhook/updateWebhook');
+        this.addEndPoint("UPDATE_WEBHOOK_STATUS", '/PlatformService/admin/webhook/updateWebhookStatus');
 
         //SSO API
         this.addEndPoint("SSO_URL", '/PlatformService/saml/login');

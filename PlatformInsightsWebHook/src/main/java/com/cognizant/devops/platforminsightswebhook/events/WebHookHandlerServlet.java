@@ -29,6 +29,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import com.cognizant.devops.platforminsightswebhook.application.AppProperties;
 import com.cognizant.devops.platforminsightswebhook.config.WebHookConstants;
 import com.cognizant.devops.platforminsightswebhook.config.WebHookMessagePublisher;
 import com.google.gson.JsonElement;
@@ -59,8 +60,10 @@ public class WebHookHandlerServlet extends HttpServlet {
 			processRequest(request);
 		} catch (Exception e) {
 			LOG.error("Error while adding data in Mq in doget method " + e.getMessage());
+			setResponseMessage(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
 		}
-		response.getWriter().append("Served at: ").append(request.getContextPath());
+		response.getWriter().append("Served at: ").append(request.getContextPath())
+				.append(" with Instance Name " + AppProperties.instanceName);
 	}
 
 	/**
@@ -74,9 +77,11 @@ public class WebHookHandlerServlet extends HttpServlet {
 			LOG.debug("In do post ");
 			processRequest(request);
 		} catch (TimeoutException e) {
+			setResponseMessage(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
 			LOG.error(e.getMessage());
 		} catch (Exception e) {
 			LOG.error("Error while adding data in Mq in doPost method " + e);
+			setResponseMessage(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
 		}
 	}
 
@@ -84,17 +89,16 @@ public class WebHookHandlerServlet extends HttpServlet {
 	 * used to process request and add data in RabbitMq
 	 * 
 	 * @param request
-	 * @throws IOException
-	 * @throws TimeoutException
+	 * @throws Exception
 	 */
-	private void processRequest(HttpServletRequest request) throws IOException, TimeoutException {
+	private void processRequest(HttpServletRequest request) throws Exception {
 		JsonObject dataWithReqParam = getBody(request);
 		//LOG.debug(" request body in post " + dataWithReqParam);
 		if (dataWithReqParam != null) {
 			String webHookMqChannelName = WebHookConstants.MQ_CHANNEL_PREFIX
 					.concat(dataWithReqParam.get(WebHookConstants.REQUEST_PARAM_KEY_WEBHOOKNAME).getAsString());
 			String res = dataWithReqParam.toString();
-			LOG.debug(" Final Json after adding parameter " + res);
+			//LOG.debug(" Final Json after adding parameter " + res);
 			WebHookMessagePublisher.getInstance().publishEventAction(res.getBytes(), webHookMqChannelName);
 			LOG.debug(" Data successfully published in webhook name as " + webHookMqChannelName);
 		} else {
@@ -145,6 +149,21 @@ public class WebHookHandlerServlet extends HttpServlet {
 	@Override
 	public void destroy() {
 		WebHookMessagePublisher.getInstance().releaseMqConnetion();
+	}
+
+	/**
+	 * This method is used to send response message
+	 * 
+	 * @param response
+	 * @param statusCode
+	 * @param message
+	 */
+	public static void setResponseMessage(HttpServletResponse response, int statusCode, String message) {
+		try {
+			response.setStatus(statusCode);
+		} catch (Exception e) {
+			LOG.error("Error in setUnauthorizedResponse ", e);
+		}
 	}
 
 }

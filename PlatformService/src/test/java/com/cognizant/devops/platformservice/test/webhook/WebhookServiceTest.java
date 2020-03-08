@@ -32,7 +32,7 @@ public class WebhookServiceTest {
 	public void testsaveWebHookConfiguration() throws InsightsCustomException {
 		Boolean webhookcheck = webhookServiceImp.saveWebHookConfiguration("git_webhook", webhookTestData.toolName,
 				webhookTestData.labelDisplay, webhookTestData.dataformat, webhookTestData.mqchannel,
-				webhookTestData.subscribestatus, webhookTestData.responseTemplate);
+				webhookTestData.subscribestatus, webhookTestData.responseTemplate,null);
 		Boolean expectedOutcome = true;
 		Assert.assertEquals(webhookcheck, expectedOutcome);
 	}
@@ -41,7 +41,7 @@ public class WebhookServiceTest {
 	public void testsaveWebHookConfigurationWithoutException() throws InsightsCustomException {
 		Boolean webhookcheck = webhookServiceImp.saveWebHookConfiguration(webhookTestData.webhookname,
 				webhookTestData.toolName, webhookTestData.labelDisplay, webhookTestData.dataformat,
-				webhookTestData.mqchannel, webhookTestData.subscribestatus, webhookTestData.responseTemplate);
+				webhookTestData.mqchannel, webhookTestData.subscribestatus, webhookTestData.responseTemplate,null);
 		Boolean expectedOutcome = true;
 		Assert.assertEquals(webhookcheck, expectedOutcome);
 	}
@@ -57,7 +57,7 @@ public class WebhookServiceTest {
 
 		Boolean webhookcheck = webhookServiceImp.updateWebHook(webhookTestData.webhookname, webhookTestData.toolName,
 				webhookTestData.labelDisplay, webhookTestData.dataformat, webhookTestData.mqchannel,
-				webhookTestData.subscribestatus, "head_commit.message=message,head_commit.timestamp=commitTime");
+				webhookTestData.subscribestatus, "head_commit.message=message,head_commit.timestamp=commitTime",null);
 		Assert.assertTrue(webhookcheck);
 	}
 

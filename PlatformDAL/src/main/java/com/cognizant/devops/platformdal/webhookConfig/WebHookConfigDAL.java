@@ -2,60 +2,64 @@
  * Copyright 2017 Cognizant Technology Solutions
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
- * use this file except in compliance with the License.  You may obtain a copy
+ * use this file except in compliance with the License. You may obtain a copy
  * of the License at
  * 
- *   http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
  * License for the specific language governing permissions and limitations under
  * the License.
  ******************************************************************************/
 package com.cognizant.devops.platformdal.webhookConfig;
 
 import java.util.List;
+import java.util.Set;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.hibernate.query.Query;
 
+import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformdal.core.BaseDAL;
 
 public class WebHookConfigDAL extends BaseDAL {
-	private static final Logger log = LogManager.getLogger(WebHookConfigDAL.class);
+	private static Logger log = LogManager.getLogger(WebHookConfigDAL.class);
 
 	public Boolean updateWebHookConfiguration(WebHookConfig webhookConfiguration) {
-
 		Query<WebHookConfig> createQuery = getSession()
 				.createQuery("FROM WebHookConfig WH WHERE WH.webhookName = :webhookName", WebHookConfig.class);
 		createQuery.setParameter("webhookName", webhookConfiguration.getWebHookName());
-		List<WebHookConfig> resultList = createQuery.getResultList();
-		WebHookConfig webhookConfig = null;
-		if (resultList != null && !resultList.isEmpty()) {
-			webhookConfig = resultList.get(0);
-		}
-
-		getSession().beginTransaction();
-		if (webhookConfig != null) {
-			webhookConfig.setDataFormat(webhookConfiguration.getDataFormat());
-			webhookConfig.setLabelName(webhookConfiguration.getLabelName());
-			webhookConfig.setWebHookName(webhookConfiguration.getWebHookName());
-			webhookConfig.setToolName(webhookConfiguration.getToolName());
-			webhookConfig.setMQChannel(webhookConfiguration.getMQChannel());
-			webhookConfig.setSubscribeStatus(webhookConfiguration.getSubscribeStatus());
-			webhookConfig.setResponseTemplate(webhookConfiguration.getResponseTemplate());
-			getSession().update(webhookConfig);
-		} else {
-
-			getSession().save(webhookConfiguration);
-		}
-		getSession().getTransaction().commit();
+		WebHookConfig parentConfigList = createQuery.getSingleResult();
 		terminateSession();
-		terminateSessionFactory();
-		return Boolean.TRUE;
+		if (parentConfigList != null) {
+			Set<WebhookDerivedConfig> dataFromUI = webhookConfiguration.getWebhookDerivedConfig();
+			parentConfigList.setDataFormat(webhookConfiguration.getDataFormat());
+			parentConfigList.setLabelName(webhookConfiguration.getLabelName());
+			parentConfigList.setWebHookName(webhookConfiguration.getWebHookName());
+			parentConfigList.setToolName(webhookConfiguration.getToolName());
+			parentConfigList.setMQChannel(webhookConfiguration.getMQChannel());
+			parentConfigList.setSubscribeStatus(webhookConfiguration.getSubscribeStatus());
+			parentConfigList.setResponseTemplate(webhookConfiguration.getResponseTemplate());
+			Set<WebhookDerivedConfig> dataDriverFromTable = parentConfigList.getWebhookDerivedConfig();
+			dataDriverFromTable.clear();
+			dataDriverFromTable.addAll(dataFromUI);
+			parentConfigList.setWebhookDerivedConfig(dataDriverFromTable);
+			getSession().beginTransaction();
+			getSession().saveOrUpdate(parentConfigList);
+			getSession().getTransaction().commit();
+			terminateSession();
+			terminateSessionFactory();
+
+			return Boolean.TRUE;
+
+		} else {
+			return Boolean.FALSE;
+		}
+
 	}
 
 	public Boolean saveWebHookConfiguration(WebHookConfig webhookConfiguration) throws InsightsCustomException {
@@ -63,18 +67,11 @@ public class WebHookConfigDAL extends BaseDAL {
 				.createQuery("FROM WebHookConfig WH WHERE WH.webhookName = :webhookName", WebHookConfig.class);
 		createQuery.setParameter("webhookName", webhookConfiguration.getWebHookName());
 		List<WebHookConfig> resultList = createQuery.getResultList();
-		WebHookConfig webhookConfig = null;
 		if (resultList != null && !resultList.isEmpty()) {
-			webhookConfig = resultList.get(0);
+			throw new InsightsCustomException(PlatformServiceConstants.WEBHOOK_NAME);
 		}
 		getSession().beginTransaction();
-		if (webhookConfig != null) {
-
-			throw new InsightsCustomException("Webhook name already exists.");
-		} else {
-
-			getSession().save(webhookConfiguration);
-		}
+		getSession().save(webhookConfiguration);
 		getSession().getTransaction().commit();
 		terminateSession();
 		terminateSessionFactory();
@@ -82,6 +79,7 @@ public class WebHookConfigDAL extends BaseDAL {
 	}
 
 	public List<WebHookConfig> getAllWebHookConfigurations() {
+		getSession().beginTransaction();
 		Query<WebHookConfig> createQuery = getSession().createQuery("FROM WebHookConfig WH", WebHookConfig.class);
 		List<WebHookConfig> result = createQuery.getResultList();
 		terminateSession();
@@ -89,23 +87,17 @@ public class WebHookConfigDAL extends BaseDAL {
 		return result;
 	}
 
-	public WebHookConfig loadWebHookConfiguration(String webhookName) {
-		Query<WebHookConfig> loadQuery = getSession()
-				.createQuery("FROM WebHookConfig SC WHERE SC.webhookName = :webhookName", WebHookConfig.class);
-		loadQuery.setParameter("webhookName", webhookName);
-		List<WebHookConfig> results = loadQuery.getResultList();
-
-		WebHookConfig webhookConfiguration = null;
-		if (results != null && !results.isEmpty()) {
-			webhookConfiguration = results.get(0);
-		}
+	public List<WebHookConfig> getAllActiveWebHookConfigurations() {
+		getSession().beginTransaction();
+		Query<WebHookConfig> createQuery = getSession()
+				.createQuery("FROM WebHookConfig WH WHERE WH.subscribeStatus = true", WebHookConfig.class);
+		List<WebHookConfig> result = createQuery.getResultList();
 		terminateSession();
 		terminateSessionFactory();
-
-		return webhookConfiguration;
+		return result;
 	}
 
-	public List<WebHookConfig> deleteWebhookConfigurations(String webhookName) {
+	public String deleteWebhookConfigurations(String webhookName) {
 		Query<WebHookConfig> createQuery = getSession()
 				.createQuery("FROM WebHookConfig a WHERE a.webhookName = :webhookName", WebHookConfig.class);
 		createQuery.setParameter("webhookName", webhookName);
@@ -115,6 +107,19 @@ public class WebHookConfigDAL extends BaseDAL {
 		getSession().getTransaction().commit();
 		terminateSession();
 		terminateSessionFactory();
-		return getAllWebHookConfigurations();
+		return PlatformServiceConstants.SUCCESS;
+	}
+
+	public void updateWebhookStatus(String webhookName, boolean status) {
+		Query<WebHookConfig> createQuery = getSession()
+				.createQuery("FROM WebHookConfig WH WHERE WH.webhookName = :webhookName", WebHookConfig.class);
+		createQuery.setParameter("webhookName", webhookName);
+		WebHookConfig updateWebhook = createQuery.getSingleResult();
+		updateWebhook.setSubscribeStatus(status);
+		getSession().beginTransaction();
+		getSession().update(updateWebhook);
+		getSession().getTransaction().commit();
+		terminateSession();
+		terminateSessionFactory();
 	}
 }

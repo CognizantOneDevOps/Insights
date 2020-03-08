@@ -23,58 +23,48 @@ import java.util.TimerTask;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
-import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
-import com.cognizant.devops.platformcommons.dal.neo4j.Neo4jDBHandler;
-import com.cognizant.devops.platformdal.webhookConfig.WebHookConfig;
-import com.cognizant.devops.platformdal.webhookConfig.WebHookConfigDAL;
 import com.cognizant.devops.engines.platformengine.message.core.EngineStatusLogger;
 import com.cognizant.devops.engines.platformwebhookengine.message.factory.EngineSubscriberResponseHandler;
 import com.cognizant.devops.engines.platformwebhookengine.message.subscriber.WebHookDataSubscriber;
 import com.cognizant.devops.engines.platformwebhookengine.message.subscriber.WebhookHealthSubscriber;
+import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
+import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
+import com.cognizant.devops.platformdal.webhookConfig.WebHookConfig;
+import com.cognizant.devops.platformdal.webhookConfig.WebHookConfigDAL;
 
 public class WebHookEngineAggregatorModule extends TimerTask {
 	private static Logger log = LogManager.getLogger(WebHookEngineAggregatorModule.class.getName());
-	private static Map<String, EngineSubscriberResponseHandler> registry = new HashMap<String, EngineSubscriberResponseHandler>();
-	private static String WEBHOOK_HEALTH_ROUTING_KEY = "WEBHOOKSUBSCRIBER_HEALTH";
+	
+	private static Map<String, EngineSubscriberResponseHandler> registry = new HashMap<>();
+	private static final String WEBHOOK_HEALTH_ROUTING_KEY = "WEBHOOKSUBSCRIBER_HEALTH";
 
 	@Override
 	public void run() {
 		log.debug(" Webhook Engine started ==== ");
 		ApplicationConfigProvider.performSystemCheck();
-		Neo4jDBHandler graphDBHandler = new Neo4jDBHandler();
 		WebHookConfigDAL webhookConfigDal = new WebHookConfigDAL();
-		List<WebHookConfig> allWebhookConfigurations = webhookConfigDal.getAllWebHookConfigurations();
+		List<WebHookConfig> allWebhookConfigurations = webhookConfigDal.getAllActiveWebHookConfigurations();
 		for (WebHookConfig webhookConfig : allWebhookConfigurations) {
-			String webhookname = webhookConfig.getWebHookName().toUpperCase();
-			String toolName = webhookConfig.getToolName().toUpperCase();
-			Boolean subscribeStatus = webhookConfig.getSubscribeStatus();
-			log.debug("Webhook Detail {}  subscribed Status {}", webhookname, subscribeStatus);
-			if (subscribeStatus == true) {
-				registerAggragators(webhookConfig, graphDBHandler, toolName);
-			}
+			registerAggragators(webhookConfig);
 			registerWebhookHealthAggragators(WEBHOOK_HEALTH_ROUTING_KEY);
 		}
 		log.debug(" Webhook Engine completed ==== ");
 	}
 
 
-	private void registerAggragators(WebHookConfig webhookConfig, Neo4jDBHandler graphDBHandler, String toolName) {
+	private void registerAggragators(WebHookConfig webhookConfig) {
+		
 		String dataRoutingKey = webhookConfig.getMQChannel();
-		String labelName = webhookConfig.getLabelName();
-		String webhookName = webhookConfig.getWebHookName();
-		String responseTemplate = webhookConfig.getResponseTemplate();
 		try {
 			if (dataRoutingKey != null && !registry.containsKey(dataRoutingKey)) {
 				try {
-					registry.put(dataRoutingKey, new WebHookDataSubscriber(dataRoutingKey, responseTemplate, toolName,
-							labelName, webhookName));
-					log.debug("Webhook {} subscribed successfully ", webhookName);
+					registry.put(dataRoutingKey, new WebHookDataSubscriber(webhookConfig));
+					log.debug("Webhook {} subscribed successfully ", webhookConfig.getWebHookName());
 					EngineStatusLogger.getInstance().createWebhookEngineStatusNode(
-							"Webhook " + webhookName + " subscribed successfully ", PlatformServiceConstants.SUCCESS);
+							"Webhook " + webhookConfig.getWebHookName() + " subscribed successfully ", PlatformServiceConstants.SUCCESS);
 				} catch (Exception e) {
 					EngineStatusLogger.getInstance().createWebhookEngineStatusNode(
-							"Unable to subscribed Webhook " + webhookName + " Error Detail :" + e.getMessage(),
+							"Unable to subscribed Webhook " + webhookConfig.getWebHookName() + " Error Detail :" + e.getMessage(),
 							PlatformServiceConstants.FAILURE);
 					log.error("Unable to add subscriber for routing key: " + e);
 
@@ -82,7 +72,7 @@ public class WebHookEngineAggregatorModule extends TimerTask {
 			}
 		} catch (Exception e) {
 			EngineStatusLogger.getInstance().createWebhookEngineStatusNode(
-					"Unable to subscribed Webhook " + webhookName + " Error Detail :" + e.getMessage(),
+					"Unable to subscribed Webhook " + webhookConfig.getWebHookName() + " Error Detail :" + e.getMessage(),
 					PlatformServiceConstants.FAILURE);
 			log.error("Unable to add subscriber for routing key: " + e);
 
@@ -92,12 +82,13 @@ public class WebHookEngineAggregatorModule extends TimerTask {
 
 	private void registerWebhookHealthAggragators(String healthRoutingKey) {
 		try {
-			registry.put(healthRoutingKey,
-					new WebhookHealthSubscriber(healthRoutingKey));
-			log.debug("Webhook Health Queue {} subscribed successfully ", healthRoutingKey);
-			EngineStatusLogger.getInstance().createWebhookEngineStatusNode(
-					"Webhook  Health Queue " + healthRoutingKey + " subscribed successfully ",
-					PlatformServiceConstants.SUCCESS);
+			if (healthRoutingKey != null && !registry.containsKey(healthRoutingKey)) {
+				registry.put(healthRoutingKey, new WebhookHealthSubscriber(healthRoutingKey));
+				log.debug("Webhook Hea2lth Queue {} subscribed successfully ", healthRoutingKey);
+				EngineStatusLogger.getInstance().createWebhookEngineStatusNode(
+						"Webhook  Health Queue " + healthRoutingKey + " subscribed successfully ",
+						PlatformServiceConstants.SUCCESS);
+			}
 		} catch (Exception e) {
 			EngineStatusLogger.getInstance().createWebhookEngineStatusNode(
 					"Unable to subscribed Webhook  Health Queue " + healthRoutingKey + " Error Detail :"

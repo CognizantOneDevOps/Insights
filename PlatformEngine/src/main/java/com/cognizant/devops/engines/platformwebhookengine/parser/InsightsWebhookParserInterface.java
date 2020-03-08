@@ -16,12 +16,14 @@
 package com.cognizant.devops.engines.platformwebhookengine.parser;
 
 import java.util.List;
+import java.util.Set;
 
+import com.cognizant.devops.platformdal.webhookConfig.WebhookDerivedConfig;
 import com.google.gson.JsonObject;
 
 
 
 public interface InsightsWebhookParserInterface {
 
-	public List<JsonObject> parseToolData(String responseTemplate,String toolData,String toolName,String labelName,String webhookName);
+	public List<JsonObject> parseToolData(String responseTemplate,String toolData,String toolName,String labelName,String webhookName, Set<WebhookDerivedConfig> webhookDerivedConfig);
 }

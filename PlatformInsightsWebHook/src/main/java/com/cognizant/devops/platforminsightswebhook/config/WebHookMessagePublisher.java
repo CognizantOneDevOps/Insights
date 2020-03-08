@@ -53,7 +53,7 @@ public class WebHookMessagePublisher {
 
 	}
 
-	public void initilizeMq() {
+	public void initilizeMq() throws Exception {
 		LOG.debug(" In initilizeMq ======== host = {} user = {} passcode = {} exchangeName= {} ", AppProperties.mqHost,
 				AppProperties.mqUser, AppProperties.mqPassword, AppProperties.mqExchangeName);
 		try {
@@ -74,14 +74,20 @@ public class WebHookMessagePublisher {
 			SubscriberStatusLogger.getInstance().createSubsriberStatusNode(
 					"Platform Webhook Subscriber : problem in connection with Rabbit Mq host " + AppProperties.mqHost,
 					WebHookConstants.FAILURE);
+			throw e;
 
 		}
 
 	}
 
-	public void publishEventAction(byte[] data, String webHookMqChannelName) throws TimeoutException, IOException {
-		LOG.debug(" Inside publishEventAction ==== ");
+	public void publishEventAction(byte[] data, String webHookMqChannelName) throws Exception {
+		LOG.debug(" Inside publishEventAction ==== " + connection);
 		try {
+
+			if (!connection.isOpen()) {
+				LOG.debug(" Connection is not open " + " connection " + connection.isOpen());
+				initilizeMq();
+			}
 			Channel channel;
 			if (mqMappingMap.containsKey(webHookMqChannelName)) {
 				channel = mqMappingMap.get(webHookMqChannelName);
@@ -95,13 +101,10 @@ public class WebHookMessagePublisher {
 				channel.basicPublish(exchangeName, webHookMqChannelName, null, data);
 				LOG.debug(" data published first time in queue " + webHookMqChannelName);
 				mqMappingMap.put(webHookMqChannelName, channel);
-
 			}
-		} catch (IOException e) {
-			LOG.error("IOException Error while publishEventAction " + e);
-			throw e;
 		} catch (Exception e) {
 			LOG.error("Error while publishEventAction " + e);
+			throw e;
 		}
 	}
 

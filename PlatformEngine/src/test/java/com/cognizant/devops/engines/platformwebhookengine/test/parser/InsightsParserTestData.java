@@ -18,6 +18,12 @@ package com.cognizant.devops.engines.platformwebhookengine.test.parser;
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.HashSet;
+import java.util.Set;
+
+import com.cognizant.devops.platformdal.webhookConfig.WebhookDerivedConfig;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 
 public class InsightsParserTestData {
 
@@ -25,8 +31,8 @@ public class InsightsParserTestData {
 	String responseTemplate = "head_commit.id=commitId,head_commit.message=message,head_commit.timestamp=commitTime,head_commit.author.name=authorName";
 	String toolName = "GIT";
 	String labelName = "SCM:GIT76:DATA";
-	String mqChannel = "IPW_git_demo";
-	String webhookName = "git_demo";
+	String mqChannel = "IPW_git_webhook";
+	String webhookName = "git_webhook";
 	String incorrectToolData = "tooldata=incorrcet";
 	DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
 	LocalDateTime now = LocalDateTime.now();
@@ -40,4 +46,32 @@ public class InsightsParserTestData {
 			+ ZonedDateTime.now().toInstant().toEpochMilli()
 			+ ",\"webhookName\":\"git_demo\",\"commitId\":\"86ef096bb924674a69cd2198e2964b76aa75d88b\",\"source\":\"webhook\",\"message\":\"Update Hello\",\"inSightsTimeX\":\""
 			+ dtf.format(now) + "\",\"labelName\":\"SCM:GIT76:DATA\",\"toollName\":\"GIT\"}";
+	Set<WebhookDerivedConfig> setWebhookDerivedConfigs = new HashSet<WebhookDerivedConfig>();
+	WebhookDerivedConfig wdcInsightsTime = new WebhookDerivedConfig();
+	WebhookDerivedConfig wdcTimeSeriesMapping = new WebhookDerivedConfig();
+	WebhookDerivedConfig wdcDataEnrichment = new WebhookDerivedConfig();
+	String operationFieldsTimeX = "{\"timeField\":\"commitTime\",\"timeFormat\":\"yyyy-MM-dd'T'HH:mm:ssXXX\",\"epochTime\":\"false\"}";
+	String operationFieldsTimeSeries = "{\"mappingTimeField\":\"commitTime\",\"mappingTimeFormat\":\"yyyy-MM-dd'T'HH:mm:ssXXX\",\"epochTime\":\"false\"}";
+	String operationFieldsDataEnrich = "{\"sourceProperty\":\"message\",\"keyPattern\":\"-\",\"targetProperty\":\"jirakey\"}";
+	//JsonObject jsonObject = new JsonParser().parse(operationFieldsDataEnrich).getAsJsonObject();
+	public Set<WebhookDerivedConfig> getSetObject() {
+		wdcInsightsTime.setOperationName("insightsTimex");
+		wdcInsightsTime.setWebhookName("git_demo");
+		wdcInsightsTime.setWid(123);
+		wdcInsightsTime.setOperationFields(operationFieldsTimeX);
+		setWebhookDerivedConfigs.add(wdcInsightsTime);
+		wdcTimeSeriesMapping.setOperationFields(operationFieldsTimeSeries);
+		wdcTimeSeriesMapping.setOperationName("timeFieldSeriesMapping");
+		wdcTimeSeriesMapping.setWebhookName("git_demo");
+		wdcTimeSeriesMapping.setWid(173);
+		setWebhookDerivedConfigs.add(wdcTimeSeriesMapping);
+		wdcDataEnrichment.setOperationFields(operationFieldsDataEnrich);
+		wdcDataEnrichment.setOperationName("dataEnrichment");
+		wdcDataEnrichment.setWebhookName("git_demo");
+		wdcDataEnrichment.setWid(873);
+		setWebhookDerivedConfigs.add(wdcDataEnrichment);
+
+		return setWebhookDerivedConfigs;
+	}
+
 }
