@@ -353,6 +353,7 @@ export class WebHookComponent implements OnInit {
         var webhookAPIRequestJson = {};
 
         if (this.actionType == 'save') {
+            console.log("1", selectedWebhook);
             webhookAPIRequestJson['toolName'] = self.selectedTool
             webhookAPIRequestJson['labelDisplay'] = self.labelDisplay
             webhookAPIRequestJson['webhookName'] = self.webhookName
@@ -382,12 +383,13 @@ export class WebHookComponent implements OnInit {
                 }
             })
         } else if (this.actionType == 'edit') {
-            webhookAPIRequestJson['toolName'] = selectedWebhook.toolName
-            webhookAPIRequestJson['labelDisplay'] = selectedWebhook.labelDisplay
-            webhookAPIRequestJson['webhookName'] = selectedWebhook.webhookName
-            webhookAPIRequestJson['dataformat'] = selectedWebhook.dataFormat
-            webhookAPIRequestJson['mqchannel'] = selectedWebhook.mqChannel
-            webhookAPIRequestJson['responseTemplate'] = selectedWebhook.responseTemplate
+            console.log("1", selectedWebhook);
+            webhookAPIRequestJson['toolName'] = self.selectedTool
+            webhookAPIRequestJson['labelDisplay'] = self.labelDisplay
+            webhookAPIRequestJson['webhookName'] = self.webhookName
+            webhookAPIRequestJson['dataformat'] = self.dataformat
+            webhookAPIRequestJson['mqchannel'] = self.mqchannel
+            webhookAPIRequestJson['responseTemplate'] = self.responseTemplate
             webhookAPIRequestJson['statussubscribe'] = self.statussubscribe
             webhookAPIRequestJson['derivedOperations'] = self.derivedOperationList
             console.log("webhookAPIRequestJson in Edit", JSON.stringify(webhookAPIRequestJson))
