@@ -21,7 +21,8 @@ Created on Jun 16, 2016
 from dateutil import parser
 import datetime
 from datetime import datetime as dateTime
-from ....core.BaseAgent import BaseAgent	import logging
+from ....core.BaseAgent import BaseAgent
+import logging
 import urllib
 import math
 import json
@@ -211,9 +212,9 @@ class GitAgent(BaseAgent):
                                     'consumptionTime': timeStampNow()
                                 }
                                 branchJiraKeyIter = re.finditer(self.jiraRegEx, branch)
-                                branchJiraKeys = [key.group(0) for key in branchJiraKeyIter]
-                                if branchJiraKeys:
-                                    orphanBranch['branchJiraKeys'] = branchJiraKeys
+                                self.branchJiraKeys = [key.group(0) for key in branchJiraKeyIter]
+                                if self.branchJiraKeys:
+                                    orphanBranch['branchJiraKeys'] = self.branchJiraKeys
                                 self.publishToolsData([orphanBranch, ])
                             self.updateTrackingJson(self.tracking)
                             self.updateTrackingCacheFile(repoName, repoTrackingCache)
@@ -323,7 +324,7 @@ class GitAgent(BaseAgent):
                 baseOriginPullReqDict[str(pullReqNumber)] = {
                     "pullReqId": pullReqNumber,
                     "originBranch": originBranch,
-                    "originBranchJiraKeys": branchJiraKeys,
+                    "originBranchJiraKeys": self.branchJiraKeys,
                     "baseBranch": baseBranch,
                     "mergedAt": pullReq.get('merged_at', None),
                     "closedAt": pullReq.get('closed_at', None),

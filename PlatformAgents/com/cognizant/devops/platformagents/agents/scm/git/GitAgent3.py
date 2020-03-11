@@ -2,7 +2,7 @@
 # Copyright 2017 Cognizant Technology Solutions
 # 
 # Licensed under the Apache License, Version 2.0 (the "License"); you may not
-# use this file except in compliance with the License.  You may obtain a copy
+# use this file except in compliance with the License.  You may obtain a copy 
 # of the License at
 # 
 #   http://www.apache.org/licenses/LICENSE-2.0
@@ -157,7 +157,7 @@ class GitAgent(BaseAgent):
                                 injectData['default'] = True
                             else:
                                 injectData['default'] = False
-                            parsedBranch = urllib.quote_plus(branch)
+                            parsedBranch = urllib.parse.quote_plus(branch)
                             fetchNextCommitsPage = True
                             getCommitDetailsUrl = commitsBaseEndPoint+repoName+'/commits?sha='+parsedBranch+'&access_token='+accessToken+'&per_page=100'
                             branchTrackingDetails = trackingDetails.get(branch, {})
@@ -212,9 +212,9 @@ class GitAgent(BaseAgent):
                                     'consumptionTime': timeStampNow()
                                 }
                                 branchJiraKeyIter = re.finditer(self.jiraRegEx, branch)
-                                branchJiraKeys = [key.group(0) for key in branchJiraKeyIter]
-                                if branchJiraKeys:
-                                    orphanBranch['branchJiraKeys'] = branchJiraKeys
+                                self.branchJiraKeys = [key.group(0) for key in branchJiraKeyIter]
+                                if self.branchJiraKeys:
+                                    orphanBranch['branchJiraKeys'] = self.branchJiraKeys
                                 self.publishToolsData([orphanBranch, ])
                             self.updateTrackingJson(self.tracking)
                             self.updateTrackingCacheFile(repoName, repoTrackingCache)
@@ -324,7 +324,7 @@ class GitAgent(BaseAgent):
                 baseOriginPullReqDict[str(pullReqNumber)] = {
                     "pullReqId": pullReqNumber,
                     "originBranch": originBranch,
-                    "originBranchJiraKeys": branchJiraKeys,
+                    "originBranchJiraKeys": self.branchJiraKeys,
                     "baseBranch": baseBranch,
                     "mergedAt": pullReq.get('merged_at', None),
                     "closedAt": pullReq.get('closed_at', None),

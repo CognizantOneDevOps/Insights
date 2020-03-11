@@ -67,7 +67,7 @@ class AgentDaemonExecutor:
             
         with open(self.versionConfigFilePath, 'r') as versionConfig_file:    
             self.versionConfig = json.load(versionConfig_file)
-            logging.info(' Version of Agent Demon ',self.versionConfig.get("version"))
+            #logging.info(' Version of Agent Demon ',self.versionConfig.get("version"))
             self.version=self.versionConfig.get("version")
         if self.versionConfig == None:
             self.version=''
