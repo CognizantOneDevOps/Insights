@@ -32,10 +32,10 @@ detectPythonVersion()
 {
      if echo "$1" | grep -q "Python 2"; then
       echo "Detected python 2 version";
-      python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.ci.citfs.CITFSAgent import CITFSAgent; CITFSAgent()" &
+      python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.ci.tfsci.TFSCIAgent import TFSCIAgent; TFSCIAgent()" &
      elif echo "$1" | grep -q "Python 3"; then
       echo "Detected python 3 version";
-      python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.ci.citfs.CITFSAgent3 import CITFSAgent; CITFSAgent()" &
+      python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.ci.tfsci.TFSCIAgent3 import TFSCIAgent; TFSCIAgent()" &
      else
       echo "python version not supported"
 	  exit 1;
@@ -46,58 +46,58 @@ detectPythonVersion()
 case "$1" in
   start)
     if [[ $(ps aux | grep '__PS_KEY__' | awk '{print $2}') ]]; then
-     echo "InSightsCITFSAgent already running"
+     echo "InSightsTFSCIAgent already running"
     else
-     echo "Starting InSightsCITFSAgent"
-     cd $INSIGHTS_AGENT_HOME/PlatformAgents/citfs
+     echo "Starting InSightsTFSCIAgent"
+     cd $INSIGHTS_AGENT_HOME/PlatformAgents/tfsci
 	 echo $python_version
      detectPythonVersion "$python_version"
     fi
     if [[ $(ps aux | grep '__PS_KEY__' | awk '{print $2}') ]]; then
-     echo "InSightsCITFSAgent Started Sucessfully"
+     echo "InSightsTFSCIAgent Started Sucessfully"
     else
-     echo "InSightsCITFSAgent Failed to Start"
+     echo "InSightsTFSCIAgent Failed to Start"
     fi
     ;;
   stop)
-    echo "Stopping InSightsCITFSAgent"
+    echo "Stopping InSightsTFSCIAgent"
     if [[ $(ps aux | grep '__PS_KEY__' | awk '{print $2}') ]]; then
      sudo kill -9 $(ps aux | grep '__PS_KEY__' | awk '{print $2}')
     else
-     echo "InSIghtsCITFSAgent already in stopped state"
+     echo "InSIghtsTFSCIAgent already in stopped state"
     fi
     if [[ $(ps aux | grep '__PS_KEY__' | awk '{print $2}') ]]; then
-     echo "InSightsCITFSAgent Failed to Stop"
+     echo "InSightsTFSCIAgent Failed to Stop"
     else
-     echo "InSightsCITFSAgent Stopped"
+     echo "InSightsTFSCIAgent Stopped"
     fi
     ;;
   restart)
-    echo "Restarting InSightsCITFSAgent"
+    echo "Restarting InSightsTFSCIAgent"
     if [[ $(ps aux | grep '__PS_KEY__' | awk '{print $2}') ]]; then
-     echo "InSightsCITFSAgent stopping"
+     echo "InSightsTFSCIAgent stopping"
      sudo kill -9 $(ps aux | grep '__PS_KEY__' | awk '{print $2}')
-     echo "InSightsCITFSAgent stopped"
-     echo "InSightsCITFSAgent starting"
-     cd $INSIGHTS_AGENT_HOME/PlatformAgents/citfs
+     echo "InSightsTFSCIAgent stopped"
+     echo "InSightsTFSCIAgent starting"
+     cd $INSIGHTS_AGENT_HOME/PlatformAgents/tfsci
 	 echo $python_version
      detectPythonVersion "$python_version"
-     echo "InSightsCITFSAgent started"
+     echo "InSightsTFSCIAgent started"
     else
-     echo "InSightsCITFSAgent already in stopped state"
-     echo "InSightsCITFSAgent starting"
-     cd $INSIGHTS_AGENT_HOME/PlatformAgents/citfs
+     echo "InSightsTFSCIAgent already in stopped state"
+     echo "InSightsTFSCIAgent starting"
+     cd $INSIGHTS_AGENT_HOME/PlatformAgents/tfsci
 	 echo $python_version
      detectPythonVersion "$python_version"
-     echo "InSightsCITFSAgent started"
+     echo "InSightsTFSCIAgent started"
     fi
     ;;
   status)
-    echo "Checking the Status of InSightsCITFSAgent"
+    echo "Checking the Status of InSightsTFSCIAgent"
     if [[ $(ps aux | grep '__PS_KEY__' | awk '{print $2}') ]]; then
-     echo "InSightsCITFSAgent is running"
+     echo "InSightsTFSCIAgent is running"
     else
-     echo "InSightsCITFSAgent is stopped"
+     echo "InSightsTFSCIAgent is stopped"
     fi
     ;;
   *)

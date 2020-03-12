@@ -1,0 +1,89 @@
+{
+ 	"vault": {
+		"getFromVault": false,
+		"secretEngine":"insights-kv",
+		"readToken":"vault_secret_token",
+		"vaultUrl":"http://Vault_Host:port/v1/"
+	},
+  	"mqConfig": {
+    	"user": "iSight",
+    	"password": "iSight",
+    	"host": "127.0.0.1",
+    	"exchange": "iSight",
+    	"agentControlXchg":"iAgent"
+  	},
+  	"subscribe": {
+    	"config": "CI.TFS.config"
+  	},
+  	"publish": {
+    	"data": "CI.TFS.DATA",
+    	"health": "CI.TFS.HEALTH"
+  	},
+  	"communication": {
+    	"type": "REST",
+    	"sslVerify": true,
+    	"responseType": "JSON"
+  	},
+ 	"dynamicTemplate": {
+   	  	"timeFieldMapping" : {
+			"startDate" : "%Y-%m-%d"
+  	   	},
+	  	"responseTemplate": {
+	    	"buildNumber": "buildNumber",
+	    	"status": "status",
+	    	"result": "result",
+	    	"queueTime": "queueTime",
+	    	"startTime": "startTime",
+	    	"finishTime": "finishTime",
+	    	"definition": {
+	    		"id": "definitionId",
+	    		"name": "definitionName",
+		  		"type": "definitionType"
+	    	},
+	    	"project": {
+	    		"id": "projectId",
+	    		"name": "projectName",
+	    		"description": "projectDescription"
+	    	},
+	    	"sourceBranch": "sourceBranch",
+	    	"sourceVersion": "sourceVersion",
+	    	"queue": {
+	    		"id": "queueId",
+	    		"name": "queueName"
+	    	},
+	    	"priority": "priority",
+	    	"reason": "reason",
+	    	"requestedBy": {
+		  		"displayName": "authorName",
+		  		"uniqueName": "authorUniqueName"
+	    	},
+	    	"repository": {
+	  	  		"type": "repositoryType"
+	    	},
+	    
+	  	}
+  	},
+ 	"agentId" :"",
+	"toolCategory" : "CI",
+	"enableDataValidation": true,
+ 	"isDebugAllowed" : false,
+	"enableValueArray": false,
+	"auth": "NTLM",
+	"toolsTimeZone" : "Asia/Kolkata",
+	"insightsTimeZone" : "Asia/Kolkata",
+	"useResponseTemplate" : true,
+	"runSchedule": 2,
+	"userid": "<USERNAME>",
+	"passwd": "<PERSONAL ACCESS TOKEN>",
+	"baseUrl": "http://hostname/tfs",
+	"timeStampField":"finishTime",
+	"timeStampFormat":"%Y-%m-%dT%H:%M:%S",
+	"isEpochTimeFormat" : false,
+	"startFrom" : "2017-01-01 01:01:01",
+	"agentSecretDetails": ["userid","passwd"],
+	"loggingSetting" : {
+		"logLevel" : "WARN",
+		"maxBytes" : 5000000,
+		"backupCount" : 1000
+ 	} 
+}

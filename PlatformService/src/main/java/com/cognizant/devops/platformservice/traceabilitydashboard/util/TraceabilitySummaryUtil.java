@@ -37,7 +37,7 @@ import com.google.gson.JsonObject;
 public class TraceabilitySummaryUtil {
 
 	static Logger log = LogManager.getLogger(TraceabilitySummaryUtil.class.getName());
-	final static String PATTERN ="[\\[\\](){}\"\\\"\"]";
+	static final String PATTERN ="[\\[\\](){}\"\\\"\"]";
 
 	public static String calTimeDiffrence(String operandName, List<JsonObject> toolRespPayload, String message)
 			throws ParseException {
@@ -63,14 +63,13 @@ public class TraceabilitySummaryUtil {
 	public static String calSUM(String operandName, String operandValue, List<JsonObject> toolRespPayload,
 			String message) {
 		int totalCount = toolRespPayload.size();
-		if (totalCount >= 0) {
-			if (toolRespPayload.get(0).has(operandName)) {
+		if (totalCount >= 0 && toolRespPayload.get(0).has(operandName)) {			
 				int count = (int) toolRespPayload.stream()
 						.filter(payload -> payload.get(operandName).getAsString().equals(operandValue)).count();
 				int rem = totalCount - count;
 				MessageFormat mf = new MessageFormat(message);
 				return mf.format(new Object[] { count, rem });
-			}
+			
 		}
 		return "";
 

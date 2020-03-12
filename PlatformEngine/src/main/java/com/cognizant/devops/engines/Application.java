@@ -27,7 +27,7 @@ import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
 import com.cognizant.devops.engines.platformengine.message.core.EngineStatusLogger;
 import com.cognizant.devops.engines.platformengine.modules.aggregator.EngineAggregatorModule;
 import com.cognizant.devops.engines.platformengine.modules.correlation.EngineCorrelatorModule;
-import com.cognizant.devops.engines.platformengine.modules.datapurging.DataPurgingExecutor;
+//import com.cognizant.devops.engines.platformengine.modules.datapurging.DataPurgingExecutor;
 import com.cognizant.devops.engines.platformengine.modules.mapper.ProjectMapperModule;
 import com.cognizant.devops.engines.platformengine.modules.offlinedataprocessing.OfflineDataProcessingExecutor;
 
@@ -72,10 +72,10 @@ public class Application {
 								ApplicationConfigProvider.getInstance().getSchedulerConfigData().getProjectMapperModuleInterval() * 60 * 1000);
 
 			// Schedule the DataPurging Executor Job
-			Timer timerDataPurgingExecutor = new Timer("DataPurgingExecutor");
+			/*Timer timerDataPurgingExecutor = new Timer("DataPurgingExecutor");
 			TimerTask dataPurgingExecutorTrigger = new DataPurgingExecutor();
 			timerDataPurgingExecutor.schedule(dataPurgingExecutorTrigger, 0, 
-								ApplicationConfigProvider.getInstance().getSchedulerConfigData().getDataPurgingExecutorInterval() * 60 * 1000);
+								ApplicationConfigProvider.getInstance().getSchedulerConfigData().getDataPurgingExecutorInterval() * 60 * 1000);*/
 
 			// Schedule the OfflineDataProcessingExecutor job
 			Timer timerOfflineDataProcessingExecutor = new Timer("OfflineDataProcessingExecutor");

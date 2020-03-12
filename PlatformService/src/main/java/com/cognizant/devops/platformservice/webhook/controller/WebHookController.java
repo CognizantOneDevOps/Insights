@@ -28,23 +28,27 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
 import com.cognizant.devops.platformcommons.core.util.ValidationUtils;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
+import com.cognizant.devops.platformdal.webhookConfig.WebHookConfig;
 import com.cognizant.devops.platformservice.rest.util.PlatformServiceUtil;
-import com.cognizant.devops.platformservice.webhook.service.WebHookConfigTO;
 import com.cognizant.devops.platformservice.webhook.service.WebHookServiceImpl;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
 @RestController
 @RequestMapping("/admin/webhook")
 public class WebHookController {
-	static Logger log = LogManager.getLogger(WebHookController.class.getName());
+	static Logger log = LogManager.getLogger(WebHookController.class);
+
 	@Autowired
 	WebHookServiceImpl webhookConfigurationService;
 
-	@RequestMapping(value = "/saveWebhook", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+	@RequestMapping(value = "/saveWebhook", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	public @ResponseBody JsonObject saveWebhook(@RequestBody String registerWebhookJson) {
+
 		try {
 			String validatedResponse = ValidationUtils.validateRequestBody(registerWebhookJson);
 			JsonParser parser = new JsonParser();
@@ -56,47 +60,60 @@ public class WebHookController {
 			String mqchannel = registerWebhookjson.get("mqchannel").getAsString();
 			String responseTemplate = registerWebhookjson.get("responseTemplate").getAsString();
 			Boolean statussubscribe = registerWebhookjson.get("statussubscribe").getAsBoolean();
+			JsonArray derivedOperationsArray = registerWebhookjson.get("derivedOperations").getAsJsonArray();
 			Boolean result = webhookConfigurationService.saveWebHookConfiguration(webhookName, toolName, labelDisplay,
-					dataformat, mqchannel, statussubscribe, responseTemplate);
-			return PlatformServiceUtil.buildSuccessResponse();
-		} catch (ArrayIndexOutOfBoundsException e) {
-			return PlatformServiceUtil.buildFailureResponse("Incorrect Response Template");
-		} catch (InsightsCustomException e) {
-			if (e.getMessage() == "Incorrect Response template") {
-				return PlatformServiceUtil.buildFailureResponse("Incorrect Response Template");
+					dataformat, mqchannel, statussubscribe, responseTemplate, derivedOperationsArray);
+			if (result) {
+				return PlatformServiceUtil.buildSuccessResponse();
 			} else {
-				return PlatformServiceUtil.buildFailureResponse("Webhook name already exists.");
+				return PlatformServiceUtil
+						.buildFailureResponse("Something went wrong,while saving the data of webhook.");
+			}
+		} catch (ArrayIndexOutOfBoundsException e) {
+			log.error(e);
+			return PlatformServiceUtil.buildFailureResponse(PlatformServiceConstants.INCORRECT_RESPONSE_TEMPLATE);
+		} catch (InsightsCustomException e) {
+			log.error(e);
+			if (e.getMessage() == PlatformServiceConstants.INCORRECT_RESPONSE_TEMPLATE) {
+				return PlatformServiceUtil.buildFailureResponse(PlatformServiceConstants.INCORRECT_RESPONSE_TEMPLATE);
+			} else if (e.getMessage() == PlatformServiceConstants.WEBHOOK_NAME) {
+				return PlatformServiceUtil.buildFailureResponse(PlatformServiceConstants.WEBHOOK_NAME);
+			}else {
+				return PlatformServiceUtil.buildFailureResponse(e.getMessage());
 			}
 		} catch (Exception e) {
+			log.error(e);
 			return PlatformServiceUtil
 					.buildFailureResponse("Unable to save or update Setting Configuration for the request");
 		}
 	}
 
-	@RequestMapping(value = "/loadwebhookConfiguration", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+	@RequestMapping(value = "/loadwebhookConfiguration", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	public @ResponseBody JsonObject getRegisteredWebHooks() {
-		List<WebHookConfigTO> webhookList;
+		List<WebHookConfig> webhookList;
 		try {
 			webhookList = webhookConfigurationService.getRegisteredWebHooks();
-			// log.debug(webhookList);
 		} catch (InsightsCustomException e) {
-			return PlatformServiceUtil.buildFailureResponse(e.toString());
+			log.error(e);
+			return PlatformServiceUtil.buildFailureResponse(e.getMessage());
 		}
 		return PlatformServiceUtil.buildSuccessResponseWithData(webhookList);
 	}
 
-	@RequestMapping(value = "/uninstallWebHook", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+	@RequestMapping(value = "/uninstallWebHook", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	public @ResponseBody JsonObject uninstallWebhook(@RequestParam String webhookname) {
 		String message = null;
 		try {
 			message = webhookConfigurationService.uninstallWebhook(webhookname);
+			return PlatformServiceUtil.buildSuccessResponseWithData(message);
 		} catch (InsightsCustomException e) {
-			return PlatformServiceUtil.buildFailureResponse(e.toString());
+			log.error(e);
+			return PlatformServiceUtil.buildFailureResponse(e.getMessage());
 		}
-		return PlatformServiceUtil.buildSuccessResponseWithData(message);
+
 	}
 
-	@RequestMapping(value = "/updateWebhook", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+	@RequestMapping(value = "/updateWebhook", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	public @ResponseBody JsonObject updateWebhook(@RequestBody String registerWebhookJson) {
 		try {
 			String validatedResponse = ValidationUtils.validateRequestBody(registerWebhookJson);
@@ -109,15 +126,34 @@ public class WebHookController {
 			String mqchannel = registerWebhookjson.get("mqchannel").getAsString();
 			String responseTemplate = registerWebhookjson.get("responseTemplate").getAsString();
 			Boolean statussubscribe = registerWebhookjson.get("statussubscribe").getAsBoolean();
-
+			JsonArray derivedOperations = registerWebhookjson.get("derivedOperations").getAsJsonArray();
 			Boolean result = webhookConfigurationService.updateWebHook(webhookName, toolName, labelDisplay, dataformat,
-					mqchannel, statussubscribe, responseTemplate);
-			if (result == false) {
-				return PlatformServiceUtil.buildFailureResponse("Update Failed.");
+					mqchannel, statussubscribe, responseTemplate, derivedOperations);
+			if (result) {
+				return PlatformServiceUtil.buildSuccessResponse();
+			} else {
+				return PlatformServiceUtil.buildFailureResponse("Something went wrong,while saving the data.");
 			}
-		} catch (InsightsCustomException e) {
-			return PlatformServiceUtil.buildFailureResponse(e.toString());
+		} catch (Exception e) {
+			log.error(e);
+			return PlatformServiceUtil.buildFailureResponse(e.getMessage());
 		}
-		return PlatformServiceUtil.buildSuccessResponse();
+
+	}
+
+	@RequestMapping(value = "/updateWebhookStatus", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	public @ResponseBody JsonObject updateWebhookStatus(@RequestBody String updateWebhookJson) {
+		String message = null;
+		try {
+			String validatedResponse = ValidationUtils.validateRequestBody(updateWebhookJson);
+			JsonParser parser = new JsonParser();
+			JsonObject updateWebhookJsonValidated = (JsonObject) parser.parse(validatedResponse);
+			message = webhookConfigurationService.updateWebhookStatus(updateWebhookJsonValidated);
+			log.debug(" Responce in updateWebhookStatus " + message);
+			return PlatformServiceUtil.buildSuccessResponse();
+		} catch (InsightsCustomException e) {
+			log.error(e);
+			return PlatformServiceUtil.buildFailureResponse(e.getMessage());
+		}
 	}
 }

@@ -6,4 +6,4 @@
       <class name="com.cognizant.devops.engines.platformengine.test.engine.EngineAggregatorCorelationModuleTest"/>
     </classes>
   </test>
-</suite> <!-- EngineSuite -->
+</suite>

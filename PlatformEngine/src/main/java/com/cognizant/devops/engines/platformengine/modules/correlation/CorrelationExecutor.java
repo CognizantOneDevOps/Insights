@@ -38,6 +38,7 @@ import com.cognizant.devops.platformcommons.dal.neo4j.GraphResponse;
 import com.cognizant.devops.platformcommons.dal.neo4j.Neo4jDBHandler;
 import com.cognizant.devops.platformdal.correlationConfig.CorrelationConfigDAL;
 import com.cognizant.devops.platformdal.correlationConfig.CorrelationConfiguration;
+import com.cognizant.devops.platformdal.relationshipconfig.RelationshipConfiguration;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -52,16 +53,13 @@ public class CorrelationExecutor {
 	private long lastCorrelationTime;
 	private long currentCorrelationTime;
 	private int dataBatchSize;
-
 	/**
 	 * Correlation execution starting point.
 	 */
 	public void execute() {
 		CorrelationConfig correlationConfig = ApplicationConfigProvider.getInstance().getCorrelations();
 		if (correlationConfig != null) {
-			
 			loadCorrelationConfiguration(correlationConfig);
-
 			List<CorrelationConfiguration> correlations = getRelation();
 			if (correlations.isEmpty()) { // No information in DB (CORRELATION_CONFIGURATION table)
 				new DataExtractor().execute();
@@ -74,7 +72,7 @@ public class CorrelationExecutor {
 			}
 			for (CorrelationConfiguration correlation : correlations) {
 				log.debug(" Correlation started for " + correlation.getRelationName());
-				if(correlation.isSelfRelation()) {
+				if (correlation.isSelfRelation()) {
 					continue;
 				}
 				updateNodesMissingCorrelationFields(correlation);
@@ -82,7 +80,7 @@ public class CorrelationExecutor {
 				while (availableRecords > 0) {
 					List<JsonObject> sourceDataList = loadDestinationData(correlation);
 					availableRecords = sourceDataList.size();
-					if (sourceDataList.size() > 0) {
+					if (!sourceDataList.isEmpty()) {
 						executeCorrelations(correlation, sourceDataList);
 					} else {
 						log.debug("No record found for Correlation of " + correlation.getRelationName());
@@ -95,6 +93,8 @@ public class CorrelationExecutor {
 			log.error("Correlation configuration is not provided in server-config.json.");
 		}
 	}
+
+	
 
 	/**
 	 * Update the destination node max time where the correlation fields are
@@ -142,8 +142,9 @@ public class CorrelationExecutor {
 	 * @return
 	 */
 	private List<JsonObject> loadDestinationData(CorrelationConfiguration correlation) {
-		log.debug(" In loadDestinationData, lastCorrelationTime " +lastCorrelationTime +" maxCorrelationTime  "+ maxCorrelationTime +" currentCorrelationTime "+currentCorrelationTime);
-		List<JsonObject> destinationDataList = null;
+		log.debug(" In loadDestinationData, lastCorrelationTime " + lastCorrelationTime + " maxCorrelationTime  "
+				+ maxCorrelationTime + " currentCorrelationTime " + currentCorrelationTime);
+		List<JsonObject> destinationDataList = new ArrayList<>();
 		String destinationLabelName = correlation.getDestinationLabelName();
 		List<String> destinationFields = Arrays.asList(correlation.getDestinationFields().split("\\s*,\\s*"));
 		StringBuffer cypher = new StringBuffer();
@@ -167,12 +168,11 @@ public class CorrelationExecutor {
 			cypher.append(" 	ELSE [] ");
 			cypher.append(" END ");
 		}
-
 		cypher.append("as values WITH destination.uuid as uuid, values UNWIND values as value WITH uuid, ");
 		cypher.append(" CASE ");
-		cypher.append(" 	WHEN (toString(value) contains \",\") THEN split(value, \",\") "); // If the value contains
-																								// comma, the split the
-																								// value
+		cypher.append(" 	WHEN (toString(value) contains \",\") THEN split(value, \",\") ");// If the value contains
+		// comma, the split the
+		// value
 		cypher.append(" 	ELSE value ");
 		cypher.append(" END as values ");
 		cypher.append("UNWIND values as value WITH uuid, value where value <> \"\" ");
@@ -185,7 +185,7 @@ public class CorrelationExecutor {
 			GraphResponse response = dbHandler.executeCypherQuery(cypher.toString());
 			JsonArray rows = response.getJson().get("results").getAsJsonArray().get(0).getAsJsonObject().get("data")
 					.getAsJsonArray().get(0).getAsJsonObject().get("row").getAsJsonArray();
-			destinationDataList = new ArrayList<JsonObject>();
+			destinationDataList = new ArrayList<>();
 			if (rows.isJsonNull() || rows.size() == 0 || rows.get(0).getAsJsonArray().size() == 0) {
 				return destinationDataList;
 			}
@@ -206,7 +206,7 @@ public class CorrelationExecutor {
 	 * @param dataList
 	 * @param allowedSourceRelationCount
 	 */
-	private int executeCorrelations(CorrelationConfiguration correlation,  List<JsonObject> dataList) {
+	private int executeCorrelations(CorrelationConfiguration correlation, List<JsonObject> dataList) {
 		StringBuffer correlationCypher = new StringBuffer();
 		String sourceField = correlation.getSourceFields(); // currently, we will support only one source field.
 		correlationCypher.append("UNWIND {props} as properties ");
@@ -216,9 +216,15 @@ public class CorrelationExecutor {
 		correlationCypher.append("destination.maxCorrelationTime=coalesce(destination.maxCorrelationTime, ")
 				.append(maxCorrelationTime).append(") WITH destination, properties ");
 		correlationCypher.append("MATCH (source:DATA:").append(correlation.getSourceLabelName()).append(") ");
-		correlationCypher.append("WHERE source.").append(sourceField).append(" IN properties.values ");
+		correlationCypher.append("WHERE source.").append(sourceField).append(" IN properties.values ")
+				.append("with source , destination ");
 		correlationCypher.append("CREATE UNIQUE (source) -[r:").append(correlation.getRelationName())
 				.append("]-> (destination) ");
+
+		String propertyVal = appendRelationshipProperties(correlation);
+		if (!propertyVal.isEmpty()) {
+			correlationCypher.append("set ").append(propertyVal).append(" ");
+		}
 		correlationCypher.append("RETURN count(distinct destination) as count");
 		log.debug("CorrelationExecution Started   " + correlationCypher);
 		Neo4jDBHandler dbHandler = new Neo4jDBHandler();
@@ -226,8 +232,7 @@ public class CorrelationExecutor {
 		int processedRecords = 0;
 		try {
 			long st = System.currentTimeMillis();
-			correlationExecutionResponse = dbHandler.bulkCreateNodes(dataList, null,
-					correlationCypher.toString());
+			correlationExecutionResponse = dbHandler.bulkCreateNodes(dataList, null, correlationCypher.toString());
 			log.debug(correlationExecutionResponse);
 			processedRecords = correlationExecutionResponse.get("response").getAsJsonObject().get("results")
 					.getAsJsonArray().get(0).getAsJsonObject().get("data").getAsJsonArray().get(0).getAsJsonObject()
@@ -243,7 +248,35 @@ public class CorrelationExecutor {
 		}
 		return processedRecords;
 	}
+	private String appendRelationshipProperties(CorrelationConfiguration configuration) {
 
+		StringBuilder propertyValueBuilder = new StringBuilder();
+		List<RelationshipConfiguration> allRelationshipConfigList = new ArrayList<>(
+				configuration.getRelationshipConfig());
+		for (RelationshipConfiguration rc : allRelationshipConfigList) {
+			String operationName = rc.getOperation();
+			if (operationName.equals("DIFF")) {
+				String propValue = RelationshipPropertiesUtil.calDiff(rc.getOperationjson());
+				propValue = "r." + rc.getFieldValue() + "=" + propValue;
+				if (!propertyValueBuilder.toString().isEmpty()) {
+					propertyValueBuilder.append(",").append(propValue);
+				} else {
+					propertyValueBuilder.append(propValue);
+				}
+			}
+			if (operationName.equals("SUM")) {
+				String propValue = RelationshipPropertiesUtil.calSUM(rc.getOperationjson());
+				propValue = "r." + rc.getFieldValue() + "=" + propValue;
+				if (!propertyValueBuilder.toString().isEmpty()) {
+					propertyValueBuilder.append(",").append(propValue);
+				} else {
+					propertyValueBuilder.append(propValue);
+				}
+			}
+		}
+		return propertyValueBuilder.toString();
+	}
+	
 	private int removeRawLabel(CorrelationConfiguration destination) {
 		StringBuffer correlationCypher = new StringBuffer();
 		correlationCypher.append("MATCH (destination:DATA:RAW:").append(destination.getDestinationLabelName())
@@ -338,7 +371,7 @@ public class CorrelationExecutor {
 
 	private List<CorrelationConfiguration> getRelation() {
 		CorrelationConfigDAL correlationConfigDAL = new CorrelationConfigDAL();
-		List<CorrelationConfiguration> correlationList = new ArrayList<CorrelationConfiguration>();
+		List<CorrelationConfiguration> correlationList = new ArrayList<>();
 		try {
 			correlationList = correlationConfigDAL.getActiveCorrelations();
 		} catch (Exception e) {

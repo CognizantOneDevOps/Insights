@@ -183,6 +183,11 @@ tr.mat-footer-row, tr.mat-row-webhook {
     color:  #544646
 }
 
+.subText{
+    font-size: 14px;
+    color:  #050505
+}
+
 .infoText{
     font-size: 13px;
     color: #FF8F1C;
@@ -254,5 +259,24 @@ td.mat-cell{
     color:#ff0000;
 }
 
+.enrichDataInputFields{
+    margin-bottom : 2%;
+    width: 59% ;
+    margin-left: 35% ;
+    margin-top: -8% ;
+}
 
+.divDataLabels{
+    margin-top: 4% ;
+    padding-left: 2%;
+}
+
+.containerDiv{
+    margin-top:3%;
+    width: 85%;
+    border: solid;
+    border-width: thin;
+    padding-bottom: 2%;
+    margin-bottom: 2%;
+}
 

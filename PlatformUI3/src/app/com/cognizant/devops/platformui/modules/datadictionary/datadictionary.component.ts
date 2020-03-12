@@ -16,6 +16,12 @@
 import { Component, OnInit } from '@angular/core';
 import { DataDictionaryService } from '@insights/app/modules/datadictionary/datadictionary.service';
 import { DataSharedService } from '@insights/common/data-shared-service';
+import { ShowJsonDialog } from '@insights/app/modules/relationship-builder/show-correlationjson';
+import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
+import { RelationshipBuilderService } from '@insights/app/modules/relationship-builder/relationship-builder.service';
+import { RelationLabel } from '@insights/app/modules/relationship-builder/relationship-builder.label';
+
+
 
 
 @Component({
@@ -63,13 +69,46 @@ export class DatadictionaryComponent implements OnInit {
   selectedDestinationTool: any;
   selectedDestinationLabel: any;
   labelListDatasourceSelected: any = [];
-
   
-  constructor(private dataDictionaryService: DataDictionaryService, private dataShare: DataSharedService) { 
+  element: any = undefined;
+  relationmappingLabels: RelationLabel[] = [];
+  neo4jRelationMappingLabels: RelationLabel[] = [];
+  corelationResponseMaster = [];
+  dataComponentColumns = [];
+  flag: boolean = false;
+  isSelfRelation: boolean = false;
+ 
+  
+
+  constructor(private dataDictionaryService: DataDictionaryService, private relationshipBuilderService: RelationshipBuilderService,private dataShare: DataSharedService,private dialog: MatDialog) { 
     this.dataDictionaryInfo();
+    this.getCorrelationProperties();
   }
 
   ngOnInit() {
+  }
+
+  /*  This method will get all the correlations present in Postgres */
+  async  getCorrelationProperties() {
+    try {
+      this.corelationResponseMaster = [];
+      let correlationresponse = await this.relationshipBuilderService.loadUiServiceLocation()
+      if (correlationresponse.status == "success") {
+        this.corelationResponseMaster = correlationresponse.data;
+        this.relationmappingLabels = [];
+      }
+      for (var element of this.corelationResponseMaster) {
+        var destinationToolName = (element.destinationLabelName);
+        var sourceToolName = (element.sourceLabelName);
+        var flag = (element.enableCorrelation);
+        //var detailProp = '<b>' + element.sourceToolName + '</b>:' + element.sourceFields + ':<b>' + element.destinationToolName + '</b>:' + element.destinationFields;
+        let relationLabel = new RelationLabel(destinationToolName, sourceToolName, element.relationName, element.sourceFields, element.destinationFields, element.relationship_properties, flag, element.isSelfRelation);
+        this.relationmappingLabels.push(relationLabel);
+      }
+    }
+    catch (error) {
+      console.log(error);
+    }
   }
   
   async dataDictionaryInfo() {
@@ -218,31 +257,34 @@ export class DatadictionaryComponent implements OnInit {
     }
     )
   }
-  async getCorrelation(data1,data2){
+
+
+  /*  This method will get correlation details between selected tools from neo4j */
+ async getCorrelation(data1,data2){
     try{
       this.showDetail3=false;
       this.noShowDetailCorr=false;
       this.clicked=true;
       this.buttonOn=true;
       this.showNoToolsSelectedForCorrelation=true
-      //console.log(data1,data2);
+      this.neo4jRelationMappingLabels = [];
       let usersResponseData3 = await this.dataDictionaryService.loadToolsRelationshipAndProperties(data1.labelName,data1.categoryName,data2.labelName,data2.categoryName);
-      if (usersResponseData3.data != undefined && usersResponseData3.status == "success") {
-        //console.log(usersResponseData3)
-        if (usersResponseData3.data["relationName"] != undefined){
-          this.showDetail3 = true;
-          this.noShowDetailCorr=false;
-          this.corrprop=usersResponseData3.data["relationName"];
-          //console.log(Object.keys(usersResponseData3.data["properties"]).length);
-          if (usersResponseData3.data["properties"] != undefined && Object.keys(usersResponseData3.data["properties"]).length > 0){
-            this.relationPropertiesSize=true;
-            this.corrData=usersResponseData3.data["properties"];
-          }else{
-            this.relationPropertiesSize=false;
-          }
+      if (usersResponseData3.data != undefined && usersResponseData3.data.length > 0) {
+        let relationsArray = usersResponseData3.data;
+        for(var relation of relationsArray) {
+            this.showDetail3 = true;
+            this.noShowDetailCorr=false;
+            this.corrprop=relation.relationName;
+            var destinationToolName = data2.labelName;
+            var sourceToolName = data1.labelName;
+            var flag = true;
+            let relationLabel = new RelationLabel(destinationToolName, sourceToolName, this.corrprop, null, null, null, flag, false);
+            this.neo4jRelationMappingLabels.push(relationLabel);        
+        }  
+        this.dataComponentColumns = ['relationName'];
         
         } 
-      }else{
+      else{
         this.noShowDetailCorr=true;
         this.showDetail3=false;
       }
@@ -252,22 +294,38 @@ export class DatadictionaryComponent implements OnInit {
 
   }
 
-  /* showDetailsofCorrelation(selectedRelation) {
-    var isSessionExpired = this.dataShare.validateSession();
-    if (!isSessionExpired) {
-      let showJsonDialog = this.dialog.open(ShowJsonDialog, {
-        panelClass: 'showrelationship-dialog-container',
-        height: '500px',
-        width: '700px',
-        disableClose: true,
-        data:
-        {
-          message: selectedRelation,
-          title: "Relationship Details"
-        }
-
-      });
+  /* This method will check whether the correlation exists in Postgres. */
+  checkIfRelationExistsInPostGres(selectedRelation) {
+    for(var relation of this.relationmappingLabels) {
+      if (relation.relationName == selectedRelation.relationName) {
+          return relation;
+          
+      }         
     }
-  } */
+    return selectedRelation;
+  }
+
+  
+
+  showDetailsofCorrelation(selectedRelation) {
+    selectedRelation = this.checkIfRelationExistsInPostGres(selectedRelation);
+    if (selectedRelation != undefined) {
+      var isSessionExpired = this.dataShare.validateSession();
+      if (!isSessionExpired) {
+        let showJsonDialog = this.dialog.open(ShowJsonDialog, {
+          panelClass: 'showrelationship-dialog-container',
+          height: '500px',
+          width: '700px',
+          disableClose: true,
+          data:
+          {
+            message: selectedRelation,
+            title: "Relationship Details"
+          }
+        });
+      }
+    }
+  }
+
 
 }

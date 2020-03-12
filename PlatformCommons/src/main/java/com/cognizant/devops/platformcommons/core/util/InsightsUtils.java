@@ -1,18 +1,18 @@
 /*******************************************************************************
- * Copyright 2017 Cognizant Technology Solutions
- * 
+* Copyright 2017 Cognizant Technology Solutions
+* 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
- * use this file except in compliance with the License.  You may obtain a copy
- * of the License at
- * 
+* use this file except in compliance with the License.  You may obtain a copy
+* of the License at
+* 
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+* 
  * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
- * License for the specific language governing permissions and limitations under
- * the License.
- ******************************************************************************/
+* distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+* WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+* License for the specific language governing permissions and limitations under
+* the License.
+******************************************************************************/
 package com.cognizant.devops.platformcommons.core.util;
 
 import java.time.DayOfWeek;
@@ -32,11 +32,12 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.core.enums.JobSchedule;
-
+import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 
 public class InsightsUtils {
 
 	static Logger log = LogManager.getLogger(InsightsUtils.class.getName());
+
 	private InsightsUtils() {
 	}
 
@@ -357,11 +358,22 @@ public class InsightsUtils {
 		DateTimeFormatter dtf = DateTimeFormatter.ofPattern(formatPattern);
 		return dtf.format(now);
 	}
-	
+
 	public static String getUtcTime(String timezone) {
-		SimpleDateFormat  dtf = new SimpleDateFormat(DATE_TIME_FORMAT);
+		SimpleDateFormat dtf = new SimpleDateFormat(DATE_TIME_FORMAT);
 		dtf.setTimeZone(TimeZone.getTimeZone(timezone));
-		return  dtf.format(new Date());
+		return dtf.format(new Date());
+	}
+	
+	public static String insightsTimeXFormat(long inputTime) {
+		SimpleDateFormat format = new SimpleDateFormat(DATE_TIME_FORMAT);
+		int length = String.valueOf(inputTime).length();
+		if (length == 10) {
+			inputTime = TimeUnit.SECONDS.toMillis(inputTime);
+		}
+		Date date = new Date(inputTime);
+		String formatted = format.format(date);
+		return formatted;
 	}
 
 	/**
@@ -395,13 +407,22 @@ public class InsightsUtils {
 		Duration d = Duration.between(lastRunTimeInput, nextRunTimeInput);
 		return d.abs().toMillis();
 	}
-	
+
 	public static long getEpochTime(String datetime) {
 
+		return calculateEpochTime(datetime);
+	}
+
+	public static long getEpochTime(String datetime, String dateFormat) throws InsightsCustomException {
+
+		return convertToEpoch(datetime,dateFormat);
+	}
+
+	private static long calculateEpochTime(String datetime) {
 		SimpleDateFormat sdf = new SimpleDateFormat(DATE_TIME_FORMAT);
 		Date dt;
 		try {
-			dt = sdf.parse(datetime);			
+			dt = sdf.parse(datetime);
 			return dt.getTime();
 
 		} catch (ParseException e) {
@@ -409,9 +430,27 @@ public class InsightsUtils {
 			return 0;
 		}
 	}
+
+	
+	
+
+	private static long convertToEpoch(String datetime, String dateFormat) throws InsightsCustomException {
+
+		try {
+			SimpleDateFormat sdf = new SimpleDateFormat(dateFormat);
+			Date dt = sdf.parse(datetime);
+			return dt.getTime();
+		} catch (ParseException e) {
+			log.error(e.getMessage());
+			throw new InsightsCustomException(e.getMessage());
+		} catch (IllegalArgumentException e) {
+			log.error(e.getMessage());
+			throw new InsightsCustomException(e.getMessage());
+		}
+	}
+	
 	
 	public static String getDateTimeFromEpoch(long milliseconds) {
-
 		String duration;
 		long days = TimeUnit.DAYS.convert(milliseconds, TimeUnit.MILLISECONDS);
 		long yrs = 0;
@@ -430,9 +469,15 @@ public class InsightsUtils {
 			month = days / 30;
 			days = days - (month * 30);
 			duration = month + "Month(s) " + days + " Days ";
-		} else {
+		
+		}
+		else if (days<=1)
+		{
+			duration = "1 Day ";
+		}
+		else {
 			duration = days + " Days ";
-		} 
+		}
 		return duration;
 	}
 }

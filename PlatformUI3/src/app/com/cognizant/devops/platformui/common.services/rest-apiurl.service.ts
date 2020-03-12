@@ -74,8 +74,8 @@ export class RestAPIurlService implements IRestAPIUrlService {
         this.addEndPoint("UPLOAD_IMAGE", '/PlatformService/admin/settings/uploadCustomLogo');
         this.addEndPoint("GET_LOGO_IMAGE", '/PlatformService/settings/getLogoImage');
 
-        this.addEndPoint("SAVE_DATAPURGING_SETTING", '/PlatformService/admin/settings/saveSettingsConfiguration');
-        this.addEndPoint("LIST_DATAPURGING_SETTING", '/PlatformService/admin/settings/loadSettingsConfiguration');
+        //this.addEndPoint("SAVE_DATAPURGING_SETTING", '/PlatformService/admin/settings/saveSettingsConfiguration');
+        //this.addEndPoint("LIST_DATAPURGING_SETTING", '/PlatformService/admin/settings/loadSettingsConfiguration');
 
         //Agent Configuration
         this.addEndPoint("AGENT_REGISTER", '/PlatformService/admin/agentConfiguration/registerAgent');
@@ -129,6 +129,7 @@ export class RestAPIurlService implements IRestAPIUrlService {
         this.addEndPoint("LIST_WEBHOOK", '/PlatformService/admin/webhook/loadwebhookConfiguration');
         this.addEndPoint("DELETE_WEBHOOK", '/PlatformService/admin/webhook/uninstallWebHook');
         this.addEndPoint("UPDATE_WEBHOOK", '/PlatformService/admin/webhook/updateWebhook');
+        this.addEndPoint("UPDATE_WEBHOOK_STATUS", '/PlatformService/admin/webhook/updateWebhookStatus');
 
         //SSO API
         this.addEndPoint("SSO_URL", '/PlatformService/saml/login');

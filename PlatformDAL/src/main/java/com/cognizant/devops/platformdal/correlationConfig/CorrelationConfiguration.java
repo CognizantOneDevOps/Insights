@@ -15,20 +15,35 @@
  ******************************************************************************/
 package com.cognizant.devops.platformdal.correlationConfig;
 
+import java.util.Set;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import com.cognizant.devops.platformdal.relationshipconfig.RelationshipConfiguration;
 
 @Entity
 @Table(name = "\"INSIGHTS_CORRELATION_CONFIGURATIONS\"")
 public class CorrelationConfiguration {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
 	@Id
 	@Column(name = "ID", unique = true, nullable = false)
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private int id;
+	
+	@OneToMany(cascade=CascadeType.ALL ,fetch=FetchType.EAGER)
+    @JoinColumn(name="RELATIONSHIP_ID")
+    private Set<RelationshipConfiguration> relationshipConfig;
 
 	@Column(name = "DESTINATION_TOOLNAME")
 	private String destinationToolName;
@@ -169,4 +184,14 @@ public class CorrelationConfiguration {
 	public void setSelfRelation(boolean isSelfRelation) {
 		this.isSelfRelation = isSelfRelation;
 	}
+
+	public Set<RelationshipConfiguration> getRelationshipConfig() {
+		return relationshipConfig;
+	}
+
+	public void setRelationshipConfig(Set<RelationshipConfiguration> relationshipConfig) {
+		this.relationshipConfig = relationshipConfig;
+	}
+
+
 }

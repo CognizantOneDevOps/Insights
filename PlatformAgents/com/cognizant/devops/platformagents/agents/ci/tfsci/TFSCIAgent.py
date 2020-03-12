@@ -14,53 +14,53 @@
 # the License.
 #-------------------------------------------------------------------------------
 '''
-Created on 12 April 2017
+Created on 06 February 2020
 
-@author: 446620
+@author: 668284
 '''
-from ....core.BaseAgent3 import BaseAgent
-import json
+from ....core.BaseAgent import BaseAgent
 
-class CITFSAgent(BaseAgent):
+class TFSCIAgent(BaseAgent):
     def process(self):
         BaseUrl = self.config.get("baseUrl", '')
         UserID = self.getCredential("userid")
         Passwd = self.getCredential("passwd")
         Auth = self.config.get("auth", '')
-        getCollectionsUrl = BaseUrl+"/_apis/projectcollections"
-        collections = self.getResponse(getCollectionsUrl, 'GET', UserID, Passwd, None, authType=Auth)
-        #print(collections)
+        getCollectionsUrl = BaseUrl+"/_apis/_commom/GetJumpList?showTeamsOnly=false&__v=5&navigationContextPackage={}&showStoppedCollections=false"
+        collectionResponse = self.getResponse(getCollectionsUrl, 'GET', UserID, Passwd, None, authType=Auth)
+        collections = collectionResponse.get("__wrappedArray")
         responseTemplate = self.getResponseTemplate()
         data = []
-        colCount = collections["count"]
+        colCount = len(collections)
         for collection in range(colCount):            
-            collectionName = collections["value"][collection]["name"]
-            getProjectsUrl = BaseUrl + "/" +collectionName+"/_apis/projects/"
+            collectionName = collections[collection]["name"]
+            getProjectsUrl = BaseUrl + "/" + collectionName +"/_apis/projects?api-version=4.1"
             projects = self.getResponse(getProjectsUrl, 'GET', UserID, Passwd, None, authType=Auth)
-            #print(projects)
             projCount = projects["count"]
             for project in range(projCount):
                 injectData = {}                
                 projectName = projects["value"][project]["name"]
                 injectData['collectionName'] = collectionName
                 injectData['projectName'] = projectName
-                #print(collectionName + "/" + projectName)
-                getBuildsUrl = BaseUrl + "/" + collectionName + "/" + projectName + "/_apis/build/builds"
-                #print(getBuildsUrl)
+                newProject = False
+                if not self.tracking.get(collectionName + "/" + projectName, None):
+                    getBuildsUrl = BaseUrl + "/" + collectionName + "/" + projectName + "/_apis/build/builds"\
+                    "?queryOrder=finishTimeAscending&$top=100&api-version=4.1"
+                    newProject = True
+                else:
+                    lastBuildTime = self.tracking.get(collectionName + "/" + projectName, None)
+                    getBuildsUrl = BaseUrl + "/" + collectionName + "/" + projectName + "/_apis/build/builds"\
+                    "?queryOrder=finishTimeAscending&minTime=" + str(lastBuildTime) + "&$top=100&api-version=4.1"
                 builds = self.getResponse(getBuildsUrl, 'GET', UserID, Passwd, None, authType=Auth)
-                #print(builds)
                 bCount = builds["count"]
-                #print(bCount)
+                if not newProject and bCount > 0:
+                    builds["value"].pop(0);
+                    bCount = bCount - 1
                 for build in range(bCount):
                     buildDetail = builds["value"][build]
-                    #print(buildDetail)
                     data += self.parseResponse(responseTemplate, buildDetail, injectData)
-                    #getBuildDetailsUrl = BaseUrl + "/" +collectionName + "/" + projectName + "/_apis/build/builds/" + str(changesets["value"][build]["id"])
-                    #buildDetails = self.getResponse(getBuildDetailsUrl, 'GET', UserID, Passwd, None, authType=Auth)
-                    #print(buildDetails)
-                #self.tracking[collectionName + "/" + projectName] = builds["value"][0]["changesetId"]
-        #print(data)
+                    self.tracking[collectionName + "/" + projectName] = builds["value"][build]["finishTime"]
         self.publishToolsData(data)
-        #self.updateTrackingJson(self.tracking)
+        self.updateTrackingJson(self.tracking)
 if __name__ == "__main__":
-    CITFSAgent()
+    TFSCIAgent()

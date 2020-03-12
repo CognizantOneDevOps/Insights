@@ -74,16 +74,32 @@ public class AuthenticationUtils {
 	
 	public static String getHost(HttpServletRequest httpRequest) {
 		URL url;
+		String urlString;
+		String hostInfo = null;
 		try {
 			if(httpRequest == null) {
 				url = new URL(ApplicationConfigProvider.getInstance().getInsightsServiceURL());
 			}else {
-				String urlString = httpRequest.getHeader(HttpHeaders.ORIGIN)==null ? httpRequest.getHeader(HttpHeaders.REFERER) : httpRequest.getHeader(HttpHeaders.ORIGIN) ;
-				url = new URL(urlString);
+				urlString = httpRequest.getHeader(HttpHeaders.ORIGIN) == null
+						? httpRequest.getHeader(HttpHeaders.REFERER)
+						: httpRequest.getHeader(HttpHeaders.ORIGIN);
+				if (urlString == null) {
+					urlString = httpRequest.getHeader(HttpHeaders.HOST);
+					hostInfo = urlString;
+					if (urlString.contains(":")) {
+						int index = urlString.indexOf(":");
+						hostInfo = urlString.substring(0, index);
+					}
+				} else {
+					url = new URL(urlString);
+					hostInfo = url.getHost();
+				}
 			}
-			return url.getHost();
+			Log.debug("host information " + hostInfo);
+			return hostInfo;
 		} catch (MalformedURLException e) {
 			Log.error("Unable to retrive host information ");
+			Log.error(e);
 			return null;
 		}
 	}

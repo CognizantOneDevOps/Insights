@@ -210,8 +210,10 @@ mat-dialog-content::-webkit-scrollbar-track {
 
 .closeIconCss {
 	padding-right: 30px;
-	padding-top: 10px;
 	color: white;
+	margin-top: auto;
+	margin-bottom: auto;
+	vertical-align: middle;
 }
 
 .showDialogHeadingCss {

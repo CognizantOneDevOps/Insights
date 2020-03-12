@@ -19,7 +19,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.cognizant.devops</groupId>
 	<artifactId>PlatformMockServer</artifactId>
-	<version>6.4</version>
+	<version>6.5</version>
 	<packaging>jar</packaging>
 	<name>PlatformMockServer</name>
 	<url>http://maven.apache.org</url>

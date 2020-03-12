@@ -361,15 +361,20 @@ mat-dialog-content::-webkit-scrollbar-track {
     margin-right: 30px;
     margin-left: 6px;
     text-align: center;
-    padding-top: 15px;
+    margin-top: auto;
+	margin-bottom: auto;
+	vertical-align: middle;
 }
 
 .closeIconCss {
     padding-right: 17px;
     text-align: center;
-    padding-top: 18px;
     color: white !important;
-}
+    margin-top: auto;
+	margin-bottom: auto;
+    vertical-align: middle;
+    width: 20%;
+} 
 
 .headerTimelag {
     word-wrap: initial;

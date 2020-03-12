@@ -39,8 +39,8 @@ class BaseAgent(object):
             self.shouldAgentRun = True;
             self.setupAgent()
         except Exception as ex:
-            self.publishHealthData(self.generateHealthData(ex=ex))
             logging.error(ex)
+            self.publishHealthData(self.generateHealthData(ex=ex))
             self.logIndicator(self.SETUP_ERROR, self.config.get('isDebugAllowed', False))
 
     def setupAgent(self):
@@ -65,7 +65,8 @@ class BaseAgent(object):
             VaultCredentials = self.loadVaultCredentials()
             self.vaultJson = VaultCredentials.json()
             if "errors" in self.vaultJson:
-                raise ValueError('BaseAgent: unable to fetchCredentials')
+                self.publishHealthData(self.generateHealthData(systemFailure=True,note="BaseAgent: unable to fetchCredentials from vault"))
+                raise ValueError('BaseAgent: unable to fetchCredentials from vault')
     
     def getCredential(self,key):
         if self.vaultFlag:
@@ -82,7 +83,8 @@ class BaseAgent(object):
         agentCredential = requests.get(vaultUrl+secretEngine+"/data/"+agentId, auth=None, headers=reqHeaders, data=None,proxies=None, verify=None)
         # agentCredential=os.popen("curl -X GET -H 'X-Vault-Token: "+readTokenValue+"\'"+" -s "+vaultUrl+secretEngine+"/data/"+agentId).read()
         if "errors" in agentCredential:
-            raise ValueError('BaseAgent: unable to load Vault Credentials')
+            self.publishHealthData(self.generateHealthData(systemFailure=True,note="BaseAgent: unable to load Vault Credentials"))
+            raise ValueError(' BaseAgent: unable to load Vault Credentials ')
         return agentCredential
         
     
@@ -124,6 +126,7 @@ class BaseAgent(object):
         formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(filename)s - %(lineno)s - %(funcName)s - %(message)s')
         handler.setFormatter(formatter)
         logging.getLogger().setLevel(loggingSetting.get('logLevel',logging.WARN))
+        logging.getLogger("pika").setLevel(logging.WARNING)
         logging.getLogger().addHandler(handler)
     
     def setupLocalCache(self):
@@ -198,12 +201,14 @@ class BaseAgent(object):
     def subscriberForAgentControl(self):
         routingKey = self.config.get('subscribe').get('agentCtrlQueue')
         def callback(ch, method, properties, data):
+            logging.debug("Data received in subscriberForAgentControl .... ")
+            logging.debug(data)
             #Update the config file and cache.
             action = data
-            if "STOP" == action:
+            if "STOP" == action.decode():
                 self.shouldAgentRun = False
-                self.publishHealthData(self.generateHealthData(note="Agent is in STOP mode"))
             ch.basic_ack(delivery_tag = method.delivery_tag)
+            logging.debug(self.shouldAgentRun)
         self.agentCtrlMessageFactory.subscribe(routingKey, callback)
            
     '''
@@ -406,26 +411,27 @@ class BaseAgent(object):
             self.executionId = str(uuid.uuid1())
             self.process()
             self.executeAgentExtensions()
-            self.publishHealthData(self.generateHealthData())
-            
+            self.publishHealthData(self.generateHealthData(note="Agent started successfully "))
         except Exception as ex:
             self.publishHealthDataForExceptions(ex)
         finally:
             '''If agent receive the STOP command, Python program should exit gracefully after current data collection is complete.  '''
             if self.shouldAgentRun == False:
-                os._exit(0)
-        
-    
+                logging.debug('executing agent stop and publish health message health message  ....   ')
+                try:
+                    self.publishHealthData(self.generateHealthData(note="Agent is in STOP mode"))
+                    os._exit(0)
+                except Exception as ex:
+                    logging.error(ex)
+
     '''
         This method publishes health node for an exception and 
         Writes exception inside log file of corresponding Agent 
     '''
     def publishHealthDataForExceptions(self, ex):
-        self.publishHealthData(self.generateHealthData(ex=ex))
         logging.error(ex)
+        self.publishHealthData(self.generateHealthData(ex=ex))
         self.logIndicator(self.EXECUTION_ERROR, self.config.get('isDebugAllowed', False))
-    
-    
     
     def executeAgentExtensions(self):
         if hasattr(self, 'extensions'):
