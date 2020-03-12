@@ -52,13 +52,13 @@ public class InsightsGeneralParserTest extends InsightsParserTestData {
 	public void testGetToolDetailJsonWithExceptions() throws InsightsCustomException {
 		List<JsonObject> response = generalparser.parseToolData(testdata.responseTemplate, incorrectToolData,
 				testdata.toolName, testdata.labelName, "",testdata.getSetObject());
+		Assert.assertFalse(response.isEmpty());
 	}
 
 	@Test(priority = 3)
 	public void testUnmatchedResponseTemplate() throws InsightsCustomException {
 		List<JsonObject> nullresponse = generalparser.parseToolData(testdata.fieldNotFoundinToolData, testdata.toolData,
 				testdata.toolName, testdata.labelName, testdata.webhookName,testdata.getSetObject());
-		System.out.print(nullresponse.toString());
 		String responseTest = nullresponse.toString();
 		responseTest = responseTest.substring(1, responseTest.length() - 1); // remove curly brackets
 		Assert.assertEquals(responseTest, "");
