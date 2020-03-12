@@ -28,6 +28,7 @@ import org.apache.logging.log4j.Logger;
 import com.cognizant.devops.engines.util.DataEnrichUtils;
 import com.cognizant.devops.platformcommons.core.enums.DerivedOperations;
 import com.cognizant.devops.platformcommons.core.util.InsightsUtils;
+import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformdal.webhookConfig.WebhookDerivedConfig;
 import com.github.wnameless.json.flattener.JsonFlattener;
 import com.google.gson.Gson;
@@ -41,7 +42,7 @@ public class InsightsGeneralParser implements InsightsWebhookParserInterface {
 
 	@Override
 	public List<JsonObject> parseToolData(String responseTemplate, String toolData, String toolName, String labelName,
-			String webhookName, Set<WebhookDerivedConfig> webhookDerivedConfigs) {
+			String webhookName, Set<WebhookDerivedConfig> webhookDerivedConfigs) throws InsightsCustomException {
 
 		try {
 			String keyMqInitial;
@@ -67,42 +68,47 @@ public class InsightsGeneralParser implements InsightsWebhookParserInterface {
 				Iterator<WebhookDerivedConfig> iterator = webhookDerivedConfigs.iterator();
 				while (iterator.hasNext()) {
 					WebhookDerivedConfig webhookDerivedConfig = iterator.next();
-					String dateFormat = "";
-					String timeFieldValue = "";
-					boolean isEpochTime = false;
-					long epochTime = 0;
-					String dateTimeFromEpoch = "";
-					String operationName = webhookDerivedConfig.getOperationName();
-					JsonObject operationFieldsList = parser.parse(webhookDerivedConfig.getOperationFields())
-							.getAsJsonObject();
-					if (operationName.equalsIgnoreCase(DerivedOperations.INSIGHTSTIMEX.getValue())) {
-						isEpochTime = operationFieldsList.get("epochTime").getAsBoolean();
-						String timeFieldKey = operationFieldsList.get("timeField").getAsString();
-						timeFieldValue = fetchValuefromJson(timeFieldKey, finalJson);
-						if (!isEpochTime) {
-							dateFormat = operationFieldsList.get("timeFormat").getAsString();
-							epochTime = InsightsUtils.getEpochTime(timeFieldValue, dateFormat);
-							finalJson.put("inSightsTime", epochTime);
-							if (dateFormat.equals("yyyy-MM-dd'T'HH:mm:ss'Z'")) {
-								finalJson.put("inSightsTimeX", timeFieldValue);
+					try {
+						String dateFormat = "";
+						String timeFieldValue = "";
+						boolean isEpochTime = false;
+						long epochTime = 0;
+						String dateTimeFromEpoch = "";
+						String operationName = webhookDerivedConfig.getOperationName();
+						JsonObject operationFieldsList = parser.parse(webhookDerivedConfig.getOperationFields())
+								.getAsJsonObject();
+						if (operationName.equalsIgnoreCase(DerivedOperations.INSIGHTSTIMEX.getValue())) {
+							isEpochTime = operationFieldsList.get("epochTime").getAsBoolean();
+							String timeFieldKey = operationFieldsList.get("timeField").getAsString();
+							timeFieldValue = fetchValuefromJson(timeFieldKey, finalJson);
+							if (!isEpochTime) {
+								dateFormat = operationFieldsList.get("timeFormat").getAsString();
+								epochTime = InsightsUtils.getEpochTime(timeFieldValue, dateFormat);
+								finalJson.put("inSightsTime", epochTime);
+								if (dateFormat.equals(InsightsUtils.DATE_TIME_FORMAT)) {
+									finalJson.put("inSightsTimeX", timeFieldValue);
+								} else {
+									dateTimeFromEpoch = InsightsUtils.insightsTimeXFormat(epochTime);
+									finalJson.put("inSightsTimeX", dateTimeFromEpoch);
+								}
 							} else {
-								dateTimeFromEpoch = InsightsUtils.insightsTimeXFormat(epochTime);
+								finalJson.put("inSightsTime", timeFieldValue);
+								dateTimeFromEpoch = InsightsUtils.insightsTimeXFormat(Long.parseLong(timeFieldValue));
 								finalJson.put("inSightsTimeX", dateTimeFromEpoch);
 							}
-
-						} else {
-							finalJson.put("inSightsTime", timeFieldValue);
-							dateTimeFromEpoch = InsightsUtils.insightsTimeXFormat(Long.parseLong(timeFieldValue));
-							finalJson.put("inSightsTimeX", dateTimeFromEpoch);
+						} else if (operationName.equalsIgnoreCase(DerivedOperations.TIMEFIELDMAPPING.getValue())) {
+							String timeFieldKey = operationFieldsList.get("mappingTimeField").getAsString();
+							timeFieldValue = fetchValuefromJson(timeFieldKey, finalJson);
+							dateFormat = operationFieldsList.get("mappingTimeFormat").getAsString();
+							epochTime = InsightsUtils.getEpochTime(timeFieldValue, dateFormat);
+							finalJson.put(timeFieldKey + "_epoch", epochTime);
+						} else if (operationName.equalsIgnoreCase(DerivedOperations.DATAENRICHMENT.getValue())) {
+							processDataEnrichment(operationFieldsList, finalJson);
 						}
-					} else if (operationName.equalsIgnoreCase(DerivedOperations.TIMEFIELDMAPPING.getValue())) {
-						String timeFieldKey = operationFieldsList.get("mappingTimeField").getAsString();
-						timeFieldValue = fetchValuefromJson(timeFieldKey, finalJson);
-						dateFormat = operationFieldsList.get("mappingTimeFormat").getAsString();
-						epochTime = InsightsUtils.getEpochTime(timeFieldValue, dateFormat);
-						finalJson.put(timeFieldKey + "_epoch", epochTime);
-					} else if (operationName.equalsIgnoreCase(DerivedOperations.DATAENRICHMENT.getValue())) {
-						processDataEnrichment(operationFieldsList, finalJson);
+					} catch (Exception e) {
+						LOG.error("Error while Webhook derived operation {} and configuration {} Error is {}",
+								webhookDerivedConfig.getOperationName(), webhookDerivedConfig.getOperationFields(), e);
+						throw new InsightsCustomException(e.getMessage());
 					}
 				}
 
@@ -115,7 +121,7 @@ public class InsightsGeneralParser implements InsightsWebhookParserInterface {
 			return retrunJsonList;
 		} catch (Exception e) {
 			LOG.error(e);
-			throw e;
+			throw new InsightsCustomException(e.getMessage());
 		}
 	}
 
@@ -147,6 +153,7 @@ public class InsightsGeneralParser implements InsightsWebhookParserInterface {
 			}
 		} catch (Exception e) {
 			LOG.error(" Error while processDataEnrichment " + e);
+			throw e;
 		}
 	}
 

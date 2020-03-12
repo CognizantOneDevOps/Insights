@@ -32,6 +32,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.core.enums.JobSchedule;
+import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 
 public class InsightsUtils {
 
@@ -364,9 +365,13 @@ public class InsightsUtils {
 		return dtf.format(new Date());
 	}
 	
-	public static String insightsTimeXFormat(long unix_seconds) {
+	public static String insightsTimeXFormat(long inputTime) {
 		SimpleDateFormat format = new SimpleDateFormat(DATE_TIME_FORMAT);
-		Date date = new Date(unix_seconds);		
+		int length = String.valueOf(inputTime).length();
+		if (length == 10) {
+			inputTime = TimeUnit.SECONDS.toMillis(inputTime);
+		}
+		Date date = new Date(inputTime);
 		String formatted = format.format(date);
 		return formatted;
 	}
@@ -408,7 +413,7 @@ public class InsightsUtils {
 		return calculateEpochTime(datetime);
 	}
 
-	public static long getEpochTime(String datetime, String dateFormat) {
+	public static long getEpochTime(String datetime, String dateFormat) throws InsightsCustomException {
 
 		return convertToEpoch(datetime,dateFormat);
 	}
@@ -429,16 +434,18 @@ public class InsightsUtils {
 	
 	
 
-	private static long convertToEpoch(String datetime, String dateFormat) {
-		SimpleDateFormat sdf = new SimpleDateFormat(dateFormat);
-		Date dt;
-		try {
-			dt = sdf.parse(datetime);
-			return dt.getTime();
+	private static long convertToEpoch(String datetime, String dateFormat) throws InsightsCustomException {
 
+		try {
+			SimpleDateFormat sdf = new SimpleDateFormat(dateFormat);
+			Date dt = sdf.parse(datetime);
+			return dt.getTime();
 		} catch (ParseException e) {
 			log.error(e.getMessage());
-			return 0;
+			throw new InsightsCustomException(e.getMessage());
+		} catch (IllegalArgumentException e) {
+			log.error(e.getMessage());
+			throw new InsightsCustomException(e.getMessage());
 		}
 	}
 	
