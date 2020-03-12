@@ -23,6 +23,7 @@ import org.testng.annotations.AfterTest;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 
+import com.cognizant.devops.platforminsightswebhook.application.AppProperties;
 import com.cognizant.devops.platforminsightswebhook.config.WebHookMessagePublisher;
 
 public class PublishEventTest {
@@ -31,6 +32,11 @@ public class PublishEventTest {
 
 	@BeforeTest
 	public void init() throws Exception {
+		AppProperties.mqHost = "localhost";
+		AppProperties.mqUser = "iSight";
+		AppProperties.mqPassword = "iSight";
+		AppProperties.mqExchangeName = "iSight";
+		AppProperties.instanceName = "testInstance";
 		WebHookMessagePublisher.getInstance().initilizeMq();
 	}
 
