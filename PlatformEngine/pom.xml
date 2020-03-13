@@ -12,14 +12,14 @@
 	<parent>
 		<artifactId>PlatformParent</artifactId>
 		<groupId>com.cognizant.devops</groupId>
-		<version>6.5</version>
+		<version>6.6-SNAPSHOT</version>
 	</parent>
 
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.cognizant.devops</groupId>
 	<artifactId>PlatformEngine</artifactId>
 	<packaging>jar</packaging>
-	<version>6.5</version>
+	<version>6.6-SNAPSHOT</version>
 	<name>PlatformEngine</name>
 	<url>http://maven.apache.org</url>
 	<properties>
@@ -60,7 +60,7 @@
 		<dependency>
 			<groupId>com.cognizant.devops</groupId>
 			<artifactId>PlatformDAL</artifactId>
-			<version>6.5</version>
+			<version>6.6-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>org.hibernate</groupId>
@@ -156,7 +156,7 @@
 		<dependency>
 			<groupId>com.cognizant.devops</groupId>
 			<artifactId>PlatformAuditing</artifactId>
-			<version>6.5</version>
+			<version>6.6-SNAPSHOT</version>
 			<exclusions>
 				<exclusion>
 					<groupId>org.apache.logging.log4j</groupId>
@@ -179,7 +179,7 @@
 		<dependency>
 			<groupId>com.cognizant.devops</groupId>
 			<artifactId>PlatformCommons</artifactId>
-			<version>6.5</version>
+			<version>6.6-SNAPSHOT</version>
 			<exclusions>
 				<exclusion>
 					<groupId>org.apache.logging.log4j</groupId>
