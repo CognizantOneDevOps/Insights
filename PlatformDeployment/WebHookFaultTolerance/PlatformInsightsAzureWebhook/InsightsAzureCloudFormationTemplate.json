@@ -1,0 +1,362 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {},
+    "variables": {
+		"appServicePlanName": "InsightsAppServicePlan",
+		"applicationInsightsName": "InsightsWebhook",
+		"storageAccountName": "insightswebhookstorage",
+		"functionAppName": "InsightsWebhookApp",
+		"website_content": "insightswebhookhandlerfunctioncontent",
+		"apiServiceMgmtName": "InsightsWebhook",
+		"apiPublisherEmail": "Insights@cogdevops.com",
+		"apiPublisherName": "Insights",
+		"api-key": "insightswebhook#cogdevops"
+	},
+    "resources": [
+		{
+            "type": "Microsoft.Web/serverfarms",
+            "apiVersion": "2018-02-01",
+            "name": "[variables('appServicePlanName')]",
+            "location": "[resourceGroup().location]",
+            "sku": {
+                "name": "Y1",
+				"tier": "Dynamic"
+            },
+            "kind": "functionapp",
+            "properties": {
+                "name": "[variables('appServicePlanName')]",
+                "workerSize": "0",
+                "workerSizeId": "0",
+                "numberOfWorkers": "1",
+                "reserved": false
+            }
+        },
+		{
+            "type": "microsoft.insights/components",
+            "apiVersion": "2015-05-01",
+            "name": "[variables('applicationInsightsName')]",
+            "location": "[resourceGroup().location]",
+            "kind": "web",
+            "properties": {
+				"ApplicationId": "[variables('applicationInsightsName')]",
+                "Application_Type": "web",
+				"Flow_Type": "Redfield",
+                "Request_Source": "IbizaWebAppExtensionCreate"
+            }
+        },
+        {
+            "type": "Microsoft.Storage/storageAccounts",
+            "apiVersion": "2019-06-01",
+            "name": "[variables('storageAccountName')]",
+            "location": "[resourceGroup().location]",
+            "sku": {
+                "name": "Standard_RAGRS",
+                "tier": "Standard"
+            },
+            "kind": "StorageV2",
+            "properties": {
+                "supportsHttpsTrafficOnly": true,
+                "accessTier": "Hot"
+            }
+        },
+        {
+            "type": "Microsoft.Storage/storageAccounts/blobServices",
+            "apiVersion": "2019-06-01",
+            "name": "[concat(variables('storageAccountName'), '/default')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName'))]"
+            ],
+            "sku": {
+                "name": "Standard_RAGRS"
+            },
+            "properties": {
+                "cors": {
+                    "corsRules": []
+                },
+                "deleteRetentionPolicy": {
+                    "enabled": false
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Storage/storageAccounts/blobServices/containers",
+            "apiVersion": "2019-06-01",
+            "name": "[concat(variables('storageAccountName'), '/default/insightsfailedwebhookevents')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts/blobServices', variables('storageAccountName'), 'default')]",
+                "[resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName'))]"
+            ],
+            "properties": {
+                "publicAccess": "Container"
+            }
+        },
+        {
+            "type": "Microsoft.Storage/storageAccounts/blobServices/containers",
+            "apiVersion": "2019-06-01",
+            "name": "[concat(variables('storageAccountName'), '/default/insightsfunctionapp')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts/blobServices', variables('storageAccountName'), 'default')]",
+                "[resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName'))]"
+            ],
+            "properties": {
+                "publicAccess": "Container"
+            }
+        },
+        {
+            "type": "Microsoft.Storage/storageAccounts/blobServices/containers",
+            "apiVersion": "2019-06-01",
+            "name": "[concat(variables('storageAccountName'), '/default/insightswebhookevents')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts/blobServices', variables('storageAccountName'), 'default')]",
+                "[resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName'))]"
+            ],
+            "properties": {
+                "publicAccess": "Container"
+            }
+        },
+		{
+            "type": "Microsoft.Web/sites",
+            "apiVersion": "2018-11-01",
+            "name": "[variables('functionAppName')]",
+            "location": "[resourceGroup().location]",
+			"dependsOn": [
+                "[resourceId('Microsoft.Web/serverfarms', variables('appServicePlanName'))]",
+				"[resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName'))]",
+				"[resourceId('microsoft.insights/components', variables('applicationInsightsName'))]"
+            ],
+            "kind": "functionapp",
+            "properties": {
+				"name": "[variables('functionAppName')]",
+				"siteConfig": {
+					"appSettings": [
+						{
+							"name": "WEBSITE_RUN_FROM_PACKAGE",
+							"value": "[concat('https://', variables('storageAccountName'), '.blob.core.windows.net/insightsfunctionapp/PlatformInsightsAzureWebhook.zip')]"
+						},
+						{
+							"name": "StorageEndpoint",
+							"value": "[concat('https://', variables('storageAccountName'), '.blob.core.windows.net/')]"
+						},
+						{
+							"name": "StorageAccountName",
+							"value": "[variables('storageAccountName')]"
+						},
+						{
+							"name": "StorageAccountKey",
+							"value": "[listKeys(resourceId(subscription().subscriptionId,resourceGroup().name,'Microsoft.Storage/storageAccounts',variables('storageAccountName')),'2019-06-01').keys[0].value]"
+						},
+						{
+							"name": "WebhookEventContainer",
+							"value": "insightswebhookevents"
+						},
+						{
+							"name": "FailedEventContainer",
+							"value": "insightsfailedwebhookevents"
+						},
+						{
+							"name": "TimerInterval",
+							"value": "0 0 * * * *"
+						},
+						{
+							"name": "FUNCTIONS_EXTENSION_VERSION",
+							"value": "~3"
+						},
+						{
+							"name": "FUNCTIONS_WORKER_RUNTIME",
+							"value": "java"
+						},
+						{
+                            "name": "AzureWebJobsStorage",
+                            "value":  "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('storageAccountName'), ';AccountKey=', listKeys(resourceId(subscription().subscriptionId,resourceGroup().name,'Microsoft.Storage/storageAccounts', variables('storageAccountName')),'2019-06-01').keys[0].value,';EndpointSuffix=','core.windows.net')]"
+                        },
+						{
+                            "name": "AzureWebJobsDashboard",
+                            "value":  "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('storageAccountName'), ';AccountKey=', listKeys(resourceId(subscription().subscriptionId,resourceGroup().name,'Microsoft.Storage/storageAccounts', variables('storageAccountName')),'2019-06-01').keys[0].value,';EndpointSuffix=','core.windows.net')]"
+                        },
+                        {
+                            "name": "WEBSITE_CONTENTAZUREFILECONNECTIONSTRING",
+                            "value":  "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('storageAccountName'), ';AccountKey=', listKeys(resourceId(subscription().subscriptionId,resourceGroup().name,'Microsoft.Storage/storageAccounts', variables('storageAccountName')),'2019-06-01').keys[0].value,';EndpointSuffix=','core.windows.net')]"
+                        },
+						{
+                            "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
+                            "value": "[reference(concat('microsoft.insights/components/', variables('applicationInsightsName')), '2015-05-01').InstrumentationKey]"
+                        },
+                        {
+                            "name": "APPLICATIONINSIGHTS_CONNECTION_STRING",
+                            "value": "[reference(concat('microsoft.insights/components/', variables('applicationInsightsName')), '2015-05-01').ConnectionString]"
+                        },
+                        {
+                            "name": "WEBSITE_CONTENTSHARE",
+                            "value": "[variables('website_content')]"
+                        }
+					],
+					"javaVersion": "1.8",
+					"reserved": true
+				},
+                "serverFarmId": "[concat(resourceGroup().id, '/providers/Microsoft.Web/serverfarms/', variables('appServicePlanName'))]",
+				"clientAffinityEnabled": true
+            }
+        },
+        {
+            "type": "Microsoft.ApiManagement/service",
+            "apiVersion": "2019-01-01",
+            "name": "[variables('apiServiceMgmtName')]",
+            "location": "West US",
+			"dependsOn": [
+                "[resourceId('Microsoft.Web/sites', variables('functionAppName'))]"
+            ],
+            "sku": {
+                "name": "Developer",
+                "capacity": 1
+            },
+            "properties": {
+                "publisherEmail": "[variables('apiPublisherEmail')]",
+                "publisherName": "[variables('apiPublisherName')]",
+                "notificationSenderEmail": "apimgmt-noreply@mail.windowsazure.com",
+                "hostnameConfigurations": [
+                    {
+                        "type": "Proxy",
+                        "hostName": "[concat(toLower(variables('apiServiceMgmtName')),'.azure-api.net')]",
+                        "negotiateClientCertificate": false,
+                        "defaultSslBinding": true
+                    }
+                ],
+                "customProperties": {
+                    "Microsoft.WindowsAzure.ApiManagement.Gateway.Security.Protocols.Tls10": "False",
+                    "Microsoft.WindowsAzure.ApiManagement.Gateway.Security.Protocols.Tls11": "False",
+                    "Microsoft.WindowsAzure.ApiManagement.Gateway.Security.Protocols.Ssl30": "False",
+                    "Microsoft.WindowsAzure.ApiManagement.Gateway.Security.Ciphers.TripleDes168": "False",
+                    "Microsoft.WindowsAzure.ApiManagement.Gateway.Security.Backend.Protocols.Tls10": "False",
+                    "Microsoft.WindowsAzure.ApiManagement.Gateway.Security.Backend.Protocols.Tls11": "False",
+                    "Microsoft.WindowsAzure.ApiManagement.Gateway.Security.Backend.Protocols.Ssl30": "False",
+                    "Microsoft.WindowsAzure.ApiManagement.Gateway.Protocols.Server.Http2": "False"
+                },
+                "virtualNetworkType": "None"
+            }
+        },
+        {
+            "type": "Microsoft.ApiManagement/service/apis",
+            "apiVersion": "2019-01-01",
+            "name": "[concat(variables('apiServiceMgmtName'), '/', toLower(variables('functionAppName')))]",
+            "dependsOn": [
+                "[resourceId('Microsoft.ApiManagement/service', variables('apiServiceMgmtName'))]"
+            ],
+            "properties": {
+                "displayName": "[variables('functionAppName')]",
+                "apiRevision": "1",
+                "description": "[concat('Import from \"', variables('functionAppName'), '\" Function App')]",
+                "path": "function",
+                "protocols": [
+                    "https"
+                ],
+                "isCurrent": true,
+				"subscriptionRequired": false
+            }
+        },
+        {
+            "type": "Microsoft.ApiManagement/service/backends",
+            "apiVersion": "2019-01-01",
+            "name": "[concat(variables('apiServiceMgmtName'), '/', toLower(variables('functionAppName')))]",
+            "dependsOn": [
+                "[resourceId('Microsoft.ApiManagement/service', variables('apiServiceMgmtName'))]"
+            ],
+            "properties": {
+                "description": "[variables('functionAppName')]",
+                "url": "[concat('https://', toLower(variables('functionAppName')), '.azurewebsites.net/api')]",
+                "protocol": "http",
+                "resourceId": "[concat('https://management.azure.com', resourceGroup().id, '/providers/Microsoft.Web/sites/', variables('functionAppName'))]",
+                "credentials": {
+                    "header": {
+                        "x-functions-key": [
+                            "[variables('api-key')]"
+                        ]
+                    }
+                }
+            }
+        },
+		{
+            "type": "Microsoft.ApiManagement/service/properties",
+            "apiVersion": "2019-01-01",
+            "name": "[concat(variables('apiServiceMgmtName'), '/', toLower(variables('functionAppName')), '-key')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.ApiManagement/service', variables('apiServiceMgmtName'))]"
+            ],
+            "properties": {
+                "displayName": "[concat(toLower(variables('functionAppName')), '-key')]",
+                "value": "[variables('api-key')]",
+                "tags": [
+                    "key",
+                    "function",
+                    "auto"
+                ],
+                "secret": true
+            }
+        },
+        {
+            "type": "Microsoft.ApiManagement/service/policies",
+            "apiVersion": "2019-01-01",
+            "name": "[concat(variables('apiServiceMgmtName'), '/policy')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.ApiManagement/service', variables('apiServiceMgmtName'))]"
+            ],
+            "properties": {
+                "value": "<!--\r\n    IMPORTANT:\r\n    - Policy elements can appear only within the <inbound>, <outbound>, <backend> section elements.\r\n    - Only the <forward-request> policy element can appear within the <backend> section element.\r\n    - To apply a policy to the incoming request (before it is forwarded to the backend service), place a corresponding policy element within the <inbound> section element.\r\n    - To apply a policy to the outgoing response (before it is sent back to the caller), place a corresponding policy element within the <outbound> section element.\r\n    - To add a policy position the cursor at the desired insertion point and click on the round button associated with the policy.\r\n    - To remove a policy, delete the corresponding policy statement from the policy document.\r\n    - Policies are applied in the order of their appearance, from the top down.\r\n-->\r\n<policies>\r\n  <inbound />\r\n  <backend>\r\n    <forward-request />\r\n  </backend>\r\n  <outbound />\r\n</policies>",
+                "format": "xml"
+            }
+        },
+        {
+            "type": "Microsoft.ApiManagement/service/apis/operations",
+            "apiVersion": "2019-01-01",
+            "name": "[concat(variables('apiServiceMgmtName'), '/', toLower(variables('functionAppName')), '/post-insightswebhookhandler')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.ApiManagement/service/apis', variables('apiServiceMgmtName'), toLower(variables('functionAppName')))]",
+                "[resourceId('Microsoft.ApiManagement/service', variables('apiServiceMgmtName'))]"
+            ],
+            "properties": {
+                "displayName": "InsightsWebhookHandler",
+                "method": "POST",
+                "urlTemplate": "/InsightsWebhookHandler",
+				"description": "This POST operation is triggered by the devops tools and passes the payload to the azure function.",
+                "templateParameters": [],
+                "request": {
+                    "queryParameters": [
+                        {
+                            "name": "endpoint",
+                            "type": "string",
+                            "required": true,
+                            "values": []
+                        }
+                    ],
+                    "headers": [],
+                    "representations": []
+                },
+                "responses": []
+            }
+        },
+        {
+            "type": "Microsoft.ApiManagement/service/apis/operations/policies",
+            "apiVersion": "2019-01-01",
+            "name": "[concat(variables('apiServiceMgmtName'), '/', toLower(variables('functionAppName')), '/post-insightswebhookhandler/policy')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.ApiManagement/service/apis/operations', variables('apiServiceMgmtName'), toLower(variables('functionAppName')), 'post-insightswebhookhandler')]",
+                "[resourceId('Microsoft.ApiManagement/service/apis', variables('apiServiceMgmtName'), toLower(variables('functionAppName')))]",
+                "[resourceId('Microsoft.ApiManagement/service', variables('apiServiceMgmtName'))]"
+            ],
+            "properties": {
+                "value": "<policies>\r\n  <inbound>\r\n    <base />\r\n    <set-backend-service id=\"apim-generated-policy\" backend-id=\"insightswebhookapp\" />\r\n  </inbound>\r\n  <backend>\r\n    <base />\r\n  </backend>\r\n  <outbound>\r\n    <base />\r\n  </outbound>\r\n  <on-error>\r\n    <base />\r\n  </on-error>\r\n</policies>",
+                "format": "xml"
+            }
+        }
+    ],
+	"outputs": {
+		"apim-InsightsWebhook": {
+			"type": "string",
+			"value": "[variables('api-key')]"
+		},
+		"webhookUrl": {
+			"type" : "string",
+			"value": "[concat('https://', toLower(variables('apiServiceMgmtName')), '.azure-api.net/function/InsightsWebhookHandler?endpoint=')]"
+		}
+	}
+}
