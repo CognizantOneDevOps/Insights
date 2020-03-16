@@ -450,21 +450,21 @@ public class AgentManagementServiceImpl implements AgentManagementService {
 
 		if ("Windows".equalsIgnoreCase(osversion)) {
 			Path destinationFile = destinationFilePath.resolve(agentId + ".bat");
-			Files.move(sourceFilePath.resolve(toolName + "agent.bat"), destinationFile, REPLACE_EXISTING);
+			Files.copy(sourceFilePath.resolve(toolName + "agent.bat"), destinationFile, REPLACE_EXISTING);
 			addAgentKeyToServiceFile(destinationFile, agentId);
 		} else if ("linux".equalsIgnoreCase(osversion)) {
 			Path destinationFile = destinationFilePath.resolve(agentId + ".sh");
-			Files.move(sourceFilePath.resolve(toolName + "agent.sh"), destinationFile, REPLACE_EXISTING);
+			Files.copy(sourceFilePath.resolve(toolName + "agent.sh"), destinationFile, REPLACE_EXISTING);
 			addAgentKeyToServiceFile(destinationFile, agentId);
 			addProcessKeyToServiceFile(destinationFile, agentId);
 		} else if ("Ubuntu".equalsIgnoreCase(osversion)) {
 			Path destinationFile = destinationFilePath.resolve(agentId + ".sh");
-			Files.move(sourceFilePath.resolve(toolName + "agent.sh"), destinationFile, REPLACE_EXISTING);
+			Files.copy(sourceFilePath.resolve(toolName + "agent.sh"), destinationFile, REPLACE_EXISTING);
 			addAgentKeyToServiceFile(destinationFile, agentId);
 			addProcessKeyToServiceFile(destinationFile, agentId);
 
 			Path destinationServiceFile = destinationFilePath.resolve(agentId + ".service");
-			Files.move(sourceFilePath.resolve(toolName + "agent.service"), destinationServiceFile, REPLACE_EXISTING);
+			Files.copy(sourceFilePath.resolve(toolName + "agent.service"), destinationServiceFile, REPLACE_EXISTING);
 			addAgentKeyToServiceFile(destinationServiceFile, agentId);
 		}
 	}
@@ -482,7 +482,7 @@ public class AgentManagementServiceImpl implements AgentManagementService {
 
 		FileUtils.deleteDirectory(destinationPath.resolve("com").toFile());
 
-		Files.move(sourcePath.resolve("com"), destinationPath.resolve("com"), REPLACE_EXISTING);
+		FileUtils.copyDirectory(sourcePath.resolve("com").toFile(), destinationPath.resolve("com").toFile());
 
 	}
 
