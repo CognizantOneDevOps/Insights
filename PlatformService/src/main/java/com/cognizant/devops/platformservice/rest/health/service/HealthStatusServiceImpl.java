@@ -31,6 +31,8 @@ import com.cognizant.devops.platformcommons.dal.elasticsearch.ElasticSearchDBHan
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphResponse;
 import com.cognizant.devops.platformcommons.dal.neo4j.Neo4jDBHandler;
 import com.cognizant.devops.platformcommons.dal.neo4j.NodeData;
+import com.cognizant.devops.platformdal.agentConfig.AgentConfig;
+import com.cognizant.devops.platformdal.agentConfig.AgentConfigDAL;
 import com.cognizant.devops.platformdal.dal.PostgresMetadataHandler;
 import com.cognizant.devops.platformservice.rest.health.HealthStatusController;
 import com.cognizant.devops.platformservice.rest.util.PlatformServiceUtil;
@@ -300,14 +302,21 @@ public class HealthStatusServiceImpl implements HealthStatusService {
 	public GraphResponse loadHealthData(String label, String type, String agentId, int limitOfRow) {
 
 		String query = "";
+		
+	
 		if (agentId.equalsIgnoreCase("")) {
 			query = "MATCH (n:" + label
 					+ ") where n.inSightsTime IS NOT NULL RETURN n order by n.inSightsTime DESC LIMIT " + limitOfRow;
 		} else if (!agentId.equalsIgnoreCase("")) {
-			query = "MATCH (n:" + label + ") where n.inSightsTime IS NOT NULL and n.agentId ='" + agentId
+			String queueName = getAgentHealthQueueName(agentId);
+			//To handle case where Agent delete from Postgres but data present in Neo4j
+			if (queueName == null) {
+				queueName = label;
+			}
+			query = "MATCH (n:" + queueName + ") where n.inSightsTime IS NOT NULL and n.agentId ='" + agentId
 					+ "' RETURN n order by n.inSightsTime DESC LIMIT " + limitOfRow;
 		}
-		log.info("query  ====== " + query);
+		log.info("query  ====== {} ", query);
 		GraphResponse graphResponse = null;
 		try {
 			Neo4jDBHandler dbHandler = new Neo4jDBHandler();
@@ -421,7 +430,7 @@ public class HealthStatusServiceImpl implements HealthStatusService {
 
 	@Override
 	public JsonObject createAgentFailureHealthLabel(String category, String tool, String agentId) {
-		log.debug(" message tool name " + category + "  " + tool);
+		log.debug(" message tool name {}  {} ", category, tool);
 		StringBuilder label = new StringBuilder("HEALTH_FAILURE");
 		if (StringUtils.isEmpty(category) || StringUtils.isEmpty(tool)) {
 			return PlatformServiceUtil.buildFailureResponse(ErrorMessage.CATEGORY_AND_TOOL_NAME_NOT_SPECIFIED);
@@ -434,12 +443,18 @@ public class HealthStatusServiceImpl implements HealthStatusService {
 
 	private JsonObject loadAgentsFailureHealthData(String nodeLabel, String agentId, int limitOfRow) {
 		String query = "";
-
+		
 		if (agentId.equalsIgnoreCase("")) {
 			query = "MATCH (n:" + nodeLabel
 					+ ") where n.inSightsTime IS NOT NULL RETURN n order by n.inSightsTime DESC LIMIT " + limitOfRow;
 		} else if (!agentId.equalsIgnoreCase("")) {
-			query = "MATCH (n:" + nodeLabel + ") where n.inSightsTime IS NOT NULL and n.agentId ='" + agentId
+			String queueName = getAgentHealthQueueName(agentId);
+			//To handle case where Agent delete from Postgres but data present in Neo4j
+			if (queueName == null) {
+				queueName = nodeLabel;
+			}
+			queueName = queueName.replaceFirst("HEALTH", "HEALTH_FAILURE");
+			query = "MATCH (n:" + queueName + ") where n.inSightsTime IS NOT NULL and n.agentId ='" + agentId
 					+ "' RETURN n order by n.inSightsTime DESC LIMIT " + limitOfRow;
 		}
 		try {
@@ -450,6 +465,20 @@ public class HealthStatusServiceImpl implements HealthStatusService {
 			log.error(e.getMessage());
 			return PlatformServiceUtil.buildFailureResponse(ErrorMessage.DB_INSERTION_FAILED);
 		}
+	}
+
+	private String getAgentHealthQueueName(String agentId) {
+		String healthRoutingKey = null;
+		try {
+			AgentConfigDAL agentConfigDal = new AgentConfigDAL();
+			AgentConfig agentConfig = agentConfigDal.getAgentConfigurations(agentId);
+			JsonObject config = (JsonObject) new JsonParser().parse(agentConfig.getAgentJson());
+			JsonObject json = config.get("publish").getAsJsonObject();
+			healthRoutingKey = json.get("health").getAsString().replace(".", ":");
+		} catch (Exception e) {
+			log.error(" No DB record found for agentId {}", agentId);
+		}
+		return healthRoutingKey;
 	}
 
 }
