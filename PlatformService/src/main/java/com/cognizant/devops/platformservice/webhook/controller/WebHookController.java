@@ -27,14 +27,12 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
-
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
 import com.cognizant.devops.platformcommons.core.util.ValidationUtils;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformdal.webhookConfig.WebHookConfig;
 import com.cognizant.devops.platformservice.rest.util.PlatformServiceUtil;
 import com.cognizant.devops.platformservice.webhook.service.WebHookServiceImpl;
-import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
@@ -53,32 +51,21 @@ public class WebHookController {
 			String validatedResponse = ValidationUtils.validateRequestBody(registerWebhookJson);
 			JsonParser parser = new JsonParser();
 			JsonObject registerWebhookjson = (JsonObject) parser.parse(validatedResponse);
-			String toolName = registerWebhookjson.get("toolName").getAsString();
-			String labelDisplay = registerWebhookjson.get("labelDisplay").getAsString();
-			String webhookName = registerWebhookjson.get("webhookName").getAsString();
-			String dataformat = registerWebhookjson.get("dataformat").getAsString();
-			String mqchannel = registerWebhookjson.get("mqchannel").getAsString();
-			String responseTemplate = registerWebhookjson.get("responseTemplate").getAsString();
-			Boolean statussubscribe = registerWebhookjson.get("statussubscribe").getAsBoolean();
-			JsonArray derivedOperationsArray = registerWebhookjson.get("derivedOperations").getAsJsonArray();
-			Boolean result = webhookConfigurationService.saveWebHookConfiguration(webhookName, toolName, labelDisplay,
-					dataformat, mqchannel, statussubscribe, responseTemplate, derivedOperationsArray);
+			Boolean result = webhookConfigurationService.saveWebHookConfiguration(registerWebhookjson);
 			if (result) {
 				return PlatformServiceUtil.buildSuccessResponse();
 			} else {
 				return PlatformServiceUtil
 						.buildFailureResponse("Something went wrong,while saving the data of webhook.");
 			}
-		} catch (ArrayIndexOutOfBoundsException e) {
-			log.error(e);
-			return PlatformServiceUtil.buildFailureResponse(PlatformServiceConstants.INCORRECT_RESPONSE_TEMPLATE);
+
 		} catch (InsightsCustomException e) {
 			log.error(e);
-			if (e.getMessage() == PlatformServiceConstants.INCORRECT_RESPONSE_TEMPLATE) {
+			if (e.getMessage().equals(PlatformServiceConstants.INCORRECT_RESPONSE_TEMPLATE) ){
 				return PlatformServiceUtil.buildFailureResponse(PlatformServiceConstants.INCORRECT_RESPONSE_TEMPLATE);
-			} else if (e.getMessage() == PlatformServiceConstants.WEBHOOK_NAME) {
+			} else if (e.getMessage().equals(PlatformServiceConstants.WEBHOOK_NAME)){
 				return PlatformServiceUtil.buildFailureResponse(PlatformServiceConstants.WEBHOOK_NAME);
-			}else {
+			} else {
 				return PlatformServiceUtil.buildFailureResponse(e.getMessage());
 			}
 		} catch (Exception e) {
@@ -119,17 +106,8 @@ public class WebHookController {
 			String validatedResponse = ValidationUtils.validateRequestBody(registerWebhookJson);
 			JsonParser parser = new JsonParser();
 			JsonObject registerWebhookjson = (JsonObject) parser.parse(validatedResponse);
-			String toolName = registerWebhookjson.get("toolName").getAsString();
-			String labelDisplay = registerWebhookjson.get("labelDisplay").getAsString();
-			String webhookName = registerWebhookjson.get("webhookName").getAsString();
-			String dataformat = registerWebhookjson.get("dataformat").getAsString();
-			String mqchannel = registerWebhookjson.get("mqchannel").getAsString();
-			String responseTemplate = registerWebhookjson.get("responseTemplate").getAsString();
-			Boolean statussubscribe = registerWebhookjson.get("statussubscribe").getAsBoolean();
-			JsonArray derivedOperations = registerWebhookjson.get("derivedOperations").getAsJsonArray();
-			Boolean result = webhookConfigurationService.updateWebHook(webhookName, toolName, labelDisplay, dataformat,
-					mqchannel, statussubscribe, responseTemplate, derivedOperations);
-			if (result) {
+			Boolean result = webhookConfigurationService.updateWebHook(registerWebhookjson);
+			if (result.booleanValue()) {
 				return PlatformServiceUtil.buildSuccessResponse();
 			} else {
 				return PlatformServiceUtil.buildFailureResponse("Something went wrong,while saving the data.");
@@ -149,7 +127,7 @@ public class WebHookController {
 			JsonParser parser = new JsonParser();
 			JsonObject updateWebhookJsonValidated = (JsonObject) parser.parse(validatedResponse);
 			message = webhookConfigurationService.updateWebhookStatus(updateWebhookJsonValidated);
-			log.debug(" Responce in updateWebhookStatus " + message);
+			log.debug(" Response in updateWebhookStatus {} ", message);
 			return PlatformServiceUtil.buildSuccessResponse();
 		} catch (InsightsCustomException e) {
 			log.error(e);

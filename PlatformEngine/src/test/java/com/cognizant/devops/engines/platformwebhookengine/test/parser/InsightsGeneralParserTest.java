@@ -22,8 +22,10 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
+import com.cognizant.devops.platformdal.webhookConfig.WebHookConfig;
 import com.cognizant.devops.engines.platformwebhookengine.modules.aggregator.WebHookEngineAggregatorModule;
 import com.cognizant.devops.engines.platformwebhookengine.parser.InsightsGeneralParser;
+import com.cognizant.devops.engines.platformwebhookengine.test.engine.WebhookEngineTestData;
 import com.google.gson.JsonObject;
 
 @Test
@@ -32,36 +34,108 @@ public class InsightsGeneralParserTest extends InsightsParserTestData {
 	public static final InsightsGeneralParser generalparser = new InsightsGeneralParser();
 	public static final InsightsParserTestData testdata = new InsightsParserTestData();
 	WebHookEngineAggregatorModule testapp = new WebHookEngineAggregatorModule();
+	WebhookEngineTestData webhookEngineTestData = new WebhookEngineTestData();
 
 	@Test(priority = 1)
 	public void testGetToolDetailJson() throws InsightsCustomException {
 
-		List<JsonObject> response = generalparser.parseToolData(testdata.responseTemplate, toolData, testdata.toolName,
-				testdata.labelName, testdata.webhookName,testdata.getSetObject());
+		WebHookConfig webhookConfig = new WebHookConfig();
+		webhookConfig.setResponseTemplate(webhookEngineTestData.responseTemplate);
+		webhookConfig.setDynamicTemplate(webhookEngineTestData.dynamicTemplate);
+		webhookConfig.setLabelName(webhookEngineTestData.labelName);
+		webhookConfig.setMQChannel(webhookEngineTestData.mqChannel);
+		webhookConfig.setToolName(webhookEngineTestData.toolName);
+		webhookConfig.setWebHookName(webhookEngineTestData.webhookName);
+		webhookConfig.setSubscribeStatus(true);
+		webhookConfig.setIsUpdateRequired(webhookEngineTestData.isUpdateRequired);
+		webhookConfig.setDataFormat(webhookEngineTestData.dataFormat);
+		webhookConfig.setWebhookDerivedConfig(webhookEngineTestData.derivedOperationsArray);
+		List<JsonObject> response = generalparser.parseToolData(webhookConfig, webhookEngineTestData.toolData);
 
-		String commitId = response.get(0).get("commitId").toString();
+		String commitId = response.get(0).get("commitId").getAsString();
 		String authorName = response.get(0).get("authorName").toString();
 		String message = response.get(0).get("message").toString();
-		Assert.assertEquals(commitId, testdata.commitId);
-		Assert.assertEquals(authorName, testdata.authorName);
-		Assert.assertEquals(message, testdata.message);
+		Assert.assertEquals(commitId, webhookEngineTestData.commitId);
+		Assert.assertEquals(authorName, webhookEngineTestData.authorName);
+		Assert.assertEquals(message, webhookEngineTestData.message);
 
 	}
 
 	@Test(priority = 2, expectedExceptions = Exception.class)
 	public void testGetToolDetailJsonWithExceptions() throws InsightsCustomException {
-		List<JsonObject> response = generalparser.parseToolData(testdata.responseTemplate, incorrectToolData,
-				testdata.toolName, testdata.labelName, "",testdata.getSetObject());
+		WebHookConfig webhookConfig = new WebHookConfig();
+		webhookConfig.setResponseTemplate(webhookEngineTestData.responseTemplate);
+		webhookConfig.setDynamicTemplate(webhookEngineTestData.dynamicTemplate);
+		webhookConfig.setLabelName(webhookEngineTestData.labelName);
+		webhookConfig.setMQChannel(webhookEngineTestData.mqChannel);
+		webhookConfig.setToolName(webhookEngineTestData.toolName);
+		webhookConfig.setWebHookName(webhookEngineTestData.webhookName);
+		webhookConfig.setSubscribeStatus(true);
+		webhookConfig.setIsUpdateRequired(webhookEngineTestData.isUpdateRequired);
+		webhookConfig.setDataFormat(webhookEngineTestData.dataFormat);
+		webhookConfig.setWebhookDerivedConfig(webhookEngineTestData.derivedOperationsArray);
+		List<JsonObject> response = generalparser.parseToolData(webhookConfig, incorrectToolData);
 		Assert.assertFalse(response.isEmpty());
 	}
 
 	@Test(priority = 3)
 	public void testUnmatchedResponseTemplate() throws InsightsCustomException {
-		List<JsonObject> nullresponse = generalparser.parseToolData(testdata.fieldNotFoundinToolData, testdata.toolData,
-				testdata.toolName, testdata.labelName, testdata.webhookName,testdata.getSetObject());
+		WebHookConfig webhookConfig = new WebHookConfig();
+		webhookConfig.setResponseTemplate(testdata.fieldNotFoundinToolData);
+		webhookConfig.setDynamicTemplate(testdata.emptyDynamicTemplate);
+		webhookConfig.setLabelName(webhookEngineTestData.labelName);
+		webhookConfig.setMQChannel(webhookEngineTestData.mqChannel);
+		webhookConfig.setToolName(webhookEngineTestData.toolName);
+		webhookConfig.setWebHookName(webhookEngineTestData.webhookName);
+		webhookConfig.setSubscribeStatus(true);
+		webhookConfig.setIsUpdateRequired(webhookEngineTestData.isUpdateRequired);
+		webhookConfig.setDataFormat(webhookEngineTestData.dataFormat);
+		webhookConfig.setWebhookDerivedConfig(webhookEngineTestData.derivedOperationsArray);
+		List<JsonObject> nullresponse = generalparser.parseToolData(webhookConfig, webhookEngineTestData.toolData);
 		String responseTest = nullresponse.toString();
 		responseTest = responseTest.substring(1, responseTest.length() - 1); // remove curly brackets
 		Assert.assertEquals(responseTest, "");
 	}
+
+	@Test(priority = 4)
+	public void testEmptyDynamicTemplate() throws InsightsCustomException {
+		WebHookConfig webhookConfig = new WebHookConfig();
+		webhookConfig.setResponseTemplate(webhookEngineTestData.responseTemplate);
+		webhookConfig.setDynamicTemplate(testdata.emptyDynamicTemplate);
+		webhookConfig.setLabelName(webhookEngineTestData.labelName);
+		webhookConfig.setMQChannel(webhookEngineTestData.mqChannel);
+		webhookConfig.setToolName(webhookEngineTestData.toolName);
+		webhookConfig.setWebHookName(webhookEngineTestData.webhookName);
+		webhookConfig.setSubscribeStatus(true);
+		webhookConfig.setIsUpdateRequired(webhookEngineTestData.isUpdateRequired);
+		webhookConfig.setDataFormat(webhookEngineTestData.dataFormat);
+		webhookConfig.setWebhookDerivedConfig(webhookEngineTestData.derivedOperationsArray);
+		List<JsonObject> nullresponse = generalparser.parseToolData(webhookConfig, webhookEngineTestData.toolData);
+		String responseTest = nullresponse.toString();
+		responseTest = responseTest.substring(1, responseTest.length() - 1); // remove curly brackets
+		Assert.assertFalse(responseTest.isEmpty());
+	}
+
+	@Test(priority = 5)
+	public void testDynamicTemplateWithArray() throws InsightsCustomException {
+		WebHookConfig webhookConfig = new WebHookConfig();
+		webhookConfig.setResponseTemplate(testdata.responseTemplateForArray);
+		webhookConfig.setDynamicTemplate(testdata.dynamicTemplateWithArray);
+		webhookConfig.setLabelName(testdata.labelName);
+		webhookConfig.setMQChannel(testdata.mqChannel);
+		webhookConfig.setToolName(testdata.toolName);
+		webhookConfig.setWebHookName(testdata.webhookName);
+		webhookConfig.setSubscribeStatus(true);
+		webhookConfig.setIsUpdateRequired(true);
+		webhookConfig.setFieldUsedForUpdate(testdata.fieldUsedForUpdate);
+		webhookConfig.setDataFormat(webhookEngineTestData.dataFormat);
+		webhookConfig.setWebhookDerivedConfig(webhookEngineTestData.derivedOperationsArrayWithoutEpochPivotal);
+		List<JsonObject> nullresponse = generalparser.parseToolData(webhookConfig,
+				testdata.toolDataWithArray);
+		String responseTest = nullresponse.toString();
+		responseTest = responseTest.substring(1, responseTest.length() - 1); // remove curly brackets
+		Assert.assertFalse(responseTest.isEmpty());
+	}
+
 
 }

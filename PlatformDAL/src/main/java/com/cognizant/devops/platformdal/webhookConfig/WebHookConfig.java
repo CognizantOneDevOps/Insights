@@ -50,6 +50,9 @@ public class WebHookConfig implements Serializable{
 	@Column(name = "RESPONSE_TEMPLATE",length = 5000)
 	private String responseTemplate;
 	
+	@Column(name = "DYNAMIC_TEMPLATE",length = 5000)
+	private String dynamicTemplate;
+	
 	@Column(name = "TOOL_NAME")
 	private String toolName;
 	
@@ -58,6 +61,12 @@ public class WebHookConfig implements Serializable{
 	
 	@Column(name = "DATA_FORMAT")
 	private String dataFormat;
+	
+	@Column(name = "IS_UPDATE_REQUIRED")
+	private Boolean isUpdateRequired = false;
+
+	@Column(name = "FIELD_USED_FOR_UPDATE")
+	private String fieldUsedForUpdate;
 
 	@Column(name = "MQ_CHANNEL", nullable = false)
 	private String mqChannel;
@@ -138,7 +147,30 @@ public class WebHookConfig implements Serializable{
 		this.responseTemplate = responseTemplate;
 	}
 	
+	public String getDynamicTemplate() {
+		return dynamicTemplate;
+	}
 
+	public void setDynamicTemplate(String dynamicTemplate) {
+		this.dynamicTemplate = dynamicTemplate;
+	}
+
+
+	public Boolean getIsUpdateRequired() {
+		return isUpdateRequired;
+	}
+
+	public void setIsUpdateRequired(Boolean isUpdateRequired) {
+		this.isUpdateRequired = isUpdateRequired;
+	}
+
+	public String getFieldUsedForUpdate() {
+		return fieldUsedForUpdate;
+	}
+
+	public void setFieldUsedForUpdate(String fieldUsedForUpdate) {
+		this.fieldUsedForUpdate = fieldUsedForUpdate;
+	}
 
 	public Set<WebhookDerivedConfig> getWebhookDerivedConfig() {
 		return derivedOperations;
@@ -151,7 +183,7 @@ public class WebHookConfig implements Serializable{
 	@Override
 	public String toString() {
 		return "WebHookConfig [id=" + id + ", subscribeStatus=" + subscribeStatus + ", responseTemplate="
-				+ responseTemplate + ", toolName=" + toolName + ", labelDisplay=" + labelDisplay + ", dataFormat="
+				+ responseTemplate +",isUpdateRequired="+isUpdateRequired+",fieldUsedForUpdate="+fieldUsedForUpdate+ ",dynamicTemplate="+ dynamicTemplate +" toolName=" + toolName + ", labelDisplay=" + labelDisplay + ", dataFormat="
 				+ dataFormat + ", mqChannel=" + mqChannel + ", webhookName=" + webhookName + "]";
 	}
 }

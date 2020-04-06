@@ -17,8 +17,6 @@ package com.cognizant.devops.engines.platformwebhookengine.message.factory;
 
 import java.io.IOException;
 
-import com.cognizant.devops.engines.platformwebhookengine.message.factory.EngineSubscriberResponseHandler;
-import com.cognizant.devops.engines.platformwebhookengine.message.factory.MessageSubscriberFactory;
 import com.rabbitmq.client.AMQP;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Envelope;
@@ -31,7 +29,8 @@ public abstract class EngineSubscriberResponseHandler {
 		MessageSubscriberFactory.getInstance().registerSubscriber(routingKey, engineSubscriberResponseHandler);
 	}
 	
-	public abstract void handleDelivery(String consumerTag, Envelope envelope, AMQP.BasicProperties properties, byte[] body) throws IOException;
+	public abstract void handleDelivery(String consumerTag, Envelope envelope, AMQP.BasicProperties properties,
+			byte[] body) throws IOException;
 	
 	
 	public Channel getChannel() {

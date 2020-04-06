@@ -18,7 +18,9 @@ package com.cognizant.devops.platformcommons.core.enums;
 public enum DerivedOperations {
 	INSIGHTSTIMEX("insightsTimex"),
 	DATAENRICHMENT("dataEnrichment"),
-	TIMEFIELDMAPPING("timeFieldSeriesMapping");
+	TIMEFIELDMAPPING("timeFieldSeriesMapping"),
+	INSIGHTSTIMEX_DB("inSightsTimeX"),
+	INSIGHTSTIME_DB("inSightsTime");
 	
 	private String value;
 
