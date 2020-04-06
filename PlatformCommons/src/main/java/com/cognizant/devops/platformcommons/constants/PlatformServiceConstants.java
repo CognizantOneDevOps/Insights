@@ -35,6 +35,6 @@ public interface PlatformServiceConstants {
 	String SP_DECODED = new String(Base64.getDecoder().decode(ConfigOptions.SP_ENCODED.getBytes()));
 	String RSA_DECODED = new String(Base64.getDecoder().decode(ConfigOptions.RSA_ENCODED.getBytes()));
 	String GRAFANA_LOGIN_ISSUE="Unable to connect to Grafana";
-	String INCORRECT_RESPONSE_TEMPLATE = "Incorrect Response template";
+	String INCORRECT_RESPONSE_TEMPLATE = "Incorrect Response Template";
 	String WEBHOOK_NAME = "Webhook name already exists";
 }

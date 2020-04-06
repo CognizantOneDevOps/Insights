@@ -44,6 +44,9 @@ public class WebHookConfigDAL extends BaseDAL {
 			parentConfigList.setMQChannel(webhookConfiguration.getMQChannel());
 			parentConfigList.setSubscribeStatus(webhookConfiguration.getSubscribeStatus());
 			parentConfigList.setResponseTemplate(webhookConfiguration.getResponseTemplate());
+			parentConfigList.setDynamicTemplate(webhookConfiguration.getDynamicTemplate());
+			parentConfigList.setIsUpdateRequired(webhookConfiguration.getIsUpdateRequired());
+			parentConfigList.setFieldUsedForUpdate(webhookConfiguration.getFieldUsedForUpdate());
 			Set<WebhookDerivedConfig> dataDriverFromTable = parentConfigList.getWebhookDerivedConfig();
 			dataDriverFromTable.clear();
 			dataDriverFromTable.addAll(dataFromUI);

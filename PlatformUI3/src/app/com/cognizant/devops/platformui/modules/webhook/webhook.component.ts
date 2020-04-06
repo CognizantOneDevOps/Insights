@@ -56,6 +56,7 @@ export class WebHookComponent implements OnInit {
     eventToSubscribe: any;
     mqchannel: any;
     responseTemplate: any;
+    dynamicTemplate: any;
     dataformat: any;
     actionType: any;
     value_to_copy: any;
@@ -70,6 +71,10 @@ export class WebHookComponent implements OnInit {
     enableaddWebhook: boolean = true;
     disableInputFields: boolean = false;
     refreshRadio: boolean = false;
+    isUpdateRequired: boolean = false;
+    fieldUsedForUpdate: string = ""
+    dynamicTemplateSelected: boolean = false;
+    responseTemplateSelected: boolean = false;
     mqChannelPrefix = "IPW_";
     regex = new RegExp("^[a-zA-Z0-9_]*$");
     regexlabel = new RegExp("^\\d+(:([A-Za-z]+|\\d+)){2}$");
@@ -93,7 +98,6 @@ export class WebHookComponent implements OnInit {
     setWebhookUrl(selectedWebhookEnable) {
         var hostname = this.initservice.getWebhookHost();
         var value_to_copy = hostname + "/PlatformInsightsWebHook/insightsDevOpsWebHook?webHookName=" + selectedWebhookEnable.webhookName;
-        console.log(value_to_copy)
         this.textToCopy = value_to_copy;
     }
     enableButtons(selectedWebhookEnable) {
@@ -119,7 +123,6 @@ export class WebHookComponent implements OnInit {
         this.webhookNameList = [];
         this.webhookList = [];
         this.webhookList = await self.webhookService.loadwebhookServices();
-        console.log(this.webhookList);
         if (this.webhookList != null && this.webhookList.status == 'success') {
             this.webhookDatasource.data = this.webhookList.data.sort((a, b) => a.webhookName > b.webhookName);
             this.webhookDatasource.paginator = this.paginator;
@@ -152,7 +155,6 @@ export class WebHookComponent implements OnInit {
             self.showMessage = "Something wrong with Service.Please try again.";
             self.messageDialog.showApplicationsMessage("Something wrong with Service.Please try again.", "ERROR");
         }
-        console.log(this.webhookDatasource.data);
     }
     list() {
         this.showWebhook = true;
@@ -185,7 +187,6 @@ export class WebHookComponent implements OnInit {
             if (toollabelresponse.status == "success") {
                 this.toolsDetail = toollabelresponse.data;
             }
-            console.log(this.toolsDetail)
             for (var element of this.toolsDetail) {
                 var toolName = (element.toolName);
                 var labelName = (element.label);
@@ -194,12 +195,11 @@ export class WebHookComponent implements OnInit {
             }
         }
         catch (error) {
-            //  console.log(error);
+            console.log(error);
         }
     }
 
     addWebHook() {
-        console.log(" In addWebHook ");
         this.showAddWebHook = true;
         this.enableWebhookicon = true;
         this.showWebhook = false;
@@ -209,19 +209,21 @@ export class WebHookComponent implements OnInit {
         this.labelDisplay = ""
         this.mqchannel = "";
         this.responseTemplate = "";
+        this.dynamicTemplate = "";
         this.dataformat = ""
         this.enableRefresh = true;
         this.disableInputFields = false;
         this.derivedOperationList = [];
+        this.isUpdateRequired = false;
+        this.fieldUsedForUpdate = "";
         this.actionType = "save";
         var jsonData = JSON.parse(this.webhookService.getSampleJSONResponse());
         for (var element of jsonData) {
-            //var operationFieldsDataJson = JSON.parse(element.operationFields);
             let dervioplist = this.getDerivedOperations(element.wid, element.operationName, element.operationFields, this.webhookName);
             this.derivedOperationList.push(element);
         }
     }
-    async editWebhook() {
+    editWebhook() {
         this.enableSaveForEdit = true;
         this.enableEdit = false;
         var isSessionExpired = this.dataShare.validateSession();
@@ -233,9 +235,23 @@ export class WebHookComponent implements OnInit {
             this.selectedTool = this.selectedWebhook.toolName;
             this.labelDisplay = this.selectedWebhook.labelDisplay;
             this.mqchannel = this.selectedWebhook.mqChannel;
+            this.isUpdateRequired = this.selectedWebhook.isUpdateRequired;
+            this.dynamicTemplate = this.selectedWebhook.dynamicTemplate;
+            if (this.selectedWebhook.dynamicTemplate != undefined) {
+                this.dynamicTemplate = this.selectedWebhook.dynamicTemplate;
+            }
+            else {
+                this.dynamicTemplate = "";
+            }
+            if (this.selectedWebhook.fieldUsedForUpdate != undefined) {
+                this.fieldUsedForUpdate = this.selectedWebhook.fieldUsedForUpdate;
+            }
+            else {
+                this.fieldUsedForUpdate = "";
+            }
+
             for (let i in this.selectedWebhook.derivedOperations) {
                 let element = this.selectedWebhook.derivedOperations[i];
-                console.log(element);
                 var operationFieldsDataJson = JSON.parse(element.operationFields);
                 let derivedOpslist = this.getDerivedOperations(element.wid, element.operationName, operationFieldsDataJson, this.webhookName);
                 this.derivedOperationList.push(derivedOpslist);
@@ -271,6 +287,9 @@ export class WebHookComponent implements OnInit {
         this.dataformat = "";
         this.mqchannel = "";
         this.responseTemplate = "";
+        this.dynamicTemplate = "";
+        this.isUpdateRequired = false;
+        this.fieldUsedForUpdate = "";
         for (let index of this.derivedOperationList) {
             if (index.operationName == 'insightsTimex') {
                 index.operationFields = {};
@@ -284,76 +303,71 @@ export class WebHookComponent implements OnInit {
         }
     }
 
-    validateWebhookData(selectedWebhook) {
+    validateWebhookData() {
         var isValidated = false;
         let messageDialogText;
-        if (selectedWebhook != undefined || selectedWebhook != null) {
-            if (selectedWebhook.webhookName == "" || selectedWebhook.selectedTool == "" || selectedWebhook.labelDisplay == "" ||
-                                                            selectedWebhook.mqchannel == "" || selectedWebhook.responseTemplate == "") {
-                isValidated = false;                                                
-                messageDialogText = "Please fill mandatory fields ";
-            } else {
-                isValidated = true;
-            }
+        if (this.webhookName === "" || this.selectedTool === "" || this.labelDisplay === "" || this.mqchannel === "") {
+            isValidated = false;
+            messageDialogText = "Please fill mandatory fields";
+        }
+        else if (this.responseTemplate === "" && (this.dynamicTemplate === "" || this.dynamicTemplate === undefined)) {
+            isValidated = false;
+            messageDialogText = "Please fill either Dynamic template or Response template ";
+        }
+        else {
             for (var element of this.derivedOperationList) {
+                var operationName = element.operationName
                 var operationFieldsDataJson = JSON.parse(JSON.stringify(element.operationFields));
-                if (operationFieldsDataJson.timeField == "" || 
-                (operationFieldsDataJson.timeField != "" && operationFieldsDataJson.epochTime == true)) {
+                if (operationFieldsDataJson.timeField == "" ||
+                    (operationFieldsDataJson.epochTime != true && operationFieldsDataJson.timeFormat == "")) {
                     isValidated = false;
-                    if(messageDialogText != "Please fill mandatory fields ") {
-                    messageDialogText = "Please fill mandatory fields in InsightTimex";
+                    if (messageDialogText != "Please fill mandatory fields" && messageDialogText != "Please fill either Dynamic template or Response template " && messageDialogText != "Incorrect Dynamic Template") {
+                        messageDialogText = "Please fill mandatory fields in InsightTimex";
                     }
                 } else if (operationFieldsDataJson.mappingTimeField != "" && operationFieldsDataJson.mappingTimeFormat == "") {
                     isValidated = false;
                     messageDialogText = "Please fill time format for Time Field Mapping";
-                } else {
+                }
+                else {
                     isValidated = true;
                 }
             }
-        } else {
-            if (this.actionType == "save") {
-                if (this.webhookName == "" || this.selectedTool == "" || this.labelDisplay == "" ||
-                                                        this.mqchannel == "" || this.responseTemplate == "") {
+            if (this.isUpdateRequired) {
+                if (this.fieldUsedForUpdate === "" || this.fieldUsedForUpdate === undefined) {
                     isValidated = false;
-                    messageDialogText = "Please fill mandatory fields ";
-                } else {
-                    isValidated = true;
+                    messageDialogText = "Please enter the node required for updation"
                 }
-                for (var element of this.derivedOperationList) {
-                    var operationFieldsDataJson = JSON.parse(JSON.stringify(element.operationFields));
-                    if (operationFieldsDataJson.timeField == "" || 
-                    (operationFieldsDataJson.timeField != "" && operationFieldsDataJson.epochTime == true)) {
-                        isValidated = false;
-                        if(messageDialogText != "Please fill mandatory fields ") {
-                            messageDialogText = "Please fill mandatory fields in InsightTimex";
-                        }
-                    } else if (operationFieldsDataJson.mappingTimeField != "" && operationFieldsDataJson.mappingTimeFormat == "") {
-                        isValidated = false;
-                        messageDialogText = "Please fill time format for Time Field Mapping";
-                    } else {
-                        isValidated = true;
-                    }
-                }
-                var checkname = this.regex.test(this.webhookName);
-                if (!checkname) {
-                    isValidated = false;
-                    messageDialogText = "Please enter valid webhook name, and it contains only alphanumeric character and underscore ";
-                }
-            } 
+            }
+
         }
         if (isValidated) {
-            this.editSaveData(selectedWebhook);
-        }else{
+            var checkname = this.regex.test(this.webhookName);
+            if (!checkname) {
+                isValidated = false;
+                messageDialogText = "Please enter valid webhook name, and it contains only alphanumeric character and underscore ";
+            }
+            else if (!((this.dynamicTemplate === "") || this.dynamicTemplate === undefined)) {
+                try {
+                    JSON.parse(this.dynamicTemplate);
+                    isValidated = true;
+                }
+                catch (error) {
+                    isValidated = false;
+                    messageDialogText = "Incorrect Dynamic Template";
+                }
+            }
+        }
+        if (isValidated) {
+            this.editSaveData();
+        } else {
             this.messageDialog.showApplicationsMessage(messageDialogText, "ERROR");
         }
     }
 
-    editSaveData(selectedWebhook) {
+    editSaveData() {
         var self = this;
         var webhookAPIRequestJson = {};
-
         if (this.actionType == 'save') {
-            console.log("1", selectedWebhook);
             webhookAPIRequestJson['toolName'] = self.selectedTool
             webhookAPIRequestJson['labelDisplay'] = self.labelDisplay
             webhookAPIRequestJson['webhookName'] = self.webhookName
@@ -362,8 +376,11 @@ export class WebHookComponent implements OnInit {
             webhookAPIRequestJson['responseTemplate'] = self.responseTemplate
             webhookAPIRequestJson['statussubscribe'] = self.statussubscribe
             webhookAPIRequestJson['derivedOperations'] = self.derivedOperationList
-            console.log("webhookAPIRequestJson ", JSON.stringify(webhookAPIRequestJson))
+            webhookAPIRequestJson['dynamicTemplate'] = self.dynamicTemplate
+            webhookAPIRequestJson['isUpdateRequired'] = self.isUpdateRequired
+            webhookAPIRequestJson['fieldUsedForUpdate'] = self.fieldUsedForUpdate
             var dialogmessage = " You have created a new Webhook <b>" + self.webhookName + "</b> .Do you want continue? "
+            title = "Save Webhook " + this.webhookName
             const dialogRef = this.messageDialog.showConfirmationMessage(title, dialogmessage, "", "ALERT", "40%");
             dialogRef.afterClosed().subscribe(result => {
                 if (result == 'yes') {
@@ -372,7 +389,7 @@ export class WebHookComponent implements OnInit {
                             if (response.status == "success") {
                                 self.messageDialog.showApplicationsMessage("<b>" + self.webhookName + "</b> saved successfully.", "SUCCESS");
                                 self.list();
-                            } else if (response.message == "Webhook name already exists.") {
+                            } else if (response.message === "Webhook name already exists") {
                                 self.messageDialog.showApplicationsMessage("<b>" + self.webhookName + "</b> already exists. Please try again with a new name.", "ERROR");
                             } else if (response.message == "Incorrect Response Template") {
                                 self.messageDialog.showApplicationsMessage("Incorrect Response Template.", "ERROR");
@@ -383,7 +400,6 @@ export class WebHookComponent implements OnInit {
                 }
             })
         } else if (this.actionType == 'edit') {
-            console.log("1", selectedWebhook);
             webhookAPIRequestJson['toolName'] = self.selectedTool
             webhookAPIRequestJson['labelDisplay'] = self.labelDisplay
             webhookAPIRequestJson['webhookName'] = self.webhookName
@@ -392,7 +408,9 @@ export class WebHookComponent implements OnInit {
             webhookAPIRequestJson['responseTemplate'] = self.responseTemplate
             webhookAPIRequestJson['statussubscribe'] = self.statussubscribe
             webhookAPIRequestJson['derivedOperations'] = self.derivedOperationList
-            console.log("webhookAPIRequestJson in Edit", JSON.stringify(webhookAPIRequestJson))
+            webhookAPIRequestJson['dynamicTemplate'] = self.dynamicTemplate
+            webhookAPIRequestJson['isUpdateRequired'] = self.isUpdateRequired
+            webhookAPIRequestJson['fieldUsedForUpdate'] = self.fieldUsedForUpdate
             var title = "Update " + this.webhookName;
             var dialogmessage = " You have updated Webhook <b>" + self.webhookName + "</b> .Do you want continue? "
             const dialogRef = this.messageDialog.showConfirmationMessage(title, dialogmessage, "", "ALERT", "40%");
@@ -502,12 +520,9 @@ export class WebHookComponent implements OnInit {
     }
 
     copyInputMessage(inputElement) {
-        console.log("First " + this.textToCopy)
         var hostname = this.initservice.getWebhookHost();
         var value_to_copy = hostname + "/PlatformInsightsWebHook/insightsDevOpsWebHook?webHookName=" + inputElement.webhookName;
-        console.log(value_to_copy)
         this.textToCopy = value_to_copy;
-        console.log("Second" + this.textToCopy);
         this._clipboardService.copyFromContent(value_to_copy);
     }
 

@@ -46,38 +46,31 @@ public class WebHookEngineAggregatorModule extends TimerTask {
 		List<WebHookConfig> allWebhookConfigurations = webhookConfigDal.getAllActiveWebHookConfigurations();
 		for (WebHookConfig webhookConfig : allWebhookConfigurations) {
 			registerAggragators(webhookConfig);
-			registerWebhookHealthAggragators(WEBHOOK_HEALTH_ROUTING_KEY);
 		}
+		registerWebhookHealthAggragators(WEBHOOK_HEALTH_ROUTING_KEY);
 		log.debug(" Webhook Engine completed ==== ");
 	}
 
-
 	private void registerAggragators(WebHookConfig webhookConfig) {
-		
+
 		String dataRoutingKey = webhookConfig.getMQChannel();
 		try {
 			if (dataRoutingKey != null && !registry.containsKey(dataRoutingKey)) {
-				try {
-					registry.put(dataRoutingKey, new WebHookDataSubscriber(webhookConfig));
-					log.debug("Webhook {} subscribed successfully ", webhookConfig.getWebHookName());
-					EngineStatusLogger.getInstance().createWebhookEngineStatusNode(
-							"Webhook " + webhookConfig.getWebHookName() + " subscribed successfully ", PlatformServiceConstants.SUCCESS);
-				} catch (Exception e) {
-					EngineStatusLogger.getInstance().createWebhookEngineStatusNode(
-							"Unable to subscribed Webhook " + webhookConfig.getWebHookName() + " Error Detail :" + e.getMessage(),
-							PlatformServiceConstants.FAILURE);
-					log.error("Unable to add subscriber for routing key: " + e);
-
-				}
+				registry.put(dataRoutingKey, new WebHookDataSubscriber(webhookConfig, dataRoutingKey));
+				log.debug("Webhook {} subscribed successfully ", webhookConfig.getWebHookName());
+				EngineStatusLogger.getInstance().createWebhookEngineStatusNode(
+						"Webhook " + webhookConfig.getWebHookName() + " subscribed successfully ",
+						PlatformServiceConstants.SUCCESS);
+			} else {
+				WebHookDataSubscriber dataSubscriber = (WebHookDataSubscriber) registry.get(dataRoutingKey);
+				dataSubscriber.setWebhookConfig(webhookConfig);
 			}
 		} catch (Exception e) {
-			EngineStatusLogger.getInstance().createWebhookEngineStatusNode(
-					"Unable to subscribed Webhook " + webhookConfig.getWebHookName() + " Error Detail :" + e.getMessage(),
+			EngineStatusLogger.getInstance().createWebhookEngineStatusNode("Unable to subscribed Webhook "
+					+ webhookConfig.getWebHookName() + " Error Detail :" + e.getMessage(),
 					PlatformServiceConstants.FAILURE);
-			log.error("Unable to add subscriber for routing key: " + e);
-
+			log.error("Unable to add subscriber for routing key: {} ", e);
 		}
-
 	}
 
 	private void registerWebhookHealthAggragators(String healthRoutingKey) {
@@ -90,13 +83,11 @@ public class WebHookEngineAggregatorModule extends TimerTask {
 						PlatformServiceConstants.SUCCESS);
 			}
 		} catch (Exception e) {
-			EngineStatusLogger.getInstance().createWebhookEngineStatusNode(
-					"Unable to subscribed Webhook  Health Queue " + healthRoutingKey + " Error Detail :"
-							+ e.getMessage(),
-					PlatformServiceConstants.FAILURE);
-			log.error("Unable to add subscriber for routing key: " + e);
+			EngineStatusLogger.getInstance().createWebhookEngineStatusNode("Unable to subscribed Webhook Health Queue "
+					+ healthRoutingKey + " Error Detail :" + e.getMessage(), PlatformServiceConstants.FAILURE);
+			log.error("Unable to add health subscriber for routing key: {} ", e);
 
 		}
-
 	}
+
 }

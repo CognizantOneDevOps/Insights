@@ -16,27 +16,19 @@
 package com.cognizant.devops.engines.platformwebhookengine.message.subscriber;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import com.cognizant.devops.platformcommons.constants.MessageConstants;
-import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
-import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBException;
-import com.cognizant.devops.platformcommons.dal.neo4j.Neo4jDBHandler;
-import com.cognizant.devops.platformdal.webhookConfig.WebHookConfig;
-import com.cognizant.devops.platformdal.webhookConfig.WebhookDerivedConfig;
+
 import com.cognizant.devops.engines.platformengine.message.core.EngineStatusLogger;
 import com.cognizant.devops.engines.platformwebhookengine.message.factory.EngineSubscriberResponseHandler;
-import com.cognizant.devops.engines.platformwebhookengine.modules.aggregator.WebhookMappingData;
 import com.cognizant.devops.engines.platformwebhookengine.parser.InsightsWebhookParserFactory;
 import com.cognizant.devops.engines.platformwebhookengine.parser.InsightsWebhookParserInterface;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
+import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
+import com.cognizant.devops.platformcommons.dal.neo4j.Neo4jDBHandler;
+import com.cognizant.devops.platformdal.webhookConfig.WebHookConfig;
 import com.google.gson.JsonObject;
 import com.rabbitmq.client.AMQP.BasicProperties;
 import com.rabbitmq.client.Envelope;
@@ -44,132 +36,80 @@ import com.rabbitmq.client.Envelope;
 public class WebHookDataSubscriber extends EngineSubscriberResponseHandler {
 
 	private static Logger log = LogManager.getLogger(WebHookDataSubscriber.class);
-	
-	private String responseTemplate;
-	private String toolName;
-	private String labelName;
-	private String webhookName;
-	private Set<WebhookDerivedConfig> webhookDerivedConfig;
-	
+	Neo4jDBHandler dbHandler = new Neo4jDBHandler();
 
-	public WebHookDataSubscriber(String routingKey, String responseTemplate, String toolName, String labelName,
-			String webhookName, Set<WebhookDerivedConfig> webhookDerivedConfig) throws Exception {
-		super(routingKey);
+	private WebHookConfig webhookConfig;
 
-		this.responseTemplate = responseTemplate;
-		this.toolName = toolName;
-		this.labelName = labelName;
-		this.webhookName = webhookName;
-		this.webhookDerivedConfig = webhookDerivedConfig;
+	public WebHookDataSubscriber(WebHookConfig webhookConfig, String mqChannelName) throws Exception {
+		super(mqChannelName);
+		this.webhookConfig = webhookConfig;
 	}
 
-	public WebHookDataSubscriber(WebHookConfig webhookConfig) throws Exception {
-		super(webhookConfig.getMQChannel());
-		this.toolName = webhookConfig.getToolName();
-		this.labelName = webhookConfig.getLabelName();
-		this.webhookName = webhookConfig.getWebHookName();
-		this.responseTemplate = webhookConfig.getResponseTemplate();
-		this.webhookDerivedConfig = webhookConfig.getWebhookDerivedConfig();
+	public void setWebhookConfig(WebHookConfig webhookConfigUpdated) {
+		this.webhookConfig = webhookConfigUpdated;
 	}
-
-	List<WebhookMappingData> webhookMappingList = new ArrayList<>(0);
 
 	@Override
 	public void handleDelivery(String consumerTag, Envelope envelope, BasicProperties properties, byte[] body)
 			throws IOException {
-		// Insert into Neo4j
 		try {
-
-			String message = new String(body, MessageConstants.MESSAGE_ENCODING);
-			InsightsWebhookParserInterface webHookParser = InsightsWebhookParserFactory.getParserInstance(toolName);
-			List<JsonObject> toolData = webHookParser.parseToolData(responseTemplate, message, toolName, labelName,
-					webhookName,webhookDerivedConfig);
-			if (!toolData.isEmpty()) {
-				Neo4jDBHandler dbHandler = new Neo4jDBHandler();
-				String query = "UNWIND {props} AS properties " + "CREATE (n:" + labelName.toUpperCase() + ") "
-						+ "SET n = properties";
-				dbHandler.bulkCreateNodes(toolData, null, query);
-				getChannel().basicAck(envelope.getDeliveryTag(), false);
-			} else {
-				log.error("Unmatched Response Template found for " + webhookName);
-				EngineStatusLogger.getInstance().createWebhookEngineStatusNode(
-						"No Webhook Nodes are inserted in DB for " + webhookName, PlatformServiceConstants.FAILURE);
-			}
-		} catch (GraphDBException e) {
-			EngineStatusLogger.getInstance().createWebhookEngineStatusNode(
-					"Exception while inserting Webhook Node in DB " + e.getMessage(), PlatformServiceConstants.FAILURE);
-			log.error(e);
+			String message = new String(body, StandardCharsets.UTF_8);
+			if (!message.equalsIgnoreCase("") || !message.isEmpty()) {
+				InsightsWebhookParserInterface webHookParser = InsightsWebhookParserFactory
+						.getParserInstance(this.webhookConfig.getToolName());
+				//log.debug(" this.webhookConfig response template ===== {} ", this.webhookConfig);
+				List<JsonObject> toolData = webHookParser.parseToolData(this.webhookConfig, message);
+				// Insert into Neo4j
+				if (!toolData.isEmpty()) {
+					if (this.webhookConfig.getIsUpdateRequired().booleanValue()) {
+						updateNeo4jNode(toolData, this.webhookConfig);
+					} else {
+						String query = "UNWIND {props} AS properties " + "CREATE (n:"
+								+ this.webhookConfig.getLabelName().toUpperCase() + ") " + "SET n = properties";
+						dbHandler.bulkCreateNodes(toolData, null, query);
+					}
+					getChannel().basicAck(envelope.getDeliveryTag(), false);
+					} else {
+					log.error("Unmatched Response Template found for {} ", this.webhookConfig.getWebHookName());
+					EngineStatusLogger.getInstance().createWebhookEngineStatusNode(
+							"No Webhook Nodes are inserted in DB for " + this.webhookConfig.getWebHookName(),
+							PlatformServiceConstants.FAILURE);
+					}
+				} else {
+				log.error(" No valid payload found for webhook {}  message {} ", this.webhookConfig.getWebHookName(),
+						message);
+				}
+			log.debug(" {} webhook data processed successfully ", this.webhookConfig.getWebHookName());
 		} catch (Exception e) {
 			log.error(e);
 			EngineStatusLogger.getInstance().createWebhookEngineStatusNode(
 					"Exception while pasring or DB issues " + e.getMessage(), PlatformServiceConstants.FAILURE);
-		}
-	}
-
-	private void processJson(JsonElement jsonElement) {
-		List<JsonElement> list = new ArrayList<JsonElement>();
-		if (jsonElement.isJsonNull()) {
-			log.debug("Null value " + jsonElement);
-		} else if (jsonElement.isJsonArray()) {
-
-			JsonArray jsonArray = jsonElement.getAsJsonArray();
-			// log.error("Json Array found " + jsonArray.size());
-			if (jsonArray.size() > 0) {
-				for (JsonElement jsonArrayElement : jsonArray) {
-					if (jsonArrayElement.isJsonObject()) {
-						list.addAll(Arrays.asList(jsonArrayElement));
-						processJson(jsonArrayElement);
-					} else {
-						list.addAll(Arrays.asList(jsonArrayElement));
-
-					}
-				}
-			} else {
-				// log.debug("Null value" + jsonArray);
-			}
-		} else {
-			log.debug(jsonElement);
-			JsonObject jsonObject = jsonElement.getAsJsonObject();
-			log.debug(jsonObject);
-			if (!jsonObject.isJsonNull()) {
-
-				for (Map.Entry<String, JsonElement> entry : jsonObject.entrySet()) {
-
-					if (entry.getValue().isJsonNull()) {
-
-					} else if (entry.getValue().isJsonArray()) {
-						processJson(entry.getValue());
-
-					} else if (!entry.getValue().isJsonPrimitive()) {
-						parseJsonPrimitive(entry);
-					} else {
-
-					}
-
-				}
 			}
 		}
-		log.debug(list);
-	}
 
-	private void parseJsonPrimitive(Map.Entry<String, JsonElement> entry) {
-
-		if (entry.getValue().isJsonArray()) {
-			processJson(entry.getValue());
-		} else if (!entry.getValue().isJsonNull()) {
-
-			JsonObject jsonObjectInternal = entry.getValue().getAsJsonObject();
-			for (Map.Entry<String, JsonElement> entryAgain : jsonObjectInternal.entrySet()) {
-				if (entry.getValue().isJsonArray()) {
-					processJson(entry.getValue());
-				} else if (!entryAgain.getValue().isJsonNull() && !entryAgain.getValue().isJsonPrimitive()) {
-					parseJsonPrimitive(entryAgain);
-				} else {
-
+	private void updateNeo4jNode(List<JsonObject> toolData, WebHookConfig webhookConfig2) {
+		try {
+			String finalQuery = "";
+			for (JsonObject jsonObject : toolData) {
+				StringBuilder query = new StringBuilder();
+				query.append("UNWIND {props} AS properties MERGE (node:").append(webhookConfig2.getLabelName());
+				if (webhookConfig2.getFieldUsedForUpdate() != null) {
+					query.append(" { " + webhookConfig2.getFieldUsedForUpdate() + ": ");
+					query.append(jsonObject.get(webhookConfig2.getFieldUsedForUpdate()));
+					query.append(" }) ");
+				}
+				query.append(" set node+=properties ").append(" ");
+				query.append("return count(node)").append(" ");
+				finalQuery = query.toString();
+				//log.debug(" Query for Record Detail {} ", finalQuery);
+				JsonObject graphresponse = dbHandler.createNodesWithSingleData(jsonObject, finalQuery);
+				if (graphresponse.get("response").getAsJsonObject().get("errors").getAsJsonArray().size() > 0) {
+					log.error("Unable to insert nodes for routing key: {} and webhook Name {} , error occured: {} ",
+							webhookConfig2.getMQChannel(), webhookConfig2.getWebHookName(), graphresponse);
 				}
 			}
-		} else {
-			log.debug(entry.getKey());
+		} catch (Exception e) {
+			log.error(" Error while featching DB record {} ", e);
 		}
 	}
 }

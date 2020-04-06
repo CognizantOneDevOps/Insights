@@ -16,62 +16,22 @@
 package com.cognizant.devops.engines.platformwebhookengine.test.parser;
 
 import java.time.LocalDateTime;
-import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.HashSet;
-import java.util.Set;
-
-import com.cognizant.devops.platformdal.webhookConfig.WebhookDerivedConfig;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 
 public class InsightsParserTestData {
 
 	int defaultInterval = 600;
-	String responseTemplate = "head_commit.id=commitId,head_commit.message=message,head_commit.timestamp=commitTime,head_commit.author.name=authorName";
-	String toolName = "GIT";
-	String labelName = "SCM:GIT76:DATA";
-	String mqChannel = "IPW_git_webhook";
-	String webhookName = "git_webhook";
+	String toolName = "PIVOTAL";
+	String labelName = "ALM:PIVOTAL76:DATA";
+	String mqChannel = "IPW_pivotal_webhook_parser_test";
+	String webhookName = "pivotal_webhook_parser_test";
 	String incorrectToolData = "tooldata=incorrcet";
+	String emptyDynamicTemplate = null;
 	DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
 	LocalDateTime now = LocalDateTime.now();
-	String commitId = "\"86ef096bb924674a69cd2198e2964b76aa75d88b\"";
-	String authorName = "\"Insights_test\"";
-	String message = "\"Update Hello\"";
-	String timestamp = "\"2019-09-16T04:52:25Z\"";
 	String fieldNotFoundinToolData = "head_commit.newid=commitId,head_commit.newmessage=message";
-	String toolData = "{\"head_commit\":{\"id\":\"86ef096bb924674a69cd2198e2964b76aa75d88b\",\"tree_id\":\"d1face44ae7151dfaf6387b5eaf3075419583dcc\",\"distinct\":true,\"message\":\"Update Hello\",\"timestamp\":\"2019-09-16T04:52:25Z\",\"author\":{\"name\":\"Insights_test\",\"email\":\"46189557+insights@users.noreply.github.com\",\"username\":\"insights546\"},\"committer\":{\"name\":\"GitHub\",\"email\":\"noreply@github.com\",\"username\":\"web-flow\"},\"added\":[],\"removed\":[],\"modified\":[\"Hello\"]}}";
-	String expectedOutput = "{\"commitTime\":\"2019-09-16T04:52:25Z\",\"authorName\":\"Insights_test\",\"insightsTime\":"
-			+ ZonedDateTime.now().toInstant().toEpochMilli()
-			+ ",\"webhookName\":\"git_demo\",\"commitId\":\"86ef096bb924674a69cd2198e2964b76aa75d88b\",\"source\":\"webhook\",\"message\":\"Update Hello\",\"inSightsTimeX\":\""
-			+ dtf.format(now) + "\",\"labelName\":\"SCM:GIT76:DATA\",\"toollName\":\"GIT\"}";
-	Set<WebhookDerivedConfig> setWebhookDerivedConfigs = new HashSet<WebhookDerivedConfig>();
-	WebhookDerivedConfig wdcInsightsTime = new WebhookDerivedConfig();
-	WebhookDerivedConfig wdcTimeSeriesMapping = new WebhookDerivedConfig();
-	WebhookDerivedConfig wdcDataEnrichment = new WebhookDerivedConfig();
-	String operationFieldsTimeX = "{\"timeField\":\"commitTime\",\"timeFormat\":\"yyyy-MM-dd'T'HH:mm:ssXXX\",\"epochTime\":\"false\"}";
-	String operationFieldsTimeSeries = "{\"mappingTimeField\":\"commitTime\",\"mappingTimeFormat\":\"yyyy-MM-dd'T'HH:mm:ssXXX\",\"epochTime\":\"false\"}";
-	String operationFieldsDataEnrich = "{\"sourceProperty\":\"message\",\"keyPattern\":\"-\",\"targetProperty\":\"jirakey\"}";
-	//JsonObject jsonObject = new JsonParser().parse(operationFieldsDataEnrich).getAsJsonObject();
-	public Set<WebhookDerivedConfig> getSetObject() {
-		wdcInsightsTime.setOperationName("insightsTimex");
-		wdcInsightsTime.setWebhookName("git_demo");
-		wdcInsightsTime.setWid(123);
-		wdcInsightsTime.setOperationFields(operationFieldsTimeX);
-		setWebhookDerivedConfigs.add(wdcInsightsTime);
-		wdcTimeSeriesMapping.setOperationFields(operationFieldsTimeSeries);
-		wdcTimeSeriesMapping.setOperationName("timeFieldSeriesMapping");
-		wdcTimeSeriesMapping.setWebhookName("git_demo");
-		wdcTimeSeriesMapping.setWid(173);
-		setWebhookDerivedConfigs.add(wdcTimeSeriesMapping);
-		wdcDataEnrichment.setOperationFields(operationFieldsDataEnrich);
-		wdcDataEnrichment.setOperationName("dataEnrichment");
-		wdcDataEnrichment.setWebhookName("git_demo");
-		wdcDataEnrichment.setWid(873);
-		setWebhookDerivedConfigs.add(wdcDataEnrichment);
-
-		return setWebhookDerivedConfigs;
-	}
-
+	String toolDataWithArray = "{\"kind\":\"blocker_create_activity\",\"guid\":\"2182342_9453\",\"created_at\":\"2020-03-11T18:17:37+05:30\",\"project_version\":9453,\"message\":\"surbhigupta1 added a blocker: \\\"https://www.pivotaltracker.com/story/show/171787663\\\"\",\"highlight\":\"added a blocker\",\"changes\":[{\"kind\":\"blocker\",\"change_type\":\"create\",\"id\":2197991,\"original_values\":{\"owner_ids\":[3133265,3086337,899032323],\"updated_at\":1584418981000},\"new_values\":{\"id\":2197991,\"story_id\":171874214,\"person_id\":3133265,\"description\":\"https://www.pivotaltracker.com/story/show/171787663\",\"resolved\":false,\"owner_ids\":[3133265,89343233],\"created_at\":1584610689000,\"updated_at\":1584610689000,\"value\":341332.3223}},{\"kind\":\"story\",\"change_type\":\"update\",\"id\":171874214,\"original_values\":{\"updated_at\":1584337896000,\"blocked_story_ids\":[]},\"new_values\":{\"updated_at\":1584610689000,\"blocked_story_ids\":[171874214]},\"name\":\"Webhook Testing Story\",\"story_type\":\"bug\"},{\"kind\":\"story\",\"change_type\":\"update\",\"id\":171874214,\"original_values\":{\"updated_at\":1584610516000},\"new_values\":{\"updated_at\":1584610689000},\"name\":\"Webhook Testing Story\",\"story_type\":\"bug\"}],\"primary_resources\":[{\"kind\":\"story\",\"id\":171874214,\"name\":\"Webhook Testing Story\",\"story_type\":\"bug\",\"url\":\"https://www.pivotaltracker.com/story/show/171874214\"}],\"secondary_resources\":[{\"kind\":\"secondary_resource\",\"message\":\"This story is blocking #171874214: \\\"https://www.pivotaltracker.com/story/show/171787663\\\"\",\"highlight\":\"is blocking\",\"resource\":{\"kind\":\"story\",\"id\":171787663,\"name\":\"WebHookFaultTolerance Artifacts not create with correct name in slack\",\"story_type\":\"bug\"}}],\"project\":{\"kind\":\"project\",\"id\":2182342,\"name\":\"OneDevOps\"},\"performed_by\":{\"kind\":\"person\",\"id\":3133265,\"name\":\"surbhigupta1\",\"initials\":\"su\"},\"occurred_at\":1584610689000,\"webHookName\":\"PIVOTALTRACKER_65_WEBHOOK\",\"iswebhookdata\":true}";
+	String responseTemplateForArray = "project.id=projectId,kind=story_state,occurred_at=pivotalTime,message=message";
+	String dynamicTemplateWithArray = "{\"message\":\"storyDetail\",\"performed_by\":{\"name\":\"performed_by_name\",\"initials\":\"performed_by_initials\"},\"changes\":[{\"kind\":\"newKind\",\"change_type\":\"newchange_type\",\"accepted_at\":\"story_accepted_at\",\"original_values\":{\"updated_at\":\"originalupdated_at\",\"owner_ids\":\"originalowner_ids\"},\"new_values\":{\"updated_at\":\"newupdated_at\",\"owner_ids\":\"newowner_ids\",\"person_id\":\"person_id\",\"review_type_id\":\"review_type_id\",\"resolved\":\"newresolved\",\"created_at\":\"newcreated_at\",\"value\":\"newvalue\",\"label_ids\":\"label_ids\"}}],\"primary_resources\":[{\"story_type\":\"story_type\",\"id\":\"pivotalId\",\"name\":\"name\"}],\"secondary_resources\":[{\"resource\":{\"id\":\"blockerStoryId\"}}]}";
+	String fieldUsedForUpdate = "pivotalId";
 }

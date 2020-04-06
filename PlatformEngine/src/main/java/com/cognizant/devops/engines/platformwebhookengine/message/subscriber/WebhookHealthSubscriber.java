@@ -28,7 +28,6 @@ import com.cognizant.devops.platformcommons.constants.MessageConstants;
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBException;
 import com.cognizant.devops.platformcommons.dal.neo4j.Neo4jDBHandler;
-import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -48,25 +47,16 @@ public class WebhookHealthSubscriber extends EngineSubscriberResponseHandler {
 		Neo4jDBHandler dbHandler = new Neo4jDBHandler();
 		String message = new String(body, MessageConstants.MESSAGE_ENCODING);
 		String routingKey = envelope.getRoutingKey();
-		log.debug(consumerTag + "  Received '" + routingKey + "':'" + message + "'");
+		log.debug(" {}  Received  {} : {}", consumerTag, routingKey, message);
 		List<JsonObject> dataList = new ArrayList<JsonObject>();
 		JsonElement json = new JsonParser().parse(message);
-		if (json.isJsonArray()) {
-			JsonArray asJsonArray = json.getAsJsonArray();
-			for (JsonElement e : asJsonArray) {
-				if (e.isJsonObject()) {
-					JsonObject jsonObject = e.getAsJsonObject();
-					dataList.add(jsonObject);
-				}
-			}
-
-		} else if (json.isJsonObject()) {
+		if (json.isJsonObject()) {
 			log.debug("This is normal json object for webhook health ");
 			dataList.add(json.getAsJsonObject());
 		}
 
 		try {
-			if (dataList.size() > 0) {
+			if (!dataList.isEmpty()) {
 				String healthLabels = ":" + routingKey.replace(".", ":");
 				boolean isRecordUpdate = createHealthNodes(dbHandler, dataList, healthLabels);
 				log.debug("Webhook Health Record update status ==== " + isRecordUpdate);
@@ -102,9 +92,7 @@ public class WebhookHealthSubscriber extends EngineSubscriberResponseHandler {
 		JsonObject graphResponse = dbHandler.executeQueryWithData(cypherhealthQuery, dataList);
 		if (graphResponse.get("response").getAsJsonObject().get("errors").getAsJsonArray().size() > 0) {
 			isRecordUpdate = Boolean.FALSE;
-			log.error("Unable to insert health nodes for routing key: " + nodeLabels + ", error occured: "
-					+ graphResponse);
-			log.error(dataList);
+			log.error("Unable to insert health nodes for routing key: {} error {}  ", nodeLabels, graphResponse);
 			EngineStatusLogger.getInstance().createEngineStatusNode(
 					"Unable to insert health nodes for routing key: " + nodeLabels, PlatformServiceConstants.FAILURE);
 		}
