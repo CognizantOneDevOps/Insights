@@ -34,37 +34,50 @@ import com.google.gson.JsonObject;
 @RestController
 @RequestMapping("/admin/bulkupload")
 public class InsightsBulkUpload {
-    static Logger log = LogManager.getLogger(InsightsBulkUpload.class.getName());
-    
+	static Logger log = LogManager.getLogger(InsightsBulkUpload.class.getName());
 
-    @Autowired
-    BulkUploadService bulkUploadService;
+	@Autowired
+	BulkUploadService bulkUploadService;
 
-    @RequestMapping(value = "/uploadToolData", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public @ResponseBody JsonObject uploadToolData(@RequestParam("file") MultipartFile file,
-        @RequestParam String toolName, @RequestParam String label) {
-        boolean status = false;
-        try {
-            status = bulkUploadService.uploadDataInDatabase(file, toolName, label);
-            return PlatformServiceUtil.buildSuccessResponse();
-        } catch (Exception e) {
-            log.error(e.getMessage());
-            return PlatformServiceUtil.buildFailureResponse(e.getMessage());
-        }
-    }
+	/**
+	 * entry point to upload Bulk Data
+	 *
+	 * @param file
+	 * @param toolName
+	 * @param label
+	 * @param insightsTimeField
+	 * @param insightsTimeFormat
+	 * @return ResponseBody
+	 */
+	@RequestMapping(value = "/uploadToolData", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+	public @ResponseBody JsonObject uploadToolData(@RequestParam("file") MultipartFile file,
+			@RequestParam String toolName, @RequestParam String label, @RequestParam String insightsTimeField,
+			@RequestParam String insightsTimeFormat) {
+		boolean status = false;
+		try {
+			status = bulkUploadService.uploadDataInDatabase(file, toolName, label, insightsTimeField,
+					insightsTimeFormat);
+			return PlatformServiceUtil.buildSuccessResponse();
+		} catch (InsightsCustomException e) {
+			log.error(e.getMessage());
+			return PlatformServiceUtil.buildFailureResponse(e.getMessage());
+		}
+	}
 
-    @RequestMapping(value = "/getToolJson", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public @ResponseBody JsonObject getToolJson() {
-        Object details = null;
-        try {
-            details = bulkUploadService.getToolDetailJson();
-            return PlatformServiceUtil.buildSuccessResponseWithData(details);
-        } catch (InsightsCustomException e) {
-            log.error(e.getMessage());
-            return PlatformServiceUtil.buildFailureResponse(e.getMessage());
-        } catch (Exception e) {
-            log.error(e.getMessage());
-            return PlatformServiceUtil.buildFailureResponse(e.getMessage());
-        }
-    }
+	/**
+	 * entry point to get Tool Details
+	 *
+	 * @return ResponseBody
+	 */
+	@RequestMapping(value = "/getToolJson", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+	public @ResponseBody JsonObject getToolJson() {
+		Object details = null;
+		try {
+			details = bulkUploadService.getToolDetailJson();
+			return PlatformServiceUtil.buildSuccessResponseWithData(details);
+		} catch (InsightsCustomException e) {
+			log.error(e.getMessage());
+			return PlatformServiceUtil.buildFailureResponse(e.getMessage());
+		}
+	}
 }

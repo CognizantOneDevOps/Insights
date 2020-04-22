@@ -1,0 +1,6 @@
+repoName,projectName,branchName,commitId,authorName,JiraId,Sprint,authorEmail,commitTime
+batch-jobs,CUP,release/0.5.0,5f574a0a9c1a0269c54ca93958cee83b8bc17e04,Saranya,CMAE-2423,Care Bears -PI-5.1,Saranya.Deivasigamani@caremore.com,1.15E+12
+batch-jobs,CUP,master,5f574a0a9c1a0269c54ca93958cee83b8bc17e04,Saranya,CMAE-2423,Care Bears -PI-5.1,Saranya.Deivasigamani@caremore.com,1.25E+12
+batch-jobs,CUP,develop-0.5.0,5f574a0a9c1a0269c54ca93958cee83b8bc17e04,Saranya,CMAE-2423,Care Bears -PI-5.1,Saranya.Deivasigamani@caremore.com,1.3E+12
+batch-jobs,CUP,develop,5f574a0a9c1a0269c54ca93958cee83b8bc17e04,Saranya,CMAE-2423,Care Bears -PI-5.1,Saranya.Deivasigamani@caremore.com,1.45E+12
+batch-jobs,CUP,release/0.4.0,5f574a0a9c1a0269c54ca93958cee83b8bc17e04,Saranya,CMAE-2423,Care Bears -PI-5.1,Saranya.Deivasigamani@caremore.com,1.55E+12
