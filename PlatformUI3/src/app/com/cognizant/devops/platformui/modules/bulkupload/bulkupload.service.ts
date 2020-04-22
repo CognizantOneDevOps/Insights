@@ -13,33 +13,48 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  ******************************************************************************/
-import { Injectable } from '@angular/core';
-import { RestCallHandlerService } from '@insights/common/rest-call-handler.service';
-import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Injectable } from "@angular/core";
+import { RestCallHandlerService } from "@insights/common/rest-call-handler.service";
+import { HttpClient } from "@angular/common/http";
+import { Observable } from "rxjs";
 
 export interface IBulkUploadService {
-    getDocRootAgentVersionTools(): Promise<any>;
-    loadUiServiceLocation(): Promise<any>;
-    uploadFile(formData: any, toolName: string, labelName: string): Promise<any>;
+  getDocRootAgentVersionTools(): Promise<any>;
+  loadUiServiceLocation(): Promise<any>;
+  uploadFile(
+    formData: any,
+    toolName: string,
+    labelName: string,
+    insightTimex: any,
+    insightTime: any
+  ): Promise<any>;
 }
 
 @Injectable()
 export class BulkUploadService implements IBulkUploadService {
-    constructor(private restCallHandlerService: RestCallHandlerService) {
+  constructor(private restCallHandlerService: RestCallHandlerService) {}
+  getDocRootAgentVersionTools(): Promise<any> {
+    return this.restCallHandlerService.get("DOCROOT_AGENT_VERSION_TOOLS");
+  }
 
-    }
-    getDocRootAgentVersionTools(): Promise<any> {
-        return this.restCallHandlerService.get("DOCROOT_AGENT_VERSION_TOOLS");
-    }
+  uploadFile(
+    formData: any,
+    toolName: string,
+    labelName: string,
+    InsightsTimeField: any,
+    InsightsTimeFormat: any
+  ): Promise<any> {
+    return this.restCallHandlerService
+      .postFormDataWithParameter("UPLOAD_FILE", formData, {
+        toolName: toolName,
+        label: labelName,
+        insightsTimeField: InsightsTimeField,
+        insightsTimeFormat: InsightsTimeFormat,
+      })
+      .toPromise();
+  }
 
-    uploadFile(formData: any, toolName: string, labelName: string): Promise<any> {
-        return this.restCallHandlerService.postFormDataWithParameter("UPLOAD_FILE", formData, { 'toolName': toolName, 'label': labelName }).toPromise();;
-
-    }
-    loadUiServiceLocation(): Promise<any> {
-        return this.restCallHandlerService.get("TOOLNAME_LABELNAME_JSON");
-
-    }
+  loadUiServiceLocation(): Promise<any> {
+    return this.restCallHandlerService.get("TOOLNAME_LABELNAME_JSON");
+  }
 }
-

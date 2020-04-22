@@ -23,6 +23,7 @@ import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 
 public interface IBulkUpload {
 	public Object getToolDetailJson() throws InsightsCustomException;
-	public boolean uploadDataInDatabase(MultipartFile file, String toolName, String label)
-			throws InsightsCustomException, IOException;
+
+	public boolean uploadDataInDatabase(MultipartFile file, String toolName, String label, String insightsTimeField,
+			String insightsTimeFormat) throws InsightsCustomException, IOException;
 }
