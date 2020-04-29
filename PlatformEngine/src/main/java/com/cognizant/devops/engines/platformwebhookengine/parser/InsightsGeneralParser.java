@@ -43,7 +43,11 @@ import com.google.gson.JsonParser;
 public class InsightsGeneralParser implements InsightsWebhookParserInterface {
 	private static Logger LOG = LogManager.getLogger(InsightsGeneralParser.class);
 
+	/**
+	 * Creating the final JSON which will be inserted in Neo4j
+	 */
 	@Override
+
 	public List<JsonObject> parseToolData(WebHookConfig webhookConfig, String message) throws InsightsCustomException {
 
 		try {
@@ -52,14 +56,14 @@ public class InsightsGeneralParser implements InsightsWebhookParserInterface {
 			if (webhookConfig.getResponseTemplate() != null) {
 				responseTemplateJson = processResponseTemplate(webhookConfig, message);
 			}
-			// dynamic tempate not empty 
+			// dynamic template is not empty
 			List<JsonObject> responseDynamicTemplateList = new ArrayList(0);
 			if (webhookConfig.getDynamicTemplate() != null
 					&& !webhookConfig.getDynamicTemplate().equalsIgnoreCase("{}")) {
 				responseDynamicTemplateList = parseDynamicTemplate(webhookConfig, message);
 			}
 
-			//merge both response template data 
+			// merge both response template data
 			if (!responseDynamicTemplateList.isEmpty()) {
 				mergeData(responseDynamicTemplateList, responseTemplateJson, retrunJsonList);
 			} else if (!responseTemplateJson.entrySet().isEmpty()) {
@@ -68,7 +72,8 @@ public class InsightsGeneralParser implements InsightsWebhookParserInterface {
 				retrunJsonList.add(responseTemplateJson);
 			}
 
-			//Apply additional field mapping using webhook derived cofiguration to combined data
+			// Apply additional field mapping using webhook derived cofiguration to combined
+			// data
 			for (JsonObject jsonObject : retrunJsonList) {
 				jsonObject.addProperty("source", "webhook");
 				jsonObject.addProperty("toolName", webhookConfig.getToolName());
@@ -84,10 +89,9 @@ public class InsightsGeneralParser implements InsightsWebhookParserInterface {
 		}
 	}
 
-
-
 	/**
-	 * This method is used to process normal Response Template
+	 * This method is used to process Response Template
+	 * 
 	 * @param webhookConfig
 	 * @param message
 	 * @return
@@ -113,10 +117,10 @@ public class InsightsGeneralParser implements InsightsWebhookParserInterface {
 		return responseTemplateJson;
 	}
 
-
-
 	/**
-	 * This Method is used to apply WebhookDerivedConfigurations
+	 * This Method is used to apply WebhookDerivedConfigurations,the additional
+	 * Operations eg.Addition of InsightsTimeX
+	 * 
 	 * @param webhookDerivedConfigs
 	 * @param responseTemplateJson
 	 * @throws InsightsCustomException
@@ -181,12 +185,12 @@ public class InsightsGeneralParser implements InsightsWebhookParserInterface {
 	}
 
 	/**
-	 * This method is use to apply dynamic parsing
+	 * This method is use to apply parsing of the Dynamic Template.
+	 * 
 	 * @param webhookConfig
 	 * @param finalJson
 	 */
 	private List<JsonObject> parseDynamicTemplate(WebHookConfig webhookConfig, String message) {
-		//combile response template json and dynamic respostemplt json 
 		InsightsDynamicJsonParser dynamicParser = new InsightsDynamicJsonParser();
 		ObjectMapper mapper = new ObjectMapper();
 		List<JsonObject> responceDynamicTemplateFinalDataList = new ArrayList(0);
@@ -221,6 +225,9 @@ public class InsightsGeneralParser implements InsightsWebhookParserInterface {
 	}
 
 	/**
+	 * Method to fetch the property field required for derived operation,from the
+	 * JSON created from Response/Dynamic template
+	 * 
 	 * @param webhookDerivedConfig
 	 * @param parser
 	 * @param responseTemplateJson
@@ -268,6 +275,13 @@ public class InsightsGeneralParser implements InsightsWebhookParserInterface {
 		}
 	}
 
+	/**
+	 * Method used to create the map of the "String" Response template,entered by
+	 * the user.
+	 * 
+	 * @param responseTemplate
+	 * @return
+	 */
 	private Map<String, String> getResponseTemplateMap(String responseTemplate) {
 
 		Map<String, String> responseTemplateMap = new HashMap<>();

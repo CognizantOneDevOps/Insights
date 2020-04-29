@@ -63,6 +63,13 @@ public class WebHookServiceImpl implements IWebHook {
 
 	}
 
+	/**
+	 * Validation of the Response Template which has been entered by the user
+	 * 
+	 * @param responseTemplate
+	 * @return
+	 * @throws InsightsCustomException
+	 */
 	private Boolean checkResponseTemplate(String responseTemplate) throws InsightsCustomException {
 		try {
 			StringTokenizer st = new StringTokenizer(responseTemplate, ",");
@@ -80,14 +87,21 @@ public class WebHookServiceImpl implements IWebHook {
 		} catch (InsightsCustomException e) {
 			log.error("Error in Response Template.. {}", e.getMessage());
 			throw new InsightsCustomException(PlatformServiceConstants.INCORRECT_RESPONSE_TEMPLATE);
-		} 
+		}
 	}
 
+	/**
+	 * Populatating the data received from the user into the Object of the entity class.
+	 * 
+	 * @param registerWebhookjson
+	 * @return
+	 * @throws InsightsCustomException
+	 */
 	private WebHookConfig populateWebHookConfiguration(JsonObject registerWebhookjson) throws InsightsCustomException {
 		try {
 			WebHookConfig webhookConfiguration = new WebHookConfig();
 			String responseTemplate = registerWebhookjson.get("responseTemplate").getAsString();
-			if(responseTemplate != "") {
+			if (responseTemplate != "") {
 				checkResponseTemplate(responseTemplate);
 			}
 			String dynamicTemplate = registerWebhookjson.get("dynamicTemplate").getAsString();
@@ -131,7 +145,7 @@ public class WebHookServiceImpl implements IWebHook {
 		} catch (InsightsCustomException e) {
 			log.error(e.getMessage());
 			throw new InsightsCustomException(e.getMessage());
-		} 
+		}
 	}
 
 	@Override

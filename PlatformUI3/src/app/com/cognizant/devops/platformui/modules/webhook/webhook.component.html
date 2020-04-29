@@ -40,14 +40,12 @@
                 </mat-icon>
             </button>
             <button [disabled] *ngIf="!enableWebhookicon" mat-icon-button>
-                <mat-icon svgIcon="webhookDeactive" title="List Existing Webhooks" style="margin-bottom: 20%;"
-                    class="mat-icon material-icons">
+                <mat-icon svgIcon="webhookDeactive" title="List Existing Webhooks" style="margin-bottom: 20%;" class="mat-icon material-icons">
 
                 </mat-icon>
             </button>
             <button *ngIf="enableWebhookicon" mat-icon-button (click)="list()">
-                <mat-icon svgIcon="webhook" title="List Existing WebHooks" style="margin-bottom: 20%;"
-                    class="mat-icon material-icons">
+                <mat-icon svgIcon="webhook" title="List Existing WebHooks" style="margin-bottom: 20%;" class="mat-icon material-icons">
                 </mat-icon>
             </button>
             <button [disabled]="!enablesubscribe" mat-icon-button (click)="actionSubscribeOrUnsubscribe( true)">
@@ -56,8 +54,7 @@
                 </mat-icon>
             </button>
 
-            <button [disabled]="!enableunsubscribe" *ngIf="!enableunsubscribe" mat-icon-button
-                (click)="actionSubscribeOrUnsubscribe( false)">
+            <button [disabled]="!enableunsubscribe" *ngIf="!enableunsubscribe" mat-icon-button (click)="actionSubscribeOrUnsubscribe( false)">
                 <mat-icon class="svgIconCss" title="Unsubscribe" svgIcon="unsubscribe_webhookDeactive">
                 </mat-icon>
             </button>
@@ -82,15 +79,13 @@
                 </mat-icon>
             </button>
             <button *ngIf="enableDelete" mat-icon-button>
-                <mat-icon class="svgIconCssCopyClipboard" style="margin-top: 10%;"
-                    (click)="copyInputMessage(selectedWebhook)" [ngxClipboard]="value_to_copy"
-                    title="Copy the Webhook Url to Clipboard" svgIcon="webhookCopyClipboard">
+                <mat-icon class="svgIconCssCopyClipboard" style="margin-top: 10%;" (click)="copyInputMessage(selectedWebhook)"
+                    [ngxClipboard]="value_to_copy" title="Copy the Webhook Url to Clipboard" svgIcon="webhookCopyClipboard">
                 </mat-icon>
             </button>
             <button disabled *ngIf="!enableDelete" mat-icon-button>
-                <mat-icon class="svgIconCssCopyClipboardDisable" style="margin-top: 10%;"
-                    (click)="copyInputMessage(selectedWebhook)" [ngxClipboard]="value_to_copy"
-                    svgIcon="webhookCopyClipboard">
+                <mat-icon class="svgIconCssCopyClipboardDisable" style="margin-top: 10%;" (click)="copyInputMessage(selectedWebhook)"
+                    [ngxClipboard]="value_to_copy" svgIcon="webhookCopyClipboard">
                 </mat-icon>
             </button>
             <button mat-icon-button (click)="Refresh()" [disabled]="!enableRefresh">
@@ -102,14 +97,12 @@
 
         <div *ngIf="showWebhook">
             <mat-radio-group [(ngModel)]="selectedWebhook">
-                <table mat-table [dataSource]="webhookDatasource" class="mat-elevation-z8"
-                    style="margin-top:2% !important">
+                <table mat-table [dataSource]="webhookDatasource" class="mat-elevation-z8" style="margin-top:2% !important">
                     <!-- Radio Button Column -->
                     <ng-container matColumnDef="radio">
                         <th mat-header-cell *matHeaderCellDef class="tableHeaderCss"></th>
                         <td mat-cell *matCellDef="let element " style="width:5% !important">
-                            <mat-radio-button [value]="element" [checked]="refreshRadio" color="primary"
-                                (click)="enableButtons(element)"></mat-radio-button>
+                            <mat-radio-button [value]="element" [checked]="refreshRadio" color="primary" (click)="enableButtons(element)"></mat-radio-button>
                         </td>
                     </ng-container>
                     <ng-container matColumnDef="WebHookName">
@@ -170,10 +163,8 @@
                             <span style="color:#ff0000;">*</span>
                         </td>
                         <td class="columnComponent">
-                            <input maxlength="40" [disabled]="disableInputFields"
-                                [ngClass]="{'input-disabled' : disableInputFields ,  'form-control': !disableInputFields}"
-                                type="text" [(ngModel)]="webhookName" name="webhookName"
-                                (ngModelChange)="changeMqChannel()">
+                            <input maxlength="40" [disabled]="disableInputFields" [ngClass]="{'input-disabled' : disableInputFields ,  'form-control': !disableInputFields}"
+                                type="text" [(ngModel)]="webhookName" name="webhookName" (ngModelChange)="changeMqChannel()">
                         </td>
                         <td>
                             <span class="infoText">Please input a logical Webhook Name to make it simplier to
@@ -203,11 +194,11 @@
                             <!--  <span class="asteriskText">*</span> -->
                         </td>
                         <td class="columnComponent">
-                            <input maxlength="40" type="text" class="form-control" [(ngModel)]="labelDisplay"
-                                name="labelDisplay">
+                            <input maxlength="40" type="text" class="form-control" [(ngModel)]="labelDisplay" name="labelDisplay">
                         </td>
                         <td>
-                            <span class="infoText"> <b>Label Name </b>for which the Webhook will be configured.</span>
+                            <span class="infoText"> <b>Label Name </b>for which the Webhook will be configured. <br>(FORMAT
+                                :- TOOL_CATEGORY:LABEL_NAME:DATA)</span>
                         </td>
                     </tr>
                     <tr class="mat-row-webhook">
@@ -246,8 +237,8 @@
                             <span class="mainText">Response Template</span>
                         </td>
                         <td class="columnComponent">
-                            <textarea [(ngModel)]="responseTemplate" name="responseTemplate" class="frmTxtarea" required
-                                style="width: 85%;resize: none;"></textarea>
+                            <textarea [(ngModel)]="responseTemplate" name="responseTemplate" class="frmTxtarea"
+                                required style="width: 85%;resize: none;"></textarea>
                         </td>
                         <td>
                             <span class="infoText">Please add response Template.It can be used in
@@ -272,11 +263,10 @@
                             <span class="mainText">Is Node updation required?</span>
                         </td>
                         <td class="columnComponent">
-                            <mat-slide-toggle [(ngModel)]="isUpdateRequired" [checked]="isUpdateRequired"
-                                style="margin-right: 15%;margin-left: 9%;">
+                            <mat-slide-toggle [(ngModel)]="isUpdateRequired" [checked]="isUpdateRequired" style="margin-right: 15%;margin-left: 9%;">
                             </mat-slide-toggle>
-                            <input *ngIf="isUpdateRequired" [(ngModel)]="fieldUsedForUpdate" class="nodeUpdateCss"
-                                type="text" placeholder="Field required for updation">
+                            <input *ngIf="isUpdateRequired" [(ngModel)]="fieldUsedForUpdate" class="nodeUpdateCss" type="text"
+                                placeholder="Field required for updation">
                         </td>
                         <td>
                             <span class="infoText">Enter the field,based on which the nodes in Neo4j will be
@@ -289,11 +279,9 @@
                             <span class="asteriskText">*</span>
                         </td>
                         <td class="columnComponent">
-                            <div class="containerDiv"
-                                *ngFor="let item of getderivedOperationItems('insightsTimex'); let i=index">
+                            <div class="containerDiv" *ngFor="let item of getderivedOperationItems('insightsTimex'); let i=index">
                                 <label class=" subText divDataLabels" style="margin-top: 4%;">Time Field</label>
-                                <input class="form-control" type="text"
-                                    style="margin-bottom: -2%;width: 58%;margin-left: 27%;margin-top: -8%;"
+                                <input class="form-control" type="text" style="margin-bottom: -2%;width: 58%;margin-left: 27%;margin-top: -8%;"
                                     [(ngModel)]="item.operationFields.timeField" name={{item.operationFields.timeField}}
                                     placeholder=" Time Field">
                                 <br>
@@ -302,13 +290,11 @@
                                     name={{item.operationFields.epochTime}} style="margin-right: 15%;margin-left: 9%;">
                                 </mat-slide-toggle>
                                 <br>
-                                <label class="subText divDataLabels" *ngIf="!item.operationFields.epochTime"
-                                    style="margin-top: 4%;">Time
+                                <label class="subText divDataLabels" *ngIf="!item.operationFields.epochTime" style="margin-top: 4%;">Time
                                     Format</label>
-                                <input class="form-control" *ngIf="!item.operationFields.epochTime" type="text"
-                                    style="margin-bottom:2%;width: 58%;margin-left: 27%;margin-top: -8%;"
-                                    [(ngModel)]="item.operationFields.timeFormat"
-                                    name={{item.operationFields.timeFormat}} placeholder="Time Format">
+                                <input class="form-control" *ngIf="!item.operationFields.epochTime" type="text" style="margin-bottom:2%;width: 58%;margin-left: 27%;margin-top: -8%;"
+                                    [(ngModel)]="item.operationFields.timeFormat" name={{item.operationFields.timeFormat}}
+                                    placeholder="Time Format">
                             </div>
                         </td>
                         <td>
@@ -321,19 +307,15 @@
                             <span class="mainText">Add Time Fields</span>
                         </td>
                         <td class="columnComponent">
-                            <div class="containerDiv"
-                                *ngFor="let item of getderivedOperationItems('timeFieldSeriesMapping'); let i=index">
+                            <div class="containerDiv" *ngFor="let item of getderivedOperationItems('timeFieldSeriesMapping'); let i=index">
                                 <label class="subText divDataLabels">Time Field</label>
-                                <input class="form-control enrichDataInputFields" type="text"
-                                    [(ngModel)]="item.operationFields.mappingTimeField"
+                                <input class="form-control enrichDataInputFields" type="text" [(ngModel)]="item.operationFields.mappingTimeField"
                                     name={{item.operationFields.mappingTimeField}} placeholder="Time Field">
                                 <label class="subText divDataLabels">Time Format</label>
-                                <input class="form-control enrichDataInputFields" type="text"
-                                    [(ngModel)]="item.operationFields.mappingTimeFormat"
+                                <input class="form-control enrichDataInputFields" type="text" [(ngModel)]="item.operationFields.mappingTimeFormat"
                                     name={{item.operationFields.mappingTimeFormat}} placeholder="Time Format">
                                 <button mat-icon-button (click)="deleteTimeFieldMappings(i)">
-                                    <mat-icon style="color: #0033a0" title="Remove Time Fields"
-                                        class="mat-icon material-icons">
+                                    <mat-icon style="color: #0033a0" title="Remove Time Fields" class="mat-icon material-icons">
                                         remove_circle
                                     </mat-icon>
                                 </button>
@@ -355,23 +337,18 @@
                             <span class="mainText">Data Enrichment</span>
                         </td>
                         <td class="columnComponent">
-                            <div class="containerDiv"
-                                *ngFor="let item of getderivedOperationItems('dataEnrichment'); let i=index">
+                            <div class="containerDiv" *ngFor="let item of getderivedOperationItems('dataEnrichment'); let i=index">
                                 <label class="subText divDataLabels">Source Property</label>
-                                <input class="form-control enrichDataInputFields" type="text"
-                                    [(ngModel)]="item.operationFields.sourceProperty"
+                                <input class="form-control enrichDataInputFields" type="text" [(ngModel)]="item.operationFields.sourceProperty"
                                     name={{item.operationFields.sourceProperty}} placeholder="Source Property">
                                 <label class="subText divDataLabels">Key Pattern</label>
-                                <input class="form-control enrichDataInputFields" type="text"
-                                    [(ngModel)]="item.operationFields.keyPattern"
+                                <input class="form-control enrichDataInputFields" type="text" [(ngModel)]="item.operationFields.keyPattern"
                                     name={{item.operationFields.keyPattern}} placeholder="Key Pattern">
                                 <label class="subText divDataLabels">Target Property</label>
-                                <input class="form-control enrichDataInputFields" type="text"
-                                    [(ngModel)]="item.operationFields.targetProperty"
+                                <input class="form-control enrichDataInputFields" type="text" [(ngModel)]="item.operationFields.targetProperty"
                                     name={{item.operationFields.targetProperty}} placeholder="Target Property">
                                 <button mat-icon-button (click)="deleteEnrichmentData(i)">
-                                    <mat-icon style="color: #0033a0" title="Remove Time Fields"
-                                        class="mat-icon material-icons">
+                                    <mat-icon style="color: #0033a0" title="Remove Time Fields" class="mat-icon material-icons">
                                         remove_circle
                                     </mat-icon>
                                 </button>

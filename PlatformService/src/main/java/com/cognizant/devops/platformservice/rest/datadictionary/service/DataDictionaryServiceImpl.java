@@ -29,13 +29,12 @@ import com.cognizant.devops.platformcommons.dal.neo4j.GraphResponse;
 import com.cognizant.devops.platformcommons.dal.neo4j.Neo4jDBHandler;
 import com.cognizant.devops.platformdal.agentConfig.AgentConfig;
 import com.cognizant.devops.platformdal.agentConfig.AgentConfigDAL;
+import com.cognizant.devops.platformdal.webhookConfig.WebHookConfig;
+import com.cognizant.devops.platformdal.webhookConfig.WebHookConfigDAL;
 import com.cognizant.devops.platformservice.rest.util.PlatformServiceUtil;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 
 @Service("dataDictionaryService")
 public class DataDictionaryServiceImpl implements DataDictionaryService {
@@ -45,33 +44,50 @@ public class DataDictionaryServiceImpl implements DataDictionaryService {
 	@Override
 	public JsonObject getToolsAndCategories() {
 		AgentConfigDAL agentConfigDAL = new AgentConfigDAL();
-		JsonArray toolDetailArray = new JsonArray();
-		Set<String> toolUniqueSet = new HashSet<>(0);
+		WebHookConfigDAL webhookConfigDal = new WebHookConfigDAL();
+		JsonArray uniqueToolDetailArray = new JsonArray();
+		Set<JsonObject> uniquetoolDetailSet = new HashSet<>();
+
 		try {
 			List<AgentConfig> agentConfigList = agentConfigDAL.getAllDataAgentConfigurations();
-			
-			Iterator<AgentConfig> iterator = agentConfigList.iterator();
-			while (iterator.hasNext()) {
-				AgentConfig configDetails = iterator.next();
-				if (!toolUniqueSet.contains(configDetails.getToolName().toUpperCase())) {
-					JsonObject toolsDetailJson = new JsonObject();
-					toolsDetailJson.addProperty("toolName", configDetails.getToolName().toUpperCase());
-					toolsDetailJson.addProperty("categoryName", configDetails.getToolCategory().toUpperCase());
-					toolsDetailJson.addProperty("labelName", configDetails.getLabelName());
-					toolDetailArray.add(toolsDetailJson);				
-				}
+			List<WebHookConfig> webHookConfigList = webhookConfigDal.getAllWebHookConfigurations();
+			Iterator<AgentConfig> iteratorAgent = agentConfigList.iterator();
+			Iterator<WebHookConfig> iteratorWebhook = webHookConfigList.iterator();
+			while (iteratorAgent.hasNext()) {
+				AgentConfig configDetails = iteratorAgent.next();
+				JsonObject toolsDetailJson = new JsonObject();
+				toolsDetailJson.addProperty("toolName", configDetails.getToolName().toUpperCase());
+				toolsDetailJson.addProperty("categoryName", configDetails.getToolCategory().toUpperCase());
+				toolsDetailJson.addProperty("labelName", configDetails.getLabelName());
+				uniquetoolDetailSet.add(toolsDetailJson);
 			}
-			
+			while (iteratorWebhook.hasNext()) {
+				WebHookConfig configDetails = iteratorWebhook.next();
+				JsonObject webhookDetailJson = new JsonObject();
+				webhookDetailJson.addProperty("toolName", configDetails.getToolName().toUpperCase());
+				if (configDetails.getLabelName().split(":").length == 0) {
+					webhookDetailJson.addProperty("categoryName", configDetails.getLabelName());
+					webhookDetailJson.addProperty("labelName", configDetails.getLabelName());
+				} else {
+					webhookDetailJson.addProperty("categoryName", configDetails.getLabelName().split(":", 0)[0]);
+					webhookDetailJson.addProperty("labelName", configDetails.getLabelName().split(":", 0)[1]);
+				}
+				uniquetoolDetailSet.add(webhookDetailJson);
+
+			}
+			for (JsonObject uniqueObject : uniquetoolDetailSet) {
+				uniqueToolDetailArray.add(uniqueObject);
+			}
 		} catch (Exception e) {
-			return PlatformServiceUtil.buildFailureResponse(e.toString());
+			log.error(e);
+			return PlatformServiceUtil.buildFailureResponse("Unable to fetch the tool details.");
 		}
-		return PlatformServiceUtil.buildSuccessResponseWithData(toolDetailArray);
+		return PlatformServiceUtil.buildSuccessResponseWithData(uniqueToolDetailArray);
 	}
 
 	@Override
 	public JsonObject getToolProperties(String labelName, String categoryName) {
-		JsonObject toolKeysJson = new JsonObject();
-		StringBuilder stringBuilder = new StringBuilder();
+		JsonArray keysArrayJson = new JsonArray();
 		try {
 			String toolPropertiesQuery = DataDictionaryConstants.GET_TOOL_PROPERTIES_QUERY;
 			GraphResponse graphResponse = neo4jDBHandler.executeCypherQuery(
@@ -83,19 +99,19 @@ public class DataDictionaryServiceImpl implements DataDictionaryService {
 			while (iterator.hasNext()) {
 				String element = iterator.next().getAsString();
 				if (!(element.equalsIgnoreCase(DataDictionaryConstants.EXEC_ID)
-						|| element.equalsIgnoreCase(DataDictionaryConstants.UUID)))
-					stringBuilder = stringBuilder.append(element).append(",");
+						|| element.equalsIgnoreCase(DataDictionaryConstants.UUID))) {
+					keysArrayJson.add(element);
+				}
 			}
-			String[] keysArray = stringBuilder.toString().split(",");
-			Gson gson = new GsonBuilder().create();
-			String keysArrayStr = gson.toJson(keysArray);
-			JsonParser parser = new JsonParser();
-			JsonArray keysArrayJson = parser.parse(keysArrayStr).getAsJsonArray();
-			toolKeysJson.add("data", keysArrayJson);
+			if (keysArrayJson.size() > 0) {
+				return PlatformServiceUtil.buildSuccessResponseWithData(keysArrayJson);
+			} else {
+				return PlatformServiceUtil.buildFailureResponse("No Data found.");
+			}
 		} catch (Exception e) {
-			return PlatformServiceUtil.buildFailureResponse(e.toString());
+			log.error(e);
+			return PlatformServiceUtil.buildFailureResponse("Properties of the label could not be fetched from Neo4j");
 		}
-		return PlatformServiceUtil.buildSuccessResponseWithData(toolKeysJson.get("data"));
 	}
 
 	@Override
@@ -109,11 +125,11 @@ public class DataDictionaryServiceImpl implements DataDictionaryService {
 					.replace("__EndToolCategory__", endToolCatergory).replace("__EndLabelName__", endLabelName));
 			JsonObject jsonResponse = graphResponse.getJson();
 			Iterator<JsonElement> dataIterator = jsonResponse.get("results").getAsJsonArray().iterator().next()
-					.getAsJsonObject().get("data").getAsJsonArray().iterator();		
-			
+					.getAsJsonObject().get("data").getAsJsonArray().iterator();
+
 			while (dataIterator.hasNext()) {
-				Iterator<JsonElement> rowIterator = dataIterator.next().getAsJsonObject().get("row")
-						.getAsJsonArray().iterator();
+				Iterator<JsonElement> rowIterator = dataIterator.next().getAsJsonObject().get("row").getAsJsonArray()
+						.iterator();
 				while (rowIterator.hasNext()) {
 					String relationName = rowIterator.next().getAsString();
 					JsonObject relationJson = new JsonObject();
@@ -121,9 +137,11 @@ public class DataDictionaryServiceImpl implements DataDictionaryService {
 					toolsRealtionJson.add(relationJson);
 				}
 			}
+			return PlatformServiceUtil.buildSuccessResponseWithData(toolsRealtionJson);
 		} catch (Exception e) {
+			log.error(e);
 			return PlatformServiceUtil.buildFailureResponse(e.toString());
 		}
-		return PlatformServiceUtil.buildSuccessResponseWithData(toolsRealtionJson);
-	}	
+		
+	}
 }

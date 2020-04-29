@@ -54,17 +54,7 @@ public class InsightsCorrelationBuilder {
 		return PlatformServiceUtil.buildSuccessResponseWithData(details);
 	}
 
-	@RequestMapping(value = "/getNeo4jJson", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public @ResponseBody JsonObject getNeo4jJson() {
-		JsonObject details = new JsonObject();
-		try {
-			details = correlationBuilderService.getNeo4jJson();
-		} catch (InsightsCustomException e) {
-			return PlatformServiceUtil.buildFailureResponse(e.toString());
-		}
-		return PlatformServiceUtil.buildSuccessResponseWithData(details);
-	}
-
+	
 	@RequestMapping(value = "/saveConfig", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 	public @ResponseBody JsonObject saveConfig(@RequestBody String configDetails) {
 
