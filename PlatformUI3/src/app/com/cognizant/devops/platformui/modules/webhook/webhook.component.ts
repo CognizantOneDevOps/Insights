@@ -77,7 +77,7 @@ export class WebHookComponent implements OnInit {
     responseTemplateSelected: boolean = false;
     mqChannelPrefix = "IPW_";
     regex = new RegExp("^[a-zA-Z0-9_]*$");
-    regexlabel = new RegExp("^\\d+(:([A-Za-z]+|\\d+)){2}$");
+    regexlabel = new RegExp("^[a-zA-Z0-9:_]+$");
     timeFieldRegex = new RegExp("^[a-zA-Z0-9]*$");
     derivedOperations = [];
     derivedOperationList: DerivedOperations[] = [];
@@ -260,6 +260,9 @@ export class WebHookComponent implements OnInit {
             if (this.selectedWebhook.responseTemplate != undefined) {
                 this.responseTemplate = this.selectedWebhook.responseTemplate;
             }
+            else {
+                this.responseTemplate = "";
+            }
             this.dataformat = this.selectedWebhook.dataFormat;
             if (this.selectedWebhook.subscribeStatus == 'Subscribed') {
                 this.statussubscribe = true;
@@ -304,6 +307,7 @@ export class WebHookComponent implements OnInit {
     }
 
     validateWebhookData() {
+
         var isValidated = false;
         let messageDialogText;
         if (this.webhookName === "" || this.selectedTool === "" || this.labelDisplay === "" || this.mqchannel === "") {
@@ -342,9 +346,31 @@ export class WebHookComponent implements OnInit {
         }
         if (isValidated) {
             var checkname = this.regex.test(this.webhookName);
+            var count = (this.labelDisplay.match(/:/g) || []).length;
+            var checkLabel = this.regexlabel.test(this.labelDisplay);
             if (!checkname) {
                 isValidated = false;
                 messageDialogText = "Please enter valid webhook name, and it contains only alphanumeric character and underscore ";
+            }
+            else if (!checkLabel) {
+                isValidated = false;
+                messageDialogText = "Please enter valid label name, and it contains only alphanumeric character,underscore & colon ";
+
+            }
+            else if (checkLabel) {
+                var count = (this.labelDisplay.match(/:/g) || []).length;
+                if (count > 1) {
+                    var splittedLength = this.labelDisplay.split(":").length;
+                    if (this.labelDisplay.split(":")[splittedLength - 1] == "" || this.labelDisplay.split(":")[splittedLength - 1] != "DATA") {
+                        isValidated = false;
+                        messageDialogText = "Invalid label Name. Please follow the nomenclature TOOL_CATEGORY:LABEL_NAME:DATA"
+                    }
+
+                }
+                else {
+                    isValidated = false;
+                    messageDialogText = "Invalid label Name. Please follow the nomenclature TOOL_CATEGORY:LABEL_NAME:DATA"
+                }
             }
             else if (!((this.dynamicTemplate === "") || this.dynamicTemplate === undefined)) {
                 try {

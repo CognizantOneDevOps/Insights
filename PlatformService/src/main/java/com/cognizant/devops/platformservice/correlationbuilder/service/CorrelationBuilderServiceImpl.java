@@ -57,25 +57,6 @@ public class CorrelationBuilderServiceImpl implements CorrelationBuilderService 
 	}
 
 	@Override
-	public JsonObject getNeo4jJson() throws InsightsCustomException {
-		String agentPath = System.getenv().get(ConfigOptions.INSIGHTS_HOME) + File.separator + ConfigOptions.CONFIG_DIR;
-		Path dir = Paths.get(agentPath);
-		JsonObject config = new JsonObject();
-		try {
-			Stream<Path> paths = Files.find(dir, Integer.MAX_VALUE,
-					(path, attrs) -> attrs.isRegularFile() && path.toString().endsWith(ConfigOptions.NEO4J_TEMPLATE));
-			FileReader reader = new FileReader(paths.limit(1).findFirst().get().toFile());
-			JsonParser parser = new JsonParser();
-			config = (JsonObject) parser.parse(reader);
-
-		} catch (IOException | JsonSyntaxException | JsonIOException e) {
-			log.error("Offline file reading issue", e.getMessage());
-			throw new InsightsCustomException("Offline file reading issue -" + e.getMessage());
-		}
-		return config;
-	}
-
-	@Override
 	public Boolean saveConfig(String config) throws InsightsCustomException {
 
 		CorrelationJson correlation = loadCorrelation(config);
@@ -97,8 +78,8 @@ public class CorrelationBuilderServiceImpl implements CorrelationBuilderService 
 			correlationConfig.setDestinationLabelName(correlation.getDestination().getLabelName());
 		}
 		correlationConfig.setDestinationFields(String.join(",", correlation.getDestination().getFields()));
-		correlationConfig.setRelationName(correlation.getRelationName());		
-		if (correlation.getPropertyList().length>0) {
+		correlationConfig.setRelationName(correlation.getRelationName());
+		if (correlation.getPropertyList().length > 0) {
 			correlationConfig.setPropertyList(String.join(",", correlation.getPropertyList()));
 		}
 		correlationConfig.setEnableCorrelation(correlation.isEnableCorrelation());
@@ -106,7 +87,6 @@ public class CorrelationBuilderServiceImpl implements CorrelationBuilderService 
 
 		CorrelationConfigDAL correlationConfigDAL = new CorrelationConfigDAL();
 		return correlationConfigDAL.saveCorrelationConfig(correlationConfig);
-		
 
 	}
 
@@ -119,7 +99,7 @@ public class CorrelationBuilderServiceImpl implements CorrelationBuilderService 
 		Boolean flag = json.get("correlationFlag").getAsBoolean();
 		CorrelationConfigDAL correlationConfigDAL = new CorrelationConfigDAL();
 		return correlationConfigDAL.updateCorrelationConfig(relationName, flag);
-		
+
 	}
 
 	@Override
@@ -130,7 +110,7 @@ public class CorrelationBuilderServiceImpl implements CorrelationBuilderService 
 		String relationNameValue = json.get("relationName").getAsString();
 		CorrelationConfigDAL correlationConfigDAL = new CorrelationConfigDAL();
 		return correlationConfigDAL.deleteCorrelationConfig(relationNameValue);
-		
+
 	}
 
 	private CorrelationJson loadCorrelation(String config) {

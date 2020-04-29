@@ -64,7 +64,7 @@ public class WebHookDataSubscriber extends EngineSubscriberResponseHandler {
 					if (this.webhookConfig.getIsUpdateRequired().booleanValue()) {
 						updateNeo4jNode(toolData, this.webhookConfig);
 					} else {
-						String query = "UNWIND {props} AS properties " + "CREATE (n:"
+						String query = "UNWIND {props} AS properties " + "CREATE (n:RAW:"
 								+ this.webhookConfig.getLabelName().toUpperCase() + ") " + "SET n = properties";
 						dbHandler.bulkCreateNodes(toolData, null, query);
 					}
@@ -87,12 +87,13 @@ public class WebHookDataSubscriber extends EngineSubscriberResponseHandler {
 			}
 		}
 
+	//Execution of the Query in which node updation in Neo4j is required,based on the unique property.
 	private void updateNeo4jNode(List<JsonObject> toolData, WebHookConfig webhookConfig2) {
 		try {
 			String finalQuery = "";
 			for (JsonObject jsonObject : toolData) {
 				StringBuilder query = new StringBuilder();
-				query.append("UNWIND {props} AS properties MERGE (node:").append(webhookConfig2.getLabelName());
+				query.append("UNWIND {props} AS properties MERGE (node:RAW:").append(webhookConfig2.getLabelName());
 				if (webhookConfig2.getFieldUsedForUpdate() != null) {
 					query.append(" { " + webhookConfig2.getFieldUsedForUpdate() + ": ");
 					query.append(jsonObject.get(webhookConfig2.getFieldUsedForUpdate()));

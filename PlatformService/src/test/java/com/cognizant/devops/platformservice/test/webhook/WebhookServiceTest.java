@@ -45,7 +45,7 @@ public class WebhookServiceTest {
 		Boolean webhookcheck = webhookServiceImp.saveWebHookConfiguration(webhookTestData.registeredWebhookJson);
 		Boolean expectedOutcome = true;
 		Assert.assertEquals(webhookcheck, expectedOutcome);
-	}
+			}
 
 	@Test(priority = 3, expectedExceptions = InsightsCustomException.class)
 	public void testsaveWebHookConfigurationException() throws InsightsCustomException {

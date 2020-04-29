@@ -91,7 +91,7 @@
         <div class="column2">
             <div class="showTable" style="text-align: center; padding: 5px;">
                 <b matTooltip="Please delete and re-create existing relation to change properties with UNIQUE name">&nbsp;
-                    List of Co-Relation in Correlation.json</b> <br> <a style="font-size: 13px">
+                    List of Co-Relations in Database</b> <br> <a style="font-size: 13px">
 
                 </a>
             </div>
@@ -169,10 +169,10 @@
                     <table *ngIf="noShowDetail">
                         <tr>
                             <td colspan="5" class="toollabel"><b>{{startToolNullPropertiesMessage}}
-                                    for selected tool</b></td>
+                                    for source tool</b></td>
                         </tr>
                         <tr>
-                            <td colspan="5" class="categorycss">Label:<b>({{agent1Category}}:{{agent1Tool}})</b>
+                            <td *ngIf="showDetail" colspan="5" class="categorycss">Label:<b>({{agent1Category}}:{{agent1Tool}})</b>
                             </td>
                         </tr>
                     </table>
@@ -230,10 +230,10 @@
                     <table *ngIf="noShowDetail2">
                         <tr>
                             <td colspan="5" class="destToolCss"><b>{{endToolNullPropertiesMessage}}
-                                    for selected tool</b></td>
+                                    for destination tool</b></td>
                         </tr>
                         <tr>
-                            <td colspan="5" class="destCategory">Label:<b>({{agent2Category}}:{{agent2Tool}})</b>
+                            <td *ngIf="showDetail2" colspan="5" class="destCategory">Label:<b>({{agent2Category}}:{{agent2Tool}})</b>
                             </td>
                         </tr>
                     </table>
