@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  ******************************************************************************/
-package com.cognizant.devops.platformservice.security.config;
+package com.cognizant.devops.platformservice.security.config.grafana;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -23,10 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.factory.PasswordEncoderFactories;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -36,16 +33,24 @@ public class GrafanaUserDetailsService implements UserDetailsService {
 	@Autowired
 	private HttpServletRequest request;
 	
+	/**
+	 * used to loads user-specific data.
+	 *
+	 */
 	@Override
-	public UserDetails loadUserByUsername(String login) throws UsernameNotFoundException {
+	public UserDetails loadUserByUsername(String login) {
+		log.debug(" In GrafanaUserDetailsService Grafana ...... ");
 		BCryptPasswordEncoder encoder = passwordEncoder();
-		PasswordEncoder encoder1 = PasswordEncoderFactories.createDelegatingPasswordEncoder();
 		UserDetails user = GrafanaUserDetailsUtil.getUserDetails(request);
 		return new org.springframework.security.core.userdetails.User(user.getUsername(),
 				encoder.encode(user.getPassword()), user.getAuthorities());
 	}
 	
-	
+	/**
+	 * used default password encoder
+	 * 
+	 * @return
+	 */
 	@Bean
 	public BCryptPasswordEncoder passwordEncoder() {
 		return new BCryptPasswordEncoder();

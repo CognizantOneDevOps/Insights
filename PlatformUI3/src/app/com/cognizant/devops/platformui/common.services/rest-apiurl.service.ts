@@ -131,10 +131,10 @@ export class RestAPIurlService implements IRestAPIUrlService {
         this.addEndPoint("UPDATE_WEBHOOK_STATUS", '/PlatformService/admin/webhook/updateWebhookStatus');
 
         //SSO API
-        this.addEndPoint("SSO_URL", '/PlatformService/saml/login');
+        this.addEndPoint("SSO_URL", InsightsInitService.singleSignOnConfig.loginURL);
         this.addEndPoint("SSO_DETAIL", '/PlatformService/user/insightsso/getUserDetail');
         this.addEndPoint("SSO_INSIGHTS_URL_LOGOUT", '/PlatformService/user/insightsso/logout');
-        this.addEndPoint("SSO_URL_LOGOUT", '/PlatformService/saml/logout');//
+        this.addEndPoint("SSO_URL_LOGOUT", InsightsInitService.singleSignOnConfig.logoutURL);//
     }
 
     public addEndPoint(name: String, url: String) {

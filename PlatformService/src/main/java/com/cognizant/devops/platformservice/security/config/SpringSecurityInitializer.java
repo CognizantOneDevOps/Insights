@@ -15,8 +15,20 @@
  ******************************************************************************/
 package com.cognizant.devops.platformservice.security.config;
 
+import javax.servlet.ServletContext;
+
 import org.springframework.security.web.context.AbstractSecurityWebApplicationInitializer;
+import org.springframework.web.multipart.support.MultipartFilter;
 
 public class SpringSecurityInitializer extends AbstractSecurityWebApplicationInitializer {
 
+	/**
+	 * This class is responsible to initiate spring security and spring filter chain
+	 * Used to check MultipartResolver,it helps to prevent attacks like CSRF
+	 *
+	 */
+	@Override
+	protected void beforeSpringSecurityFilterChain(ServletContext servletContext) {
+		insertFilters(servletContext, new MultipartFilter());
+	}
 }

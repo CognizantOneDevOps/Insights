@@ -24,10 +24,6 @@ public class SchedulerConfigData {
 	private int projectMapperModuleInterval = 10;
 	private int dataPurgingExecutorInterval = 300;
 	private int offlineDataProcessingExecutorInterval = 10;
-	
-	/*
-	 * private boolean enableAuditEngine ; private boolean enableWebHookEngine ;
-	 */
 
 	public int getAuditEngineInterval() {
 		return auditEngineInterval;

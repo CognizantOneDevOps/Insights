@@ -26,15 +26,7 @@ import org.springframework.context.support.ReloadableResourceBundleMessageSource
 // @EnableWebMvc
 public class ContentConfig  {
 	
-	 @Bean
-     public ReloadableResourceBundleMessageSource messageSource () {
-		 ReloadableResourceBundleMessageSource messageSource =
-                             new ReloadableResourceBundleMessageSource();
-         messageSource.setBasenames("classpath:/messages/build/msg","classpath:/messages/deploy/msg","classpath:/messages/codequality/msg","i18n");
-         messageSource.setDefaultEncoding("UTF-8");
-         messageSource.setCacheSeconds(120);
-         return messageSource;
-     }
+
 
 }
 

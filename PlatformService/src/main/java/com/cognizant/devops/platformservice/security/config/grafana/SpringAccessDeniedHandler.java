@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  ******************************************************************************/
-package com.cognizant.devops.platformservice.security.config;
+package com.cognizant.devops.platformservice.security.config.grafana;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -34,11 +34,14 @@ import com.cognizant.devops.platformservice.rest.util.PlatformServiceUtil;
 public class SpringAccessDeniedHandler implements AccessDeniedHandler {
 	static Logger log = LogManager.getLogger(SpringAccessDeniedHandler.class.getName());
 	
+	/**
+	 * Used to handle Spring Access condition
+	 */
 	@Override
 	public void handle(HttpServletRequest request, HttpServletResponse response,
 			AccessDeniedException accessDeniedException) throws IOException, ServletException {
 		log.error(accessDeniedException);
-		String msg = PlatformServiceUtil.buildFailureResponse("Access Denied").toString();//"{error : { message : \"Access Denied\"}}";
+		String msg = PlatformServiceUtil.buildFailureResponse("Access Denied").toString();
 		PrintWriter writer = response.getWriter();
 		writer.write(msg);
 		writer.flush();

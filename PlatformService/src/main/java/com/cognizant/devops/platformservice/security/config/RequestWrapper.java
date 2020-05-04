@@ -29,12 +29,24 @@ import org.apache.logging.log4j.Logger;
 import com.cognizant.devops.platformcommons.core.util.ValidationUtils;
 import com.cognizant.devops.platformservice.rest.util.PlatformServiceUtil;
 
+/**
+ * This class is responsible to validate Request Header, Cookies and Paramanter
+ * 
+ * @author 716660
+ *
+ */
 public final class RequestWrapper extends HttpServletRequestWrapper {
 	private static Logger log = LogManager.getLogger(RequestWrapper.class);
 	HttpServletRequest request;
 	HttpServletResponse response;
 	Boolean validationStatus = false;
 
+	/**
+	 * constructer to set HttpServletRequest and HttpServletResponse
+	 * 
+	 * @param servletRequest
+	 * @param servletResponse
+	 */
 	public RequestWrapper(HttpServletRequest servletRequest, HttpServletResponse servletResponse) {
 		super(servletRequest);
 		this.request = servletRequest;
@@ -45,41 +57,33 @@ public final class RequestWrapper extends HttpServletRequestWrapper {
 	}
 
 	/**
-	 * Apply the XSS filter to the parameters
+	 * Validate and Apply the XSS filter to the parameters
+	 * 
 	 * @param parameters
 	 */
 	public void validateAllParameter() {
 		log.debug("In getParameterValues .....");
-
 		Enumeration<String> parameterNames = request.getParameterNames();
 		while (parameterNames.hasMoreElements()) {
 			String paramName = ValidationUtils.cleanXSS(parameterNames.nextElement());
-			String paramValues = ValidationUtils.cleanXSS(request.getParameter(paramName));
-			//log.debug("In validateAllParameter getParameterValues .....{}  ==== {}", paramName, paramValues);
+			ValidationUtils.cleanXSS(request.getParameter(paramName));
 		}
 		log.debug("In validateAllParameter ==== Completed ");
 	}
 
 	/**
-	 * Apply the XSS filter to the all Headers
+	 * Validate and Apply the XSS filter to the all Headers
 	 * 
 	 * @param parameters
 	 */
 	public void validatAllHeaders() {
 		log.debug("In validatAllHeaders ");
 		Enumeration<String> headerNames = request.getHeaderNames();
-
 		while (headerNames.hasMoreElements()) {
-
 			String headerName = headerNames.nextElement();
 			String headersValue = request.getHeader(headerName);
-			log.debug("In validatAllHeaders " + headerName + " headersValue " + headersValue);
-			/* try { */
-				String headerValue = ValidationUtils.cleanXSS(headersValue);
-			/*} catch (Exception e) {
-				log.error(" Error while validatAllHeaders , for header name "+headerName);
-				throw new RuntimeException(PlatformServiceConstants.INVALID_REQUEST);
-			}*/
+			log.debug("In validatAllHeaders {} headersValue  {} ", headerName, headersValue);
+			ValidationUtils.cleanXSS(headersValue);
 		}
 		log.debug("In validatAllHeaders ==== Complated");
 	}

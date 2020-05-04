@@ -13,32 +13,50 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  ******************************************************************************/
-package com.cognizant.devops.platformservice.security.config;
+package com.cognizant.devops.platformservice.security.config.saml;
 
 import java.util.Collection;
 
-import javax.servlet.http.HttpServletRequest;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.ldap.core.DirContextAdapter;
-import org.springframework.ldap.core.DirContextOperations;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.ldap.userdetails.UserDetailsContextMapper;
-import org.springframework.stereotype.Component;
 
-@Component
-public class SpringAuthorityProvider implements UserDetailsContextMapper {
+public class SamlUserDetails implements UserDetails {
 
-	@Autowired
-	private HttpServletRequest httpRequest;
-	
+	private static final long serialVersionUID = -4067518472055845768L;
+
 	@Override
-	public UserDetails mapUserFromContext(DirContextOperations ctx, String userName,Collection<? extends GrantedAuthority> authority) {
-		return GrafanaUserDetailsUtil.getUserDetails(httpRequest);
+	public Collection<? extends GrantedAuthority> getAuthorities() {
+		return null;
 	}
 
 	@Override
-	public void mapUserToContext(UserDetails arg0, DirContextAdapter arg1) {
+	public String getPassword() {
+		return null;
 	}
-}
+
+	@Override
+	public String getUsername() {
+		return null;
+	}
+
+	@Override
+	public boolean isAccountNonExpired() {
+		return false;
+	}
+
+	@Override
+	public boolean isAccountNonLocked() {
+		return false;
+	}
+
+	@Override
+	public boolean isCredentialsNonExpired() {
+		return false;
+	}
+
+	@Override
+	public boolean isEnabled() {
+		return false;
+	}
+       
+   }

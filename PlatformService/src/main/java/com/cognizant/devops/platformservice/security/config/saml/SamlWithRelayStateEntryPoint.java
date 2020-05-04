@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  ******************************************************************************/
-package com.cognizant.devops.platformservice.security.config;
+package com.cognizant.devops.platformservice.security.config.saml;
 
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.saml.SAMLEntryPoint;
@@ -25,6 +25,9 @@ import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 public class SamlWithRelayStateEntryPoint extends SAMLEntryPoint {
 
 
+	/**
+	 * used to forword to UI application after API validation
+	 */
     @Override
     protected WebSSOProfileOptions getProfileOptions(SAMLMessageContext context, AuthenticationException exception) {
 

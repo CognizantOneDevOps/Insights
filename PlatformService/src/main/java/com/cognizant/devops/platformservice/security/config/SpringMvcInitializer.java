@@ -15,20 +15,30 @@
  ******************************************************************************/
 package com.cognizant.devops.platformservice.security.config;
 
+import java.util.Arrays;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.web.servlet.support.AbstractAnnotationConfigDispatcherServletInitializer;
 
-import com.cognizant.devops.platformservice.content.config.ContentConfig;
+import com.cognizant.devops.platformservice.security.config.grafana.InsightsSecurityConfigurationAdapter;
+import com.cognizant.devops.platformservice.security.config.kerberos.InsightsSecurityConfigurationAdapterKerberos;
+import com.cognizant.devops.platformservice.security.config.saml.InsightsSecurityConfigurationAdapterSAML;
 
 public class SpringMvcInitializer extends AbstractAnnotationConfigDispatcherServletInitializer {
 	
 	private static Logger LOG = LogManager.getLogger(SpringMvcInitializer.class);
 
+	/**
+	 * used to configure RootConfigClasses which are application spring security classes
+	 */
 	@Override
 	protected Class<?>[] getRootConfigClasses() {
-		LOG.debug("In SpringMvcInitializer  ");
-		return new Class[] { InsightsSecurityConfigurationAdapter.class,ContentConfig.class }; 
+		Class<?>[] returnArray = null;
+		returnArray = new Class[] { InsightsSecurityConfigurationAdapter.class,
+				InsightsSecurityConfigurationAdapterSAML.class };//, InsightsSecurityConfigurationAdapterKerberos.class 
+		LOG.debug("In SpringMvcInitializer {} ", Arrays.toString(returnArray));
+		return returnArray;
 	}
 
 	@Override
