@@ -53,8 +53,7 @@ import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformservice.core.ServiceResponse;
 import com.cognizant.devops.platformservice.rest.util.PlatformServiceUtil;
 import com.cognizant.devops.platformservice.security.config.AuthenticationUtils;
-import com.cognizant.devops.platformservice.security.config.SpringAuthorityUtil;
-import com.cognizant.devops.platformservice.security.config.TokenProviderUtility;
+import com.cognizant.devops.platformservice.security.config.saml.TokenProviderUtility;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -76,8 +75,8 @@ public class UserDetailsService {
 	@ResponseBody
 	public JsonObject authenticateUser(HttpServletRequest request) {
 		log.debug("Inside authenticateUser ");
-		@SuppressWarnings("unchecked")
-		Map<String, String> responseHeadersgrafanaAttr = (Map<String, String>) request.getAttribute("responseHeaders");
+		Map<String, String> responseHeadersgrafanaAttr = (Map<String, String>) request
+				.getAttribute(AuthenticationUtils.RESPONSE_HEADER_KEY);
 		for (Map.Entry<String, String> entry : responseHeadersgrafanaAttr.entrySet()) {
 			ValidationUtils.cleanXSS(entry.getValue());
 		}
@@ -117,7 +116,7 @@ public class UserDetailsService {
 			httpRequest.setAttribute("responseHeaders", httpHeaders.toSingleValueMap());
 			httpHeaders.add(AuthenticationUtils.GRAFANA_WEBAUTH_USERKEY, userid);
 
-			URI uri = new URI(ApplicationConfigProvider.getInstance().getSingleSignOnConfig().getRelayStateUrl());// +"/1"
+			URI uri = new URI(ApplicationConfigProvider.getInstance().getSingleSignOnConfig().getRelayStateUrl());
 
 			httpHeaders.setLocation(uri);
 
@@ -168,7 +167,7 @@ public class UserDetailsService {
 
 			// set Authority to spring context
 			List<GrantedAuthority> updatedAuthorities = new ArrayList<GrantedAuthority>();
-			updatedAuthorities.add(SpringAuthorityUtil.getSpringAuthorityRole(grafanaCurrentOrgRole));
+			updatedAuthorities.add(AuthenticationUtils.getSpringAuthorityRole(grafanaCurrentOrgRole));
 
 			Date expDate = new Date(System.currentTimeMillis() + 60 * 60 * 1000);
 			ExpiringUsernameAuthenticationToken autharization = new ExpiringUsernameAuthenticationToken(expDate,
@@ -179,7 +178,7 @@ public class UserDetailsService {
 
 			httpRequest.setAttribute("responseHeaders", jsonResponse);
 		} catch (Exception e) {
-			log.error("Error in SSO Cookie " + e);
+			log.error("Error in SSO Cookie {} ", e);
 			return PlatformServiceUtil.buildFailureResponse("Error in SSO Cookie " + e);
 		}
 		return PlatformServiceUtil.buildSuccessResponseWithData(jsonResponse);
@@ -268,7 +267,7 @@ public class UserDetailsService {
 		ClientResponse grafanaCurrentOrgResponse = RestHandler.doGet(loginApiUrl, null, headers);
 		JsonObject responseJson = new JsonParser().parse(grafanaCurrentOrgResponse.getEntity(String.class))
 				.getAsJsonObject();
-		log.debug(" Current user detail ==== " + responseJson);
+		log.debug(" Current user detail ==== {} ", responseJson);
 		String loginId = responseJson.get("login").toString();
 		if (loginId == null || loginId.contains("(null)")) {
 			throw new InsightsCustomException(PlatformServiceConstants.GRAFANA_LOGIN_ISSUE);

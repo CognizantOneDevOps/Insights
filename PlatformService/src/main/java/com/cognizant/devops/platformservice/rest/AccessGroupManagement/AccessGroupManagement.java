@@ -17,8 +17,6 @@ package com.cognizant.devops.platformservice.rest.AccessGroupManagement;
 
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -30,11 +28,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.providers.ExpiringUsernameAuthenticationToken;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -50,7 +43,7 @@ import com.cognizant.devops.platformservice.rest.es.models.DashboardModel;
 import com.cognizant.devops.platformservice.rest.es.models.DashboardResponse;
 import com.cognizant.devops.platformservice.rest.util.PlatformServiceUtil;
 import com.cognizant.devops.platformservice.security.config.AuthenticationUtils;
-import com.cognizant.devops.platformservice.security.config.SpringAuthorityUtil;
+import com.cognizant.devops.platformservice.security.config.InsightsAuthenticationTokenUtils;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -103,21 +96,8 @@ public class AccessGroupManagement {
 				httpRequest.getHeader(AuthenticationUtils.GRAFANA_WEBAUTH_HEADER_KEY));
 		httpRequest.setAttribute("responseHeaders", grafanaResponseCookies);
 
-		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		List<GrantedAuthority> updatedAuthorities = new ArrayList<GrantedAuthority>();
-		updatedAuthorities.add(SpringAuthorityUtil.getSpringAuthorityRole(grafanaCurrentOrgRole));
-		if (ApplicationConfigProvider.getInstance().isEnableSSO()) {
-			Object principal = auth.getPrincipal();
-			Date expDate = new Date(System.currentTimeMillis() + 60 * 60 * 1000);
-			ExpiringUsernameAuthenticationToken autharization = new ExpiringUsernameAuthenticationToken(expDate,
-					principal, auth.getCredentials(), updatedAuthorities);
-			SecurityContextHolder.getContext().setAuthentication(autharization);
-		} else {
-			Authentication newAuth = new UsernamePasswordAuthenticationToken(auth.getPrincipal(), auth.getCredentials(),
-					updatedAuthorities);
-			log.debug("Get Credentials output ", auth.getPrincipal());
-			SecurityContextHolder.getContext().setAuthentication(newAuth);
-		}
+		InsightsAuthenticationTokenUtils authenticationProviderImpl = new InsightsAuthenticationTokenUtils();
+		authenticationProviderImpl.updateSecurityContextRoleBased(grafanaCurrentOrgRole);
 
 		return PlatformServiceUtil
 				.buildSuccessResponseWithData(new JsonParser().parse(response.getEntity(String.class)));

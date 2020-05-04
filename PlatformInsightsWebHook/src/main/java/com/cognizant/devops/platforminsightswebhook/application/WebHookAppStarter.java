@@ -52,4 +52,4 @@ public class WebHookAppStarter {
 								+ " and context path as " + applicationContext.getApplicationName() + ".",
 				WebHookConstants.SUCCESS);
 	}
-} 
+}

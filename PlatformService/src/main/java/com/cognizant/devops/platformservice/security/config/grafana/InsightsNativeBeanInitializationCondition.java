@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  ******************************************************************************/
-package com.cognizant.devops.platformservice.security.config;
+package com.cognizant.devops.platformservice.security.config.grafana;
 
 import org.springframework.context.annotation.Condition;
 import org.springframework.context.annotation.ConditionContext;
@@ -21,10 +21,16 @@ import org.springframework.core.type.AnnotatedTypeMetadata;
 
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 
-public class InsightsBeanInitializationCondition implements Condition {
+public class InsightsNativeBeanInitializationCondition implements Condition {
+	//private static Logger Log = LogManager.getLogger(InsightsNativeBeanInitializationCondition.class);
+	String AUTH_TYPE = "NativeGrafana";
 	
+	/**
+	 * Used to initiate bean based on AUTH_TYPE of Authentication protocol
+	 *
+	 */
 	@Override
 	public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata) {
-		return ApplicationConfigProvider.getInstance().isEnableSSO();
+		return AUTH_TYPE.equalsIgnoreCase(ApplicationConfigProvider.getInstance().getAutheticationProtocol());
 	}
 }

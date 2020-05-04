@@ -1,15 +1,15 @@
 /*******************************************************************************
  * Copyright 2017 Cognizant Technology Solutions
- *   
+ * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
- * use this file except in compliance with the License.  You may obtain a copy
- * 	of the License at
- *   
- * 	http://www.apache.org/licenses/LICENSE-2.0
- *   
+ * use this file except in compliance with the License. You may obtain a copy
+ * of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
  * License for the specific language governing permissions and limitations under
  * the License.
  ******************************************************************************/
@@ -101,7 +101,7 @@ public class ValidationUtils {
 			if (!jsonString.equalsIgnoreCase(data.toString())) {
 				log.error(" Invilid response data ");
 				json = null;
-			}else {
+			} else {
 				json = new Gson().fromJson(jsonString, JsonObject.class);
 			}
 			// log.debug(" validateStringForHTMLContent after " + jsonString);
@@ -113,9 +113,9 @@ public class ValidationUtils {
 		String strRegEx = "<[^>]*>";
 		String modifiedString = "";
 		Boolean hasHTML = Boolean.FALSE;
-	
+
 		// log.debug(" validateStringForHTMLContent string before " + data);
-	
+
 		if (data instanceof String) {
 			modifiedString = data;
 			// log.debug(" validateStringForHTMLContent after assigment " + jsonString);
@@ -166,27 +166,32 @@ public class ValidationUtils {
 	public static String cleanXSS(String value) {
 		Boolean isXSSPattern = Boolean.FALSE;
 		String valueWithXSSPattern = "";
-		//log.debug("In cleanXSS RequestWrapper ..............." + value);
+		//log.debug("In cleanXSS RequestWrapper ............... {} ", value);
 		if (value != null || !("").equals(value)) {
 			try {
-				// match sections that match a pattern
-				for (Pattern scriptPattern : patterns) {
-					Matcher m = scriptPattern.matcher(value);
-					if (m.find()) {
-						isXSSPattern = true;
-						valueWithXSSPattern = value;
-						break;
+				boolean hasHTML = validateStringForHTMLContent(value);
+				if (hasHTML) {
+					isXSSPattern = true;
+				} else {
+					// match sections that match a pattern
+					for (Pattern scriptPattern : patterns) {
+						Matcher m = scriptPattern.matcher(value);
+						if (m.find()) {
+							isXSSPattern = true;
+							valueWithXSSPattern = value;
+							break;
+						}
 					}
 				}
 				if (isXSSPattern) {
-					log.error("Invalid pattern found in data value ******  " + valueWithXSSPattern);
+					log.error("Invalid pattern found in data value ******  {} ", valueWithXSSPattern);
 					throw new RuntimeException(PlatformServiceConstants.INVALID_REQUEST);
 				}
 			} catch (RuntimeException e) {
-				log.error("Invalid pattern found in data value ==== " + valueWithXSSPattern);
+				log.error("Invalid pattern found in data value ==== {} ", valueWithXSSPattern);
 				throw new RuntimeException(PlatformServiceConstants.INVALID_REQUEST);
 			}
-		}else {
+		} else {
 			log.debug("In cleanXSS , value is empty ");
 		}
 		return value;
@@ -217,34 +222,28 @@ public class ValidationUtils {
 					throw new RuntimeException(PlatformServiceConstants.INVALID_REQUEST);
 				}
 			} catch (RuntimeException e) {
-				log.error("Invalid pattern found in data value ==== " + valueWithXSSPattern);
+				log.error("Invalid pattern found in data value ==== {} ", valueWithXSSPattern);
 				throw new RuntimeException(PlatformServiceConstants.INVALID_REQUEST);
 			}
 		}
 		return value;
 	}
 
-	public static String extactAutharizationToken(String authHeaderTokenReq) {
+	public static String decryptAutharizationToken(String authHeaderTokenReq) {
 		String authTokenDecrypt = "";
 		String authHeaderToken = ValidationUtils.cleanXSS(authHeaderTokenReq);
 		log.debug("In Authorization token processing ");
 		try {
-			//log.debug(" authHeaderToken String " + authHeaderToken);
-			if (!authHeaderToken.startsWith("Basic ")) {
-
+			if (authHeaderToken != null && !authHeaderToken.startsWith("Basic ")) {
 				String auth = authHeaderToken.substring(0, authHeaderToken.length() - 15);
 				String passkey = authHeaderToken.substring(authHeaderToken.length() - 15, authHeaderToken.length());
-
-				//log.debug(" authHeader ==========  " + authHeaderToken);
-				//log.debug(" auth " + auth + "  key   " + passkey);
-
 				authTokenDecrypt = AES256Cryptor.decrypt(auth, passkey);
 			} else {
-				authTokenDecrypt = authHeaderToken;
+				log.error(" Invalid token start with basic ");
+				throw new RuntimeException(PlatformServiceConstants.INVALID_TOKEN);
 			}
-			//log.debug(" authTokenDecrypt  ========= " + authTokenDecrypt);
 		} catch (Exception e) {
-			log.error(" InsightsCustomException Invalid Autharization Token " + e.getMessage());
+			log.error(" InsightsCustomException Invalid Autharization Token {} ", e.getMessage());
 			throw new RuntimeException(PlatformServiceConstants.INVALID_TOKEN);
 		}
 		log.debug("In Authorization token processing Complated ");
@@ -285,7 +284,7 @@ public class ValidationUtils {
 				// replace &amp; with &
 				jsonString = jsonString.replace("&amp;", "&");
 			}
-				json = new Gson().fromJson(jsonString, JsonObject.class);
+			json = new Gson().fromJson(jsonString, JsonObject.class);
 		}
 		return json;
 	}
@@ -296,7 +295,7 @@ public class ValidationUtils {
 		try {
 			outputData = ValidationUtils.cleanXSSWithHTMLCheck(inputData);
 		} catch (RuntimeException e) {
-			log.error("validate Request Body has some issue === " + e.getMessage());
+			log.error("validate Request Body has some issue === {}", e.getMessage());
 			throw new RuntimeException(PlatformServiceConstants.INVALID_REQUEST_BODY);
 		}
 		return outputData;

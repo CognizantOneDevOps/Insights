@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import javax.annotation.Resource;
 import javax.servlet.http.Cookie;
 
 import org.apache.logging.log4j.LogManager;
@@ -27,6 +28,7 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletRequest;
+import org.springframework.security.web.FilterChainProxy;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
 import org.springframework.test.context.web.WebAppConfiguration;
@@ -45,6 +47,7 @@ import com.cognizant.devops.platformcommons.config.ApplicationConfigCache;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformservice.rest.AccessGroupManagement.AccessGroupManagement;
 import com.cognizant.devops.platformservice.rest.util.PlatformServiceUtil;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.*;
 
 @Test
 @WebAppConfiguration
@@ -63,6 +66,9 @@ public class GroupsAndUserTest extends AbstractTestNGSpringContextTests {
 	private WebApplicationContext wac;
 
 	private MockMvc mockMvc;
+
+	@Resource
+	private FilterChainProxy springSecurityFilterChain;
 
 	@BeforeTest
 	public void onInit() throws InterruptedException, IOException {
@@ -110,7 +116,7 @@ public class GroupsAndUserTest extends AbstractTestNGSpringContextTests {
 			MockHttpServletRequestBuilder builder = mockHttpServletRequestBuilderPostWithRequestParam(
 					"/admin/userMgmt/getOrgUsers?orgId=" + groupsAndUserTestData.orgId, "");
 
-			this.mockMvc.perform(builder).andExpect(ok);
+			this.mockMvc.perform(builder.with(csrf().asHeader())).andExpect(ok);
 		} catch (Exception e) {
 			log.error("Error while testing getOrgUsers " + e);
 		}
@@ -133,20 +139,20 @@ public class GroupsAndUserTest extends AbstractTestNGSpringContextTests {
 
 	@Test(priority = 3)
 	public void testAddUser() throws InsightsCustomException {
-
+	
 		try {
 			this.mockMvc = getMacMvc();
 			log.debug(" cookies " + httpRequest.getCookies());
 			MockHttpServletRequestBuilder builder = mockHttpServletRequestBuilderPost("/accessGrpMgmt/addUserInOrg",
 					groupsAndUserTestData.userPropertyListAdmin);
-
+	
 			this.mockMvc.perform(builder).andExpect(ok);
 		} catch (Exception e) {
 			log.error("Error while testing testAddUser " + e);
 		}
 		log.debug("Test case addUserInOrg pass successfully ");
 	}
-
+	
 	@Test(priority = 4)
 	public void testSearchUser() throws InsightsCustomException {
 		try {
@@ -154,98 +160,98 @@ public class GroupsAndUserTest extends AbstractTestNGSpringContextTests {
 			log.debug(" cookies " + httpRequest.getCookies());
 			MockHttpServletRequestBuilder builder = mockHttpServletRequestBuilderPost("/accessGrpMgmt/searchUser",
 					groupsAndUserTestData.userName);
-
+	
 			this.mockMvc.perform(builder).andExpect(ok);
 		} catch (Exception e) {
 			log.error("Error while testing searchUser " + e);
 		}
 		log.debug("Test case searchUser pass successfully ");
-
+	
 	}
-
+	
 	@Test(priority = 5)
 	public void testassignUser() throws InsightsCustomException {
-
+	
 		try {
 			this.mockMvc = getMacMvc();
 			log.debug(" cookies " + httpRequest.getCookies());
 			MockHttpServletRequestBuilder builder = mockHttpServletRequestBuilderPost("/accessGrpMgmt/assignUser",
 					groupsAndUserTestData.assignUserData);
-
+	
 			this.mockMvc.perform(builder).andExpect(ok);
 		} catch (Exception e) {
 			log.error("Error while testing assignUser " + e);
 		}
 		log.debug("Test case assignUser pass successfully ");
-
+	
 	}
-
+	
 	@Test(priority = 6)
 	public void testAddUserEditor() throws InsightsCustomException {
-
+	
 		try {
 			this.mockMvc = getMacMvc();
 			MockHttpServletRequestBuilder builder = mockHttpServletRequestBuilderPost("/accessGrpMgmt/addUserInOrg",
 					groupsAndUserTestData.userPropertyListEditor);
-
+	
 			this.mockMvc.perform(builder).andExpect(ok);
 		} catch (Exception e) {
 			log.error("Error while testing assignUser " + e);
 		}
 		log.debug("Test case addUserInOrg pass successfully ");
-
+	
 	}
-
+	
 	@Test(priority = 7)
 	public void testAddUserViewer() throws InsightsCustomException {
-
+	
 		try {
 			this.mockMvc = getMacMvc();
 			log.debug(" cookies " + httpRequest.getCookies());
 			MockHttpServletRequestBuilder builder = mockHttpServletRequestBuilderPost("/accessGrpMgmt/addUserInOrg",
 					groupsAndUserTestData.userPropertyListViewer);
-
+	
 			this.mockMvc.perform(builder).andExpect(ok);
 		} catch (Exception e) {
 			log.error("Error while testing assignUser " + e);
 		}
 		log.debug("Test case pass successfully ");
 	}
-
+	
 	@Test(priority = 8)
 	public void testEditOrganizationUser() throws InsightsCustomException {
-
+	
 		try {
 			this.mockMvc = getMacMvc();
 			log.debug(" cookies " + httpRequest.getCookies());
 			String url = "/admin/userMgmt/editOrganizationUser?orgId=" + groupsAndUserTestData.orgId + "&userId="
 					+ groupsAndUserTestData.userId + "&role=" + groupsAndUserTestData.role;
 			MockHttpServletRequestBuilder builder = mockHttpServletRequestBuilderPostWithRequestParam(url, "");
-
+	
 			this.mockMvc.perform(builder).andExpect(ok);
 		} catch (Exception e) {
 			log.error("Error while testing getOrgUsers " + e);
 		}
 		log.debug("Test case pass successfully ");
-
+	
 	}
-
+	
 	@Test(priority = 9)
 	public void testDeleteOrganizationUser() throws InsightsCustomException {
-
+	
 		try {
 			this.mockMvc = getMacMvc();
 			log.debug(" cookies " + httpRequest.getCookies());
 			String url = "/admin/userMgmt/deleteOrganizationUser?orgId=" + groupsAndUserTestData.orgId + "&userId="
 					+ groupsAndUserTestData.userId + "&role=" + groupsAndUserTestData.role;
 			MockHttpServletRequestBuilder builder = mockHttpServletRequestBuilderPostWithRequestParam(url, "");
-
+	
 			this.mockMvc.perform(builder).andExpect(ok);
 		} catch (Exception e) {
 			log.error("Error while testing getOrgUsers " + e);
 		}
 		log.debug("Test case pass successfully ");
-
+	
 	}
 
 }

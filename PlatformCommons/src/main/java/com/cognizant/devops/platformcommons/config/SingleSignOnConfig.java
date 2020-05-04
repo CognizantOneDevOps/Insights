@@ -39,6 +39,8 @@ public class SingleSignOnConfig implements Serializable {
 	private String defaultTargetUrl;
 	private String postLogoutURL;
 	private String tokenSigningKey;
+	private String servicePrincipalKerberos;
+	private String keyTabLocationKerberos;
 	
 	public String getEntityId() {
 		return entityId;
@@ -126,6 +128,22 @@ public class SingleSignOnConfig implements Serializable {
 	}
 	public void setTokenSigningKey(String tokenSigningKey) {
 		this.tokenSigningKey = tokenSigningKey;
+	}
+
+	public String getServicePrincipalKerberos() {
+		return servicePrincipalKerberos;
+	}
+
+	public void setServicePrincipalKerberos(String servicePrincipalKerberos) {
+		this.servicePrincipalKerberos = servicePrincipalKerberos;
+	}
+
+	public String getKeyTabLocationKerberos() {
+		return keyTabLocationKerberos;
+	}
+
+	public void setKeyTabLocationKerberos(String keyTabLocationKerberos) {
+		this.keyTabLocationKerberos = keyTabLocationKerberos;
 	}
 
 }

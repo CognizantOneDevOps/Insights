@@ -31,7 +31,7 @@ export class LoginService {
     public loginUserAuthentication(username: string, password: string): Promise<any> {
         var token = this.dataShare.getAuthorizationToken();
         this.response = this.restCallHandlerService.post("USER_AUTHNTICATE", {}, { 'Authorization': token })
-        console.log(this.response)
+        //console.log(this.response)
         return this.response.toPromise();
     }
 
@@ -42,28 +42,21 @@ export class LoginService {
         return this.response;
     }
 
-    public loginSSOUserDetailLogin(): Promise<any> {
-        console.log("SSO Login Call");
-        setTimeout(() => console.log("SSO Login Call"), 10);
-        this.response = this.restCallHandlerService.getSSO("USER_AUTHNTICATE", {}, {})
-        return this.response;
-    }
-
     public loginSSO() {
         var url = this.restAPIUrlService.getRestCallUrl("SSO_URL");
         setTimeout(() => window.location.replace(url), 10);
     }
-   
+
     public ssoInsightsLogout(): any {
-         return this.restCallHandlerService.getSSO("SSO_INSIGHTS_URL_LOGOUT");
+        return this.restCallHandlerService.getSSO("SSO_INSIGHTS_URL_LOGOUT");
         //setTimeout(() => window.location.replace(url), 100);
     }
-    
+
     public singleLogoutSSO(url) {
         console.log(" Inside singleLogoutSSO ");
         setTimeout(() => window.location.replace(url), 10);
     }
-    
+
     public logoutSSO() {
         console.log(" Inside logoutSSO ");
         var singleurl = this.restAPIUrlService.getRestCallUrl("SSO_URL_LOGOUT");

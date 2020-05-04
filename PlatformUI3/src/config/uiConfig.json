@@ -2,12 +2,16 @@
 	"showBusinessMapping": true,
 	"showAuditReporting": false,
 	"showWebhookConfiguration": true,
-	"ssoEnabled": false,
 	"enableInsightsBranding": true,
+	"autheticationProtocol": "NativeGrafana",
 	"agentsOsList": {
 		"Windows": "windows",
 		"RHEL/CentOS": "linux",
 		"Ubuntu": "Ubuntu"
+	},
+	"singleSignOnConfig": {
+		"loginURL": "/PlatformService/saml/login",
+		"logoutURL": "/PlatformService/saml/logout"
 	},
 	"serviceHost": "http://localhost:8080",
 	"grafanaHost": "http://localhost:3000",

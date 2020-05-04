@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  ******************************************************************************/
-package com.cognizant.devops.platformservice.security.config;
+package com.cognizant.devops.platformservice.security.config.saml;
 
 import org.springframework.context.ResourceLoaderAware;
 import org.springframework.core.io.Resource;
@@ -24,6 +24,7 @@ import org.springframework.stereotype.Component;
 public class ResourceLoaderService implements ResourceLoaderAware {
 	private ResourceLoader resourceLoader;
 
+	@Override
 	public void setResourceLoader(ResourceLoader resourceLoader) {
 		this.resourceLoader = resourceLoader;
 	}
@@ -32,6 +33,12 @@ public class ResourceLoaderService implements ResourceLoaderAware {
 		return resourceLoader;
 	}
 
+	/**
+	 * used to load external file in spring security
+	 * 
+	 * @param path
+	 * @return
+	 */
 	public Resource getResource(String path) {
 		return this.getResourceLoader().getResource(path);
 	}
