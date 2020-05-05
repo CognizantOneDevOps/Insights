@@ -45,12 +45,11 @@ public class DataDictionaryTest {
 		}
 
 		List<AgentConfigTO> registeredAgents = agentServiceImpl.getRegisteredAgents();
-		if (registeredAgents.isEmpty())
-		{
+		if (registeredAgents.isEmpty()) {
 			String configJson = agentServiceImpl.getToolRawConfigFile("v5.2", "git");
-			ApplicationConfigProvider.getInstance().getAgentDetails().setOnlineRegistration(false);			
-			String response = agentServiceImpl.registerAgent(dataDictionaryTestData.toolName, 
-					dataDictionaryTestData.agentVersion, dataDictionaryTestData.osversion, 
+			ApplicationConfigProvider.getInstance().getAgentDetails().setOnlineRegistration(false);
+			String response = agentServiceImpl.registerAgent(dataDictionaryTestData.toolName,
+					dataDictionaryTestData.agentVersion, dataDictionaryTestData.osversion,
 					dataDictionaryTestData.configDetails, dataDictionaryTestData.trackingDetails, false);
 
 		}

@@ -15,51 +15,17 @@
  ******************************************************************************/
 package com.cognizant.devops.platformdal.agentConfig;
 
-import java.time.Instant;
 import java.util.Date;
 import java.util.List;
-
 import org.hibernate.query.Query;
-
 import com.cognizant.devops.platformcommons.core.enums.AGENTACTION;
 import com.cognizant.devops.platformdal.core.BaseDAL;
 import com.google.gson.JsonObject;
 
 public class AgentConfigDAL extends BaseDAL {
 
-	@Deprecated
-	public boolean saveAgentConfigFromUI(String agentId, String toolCategory, String labelName, String toolName,
-			JsonObject agentJson, boolean isDataUpdateSupported, String uniqueKey, String agentVersion,
-			String osversion, Date updateDate) {
-
-		Query<AgentConfig> createQuery = getSession().createQuery(
-				"FROM AgentConfig a WHERE a.toolName = :toolName  AND a.agentKey = :agentId", AgentConfig.class);
-		createQuery.setParameter("toolName", toolName);
-		createQuery.setParameter("agentId", agentId);
-		List<AgentConfig> resultList = createQuery.getResultList();
-		AgentConfig agentConfig = null;
-		if (!resultList.isEmpty()) {
-			agentConfig = resultList.get(0);
-		}
-		getSession().beginTransaction();
-		if (agentConfig != null) {
-			setAgentConfigValues(agentConfig, toolCategory, labelName, agentId, toolName, agentJson,
-					isDataUpdateSupported, uniqueKey, agentVersion, osversion, updateDate);
-			getSession().update(agentConfig);
-		} else {
-			agentConfig = new AgentConfig();
-			setAgentConfigValues(agentConfig, toolCategory, labelName, agentId, toolName, agentJson,
-					isDataUpdateSupported, uniqueKey, agentVersion, osversion, updateDate);
-			getSession().save(agentConfig);
-		}
-		getSession().getTransaction().commit();
-		terminateSession();
-		terminateSessionFactory();
-		return true;
-	}
-
 	/**
-	 * New method
+	 * New method for updating the existing agent info in database.
 	 * 
 	 * @param agentId
 	 * @param toolCategory
@@ -71,60 +37,74 @@ public class AgentConfigDAL extends BaseDAL {
 	 * @param vault
 	 * @return
 	 */
-
-
-	public boolean saveAgentConfigFromUI(String agentId, String toolCategory,  String labelName, String toolName, 
+	public boolean updateAgentConfigFromUI(String agentId, String toolCategory, String labelName, String toolName,
 			JsonObject agentJson, String agentVersion, String osversion, Date updateDate, boolean vault) {
-		
-
-		Query<AgentConfig> createQuery = getSession().createQuery(
-				"FROM AgentConfig a WHERE a.toolName = :toolName  AND a.agentKey = :agentId ", AgentConfig.class);
-		createQuery.setParameter("toolName", toolName);
+		Query<AgentConfig> createQuery = getSession().createQuery("FROM AgentConfig a WHERE a.agentKey = :agentId ",
+				AgentConfig.class);
 		createQuery.setParameter("agentId", agentId);
-		List<AgentConfig> resultList = createQuery.getResultList();
-		AgentConfig agentConfig = null;
-		if (!resultList.isEmpty()) {
-			agentConfig = resultList.get(0);
-		}
-		getSession().beginTransaction();
+		AgentConfig agentConfig = createQuery.uniqueResult();
 		if (agentConfig != null) {
+			getSession().beginTransaction();
 			setAgentConfigValues(agentConfig, toolCategory, labelName, agentId, toolName, agentJson, agentVersion,
 					osversion, updateDate, vault);
 			getSession().update(agentConfig);
+			getSession().getTransaction().commit();
+			terminateSession();
+			terminateSessionFactory();
+			return Boolean.TRUE;
 		} else {
-			agentConfig = new AgentConfig();
-			setAgentConfigValues(agentConfig, toolCategory, labelName, agentId, toolName, agentJson, agentVersion, 
-					osversion, updateDate, vault);
-
-			getSession().save(agentConfig);
+			return Boolean.FALSE;
 		}
+	}
+
+	/**
+	 * Method to check whether the agent id is existing in the Database
+	 * 
+	 * @param agentId
+	 * @return
+	 */
+	public boolean isAgentIdExisting(String agentId) {
+		Query<AgentConfig> createQuery = getSession().createQuery("FROM AgentConfig a WHERE a.agentKey = :agentId ",
+				AgentConfig.class);
+		createQuery.setParameter("agentId", agentId);
+		if (createQuery.getResultList().isEmpty()) {
+			return Boolean.FALSE;
+		} else {
+			return Boolean.TRUE;
+		}
+	}
+
+	/**
+	 * Method Called for saving agent's info in database
+	 * 
+	 * @param agentId
+	 * @param toolCategory
+	 * @param labelName
+	 * @param toolName
+	 * @param agentJson
+	 * @param agentVersion
+	 * @param osversion
+	 * @param updateDate
+	 * @param vault
+	 * @return
+	 */
+	public boolean saveAgentConfigFromUI(String agentId, String toolCategory, String labelName, String toolName,
+			JsonObject agentJson, String agentVersion, String osversion, Date updateDate, boolean vault) {
+		AgentConfig agentConfig = new AgentConfig();
+		getSession().beginTransaction();
+		setAgentConfigValues(agentConfig, toolCategory, labelName, agentId, toolName, agentJson, agentVersion,
+				osversion, updateDate, vault);
+		getSession().save(agentConfig);
 		getSession().getTransaction().commit();
 		terminateSession();
 		terminateSessionFactory();
-		return true;
+		return Boolean.TRUE;
 	}
 
-	@Deprecated
 	private void setAgentConfigValues(AgentConfig agentConfig, String toolCategory, String labelName, String agentId,
-			String toolName, JsonObject agentJson, boolean isDataUpdateSupported, String uniqueKey, String agentVersion,
-			String osversion, Date updateDate) {
+			String toolName, JsonObject agentJson, String agentVersion, String osversion, Date updateDate,
+			boolean vault) {
 
-		agentConfig.setToolCategory(toolCategory.toUpperCase());
-		agentConfig.setToolName(toolName);
-		agentConfig.setLabelName(labelName);
-		agentConfig.setDataUpdateSupported(isDataUpdateSupported);
-		agentConfig.setAgentJson(agentJson.toString());
-		agentConfig.setOsVersion(osversion);
-		agentConfig.setAgentVersion(agentVersion);
-		agentConfig.setUpdatedDate(updateDate);
-		agentConfig.setUniqueKey(uniqueKey);
-		agentConfig.setAgentKey(agentId);
-		agentConfig.setAgentStatus(AGENTACTION.START.name());
-	}
-
-	private void setAgentConfigValues(AgentConfig agentConfig,String toolCategory, String labelName, String agentId, String toolName, JsonObject agentJson, 
-			String agentVersion, String osversion, Date updateDate, boolean vault) {
-		
 		agentConfig.setToolCategory(toolCategory.toUpperCase());
 		agentConfig.setToolName(toolName);
 		agentConfig.setLabelName(labelName);
@@ -137,48 +117,13 @@ public class AgentConfigDAL extends BaseDAL {
 		agentConfig.setVault(vault);
 	}
 
-	// for update action i.e. Insert
-	public boolean saveAgentConfigurationData(int agentId, String toolName, String toolCategory, String labelName,
-			JsonObject agentJson, boolean isDataUpdateSupported, String uniqueKey) {
-		Query<AgentConfig> createQuery = getSession().createQuery(
-				"FROM AgentConfig a WHERE a.toolName = :toolName AND a.toolCategory = :toolCategory AND a.agentId = :agentId",
-				AgentConfig.class);
-		createQuery.setParameter("toolName", toolName);
-		createQuery.setParameter("toolCategory", toolCategory);
-		createQuery.setParameter("agentId", agentId);
-		List<AgentConfig> resultList = createQuery.getResultList();
-		AgentConfig agentConfig = null;
-		if (resultList.size() > 0) {
-			agentConfig = resultList.get(0);
-		}
-		getSession().beginTransaction();
-		if (agentConfig != null) {
-			agentConfig.setAgentJson(agentJson.toString());
-			agentConfig.setDataUpdateSupported(isDataUpdateSupported);
-			agentConfig.setUniqueKey(uniqueKey);
-			if (agentConfig.getAgentKey() == null) {
-				agentConfig.setAgentKey(toolName + "-" + Instant.now().toEpochMilli());
-			}
-			getSession().update(agentConfig);
-		} else {
-			agentConfig = new AgentConfig();
-			agentConfig.setAgentId(agentId);
-			agentConfig.setAgentKey(toolName + "-" + Instant.now().toEpochMilli());
-			agentConfig.setToolName(toolName);
-			agentConfig.setToolCategory(toolCategory);
-			agentConfig.setLabelName(labelName);
-			agentConfig.setAgentJson(agentJson.toString());
-			agentConfig.setDataUpdateSupported(isDataUpdateSupported);
-			agentConfig.setUniqueKey(uniqueKey);
-			getSession().save(agentConfig);
-		}
-		getSession().getTransaction().commit();
-		terminateSession();
-		terminateSessionFactory();
-		return true;
-	}
-
-	// for read action i.e. select query
+	/**
+	 * for read action i.e. select query
+	 * 
+	 * @param toolName
+	 * @param toolCategory
+	 * @return
+	 */
 	public List<AgentConfig> getAgentConfigurations(String toolName, String toolCategory) {
 		Query<AgentConfig> createQuery = getSession().createQuery(
 				"FROM AgentConfig AC WHERE AC.toolName = :toolName AND AC.toolCategory = :toolCategory",
@@ -259,7 +204,14 @@ public class AgentConfigDAL extends BaseDAL {
 		return true;
 	}
 
-	// for delete action i.e. delete query
+	/**
+	 * for delete action i.e. delete query
+	 * 
+	 * @param toolName
+	 * @param toolCategory
+	 * @param agentId
+	 * @return
+	 */
 	public boolean deleteAgentConfigurations(String toolName, String toolCategory, int agentId) {
 		Query<AgentConfig> createQuery = getSession().createQuery(
 				"FROM AgentConfig a WHERE a.toolName = :toolName AND a.toolCategory = :toolCategory AND a.agentId = :agentId",
