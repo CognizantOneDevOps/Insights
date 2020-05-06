@@ -28,17 +28,17 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.lang.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.cognizant.devops.platformcommons.constants.ConfigOptions;
@@ -50,8 +50,6 @@ import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformservice.rest.datatagging.constants.DatataggingConstants;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-
-import javassist.expr.Instanceof;
 
 @Service("bulkUploadService")
 public class BulkUploadService implements IBulkUpload {
@@ -86,7 +84,7 @@ public class BulkUploadService implements IBulkUpload {
 					reader = new FileReader(csvfile);
 					csvParser = new CSVParser(reader, format);
 					status = parseCsvRecords(csvParser, label, insightsTimeField, insightsTimeFormat);
-					log.debug("Final Status is:", status);
+					log.debug("Final Status is: {}", status);
 				} else {
 					throw new InsightsCustomException("File is exceeding the size.");
 				}
@@ -94,13 +92,16 @@ public class BulkUploadService implements IBulkUpload {
 				throw new InsightsCustomException("Invalid file format.");
 			}
 		} catch (IOException ex) {
-			log.debug("Exception while creating csv on server", ex.getMessage());
+			log.error("Exception while creating csv on server.. {} ", ex.getMessage());
 			throw new InsightsCustomException("Exception while creating csv on server");
 		} catch (ArrayIndexOutOfBoundsException ex) {
-			log.error("Error in file.", ex.getMessage());
+			log.error("Error in file. {}", ex.getMessage());
 			throw new InsightsCustomException("Error in File Format");
+		} catch (InsightsCustomException ex) {
+			log.error("Error in csv file {} ", ex.getMessage());
+			throw new InsightsCustomException(ex.getMessage());
 		} catch (Exception ex) {
-			log.error("Error in uploading csv file", ex.getMessage());
+			log.error("Error in uploading csv file {} ", ex.getMessage());
 			throw new InsightsCustomException(ex.getMessage());
 		} finally {
 			try {
@@ -109,7 +110,6 @@ public class BulkUploadService implements IBulkUpload {
 				}
 				if (csvParser != null) {
 					csvParser.close();
-
 				}
 			} catch (IOException e) {
 				log.error(e.getMessage());
@@ -131,30 +131,64 @@ public class BulkUploadService implements IBulkUpload {
 	private boolean parseCsvRecords(CSVParser csvParser, String label, String insightsTimeField,
 			String insightsTimeFormat) throws InsightsCustomException {
 		List<JsonObject> nodeProperties = new ArrayList<>();
-		Neo4jDBHandler dbHandler = new Neo4jDBHandler();
 		String query = "UNWIND {props} AS properties " + "CREATE (n:" + label.toUpperCase() + ") "
 				+ "SET n = properties";
 		Map<String, Integer> headerMap = csvParser.getHeaderMap();
 		try {
-			if (headerMap.containsKey(insightsTimeField)) {
+			if (headerMap.containsKey("")) {
+				throw new InsightsCustomException("Error in file.");
+			} else if (headerMap.containsKey(insightsTimeField)) {
 				for (CSVRecord csvRecord : csvParser.getRecords()) {
-					JsonObject json = getToolFileDetails(csvRecord, headerMap, insightsTimeField, insightsTimeFormat);
+					JsonObject json = getCSVRecordDetails(csvRecord, headerMap, insightsTimeField, insightsTimeFormat);
 					nodeProperties.add(json);
 				}
 			} else {
 				throw new InsightsCustomException("Insights Time Field not present in csv file");
 			}
-			JsonObject graphResponse = dbHandler.bulkCreateNodes(nodeProperties, null, query);
-			if (graphResponse.get(DatataggingConstants.RESPONSE).getAsJsonObject().get(DatataggingConstants.ERRORS)
-					.getAsJsonArray().size() > 0) {
-				throw new InsightsCustomException("Error while uploading to Neo4j");
-			} else {
-				return true;
-			}
+			insertDataInDatabase(nodeProperties, query);
+			return true;
 		} catch (Exception ex) {
-			log.error("Error in file.", ex.getMessage());
+			log.error("Error while parsing the .CSV records. {} ", ex.getMessage());
 			throw new InsightsCustomException(ex.getMessage());
 		}
+	}
+
+	/**
+	 * Method to insert the obtained JSON into Neo4j
+	 * 
+	 * @param dataList
+	 * @param cypherQuery
+	 * @return
+	 * @throws InsightsCustomException
+	 */
+	private void insertDataInDatabase(List<JsonObject> dataList, String cypherQuery) throws InsightsCustomException {
+		Neo4jDBHandler dbHandler = new Neo4jDBHandler();
+		try {
+			List<List<JsonObject>> partitionList = partitionList(dataList, 1000);
+			for (List<JsonObject> chunk : partitionList) {
+				JsonObject graphResponse = dbHandler.bulkCreateNodes(chunk, null, cypherQuery);
+				if (graphResponse.get(DatataggingConstants.RESPONSE).getAsJsonObject().get(DatataggingConstants.ERRORS)
+						.getAsJsonArray().size() > 0) {
+					throw new InsightsCustomException("Error while uploading to Neo4j");
+				}
+			}
+		} catch (GraphDBException ex) {
+			log.error("Neo4j is not responding {}..", ex.getMessage());
+			throw new InsightsCustomException("Error while uploading to Neo4j");
+		}
+	}
+
+	private <T> List<List<T>> partitionList(List<T> list, final int size) {
+		List<List<T>> parts = new ArrayList<List<T>>();
+		final int N = list.size();
+		for (int i = 0; i < N; i += size) {
+			parts.add(getPartitionSubList(list, i, size, N));
+		}
+		return parts;
+	}
+
+	private <T> ArrayList<T> getPartitionSubList(List<T> list, int index, int size, final int N) {
+		return new ArrayList<T>(list.subList(index, Math.min(N, index + size)));
 	}
 
 	/**
@@ -167,29 +201,85 @@ public class BulkUploadService implements IBulkUpload {
 	 * @return JsonObject
 	 * @throws InsightsCustomException
 	 */
-	private JsonObject getToolFileDetails(CSVRecord record, Map<String, Integer> headerMap, String insightsTimeField,
+	private JsonObject getCSVRecordDetails(CSVRecord record, Map<String, Integer> headerMap, String insightsTimeField,
 			String insightsTimeFormat) throws InsightsCustomException {
 		JsonObject json = new JsonObject();
 		String recordFieldValue = null;
 		for (Map.Entry<String, Integer> header : headerMap.entrySet()) {
-			if (header.getKey() != null) {
-				try {
-					recordFieldValue = record.get(header.getValue());
-					if (header.getKey().equalsIgnoreCase(insightsTimeField)) {
-						json = addTimeField(json, recordFieldValue, insightsTimeField, insightsTimeFormat);
-					} else {
-						if (recordFieldValue.isEmpty()) {
-							recordFieldValue = "";
-						}
-						json.addProperty(header.getKey(), recordFieldValue);
+			try {
+				recordFieldValue = record.get(header.getValue());
+				if (header.getKey().equalsIgnoreCase(insightsTimeField)) {
+					if (recordFieldValue.isEmpty()) {
+						throw new InsightsCustomException("Null values in column " + insightsTimeField);
 					}
-				} catch (Exception ex) {
-					log.error("Error in file.", ex.getMessage());
-					throw new InsightsCustomException(ex.getMessage());
+					addPropertyInJson(json, recordFieldValue, header.getKey());
+					addTimePropertiesInJson(json, recordFieldValue, insightsTimeFormat);
+				} else if (recordFieldValue.isEmpty()) {
+					recordFieldValue = "";
+					json.addProperty(header.getKey(), recordFieldValue);
+				} else {
+					addPropertyInJson(json, recordFieldValue, header.getKey());
 				}
+			} catch (InsightsCustomException ex) {
+				log.error("insightsTimeFormat missing {}", ex.getMessage());
+				throw new InsightsCustomException(ex.getMessage());
 			}
 		}
 		return json;
+	}
+
+	/**
+	 * Creates JSON accordingly. Saves values of properties into Numeric/String
+	 * format as required.
+	 * 
+	 * @param json
+	 * @param recordFieldValue
+	 * @param key
+	 * @return
+	 */
+	private void addPropertyInJson(JsonObject json, String recordFieldValue, String key) {
+		String regex = "^([+-]?\\d*\\.?\\d*)$";
+		Pattern p = Pattern.compile(regex);
+		Matcher m = p.matcher(recordFieldValue);
+		if (m.find() && m.group().equals(recordFieldValue)) {
+			if (isInteger(recordFieldValue)) {
+				json.addProperty(key, Long.parseLong(recordFieldValue));
+			} else {
+				json.addProperty(key, Double.parseDouble(recordFieldValue));
+			}
+		} else {
+			json.addProperty(key, recordFieldValue);
+		}
+	}
+
+	/**
+	 * To check whether the record values are integer or not.
+	 * 
+	 * @param checkNumber
+	 * @return
+	 */
+	private boolean isInteger(String checkNumber) {
+		try {
+			Integer.parseInt(checkNumber);
+			return true;
+		} catch (NumberFormatException e) {
+			return false;
+		}
+	}
+
+	/**
+	 * Check whether the time is epoch or not
+	 * 
+	 * @param checkNumber
+	 * @return
+	 */
+	private boolean isEpoch(String checkNumber) {
+		try {
+			new BigDecimal(checkNumber);
+			return true;
+		} catch (NumberFormatException e) {
+			return false;
+		}
 	}
 
 	/**
@@ -214,7 +304,6 @@ public class BulkUploadService implements IBulkUpload {
 	 * @throws InsightsCustomException
 	 */
 	public Object getToolDetailJson() throws InsightsCustomException {
-
 		String agentPath = System.getenv().get("INSIGHTS_HOME") + File.separator + ConfigOptions.CONFIG_DIR;
 		Path dir = Paths.get(agentPath);
 		Object config = null;
@@ -225,10 +314,10 @@ public class BulkUploadService implements IBulkUpload {
 			Object obj = parser.parse(reader);
 			config = obj;
 		} catch (IOException ex) {
-			log.error("Offline file reading issue", ex.getMessage());
+			log.error("Offline file reading issue {}", ex.getMessage());
 			throw new InsightsCustomException("Offline file reading issue -" + ex.getMessage());
 		} catch (Exception ex) {
-			log.error("Error in reading csv file", ex.getMessage());
+			log.error("Error in reading csv file {}", ex.getMessage());
 			throw new InsightsCustomException("Error in reading csv file");
 		}
 		return config;
@@ -244,38 +333,32 @@ public class BulkUploadService implements IBulkUpload {
 	 * @return json
 	 * @throws InsightsCustomException
 	 */
-	public JsonObject addTimeField(JsonObject json, String recordFieldValue, String insightsTimeField,
-			String insightsTimeFormat) throws InsightsCustomException {
+	public void addTimePropertiesInJson(JsonObject json, String recordFieldValue, String insightsTimeFormat)
+			throws InsightsCustomException {
 		long epochTime = 0;
 		String dateTimeFromEpoch = null;
-		if (!recordFieldValue.isEmpty()) {
-			if (!recordFieldValue.contains("T")) {
-				if (!recordFieldValue.contains("E")) {
-					json.addProperty(PlatformServiceConstants.INSIGHTSTIME, recordFieldValue);
-					dateTimeFromEpoch = InsightsUtils.insightsTimeXFormat(Long.parseLong(recordFieldValue));
-				} else {
-					long timeStringval = new BigDecimal(recordFieldValue).longValue();
-					json.addProperty(PlatformServiceConstants.INSIGHTSTIME, timeStringval);
-					dateTimeFromEpoch = InsightsUtils.insightsTimeXFormat(timeStringval);
-				}
-				json.addProperty(PlatformServiceConstants.INSIGHTSTIMEX, dateTimeFromEpoch);
-			} else {
-				if (!insightsTimeFormat.isEmpty()) {
-					epochTime = InsightsUtils.getEpochTime(recordFieldValue, insightsTimeFormat);
-					json.addProperty(PlatformServiceConstants.INSIGHTSTIME, epochTime);
-					if (insightsTimeFormat.equals(InsightsUtils.DATE_TIME_FORMAT)) {
-						json.addProperty(PlatformServiceConstants.INSIGHTSTIMEX, recordFieldValue);
-					} else {
-						dateTimeFromEpoch = InsightsUtils.insightsTimeXFormat(epochTime);
-						json.addProperty(PlatformServiceConstants.INSIGHTSTIMEX, dateTimeFromEpoch);
-					}
-				} else {
-					throw new InsightsCustomException("Provide Insight Time Format for this file");
-				}
-			}
+		if (isEpoch(recordFieldValue)) {
+			long timeStringval = new BigDecimal(recordFieldValue).longValue();
+			json.addProperty(PlatformServiceConstants.INSIGHTSTIME, timeStringval);
+			dateTimeFromEpoch = InsightsUtils.insightsTimeXFormat(timeStringval);
+			json.addProperty(PlatformServiceConstants.INSIGHTSTIMEX, dateTimeFromEpoch);
+			log.debug("No Time format required here.");
+		} else if (insightsTimeFormat.isEmpty()) {
+			throw new InsightsCustomException("Provide Insight Time Format for this file");
 		} else {
-			throw new InsightsCustomException("Null values in column " + insightsTimeField);
+			try {
+				epochTime = InsightsUtils.getEpochTime(recordFieldValue, insightsTimeFormat);
+				json.addProperty(PlatformServiceConstants.INSIGHTSTIME, epochTime);
+				if (insightsTimeFormat.equals(InsightsUtils.DATE_TIME_FORMAT)) {
+					json.addProperty(PlatformServiceConstants.INSIGHTSTIMEX, recordFieldValue);
+				} else {
+					dateTimeFromEpoch = InsightsUtils.insightsTimeXFormat(epochTime);
+					json.addProperty(PlatformServiceConstants.INSIGHTSTIMEX, dateTimeFromEpoch);
+				}
+			} catch (InsightsCustomException ex) {
+				log.error("Mismatched Timeformat {}", ex.getMessage());
+				throw new InsightsCustomException("Mismatched Timeformat");
+			}
 		}
-		return json;
 	}
 }

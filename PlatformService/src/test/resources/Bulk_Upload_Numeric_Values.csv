@@ -1,0 +1,2 @@
+sprintName,key,issueType,Role,authorName,testerName,scrumMasterId,workPlace,weekDay,storyPoints,authorTimeSpent,testerTimeSpent,scrumMasterTimeSpent,resolutionDate,creationDate,completionDate,lastUpdated,creationDateEpochTime,completionDateEpochTime,lastUpdatedEpochTime,DevVendor,QAVendor,release,team,product,Portfolio
+Sprint-001,1716001,Story,Developer,Author1,Tester4,scrumMaster1,office,1,27.878,76,142.979,73,2/3/2020,2/2/2020 15:25,2/3/2020 4:39,2/3/2020 17:44,1580657119,1580704756,1580751868,Vendor2,Vendor4,Release1,Team1,Product1,Portfolio1
