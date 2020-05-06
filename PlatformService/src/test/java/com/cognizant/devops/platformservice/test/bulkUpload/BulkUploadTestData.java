@@ -31,6 +31,7 @@ public class BulkUploadTestData {
 	File fileWithTimeZoneFormatEpochTimes = new File(
 			classLoader.getResource("BulkUploadTest_GIT_TimeZoneFormat.csv").getFile());
 	File fileWithNullEpochTime = new File(classLoader.getResource("BulkUploadTest_GIT_NullEpochTime.csv").getFile());
+	File fileWithNumericValues = new File(classLoader.getResource("Bulk_Upload_Numeric_Values.csv").getFile());
 	String toolName = "GIT";
 	String label = "SCM:GIT:DATA";
 	String nullLabel = null;
@@ -41,6 +42,8 @@ public class BulkUploadTestData {
 	String nullInsightTimeFormat = null;
 	String insightTimeZFormat = "yyyy-MM-dd'T'HH:mm:ss'Z'";
 	String insightTimeWithTimeZoneFormat = "yyyy-MM-dd'T'HH:mm:ssXXX";
+	String fileWithNumericValues_insighstimeField = "completionDateEpochTime";
+	String labelForNumericCheck ="SCM:NUMERIC_CHECK:DATA";
 	long filesizeMaxValue = 2097152;
 
 	File fileSize = new File(classLoader.getResource("BulkUploadTest_Size.csv").getFile());

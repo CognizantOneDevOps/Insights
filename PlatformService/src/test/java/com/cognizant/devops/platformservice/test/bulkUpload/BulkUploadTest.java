@@ -37,9 +37,7 @@ public class BulkUploadTest extends BulkUploadTestData {
 
 	@Test(priority = 1)
 	public void testGetToolDetailJson() throws InsightsCustomException {
-
 		String response = bulkUploadService.getToolDetailJson().toString();
-
 		Assert.assertNotNull(response);
 		Assert.assertTrue(response.length() > 0);
 
@@ -47,7 +45,6 @@ public class BulkUploadTest extends BulkUploadTestData {
 
 	@Test(priority = 2)
 	public void testUploadDataInDatabase() throws InsightsCustomException, IOException {
-
 		FileInputStream input = new FileInputStream(file);
 		MultipartFile multipartFile = new MockMultipartFile("file", file.getName(), "text/plain",
 				IOUtils.toByteArray(input));
@@ -61,7 +58,6 @@ public class BulkUploadTest extends BulkUploadTestData {
 
 	@Test(priority = 3)
 	public void testUploadDataWithVariedEpochTimesInDatabase() throws InsightsCustomException, IOException {
-
 		FileInputStream input = new FileInputStream(fileWithVariedEpochTimes);
 		MultipartFile multipartFile = new MockMultipartFile("file", fileWithVariedEpochTimes.getName(), "text/plain",
 				IOUtils.toByteArray(input));
@@ -75,7 +71,6 @@ public class BulkUploadTest extends BulkUploadTestData {
 
 	@Test(priority = 4)
 	public void testUploadDataWithZFormatEpochTimesInDatabase() throws InsightsCustomException, IOException {
-
 		FileInputStream input = new FileInputStream(fileWithZFormatEpochTimes);
 		MultipartFile multipartFile = new MockMultipartFile("file", fileWithZFormatEpochTimes.getName(), "text/plain",
 				IOUtils.toByteArray(input));
@@ -88,7 +83,6 @@ public class BulkUploadTest extends BulkUploadTestData {
 
 	@Test(priority = 5)
 	public void testUploadDataWithTimeZoneFormatEpochTimesInDatabase() throws InsightsCustomException, IOException {
-
 		FileInputStream input = new FileInputStream(fileWithTimeZoneFormatEpochTimes);
 		MultipartFile multipartFile = new MockMultipartFile("file", fileWithTimeZoneFormatEpochTimes.getName(),
 				"text/plain", IOUtils.toByteArray(input));
@@ -102,7 +96,6 @@ public class BulkUploadTest extends BulkUploadTestData {
 
 	@Test(priority = 6, expectedExceptions = InsightsCustomException.class)
 	public void testUploadDataWithNullEpochTimesInDatabase() throws InsightsCustomException, IOException {
-
 		FileInputStream input = new FileInputStream(fileWithNullEpochTime);
 		MultipartFile multipartFile = new MockMultipartFile("file", fileWithNullEpochTime.getName(), "text/plain",
 				IOUtils.toByteArray(input));
@@ -117,7 +110,6 @@ public class BulkUploadTest extends BulkUploadTestData {
 
 	@Test(priority = 7, expectedExceptions = InsightsCustomException.class)
 	public void testUploadDataWithWrongInsightTimeFieldInDatabase() throws InsightsCustomException, IOException {
-
 		FileInputStream input = new FileInputStream(fileWithNullEpochTime);
 		MultipartFile multipartFile = new MockMultipartFile("file", fileWithNullEpochTime.getName(), "text/plain",
 				IOUtils.toByteArray(input));
@@ -132,7 +124,6 @@ public class BulkUploadTest extends BulkUploadTestData {
 
 	@Test(priority = 8, expectedExceptions = InsightsCustomException.class)
 	public void testUploadDataWithWrongInsightTimeFormatInDatabase() throws InsightsCustomException, IOException {
-
 		FileInputStream input = new FileInputStream(fileWithNullEpochTime);
 		MultipartFile multipartFile = new MockMultipartFile("file", fileWithNullEpochTime.getName(), "text/plain",
 				IOUtils.toByteArray(input));
@@ -147,7 +138,6 @@ public class BulkUploadTest extends BulkUploadTestData {
 
 	@Test(priority = 9, expectedExceptions = InsightsCustomException.class)
 	public void testUploadDataWithNullInsightTimeFieldInDatabase() throws InsightsCustomException, IOException {
-
 		FileInputStream input = new FileInputStream(fileWithVariedEpochTimes);
 		MultipartFile multipartFile = new MockMultipartFile("file", fileWithVariedEpochTimes.getName(), "text/plain",
 				IOUtils.toByteArray(input));
@@ -162,7 +152,6 @@ public class BulkUploadTest extends BulkUploadTestData {
 
 	@Test(priority = 10, expectedExceptions = InsightsCustomException.class)
 	public void testUploadDataWithNullLabelInDatabase() throws InsightsCustomException, IOException {
-
 		FileInputStream input = new FileInputStream(fileWithVariedEpochTimes);
 		MultipartFile multipartFile = new MockMultipartFile("file", fileWithVariedEpochTimes.getName(), "text/plain",
 				IOUtils.toByteArray(input));
@@ -206,11 +195,22 @@ public class BulkUploadTest extends BulkUploadTestData {
 		FileInputStream input = new FileInputStream(fileFormat);
 		MultipartFile multipartFile = new MockMultipartFile("file", fileFormat.getName(), "text/plain",
 				IOUtils.toByteArray(input));
-
 		boolean response = bulkUploadService.uploadDataInDatabase(multipartFile, bulkUploadTestData.toolName,
 				bulkUploadTestData.label, bulkUploadTestData.insightTimeField,
 				bulkUploadTestData.nullInsightTimeFormat);
 
+	}
+
+	@Test(priority = 13)
+	public void testFileWithNumericValues() throws InsightsCustomException, IOException {
+		FileInputStream input = new FileInputStream(fileWithNumericValues);
+		MultipartFile multipartFile = new MockMultipartFile("file", fileWithNumericValues.getName(), "text/plain",
+				IOUtils.toByteArray(input));
+		boolean response = bulkUploadService.uploadDataInDatabase(multipartFile, bulkUploadTestData.toolName,
+				bulkUploadTestData.labelForNumericCheck, bulkUploadTestData.fileWithNumericValues_insighstimeField,
+				bulkUploadTestData.nullInsightTimeFormat);
+		Assert.assertEquals(response, true);
+		Assert.assertFalse(multipartFile.isEmpty());
 	}
 
 }
