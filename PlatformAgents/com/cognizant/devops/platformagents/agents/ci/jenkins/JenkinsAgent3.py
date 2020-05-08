@@ -196,8 +196,11 @@ class JenkinsAgent(BaseAgent):
         }
         if len(jobDetails) == 0:
             return injectData
-        configXmlUrl = url+"config.xml"
-        auth = HTTPBasicAuth(self.userid, self.passwd)
+        configXmlUrl = url+"config.xml
+        if self.userid == None && self.passwd ==  None:
+            auth = None
+        else:
+            auth = HTTPBasicAuth(self.userid, self.passwd)
         sslVerify = self.config.get("communication", '').get("sslVerify")
         xmlResponse = requests.get(configXmlUrl, auth=auth, verify=False)
         root = ET.fromstring(xmlResponse.text.encode('UTF-8').strip())
