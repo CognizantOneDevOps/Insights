@@ -110,7 +110,7 @@ public class WebHookServiceImpl implements IWebHook {
 			JsonArray derivedOperationsArray = registerWebhookjson.get("derivedOperations").getAsJsonArray();
 			Set<WebhookDerivedConfig> setWebhookDerivedConfigs = new HashSet<WebhookDerivedConfig>();
 			webhookConfiguration.setDataFormat(registerWebhookjson.get("dataformat").getAsString());
-			webhookConfiguration.setLabelName(registerWebhookjson.get("labelDisplay").getAsString());
+			webhookConfiguration.setLabelName(registerWebhookjson.get("labelDisplay").getAsString().toUpperCase());
 			webhookConfiguration.setToolName(registerWebhookjson.get("toolName").getAsString());
 			webhookConfiguration.setMQChannel(registerWebhookjson.get("mqchannel").getAsString());
 			webhookConfiguration.setWebHookName(webhookName);

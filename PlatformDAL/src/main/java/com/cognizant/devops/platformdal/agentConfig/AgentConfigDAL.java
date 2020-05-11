@@ -107,7 +107,7 @@ public class AgentConfigDAL extends BaseDAL {
 
 		agentConfig.setToolCategory(toolCategory.toUpperCase());
 		agentConfig.setToolName(toolName);
-		agentConfig.setLabelName(labelName);
+		agentConfig.setLabelName(labelName.toUpperCase());
 		agentConfig.setAgentJson(agentJson.toString());
 		agentConfig.setOsVersion(osversion);
 		agentConfig.setAgentVersion(agentVersion);

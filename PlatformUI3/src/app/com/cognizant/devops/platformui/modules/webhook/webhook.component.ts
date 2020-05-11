@@ -355,7 +355,6 @@ export class WebHookComponent implements OnInit {
             else if (!checkLabel) {
                 isValidated = false;
                 messageDialogText = "Please enter valid label name, and it contains only alphanumeric character,underscore & colon ";
-
             }
             else if (checkLabel) {
                 var count = (this.labelDisplay.match(/:/g) || []).length;
@@ -365,14 +364,15 @@ export class WebHookComponent implements OnInit {
                         isValidated = false;
                         messageDialogText = "Invalid label Name. Please follow the nomenclature TOOL_CATEGORY:LABEL_NAME:DATA"
                     }
-
                 }
                 else {
                     isValidated = false;
                     messageDialogText = "Invalid label Name. Please follow the nomenclature TOOL_CATEGORY:LABEL_NAME:DATA"
                 }
             }
-            else if (!((this.dynamicTemplate === "") || this.dynamicTemplate === undefined)) {
+        }
+        if (isValidated) {
+            if (!((this.dynamicTemplate === "") || this.dynamicTemplate === undefined)) {
                 try {
                     JSON.parse(this.dynamicTemplate);
                     isValidated = true;

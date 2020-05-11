@@ -602,7 +602,7 @@ public class AgentManagementServiceImpl implements AgentManagementService {
 		Gson gson = new Gson();
 		JsonElement jelement = gson.fromJson(configDetails.trim(), JsonElement.class);
 		JsonObject json = jelement.getAsJsonObject();
-		String labelData = json.get("publish").getAsJsonObject().get("data").getAsString();
+		String labelData = json.get("publish").getAsJsonObject().get("data").getAsString().toUpperCase();
 		List<String> labelDataValue = Arrays.asList(labelData.split(MessageConstants.ROUTING_KEY_SEPERATOR));
 		return labelDataValue.get(1);
 
