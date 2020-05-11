@@ -1,19 +1,20 @@
 {
   "vault": {
     "getFromVault": false,
-    "secretEngine":"insights-kv",
-    "readToken":"vault_secret_token",
-    "vaultUrl":"http://Vault_Host:port/v1/"
+    "secretEngine": "insights-kv",
+    "readToken": "vault_secret_token",
+    "vaultUrl": "http://Vault_Host:port/v1/"
   },
   "mqConfig": {
     "user": "iSight",
     "password": "iSight",
     "host": "localhost",
     "exchange": "iSight",
-    "agentControlXchg":"iAgent"
+    "agentControlXchg": "iAgent"
   },
   "subscribe": {
-    "config": "DEPLOYMENT.XLDEPLOY.config"
+    "config": "DEPLOYMENT.XLDEPLOY.config",
+    "agentCtrlQueue": "InsightsXlDeploy"
   },
   "publish": {
     "data": "DEPLOYMENT.XLDEPLOY.DATA",
@@ -21,52 +22,37 @@
   },
   "communication": {
     "type": "REST",
-    "sslVerify": true,
+    "sslVerify": false,
     "responseType": "JSON"
   },
- "dynamicTemplate": {
- 	"timeFieldMapping" : {
-		"startDate" : "%Y-%m-%d"
-  	},
-	"responseTemplate" : {
-		"sha": "git_commitId",
-		"commit" : {
-			"author" : {
-				"name": "git_authorName",
-				"date": "git_commiTime"
-			}
-		}
-	},
-	"clientConfig": {
-	    "runSchedule": {
-	      "userInput": true,
-	      "label": "Schedule interval in minutes",
-	      "type": "input",
-	      "value": 30,
-	      "errorMessage": "Please specify schedule interval",
-	      "required": true
-	    }
-     }	
+  "dynamicTemplate": {
+    "timeFieldMapping": {
+      "startDate": "%Y-%m-%dT%H:%M:%S"
+    }
   },
- "agentId" : "",
- "auth": "base64",
- "toolCategory" : "DEPLOYMENT",
- "enableDataValidation": true,
- "runSchedule": 5,
- "toolsTimeZone" : "Asia/Kolkata",
- "isEpochTimeFormat" : false,
- "agentSecretDetails": ["userid","passwd"],
- "enableValueArray": false,
- "timeStampFormat":"%Y-%m-%dT%H:%M:%S",
- "timeStampField":"startDate",
- "useResponseTemplate" : true,
- "userid": "userid",
- "passwd": "passwd",
-  "baseEndPoint": "http://127.0.0.1:4516/deployit",
-  "isDebugAllowed" : false,
-  "loggingSetting" : {
-		"logLevel" : "WARN",
-		"maxBytes" : 5000000,
-		"backupCount" : 1000
- } 
+  "agentId": "",
+  "auth": "base64",
+  "toolCategory": "DEPLOYMENT",
+  "enableDataValidation": true,
+  "runSchedule": 30,
+  "toolsTimeZone": "Asia/Kolkata",
+  "isEpochTimeFormat": false,
+  "enableValueArray": false,
+  "agentSecretDetails": [
+    "userid",
+    "passwd"
+  ],
+  "timeStampFormat": "%Y-%m-%dT%H:%M:%S",
+  "timeStampField": "startFrom",
+  "useResponseTemplate": true,
+  "userID": "userID",
+  "passwd": "passwd",
+  "baseEndPoint": "baseEndPoint",
+  "startFrom": "2020-04-01",
+  "isDebugAllowed": false,
+  "loggingSetting": {
+    "logLevel": "WARN",
+    "maxBytes": 5000000,
+    "backupCount": 1000
+  }
 }

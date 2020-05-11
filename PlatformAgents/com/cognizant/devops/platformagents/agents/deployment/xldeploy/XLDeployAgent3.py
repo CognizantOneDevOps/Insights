@@ -14,41 +14,60 @@
 # the License.
 #-------------------------------------------------------------------------------
 '''
-Created on Oct 13, 2016
+Created on May 09, 2020
 
-@author: 463188
+@author: 368419
 '''
 
 import json
 import datetime
+import logging
 from datetime import timedelta
 from ....core.BaseAgent3 import BaseAgent
 
 class XLDeployAgent(BaseAgent):
     def process(self):
-        BaseEndPoint = self.config.get("baseEndPoint", '')
-        UserId = self.getCredential("userid")
-        Passwd = self.getCredential("passwd")
-        begindate = self.tracking.get("begindate", '')
-        listtasksurl = BaseEndPoint+"/tasks/v2/export?begindate="+begindate
-        try:
-            tasks = self.getResponse(listtasksurl, 'GET', UserId, Passwd, None)
-            data = []
-            responseTemplate = self.getResponseTemplate()
-            for task in tasks:
-                if task["metadata"]["taskType"]=="UPGRADE" or task["metadata"]["taskType"]=="INITIAL":
-                    appverurl = BaseEndPoint+"/repository/ci/Applications/"+task["metadata"]["application"]+"/"+task["metadata"]["version"]
-                    try:
-                        appdetails = self.getResponse(appverurl, 'GET', UserId, Passwd, None)
-                    except:
-                        pass
-                    data += self.parseResponse(responseTemplate, appdetails)
-            trackdate = datetime.date.today() + timedelta(days=1)
-            trackdate = trackdate.strftime('%Y-%m-%d')
-            self.tracking["begindate"] = trackdate
-            self.updateTrackingJson(self.tracking)
-            self.publishToolsData(data)
-        except:
-            pass
+        baseEndPoint = self.config.get("baseEndPoint", '')
+        userID = self.config.get("userID", '')
+        passwd = self.config.get("passwd", '')
+        startFrom = self.config.get("startFrom", '')
+        beginDate = self.tracking.get("startDate", startFrom)
+        
+        listtasksurl = baseEndPoint + "/task/query?begindate=" + beginDate                
+        tasks = self.getResponse(listtasksurl, 'GET', userID, passwd, None)
+        
+        data = []
+        metadata ={"labels" : ["XLDEPLOY_TASKS"],"dataUpdateSupported" : True,"uniqueKey" : ["taskId"]}
+        latestDate = beginDate
+        for task in tasks:
+                    
+            if task["metadata"]["taskType"]=="UPGRADE" or task["metadata"]["taskType"]=="INITIAL":
+                injectData = {}
+                if len(task["metadata"]["application"]) >= 1:               
+                   injectData['application_name'] = task["metadata"]["application"]   
+                
+                injectData['version'] = task["metadata"]["version"]  
+                injectData['taskType'] = task["metadata"]["taskType"]  
+                injectData['environment_id'] = task["metadata"]["environment_id"]  
+                injectData['state'] = task.get("state")
+                injectData['startDate'] = task["startDate"]
+                if latestDate == None:
+                    latestDate =task["startDate"]
+                elif task["startDate"] > latestDate: 
+                    latestDate = task["startDate"]
+                    
+                injectData['completionDate'] = task["completionDate"]
+                injectData['user'] = task.get("owner")  
+                injectData['taskId'] = task.get("id")
+                injectData['failures'] = task.get("failures")
+                injectData['state2'] = task.get("state2")                
+                data.append(injectData)
+                
+        latestDate= latestDate.split("T")[0]           
+        
+        self.tracking["startDate"] = latestDate
+        self.publishToolsData(data,metadata)
+        self.updateTrackingJson(self.tracking)
+        
 if __name__ == "__main__":
     XLDeployAgent()
