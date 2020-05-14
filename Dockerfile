@@ -96,8 +96,8 @@ EXPOSE 3000/tcp 5432/tcp 7474/tcp
 
 # installing Apache Tomcat
 
-COPY PlatformService/target/PlatformService*.war /opt/PlatformService.war
-COPY PlatformUI3/target/PlatformUI3*.zip /opt/PlatformUI3.zip
+COPY PlatformService/target/*.war /opt/PlatformService.war
+COPY PlatformUI3/target/*.zip /opt/PlatformUI3.zip
 WORKDIR /opt/
 RUN unzip PlatformUI3.zip && rm -rf PlatformUI3.zip && \
     wget https://platform.cogdevops.com/insights_install/installationScripts/latest/RHEL/tomcat/apache-tomcat.tar.gz && \
@@ -109,13 +109,13 @@ RUN cp -r /opt/app /opt/apache-tomcat/webapps/ && cp /opt/PlatformService.war /o
 # installing Insights Engine
 
 WORKDIR /opt/insightsengine/
-COPY PlatformEngine/target/PlatformEngine*.jar /opt/insightsengine/PlatformEngine.jar
+COPY PlatformEngine/target/PlatformEn*.jar /opt/insightsengine/PlatformEngine.jar
 RUN chmod -R 755 /opt/insightsengine/
 
 # installing Insights Webhook
 
 WORKDIR /opt/insightsWebhook/
-COPY PlatformInsightsWebHook/target/PlatformInsightsWebHook*.jar /opt/insightsWebhook/PlatformInsightsWebHook.jar
+COPY PlatformInsightsWebHook/target/PlatformInsightsWeb*.jar /opt/insightsWebhook/PlatformInsightsWebHook.jar
 RUN chmod -R 755 /opt/insightsWebhook/
 
 #installing Apache httpd
