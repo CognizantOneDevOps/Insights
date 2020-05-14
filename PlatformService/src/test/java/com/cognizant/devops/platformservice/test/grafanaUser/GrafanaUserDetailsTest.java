@@ -21,7 +21,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.testng.annotations.Test;
 
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
-import com.cognizant.devops.platformservice.security.config.GrafanaUserDetailsUtil;
+import com.cognizant.devops.platformservice.security.config.grafana.GrafanaUserDetailsUtil;
 
 @Test
 @ContextConfiguration(locations = { "classpath:spring-test-config.xml" })

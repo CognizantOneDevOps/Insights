@@ -17,7 +17,6 @@ package com.cognizant.devops.platformservice.webhook.service;
 
 import java.util.HashSet;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.StringTokenizer;
 
@@ -38,11 +37,40 @@ import com.google.gson.JsonObject;
 @Service("webhookConfigurationService")
 public class WebHookServiceImpl implements IWebHook {
 	private static final Logger log = LogManager.getLogger(WebHookServiceImpl.class);
+	WebHookConfigDAL webhookConfigurationDAL = new WebHookConfigDAL();
 
 	@Override
-	public Boolean saveWebHookConfiguration(String webhookname, String toolName, String labelDisplay, String dataformat,
-			String mqchannel, Boolean subscribestatus, String responseTemplate, JsonArray derivedOperationsArray)
-			throws InsightsCustomException {
+	public Boolean saveWebHookConfiguration(JsonObject registerWebhookjson) throws InsightsCustomException {
+		try {
+			WebHookConfig webHookConfig = populateWebHookConfiguration(registerWebhookjson);
+			return webhookConfigurationDAL.saveWebHookConfiguration(webHookConfig);
+		} catch (InsightsCustomException e) {
+			log.error("Error while saving the webhook .. {}", e.getMessage());
+			throw new InsightsCustomException(e.getMessage());
+		}
+	}
+
+	@Override
+	public List<WebHookConfig> getRegisteredWebHooks() throws InsightsCustomException {
+
+		try {
+			List<WebHookConfig> webhookConfigList = webhookConfigurationDAL.getAllWebHookConfigurations();
+			return webhookConfigList;
+		} catch (Exception e) {
+			log.error("Error getting all webhook config.. {}", e);
+			throw new InsightsCustomException(e.toString());
+		}
+
+	}
+
+	/**
+	 * Validation of the Response Template which has been entered by the user
+	 * 
+	 * @param responseTemplate
+	 * @return
+	 * @throws InsightsCustomException
+	 */
+	private Boolean checkResponseTemplate(String responseTemplate) throws InsightsCustomException {
 		try {
 			StringTokenizer st = new StringTokenizer(responseTemplate, ",");
 			while (st.hasMoreTokens()) {
@@ -52,95 +80,94 @@ public class WebHookServiceImpl implements IWebHook {
 					throw new InsightsCustomException(PlatformServiceConstants.INCORRECT_RESPONSE_TEMPLATE);
 				} else {
 					String[] dataKeyMapper = keyValuePairs.split("=");
-					log.debug(dataKeyMapper[0].trim() + " , " + dataKeyMapper[1].trim());
+					log.debug(" {}  , {} ", dataKeyMapper[0].trim(), dataKeyMapper[1].trim());
 				}
 			}
-			// Saving the data into the database
-			WebHookConfig webHookConfig = populateWebHookConfiguration(webhookname, toolName, labelDisplay, dataformat,
-					mqchannel, subscribestatus, responseTemplate, derivedOperationsArray);
-			WebHookConfigDAL webhookConfigurationDAL = new WebHookConfigDAL();
-			return webhookConfigurationDAL.saveWebHookConfiguration(webHookConfig);
+			return true;
+		} catch (InsightsCustomException e) {
+			log.error("Error in Response Template.. {}", e.getMessage());
+			throw new InsightsCustomException(PlatformServiceConstants.INCORRECT_RESPONSE_TEMPLATE);
+		}
+	}
+
+	/**
+	 * Populatating the data received from the user into the Object of the entity class.
+	 * 
+	 * @param registerWebhookjson
+	 * @return
+	 * @throws InsightsCustomException
+	 */
+	private WebHookConfig populateWebHookConfiguration(JsonObject registerWebhookjson) throws InsightsCustomException {
+		try {
+			WebHookConfig webhookConfiguration = new WebHookConfig();
+			String responseTemplate = registerWebhookjson.get("responseTemplate").getAsString();
+			if (responseTemplate != "") {
+				checkResponseTemplate(responseTemplate);
+			}
+			String dynamicTemplate = registerWebhookjson.get("dynamicTemplate").getAsString();
+			Boolean isUpdateRequired = registerWebhookjson.get("isUpdateRequired").getAsBoolean();
+			String webhookName = registerWebhookjson.get("webhookName").getAsString();
+			JsonArray derivedOperationsArray = registerWebhookjson.get("derivedOperations").getAsJsonArray();
+			Set<WebhookDerivedConfig> setWebhookDerivedConfigs = new HashSet<WebhookDerivedConfig>();
+			webhookConfiguration.setDataFormat(registerWebhookjson.get("dataformat").getAsString());
+			webhookConfiguration.setLabelName(registerWebhookjson.get("labelDisplay").getAsString().toUpperCase());
+			webhookConfiguration.setToolName(registerWebhookjson.get("toolName").getAsString());
+			webhookConfiguration.setMQChannel(registerWebhookjson.get("mqchannel").getAsString());
+			webhookConfiguration.setWebHookName(webhookName);
+			webhookConfiguration.setSubscribeStatus(registerWebhookjson.get("statussubscribe").getAsBoolean());
+			webhookConfiguration.setResponseTemplate(responseTemplate);
+			webhookConfiguration.setDynamicTemplate(dynamicTemplate);
+			webhookConfiguration.setFieldUsedForUpdate(registerWebhookjson.get("fieldUsedForUpdate").getAsString());
+			if (responseTemplate.isEmpty()) {
+				webhookConfiguration.setResponseTemplate(null);
+			}
+			if (dynamicTemplate.isEmpty()) {
+				webhookConfiguration.setDynamicTemplate(null);
+			}
+			webhookConfiguration.setIsUpdateRequired(isUpdateRequired);
+			if (!isUpdateRequired.booleanValue()) {
+				webhookConfiguration.setFieldUsedForUpdate(null);
+			}
+			for (JsonElement webhookDerivedConfigJson : derivedOperationsArray) {
+				WebhookDerivedConfig webhookDerivedConfig = new WebhookDerivedConfig();
+				JsonObject receivedObject = webhookDerivedConfigJson.getAsJsonObject();
+				int wid = receivedObject.get("wid").getAsInt();
+				webhookDerivedConfig.setOperationName(receivedObject.get("operationName").getAsString());
+				webhookDerivedConfig.setOperationFields(receivedObject.get("operationFields").toString());
+				webhookDerivedConfig.setWebhookName(webhookName);
+				if (wid != -1) {
+					webhookDerivedConfig.setWid(wid);
+				}
+				setWebhookDerivedConfigs.add(webhookDerivedConfig);
+			}
+			webhookConfiguration.setWebhookDerivedConfig(setWebhookDerivedConfigs);
+			return webhookConfiguration;
 		} catch (InsightsCustomException e) {
 			log.error(e.getMessage());
 			throw new InsightsCustomException(e.getMessage());
-		} catch (ArrayIndexOutOfBoundsException e) {
-			log.error(e);
-			throw new ArrayIndexOutOfBoundsException(e.getMessage());
-		} catch (NoSuchElementException e) {
-			log.error(e.getMessage());
-			throw new InsightsCustomException("Incorrect Response template");
-		} catch (Exception e) {
-			log.error(e);
-			throw new InsightsCustomException(e.getMessage());
 		}
-	}
-
-	@Override
-	public List<WebHookConfig> getRegisteredWebHooks() throws InsightsCustomException {
-		WebHookConfigDAL webhookConfigDAL = new WebHookConfigDAL();
-
-		try {
-			List<WebHookConfig> webhookConfigList = webhookConfigDAL.getAllWebHookConfigurations();
-			return webhookConfigList;
-		} catch (Exception e) {
-			log.error("Error getting all webhook config", e);
-			throw new InsightsCustomException(e.toString());
-		}
-
-	}
-
-	private WebHookConfig populateWebHookConfiguration(String webhookname, String toolName, String labelDisplay,
-			String dataformat, String mqchannel, Boolean subscribestatus, String responseTemplate,
-			JsonArray derivedOperationsArray) {
-		WebHookConfig webhookConfiguration = new WebHookConfig();
-		Set<WebhookDerivedConfig> setWebhookDerivedConfigs = new HashSet<WebhookDerivedConfig>();
-		webhookConfiguration.setDataFormat(dataformat);
-		webhookConfiguration.setLabelName(labelDisplay);
-		webhookConfiguration.setToolName(toolName);
-		webhookConfiguration.setMQChannel(mqchannel);
-		webhookConfiguration.setWebHookName(webhookname);
-		webhookConfiguration.setSubscribeStatus(subscribestatus);
-		webhookConfiguration.setResponseTemplate(responseTemplate);
-		for (JsonElement webhookDerivedConfigJson : derivedOperationsArray) {
-			WebhookDerivedConfig webhookDerivedConfig = new WebhookDerivedConfig();
-			JsonObject receivedObject = webhookDerivedConfigJson.getAsJsonObject();
-			int wid = receivedObject.get("wid").getAsInt();
-			webhookDerivedConfig.setOperationName(receivedObject.get("operationName").getAsString());
-			webhookDerivedConfig.setOperationFields(receivedObject.get("operationFields").toString());
-			webhookDerivedConfig.setWebhookName(webhookname);
-			if (wid != -1) {
-				webhookDerivedConfig.setWid(wid);
-			}
-			setWebhookDerivedConfigs.add(webhookDerivedConfig);
-		}
-		webhookConfiguration.setWebhookDerivedConfig(setWebhookDerivedConfigs);
-		return webhookConfiguration;
 	}
 
 	@Override
 	public String uninstallWebhook(String webhookname) throws InsightsCustomException {
 		try {
-			WebHookConfigDAL webhookConfigDAL = new WebHookConfigDAL();
-			webhookConfigDAL.deleteWebhookConfigurations(webhookname);
+
+			webhookConfigurationDAL.deleteWebhookConfigurations(webhookname);
+			return PlatformServiceConstants.SUCCESS;
 		} catch (Exception e) {
-			log.error("Error while un-installing webhook..", e);
+			log.error("Error while un-installing webhook..{}", e);
 			throw new InsightsCustomException(e.toString());
 		}
-		return PlatformServiceConstants.SUCCESS;
 	}
 
 	@Override
-	public Boolean updateWebHook(String webhookname, String toolName, String eventname, String dataformat,
-			String mqchannel, Boolean subscribestatus, String responseTemplate, JsonArray derivedOperations)
-			throws InsightsCustomException {
+	public Boolean updateWebHook(JsonObject registerWebhookjson) throws InsightsCustomException {
 		Boolean status = false;
 		try {
-			WebHookConfig webHookConfig = populateWebHookConfiguration(webhookname, toolName, eventname, dataformat,
-					mqchannel, subscribestatus, responseTemplate, derivedOperations);
-			WebHookConfigDAL webhookConfigurationDAL = new WebHookConfigDAL();
+			WebHookConfig webHookConfig = populateWebHookConfiguration(registerWebhookjson);
 			status = webhookConfigurationDAL.updateWebHookConfiguration(webHookConfig);
 		} catch (Exception e) {
-			log.error("Error in updating the webhook", e);
+			log.error("Error in updating the webhook.. {}", e);
 			throw new InsightsCustomException(e.toString());
 		}
 		return status;
@@ -148,15 +175,14 @@ public class WebHookServiceImpl implements IWebHook {
 
 	public String updateWebhookStatus(JsonObject updateWebhookJsonValidated) throws InsightsCustomException {
 		try {
-			WebHookConfigDAL webhookConfigDAL = new WebHookConfigDAL();
 			String webhookName = updateWebhookJsonValidated.get("webhookName").getAsString();
 			Boolean statussubscribe = updateWebhookJsonValidated.get("statussubscribe").getAsBoolean();
-			webhookConfigDAL.updateWebhookStatus(webhookName, statussubscribe);
+			webhookConfigurationDAL.updateWebhookStatus(webhookName, statussubscribe);
+			return PlatformServiceConstants.SUCCESS;
 		} catch (Exception e) {
-			log.error("Error while un-installing webhook..", e);
+			log.error("Error while updating webhook status..{}", e);
 			throw new InsightsCustomException(e.toString());
 		}
-		return PlatformServiceConstants.SUCCESS;
 	}
 
 }

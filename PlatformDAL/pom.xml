@@ -12,12 +12,12 @@
 	<parent>
 		<groupId>com.cognizant.devops</groupId>
 		<artifactId>PlatformParent</artifactId>
-		<version>6.5</version>
+		<version>6.6</version>
 	</parent>
 	<artifactId>PlatformDAL</artifactId>
 	<name>PlatformDAL</name>
 	<groupId>com.cognizant.devops</groupId>
-	<version>6.5</version>
+	<version>6.6</version>
 	<url>http://maven.apache.org</url>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -33,7 +33,7 @@
 		<dependency>
 			<groupId>com.cognizant.devops</groupId>
 			<artifactId>PlatformCommons</artifactId>
-			<version>6.5</version>
+			<version>6.6</version>
 		</dependency>
 
 		<!-- Dependency for postgresql -->
@@ -53,6 +53,12 @@
 			<artifactId>neo4j-java-driver</artifactId>
 			<version>1.7.3</version>
 		</dependency>
+		
+<!-- 		<dependency>
+		    <groupId>org.springframework.data</groupId>
+		    <artifactId>spring-data-jpa</artifactId>
+		    <version>2.2.6.RELEASE</version>
+		</dependency> -->
 	</dependencies>
 	<build>
 		<plugins>

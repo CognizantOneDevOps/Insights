@@ -14,76 +14,122 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  *******************************************************************************/
+
 .showTable {
-    background-color: #00B140;
-    color: white;
-    border-radius: 10px 10px 0 0;
-    text-align: center;
+  background-color: #00b140;
+  color: white;
+  border-radius: 10px 10px 0 0;
+  text-align: left;
+  padding: 10px;
 }
-.tableMainCss{
-    border-collapse: collapse !important ;
-    border-spacing: 0px  !important;
+
+.tableMainCss {
+  border-collapse: collapse !important;
+  border-spacing: 0px !important;
 }
+
 .bulkuploadtablecss {
-    float: right;
-    width: 100%;
-    box-shadow: 0 2px 2px -3px rgba(0, 0, 0, .2), 0 8px 10px 1px rgba(0, 0, 0, .14), 0 3px 14px 2px rgba(0, 0, 0, .12);
-    -o-box-shadow: 2px 0 5px rgba(0, 0, 0, .2);
-    margin-bottom: 0%;
-    margin-right: 1px;
-   /*  border: white; */
-    border-radius: 10px;
-    background-color: white;
+  float: right;
+  width: 100%;
+  box-shadow: 0 2px 2px -3px rgba(0, 0, 0, 0.2), 0 8px 10px 1px rgba(0, 0, 0, 0.14), 0 3px 14px 2px rgba(0, 0, 0, 0.12);
+  -o-box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2);
+  margin-bottom: 0%;
+  margin-right: 1px;
+  /*  border: white; */
+  border-radius: 10px;
+  background-color: white;
 }
 
-.AddUserColTextCss
-{
-    text-align: left; 
-    padding-left: 15px; 
-    padding-top: 8px; 
-    align-items: center;
+.AddUserColTextCss {
+  text-align: left;
+  padding-left: 15px;
+  padding-top: 8px;
+  align-items: center;
 }
+
 .form-control {
-    padding: 6px 12px;
-    font-size: 13px;
-    background-color: white;
-    background-image: none;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
-    box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
-    -webkit-transition: border-color ease-in-out .15s,-webkit-box-shadow ease-in-out .15s;
-    -o-transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
-    transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
-    margin-left: 5px;
-    margin-bottom: 5px;
+  padding: 6px 12px;
+  font-size: 13px;
+  background-color: white;
+  background-image: none;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+  box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+  -webkit-transition: border-color ease-in-out 0.15s, -webkit-box-shadow ease-in-out 0.15s;
+  -o-transition: border-color ease-in-out 0.15s, box-shadow ease-in-out 0.15s;
+  transition: border-color ease-in-out 0.15s, box-shadow ease-in-out 0.15s;
+  margin-left: 5px;
+  margin-bottom: 5px;
 }
 
-.toolColCss
-{
-    padding-top: 10px;
-    margin-bottom: 10px;
-    margin-left: 10px;
+.labelCss {
+  padding-top: 10px;
+  margin-bottom: 10px;
+  margin-left: 3%;
 }
 
-tr .disable{
+.labelInputCss {
+  width: 74%;
+  margin-left: 4%;
+}
+
+.timeFieldDivCss {
+  width: 74%;
+  padding-top: 2.5%;
+  margin-left: 6%;
+}
+
+.timeFieldInputCss {
+  width: 60%;
+  margin-left: 2px;
+  margin-top: -1%;
+  float: right;
+}
+
+.timeFormatDivCss {
+  width: 74%;
+  padding-top: 2.5%;
+  margin-left: 6%;
+}
+
+.timeFormatInputCss {
+  width: 60%;
+  margin-left: 2px;
+  float: right;
+}
+
+.toolColCss {
+  padding-top: 10px;
+  margin-bottom: 10px;
+  margin-left: 10px;
+}
+
+.toolSelect {
+  width: 74%;
+  margin-left: 5%;
+}
+
+tr .disable {
   cursor: not-allowed;
-  }
-.input-disabled{
-    color: rgba(0,0,0,.38);
-    background-color:#e1e3e7;
-    padding: 6px 12px;
-    font-size: 13px;
-    background-image: none;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
-    box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
-    -webkit-transition: border-color ease-in-out .15s,-webkit-box-shadow ease-in-out .15s;
-    -o-transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
-    transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
-    margin-left: 5px;
 }
+
+.input-disabled {
+  color: rgba(0, 0, 0, 35);
+  background-color: #ffffff;
+  padding: 6px 12px;
+  font-size: 13px;
+  background-image: none;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+  box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+  -webkit-transition: border-color ease-in-out 0.15s, -webkit-box-shadow ease-in-out 0.15s;
+  -o-transition: border-color ease-in-out 0.15s, box-shadow ease-in-out 0.15s;
+  transition: border-color ease-in-out 0.15s, box-shadow ease-in-out 0.15s;
+  margin-left: 5px;
+}
+
 .loading-indicator {
   position: fixed;
   z-index: 999;
@@ -95,220 +141,218 @@ tr .disable{
   left: 0;
   bottom: 0;
   right: 0;
- }
-
-.mainText{
-    font-size: 14px;
-    color:  #00b140;
-    font-weight:bold;
-    vertical-align: sub;
-    width: 10%
-}
-.mainText2{
-    font-size: 14px;
-    color: black;
-   /*  font-weight:bold; */
-    vertical-align: sub;
-    width: 10%
 }
 
-.mat-button{
-    font-size: 16px;
-    font-weight: 500;
-    min-width: 50px;
+.mainText {
+  font-size: 14px;
+  color: #00b140;
+  font-weight: bold;
+  vertical-align: sub;
+  width: 10%;
 }
-.btnAlign{
-    margin-right: 7px; 
-    float: right;
-    margin-bottom: 10px;
+
+.mainText2 {
+  font-size: 14px;
+  color: black;
+  /*  font-weight:bold; */
+  vertical-align: sub;
+  width: 10%;
+}
+
+.mat-button {
+  font-size: 16px;
+  font-weight: 500;
+  min-width: 50px;
+}
+
+.btnAlign {
+  margin-right: 7px;
+  float: right;
+  margin-bottom: 10px;
 }
 
 .divTablesHeadingLeft {
-    font-size: 16px;
-    margin-top: 40px;
-    margin-bottom: 6px;
-    text-align: left;
-    /* width: 100vh; */
+  font-size: 16px;
+  margin-top: 40px;
+  margin-bottom: 6px;
+  text-align: left;
+  /* width: 100vh; */
 }
+
 .arrange-horizontally {
-    -webkit-box-orient: horizontal;
-    -webkit-box-direction: normal;
-    -webkit-flex-direction: row;
-    flex-direction: row;
-    box-sizing: border-box;
-    display: -webkit-box;
-    display: -webkit-flex;
-    margin-top: 10px;
-    height: 40px;
+  -webkit-box-orient: horizontal;
+  -webkit-box-direction: normal;
+  -webkit-flex-direction: row;
+  flex-direction: row;
+  box-sizing: border-box;
+  display: -webkit-box;
+  display: -webkit-flex;
+  margin-top: 10px;
+  height: 40px;
 }
 
-.showTable {
-    background-color: #00B140;
-    color: white;
-    border-radius: 10px 10px 0 0;
-    text-align: center;
-}
-.table
-{
-        border-spacing :0 px !important;
+.table {
+  border-spacing: 0 px !important;
 }
 
-.mainHeaderText{
-    font-size: 15px;
-    color:  white;
-    
+.mainHeaderText {
+  font-size: 15px;
+  color: white;
 }
-.infoHeaderText{
-    font-size: 11px;
-    color: white;
-    padding-left: 4px;
+
+.infoHeaderText {
+  font-size: 11px;
+  color: white;
+  padding-left: 4px;
 }
+
 .dat-row {
-    height: 45px !important;
-    text-align: left !important;
-    vertical-align: middle;
-    margin-left: 5px;
+  height: 45px !important;
+  text-align: left !important;
+  vertical-align: middle;
+  margin-left: 5px;
 }
-.inputcss {
-    font-size: 14px !important;
-  /*   margin-left: 25px; */
-    width: 210px;
-    margin-top: 4px;
-    HEIGHT: 26px;
 
+.inputcss {
+  font-size: 14px !important;
+  /*   margin-left: 25px; */
+  width: 210px;
+  margin-top: 4px;
+  height: 26px;
 }
-.searchbox
-{
-       font-size: 14px !important;
-    margin-left: 17px; 
-    width: 330px;
-     margin-top: 1px 
+
+.searchbox {
+  font-size: 14px !important;
+  margin-left: 17px;
+  width: 330px;
+  margin-top: 1px;
 }
-.wrnTxt{
+
+.wrnTxt {
   color: #ff8f1c !important;
   font-size: 13px !important;
 }
 
 .dat-row1 {
-    height: 100px !important;
-    text-align: left !important;
-    vertical-align: middle;
-    margin-left: 5px;
+  height: 100px !important;
+  text-align: left !important;
+  vertical-align: middle;
+  margin-left: 5px;
 }
 
 tr:nth-child(odd) td {
-    background-color: #ffffff;
+  background-color: #ffffff;
 }
 
-tr:nth-child(even)  {
-    background-color: #E1E3E7;
-    border-color: #E1E3E7
+tr:nth-child(even) {
+  background-color: #e1e3e7;
+  border-color: #e1e3e7;
 }
+
 .dat-row2 {
-    height: 45px !important;
-    text-align: left !important;
-    vertical-align: middle;
-    margin-left: 5px;
-     background-color: #e1e3e7;
+  height: 45px !important;
+  text-align: left !important;
+  vertical-align: middle;
+  margin-left: 5px;
+  background-color: #e1e3e7;
 }
 
-.accessGroupbutton{
+.accessGroupbutton {
   min-height: 38px !important;
   min-width: 138px !important;
   font-size: 17px !important;
   border-radius: 0px !important;
   text-transform: initial !important;
   color: white !important;
-  background-color: #5C068C !important;
+  background-color: #5c068c !important;
   padding-left: 10px;
 }
 
-.filterGroupCSS{
-   float: right;
-   width: 30%
+.filterGroupCSS {
+  float: right;
+  width: 30%;
 }
-.mat-flat-button{
-    margin-left: 5px;
+
+.mat-flat-button {
+  margin-left: 5px;
 }
 
 mat-radio-button.mat-accent .mat-radio-inner-circle {
-    background-color: #5c068c !important;
+  background-color: #5c068c !important;
 }
 
-.mat-radio-button.mat-accent.mat-radio-checked .mat-radio-outer-circle{
-    background-color: #5c068c !important;
+.mat-radio-button.mat-accent.mat-radio-checked .mat-radio-outer-circle {
+  background-color: #5c068c !important;
 }
 
-th[_ngcontent-c15]:last-child{
-    border-top-left-radius: 0px;
-    border-top-right-radius: 0px;
-    border-bottom-right-radius: 0px;
-    border-bottom-left-radius: 0px;
+th[_ngcontent-c15]:last-child {
+  border-top-left-radius: 0px;
+  border-top-right-radius: 0px;
+  border-bottom-right-radius: 0px;
+  border-bottom-left-radius: 0px;
 }
 
-.dialogheader{    
-    text-align: center;
-    font-weight: bold;
-    font-size: 18pt;
-    text-decoration: none;
-    color: white;
-    padding-top: 10px;
-    padding-bottom: 50px; 
-    padding-left: 15px
+.dialogheader {
+  text-align: center;
+  font-weight: bold;
+  font-size: 18pt;
+  text-decoration: none;
+  color: white;
+  padding-top: 10px;
+  padding-bottom: 50px;
+  padding-left: 15px;
 }
 
 .dat-row:nth-child(even) {
-    background-color: #e1e3e7;
+  background-color: #e1e3e7;
 }
 
 .dat-row:nth-child(odd) {
-    background-color: #FFFFFF;
+  background-color: #ffffff;
 }
 
-.dialogText{
-    font-size: 14px;
-    color:  #00b140;
-    font-weight:bold;
-    vertical-align: middle;
-    width: 10%;
-    padding-left: inherit;
+.dialogText {
+  font-size: 14px;
+  color: #00b140;
+  font-weight: bold;
+  vertical-align: middle;
+  width: 10%;
+  padding-left: inherit;
 }
 
-.mat-dialog-actions-button{
-    float: right;
-    padding-right: 25px;
+.mat-dialog-actions-button {
+  float: right;
+  padding-right: 25px;
 }
 
-.warningText{
-    color: #FF8F1C;
+.warningText {
+  color: #ff8f1c;
 }
 
-.contentBodyCss{
-    padding-left:50px ;
-    padding-right: 20px;
+.contentBodyCss {
+  padding-left: 50px;
+  padding-right: 20px;
 }
 
-.textPaddingInfo
-{
-  padding-left:50px ;
-  height: 35%
+.textPaddingInfo {
+  padding-left: 50px;
+  height: 35%;
 }
 
-.sectionSubHeading{
-    font-size: 13px;
-    color: #00B140; 
-}
-.mat-cell-value-single{
-    font-size: 15px;
-    height: 40px;
-    text-align: left;
-    font-family: inherit;
-    padding-left: 10px;
-    padding-right: 10px;
-}
-.input{
-    height: 50px !important;
+.sectionSubHeading {
+  font-size: 13px;
+  color: #00b140;
 }
 
+.mat-cell-value-single {
+  font-size: 15px;
+  height: 40px;
+  text-align: left;
+  font-family: inherit;
+  padding-left: 10px;
+  padding-right: 10px;
+}
 
-
+.input {
+  height: 50px !important;
+}

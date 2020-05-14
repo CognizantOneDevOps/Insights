@@ -2,14 +2,14 @@
  * Copyright 2017 Cognizant Technology Solutions
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
- * use this file except in compliance with the License.  You may obtain a copy
+ * use this file except in compliance with the License. You may obtain a copy
  * of the License at
  * 
- *   http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
  * License for the specific language governing permissions and limitations under
  * the License.
  ******************************************************************************/
@@ -55,9 +55,9 @@ public class ApplicationConfigProvider implements Serializable {
 	private boolean enableWebHookEngine = false;
 	private SchedulerConfigData schedulerConfigData = new SchedulerConfigData();
 	private String driverLocation;
-	
+
 	private Vault vault = new Vault();
-	private boolean enableSSO = false;
+	private String autheticationProtocol = "NativeGrafana";
 	private SingleSignOnConfig singleSignOnConfig = new SingleSignOnConfig();
 
 	private ApplicationConfigProvider() {
@@ -94,13 +94,6 @@ public class ApplicationConfigProvider implements Serializable {
 		this.sparkConfigurations = sparkConfigurations;
 	}
 
-	/*
-	 * public LDAPConfiguration getLdapConfiguration() { return ldapConfiguration; }
-	 * 
-	 * public void setLdapConfiguration(LDAPConfiguration ldapConfiguration) {
-	 * this.ldapConfiguration = ldapConfiguration; }
-	 */
-
 	public MessageQueueDataModel getMessageQueue() {
 		return messageQueue;
 	}
@@ -124,13 +117,6 @@ public class ApplicationConfigProvider implements Serializable {
 	public void setGrafana(GrafanaData grafana) {
 		this.grafana = grafana;
 	}
-
-	/*
-	 * public boolean isDisableAuth() { return disableAuth; }
-	 * 
-	 * public void setDisableAuth(boolean disableAuth) { this.disableAuth =
-	 * disableAuth; }
-	 */
 
 	public String getInsightsTimeZone() {
 		return insightsTimeZone;
@@ -203,13 +189,6 @@ public class ApplicationConfigProvider implements Serializable {
 	public void setProxyPort(int proxyPort) {
 		this.proxyPort = proxyPort;
 	}
-
-	/*
-	 * public boolean isEnableNativeUsers() { return enableNativeUsers; }
-	 * 
-	 * public void setEnableNativeUsers(boolean enableNativeUsers) {
-	 * this.enableNativeUsers = enableNativeUsers; }
-	 */
 
 	public List<String> getTrustedHosts() {
 		return trustedHosts;
@@ -298,6 +277,7 @@ public class ApplicationConfigProvider implements Serializable {
 	public void setDriverLocation(String driverLocation) {
 		this.driverLocation = driverLocation;
 	}
+
 	public Vault getVault() {
 		return vault;
 	}
@@ -305,12 +285,13 @@ public class ApplicationConfigProvider implements Serializable {
 	public void setVault(Vault vault) {
 		this.vault = vault;
 	}
-	public boolean isEnableSSO() {
-		return enableSSO;
+
+	public String getAutheticationProtocol() {
+		return autheticationProtocol;
 	}
 
-	public void setEnableSSO(boolean enableSSO) {
-		this.enableSSO = enableSSO;
+	public void setAutheticationProtocol(String autheticationProtocol) {
+		this.autheticationProtocol = autheticationProtocol;
 	}
 
 	public SingleSignOnConfig getSingleSignOnConfig() {

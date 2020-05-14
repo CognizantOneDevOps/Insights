@@ -26,6 +26,7 @@ import { LogService } from '@insights/common/log-service';
 export class InsightsInitService {
 
     location: Location;
+    autheticationProtocolList = ['SAML', 'NativeGrafana', 'Kerberos']
     static serviceHost: String;
     static grafanaHost: String;
     static webhookHost: String;
@@ -34,7 +35,8 @@ export class InsightsInitService {
     static showAuditReporting = false;
     static showWebhookConfiguration = false;
     static showBusinessMapping = true;
-    static ssoEnabled = false;
+    static autheticationProtocol = "NativeGrafana";
+    static singleSignOnConfig;
     static enableInsightsBranding = true;
 
     constructor(location: Location, private http: HttpClient,
@@ -82,7 +84,11 @@ export class InsightsInitService {
         InsightsInitService.showAuditReporting = UIConfigResponse.showAuditReporting;
         InsightsInitService.showWebhookConfiguration = UIConfigResponse.showWebhookConfiguration;
         InsightsInitService.showBusinessMapping = UIConfigResponse.showBusinessMapping;
-        InsightsInitService.ssoEnabled = UIConfigResponse.ssoEnabled;
+        if (this.autheticationProtocolList.indexOf(UIConfigResponse.autheticationProtocol) <= 0) {
+            console.error("Please provide valid authetication Protocol from list " + String(this.autheticationProtocolList));
+        }
+        InsightsInitService.autheticationProtocol = UIConfigResponse.autheticationProtocol;
+        InsightsInitService.singleSignOnConfig = UIConfigResponse.singleSignOnConfig
         InsightsInitService.enableInsightsBranding = UIConfigResponse.enableInsightsBranding
     }
 

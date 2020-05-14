@@ -439,7 +439,7 @@ public class InsightsUtils {
 		try {
 			SimpleDateFormat sdf = new SimpleDateFormat(dateFormat);
 			Date dt = sdf.parse(datetime);
-			return dt.getTime();
+			return TimeUnit.MILLISECONDS.toSeconds(dt.getTime());
 		} catch (ParseException e) {
 			log.error(e.getMessage());
 			throw new InsightsCustomException(e.getMessage());

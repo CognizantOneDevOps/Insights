@@ -159,8 +159,8 @@ public class HealthStatusController {
 		if (StringUtils.isEmpty(category) || StringUtils.isEmpty(tool)) {
 			return PlatformServiceUtil.buildFailureResponse(ErrorMessage.CATEGORY_AND_TOOL_NAME_NOT_SPECIFIED);
 		}
-		log.debug(" message tool name " + category + "  " + tool + "  " + agentId);
-		StringBuffer label = new StringBuffer("HEALTH");
+		log.debug(" message tool name {}  {}  {} ", category, tool, agentId);
+		StringBuilder label = new StringBuilder("HEALTH");
 		if (category.equalsIgnoreCase(ServiceStatusConstants.PlatformEngine)) {
 			label.append(":").append("ENGINE");
 		} else if (category.equalsIgnoreCase(ServiceStatusConstants.PlatformWebhookEngine)) { 

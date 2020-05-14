@@ -30,10 +30,13 @@ import javax.servlet.ServletException;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.util.Assert;
 import org.springframework.web.WebApplicationInitializer;
 
 import com.cognizant.devops.platformcommons.config.ApplicationConfigCache;
-import com.cognizant.devops.platformservice.security.config.CrossScriptingFilter;
+import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
+import com.cognizant.devops.platformservice.security.config.AuthenticationUtils;
+import com.cognizant.devops.platformservice.security.config.InsightsResponseHeaderWriterFilter;
 /**
  * 
  * @author 146414
@@ -42,14 +45,22 @@ import com.cognizant.devops.platformservice.security.config.CrossScriptingFilter
 public class PlatformServiceInitializer implements WebApplicationInitializer {
 	static Logger log = LogManager.getLogger(PlatformServiceInitializer.class.getName());
 
-	
 	@Override
 	public void onStartup(ServletContext servletContext) throws ServletException {
 		ApplicationConfigCache.loadConfigCache();
 		disableSslVerification();
+		validateAutheticationProtocol();
 		InsightsConfiguration.doInsightsConfiguration();
-		servletContext.addFilter("CrossScriptingFilter", CrossScriptingFilter.class).addMappingForUrlPatterns(null,
-				false, "/*");
+		servletContext.addFilter("InsightsResponseHeaderWriter", InsightsResponseHeaderWriterFilter.class)
+				.addMappingForUrlPatterns(null, false, "/*");
+	}
+
+	private void validateAutheticationProtocol() {
+		String autheticationProtocol = ApplicationConfigProvider.getInstance().getAutheticationProtocol();
+		log.debug(" Authetication Protocol for applications {} ", autheticationProtocol);
+		Assert.isTrue(AuthenticationUtils.AUTHENTICATION_PROTOCOL_LIST.contains(autheticationProtocol),
+				"Please provide valid authetication Protocol from list "
+					+ AuthenticationUtils.AUTHENTICATION_PROTOCOL_LIST.toString());
 	}
 
 	private static void disableSslVerification() {

@@ -5,3 +5,7 @@
 */target/*
 *.log
 *.gitignore
+**/target/*
+**/dependency-reduced-pom.xml
+**/package-lock.json
+**/test-output/*

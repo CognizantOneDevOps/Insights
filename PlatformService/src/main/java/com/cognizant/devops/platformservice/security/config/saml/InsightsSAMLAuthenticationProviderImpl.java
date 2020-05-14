@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  ******************************************************************************/
-package com.cognizant.devops.platformservice.security.config;
+package com.cognizant.devops.platformservice.security.config.saml;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -36,11 +36,20 @@ import org.springframework.security.saml.SAMLConstants;
 import org.springframework.security.saml.SAMLCredential;
 import org.springframework.security.saml.context.SAMLMessageContext;
 
+import com.cognizant.devops.platformservice.security.config.SpringAuthority;
+
 public class InsightsSAMLAuthenticationProviderImpl extends SAMLAuthenticationProvider {
 	
 	private static Logger log = LogManager.getLogger(InsightsSAMLAuthenticationProviderImpl.class);
     private boolean excludeCredential = false;
     
+	/**
+	 * Used to autheticate initial SAML login request, It will redirect user to
+	 * service provider login URL and then fetch necessay user detail.
+	 * It also create ExpiringUsernameAuthenticationToken and set it in spring
+	 * security context
+	 * 
+	 */
 	@Override
 	public Authentication authenticate(Authentication authentication) throws AuthenticationException {
 		
@@ -68,15 +77,15 @@ public class InsightsSAMLAuthenticationProviderImpl extends SAMLAuthenticationPr
                 throw new SAMLException("Unsupported profile encountered in the context " + context.getCommunicationProfileId());
             }
         } catch (SAMLRuntimeException e) {
-            log.debug("Error validating SAML message", e);
+			log.debug("Error validating SAML message {}", e);
             samlLogger.log(SAMLConstants.AUTH_N_RESPONSE, SAMLConstants.FAILURE, context, e);
             throw new AuthenticationServiceException("Error validating SAML message", e);
         } catch (SAMLException e) {
-            log.debug("Error validating SAML message", e);
+			log.debug("Error validating SAML message {}", e);
             samlLogger.log(SAMLConstants.AUTH_N_RESPONSE, SAMLConstants.FAILURE, context, e);
             throw new AuthenticationServiceException("Error validating SAML message", e);
         } catch (ValidationException e) {
-            log.debug("Error validating signature", e);
+			log.debug("Error validating signature {}", e);
             samlLogger.log(SAMLConstants.AUTH_N_RESPONSE, SAMLConstants.FAILURE, context, e);
             throw new AuthenticationServiceException("Error validating SAML message signature", e);
         } catch (org.opensaml.xml.security.SecurityException e) {
@@ -101,8 +110,6 @@ public class InsightsSAMLAuthenticationProviderImpl extends SAMLAuthenticationPr
         ExpiringUsernameAuthenticationToken result = new ExpiringUsernameAuthenticationToken(expiration, principal, authenticationCredential, updatedAuthorities);
         result.setDetails(userDetails);
         samlLogger.log(SAMLConstants.AUTH_N_RESPONSE, SAMLConstants.SUCCESS, context, result, null);
-
         return result;
-
     }
 }

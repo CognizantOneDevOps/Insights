@@ -34,11 +34,6 @@ export class RelationshipBuilderService implements IRelationshipBuilderService {
         return this.restCallHandlerService.get("CO_RELATIONSHIP_JSON");
     }
 
-    loadUiServiceLocationNeo4j(): Promise<any> {
-
-        return this.restCallHandlerService.get("CO_RELATIONSHIP_JSON_NEO4J");
-    }
-
     loadToolsAndCategories(): Promise<any> {
 
         return this.restCallHandlerService.get("DATA_DICTIONARY_TOOLS_AND_CATEGORY");
@@ -64,7 +59,7 @@ export class RelationshipBuilderService implements IRelationshipBuilderService {
 
     loadToolsRelationshipAndProperties(startToolCategory: string, startLabelName: string, endToolCatergory: string, endLabelName: string): Promise<any> {
 
-        return this.restCallHandlerService.get("DATA_DICTIONARY_TOOLS_RELATIONSHIPS", {'startLabelName': startLabelName, 'startToolCategory': startToolCategory, 'endLabelName': endLabelName, 'endToolCatergory': endToolCatergory});
+        return this.restCallHandlerService.get("DATA_DICTIONARY_TOOLS_RELATIONSHIPS", { 'startLabelName': startLabelName, 'startToolCategory': startToolCategory, 'endLabelName': endLabelName, 'endToolCatergory': endToolCatergory });
     }
 
 

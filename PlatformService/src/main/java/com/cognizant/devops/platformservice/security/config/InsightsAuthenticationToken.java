@@ -19,13 +19,12 @@ import java.util.Collection;
 
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.saml.SAMLCredential;
 
 public class InsightsAuthenticationToken extends AbstractAuthenticationToken {
 
 	private static final long serialVersionUID = -5778228220445024521L;
 	private final transient Object principal;
-	private final transient SAMLCredential credentials;
+	private final transient Object credentials;
 
 	public InsightsAuthenticationToken(Object principal) {
 		super(null);
@@ -33,7 +32,15 @@ public class InsightsAuthenticationToken extends AbstractAuthenticationToken {
 		this.credentials = null;
 	}
 
-	public InsightsAuthenticationToken(Object principal, Object details, SAMLCredential credentials,
+	/**
+	 * used to set AbstractAuthenticationToken
+	 * 
+	 * @param principal
+	 * @param details
+	 * @param credentials
+	 * @param authorities
+	 */
+	public InsightsAuthenticationToken(Object principal, Object details, Object credentials,
 			Collection<? extends GrantedAuthority> authorities) {
 		super(authorities);
 		this.principal = principal;
@@ -42,13 +49,20 @@ public class InsightsAuthenticationToken extends AbstractAuthenticationToken {
 		super.setAuthenticated(true);
 	}
 
+	/**
+	 * used to get user credential based on Authentication protocol
+	 */
 	@Override
 	public Object getCredentials() {
 		return credentials;
 	}
 
+	/**
+	 * used to get Auth user detail
+	 */
 	@Override
 	public Object getPrincipal() {
 		return principal;
 	}
+
 }

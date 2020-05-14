@@ -73,10 +73,11 @@ public class InsightsAgentConfiguration {
 			boolean vault = registerAgentjson.get("vault").getAsBoolean();
 			message = agentManagementService.registerAgent(toolName, agentVersion, osversion, configDetails,
 					trackingDetails, vault);
+			return PlatformServiceUtil.buildSuccessResponseWithData(message);
 		} catch (InsightsCustomException e) {
-			return PlatformServiceUtil.buildFailureResponse(e.toString());
+			return PlatformServiceUtil.buildFailureResponse(e.getMessage());
 		}
-		return PlatformServiceUtil.buildSuccessResponseWithData(message);
+		
 	}
 
 	@RequestMapping(value = "/uninstallAgent", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)

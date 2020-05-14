@@ -115,7 +115,6 @@ export class RestAPIurlService implements IRestAPIUrlService {
         this.addEndPoint("DOWNLOAD_CYPHER_QUERY", '/PlatformService/blockchain/queryBuilder/getFileContents');
         this.addEndPoint("TEST_QUERY", '/PlatformService/traceability/testQuery');
         this.addEndPoint("CO_RELATIONSHIP_JSON", '/PlatformService/admin/correlationbuilder/getCorrelationJson');
-        this.addEndPoint("CO_RELATIONSHIP_JSON_NEO4J", '/PlatformService/admin/correlationbuilder/getNeo4jJson');
         this.addEndPoint("SAVE_RELATIONSHIP_JSON", '/PlatformService/admin/correlationbuilder/saveConfig');
         this.addEndPoint("UPDATE_RELATIONSHIP", '/PlatformService/admin/correlationbuilder/updateCorrelation');
         this.addEndPoint("DELETE_RELATIONSHIP", '/PlatformService/admin/correlationbuilder/deleteCorrelation');
@@ -132,10 +131,10 @@ export class RestAPIurlService implements IRestAPIUrlService {
         this.addEndPoint("UPDATE_WEBHOOK_STATUS", '/PlatformService/admin/webhook/updateWebhookStatus');
 
         //SSO API
-        this.addEndPoint("SSO_URL", '/PlatformService/saml/login');
+        this.addEndPoint("SSO_URL", InsightsInitService.singleSignOnConfig.loginURL);
         this.addEndPoint("SSO_DETAIL", '/PlatformService/user/insightsso/getUserDetail');
         this.addEndPoint("SSO_INSIGHTS_URL_LOGOUT", '/PlatformService/user/insightsso/logout');
-        this.addEndPoint("SSO_URL_LOGOUT", '/PlatformService/saml/logout');//
+        this.addEndPoint("SSO_URL_LOGOUT", InsightsInitService.singleSignOnConfig.logoutURL);//
     }
 
     public addEndPoint(name: String, url: String) {

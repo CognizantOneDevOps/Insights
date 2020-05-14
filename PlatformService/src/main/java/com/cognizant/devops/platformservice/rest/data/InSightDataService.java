@@ -16,6 +16,7 @@
 package com.cognizant.devops.platformservice.rest.data;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -28,7 +29,6 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.cognizant.devops.platformdal.mapping.projects.ProjectMapping;
@@ -44,15 +44,16 @@ public class InSightDataService {
 
 	@Autowired
 	private HttpServletRequest request;
+
 	@RequestMapping(value = "/db/graph", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 	public JsonObject addProjectMapping(@RequestParam String cypher) {
 		if (cypher == null || !cypher.contains(":PROJECT_TEMPLATE")) {
 			return PlatformServiceUtil.buildFailureResponse("Project template is not specified");
 		}
-		Object responseHeadersAttr = request.getAttribute("responseHeaders");
+		Map<String, String> grafanaResponseCookies = new HashMap();
+
 		List<String> projectLabels = new ArrayList<String>();
-		if (responseHeadersAttr != null) {
-			Map<String, String> grafanaResponseCookies = (Map<String, String>) responseHeadersAttr;
+		if (!grafanaResponseCookies.isEmpty()) {
 			String grafanaOrg = grafanaResponseCookies.get("grafanaOrg");
 			// String grafanaUser = grafanaResponseCookies.get("grafana_user");
 			ProjectMappingDAL projectMappingDAL = new ProjectMappingDAL();

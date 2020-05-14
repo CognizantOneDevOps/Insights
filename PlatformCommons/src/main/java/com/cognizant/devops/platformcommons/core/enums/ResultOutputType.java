@@ -18,7 +18,10 @@ package com.cognizant.devops.platformcommons.core.enums;
 public enum ResultOutputType {
 
 	TIMERESULTOUTPUT("time"),
-	NUMBERRESULTOUTPUT("number");
+	NUMBERRESULTOUTPUT("number"),
+	COMBINED_NODE("CombinedNode"),
+	INDIVIDUAL_NODE("IndividualNode"),
+	COMBINED_WITH_SUB_NODE("CombinedNodeWithSubNode");
 	
     private String value;
 

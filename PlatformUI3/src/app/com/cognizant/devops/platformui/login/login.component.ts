@@ -19,7 +19,7 @@ import { LoginService } from '@insights/app/login/login.service';
 import { InsightsInitService } from '@insights/common/insights-initservice';
 import { RestAPIurlService } from '@insights/common/rest-apiurl.service'
 import { RestCallHandlerService } from '@insights/common/rest-call-handler.service';
-import { CookieService } from 'ngx-cookie';
+import { CookieService } from 'ngx-cookie-service';//ngx-cookie
 import { Router, ActivatedRoute, ParamMap } from '@angular/router';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { DatePipe } from '@angular/common';
@@ -69,14 +69,15 @@ export class LoginComponent implements OnInit, ILoginComponent {
 
   ngOnInit() {
     var self = this
-    console.log("Is sso enabled " + InsightsInitService.ssoEnabled)
-    if (InsightsInitService.ssoEnabled) {
+    console.log("autheticationProtocol " + InsightsInitService.autheticationProtocol)
+    if (InsightsInitService.autheticationProtocol == "SAML") {
       console.log(" SSO is enable calling saml login");
       this.dataShare.storeTimeZone();
-      this.ssoEnable = InsightsInitService.ssoEnabled;
+      this.ssoEnable = true;
       this.loginService.loginSSO();
-    } else {
+    } else if (InsightsInitService.autheticationProtocol == "NativeGrafana" || InsightsInitService.autheticationProtocol == "Kerberos") {
       console.log("Continue on login page ")
+      this.deleteAllPreviousCookies();
       this.getAsyncData();
       this.createAndValidateForm();
       this.dataShare.storeTimeZone();
@@ -113,6 +114,7 @@ export class LoginComponent implements OnInit, ILoginComponent {
   }
 
   public userAuthentication(): void {
+    this.deleteAllPreviousCookies();
     this.username = this.loginForm.value.username;
     this.password = this.loginForm.value.password;
     if (this.username === '' || this.password === '') {
@@ -136,8 +138,10 @@ export class LoginComponent implements OnInit, ILoginComponent {
             this.dataShare.setAuthorizationToken(token);
             this.dataShare.setSession();
             this.cookies = "";
+            console.log(grafcookies);
             for (var key in grafcookies) {
-              this.cookieService.put(key, grafcookies[key], { storeUnencoded: true, path: '/', expires: date });
+              //this.cookieService.put(key, grafcookies[key], { storeUnencoded: true, path: '/' });//, expires: date
+              this.cookieService.set(key, grafcookies[key], 0, '/');
             }
 
             var uniqueString = "grfanaLoginIframe";
@@ -202,9 +206,18 @@ export class LoginComponent implements OnInit, ILoginComponent {
   }
 
   deleteAllPreviousCookies(): void {
+    console.log("in delete all cookies ");
     let allCookies = this.cookieService.getAll();
+    let grafana_session_cookie = this.cookieService.get('grafana_session');
+    console.log("grafana_session_cookie " + grafana_session_cookie);
+    if (grafana_session_cookie != undefined || grafana_session_cookie != '') {
+      this.cookieService.set('grafana_session', undefined);
+    }
+    this.dataShare.deleteAllPreviousCookies();
+    this.cookieService.deleteAll('/');
     for (let key of Object.keys(allCookies)) {
-      this.cookieService.remove(key);
+      console.log("in delete cookies " + key);
+      this.cookieService.delete(key, '/');
     }
   }
 }

@@ -31,6 +31,9 @@ public enum SpringAuthority implements GrantedAuthority {
         this.name = name;
     }
  
+	/**
+	 * used to get valid Authority
+	 */
     @Override
 	public String getAuthority() {
 		return this.name;

@@ -127,7 +127,7 @@ export class LogoutHandlerComponent implements OnInit {
       dialogRef.afterClosed().subscribe(result => {
         //console.log('The dialog was closed  ' + result);
         if (result == 'yes') {
-          if (InsightsInitService.ssoEnabled) {
+          if (InsightsInitService.autheticationProtocol == "SAML") {
             console.error(" logging out from sso " + self.logoutUrl);
             if (this.logoutUrl != undefined) {
               this.loginService.singleLogoutSSO(self.logoutUrl);

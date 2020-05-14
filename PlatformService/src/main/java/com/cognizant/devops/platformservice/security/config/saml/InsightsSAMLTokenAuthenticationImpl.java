@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  ******************************************************************************/
-package com.cognizant.devops.platformservice.security.config;
+package com.cognizant.devops.platformservice.security.config.saml;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -25,10 +25,12 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.providers.ExpiringUsernameAuthenticationToken;
 
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
+import com.cognizant.devops.platformservice.security.config.InsightsAuthenticationException;
+import com.cognizant.devops.platformservice.security.config.InsightsAuthenticationToken;
 
-public class InsightsAuthenticationProviderImpl implements AuthenticationProvider {
+public class InsightsSAMLTokenAuthenticationImpl implements AuthenticationProvider {
 	
-	private static Logger LOG = LogManager.getLogger(InsightsAuthenticationProviderImpl.class);
+	private static Logger LOG = LogManager.getLogger(InsightsSAMLTokenAuthenticationImpl.class);
 	
     
     @Override
@@ -37,54 +39,53 @@ public class InsightsAuthenticationProviderImpl implements AuthenticationProvide
         		|| ExpiringUsernameAuthenticationToken.class.isAssignableFrom(authentication);
     }
     
+	/**
+	 * This method is used to validate all subsequent request token
+	 *
+	 */
 	@Override
 	public Authentication authenticate(Authentication authentication) throws InsightsAuthenticationException {
 		LOG.debug("Inside InsightsAuthenticationProviderImpl === ");
-		//if(!(authentication.getCredentials() instanceof SAMLCredential)) {
-			
-	        
 			if (!supports(authentication.getClass())) {
 	            throw new IllegalArgumentException("Only SAMLAuthenticationToken is supported, " + authentication.getClass() + " was attempted");
 	        }
 			
-			/*
-			 * Assert.isInstanceOf(InsightsAuthenticationToken.class, authentication,
-			 * "This method only accepts JwtAuthenticationToken");
-			 */
-			
 	        if (authentication.getPrincipal() == null) {
-	        	LOG.debug("Authentication token is missing - authentication.getPrincipal() "+authentication.getPrincipal());
+			LOG.debug("Authentication token is missing - authentication.getPrincipal() {} ",
+					authentication.getPrincipal());
 	            throw new AuthenticationCredentialsNotFoundException("Authentication token is missing");
 	        }
-	    
-			try {
-				TokenProviderUtility tokenProviderUtility = new TokenProviderUtility();
-				boolean isTokenVarified=tokenProviderUtility.verifyToken(authentication.getPrincipal().toString());
-				LOG.debug(" isTokenVarified ==== "+isTokenVarified);
-			}catch (InsightsCustomException e) {
-				LOG.error(e);
-				LOG.error(" Exception while varifing token "+e.getMessage(),e);
-				throw new InsightsAuthenticationException(e.getMessage());
-			}catch (AuthorizationServiceException e) {
-				LOG.error(e);
-				LOG.error(" Exception while validating token "+e.getMessage());
-				throw new InsightsAuthenticationException(e.getMessage(),e);
-			}catch (AuthenticationCredentialsNotFoundException e) {
-				LOG.error(e);
-				LOG.error(" Token not found in cache "+e.getMessage());
-				throw new InsightsAuthenticationException(e.getMessage(),e);
-			}catch (AccountExpiredException e) {
-				LOG.error(e);
-				LOG.error(" Token Expire "+e.getMessage());
-				throw new InsightsAuthenticationException(e.getMessage(),e);
-			}catch (Exception e) {
-				LOG.error(e);
-				LOG.error(" Error while validating token "+e.getMessage());
-				throw new InsightsAuthenticationException(e.getMessage(),e);
-			}
-		//}
+		/*validate request token*/
+		validateIncomingToken(authentication.getPrincipal());
         return authentication;
-
     }
-	
+
+	public void validateIncomingToken(Object principal) {
+		try {
+			TokenProviderUtility tokenProviderUtility = new TokenProviderUtility();
+			boolean isTokenVarified = tokenProviderUtility.verifyToken(principal.toString());
+			LOG.debug(" isTokenVarified ==== {} ", isTokenVarified);
+		} catch (InsightsCustomException e) {
+			LOG.error(e);
+			LOG.error(" Exception while varifing token " + e.getMessage(), e);
+			throw new InsightsAuthenticationException(e.getMessage());
+		} catch (AuthorizationServiceException e) {
+			LOG.error(e);
+			LOG.error(" Exception while validating token {}", e.getMessage());
+			throw new InsightsAuthenticationException(e.getMessage(), e);
+		} catch (AuthenticationCredentialsNotFoundException e) {
+			LOG.error(e);
+			LOG.error(" Token not found in cache {} ", e.getMessage());
+			throw new InsightsAuthenticationException(e.getMessage(), e);
+		} catch (AccountExpiredException e) {
+			LOG.error(e);
+			LOG.error(" Token Expire {}", e.getMessage());
+			throw new InsightsAuthenticationException(e.getMessage(), e);
+		} catch (Exception e) {
+			LOG.error(e);
+			LOG.error(" Error while validating token {} ", e.getMessage());
+			throw new InsightsAuthenticationException(e.getMessage(), e);
+		}
+	}
+
 }

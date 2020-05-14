@@ -87,13 +87,13 @@ export class HomeComponent implements OnInit {
     private cookieService: CookieService, private config: InsightsInitService,
     public router: Router, private dataShare: DataSharedService,
     private dialog: MatDialog, private imageHandeler: ImageHandlerService,
-    public messageDialog: MessageDialogService ) {
+    public messageDialog: MessageDialogService) {
     console.log("Home page constructer ");
     this.displayLandingPage = true;
     if (this.depth === undefined) {
       this.depth = 0;
     }
-    
+
     this.isValidUser = true;
     this.framesize = window.frames.innerHeight;
     this.leftNavWidthInPer = 20;
@@ -161,12 +161,7 @@ export class HomeComponent implements OnInit {
     this.currentUserWithOrgs = await this.grafanaService.getCurrentUserWithOrgs();
     //console.log(this.currentUserWithOrgs);
     if (this.currentUserWithOrgs != undefined && this.currentUserWithOrgs.data != undefined) {
-      if (InsightsInitService.ssoEnabled) {
-        this.userName = self.dataShare.getSSOUserName();
-      } else {
-        this.userName = self.currentUserWithOrgs.data.userDetail.name != undefined ? self.currentUserWithOrgs.data.userDetail.name.replace(/['"]+/g, '') : "";
-      }
-      this.dataShare.setUserName(this.userName);
+      this.userName = this.dataShare.setUserName(self.currentUserWithOrgs.data.userDetail.name);
       this.userCurrentOrg = this.currentUserWithOrgs.data.userDetail.orgId;
       this.currentUserOrgsArray = this.currentUserWithOrgs.data.orgArray;
       //console.log(this.currentUserOrgsArray);
@@ -441,11 +436,7 @@ export class HomeComponent implements OnInit {
   }
 
   public logout(): void {
-    if(InsightsInitService.ssoEnabled){
-      this.router.navigate(['/logout/2']);
-    }else{
-      this.router.navigate(['/logout/1']);
-    }
+    this.dataShare.logoutInitilize();
   }
 
   public about(): void {

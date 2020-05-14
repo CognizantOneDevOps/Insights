@@ -112,7 +112,6 @@ export class RelationshipBuilderComponent implements OnInit {
   constructor(private router: Router, private relationshipBuilderService: RelationshipBuilderService, private dialog: MatDialog, public messageDialog: MessageDialogService, private dataShare: DataSharedService) {
     this.dataDictionaryInfo();
     this.getCorrelation();
-    console.log(this.selectRelation)
     this.displayedToolColumns = ['checkbox', 'toolproperties']
   }
 
@@ -351,16 +350,17 @@ export class RelationshipBuilderComponent implements OnInit {
     }
   }
   selectLabelforsource(selectedSourceTool) {
-    var islabelsameastool = false;
     this.labelSourceListDatasourceSelected = []
     this.agentDataSource.filter(av => {
       if (av.toolName == selectedSourceTool) {
         if (av.labelName != null) {
           this.labelSourceListDatasourceSelected.push(av)
+
         }
       }
     }
     )
+
   }
 
 

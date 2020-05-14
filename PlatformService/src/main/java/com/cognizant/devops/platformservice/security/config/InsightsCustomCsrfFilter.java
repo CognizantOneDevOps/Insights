@@ -2,14 +2,14 @@
  * Copyright 2017 Cognizant Technology Solutions
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
- * use this file except in compliance with the License.  You may obtain a copy
+ * use this file except in compliance with the License. You may obtain a copy
  * of the License at
  * 
- *   http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
  * License for the specific language governing permissions and limitations under
  * the License.
  ******************************************************************************/
@@ -29,30 +29,32 @@ import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.util.WebUtils;
 
-public class CustomCsrfFilter extends OncePerRequestFilter {
+public class InsightsCustomCsrfFilter extends OncePerRequestFilter {
 
-	private static Logger LOG = LogManager.getLogger(CustomCsrfFilter.class);
+	private static Logger LOG = LogManager.getLogger(InsightsCustomCsrfFilter.class);
 
+	/**
+	 * Filter used to extract CSRF token and add it in response header
+	 *
+	 */
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
 			throws ServletException, IOException {
-		LOG.debug(" Inside Filter == CustomCsrfFilter token ");
+		LOG.debug(" Inside Filter == CustomCsrfFilter token ........ {} method {} ", request.getRequestURL(),
+				request.getMethod());
 		CsrfToken csrf = (CsrfToken) request.getAttribute(CsrfToken.class.getName());
-		// LOG.debug(" arg0 CsrfToken " + CsrfToken.class.getName() + " " + csrf);
 		if (csrf != null) {
 			Cookie cookie = WebUtils.getCookie(request, AuthenticationUtils.CSRF_COOKIE_NAME);
 			String token = csrf.getToken();
-
-			// LOG.debug(" arg0 CsrfToken value " + token);
+			//LOG.debug("CsrfToken value in CustomCsrfFilter arg0 {} ", token);
 			if (cookie == null || token != null && !token.equals(cookie.getValue())) {
 				cookie = new Cookie(AuthenticationUtils.CSRF_COOKIE_NAME, token);
 				cookie.setPath("/");
 				response.addCookie(cookie);
 			}
 		} else {
-			LOG.debug(" csrf token is empty ");
+			LOG.error(" csrf token is empty for url {}  ", request.getRequestURL());
 		}
 		filterChain.doFilter(request, response);
 	}
-
 }

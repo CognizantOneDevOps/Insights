@@ -55,8 +55,15 @@ export class DataSharedService {
     this.storage.remove("customerLogo");
   }
 
-  public setUserName(userName: String) {
+  public setUserName(userNameStr: String): string  {
+    let userName = "";
+    if (InsightsInitService.autheticationProtocol == "SAML") {
+      userName = this.getSSOUserName();
+    } else if (InsightsInitService.autheticationProtocol == "NativeGrafana") {
+      userName = userNameStr != undefined ? userNameStr.replace(/['"]+/g, '') : "";
+    }
     this.storage.set("userName", userName);
+    return userName;
   }
 
   public getUserName() {
@@ -69,6 +76,15 @@ export class DataSharedService {
 
   public getSSOUserName() {
     return this.storage.get("SsoUserName");
+  }
+
+  public logoutInitilize() {
+    if (InsightsInitService.autheticationProtocol == "SAML") {
+      this.router.navigate(['/logout/2']);
+    } else if (InsightsInitService.autheticationProtocol == "NativeGrafana") {
+      this.router.navigate(['/logout/1']);
+    }
+
   }
 
   public setSSOLogoutURL(logoutURL: String) {
@@ -88,9 +104,9 @@ export class DataSharedService {
   }
 
   public setAuthorizationToken(strAuthorization: string) {
-    if (InsightsInitService.ssoEnabled) {
+    if (InsightsInitService.autheticationProtocol == "SAML") {
       this.storage.set("Authorization", strAuthorization);
-    } else {
+    } else if (InsightsInitService.autheticationProtocol == "NativeGrafana") {
       var auth_uuid = uuid();
       auth_uuid = auth_uuid.substring(0, 15);
       var auth = this.encryptData(auth_uuid, strAuthorization) + auth_uuid;
@@ -159,11 +175,11 @@ export class DataSharedService {
     var varDateSessionExpiration = this.storage.get('dateSessionExpiration')
     if (authToken === undefined) {
       this.storage.remove('Authorization');
-      if(!InsightsInitService.ssoEnabled){
+      if (InsightsInitService.autheticationProtocol == "NativeGrafana") {
         this.router.navigate(['/login']);
       }
     } else {
-      if (!InsightsInitService.ssoEnabled) {
+      if (InsightsInitService.autheticationProtocol == "NativeGrafana") {
         var varDateSessionExpirationTime = new Date(this.storage.get('dateSessionExpiration'));
         var date = new Date();
         // console.log(dashboardSessionExpirationTime + "  ===== " + date);
@@ -222,7 +238,7 @@ export class DataSharedService {
     var encryptedValue = CryptoJS.AES.encrypt(value, keys);
     return encryptedValue.toString();
   }
-  
+
   public getCurrentYear() {
     var Year = new Date().getFullYear();
     return Year;

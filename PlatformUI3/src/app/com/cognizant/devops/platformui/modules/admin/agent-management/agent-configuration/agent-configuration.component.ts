@@ -255,7 +255,7 @@ export class AgentConfigurationComponent implements OnInit {
 
   getAgentConfigItems(filtername: any) {
     if (filtername == 'object') {
-      return this.agentConfigItems.filter(item => (item.type == filtername && item.key != 'dynamicTemplate'  && item.key != 'vault' && item.key != 'agentSecretDetails'));
+      return this.agentConfigItems.filter(item => (item.type == filtername && item.key != 'dynamicTemplate' && item.key != 'vault' && item.key != 'agentSecretDetails'));
     } else if (filtername == 'dynamicTemplate') {
       return this.agentConfigItems.filter(item => item.key == 'dynamicTemplate');
     } else {
@@ -297,9 +297,9 @@ export class AgentConfigurationComponent implements OnInit {
     this.updatedConfigParamdata = {};
 
     for (let configParamData of this.agentConfigItems) {
-      if(configParamData.key == "agentSecretDetails"){
-        this.updatedConfigParamdata["agentSecretDetails"]  = configParamData.value;
-      }else if (configParamData.key != "dynamicTemplate" && configParamData.type == "object") {
+      if (configParamData.key == "agentSecretDetails") {
+        this.updatedConfigParamdata["agentSecretDetails"] = configParamData.value;
+      } else if (configParamData.key != "dynamicTemplate" && configParamData.type == "object") {
         this.item = {};
         for (let configinnerData of configParamData.children) {
           this.item[configinnerData.key] = this.checkDatatype(configinnerData.value);
@@ -378,7 +378,7 @@ export class AgentConfigurationComponent implements OnInit {
           self.agentConfigstatusCode = "SUCCESS";
         } else {
           self.sendStatusMsg("register");
-          self.agentConfigstatus = "Agent Register Failed";
+          self.agentConfigstatus = "Agent Registration Failed. Please check the logs for more details.";
           self.agentConfigstatusCode = "ERROR";
         }
       }
