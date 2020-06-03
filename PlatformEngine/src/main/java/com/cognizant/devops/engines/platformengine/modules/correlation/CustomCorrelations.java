@@ -22,9 +22,9 @@ import java.util.regex.Pattern;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBException;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphResponse;
 import com.cognizant.devops.platformcommons.dal.neo4j.Neo4jDBHandler;
+import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -92,7 +92,7 @@ public class CustomCorrelations {
 					log.debug(jiraEnrichmentResponse);
 				}
 			}
-		} catch (GraphDBException e) {
+		} catch (InsightsCustomException e) {
 			log.error(e);
 		}
 	}
@@ -160,7 +160,7 @@ public class CustomCorrelations {
 				resultCount = resultCount - dataBatchSize;
 				log.debug("Processed "+processedRecords+" GIT records, time taken: "+(System.currentTimeMillis() - st) + " ms");
 			}
-		} catch (GraphDBException e) {
+		} catch (InsightsCustomException e) {
 			log.error("Unable to extract JIRA keys from Git Commit messages", e);
 		}
 	}
@@ -199,7 +199,7 @@ public class CustomCorrelations {
 				resultCount = resultCount - dataBatchSize;
 				log.debug("Processed "+processedRecords+" GIT records, time taken: "+(System.currentTimeMillis() - st) + " ms");
 			}
-		} catch (GraphDBException e) {
+		} catch (InsightsCustomException e) {
 			log.error(e);
 		}
 	}
@@ -227,7 +227,7 @@ public class CustomCorrelations {
 					break;
 				}
 			}
-		} catch (GraphDBException e) {
+		} catch (InsightsCustomException e) {
 			log.error("Unable to remove RAW label from Jenkins nodes.", e);
 		}
 	}
@@ -280,7 +280,7 @@ public class CustomCorrelations {
 					break;
 				}
 			}
-		} catch (GraphDBException e) {
+		} catch (InsightsCustomException e) {
 			log.error("Unable to execute correlations between Jenkins and JIRA", e);
 		}
 	}

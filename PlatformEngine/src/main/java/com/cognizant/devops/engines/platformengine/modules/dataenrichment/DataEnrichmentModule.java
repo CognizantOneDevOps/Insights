@@ -27,9 +27,9 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.cognizant.devops.platformcommons.constants.ConfigOptions;
-import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBException;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphResponse;
 import com.cognizant.devops.platformcommons.dal.neo4j.Neo4jDBHandler;
+import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 /**
@@ -65,7 +65,7 @@ public class DataEnrichmentModule extends TimerTask {
 					log.debug(entry.getKey()+" Processed "+processedRecords);
 				}
 
-			} catch (GraphDBException e) {
+			} catch (InsightsCustomException e) {
 				log.error(entry.getKey() + " Processing Failed", e);
 			} catch (Exception e) {
 				log.error(entry.getKey() + " Processing Failed", e);

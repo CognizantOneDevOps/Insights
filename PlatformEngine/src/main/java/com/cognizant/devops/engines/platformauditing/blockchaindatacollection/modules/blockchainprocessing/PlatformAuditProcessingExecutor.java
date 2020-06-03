@@ -15,19 +15,19 @@
  ******************************************************************************/
 package com.cognizant.devops.engines.platformauditing.blockchaindatacollection.modules.blockchainprocessing;
 
-import com.cognizant.devops.platformauditing.api.InsightsAuditImpl;
-import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBException;
-import com.cognizant.devops.platformcommons.dal.neo4j.GraphResponse;
-import com.cognizant.devops.platformcommons.dal.neo4j.Neo4jDBHandler;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
+import java.io.IOException;
+import java.util.TimerTask;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-
-import java.io.IOException;
-import java.util.TimerTask;
+import com.cognizant.devops.platformauditing.api.InsightsAuditImpl;
+import com.cognizant.devops.platformcommons.dal.neo4j.GraphResponse;
+import com.cognizant.devops.platformcommons.dal.neo4j.Neo4jDBHandler;
+import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 
 
 public class PlatformAuditProcessingExecutor extends TimerTask {
@@ -89,7 +89,7 @@ public class PlatformAuditProcessingExecutor extends TimerTask {
                 }
 
             }
-        } catch (GraphDBException | IOException e) {
+        } catch (InsightsCustomException | IOException e) {
             LOG.error("Error occured while loading the destination data ", e);
         } catch (Exception e) {
 			LOG.error(e);

@@ -48,7 +48,7 @@ import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.constants.ConfigOptions;
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
 import com.cognizant.devops.platformcommons.core.util.ValidationUtils;
-import com.cognizant.devops.platformcommons.dal.rest.RestHandler;
+import com.cognizant.devops.platformcommons.dal.grafana.GrafanaHandler;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformservice.core.ServiceResponse;
 import com.cognizant.devops.platformservice.rest.util.PlatformServiceUtil;
@@ -58,7 +58,6 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import com.sun.jersey.api.client.ClientResponse;
 
 @RestController
 @RequestMapping("/user")
@@ -247,11 +246,10 @@ public class UserDetailsService {
 		return PlatformServiceUtil.buildSuccessResponse();
 	}
 
-	private String getCurrentOrgRole(Map<String, String> headers, String grafanaCurrentOrg) {
-		String userOrgsApiUrl = PlatformServiceUtil.getGrafanaURL("/api/user/orgs");
-		ClientResponse grafanaCurrentOrgResponse = RestHandler.doGet(userOrgsApiUrl, null, headers);
-		JsonArray grafanaOrgs = new JsonParser().parse(grafanaCurrentOrgResponse.getEntity(String.class))
-				.getAsJsonArray();
+	private String getCurrentOrgRole(Map<String, String> headers, String grafanaCurrentOrg) throws InsightsCustomException {
+		GrafanaHandler grafanaHandler = new GrafanaHandler();
+		String grafanaCurrentOrgResponse = grafanaHandler.grafanaGet("/api/user/orgs", headers);
+		JsonArray grafanaOrgs = new JsonParser().parse(grafanaCurrentOrgResponse).getAsJsonArray();
 		String grafanaCurrentOrgRole = null;
 		for (JsonElement org : grafanaOrgs) {
 			if (grafanaCurrentOrg.equals(org.getAsJsonObject().get("orgId").toString())) {
@@ -263,9 +261,9 @@ public class UserDetailsService {
 	}
 
 	private String getGrafanaCurrentOrg(Map<String, String> headers) throws InsightsCustomException {
-		String loginApiUrl = PlatformServiceUtil.getGrafanaURL("/api/user");
-		ClientResponse grafanaCurrentOrgResponse = RestHandler.doGet(loginApiUrl, null, headers);
-		JsonObject responseJson = new JsonParser().parse(grafanaCurrentOrgResponse.getEntity(String.class))
+		GrafanaHandler grafanaHandler = new GrafanaHandler();
+		String grafanaCurrentOrgResponse = grafanaHandler.grafanaGet("/api/user", headers);
+		JsonObject responseJson = new JsonParser().parse(grafanaCurrentOrgResponse)
 				.getAsJsonObject();
 		log.debug(" Current user detail ==== {} ", responseJson);
 		String loginId = responseJson.get("login").toString();

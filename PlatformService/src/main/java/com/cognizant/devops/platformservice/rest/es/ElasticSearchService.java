@@ -28,8 +28,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.dal.elasticsearch.ElasticSearchDBHandler;
+import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonParser;
+import com.google.gson.JsonSyntaxException;
 
 @RestController
 @RequestMapping("/search")
@@ -41,7 +43,7 @@ public class ElasticSearchService {
 
 	@RequestMapping(value = "/data", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 	public String searchData(@RequestParam String query, @RequestParam(required = false, defaultValue = "0") int from,
-			@RequestParam(required = false, defaultValue = "100") int size) {
+			@RequestParam(required = false, defaultValue = "100") int size) throws JsonSyntaxException, InsightsCustomException {
 		ElasticSearchDBHandler dbHandler = new ElasticSearchDBHandler();
 		String url = ApplicationConfigProvider.getInstance().getEndpointData().getElasticSearchEndpoint()
 				+ "/neo4j-index/_search?from=" + from + "&size=" + size + "&q=*" + query + "*";

@@ -31,9 +31,9 @@ import org.springframework.http.MediaType;
 
 import com.cognizant.devops.auditservice.audit.utils.EmailUtil;
 import com.cognizant.devops.auditservice.audit.utils.PdfTableUtil;
-import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBException;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphResponse;
 import com.cognizant.devops.platformcommons.dal.neo4j.Neo4jDBHandler;
+import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -167,7 +167,7 @@ public class AuditCypherReport extends AuditReportStrategy{
 			}else{
 				log.info("Aborting query from execute as it contains invalid keywords !!" + cypherQuery );
 			}
-		} catch (GraphDBException e) {
+		} catch (InsightsCustomException e) {
 			e.printStackTrace();
 			log.error( " - query processing failed", e);
 			return Boolean.FALSE;

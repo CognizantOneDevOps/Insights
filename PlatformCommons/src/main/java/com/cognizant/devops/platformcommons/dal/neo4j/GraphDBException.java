@@ -15,7 +15,7 @@
  ******************************************************************************/
 package com.cognizant.devops.platformcommons.dal.neo4j;
 
-import com.sun.jersey.api.client.ClientResponse;
+import org.glassfish.jersey.client.ClientResponse;
 
 public class GraphDBException extends Exception {
 	/**
@@ -28,6 +28,10 @@ public class GraphDBException extends Exception {
 		this.obj = obj;
 	}
 	
+	public GraphDBException(String message) {
+		super(message);
+	}
+
 	public ClientResponse getExceptionDetails(){
 		return obj;
 	}

@@ -31,7 +31,6 @@ import org.testng.annotations.Test;
 
 import com.cognizant.devops.engines.platformwebhookengine.modules.aggregator.WebHookEngineAggregatorModule;
 import com.cognizant.devops.platformcommons.config.ApplicationConfigCache;
-import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBException;
 import com.cognizant.devops.platformcommons.dal.neo4j.Neo4jDBHandler;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformdal.webhookConfig.WebHookConfig;
@@ -204,8 +203,8 @@ public class WebhookEngineTest {
 		try {
 			dbHandler.executeCypherQuery(query);
 			dbHandler.executeCypherQuery(queryDeleteHeathData);
-		} catch (GraphDBException e) {
-			log.error("GraphDBException : " + e.toString());
+		} catch (InsightsCustomException e) {
+			log.error("InsightsCustomException : " + e.toString());
 		}
 	}
 

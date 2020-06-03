@@ -28,10 +28,10 @@ import org.apache.logging.log4j.Logger;
 
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
-import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBException;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphResponse;
 import com.cognizant.devops.platformcommons.dal.neo4j.Neo4jDBHandler;
 import com.cognizant.devops.platformcommons.dal.neo4j.NodeData;
+import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformdal.agentConfig.AgentConfig;
 import com.cognizant.devops.platformdal.agentConfig.AgentConfigDAL;
 import com.cognizant.devops.engines.platformengine.message.core.EngineStatusLogger;
@@ -198,7 +198,7 @@ public class EngineAggregatorModule extends TimerTask {
 				log.debug("arg0 toolDataList  " + toolDataList);
 				businessMappinMap.put(toolName, toolDataList);
 			}
-		} catch (GraphDBException e) {
+		} catch (InsightsCustomException e) {
 			log.error(e);
 		}
 		return businessMappinMap;

@@ -25,6 +25,8 @@ import java.util.Map.Entry;
 import java.util.StringTokenizer;
 import java.util.TreeMap;
 
+import javax.ws.rs.ProcessingException;
+
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -35,11 +37,10 @@ import com.cognizant.devops.engines.platformengine.modules.aggregator.BusinessMa
 import com.cognizant.devops.engines.util.DataEnrichUtils;
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.constants.MessageConstants;
-import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBException;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphResponse;
 import com.cognizant.devops.platformcommons.dal.neo4j.Neo4jDBHandler;
-import com.cognizant.devops.platformcommons.dal.neo4j.Neo4jFieldIndexRegistry;
 import com.cognizant.devops.platformcommons.dal.neo4j.NodeData;
+import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -50,6 +51,7 @@ import com.rabbitmq.client.Envelope;
 
 public class AgentDataSubscriber extends EngineSubscriberResponseHandler {
 	private static Logger log = LogManager.getLogger(AgentDataSubscriber.class.getName());
+	Neo4jDBHandler dbHandler = new Neo4jDBHandler();
 
 	public AgentDataSubscriber(String routingKey) throws Exception {
 		super(routingKey);
@@ -92,7 +94,6 @@ public class AgentDataSubscriber extends EngineSubscriberResponseHandler {
 			throws IOException {
 		ApplicationConfigProvider.performSystemCheck();
 		boolean enableOnlineDatatagging = ApplicationConfigProvider.getInstance().isEnableOnlineDatatagging();
-		Neo4jDBHandler dbHandler = new Neo4jDBHandler();
 		String message = new String(body, MessageConstants.MESSAGE_ENCODING);
 		String routingKey = envelope.getRoutingKey();
 		log.debug("Routing key in data " + routingKey);
@@ -134,7 +135,6 @@ public class AgentDataSubscriber extends EngineSubscriberResponseHandler {
 					StringBuffer keys = new StringBuffer();
 					for (JsonElement key : uniqueKeyArray) {
 						keys.append(key.getAsString()).append(",");
-						Neo4jFieldIndexRegistry.getInstance().syncFieldIndex(toolName, key.getAsString());
 					}
 					keys.delete(keys.length() - 1, keys.length());
 					uniqueKey = keys.toString();
@@ -153,13 +153,13 @@ public class AgentDataSubscriber extends EngineSubscriberResponseHandler {
 					dataWithproperty = e.getAsJsonObject();
 					// Below Code has the ability to add derived properties as part of Nodes
 					if (this.isEnrichmentRequired && e.getAsJsonObject().has(sourceProperty)) {
-							JsonElement sourceElem = e.getAsJsonObject().get(sourceProperty);
-							if(sourceElem.isJsonPrimitive()) {
-								String enrichedData = DataEnrichUtils.dataExtractor(sourceElem.getAsString(), keyPattern);
-								if (enrichedData != null) {
-									dataWithproperty.addProperty(targetProperty, enrichedData);
-								}
+						JsonElement sourceElem = e.getAsJsonObject().get(sourceProperty);
+						if (sourceElem.isJsonPrimitive()) {
+							String enrichedData = DataEnrichUtils.dataExtractor(sourceElem.getAsString(), keyPattern);
+							if (enrichedData != null) {
+								dataWithproperty.addProperty(targetProperty, enrichedData);
 							}
+						}
 					}
 					if (enableOnlineDatatagging) {
 						JsonObject jsonWithLabel = applyDataTagging(dataWithproperty);
@@ -199,8 +199,13 @@ public class AgentDataSubscriber extends EngineSubscriberResponseHandler {
 					}
 				}
 				getChannel().basicAck(envelope.getDeliveryTag(), false);
-			} catch (GraphDBException e) {
-				log.error("GraphDBException occured.", e);
+			} catch (ProcessingException e) {
+				log.error("ProcessingException occured {} ", e);
+				getChannel().basicNack(envelope.getDeliveryTag(), false, true);
+			} catch (InsightsCustomException e) {
+				log.error("InsightsCustomException occured {} ", e);
+			} catch (Exception e) {
+				log.error("Exception occured {} ", e);
 			}
 		}
 	}
@@ -219,7 +224,6 @@ public class AgentDataSubscriber extends EngineSubscriberResponseHandler {
 	}
 
 	private JsonObject applyDataTagging(JsonObject asJsonObject) {
-
 		List<String> selectedBusinessMappingArray = new ArrayList<String>(0);
 		Map<String, String> labelMappingMap = new TreeMap<String, String>();
 		for (BusinessMappingData businessMappingData : businessMappingList) {
@@ -275,7 +279,7 @@ public class AgentDataSubscriber extends EngineSubscriberResponseHandler {
 		try {
 			GraphResponse response = dbHandler.executeCypherQuery("MATCH (n:METADATA:DATATAGGING) return n");
 			nodes = response.getNodes();
-		} catch (GraphDBException e) {
+		} catch (InsightsCustomException e) {
 			log.error(e);
 		}
 		if (nodes.size() > 0) {
@@ -353,13 +357,11 @@ public class AgentDataSubscriber extends EngineSubscriberResponseHandler {
 			for (String field : fields) {
 				searchCriteria.addProperty(field, field);
 				query.append(field).append(" : properties.").append(field).append(",");
-				Neo4jFieldIndexRegistry.getInstance().syncFieldIndex(toolName, field);
 			}
 			query.delete(query.length() - 1, query.length());
 			query.append(" ");
 		} else {
 			query.append(fieldName).append(" : ").append("properties.").append(fieldName);
-			Neo4jFieldIndexRegistry.getInstance().syncFieldIndex(toolName, fieldName);
 		}
 		query.append(" }) set node+=properties ").append(" ");
 		query.append("return count(node)").append(" ");
@@ -426,7 +428,6 @@ public class AgentDataSubscriber extends EngineSubscriberResponseHandler {
 			for (JsonElement constraint : properties) {
 				String fieldName = constraint.getAsString();
 				cypherQuery.append(fieldName).append(" : properties.").append(fieldName).append(",");
-				Neo4jFieldIndexRegistry.getInstance().syncFieldIndex(toolName, fieldName);
 			}
 			cypherQuery.delete(cypherQuery.length() - 1, cypherQuery.length());
 			cypherQuery.append(" }");

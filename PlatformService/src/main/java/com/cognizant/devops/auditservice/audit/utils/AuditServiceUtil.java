@@ -23,29 +23,15 @@ import java.util.Date;
 import java.util.Map;
 import java.util.TimeZone;
 
-import javax.ws.rs.core.MediaType;
-
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonPrimitive;
-import com.sun.jersey.api.client.Client;
-import com.sun.jersey.api.client.ClientResponse;
-import com.sun.jersey.api.client.WebResource;
 
 
 public class AuditServiceUtil {
 
-    public static ClientResponse publishConfigChanges(String host, int port, JsonObject requestJson) {
-        WebResource resource = Client.create()
-                .resource("http://" + host + ":" + port + "/PlatformEngine/refreshAggregators");
-        ClientResponse response = resource.accept(MediaType.APPLICATION_JSON)
-                .type(MediaType.APPLICATION_JSON)
-                .entity(requestJson.toString())
-                .post(ClientResponse.class);
-        return response;
-    }
 
     //GetAssetDetails and QueryByDate: Convert the output from ledger into format suitable for UI
     public static JsonObject parseOutput(String message) {

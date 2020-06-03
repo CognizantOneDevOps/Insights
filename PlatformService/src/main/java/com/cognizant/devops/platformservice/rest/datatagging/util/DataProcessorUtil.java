@@ -33,7 +33,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBException;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphResponse;
 import com.cognizant.devops.platformcommons.dal.neo4j.Neo4jDBHandler;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
@@ -76,7 +75,7 @@ public class DataProcessorUtil {
 		} catch (FileNotFoundException e) {
 			log.error("File not found Exception in uploading csv file", e);
 			throw new InsightsCustomException("File not found Exception in uploading csv file");
-		} catch (IOException | GraphDBException e) {
+		} catch (IOException e) {
 			log.error("IOException in uploading csv file", e);
 			throw new InsightsCustomException("IOException in uploading csv file");
 		} catch (InsightsCustomException e) {
@@ -89,7 +88,7 @@ public class DataProcessorUtil {
 
 	private boolean parseCsvRecords(boolean status, CSVParser csvParser, Neo4jDBHandler dbHandler,
 			Map<String, Integer> headerMap, String query)
-			throws IOException, GraphDBException, InsightsCustomException {
+			throws IOException,InsightsCustomException {
 		List<JsonObject> nodeProperties = new ArrayList<>();
 		List<String> combo = new ArrayList<>();
 		getCurrentRecords(combo, dbHandler);
@@ -171,7 +170,7 @@ public class DataProcessorUtil {
 				return status;
 			}
 			status = true;
-		} catch (GraphDBException e) {
+		} catch (InsightsCustomException e) {
 			log.error("Exception in deleting nodes ", e);
 		}
 		return status;
@@ -189,7 +188,7 @@ public class DataProcessorUtil {
 				return status;
 			}
 			status = true;
-		} catch (GraphDBException e) {
+		} catch (InsightsCustomException e) {
 			log.error(e);
 		}
 		return status;
@@ -210,7 +209,7 @@ public class DataProcessorUtil {
 		return json;
 	}
 
-	private void getCurrentRecords(List<String> combo, Neo4jDBHandler dbHandler) throws GraphDBException {
+	private void getCurrentRecords(List<String> combo, Neo4jDBHandler dbHandler) throws InsightsCustomException {
 		String cypherQuery = " MATCH (n :METADATA:DATATAGGING)  RETURN n";
 		GraphResponse graphResponse = dbHandler.executeCypherQuery(cypherQuery);
 		JsonArray rows = graphResponse.getJson().get("results").getAsJsonArray().get(0).getAsJsonObject().get("data")

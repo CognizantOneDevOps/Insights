@@ -52,6 +52,7 @@ import org.testng.annotations.Test;
 
 import com.cognizant.devops.platformcommons.config.ApplicationConfigCache;
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
+import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformservice.rest.AccessGroupManagement.AccessGroupManagement;
 import com.cognizant.devops.platformservice.rest.util.PlatformServiceUtil;
 import com.cognizant.devops.platformservice.security.config.AuthenticationUtils;
@@ -84,7 +85,7 @@ public class GrafanaAuthenticationTest extends AbstractTestNGSpringContextTests 
 
 
 	@BeforeTest
-	public void onInit() throws InterruptedException, IOException {
+	public void onInit() throws InterruptedException, IOException, InsightsCustomException {
 		ApplicationConfigCache.loadConfigCache();
 
 		Map<String, String> cookiesMap = null;

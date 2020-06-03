@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.cognizant.devops.platformcommons.dal.neo4j.Neo4jDBHandler;
+import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 
 @RestController
 @RequestMapping("/db")
@@ -31,7 +32,7 @@ public class GraphDBService {
 	static Logger log = LogManager.getLogger(GraphDBService.class.getName());
 
 	@RequestMapping(value = "/data", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public String executeCypher(@RequestParam String cypher){
+	public String executeCypher(@RequestParam String cypher) throws InsightsCustomException{
 		Neo4jDBHandler dbHandler = new Neo4jDBHandler();
 		return dbHandler.executeCypherQueryRaw(cypher);
 	}

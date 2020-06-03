@@ -44,7 +44,6 @@ import org.springframework.web.multipart.MultipartFile;
 import com.cognizant.devops.platformcommons.constants.ConfigOptions;
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
 import com.cognizant.devops.platformcommons.core.util.InsightsUtils;
-import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBException;
 import com.cognizant.devops.platformcommons.dal.neo4j.Neo4jDBHandler;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformservice.rest.datatagging.constants.DatataggingConstants;
@@ -172,7 +171,7 @@ public class BulkUploadService implements IBulkUpload {
 					throw new InsightsCustomException("Error while uploading to Neo4j");
 				}
 			}
-		} catch (GraphDBException ex) {
+		} catch (InsightsCustomException ex) {
 			log.error("Neo4j is not responding {}..", ex.getMessage());
 			throw new InsightsCustomException("Error while uploading to Neo4j");
 		}

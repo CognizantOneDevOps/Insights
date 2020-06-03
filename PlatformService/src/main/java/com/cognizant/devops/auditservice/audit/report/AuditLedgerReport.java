@@ -36,9 +36,9 @@ import com.cognizant.devops.auditservice.audit.utils.PdfTableUtil;
 import com.cognizant.devops.platformauditing.util.RestructureDataUtil;
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.core.util.SystemStatus;
-import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBException;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphResponse;
 import com.cognizant.devops.platformcommons.dal.neo4j.Neo4jDBHandler;
+import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -135,7 +135,7 @@ public class AuditLedgerReport extends AuditReportStrategy{
 			}else{
 				log.info("Aborting query from execute as it contains invalid keywords !!" + cypherQuery );
 			}
-		} catch (GraphDBException e) {
+		} catch (InsightsCustomException e) {
 			e.printStackTrace();
 			log.info("graph exception");
 			log.error(" - query processing failed"+ e);
