@@ -173,8 +173,23 @@ public class AgentManagementTest extends AgentManagementTestData{
 			
 	}
 	
+	@Test(priority = 7, expectedExceptions = InsightsCustomException.class) 
+	public void testAgentIDandToolNamenotequal() throws InsightsCustomException {
+		
+		AgentManagementServiceImpl agentServiceImpl = new AgentManagementServiceImpl();
+		String expectedOutcome = "Agent Id and Tool name cannot be the same.";
+		
+		String response = agentServiceImpl.registerAgent(agentManagementTestData.toolName, 
+							agentManagementTestData.agentVersion, agentManagementTestData.osversion, 
+							agentManagementTestData.configDetailsWithSameIDs, agentManagementTestData.trackingDetails, false);
+		
+		Assert.assertEquals(expectedOutcome, response);
+			
+	}
 	
-	@Test(priority = 7) 
+	
+	
+	@Test(priority = 8) 
 	public void testRegisterAgentInDatabase() throws InsightsCustomException {
 
 		AgentManagementServiceImpl agentServiceImpl = new AgentManagementServiceImpl();
@@ -186,13 +201,13 @@ public class AgentManagementTest extends AgentManagementTestData{
         Assert.assertTrue(registeredAgents.size() > 0);
 	}
 	
-	@Test(priority = 8)
+	@Test(priority = 9)
 	public void testGetRegisteredAgents() throws InsightsCustomException {
 		
 		Assert.assertFalse(agentManagementServiceImpl.getRegisteredAgents().isEmpty());		
 	}
 	
-	@Test(priority = 9)
+	@Test(priority = 10)
 	public void testStartStopAgentForStartAction() throws InsightsCustomException {
 
 		String action = "START";
@@ -204,7 +219,7 @@ public class AgentManagementTest extends AgentManagementTestData{
 		Assert.assertEquals(response, expectedOutput);
 	}
 	
-	@Test(priority = 10)
+	@Test(priority = 11)
 	public void testStartStopAgentForStopAction() throws InsightsCustomException {
 
 		String action = "STOP";
@@ -216,7 +231,7 @@ public class AgentManagementTest extends AgentManagementTestData{
 		Assert.assertEquals(response, expectedOutput);
 	}
 	
-	@Test(priority = 11)
+	@Test(priority = 12)
 	public void testStartStopAgentForNoAction() throws InsightsCustomException {
 
 		String action = "REGISTER";
@@ -228,7 +243,7 @@ public class AgentManagementTest extends AgentManagementTestData{
 		Assert.assertEquals(response, expectedOutput);
 	}
 	
-	@Test(priority = 12)
+	@Test(priority = 13)
 	public void testStartStopAgentForLinux() throws InsightsCustomException {
 
 		String action = "REGISTER";
@@ -240,7 +255,7 @@ public class AgentManagementTest extends AgentManagementTestData{
 		Assert.assertEquals(response, expectedOutput);
 	}
 
-	@Test(priority = 13, expectedExceptions = InsightsCustomException.class)
+	@Test(priority = 14, expectedExceptions = InsightsCustomException.class)
 	public void testStartStopAgentForException() throws InsightsCustomException {
 
 		String action = "REGISTER";
@@ -251,7 +266,7 @@ public class AgentManagementTest extends AgentManagementTestData{
 		Assert.assertEquals(response, expectedOutput);
 	}
 	
-	@Test (priority = 14)
+	@Test (priority = 15)
 	public void getAgentDetails() throws InsightsCustomException {
 		
 		AgentConfig agentConfig = new AgentConfig();
@@ -264,7 +279,7 @@ public class AgentManagementTest extends AgentManagementTestData{
 		
 	}
 	
-	@Test (priority = 15)
+	@Test (priority = 16)
 	public void getAgentDetailsForException() throws InsightsCustomException {
 
 		AgentConfig agentConfig = new AgentConfig();
@@ -272,7 +287,7 @@ public class AgentManagementTest extends AgentManagementTestData{
 		AgentConfigTO agentConfigDetails = agentManagementServiceImpl.getAgentDetails(agentManagementTestData.agentId);
 	}
 	
-	@Test(priority = 16)
+	@Test(priority = 17)
 	public void testUpdateAgent() throws InsightsCustomException {
 		
 		ApplicationConfigProvider.getInstance().getAgentDetails().setOnlineRegistration(true);
@@ -281,7 +296,7 @@ public class AgentManagementTest extends AgentManagementTestData{
 																agentManagementTestData.agentVersion, agentManagementTestData.osversion, false);
 	}
 	
-	@Test(priority = 17)
+	@Test(priority = 18)
 	public void testUninstallAgent() throws InsightsCustomException{
 
 		String expectedOutCome = "SUCCESS"; 
@@ -290,7 +305,7 @@ public class AgentManagementTest extends AgentManagementTestData{
 		Assert.assertEquals(expectedOutCome, response);
 		
 	}
-	@Test(priority = 18, expectedExceptions = InsightsCustomException.class)
+	@Test(priority = 19, expectedExceptions = InsightsCustomException.class)
 	public void testUninstallAgentForException() throws InsightsCustomException{
 
 		String expectedOutCome =  "No entity found for query";

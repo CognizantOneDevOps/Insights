@@ -326,6 +326,10 @@ export class AgentConfigurationComponent implements OnInit {
         agentId = undefined;
         self.messageDialog.showApplicationsMessage("Please enter valid agentId, and only contain alphanumeric character and underscore ", "ERROR");
       }
+      else if (agentId.toLowerCase() == self.selectedTool.toLowerCase()) {
+        agentId = undefined;
+        self.messageDialog.showApplicationsMessage("AgentID and Tool name cannot be same ", "ERROR");
+      }
     } else {
       if (agentId != oldAgentId) {
         self.messageDialog.showApplicationsMessage("You are not allow to change AgentId while update ", "ERROR");
@@ -339,6 +343,7 @@ export class AgentConfigurationComponent implements OnInit {
       self.configData = "";
       self.configData = JSON.stringify(self.updatedConfigParamdata);
       var agentAPIRequestJson = {};
+      let registerAgentRes: any;
       //console.log(this.configData)
       if (actionType == "Update") {
 
@@ -348,39 +353,52 @@ export class AgentConfigurationComponent implements OnInit {
         agentAPIRequestJson['agentVersion'] = self.selectedVersion
         agentAPIRequestJson['osversion'] = self.selectedOS
         agentAPIRequestJson['vault'] = this.vault
-        var updateAgentRes = await self.agentService.updateAgentV2(JSON.stringify(agentAPIRequestJson));
+        try {
+          var updateAgentRes = await self.agentService.updateAgentV2(JSON.stringify(agentAPIRequestJson));
 
-        self.agentConfigstatus = updateAgentRes.status;
-        //console.log(updateAgentRes);
-        if (updateAgentRes.status == "success") {
-          self.sendStatusMsg("updated");
-          self.agentConfigstatus = "Agent updated Successfully"
-          self.agentConfigstatusCode = "SUCCESS";
-        } else {
+          self.agentConfigstatus = updateAgentRes.status;
+          //console.log(updateAgentRes);
+          if (updateAgentRes.status == "success") {
+            self.sendStatusMsg("updated");
+            self.agentConfigstatus = "Agent updated Successfully"
+            self.agentConfigstatusCode = "SUCCESS";
+          } else {
+            self.sendStatusMsg("update");
+            self.agentConfigstatus = "Agent update Failed";
+            self.agentConfigstatusCode = "ERROR";
+          }
+        } catch (e) {
+          console.error("Error is: ", e)
           self.sendStatusMsg("update");
           self.agentConfigstatus = "Agent update Failed";
           self.agentConfigstatusCode = "ERROR";
         }
       } else {
-
         agentAPIRequestJson['toolName'] = self.selectedTool
         agentAPIRequestJson['agentVersion'] = self.selectedVersion
         agentAPIRequestJson['osversion'] = self.selectedOS
         agentAPIRequestJson['configJson'] = self.configData
         agentAPIRequestJson['trackingDetails'] = self.trackingUploadedFileContentStr
         agentAPIRequestJson['vault'] = this.vault
-        var registerAgentRes = await self.agentService.registerAgentV2(JSON.stringify(agentAPIRequestJson));
-        self.agentConfigstatus = registerAgentRes.status;
-        //console.log(registerAgentRes);
-        if (registerAgentRes.status == "success") {
-          self.sendStatusMsg("registered");
-          self.agentConfigstatus = " Agent Registered Successfully"
-          self.agentConfigstatusCode = "SUCCESS";
-        } else {
+        try {
+          registerAgentRes = await self.agentService.registerAgentV2(JSON.stringify(agentAPIRequestJson));
+          self.agentConfigstatus = registerAgentRes.status;
+          if (registerAgentRes.status == "success") {
+            self.sendStatusMsg("registered");
+            self.agentConfigstatus = " Agent Registered Successfully"
+            self.agentConfigstatusCode = "SUCCESS";
+          } else {
+            self.sendStatusMsg("register");
+            self.agentConfigstatus = "Agent Registration Failed. Please check the logs for more details.";
+            self.agentConfigstatusCode = "ERROR";
+          }
+        } catch (e) {
+          console.error("Error is: ", e)
           self.sendStatusMsg("register");
           self.agentConfigstatus = "Agent Registration Failed. Please check the logs for more details.";
           self.agentConfigstatusCode = "ERROR";
         }
+
       }
 
       //console.log(this.agentConfigstatus)

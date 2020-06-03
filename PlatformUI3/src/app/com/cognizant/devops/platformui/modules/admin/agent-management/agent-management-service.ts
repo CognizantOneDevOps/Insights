@@ -15,7 +15,7 @@
  ******************************************************************************/
 import { Injectable } from '@angular/core';
 import { RestCallHandlerService } from '@insights/common/rest-call-handler.service';
-import { Observable } from 'rxjs';
+import { Observable, throwError } from 'rxjs';
 
 export interface IAgentService {
     loadGlobalHealthConfigurations(): Promise<any>;
@@ -83,7 +83,7 @@ export class AgentService implements IAgentService {
     }
 
     registerAgentV2(registerAgentJson: string): Promise<any> {
-        return this.restCallHandlerService.postWithAgentData("AGENT_REGISTERV2", registerAgentJson, "", { 'Content-Type': 'application/x-www-form-urlencoded' }).toPromise();;
+        return this.restCallHandlerService.postWithAgentData("AGENT_REGISTERV2", registerAgentJson, "", { 'Content-Type': 'application/x-www-form-urlencoded' }).toPromise();
     }
 
     updateAgentV2(agentMappingJson: string): Promise<any> {

@@ -102,6 +102,9 @@ public class AgentManagementServiceImpl implements AgentManagementService {
 			if (ValidationUtils.checkAgentIdString(agentId)) {
 				throw new InsightsCustomException("Agent Id has to be Alpha numeric with '_' as special character");
 			}
+			if(agentId.equalsIgnoreCase(toolName)) {
+				throw new InsightsCustomException("Agent Id and Tool name cannot be the same.");
+			}
 			// Condition to check whether the agent ID is existing already in database or
 			// not.
 			if (agentConfigDAL.isAgentIdExisting(agentId)) {

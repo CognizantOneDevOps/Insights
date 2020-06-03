@@ -15,19 +15,19 @@
  ******************************************************************************/
 
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs'
+import { Observable, throwError } from 'rxjs'
 import { RestAPIurlService } from '@insights/common/rest-apiurl.service'
 import { HttpClient, HttpHeaders, HttpParams, HttpErrorResponse } from '@angular/common/http';
 import { DataSharedService } from '@insights/common/data-shared-service';
 import 'rxjs/Rx';
 import { MessageDialogService } from '@insights/app/modules/application-dialog/message-dialog-service';
-import { Router, NavigationExtras   } from '@angular/router';
+import { Router, NavigationExtras } from '@angular/router';
 
 @Injectable()
 export class RestCallHandlerService {
   asyncResult: any;
   constructor(private http: HttpClient, private restAPIUrlService: RestAPIurlService,
-    private dataShare: DataSharedService, public messageDialog: MessageDialogService, 
+    private dataShare: DataSharedService, public messageDialog: MessageDialogService,
     private router: Router) {
 
   }
@@ -256,7 +256,7 @@ export class RestCallHandlerService {
     var isSessionExpired = this.dataShare.validateSession();
     if (!isSessionExpired) {
       var restCallUrl = this.restAPIUrlService.getRestCallUrl(url);
-      var dataresponse;
+      var dataresponse = null;
       let headers;
       var authToken = this.dataShare.getAuthorizationToken();
       var webAuthToken = this.dataShare.getWebAuthToken();
@@ -280,8 +280,12 @@ export class RestCallHandlerService {
         headers: headers,
         params: params
       }
-      dataresponse = this.http.post(restCallUrl, data, httpOptions).catch((e: any) => Observable.throw(this.handleTokenError(e)));
-       return dataresponse;
+      dataresponse = this.http.post(restCallUrl, data, httpOptions)
+        .catch((e: HttpErrorResponse) => {
+          this.handleTokenError(e)
+          throw e.error.message
+        });
+      return dataresponse;
     } else {
       console.log("Session Expired")
     }
@@ -298,7 +302,7 @@ export class RestCallHandlerService {
           "message": error.error
         }
       };
-      this.router.navigate(['/logout/'+error.status],navigationExtras);
+      this.router.navigate(['/logout/' + error.status], navigationExtras);
     } else {
       console.error('An error occurred', error);
     }
