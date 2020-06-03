@@ -27,8 +27,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.cognizant.devops.platformcommons.constants.ConfigOptions;
-import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBException;
 import com.cognizant.devops.platformcommons.dal.neo4j.Neo4jDBHandler;
+import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
@@ -59,7 +59,7 @@ public class EngineCorrelationNodeBuilderModule {
 			log.error(e);
 		} catch (IOException e) {
 			log.error(e);
-		} catch (GraphDBException e) {
+		} catch (InsightsCustomException e) {
 			log.error(e);
 		} finally {
 			try {

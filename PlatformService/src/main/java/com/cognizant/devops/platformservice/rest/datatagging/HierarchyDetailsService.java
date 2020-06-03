@@ -30,20 +30,15 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.cognizant.devops.platformcommons.constants.ErrorMessage;
-import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBException;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphResponse;
 import com.cognizant.devops.platformcommons.dal.neo4j.Neo4jDBHandler;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
-import com.cognizant.devops.platformdal.entity.definition.EntityDefinition;
-import com.cognizant.devops.platformdal.entity.definition.EntityDefinitionDAL;
-import com.cognizant.devops.platformdal.hierarchy.details.HierarchyDetails;
 import com.cognizant.devops.platformdal.hierarchy.details.HierarchyDetailsDAL;
 import com.cognizant.devops.platformservice.rest.datatagging.constants.DatataggingConstants;
 import com.cognizant.devops.platformservice.rest.datatagging.model.Node;
 import com.cognizant.devops.platformservice.rest.datatagging.util.DataProcessorUtil;
 import com.cognizant.devops.platformservice.rest.neo4j.GraphDBService;
 import com.cognizant.devops.platformservice.rest.util.PlatformServiceUtil;
-import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -98,7 +93,7 @@ public class HierarchyDetailsService {
 			JsonArray asJsonArray = rows.getAsJsonArray();
 			JsonObject jsonObject = populateHierarchyDetails(asJsonArray);
 			parentArray.add(jsonObject);
-		} catch (GraphDBException e) {
+		} catch (InsightsCustomException e) {
 			log.error(e);
 			return PlatformServiceUtil.buildFailureResponse(ErrorMessage.DB_INSERTION_FAILED);
 		}
@@ -188,7 +183,7 @@ public class HierarchyDetailsService {
 
 	@RequestMapping(value = "/getHierarchyProperties", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 	public JsonObject getHierarchyProperties(@RequestParam String level1, @RequestParam String level2,
-			@RequestParam String level3, @RequestParam String level4) throws GraphDBException {
+			@RequestParam String level3, @RequestParam String level4) throws InsightsCustomException {
 		Neo4jDBHandler dbHandler = new Neo4jDBHandler();
 		String queryLabels = ":METADATA:DATATAGGING";
 		StringBuilder sb = new StringBuilder();
@@ -230,7 +225,7 @@ public class HierarchyDetailsService {
 		GraphResponse response;
 		try {
 			response = dbHandler.executeCypherQuery(query);
-		} catch (GraphDBException e) {
+		} catch (InsightsCustomException e) {
 			log.error(e);
 			return PlatformServiceUtil.buildFailureResponse(ErrorMessage.DB_INSERTION_FAILED);
 		}

@@ -15,21 +15,24 @@
  ******************************************************************************/
 package com.cognizant.devops.engines.platformauditing.blockchaindatacollection.modules.blockchainprocessing;
 
-import com.cognizant.devops.platformauditing.api.InsightsAuditImpl;
-import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBException;
-import com.cognizant.devops.platformcommons.dal.neo4j.GraphResponse;
-import com.cognizant.devops.platformcommons.dal.neo4j.Neo4jDBHandler;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Map;
+
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-
-import java.io.*;
-import java.util.Map;
+import com.cognizant.devops.platformauditing.api.InsightsAuditImpl;
+import com.cognizant.devops.platformcommons.dal.neo4j.GraphResponse;
+import com.cognizant.devops.platformcommons.dal.neo4j.Neo4jDBHandler;
+import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 
 public class util {
 
@@ -70,7 +73,7 @@ public class util {
         FileUtils.writeStringToFile(f, String.valueOf(tracking));
     }
 
-    public boolean updateFlagToNeo4j(boolean flag, JsonObject data) throws GraphDBException {
+    public boolean updateFlagToNeo4j(boolean flag, JsonObject data) throws InsightsCustomException {
         String blockchainProcessedFlag = "blockchainProcessedFlag";
         Neo4jDBHandler dbHandler = new Neo4jDBHandler();
         if (flag == true ) {

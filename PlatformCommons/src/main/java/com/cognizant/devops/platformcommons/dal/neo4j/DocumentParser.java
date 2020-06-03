@@ -18,10 +18,12 @@ package com.cognizant.devops.platformcommons.dal.neo4j;
 import java.util.List;
 import java.util.Map;
 
+import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.google.gson.JsonSyntaxException;
 
 /**
  * 
@@ -78,14 +80,19 @@ public class DocumentParser {
 	 * 
 	 * @param jsonData
 	 * @return GraphResponse
+	 * @throws InsightsCustomException 
 	 */
-	public GraphResponse processGraphDBNode(String jsonData){
+	public GraphResponse processGraphDBNode(String jsonData) throws InsightsCustomException{
+		try {
 		GraphResponse response = new GraphResponse();
 		List<NodeData> nodeDataList = response.getNodes();
 		JsonElement parsedJson = new JsonParser().parse(jsonData);
 		response.setJson(parsedJson.getAsJsonObject());
 		processGraphDBJson(parsedJson, nodeDataList, null, "");
 		return response;
+		}catch(Exception e) {
+			throw new InsightsCustomException(e.getMessage());
+		}
 	}
 	
 	/**

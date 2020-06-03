@@ -34,7 +34,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.core.util.ValidationUtils;
-import com.cognizant.devops.platformcommons.dal.rest.RestHandler;
+import com.cognizant.devops.platformcommons.dal.grafana.GrafanaHandler;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformservice.security.config.AuthenticationUtils;
 import com.cognizant.devops.platformservice.security.config.SpringAuthority;
@@ -42,10 +42,12 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import com.sun.jersey.api.client.ClientResponse;
+
 
 public class GrafanaUserDetailsUtil {
 	private static final Logger log = LogManager.getLogger(GrafanaUserDetailsUtil.class);
+	
+	
 
 	/**
 	 * used to validate grafana user detail and add grafana cookies in request
@@ -107,7 +109,7 @@ public class GrafanaUserDetailsUtil {
 	}
 
 	/**
-	 * used to fetch grafgana current organization and based on that organization it
+	 * used to fetch grafana current organization and based on that organization it
 	 * fetch role, both will be added to grafanaResponseCookies.
 	 * 
 	 * @param headers
@@ -116,30 +118,16 @@ public class GrafanaUserDetailsUtil {
 	 */
 	private static void getCurrentOrgAndRole(Map<String, String> headers, Map<String, String> grafanaResponseCookies)
 			throws InsightsCustomException {
+		GrafanaHandler grafanaHandler = new GrafanaHandler();
 		log.debug("Inside getCurrentOrgRole function call!");
-		String loginApiUrl = ApplicationConfigProvider.getInstance().getGrafana().getGrafanaEndpoint() + "/api/user";
-		ClientResponse grafanaCurrentOrgResponse = RestHandler.doGet(loginApiUrl, null, headers);
-		if (grafanaCurrentOrgResponse.getStatus() != 200) {
-			throw new InsightsCustomException(
-					"GrafanaUserDetailsUtil ==== Invalid grafana cookies, Please re login again ==== {} "
-							+ grafanaCurrentOrgResponse.getEntity(String.class) + "   "
-							+ grafanaCurrentOrgResponse.getStatus());
-		}
-		JsonObject responseJson = new JsonParser().parse(grafanaCurrentOrgResponse.getEntity(String.class))
-				.getAsJsonObject();
+		String grafanaCurrentOrgResponse = grafanaHandler.grafanaGet("/api/user", headers);
+		JsonObject responseJson = new JsonParser().parse(grafanaCurrentOrgResponse).getAsJsonObject();
 		String grafanaCurrentOrg = responseJson.get("orgId").toString();
 		if (grafanaCurrentOrg != null) {
 			grafanaResponseCookies.put("grafanaOrg", ValidationUtils.cleanXSS(grafanaCurrentOrg));
-			String userOrgsApiUrl = ApplicationConfigProvider.getInstance().getGrafana().getGrafanaEndpoint()
-					+ "/api/user/orgs";
-			ClientResponse grafanaRoleResponse = RestHandler.doGet(userOrgsApiUrl, null, headers);
-			if (grafanaRoleResponse.getStatus() != 200) {
-				throw new InsightsCustomException(
-						"GrafanaUserDetailsUtil ==== Invalid grafana cookies, Please re login again ==== "
-								+ grafanaRoleResponse.getEntity(String.class) + "  " + grafanaRoleResponse.getStatus());
-			}
-			JsonArray grafanaOrgs = new JsonParser().parse(grafanaRoleResponse.getEntity(String.class))
-					.getAsJsonArray();
+			String userOrgsApiUrl = "/api/user/orgs";
+			String grafanaRoleResponse = grafanaHandler.grafanaGet(userOrgsApiUrl, headers);
+			JsonArray grafanaOrgs = new JsonParser().parse(grafanaRoleResponse).getAsJsonArray();
 			String grafanaCurrentOrgRole = null;
 			for (JsonElement org : grafanaOrgs) {
 				if (grafanaCurrentOrg.equals(org.getAsJsonObject().get("orgId").toString())) {
@@ -163,21 +151,14 @@ public class GrafanaUserDetailsUtil {
 	 */
 	private static List<NewCookie> getValidGrafanaSession(String userName, String password)
 			throws InsightsCustomException {
+		GrafanaHandler grafanaHandler = new GrafanaHandler();
 		log.debug("Inside getValidGrafanaSession method call");
 		JsonObject loginRequestParams = new JsonObject();
 		loginRequestParams.addProperty("user", userName);
 		loginRequestParams.addProperty("password", password);
-		String loginApiUrl = ApplicationConfigProvider.getInstance().getGrafana().getGrafanaEndpoint() + "/login";
-		ClientResponse grafanaLoginResponse = RestHandler.doPost(loginApiUrl, loginRequestParams, null);
-		log.debug("GrafanaUserDetailsUtil ==== status code {} loginApiUrl {} Grafana responce {} ",
-				grafanaLoginResponse.getStatus(), loginApiUrl, grafanaLoginResponse.getEntity(String.class));
-		if (grafanaLoginResponse.getStatus() != 200) {
-			String response = grafanaLoginResponse.getEntity(String.class);
-			log.error("GrafanaUserDetailsUtil ==== unable to getValidGrafanaSession ==== {} response {}",
-					grafanaLoginResponse.getStatus(), response);
-			throw new InsightsCustomException(" user or password is incorrect ==== ");
-		}
-		return grafanaLoginResponse.getCookies();
+		String loginApiUrl =  "/login";
+		return grafanaHandler.getGrafanaCookies(loginApiUrl, loginRequestParams, null);
+		
 	}
 
 }

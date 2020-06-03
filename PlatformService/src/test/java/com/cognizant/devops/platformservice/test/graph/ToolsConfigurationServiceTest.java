@@ -23,6 +23,7 @@ import static org.junit.Assert.assertNotNull;
 
 import org.junit.Test;
 
+import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformservice.test.utility.ServiceTestConstants;
 import com.cognizant.devops.platformservice.test.utility.ServiceTestUtilities;
 import com.google.gson.JsonArray;
@@ -33,7 +34,7 @@ public class ToolsConfigurationServiceTest  {
   
     
     @Test //When a READ call is implemented
-    public void testLoadToolsConfig() {//succesful API call
+    public void testLoadToolsConfig() throws InsightsCustomException {//succesful API call
     	String requestPath = "/tools/read?category=SCM&toolName=GIT";
         JsonObject jsonObj = ServiceTestUtilities.makeServiceRequest(requestPath,ServiceTestConstants.GET_REQUEST,null);
         JsonObject obj = (JsonObject) jsonObj.get("data"); 
@@ -43,14 +44,14 @@ public class ToolsConfigurationServiceTest  {
     }
     
     @Test //Successful test to download data of a ToolsConfig
-    public void testDownloadToolsConfig() {//succesful API call
+    public void testDownloadToolsConfig() throws InsightsCustomException {//succesful API call
     	String requestPath = "/tools/download?category=SCM&tool=GIT";
         JsonObject jsonObj = ServiceTestUtilities.makeServiceRequest(requestPath,ServiceTestConstants.GET_REQUEST,null); 
     	assertTrue(jsonObj.entrySet().isEmpty());
     }
     
     @Test //Successful ToolsConfig details test
-    public void testGetToolsConfig() {//succesful API call
+    public void testGetToolsConfig() throws InsightsCustomException {//succesful API call
     	String requestPath = "/tools/toolsConfig";
         JsonObject jsonObj = ServiceTestUtilities.makeServiceRequest(requestPath,ServiceTestConstants.GET_REQUEST,null);
         JsonObject obj = (JsonObject) jsonObj.get("data"); 
@@ -62,21 +63,21 @@ public class ToolsConfigurationServiceTest  {
     //Accessing GET through POST call
     
     @Test //When a READ call is implemented
-    public void testLoadToolsConfigPost() {//succesful API call
+    public void testLoadToolsConfigPost() throws InsightsCustomException {//succesful API call
     	String requestPath = "/tools/read?category=SCM&toolName=GIT";
         JsonObject jsonObj = ServiceTestUtilities.makeServiceRequest(requestPath,ServiceTestConstants.POST_REQUEST,null);
         assertEquals("Should return failure","failure",jsonObj.get("status").getAsString());
     }
     
     @Test //Successful test to download data of a ToolsConfig
-    public void testDownloadToolsConfigPost() {//succesful API call
+    public void testDownloadToolsConfigPost() throws InsightsCustomException {//succesful API call
     	String requestPath = "/tools/download?category=SCM&tool=GIT";
         JsonObject jsonObj = ServiceTestUtilities.makeServiceRequest(requestPath,ServiceTestConstants.POST_REQUEST,null);
         assertEquals("Should return failure","failure",jsonObj.get("status").getAsString());
     }
     
     @Test //Successful ToolsConfig details test
-    public void testGetToolsConfigPost() {//succesful API call
+    public void testGetToolsConfigPost() throws InsightsCustomException {//succesful API call
     	String requestPath = "/tools/toolsConfig";
         JsonObject jsonObj = ServiceTestUtilities.makeServiceRequest(requestPath,ServiceTestConstants.POST_REQUEST,null);
         assertEquals("Should return failure","failure",jsonObj.get("status").getAsString());

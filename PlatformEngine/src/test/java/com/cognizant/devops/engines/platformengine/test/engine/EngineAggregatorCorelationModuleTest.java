@@ -27,13 +27,13 @@ import org.testng.annotations.AfterTest;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 
-import com.cognizant.devops.platformcommons.config.ApplicationConfigCache;
-import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBException;
-import com.cognizant.devops.platformcommons.dal.neo4j.GraphResponse;
-import com.cognizant.devops.platformcommons.dal.neo4j.Neo4jDBHandler;
-import com.cognizant.devops.platformdal.agentConfig.AgentConfigDAL;
 import com.cognizant.devops.engines.platformengine.modules.aggregator.EngineAggregatorModule;
 import com.cognizant.devops.engines.platformengine.modules.correlation.EngineCorrelatorModule;
+import com.cognizant.devops.platformcommons.config.ApplicationConfigCache;
+import com.cognizant.devops.platformcommons.dal.neo4j.GraphResponse;
+import com.cognizant.devops.platformcommons.dal.neo4j.Neo4jDBHandler;
+import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
+import com.cognizant.devops.platformdal.agentConfig.AgentConfigDAL;
 
 public class EngineAggregatorCorelationModuleTest {
 	private static Logger log = LogManager.getLogger(EngineAggregatorCorelationModuleTest.class.getName());
@@ -143,9 +143,9 @@ public class EngineAggregatorCorelationModuleTest {
 
 			Assert.assertEquals("true", finalJson.toString());
 
-		} catch (GraphDBException e) {
+		} catch (InsightsCustomException e) {
 
-			log.error("GraphDBException : " + e.toString());
+			log.error("InsightsCustomException : " + e.toString());
 		}
 	}
 
@@ -165,9 +165,9 @@ public class EngineAggregatorCorelationModuleTest {
 
 			dbHandler.executeCypherQuery(query);
 
-		} catch (GraphDBException e) {
+		} catch (InsightsCustomException e) {
 
-			log.error("GraphDBException : " + e.toString());
+			log.error("InsightsCustomException : " + e.toString());
 		}
 
 	}

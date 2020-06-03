@@ -26,8 +26,8 @@ import com.cognizant.devops.engines.platformengine.message.core.EngineStatusLogg
 import com.cognizant.devops.engines.platformwebhookengine.message.factory.EngineSubscriberResponseHandler;
 import com.cognizant.devops.platformcommons.constants.MessageConstants;
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
-import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBException;
 import com.cognizant.devops.platformcommons.dal.neo4j.Neo4jDBHandler;
+import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -69,7 +69,7 @@ public class WebhookHealthSubscriber extends EngineSubscriberResponseHandler {
 						" Data List is empty for webhook health record: " + routingKey,
 						PlatformServiceConstants.FAILURE);
 			}
-		} catch (GraphDBException e) {
+		} catch (InsightsCustomException e) {
 			log.error(e);
 		}
 
@@ -79,10 +79,9 @@ public class WebhookHealthSubscriber extends EngineSubscriberResponseHandler {
 	 * @param dbHandler
 	 * @param dataList
 	 * @param nodeLabels
-	 * @throws GraphDBException
 	 */
 	private boolean createHealthNodes(Neo4jDBHandler dbHandler, List<JsonObject> dataList, String nodeLabels)
-			throws GraphDBException {
+			throws InsightsCustomException {
 		String cypherhealthQuery;
 		boolean isRecordUpdate = Boolean.TRUE;
 		// For Sequential/successive webhook health publishing

@@ -21,12 +21,12 @@ import java.util.TimerTask;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import com.cognizant.devops.engines.platformengine.message.core.EngineStatusLogger;
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
-import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBException;
 import com.cognizant.devops.platformcommons.dal.neo4j.Neo4jDBHandler;
+import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformdal.mapping.projects.ProjectMapping;
 import com.cognizant.devops.platformdal.mapping.projects.ProjectMappingDAL;
-import com.cognizant.devops.engines.platformengine.message.core.EngineStatusLogger;
 
 public class ProjectMapperModule extends TimerTask {
 	private static Logger log = LogManager.getLogger(ProjectMapperModule.class.getName());
@@ -44,7 +44,7 @@ public class ProjectMapperModule extends TimerTask {
 			for(ProjectMapping projectMapping : projectMappingList){
 				try {
 					graphDBHandler.executeCypherQuery(projectMapping.getCypherQuery());
-				} catch (GraphDBException e) {
+				} catch (InsightsCustomException e) {
 					log.error(e);
 				}
 			}

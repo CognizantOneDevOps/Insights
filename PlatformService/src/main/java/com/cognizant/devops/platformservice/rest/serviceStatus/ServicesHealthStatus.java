@@ -20,6 +20,7 @@ import java.io.IOException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -35,9 +36,6 @@ import com.cognizant.devops.platformcommons.dal.neo4j.Neo4jDBHandler;
 import com.cognizant.devops.platformdal.dal.PostgresMetadataHandler;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import com.sun.jersey.api.client.Client;
-import com.sun.jersey.api.client.ClientResponse;
-import com.sun.jersey.api.client.WebResource;
 
 @RestController
 @RequestMapping("/ServicesHealthStatus")
@@ -48,7 +46,7 @@ public class ServicesHealthStatus {
 	private static final String PLATFORM_SERVICE_VERSION_FILE = "version.properties";
 
 	static Logger log = LogManager.getLogger(ServicesHealthStatus.class.getName());
-	@RequestMapping(value = "/getStatus", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+	@GetMapping(value = "/getStatus", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 	@ResponseBody
 	public JsonObject getHealthStatus() throws IOException{
 		JsonObject servicesHealthStatus = new JsonObject();
@@ -106,31 +104,6 @@ public class ServicesHealthStatus {
 		return servicesHealthStatus;		
 	}
 	
-	private JsonObject getClientResponse(String hostEndPoint, String apiUrl, String type,String version){
-		try {
-			Client client = Client.create();
-			WebResource webResource = client
-				   .resource(apiUrl);
-
-				ClientResponse response = webResource.accept(MediaType.APPLICATION_JSON.toString())
-		                   .get(ClientResponse.class);
-
-				if (response.getStatus() != 200) {
-					throw new RuntimeException("Failed : HTTP error code : "+ response.getStatus());
-				}
-				
-				String successResponse = "" ;
-				if( response.getStatus() == 200){
-					successResponse = "Response successfully recieved from "+apiUrl;
-				}
-				return buildSuccessResponse(successResponse, hostEndPoint, type,version);
-
-			  } catch (Exception e) {
-				  log.error("Error while capturing health check at "+apiUrl,e);
-			  }
-		String failureResponse = "Error while capturing health check at "+apiUrl;
-		return buildFailureResponse(failureResponse, hostEndPoint, type,version);
-	}
 	
 	private JsonObject getClientResponse(String hostEndPoint, String apiUrl, String displayType,String serviceType, boolean isRequiredAuthentication,String username, String password,String authToken){
 		JsonObject returnResponse=null;

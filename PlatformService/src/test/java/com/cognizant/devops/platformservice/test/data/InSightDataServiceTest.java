@@ -20,7 +20,7 @@ import static org.junit.Assert.assertNotNull;
 
 import org.junit.Test;
 
-
+import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformservice.test.utility.ServiceTestConstants;
 import com.cognizant.devops.platformservice.test.utility.ServiceTestUtilities;
 import com.google.gson.JsonArray;
@@ -31,7 +31,7 @@ public class InSightDataServiceTest {
 	
      
     @Test //When parameter, orgId=1 is valid
-    public void testFetchPrjtMappingByOrgId() {
+    public void testFetchPrjtMappingByOrgId() throws InsightsCustomException {
     	String requestPath = "/data/fetchProjectMappingByOrgId?orgId=1";
         JsonObject jsonObj = ServiceTestUtilities.makeServiceRequest(requestPath,ServiceTestConstants.GET_REQUEST,null);
         JsonArray jsonDataArry = (JsonArray) jsonObj.get("data");
@@ -39,7 +39,7 @@ public class InSightDataServiceTest {
         assertNotNull(jsonDataArry);//Data array is not null
     }
     @Test //When parameter, orgId=1000 is invalid
-    public void testFetchPrjtMappingByOrgIdNullData() {
+    public void testFetchPrjtMappingByOrgIdNullData() throws InsightsCustomException {
     	String requestPath = "/data/fetchProjectMappingByOrgId?orgId=1000";
         JsonObject jsonObj = ServiceTestUtilities.makeServiceRequest(requestPath,ServiceTestConstants.GET_REQUEST,null);
         JsonArray jsonDataArry = (JsonArray) jsonObj.get("data");
@@ -48,7 +48,7 @@ public class InSightDataServiceTest {
 
     }
     @Test //When all the project mappings are fetched successfully
-    public void testFetchAllPrjtMapping() {
+    public void testFetchAllPrjtMapping() throws InsightsCustomException {
     	String requestPath = "/data/fetchAllProjectMapping";
         JsonObject jsonObj = ServiceTestUtilities.makeServiceRequest(requestPath,ServiceTestConstants.GET_REQUEST,null);
         JsonArray jsonDataArry = (JsonArray) jsonObj.get("data");
@@ -61,20 +61,20 @@ public class InSightDataServiceTest {
     
     
     @Test //When parameter, orgId=1 is valid and called through POST method
-    public void testFetchPrjtMappingByOrgIdPost() {
+    public void testFetchPrjtMappingByOrgIdPost() throws InsightsCustomException {
     	String requestPath = "/data/fetchProjectMappingByOrgId?orgId=1";
         JsonObject jsonObj = ServiceTestUtilities.makeServiceRequest(requestPath,ServiceTestConstants.POST_REQUEST,null);
         assertEquals("Should return failure","failure",jsonObj.get("status").getAsString());
     }
     @Test //When parameter, orgId=1000 is invalid and called through POST method
-    public void testFetchPrjtMappingByOrgIdNullDataPost() {
+    public void testFetchPrjtMappingByOrgIdNullDataPost() throws InsightsCustomException {
     	String requestPath = "/data/fetchProjectMappingByOrgId?orgId=1000";
         JsonObject jsonObj = ServiceTestUtilities.makeServiceRequest(requestPath,ServiceTestConstants.POST_REQUEST,null);
         assertEquals("Should return failure","failure",jsonObj.get("status").getAsString());
 
     }
     @Test //When all the project mappings are fetched successfully and called through POST method
-    public void testFetchAllPrjtMappingPost() {
+    public void testFetchAllPrjtMappingPost() throws InsightsCustomException {
     	String requestPath = "/data/fetchAllProjectMapping";
         JsonObject jsonObj = ServiceTestUtilities.makeServiceRequest(requestPath,ServiceTestConstants.POST_REQUEST,null);
         assertEquals("Should return failure","failure",jsonObj.get("status").getAsString());

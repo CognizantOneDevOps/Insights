@@ -29,10 +29,10 @@ import com.cognizant.devops.platformcommons.core.enums.ExecutionActions;
 import com.cognizant.devops.platformcommons.core.enums.JobSchedule;
 import com.cognizant.devops.platformcommons.core.enums.KPIJobResultAttributes;
 import com.cognizant.devops.platformcommons.core.util.InsightsUtils;
-import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBException;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphResponse;
 import com.cognizant.devops.platformcommons.dal.neo4j.Neo4jDBHandler;
 import com.cognizant.devops.platformcommons.dal.neo4j.NodeData;
+import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platforminsights.datamodel.InferenceConfigDefinition;
 import com.cognizant.devops.platforminsights.exception.InsightsJobFailedException;
 import com.google.gson.Gson;
@@ -222,7 +222,7 @@ public class Neo4jDBImpl implements DatabaseService {
 			} else {
 				log.error(" No result to store in neo4j for job : " + inferenceConfigDefinition.getName());
 			}
-		} catch (GraphDBException | NullPointerException e) {
+		} catch ( NullPointerException | InsightsCustomException e) {
 			log.error("Error while saving neo4j record " + e.getMessage());
 		} catch (Exception e) {
 			log.error("Error while saving neo4j record " + e.getMessage());

@@ -20,24 +20,25 @@ import java.util.TimerTask;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
 import com.cognizant.devops.engines.platformengine.message.core.EngineStatusLogger;
+import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
+
 /**
  * 
  * @author Vishal Ganjare (vganjare)
  * 
- * Entry point for correlation executor.
+ *         Entry point for correlation executor.
  *
  */
 public class EngineCorrelatorModule extends TimerTask {
 	private static boolean isCorrelationExecutionInProgress = false;
 	private static Logger log = LogManager.getLogger(EngineCorrelatorModule.class.getName());
-	
+
 	@Override
 	public void run() {
 		log.debug(" EngineCorrelatorModule start  ====");
 		try {
-			if(!isCorrelationExecutionInProgress) {
+			if (!isCorrelationExecutionInProgress) {
 				isCorrelationExecutionInProgress = true;
 				CorrelationExecutor correlationsExecutor = new CorrelationExecutor();
 				correlationsExecutor.execute();
@@ -46,7 +47,7 @@ public class EngineCorrelatorModule extends TimerTask {
 			EngineStatusLogger.getInstance().createEngineStatusNode("Correlation Execution Completed",
 					PlatformServiceConstants.SUCCESS);
 		} catch (Exception e) {
-			log.error("Error in correlation module " + e.getMessage());
+			log.error("Error in correlation module {} ", e);
 			EngineStatusLogger.getInstance().createEngineStatusNode("Correlation Execution has some issue  ",
 					PlatformServiceConstants.FAILURE);
 		}

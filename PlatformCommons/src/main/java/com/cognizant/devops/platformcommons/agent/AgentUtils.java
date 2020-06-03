@@ -17,10 +17,10 @@ package com.cognizant.devops.platformcommons.agent;
 
 import java.util.Map;
 
-import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBException;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphResponse;
 import com.cognizant.devops.platformcommons.dal.neo4j.Neo4jDBHandler;
 import com.cognizant.devops.platformcommons.dal.neo4j.NodeData;
+import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonSyntaxException;
@@ -29,7 +29,7 @@ public class AgentUtils {
 	private AgentUtils(){
 		
 	}
-	public static JsonObject buildAgentConfig(String category, String tool) throws GraphDBException{
+	public static JsonObject buildAgentConfig(String category, String tool) throws InsightsCustomException{
 		StringBuffer cypher = new StringBuffer();
 		cypher.append("MATCH (n:AGENT:").append(category).append(":").append(tool).append(") return n");
 		
