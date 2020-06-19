@@ -15,6 +15,7 @@
  ******************************************************************************/
 package com.cognizant.devops.platformregressiontest.common;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,7 +26,11 @@ public class TestRunner {
 	public static void main(String[] args) {
 
 		List<String> file = new ArrayList<String>();
-		file.add("C:\\Project\\AutomationTest\\Insights\\PlatformRegressionTest\\src\\test\\resources\\testng.xml");
+		
+		File path = new File("src/test/resources/testng.xml");
+		String xmlPath = path.getAbsolutePath();
+		
+		file.add(xmlPath);
 		TestNG testNG = new TestNG();
 		testNG.setTestSuites(file);
 		testNG.run();
