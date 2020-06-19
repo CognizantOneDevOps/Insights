@@ -1,4 +1,4 @@
-package com.cognizant.devops.platformservicetest.test;
+package com.cognizant.devops.platformregressiontest.test;
 
 public class App {
 
