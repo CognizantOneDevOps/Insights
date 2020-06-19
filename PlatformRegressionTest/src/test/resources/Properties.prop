@@ -1,0 +1,14 @@
+
+baseURI = http://localhost:8080
+viewerRole = viewer
+userName= 755790
+orgId2=2
+orgId1=1
+orgName= InsightsAutomation 
+grafanaRole= Admin
+grafanaOrg=1
+webhookName = pvt_webhook_test
+statusSubscribe = true
+statusUnsubscribe = false
+actionStart = START
+actionStop =STOP

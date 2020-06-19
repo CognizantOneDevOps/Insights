@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
+
+<suite name="suite" verbose="10">
+	<test name="platformregressiontest">
+		<classes>
+			<class
+				name="com.cognizant.devops.platformregressiontest.test.agentmanagement.RegisterAgentAPITest" />
+			<class
+				name="com.cognizant.devops.platformregressiontest.test.agentmanagement.UpdateAgentAPITest" />
+			<class
+				name="com.cognizant.devops.platformregressiontest.test.agentmanagement.StartStopAgentAPITest" />
+			<class
+				name="com.cognizant.devops.platformregressiontest.test.agentmanagement.DeleteAgentAPITest" />
+			<class
+				name="com.cognizant.devops.platformregressiontest.test.correlationbuilder.SaveCorrelationAPITest" />
+			<class
+				name="com.cognizant.devops.platformregressiontest.test.correlationbuilder.UpdateCorrelationAPITest" />
+			<class
+				name="com.cognizant.devops.platformregressiontest.test.correlationbuilder.DeleteCorrelationAPITest" />
+			<class
+				name="com.cognizant.devops.platformregressiontest.test.groupsanduser.CreateOrgAPITest" />
+			<class
+				name="com.cognizant.devops.platformregressiontest.test.groupsanduser.CreateUserAPITest" />
+			<class
+				name="com.cognizant.devops.platformregressiontest.test.groupsanduser.SearchUserAPITest" />
+			<class
+				name="com.cognizant.devops.platformregressiontest.test.groupsanduser.AssignUserAPITest" />
+			<class
+				name="com.cognizant.devops.platformregressiontest.test.groupsanduser.UpdateUserAPITest" />
+			<class
+				name="com.cognizant.devops.platformregressiontest.test.groupsanduser.DeleteUserAPITest" />
+			<class
+				name="com.cognizant.devops.platformregressiontest.test.webhookconfiguration.SaveWebhookAPITest" />
+			<class
+				name="com.cognizant.devops.platformregressiontest.test.webhookconfiguration.UpdateWebhookAPITest" />
+			<class
+				name="com.cognizant.devops.platformregressiontest.test.webhookconfiguration.UpdateStatusWebhookAPITest" />
+			<class
+				name="com.cognizant.devops.platformregressiontest.test.webhookconfiguration.DeleteWebhookAPITest" />
+		</classes>
+	</test>
+</suite>
