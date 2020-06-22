@@ -240,7 +240,8 @@ public class ValidationUtils {
 				authTokenDecrypt = AES256Cryptor.decrypt(auth, passkey);
 			} else {
 				log.error(" Invalid token start with basic ");
-				throw new RuntimeException(PlatformServiceConstants.INVALID_TOKEN);
+				authTokenDecrypt=authHeaderToken;
+				//throw new RuntimeException(PlatformServiceConstants.INVALID_TOKEN);
 			}
 		} catch (Exception e) {
 			log.error(" InsightsCustomException Invalid Autharization Token {} ", e.getMessage());
