@@ -95,7 +95,10 @@ public class LambdaFunctionHandler implements RequestHandler<KinesisFirehoseEven
 			} catch (Exception e) {
 				log.error("Error connecting to URL " + url + " " + e.toString());
 			} finally {
-				if (responseCode != 200 || MAINTENANCE_MODE) {
+				if (responseCode != 200 || MAINTENANCE_MODE || url == null) {
+					if (url == null) {
+						log.error("Url Entry is null for the tool "+ tool);
+					}
 					Record transRecord = new Record(record.getRecordId(), Result.Ok, bufferData);
 					transRecords.add(transRecord);
 				}

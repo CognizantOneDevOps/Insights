@@ -145,7 +145,7 @@ public class LambdaFunctionHandler implements RequestHandler<Object, String> {
 					String body = finalJson.get("body").toString();
 					String tool = finalJson.get("tool").getAsString();
 					String url = System.getenv(tool);
-					sendData(element, body, url);
+					sendData(element, body, url, tool);
 				} catch (Exception e) {
 					log.error("Could able to process the data" + e.toString());
 				} 
@@ -164,7 +164,7 @@ public class LambdaFunctionHandler implements RequestHandler<Object, String> {
 	 * @return responseCode
 	 */
 
-	public int sendData(JsonElement data, String body, String url){
+	public int sendData(JsonElement data, String body, String url, String tool){
 
 		try {
 			if (responseCode == 200 && url != null) {
@@ -190,7 +190,10 @@ public class LambdaFunctionHandler implements RequestHandler<Object, String> {
 		} catch (Exception e) {
 			log.error("Error connecting to URL " + url + " " + e.toString());
 		} finally {
-			if (responseCode != 200) {
+			if (responseCode != 200 || url == null) {
+				if (url == null) {
+					log.error("Url Entry is null for the tool " + tool);
+				}
 				failedData.append(data);
 			}
 		}

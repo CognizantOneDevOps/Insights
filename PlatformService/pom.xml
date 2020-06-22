@@ -83,7 +83,7 @@
 		<dependency>
 			<groupId>org.springframework.security</groupId>
 			<artifactId>spring-security-test</artifactId>
-			<version>${spring.version}</version>
+			<version>${spring.security.version}</version>
 			<scope>test</scope>
 		</dependency>
 
@@ -103,13 +103,36 @@
 			<groupId>org.springframework.security.kerberos</groupId>
 			<artifactId>spring-security-kerberos-client</artifactId>
 			<version>${spring-security-kerberos.version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.apache.httpcomponents</groupId>
+					<artifactId>httpclient</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
-
+		<!-- Added to resolve Kerberos client security vulnerability issue -->
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpclient</artifactId>
+			<version>4.5.3</version>
+		</dependency>
 		<!-- https://mvnrepository.com/artifact/org.opensaml/opensaml -->
 		<dependency>
 			<groupId>org.opensaml</groupId>
 			<artifactId>opensaml</artifactId>
 			<version>2.6.4</version>
+			<exclusions>
+				<exclusion>
+					<groupId>commons-collections</groupId>
+					<artifactId>commons-collections</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<!-- Added to resolve opensaml security vulnerability issue -->
+		<dependency>
+			<groupId>commons-collections</groupId>
+			<artifactId>commons-collections</artifactId>
+			<version>3.2.2</version>
 		</dependency>
 
 		<!-- https://mvnrepository.com/artifact/org.springframework.security.extensions/spring-security-saml2-core -->
@@ -117,7 +140,20 @@
 			<groupId>org.springframework.security.extensions</groupId>
 			<artifactId>spring-security-saml2-core</artifactId>
 			<version>1.0.9.RELEASE</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.bouncycastle</groupId>
+					<artifactId>bcprov-ext-jdk15on</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
+		<!-- Added to resolve springframework security vulnerability issue -->
+		<dependency>
+			<groupId>org.bouncycastle</groupId>
+			<artifactId>bcprov-ext-jdk15on</artifactId>
+			<version>1.64</version>
+		</dependency>
+
 
 		<dependency>
 			<groupId>com.nimbusds</groupId>
@@ -249,7 +285,7 @@
 		<dependency>
 			<groupId>org.bouncycastle</groupId>
 			<artifactId>bcprov-jdk15on</artifactId>
-			<version>1.60</version>
+			<version>1.64</version>
 		</dependency>
 
 		<dependency>
@@ -298,7 +334,7 @@
 		<dependency>
 			<groupId>org.yaml</groupId>
 			<artifactId>snakeyaml</artifactId>
-			<version>1.25</version>
+			<version>1.26</version>
 		</dependency>
 		<dependency>
 			<groupId>com.beust</groupId>
