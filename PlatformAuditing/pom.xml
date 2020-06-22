@@ -49,14 +49,59 @@
 		<dependency>
 			<groupId>org.hyperledger.fabric-sdk-java</groupId>
 			<artifactId>fabric-sdk-java</artifactId>
-			<version>1.4.4</version>
+			<version>1.4.9</version>
 			<exclusions>
 				<exclusion>
 					<groupId>log4j</groupId>
 					<artifactId>log4j</artifactId>
 				</exclusion>
+				<exclusion>
+					<groupId>io.netty</groupId>
+	   			    <artifactId>netty-codec</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>io.netty</groupId>
+	   			    <artifactId>netty-codec-http</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>io.netty</groupId>
+	   			    <artifactId>netty-codec-http2</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.bouncycastle</groupId>
+	        		<artifactId>bcpkix-jdk15on</artifactId>
+				</exclusion>
 			</exclusions>
 		</dependency>
+		<!-- Added to resolve hyperledger security vulnerability issue -->
+		<dependency>
+		    <groupId>io.netty</groupId>
+		    <artifactId>netty-codec</artifactId>
+		    <version>4.1.46.Final</version>
+		</dependency>
+		
+		<!-- Added to resolve hyperledger security vulnerability issue -->
+		<dependency>
+		    <groupId>io.netty</groupId>
+		    <artifactId>netty-codec-http</artifactId>
+		    <version>4.1.48.Final</version>
+		</dependency>
+		
+		<!-- Added to resolve hyperledger security vulnerability issue -->
+		<dependency>
+		    <groupId>io.netty</groupId>
+		    <artifactId>netty-codec-http2</artifactId>
+		    <version>4.1.39.Final</version>
+		</dependency>
+		
+		<!-- Added to resolve hyperledger security vulnerability issue -->
+		<dependency>
+		    <groupId>org.bouncycastle</groupId>
+		    <artifactId>bcpkix-jdk15on</artifactId>
+		    <version>1.64</version>
+		</dependency>
+		
+		
 		<dependency>
 			<groupId>com.cognizant.devops</groupId>
 			<artifactId>PlatformCommons</artifactId>
