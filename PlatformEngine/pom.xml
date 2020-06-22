@@ -61,7 +61,7 @@
 		<dependency>
 			<groupId>org.hibernate</groupId>
 			<artifactId>hibernate-core</artifactId>
-			<version>5.4.2.Final</version>
+			<version>5.4.17.Final</version>
 		</dependency>
 		<dependency>
 			<groupId>com.github.wnameless</groupId>
@@ -112,7 +112,7 @@
 		<dependency>
 			<groupId>org.yaml</groupId>
 			<artifactId>snakeyaml</artifactId>
-			<version>1.25</version>
+			<version>1.26</version>
 		</dependency>
 
 		<dependency>
@@ -131,12 +131,6 @@
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-lang3</artifactId>
 			<version>3.9</version>
-		</dependency>
-
-		<dependency>
-			<groupId>org.hibernate</groupId>
-			<artifactId>hibernate-core</artifactId>
-			<version>5.4.2.Final</version>
 		</dependency>
 
 		<dependency>
