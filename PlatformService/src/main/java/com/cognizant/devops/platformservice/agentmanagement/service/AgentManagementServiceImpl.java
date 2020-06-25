@@ -600,12 +600,26 @@ public class AgentManagementServiceImpl implements AgentManagementService {
 		return toolName + "_" + Instant.now().toEpochMilli();
 	}
 
-	private String getLabelName(String configDetails) {
+	private String getLabelName(String configDetails) throws InsightsCustomException {
 		Gson gson = new Gson();
 		JsonElement jelement = gson.fromJson(configDetails.trim(), JsonElement.class);
 		JsonObject json = jelement.getAsJsonObject();
-		String labelData = json.get("publish").getAsJsonObject().get("data").getAsString().toUpperCase();
-		List<String> labelDataValue = Arrays.asList(labelData.split(MessageConstants.ROUTING_KEY_SEPERATOR));
+		List<String> labelDataValue = null;
+		try {
+			String labelData = json.get("publish").getAsJsonObject().get("data").getAsString().toUpperCase();
+			String labelHealth = json.get("publish").getAsJsonObject().get("health").getAsString().toUpperCase();
+			if (ValidationUtils.checkLabelNameString(labelData)) {
+				throw new InsightsCustomException("Invalid data label Name, it should contain only alphanumeric character,underscore & dot");
+			} 
+			if(ValidationUtils.checkLabelNameString(labelHealth)) {
+				throw new InsightsCustomException("Invalid health label Name, it should contain only alphanumeric character,underscore & dot");
+			}
+			labelDataValue = Arrays.asList(labelData.split(MessageConstants.ROUTING_KEY_SEPERATOR));
+			
+		} catch (Exception e) {
+			log.error("Invalid label Name {} ", e);
+			throw new InsightsCustomException(e.getMessage());
+		}
 		return labelDataValue.get(1);
 
 	}
