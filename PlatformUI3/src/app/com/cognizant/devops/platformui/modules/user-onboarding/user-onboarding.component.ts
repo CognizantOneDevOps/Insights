@@ -688,6 +688,12 @@ export class UserOnboardingComponent implements OnInit {
     }
   }
 
+  trackEvent1 = function (event) {
+    if (event.key === 'Enter') {
+      this.searchData(this.searchOrgForUser, this.selectedAdminOrg)
+    }
+  }
+
 }
 
 
