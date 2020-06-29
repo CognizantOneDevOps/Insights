@@ -1,3 +1,4 @@
+
 {
   "vault": {
     "getFromVault": false,
@@ -10,7 +11,7 @@
     "password": "iSight",
     "host": "127.0.0.1",
     "exchange": "iSight",
-    "agentControlXchg":"iAgent"
+    "agentControlXchg": "iAgent"
   },
   "subscribe": {
     "config": "ALM.PIVOTALTRACKER.config"
@@ -20,45 +21,121 @@
     "health": "ALM.PIVOTALTRACKER.HEALTH"
   },
   "communication": {
-    	"type": "REST",
-    	"sslVerify": false,
-    	"responseType": "JSON"
+    "type": "REST",
+    "sslVerify": false,
+    "responseType": "JSON"
   },
   "dynamicTemplate": {
-   "timeFieldMapping" : {
-		"startDate" : "%Y-%m-%d"
-  	},
-  "responseTemplate": {
-    "id": "storyId",
-    "created_at": "createdAt",
-    "story_type": "storyType",
-    "name": "storyName",
-    "current_state": "currentStoryState"
-  },
-  "relationMetadata": {"labels" : ["LATEST"],"relation":{"properties":["iterationNumber","projectId", "storyId", "backLog","cycleTime","rejectionRate"],"name":"ITERATION_HAS_ISSUES","source":{"constraints":["projectId","storyId"]},"destination":{"constraints":["iterationNumber"]}}},
-  "storyMetadata": {"labels" : ["STORY"],"dataUpdateSupported" : true,"uniqueKey":["projectId","storyId"]}
+    "activityResponseTemplate":{
+      "kind": "kind",
+      "message": "message",
+      "occurred_at": "occurredAt",
+      "performed_by": {
+        "name" : "name",
+        "id" : "performedById"
+      },
+	    "ActivityMetadata" : {
+        "labels" : ["ACTIVITY"],
+        "dataUpdateSupported" : false,
+        "uniqueKey" : ["key"]
+    }
+    },
+    		
+    "iterationResponseTemplate": {
+      "number": "iterationNumber",
+      "start": "iterationStartTime",
+      "finish": "iterationFinishTime",
+      "project_id": "projectId",
+      "length": "iterationLengthInWeek",
+      "velocity": "velocity",
+      "analytics": {
+        "cycle_time": "cycleTime",
+        "rejection_rate": "rejectionRate"
+      }
+    },
+    "timeFieldMapping": {
+      "startDate": "%Y-%m-%d",
+	  "occurredAt":"%Y-%m-%dT%H:%M:%S",
+          "iterationStartTime":"%Y-%m-%dT%H:%M:%S",
+          "iterationFinishTime":"%Y-%m-%dT%H:%M:%S" 
+    },
+    "responseTemplate": {
+      "id": "key",
+      "created_at": "createdAt",
+      "story_type": "storyType",
+      "name": "storyName",
+      "current_state": "currentStoryState",
+      "estimate": "storyPoint",
+      "requested_by_id": "requesterId",
+      "owned_by_id": "ownerId",
+      "project_id": "projectId",
+      "url": "url"
+    },
+    "relationMetadata": {
+      "labels": [
+        "LATEST"
+      ],
+      "relation": {
+        "properties": [
+          "iterationNumber",
+          "projectId",
+          "key",
+          "backLog",
+          "cycleTime",
+          "rejectionRate",
+          "iterationStartTime",
+          "iterationFinishTime",
+          "iterationLengthInWeek"
+        ],
+        "name": "ITERATION_HAS_ISSUES",
+        "source": {
+          "constraints": [
+            "projectId",
+            "key"
+          ]
+        },
+        "destination": {
+          "constraints": [
+            "iterationNumber"
+          ]
+        }
+      }
+    },
+    "storyMetadata": {
+      "labels": [
+        "STORY"
+      ],
+      "dataUpdateSupported": true,
+      "uniqueKey": [
+        "projectId",
+        "key"
+      ]
+    }
   },
   "agentId" : "",
+  "getAllActivity": true,
+  "getAllMembers": true,
   "auth": "base64",
   "runSchedule": 30,
-  "toolCategory" : "ALM",
+  "toolCategory": "ALM",
+  "enableValueArray": false,
   "enableValueArray": false,
   "enableDataValidation": true,
-  "useResponseTemplate" : true,
+  "useResponseTemplate": true,
   "userid": "",
   "passwd": "",
   "token": "",
   "baseEndPoint": "https://www.pivotaltracker.com",
-  "startFrom": "2015-11-29 12:17:45",
-  "toolsTimeZone" : "Asia/Kolkata",
-  "timeStampField":"createdAt",
-  "timeStampFormat":"%Y-%m-%dT%H:%M:%SZ",
-  "isEpochTimeFormat" : false,
-  "agentSecretDetails": ["userid","passwd"],
-  "isDebugAllowed" : true,
-  	"loggingSetting" : {
-		"logLevel" : "WARN",
-		"maxBytes" : 5000000,
-		"backupCount" : 1000
-	}
+  "agentSecretDetails": ["userid","passwd","accesstoken"],
+  "startFrom": "2020-01-1 12:17:45",
+  "toolsTimeZone": "Asia/Kolkata",
+  "timeStampField": "createdAt",
+  "timeStampFormat": "%Y-%m-%dT%H:%M:%SZ",
+  "isEpochTimeFormat": false,
+  "isDebugAllowed": true,
+  "loggingSetting": {
+    "logLevel": "WARN",
+    "maxBytes": 5000000,
+    "backupCount": 1000
+  }
 }
