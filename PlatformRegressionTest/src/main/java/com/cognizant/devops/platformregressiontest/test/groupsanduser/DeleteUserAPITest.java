@@ -66,7 +66,7 @@ public class DeleteUserAPITest extends GroupsAndUserTestData {
 		httpRequest.cookies("JSESSIONID", jSessionID, "grafanaOrg", p.getProperty("grafanaOrg"), "grafanaRole",
 				p.getProperty("grafanaRole"), "XSRF-TOKEN", xsrfToken);
 		httpRequest.header("Authorization", groupsAndUserTestData.authorization);
-		httpRequest.queryParams("orgId", 1);
+		httpRequest.queryParams("orgId", p.getProperty("orgId1"));
 
 		httpRequest.header("Content-Type", "application/json");
 
