@@ -135,6 +135,8 @@ export class RestAPIurlService implements IRestAPIUrlService {
         this.addEndPoint("SSO_DETAIL", '/PlatformService/user/insightsso/getUserDetail');
         this.addEndPoint("SSO_INSIGHTS_URL_LOGOUT", '/PlatformService/user/insightsso/logout');
         this.addEndPoint("SSO_URL_LOGOUT", InsightsInitService.singleSignOnConfig.logoutURL);//
+        this.addEndPoint("KERBEROS_LOGIN_URL","/PlatformService/user/insightsso/authenticateKerberos");
+        this.addEndPoint("KERBEROS_USER_DETAIL", '/PlatformService/user/insightsso/getKerberosUserDetail');
     }
 
     public addEndPoint(name: String, url: String) {

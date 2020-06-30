@@ -39,7 +39,6 @@ export class SSOLoginComponent implements OnInit {
     private route: ActivatedRoute, public messageDialog: MessageDialogService) {
     console.log("Inside new ssoLogin component constructor");
     this.dataShare.setSession();
-
   }
 
   ngOnInit() {
@@ -48,7 +47,6 @@ export class SSOLoginComponent implements OnInit {
   }
 
   public getSSODetail() {
-    this.dataShare.setAuthorizationToken("user");
     this.loginService.loginSSOUserDetail()
       .then(response => {
         console.log("in success ");
@@ -60,15 +58,11 @@ export class SSOLoginComponent implements OnInit {
     console.log(" inside handleTokenSuccess " + apiRes);
     if (apiRes.status = "success") {
       var resData = apiRes.data;
-      //console.log(this.isEmptyObject(resData));
-      //console.log(resData)
       if (this.isEmptyObject(resData)) {
         console.log("Response is empty ");
       }
       if (resData != null || resData != undefined || !this.isEmptyObject(resData)) {
-        //console.log(apiRes);
         let headers = apiRes.headers;
-        //console.log(headers);
         var date = new Date();
         var minutes = 30;
         date.setTime(date.getTime() + (minutes * 60 * 1000));
@@ -78,11 +72,10 @@ export class SSOLoginComponent implements OnInit {
           if (value == "" || value == undefined) {
             console.log("value is not define for cookie " + key);
           } else {
-            if (key != "jtoken" && key !="postLogoutURL" && key !="insights-sso-givenname") {
+            if (key != "jtoken" && key != "postLogoutURL" && key != "insights-sso-givenname") {
               this.cookieService.put(key, value, { storeUnencoded: true, path: '/' })
             }
             if (key == "insights-sso-token") {
-              //var token = 'Basic ' + btoa(this.username + ":" + this.password);
               this.dataShare.setWebAuthToken(resData["insights-sso-token"]);
               this.cookieService.put("username", resData["insights-sso-token"], { storeUnencoded: true, path: '/' });
             } else if (key == "jtoken") {
@@ -113,19 +106,16 @@ export class SSOLoginComponent implements OnInit {
     console.log("Inside handleTokenError")
     console.log(error.status);
     if (error.status === 401) {
-      //this.callSSOLogin();
     } else if (error.status === 403) {
-      //this.callSSOLogin();
     }
   }
 
   callHomePage() {
     var self = this;
-    //this.dataShare.setAuthorizationToken(this.dataShare.getWebAuthToken());
     this.showThrobber = false;
     setTimeout(() => {
       self.router.navigateByUrl('/InSights/Home');
-    }, 150);
+    }, 1);
   }
 
   callSSOLogin() {

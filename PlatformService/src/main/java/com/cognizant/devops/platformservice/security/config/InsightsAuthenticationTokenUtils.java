@@ -30,6 +30,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.kerberos.authentication.KerberosServiceRequestToken;
 import org.springframework.security.providers.ExpiringUsernameAuthenticationToken;
 import org.springframework.security.saml.SAMLCredential;
 
@@ -124,6 +125,15 @@ public class InsightsAuthenticationTokenUtils {
 			ExpiringUsernameAuthenticationToken autharization = new ExpiringUsernameAuthenticationToken(expDate,
 					principal, auth.getCredentials(), updatedAuthorities);
 			SecurityContextHolder.getContext().setAuthentication(autharization);
+		}else if ("Kerberos".equalsIgnoreCase(ApplicationConfigProvider.getInstance().getAutheticationProtocol())) {
+			SecurityContext context = SecurityContextHolder.getContext();
+			KerberosServiceRequestToken authKerberos = (KerberosServiceRequestToken) context.getAuthentication();
+			KerberosServiceRequestToken responseAuth = new KerberosServiceRequestToken(authKerberos.getDetails(), authKerberos.getTicketValidation(),
+					updatedAuthorities, authKerberos.getToken());
+			Log.debug("In successfulAuthentication Older Kerberos GrantedAuthority ==== {} ", authKerberos);
+			Log.debug("In successfulAuthentication Kerberos GrantedAuthority ==== {} ", responseAuth);
+
+			SecurityContextHolder.getContext().setAuthentication(responseAuth);
 		}
 	}
 }

@@ -55,9 +55,9 @@ export class DataSharedService {
     this.storage.remove("customerLogo");
   }
 
-  public setUserName(userNameStr: String): string  {
+  public setUserName(userNameStr: String): string {
     let userName = "";
-    if (InsightsInitService.autheticationProtocol == "SAML") {
+    if (InsightsInitService.autheticationProtocol == "SAML" || InsightsInitService.autheticationProtocol == "Kerberos") {
       userName = this.getSSOUserName();
     } else if (InsightsInitService.autheticationProtocol == "NativeGrafana") {
       userName = userNameStr != undefined ? userNameStr.replace(/['"]+/g, '') : "";
@@ -87,6 +87,14 @@ export class DataSharedService {
 
   }
 
+  public getlogoutDisplay():boolean {
+    if ( InsightsInitService.autheticationProtocol == "Kerberos") {
+      return false;
+    } else if (InsightsInitService.autheticationProtocol == "NativeGrafana" || InsightsInitService.autheticationProtocol == "SAML") {
+      return true;
+    }
+  }
+
   public setSSOLogoutURL(logoutURL: String) {
     this.storage.set("SSOLogoutUrl", logoutURL);
   }
@@ -111,6 +119,8 @@ export class DataSharedService {
       auth_uuid = auth_uuid.substring(0, 15);
       var auth = this.encryptData(auth_uuid, strAuthorization) + auth_uuid;
       this.storage.set("Authorization", auth);
+    } else if (InsightsInitService.autheticationProtocol == "Kerberos") {
+      this.storage.set("Authorization", strAuthorization);
     }
   }
 
@@ -242,5 +252,15 @@ export class DataSharedService {
   public getCurrentYear() {
     var Year = new Date().getFullYear();
     return Year;
+  }
+
+  getCustomizeName(name): String {
+    var returnName: String = "";
+    if (name != undefined && name.length > 16) {
+      returnName = (name.substring(0, 16)) + '..';
+    } else {
+      returnName = (name);
+    }
+    return returnName;
   }
 }

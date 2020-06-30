@@ -45,7 +45,7 @@
         <div class="table-responsive-sm" style="box-sizing: content-box;">
         <table class="table" style="margin-bottom: 0rem;">
           <tr class="mat-line-heading" *ngIf="isExpanded">
-            <span style="padding-left: 4%;" title="{{userName}}"> Welcome: {{userName}} </span>
+            <span style="padding-left: 4%;" title="{{userName}}"> Welcome: {{userDisplayName}} </span>
           </tr>
           <tr class="mat-line-heading" *ngIf="isExpanded">
             <td class="arrange-horizontally-roledetail">
@@ -53,7 +53,7 @@
             </td>
           </tr>
           <tr *ngIf="!isExpanded">
-            <img mat-card-image class="feviconIcon" (click)="showLandingPage()" height="40px" align="center" src='icons/svg/homePage/Insights_Fevicon.png'
+            <img mat-card-image class="feviconIcon" (click)="showLandingPage()" height="35px" align="center" src='icons/svg/homePage/Insights_Fevicon.png'
             />
             <!-- Insights_Fevicon.svg -->
           </tr>
@@ -76,14 +76,15 @@
       <div class="bottomnavg">
         <div class="bottomButton">
           <mat-nav-list *ngIf="isExpanded" class="arrange-horizontally-bottombutton">
-            <ng-container *ngFor="let itemBottom of navItemsBottom">
-              <a [attr.title]="itemBottom.title" mat-list-item class="mat-list-item-bottom" (click)="onItemSelected(itemBottom)">
+            <ng-container *ngFor="let itemBottom of getNavItemsBottomByFilter()">
+              <a [attr.title]="itemBottom.title" mat-list-item [ngClass]="{ 'mat-list-item-bottom' : showLogoutButton ,'mat-list-item-bottomWithoutlogout': !showLogoutButton}" 
+               (click)="onItemSelected(itemBottom)">
                 <p matLine *ngIf="isExpanded" class="mat-line-bottom mat-list-text-bottom ">{{itemBottom.displayName}}</p>
               </a>
             </ng-container>
           </mat-nav-list>
-          <mat-nav-list *ngIf="!isExpanded" class="navItemImageForCollpases">
-            <a *ngIf="!isExpanded" title="Logout" class="mat-list-item-bottom" (click)="logout()">
+          <mat-nav-list *ngIf="!isExpanded && showLogoutButton" [ngClass]="{  'navItemImageForCollpases' : showLogoutButton ,  'navItemImageForCollpasesWithoutlogout': !showLogoutButton}">  
+            <a *ngIf="!isExpanded && showLogoutButton" title="Logout" class="mat-list-item-bottom" (click)="logout()">
               <img mat-card-image class="mat-icon ng-tns-c10-10 material-icons ng-star-inserted" height="24px" align="center" src='icons/svg/homePage/logout.png'
               />
             </a>

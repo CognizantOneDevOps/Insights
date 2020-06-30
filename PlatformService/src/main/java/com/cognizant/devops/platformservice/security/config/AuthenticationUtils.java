@@ -55,6 +55,9 @@ public class AuthenticationUtils {
 	public static final String GRAFANA_SESSION_KEY = "grafana_session";
 	public static final String GRAFANA_ROLE_KEY = "grafanaRole";
 	public static final String GRAFANA_SESSION_COOKIE_KEY = "grafana_session";
+	public static final String GRAFANA_WEBAUTH_HTTP_REQUEST_HEADER="insights-sso-token";
+	public static final String GRAFANA_COOKIES_ORG="grafanaOrg";
+	public static final String GRAFANA_COOKIES_ROLE="grafanaRole";
 
 	public static final String SMAL_SCHEMA = "https";
 	public static final String APPLICATION_CONTEXT_NAME = "/PlatformService";
@@ -63,6 +66,8 @@ public class AuthenticationUtils {
 	public static final String RESPONSE_HEADER_KEY = "responseHeaders";
 	public static final Integer SESSION_TIME = 60;
 	public static final String AUTH_HEADER_KEY = "Authorization";
+	
+	public static final String KERBEROS_AUTH_HEADER_KEY = "authorization";
 
 	public static final String NATIVE_AUTH_PROTOCOL = "NativeGrafana";
 	public static final boolean IS_NATIVE_AUTHENTICATION = NATIVE_AUTH_PROTOCOL
