@@ -48,12 +48,14 @@ export class HomeComponent implements OnInit {
   isExpanded = true;
   element: HTMLElement;
   userName: String = '';
+  userDisplayName: String = '';
   userRole: String = '';
   userCurrentOrg: string = '';
   showAdminTab: boolean = false;
   isToolbarDisplay: boolean = InsightsInitService.enableInsightsBranding;
   showBusinessMapping: boolean = false;
   isValidUser: boolean = false;
+  showLogoutButton: boolean = true;
   iframeStyle = 'width:100%; height:500px;';
   iframeWidth = window.innerWidth - 20;
   iframeHeight = window.innerHeight;
@@ -108,6 +110,8 @@ export class HomeComponent implements OnInit {
     var otherMenu = ((45 / 100) * this.framesize);
     this.framesize = this.framesize - otherMenu; //bottom nav 106 px + tap fix content 110 236
     window.addEventListener('message', receiveMessage, false);
+    this.showLogoutButton = this.dataShare.getlogoutDisplay();
+    console.log(" showLogoutButton "+this.showLogoutButton)
     this.getInformationFromGrafana();
   }
 
@@ -124,7 +128,6 @@ export class HomeComponent implements OnInit {
   loadCustomerLogo() {
     console.log("In Customer logo method");
     this.insightsCustomerLogo = this.dataShare.getCustomerLogo();
-    //console.log(this.insightsCustomerLogo);
     if (this.insightsCustomerLogo == "DefaultLogo") {
       this.insightsCustomerLogo = "";
     }
@@ -159,21 +162,19 @@ export class HomeComponent implements OnInit {
     let self = this;
     this.loadBottomMenuItem();
     this.currentUserWithOrgs = await this.grafanaService.getCurrentUserWithOrgs();
-    //console.log(this.currentUserWithOrgs);
     if (this.currentUserWithOrgs != undefined && this.currentUserWithOrgs.data != undefined) {
       this.userName = this.dataShare.setUserName(self.currentUserWithOrgs.data.userDetail.name);
+      this.userDisplayName=this.dataShare.getCustomizeName(this.userName);
       this.userCurrentOrg = this.currentUserWithOrgs.data.userDetail.orgId;
-      this.currentUserOrgsArray = this.currentUserWithOrgs.data.orgArray;
-      //console.log(this.currentUserOrgsArray);
+      this.currentUserOrgsArray = this.currentUserWithOrgs.data.orgArray
       for (let orgData of this.currentUserOrgsArray) {
         if (orgData.orgId == this.userCurrentOrg) {
           this.selectedOrg = orgData.name;
           this.userRole = orgData.role;
-          this.selectedOrgName = this.getSelectedOrgName(this.selectedOrg);
+          this.selectedOrgName = this.dataShare.getCustomizeName(this.selectedOrg);
         }
       }
       this.dataShare.setOrgAndRole(self.selectedOrg, self.userCurrentOrg, self.userRole);
-      //console.log(self.userRole.toString() + "   " + self.userCurrentOrg);
       this.cookieService.set('grafanaRole', self.userRole.toString());
       this.cookieService.set('grafanaOrg', self.userCurrentOrg);
       this.loadorganizations();
@@ -411,6 +412,7 @@ export class HomeComponent implements OnInit {
         isToolbarDisplay: false,
         showIcon: false,
         title: "About",
+        showMenu: true,
         isAdminMenu: false
       }, {
         displayName: 'Help',
@@ -418,14 +420,16 @@ export class HomeComponent implements OnInit {
         isToolbarDisplay: false,
         showIcon: false,
         title: "Help",
+        showMenu: true,
         isAdminMenu: false
       }, {
         displayName: 'Logout',
         iconName: 'logout',
         route: 'login',
         isToolbarDisplay: false,
-        showIcon: true,
+        showIcon: this.showLogoutButton,
         title: "Logout",
+        showMenu: this.showLogoutButton,
         isAdminMenu: false
       }
     ];
@@ -433,6 +437,10 @@ export class HomeComponent implements OnInit {
 
   getNavItemsByFilter() {
     return this.navItems.filter(x => x.showMenu == true);
+  }
+
+  getNavItemsBottomByFilter() {
+    return this.navItemsBottom.filter(x => x.showMenu == true);
   }
 
   public logout(): void {
@@ -451,12 +459,11 @@ export class HomeComponent implements OnInit {
 
   switchOrganizations(orgId, route, orgName, selectedItem) {
     var self = this;
-    //console.log("In switch organization " + JSON.stringify(this.currentUserOrgs));
     self.defaultOrg = orgId;
     self.grafanaService.switchUserOrg(orgId).then(function (switchorgResponseData) {
       if (switchorgResponseData != null && switchorgResponseData.status == 'success') {
         self.selectedOrg = (selectedItem == undefined ? '' : selectedItem.displayName);
-        self.selectedOrgName = self.getSelectedOrgName(self.selectedOrg);
+        self.selectedOrgName = self.dataShare.getCustomizeName(self.selectedOrg);
         var grafanaCurrentOrgRole;
         for (let orgData of self.currentUserOrgsArray) {
           if (orgData.orgId == orgId) {
@@ -481,20 +488,8 @@ export class HomeComponent implements OnInit {
   }
 
   showLandingPage() {
-    // console.log("ByUrl " + this.router.url);
-    // console.log(this.router.isActive(this.router.url, true))
     this.router.navigate(['InSights/Home'], { skipLocationChange: true });
     this.displayLandingPage = true;
     this.isToolbarDisplay = InsightsInitService.enableInsightsBranding;
-  }
-
-  getSelectedOrgName(orgSelectedName): String {
-    var orgName: String = "";
-    if (orgSelectedName != undefined && orgSelectedName.length > 16) {
-      orgName = (orgSelectedName.substring(0, 16)) + '..';
-    } else {
-      orgName = (orgSelectedName);
-    }
-    return orgName;
   }
 }

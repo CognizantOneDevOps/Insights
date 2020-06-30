@@ -36,7 +36,7 @@ public class SpringMvcInitializer extends AbstractAnnotationConfigDispatcherServ
 	protected Class<?>[] getRootConfigClasses() {
 		Class<?>[] returnArray = null;
 		returnArray = new Class[] { InsightsSecurityConfigurationAdapter.class,
-				InsightsSecurityConfigurationAdapterSAML.class };//, InsightsSecurityConfigurationAdapterKerberos.class 
+				InsightsSecurityConfigurationAdapterSAML.class , InsightsSecurityConfigurationAdapterKerberos.class}; 
 		LOG.debug("In SpringMvcInitializer {} ", Arrays.toString(returnArray));
 		return returnArray;
 	}

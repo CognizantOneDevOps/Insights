@@ -232,7 +232,7 @@ export class HealthCheckComponent implements OnInit {
       //this.reportLogsDataSource.paginator = this.paginator;
     } else {
       //this.showMessage = "Something wrong with Service, Please try again.";
-      this.messageDialog.showApplicationsMessage("No Report available !", "ERROR");
+      //this.messageDialog.showApplicationsMessage("No Report available !", "ERROR");
     }
   }
 

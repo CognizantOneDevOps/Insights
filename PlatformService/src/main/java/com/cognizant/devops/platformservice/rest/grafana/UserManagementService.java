@@ -33,6 +33,7 @@ import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformservice.rest.util.PlatformServiceUtil;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.google.gson.JsonSyntaxException;
 
 @RestController
 @RequestMapping("/admin/userMgmt")
@@ -47,10 +48,16 @@ public class UserManagementService {
 
 	@PostMapping(value = "/getOrgUsers", produces = MediaType.APPLICATION_JSON_VALUE)
 	public JsonObject getOrgUsers(@RequestParam int orgId) throws InsightsCustomException {
-		Map<String, String> headers = PlatformServiceUtil.prepareGrafanaHeader(httpRequest);
-		String response = grafanaHandler.grafanaGet(PATH + orgId + "/users", headers);
-		return PlatformServiceUtil
-				.buildSuccessResponseWithData(new JsonParser().parse(response));
+		try {
+			Map<String, String> headers = PlatformServiceUtil.prepareGrafanaHeader(httpRequest);
+			String response = grafanaHandler.grafanaGet(PATH + orgId + "/users", headers);
+			return PlatformServiceUtil
+					.buildSuccessResponseWithData(new JsonParser().parse(response));
+		} catch (JsonSyntaxException e) {
+			return PlatformServiceUtil.buildFailureResponse("Unable to get current org users");
+		} catch (InsightsCustomException e) {
+			return PlatformServiceUtil.buildFailureResponse("Unable to get current org users,Permission denide ");
+		}
 	}
 
 	@PostMapping(value = "/createOrg", produces = MediaType.APPLICATION_JSON_VALUE)

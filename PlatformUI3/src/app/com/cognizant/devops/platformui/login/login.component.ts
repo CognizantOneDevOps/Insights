@@ -46,6 +46,7 @@ export class LoginComponent implements OnInit, ILoginComponent {
   logMsg: string;
   isLoginError: boolean;
   isDisabled: boolean;
+  kerberosToken:string;
   showThrobber: boolean = false;
   cookies: string;
   username: string;
@@ -54,7 +55,7 @@ export class LoginComponent implements OnInit, ILoginComponent {
   resourceImage: any;
   loginForm: FormGroup;
   imageAlt: String = "";
-  ssoEnable: boolean = false;
+  displayLoginPage: boolean = true;
   year: any;
 
   constructor(private loginService: LoginService, private restAPIUrlService: RestAPIurlService,
@@ -70,31 +71,35 @@ export class LoginComponent implements OnInit, ILoginComponent {
   ngOnInit() {
     var self = this
     console.log("autheticationProtocol " + InsightsInitService.autheticationProtocol)
-    if (InsightsInitService.autheticationProtocol == "SAML") {
+    if (InsightsInitService.autheticationProtocol == "SAML" || InsightsInitService.autheticationProtocol == "Kerberos") {
       console.log(" SSO is enable calling saml login");
       this.dataShare.storeTimeZone();
-      this.ssoEnable = true;
-      this.loginService.loginSSO();
-    } else if (InsightsInitService.autheticationProtocol == "NativeGrafana" || InsightsInitService.autheticationProtocol == "Kerberos") {
+      this.deleteAllPreviousCookies();
+      this.displayLoginPage = false;
+       setTimeout(() => {
+        this.loginService.loginSSO();
+      }, 1000);
+      
+    } else if (InsightsInitService.autheticationProtocol == "NativeGrafana") {
       console.log("Continue on login page ")
       this.deleteAllPreviousCookies();
-      this.getAsyncData();
+      this.getImageAsyncData();
       this.createAndValidateForm();
       this.dataShare.storeTimeZone();
       this.dataShare.removeAuthorization();
       this.dataShare.setWebAuthToken("-");
-    }
+    } 
     this.year = this.dataShare.getCurrentYear();
   }
 
   public createAndValidateForm() {
     this.loginForm = new FormGroup({
       username: new FormControl('', Validators.required),
-      password: new FormControl('', Validators.required),
+      password: new FormControl('', Validators.required)
     });
   }
 
-  async getAsyncData() {
+  async getImageAsyncData() {
     try {
 
       this.resourceImage = await this.grafanaService.getLogoImage();
@@ -117,15 +122,15 @@ export class LoginComponent implements OnInit, ILoginComponent {
     this.deleteAllPreviousCookies();
     this.username = this.loginForm.value.username;
     this.password = this.loginForm.value.password;
-    if (this.username === '' || this.password === '') {
+    this.kerberosToken=this.loginForm.value.kerberosToken;
+    if ((this.username === '' || this.password === '')&&this.kerberosToken==='') {
       this.logMsg = '';
-    } else {
+    } else if (InsightsInitService.autheticationProtocol == "NativeGrafana") {
       var self = this;
       this.isDisabled = true;
       this.showThrobber = true;
       var token = 'Basic ' + btoa(this.username + ":" + this.password);
       this.dataShare.setAuthorizationToken(token);
-
       this.loginService.loginUserAuthentication(this.username, this.password)
         .then((data) => {
           var grafcookies = data.data;
@@ -144,39 +149,7 @@ export class LoginComponent implements OnInit, ILoginComponent {
               this.cookieService.set(key, grafcookies[key], 0, '/');
             }
 
-            var uniqueString = "grfanaLoginIframe";
-            var iframe = document.createElement("iframe");
-            iframe.id = uniqueString;
-            document.body.appendChild(iframe);
-            iframe.style.display = "none";
-            iframe.contentWindow.name = uniqueString;
-            // construct a form with hidden inputs, targeting the iframe
-            var form = document.createElement("form");
-            form.target = uniqueString;
-            form.action = InsightsInitService.grafanaHost + "/login";
-
-            form.method = "POST";
-            // repeat for each parameter
-            var input = document.createElement("input");
-            input.type = "hidden";
-            input.name = "user";
-            input.value = this.username;
-            form.appendChild(input);
-
-            var input1 = document.createElement("input");
-            input1.type = "hidden";
-            input1.name = "password";
-            input1.value = this.password;
-            form.appendChild(input1);
-
-            var input2 = document.createElement("input");
-            input2.type = "hidden";
-            input2.name = "email";
-            input2.value = '';
-            form.appendChild(input2);
-
-            document.body.appendChild(form);
-            form.submit();
+            this.loginGrafana();
             setTimeout(() => {
               //self.showThrobber = false;
               self.router.navigate(['/InSights/Home']);
@@ -202,7 +175,45 @@ export class LoginComponent implements OnInit, ILoginComponent {
           self.isLoginError = true;
           self.isDisabled = false;
         });
+    } else if (InsightsInitService.autheticationProtocol == "Kerberos") {
+      console.log('kerberosToken ' +this.kerberosToken)
+      this.dataShare.setAuthorizationToken(this.kerberosToken);
+     /*  setTimeout(() => {
+        this.router.navigate(['/ssologin']);
+      }, 1000); */
     }
+  }
+
+  private loginGrafana() {
+    var uniqueString = "grfanaLoginIframe";
+    var iframe = document.createElement("iframe");
+    iframe.id = uniqueString;
+    document.body.appendChild(iframe);
+    iframe.style.display = "none";
+    iframe.contentWindow.name = uniqueString;
+    // construct a form with hidden inputs, targeting the iframe
+    var form = document.createElement("form");
+    form.target = uniqueString;
+    form.action = InsightsInitService.grafanaHost + "/login";
+    form.method = "POST";
+    // repeat for each parameter
+    var input = document.createElement("input");
+    input.type = "hidden";
+    input.name = "user";
+    input.value = this.username;
+    form.appendChild(input);
+    var input1 = document.createElement("input");
+    input1.type = "hidden";
+    input1.name = "password";
+    input1.value = this.password;
+    form.appendChild(input1);
+    var input2 = document.createElement("input");
+    input2.type = "hidden";
+    input2.name = "email";
+    input2.value = '';
+    form.appendChild(input2);
+    document.body.appendChild(form);
+    form.submit();
   }
 
   deleteAllPreviousCookies(): void {

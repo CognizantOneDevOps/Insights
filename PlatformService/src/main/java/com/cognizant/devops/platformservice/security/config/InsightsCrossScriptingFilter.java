@@ -61,6 +61,10 @@ public class InsightsCrossScriptingFilter extends OncePerRequestFilter {
 								+ e.getMessage() + " status " + element.get("StatusCode"))
 						.toString();
 				AuthenticationUtils.setResponseMessage(httpResponce, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, msg);
+			} else if (e.getMessage().contains("InsightsAuthenticationException")) {
+				LOG.error("Invalid request in InsightsAuthenticationException CrossScriptingFilter {} ", e.getMessage());
+				AuthenticationUtils.setResponseMessage(httpResponce, AuthenticationUtils.SECURITY_CONTEXT_CODE,
+						"Authentication not successful ,Please relogin ");
 			} else {
 				LOG.error("Invalid request in CrossScriptingFilter {}", e.getMessage());
 				msg = PlatformServiceUtil.buildFailureResponse(

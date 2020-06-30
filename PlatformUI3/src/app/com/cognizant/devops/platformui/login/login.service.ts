@@ -19,6 +19,7 @@ import { RestCallHandlerService } from '@insights/common/rest-call-handler.servi
 import { DataSharedService } from '@insights/common/data-shared-service';
 import { Observable } from 'rxjs'
 import { RestAPIurlService } from '@insights/common/rest-apiurl.service'
+import { InsightsInitService } from '@insights/common/insights-initservice';
 
 @Injectable()
 export class LoginService {
@@ -31,6 +32,12 @@ export class LoginService {
     public loginUserAuthentication(username: string, password: string): Promise<any> {
         var token = this.dataShare.getAuthorizationToken();
         this.response = this.restCallHandlerService.post("USER_AUTHNTICATE", {}, { 'Authorization': token })
+        return this.response.toPromise();
+    }
+
+    public loginKerberosUserAuthentication(username: string, password: string): Promise<any> {
+        var token = this.dataShare.getAuthorizationToken();
+        this.response = this.restCallHandlerService.post("KERBEROS_LOGIN_URL", {}, { 'Authorization': token })
         //console.log(this.response)
         return this.response.toPromise();
     }
@@ -38,7 +45,14 @@ export class LoginService {
     public loginSSOUserDetail(): Promise<any> {
         console.log("SSO Login Call");
         setTimeout(() => console.log("SSO Login Call"), 10);
-        this.response = this.restCallHandlerService.getSSO("SSO_DETAIL", {}, {})
+        if (InsightsInitService.autheticationProtocol == "Kerberos") {
+            //var token = this.dataShare.getAuthorizationToken();
+            this.dataShare.setAuthorizationToken(" ");
+            this.response = this.restCallHandlerService.getSSO("KERBEROS_USER_DETAIL", {}, {})
+        } else if (InsightsInitService.autheticationProtocol == "SAML") {
+            this.dataShare.setAuthorizationToken("user");
+            this.response = this.restCallHandlerService.getSSO("SSO_DETAIL", {}, {})
+        }
         return this.response;
     }
 
