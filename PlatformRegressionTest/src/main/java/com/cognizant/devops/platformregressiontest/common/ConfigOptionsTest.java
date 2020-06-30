@@ -21,5 +21,7 @@ public interface ConfigOptionsTest {
 	String TESTDATA_FILE = "Test_Data.xlsx";
 	String INSIGHTS_HOME = "INSIGHTS_HOME";
 	String CONFIG_DIR = ".InSights";
+	String TESTNG_FILE = "testng.xml";
+
 
 }

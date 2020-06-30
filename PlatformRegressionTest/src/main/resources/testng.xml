@@ -20,8 +20,6 @@
 			<class
 				name="com.cognizant.devops.platformregressiontest.test.correlationbuilder.DeleteCorrelationAPITest" />
 			<class
-				name="com.cognizant.devops.platformregressiontest.test.groupsanduser.CreateOrgAPITest" />
-			<class
 				name="com.cognizant.devops.platformregressiontest.test.groupsanduser.CreateUserAPITest" />
 			<class
 				name="com.cognizant.devops.platformregressiontest.test.groupsanduser.SearchUserAPITest" />

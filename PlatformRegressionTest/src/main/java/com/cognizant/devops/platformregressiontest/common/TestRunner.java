@@ -27,10 +27,11 @@ public class TestRunner {
 
 		List<String> file = new ArrayList<String>();
 		
-		File path = new File("src/test/resources/testng.xml");
-		String xmlPath = path.getAbsolutePath();
+		String path = System.getenv().get(ConfigOptionsTest.INSIGHTS_HOME) + File.separator
+				+ ConfigOptionsTest.CONFIG_DIR + File.separator + ConfigOptionsTest.TESTNG_FILE;
 		
-		file.add(xmlPath);
+
+		file.add(path);
 		TestNG testNG = new TestNG();
 		testNG.setTestSuites(file);
 		testNG.run();
