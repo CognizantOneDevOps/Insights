@@ -72,9 +72,10 @@ export class LogoutHandlerComponent implements OnInit {
       this.loginService.logout()
         .then(function (data) {
           console.log(data);
-          if (data.status == "SUCCESS") {
+          //if (data.status == "success") {
+			console.log(" logout status SUCCESS SUCCESS")
             setTimeout(() => self.router.navigate(['/login']), 1);
-          }
+          //}
         });
     }
     this.deleteAllPreviousCookiesAndSessionValue();

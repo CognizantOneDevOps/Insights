@@ -14,181 +14,181 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  ****************************************************************************** -->
-<div class="overflow1">
-  <div [ngClass]="{ 'landingpageCssCollapse' : !isExpanded , 'landingpageCssExpand': isExpanded}">
-    <div class="headerdiv" autosize="true">
-      <p>
-        <span class="heading1"> Welcome to </span>
-        <span class="textCss">One</span>
-        <span class="heading1">DevOps<sup>TM</sup> | Insights</span>
-      </p>
-    </div>
-    <div class="textcenter">
-      <p>
-        <span class="BlackCss">Leverage </span>
-        <span class="textCssSmall">Real-Time Dashboard </span>
-        <span class="BlackCss">for</span>
-        <span class="heading2"> Devops Journey. </span>
-        <span class="BlackCss">Achieve end-to-end </span>
-        <span class="textCssSmall">Traceability </span>
-        <span class="BlackCss">across the</span>
-        <span class="heading2"> Devops Lifecycle</span>
-      </p>
-    </div>
+<div style="display: flex; justify-content: center; align-items: center">
+  <div class="loading-indicator">
+    <mat-progress-spinner [diameter]="100" *ngIf="showThrobber" color="primary" mode="indeterminate">
+    </mat-progress-spinner>
+  </div>
+</div>
+<div *ngIf="!showThrobber">
+  <div *ngIf="showDashboards">
+    <table>
+      <tr>
+        <td *ngIf="!isRecentEmpty">
+          <div [ngClass]="{'marginforCol' : isStarredMore, 'greaterMarginforCol': enableMarginForRecent}">
+            <mat-icon class="mat-icon material-icons mainText">
+              access_time
+            </mat-icon>
+            <label class="mainText"> Recent Dashboards</label>
+            <mat-grid-list cols="3" rowHeight="120px" [gutterSize]="'10px'" style="width: 80%">
+              <mat-grid-tile *ngFor="let item of recentDashboardLists" [colspan]="1" [rowspan]="1" (click)="onRowClicked(item)">
+                <mat-icon class="dashboardIcon" svgIcon="dashboard"></mat-icon>
+                <mat-grid-tile-footer class="short-desc">
+                  <h3>{{item.title}}</h3>
+                </mat-grid-tile-footer>
+              </mat-grid-tile>
+            </mat-grid-list>
+          </div>
+        </td>
+        <td *ngIf="checkEmptyColRequirements()" style="width: 520px">
+        </td>
+        <td *ngIf="checkEmptyColForRecent()">
+          <div [ngClass]="{'marginforCol' : isRecentMore,'greaterMarginforCol': enableMarginForStarred}">
+            <mat-icon class="mat-icon material-icons mainText">
+              star
+            </mat-icon>
+            <label class="mainText"> Starred Dashboards</label>
+            <mat-grid-list cols="3" rowHeight="120px" [gutterSize]="'10px'" style="width: 80%">
+              <mat-grid-tile *ngFor="let item of starredDashboardLists" [colspan]="1" [rowspan]="1" (click)="onRowClicked(item)">
+                <mat-icon class="dashboardIcon" svgIcon="dashboard"></mat-icon>
+                <mat-grid-tile-footer class="short-desc">
+                  <h3>{{item.title}}</h3>
+                </mat-grid-tile-footer>
+              </mat-grid-tile>
+            </mat-grid-list>
+          </div>
+        </td>
+
+        <td *ngIf="checkNonEmpty()">
+          <div [ngClass]="{'marginforCol' : isRecentMore,'greaterMarginforCol': enableMarginForStarred}">
+            <mat-icon class="mat-icon material-icons mainText">
+              star
+            </mat-icon>
+            <label class="mainText"> Starred Dashboards</label>
+            <mat-grid-list cols="4" rowHeight="120px" [gutterSize]="'10px'">
+              <mat-grid-tile *ngFor="let item of starredDashboardLists" [colspan]="1" [rowspan]="1" (click)="onRowClicked(item)">
+                <mat-icon class="dashboardIcon" svgIcon="dashboard"></mat-icon>
+                <mat-grid-tile-footer class="short-desc">
+                  <h3>{{item.title}}</h3>
+                </mat-grid-tile-footer>
+              </mat-grid-tile>
+            </mat-grid-list>
+          </div>
+        </td>
+        <td *ngIf="checkEmptyColForRecent()" style="width: 520px">
+        </td>
+      </tr>
+
+    </table>
+    <table *ngIf="!isGeneralEmpty" style="margin-top: 5%;">
+      <tr>
+        <td>
+          <mat-icon class="mat-icon material-icons mainText">
+            folder
+          </mat-icon>
+          <label class="mainText"> General Dashboards</label>
+          <mat-grid-list cols="8" rowHeight="120px" [gutterSize]="'10px'">
+            <mat-grid-tile *ngFor="let item of generalDashboardLists" [colspan]="1" [rowspan]="1" (click)="onRowClicked(item)">
+              <mat-icon class="dashboardIcon" svgIcon="dashboard"></mat-icon>
+              <mat-grid-tile-footer class="short-desc">
+                <h3>{{item.title}}</h3>
+              </mat-grid-tile-footer>
+            </mat-grid-tile>
+          </mat-grid-list>
+        </td>
+      </tr>
+    </table>
+    <table *ngIf="!isFolderListEmpty">
+      <tr *ngFor="let folder of folderListArray">
+        <td>
+          <mat-icon class="mat-icon material-icons mainText">
+            folder
+          </mat-icon>
+          <label class="mainText"> {{folder.key}}</label>
+          <mat-grid-list cols="8" rowHeight="120px" [gutterSize]="'10px'">
+            <mat-grid-tile *ngFor="let item of folder.value" (click)="onRowClicked(item)">
+              <mat-icon class="dashboardIcon" svgIcon="dashboard"></mat-icon>
+              <mat-grid-tile-footer class="short-desc">
+                <h3>{{item.title}}</h3>
+              </mat-grid-tile-footer>
+            </mat-grid-tile>
+          </mat-grid-list>
+        </td>
+      </tr>
+    </table>
+  </div>
+</div>
+
+<div *ngIf="showLandingPage">
+  <div class="overflow1">
+    <div [ngClass]="{ 'landingpageCssCollapse' : !isExpanded , 'landingpageCssExpand': isExpanded}">
+      <div class="headerdiv" autosize="true">
+        <p>
+          <span class="heading1"> Welcome to </span>
+          <span class="textCss">One</span>
+          <span class="heading1">DevOps<sup>TM</sup> | Insights</span>
+        </p>
+      </div>
+      <div class="textcenter">
+        <p>
+          <span class="BlackCss">Leverage </span>
+          <span class="textCssSmall">Real-Time Dashboard </span>
+          <span class="BlackCss">for</span>
+          <span class="heading2"> Devops Journey. </span>
+          <span class="BlackCss">Achieve end-to-end </span>
+          <span class="textCssSmall">Traceability </span>
+          <span class="BlackCss">across the</span>
+          <span class="heading2"> Devops Lifecycle</span>
+        </p>
+      </div>
 
       <div class="row">
         <div style="color: #00B140;" class="col-sm-10 offset-sm-1">What does Insights mean to you?</div>
       </div>
 
-    <div>
-      <div class="table-responsive-sm">
-      <table class="table col-sm-10 offset-sm-1 landing-home">
-        <thead>
-          <tr>
-            <td style="color: #0033a0;font-size: 11pt;">
-              For Admin and Powerusers
-            </td>
-            <td style="color: #0033a0;font-size: 11pt;">
-              For Users and Editors
-            </td>
-          </tr>
-        </thead>
-        <tbody>
-        <tr>
-          <td><span>Configure Agents for Collecting Data from DevOps tools</span></td>
-          <td><span>Create Dashboards and Panels for measuring KPI</span></td>
-        </tr>
-        <tr>
-          <td><span>Create and Modify Access Groups and add Users to them</span></td>
-          <td><span>Create Playlists to display Dashboards in Round Robin</span></td>
-        </tr>
-        <tr>
-          <td><span>Archive your data</span></td>
-          <td><span>Measure the overall Progress of DevOps Maturity</span></td>
-        </tr>
-        <tr>
-          <td><span>Monitor the status of the Various Components in Insights</span></td>
-          <td><span>Life of a Code - Know where your code is</span></td>
-        </tr>
-        <tr>
-          <td><span>Get real time notifications by integrating with &nbsp;Communication Channels</span></td>
-          <td><span>Search and Download Reports for Auditing</span></td>
-        </tr>
-      </tbody>
-      </table>
-    </div>
-    </div>
-    
-    <!--<div>
-     <div class="column-image">
-        <mat-icon svgIcon="OrangeLine" [ngStyle]="{height: '200px', width: '1px'}"></mat-icon>
+      <div>
+        <div class="table-responsive-sm">
+          <table class="table col-sm-10 offset-sm-1 landing-home">
+            <thead>
+              <tr>
+                <td style="color: #0033a0;font-size: 11pt;">
+                  For Admin and Powerusers
+                </td>
+                <td style="color: #0033a0;font-size: 11pt;">
+                  For Users and Editors
+                </td>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><span>Configure Agents for Collecting Data from DevOps tools</span></td>
+                <td><span>Create Dashboards and Panels for measuring KPI</span></td>
+              </tr>
+              <tr>
+                <td><span>Create and Modify Access Groups and add Users to them</span></td>
+                <td><span>Create Playlists to display Dashboards in Round Robin</span></td>
+              </tr>
+              <tr>
+                <td><span>Archive your data</span></td>
+                <td><span>Measure the overall Progress of DevOps Maturity</span></td>
+              </tr>
+              <tr>
+                <td><span>Monitor the status of the Various Components in Insights</span></td>
+                <td><span>Life of a Code - Know where your code is</span></td>
+              </tr>
+              <tr>
+                <td><span>Get real time notifications by integrating with &nbsp;Communication Channels</span></td>
+                <td><span>Search and Download Reports for Auditing</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
-      <div class="table-responsive-sm">
-      <table class="table" cellspacing="15" style="margin-top:10px; margin-left:100px;margin-bottom: 0rem;">
-        <tbody>
-        <tr>
-          <td style="color: #0033a0;font-size: 11pt; position: relative; left: 165px;padding-block-end: 3%;">
-            For Admin and Powerusers
-          </td>
-          <td class="BlackCssColumn" style="color: #0033a0;font-size: 11pt;float:left;    margin-top: 1pt;">
-            For Users and Editors
-          </td>
-        </tr>
-        <tr>
-          <td style="float: right;position: relative;left: -20px;">
-            <ul>
-              <div class="BlackCssColumn">
-                <li>
-                  Configure Agents for Collecting Data from DevOps tools
-                </li>
-              </div>
-            </ul>
-          </td>
-          <td>
-            <ul>
-              <div class="BlackCssColumn">
-                <li> Create Dashboards and Panels for measuring KPI</li>
-              </div>
-            </ul>
-          </td>
-        </tr>
-        <tr>
-          <td style="float: right;position: relative;left: -20px;">
-            <ul>
-              <div class="BlackCssColumn">
-                <li>
-                  Create and Modify Access Groups and add Users to them
-                </li>
-              </div>
-            </ul>
-          </td>
-          <td>
-            <ul>
-              <div class="BlackCssColumn">
-                <li> Create Playlists to display Dashboards in Round Robin </li>
-              </div>
-            </ul>
-          </td>
-        </tr>
-        <tr>
-          <td style="float: right;position: relative;left: -20px;">
-            <ul>
-              <div class="BlackCssColumn">
-                <li>
-                  Archive your data
-                </li>
-              </div>
-            </ul>
-          </td>
-          <td>
-            <ul>
-              <div class="BlackCssColumn">
-                <li> Measure the overall Progress of DevOps Maturity </li>
-              </div>
-            </ul>
-          </td>
-        </tr>
-        <tr>
-          <td style="float: right;position: relative;left: -20px;">
-            <ul>
-              <div class="BlackCssColumn">
-                <li>
-                  Monitor the status of the Various Components in Insights
-                </li>
-              </div>
-            </ul>
-          </td>
-          <td>
-            <ul>
-              <div class="BlackCssColumn">
-                <li> Life of a Code - Know where your code is </li>
-              </div>
-            </ul>
-          </td>
-        </tr>
-        <tr>
-          <td style="float: right;position: relative;left: -20px;;">
-            <ul>
-              <div class="BlackCssColumn">
-                <li>
-                  Get real time notifications by integrating with &nbsp;Communication Channels
-                </li>
-              </div>
-            </ul>
-          </td>
-          <td style="padding-bottom:130px;">
-            <ul>
-              <div class="BlackCssColumn">
-                <li> Search and Download Reports for Auditing </li>
-              </div>
-            </ul>
-          </td>
-        </tr>
-      </tbody>
-      </table>
-    </div>
-    </div>-->
-    <div class="bottomgreencode">
-      For more information - please refer to our detailed help section.
+      <div class="bottomgreencode">
+        For more information - please refer to our detailed help section. <br>
+        <p class="ClickHereCss">No Dashboards Found. <b class="hyperlink" (click)="onClickHere()"><u>Click Here</u></b>
+          to add a
+          Dashboard </p>
+      </div>
     </div>
   </div>

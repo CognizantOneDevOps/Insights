@@ -48,8 +48,8 @@ export class GrafanaDashboardComponent implements OnInit {
     constructor(private route: ActivatedRoute, private router: Router,
         private sanitizer: DomSanitizer, private grafanadashboardservice: GrafanaDashboardService, private cookieService: CookieService) {
         var self = this;
-        var offset = 1; // 5px is app-grafana-dashboard height true 5
-        this.framesize = window.frames.innerHeight; //- offset
+        var offset = 55; // 5px is app-grafana-dashboard height true 5
+        this.framesize = window.frames.innerHeight - offset
         console.log(" self.framesize inner height " + self.framesize);
         var receiveMessage = function (evt) {
             var height = parseInt(evt.data);
@@ -62,16 +62,11 @@ export class GrafanaDashboardComponent implements OnInit {
     }
 
     ngOnInit() {
-        this.route.paramMap.subscribe(async (params: ParamMap) => {
-            this.orgId = params.get('id');
-            //console.log("orgid works " + this.orgId);
-            this.selectedDashboard = undefined;
-            //this.dashboardUrl = undefined;
-            this.dashboards = undefined;
-            this.dashboardTitle = undefined;
-            this.selectedDashboardUrl = undefined;
-            this.parseDashboards();
+        var url;
+        this.route.queryParams.subscribe(params => {
+            url = params["dashboardURL"];
         });
+        this.dashboardUrl = this.sanitizer.bypassSecurityTrustResourceUrl(url);
     }
 
     setScrollBarPosition() {
@@ -94,7 +89,7 @@ export class GrafanaDashboardComponent implements OnInit {
         var dashboardslist = await this.grafanadashboardservice.searchDashboard();
         var self = this;
         var dataArray = dashboardslist.dashboards;
-        //console.log(dashboardslist);
+        console.log("dashboards...list in grafana", dashboardslist);
         if (dashboardslist != undefined && dataArray != undefined) {
             if (dataArray.length > 0) {
                 var model = [];
@@ -118,7 +113,7 @@ export class GrafanaDashboardComponent implements OnInit {
             console.log("No dashboard found");
         }
         console.log("parseDashboards complate 1")
-        console.log(this.selectedDashboard);
+
         if (this.selectedDashboard != undefined) {
             this.selectedDashboard.iframeUrl = this.selectedDashboard.iframeUrl.replace("iSight.js", "iSight_ui3.js");
             this.dashboardUrl = this.sanitizer.bypassSecurityTrustResourceUrl(this.selectedDashboard.iframeUrl);
