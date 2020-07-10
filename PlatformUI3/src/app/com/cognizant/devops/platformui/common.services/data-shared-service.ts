@@ -70,6 +70,10 @@ export class DataSharedService {
     return this.storage.get("userName");
   }
 
+  public getOrgId() {
+    return this.storage.get("orgId");
+  }
+
   public setSSOUserName(ssouserName: String) {
     this.storage.set("SsoUserName", ssouserName);
   }
@@ -87,8 +91,8 @@ export class DataSharedService {
 
   }
 
-  public getlogoutDisplay():boolean {
-    if ( InsightsInitService.autheticationProtocol == "Kerberos") {
+  public getlogoutDisplay(): boolean {
+    if (InsightsInitService.autheticationProtocol == "Kerberos") {
       return false;
     } else if (InsightsInitService.autheticationProtocol == "NativeGrafana" || InsightsInitService.autheticationProtocol == "SAML") {
       return true;

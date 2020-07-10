@@ -49,6 +49,7 @@ export class HomeComponent implements OnInit {
   element: HTMLElement;
   userName: String = '';
   userDisplayName: String = '';
+  timeZone: String = '';
   userRole: String = '';
   userCurrentOrg: string = '';
   showAdminTab: boolean = false;
@@ -81,9 +82,11 @@ export class HomeComponent implements OnInit {
   currentUserOrgsArray = []
   currentUserWithOrgs: any;
   insightsCustomerLogo: any;
-  year: any;
+  currentUserDetail: any;
+  lastSeenAtTime: string = ''; year: any;
   aboutPageURL = "https://onedevops.atlassian.net/wiki/spaces/OI/pages/218936/Release+Notes";
   helpPageURL = "https://onedevops.atlassian.net/wiki/spaces/OI/overview";
+
 
   constructor(private grafanaService: GrafanaAuthenticationService,
     private cookieService: CookieService, private config: InsightsInitService,
@@ -111,13 +114,15 @@ export class HomeComponent implements OnInit {
     this.framesize = this.framesize - otherMenu; //bottom nav 106 px + tap fix content 110 236
     window.addEventListener('message', receiveMessage, false);
     this.showLogoutButton = this.dataShare.getlogoutDisplay();
-    console.log(" showLogoutButton "+this.showLogoutButton)
+    console.log(" showLogoutButton " + this.showLogoutButton)
     this.getInformationFromGrafana();
   }
 
   ngOnInit() {
     console.log("Home page constructer nginit ");
     this.loadCustomerLogo();
+    var rightNow = this.dataShare.getTimeZone();
+    this.timeZone = rightNow.split(/\s/).reduce((response, word) => response += word.slice(0, 1), '')
     this.year = this.dataShare.getCurrentYear();
   }
 
@@ -164,7 +169,8 @@ export class HomeComponent implements OnInit {
     this.currentUserWithOrgs = await this.grafanaService.getCurrentUserWithOrgs();
     if (this.currentUserWithOrgs != undefined && this.currentUserWithOrgs.data != undefined) {
       this.userName = this.dataShare.setUserName(self.currentUserWithOrgs.data.userDetail.name);
-      this.userDisplayName=this.dataShare.getCustomizeName(this.userName);
+      this.userDisplayName = this.dataShare.getCustomizeName(this.userName);
+      this.lastSeenAtTime = self.currentUserWithOrgs.data.userDetail.lastSeenAt;
       this.userCurrentOrg = this.currentUserWithOrgs.data.userDetail.orgId;
       this.currentUserOrgsArray = this.currentUserWithOrgs.data.orgArray
       for (let orgData of this.currentUserOrgsArray) {
@@ -190,7 +196,6 @@ export class HomeComponent implements OnInit {
   }
 
 
-
   public async loadorganizations() {
     var self = this;
 
@@ -202,8 +207,8 @@ export class HomeComponent implements OnInit {
         var navItemobj = new NavItem();
         navItemobj.displayName = orgDtl.name;
         navItemobj.iconName = 'grafanaOrg';
-        navItemobj.route = 'InSights/Home/grafanadashboard/' + orgDtl.orgId;
-        navItemobj.isToolbarDisplay = false;
+        navItemobj.route = 'InSights/Home/landingPage';
+        navItemobj.isToolbarDisplay = true;
         navItemobj.showIcon = false;
         navItemobj.isAdminMenu = false;
         navItemobj.orgId = orgDtl.orgId;
@@ -234,6 +239,7 @@ export class HomeComponent implements OnInit {
         if (item.iconName == 'grafanaOrg') {
           this.displayLandingPage = false;
           this.switchOrganizations(item.orgId, item.route, this.selectedOrgName, this.selectedItem);
+          //this.router.navigateByUrl(item.route, { skipLocationChange: true });
         } else if (item.displayName == 'About') {
           this.about();
         } else if (item.displayName == 'Help') {
@@ -480,7 +486,8 @@ export class HomeComponent implements OnInit {
         self.dataShare.setOrgAndRole(orgName, orgId, self.userRole);
         self.cookieService.set('grafanaRole', grafanaCurrentOrgRole);
         self.cookieService.set('grafanaOrg', orgId);
-        self.router.navigateByUrl(route, { skipLocationChange: true });
+        //self.router.navigateByUrl(route, { skipLocationChange: true });
+        self.showLandingPage();
       } else {
         this.messageDialog.showApplicationsMessage(" Error while Organizantion change ,Please try again later ", "ERROR");
       }

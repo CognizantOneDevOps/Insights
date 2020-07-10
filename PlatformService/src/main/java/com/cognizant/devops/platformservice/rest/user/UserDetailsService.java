@@ -18,6 +18,7 @@ package com.cognizant.devops.platformservice.rest.user;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -71,6 +72,8 @@ public class UserDetailsService {
 
 	@Autowired
 	private TokenProviderUtility tokenProviderUtility;
+	
+	GrafanaHandler grafanaHandler = new GrafanaHandler();
 
 	/**used to authenticate Grafana User
 	 * @param request
@@ -315,24 +318,34 @@ public class UserDetailsService {
 	 */
 	@GetMapping(value = "/logout", produces = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
-	public ServiceResponse logout(HttpServletRequest request) {
-		HttpSession session = request.getSession(false);
-		SecurityContextHolder.clearContext();
-		if (session != null) {
-			session.invalidate();
-		}
-		Map<String, String> grafanaHeaders = new HashMap<>();
-		grafanaHeaders.put(AuthenticationUtils.GRAFANA_COOKIES_ORG, null);
-		grafanaHeaders.put(AuthenticationUtils.GRAFANA_COOKIES_ROLE, null);
-		grafanaHeaders.put("grafana_user", null);
-		grafanaHeaders.put("grafana_sess", null);
-		grafanaHeaders.put("grafana_session", null);
-		// To Do : get a service to do a Grafana Logout
+	public JsonObject logout(HttpServletRequest request) {
+		try {
+			HttpSession session = request.getSession(false);
+			SecurityContextHolder.clearContext();
+			if (session != null) {
+				session.invalidate();
+			}
+			boolean isGrafanaLogout = logoutGrafana();
+			if (isGrafanaLogout) {
+				Map<String, String> grafanaHeaders = new HashMap<>();
+				grafanaHeaders.put(AuthenticationUtils.GRAFANA_COOKIES_ORG, null);
+				grafanaHeaders.put(AuthenticationUtils.GRAFANA_COOKIES_ROLE, null);
+				grafanaHeaders.put("grafana_user", null);
+				grafanaHeaders.put("grafana_sess", null);
+				grafanaHeaders.put("grafana_session", null);
 
-		request.setAttribute("responseHeaders", grafanaHeaders);
-		ServiceResponse response = new ServiceResponse();
-		response.setStatus(ConfigOptions.SUCCESS_RESPONSE);
-		return response;
+				request.setAttribute("responseHeaders", grafanaHeaders);
+
+			} else {
+				String message = "Not able to logout Grafana";
+				return PlatformServiceUtil.buildFailureResponse(message);
+			}
+
+
+		} catch (Exception e) {
+			log.error(e);
+		}
+		return PlatformServiceUtil.buildSuccessResponse();
 	}
 
 	/** used to logout SAML application
@@ -345,6 +358,8 @@ public class UserDetailsService {
 			HttpSession session = httpRequest.getSession(false);
 			String auth_token = ValidationUtils.cleanXSS(httpRequest.getHeader("Authorization"));
 			//log.debug(" auth token === " + auth_token);
+			
+			boolean isGrafanaLogout = logoutGrafana();
 			
 			Map<String, String> grafanaHeaders = new HashMap<>();
 			grafanaHeaders.put(AuthenticationUtils.GRAFANA_COOKIES_ORG, null);
@@ -415,5 +430,69 @@ public class UserDetailsService {
 			throw new InsightsCustomException(PlatformServiceConstants.GRAFANA_LOGIN_ISSUE);
 		}
 		return responseJson.get("orgId").toString();
+	}
+	
+	/** Used to logout grafana for user 
+	 * @return
+	 */
+	private boolean logoutGrafana() {
+		boolean isGrafanaLogout = Boolean.FALSE;
+		JsonParser parser = new JsonParser();
+		String logoutResponseStr = null;
+		try {
+			Map<String, String> headers = PlatformServiceUtil.prepareGrafanaHeader(httpRequest);
+
+			String responseUser = grafanaHandler.grafanaGet("/api/user", headers);
+
+			String authString = ApplicationConfigProvider.getInstance().getGrafana().getAdminUserName() + ":"
+					+ ApplicationConfigProvider.getInstance().getGrafana().getAdminUserPassword();
+
+
+			JsonObject userresponse = parser.parse(responseUser).getAsJsonObject();
+
+			int grafanauserId = userresponse.get("id").getAsInt();
+
+			String currentUserName = userresponse.get("login").getAsString();
+
+			String encodedString = Base64.getEncoder().encodeToString(authString.getBytes());
+			headers.put("Authorization", "Basic " + encodedString);
+
+			if (currentUserName
+					.equalsIgnoreCase(ApplicationConfigProvider.getInstance().getGrafana().getAdminUserName())) {
+				log.debug(" admin user logout processing");
+				String currentLoginAuthToken = grafanaHandler
+						.grafanaGet("/api/admin/users/" + grafanauserId + "/auth-tokens", 
+						headers);
+				JsonArray listOfAuthToken = parser.parse(currentLoginAuthToken).getAsJsonArray();
+				log.debug(" admin user logout processing tokal list are {} ", listOfAuthToken.size());
+				for (JsonElement jsonElement : listOfAuthToken) {
+					log.debug(" auth token list {} ", jsonElement.getAsJsonObject());
+					JsonObject authTokenRequest = new JsonObject();
+					authTokenRequest.addProperty("authTokenId", jsonElement.getAsJsonObject().get("id").getAsInt());
+
+					String revokeResponse = grafanaHandler.grafanaPost(
+							"/api/admin/users/" + grafanauserId + "/revoke-auth-token", authTokenRequest, headers);
+					log.debug(" auth token revokeResponse {} ", revokeResponse);
+
+				}
+				logoutResponseStr = "All User auth token revoked";
+			} else {
+				log.debug("normal user logout processing {} ");
+				logoutResponseStr = grafanaHandler.grafanaPost("/api/admin/users/" + grafanauserId + "/logout",
+					new JsonObject(), headers);
+			}
+
+			if (logoutResponseStr != null && (logoutResponseStr.contains("User auth token revoked")
+					|| logoutResponseStr.contains("User logged out")
+					|| logoutResponseStr.contains("All User auth token revoked"))) {
+				log.debug("Grafana logout done successfully  {}", logoutResponseStr);
+				isGrafanaLogout = Boolean.TRUE;
+			} else {
+				log.error("Error while logging out grafana appication {} ", logoutResponseStr);
+			}
+		} catch (Exception e) {
+			log.error(" Logout Grafana " + e);
+		}
+		return isGrafanaLogout;
 	}
 }

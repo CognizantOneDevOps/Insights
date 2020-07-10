@@ -63,4 +63,8 @@ export class GrafanaAuthenticationService implements IAuthenticationService {
         return this.restCallHandlerService.getJSON(restCallUrl);
     }
 
+    currentUserDetail(login: string) {
+        var restHandler = this.restCallHandlerService;
+        return restHandler.postWithData("CURRENT_USER_DETAIL", login, "", { 'Content-Type': 'application/x-www-form-urlencoded' }).toPromise();
+    }
 }
