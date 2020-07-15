@@ -22,6 +22,7 @@ import { DataSharedService } from '@insights/common/data-shared-service';
 import 'rxjs/Rx';
 import { MessageDialogService } from '@insights/app/modules/application-dialog/message-dialog-service';
 import { Router, NavigationExtras } from '@angular/router';
+import { AutheticationProtocol, RequestHeader } from '@insights/common/insights-enum';
 
 @Injectable()
 export class RestCallHandlerService {
@@ -39,8 +40,8 @@ export class RestCallHandlerService {
       var authToken = this.dataShare.getAuthorizationToken();
       var webAuthToken = this.dataShare.getWebAuthToken();
       const headers = new HttpHeaders()
-        .set("Authorization", authToken)
-        .set("user", webAuthToken);
+        .set(RequestHeader.AUTH_TOKEN, authToken)
+        .set(RequestHeader.WEBAUTHUSER, webAuthToken);
       var restCallUrl = this.constructGetUrl(url, requestParams);
       this.asyncResult = await this.http.get(restCallUrl, { headers, withCredentials: true })
         .toPromise().catch(err => { this.handleTokenError(err) });
@@ -55,9 +56,32 @@ export class RestCallHandlerService {
     var authToken = this.dataShare.getAuthorizationToken();
     var webAuthToken = this.dataShare.getWebAuthToken();
     const headers = new HttpHeaders()
-      .set("Authorization", authToken)
+      .set(RequestHeader.AUTH_TOKEN, authToken)
     var restCallUrl = this.constructGetUrl(url, requestParams);
-    //console.log("restCallUrl " + restCallUrl);
+    console.log("restCallUrl " + restCallUrl);
+    this.asyncResult = await this.http.get(restCallUrl, { headers, withCredentials: true }).toPromise();
+    return this.asyncResult;
+  }
+
+  public getSSOJWT(restCallUrl: string, authToken2: string): Observable<any> {
+    var authToken = this.dataShare.getAuthorizationToken();
+    var webAuthToken = this.dataShare.getWebAuthToken();
+    const headers = new HttpHeaders()
+      .set(RequestHeader.AUTH_TOKEN, authToken2)
+    console.log("restCallUrl " + restCallUrl);
+    var asyncResult2 = this.http.get(restCallUrl, { headers, withCredentials: true, observe: 'response' });//.toPromise()
+    console.log(asyncResult2)
+    return asyncResult2;
+  }
+
+  public async getSSOLogout(url: string, requestParams?: Object, additionalheaders?: Object): Promise<any> {
+    var authToken = this.dataShare.getAuthorizationToken();
+    var webAuthToken = this.dataShare.getWebAuthToken();
+    const headers = new HttpHeaders()
+      .set(RequestHeader.AUTH_TOKEN, authToken)
+      .set(RequestHeader.WEBAUTHUSER, webAuthToken);
+    var restCallUrl = this.constructGetUrl(url, requestParams);
+    console.log("restCallUrl " + restCallUrl);
     this.asyncResult = await this.http.get(restCallUrl, { headers, withCredentials: true }).toPromise();
     return this.asyncResult;
   }
@@ -123,8 +147,8 @@ export class RestCallHandlerService {
         }
       }
       headers = new HttpHeaders();
-      headers = headers.set('Authorization', authToken);
-      headers = headers.set('user', webAuthToken);
+      headers = headers.set(RequestHeader.AUTH_TOKEN, authToken);
+      headers = headers.set(RequestHeader.WEBAUTHUSER, webAuthToken);
 
       for (var key in additionalheaders) {
         if (headers.hasOwnProperty(key)) {
@@ -198,8 +222,8 @@ export class RestCallHandlerService {
       }
 
       headers = new HttpHeaders();
-      headers = headers.set('Authorization', authToken);
-      headers = headers.set('user', webAuthToken);
+      headers = headers.set(RequestHeader.AUTH_TOKEN, authToken);
+      headers = headers.set(RequestHeader.WEBAUTHUSER, webAuthToken);
 
       for (var key in additionalheaders) {
         if (headers.hasOwnProperty(key)) {
@@ -234,8 +258,8 @@ export class RestCallHandlerService {
       }
 
       headers = new HttpHeaders();
-      headers = headers.set('Authorization', authToken);
-      headers = headers.set('user', webAuthToken);
+      headers = headers.set(RequestHeader.AUTH_TOKEN, authToken);
+      headers = headers.set(RequestHeader.WEBAUTHUSER, webAuthToken);
       for (var key in additionalheaders) {
         if (headers.hasOwnProperty(key)) {
           headers = headers.set(key, additionalheaders[key]);
@@ -269,8 +293,8 @@ export class RestCallHandlerService {
       }
 
       headers = new HttpHeaders();
-      headers = headers.set('Authorization', authToken);
-      headers = headers.set('user', webAuthToken);
+      headers = headers.set(RequestHeader.AUTH_TOKEN, authToken);
+      headers = headers.set(RequestHeader.WEBAUTHUSER, webAuthToken);
       for (var key in additionalheaders) {
         if (headers.hasOwnProperty(key)) {
           headers = headers.set(key, additionalheaders[key]);
@@ -292,8 +316,8 @@ export class RestCallHandlerService {
   }
 
   handleTokenError(error: HttpErrorResponse) {
-    console.log("Inside handleTokenError in rest-call-Handle.service ")
-    console.log(error.status);
+    console.error("Inside handleTokenError in rest-call-Handle.service " + error.url)
+    console.error(error.status);
     if (error.status === 810 || error.status === 811 || error.status === 812 || error.status === 814) {
       console.error(error);
       let navigationExtras: NavigationExtras = {

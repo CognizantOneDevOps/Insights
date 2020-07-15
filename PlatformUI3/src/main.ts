@@ -20,11 +20,17 @@ import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 
 import { InsightsAppModule } from './app/insights.module';
 import { environment } from './environments/environment';
+import { InsightsInitService } from '@insights/common/insights-initservice';
 
 if (environment.production) {
   enableProdMode();
   if (window) {
-    window.console.log = function () { };
+    if (InsightsInitService.isDebugModeEnable) {
+      console.log(" debug mode enable ")
+    } else {
+      console.log(" debug mode disable " + InsightsInitService.isDebugModeEnable)
+      window.console.log = function () { };
+    }
     window.onbeforeunload = function () { return "Back button is not available!"; window.history.forward(1); };
   }
 }

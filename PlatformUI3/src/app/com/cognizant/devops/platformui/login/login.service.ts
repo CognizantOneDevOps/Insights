@@ -20,6 +20,7 @@ import { DataSharedService } from '@insights/common/data-shared-service';
 import { Observable } from 'rxjs'
 import { RestAPIurlService } from '@insights/common/rest-apiurl.service'
 import { InsightsInitService } from '@insights/common/insights-initservice';
+import { AutheticationProtocol } from '@insights/common/insights-enum';
 
 @Injectable()
 export class LoginService {
@@ -43,8 +44,8 @@ export class LoginService {
     }
 
     public loginSSOUserDetail(): Promise<any> {
-        console.log("SSO Login Call");
-        setTimeout(() => console.log("SSO Login Call"), 10);
+        console.log("SSO Login Call " + InsightsInitService.autheticationProtocol);
+        setTimeout(() => console.log("SSO Login Call"), 1);
         if (InsightsInitService.autheticationProtocol == "Kerberos") {
             //var token = this.dataShare.getAuthorizationToken();
             this.dataShare.setAuthorizationToken(" ");
@@ -52,6 +53,10 @@ export class LoginService {
         } else if (InsightsInitService.autheticationProtocol == "SAML") {
             this.dataShare.setAuthorizationToken("user");
             this.response = this.restCallHandlerService.getSSO("SSO_DETAIL", {}, {})
+        } else if (InsightsInitService.autheticationProtocol == AutheticationProtocol.JWT.toString()) {
+            //var token = this.dataShare.getAuthorizationToken();
+            //this.dataShare.setAuthorizationToken(" ");
+            this.response = this.restCallHandlerService.getSSO("JWT_USER_DETAIL", {}, {})
         }
         return this.response;
     }
@@ -61,8 +66,24 @@ export class LoginService {
         setTimeout(() => window.location.replace(url), 10);
     }
 
+    public loginSSOJWT(authrizationToken: string) {
+        console.log("loginSSOJWT Login Call authrizationToken " + authrizationToken);
+        this.dataShare.setAuthorizationToken(authrizationToken);
+        var url = this.restAPIUrlService.getRestCallUrl("SSO_URL");
+        console.log(" url  " + url);
+        let asyncResult2 = this.restCallHandlerService.getSSOJWT(url, authrizationToken);
+        asyncResult2.subscribe(resp => {
+            console.log(resp.body.toString());
+            let apiresponsea = JSON.parse(JSON.stringify(resp.body));
+            var token = String(apiresponsea.tokenauth)
+            this.dataShare.setAuthorizationToken(token);
+            console.log(this.dataShare.getAuthorizationToken());
+            setTimeout(() => window.location.replace(apiresponsea.urlRedirect), 10);
+        });
+    }
+
     public ssoInsightsLogout(): any {
-        return this.restCallHandlerService.getSSO("SSO_INSIGHTS_URL_LOGOUT");
+        return this.restCallHandlerService.getSSOLogout("SSO_INSIGHTS_URL_LOGOUT");
         //setTimeout(() => window.location.replace(url), 100);
     }
 

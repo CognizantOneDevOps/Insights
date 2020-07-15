@@ -11,7 +11,8 @@
 	},
 	"singleSignOnConfig": {
 		"loginURL": "/PlatformService/saml/login",
-		"logoutURL": "/PlatformService/saml/logout"
+		"logoutURL": "/PlatformService/saml/logout",
+		"jwtTokenOriginURL": "http://localhost:8282"
 	},
 	"serviceHost": "http://localhost:8080",
 	"grafanaHost": "http://localhost:3000",
