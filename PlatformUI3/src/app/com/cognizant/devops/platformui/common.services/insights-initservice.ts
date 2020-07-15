@@ -26,7 +26,7 @@ import { LogService } from '@insights/common/log-service';
 export class InsightsInitService {
 
     location: Location;
-    autheticationProtocolList = ['SAML', 'NativeGrafana', 'Kerberos']
+    autheticationProtocolList = ['SAML', 'NativeGrafana', 'Kerberos', 'JWT']
     static serviceHost: String;
     static grafanaHost: String;
     static webhookHost: String;
@@ -38,6 +38,7 @@ export class InsightsInitService {
     static autheticationProtocol = "NativeGrafana";
     static singleSignOnConfig;
     static enableInsightsBranding = true;
+    static isDebugModeEnable = false;
 
     constructor(location: Location, private http: HttpClient,
         private imageHandler: ImageHandlerService, private logger: LogService) {
@@ -90,6 +91,7 @@ export class InsightsInitService {
         InsightsInitService.autheticationProtocol = UIConfigResponse.autheticationProtocol;
         InsightsInitService.singleSignOnConfig = UIConfigResponse.singleSignOnConfig
         InsightsInitService.enableInsightsBranding = UIConfigResponse.enableInsightsBranding
+        //InsightsInitService.isDebugModeEnable = UIConfigResponse.isDebugModeEnable
     }
 
     private loadImageHandler() {

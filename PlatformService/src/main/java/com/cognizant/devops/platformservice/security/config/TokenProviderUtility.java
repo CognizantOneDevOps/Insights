@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  ******************************************************************************/
-package com.cognizant.devops.platformservice.security.config.saml;
+package com.cognizant.devops.platformservice.security.config;
 
 import java.time.Duration;
 import java.util.Date;
@@ -41,7 +41,6 @@ import org.springframework.stereotype.Repository;
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.core.util.ValidationUtils;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
-import com.cognizant.devops.platformservice.security.config.AuthenticationUtils;
 import com.cognizant.devops.platformservice.traceabilitydashboard.constants.TraceabilityConstants;
 import com.nimbusds.jose.JWSAlgorithm;
 import com.nimbusds.jose.JWSHeader;
@@ -67,6 +66,8 @@ public class TokenProviderUtility {
 			initilizeTokenCache();
 		}
 	}
+
+
 
 	/**
 	 * used to initilize cache
@@ -148,8 +149,7 @@ public class TokenProviderUtility {
 	 * @throws AccountExpiredException
 	 * @throws InsightsCustomException
 	 */
-	public boolean verifyToken(String token) throws AuthorizationServiceException,
-			AuthenticationCredentialsNotFoundException, AccountExpiredException, InsightsCustomException {
+	public boolean verifyToken(String token) throws InsightsCustomException {
 		boolean isVerify = Boolean.FALSE;
 		boolean isTokenExistsInCache = Boolean.FALSE;
 		boolean validateTokenDate = Boolean.FALSE;
@@ -216,6 +216,64 @@ public class TokenProviderUtility {
 		log.debug(" is Token Verify  ====  {} ", isVerify);
 
 		return isVerify;
+	}
+
+	/**
+	 * Used to verify received token without cache
+	 * 
+	 * @param token
+	 * @return
+	 * @throws AuthorizationServiceException
+	 * @throws AuthenticationCredentialsNotFoundException
+	 * @throws AccountExpiredException
+	 * @throws InsightsCustomException
+	 */
+	public JWTClaimsSet verifyAndFetchCliaimsToken(String token) throws InsightsCustomException {
+		boolean isVerify = Boolean.FALSE;
+		boolean validateTokenDate = Boolean.FALSE;
+		JWTClaimsSet claims = null;
+		log.debug(" In verifyAndFetchCliaimsToken method ");
+		try {
+			String authToken = ValidationUtils.cleanXSS(token);
+			if (authToken == null || authToken.isEmpty()) {
+				log.error("authToken is null or empty");
+				throw new InsightsCustomException("authToken is null or empty");
+			}
+
+			// parse the JWS and verify its HMAC
+			SignedJWT signedJWT = SignedJWT.parse(authToken);
+			JWSVerifier verifier = new MACVerifier(signingKey);
+			isVerify = signedJWT.verify(verifier);
+
+			claims = signedJWT.getJWTClaimsSet();
+
+			log.debug("alice  after  username  {} ", signedJWT.getJWTClaimsSet().getSubject());
+			log.debug(" domain {} ", signedJWT.getJWTClaimsSet().getIssuer()); //cognizant.com
+			log.debug("Exceperation Time after  {}", signedJWT.getJWTClaimsSet().getExpirationTime());
+			log.debug("Check date of token with current date {} ",
+					new Date().before(signedJWT.getJWTClaimsSet().getExpirationTime()));//after
+			validateTokenDate = new Date().before(signedJWT.getJWTClaimsSet().getExpirationTime());//after
+
+			if (!isVerify) {
+				log.debug("Token signuture not match ");
+				isVerify = Boolean.FALSE;
+				throw new AuthorizationServiceException("Token signuture not match");
+			} else if (!validateTokenDate) {
+				isVerify = Boolean.FALSE;
+				throw new AccountExpiredException("Token Expire");
+			} else {
+				log.debug("Token verified sucessfully ==== ");
+				isVerify = Boolean.TRUE;
+			}
+		} catch (Exception e) {
+			log.error(e);
+			log.error(" Exception while validating token {} ", e.getMessage());
+			throw new InsightsCustomException("Exception while varifing token ==== " + e.getMessage());
+		}
+
+		log.debug(" is Token Verify  ====  {} ", isVerify);
+
+		return claims;
 	}
 
 	/**

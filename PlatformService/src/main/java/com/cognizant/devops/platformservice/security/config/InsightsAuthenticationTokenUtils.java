@@ -86,6 +86,33 @@ public class InsightsAuthenticationTokenUtils {
 	}
 
 	/**
+	 * Used to validate JWT token Data
+	 * 
+	 * @param request
+	 * @param response
+	 * @return
+	 */
+	public Authentication authenticationJWTData(HttpServletRequest request, HttpServletResponse response) {
+		Log.debug(" Inside authenticationJWTData , url ==== {} ", request.getRequestURI());
+		String auth_token = extractAndValidateAuthToken(request, response);
+		SecurityContext context = SecurityContextHolder.getContext();
+		Authentication auth = context.getAuthentication();
+		if (auth != null) {
+			Object credentials = auth.getCredentials();
+			InsightsAuthenticationToken jwtAuthenticationToken = new InsightsAuthenticationToken(auth_token,
+					auth.getDetails(), credentials, auth.getAuthorities());
+			return jwtAuthenticationToken;
+		} else {
+			//UserDetails user = GrafanaUserDetailsUtil.getUserDetails(request);user.getAuthorities()
+			InsightsAuthenticationToken jwtAuthenticationToken = new InsightsAuthenticationToken(auth_token, null, null,
+					null);
+			/*AuthenticationUtils.setResponseMessage(response, AuthenticationUtils.SECURITY_CONTEXT_CODE,
+					"Authentication not successful ,Please relogin ");*/
+			return jwtAuthenticationToken;
+		}
+	}
+
+	/**
 	 * Extract and validate authrization token
 	 * 
 	 * @param request
@@ -132,6 +159,16 @@ public class InsightsAuthenticationTokenUtils {
 					updatedAuthorities, authKerberos.getToken());
 			Log.debug("In successfulAuthentication Older Kerberos GrantedAuthority ==== {} ", authKerberos);
 			Log.debug("In successfulAuthentication Kerberos GrantedAuthority ==== {} ", responseAuth);
+
+			SecurityContextHolder.getContext().setAuthentication(responseAuth);
+		} else if ("JWT".equalsIgnoreCase(ApplicationConfigProvider.getInstance().getAutheticationProtocol())) {
+			SecurityContext context = SecurityContextHolder.getContext();
+			InsightsAuthenticationToken authKerberos = (InsightsAuthenticationToken) context.getAuthentication();
+
+			InsightsAuthenticationToken responseAuth = new InsightsAuthenticationToken(authKerberos.getPrincipal(),
+					authKerberos.getDetails(), authKerberos.getCredentials(), updatedAuthorities);
+			Log.debug("In successfulAuthentication JWT Older GrantedAuthority ==== {} ", authKerberos);
+			Log.debug("In successfulAuthentication JWT GrantedAuthority ==== {} ", responseAuth);
 
 			SecurityContextHolder.getContext().setAuthentication(responseAuth);
 		}

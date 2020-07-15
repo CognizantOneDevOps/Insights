@@ -20,6 +20,7 @@ import { InsightsInitService } from '@insights/common/insights-initservice';
 import { DataSharedService } from '@insights/common/data-shared-service';
 import { CookieService } from 'ngx-cookie-service';
 import { LoginService } from '@insights/app/login/login.service';
+import { AutheticationProtocol } from '@insights/common/insights-enum';
 
 @Component({
   selector: 'app-logout-handler',
@@ -63,7 +64,11 @@ export class LogoutHandlerComponent implements OnInit {
       this.loginService.ssoInsightsLogout().then(function (responsedata) {
         //console.log(responsedata);
         if (responsedata.status = "success") {
-          self.loginService.singleLogoutSSO(self.dataShare.getSSOLogoutURL());
+          if (InsightsInitService.autheticationProtocol == AutheticationProtocol.SAML.toString()) {
+            self.loginService.singleLogoutSSO(self.dataShare.getSSOLogoutURL());
+          } else {
+            setTimeout(() => self.router.navigate(['/login']), 1);
+          }
         }
       });
     } else {

@@ -27,6 +27,7 @@ import org.springframework.security.providers.ExpiringUsernameAuthenticationToke
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformservice.security.config.InsightsAuthenticationException;
 import com.cognizant.devops.platformservice.security.config.InsightsAuthenticationToken;
+import com.cognizant.devops.platformservice.security.config.TokenProviderUtility;
 
 public class InsightsSAMLTokenAuthenticationImpl implements AuthenticationProvider {
 	
