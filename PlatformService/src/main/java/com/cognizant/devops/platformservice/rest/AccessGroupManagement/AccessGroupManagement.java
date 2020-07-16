@@ -20,10 +20,8 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.NewCookie;
@@ -41,17 +39,14 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
-import com.cognizant.devops.platformcommons.core.util.InsightsUtils;
 import com.cognizant.devops.platformcommons.core.util.ValidationUtils;
 import com.cognizant.devops.platformcommons.dal.grafana.GrafanaHandler;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
-import com.cognizant.devops.platformdal.webhookConfig.WebHookConfig;
 import com.cognizant.devops.platformservice.rest.es.models.DashboardModel;
 import com.cognizant.devops.platformservice.rest.es.models.DashboardResponse;
 import com.cognizant.devops.platformservice.rest.util.PlatformServiceUtil;
 import com.cognizant.devops.platformservice.security.config.AuthenticationUtils;
 import com.cognizant.devops.platformservice.security.config.InsightsAuthenticationTokenUtils;
-import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -423,7 +418,7 @@ public class AccessGroupManagement {
 		log.debug("The Current Grafana OrgId is: " + grafanaCurrentOrg + "\n\n");
 		return grafanaCurrentOrg;
 	}
-
+	
 	@GetMapping(value = "/getDashboardsFoldersDetail", produces = MediaType.APPLICATION_JSON_VALUE)
 	public JsonObject loadDashboardDataGrafana() {
 		Map<String, JsonArray> mapOfFolders = new HashMap<String, JsonArray>();
@@ -453,6 +448,7 @@ public class AccessGroupManagement {
 				JsonObject dashboardData = data.getAsJsonObject();
 				JsonObject datamodel = new JsonObject();
 				datamodel.addProperty("title", dashboardData.get("title").getAsString());
+				datamodel.addProperty("id", dashboardData.get("id").getAsInt());
 				if ("dash-db".equals(dashboardData.get("type").getAsString())) {
 					if (grafanaVersion.contains("5.")) {
 						datamodel.addProperty("url",

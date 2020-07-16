@@ -57,7 +57,6 @@ export class RestAPIurlService implements IRestAPIUrlService {
         this.addEndPoint("GET_GRAFANA_VERSION", "/PlatformService/accessGrpMgmt/getGrafanaVersion");
         this.addEndPoint("SEARCH_DASHBOARD", '/PlatformService/accessGrpMgmt/dashboards');
         this.addEndPoint("CURRENT_USER_DETAIL", '/PlatformService/accessGrpMgmt/currentUserDetail');
-
         this.addEndPoint("SEARCH_DASHBOARD_FOLDERDETAIL", '/PlatformService/accessGrpMgmt/getDashboardsFoldersDetail');
         this.addEndPoint("ORG_USERS_GET", '/PlatformService/admin/userMgmt/getOrgUsers');
         this.addEndPoint("ORG_CREATE", '/PlatformService/admin/userMgmt/createOrg');

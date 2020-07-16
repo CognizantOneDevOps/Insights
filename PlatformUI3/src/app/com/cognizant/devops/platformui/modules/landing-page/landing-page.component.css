@@ -28,6 +28,14 @@
 	cursor: -webkit-grabbing;
 }
 
+.marginCss {
+	margin-top: 2%;
+}
+
+.withoutMarginCss {
+	margin-top: 0%;
+}
+
 .ClickHereCss {
 	font-style: italic;
 	color: black;
@@ -102,7 +110,7 @@ p {
 }
 
 .greaterMarginforCol {
-	margin-top: -200px
+	margin-top: -120px
 }
 
 .mat-grid-tile:nth-child(even) {

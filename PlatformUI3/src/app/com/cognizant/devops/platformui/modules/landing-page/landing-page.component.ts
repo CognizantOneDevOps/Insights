@@ -32,6 +32,7 @@ import { DataSharedService } from '@insights/common/data-shared-service';
 export class LandingPageComponent implements OnInit {
   @Input() isExpanded: boolean = false;
   breakpoint: number;
+  recentdashIds: number[]
   orgId: string;
   dataArrayMasterList: any = {};
   generalDashboardLists = [];
@@ -64,8 +65,11 @@ export class LandingPageComponent implements OnInit {
   folderList: any = {};
   showDashboards: boolean = true;
   folderListArray = [];
+  allData = [];
+  recentDashboardResponse: any;
   rowCountOfStarred: number;
   rowCountOfRecent: number;
+  itemNew: any;
   constructor(public router: Router, private grafanadashboardservice: LandingPageService, private dataShare: DataSharedService) {
     this.router.events.subscribe(event => {
       if (event instanceof NavigationStart) {
@@ -86,6 +90,7 @@ export class LandingPageComponent implements OnInit {
   }
   async parseDashboards() {
     this.showThrobber = true;
+    this.recentdashIds = this.queryForRecentDashboards();
     this.repsonseFromGrafana = await this.grafanadashboardservice.searchDashboard();
     if (this.repsonseFromGrafana.status == "success") {
       this.dashboardslist = this.repsonseFromGrafana.data;
@@ -103,27 +108,6 @@ export class LandingPageComponent implements OnInit {
         if (this.starredDashboardLists.length > 6) {
           this.starredDashboardLists.splice(6, this.starredDashboardLists.length - 1)
         }
-        if (this.recentDashboardLists.length > 6) {
-          this.recentDashboardLists.splice(6, this.recentDashboardLists.length - 1)
-        }
-        this.rowCountOfStarred = this.calculateRows(this.starredDashboardLists);
-        this.rowCountOfRecent = this.calculateRows(this.recentDashboardLists);
-        if (this.rowCountOfStarred > this.rowCountOfRecent) {
-          if (this.rowCountOfStarred == 3 && this.rowCountOfRecent == 1) {
-            this.enableMarginForRecent = true;
-            this.enableMarginForStarred = false;
-          }
-          this.isStarredMore = true;
-          this.isRecentMore = false;
-        }
-        else if (this.rowCountOfStarred < this.rowCountOfRecent) {
-          if (this.rowCountOfStarred == 1 && this.rowCountOfRecent == 3) {
-            this.enableMarginForStarred = true;
-            this.enableMarginForRecent = false;
-          }
-          this.isRecentMore = true;
-          this.isStarredMore = false;
-        }
         this.dataArrayMasterList = this.dashboardslist;
         this.folderList = JSON.parse(JSON.stringify(this.dataArrayMasterList));
         if (Object.keys(this.folderList).length == 0) {
@@ -132,21 +116,62 @@ export class LandingPageComponent implements OnInit {
           delete this.folderList['general']
           delete this.folderList['starred']
           this.folderListArray = [];
+          this.allData = [];
           for (let key in this.folderList) {
             this.folderListArray.push({ key: key, value: this.folderList[key] });
+            this.allData.push(this.folderList[key]);
+          }
+        }
+        this.recentDashboardLists = [];
+        if (this.recentdashIds.length != 0) {
+          this.allData.push(this.generalDashboardLists);
+          if (this.recentdashIds.length > 6) {
+            this.recentdashIds.splice(6, this.recentdashIds.length - 1)
+          }
+          for (let i of this.recentdashIds) {
+            for (let data of this.allData) {
+              var existingValue;
+              existingValue = data.find(x => x.id == i);
+              if (existingValue != undefined) {
+                this.recentDashboardLists.push(existingValue)
+                break;
+              }
+            }
           }
         }
         this.checkList();
       }
+
     }
     else {
       this.showLandingPage = true;
       this.showDashboards = false;
       this.showThrobber = false;
     }
+    this.recentdashIds = this.queryForRecentDashboards();
+
+  }
+  queryForRecentDashboards() {
+    let impressions = window.localStorage[this.impressionKey()] || '[]';
+    impressions = JSON.parse(impressions);
+    impressions = impressions.filter(this.isNumber);
+    const dashIds: number[] = impressions;
+    return dashIds;
+  }
+  isNumber(element) {
+    if (typeof element === 'number') {
+      return true;
+    }
+    else {
+      return false;
+    }
   }
 
-  calculateRows(rowCountArray) {
+  impressionKey() {
+    return 'dashboard_impressions-' + this.dataShare.getOrgId();
+  }
+
+  calculateRowsForStarred(rowCountArray) {
     var myArray = JSON.parse(JSON.stringify(rowCountArray))
     var results = [];
     while (myArray.length) {
@@ -154,7 +179,26 @@ export class LandingPageComponent implements OnInit {
     }
     return results.length;
   }
+  calculateRowsForRecent(rowCountArray) {
+    var myArray = JSON.parse(JSON.stringify(rowCountArray))
+    var results = [];
+    while (myArray.length) {
+      results.push(myArray.splice(0, 3));
+    }
+    return results.length;
+  }
   checkList() {
+    this.rowCountOfStarred = this.calculateRowsForStarred(this.starredDashboardLists);
+    this.rowCountOfRecent = this.calculateRowsForRecent(this.recentDashboardLists);
+    if (this.rowCountOfStarred > this.rowCountOfRecent) {
+      this.isStarredMore = true;
+      this.isRecentMore = false;
+    }
+    else if (this.rowCountOfStarred < this.rowCountOfRecent) {
+      this.isRecentMore = true;
+      this.isStarredMore = false;
+    }
+
     if (this.generalDashboardLists == undefined || this.generalDashboardLists.length == 0) {
       this.isGeneralEmpty = true;
     }
@@ -197,7 +241,6 @@ export class LandingPageComponent implements OnInit {
         "dashboardURL": item.url
       }
     };
-    //console.log(navigationExtras);
     this.router.navigate([route], navigationExtras);
   }
 
@@ -224,8 +267,14 @@ export class LandingPageComponent implements OnInit {
     else {
       return false;
     }
-
-
+  }
+  checkEmptyStarredRecent() {
+    if (this.isStarredEmpty && this.isRecentEmpty) {
+      return true;
+    }
+    else {
+      return false;
+    }
   }
 
 }
