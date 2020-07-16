@@ -25,7 +25,7 @@
     <table>
       <tr>
         <td *ngIf="!isRecentEmpty">
-          <div [ngClass]="{'marginforCol' : isStarredMore, 'greaterMarginforCol': enableMarginForRecent}">
+          <div [ngClass]="{'greaterMarginforCol': isStarredMore}">
             <mat-icon class="mat-icon material-icons mainText">
               access_time
             </mat-icon>
@@ -43,11 +43,11 @@
         <td *ngIf="checkEmptyColRequirements()" style="width: 520px">
         </td>
         <td *ngIf="checkEmptyColForRecent()">
-          <div [ngClass]="{'marginforCol' : isRecentMore,'greaterMarginforCol': enableMarginForStarred}">
+          <div>
             <mat-icon class="mat-icon material-icons mainText">
               star
             </mat-icon>
-            <label class="mainText"> Starred Dashboards</label>
+            <label class="mainText"> Favourite Dashboards</label>
             <mat-grid-list cols="3" rowHeight="120px" [gutterSize]="'10px'" style="width: 80%">
               <mat-grid-tile *ngFor="let item of starredDashboardLists" [colspan]="1" [rowspan]="1" (click)="onRowClicked(item)">
                 <mat-icon class="dashboardIcon" svgIcon="dashboard"></mat-icon>
@@ -58,13 +58,12 @@
             </mat-grid-list>
           </div>
         </td>
-
         <td *ngIf="checkNonEmpty()">
-          <div [ngClass]="{'marginforCol' : isRecentMore,'greaterMarginforCol': enableMarginForStarred}">
+          <div [ngClass]="{'greaterMarginforCol': isRecentMore}">
             <mat-icon class="mat-icon material-icons mainText">
               star
             </mat-icon>
-            <label class="mainText"> Starred Dashboards</label>
+            <label class="mainText"> Favourite Dashboards</label>
             <mat-grid-list cols="4" rowHeight="120px" [gutterSize]="'10px'">
               <mat-grid-tile *ngFor="let item of starredDashboardLists" [colspan]="1" [rowspan]="1" (click)="onRowClicked(item)">
                 <mat-icon class="dashboardIcon" svgIcon="dashboard"></mat-icon>
@@ -80,13 +79,14 @@
       </tr>
 
     </table>
-    <table *ngIf="!isGeneralEmpty" style="margin-top: 5%;">
+    <table *ngIf="!isGeneralEmpty" [ngClass]="{ 'marginCss' : !checkEmptyStarredRecent(),'withoutMarginCss': checkEmptyStarredRecent()}">
       <tr>
         <td>
           <mat-icon class="mat-icon material-icons mainText">
             folder
           </mat-icon>
           <label class="mainText"> General Dashboards</label>
+          <label>{{itemNew}}</label>
           <mat-grid-list cols="8" rowHeight="120px" [gutterSize]="'10px'">
             <mat-grid-tile *ngFor="let item of generalDashboardLists" [colspan]="1" [rowspan]="1" (click)="onRowClicked(item)">
               <mat-icon class="dashboardIcon" svgIcon="dashboard"></mat-icon>
@@ -126,7 +126,8 @@
         <p>
           <span class="heading1"> Welcome to </span>
           <span class="textCss">One</span>
-          <span class="heading1">DevOps<sup>TM</sup> | Insights</span>
+          <span class="heading1">DevOps
+            <sup>TM</sup> | Insights</span>
         </p>
       </div>
       <div class="textcenter">
@@ -161,34 +162,57 @@
             </thead>
             <tbody>
               <tr>
-                <td><span>Configure Agents for Collecting Data from DevOps tools</span></td>
-                <td><span>Create Dashboards and Panels for measuring KPI</span></td>
+                <td>
+                  <span>Configure Agents for Collecting Data from DevOps tools</span>
+                </td>
+                <td>
+                  <span>Create Dashboards and Panels for measuring KPI</span>
+                </td>
               </tr>
               <tr>
-                <td><span>Create and Modify Access Groups and add Users to them</span></td>
-                <td><span>Create Playlists to display Dashboards in Round Robin</span></td>
+                <td>
+                  <span>Create and Modify Access Groups and add Users to them</span>
+                </td>
+                <td>
+                  <span>Create Playlists to display Dashboards in Round Robin</span>
+                </td>
               </tr>
               <tr>
-                <td><span>Archive your data</span></td>
-                <td><span>Measure the overall Progress of DevOps Maturity</span></td>
+                <td>
+                  <span>Archive your data</span>
+                </td>
+                <td>
+                  <span>Measure the overall Progress of DevOps Maturity</span>
+                </td>
               </tr>
               <tr>
-                <td><span>Monitor the status of the Various Components in Insights</span></td>
-                <td><span>Life of a Code - Know where your code is</span></td>
+                <td>
+                  <span>Monitor the status of the Various Components in Insights</span>
+                </td>
+                <td>
+                  <span>Life of a Code - Know where your code is</span>
+                </td>
               </tr>
               <tr>
-                <td><span>Get real time notifications by integrating with &nbsp;Communication Channels</span></td>
-                <td><span>Search and Download Reports for Auditing</span></td>
+                <td>
+                  <span>Get real time notifications by integrating with &nbsp;Communication Channels</span>
+                </td>
+                <td>
+                  <span>Search and Download Reports for Auditing</span>
+                </td>
               </tr>
             </tbody>
           </table>
         </div>
       </div>
       <div class="bottomgreencode">
-        For more information - please refer to our detailed help section. <br>
-        <p class="ClickHereCss">No Dashboards Found. <b class="hyperlink" (click)="onClickHere()"><u>Click Here</u></b>
-          to add a
-          Dashboard </p>
+        For more information - please refer to our detailed help section.
+        <br>
+        <p class="ClickHereCss">No Dashboards Found.
+          <b class="hyperlink" (click)="onClickHere()">
+            <u>Click Here</u>
+          </b>
+          to add a Dashboard </p>
       </div>
     </div>
   </div>
