@@ -32,10 +32,10 @@ detectPythonVersion()
 {
      if echo "$1" | grep -q "Python 2"; then
       echo "Detected python 2 version";
-      python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.ci.azurepipeline.AzurePipelineAgent import AzurePipelineAgent; AzurePipelineAgent()" &
+      python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.deployment.azurerelease.AzureReleaseAgent import AzureReleaseAgent; AzureReleaseAgent()" &
      elif echo "$1" | grep -q "Python 3"; then
       echo "Detected python 3 version";
-      python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.ci.azurepipeline.AzurePipelineAgent3 import AzurePipelineAgent; AzurePipelineAgent()" &
+      python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.deployment.azurerelease.AzureReleaseAgent3 import AzureReleaseAgent; AzureReleaseAgent()" &
      else
       echo "python version not supported"
 	  exit 1;
@@ -46,58 +46,58 @@ detectPythonVersion()
 case "$1" in
   start)
     if [[ $(ps aux | grep '__PS_KEY__' | awk '{print $2}') ]]; then
-     echo "InSightsAzurePipelineAgent already running"
+     echo "InSightsAzureReleaseAgent already running"
     else
-     echo "Starting InSightsAzurePipelineAgent"
-     cd $INSIGHTS_AGENT_HOME/PlatformAgents/azurepipeline
+     echo "Starting InSightsAzureReleaseAgent"
+     cd $INSIGHTS_AGENT_HOME/PlatformAgents/azurerelease
      echo $python_version
      detectPythonVersion "$python_version"
     fi
     if [[ $(ps aux | grep '__PS_KEY__' | awk '{print $2}') ]]; then
-     echo "InSightsAzurePipelineAgent Started Sucessfully"
+     echo "InSightsAzureReleaseAgent Started Sucessfully"
     else
-     echo "InSightsAzurePipelineAgent Failed to Start"
+     echo "InSightsAzureReleaseAgent Failed to Start"
     fi
     ;;
   stop)
-    echo "Stopping InSightsAzurePipelineAgent"
+    echo "Stopping InSightsAzureReleaseAgent"
     if [[ $(ps aux | grep '__PS_KEY__' | awk '{print $2}') ]]; then
      sudo kill -9 $(ps aux | grep '__PS_KEY__' | awk '{print $2}')
     else
-     echo "InSightsAzurePipelineAgent already in stopped state"
+     echo "InSightsAzureReleaseAgent already in stopped state"
     fi
     if [[ $(ps aux | grep '__PS_KEY__' | awk '{print $2}') ]]; then
-     echo "InSightsAzurePipelineAgent Failed to Stop"
+     echo "InSightsAzureReleaseAgent Failed to Stop"
     else
-     echo "InSightsAzurePipelineAgent Stopped"
+     echo "InSightsAzureReleaseAgent Stopped"
     fi
     ;;
   restart)
-    echo "Restarting InSightsAzurePipelineAgent"
+    echo "Restarting InSightsAzureReleaseAgent"
     if [[ $(ps aux | grep '__PS_KEY__' | awk '{print $2}') ]]; then
-     echo "InSightsAzurePipelineAgent stopping"
+     echo "InSightsAzureReleaseAgent stopping"
      sudo kill -9 $(ps aux | grep '__PS_KEY__' | awk '{print $2}')
-     echo "InSightsAzurePipelineAgent stopped"
-     echo "InSightsAzurePipelineAgent starting"
-     cd $INSIGHTS_AGENT_HOME/PlatformAgents/azurepipeline
+     echo "InSightsAzureReleaseAgent stopped"
+     echo "InSightsAzureReleaseAgent starting"
+     cd $INSIGHTS_AGENT_HOME/PlatformAgents/azurerelease
     echo $python_version
      detectPythonVersion "$python_version"
-     echo "InSightsAzurePipelineAgent started"
+     echo "InSightsAzureReleaseAgent started"
     else
-     echo "InSightsAzurePipelineAgent already in stopped state"
-     echo "InSightsAzurePipelineAgent starting"
-     cd $INSIGHTS_AGENT_HOME/PlatformAgents/azurepipeline
+     echo "InSightsAzureReleaseAgent already in stopped state"
+     echo "InSightsAzureReleaseAgent starting"
+     cd $INSIGHTS_AGENT_HOME/PlatformAgents/azurerelease
      echo $python_version
      detectPythonVersion "$python_version"
-     echo "InSightsAzurePipelineAgent started"
+     echo "InSightsAzureReleaseAgent started"
     fi
     ;;
   status)
-    echo "Checking the Status of InSightsAzurePipelineAgent"
+    echo "Checking the Status of InSightsAzureReleaseAgent"
     if [[ $(ps aux | grep '__PS_KEY__' | awk '{print $2}') ]]; then
-     echo "InSightsAzurePipelineAgent is running"
+     echo "InSightsAzureReleaseAgent is running"
     else
-     echo "InSightsAzurePipelineAgent is stopped"
+     echo "InSightsAzureReleaseAgent is stopped"
     fi
     ;;
   *)
