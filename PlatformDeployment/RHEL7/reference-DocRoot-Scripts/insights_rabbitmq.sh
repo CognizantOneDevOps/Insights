@@ -16,7 +16,7 @@
 echo "#################### Installing Erlang , required for Rabbit MQ ####################"
 yum update
 cd /tmp
-wget https://platform.cogdevops.com/insights_install/latest/RHEL/rabbitmq/epel-release-latest-7.noarch.rpm
+wget https://platform.cogdevops.com/insights_install/installationScripts/latest/RHEL/rabbitmq/epel-release-latest-7.noarch.rpm
 sudo yum install epel-release-latest-7.noarch.rpm
 sudo yum --disablerepo="*" --enablerepo="epel" list available
 sudo yum search htop
@@ -24,7 +24,7 @@ sudo yum info hto
 sudo yum install htop
 cd /opt
 sudo mkdir erlang && cd erlang
-sudo wget https://platform.cogdevops.com/insights_install/installationScripts/latest/RHEL/rabbitmq/esl-erlang_23.0-1~centos~7_amd64.rpm
+sudo wget https://platform.cogdevops.com/insights_install/installationScripts/latest/RHEL/rabbitmq/erlang.rpm
 sudo rpm -ivh esl-erlang_23.0-1~centos~7_amd64.rpm
 echo "#################### Installing Rabbit MQ with configs and user creation ####################"
 sudo mkdir rabbitmq && cd rabbitmq
