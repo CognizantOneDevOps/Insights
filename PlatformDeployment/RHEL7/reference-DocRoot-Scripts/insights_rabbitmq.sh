@@ -25,7 +25,7 @@ sudo yum install htop
 cd /opt
 sudo mkdir erlang && cd erlang
 sudo wget https://platform.cogdevops.com/insights_install/installationScripts/latest/RHEL/rabbitmq/erlang.rpm
-sudo rpm -ivh esl-erlang_23.0-1~centos~7_amd64.rpm
+sudo rpm -ivh erlang.rpm
 echo "#################### Installing Rabbit MQ with configs and user creation ####################"
 sudo mkdir rabbitmq && cd rabbitmq
 sudo wget https://platform.cogdevops.com/insights_install/installationScripts/latest/RHEL/rabbitmq/rabbitmq-server.noarch.rpm
