@@ -140,13 +140,13 @@
 	</scm>
 
 	<distributionManagement>
-		<repository>
-			<id>nexus</id>
-			<url>https://repo.cogdevops.com/repository/InsightsEnterpriseRelease</url>
+		<repository> 
+			<id>nexus</id>                
+			<url>https://repo.cogdevops.com/repository/InsightsRelease</url> 
 		</repository>
 		<snapshotRepository>
 			<id>nexus</id>
-			<url>https://repo.cogdevops.com/repository/buildonInsightsEnterprise</url>
+			<url>https://repo.cogdevops.com/repository/buildonInsights</url>
 		</snapshotRepository>
 	</distributionManagement>
 
