@@ -37,3 +37,13 @@ sudo echo NEO4J_INIT_HOME=`pwd` | sudo tee -a /etc/environment
 sudo echo "export" NEO4J_INIT_HOME=`pwd` | sudo tee -a /etc/profile
 source /etc/environment
 source /etc/profile
+sleep 10
+sudo chmod -R 777 /opt/NEO4J_HOME
+cd /etc/init.d/
+sudo wget https://platform.cogdevops.com/insights_install/installationScripts/latest/RHEL/initscripts/Neo4j.sh
+sudo mv Neo4j.sh Neo4j
+sudo chmod +x Neo4j
+sudo chkconfig Neo4j on
+sleep 10
+sudo service Neo4j stop
+sudo service Neo4j start

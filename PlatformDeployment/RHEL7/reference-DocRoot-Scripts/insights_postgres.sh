@@ -15,6 +15,7 @@
 #-------------------------------------------------------------------------------
 # install postgresql
 echo "#################### Installing Postgres with configs , Databases and Roles ####################"
+cd /opt
 sudo rpm -ivh http://platform.cogdevops.com/insights_install/installationScripts/latest/RHEL/postgres/pgdg.noarch.rpm -y
 sudo wget https://platform.cogdevops.com/insights_install/installationScripts/latest/RHEL/postgres/postgres_dependencies.zip
 sudo unzip postgres_dependencies.zip && cd postgres_dependencies

@@ -3,7 +3,7 @@
 #   
 # Licensed under the Apache License, Version 2.0 (the "License"); you may not
 # use this file except in compliance with the License.  You may obtain a copy
-# of the License at
+# of the License ats
 # 
 #   http://www.apache.org/licenses/LICENSE-2.0
 # 
@@ -13,7 +13,7 @@
 # License for the specific language governing permissions and limitations under
 # the License.
 #-------------------------------------------------------------------------------
-echo "#################### Installing Tomcat8 ####################"
+echo "#################### Installing Tomcat9.0.36 ####################"
 cd /opt
 sudo wget https://platform.cogdevops.com/insights_install/release/latest/PlatformUI3.zip -O PlatformUI3.zip
 sudo unzip PlatformUI3.zip && sudo rm -rf PlatformUI3.zip
@@ -27,10 +27,10 @@ sudo rm -rf PlatformService.war
 cd apache-tomcat
 sudo chmod -R 777 /opt/apache-tomcat
 cd /etc/init.d/
-sudo wget https://platform.cogdevops.com/insights_install/installationScripts/latest/RHEL/initscripts/Tomcat8.sh
-sudo mv Tomcat8.sh Tomcat8
-sudo chmod +x Tomcat8
-sudo chkconfig Tomcat8 on
+sudo wget https://platform.cogdevops.com/insights_install/installationScripts/latest/RHEL/initscripts/Tomcat.sh
+sudo mv Tomcat.sh Tomcat
+sudo chmod +x Tomcat
+sudo chkconfig Tomcat on
 sleep 10
-sudo service Tomcat8 stop
-sudo service Tomcat8 start
+sudo service Tomcat stop
+sudo service Tomcat start

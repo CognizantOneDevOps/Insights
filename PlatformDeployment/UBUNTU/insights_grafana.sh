@@ -15,6 +15,7 @@
 # the License.
 #-------------------------------------------------------------------------------
 echo "#################### Installing Grafana (running as BG process) ####################"
+cd /opt
 sudo mkdir grafana
 cd grafana
 sudo wget https://platform.cogdevops.com/insights_install/installationScripts/latest/Ubuntu/packages/grafana/grafana.tar.gz 
