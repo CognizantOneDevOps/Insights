@@ -12,14 +12,14 @@
 	<parent>
 		<artifactId>PlatformParent</artifactId>
 		<groupId>com.cognizant.devops</groupId>
-		<version>6.7</version>
+		<version>6.8-SNAPSHOT</version>
 	</parent>
 
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.cognizant.devops</groupId>
 	<artifactId>PlatformAuditing</artifactId>
 	<packaging>jar</packaging>
-	<version>6.7</version>
+	<version>6.8-SNAPSHOT</version>
 	<name>PlatformAuditing</name>
 	<url>http://maven.apache.org</url>
 
@@ -105,7 +105,7 @@
 		<dependency>
 			<groupId>com.cognizant.devops</groupId>
 			<artifactId>PlatformCommons</artifactId>
-			<version>6.7</version>
+			<version>6.8-SNAPSHOT</version>
 			<exclusions>
 				<exclusion>
 					<groupId>org.apache.logging.log4j</groupId>
