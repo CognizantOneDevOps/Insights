@@ -16,7 +16,7 @@
 #-------------------------------------------------------------------------------
 # install erlang
 #echo "#################### Installing Erlang , required for Rabbit MQ ####################"
-
+cd /opt
 wget https://platform.cogdevops.com/insights_install/installationScripts/latest/Ubuntu/packages/rabbitmq/erlang.zip
 unzip erlang.zip && cd erlang
 sudo dpkg -i *.deb

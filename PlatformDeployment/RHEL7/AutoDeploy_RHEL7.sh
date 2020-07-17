@@ -40,7 +40,7 @@ echo "1)insights_first
 6)insights_grafana
 7)insights_python
 8)insights_rabbitmq
-9)insights_tomcat8
+9)insights_tomcat
 10)insights_enginejar
 11)insights_all"
 read input
@@ -63,7 +63,7 @@ case $package in
    ;;
    "insights_rabbitmq") sudo wget https://platform.cogdevops.com/insights_install/installationScripts/latest/RHEL/scripts/insights_rabbitmq.sh -O insights_rabbitmq.sh && sh insights_rabbitmq.sh
    ;;
-   "insights_tomcat8") sudo wget https://platform.cogdevops.com/insights_install/installationScripts/latest/RHEL/scripts/insights_tomcat8.sh -O insights_tomcat8.sh && sh insights_tomcat8.sh
+   "insights_tomcat") sudo wget https://platform.cogdevops.com/insights_install/installationScripts/latest/RHEL/scripts/insights_tomcat.sh -O insights_tomcat.sh && sh insights_tomcat.sh
    ;;
    "insights_enginejar") sudo wget https://platform.cogdevops.com/insights_install/installationScripts/latest/RHEL/scripts/insights_enginejar.sh -O insights_enginejar.sh && sh insights_enginejar.sh
    ;;

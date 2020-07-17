@@ -15,7 +15,7 @@
 #-------------------------------------------------------------------------------
 
 #!/bin/sh
-# /etc/init.d/Tomcat8
+# /etc/init.d/Tomcat
 
 ### BEGIN INIT INFO
 # Provides: Runs a Tomcat script on startup
