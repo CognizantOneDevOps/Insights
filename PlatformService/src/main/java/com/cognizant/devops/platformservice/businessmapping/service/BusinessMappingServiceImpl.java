@@ -26,7 +26,6 @@ import org.springframework.stereotype.Service;
 
 import com.cognizant.devops.platformcommons.constants.ErrorMessage;
 import com.cognizant.devops.platformcommons.core.util.ValidationUtils;
-import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBException;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphResponse;
 import com.cognizant.devops.platformcommons.dal.neo4j.Neo4jDBHandler;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
@@ -57,7 +56,7 @@ public class BusinessMappingServiceImpl implements BusinessMappingService {
 			JsonArray asJsonArray = rows.getAsJsonArray();
 			JsonObject jsonObject = populateHierarchyDetails(asJsonArray);
 			parentArray.add(jsonObject);
-		} catch (GraphDBException e) {
+		} catch (InsightsCustomException e) {
 			log.error(e);
 			return PlatformServiceUtil.buildFailureResponse(ErrorMessage.DB_INSERTION_FAILED);
 		}
@@ -162,7 +161,7 @@ public class BusinessMappingServiceImpl implements BusinessMappingService {
 	 */
 	@Override
 	public JsonObject getHierarchyProperties(String level1, String level2, String level3, String level4)
-			throws GraphDBException {
+			throws InsightsCustomException {
 		Neo4jDBHandler dbHandler = new Neo4jDBHandler();
 		String queryLabels = ":METADATA:DATATAGGING";
 		StringBuilder sb = new StringBuilder();
@@ -216,7 +215,7 @@ public class BusinessMappingServiceImpl implements BusinessMappingService {
 				log.error(graphResponse);
 				// return "success";
 			}
-		} catch (GraphDBException e) {
+		} catch (InsightsCustomException e) {
 			log.error(e);
 			return PlatformServiceUtil.buildFailureResponse(e.getMessage());
 		}
@@ -237,7 +236,7 @@ public class BusinessMappingServiceImpl implements BusinessMappingService {
 			for (int i = 0; i < size; i++) {
 				propertyList.add(response.getNodes().get(i).getPropertyMap());
 			}
-		} catch (GraphDBException e) {
+		} catch (InsightsCustomException e) {
 			log.error(e);
 			return PlatformServiceUtil.buildFailureResponse(ErrorMessage.DB_INSERTION_FAILED);
 		}
@@ -269,7 +268,7 @@ public class BusinessMappingServiceImpl implements BusinessMappingService {
 		return PlatformServiceUtil.buildSuccessResponse();
 	}
 
-	private JsonArray getCurrentRecords(String uuid, Neo4jDBHandler dbHandler) throws GraphDBException {
+	private JsonArray getCurrentRecords(String uuid, Neo4jDBHandler dbHandler) throws InsightsCustomException {
 		String cypherQuery = " MATCH (n :METADATA:BUSINESSMAPPING) WHERE n.uuid='" + uuid + "'  RETURN n";
 		GraphResponse graphResponse = dbHandler.executeCypherQuery(cypherQuery);
 		JsonArray rows = graphResponse.getJson().get("results").getAsJsonArray().get(0).getAsJsonObject().get("data")

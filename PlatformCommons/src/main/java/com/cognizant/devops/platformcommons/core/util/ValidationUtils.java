@@ -31,6 +31,7 @@ public class ValidationUtils {
 	private static Pattern agentNamePattern = Pattern.compile("[^A-Za-z]", Pattern.CASE_INSENSITIVE);
 	private static Pattern CRLF = Pattern.compile("(\r\n|\r|\n|\n\r)");
 	private static Pattern agentIdPattern = Pattern.compile("[^A-Za-z0-9\\_]", Pattern.CASE_INSENSITIVE);
+	private static Pattern LabelPattern = Pattern.compile("[^A-Za-z0-9\\_\\.]", Pattern.CASE_INSENSITIVE);
 
 	public static String checkHTTPResponseSplitting(String value, boolean isReplace) {
 		Pattern CRLF = Pattern.compile("(\r\n|\r|\n|\n\r)");
@@ -74,6 +75,17 @@ public class ValidationUtils {
 		return returnBoolean;
 	}
 
+	public static boolean checkLabelNameString(String labelData) {
+		boolean returnBoolean = false;
+
+		Matcher m = LabelPattern.matcher(labelData);
+		if (m.find()) {
+			returnBoolean = true;
+		}
+		return returnBoolean;
+	}
+	
+	
 	/**
 	 * Validate response data which doesnot contain any HTML String
 	 * 
@@ -240,7 +252,8 @@ public class ValidationUtils {
 				authTokenDecrypt = AES256Cryptor.decrypt(auth, passkey);
 			} else {
 				log.error(" Invalid token start with basic ");
-				throw new RuntimeException(PlatformServiceConstants.INVALID_TOKEN);
+				authTokenDecrypt=authHeaderToken;
+				//throw new RuntimeException(PlatformServiceConstants.INVALID_TOKEN);
 			}
 		} catch (Exception e) {
 			log.error(" InsightsCustomException Invalid Autharization Token {} ", e.getMessage());

@@ -63,9 +63,9 @@ public class InsightsAuthenticationFilter extends AbstractAuthenticationProcessi
 		} else if (AuthenticationUtils.IS_NATIVE_AUTHENTICATION) {
 			UserDetails user = GrafanaUserDetailsUtil.getUserDetails(request);
 			authentication = authenticationtokenUtils.authenticationNativeGrafana(user);
-		} /*else if (ApplicationConfigProvider.getInstance().getAutheticationProtocol().equalsIgnoreCase("Kerberos")) {
-			//authenticationReturn = authenticationtokenUtils.authenticationSAMLData(request, response);
-			}*/
+		} else if (ApplicationConfigProvider.getInstance().getAutheticationProtocol().equalsIgnoreCase("JWT")) {
+			authentication = authenticationtokenUtils.authenticationJWTData(request, response);
+		}
 		if (authentication != null) {
 			authentication = getAuthenticationManager().authenticate(authentication);
 		}
@@ -97,8 +97,9 @@ public class InsightsAuthenticationFilter extends AbstractAuthenticationProcessi
 		if (exceptionClass != null && exceptionClass.getClass().getName().contains("AccountExpiredException")) {
 			AuthenticationUtils.setResponseMessage(response, AuthenticationUtils.TOKEN_EXPIRE_CODE, "Token Expire ");
 		} else {
+			Log.error(" Error while validating authentication {} ", authException.getMessage());
 			AuthenticationUtils.setResponseMessage(response, AuthenticationUtils.UNAUTHORISE,
-					"Authentication not successful, Please relogin ");
+					"Authentication not successful, Please relogin " + authException.getMessage());
 		}
 	}
 }

@@ -27,9 +27,9 @@ import org.springframework.stereotype.Service;
 
 import com.cognizant.devops.platformcommons.core.util.InsightsUtils;
 import com.cognizant.devops.platformcommons.dal.elasticsearch.ElasticSearchDBHandler;
-import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBException;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphResponse;
 import com.cognizant.devops.platformcommons.dal.neo4j.Neo4jDBHandler;
+import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -62,14 +62,14 @@ public class QueryCachingServiceImpl implements QueryCachingService {
 				log.debug("\n\nFetching Query Cache Results.");
 				resultJson = getEsCachedResults(requestPayload);
 			}
-		} catch (GraphDBException e) {
+		} catch (InsightsCustomException e) {
 			log.error("Error caught - ", e);
 		}
 		return resultJson;
 
 	}
 
-	private JsonObject getNeo4jDatasourceResults(String queryjson) throws GraphDBException {
+	private JsonObject getNeo4jDatasourceResults(String queryjson) throws InsightsCustomException {
 
 		Neo4jDBHandler Neo4jDbHandler = new Neo4jDBHandler();
 		GraphResponse response = null;
@@ -91,9 +91,9 @@ public class QueryCachingServiceImpl implements QueryCachingService {
 			}
 			String[] queriesArray = stringBuilder.toString().split(QueryCachingConstants.NEW_STATEMENT);
 			response = Neo4jDbHandler.executeCypherQueryMultiple(queriesArray);
-		} catch (GraphDBException e) {
+		} catch (InsightsCustomException e) {
 			log.error("\n\nException in neo4j query execution", e);
-			throw e;
+			throw new InsightsCustomException(e.getMessage());
 		}
 		return response.getJson();
 	}
@@ -218,7 +218,7 @@ public class QueryCachingServiceImpl implements QueryCachingService {
 			log.error("\n\nQuery Caching - Error in capturing Elasticsearch response", e);
 			try {
 				return getNeo4jDatasourceResults(requestPayload);
-			} catch (GraphDBException graphDBEx) {
+			} catch (InsightsCustomException graphDBEx) {
 				log.error("\n\nQuery Caching - Exception in neo4j query execution", graphDBEx);
 			}
 		}

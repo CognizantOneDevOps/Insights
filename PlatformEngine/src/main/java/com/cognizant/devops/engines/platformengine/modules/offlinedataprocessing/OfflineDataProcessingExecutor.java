@@ -40,9 +40,9 @@ import com.cognizant.devops.engines.platformengine.modules.offlinedataprocessing
 import com.cognizant.devops.platformcommons.constants.ConfigOptions;
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
 import com.cognizant.devops.platformcommons.core.util.InsightsUtils;
-import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBException;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphResponse;
 import com.cognizant.devops.platformcommons.dal.neo4j.Neo4jDBHandler;
+import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
@@ -208,7 +208,7 @@ public class OfflineDataProcessingExecutor extends TimerTask {
 				dataEnrichmentModel.setRecordsProcessed(recordCount);
 				dataEnrichmentModel.setQueryProcessingTime(queryProcessingTime);
 			}
-		} catch (GraphDBException e) {
+		} catch (InsightsCustomException e) {
 			log.error(cypherQuery + " - query processing failed", e);
 			return Boolean.FALSE;
 		}

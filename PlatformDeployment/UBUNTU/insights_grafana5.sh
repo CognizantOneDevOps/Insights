@@ -16,6 +16,7 @@
 #-------------------------------------------------------------------------------
 # Install customized Grafana V5.2.2
 echo "#################### Installing Grafana (running as BG process) ####################"
+cd /opt
 sudo mkdir grafana
 cd grafana
 export GRAFANA_HOME=`pwd`

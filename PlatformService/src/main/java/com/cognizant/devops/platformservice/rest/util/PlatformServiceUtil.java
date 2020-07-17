@@ -37,16 +37,17 @@ import org.apache.logging.log4j.Logger;
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
 import com.cognizant.devops.platformcommons.core.util.ValidationUtils;
-import com.cognizant.devops.platformcommons.dal.rest.RestHandler;
+import com.cognizant.devops.platformcommons.dal.grafana.GrafanaHandler;
+import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformservice.security.config.AuthenticationUtils;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
-import com.sun.jersey.api.client.Client;
-import com.sun.jersey.api.client.ClientResponse;
-import com.sun.jersey.api.client.WebResource;
+
 
 public class PlatformServiceUtil {
 	private static final Logger log = LogManager.getLogger(PlatformServiceUtil.class);
+	
+	GrafanaHandler grafanaHandler = new GrafanaHandler();
 
 	private PlatformServiceUtil() {
 
@@ -94,13 +95,6 @@ public class PlatformServiceUtil {
 		return jsonResponse;
 	}
 
-	public static ClientResponse publishConfigChanges(String host, int port, JsonObject requestJson) {
-		WebResource resource = Client.create()
-				.resource("http://" + host + ":" + port + "/PlatformEngine/refreshAggregators");
-		ClientResponse response = resource.accept(MediaType.APPLICATION_JSON).type(MediaType.APPLICATION_JSON)
-				.entity(requestJson.toString()).post(ClientResponse.class);
-		return response;
-	}
 
 	public static Cookie[] validateCookies(Cookie[] request_cookies) {
 		Cookie[] cookiesArray = null;
@@ -203,11 +197,11 @@ public class PlatformServiceUtil {
 			final Matcher matcher = pattern.matcher(filename);
 
 			if (matcher.find()) {
-				log.debug("File name is Valid for regex -- " + filename);
+				log.debug("File name is Valid for regex -- {}", filename);
 				return true;
 			}
 		} catch (Exception e) {
-			log.error("Not a valid path -- " + e.getStackTrace());
+			log.error("Not a valid path -- {}", e.getStackTrace());
 		}
 		return false;
 	}
@@ -230,9 +224,10 @@ public class PlatformServiceUtil {
 	 * value
 	 * 
 	 * @return Map of Grafana Header
+	 * @throws InsightsCustomException 
 	 */
-	public static Map<String, String> prepareGrafanaHeader(HttpServletRequest httpRequest) {
-		Map<String, String> headers = new HashMap<String, String>();
+	public static Map<String, String> prepareGrafanaHeader(HttpServletRequest httpRequest) throws InsightsCustomException {
+		Map<String, String> headers = new HashMap<>();
 		if (!AuthenticationUtils.IS_NATIVE_AUTHENTICATION) {
 			String webAuthHeaderKey = ValidationUtils
 					.cleanXSS(httpRequest.getHeader(AuthenticationUtils.GRAFANA_WEBAUTH_HEADER_KEY));
@@ -249,8 +244,9 @@ public class PlatformServiceUtil {
 	 * This method used to return grafana cookies string based on request cookies
 	 * 
 	 * @return string of cookies
+	 * @throws InsightsCustomException 
 	 */
-	public static String getUserCookiesFromRequestCookies(HttpServletRequest httpRequest) {
+	public static String getUserCookiesFromRequestCookies(HttpServletRequest httpRequest) throws InsightsCustomException {
 		Map<String, String> requestCookies = PlatformServiceUtil.getRequestCookies(httpRequest);
 		if (requestCookies.isEmpty() || !requestCookies.containsKey(AuthenticationUtils.GRAFANA_SESSION_COOKIE_KEY)) {
 			if (AuthenticationUtils.IS_NATIVE_AUTHENTICATION) {
@@ -268,8 +264,9 @@ public class PlatformServiceUtil {
 	}
 
 	public static Map<String, String> getGrafanaCookies(HttpServletRequest httpRequest)
-			throws UnsupportedEncodingException {
-		Map<String, String> requestCookies = new HashMap<String, String>(0);
+			throws UnsupportedEncodingException, InsightsCustomException {
+		GrafanaHandler grafanaHandler = new GrafanaHandler();
+		Map<String, String> requestCookies = new HashMap<>(0);
 		String authHeader = ValidationUtils
 				.decryptAutharizationToken(httpRequest.getHeader(AuthenticationUtils.AUTH_HEADER_KEY));
 		String decodedAuthHeader = new String(Base64.getDecoder().decode(authHeader.split(" ")[1]), "UTF-8");
@@ -277,18 +274,15 @@ public class PlatformServiceUtil {
 		JsonObject loginRequestParams = new JsonObject();
 		loginRequestParams.addProperty("user", authTokens[0]);
 		loginRequestParams.addProperty("password", authTokens[1]);
-		String loginApiUrl = PlatformServiceUtil.getGrafanaURL("/login");
-		ClientResponse grafanaLoginResponse = RestHandler.doPost(loginApiUrl, loginRequestParams, null);
-		log.debug("GrafanaUserDetailsUtil ==== status code {} loginApiUrl {} Grafana responce {} ",
-				grafanaLoginResponse.getStatus(), loginApiUrl, grafanaLoginResponse.getEntity(String.class));
-		List<NewCookie> cookies2 = grafanaLoginResponse.getCookies();
+		String loginApiUrl = "/login";
+		List<NewCookie> cookies2 = grafanaHandler.getGrafanaCookies(loginApiUrl, loginRequestParams, null);
 		for (NewCookie cookie : cookies2) {
 			requestCookies.put(cookie.getName(), ValidationUtils.cleanXSS(cookie.getValue()).concat("; HttpOnly"));
 		}
 		return requestCookies;
 	}
 
-	public static String getGrafanaURL(String urlPart) {
+	/*public static String getGrafanaURL(String urlPart) {
 		return ApplicationConfigProvider.getInstance().getGrafana().getGrafanaEndpoint() + urlPart;
-	}
+	}*/
 }

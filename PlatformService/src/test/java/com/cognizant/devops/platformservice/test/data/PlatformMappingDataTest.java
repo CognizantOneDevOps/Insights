@@ -20,7 +20,7 @@ import static org.junit.Assert.assertNotNull;
 
 import org.junit.Test;
 
-
+import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformservice.test.utility.ServiceTestConstants;
 import com.cognizant.devops.platformservice.test.utility.ServiceTestUtilities;
 import com.google.gson.JsonArray;
@@ -31,7 +31,7 @@ public class PlatformMappingDataTest {
   
     
     @Test //Succesful API call for Tools
-    public void testGetToolsList() {//succesful API call
+    public void testGetToolsList() throws InsightsCustomException {//succesful API call
     	String requestPath = "/mappingdata/tools";
         JsonObject jsonObj = ServiceTestUtilities.makeServiceRequest(requestPath,ServiceTestConstants.GET_REQUEST,null);
         JsonArray jsonDataArry = (JsonArray) jsonObj.get("data");
@@ -40,7 +40,7 @@ public class PlatformMappingDataTest {
     }
     
     @Test //When tool name= JENKINS is correct for Tools Category
-    public void testGetToolsCatList() {//Tool name is correct
+    public void testGetToolsCatList() throws InsightsCustomException {//Tool name is correct
     	String requestPath = "/mappingdata/toolsCategory?toolName=JENKINS";
         JsonObject jsonObj = ServiceTestUtilities.makeServiceRequest(requestPath,ServiceTestConstants.GET_REQUEST,null);
         JsonArray jsonDataArry = (JsonArray) jsonObj.get("data");
@@ -49,7 +49,7 @@ public class PlatformMappingDataTest {
     }
     
     @Test //When tool name= JENKINS1 is incorrect for Tools Category
-    public void testGetToolsCatListNullData() {//Tool name is wrong
+    public void testGetToolsCatListNullData() throws InsightsCustomException {//Tool name is wrong
     	String requestPath = "/mappingdata/toolsCategory?toolName=JENKINS1";
         JsonObject jsonObj = ServiceTestUtilities.makeServiceRequest(requestPath,ServiceTestConstants.GET_REQUEST,null);
         JsonArray jsonDataArry = (JsonArray) jsonObj.get("data");  
@@ -59,7 +59,7 @@ public class PlatformMappingDataTest {
     }
     
     @Test //When tool name= JENKINS is correct for Tools Field
-    public void testLoadToolsField() {//Tool name is correct
+    public void testLoadToolsField() throws InsightsCustomException {//Tool name is correct
     	String requestPath = "/mappingdata/toolsField?toolName=JENKINS";
         JsonObject jsonObj = ServiceTestUtilities.makeServiceRequest(requestPath,ServiceTestConstants.GET_REQUEST,null);
         JsonObject obj= (JsonObject) jsonObj.get("data"); //Data elements are fetched
@@ -69,7 +69,7 @@ public class PlatformMappingDataTest {
     }
     
     @Test //When tool name= JENKINS1 is incorrect for Tools Field
-    public void testLoadToolsFieldNullData() {//for wrong tool name
+    public void testLoadToolsFieldNullData() throws InsightsCustomException {//for wrong tool name
     	String requestPath = "/mappingdata/toolsField?toolName=JENKINS1";
         JsonObject jsonObj = ServiceTestUtilities.makeServiceRequest(requestPath,ServiceTestConstants.GET_REQUEST,null);
         JsonObject obj= (JsonObject) jsonObj.get("data");        
@@ -80,7 +80,7 @@ public class PlatformMappingDataTest {
         }
     
     @Test //When tool name= JENKINS is correct for Tools Field Values
-    public void testLoadToolsFieldValue() {//Tool name and Field value is correct
+    public void testLoadToolsFieldValue() throws InsightsCustomException {//Tool name and Field value is correct
     	String requestPath = "/mappingdata/toolsFieldValue?toolName=JENKINS&fieldName=jen_SCMRemoteUrl";
         JsonObject jsonObj = ServiceTestUtilities.makeServiceRequest(requestPath,ServiceTestConstants.GET_REQUEST,null);
         JsonObject obj= (JsonObject) jsonObj.get("data"); //Data elements are fetched
@@ -90,7 +90,7 @@ public class PlatformMappingDataTest {
     }
         
     @Test //When tool name= JENKINS1 is incorrect for Tools Field Values
-    public void testLoadToolsFieldValueNullData() {//Tool name is incorrect and Field value is correct
+    public void testLoadToolsFieldValueNullData() throws InsightsCustomException {//Tool name is incorrect and Field value is correct
     	String requestPath = "/mappingdata/toolsFieldValue?toolName=JENKINS1&fieldName=jen_SCMRemoteUrl";
         JsonObject jsonObj = ServiceTestUtilities.makeServiceRequest(requestPath,ServiceTestConstants.GET_REQUEST,null);
         JsonObject obj= (JsonObject) jsonObj.get("data");
@@ -101,28 +101,28 @@ public class PlatformMappingDataTest {
     //Accessing GET through POST call
     
     @Test //Succesful API call for Tools using POST
-    public void testGetToolsListPost() {//succesful API call
+    public void testGetToolsListPost() throws InsightsCustomException {//succesful API call
     	String requestPath = "/mappingdata/tools";
         JsonObject jsonObj = ServiceTestUtilities.makeServiceRequest(requestPath,ServiceTestConstants.POST_REQUEST,null);
         assertEquals("Should return failure","failure",jsonObj.get("status").getAsString());
     }
     
     @Test //When tool name= JENKINS is correct for Tools Category using POST
-    public void testGetToolsCatListPost() {//Tool name is correct
+    public void testGetToolsCatListPost() throws InsightsCustomException {//Tool name is correct
     	String requestPath = "/mappingdata/toolsCategory?toolName=JENKINS";
         JsonObject jsonObj = ServiceTestUtilities.makeServiceRequest(requestPath,ServiceTestConstants.POST_REQUEST,null);
         assertEquals("Should return failure","failure",jsonObj.get("status").getAsString());
     }
     
     @Test //When tool name= JENKINS is correct for Tools Field using POST
-    public void testLoadToolsFieldPost() {//Tool name is correct
+    public void testLoadToolsFieldPost() throws InsightsCustomException {//Tool name is correct
     	String requestPath = "/mappingdata/toolsField?toolName=JENKINS";
         JsonObject jsonObj = ServiceTestUtilities.makeServiceRequest(requestPath,ServiceTestConstants.POST_REQUEST,null);
         assertEquals("Should return failure","failure",jsonObj.get("status").getAsString());
     }
     
     @Test //When tool name= JENKINS is correct for Tools Field Values using POST
-    public void testLoadToolsFieldValuePost() {//Tool name and Field value is correct
+    public void testLoadToolsFieldValuePost() throws InsightsCustomException {//Tool name and Field value is correct
     	String requestPath = "/mappingdata/toolsFieldValue?toolName=JENKINS&fieldName=jen_SCMRemoteUrl";
         JsonObject jsonObj = ServiceTestUtilities.makeServiceRequest(requestPath,ServiceTestConstants.POST_REQUEST,null);
         assertEquals("Should return failure","failure",jsonObj.get("status").getAsString());

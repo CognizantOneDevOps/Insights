@@ -32,18 +32,17 @@ import org.apache.commons.csv.CSVPrinter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import com.cognizant.devops.engines.platformengine.message.core.EngineStatusLogger;
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.constants.ConfigOptions;
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
 import com.cognizant.devops.platformcommons.core.util.DataPurgingUtils;
 import com.cognizant.devops.platformcommons.core.util.InsightsUtils;
 import com.cognizant.devops.platformcommons.dal.elasticsearch.ElasticSearchDBHandler;
-import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBException;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphResponse;
 import com.cognizant.devops.platformcommons.dal.neo4j.Neo4jDBHandler;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformdal.settingsconfig.SettingsConfigurationDAL;
-import com.cognizant.devops.engines.platformengine.message.core.EngineStatusLogger;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -101,7 +100,7 @@ public class DataPurgingExecutor extends TimerTask {
 			String fileLocation = backupFileLocation + File.separator + backupFilePrefix + "_" + localDateTime;
 			writeToJsonFile(responseList, fileLocation);
 
-		} catch (GraphDBException e) {
+		} catch (InsightsCustomException e) {
 			log.error("Exception occured while selecting matching records for a specific data rentention period:" + e);
 			deleteFlag = false;
 		} catch (IOException e) {
@@ -118,7 +117,7 @@ public class DataPurgingExecutor extends TimerTask {
 			try {
 				dbHandler.executeCypherQuery(deleteQry);
 
-			} catch (GraphDBException e) {
+			} catch (InsightsCustomException e) {
 				log.error(
 						"Exception occured while deleting DATA nodes of Neo4j database inside DataPurgingExecutor Job: "
 								+ e);
@@ -184,10 +183,10 @@ public class DataPurgingExecutor extends TimerTask {
 	 * @param epochTime
 	 * @param dbHandler
 	 * @return
-	 * @throws GraphDBException
+	 * @throws InsightsCustomException
 	 */
 	private List<GraphResponse> getAllOrphanNodesInfo(List<GraphResponse> resultList, String rowLimit, long epochTime,
-			Neo4jDBHandler dbHandler) throws GraphDBException {
+			Neo4jDBHandler dbHandler) throws InsightsCustomException {
 		GraphResponse response = null;
 		int splitlength = 0;
 		try {
@@ -198,7 +197,7 @@ public class DataPurgingExecutor extends TimerTask {
 				splitlength = splitlength + Integer.parseInt(rowLimit);
 
 			}
-		} catch (GraphDBException e) {
+		} catch (InsightsCustomException e) {
 			log.error(
 					"Exception occured while getting information of all orphan data nodes in DataPurgingExecutor Job: "
 							+ e);
@@ -215,10 +214,10 @@ public class DataPurgingExecutor extends TimerTask {
 	 * @param epochTime
 	 * @param dbHandler
 	 * @return
-	 * @throws GraphDBException
+	 * @throws InsightsCustomException
 	 */
 	private List<GraphResponse> getNodesRelationshipsInfo(List<GraphResponse> resultList, String rowLimit,
-			long epochTime, Neo4jDBHandler dbHandler) throws GraphDBException {
+			long epochTime, Neo4jDBHandler dbHandler) throws InsightsCustomException {
 		GraphResponse response = null;
 		int splitlength = 0;
 		try {
@@ -229,30 +228,30 @@ public class DataPurgingExecutor extends TimerTask {
 				splitlength = splitlength + Integer.parseInt(rowLimit);
 
 			}
-		} catch (GraphDBException e) {
+		} catch (InsightsCustomException e) {
 			log.error(
 					"Exception occured while getting information of all nodes with relationships in DataPurgingExecutor Job:"
 							+ e);
-			throw e;
+			throw new InsightsCustomException(e.getMessage());
 		}
 		return resultList;
 	}
 
-	private int getOrphanNodeCount(Neo4jDBHandler dbHandler, long epochTime) throws GraphDBException {
+	private int getOrphanNodeCount(Neo4jDBHandler dbHandler, long epochTime) throws InsightsCustomException {
 		String cntQry = "MATCH (n:DATA) WHERE not (n)-[]-() and n.inSightsTime<" + epochTime + " return count(*)";
 		GraphResponse cntResponse = dbHandler.executeCypherQuery(cntQry);
 		return cntResponse.getJson().get("results").getAsJsonArray().get(0).getAsJsonObject().get("data")
 				.getAsJsonArray().get(0).getAsJsonObject().get("row").getAsInt();
 	}
 
-	private int getNodesWithRelationshipsCount(Neo4jDBHandler dbHandler, long epochTime) throws GraphDBException {
+	private int getNodesWithRelationshipsCount(Neo4jDBHandler dbHandler, long epochTime) throws InsightsCustomException {
 		String cntQry = "MATCH (n:DATA)-[r]->(m:DATA) where n.inSightsTime<" + epochTime + " return count(*)";
 		GraphResponse cntResponse = dbHandler.executeCypherQuery(cntQry);
 		return cntResponse.getJson().get("results").getAsJsonArray().get(0).getAsJsonObject().get("data")
 				.getAsJsonArray().get(0).getAsJsonObject().get("row").getAsInt();
 	}
 
-	private GraphResponse getOrphanNodesInfo(String limit, int splitlength, long epochTime) throws GraphDBException {
+	private GraphResponse getOrphanNodesInfo(String limit, int splitlength, long epochTime) throws InsightsCustomException {
 		Neo4jDBHandler dbHandler = new Neo4jDBHandler();
 		String query = "MATCH (n:DATA) WHERE not(n)-[]-() and n.inSightsTime<" + epochTime + " return n skip "
 				+ splitlength + " limit " + limit;
@@ -260,7 +259,7 @@ public class DataPurgingExecutor extends TimerTask {
 	}
 
 	private GraphResponse getNodesWithRelationshipInfo(String limit, int splitlength, long epochTime)
-			throws GraphDBException {
+			throws InsightsCustomException {
 		Neo4jDBHandler dbHandler = new Neo4jDBHandler();
 		String query = "MATCH (n:DATA)-[r]->(m:DATA) where n.inSightsTime<" + epochTime + " return distinct n,r,m skip "
 				+ splitlength + " limit " + limit;

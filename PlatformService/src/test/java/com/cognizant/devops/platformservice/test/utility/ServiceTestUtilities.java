@@ -20,30 +20,31 @@ import java.util.Map;
 
 import javax.ws.rs.core.MediaType;
 
-import com.cognizant.devops.platformcommons.dal.rest.RestHandler;
+import com.cognizant.devops.platformcommons.dal.grafana.GrafanaHandler;
+import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import com.sun.jersey.api.client.ClientResponse;
 
 public class ServiceTestUtilities {
 
-	public static JsonObject makeServiceRequest(String path, String requestType, JsonElement jsonElement) {
+	public static JsonObject makeServiceRequest(String path, String requestType, JsonElement jsonElement) throws InsightsCustomException {
+		GrafanaHandler grafanaHandler = new GrafanaHandler();
 		String requestUrl = ServiceTestConstants.BASE_URI + path;
 
 		Map<String, String> requestHeaders = new HashMap<String, String>();
 		requestHeaders.put("Authorization", ServiceTestConstants.AUTH);
 		requestHeaders.put("Accept", MediaType.APPLICATION_JSON);
-		ClientResponse response = null;
+		String response = null;
 		JsonObject jsonObj = new JsonObject();
 		if ("GET".equalsIgnoreCase(requestType)) {
-			response = RestHandler.doGet(requestUrl, null, requestHeaders);
+			response = grafanaHandler.grafanaGet(requestUrl, requestHeaders);
 		} else if ("POST".equalsIgnoreCase(requestType)) {
-			response = RestHandler.doPost(requestUrl, jsonElement, requestHeaders);
+			response = grafanaHandler.grafanaPost(requestUrl, jsonElement, requestHeaders);
 		}
 
-		if (null != response) {
+		/*if (null != response) {
 			if (response.getStatusInfo().getStatusCode() == 200) {
 				String jsonResp = response.getEntity(String.class);
 				System.out.println(jsonResp);
@@ -54,6 +55,15 @@ public class ServiceTestUtilities {
 				jsonObj.addProperty("status","failure");
 				jsonObj.add("statusInfo", new Gson().toJsonTree(response.getStatusInfo()));
 			}
+		}*/
+		
+		if( null != response ){
+    		String jsonResp = response;
+    		System.out.println(jsonResp);
+    		JsonParser jsonParser = new JsonParser();
+    		jsonObj = (JsonObject)jsonParser.parse(jsonResp);
+    	} else {
+			jsonObj.addProperty("status","failure");
 		}
 
 		return jsonObj;

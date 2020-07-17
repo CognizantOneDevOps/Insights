@@ -71,7 +71,7 @@ public class GroupsAndUserTest extends AbstractTestNGSpringContextTests {
 	private FilterChainProxy springSecurityFilterChain;
 
 	@BeforeTest
-	public void onInit() throws InterruptedException, IOException {
+	public void onInit() throws InterruptedException, IOException, InsightsCustomException {
 		ApplicationConfigCache.loadConfigCache();
 		httpRequest.addHeader("Authorization", groupsAndUserTestData.authorization);
 		Map<String, String> cookiesMap = PlatformServiceUtil.getGrafanaCookies(httpRequest);

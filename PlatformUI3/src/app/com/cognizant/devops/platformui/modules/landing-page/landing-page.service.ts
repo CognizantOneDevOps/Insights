@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2017 Cognizant Technology Solutions
+ * Copyright 2019 Cognizant Technology Solutions
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License.  You may obtain a copy
@@ -13,20 +13,19 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  ******************************************************************************/
-package com.cognizant.devops.platformservice.content.config;
+import { Injectable } from '@angular/core';
+import { RestCallHandlerService } from '@insights/common/rest-call-handler.service';
+import { Observable } from 'rxjs';
 
+@Injectable()
+export class LandingPageService {
+    constructor(private restCallHandlerService: RestCallHandlerService) {
+    }
 
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.support.ReloadableResourceBundleMessageSource;
-
-@ComponentScan(basePackages = {"com.cognizant.devops.platformservice.*"})
-@Configuration
-// @EnableWebMvc
-public class ContentConfig  {
-	
-
+    searchDashboard(): Promise<any> {
+        var restHandler = this.restCallHandlerService;
+        return restHandler.get("SEARCH_DASHBOARD_FOLDERDETAIL");
+    }
 
 }
 

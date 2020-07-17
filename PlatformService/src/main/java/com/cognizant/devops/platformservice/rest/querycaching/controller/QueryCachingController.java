@@ -28,7 +28,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBException;
+import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformservice.rest.querycaching.service.QueryCachingService;
 import com.cognizant.devops.platformservice.rest.querycaching.service.QueryCachingServiceImpl;
 import com.google.gson.JsonObject;
@@ -48,7 +48,7 @@ public class QueryCachingController {
 		try {
 			payloadRequest = request.getReader().lines().collect(Collectors.joining(System.lineSeparator()));
 			results = queryCachingService.getCacheResults(payloadRequest);
-		} catch (GraphDBException | IOException e) {
+		} catch (InsightsCustomException | IOException e) {
 			log.error(e);
 		}
 

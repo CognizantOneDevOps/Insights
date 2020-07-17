@@ -15,7 +15,9 @@
  ******************************************************************************/
 package com.cognizant.devops.platformdal.correlationConfig;
 
+import java.util.HashSet;
 import java.util.Set;
+
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -26,6 +28,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+
 import com.cognizant.devops.platformdal.relationshipconfig.RelationshipConfiguration;
 
 @Entity
@@ -40,10 +43,10 @@ public class CorrelationConfiguration {
 	@Column(name = "ID", unique = true, nullable = false)
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private int id;
-	
-	@OneToMany(cascade=CascadeType.ALL ,fetch=FetchType.EAGER)
-    @JoinColumn(name="RELATIONSHIP_ID")
-    private Set<RelationshipConfiguration> relationshipConfig;
+
+	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+	@JoinColumn(name = "RELATIONSHIP_ID")
+	private Set<RelationshipConfiguration> relationshipConfig = new HashSet<>();
 
 	@Column(name = "DESTINATION_TOOLNAME")
 	private String destinationToolName;
@@ -192,6 +195,5 @@ public class CorrelationConfiguration {
 	public void setRelationshipConfig(Set<RelationshipConfiguration> relationshipConfig) {
 		this.relationshipConfig = relationshipConfig;
 	}
-
 
 }

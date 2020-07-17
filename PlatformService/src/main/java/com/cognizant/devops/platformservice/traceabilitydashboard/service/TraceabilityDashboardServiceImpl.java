@@ -31,9 +31,10 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.stream.Collectors;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.ehcache.Cache;
@@ -47,7 +48,6 @@ import org.ehcache.config.units.MemoryUnit;
 import org.springframework.stereotype.Service;
 
 import com.cognizant.devops.platformcommons.core.util.InsightsUtils;
-import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBException;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphResponse;
 import com.cognizant.devops.platformcommons.dal.neo4j.Neo4jDBHandler;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
@@ -252,7 +252,7 @@ public class TraceabilityDashboardServiceImpl implements TraceabilityDashboardSe
 		return map;
 	}
 
-	public JsonObject executeCypherQuery(String query) throws GraphDBException {
+	public JsonObject executeCypherQuery(String query) throws  InsightsCustomException {
 		Neo4jDBHandler dbHandler = new Neo4jDBHandler();
 		GraphResponse neo4jResponse = dbHandler.executeCypherQuery(query);
 		LOG.debug("Response received from neo4j");
@@ -476,7 +476,7 @@ public class TraceabilityDashboardServiceImpl implements TraceabilityDashboardSe
 	}
 
 	private HashMap<String, List<String>> resolveUpAndDownLinks(HashMap<String, List<String>> drilldownListMap,
-			List<String> baseTool) throws GraphDBException {
+			List<String> baseTool) throws  InsightsCustomException {
 
 		HashMap<String, List<String>> mainToolList = new HashMap<>();
 		List<String> excludeLabels = new ArrayList<>();
@@ -573,7 +573,7 @@ public class TraceabilityDashboardServiceImpl implements TraceabilityDashboardSe
 				pipelineCache.put(cacheKey, response.toString());
 				return response;
 
-			} catch (JsonSyntaxException | JsonIOException | GraphDBException | InsightsCustomException ex1) {
+			} catch (JsonSyntaxException | JsonIOException | InsightsCustomException ex1) {
 				LOG.error(ex1.getMessage());
 				throw new InsightsCustomException(ex1.getMessage());
 			}
@@ -601,7 +601,7 @@ public class TraceabilityDashboardServiceImpl implements TraceabilityDashboardSe
 		try {
 			Neo4jDBHandler dbHandler = new Neo4jDBHandler();
 			neo4jResponse = dbHandler.executeCypherQuery("match(n:DATA) return collect(distinct n.toolName)");
-		} catch (GraphDBException e) {
+		} catch (InsightsCustomException e) {
 			LOG.error("Exception in neo4j");
 			throw new InsightsCustomException(e.getMessage());
 		}

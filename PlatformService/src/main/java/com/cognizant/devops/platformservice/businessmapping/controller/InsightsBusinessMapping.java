@@ -26,7 +26,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBException;
+import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformservice.businessmapping.service.BusinessMappingService;
 import com.google.gson.JsonObject;
 
@@ -45,30 +45,30 @@ public class InsightsBusinessMapping {
 
 	@RequestMapping(value = "/getHierarchyProperties", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 	public JsonObject getHierarchyProperties(@RequestParam String level1, @RequestParam String level2,
-			@RequestParam String level3, @RequestParam String level4) throws GraphDBException {
+			@RequestParam String level3, @RequestParam String level4) throws InsightsCustomException {
 		return businessMappingService.getHierarchyProperties(level1, level2, level3, level4);
 	}
 	
 	@RequestMapping(value = "/saveToolsMapping", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public JsonObject saveToolsMappingLabel(@RequestBody String agentMappingJson) throws GraphDBException {
+	public JsonObject saveToolsMappingLabel(@RequestBody String agentMappingJson) {
 		log.debug(" info mapping agent JOSN "+agentMappingJson);
 		return businessMappingService.saveToolsMappingLabel(agentMappingJson);
 	}
 	
 	@RequestMapping(value = "/getToolsMapping", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public JsonObject getToolsMappingLabel(@RequestParam String agentName) throws GraphDBException {
+	public JsonObject getToolsMappingLabel(@RequestParam String agentName) {
 		log.debug(" Tool Name "+agentName);
 		return businessMappingService.getToolsMappingLabel(agentName);
 	}
 	
 	@RequestMapping(value = "/editToolsMapping", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public JsonObject editToolsMappingLabel(@RequestBody String agentMappingJson) throws GraphDBException {
+	public JsonObject editToolsMappingLabel(@RequestBody String agentMappingJson){
 		log.debug(" Edit info mapping agent JOSN "+agentMappingJson);
 		return businessMappingService.editToolsMappingLabel(agentMappingJson);
 	}
 	
 	@RequestMapping(value = "/deleteToolsMapping", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public JsonObject deleteToolsMappingLabel(@RequestParam String uuid) throws GraphDBException {
+	public JsonObject deleteToolsMappingLabel(@RequestParam String uuid) {
 		log.debug(" delete info mapping agent JOSN "+uuid);
 		return businessMappingService.deleteToolsMappingLabel(uuid);
 	}

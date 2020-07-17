@@ -50,7 +50,6 @@ public class PlatformServiceInitializer implements WebApplicationInitializer {
 		ApplicationConfigCache.loadConfigCache();
 		disableSslVerification();
 		validateAutheticationProtocol();
-		InsightsConfiguration.doInsightsConfiguration();
 		servletContext.addFilter("InsightsResponseHeaderWriter", InsightsResponseHeaderWriterFilter.class)
 				.addMappingForUrlPatterns(null, false, "/*");
 	}

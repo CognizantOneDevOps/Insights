@@ -55,12 +55,12 @@ import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.constants.MessageConstants;
 import com.cognizant.devops.platformcommons.core.enums.AGENTACTION;
 import com.cognizant.devops.platformcommons.core.util.ValidationUtils;
+import com.cognizant.devops.platformcommons.dal.vault.VaultHandler;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformdal.agentConfig.AgentConfig;
 import com.cognizant.devops.platformdal.agentConfig.AgentConfigDAL;
 import com.cognizant.devops.platformservice.agentmanagement.util.AgentManagementUtil;
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -69,9 +69,7 @@ import com.rabbitmq.client.AMQP.BasicProperties;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
-import com.sun.jersey.api.client.Client;
-import com.sun.jersey.api.client.ClientResponse;
-import com.sun.jersey.api.client.WebResource;
+
 
 @Service("agentManagementService")
 public class AgentManagementServiceImpl implements AgentManagementService {
@@ -80,6 +78,7 @@ public class AgentManagementServiceImpl implements AgentManagementService {
 	private static final String SUCCESS = "SUCCESS";
 	private static final String CONFIG = "config.json";
 	AgentConfigDAL agentConfigDAL = new AgentConfigDAL();
+	VaultHandler vaultHandler = new VaultHandler();
 	String filePath = ApplicationConfigProvider.getInstance().getAgentDetails().getUnzipPath();
 
 	@Override
@@ -102,6 +101,9 @@ public class AgentManagementServiceImpl implements AgentManagementService {
 			}
 			if (ValidationUtils.checkAgentIdString(agentId)) {
 				throw new InsightsCustomException("Agent Id has to be Alpha numeric with '_' as special character");
+			}
+			if(agentId.equalsIgnoreCase(toolName)) {
+				throw new InsightsCustomException("Agent Id and Tool name cannot be the same.");
 			}
 			// Condition to check whether the agent ID is existing already in database or
 			// not.
@@ -212,7 +214,7 @@ public class AgentManagementServiceImpl implements AgentManagementService {
 			Date updateDate = Timestamp.valueOf(LocalDateTime.now());
 			if (vault) {
 				log.debug("--update Store secrets to vault --");
-				HashMap<String, Map<String, String>> dataMap = getToolbasedSecret(json, agentId);
+				Map<String, String> dataMap = getToolbasedSecret(json, agentId);
 				updateSecrets(agentId, dataMap, json);
 			}
 			Path agentZipPath = updateAgentConfig(toolName, json, agentId);
@@ -598,15 +600,30 @@ public class AgentManagementServiceImpl implements AgentManagementService {
 		return toolName + "_" + Instant.now().toEpochMilli();
 	}
 
-	private String getLabelName(String configDetails) {
+	private String getLabelName(String configDetails) throws InsightsCustomException {
 		Gson gson = new Gson();
 		JsonElement jelement = gson.fromJson(configDetails.trim(), JsonElement.class);
 		JsonObject json = jelement.getAsJsonObject();
-		String labelData = json.get("publish").getAsJsonObject().get("data").getAsString().toUpperCase();
-		List<String> labelDataValue = Arrays.asList(labelData.split(MessageConstants.ROUTING_KEY_SEPERATOR));
+		List<String> labelDataValue = null;
+		try {
+			String labelData = json.get("publish").getAsJsonObject().get("data").getAsString().toUpperCase();
+			String labelHealth = json.get("publish").getAsJsonObject().get("health").getAsString().toUpperCase();
+			if (ValidationUtils.checkLabelNameString(labelData)) {
+				throw new InsightsCustomException("Invalid data label Name, it should contain only alphanumeric character,underscore & dot");
+			} 
+			if(ValidationUtils.checkLabelNameString(labelHealth)) {
+				throw new InsightsCustomException("Invalid health label Name, it should contain only alphanumeric character,underscore & dot");
+			}
+			labelDataValue = Arrays.asList(labelData.split(MessageConstants.ROUTING_KEY_SEPERATOR));
+			
+		} catch (Exception e) {
+			log.error("Invalid label Name {} ", e);
+			throw new InsightsCustomException(e.getMessage());
+		}
 		return labelDataValue.get(1);
 
 	}
+
 
 	/**
 	 * Prepare vault based structure and store in vault.
@@ -620,16 +637,11 @@ public class AgentManagementServiceImpl implements AgentManagementService {
 	 * @throws UniformInterfaceException
 	 * @throws IOException
 	 */
-	private HashMap<String, Map<String, String>> prepareSecret(String agentId, JsonObject json)
-			throws InsightsCustomException, IOException {
-		HashMap<String, Map<String, String>> dataMap = getToolbasedSecret(json, agentId);
-		ClientResponse vaultresponse = storeToVault(dataMap, agentId);
-		if (vaultresponse.getStatus() != 200) {
-			log.debug("vault response {} -- ", vaultresponse);
-			throw new InsightsCustomException("Failed : HTTP error code : " + vaultresponse.getStatus());
+	private void prepareSecret(String agentId, JsonObject json) throws InsightsCustomException, IOException {
+		Map<String, String> dataMap = getToolbasedSecret(json, agentId);
+		if (!dataMap.isEmpty()) {
+			vaultSecret(agentId, null, dataMap);
 		}
-		vaultresponse.getEntity(String.class);
-		return dataMap;
 	}
 
 	/**
@@ -642,10 +654,9 @@ public class AgentManagementServiceImpl implements AgentManagementService {
 	 * @return dataMap
 	 * @throws IOException
 	 */
-	private HashMap<String, Map<String, String>> getToolbasedSecret(JsonObject json, String agentId)
+	private Map<String, String> getToolbasedSecret(JsonObject json, String agentId)
 			throws IOException {
-		HashMap<String, Map<String, String>> dataMap = new HashMap<String, Map<String, String>>();
-		HashMap<String, String> secretMap = new HashMap<String, String>();
+		HashMap<String, String> secretMap = new HashMap<>();
 		String configFilePath = filePath + File.separator + agentId;
 		File configFile = null;
 		Path dir = Paths.get(configFilePath);
@@ -674,39 +685,9 @@ public class AgentManagementServiceImpl implements AgentManagementService {
 		vaultObj.addProperty("vaultUrl", ApplicationConfigProvider.getInstance().getVault().getVaultEndPoint());
 		json.add("vault", vaultObj);
 		log.debug("Updated Json {} without creds --", json);
-		dataMap.put("data", secretMap);
-		return dataMap;
+		return secretMap;
 	}
 
-	/**
-	 * Stores userid/pwd/token and aws credentials in vault engine as per agent.
-	 * 
-	 * @param dataMap {eg: {"data":{"passwd":"password","userid":"userid"}}}
-	 * @param agentId
-	 * @return vaultresponse
-	 * @throws InsightsCustomException
-	 */
-	private ClientResponse storeToVault(HashMap<String, Map<String, String>> dataMap, String agentId)
-			throws InsightsCustomException {
-		ClientResponse vaultresponse = null;
-		try {
-			GsonBuilder gb = new GsonBuilder();
-			Gson gsonObject = gb.create();
-			String jsonobj = gsonObject.toJson(dataMap);
-			log.debug("Request body for vault {} -- ", jsonobj);
-			String url = ApplicationConfigProvider.getInstance().getVault().getVaultEndPoint()
-					+ ApplicationConfigProvider.getInstance().getVault().getSecretEngine() + "/data/" + agentId;
-			log.debug("url {}--", url);
-			WebResource resource = Client.create().resource(url);
-			vaultresponse = resource.type("application/json")
-					.header("X-Vault-Token", ApplicationConfigProvider.getInstance().getVault().getVaultToken())
-					.post(ClientResponse.class, jsonobj);
-		} catch (Exception e) {
-			log.error("Error while Storing to vault agent {} ", e);
-			throw new InsightsCustomException(e.getMessage());
-		}
-		return vaultresponse;
-	}
 
 	/**
 	 * Compare vault secret with UI value and update the vault with new secrets
@@ -715,86 +696,41 @@ public class AgentManagementServiceImpl implements AgentManagementService {
 	 * @param secretMap
 	 * @param json
 	 * @throws InsightsCustomException
+	 * @throws IOException 
 	 */
-	private void updateSecrets(String agentId, HashMap<String, Map<String, String>> secretMap, JsonObject json)
-			throws InsightsCustomException {
-		ClientResponse secret = fetchSecret(agentId);
-		if (secret.getStatus() == 200) {
-			String vaultresponse = secret.getEntity(String.class);
-			JsonObject vaultObject = new JsonParser().parse(vaultresponse).getAsJsonObject();
-			JsonObject vaultData = vaultObject.get("data").getAsJsonObject().get("data").getAsJsonObject();
-			// Modified secrets from UI
-			Map<String, String> dataMap = secretMap.get("data");
-			// update secrets based on vault values
-			for (Entry<String, String> field : dataMap.entrySet()) {
-				if (vaultData.has(field.getKey()) && !field.getValue().contains("***")) {
-					dataMap.put(field.getKey(), field.getValue());
-				} else if (vaultData.has(field.getKey())) {
-					dataMap.put(field.getKey(), vaultData.get(field.getKey()).getAsString());
-				} else {
-					dataMap.put(field.getKey(), field.getValue());
-				}
+	private void updateSecrets(String agentId, Map<String, String> updatedDataMap, JsonObject json)
+			throws InsightsCustomException, IOException {
+		String vaultresponse = vaultHandler.fetchFromVault(agentId);
+		JsonObject vaultObject = new JsonParser().parse(vaultresponse).getAsJsonObject();
+		JsonObject vaultData = vaultObject.get("data").getAsJsonObject().get("data").getAsJsonObject();
+		// update secrets based on vault values
+		for (Entry<String, String> field : updatedDataMap.entrySet()) {
+			if (vaultData.has(field.getKey()) && !field.getValue().contains("***")) {
+				updatedDataMap.put(field.getKey(), field.getValue());
+			} else if (vaultData.has(field.getKey())) {
+				updatedDataMap.put(field.getKey(), vaultData.get(field.getKey()).getAsString());
+			} else {
+				updatedDataMap.put(field.getKey(), field.getValue());
 			}
-			if (!dataMap.isEmpty()) {
-				updateVaultSecret(agentId, vaultData, dataMap);
-			}
-		} else {
-			log.debug("vault response {}-- ", secret);
-			throw new InsightsCustomException("Failed : HTTP error code : " + secret.getStatus());
 		}
-	}
-
-	/**
-	 * fetches userid/pwd/token and aws credentials in vault engine as per agentID.
-	 * 
-	 * @param agentId
-	 * @return vaultresponse
-	 * @throws InsightsCustomException
-	 */
-	private ClientResponse fetchSecret(String agentId) throws InsightsCustomException {
-		ClientResponse vaultresponse = null;
-		try {
-			String url = ApplicationConfigProvider.getInstance().getVault().getVaultEndPoint()
-					+ ApplicationConfigProvider.getInstance().getVault().getSecretEngine() + "/data/" + agentId;
-			log.debug(url);
-			WebResource resource = Client.create().resource(url);
-			vaultresponse = resource.type("application/json")
-					.header("X-Vault-Token", ApplicationConfigProvider.getInstance().getVault().getVaultToken())
-					.get(ClientResponse.class);
-		} catch (Exception e) {
-			log.error("Error while fetching secret from vault {}-- ", e);
-			throw new InsightsCustomException(e.getMessage());
+		if (!updatedDataMap.isEmpty()) {
+			vaultSecret(agentId, vaultData, updatedDataMap);
 		}
-		return vaultresponse;
+		
 	}
-
-	/**
-	 * Checks if vault and UI has same secrets and creates new version if difference
-	 * found.
-	 * 
-	 * @param agentId
-	 * @param vaultData
-	 * @param dataMap
-	 * @throws InsightsCustomException
-	 * @throws RuntimeException
-	 * @throws ClientHandlerException
-	 * @throws UniformInterfaceException
-	 */
-	private void updateVaultSecret(String agentId, JsonObject vaultData, Map<String, String> dataMap)
+	
+	
+	private Map<String, String> vaultSecret(String agentId, JsonObject vaultData, Map<String, String> updatedDataMap)
 			throws InsightsCustomException {
 		Gson gson = new Gson();
-		JsonObject uidata = gson.toJsonTree(dataMap).getAsJsonObject();
-		if (!dataMap.isEmpty() && !uidata.equals(vaultData)) {
-			HashMap<String, Map<String, String>> updateMap = new HashMap<String, Map<String, String>>();
-			updateMap.put("data", dataMap);
-			ClientResponse updatedVaultResponse = storeToVault(updateMap, agentId);
-			if (updatedVaultResponse.getStatus() != 200) {
-				log.debug("updated vault response {} -- ", updatedVaultResponse);
-				throw new InsightsCustomException("Failed : HTTP error code : " + updatedVaultResponse.getStatus());
-			}
-			updatedVaultResponse.getEntity(String.class);
-		} else {
-			log.debug("Secrets not modified !!");
+		JsonObject updatedDataJson = gson.toJsonTree(updatedDataMap).getAsJsonObject();
+		// In registeragent case existing vaultData is null and in updateAgent case it has exising valut value
+		if ((vaultData == null && !updatedDataMap.isEmpty())
+				|| (vaultData != null && vaultData.entrySet().size() > 0 && !updatedDataJson.equals(vaultData))) {
+			vaultHandler.storeToVault(updatedDataJson, agentId);
 		}
+		return updatedDataMap;
+
 	}
+	
 }

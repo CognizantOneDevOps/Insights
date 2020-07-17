@@ -25,17 +25,19 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
 import com.cognizant.devops.engines.platformengine.message.core.EngineStatusLogger;
 import com.cognizant.devops.engines.platformengine.modules.correlation.model.Correlation;
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.config.CorrelationConfig;
 import com.cognizant.devops.platformcommons.constants.ConfigOptions;
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
-import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBException;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphResponse;
 import com.cognizant.devops.platformcommons.dal.neo4j.Neo4jDBHandler;
+import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformdal.correlationConfig.CorrelationConfigDAL;
 import com.cognizant.devops.platformdal.correlationConfig.CorrelationConfiguration;
 import com.cognizant.devops.platformdal.relationshipconfig.RelationshipConfiguration;
@@ -128,7 +130,7 @@ public class CorrelationExecutor {
 				log.debug("Pre Processed " + correlation.getDestinationToolName() + " " + destinationLabelName
 						+ " records: " + processedRecords + " in: " + (System.currentTimeMillis() - st) + " ms");
 			}
-		} catch (GraphDBException e) {
+		} catch (InsightsCustomException e) {
 			log.error("Error occured while loading the destination data for correlations.", e);
 		}
 	}
@@ -193,7 +195,7 @@ public class CorrelationExecutor {
 			for (JsonElement data : dataArray) {
 				destinationDataList.add(data.getAsJsonObject());
 			}
-		} catch (GraphDBException e) {
+		} catch (InsightsCustomException e) {
 			log.error("Error occured while loading the destination data for correlations.", e);
 		}
 		return destinationDataList;
@@ -239,7 +241,7 @@ public class CorrelationExecutor {
 					.get("row").getAsInt();
 			log.debug("Correlated " + correlation.getDestinationToolName() + " " + correlation.getDestinationLabelName()
 					+ " records: " + processedRecords + " in: " + (System.currentTimeMillis() - st) + " ms");
-		} catch (GraphDBException e) {
+		} catch (InsightsCustomException e) {
 			log.error("Error occured while executing correlations for relation " + correlation.getRelationName() + ".",
 					e);
 			EngineStatusLogger.getInstance().createEngineStatusNode(
@@ -298,7 +300,7 @@ public class CorrelationExecutor {
 						.get("data").getAsJsonArray().get(0).getAsJsonObject().get("row").getAsInt();
 				log.debug("Processed " + processedRecords + " records in " + (System.currentTimeMillis() - st) + " ms");
 			}
-		} catch (GraphDBException e) {
+		} catch (InsightsCustomException e) {
 			log.error(
 					"Error occured while removing RAW label from tool: " + destination.getDestinationLabelName() + ".",
 					e);

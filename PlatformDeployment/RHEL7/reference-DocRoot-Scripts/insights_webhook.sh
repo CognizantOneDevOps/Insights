@@ -29,3 +29,13 @@ sleep 10
 sudo wget https://platform.cogdevops.com/insights_install/release/latest/PlatformWebhookEngine.jar -O PlatformWebhookEngine.jar
 sleep 2
 sudo nohup java -jar PlatformWebhookEngine.jar &
+sleet 5
+sudo chmod -R 777 /opt/insightsWebHook
+cd /etc/init.d/
+sudo wget http://platform.cogdevops.com/insights_install/installationScripts/latest/RHEL/initscripts/InSightsWebHook.sh
+sudo mv InSightsWebHook.sh InSightsWebHook
+sudo chmod +x InSightsWebHook
+sudo chkconfig InSightsWebHook on
+sleep 10
+sudo service InSightsWebHook stop
+sudo service InSightsWebHook start

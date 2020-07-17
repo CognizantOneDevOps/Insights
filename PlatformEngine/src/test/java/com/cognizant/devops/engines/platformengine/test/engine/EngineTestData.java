@@ -25,22 +25,21 @@ import java.util.concurrent.TimeoutException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import com.cognizant.devops.engines.Application;
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.config.MessageQueueDataModel;
 import com.cognizant.devops.platformcommons.constants.MessageConstants;
-import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBException;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphResponse;
 import com.cognizant.devops.platformcommons.dal.neo4j.Neo4jDBHandler;
+import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.rabbitmq.client.AMQP.Exchange.DeclareOk;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
-import com.rabbitmq.client.AMQP.Exchange.DeclareOk;
 
 public class EngineTestData {
 	private static Logger log = LogManager.getLogger(EngineTestData.class);
@@ -144,7 +143,7 @@ public class EngineTestData {
 
 	    map = gson.fromJson(finalJson, Map.class);
 		}
-		catch (GraphDBException e) {
+		catch (InsightsCustomException e) {
 			log.error(e);
 		} 
 		return map;				

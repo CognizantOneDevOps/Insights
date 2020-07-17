@@ -23,17 +23,17 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
-import com.cognizant.devops.platformcommons.dal.rest.RestHandler;
+import com.cognizant.devops.platformcommons.dal.grafana.GrafanaHandler;
+import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformservice.rest.util.PlatformServiceUtil;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import com.sun.jersey.api.client.ClientResponse;
+import com.google.gson.JsonSyntaxException;
 
 @RestController
 @RequestMapping("/admin/userMgmt")
@@ -42,49 +42,46 @@ public class UserManagementService {
 
 	@Autowired
 	private HttpServletRequest httpRequest;
+	
+	GrafanaHandler grafanaHandler = new GrafanaHandler();
+	private static final String PATH = "/api/orgs/";  
 
-	@RequestMapping(value = "/getOrgUsers", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	public JsonObject getOrgUsers(@RequestParam int orgId) {
-		String apiUrl = ApplicationConfigProvider.getInstance().getGrafana().getGrafanaEndpoint() + "/api/orgs/" + orgId
-				+ "/users";
-		Map<String, String> headers = PlatformServiceUtil.prepareGrafanaHeader(httpRequest);
-		ClientResponse response = RestHandler.doGet(apiUrl, null, headers);
-		return PlatformServiceUtil
-				.buildSuccessResponseWithData(new JsonParser().parse(response.getEntity(String.class)));
+	@PostMapping(value = "/getOrgUsers", produces = MediaType.APPLICATION_JSON_VALUE)
+	public JsonObject getOrgUsers(@RequestParam int orgId) throws InsightsCustomException {
+		try {
+			Map<String, String> headers = PlatformServiceUtil.prepareGrafanaHeader(httpRequest);
+			String response = grafanaHandler.grafanaGet(PATH + orgId + "/users", headers);
+			return PlatformServiceUtil
+					.buildSuccessResponseWithData(new JsonParser().parse(response));
+		} catch (JsonSyntaxException e) {
+			return PlatformServiceUtil.buildFailureResponse("Unable to get current org users");
+		} catch (InsightsCustomException e) {
+			return PlatformServiceUtil.buildFailureResponse("Unable to get current org users,Permission denide ");
+		}
 	}
 
-	@RequestMapping(value = "/createOrg", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	public String createOrg(@RequestParam String orgName) {
-		String apiUrl = ApplicationConfigProvider.getInstance().getGrafana().getGrafanaEndpoint() + "/api/orgs";
+	@PostMapping(value = "/createOrg", produces = MediaType.APPLICATION_JSON_VALUE)
+	public String createOrg(@RequestParam String orgName) throws InsightsCustomException {
 		JsonObject request = new JsonObject();
 		request.addProperty("name", orgName);
 		Map<String, String> headers = PlatformServiceUtil.prepareGrafanaHeader(httpRequest);
-		ClientResponse response = RestHandler.doPost(apiUrl, request, headers);
-		return response.getEntity(String.class);
+		return grafanaHandler.grafanaPost(PATH, request, headers);
 	}
 
-	@RequestMapping(value = "/editOrganizationUser", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	public String editOrganizationUser(@RequestParam int orgId, @RequestParam int userId, @RequestParam String role) {
-		log.debug("\n\nInside editOrganizationUser method call");
-		String apiUrl = ApplicationConfigProvider.getInstance().getGrafana().getGrafanaEndpoint() + "/api/orgs/" + orgId
-				+ "/users/" + userId;
-		log.debug("API URL is: " + apiUrl);
+	@PostMapping(value = "/editOrganizationUser", produces = MediaType.APPLICATION_JSON_VALUE)
+	public String editOrganizationUser(@RequestParam int orgId, @RequestParam int userId, @RequestParam String role) throws InsightsCustomException {
+		log.debug("%n%nInside editOrganizationUser method call");
 		JsonObject request = new JsonObject();
 		request.addProperty("role", role);
 		Map<String, String> headers = PlatformServiceUtil.prepareGrafanaHeader(httpRequest);
-		ClientResponse response = RestHandler.doPatch(apiUrl, request, headers);
-		return response.getEntity(String.class);
+		return grafanaHandler.grafanaPatch(PATH + orgId + "/users/" + userId, request, headers);
 	}
 
-	@RequestMapping(value = "/deleteOrganizationUser", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	public String deleteOrganizationUser(@RequestParam int orgId, @RequestParam int userId, @RequestParam String role) {
-		log.debug("\n\nInside deleteOrganizationUser method call");
-		String apiUrl = ApplicationConfigProvider.getInstance().getGrafana().getGrafanaEndpoint() + "/api/orgs/" + orgId
-				+ "/users/" + userId;
-		log.debug("API URL is: " + apiUrl);
-		JsonObject request = new JsonObject();
+	@PostMapping(value = "/deleteOrganizationUser", produces = MediaType.APPLICATION_JSON_VALUE)
+	public String deleteOrganizationUser(@RequestParam int orgId, @RequestParam int userId, @RequestParam String role) throws InsightsCustomException {
+		log.debug("%n%nInside deleteOrganizationUser method call");
 		Map<String, String> headers = PlatformServiceUtil.prepareGrafanaHeader(httpRequest);
-		ClientResponse response = RestHandler.doDelete(apiUrl, request, headers);
-		return response.getEntity(String.class);
+		return grafanaHandler.grafanaDelete(PATH + orgId + "/users/" + userId, headers);
+		
 	}
 }

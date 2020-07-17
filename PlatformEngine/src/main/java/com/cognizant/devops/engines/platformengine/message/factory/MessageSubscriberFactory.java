@@ -20,11 +20,12 @@ import java.util.concurrent.TimeoutException;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import com.cognizant.devops.engines.platformengine.message.core.EngineStatusLogger;
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.config.MessageQueueDataModel;
 import com.cognizant.devops.platformcommons.constants.MessageConstants;
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
-import com.cognizant.devops.engines.platformengine.message.core.EngineStatusLogger;
 import com.rabbitmq.client.AMQP;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
@@ -37,9 +38,9 @@ public class MessageSubscriberFactory {
 	private static final Logger log = LogManager.getLogger(MessageSubscriberFactory.class);
 	private ConnectionFactory factory;
 	private Connection connection;
-	private static MessageSubscriberFactory instance = new MessageSubscriberFactory(); 
-	
-	private void initConnectionFactory(){
+	private static MessageSubscriberFactory instance = new MessageSubscriberFactory();
+
+	private void initConnectionFactory() {
 		MessageQueueDataModel messageQueueConfig = ApplicationConfigProvider.getInstance().getMessageQueue();
 		factory = new ConnectionFactory();
 		factory.setHost(messageQueueConfig.getHost());
@@ -52,41 +53,51 @@ public class MessageSubscriberFactory {
 			channel.close();
 		} catch (IOException e) {
 			log.error("Unable to create MQ connection", e);
-			EngineStatusLogger.getInstance().createEngineStatusNode("Exception while creating Message Queue connection "+e.getMessage(),PlatformServiceConstants.FAILURE);
+			EngineStatusLogger.getInstance().createEngineStatusNode(
+					"Exception while creating Message Queue connection " + e.getMessage(),
+					PlatformServiceConstants.FAILURE);
 		} catch (TimeoutException e) {
 			log.error("Unable to create MQ connection within specified time.", e);
-			EngineStatusLogger.getInstance().createEngineStatusNode("Exception while creating Message queue connection"+e.getMessage(),PlatformServiceConstants.FAILURE);
+			EngineStatusLogger.getInstance().createEngineStatusNode(
+					"Exception while creating Message queue connection" + e.getMessage(),
+					PlatformServiceConstants.FAILURE);
 
 		}
 	}
 
-	private MessageSubscriberFactory(){
+	private MessageSubscriberFactory() {
 		initConnectionFactory();
 	}
-	
-	public static MessageSubscriberFactory getInstance(){
+
+	public static MessageSubscriberFactory getInstance() {
 		return instance;
 	}
-	
-	public void registerSubscriber(String routingKey, final EngineSubscriberResponseHandler responseHandler) throws Exception {
+
+	public void registerSubscriber(String routingKey, final EngineSubscriberResponseHandler responseHandler)
+			throws Exception {
 		Channel channel = connection.createChannel();
 		String queueName = routingKey.replace(".", "_");
 		channel.queueDeclare(queueName, true, false, false, null);
 		channel.queueBind(queueName, MessageConstants.EXCHANGE_NAME, routingKey);
 		channel.basicQos(ApplicationConfigProvider.getInstance().getMessageQueue().getPrefetchCount());
 		responseHandler.setChannel(channel);
-		log.debug("prefetchCount "+ApplicationConfigProvider.getInstance().getMessageQueue().getPrefetchCount() );
+		log.debug("prefetchCount " + ApplicationConfigProvider.getInstance().getMessageQueue().getPrefetchCount());
 		Consumer consumer = new DefaultConsumer(channel) {
 			@Override
 			public void handleDelivery(String consumerTag, Envelope envelope, AMQP.BasicProperties properties,
 					byte[] body) throws IOException {
-				responseHandler.handleDelivery(consumerTag, envelope, properties, body);
+				try {
+					responseHandler.handleDelivery(consumerTag, envelope, properties, body);
+				} catch (Exception e) {
+					log.error("Error : {}", e);
+				}
 			}
 		};
 		channel.basicConsume(queueName, false, routingKey, consumer);
 	}
-	
-	public void unregisterSubscriber(String routingKey, final EngineSubscriberResponseHandler responseHandler) throws IOException, TimeoutException{
+
+	public void unregisterSubscriber(String routingKey, final EngineSubscriberResponseHandler responseHandler)
+			throws IOException, TimeoutException {
 		responseHandler.getChannel().basicCancel(routingKey);
 		responseHandler.getChannel().close();
 	}
