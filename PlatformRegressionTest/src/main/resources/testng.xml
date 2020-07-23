@@ -2,7 +2,7 @@
 
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
 
-<suite name="suite" verbose="10">
+<suite thread-count="1" name="suite" verbose="10">
 	<test name="platformregressiontest">
 		<classes>
 			<class
@@ -37,6 +37,12 @@
 				name="com.cognizant.devops.platformregressiontest.test.webhookconfiguration.UpdateStatusWebhookAPITest" />
 			<class
 				name="com.cognizant.devops.platformregressiontest.test.webhookconfiguration.DeleteWebhookAPITest" />
+		</classes>
+	</test>
+	<test name="logintest">
+		<classes>
+			<class
+				name="com.cognizant.devops.platformregressiontest.test.login.LoginTest" />
 		</classes>
 	</test>
 </suite>

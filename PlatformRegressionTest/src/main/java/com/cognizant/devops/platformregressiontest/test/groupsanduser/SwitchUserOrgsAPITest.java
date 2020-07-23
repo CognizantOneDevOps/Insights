@@ -15,16 +15,15 @@
  ******************************************************************************/
 package com.cognizant.devops.platformregressiontest.test.groupsanduser;
 
-import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
-import java.util.Properties;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-import com.cognizant.devops.platformregressiontest.common.ConfigOptionsTest;
+import com.cognizant.devops.platformregressiontest.common.CommonUtils;
 import com.google.gson.JsonObject;
 
 import io.restassured.RestAssured;
@@ -35,40 +34,25 @@ import io.restassured.specification.RequestSpecification;
 
 public class SwitchUserOrgsAPITest extends GroupsAndUserTestData {
 
-	GroupsAndUserTestData groupsAndUserTestData = new GroupsAndUserTestData();
-
-	String jSessionID;
-	String xsrfToken;
-	private FileReader reader = null;
-	Properties p = null;
+	private static final Logger log = LogManager.getLogger(SwitchUserOrgsAPITest.class);
 
 	@BeforeMethod
-	public Properties onInit() throws InterruptedException, IOException {
-		jSessionID = groupsAndUserTestData.getJsessionId();
-		xsrfToken = groupsAndUserTestData.getXSRFToken(jSessionID);
-
-		String path = System.getenv().get(ConfigOptionsTest.INSIGHTS_HOME) + File.separator
-				+ ConfigOptionsTest.CONFIG_DIR + File.separator + ConfigOptionsTest.PROP_FILE;
-
-		reader = new FileReader(path);
-
-		p = new Properties();
-
-		p.load(reader);
-		return p;
+	public void onInit() throws InterruptedException, IOException {
+		jSessionID = getJsessionId();
+		xsrfToken = getXSRFToken(jSessionID);
 	}
 
 	@Test(priority = 1)
 	public void switchUserOrgs() {
 
-		RestAssured.baseURI = p.getProperty("baseURI") + "/PlatformService/accessGrpMgmt/switchUserOrg?orgId=2";
+		RestAssured.baseURI = CommonUtils.getProperty("baseURI") + CommonUtils.getProperty("switchUser");
 		RequestSpecification httpRequest = RestAssured.given();
 
 		httpRequest.header(new Header("XSRF-TOKEN", xsrfToken));
-		httpRequest.cookies("JSESSIONID", jSessionID, "grafanaOrg", p.getProperty("grafanaOrg"), "grafanaRole",
-				p.getProperty("grafanaRole"), "XSRF-TOKEN", xsrfToken);
-		httpRequest.header("Authorization", groupsAndUserTestData.authorization);
-		httpRequest.queryParams("orgId", p.getProperty("orgId2"));
+		httpRequest.cookies("JSESSIONID", jSessionID, "grafanaOrg", CommonUtils.getProperty("grafanaOrg"),
+				"grafanaRole", CommonUtils.getProperty("grafanaRole"), "XSRF-TOKEN", xsrfToken);
+		httpRequest.header("Authorization", authorization);
+		httpRequest.queryParams("orgId", CommonUtils.getProperty("orgId2"));
 
 		// Request payload sending along with post request
 
@@ -81,7 +65,7 @@ public class SwitchUserOrgsAPITest extends GroupsAndUserTestData {
 
 		String switchUserResponse = response.getBody().asString();
 
-		System.out.println("switchUserResponse" + switchUserResponse);
+		log.debug("switchUserResponse" + switchUserResponse);
 
 		int statusCode = response.getStatusCode();
 		Assert.assertEquals(statusCode, 200);
@@ -91,26 +75,26 @@ public class SwitchUserOrgsAPITest extends GroupsAndUserTestData {
 	}
 
 	@Test(priority = 2)
-	public void switchUserToAnotherOrg() {
+	public void switchUserOrgToAnotherOrg() {
 
-		RestAssured.baseURI = p.getProperty("baseURI") + "/PlatformService/accessGrpMgmt/switchUserOrg?orgId=1";
+		RestAssured.baseURI = CommonUtils.getProperty("baseURI")
+				+ "/PlatformService/accessGrpMgmt/switchUserOrg?orgId=1";
 		RequestSpecification httpRequest = RestAssured.given();
 
 		httpRequest.header(new Header("XSRF-TOKEN", xsrfToken));
-		httpRequest.cookies("JSESSIONID", jSessionID, "grafanaOrg", p.getProperty("grafanaOrg"), "grafanaRole",
-				p.getProperty("grafanaRole"), "XSRF-TOKEN", xsrfToken);
-		httpRequest.header("Authorization", groupsAndUserTestData.authorization);
-		httpRequest.queryParams("orgId", p.getProperty("orgId1"));
+		httpRequest.cookies("JSESSIONID", jSessionID, "grafanaOrg", CommonUtils.getProperty("grafanaOrg"),
+				"grafanaRole", CommonUtils.getProperty("grafanaRole"), "XSRF-TOKEN", xsrfToken);
+		httpRequest.header("Authorization", authorization);
+		httpRequest.queryParams("orgId", CommonUtils.getProperty("orgId1"));
 
 		// Request payload sending along with post request
 
 		httpRequest.header("Content-Type", "application/json");
-
 		Response response = httpRequest.request(Method.POST, "/");
 
 		String switchUserOrgResponse = response.getBody().asString();
 
-		System.out.println("switchUserResponse" + switchUserOrgResponse);
+		log.debug("switchUserResponse" + switchUserOrgResponse);
 
 		int statusCode = response.getStatusCode();
 		Assert.assertEquals(statusCode, 200);

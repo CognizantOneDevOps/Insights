@@ -15,19 +15,15 @@
  ******************************************************************************/
 package com.cognizant.devops.platformregressiontest.test.webhookconfiguration;
 
-import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
-import java.util.Properties;
-
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
-
-import com.cognizant.devops.platformregressiontest.common.ConfigOptionsTest;
+import com.cognizant.devops.platformregressiontest.common.CommonUtils;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-
 import io.restassured.RestAssured;
 import io.restassured.http.Header;
 import io.restassured.http.Method;
@@ -36,26 +32,12 @@ import io.restassured.specification.RequestSpecification;
 
 public class UpdateWebhookAPITest extends WebhookTestData {
 
-	WebhookTestData webhookTestData = new WebhookTestData();
-	String jSessionID;
-	String xsrfToken;
-	private FileReader reader = null;
-	Properties p = null;
+	private static final Logger log = LogManager.getLogger(UpdateWebhookAPITest.class);
 
 	@BeforeMethod
-	public Properties onInit() throws InterruptedException, IOException {
-		jSessionID = webhookTestData.getJsessionId();
-		xsrfToken = webhookTestData.getXSRFToken(jSessionID);
-
-		String path = System.getenv().get(ConfigOptionsTest.INSIGHTS_HOME) + File.separator
-				+ ConfigOptionsTest.CONFIG_DIR + File.separator + ConfigOptionsTest.PROP_FILE;
-
-		reader = new FileReader(path);
-
-		p = new Properties();
-
-		p.load(reader);
-		return p;
+	public void onInit() throws InterruptedException, IOException {
+		jSessionID = getJsessionId();
+		xsrfToken = getXSRFToken(jSessionID);
 	}
 
 	@Test(priority = 1, dataProvider = "webhookdataprovider")
@@ -64,13 +46,13 @@ public class UpdateWebhookAPITest extends WebhookTestData {
 			String timeFormat, String wid, String operationName, String dynamicTemplate, String isUpdateRequired,
 			String fieldUsedForUpdate) {
 
-		RestAssured.baseURI = p.getProperty("baseURI") + "/PlatformService/admin/webhook/updateWebhook";
+		RestAssured.baseURI = CommonUtils.getProperty("baseURI") + CommonUtils.getProperty("updateWebhook");
 		RequestSpecification httpRequest = RestAssured.given();
 
 		httpRequest.header(new Header("XSRF-TOKEN", xsrfToken));
-		httpRequest.cookies("JSESSIONID", jSessionID, "grafanaOrg", "1", "grafanaRole", "Admin", "XSRF-TOKEN",
-				xsrfToken);
-		httpRequest.header("Authorization", webhookTestData.authorization);
+		httpRequest.cookies("JSESSIONID", jSessionID, "grafanaOrg", CommonUtils.getProperty("grafanaOrg"),
+				"grafanaRole", CommonUtils.getProperty("grafanaRole"), "XSRF-TOKEN", xsrfToken);
+		httpRequest.header("Authorization", authorization);
 
 		// Request payload sending along with post request
 		JsonObject requestParam = new JsonObject();
@@ -109,7 +91,7 @@ public class UpdateWebhookAPITest extends WebhookTestData {
 
 		String updateWebhook = response.getBody().asString();
 
-		System.out.println("updateWebhook" + updateWebhook);
+		log.debug("updateWebhook", updateWebhook);
 
 		int statusCode = response.getStatusCode();
 		Assert.assertTrue(updateWebhook.contains("status"), "success");
@@ -121,12 +103,12 @@ public class UpdateWebhookAPITest extends WebhookTestData {
 	@Test(priority = 2)
 	public void updateWebhookFail() {
 
-		RestAssured.baseURI = p.getProperty("baseURI") + "/PlatformService/admin/webhook/updateWebhook";
+		RestAssured.baseURI = CommonUtils.getProperty("baseURI") + CommonUtils.getProperty("updateWebhook");
 
 		RequestSpecification httpRequest = RestAssured.given();
 		httpRequest.header(new Header("XSRF-TOKEN", xsrfToken));
-		httpRequest.cookies("JSESSIONID", jSessionID, "grafanaOrg", "1", "grafanaRole", "Admin", "XSRF-TOKEN",
-				xsrfToken);
+		httpRequest.cookies("JSESSIONID", jSessionID, "grafanaOrg", CommonUtils.getProperty("grafanaOrg"),
+				"grafanaRole", CommonUtils.getProperty("grafanaRole"), "XSRF-TOKEN", xsrfToken);
 
 		JsonObject requestParam = new JsonObject();
 
@@ -136,7 +118,7 @@ public class UpdateWebhookAPITest extends WebhookTestData {
 		// Response Object
 		Response response = httpRequest.request(Method.POST, "/");
 		String responseWebhookFail = response.getBody().asString();
-		System.out.println("responseWebhookFail" + responseWebhookFail);
+		log.debug("UpdateWebhookResponseFail" + responseWebhookFail);
 
 		// Statuscode Validation
 		int FailureStatusCode = response.getStatusCode();

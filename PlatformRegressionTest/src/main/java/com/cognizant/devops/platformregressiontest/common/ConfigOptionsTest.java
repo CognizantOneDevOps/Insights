@@ -16,12 +16,14 @@
 package com.cognizant.devops.platformregressiontest.common;
 
 public interface ConfigOptionsTest {
-	
+
 	String PROP_FILE = "Properties.prop";
 	String TESTDATA_FILE = "Test_Data.xlsx";
 	String INSIGHTS_HOME = "INSIGHTS_HOME";
 	String CONFIG_DIR = ".InSights";
+	String AUTO_DIR = "Automation";
+	String CHROME_DIR = "chromedriver_win32";
+	String DRIVER_FILE = "chromedriver.exe";
 	String TESTNG_FILE = "testng.xml";
-
 
 }
