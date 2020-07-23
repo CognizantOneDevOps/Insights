@@ -36,13 +36,8 @@ public class KerberosUserDetailsService implements UserDetailsService {
 	 */
 	@Override
 	public UserDetails loadUserByUsername(String loginUsername) {
-		log.debug(" In  ...... ");
-		//BCryptPasswordEncoder encoder = passwordEncoder();
 		return new User(loginUsername, "notUsed", true, true, true, true,
 				AuthorityUtils.createAuthorityList("Viewer"));
-		//UserDetails user = GrafanaUserDetailsUtil.getUserDetails(request);
-		/*return new org.springframework.security.core.userdetails.User(user.getUsername(),
-				encoder.encode(user.getPassword()), user.getAuthorities());*/
 	}
 	
 	@Bean

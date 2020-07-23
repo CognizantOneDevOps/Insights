@@ -1,0 +1,108 @@
+{
+  "vault": {
+    "getFromVault": false,
+    "secretEngine": "insights-kv",
+    "readToken": "vault_secret_token",
+    "vaultUrl": "http://Vault_Host:port/v1/"
+  },
+  "mqConfig": {
+    "user": "iSight",
+    "password": "iSight",
+    "host": "127.0.0.1",
+    "exchange": "iSight",
+    "agentControlXchg": "iAgent"
+  },
+  "subscribe": {
+    "config": "DEPLOYMENT.AZURERELEASE.config"
+  },
+  "publish": {
+    "data": "DEPLOYMENT.AZURERELEASE.DATA",
+    "health": "DEPLOYMENT.AZURERELEASE.HEALTH"
+  },
+  "communication": {
+    "type": "REST",
+    "sslVerify": false,
+    "responseType": "JSON"
+  },
+  "dynamicTemplate": {
+    "timeFieldMapping": {
+      "queuedOn": "%Y-%m-%dT%H:%M:%S",
+      "startedOn": "%Y-%m-%dT%H:%M:%S",
+      "completedOn": "%Y-%m-%dT%H:%M:%S",
+      "lastModifiedOn": "%Y-%m-%dT%H:%M:%S"
+    },
+    "responseTemplate": {
+      "id": "deploymentId",
+      "release": {
+        "id": "releaseId",
+        "name": "releaseName",
+        "artifacts": [
+          {
+            "definitionReference": {
+              "project": {
+                "name": "projectRepository"
+              },
+              "repository": {
+                "name": "repositoryName"
+              },
+              "sourceVersion": {
+                "id": "commitId"
+              },
+              "branch": {
+                "name": "branchName"
+              },
+              "version": {
+                "name": "buildId"
+              }
+            }
+          }
+        ]
+      },
+      "releaseDefinition": {
+        "id": "releaseDefinitionId",
+        "name": "releaseDefinitionName"
+      },
+      "releaseEnvironment": {
+        "id": "releaseEnvironmentId",
+        "name": "releaseEnvironmentName"
+      },
+      "attempt": "attempt",
+      "reason": "reason",
+      "deploymentStatus": "deploymentStatus",
+      "operationStatus": "deploymentOperationStatus",
+      "queuedOn": "queuedOn",
+      "startedOn": "startedOn",
+      "completedOn": "completedOn",
+      "lastModifiedOn": "lastModifiedOn"
+    }
+  },
+  "agentId": "",
+  "toolCategory": "DEPLOYMENT",
+  "toolsTimeZone": "Asia/Kolkata",
+  "insightsTimeZone": "Asia/Kolkata",
+  "enableDataValidation": true,
+  "isDebugAllowed": false,
+  "enableValueArray": false,
+  "useResponseTemplate": true,
+  "runSchedule": 30,
+  "auth": "BASIC",
+  "userid": "",
+  "passwd": "",
+  "baseUrl": "https://dev.azure.com",
+  "collectionName": "",
+  "timeStampField": "queuedOn",
+  "timeStampFormat": "%Y-%m-%dT%H:%M:%S",
+  "isEpochTimeFormat": false,
+  "isStartFromDateEnabled": true,
+  "startFromDate": "0001-01-01T00:00:00",
+  "APIPageSize": 10,
+  "agentSecretDetails": [
+    "userid",
+    "passwd"
+  ],
+  "loggingSetting": {
+    "logLevel": "WARN",
+    "maxBytes": 5000000,
+    "backupCount": 1000
+  }
+}

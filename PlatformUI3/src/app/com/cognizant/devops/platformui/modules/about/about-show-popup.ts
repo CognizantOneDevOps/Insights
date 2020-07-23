@@ -17,6 +17,7 @@
 import { Component, OnInit, Inject, ViewChild } from '@angular/core';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA, MatPaginator, MatTableDataSource } from '@angular/material';
 import { RestCallHandlerService } from '@insights/common/rest-call-handler.service';
+import { DataSharedService } from '@insights/common/data-shared-service';
 
 
 
@@ -27,13 +28,15 @@ import { RestCallHandlerService } from '@insights/common/rest-call-handler.servi
 })
 export class AboutDialog implements OnInit {
 aboutPageURL = "https://github.com/CognizantOneDevOps/Insights/releases";
-aboutGitLicenseURL = "https://github.com/CognizantOneDevOps/Insights/blob/PlatformUI3.0/LICENSE";
+aboutGitLicenseURL = "https://github.com/CognizantOneDevOps/Insights/blob/master/LICENSE";
 /*aboutGitURL= "https://github.com/CognizantOneDevOps/Insights.git";*/
-  constructor(public dialogRef: MatDialogRef<AboutDialog>,
+year: any;
+  constructor(public dialogRef: MatDialogRef<AboutDialog>,private dataShare: DataSharedService,
     @Inject(MAT_DIALOG_DATA) public data: any) {
   }
 
   ngOnInit() {
+    this.year = this.dataShare.getCurrentYear();
   }
 
   ngAfterViewInit() {

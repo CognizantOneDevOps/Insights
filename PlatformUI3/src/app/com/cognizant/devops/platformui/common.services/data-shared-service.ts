@@ -25,6 +25,7 @@ import { ApplicationMessageDialog } from '@insights/app/modules/application-dial
 import * as CryptoJS from 'crypto-js';
 import { v4 as uuid } from 'uuid';
 import { InsightsInitService } from '@insights/common/insights-initservice';
+import { AutheticationProtocol } from '@insights/common/insights-enum';
 
 @Injectable()
 export class DataSharedService {
@@ -32,8 +33,9 @@ export class DataSharedService {
   private userSource = new BehaviorSubject<String>('admin');
   currentUser = this.userSource.asObservable();
 
-  constructor(@Inject(SESSION_STORAGE) private storage: StorageService, private datePipe: DatePipe, private cookieService: CookieService,
-    public router: Router, public dialog: MatDialog) { }
+  constructor(@Inject(SESSION_STORAGE) private storage: StorageService, private datePipe: DatePipe,
+    private cookieService: CookieService, public router: Router,
+    public dialog: MatDialog) { }
 
   public changeUser(user: String) {
     this.userSource.next(user)
@@ -55,11 +57,13 @@ export class DataSharedService {
     this.storage.remove("customerLogo");
   }
 
-  public setUserName(userNameStr: String): string  {
+  public setUserName(userNameStr: String): string {
     let userName = "";
-    if (InsightsInitService.autheticationProtocol == "SAML") {
+    if (InsightsInitService.autheticationProtocol == AutheticationProtocol.SAML.toString()
+      || InsightsInitService.autheticationProtocol == AutheticationProtocol.Kerberos.toString()
+      || InsightsInitService.autheticationProtocol == AutheticationProtocol.JWT.toString()) {
       userName = this.getSSOUserName();
-    } else if (InsightsInitService.autheticationProtocol == "NativeGrafana") {
+    } else if (InsightsInitService.autheticationProtocol == AutheticationProtocol.NativeGrafana.toString()) {
       userName = userNameStr != undefined ? userNameStr.replace(/['"]+/g, '') : "";
     }
     this.storage.set("userName", userName);
@@ -68,6 +72,10 @@ export class DataSharedService {
 
   public getUserName() {
     return this.storage.get("userName");
+  }
+
+  public getOrgId() {
+    return this.storage.get("orgId");
   }
 
   public setSSOUserName(ssouserName: String) {
@@ -79,12 +87,23 @@ export class DataSharedService {
   }
 
   public logoutInitilize() {
-    if (InsightsInitService.autheticationProtocol == "SAML") {
+    if (InsightsInitService.autheticationProtocol == AutheticationProtocol.SAML.toString()
+      || InsightsInitService.autheticationProtocol == AutheticationProtocol.JWT.toString()) {
       this.router.navigate(['/logout/2']);
-    } else if (InsightsInitService.autheticationProtocol == "NativeGrafana") {
+    } else if (InsightsInitService.autheticationProtocol == AutheticationProtocol.NativeGrafana.toString()) {
       this.router.navigate(['/logout/1']);
     }
 
+  }
+
+  public getlogoutDisplay(): boolean {
+    if (InsightsInitService.autheticationProtocol == "Kerberos") {
+      return false;
+    } else if (InsightsInitService.autheticationProtocol == AutheticationProtocol.NativeGrafana.toString()
+      || InsightsInitService.autheticationProtocol == AutheticationProtocol.SAML.toString()
+      || InsightsInitService.autheticationProtocol == AutheticationProtocol.JWT.toString()) {
+      return true;
+    }
   }
 
   public setSSOLogoutURL(logoutURL: String) {
@@ -104,9 +123,11 @@ export class DataSharedService {
   }
 
   public setAuthorizationToken(strAuthorization: string) {
-    if (InsightsInitService.autheticationProtocol == "SAML") {
+    if (InsightsInitService.autheticationProtocol == AutheticationProtocol.SAML.toString()
+      || InsightsInitService.autheticationProtocol == AutheticationProtocol.Kerberos.toString()
+      || InsightsInitService.autheticationProtocol == AutheticationProtocol.JWT.toString()) {
       this.storage.set("Authorization", strAuthorization);
-    } else if (InsightsInitService.autheticationProtocol == "NativeGrafana") {
+    } else if (InsightsInitService.autheticationProtocol == AutheticationProtocol.NativeGrafana.toString()) {
       var auth_uuid = uuid();
       auth_uuid = auth_uuid.substring(0, 15);
       var auth = this.encryptData(auth_uuid, strAuthorization) + auth_uuid;
@@ -242,5 +263,15 @@ export class DataSharedService {
   public getCurrentYear() {
     var Year = new Date().getFullYear();
     return Year;
+  }
+
+  getCustomizeName(name): String {
+    var returnName: String = "";
+    if (name != undefined && name.length > 16) {
+      returnName = (name.substring(0, 16)) + '..';
+    } else {
+      returnName = (name);
+    }
+    return returnName;
   }
 }

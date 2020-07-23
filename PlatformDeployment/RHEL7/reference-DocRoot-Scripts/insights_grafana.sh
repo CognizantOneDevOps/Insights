@@ -15,6 +15,7 @@
 #-------------------------------------------------------------------------------
 # Install customized Grafana V4.6.2
 echo "#################### Installing Grafana (running as BG process) ####################"
+cd /opt
 sudo mkdir grafana
 cd grafana
 sudo wget https://platform.cogdevops.com/insights_install/installationScripts/latest/RHEL/grafana/latest/grafana.tar.gz
@@ -33,6 +34,14 @@ sudo echo $! > grafana-pid.txt
 sleep 10
 curl -X POST -u admin:admin -H "Content-Type: application/json" -d '{"name":"PowerUser","email":"PowerUser@PowerUser.com","login":"PowerUser","password":"C0gnizant@1"}' http://localhost:3000/api/admin/users
 sleep 10
-cd ..
+sudo chmod -R 777 /opt/grafana
+cd /etc/init.d/
+sudo wget https://platform.cogdevops.com/insights_install/installationScripts/latest/RHEL/initscripts/Grafana.sh
+sudo mv Grafana.sh Grafana
+sudo chmod +x Grafana
+sudo chkconfig Grafana on
+sleep 10
+sudo service Grafana stop
+sudo service Grafana start
 
 

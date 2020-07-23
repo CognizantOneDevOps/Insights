@@ -1,9 +1,9 @@
 {
   "vault": {
     "getFromVault": false,
-    "secretEngine":"insights-kv",
-    "readToken":"vault_secret_token",
-    "vaultUrl":"http://Vault_Host:port/v1/"
+    "secretEngine": "insights-kv",
+    "readToken": "vault_secret_token",
+    "vaultUrl": "http://Vault_Host:port/v1/"
   },
   "mqConfig": {
     "user": "iSight",
@@ -32,7 +32,7 @@
       "result": "result",
       "id": "buildId",
       "sourceVersion": "sourceVersion",
-	  "sourceBranch": "sourceBranch",
+      "sourceBranch": "sourceBranch",
       "queueTime": "queuedDate",
       "reason": "manual",
       "requestedBy": {
@@ -42,7 +42,7 @@
       "status": "status",
       "repository": {
         "type": "repositoryType",
-		"name": "repositoryName"
+        "name": "repositoryName"
       },
       "buildNumber": "buildNumber",
       "startTime": "startDate",
@@ -54,7 +54,7 @@
       "priority": "priority"
     }
   },
-  "agentId" : "",
+  "agentId": "",
   "toolCategory": "CI",
   "toolsTimeZone": "Asia/Kolkata",
   "insightsTimeZone": "Asia/Kolkata",
@@ -63,16 +63,20 @@
   "enableValueArray": false,
   "useResponseTemplate": true,
   "runSchedule": 30,
-  "auth": "NTLM",
-  "userid": "user",
-  "passwd": "auth token",
-  "baseUrl": "https://<Azure-hostname>",
-  "collectionName": "myorganization",
+  "auth": "BASIC",
+  "userid": "",
+  "passwd": "",
+  "baseUrl": "https://dev.azure.com",
+  "collectionName": "",
   "timeStampField": "startDate",
   "timeStampFormat": "%Y-%m-%dT%H:%M:%S",
   "isEpochTimeFormat": false,
-  "startFrom": "2017-01-01 01:01:01",
-  "agentSecretDetails": ["userid","passwd"],
+  "isStartFromDateEnabled": true,
+  "startFromDate": "2020-01-01",
+  "agentSecretDetails": [
+    "userid",
+    "passwd"
+  ],
   "loggingSetting": {
     "logLevel": "WARN",
     "maxBytes": 5000000,

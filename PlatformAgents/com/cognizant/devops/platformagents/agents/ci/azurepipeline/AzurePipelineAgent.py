@@ -1,5 +1,5 @@
-#-------------------------------------------------------------------------------
-# Copyright 2017 Cognizant Technology Solutions
+# -------------------------------------------------------------------------------
+# Copyright 2020 Cognizant Technology Solutions
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may not
 # use this file except in compliance with the License.  You may obtain a copy
@@ -12,13 +12,14 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
 # License for the specific language governing permissions and limitations under
 # the License.
-#-------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------
 '''
-Created on 12 April 2017
+Created on 31 May 2020
 
-@author: 446620
+@author: 302683
 '''
 from ....core.BaseAgent import BaseAgent
+
 
 class AzurePipelineAgent(BaseAgent):
     def process(self):
@@ -26,8 +27,14 @@ class AzurePipelineAgent(BaseAgent):
         UserID = self.getCredential("userid")
         Passwd = self.getCredential("passwd")
         collectionName = self.config.get("collectionName", '')
-        getProjectUrl = BaseUrl+ "/" + collectionName +"/_apis/projects"
+        isStartFromDateEnabled = self.config.get("isStartFromDateEnabled", False)
+        startFromDate = self.config.get("startFromDate", None)
+        buildMetadata = {
+            "dataUpdateSupported": True,
+            "uniqueKey": ["buildId"]
+        }
         responseTemplate = self.getResponseTemplate()
+        getProjectUrl = BaseUrl + "/" + collectionName + "/_apis/projects?api-version=5.1"
         data = []
         projects = self.getResponse(getProjectUrl, 'GET', UserID, Passwd, None)
         projCount = projects["count"]
@@ -35,22 +42,26 @@ class AzurePipelineAgent(BaseAgent):
             injectData = {}
             projectName = projects["value"][project]["name"]
             injectData['projectName'] = projectName
-            getBuildsUrl = BaseUrl + "/" + collectionName + "/" + projectName + "/_apis/build/builds"
-            builds = self.getResponse(getBuildsUrl, 'GET', UserID, Passwd, None)
-            bCount = builds["count"]
-            startFrom=self.tracking.get(projectName,None)
-            if startFrom != None:
-                startFrom = startFrom+1
-            else:
-                startFrom = 1
-            for buildIterator in range(0, bCount):
+            injectData['isNodeUpdated'] = True
+            buildsURL = BaseUrl + "/" + collectionName + "/" + projectName + "/_apis/build/builds"
+            getBuildsUrl = buildsURL + "?api-version=5.1&queryOrder=finishTimeAscending"
+            startFrom = self.tracking.get(projectName, None)
+            additionalQueryParameter = ''
+            if startFrom is not None:
+                additionalQueryParameter = '&minTime=' + startFrom
+            elif isStartFromDateEnabled and startFromDate is not None:
+                additionalQueryParameter = "&minTime=" + startFromDate
+            builds = self.getResponse(getBuildsUrl + additionalQueryParameter, 'GET', UserID, Passwd, None)
+            buildCount = builds["count"]
+            for buildIterator in range(0, buildCount):
                 buildDetail = builds['value'][buildIterator]
-                if buildDetail['id'] > startFrom:
-                    data += self.parseResponse(responseTemplate, buildDetail, injectData)
-            self.tracking[projectName] = buildDetail['id']
-        if data != []:
-            self.publishToolsData(data)
-            self.updateTrackingJson(self.tracking)
-			
+                data += self.parseResponse(responseTemplate, buildDetail, injectData)
+            self.tracking[projectName] = buildDetail['finishTime']
+            if data:
+                self.publishToolsData(data, buildMetadata)
+                self.updateTrackingJson(self.tracking)
+                data = []
+
+
 if __name__ == "__main__":
     AzurePipelineAgent()

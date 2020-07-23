@@ -48,12 +48,15 @@ export class HomeComponent implements OnInit {
   isExpanded = true;
   element: HTMLElement;
   userName: String = '';
+  userDisplayName: String = '';
+  timeZone: String = '';
   userRole: String = '';
   userCurrentOrg: string = '';
   showAdminTab: boolean = false;
   isToolbarDisplay: boolean = InsightsInitService.enableInsightsBranding;
   showBusinessMapping: boolean = false;
   isValidUser: boolean = false;
+  showLogoutButton: boolean = true;
   iframeStyle = 'width:100%; height:500px;';
   iframeWidth = window.innerWidth - 20;
   iframeHeight = window.innerHeight;
@@ -79,9 +82,11 @@ export class HomeComponent implements OnInit {
   currentUserOrgsArray = []
   currentUserWithOrgs: any;
   insightsCustomerLogo: any;
-  year: any;
+  currentUserDetail: any;
+  lastSeenAtTime: string = ''; year: any;
   aboutPageURL = "https://onedevops.atlassian.net/wiki/spaces/OI/pages/218936/Release+Notes";
   helpPageURL = "https://onedevops.atlassian.net/wiki/spaces/OI/overview";
+
 
   constructor(private grafanaService: GrafanaAuthenticationService,
     private cookieService: CookieService, private config: InsightsInitService,
@@ -108,12 +113,16 @@ export class HomeComponent implements OnInit {
     var otherMenu = ((45 / 100) * this.framesize);
     this.framesize = this.framesize - otherMenu; //bottom nav 106 px + tap fix content 110 236
     window.addEventListener('message', receiveMessage, false);
+    this.showLogoutButton = this.dataShare.getlogoutDisplay();
+    console.log(" showLogoutButton " + this.showLogoutButton)
     this.getInformationFromGrafana();
   }
 
   ngOnInit() {
     console.log("Home page constructer nginit ");
     this.loadCustomerLogo();
+    var rightNow = this.dataShare.getTimeZone();
+    this.timeZone = rightNow.split(/\s/).reduce((response, word) => response += word.slice(0, 1), '')
     this.year = this.dataShare.getCurrentYear();
   }
 
@@ -124,7 +133,6 @@ export class HomeComponent implements OnInit {
   loadCustomerLogo() {
     console.log("In Customer logo method");
     this.insightsCustomerLogo = this.dataShare.getCustomerLogo();
-    //console.log(this.insightsCustomerLogo);
     if (this.insightsCustomerLogo == "DefaultLogo") {
       this.insightsCustomerLogo = "";
     }
@@ -159,21 +167,20 @@ export class HomeComponent implements OnInit {
     let self = this;
     this.loadBottomMenuItem();
     this.currentUserWithOrgs = await this.grafanaService.getCurrentUserWithOrgs();
-    //console.log(this.currentUserWithOrgs);
     if (this.currentUserWithOrgs != undefined && this.currentUserWithOrgs.data != undefined) {
       this.userName = this.dataShare.setUserName(self.currentUserWithOrgs.data.userDetail.name);
+      this.userDisplayName = this.dataShare.getCustomizeName(this.userName);
+      this.lastSeenAtTime = self.currentUserWithOrgs.data.userDetail.lastSeenAt;
       this.userCurrentOrg = this.currentUserWithOrgs.data.userDetail.orgId;
-      this.currentUserOrgsArray = this.currentUserWithOrgs.data.orgArray;
-      //console.log(this.currentUserOrgsArray);
+      this.currentUserOrgsArray = this.currentUserWithOrgs.data.orgArray
       for (let orgData of this.currentUserOrgsArray) {
         if (orgData.orgId == this.userCurrentOrg) {
           this.selectedOrg = orgData.name;
           this.userRole = orgData.role;
-          this.selectedOrgName = this.getSelectedOrgName(this.selectedOrg);
+          this.selectedOrgName = this.dataShare.getCustomizeName(this.selectedOrg);
         }
       }
       this.dataShare.setOrgAndRole(self.selectedOrg, self.userCurrentOrg, self.userRole);
-      //console.log(self.userRole.toString() + "   " + self.userCurrentOrg);
       this.cookieService.set('grafanaRole', self.userRole.toString());
       this.cookieService.set('grafanaOrg', self.userCurrentOrg);
       this.loadorganizations();
@@ -189,7 +196,6 @@ export class HomeComponent implements OnInit {
   }
 
 
-
   public async loadorganizations() {
     var self = this;
 
@@ -201,8 +207,8 @@ export class HomeComponent implements OnInit {
         var navItemobj = new NavItem();
         navItemobj.displayName = orgDtl.name;
         navItemobj.iconName = 'grafanaOrg';
-        navItemobj.route = 'InSights/Home/grafanadashboard/' + orgDtl.orgId;
-        navItemobj.isToolbarDisplay = false;
+        navItemobj.route = 'InSights/Home/landingPage';
+        navItemobj.isToolbarDisplay = true;
         navItemobj.showIcon = false;
         navItemobj.isAdminMenu = false;
         navItemobj.orgId = orgDtl.orgId;
@@ -233,6 +239,7 @@ export class HomeComponent implements OnInit {
         if (item.iconName == 'grafanaOrg') {
           this.displayLandingPage = false;
           this.switchOrganizations(item.orgId, item.route, this.selectedOrgName, this.selectedItem);
+          //this.router.navigateByUrl(item.route, { skipLocationChange: true });
         } else if (item.displayName == 'About') {
           this.about();
         } else if (item.displayName == 'Help') {
@@ -411,6 +418,7 @@ export class HomeComponent implements OnInit {
         isToolbarDisplay: false,
         showIcon: false,
         title: "About",
+        showMenu: true,
         isAdminMenu: false
       }, {
         displayName: 'Help',
@@ -418,14 +426,16 @@ export class HomeComponent implements OnInit {
         isToolbarDisplay: false,
         showIcon: false,
         title: "Help",
+        showMenu: true,
         isAdminMenu: false
       }, {
         displayName: 'Logout',
         iconName: 'logout',
         route: 'login',
         isToolbarDisplay: false,
-        showIcon: true,
+        showIcon: this.showLogoutButton,
         title: "Logout",
+        showMenu: this.showLogoutButton,
         isAdminMenu: false
       }
     ];
@@ -433,6 +443,10 @@ export class HomeComponent implements OnInit {
 
   getNavItemsByFilter() {
     return this.navItems.filter(x => x.showMenu == true);
+  }
+
+  getNavItemsBottomByFilter() {
+    return this.navItemsBottom.filter(x => x.showMenu == true);
   }
 
   public logout(): void {
@@ -451,12 +465,11 @@ export class HomeComponent implements OnInit {
 
   switchOrganizations(orgId, route, orgName, selectedItem) {
     var self = this;
-    //console.log("In switch organization " + JSON.stringify(this.currentUserOrgs));
     self.defaultOrg = orgId;
     self.grafanaService.switchUserOrg(orgId).then(function (switchorgResponseData) {
       if (switchorgResponseData != null && switchorgResponseData.status == 'success') {
         self.selectedOrg = (selectedItem == undefined ? '' : selectedItem.displayName);
-        self.selectedOrgName = self.getSelectedOrgName(self.selectedOrg);
+        self.selectedOrgName = self.dataShare.getCustomizeName(self.selectedOrg);
         var grafanaCurrentOrgRole;
         for (let orgData of self.currentUserOrgsArray) {
           if (orgData.orgId == orgId) {
@@ -473,7 +486,8 @@ export class HomeComponent implements OnInit {
         self.dataShare.setOrgAndRole(orgName, orgId, self.userRole);
         self.cookieService.set('grafanaRole', grafanaCurrentOrgRole);
         self.cookieService.set('grafanaOrg', orgId);
-        self.router.navigateByUrl(route, { skipLocationChange: true });
+        //self.router.navigateByUrl(route, { skipLocationChange: true });
+        self.showLandingPage();
       } else {
         this.messageDialog.showApplicationsMessage(" Error while Organizantion change ,Please try again later ", "ERROR");
       }
@@ -481,20 +495,8 @@ export class HomeComponent implements OnInit {
   }
 
   showLandingPage() {
-    // console.log("ByUrl " + this.router.url);
-    // console.log(this.router.isActive(this.router.url, true))
     this.router.navigate(['InSights/Home'], { skipLocationChange: true });
     this.displayLandingPage = true;
     this.isToolbarDisplay = InsightsInitService.enableInsightsBranding;
-  }
-
-  getSelectedOrgName(orgSelectedName): String {
-    var orgName: String = "";
-    if (orgSelectedName != undefined && orgSelectedName.length > 16) {
-      orgName = (orgSelectedName.substring(0, 16)) + '..';
-    } else {
-      orgName = (orgSelectedName);
-    }
-    return orgName;
   }
 }
