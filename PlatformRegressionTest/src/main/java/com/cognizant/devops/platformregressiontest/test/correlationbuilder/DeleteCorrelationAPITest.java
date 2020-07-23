@@ -15,16 +15,15 @@
  ******************************************************************************/
 package com.cognizant.devops.platformregressiontest.test.correlationbuilder;
 
-import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
-import java.util.Properties;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-import com.cognizant.devops.platformregressiontest.common.ConfigOptionsTest;
+import com.cognizant.devops.platformregressiontest.common.CommonUtils;
 import com.google.gson.JsonObject;
 
 import io.restassured.RestAssured;
@@ -35,39 +34,25 @@ import io.restassured.specification.RequestSpecification;
 
 public class DeleteCorrelationAPITest extends CorrelationTestData {
 
-	CorrelationTestData correlationTestData = new CorrelationTestData();
-
-	String jSessionID;
-	String xsrfToken;
-	private FileReader reader = null;
-	Properties p = null;
+	private static final Logger log = LogManager.getLogger(DeleteCorrelationAPITest.class);
 
 	@BeforeMethod
-	public Properties onInit() throws InterruptedException, IOException {
-		jSessionID = correlationTestData.getJsessionId();
-		xsrfToken = correlationTestData.getXSRFToken(jSessionID);
-
-		String path = System.getenv().get(ConfigOptionsTest.INSIGHTS_HOME) + File.separator
-				+ ConfigOptionsTest.CONFIG_DIR + File.separator + ConfigOptionsTest.PROP_FILE;
-
-		reader = new FileReader(path);
-
-		p = new Properties();
-
-		p.load(reader);
-		return p;
+	public void onInit() throws InterruptedException, IOException {
+		jSessionID = getJsessionId();
+		xsrfToken = getXSRFToken(jSessionID);
 	}
 
 	@Test(priority = 1, dataProvider = "correlationdeletedataprovider")
 	public void deleteCorrelation(String relationName) {
 
-		RestAssured.baseURI = p.getProperty("baseURI") + "/PlatformService/admin/correlationbuilder/deleteCorrelation";
+		RestAssured.baseURI = CommonUtils.getProperty("baseURI") + CommonUtils.getProperty("deleteCorrelation");
+
 		RequestSpecification httpRequest = RestAssured.given();
 
 		httpRequest.header(new Header("XSRF-TOKEN", xsrfToken));
-		httpRequest.cookies("JSESSIONID", jSessionID, "grafanaOrg", p.getProperty("grafanaOrg"), "grafanaRole",
-				p.getProperty("grafanaRole"), "XSRF-TOKEN", xsrfToken);
-		httpRequest.header("Authorization", correlationTestData.authorization);
+		httpRequest.cookies("JSESSIONID", jSessionID, "grafanaOrg", CommonUtils.getProperty("grafanaOrg"),
+				"grafanaRole", CommonUtils.getProperty("grafanaRole"), "XSRF-TOKEN", xsrfToken);
+		httpRequest.header("Authorization", authorization);
 
 		// Request payload sending along with post request
 
@@ -81,7 +66,7 @@ public class DeleteCorrelationAPITest extends CorrelationTestData {
 
 		String correaltionResponse = response.getBody().asString();
 
-		System.out.println("correaltionResponse" + correaltionResponse);
+		log.debug("correaltionResponse" + correaltionResponse);
 
 		int statusCode = response.getStatusCode();
 		Assert.assertTrue(correaltionResponse.contains("status"), "success");
@@ -93,13 +78,13 @@ public class DeleteCorrelationAPITest extends CorrelationTestData {
 	@Test(priority = 2, dataProvider = "correlationdeletedataprovider")
 	public void deleteCorrelationFail(String relationName) {
 
-		RestAssured.baseURI = p.getProperty("baseURI") + "/PlatformService/admin/correlationbuilder/deleteCorrelation";
+		RestAssured.baseURI = CommonUtils.getProperty("baseURI") + CommonUtils.getProperty("deleteCorrelation");
 		RequestSpecification httpRequest = RestAssured.given();
 
 		httpRequest.header(new Header("XSRF-TOKEN", xsrfToken));
-		httpRequest.cookies("JSESSIONID", jSessionID, "grafanaOrg", p.getProperty("grafanaOrg"), "grafanaRole",
-				p.getProperty("grafanaRole"), "XSRF-TOKEN", xsrfToken);
-		httpRequest.header("Authorization", correlationTestData.authorization);
+		httpRequest.cookies("JSESSIONID", jSessionID, "grafanaOrg", CommonUtils.getProperty("grafanaOrg"),
+				"grafanaRole", CommonUtils.getProperty("grafanaRole"), "XSRF-TOKEN", xsrfToken);
+		httpRequest.header("Authorization", authorization);
 
 		// Request payload sending along with post request
 
@@ -113,7 +98,7 @@ public class DeleteCorrelationAPITest extends CorrelationTestData {
 
 		String deleteResponseFail = response.getBody().asString();
 
-		System.out.println("deleteResponseFail" + deleteResponseFail);
+		log.debug("deleteResponseFail" + deleteResponseFail);
 
 		int statusCode = response.getStatusCode();
 		Assert.assertTrue(deleteResponseFail.contains("status"), "failure");

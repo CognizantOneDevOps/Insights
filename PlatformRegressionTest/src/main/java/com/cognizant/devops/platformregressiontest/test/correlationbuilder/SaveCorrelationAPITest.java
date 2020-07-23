@@ -15,19 +15,16 @@
  ******************************************************************************/
 package com.cognizant.devops.platformregressiontest.test.correlationbuilder;
 
-import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
-import java.util.Properties;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
-
-import com.cognizant.devops.platformregressiontest.common.ConfigOptionsTest;
+import com.cognizant.devops.platformregressiontest.common.CommonUtils;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-
 import io.restassured.RestAssured;
 import io.restassured.http.Header;
 import io.restassured.http.Method;
@@ -36,36 +33,23 @@ import io.restassured.specification.RequestSpecification;
 
 public class SaveCorrelationAPITest extends CorrelationTestData {
 
-	CorrelationTestData correlationTestData = new CorrelationTestData();
-
-	String jSessionID;
-	String xsrfToken;
-	private FileReader reader = null;
-	Properties p = null;
+	private static final Logger log = LogManager.getLogger(CorrelationTestData.class);
 
 	@BeforeMethod
-	public Properties onInit() throws InterruptedException, IOException {
-		jSessionID = correlationTestData.getJsessionId();
-		xsrfToken = correlationTestData.getXSRFToken(jSessionID);
+	public void onInit() throws InterruptedException, IOException {
+		jSessionID = getJsessionId();
+		xsrfToken = getXSRFToken(jSessionID);
 
-		String path = System.getenv().get(ConfigOptionsTest.INSIGHTS_HOME) + File.separator
-				+ ConfigOptionsTest.CONFIG_DIR + File.separator + ConfigOptionsTest.PROP_FILE;
-
-		reader = new FileReader(path);
-
-		p = new Properties();
-
-		p.load(reader);
-		return p;
 	}
 
 	@Test(priority = 1)
 	public void getCorrelationJson() {
 
-		RestAssured.baseURI = p.getProperty("baseURI") + "/PlatformService/admin/correlationbuilder/getCorrelationJson";
+		RestAssured.baseURI = CommonUtils.getProperty("baseURI") + CommonUtils.getProperty("getCorrelation");
+
 		RequestSpecification httpRequest = RestAssured.given();
 
-		httpRequest.header("Authorization", correlationTestData.authorization);
+		httpRequest.header("Authorization", authorization);
 		httpRequest.header("Content-Type", "application/json");
 		Response response = httpRequest.request(Method.GET, "/");
 
@@ -82,13 +66,14 @@ public class SaveCorrelationAPITest extends CorrelationTestData {
 			String sourceToolName, String sourceToolCategory, String sourceLabelName, String relationName,
 			String isSelfRelation) {
 
-		RestAssured.baseURI = p.getProperty("baseURI") + "/PlatformService/admin/correlationbuilder/saveConfig";
+		RestAssured.baseURI = CommonUtils.getProperty("baseURI") + CommonUtils.getProperty("saveCorrelation");
+
 		RequestSpecification httpRequest = RestAssured.given();
 
 		httpRequest.header(new Header("XSRF-TOKEN", xsrfToken));
-		httpRequest.cookies("JSESSIONID", jSessionID, "grafanaOrg", "1", "grafanaRole", "Admin", "XSRF-TOKEN",
-				xsrfToken);
-		httpRequest.header("Authorization", correlationTestData.authorization);
+		httpRequest.cookies("JSESSIONID", jSessionID, "grafanaOrg", CommonUtils.getProperty("grafanaOrg"),
+				"grafanaRole", CommonUtils.getProperty("grafanaRole"), "XSRF-TOKEN", xsrfToken);
+		httpRequest.header("Authorization", authorization);
 
 		// Request payload sending along with post request
 
@@ -120,11 +105,12 @@ public class SaveCorrelationAPITest extends CorrelationTestData {
 
 		Response response = httpRequest.request(Method.POST, "/");
 
-		String correaltionResponse = response.getBody().asString();
+		String correlationResponse = response.getBody().asString();
+		log.debug("SaveCorrelationResponse", correlationResponse);
 
 		int statusCode = response.getStatusCode();
-		Assert.assertTrue(correaltionResponse.contains("status"), "success");
-		Assert.assertEquals(correaltionResponse.contains("success"), true);
+		Assert.assertTrue(correlationResponse.contains("status"), "success");
+		Assert.assertEquals(correlationResponse.contains("success"), true);
 		Assert.assertEquals(statusCode, 200);
 
 	}
@@ -134,12 +120,12 @@ public class SaveCorrelationAPITest extends CorrelationTestData {
 			String destinationLabelName, String sourceToolName, String sourceToolCategory, String sourceLabelName,
 			String relationName, String isSelfRelation) {
 
-		RestAssured.baseURI = p.getProperty("baseURI") + "/PlatformService/admin/correlationbuilder/saveConfig";
+		RestAssured.baseURI = CommonUtils.getProperty("baseURI") + CommonUtils.getProperty("saveCorrelation");
 
 		RequestSpecification httpRequest = RestAssured.given();
 		httpRequest.header(new Header("XSRF-TOKEN", xsrfToken));
-		httpRequest.cookies("JSESSIONID", jSessionID, "grafanaOrg", "1", "grafanaRole", "Admin", "XSRF-TOKEN",
-				xsrfToken);
+		httpRequest.cookies("JSESSIONID", jSessionID, "grafanaOrg", CommonUtils.getProperty("grafanaOrg"),
+				"grafanaRole", CommonUtils.getProperty("grafanaRole"), "XSRF-TOKEN", xsrfToken);
 
 		JsonObject requestParam = new JsonObject();
 
@@ -150,7 +136,7 @@ public class SaveCorrelationAPITest extends CorrelationTestData {
 		Response responseAgent = httpRequest.request(Method.POST, "/");
 
 		String responseCorrelation = responseAgent.getBody().asString();
-		System.out.println("FailureResponse" + responseCorrelation);
+		log.debug("FailureResponse" + responseCorrelation);
 
 		// Statuscode Validation
 		int FailureStatusCode = responseAgent.getStatusCode();

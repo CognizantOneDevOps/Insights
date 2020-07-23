@@ -16,26 +16,43 @@
 package com.cognizant.devops.platformregressiontest.common;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.Properties;
 
-import org.testng.TestNG;
+public class CommonUtils {
 
-public class TestRunner {
+	public static Properties props = null;
 
-	public static void main(String[] args) {
+	static {
+		loadProperties();
 
-		List<String> file = new ArrayList<String>();
+	}
 
-		String path = System.getenv().get(ConfigOptionsTest.INSIGHTS_HOME) + File.separator
-				+ ConfigOptionsTest.CONFIG_DIR + File.separator + ConfigOptionsTest.AUTO_DIR + File.separator
-				+ ConfigOptionsTest.TESTNG_FILE;
+	public static void loadProperties() {
 
-		file.add(path);
-		TestNG testNG = new TestNG();
-		testNG.setTestSuites(file);
-		testNG.run();
+		try {
+			FileReader reader = null;
 
+			String path = System.getenv().get(ConfigOptionsTest.INSIGHTS_HOME) + File.separator
+					+ ConfigOptionsTest.CONFIG_DIR + File.separator + ConfigOptionsTest.PROP_FILE;
+
+			reader = new FileReader(path);
+			props = new Properties();
+
+			props.load(reader);
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+	}
+	public static String getProperty(String key) {
+		return props.getProperty(key);
 	}
 
 }

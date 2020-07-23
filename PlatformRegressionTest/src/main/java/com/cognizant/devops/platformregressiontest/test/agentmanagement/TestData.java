@@ -16,13 +16,12 @@
 package com.cognizant.devops.platformregressiontest.test.agentmanagement;
 
 import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
-import java.util.Properties;
 
-import org.testng.annotations.BeforeMethod;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.testng.annotations.DataProvider;
-
+import com.cognizant.devops.platformregressiontest.common.CommonUtils;
 import com.cognizant.devops.platformregressiontest.common.ConfigOptionsTest;
 import com.cognizant.devops.platformregressiontest.common.XLUtils;
 import com.google.gson.Gson;
@@ -36,42 +35,15 @@ import io.restassured.specification.RequestSpecification;
 
 public class TestData {
 
+	private static final Logger log = LogManager.getLogger(RegisterAgentAPITest.class);
+
 	String jSessionID;
 	String xsrfToken;
-	private FileReader reader = null;
-	Properties p = null;
-
-	@BeforeMethod
-	public Properties onInit() throws InterruptedException, IOException {
-
-		String path = System.getenv().get(ConfigOptionsTest.INSIGHTS_HOME) + File.separator
-				+ ConfigOptionsTest.CONFIG_DIR + File.separator + ConfigOptionsTest.PROP_FILE;
-
-		reader = new FileReader(path);
-
-		p = new Properties();
-
-		p.load(reader);
-		return p;
-
-	}
-
 	String authorization = "U2FsdGVkX19WFjYlorGzpolzbX1Ro+f5XcvD3Lt5lzaEo3JvlyHNfIeRMwiApFgR99b74c48-f15e-4";
 
 	public String getJsessionId() throws InterruptedException, IOException {
 
-		Properties p = null;
-
-		String path = System.getenv().get(ConfigOptionsTest.INSIGHTS_HOME) + File.separator
-				+ ConfigOptionsTest.CONFIG_DIR + File.separator + ConfigOptionsTest.PROP_FILE;
-
-		reader = new FileReader(path);
-
-		p = new Properties();
-
-		p.load(reader);
-
-		RestAssured.baseURI = p.getProperty("baseURI") + "/PlatformService/user/authenticate";
+		RestAssured.baseURI = CommonUtils.getProperty("baseURI") + "/PlatformService/user/authenticate";
 		RequestSpecification httpRequest = RestAssured.given();
 
 		httpRequest.header("Authorization",
@@ -83,7 +55,7 @@ public class TestData {
 		JsonElement jelement = gson.fromJson(cookies.trim(), JsonElement.class);
 		JsonObject json = jelement.getAsJsonObject();
 		String jSessionId = json.get("JSESSIONID").getAsString();
-		System.out.println("SessionID---------------------------->" + jSessionId);
+		log.debug("SessionID---------------------------->" + jSessionId);
 		getXSRFToken(jSessionId);
 		jSessionID = jSessionId;
 		return jSessionId;
@@ -92,35 +64,21 @@ public class TestData {
 
 	public String getXSRFToken(String jSessionId) throws InterruptedException, IOException {
 
-		Properties p = null;
-
-		/*
-		 * File file = new File("src/test/resources/Properties.prop"); String path =
-		 * file.getAbsolutePath();
-		 */
-		String path = System.getenv().get(ConfigOptionsTest.INSIGHTS_HOME) + File.separator
-				+ ConfigOptionsTest.CONFIG_DIR + File.separator + ConfigOptionsTest.PROP_FILE;
-
-		reader = new FileReader(path);
-
-		p = new Properties();
-
-		p.load(reader);
-		RestAssured.baseURI = p.getProperty("baseURI")
-				+ "/PlatformService/admin/agentConfiguration/getRegisteredAgents";
+		RestAssured.baseURI = CommonUtils.getProperty("baseURI")
+				+ "/PlatformService/admin/webhook/loadwebhookConfiguration";
 		RequestSpecification httpRequest = RestAssured.given();
+
 		httpRequest.cookie("JSESSIONID", jSessionId);
 		httpRequest.header("Authorization", authorization);
-
 		httpRequest.header("Content-Type", "application/json");
 		Response response = httpRequest.request(Method.GET, "/");
 		String cookies = response.getCookies().toString();
+
 		Gson gson = new Gson();
 		JsonElement jelement = gson.fromJson(cookies.trim(), JsonElement.class);
 		JsonObject json = jelement.getAsJsonObject();
 		String Xsrf = json.get("XSRF-TOKEN").getAsString();
-		System.out.println("XSRF---------------------------->" + Xsrf);
-		// registerAgentPost(jSessionId, Xsrf);
+		log.debug("XSRF---------------------------->" + Xsrf);
 		xsrfToken = Xsrf;
 		return Xsrf;
 	}

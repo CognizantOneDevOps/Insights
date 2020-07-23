@@ -15,16 +15,15 @@
  ******************************************************************************/
 package com.cognizant.devops.platformregressiontest.test.correlationbuilder;
 
-import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
-import java.util.Properties;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-import com.cognizant.devops.platformregressiontest.common.ConfigOptionsTest;
+import com.cognizant.devops.platformregressiontest.common.CommonUtils;
 import com.google.gson.JsonObject;
 
 import io.restassured.RestAssured;
@@ -35,36 +34,22 @@ import io.restassured.specification.RequestSpecification;
 
 public class UpdateCorrelationAPITest extends CorrelationTestData {
 
-	CorrelationTestData correlationTestData = new CorrelationTestData();
-
-	String jSessionID;
-	String xsrfToken;
-	private FileReader reader = null;
-	Properties p = null;
+	private static final Logger log = LogManager.getLogger(UpdateCorrelationAPITest.class);
 
 	@BeforeMethod
-	public Properties onInit() throws InterruptedException, IOException {
-		jSessionID = correlationTestData.getJsessionId();
-		xsrfToken = correlationTestData.getXSRFToken(jSessionID);
+	public void onInit() throws InterruptedException, IOException {
+		jSessionID = getJsessionId();
+		xsrfToken = getXSRFToken(jSessionID);
 
-		String path = System.getenv().get(ConfigOptionsTest.INSIGHTS_HOME) + File.separator
-				+ ConfigOptionsTest.CONFIG_DIR + File.separator + ConfigOptionsTest.PROP_FILE;
-
-		reader = new FileReader(path);
-
-		p = new Properties();
-
-		p.load(reader);
-		return p;
 	}
 
 	@Test(priority = 1)
 	public void getToolsAndCategories() {
 
-		RestAssured.baseURI = p.getProperty("baseURI") + "/PlatformService/datadictionary/getToolsAndCategories";
+		RestAssured.baseURI = CommonUtils.getProperty("baseURI") + CommonUtils.getProperty("getToolCategory");
 		RequestSpecification httpRequest = RestAssured.given();
 
-		httpRequest.header("Authorization", correlationTestData.authorization);
+		httpRequest.header("Authorization", authorization);
 		httpRequest.header("Content-Type", "application/json");
 		Response response = httpRequest.request(Method.GET, "/");
 
@@ -79,13 +64,13 @@ public class UpdateCorrelationAPITest extends CorrelationTestData {
 	@Test(priority = 2, dataProvider = "correlationupdatedataprovider")
 	public void updateCorrelation(String relationName, String correlationFlag) {
 
-		RestAssured.baseURI = p.getProperty("baseURI") + "/PlatformService/admin/correlationbuilder/updateCorrelation";
+		RestAssured.baseURI = CommonUtils.getProperty("baseURI") + CommonUtils.getProperty("updateCorrelation");
 		RequestSpecification httpRequest = RestAssured.given();
 
 		httpRequest.header(new Header("XSRF-TOKEN", xsrfToken));
-		httpRequest.cookies("JSESSIONID", jSessionID, "grafanaOrg", p.getProperty("grafanaOrg"), "grafanaRole",
-				p.getProperty("grafanaRole"), "XSRF-TOKEN", xsrfToken);
-		httpRequest.header("Authorization", correlationTestData.authorization);
+		httpRequest.cookies("JSESSIONID", jSessionID, "grafanaOrg", CommonUtils.getProperty("grafanaOrg"),
+				"grafanaRole", CommonUtils.getProperty("grafanaRole"), "XSRF-TOKEN", xsrfToken);
+		httpRequest.header("Authorization", authorization);
 
 		// Request payload sending along with post request
 
@@ -98,11 +83,12 @@ public class UpdateCorrelationAPITest extends CorrelationTestData {
 
 		Response response = httpRequest.request(Method.POST, "/");
 
-		String correaltionResponse = response.getBody().asString();
+		String correlationResponse = response.getBody().asString();
+		log.debug("UpdateCorrelationResponse" + correlationResponse);
 
 		int statusCode = response.getStatusCode();
-		Assert.assertTrue(correaltionResponse.contains("status"), "success");
-		Assert.assertEquals(correaltionResponse.contains("success"), true);
+		Assert.assertTrue(correlationResponse.contains("status"), "success");
+		Assert.assertEquals(correlationResponse.contains("success"), true);
 		Assert.assertEquals(statusCode, 200);
 
 	}
@@ -110,13 +96,13 @@ public class UpdateCorrelationAPITest extends CorrelationTestData {
 	@Test(priority = 3, dataProvider = "correlationupdatedataprovider")
 	public void updateCorrelationFail(String relationName, String correlationFlag) {
 
-		RestAssured.baseURI = p.getProperty("baseURI") + "/PlatformService/admin/correlationbuilder/updateCorrelation";
+		RestAssured.baseURI = CommonUtils.getProperty("baseURI") + CommonUtils.getProperty("updateCorrelation");
 		RequestSpecification httpRequest = RestAssured.given();
 
 		httpRequest.header(new Header("XSRF-TOKEN", xsrfToken));
-		httpRequest.cookies("JSESSIONID", jSessionID, "grafanaOrg", p.getProperty("grafanaOrg"), "grafanaRole",
-				p.getProperty("grafanaRole"), "XSRF-TOKEN", xsrfToken);
-		httpRequest.header("Authorization", correlationTestData.authorization);
+		httpRequest.cookies("JSESSIONID", jSessionID, "grafanaOrg", CommonUtils.getProperty("grafanaOrg"),
+				"grafanaRole", CommonUtils.getProperty("grafanaRole"), "XSRF-TOKEN", xsrfToken);
+		httpRequest.header("Authorization", authorization);
 
 		// Request payload sending along with post request
 
@@ -131,7 +117,7 @@ public class UpdateCorrelationAPITest extends CorrelationTestData {
 
 		String correaltionResponseFail = response.getBody().asString();
 
-		System.out.println("correaltionResponseFail" + correaltionResponseFail);
+		log.debug("correaltionResponseFail" + correaltionResponseFail);
 
 		Assert.assertTrue(correaltionResponseFail.contains("message"), "Unable to update correlation");
 		Assert.assertEquals(correaltionResponseFail.contains("failure"), true);
