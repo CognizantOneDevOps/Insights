@@ -24,6 +24,7 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAdjusters;
 import java.util.Date;
+import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.TimeZone;
@@ -364,7 +365,7 @@ public class InsightsUtils {
 		dtf.setTimeZone(TimeZone.getTimeZone(timezone));
 		return dtf.format(new Date());
 	}
-	
+
 	public static String insightsTimeXFormat(long inputTime) {
 		SimpleDateFormat format = new SimpleDateFormat(DATE_TIME_FORMAT);
 		int length = String.valueOf(inputTime).length();
@@ -415,7 +416,7 @@ public class InsightsUtils {
 
 	public static long getEpochTime(String datetime, String dateFormat) throws InsightsCustomException {
 
-		return convertToEpoch(datetime,dateFormat);
+		return convertToEpoch(datetime, dateFormat);
 	}
 
 	private static long calculateEpochTime(String datetime) {
@@ -431,9 +432,6 @@ public class InsightsUtils {
 		}
 	}
 
-	
-	
-
 	private static long convertToEpoch(String datetime, String dateFormat) throws InsightsCustomException {
 
 		try {
@@ -448,8 +446,7 @@ public class InsightsUtils {
 			throw new InsightsCustomException(e.getMessage());
 		}
 	}
-	
-	
+
 	public static String getDateTimeFromEpoch(long milliseconds) {
 		String duration;
 		long days = TimeUnit.DAYS.convert(milliseconds, TimeUnit.MILLISECONDS);
@@ -469,13 +466,10 @@ public class InsightsUtils {
 			month = days / 30;
 			days = days - (month * 30);
 			duration = month + "Month(s) " + days + " Days ";
-		
-		}
-		else if (days<=1)
-		{
+
+		} else if (days <= 1) {
 			duration = "1 Day ";
-		}
-		else {
+		} else {
 			duration = days + " Days ";
 		}
 		return duration;

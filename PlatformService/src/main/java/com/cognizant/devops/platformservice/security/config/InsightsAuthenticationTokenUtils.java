@@ -30,6 +30,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.kerberos.authentication.KerberosServiceRequestToken;
 import org.springframework.security.providers.ExpiringUsernameAuthenticationToken;
 import org.springframework.security.saml.SAMLCredential;
 
@@ -85,6 +86,33 @@ public class InsightsAuthenticationTokenUtils {
 	}
 
 	/**
+	 * Used to validate JWT token Data
+	 * 
+	 * @param request
+	 * @param response
+	 * @return
+	 */
+	public Authentication authenticationJWTData(HttpServletRequest request, HttpServletResponse response) {
+		Log.debug(" Inside authenticationJWTData , url ==== {} ", request.getRequestURI());
+		String auth_token = extractAndValidateAuthToken(request, response);
+		SecurityContext context = SecurityContextHolder.getContext();
+		Authentication auth = context.getAuthentication();
+		if (auth != null) {
+			Object credentials = auth.getCredentials();
+			InsightsAuthenticationToken jwtAuthenticationToken = new InsightsAuthenticationToken(auth_token,
+					auth.getDetails(), credentials, auth.getAuthorities());
+			return jwtAuthenticationToken;
+		} else {
+			//UserDetails user = GrafanaUserDetailsUtil.getUserDetails(request);user.getAuthorities()
+			InsightsAuthenticationToken jwtAuthenticationToken = new InsightsAuthenticationToken(auth_token, null, null,
+					null);
+			/*AuthenticationUtils.setResponseMessage(response, AuthenticationUtils.SECURITY_CONTEXT_CODE,
+					"Authentication not successful ,Please relogin ");*/
+			return jwtAuthenticationToken;
+		}
+	}
+
+	/**
 	 * Extract and validate authrization token
 	 * 
 	 * @param request
@@ -124,6 +152,25 @@ public class InsightsAuthenticationTokenUtils {
 			ExpiringUsernameAuthenticationToken autharization = new ExpiringUsernameAuthenticationToken(expDate,
 					principal, auth.getCredentials(), updatedAuthorities);
 			SecurityContextHolder.getContext().setAuthentication(autharization);
+		}else if ("Kerberos".equalsIgnoreCase(ApplicationConfigProvider.getInstance().getAutheticationProtocol())) {
+			SecurityContext context = SecurityContextHolder.getContext();
+			KerberosServiceRequestToken authKerberos = (KerberosServiceRequestToken) context.getAuthentication();
+			KerberosServiceRequestToken responseAuth = new KerberosServiceRequestToken(authKerberos.getDetails(), authKerberos.getTicketValidation(),
+					updatedAuthorities, authKerberos.getToken());
+			Log.debug("In successfulAuthentication Older Kerberos GrantedAuthority ==== {} ", authKerberos);
+			Log.debug("In successfulAuthentication Kerberos GrantedAuthority ==== {} ", responseAuth);
+
+			SecurityContextHolder.getContext().setAuthentication(responseAuth);
+		} else if ("JWT".equalsIgnoreCase(ApplicationConfigProvider.getInstance().getAutheticationProtocol())) {
+			SecurityContext context = SecurityContextHolder.getContext();
+			InsightsAuthenticationToken authKerberos = (InsightsAuthenticationToken) context.getAuthentication();
+
+			InsightsAuthenticationToken responseAuth = new InsightsAuthenticationToken(authKerberos.getPrincipal(),
+					authKerberos.getDetails(), authKerberos.getCredentials(), updatedAuthorities);
+			Log.debug("In successfulAuthentication JWT Older GrantedAuthority ==== {} ", authKerberos);
+			Log.debug("In successfulAuthentication JWT GrantedAuthority ==== {} ", responseAuth);
+
+			SecurityContextHolder.getContext().setAuthentication(responseAuth);
 		}
 	}
 }

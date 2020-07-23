@@ -16,7 +16,7 @@
  ******************************************************************************
  -->
 
-<div *ngIf="!ssoEnable" class="whiteBackground">
+<div *ngIf="displayLoginPage" class="whiteBackground">
 
   <div class="table-responsive-sm">
     <table class="col-sm-8 offset-sm-2 table">
@@ -78,7 +78,7 @@
               </div>
               <mat-card-actions layout="row" class="buttonMar" layout-align="center center">
                 <div flex="60" flex-offset="15" class="logOnBtnAlign">
-                  <button mat-button class="md-raised md-primary sigBtnCss" [disabled]="loginForm.invalid"
+                  <button mat-button class="md-raised md-primary sigBtnCss" [disabled]="loginForm.invalid" 
                     (click)="userAuthentication()">LOG
                     ON</button>
                 </div>

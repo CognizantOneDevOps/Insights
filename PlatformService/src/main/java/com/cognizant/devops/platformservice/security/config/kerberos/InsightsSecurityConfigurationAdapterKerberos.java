@@ -38,15 +38,14 @@ import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.kerberos.authentication.KerberosAuthenticationProvider;
-import org.springframework.security.kerberos.authentication.KerberosServiceAuthenticationProvider;
 import org.springframework.security.kerberos.authentication.sun.SunJaasKerberosClient;
 import org.springframework.security.kerberos.authentication.sun.SunJaasKerberosTicketValidator;
 import org.springframework.security.kerberos.web.authentication.SpnegoAuthenticationProcessingFilter;
-import org.springframework.security.kerberos.web.authentication.SpnegoEntryPoint;
 import org.springframework.security.ldap.DefaultSpringSecurityContextSource;
 import org.springframework.security.web.DefaultSecurityFilterChain;
 import org.springframework.security.web.FilterChainProxy;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.security.web.csrf.CsrfFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
@@ -81,6 +80,9 @@ public class InsightsSecurityConfigurationAdapterKerberos extends WebSecurityCon
 	@Autowired
 	private AuthenticationUtils authenticationUtils;
 
+	/**
+	 * This method is used to configure spring security using AuthenticationManagerBuilder
+	 */
 	@Override
 	protected void configure(AuthenticationManagerBuilder auth) throws Exception {
 		LOG.debug("message Inside InsightsSecurityConfigurationAdapterKerberos, AuthenticationManagerBuilder **** {} ",
@@ -90,7 +92,10 @@ public class InsightsSecurityConfigurationAdapterKerberos extends WebSecurityCon
 					.authenticationProvider(kerberosServiceAuthenticationProvider());
 		}
 	}
-
+	
+	/**
+	 * This method is used to configure spring security using http
+	 */
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
 		LOG.debug("message Inside InsightsSecurityConfigurationAdapterKerberos,HttpSecurity **** {} ",
@@ -106,10 +111,9 @@ public class InsightsSecurityConfigurationAdapterKerberos extends WebSecurityCon
 			http.exceptionHandling().authenticationEntryPoint(spnegoEntryPoint());
 			http.addFilterAfter(kerberosFilter(),
 					BasicAuthenticationFilter.class);
-
+			
 			http.anonymous().disable().authorizeRequests().antMatchers("/error").permitAll().antMatchers("/admin/**")
-					.access("hasAuthority('Admin')").antMatchers("/saml/**").permitAll()
-					//.antMatchers("/user/insightsso/**").permitAll() ///logout
+					.access("hasAuthority('Admin')")
 					.anyRequest().authenticated();
 
 			http.logout().logoutSuccessUrl("/");
@@ -126,17 +130,11 @@ public class InsightsSecurityConfigurationAdapterKerberos extends WebSecurityCon
 	@Conditional(InsightsKerberosBeanInitializationCondition.class)
 	public FilterChainProxy kerberosFilter() throws Exception {
 		LOG.debug("message Inside InsightsSecurityConfigurationAdapterKerberos FilterChainProxy, initial bean **** ");
-
-		/*AuthenticationUtils.setSecurityFilterchain(
-				new DefaultSecurityFilterChain(new AntPathRequestMatcher("/kerberos/login/**"), spnegoEntryPoint()));*/
-
-		/*AuthenticationUtils.setSecurityFilterchain(new DefaultSecurityFilterChain(
-				new AntPathRequestMatcher("/user/insightsso/**"), insightsSSOProcessingFilter()));*/
-
+		
 		List<Filter> filters = new ArrayList<>();
 		filters.add(0, new InsightsCustomCsrfFilter());
 		filters.add(1, new InsightsCrossScriptingFilter());
-		filters.add(2, insightsServiceProcessingFilter());
+		filters.add(2, spnegoAuthenticationProcessingFilter(authenticationManagerBean()));
 		filters.add(3, new InsightsResponseHeaderWriterFilter());
 
 		AuthenticationUtils
@@ -170,12 +168,6 @@ public class InsightsSecurityConfigurationAdapterKerberos extends WebSecurityCon
 	public AuthenticationManager authenticationManagerBean() throws Exception {
 		return super.authenticationManagerBean();
 	}
-
-	/*@Override
-	protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-		auth.authenticationProvider(kerberosAuthenticationProvider())
-				.authenticationProvider(kerberosServiceAuthenticationProvider());
-	}*/
 
 	/**
 	 * Used to configure kerberos Authentication Provider
@@ -213,9 +205,23 @@ public class InsightsSecurityConfigurationAdapterKerberos extends WebSecurityCon
 	 */
 	@Bean
 	@Conditional(InsightsKerberosBeanInitializationCondition.class)
-	public SpnegoEntryPoint spnegoEntryPoint() {
-		SpnegoEntryPoint spnegoEntryPoint = new SpnegoEntryPoint();//"/user/insightsso/authenticateSSO"
+	public InsightsSpnegoEntryPoint spnegoEntryPoint() {
+		InsightsSpnegoEntryPoint spnegoEntryPoint = new InsightsSpnegoEntryPoint("/user/insightsso/getKerberosUserDetail");//"/klogin"
+		
 		return spnegoEntryPoint;
+	} 
+	
+
+	/**
+	 * Used to handle logout senerio if unautheticated
+	 * 
+	 * @return
+	 */
+	@Bean
+	@Conditional(InsightsKerberosBeanInitializationCondition.class)
+	public SimpleUrlAuthenticationFailureHandler authenticationFailureHandler() {
+		LOG.debug(" Inside authenticationFailureHandler ==== ");
+		return new InsightsKerberosAuthenticationFailureHandler();
 	}
 
 	/**
@@ -229,6 +235,7 @@ public class InsightsSecurityConfigurationAdapterKerberos extends WebSecurityCon
 			AuthenticationManager authenticationManager) {
 		SpnegoAuthenticationProcessingFilter filter = new SpnegoAuthenticationProcessingFilter();
 		filter.setAuthenticationManager(authenticationManager);
+		filter.setFailureHandler(authenticationFailureHandler());
 		return filter;
 	}
 
@@ -239,8 +246,8 @@ public class InsightsSecurityConfigurationAdapterKerberos extends WebSecurityCon
 	 */
 	@Bean
 	@Conditional(InsightsKerberosBeanInitializationCondition.class)
-	public KerberosServiceAuthenticationProvider kerberosServiceAuthenticationProvider() {
-		KerberosServiceAuthenticationProvider provider = new KerberosServiceAuthenticationProvider();
+	public InsightsKerberosAuthenticationProvider kerberosServiceAuthenticationProvider() {
+		InsightsKerberosAuthenticationProvider provider = new InsightsKerberosAuthenticationProvider();
 		provider.setTicketValidator(sunJaasKerberosTicketValidator());
 		provider.setUserDetailsService(kerberosUserDetailsService());
 		return provider;

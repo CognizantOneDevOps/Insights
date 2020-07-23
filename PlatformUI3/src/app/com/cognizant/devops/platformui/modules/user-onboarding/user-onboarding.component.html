@@ -298,7 +298,7 @@
             </td>
 
             <input [disabled]="!assignuserSaveEnable" type="text" class="searchbox" [(ngModel)]='searchOrgForUser'
-              [value]="searchOrgForUser" required placeholder=" Search by Login ID" (keydown)="trackEvent($event)">
+              [value]="searchOrgForUser" required placeholder=" Search by Login ID" (keydown)="trackEvent1($event)">
             <button mat-icon-button (click)="searchUserInAssign(searchOrgForUser)">
               <mat-icon title="Search" class="mat-icon material-icons">
                 search

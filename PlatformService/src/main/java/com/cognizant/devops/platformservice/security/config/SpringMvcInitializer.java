@@ -22,6 +22,7 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.web.servlet.support.AbstractAnnotationConfigDispatcherServletInitializer;
 
 import com.cognizant.devops.platformservice.security.config.grafana.InsightsSecurityConfigurationAdapter;
+import com.cognizant.devops.platformservice.security.config.jwt.InsightsSecurityConfigurationAdapterJWT;
 import com.cognizant.devops.platformservice.security.config.kerberos.InsightsSecurityConfigurationAdapterKerberos;
 import com.cognizant.devops.platformservice.security.config.saml.InsightsSecurityConfigurationAdapterSAML;
 
@@ -36,7 +37,8 @@ public class SpringMvcInitializer extends AbstractAnnotationConfigDispatcherServ
 	protected Class<?>[] getRootConfigClasses() {
 		Class<?>[] returnArray = null;
 		returnArray = new Class[] { InsightsSecurityConfigurationAdapter.class,
-				InsightsSecurityConfigurationAdapterSAML.class };//, InsightsSecurityConfigurationAdapterKerberos.class 
+				InsightsSecurityConfigurationAdapterSAML.class, InsightsSecurityConfigurationAdapterKerberos.class,
+				InsightsSecurityConfigurationAdapterJWT.class };
 		LOG.debug("In SpringMvcInitializer {} ", Arrays.toString(returnArray));
 		return returnArray;
 	}

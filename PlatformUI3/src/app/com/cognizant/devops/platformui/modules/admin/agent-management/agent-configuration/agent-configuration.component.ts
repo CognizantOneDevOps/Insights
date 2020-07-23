@@ -71,6 +71,11 @@ export class AgentConfigurationComponent implements OnInit {
   subTitleInfoText: string;
   @ViewChild('fileInput') myFileDiv: ElementRef;
   regex = new RegExp("[a-zA-Z0-9_]*", 'gi');
+  regexlabel = new RegExp("^[a-zA-Z0-9._]+$");
+  labelData: string = "";
+	oldLabelData: string = "";
+	labelHealth: string = "";
+	oldLabelHealth: string = "";
   color = 'accent';
   vault = false;
 
@@ -313,6 +318,10 @@ export class AgentConfigurationComponent implements OnInit {
     }
 
     //console.log(this.updatedConfigParamdata);
+    this.labelData = String(this.updatedConfigParamdata["publish"]["data"]);
+    this.oldLabelData = String(this.defaultConfigdata["publish"]["data"]);
+    this.labelHealth = String(this.updatedConfigParamdata["publish"]["health"]);
+    this.oldLabelHealth = String(this.defaultConfigdata["publish"]["health"]);
     var agentId: string = String(this.updatedConfigParamdata['agentId']);
     var oldAgentId: string = String(this.defaultConfigdata['agentId']);
     var checkAgentId = this.regex.test(agentId);
@@ -330,14 +339,26 @@ export class AgentConfigurationComponent implements OnInit {
         agentId = undefined;
         self.messageDialog.showApplicationsMessage("AgentID and Tool name cannot be same ", "ERROR");
       }
+     else if (this.labelData != this.oldLabelData) {
+      this.validateLabel(this.labelData, "DATA");
+     }
+     else if (this.labelHealth != this.oldLabelHealth) {
+      this.validateLabel(this.labelHealth, "HEALTH");
+     }
     } else {
       if (agentId != oldAgentId) {
         self.messageDialog.showApplicationsMessage("You are not allow to change AgentId while update ", "ERROR");
         agentId = undefined;
       }
+      else if (this.labelData != this.oldLabelData) {
+        this.validateLabel(this.labelData, "DATA");
+       }
+       else if (this.labelHealth != this.oldLabelHealth) {
+        this.validateLabel(this.labelHealth, "HEALTH");
+       }
     }
 
-    if (this.updatedConfigParamdata && agentId != undefined) {
+    if (this.updatedConfigParamdata && agentId != undefined && this.labelData != undefined && this.labelHealth != undefined) {
 
 
       self.configData = "";
@@ -417,6 +438,50 @@ export class AgentConfigurationComponent implements OnInit {
         self.messageDialog.showApplicationsMessage(this.agentConfigstatus, "ERROR");
       }
     }
+
+  }
+
+  validateLabel(labelName, labelType) {
+    
+      var checkLabel = this.regexlabel.test(labelName);
+      if (!checkLabel) {
+        this.messageDialog.showApplicationsMessage("Please enter valid label name, and it contains only alphanumeric character,underscore & dot ", "ERROR");
+        if(labelType == "DATA") {
+          this.labelData = undefined;
+        } 
+        else if(labelType == "HEALTH") {
+          this.labelHealth = undefined;
+        }
+      }
+      else if(labelName == "" || labelName == undefined|| labelName == "NaN") {
+        this.messageDialog.showApplicationsMessage("Please enter valid Label name, it cannot be blank", "ERROR");
+        this.labelData = undefined;
+        this.labelHealth = undefined;
+      }
+      else if (checkLabel) {
+        var count = (labelName.match(/\./g) || []).length;
+        if (count > 1) {
+          var splittedLength = labelName.split(".").length;
+          if (labelType == "DATA" && (labelName.split(".")[splittedLength - 1] == "" || labelName.split(".")[splittedLength - 1] != "DATA" )) {
+            this.messageDialog.showApplicationsMessage("Invalid label Name. Please follow the nomenclature TOOL_CATEGORY.LABEL_NAME.DATA", "ERROR");
+            this.labelData = undefined;
+          }
+          else if (labelType == "HEALTH" && (labelName.split(".")[splittedLength - 1] == "" || labelName.split(".")[splittedLength - 1] != "HEALTH")) {
+            this.messageDialog.showApplicationsMessage("Invalid label Name. Please follow the nomenclature TOOL_CATEGORY.LABEL_NAME.HEALTH", "ERROR");
+            this.labelHealth = undefined;
+          }
+        }
+        else {
+          if(labelType == "DATA") {
+            this.messageDialog.showApplicationsMessage("Invalid label Name. Please follow the nomenclature TOOL_CATEGORY.LABEL_NAME.DATA", "ERROR");
+            this.labelData = undefined;
+          }
+          else if(labelType == "HEALTH"){
+            this.messageDialog.showApplicationsMessage("Invalid label Name. Please follow the nomenclature TOOL_CATEGORY.LABEL_NAME.HEALTH", "ERROR");
+            this.labelHealth = undefined;
+          }
+        }
+      }
   }
 
   sendStatusMsg(Msg): void {

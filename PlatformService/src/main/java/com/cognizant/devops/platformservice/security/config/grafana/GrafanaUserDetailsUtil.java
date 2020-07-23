@@ -73,7 +73,7 @@ public class GrafanaUserDetailsUtil {
 			userName = authTokens[0];
 			credential = authTokens[1];
 
-			log.debug("GrafanaUserDetailsUtil ==== Grafana's session not found! Establishing valid garafna session");
+			log.debug("GrafanaUserDetailsUtil ====Establishing valid Grafana's session ");
 			List<NewCookie> currentGrafanacookies = getValidGrafanaSession(authTokens[0], authTokens[1]);
 
 			grafanaResponseCookies = currentGrafanacookies.stream()

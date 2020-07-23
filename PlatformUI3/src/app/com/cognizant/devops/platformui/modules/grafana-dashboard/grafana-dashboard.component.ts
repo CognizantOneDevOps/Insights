@@ -35,7 +35,7 @@ import { HomeComponent } from '@insights/app/modules/home/home.component';
 export class GrafanaDashboardComponent implements OnInit {
     orgId: string;
     routeParameter: Observable<any>;
-    dashboardUrl: SafeResourceUrl ;
+    dashboardUrl: SafeResourceUrl;
     iSightDashboards = [];
     dashboardTitle: string;
     selectedOrgUrl: string;
@@ -48,8 +48,8 @@ export class GrafanaDashboardComponent implements OnInit {
     constructor(private route: ActivatedRoute, private router: Router,
         private sanitizer: DomSanitizer, private grafanadashboardservice: GrafanaDashboardService, private cookieService: CookieService) {
         var self = this;
-        var offset = 1; // 5px is app-grafana-dashboard height true 5
-        this.framesize = window.frames.innerHeight; //- offset
+        var offset = 55; // 5px is app-grafana-dashboard height true 5
+        this.framesize = window.frames.innerHeight - offset
         console.log(" self.framesize inner height " + self.framesize);
         var receiveMessage = function (evt) {
             var height = parseInt(evt.data);
@@ -62,16 +62,11 @@ export class GrafanaDashboardComponent implements OnInit {
     }
 
     ngOnInit() {
-        this.route.paramMap.subscribe(async (params: ParamMap) => {
-            this.orgId = params.get('id');
-            //console.log("orgid works " + this.orgId);
-            this.selectedDashboard = undefined;
-            //this.dashboardUrl = undefined;
-            this.dashboards = undefined;
-            this.dashboardTitle = undefined;
-            this.selectedDashboardUrl = undefined;
-            this.parseDashboards();
+        var url;
+        this.route.queryParams.subscribe(params => {
+            url = params["dashboardURL"];
         });
+        this.dashboardUrl = this.sanitizer.bypassSecurityTrustResourceUrl(url);
     }
 
     setScrollBarPosition() {
@@ -94,7 +89,7 @@ export class GrafanaDashboardComponent implements OnInit {
         var dashboardslist = await this.grafanadashboardservice.searchDashboard();
         var self = this;
         var dataArray = dashboardslist.dashboards;
-        //console.log(dashboardslist);
+        console.log("dashboards...list in grafana", dashboardslist);
         if (dashboardslist != undefined && dataArray != undefined) {
             if (dataArray.length > 0) {
                 var model = [];
@@ -110,25 +105,22 @@ export class GrafanaDashboardComponent implements OnInit {
                 if (self.selectedDashboard) {
                     self.dashboardTitle = self.selectedDashboard.title;
                 }
-                //console.log(self.dashboardTitle + "   " + self.selectedDashboard.title);
+                console.log(self.dashboardTitle + "   " + self.selectedDashboard.title);
             } else {
-                //console.log("No dashboard  Array found");
+                console.log("No dashboard  Array found");
             }
         } else {
-            //console.log("No dashboard found");
+            console.log("No dashboard found");
         }
-        //console.log("parseDashboards complate 1")
-        console.log(this.selectedDashboard);
+        console.log("parseDashboards complate 1")
+
         if (this.selectedDashboard != undefined) {
             this.selectedDashboard.iframeUrl = this.selectedDashboard.iframeUrl.replace("iSight.js", "iSight_ui3.js");
             this.dashboardUrl = this.sanitizer.bypassSecurityTrustResourceUrl(this.selectedDashboard.iframeUrl);
         } else {
             this.dashboardUrl = this.sanitizer.bypassSecurityTrustResourceUrl(InsightsInitService.grafanaHost + '/dashboard/script/iSight_ui3.js?url=' + InsightsInitService.grafanaHost + '/?orgId=' + this.orgId);// 1/?orgId=3 3/d/DrPYuKJmz/dynatrace-data?orgId=
-            //console.log("No dashboard found,set default dashboardUrl");
+            console.log("No dashboard found,set default dashboardUrl");
         }
-        //console.log(this.dashboardUrl);
-        // this.setScrollBarPosition();
-        //console.log("parseDashboards complate 11")
     }
 
     private setSelectedDashboard(dashboard) {
