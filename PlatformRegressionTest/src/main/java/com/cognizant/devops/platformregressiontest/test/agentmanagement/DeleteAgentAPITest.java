@@ -29,7 +29,7 @@ import io.restassured.http.Method;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
 
-public class DeleteAgentAPITest extends TestData {
+public class DeleteAgentAPITest extends AgentTestData {
 	
 	private static final Logger log = LogManager.getLogger(DeleteAgentAPITest.class);
 

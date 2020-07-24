@@ -30,7 +30,7 @@ import io.restassured.http.Method;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
 
-public class StartStopAgentAPITest extends TestData {
+public class StartStopAgentAPITest extends AgentTestData {
 
 	private static final Logger log = LogManager.getLogger(StartStopAgentAPITest.class);
 

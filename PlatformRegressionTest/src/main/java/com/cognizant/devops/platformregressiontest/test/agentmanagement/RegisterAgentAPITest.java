@@ -33,7 +33,7 @@ import io.restassured.http.Method;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
 
-public class RegisterAgentAPITest extends TestData {
+public class RegisterAgentAPITest extends AgentTestData {
 
 	private static final Logger log = LogManager.getLogger(RegisterAgentAPITest.class);
 
