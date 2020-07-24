@@ -17,9 +17,9 @@ public class LoginTest {
 	@Test(priority = 1)
 	public void login() throws Exception {
 
-		String path = System.getenv().get(ConfigOptionsTest.INSIGHTS_HOME) + File.separator
-				+ ConfigOptionsTest.CONFIG_DIR + File.separator + ConfigOptionsTest.AUTO_DIR + File.separator
-				+ ConfigOptionsTest.CHROME_DIR + File.separator + ConfigOptionsTest.DRIVER_FILE;
+		String path = System.getenv().get(ConfigOptionsTest.INSIGHTS_HOME) + File.separator + File.separator
+				+ ConfigOptionsTest.AUTO_DIR + File.separator + ConfigOptionsTest.CHROME_DIR + File.separator
+				+ ConfigOptionsTest.DRIVER_FILE;
 		System.setProperty("webdriver.chrome.driver", path);
 
 		WebDriver driver = new ChromeDriver();

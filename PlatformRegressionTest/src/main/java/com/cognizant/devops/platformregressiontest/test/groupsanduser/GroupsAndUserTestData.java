@@ -29,7 +29,7 @@ public class GroupsAndUserTestData {
 	String[][] getuserDetail() throws IOException {
 
 		String path = System.getenv().get(ConfigOptionsTest.INSIGHTS_HOME) + File.separator
-				+ ConfigOptionsTest.CONFIG_DIR + File.separator + ConfigOptionsTest.TESTDATA_FILE;
+				+ ConfigOptionsTest.AUTO_DIR + File.separator + ConfigOptionsTest.TESTDATA_FILE;
 
 		int rowNum = XLUtils.getRowCount(path, "AddUser");
 		int colNum = XLUtils.getCellCount(path, "AddUser", 1);
@@ -53,7 +53,7 @@ public class GroupsAndUserTestData {
 	String[][] getUpdateUserData() throws IOException {
 
 		String path = System.getenv().get(ConfigOptionsTest.INSIGHTS_HOME) + File.separator
-				+ ConfigOptionsTest.CONFIG_DIR + File.separator + ConfigOptionsTest.TESTDATA_FILE;
+				+ ConfigOptionsTest.AUTO_DIR + File.separator + ConfigOptionsTest.TESTDATA_FILE;
 
 		int rowNum = XLUtils.getRowCount(path, "UpdateUser");
 		int colNum = XLUtils.getCellCount(path, "UpdateUser", 1);
@@ -77,7 +77,7 @@ public class GroupsAndUserTestData {
 	String[][] getCorrelationDeleteData() throws IOException {
 
 		String path = System.getenv().get(ConfigOptionsTest.INSIGHTS_HOME) + File.separator
-				+ ConfigOptionsTest.CONFIG_DIR + File.separator + ConfigOptionsTest.TESTDATA_FILE;
+				+ ConfigOptionsTest.AUTO_DIR + File.separator + ConfigOptionsTest.TESTDATA_FILE;
 
 		int rowNum = XLUtils.getRowCount(path, "AssignUser");
 		int colNum = XLUtils.getCellCount(path, "AssignUser", 1);

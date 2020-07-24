@@ -29,7 +29,7 @@ public class WebhookTestData {
 	String[][] getAgentData() throws IOException {
 
 		String path = System.getenv().get(ConfigOptionsTest.INSIGHTS_HOME) + File.separator
-				+ ConfigOptionsTest.CONFIG_DIR + File.separator + ConfigOptionsTest.TESTDATA_FILE;
+				+ ConfigOptionsTest.AUTO_DIR + File.separator + ConfigOptionsTest.TESTDATA_FILE;
 
 		int rowNum = XLUtils.getRowCount(path, "SaveWebhook");
 		int colNum = XLUtils.getCellCount(path, "SaveWebhook", 1);
