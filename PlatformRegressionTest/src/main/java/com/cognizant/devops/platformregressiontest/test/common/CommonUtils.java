@@ -53,7 +53,7 @@ public class CommonUtils {
 			FileReader reader = null;
 
 			String path = System.getenv().get(ConfigOptionsTest.INSIGHTS_HOME) + File.separator
-					+ ConfigOptionsTest.CONFIG_DIR + File.separator + ConfigOptionsTest.PROP_FILE;
+					+ ConfigOptionsTest.AUTO_DIR + File.separator + ConfigOptionsTest.PROP_FILE;
 
 			reader = new FileReader(path);
 			props = new Properties();

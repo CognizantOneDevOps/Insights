@@ -31,7 +31,7 @@ import io.restassured.http.Method;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
 
-public class UpdateAgentAPITest extends TestData {
+public class UpdateAgentAPITest extends AgentTestData {
 
 	private static final Logger log = LogManager.getLogger(UpdateAgentAPITest.class);
 

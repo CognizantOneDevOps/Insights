@@ -23,10 +23,7 @@
 	<url>http://maven.apache.org</url>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<testng.version>7.0.1</testng.version>
-		<spring.version>5.2.3.RELEASE</spring.version>
 	</properties>
-
 	<dependencies>
 		<dependency>
 			<groupId>com.google.code.gson</groupId>
@@ -209,7 +206,7 @@
 								<transformer
 									implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
 									<manifestEntries>
-										<Main-Class>com.cognizant.devops.platformregressiontest.test.common.TestRunner</Main-Class>
+										<Main-Class>com.cognizant.devops.platformregressiontest.test.common.PlatformRegressionMain</Main-Class>
 									</manifestEntries>
 								</transformer>
 							</transformers>
