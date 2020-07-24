@@ -17,14 +17,13 @@
 package com.cognizant.devops.platformregressiontest.test.agentmanagement;
 
 import java.io.IOException;
-import java.util.Properties;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
-import com.cognizant.devops.platformregressiontest.common.CommonUtils;
+import com.cognizant.devops.platformregressiontest.test.common.CommonUtils;
+import com.cognizant.devops.platformregressiontest.test.common.ConfigOptionsTest;
 import io.restassured.RestAssured;
 import io.restassured.http.Header;
 import io.restassured.http.Method;
@@ -33,17 +32,16 @@ import io.restassured.specification.RequestSpecification;
 
 public class StartStopAgentAPITest extends TestData {
 
-	private static final Logger log = LogManager.getLogger(RegisterAgentAPITest.class);
+	private static final Logger log = LogManager.getLogger(StartStopAgentAPITest.class);
+
+	String jSessionID;
+	String xsrfToken;
 
 	@BeforeMethod
-	public Properties onInit() throws InterruptedException, IOException {
+	public void onInit() throws InterruptedException, IOException {
 
-		jSessionID = getJsessionId();
-		xsrfToken = getXSRFToken(jSessionID);
-
-		Properties CommonUtils = null;
-
-		return CommonUtils;
+		jSessionID = CommonUtils.getJsessionId();
+		xsrfToken = CommonUtils.getXSRFToken(jSessionID);
 	}
 
 	@Test(priority = 1, dataProvider = "agentupdateprovider")
@@ -53,25 +51,25 @@ public class StartStopAgentAPITest extends TestData {
 		RestAssured.baseURI = CommonUtils.getProperty("baseURI") + CommonUtils.getProperty("startStopAgentBaseURI");
 
 		RequestSpecification httpRequest = RestAssured.given();
-		
-		httpRequest.header(new Header("XSRF-TOKEN", xsrfToken));
-		httpRequest.cookies("JSESSIONID", jSessionID, "grafanaOrg", CommonUtils.getProperty("grafanaOrg"),
-				"grafanaRole", CommonUtils.getProperty("grafanaRole"), "XSRF-TOKEN", xsrfToken);
-		httpRequest.header("Authorization", authorization);
+		httpRequest.header(new Header(ConfigOptionsTest.CSRF_NAME_KEY, xsrfToken));
+		httpRequest.cookies(ConfigOptionsTest.SESSION_ID_KEY, jSessionID, ConfigOptionsTest.GRAFANA_COOKIES_ORG,
+				CommonUtils.getProperty("grafanaOrg"), ConfigOptionsTest.GRAFANA_COOKIES_ROLE,
+				CommonUtils.getProperty("grafanaRole"), ConfigOptionsTest.CSRF_NAME_KEY, xsrfToken);
+		httpRequest.header(ConfigOptionsTest.AUTH_HEADER_KEY, CommonUtils.getProperty("authorization"));
+
 		httpRequest.queryParams("agentId", agentId, "toolName", toolName, "osversion", osversion, "action",
 				CommonUtils.getProperty("actionStart"));
 
-		httpRequest.header("Content-Type", "application/json");
+		httpRequest.header(ConfigOptionsTest.CONTENT_HEADER_KEY, ConfigOptionsTest.CONTENT_TYPE_VALUE);
 
 		// Response Object
 		Response responseAgent = httpRequest.request(Method.POST, "/");
 
 		String responseStartAgent = responseAgent.getBody().asString();
-		log.debug("UpdatedResponse" + responseStartAgent);
+		log.debug("UpdatedResponse {}", responseStartAgent);
 
-		// Statuscode Validation
-		int StatusCode = responseAgent.getStatusCode();
-		Assert.assertEquals(StatusCode, 200);
+		int statusCode = responseAgent.getStatusCode();
+		Assert.assertEquals(statusCode, 200);
 
 	}
 
@@ -82,22 +80,23 @@ public class StartStopAgentAPITest extends TestData {
 		RestAssured.baseURI = CommonUtils.getProperty("baseURI") + CommonUtils.getProperty("startStopAgentBaseURI");
 
 		RequestSpecification httpRequest = RestAssured.given();
-		httpRequest.header(new Header("XSRF-TOKEN", xsrfToken));
-		httpRequest.cookies("JSESSIONID", jSessionID, "grafanaOrg", CommonUtils.getProperty("grafanaOrg"),
-				"grafanaRole", CommonUtils.getProperty("grafanaRole"), "XSRF-TOKEN", xsrfToken);
-		httpRequest.header("Authorization", authorization);
+		httpRequest.header(new Header(ConfigOptionsTest.CSRF_NAME_KEY, xsrfToken));
+		httpRequest.cookies(ConfigOptionsTest.SESSION_ID_KEY, jSessionID, ConfigOptionsTest.GRAFANA_COOKIES_ORG,
+				CommonUtils.getProperty("grafanaOrg"), ConfigOptionsTest.GRAFANA_COOKIES_ROLE,
+				CommonUtils.getProperty("grafanaRole"), ConfigOptionsTest.CSRF_NAME_KEY, xsrfToken);
+		httpRequest.header(ConfigOptionsTest.AUTH_HEADER_KEY, CommonUtils.getProperty("authorization"));
+
 		httpRequest.queryParams("agentId", agentId, "toolName", toolName, "osversion", osversion, "action",
 				CommonUtils.getProperty("actionStop"));
 
-		httpRequest.header("Content-Type", "application/json");
+		httpRequest.header(ConfigOptionsTest.CONTENT_HEADER_KEY, ConfigOptionsTest.CONTENT_TYPE_VALUE);
 
 		// Response Object
 		Response responseAgent = httpRequest.request(Method.POST, "/");
 
 		String responseStopAgent = responseAgent.getBody().asString();
-		log.debug("FailureResponse" + responseStopAgent);
+		log.debug("FailureResponse {}", responseStopAgent);
 
-		// Statuscode Validation
 		int statusCode = responseAgent.getStatusCode();
 		Assert.assertEquals(statusCode, 200);
 		Assert.assertTrue(responseStopAgent.contains("status"), "success");

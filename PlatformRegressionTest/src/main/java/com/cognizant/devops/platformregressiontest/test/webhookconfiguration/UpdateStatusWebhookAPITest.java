@@ -21,7 +21,8 @@ import org.apache.logging.log4j.Logger;
 import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
-import com.cognizant.devops.platformregressiontest.common.CommonUtils;
+import com.cognizant.devops.platformregressiontest.test.common.CommonUtils;
+import com.cognizant.devops.platformregressiontest.test.common.ConfigOptionsTest;
 import com.google.gson.JsonObject;
 import io.restassured.RestAssured;
 import io.restassured.http.Header;
@@ -32,11 +33,14 @@ import io.restassured.specification.RequestSpecification;
 public class UpdateStatusWebhookAPITest extends WebhookTestData {
 
 	private static final Logger log = LogManager.getLogger(UpdateStatusWebhookAPITest.class);
+	String jSessionID;
+	String xsrfToken;
 
 	@BeforeMethod
 	public void onInit() throws InterruptedException, IOException {
-		jSessionID = getJsessionId();
-		xsrfToken = getXSRFToken(jSessionID);
+
+		jSessionID = CommonUtils.getJsessionId();
+		xsrfToken = CommonUtils.getXSRFToken(jSessionID);
 	}
 
 	@Test(priority = 1)
@@ -45,10 +49,11 @@ public class UpdateStatusWebhookAPITest extends WebhookTestData {
 		RestAssured.baseURI = CommonUtils.getProperty("baseURI") + CommonUtils.getProperty("subscribeWebhook");
 		RequestSpecification httpRequest = RestAssured.given();
 
-		httpRequest.header(new Header("XSRF-TOKEN", xsrfToken));
-		httpRequest.cookies("JSESSIONID", jSessionID, "grafanaOrg", CommonUtils.getProperty("grafanaOrg"),
-				"grafanaRole", CommonUtils.getProperty("grafanaRole"), "XSRF-TOKEN", xsrfToken);
-		httpRequest.header("Authorization", authorization);
+		httpRequest.header(new Header(ConfigOptionsTest.CSRF_NAME_KEY, xsrfToken));
+		httpRequest.cookies(ConfigOptionsTest.SESSION_ID_KEY, jSessionID, ConfigOptionsTest.GRAFANA_COOKIES_ORG,
+				CommonUtils.getProperty("grafanaOrg"), ConfigOptionsTest.GRAFANA_COOKIES_ROLE,
+				CommonUtils.getProperty("grafanaRole"), ConfigOptionsTest.CSRF_NAME_KEY, xsrfToken);
+		httpRequest.header(ConfigOptionsTest.AUTH_HEADER_KEY, CommonUtils.getProperty("authorization"));
 
 		// Request payload sending along with post request
 		JsonObject requestParam = new JsonObject();
@@ -56,18 +61,18 @@ public class UpdateStatusWebhookAPITest extends WebhookTestData {
 		requestParam.addProperty("webhookName", "pvt_webhook_test");
 		requestParam.addProperty("statussubscribe", true);
 
-		httpRequest.header("Content-Type", "application/json");
+		httpRequest.header(ConfigOptionsTest.CONTENT_HEADER_KEY, ConfigOptionsTest.CONTENT_TYPE_VALUE);
 		httpRequest.body(requestParam);
 
 		Response response = httpRequest.request(Method.POST, "/");
 
-		String SaveWebhookStatus = response.getBody().asString();
+		String updateWebhookStatus = response.getBody().asString();
 
-		log.debug("SaveWebhookStatus" + SaveWebhookStatus);
+		log.debug("SubscribeWebhookStatus {}", updateWebhookStatus);
 
 		int statusCode = response.getStatusCode();
-		Assert.assertTrue(SaveWebhookStatus.contains("status"), "success");
-		Assert.assertEquals(SaveWebhookStatus.contains("success"), true);
+		Assert.assertTrue(updateWebhookStatus.contains("status"), "success");
+		Assert.assertEquals(updateWebhookStatus.contains("success"), true);
 		Assert.assertEquals(statusCode, 200);
 
 	}
@@ -78,26 +83,25 @@ public class UpdateStatusWebhookAPITest extends WebhookTestData {
 		RestAssured.baseURI = CommonUtils.getProperty("baseURI") + CommonUtils.getProperty("subscribeWebhook");
 		RequestSpecification httpRequest = RestAssured.given();
 
-		httpRequest.header(new Header("XSRF-TOKEN", xsrfToken));
-		httpRequest.cookies("JSESSIONID", jSessionID, "grafanaOrg", CommonUtils.getProperty("grafanaOrg"),
-				"grafanaRole", CommonUtils.getProperty("grafanaRole"), "XSRF-TOKEN", xsrfToken);
-		httpRequest.header("Authorization", authorization);
+		httpRequest.header(new Header(ConfigOptionsTest.CSRF_NAME_KEY, xsrfToken));
+		httpRequest.cookies(ConfigOptionsTest.SESSION_ID_KEY, jSessionID, ConfigOptionsTest.GRAFANA_COOKIES_ORG,
+				CommonUtils.getProperty("grafanaOrg"), ConfigOptionsTest.GRAFANA_COOKIES_ROLE,
+				CommonUtils.getProperty("grafanaRole"), ConfigOptionsTest.CSRF_NAME_KEY, xsrfToken);
+		httpRequest.header(ConfigOptionsTest.AUTH_HEADER_KEY, CommonUtils.getProperty("authorization"));
 
 		JsonObject requestParam = new JsonObject();
 
 		requestParam.addProperty("webhookName", CommonUtils.getProperty("webhookName"));
 		requestParam.addProperty("statussubscribe", CommonUtils.getProperty("statusUnsubscribe"));
 
-		httpRequest.header("Content-Type", "application/json");
+		httpRequest.header(ConfigOptionsTest.CONTENT_HEADER_KEY, ConfigOptionsTest.CONTENT_TYPE_VALUE);
 		httpRequest.body(requestParam);
 
-		// Response Object
 		Response response = httpRequest.request(Method.POST, "/");
 
 		String unsubscribeResponse = response.getBody().asString();
-		log.debug("unsubscribeResponse" + unsubscribeResponse);
+		log.debug("unsubscribeResponse {}", unsubscribeResponse);
 
-		// Statuscode Validation
 		int statusCode = response.getStatusCode();
 		Assert.assertEquals(statusCode, 200);
 		Assert.assertTrue(unsubscribeResponse.contains("status"), "success");

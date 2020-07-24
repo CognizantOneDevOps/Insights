@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  ******************************************************************************/
-package com.cognizant.devops.platformregressiontest.common;
+package com.cognizant.devops.platformregressiontest.test.common;
 
 import java.io.File;
 import java.util.ArrayList;

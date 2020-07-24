@@ -23,7 +23,10 @@ import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-import com.cognizant.devops.platformregressiontest.common.CommonUtils;
+import com.cognizant.devops.platformregressiontest.test.common.CommonUtils;
+import com.cognizant.devops.platformregressiontest.test.common.ConfigOptionsTest;
+import com.google.gson.Gson;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 import io.restassured.RestAssured;
@@ -36,11 +39,14 @@ public class RegisterAgentAPITest extends TestData {
 
 	private static final Logger log = LogManager.getLogger(RegisterAgentAPITest.class);
 
+	String jSessionID;
+	String xsrfToken;
+
 	@BeforeMethod
 	public void onInit() throws InterruptedException, IOException {
 
-		jSessionID = getJsessionId();
-		xsrfToken = getXSRFToken(jSessionID);
+		jSessionID = CommonUtils.getJsessionId();
+		xsrfToken = CommonUtils.getXSRFToken(jSessionID);
 	}
 
 	@Test(priority = 1, dataProvider = "agentdataprovider")
@@ -49,10 +55,11 @@ public class RegisterAgentAPITest extends TestData {
 		RestAssured.baseURI = CommonUtils.getProperty("baseURI") + CommonUtils.getProperty("registerAgentBaseURI");
 		RequestSpecification httpRequest = RestAssured.given();
 
-		httpRequest.header(new Header("XSRF-TOKEN", xsrfToken));
-		httpRequest.cookies("JSESSIONID", jSessionID, "grafanaOrg", CommonUtils.getProperty("grafanaOrg"),
-				"grafanaRole", CommonUtils.getProperty("grafanaRole"), "XSRF-TOKEN", xsrfToken);
-		httpRequest.header("Authorization", authorization);
+		httpRequest.header(new Header(ConfigOptionsTest.CSRF_NAME_KEY, xsrfToken));
+		httpRequest.cookies(ConfigOptionsTest.SESSION_ID_KEY, jSessionID, ConfigOptionsTest.GRAFANA_COOKIES_ORG,
+				CommonUtils.getProperty("grafanaOrg"), ConfigOptionsTest.GRAFANA_COOKIES_ROLE,
+				CommonUtils.getProperty("grafanaRole"), ConfigOptionsTest.CSRF_NAME_KEY, xsrfToken);
+		httpRequest.header(ConfigOptionsTest.AUTH_HEADER_KEY, CommonUtils.getProperty("authorization"));
 
 		// Request payload sending along with post request
 		JsonObject requestParam = new JsonObject();
@@ -63,18 +70,18 @@ public class RegisterAgentAPITest extends TestData {
 		requestParam.addProperty("trackingDetails", "");
 		requestParam.addProperty("vault", vault);
 
-		httpRequest.header("Content-Type", "application/json");
+		httpRequest.header(ConfigOptionsTest.CONTENT_HEADER_KEY, ConfigOptionsTest.CONTENT_TYPE_VALUE);
 		httpRequest.body(requestParam);
 
 		// Response Object
 		Response responseAgent = httpRequest.request(Method.POST, "/");
 
 		String responseRegisterAgent = responseAgent.getBody().asString();
-		log.debug("SuccessResponse", responseRegisterAgent);
+		log.debug("SuccessResponse {}", responseRegisterAgent);
 
 		int statusCode = responseAgent.getStatusCode();
 
-		log.debug("StatusCode" + statusCode);
+		log.debug("StatusCode {}", statusCode);
 		Assert.assertEquals(statusCode, 200);
 		Assert.assertEquals(responseRegisterAgent.contains("success"), true);
 
@@ -82,51 +89,40 @@ public class RegisterAgentAPITest extends TestData {
 
 	// @Test(priority = 2, dataProvider = "agentdataprovider")
 	public void registerAgentAuthorizationFail(String toolName, String agentVersion, String osversion,
-			String configJson, String vault) {
+			String configJson, String vault) throws InterruptedException, IOException {
 
-		RestAssured.baseURI = CommonUtils.getProperty("basURI") + CommonUtils.getProperty("registerAgentBaseURI");
+		RestAssured.baseURI = CommonUtils.getProperty("baseURI")
+				+ "/PlatformService/admin/agentConfiguration/getRegisteredAgents";
 		RequestSpecification httpRequest = RestAssured.given();
+		httpRequest.header("Authorization", CommonUtils.getProperty("authorization"));
 
-		httpRequest.header(new Header("XSRF-TOKEN", xsrfToken));
-		httpRequest.cookies("JSESSIONID", jSessionID, "grafanaOrg", CommonUtils.getProperty("grafanaOrg"),
-				"grafanaRole", CommonUtils.getProperty("grafanaRole"), "XSRF-TOKEN", xsrfToken);
-		// httpRequest.header("Authorization", authorization);
+		httpRequest.header(ConfigOptionsTest.CONTENT_HEADER_KEY, ConfigOptionsTest.CONTENT_TYPE_VALUE);
+		Response response = httpRequest.request(Method.GET, "/");
 
-		// Request payload sending along with post request
-		JsonObject requestParam = new JsonObject();
-		requestParam.addProperty("toolName", toolName);
-		requestParam.addProperty("agentVersion", agentVersion);
-		requestParam.addProperty("osversion", osversion);
-		requestParam.addProperty("configJson", configJson);
-		requestParam.addProperty("trackingDetails", "");
-		requestParam.addProperty("vault", vault);
-
-		httpRequest.header("Content-Type", "application/json");
-		httpRequest.body(requestParam);
-
-		// Response Object
-		Response responseAgent = httpRequest.request(Method.POST, "/");
-
-		String responseRegisterAgent = responseAgent.getBody().asString();
-		log.debug("FailureResponse" + responseRegisterAgent);
+		String responseRegisterAgentList = response.getBody().asString();
+		Gson gson = new Gson();
+		JsonElement jelement = gson.fromJson(responseRegisterAgentList.trim(), JsonElement.class);
+		JsonObject json = jelement.getAsJsonObject();
+		log.debug("responseRegisterAgent {}", responseRegisterAgentList);
 
 		// Statuscode Validation
-		int FailureStatusCode = responseAgent.getStatusCode();
-		Assert.assertEquals(FailureStatusCode, 400);
-		Assert.assertTrue(responseRegisterAgent.contains("status"), "failure");
+		// int FailureStatusCode = responseAgent.getStatusCode();
+		// Assert.assertEquals(FailureStatusCode, 400);
+		// Assert.assertTrue(responseRegisterAgent.contains("status"), "failure");
 
 	}
 
-	@Test(priority = 2, dataProvider = "agentdataprovider")
+	@Test(priority = 3, dataProvider = "agentdataprovider")
 	public void registerAgentFail(String toolName, String agentVersion, String osversion, String configJson,
-			String vault) {
+			String vault) throws InterruptedException, IOException {
 
 		RestAssured.baseURI = CommonUtils.getProperty("baseURI") + CommonUtils.getProperty("registerAgentBaseURI");
 
 		RequestSpecification httpRequest = RestAssured.given();
-		httpRequest.header(new Header("XSRF-TOKEN", xsrfToken));
-		httpRequest.cookies("JSESSIONID", jSessionID, "grafanaOrg", CommonUtils.getProperty("grafanaOrg"),
-				"grafanaRole", CommonUtils.getProperty("grafanaRole"), "XSRF-TOKEN", xsrfToken);
+		httpRequest.header(new Header(ConfigOptionsTest.CSRF_NAME_KEY, xsrfToken));
+		httpRequest.cookies(ConfigOptionsTest.SESSION_ID_KEY, jSessionID, ConfigOptionsTest.GRAFANA_COOKIES_ORG,
+				CommonUtils.getProperty("grafanaOrg"), ConfigOptionsTest.GRAFANA_COOKIES_ROLE,
+				CommonUtils.getProperty("grafanaRole"), ConfigOptionsTest.CSRF_NAME_KEY, xsrfToken);
 
 		// Request payload sending along with post request
 		JsonObject requestParam = new JsonObject();
@@ -136,18 +132,16 @@ public class RegisterAgentAPITest extends TestData {
 		requestParam.addProperty("configJson", configJson);
 		requestParam.addProperty("trackingDetails", "");
 
-		httpRequest.header("Content-Type", "application/json");
+		httpRequest.header(ConfigOptionsTest.CONTENT_HEADER_KEY, ConfigOptionsTest.CONTENT_TYPE_VALUE);
 		httpRequest.body(requestParam);
 
-		// Response Object
 		Response responseAgent = httpRequest.request(Method.POST, "/");
 
 		String responseRegisterAgent = responseAgent.getBody().asString();
-		log.debug("FailureResponse" + responseRegisterAgent);
+		log.debug("FailureResponse {}", responseRegisterAgent);
 
-		// Statuscode Validation
-		int FailureStatusCode = responseAgent.getStatusCode();
-		Assert.assertEquals(FailureStatusCode, 400);
+		int failureStatusCode = responseAgent.getStatusCode();
+		Assert.assertEquals(failureStatusCode, 400);
 		Assert.assertTrue(responseRegisterAgent.contains("status"), "failure");
 
 	}

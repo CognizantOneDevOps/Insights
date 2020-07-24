@@ -1,29 +1,18 @@
 package com.cognizant.devops.platformregressiontest.test.login;
 
 import java.io.File;
-import java.io.IOException;
-import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.testng.Assert;
-import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-import com.cognizant.devops.platformregressiontest.common.CommonUtils;
-import com.cognizant.devops.platformregressiontest.common.ConfigOptionsTest;
+import com.cognizant.devops.platformregressiontest.test.common.CommonUtils;
+import com.cognizant.devops.platformregressiontest.test.common.ConfigOptionsTest;
 
 public class LoginTest {
-
-	@BeforeMethod
-	public Properties onInit() throws IOException {
-
-		Properties CommonUtils = null;
-
-		return CommonUtils;
-	}
 
 	@Test(priority = 1)
 	public void login() throws Exception {
