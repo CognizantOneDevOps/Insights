@@ -22,11 +22,10 @@ import org.apache.logging.log4j.Logger;
 import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
-
-import com.cognizant.devops.platformregressiontest.common.CommonUtils;
+import com.cognizant.devops.platformregressiontest.test.common.CommonUtils;
+import com.cognizant.devops.platformregressiontest.test.common.ConfigOptionsTest;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-
 import io.restassured.RestAssured;
 import io.restassured.http.Header;
 import io.restassured.http.Method;
@@ -36,11 +35,14 @@ import io.restassured.specification.RequestSpecification;
 public class SaveWebhookAPITest extends WebhookTestData {
 
 	private static final Logger log = LogManager.getLogger(SaveWebhookAPITest.class);
+	String jSessionID;
+	String xsrfToken;
 
 	@BeforeMethod
 	public void onInit() throws InterruptedException, IOException {
-		jSessionID = getJsessionId();
-		xsrfToken = getXSRFToken(jSessionID);
+
+		jSessionID = CommonUtils.getJsessionId();
+		xsrfToken = CommonUtils.getXSRFToken(jSessionID);
 	}
 
 	@Test(priority = 1)
@@ -49,8 +51,8 @@ public class SaveWebhookAPITest extends WebhookTestData {
 		RestAssured.baseURI = CommonUtils.getProperty("baseURI") + CommonUtils.getProperty("loadWebhookCOnfiguration");
 		RequestSpecification httpRequest = RestAssured.given();
 
-		httpRequest.header("Authorization", authorization);
-		httpRequest.header("Content-Type", "application/json");
+		httpRequest.header(ConfigOptionsTest.AUTH_HEADER_KEY, CommonUtils.getProperty("authorization"));
+		httpRequest.header(ConfigOptionsTest.CONTENT_HEADER_KEY, ConfigOptionsTest.CONTENT_TYPE_VALUE);
 		Response response = httpRequest.request(Method.GET, "/");
 
 		String webhookConfiguration = response.getBody().asString();
@@ -62,7 +64,7 @@ public class SaveWebhookAPITest extends WebhookTestData {
 	}
 
 	@Test(priority = 2, dataProvider = "webhookdataprovider")
-	public void saveWebhook(String toolName, String labelDisplay, String webhookName, String dataformat,
+	public void saveWebHookConfiguration(String toolName, String labelDisplay, String webhookName, String dataformat,
 			String mqchannel, String responseTemplate, String statussubscribe, String timeField, String epochTime,
 			String timeFormat, String wid, String operationName, String dynamicTemplate, String isUpdateRequired,
 			String fieldUsedForUpdate) {
@@ -70,10 +72,11 @@ public class SaveWebhookAPITest extends WebhookTestData {
 		RestAssured.baseURI = CommonUtils.getProperty("baseURI") + CommonUtils.getProperty("saveWebhook");
 		RequestSpecification httpRequest = RestAssured.given();
 
-		httpRequest.header(new Header("XSRF-TOKEN", xsrfToken));
-		httpRequest.cookies("JSESSIONID", jSessionID, "grafanaOrg", CommonUtils.getProperty("grafanaOrg"),
-				"grafanaRole", CommonUtils.getProperty("grafanaRole"), "XSRF-TOKEN", xsrfToken);
-		httpRequest.header("Authorization", authorization);
+		httpRequest.header(new Header(ConfigOptionsTest.CSRF_NAME_KEY, xsrfToken));
+		httpRequest.cookies(ConfigOptionsTest.SESSION_ID_KEY, jSessionID, ConfigOptionsTest.GRAFANA_COOKIES_ORG,
+				CommonUtils.getProperty("grafanaOrg"), ConfigOptionsTest.GRAFANA_COOKIES_ROLE,
+				CommonUtils.getProperty("grafanaRole"), ConfigOptionsTest.CSRF_NAME_KEY, xsrfToken);
+		httpRequest.header(ConfigOptionsTest.AUTH_HEADER_KEY, CommonUtils.getProperty("authorization"));
 
 		// Request payload sending along with post request
 		JsonObject requestParam = new JsonObject();
@@ -105,18 +108,18 @@ public class SaveWebhookAPITest extends WebhookTestData {
 		requestParam.addProperty("isUpdateRequired", isUpdateRequired);
 		requestParam.addProperty("fieldUsedForUpdate", fieldUsedForUpdate);
 
-		httpRequest.header("Content-Type", "application/json");
+		httpRequest.header(ConfigOptionsTest.CONTENT_HEADER_KEY, ConfigOptionsTest.CONTENT_TYPE_VALUE);
 		httpRequest.body(requestParam);
 
 		Response response = httpRequest.request(Method.POST, "/");
 
-		String SaveWebhook = response.getBody().asString();
+		String saveWebhook = response.getBody().asString();
 
-		log.debug("SaveWebhook" + SaveWebhook);
+		log.debug("SaveWebhook {}", saveWebhook);
 
 		int statusCode = response.getStatusCode();
-		Assert.assertTrue(SaveWebhook.contains("status"), "success");
-		Assert.assertEquals(SaveWebhook.contains("success"), true);
+		Assert.assertTrue(saveWebhook.contains("status"), "success");
+		Assert.assertEquals(saveWebhook.contains("success"), true);
 		Assert.assertEquals(statusCode, 200);
 
 	}
@@ -127,23 +130,23 @@ public class SaveWebhookAPITest extends WebhookTestData {
 		RestAssured.baseURI = CommonUtils.getProperty("baseURI") + CommonUtils.getProperty("saveWebhook");
 
 		RequestSpecification httpRequest = RestAssured.given();
-		httpRequest.header(new Header("XSRF-TOKEN", xsrfToken));
-		httpRequest.cookies("JSESSIONID", jSessionID, "grafanaOrg", CommonUtils.getProperty("grafanaOrg"),
-				"grafanaRole", CommonUtils.getProperty("grafanaRole"), "XSRF-TOKEN", xsrfToken);
+
+		httpRequest.header(new Header(ConfigOptionsTest.CSRF_NAME_KEY, xsrfToken));
+		httpRequest.cookies(ConfigOptionsTest.SESSION_ID_KEY, jSessionID, ConfigOptionsTest.GRAFANA_COOKIES_ORG,
+				CommonUtils.getProperty("grafanaOrg"), ConfigOptionsTest.GRAFANA_COOKIES_ROLE,
+				CommonUtils.getProperty("grafanaRole"), ConfigOptionsTest.CSRF_NAME_KEY, xsrfToken);
 
 		JsonObject requestParam = new JsonObject();
-		httpRequest.header("Content-Type", "application/json");
+		httpRequest.header(ConfigOptionsTest.CONTENT_HEADER_KEY, ConfigOptionsTest.CONTENT_TYPE_VALUE);
 		httpRequest.body(requestParam);
 
-		// Response Object
 		Response response = httpRequest.request(Method.POST, "/");
 
 		String responseWebhook = response.getBody().asString();
-		log.debug("responseWebhook" + responseWebhook);
+		log.debug("responseWebhook {}", responseWebhook);
 
-		// Statuscode Validation
-		int FailureStatusCode = response.getStatusCode();
-		Assert.assertEquals(FailureStatusCode, 400);
+		int failureStatusCode = response.getStatusCode();
+		Assert.assertEquals(failureStatusCode, 400);
 		Assert.assertTrue(responseWebhook.contains("status"), "failure");
 		Assert.assertEquals(responseWebhook.contains("failure"), true);
 

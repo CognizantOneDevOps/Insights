@@ -23,7 +23,8 @@ import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-import com.cognizant.devops.platformregressiontest.common.CommonUtils;
+import com.cognizant.devops.platformregressiontest.test.common.CommonUtils;
+import com.cognizant.devops.platformregressiontest.test.common.ConfigOptionsTest;
 import com.google.gson.JsonObject;
 
 import io.restassured.RestAssured;
@@ -36,11 +37,14 @@ public class UpdateCorrelationAPITest extends CorrelationTestData {
 
 	private static final Logger log = LogManager.getLogger(UpdateCorrelationAPITest.class);
 
+	String jSessionID;
+	String xsrfToken;
+
 	@BeforeMethod
 	public void onInit() throws InterruptedException, IOException {
-		jSessionID = getJsessionId();
-		xsrfToken = getXSRFToken(jSessionID);
 
+		jSessionID = CommonUtils.getJsessionId();
+		xsrfToken = CommonUtils.getXSRFToken(jSessionID);
 	}
 
 	@Test(priority = 1)
@@ -49,8 +53,8 @@ public class UpdateCorrelationAPITest extends CorrelationTestData {
 		RestAssured.baseURI = CommonUtils.getProperty("baseURI") + CommonUtils.getProperty("getToolCategory");
 		RequestSpecification httpRequest = RestAssured.given();
 
-		httpRequest.header("Authorization", authorization);
-		httpRequest.header("Content-Type", "application/json");
+		httpRequest.header(ConfigOptionsTest.AUTH_HEADER_KEY, CommonUtils.getProperty("authorization"));
+		httpRequest.header(ConfigOptionsTest.CONTENT_HEADER_KEY, ConfigOptionsTest.CONTENT_TYPE_VALUE);
 		Response response = httpRequest.request(Method.GET, "/");
 
 		String correlationJson = response.getBody().asString();
@@ -67,10 +71,11 @@ public class UpdateCorrelationAPITest extends CorrelationTestData {
 		RestAssured.baseURI = CommonUtils.getProperty("baseURI") + CommonUtils.getProperty("updateCorrelation");
 		RequestSpecification httpRequest = RestAssured.given();
 
-		httpRequest.header(new Header("XSRF-TOKEN", xsrfToken));
-		httpRequest.cookies("JSESSIONID", jSessionID, "grafanaOrg", CommonUtils.getProperty("grafanaOrg"),
-				"grafanaRole", CommonUtils.getProperty("grafanaRole"), "XSRF-TOKEN", xsrfToken);
-		httpRequest.header("Authorization", authorization);
+		httpRequest.header(new Header(ConfigOptionsTest.CSRF_NAME_KEY, xsrfToken));
+		httpRequest.cookies(ConfigOptionsTest.SESSION_ID_KEY, jSessionID, ConfigOptionsTest.GRAFANA_COOKIES_ORG,
+				CommonUtils.getProperty("grafanaOrg"), ConfigOptionsTest.GRAFANA_COOKIES_ROLE,
+				CommonUtils.getProperty("grafanaRole"), ConfigOptionsTest.CSRF_NAME_KEY, xsrfToken);
+		httpRequest.header(ConfigOptionsTest.AUTH_HEADER_KEY, CommonUtils.getProperty("authorization"));
 
 		// Request payload sending along with post request
 
@@ -78,13 +83,13 @@ public class UpdateCorrelationAPITest extends CorrelationTestData {
 		requestParam.addProperty("relationName", relationName);
 		requestParam.addProperty("correlationFlag", correlationFlag);
 
-		httpRequest.header("Content-Type", "application/json");
+		httpRequest.header(ConfigOptionsTest.CONTENT_HEADER_KEY, ConfigOptionsTest.CONTENT_TYPE_VALUE);
 		httpRequest.body(requestParam);
 
 		Response response = httpRequest.request(Method.POST, "/");
 
 		String correlationResponse = response.getBody().asString();
-		log.debug("UpdateCorrelationResponse" + correlationResponse);
+		log.debug("UpdateCorrelationResponse {}" , correlationResponse);
 
 		int statusCode = response.getStatusCode();
 		Assert.assertTrue(correlationResponse.contains("status"), "success");
@@ -99,25 +104,25 @@ public class UpdateCorrelationAPITest extends CorrelationTestData {
 		RestAssured.baseURI = CommonUtils.getProperty("baseURI") + CommonUtils.getProperty("updateCorrelation");
 		RequestSpecification httpRequest = RestAssured.given();
 
-		httpRequest.header(new Header("XSRF-TOKEN", xsrfToken));
-		httpRequest.cookies("JSESSIONID", jSessionID, "grafanaOrg", CommonUtils.getProperty("grafanaOrg"),
-				"grafanaRole", CommonUtils.getProperty("grafanaRole"), "XSRF-TOKEN", xsrfToken);
-		httpRequest.header("Authorization", authorization);
+		httpRequest.header(new Header(ConfigOptionsTest.CSRF_NAME_KEY, xsrfToken));
+		httpRequest.cookies(ConfigOptionsTest.SESSION_ID_KEY, jSessionID, ConfigOptionsTest.GRAFANA_COOKIES_ORG,
+				CommonUtils.getProperty("grafanaOrg"), ConfigOptionsTest.GRAFANA_COOKIES_ROLE,
+				CommonUtils.getProperty("grafanaRole"), ConfigOptionsTest.CSRF_NAME_KEY, xsrfToken);
+		httpRequest.header(ConfigOptionsTest.AUTH_HEADER_KEY, CommonUtils.getProperty("authorization"));
 
 		// Request payload sending along with post request
-
 		JsonObject requestParam = new JsonObject();
 		requestParam.addProperty("relationName", "");
 		requestParam.addProperty("correlationFlag", correlationFlag);
 
-		httpRequest.header("Content-Type", "application/json");
+		httpRequest.header(ConfigOptionsTest.CONTENT_HEADER_KEY, ConfigOptionsTest.CONTENT_TYPE_VALUE);
 		httpRequest.body(requestParam);
 
 		Response response = httpRequest.request(Method.POST, "/");
 
 		String correaltionResponseFail = response.getBody().asString();
 
-		log.debug("correaltionResponseFail" + correaltionResponseFail);
+		log.debug("correaltionResponseFail {}" , correaltionResponseFail);
 
 		Assert.assertTrue(correaltionResponseFail.contains("message"), "Unable to update correlation");
 		Assert.assertEquals(correaltionResponseFail.contains("failure"), true);

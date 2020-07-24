@@ -17,15 +17,13 @@
 package com.cognizant.devops.platformregressiontest.test.agentmanagement;
 
 import java.io.IOException;
-import java.util.Properties;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
-
-import com.cognizant.devops.platformregressiontest.common.CommonUtils;
+import com.cognizant.devops.platformregressiontest.test.common.CommonUtils;
+import com.cognizant.devops.platformregressiontest.test.common.ConfigOptionsTest;
 import com.google.gson.JsonObject;
 import io.restassured.RestAssured;
 import io.restassured.http.Header;
@@ -37,14 +35,14 @@ public class UpdateAgentAPITest extends TestData {
 
 	private static final Logger log = LogManager.getLogger(UpdateAgentAPITest.class);
 
+	String jSessionID;
+	String xsrfToken;
+
 	@BeforeMethod
-	public Properties onInit() throws InterruptedException, IOException {
+	public void onInit() throws InterruptedException, IOException {
 
-		jSessionID = getJsessionId();
-		xsrfToken = getXSRFToken(jSessionID);
-		Properties CommonUtils = null;
-
-		return CommonUtils;
+		jSessionID = CommonUtils.getJsessionId();
+		xsrfToken = CommonUtils.getXSRFToken(jSessionID);
 	}
 
 	@Test(priority = 1, dataProvider = "agentupdateprovider")
@@ -54,10 +52,11 @@ public class UpdateAgentAPITest extends TestData {
 		RestAssured.baseURI = CommonUtils.getProperty("baseURI") + CommonUtils.getProperty("updateAgentBaseURI");
 		RequestSpecification httpRequest = RestAssured.given();
 
-		httpRequest.header(new Header("XSRF-TOKEN", xsrfToken));
-		httpRequest.cookies("JSESSIONID", jSessionID, "grafanaOrg", CommonUtils.getProperty("grafanaOrg"),
-				"grafanaRole", CommonUtils.getProperty("grafanaRole"), "XSRF-TOKEN", xsrfToken);
-		httpRequest.header("Authorization", authorization);
+		httpRequest.header(new Header(ConfigOptionsTest.CSRF_NAME_KEY, xsrfToken));
+		httpRequest.cookies(ConfigOptionsTest.SESSION_ID_KEY, jSessionID, ConfigOptionsTest.GRAFANA_COOKIES_ORG,
+				CommonUtils.getProperty("grafanaOrg"), ConfigOptionsTest.GRAFANA_COOKIES_ROLE,
+				CommonUtils.getProperty("grafanaRole"), ConfigOptionsTest.CSRF_NAME_KEY, xsrfToken);
+		httpRequest.header(ConfigOptionsTest.AUTH_HEADER_KEY, CommonUtils.getProperty("authorization"));
 
 		// Request payload sending along with post request
 		JsonObject requestParam = new JsonObject();
@@ -76,11 +75,10 @@ public class UpdateAgentAPITest extends TestData {
 		Response responseAgent = httpRequest.request(Method.POST, "/");
 
 		String responseUpdateAgent = responseAgent.getBody().asString();
-		log.debug("UpdatedResponse" + responseUpdateAgent);
+		log.debug("UpdatedResponse {}", responseUpdateAgent);
 
-		// Statuscode Validation
-		int StatusCode = responseAgent.getStatusCode();
-		Assert.assertEquals(StatusCode, 200);
+		int statusCode = responseAgent.getStatusCode();
+		Assert.assertEquals(statusCode, 200);
 
 	}
 
@@ -91,9 +89,10 @@ public class UpdateAgentAPITest extends TestData {
 		RestAssured.baseURI = CommonUtils.getProperty("baseURI") + CommonUtils.getProperty("updateAgentBaseURI");
 		RequestSpecification httpRequest = RestAssured.given();
 
-		httpRequest.header(new Header("XSRF-TOKEN", xsrfToken));
-		httpRequest.cookies("JSESSIONID", jSessionID, "grafanaOrg", CommonUtils.getProperty("grafanaOrg"),
-				"grafanaRole", CommonUtils.getProperty("grafanaRole"), "XSRF-TOKEN", xsrfToken);
+		httpRequest.header(new Header(ConfigOptionsTest.CSRF_NAME_KEY, xsrfToken));
+		httpRequest.cookies(ConfigOptionsTest.SESSION_ID_KEY, jSessionID, ConfigOptionsTest.GRAFANA_COOKIES_ORG,
+				CommonUtils.getProperty("grafanaOrg"), ConfigOptionsTest.GRAFANA_COOKIES_ROLE,
+				CommonUtils.getProperty("grafanaRole"), ConfigOptionsTest.CSRF_NAME_KEY, xsrfToken);
 
 		// Request payload sending along with post request
 		JsonObject requestParam = new JsonObject();
@@ -108,15 +107,13 @@ public class UpdateAgentAPITest extends TestData {
 		httpRequest.header("Content-Type", "application/json");
 		httpRequest.body(requestParam);
 
-		// Response Object
 		Response responseAgent = httpRequest.request(Method.POST, "/");
 
 		String responseUpdateAgent = responseAgent.getBody().asString();
-		log.debug("FailureResponse" + responseUpdateAgent);
+		log.debug("FailureResponse {}", responseUpdateAgent);
 
-		// Statuscode Validation
-		int FailureStatusCode = responseAgent.getStatusCode();
-		Assert.assertEquals(FailureStatusCode, 400);
+		int failureStatusCode = responseAgent.getStatusCode();
+		Assert.assertEquals(failureStatusCode, 400);
 		Assert.assertTrue(responseUpdateAgent.contains("status"), "failure");
 
 	}

@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  ******************************************************************************/
-package com.cognizant.devops.platformregressiontest.common;
+package com.cognizant.devops.platformregressiontest.test.common;
 
 public interface ConfigOptionsTest {
 
@@ -25,5 +25,11 @@ public interface ConfigOptionsTest {
 	String CHROME_DIR = "chromedriver_win32";
 	String DRIVER_FILE = "chromedriver.exe";
 	String TESTNG_FILE = "testng.xml";
-
+	public static final String AUTH_HEADER_KEY = "authorization";
+	public static final String CSRF_NAME_KEY = "XSRF-TOKEN";
+	public static final String SESSION_ID_KEY = "JSESSIONID";
+	public static final String GRAFANA_COOKIES_ORG = "grafanaOrg";
+	public static final String GRAFANA_COOKIES_ROLE = "grafanaRole";
+	public static final String CONTENT_HEADER_KEY = "Content-Type";
+	public static final String CONTENT_TYPE_VALUE = "application/json";
 }

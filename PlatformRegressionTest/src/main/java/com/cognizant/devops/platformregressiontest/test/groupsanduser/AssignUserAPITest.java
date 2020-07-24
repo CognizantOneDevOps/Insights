@@ -27,7 +27,8 @@ import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-import com.cognizant.devops.platformregressiontest.common.CommonUtils;
+import com.cognizant.devops.platformregressiontest.test.common.CommonUtils;
+import com.cognizant.devops.platformregressiontest.test.common.ConfigOptionsTest;
 import com.google.gson.JsonObject;
 
 import io.restassured.RestAssured;
@@ -39,27 +40,28 @@ import io.restassured.specification.RequestSpecification;
 public class AssignUserAPITest extends GroupsAndUserTestData {
 
 	private static final Logger log = LogManager.getLogger(AssignUserAPITest.class);
+	String jSessionID;
+	String xsrfToken;
 
 	@BeforeMethod
 	public void onInit() throws InterruptedException, IOException {
-		jSessionID = getJsessionId();
-		xsrfToken = getXSRFToken(jSessionID);
 
+		jSessionID = CommonUtils.getJsessionId();
+		xsrfToken = CommonUtils.getXSRFToken(jSessionID);
 	}
-
 	@Test(priority = 1, dataProvider = "assignuserdataprovider")
 	public void assignUser(String orgName, String orgId, String roleName, String userName) {
 
 		RestAssured.baseURI = CommonUtils.getProperty("baseURI") + CommonUtils.getProperty("assignUser");
 		RequestSpecification httpRequest = RestAssured.given();
 
-		httpRequest.header(new Header("XSRF-TOKEN", xsrfToken));
-		httpRequest.cookies("JSESSIONID", jSessionID, "grafanaOrg", CommonUtils.getProperty("grafanaOrg"),
-				"grafanaRole", CommonUtils.getProperty("grafanaRole"), "XSRF-TOKEN", xsrfToken);
-		httpRequest.header("Authorization", authorization);
+		httpRequest.header(new Header(ConfigOptionsTest.CSRF_NAME_KEY, xsrfToken));
+		httpRequest.cookies(ConfigOptionsTest.SESSION_ID_KEY, jSessionID, ConfigOptionsTest.GRAFANA_COOKIES_ORG,
+				CommonUtils.getProperty("grafanaOrg"), ConfigOptionsTest.GRAFANA_COOKIES_ROLE,
+				CommonUtils.getProperty("grafanaRole"), ConfigOptionsTest.CSRF_NAME_KEY, xsrfToken);
+		httpRequest.header(ConfigOptionsTest.AUTH_HEADER_KEY, CommonUtils.getProperty("authorization"));
 
 		// Request payload sending along with post request
-
 		Map<String, Object> json = new HashMap<>();
 		json.put("orgName", orgName);
 		json.put("orgId", orgId);
@@ -69,14 +71,14 @@ public class AssignUserAPITest extends GroupsAndUserTestData {
 		List<Map<String, Object>> requestParam = new ArrayList<>();
 		requestParam.add(json);
 
-		httpRequest.header("Content-Type", "application/json");
+		httpRequest.header(ConfigOptionsTest.CONTENT_HEADER_KEY, ConfigOptionsTest.CONTENT_TYPE_VALUE);
 		httpRequest.body(requestParam);
 
 		Response response = httpRequest.request(Method.POST, "/");
 
 		String assignUesrResponse = response.getBody().asString();
 
-		log.debug("assignUesrResponse" + assignUesrResponse);
+		log.debug("assignUesrResponse {}" , assignUesrResponse);
 
 		int statusCode = response.getStatusCode();
 		Assert.assertEquals(statusCode, 200);
@@ -90,22 +92,22 @@ public class AssignUserAPITest extends GroupsAndUserTestData {
 		RestAssured.baseURI = CommonUtils.getProperty("baseURI") + CommonUtils.getProperty("assignUser");
 		RequestSpecification httpRequest = RestAssured.given();
 
-		httpRequest.header(new Header("XSRF-TOKEN", xsrfToken));
-		httpRequest.cookies("JSESSIONID", jSessionID, "grafanaOrg", CommonUtils.getProperty("grafanaOrg"),
-				"grafanaRole", CommonUtils.getProperty("grafanaRole"), "XSRF-TOKEN", xsrfToken);
+		httpRequest.header(new Header(ConfigOptionsTest.CSRF_NAME_KEY, xsrfToken));
+		httpRequest.cookies(ConfigOptionsTest.SESSION_ID_KEY, jSessionID, ConfigOptionsTest.GRAFANA_COOKIES_ORG,
+				CommonUtils.getProperty("grafanaOrg"), ConfigOptionsTest.GRAFANA_COOKIES_ROLE,
+				CommonUtils.getProperty("grafanaRole"), ConfigOptionsTest.CSRF_NAME_KEY, xsrfToken);
 
 		// Request payload sending along with post request
-
 		JsonObject requestParam = new JsonObject();
 
-		httpRequest.header("Content-Type", "application/json");
+		httpRequest.header(ConfigOptionsTest.CONTENT_HEADER_KEY, ConfigOptionsTest.CONTENT_TYPE_VALUE);
 		httpRequest.body(requestParam);
 
 		Response response = httpRequest.request(Method.POST, "/");
 
 		String assignUserResponseFail = response.getBody().asString();
 
-		log.debug("assignUserResponseFail" + assignUserResponseFail);
+		log.debug("assignUserResponseFail {}" , assignUserResponseFail);
 
 		int statusCode = response.getStatusCode();
 		Assert.assertEquals(statusCode, 400);

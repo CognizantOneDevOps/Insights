@@ -16,14 +16,13 @@
 package com.cognizant.devops.platformregressiontest.test.agentmanagement;
 
 import java.io.IOException;
-import java.util.Properties;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
-import com.cognizant.devops.platformregressiontest.common.CommonUtils;
+import com.cognizant.devops.platformregressiontest.test.common.CommonUtils;
+import com.cognizant.devops.platformregressiontest.test.common.ConfigOptionsTest;
 import io.restassured.RestAssured;
 import io.restassured.http.Header;
 import io.restassured.http.Method;
@@ -31,17 +30,17 @@ import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
 
 public class DeleteAgentAPITest extends TestData {
+	
+	private static final Logger log = LogManager.getLogger(DeleteAgentAPITest.class);
 
-	private static final Logger log = LogManager.getLogger(RegisterAgentAPITest.class);
+	String jSessionID;
+	String xsrfToken;
 
 	@BeforeMethod
-	public Properties onInit() throws InterruptedException, IOException {
-		jSessionID = getJsessionId();
-		xsrfToken = getXSRFToken(jSessionID);
+	public void onInit() throws InterruptedException, IOException {
 
-		Properties CommonUtils = null;
-
-		return CommonUtils;
+		jSessionID = CommonUtils.getJsessionId();
+		xsrfToken = CommonUtils.getXSRFToken(jSessionID);
 	}
 
 	@Test(priority = 1, dataProvider = "agentdeletedataprovider")
@@ -50,23 +49,22 @@ public class DeleteAgentAPITest extends TestData {
 		RestAssured.baseURI = CommonUtils.getProperty("baseURI") + CommonUtils.getProperty("deleteAgentBaseURI");
 
 		RequestSpecification httpRequest = RestAssured.given();
-		httpRequest.header(new Header("XSRF-TOKEN", xsrfToken));
-		httpRequest.cookies("JSESSIONID", jSessionID, "grafanaOrg", CommonUtils.getProperty("grafanaOrg"),
-				"grafanaRole", CommonUtils.getProperty("grafanaRole"), "XSRF-TOKEN", xsrfToken);
-		httpRequest.header("Authorization", authorization);
+		httpRequest.header(new Header(ConfigOptionsTest.CSRF_NAME_KEY, xsrfToken));
+		httpRequest.cookies(ConfigOptionsTest.SESSION_ID_KEY, jSessionID, ConfigOptionsTest.GRAFANA_COOKIES_ORG,
+				CommonUtils.getProperty("grafanaOrg"), ConfigOptionsTest.GRAFANA_COOKIES_ROLE,
+				CommonUtils.getProperty("grafanaRole"), ConfigOptionsTest.CSRF_NAME_KEY, xsrfToken);
+		httpRequest.header(ConfigOptionsTest.AUTH_HEADER_KEY, CommonUtils.getProperty("authorization"));
 		httpRequest.queryParams("agentId", agentId, "toolName", toolName, "osversion", osversion, "action", action);
 
-		httpRequest.header("Content-Type", "application/json");
+		httpRequest.header(ConfigOptionsTest.CONTENT_HEADER_KEY, ConfigOptionsTest.CONTENT_TYPE_VALUE);
 
-		// Response Object
 		Response responseAgent = httpRequest.request(Method.POST, "/");
 
 		String responseDeleteAgent = responseAgent.getBody().asString();
-		log.debug("Response" + responseDeleteAgent);
+		log.debug("Response {}" , responseDeleteAgent);
 
-		// Statuscode Validation
 		int statusCode = responseAgent.getStatusCode();
-		log.debug("StatusCode" + statusCode);
+		log.debug("StatusCode {}" , statusCode);
 		Assert.assertEquals(statusCode, 200);
 		Assert.assertTrue(responseDeleteAgent.contains("status"), "success");
 
@@ -78,23 +76,23 @@ public class DeleteAgentAPITest extends TestData {
 		RestAssured.baseURI = CommonUtils.getProperty("baseURI") + CommonUtils.getProperty("deleteAgentBaseURI");
 
 		RequestSpecification httpRequest = RestAssured.given();
-		httpRequest.header(new Header("XSRF-TOKEN", xsrfToken));
-		httpRequest.cookies("JSESSIONID", jSessionID, "grafanaOrg", CommonUtils.getProperty("grafanaOrg"),
-				"grafanaRole", CommonUtils.getProperty("grafanaRole"), "XSRF-TOKEN", xsrfToken);
-		httpRequest.header("Authorization", authorization);
+		httpRequest.header(new Header(ConfigOptionsTest.CSRF_NAME_KEY, xsrfToken));
+		httpRequest.cookies(ConfigOptionsTest.SESSION_ID_KEY, jSessionID, ConfigOptionsTest.GRAFANA_COOKIES_ORG,
+				CommonUtils.getProperty("grafanaOrg"), ConfigOptionsTest.GRAFANA_COOKIES_ROLE,
+				CommonUtils.getProperty("grafanaRole"), ConfigOptionsTest.CSRF_NAME_KEY, xsrfToken);
+		httpRequest.header(ConfigOptionsTest.AUTH_HEADER_KEY, CommonUtils.getProperty("authorization"));
+		
 		httpRequest.queryParams("agentId", agentId, "toolName", toolName, "osversion", osversion, "action", action);
-
-		httpRequest.header("Content-Type", "application/json");
-
-		// Response Object
+		
+		httpRequest.header(ConfigOptionsTest.CONTENT_HEADER_KEY, ConfigOptionsTest.CONTENT_TYPE_VALUE);
+		
 		Response responseAgent = httpRequest.request(Method.POST, "/");
 
 		String responseDeleteAgent = responseAgent.getBody().asString();
-		log.debug("responseDeleteAgent" + responseDeleteAgent);
+		log.debug("responseDeleteAgent {}" , responseDeleteAgent);
 
-		// Statuscode Validation
-		int FailurestatusCode = responseAgent.getStatusCode();
-		Assert.assertEquals(FailurestatusCode, 200);
+		int failurestatusCode = responseAgent.getStatusCode();
+		Assert.assertEquals(failurestatusCode, 200);
 		Assert.assertTrue(responseDeleteAgent.contains("status"), "failure");
 		Assert.assertTrue(responseDeleteAgent.contains("message"), "No entity found for query");
 
