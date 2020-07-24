@@ -35,7 +35,7 @@ import io.restassured.specification.RequestSpecification;
 
 public class DeleteCorrelationAPITest extends CorrelationTestData {
 
-	private static final Logger log = LogManager.getLogger(SaveCorrelationAPITest.class);
+	private static final Logger log = LogManager.getLogger(DeleteCorrelationAPITest.class);
 
 	String jSessionID;
 	String xsrfToken;
