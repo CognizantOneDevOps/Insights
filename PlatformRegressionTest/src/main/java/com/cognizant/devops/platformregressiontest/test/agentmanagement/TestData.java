@@ -27,7 +27,7 @@ public class TestData {
 	String[][] getAgentData() throws IOException {
 
 		String path = System.getenv().get(ConfigOptionsTest.INSIGHTS_HOME) + File.separator
-				+ ConfigOptionsTest.CONFIG_DIR + File.separator + ConfigOptionsTest.TESTDATA_FILE;
+				+ ConfigOptionsTest.AUTO_DIR + File.separator + ConfigOptionsTest.TESTDATA_FILE;
 
 		int rowNum = XLUtils.getRowCount(path, "AgentRegistration");
 		int colNum = XLUtils.getCellCount(path, "AgentRegistration", 1);
@@ -51,7 +51,7 @@ public class TestData {
 	String[][] getUpdateAgentData() throws IOException {
 
 		String path = System.getenv().get(ConfigOptionsTest.INSIGHTS_HOME) + File.separator
-				+ ConfigOptionsTest.CONFIG_DIR + File.separator + ConfigOptionsTest.TESTDATA_FILE;
+				+ ConfigOptionsTest.AUTO_DIR + File.separator + ConfigOptionsTest.TESTDATA_FILE;
 
 		int rowNum = XLUtils.getRowCount(path, "UpdateAgent");
 		int colNum = XLUtils.getCellCount(path, "UpdateAgent", 1);
@@ -75,7 +75,7 @@ public class TestData {
 	String[][] getAgentDeleteData() throws IOException {
 
 		String path = System.getenv().get(ConfigOptionsTest.INSIGHTS_HOME) + File.separator
-				+ ConfigOptionsTest.CONFIG_DIR + File.separator + ConfigOptionsTest.TESTDATA_FILE;
+				+ ConfigOptionsTest.AUTO_DIR + File.separator + ConfigOptionsTest.TESTDATA_FILE;
 
 		int rowNum = XLUtils.getRowCount(path, "DeleteAgent");
 		int colNum = XLUtils.getCellCount(path, "DeleteAgent", 1);

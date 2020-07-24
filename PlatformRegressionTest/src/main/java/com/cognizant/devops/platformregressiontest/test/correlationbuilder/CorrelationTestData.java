@@ -27,7 +27,7 @@ public class CorrelationTestData {
 	String[][] getCorrelationData() throws IOException {
 
 		String path = System.getenv().get(ConfigOptionsTest.INSIGHTS_HOME) + File.separator
-				+ ConfigOptionsTest.CONFIG_DIR + File.separator + ConfigOptionsTest.TESTDATA_FILE;
+				+ ConfigOptionsTest.AUTO_DIR + File.separator + ConfigOptionsTest.TESTDATA_FILE;
 
 		int rowNum = XLUtils.getRowCount(path, "SaveCorrelation");
 		int colNum = XLUtils.getCellCount(path, "SaveCorrelation", 1);
@@ -51,7 +51,7 @@ public class CorrelationTestData {
 	String[][] getCorrelationUpdateData() throws IOException {
 
 		String path = System.getenv().get(ConfigOptionsTest.INSIGHTS_HOME) + File.separator
-				+ ConfigOptionsTest.CONFIG_DIR + File.separator + ConfigOptionsTest.TESTDATA_FILE;
+				+ ConfigOptionsTest.AUTO_DIR + File.separator + ConfigOptionsTest.TESTDATA_FILE;
 
 		int rowNum = XLUtils.getRowCount(path, "UpdateCorrelation");
 		int colNum = XLUtils.getCellCount(path, "UpdateCorrelation", 1);
@@ -75,7 +75,7 @@ public class CorrelationTestData {
 	String[][] getCorrelationDeleteData() throws IOException {
 
 		String path = System.getenv().get(ConfigOptionsTest.INSIGHTS_HOME) + File.separator
-				+ ConfigOptionsTest.CONFIG_DIR + File.separator + ConfigOptionsTest.TESTDATA_FILE;
+				+ ConfigOptionsTest.AUTO_DIR + File.separator + ConfigOptionsTest.TESTDATA_FILE;
 
 		int rowNum = XLUtils.getRowCount(path, "DeleteCorrelation");
 		int colNum = XLUtils.getCellCount(path, "DeleteCorrelation", 1);

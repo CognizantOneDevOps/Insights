@@ -25,8 +25,6 @@ import org.testng.annotations.Test;
 
 import com.cognizant.devops.platformregressiontest.test.common.CommonUtils;
 import com.cognizant.devops.platformregressiontest.test.common.ConfigOptionsTest;
-import com.google.gson.Gson;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 import io.restassured.RestAssured;
@@ -87,12 +85,11 @@ public class RegisterAgentAPITest extends TestData {
 
 	}
 
-	// @Test(priority = 2, dataProvider = "agentdataprovider")
+	@Test(priority = 2, dataProvider = "agentdataprovider")
 	public void registerAgentAuthorizationFail(String toolName, String agentVersion, String osversion,
-			String configJson, String vault) throws InterruptedException, IOException {
+			String configJson, String vault) {
 
-		RestAssured.baseURI = CommonUtils.getProperty("baseURI")
-				+ "/PlatformService/admin/agentConfiguration/getRegisteredAgents";
+		RestAssured.baseURI = CommonUtils.getProperty("baseURI") + CommonUtils.getProperty("getRegiterAgent");
 		RequestSpecification httpRequest = RestAssured.given();
 		httpRequest.header("Authorization", CommonUtils.getProperty("authorization"));
 
@@ -100,15 +97,11 @@ public class RegisterAgentAPITest extends TestData {
 		Response response = httpRequest.request(Method.GET, "/");
 
 		String responseRegisterAgentList = response.getBody().asString();
-		Gson gson = new Gson();
-		JsonElement jelement = gson.fromJson(responseRegisterAgentList.trim(), JsonElement.class);
-		JsonObject json = jelement.getAsJsonObject();
-		log.debug("responseRegisterAgent {}", responseRegisterAgentList);
+		log.debug("responseRegisterAgentList {}", responseRegisterAgentList);
 
-		// Statuscode Validation
-		// int FailureStatusCode = responseAgent.getStatusCode();
-		// Assert.assertEquals(FailureStatusCode, 400);
-		// Assert.assertTrue(responseRegisterAgent.contains("status"), "failure");
+		int statusCode = response.getStatusCode();
+		Assert.assertEquals(statusCode, 200);
+		Assert.assertTrue(responseRegisterAgentList.contains("status"), "failure");
 
 	}
 

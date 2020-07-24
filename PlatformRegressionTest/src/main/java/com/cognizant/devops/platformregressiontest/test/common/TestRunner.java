@@ -27,9 +27,8 @@ public class TestRunner {
 
 		List<String> file = new ArrayList<String>();
 
-		String path = System.getenv().get(ConfigOptionsTest.INSIGHTS_HOME) + File.separator
-				+ ConfigOptionsTest.CONFIG_DIR + File.separator + ConfigOptionsTest.AUTO_DIR + File.separator
-				+ ConfigOptionsTest.TESTNG_FILE;
+		String path = System.getenv().get(ConfigOptionsTest.INSIGHTS_HOME) + File.separator + ConfigOptionsTest.AUTO_DIR
+				+ File.separator + ConfigOptionsTest.TESTNG_FILE;
 
 		file.add(path);
 		TestNG testNG = new TestNG();
