@@ -20,7 +20,7 @@ import { GrafanaDashboardMode } from '../grafana-dashboard/grafana-dashboard-mod
 import { GrafanaDashboardService } from '../grafana-dashboard/grafana-dashboard-service';
 import { InsightsInitService } from '@insights/common/insights-initservice';
 import { LandingPageService } from './landing-page.service';
-import { RouterLinkWithHref, NavigationExtras, Router, NavigationStart } from '@angular/router';
+import { RouterLinkWithHref, NavigationExtras, Router, NavigationStart, ActivatedRoute, ParamMap } from '@angular/router';
 import { Event } from '@angular/router';
 import { DataSharedService } from '@insights/common/data-shared-service';
 
@@ -70,27 +70,29 @@ export class LandingPageComponent implements OnInit {
   rowCountOfStarred: number;
   rowCountOfRecent: number;
   itemNew: any;
-  constructor(public router: Router, private grafanadashboardservice: LandingPageService, private dataShare: DataSharedService) {
-    this.router.events.subscribe(event => {
-      if (event instanceof NavigationStart) {
-        if (event.url == "/InSights/Home") {
-          this.parseDashboards();
-        }
-      }
-    });
+  constructor(private activeroute: ActivatedRoute, public router: Router, private grafanadashboardservice: LandingPageService, private dataShare: DataSharedService) {
   }
 
   ngOnInit() {
-    this.parseDashboards();
-    this.breakpoint = (window.innerWidth <= 400) ? 1 : 6;
+    var self = this;
+    self.activeroute.paramMap.subscribe(async (params: ParamMap) => {
+      self.orgId = params.get('id');
+      self.parseDashboards();
+    });
   }
 
   onResize(event) {
     this.breakpoint = (event.target.innerWidth <= 400) ? 1 : 6;
   }
   async parseDashboards() {
+    this.queryForRecentDashboards();
     this.showThrobber = true;
-    this.recentdashIds = this.queryForRecentDashboards();
+    this.isStarredEmpty = false;
+    this.isRecentEmpty = false;
+    this.isGeneralEmpty = false;
+    this.isFolderListEmpty = false;
+    this.isStarredMore = false;
+    this.isRecentMore = false;
     this.repsonseFromGrafana = await this.grafanadashboardservice.searchDashboard();
     if (this.repsonseFromGrafana.status == "success") {
       this.dashboardslist = this.repsonseFromGrafana.data;
@@ -148,15 +150,13 @@ export class LandingPageComponent implements OnInit {
       this.showDashboards = false;
       this.showThrobber = false;
     }
-    this.recentdashIds = this.queryForRecentDashboards();
-
   }
-  queryForRecentDashboards() {
-    let impressions = window.localStorage[this.impressionKey()] || '[]';
+
+  async queryForRecentDashboards() {
+    let impressions = await window.localStorage[this.impressionKey()] || '[]';
     impressions = JSON.parse(impressions);
     impressions = impressions.filter(this.isNumber);
-    const dashIds: number[] = impressions;
-    return dashIds;
+    this.recentdashIds = impressions;
   }
   isNumber(element) {
     if (typeof element === 'number') {
@@ -198,7 +198,6 @@ export class LandingPageComponent implements OnInit {
       this.isRecentMore = true;
       this.isStarredMore = false;
     }
-
     if (this.generalDashboardLists == undefined || this.generalDashboardLists.length == 0) {
       this.isGeneralEmpty = true;
     }

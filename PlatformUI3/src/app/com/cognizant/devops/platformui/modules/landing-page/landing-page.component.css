@@ -37,10 +37,10 @@
 }
 
 .ClickHereCss {
-	font-style: italic;
-	color: black;
+	color: #0033A0;
 	font-family: inherit;
-	font-size: 13px
+	font-size: 13pt;
+	margin-top: 0.9%
 }
 
 .loading-indicator {
@@ -157,6 +157,11 @@ border-collapse: collapse; */
 	text-align: center;
 }
 
+.landingpageCss {
+	overflow-x: hidden;
+	overflow-y: hidden;
+}
+
 .landingpageCssExpand {
 	overflow-x: hidden;
 	overflow-y: hidden;
@@ -165,8 +170,6 @@ border-collapse: collapse; */
 .landingpageCssCollapse {
 	overflow-x: hidden;
 	overflow-y: hidden;
-	margin-left: 100px;
-	margin-right: 100px;
 }
 
 .textcenter {

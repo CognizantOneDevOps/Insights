@@ -47,7 +47,7 @@
             <mat-icon class="mat-icon material-icons mainText">
               star
             </mat-icon>
-            <label class="mainText"> Favourite Dashboards</label>
+            <label class="mainText"> Favorite Dashboards</label>
             <mat-grid-list cols="3" rowHeight="120px" [gutterSize]="'10px'" style="width: 80%">
               <mat-grid-tile *ngFor="let item of starredDashboardLists" [colspan]="1" [rowspan]="1" (click)="onRowClicked(item)">
                 <mat-icon class="dashboardIcon" svgIcon="dashboard"></mat-icon>
@@ -121,7 +121,7 @@
 
 <div *ngIf="showLandingPage">
   <div class="overflow1">
-    <div [ngClass]="{ 'landingpageCssCollapse' : !isExpanded , 'landingpageCssExpand': isExpanded}">
+    <div [ngClass]="landingpageCss">
       <div class="headerdiv" autosize="true">
         <p>
           <span class="heading1"> Welcome to </span>
@@ -160,9 +160,10 @@
                 </td>
               </tr>
             </thead>
+
             <tbody>
               <tr>
-                <td>
+                <td style="padding-left:2.3%">
                   <span>Configure Agents for Collecting Data from DevOps tools</span>
                 </td>
                 <td>
@@ -170,7 +171,7 @@
                 </td>
               </tr>
               <tr>
-                <td>
+                <td style="padding-left:2.3%">
                   <span>Create and Modify Access Groups and add Users to them</span>
                 </td>
                 <td>
@@ -178,7 +179,7 @@
                 </td>
               </tr>
               <tr>
-                <td>
+                <td style="padding-left:2.3%">
                   <span>Archive your data</span>
                 </td>
                 <td>
@@ -186,7 +187,7 @@
                 </td>
               </tr>
               <tr>
-                <td>
+                <td style="padding-left:2.3%">
                   <span>Monitor the status of the Various Components in Insights</span>
                 </td>
                 <td>
@@ -194,8 +195,8 @@
                 </td>
               </tr>
               <tr>
-                <td>
-                  <span>Get real time notifications by integrating with &nbsp;Communication Channels</span>
+                <td style="padding-left:2.3%">
+                  <span>Get real time notifications by integrating with Communication Channels</span>
                 </td>
                 <td>
                   <span>Search and Download Reports for Auditing</span>
@@ -208,11 +209,11 @@
       <div class="bottomgreencode">
         For more information - please refer to our detailed help section.
         <br>
-        <p class="ClickHereCss">No Dashboards Found.
-          <b class="hyperlink" (click)="onClickHere()">
-            <u>Click Here</u>
-          </b>
-          to add a Dashboard </p>
+        <p class="ClickHereCss"><b>Do you want to create a dashboard?
+            <b class="hyperlink" (click)="onClickHere()">
+              <u> Click Here</u>
+            </b>
+          </b></p>
       </div>
     </div>
   </div>

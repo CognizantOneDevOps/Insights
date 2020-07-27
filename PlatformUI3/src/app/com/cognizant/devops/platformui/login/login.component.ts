@@ -222,8 +222,8 @@ export class LoginComponent implements OnInit, ILoginComponent, AfterViewInit {
             self.logMsg = "Internal server error"
           } else if (data.status == 404) {
             self.logMsg = "Server Not found"
-          } else if (data.status == 401) {
-            self.logMsg = "Invalid Credentials" //Unauthorized Access
+          } else if (data.status == 401 || data.status == 814) {
+            self.logMsg = "Invalid Credentials. Please try again."
           } else {
             self.logMsg = "Internal server error";
           }
@@ -244,7 +244,8 @@ export class LoginComponent implements OnInit, ILoginComponent, AfterViewInit {
     }
   }
 
-  private loginGrafana() {
+  private async loginGrafana() {
+    console.log("here in grafana..")
     var uniqueString = "grfanaLoginIframe";
     var iframe = document.createElement("iframe");
     iframe.id = uniqueString;
