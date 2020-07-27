@@ -97,13 +97,7 @@ export class DataSharedService {
   }
 
   public getlogoutDisplay(): boolean {
-    if (InsightsInitService.autheticationProtocol == "Kerberos") {
-      return false;
-    } else if (InsightsInitService.autheticationProtocol == AutheticationProtocol.NativeGrafana.toString()
-      || InsightsInitService.autheticationProtocol == AutheticationProtocol.SAML.toString()
-      || InsightsInitService.autheticationProtocol == AutheticationProtocol.JWT.toString()) {
-      return true;
-    }
+    return InsightsInitService.enableLogoutButton;
   }
 
   public setSSOLogoutURL(logoutURL: String) {

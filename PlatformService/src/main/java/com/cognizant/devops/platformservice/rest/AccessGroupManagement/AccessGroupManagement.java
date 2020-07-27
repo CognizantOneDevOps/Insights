@@ -184,6 +184,7 @@ public class AccessGroupManagement {
 					JsonObject jsonResponseName = new JsonParser().parse(responsename).getAsJsonObject();
 					if (jsonResponseName.get("id") == null) {
 						message = "User does not exsist.";
+						return PlatformServiceUtil.buildFailureResponse(message);
 					} else {
 
 						String apiUrlorg = "/api/orgs/" + orgId + "/users";
@@ -196,8 +197,10 @@ public class AccessGroupManagement {
 				}
 			}
 			return PlatformServiceUtil.buildSuccessResponseWithData(message);
+		} catch (InsightsCustomException e) {
+			return PlatformServiceUtil.buildFailureResponse("User already exsists in the Org.");
 		} catch (Exception e) {
-			return PlatformServiceUtil.buildFailureResponse(e.toString());
+			return PlatformServiceUtil.buildFailureResponse(e.getMessage());
 		}
 	}
 
@@ -418,7 +421,7 @@ public class AccessGroupManagement {
 		log.debug("The Current Grafana OrgId is: " + grafanaCurrentOrg + "\n\n");
 		return grafanaCurrentOrg;
 	}
-	
+
 	@GetMapping(value = "/getDashboardsFoldersDetail", produces = MediaType.APPLICATION_JSON_VALUE)
 	public JsonObject loadDashboardDataGrafana() {
 		Map<String, JsonArray> mapOfFolders = new HashMap<String, JsonArray>();

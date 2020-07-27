@@ -94,7 +94,6 @@ export class HomeComponent implements OnInit {
     private dialog: MatDialog, private imageHandeler: ImageHandlerService,
     public messageDialog: MessageDialogService) {
     console.log("Home page constructer ");
-    this.displayLandingPage = true;
     if (this.depth === undefined) {
       this.depth = 0;
     }
@@ -148,6 +147,7 @@ export class HomeComponent implements OnInit {
       var self = this;
       this.grafanaService.getLogoImage().then(
         function (resourceImage) {
+
           self.dataShare.removeCustomerLogoFromSesssion();
           if (resourceImage.data.encodedString.length > 0) {
             var imageSrc = 'data:image/jpg;base64,' + resourceImage.data.encodedString;
@@ -157,6 +157,7 @@ export class HomeComponent implements OnInit {
           }
         }
       )
+
     } catch (error) {
       console.log(error);
     }
@@ -183,6 +184,7 @@ export class HomeComponent implements OnInit {
       this.dataShare.setOrgAndRole(self.selectedOrg, self.userCurrentOrg, self.userRole);
       this.cookieService.set('grafanaRole', self.userRole.toString());
       this.cookieService.set('grafanaOrg', self.userCurrentOrg);
+      self.router.navigateByUrl('/InSights/Home/landingPage/' + self.dataShare.getOrgId(), { skipLocationChange: true, replaceUrl: true });
       this.loadorganizations();
     } else {
       console.log(" user and user organization data is not valid  ")
@@ -207,7 +209,7 @@ export class HomeComponent implements OnInit {
         var navItemobj = new NavItem();
         navItemobj.displayName = orgDtl.name;
         navItemobj.iconName = 'grafanaOrg';
-        navItemobj.route = 'InSights/Home/landingPage';
+        navItemobj.route = 'InSights/Home/landingPage/' + orgDtl.orgId;
         navItemobj.isToolbarDisplay = true;
         navItemobj.showIcon = false;
         navItemobj.isAdminMenu = false;
@@ -239,7 +241,6 @@ export class HomeComponent implements OnInit {
         if (item.iconName == 'grafanaOrg') {
           this.displayLandingPage = false;
           this.switchOrganizations(item.orgId, item.route, this.selectedOrgName, this.selectedItem);
-          //this.router.navigateByUrl(item.route, { skipLocationChange: true });
         } else if (item.displayName == 'About') {
           this.about();
         } else if (item.displayName == 'Help') {
@@ -486,8 +487,7 @@ export class HomeComponent implements OnInit {
         self.dataShare.setOrgAndRole(orgName, orgId, self.userRole);
         self.cookieService.set('grafanaRole', grafanaCurrentOrgRole);
         self.cookieService.set('grafanaOrg', orgId);
-        //self.router.navigateByUrl(route, { skipLocationChange: true });
-        self.showLandingPage();
+        self.router.navigateByUrl(route, { skipLocationChange: true });
       } else {
         this.messageDialog.showApplicationsMessage(" Error while Organizantion change ,Please try again later ", "ERROR");
       }
@@ -495,8 +495,9 @@ export class HomeComponent implements OnInit {
   }
 
   showLandingPage() {
-    this.router.navigate(['InSights/Home'], { skipLocationChange: true });
-    this.displayLandingPage = true;
-    this.isToolbarDisplay = InsightsInitService.enableInsightsBranding;
+    var self = this;
+    self.router.navigateByUrl('/InSights/Home/landingPage/' + self.dataShare.getOrgId(), { skipLocationChange: true });
+    self.displayLandingPage = false;
+    self.isToolbarDisplay = InsightsInitService.enableInsightsBranding;
   }
 }
