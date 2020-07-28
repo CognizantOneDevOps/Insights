@@ -1,0 +1,17 @@
+{
+  "type": "panel",
+  "name": "Insights Charts",
+  "id": "insightscharts",
+
+  "info": {
+    "author": {
+      "name": "Vishal Ganjare",
+      "url": "https://github.com/vganjare"
+},
+    "logos": {
+      "small": "img/inSightsChartsPanel.svg",
+      "large": "img/inSightsChartsPanel.svg"
+    }
+  }
+}
+

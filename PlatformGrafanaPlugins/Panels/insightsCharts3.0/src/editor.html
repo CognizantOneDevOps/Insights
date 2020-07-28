@@ -1,0 +1,95 @@
+<html>
+<head>
+    <style>
+		.mainWrapp {
+		 width: 100%;
+		 margin: 0 auto;
+		}
+		.leftWrapp, .rightWrapp {
+			border: 1px solid white;
+			float: left;
+			min-height: 450px;			
+		}
+		.leftWrapp {
+			 width: 29%;
+		}
+		.rightWrapp {
+			 width: 70%;
+		}   
+		.frmTxtarea {
+		    width: 85%;
+			height: 200px;
+		}
+		.lblclss {
+			padding: 10px 0px 10px 0px
+		}
+		.dataTyepSelect {
+			font-style: italic;
+			font-size: 15px;
+			color: #757575;
+			outline: none;
+			background-color: #f1f1f1;
+			border: 1px solid #939393;
+			padding: .6rem .75rem;
+			height: 45px;
+			border-radius: 2px
+		}
+		
+		.dataTyepWd {
+			width: 85%;
+		}
+		
+		.chartBtn {
+			outline: none;
+			width: 90px;
+			height: 35px;
+			text-transform: initial;
+			text-decoration: none ! important;
+			margin-top: 6px;
+			color: rgba(255, 255, 255, 0.87);
+			background-color: rgb(63, 81, 181);
+			border-radius: 2px;
+			text-align: center
+		}
+		
+    </style>
+</head>
+<body>
+<div class="mainWrapp">
+<h4>Specify field types</h4>
+	<div class="leftWrapp">
+		<div ng-repeat="targets in editorCtrl.insightsChartEditorModel.targets">
+				<b><u>{{targets.id}}</u></b>
+				<div ng-repeat="columnModel in targets.columnModel">
+					<span style="font-weight: bold;">{{columnModel.name}}:&nbsp;&nbsp;</span>					
+					<select class="dataTyepSelect dataTyepWd" ng-model="columnModel.type">
+						<option value="" selected="" disabled="">Select Type</option>
+						<option ng-repeat="type in editorCtrl.supportedDataTypes" ng-value="type">{{type}}</option>
+					</select>										
+				</div>				
+		</div>	
+	</div>
+	<div class="rightWrapp">	
+		<div style="padding-bottom: 20px;">		
+			<label class="lblclss">Data Transformation Instructions</label>			
+			<textarea ng-model="editorCtrl.insightsChartEditorModel.transformInstrctions" rows="5" class="frmTxtarea"></textarea>
+		</div>
+		<div style="padding-bottom: 20px;">		
+			<label class="lblclss">Data Join Instructions</label>			
+			<textarea ng-model="editorCtrl.insightsChartEditorModel.joinInstructions" rows="5" class="frmTxtarea"></textarea>
+		</div>
+		<div style="padding-bottom: 20px;">		
+			<label class="lblclss">Chart Options</label>			
+			<textarea ng-model="editorCtrl.insightsChartEditorModel.chartOptions" rows="5" class="frmTxtarea"></textarea>
+		</div>	
+		<div>		
+			<input class="chartBtn" ng-click="editorCtrl.loadChartEditor()" type="button" value="Load Chart"  style="margin-right: 30px;">			
+			<input class="chartBtn" ng-click="editorCtrl.saveChartOptions()" type="submit" value="Save Chart">
+		</div>
+	</div>	
+	<div id="chartEditorContainer"></div>
+</div>
+
+</body>
+
+</html>
