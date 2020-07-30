@@ -57,8 +57,6 @@
 }
 
 .embed-responsive {
-    overflow-y: hidden !important;
-    overflow-x: hidden !important;
     position: inherit;
     display: block;
     width: 100%;
