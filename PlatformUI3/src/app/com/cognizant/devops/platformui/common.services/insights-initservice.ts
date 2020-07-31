@@ -39,6 +39,7 @@ export class InsightsInitService {
     static singleSignOnConfig;
     static enableInsightsBranding = true;
     static isDebugModeEnable = false;
+    static enableLogoutButton = true;
 
     constructor(location: Location, private http: HttpClient,
         private imageHandler: ImageHandlerService, private logger: LogService) {
@@ -92,6 +93,7 @@ export class InsightsInitService {
         InsightsInitService.singleSignOnConfig = UIConfigResponse.singleSignOnConfig
         InsightsInitService.enableInsightsBranding = UIConfigResponse.enableInsightsBranding
         //InsightsInitService.isDebugModeEnable = UIConfigResponse.isDebugModeEnable
+        InsightsInitService.enableLogoutButton = UIConfigResponse.enableLogoutButton
     }
 
     private loadImageHandler() {

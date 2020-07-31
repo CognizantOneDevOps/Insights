@@ -15,6 +15,8 @@
  ******************************************************************************/
 package com.cognizant.devops.platformservice.security.config;
 
+import java.net.UnknownHostException;
+
 import javax.servlet.FilterChain;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -53,7 +55,9 @@ public class InsightsCrossScriptingFilter extends OncePerRequestFilter {
 		} catch (Exception e) {
 			String msg;
 			if (e.getMessage().contains("InsightsCustomException")) {
-				LOG.error("Invalid request in InsightsCustomException CrossScriptingFilter {} ", e.getMessage());
+				LOG.error(
+						"Invalid request in InsightsCustomException CrossScriptingFilter  InsightsCustomException {} ",
+						e.getMessage());
 				JsonParser parser = new JsonParser();
 				JsonObject element = parser.parse(e.getMessage()).getAsJsonObject();
 				msg = PlatformServiceUtil.buildFailureResponse(
@@ -62,9 +66,17 @@ public class InsightsCrossScriptingFilter extends OncePerRequestFilter {
 						.toString();
 				AuthenticationUtils.setResponseMessage(httpResponce, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, msg);
 			} else if (e.getMessage().contains("InsightsAuthenticationException")) {
-				LOG.error("Invalid request in InsightsAuthenticationException CrossScriptingFilter {} ", e.getMessage());
+				LOG.error(
+						"Invalid request in InsightsAuthenticationException CrossScriptingFilter InsightsAuthenticationException {} ",
+						e.getMessage());
 				AuthenticationUtils.setResponseMessage(httpResponce, AuthenticationUtils.SECURITY_CONTEXT_CODE,
 						"Authentication not successful ,Please relogin ");
+			} else if (e.getMessage().contains("UnknownHostException")) {
+				LOG.error(
+						"Invalid request in InsightsAuthenticationException CrossScriptingFilter UnknownHostException {} ",
+						e.getMessage());
+				AuthenticationUtils.setResponseMessage(httpResponce, AuthenticationUtils.INFORMATION_MISMATCH,
+						e.getMessage());
 			} else {
 				LOG.error("Invalid request in CrossScriptingFilter {}", e.getMessage());
 				msg = PlatformServiceUtil.buildFailureResponse(
@@ -81,8 +93,9 @@ public class InsightsCrossScriptingFilter extends OncePerRequestFilter {
 	 * 
 	 * @param request
 	 * @param response
+	 * @throws UnknownHostException
 	 */
-	public void validateHeaders(HttpServletRequest request, HttpServletResponse response) {
+	public void validateHeaders(HttpServletRequest request, HttpServletResponse response) throws UnknownHostException {
 		LOG.info(" InsightsCrossScriptingFilter validate header ............... ");
 		String origin = request.getHeader(HttpHeaders.ORIGIN);
 		String host = AuthenticationUtils.getHost(request);
@@ -91,11 +104,13 @@ public class InsightsCrossScriptingFilter extends OncePerRequestFilter {
 			LOG.error(" Invalid request " + PlatformServiceConstants.HOST_NOT_FOUND);
 			AuthenticationUtils.setResponseMessage(response, AuthenticationUtils.INFORMATION_MISMATCH,
 					PlatformServiceConstants.HOST_NOT_FOUND);
+			throw new UnknownHostException(PlatformServiceConstants.HOST_NOT_FOUND);
 		}
 		if (!ApplicationConfigProvider.getInstance().getTrustedHosts().contains(host)) {
 			LOG.error(" Invalid request " + PlatformServiceConstants.INVALID_REQUEST_ORIGIN);
 			AuthenticationUtils.setResponseMessage(response, AuthenticationUtils.INFORMATION_MISMATCH,
 					PlatformServiceConstants.INVALID_REQUEST_ORIGIN);
+			throw new UnknownHostException(PlatformServiceConstants.INVALID_REQUEST_ORIGIN);
 		}
 	}
 }
