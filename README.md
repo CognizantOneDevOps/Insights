@@ -17,7 +17,5 @@ For information on the latest features and updates please refer to the below men
 
 Latest Major Release Updates :  
 
-Major Release v6.0 - 
-Grafana upgraded to 6.1
-Bulk data upload facility
+Commercial Fusion Chart support through Grafana 7.1.0
 
