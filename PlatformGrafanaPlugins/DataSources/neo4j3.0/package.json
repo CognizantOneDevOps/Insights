@@ -1,0 +1,20 @@
+{
+  "name": "neo4j-datasource",
+  "version": "1.0.0",
+  "description": "Neo4j - Grafana Data Source",
+  "scripts": {
+    "build": "grafana-toolkit plugin:build",
+    "test": "grafana-toolkit plugin:test",
+    "dev": "grafana-toolkit plugin:dev",
+    "watch": "grafana-toolkit plugin:dev --watch"
+  },
+  "author": "Insights Development Team",
+  "license": "Apache-2.0",
+  "devDependencies": {
+    "@grafana/data": "7.0.3",
+    "@grafana/toolkit": "7.0.3",
+    "@grafana/ui": "7.0.3",
+    "@types/lodash": "4.14.150",
+    "@grafana/runtime": "7.0.3"
+  }
+}

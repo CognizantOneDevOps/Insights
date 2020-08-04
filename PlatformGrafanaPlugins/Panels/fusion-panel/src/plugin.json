@@ -1,0 +1,39 @@
+{
+  "type": "panel",
+  "name": "fusion-panel",
+  "id": "cde-fusion-panel",
+  "info": {
+    "description": "Fusion panels with CDN implementation",
+    "author": {
+      "name": "Murugesan, Vijay Raghunath",
+      "url": "https://www.cognizant.com/"
+    },
+    "keywords": [
+      "fusion",
+      "CDN",
+      "Grafana 7",
+      "React"
+    ],
+    "logos": {
+      "small": "img/logo.svg",
+      "large": "img/logo.svg"
+    },
+    "links": [
+      {
+        "name": "Website",
+        "url": "https://github.com/grafana/simple-react-panel"
+      },
+      {
+        "name": "License",
+        "url": "https://github.com/grafana/simple-react-panel/blob/master/LICENSE"
+      }
+    ],
+    "screenshots": [],
+    "version": "%VERSION%",
+    "updated": "%TODAY%"
+  },
+  "dependencies": {
+    "grafanaVersion": "6.3.x",
+    "plugins": []
+  }
+}

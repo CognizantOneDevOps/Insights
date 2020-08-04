@@ -14,7 +14,7 @@ License for the specific language governing permissions and limitations under
 the License.
 :comment
 echo "Setting up Grafana as Windows service"
-call %~dp0nssm-2.24\win64\nssm install Grafana "%~dp0grafana-6.1.6\bin\grafana-server.exe"
+call %~dp0nssm-2.24\win64\nssm install Grafana "%~dp0grafana-7.1.0\bin\grafana-server.exe"
 Timeout 5
 echo "Setting up Tomcat 9 as Windows service"
 call %~dp0apache-tomcat\bin\service install
