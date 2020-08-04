@@ -53,7 +53,7 @@ const homeRoutes: Routes = [
       //{ path: 'dataarchiving', component: DataArchivingComponent },
       { path: 'agentconfiguration', component: AgentConfigurationComponent },
       { path: 'accessGroupManagement', component: UserOnboardingComponent },
-      { path: 'landingPage', component: LandingPageComponent },
+      { path: 'landingPage/:id', component: LandingPageComponent },
       { path: 'logoSetting', component: LogoSettingComponent },
       { path: 'querybuilder', component: CustomReportComponent },
       { path: 'reportconfiguration', component: CustomReportConfigComponent },

@@ -178,7 +178,16 @@ export class UserOnboardingComponent implements OnInit {
         self.userDataSource.paginator = self.paginator;
         //console.log(self.userDataSource);
         //console.log(self.userDataSource.data);
-      } else {
+      }
+      else if (usersResponseData.message == "Unable to get current org users,Permission denide ") {
+        const dialogRef = self.messageDialog.showApplicationsMessage("User needs to be Grafana Admin to view this page.", "WARN");
+        self.showThrobber = false;
+        dialogRef.afterClosed().subscribe(result => {
+          self.router.navigateByUrl('/InSights/Home/landingPage/' + self.dataShare.getOrgId(), { skipLocationChange: true });
+        })
+
+      }
+      else {
         self.messageDialog.showApplicationsMessage("Unable to load data", "WARN");
       }
     });
@@ -453,12 +462,11 @@ export class UserOnboardingComponent implements OnInit {
         userBMparameter = JSON.stringify(requestjson);
         this.userOnboardingService.assignUser(userBMparameter)
           .subscribe(data => {
-            var userResponse2 = data.data;
-            if (userResponse2 == "User does not exist.") {
-              this.messageDialog.showApplicationsMessage(data.data, "ERROR")
+            if (data.status == "success") {
+              this.messageDialog.showApplicationsMessage(data.data, "SUCCESS");
             }
             else {
-              this.messageDialog.showApplicationsMessage(data.data, "SUCCESS");
+              this.messageDialog.showApplicationsMessage(data.message, "ERROR")
             }
           })
       }

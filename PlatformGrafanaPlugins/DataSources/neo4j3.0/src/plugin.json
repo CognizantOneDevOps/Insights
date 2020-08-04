@@ -1,0 +1,31 @@
+{
+  "type": "datasource",
+  "name": "Neo4j Data Source",
+  "id": "neo4j-datasource",
+  "metrics": true,
+  "annotations": true,
+  "executable": "neo4j-plugin",
+  "info": {
+    "description": "Neo4j Data Source",
+    "author": {
+      "name": "Insights Development Team"
+    },
+    "keywords": ["Neo4j"],
+    "logos": {
+      "small": "img/neo4j.svg",
+      "large": "img/neo4j.svg"
+    },
+    "links": [
+      { "name": "Website", "url": "https://github.com/grafana/simple-datasource" },
+      { "name": "License", "url": "https://github.com/grafana/simple-datasource/blob/master/LICENSE" }
+    ],
+    "screenshots": [],
+    "version": "%VERSION%",
+    "updated": "%TODAY%"
+  },
+
+  "dependencies": {
+    "grafanaVersion": "7.0.0",
+    "plugins": []
+  }
+}

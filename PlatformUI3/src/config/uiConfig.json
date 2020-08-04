@@ -3,6 +3,7 @@
 	"showAuditReporting": false,
 	"showWebhookConfiguration": true,
 	"enableInsightsBranding": true,
+	"enableLogoutButton": true,
 	"autheticationProtocol": "NativeGrafana",
 	"agentsOsList": {
 		"Windows": "windows",

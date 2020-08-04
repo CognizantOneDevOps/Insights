@@ -45,7 +45,7 @@ public class InferenceDataProviderController{
 
 	@Autowired
 	InsightsInferenceService insightsInferenceService;
-
+	
 	@RequestMapping(value = "/data", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 	public JsonArray getInferenceData(HttpServletRequest request) {
 		LOG.debug(
@@ -83,6 +83,54 @@ public class InferenceDataProviderController{
 	}
 	@RequestMapping(value = "/data/testDataSource", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 	public JsonObject checkInferenceDS() {
+		JsonObject result = new JsonObject();
+		result.addProperty("result", "success");
+		return result;
+	}
+
+	/**for Grafana 7.1.0**/
+	@RequestMapping(value = "/data/v7", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+	public JsonArray getInferenceData7(HttpServletRequest request) {
+		LOG.debug(
+				" inside getInferenceData call /datasource/inference/data ============================================== ");
+		String input = null;
+		List<InsightsInference> inferences = null;
+		try {
+			input = request.getReader().lines().collect(Collectors.joining(System.lineSeparator()));
+		} catch (Exception e) {
+			LOG.error(e);
+		}
+		JsonArray result = new JsonArray();
+		JsonArray inferenceInputFromPanel = new JsonParser().parse(input).getAsJsonArray();
+		for(JsonElement jsonElemFromDS: inferenceInputFromPanel.getAsJsonArray()) 
+		{
+			String schedule = jsonElemFromDS.getAsJsonObject().get("vectorSchedule").getAsString();
+			String vectorType = jsonElemFromDS.getAsJsonObject().get("vectorType").getAsString();
+			LOG.debug(" for vector type " + vectorType);
+			if (vectorType == null || "".equalsIgnoreCase(vectorType)) {
+				inferences = insightsInferenceService.getInferenceDetails(schedule);
+			} else {
+				inferences = insightsInferenceService.getInferenceDetailsVectorWise(schedule, vectorType);
+			}
+			JsonObject responseOutputFromES = PlatformServiceUtil.buildSuccessResponseWithData(inferences);
+			for(JsonElement jsonElemES : responseOutputFromES.get("data").getAsJsonArray())
+			{
+				if(((JsonObject) jsonElemES).get("heading").getAsString().equals(
+						jsonElemFromDS.getAsJsonObject().get("vectorType").getAsString())) {
+							JsonArray ja = new JsonArray();
+							ja.add(jsonElemES.getAsJsonObject());
+							result.add(ja);
+							//result.add(jsonElemES.getAsJsonObject());
+							break;
+				}
+			}
+		}
+		return result;
+	}
+	
+	/**for Grafana 7.1.0**/
+	@RequestMapping(value = "/data/v7/testDataSource", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+	public JsonObject checkInferenceDS7() {
 		JsonObject result = new JsonObject();
 		result.addProperty("result", "success");
 		return result;
