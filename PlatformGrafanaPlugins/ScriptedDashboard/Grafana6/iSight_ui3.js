@@ -162,7 +162,7 @@ var addStyleTag = function () {
 	} else {
 		var style = "<style type=\"text/css\">" +
 			".sidemenu {display : none !important;}\n" +
-			".main-view{position:absolute;width:100%;-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;height: calc(100% - 35px);)}\n" +
+			".main-view{position:absolute;width:100%;-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;height: 100%}\n" +
 			//".scroll-canvas{position:fixed;width:100%;overflow:auto;-webkit-overflow-scrolling:touch;}\n" +
 			".navbar-brand-btn {display : none !important;}\n" +
 			".page-header-canvas {display : none !important;}\n" +
