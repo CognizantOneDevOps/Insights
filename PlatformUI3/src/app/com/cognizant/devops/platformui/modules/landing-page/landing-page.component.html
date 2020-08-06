@@ -63,7 +63,7 @@
             <mat-icon class="mat-icon material-icons mainText">
               star
             </mat-icon>
-            <label class="mainText"> Favourite Dashboards</label>
+            <label class="mainText"> Favorite Dashboards</label>
             <mat-grid-list cols="4" rowHeight="120px" [gutterSize]="'10px'">
               <mat-grid-tile *ngFor="let item of starredDashboardLists" [colspan]="1" [rowspan]="1" (click)="onRowClicked(item)">
                 <mat-icon class="dashboardIcon" svgIcon="dashboard"></mat-icon>

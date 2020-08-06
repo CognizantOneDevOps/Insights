@@ -180,10 +180,10 @@ export class UserOnboardingComponent implements OnInit {
         //console.log(self.userDataSource.data);
       }
       else if (usersResponseData.message == "Unable to get current org users,Permission denide ") {
-        const dialogRef = self.messageDialog.showApplicationsMessage("User needs to be Grafana Admin to View this page.", "WARN");
+        const dialogRef = self.messageDialog.showApplicationsMessage("User needs to be Grafana Admin to view this page.", "WARN");
         self.showThrobber = false;
         dialogRef.afterClosed().subscribe(result => {
-          self.router.navigate(['InSights/Home/landingPage'], { skipLocationChange: true });
+          self.router.navigateByUrl('/InSights/Home/landingPage/' + self.dataShare.getOrgId(), { skipLocationChange: true });
         })
 
       }
