@@ -45,7 +45,7 @@
 		<module>PlatformCommons</module>
         <module>PlatformDAL</module>
         <module>PlatformAuditing</module>          
-         <module>PlatformService</module>
+        <module>PlatformService</module>
         <module>PlatformEngine</module>
         <module>PlatformUI3</module>     
         <module>PlatformInsights</module>

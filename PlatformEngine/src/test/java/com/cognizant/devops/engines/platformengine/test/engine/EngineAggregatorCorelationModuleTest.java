@@ -17,6 +17,7 @@ package com.cognizant.devops.engines.platformengine.test.engine;
 
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
@@ -30,15 +31,19 @@ import org.testng.annotations.Test;
 import com.cognizant.devops.engines.platformengine.modules.aggregator.EngineAggregatorModule;
 import com.cognizant.devops.engines.platformengine.modules.correlation.EngineCorrelatorModule;
 import com.cognizant.devops.platformcommons.config.ApplicationConfigCache;
+import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphResponse;
 import com.cognizant.devops.platformcommons.dal.neo4j.Neo4jDBHandler;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformdal.agentConfig.AgentConfigDAL;
+import com.cognizant.devops.platformdal.correlationConfig.CorrelationConfigDAL;
+import com.cognizant.devops.platformdal.correlationConfig.CorrelationConfiguration;
 
 public class EngineAggregatorCorelationModuleTest {
 	private static Logger log = LogManager.getLogger(EngineAggregatorCorelationModuleTest.class.getName());
 
 	private AgentConfigDAL agentConfigDAL = new AgentConfigDAL();
+	CorrelationConfigDAL correlationConfigDAL = new CorrelationConfigDAL();
 
 	private FileReader reader = null;
 
@@ -60,14 +65,24 @@ public class EngineAggregatorCorelationModuleTest {
 		 */
 
 
-		agentConfigDAL.saveAgentConfigFromUI(p.getProperty("gitAgentId"), EngineTestData.gitToolCategory,
-				EngineTestData.gitLabelName, "git", EngineTestData.getJsonObject(EngineTestData.gitConfig),
-				EngineTestData.agentVersion, EngineTestData.osversion, EngineTestData.updateDate, false);
-		/******************************************************************************************/
+		try {
+			agentConfigDAL.saveAgentConfigFromUI(p.getProperty("gitAgentId"), EngineTestData.gitToolCategory,
+					EngineTestData.gitLabelName, "git", EngineTestData.getJsonObject(EngineTestData.gitConfig),
+					EngineTestData.agentVersion, EngineTestData.osversion, EngineTestData.updateDate, false);
+			/******************************************************************************************/
 
-		agentConfigDAL.saveAgentConfigFromUI(p.getProperty("jenkinsAgentId"), EngineTestData.jenkinToolCategory,
-				EngineTestData.jenkinLabelName, "jenkins", EngineTestData.getJsonObject(EngineTestData.jenkinsConfig),
-				EngineTestData.agentVersion, EngineTestData.osversion, EngineTestData.updateDate, false);
+			agentConfigDAL.saveAgentConfigFromUI(p.getProperty("jenkinsAgentId"), EngineTestData.jenkinToolCategory,
+					EngineTestData.jenkinLabelName, "jenkins",
+					EngineTestData.getJsonObject(EngineTestData.jenkinsConfig), EngineTestData.agentVersion,
+					EngineTestData.osversion, EngineTestData.updateDate, false);
+
+			CorrelationConfiguration saveCorrelationJson = EngineTestData
+					.loadCorrelation(EngineTestData.saveDataConfig);
+
+			correlationConfigDAL.saveCorrelationConfig(saveCorrelationJson);
+		} catch (InsightsCustomException e) {
+			log.error(e);
+		}
 
 		Thread.sleep(1000);
 
@@ -91,8 +106,9 @@ public class EngineAggregatorCorelationModuleTest {
 
 		/* Start Engine for Correlation **/
 
-		EngineCorrelatorModule ecm = new EngineCorrelatorModule();
-		ecm.run();
+		ApplicationConfigProvider.getInstance().getCorrelations().setBatchSize(1000);
+		ApplicationConfigProvider.getInstance().getCorrelations().setCorrelationFrequency(1);
+		ApplicationConfigProvider.getInstance().getCorrelations().setCorrelationWindow(-1);
 
 		log.debug("Test Data flow has been created successfully");
 	}
@@ -126,10 +142,25 @@ public class EngineAggregatorCorelationModuleTest {
 	}
 
 	@Test(priority = 2)
+	public void testSaveConfig() throws InsightsCustomException {
+		try {
+
+			List<CorrelationConfiguration> correlationList = correlationConfigDAL.getActiveCorrelations();
+			Assert.assertTrue(!correlationList.isEmpty());
+			Thread.sleep(5000);
+
+			EngineCorrelatorModule ecm = new EngineCorrelatorModule();
+			ecm.run();
+		} catch (Exception e) {
+			log.error(e);
+		}
+	}
+
+	@Test(priority = 3)
 	public void testCorrelation() {
 
 		Neo4jDBHandler dbHandler = new Neo4jDBHandler();
-		String query = "MATCH (p:DATA {commitId:'CM-7569369619'}), (q:DATA {scmcommitId:'CM-7569369619'}) RETURN distinct  EXISTS( (p)-[:TEST_FROM_GIT_TO_JENKINS]->(q))";
+		String query = "MATCH (a)<-[r:TEST_FROM_GIT_TO_JENKINS]-(b) where a.scmcommitId=\"CM-7569369619\" and b.commitId='CM-7569369619' return count(a) as Total";
 		GraphResponse neo4jResponse;
 		try {
 
@@ -140,12 +171,13 @@ public class EngineAggregatorCorelationModuleTest {
 					.replace("]", "");
 
 			/* Assert on Node Relationship */
+			log.debug("finalJson  {} ", finalJson);
 
-			Assert.assertEquals("true", finalJson.toString());
+			Assert.assertTrue(Integer.parseInt(finalJson) > 0); //"true"
 
-		} catch (InsightsCustomException e) {
+		} catch (InsightsCustomException | AssertionError e) {
 
-			log.error("InsightsCustomException : " + e.toString());
+			log.error("InsightsCustomException : or AssertionError " + e);
 		}
 	}
 
@@ -154,8 +186,17 @@ public class EngineAggregatorCorelationModuleTest {
 
 		/* Cleaning Postgre */
 
-		agentConfigDAL.deleteAgentConfigurations("JENKINSTEST8800");
-		agentConfigDAL.deleteAgentConfigurations("GITTEST8800");
+		try {
+			agentConfigDAL.deleteAgentConfigurations("JENKINSTEST8800");
+			agentConfigDAL.deleteAgentConfigurations("GITTEST8800");
+			correlationConfigDAL.deleteCorrelationConfig("TEST_FROM_GIT_TO_JENKINS");
+		} catch (InsightsCustomException e1) {
+			log.error(e1);
+		}
+
+		ApplicationConfigProvider.getInstance().getCorrelations().setBatchSize(2000);
+		ApplicationConfigProvider.getInstance().getCorrelations().setCorrelationFrequency(3);
+		ApplicationConfigProvider.getInstance().getCorrelations().setCorrelationWindow(48);
 
 		/* Cleaning Neo4J */
 
@@ -164,6 +205,8 @@ public class EngineAggregatorCorelationModuleTest {
 		try {
 
 			dbHandler.executeCypherQuery(query);
+			dbHandler.executeCypherQuery("MATCH (n:JENKINS_UNTEST) DETACH DELETE n");
+			dbHandler.executeCypherQuery("MATCH (n:GIT_UNTEST) DETACH DELETE n");
 
 		} catch (InsightsCustomException e) {
 
