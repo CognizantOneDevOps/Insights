@@ -22,8 +22,15 @@ import org.hibernate.cfg.Configuration;
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.config.PostgreData;
 import com.cognizant.devops.platformdal.agentConfig.AgentConfig;
+import com.cognizant.devops.platformdal.assessmentreport.InsightsAssessmentConfiguration;
+import com.cognizant.devops.platformdal.assessmentreport.InsightsAssessmentReportTemplate;
+import com.cognizant.devops.platformdal.assessmentreport.InsightsContentConfig;
+import com.cognizant.devops.platformdal.assessmentreport.InsightsKPIConfig;
+import com.cognizant.devops.platformdal.assessmentreport.InsightsReportsKPIConfig;
+import com.cognizant.devops.platformdal.assessmentreport.InsightsVisualizationConfig;
 import com.cognizant.devops.platformdal.correlationConfig.CorrelationConfiguration;
 import com.cognizant.devops.platformdal.dashboards.CustomDashboard;
+import com.cognizant.devops.platformdal.dataArchivalConfig.InsightsDataArchivalConfig;
 import com.cognizant.devops.platformdal.entity.definition.EntityDefinition;
 import com.cognizant.devops.platformdal.grafana.user.User;
 import com.cognizant.devops.platformdal.hierarchy.details.HierarchyDetails;
@@ -31,19 +38,26 @@ import com.cognizant.devops.platformdal.icon.Icon;
 import com.cognizant.devops.platformdal.mapping.hierarchy.HierarchyMapping;
 import com.cognizant.devops.platformdal.mapping.projects.ProjectMapping;
 import com.cognizant.devops.platformdal.queryBuilder.QueryBuilderConfig;
-import com.cognizant.devops.platformdal.relationshipconfig.RelationshipConfigDAL;
+/*import com.cognizant.devops.platformdal.relationshipconfig.RelationshipConfigDAL;*/
 import com.cognizant.devops.platformdal.relationshipconfig.RelationshipConfiguration;
 import com.cognizant.devops.platformdal.settingsconfig.SettingsConfiguration;
 import com.cognizant.devops.platformdal.tools.layout.ToolsLayout;
 import com.cognizant.devops.platformdal.user.UserPortfolio;
 import com.cognizant.devops.platformdal.webhookConfig.WebHookConfig;
 import com.cognizant.devops.platformdal.webhookConfig.WebhookDerivedConfig;
+import com.cognizant.devops.platformdal.workflow.InsightsWorkflowConfiguration;
+import com.cognizant.devops.platformdal.workflow.InsightsWorkflowExecutionHistory;
+import com.cognizant.devops.platformdal.workflow.InsightsWorkflowTask;
+import com.cognizant.devops.platformdal.workflow.InsightsWorkflowTaskSequence;
+import com.cognizant.devops.platformdal.workflow.InsightsWorkflowType;
+
 
 public class PlatformDALSessionFactoryProvider {
 	private static SessionFactory sessionFactory;
 	private static SessionFactory grafanaSessionFactory;
+	
 	private PlatformDALSessionFactoryProvider(){
-		
+	
 	}
 	static{
 		initInSightsDAL();
@@ -67,6 +81,18 @@ public class PlatformDALSessionFactoryProvider {
 			configuration.addAnnotatedClass(CorrelationConfiguration.class);
 			configuration.addAnnotatedClass(RelationshipConfiguration.class);
 			configuration.addAnnotatedClass(WebhookDerivedConfig.class);
+			configuration.addAnnotatedClass(InsightsKPIConfig.class);
+			configuration.addAnnotatedClass(InsightsContentConfig.class);
+    		configuration.addAnnotatedClass(InsightsAssessmentReportTemplate.class);
+		    configuration.addAnnotatedClass(InsightsAssessmentConfiguration.class);
+		    configuration.addAnnotatedClass(InsightsReportsKPIConfig.class);
+		    configuration.addAnnotatedClass(InsightsVisualizationConfig.class);
+		    configuration.addAnnotatedClass(InsightsWorkflowTask.class);
+		    configuration.addAnnotatedClass(InsightsWorkflowTaskSequence.class);
+		    configuration.addAnnotatedClass(InsightsWorkflowConfiguration.class);
+		    configuration.addAnnotatedClass(InsightsWorkflowExecutionHistory.class);
+		    configuration.addAnnotatedClass(InsightsWorkflowType.class);
+		    configuration.addAnnotatedClass(InsightsDataArchivalConfig.class);
 			PostgreData postgre = ApplicationConfigProvider.getInstance().getPostgre();
 			if(postgre != null){
 				configuration.setProperty("hibernate.connection.username", postgre.getUserName());

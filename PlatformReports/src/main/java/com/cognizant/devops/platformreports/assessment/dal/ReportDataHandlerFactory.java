@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2017 Cognizant Technology Solutions
+ * Copyright 2020 Cognizant Technology Solutions
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License.  You may obtain a copy
@@ -13,16 +13,22 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  ******************************************************************************/
-package com.cognizant.devops.platformcommons.constants;
+package com.cognizant.devops.platformreports.assessment.dal;
 
-public interface MessageConstants {
-	String EXCHANGE_NAME = "iSight";
-	String EXCHANGE_TYPE = "topic";
-	String MESSAGE_Q_ENDPOINT = "localhost";
-	String MESSAGE_Q_USER = "iSight";
-	String MESSAGE_Q_PASSWORD = "iSight";
-	String ROUTING_KEY_FOR_DATA = "DATA";
-	String ROUTING_KEY_FOR_HEALTH = "HEALTH";
-	String ROUTING_KEY_SEPERATOR = "\\.";
-	String MESSAGE_ENCODING = "UTF-8";
+public class ReportDataHandlerFactory {
+
+	public static ReportDataHandler getDataSource(String datasource) {
+		if (datasource == null) {
+			return null;
+		}
+		if (datasource.equalsIgnoreCase("NEO4J")) {
+			return new ReportGraphDataHandler();
+
+		} else if (datasource.equalsIgnoreCase("ElasticSearch")) {
+			return new ReportElasticSearchDataHandler();
+
+		}
+		return null;
+	}
+
 }

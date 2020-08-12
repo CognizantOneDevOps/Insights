@@ -1,6 +1,6 @@
 /*
 *******************************************************************************
- * Copyright 2019 Cognizant Technology Solutions
+ * Copyright 2020 Cognizant Technology Solutions
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License.  You may obtain a copy
@@ -15,13 +15,70 @@
  * the License.
  *******************************************************************************/
 
-table,mat-table {
-    width: 100%;  
+table, mat-table {
+    width: 100%;
     border-collapse: collapse;
 }
 
+::ng-deep .mat-datepicker-content .mat-calendar {
+    width: 270px!important;
+    height: 320px!important;
+}
+
+.columnName {
+    width: 15%;
+    padding: 0px 0px 0px 15px;
+}
+
+.columnComponent {
+    width: 40%;
+}
+
+.form-control {
+    display: block;
+    width: 100%;
+    padding: 6px 12px;
+    font-size: 14px;
+    line-height: 1.42857143;
+    color: #555;
+    background-color: #fff;
+    background-image: none;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    margin-left: 10px;
+}
+
+.form-control-select {
+    display: block;
+    padding-top: 6px;
+    padding-right: 12px;
+    padding-bottom: 6px;
+    padding-left: 12px;
+    font-size: 14px;
+    line-height: 1.42857143;
+    color: #555;
+    background-color: #fff;
+    background-image: none;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    margin-left: 10px;
+}
+
+.button-row {
+    margin-bottom: 10px;
+}
+
+.mainText {
+    font-size: 15px;
+    color: #00b140;
+    font-weight: bold;
+    vertical-align: sub;
+    padding-left: 19px;
+    padding-top: 10px;
+}
+
 .tableHeaderCss {
-    background-color: #00B140;   
+    background-color: #00B140;
     color: white;
     font-size: 14px;
     height: 30px;
@@ -30,45 +87,92 @@ table,mat-table {
     text-align: left;
 }
 
-
-.mat-cell {
-    font-size: 13px;
-    height: 40px;
-    text-align: left;
-    font-family: inherit
-}
-
-tr.mat-footer-row, tr.mat-row {
-    height: 40px !important;
-    text-align: left !important;
-}
-.mat-button{
-    font-size: 16px;
-    font-weight: 500;
-    min-width: 50px;
-}
-.btnAlign{
-    margin-right: 7px; 
-    float: right;
-}
-
-.form-control {
-    display: block;
-    width: 60%;
+.form-control-label {
     padding: 6px 12px;
     font-size: 13px;
     background-color: white;
     background-image: none;
     border: 1px solid #ccc;
     border-radius: 4px;
-    -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
-    box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
-    -webkit-transition: border-color ease-in-out .15s,-webkit-box-shadow ease-in-out .15s;
-    -o-transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
-    transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
+    -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075);
+    box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075);
+    -webkit-transition: border-color ease-in-out .15s, -webkit-box-shadow ease-in-out .15s;
+    -o-transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
+    transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
+    margin-left: 5px;
+    margin-bottom: 5px;
+    height: 100px;
+    width: 60%;
 }
 
-.mat-select-value{
+.mat-cell {
+    font-size: 14px;
+    height: 40px;
+    text-align: left;
+    font-family: inherit
+}
+
+tr.mat-footer-row, tr.mat-row-webhook {
+    height: 45px !important;
+    text-align: left !important;
+    vertical-align: middle;
+    padding-right: 65px !important;
+    padding-left: 65px !important;
+}
+
+.mat-row-webhook:nth-child(even) {
+    background-color: #e1e3e7;
+}
+
+.mat-row-webhook:nth-child(odd) {
+    background-color: #FFFFFF;
+}
+
+.mat-button {
+    font-size: 16px;
+    font-weight: 500;
+    min-width: 50px;
+}
+
+.btnAlign {
+    margin-right: 7px;
+    float: right;
+}
+
+.form-control {
+    display: block;
+    width: 85%;
+    padding: 6px 12px;
+    font-size: 13px;
+    background-color: white;
+    background-image: none;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075);
+    box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075);
+    -webkit-transition: border-color ease-in-out .15s, -webkit-box-shadow ease-in-out .15s;
+    -o-transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
+    transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
+}
+
+.input-disabled {
+    color: rgba(0, 0, 0, .38);
+    background-color: #e1e3e7;
+    display: block;
+    width: 85%;
+    padding: 6px 12px;
+    font-size: 13px;
+    background-image: none;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075);
+    box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075);
+    -webkit-transition: border-color ease-in-out .15s, -webkit-box-shadow ease-in-out .15s;
+    -o-transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
+    transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
+}
+
+.mat-select-value {
     color: #9e9a9a;
 }
 
@@ -76,89 +180,75 @@ tr.mat-footer-row, tr.mat-row {
     display: inline-block !important;
 }
 
-.messageText{
+.messageText {
     font-size: 16px;
     color: #5C068C;
     margin-top: 28px;
     padding-left: 20px;
 }
 
-.inputBoxCont{
+.inputBoxCont {
     width: 90%;
     height: 35px;
 }
 
-.mainText{
+.mainText {
     font-size: 14px;
-    color:  #544646
+    color: #544646
 }
 
-.infoText{
+.infoText {
     font-size: 13px;
     color: #FF8F1C;
-    padding-left: 4px;
+    padding-left: 0px;
 }
 
-.nonEditableText{
+.nonEditableText {
     font-size: 13px;
     color: #9e9a9a;
     padding-left: 12px;
 }
 
-.mainHeaderText{
+.mainHeaderText {
     font-size: 15px;
-    color:  white;
-    
+    color: white;
 }
 
-.infoHeaderText{
+td.mat-cell:first-of-type {
+    padding-left: 10px !important;
+}
+
+td.mat-cell:last-of-type {
+    padding-left: 15px !important;
+    padding-right: 0px !important;
+}
+
+.infoHeaderText {
     font-size: 11px;
     color: white;
     padding-left: 4px;
 }
 
-.input-disabled{
-    color: rgba(0,0,0,.38);
-    background-color:#e1e3e7;
-    display: block;
-    width: 60%;
-    padding: 6px 12px;
-    font-size: 13px;
-    background-image: none;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
-    box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
-    -webkit-transition: border-color ease-in-out .15s,-webkit-box-shadow ease-in-out .15s;
-    -o-transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
-    transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
-}
-
-.mat-select-disabled{
-    color: rgba(0,0,0,.38);
-    background-color:#e1e3e7;
+.mat-select-disabled {
+    color: rgba(0, 0, 0, .38);
+    background-color: #e1e3e7;
 }
 
 tr.mat-header-row {
     height: 40px;
 }
 
-
-.mat-header-cell, .mat-cell {
-   
-}
-
 .header-group-row {
-  border: none;
-  align-items: stretch;
+    border: none;
+    align-items: stretch;
 }
+
 .header-group {
     display: flex;
     align-items: center;
 }
 
-td{
-    padding-left: 65px;
-    padding-right: 65px;
+td.mat-cell {
+    border-bottom-width: 0px;
+    border-bottom-style: none;
 }
-

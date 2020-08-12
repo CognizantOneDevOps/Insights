@@ -1,0 +1,101 @@
+/********************************************************************************
+ * Copyright 2019 Cognizant Technology Solutions
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License.  You may obtain a copy
+ * of the License at
+ * 
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License. */
+
+ul {
+    position: relative;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+}
+
+li {
+    display: flex;
+    margin: 1px;
+    padding: 5px;
+}
+
+li:last-child {
+    position: absolute;
+    top: 0;
+    right: 0;
+}
+
+.container {
+    overflow-y: auto;
+    flex: 1;
+    cursor: move;
+    cursor: grab;
+    cursor: -moz-grab;
+    cursor: -webkit-grab;
+    cursor: grabbing;
+    cursor: -moz-grabbing;
+    cursor: -webkit-grabbing;
+}
+
+.showDialogHeadingCss {
+    font-family: inherit;
+    font-size: 20px;
+    color: white;
+    margin-left: 28%;
+    margin-right: 4%;
+    margin-bottom: 10px;
+    font-weight:bold;
+}
+
+.closeIconCss {
+    padding-right: 30px;
+    color: white;
+    margin-top: auto;
+    margin-bottom: auto;
+    vertical-align: middle;
+}
+
+.closeicon {
+    width: 38px;
+    color: white;
+    padding-right: 11px;
+}
+
+.form-control {
+    display: inline-block;
+    width: 65%;
+    padding: 6px 12px;
+    font-size: 14px;
+    line-height: 1.42857143;
+    color: #555;
+    background-color: #fff;
+    background-image: none;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    margin-left: 10px;
+}
+
+.mainText {
+    font-size: 15px;
+    color: #000000;
+    font-weight: bold;
+    padding-left: 19px;
+}
+
+.headerStyle {
+    color: white;
+    width: 100%;
+    padding-top: 14px;
+    height: 58px;
+
+}

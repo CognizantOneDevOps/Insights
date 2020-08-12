@@ -1,0 +1,24 @@
+[
+
+   {
+      "kpiId":152,
+      "name":"Number of Open Defects",
+      "schedule":"DAILY",
+      "group":"DEFECTS",
+      "toolName":"JIRA",
+      "neo4jQuery":"MATCH (n:JIRA:DATA) WHERE n.SPKstartTime > {startTime} and n.SPKstartTime < {endTime} and n.SPKissueType='Bug' and n.SPKstatus='Open'  RETURN count(n) as OpenDefect",
+      "lastRunTime":1510680000000,
+      "isActive":true,
+      "resultField":"OpenDefect"
+   },
+   {
+      "kpiId":153,
+      "name":"Average Defect Duration",
+      "schedule":"DAILY",
+      "group":"DEFECTS",
+      "neo4jQuery":"MATCH (n:JIRA:DATA) WHERE n.SPKstartTime > {startTime} and n.SPKstartTime < {endTime} and n.SPKissueType='Bug' and n.SPKstatus='Closed'  RETURN COALESCE(Avg(toInt(n.SPKduration)),0) as AvgDefectCompletionTime",
+      "lastRunTime":1510680000000,
+      "isActive":true,
+      "resultField":"AvgDefectCompletionTime"
+   }
+]

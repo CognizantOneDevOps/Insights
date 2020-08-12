@@ -24,7 +24,7 @@ import { PageNotFoundComponent } from '@insights/app/modules/page-not-found/page
 import { AgentManagementComponent } from '@insights/app/modules/admin/agent-management/agent-management.component';
 import { DatadictionaryComponent } from '@insights/app/modules/datadictionary/datadictionary.component';
 import { BusinessMappingComponent } from '@insights/app/modules/admin/businessmapping/businessmapping.component';
-//import { DataArchivingComponent } from '@insights/app/modules/settings/dataarchiving/dataarchiving.component';
+import { DataArchivingComponent } from '@insights/app/modules/settings/dataarchiving/dataarchiving.component';
 import { AgentConfigurationComponent } from '@insights/app/modules/admin/agent-management/agent-configuration/agent-configuration.component';
 import { BlockChainComponent } from '@insights/app/modules/blockchain/blockchain.component';
 import { UserOnboardingComponent } from '@insights/app/modules/user-onboarding/user-onboarding.component';
@@ -37,6 +37,10 @@ import { BulkUploadComponent } from '@insights/app/modules/bulkupload/bulkupload
 import { WebHookComponent } from '@insights/app/modules/webhook/webhook.component';
 import { AuthGuardService as AuthGuard } from '@insights/common/auth-guard.service';
 import { TraceabilityDashboardCompenent } from '@insights/app/modules/traceability/traceability-builder.component';
+import { ReportConfigComponent } from '@insights/app/modules/reportmanagement/report-configuration/report-configuration.component';
+import { ReportManagementComponent } from './reportmanagement/reportmanagement.component';
+
+
 const homeRoutes: Routes = [
   {
     path: 'InSights/Home', component: HomeComponent,
@@ -50,7 +54,7 @@ const homeRoutes: Routes = [
       { path: 'agentmanagement', component: AgentManagementComponent },
       { path: 'datadictionary', component: DatadictionaryComponent },
       { path: 'businessmapping', component: BusinessMappingComponent },
-      //{ path: 'dataarchiving', component: DataArchivingComponent },
+      { path: 'dataarchiving', component: DataArchivingComponent },
       { path: 'agentconfiguration', component: AgentConfigurationComponent },
       { path: 'accessGroupManagement', component: UserOnboardingComponent },
       { path: 'landingPage/:id', component: LandingPageComponent },
@@ -60,6 +64,8 @@ const homeRoutes: Routes = [
       { path: 'relationship-builder', component: RelationshipBuilderComponent },
       { path: 'bulkupload', component: BulkUploadComponent },
       { path: 'webhook', component: WebHookComponent },
+      { path: 'reportmanagement', component: ReportManagementComponent },
+      { path: 'report-configuration', component: ReportConfigComponent },
       { path: 'traceability', component: TraceabilityDashboardCompenent }
     ],
     canActivate: [AuthGuard]

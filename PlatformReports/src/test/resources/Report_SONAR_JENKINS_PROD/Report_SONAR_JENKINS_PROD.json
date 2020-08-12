@@ -1,0 +1,74 @@
+[
+   {
+      "type":"mscolumn2d",
+      "renderAt":"mscolumn2d_100252",
+      "width":"700",
+      "height":"350",
+      "dataFormat":"json",
+      "dataSource":{
+         "chart":{
+            "bgColor":"black",
+            "caption":" Productivity Trend",
+            "subCaption":" Productivity Trend",
+            "theme":"fusion"
+         }
+      }
+   },
+    {
+      "type":"mscolumn2d",
+      "renderAt":"mscolumn2d_100253",
+      "width":"700",
+      "height":"350",
+      "dataFormat":"json",
+      "dataSource":{
+         "chart":{
+            "bgColor":"black",
+            "caption":" Productivity Trend",
+            "subCaption":" Productivity Trend",
+            "theme":"fusion"
+         }
+      }
+   }  ,
+    {
+      "type":"mscolumn2d",
+      "renderAt":"mscolumn2d_100254",
+      "width":"700",
+      "height":"350",
+      "dataFormat":"json",
+      "dataSource":{
+         "chart":{
+            "bgColor":"black",
+            "caption":" Productivity Trend_MINMAX",
+            "subCaption":" Productivity Trend",
+            "theme":"fusion"
+         }
+      }
+   }  ,
+    {
+      "type":"mscolumn2d",
+      "renderAt":"mscolumn2d_100112",
+      "width":"700",
+      "height":"350",
+      "dataFormat":"json",
+      "dataSource":{
+         "chart":{
+            "bgColor":"black",
+            "caption":" Average Build Time",
+            "subCaption":" Average Build Time",
+            "theme":"fusion"
+         }
+      }
+   },
+   {
+      "type":"pie2d",
+      "renderAt":"pie2d_100903",    
+      "dataFormat":"json",
+      "dataSource":{
+         "chart":{
+            "caption":"Average hours spent on projects in a sprint",
+            "subCaption":"",
+            "theme":"fusion"
+         }
+      }
+   }
+]

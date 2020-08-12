@@ -1,0 +1,101 @@
+/********************************************************************************
+ * Copyright 2019 Cognizant Technology Solutions
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License.  You may obtain a copy
+ * of the License at
+ * 
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License. */
+
+.scrollData {
+    height: 82%;
+}
+
+table {
+    table-layout: fixed;
+    width: 100%
+}
+
+tr:nth-child(odd) td {
+    background-color: #ffffff;
+}
+
+tr:nth-child(even) td {
+    background-color: #E1E3E7;
+}
+
+tr.mat-footer-row, tr.mat-row {
+    font-size: 12px !important;
+}
+
+ul {
+    position: relative;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+}
+
+li {
+    display: flex;
+    margin: 1px;
+    padding: 5px;
+}
+
+li:last-child {
+    position: absolute;
+    top: 0;
+    right: 0;
+}
+
+.titleStyle {
+    background-color: #FF8F1C;
+    color: white;
+    margin: 0;
+    padding-bottom: 5px;
+    padding-top: 5px;
+    font-weight: bold;
+    border: 3px solid #FF8F1C;
+}
+
+.mat-table {
+    font-family: inherit;
+}
+
+.timeZone {
+    text-align: left;
+    padding-top: 1.5%;
+    padding-bottom: 1%;
+    font-family: Roboto, Helvetica Neue, sans-serif;
+    color: blue;
+    font-size: 12px;
+    padding-left: 2%;
+}
+
+td {
+    width: 50%;
+    line-height: 1.2em;
+}
+
+.columnName {
+    padding-left: 20%;
+    font-weight: bolder;
+    text-align: left;
+}
+
+.columnComponent {
+    padding-left: 5%;
+    text-align: left;
+}
+
+.mat-tooltip {
+    white-space: pre-line;
+}

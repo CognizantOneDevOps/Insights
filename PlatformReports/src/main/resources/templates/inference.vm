@@ -1,0 +1,121 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title></title>
+
+</head>
+
+<body style="margin-top:0;margin-bottom:0;margin-right:0;margin-left:0;padding-top:0;padding-bottom:0;padding-right:0;padding-left:0;background-color:#ffffff;">
+
+    <div style="margin-top:0;margin-bottom:0;margin-right:auto;margin-left:auto;width:80%;max-width:100%;margin:auto;border:1px solid;border-color:#009933;">
+    
+    	<table width="100%" cellpadding="0" cellspacing="0" border="0" > 
+						<tbody> 
+						<tr> 
+							<td align="center" style="background-color:#000000;">
+							
+							
+							<embed  src="cid:${logoImage}">
+							</td>
+					
+						
+							
+						</tr> 
+			
+					</tbody> 
+		</table> 
+						
+
+        <table width="100%" cellpadding="10" cellspacing="0" border="0" style="border-bottom:1px solid #009933 ;font-size:14px;line-height:22px;text-align:left;color:#333333;">
+            <tbody>
+
+                <tr>
+                    #if ($!$accordianData) #foreach ($data in $accordianData) #if( !$foreach.hasNext && (($accordianData.size() % 2) > 0))
+
+                    <td style="padding-bottom:10px;width:50%;padding-left: 20%;padding-right:25%;height:100%" colspan="2">
+                        #else
+                        <td style="padding-bottom:10px;width:50%;vertical-align:top;height:100%">
+                            #end
+
+                            <div style="border:1px solid #666;height:100%;">
+
+                                <p style="font-size: 16px; line-height: 25px; margin: 0 0 8px 0;background-color:#d3e9c7;font-family: proxima_novasemibold;padding-left:20px;padding-top:10px;padding-bottom:10px;"><b>$data.heading.getAsString()
+								<span style="font-size: 14px;font-family: proxima_novasemibold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Observations:- (Positives:$data.noOfPositives, Negatives: $data.noOfNegatives, Neutral: $data.noOfNeutral) </span></b></p>
+                                <p><span style="font-size: 14px; margin-left:50px;font-family:Proxima Nova;"><b>Daily Observations: (Last run: $data.inferenceDetails[0].lastRun.getAsString())</b></span> </p>
+                                <p style="margin: 0 0 8px 0;font-size: 12px;font-family:Proxima Nova;">
+                                    <ul style=" margin-left: 25px; ">
+                                        #if ($!data.inferenceDetails) #foreach ($content in $data.inferenceDetails) #if ($content.get("schedule").getAsString()=="DAILY") #if ($content.get("sentiment").getAsString()=="POSITIVE")
+                                        <li style="color: green;">
+                                            $data.inferenceDetails.get($foreach.index).get("inference").getAsString()
+                                        </li>
+                                        #elseif($content.get("sentiment").getAsString()=="NEGATIVE" )
+                                        <li style="color: red;">
+                                            $data.inferenceDetails.get($foreach.index).get("inference").getAsString()
+                                        </li>
+                                        #elseif($content.get("sentiment").getAsString()=="NEUTRAL" )
+                                        <li style="color: blue;">
+                                            $data.inferenceDetails.get($foreach.index).get("inference").getAsString()
+                                        </li>
+                                        #end #end #end
+                                    </ul>
+
+                                    #end
+
+                                </p>
+                            </div>
+                        </td>
+
+                        #if(($foreach.index+1) % 2 ==0)
+
+                		 </tr>
+               			 <tr>
+                   		#end 
+                    #end 
+                    #else
+                    <p><span style="font-size: 14px; margin-left:50px;font-family:Proxima Nova;">
+                    No Data Found
+                    </span>
+                    </p>
+                    #end
+
+                </tr>
+                
+                	
+              
+            </tbody>
+
+        </table>
+        <table width="100%" cellpadding="0" cellspacing="0" border="0">
+          <tr>
+                <td style=" text-align:left;padding-left:15px;"> 
+          		
+          				© 2017 Cognizant Technology Solutions, Inc., All rights reserved
+          			
+          		</td>
+          		<td align="right">
+
+          			<embed  src ="cid:${footerImage}">
+          				
+          		</td>
+          		
+          		<!--
+          		<td>
+          			
+          			<embed  src ="cid:${footerImage}"  width="100%">
+          			
+          		</td>
+          		-->
+          		
+          </tr>
+          
+        </table>
+        
+       
+
+    </div>
+
+</body>
+
+</html>

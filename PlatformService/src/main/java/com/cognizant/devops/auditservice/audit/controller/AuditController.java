@@ -173,8 +173,8 @@ public class AuditController {
 		try {
 			String path = System.getenv().get("INSIGHTS_HOME") + File.separator + "logs" + File.separator + "PlatformAuditService" + File.separator + "Reports"+ File.separator + logFileName;
 			//String path = ConfigOptions.REPORT_LOGS_PATH + ConfigOptions.FILE_SEPERATOR + logFileName;
-			System.out.println("Report log path -- "+path);
-			System.out.println("Log File Name -- "+Paths.get(new File(path).getAbsolutePath()).getFileName());
+			//System.out.println("Report log path -- "+path);
+			//System.out.println("Log File Name -- "+Paths.get(new File(path).getAbsolutePath()).getFileName());
 			boolean checkValidFile = PlatformServiceUtil.validateFile(logFileName);
 			if(checkValidFile) {
 				byte[] fileContent = Files.readAllBytes(Paths.get(new File(path).getAbsolutePath()));

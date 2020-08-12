@@ -43,19 +43,19 @@
 	</dependencies>
 	<modules>
 		<module>PlatformCommons</module>
-        <module>PlatformDAL</module>
-        <module>PlatformAuditing</module>          
-        <module>PlatformService</module>
-        <module>PlatformEngine</module>
-        <module>PlatformUI3</module>     
-        <module>PlatformInsights</module>
-        <module>PlatformInsightsWebHook</module>
-        <module>PlatformDeployment/WebHookFaultTolerance/AWSLambdaFunctions/PlatformInsightsLambdaKinesis</module>
-        <module>PlatformDeployment/WebHookFaultTolerance/AWSLambdaFunctions/PlatformInsightsLambdaRetrieval</module>
-        <!--<module>PlatformDeployment/WebHookFaultTolerance/PlatformInsightsAzureWebhook</module>--> 
-        <module>PlatformRegressionTest</module>
-		
-		<!--<module>PlatformDeployment/WebHookFaultTolerance/PlatformInsightsAzureWebhook</module>-->
+		<module>PlatformDAL</module>
+		<module>PlatformAuditing</module>
+		<module>PlatformService</module>
+		<module>PlatformEngine</module>
+		<module>PlatformWorkflow</module>
+		<module>PlatformReports</module>
+		<module>PlatformInsightsWebHook</module>
+		<module>PlatformDeployment/WebHookFaultTolerance/AWSLambdaFunctions/PlatformInsightsLambdaKinesis</module>
+		<module>PlatformDeployment/WebHookFaultTolerance/AWSLambdaFunctions/PlatformInsightsLambdaRetrieval</module>
+		<!--<module>PlatformDeployment/WebHookFaultTolerance/PlatformInsightsAzureWebhook</module> -->
+		<module>PlatformUI3</module>
+		<module>PlatformRegressionTest</module>
+
 	</modules>
 	<build>
 		<pluginManagement>
@@ -109,7 +109,18 @@
 					<haveGraph>true</haveGraph>
 					<generateLatex>false</generateLatex>
 					<generateHtml>true</generateHtml>
-					<input>${project.basedir}/PlatformAgents ${project.basedir}/PlatformCommons ${project.basedir}/PlatformDAL ${project.basedir}/PlatformDeployment ${project.basedir}/PlatformEngine ${project.basedir}/PlatformGrafanaPlugins ${project.basedir}/PlatformInsights ${project.basedir}/PlatformInsightsWebHook ${project.basedir}/PlatformMockServer ${project.basedir}/PlatformService ${project.basedir}/PlatformUI3 ${project.basedir}/PlatformWebhookEngine ${project.basedir}/PlatformRegressionTest</input>
+					<input>${project.basedir}/PlatformAgents
+						${project.basedir}/PlatformCommons ${project.basedir}/PlatformDAL
+						${project.basedir}/PlatformDeployment
+						${project.basedir}/PlatformEngine
+						${project.basedir}/PlatformGrafanaPlugins
+						${project.basedir}/PlatformWorkflow
+						${project.basedir}/PlatformReports
+						${project.basedir}/PlatformInsightsWebHook
+						${project.basedir}/PlatformMockServer
+						${project.basedir}/PlatformService ${project.basedir}/PlatformUI3
+						${project.basedir}/PlatformWebhookEngine
+						${project.basedir}/PlatformRegressionTest</input>
 					<outputDirectory>${basedir}/DoxygenReport</outputDirectory>
 					<inlineSources>true</inlineSources>
 					<haveDot>true</haveDot>

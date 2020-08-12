@@ -53,12 +53,15 @@ public class ApplicationConfigProvider implements Serializable {
 	private QueryCache queryCache = new QueryCache();
 	private boolean enableAuditEngine = false;
 	private boolean enableWebHookEngine = false;
+	private boolean enableDataArchivalEngine = false;
 	private SchedulerConfigData schedulerConfigData = new SchedulerConfigData();
 	private String driverLocation;
 
 	private Vault vault = new Vault();
 	private String autheticationProtocol = "NativeGrafana";
 	private SingleSignOnConfig singleSignOnConfig = new SingleSignOnConfig();
+	private AssessmentReport assessmentReport = new AssessmentReport();	
+	private WorkflowDetails workflowDetails = new WorkflowDetails();
 
 	private ApplicationConfigProvider() {
 		this.refreshTime = new Date(new Date().getTime() - 86400000);
@@ -301,4 +304,30 @@ public class ApplicationConfigProvider implements Serializable {
 	public void setSingleSignOnConfig(SingleSignOnConfig singleSignOnConfig) {
 		this.singleSignOnConfig = singleSignOnConfig;
 	}
+
+	public AssessmentReport getAssessmentReport() {
+		return assessmentReport;
+	}
+
+	public void setAssessmentReport(AssessmentReport assessmentReport) {
+		this.assessmentReport = assessmentReport;
+	}
+
+	public WorkflowDetails getWorkflowDetails() {
+		return workflowDetails;
+	}
+
+	public void setWorkflowDetails(WorkflowDetails workflowDetails) {
+		this.workflowDetails = workflowDetails;
+	}
+
+	public boolean isEnableDataArchivalEngine() {
+		return enableDataArchivalEngine;
+	}
+
+	public void setEnableDataArchivalEngine(boolean enableDataArchivalEngine) {
+		this.enableDataArchivalEngine = enableDataArchivalEngine;
+	}
+	
+	
 }

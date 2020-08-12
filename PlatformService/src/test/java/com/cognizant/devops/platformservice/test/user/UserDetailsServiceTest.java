@@ -71,7 +71,7 @@ public class UserDetailsServiceTest {
     	
     	if( null != response ){
     		String jsonResp = response;
-    		System.out.println(jsonResp);
+			//System.out.println(jsonResp);
     		JsonParser jsonParser = new JsonParser();
     		jsonObj = (JsonObject)jsonParser.parse(jsonResp);
     	}

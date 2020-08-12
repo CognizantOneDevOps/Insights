@@ -49,13 +49,13 @@ public class TestngInitializerTest extends AbstractTestNGSpringContextTests{
 
 	static {
 		ApplicationConfigCache.loadConfigCache();
-		System.out.println("Testng initializer class to load Config Cache .... static");
+		log.debug("Testng initializer class to load Config Cache .... static");
 
 	}
 
 	@BeforeSuite
 	public void testOnStartup() throws ServletException {
 		ApplicationConfigCache.loadConfigCache();
-		System.out.println("Testng initializer class to load Config Cache");
+		log.debug("Testng initializer class to load Config Cache");
 	}
 }

@@ -1,0 +1,34 @@
+[
+   {
+      "contentId":200,
+      "isActive":"TRUE",
+      "expectedTrend":"UPWARDS",
+      "contentName":"Avg Employee Productivity for last Week",
+      "action":"COUNT",
+      "kpiId":252,
+      "noOfResult":15,
+      "threshold":50,
+      "directionOfThreshold":"BELOW",
+      "message":{
+         "contentMessage":"No of employees who had been below the defined productivity were {result} in the past {day} days"
+      }
+   },
+   {
+      "contentId":204,
+      "isActive":"TRUE",
+      "expectedTrend":"UPWARDS",
+      "contentName":"Avg Employee Productivity in percentage w.r.t different zones ",
+      "kpiId":253,
+      "noOfResult":15,
+      "thresholds":{
+         "red":44,
+         "amber":50,
+         "green":55
+      },
+      "action":"PERCENTAGE",
+      "directionOfThreshold":"ABOVE",
+      "message":{
+         "contentMessage":"Employees as per productivity percentage w.r.t zones are red {red}%, amber {amber}% , green {green}%"
+      }
+   }
+]

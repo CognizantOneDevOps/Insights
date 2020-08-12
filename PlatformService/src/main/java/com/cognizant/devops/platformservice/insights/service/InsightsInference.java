@@ -32,6 +32,7 @@ public class InsightsInference implements Serializable{
 	private Integer ranking;
 	private Long currentResult;
 	private Long lastResult;
+	private String executionDate;
 	
 	public Long getCurrentResult() {
 		return currentResult;
@@ -63,6 +64,15 @@ public class InsightsInference implements Serializable{
 	}
 	public void setRanking(Integer ranking) {
 		this.ranking = ranking;
+	}
+	public String getExecutionDate() {
+		return executionDate;
+	}
+	public void setExecutionDate(String executionDate) {
+		this.executionDate = executionDate;
+	}
+	public static long getSerialversionuid() {
+		return serialVersionUID;
 	}
 	
 }

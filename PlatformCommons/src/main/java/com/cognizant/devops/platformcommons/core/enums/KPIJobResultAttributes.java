@@ -17,9 +17,9 @@ package com.cognizant.devops.platformcommons.core.enums;
 
 public enum KPIJobResultAttributes {
 
-	KPIID("kpiID"),
+	KPIID("kpiId"),
 	NAME("name"),
-	RESULT("result"),
+	RESULTS("results"),
 	RESULTTIME("resultTime"),
 	RESULTTIMEX("resultTimeX"),
 	EXPECTEDTREND("expectedTrend"),
@@ -33,15 +33,19 @@ public enum KPIJobResultAttributes {
 	GROUPBYFIELDVAL("groupByFieldVal"),
 	RESULTOUTPUTTYPE("resultOutPutType"),
 	ISCOMPARISIONKPI("isComparisionKpi"),
+	COMPARISIONFIELD("comparisionField"),
 	ISACTIVE("isActive"),
 	AVERAGEFIELD("averageField"),
 	ENDTIMEFIELD("endTimeField"),
 	NEO4JLABEL("neo4jLabel"),
-	NEXTRUN("nextRun"),
+	NEXTRUNTIME("nextRunTime"),
 	STARTTIMEFIELD("startTimeField"),
 	TIMEFORMAT("timeFormat"),
 	LASTRUNTIME("lastRunTime"),
-	NEO4JQUERY("neo4jQuery");
+	NEO4JQUERY("neo4jQuery"),
+	RESULTPROPERTYCOUNT("resultPropertyCount"),
+	EXCUTEIONID("executionId"),
+	RESULTFIELD("resultField");
 
 	private String value;
 

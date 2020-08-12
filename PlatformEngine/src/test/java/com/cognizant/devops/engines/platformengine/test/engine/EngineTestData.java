@@ -27,7 +27,7 @@ import org.apache.logging.log4j.Logger;
 
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.config.MessageQueueDataModel;
-import com.cognizant.devops.platformcommons.constants.MessageConstants;
+import com.cognizant.devops.platformcommons.constants.MQMessageConstants;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphResponse;
 import com.cognizant.devops.platformcommons.dal.neo4j.Neo4jDBHandler;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
@@ -107,7 +107,7 @@ public class EngineTestData {
 			 */
 
 			try {
-				channel.exchangeDeclare(exchangeName, MessageConstants.EXCHANGE_TYPE);
+				channel.exchangeDeclare(exchangeName, MQMessageConstants.EXCHANGE_TYPE);
 				channel.queueDeclare(queueName, true, false, false, null);
 				channel.queueBind(queueName, exchangeName, routingKey);
 				channel.basicPublish(exchangeName, routingKey, null, message.getBytes());

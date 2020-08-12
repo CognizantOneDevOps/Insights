@@ -66,6 +66,7 @@ public class BulkUploadService implements IBulkUpload {
 	 * @return boolean
 	 * @throws InsightsCustomException
 	 */
+	@Override
 	public boolean uploadDataInDatabase(MultipartFile file, String toolName, String label, String insightsTimeField,
 			String insightsTimeFormat) throws InsightsCustomException {
 		File csvfile = null;
@@ -209,7 +210,8 @@ public class BulkUploadService implements IBulkUpload {
 				recordFieldValue = record.get(header.getValue());
 				if (header.getKey().equalsIgnoreCase(insightsTimeField)) {
 					if (recordFieldValue.isEmpty()) {
-						throw new InsightsCustomException("Null values in column " + insightsTimeField);
+						throw new InsightsCustomException(
+								"Null values in column " + insightsTimeField + " record  " + record);
 					}
 					addPropertyInJson(json, recordFieldValue, header.getKey());
 					addTimePropertiesInJson(json, recordFieldValue, insightsTimeFormat);
@@ -302,6 +304,7 @@ public class BulkUploadService implements IBulkUpload {
 	 * @return Object
 	 * @throws InsightsCustomException
 	 */
+	@Override
 	public Object getToolDetailJson() throws InsightsCustomException {
 		String agentPath = System.getenv().get("INSIGHTS_HOME") + File.separator + ConfigOptions.CONFIG_DIR;
 		Path dir = Paths.get(agentPath);

@@ -1,0 +1,32 @@
+[
+   {
+      "type":"mscolumn2d",
+      "renderAt":"mscolumn2d_252",
+      "width":"700",
+      "height":"350",
+      "dataFormat":"json",
+      "dataSource":{
+         "chart":{
+            "bgColor":"black",
+            "caption":" Productivity Trend",
+            "subCaption":" Productivity Trend",
+            "theme":"fusion"
+         }
+      }
+   } ,
+    {
+      "type":"mscolumn2d",
+      "renderAt":"mscolumn2d_112",
+      "width":"700",
+      "height":"350",
+      "dataFormat":"json",
+      "dataSource":{
+         "chart":{
+            "bgColor":"black",
+            "caption":" Average Build Time",
+            "subCaption":" Average Build Time",
+            "theme":"fusion"
+         }
+      }
+   } 
+]

@@ -1,0 +1,59 @@
+[
+ 
+   {
+      "contentId":22152,
+      "expectedTrend":"DOWNWARDS",
+      "contentName":"Number of Open Defects",
+      "category":"COMPARISON",
+      "kpiId":"152",
+      "noOfResult":2,
+      "threshold":0,
+      "message":{
+         "positive":" Total Number of Open Defects has decreased  to {current:OpenDefect} from {previous:OpenDefect}",
+         "negative":" Total Number of Open Defects has increased to {current:OpenDefect}  from {previous:OpenDefect}",
+         "neutral":" Total Number of Open Defects has remain same  to {OpenDefect}"
+      },
+      "isActive":"TRUE"
+   },
+   {
+      "contentId":22154,
+      "expectedTrend":"DOWNWARDS",
+      "contentName":"Number of Open Defects",
+      "category":"STANDARD",
+      "kpiId":"152",
+      "noOfResult":2,
+      "threshold":0,
+      "message":{
+         "contentMessage":" Open defects captured in last run were {OpenDefect}"
+      },
+      "isActive":"TRUE"
+   },
+   {
+      "contentId":23153,
+      "expectedTrend":"DOWNWARDS",
+      "contentName":"Average Defect Duration",
+      "category":"COMPARISON",
+      "kpiId":"153",
+      "noOfResult":2,
+      "threshold":0,
+      "message":{
+         "positive":" Average Defect Duration has decreased to {current:AvgDefectCompletionTime} from {previous:AvgDefectCompletionTime}",
+         "negative":"Average Defect Duration has increased to {current:AvgDefectCompletionTime}  from {previous:AvgDefectCompletionTime}",
+         "neutral":"Average Defect Duration has remain same  to {AvgDefectCompletionTime}"
+      },
+      "isActive":"TRUE"
+   },
+   {
+      "contentId":23154,
+      "expectedTrend":"DOWNWARDS",
+      "contentName":"Average Defect Duration",
+      "category":"STANDARD",
+      "kpiId":"153",
+      "noOfResult":2,
+      "threshold":0,
+      "message":{
+         "contentMessage":"Average Defect Duration captured in last run was {AvgDefectCompletionTime}s"
+      },
+      "isActive":"TRUE"
+   }
+]

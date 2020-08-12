@@ -25,6 +25,9 @@ import org.hibernate.boot.model.naming.ImplicitNamingStrategyJpaCompliantImpl;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.service.ServiceRegistry;
 
+import com.cognizant.devops.platformcommons.core.util.InsightsUtils;
+import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
+
 public class TestDal {
 	final static Logger logger = LogManager.getLogger(TestDal.class);
 	public static void main(String[] args) {
@@ -45,5 +48,18 @@ public class TestDal {
 		session.getTransaction().commit();
 		session.close();
 		sessionFactory.close();
+
+		long epochtime;
+		try {
+			epochtime = InsightsUtils.getEpochTime("2020-08-03 04:19:30 UTC", "yyyy-MM-dd HH:mm:ss");
+			logger.debug("message epochtime  {} ", epochtime);
+
+			String dateTimeFromEpoch = InsightsUtils.insightsTimeXFormat(epochtime);
+
+			logger.debug("message epochtime  {}  dateTimeFromEpoch {} ", epochtime, dateTimeFromEpoch);
+		} catch (InsightsCustomException e) {
+
+		} //timeFieldValue dateFormat
+
 	}
 }
