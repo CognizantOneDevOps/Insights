@@ -18,5 +18,7 @@
         <property name="show_sql">true</property>
        <!--  <mapping class="test.Student"/>-->
        <!-- <mapping resource="Test.hbm.xml"/> -->  
+        <property name="show_sql">false</property> 
+		<property name="format_sql">false</property> <!-- true -->
     </session-factory>
 </hibernate-configuration>

@@ -15,6 +15,7 @@
  ******************************************************************************/
 
 package com.cognizant.devops.platformdal.relationshipconfig;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -27,26 +28,29 @@ import com.cognizant.devops.platformdal.correlationConfig.CorrelationConfigurati
 
 @Entity
 @Table(name = "\"INSIGHTS_RELATIONSHIP_CONFIGURATIONS\"")
-public class RelationshipConfiguration {	
-	/**
-	 * 
-	 */	
+public class RelationshipConfiguration {
+
+	private static final long serialVersionUID = 1L;
+
 	@Id
 	@Column(name = "RID", unique = true, nullable = false)
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private int rid;
-	
-	private static final long serialVersionUID = 1L;	
-	@Column(name="RELATION_NAME")
+
+	@Column(name = "RELATION_NAME")
 	String relationname;
-	@Column(name="OPERATION_JSON")
+
+	@Column(name = "OPERATION_JSON")
 	String operationjson;
-	@Column (name="OPERATION")
+
+	@Column(name = "OPERATION")
 	String operation;
-	@Column(name="RELATIONSHIP_FIELD_VALUE")
-	String fieldValue;	
+
+	@Column(name = "RELATIONSHIP_FIELD_VALUE")
+	String fieldValue;
+
 	@ManyToOne
-	CorrelationConfiguration correlationConfig;	
+	CorrelationConfiguration correlationConfig;
 
 	public String getRelationname() {
 		return relationname;
@@ -86,13 +90,14 @@ public class RelationshipConfiguration {
 
 	public void setCorrelationConfig(CorrelationConfiguration correlationConfig) {
 		this.correlationConfig = correlationConfig;
-	}	
+	}
+
 	public int getRid() {
 		return rid;
 	}
+
 	public void setRid(int rid) {
 		this.rid = rid;
 	}
-	
 
 }

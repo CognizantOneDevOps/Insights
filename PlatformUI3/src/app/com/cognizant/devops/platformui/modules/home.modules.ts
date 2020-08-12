@@ -13,7 +13,6 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  ******************************************************************************/
-
 import { DomSanitizer, BrowserModule, SafeUrl } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -24,11 +23,8 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MaterialModule } from '@insights/app/material.module';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA, MatDialogModule } from '@angular/material';
 import { MatDatepickerModule } from '@angular/material/datepicker';
-
-
 import { HomeRouting } from '@insights/app/modules/home.routing';
 import { SharedServices } from '@insights/app/shared.services';
-
 import { HomeComponent } from '@insights/app/modules/home/home.component';
 import { PlaylistComponent } from '@insights/app/modules/playlist/playlist.component';
 import { AdminComponent } from '@insights/app/modules/admin/admin.component';
@@ -41,7 +37,8 @@ import { AboutDialog } from '@insights/app/modules/about/about-show-popup';
 import { BlockChainComponent } from '@insights/app/modules/blockchain/blockchain.component';
 import { AgentManagementComponent } from '@insights/app/modules/admin/agent-management/agent-management.component';
 import { DatadictionaryComponent } from '@insights/app/modules/datadictionary/datadictionary.component';
-//import { DataArchivingComponent } from '@insights/app/modules/settings/dataarchiving/dataarchiving.component';
+
+import { DataArchivingComponent } from '@insights/app/modules/settings/dataarchiving/dataarchiving.component';
 import { GrafanaAuthenticationService } from '@insights/common/grafana-authentication-service';
 import { GrafanaDashboardService } from '@insights/app/modules/grafana-dashboard/grafana-dashboard-service';
 import { AgentService } from '@insights/app/modules/admin/agent-management/agent-management-service';
@@ -50,7 +47,8 @@ import { DataDictionaryService } from '@insights/app/modules/datadictionary/data
 
 import { BusinessMappingService } from '@insights/app/modules/admin/businessmapping/businessmapping.service';
 import { BusinessMappingComponent } from '@insights/app/modules/admin/businessmapping/businessmapping.component';
-//import { DataArchivingService } from '@insights/app/modules/settings/dataarchiving/dataarchiving-service';
+
+import { DataArchivingService } from '@insights/app/modules/settings/dataarchiving/dataarchiving-service';
 import { AgentConfigurationComponent } from '@insights/app/modules/admin/agent-management/agent-configuration/agent-configuration.component';
 
 import { UserOnboardingComponent } from '@insights/app/modules/user-onboarding/user-onboarding.component';
@@ -81,9 +79,17 @@ import { WebHookService } from '@insights/app/modules/webhook/webhook.service';
 import { TraceabilityDashboardCompenent } from '@insights/app/modules/traceability/traceability-builder.component';
 import { TraceabiltyService } from '@insights/app/modules/traceability/traceablity-builder.service';
 import { ShowTraceabiltyDetailsDialog } from '@insights/app/modules/traceability/traceabilty-show-details-dialog';
-import { AddPropertyDialog } from './relationship-builder/add-propertydialog';
-import { LandingPageService } from './landing-page/landing-page.service';
-
+import { AddPropertyDialog } from '@insights/app/modules/relationship-builder/add-propertydialog';
+import { LandingPageService } from '@insights/app/modules/landing-page/landing-page.service';
+import { ViewKPIDialog } from '@insights/app/modules/reportmanagement/report-configuration/view-kpi-dialog';
+import { AddTasksDialog } from '@insights/app/modules/reportmanagement/report-configuration/add-task';
+import { DragulaModule, DragulaService } from 'ng2-dragula';
+import { ReportManagementService } from '@insights/app/modules/reportmanagement/reportmanagement.service';
+import { ReportManagementComponent } from '@insights/app/modules/reportmanagement/reportmanagement.component';
+import { WorkflowHistoryDetailsDialog } from '@insights/app/modules/reportmanagement/workflow-history-details/workflow-history-details-dialog';
+import { ReportConfigComponent } from '@insights/app/modules/reportmanagement/report-configuration/report-configuration.component';
+import { DataArchiveDetailsDialog } from '@insights/app/modules/settings/dataarchiving/data-archive-details/data-archive-details-dialog';
+import { DataArchiveConfigureURLDialog } from '@insights/app/modules/settings/dataarchiving/data-archive-configureurl/data-archive-configureurl-dialog';
 
 
 @NgModule({
@@ -101,7 +107,10 @@ import { LandingPageService } from './landing-page/landing-page.service';
     AgentManagementComponent,
     DatadictionaryComponent,
     BusinessMappingComponent,
-    //DataArchivingComponent,
+
+    DataArchivingComponent,
+    DataArchiveDetailsDialog,
+    DataArchiveConfigureURLDialog,
     AgentConfigurationComponent,
     BlockChainComponent,
     UserOnboardingComponent,
@@ -118,8 +127,13 @@ import { LandingPageService } from './landing-page/landing-page.service';
     RelationshipBuilderComponent,
     BulkUploadComponent,
     WebHookComponent,
+    ReportManagementComponent,
+    ReportConfigComponent,
     TraceabilityDashboardCompenent,
-    AddPropertyDialog
+    AddPropertyDialog,
+    AddTasksDialog,
+    ViewKPIDialog,
+    WorkflowHistoryDetailsDialog
   ],
   imports: [
     HomeRouting,
@@ -131,7 +145,8 @@ import { LandingPageService } from './landing-page/landing-page.service';
     MaterialModule,
     SharedServices,
     MatDatepickerModule,
-    StorageServiceModule
+    StorageServiceModule,
+    DragulaModule
   ],
   entryComponents: [
     ShowDetailsDialog,
@@ -142,7 +157,12 @@ import { LandingPageService } from './landing-page/landing-page.service';
     AddGroupMessageDialog,
     AssetDetailsDialog,
     ShowJsonDialog,
-    AddPropertyDialog
+    AddPropertyDialog,
+    AddTasksDialog,
+    ViewKPIDialog,
+    WorkflowHistoryDetailsDialog,
+    DataArchiveDetailsDialog,
+    DataArchiveConfigureURLDialog
   ],
 
   providers: [
@@ -152,22 +172,22 @@ import { LandingPageService } from './landing-page/landing-page.service';
     HealthCheckService,
     DataDictionaryService,
     BusinessMappingService,
-    //DataArchivingService,
+   
+    DataArchivingService,
     UserOnboardingService,
     MessageDialogService,
     LogoSettingService,
     BlockChainService,
     DatePipe,
+    DragulaService,
     TitleCasePipe,
     QueryBuilderService,
     RelationshipBuilderService,
     BulkUploadService,
     WebHookService,
-    TraceabiltyService,
-    LandingPageService
+    ReportManagementService,
+    LandingPageService,
+    TraceabiltyService
   ]
 })
-
-
-
 export class HomeModules { }

@@ -1,0 +1,27 @@
+.content-mesaage
+{
+    max-width: 370px !important;
+    word-wrap: break-word !important;
+    font-size:14px;
+    text-align: left;
+}
+.content
+{
+    margin-left: 1.5%;
+    margin-top:4%;
+    background-color:rgb(232,232,232);
+    text-align: center;
+}
+.row
+{
+    margin-top:1%;
+}
+h4
+{
+    margin-top: 1.5%;
+    text-decoration: underline;
+    font-weight: bold;
+    font-family: 'Source Sans Pro', sans-serif;
+    color:blue;
+	font-size:16px;
+}

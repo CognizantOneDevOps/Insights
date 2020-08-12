@@ -1,0 +1,86 @@
+[
+   {
+      "type":"mscolumn2d",
+      "renderAt":"mscolumn2d_901",
+      "width":"700",
+      "height":"350",
+      "dataFormat":"json",
+      "dataSource":{
+         "chart":{
+            "caption":"Average Code Issues in Deployment",
+            "subCaption":"Average Code Issues in Deployment",
+            "theme":"fusion"
+         }
+      }
+   },
+   {
+      "type":"stackedcolumn2d",
+      "renderAt":"stackedcolumn2d_901",
+      "width":"700",
+      "height":"350",
+      "dataFormat":"json",
+      "dataSource":{
+         "chart":{
+            "caption":"Average Code Issues in Deployment ",
+            "subCaption":"Average Code Issues in Deployment",
+            "theme":"fusion"
+         }
+      }
+   },
+   {
+      "type":"pie2d",
+      "renderAt":"pie2d_901",
+      "width":"700",
+      "height":"350",
+      "dataFormat":"json",
+      "dataSource":{
+         "chart":{
+            "caption":"Average Code Issues in Deployment ",
+            "subCaption":"Average Code Issues in Deployment",
+            "theme":"fusion"
+         }
+      }
+   },
+   {
+      "type":"mscolumn2d",
+      "renderAt":"mscolumn2d_900",
+      "width":"700",
+      "height":"350",
+      "dataFormat":"json",
+      "dataSource":{
+         "chart":{
+            "caption":"Avg all employee productivity for threshold",
+            "subCaption":"Avg all employee productivity for threshold",
+            "theme":"fusion"
+         }
+      }
+   },
+   {
+      "type":"mscolumn2d",
+      "renderAt":"mscolumn2d_902",
+      "width":"700",
+      "height":"350",
+      "dataFormat":"json",
+      "dataSource":{
+         "chart":{
+            "caption":"Jenkins Build Failures V/S Success",
+            "subCaption":"Jenkins Build Failures V/S Success",
+            "theme":"fusion"
+         }
+      }
+   },
+   {
+      "type":"msline",
+      "renderAt":"msline_902",
+      "width":"700",
+      "height":"350",
+      "dataFormat":"json",
+      "dataSource":{
+         "chart":{
+            "caption":"Jenkins Build Failures V/S Success",
+            "subCaption":"Jenkins Build Failures V/S Success",
+            "theme":"fusion"
+         }
+      }
+   }
+]

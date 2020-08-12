@@ -1,0 +1,87 @@
+<!--
+ *********************************************************************************
+ * Copyright 2019 Cognizant Technology Solutions
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License.  You may obtain a copy
+ * of the License at
+ * 
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ *******************************************************************************-->
+
+<div class="titleStyle">
+    <ul>
+        <li style="background-color: #FF8F1C;word-break: break-word;">Data Archival Detail for {{archivalName}}</li>
+        <li (click)="closeShowDetailsDialog()" style="background-color: #FF8F1C;">
+            <mat-icon svgIcon="close_dialog">
+            </mat-icon>
+        </li>
+    </ul>
+</div>
+<div class="scrollData">
+    <table>
+                <tr class="mat-row">
+                        <td class="columnName">
+                            <span>Records From</span>
+                            <span style="display:inline-block; width: 31px"></span>
+                            <span style="text-align: right !important"> :</span>
+                        </td>
+                        <td class="columnComponent">
+                            {{startDate}}
+                        </td>
+                </tr>
+                <tr class="mat-row">
+                        <td class="columnName">
+                            <span>Records To</span>
+                            <span style="display:inline-block; width: 46px"></span>
+                            <span style="text-align: right !important"> :</span>
+                        </td>
+                        <td class="columnComponent">
+                            {{endDate}}
+                        </td>
+                </tr>
+                <tr class="mat-row">
+                        <td class="columnName">
+                            <span>Days to retain</span>
+                            <span style="display:inline-block; width: 30px"></span>
+                            <span style="text-align: right !important"> :</span>
+                        </td>
+                        <td class="columnComponent">
+                            {{daystoRetain}}
+                        </td>
+                </tr>
+                <tr class="mat-row">
+                        <td class="columnName" >
+                            <span>Creation Date</span>
+                            <span style="display:inline-block; width: 30px"></span>
+                            <span style="text-align: right !important"> :</span>
+                        </td>
+                        <td class="columnComponent" >
+                            {{createdOnDate}}
+                        </td>
+                </tr>
+                <tr class="mat-row">
+                        <td class="columnName" >
+                            <span>Author</span>
+                            <span style="display:inline-block; width: 68px"></span>
+                            <span style="text-align: right !important"> :</span>
+                        </td>
+                        <td class="columnComponent" style="overflow: hidden">
+                            {{authorName.slice(0,30)}}
+                        </td>
+                </tr>
+    </table>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6 timeZone">
+                Timezone: {{timezone }}
+            </div>
+        </div>
+    </div>
+</div>

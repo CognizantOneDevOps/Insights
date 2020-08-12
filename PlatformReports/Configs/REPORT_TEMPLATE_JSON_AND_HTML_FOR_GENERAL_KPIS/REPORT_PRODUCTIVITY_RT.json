@@ -1,0 +1,37 @@
+{
+   "reportId":"601",
+   "reportName":"Report_PRODUCTIVITY",
+   "description":"KPIS only for Productivity",
+   "isActive":true,
+   "file":"REPORT_PRODUCTIVITY",
+   "kpiConfigs":[
+      {
+         "kpiId":252,
+         "visualizationConfigs":[
+            {
+               "vType":"mscolumn2d_252",
+               "vQuery":"MATCH (n:KPI:RESULTS) where n.reportId = 601 and n.kpiId=252 with DISTINCT MAX(n.executionId) as latestExecutionId,n.completionDateEpochTime as completionDateEpochTime MATCH (n:KPI:RESULTS) where n.executionId=latestExecutionId RETURN  completionDateEpochTime , n.Productivity as Productivity ORDER BY completionDateEpochTime DESC"
+            }
+         ]
+      },
+      {
+         "kpiId":253,
+         "visualizationConfigs":[
+            {
+               "vType":"mscolumn2d_253",
+               "vQuery":"MATCH (n:KPI:RESULTS) where n.reportId = 601 and n.kpiId=253 with DISTINCT MAX(n.executionId) as latestExecutionId,n.completionDateEpochTime as completionDateEpochTime MATCH (n:KPI:RESULTS) where n.executionId=latestExecutionId RETURN  completionDateEpochTime , n.Productivity as Productivity ORDER BY completionDateEpochTime DESC"
+            }
+         ]
+      },
+      {
+         "kpiId":254,
+         "visualizationConfigs":[
+            {
+               "vType":"mscolumn2d_254",
+               "vQuery":"MATCH (n:KPI:RESULTS) where n.reportId = 601 and n.kpiId=254 with DISTINCT MAX(n.executionId) as latestExecutionId,n.completionDateEpochTime as completionDateEpochTime MATCH (n:KPI:RESULTS) where n.executionId=latestExecutionId RETURN  completionDateEpochTime , n.Productivity as Productivity ORDER BY completionDateEpochTime DESC"
+            }
+         ]
+      }  
+     
+   ]
+}

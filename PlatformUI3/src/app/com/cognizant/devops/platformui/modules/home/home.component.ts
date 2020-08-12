@@ -307,6 +307,15 @@ export class HomeComponent implements OnInit {
         isAdminMenu: false
       },
       {
+        displayName: 'Report Management',
+        iconName: 'feature',
+        route: 'InSights/Home/reportmanagement',
+        isToolbarDisplay: InsightsInitService.enableInsightsBranding,
+        showMenu: true,
+        title: "Report Management",
+        isAdminMenu: false
+      },
+      {
         displayName: 'Data Dictionary',
         iconName: 'datadictionary',
         route: 'InSights/Home/datadictionary',
@@ -395,7 +404,7 @@ export class HomeComponent implements OnInit {
             showMenu: true,
             title: "Logo Setting",
             isAdminMenu: true
-          }/*,
+          },
           {
             displayName: 'Data Archival',
             iconName: 'feature',
@@ -404,7 +413,7 @@ export class HomeComponent implements OnInit {
             showMenu: true,
             title: "Data Archival",
             isAdminMenu: true
-          }*/
+          }
         ]
       }
     ];

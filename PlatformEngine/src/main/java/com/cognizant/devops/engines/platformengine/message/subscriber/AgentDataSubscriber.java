@@ -36,7 +36,7 @@ import com.cognizant.devops.engines.platformengine.message.factory.EngineSubscri
 import com.cognizant.devops.engines.platformengine.modules.aggregator.BusinessMappingData;
 import com.cognizant.devops.engines.util.DataEnrichUtils;
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
-import com.cognizant.devops.platformcommons.constants.MessageConstants;
+import com.cognizant.devops.platformcommons.constants.MQMessageConstants;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphResponse;
 import com.cognizant.devops.platformcommons.dal.neo4j.Neo4jDBHandler;
 import com.cognizant.devops.platformcommons.dal.neo4j.NodeData;
@@ -94,13 +94,13 @@ public class AgentDataSubscriber extends EngineSubscriberResponseHandler {
 			throws IOException {
 		ApplicationConfigProvider.performSystemCheck();
 		boolean enableOnlineDatatagging = ApplicationConfigProvider.getInstance().isEnableOnlineDatatagging();
-		String message = new String(body, MessageConstants.MESSAGE_ENCODING);
+		String message = new String(body, MQMessageConstants.MESSAGE_ENCODING);
 		String routingKey = envelope.getRoutingKey();
 		log.debug("Routing key in data " + routingKey);
 		List<String> labels = new ArrayList<String>();
 		labels.add("RAW");
 		if (this.labelName == null) {
-			labels.addAll(Arrays.asList(routingKey.split(MessageConstants.ROUTING_KEY_SEPERATOR)));
+			labels.addAll(Arrays.asList(routingKey.split(MQMessageConstants.ROUTING_KEY_SEPERATOR)));
 		} else {
 			labels.add(this.category.toUpperCase());
 			labels.add(this.toolName.toUpperCase());

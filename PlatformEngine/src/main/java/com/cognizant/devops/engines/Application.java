@@ -21,14 +21,15 @@ import java.util.TimerTask;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import com.cognizant.devops.platformcommons.config.ApplicationConfigCache;
-import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
-import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
+import com.cognizant.devops.engines.platformdataarchivalengine.modules.aggregator.DataArchivalAggregatorModule;
 import com.cognizant.devops.engines.platformengine.message.core.EngineStatusLogger;
 import com.cognizant.devops.engines.platformengine.modules.aggregator.EngineAggregatorModule;
 import com.cognizant.devops.engines.platformengine.modules.correlation.EngineCorrelatorModule;
 import com.cognizant.devops.engines.platformengine.modules.mapper.ProjectMapperModule;
 import com.cognizant.devops.engines.platformengine.modules.offlinedataprocessing.OfflineDataProcessingExecutor;
+import com.cognizant.devops.platformcommons.config.ApplicationConfigCache;
+import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
+import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
 
 /**
  * Engine execution will start from Application. 1. Load the iSight config 2.
@@ -55,21 +56,24 @@ public class Application {
 			// Subscribe for desired events. This used to consume data from tool queue.
 			Timer timerEngineAggregator = new Timer("EngineAggregatorModule");
 			TimerTask engineAggregatorModuleTrigger = new EngineAggregatorModule();
-			timerEngineAggregator.schedule(engineAggregatorModuleTrigger, 0, 
-								ApplicationConfigProvider.getInstance().getSchedulerConfigData().getEngineAggregatorModuleInterval() * 60 * 1000);
-			
+			timerEngineAggregator.schedule(engineAggregatorModuleTrigger, 0,
+					ApplicationConfigProvider.getInstance().getSchedulerConfigData().getEngineAggregatorModuleInterval()
+							* 60 * 1000);
+
 			// Schedule the Correlation Module.
 			Timer timerEngineCorrelatorModule = new Timer("EngineCorrelatorModule");
 			TimerTask engineCorrelatorModuleTrigger = new EngineCorrelatorModule();
-			timerEngineCorrelatorModule.schedule(engineCorrelatorModuleTrigger, 0, 
-								ApplicationConfigProvider.getInstance().getSchedulerConfigData().getEngineCorrelatorModuleInterval() * 60 * 1000);
-			
+			timerEngineCorrelatorModule.schedule(engineCorrelatorModuleTrigger, 0,
+					ApplicationConfigProvider.getInstance().getSchedulerConfigData().getEngineCorrelatorModuleInterval()
+							* 60 * 1000);
+
 			// Schedule the Project Mapping Module.
 			Timer timerProjectMapperModule = new Timer("ProjectMapperModule");
 			TimerTask projectMapperModuleTrigger = new ProjectMapperModule();
-			timerProjectMapperModule.schedule(projectMapperModuleTrigger, 0, 
-								ApplicationConfigProvider.getInstance().getSchedulerConfigData().getProjectMapperModuleInterval() * 60 * 1000);
-			
+			timerProjectMapperModule.schedule(projectMapperModuleTrigger, 0,
+					ApplicationConfigProvider.getInstance().getSchedulerConfigData().getProjectMapperModuleInterval()
+							* 60 * 1000);
+
 			// Schedule the OfflineDataProcessingExecutor job
 			Timer timerOfflineDataProcessingExecutor = new Timer("OfflineDataProcessingExecutor");
 			TimerTask offlineDataProcessingExecutorTrigger = new OfflineDataProcessingExecutor();
@@ -147,5 +151,20 @@ public class Application {
 			}
 		}
 
+		if (ApplicationConfigProvider.getInstance().isEnableDataArchivalEngine()) {
+			try {
+				Timer timerEngineDataArchivalAggregator = new Timer("DataArchivalAggregatorModule");
+				TimerTask dataArchivalAggregatorModuleTrigger = new DataArchivalAggregatorModule();
+				timerEngineDataArchivalAggregator.schedule(dataArchivalAggregatorModuleTrigger, 0,
+						ApplicationConfigProvider.getInstance().getSchedulerConfigData().getDataArchivalEngineInterval()
+								* 60 * 1000);
+				EngineStatusLogger.getInstance().createDataArchivalStatusNode(
+						"Platform Data Archival Engine Service started. ", PlatformServiceConstants.SUCCESS);
+			} catch (Exception e) {
+				EngineStatusLogger.getInstance().createDataArchivalStatusNode(
+						"Data Archival Engine Service not running " + e.getMessage(), PlatformServiceConstants.FAILURE);
+				log.error(e);
+			}
+		}
 	}
 }

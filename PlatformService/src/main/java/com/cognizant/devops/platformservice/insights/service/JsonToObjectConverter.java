@@ -63,7 +63,7 @@ public final class JsonToObjectConverter {
 				if(kpiData.get(KPIJobResultAttributes.ISCOMPARISIONKPI.toString()) != null && !kpiData.get(KPIJobResultAttributes.ISCOMPARISIONKPI.toString()).isJsonNull()) {
 					inferenceDetails.setIsComparisionKpi(kpiData.get(KPIJobResultAttributes.ISCOMPARISIONKPI.toString()).getAsBoolean());
 				}
-				inferenceDetails.setResult(kpiData.get(KPIJobResultAttributes.RESULT.toString()).getAsLong());
+				inferenceDetails.setResult(kpiData.get(KPIJobResultAttributes.RESULTS.toString()).getAsLong());
 				if(kpiData.get(KPIJobResultAttributes.RESULTOUTPUTTYPE.toString()) != null && !kpiData.get(KPIJobResultAttributes.RESULTOUTPUTTYPE.toString()).isJsonNull()) {
 					inferenceDetails.setResultOutPutType(kpiData.get(KPIJobResultAttributes.RESULTOUTPUTTYPE.toString()).getAsString());
 				}

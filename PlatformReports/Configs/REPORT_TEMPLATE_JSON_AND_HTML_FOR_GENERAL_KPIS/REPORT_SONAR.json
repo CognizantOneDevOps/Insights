@@ -1,0 +1,257 @@
+[
+   {
+      "type":"mscolumn2d",
+      "renderAt":"mscolumn2d_131",
+      "width":"700",
+      "height":"350",
+      "dataFormat":"json",
+      "dataSource":{
+         "chart":{
+            "bgColor":"black",
+            "caption":" Average Duplicated Blocks",
+            "subCaption":" Average Duplicated Blocks",
+            "theme":"fusion"
+         }
+      }
+   },
+   {
+      "type":"mscolumn2d",
+      "renderAt":"mscolumn2d_132",
+      "width":"700",
+      "height":"350",
+      "dataFormat":"json",
+      "dataSource":{
+         "chart":{
+            "bgColor":"black",
+            "caption":"Average Duplicated Blocks",
+            "subCaption":"Average Duplicated Blocks",
+            "theme":"fusion"
+         }
+      }
+   },
+   {
+      "type":"mscolumn2d",
+      "renderAt":"mscolumn2d_133",
+      "width":"700",
+      "height":"350",
+      "dataFormat":"json",
+      "dataSource":{
+         "chart":{
+            "bgColor":"black",
+            "caption":"Number of Quality Failed Blocks",
+            "subCaption":" Number of Quality Failed Blocks",
+            "theme":"fusion"
+         }
+      }
+   },
+   {
+      "type":"mscolumn2d",
+      "renderAt":"mscolumn2d_134",
+      "width":"700",
+      "height":"350",
+      "dataFormat":"json",
+      "dataSource":{
+         "chart":{
+            "bgColor":"black",
+            "caption":" Number of Quality Failed Blocks",
+            "subCaption":"Number of Quality Failed Blocks",
+            "theme":"fusion"
+         }
+      }
+   },
+   {
+      "type":"mscolumn2d",
+      "renderAt":"mscolumn2d_131",
+      "width":"700",
+      "height":"350",
+      "dataFormat":"json",
+      "dataSource":{
+         "chart":{
+            "bgColor":"black",
+            "caption":"Average Duplicated Blocks",
+            "subCaption":"Average Duplicated Blocks",
+            "theme":"fusion"
+         }
+      }
+   },
+   {
+      "type":"mscolumn2d",
+      "renderAt":"mscolumn2d_331",
+      "width":"700",
+      "height":"350",
+      "dataFormat":"json",
+      "dataSource":{
+         "chart":{
+            "bgColor":"black",
+            "caption":"Average Complexity",
+            "subCaption":"Average Complexity",
+            "theme":"fusion"
+         }
+      }
+   },
+   {
+      "type":"mscolumn2d",
+      "renderAt":"mscolumn2d_332",
+      "width":"700",
+      "height":"350",
+      "dataFormat":"json",
+      "dataSource":{
+         "chart":{
+            "bgColor":"black",
+            "caption":"Average Complexity",
+            "subCaption":"Average Complexity",
+            "theme":"fusion"
+         }
+      }
+   },
+   {
+      "type":"mscolumn2d",
+      "renderAt":"mscolumn2d_101",
+      "width":"700",
+      "height":"350",
+      "dataFormat":"json",
+      "dataSource":{
+         "chart":{
+            "bgColor":"black",
+            "caption":"Number of Quality Passed Blocks",
+            "subCaption":"Number of Quality Passed Blocks",
+            "theme":"fusion"
+         }
+      }
+   },
+   {
+      "type":"mscolumn2d",
+      "renderAt":"mscolumn2d_102",
+      "width":"700",
+      "height":"350",
+      "dataFormat":"json",
+      "dataSource":{
+         "chart":{
+            "bgColor":"black",
+            "caption":"Number of Quality Passed Blocks",
+            "subCaption":"Number of Quality Passed Blocks",
+            "theme":"fusion"
+         }
+      }
+   },
+   {
+      "type":"mscolumn2d",
+      "renderAt":"mscolumn2d_235",
+      "width":"700",
+      "height":"350",
+      "dataFormat":"json",
+      "dataSource":{
+         "chart":{
+            "bgColor":"black",
+            "caption":"Average Code Coverage",
+            "subCaption":"Average Code Coverage",
+            "theme":"fusion"
+         }
+      }
+   },
+   {
+      "type":"mscolumn2d",
+      "renderAt":"mscolumn2d_236",
+      "width":"700",
+      "height":"350",
+      "dataFormat":"json",
+      "dataSource":{
+         "chart":{
+            "bgColor":"black",
+            "caption":" Average Code Coverage",
+            "subCaption":" Average Code Coverage",
+            "theme":"fusion"
+         }
+      }
+   },
+   {
+      "type":"mscolumn2d",
+      "renderAt":"mscolumn2d_237",
+      "width":"700",
+      "height":"350",
+      "dataFormat":"json",
+      "dataSource":{
+         "chart":{
+            "bgColor":"black",
+            "caption":"Average Code Coverage",
+            "subCaption":"Average Code Coverage",
+            "theme":"fusion"
+         }
+      }
+   },
+   {
+      "type":"mscolumn2d",
+      "renderAt":"mscolumn2d_238",
+      "width":"700",
+      "height":"350",
+      "dataFormat":"json",
+      "dataSource":{
+         "chart":{
+            "bgColor":"black",
+            "caption":"Average Code Coverage",
+            "subCaption":"Average Code Coverage",
+            "theme":"fusion"
+         }
+      }
+   },
+   {
+      "type":"mscolumn2d",
+      "renderAt":"mscolumn2d_138",
+      "width":"700",
+      "height":"350",
+      "dataFormat":"json",
+      "dataSource":{
+         "chart":{
+            "bgColor":"black",
+            "caption":"Number of Failed Sonar Executions",
+            "subCaption":" Number of Failed Sonar Executions",
+            "theme":"fusion"
+         }
+      }
+   },
+   {
+      "type":"mscolumn2d",
+      "renderAt":"mscolumn2d_137",
+      "width":"700",
+      "height":"350",
+      "dataFormat":"json",
+      "dataSource":{
+         "chart":{
+            "bgColor":"black",
+            "caption":"Number of Failed Sonar Executions",
+            "subCaption":"Number of Failed Sonar Executions",
+            "theme":"fusion"
+         }
+      }
+   },
+   {
+      "type":"mscolumn2d",
+      "renderAt":"mscolumn2d_136",
+      "width":"700",
+      "height":"350",
+      "dataFormat":"json",
+      "dataSource":{
+         "chart":{
+            "bgColor":"black",
+            "caption":"Number of Successful Sonar Executions",
+            "subCaption":"Number of Successful Sonar Executions",
+            "theme":"fusion"
+         }
+      }
+   },
+   {
+      "type":"mscolumn2d",
+      "renderAt":"mscolumn2d_135",
+      "width":"700",
+      "height":"350",
+      "dataFormat":"json",
+      "dataSource":{
+         "chart":{
+            "bgColor":"black",
+            "caption":" Number of Successful Sonar Executions",
+            "subCaption":" Number of Successful Sonar Executions",
+            "theme":"fusion"
+         }
+      }
+   }
+]

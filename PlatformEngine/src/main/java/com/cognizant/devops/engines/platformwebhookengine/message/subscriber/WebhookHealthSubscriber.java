@@ -24,7 +24,7 @@ import org.apache.logging.log4j.Logger;
 
 import com.cognizant.devops.engines.platformengine.message.core.EngineStatusLogger;
 import com.cognizant.devops.engines.platformwebhookengine.message.factory.EngineSubscriberResponseHandler;
-import com.cognizant.devops.platformcommons.constants.MessageConstants;
+import com.cognizant.devops.platformcommons.constants.MQMessageConstants;
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
 import com.cognizant.devops.platformcommons.dal.neo4j.Neo4jDBHandler;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
@@ -45,7 +45,7 @@ public class WebhookHealthSubscriber extends EngineSubscriberResponseHandler {
 	public void handleDelivery(String consumerTag, Envelope envelope, BasicProperties properties, byte[] body)
 			throws IOException {
 		Neo4jDBHandler dbHandler = new Neo4jDBHandler();
-		String message = new String(body, MessageConstants.MESSAGE_ENCODING);
+		String message = new String(body, MQMessageConstants.MESSAGE_ENCODING);
 		String routingKey = envelope.getRoutingKey();
 		log.debug(" {}  Received  {} : {}", consumerTag, routingKey, message);
 		List<JsonObject> dataList = new ArrayList<JsonObject>();

@@ -16,8 +16,8 @@
 package com.cognizant.devops.platformcommons.core.enums;
 
 public enum JobSchedule {
-	DAILY("daily"), WEEKLY("weekly"), MONTHLY("monthly"), QUARTERLY("quarterly"), YEARLY("yearly");
-	
+	DAILY("daily"), WEEKLY("weekly"), BI_WEEKLY_SPRINT("bi_weekly_sprint"), TRI_WEEKLY_SPRINT("tri_weekly_sprint"),MONTHLY("monthly"), QUARTERLY("quarterly"), YEARLY("yearly"),ONETIME("onetime");
+
 	 private String value;
 
 	 JobSchedule(final String value) {

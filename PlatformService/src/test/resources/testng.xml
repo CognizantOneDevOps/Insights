@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
 
 <suite name="Suite" preserve-order="true">
 	<test name="PlatformServiceTest" preserve-order="true">
 		<classes>
 			<class
 				name="com.cognizant.devops.platformservice.test.testngInitializer.TestngInitializerTest" />
-			 <class
+			<class
 				name="com.cognizant.devops.platformservice.test.about.AboutServiceTest" />
 			<class
 				name="com.cognizant.devops.platformservice.test.agentManagement.AgentManagementTest" />
 			<class
 				name="com.cognizant.devops.platformservice.test.CorrelationBuilder.CorrelationBuilderTest" />
 			<class
-				name="com.cognizant.devops.platformservice.test.bulkUpload.BulkUploadTest" /> 
+				name="com.cognizant.devops.platformservice.test.bulkUpload.BulkUploadTest" />
 			<class
 				name="com.cognizant.devops.platformservice.test.dataDictionary.DataDictionaryTest" />
 			<class
@@ -25,7 +25,13 @@
 			<class
 				name="com.cognizant.devops.platformservice.test.accessGroupManagement.GroupsAndUserTest" />
 			<class
-				name="com.cognizant.devops.platformservice.test.traceabilitydashboard.TraceabilityDashboardTest" /> 
+				name="com.cognizant.devops.platformservice.test.traceabilitydashboard.TraceabilityDashboardTest" />
+			<class
+				name="com.cognizant.devops.platformservice.test.assessmentReports.AssessmentReportServiceTest" />
+			<class
+				name="com.cognizant.devops.platformservice.test.workflow.WorkflowServiceTest" /> 
+			<class
+				name="com.cognizant.devops.platformservice.test.dataArchival.DataArchivalServiceTest" />	
 		</classes>
 	</test>
 </suite>

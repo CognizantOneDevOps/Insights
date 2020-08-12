@@ -1,0 +1,197 @@
+[
+   {
+      "type":"mscolumn2d",
+      "renderAt":"mscolumn2d_112",
+      "width":"700",
+      "height":"350",
+      "dataFormat":"json",
+      "dataSource":{
+         "chart":{
+            "bgColor":"black",
+            "caption":" Average Build Time",
+            "subCaption":" Average Build Time",
+            "theme":"fusion"
+         }
+      }
+   },
+   {
+      "type":"mscolumn2d",
+      "renderAt":"mscolumn2d_232",
+      "width":"700",
+      "height":"350",
+      "dataFormat":"json",
+      "dataSource":{
+         "chart":{
+            "bgColor":"black",
+            "caption":" Number of Builds",
+            "subCaption":" Number of Builds",
+            "theme":"fusion"
+         }
+      }
+   },
+   {
+      "type":"mscolumn2d",
+      "renderAt":"mscolumn2d_231",
+      "width":"700",
+      "height":"350",
+      "dataFormat":"json",
+      "dataSource":{
+         "chart":{
+            "bgColor":"black",
+            "caption":" Number of Builds",
+            "subCaption":" Number of Builds",
+            "theme":"fusion"
+         }
+      }
+   },
+   {
+      "type":"mscolumn2d",
+      "renderAt":"mscolumn2d_122",
+      "width":"700",
+      "height":"350",
+      "dataFormat":"json",
+      "dataSource":{
+         "chart":{
+            "bgColor":"black",
+            "caption":" Number of Successful Builds",
+            "subCaption":" Number of Successful Builds",
+            "theme":"fusion"
+         }
+      }
+   },
+   {
+      "type":"mscolumn2d",
+      "renderAt":"mscolumn2d_126",
+      "width":"700",
+      "height":"350",
+      "dataFormat":"json",
+      "dataSource":{
+         "chart":{
+            "bgColor":"black",
+            "caption":" Maximum Build Time",
+            "subCaption":" Maximum Build Time",
+            "theme":"fusion"
+         }
+      }
+   },
+   {
+      "type":"mscolumn2d",
+      "renderAt":"mscolumn2d_123",
+      "width":"700",
+      "height":"350",
+      "dataFormat":"json",
+      "dataSource":{
+         "chart":{
+            "bgColor":"black",
+            "caption":" Number of Successful Builds",
+            "subCaption":" Number of Successful Builds",
+            "theme":"fusion"
+         }
+      }
+   },
+   {
+      "type":"mscolumn2d",
+      "renderAt":"mscolumn2d_127",
+      "width":"700",
+      "height":"350",
+      "dataFormat":"json",
+      "dataSource":{
+         "chart":{
+            "bgColor":"black",
+            "caption":"Maximum Build Time",
+            "subCaption":"Maximum Build Time",
+            "theme":"fusion"
+         }
+      }
+   },
+   {
+      "type":"mscolumn2d",
+      "renderAt":"mscolumn2d_128",
+      "width":"700",
+      "height":"350",
+      "dataFormat":"json",
+      "dataSource":{
+         "chart":{
+            "bgColor":"black",
+            "caption":" Minimum Build Time",
+            "subCaption":" Minimum Build Time",
+            "theme":"fusion"
+         }
+      }
+   },
+   {
+      "type":"mscolumn2d",
+      "renderAt":"mscolumn2d_129",
+      "width":"700",
+      "height":"350",
+      "dataFormat":"json",
+      "dataSource":{
+         "chart":{
+            "bgColor":"black",
+            "caption":"Minimum Build Time",
+            "subCaption":" Minimum Build Time",
+            "theme":"fusion"
+         }
+      }
+   },
+   {
+      "type":"mscolumn2d",
+      "renderAt":"mscolumn2d_125",
+      "width":"700",
+      "height":"350",
+      "dataFormat":"json",
+      "dataSource":{
+         "chart":{
+            "bgColor":"black",
+            "caption":" Number of Failed Builds",
+            "subCaption":" Number of Failed Builds",
+            "theme":"fusion"
+         }
+      }
+   },
+   {
+      "type":"mscolumn2d",
+      "renderAt":"mscolumn2d_124",
+      "width":"700",
+      "height":"350",
+      "dataFormat":"json",
+      "dataSource":{
+         "chart":{
+            "bgColor":"black",
+            "caption":" Number of Failed Builds",
+            "subCaption":" Number of Failed Builds",
+            "theme":"fusion"
+         }
+      }
+   },
+   {
+      "type":"mscolumn2d",
+      "renderAt":"mscolumn2d_122",
+      "width":"700",
+      "height":"350",
+      "dataFormat":"json",
+      "dataSource":{
+         "chart":{
+            "bgColor":"black",
+            "caption":"Number of Successful Builds",
+            "subCaption":"Number of Successful Builds",
+            "theme":"fusion"
+         }
+      }
+   },
+   {
+      "type":"mscolumn2d",
+      "renderAt":"mscolumn2d_111",
+      "width":"700",
+      "height":"350",
+      "dataFormat":"json",
+      "dataSource":{
+         "chart":{
+            "bgColor":"black",
+            "caption":"Average Build Time",
+            "subCaption":"Average Build Time",
+            "theme":"fusion"
+         }
+      }
+   }
+]

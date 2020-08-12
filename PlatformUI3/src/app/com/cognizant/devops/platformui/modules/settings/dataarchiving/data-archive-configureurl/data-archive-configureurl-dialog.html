@@ -1,0 +1,42 @@
+<!--
+ *********************************************************************************
+ * Copyright 2019 Cognizant Technology Solutions
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License.  You may obtain a copy
+ * of the License at
+ * 
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ *******************************************************************************-->
+
+<div class="headerStyle" style="background-color:#00B140 !important">
+        <ul>
+            <li style="background-color: #00B140;font-weight:bold;">Data Source URL for {{archivalName}}</li>
+            <li (click)="closeShowDetailsDialog()" class="closeicon">
+                <mat-icon svgIcon="close_dialog">
+                </mat-icon>
+            </li>
+        </ul>
+</div>
+<br>
+<div class="container">
+        <span class="mainText">Enter Datasource URL</span>
+        <span style="display:inline-block; width: 26px"></span>
+        <input maxlength="50"  autocomplete="off"
+        type="text" [(ngModel)]="inputDataSourceURL" name="inputDataSourceURL" class="form-control">
+</div>
+<br>
+<div style="background-color:#ffffff;padding-right: 2% !important">
+        <button mat-raised-button (click)="closeShowDetailsDialog()" class="configureBut" style="margin-top:2%;width:130px;margin-left: 55%; margin-bottom: 15px;">
+            CANCEL
+        </button>
+        <button mat-raised-button (click)="saveURL()" class="configureBut" style="margin-left: 3%;width:130px;padding-left: 10px;padding-right: 10px;">
+            ADD
+        </button>
+</div>

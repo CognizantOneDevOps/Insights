@@ -52,7 +52,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
-import com.cognizant.devops.platformcommons.constants.MessageConstants;
+import com.cognizant.devops.platformcommons.constants.MQMessageConstants;
 import com.cognizant.devops.platformcommons.core.enums.AGENTACTION;
 import com.cognizant.devops.platformcommons.core.util.ValidationUtils;
 import com.cognizant.devops.platformcommons.dal.vault.VaultHandler;
@@ -582,7 +582,7 @@ public class AgentManagementServiceImpl implements AgentManagementService {
 		factory.setPassword(ApplicationConfigProvider.getInstance().getMessageQueue().getPassword());
 		Connection connection = factory.newConnection();
 		Channel channel = connection.createChannel();
-		channel.exchangeDeclare(exchangeName, MessageConstants.EXCHANGE_TYPE, true);
+		channel.exchangeDeclare(exchangeName, MQMessageConstants.EXCHANGE_TYPE, true);
 		channel.queueDeclare(routingKey, true, false, false, null);
 		channel.queueBind(routingKey, exchangeName, routingKey);
 		channel.basicPublish(exchangeName, routingKey, props, data);
@@ -614,7 +614,7 @@ public class AgentManagementServiceImpl implements AgentManagementService {
 			if(ValidationUtils.checkLabelNameString(labelHealth)) {
 				throw new InsightsCustomException("Invalid health label Name, it should contain only alphanumeric character,underscore & dot");
 			}
-			labelDataValue = Arrays.asList(labelData.split(MessageConstants.ROUTING_KEY_SEPERATOR));
+			labelDataValue = Arrays.asList(labelData.split(MQMessageConstants.ROUTING_KEY_SEPERATOR));
 			
 		} catch (Exception e) {
 			log.error("Invalid label Name {} ", e);

@@ -38,7 +38,7 @@
 		</dependency>
 
 
-		<!-- Spring 3 dependencies -->
+		<!-- Spring 5 dependencies -->
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-core</artifactId>

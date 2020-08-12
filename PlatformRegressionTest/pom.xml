@@ -18,7 +18,7 @@
 	<groupId>com.cognizant.devops</groupId>
 	<artifactId>PlatformRegressionTest</artifactId>
 	<packaging>jar</packaging>
-	<version>6.8-SNAPSHOT</version>
+	<version>6.9-SNAPSHOT</version>
 	<name>PlatformRegressionTest</name>
 	<url>http://maven.apache.org</url>
 	<properties>

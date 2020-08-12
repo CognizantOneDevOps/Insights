@@ -25,7 +25,7 @@ import org.apache.logging.log4j.Logger;
 
 import com.cognizant.devops.engines.platformengine.message.core.EngineStatusLogger;
 import com.cognizant.devops.engines.platformengine.message.factory.EngineSubscriberResponseHandler;
-import com.cognizant.devops.platformcommons.constants.MessageConstants;
+import com.cognizant.devops.platformcommons.constants.MQMessageConstants;
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
 import com.cognizant.devops.platformcommons.dal.neo4j.Neo4jDBHandler;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
@@ -47,10 +47,10 @@ public class AgentHealthSubscriber extends EngineSubscriberResponseHandler {
 	public void handleDelivery(String consumerTag, Envelope envelope, BasicProperties properties, byte[] body)
 			throws IOException {
 		try {
-			String message = new String(body, MessageConstants.MESSAGE_ENCODING);
+			String message = new String(body, MQMessageConstants.MESSAGE_ENCODING);
 			String routingKey = envelope.getRoutingKey();
 			log.debug(consumerTag + " [x] Received '" + routingKey + "':'" + message + "'");
-			List<String> labels = Arrays.asList(routingKey.split(MessageConstants.ROUTING_KEY_SEPERATOR));
+			List<String> labels = Arrays.asList(routingKey.split(MQMessageConstants.ROUTING_KEY_SEPERATOR));
 			List<JsonObject> dataList = new ArrayList<JsonObject>();
 			List<JsonObject> failedDataList = new ArrayList<JsonObject>();
 			JsonElement json = new JsonParser().parse(message);

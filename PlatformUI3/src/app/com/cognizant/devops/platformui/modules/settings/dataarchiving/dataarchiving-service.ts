@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2019 Cognizant Technology Solutions
+ * Copyright 2020 Cognizant Technology Solutions
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License.  You may obtain a copy
@@ -19,8 +19,7 @@ import { Observable } from 'rxjs';
 
 
 export interface IDataArchiving {
-    saveDatapurging(settingsDataType: string, activeDataFlag: string, lastModifiedUser: string, settingsJsonstr: string): Promise<any>;
-    listDatapurgingdata(label: string): Promise<any>;
+   
 }
 
 @Injectable()
@@ -29,11 +28,31 @@ export class DataArchivingService implements IDataArchiving {
     constructor(private restCallHandlerService: RestCallHandlerService) {
     }
 
-    saveDatapurging(settingsDataType: string, activeDataFlag: string, lastModifiedUser: string, settingsJsonstr: string): Promise<any> {
-        return this.restCallHandlerService.postWithParameter("SAVE_DATAPURGING_SETTING", { 'settingsType': settingsDataType, 'activeFlag': activeDataFlag, 'lastModifiedByUser': lastModifiedUser, 'settingsJson': settingsJsonstr }, { 'Content-Type': 'application/x-www-form-urlencoded' }).toPromise();
+    saveArchivalRecord(archivalDetails: string): Promise<any> {
+        return this.restCallHandlerService.postWithData("SAVE_ARCHIVE_DETAILS", archivalDetails, "", { 'Content-Type': 'application/x-www-form-urlencoded' }).toPromise();
     }
 
-    listDatapurgingdata(label: string): Promise<any> {
-        return this.restCallHandlerService.get("LIST_DATAPURGING_SETTING", { 'settingsType': label });
+    listArchivedRecord(): Promise<any> {
+        return this.restCallHandlerService.get("ARCHIVED_DATA_LIST");
     }
-}
+
+    listActiveArchivedRecord(): Promise<any> {
+        return this.restCallHandlerService.get("ACTIVE_ARCHIVED_DATA_LIST");
+    }
+
+    deleteArchivedData(archivalName: string): Promise<any> {
+        return this.restCallHandlerService.postWithParameter("DELETE_ARCHIVED_DATA", { 'archivalName': archivalName }, { 'Content-Type': 'application/x-www-form-urlencoded' }).toPromise();
+    }
+
+    inactivateArchivedData(archivalName: string): Promise<any> {
+        return this.restCallHandlerService.postWithParameter("INACTIVATE_RECORD", { 'archivalName': archivalName }, { 'Content-Type': 'application/x-www-form-urlencoded' }).toPromise();
+    }
+
+    activateArchivedData(archivalName: string): Promise<any> {
+        return this.restCallHandlerService.postWithParameter("ACTIVATE_RECORD", { 'archivalName': archivalName }, { 'Content-Type': 'application/x-www-form-urlencoded' }).toPromise();
+    }
+ 
+    updateDataSourceURL(archivalURLDetails: string): Promise<any> {
+        return this.restCallHandlerService.postWithData("UPDATE_DATASOURCE_URL", archivalURLDetails,"",{ 'Content-Type': 'application/json' }).toPromise();
+    }
+} 
