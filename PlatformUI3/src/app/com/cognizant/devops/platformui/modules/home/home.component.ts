@@ -53,7 +53,7 @@ export class HomeComponent implements OnInit {
   userRole: String = '';
   userCurrentOrg: string = '';
   showAdminTab: boolean = false;
-  isToolbarDisplay: boolean = InsightsInitService.enableInsightsBranding;
+  isToolbarDisplay: boolean = InsightsInitService.enableInsightsToolbar;
   showBusinessMapping: boolean = false;
   isValidUser: boolean = false;
   showLogoutButton: boolean = true;
@@ -210,7 +210,7 @@ export class HomeComponent implements OnInit {
         navItemobj.displayName = orgDtl.name;
         navItemobj.iconName = 'grafanaOrg';
         navItemobj.route = 'InSights/Home/landingPage/' + orgDtl.orgId;
-        navItemobj.isToolbarDisplay = true;
+        navItemobj.isToolbarDisplay = InsightsInitService.enableInsightsToolbar;
         navItemobj.showIcon = false;
         navItemobj.isAdminMenu = false;
         navItemobj.orgId = orgDtl.orgId;
@@ -222,7 +222,7 @@ export class HomeComponent implements OnInit {
       navItemobj.displayName = 'Traceability Dashboard';
       navItemobj.iconName = 'traceability';
       navItemobj.route = 'InSights/Home/traceability';
-      navItemobj.isToolbarDisplay = InsightsInitService.enableInsightsBranding;
+      navItemobj.isToolbarDisplay = InsightsInitService.enableInsightsToolbar;
       navItemobj.showIcon = true;
       navItemobj.isAdminMenu = false;
       navItemobj.title = "traceability";
@@ -265,7 +265,7 @@ export class HomeComponent implements OnInit {
         isAdminMenu: false,
         showMenu: true,
         title: "Click on Organization to see various Org's Dashboards",
-        isToolbarDisplay: InsightsInitService.enableInsightsBranding,
+        isToolbarDisplay: InsightsInitService.enableInsightsToolbar,
         children: this.navOrgList
       },
       {
@@ -274,13 +274,13 @@ export class HomeComponent implements OnInit {
         isAdminMenu: true,
         showMenu: InsightsInitService.showAuditReporting,
         title: "Audit Report and search assets",
-        isToolbarDisplay: InsightsInitService.enableInsightsBranding,
+        isToolbarDisplay: InsightsInitService.enableInsightsToolbar,
         children: [
           {
             displayName: 'Search Assets',
             iconName: 'feature',
             route: 'InSights/Home/blockchain',
-            isToolbarDisplay: InsightsInitService.enableInsightsBranding,
+            isToolbarDisplay: InsightsInitService.enableInsightsToolbar,
             showMenu: InsightsInitService.showAuditReporting,
             title: "Search Assets",
             isAdminMenu: true
@@ -289,7 +289,7 @@ export class HomeComponent implements OnInit {
             displayName: 'Query Builder',
             iconName: 'feature',
             route: 'InSights/Home/querybuilder',
-            isToolbarDisplay: InsightsInitService.enableInsightsBranding,
+            isToolbarDisplay: InsightsInitService.enableInsightsToolbar,
             showMenu: InsightsInitService.showAuditReporting,
             title: "Query Builder",
             isAdminMenu: true
@@ -310,7 +310,7 @@ export class HomeComponent implements OnInit {
         displayName: 'Report Management',
         iconName: 'feature',
         route: 'InSights/Home/reportmanagement',
-        isToolbarDisplay: InsightsInitService.enableInsightsBranding,
+        isToolbarDisplay: InsightsInitService.enableInsightsToolbar,
         showMenu: true,
         title: "Report Management",
         isAdminMenu: false
@@ -319,7 +319,7 @@ export class HomeComponent implements OnInit {
         displayName: 'Data Dictionary',
         iconName: 'datadictionary',
         route: 'InSights/Home/datadictionary',
-        isToolbarDisplay: InsightsInitService.enableInsightsBranding,
+        isToolbarDisplay: InsightsInitService.enableInsightsToolbar,
         showMenu: true,
         title: "Data Dictionary",
         isAdminMenu: false
@@ -328,7 +328,7 @@ export class HomeComponent implements OnInit {
         displayName: 'Health Check',
         iconName: 'feature',
         route: 'InSights/Home/healthcheck',
-        isToolbarDisplay: InsightsInitService.enableInsightsBranding,
+        isToolbarDisplay: InsightsInitService.enableInsightsToolbar,
         showMenu: true,
         title: "Health Check",
         isAdminMenu: true
@@ -337,7 +337,7 @@ export class HomeComponent implements OnInit {
       {
         displayName: 'Configuration',
         iconName: 'admin',
-        isToolbarDisplay: InsightsInitService.enableInsightsBranding,
+        isToolbarDisplay: InsightsInitService.enableInsightsToolbar,
         isAdminMenu: true,
         title: "Configuration",
         showMenu: true,
@@ -346,7 +346,7 @@ export class HomeComponent implements OnInit {
             displayName: 'Agent Management',
             iconName: 'feature',
             route: 'InSights/Home/agentmanagement',
-            isToolbarDisplay: InsightsInitService.enableInsightsBranding,
+            isToolbarDisplay: InsightsInitService.enableInsightsToolbar,
             showMenu: true,
             title: "Agent Management",
             isAdminMenu: true
@@ -355,7 +355,7 @@ export class HomeComponent implements OnInit {
             displayName: 'Bulk Upload',
             iconName: 'feature',
             route: 'InSights/Home/bulkupload',
-            isToolbarDisplay: InsightsInitService.enableInsightsBranding,
+            isToolbarDisplay: InsightsInitService.enableInsightsToolbar,
             showMenu: true,
             title: "Bulk Upload",
             isAdminMenu: true
@@ -364,7 +364,7 @@ export class HomeComponent implements OnInit {
             displayName: 'Webhook Configuration',
             iconName: 'feature',
             route: 'InSights/Home/webhook',
-            isToolbarDisplay: InsightsInitService.enableInsightsBranding,
+            isToolbarDisplay: InsightsInitService.enableInsightsToolbar,
             showMenu: InsightsInitService.showWebhookConfiguration,
             title: "WebHook",
             isAdminMenu: true
@@ -373,7 +373,7 @@ export class HomeComponent implements OnInit {
             displayName: 'Business Mapping',
             iconName: 'feature',
             route: 'InSights/Home/businessmapping',
-            isToolbarDisplay: InsightsInitService.enableInsightsBranding,
+            isToolbarDisplay: InsightsInitService.enableInsightsToolbar,
             showMenu: InsightsInitService.showBusinessMapping,
             title: "Business Mapping",
             isAdminMenu: true
@@ -382,7 +382,7 @@ export class HomeComponent implements OnInit {
             displayName: 'Group & Users',
             iconName: 'feature',
             route: 'InSights/Home/accessGroupManagement',
-            isToolbarDisplay: InsightsInitService.enableInsightsBranding,
+            isToolbarDisplay: InsightsInitService.enableInsightsToolbar,
             showMenu: true,
             title: "Group & Users",
             isAdminMenu: true
@@ -391,7 +391,7 @@ export class HomeComponent implements OnInit {
             displayName: 'Co-Relation Builder',
             iconName: 'feature',
             route: 'InSights/Home/relationship-builder',
-            isToolbarDisplay: InsightsInitService.enableInsightsBranding,
+            isToolbarDisplay: InsightsInitService.enableInsightsToolbar,
             showMenu: true,
             title: "Relationship-Builder",
             isAdminMenu: true
@@ -400,7 +400,7 @@ export class HomeComponent implements OnInit {
             displayName: 'Logo Setting',
             iconName: 'feature',
             route: 'InSights/Home/logoSetting',
-            isToolbarDisplay: InsightsInitService.enableInsightsBranding,
+            isToolbarDisplay: InsightsInitService.enableInsightsToolbar,
             showMenu: true,
             title: "Logo Setting",
             isAdminMenu: true
@@ -409,7 +409,7 @@ export class HomeComponent implements OnInit {
             displayName: 'Data Archival',
             iconName: 'feature',
             route: 'InSights/Home/dataarchiving',
-            isToolbarDisplay: InsightsInitService.enableInsightsBranding,
+            isToolbarDisplay: InsightsInitService.enableInsightsToolbar,
             showMenu: true,
             title: "Data Archival",
             isAdminMenu: true
@@ -507,6 +507,6 @@ export class HomeComponent implements OnInit {
     var self = this;
     self.router.navigateByUrl('/InSights/Home/landingPage/' + self.dataShare.getOrgId(), { skipLocationChange: true });
     self.displayLandingPage = false;
-    self.isToolbarDisplay = InsightsInitService.enableInsightsBranding;
+    self.isToolbarDisplay = InsightsInitService.enableInsightsToolbar;
   }
 }

@@ -37,7 +37,7 @@ export class InsightsInitService {
     static showBusinessMapping = true;
     static autheticationProtocol = "NativeGrafana";
     static singleSignOnConfig;
-    static enableInsightsBranding = true;
+    static enableInsightsToolbar = true;
     static isDebugModeEnable = false;
     static enableLogoutButton = true;
 
@@ -91,7 +91,7 @@ export class InsightsInitService {
         }
         InsightsInitService.autheticationProtocol = UIConfigResponse.autheticationProtocol;
         InsightsInitService.singleSignOnConfig = UIConfigResponse.singleSignOnConfig
-        InsightsInitService.enableInsightsBranding = UIConfigResponse.enableInsightsBranding
+        InsightsInitService.enableInsightsToolbar = UIConfigResponse.enableInsightsToolbar
         //InsightsInitService.isDebugModeEnable = UIConfigResponse.isDebugModeEnable
         InsightsInitService.enableLogoutButton = UIConfigResponse.enableLogoutButton
     }
