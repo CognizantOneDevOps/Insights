@@ -42,14 +42,19 @@ export class GrafanaDashboardComponent implements OnInit {
     defaultOrg: number;
     selectedApp: string;
     framesize: any;
+    offset: number;
     selectedDashboardUrl: string = '';
     selectedDashboard: GrafanaDashboardMode;
     dashboards = [];
     constructor(private route: ActivatedRoute, private router: Router,
         private sanitizer: DomSanitizer, private grafanadashboardservice: GrafanaDashboardService, private cookieService: CookieService) {
         var self = this;
-        var offset = 55; // 5px is app-grafana-dashboard height true 5
-        this.framesize = window.frames.innerHeight - offset
+        if(InsightsInitService.enableInsightsToolbar) {
+            this.offset = 55; // 5px is app-grafana-dashboard height true 5
+        } else {
+            this.offset = 0;
+        }
+        this.framesize = window.frames.innerHeight - this.offset
         console.log(" self.framesize inner height " + self.framesize);
         var receiveMessage = function (evt) {
             var height = parseInt(evt.data);
