@@ -66,7 +66,7 @@ export class ReportConfigComponent implements OnInit {
   enableadd: boolean = true;
   showStartDate: boolean = false;
   regex = new RegExp("^[a-zA-Z0-9_]*$");
-  emailRegex = new RegExp("(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+.[a-zA-Z0-9-.]+$)");
+  emailRegex = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
   activeDataArchivalRecordsResponse: any;
   activeDataArchivalRecords: any;
   dataSourceList = [];
@@ -316,16 +316,15 @@ export class ReportConfigComponent implements OnInit {
           isValidated = false;
           messageDialogText = "Please fill mandatory fields";
         }
-      } else {
-        var emails = this.emailAddress.replace(/\s/g, "").split(",");
-        for (var email of emails) {
-          if (!this.emailRegex.test(email)) {
+       }
+	  }
+    var emails = this.emailAddress.replace(/\s/g, "").split(",");
+    for (var email of emails) {
+        if (!this.emailRegex.test(email)) {
             isValidated = false;
             messageDialogText = "Error in email address format";
             break;
-          }
         }
-      }
     }
     if (isValidated) {
       this.editSaveData();

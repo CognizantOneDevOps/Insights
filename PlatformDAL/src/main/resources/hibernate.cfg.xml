@@ -15,7 +15,6 @@
 
         <property name="connection_pool_size">1</property>
         <property name="hbm2ddl.auto">update</property>
-        <property name="show_sql">true</property>
        <!--  <mapping class="test.Student"/>-->
        <!-- <mapping resource="Test.hbm.xml"/> -->  
         <property name="show_sql">false</property> 

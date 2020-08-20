@@ -133,7 +133,7 @@ public abstract class BaseContentCategoryImpl {
 		detail.setKpiName(inferenceResult.getName());
 		detail.setNoOfResult(contentConfigDefinition.getNoOfResult());
 		detail.setRanking(null);//ranking
-		detail.setResultField(inferenceResult.getResultField());
+		detail.setResultField(contentConfigDefinition.getResultField());
 		detail.setResultTime(inferenceResult.getResultTime());
 		detail.setResultTimeX(inferenceResult.getResultTimeX());
 		detail.setResultValuesMap(resultValuesMap);
@@ -176,4 +176,8 @@ public abstract class BaseContentCategoryImpl {
 
 	}
 	
+	public String getResultFieldFromContentDefination() {
+		return contentConfigDefinition.getResultField();
+	}
+
 }

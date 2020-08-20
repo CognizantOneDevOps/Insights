@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -38,6 +39,7 @@ import com.cognizant.devops.platformreports.assessment.util.ReportEngineUtils;
 import com.cognizant.devops.platformreports.exception.InsightsJobFailedException;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 public class ReportGraphDataHandler implements ReportDataHandler {
@@ -161,7 +163,7 @@ public class ReportGraphDataHandler implements ReportDataHandler {
 	}
 
 	/**
-	 * Used to parse Neo4j responce and create result Json Object
+	 * Used to parse KPI query Neo4j responce and create result Json Object
 	 * 
 	 * @param data
 	 * @param columns
@@ -184,9 +186,8 @@ public class ReportGraphDataHandler implements ReportDataHandler {
 
 				}
 			}
-			String resultValue = String.valueOf(dataJson.get(kpiDefinition.getResultField()));
-			if (!dataJson.entrySet().isEmpty() && resultValue != null
-					&& (!resultValue.equalsIgnoreCase("0") || !resultValue.equalsIgnoreCase(""))) {
+			//String resultValue = String.valueOf(dataJson.get(kpiDefinition.getResultField()));
+			if (!dataJson.entrySet().isEmpty() && validateJson(dataJson)) {
 				dataJson.addProperty(KPIJobResultAttributes.RESULTTIME.getValue(), InsightsUtils.getTodayTime());
 				dataJson.addProperty(KPIJobResultAttributes.RESULTTIMEX.getValue(),
 						InsightsUtils.getUtcTime(ReportEngineUtils.TIMEZONE));
@@ -205,6 +206,21 @@ public class ReportGraphDataHandler implements ReportDataHandler {
 			}
 		}
 		return listOfResultJson;
+	}
+
+	private boolean validateJson(JsonObject dataJson) {
+		boolean retunValue = Boolean.TRUE;
+		for (Entry<String, JsonElement> elemant : dataJson.entrySet()) {
+			String resultValue = String.valueOf(elemant.getValue());
+			if (resultValue != null && (!resultValue.equalsIgnoreCase("0") || !resultValue.equalsIgnoreCase(""))) {
+				retunValue = Boolean.TRUE;
+			} else {
+				retunValue = Boolean.FALSE;
+				break;
+			}
+		}
+
+		return retunValue;
 	}
 
 	public void creatingResultDetailFromGraphResponce(List<InsightsKPIResultDetails> kpiDetailList,

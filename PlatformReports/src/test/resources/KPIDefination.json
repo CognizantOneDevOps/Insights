@@ -115,7 +115,7 @@
       "group":"CODEQUALITY",
       "toolName":"SONAR",
       "category":"STANDARD",
-      "DBQuery":"MATCH (n:SONAR:DATA) where n.SPKstartTime > 1593561600 and n.SPKstartTime < 1596239999 and n.SPKqualityGate='pass' RETURN  count(n) as NumberOfQualityBlocks LIMIT 2",
+      "DBQuery":"MATCH (n:SONAR:DATA) where n.SPKstartTime > 1593561600 and n.SPKstartTime < 1596239999 and n.SPKqualityGates='pass' RETURN  count(n) as NumberOfQualityBlocks LIMIT 2",
       "datasource":"NEO4J",
       "isActive":true,
       "resultField":"NumberOfQualityBlocks"
@@ -253,5 +253,39 @@
       "datasource":"NEO4J",
       "isActive":true,
       "resultField":"Duration"
+   },
+   {
+      "kpiId":100127,
+      "name":"Maximum Build Time",
+      "group":"BUILD",
+      "category":"STANDARD",
+      "toolName":"JENKINS",
+      "DBQuery":"MATCH (n:JENKINS:DATA) WHERE n.SPKstartTime > 1593561600 and n.SPKstartTime < 1596239999 and n.SPKvectors = 'BUILD' and n.SPKstatus='Success' RETURN COALESCE(Max(toInt(n.SPKduration)),0) as MaxBuildTime",
+      "datasource":"NEO4J",
+      "isActive":true,
+      "resultField":"MaxBuildTime"
+   },
+   {
+      "kpiId":100161,
+      "expectedTrend":"UPWARDS",
+      "name":"Number of Closed Defects",
+      "group":"DEFECTS",
+      "toolName":"JIRA",
+      "category":"COMPARISON",
+      "DBQuery":"MATCH (n:JIRA:DATA) WHERE n.SPKstartTime > 1593561600 and n.SPKstartTime < 1596239999 and n.SPKissueTypes='Bug' and n.SPKstatus='Closed'  RETURN n",
+      "datasource":"NEO4J",
+      "isActive":true,
+      "resultField":"ClosedDefect"
+   },
+   {
+      "kpiId":100153,
+      "name":"Average Defect Duration",
+      "group":"DEFECTS",
+      "toolName":"JIRA",
+      "category":"COMPARISON",
+      "DBQuery":"MATCH (n:JIRA:DATA) WHERE SPKstartTime > 1593561600 and n.SPKstartTime < 1596239999 and n.SPKissueType='Bug' and n.SPKstatus='Closed'  RETURN COALESCE(Avg(toInt(n.SPKduration)),0) as AvgDefectCompletionTime",
+      "datasource":"NEO4J",
+      "isActive":true,
+      "resultField":"AvgDefectCompletionTime"
    }
 ]

@@ -1,0 +1,120 @@
+{
+   "reportId":"1100",
+   "reportName":"REPORT_SPRINT_SCORECARD",
+   "description":"Testing",
+   "isActive":true,
+   "file":"REPORT_SPRINT_SCORECARD",
+   "kpiConfigs":[
+      {
+         "kpiId":1101,
+         "visualizationConfigs":[
+            {
+               "vType":"mscolumn2d_1101",
+               "vQuery":"MATCH (n:KPI:RESULTS) where n.reportId = 1100 and n.kpiId=1101 with MAX(n.executionId) as latestExecutionId MATCH (n:KPI:RESULTS) where n.executionId=latestExecutionId and n.kpiId=1101 RETURN  n.Date , n.Failure as Failure,n.Success as Success"
+            }
+         ]
+      },
+      {
+         "kpiId":1110,
+         "visualizationConfigs":[
+            {
+               "vType":"mscolumn2d_1110",
+               "vQuery":"MATCH (n:KPI:RESULTS) where n.reportId = 1100 and n.kpiId=1110 with MAX(n.executionId) as latestExecutionId MATCH (n:KPI:RESULTS) where n.executionId=latestExecutionId and n.kpiId=1110 RETURN  n.Date  as Date , n.Failure as Failure,n.Success as Success"
+            }
+         ]
+      },
+      {
+         "kpiId":1106,
+         "visualizationConfigs":[
+            {
+               "vType":"msbar2d_1106",
+               "vQuery":"MATCH (n:KPI:RESULTS) where n.reportId = 1100 and n.kpiId=1106 with MAX(n.executionId) as latestExecutionId MATCH (n:KPI:RESULTS) where n.executionId=latestExecutionId and n.kpiId=1106 RETURN  n.Developer as Developer, n.CountOfIssueForDeveloper as Issues"
+            }
+         ]
+      },
+      {
+         "kpiId":1107,
+         "visualizationConfigs":[
+            {
+               "vType":"table_1107",
+               "vQuery":"MATCH (n:KPI:RESULTS) where n.reportId = 1100 and n.kpiId=1107 with MAX(n.executionId) as latestExecutionId MATCH (n:KPI:RESULTS) where n.executionId=latestExecutionId and n.kpiId=1107 RETURN  n.Type as Type, sum(n.Count) as Count"
+            }
+         ]
+      },
+	  {
+         "kpiId":1102,
+         "visualizationConfigs":[
+            {
+               "vType":"pie2d_1102",
+               "vQuery":"MATCH (n:KPI:RESULTS) where n.reportId = 1100 and n.kpiId=1102 with MAX(n.executionId) as latestExecutionId MATCH (n:KPI:RESULTS) where n.executionId=latestExecutionId and n.kpiId=1102 RETURN  n.resultField as Deployment ,n.Deployment as Value"
+            }
+         ]
+      },
+	  
+	  {
+         "kpiId":1103,
+         "visualizationConfigs":[
+            {
+               "vType":"pie2d_1103",
+               "vQuery":"MATCH (n:KPI:RESULTS) where n.reportId = 1100 and n.kpiId=1103 with MAX(n.executionId) as latestExecutionId MATCH (n:KPI:RESULTS) where n.executionId=latestExecutionId and n.kpiId=1103 RETURN n.resultField as Time , n.Time as Value"
+            }
+         ]
+      },
+	  {
+         "kpiId":1104,
+         "visualizationConfigs":[
+            {
+               "vType":"angulargauge_1104",
+               "vQuery":"MATCH (n:KPI:RESULTS) where n.reportId = 1100 and n.kpiId=1104 with MAX(n.executionId) as latestExecutionId MATCH (n:KPI:RESULTS) where n.executionId=latestExecutionId and n.kpiId=1104 RETURN  n.resultField as Time , n.Time as Value"
+            }
+         ]
+      },
+{
+         "kpiId":1108,
+         "visualizationConfigs":[
+            {
+               "vType":"angulargauge_1108",
+               "vQuery":"MATCH (n:KPI:RESULTS) where n.reportId = 1100 and n.kpiId=1108 with MAX(n.executionId) as latestExecutionId MATCH (n:KPI:RESULTS) where n.executionId=latestExecutionId and n.kpiId=1108 RETURN  n.resultField as Time , n.Time as Value"
+            }
+         ]
+      },	  
+	  
+	  {
+         "kpiId":1111,
+         "visualizationConfigs":[
+            {
+               "vType":"pie2d_1111",
+               "vQuery":"MATCH (n:KPI:RESULTS) where n.reportId = 1100 and n.kpiId=1111 with MAX(n.executionId) as latestExecutionId MATCH (n:KPI:RESULTS) where n.executionId=latestExecutionId and n.kpiId=1111 RETURN  n.resultField as Builds, n.Builds as Value"
+            }
+         ]
+      },
+	  {
+         "kpiId":1112,
+         "visualizationConfigs":[
+            {
+               "vType":"pie2d_1112",
+               "vQuery":"MATCH (n:KPI:RESULTS) where n.reportId = 1100 and n.kpiId=1112 with MAX(n.executionId) as latestExecutionId MATCH (n:KPI:RESULTS) where n.executionId=latestExecutionId and n.kpiId=1112 RETURN  n.resultField as Time, n.Time as Value"
+            }
+         ]
+      },{
+	     "kpiId":1113,
+         "visualizationConfigs":[
+            {
+               "vType":"pie2d_1113",
+               "vQuery":"MATCH (n:KPI:RESULTS) where n.reportId = 1100 and n.kpiId=1113 with MAX(n.executionId) as latestExecutionId MATCH (n:KPI:RESULTS) where n.executionId=latestExecutionId and n.kpiId=1113 RETURN  n.resultField as Defects,n.Defects as Value"
+            }
+         ]
+      },
+	  {
+	     "kpiId":1114,
+         "visualizationConfigs":[
+            {
+               "vType":"pie2d_1114",
+               "vQuery":"MATCH (n:KPI:RESULTS) where n.reportId = 1100 and n.kpiId=1114 with MAX(n.executionId) as latestExecutionId MATCH (n:KPI:RESULTS) where n.executionId=latestExecutionId and n.kpiId=1114 RETURN  n.resultField as Stories,n.Stories as Value"
+            }
+         ]
+      }
+	  
+	  
+   ]
+}

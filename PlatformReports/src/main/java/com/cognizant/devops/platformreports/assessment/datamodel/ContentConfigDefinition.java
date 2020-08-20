@@ -39,6 +39,7 @@ public class ContentConfigDefinition {
 	private int assessmentId;
 	private int reportId;
 	private String workflowId;
+	private String resultField;
 	
 
 	public String getThresholds() {
@@ -174,13 +175,21 @@ public class ContentConfigDefinition {
 		this.schedule = schedule;
 	}
 
+	public String getResultField() {
+		return resultField;
+	}
+
+	public void setResultField(String resultField) {
+		this.resultField = resultField;
+	}
+
 	@Override
 	public String toString() {
-		return "InferenceContentConfigDefinition [contentId=" + contentId + ", kpiId=" + kpiId + ", action=" + action
-				+ ", directionOfThreshold=" + directionOfThreshold + ", category=" + category + ", contentName="
-				+ contentName + ", message=" + message + ", expectedTrend=" + expectedTrend + ", noOfResult="
-				+ noOfResult + ", threshold=" + threshold + ", thresholds=" + thresholds + ", executionId="
-				+ executionId + ", assessmentId=" + assessmentId + ", reportId=" + reportId + ", workflowId="
-				+ workflowId + "]";
+		return "ContentConfigDefinition [contentId=" + contentId + ", kpiId=" + kpiId + ", action=" + action
+				+ ", directionOfThreshold=" + directionOfThreshold + ", category=" + category + ", schedule=" + schedule
+				+ ", contentName=" + contentName + ", message=" + message + ", expectedTrend=" + expectedTrend
+				+ ", noOfResult=" + noOfResult + ", threshold=" + threshold + ", thresholds=" + thresholds
+				+ ", executionId=" + executionId + ", assessmentId=" + assessmentId + ", reportId=" + reportId
+				+ ", workflowId=" + workflowId + ", resultField=" + resultField + "]";
 	}
 }

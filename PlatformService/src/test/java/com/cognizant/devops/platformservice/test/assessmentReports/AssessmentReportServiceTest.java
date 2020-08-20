@@ -451,10 +451,7 @@ public class AssessmentReportServiceTest extends AssessmentReportServiceData {
 			workflowConfigDAL.deleteWorkflowTaskSequence(workflowID);
 		}
 		
-		//Delete tasks
-		InsightsWorkflowTask tasks  =  workflowConfigDAL.getTaskbyTaskDescription(workflowTaskJson.get("description").getAsString());
-		String status = workflowConfigDAL.deleteTask(tasks.getTaskId());
-		
+
 		//Delete Report Templates
 		reportConfigDAL.deleteReportTemplatebyReportID(reportTemplateJson.get("reportId").getAsInt());
 		

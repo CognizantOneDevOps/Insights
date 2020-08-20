@@ -9,6 +9,7 @@
       "noOfResult":15,
       "threshold":50,
       "directionOfThreshold":"BELOW",
+      "resultField":"Productivity",
       "message":{
          "contentMessage":"No of employees who had been below the defined productivity were {result} in the past {day} days"
       }
@@ -23,6 +24,7 @@
       "noOfResult":15,
       "threshold":50,
       "directionOfThreshold":"ABOVE",
+      "resultField":"Productivity",
       "message":{
          "contentMessage":"No of employees who had been above the defined productivity were {result} in the past {day} days"
       }
@@ -37,6 +39,7 @@
       "threshold":45,
       "action":"AVERAGE",
       "directionOfThreshold":"ABOVE",
+      "resultField":"Productivity",
       "message":{
          "contentMessage":"Employee Productivity has been {actualdirection} the defined the threshold in the past {week} week(s)"
       }
@@ -51,6 +54,7 @@
       "threshold":50,
       "action":"PERCENTAGE",
       "directionOfThreshold":"ABOVE",
+      "resultField":"Productivity",
       "message":{
          "contentMessage":"Percentage Employee Productivity has been {actualdirection} the defined the threshold % in the past {week} week(s)"
       }
@@ -69,6 +73,7 @@
       },
       "action":"PERCENTAGE",
       "directionOfThreshold":"ABOVE",
+      "resultField":"Productivity",
       "message":{
          "contentMessage":"Employees as per productivity percentage w.r.t zones are red {red}%, amber {amber}% , green {green}%"
       }
@@ -87,6 +92,7 @@
       },
       "action":"COUNT",
       "directionOfThreshold":"BELOW",
+      "resultField":"Productivity",
       "message":{
          "contentMessage":"Employees as per productivity w.r.t zones are red {red}, amber {amber} , green {green}"
       }
@@ -105,6 +111,7 @@
       },
       "action":"COUNT",
       "directionOfThreshold":"ABOVE",
+      "resultField":"Productivity",
       "message":{
          "contentMessage":"Employee productivity in last {week} week(s) was in {zone}"
       }
@@ -117,6 +124,7 @@
       "kpiId":100254,
       "noOfResult":15,
       "action":"MIN",
+      "resultField":"Productivity",
       "message":{
          "contentMessage":"Employee productivity was minimum on {minDate} day in last {week} week(s) and was {result}"
       }
@@ -129,6 +137,7 @@
       "kpiId":100254,
       "noOfResult":15,
       "action":"MAX",
+      "resultField":"Productivity",
       "message":{
          "contentMessage":"Employee productivity was maximum on {maxDate} day in last {week} week(s) and was {result}"
       }
@@ -140,6 +149,7 @@
       "kpiId":100111,
       "noOfResult":2,
       "threshold":0,
+      "resultField":"avgOutput",
       "message":{
          "positive":"Average Build Time has decreased to {current:avgOutput}s from {previous:avgOutput}s ",
          "negative":"Average Build Time has increased to {current:avgOutput}s from {previous:avgOutput}s ",
@@ -154,6 +164,7 @@
       "kpiId":100112,
       "noOfResult":2,
       "threshold":0,
+      "resultField":"avgOutput",
       "message":{
          "contentMessage":"There was {avgOutput}s Average Build Time captured in the last run."
       },
@@ -166,6 +177,7 @@
       "kpiId":100331,
       "noOfResult":2,
       "threshold":0,
+      "resultField":"AvgComplexityCoverage",
       "message":{
          "positive":"Average Code Complexity has decreased to {current:AvgComplexityCoverage} from {previous:AvgComplexityCoverage}",
          "negative":"Average Code Complexity has increased to {current:AvgComplexityCoverage}  from {previous:AvgComplexityCoverage}",
@@ -180,6 +192,7 @@
       "kpiId":100332,
       "noOfResult":2,
       "threshold":0,
+      "resultField":"AvgComplexityCoverage",
       "message":{
          "contentMessage":"Average Code Complexity captured in last run was {AvgComplexityCoverage}s"
       },
@@ -192,6 +205,7 @@
       "kpiId":100131,
       "noOfResult":2,
       "threshold":0,
+      "resultField":"AvgDuplicateBlocksCoverage",
       "message":{
          "positive":"Average duplicated blocks has decreased to {current:AvgDuplicateBlocksCoverage} from {previous:AvgDuplicateBlocksCoverage}",
          "negative":"Average duplicated blocks has increased to {current:AvgDuplicateBlocksCoverage}  from {previous:AvgDuplicateBlocksCoverage}",
@@ -206,6 +220,7 @@
       "kpiId":100132,
       "noOfResult":2,
       "threshold":0,
+      "resultField":"AvgDuplicateBlocksCoverage",
       "message":{
          "contentMessage":"Average Duplicated Blocks captured in last run was {AvgDuplicateBlocksCoverage}s"
       },
@@ -218,6 +233,7 @@
       "kpiId":100133,
       "noOfResult":2,
       "threshold":0,
+      "resultField":"NumberOfQualityBlocks",
       "message":{
          "positive":"Number of Quality failed Blocks has decreased to {current:NumberOfQualityBlocks} from {previous:NumberOfQualityBlocks}",
          "negative":"Number of Quality failed Blocks has increased to {current:NumberOfQualityBlocks}  from {previous:NumberOfQualityBlocks}",
@@ -232,8 +248,9 @@
       "kpiId":100134,
       "noOfResult":2,
       "threshold":0,
+      "resultField":"NumberOfQualityBlocks",
       "message":{
-         "contentMessage":"Quality failed Blocks captured in last run were NumberOfQualityBlocks} "
+         "contentMessage":"Quality failed Blocks captured in last run were NumberOfQualityBlocks}"
       },
       "isActive":"TRUE"
    },
@@ -244,6 +261,7 @@
       "kpiId":100101,
       "noOfResult":2,
       "threshold":0,
+      "resultField":"NumberOfQualityBlocks",
       "message":{
          "positive":"Number of Quality Passed Blocks has increased to {current:NumberOfQualityBlocks} from {previous:NumberOfQualityBlocks}",
          "negative":"Number of Quality Passed Blocks has decreased to {current:NumberOfQualityBlocks}  from {previous:NumberOfQualityBlocks}",
@@ -258,6 +276,7 @@
       "kpiId":100102,
       "noOfResult":2,
       "threshold":0,
+      "resultField":"NumberOfQualityBlocks",
       "message":{
          "contentMessage":"Quality Passed Blocks captured in last run were {NumberOfQualityBlocks}"
       },
@@ -273,6 +292,7 @@
       "threshold":100,
       "action":"AVERAGE",
       "directionOfThreshold":"ABOVE",
+      "resultField":"AvgCodeCoverage",
       "message":{
          "contentMessage":"Average Code Coverage had been {actualdirection} the defined threshold in the past {week} weeks"
       }
@@ -284,6 +304,7 @@
       "kpiId":100236,
       "noOfResult":2,
       "threshold":0,
+      "resultField":"AvgCodeCoverage",
       "message":{
          "positive":"Average Code Coverage has increased {current:AvgCodeCoverage} from {previous:AvgCodeCoverage}",
          "negative":"Average Code Coverage has decreaed to {current:AvgCodeCoverage}  from {previous:AvgCodeCoverage}",
@@ -298,6 +319,7 @@
       "contentName":"Avg  Code Coverage w.r.t zone ",     
       "kpiId":100237,
       "noOfResult":15,
+      "resultField":"AvgCodeCoverage",
       "thresholds":{
          "red":60,
          "amber":70,
@@ -306,7 +328,9 @@
       "action":"COUNT",
       "directionOfThreshold":"ABOVE",
       "message":{
-         "contentMessage":"Average Code Coverage  w.r.t zones are red {red}, amber {amber} , green {green}"
+      	"positive":"Average Code Coverage  w.r.t zones are red {red}, amber {amber} , green {green}",
+         "negative":"Average Code Coverage  w.r.t zones are red {red}, amber {amber} , green {green}",
+         "neutral":"Average Code Coverage  w.r.t zones are red {red}, amber {amber} , green {green}"
       }
    },
    {
@@ -316,6 +340,7 @@
       "contentName":"Avg Code Coverage's Zone ",   
       "kpiId":100237,
       "noOfResult":15,
+      "resultField":"AvgCodeCoverage",
       "thresholds":{
          "red":60,
          "amber":70,
@@ -324,7 +349,9 @@
       "action":"COUNT",
       "directionOfThreshold":"ABOVE",
       "message":{
-         "contentMessage":"Average Code Coverage in last {week} week(s) was in {zone}"
+         "positive":"Average Code Coverage in last {week} week(s) was in {zone}",
+         "negative":"Average Code Coverage in last {week} week(s) was in {zone}",
+         "neutral":"Average Code Coverage in last {week} week(s) was in {zone}"
       }
    },
    {
@@ -334,6 +361,7 @@
       "kpiId":100135,
       "noOfResult":2,
       "threshold":0,
+      "resultField":"NumberOfSonarExecutions",
       "message":{
          "contentMessage":"Average Code Coverage captured in last run were {AvgCodeCoverage}s"
       },
@@ -346,6 +374,7 @@
       "kpiId":100135,
       "noOfResult":2,
       "threshold":0,
+      "resultField":"NumberOfSonarExecutions",
       "message":{
          "positive":"Number of successful Sonar Executions has increased {current:NumberOfSonarExecutions} from {previous:NumberOfSonarExecutions}",
          "negative":"Number of successful Sonar Executions has decreaed to {current:NumberOfSonarExecutions}  from {previous:NumberOfSonarExecutions}",
@@ -360,6 +389,7 @@
       "kpiId":100136,
       "noOfResult":2,
       "threshold":0,
+      "resultField":"NumberOfSonarExecutions",
       "message":{
          "contentMessage":"Successful Sonar Executions captured in last run were {NumberOfSonarExecutions}"
       },
@@ -372,6 +402,7 @@
       "kpiId":100137,
       "noOfResult":2,
       "threshold":0,
+      "resultField":"NumberOfSonarExecutions",
       "message":{
          "positive":"Number of failed Sonar Executions has decreased to {current:NumberOfSonarExecutions} from {previous:NumberOfSonarExecutions}",
          "negative":"Number of failed Sonar Executions has increased to {current:NumberOfSonarExecutions}  from {previous:NumberOfSonarExecutions}",
@@ -386,6 +417,7 @@
       "kpiId":100138,
       "noOfResult":2,
       "threshold":0,
+      "resultField":"NumberOfSonarExecutions",
       "message":{
          "contentMessage":"Failed Sonar Executions captured in last run were {NumberOfSonarExecutions} "
       },
@@ -401,6 +433,7 @@
       "threshold":5,
       "action":"AVERAGE",
       "directionOfThreshold":"BELOW",
+      "resultField":"CodeSmell",
       "message":{
          "contentMessage":"Average Code Smell has been {actualdirection} the defined threshold in the last sprint."
       }
@@ -415,8 +448,22 @@
       "threshold":5,
       "action":"AVERAGE",
       "directionOfThreshold":"BELOW",
+       "resultField":"Duration",
       "message":{
          "contentMessage":"Average hours spent on projects is {actualdirection} the defined threshold in the last sprint."
       }
+   },
+   {
+      "contentId":2006128,
+      "expectedTrend":"DOWNWARDS",
+      "contentName":"Maximum Build Time",
+      "kpiId":"100127",
+      "noOfResult":2,
+      "threshold":0,
+      "resultField":"MaxBuildTime",
+      "message":{
+         "contentMessage":"Maximum Build time captured in the last run was {MaxBuildTime}s"
+      },
+      "isActive":"TRUE"
    }
 ]

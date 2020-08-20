@@ -45,6 +45,7 @@ public class WorkflowServiceTest extends WorkflowServiceTestData {
 	WorkflowDAL workflowConfigDAL = new WorkflowDAL();
 	ReportConfigDAL reportConfigDAL = new ReportConfigDAL();
 	public JsonObject dailyAssessmentReportWorkflowJson = null;
+	int taskID = 0;
 	
 	@BeforeTest
 	public void prepareData() throws InsightsCustomException {

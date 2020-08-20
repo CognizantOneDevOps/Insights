@@ -33,7 +33,7 @@
         <ng-container *ngFor="let header of finalHeaderToShow | keyvalue" matColumnDef="{{header.key}}">
             <th mat-header-cell *matHeaderCellDef [ngClass]="{'tableExceIdHeaderCss':(header.key =='executionid'),'tableTimeHeaderCss':((header.key=='startTime') ||(header.key=='endTime')),'tableStatusLogHeaderCss':(header.key=='statusLog'),'tableTaskStatusAndRetryCountHeaderCss':((header.key=='currentTask') ||(header.key=='taskStatus') ||(header.key=='retryCount'))}">
                 {{header.value}}</th>
-            <td mat-cell style="padding-top:2px;padding-bottom:2px;" *matCellDef="let element">
+            <td mat-cell class="cellCss" *matCellDef="let element">
                 {{element[header.key]}}</td>
         </ng-container>
         <tr mat-header-row *matHeaderRowDef="headerArrayDisplay" class="tableHeaderCss"></tr>

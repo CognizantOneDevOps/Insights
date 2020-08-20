@@ -58,5 +58,4 @@ public class AssessmentReportContentProcesser {
 			throw new InsightsJobFailedException("Exception while execution content Id");
 		}
 	}
-
 }

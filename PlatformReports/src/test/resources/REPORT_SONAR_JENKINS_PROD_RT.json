@@ -46,7 +46,7 @@
          "visualizationConfigs":[
             {
                "vType":"table_100901",
-               "vQuery":"MATCH (n:KPI:RESULTS) where n.reportId = 300600 and n.kpiId=100901 with MAX(n.executionId) as latestExecutionId MATCH (n:KPI:RESULTS) where n.executionId=latestExecutionId and n.kpiId=100901 RETURN  apoc.date.format( n.recordDate ,'s','MM/dd') as Date , n.Bugs as Bugs,n.Vulnerablilities as Vulnerablilities,n.CodeSmell as CodeSmell ORDER BY Date DESC"
+               "vQuery":"MATCH (n:KPI:RESULTS) where n.reportId = 300600 and n.kpiId=100901 with MAX(n.executionId) as latestExecutionId MATCH (n:KPI:RESULTS) where n.executionId=latestExecutionId and n.kpiId=100901 RETURN  n.recordDate as Date , n.Bugs as Bugs,n.Vulnerablilities as Vulnerablilities,n.CodeSmell as CodeSmell ORDER BY Date DESC"
             }
          ]
       },

@@ -127,7 +127,7 @@ public class WorkflowTest extends WorkflowTestData {
 	@Test(priority = 5)
 	public void testWrongTaskStatusUpdate() {
 		InsightsWorkflowConfiguration workflowConfig = workflowDAL.getWorkflowConfigByWorkflowId(WorkflowIdWrongTask);		
-		Assert.assertEquals(workflowConfig.getStatus(), "RESTART");
+		Assert.assertEquals(workflowConfig.getStatus(), "TASK_INITIALIZE_ERROR");
 		Assert.assertTrue(workflowConfig.getNextRun() == nextRunDaily);
 	}
 	

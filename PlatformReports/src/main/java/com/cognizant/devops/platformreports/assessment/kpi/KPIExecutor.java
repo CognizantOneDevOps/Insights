@@ -105,9 +105,10 @@ public class KPIExecutor implements Callable<JsonObject> {
 			return kpiDefinition.getKpiId();		
 
 		} else {
-			log.error(" No neo4j query defined for KPI {} With Id {} ", kpiDefinition.getGroupName(),
+			log.error("Worlflow Detail ====   No neo4j query defined for KPI {} With Id {} ",
+					kpiDefinition.getGroupName(),
 					kpiDefinition.getKpiId());
-			throw new InsightsJobFailedException("No neo4j query defined for KPI");
+			throw new InsightsJobFailedException("Worlflow Detail ==== No neo4j query defined for KPI");
 		}
 	}
 

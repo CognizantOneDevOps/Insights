@@ -1,0 +1,80 @@
+[
+    {
+      "kpiId":2101,
+      "name":"Defects Type Count",
+      "group":"ALM",
+      "category":"STANDARD",
+      "toolName":"JIRA",
+      "DBQuery":"MATCH (n:JIRA) WHERE  n.SPKstartTime > {startTime}  and n.SPKstartTime < {endTime} RETURN DISTINCT n.SPKdefectDuring as Type, count(n) as Count",
+      "datasource":"NEO4J",
+      "isActive":true,
+      "resultField":"Count"
+   },
+   {
+      "kpiId":2102,
+      "name":"Total Hours Worked On Projects",
+      "group":"ALM",
+      "category":"THRESHOLD",
+      "toolName":"JIRA",
+      "DBQuery":"MATCH (n:JIRA) where n.SPKprojectName in ['PaymentServices','MobileServices','ClaimFinder','AgentLocator'] and  n.SPKstartTime > {startTime} and n.SPKstartTime < {endTime} with n return distinct n.SPKprojectName as StoryTypes , sum(n.SPKduration)/3600 as Duration",
+      "datasource":"NEO4J",
+      "isActive":true,
+      "resultField":"Duration"
+   },
+   {
+      "kpiId":2103,
+      "name":"Avg all employee productivity for threshold ",
+      "toolName":"PRODUCTIVITY",
+      "category":"MINMAX",
+      "group":"PRODUCTIVITY",
+      "isActive":true,
+      "DBQuery":"MATCH (n:PRODUCTIVITY) where n.completionDateEpochTime > {startTime} AND n.completionDateEpochTime < {endTime} WITH n.completionDateEpochTime as completionDateEpochTime, avg(n.storyPoints*8) as StoryPoint, avg(n.authorTimeSpent) as authorTimeSpent  return   completionDateEpochTime, StoryPoint, authorTimeSpent, round((toFloat(StoryPoint)/authorTimeSpent)*100) as Productivity",
+      "resultField":"Productivity",
+      "datasource":"NEO4J"
+   },
+  {
+      "kpiId":2104,
+      "name":"Total Code Issues in Deployment",
+      "group":"CODEQUALITY",
+      "category":"COMPARISON",
+      "toolName":"SONAR",
+      "DBQuery":"MATCH (n:SONAR:DATA) WHERE  n.SPKstartTime > {startTime} and n.SPKstartTime < {endTime} and n.SPKvector = 'CODEQUALITY' with n where n.SPKstatus='Success'  RETURN  toInt(ROUND(SUM(n.SPKbugs))) as Bugs , toInt(ROUND(SUM(n.SPKcodeSmellsStr))) as CodeSmell, toInt(ROUND(SUM(n.SPKVulnerabilitiesStr))) as Vulnerablilities",
+      "datasource":"NEO4J",
+      "isActive":true,
+      "resultField":"CodeSmell"
+   },
+    {
+   "kpiId":2105,
+      "name":"Jenkins Build Failures V/S Success",
+      "group":"BUILD",
+      "category":"THRESHOLD_RANGE",
+      "toolName":"JENKINS",
+      "DBQuery":"MATCH (n:JENKINS:DATA) WHERE  n.SPKstartTime > {startTime}  and n.SPKstartTime < {endTime} and n.SPKvector = 'BUILD' with n , case when n.SPKstatus='Failure'then count(n.SPKduration) end as Failure ,case when n.SPKstatus='Success'then count(n.SPKduration) end as Success RETURN  count(Failure) as Failure , count (Success) as Success",
+      "datasource":"NEO4J",
+      "isActive":true,
+      "resultField":"Failure"
+   },
+   
+   {
+      "kpiId":2106,
+      "name":"Maximum Deploy Time in Secs",
+      "group":"DEPLOYMENT",
+      "category":"STANDARD",
+      "toolName":"RUNDECK",
+      "DBQuery":"MATCH (n:DEPLOYMENT) WHERE n.SPKstartTime > {startTime} and n.SPKstartTime < {endTime} and n.SPKstatus='Success' RETURN ceil(max(toInt(n.SPKduration))) as Deploy",
+      "datasource":"NEO4J",
+      "isActive":true,
+      "resultField":"Deploy"
+   },  
+    {
+      "kpiId":2107,
+      "name":"Total Number of Builds",
+      "group":"BUILD",
+      "category":"STANDARD",
+      "toolName":"JENKINS",
+      "DBQuery":"MATCH (n:JENKINS:DATA)WHERE n.SPKstartTime > {startTime} and n.SPKstartTime < {endTime} RETURN count(n) as Builds",
+      "datasource":"NEO4J",
+      "isActive":true,
+      "resultField":"Builds"
+   }
+]

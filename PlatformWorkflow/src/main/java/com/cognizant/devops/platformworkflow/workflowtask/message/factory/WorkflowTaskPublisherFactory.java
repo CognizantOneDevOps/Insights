@@ -72,7 +72,7 @@ public class WorkflowTaskPublisherFactory {
 		channel.queueDeclare(queueName, true, false, false, null);
 		channel.queueBind(queueName, MQMessageConstants.EXCHANGE_NAME, routingKey);
 		channel.basicPublish(MQMessageConstants.EXCHANGE_NAME, routingKey, null, data.getBytes());
-		LOG.debug(" data published time in queue {} ", routingKey);
+		LOG.debug("Worlflow Detail ==== data published time in queue {} ", routingKey);
 	}
 }
 

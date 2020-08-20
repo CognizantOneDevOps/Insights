@@ -31,6 +31,7 @@ import com.cognizant.devops.platformdal.workflow.InsightsWorkflowTask;
 import com.cognizant.devops.platformdal.workflow.InsightsWorkflowTaskSequence;
 import com.cognizant.devops.platformdal.workflow.WorkflowDAL;
 import com.cognizant.devops.platformworkflow.workflowtask.exception.WorkflowFailedTaskException;
+import com.cognizant.devops.platformworkflow.workflowtask.exception.WorkflowTaskInitializationException;
 import com.cognizant.devops.platformworkflow.workflowtask.message.factory.WorkflowTaskPublisherFactory;
 import com.cognizant.devops.platformworkflow.workflowtask.message.factory.WorkflowTaskSubscriberHandler;
 import com.cognizant.devops.platformworkflow.workflowtask.utils.WorkflowUtils;
@@ -110,7 +111,7 @@ public class WorkflowDataHandler {
 	 * @return
 	 */
 	public List<InsightsWorkflowExecutionHistory> getNextTasksForRetry() {
-		List<InsightsWorkflowConfiguration> workflowConfigs = workflowDAL.getErrorWorkflows();
+		List<InsightsWorkflowConfiguration> workflowConfigs = workflowDAL.getCompletedTaskRetryWorkflows();
 		List<InsightsWorkflowExecutionHistory> workflowHistoryIds = new ArrayList<>();
 		try {
 			for (InsightsWorkflowConfiguration failedWorkflow : workflowConfigs) {
@@ -173,17 +174,18 @@ public class WorkflowDataHandler {
 	 * @param mqRequestJson
 	 * @throws WorkflowFailedTaskException
 	 */
-	public void publishMessageInMQ(String routingKey, JsonObject mqRequestJson) throws WorkflowFailedTaskException {
+	public void publishMessageInMQ(String routingKey, JsonObject mqRequestJson)
+			throws WorkflowTaskInitializationException {
 		try {
 			int subscribedTaskId = mqRequestJson.get("currentTaskId").getAsInt();
 			if (registry.containsKey(subscribedTaskId)) {
 				WorkflowTaskPublisherFactory.publish(routingKey, mqRequestJson.toString());
 			} else {
-				throw new WorkflowFailedTaskException("Worlflow Detail ====  Queue is not subscribed yet");
+				throw new WorkflowTaskInitializationException("Worlflow Detail ====  Queue is not subscribed yet");
 			}
 		} catch (Exception e) {
 			log.error(" Error while publishing message in  routingKey {} queue {} ", routingKey, e);
-			throw new WorkflowFailedTaskException("Worlflow Detail ====  Queue is not subscribed yet");
+			throw new WorkflowTaskInitializationException("Worlflow Detail ====  Queue is not subscribed yet");
 		}
 	}
 
@@ -241,14 +243,15 @@ public class WorkflowDataHandler {
 	 * @param requestMessage
 	 * @throws WorkflowFailedTaskException
 	 */
-	public void publishMessageToNextInMQ(Map<String, Object> requestMessage) throws WorkflowFailedTaskException {
+	public void publishMessageToNextInMQ(Map<String, Object> requestMessage)
+			throws WorkflowTaskInitializationException {
 		try {
-			log.debug(" Worlflow Detail ==== publishMessageToNextInMQ start  ");
+			log.debug(" Worlflow Detail ==== publishMessageToNextInMQ start  {} ", requestMessage);
 
 			String workflowId = String.valueOf(requestMessage.get("workflowId"));
 			InsightsWorkflowTask insightsWorkflowTaskEntity = workflowDAL
 					.getTaskByTaskId((int) requestMessage.get("nextTaskId"));
-			log.debug(" workflowId {}  ", workflowId);
+			log.debug("Worlflow Detail ==== workflowId {}  ", workflowId);
 			InsightsWorkflowTaskSequence currentTaskSequence = workflowDAL
 					.getWorkflowTaskSequenceByWorkflowAndTaskId(workflowId, (int) requestMessage.get("currentTaskId"));
 			InsightsWorkflowTaskSequence nextTaskSequence = workflowDAL
@@ -257,7 +260,6 @@ public class WorkflowDataHandler {
 			if (currentTaskSequence.getNextTask() == -1) {
 				log.debug("Worlflow Detail ==== This is last task update workflow config ");
 				updateWorkflowDetails(workflowId, WorkflowTaskEnum.WorkflowTaskStatus.COMPLETED.toString(), true);
-
 			} else {
 				JsonObject mqRequestJson = new JsonObject();
 				createTaskRequestJson((long) requestMessage.get("executionId"), workflowId,
@@ -265,14 +267,15 @@ public class WorkflowDataHandler {
 						nextTaskSequence.getSequence(), mqRequestJson);
 				log.debug(" Worlflow Detail ====  publish message {} ", mqRequestJson);
 				publishMessageInMQ(insightsWorkflowTaskEntity.getMqChannel(), mqRequestJson);
-
 			}
 			log.debug(" Worlflow Detail ====  publishMessageToNextInMQ completed ");
-		} catch (WorkflowFailedTaskException we) {
-			throw new WorkflowFailedTaskException("Worlflow Detail ====  unable to publish message in MQ");
+		} catch (WorkflowTaskInitializationException we) {
+			log.error("Worlflow Detail ==== Error while publishMessageToNextInMQ {} ", we);
+			throw new WorkflowTaskInitializationException(
+					"Worlflow Detail ====  unable to next task publish message in MQ");
 		} catch (Exception e) {
-			log.error(" Error while publishMessageToNextInMQ {} ", e);
-			throw new WorkflowFailedTaskException("Worlflow Detail ====  unable to publish message in MQ");
+			log.error("Worlflow Detail ==== Error while publishMessageToNextInMQ {} ", e);
+			throw new WorkflowTaskInitializationException("Worlflow Detail ====  unable to publish message in MQ");
 		}
 	}
 

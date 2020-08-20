@@ -59,7 +59,7 @@ public class EngineAggregatorModule extends TimerTask {
 		ApplicationConfigProvider.performSystemCheck();
 		Neo4jDBHandler graphDBHandler = new Neo4jDBHandler();
 		AgentConfigDAL agentConfigDal = new AgentConfigDAL();
-		List<AgentConfig> allAgentConfigurations = agentConfigDal.getAllAgentConfigurations();
+		List<AgentConfig> allAgentConfigurations = agentConfigDal.getAllEngineAggregatorAgentConfigurations();
 		boolean enableOnlineDatatagging = ApplicationConfigProvider.getInstance().isEnableOnlineDatatagging();
 		Map<String, List<BusinessMappingData>> businessMappinMap = new HashMap<String, List<BusinessMappingData>>(0);
 		if (enableOnlineDatatagging) {

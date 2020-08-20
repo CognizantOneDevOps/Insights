@@ -21,7 +21,7 @@ import java.util.Map;
 import com.google.gson.JsonArray;
 
 public class InsightsAssessmentConfigurationDTO {
-	
+
 	private int reportId;
 	private int configId;
 	private String asseementreportname;
@@ -31,8 +31,8 @@ public class InsightsAssessmentConfigurationDTO {
 	private String workflowId;
 	private String pdfReportDirPath;
 	private String pdfReportFolderName;
-	Map<String, JsonArray> contentJsonObjMap = new HashMap<>();
 	Map<String, JsonArray> tableJsonObjMap = new HashMap<>();
+	Map<String, String> contentMap = new HashMap<>();
 	JsonArray visualizationResult = new JsonArray();
 
 	public int getReportId() {
@@ -46,6 +46,7 @@ public class InsightsAssessmentConfigurationDTO {
 	public String getAsseementreportname() {
 		return asseementreportname;
 	}
+
 	public void setAsseementreportname(String asseementreportname) {
 		this.asseementreportname = asseementreportname;
 	}
@@ -106,14 +107,6 @@ public class InsightsAssessmentConfigurationDTO {
 		this.pdfReportFolderName = pdfReportFolderName;
 	}
 
-	public Map<String, JsonArray> getContentJsonObjMap() {
-		return contentJsonObjMap;
-	}
-
-	public void setContentJsonObjMap(Map<String, JsonArray> contentJsonObjMap) {
-		this.contentJsonObjMap = contentJsonObjMap;
-	}
-
 	public Map<String, JsonArray> getTableJsonObjMap() {
 		return tableJsonObjMap;
 	}
@@ -130,12 +123,20 @@ public class InsightsAssessmentConfigurationDTO {
 		this.visualizationResult = visualizationResult;
 	}
 
+	public Map<String, String> getContentMap() {
+		return contentMap;
+	}
+
+	public void setContentMap(Map<String, String> contentMap) {
+		this.contentMap = contentMap;
+	}
+
 	@Override
 	public String toString() {
 		return "InsightsAssessmentConfigurationDTO [reportId=" + reportId + ", configId=" + configId
 				+ ", asseementreportname=" + asseementreportname + ", reportName=" + reportName + ", reportFilePath="
 				+ reportFilePath + ", executionId=" + executionId + ", workflowId=" + workflowId + ", pdfReportDirPath="
-				+ pdfReportDirPath + ", pdfReportFolderName=" + pdfReportFolderName + ", contentJsonObjMap="
-				+ contentJsonObjMap + ", tableJsonObjMap=" + tableJsonObjMap + "]";
+				+ pdfReportDirPath + ", pdfReportFolderName=" + pdfReportFolderName + ", tableJsonObjMap="
+				+ tableJsonObjMap + ", contentMap=" + contentMap + ", visualizationResult=" + visualizationResult + "]";
 	}
 }

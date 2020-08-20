@@ -88,7 +88,7 @@ public class MinMaxCategoryImpl extends BaseContentCategoryImpl {
 
 		InsightsContentDetail inferenceContentResult = null;
 		Map<String, Object> resultValuesMap = new HashMap<>();
-		String comparisonField = inferenceResults.get(0).getResultField();
+		String comparisonField = getResultFieldFromContentDefination();
 
 		try {
 
@@ -134,7 +134,7 @@ public class MinMaxCategoryImpl extends BaseContentCategoryImpl {
 
 		InsightsContentDetail inferenceContentResult = null;
 		Map<String, Object> resultValuesMap = new HashMap<>();
-		String comparisonField = inferenceResults.get(0).getResultField();
+		String comparisonField = getResultFieldFromContentDefination();
 
 		try {
 

@@ -1,0 +1,135 @@
+[
+   {
+      "kpiId":1101,
+      "name":"Rundeck Deployment Failures V/S Success",
+      "group":"DEPLOYMENT",
+      "category":"STANDARD",
+      "toolName":"RUNDECK",
+      "DBQuery":"MATCH (n:RUNDECK:DATA) WHERE n.SPKstartTime > {startTime} and n.SPKstartTime < {endTime} and  n.SPKvector = 'DEPLOYMENT' with n with DISTINCT apoc.date.format( n.SPKstartTime ,'s','MM/dd') as Date, case when n.SPKstatus='Failure'then count(n) else 0 end as Failure ,case when n.SPKstatus='Success'then count(n) else 0 end as Success RETURN Date,sum(Failure) as Failure, sum(Success)as Success order by Date  desc",
+      "datasource":"NEO4J",
+      "isActive":true,
+      "resultField":"Failure"
+   },
+   {
+      "kpiId":1102,
+      "name":"Total Number of  Deployments",
+      "group":"DEPLOYMENT",
+      "toolName":"RUNDECK",
+      "category":"STANDARD",
+      "DBQuery":"MATCH (n:RUNDECK:DATA) WHERE n.SPKstartTime > {startTime} and n.SPKstartTime < {endTime} and  n.SPKvector = 'DEPLOYMENT' RETURN count(n.SPKstatus) as totalDeploymentCount",
+      "datasource":"NEO4J",
+      "isActive":true,
+      "resultField":"totalDeploymentCount"
+   },
+   {
+      "kpiId":1103,
+      "name":"Average Successful Deployment Time In Seconds",
+      "group":"DEPLOYMENT",
+      "category":"STANDARD",
+      "toolName":"RUNDECK",
+      "DBQuery":"MATCH (n:DEPLOYMENT)  WHERE n.SPKstartTime > {startTime}  and n.SPKstartTime < {endTime} AND n.SPKstatus='Success' RETURN toInt(ROUND(Avg(toInt(n.SPKduration)))) as AvgTimeInSecs",
+      "datasource":"NEO4J",
+      "isActive":true,
+      "resultField":"AvgTimeInSecs"
+   },
+   {
+      "kpiId":1104,
+      "name":"Maximum Deploy Time in Secs",
+      "group":"DEPLOYMENT",
+      "category":"STANDARD",
+      "toolName":"RUNDECK",
+      "DBQuery":"MATCH (n:DEPLOYMENT) WHERE n.SPKstartTime > {startTime} and n.SPKstartTime < {endTime} and n.SPKstatus='Success' RETURN ceil(max(toInt(n.SPKduration))) as Deploy",
+      "datasource":"NEO4J",
+      "isActive":true,
+      "resultField":"Deploy"
+   },  
+   {
+      "kpiId":1106,
+      "name":"Defects Assigness",
+      "group":"ALM",
+      "category":"STANDARD",
+      "toolName":"JIRA",
+      "DBQuery":"match (n:DEFECTS)  WHERE n.SPKstartTime > {startTime} and n.SPKstartTime < {endTime}  return DISTINCT n.SPKassignedTo as Developer, count(n.SPKdefectID) as CountOfIssueForDeveloper",
+      "datasource":"NEO4J",
+      "isActive":true,
+      "resultField":"CountOfIssueForDeveloper"
+   },
+   {
+      "kpiId":1107,
+      "name":"Defects Type Count",
+      "group":"ALM",
+      "category":"STANDARD",
+      "toolName":"JIRA",
+      "DBQuery":"MATCH (n:JIRA) WHERE  n.SPKstartTime > {startTime}  and n.SPKstartTime < {endTime} RETURN DISTINCT n.SPKdefectDuring as Type, count(n) as Count",
+      "datasource":"NEO4J",
+      "isActive":true,
+      "resultField":"Count"
+   },
+   {
+      "kpiId":1108,
+      "name":"Maximum Build Time",
+      "group":"BUILD",
+      "category":"STANDARD",
+      "toolName":"JENKINS",
+      "DBQuery":"MATCH (n:JENKINS:DATA) WHERE n.SPKstartTime > {startTime} and n.SPKstartTime < {endTime} and n.SPKvector = 'BUILD' and n.SPKstatus='Success' RETURN COALESCE(Max(toInt(n.SPKduration)),0) as MaxBuildTime",
+      "datasource":"NEO4J",
+      "isActive":true,
+      "resultField":"MaxBuildTime"
+   },
+  
+    {
+      "kpiId":1110,
+      "name":"JENKINS Build Failures V/S Success",
+      "group":"BUILD",
+      "category":"STANDARD",
+      "toolName":"JENKINS",
+      "DBQuery":"MATCH (n:JENKINS:DATA) WHERE n.SPKstartTime > {startTime} and n.SPKstartTime < {endTime} and  n.SPKvector = 'BUILD' with n with DISTINCT apoc.date.format( n.SPKstartTime ,'s','MM/dd') as Date, case when n.SPKstatus='Failure'then count(n) else 0 end as Failure ,case when n.SPKstatus='Success'then count(n) else 0 end as Success RETURN Date,sum(Failure) as Failure, sum(Success)as Success order by Date  desc",
+      "datasource":"NEO4J",
+      "isActive":true,
+      "resultField":"Failure"
+   },
+   {
+      "kpiId":1111,
+      "name":"Total Number of Builds",
+      "group":"BUILD",
+      "category":"STANDARD",
+      "toolName":"JENKINS",
+      "DBQuery":"MATCH (n:JENKINS:DATA)WHERE n.SPKstartTime > {startTime} and n.SPKstartTime < {endTime} RETURN count(n) as TotalNumberBuild",
+      "datasource":"NEO4J",
+      "isActive":true,
+      "resultField":"TotalNumberBuild"
+   },
+   {
+      "kpiId":1112,
+      "name":"Average Successful Build Time",
+      "group":"BUILD",
+      "category":"STANDARD",
+      "toolName":"JENKINS",
+      "DBQuery":"MATCH (n:JENKINS:DATA)  WHERE n.SPKstartTime > {startTime} and n.SPKstartTime < {endTime} and n.SPKvector = 'BUILD' and n.SPKstatus='Success'   RETURN toInt(ROUND(Avg(toInt(n.SPKduration)))) as avgOutput",
+      "datasource":"NEO4J",
+      "isActive":true,
+      "resultField":"avgOutput"
+   },
+   {
+      "kpiId":1113,
+      "name":"Total number of Defects",
+      "group":"ALM",
+      "category":"STANDARD",
+      "toolName":"JIRA",
+      "DBQuery":"MATCH (n:JIRA) WHERE  n.SPKstartTime > {startTime}  and n.SPKstartTime < {endTime} and n.SPKvector='DEFECTS' RETURN count(n) as CountOfDefects",
+      "datasource":"NEO4J",
+      "isActive":true,
+      "resultField":"CountOfDefects"
+   },
+   {
+      "kpiId":1114,
+      "name":"Total number of Stories",
+      "group":"ALM",
+      "category":"STANDARD",
+      "toolName":"JIRA",
+      "DBQuery":"match (n:JIRA) where not(n.SPKvector) in ['DEFECTS'] or not exists(n.SPKvector) and n.SPKstartTime > {startTime}  and n.SPKstartTime < {endTime} return COUNT(n) as NumberOfStories",
+      "datasource":"NEO4J",
+      "isActive":true,
+      "resultField":"NumberOfStories"
+   }
+]

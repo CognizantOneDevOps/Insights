@@ -37,7 +37,7 @@
          "visualizationConfigs":[
             {
                "vType":"mscolumn2d_134",
-               "vQuery":"MATCH (n:KPI:RESULTS) where n.reportId = 603 and n.kpiId=134 RETURN n.SPKendTime as SPKendTime , n.NumberOfQualityBlocks as NumberOfQualityBlocks LIMIT 5"
+               "vQuery":"MATCH (n:KPI:RESULTS) where n.reportId = 300603 and n.kpiId=134 RETURN n.SPKendTime as SPKendTime , n.NumberOfQualityBlocks as NumberOfQualityBlocks LIMIT 5"
             }
          ]
       },

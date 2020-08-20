@@ -16,6 +16,7 @@
 package com.cognizant.devops.platformdal.workflow;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.persistence.NoResultException;
@@ -396,15 +397,16 @@ public class WorkflowDAL extends BaseDAL {
 	 * 
 	 * @return List<InsightsWorkflowConfiguration>
 	 */
-	public List<InsightsWorkflowConfiguration> getErrorWorkflows() {
+	public List<InsightsWorkflowConfiguration> getCompletedTaskRetryWorkflows() {
 		Query<InsightsWorkflowConfiguration> createQuery = getSession().createQuery(
-				"FROM InsightsWorkflowConfiguration WC WHERE WC.status='ERROR' and WC.isActive = true",
+				"FROM InsightsWorkflowConfiguration WC WHERE WC.status='TASK_INITIALIZE_ERROR' and WC.isActive = true",
 				InsightsWorkflowConfiguration.class);
 		List<InsightsWorkflowConfiguration> failedWorkflows = createQuery.getResultList();
 		terminateSession();
 		terminateSessionFactory();
 		return failedWorkflows;
 	}
+
 
 	/**
 	 * Method to get latest Workflow Task by End time
@@ -422,7 +424,9 @@ public class WorkflowDAL extends BaseDAL {
 		List<InsightsWorkflowExecutionHistory> nextTasks = createQuery.getResultList();
 		terminateSession();
 		terminateSessionFactory();
-		if (nextTasks.stream().noneMatch(anyFailedTask -> anyFailedTask.getTaskStatus().equals("ERROR"))) {
+		List<String> errorStatusList = Arrays
+				.asList("ERROR", "ABORTED", "RETRY_EXCEEDED", "IN_PROGRESS");
+		if (nextTasks.stream().noneMatch(anyFailedTask -> errorStatusList.contains(anyFailedTask.getTaskStatus()))) {
 			return nextTasks.get(0);
 		}
 
@@ -460,7 +464,7 @@ public class WorkflowDAL extends BaseDAL {
 	 */
 	public List<InsightsWorkflowConfiguration> getAllRestartWorkflows() {
 		Query<InsightsWorkflowConfiguration> createQuery = getSession().createQuery(
-				"FROM InsightsWorkflowConfiguration WC WHERE WC.isActive = true and WC.status='RESTART'",
+				"FROM InsightsWorkflowConfiguration WC WHERE WC.isActive = true and WC.status='TASK_INITIALIZE_ERROR' ",
 				InsightsWorkflowConfiguration.class);
 		List<InsightsWorkflowConfiguration> resultList = createQuery.getResultList();
 		terminateSession();
