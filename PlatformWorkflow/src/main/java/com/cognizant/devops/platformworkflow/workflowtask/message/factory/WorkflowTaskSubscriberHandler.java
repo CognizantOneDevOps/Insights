@@ -26,6 +26,7 @@ import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.core.enums.WorkflowTaskEnum;
 import com.cognizant.devops.platformworkflow.workflowtask.core.WorkflowDataHandler;
 import com.cognizant.devops.platformworkflow.workflowtask.exception.WorkflowFailedTaskException;
+import com.cognizant.devops.platformworkflow.workflowtask.exception.WorkflowTaskInitializationException;
 import com.cognizant.devops.platformworkflow.workflowtask.utils.MQMessageConstants;
 import com.cognizant.devops.platformworkflow.workflowtask.utils.WorkflowUtils;
 import com.rabbitmq.client.AMQP;
@@ -38,7 +39,7 @@ public abstract class WorkflowTaskSubscriberHandler {
 	private static final Logger log = LogManager.getLogger(WorkflowTaskSubscriberHandler.class);
 	private Channel channel;
 	private WorkflowTaskSubscriberHandler engineSubscriberResponseHandler;
-	protected String statusLog;
+	protected String statusLog = "{}";
 	WorkflowDataHandler workflowStateProcess;
 
 	public WorkflowTaskSubscriberHandler(String routingKey) throws Exception {
@@ -169,12 +170,17 @@ public abstract class WorkflowTaskSubscriberHandler {
 			// update complete time in INSIGHTS_WORKFLOW_EXECUTION_ENTITY
 			workflowStateProcess.updateWorkflowExecutionHistory(exectionHistoryId, status, statusLog);
 			// send message to next task
-			workflowStateProcess.publishMessageToNextInMQ(requestMessage);
+			if (status.equalsIgnoreCase(WorkflowTaskEnum.WorkflowStatus.COMPLETED.toString())) {
+				workflowStateProcess.publishMessageToNextInMQ(requestMessage);
+			} else {
+				log.error("Worlflow Detail ==== Current execution status not completed Status is {} message is {} ",
+						status, message);
+			}
 			// Mq ack message
-		} catch (WorkflowFailedTaskException wt) {
-			log.error("Worlflow Detail ==== failed in workflow task post processer due to {}", wt);
-			workflowStateProcess.updateWorkflowDetails(workflowId, WorkflowTaskEnum.WorkflowStatus.ERROR.toString(),
-					false);
+		} catch (WorkflowTaskInitializationException wtie) {
+			log.error("Worlflow Detail ==== failed in workflow task post processer due to {}", wtie);
+			workflowStateProcess.updateWorkflowDetails(workflowId,
+					WorkflowTaskEnum.WorkflowStatus.TASK_INITIALIZE_ERROR.toString(), false);
 		} catch (Exception e) {
 			log.error("Worlflow Detail ==== failed in workflow task post processer due to exception  ", e);
 		}

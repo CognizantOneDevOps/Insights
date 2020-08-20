@@ -32,6 +32,8 @@ public class ReportChartCollection {
 		     Arrays.asList("mscolumn2d","mscolumn3d","msline","msbar2d","msbar3d","overlappedcolumn2d",
 		    		       "overlappedbar2d","msarea","stackedcolumn2d","stackedcolumn3d","stackedbar2d","stackedbar3d",
 		    		       "stackedarea2d");
+	public static final List<String> SINGLE_VALUE_CHARTS = 
+		     Arrays.asList("angulargauge");
 	
 	
 }

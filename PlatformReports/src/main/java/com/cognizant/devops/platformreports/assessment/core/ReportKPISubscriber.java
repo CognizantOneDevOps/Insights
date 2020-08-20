@@ -73,7 +73,7 @@ public class ReportKPISubscriber extends WorkflowTaskSubscriberHandler {
 
 			String message = new String(body, MQMessageConstants.MESSAGE_ENCODING);
 
-			log.debug("Worlflow Detail ==== ReportKPISubscriber routing key {} message handleDelivery ===== {} ",
+			log.debug("Worlflow Detail ==== ReportKPISubscriber routing key  message handleDelivery ===== {} ",
 					message);
 
 			JsonObject incomingTaskMessage = new JsonParser().parse(message).getAsJsonObject();
@@ -104,14 +104,14 @@ public class ReportKPISubscriber extends WorkflowTaskSubscriberHandler {
 			}
 
 		} catch (InsightsJobFailedException e) {
-			log.error(e);
+			log.error("Worlflow Detail ==== InsightsJobFailedException ==== {} ", e);
 			throw new InsightsJobFailedException("some of the Kpi's or Contents failed to execute");
 		} catch (RejectedExecutionException e) {
-			log.error(e);
+			log.error("Worlflow Detail ==== RejectedExecutionException ==== {} ", e);
 			throw new InsightsJobFailedException(
 					"some of the Kpi's or Contents failed to execute RejectedExecutionException ");
 		} catch (Exception e) {
-			log.error(e);
+			log.error("Worlflow Detail ==== handleTaskExecution ==== {} ", e);
 			throw new InsightsJobFailedException("some of the Kpi's or Contents failed to execute Exception ");
 		}
 		log.debug("Worlflow Detail ==== ReportKPISubscriber completed ");
@@ -123,13 +123,16 @@ public class ReportKPISubscriber extends WorkflowTaskSubscriberHandler {
 		InsightsWorkflowExecutionHistory historyConfig = workflowDAL
 				.getWorkflowExecutionHistoryByHistoryId(incomingTaskMessage.get("exectionHistoryId").getAsInt());
 		JsonObject statusLog = new Gson().fromJson(historyConfig.getStatusLog(), JsonObject.class);
-		Type type = new TypeToken<List<Integer>>() {
-		}.getType();
-		Gson gson = new Gson();
-		List<Integer> kpiList = gson.fromJson(statusLog.get("kpiList"), type);
-		kpiConfigList.addAll(reportConfigDAL.getActiveKPIConfigurationsBasedOnKPIId(kpiList));
-		contentList.addAll(gson.fromJson(statusLog.get("contentArray"), type));
-
+		if (statusLog != null) {
+			Type type = new TypeToken<List<Integer>>() {
+			}.getType();
+			Gson gson = new Gson();
+			List<Integer> kpiList = gson.fromJson(statusLog.get("kpiList"), type);
+			kpiConfigList.addAll(reportConfigDAL.getActiveKPIConfigurationsBasedOnKPIId(kpiList));
+			contentList.addAll(gson.fromJson(statusLog.get("contentArray"), type));
+		} else {
+			log.error("Worlflow Detail ==== ReportKPISubscriber unable to parse retry message {} ", statusLog);
+		}
 	}
 
 	private void executeKPI(List<InsightsKPIConfig> kpiConfigList, List<JsonObject> failedJobs)
@@ -138,7 +141,6 @@ public class ReportKPISubscriber extends WorkflowTaskSubscriberHandler {
 		int assessmentId = workflowConfig.getAssessmentConfig().getId();
 		String assessmentInputDataSource = workflowConfig.getAssessmentConfig().getInputDatasource();
 		int reportTemplateId = workflowConfig.getAssessmentConfig().getReportTemplateEntity().getReportId();
-		log.debug("Worlflow Detail ==== ReportKPISubscriber  start for loop ");
 		List<Callable<JsonObject>> kpiListToExecute = new ArrayList<>();
 		for (InsightsKPIConfig kpiConfig : kpiConfigList) {
 			try {
@@ -161,8 +163,6 @@ public class ReportKPISubscriber extends WorkflowTaskSubscriberHandler {
 				kpiConfigDTO.setOneTimeReportStartTime(workflowConfig.getAssessmentConfig().getStartDate());
 				kpiConfigDTO.setOneTimeReportEndDate(workflowConfig.getAssessmentConfig().getEndDate());
 				kpiConfigDTO.setInputDatasource(assessmentInputDataSource);
-				// Submit each kpi as indiviual thread
-				log.debug("Worlflow Detail ==== ReportKPISubscriber before thred start ");
 
 				KPIExecutor kpirun = new KPIExecutor(kpiConfigDTO);
 				kpiListToExecute.add(kpirun);
@@ -170,8 +170,6 @@ public class ReportKPISubscriber extends WorkflowTaskSubscriberHandler {
 			} catch (Exception e) {
 				log.debug("Worlflow Detail ==== ReportKPISubscriber  Exception  after  thread complete  ");
 			}
-			log.debug("Worlflow Detail ==== ReportKPISubscriber after  thread complete  ");
-
 		}
 
 		/* segregate entire KPI execution list into defined chunks */
@@ -190,10 +188,11 @@ public class ReportKPISubscriber extends WorkflowTaskSubscriberHandler {
 
 		for (List<Callable<JsonObject>> chunk : chunkList) {
 			List<Future<JsonObject>> chunkResponse = WorkflowThreadPool.getInstance().invokeAll(chunk);
+			log.debug("Worlflow Detail ==== ReportKPISubscriber  chunk submmited to thread ");
 			for (Future<JsonObject> singleChunkResponse : chunkResponse) {
 				if (!singleChunkResponse.isCancelled()
 						&& !singleChunkResponse.get().get("Status").getAsString().equalsIgnoreCase("Success")) {
-
+					log.debug("Worlflow Detail ==== ReportKPISubscriber chunk response thread ");
 					failedJobs.add(singleChunkResponse.get());
 				}
 

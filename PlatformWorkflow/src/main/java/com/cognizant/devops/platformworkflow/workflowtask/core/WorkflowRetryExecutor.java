@@ -30,7 +30,7 @@ import com.cognizant.devops.platformdal.workflow.InsightsWorkflowConfiguration;
 import com.cognizant.devops.platformdal.workflow.InsightsWorkflowExecutionHistory;
 import com.cognizant.devops.platformdal.workflow.InsightsWorkflowTask;
 import com.cognizant.devops.platformdal.workflow.InsightsWorkflowTaskSequence;
-import com.cognizant.devops.platformworkflow.workflowtask.exception.WorkflowFailedTaskException;
+import com.cognizant.devops.platformworkflow.workflowtask.exception.WorkflowTaskInitializationException;
 import com.cognizant.devops.platformworkflow.workflowtask.utils.WorkflowUtils;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
@@ -68,7 +68,7 @@ public class WorkflowRetryExecutor implements Job {
 	 */
 	public void retryWorkflowWithFailedTask() {
 		JsonParser parser = new JsonParser();
-		log.debug(" Worlflow Detail ====  Inside WorkflowRetryExecutor "); 
+		log.debug(" Worlflow Detail ====  Inside WorkflowRetryExecutor retryWorkflowWithFailedTask");
 		List<InsightsWorkflowExecutionHistory> readyToRunWorkflowHistory = workflowProcessing.getFailedTasksForRetry();
 		for (InsightsWorkflowExecutionHistory workflowHistory : readyToRunWorkflowHistory) {
 			if (workflowHistory.getRetryCount() < maxWorkflowsRetries) {
@@ -76,11 +76,13 @@ public class WorkflowRetryExecutor implements Job {
 						.getWorkflowTaskByTaskId(workflowHistory.getCurrenttask());
 				JsonObject mqRetryJsonObject = parser.parse(workflowHistory.getRequestMessage()).getAsJsonObject();
 				mqRetryJsonObject.addProperty(WorkflowUtils.RETRY_JSON_PROPERTY, true);
-				mqRetryJsonObject.addProperty("exectionHistoryId", workflowHistory.getId());
+				mqRetryJsonObject.addProperty(WorkflowUtils.EXECUTION_HISTORY_JOSN_PROPERTY, workflowHistory.getId());
 				log.debug(" Worlflow Detail  ====  Retry flow workflowHistory {}  ", workflowHistory);
 				try {
+					log.debug(" Worlflow Detail ==== before publish message retryWorkflowWithFailedTask {} ",
+							mqRetryJsonObject);
 					workflowProcessing.publishMessageInMQ(firstworkflowTask.getMqChannel(), mqRetryJsonObject);
-				} catch (WorkflowFailedTaskException e) {
+				} catch (WorkflowTaskInitializationException e) {
 					log.debug(" Worlflow Detail ====  workflow failed to execute due to MQ exception {}  ",
 							workflowHistory.getWorkflowConfig().getWorkflowId());
 				}
@@ -91,9 +93,7 @@ public class WorkflowRetryExecutor implements Job {
 						workflowHistory.getWorkflowConfig().getWorkflowId(),
 						WorkflowTaskEnum.WorkflowStatus.ABORTED.toString(), "");
 			}
-
 		}
-
 	}
 
 	/**
@@ -101,7 +101,7 @@ public class WorkflowRetryExecutor implements Job {
 	 * is completed and none is in error state
 	 */
 	private void retryWorkflowWithCompletedTask() {
-
+		log.debug(" Worlflow Detail ====  Inside WorkflowRetryExecutor retryWorkflowWithCompletedTask ");
 		JsonParser parser = new JsonParser();
 		List<InsightsWorkflowExecutionHistory> readyToRunWorkflowHistory = workflowProcessing.getNextTasksForRetry();
 		for (InsightsWorkflowExecutionHistory lastCompletedTaskExecution : readyToRunWorkflowHistory) {
@@ -110,10 +110,12 @@ public class WorkflowRetryExecutor implements Job {
 			mqRetryJsonObject.addProperty("exectionHistoryId", lastCompletedTaskExecution.getId());
 			String message = new Gson().toJson(mqRetryJsonObject);
 			Map<String, Object> requestMessage = WorkflowUtils.convertJsonObjectToMap(message);
-			log.debug(" Worlflow Detail  ====  Retry flow workflowHistory {}  ", lastCompletedTaskExecution);
+			log.debug(
+					" Worlflow Detail  ==== Inside WorkflowRetryExecutor retryWorkflowWithCompletedTask Retry flow workflowHistory {}  ",
+					lastCompletedTaskExecution);
 			try {
 				workflowProcessing.publishMessageToNextInMQ(requestMessage);
-			} catch (WorkflowFailedTaskException e) {
+			} catch (WorkflowTaskInitializationException e) {
 				log.debug(
 						" Worlflow Detail  ====  workflow failed to retry and will be picked up in next retry schedule  {} ",
 						lastCompletedTaskExecution);
@@ -127,11 +129,15 @@ public class WorkflowRetryExecutor implements Job {
 	 * completed or failed
 	 */
 	private void retryWorkflowWithoutHistory() {
+		log.debug(" Worlflow Detail ====  Inside WorkflowRetryExecutor retryWorkflowWithoutHistory ");
 		List<InsightsWorkflowConfiguration> readyToRetryWorkflow = workflowProcessing.getReadyToRetryWorkflows();
+		
+		log.debug(" Worlflow Detail ==== retryWorkflowWithoutHistory {} ", readyToRetryWorkflow.size());
+
 		if (!readyToRetryWorkflow.isEmpty()) {
 			for (InsightsWorkflowConfiguration workflowConfig : readyToRetryWorkflow) {
 				long executionId = System.currentTimeMillis();
-				log.debug(" Worlflow Detail ====  executionId {}  ", executionId);
+				log.debug(" Worlflow Detail ==== retryWorkflowWithoutHistory executionId {}  ", executionId);
 				InsightsWorkflowTaskSequence firstworkflowTask = workflowProcessing
 						.getWorkflowTaskSequenceByWorkflowId(workflowConfig.getWorkflowId());
 				JsonObject mqRequestJson = new JsonObject();
@@ -139,15 +145,18 @@ public class WorkflowRetryExecutor implements Job {
 						firstworkflowTask.getWorkflowTaskEntity().getTaskId(), firstworkflowTask.getNextTask(),
 						firstworkflowTask.getSequence(), mqRequestJson);
 				try {
+					log.debug(" Worlflow Detail ==== before publish message retryWorkflowWithoutHistory {} ",
+							mqRequestJson);
 					workflowProcessing.publishMessageInMQ(firstworkflowTask.getWorkflowTaskEntity().getMqChannel(),
 							mqRequestJson);
-				} catch (WorkflowFailedTaskException e) {
-					log.debug(" Worlflow Detail ====  workflow failed to execute due to MQ exception {}  ",
+				} catch (WorkflowTaskInitializationException e) {
+					log.debug(
+							" Worlflow Detail ==== retryWorkflowWithoutHistory workflow failed to execute due to MQ exception {}  ",
 							workflowConfig.getWorkflowId());
 				}
 			}
 		} else {
-			log.debug("Worlflow Detail ====  No workflows are currently on due to run");
+			log.debug("Worlflow Detail ====  WorkflowRetryExecutor No retry workflows are currently on due to run");
 		}
 	}
 }

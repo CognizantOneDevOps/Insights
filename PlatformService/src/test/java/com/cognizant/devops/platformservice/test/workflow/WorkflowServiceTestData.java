@@ -30,8 +30,6 @@ public class WorkflowServiceTestData {
 	JsonParser parser = new JsonParser();
 	String workflowType = "Report";
 	
-	int taskID = 0;
-	
 	int historyid = 0;
 	
 	String registerkpiWorkflow = "{\"kpiId\":123456,\"name\":\"Total Successful Deployments_workflow\",\"group\":\"DEPLOYMENT\",\"toolName\":\"RUNDECK\",\"category\":\"STANDARD\",\"DBQuery\":\"MATCH (n:RUNDECK:DATA) WHERE n.SPKstartTime > {startTime} and n.SPKstartTime < {endTime} and  n.SPKvector = 'DEPLOYMENT' and n.SPKstatus='Success' RETURN count(n.SPKstatus) as totalDeploymentCount\",\"datasource\":\"NEO4J\",\"isActive\":true,\"resultField\":\"totalDeploymentCount\"}";

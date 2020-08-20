@@ -42,6 +42,7 @@ public class AssessmentReportsTest extends AssessmentReportsTestData {
 	@BeforeTest
 	public void onInit() throws Exception {
 		
+		ApplicationConfigCache.loadConfigCache();
 		
 		//save multiple Kpi definition in db
 		readKpiFileAndSave("KPIDefination.json");
@@ -52,6 +53,8 @@ public class AssessmentReportsTest extends AssessmentReportsTestData {
 		//save report template in db
 		readReportTempFileAndSave("REPORT_SONAR_JENKINS_PROD_RT.json");
 		readReportTempFileAndSave("REPORT_SONAR_RT.json");
+		saveReportTemplate(reportTemplatekpi);
+		saveReportTemplate(reportTemplatekpis);
 		
 		//save workflow task in db
 		saveWorkflowTask(taskKpiExecution);
@@ -62,9 +65,7 @@ public class AssessmentReportsTest extends AssessmentReportsTestData {
 		//save assessment report
 		saveAssessmentReport(workflowIdProd, assessmentReport, 3);
 		saveAssessmentReport(workflowIdFail, assessmentReportFail, 1);
-				
-		ApplicationConfigCache.loadConfigCache();
-		
+
 		initializeTask();
 		
 		//run workflow executor 
@@ -144,7 +145,7 @@ public class AssessmentReportsTest extends AssessmentReportsTestData {
 	public void testRetryKpiExecute() throws InterruptedException {
 		InsightsKPIConfig existingConfig = reportConfigDAL.getKPIConfig(100331);
 		existingConfig.setCategory("COMPARISON");
-		existingConfig.setdBQuery(query);
+		existingConfig.setdBQuery(querySonar);
 		reportConfigDAL.updateKpiConfig(existingConfig);
 		WorkflowRetryExecutor executorRetry = new WorkflowRetryExecutor();
 		executorRetry.retryWorkflowWithFailedTask();
@@ -169,7 +170,43 @@ public class AssessmentReportsTest extends AssessmentReportsTestData {
 
 	}
 	
+	
+	//Kpi execution exception case when kpi queries are not appropriate
+	@Test(priority = 10)
+	public void testWithWrongKpiQueries() throws InterruptedException, InsightsCustomException {
+		saveAssessmentReport(workflowIdWrongkpi, assessmentReportWrongkpi, 2);
+		saveAssessmentReport(workflowIdWrongkpis, assessmentReportWrongkpis, 2);
+		WorkflowExecutor executor = new WorkflowExecutor();
+		executor.executeWorkflow();
+		Thread.sleep(8000);
+		InsightsWorkflowConfiguration workflowConfigWrongkpi = workflowDAL.getWorkflowConfigByWorkflowId(workflowIdWrongkpi);		
+		InsightsWorkflowConfiguration workflowConfigWrongkpis = workflowDAL.getWorkflowConfigByWorkflowId(workflowIdWrongkpi);		
+		Assert.assertEquals(workflowConfigWrongkpi.getStatus(), WorkflowTaskEnum.WorkflowStatus.ERROR.toString());
+		Assert.assertEquals(workflowConfigWrongkpis.getStatus(), WorkflowTaskEnum.WorkflowStatus.ERROR.toString());
 
+	}
+	
+	//correct kpi queries updation
+	@Test(priority = 11)
+	public void testRetryWrongKpiQueries() throws InterruptedException {
+		updateCorrectKpiQuery(100127, queryJenkins);
+		updateCorrectKpiQuery(100161, queryJira);
+		updateCorrectKpiQuery(100153, queryJiraAvg);
+		WorkflowRetryExecutor executorRetry = new WorkflowRetryExecutor();
+		executorRetry.retryWorkflowWithFailedTask();
+		Thread.sleep(50000);
+	}
+	
+	//PDF execution exception case when visualizationConfigs or charts details are not appropriate
+	@Test(priority = 12)
+	public void testWrongKpiQueriesStatus() throws InterruptedException, InsightsCustomException {
+		
+		InsightsWorkflowConfiguration workflowConfigWrongkpi = workflowDAL.getWorkflowConfigByWorkflowId(workflowIdWrongkpi);		
+		InsightsWorkflowConfiguration workflowConfigWrongkpis = workflowDAL.getWorkflowConfigByWorkflowId(workflowIdWrongkpis);		
+		Assert.assertEquals(workflowConfigWrongkpis.getStatus(), WorkflowTaskEnum.WorkflowStatus.ERROR.toString());
+		Assert.assertEquals(workflowConfigWrongkpi.getStatus(), WorkflowTaskEnum.WorkflowStatus.ERROR.toString());
+
+	}
 	
 	//delete dummy data
 		@AfterTest
@@ -178,6 +215,8 @@ public class AssessmentReportsTest extends AssessmentReportsTestData {
 			//cleaning Postgres
 			delete(workflowIdProd);
 			delete(workflowIdFail);
+			delete(workflowIdWrongkpi);
+			delete(workflowIdWrongkpis);
 			
 			//delete workflow Task
 			for(int element: taskidList) {
@@ -188,6 +227,9 @@ public class AssessmentReportsTest extends AssessmentReportsTestData {
 			for(int element: reportIdList) {
 				reportConfigDAL.deleteReportTemplatebyReportID(element);
 			}
+			reportConfigDAL.deleteReportTemplatebyReportID(reportTemplateJson.get("reportId").getAsInt());
+			reportConfigDAL.deleteReportTemplatebyReportID(reportTemplateKpisJson.get("reportId").getAsInt());
+
 			
 			//delete content Config
 			for(int element: contentIdList) {

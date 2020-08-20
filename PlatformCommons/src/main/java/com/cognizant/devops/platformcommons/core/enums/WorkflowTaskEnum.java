@@ -21,7 +21,7 @@ public class WorkflowTaskEnum {
 	 * Enums stating the list of WORKFLOW status supported.	 
 	 */
 	public enum WorkflowStatus {
-		NOT_STARTED, IN_PROGRESS, COMPLETED, ERROR, RESTART, ABORTED
+		NOT_STARTED, IN_PROGRESS, COMPLETED, ERROR, RESTART, ABORTED, TASK_INITIALIZE_ERROR
 	}
 	public enum WorkflowType {
 		REPORT("Report");

@@ -103,7 +103,7 @@ public class ReportEmailSubscriber extends WorkflowTaskSubscriberHandler {
 		mailReportDTO.setTimeOfReportGeneration(InsightsUtils.insightsTimeXFormat(executionId));
 		workflowConfig = workflowDAL.getWorkflowConfigByWorkflowId(workflowId);
 		mailReportDTO.setAsseementreportname(workflowConfig.getAssessmentConfig().getAsseementreportname());
-		String folderName = workflowConfig.getAssessmentConfig().getReportTemplateEntity().getReportId() + "_"
+		String folderName = workflowConfig.getAssessmentConfig().getAsseementreportname() + "_"
 				+ executionId;
 		mailReportDTO.setReportFilePath(ReportEngineUtils.REPORT_PDF_EXECUTION_RESOLVED_PATH + folderName
 				+ File.separator + mailReportDTO.getAsseementreportname() + "." + ReportEngineUtils.REPORT_TYPE);
@@ -132,6 +132,6 @@ public class ReportEmailSubscriber extends WorkflowTaskSubscriberHandler {
 		statusObject.add("log", logArray);
 		// statusLog set here which is class variable of WorkflowTaskSubscriberHandler
 		statusLog = new Gson().toJson(statusObject);
-		throw new InsightsJobFailedException("enable to send an email");
+		throw new InsightsJobFailedException("unable to send an email");
 	}
 }

@@ -38,22 +38,16 @@ public class PlatformReportApplication {
 	private PlatformReportApplication() {
 
 	}
-
+	
 	public static void main(String[] args) {
 		// Load isight config
 		ApplicationConfigCache.loadConfigCache();
 		// Create Default users
 		ApplicationConfigProvider.performSystemCheck();
 		try {
-
+	
 			PlatformWorkflowApplicationTest.testWorkflowExecutor();
-
-			/*WorkflowExecutor executor = new WorkflowExecutor();
-			executor.run();*/
-/*
-			WorkflowRetryExecutor retryExecuter = new WorkflowRetryExecutor();
-			retryExecuter.run();
-*/
+	
 		} catch (Exception e) {
 			log.error("Exception in PlatformReportApplication ", e);
 			InsightsStatusProvider.getInstance().createInsightStatusNode(
@@ -61,4 +55,5 @@ public class PlatformReportApplication {
 					PlatformServiceConstants.FAILURE);
 		}
 	}
+	
 }

@@ -1,0 +1,198 @@
+
+[
+    {
+      "contentId":21101,
+      "expectedTrend":"DOWNWARDS",
+      "contentName":"Failed Deployments",
+      "kpiId":"1101",
+      "noOfResult":2,
+      "threshold":0,
+      "resultField":"Failure",  
+      "message":{
+         "contentMessage":"There were {Failure} failed deployments captured in the sprint."
+      },
+      "isActive":"TRUE"
+   },
+    {
+      "contentId":21115,
+      "expectedTrend":"UPWARDS",
+      "contentName":"Successful Deployments",
+      "kpiId":"1101",
+      "noOfResult":2,
+      "threshold":0,
+      "resultField":"Success",  
+      "message":{
+         "contentMessage":"There were {Success} successful deployments captured in last sprint"
+      },
+      "isActive":"TRUE"
+   },
+   
+  {
+      "contentId":21102,
+      "expectedTrend":"UPWARDS",
+      "contentName":"Total Number of Deployments",
+      "kpiId":"1102",
+      "noOfResult":2,
+	   "resultField":"totalDeploymentCount",
+      "threshold":0,
+      "message":{
+         "contentMessage":"There were {totalDeploymentCount} total deployments captured in the last run."
+      },
+      "isActive":"TRUE"
+   },
+   {
+      "contentId":21103,
+      "isActive":"TRUE",
+      "expectedTrend":"UPWARDS",
+      "contentName":"Average Successful Deployment Time In Seconds",
+      "kpiId":1103,
+      "noOfResult":2,
+	  "resultField":"AvgTimeInSecs",
+      "threshold":0,     
+      
+      "message":{
+         "contentMessage":"Average successful deployment time in seconds was {AvgTimeInSecs}s in the last sprint."
+      }
+   },
+  {
+      "contentId":21104,
+      "expectedTrend":"DOWNWARDS",
+      "contentName":"Maximum Deploy Time in Secs",
+      "kpiId":"1104",
+      "noOfResult":2,
+      "threshold":0,
+	  "resultField":"Deploy",
+      "message":{
+         "contentMessage":"Maximum successful deployment time captured in the last sprint was {Deploy}s ."
+      },
+      "isActive":"TRUE"
+   },
+   
+   
+    {
+      "contentId":21106,
+      "expectedTrend":"UPWARDS",
+	   "resultField":"CountOfIssueForDeveloper",
+      "contentName":"Defects Assigness",
+      "kpiId":"1106",
+      "noOfResult":2,
+      "threshold":0,
+      "message":{
+         "contentMessage":"Total defects asigned to each developer in the last sprint were {CountOfIssueForDeveloper} "
+      },
+      "isActive":"TRUE"
+   },
+   {
+      "contentId":21107,
+      "isActive":"TRUE",
+      "expectedTrend":"BELOW",
+	   "resultField":"Count",
+      "contentName":" Defects Count",
+      "kpiId":1107,
+       "noOfResult":2,
+      "threshold":0,      
+      "directionOfThreshold":"BELOW",
+      "message":{
+         "contentMessage":"Total number of defects captured in the last sprint was {Count}"
+      }
+   }
+   ,
+    {
+      "contentId":21108,
+      "expectedTrend":"UPWARDS",
+      "contentName":"Maximum Deploy Time in Secs",
+	  "resultField":"MaxBuildTime",
+      "kpiId":"1108",
+      "noOfResult":2,
+      "threshold":0,
+      "message":{
+         "contentMessage":" Maximum successful build time captured in the last sprint was {MaxBuildTime}s  ."
+      },
+      "isActive":"TRUE"
+   },  
+   
+   
+    {
+      "contentId":21110,
+      "expectedTrend":"DOWNWARDS",
+      "contentName":"Failed Builds",
+      "kpiId":"1110",
+      "noOfResult":2,
+	  "resultField":"Failure",
+      "threshold":0,	  
+      "message":{
+         "contentMessage":"Failed builds captured in the last sprint were {Failure} ."
+      },
+      "isActive":"TRUE"
+   },
+    {
+      "contentId":21116,
+      "expectedTrend":"UPWARDS",
+      "contentName":"Successful Builds",
+      "kpiId":"1110",
+      "noOfResult":2,
+      "threshold":0,
+      "resultField":"Success",  
+      "message":{
+         "contentMessage":"Successful builds captured in the last sprint were {Success}." 
+      },
+      "isActive":"TRUE"
+   },
+    {
+      "contentId":21111,
+      "expectedTrend":"UPWARDS",
+      "contentName":"Total Number of Builds",
+      "kpiId":"1111",
+	   "resultField":"TotalNumberBuild",
+      "noOfResult":2,
+      "threshold":0,
+      "message":{
+         "contentMessage":"There were total {TotalNumberBuild} build(s) captured in the last sprint."
+      },
+      "isActive":"TRUE"
+   },
+   
+   {
+      "contentId":21112,
+      "expectedTrend":"UPWARDS",
+      "contentName":"Average Successful Build Time",
+      "kpiId":"1112",
+      "noOfResult":2,
+      "threshold":0,
+	  "resultField":"avgOutput",
+      "message":{
+         "contentMessage":" Average sucessful build time captured in the last sprint was  {avgOutput}s ."
+      },
+      "isActive":"TRUE"
+   },
+   {
+      "contentId":21113,
+	   "resultField":"CountOfDefects",
+      "expectedTrend":"UPWARDS",
+      "contentName":"Total number of Defects",
+      "kpiId":"1113",
+      "noOfResult":2,
+      "threshold":0,
+      "message":{
+         "contentMessage":"Total number of defetcts captured in the last sprint were {CountOfDefects}."
+      },
+      "isActive":"TRUE"
+   },
+    {
+      "contentId":21114,
+      "expectedTrend":"UPWARDS",
+      "contentName":"Total number of Stories",
+	   "resultField":"NumberOfStories",
+      "kpiId":"1114",
+      "noOfResult":2,
+      "threshold":0,
+      "message":{
+         "contentMessage":"Total stories captured in the last run were {NumberOfStories}."
+      },
+      "isActive":"TRUE"
+   }
+   
+   
+   
+  
+]

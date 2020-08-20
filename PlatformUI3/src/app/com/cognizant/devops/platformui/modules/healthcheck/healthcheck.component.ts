@@ -161,9 +161,15 @@ export class HealthCheckComponent implements OnInit {
     if (!isSessionExpired) {
       var rcategoryName = categoryName.replace(/ +/g, "");
       if (toolName == "-") {
-        var filePath = "${INSIGHTS_HOME}/logs/" + rcategoryName + "/" + rcategoryName + ".log";
-        var detailType = categoryName;
-      } else {
+        if(categoryName == 'Platform DataArchivalEngine'){
+          var filePath = "${INSIGHTS_HOME}/logs/PlatformEngine/platformEngine.log";
+          var detailType = categoryName;
+        }else{
+          var filePath = "${INSIGHTS_HOME}/logs/" + rcategoryName + "/" + rcategoryName + ".log";
+          var detailType = categoryName;
+        }
+      }
+      else {
         var rtoolName = toolName.charAt(0).toUpperCase() + toolName.slice(1).toLowerCase();
         var filePath = "${INSIGHTS_HOME}/logs/PlatformAgent/log_" + agentId + "Agent.log";
         var detailType = rtoolName;

@@ -38,7 +38,6 @@ public class WorkflowSchedular {
 	public void executor() {
 		try {
 			Scheduler scheduler = new StdSchedulerFactory().getScheduler();
-			scheduler.start();
 			JobDetail jobWorkflow = JobBuilder.newJob(WorkflowExecutor.class)
 					.withIdentity("WorkflowExecutor", "WorkflowExecutor").build();
 
@@ -64,9 +63,9 @@ public class WorkflowSchedular {
 							.getWorkflowDetails().getWorkflowRetryExecutorCron()))
 					.build();
 
-			scheduler.start();
 			scheduler.scheduleJob(jobWorkflow, triggerWorkflow);
 			scheduler.scheduleJob(jobWorkflowRetry, triggeWorkflowRetry);
+			scheduler.start();
 
 		} catch (SchedulerException e) {
 			log.error(e);

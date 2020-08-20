@@ -9,6 +9,7 @@
       "noOfResult":15,
       "threshold":50,
       "directionOfThreshold":"BELOW",
+      "resultField":"Productivity",
       "message":{
          "contentMessage":"No of employees who had been below the defined productivity were {result} in the past {day} days"
       }
@@ -27,6 +28,7 @@
       },
       "action":"PERCENTAGE",
       "directionOfThreshold":"ABOVE",
+      "resultField":"Productivity",
       "message":{
          "contentMessage":"Employees as per productivity percentage w.r.t zones are red {red}%, amber {amber}% , green {green}%"
       }

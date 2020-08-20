@@ -25,6 +25,6 @@ sudo make install && cd .. && sudo wget https://platform.cogdevops.com/insights_
 python --version
 sudo python get-pip.py
 sudo pip install pika==1.1.0
-sudo pip install requests apscheduler python-dateutil xmltodict pytz requests_ntlm boto3
+sudo pip install requests apscheduler python-dateutil xmltodict pytz requests_ntlm boto3 urllib3 neotime neo4j neobolt elasticsearch
 sleep 5
 

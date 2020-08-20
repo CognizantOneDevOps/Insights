@@ -22,6 +22,7 @@ import org.testng.annotations.AfterTest;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 
+import com.cognizant.devops.platformcommons.config.ApplicationConfigCache;
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.core.util.InsightsUtils;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
@@ -42,7 +43,7 @@ public class DataArchivalServiceTest extends DataArchivalServiceData {
 
 	@BeforeTest
 	public void prepareData() throws InsightsCustomException {
-		
+		ApplicationConfigCache.loadConfigCache();
 		//register agent in DB	
 		Boolean status = agentConfigDAL.saveAgentConfigFromUI(agentJson.get("agentId").getAsString(), agentJson.get("toolCategory").getAsString(),agentJson.get("labelName").getAsString(), agentJson.get("toolName").getAsString(),
 				agentJson, agentJson.get("agentVersion").getAsString(), agentJson.get("osversion").getAsString(), updateDate, vault);
@@ -120,17 +121,17 @@ public class DataArchivalServiceTest extends DataArchivalServiceData {
 				.saveDataArchivalDetails(saveArchivalRecordsWithStartDateGreaterThanEndDateDataJson);
 	}
 	
-	@Test(priority = 10, expectedExceptions = InsightsCustomException.class)
+	/*@Test(priority = 10, expectedExceptions = InsightsCustomException.class)
 	public void testsaveArchivalRecordsWithRabbitMqDown() throws InsightsCustomException {
 		host = ApplicationConfigProvider.getInstance().getMessageQueue().getHost();
 		ApplicationConfigProvider.getInstance().getMessageQueue().setHost("notLocalhost");
 		String status = dataArchivalServiceImpl
 				.saveDataArchivalDetails(saveArchivalRecordsJson);
-	}
+		ApplicationConfigProvider.getInstance().getMessageQueue().setHost(host);
+	}*/
 	
 	@Test(priority = 11, expectedExceptions = InsightsCustomException.class)
 	public void testsaveArchivalRecordsWithNoDataArchivalAgent() throws InsightsCustomException {
-		ApplicationConfigProvider.getInstance().getMessageQueue().setHost(host);
 		List<AgentConfig> agentConfigs =  agentConfigDAL.deleteAgentConfigurations(agentJson.get("agentId").getAsString());
 		String status = dataArchivalServiceImpl
 				.saveDataArchivalDetails(saveArchivalRecordsJson);

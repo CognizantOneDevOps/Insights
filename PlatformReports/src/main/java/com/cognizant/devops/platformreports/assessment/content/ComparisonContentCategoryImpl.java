@@ -36,7 +36,7 @@ public class ComparisonContentCategoryImpl extends BaseContentCategoryImpl {
 	}
 
 	/**
-	 * Generate content text using KPI result
+	 * Generate comparision content text using KPI result
 	 */
 	@Override
 	public void generateContent() {
@@ -69,7 +69,7 @@ public class ComparisonContentCategoryImpl extends BaseContentCategoryImpl {
 			String actualTrend = ReportEngineEnum.KPITrends.NOCHANGE.getValue();
 			ReportEngineEnum.KPISentiment sentiment = ReportEngineEnum.KPISentiment.NEUTRAL;
 			Map<String, Object> resultValuesMap = resultFirstData.getResults();
-			String trendText = "";
+
 			String contentText = "";
 
 			// This condition will be executed if KPI comparison is FALSE
@@ -77,7 +77,7 @@ public class ComparisonContentCategoryImpl extends BaseContentCategoryImpl {
 				if (kpiResultDetailsList.size() < 2) {
 					return inferenceContentResult;
 				}
-				String comparisonField = resultFirstData.getResultField();
+				String comparisonField = getResultFieldFromContentDefination();
 				InsightsKPIResultDetails previousDateData = kpiResultDetailsList.get(1);
 				Object currentValue = resultFirstData.getResults().get(comparisonField);
 				Object previousValue = previousDateData.getResults().get(comparisonField);

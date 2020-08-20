@@ -43,7 +43,7 @@ public class InsightsReportsKPIConfig implements Serializable {
 	@Column(name="id")	
 	int id;	
 	
-	@Column(name="vConfig" , length=1000)
+	@Column(name = "vConfig", length = 10000)
 	String vConfig;
 	
 	@ManyToOne(fetch=FetchType.EAGER)

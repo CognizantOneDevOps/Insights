@@ -79,7 +79,8 @@ public class DataArchivalServiceImpl implements DataArchivalService {
 				throw new InsightsCustomException("Please enter valid archival name, it cannot be blank");
 			}
 
-			List<AgentConfig> agentDetails = agentConfigDAL.getAgentConfigurations(DataArchivalConstants.toolName,DataArchivalConstants.toolCategory);
+			List<AgentConfig> agentDetails = agentConfigDAL.getAgentConfigurations(DataArchivalConstants.TOOLNAME,
+					DataArchivalConstants.TOOLCATEGORY);
 			if (!agentDetails.isEmpty()) {
 				JsonObject agentJson = new JsonParser().parse(agentDetails.get(0).getAgentJson()).getAsJsonObject();
 				String routingKey = agentJson.get("subscribe").getAsJsonObject().get("dataArchivalQueue").getAsString();
@@ -124,18 +125,8 @@ public class DataArchivalServiceImpl implements DataArchivalService {
 	@Override
 	public List<InsightsDataArchivalConfig> getAllArchivalRecord() throws InsightsCustomException {
 		List<InsightsDataArchivalConfig> archivedRecordList = new ArrayList<>();
-		// Long today = InsightsUtils.getTodayTime() / 1000;
 		try {
 			archivedRecordList = dataArchivalConfigdal.getAllArchivalRecord();
-			// inactivate expired record
-			/*
-			 * for(DataArchivalConfig i: archivedRecordList) { long expiryDate =
-			 * i.getExpiryDate(); if(today.compareTo(expiryDate) >= 0) { String archiveName
-			 * = i.getArchivalName();
-			 * if((DataArchivalStatus.ACTIVE.name().equalsIgnoreCase(i.getStatus()))) {
-			 * inactivateArchivalRecord(archiveName); } } }
-			 */
-
 		} catch (Exception e) {
 			log.error("Error getting all archival records {}", e.getMessage());
 			throw new InsightsCustomException(e.getMessage());

@@ -81,22 +81,25 @@ public class FusionChartHandler implements BasePDFProcessor {
 
 	private void createPDFDirectory(InsightsAssessmentConfigurationDTO assessmentReportDTO) {
 		try {
-			String folderName = assessmentReportDTO.getReportId() + "_" + assessmentReportDTO.getExecutionId();
+			String folderName = assessmentReportDTO.getAsseementreportname() + "_"
+					+ assessmentReportDTO.getExecutionId();
 			assessmentReportDTO.setPdfReportFolderName(folderName);
-			String reportExecutionFile = ReportEngineUtils.REPORT_PDF_EXECUTION_RESOLVED_PATH
-					// + assessmentReportDTO.getReportFilePath() + "/"
-					+ folderName;
+			String reportExecutionFile = ReportEngineUtils.REPORT_PDF_EXECUTION_RESOLVED_PATH + folderName;
 			assessmentReportDTO.setPdfReportDirPath(reportExecutionFile);
-			File sourceTemplateFolderPath = new File(
+			String templatePath =
 					ReportEngineUtils.REPORT_PDF_RESOLVED_PATH + ReportEngineUtils.REPORT_CONFIG_TEMPLATE_DIR
-							+ File.separator + assessmentReportDTO.getReportFilePath());
+							+ File.separator + assessmentReportDTO.getReportFilePath();
+			log.debug("Worlflow Detail ==== path sourceTemplateFolderPath {} reportExecutionFile {}  ", templatePath,
+					reportExecutionFile);
+
+			File sourceTemplateFolderPath = new File(templatePath);
 			File reportExecutionFolder = new File(reportExecutionFile);
 
 			getReportExecutionFolder(sourceTemplateFolderPath, reportExecutionFolder);
 
 		} catch (Exception e) {
 			log.error(e);
-			throw new InsightsJobFailedException("Unable to create pdf directory message " + e);
+			throw new InsightsJobFailedException("Worlflow Detail ==== Unable to create pdf directory message " + e);
 		}
 	}
 
@@ -118,20 +121,27 @@ public class FusionChartHandler implements BasePDFProcessor {
 			String json = new String(Files.readAllBytes(Paths.get(templateJsonPath)));
 			JsonArray pdfTemplateJsonArray = new JsonParser().parse(json).getAsJsonArray();
 			Map<String, JsonObject> templateJsonObjMap = loadTemplateJson(pdfTemplateJsonArray);
-			Map<String, JsonArray> contentJsonObjMap = new HashMap<>();
+			Map<String, String> contentMap = new HashMap<>();
 			Map<String, JsonArray> tableJsonObjMap = new HashMap<>();
 			JsonArray kpiResultArray = assessmentReportDTO.getVisualizationResult();
-
+			//log.debug("Worlflow Detail ====  kpiResultArray  {} ", kpiResultArray);
 			for (JsonElement element : kpiResultArray) {
 				JsonObject eachKpiResult = element.getAsJsonObject();
-				String KpiId = eachKpiResult.get("kpiId").getAsString();
+				//String KpiId = eachKpiResult.get("kpiId").getAsString();
 				JsonArray kpiVisualizationArray = eachKpiResult.get("visualizationresult").getAsJsonArray();
 				for (JsonElement eachElement : kpiVisualizationArray) {
 					JsonObject eachVisualizationResult = eachElement.getAsJsonObject();
 					String vType = eachVisualizationResult.get("vType").getAsString();
 					JsonArray fromkpiResultArray = eachVisualizationResult.get("KpiResult").getAsJsonArray();
 					if (fromkpiResultArray.size() > 0) {
-						if (vType.startsWith("table")) {
+						if (vType.startsWith("table") || vType.startsWith("singlestat")) {
+							if (templateJsonObjMap.containsKey(vType)) {
+								String caption = templateJsonObjMap.get(vType).getAsJsonObject().get("caption")
+										.getAsString();
+								fromkpiResultArray.get(0).getAsJsonObject().addProperty("caption", caption);
+							} else {
+								fromkpiResultArray.get(0).getAsJsonObject().addProperty("caption", "");
+							}
 							tableJsonObjMap.put(vType, fromkpiResultArray);
 						} else {
 							JsonObject visualizationObjectFromTemplateJson = templateJsonObjMap.get(vType);
@@ -148,12 +158,23 @@ public class FusionChartHandler implements BasePDFProcessor {
 				if (eachKpiResult.has("contentResult")) {
 					JsonArray kpiContentArray = eachKpiResult.get("contentResult").getAsJsonArray();
 					if (kpiContentArray.size() > 0) {
-						contentJsonObjMap.put(KpiId, kpiContentArray);
+						JsonObject content = kpiContentArray.get(0).getAsJsonObject();
+						JsonArray dataArray = content.get("data").getAsJsonArray();
+						for (JsonElement eachData : dataArray) {
+							JsonObject eachRowObject = eachData.getAsJsonObject();
+							JsonArray eachRowArray = eachRowObject.get("row").getAsJsonArray();
+							// Assuming First Array Item as content Text
+							String contentText = eachRowArray.get(0).getAsString();
+							// Assuming Second Array Item as content Id
+							String contentId = eachRowArray.get(1).getAsString();
+							contentMap.put(contentId, contentText);
+						}
 					}
+
 				}
 			}
-			assessmentReportDTO.setContentJsonObjMap(contentJsonObjMap);
 			assessmentReportDTO.setTableJsonObjMap(tableJsonObjMap);
+			assessmentReportDTO.setContentMap(contentMap);
 		} catch (Exception e) {
 			log.error(e);
 			throw new InsightsJobFailedException(" unable to create charts config " + e);
@@ -171,6 +192,7 @@ public class FusionChartHandler implements BasePDFProcessor {
 			File render = new File(templateHtmlPath);
 			Document document = Jsoup.parse(render, "UTF-8");
 			String originalHTml = document.toString();
+			//processHtmlSingleValue(assessmentReportDTO, document);
 			processHtmlContent(assessmentReportDTO, document);
 			processHtmlTable(assessmentReportDTO, document);
 
@@ -182,7 +204,7 @@ public class FusionChartHandler implements BasePDFProcessor {
 
 		} catch (Exception e) {
 			log.error(e);
-			throw new InsightsJobFailedException("unable to modify html and content data" + e);
+			throw new InsightsJobFailedException("unable to modify html and content data " + e);
 		} finally {
 
 			if (printWriter != null) {
@@ -191,6 +213,24 @@ public class FusionChartHandler implements BasePDFProcessor {
 		}
 
 	}
+	
+	/*private void processHtmlSingleValue(InsightsAssessmentConfigurationDTO assessmentReportDTO, Document document) {
+		Elements allTableDiv = document.getElementsByAttributeValueMatching("id", "singlestat_*");
+		if (!allTableDiv.isEmpty()) {
+			Map<String, JsonArray> tableJsonObjMap = assessmentReportDTO.getTableJsonObjMap();
+			for (Element elmTableDiv : allTableDiv) {
+				String divId = elmTableDiv.attr("id");
+				if (tableJsonObjMap.containsKey(divId)) {
+					log.debug(" allDiv2 Content Elament {} ", elmTableDiv); // log
+					singleValueResponse(elmTableDiv, tableJsonObjMap.get(divId));
+				}
+				log.debug(" allDiv2 Content Elament {} ", elmTableDiv); // log
+	
+			}
+		}
+	}*/
+	
+	
 
 	private void processHtmlTable(InsightsAssessmentConfigurationDTO assessmentReportDTO, Document document) {
 		Elements allTableDiv = document.getElementsByAttributeValueMatching("id", "table_*");
@@ -199,11 +239,9 @@ public class FusionChartHandler implements BasePDFProcessor {
 			for (Element elmTableDiv : allTableDiv) {
 				String divId = elmTableDiv.attr("id");
 				if (tableJsonObjMap.containsKey(divId)) {
-					log.debug(" allDiv2 Content Elament {} ", elmTableDiv); // log
+					log.debug("Worlflow Detail ==== Table  Elament {} ", elmTableDiv); // log
 					commonTableResponse(elmTableDiv, tableJsonObjMap.get(divId));
 				}
-				log.debug(" allDiv2 Content Elament {} ", elmTableDiv); // log
-
 			}
 		}
 	}
@@ -211,29 +249,30 @@ public class FusionChartHandler implements BasePDFProcessor {
 	private void processHtmlContent(InsightsAssessmentConfigurationDTO assessmentReportDTO, Document document) {
 		Elements allContentDiv = document.getElementsByAttributeValueMatching("id", "content_*");
 		if (!allContentDiv.isEmpty()) {
-			Map<String, JsonArray> contentJsonObjMap = assessmentReportDTO.getContentJsonObjMap();
+			Map<String, String> contentMap = assessmentReportDTO.getContentMap();
 			for (Element elmDiv : allContentDiv) {
 				String divId = elmDiv.attr("id");
-				String kpiId = divId.split("_")[1];
-				if (contentJsonObjMap.containsKey(kpiId)) {
-					log.debug(" allDiv2 Content Elament {} ", elmDiv); // log
-					addContentInHtmlTag(elmDiv, contentJsonObjMap.get(kpiId));
+				String contentId = divId.split("_")[1];
+				if (contentMap.containsKey(contentId)) {
+					log.debug("Worlflow Detail ==== allDiv2 Content Elament {} ", elmDiv); // log
+					addContentInHtmlTag(elmDiv, contentMap.get(contentId));
 				}
 			}
 		}
 	}
 
 	private void exportPDFFile(JsonArray finalTemplateJson, InsightsAssessmentConfigurationDTO assessmentReportDTO) {
+		Path zipPathVeriable = null;
 		try {
 			String url = ApplicationConfigProvider.getInstance().getAssessmentReport().getFusionExportAPIUrl();
 			String zipPath = assessmentReportDTO.getPdfReportDirPath() + ".zip";
 			Path sourceFolderPath = Paths.get(assessmentReportDTO.getPdfReportDirPath());
-			Path zipPathVeriable = Paths.get(zipPath);
+			zipPathVeriable = Paths.get(zipPath);
 			Path zipData = getPDFZipFolder(sourceFolderPath, zipPathVeriable);
 			if (zipData.toFile().exists()) {
 				log.debug("Worlflow Detail ====  Zip file created  {} ", zipPath);
 			} else {
-				throw new InsightsCustomException(" Zip file not created ");
+				throw new InsightsCustomException("Worlflow Detail ==== Zip file not created ");
 			}
 			String exportedFilePath = assessmentReportDTO.getPdfReportDirPath() + File.separator
 					+ assessmentReportDTO.getAsseementreportname() + "." + ReportEngineUtils.REPORT_TYPE; // System.currentTimeMillis()
@@ -263,10 +302,17 @@ public class FusionChartHandler implements BasePDFProcessor {
 				log.error("Worlflow Detail ==== Error while created pdf file {} ", exportedFilePath);
 				throw new InsightsJobFailedException("Unable to generate pdf {} " + exportedFilePath);
 			}
-
 		} catch (Exception e) {
-			log.error(e);
+			log.error("Worlflow Detail ==== Error while created pdf ", e);
 			throw new InsightsJobFailedException(e.getMessage());
+		} finally {
+			try {
+				if (zipPathVeriable != null) {
+					Files.delete(zipPathVeriable);
+				}
+			} catch (Exception e) {
+				log.error(" Worlflow Detail ==== unable to delete file, It might not created ");
+			}
 		}
 
 	}
@@ -304,6 +350,9 @@ public class FusionChartHandler implements BasePDFProcessor {
 			singleSeriesResonse(rowData, toTemplateObject);
 		}
 
+		else if (ReportChartCollection.SINGLE_VALUE_CHARTS.contains(chartType)) {
+			singleValueResponse(rowData, toTemplateObject);
+		}
 		/* Common Response */
 		else if (ReportChartCollection.COMMON_CHARTS.contains(chartType)) {
 			commonChartResponse(columnData, rowData, toTemplateObject);
@@ -344,6 +393,22 @@ public class FusionChartHandler implements BasePDFProcessor {
 
 		return toTemplateObject;
 	}
+	
+	private JsonObject singleValueResponse(JsonArray rowData, JsonObject toTemplateObject) {		
+		JsonArray dial = new JsonArray();
+		for (JsonElement row : rowData) {			
+			int value = row.getAsJsonObject().get("row").getAsJsonArray().get(1).getAsInt();			
+			JsonObject dialObject = new JsonObject();
+			dialObject.addProperty("value", value);
+			dial.add(dialObject);			
+		}
+		JsonObject dialArray = new JsonObject();
+		dialArray.add("dial", dial);
+		toTemplateObject.get("dataSource").getAsJsonObject().add("dials", dialArray);
+
+		return toTemplateObject;
+	}
+	
 
 	private JsonObject commonChartResponse(JsonArray columnData, JsonArray rowData, JsonObject toTemplateObject) {
 
@@ -385,38 +450,69 @@ public class FusionChartHandler implements BasePDFProcessor {
 		return toTemplateObject;
 	}
 
-	private void commonContentResponse(JsonArray fromContentResultArray, JsonArray contentTextArray) {
-
+	/*private void commonContentResponse(JsonArray fromContentResultArray, JsonArray contentTextArray) {
+	
 		// JsonArray columnData =
 		// fromContentResultArray.get(0).getAsJsonObject().get("columns").getAsJsonArray();
 		JsonArray rowData = fromContentResultArray.get(0).getAsJsonObject().get("data").getAsJsonArray();
-
+	
 		for (JsonElement data : rowData) {
 			String rowValue = data.getAsJsonObject().get("row").getAsJsonArray().get(0).getAsString();
 			contentTextArray.add(rowValue);
 		}
+	
+	}*/
 
-	}
-
-	private void addContentInHtmlTag(Element elmDiv, JsonArray contentInputTextJsonArray) {
-		JsonArray contentTextArray = new JsonArray();
-		commonContentResponse(contentInputTextJsonArray, contentTextArray);
+	private void addContentInHtmlTag(Element elmDiv, String contentText) {
+		// commonContentResponse(contentInputTextJsonArray, contentTextArray);
 		StringBuffer contentList = new StringBuffer();
 		contentList.append("<ul>");
-		for (JsonElement jsonContentElement : contentTextArray) {
-			contentList.append("<li>" + jsonContentElement.getAsString() + "</li>");
-		}
+
+		contentList.append("<li>" + contentText + "</li>");
+
 		contentList.append("</ul>");
 
 		log.debug(" contentList  {} ", contentList);
 		elmDiv.append(contentList.toString());
 	}
 
+	/*
+	 * private void addContentInHtmlTag(Element elmDiv, JsonArray
+	 * contentInputTextJsonArray) { JsonArray contentTextArray = new JsonArray();
+	 * commonContentResponse(contentInputTextJsonArray, contentTextArray);
+	 * StringBuffer contentList = new StringBuffer(); contentList.append("<ul>");
+	 * for (JsonElement jsonContentElement : contentTextArray) {
+	 * contentList.append("<li>" + jsonContentElement.getAsString() + "</li>"); }
+	 * contentList.append("</ul>");
+	 * 
+	 * log.debug(" contentList  {} ", contentList);
+	 * elmDiv.append(contentList.toString()); }
+	 */
+	/*private void singleValueResponse(Element elmDiv, JsonArray fromTableResultArray) {
+		
+		JsonArray rowData = fromTableResultArray.get(0).getAsJsonObject().get("data").getAsJsonArray();
+		StringBuffer tableList = new StringBuffer();
+		tableList.append("<table class='table table-bordered'>");
+		tableList.append("<thead>");
+		tableList.append("<tr class='singleStatRowCss'>");	
+		String labelValue = rowData.getAsJsonArray().get(0).getAsJsonObject().get("row").getAsJsonArray().get(1).getAsString();
+		tableList.append("<th class='singlestatCSS'>" + labelValue + "</th>");
+		tableList.append("</tr>");
+		tableList.append("</thead>");
+		tableList.append("</tbody>");
+		tableList.append("</table>");
+		log.debug(" contentList  {} ", tableList);
+		elmDiv.append(tableList.toString());
+	
+	
+	}*/
+	
 	private void commonTableResponse(Element elmDiv, JsonArray fromTableResultArray) {
 		JsonArray columnData = fromTableResultArray.get(0).getAsJsonObject().get("columns").getAsJsonArray();
 		JsonArray rowData = fromTableResultArray.get(0).getAsJsonObject().get("data").getAsJsonArray();
-
+		String caption=fromTableResultArray.get(0).getAsJsonObject().get("caption").getAsString();
 		StringBuffer tableList = new StringBuffer();
+		tableList.append("<h2 class='tablecaption'>"+caption+"</h2>");
 		tableList.append("<table class='table table-bordered'>");
 		tableList.append("<thead>");
 		tableList.append("<tr>");

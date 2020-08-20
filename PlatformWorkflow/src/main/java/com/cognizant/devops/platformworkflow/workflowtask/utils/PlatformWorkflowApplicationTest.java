@@ -29,6 +29,7 @@ import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformworkflow.workflowtask.core.WorkflowExecutor;
 import com.cognizant.devops.platformworkflow.workflowtask.core.WorkflowRetryExecutor;
 import com.cognizant.devops.platformworkflow.workflowtask.core.WorkflowTaskInitializer;
+import com.cognizant.devops.platformworkflow.workflowthread.core.WorkflowThreadPool;
 
 /**
  * Engine execution will start from Application. 1. Load the iSight config 2.
@@ -89,6 +90,8 @@ public class PlatformWorkflowApplicationTest {
 		try {
 			log.debug(" Worlflow Detail ==== Inside initilizeWorkflowTasks   ");
 			taskSubscriber.registerTaskSubscriber();
+
+			WorkflowThreadPool.getInstance();
 		} catch (Exception e) {
 			log.error(e);
 		}

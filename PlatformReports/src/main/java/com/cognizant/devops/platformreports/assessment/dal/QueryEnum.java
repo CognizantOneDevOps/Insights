@@ -46,7 +46,7 @@ public enum QueryEnum {
 	
 	//return b.text 
 	NEO4J_VCONTENTQUERY("Match (b:" + ReportEngineUtils.NEO4J_CONTENT_RESULT_LABEL
-					+ ") Where b.kpiId= :kpiId and b.executionId = :executionId RETURN b.inferenceText as Text"),
+					+ ") Where b.kpiId= :kpiId and b.executionId = :executionId RETURN b.inferenceText as Text ,b.contentId as contentId"),
 	ES_STANDARD(
 			" {\"size\": 400,\"sort\": [{ \"executionId\": \"desc\" }],\"query\": {\"bool\":{ \"must\":[{ \"match\":{ \"kpiId\":%kpiId% } },{ \"match\":{ \"executionId\":%executionId% } } ]}}}"),
 	ES_COMPARISON(

@@ -17,6 +17,8 @@ package com.cognizant.devops.platformdal.dataArchivalConfig;
 
 import java.util.List;
 
+import javax.persistence.NoResultException;
+
 import org.hibernate.query.Query;
 
 import com.cognizant.devops.platformcommons.core.enums.DataArchivalStatus;
@@ -146,14 +148,18 @@ public class DataArchivalConfigDal extends BaseDAL {
 		Query<InsightsDataArchivalConfig> createQuery = getSession().createQuery("FROM InsightsDataArchivalConfig DA WHERE "
 				+ "DA.archivalName = :archivalName",InsightsDataArchivalConfig.class);
 		createQuery.setParameter("archivalName", archivalName);
-		InsightsDataArchivalConfig updateSourceUrl = createQuery.getSingleResult();
-		updateSourceUrl.setSourceUrl(sourceUrl);
-		updateSourceUrl.setStatus(DataArchivalStatus.ACTIVE.name());
-		getSession().beginTransaction();
-		getSession().update(updateSourceUrl);
-		getSession().getTransaction().commit();
-		terminateSession();
-		terminateSessionFactory();
+		InsightsDataArchivalConfig updateSourceUrl = createQuery.uniqueResult();
+		if (updateSourceUrl != null) {
+			updateSourceUrl.setSourceUrl(sourceUrl);
+			updateSourceUrl.setStatus(DataArchivalStatus.ACTIVE.name());
+			getSession().beginTransaction();
+			getSession().update(updateSourceUrl);
+			getSession().getTransaction().commit();
+			terminateSession();
+			terminateSessionFactory();
+		} else {
+			throw new NoResultException("No entity result found for query");
+		}
 		return Boolean.TRUE;
 	}
 

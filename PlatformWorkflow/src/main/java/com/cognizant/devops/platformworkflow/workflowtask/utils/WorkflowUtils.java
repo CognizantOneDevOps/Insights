@@ -37,6 +37,8 @@ public class WorkflowUtils {
 
 	public static final String RETRY_JSON_PROPERTY = "isWorkflowTaskRetry";
 
+	public static final String EXECUTION_HISTORY_JOSN_PROPERTY = "exectionHistoryId";
+
 	public static Map<String, Object> convertJsonObjectToMap(String json) {
 		ObjectMapper oMapper = new ObjectMapper();
 		@SuppressWarnings("unchecked")

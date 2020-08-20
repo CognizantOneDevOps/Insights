@@ -66,8 +66,16 @@ public class AssessmentReportsTestData {
 	String taskPDFExecution = "{\"description\":\"TEST.REPORT_PDF_Execute\",\"mqChannel\":\"TEST.WORKFLOW.TASK.PDF.EXCECUTION\",\"componentName\":\"com.cognizant.devops.platformreports.assessment.core.PDFExecutionSubscriber\",\"dependency\":2,\"workflowType\":\"Report\"}";
 	String taskEmailExecution = "{\"description\":\"TEST.REPORT_EMAIL_Execute\",\"mqChannel\":\"TEST.WORKFLOW.TASK.EMAIL.EXCECUTION\",\"componentName\":\"com.cognizant.devops.platformreports.assessment.core.ReportEmailSubscriber\",\"dependency\":3,\"workflowType\":\"Report\"}";
 	
+	String reportTemplatekpi = "{\"reportId\":\"111605\",\"reportName\":\"Testing_fail\",\"description\":\"Testing\",\"isActive\":true,\"file\":\"REPORT_JENKINS_TEST\",\"kpiConfigs\":[{\"kpiId\":100127,\"visualizationConfigs\":[{\"vType\":\"mscolumn2d_100127\",\"vQuery\":\"MATCH (n:KPI:RESULTS) where n.reportId = 602 and n.kpiId=127 RETURN n.SPKendTime as SPKendTime , n.MaxBuildTime as MaxBuildTime LIMIT 5\"}]}]}";
+	String reportTemplatekpis = "{\"reportId\":\"111606\",\"reportName\":\"Testing_fail_queries\",\"description\":\"Testing_queries\",\"isActive\":true,\"file\":\"\",\"kpiConfigs\":[{\"kpiId\":100161,\"visualizationConfigs\":[{\"vType\":\"100161_line\",\"vQuery\":\"\"}]},{\"kpiId\":100153,\"visualizationConfigs\":[{\"vType\":\"100153_line\",\"vQuery\":\"\"}]}]}";
+
+	JsonObject reportTemplateJson = new JsonParser().parse(reportTemplatekpi).getAsJsonObject();
+	JsonObject reportTemplateKpisJson = new JsonParser().parse(reportTemplatekpis).getAsJsonObject();
+
 	String assessmentReport = "{\"reportName\":\"report_test100021547\",\"reportTemplate\":300600,\"emailList\":\"abc@abc.com\",\"schedule\":\"BI_WEEKLY_SPRINT\",\"startdate\":\"2020-05-12T00:00:00Z\",\"isReoccuring\":true,\"datasource\":\"\"}";
 	String assessmentReportFail = "{\"reportName\":\"report_test_Sonar100064032\",\"reportTemplate\":300603,\"emailList\":\"abc@abc.com\",\"schedule\":\"QUARTERLY\",\"startdate\":null,\"isReoccuring\":true,\"datasource\":\"\"}";
+	String assessmentReportWrongkpi = "{\"reportName\":\"report_test_10083556935\",\"reportTemplate\":111605,\"emailList\":\"abc@abc.com\",\"schedule\":\"MONTHLY\",\"startdate\":null,\"isReoccuring\":true,\"datasource\":\"\"}";
+	String assessmentReportWrongkpis = "{\"reportName\":\"report_test_10083563542\",\"reportTemplate\":111606,\"emailList\":\"abc@abc.com\",\"schedule\":\"MONTHLY\",\"startdate\":null,\"isReoccuring\":true,\"datasource\":\"\"}";
 
 	String mqChannelKpiExecution = "TEST.WORKFLOW.TASK.KPI.EXCECUTION";
 	String mqChannelPDFExecution = "TEST.WORKFLOW.TASK.PDF.EXCECUTION";
@@ -75,11 +83,16 @@ public class AssessmentReportsTestData {
 
 	public static String workflowIdProd = WorkflowTaskEnum.WorkflowType.REPORT.getValue() + "_" + "10000567276";
 	public static String workflowIdFail = WorkflowTaskEnum.WorkflowType.REPORT.getValue() + "_" + "10000640327";
+	public static String workflowIdWrongkpi = WorkflowTaskEnum.WorkflowType.REPORT.getValue() + "_" + "10000835535";
+	public static String workflowIdWrongkpis = WorkflowTaskEnum.WorkflowType.REPORT.getValue() + "_" + "1000083563542";
 
 	public static long nextRunDaily;
 	public static long nextRunBiWeekly;
 	
-	String query = "MATCH (n:SONAR:DATA) where n.SPKstartTime > 1593561600 and n.SPKstartTime < 1596239999 and n.SPKstatus='Success' RETURN  COALESCE(Avg(toInt(n.SPKcomplexity)),0) as AvgComplexityCoverage";
+	String querySonar = "MATCH (n:SONAR:DATA) where n.SPKstartTime > 1593561600 and n.SPKstartTime < 1596239999 and n.SPKstatus='Success' RETURN  COALESCE(Avg(toInt(n.SPKcomplexity)),0) as AvgComplexityCoverage";
+	String queryJira = "MATCH (n:JIRA:DATA) WHERE n.SPKstartTime > 1593561600 and n.SPKstartTime < 1596239999 and n.SPKissueType='Bug' and n.SPKstatus='Closed'  RETURN count(n) as ClosedDefect" ;
+	String queryJenkins = "MATCH (n:JENKINS:DATA) WHERE n.SPKstartTime > 1593561600 and n.SPKstartTime < 1596239999 and n.SPKvector = 'BUILD' and n.SPKstatus='Success' RETURN COALESCE(Max(toInt(n.SPKduration)),0) as MaxBuildTime";
+	String queryJiraAvg = "MATCH (n:JIRA:DATA) WHERE n.SPKstartTime > 1593561600 and n.SPKstartTime < 1596239999 and n.SPKissueType='Bug' and n.SPKstatus='Closed'  RETURN COALESCE(Avg(toInt(n.SPKduration)),0) as AvgDefectCompletionTime";
 	
 	public static List<Integer> reportIdList = new ArrayList<Integer>();
 	public static List<Integer> taskidList = new ArrayList<Integer>();
@@ -425,5 +438,9 @@ public class AssessmentReportsTestData {
 		reportConfigDAL.deleteAssessmentReport(id);
 	}
 	
-	
+	public void updateCorrectKpiQuery(int kpiId, String query) {
+		InsightsKPIConfig existingConfig = reportConfigDAL.getKPIConfig(kpiId);
+		existingConfig.setdBQuery(query);
+		reportConfigDAL.updateKpiConfig(existingConfig);
+	}
 }

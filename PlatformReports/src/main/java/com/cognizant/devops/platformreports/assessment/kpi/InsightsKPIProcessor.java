@@ -86,11 +86,13 @@ public class InsightsKPIProcessor {
 					|| kpiDefinition.getCategory().equals(ContentCategory.MINMAX.name())) {
 				getQueryBySchedule(startDate, kpiDefinition.getSchedule(), noOfDays, graphQuery, endDate,
 						queryModelList);
-
 			} else {
 				getQueryWithScheduleDates(kpiDefinition.getNextRunTime(), kpiDefinition.getSchedule(), graphQuery, 0,
 						queryModelList);
 			}
+
+			log.debug("Worlflow Detail ====  In processKPI for kpiId {} category {} queryModelList {}",
+					kpiDefinition.getKpiId(), kpiDefinition.getCategory(), queryModelList.size());
 
 			for (QueryModel model : queryModelList) {
 				listOfResultJson.addAll(kPIQueryDataHandler.fetchKPIData(model.getQuery(), kpiDefinition, model));
@@ -99,17 +101,17 @@ public class InsightsKPIProcessor {
 			ReportDataHandler kPIResultDataHandler = ReportDataHandlerFactory
 					.getDataSource(ApplicationConfigProvider.getInstance().getAssessmentReport().getOutputDatasource());
 
-			log.debug(" Number of record fetch against kpi Id {} is {}", kpiDefinition.getKpiId(),
+			log.debug("Worlflow Detail ====  Number of record fetch against kpi Id {} is {}", kpiDefinition.getKpiId(),
 					listOfResultJson.size());
 			if (!listOfResultJson.isEmpty()) {
 				kPIResultDataHandler.saveData(listOfResultJson);
 			} else {
-				log.error(" No result to store in neo4j for job : {} ", kpiConfigDTO.getKpiId());
+				log.error("Worlflow Detail ====  No result to store in neo4j for job : {} ", kpiConfigDTO.getKpiId());
 				return ReportEngineEnum.StatusCode.NO_DATA.getValue();
 			}
 
 		} catch (Exception e) {
-			log.error("Some calculation job failed for kpiID - " + kpiDefinition.getKpiId(), e);
+			log.error("Worlflow Detail ==== Some calculation job failed for kpiID - " + kpiDefinition.getKpiId(), e);
 			throw new InsightsJobFailedException("Something went wrong with KPI query execution " + e.getMessage());
 		}
 		return ReportEngineEnum.StatusCode.SUCCESS.getValue();
@@ -182,6 +184,5 @@ public class InsightsKPIProcessor {
 
 			}
 		}
-
 	}
 }

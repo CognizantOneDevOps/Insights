@@ -28,11 +28,9 @@ import com.cognizant.devops.engines.platformdataarchivalengine.message.subscribe
 import com.cognizant.devops.engines.platformdataarchivalengine.message.subscriber.DataArchivalHealthSubscriber;
 import com.cognizant.devops.engines.platformengine.message.core.EngineStatusLogger;
 import com.cognizant.devops.engines.platformengine.message.factory.EngineSubscriberResponseHandler;
-import com.cognizant.devops.engines.platformengine.message.subscriber.AgentHealthSubscriber;
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.constants.DataArchivalConstants;
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
-import com.cognizant.devops.platformcommons.dal.neo4j.Neo4jDBHandler;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformdal.agentConfig.AgentConfig;
 import com.cognizant.devops.platformdal.agentConfig.AgentConfigDAL;
@@ -40,9 +38,8 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
 public class DataArchivalAggregatorModule extends TimerTask {
-	private static Logger log = LogManager.getLogger(DataArchivalAggregatorModule.class.getName());
-	private static Map<String, EngineSubscriberResponseHandler> registry = new HashMap<String, EngineSubscriberResponseHandler>();
-	Neo4jDBHandler neo4jDBHandler = new Neo4jDBHandler();
+	private static Logger log = LogManager.getLogger(DataArchivalAggregatorModule.class);
+	private static Map<String, EngineSubscriberResponseHandler> registry = new HashMap<>();
 	AgentConfigDAL agentConfigDAL = new AgentConfigDAL();
 
 	@Override
@@ -50,63 +47,59 @@ public class DataArchivalAggregatorModule extends TimerTask {
 		log.debug("Data Archival Aggregator Module start");
 		ApplicationConfigProvider.performSystemCheck();
 		try {
-		List<AgentConfig> agentConfig = agentConfigDAL.getAgentConfigurations(DataArchivalConstants.toolName, DataArchivalConstants.toolCategory);
-		if(!agentConfig.isEmpty()) {
-		registerAggregator(agentConfig.get(0));
-		}
-		else {
-			throw new InsightsCustomException("Data archival agent not present.");
-		}
-		}catch(Exception e) {
-			log.error("Error running Data Archival Aggregator.{}",e);
+			List<AgentConfig> agentConfig = agentConfigDAL.getAgentConfigurations(DataArchivalConstants.TOOLNAME,
+					DataArchivalConstants.TOOLCATEGORY);
+			if (!agentConfig.isEmpty()) {
+				JsonObject config = (JsonObject) new JsonParser().parse(agentConfig.get(0).getAgentJson());
+				JsonObject publishJson = config.get("publish").getAsJsonObject();
+				String dataRoutingKey = publishJson.get("data").getAsString();
+				registerDataAggregator(dataRoutingKey);
+				String healthRoutingKey = publishJson.get("health").getAsString();
+				registerHealthAggregator(healthRoutingKey);
+			} else {
+				throw new InsightsCustomException("Data archival agent not present.");
+			}
+		} catch (Exception e) {
+			log.error("Unable to add subscriber ", e);
+			EngineStatusLogger.getInstance().createDataArchivalStatusNode(
+					" Error occured while executing aggregator  " + e.getMessage(), PlatformServiceConstants.FAILURE);
 		}
 
 	}
 
-	private void registerAggregator(AgentConfig agentConfig) {
-		try {
-			JsonObject config = (JsonObject) new JsonParser().parse(agentConfig.getAgentJson());
-			JsonObject publishJson = config.get("publish").getAsJsonObject();
-			String dataRoutingKey = publishJson.get("data").getAsString();
-			if (dataRoutingKey != null && !registry.containsKey(dataRoutingKey)) {
-				try {
-					registry.put(dataRoutingKey, new DataArchivalDataSubscriber(dataRoutingKey));
-				} catch (Exception e) {
-					log.error("Unable to add subscriber for routing key: " + dataRoutingKey, e);
-					EngineStatusLogger.getInstance().createDataArchivalStatusNode(
-							" Error occured while executing aggragator for data queue subscriber " + e.getMessage(),
-							PlatformServiceConstants.FAILURE);
-				}
+	private void registerDataAggregator(String dataRoutingKey) {
+
+		if (dataRoutingKey != null && !registry.containsKey(dataRoutingKey)) {
+			try {
+				registry.put(dataRoutingKey, new DataArchivalDataSubscriber(dataRoutingKey));
 				EngineStatusLogger.getInstance().createDataArchivalStatusNode(
 						" Data archival data queue " + dataRoutingKey + " subscribed successfully ",
 						PlatformServiceConstants.SUCCESS);
-			} else if (registry.containsKey(dataRoutingKey)) {
-				DataArchivalDataSubscriber dataSubscriber = (DataArchivalDataSubscriber) registry.get(dataRoutingKey);
+			} catch (Exception e) {
+				log.error("Unable to add subscriber for routing key: " + dataRoutingKey, e);
+				EngineStatusLogger.getInstance().createDataArchivalStatusNode(
+						" Error occured while executing aggragator for data queue subscriber " + e.getMessage(),
+						PlatformServiceConstants.FAILURE);
 			}
-			
-			String healthRoutingKey = publishJson.get("health").getAsString();
-			if (healthRoutingKey != null && !registry.containsKey(healthRoutingKey)) {
-				// Make sure that default health node is initialized
-				String nodeLabels = ":LATEST:" + healthRoutingKey.replace(".", ":");
-				try {
-					neo4jDBHandler.executeCypherQuery("MERGE (n" + nodeLabels + ") return n");
-					registry.put(healthRoutingKey, new DataArchivalHealthSubscriber(healthRoutingKey));
-				} catch (Exception e) {
-					log.error("Unable to add subscriber for routing key: " + healthRoutingKey, e);
-					EngineStatusLogger.getInstance().createDataArchivalStatusNode(
-							" Error occured while executing aggregator for Data archival health queue subscriber  " + e.getMessage(),
-							PlatformServiceConstants.FAILURE);
-				}
+		}
+	}
+
+	private void registerHealthAggregator(String healthRoutingKey) {
+
+		if (healthRoutingKey != null && !registry.containsKey(healthRoutingKey)) {
+			try {
+				registry.put(healthRoutingKey, new DataArchivalHealthSubscriber(healthRoutingKey));
 				EngineStatusLogger.getInstance().createDataArchivalStatusNode(
 						" Data Archival Agent health queue " + healthRoutingKey + " subscribed successfully ",
 						PlatformServiceConstants.SUCCESS);
+			} catch (Exception e) {
+				log.error("Unable to add subscriber for routing key: " + healthRoutingKey, e);
+				EngineStatusLogger.getInstance().createDataArchivalStatusNode(
+						" Error occured while executing aggregator for Data archival health queue subscriber  "
+								+ e.getMessage(),
+						PlatformServiceConstants.FAILURE);
 			}
-		} catch (Exception e) {
-			log.error("Unable to add subscriber for routing key: " + agentConfig.getAgentKey(), e);
-			EngineStatusLogger.getInstance().createDataArchivalStatusNode(
-					" Error occured while executing aggragator  " + agentConfig.getAgentKey() + e.getMessage(),
-					PlatformServiceConstants.FAILURE);
 		}
-
 	}
+
 }

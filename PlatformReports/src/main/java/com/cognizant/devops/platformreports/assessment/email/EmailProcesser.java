@@ -112,6 +112,7 @@ public class EmailProcesser implements Callable<JsonObject> {
 					"<p>\n" + "** This is an Auto Generated Mail by Insights scheduler. Please Do not reply to this mail**</p>");
 			Multipart multipart = new MimeMultipart();
 			// Create the attachment part
+			log.debug("Workflow Detail ==== Attaching file from {} ", mail.getReportFilePath());
 			BodyPart messageBodyPart = new MimeBodyPart();
 			((MimeBodyPart) messageBodyPart).attachFile(mail.getReportFilePath());
 			multipart.addBodyPart(messageBodyPart);//

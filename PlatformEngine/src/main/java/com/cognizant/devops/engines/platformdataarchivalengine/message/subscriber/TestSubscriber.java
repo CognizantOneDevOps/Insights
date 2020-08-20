@@ -16,12 +16,8 @@
 package com.cognizant.devops.engines.platformdataarchivalengine.message.subscriber;
 
 import java.io.IOException;
-import java.sql.Timestamp;
-import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.concurrent.TimeoutException;
 
-import com.cognizant.devops.engines.platformengine.message.factory.MessagePublisherFactory;
 import com.cognizant.devops.platformcommons.config.ApplicationConfigCache;
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.config.MessageQueueDataModel;
@@ -40,9 +36,9 @@ public class TestSubscriber {
 			ApplicationConfigCache.loadConfigCache();
 			ApplicationConfigProvider.performSystemCheck();
 			TestSubscriber obj = new TestSubscriber();
-			//AgentConfigDAL agentConfigDAL = new AgentConfigDAL();
+			AgentConfigDAL agentConfigDAL = new AgentConfigDAL();
 			//DataArchivalDataSubscriber sb = new DataArchivalDataSubscriber("SYSTEM.DATAARCHIVAL.DATA");
-//			String configDetails = "{\"mqConfig\":{\"user\":\"iSight\",\"password\":\"iSight\",\"host\":\"127.0.0.1\",\"exchange\":\"iSight\",\"agentControlXchg\":\"iAgent\"},\"subscribe\":{\"config\":\"SYSTEM.DATAARCHIVAL.CONFIG\",\"agentCtrlQueue\":\"Archival_agent_test\",\"dataArchivalQueue\":\"SYSTEM.DATAARCHIVAL.CONFIG\"},\"publish\":{\"data\":\"SYSTEM.DATAARCHIVAL.DATA\",\"health\":\"SYSTEM.DATAARCHIVAL.HEALTH\"},\"agentId\":\"Archival_agent_test\",\"toolCategory\":\"SYSTEM\",\"toolsTimeZone\":\"GMT\",\"insightsTimeZone\":\"Asia/Kolkata\",\"startFrom\":\"2017-10-01 00:00:01\",\"isDebugAllowed\":false,\"loggingSetting\":{\"logLevel\":\"WARN\",\"maxBytes\":5000000,\"backupCount\":1000},\"osversion\":\"windows\",\"agentVersion\":\"v6.8\",\"toolName\":\"dataarchival\",\"labelName\":\"DATAARCHIVAL\"}";
+//			String configDetails = "{\"mqConfig\":{\"user\":\"iSight\",\"password\":\"iSight\",\"host\":\"127.0.0.1\",\"exchange\":\"iSight\",\"agentControlXchg\":\"iAgent\"},\"subscribe\":{\"config\":\"SYSTEM.ELASTICTRANSFER.CONFIG\",\"agentCtrlQueue\":\"Elastic_transfer_agent_test\",\"dataArchivalQueue\":\"SYSTEM.ELASTICTRANSFER.CONFIG\"},\"publish\":{\"data\":\"SYSTEM.ELASTICTRANSFER.DATA\",\"health\":\"SYSTEM.ELASTICTRANSFER.HEALTH\"},\"agentId\":\"Elastic_transfer_agent_test\",\"toolCategory\":\"SYSTEM\",\"toolsTimeZone\":\"GMT\",\"insightsTimeZone\":\"Asia/Kolkata\",\"startFrom\":\"2017-10-01 00:00:01\",\"isDebugAllowed\":false,\"loggingSetting\":{\"logLevel\":\"WARN\",\"maxBytes\":5000000,\"backupCount\":1000},\"osversion\":\"windows\",\"agentVersion\":\"v6.8\",\"toolName\":\"ELASTICTRANSFER\",\"labelName\":\"ELASTICTRANSFER\"}";
 //			JsonObject agentJson = convertStringIntoJson(configDetails);
 //			String trackingDetails = "";
 //			Date updateDate = Timestamp.valueOf(LocalDateTime.now());
@@ -50,7 +46,12 @@ public class TestSubscriber {
 //			Boolean status = agentConfigDAL.saveAgentConfigFromUI(agentJson.get("agentId").getAsString(), agentJson.get("toolCategory").getAsString(),agentJson.get("labelName").getAsString(), agentJson.get("toolName").getAsString(),
 //					agentJson, agentJson.get("agentVersion").getAsString(), agentJson.get("osversion").getAsString(), updateDate, vault);
 //			System.out.println("Status:"+status);
-			obj.publishDataArchivalDetails("SYSTEM.DATATRANSFER.DATA", "{\"archivalName\":\"Test_1\",\"sourceUrl\":\"http://10.224.86.168:7575\"}");
+			obj.publishDataArchivalDetails("SYSTEM.ELASTICTRANSFER.DATA", "{\"archivalName\":\"Archive_1\",\"sourceUrl\":\"http://10.224.86.168:7575\"}");
+			obj.publishDataArchivalDetails("SYSTEM.ELASTICTRANSFER.DATA", "{\"archivalName\":\"Archive_2\",\"sourceUrl\":\"http://10.224.86.168:7575\"}");
+			//obj.publishDataArchivalDetails("SYSTEM.ELASTICTRANSFER.DATA", "{\"archivalName\":\"Archive_3\",\"sourceUrl\":\"http://10.224.86.168:7575\"}");
+			//obj.publishDataArchivalDetails("SYSTEM.ELASTICTRANSFER.DATA", "{\"archivalName\":\"Archive_4\",\"sourceUrl\":\"http://10.224.86.168:7575\"}");
+			obj.publishDataArchivalDetails("SYSTEM.ELASTICTRANSFER.HEALTH", "[{\"inSightsTime\": 1596177570.931, \"status\": \"failure\", \"execId\": \"96a32c9e-d2f8-11ea-83ef-005056955e95\", \"categoryName\": \"SYSTEM\", \"executionTime\": 9, \"inSightsTimeX\": \"2020-07-31T06:39:30Z\", \"toolName\": \"ELASTICTRANSFER\", \"message\": \"Error occurred: unsupported operand type(s) for +: 'NoneType' and 'str'\", \"agentId\": \"Elastic_transfer_agent_test\"}]");
+			obj.publishDataArchivalDetails("SYSTEM.ELASTICTRANSFER.HEALTH", "[{\"inSightsTime\": 1596177570.931, \"status\": \"success\", \"execId\": \"96a32c9e-d2f8-11ea-83ef-005056955e99\", \"categoryName\": \"SYSTEM\", \"executionTime\": 9, \"inSightsTimeX\": \"2020-07-31T06:39:30Z\", \"toolName\": \"ELASTICTRANSFER\", \"message\": \"Success message\", \"agentId\": \"Elastic_transfer_agent_test\"}]");
 		} catch (Exception e) {
 			//System.out.println("Error:"+e);
 		}

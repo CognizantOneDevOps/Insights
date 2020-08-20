@@ -48,6 +48,7 @@ td.mat-cell, td.mat-footer-cell, th.mat-header-cell {
     font-size: 12px !important;
     letter-spacing: .010em;
     text-align: left;
+    padding-left:10px;
 }
 
 ul {
@@ -94,7 +95,7 @@ li:last-child {
     margin: 0px;
     letter-spacing: .010em;
     line-height: 1.2em;
-    text-align: center !important;
+    text-align: center;
     width: 165px !important;
 }
 
@@ -158,4 +159,10 @@ li:last-child {
 
 ::ng-deep.mat-paginator-container {
     min-height: 48px !important;
+}
+
+.cellCss{
+    padding-top:2px;
+    padding-bottom:2px;
+    padding-left:10px
 }

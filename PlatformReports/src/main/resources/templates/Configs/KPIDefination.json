@@ -209,28 +209,6 @@
       "resultField":"totalDeploymentCount"
    },
    {
-      "kpiId":243,
-      "name":"Maximum Deployment Time",
-      "group":"DEPLOYMENT",
-      "category":"COMPARISON",
-      "toolName":"RUNDECK",
-      "DBQuery":"MATCH (n:RUNDECK:DATA) WHERE n.SPKstartTime > {startTime} and n.SPKstartTime < {endTime} and  n.SPKvector = 'DEPLOYMENT' and n.SPKstatus='Success' RETURN COALESCE(Max(toInt(n.SPKduration)),0) as MaxDeploymentTime",
-      "datasource":"NEO4J",
-      "isActive":true,
-      "resultField":"MaxDeploymentTime"
-   },
-   {
-      "kpiId":244,
-      "name":"Maximum Deployment Time",
-      "group":"DEPLOYMENT",
-      "toolName":"RUNDECK",
-      "category":"STANDARD",
-      "DBQuery":"MATCH (n:RUNDECK:DATA) WHERE n.SPKstartTime > {startTime} and n.SPKstartTime < {endTime} and  n.SPKvector = 'DEPLOYMENT' and n.SPKstatus='Success' RETURN COALESCE(Max(toInt(n.SPKduration)),0) as MaxDeploymentTime",
-      "datasource":"NEO4J",
-      "isActive":true,
-      "resultField":"MaxDeploymentTime"
-   },
-   {
       "kpiId":142,
       "name":"Total Successful Deployments",
       "group":"DEPLOYMENT",
@@ -251,6 +229,28 @@
       "datasource":"NEO4J",
       "isActive":true,
       "resultField":"totalDeploymentCount"
+   },
+   {
+      "kpiId":243,
+      "name":"Maximum Deployment Time",
+      "group":"DEPLOYMENT",
+      "category":"COMPARISON",
+      "toolName":"RUNDECK",
+      "DBQuery":"MATCH (n:RUNDECK:DATA) WHERE n.SPKstartTime > {startTime} and n.SPKstartTime < {endTime} and  n.SPKvector = 'DEPLOYMENT' and n.SPKstatus='Success' RETURN COALESCE(Max(toInt(n.SPKduration)),0) as MaxDeploymentTime",
+      "datasource":"NEO4J",
+      "isActive":true,
+      "resultField":"MaxDeploymentTime"
+   },
+   {
+      "kpiId":244,
+      "name":"Maximum Deployment Time",
+      "group":"DEPLOYMENT",
+      "toolName":"RUNDECK",
+      "category":"STANDARD",
+      "DBQuery":"MATCH (n:RUNDECK:DATA) WHERE n.SPKstartTime > {startTime} and n.SPKstartTime < {endTime} and  n.SPKvector = 'DEPLOYMENT' and n.SPKstatus='Success' RETURN COALESCE(Max(toInt(n.SPKduration)),0) as MaxDeploymentTime",
+      "datasource":"NEO4J",
+      "isActive":true,
+      "resultField":"MaxDeploymentTime"
    },
    {
       "kpiId":144,
@@ -563,5 +563,16 @@
       "datasource":"NEO4J",
       "isActive":true,
       "resultField":"AvgDefectCompletionTime"
+   },
+   {
+      "kpiId":901,
+      "name":"Average Code Issues in Deployment",
+      "group":"CODEQUALITY",
+      "category":"THRESHOLD",
+      "toolName":"SONAR",
+      "DBQuery":"MATCH (n:SONAR:DATA) WHERE  n.SPKstartTime > {startTime} and n.SPKstartTime < {endTime} and n.SPKvector = 'CODEQUALITY' with n where n.SPKstatus='Success'  RETURN  toInt(ROUND(Avg(n.SPKbugs))) as Bugs , toInt(ROUND(Avg(n.SPKcodeSmellsStr))) as CodeSmell, toInt(ROUND(Avg(n.SPKVulnerabilitiesStr))) as Vulnerablilities",
+      "datasource":"NEO4J",
+      "isActive":true,
+      "resultField":"CodeSmell"
    }
 ]

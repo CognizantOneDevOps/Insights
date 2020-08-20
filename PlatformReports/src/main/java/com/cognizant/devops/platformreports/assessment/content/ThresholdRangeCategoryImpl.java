@@ -87,7 +87,6 @@ public class ThresholdRangeCategoryImpl extends BaseContentCategoryImpl {
 		if (contentConfigDefinition.getThresholds() != null) {
 			try {
 
-				
 				InsightsKPIResultDetails resultDetailObj = inferenceResults.get(0);
 				Map<String, Object> zoneWiseCountWithSentiment = getZoneWiseCountWithSentiment(inferenceResults);
 				Map<String, Object> resultValuesMap = new HashMap<>();
@@ -153,8 +152,7 @@ public class ThresholdRangeCategoryImpl extends BaseContentCategoryImpl {
 		String zone="green";
 		ReportEngineEnum.KPISentiment sentiment = ReportEngineEnum.KPISentiment.NEUTRAL;
 		HashMap<String,Integer> zonesMap = new HashMap<>();
-		InsightsKPIResultDetails resultDetailObj = inferenceResults.get(0);
-		String comparisonField = resultDetailObj.getResultField();
+		String comparisonField = getResultFieldFromContentDefination();
 		JsonObject thresholdObjs = jsonParser.parse(String.valueOf(contentConfigDefinition.getThresholds()))
 				.getAsJsonObject();
 		double amberThreshold = thresholdObjs.get("amber").getAsDouble();

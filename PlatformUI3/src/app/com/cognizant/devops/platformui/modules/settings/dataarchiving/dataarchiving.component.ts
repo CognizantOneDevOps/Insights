@@ -157,13 +157,11 @@ export class DataArchivingComponent implements OnInit {
     this.archiveList = [];
     this.archiveList = await self.dataArchivingService.listArchivedRecord();
     if (this.archiveList != null && this.archiveList.status == 'success') {
-      console.log(this.archiveList);
       this.archivalDatasource.data = this.archiveList.data.sort(
         (a, b) => a.archivalName > b.archivalName
       );
       this.archivedRecordDetailData.data = this.archiveList.data;
       this.archivalDatasource.paginator = this.paginator;
-      console.log(this.archivalDatasource.data);
       this.count = 0;
       this.containerCount = 0;
       self.showDetail = true;
@@ -211,7 +209,6 @@ export class DataArchivingComponent implements OnInit {
       this.archivalDatasource.data.forEach(element => {
         this.clicked.push(true);
       });
-      console.log(this.containerCount);
       this.displayedColumns = [
         'radio',
         'ArchivalName',
@@ -264,9 +261,6 @@ export class DataArchivingComponent implements OnInit {
     this.showDetail = false;
     var archiveAPIRequestJson = {};
     if (this.actionType == 'save') {
-      console.log(
-        self.archivalName + this.startDate + this.endDate + this.noOfDays
-      );
       archiveAPIRequestJson['archivalName'] = self.archivalName;
       archiveAPIRequestJson['startDate'] = self.startDate;
       archiveAPIRequestJson['endDate'] = self.endDate;
@@ -289,7 +283,6 @@ export class DataArchivingComponent implements OnInit {
           this.dataArchivingService
             .saveArchivalRecord(JSON.stringify(archiveAPIRequestJson))
             .then(function(response) {
-              console.log("Reponse:",response);
               if (response.status == 'success') {
                 self.messageDialog.showApplicationsMessage(
                   '<b>' +
@@ -299,7 +292,7 @@ export class DataArchivingComponent implements OnInit {
                 );
                 self.getExistingArchivedData();
                 self.refresh();
-                this.showDetail = true;
+                self.showDetail = true;
               } else if (response.message === 'Archival Name already exists.') {
                 self.messageDialog.showApplicationsMessage(
                   '<b>' +

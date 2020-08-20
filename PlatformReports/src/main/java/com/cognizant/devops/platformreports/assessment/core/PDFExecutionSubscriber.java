@@ -63,13 +63,14 @@ public class PDFExecutionSubscriber extends WorkflowTaskSubscriberHandler {
 			JsonObject incomingTaskMessageJson = new JsonParser().parse(incomingTaskMessage).getAsJsonObject();
 			prepareVisualizationJsonBasedOnKPIResult(incomingTaskMessageJson);
 			processVisualizationJson();
-
+			log.debug("Worlflow Detail ==== PDFExecutionSubscriber Completed  {} ", incomingTaskMessage);
 		} catch (InsightsJobFailedException ijfe) {
+			log.error("Worlflow Detail ==== PDFExecutionSubscriber Completed with error {}", ijfe);
 			statusLog=ijfe.getMessage();
 			throw ijfe;
 		} catch (Exception e) {
-			log.error(e);
-
+			log.error("Worlflow Detail ==== PDFExecutionSubscriber Completed with error {}", e);
+			throw new InsightsJobFailedException(e.getMessage());
 		}
 	}
 

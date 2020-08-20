@@ -28,6 +28,7 @@ import com.cognizant.devops.platformcommons.core.enums.WorkflowTaskEnum;
 import com.cognizant.devops.platformdal.workflow.InsightsWorkflowConfiguration;
 import com.cognizant.devops.platformdal.workflow.InsightsWorkflowTaskSequence;
 import com.cognizant.devops.platformworkflow.workflowtask.exception.WorkflowFailedTaskException;
+import com.cognizant.devops.platformworkflow.workflowtask.exception.WorkflowTaskInitializationException;
 import com.google.gson.JsonObject;
 
 public class WorkflowExecutor implements Job {
@@ -68,13 +69,14 @@ public class WorkflowExecutor implements Job {
 						firstworkflowTask.getWorkflowTaskEntity().getTaskId(), firstworkflowTask.getNextTask(),
 						firstworkflowTask.getSequence(), mqRequestJson);
 				try {
+					log.debug(" Worlflow Detail ==== before publish message executeWorkflow {} ", mqRequestJson);
 					workflowProcessing.publishMessageInMQ(firstworkflowTask.getWorkflowTaskEntity().getMqChannel(),
 							mqRequestJson);
-				} catch (WorkflowFailedTaskException e) {
+				} catch (WorkflowTaskInitializationException e) {
 					log.debug(" Worlflow Detail ====  workflow failed to execute due to MQ exception {}  ",
 							workflowConfig.getWorkflowId());
 					workflowProcessing.updateWorkflowDetails(workflowConfig.getWorkflowId(),
-							WorkflowTaskEnum.WorkflowStatus.RESTART.toString(), false);
+							WorkflowTaskEnum.WorkflowStatus.TASK_INITIALIZE_ERROR.toString(), false);
 				}
 			}
 

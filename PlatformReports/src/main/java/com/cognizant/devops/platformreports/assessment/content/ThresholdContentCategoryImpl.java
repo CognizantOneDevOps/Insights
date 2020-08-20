@@ -78,7 +78,7 @@ public class ThresholdContentCategoryImpl extends BaseContentCategoryImpl {
 	}
 
 	/**
-	 * Process KPI result to create content text using count method
+	 * Process KPI result to create content text using count and precentage method
 	 * 
 	 * @param inferenceResults
 	 * @return
@@ -96,7 +96,7 @@ public class ThresholdContentCategoryImpl extends BaseContentCategoryImpl {
 			String actaulDirection = "Neutral";
 			addTimeValueinResult(resultValuesMap, contentConfigDefinition.getSchedule());
 			for (InsightsKPIResultDetails inferenceResultDetails : inferenceResults) {
-				String comparisonField = inferenceResultDetails.getResultField();
+				String comparisonField = getResultFieldFromContentDefination();
 				Double currentValue = (Double) inferenceResultDetails.getResults().get(comparisonField);
 				if (currentValue < getContentConfig().getThreshold()) {
 					listBelow.add(inferenceResultDetails);
@@ -105,6 +105,9 @@ public class ThresholdContentCategoryImpl extends BaseContentCategoryImpl {
 				}
 			}
 
+			resultValuesMap.put("belowThresholdCount", listBelow.size());
+			resultValuesMap.put("aboveThresholdCount", listAbove.size());
+
 			if (getContentConfig().getDirectionOfThreshold() == ReportEngineEnum.DirectionOfThreshold.BELOW) {
 				result = String.valueOf(listBelow.size());
 				actaulDirection = listBelow.size() > listAbove.size() ? "Below" : "Above";
@@ -112,7 +115,6 @@ public class ThresholdContentCategoryImpl extends BaseContentCategoryImpl {
 					result = String.valueOf(listBelow.size() * 100 / inferenceResults.size());
 					actaulDirection = (listBelow.size() * 100 / inferenceResults.size() > (listAbove.size() * 100)
 							/ inferenceResults.size()) ? "Below" : "Above";
-					resultValuesMap.put("actualdirection", actaulDirection);
 				}
 				resultValuesMap.put("actualdirection", actaulDirection);
 
@@ -138,7 +140,6 @@ public class ThresholdContentCategoryImpl extends BaseContentCategoryImpl {
 			if (inferenceText != null) {
 				inferenceContentResult = setContentDetail(resultFirstData, resultValuesMap, sentiment, "",
 						inferenceText);
-
 			} else {
 				log.debug(" inference text is null in threshold KPIId {} contentId {} result {} ",
 						getContentConfig().getKpiId(), getContentConfig().getContentId(), resultFirstData);
@@ -163,8 +164,9 @@ public class ThresholdContentCategoryImpl extends BaseContentCategoryImpl {
 
 		Map<String, Object> resultValuesMap = new HashMap<>();
 		InsightsContentDetail inferenceContentResult = null;
-		String comparisonField = inferenceResults.get(0).getResultField();
+		String comparisonField = getResultFieldFromContentDefination();
 		InsightsKPIResultDetails resultDetailObj = inferenceResults.get(0);
+
 		ReportEngineEnum.KPISentiment sentiment = ReportEngineEnum.KPISentiment.NEUTRAL;
 		String actaulDirection = "Neutral";
 		Double avgValue = inferenceResults.stream()
@@ -180,6 +182,8 @@ public class ThresholdContentCategoryImpl extends BaseContentCategoryImpl {
 				? ReportEngineEnum.KPISentiment.POSITIVE
 				: ReportEngineEnum.KPISentiment.NEGATIVE;
     	resultValuesMap.put("actualdirection", actaulDirection);
+		resultValuesMap.put("result", avgValue);
+
 		addTimeValueinResult(resultValuesMap, contentConfigDefinition.getSchedule());
 		try {
 

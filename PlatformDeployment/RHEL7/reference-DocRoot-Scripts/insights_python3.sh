@@ -30,6 +30,6 @@ sudo make altinstall
 sudo rm -f /usr/bin/python
 sudo ln -s /opt/Python/python /usr/bin/python
 sudo python -m pip install pika==1.1.0
-sudo python -m pip install requests apscheduler python-dateutil xmltodict pytz requests_ntlm boto3
+sudo python -m pip install requests apscheduler python-dateutil xmltodict pytz requests_ntlm boto3 urllib3 neotime neo4j neobolt elasticsearch
 python --version
 sleep 5

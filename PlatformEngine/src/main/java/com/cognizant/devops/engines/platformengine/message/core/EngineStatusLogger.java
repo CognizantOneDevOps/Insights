@@ -22,10 +22,9 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.cognizant.devops.platformcommons.core.util.ComponentHealthLogger;
-import com.cognizant.devops.engines.platformengine.modules.users.EngineUsersModule;
 
 public class EngineStatusLogger extends ComponentHealthLogger {
-	private static Logger log = LogManager.getLogger(EngineUsersModule.class.getName());
+	private static Logger log = LogManager.getLogger(EngineStatusLogger.class);
 	static EngineStatusLogger instance = null;
 
 	private EngineStatusLogger() {
@@ -40,51 +39,54 @@ public class EngineStatusLogger extends ComponentHealthLogger {
 	}
 
 	public boolean createEngineStatusNode(String message, String status) {
-	try {
+		try {
 			String version = "";
 			version = EngineStatusLogger.class.getPackage().getImplementationVersion();
-			log.debug(" Engine version " + version);
-			Map<String, String> extraParameter = new HashMap<String, String>(0);
+			log.debug(" Engine version for createEngineStatusNode {} ", version);
+			Map<String, String> extraParameter = new HashMap<>(0);
 			createComponentStatusNode("HEALTH:ENGINE", version, message, status, extraParameter);
 		} catch (Exception e) {
-			log.error(" Unable to create node " + e.getMessage());
+			log.error(" Unable to create node {} ", e.getMessage());
 		}
 		return Boolean.TRUE;
 	}
+
 	public boolean createDataArchivalStatusNode(String message, String status) {
-	try {
+		try {
 			String version = "";
 			version = EngineStatusLogger.class.getPackage().getImplementationVersion();
-			log.debug(" Engine version " + version);
-			Map<String, String> extraParameter = new HashMap<String, String>(0);
-			createComponentStatusNode("HEALTH:DATAARCHIVAL", version, message, status, extraParameter);
+			log.debug(" Engine version for createDataArchivalStatusNode {} ", version);
+			Map<String, String> extraParameter = new HashMap<>(0);
+			createComponentStatusNode("HEALTH:DATAARCHIVALENGINE", version, message, status, extraParameter);
 		} catch (Exception e) {
-			log.error(" Unable to create node " + e.getMessage());
+			log.error(" Unable to create node {}", e.getMessage());
 		}
 		return Boolean.TRUE;
 	}
+
 	public boolean createWebhookEngineStatusNode(String message, String status) {
 		try {
-				String version = "";
-				version = EngineStatusLogger.class.getPackage().getImplementationVersion();
-				log.debug(" Engine version " + version);
-				Map<String, String> extraParameter = new HashMap<String, String>(0);
-				createComponentStatusNode("HEALTH:WEBHOOKENGINE", version, message, status, extraParameter);
-			} catch (Exception e) {
-				log.error(" Unable to create node " + e.getMessage());
-			}
-			return Boolean.TRUE;
+			String version = "";
+			version = EngineStatusLogger.class.getPackage().getImplementationVersion();
+			log.debug(" Engine version createWebhookEngineStatusNode {}", version);
+			Map<String, String> extraParameter = new HashMap<>(0);
+			createComponentStatusNode("HEALTH:WEBHOOKENGINE", version, message, status, extraParameter);
+		} catch (Exception e) {
+			log.error(" Unable to create node {}", e.getMessage());
+		}
+		return Boolean.TRUE;
 	}
+
 	public boolean createAuditStatusNode(String message, String status) {
 		try {
-				String version = "";
-				version = EngineStatusLogger.class.getPackage().getImplementationVersion();
-				log.debug(" Engine version " + version);
-				Map<String, String> extraParameter = new HashMap<String, String>(0);
-				createComponentStatusNode("HEALTH:AUDITENGINE", version, message, status, extraParameter);
-			} catch (Exception e) {
-				log.error(" Unable to create node " + e.getMessage());
-			}
-			return Boolean.TRUE;
+			String version = "";
+			version = EngineStatusLogger.class.getPackage().getImplementationVersion();
+			log.debug(" Engine version createAuditStatusNode {} ", version);
+			Map<String, String> extraParameter = new HashMap<>(0);
+			createComponentStatusNode("HEALTH:AUDITENGINE", version, message, status, extraParameter);
+		} catch (Exception e) {
+			log.error(" Unable to create node {} ", e.getMessage());
+		}
+		return Boolean.TRUE;
 	}
 }
