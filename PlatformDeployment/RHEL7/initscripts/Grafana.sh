@@ -28,7 +28,7 @@
 ### END INIT INFO
 
 [[ -z "${GRAFANA_HOME}" ]] && GRAFANA_HOME_VAR=sudo env | grep GRAFANA_HOME | cut -d'=' -f2 || GRAFANA_HOME_VAR="${GRAFANA_HOME}"
-GRAFANA_HOME_VAR=$GRAFANA_HOME_VAR/grafana-4.6.2/bin
+GRAFANA_HOME_VAR=$GRAFANA_HOME_VAR/grafana/bin
 echo $GRAFANA_HOME_VAR
 case "$1" in
   start)
