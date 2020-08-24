@@ -53,8 +53,8 @@ public class AssessmentReportContentProcesser {
 			}
 			baseContentAction.generateContent();
 		} catch (InsightsJobFailedException e) {
-			log.error(" Exception while execution content Id {} KPI Id {} ",
-					inferenceContentConfigDefinition.getContentId(), inferenceContentConfigDefinition.getKpiId());
+			log.error("Worlflow Detail ====  Exception while execution content Id {} KPI Id {} exception {} ",
+					inferenceContentConfigDefinition.getContentId(), inferenceContentConfigDefinition.getKpiId(), e);
 			throw new InsightsJobFailedException("Exception while execution content Id");
 		}
 	}

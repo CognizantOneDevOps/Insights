@@ -15,8 +15,11 @@
  ******************************************************************************/
 package com.cognizant.devops.platformreports.assessment.pdf;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.Callable;
 
+import org.apache.commons.text.StringSubstitutor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -71,6 +74,7 @@ public class PDFKPIVisualizationProcesser implements Callable<JsonObject> {
 			JsonObject configObject = eachConfig.getAsJsonObject();
 			String vType = configObject.get("vType").getAsString();
 			String vQuery = configObject.get("vQuery").getAsString();
+			vQuery = addFieldInVQuery(vQuery, kpiId);
 			vResultObject.addProperty("vType", vType);
 			JsonArray kpiResultArray = dataProcessor.fetchAndFormatKPIResult(vQuery);
 			if (kpiResultArray.size() > 0) {
@@ -90,6 +94,15 @@ public class PDFKPIVisualizationProcesser implements Callable<JsonObject> {
 		log.debug("Worlflow Detail ==== prepared Visualization responce for kpi {} ",
 				reportKpiConfig.getKpiConfig().getKpiId());
 		return eachKPIObject;
+	}
+
+	private String addFieldInVQuery(String vQuery, int kpiId) {
+		Map<String, Long> dateReplaceMap = new HashMap<>();
+		dateReplaceMap.put("assessmentId", Long.parseLong(String.valueOf(assessmentReportDTO.getConfigId())));
+		dateReplaceMap.put("executionId",assessmentReportDTO.getExecutionId());
+		dateReplaceMap.put("kpiId", Long.parseLong(String.valueOf(kpiId)));
+		StringSubstitutor sub = new StringSubstitutor(dateReplaceMap, "{", "}");
+		return sub.replace(vQuery);
 	}
 
 }

@@ -3,14 +3,14 @@
       "contentId":22101,
       "isActive":"TRUE",
       "expectedTrend":"BELOW",
-      "resultField":"Count",
+      "resultField":"Issues",
       "contentName":" Defects Count",
-      "kpiId":2101,
+      "kpiId":2108,
       "noOfResult":2,
       "threshold":0,
       "directionOfThreshold":"BELOW",
       "message":{
-         "contentMessage":"Total number of defects captured in the last sprint were {Count}"
+         "contentMessage":"Total number of defects captured in the last sprint were {Issues}"
       }
    },
    {

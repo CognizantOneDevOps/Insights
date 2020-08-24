@@ -5,7 +5,18 @@
       "group":"DEPLOYMENT",
       "category":"STANDARD",
       "toolName":"RUNDECK",
-      "DBQuery":"MATCH (n:RUNDECK:DATA) WHERE n.SPKstartTime > {startTime} and n.SPKstartTime < {endTime} and  n.SPKvector = 'DEPLOYMENT' with n with DISTINCT apoc.date.format( n.SPKstartTime ,'s','MM/dd') as Date, case when n.SPKstatus='Failure'then count(n) else 0 end as Failure ,case when n.SPKstatus='Success'then count(n) else 0 end as Success RETURN Date,sum(Failure) as Failure, sum(Success)as Success order by Date  desc",
+      "DBQuery":"MATCH (n:RUNDECK:DATA) WHERE n.SPKstartTime > {startTime} and n.SPKstartTime < {endTime} and  n.SPKvector = 'DEPLOYMENT' with n with DISTINCT apoc.date.format( n.SPKstartTime ,'s','MM/dd','IST') as Date, case when n.SPKstatus='Failure'then count(n) else 0 end as Failure ,case when n.SPKstatus='Success'then count(n) else 0 end as Success RETURN Date,sum(Failure) as Failure, sum(Success)as Success order by Date  desc",
+      "datasource":"NEO4J",
+      "isActive":true,
+      "resultField":"Failure"
+   },
+   {
+      "kpiId":1115,
+      "name":"Total Rundeck Deployment Failures V/S Success",
+      "group":"DEPLOYMENT",
+      "category":"STANDARD",
+      "toolName":"RUNDECK",
+      "DBQuery":"MATCH (n:RUNDECK:DATA) WHERE n.SPKstartTime > {startTime} and n.SPKstartTime < {endTime} and  n.SPKvector = 'DEPLOYMENT' with n , case when n.SPKstatus='Failure'then count(n) else 0 end as Failure ,case when n.SPKstatus='Success'then count(n) else 0 end as Success RETURN sum(Failure) as Failure, sum(Success)as Success",
       "datasource":"NEO4J",
       "isActive":true,
       "resultField":"Failure"
@@ -27,7 +38,7 @@
       "group":"DEPLOYMENT",
       "category":"STANDARD",
       "toolName":"RUNDECK",
-      "DBQuery":"MATCH (n:DEPLOYMENT)  WHERE n.SPKstartTime > {startTime}  and n.SPKstartTime < {endTime} AND n.SPKstatus='Success' RETURN toInt(ROUND(Avg(toInt(n.SPKduration)))) as Time",
+      "DBQuery":"MATCH (n:RUNDECK)  WHERE n.SPKstartTime > {startTime}  and n.SPKstartTime < {endTime} AND n.SPKstatus='Success' RETURN toInt(ROUND(Avg(toInt(n.SPKduration)))) as Time",
       "datasource":"NEO4J",
       "isActive":true,
       "resultField":"Time"
@@ -38,7 +49,7 @@
       "group":"DEPLOYMENT",
       "category":"STANDARD",
       "toolName":"RUNDECK",
-      "DBQuery":"MATCH (n:DEPLOYMENT) WHERE n.SPKstartTime > {startTime} and n.SPKstartTime < {endTime} and n.SPKstatus='Success' RETURN ceil(max(toInt(n.SPKduration))) as Time",
+      "DBQuery":"MATCH (n:RUNDECK) WHERE n.SPKstartTime > {startTime} and n.SPKstartTime < {endTime} and n.SPKstatus='Success' RETURN ceil(max(toInt(n.SPKduration))) as Time",
       "datasource":"NEO4J",
       "isActive":true,
       "resultField":"Time"
@@ -49,18 +60,30 @@
       "group":"ALM",
       "category":"STANDARD",
       "toolName":"JIRA",
-      "DBQuery":"match (n:JIRA)  WHERE n.SPKstartTime > {startTime} and n.SPKstartTime < {endTime}  return DISTINCT n.SPKassignedTo as Developer, count(n.SPKdefectID) as Issues",
+      "DBQuery":"match (n:JIRA)  WHERE n.SPKstartTime > {startTime} and n.SPKstartTime < {endTime} and n.SPKvector='DEFECTS'  return DISTINCT n.SPKassignedTo as Developer, count(n.SPKdefectID) as Issues",
       "datasource":"NEO4J",
       "isActive":true,
       "resultField":"Issues"
    },
+   {
+      "kpiId":1117,
+      "name":"Total Defects Count",
+      "group":"ALM",
+      "category":"STANDARD",
+      "toolName":"JIRA",
+      "DBQuery":"match (n:JIRA)  WHERE n.SPKstartTime > {startTime} and n.SPKstartTime < {endTime} and n.SPKvector='DEFECTS'  return count(n) as Issues",
+      "datasource":"NEO4J",
+      "isActive":true,
+      "resultField":"Issues"
+   },
+   
    {
       "kpiId":1107,
       "name":"Defects Type Count",
       "group":"ALM",
       "category":"STANDARD",
       "toolName":"JIRA",
-      "DBQuery":"MATCH (n:JIRA) WHERE  n.SPKstartTime > {startTime}  and n.SPKstartTime < {endTime} RETURN DISTINCT n.SPKdefectDuring as Type, count(n) as Count",
+      "DBQuery":"MATCH (n:JIRA) WHERE  n.SPKstartTime > {startTime}  and n.SPKstartTime < {endTime} and n.SPKvector='DEFECTS' RETURN DISTINCT n.SPKdefectDuring as Type, count(n) as Count",
       "datasource":"NEO4J",
       "isActive":true,
       "resultField":"Count"
@@ -83,7 +106,18 @@
       "group":"BUILD",
       "category":"STANDARD",
       "toolName":"JENKINS",
-      "DBQuery":"MATCH (n:JENKINS:DATA) WHERE n.SPKstartTime > {startTime} and n.SPKstartTime < {endTime} and  n.SPKvector = 'BUILD' with n with DISTINCT apoc.date.format( n.SPKstartTime ,'s','MM/dd') as Date, case when n.SPKstatus='Failure'then count(n) else 0 end as Failure ,case when n.SPKstatus='Success'then count(n) else 0 end as Success RETURN Date,sum(Failure) as Failure, sum(Success)as Success order by Date  desc",
+      "DBQuery":"MATCH (n:JENKINS:DATA) WHERE n.SPKstartTime > {startTime} and n.SPKstartTime < {endTime} and  n.SPKvector = 'BUILD' with n with DISTINCT apoc.date.format( n.SPKstartTime ,'s','MM/dd','IST') as Date, case when n.SPKstatus='Failure'then count(n) else 0 end as Failure ,case when n.SPKstatus='Success'then count(n) else 0 end as Success RETURN Date,sum(Failure) as Failure, sum(Success)as Success order by Date  desc",
+      "datasource":"NEO4J",
+      "isActive":true,
+      "resultField":"Failure"
+   },
+   {
+      "kpiId":1116,
+      "name":"Total JENKINS Build Failures V/S Success",
+      "group":"BUILD",
+      "category":"STANDARD",
+      "toolName":"JENKINS",
+      "DBQuery":"MATCH (n:JENKINS:DATA) WHERE  n.SPKstartTime > {startTime} and n.SPKstartTime < {endTime} AND n.SPKvector = 'BUILD' with n , case when n.SPKstatus='Failure'then count(n) else 0 end as Failure ,case when n.SPKstatus='Success'then count(n) else 0 end as Success RETURN sum(Failure) as Failure, sum(Success)as Success",
       "datasource":"NEO4J",
       "isActive":true,
       "resultField":"Failure"
@@ -94,7 +128,7 @@
       "group":"BUILD",
       "category":"STANDARD",
       "toolName":"JENKINS",
-      "DBQuery":"MATCH (n:JENKINS:DATA)WHERE n.SPKstartTime > {startTime} and n.SPKstartTime < {endTime} RETURN count(n) as TotalNumberBuild",
+      "DBQuery":"MATCH (n:JENKINS:DATA)WHERE n.SPKstartTime > {startTime} and n.SPKstartTime < {endTime} RETURN count(n) as Builds",
       "datasource":"NEO4J",
       "isActive":true,
       "resultField":"Builds"

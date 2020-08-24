@@ -368,7 +368,7 @@
       "group":"CODEQUALITY",
       "category":"THRESHOLD",
       "toolName":"SONAR",
-      "DBQuery":"MATCH (n:SONAR:DATA) where n.SPKstartTime > {startTime} and n.SPKstartTime < {endTime} and n.SPKstatus='Success' RETURN  n.SPKendTime as SPKendTime,COALESCE(Avg(toInt(n.SPKcoverage)),0) as AvgCodeCoverage",
+      "DBQuery":"MATCH (n:SONAR:DATA) where n.SPKstartTime > {startTime} and n.SPKstartTime < {endTime} and n.SPKstatus='Success' RETURN COALESCE(Avg(toInt(n.SPKcoverage)),0) as AvgCodeCoverage",
       "datasource":"NEO4J",
       "isActive":true,
       "resultField":"AvgCodeCoverage"
@@ -391,7 +391,7 @@
       "category":"THRESHOLD_RANGE",
       "toolName":"SONAR",
       "category":"COMPARISON",
-      "DBQuery":"MATCH (n:SONAR:DATA) where n.SPKstartTime > {startTime} and n.SPKstartTime < {endTime} and n.SPKstatus='Success' RETURN  n.SPKendTime as SPKendTime,COALESCE(Avg(toInt(n.SPKcoverage)),0) as AvgCodeCoverage",
+      "DBQuery":"MATCH (n:SONAR:DATA) where n.SPKstartTime > {startTime} and n.SPKstartTime < {endTime} and n.SPKstatus='Success' RETURN  COALESCE(Avg(toInt(n.SPKcoverage)),0) as AvgCodeCoverage",
       "datasource":"NEO4J",
       "isActive":true,
       "resultField":"AvgCodeCoverage"

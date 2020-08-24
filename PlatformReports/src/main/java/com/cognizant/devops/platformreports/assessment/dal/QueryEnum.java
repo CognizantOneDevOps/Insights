@@ -25,24 +25,24 @@ public enum QueryEnum {
 	NEO4J_STANDARD(
 			"Match (b:"
 			+ ReportEngineUtils.NEO4J_RESULT_LABEL + ") Where b.kpiId= :kpiId "
-			+ " and b.executionId=:executionId RETURN b "),
+					+ " and b.executionId=:executionId and b.assessmentId =:assessmentId RETURN b "),
 	NEO4J_COMPARISON(
 			"MATCH (n:" + ReportEngineUtils.NEO4J_RESULT_LABEL + ") "
 			+ "with max(n.executionId) as latestexecutionId " + "MATCH (s:"
 			+ ReportEngineUtils.NEO4J_RESULT_LABEL
 			+ ") where s.executionId <> latestexecutionId with max(s.executionId) as secondlastexecutionId,latestexecutionId "
 			+ "Match (b:" + ReportEngineUtils.NEO4J_RESULT_LABEL
-			+ ") where b.executionId in [latestexecutionId,secondlastexecutionId] and b.kpiId =:kpiId "
+					+ ") where b.executionId in [latestexecutionId,secondlastexecutionId] and b.kpiId =:kpiId and b.assessmentId =:assessmentId "
 			+ " return b order by b.executionId desc"),
 	NEO4J_THRESHOLD(
 			"Match (b:" + ReportEngineUtils.NEO4J_RESULT_LABEL
-					+ ") Where b.kpiId=:kpiId and b.executionId = :executionId RETURN b order by b.executionId desc "),
+					+ ") Where b.kpiId=:kpiId and b.executionId = :executionId and b.assessmentId =:assessmentId RETURN b order by b.executionId desc "),
 	NEO4J_THRESHOLD_RANGE(
 			"Match (b:" + ReportEngineUtils.NEO4J_RESULT_LABEL
-					+ ") Where b.kpiId= :kpiId and b.executionId = :executionId  RETURN b order by b.executionId desc  "),
+					+ ") Where b.kpiId= :kpiId and b.executionId = :executionId and b.assessmentId =:assessmentId  RETURN b order by b.executionId desc  "),
 	NEO4J_MINMAX(
 			"Match (b:" + ReportEngineUtils.NEO4J_RESULT_LABEL
-					+ ") Where b.kpiId= :kpiId and b.executionId = :executionId RETURN b order by b.executionId desc "),
+					+ ") Where b.kpiId= :kpiId and b.executionId = :executionId and b.assessmentId =:assessmentId  RETURN b order by b.executionId desc "),
 	
 	//return b.text 
 	NEO4J_VCONTENTQUERY("Match (b:" + ReportEngineUtils.NEO4J_CONTENT_RESULT_LABEL

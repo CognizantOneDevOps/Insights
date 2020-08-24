@@ -69,9 +69,6 @@ public class WorkflowTest extends WorkflowTestData {
 		saveAssessmentReport(WorkflowIdWith2Task, mqChannel, assessmentReportWith2Task, mqChannelFail);
 		saveAssessmentReport(WorkflowIdTest, mqChannel, assessmentReportTest, wrongMqChannel);
 
-		
-		
-
 		initializeTask();
 		
 		WorkflowThreadPool.getInstance();
@@ -177,8 +174,6 @@ public class WorkflowTest extends WorkflowTestData {
 		}		
 	}
 	
-	
-	//delete dummy data
 	@AfterTest
 	public void cleanUp() {
 		
@@ -201,9 +196,6 @@ public class WorkflowTest extends WorkflowTestData {
 		
 		//delete kpi
 		reportConfigDAL.deleteKPIbyKpiID(kpiDefinitionJson.get("kpiId").getAsInt());
-
-
-		
 
 	}
 }

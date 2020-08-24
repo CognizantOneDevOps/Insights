@@ -21,6 +21,9 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Set;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import com.cognizant.devops.platformcommons.core.enums.WorkflowTaskEnum;
 import com.cognizant.devops.platformcommons.core.util.InsightsUtils;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
@@ -45,6 +48,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
 public class WorkflowTestData {
+	private static final Logger log = LogManager.getLogger(WorkflowTestData.class);
 	
 	WorkflowDAL workflowDAL = new WorkflowDAL();
 	ReportConfigDAL reportConfigDAL = new ReportConfigDAL();
@@ -206,42 +210,46 @@ public class WorkflowTestData {
 	}
 	
 	public String saveAssessmentReport(String workflowid, String mqChannel, String assessmentReport, String mqChannel2) throws InsightsCustomException {
-		int taskId = getTaskId(mqChannel);
-		int task2Id = 0;
-		if(mqChannel2 != null) {
-			task2Id = getTaskId(mqChannel2);
-		}
-		JsonObject assessmentReportJson = addTask(taskId, assessmentReport, task2Id);
-		int reportId = assessmentReportJson.get("reportTemplate").getAsInt();
-		InsightsAssessmentReportTemplate reportTemplate = (InsightsAssessmentReportTemplate) reportConfigDAL
-				.getActiveReportTemplateByReportId(reportId);
-		String workflowType = WorkflowTaskEnum.WorkflowType.REPORT.getValue();
-		String reportName = assessmentReportJson.get("reportName").getAsString();
-		boolean isActive = true;
-		String schedule = assessmentReportJson.get("schedule").getAsString();
-		String emailList = assessmentReportJson.get("emailList").getAsString();
-		String datasource = assessmentReportJson.get("datasource").getAsString();
-		boolean reoccurence = assessmentReportJson.get("isReoccuring").getAsBoolean();
-		long epochStartDate = 0;
-		long epochEndDate = 0;
-		String reportStatus = WorkflowTaskEnum.WorkflowStatus.NOT_STARTED.toString();
-		JsonArray taskList = assessmentReportJson.get("tasklist").getAsJsonArray();
+		try {
+			int taskId = getTaskId(mqChannel);
+			int task2Id = 0;
+			if(mqChannel2 != null) {
+				task2Id = getTaskId(mqChannel2);
+			}
+			JsonObject assessmentReportJson = addTask(taskId, assessmentReport, task2Id);
+			int reportId = assessmentReportJson.get("reportTemplate").getAsInt();
+			InsightsAssessmentReportTemplate reportTemplate = (InsightsAssessmentReportTemplate) reportConfigDAL
+					.getActiveReportTemplateByReportId(reportId);
+			String workflowType = WorkflowTaskEnum.WorkflowType.REPORT.getValue();
+			String reportName = assessmentReportJson.get("reportName").getAsString();
+			boolean isActive = true;
+			String schedule = assessmentReportJson.get("schedule").getAsString();
+			String emailList = assessmentReportJson.get("emailList").getAsString();
+			String datasource = assessmentReportJson.get("datasource").getAsString();
+			boolean reoccurence = assessmentReportJson.get("isReoccuring").getAsBoolean();
+			long epochStartDate = 0;
+			long epochEndDate = 0;
+			String reportStatus = WorkflowTaskEnum.WorkflowStatus.NOT_STARTED.toString();
+			JsonArray taskList = assessmentReportJson.get("tasklist").getAsJsonArray();
 //		workflowId = WorkflowTaskEnum.WorkflowType.REPORT.getValue() + "_"
 //				+ InsightsUtils.getCurrentTimeInSeconds();
-		
-		InsightsAssessmentConfiguration assessmentConfig = new InsightsAssessmentConfiguration();
-		InsightsWorkflowConfiguration workflowConfig = saveWorkflowConfig(workflowid, isActive,
-				reoccurence, schedule, reportStatus, workflowType, taskList, epochStartDate, epochEndDate);
-		assessmentConfig.setActive(isActive);
-		assessmentConfig.setEmails(emailList);
-		assessmentConfig.setInputDatasource(datasource);
-		assessmentConfig.setAsseementreportname(reportName);
-		assessmentConfig.setStartDate(epochStartDate);
-		assessmentConfig.setEndDate(epochEndDate);
-		assessmentConfig.setReportTemplateEntity(reportTemplate);
-		assessmentConfig.setWorkflowConfig(workflowConfig);
-		workflowConfig.setAssessmentConfig(assessmentConfig);
-		reportConfigDAL.saveInsightsAssessmentConfig(assessmentConfig);
+			
+			InsightsAssessmentConfiguration assessmentConfig = new InsightsAssessmentConfiguration();
+			InsightsWorkflowConfiguration workflowConfig = saveWorkflowConfig(workflowid, isActive,
+					reoccurence, schedule, reportStatus, workflowType, taskList, epochStartDate, epochEndDate);
+			assessmentConfig.setActive(isActive);
+			assessmentConfig.setEmails(emailList);
+			assessmentConfig.setInputDatasource(datasource);
+			assessmentConfig.setAsseementreportname(reportName);
+			assessmentConfig.setStartDate(epochStartDate);
+			assessmentConfig.setEndDate(epochEndDate);
+			assessmentConfig.setReportTemplateEntity(reportTemplate);
+			assessmentConfig.setWorkflowConfig(workflowConfig);
+			workflowConfig.setAssessmentConfig(assessmentConfig);
+			reportConfigDAL.saveInsightsAssessmentConfig(assessmentConfig);
+		} catch (InsightsCustomException e) {
+			log.error(e);
+		}
 		return workflowid;
 	}
 	
@@ -354,9 +362,13 @@ public class WorkflowTestData {
 	
 	
 	public void delete(String workflowId) {
-		deleteExecutionHistory(workflowId);
-		InsightsWorkflowConfiguration workflowConfig = workflowDAL.getWorkflowConfigByWorkflowId(workflowId);		
-		int id = workflowConfig.getAssessmentConfig().getId();
-		reportConfigDAL.deleteAssessmentReport(id);
+		try {
+			deleteExecutionHistory(workflowId);
+			InsightsWorkflowConfiguration workflowConfig = workflowDAL.getWorkflowConfigByWorkflowId(workflowId);		
+			int id = workflowConfig.getAssessmentConfig().getId();
+			reportConfigDAL.deleteAssessmentReport(id);
+		} catch (Exception e) {
+			log.error(e);
+		}
 	}
 }

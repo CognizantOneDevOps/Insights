@@ -88,13 +88,14 @@ public class ReportGraphDataHandler implements ReportDataHandler {
 		List<JsonObject> listOfResultJson = new ArrayList<>();
 		try {
 
-			log.debug("graphQuery with date is === {} ", graphQuery);
+			log.debug("Worlflow Detail ==== graphQuery with date for KPI {} ==== is === {} ", kpiDefinition.getKpiId(),
+					graphQuery);
 			if (!kpiDefinition.getInputDatasource().isEmpty()) {
 				graphDBHandler = new Neo4jDBHandler(kpiDefinition.getInputDatasource());
 			}
 			List<JsonObject> graphResp = fetchData(graphQuery);
 			JsonArray graphJsonResult = graphResp.get(0).getAsJsonArray("results");
-			log.debug(" KPI Id {}  record return by query ==== {} ", kpiDefinition.getKpiId(),
+			log.debug(" Worlflow Detail ==== KPI Id {}  record return by query ==== {} ", kpiDefinition.getKpiId(),
 					graphResp.get(0).getAsJsonArray("results"));
 			JsonArray data = graphJsonResult.get(0).getAsJsonObject().getAsJsonArray("data");
 			JsonArray columns = graphJsonResult.get(0).getAsJsonObject().getAsJsonArray("columns");
@@ -121,7 +122,8 @@ public class ReportGraphDataHandler implements ReportDataHandler {
 		String query_type = "NEO4J_" + contentConfigDefinition.getCategory().toString();
 		String graphQuery = QueryEnum.valueOf(query_type).toString();
 		graphQuery = graphQuery.replaceAll(":kpiId", String.valueOf(contentConfigDefinition.getKpiId()))
-				.replaceAll(":executionId", String.valueOf(contentConfigDefinition.getExecutionId()));
+				.replaceAll(":executionId", String.valueOf(contentConfigDefinition.getExecutionId()))
+				.replaceAll(":assessmentId", String.valueOf(contentConfigDefinition.getAssessmentId()));
 		List<JsonObject> graphResponse = neo4jExecutor.fetchData(graphQuery);
 		creatingResultDetailFromGraphResponce(kpiDetailList, contentConfigDefinition, graphResponse.get(0));
 		return kpiDetailList;
@@ -226,7 +228,8 @@ public class ReportGraphDataHandler implements ReportDataHandler {
 	public void creatingResultDetailFromGraphResponce(List<InsightsKPIResultDetails> kpiDetailList,
 			ContentConfigDefinition contentConfigDefinition, JsonObject graphResp) {
 		JsonArray graphJsonResult = graphResp.getAsJsonArray("results");
-		log.debug(" KPI Id {}  record return by key query ==== {} ", contentConfigDefinition.getKpiId(),
+		log.debug("Worlflow Detail ====  KPI Id {}  record return by key query ==== {} ",
+				contentConfigDefinition.getKpiId(),
 				graphResp.getAsJsonArray("results"));
 		JsonArray data = graphJsonResult.get(0).getAsJsonObject().getAsJsonArray("data");
 		for (int dataIndex = 0; dataIndex < data.size(); dataIndex++) {
@@ -250,7 +253,7 @@ public class ReportGraphDataHandler implements ReportDataHandler {
 					kpiDetailList.add(resultMapping);
 				} catch (Exception e) {
 					log.error(" Error while parsing kpi result {} ", e);
-					throw new InsightsJobFailedException(" Error while parsing kpi result {} " + e);
+					throw new InsightsJobFailedException(" Error while parsing kpi result {} " + e.getMessage());
 				}
 			}
 		}

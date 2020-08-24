@@ -182,7 +182,7 @@ public class ReportConfigDAL extends BaseDAL {
 	 */
 	public List<InsightsAssessmentReportTemplate> getAllReportTemplates() {
 		Query<InsightsAssessmentReportTemplate> query = getSession().createQuery(
-				"FROM InsightsAssessmentReportTemplate RE ORDER BY RE.reportId",
+				"FROM InsightsAssessmentReportTemplate RE where RE.isActive =TRUE ORDER BY RE.reportId",
 				InsightsAssessmentReportTemplate.class);
 		List<InsightsAssessmentReportTemplate> reportEntityResult = query.getResultList();
 		terminateSession();

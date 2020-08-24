@@ -78,19 +78,27 @@ public class AssessmentReportsTest extends AssessmentReportsTestData {
 
 	@Test(priority = 1)
 	public void testExecutionHistoryUpdateProd() throws InterruptedException {
-		List<InsightsWorkflowExecutionHistory> executionHistory = workflowDAL.getWorkflowExecutionHistoryRecordsByWorkflowId(workflowIdProd);
-		if(executionHistory.size() > 0) {
-			for(InsightsWorkflowExecutionHistory eachExecutionRecord: executionHistory) {
-				Assert.assertEquals(eachExecutionRecord.getTaskStatus(), WorkflowTaskEnum.WorkflowStatus.COMPLETED.toString());	
+		try {
+			List<InsightsWorkflowExecutionHistory> executionHistory = workflowDAL.getWorkflowExecutionHistoryRecordsByWorkflowId(workflowIdProd);
+			if(executionHistory.size() > 0) {
+				for(InsightsWorkflowExecutionHistory eachExecutionRecord: executionHistory) {
+					Assert.assertEquals(eachExecutionRecord.getTaskStatus(), WorkflowTaskEnum.WorkflowStatus.COMPLETED.toString());	
+				}
 			}
+		} catch (AssertionError e) {
+			Assert.fail("testExecutionHistoryUpdateProd");
 		}		
 	}	
 	
 	@Test(priority = 2)
 	public void testValidateStatusUpdateProd() {
-		InsightsWorkflowConfiguration workflowConfig = workflowDAL.getWorkflowConfigByWorkflowId(workflowIdProd);		
-		Assert.assertEquals(workflowConfig.getStatus(), WorkflowTaskEnum.WorkflowStatus.COMPLETED.toString());
-		Assert.assertTrue(workflowConfig.getNextRun() > nextRunBiWeekly);
+		try {
+			InsightsWorkflowConfiguration workflowConfig = workflowDAL.getWorkflowConfigByWorkflowId(workflowIdProd);
+			Assert.assertEquals(workflowConfig.getStatus(), WorkflowTaskEnum.WorkflowStatus.COMPLETED.toString());
+			Assert.assertTrue(workflowConfig.getNextRun() > nextRunBiWeekly);
+		} catch (AssertionError e) {
+			Assert.fail("testValidateStatusUpdateProd");
+		}
 	}
 	
 	

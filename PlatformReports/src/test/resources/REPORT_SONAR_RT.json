@@ -10,7 +10,7 @@
          "visualizationConfigs":[
             {
                "vType":"mscolumn2d_100131",
-               "vQuery":"MATCH (n:KPI:RESULTS) where n.reportId = 300603 and n.kpiId=100131 RETURN n.SPKendTime as SPKendTime , n.AvgDuplicateBlocksCoverage as AvgDuplicateBlocksCoverage LIMIT 5"
+               "vQuery":"MATCH (n:KPI:RESULTS) where n.assessmentId = {assessmentId} and n.executionId = {executionId} and n.kpiId={kpiId} RETURN n.SPKendTime as SPKendTime , n.AvgDuplicateBlocksCoverage as AvgDuplicateBlocksCoverage LIMIT 5"
             }
          ]
       },
@@ -19,7 +19,7 @@
          "visualizationConfigs":[
             {
                "vType":"mscolumn2d_100132",
-               "vQuery":"MATCH (n:KPI:RESULTS) where n.reportId = 300603 and n.kpiId=100132 RETURN n.SPKendTime as SPKendTime , n.AvgDuplicateBlocksCoverage as AvgDuplicateBlocksCoverage LIMIT 5"
+               "vQuery":"MATCH (n:KPI:RESULTS) where n.assessmentId = {assessmentId} and n.executionId = {executionId} and n.kpiId={kpiId} RETURN n.SPKendTime as SPKendTime , n.AvgDuplicateBlocksCoverage as AvgDuplicateBlocksCoverage LIMIT 5"
             }
          ]
       },
@@ -28,7 +28,7 @@
          "visualizationConfigs":[
             {
                "vType":"mscolumn2d_100133",
-               "vQuery":"MATCH (n:KPI:RESULTS) where n.reportId = 300603 and n.kpiId=100133 RETURN n.SPKendTime as SPKendTime , n.NumberOfQualityBlocks as NumberOfQualityBlocks LIMIT 5"
+               "vQuery":"MATCH (n:KPI:RESULTS) where n.assessmentId = {assessmentId} and n.executionId = {executionId} and n.kpiId={kpiId} RETURN n.SPKendTime as SPKendTime , n.NumberOfQualityBlocks as NumberOfQualityBlocks LIMIT 5"
             }
          ]
       },
@@ -37,7 +37,7 @@
          "visualizationConfigs":[
             {
                "vType":"mscolumn2d_134",
-               "vQuery":"MATCH (n:KPI:RESULTS) where n.reportId = 300603 and n.kpiId=134 RETURN n.SPKendTime as SPKendTime , n.NumberOfQualityBlocks as NumberOfQualityBlocks LIMIT 5"
+               "vQuery":"MATCH (n:KPI:RESULTS) where n.assessmentId = {assessmentId} and n.executionId = {executionId} and n.kpiId={kpiId} RETURN n.SPKendTime as SPKendTime , n.NumberOfQualityBlocks as NumberOfQualityBlocks LIMIT 5"
             }
          ]
       },
@@ -46,7 +46,7 @@
          "visualizationConfigs":[
             {
                "vType":"mscolumn2d_100331",
-               "vQuery":"MATCH (n:KPI:RESULTS) where n.reportId = 300603 and n.kpiId=331 RETURN n.SPKendTime as SPKendTime , n.AvgComplexityCoverage as AvgComplexityCoverage LIMIT 5"
+               "vQuery":"MATCH (n:KPI:RESULTS) where n.assessmentId = {assessmentId} and n.executionId = {executionId} and n.kpiId={kpiId} RETURN n.SPKendTime as SPKendTime , n.AvgComplexityCoverage as AvgComplexityCoverage LIMIT 5"
             }
          ]
       },
@@ -55,7 +55,7 @@
          "visualizationConfigs":[
             {
                "vType":"mscolumn2d_100332",
-               "vQuery":"MATCH (n:KPI:RESULTS) where n.reportId = 300603 and n.kpiId=100332 RETURN n.SPKendTime as SPKendTime , n.AvgComplexityCoverage as AvgComplexityCoverage LIMIT 5"
+               "vQuery":"MATCH (n:KPI:RESULTS) where n.assessmentId = {assessmentId} and n.executionId = {executionId} and n.kpiId={kpiId} RETURN n.SPKendTime as SPKendTime , n.AvgComplexityCoverage as AvgComplexityCoverage LIMIT 5"
             }
          ]
       },
@@ -64,7 +64,7 @@
          "visualizationConfigs":[
             {
                "vType":"mscolumn2d_100101",
-               "vQuery":"MATCH (n:KPI:RESULTS) where n.reportId = 300603 and n.kpiId=100101 RETURN n.SPKendTime as SPKendTime , n.NumberOfQualityBlocks as NumberOfQualityBlocks LIMIT 5"
+               "vQuery":"MATCH (n:KPI:RESULTS) where n.assessmentId = {assessmentId} and n.executionId = {executionId} and n.kpiId={kpiId} RETURN n.SPKendTime as SPKendTime , n.NumberOfQualityBlocks as NumberOfQualityBlocks LIMIT 5"
             }
          ]
       },
@@ -73,7 +73,7 @@
          "visualizationConfigs":[
             {
                "vType":"mscolumn2d_100102",
-               "vQuery":"MATCH (n:KPI:RESULTS) where n.reportId = 300603 and n.kpiId=100102 RETURN n.SPKendTime as SPKendTime , n.NumberOfQualityBlocks as NumberOfQualityBlocks LIMIT 5"
+               "vQuery":"MATCH (n:KPI:RESULTS) where n.assessmentId = {assessmentId} and n.executionId = {executionId} and n.kpiId={kpiId} RETURN n.SPKendTime as SPKendTime , n.NumberOfQualityBlocks as NumberOfQualityBlocks LIMIT 5"
             }
          ]
       },
@@ -82,7 +82,7 @@
          "visualizationConfigs":[
             {
                "vType":"mscolumn2d_100235",
-               "vQuery":"MATCH (n:KPI:RESULTS) where n.reportId = 300603 and n.kpiId=100235 with DISTINCT MAX(n.executionId) as latestExecutionId,n.SPKendTime as SPKendTime MATCH (n:KPI:RESULTS) where n.executionId=latestExecutionId RETURN  SPKendTime , n.AvgCodeCoverage as AvgCodeCoverage ORDER BY SPKendTime DESC"
+               "vQuery":"MATCH (n:KPI:RESULTS) where n.assessmentId = {assessmentId} and n.executionId = {executionId} and n.kpiId={kpiId} with DISTINCT MAX(n.executionId) as latestExecutionId,n.SPKendTime as SPKendTime MATCH (n:KPI:RESULTS) where n.executionId=latestExecutionId RETURN  SPKendTime , n.AvgCodeCoverage as AvgCodeCoverage ORDER BY SPKendTime DESC"
             }
          ]
       },
@@ -91,7 +91,7 @@
          "visualizationConfigs":[
             {
                "vType":"mscolumn2d_100236",
-               "vQuery":"MATCH (n:KPI:RESULTS) where n.reportId = 300603 and n.kpiId=100236 RETURN n.SPKendTime as SPKendTime , n.AvgCodeCoverage as AvgCodeCoverage LIMIT 5"
+               "vQuery":"MATCH (n:KPI:RESULTS) where n.assessmentId = {assessmentId} and n.executionId = {executionId} and n.kpiId={kpiId} RETURN n.SPKendTime as SPKendTime , n.AvgCodeCoverage as AvgCodeCoverage LIMIT 5"
             }
          ]
       },
@@ -100,7 +100,7 @@
          "visualizationConfigs":[
             {
                "vType":"mscolumn2d_100237",
-               "vQuery":"MATCH (n:KPI:RESULTS) where n.reportId = 300603 and n.kpiId=100237 with DISTINCT MAX(n.executionId) as latestExecutionId,n.SPKendTime as SPKendTime MATCH (n:KPI:RESULTS) where n.executionId=latestExecutionId RETURN  SPKendTime , n.AvgCodeCoverage as AvgCodeCoverage ORDER BY SPKendTime DESC"
+               "vQuery":"MATCH (n:KPI:RESULTS) where n.assessmentId = {assessmentId} and n.executionId = {executionId} and n.kpiId={kpiId} with DISTINCT MAX(n.executionId) as latestExecutionId,n.SPKendTime as SPKendTime MATCH (n:KPI:RESULTS) where n.executionId=latestExecutionId RETURN  SPKendTime , n.AvgCodeCoverage as AvgCodeCoverage ORDER BY SPKendTime DESC"
             }
          ]
       },
@@ -109,7 +109,7 @@
          "visualizationConfigs":[
             {
                "vType":"mscolumn2d_100238",
-               "vQuery":"MATCH (n:KPI:RESULTS) where n.reportId = 300603 and n.kpiId=100238 RETURN n.SPKendTime as SPKendTime , n.AvgCodeCoverage as AvgCodeCoverage LIMIT 5"
+               "vQuery":"MATCH (n:KPI:RESULTS) where n.assessmentId = {assessmentId} and n.executionId = {executionId} and n.kpiId={kpiId} RETURN n.SPKendTime as SPKendTime , n.AvgCodeCoverage as AvgCodeCoverage LIMIT 5"
             }
          ]
       },
@@ -118,7 +118,7 @@
          "visualizationConfigs":[
             {
                "vType":"mscolumn2d_100138",
-               "vQuery":"MATCH (n:KPI:RESULTS) where n.reportId = 300603 and n.kpiId=100138 RETURN n.SPKendTime as SPKendTime , n.NumberOfSonarExecutions as NumberOfSonarExecutions LIMIT 5"
+               "vQuery":"MATCH (n:KPI:RESULTS) where n.assessmentId = {assessmentId} and n.executionId = {executionId} and n.kpiId={kpiId} RETURN n.SPKendTime as SPKendTime , n.NumberOfSonarExecutions as NumberOfSonarExecutions LIMIT 5"
             }
          ]
       },
@@ -127,7 +127,7 @@
          "visualizationConfigs":[
             {
                "vType":"mscolumn2d_100137",
-               "vQuery":"MATCH (n:KPI:RESULTS) where n.reportId = 300603 and n.kpiId=100137 RETURN n.SPKendTime as SPKendTime , n.NumberOfSonarExecutions as NumberOfSonarExecutions LIMIT 5"
+               "vQuery":"MATCH (n:KPI:RESULTS) where n.assessmentId = {assessmentId} and n.executionId = {executionId} and n.kpiId={kpiId} RETURN n.SPKendTime as SPKendTime , n.NumberOfSonarExecutions as NumberOfSonarExecutions LIMIT 5"
             }
          ]
       },
@@ -136,7 +136,7 @@
          "visualizationConfigs":[
             {
                "vType":"mscolumn2d_100136",
-               "vQuery":"MATCH (n:KPI:RESULTS) where n.reportId = 300603 and n.kpiId=100136 RETURN n.SPKendTime as SPKendTime , n.NumberOfSonarExecutions as NumberOfSonarExecutions LIMIT 5"
+               "vQuery":"MATCH (n:KPI:RESULTS) where n.assessmentId = {assessmentId} and n.executionId = {executionId} and n.kpiId={kpiId} RETURN n.SPKendTime as SPKendTime , n.NumberOfSonarExecutions as NumberOfSonarExecutions LIMIT 5"
             }
          ]
       },
@@ -145,7 +145,7 @@
          "visualizationConfigs":[
             {
                "vType":"mscolumn2d_100135",
-               "vQuery":"MATCH (n:KPI:RESULTS) where n.reportId = 300603 and n.kpiId=100135 RETURN n.SPKendTime as SPKendTime , n.NumberOfSonarExecutions as NumberOfSonarExecutions LIMIT 5"
+               "vQuery":"MATCH (n:KPI:RESULTS) where n.assessmentId = {assessmentId} and n.executionId = {executionId} and n.kpiId={kpiId} RETURN n.SPKendTime as SPKendTime , n.NumberOfSonarExecutions as NumberOfSonarExecutions LIMIT 5"
             }
          ]
       }

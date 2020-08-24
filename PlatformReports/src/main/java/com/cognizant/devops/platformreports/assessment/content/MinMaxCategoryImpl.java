@@ -25,6 +25,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.cognizant.devops.platformcommons.core.enums.WorkflowTaskEnum.WorkflowSchedule;
+import com.cognizant.devops.platformcommons.core.util.InsightsUtils;
 import com.cognizant.devops.platformreports.assessment.datamodel.ContentConfigDefinition;
 import com.cognizant.devops.platformreports.assessment.datamodel.InsightsContentDetail;
 import com.cognizant.devops.platformreports.assessment.datamodel.InsightsKPIResultDetails;
@@ -94,13 +95,13 @@ public class MinMaxCategoryImpl extends BaseContentCategoryImpl {
 
 			InsightsKPIResultDetails minResultObject = Collections.min(inferenceResults,
 					Comparator.comparing(e -> (double) e.getResults().get(comparisonField)));
-			double minValue = (double) minResultObject.getResults().get(comparisonField);
-			String dateOfMinValue = minResultObject.getResultTimeX();
+			//double minValue = (double) minResultObject.getResults().get(comparisonField);
+			String dateOfMinValue = InsightsUtils.insightsTimeXFormat(minResultObject.getRecordDate());
 			String inferenceText = "";
 			ReportEngineEnum.KPISentiment sentiment = ReportEngineEnum.KPISentiment.NEUTRAL;
 			InsightsKPIResultDetails resultFirstData = inferenceResults.get(0);
 			addTimeValueinResult(resultValuesMap, contentConfigDefinition.getSchedule());
-			resultValuesMap.put("result", minValue);
+			resultValuesMap.put("result", getResultValueForDisplay(minResultObject.getResults().get(comparisonField)));
 			resultValuesMap.put("minDate", dateOfMinValue);
 
 			inferenceText = getContentText(ReportEngineUtils.STANDARD_MESSAGE_KEY, resultValuesMap);
@@ -140,14 +141,14 @@ public class MinMaxCategoryImpl extends BaseContentCategoryImpl {
 
 			InsightsKPIResultDetails maxResultObject = Collections.max(inferenceResults,
 					Comparator.comparing(e -> (double) e.getResults().get(comparisonField)));
-			double maxValue = (double) maxResultObject.getResults().get(comparisonField);
+			//double maxValue = (double) maxResultObject.getResults().get(comparisonField);
 
-			String dateOfMaxValue = maxResultObject.getResultTimeX();
+			String dateOfMaxValue = InsightsUtils.insightsTimeXFormat(maxResultObject.getRecordDate());
 			String inferenceText = "";
 			ReportEngineEnum.KPISentiment sentiment = ReportEngineEnum.KPISentiment.NEUTRAL;
 			InsightsKPIResultDetails resultFirstData = inferenceResults.get(0);
 			addTimeValueinResult(resultValuesMap, contentConfigDefinition.getSchedule());
-			resultValuesMap.put("result", maxValue);
+			resultValuesMap.put("result", getResultValueForDisplay(maxResultObject.getResults().get(comparisonField)));
 			resultValuesMap.put("maxDate", dateOfMaxValue);
 
 			inferenceText = getContentText(ReportEngineUtils.STANDARD_MESSAGE_KEY, resultValuesMap);

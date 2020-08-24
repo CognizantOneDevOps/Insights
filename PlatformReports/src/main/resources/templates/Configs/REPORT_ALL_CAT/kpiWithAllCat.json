@@ -61,11 +61,12 @@
       "group":"DEPLOYMENT",
       "category":"STANDARD",
       "toolName":"RUNDECK",
-      "DBQuery":"MATCH (n:DEPLOYMENT) WHERE n.SPKstartTime > {startTime} and n.SPKstartTime < {endTime} and n.SPKstatus='Success' RETURN ceil(max(toInt(n.SPKduration))) as Deploy",
+      "DBQuery":"MATCH (n:RUNDECK) WHERE n.SPKstartTime > {startTime} and n.SPKstartTime < {endTime} and n.SPKstatus='Success' RETURN ceil(max(toInt(n.SPKduration))) as Deploy",
       "datasource":"NEO4J",
       "isActive":true,
       "resultField":"Deploy"
-   },  
+   }, 
+ 
     {
       "kpiId":2107,
       "name":"Total Number of Builds",
@@ -76,5 +77,15 @@
       "datasource":"NEO4J",
       "isActive":true,
       "resultField":"Builds"
+   }, {
+      "kpiId":2108,
+      "name":"Total Defects Count",
+      "group":"ALM",
+      "category":"STANDARD",
+      "toolName":"JIRA",
+      "DBQuery":"match (n:JIRA)  WHERE n.SPKstartTime > {startTime} and n.SPKstartTime < {endTime} and n.SPKvector='DEFECTS'  return count(n) as Issues",
+      "datasource":"NEO4J",
+      "isActive":true,
+      "resultField":"Issues"
    }
 ]

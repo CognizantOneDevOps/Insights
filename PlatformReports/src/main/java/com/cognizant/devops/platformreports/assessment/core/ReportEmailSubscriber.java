@@ -132,6 +132,7 @@ public class ReportEmailSubscriber extends WorkflowTaskSubscriberHandler {
 		statusObject.add("log", logArray);
 		// statusLog set here which is class variable of WorkflowTaskSubscriberHandler
 		statusLog = new Gson().toJson(statusObject);
+		log.error("Workflow Detail ==== unable to send an email statusLog {}  ", statusLog);
 		throw new InsightsJobFailedException("unable to send an email");
 	}
 }

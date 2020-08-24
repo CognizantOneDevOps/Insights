@@ -17,6 +17,7 @@ package com.cognizant.devops.platformreports.assessment.content;
 
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.apache.commons.text.StringSubstitutor;
 import org.apache.logging.log4j.LogManager;
@@ -130,7 +131,7 @@ public abstract class BaseContentCategoryImpl {
 		detail.setContentId(contentConfigDefinition.getContentId());		
 		detail.setInferenceText(inferenceText);
 		detail.setKpiId(inferenceResult.getKpiId());
-		detail.setKpiName(inferenceResult.getName());
+		detail.setKpiName(inferenceResult.getKpiName());
 		detail.setNoOfResult(contentConfigDefinition.getNoOfResult());
 		detail.setRanking(null);//ranking
 		detail.setResultField(contentConfigDefinition.getResultField());
@@ -140,9 +141,9 @@ public abstract class BaseContentCategoryImpl {
 		detail.setSchedule(inferenceResult.getSchedule());
 		detail.setSentiment(sentiment);
 		detail.setThreshold(contentConfigDefinition.getThreshold());
-		detail.setToolName(inferenceResult.getToolName());
+		detail.setToolName(inferenceResult.getToolname());
 		detail.setTrendline(null);//trendline
-		detail.setGroup(inferenceResult.getGroup());
+		detail.setGroup(inferenceResult.getGroupName());
 		detail.setExecutionId(contentConfigDefinition.getExecutionId());
 		return detail;
 	}
@@ -158,6 +159,8 @@ public abstract class BaseContentCategoryImpl {
 	public String getContentText(String key, Map<String, Object> resultValuesMap) throws InsightsCustomException {
 		String inferenceText = null;
 		try {
+			resultValuesMap = resultValuesMap.entrySet().stream()
+					.collect(Collectors.toMap(Map.Entry::getKey, e -> getResultValueForDisplay(e.getValue())));
 			StringSubstitutor sub = new StringSubstitutor(resultValuesMap, "{", "}");
 			JsonObject valueMessageObject = jsonParser
 					.parse(String.valueOf(contentConfigDefinition.getMessage()))
@@ -178,6 +181,45 @@ public abstract class BaseContentCategoryImpl {
 	
 	public String getResultFieldFromContentDefination() {
 		return contentConfigDefinition.getResultField();
+	}
+
+	boolean isInteger(double number) {
+		return number % 1 == 0;// if the modulus(remainder of the division) of the argument(number) with 1 is 0 then return true otherwise false.
+	}
+
+	public boolean isNumeric(String strNum) {
+		if (strNum == null) {
+			return false;
+		}
+		try {
+			double d = Double.parseDouble(strNum);
+		} catch (NumberFormatException nfe) {
+			return false;
+		}
+		return true;
+	}
+
+	public String getResultValueForDisplay(Object value){
+		String returnValue;
+		try {
+			//log.debug("value   {} ", value);
+			if (!isNumeric(String.valueOf(value))) {
+				returnValue= String.valueOf(value);
+			} else {
+				Double newData = new Double(String.valueOf(value));
+				if (isInteger(newData.doubleValue())) {
+					returnValue = String.valueOf(newData.intValue());
+				} else {
+					returnValue = String.valueOf(newData.doubleValue());
+				}
+			}
+			//log.debug("returnValue   {} ", returnValue);
+		} catch (Exception e) {
+			log.error(" Exception in getResultValueForDisplay for content {} === value === {}  ",
+					contentConfigDefinition.getContentId(), value);
+			returnValue = String.valueOf(value);
+		}
+		return returnValue;
 	}
 
 }

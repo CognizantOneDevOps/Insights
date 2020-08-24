@@ -10,7 +10,7 @@
          "visualizationConfigs":[
             {
                "vType":"table_2101",
-               "vQuery":"MATCH (n:KPI:RESULTS) where n.reportId = 2100 and n.kpiId=2101 with MAX(n.executionId) as latestExecutionId MATCH (n:KPI:RESULTS) where n.executionId=latestExecutionId and n.kpiId=2101 RETURN  n.Type as Type, sum(n.Count) as Count"
+               "vQuery":"MATCH (n:KPI:RESULTS)  where n.assessmentId = {assessmentId} and n.executionId = {executionId} and n.kpiId={kpiId} RETURN  n.Type as Type, sum(n.Count) as Count"
             }
          ]
       },
@@ -19,7 +19,7 @@
          "visualizationConfigs":[
             {
                "vType":"pie2d_2102",
-               "vQuery":"MATCH (n:KPI:RESULTS) where n.reportId = 2100 and n.kpiId=2102 with MAX(n.executionId) as latestExecutionId MATCH (n:KPI:RESULTS) where n.executionId=latestExecutionId and n.kpiId=2102 and n.StoryTypes in ['PaymentServices','MobileServices','ClaimFinder','AgentLocator'] with n return distinct n.StoryTypes as StoryTypes ,toInt(ROUND(Avg(n.Duration))) as Duration"
+               "vQuery":"MATCH (n:KPI:RESULTS)  where n.assessmentId = {assessmentId} and n.executionId = {executionId} and n.kpiId={kpiId}  RETURN distinct n.StoryTypes as StoryTypes ,toInt(ROUND(Avg(n.Duration))) as Duration"
             }
          ]
       },
@@ -28,7 +28,7 @@
          "visualizationConfigs":[
             {
                "vType":"mscolumn2d_2103",
-               "vQuery":"MATCH (n:KPI:RESULTS) where n.reportId = 2100 and n.kpiId=2103 with MAX(n.executionId) as latestExecutionId MATCH (n:KPI:RESULTS) where n.executionId=latestExecutionId and n.kpiId=2103 RETURN  apoc.date.format( n.recordDate ,'s','MM/dd') as Date, n.Productivity as Productivity ORDER BY Date DESC"
+               "vQuery":"MATCH (n:KPI:RESULTS)  where n.assessmentId = {assessmentId} and n.executionId = {executionId} and n.kpiId={kpiId}  RETURN  apoc.date.format( n.recordDate ,'s','MM/dd','IST') as Date, n.Productivity as Productivity ORDER BY Date DESC"
             }
          ]
       },
@@ -37,7 +37,7 @@
          "visualizationConfigs":[
             {
                "vType":"mscolumn2d_2104",
-               "vQuery":"MATCH (n:KPI:RESULTS) where n.reportId = 2100 and n.kpiId=2104 RETURN  apoc.date.format( n.recordDate ,'s','MM/dd') as Date , n.Bugs as Bugs,n.Vulnerablilities as Vulnerablilities,n.CodeSmell as CodeSmell ORDER BY n.executionId DESC limit 2"
+               "vQuery":"MATCH (n:KPI:RESULTS) where n.assessmentId = {assessmentId} and n.kpiId={kpiId} RETURN  apoc.date.format( n.recordDate ,'s','MM/dd','IST') as Date , n.Bugs as Bugs,n.Vulnerablilities as Vulnerablilities,n.CodeSmell as CodeSmell ORDER BY n.executionId DESC limit 2"
             }
          ]
       },
@@ -46,7 +46,7 @@
          "visualizationConfigs":[
             {
                "vType":"msline_2105",
-               "vQuery":"MATCH (n:KPI:RESULTS) where n.reportId = 2100 and n.kpiId=2105 with MAX(n.executionId) as latestExecutionId MATCH (n:KPI:RESULTS) where n.executionId=latestExecutionId and n.kpiId=2105 RETURN   apoc.date.format( n.recordDate ,'s','MM/dd') as Date , n.Failure as Failure,n.Success as Success ORDER BY Date DESC"
+               "vQuery":"MATCH (n:KPI:RESULTS) where n.assessmentId = {assessmentId} and n.executionId = {executionId} and n.kpiId={kpiId} RETURN   apoc.date.format( n.recordDate ,'s','MM/dd','IST') as Date , n.Failure as Failure, n.Success as Success ORDER BY Date DESC"
             }
          ]
       },
@@ -56,7 +56,7 @@
             {
               
                "vType":"angulargauge_2106",
-               "vQuery":"MATCH (n:KPI:RESULTS) where n.reportId = 2100 and n.kpiId=2106 with MAX(n.executionId) as latestExecutionId MATCH (n:KPI:RESULTS) where n.executionId=latestExecutionId and n.kpiId=2106 RETURN  n.resultField as Deploy , n.Deploy as Value"
+               "vQuery":"MATCH (n:KPI:RESULTS) where n.assessmentId = {assessmentId} and n.executionId = {executionId} and n.kpiId={kpiId} RETURN  n.resultField as Deploy , n.Deploy as Value"
             }
          ]
       },
@@ -65,7 +65,7 @@
          "visualizationConfigs":[
             {              
               "vType":"pie2d_2107",
-               "vQuery":"MATCH (n:KPI:RESULTS) where n.reportId = 2100 and n.kpiId=2107 with MAX(n.executionId) as latestExecutionId MATCH (n:KPI:RESULTS) where n.executionId=latestExecutionId and n.kpiId=2107 RETURN  n.resultField as Builds, n.Builds as Value"
+               "vQuery":"MATCH (n:KPI:RESULTS) where n.assessmentId = {assessmentId} and n.executionId = {executionId} and n.kpiId={kpiId} RETURN  n.resultField as Builds, n.Builds as Value"
             }
          ]
       }
