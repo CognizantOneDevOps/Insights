@@ -162,7 +162,9 @@ public class PDFExecutionSubscriber extends WorkflowTaskSubscriberHandler {
 		statusObject.add("kpiList", kpiArray);
 		// statusLog set here which is class variable of WorkflowTaskSubscriberHandler
 		statusLog = new Gson().toJson(statusObject);
-		throw new InsightsJobFailedException("some of the Kpi's visualization is failed to execute");
+		log.error("Worlflow Detail ==== some of the Kpi's visualization is failed to execute statusLog {} ", statusLog);
+		throw new InsightsJobFailedException(
+				"Worlflow Detail ==== some of the Kpi's visualization is failed to execute");
 	}
 
 	private void processVisualizationJson() {

@@ -82,7 +82,8 @@ public class ReportKPISubscriber extends WorkflowTaskSubscriberHandler {
 			workflowConfig = workflowDAL.getWorkflowConfigByWorkflowId(workflowId);
 			/* kpi and content list */
 
-			log.debug("Worlflow Detail ==== ReportKPISubscriber executionId {}  ", executionId);
+			log.debug("Worlflow Detail ==== ReportKPISubscriber workflowid {}  executionId {}  ", workflowId,
+					executionId);
 			boolean isWorkflowTaskRetry = incomingTaskMessage.get(WorkflowUtils.RETRY_JSON_PROPERTY).getAsBoolean();
 			if (isWorkflowTaskRetry) {
 				/* fill failed kpis and content for execution */
@@ -105,14 +106,15 @@ public class ReportKPISubscriber extends WorkflowTaskSubscriberHandler {
 
 		} catch (InsightsJobFailedException e) {
 			log.error("Worlflow Detail ==== InsightsJobFailedException ==== {} ", e);
-			throw new InsightsJobFailedException("some of the Kpi's or Contents failed to execute");
+			throw new InsightsJobFailedException("some of the Kpi's or Contents failed to execute " + e.getMessage());
 		} catch (RejectedExecutionException e) {
 			log.error("Worlflow Detail ==== RejectedExecutionException ==== {} ", e);
 			throw new InsightsJobFailedException(
-					"some of the Kpi's or Contents failed to execute RejectedExecutionException ");
+					"some of the Kpi's or Contents failed to execute RejectedExecutionException " + e.getMessage());
 		} catch (Exception e) {
 			log.error("Worlflow Detail ==== handleTaskExecution ==== {} ", e);
-			throw new InsightsJobFailedException("some of the Kpi's or Contents failed to execute Exception ");
+			throw new InsightsJobFailedException(
+					"some of the Kpi's or Contents failed to execute Exception " + e.getMessage());
 		}
 		log.debug("Worlflow Detail ==== ReportKPISubscriber completed ");
 	}
@@ -123,12 +125,15 @@ public class ReportKPISubscriber extends WorkflowTaskSubscriberHandler {
 		InsightsWorkflowExecutionHistory historyConfig = workflowDAL
 				.getWorkflowExecutionHistoryByHistoryId(incomingTaskMessage.get("exectionHistoryId").getAsInt());
 		JsonObject statusLog = new Gson().fromJson(historyConfig.getStatusLog(), JsonObject.class);
+		log.debug(" Worlflow Detail ====  extractKPIAndContentRetryList statusLog {} ", statusLog);
 		if (statusLog != null) {
 			Type type = new TypeToken<List<Integer>>() {
 			}.getType();
 			Gson gson = new Gson();
 			List<Integer> kpiList = gson.fromJson(statusLog.get("kpiList"), type);
-			kpiConfigList.addAll(reportConfigDAL.getActiveKPIConfigurationsBasedOnKPIId(kpiList));
+			if (!kpiList.isEmpty()) {
+				kpiConfigList.addAll(reportConfigDAL.getActiveKPIConfigurationsBasedOnKPIId(kpiList));
+			}
 			contentList.addAll(gson.fromJson(statusLog.get("contentArray"), type));
 		} else {
 			log.error("Worlflow Detail ==== ReportKPISubscriber unable to parse retry message {} ", statusLog);

@@ -15,6 +15,8 @@
  ******************************************************************************/
 package com.cognizant.devops.platformdal.test;
 
+import java.io.File;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.hibernate.Session;
@@ -51,6 +53,13 @@ public class TestDal {
 
 		long epochtime;
 		try {
+
+			File file = new File("aa");
+			logger.debug(file.exists());
+
+			logger.debug("int {}", isInteger(3456));
+			logger.debug(" double {} ", isInteger(425734099.8409254));
+
 			epochtime = InsightsUtils.getEpochTime("2020-08-03 04:19:30 UTC", "yyyy-MM-dd HH:mm:ss");
 			logger.debug("message epochtime  {} ", epochtime);
 
@@ -61,5 +70,9 @@ public class TestDal {
 
 		} //timeFieldValue dateFormat
 
+	}
+
+	static boolean isInteger(double number) {
+		return number % 1 == 0;// if the modulus(remainder of the division) of the argument(number) with 1 is 0 then return true otherwise false.
 	}
 }

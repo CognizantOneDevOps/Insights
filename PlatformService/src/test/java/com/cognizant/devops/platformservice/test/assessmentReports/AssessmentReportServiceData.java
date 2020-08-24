@@ -45,7 +45,7 @@ public class AssessmentReportServiceData {
 	File emptyFile = new File(classLoader.getResource("EmptyFile.json").getFile());
 	//JsonObject workflowTaskJson = null;
 	InsightsWorkflowTask tasks = null;
-	int taskID =0;
+	//int taskID =0;
 	JsonObject incorrectregisterkpiJson = null;
 	JsonObject registerContentJson = null;
 	JsonObject incorrectregisterContentJson = null;
@@ -118,11 +118,12 @@ public class AssessmentReportServiceData {
 	
 	void prepareData() throws InsightsCustomException {
 		
-		//String workflowTaskTest = "{\"description\": \"KPI_Execute_test\",\"mqChannel\": \"WORKFLOW.TASK.KPI.EXCECUTION\",\"componentName\": \"com.cognizant.devops.platformreports.assessment.core.ReportKPISubscriber\",\"dependency\": \"100\",\"workflowType\": \"Report\"}";
-		//workflowTaskJson = convertStringIntoJson(workflowTaskTest);
-		//int response = workflowService.saveWorkflowTask(workflowTaskJson);
-		//InsightsWorkflowTask tasks  =  workflowConfigDAL.getTaskbyTaskDescription(workflowTaskJson.get("description").getAsString());
-		//taskID = tasks.getTaskId();
+		String workflowTaskTest = "{\"description\": \"KPI_Execute_test\",\"mqChannel\": \"WORKFLOW.TASK.KPI.EXCECUTION\",\"componentName\": \"com.cognizant.devops.platformreports.assessment.core.ReportKPISubscriber\",\"dependency\": \"100\",\"workflowType\": \"Report\"}";
+		JsonObject workflowTaskJson = convertStringIntoJson(workflowTaskTest);
+		int response = workflowService.saveWorkflowTask(workflowTaskJson);
+		InsightsWorkflowTask tasks = workflowConfigDAL
+				.getTaskbyTaskDescription(workflowTaskJson.get("description").getAsString());
+		int taskID = tasks.getTaskId();
 
 	String registerkpi = "{\"kpiId\":100201,\"name\":\"Total Successful Deployments\",\"group\":\"DEPLOYMENT\",\"toolName\":\"RUNDECK\",\"category\":\"STANDARD\",\"DBQuery\":\"MATCH (n:RUNDECK:DATA) WHERE n.SPKstartTime > {startTime} and n.SPKstartTime < {endTime} and  n.SPKvector = 'DEPLOYMENT' and n.SPKstatus='Success' RETURN count(n.SPKstatus) as totalDeploymentCount\",\"datasource\":\"NEO4J\",\"isActive\":true,\"resultField\":\"totalDeploymentCount\"}";
 	registerkpiJson = convertStringIntoJson(registerkpi);

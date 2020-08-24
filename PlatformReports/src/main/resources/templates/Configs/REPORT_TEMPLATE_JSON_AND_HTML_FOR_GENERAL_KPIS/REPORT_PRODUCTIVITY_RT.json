@@ -1,6 +1,6 @@
 {
    "reportId":"601",
-   "reportName":"Report_PRODUCTIVITY",
+   "reportName":"REPORT_PRODUCTIVITY",
    "description":"KPIS only for Productivity",
    "isActive":true,
    "file":"REPORT_PRODUCTIVITY",
@@ -10,7 +10,7 @@
          "visualizationConfigs":[
             {
                "vType":"mscolumn2d_252",
-               "vQuery":"MATCH (n:KPI:RESULTS) where n.reportId = 601 and n.kpiId=252 with DISTINCT MAX(n.executionId) as latestExecutionId,n.completionDateEpochTime as completionDateEpochTime MATCH (n:KPI:RESULTS) where n.executionId=latestExecutionId RETURN  completionDateEpochTime , n.Productivity as Productivity ORDER BY completionDateEpochTime DESC"
+               "vQuery":"MATCH (n:KPI:RESULTS) where n.assessmentId = {assessmentId} and n.executionId = {executionId} and n.kpiId={kpiId} RETURN  n.completionDateEpochTime as completionDateEpochTime, n.Productivity as Productivity ORDER BY n.completionDateEpochTime DESC"
             }
          ]
       },
@@ -19,7 +19,7 @@
          "visualizationConfigs":[
             {
                "vType":"mscolumn2d_253",
-               "vQuery":"MATCH (n:KPI:RESULTS) where n.reportId = 601 and n.kpiId=253 with DISTINCT MAX(n.executionId) as latestExecutionId,n.completionDateEpochTime as completionDateEpochTime MATCH (n:KPI:RESULTS) where n.executionId=latestExecutionId RETURN  completionDateEpochTime , n.Productivity as Productivity ORDER BY completionDateEpochTime DESC"
+               "vQuery":"MATCH (n:KPI:RESULTS) where n.assessmentId = {assessmentId} and n.executionId = {executionId} and n.kpiId={kpiId} RETURN  n.completionDateEpochTime as completionDateEpochTime, n.Productivity as Productivity ORDER BY n.completionDateEpochTime DESC"
             }
          ]
       },
@@ -28,7 +28,7 @@
          "visualizationConfigs":[
             {
                "vType":"mscolumn2d_254",
-               "vQuery":"MATCH (n:KPI:RESULTS) where n.reportId = 601 and n.kpiId=254 with DISTINCT MAX(n.executionId) as latestExecutionId,n.completionDateEpochTime as completionDateEpochTime MATCH (n:KPI:RESULTS) where n.executionId=latestExecutionId RETURN  completionDateEpochTime , n.Productivity as Productivity ORDER BY completionDateEpochTime DESC"
+               "vQuery":"MATCH (n:KPI:RESULTS) where n.assessmentId = {assessmentId} and n.executionId = {executionId} and n.kpiId={kpiId} RETURN  n.completionDateEpochTime , n.Productivity as Productivity ORDER BY n.completionDateEpochTime DESC"
             }
          ]
       }  

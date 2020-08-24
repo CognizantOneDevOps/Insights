@@ -44,7 +44,7 @@ public class ComparisonContentCategoryImpl extends BaseContentCategoryImpl {
 
 		if (!kpiResults.isEmpty()) {
 			InsightsContentDetail contentResult = getContentFromResult(kpiResults);
-			log.debug(" contentResultList  + {} ", contentResult);
+			log.debug("Worlflow Detail ====  contentResultList  + {} ", contentResult);
 			if (contentResult != null) {
 				saveContentResult(contentResult);
 			}
@@ -85,8 +85,8 @@ public class ComparisonContentCategoryImpl extends BaseContentCategoryImpl {
 				sentiment = getSentiment(previousValue, currentValue, getContentConfig().getExpectedTrend());
 				actualTrend = String.valueOf(getActualTrend(getContentConfig().getExpectedTrend(), sentiment));
 
-				resultValuesMap.put("current:" + comparisonField, currentValue);
-				resultValuesMap.put("previous:" + comparisonField, previousValue);
+				resultValuesMap.put("current:" + comparisonField, getResultValueForDisplay(currentValue));
+				resultValuesMap.put("previous:" + comparisonField, getResultValueForDisplay(previousValue));
 
 				contentText = getContentText(sentiment.getValue(), resultValuesMap);
 
@@ -94,19 +94,20 @@ public class ComparisonContentCategoryImpl extends BaseContentCategoryImpl {
 				contentText = getContentText(ReportEngineUtils.STANDARD_MESSAGE_KEY, resultValuesMap);
 
 			}
-			log.debug("  contentText  {} ", contentText);
+			log.debug("Worlflow Detail ====   contentText  {} ", contentText);
 
 			if (contentText != null) {
 				inferenceContentResult = setContentDetail(resultFirstData, resultValuesMap, sentiment, actualTrend,
 						contentText);
 
 			} else {
-				log.debug(" content text is null in comparison KPI KPIId {} contentId {} result {} ",
+				log.debug(
+						"Worlflow Detail ====  content text is null in comparison KPI KPIId {} contentId {} result {} ",
 						contentConfigDefinition.getKpiId(), contentConfigDefinition.getContentId(), resultFirstData);
 			}
 		} catch (Exception e) {
 			log.error(e);
-			log.error(" Error while content processing comparison  KPIId {} contentId {} ",
+			log.error("Worlflow Detail ====  Error while content processing comparison  KPIId {} contentId {} ",
 					contentConfigDefinition.getKpiId(), contentConfigDefinition.getContentId());
 			throw new InsightsJobFailedException("Error while content processing comparison  KPIId {} contentId {} " + e.getMessage());
 		}
@@ -126,14 +127,14 @@ public class ComparisonContentCategoryImpl extends BaseContentCategoryImpl {
 	 * @return
 	 */
 	public ReportEngineEnum.KPISentiment getSentiment(Object previousValue, Object currentValue, String expectedTrend) {
-		Double previousVal = null;
-		Double currentVal = null;
-		if (previousValue instanceof String) {
+		double previousVal;
+		double currentVal;
+		if (!isNumeric(String.valueOf(previousValue))) {
 			previousVal = Double.parseDouble(String.valueOf(previousValue));
 			currentVal = Double.parseDouble(String.valueOf(currentValue));
-		} else if (previousValue instanceof Double) {
-			previousVal = (Double) previousValue;
-			currentVal = (Double) currentValue;
+		} else {
+			previousVal = (double) previousValue;
+			currentVal = (double) currentValue;
 		}
 		if (expectedTrend.equalsIgnoreCase(ReportEngineEnum.KPITrends.DOWNWARDS.getValue())) {
 			if (previousVal > currentVal) {

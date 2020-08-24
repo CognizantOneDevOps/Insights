@@ -10,15 +10,15 @@
          "visualizationConfigs":[
             {
                "vType":"mscolumn2d_901",
-               "vQuery":"MATCH (n:KPI:RESULTS) where n.reportId = 900 and n.kpiId=901 with MAX(n.executionId) as latestExecutionId MATCH (n:KPI:RESULTS) where n.executionId=latestExecutionId and n.kpiId=901 RETURN  apoc.date.format( n.recordDate ,'s','MM/dd') as Date , n.Bugs as Bugs,n.Vulnerablilities as Vulnerablilities,n.CodeSmell as CodeSmell ORDER BY Date DESC"
+               "vQuery":"MATCH (n:KPI:RESULTS) where n.assessmentId = {assessmentId} and n.executionId = {executionId} and n.kpiId={kpiId} RETURN  apoc.date.format( n.recordDate ,'s','MM/dd','IST') as Date , n.Bugs as Bugs,n.Vulnerablilities as Vulnerablilities,n.CodeSmell as CodeSmell ORDER BY Date DESC"
             },
             {
                "vType":"table_901",
-               "vQuery":"MATCH (n:KPI:RESULTS) where n.reportId = 900 and n.kpiId=901 with MAX(n.executionId) as latestExecutionId MATCH (n:KPI:RESULTS) where n.executionId=latestExecutionId and n.kpiId=901 RETURN  apoc.date.format( n.recordDate ,'s','MM/dd') as Date , n.Bugs as Bugs,n.Vulnerablilities as Vulnerablilities,n.CodeSmell as CodeSmell ORDER BY Date DESC"
+               "vQuery":"MATCH (n:KPI:RESULTS) where n.assessmentId = {assessmentId} and n.executionId = {executionId} and n.kpiId={kpiId} RETURN  apoc.date.format( n.recordDate ,'s','MM/dd','IST') as Date , n.Bugs as Bugs,n.Vulnerablilities as Vulnerablilities,n.CodeSmell as CodeSmell ORDER BY Date DESC"
             },
             {
                "vType":"stackedcolumn2d_901",
-               "vQuery":"MATCH (n:KPI:RESULTS) where n.reportId = 900 and n.kpiId=901 with MAX(n.executionId) as latestExecutionId MATCH (n:KPI:RESULTS) where n.executionId=latestExecutionId and n.kpiId=901 RETURN  apoc.date.format( n.recordDate ,'s','MM/dd') as Date , n.Bugs as Bugs,n.Vulnerablilities as Vulnerablilities,n.CodeSmell as CodeSmell ORDER BY Date DESC"
+               "vQuery":"MATCH (n:KPI:RESULTS)where n.assessmentId = {assessmentId} and n.executionId = {executionId} and n.kpiId={kpiId} RETURN  apoc.date.format( n.recordDate ,'s','MM/dd','IST') as Date , n.Bugs as Bugs,n.Vulnerablilities as Vulnerablilities,n.CodeSmell as CodeSmell ORDER BY Date DESC"
             }
          ]
       },
@@ -27,7 +27,7 @@
          "visualizationConfigs":[
             {
                "vType":"mscolumn2d_900",
-               "vQuery":"MATCH (n:KPI:RESULTS) where n.reportId = 900 and n.kpiId=900 with MAX(n.executionId) as latestExecutionId MATCH (n:KPI:RESULTS) where n.executionId=latestExecutionId and n.kpiId=900 RETURN  apoc.date.format( n.recordDate ,'s','MM/dd') as Date, n.Productivity as Productivity ORDER BY Date DESC"
+               "vQuery":"MATCH (n:KPI:RESULTS) where n.assessmentId = {assessmentId} and n.executionId = {executionId} and n.kpiId={kpiId} RETURN  apoc.date.format( n.recordDate ,'s','MM/dd','IST') as Date, n.Productivity as Productivity ORDER BY Date DESC"
             }
          ]
       },
@@ -36,15 +36,15 @@
          "visualizationConfigs":[
             {
                "vType":"mscolumn2d_902",
-               "vQuery":"MATCH (n:KPI:RESULTS) where n.reportId = 900 and n.kpiId=902 with MAX(n.executionId) as latestExecutionId MATCH (n:KPI:RESULTS) where n.executionId=latestExecutionId and n.kpiId=902 RETURN   apoc.date.format( n.recordDate ,'s','MM/dd') as Date , n.Failure as Failure,n.Success as Success ORDER BY Date DESC"
+               "vQuery":"MATCH (n:KPI:RESULTS) where n.assessmentId = {assessmentId} and n.executionId = {executionId} and n.kpiId={kpiId} RETURN   apoc.date.format( n.recordDate ,'s','MM/dd','IST') as Date , n.Failure as Failure,n.Success as Success ORDER BY Date DESC"
             },
             {
                "vType":"msline_902",
-               "vQuery":"MATCH (n:KPI:RESULTS) where n.reportId = 900 and n.kpiId=902 with MAX(n.executionId) as latestExecutionId MATCH (n:KPI:RESULTS) where n.executionId=latestExecutionId and n.kpiId=902 RETURN   apoc.date.format( n.recordDate ,'s','MM/dd') as Date , n.Failure as Failure,n.Success as Success ORDER BY Date DESC"
+               "vQuery":"MATCH (n:KPI:RESULTS) where n.assessmentId = {assessmentId} and n.executionId = {executionId} and n.kpiId={kpiId} RETURN   apoc.date.format( n.recordDate ,'s','MM/dd','IST') as Date , n.Failure as Failure,n.Success as Success ORDER BY Date DESC"
             },
             {
                "vType":"msarea_902",
-               "vQuery":"MATCH (n:KPI:RESULTS) where n.reportId = 900 and n.kpiId=902 with MAX(n.executionId) as latestExecutionId MATCH (n:KPI:RESULTS) where n.executionId=latestExecutionId and n.kpiId=902 RETURN   apoc.date.format( n.recordDate ,'s','MM/dd') as Date , n.Failure as Failure,n.Success as Success ORDER BY Date DESC"
+               "vQuery":"MATCH (n:KPI:RESULTS) where n.assessmentId = {assessmentId} and n.executionId = {executionId} and n.kpiId={kpiId} RETURN   apoc.date.format( n.recordDate ,'s','MM/dd','IST') as Date , n.Failure as Failure,n.Success as Success ORDER BY Date DESC"
             }
          ]
       },
@@ -53,7 +53,7 @@
          "visualizationConfigs":[
             {
                "vType":"pie2d_903",
-               "vQuery":"MATCH (n:KPI:RESULTS) where n.reportId = 900 and n.kpiId=903 with MAX(n.executionId) as latestExecutionId MATCH (n:KPI:RESULTS) where n.executionId=latestExecutionId and n.kpiId=903 and n.StoryTypes in ['PaymentServices','MobileServices','ClaimFinder','AgentLocator'] with n return distinct n.StoryTypes as StoryTypes ,toInt(ROUND(Avg(n.Duration))) as Duration"
+               "vQuery":"MATCH (n:KPI:RESULTS) where n.assessmentId = {assessmentId} and n.executionId = {executionId} and n.kpiId={kpiId} return distinct n.StoryTypes as StoryTypes ,toInt(ROUND(Avg(n.Duration))) as Duration"
             }
          ]
       }

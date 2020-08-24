@@ -226,81 +226,89 @@ public class AssessmentReportsTestData {
 		JsonObject reportJson = new JsonParser().parse(reportTemplate).getAsJsonObject();
 		Set<InsightsReportsKPIConfig> reportsKPIConfigSet = new HashSet<>();
 		int reportId = reportJson.get("reportId").getAsInt();
-		InsightsAssessmentReportTemplate reportEntity = (InsightsAssessmentReportTemplate) reportConfigDAL
-				.getActiveReportTemplateByReportId(reportId);
-		if(reportEntity == null) {
-			String reportName = reportJson.get("reportName").getAsString();
-			boolean isActive = reportJson.get("isActive").getAsBoolean();
-			String description = reportJson.get("description").getAsString();
-            String file = reportJson.get("file").getAsString();
-			reportEntity = new InsightsAssessmentReportTemplate();
-			reportEntity.setReportId(reportId);
-			reportEntity.setActive(isActive);
-			reportEntity.setDescription(description);
-			reportEntity.setTemplateName(reportName);
-			reportEntity.setFile(file);
-			JsonArray kpiConfigArray = reportJson.get("kpiConfigs").getAsJsonArray();
-			for (JsonElement eachKpiConfig : kpiConfigArray) {
-				JsonObject KpiObject = eachKpiConfig.getAsJsonObject();
-				int kpiId = KpiObject.get("kpiId").getAsInt();
-				String vConfig = (KpiObject.get("visualizationConfigs").getAsJsonArray()).toString();
-				InsightsKPIConfig kpiConfig = reportConfigDAL.getKPIConfig(kpiId);
-				if(kpiConfig != null) {
-					InsightsReportsKPIConfig reportsKPIConfig = new InsightsReportsKPIConfig();
-					reportsKPIConfig.setKpiConfig(kpiConfig);
-					reportsKPIConfig.setvConfig(vConfig);
-					reportsKPIConfig.setReportTemplateEntity(reportEntity);
-					reportsKPIConfigSet.add(reportsKPIConfig);
+		try {
+			InsightsAssessmentReportTemplate reportEntity = (InsightsAssessmentReportTemplate) reportConfigDAL
+					.getActiveReportTemplateByReportId(reportId);
+			if(reportEntity == null) {
+				String reportName = reportJson.get("reportName").getAsString();
+				boolean isActive = reportJson.get("isActive").getAsBoolean();
+				String description = reportJson.get("description").getAsString();
+			    String file = reportJson.get("file").getAsString();
+				reportEntity = new InsightsAssessmentReportTemplate();
+				reportEntity.setReportId(reportId);
+				reportEntity.setActive(isActive);
+				reportEntity.setDescription(description);
+				reportEntity.setTemplateName(reportName);
+				reportEntity.setFile(file);
+				JsonArray kpiConfigArray = reportJson.get("kpiConfigs").getAsJsonArray();
+				for (JsonElement eachKpiConfig : kpiConfigArray) {
+					JsonObject KpiObject = eachKpiConfig.getAsJsonObject();
+					int kpiId = KpiObject.get("kpiId").getAsInt();
+					String vConfig = (KpiObject.get("visualizationConfigs").getAsJsonArray()).toString();
+					InsightsKPIConfig kpiConfig = reportConfigDAL.getKPIConfig(kpiId);
+					if(kpiConfig != null) {
+						InsightsReportsKPIConfig reportsKPIConfig = new InsightsReportsKPIConfig();
+						reportsKPIConfig.setKpiConfig(kpiConfig);
+						reportsKPIConfig.setvConfig(vConfig);
+						reportsKPIConfig.setReportTemplateEntity(reportEntity);
+						reportsKPIConfigSet.add(reportsKPIConfig);
+					}
+					
 				}
-				
+				reportEntity.setReportsKPIConfig(reportsKPIConfigSet);
+				reportConfigDAL.saveReportConfig(reportEntity);
 			}
-			reportEntity.setReportsKPIConfig(reportsKPIConfigSet);
-			reportConfigDAL.saveReportConfig(reportEntity);
+		} catch (Exception e) {
+			log.error(e);
 		}
 		return reportId;
 
 	}
 	
 	public String saveAssessmentReport(String workflowid, String assessmentReport, int noOftask) throws InsightsCustomException {
-		JsonObject assessmentReportJson = addTask(assessmentReport, noOftask);
-		int reportId = assessmentReportJson.get("reportTemplate").getAsInt();
-		InsightsAssessmentReportTemplate reportTemplate = (InsightsAssessmentReportTemplate) reportConfigDAL
-				.getActiveReportTemplateByReportId(reportId);
-		String workflowType = WorkflowTaskEnum.WorkflowType.REPORT.getValue();
-		String reportName = assessmentReportJson.get("reportName").getAsString();
-		boolean isActive = true;
-		String schedule = assessmentReportJson.get("schedule").getAsString();
-		String emailList = assessmentReportJson.get("emailList").getAsString();
-		String datasource = assessmentReportJson.get("datasource").getAsString();
-		boolean reoccurence = assessmentReportJson.get("isReoccuring").getAsBoolean();
-		long epochStartDate = 0;
-		long epochEndDate = 0;
-		JsonElement startDateJsonObject = assessmentReportJson.get("startdate");
-		if (startDateJsonObject.isJsonNull()) {
-			epochStartDate = 0;
-		} else {
-			epochStartDate = InsightsUtils.getEpochTime(startDateJsonObject.getAsString()) / 1000;
-			epochStartDate = InsightsUtils.getStartOfTheDay(epochStartDate) + 1;
+		try {
+			JsonObject assessmentReportJson = addTask(assessmentReport, noOftask);
+			int reportId = assessmentReportJson.get("reportTemplate").getAsInt();
+			InsightsAssessmentReportTemplate reportTemplate = (InsightsAssessmentReportTemplate) reportConfigDAL
+					.getActiveReportTemplateByReportId(reportId);
+			String workflowType = WorkflowTaskEnum.WorkflowType.REPORT.getValue();
+			String reportName = assessmentReportJson.get("reportName").getAsString();
+			boolean isActive = true;
+			String schedule = assessmentReportJson.get("schedule").getAsString();
+			String emailList = assessmentReportJson.get("emailList").getAsString();
+			String datasource = assessmentReportJson.get("datasource").getAsString();
+			boolean reoccurence = assessmentReportJson.get("isReoccuring").getAsBoolean();
+			long epochStartDate = 0;
+			long epochEndDate = 0;
+			JsonElement startDateJsonObject = assessmentReportJson.get("startdate");
+			if (startDateJsonObject.isJsonNull()) {
+				epochStartDate = 0;
+			} else {
+				epochStartDate = InsightsUtils.getEpochTime(startDateJsonObject.getAsString()) / 1000;
+				epochStartDate = InsightsUtils.getStartOfTheDay(epochStartDate) + 1;
 
-		}
-		String reportStatus = WorkflowTaskEnum.WorkflowStatus.NOT_STARTED.toString();
-		JsonArray taskList = assessmentReportJson.get("tasklist").getAsJsonArray();
+			}
+			String reportStatus = WorkflowTaskEnum.WorkflowStatus.NOT_STARTED.toString();
+			JsonArray taskList = assessmentReportJson.get("tasklist").getAsJsonArray();
 //		workflowId = WorkflowTaskEnum.WorkflowType.REPORT.getValue() + "_"
 //				+ InsightsUtils.getCurrentTimeInSeconds();
-		
-		InsightsAssessmentConfiguration assessmentConfig = new InsightsAssessmentConfiguration();
-		InsightsWorkflowConfiguration workflowConfig = saveWorkflowConfig(workflowid, isActive,
-				reoccurence, schedule, reportStatus, workflowType, taskList, epochStartDate, epochEndDate);
-		assessmentConfig.setActive(isActive);
-		assessmentConfig.setEmails(emailList);
-		assessmentConfig.setInputDatasource(datasource);
-		assessmentConfig.setAsseementreportname(reportName);
-		assessmentConfig.setStartDate(epochStartDate);
-		assessmentConfig.setEndDate(epochEndDate);
-		assessmentConfig.setReportTemplateEntity(reportTemplate);
-		assessmentConfig.setWorkflowConfig(workflowConfig);
-		workflowConfig.setAssessmentConfig(assessmentConfig);
-		reportConfigDAL.saveInsightsAssessmentConfig(assessmentConfig);
+			
+			InsightsAssessmentConfiguration assessmentConfig = new InsightsAssessmentConfiguration();
+			InsightsWorkflowConfiguration workflowConfig = saveWorkflowConfig(workflowid, isActive,
+					reoccurence, schedule, reportStatus, workflowType, taskList, epochStartDate, epochEndDate);
+			assessmentConfig.setActive(isActive);
+			assessmentConfig.setEmails(emailList);
+			assessmentConfig.setInputDatasource(datasource);
+			assessmentConfig.setAsseementreportname(reportName);
+			assessmentConfig.setStartDate(epochStartDate);
+			assessmentConfig.setEndDate(epochEndDate);
+			assessmentConfig.setReportTemplateEntity(reportTemplate);
+			assessmentConfig.setWorkflowConfig(workflowConfig);
+			workflowConfig.setAssessmentConfig(assessmentConfig);
+			reportConfigDAL.saveInsightsAssessmentConfig(assessmentConfig);
+		} catch (InsightsCustomException e) {
+			log.error(e);
+		}
 		return workflowid;
 	}
 	

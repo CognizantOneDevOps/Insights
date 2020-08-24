@@ -1,16 +1,16 @@
 {
    "reportId":"602",
-   "reportName":"Report_JENKINS",
+   "reportName":"REPORT_JENKINS",
    "description":"KPIs related to Jenkins.",
    "isActive":true,
-   "file":"REPORT_JENKINS.json",
+   "file":"REPORT_JENKINS",
    "kpiConfigs":[
       {
          "kpiId":112,
          "visualizationConfigs":[
             {
-               "vType":"mscolumn2d_112",
-               "vQuery":"MATCH (n:KPI:RESULTS) where n.reportId = 602 and n.kpiId=112 RETURN n.SPKduration as SPKduration , n.avgOutput as avgOutput LIMIT 5"
+               "vType":"pie2d_112",
+               "vQuery":"MATCH (n:KPI:RESULTS) where n.assessmentId = {assessmentId} and n.executionId = {executionId} and n.kpiId={kpiId} RETURN n.resultField as avgOutput , n.avgOutput as value LIMIT 5"
             }
          ]
       },
@@ -19,7 +19,7 @@
          "visualizationConfigs":[
             {
                "vType":"mscolumn2d_231",
-               "vQuery":"MATCH (n:KPI:RESULTS) where n.reportId = 602 and n.kpiId=231 RETURN n.SPKendTime as SPKendTime , n.TotalNumberBuild as TotalNumberBuild LIMIT 5"
+               "vQuery":"MATCH (n:KPI:RESULTS) where n.assessmentId = {assessmentId} and n.kpiId={kpiId} RETURN n.resultField as SPKendTime , n.TotalNumberBuild as value ORDER BY n.executionId DESC limit 2"
             }
          ]
       },
@@ -27,8 +27,8 @@
          "kpiId":232,
          "visualizationConfigs":[
             {
-               "vType":"mscolumn2d_232",
-               "vQuery":"MATCH (n:KPI:RESULTS) where n.reportId = 602 and n.kpiId=232 RETURN n.SPKendTime as SPKendTime , n.TotalNumberBuild as TotalNumberBuild LIMIT 5"
+               "vType":"pie2d_232",
+               "vQuery":"MATCH (n:KPI:RESULTS) where n.assessmentId = {assessmentId} and n.executionId = {executionId} and n.kpiId={kpiId} RETURN n.resultField as TotalNumberBuild , n.TotalNumberBuild as value LIMIT 5"
             }
          ]
       },
@@ -37,7 +37,7 @@
          "visualizationConfigs":[
             {
                "vType":"mscolumn2d_122",
-               "vQuery":"MATCH (n:KPI:RESULTS) where n.reportId = 602 and n.kpiId=122 RETURN n.SPKendTime as SPKendTime , n.TotalNumberBuild as TotalNumberBuild LIMIT 5"
+               "vQuery":"MATCH (n:KPI:RESULTS) where n.assessmentId = {assessmentId} and n.kpiId={kpiId} RETURN n.resultField as TotalNumberBuild , n.TotalNumberBuild as value  ORDER BY n.executionId DESC limit 2"
             }
          ]
       },
@@ -45,8 +45,8 @@
          "kpiId":123,
          "visualizationConfigs":[
             {
-               "vType":"mscolumn2d_123",
-               "vQuery":"MATCH (n:KPI:RESULTS) where n.reportId = 602 and n.kpiId=123 RETURN n.SPKendTime as SPKendTime , n.TotalNumberBuild as TotalNumberBuild LIMIT 5"
+               "vType":"pie2d_123",
+               "vQuery":"MATCH (n:KPI:RESULTS) where n.assessmentId = {assessmentId} and n.executionId = {executionId} and n.kpiId={kpiId} RETURN n.resultField as TotalNumberBuild , n.TotalNumberBuild as value LIMIT 5"
             }
          ]
       },
@@ -55,7 +55,7 @@
          "visualizationConfigs":[
             {
                "vType":"mscolumn2d_126",
-               "vQuery":"MATCH (n:KPI:RESULTS) where n.reportId = 602 and n.kpiId=126 RETURN n.SPKendTime as SPKendTime , n.TotalNumberBuild as TotalNumberBuild LIMIT 5"
+               "vQuery":"MATCH (n:KPI:RESULTS) where n.assessmentId = {assessmentId}  and n.kpiId={kpiId} RETURN n.resultField as MaxBuildTime , n.MaxBuildTime as value  ORDER BY n.executionId DESC limit 2"
             }
          ]
       },
@@ -63,8 +63,8 @@
          "kpiId":127,
          "visualizationConfigs":[
             {
-               "vType":"mscolumn2d_127",
-               "vQuery":"MATCH (n:KPI:RESULTS) where n.reportId = 602 and n.kpiId=127 RETURN n.SPKendTime as SPKendTime , n.MaxBuildTime as MaxBuildTime LIMIT 5"
+               "vType":"pie2d_127",
+               "vQuery":"MATCH (n:KPI:RESULTS) where n.assessmentId = {assessmentId} and n.executionId = {executionId} and n.kpiId={kpiId} RETURN n.resultField as MaxBuildTime , n.MaxBuildTime as value LIMIT 5"
             }
          ]
       },
@@ -73,7 +73,7 @@
          "visualizationConfigs":[
             {
                "vType":"mscolumn2d_128",
-               "vQuery":"MATCH (n:KPI:RESULTS) where n.reportId = 602 and n.kpiId=128 RETURN n.SPKendTime as SPKendTime , n.MinBuildTime as MinBuildTime LIMIT 5"
+               "vQuery":"MATCH (n:KPI:RESULTS) where n.assessmentId = {assessmentId} and n.kpiId={kpiId} RETURN n.resultField as MinBuildTime , n.MinBuildTime as value  ORDER BY n.executionId DESC limit 2"
             }
          ]
       },
@@ -81,8 +81,8 @@
          "kpiId":129,
          "visualizationConfigs":[
             {
-               "vType":"mscolumn2d_129",
-               "vQuery":"MATCH (n:KPI:RESULTS) where n.reportId = 602 and n.kpiId=129 RETURN n.SPKendTime as SPKendTime , n.MinBuildTime as MinBuildTime LIMIT 5"
+               "vType":"pie2d_129",
+               "vQuery":"MATCH (n:KPI:RESULTS) where n.assessmentId = {assessmentId} and n.executionId = {executionId} and n.kpiId={kpiId} RETURN n.resultField as MinBuildTime , n.MinBuildTime as value LIMIT 5"
             }
          ]
       },
@@ -90,8 +90,8 @@
          "kpiId":125,
          "visualizationConfigs":[
             {
-               "vType":"mscolumn2d_125",
-               "vQuery":"MATCH (n:KPI:RESULTS) where n.reportId = 602 and n.kpiId=125 RETURN n.SPKendTime as SPKendTime , n.TotalNumberBuild as TotalNumberBuild LIMIT 5"
+               "vType":"pie2d_125",
+               "vQuery":"MATCH (n:KPI:RESULTS) where n.assessmentId = {assessmentId} and n.executionId = {executionId} and n.kpiId={kpiId} RETURN n.resultField as TotalNumberBuild , n.TotalNumberBuild as value LIMIT 5"
             }
          ]
       },
@@ -100,7 +100,7 @@
          "visualizationConfigs":[
             {
                "vType":"mscolumn2d_124",
-               "vQuery":"MATCH (n:KPI:RESULTS) where n.reportId = 602 and n.kpiId=124 RETURN n.SPKendTime as SPKendTime , n.TotalNumberBuild as TotalNumberBuild LIMIT 5"
+               "vQuery":"MATCH (n:KPI:RESULTS) where n.assessmentId = {assessmentId} and n.kpiId={kpiId} RETURN n.resultField as TotalNumberBuild , n.TotalNumberBuild as value  ORDER BY n.executionId DESC limit 2"
             }
          ]
       },
@@ -109,7 +109,7 @@
          "visualizationConfigs":[
             {
                "vType":"mscolumn2d_111",
-               "vQuery":"MATCH (n:KPI:RESULTS) where n.reportId = 602 and n.kpiId=111 RETURN n.SPKduration as SPKduration , n.avgOutput as avgOutput LIMIT 5"
+               "vQuery":"MATCH (n:KPI:RESULTS) where n.assessmentId = {assessmentId} and n.kpiId={kpiId} RETURN n.resultField as avgOutput , n.avgOutput as value ORDER BY n.executionId DESC limit 2"
             }
          ]
       }

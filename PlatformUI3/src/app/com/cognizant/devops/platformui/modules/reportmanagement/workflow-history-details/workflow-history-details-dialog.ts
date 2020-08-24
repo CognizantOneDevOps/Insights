@@ -146,7 +146,7 @@ export class WorkflowHistoryDetailsDialog implements OnInit {
             if (obj["statusLog"].toLowerCase() === "null") {
               obj["statusLog"] = "-";
             } else {
-              obj["statusLog"] = obj["statusLog"].slice(0, 100);
+              obj["statusLog"] = obj["statusLog"].slice(0, 300);
             }
           }
           this.detailedRecords.push(obj);

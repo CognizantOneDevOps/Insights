@@ -4,7 +4,7 @@
       "contentId":21101,
       "expectedTrend":"DOWNWARDS",
       "contentName":"Failed Deployments",
-      "kpiId":"1101",
+      "kpiId":"1115",
       "noOfResult":2,
       "threshold":0,
       "resultField":"Failure",  
@@ -17,7 +17,7 @@
       "contentId":21115,
       "expectedTrend":"UPWARDS",
       "contentName":"Successful Deployments",
-      "kpiId":"1101",
+      "kpiId":"1115",
       "noOfResult":2,
       "threshold":0,
       "resultField":"Success",  
@@ -74,11 +74,11 @@
       "expectedTrend":"UPWARDS",
 	   "resultField":"Issues",
       "contentName":"Defects Assigness",
-      "kpiId":"1106",
+      "kpiId":"1117",
       "noOfResult":2,
       "threshold":0,
       "message":{
-         "contentMessage":"Total defects asigned to each developer in the last sprint were {Issues} "
+         "contentMessage":"Total defects captured for the last run were {Issues} "
       },
       "isActive":"TRUE"
    },
@@ -86,14 +86,14 @@
       "contentId":21107,
       "isActive":"TRUE",
       "expectedTrend":"BELOW",
-	   "resultField":"Count",
+	   "resultField":"Issues",
       "contentName":" Defects Count",
-      "kpiId":1107,
+      "kpiId":1117,
        "noOfResult":2,
       "threshold":0,      
       "directionOfThreshold":"BELOW",
       "message":{
-         "contentMessage":"Total number of defects captured in the last sprint were {Count}"
+         "contentMessage":"Total number of defects captured in the last run were {Issues}"
       }
    }
    ,
@@ -106,7 +106,7 @@
       "noOfResult":2,
       "threshold":0,
       "message":{
-         "contentMessage":" Maximum successful build time captured in the last sprint was {Time}s  ."
+         "contentMessage":"Maximum successful build time captured in the last sprint was {Time}s  ."
       },
       "isActive":"TRUE"
    },  
@@ -116,7 +116,7 @@
       "contentId":21110,
       "expectedTrend":"DOWNWARDS",
       "contentName":"Failed Builds",
-      "kpiId":"1110",
+      "kpiId":"1116",
       "noOfResult":2,
 	  "resultField":"Failure",
       "threshold":0,	  
@@ -129,7 +129,7 @@
       "contentId":21116,
       "expectedTrend":"UPWARDS",
       "contentName":"Successful Builds",
-      "kpiId":"1110",
+      "kpiId":"1116",
       "noOfResult":2,
       "threshold":0,
       "resultField":"Success",  
