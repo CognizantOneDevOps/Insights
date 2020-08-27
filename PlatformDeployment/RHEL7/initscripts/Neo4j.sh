@@ -28,7 +28,7 @@
 ### END INIT INFO 
  
 [[ -z "${NEO4J_INIT_HOME}" ]] && MyVar=sudo env | grep NEO4J_INIT_HOME | cut -d'=' -f2 || MyVar="${NEO4J_INIT_HOME}"
-MyVar=$MyVar/neo4j-community-3.3.0
+MyVar=$MyVar/neo4j-Insights
 echo $MyVar
 
 case "$1" in

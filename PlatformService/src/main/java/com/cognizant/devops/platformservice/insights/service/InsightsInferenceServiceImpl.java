@@ -171,15 +171,15 @@ public class InsightsInferenceServiceImpl implements InsightsInferenceService {
 		List<InsightsInferenceDetail> details = new ArrayList<>(10);
 
 		InsightsInferenceDetail detail = new InsightsInferenceDetail();
-		detail.setKpi(name);
-		detail.setSentiment(sentiment);
-		detail.setAction(ExecutionActions.valueOf(action));
+	//	detail.setKpi(name);
+	//	detail.setSentiment(sentiment);
+	//	detail.setAction(ExecutionActions.valueOf(action));
 		detail.setTrendline(trend);
 		detail.setInference(inferenceLine);
 		detail.setSchedule(jobSchedule);
-		detail.setLastRun(lastRunDate);
+	//	detail.setLastRun(lastRunDate);
 		detail.setResultSet(result);
-		detail.setKpiId(kpiID.intValue());
+//		detail.setKpiId(kpiID.intValue());
 		details.add(detail);
 
 		return details;
@@ -404,7 +404,7 @@ public class InsightsInferenceServiceImpl implements InsightsInferenceService {
 		neo4jDef.setName(node.getPropertyMap().get(KPIJobResultAttributes.NAME.toString()));
 		neo4jDef.setVector(node.getPropertyMap().get(KPIJobResultAttributes.VECTOR.toString()));
 		neo4jDef.setExpectedTrend(node.getPropertyMap().get(KPIJobResultAttributes.EXPECTEDTREND.toString()));
-		neo4jDef.setResult(Long.parseLong(node.getPropertyMap().get(KPIJobResultAttributes.RESULT.toString())));
+		neo4jDef.setResult(Long.parseLong(node.getPropertyMap().get(KPIJobResultAttributes.RESULTS.toString())));
 		neo4jDef.setSchedule(node.getPropertyMap().get(KPIJobResultAttributes.SCHEDULE.toString()));
 		neo4jDef.setAction(node.getPropertyMap().get(KPIJobResultAttributes.ACTION.toString()));
 		neo4jDef.setResultTime(Long.parseLong(node.getPropertyMap().get(KPIJobResultAttributes.RESULTTIME.toString())));

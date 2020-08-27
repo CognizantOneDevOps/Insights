@@ -24,7 +24,7 @@ import org.apache.logging.log4j.Logger;
 import com.cognizant.devops.engines.platformengine.message.core.EngineStatusLogger;
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.config.MessageQueueDataModel;
-import com.cognizant.devops.platformcommons.constants.MessageConstants;
+import com.cognizant.devops.platformcommons.constants.MQMessageConstants;
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
 import com.rabbitmq.client.AMQP;
 import com.rabbitmq.client.Channel;
@@ -49,7 +49,7 @@ public class MessageSubscriberFactory {
 		try {
 			connection = factory.newConnection();
 			Channel channel = connection.createChannel();
-			channel.exchangeDeclare(MessageConstants.EXCHANGE_NAME, MessageConstants.EXCHANGE_TYPE, true);
+			channel.exchangeDeclare(MQMessageConstants.EXCHANGE_NAME, MQMessageConstants.EXCHANGE_TYPE, true);
 			channel.close();
 		} catch (IOException e) {
 			log.error("Unable to create MQ connection", e);
@@ -78,7 +78,7 @@ public class MessageSubscriberFactory {
 		Channel channel = connection.createChannel();
 		String queueName = routingKey.replace(".", "_");
 		channel.queueDeclare(queueName, true, false, false, null);
-		channel.queueBind(queueName, MessageConstants.EXCHANGE_NAME, routingKey);
+		channel.queueBind(queueName, MQMessageConstants.EXCHANGE_NAME, routingKey);
 		channel.basicQos(ApplicationConfigProvider.getInstance().getMessageQueue().getPrefetchCount());
 		responseHandler.setChannel(channel);
 		log.debug("prefetchCount " + ApplicationConfigProvider.getInstance().getMessageQueue().getPrefetchCount());

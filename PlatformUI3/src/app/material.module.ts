@@ -20,6 +20,8 @@ import { MatTabsModule } from '@angular/material/tabs';
 import { MatTreeModule } from '@angular/material/tree';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { ClipboardModule } from 'ngx-clipboard';
+
+import { DragulaModule } from 'ng2-dragula';
 import {
     MatButtonModule,
     MatMenuModule,
@@ -41,10 +43,8 @@ import {
     MatSortModule,
     MatProgressBarModule,
     MatSlideToggleModule,
-
-
 } from '@angular/material';
-
+import { from } from 'rxjs';
 @NgModule({
     imports: [],
     exports: [
@@ -71,7 +71,8 @@ import {
         MatTooltipModule,
         MatProgressBarModule,
         ClipboardModule,
-        MatSlideToggleModule
+        MatSlideToggleModule,
+        DragulaModule,
 
 
     ],

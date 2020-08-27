@@ -30,18 +30,16 @@ public interface EmailConstants {
 	String NOOFNEUTRAL	 ="noOfNeutral";
 	String NOOFPOSITIVE ="noOfPositives";
 	String NOOFNEGATIVE ="noOfNegatives";
-	String ACCORDIANDATA ="accordianData";
-	
+	String ACCORDIANDATA ="accordianData";	
 	String ACCEPT ="Accept";
-	String AUTHORIZATION ="Authorization";
-	
+	String AUTHORIZATION ="Authorization";	
 	String FORMAT ="format";
 	String FLOWED ="flowed";
 	String CONTENTTYPE ="Content-type";
 	String CHARSET ="text/HTML; charset=UTF-8";
 	String BIT ="8bit";
 	String ENCODING ="Content-Transfer-Encoding";
-	String NOREPLY ="NoReply-JD";
+	String NOREPLY ="NoReply-OneDevops";
 	String SMTPHOST ="mail.smtp.host";
 	String SMTPPORT = "mail.smtp.port";
 	String SMTPUSER = "mail.smtp.user";

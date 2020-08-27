@@ -31,7 +31,6 @@ import com.cognizant.devops.platformcommons.constants.ErrorMessage;
 import com.cognizant.devops.platformcommons.constants.ServiceStatusConstants;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphResponse;
 import com.cognizant.devops.platformservice.rest.health.service.HealthStatusService;
-import com.cognizant.devops.platformservice.rest.health.service.HealthStatusServiceImpl;
 import com.cognizant.devops.platformservice.rest.util.PlatformServiceUtil;
 import com.google.gson.JsonObject;
 
@@ -57,15 +56,14 @@ public class HealthStatusController {
 			hostEndPoint = ServiceStatusConstants.POSTGRESQL_HOST;
 			apiUrl = hostEndPoint;
 			JsonObject postgreStatus = healthStatusService.getClientResponse(hostEndPoint, apiUrl,
-					ServiceStatusConstants.DB,
-					ServiceStatusConstants.PgSQL, Boolean.FALSE, username, password, authToken);
+					ServiceStatusConstants.DB, ServiceStatusConstants.PgSQL, Boolean.FALSE, username, password,
+					authToken);
 			servicesHealthStatus.add(ServiceStatusConstants.PgSQL, postgreStatus);
 			log.debug("After Postgres================");
 			/* PlatformService health check */
 			hostEndPoint = ServiceStatusConstants.PLATFORM_SERVICE_HOST;
 			JsonObject platformServStatus = healthStatusService.getVersionDetails(PLATFORM_SERVICE_VERSION_FILE,
-					hostEndPoint,
-					ServiceStatusConstants.Service);
+					hostEndPoint, ServiceStatusConstants.Service);
 			servicesHealthStatus.add(ServiceStatusConstants.PlatformService, platformServStatus);
 			log.debug("After Platform Service================");
 			/* Insights Inference health check */
@@ -79,8 +77,8 @@ public class HealthStatusController {
 			apiUrl = hostEndPoint + "/db/data/";
 			authToken = ApplicationConfigProvider.getInstance().getGraph().getAuthToken();
 			JsonObject neo4jStatus = healthStatusService.getClientResponse(hostEndPoint, apiUrl,
-					ServiceStatusConstants.DB,
-					ServiceStatusConstants.Neo4j, Boolean.TRUE, username, password, authToken);
+					ServiceStatusConstants.DB, ServiceStatusConstants.Neo4j, Boolean.TRUE, username, password,
+					authToken);
 			servicesHealthStatus.add(ServiceStatusConstants.Neo4j, neo4jStatus);
 			log.debug("After Neo4j================");
 			/* Elastic Search health check */
@@ -106,8 +104,8 @@ public class HealthStatusController {
 			JsonObject jsonPlatformEngineStatus = healthStatusService.getComponentStatus("PlatformEngine", "");
 			servicesHealthStatus.add(ServiceStatusConstants.PlatformEngine, jsonPlatformEngineStatus);
 			log.debug("After Platform Engine================");
-			
-			if(ApplicationConfigProvider.getInstance().isEnableWebHookEngine()) {
+
+			if (ApplicationConfigProvider.getInstance().isEnableWebHookEngine()) {
 				hostEndPoint = ServiceStatusConstants.PlatformWebhookEngine;
 				apiUrl = hostEndPoint;
 				JsonObject jsonPlatformWebhookEngineStatus = healthStatusService
@@ -121,17 +119,25 @@ public class HealthStatusController {
 				servicesHealthStatus.add(ServiceStatusConstants.PlatformWebhookSubscriber,
 						jsonPlatformWebhookSubscriberStatus);
 			}
-			
-			if(ApplicationConfigProvider.getInstance().isEnableAuditEngine()) {
+
+			if (ApplicationConfigProvider.getInstance().isEnableAuditEngine()) {
 				hostEndPoint = ServiceStatusConstants.PlatformAuditEngine;
 				apiUrl = hostEndPoint;
 				JsonObject jsonPlatformAuditEngineStatus = healthStatusService.getComponentStatus("PlatformAuditEngine",
 						"");
 				servicesHealthStatus.add(ServiceStatusConstants.PlatformAuditEngine, jsonPlatformAuditEngineStatus);
 			}
-	
-			log.debug(" servicesHealthStatus "+servicesHealthStatus.toString());
-		}catch(Exception e) {
+			if (ApplicationConfigProvider.getInstance().isEnableDataArchivalEngine()) {
+				hostEndPoint = ServiceStatusConstants.PlatformDataArchivalEngine;
+				apiUrl = hostEndPoint;
+				JsonObject jsonPlatformDataArchivalEngineStatus = healthStatusService
+						.getComponentStatus("PlatformDataArchivalEngine", "");
+				servicesHealthStatus.add(ServiceStatusConstants.PlatformDataArchivalEngine,
+						jsonPlatformDataArchivalEngineStatus);
+			}
+
+			log.debug(" servicesHealthStatus {}",servicesHealthStatus.toString());
+		} catch (Exception e) {
 			PlatformServiceUtil.buildFailureResponse(e.getMessage());
 		}
 		return PlatformServiceUtil.buildSuccessResponseWithData(servicesHealthStatus);
@@ -144,7 +150,7 @@ public class HealthStatusController {
 		try {
 			JsonObject jsonAgentStatus = healthStatusService.getComponentStatus("Agents", "");
 			servicesAgentsHealthStatus.add(ServiceStatusConstants.Agents, jsonAgentStatus);
-			log.debug(" servicesAgentsHealthStatus  " + servicesAgentsHealthStatus);
+			log.debug(" servicesAgentsHealthStatus {}",servicesAgentsHealthStatus);
 		} catch (Exception e) {
 			log.error(e.getMessage());
 			PlatformServiceUtil.buildFailureResponse(e.getMessage());
@@ -163,14 +169,16 @@ public class HealthStatusController {
 		StringBuilder label = new StringBuilder("HEALTH");
 		if (category.equalsIgnoreCase(ServiceStatusConstants.PlatformEngine)) {
 			label.append(":").append("ENGINE");
-		} else if (category.equalsIgnoreCase(ServiceStatusConstants.PlatformWebhookEngine)) { 
-			label.append(":").append("WEBHOOKENGINE"); 
-		}else if (category.equalsIgnoreCase(ServiceStatusConstants.PlatformAuditEngine)) { 
-			label.append(":").append("AUDITENGINE"); 
-		} else if(category.equalsIgnoreCase("Platform WebhookSubscriber")) {
+		} else if (category.equalsIgnoreCase(ServiceStatusConstants.PlatformWebhookEngine)) {
+			label.append(":").append("WEBHOOKENGINE");
+		} else if (category.equalsIgnoreCase(ServiceStatusConstants.PlatformAuditEngine)) {
+			label.append(":").append("AUDITENGINE");
+		} else if (category.equalsIgnoreCase("Platform WebhookSubscriber")) {
 			label.append(":").append("WEBHOOKSUBSCRIBER");
-		} else if(category.equalsIgnoreCase(ServiceStatusConstants.InsightsInference)) {
+		} else if (category.equalsIgnoreCase(ServiceStatusConstants.InsightsInference)) {
 			label.append(":").append("INSIGHTS");
+		} else if (category.equalsIgnoreCase(ServiceStatusConstants.PlatformDataArchivalEngine)) {
+			label.append(":").append("DATAARCHIVALENGINE");
 		} else {
 			label.append(":").append(category);
 			label.append(":").append(tool);
@@ -186,6 +194,5 @@ public class HealthStatusController {
 		log.debug("############ inside getAgentFailureDetails  -----");
 		return healthStatusService.createAgentFailureHealthLabel(category, tool, agentId);
 	}
-
 
 }

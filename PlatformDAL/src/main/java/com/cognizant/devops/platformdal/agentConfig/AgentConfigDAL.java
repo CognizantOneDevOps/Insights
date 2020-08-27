@@ -17,7 +17,10 @@ package com.cognizant.devops.platformdal.agentConfig;
 
 import java.util.Date;
 import java.util.List;
+
 import org.hibernate.query.Query;
+
+import com.cognizant.devops.platformcommons.constants.DataArchivalConstants;
 import com.cognizant.devops.platformcommons.core.enums.AGENTACTION;
 import com.cognizant.devops.platformdal.core.BaseDAL;
 import com.google.gson.JsonObject;
@@ -177,6 +180,16 @@ public class AgentConfigDAL extends BaseDAL {
 
 	public List<AgentConfig> getAllAgentConfigurations() {
 		Query<AgentConfig> createQuery = getSession().createQuery("FROM AgentConfig AC", AgentConfig.class);
+		List<AgentConfig> result = createQuery.getResultList();
+		terminateSession();
+		terminateSessionFactory();
+		return result;
+	}
+
+	public List<AgentConfig> getAllEngineAggregatorAgentConfigurations() {
+		Query<AgentConfig> createQuery = getSession().createQuery("FROM AgentConfig AC WHERE AC.toolCategory != '"
+				+ DataArchivalConstants.TOOLCATEGORY + "'",
+				AgentConfig.class);
 		List<AgentConfig> result = createQuery.getResultList();
 		terminateSession();
 		terminateSessionFactory();

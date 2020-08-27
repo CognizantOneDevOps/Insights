@@ -1,0 +1,72 @@
+[
+   {
+      "contentId":900001,
+      "isActive":"TRUE",
+      "expectedTrend":"UPWARDS",
+      "contentName":"Avg Employee Productivity for last Week",
+      "action":"COUNT",
+      "kpiId":900,
+      "noOfResult":15,
+      "threshold":50,
+      "directionOfThreshold":"BELOW",
+      "message":{
+         "contentMessage":"No of employees who had been below the defined productivity were {result} in the past {day} days"
+      }
+   },
+   {
+      "contentId":900002,
+      "isActive":"TRUE",
+      "expectedTrend":"UPWARDS",
+      "contentName":"Avg Employee Productivity w.r.t Threshold ",
+      "kpiId":900,
+      "noOfResult":15,
+      "threshold":45,
+      "action":"AVERAGE",
+      "directionOfThreshold":"ABOVE",
+      "message":{
+         "contentMessage":"Employee Productivity has been {actualdirection} the defined the threshold in the past {week} week(s)"
+      }
+   },
+   {
+      "contentId":900003,
+      "isActive":"TRUE",
+      "expectedTrend":"UPWARDS",
+      "contentName":"Average Code Smell of Deployments in a Sprint ",
+      "kpiId":901,
+      "noOfResult":15,
+      "threshold":5,
+      "action":"AVERAGE",
+      "directionOfThreshold":"BELOW",
+      "message":{
+         "contentMessage":"Average Code Smell has been {actualdirection} the defined threshold in the last sprint."
+      }
+   },
+   {
+      "contentId":900004,
+      "isActive":"TRUE",
+      "expectedTrend":"BELOW",
+      "contentName":"Average Failure  of Builds in a Sprint ",
+      "kpiId":902,
+      "noOfResult":15,
+      "threshold":5,
+      "action":"AVERAGE",
+      "directionOfThreshold":"BELOW",
+      "message":{
+         "contentMessage":"Average Failure of Builds has been {actualdirection} the defined threshold in the last sprint."
+      }
+   },
+   {
+      "contentId":900005,
+      "isActive":"TRUE",
+      "expectedTrend":"BELOW",
+      "contentName":"Average hours spent on projects in a Sprint ",
+      "kpiId":903,
+      "noOfResult":15,
+      "threshold":5,
+      "action":"AVERAGE",
+      "directionOfThreshold":"BELOW",
+      "message":{
+         "contentMessage":"Average hours spent on projects is {actualdirection} the defined threshold in the last sprint."
+      }
+   }
+]

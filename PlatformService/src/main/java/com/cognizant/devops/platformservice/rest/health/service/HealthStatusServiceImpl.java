@@ -276,6 +276,31 @@ public class HealthStatusServiceImpl implements HealthStatusService {
 							ServiceStatusConstants.Service, version);
 				}
 
+			} else if (serviceType.equalsIgnoreCase("PlatformDataArchivalEngine")) {
+				graphResponse = loadHealthData("HEALTH:DATAARCHIVALENGINE", serviceType, "", 1);
+				if (graphResponse != null) {
+					if (graphResponse.getNodes().size() > 0) {
+						successResponse = graphResponse.getNodes().get(0).getPropertyMap().get("message");
+						;
+						version = graphResponse.getNodes().get(0).getPropertyMap().get("version");
+						status = graphResponse.getNodes().get(0).getPropertyMap().get("status");
+					} else {
+						successResponse = "Node list is empty in response not received from Neo4j";
+						status = PlatformServiceConstants.FAILURE;
+					}
+				} else {
+					successResponse = "Response not received from Neo4j";
+					status = PlatformServiceConstants.FAILURE;
+				}
+
+				if (status.equalsIgnoreCase(PlatformServiceConstants.SUCCESS)) {
+					returnObject = buildSuccessResponse(successResponse.toString(), apiUrl,
+							ServiceStatusConstants.Service, version);
+				} else {
+					returnObject = buildFailureResponse(successResponse.toString(), apiUrl,
+							ServiceStatusConstants.Service, version);
+				}
+
 			} else if (serviceType.equalsIgnoreCase("Agents")) {
 				graphResponse = loadHealthData("HEALTH:LATEST", serviceType, "", 100);
 				if (graphResponse != null) {
@@ -302,14 +327,13 @@ public class HealthStatusServiceImpl implements HealthStatusService {
 	public GraphResponse loadHealthData(String label, String type, String agentId, int limitOfRow) {
 
 		String query = "";
-		
-	
+
 		if (agentId.equalsIgnoreCase("")) {
 			query = "MATCH (n:" + label
 					+ ") where n.inSightsTime IS NOT NULL RETURN n order by n.inSightsTime DESC LIMIT " + limitOfRow;
 		} else if (!agentId.equalsIgnoreCase("")) {
 			String queueName = getAgentHealthQueueName(agentId);
-			//To handle case where Agent delete from Postgres but data present in Neo4j
+			// To handle case where Agent delete from Postgres but data present in Neo4j
 			if (queueName == null) {
 				queueName = label;
 			}
@@ -366,7 +390,7 @@ public class HealthStatusServiceImpl implements HealthStatusService {
 				jsonResponse2.addProperty("agentId", agentId);
 				jsonResponse2.addProperty("inSightsTimeX", insightTimeX);
 				jsonResponse2.addProperty(PlatformServiceConstants.STATUS, agentstatus);
-				//jsonResponse2.addProperty(PlatformServiceConstants.MESSAGE, message);
+				// jsonResponse2.addProperty(PlatformServiceConstants.MESSAGE, message);
 				jsonResponse2.addProperty("category", toolcategory);
 				agentNode.add(jsonResponse2);
 			}
@@ -443,13 +467,13 @@ public class HealthStatusServiceImpl implements HealthStatusService {
 
 	private JsonObject loadAgentsFailureHealthData(String nodeLabel, String agentId, int limitOfRow) {
 		String query = "";
-		
+
 		if (agentId.equalsIgnoreCase("")) {
 			query = "MATCH (n:" + nodeLabel
 					+ ") where n.inSightsTime IS NOT NULL RETURN n order by n.inSightsTime DESC LIMIT " + limitOfRow;
 		} else if (!agentId.equalsIgnoreCase("")) {
 			String queueName = getAgentHealthQueueName(agentId);
-			//To handle case where Agent delete from Postgres but data present in Neo4j
+			// To handle case where Agent delete from Postgres but data present in Neo4j
 			if (queueName == null) {
 				queueName = nodeLabel;
 			}

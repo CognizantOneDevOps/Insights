@@ -1,0 +1,25 @@
+.chart {
+    width: 98%;
+    margin-left: 10px;
+    margin-right: 10px;
+    padding: 10px;
+}
+
+.sample{
+	padding-left:20px;
+	color:red;
+}
+.content{
+	padding-left:20px;
+	color:blue;
+	font-size:16px;
+	font-family: 'Source Sans Pro', sans-serif;
+	font-weight: 400;
+}
+table {
+  border-collapse: collapse;
+}
+
+table, th, td {
+  border: 1px solid black;
+}

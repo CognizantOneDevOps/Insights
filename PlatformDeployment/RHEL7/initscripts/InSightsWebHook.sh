@@ -35,7 +35,7 @@ case "$1" in
     else
      echo "Starting InSightsWebHook"
      cd $INSIGHTS_WEBHOOK
-     sudo nohup java -jar PlatformInsightsWebHook.jar &
+	 sudo nohup java -jar PlatformInsightsWebHook.jar -config.file.location=$INSIGHTS_WEBHOOK &
      echo $! > InSightsWebHook-pid.txt
      sleep 10
     fi
@@ -68,7 +68,7 @@ case "$1" in
      echo "InSightsWebHook stopped"
      echo "InSightsWebHook starting"
      cd $INSIGHTS_WEBHOOK
-     sudo nohup java -jar PlatformInsightsWebHook.jar &
+	 sudo nohup java -jar PlatformInsightsWebHook.jar -config.file.location=$INSIGHTS_WEBHOOK &
      echo $! > InSightsWebHook-pid.txt
 	 sleep 10
      echo "InSightsWebHook started"
@@ -76,7 +76,7 @@ case "$1" in
      echo "InSightsWebHook already in stopped state"
      echo "InSightsWebHook starting"
      cd $INSIGHTS_WEBHOOK
-     sudo nohup java -jar PlatformInsightsWebHook.jar &
+	 sudo nohup java -jar PlatformInsightsWebHook.jar -config.file.location=$INSIGHTS_WEBHOOK &
      echo $! > InSightsWebHook-pid.txt
 	 sleep 10
      echo "InSightsWebHook started"

@@ -45,6 +45,20 @@ export class RestAPIurlService implements IRestAPIUrlService {
 
         this.addEndPoint("COOKIE_GRAFANA", '/PlatformService/user/cookiesForGrafana');
 
+
+        //Inference & Report Configuration
+        this.addEndPoint("SAVE_REPORT", '/PlatformService/insights/report/saveAssessmentReport');
+        this.addEndPoint("GET_SCHEDULE", '/PlatformService/insights/report/getSchedule');
+        this.addEndPoint("GET_REPORT_TEMPLATE", '/PlatformService/insights/report/getReportTemplate');
+        this.addEndPoint("GET_ASSESSMENT_REPORT", '/PlatformService/insights/report/loadAssessmentReport');
+        this.addEndPoint("DELETE_ASSESSMENT_REPORT", '/PlatformService/insights/report/deleteAssessmentReport');
+        this.addEndPoint("STATE_CHANGE", '/PlatformService/insights/report/updateAssessmentReportState');
+        this.addEndPoint("UPDATE_REPORT", '/PlatformService/insights/report/updateAssessmentReport');
+        this.addEndPoint("GET_KPI_LIST", '/PlatformService/insights/report/getKPIlistOfReportTemplate');
+        this.addEndPoint("GET_TASK_LIST", '/PlatformService/insights/workflow/getTaskList');
+        this.addEndPoint("GET_WORKFLOW_EXECUTION_RECORDS", '/PlatformService/insights/workflow/workFlowExecutionRecords');
+        this.addEndPoint("SET_RETRY_COUNT", '/PlatformService/insights/workflow/setRetryStatus');
+
         //Grafana Data Collection
         //this.addEndPoint("ACCESS_GROUP_MANAGEMENT_GET_ORGS", '/PlatformService/accessGrpMgmt/getOrgs');
         this.addEndPoint("ACCESS_GROUP_MANAGEMENT_GET_CURRENT_USER_ORGS", '/PlatformService/accessGrpMgmt/getCurrentUserOrgs');
@@ -56,14 +70,13 @@ export class RestAPIurlService implements IRestAPIUrlService {
         this.addEndPoint("ACCESS_GROUP_MANAGEMENT_GET_USERS_ORGS", '/PlatformService/accessGrpMgmt/getCurrentOrgRole');
         this.addEndPoint("GET_GRAFANA_VERSION", "/PlatformService/accessGrpMgmt/getGrafanaVersion");
         this.addEndPoint("SEARCH_DASHBOARD", '/PlatformService/accessGrpMgmt/dashboards');
-        this.addEndPoint("CURRENT_USER_DETAIL", '/PlatformService/accessGrpMgmt/currentUserDetail');
-        this.addEndPoint("SEARCH_DASHBOARD_FOLDERDETAIL", '/PlatformService/accessGrpMgmt/getDashboardsFoldersDetail');
         this.addEndPoint("ORG_USERS_GET", '/PlatformService/admin/userMgmt/getOrgUsers');
         this.addEndPoint("ORG_CREATE", '/PlatformService/admin/userMgmt/createOrg');
         this.addEndPoint("USER_CREATE", '/PlatformService/accessGrpMgmt/addUserInOrg');
         this.addEndPoint("ASSIGN_USER", '/PlatformService/accessGrpMgmt/assignUser');
         this.addEndPoint("USER_ORG_SEARCH", '/PlatformService/accessGrpMgmt/searchUser');
-
+        this.addEndPoint("CURRENT_USER_DETAIL", '/PlatformService/accessGrpMgmt/currentUserDetail');
+        this.addEndPoint("SEARCH_DASHBOARD_FOLDERDETAIL", '/PlatformService/accessGrpMgmt/getDashboardsFoldersDetail');
         //Business Mapping module under Admin section
         this.addEndPoint("GET_ALL_HIERARCHY_DETAILS", '/PlatformService/admin/businessmapping/getAllHierarchyDetails');
         this.addEndPoint("GET_HIERARCHY_PROPERTIES", '/PlatformService/admin/businessmapping/getHierarchyProperties');
@@ -139,7 +152,15 @@ export class RestAPIurlService implements IRestAPIUrlService {
         this.addEndPoint("SSO_URL_LOGOUT", InsightsInitService.singleSignOnConfig.logoutURL);//
         this.addEndPoint("KERBEROS_LOGIN_URL", "/PlatformService/user/insightsso/authenticateKerberos");
         this.addEndPoint("KERBEROS_USER_DETAIL", '/PlatformService/user/insightsso/getKerberosUserDetail');
-        this.addEndPoint("JWT_USER_DETAIL", '/PlatformService/user/insightsso/getJWTUserDetail');
+
+        //data archival
+        this.addEndPoint("SAVE_ARCHIVE_DETAILS", '/PlatformService/admin/dataarchival/saveDataArchivalDetails');
+        this.addEndPoint("ARCHIVED_DATA_LIST", '/PlatformService/admin/dataarchival/getAllArchivalRecord');
+        this.addEndPoint("DELETE_ARCHIVED_DATA", '/PlatformService/admin/dataarchival/deleteArchivedRecord');
+        this.addEndPoint("INACTIVATE_RECORD", '/PlatformService/admin/dataarchival/inactivateArchivalRecord');
+        this.addEndPoint("ACTIVATE_RECORD", '/PlatformService/admin/dataarchival/activateArchivalRecord');
+        this.addEndPoint("ACTIVE_ARCHIVED_DATA_LIST", '/PlatformService/admin/dataarchival/getActiveArchivalRecord');
+        this.addEndPoint("UPDATE_DATASOURCE_URL",'/PlatformService/admin/dataarchival/updateArchivalSourceUrl');
 
     }
 

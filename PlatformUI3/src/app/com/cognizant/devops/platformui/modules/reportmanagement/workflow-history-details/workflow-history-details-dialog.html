@@ -1,0 +1,57 @@
+<!--
+ *********************************************************************************
+ * Copyright 2019 Cognizant Technology Solutions
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License.  You may obtain a copy
+ * of the License at
+ * 
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ *******************************************************************************-->
+
+<div class="titleStyle">
+    <ul>
+        <li style="background-color: #FF8F1C;">Workflow History Detail - {{reportName}}</li>
+        <li (click)="closeShowDetailsDialog()" style="background-color: #FF8F1C;">
+            <mat-icon svgIcon="close_dialog">
+            </mat-icon>
+        </li>
+    </ul>
+</div>
+<div class="loading-indicator">
+    <mat-progress-spinner [diameter]="100" *ngIf="showThrobber" color="primary" mode="indeterminate">
+    </mat-progress-spinner>
+</div>
+<div *ngIf="checkResponseData" class="scrollData">
+    <table mat-table [dataSource]="executionRecordsDetailedDatasource">
+        <ng-container *ngFor="let header of finalHeaderToShow | keyvalue" matColumnDef="{{header.key}}">
+            <th mat-header-cell *matHeaderCellDef [ngClass]="{'tableExceIdHeaderCss':(header.key =='executionid'),'tableTimeHeaderCss':((header.key=='startTime') ||(header.key=='endTime')),'tableStatusLogHeaderCss':(header.key=='statusLog'),'tableTaskStatusAndRetryCountHeaderCss':((header.key=='currentTask') ||(header.key=='taskStatus') ||(header.key=='retryCount'))}">
+                {{header.value}}</th>
+            <td mat-cell class="cellCss" *matCellDef="let element">
+                {{element[header.key]}}</td>
+        </ng-container>
+        <tr mat-header-row *matHeaderRowDef="headerArrayDisplay" class="tableHeaderCss"></tr>
+        <tr mat-row *matRowDef="let row; columns: headerArrayDisplay;"></tr>
+    </table>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6 timeZone">
+                Timezone: {{timezone }}
+            </div>
+            <div class="col-md-6">
+                <mat-paginator #paginator [pageSize]="MAX_ROWS_PER_TABLE" showFirstLastButtons class="paginationStyle">
+                </mat-paginator>
+            </div>
+        </div>
+    </div>
+
+</div>
+<div class="noDataFoundCss" *ngIf="!checkResponseData">
+    No Data Found
+</div>

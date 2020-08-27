@@ -1,0 +1,4 @@
+mqHost=localhost
+mqUser = iSight
+mqPassword = iSight
+mqExchangeName=iSight

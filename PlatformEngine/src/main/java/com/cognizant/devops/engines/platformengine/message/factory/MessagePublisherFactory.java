@@ -17,7 +17,8 @@ package com.cognizant.devops.engines.platformengine.message.factory;
 
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.config.MessageQueueDataModel;
-import com.cognizant.devops.platformcommons.constants.MessageConstants;
+/*import com.cognizant.devops.platformcommons.constants.MessageConstants;*/
+import com.cognizant.devops.platformcommons.constants.MQMessageConstants;
 import com.google.gson.GsonBuilder;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
@@ -36,10 +37,10 @@ public class MessagePublisherFactory {
 		factory.setPassword(messageQueueConfig.getPassword());
         Connection connection = factory.newConnection();
         Channel channel = connection.createChannel();
-        channel.exchangeDeclare(MessageConstants.EXCHANGE_NAME, MessageConstants.EXCHANGE_TYPE);
+        channel.exchangeDeclare(MQMessageConstants.EXCHANGE_NAME, MQMessageConstants.EXCHANGE_TYPE);
         
         String message = new GsonBuilder().disableHtmlEscaping().create().toJson(data);
-        channel.basicPublish(MessageConstants.EXCHANGE_NAME, routingKey, null, message.getBytes());
+        channel.basicPublish(MQMessageConstants.EXCHANGE_NAME, routingKey, null, message.getBytes());
         connection.close();
 	}
 }

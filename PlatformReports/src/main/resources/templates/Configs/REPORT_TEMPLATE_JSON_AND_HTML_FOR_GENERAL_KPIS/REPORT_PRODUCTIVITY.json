@@ -1,0 +1,47 @@
+[
+   {
+      "type":"mscolumn2d",
+      "renderAt":"mscolumn2d_252",
+      "width":"700",
+      "height":"350",
+      "dataFormat":"json",
+      "dataSource":{
+         "chart":{
+            "bgColor":"black",
+            "caption":" Productivity Trend",
+            "subCaption":" Productivity Trend",
+            "theme":"fusion"
+         }
+      }
+   },
+    {
+      "type":"mscolumn2d",
+      "renderAt":"mscolumn2d_253",
+      "width":"700",
+      "height":"350",
+      "dataFormat":"json",
+      "dataSource":{
+         "chart":{
+            "bgColor":"black",
+            "caption":" Productivity Trend",
+            "subCaption":" Productivity Trend",
+            "theme":"fusion"
+         }
+      }
+   }  ,
+    {
+      "type":"mscolumn2d",
+      "renderAt":"mscolumn2d_254",
+      "width":"700",
+      "height":"350",
+      "dataFormat":"json",
+      "dataSource":{
+         "chart":{
+            "bgColor":"black",
+            "caption":" Productivity Trend_MINMAX",
+            "subCaption":" Productivity Trend",
+            "theme":"fusion"
+         }
+      }
+   }  
+]

@@ -20,12 +20,12 @@ wget https://platform.cogdevops.com/insights_install/installationScripts/latest/
 sudo yum install epel-release-latest-7.noarch.rpm
 sudo yum --disablerepo="*" --enablerepo="epel" list available
 sudo yum search htop
-sudo yum info hto
+sudo yum info htop
 sudo yum install htop
 cd /opt
 sudo mkdir erlang && cd erlang
 sudo wget https://platform.cogdevops.com/insights_install/installationScripts/latest/RHEL/rabbitmq/erlang.rpm
-sudo rpm -ivh esl-erlang_23.0-1~centos~7_amd64.rpm
+sudo rpm -ivh erlang.rpm
 echo "#################### Installing Rabbit MQ with configs and user creation ####################"
 sudo mkdir rabbitmq && cd rabbitmq
 sudo wget https://platform.cogdevops.com/insights_install/installationScripts/latest/RHEL/rabbitmq/rabbitmq-server.noarch.rpm
@@ -40,4 +40,4 @@ sudo rabbitmq-plugins enable rabbitmq_management
 sleep 15
 curl -X PUT -u guest:guest -H "Content-Type: application/json" -d '{"password":"iSight","tags":"administrator"}' "http://localhost:15672/api/users/iSight"
 sleep 15
-curl -X PUT -u guest:guest -H "Content-Type: application/json" -d '{"configure":".*","write":".*","read":".*"}' http://localhost:15672/api/permissions/%2f/iSight
+curl -X PUT -u guest:guest -H "Content-Type: application/json" -d '{"configure":".*","write":".*","read":".*"}' "http://localhost:15672/api/permissions/%2f/iSight"

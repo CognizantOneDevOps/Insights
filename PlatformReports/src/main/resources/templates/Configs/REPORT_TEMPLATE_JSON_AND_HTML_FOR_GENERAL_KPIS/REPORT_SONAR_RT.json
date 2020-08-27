@@ -1,0 +1,153 @@
+{
+   "reportId":"603",
+   "reportName":"REPORT_SONAR",
+   "description":"Kpis for sonar only",
+   "isActive":true,
+   "file":"REPORT_SONAR",
+   "kpiConfigs":[
+      {
+         "kpiId":131,
+         "visualizationConfigs":[
+            {
+               "vType":"mscolumn2d_131",
+               "vQuery":"MATCH (n:KPI:RESULTS) where n.assessmentId = {assessmentId} and n.kpiId={kpiId} RETURN n.resultField as SPKendTime , n.AvgDuplicateBlocksCoverage as AvgDuplicateBlocksCoverage ORDER BY n.executionId DESC limit 2"
+            }
+         ]
+      },
+      {
+         "kpiId":132,
+         "visualizationConfigs":[
+            {
+               "vType":"pie2d_132",
+               "vQuery":"MATCH (n:KPI:RESULTS) where n.assessmentId = {assessmentId} and n.executionId = {executionId} and n.kpiId={kpiId} RETURN n.resultField as SPKendTime , n.AvgDuplicateBlocksCoverage as AvgDuplicateBlocksCoverage LIMIT 5"
+            }
+         ]
+      },
+      {
+         "kpiId":133,
+         "visualizationConfigs":[
+            {
+               "vType":"mscolumn2d_133",
+               "vQuery":"MATCH (n:KPI:RESULTS) where n.assessmentId = {assessmentId}  and n.kpiId={kpiId} RETURN n.resultField as SPKendTime , n.NumberOfQualityBlocks as NumberOfQualityBlocks  ORDER BY n.executionId DESC limit 2"
+            }
+         ]
+      },
+      {
+         "kpiId":134,
+         "visualizationConfigs":[
+            {
+               "vType":"pie2d_134",
+               "vQuery":"MATCH (n:KPI:RESULTS) where n.assessmentId = {assessmentId} and n.executionId = {executionId} and n.kpiId={kpiId} RETURN n.resultField as SPKendTime , n.NumberOfQualityBlocks as NumberOfQualityBlocks LIMIT 5"
+            }
+         ]
+      },
+      {
+         "kpiId":331,
+         "visualizationConfigs":[
+            {
+               "vType":"mscolumn2d_331",
+               "vQuery":"MATCH (n:KPI:RESULTS) where n.assessmentId = {assessmentId}  and n.kpiId={kpiId} RETURN n.resultField as SPKendTime , n.AvgComplexityCoverage as AvgComplexityCoverage  ORDER BY n.executionId DESC limit 2"
+            }
+         ]
+      },
+      {
+         "kpiId":332,
+         "visualizationConfigs":[
+            {
+               "vType":"pie2d_332",
+               "vQuery":"MATCH (n:KPI:RESULTS) where n.assessmentId = {assessmentId} and n.executionId = {executionId} and n.kpiId={kpiId} RETURN n.resultField as SPKendTime , n.AvgComplexityCoverage as AvgComplexityCoverage LIMIT 5"
+            }
+         ]
+      },
+      {
+         "kpiId":101,
+         "visualizationConfigs":[
+            {
+               "vType":"mscolumn2d_101",
+               "vQuery":"MATCH (n:KPI:RESULTS) where n.assessmentId = {assessmentId} and n.kpiId={kpiId} RETURN n.resultField as SPKendTime , n.NumberOfQualityBlocks as NumberOfQualityBlocks  ORDER BY n.executionId DESC limit 2"
+            }
+         ]
+      },
+      {
+         "kpiId":102,
+         "visualizationConfigs":[
+            {
+               "vType":"pie2d_102",
+               "vQuery":"MATCH (n:KPI:RESULTS) where n.assessmentId = {assessmentId} and n.executionId = {executionId} and n.kpiId={kpiId} RETURN n.resultField as SPKendTime , n.NumberOfQualityBlocks as NumberOfQualityBlocks LIMIT 5"
+            }
+         ]
+      },
+      {
+         "kpiId":235,
+         "visualizationConfigs":[
+            {
+               "vType":"pie2d_235",
+               "vQuery":"MATCH (n:KPI:RESULTS)  where n.assessmentId = {assessmentId} and n.executionId = {executionId} and n.kpiId={kpiId} RETURN  n.resultField as  SPKendTime, n.AvgCodeCoverage as AvgCodeCoverage ORDER BY n.resultField DESC"
+            }
+         ]
+      },
+      {
+         "kpiId":236,
+         "visualizationConfigs":[
+            {
+               "vType":"mscolumn2d_236",
+               "vQuery":"MATCH (n:KPI:RESULTS) where n.assessmentId = {assessmentId} and n.kpiId={kpiId} RETURN n.resultField as SPKendTime , n.AvgCodeCoverage as AvgCodeCoverage  ORDER BY n.executionId DESC limit 2"
+            }
+         ]
+      },
+      {
+         "kpiId":237,
+         "visualizationConfigs":[
+            {
+               "vType":"pie2d_237",
+               "vQuery":"MATCH (n:KPI:RESULTS) where n.assessmentId = {assessmentId} and n.executionId = {executionId} and n.kpiId={kpiId} RETURN  n.resultField as SPKendTime , n.AvgCodeCoverage as AvgCodeCoverage ORDER BY n.resultField DESC"
+            }
+         ]
+      },
+      {
+         "kpiId":238,
+         "visualizationConfigs":[
+            {
+               "vType":"pie2d_238",
+               "vQuery":"MATCH (n:KPI:RESULTS) where n.assessmentId = {assessmentId} and n.executionId = {executionId} and n.kpiId={kpiId} RETURN n.resultField as SPKendTime , n.AvgCodeCoverage as AvgCodeCoverage LIMIT 5"
+            }
+         ]
+      },
+      {
+         "kpiId":138,
+         "visualizationConfigs":[
+            {
+               "vType":"pie2d_138",
+               "vQuery":"MATCH (n:KPI:RESULTS) where n.assessmentId = {assessmentId} and n.executionId = {executionId} and n.kpiId={kpiId} RETURN n.resultField as SPKendTime , n.NumberOfSonarExecutions as NumberOfSonarExecutions LIMIT 5"
+            }
+         ]
+      },
+      {
+         "kpiId":137,
+         "visualizationConfigs":[
+            {
+               "vType":"mscolumn2d_137",
+               "vQuery":"MATCH (n:KPI:RESULTS) where n.assessmentId = {assessmentId}  and n.kpiId={kpiId} RETURN n.resultField as SPKendTime , n.NumberOfSonarExecutions as NumberOfSonarExecutions  ORDER BY n.executionId DESC limit 2"
+            }
+         ]
+      },
+      {
+         "kpiId":136,
+         "visualizationConfigs":[
+            {
+               "vType":"pie2d_136",
+               "vQuery":"MATCH (n:KPI:RESULTS) where n.assessmentId = {assessmentId} and n.executionId = {executionId} and n.kpiId={kpiId} RETURN n.resultField as SPKendTime , n.NumberOfSonarExecutions as NumberOfSonarExecutions LIMIT 5"
+            }
+         ]
+      },
+      {
+         "kpiId":135,
+         "visualizationConfigs":[
+            {
+               "vType":"mscolumn2d_135",
+               "vQuery":"MATCH (n:KPI:RESULTS) where n.assessmentId = {assessmentId} and n.kpiId={kpiId} RETURN n.resultField as SPKendTime , n.NumberOfSonarExecutions as NumberOfSonarExecutions ORDER BY n.executionId DESC limit 2"
+            }
+         ]
+      }
+   ]
+}

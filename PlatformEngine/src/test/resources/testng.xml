@@ -1,9 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
 <suite name="EngineSuite">
-  <test name="PlatformEngineTestCases">
-    <classes>
-      <class name="com.cognizant.devops.engines.platformengine.test.engine.EngineAggregatorCorelationModuleTest"/>
-    </classes>
-  </test>
+	<test name="PlatformEngineTestCases" preserve-order="true">
+		<classes>
+			<class
+				name="com.cognizant.devops.engines.platformengine.test.engine.EngineAggregatorCorelationModuleTest" />
+		</classes>
+	</test>
+	<test name="PlatformWebhookEngineTest" preserve-order="true">
+		<classes>
+			<class
+				name="com.cognizant.devops.engines.platformwebhookengine.test.parser.InsightsGeneralParserTest" />
+			<class
+				name="com.cognizant.devops.engines.platformwebhookengine.test.engine.WebhookEngineTest" />
+		</classes>
+	</test>
+	<test name="PlatformDataArchivalEngineTest" preserve-order="true">
+		<classes>
+			<class
+				name="com.cognizant.devops.engines.platformdataarchivalengine.test.engine.DataArchivalEngineTest" />
+		</classes>
+	</test>
 </suite> <!-- EngineSuite -->

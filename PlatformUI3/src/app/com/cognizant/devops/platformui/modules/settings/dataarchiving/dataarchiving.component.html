@@ -1,6 +1,6 @@
 <!--
 *******************************************************************************
- * Copyright 2019 Cognizant Technology Solutions
+ * Copyright 2020 Cognizant Technology Solutions
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License.  You may obtain a copy
@@ -14,110 +14,207 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  ****************************************************************************** -->
-<div class="pageCss">
+ <div class="pageCss">
 
-  <div layout layout-align="left" class="titleStyle">
-    <div>Configuration |
-      <a class="greenTitleTxt">Data Archival </a>
+    <div layout layout-align="left" class="titleStyle">
+      <div>Configuration |
+        <a class="greenTitleTxt">Data Archival </a>
+      </div>
     </div>
-  </div>
-  <div class="orangeStripCss"></div>
-
-  <div layout layout-align="left" class="sectionHeadingStyle">
-    <div layout>&nbsp; Data Archival
-      <span class="sectionSubHeading"> (Archived data will be removed from the Database and stored in selected folder only in JSON format) </span>
+    <div class="orangeStripCss"></div>
+  
+    <div layout layout-align="left" class="sectionHeadingStyle">
+      <div layout>&nbsp; Data Archival
+        <span class="sectionSubHeading"> (Add / Edit / Delete / View Details) </span>
+      </div>
     </div>
-  </div>
-
-  <div>
+  
     <div class="btnAlign">
-      <button mat-icon-button (click)="editData()" [disabled]="iseditdisabled">
-        <mat-icon title="Edit" class="mat-icon material-icons"> <!--usingBtnCss usingBtnCss-->
-          edit
-        </mat-icon>
-      </button>
-      <button mat-icon-button (click)="saveData('add')" [disabled]="!iseditdisabled">
-        <mat-icon title="Save" class="mat-icon material-icons">
-          save
-        </mat-icon>
-      </button>
-    </div>
 
-    <div>
-      <table class="mat-elevation-z8 mat-table">
+    <ng-container *ngIf="!showAdd">
+      <button [disabled]="!enableAdd" mat-icon-button (click)="add()">
+          <mat-icon title="Add" style="margin-top: 10%;" class="mat-icon material-icons">
+              add_circle
+          </mat-icon>
+      </button>
+    </ng-container>
+
+    <ng-container *ngIf="!showAdd">
+            <button mat-icon-button (click)="configureURL()" [disabled]="!enableEdit">
+                    <mat-icon title="Edit " class="mat-icon material-icons">
+                        edit
+                    </mat-icon>
+            </button>
+    </ng-container>
+     
+      <ng-container *ngIf="showAdd">
+         <button [disabled]="!showAdd" mat-icon-button (click)="validateArchiveData()">
+             <mat-icon title="Save" style="margin-top: 12%;" class="mat-icon material-icons">
+                save
+            </mat-icon>
+         </button>
+    </ng-container>
+
+    <ng-container *ngIf="!showAdd">
+      <button mat-icon-button (click)="delete()" [disabled]="!enableDelete">
+          <mat-icon title="Delete" style="margin-bottom: -10%;" class="mat-icon material-icons">
+              delete
+          </mat-icon>
+      </button>
+    </ng-container>
+      
+    <ng-container *ngIf="!showAdd">
+      <button mat-icon-button (click)="archiveRecordsDetails()" [disabled]="!enableBrowse">
+        <mat-icon title="View Details" style="margin-bottom: -10%;" class="mat-icon material-icons">
+            visibility
+        </mat-icon>
+      </button>
+    </ng-container>
+
+    <ng-container *ngIf="showAdd">
+    <button mat-icon-button (click)="clearValues()" >
+            <mat-icon title="Reset" style="margin-top: 12%;" class="mat-icon material-icons">
+                cancel
+            </mat-icon>
+    </button>
+    </ng-container>
+  
+      <button mat-icon-button>
+          <mat-icon svgIcon="redirect_icon" title="Redirect To Landing Page" style="margin-bottom: 12%;" class="mat-icon material-icons" (click)="refresh()">
+            refresh </mat-icon>
+        </button>
+  
+  </div>
+  
+  <div *ngIf="showList">
+      <mat-radio-group [(ngModel)]="selectedArchivedData">
+          <table mat-table [dataSource]="archivalDatasource" class="mat-elevation-z8" style="margin-top:2% !important">
+              <ng-container matColumnDef="radio">
+                  <th mat-header-cell *matHeaderCellDef class="tableHeaderCss"></th>
+                  <td mat-cell *matCellDef="let element;let i = index " style="width:5% !important">
+                      <mat-radio-button [value]="element"  color="primary" (change)="radioChange($event,i);"></mat-radio-button>
+                  </td>
+              </ng-container>
+              <ng-container matColumnDef="ArchivalName">
+                  <th mat-header-cell *matHeaderCellDef class="tableHeaderCss">Archival Name</th>
+                  <td mat-cell *matCellDef="let element" style="width:30% !important;word-break: break-word;">
+                      {{element.archivalName}}
+                  </td>
+              </ng-container>
+              <ng-container matColumnDef="DataSourceUrl">
+                  <th mat-header-cell *matHeaderCellDef class="tableHeaderCss" style="padding-left:13px">Data Source Url</th>
+                  <td mat-cell *matCellDef="let element" style="width:40% !important; word-break: break-word; padding-left:15px" [ngStyle]="element.sourceUrl?{'color': 'blue','cursor': 'pointer','text-decoration': 'underline'}: {'cursor':'auto'}" (click)="onNavigate(element.sourceUrl)">
+                      {{element.sourceUrl}}
+              </ng-container>
+              <ng-container matColumnDef="ExpiryDate">
+                  <th mat-header-cell *matHeaderCellDef class="tableHeaderCss" style="padding-left:15px">Expiry Date
+                      ({{timeZone}})</th>
+                  <td mat-cell *matCellDef="let element" style="width:18%;padding-left:15px">
+                      {{element.expiryDate}} </td>
+              </ng-container>
+              <ng-container matColumnDef="Status">
+                  <th mat-header-cell *matHeaderCellDef class="tableHeaderCss">Status</th>
+                  <td mat-cell *matCellDef="let element" style="width:25%">
+                      {{element.status}} </td>
+              </ng-container>
+              <ng-container matColumnDef="Action">
+                  <th mat-header-cell *matHeaderCellDef class="tableHeaderCss" style="padding-left: 15px !important">Action</th>
+                  <td mat-cell *matCellDef="let element;let i = index" style="width:10% !important">
+                      <mat-slide-toggle (change)="updateStatus($event, element)" 
+                      [disabled]="clicked[i]" [(ngModel)]="element.action"
+                       >
+                      </mat-slide-toggle>
+                  </td>
+              </ng-container>
+              <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+              <tr mat-row *matRowDef="let row; columns: displayedColumns;"> </tr>
+          </table>
+      </mat-radio-group>
+  </div>
+  <div [hidden]="!showDetail">
+      <mat-paginator #paginator [pageSize]="MAX_ROWS_PER_TABLE" (click)="refresh()" showFirstLastButtons class="paginationStyle">
+      </mat-paginator>
+  </div>
+  
+  <div *ngIf="showAdd">
+    <table class="mat-elevation-z8 mat-table">
         <thead>
-          <tr class="mat-header-row" layout-align="start start">
-            <th colspan="3" class="tableHeaderCss mat-header-cell" style="height:40px;border-radius: 10px 10px 0 0;padding-left: 65px;padding-right: 65px">
-              <span class="mainHeaderText">Add/Edit information to Archive Data</span>
-              <span class="infoHeaderText">(Please note fields marked as “ <span style="color:#ff0000">* </span> ” are mandatory,
-              runtime will be auto-populated)</span>
-            </th>
-          </tr>
+            <tr class="mat-header-row" layout-align="start start">
+                <th colspan="3" class="tableHeaderCss mat-header-cell" style=" border-radius: 10px 10px 0 0;">
+                    <span class="mainHeaderText">Add details to Archive data</span>
+                    <span class="infoHeaderText">(Please provide accurate details.)
+                    </span>
+                </th>
+            </tr>
         </thead>
         <tbody>
-          <tr class="mat-row" *ngFor="let element of displayedColumnsNameMapping">
-            <td class="mat-cell" style="width:65%;padding: 0px 0px 0px 65px ;">
-              <span class="mainText">{{element.displayName}}</span>
-              <span *ngIf="element.type!='text'" style="color:#ff0000;">*</span>
-              <span class="infoText">{{element.infoText}}</span>
-            </td>
-            <td class="mat-cell" style="width:34%;padding: 0px 0px 0px 115px ;">
-              <div *ngIf="element.type=='input'">
-                <input [(ngModel)]="element.value" name="{{element.key}}" [disabled]="!iseditdisabled" [ngClass]="{  'input-disabled' : !iseditdisabled ,  'form-control': iseditdisabled}"
-                  required>
-                  <!--OnlyNumber="true"-->
-              </div>
-              <div *ngIf="element.type=='text'" [(ngModel)]="element.value" [name]="element.key" ngDefaultControl [disabled]="!iseditdisabled">
-                <span class="nonEditableText">{{element.value}}</span>
-              </div>
-              <div *ngIf="element.type=='list'">
-                <mat-select [(ngModel)]="element.value" name="{{element.key}}" [ngClass]="{  'input-disabled' : !iseditdisabled ,  'form-control': iseditdisabled}"
-                  required placeholder="Select number of records" [disabled]="!iseditdisabled">
-                  <mat-option *ngFor="let record of element.record" [value]="record.value">
-                    {{record.name}}
-                  </mat-option>
-                  </mat-select>
-              </div>
-            </td>
+            <tr class="mat-row-webhook">
+                <td class="mat-cell" class="columnName">
+                    <span class="mainText">Archival Name</span>
+                    <span style="color:#ff0000;">*</span>
+                </td>
+                <td class="columnComponent">
+                    <input maxlength="40" [disabled]="disableInputFields" autocomplete="off" [ngClass]="{'input-disabled' : disableInputFields ,  'form-control': !disableInputFields}"
+                        type="text" [(ngModel)]="archivalName" name="archivalName" >
+                </td>
+                <td>
+                    <span class="infoText">Please input a valid Archival Name, it contains only alphanumeric character and underscore.</span>
+                </td>
+            </tr>
+            <tr class="mat-row-webhook">
+              <td class="mat-cell" class="columnName">
+                  <span class="mainText">Records From</span>
+                  <span style="color:#ff0000;">*</span>
+              </td>
+              <td class="columnComponent">
+                  <mat-form-field style="padding-left:10px; width: 87%;" appearance="standard" required>
+                      <input matInput #startDateMatInput  [matDatepicker]="startDatePicker"
+                          required [max]="today" placeholder="Choose a date"  [(ngModel)]="startDateInput" 
+                          disabled (dateChange)="getstartDate('change', $event)">
+                      <mat-datepicker-toggle matSuffix [for]="startDatePicker"></mat-datepicker-toggle>
+                      <mat-datepicker #startDatePicker [disabled]="disableInputFields"></mat-datepicker>
+  
+                  </mat-form-field>
+              </td>
+              <td>
+                  <span class="infoText">Enter the date when Data Archival records collection starts.</span>
+              </td>
           </tr>
+  
+          <tr  class="mat-row-webhook">
+            <td class="mat-cell" class="columnName">
+                <span class="mainText">Records To</span>
+                <span style="color:#ff0000;">*</span>
+            </td>
+            <td class="columnComponent">
+                <mat-form-field style="padding-left:10px; width: 87%;" appearance="standard" required>
+                    <input matInput #endDateMatInput  [matDatepicker]="endDatePicker" required [max]="today"
+                        placeholder="Choose a date" [(ngModel)]="endDateInput" disabled (dateChange)="getendDate('change', $event)">
+                    <mat-datepicker-toggle matSuffix [for]="endDatePicker"></mat-datepicker-toggle>
+                    <mat-datepicker #endDatePicker [disabled]="disableInputFields"></mat-datepicker>
+  
+                </mat-form-field>
+            </td>
+            <td>
+                <span class="infoText">Enter the date when Data Archival records collection stops.</span>
+            </td>
+        </tr>
+           
+        <tr class="mat-row-webhook">
+          <td class="mat-cell" class="columnName">
+              <span class="mainText">Days to Retain</span>
+              <span style="color:#ff0000;">*</span>
+          </td>
+          <td class="columnComponent">
+              <input type="number" [(ngModel)]="noOfDays" name="DaysToRetain" class="form-control" min="1" max="90" integer />
+          </td>
+          <td>
+              <span class="infoText">Please input number of days to retain data.</span>
+          </td>
+      </tr>
+  
         </tbody>
-      </table>
-    </div>
+    </table>
   </div>
-
-  <!--<table mat-table [dataSource]="displayedColumnsNameMapping" class="mat-elevation-z8">
-    <!--<tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>->
-    <ng-container *matHeaderRowDef="displayedColumns">
-      <!--Group1->
-      <div class="mat-header-row header-group-row">
-        <div class="mat-header-cell header-group" role="columnheader" style="flex: 2">Add/Edit information to Archive Data (Please note fields marked as <span style="color:black">“*” </span> are mandatory,
-          runtime will be auto-populated)</div>
-      </div>
-      <!--<mat-header-row></mat-header-row>->
-    </ng-container>
-    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-
-    <ng-container matColumnDef="displayName">
-      <th mat-header-cell *matHeaderCellDef class="tableHeaderCss">Add/Edit information to Archive Data (Please note fields marked as <span style="color:black">“*” </span> are mandatory,
-        runtime will be auto-populated)</th>
-      <td mat-cell *matCellDef="let element">{{element['displayName']}} {{element['infoText']}}</td>
-    </ng-container>
-
-    <ng-container matColumnDef="input">
-      <th mat-header-cell *matHeaderCellDef class="tableHeaderCss"></th>
-      <td mat-cell *matCellDef="let element">
-        {{ element[type]}} aa {{element.type}}
-        <input *ngIf="element.type=='input'" [(ngModel)]="element.value" name="{{element[key]}}" [disabled]="!iseditdisabled" [ngClass]="{  'input-disabled' : !iseditdisabled ,  'form-control': iseditdisabled}"
-          required>
-          <span *ngIf="element[type]=='text'" class="nonEditableText">{{element[value]}}</span>
-          <mat-select *ngIf="element[type]=='list'" [(ngModel)]="element[value]" name="{{element[key]}}" [ngClass]="{  'input-disabled' : !iseditdisabled ,  'form-control': iseditdisabled}"
-            required placeholder="Select number of records" [disabled]="!iseditdisabled">
-            <mat-option *ngFor="let record of element.record" [value]="record.value">
-              {{record.name}}
-            </mat-option>
-            </mat-select>
-      </td>
-    </ng-container>
-  </table>-->
-
-</div>
+  
+  </div>

@@ -1,0 +1,48 @@
+.content-mesaage
+{
+    max-width: 370px !important;
+    word-wrap: break-word !important;
+    font-size:14px;
+    text-align: left;
+}
+.content
+{
+    margin-left: 1.5%;
+    margin-top:4%;
+    text-align: center;
+}
+
+.table td{
+    border: black solid 1px !important;
+	text-align:center;
+}
+.h3{
+	
+    text-align:center;
+    font-weight: bold;
+    font-family: 'Source Sans Pro', sans-serif;
+    color:black;
+	font-size:16px;
+}
+
+.table th{
+    border: black solid 1px !important;
+	text-align:center;
+}
+.row
+{
+    margin-top:1%;
+}
+h4
+{
+    margin-top: 1.5%;
+    text-decoration: underline;
+    font-weight: bold;
+    font-family: 'Source Sans Pro', sans-serif;
+    color:blue;
+	font-size:16px;
+}
+img
+{
+	visibility: hidden !important;
+}

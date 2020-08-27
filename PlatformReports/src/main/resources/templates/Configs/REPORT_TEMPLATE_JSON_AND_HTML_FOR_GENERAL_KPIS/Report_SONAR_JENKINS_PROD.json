@@ -1,0 +1,576 @@
+[
+   {
+      "type":"mscolumn2d",
+      "renderAt":"mscolumn2d_252",
+      "width":"700",
+      "height":"350",
+      "dataFormat":"json",
+      "dataSource":{
+         "chart":{
+            "bgColor":"black",
+            "caption":" Productivity Trend",
+            "subCaption":" Productivity Trend",
+            "theme":"fusion"
+         }
+      }
+   },
+    {
+      "type":"mscolumn2d",
+      "renderAt":"mscolumn2d_253",
+      "width":"700",
+      "height":"350",
+      "dataFormat":"json",
+      "dataSource":{
+         "chart":{
+            "bgColor":"black",
+            "caption":" Productivity Trend",
+            "subCaption":" Productivity Trend",
+            "theme":"fusion"
+         }
+      }
+   }  ,
+    {
+      "type":"mscolumn2d",
+      "renderAt":"mscolumn2d_254",
+      "width":"700",
+      "height":"350",
+      "dataFormat":"json",
+      "dataSource":{
+         "chart":{
+            "bgColor":"black",
+            "caption":" Productivity Trend_MINMAX",
+            "subCaption":" Productivity Trend",
+            "theme":"fusion"
+         }
+      }
+   }  ,
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   {
+      "type":"mscolumn2d",
+      "renderAt":"mscolumn2d_131",
+      "dataFormat":"json",
+      "dataSource":{
+         "chart":{
+            "bgColor":"black",
+            "caption":" Average Duplicated Blocks",
+            "subCaption":" Average Duplicated Blocks",
+            "theme":"fusion"
+         }
+      }
+   },
+   {
+      "type":"pie2d",
+      "renderAt":"pie2d_132",
+      "dataFormat":"json",
+      "dataSource":{
+         "chart":{
+            "bgColor":"black",
+            "caption":"Average Duplicated Blocks",
+            "subCaption":"",
+            "showPercentValues":"0",
+            "decimals":"1",
+            "showValues":"1",
+            "labelFontColor":"#fffff",
+            "labelFontBold":"5",
+            "labelFontSize":"25",
+            "theme":"fusion",
+            "tooltipBorderRadius":"20",
+            "showLabels":"0"
+         }
+      }
+   },
+   {
+      "type":"mscolumn2d",
+      "renderAt":"mscolumn2d_133",
+      "dataFormat":"json",
+      "dataSource":{
+         "chart":{
+            "bgColor":"black",
+            "caption":"Number of Quality Failed Blocks",
+            "subCaption":" Number of Quality Failed Blocks",
+            "theme":"fusion"
+         }
+      }
+   },
+   {
+      "type":"pie2d",
+      "renderAt":"pie2d_134",
+      "dataFormat":"json",
+      "dataSource":{
+         "chart":{
+            "bgColor":"black",
+            "caption":" Number of Quality Failed Blocks",
+            "subCaption":"",
+            "showPercentValues":"0",
+            "decimals":"1",
+            "showValues":"1",
+            "labelFontColor":"#fffff",
+            "labelFontBold":"5",
+            "labelFontSize":"25",
+            "theme":"fusion",
+            "tooltipBorderRadius":"20",
+            "showLabels":"0"
+         }
+      }
+   },
+   {
+      "type":"mscolumn2d",
+      "renderAt":"mscolumn2d_131",
+      "dataFormat":"json",
+      "dataSource":{
+         "chart":{
+            "bgColor":"black",
+            "caption":"Average Duplicated Blocks",
+            "subCaption":"Average Duplicated Blocks",
+            "theme":"fusion"
+         }
+      }
+   },
+   {
+      "type":"mscolumn2d",
+      "renderAt":"mscolumn2d_331",
+      "dataFormat":"json",
+      "dataSource":{
+         "chart":{
+            "bgColor":"black",
+            "caption":"Average Complexity",
+            "subCaption":"Average Complexity",
+            "theme":"fusion"
+         }
+      }
+   },
+   {
+      "type":"pie2d",
+      "renderAt":"pie2d_332",
+      "dataFormat":"json",
+      "dataSource":{
+         "chart":{
+            "bgColor":"black",
+            "caption":"Average Complexity",
+            "subCaption":"",
+            "showPercentValues":"0",
+            "decimals":"1",
+            "showValues":"1",
+            "labelFontColor":"#fffff",
+            "labelFontBold":"5",
+            "labelFontSize":"25",
+            "theme":"fusion",
+            "tooltipBorderRadius":"20",
+            "showLabels":"0"
+         }
+      }
+   },
+   {
+      "type":"mscolumn2d",
+      "renderAt":"mscolumn2d_101",
+      "dataFormat":"json",
+      "dataSource":{
+         "chart":{
+            "bgColor":"black",
+            "caption":"Number of Quality Passed Blocks",
+            "subCaption":"Number of Quality Passed Blocks",
+            "theme":"fusion"
+         }
+      }
+   },
+   {
+      "type":"pie2d",
+      "renderAt":"pie2d_102",
+      "dataFormat":"json",
+      "dataSource":{
+         "chart":{
+            "bgColor":"black",
+            "caption":"Number of Quality Passed Blocks",
+            "subCaption":"Number of Quality Passed Blocks",
+            "theme":"fusion"
+         }
+      }
+   },
+   {
+      "type":"pie2d",
+      "renderAt":"pie2d_235",
+      "dataFormat":"json",
+      "dataSource":{
+         "chart":{
+            "bgColor":"black",
+            "caption":"Average Code Coverage",
+            "subCaption":"",
+            "showPercentValues":"0",
+            "decimals":"1",
+            "showValues":"1",
+            "labelFontColor":"#fffff",
+            "labelFontBold":"5",
+            "labelFontSize":"25",
+            "theme":"fusion",
+            "tooltipBorderRadius":"20",
+            "showLabels":"0"
+         }
+      }
+   },
+   {
+      "type":"mscolumn2d",
+      "renderAt":"mscolumn2d_236",
+      "dataFormat":"json",
+      "dataSource":{
+         "chart":{
+            "bgColor":"black",
+            "caption":" Average Code Coverage",
+            "subCaption":" Average Code Coverage",
+            "theme":"fusion"
+         }
+      }
+   },
+   {
+      "type":"pie2d",
+      "renderAt":"pie2d_237",
+      "dataFormat":"json",
+      "dataSource":{
+         "chart":{
+            "bgColor":"black",
+            "caption":"Average Code Coverage",
+            "subCaption":"",
+            "showPercentValues":"0",
+            "decimals":"1",
+            "showValues":"1",
+            "labelFontColor":"#fffff",
+            "labelFontBold":"5",
+            "labelFontSize":"25",
+            "theme":"fusion",
+            "tooltipBorderRadius":"20",
+            "showLabels":"0"
+         }
+      }
+   },
+   {
+      "type":"pie2d",
+      "renderAt":"pie2d_238",
+      "dataFormat":"json",
+      "dataSource":{
+         "chart":{
+            "bgColor":"black",
+            "caption":"Average Code Coverage",
+            "subCaption":"",
+            "showPercentValues":"0",
+            "decimals":"1",
+            "showValues":"1",
+            "labelFontColor":"#fffff",
+            "labelFontBold":"5",
+            "labelFontSize":"25",
+            "theme":"fusion",
+            "tooltipBorderRadius":"20",
+            "showLabels":"0"
+         }
+      }
+   },
+   {
+      "type":"pie2d",
+      "renderAt":"pie2d_138",
+      "dataFormat":"json",
+      "dataSource":{
+         "chart":{
+            "bgColor":"black",
+            "caption":"Number of Failed Sonar Executions",
+            "subCaption":"",
+            "showPercentValues":"0",
+            "decimals":"1",
+            "showValues":"1",
+            "labelFontColor":"#fffff",
+            "labelFontBold":"5",
+            "labelFontSize":"25",
+            "theme":"fusion",
+            "tooltipBorderRadius":"20",
+            "showLabels":"0"
+         }
+      }
+   },
+   {
+      "type":"mscolumn2d",
+      "renderAt":"mscolumn2d_137",
+      "dataFormat":"json",
+      "dataSource":{
+         "chart":{
+            "bgColor":"black",
+            "caption":"Number of Failed Sonar Executions",
+            "theme":"fusion"
+         }
+      }
+   },
+   {
+      "type":"pie2d",
+      "renderAt":"pie2d_136",
+      "dataFormat":"json",
+      "dataSource":{
+         "chart":{
+            "bgColor":"black",
+            "caption":"Number of Successful Sonar Executions",
+            "subCaption":"",
+            "showPercentValues":"0",
+            "decimals":"1",
+            "showValues":"1",
+            "labelFontColor":"#fffff",
+            "labelFontBold":"5",
+            "labelFontSize":"25",
+            "theme":"fusion",
+            "tooltipBorderRadius":"20",
+            "showLabels":"0"
+         }
+      }
+   },
+   {
+      "type":"mscolumn2d",
+      "renderAt":"mscolumn2d_135",
+      "dataFormat":"json",
+      "dataSource":{
+         "chart":{
+            "bgColor":"black",
+            "caption":" Number of Successful Sonar Executions",
+            "subCaption":" Number of Successful Sonar Executions",
+            "theme":"fusion"
+         }
+      }
+   },
+   
+   
+   {
+      "type":"pie2d",
+      "renderAt":"pie2d_112",
+      "dataFormat":"json",
+      "dataSource":{
+         "chart":{
+            "bgColor":"black",
+            "caption":" Average Build Time",
+            "subCaption":"",
+            "showPercentValues":"0",
+            "decimals":"1",
+            "showValues":"1",
+            "labelFontColor":"#fffff",
+            "labelFontBold":"5",
+            "labelFontSize":"25",
+            "theme":"fusion",
+            "tooltipBorderRadius":"20",
+            "showLabels":"0"
+         }
+      }
+   },
+   {
+      "type":"pie2d",
+      "renderAt":"pie2d_232",
+      "dataFormat":"json",
+      "dataSource":{
+         "chart":{
+            "bgColor":"black",
+            "caption":" Number of Builds",
+            "subCaption":"",
+            "showPercentValues":"0",
+            "decimals":"1",
+            "showValues":"1",
+            "labelFontColor":"#fffff",
+            "labelFontBold":"5",
+            "labelFontSize":"25",
+            "theme":"fusion",
+            "tooltipBorderRadius":"20",
+            "showLabels":"0"
+         }
+      }
+   },
+   {
+      "type":"mscolumn2d",
+      "renderAt":"mscolumn2d_231",
+      "dataFormat":"json",
+      "dataSource":{
+         "chart":{
+            "bgColor":"black",
+            "caption":" Number of Builds",
+            "subCaption":"",
+            "theme":"fusion"
+         }
+      }
+   },
+   {
+      "type":"mscolumn2d",
+      "renderAt":"mscolumn2d_122",
+      "dataFormat":"json",
+      "dataSource":{
+         "chart":{
+            "bgColor":"black",
+            "caption":" Number of Successful Builds",
+            "subCaption":"",
+            "theme":"fusion"
+         }
+      }
+   },
+   {
+      "type":"mscolumn2d",
+      "renderAt":"mscolumn2d_126",
+      "dataFormat":"json",
+      "dataSource":{
+         "chart":{
+            "bgColor":"black",
+            "caption":" Maximum Build Time",
+            "subCaption":"",
+            "theme":"fusion"
+         }
+      }
+   },
+   {
+      "type":"pie2d",
+      "renderAt":"pie2d_123",
+      "dataFormat":"json",
+      "dataSource":{
+         "chart":{
+            "bgColor":"black",
+            "caption":" Number of Successful Builds",
+            "subCaption":"",
+            "showPercentValues":"0",
+            "decimals":"1",
+            "showValues":"1",
+            "labelFontColor":"#fffff",
+            "labelFontBold":"5",
+            "labelFontSize":"25",
+            "theme":"fusion",
+            "tooltipBorderRadius":"20",
+            "showLabels":"0"
+         }
+      }
+   },
+   {
+      "type":"pie2d",
+      "renderAt":"pie2d_127",
+      "dataFormat":"json",
+      "dataSource":{
+         "chart":{
+            "bgColor":"black",
+            "caption":"Maximum Build Time",
+            "subCaption":"",
+            "showPercentValues":"0",
+            "decimals":"1",
+            "showValues":"1",
+            "labelFontColor":"#fffff",
+            "labelFontBold":"5",
+            "labelFontSize":"25",
+            "theme":"fusion",
+            "tooltipBorderRadius":"20",
+            "showLabels":"0"
+         }
+      }
+   },
+   {
+      "type":"mscolumn2d",
+      "renderAt":"mscolumn2d_128",
+      "dataFormat":"json",
+      "dataSource":{
+         "chart":{
+            "bgColor":"black",
+            "caption":" Minimum Build Time",
+            "subCaption":"",
+            "theme":"fusion"
+         }
+      }
+   },
+   {
+      "type":"pie2d",
+      "renderAt":"pie2d_129",
+      "dataFormat":"json",
+      "dataSource":{
+         "chart":{
+            "bgColor":"black",
+            "caption":"Minimum Build Time",
+            "subCaption":"",
+            "showPercentValues":"0",
+            "decimals":"1",
+            "showValues":"1",
+            "labelFontColor":"#fffff",
+            "labelFontBold":"5",
+            "labelFontSize":"25",
+            "theme":"fusion",
+            "tooltipBorderRadius":"20",
+            "showLabels":"0"
+         }
+      }
+   },
+   {
+      "type":"pie2d",
+      "renderAt":"pie2d_125",
+      "dataFormat":"json",
+      "dataSource":{
+         "chart":{
+            "bgColor":"black",
+            "caption":" Number of Failed Builds",
+            "subCaption":"",
+            "showPercentValues":"0",
+            "decimals":"1",
+            "showValues":"1",
+            "labelFontColor":"#fffff",
+            "labelFontBold":"5",
+            "labelFontSize":"25",
+            "theme":"fusion",
+            "tooltipBorderRadius":"20",
+            "showLabels":"0"
+         }
+      }
+   },
+   {
+      "type":"mscolumn2d",
+      "renderAt":"mscolumn2d_124",
+      "dataFormat":"json",
+      "dataSource":{
+         "chart":{
+            "bgColor":"black",
+            "caption":" Number of Failed Builds",
+            "subCaption":"",
+            "theme":"fusion"
+         }
+      }
+   },
+   {
+      "type":"pie2d",
+      "renderAt":"pie2d_122",
+      "dataFormat":"json",
+      "dataSource":{
+         "chart":{
+            "bgColor":"black",
+            "caption":"Number of Successful Builds",
+            "subCaption":"",
+            "showPercentValues":"0",
+            "decimals":"1",
+            "showValues":"1",
+            "labelFontColor":"#fffff",
+            "labelFontBold":"5",
+            "labelFontSize":"25",
+            "theme":"fusion",
+            "tooltipBorderRadius":"20",
+            "showLabels":"0"
+         }
+      }
+   },
+   {
+      "type":"mscolumn2d",
+      "renderAt":"mscolumn2d_111",
+      "dataFormat":"json",
+      "dataSource":{
+         "chart":{
+            "bgColor":"black",
+            "caption":"Average Build Time",
+            "subCaption":"",
+            "theme":"fusion"
+         }
+      }
+   }
+
+
+   
+   
+   
+   
+   
+]

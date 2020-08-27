@@ -2,7 +2,7 @@
 	"showBusinessMapping": true,
 	"showAuditReporting": false,
 	"showWebhookConfiguration": true,
-	"enableInsightsBranding": true,
+	"enableInsightsToolbar": true,
 	"enableLogoutButton": true,
 	"autheticationProtocol": "NativeGrafana",
 	"agentsOsList": {

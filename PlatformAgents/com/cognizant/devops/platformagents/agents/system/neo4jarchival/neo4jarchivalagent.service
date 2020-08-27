@@ -1,0 +1,9 @@
+[Unit]
+Description=Ubuntu Neo4jArchivalAgent Service
+
+[Service]
+Type=forking
+ExecStart=/bin/bash /opt/insightsagents/PlatformAgents/neo4jarchival/__AGENT_KEY__/__AGENT_KEY__.sh
+
+[Install]
+WantedBy=multi-user.target

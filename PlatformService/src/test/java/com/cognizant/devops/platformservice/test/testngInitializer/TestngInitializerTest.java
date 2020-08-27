@@ -15,14 +15,19 @@
  *******************************************************************************/
 package com.cognizant.devops.platformservice.test.testngInitializer;
 
+import javax.annotation.Resource;
 import javax.servlet.ServletException;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.web.FilterChainProxy;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
 import org.springframework.test.context.web.WebAppConfiguration;
-import org.testng.annotations.BeforeTest;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.web.context.WebApplicationContext;
+import org.testng.annotations.BeforeSuite;
 import org.testng.annotations.Test;
 
 import com.cognizant.devops.platformcommons.config.ApplicationConfigCache;
@@ -34,9 +39,23 @@ public class TestngInitializerTest extends AbstractTestNGSpringContextTests{
 	
 	static Logger log = LogManager.getLogger(TestngInitializerTest.class);
 	
-	@BeforeTest
+	@Autowired
+	private WebApplicationContext wac;
+
+	private MockMvc mockMvc;
+
+	@Resource
+	private FilterChainProxy springSecurityFilterChain;
+
+	static {
+		ApplicationConfigCache.loadConfigCache();
+		log.debug("Testng initializer class to load Config Cache .... static");
+
+	}
+
+	@BeforeSuite
 	public void testOnStartup() throws ServletException {
 		ApplicationConfigCache.loadConfigCache();
-		System.out.println("Testng initializer class to load Config Cache");
+		log.debug("Testng initializer class to load Config Cache");
 	}
 }

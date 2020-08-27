@@ -21,9 +21,10 @@ import java.util.List;
 import java.util.Map;
 
 public class NodeData {
-	private Map<String, String> propertyMap = new HashMap<String, String>();
-	private Map<String, NodeData> relationMap = new HashMap<String, NodeData>();
-	private List<String> labels = new ArrayList<String>();
+
+	private Map<String, String> propertyMap = new HashMap<>();
+	private Map<String, NodeData> relationMap = new HashMap<>();
+	private List<String> labels = new ArrayList<>();
 	
 	public Map<String, String> getPropertyMap() {
 		return propertyMap;
@@ -36,7 +37,7 @@ public class NodeData {
 		propertyMap.put(name, value);
 	}
 	
-	public String getProperty(String name){
+	public String getProperty (String name){
 		return propertyMap.get(name);
 	}
 	

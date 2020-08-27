@@ -49,7 +49,7 @@ public class InsightsBulkUpload {
 	 * @param insightsTimeFormat
 	 * @return ResponseBody
 	 */
-	@RequestMapping(value = "/uploadToolData", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+	@RequestMapping(value = "/uploadToolData", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	public @ResponseBody JsonObject uploadToolData(@RequestParam("file") MultipartFile file,
 			@RequestParam String toolName, @RequestParam String label, @RequestParam String insightsTimeField,
 			@RequestParam String insightsTimeFormat) {

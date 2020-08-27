@@ -12,15 +12,17 @@
 	<parent>
 		<groupId>com.cognizant.devops</groupId>
 		<artifactId>PlatformParent</artifactId>
-		<version>6.8</version>
+		<version>7.0-beta</version>
 	</parent>
 	<artifactId>PlatformDAL</artifactId>
 	<name>PlatformDAL</name>
 	<groupId>com.cognizant.devops</groupId>
-	<version>6.8</version>
+	<version>7.0-beta</version>
 	<url>http://maven.apache.org</url>
+
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<elasticsearch.version>7.6.2</elasticsearch.version>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -33,7 +35,7 @@
 		<dependency>
 			<groupId>com.cognizant.devops</groupId>
 			<artifactId>PlatformCommons</artifactId>
-			<version>6.8</version>
+			<version>7.0-beta</version>
 		</dependency>
 
 		<!-- Dependency for postgresql -->
@@ -53,12 +55,28 @@
 			<artifactId>neo4j-java-driver</artifactId>
 			<version>1.7.3</version>
 		</dependency>
-		
-<!-- 		<dependency>
-		    <groupId>org.springframework.data</groupId>
-		    <artifactId>spring-data-jpa</artifactId>
-		    <version>2.2.6.RELEASE</version>
-		</dependency> -->
+		<dependency>
+			<groupId>org.elasticsearch.client</groupId>
+			<artifactId>elasticsearch-rest-client</artifactId>
+			<version>${elasticsearch.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.elasticsearch</groupId>
+			<artifactId>elasticsearch-x-content</artifactId>
+			<version>${elasticsearch.version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>com.fasterxml.jackson.core</groupId>
+					<artifactId>jackson-core</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>org.elasticsearch.client</groupId>
+			<artifactId>elasticsearch-rest-high-level-client</artifactId>
+			<version>${elasticsearch.version}</version>
+		</dependency>
 	</dependencies>
 	<build>
 		<plugins>
@@ -75,9 +93,9 @@
 						</goals>
 						<configuration>
 							<encoding>UTF-8</encoding>
-					        <nonFilteredFileExtensions>
-					          <nonFilteredFileExtension>pdf</nonFilteredFileExtension>
-					        </nonFilteredFileExtensions>
+							<nonFilteredFileExtensions>
+								<nonFilteredFileExtension>pdf</nonFilteredFileExtension>
+							</nonFilteredFileExtensions>
 							<outputDirectory>${project.basedir}/target</outputDirectory>
 							<resources>
 								<resource>
@@ -97,9 +115,9 @@
 						</goals>
 						<configuration>
 							<encoding>UTF-8</encoding>
-					        <nonFilteredFileExtensions>
-					          <nonFilteredFileExtension>pdf</nonFilteredFileExtension>
-					        </nonFilteredFileExtensions>
+							<nonFilteredFileExtensions>
+								<nonFilteredFileExtension>pdf</nonFilteredFileExtension>
+							</nonFilteredFileExtensions>
 							<outputDirectory>${project.build.directory}</outputDirectory>
 							<resources>
 								<resource>

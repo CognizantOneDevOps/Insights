@@ -16,4 +16,4 @@ the License.
 echo "Set INSIGHTS_HOME"
 setx -m INSIGHTS_HOME "%~dp0INSIGHTS_HOME"
 echo "Set CATALINA_HOME"
-setx -m CATALINA_HOME "%~dp0apache-tomcat-9.0.36"
+setx -m CATALINA_HOME "%~dp0apache-tomcat"

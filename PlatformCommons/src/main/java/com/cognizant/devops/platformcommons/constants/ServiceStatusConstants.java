@@ -37,6 +37,7 @@ public interface ServiceStatusConstants {
 	String PlatformWebhookEngine="Platform WebhookEngine";
 	String PlatformAuditEngine="Platform AuditEngine";
 	String PlatformEngine="Platform Engine";
+	String PlatformDataArchivalEngine="Platform DataArchivalEngine";
 	String RabbitMq="RabbitMQ";
 	String Agents="Agents";
 }

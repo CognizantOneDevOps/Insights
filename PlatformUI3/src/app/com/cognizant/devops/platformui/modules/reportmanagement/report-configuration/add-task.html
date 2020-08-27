@@ -1,0 +1,53 @@
+<!--
+   *********************************************************************************
+   * Copyright 2019 Cognizant Technology Solutions
+   * 
+   * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+   * use this file except in compliance with the License.  You may obtain a copy
+   * of the License at
+   * 
+   *   http://www.apache.org/licenses/LICENSE-2.0
+   * 
+   * Unless required by applicable law or agreed to in writing, software
+   * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+   * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+   * License for the specific language governing permissions and limitations under
+   * the License.
+   *******************************************************************************-->
+<div class="arrange-horizontally-Dialog" style="background-color:#00B140 !important">
+    <div class="gridheadercenter">
+        <pre class="showDialogHeadingCss">Add Tasks to Workflow</pre>
+    </div>
+    <div class="closeIconCss">
+        <a (click)="closeShowDetailsDialog()">
+            <mat-icon class="closeicon" svgIcon="close_dialog"> </mat-icon>
+        </a>
+    </div>
+</div>
+<div class="flex2">
+    <label class="SubHeading">Task Lists for Workflow</label>
+    <label class="SubHeading">Selected Tasks for Execution</label>
+</div>
+<div class="infoHeaderText">
+    <label>(Please insure the task is in correct sequence)
+    </label>
+</div>
+
+
+<div class="flex">
+    <div class="container" dragula="TASKS" [(dragulaModel)]="listOftasks" (dragulaModelChange)="listOftasks = $event">
+        <div class="task" id="fromAllTaskList" *ngFor="let task of listOftasks">{{ task.description }}</div>
+    </div>
+    <div class="container" dragula="TASKS" [(dragulaModel)]="targetTasks">
+        <div class="task" id="fromSelectedTaskList" *ngFor="let task of targetTasks">{{ task.description }}</div>
+    </div>
+</div>
+
+<div style="background-color:#ffffff">
+    <button mat-raised-button (click)="closeShowDetailsDialog()" class="configureBut" style="margin-top:2%;width:130px;margin-left: 55%; margin-bottom: 15px;">
+        CANCEL
+    </button>
+    <button mat-raised-button (click)="savetasks()" class="configureBut" style="margin-left: 3%;width:130px;padding-left: 10px;padding-right: 10px;">
+        ADD
+    </button>
+</div>

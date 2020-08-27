@@ -48,7 +48,7 @@ public class GetPropertyValues{
 		} 
 		catch (Exception e)
 		{
-			System.out.println("Exception: " + e);
+			//System.out.println("Exception: " + e);
 		}
 		finally 
 		{

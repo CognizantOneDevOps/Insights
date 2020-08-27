@@ -51,7 +51,7 @@ public class AboutServiceTest {
 			String key = (String) e.nextElement();
 			jsonObj.addProperty(key, properties.getProperty(key));
 		}
-		System.out.println(" Test ng for AboutService");
+		//System.out.println(" Test ng for AboutService");
 	}
 	
 }

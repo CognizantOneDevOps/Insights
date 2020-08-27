@@ -1,0 +1,35 @@
+[
+   {
+      "kpiId":900,
+      "name":"Avg all employee productivity for threshold ",
+      "toolName":"PRODUCTIVITY",
+      "category":"THRESHOLD",
+      "group":"PRODUCTIVITY",
+      "isActive":true,
+      "DBQuery":"MATCH (n:PRODUCTIVITY) where n.completionDateEpochTime > {startTime} AND n.completionDateEpochTime < {endTime} WITH n.completionDateEpochTime as completionDateEpochTime, avg(n.storyPoints*8) as StoryPoint, avg(n.authorTimeSpent) as authorTimeSpent  return   completionDateEpochTime, StoryPoint, authorTimeSpent, round((toFloat(StoryPoint)/authorTimeSpent)*100) as Productivity",
+      "resultField":"Productivity",
+      "datasource":"NEO4J"
+   },
+   {
+      "kpiId":901,
+      "name":"Average Code Issues in Deployment",
+      "group":"CODEQUALITY",
+      "category":"THRESHOLD",
+      "toolName":"SONAR",
+      "DBQuery":"MATCH (n:SONAR:DATA) WHERE  n.SPKstartTime > {startTime} and n.SPKstartTime < {endTime} and n.SPKvector = 'CODEQUALITY' with n where n.SPKstatus='Success'  RETURN  toInt(ROUND(Avg(n.SPKbugs))) as Bugs , toInt(ROUND(Avg(n.SPKcodeSmellsStr))) as CodeSmell, toInt(ROUND(Avg(n.SPKVulnerabilitiesStr))) as Vulnerablilities",
+      "datasource":"NEO4J",
+      "isActive":true,
+      "resultField":"CodeSmell"
+   },
+   {
+      "kpiId":902,
+      "name":"Jenkins Build Failures V/S Success",
+      "group":"BUILD",
+      "category":"THRESHOLD",
+      "toolName":"JENKINS",
+      "DBQuery":"MATCH (n:JENKINS:DATA) WHERE  n.SPKstartTime > {startTime}  and n.SPKstartTime < {endTime} and n.SPKvector = 'BUILD' with n , case when n.SPKstatus='Failure'then count(n.SPKduration) end as Failure ,case when n.SPKstatus='Success'then count(n.SPKduration) end as Success RETURN  count(Failure) as Failure , count (Success) as Success",
+      "datasource":"NEO4J",
+      "isActive":true,
+      "resultField":"Failure"
+   }
+]

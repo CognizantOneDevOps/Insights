@@ -24,7 +24,8 @@ public class SchedulerConfigData {
 	private int projectMapperModuleInterval = 10;
 	private int dataPurgingExecutorInterval = 300;
 	private int offlineDataProcessingExecutorInterval = 10;
-
+	private int inferenceJobExecutor = 20;
+	private int dataArchivalEngineInterval = 240;
 	public int getAuditEngineInterval() {
 		return auditEngineInterval;
 	}
@@ -80,5 +81,21 @@ public class SchedulerConfigData {
 	public void setOfflineDataProcessingExecutorInterval(int offlineDataProcessingExecutorInterval) {
 		this.offlineDataProcessingExecutorInterval = offlineDataProcessingExecutorInterval;
 	}
+	public int getInferenceJobExecutor() {
+		return inferenceJobExecutor;
+	}
+
+	public void setInferenceJobExecutor(int inferenceJobExecutor) {
+		this.inferenceJobExecutor = inferenceJobExecutor;
+	}
+
+	public int getDataArchivalEngineInterval() {
+		return dataArchivalEngineInterval;
+	}
+
+	public void setDataArchivalEngineInterval(int dataArchivalEngineInterval) {
+		this.dataArchivalEngineInterval = dataArchivalEngineInterval;
+	}
+	
 
 }
