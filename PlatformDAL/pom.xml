@@ -12,12 +12,12 @@
 	<parent>
 		<groupId>com.cognizant.devops</groupId>
 		<artifactId>PlatformParent</artifactId>
-		<version>6.9-SNAPSHOT</version>
+		<version>7.0-beta</version>
 	</parent>
 	<artifactId>PlatformDAL</artifactId>
 	<name>PlatformDAL</name>
 	<groupId>com.cognizant.devops</groupId>
-	<version>6.9-SNAPSHOT</version>
+	<version>7.0-beta</version>
 	<url>http://maven.apache.org</url>
 
 	<properties>
@@ -35,7 +35,7 @@
 		<dependency>
 			<groupId>com.cognizant.devops</groupId>
 			<artifactId>PlatformCommons</artifactId>
-			<version>6.9-SNAPSHOT</version>
+			<version>7.0-beta</version>
 		</dependency>
 
 		<!-- Dependency for postgresql -->
