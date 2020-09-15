@@ -31,6 +31,13 @@
     "responseType": "JSON"
   },
   "dynamicTemplate": {
+   "branches":{
+         "insightsTimeXFieldMapping":{
+            "timefield":"consumptionTime",
+            "isEpoch":false,
+            "timeformat":"%Y-%m-%dT%H:%M:%SZ"
+         }
+      },
     "timeFieldMapping": {
       "startDate": "%Y-%m-%d"
     },

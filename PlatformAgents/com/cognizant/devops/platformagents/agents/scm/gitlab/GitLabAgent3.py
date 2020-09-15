@@ -57,6 +57,8 @@ class GitLabAgent(BaseAgent):
         branchesMetaData = metaData.get('branches', {})
         commitsMetaData = metaData.get('commits', {})
         mergeReqMetaData = metaData.get('mergeRequest', {})
+        branchesinsighstTimeX=dynamicTemplate.get('branches',{}).get('insightsTimeXFieldMapping',None)
+        mergeReqinsighstTimeX=dynamicTemplate.get('mergeRequest',{}).get('insightsTimeXFieldMapping',None)
         defMergeReqResTemplate = {
             "id": "mergeReqId", "state": "mergeReqState",
             "source_branch": "originBranch",
@@ -88,7 +90,7 @@ class GitLabAgent(BaseAgent):
                 projectUpdatedAt = parser.parse(projectUpdatedAt, ignoretz=True)
                 branch_from_tracking_json = []
                 for key in trackingDetails:
-                    if key != "projectModificationTime":
+                    if key not in ['mergeReqModificationTime','projectModificationTime']: 
                         branch_from_tracking_json.append(key)
                 if startFrom < projectUpdatedAt:
                     trackingDetails['projectModificationTime'] = project.get('last_activity_at')
@@ -136,10 +138,13 @@ class GitLabAgent(BaseAgent):
                                 else:
                                     break
                             if len(branches) > 0:
+                                timestamp=branchesinsighstTimeX.get('timefield',None)
+                                timeformat=branchesinsighstTimeX.get('timeformat',None)
+                                isEpoch=branchesinsighstTimeX.get('isEpoch',False)
                                 activeBranches = [
                                     {'projectPath': projectPath, 'projectId': projectId, 'activeBranches': allBranches, 'gitType': 'metadata',
                                      'consumptionTime': timeStampNow()}]                                
-                                self.publishToolsData(activeBranches, branchesMetaData)
+                                self.publishToolsData(activeBranches, branchesMetaData,timestamp,timeformat,isEpoch,True)
                         if enableBrancheDeletion:
                             for key in branch_from_tracking_json:
                                 if key not in allBranches:
@@ -455,7 +460,11 @@ class GitLabAgent(BaseAgent):
                 branchesList.append(branch[1])
 
         if commitData:
-            self.publishToolsData(mergeReqData, metaData)
+            mergeReqinsighstTimeX=self.config.get('dynamicTemplate', {}).get('mergeRequest',{}).get('insightsTimeXFieldMapping',None)
+            timestamp=mergeReqinsighstTimeX.get('timefield',None)
+            timeformat=mergeReqinsighstTimeX.get('timeformat',None)
+            isEpoch=mergeReqinsighstTimeX.get('isEpoch',False)
+            self.publishToolsData(mergeReqData, metaData,timestamp,timeformat,isEpoch,True)
             self.publishToolsData(commitData, commitMetaData)
             self.updateTrackingJson(self.tracking)
             self.updateTrackingCacheFile(projectPath, trackingCache)
@@ -511,12 +520,12 @@ class GitLabAgent(BaseAgent):
         branch_delete['branchName'] = branchName
         branch_delete['projectPath'] = projectPath
         branch_delete['event'] = "branchDeletion"
+        branch_delete['deletionTime'] =  trackingDetails.get('projectModificationTime',None)
         # branch_delete['lastCommitDate'] = lastCommitDate
         # branch_delete['lastCommitId'] = lastCommitId
         data_branch_delete.append(branch_delete)
         branchMetadata = {"labels": ["METADATA"], "dataUpdateSupported": True, "uniqueKey": ["projectPath", "branchName"]}
-        self.publishToolsData(data_branch_delete, branchMetadata)
-
+        self.publishToolsData(data_branch_delete, branchMetadata,'deletionTime','%Y-%m-%dT%H:%M:%SZ',False,True)
 
 if __name__ == "__main__":
     GitLabAgent()

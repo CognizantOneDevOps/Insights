@@ -91,12 +91,16 @@ class AzureRepoAgent(BaseAgent):
                                     fetchNextBranchPage = False
                                     break
                             if len(branches) > 0 :
+                                branchesinsighstTimeX=dynamicTemplate.get('branches',{}).get('insightsTimeXFieldMapping',None)
+                                timestamp=branchesinsighstTimeX.get('timefield',None)
+                                timeformat=branchesinsighstTimeX.get('timeformat',None)
+                                isEpoch=branchesinsighstTimeX.get('isEpoch',False)
                                 activeBranches = [{ 'repoName' : repoName, 'activeBranches' : allBranches, 'gitType' : 'metadata'}]
                                 metadata = {
                                         "dataUpdateSupported" : True,
                                         "uniqueKey" : ["repoName", "gitType"]
                                     }
-                                self.publishToolsData(activeBranches, metadata)
+                                self.publishToolsData(activeBranches, metadata,timestamp,timeformat,isEpoch,True)
                         if enableBrancheDeletion:
                             for key in branch_from_tracking_json:
                                 if key not in allBranches:
@@ -156,9 +160,10 @@ class AzureRepoAgent(BaseAgent):
         branch_delete['branchName'] = branchName
         branch_delete['repoName'] = repoName
         branch_delete['event'] = "branchDeletion"
+        branch_delete['deletionTime'] =  trackingDetails.get('repoModificationTime',None)
         data_branch_delete.append(branch_delete)
         branchMetadata = {"labels" : ["METADATA"],"dataUpdateSupported" : True,"uniqueKey":["repoName","branchName"]}
-        self.publishToolsData(data_branch_delete, branchMetadata)
+        self.publishToolsData(data_branch_delete, branchMetadata,'deletionTime','%Y-%m-%dT%H:%M:%SZ',False,True)
 
 if __name__ == "__main__":
     AzureRepoAgent()

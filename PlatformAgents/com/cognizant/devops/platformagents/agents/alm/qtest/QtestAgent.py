@@ -17,6 +17,7 @@ from ....core.BaseAgent import BaseAgent
 import json
 import logging.handlers
 import math
+import datetime
 from dateutil import parser
 
 
@@ -277,6 +278,8 @@ class QtestAgent (BaseAgent):
                                     injectData['id'] = parentId
                                     injectData['projectId'] = int(project)
                                     injectData['almType'] = 'linked-objects'
+                                    current_time = datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
+                                    injectDat['lastModifiedDate']= current_time
                                     injectData['almParentType'] = entity
                                     if len(res.get('objects', [])) > 0:
                                         injectData['isLinked'] = True

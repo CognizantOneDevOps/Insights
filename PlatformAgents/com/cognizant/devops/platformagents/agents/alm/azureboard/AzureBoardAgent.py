@@ -96,7 +96,12 @@ class AzureBoardAgent(BaseAgent):
                 "dataUpdateSupported": True, "uniqueKey": ["key"]}
             self.publishToolsData(data, jiraKeyMetadata)
             if len(workLogData) > 0:
-                self.publishToolsData(workLogData, changeLogMetadata)
+                insighstTimeXFieldMapping = self.config.get('dynamicTemplate', {}).get('changeLog', {}).get('insightsTimeXFieldMapping',None)
+                timeStampField=insighstTimeXFieldMapping.get('timefield',None)
+                timeStampFormat=insighstTimeXFieldMapping.get('timeformat',None)
+                isEpoch=insighstTimeXFieldMapping.get('isEpoch',None);
+                timeFieldMapping=self.config.get('dynamicTemplate', {}).get('changeLog', {}).get('timeFieldMapping',None) 
+                self.publishToolsData(workLogData, changeLogMetadata,timeStampField,timeStampFormat,isEpoch,True)
             self.updateTrackingJson(self.tracking)
 
     def processChangeLog(self, baseUrl, issue, workLogFields, responseTemplate, startFromDate):
@@ -175,6 +180,10 @@ class AzureBoardAgent(BaseAgent):
     def retrieveSprintDetails(self):
         sprintDetails = self.config.get('dynamicTemplate', {}).get(
             'extensions', {}).get('sprints', None)
+        insighstTimeXFieldMapping = sprintDetails.get('insightsTimeXFieldMapping',None)
+        timeStampField=insighstTimeXFieldMapping.get('timefield',None)
+        timeStampFormat=insighstTimeXFieldMapping.get('timeformat',None)
+        isEpoch=insighstTimeXFieldMapping.get('isEpoch',None);
         teamApiUrl = sprintDetails.get('teamApiUrl')
         responseTemplate = sprintDetails.get('sprintResponseTemplate', None)
         sprintMetadata = sprintDetails.get('sprintMetadata')
@@ -188,7 +197,7 @@ class AzureBoardAgent(BaseAgent):
                 injectData = {"teamName": team["name"] }
                 sprints = self.getResponse(sprintApiUrl, 'GET', userid, passwd, None)["value"]
                 for sprint in sprints:
-                    self.publishToolsData(self.parseResponse(responseTemplate, sprint, injectData), sprintMetadata)
+                    self.publishToolsData(self.parseResponse(responseTemplate, sprint, injectData), sprintMetadata,timeStampField,timeStampFormat,isEpoch,True)
 
 if __name__ == "__main__":
     AzureBoardAgent()

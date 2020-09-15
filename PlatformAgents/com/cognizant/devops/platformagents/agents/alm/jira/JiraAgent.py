@@ -19,68 +19,127 @@ Created on Jun 22, 2016
 @author: 463188
 '''
 from datetime import datetime as dateTime2
-import datetime
+import datetime 
 import copy
-
+import re 
+import logging.handlers
 from dateutil import parser
 
+#from com.cognizant.devops.platformagents.core.BaseAgent import BaseAgent
 from ....core.BaseAgent import BaseAgent
 
 
 class JiraAgent(BaseAgent):
-        
+    changedFields = set()
+
     def process(self):
-        self.userid = self.getCredential("userid")
-        self.passwd = self.getCredential("passwd")
-        baseUrl = self.config.get("baseUrl", '')
-        startFrom = self.config.get("startFrom", '')
-        lastUpdated = self.tracking.get("lastupdated", startFrom)
-        responseTemplate = self.getResponseTemplate()
-        fields = self.extractFields(responseTemplate)
-        jiraIssuesUrl = baseUrl+"?jql=updated>='"+lastUpdated+"' ORDER BY updated ASC&maxResults="+str(self.config.get("dataFetchCount", 1000))+'&fields='+fields
-        changeLog = self.config.get('dynamicTemplate', {}).get('changeLog', None)
-        if changeLog:
-            jiraIssuesUrl = jiraIssuesUrl + '&expand=changelog'
-            changeLogFields = changeLog['fields']
-            changeLogMetadata = changeLog['metadata']
-            changeLogResponseTemplate = changeLog['responseTemplate']
-            startFromDate = parser.parse(startFrom)
-        total = 1
-        maxResults = 0
-        startAt = 0
-        updatetimestamp = None
-        sprintField = self.config.get("sprintField", None)
-        while (startAt + maxResults) < total:
-            data = []
-            workLogData = []
-            #jiraIssuesUrl = self.buildJiraRestUrl(baseUrl, startFrom, fields) + '&startAt='+str(startAt + maxResults)
-            response = self.getResponse(jiraIssuesUrl+'&startAt='+str(startAt + maxResults), 'GET', self.userid, self.passwd, None)
-            jiraIssues = response["issues"]
-            for issue in jiraIssues:
-                parsedIssue = self.parseResponse(responseTemplate, issue)
-                if sprintField:
-                    self.processSprintInformation(parsedIssue, issue, sprintField, self.tracking)
-                data += parsedIssue
-                if changeLog:
-                    workLogData += self.processChangeLog(issue, changeLogFields, changeLogResponseTemplate, startFromDate)
-            maxResults = response['maxResults']
-            total = response['total']
-            startAt = response['startAt']
-            if len(jiraIssues) > 0:
-                updatetimestamp = jiraIssues[len(jiraIssues) - 1]["fields"]["updated"]
-                dt = parser.parse(updatetimestamp)
-                fromDateTime = dt + datetime.timedelta(minutes=01)
-                fromDateTime = fromDateTime.strftime('%Y-%m-%d %H:%M')
-                self.tracking["lastupdated"] = fromDateTime
-                jiraKeyMetadata = {"dataUpdateSupported" : True,"uniqueKey" : ["key"]}
-                self.publishToolsData(data, jiraKeyMetadata)
-                #self.publishToolsData(data)
-                if len(workLogData) > 0:
-                    self.publishToolsData(workLogData, changeLogMetadata)
-                self.updateTrackingJson(self.tracking)
-            else:
-                break
-    
+         self.userid=self.config.get("userid",'')
+         self.passwd=self.config.get("passwd",'')
+         baseUrl=self.config.get("baseUrl",'')
+         startFrom = self.config.get("startFrom",'')
+         lastUpdated = self.tracking.get("lastupdated",startFrom)
+         currentDate = dateTime2.combine(dateTime2.now().date(), dateTime2.min.time())
+         responseTemplate=self.getResponseTemplate()
+         fields = self.extractFields(responseTemplate)
+         jiraIssuesUrl = baseUrl+"?jql=updated>='"+lastUpdated+"' ORDER BY updated ASC&maxResults="+str(self.config.get("dataFetchCount", 1000))+'&fields='+fields
+         enableIssueModificationTimeline = self.config.get('enableIssueModificationTimeline',False)
+         enableReSyncTrigger = self.config.get('enableReSyncTrigger', False)
+         bypassSprintExtCall = self.config.get('bypassSprintExtCall', False)
+         issueModificationTimelineCaptureDate=self.tracking.get("issueModificationTimelineCaptureDate", lastUpdated).split(" ")[0]
+         issueModificationTimelineCaptureDate = parser.parse(issueModificationTimelineCaptureDate)
+         issueStatusFilter = self.config.get('dynamicTemplate',dict()).get('issueStatusFilter',list())
+         changeLog = self.config.get('changeLog',None)
+         if changeLog:
+             jiraIssuesUrl = jiraIssuesUrl+'&expand=changelog'
+             changeLogFields = changeLog['fields']
+             changeLogMetadata = changeLog['metadata']
+             changeLogResponseTemplate= changeLog['responseTemplate']
+             startFromDate = parser.parse(startFrom)
+         total = 1
+         maxResults = 0
+         startAt = 0
+         updatetimestamp = None
+         sprintField = self.config.get('sprintField',None)
+         fieldsList =  list()
+         self.propertyExtractor(responseTemplate, fieldsList)
+         while (startAt + maxResults) < total:
+             data =[]
+             workLogData = []
+             issueModificationTimeline = []
+             #jiraIssuesUrl = self.buildJiraRestUrl(baseUrl, startFrom, fields) + '&startAt='+str(startAt + maxResults)
+             response = self.getResponse(jiraIssuesUrl+'&startAt='+str(startAt + maxResults), 'GET', self.userid, self.passwd, None)
+             jiraIssues = response["issues"]
+             for issue in jiraIssues:
+                 parsedIssue = self.parseResponse(responseTemplate, issue)
+                 issueStatus = issue.get('fields', dict()).get ('status',dict()).get('name','')
+                 isIssueStatusFilter = str(issueStatus) not in issueStatusFilter
+                 parsedIssue[0]['processed'] = False
+                 inwardIssueMetaData = list()
+                 outwardIssuesMetaData = list()
+                 issueLinkList = issue.get('fields',{}).get ('issuelinks', list())
+                 for issueLink in issueLinkList :
+                     if 'inwardIssue' in issueLink:
+                         linkType = issueLink.get ('type', {}).get('inward', '')
+                         key = issueLink.get ('inwardIssue', {}).get('key', '')
+                         inwardIssueMetaData.append (key+'__'+linkType)
+                     elif 'outwordIssue' in issueLink:
+                         linkType = issueLink.get ('type', {}).get('outward', '')
+                         key =    issueLink.get ('outwardIssue', {}).get('key', '')
+                         outwardIssuesMetaData.append (key+'__'+linkType)
+                 parsedIssue[0]['inwardIssuesMetaData'] = inwardIssueMetaData
+                 parsedIssue[0]['outwardIssuesMetaData'] = outwardIssuesMetaData
+                 if sprintField:
+                     self .processSprintInformation(parsedIssue, issue, isIssueStatusFilter, sprintField,self.tracking)
+                 for field in fieldsList:
+                     if field not in parsedIssue[0]:
+                         parsedIssue[0][field] = None
+                     data += parsedIssue
+                     if changeLog:
+                         workLogData += self.processChangeLog(issue, changeLogFields, changeLogResponseTemplate, startFromDate, enableIssueModificationTimeline, issueModificationTimeline, issueModificationTimelineCaptureDate)
+             maxResults = response['maxResults']
+             total = response['total']
+             startAt = response['startAt']
+             if len(jiraIssues) > 0:
+                 updatetimestamp = jiraIssues[len(jiraIssues) - 1]["fields"]["updated"]
+                 dt = parser.parse(updatetimestamp)
+                 fromDateTime = dt + datetime.timedelta(minutes=01)
+                 fromDateTime = fromDateTime.strftime('%Y-%m-%d %H:%M')
+                 self.tracking["lastupdated"] = fromDateTime
+                 jiraKeyMetadata = {"dataUpdateSupported" : True,"uniqueKey" : ["key"]}
+                 self.publishToolsData(data, jiraKeyMetadata)
+                 #self.publishToolsData(data)
+                 if len(workLogData) > 0:
+                     insighstTimeXFieldMapping = self.config.get('dynamicTemplate', {}).get('extensions', {}).get('releaseDetails', {}).get('insightsTimeXFieldMapping',None)
+                     timeStampField=insighstTimeXFieldMapping.get('timefield',None)
+                     timeStampFormat=insighstTimeXFieldMapping.get('timeformat',None)
+                     isEpoch=insighstTimeXFieldMapping.get('isEpoch',None); 
+                     self.publishToolsData(workLogData, changeLogMetadata ,timeStampField,timeStampFormat,isEpoch,True)
+                 if len(issueModificationTimeline) > 0:
+                     self.publishToolsData(issueModificationTimeline, {"labels": ["LATEST"], "relation": {"properties": list(self.changedFields) + ['fields'], "name":"ISSUE_CHANGE_TIMELINE", "source": {"constraints":["key"]}, "destination": {"labels": ["TIMELINE"], "constraints":["timelineDate","timelineDateEpoch"]}}})
+                 self.updateTrackingJson(self.tracking)
+             else:
+                 break
+         latestJiraDateStr = self.tracking["lastupdated"]
+         latestJiraDate = parser.parse(latestJiraDateStr)
+         lastTrackedDate = parser.parse(self.tracking.get("lastTrakced", lastUpdated).split(' ')[0])
+         lastTracked = lastTrackedDate.strftime("%Y-%m-%d %H:%M")
+         reSync = self.tracking.get("reSync", False)
+         if enableReSyncTrigger:
+             if maxResults and not reSync and 0 >= (currentDate - latestJiraDate).total_seconds() <= (26*60*60) and (currentDate - lastTrackedDate).total_seconds() == (24*60*60):
+                 self.tracking["lastupdated"] = lastTracked
+                 self.tracking["issueModificationTimelineCaptureDate"] = lastTracked
+                 self.tracking["reSync"] = True
+                 self.tracking ["lastTracked"] = currentDate.strftime("%Y-%m-%d %H:%M" )
+             elif reSync and currentDate >= lastTrackedDate:
+                 self.tracking["reSync"] = False
+         if enableIssueModificationTimeline :
+             self.tracking["issueModificationTimelineCaptureDate"] = self.tracking["lastupdated"]
+         if enableReSyncTrigger or enableIssueModificationTimeline:
+             self.updateTrackingJson(self.tracking)
+         if bypassSprintExtCall and maxResults:
+             self.retrieveSprintDetails()
+             self.retrieveSprintReports()
+
     def buildJiraRestUrl(self, baseUrl, startFrom, fields):
         lastUpdatedDate = self.tracking.get("lastupdated", startFrom)
         endDate = parser.parse(lastUpdatedDate) + datetime.timedelta(hours=24)
@@ -90,16 +149,20 @@ class JiraAgent(BaseAgent):
         if changeLog:
             jiraIssuesUrl = jiraIssuesUrl + '&expand=changelog'
         return jiraIssuesUrl
-    
-    def processChangeLog(self, issue, workLogFields, responseTemplate, startFromDate):
+
+    def processChangeLog(self, issue, workLogFields, responseTemplate, startFromDate, enableIssueModificationTimeline, issueModificationTimeline, issueModificationTimelineCaptureDate):
         changeLog = issue.get('changelog', None)
         workLogData = []
         injectData = {'issueKey' : issue['key'] }
         if changeLog:
             histories = changeLog.get('histories', [])
+            if enableIssueModificationTimeline:
+                self.buildIssueModificationTimeLine(issue['key'], histories, issueModificationTimeline,issueModificationTimelineCaptureDate)
+            loadRemoteLinks = False
+            remoteIssueLinkDataMap = {}
             for change in histories:
                 data = self.parseResponse(responseTemplate, change, injectData)[0]
-                changeDate = parser.parse(data['changeDate'].split('.')[0]);
+                changeDate = parser.parse(data['changeDate'].split('.')[0])
                 if changeDate > startFromDate:
                     items = change['items']
                     for item in items:
@@ -111,24 +174,81 @@ class JiraAgent(BaseAgent):
                             dataCopy['from'] = item['from']
                             dataCopy['to'] = item['to']
                             workLogData.append(dataCopy)
+                            if dataCopy.get('changeField', None) == 'RemoteIssueLink':
+                                objectLinkId = dataCopy.get('to', None)
+                                if objectLinkId is None:
+                                    objectLinkId = dataCopy.get('from',None)
+                                if objectLinkId :
+                                    remoteIssueLinkDataMap[objectLinkId] = dataCopy
+                                    loadRemoteLinks = True 
+                    if loadRemoteLinks:
+                        try:
+                            self.loadRemoteLinks(issue['key'], remoteIssueLinkDataMap)
+                        except Exception as ex:
+                            logging.error(ex)
         return workLogData
-    
+
+    def loadRemoteLinks(self, issueKey, remoteIssueLinkChangeDataMap):
+        remoteIssueLinksConfig = self.config.get('dynamicTemplate', {}).get('extensions',{}).get('remoteIssueLinks',None)
+        if  remoteIssueLinksConfig:
+            remoteIssueLinkRestUrl = remoteIssueLinksConfig.get("remoteIssueLinkRestUrl").format(issueKey)
+            responseTemplate = remoteIssueLinksConfig.get("remoteIssueLinkResponseTemplate")
+            remoteIssueLinkResponse = self.getResponse(remoteIssueLinkRestUrl, 'GET', self.userid, self.passwd, None)
+            if remoteIssueLinkResponse:
+                parsedResponses = self.parseResponse(responseTemplate, remoteIssueLinkResponse)
+                for parsedResponse in parsedResponses:
+                    remoteLinkId = parsedResponse['remoteLinkId']
+                    if remoteLinkId:
+                        remoteLinkId = str(remoteLinkId)
+                        remoteLinkChangeObject = remoteIssueLinkChangeDataMap.get(remoteLinkId,{})
+                        remoteLinkChangeObject.update(parsedResponse)
+
+    def buildIssueModificationTimeLine(self, issueKey, histories, issueModificationTimeline, issueModificationTimelineCaptureDate):
+        currentDate = parser.parse(datetime.datetime.now().strftime("%Y-%m-%d"))
+        timelineMap = {}
+        for change in histories:
+            changeDate = parser.parse(change['created'].split('T')[0])
+            # validate the working. we need to compare the date and time together. also, we will need to capture the change log till date and time.
+            if currentDate>changeDate >= issueModificationTimelineCaptureDate:
+                fields = timelineMap.get(str(changeDate), None)
+                if fields is None:
+                    fields = dict()
+                    timelineMap[str(changeDate)] = fields
+                items = change['items']
+                for item in items:
+                    changedField = re.sub (r'[-\+!~@#$%^&*()={}\[\]";<.>//\'\s"]', '' ,str(item['field']).lower()).capitalize()
+                    fields[changedField] = fields.get(changedField, 0) +1
+        for timelineDate in timelineMap:
+            data = dict()
+            data['key'] = issueKey
+            data['timelineDate'] = timelineDate.split(' ')[0]
+            fields = timelineMap[timelineDate]
+            data['fields'] = fields.keys()
+            for field in fields:
+                data[field] = fields[field]
+                self.changedFields.add(field)
+            issueModificationTimeline.append(data)
+
     def scheduleExtensions(self):
+        bypassSprintExtCall = self.config.get ('bypassSprintExtCall',False)
         extensions = self.config.get('dynamicTemplate', {}).get('extensions', None)
         if extensions:
             #backlog = extensions.get('backlog', None)
             #if backlog:
             #    self.registerExtension('backlog', self.retrieveBacklogDetails, backlog.get('runSchedule'))
             sprints = extensions.get('sprints', None)
-            if sprints:
+            if sprints and not bypassSprintExtCall:
                 self.registerExtension('sprints', self.retrieveSprintDetails, sprints.get('runSchedule'))
             sprintReport = extensions.get('sprintReport', None)
-            if sprintReport:
+            if sprintReport and not bypassSprintExtCall:
                 self.registerExtension('sprintReport', self.retrieveSprintReports, sprintReport.get('runSchedule'))
             releaseDetails = extensions.get('releaseDetails', None)
             if releaseDetails:
                 self.registerExtension('releaseDetails', self.retrieveReleaseDetails, releaseDetails.get('runSchedule'))
-    
+            sprintDeletionIdentifier = extensions.get('sprintDeletionIdentifier', None)
+            if sprintDeletionIdentifier:
+                self.registerExtension('sprintDeletionIdentifier', self.sprintDeletionIdentifier, sprintDeletionIdentifier.get('runSchedule'))
+
     def extractFields(self, responseTemplate):
         fieldsJson = responseTemplate.get("fields", None)
         fieldsParam = ''
@@ -140,7 +260,24 @@ class JiraAgent(BaseAgent):
             fieldsParam += ','+ self.config.get("sprintField")
         return fieldsParam
 
-    def processSprintInformation(self, parsedIssue, issue, sprintField, tracking):
+    def propertyExtractor (self, temObject, data):
+        if temObject is None or data is None:
+            return
+        keyType = type(temObject)
+        if keyType is dict:
+            for key in temObject:
+                self.propertyExtractor(temObject.get(key, None), data)
+        elif keyType is list:
+            for valObject in temObject:
+                self.propertyExtractor(valObject, data)
+        elif keyType in [unicode, str]:
+            data.append(temObject)
+        else:
+            logging.error ("Response Template not well formed")
+
+
+    def processSprintInformation(self, parsedIssue, issue,  isIssueStatusFilter,sprintField, tracking):
+        sprintStates = set()
         if sprintField:
             boardsTracking = tracking.get('boards', None)
             if boardsTracking is None:
@@ -148,32 +285,36 @@ class JiraAgent(BaseAgent):
                 tracking['boards'] = boardsTracking
             sprintDetails = issue.get("fields", {}).get(sprintField, None)
             if sprintDetails:
-                sprints = []
-                boards = []
-                for sprint in sprintDetails:
-                    sprintData = {}
-                    sprintDetail = sprint.split("[")[1][:-1]
-                    sprintPropertieTokens = sprintDetail.split(",")
-                    for propertyToken in sprintPropertieTokens:
-                        propertyKeyValToken = propertyToken.split("=")
-                        if len(propertyKeyValToken) > 1:
-                            sprintData[propertyKeyValToken[0]] = propertyKeyValToken[1]
-                    boardId = sprintData.get('rapidViewId')
-                    sprintId = sprintData.get('id')
-                    boardTracking = boardsTracking.get(boardId, None)
-                    if boardTracking is None:
-                        boardTracking = {}
-                        boardsTracking[boardId] = boardTracking
-                    sprintTracking = boardTracking.get('sprints', None)
-                    if sprintTracking is None:
-                        sprintTracking = {}
-                        boardTracking['sprints'] = sprintTracking
-                    if sprintTracking.get(sprintId, None) is None:
-                        sprintTracking[sprintId] = {}
-                    if boardId not in boards:
-                        boards.append(boardId)
-                    if sprintId not in sprints:
-                        sprints.append(sprintId)
+                try:
+                    sprints = []
+                    boards = []                
+                    for sprint in sprintDetails:
+                        sprintData = {}
+                        sprintDetail = sprint.split("[")[1][:-1]
+                        sprintPropertieTokens = sprintDetail.split(",")
+                        for propertyToken in sprintPropertieTokens:
+                            propertyKeyValToken = propertyToken.split("=")
+                            if len(propertyKeyValToken) > 1:
+                                sprintData[propertyKeyValToken[0]] = propertyKeyValToken[1]
+                        boardId = sprintData.get('rapidViewId')
+                        sprintId = sprintData.get('id')
+                        boardTracking = boardsTracking.get(boardId, None)
+                        if boardTracking is None:
+                            boardTracking = {}
+                            boardsTracking[boardId] = boardTracking
+                        sprintTracking = boardTracking.get('sprints', None)
+                        if sprintTracking is None:
+                            sprintTracking = {}
+                            boardTracking['sprints'] = sprintTracking
+                        if sprintTracking.get(sprintId, None) is None:
+                            sprintTracking[sprintId] = {}
+                        if boardId not in boards:
+                            boards.append(boardId)
+                        if sprintId not in sprints:
+                            sprints.append(sprintId)
+                except Exception as ex:
+                    parsedIssue[0]['error'] = str(ex)
+                    
                 parsedIssue[0]['sprints'] = sprints
                 parsedIssue[0]['boards'] = boards
                 #if len(boards) > 1 :
@@ -182,10 +323,16 @@ class JiraAgent(BaseAgent):
                 #        sprintTracking = boardTracking.get('sprints')
                 #        for sprint in sprints:
                 #            if sprintTracking.get(sprint, None) is None:
-                #                sprintTracking[sprint] = {}
-     
-    def retrieveSprintDetails(self):
+                #                sprintTracking[sprint] = {} 
+ 
+    def retrieveSprintDetails (self):
         sprintDetails = self.config.get('dynamicTemplate', {}).get('extensions', {}).get('sprints', None)
+		
+        insighstTimeXFieldMapping = self.config.get('dynamicTemplate', {}).get('extensions', {}).get('sprints', {}).get('insightsTimeXFieldMapping',None)
+        timeStampField=insighstTimeXFieldMapping.get('timefield',None)
+        timeStampFormat=insighstTimeXFieldMapping.get('timeformat',None)
+        isEpoch=insighstTimeXFieldMapping.get('isEpoch',None);
+		
         boardApiUrl = sprintDetails.get('boardApiUrl')
         boards = self.tracking.get('boards', None)
         if sprintDetails and boards:
@@ -233,7 +380,7 @@ class JiraAgent(BaseAgent):
                             data.append(parsedSprint)
                 if len(data) > 0 : 
                     self.publishToolsData(data, sprintMetadata)
-                    
+    
     def retrieveBacklogDetails(self):
         backlogDetails = self.config.get('dynamicTemplate', {}).get('extensions', {}).get('backlog', None)
         boardApiUrl = backlogDetails.get('boardApiUrl')
@@ -319,7 +466,7 @@ class JiraAgent(BaseAgent):
                                 #self.publishToolsData(self.getSprintInformation(sprintReportResponse, boardId, sprintId, board['name'], board['type']), sprintMetadata)
                                 self.publishToolsData(data, relationMetadata)
                                 self.updateTrackingJson(self.tracking)
-    
+
     def getSprintInformation(self, content, boardId, sprintId, boardName, boardType):
         data = []
         sprint = content.get('sprint')
@@ -345,7 +492,7 @@ class JiraAgent(BaseAgent):
             sprint['completeDateEpoch'] = self.getRemoteDateTime(dateTime2.strptime(completeDate.split(' ')[0], timeStampFormat)).get('epochTime')
         data.append(sprint)
         return data
-        
+
     def addSprintDetails(self, responseTemplate, content, sprintIssueRegion, injectData):
         issueKeysAddedDuringSprint = content.get('issueKeysAddedDuringSprint', {})
         issues = content.get(sprintIssueRegion, None)
@@ -361,20 +508,62 @@ class JiraAgent(BaseAgent):
      
     def retrieveReleaseDetails(self):
         releaseDetails = self.config.get('dynamicTemplate', {}).get('extensions', {}).get('releaseDetails', None)
+
+        insighstTimeXFieldMapping = self.config.get('dynamicTemplate', {}).get('extensions', {}).get('sprints', {}).get('insightsTimeXFieldMapping',None)
+        timeStampField=insighstTimeXFieldMapping.get('timefield',None)
+        timeStampFormat=insighstTimeXFieldMapping.get('timeformat',None)
+        isEpoch=insighstTimeXFieldMapping.get('isEpoch',None);
+
         if releaseDetails:
             jiraProjectApiUrl = releaseDetails.get('jiraProjectApiUrl', None)
             jiraProjectResponseTemplate = releaseDetails.get('jiraProjectResponseTemplate', None)
             jiraReleaseResponseTemplate = releaseDetails.get('jiraReleaseResponseTemplate', None)
             releaseVersionsMetadata = releaseDetails.get('releaseVersionsMetadata')
             if jiraProjectApiUrl and jiraProjectResponseTemplate and jiraReleaseResponseTemplate:
-                jiraProjects = self.getResponse(jiraProjectApiUrl, 'GET', self.userid, self.passwd, None)
+                jiraProjects = self.getResponse(jiraProjectApiUrl, 'GET',  self.userid, self.passwd, None)
                 parsedJiraProjects = self.parseResponse(jiraProjectResponseTemplate, jiraProjects)
                 for parsedJiraProject in parsedJiraProjects:
                     projectKey = parsedJiraProject['projectKey']
                     releaseApiUrl = jiraProjectApiUrl + '/' + projectKey + '/versions'
                     releaseVersionsResponse = self.getResponse(releaseApiUrl, 'GET', self.userid, self.passwd, None)
-                    parsedReleaseVersions = self.parseResponse(jiraReleaseResponseTemplate, releaseVersionsResponse)
+                    parsedReleaseVersions = self.parseResponse(jiraReleaseResponseTemplate, releaseVersionsResponse,parsedJiraProject)
                     self.publishToolsData(parsedReleaseVersions, releaseVersionsMetadata)
-                    
+
+    def sprintDeletionIdentifier(self):
+        deletedSprintsData = list()
+        sprintDeletionIdentifier = self.config.get('dynamicTemplate', {}).get('extensions', {}).get('sprintDeletionIdentifier',None)
+        boards = self.tracking.get('boards', None)
+        if sprintDeletionIdentifier and boards:
+            sprintUrl = sprintDeletionIdentifier.get('sprintApiUrl','')
+            userName = self.config.get("userid",'')
+            password = self.config.get("passwd",'')
+            for boardId in boards:
+                boardMetaData = boards[boardId]
+                sprints = boardMetaData.get('sprints', {})
+                deletedSprints = dict()
+                for sprintId in sprints.keys():
+                    sprintExists = self.checkingSprintExistence(sprintUrl, userName, password, sprintId)
+                    if not sprintExists:
+                        deletedSprints[sprintId] = sprints.pop(sprintId, dict())
+                    if len(deletedSprints):
+                        if 'deletedSprints' not in boardMetaData:
+                            boardMetaData['deletedSrints'] = dict()
+                        boardMetaData.get('deletedSprints', dict()).update(deletedSprints)
+                        for sprintId in deletedSprints:
+                            deletedSprintsData.append({'sprintId': int(sprintId), 'boardId': int(boardId), 'event': 'sprintDeleted'})
+            if len(deletedSprintsData):
+                metaData  = sprintDeletionIdentifier.get('metadata', dict())
+                self.publishToolsData(deletedSprintsData, metaData)
+                self.updateTrackingJson(self.tracking)
+    def checkingSprintExistence(self, sprintUrl, userName, password, sprintId):
+        try:
+            url = sprintUrl +'/' +sprintId
+            self.getResponse(url, 'GET', userName, password, None)
+            return True 
+        except Exception as err:
+            if 'Sprint done not exists' in err.message:
+                return False
+            else:
+                return  True 
 if __name__ == "__main__":
-    JiraAgent()        
+    JiraAgent()           

@@ -59,6 +59,20 @@
           "iterationStartTime":"%Y-%m-%dT%H:%M:%S",
           "iterationFinishTime":"%Y-%m-%dT%H:%M:%S" 
     },
+     "iteration":{
+            "insightsTimeXFieldMapping":{
+               "timefield":"iterationFinishTime",
+               "isEpoch":false,
+               "timeformat":"%Y-%m-%dT%H:%M:%SZ"
+            }
+         },
+         "activity":{
+               "insightsTimeXFieldMapping":{
+                  "timefield":"occurredAt",
+                  "isEpoch":false,
+                  "timeformat":"%Y-%m-%dT%H:%M:%SZ"
+               }
+            },
     "responseTemplate": {
       "id": "key",
       "created_at": "createdAt",
