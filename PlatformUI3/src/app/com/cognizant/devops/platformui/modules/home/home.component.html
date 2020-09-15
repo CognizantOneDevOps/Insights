@@ -32,10 +32,8 @@
             </tr>
             <tr *ngIf="!isExpanded" style="margin:auto;display:table-row;margin-right:auto;margin-left:30px;height:100%;">
               <a (click)="onMenuClick()">
-                <img mat-card-image class="feviconIcon" height="40px" width="40px" align="center" src='icons/svg/homePage/menu_white_36.png'
-                />
+                <img mat-card-image class="feviconIcon" height="40px" width="40px" align="center" src='icons/svg/homePage/menu_white_36.png' />
               </a>
-              <!--<mat-icon class="material-icons-menu">menu</mat-icon>-->
             </tr>
           </table>
         </div>
@@ -43,20 +41,8 @@
       <div style="border-bottom-style: solid;border-color: #9e9a9a;border-bottom-width: 2px;">
         <div class="table-responsive-sm" style="box-sizing: content-box;">
           <table class="table" style="margin-bottom: 0rem;">
-            <tr class="mat-line-heading" *ngIf="isExpanded">
-              <span style="padding-left: 4%;" title="{{userName}}"> Welcome: {{userDisplayName}} </span>
-            </tr>
-            <tr class="mat-line-heading" *ngIf="isExpanded">
-              <td class="arrange-horizontally-roledetail">
-                Role:
-                <span class="roleName" title="You are the {{userRole}} for ({{selectedOrg}})"> {{userRole}}
-                  <span class="orgNameInRole"> ({{selectedOrgName}}) </span>
-                </span>
-              </td>
-            </tr>
             <tr *ngIf="!isExpanded">
-              <img mat-card-image class="feviconIcon" (click)="showLandingPage()" height="40px" align="center" src='icons/svg/homePage/Insights_Fevicon.png'
-              />
+              <img mat-card-image class="feviconIcon" (click)="showLandingPage()" height="35px" align="center" src='icons/svg/homePage/Insights_Fevicon.png' />
               <!-- Insights_Fevicon.svg -->
             </tr>
           </table>
@@ -68,8 +54,9 @@
             <tbody>
               <tr>
                 <mat-nav-list>
-                  <app-menu-list-item *ngFor="let item of getNavItemsByFilter()" [item]="item" [depth]="depth" [isExpanded]="isExpanded" [selectedOrg]="selectedOrg"
-                    [showAdminTab]="showAdminTab" [leftNavWidthpx]="leftNavWidthpx"></app-menu-list-item>
+                  <app-menu-list-item *ngFor="let item of getNavItemsByFilter()" [item]="item" [depth]="depth"
+                    [isExpanded]="isExpanded" [selectedOrg]="selectedOrg" [showAdminTab]="showAdminTab"
+                    [leftNavWidthpx]="leftNavWidthpx"></app-menu-list-item>
                 </mat-nav-list>
               </tr>
           </table>
@@ -87,8 +74,8 @@
           </mat-nav-list>
           <mat-nav-list *ngIf="!isExpanded && showLogoutButton" [ngClass]="{  'navItemImageForCollpases' : showLogoutButton ,  'navItemImageForCollpasesWithoutlogout': !showLogoutButton}">
             <a *ngIf="!isExpanded && showLogoutButton" title="Logout" class="mat-list-item-bottom" (click)="logout()">
-              <img mat-card-image class="mat-icon ng-tns-c10-10 material-icons ng-star-inserted" height="24px" align="center" src='icons/svg/homePage/logout.png'
-              />
+              <img mat-card-image class="mat-icon ng-tns-c10-10 material-icons ng-star-inserted" height="24px" align="center"
+                src='icons/svg/homePage/logout.png' />
             </a>
           </mat-nav-list>
         </div>
@@ -103,19 +90,21 @@
     </mat-sidenav>
     <mat-sidenav-content class="mat-drawer-content">
       <mat-toolbar *ngIf="isToolbarDisplay">
-        <span class="fill-remaining-space"></span>
-
-        <div>
-          <label style="font-size: 18px;margin-right: -660px;margin-bottom: 20px;font-family: inherit">Welcome: {{userDisplayName}}
-          </label>
-          <br>
+        <div class="Allignment">
+          <table>
+            <tr title="{{userName}}" class="UsernameCss">Welcome:
+              {{userDisplayName}}
+            </tr>
+            <br>
+            <tr title="You are the {{userRole}} for ({{selectedOrg}})" class="RoleCss">
+              Role: {{userRole}} ({{selectedOrgName}})
+            </tr>
+          </table>
+          <button title="Redirect to Home Page" mat-icon-button (click)="showLandingPage()">
+            <mat-icon class="homeButton" svgIcon="homeButton">
+            </mat-icon>
+          </button>
         </div>
-        <div>
-          <label style="font-size: 13px;margin-top: 40px;font-family: inherit">Last Login Time : {{lastSeenAtTime | date:'yyyy-MM-dd HH:mm:ss'}} ({{timeZone}})</label>
-        </div>
-
-        <!-- <img height="31px" width="469px" align="right" src='icons/svg/homePage/PoweredBy.png' alt="Powered By Cognizant OneDevOps | Insights"
-            style="margin:auto;" /> -->
       </mat-toolbar>
       <div>
         <router-outlet></router-outlet>

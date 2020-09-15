@@ -20,6 +20,46 @@
   font-weight: 400;
 }
 
+.is-active {
+  background-color: red;
+}
+
+.RoleCss {
+  font-size: 14px;
+  font-family: inherit;
+  width: auto;
+  display: inline-block;
+  margin-top: -20px;
+}
+
+*:focus {
+  outline: none !important;
+}
+
+.UsernameCss {
+  font-size: 17px;
+  font-family: inherit;
+  width: auto;
+  margin-top: 10px;
+  max-width: 240px;
+  display: inline-block;
+}
+
+.homeButton {
+  color: #f7f3f3;
+  height: 30px;
+  width: 30px;
+  position: absolute;
+  outline: none;
+}
+
+.Allignment {
+  position: absolute;
+  right: 30px;
+  display: flex;
+  justify-content: center;
+}
+
 .container {
   display: flex;
   flex-direction: column;
@@ -289,7 +329,7 @@
   opacity: 0.9;
   background: #1e2028;
   color: white;
-  padding-right: 25px;
+  padding-right: 225px;
   height: 55px !important;
 }
 
@@ -413,7 +453,7 @@ navItemImageForCollpasesWithoutlogout {
   width: 100%;
   overflow-y: auto !important;
   overflow-x: hidden !important;
-  height: 48%;
+  height: 62%;
 }
 
 .mat-divider {

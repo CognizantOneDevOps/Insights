@@ -83,7 +83,7 @@ export class HomeComponent implements OnInit {
   currentUserWithOrgs: any;
   insightsCustomerLogo: any;
   currentUserDetail: any;
-  lastSeenAtTime: string = ''; year: any;
+  year: any;
   aboutPageURL = "https://onedevops.atlassian.net/wiki/spaces/OI/pages/218936/Release+Notes";
   helpPageURL = "https://onedevops.atlassian.net/wiki/spaces/OI/overview";
 
@@ -171,7 +171,6 @@ export class HomeComponent implements OnInit {
     if (this.currentUserWithOrgs != undefined && this.currentUserWithOrgs.data != undefined) {
       this.userName = this.dataShare.setUserName(self.currentUserWithOrgs.data.userDetail.name);
       this.userDisplayName = this.dataShare.getCustomizeName(this.userName);
-      this.lastSeenAtTime = self.currentUserWithOrgs.data.userDetail.lastSeenAt;
       this.userCurrentOrg = this.currentUserWithOrgs.data.userDetail.orgId;
       this.currentUserOrgsArray = this.currentUserWithOrgs.data.orgArray
       for (let orgData of this.currentUserOrgsArray) {

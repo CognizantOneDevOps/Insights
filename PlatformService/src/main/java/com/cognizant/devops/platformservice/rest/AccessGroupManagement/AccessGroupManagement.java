@@ -126,6 +126,7 @@ public class AccessGroupManagement {
 		}
 	}
 
+	@Deprecated
 	public String lastSeenOfUser(String name) {
 		try {
 			String lastSeen = "";
@@ -240,10 +241,7 @@ public class AccessGroupManagement {
 		Map<String, String> headers = PlatformServiceUtil.prepareGrafanaHeader(httpRequest);
 		log.debug("Headers in get User {}", headers);
 		String responseUser = grafanaHandler.grafanaGet("/api/user", headers);
-		JsonObject jsonObject = parser.parse(responseUser).getAsJsonObject();
-		String loginName = jsonObject.get("login").getAsString();
-		String lastSeen = lastSeenOfUser(loginName);
-		jsonObject.addProperty("lastSeenAt", lastSeen);
+		JsonObject jsonObject = parser.parse(responseUser).getAsJsonObject();		
 		responseJson.add("userDetail", (jsonObject));
 		String responseUserOrg = grafanaHandler.grafanaGet("/api/user/orgs", headers);
 		responseJson.add("orgArray", parser.parse(responseUserOrg));
