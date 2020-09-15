@@ -18,18 +18,17 @@ Created on Jun 16, 2016
 
 @author: 146414
 '''
-from dateutil import parser
 import datetime
-from datetime import datetime as dateTime
-from ....core.BaseAgent3 import BaseAgent
-import logging
-import urllib
-import math
 import json
+import logging
 import os
-import sys
 import re
-
+import sys
+import urllib.request, urllib.parse, urllib.error
+from datetime import datetime as dateTime
+from dateutil import parser
+from ....core.BaseAgent3 import BaseAgent
+#from com.cognizant.devops.platformagents.core.BaseAgent import BaseAgent
 
 class GitAgent(BaseAgent):
     trackingCachePath = None
@@ -47,7 +46,7 @@ class GitAgent(BaseAgent):
         isOptimalDataCollect = self.config.get("enableOptimizedDataRetrieval", False)
         isPullReqCommitAPIDataRetrieval = self.config.get("enablePullReqCommitAPIDataRetrieval", False)
         enableBrancheDeletion = self.config.get("enableBrancheDeletion", False)
-        self.setupTrackingCachePath('trackingCache')
+        self.TrackingCachePathSetup('trackingCache')
         repos = self.getResponse(getReposUrl+'&per_page=100&sort=created&page=1', 'GET', None, None, None)
         responseTemplate = self.getResponseTemplate()
         dynamicTemplate = self.config.get('dynamicTemplate', {})
@@ -55,12 +54,16 @@ class GitAgent(BaseAgent):
         branchesMetaData = metaData.get('branches', {})
         commitsMetaData = metaData.get('commits', {})
         pullReqMetaData = metaData.get('pullRequest', {})
+        branchesinsighstTimeX = dynamicTemplate.get('branches',{}).get('insightsTimeXFieldMapping',None)
+        pullReqinsighstTimeX = dynamicTemplate.get('pullRequest',{}).get('insightsTimeXFieldMapping',None)
+        orphanCommitsMetaData = metaData.get('orphanCommits',{})
         defPullReqResTemplate = {
             "number": "pullReqId", "state": "pullReqState",
             "head": {"ref": "originBranch", "repo": {"fork": "isForked"}},
             "base": {"ref": "baseBranch"}, "isMerged": "isMerged"
         }
         pullReqResponseTemplate = dynamicTemplate.get('pullReqResponseTemplate', defPullReqResTemplate)
+        orphanCommitResTemplate= dynamicTemplate.get('orphanCommitResponseTemplate',defPullReqResTemplate)
         repoPageNum = 1
         fetchNextPage = True
         while fetchNextPage:
@@ -70,14 +73,18 @@ class GitAgent(BaseAgent):
             for repo in repos:
                 repoName = repo.get('name', None)
                 if not os.path.isfile(self.trackingCachePath + repoName + '.json'):
-                    self.updateTrackingCacheFile(repoName, dict())
-                repoTrackingCache = self.loadTrackingCacheFile(repoName)
+                    self.UpdateTrackingCache(repoName, dict())
+                repoTrackingCache = self.TrackingCacheFileLoad(repoName)
                 repoDefaultBranch = repo.get('default_branch', None)
+                orphanCommitInjectData= dict()
+                orphanCommitInjectData['repoName']= repoName
+                orphanCommitInjectData['gitType']= 'orphanCommit'
                 commitDict = dict()
                 trackingDetails = self.tracking.get(repoName, None)
                 if trackingDetails is None:
                     trackingDetails = {}
                     self.tracking[repoName] = trackingDetails
+                trackingDetails['cacheFilePath']= os.path.realpath(self.trackingCachePath+repoName+ '.json')
                 repoModificationTime = trackingDetails.get('repoModificationTime', None)
                 if repoModificationTime is None:
                     repoModificationTime = startFrom
@@ -85,21 +92,24 @@ class GitAgent(BaseAgent):
                 if repoUpdatedAt is None:
                     repoUpdatedAt = repo.get('updated_at')
                 repoUpdatedAt = parser.parse(repoUpdatedAt, ignoretz=True)
-                branch_from_tracking_json = []
-                for key in trackingDetails:
-                    if key != "repoModificationTime":
-                        branch_from_tracking_json.append(key)
+                if 'branches' not in repoTrackingCache:
+                    repoTrackingCache['branches']=dict()
+                branchesTrackingDetails = repoTrackingCache.get('branches', dict())
+                branch_from_tracking_json = list(branchesTrackingDetails.keys())
                 if startFrom < repoUpdatedAt:
                     trackingDetails['repoModificationTime'] = repo.get('updated_at')
                     branches = ['master']
                     if repoDefaultBranch != 'master':
                         branches.append(repoDefaultBranch)
+                    #print("repoName")
                     if repoName != None:
                         if enableBranches:
                             if isOptimalDataCollect:
-                                self.retrievePullRequest(commitsBaseEndPoint, repoName, repoDefaultBranch, accessToken,
+                                self.PullRequest(commitsBaseEndPoint, repoName, repoDefaultBranch, accessToken,
                                                          trackingDetails, repoTrackingCache, startFromStr, pullReqMetaData,
-                                                         pullReqResponseTemplate, commitsMetaData, responseTemplate)
+                                                         pullReqResponseTemplate, commitsMetaData, responseTemplate, orphanCommitsMetaData, orphanCommitResTemplate)
+
+
                                 if 'commitDict' in repoTrackingCache:
                                     commitDict = repoTrackingCache['commitDict']
                             branches = []
@@ -121,68 +131,189 @@ class GitAgent(BaseAgent):
                                 else:
                                     fetchNextBranchPage = False
                                     break
-                            if len(branches) > 0:
-                                activeBranches = [{'repoName': repoName, 'activeBranches': allBranches, 'gitType': 'metadata', 'consumptionTime': timeStampNow()}]
-                                self.publishToolsData(activeBranches, branchesMetaData)
+                            repoMeta={
+                                'repoName' : repoName,
+                                'activeBranches': allBranches,
+                                'description' : repo.get('description', None),
+                                'gitType': 'metadata',
+                                'consumptionTime' : timeStampNow()
+                            }
+                            #topics API
+                            getTopicsUrl = commitsBaseEndPoint + repoName + '/topics?access_token=' + accessToken
+                            topicsList = list()
+                            try:
+                                topicsAPIHeaders = {'Accept': 'application/vnd.github.mercy-preview+json'}
+                                topicsResp = self.getResponse(getTopicsUrl, 'GET',None, None, None, reqHeaders=topicsAPIHeaders)
+                                topicsList = topicsResp.get('names', list())
+                            except Exception as err:
+                                logging.error(err)
+                            if topicsList:
+                                repoMeta['topics'] = topicsList
+                                appIdIter = re.finditer(r"(?i)app[0-9]+" , str(topicsList))
+                                appIds = [str.upper(key.group(0)) for key in appIdIter]
+                                if appIds:
+                                    repoMeta['appIds'] = appIds
+                            timestamp = branchesinsighstTimeX.get('timefield',None)
+                            timeformat = branchesinsighstTimeX.get('timeformat',None)
+                            isEpoch = branchesinsighstTimeX.get('isEpoch',False)
+                            self.publishToolsData([repoMeta], branchesMetaData,timestamp,timeformat,isEpoch,True)
                         if enableBrancheDeletion:
                             for key in branch_from_tracking_json:
                                 if key not in allBranches:
-                                    tracking = self.tracking.get(repoName,None)
-                                    if tracking:
-                                        lastCommitDate = trackingDetails.get(key, {}).get('latestCommitDate', None)
-                                        lastCommitId = trackingDetails.get(key, {}).get('latestCommitId', None)
-                                        self.updateTrackingForBranchCreateDelete(trackingDetails, repoName, key, lastCommitDate, lastCommitId)
-                                        tracking.pop(key)
-                        self.updateTrackingJson(self.tracking)
+                                    lastCommitDate = branchesTrackingDetails.get(key,[]).get('lastestCommitData', None)
+                                    lastCommitId = branchesTrackingDetails.get(key, {}).get('latestCommitId', None)
+                                    self.CreateDeleteTrackingForBranchUpdate(branchesTrackingDetails, repoName, key, lastCommitDate, lastCommitId)
+                                    branchesTrackingDetails.pop(key)
 
                         branchesFound = list()
                         branchesNotFound = list()
+                        pullReqBranches = list()
                         if 'pullReqBranches' in repoTrackingCache:
                             pullReqBranches = repoTrackingCache['pullReqBranches']
                             for branch in branches:
+                                print(branch)
                                 if branch in pullReqBranches:
                                     branchesFound.append(branch)
                                 else:
                                     branchesNotFound.append(branch)
                         orderedBranches = branchesFound + branchesNotFound
-                        injectData = dict()
+                        injectData =dict()
                         injectData['repoName'] = repoName
                         injectData['gitType'] = 'commit'
-                        injectData['fromPullReq'] = False
+                        injectData['fromPullReq'] = True
+                        orphanCommitInjectData['fromPullReq'] = True
+                        if isPullReqCommitAPIDataRetrieval and 'repoPullRequests' in repoTrackingCache:
+                            repoPullReq = repoTrackingCache['repoPullRequests']
+                            for originBranch in orderedBranches:
+                                originBranchPullReq = repoPullReq.get(originBranch, dict())
+                                for baseBranch in originBranchPullReq:
+                                    baseOriginPullReqDict = originBranchPullReq[baseBranch]
+                                    sortedPullReqList = sorted(map(int , list(baseOriginPullReqDict.keys())), reverse=True)
+                                    for pullReq in list(baseOriginPullReqDict.values()):
+                                        data = list()
+                                        orphanCommitData = list()
+                                        commitIdList = list()
+                                        if pullReq.get('commitCount',0) >= 250 and not pullReq.get('computedPullReq' , False):
+                                            until = None
+                                            if pullReq.get('mergedAt', None):
+                                                until = pullReq['mergedAt']
+                                            elif pullReq.get('closedAt', None):
+                                                until = pullReq['closedAt']
+                                            else:
+                                                until = pullReq.get('updatedAt',None)
+                                            pullReqId = pullReq.get('pullReqId')
+                                            branchSHA = pullReq.get('headSHA','')
+                                            if originBranch == repoDefaultBranch:
+                                                injectData['default'] = True
+                                            else:
+                                                injectData['default'] = False
+                                            since = pullReq.get('since', None)
+                                            if not since:
+                                                for previousPullReq in sortedPullReqList[sortedPullReqList.index(pullReqId) +1 :]:
+                                                    pullReqDetails = baseOriginPullReqDict.get(str(previousPullReq), dict())
+                                                    if pullReqDetails.get('mergedAt',None):
+                                                        since = pullReqDetails['mergedAt']
+                                                        break
+                                            if not since:
+                                                since = startFrom.strftime("%Y-%m-%dT%H:%M:%SZ")
+                                            fetchNextBranchPage = True
+                                            getCommitDetailsUrl = commitsBaseEndPoint + repoName + '/commits?sha' + branchSHA+ 'access_token=' +accessToken + '&per+page=100'
+                                            getCommitDetailsUrl += '&since=' + since + '&until=' + until
+                                            commitsPageNum = 1
+                                            isOrphanCommit = not pullReq.get('isMerged',True) and not pullReq.get('isForked', True)
+                                            if isOrphanCommit:
+                                                orphanCommitInjectData['branchName']= originBranch
+                                                branchJiraKeyIter = re.finditer(self.jiraRegEx, originBranch)
+                                                branchJiraKeys = [key.group(0) for key in branchJiraKeyIter]
+                                                if branchJiraKeys:
+                                                    orphanCommitInjectData['branchJiraKeys'] = branchJiraKeys
+                                                else :
+                                                    orphanCommitInjectData.pop('branchJiraKeys','')
+                                            while fetchNextCommitsPage:
+                                                try:
+                                                    commits =self.getResponse(getCommitDetailsUrl + '&page=' +str(commitsPageNum),'GET', None, None,None)
+                                                    for commit in commits:
+                                                        commitId = commit.get('sha', None)
+                                                        commitMessage= commit.get('commit',dict()).get('message','')
+                                                        jiraKeyIter = re.finditer(self.jiraRegEx, commitMessage)
+                                                        jiraKeys = [key.group(0) for key in jiraKeyIter]
+                                                        if jiraKeys:
+                                                            injectData['jiraKeys'] = jiraKeys
+                                                        else:
+                                                            injectData.pop('jiraKeys','')
+                                                            injectData['jiraKeyProcessed'] = True
+                                                            injectData['consumptionTime'] = timeStampNow()
+                                                            data += self.parseResponse(responseTemplate, commit, injectData)
+                                                            commitDict[commitId] = True
+                                                            commitIdList.append(commitId)
+                                                            if isOrphanCommit:
+                                                                orphanCommitInjectData['consumptionTime'] = timeStampNow()
+                                                                orphanCommitData += self.parseResponse(orphanCommitResTemplate, commit, orphanCommitInjectData)
+                                                        if len(commits) == 0 or len(data) == 0 or len(commits) < 100:
+                                                            break
+                                                except Exception as ex:
+                                                    fetchNextCommitsPage = False
+                                                    logging.error(ex)
+                                                commitsPageNum = commitsPageNum
+                                            if commitIdList:
+                                                self.publishToolsData(data,commitsMetaData)
+                                                pullReqDict={
+                                                    "repoName":  repoName,
+                                                    "pullReqId": pullReqId,
+                                                    "computedCommitId": commitIdList,
+                                                    "since":since,
+                                                    "until": until,
+                                                    "consumptionTime": timeStampNow(),
+                                                    "gitType":"computedPullRequest"
+                                                }
+                                                timestamp = pullReqinsighstTimeX.get('timefield',None)
+                                                timeformat = pullReqinsighstTimeX.get('timeformat',None)
+                                                isEpoch = pullReqinsighstTimeX.get('isEpoch',False)
+                                                self.publishToolsData([pullReqDict],pullReqMetaData,timestamp,timeformat,isEpoch,True)
+                                                if isOrphanCommit:
+                                                    self.publishToolsData(orphanCommitData, orphanCommitsMetaData)
+                                                pullReq['computedPullReq'] = True
+                                                pullReq['since'] = until
+                                                self.UpdateTrackingCache(repoName, repoTrackingCache)
+
+                        injectData["fromPullReq"] = False
                         for branch in orderedBranches:
-                            hasLatestPullReq = False
-                            data = []
+                            hasLatestPullReq =False
+                            data= []
                             orphanCommitIdList = list()
                             if branch == repoDefaultBranch:
-                                injectData['default'] = True
+                                injectData['default'] =True
                             else:
                                 injectData['default'] = False
-                            parsedBranch = urllib.parse.quote_plus(branch)
+                            try:
+                                parseBranch = urllib.parse.quote_plus(branch.encode('utf-8'))
+                            except Exception as er:
+                                logging.error(er)
                             fetchNextCommitsPage = True
-                            getCommitDetailsUrl = commitsBaseEndPoint+repoName+'/commits?sha='+parsedBranch+'&access_token='+accessToken+'&per_page=100'
-                            branchTrackingDetails = trackingDetails.get(branch, {})
+                            getCommitDetailsUrl = commitsBaseEndPoint + repoName +'/commits?sha=' + parseBranch + '&access_token=' + accessToken+'&per_page=100'
+                            branchTrackingDetails = branchesTrackingDetails.get(branch,{})
                             since = branchTrackingDetails.get('latestCommitDate', None)
                             if since != None:
-                                getCommitDetailsUrl += '&since='+since
+                                getCommitDetailsUrl += '&since=' + since
                             commitsPageNum = 1
                             latestCommit = None
                             while fetchNextCommitsPage:
-                                try:
-                                    commits = self.getResponse(getCommitDetailsUrl + '&page='+str(commitsPageNum), 'GET', None, None, None)
-                                    if latestCommit is None and len(commits) > 0:
+                                try :
+                                    commits = self.getResponse(getCommitDetailsUrl + '&page=' +str(commitsPageNum), 'GET', None,None, None)
+                                    if latestCommit is None and len(commits)> 0:
                                         latestCommit = commits[0]
                                     for commit in commits:
                                         commitId = commit.get('sha', None)
                                         if since is not None or startFrom < parser.parse(commit["commit"]["author"]["date"], ignoretz=True):
                                             if commitId not in commitDict:
-                                                commitMessage = commit.get('commit', dict()).get('message', '')
+                                                commitMessage = commit.get('commit', dict()). get('message', '')
                                                 jiraKeyIter = re.finditer(self.jiraRegEx, commitMessage)
                                                 jiraKeys = [key.group(0) for key in jiraKeyIter]
                                                 if jiraKeys:
                                                     injectData['jiraKeys'] = jiraKeys
                                                 else:
-                                                    injectData.pop('jiraKeys', '')
-                                                injectData['jiraKeyProcessed'] = True
+                                                    injectData.pop('jiraKeys','')
+                                                injectData['jiraJeyProcessed'] =True
                                                 injectData['consumptionTime'] = timeStampNow()
                                                 data += self.parseResponse(responseTemplate, commit, injectData)
                                                 commitDict[commitId] = False
@@ -191,7 +322,7 @@ class GitAgent(BaseAgent):
                                                 orphanCommitIdList.append(commitId)
                                         else:
                                             fetchNextCommitsPage = False
-                                            self.updateTrackingForBranch(trackingDetails, branch, latestCommit, repoDefaultBranch)
+                                            self.TrackingForBranchUpdate(branchesTrackingDetails, branch, latestCommit, repoDefaultBranch)
                                             break
                                     if len(commits) == 0 or len(data) == 0 or len(commits) < 100:
                                         fetchNextCommitsPage = False
@@ -201,7 +332,7 @@ class GitAgent(BaseAgent):
                                     logging.error(ex)
                                 commitsPageNum = commitsPageNum + 1
                             if data or orphanCommitIdList:
-                                self.updateTrackingForBranch(trackingDetails, branch, latestCommit, repoDefaultBranch,
+                                self.TrackingForBranchUpdate(trackingDetails, branch, latestCommit, repoDefaultBranch,
                                                              isOptimalDataCollect, len(data), hasLatestPullReq)
                                 self.publishToolsData(data, commitsMetaData)
                                 orphanBranch = {
@@ -212,30 +343,42 @@ class GitAgent(BaseAgent):
                                     'consumptionTime': timeStampNow()
                                 }
                                 branchJiraKeyIter = re.finditer(self.jiraRegEx, branch)
-                                self.branchJiraKeys = [key.group(0) for key in branchJiraKeyIter]
-                                if self.branchJiraKeys:
-                                    orphanBranch['branchJiraKeys'] = self.branchJiraKeys
-                                self.publishToolsData([orphanBranch, ])
-                            self.updateTrackingJson(self.tracking)
-                            self.updateTrackingCacheFile(repoName, repoTrackingCache)
-            repoPageNum = repoPageNum + 1
-            repos = self.getResponse(getReposUrl+'&per_page=100&sort=created&page='+str(repoPageNum), 'GET', None, None, None)
+                                branchJiraKeys = [key.group(0) for key in branchJiraKeyIter]
+                                if branchJiraKeys:
+                                    orphanBranch['branchJiraKeys'] = branchJiraKeys
+                                timestamp = branchesinsighstTimeX.get('timefield',None)
+                                timeformat = branchesinsighstTimeX.get('timeformat',None)
+                                isEpoch = branchesinsighstTimeX.get('isEpoch',False)
+                                self.publishToolsData([orphanBranch],branchesMetaData,timestamp,timeformat,isEpoch,True)
+                            self.UpdateTrackingCache(repoName, repoTrackingCache)
+                    self.updateTrackingJson(self.tracking)
+                repoPageNum = repoPageNum + 1
+                repos = self.getResponse(getReposUrl + '&per_page=100&sort=created&page=' + str(repoPageNum), 'GET', None, None, None)
 
-    def retrievePullRequest(self, repoEndPoint, repoName, defaultBranch, accessToken, trackingDetails, trackingCache,
-                            startFrom, metaData, responseTemplate, commitMetaData, commitsResponseTemplate):
+    def PullRequest(self, repoEndPoint, repoName, defaultBranch, accessToken, trackingDetails, trackingCache,
+                            startFrom, metaData, responseTemplate, commitMetaData, commitsResponseTemplate,
+                            orphanCommitMetaData, orphanCommitResTemplate):
         timeStampNow = lambda: dateTime.now().strftime("%Y-%m-%dT%H:%M:%SZ")
         injectData = dict()
         pullReqData = list()
         commitData = list()
+        orphanCommitData = list()
         branchesDict = dict()
         injectData['repoName'] = repoName
         injectData['fromPullReq'] = True
         injectData['gitType'] = 'commit'
+        orphanCommitInjectData = {
+            'repoName' :repoName,
+            'gitType': 'orphanCommit',
+            'fromPullReq' :True
+        }
         defaultParams = 'access_token=%s' % accessToken + '&per_page=100&page=%s'
         pullReqUrl = repoEndPoint + repoName + '/pulls?state=all&sort=updated&direction=desc&'
         pullReqUrl += defaultParams
         lastTrackedTimeStr = trackingDetails.get('pullReqModificationTime', startFrom)
         lastTrackedTime = parser.parse(lastTrackedTimeStr, ignoretz=True)
+        pullReqLatestModifiedTime = lastTrackedTimeStr
+        branchesTrackingDetails = trackingCache['branches']
         if 'commitDict' not in trackingCache:
             trackingCache['commitDict'] = dict()
         commitDict = trackingCache['commitDict']
@@ -247,13 +390,14 @@ class GitAgent(BaseAgent):
         pullReqPage = 1
         nextPullReqPage = True
         isLatestPullReqDateSet = False
+        isTrackinfFileWrie = False
+
         while nextPullReqPage:
             pullReqDetails = list()
             try:
                 pullReqDetails = self.getResponse(pullReqUrl % pullReqPage, 'GET', None, None, None)
                 if pullReqDetails and not isLatestPullReqDateSet:
                     pullReqLatestModifiedTime = pullReqDetails[0].get('updated_at', None)
-                    trackingDetails['pullReqModificationTime'] = pullReqLatestModifiedTime
                     isLatestPullReqDateSet = True
             except Exception as err:
                 logging.error(err)
@@ -265,6 +409,7 @@ class GitAgent(BaseAgent):
                 updatedAtStr = pullReq.get('updated_at', None)
                 updatedAt = parser.parse(updatedAtStr, ignoretz=True)
                 if updatedAt <= lastTrackedTime:
+                    isTrackinfFileWrie = True
                     nextPullReqPage = False
                     break
                 pullReq['isMerged'] = True if pullReq.get('merged_at', None) else False
@@ -282,6 +427,14 @@ class GitAgent(BaseAgent):
                 else:
                     isForked = True
                 originBranch = originBranchDetails.get('ref', None)
+                branchJiraKeyIter = re.finditer(self.jiraRegEx, originBranch)
+                branchJiraKeys = [key.group(0) for key in branchJiraKeyIter]
+                if branchJiraKeys:
+                    pullReq['originBranchJiraKeys']= branchJiraKeys
+                    orphanCommitInjectData['branchJiraKeys']= branchJiraKeys
+                else:
+                    orphanCommitInjectData.pop('branchJiraKeys','')
+                orphanCommitInjectData['branchName'] = originBranch
                 commitPage = 1
                 nextPullReqCommitPage = True
                 while nextPullReqCommitPage:
@@ -305,6 +458,9 @@ class GitAgent(BaseAgent):
                         injectData['jiraKeyProcessed'] = True
                         injectData['consumptionTime'] = timeStampNow()
                         commitList += self.parseResponse(commitsResponseTemplate, commit, injectData)
+                        if not pullReq['isMerged'] and not isForked:
+                            orphanCommitInjectData['consumptionTime'] = timeStampNow()
+                            orphanCommitData += self.parseResponse(orphanCommitResTemplate, commit, orphanCommitInjectData)
                         commitIdSet.add(commitId)
                         commitDict[commitId] = True
                     if len(commitDetails) < 100:
@@ -324,7 +480,7 @@ class GitAgent(BaseAgent):
                 baseOriginPullReqDict[str(pullReqNumber)] = {
                     "pullReqId": pullReqNumber,
                     "originBranch": originBranch,
-                    "originBranchJiraKeys": self.branchJiraKeys,
+                    "originBranchJiraKeys": branchJiraKeys,
                     "baseBranch": baseBranch,
                     "mergedAt": pullReq.get('merged_at', None),
                     "closedAt": pullReq.get('closed_at', None),
@@ -336,6 +492,7 @@ class GitAgent(BaseAgent):
                     "isForked": isForked
                 }
                 branchesDict[pullReqNumber] = originBranch
+
                 if not isForked:
                     if originBranch not in trackingDetails:
                         trackingDetails[originBranch] = dict()
@@ -362,86 +519,93 @@ class GitAgent(BaseAgent):
                         logging.error(err)
                         logging.warn(baseOriginPullReqDict[str(pullReqNumber)])
                 if commitList:
-                    pullReqData += self.parseResponse(responseTemplate, pullReq, {'repoName': repoName, 'gitType': 'pullRequest', 'consumptionTime': timeStampNow()})
+                    pullReqData += self.parseResponse(responseTemplate, pullReq,  {'repoName': repoName, 'gitType': 'pullRequest', 'consumptionTime': timeStampNow()})
                     commitData += commitList
             if len(pullReqDetails) < 100:
+                isTrackinfFileWrie = True
                 nextPullReqPage = False
             else:
                 pullReqPage += 1
-        for branch in sorted(branchesDict.items(), key=lambda record: record[0]):
+        for branch in sorted(list(branchesDict.items()), key=lambda record: record[0]):
             if branch not in branchesList:
                 branchesList.append(branch[1])
 
         if commitData:
-            self.publishToolsData(pullReqData, metaData)
+            pullReqinsighstTimeX = self.config.get('dynamicTemplate', {}).get('pullRequest',{}).get('insightsTimeXFieldMapping',None)
+            pullReqtimestamp = pullReqinsighstTimeX.get('timefield',None)
+            pullReqtimeformat = pullReqinsighstTimeX.get('timeformat',None)
+            pullReqisEpoch = pullReqinsighstTimeX.get('isEpoch',False)
+            self.publishToolsData(pullReqData, metaData,pullReqtimestamp,pullReqtimeformat,pullReqisEpoch,True)
             self.publishToolsData(commitData, commitMetaData)
-            self.updateTrackingJson(self.tracking)
-            self.updateTrackingCacheFile(repoName, trackingCache)
+            self.publishToolsData(orphanCommitData, orphanCommitMetaData)
+        if isTrackinfFileWrie:
+            trackingDetails['pullReqModificationTime'] = pullReqLatestModifiedTime
+            self.UpdateTrackingCache(repoName, trackingCache)
 
-    # def associatedPullRequest(self):
-    #     timeStampNow = lambda: dateTime.now().strftime("%Y-%m-%dT%H:%M:%SZ")
-    #     searchAPIEndpoint = self.config.get('searchAPI', None)
-    #     accessToken = self.config.get('accessToken', '')
-    #     metaData = self.config.get('dynamicTemplate', dict()).get('metaData', dict()).get('commits', dict())
-    #     searchUrl = searchAPIEndpoint + "?access_token=" + accessToken + "&q=%s&page=%d&per_page=%d"
-    #
-    #     for repository in self.tracking:
-    #         repositoryDict = self.tracking[repository]
-    #         commitDict = repositoryDict.get('commitDict', dict())
-    #         associatedPullReq = list()
-    #         for commitId, isLinkCaptured in commitDict.items():
-    #             # not isLinkCaptured for testing sake removed not
-    #             if isLinkCaptured:
-    #                 pullReqIdList = list()
-    #                 pageSize = 100
-    #                 nextResponse, page = True, 1
-    #                 pageSetFlag, totalPage = False, 0
-    #                 while nextResponse:
-    #                     response = dict()
-    #                     try:
-    #                         url = searchUrl % (commitId, page, pageSize)
-    #                         response = self.getResponse(url, 'GET', None, None, None)
-    #                         if not pageSetFlag:
-    #                             total = response.get('total_count', 0)
-    #                             totalPage = int(math.ceil(float(total) / 100))
-    #                             pageSetFlag = True
-    #                     except Exception as err:
-    #                         logging.error(err)
-    #                     responseData = response.get('items', None)
-    #                     if responseData:
-    #                         for pullReqInfo in responseData:
-    #                             pullReqIdList.append(pullReqInfo.get('number', None))
-    #                         if totalPage == page:
-    #                             pageSetFlag, nextResponse = False, False
-    #                     else:
-    #                         pageSetFlag, nextResponse = False, False
-    #                     page = page + 1
-    #                 if pullReqIdList:
-    #                     associatedPullReq.append({
-    #                         "repoName": repository,
-    #                         "commitId": commitId,
-    #                         "associatedPullReq": pullReqIdList,
-    #                         "fromPullReq": True,
-    #                         "consumptionTime": timeStampNow()
-    #                     })
-    #         if associatedPullReq:
-    #             self.publishToolsData(associatedPullReq, metaData)
+        # def associatedPullRequest(self):
+        #     timeStampNow = lambda: dateTime.now().strftime("%Y-%m-%dT%H:%M:%SZ")
+        #     searchAPIEndpoint = self.config.get('searchAPI', None)
+        #     accessToken = self.config.get('accessToken', '')
+        #     metaData = self.config.get('dynamicTemplate', dict()).get('metaData', dict()).get('commits', dict())
+        #     searchUrl = searchAPIEndpoint + "?access_token=" + accessToken + "&q=%s&page=%d&per_page=%d"
+        #
+        #     for repository in self.tracking:
+        #         repositoryDict = self.tracking[repository]
+        #         commitDict = repositoryDict.get('commitDict', dict())
+        #         associatedPullReq = list()
+        #         for commitId, isLinkCaptured in commitDict.items():
+        #             # not isLinkCaptured for testing sake removed not
+        #             if isLinkCaptured:
+        #                 pullReqIdList = list()
+        #                 pageSize = 100
+        #                 nextResponse, page = True, 1
+        #                 pageSetFlag, totalPage = False, 0
+        #                 while nextResponse:
+        #                     response = dict()
+        #                     try:
+        #                         url = searchUrl % (commitId, page, pageSize)
+        #                         response = self.getResponse(url, 'GET', None, None, None)
+        #                         if not pageSetFlag:
+        #                             total = response.get('total_count', 0)
+        #                             totalPage = int(math.ceil(float(total) / 100))
+        #                             pageSetFlag = True
+        #                     except Exception as err:
+        #                         logging.error(err)
+        #                     responseData = response.get('items', None)
+        #                     if responseData:
+        #                         for pullReqInfo in responseData:
+        #                             pullReqIdList.append(pullReqInfo.get('number', None))
+        #                         if totalPage == page:
+        #                             pageSetFlag, nextResponse = False, False
+        #                     else:
+        #                         pageSetFlag, nextResponse = False, False
+        #                     page = page + 1
+        #                 if pullReqIdList:
+        #                     associatedPullReq.append({
+        #                         "repoName": repository,
+        #                         "commitId": commitId,
+        #                         "associatedPullReq": pullReqIdList,
+        #                         "fromPullReq": True,
+        #                         "consumptionTime": timeStampNow()
+        #                     })
+        #         if associatedPullReq:
+        #             self.publishToolsData(associatedPullReq, metaData)
 
-    def setupTrackingCachePath(self, folderName):
+    def TrackingCachePathSetup(self, folderName):
         self.trackingCachePath = os.path.dirname(sys.modules[self.__module__].__file__) + os.path.sep + folderName + os.path.sep
         if not os.path.exists(self.trackingCachePath):
             os.mkdir(self.trackingCachePath)
 
-    def loadTrackingCacheFile(self, fileName):
+    def TrackingCacheFileLoad(self, fileName):
         with open(self.trackingCachePath + fileName + '.json', 'r') as filePointer:
             data = json.load(filePointer)
         return data
 
-    def updateTrackingCacheFile(self, fileName, trackingDict):
+    def UpdateTrackingCache(self, fileName, trackingDict):
         with open(self.trackingCachePath + fileName + '.json', 'w') as filePointer:
             json.dump(trackingDict, filePointer)
 
-    def updateTrackingForBranch(self, trackingDetails, branchName, latestCommit, repoDefaultBranch, isOptimalDataCollect=False, totalCommit=0, hasLatestPullReq=False):
+    def TrackingForBranchUpdate(self, trackingDetails, branchName, latestCommit, repoDefaultBranch,isOptimalDataCollect=False, totalCommit=0, hasLatestPullReq=False):
         updatetimestamp = latestCommit["commit"]["author"]["date"]
         dt = parser.parse(updatetimestamp)
         fromDateTime = dt + datetime.timedelta(seconds=0o1)
@@ -463,15 +627,14 @@ class GitAgent(BaseAgent):
             elif hasLatestPullReq:
                 branchTrackingDetails['commitCount'] = totalCommit
 
-    def updateTrackingForBranchCreateDelete(self, trackingDetails, repoName, branchName, lastCommitDate, lastCommitId):
-        trackingDetails = self.tracking.get(repoName,None)
-        data_branch_delete=[]
+    def CreateDeleteTrackingForBranchUpdate(self, trackingDetails, repoName, branchName, lastCommitDate, lastCommitId):
+        data_branch_delete = []
         branch_delete = {}
         branch_delete['branchName'] = branchName
         branch_delete['repoName'] = repoName
         branch_delete['event'] = "branchDeletion"
-        #branch_delete['lastCommitDate'] = lastCommitDate
-        #branch_delete['lastCommitId'] = lastCommitId
+        # branch_delete['lastCommitDate'] = lastCommitDate
+        # branch_delete['lastCommitId'] = lastCommitId
         data_branch_delete.append(branch_delete)
         branchMetadata = {"labels": ["METADATA"], "dataUpdateSupported": True, "uniqueKey": ["repoName", "branchName"]}
         self.publishToolsData(data_branch_delete, branchMetadata)

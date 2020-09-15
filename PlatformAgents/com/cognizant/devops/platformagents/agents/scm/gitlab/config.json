@@ -73,6 +73,20 @@
         }
       }
     },
+     "branches":{
+         "insightsTimeXFieldMapping":{
+            "timefield":"consumptionTime",
+            "isEpoch":false,
+            "timeformat":"%Y-%m-%dT%H:%M:%SZ"
+         }
+      },
+      "mergeRequest":{
+         "insightsTimeXFieldMapping":{
+            "timefield":"updatedAt",
+            "isEpoch":false,
+            "timeformat":"%Y-%m-%dT%H:%M:%SZ"
+         }
+      },
     "metaData": {
       "branches": {
         "dataUpdateSupported": true,

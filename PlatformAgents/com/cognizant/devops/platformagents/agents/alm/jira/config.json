@@ -1,158 +1,306 @@
 {
-  "vault": {
-	"getFromVault": false,
-	"secretEngine":"insights-kv",
-	"readToken":"vault_secret_token",
-	"vaultUrl":"http://Vault_Host:port/v1/"
-  },
-  "mqConfig": {
-    "user": "iSight",
-    "password": "iSight",
-    "host": "127.0.0.1",
-    "exchange": "iSight",
-    "agentControlXchg":"iAgent"
-  },
-  "subscribe": {
-    "config": "ALM.JIRA.config"
-  },
-  "publish": {
-    "data": "ALM.JIRA.DATA",
-    "health": "ALM.JIRA.HEALTH"
-  },
-  "communication": {
-    "type": "REST",
-    "sslVerify": true,
-    "responseType": "JSON"
-  },
- "dynamicTemplate": {
- 	   "timeFieldMapping" : {
-        "creationDate" : "%Y-%m-%dT%H:%M:%S",
-		"startDate" : "%Y-%m-%d"
-  		}, 		
-	  "responseTemplate": {
-	    "key": "key",
-	    "fields": {
-	      "issuetype": {
-	        "name": "issueType"
-	      },
-		  "created": "creationDate",
-	      "updated": "lastUpdated",
-	      "project": {
-	        "name": "projectName"
-	      },
-	      "creator": {
-	        "name": "creator"
-	      },
-	      "priority": {
-	        "name": "priority"
-	      },
-	      "assignee": {
-	        "name": "assignee"
-	      },
-	      "status": {
-	        "name": "status"
-	      },      
-	      "issuelinks": [
-	        {
-	          "outwardIssue": {
-	            "key": "outwardIssue"
-	          }
-	        },
-	        {
-	          "inwardIssue": {
-	            "key": "inwardIssue"
-	          }
-	        }
-	      ]
-	    } 
-	  },
-	  "extensions" : {
-        "sprints" : {
-                "runSchedule" : 720,
-                "boardApiUrl" : "#JIRA_URL#/rest/agile/1.0/board",
-                "sprintApiUrl" : "#JIRA_URL#/rest/agile/1.0/sprint",
-                "sprintResponseTemplate" : {
-                        "id": "sprintId",
-                        "state": "state",
-                        "name": "sprintName",
-                        "startDate": "sprintStartDate",
-                        "endDate": "sprintEndDate",
-                        "completeDate": "sprintCompleteDate",
-                        "originBoardId": "boardId"
-                },
-                "sprintMetadata" : {
-                "labels" : ["SPRINT"],
-                "dataUpdateSupported" : true,
-                "uniqueKey" : ["boardId", "sprintId"]
-            }
-        },
-		  	"sprintReport" : {
-		  		"runSchedule" : 720,
-		  		"boardApiUrl" : "https://<JIRA_HOST>/rest/agile/1.0/board",
-			  	"sprintReportUrl" : "https://<JIRA_HOST>/rest/greenhopper/1.0/rapid/charts/sprintreport",
-			  	"sprintReportResponseTemplate" : {
-			        "key": "key",
-			        "typeName": "issueType",
-			        "priorityName": "priority",
-			        "currentEstimateStatistic": {
-			          "statFieldValue": {
-			            "value": "currentEstimate"
-			          }
-			        },
-			        "estimateStatistic": {
-			          "statFieldValue": {
-			            "value": "committedEstimate"
-			          }
-			        },
-			    	"statusName": "status"
-			    },
-			    "relationMetadata" : {
-			        "labels" : ["LATEST"],
-			        "relation" : {
-			                "properties" : ["addedDuringSprint", "sprintIssueRegion", "committedEstimate"],
-			                "name" : "SPRINT_HAS_ISSUES",
-			                "source" : {
-			                        "constraints" : ["sprintId", "boardId"]
-			                    },
-			                "destination" : {
-			                        "constraints" : ["key"]
-			                    }
-			            }
-			    },
-			    "sprintMetadata" : {
-			        "labels" : ["SPRINT"],
-			        "dataUpdateSupported" : true,
-			        "uniqueKey" : ["boardId", "sprintId"]
-			    }
-		  	},
-		  	"releaseDetails" : {
-		  		"runSchedule" : 720,
-			  	"jiraProjectApiUrl" : "https://<JIRA_HOST>/rest/api/2/project",
-			  	"jiraProjectResponseTemplate" : {
-				    "id": "projectId",
-				    "key": "projectKey",
-				    "name": "projectName",
-				    "projectCategory": {
-				      "name": "projectCategory"
-				    },
-				    "projectTypeKey": "projectType"
+	"vault": {
+		"getFromVault": false,
+		"secretEngine": "insights-kv",
+		"readToken": "vault_secret_token",
+		"vaultUrl": "http://Vault_Host:port/v1/"
+	},
+	"mqConfig": {
+		"user": "iSight",
+		"password": "iSight",
+		"host": "127.0.0.1",
+		"exchange": "iSight",
+		"agentControlXchg": "iAgent"
+	},
+	"subscribe": {
+		"config": "ALM.JIRA.config"
+	},
+	"publish": {
+		"data": "ALM.JIRA.DATA",
+		"health": "ALM.JIRA.HEALTH"
+	},
+	"communication": {
+		"type": "REST",
+		"sslVerify": true,
+		"responseType": "JSON"
+	},
+	"dynamicTemplate": {
+		"timeFieldMapping": {
+			"creationDate": "%Y-%m-%dT%H:%M:%S",
+			"changeDate": "%Y-%m-%dT%H:%M:%S",
+			"resolutionsdate": "%Y-%m-%dT%H:%M:%S",
+			"sprintStartDate": "%Y-%m-%dT%H:%M:%S",
+			"sprintEndDate": "%Y-%m-%dT%H:%M:%S",
+			"sprintCompleteDate": "%Y-%m-%dT%H:%M:%S",
+			"releaseDate": "%Y-%m-%d",
+			"startDate": "%Y-%m-%d",
+			"userStartDate": "%d/%b/%y",
+			"userReleaseDate": "%d/%b/%y",
+			"duedate": "%Y-%m-%d",
+			"timelineDate": "%Y-%m-%d"
+		},
+		"responseTemplate": {
+			"key": "key",
+			"fields": {
+				"issuetype": {
+					"name": "issueType"
 				},
-				"jiraReleaseResponseTemplate" : {
-				    "id": "versionId",
-				    "name": "versionName",
-				    "archived": "archived",
-				    "released": "released",
-				    "releaseDate": "releaseDate",
-				    "projectId": "projectId"
+				"descriptions": "description",
+				"timespent": "timespent",
+				"project": {
+					"key": "projectKey",
+					"name": "issueType"
 				},
-				"releaseVersionsMetadata" : {
-			        "labels" : ["RELEASE"],
-			        "dataUpdateSupported" : true,
-			        "uniqueKey" : ["projectKey", "projectId"]
-			    }
-			 }
- 		},
- 	"changeLog": {
+				"fixVersions": [{
+					"id": "fixVersions"
+				}],
+				"versions": [{
+					"id": "versions"
+				}],
+				"aggregratetimespent": "aggregatetimespent",
+				"resolutions": {
+					"name": "resolutions"
+				},
+				"resolutiondate": "resolutionsdate",
+				"created": "creationDate",
+				"priority": {
+					"name": "priority"
+				},
+				"labels": "labels",
+				"timeestimate": "timeestimate",
+				"aggregatetimeoriginalestimate": "aggregatetimeoriginalestimate",
+				"issueLinks": [{
+						"outwardIssue": {
+							"key": "outwardIssues"
+						}
+					},
+					{
+						"inwardIssue": {
+							"key": "inwardIssues"
+						}
+					}
+				],
+				"assignee": {
+					"name": "assigneeID",
+					"emailAddress": "assigneeEmail",
+					"displayName": "assigneeDisplayName"
+				},
+				"parent": {
+					"key": "parentKey"
+				},
+				"updated": "lastUpdated",
+				"status": {
+					"name": "status"
+				},
+				"summary": "summary",
+				"creator": {
+					"name": "creatorName",
+					"emailAddress": "creatorEmail",
+					"displayName": "creatorDisplayName"
+				},
+				"subtasks": [{
+					"key": "subtasks"
+				}],
+				"reporter": {
+					"name": "reporterName",
+					"emailAddress": "reporterEmail",
+					"displayName": "reporterDisplayName"
+				},
+				"environment": "environment",
+				"duedate": "duedate",
+				"progress": {
+					"progress": "progressTimeSec",
+					"total": "totalTimeSec",
+					"percent": "percentComplete"
+				}
+			}
+		},
+		"issueStatusFilter": [
+			"Done",
+			"Closed",
+			"Cancelled",
+			"implemented"
+		],
+		"extensions": {
+			"backlog1": {
+				"runSchedule": 720,
+				"boardApiUrl": "https://<JIRA_HOST>/rest/agile/1.0/board",
+				"backlogMetaDate": {
+					"labels": [
+						"BACKLOG"
+					],
+					"dataUpdateSupported": true,
+					"uniqueKey": [
+						"boardId",
+						"backlogIssueKey"
+					]
+				}
+			},
+			"sprints": {
+				"insightsTimeXFieldMapping": {
+					"timefield": "sprintCompleteDate",
+					"isEpoch": false,
+					"timeformat": "%Y-%m-%dT%H:%M:%S"
+				},
+				"runSchedule": 60,
+				"boardApiUrl": "https://<JIRA_HOST>/rest/agile/1.0/board",
+				"sprintApiUrl": "https://<JIRA_HOST>/rest/agile/1.0/sprint",
+				"sprintResponseTemplate": {
+					"id": "sprintId",
+					"state": "state",
+					"name": "sprintName",
+					"startDate": "sprintStartDate",
+					"endDate": "sprintEndDate",
+					"completeDate": "sprintCompleteDate",
+					"originBoardId": "boardId"
+				},
+				"sprintMetadata": {
+					"labels": [
+						"SPRINT"
+					],
+					"dataUpdateSupported": true,
+					"uniqueKey": [
+						"boardId",
+						"sprintId"
+					]
+				}
+			},
+			"sprintReport": {
+				"insightsTimeXFieldMapping": {
+					"timefield": "sprintCompleteDate",
+					"isEpoch": false,
+					"timeformat": "%Y-%m-%dT%H:%M:%S"
+				},
+				"runSchedule": 720,
+				"boardApiUrl": "https://<JIRA_HOST>/rest/agile/1.0/board",
+				"sprintReportUrl": "https://<JIRA_HOST>/rest/greenhopper/1.0/rapid/charts/sprintreport",
+				"sprintReportResponseTemplate": {
+					"key": "key",
+					"typeName": "issueType",
+					"priorityName": "priority",
+					"currentEstimateStatistic": {
+						"statFieldId": "currentEstimateField",
+						"statFieldValue": {
+							"value": "currentEstimate"
+						}
+					},
+					"estimateStatistic": {
+						"statFieldId": "committedEstimateField",
+						"statFieldValue": {
+							"value": "committedEstimate"
+						}
+					},
+					"statusName": "status"
+				},
+				"relationMetadata": {
+					"labels": [
+						"LATEST"
+					],
+					"relation": {
+						"properties": [
+							"addedDuringSprint",
+							"sprintIssueRegion",
+							"committedEstimate",
+							"committedEstimateField"
+						],
+						"name": "SPRINT_HAS_ISSUES",
+						"source": {
+							"constraints": [
+								"sprintId",
+								"boardId"
+							]
+						},
+						"destination": {
+							"constraints": [
+								"key",
+								"projectKey"
+							]
+						}
+					}
+				},
+				"sprintMetadata": {
+					"labels": [
+						"SPRINT"
+					],
+					"dataUpdateSupported": true,
+					"uniqueKey": [
+						"boardId",
+						"sprintId"
+					]
+				}
+			},
+			"releaseDetails": {
+				"insightsTimeXFieldMapping": {
+					"timefield": "sprintCompleteDate",
+					"isEpoch": false,
+					"timeformat": "%Y-%m-%dT%H:%M:%S"
+				},
+				"runSchedule": 720,
+				"jiraProjectApiUrl": "https://<JIRA_HOST>/rest/api/2/project",
+				"jiraProjectResponseTemplate": {
+					"id": "projectId",
+					"key": "projectKey",
+					"name": "projectName",
+					"projectCategory": {
+						"name": "projectCategory"
+					},
+					"projectTypeKey": "projectType"
+				},
+				"jiraReleaseResponseTemplate": {
+					"id": "versionId",
+					"name": "versionName",
+					"description": "description",
+					"archived": "archived",
+					"released": "released",
+					"startDate": "startDate",
+					"releaseDate": "releaseDate",
+					"overdue": "overdue",
+					"userStartDate": "userStartDate",
+					"userReleaseDate": "userReleaseDate",
+					"projectId": "projectId"
+				},
+				"releaseVersionsMetadata": {
+					"labels": [
+						"RELEASE"
+					],
+					"dataUpdateSupported": true,
+					"uniqueKey": [
+						"versionId",
+						"projectId"
+					]
+				}
+			},
+			"remoteIssueLink1": {
+				"remoteIssueLinkRestUrl": "https://<JIRA_HOST>/rest/api/latest/issue/{0}/remotelink",
+				"remoteIssuelinkResponseTemplate": {
+					"id": "remoteLinkId",
+					"application": {
+						"type": "remoteLinkType",
+						"name": "remoteLinkName"
+					},
+					"obejct": {
+						"url": "remoteLinkUrl",
+						"title": "remoteLinkTitle"
+					}
+				}
+			},
+			"sprintDeletionIdentifier": {
+				"runSchedule": 720,
+				"sprintApiUrl": "https://<JIRA_HOST>/rest/agile/1.0/sprint",
+				"metadata": {
+					"labels": [
+						"SPRINT"
+					],
+					"dataUpdateSupported": true,
+					"uniqueKey": [
+						"sprintId",
+						"boardId"
+					]
+				}
+			}
+		}
+	},
+	"changeLog": {
 		"fields": [
 			"assignee",
 			"Sprint",
@@ -180,6 +328,11 @@
 				"changedfield"
 			]
 		},
+		"insightsTimeXFieldMapping": {
+			"timefield": "changeDate",
+			"isEpoch": false,
+			"timeformat": "%Y-%m-%dT%H:%M:%S"
+		},
 		"responseTemplate": {
 			"id": "changeId",
 			"author": {
@@ -189,32 +342,40 @@
 			},
 			"created": "changeDate"
 		}
-	}
-  },
-  "agentId": "",
-  "toolCategory" : "ALM",
-  "enableSprintReport" : false,
-  "enableDataValidation": true,
-  "sprintField": "sprintField",
-  "enableValueArray": true, 
-  "isDebugAllowed" : false,  
-  "runSchedule": 30,
-  "sprintRetrivalSchedule" : 360,
-  "dataFetchCount": 1000,
-  "userid": "userid",
-  "passwd": "password",
-  "baseUrl": "https://127.0.0.1/rest/api/2/search",
-  "startFrom": "2016-10-10 00:01",
-  "toolsTimeZone" : "Asia/Kolkata",
-  "insightsTimeZone" : "Asia/Kolkata",
-  "useResponseTemplate" : true,
-  "timeStampField":"lastUpdated",
-  "timeStampFormat":"%Y-%m-%dT%H:%M:%S",
-  "isEpochTimeFormat" : false,
-  "agentSecretDetails": ["userid","passwd"],
-  "loggingSetting" : {
-		"logLevel" : "WARN",
-		"maxBytes" : 5000000,
-		"backupCount" : 1000
-	}
+	},
+	"agentId": "",
+	"toolCategory": "ALM",
+	"enableSprintReport": false,
+	"enableDataValidation": true,
+	"sprintField": "",
+	"enableValueArray": true,
+	"isDebugAllowed": false,
+	"runSchedule": 30,
+	"enableIssueModificationTimeline": true,
+	"bypassSprintExtCall": false,
+	"enableReSyncTrigger": true,
+	"sprintRetrivalSchedule": 360,
+	"dataFetchCount": 30,
+	"userid": "userid",
+	"passwd": "passwd",
+	"baseUrl": "https://127.0.0.1/rest/api/2/search",
+	"startFrom": "startFrom",
+	"toolsTimeZone": "Asia/Kolkata",
+	"insightsTimeZone": "Asia/Kolkata",
+	"useResponseTemplate": true,
+	"timeStampField": "lastUpdated",
+	"timeStampFormat": "%Y-%m-%dT%H:%M:%S",
+	"isEpochTimeFormat": false,
+	"agentSecretDetails": [
+		"userid",
+		"passwd"
+	],
+	"loggingSetting": {
+		"logLevel": "WARN",
+		"maxBytes": 5000000,
+		"backupCount": 1000
+	},
+	"osversion": "Ubuntu",
+	"agentVersion": "v6.3",
+	"toolName": "JIRA"
 }

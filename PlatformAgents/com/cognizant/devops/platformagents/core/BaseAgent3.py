@@ -233,7 +233,7 @@ class BaseAgent(object):
             uniqeKey: String --> comma separated node properties
         }
     '''
-    def publishToolsData(self, data, metadata=None, timeStampField=None, timeStampFormat=None, isEpochTime=False):
+    def publishToolsData(self, data, metadata=None, timeStampField=None, timeStampFormat=None, isEpochTime=False,isExtension=False):
         if metadata:
             metadataType = type(metadata)
             if metadataType is not dict:
@@ -243,7 +243,7 @@ class BaseAgent(object):
             if enableDataValidation:
                 data = self.validateData(data)
             self.addExecutionId(data, self.executionId)
-            self.addTimeStampField(data, timeStampField, timeStampFormat, isEpochTime)
+            self.addTimeStampField(data, timeStampField, timeStampFormat, isEpochTime,isExtension)
             logging.info(data)
             self.messageFactory.publish(self.dataRoutingKey, data, self.config.get('dataBatchSize', 100), metadata)
             self.logIndicator(self.PUBLISH_START, self.config.get('isDebugAllowed', False))
@@ -276,12 +276,12 @@ class BaseAgent(object):
         self.addExecutionId(data, self.executionId)
         self.messageFactory.publish(self.healthRoutingKey, data)
     
-    def addTimeStampField(self, data, timeStampField=None, timeStampFormat=None, isEpochTime=False):
+    def addTimeStampField(self, data, timeStampField=None, timeStampFormat=None, isEpochTime=False,isExtension=False):
         if timeStampField is None:
             timeStampField = self.config.get('timeStampField')
         if timeStampFormat is None:
             timeStampFormat = self.config.get('timeStampFormat')
-        if not isEpochTime:
+        if not isEpochTime and not isExtension:
             isEpochTime = self.config.get('isEpochTimeFormat', False)
         timeFieldMapping = self.config.get('dynamicTemplate', {}).get('timeFieldMapping', None)
         for d in data:

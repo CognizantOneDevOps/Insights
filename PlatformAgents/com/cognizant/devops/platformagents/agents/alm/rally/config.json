@@ -1,112 +1,196 @@
 {
-  "vault": {
-    "getFromVault": false,
-    "secretEngine":"insights-kv",
-    "readToken":"vault_secret_token",
-    "vaultUrl":"http://Vault_Host:port/v1/"
-  },
-  "mqConfig": {
-    "user": "iSight",
-    "password": "iSight",
-    "host": "127.0.0.1",
-    "exchange": "iSight",
-    "agentControlXchg":"iAgent"
-  },
-  "subscribe": {
-    "config": "ALM.RALLY.config",
-    "agentCtrlQueue" : "pizzahutagent"
-  },
-  "publish": {
-    "data": "ALM.RALLY.DATA",
-    "health": "ALM.RALLY.HEALTH"
-  },
-  "communication": {
-    "type": "REST",
-    "sslVerify": false,
-    "responseType": "JSON"
-  },
-  
-  "dynamicTemplate": {
-    "timeFieldMapping" : {
-		"startDate" : "%Y-%m-%dT%H:%M:%S.%fZ"
-  	},
-  "runSchedule": 30,
-  "relationMetadata": {"labels" : ["RALLY_ITERATION"],"dataUpdateSupported" : true,"uniqueKey":["workspaceID", "projectID", "iterationID"]},
-  "releaseMetadata": {"labels":["RALLY_RELEASE"],"dataUpdateSupported" : true,"uniqueKey":["workspaceID", "projectID","releaseID"]},
-  "storyMetadata": {"labels":["RALLY_STORY"],"dataUpdateSupported" : true,"uniqueKey":["formattedID" , "workspaceID"]},
-  "specificWorkspaceList": [
-                           
-                          ],
-  "artifactType" : ["Defect", "TestCase", "HierarchicalRequirement", "DefectSuite", "TestSet", "Task", "TAGS"],
-  "storyResponseTemplate" : [
-  "DefectSuites:Count", "WorkProduct:_refObjectName", "Tasks:Count","Defects:Count","State" , "Priority" , "Risk", "TesCaseType" , "OpenedDate" , "ClosedDate" , "Environment", "FlowStateChangedDate", "ScheduleState", "TestCaseCount", "PlanEstimate", "TaskActualTotal" , "TaskEstimateTotal",  "TaskRemainingTotal","PassingTestCaseCount","TaskStatus","CreationDate","LastRun","LastVerdict" ],
-  "iterationResponseTemplate" : {
-	"Iteration" : {
-				"_refObjectName": "iterationName",
-				"CreationDate": "iterationCreationDate",
-				"EndDate": "iterationEndDate",
-				"PlanEstimate": "iterationPlanEstimate",
-				"PlannedVelocity": "iterationPlannedVelocity",
-				"StartDate": "iterationStartDate",
-				"TaskActualTotal": "iterationState",
-				"TaskEstimateTotal": "iterationTaskEstimateTotal",
-				"TaskRemainingTotal": "iterationTaskRemainingTotal",
-				"Workspace" : {
-					"_refObjectName": "iterationWorkspace"
-							  },
-				"Project" : {
-					"_refObjectName": "iterationProjectName"
-							 }
-				}
-	   },
-	"releaseResponseTemplate" : {
-	"Release" : {
-					"_refObjectName": "releaseName",
-					"CreationDate": "releaseCreationDate",
-					"State": "releaseState",
-					"Accepted":"releaseAccepted",
-					"PlanEstimate": "releasePlanEstimate",
-					"PlannedVelocity": "releasePlannedVelocity",
-					"ReleaseDate": "releaseEndDate",
-					"ReleaseStartDate": "releaseStartDate",
-					"TaskActualTotal": "releaseTaskActualTotal",
-					"TaskEstimateTotal": "releaseTaskEstimateTotal",
-					"TaskRemainingTotal": "releaseTaskRemainingTotal",
-					"Workspace" : {
-						"_refObjectName": "releaseWorkspace"
-								  },
-					"Project" : {
-						"_refObjectName": "iterationProjectName"
-								 },
-					"WorkProducts":{
-						"Count":"releaseWorkProducyCount"
-					}			 
-			  }
-	   }
-  },
-  "agentId": "",
-  "toolCategory" : "ALM",
-  "proxy": "proxy.companyname.com:8080/",
-  "accesstoken":"***REMOVED***",
-  "runSchedule": 30,
-  "userid": "userid",
-  "passwd": "passwd",
-  "dataSize" : 20,
-  "enableDataValidation": true,
-  "baseUrl": "https://rally1.rallydev.com/slm/webservice/v2.0/",
-  "startFrom": "2019-04-15T00:00:01.000Z",
-  "enableValueArray": false,
-  "toolsTimeZone" : "Asia/Kolkata",
-  "insightsTimeZone" : "Asia/Kolkata",
-  "useResponseTemplate" : true,
-  "timeStampField":"lastUpdateDate",
-  "timeStampFormat":"%Y-%m-%dT%H:%M:%S.%fZ",
-  "isEpochTimeFormat" : false,
-  "agentSecretDetails": ["userid","passwd","accesstoken"],
-  "isDebugAllowed" : false,
-  "loggingSetting" : {
-		"logLevel" : "WARN",
-		"maxBytes" : 5000000,
-		"backupCount" : 1000
-	}
+   "vault":{
+      "getFromVault":false,
+      "secretEngine":"insights-kv",
+      "readToken":"vault_secret_token",
+      "vaultUrl":"http://Vault_Host:port/v1/"
+   },
+   "mqConfig":{
+      "user":"iSight",
+      "password":"iSight",
+      "host":"127.0.0.1",
+      "exchange":"iSight",
+      "agentControlXchg":"iAgent"
+   },
+   "subscribe":{
+      "config":"ALM.RALLY.config",
+      "agentCtrlQueue":"pizzahutagent"
+   },
+   "publish":{
+      "data":"ALM.RALLY.DATA",
+      "health":"ALM.RALLY.HEALTH"
+   },
+   "communication":{
+      "type":"REST",
+      "sslVerify":false,
+      "responseType":"JSON"
+   },
+   "dynamicTemplate":{
+      "timeFieldMapping":{
+         "startDate":"%Y-%m-%dT%H:%M:%S.%fZ"
+      },
+      "runSchedule":30,
+      "relationMetadata":{
+         "labels":[
+            "RALLY_ITERATION"
+         ],
+         "dataUpdateSupported":true,
+         "uniqueKey":[
+            "workspaceID",
+            "projectID",
+            "iterationID"
+         ]
+      },
+      "releaseMetadata":{
+         "labels":[
+            "RALLY_RELEASE"
+         ],
+         "dataUpdateSupported":true,
+         "uniqueKey":[
+            "workspaceID",
+            "projectID",
+            "releaseID"
+         ]
+      },
+        "release":{
+         "insightsTimeXFieldMapping":{
+            "timefield":"releaseCreationDate",
+            "isEpoch":false,
+            "timeformat":"%Y-%m-%dT%H:%M:%SZ"
+         }
+      },
+      "story":{
+         "insightsTimeXFieldMapping":{
+            "timefield":"CreationDate",
+            "isEpoch":false,
+            "timeformat":"%Y-%m-%dT%H:%M:%SZ"
+         }
+      },
+       "iteration":{
+         "insightsTimeXFieldMapping":{
+            "timefield":"iterationEndDate",
+            "isEpoch":false,
+            "timeformat":"%Y-%m-%dT%H:%M:%SZ"
+         }
+      },
+      "storyMetadata":{
+         "labels":[
+            "RALLY_STORY"
+         ],
+         "dataUpdateSupported":true,
+         "uniqueKey":[
+            "formattedID",
+            "workspaceID"
+         ]
+      },
+      "specificWorkspaceList":[
+         
+      ],
+      "artifactType":[
+         "Defect",
+         "TestCase",
+         "HierarchicalRequirement",
+         "DefectSuite",
+         "TestSet",
+         "Task",
+         "TAGS"
+      ],
+      "storyResponseTemplate":[
+         "DefectSuites:Count",
+         "WorkProduct:_refObjectName",
+         "Tasks:Count",
+         "Defects:Count",
+         "State",
+         "Priority",
+         "Risk",
+         "TesCaseType",
+         "OpenedDate",
+         "ClosedDate",
+         "Environment",
+         "FlowStateChangedDate",
+         "ScheduleState",
+         "TestCaseCount",
+         "PlanEstimate",
+         "TaskActualTotal",
+         "TaskEstimateTotal",
+         "TaskRemainingTotal",
+         "PassingTestCaseCount",
+         "TaskStatus",
+         "CreationDate",
+         "LastRun",
+         "LastVerdict"
+      ],
+      "iterationResponseTemplate":{
+         "Iteration":{
+            "_refObjectName":"iterationName",
+            "CreationDate":"iterationCreationDate",
+            "EndDate":"iterationEndDate",
+            "PlanEstimate":"iterationPlanEstimate",
+            "PlannedVelocity":"iterationPlannedVelocity",
+            "StartDate":"iterationStartDate",
+            "TaskActualTotal":"iterationState",
+            "TaskEstimateTotal":"iterationTaskEstimateTotal",
+            "TaskRemainingTotal":"iterationTaskRemainingTotal",
+            "Workspace":{
+               "_refObjectName":"iterationWorkspace"
+            },
+            "Project":{
+               "_refObjectName":"iterationProjectName"
+            }
+         }
+      },
+      "releaseResponseTemplate":{
+         "Release":{
+            "_refObjectName":"releaseName",
+            "CreationDate":"releaseCreationDate",
+            "State":"releaseState",
+            "Accepted":"releaseAccepted",
+            "PlanEstimate":"releasePlanEstimate",
+            "PlannedVelocity":"releasePlannedVelocity",
+            "ReleaseDate":"releaseEndDate",
+            "ReleaseStartDate":"releaseStartDate",
+            "TaskActualTotal":"releaseTaskActualTotal",
+            "TaskEstimateTotal":"releaseTaskEstimateTotal",
+            "TaskRemainingTotal":"releaseTaskRemainingTotal",
+            "Workspace":{
+               "_refObjectName":"releaseWorkspace"
+            },
+            "Project":{
+               "_refObjectName":"iterationProjectName"
+            },
+            "WorkProducts":{
+               "Count":"releaseWorkProducyCount"
+            }
+         }
+      }
+   },
+   "agentId":"",
+   "toolCategory":"ALM",
+   "proxy":"proxy.companyname.com:8080/",
+   "accesstoken":"***REMOVED***",
+   "runSchedule":30,
+   "userid":"userid",
+   "passwd":"passwd",
+   "dataSize":20,
+   "enableDataValidation":true,
+   "baseUrl":"https://rally1.rallydev.com/slm/webservice/v2.0/",
+   "startFrom":"2019-04-15T00:00:01.000Z",
+   "enableValueArray":false,
+   "toolsTimeZone":"Asia/Kolkata",
+   "insightsTimeZone":"Asia/Kolkata",
+   "useResponseTemplate":true,
+   "timeStampField":"lastUpdateDate",
+   "timeStampFormat":"%Y-%m-%dT%H:%M:%S.%fZ",
+   "isEpochTimeFormat":false,
+   "agentSecretDetails":[
+      "userid",
+      "passwd",
+      "accesstoken"
+   ],
+   "isDebugAllowed":false,
+   "loggingSetting":{
+      "logLevel":"WARN",
+      "maxBytes":5000000,
+      "backupCount":1000
+   }
 }

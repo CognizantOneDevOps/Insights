@@ -114,7 +114,11 @@ class PivotalTrackerAgent(BaseAgent):
                     activityCollection = False
                 if len(activities)> 0:
                     self.tracking['trackingInfo'][(projectId)] = trackingDetails
-                    self.publishToolsData(self.allActivitiesData, self.activityMetadata )
+                    activityinsighstTimeX = self.config.get('dynamicTemplate', {}).get('activity',{}).get('insightsTimeXFieldMapping',None)
+                    timestamp = activityinsighstTimeX.get('timefield',None)
+                    timeformat = activityinsighstTimeX.get('timeformat',None)
+                    isEpoch = activityinsighstTimeX.get('isEpoch',False)
+                    self.publishToolsData(self.allActivitiesData,self.activityMetadata,timestamp,timeformat,isEpoch,True)
                     #self.publishToolsData(self.allActivitiesData,self.activityRelationMetadata)
                     self.updateTrackingJson(self.tracking)
     def getAllEpics(self):
@@ -202,13 +206,17 @@ class PivotalTrackerAgent(BaseAgent):
                     self.tracking['trackingInfo'][projectId] = trackingDetails
                 else :
                     iterationContinue = False
-            self.publishToolsData(self.iteration_data, self.relationMetadata)
+            iterationinsighstTimeX = self.config.get('dynamicTemplate', {}).get('iteration',{}).get('insightsTimeXFieldMapping',None)
+            timestamp = iterationinsighstTimeX.get('timefield',None)
+            timeformat = iterationinsighstTimeX.get('timeformat',None)
+            isEpoch = iterationinsighstTimeX.get('isEpoch',False)
+            self.publishToolsData(self.iteration_data,self.relationMetadata,timestamp,timeformat,isEpoch,True)
             self.updateTrackingJson(self.tracking)
 
     def getProjectList(self):
         trackingDetails = self.tracking
         trackingData = {}
-        allProjects = []
+       
         allWorkspaces = self.getResponse(self.baseEndPoint + "/services/v5/my/workspaces" ,
                                             'GET', self.userid, self.password, None, reqHeaders=self.reqHeaders)
         for workspace in allWorkspaces:
@@ -219,10 +227,10 @@ class PivotalTrackerAgent(BaseAgent):
                 self.all_projects.append(tempDict)
                 if project_id:
                     trackingData[project_id] = {}
-        Projects = self.getResponse(self.baseEndPoint + "/services/v5/projects/" ,
+        all_projects = self.getResponse(self.baseEndPoint + "/services/v5/projects" ,
                                             'GET', self.userid, self.password, None, reqHeaders=self.reqHeaders)
-        allProjects.append(Projects)
-        for project in allProjects:
+       
+        for project in all_projects:
             tempDict = {}
             tempDict['workspaceName'] = None
             tempDict['projectId'] = project.get('id', None)
@@ -273,5 +281,4 @@ class PivotalTrackerAgent(BaseAgent):
         self.updateTrackingJson(trackingDetails)
 if __name__ == "__main__":
     PivotalTrackerAgent()
-
 

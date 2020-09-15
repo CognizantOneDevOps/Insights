@@ -63,6 +63,11 @@
     },
     "extensions": {
       "sprints": {
+       "insightsTimeXFieldMapping":{
+               "timefield":"sprintEndDate",
+               "isEpoch":false,
+               "timeformat":"%Y-%m-%dT%H:%M:%S"
+            },  
         "runSchedule": 720,
         "boardApiUrl": "##/rest/agile/1.0/board",
         "teamApiUrl": "https://dev.azure.com/<organization>/_apis/teams?api-version=5.0-preview.2",
@@ -126,6 +131,11 @@
           "changedfield"
         ]
       },
+        "insightsTimeXFieldMapping":{
+            "timefield":"changeDate",
+            "isEpoch":false,
+            "timeformat":"%Y-%m-%dT%H:%M:%S"
+         },
       "responseTemplate": {
         "id": "changeId",
         "rev": "rev",
