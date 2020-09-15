@@ -117,7 +117,7 @@
                             {{element.toolName}}
                         </td>
                     </ng-container>
-                    <ng-container matColumnDef="LabelName">
+                    <ng-container matColumnDef="LabelName" >
                         <th mat-header-cell *matHeaderCellDef class="tableHeaderCss">Label Name</th>
                         <td mat-cell *matCellDef="let element" style="width:20% !important">
                             {{element.labelDisplay}}
@@ -189,12 +189,24 @@
                     </tr>
                     <tr class="mat-row-webhook">
                         <td class="mat-cell" class="columnName">
+                            <span class="mainText">Is Event Processing</span>
+                        </td> 
+                        <td class="columnComponent">
+                            <mat-slide-toggle (toggleChange)="onEventChange()" [disabled]="isUpdateRequired || !isToolSelected "  [(ngModel)]="isEventProcessing" [checked]="isEventProcessing" style="margin-right: 15%;margin-left: 9%;">
+                            </mat-slide-toggle>                           
+                        </td>
+                        <td>
+                            <span class="infoText">Select this field if you want to use webhook for event processing.</span>
+                        </td>
+                    </tr>
+                    <tr class="mat-row-webhook">
+                        <td class="mat-cell" class="columnName">
                             <span class="mainText">Label Name</span>
                             <span style="color:#ff0000;">*</span>
                             <!--  <span class="asteriskText">*</span> -->
                         </td>
                         <td class="columnComponent">
-                            <input maxlength="40" type="text" class="form-control" [(ngModel)]="labelDisplay" name="labelDisplay">
+                            <input (focusout)="onLabelFocusOut()" [disabled]="isEventProcessing" [ngClass]="{'input-disabled' : isEventProcessing , 'form-control': !isEventProcessing}" maxlength="40" type="text" class="form-control" [(ngModel)]="labelDisplay" name="labelDisplay">
                         </td>
                         <td>
                             <span class="infoText"> <b>Label Name </b>for which the Webhook will be configured. <br>(FORMAT
@@ -242,7 +254,7 @@
                         </td>
                         <td>
                             <span class="infoText">Please add response Template.It can be used in
-                                generaic case of a JSON object. </span>
+                                generaic case of a JSON object. multiple values are seperated with comma.  </span>
                         </td>
                     </tr>
                     <tr class="mat-row-webhook">
@@ -263,7 +275,7 @@
                             <span class="mainText">Is Node updation required?</span>
                         </td>
                         <td class="columnComponent">
-                            <mat-slide-toggle [(ngModel)]="isUpdateRequired" [checked]="isUpdateRequired" style="margin-right: 15%;margin-left: 9%;">
+                            <mat-slide-toggle [disabled]="isEventProcessing" [(ngModel)]="isUpdateRequired" [checked]="isUpdateRequired" style="margin-right: 15%;margin-left: 9%;">
                             </mat-slide-toggle>
                             <input *ngIf="isUpdateRequired" [(ngModel)]="fieldUsedForUpdate" class="nodeUpdateCss" type="text"
                                 placeholder="Field required for updation">
@@ -273,6 +285,7 @@
                                 merged.</span>
                         </td>
                     </tr>
+
                     <tr class="mat-row-webhook">
                         <td class="mat-cell" class="columnName">
                             <span class="mainText">InsightsTimex</span>
@@ -364,6 +377,21 @@
                             <span class="infoText">Please add enrich data fields</span>
                         </td>
                     </tr>
+                  
+                    <tr class="mat-row-webhook" [hidden]="!isEventProcessing" >
+
+                        <td class="mat-cell" class="columnName">
+                            <span class="mainText">Event Config Details</span>
+                        </td>
+                        <td class="columnComponent">
+                            <textarea [(ngModel)]="eventConfig" name="eventConfig" class="frmTxtarea" required
+                                style="width: 85%;resize: none;"></textarea>
+                        </td>
+                        <td>
+                            <span class="infoText">Fill this config template for event processing</span>
+                        </td>
+                    </tr>
+                  
                 </tbody>
             </table>
         </div>

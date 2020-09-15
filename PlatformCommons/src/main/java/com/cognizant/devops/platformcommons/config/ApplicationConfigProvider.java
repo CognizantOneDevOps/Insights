@@ -62,9 +62,17 @@ public class ApplicationConfigProvider implements Serializable {
 	private SingleSignOnConfig singleSignOnConfig = new SingleSignOnConfig();
 	private AssessmentReport assessmentReport = new AssessmentReport();	
 	private WorkflowDetails workflowDetails = new WorkflowDetails();
-
+    private WebhookEngine webhookEngine= new WebhookEngine();
 	private ApplicationConfigProvider() {
 		this.refreshTime = new Date(new Date().getTime() - 86400000);
+	}
+
+	public WebhookEngine getWebhookEngine() {
+		return webhookEngine;
+	}
+
+	public void setWebhookEngine(WebhookEngine webhookEngine) {
+		this.webhookEngine = webhookEngine;
 	}
 
 	public static void performSystemCheck() {

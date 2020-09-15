@@ -26,6 +26,8 @@ public class SchedulerConfigData {
 	private int offlineDataProcessingExecutorInterval = 10;
 	private int inferenceJobExecutor = 20;
 	private int dataArchivalEngineInterval = 240;
+	private int offlineWebhookEventProcessingInterval = 15;
+
 	public int getAuditEngineInterval() {
 		return auditEngineInterval;
 	}
@@ -81,6 +83,7 @@ public class SchedulerConfigData {
 	public void setOfflineDataProcessingExecutorInterval(int offlineDataProcessingExecutorInterval) {
 		this.offlineDataProcessingExecutorInterval = offlineDataProcessingExecutorInterval;
 	}
+
 	public int getInferenceJobExecutor() {
 		return inferenceJobExecutor;
 	}
@@ -96,6 +99,13 @@ public class SchedulerConfigData {
 	public void setDataArchivalEngineInterval(int dataArchivalEngineInterval) {
 		this.dataArchivalEngineInterval = dataArchivalEngineInterval;
 	}
-	
+
+	public int getOfflineWebhookEventProcessingInterval() {
+		return offlineWebhookEventProcessingInterval;
+	}
+
+	public void setOfflineWebhookEventProcessingInterval(int offlineWebhookEventProcessingInterval) {
+		this.offlineWebhookEventProcessingInterval = offlineWebhookEventProcessingInterval;
+	}
 
 }

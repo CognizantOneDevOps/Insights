@@ -74,6 +74,12 @@ public class WebHookConfig implements Serializable{
 	@Column(name = "WEBHOOK_NAME", unique = true, nullable = false)
 	private String webhookName;
 	
+	@Column(name="IS_EVENT_PROCESSING")
+	private boolean isEventProcessing = false;
+	
+	@Column (name="EVENT_CONFIG_JSON" , length=10000)
+	private String eventConfigJson;
+	
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
     @JoinColumn(name="WEBHOOK_CONFIGID")
     private Set<WebhookDerivedConfig> derivedOperations = new HashSet<>(0);
@@ -178,6 +184,24 @@ public class WebHookConfig implements Serializable{
 
 	public void setWebhookDerivedConfig(Set<WebhookDerivedConfig> derivedOperations) {
 		this.derivedOperations = derivedOperations;
+	}	
+
+	public boolean isEventProcessing() {
+		return isEventProcessing;
+	}
+
+	public void setEventProcessing(boolean isEventProcessing) {
+		this.isEventProcessing = isEventProcessing;
+	}
+	
+	
+
+	public String getEventConfigJson() {
+		return eventConfigJson;
+	}
+
+	public void setEventConfigJson(String eventConfigJson) {
+		this.eventConfigJson = eventConfigJson;
 	}
 
 	@Override

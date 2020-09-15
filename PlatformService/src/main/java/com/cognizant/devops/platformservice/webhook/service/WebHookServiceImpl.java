@@ -106,6 +106,8 @@ public class WebHookServiceImpl implements IWebHook {
 			}
 			String dynamicTemplate = registerWebhookjson.get("dynamicTemplate").getAsString();
 			Boolean isUpdateRequired = registerWebhookjson.get("isUpdateRequired").getAsBoolean();
+			String eventConfig=registerWebhookjson.get("eventConfig").getAsString();
+			Boolean isEventProcessing = registerWebhookjson.get("isEventProcessing").getAsBoolean();
 			String webhookName = registerWebhookjson.get("webhookName").getAsString();
 			JsonArray derivedOperationsArray = registerWebhookjson.get("derivedOperations").getAsJsonArray();
 			Set<WebhookDerivedConfig> setWebhookDerivedConfigs = new HashSet<WebhookDerivedConfig>();
@@ -118,11 +120,17 @@ public class WebHookServiceImpl implements IWebHook {
 			webhookConfiguration.setResponseTemplate(responseTemplate);
 			webhookConfiguration.setDynamicTemplate(dynamicTemplate);
 			webhookConfiguration.setFieldUsedForUpdate(registerWebhookjson.get("fieldUsedForUpdate").getAsString());
+			webhookConfiguration.setEventConfigJson(eventConfig);
+			webhookConfiguration.setEventProcessing(isEventProcessing);
 			if (responseTemplate.isEmpty()) {
 				webhookConfiguration.setResponseTemplate(null);
 			}
 			if (dynamicTemplate.isEmpty()) {
 				webhookConfiguration.setDynamicTemplate(null);
+			}
+			if(eventConfig.isEmpty())
+			{
+				webhookConfiguration.setEventConfigJson(null);
 			}
 			webhookConfiguration.setIsUpdateRequired(isUpdateRequired);
 			if (!isUpdateRequired.booleanValue()) {

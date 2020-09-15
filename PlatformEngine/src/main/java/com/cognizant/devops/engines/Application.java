@@ -27,6 +27,7 @@ import com.cognizant.devops.engines.platformengine.modules.aggregator.EngineAggr
 import com.cognizant.devops.engines.platformengine.modules.correlation.EngineCorrelatorModule;
 import com.cognizant.devops.engines.platformengine.modules.mapper.ProjectMapperModule;
 import com.cognizant.devops.engines.platformengine.modules.offlinedataprocessing.OfflineDataProcessingExecutor;
+import com.cognizant.devops.engines.platformwebhookengine.offlineprocessing.WebhookOfflineEventProcessing;
 import com.cognizant.devops.platformcommons.config.ApplicationConfigCache;
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
@@ -124,10 +125,9 @@ public class Application {
 			}
 		}
 
-		if (ApplicationConfigProvider.getInstance().isEnableWebHookEngine()) {
+		if (ApplicationConfigProvider.getInstance().getWebhookEngine().isEnableWebHookEngine()) {
 
 			try {
-
 				// Scheduling Webhook Engine job.
 				Timer timerWebhookEngineJobExecutorModule = new Timer("WebhookEngineJobExecutorModule");
 				Class webhookAggregatorTrigger = Class.forName(
@@ -138,6 +138,18 @@ public class Application {
 								* 1000);
 				EngineStatusLogger.getInstance().createWebhookEngineStatusNode(
 						"Platform WebhookEngine Service started. ", PlatformServiceConstants.SUCCESS);
+
+				// Scheduling webhook offline processing job
+
+				Timer timerOfflineEventProcessingExecutor = new Timer("WebhookOfflineEventProcessing");
+				TimerTask offlineEventProcessingExecutorTrigger = new WebhookOfflineEventProcessing();
+				timerOfflineEventProcessingExecutor.schedule(offlineEventProcessingExecutorTrigger, 0,
+						ApplicationConfigProvider.getInstance().getSchedulerConfigData()
+								.getOfflineWebhookEventProcessingInterval() * 60 * 1000);
+
+				EngineStatusLogger.getInstance().createEngineStatusNode(
+						"Platform WebhookOfflineEventProcessing Started ", PlatformServiceConstants.SUCCESS);
+
 			} catch (ClassNotFoundException e) {
 				EngineStatusLogger.getInstance().createWebhookEngineStatusNode(
 						"Platform WebhookEngine Service not running as it is not subscribed " + e.getMessage(),
