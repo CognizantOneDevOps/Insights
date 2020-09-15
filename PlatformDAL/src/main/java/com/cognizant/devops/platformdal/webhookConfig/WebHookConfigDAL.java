@@ -47,6 +47,8 @@ public class WebHookConfigDAL extends BaseDAL {
 			parentConfigList.setDynamicTemplate(webhookConfiguration.getDynamicTemplate());
 			parentConfigList.setIsUpdateRequired(webhookConfiguration.getIsUpdateRequired());
 			parentConfigList.setFieldUsedForUpdate(webhookConfiguration.getFieldUsedForUpdate());
+			parentConfigList.setEventConfigJson(webhookConfiguration.getEventConfigJson());
+			parentConfigList.setEventProcessing(webhookConfiguration.isEventProcessing());
 			Set<WebhookDerivedConfig> dataDriverFromTable = parentConfigList.getWebhookDerivedConfig();
 			dataDriverFromTable.clear();
 			dataDriverFromTable.addAll(dataFromUI);
@@ -124,5 +126,16 @@ public class WebHookConfigDAL extends BaseDAL {
 		getSession().getTransaction().commit();
 		terminateSession();
 		terminateSessionFactory();
+	}
+	
+	public List<WebHookConfig> getAllEventWebHookConfigurations()
+	{
+		getSession().beginTransaction();
+		Query<WebHookConfig> createQuery = getSession()
+				.createQuery("FROM WebHookConfig WH WHERE WH.isEventProcessing = true", WebHookConfig.class);
+		List<WebHookConfig> result = createQuery.getResultList();
+		terminateSession();
+		terminateSessionFactory();
+		return result;
 	}
 }

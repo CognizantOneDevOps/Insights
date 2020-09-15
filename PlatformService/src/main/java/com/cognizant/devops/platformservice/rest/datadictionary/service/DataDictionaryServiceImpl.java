@@ -65,7 +65,8 @@ public class DataDictionaryServiceImpl implements DataDictionaryService {
 				WebHookConfig configDetails = iteratorWebhook.next();
 				JsonObject webhookDetailJson = new JsonObject();
 				webhookDetailJson.addProperty("toolName", configDetails.getToolName().toUpperCase());
-				if (configDetails.getLabelName().split(":").length == 0) {
+				
+				if (configDetails.getLabelName().split(":").length == 0 ||  configDetails.getLabelName().split(":").length == 1) {
 					webhookDetailJson.addProperty("categoryName", configDetails.getLabelName());
 					webhookDetailJson.addProperty("labelName", configDetails.getLabelName());
 				} else {
