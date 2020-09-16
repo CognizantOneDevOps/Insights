@@ -27,7 +27,7 @@ import javax.xml.bind.JAXBException;
 
 import org.springframework.stereotype.Service;
 
-import com.cognizant.devops.auditservice.audit.utils.PdfTableUtil;
+import com.cognizant.devops.platformauditing.util.PdfTableUtil;
 
 /**
  *	All pdf write operations are customized here.

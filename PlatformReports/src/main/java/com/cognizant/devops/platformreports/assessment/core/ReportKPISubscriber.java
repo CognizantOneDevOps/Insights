@@ -82,8 +82,6 @@ public class ReportKPISubscriber extends WorkflowTaskSubscriberHandler {
 			workflowConfig = workflowDAL.getWorkflowConfigByWorkflowId(workflowId);
 			/* kpi and content list */
 
-			log.debug("Worlflow Detail ==== ReportKPISubscriber workflowid {}  executionId {}  ", workflowId,
-					executionId);
 			boolean isWorkflowTaskRetry = incomingTaskMessage.get(WorkflowUtils.RETRY_JSON_PROPERTY).getAsBoolean();
 			if (isWorkflowTaskRetry) {
 				/* fill failed kpis and content for execution */
@@ -185,7 +183,7 @@ public class ReportKPISubscriber extends WorkflowTaskSubscriberHandler {
 
 		executeKpiChunks(kpiChunkList, failedJobs);
 
-		log.debug("Worlflow Detail ==== ReportKPISubscriber  complete for loop ");
+		log.debug("Worlflow Detail ==== ReportKPISubscriber  executeKPI completed ");
 	}
 
 	private void executeKpiChunks(List<List<Callable<JsonObject>>> chunkList, List<JsonObject> failedJobs)
@@ -193,11 +191,11 @@ public class ReportKPISubscriber extends WorkflowTaskSubscriberHandler {
 
 		for (List<Callable<JsonObject>> chunk : chunkList) {
 			List<Future<JsonObject>> chunkResponse = WorkflowThreadPool.getInstance().invokeAll(chunk);
-			log.debug("Worlflow Detail ==== ReportKPISubscriber  chunk submmited to thread ");
+			//log.debug("Worlflow Detail ==== ReportKPISubscriber  chunk submmited to thread ");
 			for (Future<JsonObject> singleChunkResponse : chunkResponse) {
 				if (!singleChunkResponse.isCancelled()
 						&& !singleChunkResponse.get().get("Status").getAsString().equalsIgnoreCase("Success")) {
-					log.debug("Worlflow Detail ==== ReportKPISubscriber chunk response thread ");
+					//log.debug("Worlflow Detail ==== ReportKPISubscriber chunk response thread ");
 					failedJobs.add(singleChunkResponse.get());
 				}
 

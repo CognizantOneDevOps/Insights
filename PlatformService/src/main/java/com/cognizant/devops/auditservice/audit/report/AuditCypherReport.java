@@ -30,7 +30,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 
 import com.cognizant.devops.auditservice.audit.utils.EmailUtil;
-import com.cognizant.devops.auditservice.audit.utils.PdfTableUtil;
+import com.cognizant.devops.platformauditing.util.PdfTableUtil;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphResponse;
 import com.cognizant.devops.platformcommons.dal.neo4j.Neo4jDBHandler;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;

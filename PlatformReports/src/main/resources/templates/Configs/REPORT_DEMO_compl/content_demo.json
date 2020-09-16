@@ -9,8 +9,10 @@
       "noOfResult":15,
       "threshold":50,
       "directionOfThreshold":"BELOW",
+	  "resultField":"Productivity",
       "message":{
-         "contentMessage":"No of employees who had been below the defined productivity were {result} in the past {day} days"
+         "contentMessage":"No of employees who had been below the defined productivity were {result} in the past {day} days",
+		 "neutralMessage":"No employees productivity data captured for past {day} days"
       }
    },
    {
@@ -23,8 +25,10 @@
       "threshold":45,
       "action":"AVERAGE",
       "directionOfThreshold":"ABOVE",
+	  "resultField":"CodeSmell",
       "message":{
-         "contentMessage":"Employee Productivity has been {actualdirection} the defined the threshold in the past {week} week(s)"
+         "contentMessage":"Employee Productivity has been {actualdirection} the defined the threshold in the past {week} week(s)",
+		 "neutralMessage":"No employees productivity data captured for past {week} week(s)"
       }
    },
    {
@@ -38,7 +42,8 @@
       "action":"AVERAGE",
       "directionOfThreshold":"BELOW",
       "message":{
-         "contentMessage":"Average Code Smell has been {actualdirection} the defined threshold in the last sprint."
+         "contentMessage":"Average Code Smell has been {actualdirection} the defined threshold in the last sprint.",
+		 "neutralMessage":"No Deployments data captured in the last run."
       }
    },
    {
@@ -51,8 +56,10 @@
       "threshold":5,
       "action":"AVERAGE",
       "directionOfThreshold":"BELOW",
+	  "resultField":"Failure",
       "message":{
-         "contentMessage":"Average Failure of Builds has been {actualdirection} the defined threshold in the last sprint."
+         "contentMessage":"Average Failure of Builds has been {actualdirection} the defined threshold in the last sprint.",
+		 "neutralMessage":"No Builds data captured in a Sprint"
       }
    }
 ]

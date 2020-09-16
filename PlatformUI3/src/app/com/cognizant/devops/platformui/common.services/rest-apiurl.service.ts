@@ -57,7 +57,9 @@ export class RestAPIurlService implements IRestAPIUrlService {
         this.addEndPoint("GET_KPI_LIST", '/PlatformService/insights/report/getKPIlistOfReportTemplate');
         this.addEndPoint("GET_TASK_LIST", '/PlatformService/insights/workflow/getTaskList');
         this.addEndPoint("GET_WORKFLOW_EXECUTION_RECORDS", '/PlatformService/insights/workflow/workFlowExecutionRecords');
-        this.addEndPoint("SET_RETRY_COUNT", '/PlatformService/insights/workflow/setRetryStatus');
+        this.addEndPoint("SET_REPORT_STATUS", '/PlatformService/insights/report/setReportStatus');
+        this.addEndPoint("DOWNLOAD_REPORT_PDF", '/PlatformService/insights/workflow/downloadReportPDF');
+        this.addEndPoint("GET_PDF_EXECUTIONID", '/PlatformService/insights/workflow/maxExecutionIDs');
 
         //Grafana Data Collection
         //this.addEndPoint("ACCESS_GROUP_MANAGEMENT_GET_ORGS", '/PlatformService/accessGrpMgmt/getOrgs');
@@ -160,7 +162,7 @@ export class RestAPIurlService implements IRestAPIUrlService {
         this.addEndPoint("INACTIVATE_RECORD", '/PlatformService/admin/dataarchival/inactivateArchivalRecord');
         this.addEndPoint("ACTIVATE_RECORD", '/PlatformService/admin/dataarchival/activateArchivalRecord');
         this.addEndPoint("ACTIVE_ARCHIVED_DATA_LIST", '/PlatformService/admin/dataarchival/getActiveArchivalRecord');
-        this.addEndPoint("UPDATE_DATASOURCE_URL",'/PlatformService/admin/dataarchival/updateArchivalSourceUrl');
+        this.addEndPoint("UPDATE_DATASOURCE_URL", '/PlatformService/admin/dataarchival/updateArchivalSourceUrl');
 
     }
 

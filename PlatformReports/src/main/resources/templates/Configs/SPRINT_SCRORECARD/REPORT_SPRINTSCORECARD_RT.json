@@ -4,13 +4,14 @@
    "description":"Testing",
    "isActive":true,
    "file":"REPORT_SPRINT_SCORECARD",
+   "visualizationutil":"Fusion",
    "kpiConfigs":[
       {
          "kpiId":1101,
          "visualizationConfigs":[
             {
                "vType":"mscolumn2d_1101",
-               "vQuery":"MATCH (n:KPI:RESULTS) where n.assessmentId = {assessmentId} and n.executionId = {executionId} and n.kpiId={kpiId} RETURN  n.Date , n.Failure as Failure,n.Success as Success"
+               "vQuery":"MATCH (n:KPI:RESULTS) where n.assessmentId = {assessmentId} and n.executionId = {executionId} and n.kpiId={kpiId} RETURN  n.Date as Date , n.Failure as Failure,n.Success as Success ORDER BY Date ASC"
             }
          ]
       },
@@ -19,7 +20,7 @@
          "visualizationConfigs":[
             {
                "vType":"mscolumn2d_1115",
-               "vQuery":"MATCH (n:KPI:RESULTS) where n.assessmentId = {assessmentId} and n.executionId = {executionId} and n.kpiId={kpiId} RETURN  n.Date , n.Failure as Failure,n.Success as Success"
+               "vQuery":"MATCH (n:KPI:RESULTS) where n.assessmentId = {assessmentId} and n.executionId = {executionId} and n.kpiId={kpiId} RETURN  n.Date as Date , n.Failure as Failure,n.Success as Success ORDER BY Date ASC"
             }
          ]
       },
@@ -28,7 +29,7 @@
          "visualizationConfigs":[
             {
                "vType":"mscolumn2d_1110",
-               "vQuery":"MATCH (n:KPI:RESULTS)  where n.assessmentId = {assessmentId} and n.executionId = {executionId} and n.kpiId={kpiId} RETURN  n.Date  as Date , n.Failure as Failure,n.Success as Success"
+               "vQuery":"MATCH (n:KPI:RESULTS)  where n.assessmentId = {assessmentId} and n.executionId = {executionId} and n.kpiId={kpiId} RETURN  n.Date  as Date , n.Failure as Failure,n.Success as Success ORDER BY Date ASC"
             }
          ]
       },
@@ -37,7 +38,7 @@
          "visualizationConfigs":[
             {
                "vType":"mscolumn2d_1116",
-               "vQuery":"MATCH (n:KPI:RESULTS)  where n.assessmentId = {assessmentId} and n.executionId = {executionId} and n.kpiId={kpiId} RETURN  n.Date  as Date , n.Failure as Failure,n.Success as Success"
+               "vQuery":"MATCH (n:KPI:RESULTS)  where n.assessmentId = {assessmentId} and n.executionId = {executionId} and n.kpiId={kpiId} RETURN  n.Date  as Date , n.Failure as Failure,n.Success as Success ORDER BY Date ASC"
             }
          ]
       },

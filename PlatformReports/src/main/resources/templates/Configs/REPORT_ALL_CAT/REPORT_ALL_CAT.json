@@ -4,6 +4,7 @@
       "renderAt":"table_2101",
       "dataFormat":"json",
       "caption":"Defects Type & Count",
+	  "dataEmptyMessage":"No Data Found.",
       "dataSource":{
          "chart":{
             "caption":"Defects Type",
@@ -16,6 +17,7 @@
       "type":"pie2d",
       "renderAt":"pie2d_2102",      
       "dataFormat":"json",
+	  "dataEmptyMessage":"No Data Found.",
       "dataSource":{
          "chart":{
             "caption":"Total Hours Worked On Projects ",
@@ -28,6 +30,7 @@
       "type":"mscolumn2d",
       "renderAt":"mscolumn2d_2103",
       "dataFormat":"json",
+	  "dataEmptyMessage":"No Data Found.",
       "dataSource":{
          "chart":{
             "caption":"Avgerage productivity",
@@ -40,9 +43,10 @@
       "type":"mscolumn2d",
       "renderAt":"mscolumn2d_2104",      
       "dataFormat":"json",
+	  "dataEmptyMessage":"No Data Found.",
       "dataSource":{
          "chart":{
-            "caption":"Total Code Issues in Deployment ",
+            "caption":"Total Code Issues in Deployment",
             "subCaption":"",
             "theme":"fusion"
          }
@@ -52,6 +56,7 @@
       "type":"msline",
       "renderAt":"msline_2105",    
       "dataFormat":"json",
+	  "dataEmptyMessage":"No Data Found.",
       "dataSource":{
          "chart":{
             "caption":"Average Build Status",
@@ -61,9 +66,23 @@
       }
    },
    {
+      "type":"msbar2d",
+      "renderAt":"msbar2d_2109",    
+      "dataFormat":"json",
+	  "dataEmptyMessage":"No Data Found.",
+      "dataSource":{
+         "chart":{
+            "caption":" Build Status Count wise",
+            "subCaption":"",
+            "theme":"fusion"
+         }
+      }
+   },
+   {
       "type":"angulargauge",
       "renderAt":"angulargauge_2106",
       "dataFormat":"json",
+	  "dataEmptyMessage":"No Data Found.",
       "dataSource":{
          "chart":{
             "caption":"Maximum Succesful Deploy Time in Seconds",
@@ -102,6 +121,7 @@
       "type":"pie2d",
       "renderAt":"pie2d_2107",
       "dataFormat":"json",
+	  "dataEmptyMessage":"No Data Found.",
       "dataSource":{
          "chart":{
             "caption":"Total Number of Builds",
@@ -115,7 +135,7 @@
             "theme":"fusion",
             "tooltipBorderRadius":"20",
             "showLabels":"0"
-         }
+		}
       }
    }
 ]

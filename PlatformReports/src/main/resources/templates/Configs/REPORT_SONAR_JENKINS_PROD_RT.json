@@ -4,6 +4,7 @@
    "description":"Testing",
    "isActive":true,
    "file":"REPORT_SONAR_JENKINS_PROD",
+   "visualizationutil":"Fusion",
    "kpiConfigs":[
       {
          "kpiId":252,

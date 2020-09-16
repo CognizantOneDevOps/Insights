@@ -90,6 +90,7 @@ import { WorkflowHistoryDetailsDialog } from '@insights/app/modules/reportmanage
 import { ReportConfigComponent } from '@insights/app/modules/reportmanagement/report-configuration/report-configuration.component';
 import { DataArchiveDetailsDialog } from '@insights/app/modules/settings/dataarchiving/data-archive-details/data-archive-details-dialog';
 import { DataArchiveConfigureURLDialog } from '@insights/app/modules/settings/dataarchiving/data-archive-configureurl/data-archive-configureurl-dialog';
+import { EmailConfigurationDialog } from '@insights/app/modules/reportmanagement/report-configuration/email-configuration-dialog'; 
 
 
 @NgModule({
@@ -133,7 +134,8 @@ import { DataArchiveConfigureURLDialog } from '@insights/app/modules/settings/da
     AddPropertyDialog,
     AddTasksDialog,
     ViewKPIDialog,
-    WorkflowHistoryDetailsDialog
+    WorkflowHistoryDetailsDialog,
+    EmailConfigurationDialog
   ],
   imports: [
     HomeRouting,
@@ -162,7 +164,8 @@ import { DataArchiveConfigureURLDialog } from '@insights/app/modules/settings/da
     ViewKPIDialog,
     WorkflowHistoryDetailsDialog,
     DataArchiveDetailsDialog,
-    DataArchiveConfigureURLDialog
+    DataArchiveConfigureURLDialog,
+    EmailConfigurationDialog
   ],
 
   providers: [

@@ -26,7 +26,9 @@ import java.util.concurrent.Future;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
+import com.cognizant.devops.platformcommons.core.enums.WorkflowTaskEnum;
+import com.cognizant.devops.platformcommons.core.util.InsightsUtils;
+import com.cognizant.devops.platformdal.assessmentreport.InsightsReportVisualizationContainer;
 import com.cognizant.devops.platformdal.assessmentreport.InsightsReportsKPIConfig;
 import com.cognizant.devops.platformdal.workflow.InsightsWorkflowConfiguration;
 import com.cognizant.devops.platformdal.workflow.WorkflowDAL;
@@ -57,19 +59,21 @@ public class PDFExecutionSubscriber extends WorkflowTaskSubscriberHandler {
 	public void handleTaskExecution(byte[] body) throws IOException {
 		try {
 			String incomingTaskMessage = new String(body, MQMessageConstants.MESSAGE_ENCODING);
-			log.debug("Worlflow Detail ==== PDFExecutionSubscriber routing key  message handleDelivery ===== {} ",
+			log.debug(
+					"Worlflow Detail ==== PDFExecutionSubscriber started ... routing key  message handleDelivery ===== {} ",
 					incomingTaskMessage);
 			assessmentReportDTO = new InsightsAssessmentConfigurationDTO();
 			JsonObject incomingTaskMessageJson = new JsonParser().parse(incomingTaskMessage).getAsJsonObject();
 			prepareVisualizationJsonBasedOnKPIResult(incomingTaskMessageJson);
 			processVisualizationJson();
+			setPDFDetailsInEmailHistory(incomingTaskMessageJson);
 			log.debug("Worlflow Detail ==== PDFExecutionSubscriber Completed  {} ", incomingTaskMessage);
 		} catch (InsightsJobFailedException ijfe) {
-			log.error("Worlflow Detail ==== PDFExecutionSubscriber Completed with error {}", ijfe);
-			statusLog=ijfe.getMessage();
+			log.error("Worlflow Detail ==== PDFExecutionSubscriber Completed with error ", ijfe);
+			statusLog = ijfe.getMessage();
 			throw ijfe;
 		} catch (Exception e) {
-			log.error("Worlflow Detail ==== PDFExecutionSubscriber Completed with error {}", e);
+			log.error("Worlflow Detail ==== PDFExecutionSubscriber Completed with error ", e);
 			throw new InsightsJobFailedException(e.getMessage());
 		}
 	}
@@ -90,6 +94,9 @@ public class PDFExecutionSubscriber extends WorkflowTaskSubscriberHandler {
 		assessmentReportDTO
 				.setReportName(workflowConfig.getAssessmentConfig().getReportTemplateEntity().getTemplateName());
 		assessmentReportDTO.setReportFilePath(workflowConfig.getAssessmentConfig().getReportTemplateEntity().getFile());
+		assessmentReportDTO
+				.setAsseementreportdisplayname(workflowConfig.getAssessmentConfig().getAsseementReportDisplayName());
+		assessmentReportDTO.setVisualizationutil(workflowConfig.getAssessmentConfig().getReportTemplateEntity().getVisualizationutil());
 
 		Set<InsightsReportsKPIConfig> reportsKPIConfigSet = workflowConfig.getAssessmentConfig()
 				.getReportTemplateEntity().getReportsKPIConfig();
@@ -97,7 +104,8 @@ public class PDFExecutionSubscriber extends WorkflowTaskSubscriberHandler {
 
 	}
 
-	private void getKPIVisualizationReportObject(Set<InsightsReportsKPIConfig> reportsKPIConfigSet) throws InterruptedException, ExecutionException {
+	private void getKPIVisualizationReportObject(Set<InsightsReportsKPIConfig> reportsKPIConfigSet)
+			throws InterruptedException, ExecutionException {
 
 		List<JsonObject> failedJobs = new ArrayList<>();
 		List<Callable<JsonObject>> kpiListToExecute = new ArrayList<>();
@@ -148,7 +156,7 @@ public class PDFExecutionSubscriber extends WorkflowTaskSubscriberHandler {
 	}
 
 	private void updateFailedTaskStatusLog(List<JsonObject> failedJobs,
-			InsightsAssessmentConfigurationDTO assessmentReportDTO) throws InterruptedException, ExecutionException {
+			InsightsAssessmentConfigurationDTO assessmentReportDTO) {
 		JsonObject statusObject = new JsonObject();
 		JsonArray kpiArray = new JsonArray();
 
@@ -169,8 +177,28 @@ public class PDFExecutionSubscriber extends WorkflowTaskSubscriberHandler {
 
 	private void processVisualizationJson() {
 		BasePDFProcessor chartHandler = ReportPDFVisualizationHandlerFactory
-				.getChartHandler(ApplicationConfigProvider.getInstance().getAssessmentReport().getChartVendor());
+				.getChartHandler(assessmentReportDTO.getVisualizationutil());
 		chartHandler.generatePDF(assessmentReportDTO);
 	}
 
+	private void setPDFDetailsInEmailHistory(JsonObject incomingTaskMessageJson) {
+		try {
+			String workflowId = incomingTaskMessageJson.get("workflowId").getAsString();
+			InsightsReportVisualizationContainer emailHistoryConfig = new InsightsReportVisualizationContainer();
+			emailHistoryConfig.setAttachmentPath(assessmentReportDTO.getPdfExportedFilePath());
+			emailHistoryConfig.setExecutionId(assessmentReportDTO.getExecutionId());
+			if (incomingTaskMessageJson.get("nextTaskId").getAsInt() == -1) {
+				emailHistoryConfig.setStatus(WorkflowTaskEnum.WorkflowStatus.COMPLETED.name());
+				emailHistoryConfig.setExecutionTime(InsightsUtils.getCurrentTimeInEpochMilliSeconds());
+			} else {
+				emailHistoryConfig.setStatus(WorkflowTaskEnum.EmailStatus.NOT_STARTED.name());
+			}
+			emailHistoryConfig.setWorkflowConfig(workflowId);
+			workflowDAL.saveEmailExecutionHistory(emailHistoryConfig);
+		} catch (Exception e) {
+			log.error("Worlflow Detail ==== Error setting PDF details in Email History table");
+			throw new InsightsJobFailedException(
+					"Worlflow Detail ==== Error setting PDF details in Email History table");
+		}
+	}
 }

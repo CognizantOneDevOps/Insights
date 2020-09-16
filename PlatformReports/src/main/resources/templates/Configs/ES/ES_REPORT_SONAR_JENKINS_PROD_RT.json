@@ -4,6 +4,7 @@
    "description":"ES Testing",
    "isActive":true,
    "file":"ES_REPORT_SONAR_JENKINS_PROD",
+   "visualizationutil":"Fusion",
    "kpiConfigs":[
       {
          "kpiId":252,

@@ -48,28 +48,31 @@ public class InsightsAssessmentConfiguration implements Serializable {
 	@Column(name = "asseementreportname", unique = true, nullable = false)
 	private String asseementreportname;
 
-	@Column(name = "emailList", nullable = false, length=2000)
+	@Column(name = "asseementreportdisplayname")
+	private String asseementReportDisplayName;
+
+	@Column(name = "emailList", nullable = false, length = 2000)
 	private String emails;
 
 	@Column(name = "startDate")
 	private long startDate;
-	
-	@Column(name="endDate")
+
+	@Column(name = "endDate")
 	private long endDate;
-	
-	@Column(name="inputDatasource")
-	private String inputDatasource;	
+
+	@Column(name = "inputDatasource")
+	private String inputDatasource;
 
 	@Column(name = "isActive")
 	private boolean isActive;
 
 	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "reportId", referencedColumnName = "reportId")
-	private InsightsAssessmentReportTemplate reportTemplateEntity ;
+	private InsightsAssessmentReportTemplate reportTemplateEntity;
 
 	@OneToOne(cascade = CascadeType.ALL)
 	@JoinColumn(name = "workflowId", referencedColumnName = "workflowId")
-	private InsightsWorkflowConfiguration workflowConfig ;
+	private InsightsWorkflowConfiguration workflowConfig;
 
 	public int getId() {
 		return id;
@@ -87,12 +90,12 @@ public class InsightsAssessmentConfiguration implements Serializable {
 		this.asseementreportname = asseementreportname;
 	}
 
-	public String getEmails() {
-		return emails;
+	public String getAsseementReportDisplayName() {
+		return asseementReportDisplayName;
 	}
 
-	public void setEmails(String emails) {
-		this.emails = emails;
+	public void setAsseementReportDisplayName(String asseementReportDisplayName) {
+		this.asseementReportDisplayName = asseementReportDisplayName;
 	}
 
 	public long getStartDate() {
@@ -143,7 +146,11 @@ public class InsightsAssessmentConfiguration implements Serializable {
 		this.workflowConfig = workflowConfig;
 	}
 
-	
-	
+	public String getEmails() {
+		return emails;
+	}
 
+	public void setEmails(String emails) {
+		this.emails = emails;
+	}
 }

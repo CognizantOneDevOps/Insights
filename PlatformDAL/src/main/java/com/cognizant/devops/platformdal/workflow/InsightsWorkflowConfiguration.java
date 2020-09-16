@@ -29,46 +29,52 @@ import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 import com.cognizant.devops.platformdal.assessmentreport.InsightsAssessmentConfiguration;
+import com.cognizant.devops.platformdal.assessmentreport.InsightsEmailTemplates;
 
 @Entity
-@Table(name="\"INSIGHTS_WORKFLOW_CONFIG\"")
+@Table(name = "\"INSIGHTS_WORKFLOW_CONFIG\"")
 public class InsightsWorkflowConfiguration implements Serializable {
 
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = -1249381939971490215L; 
+	private static final long serialVersionUID = -1249381939971490215L;
 
 	@Id
-	@Column(name="workflowId")
+	@Column(name = "workflowId")
 	private String workflowId;
-	
-	@Column(name="workflowType")
+
+	@Column(name = "workflowType")
 	private String workflowType;
-	
-	@Column(name="scheduleType")
+
+	@Column(name = "scheduleType")
 	private String scheduleType;
-	
-	@Column(name="reoccurence")
+
+	@Column(name = "reoccurence")
 	private boolean reoccurence;
-	
-	@Column(name="lastRun")
+
+	@Column(name = "lastRun")
 	private long lastRun;
-	
-	@Column(name="nextRun")
+
+	@Column(name = "nextRun")
 	private long nextRun;
-	
-	@Column(name="status")
+
+	@Column(name = "runImmediate")
+	private boolean runImmediate;
+
+	@Column(name = "status")
 	private String status;
-	
-	@Column(name="isActive")
-	private boolean isActive;		
-	
-	@OneToOne(mappedBy="workflowConfig" , fetch=FetchType.EAGER)
+
+	@Column(name = "isActive")
+	private boolean isActive;
+
+	@OneToOne(mappedBy = "workflowConfig", fetch = FetchType.EAGER)
 	private InsightsAssessmentConfiguration assessmentConfig;
-	
-	
-	@OneToMany(fetch=FetchType.EAGER, cascade=CascadeType.ALL , mappedBy="workflowConfig")
+
+	@OneToOne(mappedBy = "workflowConfig", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+	private InsightsEmailTemplates emailConfig;
+
+	@OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, mappedBy = "workflowConfig")
 	private Set<InsightsWorkflowTaskSequence> taskSequenceEntity = new HashSet<>();
 
 	public String getWorkflowId() {
@@ -150,4 +156,21 @@ public class InsightsWorkflowConfiguration implements Serializable {
 	public void setNextRun(long nextRun) {
 		this.nextRun = nextRun;
 	}
+
+	public boolean isRunImmediate() {
+		return runImmediate;
+	}
+
+	public void setRunImmediate(boolean runImmediate) {
+		this.runImmediate = runImmediate;
+	}
+
+	public InsightsEmailTemplates getEmailConfig() {
+		return emailConfig;
+	}
+
+	public void setEmailConfig(InsightsEmailTemplates emailConfig) {
+		this.emailConfig = emailConfig;
+	}
+
 }

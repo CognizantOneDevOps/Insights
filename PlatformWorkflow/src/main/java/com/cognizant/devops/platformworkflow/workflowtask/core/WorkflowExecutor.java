@@ -27,7 +27,6 @@ import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.core.enums.WorkflowTaskEnum;
 import com.cognizant.devops.platformdal.workflow.InsightsWorkflowConfiguration;
 import com.cognizant.devops.platformdal.workflow.InsightsWorkflowTaskSequence;
-import com.cognizant.devops.platformworkflow.workflowtask.exception.WorkflowFailedTaskException;
 import com.cognizant.devops.platformworkflow.workflowtask.exception.WorkflowTaskInitializationException;
 import com.google.gson.JsonObject;
 
@@ -61,7 +60,8 @@ public class WorkflowExecutor implements Job {
 		if (!readyToRunWorkflow.isEmpty()) {
 			for (InsightsWorkflowConfiguration workflowConfig : readyToRunWorkflow) {
 				long executionId = System.currentTimeMillis();
-				log.debug(" Worlflow Detail ====  executionId {}  ", executionId);
+				log.debug(" Worlflow Detail ==== workflowid {} executionId {}  ", workflowConfig.getWorkflowId(),
+						executionId);
 				InsightsWorkflowTaskSequence firstworkflowTask = workflowProcessing
 						.getWorkflowTaskSequenceByWorkflowId(workflowConfig.getWorkflowId());
 				JsonObject mqRequestJson = new JsonObject();

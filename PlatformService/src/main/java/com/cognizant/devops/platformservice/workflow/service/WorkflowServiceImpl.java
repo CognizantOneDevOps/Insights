@@ -15,6 +15,9 @@
  ******************************************************************************/
 package com.cognizant.devops.platformservice.workflow.service;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -25,11 +28,12 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Service;
 
-import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
 import com.cognizant.devops.platformcommons.core.enums.WorkflowTaskEnum;
 import com.cognizant.devops.platformcommons.core.util.InsightsUtils;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformdal.assessmentreport.InsightsAssessmentConfiguration;
+import com.cognizant.devops.platformdal.assessmentreport.InsightsEmailTemplates;
+import com.cognizant.devops.platformdal.assessmentreport.InsightsReportVisualizationContainer;
 import com.cognizant.devops.platformdal.assessmentreport.ReportConfigDAL;
 import com.cognizant.devops.platformdal.workflow.InsightsWorkflowConfiguration;
 import com.cognizant.devops.platformdal.workflow.InsightsWorkflowTask;
@@ -96,8 +100,8 @@ public class WorkflowServiceImpl {
 	 * @throws InsightsCustomException
 	 */
 	public InsightsWorkflowConfiguration saveWorkflowConfig(String workflowId, boolean isActive, boolean reoccurence,
-			String schedule, String reportStatus, String workflowType, JsonArray taskList, long startdate, long enddate)
-			throws InsightsCustomException {
+			String schedule, String reportStatus, String workflowType, JsonArray taskList, long startdate,
+			JsonObject emailDetails, boolean runImmediate) throws InsightsCustomException {
 		InsightsWorkflowConfiguration workflowConfig = workflowConfigDAL.getWorkflowByWorkflowId(workflowId);
 		if (workflowConfig != null) {
 			throw new InsightsCustomException("Workflow already exists for with assessment report id "
@@ -121,9 +125,14 @@ public class WorkflowServiceImpl {
 		workflowConfig.setScheduleType(schedule);
 		workflowConfig.setStatus(reportStatus);
 		workflowConfig.setWorkflowType(workflowType);
+		workflowConfig.setRunImmediate(runImmediate);
 		Set<InsightsWorkflowTaskSequence> sequneceEntitySet = setSequence(taskList, workflowConfig);
 		// Attach TaskSequence to workflow
 		workflowConfig.setTaskSequenceEntity(sequneceEntitySet);
+		if (emailDetails != null) {
+			InsightsEmailTemplates emailTemplateConfig = createEmailTemplateObject(emailDetails, workflowConfig);
+			workflowConfig.setEmailConfig(emailTemplateConfig);
+		}
 		return workflowConfig;
 
 	}
@@ -149,7 +158,7 @@ public class WorkflowServiceImpl {
 			return jsonarray;
 
 		} catch (Exception e) {
-			log.error("Error while deleting assesment report.{}", e);
+			log.error("Error while deleting assesment report", e);
 			throw new InsightsCustomException(e.toString());
 		}
 	}
@@ -224,7 +233,7 @@ public class WorkflowServiceImpl {
 			List<Object[]> records = workflowConfigDAL
 					.getWorkflowExecutionRecordsbyAssessmentConfigID(assessmentConfigId);
 			JsonArray recordData = new JsonArray();
-			records.stream().forEach((record) -> {
+			records.stream().forEach(record -> {
 				JsonObject rec = new JsonObject();
 				rec.addProperty("executionid", (long) record[0]);
 				rec.addProperty("startTime", (long) record[1]);
@@ -243,31 +252,98 @@ public class WorkflowServiceImpl {
 			responseJson.add("records", recordData);
 			return responseJson;
 		} catch (Exception e) {
-			log.error("Error while fetching Workflow Execution History records. {}", e);
+			log.error("Error while fetching Workflow Execution History records.", e);
 			throw new InsightsCustomException("Error while fetching Workflow Execution History records");
 		}
 	}
 
-	/**
-	 * Set the status to RETRY
-	 * 
-	 * @param configId
-	 * @return
-	 * @throws InsightsCustomException
-	 */
-	public String setRetryStatus(String configId) throws InsightsCustomException {
+	public InsightsEmailTemplates createEmailTemplateObject(JsonObject emailDetails,
+			InsightsWorkflowConfiguration workflowConfig) {
+		InsightsEmailTemplates emailTemplateConfig = workflowConfig.getEmailConfig();
+		if (emailTemplateConfig == null) {
+			emailTemplateConfig = new InsightsEmailTemplates();
+		}
+		String mailBody = emailDetails.get("mailBodyTemplate").getAsString();
+		mailBody = mailBody.replace("#", "<").replace("~", ">");
+		emailTemplateConfig.setMailFrom(emailDetails.get("senderEmailAddress").getAsString());
+		if (!emailDetails.get("receiverEmailAddress").getAsString().isEmpty()) {
+			emailTemplateConfig.setMailTo(emailDetails.get("receiverEmailAddress").getAsString());
+		} else {
+			emailTemplateConfig.setMailTo(null);
+		}
+		if (!emailDetails.get("receiverCCEmailAddress").getAsString().isEmpty()) {
+			emailTemplateConfig.setMailCC(emailDetails.get("receiverCCEmailAddress").getAsString());
+		} else {
+			emailTemplateConfig.setMailCC(null);
+		}
+		if (!emailDetails.get("receiverBCCEmailAddress").getAsString().isEmpty()) {
+			emailTemplateConfig.setMailBCC(emailDetails.get("receiverBCCEmailAddress").getAsString());
+		} else {
+			emailTemplateConfig.setMailBCC(null);
+		}
+		emailTemplateConfig.setSubject(emailDetails.get("mailSubject").getAsString());
+		emailTemplateConfig.setMailBody(mailBody);
+		emailTemplateConfig.setWorkflowConfig(workflowConfig);
+		return emailTemplateConfig;
+	}
+
+	public JsonObject getMaximumExecutionIDs(JsonObject configIdJson) throws InsightsCustomException {
 		try {
-			int assessmentReportId = Integer.parseInt(configId);
-			InsightsAssessmentConfiguration assessmentConfig = reportConfigDAL
-					.getAssessmentByConfigId(assessmentReportId);
-			InsightsWorkflowConfiguration workFlowObject = assessmentConfig.getWorkflowConfig();
-			workFlowObject.setStatus(WorkflowTaskEnum.WorkflowStatus.RESTART.toString());
-			assessmentConfig.setWorkflowConfig(workFlowObject);
-			reportConfigDAL.updateAssessmentReportConfiguration(assessmentConfig, assessmentReportId);
-			return PlatformServiceConstants.SUCCESS;
+			long workflowExecutionId = -1;
+			long reportVisualizerExecutionId = -1;
+			boolean status = false;
+			long executionId = -1;
+			boolean alreadySet = false;
+			int assessmentConfigId = configIdJson.get("configid").getAsInt();
+			InsightsAssessmentConfiguration assessmentObj = reportConfigDAL.getAssessmentByConfigId(assessmentConfigId);
+			String workflowId = assessmentObj.getWorkflowConfig().getWorkflowId();
+			List<Object[]> result = workflowConfigDAL
+					.getMaxExecutionIDsFromWorkflowExecutionAndReportVisualization(workflowId);
+			for (Object[] record : result) {
+				if (record[0] == null && record[1] == null) {
+					executionId = -1;
+					alreadySet = true;
+				} else {
+					reportVisualizerExecutionId = (long) record[0];
+					workflowExecutionId = (long) record[1];
+				}
+			}
+			if (!alreadySet) {
+				if (workflowExecutionId == reportVisualizerExecutionId) {
+					status = true;
+					executionId = reportVisualizerExecutionId;
+				} else {
+					executionId = reportVisualizerExecutionId;
+				}
+			}
+			JsonObject responseJson = new JsonObject();
+			responseJson.addProperty("status", status);
+			responseJson.addProperty("executionId", executionId);
+			responseJson.addProperty("workflowId", workflowId);
+			return responseJson;
 		} catch (Exception e) {
-			log.error("Error while updating report status..{}", e);
+			log.error("Error while fetching execution ids", e);
+			throw new InsightsCustomException("Error while fetching execution ids");
+		}
+	}
+
+	public byte[] getReportPDF(JsonObject pdfDetailsJson) throws InsightsCustomException {
+		byte[] pdfContent = null;
+		try {
+			String workflowId = pdfDetailsJson.get("workflowId").getAsString();
+			long executionId = pdfDetailsJson.get("executionId").getAsLong();
+			InsightsReportVisualizationContainer reportVisObject = workflowConfigDAL
+					.getReportVisualizationContainerByWorkflowAndExecutionId(workflowId, executionId);
+			if (reportVisObject != null) {
+				Path pdfPath = Paths.get(reportVisObject.getAttachmentPath());
+				pdfContent = Files.readAllBytes(pdfPath);
+			} else {
+				throw new InsightsCustomException("PDF not generated");
+			}
+		} catch (Exception e) {
+			log.error("Error while updating report status.", e);
 			throw new InsightsCustomException(e.toString());
 		}
+		return pdfContent;
 	}
 }

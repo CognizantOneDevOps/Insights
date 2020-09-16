@@ -17,6 +17,8 @@ package com.cognizant.devops.platformworkflow.test;
 
 import java.util.List;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.testng.Assert;
 import org.testng.annotations.AfterTest;
 import org.testng.annotations.BeforeTest;
@@ -37,6 +39,8 @@ import com.cognizant.devops.platformworkflow.workflowtask.utils.PlatformWorkflow
 import com.cognizant.devops.platformworkflow.workflowthread.core.WorkflowThreadPool;
 
 public class WorkflowTest extends WorkflowTestData {
+
+	private static final Logger log = LogManager.getLogger(WorkflowTest.class);
 
 	WorkflowDAL workflowDAL = new WorkflowDAL();
 	ReportConfigDAL reportConfigDAL = new ReportConfigDAL();
@@ -68,6 +72,9 @@ public class WorkflowTest extends WorkflowTestData {
 		saveAssessmentReport(WorkflowIdWrongTask, wrongMqChannel, reportWithWrongTask, null);
 		saveAssessmentReport(WorkflowIdWith2Task, mqChannel, assessmentReportWith2Task, mqChannelFail);
 		saveAssessmentReport(WorkflowIdTest, mqChannel, assessmentReportTest, wrongMqChannel);
+		saveAssessmentReport(WorkflowIdTestImmediate, mqChannel, assessmentReportImmediate, null);
+
+		updateRunImmediate(WorkflowIdTestImmediate);
 
 		initializeTask();
 		
@@ -174,6 +181,15 @@ public class WorkflowTest extends WorkflowTestData {
 		}		
 	}
 	
+	@Test(priority = 9)
+	public void testValidateImmediateWorkflowStatus() {
+		InsightsWorkflowConfiguration workflowConfig = workflowDAL
+				.getWorkflowConfigByWorkflowId(WorkflowIdTestImmediate);
+		Assert.assertEquals(workflowConfig.getStatus(), "COMPLETED");
+		Assert.assertTrue(workflowConfig.getNextRun() > nextRunDaily);
+
+	}
+
 	@AfterTest
 	public void cleanUp() {
 		
@@ -182,9 +198,11 @@ public class WorkflowTest extends WorkflowTestData {
 		delete(WorkflowIdWith2Task);
 		delete(WorkflowIdWrongTask);
 		delete(WorkflowIdTest);
+		delete(WorkflowIdTestImmediate);
 		
 		//delete workflow task
 		for(int element: taskidList) {
+			log.debug("Test case message ==== deleted task {} ", element);
 			workflowDAL.deleteTask(element);
 		}
 		

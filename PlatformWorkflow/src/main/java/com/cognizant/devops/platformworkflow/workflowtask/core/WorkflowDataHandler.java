@@ -58,7 +58,8 @@ public class WorkflowDataHandler {
 
 		List<InsightsWorkflowConfiguration> readyToRunReports = new ArrayList<>();
 		try {
-			List<InsightsWorkflowConfiguration> workflowConfigs = workflowDAL.getAllActiveWorkflowConfiguration();
+			List<InsightsWorkflowConfiguration> workflowConfigs = workflowDAL
+					.getAllScheduledAndActiveWorkflowConfiguration();
 			for (InsightsWorkflowConfiguration worflowConfig : workflowConfigs) {
 
 				if (worflowConfig.getStatus().equalsIgnoreCase(WorkflowTaskEnum.WorkflowStatus.COMPLETED.name())
@@ -75,6 +76,33 @@ public class WorkflowDataHandler {
 			}
 		} catch (Exception e) {
 			log.error("Error while preparing workflows for execution {}", e);
+		}
+		return readyToRunReports;
+	}
+
+	/**
+	 * Method to get all Immediate workflow config
+	 * 
+	 * @return
+	 */
+	public List<InsightsWorkflowConfiguration> getImmediateWorkFlowConfigs() {
+
+		List<InsightsWorkflowConfiguration> readyToRunReports = new ArrayList<>();
+		try {
+			List<InsightsWorkflowConfiguration> workflowImmediateConfigs = workflowDAL
+					.getImmediateWorkflowConfiguration();
+			for (InsightsWorkflowConfiguration worflowImmediateConfig : workflowImmediateConfigs) {
+				if (worflowImmediateConfig.getStatus()
+						.equalsIgnoreCase(WorkflowTaskEnum.WorkflowStatus.NOT_STARTED.name())
+						|| worflowImmediateConfig.getStatus()
+								.equalsIgnoreCase(WorkflowTaskEnum.WorkflowStatus.RESTART.toString())
+						|| worflowImmediateConfig.getStatus()
+								.equalsIgnoreCase(WorkflowTaskEnum.WorkflowStatus.TASK_INITIALIZE_ERROR.toString())) {
+					readyToRunReports.add(worflowImmediateConfig);
+				}
+			}
+		} catch (Exception e) {
+			log.error("Error while preparing getImmediateWorkFlowConfigs for execution {}", e);
 		}
 		return readyToRunReports;
 	}
@@ -198,7 +226,7 @@ public class WorkflowDataHandler {
 	 * @return
 	 */
 	public int saveWorkflowExecutionHistory(Map<String, Object> requestMessage) {
-		log.debug(" Worlflow Detail ==== saveWorkflowExecutionHistory started ");
+		//log.debug(" Worlflow Detail ==== saveWorkflowExecutionHistory started ");
 
 		String workflowId = String.valueOf(requestMessage.get("workflowId"));
 		InsightsWorkflowConfiguration workflowConfig = workflowDAL
@@ -227,7 +255,7 @@ public class WorkflowDataHandler {
 	 * @param statusLog
 	 */
 	public void updateWorkflowExecutionHistory(int historyId, String status, String statusLog) {
-		log.debug(" Worlflow Detail ==== updateWorkflowExecutionHistory start ");
+		//log.debug(" Worlflow Detail ==== updateWorkflowExecutionHistory start ");
 
 		InsightsWorkflowExecutionHistory historyConfig = workflowDAL.getWorkflowExecutionHistoryByHistoryId(historyId);
 		historyConfig.setEndTime(System.currentTimeMillis());
@@ -251,7 +279,7 @@ public class WorkflowDataHandler {
 			String workflowId = String.valueOf(requestMessage.get("workflowId"));
 			InsightsWorkflowTask insightsWorkflowTaskEntity = workflowDAL
 					.getTaskByTaskId((int) requestMessage.get("nextTaskId"));
-			log.debug("Worlflow Detail ==== workflowId {}  ", workflowId);
+			//log.debug("Worlflow Detail ==== workflowId {}  ", workflowId);
 			InsightsWorkflowTaskSequence currentTaskSequence = workflowDAL
 					.getWorkflowTaskSequenceByWorkflowAndTaskId(workflowId, (int) requestMessage.get("currentTaskId"));
 			InsightsWorkflowTaskSequence nextTaskSequence = workflowDAL
@@ -265,7 +293,7 @@ public class WorkflowDataHandler {
 				createTaskRequestJson((long) requestMessage.get("executionId"), workflowId,
 						(int) requestMessage.get("nextTaskId"), nextTaskSequence.getNextTask(),
 						nextTaskSequence.getSequence(), mqRequestJson);
-				log.debug(" Worlflow Detail ====  publish message {} ", mqRequestJson);
+				log.debug(" Worlflow Detail ====  publish message for nexttask {} ", mqRequestJson);
 				publishMessageInMQ(insightsWorkflowTaskEntity.getMqChannel(), mqRequestJson);
 			}
 			log.debug(" Worlflow Detail ====  publishMessageToNextInMQ completed ");
@@ -288,8 +316,10 @@ public class WorkflowDataHandler {
 	 */
 	public void updateWorkflowDetails(String workflowId, String status, boolean isUpdateLastRunTime) {
 
-		log.debug(" Worlflow Detail ==== updateWorkflowStatus  started ");
+		//log.debug(" Worlflow Detail ==== updateWorkflowStatus  started ");
 		InsightsWorkflowConfiguration workflowConfig = workflowDAL.getWorkflowConfigByWorkflowId(workflowId);
+		boolean runImmediate = workflowConfig.isRunImmediate();
+		workflowConfig.setRunImmediate(Boolean.FALSE);
 		if (isUpdateLastRunTime) {
 			long workflowlastRunTime = InsightsUtils.getCurrentTimeInSeconds();
 			long nextRunTime = InsightsUtils.getNextRunTime(workflowConfig.getNextRun(),
@@ -299,8 +329,9 @@ public class WorkflowDataHandler {
 		}
 		if (status.equalsIgnoreCase("ERROR") || status.equalsIgnoreCase("ABORTED")) {
 			workflowConfig.setLastRun(InsightsUtils.getCurrentTimeInSeconds());
+		} else if (status.equalsIgnoreCase("TASK_INITIALIZE_ERROR") && runImmediate) {
+			workflowConfig.setRunImmediate(Boolean.TRUE);
 		}
-
 		workflowConfig.setStatus(status);
 		workflowDAL.updateWorkflowConfig(workflowConfig);
 		log.debug(" Worlflow Detail ====  updateWorkflowStatus completed ");
@@ -317,7 +348,7 @@ public class WorkflowDataHandler {
 	 * @param statusLog
 	 */
 	public void updateRetryWorkflowExecutionHistory(int historyId, String workflowId, String status, String statusLog) {
-		log.debug(" Worlflow Detail ==== updateWorkflowExecutionHistory start ");
+		//log.debug(" Worlflow Detail ==== updateWorkflowExecutionHistory start ");
 
 		InsightsWorkflowExecutionHistory historyConfig = workflowDAL.getWorkflowExecutionHistoryByHistoryId(historyId);
 		if (status.equalsIgnoreCase(WorkflowTaskEnum.WorkflowStatus.IN_PROGRESS.toString())) {

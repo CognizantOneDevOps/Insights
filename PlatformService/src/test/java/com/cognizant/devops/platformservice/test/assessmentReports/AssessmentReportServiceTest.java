@@ -408,14 +408,6 @@ public class AssessmentReportServiceTest extends AssessmentReportServiceData {
 		String status = assessmentService.deleteAssessmentReport(deleteAssessmentReportWrongConfigId);
 	}
 
-	@Test(priority = 33)
-	public void testUpdateAssessmentReport() throws InsightsCustomException {
-		String updateAssessmentReport = "{\"isReoccuring\":true,\"emailList\":\"dasdsd\",\"id\":"+reportConfigDAL.getAssessmentByAssessmentName(weeklyAssessmentReportJson.get("reportName").getAsString()).getId()+",\"tasklist\":[{\"taskId\":1,\"description\":\"KPI_Execute\"},{\"taskId\":2,\"description\":\"PDF_Execute\"},{\"taskId\":3,\"description\":\"EMAIL_Execute\"}]}";
-		final JsonObject updateAssessmentReportJson = convertStringIntoJson(updateAssessmentReport);
-		int assessmentId = assessmentService.updateAssessmentReport(updateAssessmentReportJson);
-		Assert.assertEquals(assessmentId, updateAssessmentReportJson.get("id").getAsInt());
-	}
-
 	@Test(priority = 34)
 	public void testGetSchedule() throws InsightsCustomException {
 		List<String> scheduleRecords = assessmentService.getSchedule();
@@ -446,43 +438,157 @@ public class AssessmentReportServiceTest extends AssessmentReportServiceData {
 		int assessmentid = assessmentService.saveAssessmentReport(oneTimeAssessmentReportWithStartDateGreaterThanEndDateJson);
 	}
 	
-	@AfterTest
+	@Test(priority = 38)
+	public void testSaveDailyEmailAssessmentReport() throws InsightsCustomException {
+		int assessmentid = assessmentService.saveAssessmentReport(dailyEmailAssessmentReportJson);
+		InsightsAssessmentConfiguration assessment = reportConfigDAL.getAssessmentByConfigId(assessmentid);
+		Assert.assertNotNull(assessment,"Report not found in db");
+		Assert.assertEquals(assessment.getReportTemplateEntity().getReportId(),
+				dailyEmailAssessmentReportJson.get("reportTemplate").getAsInt(),"Report Template not present in db as expected");
+		Assert.assertEquals(assessment.getStartDate(),dailyEmailExpectedAssessmentStartDate,"Start Date not equal");
+		Assert.assertEquals(assessment.getEndDate(),dailyEmailExpectedAssessmentEndDate,"End date not equal");
+		Assert.assertEquals(assessment.getWorkflowConfig().getNextRun(),dailyEmailExpectedNextRun,"Next run not equal");
+		Assert.assertTrue(assessment.getWorkflowConfig().getTaskSequenceEntity().size()>0,"Records not present in Workflow Task Sequence table");
+		Set<InsightsWorkflowTaskSequence>  set = assessment.getWorkflowConfig().getTaskSequenceEntity();
+		int noOfTasks = set.size();
+		set.forEach(x->{
+			if(x.getSequence()==noOfTasks)
+		      Assert.assertEquals(x.getNextTask(), -1,"Last task's next task not assigned -1");		
+		});
+		Assert.assertNotNull(assessment.getWorkflowConfig().getEmailConfig(),"Email details not found in db");
+		Assert.assertEquals(assessment.getWorkflowConfig().getEmailConfig().getSubject(),dailyEmailAssessmentReportJson.get("emailDetails").getAsJsonObject().get("mailSubject").getAsString(),"Email details not found in db");
+	}
+	
+	@Test(priority = 39)
+	public void testSaveDailyWithoutEmailAssessmentReport() throws InsightsCustomException, InterruptedException {
+		Thread.sleep(1000);
+		int assessmentid = assessmentService.saveAssessmentReport(dailywithoutEmailAssessmentReportJson);
+		InsightsAssessmentConfiguration assessment = reportConfigDAL.getAssessmentByConfigId(assessmentid);
+		Assert.assertNotNull(assessment,"Report not found in db");
+		Assert.assertEquals(assessment.getReportTemplateEntity().getReportId(),
+				dailywithoutEmailAssessmentReportJson.get("reportTemplate").getAsInt(),"Report Template not present in db as expected");
+		Assert.assertEquals(assessment.getStartDate(),dailywithoutEmailExpectedAssessmentStartDate,"Start Date not equal");
+		Assert.assertEquals(assessment.getEndDate(),dailywithoutEmailExpectedAssessmentEndDate,"End date not equal");
+		Assert.assertEquals(assessment.getWorkflowConfig().getNextRun(),dailywithoutEmailExpectedNextRun,"Next run not equal");
+		Assert.assertTrue(assessment.getWorkflowConfig().getTaskSequenceEntity().size()>0,"Records not present in Workflow Task Sequence table");
+		Set<InsightsWorkflowTaskSequence>  set = assessment.getWorkflowConfig().getTaskSequenceEntity();
+		int noOfTasks = set.size();
+		set.forEach(x->{
+			if(x.getSequence()==noOfTasks)
+		      Assert.assertEquals(x.getNextTask(), -1,"Last task's next task not assigned -1");		
+		});
+		Assert.assertNull(assessment.getWorkflowConfig().getEmailConfig(),"Email details present in db");
+	}
+	
+	@Test(priority = 40 ,expectedExceptions = InsightsCustomException.class )
+	public void testSaveEmailAssessmentReportWithEmailDetailsAndNoEmailTask() throws InsightsCustomException, InterruptedException {
+		Thread.sleep(1000);
+		int assessmentid = assessmentService.saveAssessmentReport(dailywithoutEmailtaskAssessmentReportJson);
+	}
+	
+	@Test(priority = 41 ,expectedExceptions = InsightsCustomException.class )
+	public void testSaveEmailAssessmentReportWithEmailTaskAndNoEmailDetails() throws InsightsCustomException, InterruptedException {
+		Thread.sleep(1000);
+		int assessmentid = assessmentService.saveAssessmentReport(dailywithoutEmaildetailsAssessmentReportJson);
+	}
+	
+	@Test(priority = 42)
+	public void testUpdateAssessmentReport() throws InsightsCustomException {
+		String updateAssessmentReport = "{\"isReoccuring\":true,\"emailList\":\"dasdsd\",\"id\":"+reportConfigDAL.getAssessmentByAssessmentName(dailyEmailAssessmentReportJson.get("reportName").getAsString()).getId()+",\"tasklist\":[{\"taskId\":1,\"description\":\"KPI_Execute_service_test\"},{\"taskId\":2,\"description\":\"PDF_Execute_service_test\"},{\"taskId\":3,\"description\":\"Email_Execute_service_test\"}],\"emailDetails\":{\"senderEmailAddress\":\"onedevops@cogdevops.com\",\"receiverEmailAddress\":\"dibakor.barua@cognizant.com\",\"mailSubject\":\"{ReportDisplayName} - {TimeOfReportGeneration}\",\"mailBodyTemplate\":\"Dear User,\\nPlease find attached Assessment Report  {ReportDisplayName}\\ngenerated on {TimeOfReportGeneration}.\\n\\nRegards,\\nOneDevops Team.\\n** This is an Auto Generated Mail by Insights scheduler. Please Do not reply to this mail**\"}}";
+		final JsonObject updateAssessmentReportJson = convertStringIntoJson(updateAssessmentReport);
+		int assessmentId = assessmentService.updateAssessmentReport(updateAssessmentReportJson);
+		Assert.assertEquals(assessmentId, updateAssessmentReportJson.get("id").getAsInt());
+	}
+	
+	@Test(priority = 43)
+	public void testsetRetryStatus() throws InsightsCustomException {
+
+		int configId = reportConfigDAL
+				.getAssessmentByAssessmentName(dailyRestartAssessmentReport.get("reportName").getAsString()).getId();
+		String retryJson = "{\"configId\":" + configId + ",\"status\":\"RESTART\"}";
+		JsonObject reportRestartJson = parser.parse(retryJson).getAsJsonObject();
+		String status = assessmentService.setReportStatus(reportRestartJson);
+		InsightsAssessmentConfiguration assessment = reportConfigDAL.getAssessmentByConfigId(Integer.valueOf(configId));
+		Assert.assertEquals(status, PlatformServiceConstants.SUCCESS);
+		Assert.assertEquals(assessment.getWorkflowConfig().getStatus(), "RESTART");
+
+	}
+
+	@Test(priority = 44)
+	public void testrunImmediateStatus() throws InsightsCustomException {
+		int configId = reportConfigDAL
+				.getAssessmentByAssessmentName(dailyRunImmediateAssessmentReport.get("reportName").getAsString())
+				.getId();
+		String retryJson = "{\"configId\":" + configId + ",\"runimmediate\":true}";
+		JsonObject reportRestartJson = parser.parse(retryJson).getAsJsonObject();
+		String status = assessmentService.setReportStatus(reportRestartJson);
+		InsightsAssessmentConfiguration assessment = reportConfigDAL.getAssessmentByConfigId(Integer.valueOf(configId));
+		Assert.assertEquals(status, PlatformServiceConstants.SUCCESS);
+		Assert.assertTrue(assessment.getWorkflowConfig().isRunImmediate());
+
+	}
+
+	@AfterClass
 	public void cleanUp() {
 		
-	
-		//Delete assessment reports
-		List<String> assessmentReportNames = Arrays.asList(weeklyAssessmentReportJson.get("reportName").getAsString(),monthlyAssessmentReportJson.get("reportName").getAsString(),quarterlyAssessmentReportJson.get("reportName").getAsString(),yearlyAssessmentReportJson.get("reportName").getAsString(),oneTimeAssessmentReportJson.get("reportName").getAsString(),biWeeklyAssessmentReportJson.get("reportName").getAsString(),triWeeklyAssessmentReportJson.get("reportName").getAsString(),triWeeklyAssessmentWithDataSourceReportJson.get("reportName").getAsString());
-		for(String assessmentReport: assessmentReportNames ) {
-			InsightsAssessmentConfiguration assessment = reportConfigDAL.getAssessmentByAssessmentName(assessmentReport.trim());
-			String workflowID = assessment.getWorkflowConfig().getWorkflowId();
-			int configID = assessment.getId();
-			reportConfigDAL.deleteAssessmentReport(configID);
-			workflowConfigDAL.deleteWorkflowTaskSequence(workflowID);
-		}
-		
-		//deleteTask
+		try {
+			//Delete assessment reports
+			List<String> assessmentReportNames = Arrays.asList(
+					weeklyAssessmentReportJson.get("reportName").getAsString(),
+					monthlyAssessmentReportJson.get("reportName").getAsString(),
+					quarterlyAssessmentReportJson.get("reportName").getAsString(),
+					yearlyAssessmentReportJson.get("reportName").getAsString(),
+					oneTimeAssessmentReportJson.get("reportName").getAsString(),
+					biWeeklyAssessmentReportJson.get("reportName").getAsString(),
+					triWeeklyAssessmentReportJson.get("reportName").getAsString(),
+					triWeeklyAssessmentWithDataSourceReportJson.get("reportName").getAsString(),
+					dailyEmailAssessmentReportJson.get("reportName").getAsString(),
+					dailywithoutEmailAssessmentReportJson.get("reportName").getAsString(),
+					dailyRestartAssessmentReport.get("reportName").getAsString(),
+					dailyRunImmediateAssessmentReport.get("reportName").getAsString());
+			for (String assessmentReport : assessmentReportNames) {
+				InsightsAssessmentConfiguration assessment = reportConfigDAL
+						.getAssessmentByAssessmentName(assessmentReport.trim());
+				String workflowID = assessment.getWorkflowConfig().getWorkflowId();
+				int configID = assessment.getId();
+				reportConfigDAL.deleteAssessmentReport(configID);
+				workflowConfigDAL.deleteWorkflowTaskSequence(workflowID);
+			}
 
-		InsightsWorkflowTask tasks = workflowConfigDAL.getTaskbyTaskDescription("KPI_Execute_test");
-		int taskID = tasks.getTaskId();
-		workflowConfigDAL.deleteTask(taskID);
+			//deleteTask
 
-		//Delete Report Templates
-		reportConfigDAL.deleteReportTemplatebyReportID(reportTemplateJson.get("reportId").getAsInt());
-		
-		//Delete Content
-		reportConfigDAL.deleteContentbyContentID(registerContentJson.get("contentId").getAsInt());
-		
-		//Delete KPI
-		reportConfigDAL.deleteKPIbyKpiID(registerkpiJson.get("kpiId").getAsInt());
-		
-		//Delete bulk Content
-		for(int element: contentIdList) {
-			reportConfigDAL.deleteContentbyContentID(element);
-		}
-		
-		//Delete bulk kpi
-		for(int element: kpiIdList) {
-			reportConfigDAL.deleteKPIbyKpiID(element);
+			InsightsWorkflowTask tasks = workflowConfigDAL.getTaskbyTaskDescription("KPI_Execute_service_test");
+			int taskID = tasks.getTaskId();
+			workflowConfigDAL.deleteTask(taskID);
+
+			InsightsWorkflowTask pdftasks = workflowConfigDAL.getTaskbyTaskDescription("PDF_Execute_service_test");
+			int pdftaskID = pdftasks.getTaskId();
+			workflowConfigDAL.deleteTask(pdftaskID);
+
+			InsightsWorkflowTask emailtasks = workflowConfigDAL.getTaskbyTaskDescription("Email_Execute_service_test");
+			int emailtaskID = emailtasks.getTaskId();
+			workflowConfigDAL.deleteTask(emailtaskID);
+
+			//Delete Report Templates
+			reportConfigDAL.deleteReportTemplatebyReportID(reportTemplateJson.get("reportId").getAsInt());
+
+			//Delete Content
+			reportConfigDAL.deleteContentbyContentID(registerContentJson.get("contentId").getAsInt());
+
+			//Delete KPI
+			reportConfigDAL.deleteKPIbyKpiID(registerkpiJson.get("kpiId").getAsInt());
+
+			//Delete bulk Content
+			for (int element : contentIdList) {
+				reportConfigDAL.deleteContentbyContentID(element);
+			}
+
+			//Delete bulk kpi
+			for (int element : kpiIdList) {
+				reportConfigDAL.deleteKPIbyKpiID(element);
+			}
+		}catch(Exception e) {
+			log.error("Error cleaning up at AssessmentReportServiceTest ",e);
 		}
 
 	}

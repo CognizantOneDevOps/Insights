@@ -168,7 +168,6 @@
       "kpiId":100237,
       "name":"Average Code Coverage",
       "group":"CODEQUALITY",
-      "category":"THRESHOLD_RANGE",
       "toolName":"SONAR",
       "category":"COMPARISON",
       "DBQuery":"MATCH (n:SONAR:DATA) where n.SPKstartTime > 1593561600 and n.SPKstartTime < 1596239999 and n.SPKstatus='Success' RETURN  n.SPKendTime as SPKendTime,COALESCE(Avg(toInt(n.SPKcoverage)),0) as AvgCodeCoverage LIMIT 2",
@@ -182,7 +181,6 @@
       "group":"CODEQUALITY",
       "category":"STANDARD",
       "toolName":"SONAR",
-      "category":"COMPARISON",
       "DBQuery":"MATCH (n:SONAR:DATA) where n.SPKstartTime > 1593561600 and n.SPKstartTime < 1596239999 and n.SPKstatus='Success' RETURN COALESCE(Avg(toInt(n.SPKcoverage)),0) as AvgCodeCoverage LIMIT 2",
       "datasource":"NEO4J",
       "isActive":true,
@@ -287,5 +285,70 @@
       "datasource":"NEO4J",
       "isActive":true,
       "resultField":"AvgDefectCompletionTime"
+   },
+   {
+   	  "kpiId":102109,
+      "name":"Jenkins Build Failures V/S Success Trend",
+      "group":"BUILD",
+      "category":"TREND",
+      "toolName":"JENKINS",
+      "DBQuery":"MATCH (n:JENKINS:DATA) WHERE  n.SPKstartTime > 1593561600 and n.SPKstartTime < 1596239999 and n.SPKvector = 'BUILD' with n , case when n.SPKstatus='Failure'then count(n.SPKduration) end as Failure ,case when n.SPKstatus='Success'then count(n.SPKduration) end as Success RETURN  count(Failure) as Failure , count (Success) as Success",
+      "datasource":"NEO4J",
+      "isActive":true,
+      "resultField":"Failure"
+   },    {
+      "kpiId":112101,
+      "name":"Defects Type Count",
+      "group":"ALM",
+      "category":"STANDARD",
+      "toolName":"JIRA",
+      "DBQuery":"MATCH (n:JIRA) WHERE  n.SPKstartTime > 1535760000 and n.SPKstartTime < 1538351999 RETURN DISTINCT n.SPKdefectDuring as Type, count(n) as Count",
+      "datasource":"NEO4J",
+      "isActive":true,
+      "resultField":"Count"
+   },
+   {
+      "kpiId":112102,
+      "name":"Total Hours Worked On Projects",
+      "group":"ALM",
+      "category":"THRESHOLD",
+      "toolName":"JIRA",
+      "DBQuery":"MATCH (n:JIRA) where  n.SPKstartTime > 1535760000 and n.SPKstartTime < 1538351999 and n.SPKprojectName in ['PaymentServices','MobileServices','ClaimFinder','AgentLocator'] and  n.SPKstartTime > {startTime} and n.SPKstartTime < {endTime} with n return distinct n.SPKprojectName as StoryTypes , sum(n.SPKduration)/3600 as Duration",
+      "datasource":"NEO4J",
+      "isActive":true,
+      "resultField":"Duration"
+   },
+   {
+      "kpiId":112103,
+      "name":"Avg all employee productivity for threshold ",
+      "toolName":"PRODUCTIVITY",
+      "category":"MINMAX",
+      "group":"PRODUCTIVITY",
+      "isActive":true,
+      "DBQuery":"MATCH (n:PRODUCTIVITY) where n.completionDateEpochTime > 1535760000 AND n.completionDateEpochTime < 1538351999 WITH n.completionDateEpochTime as completionDateEpochTime, avg(n.storyPoints*8) as StoryPoint, avg(n.authorTimeSpent) as authorTimeSpent  return   completionDateEpochTime, StoryPoint, authorTimeSpent, round((toFloat(StoryPoint)/authorTimeSpent)*100) as Productivity",
+      "resultField":"Productivity",
+      "datasource":"NEO4J"
+   },
+  {
+      "kpiId":112104,
+      "name":"Total Code Issues in Deployment",
+      "group":"CODEQUALITY",
+      "category":"COMPARISON",
+      "toolName":"SONAR",
+      "DBQuery":"MATCH (n:SONAR:DATA) WHERE  n.SPKstartTime > 1535760000 and n.SPKstartTime < 1538351999 and n.SPKvector = 'CODEQUALITY' with n where n.SPKstatus='Success'  RETURN  toInt(ROUND(SUM(n.SPKbugs))) as Bugs , toInt(ROUND(SUM(n.SPKcodeSmellsStr))) as CodeSmell, toInt(ROUND(SUM(n.SPKVulnerabilitiesStr))) as Vulnerablilities",
+      "datasource":"NEO4J",
+      "isActive":true,
+      "resultField":"CodeSmell"
+   },
+    {
+   "kpiId":112105,
+      "name":"Jenkins Build Failures V/S Success",
+      "group":"BUILD",
+      "category":"THRESHOLD_RANGE",
+      "toolName":"JENKINS",
+      "DBQuery":"MATCH (n:JENKINS:DATA) WHERE  n.SPKstartTime > 1535760000  and n.SPKstartTime < 1538351999 and n.SPKvector = 'BUILD' with n , case when n.SPKstatus='Failure'then count(n.SPKduration) end as Failure ,case when n.SPKstatus='Success'then count(n.SPKduration) end as Success RETURN  count(Failure) as Failure , count (Success) as Success",
+      "datasource":"NEO4J",
+      "isActive":true,
+      "resultField":"Failure"
    }
 ]

@@ -35,11 +35,14 @@ public class WorkflowServiceTestData {
 	String registerkpiWorkflow = "{\"kpiId\":123456,\"name\":\"Total Successful Deployments_workflow\",\"group\":\"DEPLOYMENT\",\"toolName\":\"RUNDECK\",\"category\":\"STANDARD\",\"DBQuery\":\"MATCH (n:RUNDECK:DATA) WHERE n.SPKstartTime > {startTime} and n.SPKstartTime < {endTime} and  n.SPKvector = 'DEPLOYMENT' and n.SPKstatus='Success' RETURN count(n.SPKstatus) as totalDeploymentCount\",\"datasource\":\"NEO4J\",\"isActive\":true,\"resultField\":\"totalDeploymentCount\"}";
 	public JsonObject registerkpiWorkflowJson = convertStringIntoJson(registerkpiWorkflow);
 	
-	String reportTemplateWorkflow = "{\"reportId\":\"123456\",\"reportName\":\"Fail Report_workflow\",\"description\":\"Testing\",\"isActive\":true,\"file\":\"File.json\",\"kpiConfigs\":[{\"kpiId\":123456,\"visualizationConfigs\":[{\"vId\":\"100\",\"vQuery\":\"Query\"}]}]}";
+	String reportTemplateWorkflow = "{\"reportId\":\"123456\",\"reportName\":\"Fail Report_workflow\",\"description\":\"Testing\",\"isActive\":true,\"file\":\"File.json\",\"visualizationutil\":\"Fusion\",\"kpiConfigs\":[{\"kpiId\":123456,\"visualizationConfigs\":[{\"vId\":\"100\",\"vQuery\":\"Query\"}]}]}";
 	public JsonObject reportTemplateWorkflowJson = convertStringIntoJson(reportTemplateWorkflow);
 	
 	String workflowTaskData = "{\"description\": \"KPI_Execute_Workflow_test\",\"mqChannel\": \"WORKFLOW.TASK.KPI.EXCECUTION\",\"componentName\": \"com.cognizant.devops.platformreports.assessment.core.ReportKPISubscriber\",\"dependency\": \"100\",\"workflowType\": \"Report\"}";
 	public JsonObject workflowTaskAsJson = convertStringIntoJson(workflowTaskData);
+	
+	String workflowEmailTaskData = "{\"description\": \"Email_Execute_Workflow_test\",\"mqChannel\": \"WORKFLOW.TASK.EMAIL.EXCECUTION\",\"componentName\": \"com.cognizant.devops.platformreports.assessment.core.ReportEmailSubscriber\",\"dependency\": \"100\",\"workflowType\": \"Report\"}";
+	public JsonObject workflowEmailTaskAsJson = convertStringIntoJson(workflowEmailTaskData);
 	
 	String incorrectWorkflowTask = "{\"description\": \"KPI_Execute_Workflow_test\",\"componentName\": \"com.cognizant.devops.platforminsights.workflowtask.message.tasksubscribers.ReportKPISubscriber\",\"dependency\": \"100\",\"workflowType\": \"Report\"}";
 

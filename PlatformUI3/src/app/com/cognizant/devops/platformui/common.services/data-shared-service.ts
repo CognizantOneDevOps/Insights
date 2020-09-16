@@ -268,4 +268,26 @@ export class DataSharedService {
     }
     return returnName;
   }
+
+  validateEmailAddresses(emailAddress):boolean {
+    var emailRegex = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    var isValidated = true;
+    var emails = emailAddress.replace(/\s/g, "").split(",");
+    for (var email of emails) {
+      if (!emailRegex.test(email)) {
+        isValidated = false;
+        break;
+      }
+    }
+    return isValidated;
+  }
+
+  convertDateToSpecificDateFormat(dateObject,format){
+    var formattedDate;
+    formattedDate = this.datePipe.transform(
+      dateObject,
+      format
+    );
+    return formattedDate;
+  }
 }

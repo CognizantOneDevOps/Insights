@@ -10,7 +10,8 @@
       "threshold":50,
       "directionOfThreshold":"BELOW",
       "message":{
-         "contentMessage":"No of employees who had been below the defined productivity were {result} in the past {day} days"
+         "contentMessage":"No of employees who had been below the defined productivity were {result} in the past {day} days",
+		 "neutralMessage":"No employees productivity data captured for past {day} days"
       },
       "resultField":"Productivity"
    },
@@ -25,7 +26,8 @@
       "action":"AVERAGE",
       "directionOfThreshold":"ABOVE",
       "message":{
-         "contentMessage":"Employee Productivity has been {actualdirection} the defined the threshold in the past {week} week(s)"
+         "contentMessage":"Employee Productivity has been {actualdirection} the defined the threshold in the past {week} week(s)",
+		 "neutralMessage":"No employees productivity data captured for past {day} days"
       },
       "resultField":"Productivity"
    },
@@ -40,7 +42,8 @@
       "action":"AVERAGE",
       "directionOfThreshold":"BELOW",
       "message":{
-         "contentMessage":"Average Code Smell has been {actualdirection} the defined threshold in the last sprint."
+         "contentMessage":"Average Code Smell has been {actualdirection} the defined threshold in the last sprint.",
+		 "neutralMessage":"No Code Smell of code issues captured captured in a Sprint "
       },
       "resultField":"CodeSmell"
    },
@@ -55,7 +58,8 @@
       "action":"AVERAGE",
       "directionOfThreshold":"BELOW",
       "message":{
-         "contentMessage":"Average bugs has been {actualdirection} the defined threshold in the last sprint."
+         "contentMessage":"Average bugs has been {actualdirection} the defined threshold in the last sprint.",
+		 "neutralMessage":"No Bugs of code issues captured in a Sprint "
       },
       "resultField":"Bugs"
    },
@@ -70,7 +74,8 @@
       "action":"AVERAGE",
       "directionOfThreshold":"BELOW",
       "message":{
-         "contentMessage":"Average vulnerablilities has been {actualdirection} the defined threshold in the last sprint."
+         "contentMessage":"Average vulnerablilities has been {actualdirection} the defined threshold in the last sprint.",
+		 "neutralMessage":"No Vulnerablilities of code issues captured in a Sprint "
       },
       "resultField":"Vulnerablilities"
    },
@@ -85,7 +90,8 @@
       "action":"AVERAGE",
       "directionOfThreshold":"BELOW",
       "message":{
-         "contentMessage":"Average Failure of Builds has been {actualdirection} the defined threshold in the last sprint."
+         "contentMessage":"Average Failure of Builds has been {actualdirection} the defined threshold in the last sprint.",
+		 "neutralMessage":"No Builds captured in a Sprint"
       },
       "resultField":"Failure"
    },
@@ -100,7 +106,8 @@
       "action":"AVERAGE",
       "directionOfThreshold":"BELOW",
       "message":{
-         "contentMessage":"Average hours spent on projects is {actualdirection} the defined threshold in the last sprint."
+         "contentMessage":"Average hours spent on projects is {actualdirection} the defined threshold in the last sprint.",
+		 "neutralMessage":"No Duration captured in a Sprint"
       },
       "resultField":"Duration"
    }

@@ -22,8 +22,6 @@ import com.cognizant.devops.platformcommons.config.ApplicationConfigCache;
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
 import com.cognizant.devops.platformworkflow.workflowtask.core.InsightsStatusProvider;
-import com.cognizant.devops.platformworkflow.workflowtask.core.WorkflowExecutor;
-import com.cognizant.devops.platformworkflow.workflowtask.core.WorkflowRetryExecutor;
 import com.cognizant.devops.platformworkflow.workflowtask.utils.PlatformWorkflowApplicationTest;
 
 /**

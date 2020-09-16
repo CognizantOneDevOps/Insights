@@ -43,7 +43,7 @@ import com.google.gson.JsonParser;
 @RequestMapping("/insights/report")
 public class InsightsAssessmentReportController {
 
-	private static Logger LOG = LogManager.getLogger(InsightsAssessmentReportController.class);
+	private static Logger log = LogManager.getLogger(InsightsAssessmentReportController.class);
 
 	@Autowired
 	AssesmentReportServiceImpl assessmentReportService;
@@ -59,10 +59,10 @@ public class InsightsAssessmentReportController {
 			int resultKpiId = assessmentReportService.saveKpiDefinition(registerKpijson);
 			return PlatformServiceUtil.buildSuccessResponseWithData(" Kpi created with Id " + resultKpiId);
 		} catch (InsightsCustomException e) {
-			LOG.error(e);
+			log.error(e);
 			return PlatformServiceUtil.buildFailureResponse(e.getMessage());
 		} catch (Exception e) {
-			LOG.error(e);
+			log.error(e);
 			return PlatformServiceUtil.buildFailureResponse("Unable to save KPI Setting Configuration");
 		}
 	}
@@ -78,10 +78,10 @@ public class InsightsAssessmentReportController {
 			int contentId = assessmentReportService.saveContentDefinition(registerContentKPIJson);
 			return PlatformServiceUtil.buildSuccessResponseWithData(" Content Id created " + contentId);
 		} catch (InsightsCustomException e) {
-			LOG.error(e);
+			log.error(e);
 			return PlatformServiceUtil.buildFailureResponse(e.getMessage());
 		} catch (Exception e) {
-			LOG.error(e);
+			log.error(e);
 			return PlatformServiceUtil.buildFailureResponse("Unable to save Cantent Definition due to exception");
 		}
 	}
@@ -92,10 +92,10 @@ public class InsightsAssessmentReportController {
 			String resultKpiIdResponse = assessmentReportService.uploadKPIInDatabase(file);
 			return PlatformServiceUtil.buildSuccessResponseWithData(" Kpis details are  " + resultKpiIdResponse);
 		} catch (InsightsCustomException e) {
-			LOG.error(e);
+			log.error(e);
 			return PlatformServiceUtil.buildFailureResponse(e.getMessage());
 		} catch (Exception e) {
-			LOG.error(e);
+			log.error(e);
 			return PlatformServiceUtil.buildFailureResponse("Unable to save KPI Setting Configuration ");
 		}
 	}
@@ -106,10 +106,10 @@ public class InsightsAssessmentReportController {
 			String resultContentResponse = assessmentReportService.uploadContentInDatabase(file);
 			return PlatformServiceUtil.buildSuccessResponseWithData(" Contents details are " + resultContentResponse);
 		} catch (InsightsCustomException e) {
-			LOG.error(e);
+			log.error(e);
 			return PlatformServiceUtil.buildFailureResponse(e.getMessage());
 		} catch (Exception e) {
-			LOG.error(e);
+			log.error(e);
 			return PlatformServiceUtil.buildFailureResponse("Unable to save Content Setting Configuration");
 		}
 	}
@@ -138,10 +138,10 @@ public class InsightsAssessmentReportController {
 			return PlatformServiceUtil
 					.buildSuccessResponseWithData(" Assessment Report Id created " + assessmentReportId);
 		} catch (InsightsCustomException e) {
-			LOG.error(e);
+			log.error(e);
 			return PlatformServiceUtil.buildFailureResponse(e.getMessage());
 		} catch (Exception e) {
-			LOG.error(e);
+			log.error(e);
 			return PlatformServiceUtil.buildFailureResponse("Unable to save assessment report due to exception");
 		}
 	}
@@ -157,10 +157,10 @@ public class InsightsAssessmentReportController {
 			return PlatformServiceUtil
 					.buildSuccessResponseWithData(" Assessment Report Id updated " + assessmentReportId);
 		} catch (InsightsCustomException e) {
-			LOG.error(e);
+			log.error(e);
 			return PlatformServiceUtil.buildFailureResponse(e.getMessage());
 		} catch (Exception e) {
-			LOG.error(e);
+			log.error(e);
 			return PlatformServiceUtil.buildFailureResponse("Unable to update assessment report due to exception");
 		}
 	}
@@ -205,7 +205,7 @@ public class InsightsAssessmentReportController {
 
 	// CONTROLLER FOR REPORT TEMPLATE CONFIG TABLE
 
-	@RequestMapping(value = "/saveReportTemplate", produces = MediaType.APPLICATION_JSON_VALUE)
+	@RequestMapping(value = "/saveReportTemplate", produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.POST)
 	public @ResponseBody JsonObject saveReportTemplate(@RequestBody String reportTemplate) {
 		try {
 			reportTemplate = reportTemplate.replace("\n", "").replace("\r", "");
@@ -215,10 +215,10 @@ public class InsightsAssessmentReportController {
 			int templateReportId = assessmentReportService.saveTemplateReport(reportTemplateJson);
 			return PlatformServiceUtil.buildSuccessResponseWithData(" Template Report Id created " + templateReportId);
 		} catch (InsightsCustomException e) {
-			LOG.error(e);
+			log.error(e);
 			return PlatformServiceUtil.buildFailureResponse(e.getMessage());
 		} catch (Exception e) {
-			LOG.error(e);
+			log.error(e);
 			return PlatformServiceUtil.buildFailureResponse("Unable to save template report due to exception");
 		}
 	}
@@ -252,6 +252,20 @@ public class InsightsAssessmentReportController {
 			return PlatformServiceUtil.buildFailureResponse(e.getMessage());
 		}
 
+	}
+
+	@RequestMapping(value = "/setReportStatus", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	public @ResponseBody JsonObject setWorkflowStatus(@RequestBody String reportConfigJsonString) {
+		String message = null;
+		try {
+			String validatedResponse = ValidationUtils.validateRequestBody(reportConfigJsonString);
+			JsonParser parser = new JsonParser();
+			JsonObject reportConfigJson = (JsonObject) parser.parse(validatedResponse);
+			message = assessmentReportService.setReportStatus(reportConfigJson);
+			return PlatformServiceUtil.buildSuccessResponseWithData(message);
+		} catch (InsightsCustomException e) {
+			return PlatformServiceUtil.buildFailureResponse(e.getMessage());
+		}
 	}
 
 }

@@ -5,12 +5,13 @@
       "expectedTrend":"BELOW",
       "resultField":"Issues",
       "contentName":" Defects Count",
-      "kpiId":2108,
+      "kpiId":2101,
       "noOfResult":2,
       "threshold":0,
       "directionOfThreshold":"BELOW",
       "message":{
-         "contentMessage":"Total number of defects captured in the last sprint were {Issues}"
+         "contentMessage":"Total number of defects captured in the last sprint were {Count}",
+		 "neutralMessage":"No defects captured in the last sprint"
       }
    },
    {
@@ -24,7 +25,8 @@
       "action":"AVERAGE",
       "directionOfThreshold":"BELOW",
       "message":{
-         "contentMessage":"Average hours spent on projects is {actualdirection} the defined threshold in the last sprint."
+         "contentMessage":"Average hours spent on projects is {actualdirection} the defined threshold in the last sprint.",
+		 "neutralMessage":"No average time spent on projects. "
       },
       "resultField":"Duration"
    },
@@ -38,14 +40,15 @@
       "action":"MAX",
       "resultField":"Productivity",
       "message":{
-         "contentMessage":"Employee productivity was maximum on {maxDate} day in last {week} week(s) and was {result}"
+         "contentMessage":"Employee productivity was maximum on {maxDate} day in last {week} week(s) and was {result}",
+		 "neutralMessage":"No detail found on Employee productivity"
       }
    },
    {
       "contentId":22104,
       "expectedTrend":"DOWNWARDS",
       "contentName":"Total Code Smell in Deployment",
-      "kpiId":"2104",
+      "kpiId":2104,
       "noOfResult":2,
       "threshold":0,
       "resultField":"CodeSmell",
@@ -60,7 +63,7 @@
       "contentId":22108,
       "expectedTrend":"DOWNWARDS",
       "contentName":"Total Code Bugs in Deployment",
-      "kpiId":"2104",
+      "kpiId":2104,
       "noOfResult":2,
       "threshold":0,
       "resultField":"Bugs",
@@ -75,7 +78,7 @@
       "contentId":22109,
       "expectedTrend":"DOWNWARDS",
       "contentName":"Total Code Vulnerablilities in Deployment",
-      "kpiId":"2104",
+      "kpiId":2104,
       "noOfResult":2,
       "threshold":0,
       "resultField":"Vulnerablilities",
@@ -102,7 +105,8 @@
       "action":"COUNT",
       "directionOfThreshold":"BELOW",
       "message":{
-         "contentMessage":"Total Failure builds w.r.t zones are red {red}, amber {amber} , green {green}"
+         "contentMessage":"Total Failure builds w.r.t zones are red {red}, amber {amber} , green {green}",
+		 "neutralMessage":"No total Failure builds found"
       }
    },
     {
@@ -121,7 +125,8 @@
       "action":"COUNT",
       "directionOfThreshold":"ABOVE",
       "message":{
-         "contentMessage":"Total Successful builds  w.r.t zones are red {red}, amber {amber} , green {green}"
+         "contentMessage":"Total Successful builds  w.r.t zones are red {red}, amber {amber} , green {green}",
+		 "neutralMessage":"No Successful builds found"
       }
    },
    {
@@ -133,7 +138,8 @@
       "threshold":0,
 	  "resultField":"Deploy",
       "message":{
-         "contentMessage":"Maximum successful deployment time captured in the last sprint was {Deploy}s ."
+         "contentMessage":"Maximum successful deployment time captured in the last sprint was {Deploy}s .",
+		 "neutralMessage":"No deployment captured in the last sprint"
       },
       "isActive":"TRUE"
    },
@@ -142,12 +148,39 @@
       "expectedTrend":"UPWARDS",
       "contentName":"Total Number of Builds",
       "kpiId":"2107",
-	   "resultField":"Builds",
+	  "resultField":"Builds",
       "noOfResult":2,
       "threshold":0,
       "message":{
-         "contentMessage":"There were total {Builds} build(s) captured in the last sprint."
+         "contentMessage":"There were total {Builds} build(s) captured in the last sprint.",
+		 "neutralMessage":"No build(s) captured in the last sprint."
       },
       "isActive":"TRUE"
+   },{
+      "contentId":22111,
+      "isActive":"TRUE",
+      "expectedTrend":"UPWARDS",
+      "contentName":"Total Successful builds w.r.t zone ",
+      "kpiId":2109,
+      "noOfResult":15,
+      "resultField":"Success",
+      "action":"COUNT",
+      "message":{
+         "contentMessage":"Total Successful builds were {result} in last {day} days",
+		 "neutralMessage":"No Successful builds in last {day} days "
+      }
+   },{
+      "contentId":22112,
+      "isActive":"TRUE",
+      "expectedTrend":"DOWNWARDS",
+      "contentName":"Total Failure w.r.t zone ",
+      "kpiId":2109,
+      "noOfResult":15,
+      "resultField":"Failure",
+      "action":"COUNT",
+      "message":{
+         "contentMessage":"Total Failure builds were {result} in last {day} days",
+		 "neutralMessage":"No Failure builds in last {day} days "
+      }
    }
 ]

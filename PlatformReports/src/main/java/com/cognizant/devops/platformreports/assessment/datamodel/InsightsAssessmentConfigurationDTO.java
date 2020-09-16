@@ -31,9 +31,12 @@ public class InsightsAssessmentConfigurationDTO {
 	private String workflowId;
 	private String pdfReportDirPath;
 	private String pdfReportFolderName;
+	private String pdfExportedFilePath;
+	private String visualizationutil;
 	Map<String, JsonArray> tableJsonObjMap = new HashMap<>();
 	Map<String, String> contentMap = new HashMap<>();
 	JsonArray visualizationResult = new JsonArray();
+	private String asseementreportdisplayname;
 
 	public int getReportId() {
 		return reportId;
@@ -131,12 +134,37 @@ public class InsightsAssessmentConfigurationDTO {
 		this.contentMap = contentMap;
 	}
 
+	public String getAsseementreportdisplayname() {
+		return asseementreportdisplayname;
+	}
+
+	public void setAsseementreportdisplayname(String asseementreportdisplayname) {
+		this.asseementreportdisplayname = asseementreportdisplayname;
+	}
+
+	public String getPdfExportedFilePath() {
+		return pdfExportedFilePath;
+	}
+
+	public void setPdfExportedFilePath(String pdfExportedFilePath) {
+		this.pdfExportedFilePath = pdfExportedFilePath;
+	}
+
+	public String getVisualizationutil() {
+		return visualizationutil;
+	}
+
+	public void setVisualizationutil(String visualizationutil) {
+		this.visualizationutil = visualizationutil;
+	}
+
 	@Override
 	public String toString() {
 		return "InsightsAssessmentConfigurationDTO [reportId=" + reportId + ", configId=" + configId
 				+ ", asseementreportname=" + asseementreportname + ", reportName=" + reportName + ", reportFilePath="
 				+ reportFilePath + ", executionId=" + executionId + ", workflowId=" + workflowId + ", pdfReportDirPath="
 				+ pdfReportDirPath + ", pdfReportFolderName=" + pdfReportFolderName + ", tableJsonObjMap="
-				+ tableJsonObjMap + ", contentMap=" + contentMap + ", visualizationResult=" + visualizationResult + "]";
+				+ tableJsonObjMap + ", contentMap=" + contentMap + ", visualizationResult=" + visualizationResult
+				+ ", asseementreportdisplayname=" + asseementreportdisplayname + "]";
 	}
 }

@@ -41,15 +41,19 @@ public class ComparisonContentCategoryImpl extends BaseContentCategoryImpl {
 	@Override
 	public void generateContent() {
 		List<InsightsKPIResultDetails> kpiResults = getKPIExecutionResult();
-
+		InsightsContentDetail contentResult = null;
 		if (!kpiResults.isEmpty()) {
-			InsightsContentDetail contentResult = getContentFromResult(kpiResults);
-			log.debug("Worlflow Detail ====  contentResultList  + {} ", contentResult);
-			if (contentResult != null) {
-				saveContentResult(contentResult);
-			}
+			contentResult = getContentFromResult(kpiResults);
 		} else {
-			log.debug(" No kpi result found ");
+			contentResult = setNeutralContentDetail();
+			log.debug("Worlflow Detail ====   No kpi result found for kpi Id {} ContentId {} ",
+					contentConfigDefinition.getKpiId(), contentConfigDefinition.getContentId());
+		}
+		if (contentResult != null) {
+			log.debug("Worlflow Detail ====  contentid {}  kpi {} contentResultText  + {} ",
+					contentConfigDefinition.getCategory(), contentConfigDefinition.getKpiId(),
+					contentResult.getInferenceText());
+			saveContentResult(contentResult);
 		}
 	}
 
@@ -64,22 +68,21 @@ public class ComparisonContentCategoryImpl extends BaseContentCategoryImpl {
 		InsightsContentDetail inferenceContentResult = null;
 
 		try {
-
 			InsightsKPIResultDetails resultFirstData = kpiResultDetailsList.get(0);
 			String actualTrend = ReportEngineEnum.KPITrends.NOCHANGE.getValue();
 			ReportEngineEnum.KPISentiment sentiment = ReportEngineEnum.KPISentiment.NEUTRAL;
 			Map<String, Object> resultValuesMap = resultFirstData.getResults();
 
 			String contentText = "";
-
+			String comparisonField = getResultFieldFromContentDefination();
+			Object currentValue = resultFirstData.getResults().get(comparisonField);
 			// This condition will be executed if KPI comparison is FALSE
 			if (getContentConfig().getCategory() == ReportEngineEnum.ContentCategory.COMPARISON) {
 				if (kpiResultDetailsList.size() < 2) {
-					return inferenceContentResult;
+					return setNeutralContentDetail();
 				}
-				String comparisonField = getResultFieldFromContentDefination();
 				InsightsKPIResultDetails previousDateData = kpiResultDetailsList.get(1);
-				Object currentValue = resultFirstData.getResults().get(comparisonField);
+
 				Object previousValue = previousDateData.getResults().get(comparisonField);
 
 				sentiment = getSentiment(previousValue, currentValue, getContentConfig().getExpectedTrend());
@@ -91,15 +94,19 @@ public class ComparisonContentCategoryImpl extends BaseContentCategoryImpl {
 				contentText = getContentText(sentiment.getValue(), resultValuesMap);
 
 			} else if (getContentConfig().getCategory() == ReportEngineEnum.ContentCategory.STANDARD) {
-				contentText = getContentText(ReportEngineUtils.STANDARD_MESSAGE_KEY, resultValuesMap);
-
+				log.debug("Worlflow Detail ====  record {} value for STANDARD category is  {} ", comparisonField,
+						currentValue);
+				if (currentValue != null && (String.valueOf(currentValue).equalsIgnoreCase("0.0")
+						|| String.valueOf(currentValue).equalsIgnoreCase("0")
+						|| String.valueOf(currentValue).equalsIgnoreCase(""))) {
+					contentText = getContentText(ReportEngineUtils.NEUTRAL_MESSAGE_KEY, resultValuesMap);
+				} else {
+					contentText = getContentText(ReportEngineUtils.STANDARD_MESSAGE_KEY, resultValuesMap);
+				}
 			}
-			log.debug("Worlflow Detail ====   contentText  {} ", contentText);
-
 			if (contentText != null) {
 				inferenceContentResult = setContentDetail(resultFirstData, resultValuesMap, sentiment, actualTrend,
 						contentText);
-
 			} else {
 				log.debug(
 						"Worlflow Detail ====  content text is null in comparison KPI KPIId {} contentId {} result {} ",
@@ -111,9 +118,7 @@ public class ComparisonContentCategoryImpl extends BaseContentCategoryImpl {
 					contentConfigDefinition.getKpiId(), contentConfigDefinition.getContentId());
 			throw new InsightsJobFailedException("Error while content processing comparison  KPIId {} contentId {} " + e.getMessage());
 		}
-
 		return inferenceContentResult;
-
 	}
 
 	

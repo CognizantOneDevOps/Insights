@@ -1,0 +1,11 @@
+{
+      "kpiId":1000014,
+      "name":"Test_JIRA",
+      "group":"ALM",
+      "toolName":"JIRA",
+      "category":"STANDARD",
+      "DBQuery":"MATCH (a:JIRA) where a.status='Done' optional match (a)-[r:FROM_JIRA_TO_GIT]->() where r is null return a.issueAPI as `ISSUE API`, a.toolName as `TOOL NAME`, a.status as `STATUS`, a.key as `Key`",
+      "datasource":"NEO4J",
+      "isActive":true,
+      "resultField":"key"
+}

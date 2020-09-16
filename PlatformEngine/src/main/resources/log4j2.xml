@@ -17,6 +17,10 @@
  
 	</Appenders>
 		<Loggers>
+		<Logger name="org.hibernate" level="error" additivity="false">
+            <AppenderRef ref="RollingFile" />
+			<AppenderRef ref="Console" />
+        </Logger>
 		<Root level="debug">
 			<AppenderRef ref="RollingFile" />
 			<AppenderRef ref="Console" />

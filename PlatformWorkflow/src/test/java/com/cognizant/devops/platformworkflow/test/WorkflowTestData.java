@@ -64,7 +64,7 @@ public class WorkflowTestData {
 	String failWorkflowTask = "{\"description\":\"TEST_FAIL_TASK_Execute\",\"mqChannel\":\"WORKFLOW.TEST.FAIL.TASK.EXCECUTION\",\"componentName\":\"com.cognizant.devops.platformworkflow.test.WorkflowTestFailTaskSubscriber\",\"dependency\":2,\"workflowType\":\"Report\"}";
 	String wrongWorkflowTask = "{\"description\":\"WRONG_TEST_TASK\",\"mqChannel\":\"WORKFLOW.TEST.WRONG.TASK\",\"componentName\":\"com.cognizant.devops.platformworkflow.test\",\"dependency\":3,\"workflowType\":\"Report\"}";
 	
-	String reportTemplate = "{\"reportId\":\"111600\",\"reportName\":\"Productivity\",\"description\":\"Backend Team\",\"isActive\":true,\"kpiConfigs\":[{\"kpiId\":1111265,\"visualizationConfigs\":[{\"vType\":\"1111265_line\",\"vQuery\":\"\"}]}]}";
+	String reportTemplate = "{\"reportId\":\"111600\",\"reportName\":\"Productivity\",\"description\":\"Backend Team\",\"isActive\":true,\"file\":\"\",\"visualizationutil\":\"Fusion\",\"kpiConfigs\":[{\"kpiId\":1111265,\"visualizationConfigs\":[{\"vType\":\"1111265_line\",\"vQuery\":\"\"}]}]}";
 	JsonObject reportTemplateJson = new JsonParser().parse(reportTemplate).getAsJsonObject();
 
 	String assessmentReport = "{\"reportName\":\"workflow_test\",\"reportTemplate\":111600,\"emailList\":\"xyz@xyz.com\",\"schedule\":\"DAILY\",\"startdate\":null,\"isReoccuring\":true,\"datasource\":\"\"}";
@@ -72,12 +72,14 @@ public class WorkflowTestData {
 	String assessmentReportWith2Task = "{\"reportName\":\"workflow_test_with2Task\",\"reportTemplate\":111600,\"emailList\":\"xyz@xyz.com\",\"schedule\":\"DAILY\",\"startdate\":null,\"isReoccuring\":true,\"datasource\":\"\"}";
 	String reportWithWrongTask = "{\"reportName\":\"workflow_test_wrongTask\",\"reportTemplate\":111600,\"emailList\":\"xyz@xyz.com\",\"schedule\":\"DAILY\",\"startdate\":null,\"isReoccuring\":false,\"datasource\":\"\"}";
 	String assessmentReportTest = "{\"reportName\":\"workflow_testing\",\"reportTemplate\":111600,\"emailList\":\"xyz@xyz.com\",\"schedule\":\"DAILY\",\"startdate\":null,\"isReoccuring\":true,\"datasource\":\"\"}";
+	String assessmentReportImmediate = "{\"reportName\":\"workflow_immmediate_test\",\"asseementreportdisplayname\":\"Report_immmediate_test\",\"reportTemplate\":111600,\"emailList\":\"xyz@xyz.com\",\"schedule\":\"DAILY\",\"startdate\":null,\"isReoccuring\":true,\"datasource\":\"\"}";
 	
 	public static String workflowId = WorkflowTaskEnum.WorkflowType.REPORT.getValue() + "_" + "1234567";
 	public static String failWorkflowId = WorkflowTaskEnum.WorkflowType.REPORT.getValue() + "_" + "123456789";
 	public static String WorkflowIdWith2Task = WorkflowTaskEnum.WorkflowType.REPORT.getValue() + "_" + "1234512345";
 	public static String WorkflowIdWrongTask = WorkflowTaskEnum.WorkflowType.REPORT.getValue() + "_" + "1234321";
 	public static String WorkflowIdTest = WorkflowTaskEnum.WorkflowType.REPORT.getValue() + "_" + "1122334455";
+	public static String WorkflowIdTestImmediate = WorkflowTaskEnum.WorkflowType.REPORT.getValue() + "_" + "1122337766";
 	
 	String mqChannel = "WORKFLOW.TEST.TASK.EXCECUTION";
 	String mqChannelFail = "WORKFLOW.TEST.FAIL.TASK.EXCECUTION";
@@ -183,11 +185,15 @@ public class WorkflowTestData {
 			String reportName = reportJson.get("reportName").getAsString();
 			boolean isActive = reportJson.get("isActive").getAsBoolean();
 			String description = reportJson.get("description").getAsString();
+			String file = reportJson.get("file").getAsString();
+			String visualizationutil = reportJson.get("visualizationutil").getAsString();
 			reportEntity = new InsightsAssessmentReportTemplate();
 			reportEntity.setReportId(reportId);
 			reportEntity.setActive(isActive);
 			reportEntity.setDescription(description);
 			reportEntity.setTemplateName(reportName);
+			reportEntity.setFile(file);
+			reportEntity.setVisualizationutil(visualizationutil);
 			JsonArray kpiConfigArray = reportJson.get("kpiConfigs").getAsJsonArray();
 			for (JsonElement eachKpiConfig : kpiConfigArray) {
 				JsonObject KpiObject = eachKpiConfig.getAsJsonObject();
@@ -227,6 +233,7 @@ public class WorkflowTestData {
 			String emailList = assessmentReportJson.get("emailList").getAsString();
 			String datasource = assessmentReportJson.get("datasource").getAsString();
 			boolean reoccurence = assessmentReportJson.get("isReoccuring").getAsBoolean();
+			//boolean reoccurence = assessmentReportJson.get("isReoccuring").getAsBoolean();
 			long epochStartDate = 0;
 			long epochEndDate = 0;
 			String reportStatus = WorkflowTaskEnum.WorkflowStatus.NOT_STARTED.toString();
@@ -236,7 +243,8 @@ public class WorkflowTestData {
 			
 			InsightsAssessmentConfiguration assessmentConfig = new InsightsAssessmentConfiguration();
 			InsightsWorkflowConfiguration workflowConfig = saveWorkflowConfig(workflowid, isActive,
-					reoccurence, schedule, reportStatus, workflowType, taskList, epochStartDate, epochEndDate);
+					reoccurence, schedule, reportStatus, workflowType, taskList, epochStartDate, epochEndDate,
+					Boolean.FALSE);
 			assessmentConfig.setActive(isActive);
 			assessmentConfig.setEmails(emailList);
 			assessmentConfig.setInputDatasource(datasource);
@@ -254,7 +262,8 @@ public class WorkflowTestData {
 	}
 	
 	public InsightsWorkflowConfiguration saveWorkflowConfig(String workflowId, boolean isActive, boolean reoccurence,
-			String schedule, String reportStatus, String workflowType, JsonArray taskList, long startdate, long enddate) throws InsightsCustomException {
+			String schedule, String reportStatus, String workflowType, JsonArray taskList, long startdate, long enddate,
+			boolean runImmediate) throws InsightsCustomException {
 		InsightsWorkflowConfiguration workflowConfig = new InsightsWorkflowConfiguration();
 		workflowConfig.setWorkflowId(workflowId);
 		workflowConfig.setActive(isActive);
@@ -265,6 +274,7 @@ public class WorkflowTestData {
 		workflowConfig.setScheduleType(schedule);
 		workflowConfig.setStatus(reportStatus);
 		workflowConfig.setWorkflowType(workflowType);
+		workflowConfig.setRunImmediate(runImmediate);
 		Set<InsightsWorkflowTaskSequence> sequneceEntitySet = setSequence(taskList, workflowConfig);
 		workflowConfig.setTaskSequenceEntity(sequneceEntitySet);
 		return workflowConfig;
@@ -360,6 +370,16 @@ public class WorkflowTestData {
 		}
 	}
 	
+	public void updateRunImmediate(String workflowId) {
+		try {
+			InsightsWorkflowConfiguration workflowConfig = workflowDAL.getWorkflowConfigByWorkflowId(workflowId);
+			workflowConfig.setRunImmediate(Boolean.TRUE);
+			workflowConfig.setActive(Boolean.TRUE);
+			workflowDAL.updateWorkflowConfig(workflowConfig);
+		} catch (Exception e) {
+			log.error(e);
+		}
+	}
 	
 	public void delete(String workflowId) {
 		try {

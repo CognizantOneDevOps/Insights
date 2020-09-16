@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  ******************************************************************************/
-package com.cognizant.devops.platformreports.assessment.datamodel;
+package com.cognizant.devops.platformworkflow.workflowtask.email;
 
 import java.io.Serializable;
 import java.util.List;
@@ -26,11 +26,15 @@ public class MailReport implements Serializable {
 	 * 
 	 */
 	private static final long serialVersionUID = 6584480569886905118L;
-	private List<InternetAddress> mailTo;	
+	private List<InternetAddress> mailTo;
+	private List<InternetAddress> mailCC;
+	private List<InternetAddress> mailBCC;
 	private String asseementreportname;
-	private String reportFilePath;	
+	private String reportFilePath;
 	private String timeOfReportGeneration;
-
+	private String mailFrom;
+	private String subject;
+	private String mailBody;
 
 	public String getAsseementreportname() {
 		return asseementreportname;
@@ -48,7 +52,6 @@ public class MailReport implements Serializable {
 		this.reportFilePath = reportFilePath;
 	}
 
-	
 	public List<InternetAddress> getMailTo() {
 		return mailTo;
 	}
@@ -63,6 +66,46 @@ public class MailReport implements Serializable {
 
 	public void setTimeOfReportGeneration(String timeOfReportGeneration) {
 		this.timeOfReportGeneration = timeOfReportGeneration;
+	}
+
+	public String getMailFrom() {
+		return mailFrom;
+	}
+
+	public void setMailFrom(String mailFrom) {
+		this.mailFrom = mailFrom;
+	}
+
+	public String getSubject() {
+		return subject;
+	}
+
+	public void setSubject(String subject) {
+		this.subject = subject;
+	}
+
+	public String getMailBody() {
+		return mailBody;
+	}
+
+	public void setMailBody(String mailBody) {
+		this.mailBody = mailBody;
+	}
+
+	public List<InternetAddress> getMailCC() {
+		return mailCC;
+	}
+
+	public void setMailCC(List<InternetAddress> mailCC) {
+		this.mailCC = mailCC;
+	}
+
+	public List<InternetAddress> getMailBCC() {
+		return mailBCC;
+	}
+
+	public void setMailBCC(List<InternetAddress> mailBCC) {
+		this.mailBCC = mailBCC;
 	}
 
 }
