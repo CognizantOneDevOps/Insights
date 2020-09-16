@@ -154,6 +154,7 @@ export class RestAPIurlService implements IRestAPIUrlService {
         this.addEndPoint("SSO_URL_LOGOUT", InsightsInitService.singleSignOnConfig.logoutURL);//
         this.addEndPoint("KERBEROS_LOGIN_URL", "/PlatformService/user/insightsso/authenticateKerberos");
         this.addEndPoint("KERBEROS_USER_DETAIL", '/PlatformService/user/insightsso/getKerberosUserDetail');
+        this.addEndPoint("JWT_USER_DETAIL", '/PlatformService/user/insightsso/getJWTUserDetail');
 
         //data archival
         this.addEndPoint("SAVE_ARCHIVE_DETAILS", '/PlatformService/admin/dataarchival/saveDataArchivalDetails');
@@ -176,6 +177,7 @@ export class RestAPIurlService implements IRestAPIUrlService {
 
     public getRestCallUrl(moduleUrlKey: String) {
         if (!this.apiMap.has(moduleUrlKey)) {
+            console.error("Url Mapping doesnt exist "+moduleUrlKey);
             throw new Error("Url Mapping doesnt exist");
         }
         return InsightsInitService.serviceHost.toString().concat(this.apiMap.get(moduleUrlKey).toString());

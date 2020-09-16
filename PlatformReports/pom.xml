@@ -25,7 +25,6 @@
 
 
 	<properties>
-		<spring.version>5.2.3.RELEASE</spring.version>
 		<testng.version>7.1.0</testng.version>
 		<project.name>PlatformReports</project.name>
 	</properties>
@@ -35,7 +34,7 @@
 		<dependency>
 			<groupId>org.testng</groupId>
 			<artifactId>testng</artifactId>
-			<version>7.1.0</version>
+			<version>${testng.version}</version>
 			<exclusions>
 				<exclusion>
 					<groupId>org.yaml</groupId>

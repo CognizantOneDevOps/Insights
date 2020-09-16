@@ -18,6 +18,7 @@ package com.cognizant.devops.platformservice.test.dataDictionary;
 import java.util.List;
 
 import org.junit.Assert;
+import org.testng.SkipException;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -67,8 +68,12 @@ public class DataDictionaryTest {
 	public void getToolPropertiesTest() throws InsightsCustomException {
 		JsonObject response = dataDictionaryImpl.getToolProperties(dataDictionaryTestData.destLabel,
 				dataDictionaryTestData.destCat);
-		int sizeOfresponse = response.get("data").getAsJsonArray().size();
-		Assert.assertTrue(sizeOfresponse >= 0);
+		if (response.has("data")) {
+			int sizeOfresponse = response.get("data").getAsJsonArray().size();
+			Assert.assertTrue(sizeOfresponse >= 0);
+		} else {
+			throw new SkipException("skipped getToolPropertiesTest this test case as required data not found");
+		}
 	}
 
 	@Test(priority = 3)
