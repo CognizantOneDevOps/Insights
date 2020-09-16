@@ -17,7 +17,7 @@ package com.cognizant.devops.engines.platformwebhookengine.test.parser;
 
 import java.util.List;
 
-import org.springframework.test.context.ContextConfiguration;
+
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -29,7 +29,7 @@ import com.cognizant.devops.engines.platformwebhookengine.test.engine.WebhookEng
 import com.google.gson.JsonObject;
 
 @Test
-@ContextConfiguration(locations = { "classpath:spring-test-config.xml" })
+
 public class InsightsGeneralParserTest extends InsightsParserTestData {
 	public static final InsightsGeneralParser generalparser = new InsightsGeneralParser();
 	public static final InsightsParserTestData testdata = new InsightsParserTestData();

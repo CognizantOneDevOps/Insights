@@ -21,25 +21,12 @@ import java.io.UnsupportedEncodingException;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
-import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 
 import javax.mail.MessagingException;
-import javax.net.ssl.SSLContext;
 
-import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
-import org.apache.http.conn.ssl.SSLContexts;
-import org.apache.http.conn.ssl.TrustStrategy;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.MediaType;
-import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
-import org.springframework.web.client.RestTemplate;
 
 import com.cognizant.devops.insightsemail.core.util.EmailFormatter;
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
@@ -50,9 +37,6 @@ import com.cognizant.devops.platformcommons.core.email.Mail;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
-
-import sun.misc.BASE64Encoder;
 
 public class InsightsEmailService {
 	
@@ -76,7 +60,7 @@ public class InsightsEmailService {
 
 	private JsonObject getInferenceDetails() throws KeyManagementException, KeyStoreException, NoSuchAlgorithmException {
 		//RestTemplate restTemplate = new RestTemplate();
-		RestTemplate restTemplate = restTemplate();
+		/*RestTemplate restTemplate = restTemplate();
 		String credential = ApplicationConfigProvider.getInstance().getUserId()+":"+
 				ApplicationConfigProvider.getInstance().getPassword();
 		byte[] credsBytes = credential.getBytes();
@@ -89,9 +73,9 @@ public class InsightsEmailService {
 		String restUrl = ApplicationConfigProvider.getInstance().getInsightsServiceURL()+"/PlatformService/insights/inferences";
 		//String restUrl = "http://localhost:7080"+"/PlatformService/insights/inferences";
 		HttpEntity<String> response = restTemplate.exchange(restUrl,HttpMethod.GET,entity,String.class);
-		JsonParser parser = new JsonParser(); 
+		JsonParser parser = new JsonParser(); */
 		JsonObject resultJson=new JsonObject();
-		resultJson= parser.parse(response.getBody()).getAsJsonObject();
+		//resultJson= parser.parse(response.getBody()).getAsJsonObject();
 		LOG.debug("Insights inference details received from service");
 		return resultJson;
 	}
@@ -139,26 +123,26 @@ public class InsightsEmailService {
 		return stringWriter.toString();
 	}
 
-	public RestTemplate restTemplate() throws KeyStoreException, NoSuchAlgorithmException, KeyManagementException {
-	    TrustStrategy acceptingTrustStrategy = (X509Certificate[] chain, String authType) -> true;
-
-	    SSLContext sslContext = SSLContexts.custom()
-	                    .loadTrustMaterial(null, acceptingTrustStrategy)
-	                    .build();
-
-	    SSLConnectionSocketFactory csf = new SSLConnectionSocketFactory(sslContext,SSLConnectionSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
-
-	    CloseableHttpClient httpClient = HttpClients.custom()
-	                    .setSSLSocketFactory(csf)
-	                    .build();
-
-	    HttpComponentsClientHttpRequestFactory requestFactory =
-	                    new HttpComponentsClientHttpRequestFactory();
-
-	    requestFactory.setHttpClient(httpClient);
-	    RestTemplate restTemplate = new RestTemplate(requestFactory);
-	    return restTemplate;
-	 }
+	/*	public RestTemplate restTemplate() throws KeyStoreException, NoSuchAlgorithmException, KeyManagementException {
+		    TrustStrategy acceptingTrustStrategy = (X509Certificate[] chain, String authType) -> true;
+	
+		    SSLContext sslContext = SSLContexts.custom()
+		                    .loadTrustMaterial(null, acceptingTrustStrategy)
+		                    .build();
+	
+		    SSLConnectionSocketFactory csf = new SSLConnectionSocketFactory(sslContext,SSLConnectionSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
+	
+		    CloseableHttpClient httpClient = HttpClients.custom()
+		                    .setSSLSocketFactory(csf)
+		                    .build();
+	
+		    HttpComponentsClientHttpRequestFactory requestFactory =
+		                    new HttpComponentsClientHttpRequestFactory();
+	
+		    requestFactory.setHttpClient(httpClient);
+		    RestTemplate restTemplate = new RestTemplate(requestFactory);
+		    return restTemplate;
+		 }*/
 	
 	public static void main(String[] args)
 	{	

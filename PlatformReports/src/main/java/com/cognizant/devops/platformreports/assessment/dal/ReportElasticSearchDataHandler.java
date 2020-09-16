@@ -63,7 +63,7 @@ public class ReportElasticSearchDataHandler implements ReportDataHandler {
 		try {
 
 			String indexName = ReportEngineUtils.ES_KPI_RESULT_INDEX;
-			deoES.saveBulk(indexName.toLowerCase(), resultList);
+			deoES.saveESResult(indexName.toLowerCase(), resultList);
 
 		} catch (Exception e) {
 			log.error("Error while saving saving KPI record {}", e.getMessage());
@@ -104,7 +104,7 @@ public class ReportElasticSearchDataHandler implements ReportDataHandler {
 			List<JsonObject> rows = new ArrayList<>();
 			rows.add(contentResult);
 			String indexName = ReportEngineUtils.ES_CONTENT_RESULT_INDEX;
-			deoES.saveBulk(indexName.toLowerCase(), rows);
+			deoES.saveESResult(indexName.toLowerCase(), rows);
 			log.debug("Worlflow Detail ==== In ES,  saveContentResult completed ");
 		} catch (Exception e) {
 			log.error("Error while saving Content Result record {}", e.getMessage());

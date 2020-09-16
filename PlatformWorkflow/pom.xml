@@ -29,7 +29,7 @@
 		<java.version>1.8</java.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<spring.version>2.3.1.RELEASE</spring.version>
-		<testng.version>7.1.0</testng.version>
+		<testng.version>7.3.0</testng.version>
 		<project.name>PlatformInsights</project.name>
 	</properties>
 
@@ -37,7 +37,7 @@
 		<dependency>
 			<groupId>org.testng</groupId>
 			<artifactId>testng</artifactId>
-			<version>7.1.0</version>
+			<version>${testng.version}</version>
 			<exclusions>
 				<exclusion>
 					<groupId>org.yaml</groupId>
