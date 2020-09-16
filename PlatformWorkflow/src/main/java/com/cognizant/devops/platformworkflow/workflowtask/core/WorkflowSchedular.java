@@ -63,9 +63,21 @@ public class WorkflowSchedular {
 							.getWorkflowDetails().getWorkflowRetryExecutorCron()))
 					.build();
 
+			JobDetail jobImmediateWorkflow = JobBuilder.newJob(WorkflowImmediateJobExecutor.class)
+					.withIdentity("WorkflowImmediateJobExecutor", "WorkflowImmediateJobExecutor").build();
+
+			log.debug("Worlflow Detail ====  Workflow WorkflowImmediateJobExecutor Executor corn created ==== {} ",
+					"0 */5 * ? * *");
+
+			CronTrigger triggeImmediateWorkflow = TriggerBuilder.newTrigger()
+					.withIdentity("WorkflowImmediateJobExecutortrigger", "WorkflowImmediateJobExecutor")
+					.withSchedule(CronScheduleBuilder.cronSchedule("0 */5 * ? * *"))
+					.build();
+
+			scheduler.start();
 			scheduler.scheduleJob(jobWorkflow, triggerWorkflow);
 			scheduler.scheduleJob(jobWorkflowRetry, triggeWorkflowRetry);
-			scheduler.start();
+			scheduler.scheduleJob(jobImmediateWorkflow, triggeImmediateWorkflow);
 
 		} catch (SchedulerException e) {
 			log.error(e);

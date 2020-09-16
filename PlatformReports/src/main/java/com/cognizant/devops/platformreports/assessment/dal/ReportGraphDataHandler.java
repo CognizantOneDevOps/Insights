@@ -95,18 +95,19 @@ public class ReportGraphDataHandler implements ReportDataHandler {
 			}
 			List<JsonObject> graphResp = fetchData(graphQuery);
 			JsonArray graphJsonResult = graphResp.get(0).getAsJsonArray("results");
-			log.debug(" Worlflow Detail ==== KPI Id {}  record return by query ==== {} ", kpiDefinition.getKpiId(),
-					graphResp.get(0).getAsJsonArray("results"));
+
 			JsonArray data = graphJsonResult.get(0).getAsJsonObject().getAsJsonArray("data");
 			JsonArray columns = graphJsonResult.get(0).getAsJsonObject().getAsJsonArray("columns");
-
+			log.debug(" Worlflow Detail ==== KPI Id {}  record return by query ==== {} ", kpiDefinition.getKpiId(),
+					data.size());
 			if (data.size() > 0) {
 				listOfResultJson.addAll(creatingResulJsontFromGraphResponce(data, columns, kpiDefinition, model));
 			} else {
-				log.error("Neo4j query returned invalid result for the KPIID {} ", kpiDefinition.getKpiId());
-				InsightsStatusProvider.getInstance().createInsightStatusNode(
+				log.error("Worlflow Detail ==== No Result Neo4j query returned invalid result for the KPIID {} ",
+						kpiDefinition.getKpiId());
+				/*InsightsStatusProvider.getInstance().createInsightStatusNode(
 						"Neo4j query returned invalid result for the KPIID " + kpiDefinition.getKpiId(),
-						PlatformServiceConstants.FAILURE);
+						PlatformServiceConstants.FAILURE);*/
 			}
 		} catch (Exception e) {
 			log.error("Exception while running neo4j operation {} ", e);
@@ -124,6 +125,8 @@ public class ReportGraphDataHandler implements ReportDataHandler {
 		graphQuery = graphQuery.replaceAll(":kpiId", String.valueOf(contentConfigDefinition.getKpiId()))
 				.replaceAll(":executionId", String.valueOf(contentConfigDefinition.getExecutionId()))
 				.replaceAll(":assessmentId", String.valueOf(contentConfigDefinition.getAssessmentId()));
+		log.debug("Worlflow Detail ====  for kpi {} contentId {} graphQuery   {} ", contentConfigDefinition.getKpiId(),
+				contentConfigDefinition.getContentId(), graphQuery);
 		List<JsonObject> graphResponse = neo4jExecutor.fetchData(graphQuery);
 		creatingResultDetailFromGraphResponce(kpiDetailList, contentConfigDefinition, graphResponse.get(0));
 		return kpiDetailList;
@@ -189,12 +192,13 @@ public class ReportGraphDataHandler implements ReportDataHandler {
 				}
 			}
 			//String resultValue = String.valueOf(dataJson.get(kpiDefinition.getResultField()));
-			if (!dataJson.entrySet().isEmpty() && validateJson(dataJson)) {
+			if (!dataJson.entrySet().isEmpty()) { //&& validateJson(dataJson)
 				dataJson.addProperty(KPIJobResultAttributes.RESULTTIME.getValue(), InsightsUtils.getTodayTime());
 				dataJson.addProperty(KPIJobResultAttributes.RESULTTIMEX.getValue(),
 						InsightsUtils.getUtcTime(ReportEngineUtils.TIMEZONE));
 				dataJson.add(ReportEngineUtils.COLUMN_PROPERTY, columns);
 				dataJson.addProperty("recordDate", model.getRecordDate());
+				dataJson.addProperty("recordDateX", InsightsUtils.insightsTimeXFormat(model.getRecordDate()));
 
 				// merge two json, merge result column with column value and inference Config
 				// Property Json
@@ -214,7 +218,9 @@ public class ReportGraphDataHandler implements ReportDataHandler {
 		boolean retunValue = Boolean.TRUE;
 		for (Entry<String, JsonElement> elemant : dataJson.entrySet()) {
 			String resultValue = String.valueOf(elemant.getValue());
-			if (resultValue != null && (!resultValue.equalsIgnoreCase("0") || !resultValue.equalsIgnoreCase(""))) {
+			//log.debug("Worlflow Detail ====  for kpi resultValue   {} ", resultValue);
+			if (resultValue != null && (!resultValue.equalsIgnoreCase("0") && !resultValue.equalsIgnoreCase("0.0")
+					&& !resultValue.equalsIgnoreCase(""))) {
 				retunValue = Boolean.TRUE;
 			} else {
 				retunValue = Boolean.FALSE;
@@ -230,7 +236,7 @@ public class ReportGraphDataHandler implements ReportDataHandler {
 		JsonArray graphJsonResult = graphResp.getAsJsonArray("results");
 		log.debug("Worlflow Detail ====  KPI Id {}  record return by key query ==== {} ",
 				contentConfigDefinition.getKpiId(),
-				graphResp.getAsJsonArray("results"));
+				graphResp.getAsJsonArray("results").size());
 		JsonArray data = graphJsonResult.get(0).getAsJsonObject().getAsJsonArray("data");
 		for (int dataIndex = 0; dataIndex < data.size(); dataIndex++) {
 			JsonArray rowData = data.get(dataIndex).getAsJsonObject().getAsJsonArray("row");

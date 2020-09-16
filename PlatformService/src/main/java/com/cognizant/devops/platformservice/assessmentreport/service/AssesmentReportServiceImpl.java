@@ -41,6 +41,7 @@ import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformdal.assessmentreport.InsightsAssessmentConfiguration;
 import com.cognizant.devops.platformdal.assessmentreport.InsightsAssessmentReportTemplate;
 import com.cognizant.devops.platformdal.assessmentreport.InsightsContentConfig;
+import com.cognizant.devops.platformdal.assessmentreport.InsightsEmailTemplates;
 import com.cognizant.devops.platformdal.assessmentreport.InsightsKPIConfig;
 import com.cognizant.devops.platformdal.assessmentreport.InsightsReportsKPIConfig;
 import com.cognizant.devops.platformdal.assessmentreport.ReportConfigDAL;
@@ -163,7 +164,6 @@ public class AssesmentReportServiceImpl {
 	public String uploadKPIInDatabase(MultipartFile file) throws InsightsCustomException {
 		StringBuilder kpiResultList = new StringBuilder();
 		String originalFilename = file.getOriginalFilename();
-
 		JsonParser jsonParser = new JsonParser();
 		String fileExt = FilenameUtils.getExtension(originalFilename);
 		try {
@@ -171,14 +171,7 @@ public class AssesmentReportServiceImpl {
 				String kpiJson = readFileAndCreateJson(file);
 				JsonArray kpiJsonArray = jsonParser.parse(kpiJson).getAsJsonArray();
 				for (JsonElement jsonElement : kpiJsonArray) {
-					int kpiId = jsonElement.getAsJsonObject().get("kpiId").getAsInt();
-					try {
-						kpiId = saveKpiDefinition(jsonElement.getAsJsonObject());
-						kpiResultList.append("==== Success:KPI Id(" + kpiId + ") created.");
-					} catch (Exception e) {
-						kpiResultList.append(
-								" ==== Error : KPI Id (" + kpiId + ") not created, with Exception " + e.getMessage());
-					}
+					kpiResultList = saveBulkKpiDefinition(jsonElement, kpiResultList);
 				}
 			} else {
 				log.error(" KPI Detail {} ", kpiResultList);
@@ -190,6 +183,24 @@ public class AssesmentReportServiceImpl {
 			throw new InsightsCustomException(ex.getMessage());
 		}
 		return kpiResultList.toString();
+	}
+
+	/**
+	 * Method to save Kpi during Bulk save
+	 * 
+	 * @param jsonElement
+	 * @param kpiResultList
+	 * @return
+	 */
+	public StringBuilder saveBulkKpiDefinition(JsonElement jsonElement, StringBuilder kpiResultList) {
+		int kpiId = jsonElement.getAsJsonObject().get("kpiId").getAsInt();
+		try {
+			kpiId = saveKpiDefinition(jsonElement.getAsJsonObject());
+			kpiResultList.append("==== Success:KPI Id(" + kpiId + ") created.");
+		} catch (Exception e) {
+			kpiResultList.append(" ==== Error : KPI Id (" + kpiId + ") not created, with Exception " + e.getMessage());
+		}
+		return kpiResultList;
 	}
 
 	/**
@@ -209,14 +220,7 @@ public class AssesmentReportServiceImpl {
 				String contentJson = readFileAndCreateJson(file);
 				JsonArray contentJsonArray = jsonParser.parse(contentJson).getAsJsonArray();
 				for (JsonElement jsonElement : contentJsonArray) {
-					int contentId = jsonElement.getAsJsonObject().get("contentId").getAsInt();
-					try {
-						contentId = saveContentDefinition(jsonElement.getAsJsonObject());
-						contentResultList.append(" ====  Suceess : Content Id(" + contentId + ") created. ");
-					} catch (Exception e) {
-						contentResultList.append(" ==== Error : Content Id (" + contentId
-								+ ") not created, with Exception " + e.getMessage());
-					}
+					contentResultList = saveBulkContentDefinition(jsonElement, contentResultList);
 				}
 			} else {
 				log.error(" Content Detail {} ", contentResultList);
@@ -231,10 +235,29 @@ public class AssesmentReportServiceImpl {
 	}
 
 	/**
+	 * Method to save Content during bulk save
+	 * 
+	 * @param jsonElement
+	 * @param contentResultList
+	 * @return StringBuilder
+	 */
+	public StringBuilder saveBulkContentDefinition(JsonElement jsonElement, StringBuilder contentResultList) {
+		int contentId = jsonElement.getAsJsonObject().get("contentId").getAsInt();
+		try {
+			contentId = saveContentDefinition(jsonElement.getAsJsonObject());
+			contentResultList.append(" ====  Suceess : Content Id(" + contentId + ") created. ");
+		} catch (Exception e) {
+			contentResultList.append(
+					" ==== Error : Content Id (" + contentId + ") not created, with Exception " + e.getMessage());
+		}
+		return contentResultList;
+	}
+
+	/**
 	 * Read file and create Json String from it
 	 * 
 	 * @param file
-	 * @return
+	 * @return String
 	 * @throws IOException
 	 */
 	private String readFileAndCreateJson(MultipartFile file) throws IOException {
@@ -274,7 +297,7 @@ public class AssesmentReportServiceImpl {
 	 * Method to save the details in ASSESSMENT_CONFIGURATION table.
 	 * 
 	 * @param assessmentReportJson
-	 * @return
+	 * @return int
 	 * @throws InsightsCustomException
 	 */
 	public int saveAssessmentReport(JsonObject assessmentReportJson) throws InsightsCustomException {
@@ -295,7 +318,7 @@ public class AssesmentReportServiceImpl {
 	 * Method to update the Active State in ASSESSMENT_CONFIGURATION table.
 	 * 
 	 * @param updateReportJsonValidated
-	 * @return
+	 * @return String
 	 * @throws InsightsCustomException
 	 */
 	public String updateAssessmentReportState(JsonObject updateReportJsonValidated) throws InsightsCustomException {
@@ -311,7 +334,7 @@ public class AssesmentReportServiceImpl {
 			reportConfigDAL.updateAssessmentReportConfiguration(assessmentConfig, assessmentReportId);
 			return PlatformServiceConstants.SUCCESS;
 		} catch (Exception e) {
-			log.error("Error while updating report status..{}", e);
+			log.error("Error while updating report status.", e);
 			throw new InsightsCustomException(e.toString());
 		}
 	}
@@ -325,27 +348,31 @@ public class AssesmentReportServiceImpl {
 	 */
 	public int updateAssessmentReport(JsonObject assessmentReportJson) throws InsightsCustomException {
 		int assessmentReportId = assessmentReportJson.get("id").getAsInt();
-
+		JsonObject emailDetails = null;
 		try {
 			InsightsAssessmentConfiguration assessmentConfig = reportConfigDAL
 					.getAssessmentByConfigId(assessmentReportId);
 			WorkflowServiceImpl workfowserice = new WorkflowServiceImpl();
-			// String workflowId = assessmentConfig.getWorkflowConfig().getWorkflowId();
 			InsightsWorkflowConfiguration workFlowObject = assessmentConfig.getWorkflowConfig();
 			workFlowObject.setReoccurence(assessmentReportJson.get("isReoccuring").getAsBoolean());
-			// workFlowObject.setScheduleType(assessmentReportJson.get("schedule").getAsString());
 			JsonArray taskArray = assessmentReportJson.get("tasklist").getAsJsonArray();
 			Set<InsightsWorkflowTaskSequence> taskSequenceSet = assessmentConfig.getWorkflowConfig()
 					.getTaskSequenceEntity();
 			taskSequenceSet = workfowserice.setSequence(taskArray, workFlowObject);
-			// workFlowObject.getTaskSequenceEntity().addAll(taskSequenceSet);
 			workFlowObject.setTaskSequenceEntity(taskSequenceSet);
+			if (!assessmentReportJson.get("emailDetails").isJsonNull()) {
+				emailDetails = assessmentReportJson.get("emailDetails").getAsJsonObject();
+				InsightsEmailTemplates emailTemplateConfig = workflowService.createEmailTemplateObject(emailDetails,
+						workFlowObject);
+				workFlowObject.setEmailConfig(emailTemplateConfig);
+			} else {
+				workFlowObject.setEmailConfig(null);
+			}
 			assessmentConfig.setWorkflowConfig(workFlowObject);
-			assessmentConfig.setEmails(assessmentReportJson.get("emailList").getAsString());
 			reportConfigDAL.updateAssessmentReportConfiguration(assessmentConfig, assessmentReportId);
 			return assessmentReportId;
 		} catch (Exception e) {
-			log.error("Error in updating the report.. {}", e);
+			log.error("Error in updating the report.", e);
 			throw new InsightsCustomException(e.toString());
 		}
 
@@ -361,68 +388,120 @@ public class AssesmentReportServiceImpl {
 		try {
 			List<InsightsAssessmentConfiguration> assessmentReportList = reportConfigDAL.getAllAssessmentConfig();
 			JsonArray jsonarray = new JsonArray();
-			for (InsightsAssessmentConfiguration reportTemplate : assessmentReportList) {
-				JsonObject jsonobject = new JsonObject();
-				jsonobject.addProperty("configId", reportTemplate.getId());
-				jsonobject.addProperty("reportName", reportTemplate.getAsseementreportname());
-				long startdate = reportTemplate.getStartDate();
-				InsightsAssessmentReportTemplate reporttemplate = reportTemplate.getReportTemplateEntity();
-				JsonObject jsonObject = new JsonObject();
-				jsonObject.addProperty("reportId", reporttemplate.getReportId());
-				jsonObject.addProperty("templateName", reporttemplate.getTemplateName());
-				InsightsWorkflowConfiguration workflowConfig = reportTemplate.getWorkflowConfig();
-				// JsonObject jsonObjectForWorkflow = new JsonObject();
-				long lastRun = workflowConfig.getLastRun();
-				long nextRun = workflowConfig.getNextRun();
-				String status = workflowConfig.getStatus();
-				if (status.equals(WorkflowTaskEnum.WorkflowStatus.NOT_STARTED.toString()) || lastRun == 0) {
-					jsonobject.addProperty("lastRun", "");
-				} else {
-
-					jsonobject.addProperty("lastRun", lastRun);
-				}
-				if (nextRun == 0) {
-					jsonobject.addProperty("nextRun", "");
-				} else {
-
-					jsonobject.addProperty("nextRun", nextRun);
-				}
-				jsonobject.addProperty("schedule", workflowConfig.getScheduleType());
-				jsonobject.addProperty("status", status);
-
-				// array.add(jsonObject);
-				String startDate = InsightsUtils.specficTimeFormat(startdate, "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
-				jsonobject.addProperty("isActive", reportTemplate.isActive());
-				jsonobject.addProperty("emailAddress", reportTemplate.getEmails());
-				jsonobject.addProperty("inputDatasource", reportTemplate.getInputDatasource());
-				jsonobject.addProperty("startdate", startDate);
-				jsonobject.addProperty("isReoccuring", reportTemplate.getWorkflowConfig().isReoccurence());
-				if (workflowConfig.getScheduleType().equals(WorkflowTaskEnum.WorkflowSchedule.ONETIME.toString())) {
-					String endDate = InsightsUtils.specficTimeFormat(reportTemplate.getEndDate(),
-							"yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
-					jsonobject.addProperty("enddate", endDate);
-				}
-				jsonobject.add("template", jsonObject);
-				String workflowId = workflowConfig.getWorkflowId();
-				JsonArray detailTask = new JsonArray();
-
-				List<InsightsWorkflowTaskSequence> taskList = workflowConfigDAL
-						.getAllWorkflowTaskSequenceByWorkflowId(workflowId);
-				for (InsightsWorkflowTaskSequence eachTask : taskList) {
-					JsonObject detailTaskJson = new JsonObject();
-					detailTaskJson.addProperty("taskId", eachTask.getWorkflowTaskEntity().getTaskId());
-					detailTaskJson.addProperty("description", eachTask.getWorkflowTaskEntity().getDescription());
-					detailTask.add(detailTaskJson);
-
-				}
-				jsonobject.add("taskDesc", detailTask);
-				jsonarray.add(jsonobject);
+			for (InsightsAssessmentConfiguration assessmentReport : assessmentReportList) {
+				JsonObject assessmentJson = createAssessmentReportJsonForUI(assessmentReport);
+				jsonarray.add(assessmentJson);
 			}
 			return jsonarray;
 		} catch (Exception e) {
-			log.error("Error getting all report template.. {}", e);
+			log.error("Error getting all report template..", e);
 			throw new InsightsCustomException(e.toString());
 		}
+	}
+
+	/**
+	 * Method to create AssessmentReport JsonObject
+	 * 
+	 * @param assessmentReport
+	 * @return JsonObject
+	 */
+	public JsonObject createAssessmentReportJsonForUI(InsightsAssessmentConfiguration assessmentReport) {
+		JsonObject jsonobject = new JsonObject();
+		jsonobject.addProperty("configId", assessmentReport.getId());
+		jsonobject.addProperty("reportName", assessmentReport.getAsseementreportname());
+		jsonobject.addProperty("asseementreportdisplayname", assessmentReport.getAsseementReportDisplayName());
+		jsonobject.addProperty("isActive", assessmentReport.isActive());
+		jsonobject.addProperty("inputDatasource", assessmentReport.getInputDatasource());
+		jsonobject.addProperty("isReoccuring", assessmentReport.getWorkflowConfig().isReoccurence());
+
+		InsightsAssessmentReportTemplate reporttemplate = assessmentReport.getReportTemplateEntity();
+		JsonObject reportTemplateJsonObject = new JsonObject();
+		reportTemplateJsonObject.addProperty("reportId", reporttemplate.getReportId());
+		reportTemplateJsonObject.addProperty("templateName", reporttemplate.getTemplateName());
+		jsonobject.add("template", reportTemplateJsonObject);
+
+		InsightsWorkflowConfiguration workflowConfig = assessmentReport.getWorkflowConfig();
+		long lastRun = workflowConfig.getLastRun();
+		long nextRun = workflowConfig.getNextRun();
+		String status = workflowConfig.getStatus();
+		if (status.equals(WorkflowTaskEnum.WorkflowStatus.NOT_STARTED.toString()) || lastRun == 0) {
+			jsonobject.addProperty("lastRun", "");
+		} else {
+			jsonobject.addProperty("lastRun", lastRun);
+		}
+		if (nextRun == 0) {
+			jsonobject.addProperty("nextRun", "");
+		} else {
+			jsonobject.addProperty("nextRun", nextRun);
+		}
+		jsonobject.addProperty("schedule", workflowConfig.getScheduleType());
+		jsonobject.addProperty("status", status);
+		long startdate = assessmentReport.getStartDate();
+		String startDate = InsightsUtils.specficTimeFormat(startdate, "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+		jsonobject.addProperty("startdate", startDate);
+		if (workflowConfig.getScheduleType().equals(WorkflowTaskEnum.WorkflowSchedule.ONETIME.toString())) {
+			String endDate = InsightsUtils.specficTimeFormat(assessmentReport.getEndDate(),
+					"yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+			jsonobject.addProperty("enddate", endDate);
+		}
+		jsonobject.addProperty("startdate", startDate);
+		String workflowId = workflowConfig.getWorkflowId();
+		jsonobject.addProperty("workflowId", workflowId);
+		jsonobject.addProperty("runimmediate", workflowConfig.isRunImmediate());
+		JsonArray detailTask = new JsonArray();
+		List<InsightsWorkflowTaskSequence> taskList = workflowConfigDAL
+				.getAllWorkflowTaskSequenceByWorkflowId(workflowId);
+		for (InsightsWorkflowTaskSequence eachTask : taskList) {
+			JsonObject detailTaskJson = new JsonObject();
+			detailTaskJson.addProperty("taskId", eachTask.getWorkflowTaskEntity().getTaskId());
+			detailTaskJson.addProperty("description", eachTask.getWorkflowTaskEntity().getDescription());
+			detailTask.add(detailTaskJson);
+		}
+		jsonobject.add("taskDesc", detailTask);
+		InsightsEmailTemplates emailConfig = workflowConfig.getEmailConfig();
+		JsonObject emailDetails = loadEmailDetailsForUI(emailConfig);
+		jsonobject.add("emailDetails", emailDetails);
+		return jsonobject;
+	}
+
+	/**
+	 * Method to create Email details object for UI
+	 * 
+	 * @param emailConfig
+	 * @return JsonObject
+	 */
+	public JsonObject loadEmailDetailsForUI(InsightsEmailTemplates emailConfig) {
+		JsonObject emailDetails = new JsonObject();
+		if (emailConfig != null) {
+			String mailBody = emailConfig.getMailBody();
+			mailBody = mailBody.replace("<", "#").replace(">", "~");
+			emailDetails.addProperty("senderEmailAddress", emailConfig.getMailFrom());
+			if (emailConfig.getMailTo() != null) {
+				emailDetails.addProperty("receiverEmailAddress", emailConfig.getMailTo());
+			} else {
+				emailDetails.addProperty("receiverEmailAddress", "");
+			}
+			if (emailConfig.getMailCC() != null) {
+				emailDetails.addProperty("receiverCCEmailAddress", emailConfig.getMailCC());
+			} else {
+				emailDetails.addProperty("receiverCCEmailAddress", "");
+			}
+			if (emailConfig.getMailBCC() != null) {
+				emailDetails.addProperty("receiverBCCEmailAddress", emailConfig.getMailBCC());
+			} else {
+				emailDetails.addProperty("receiverBCCEmailAddress", "");
+			}
+			emailDetails.addProperty("mailSubject", emailConfig.getSubject());
+			emailDetails.addProperty("mailBodyTemplate", mailBody);
+		} else {
+			emailDetails.addProperty("senderEmailAddress", "");
+			emailDetails.addProperty("receiverEmailAddress", "");
+			emailDetails.addProperty("receiverCCEmailAddress", "");
+			emailDetails.addProperty("receiverBCCEmailAddress", "");
+			emailDetails.addProperty("mailSubject", "");
+			emailDetails.addProperty("mailBodyTemplate", "");
+		}
+		return emailDetails;
 	}
 
 	/**
@@ -446,15 +525,24 @@ public class AssesmentReportServiceImpl {
 			}
 			return PlatformServiceConstants.SUCCESS;
 		} catch (Exception e) {
-			log.error("Error while deleting assesment report.{}", e);
+			log.error("Error while deleting assesment report.", e);
 			throw new InsightsCustomException(e.getMessage());
 		}
 	}
 
+	/**
+	 * Method to save workflow configuration and create assessment report object
+	 * 
+	 * @param assessmentReportJson
+	 * @return
+	 * @throws InsightsCustomException
+	 */
 	private InsightsAssessmentConfiguration populateAssessmentReportConfiguration(JsonObject assessmentReportJson)
 			throws InsightsCustomException {
 		int reportId = -1;
+		JsonObject emailDetails = null;
 		try {
+			log.debug(" Assessment Json to be saved {} ", assessmentReportJson);
 			reportId = assessmentReportJson.get("reportTemplate").getAsInt();
 			InsightsAssessmentReportTemplate reportTemplate = (InsightsAssessmentReportTemplate) reportConfigDAL
 					.getActiveReportTemplateByReportId(reportId);
@@ -462,13 +550,24 @@ public class AssesmentReportServiceImpl {
 				throw new InsightsCustomException(" report template is not available for report ID: " + reportId);
 			}
 			String workflowType = WorkflowTaskEnum.WorkflowType.REPORT.getValue();
-			long epochStartDate, epochEndDate;
+			long epochStartDate;
+			long epochEndDate;
 			String reportName = assessmentReportJson.get("reportName").getAsString();
+			InsightsAssessmentConfiguration assessmentReport = reportConfigDAL
+					.getAssessmentByAssessmentName(reportName);
+			if (assessmentReport != null) {
+				throw new InsightsCustomException("Assessment Report with the given Report name already exists");
+			}
+			String emailList = assessmentReportJson.get("emailList").getAsString();
 			boolean isActive = false;
 			String schedule = assessmentReportJson.get("schedule").getAsString();
-			String emailList = assessmentReportJson.get("emailList").getAsString();
 			String datasource = assessmentReportJson.get("datasource").getAsString();
 			boolean reoccurence = assessmentReportJson.get("isReoccuring").getAsBoolean();
+			boolean runImmediate = false;
+			String asseementreportdisplayname = assessmentReportJson.get("asseementreportdisplayname").getAsString();
+			if (!assessmentReportJson.get("emailDetails").isJsonNull()) {
+				emailDetails = assessmentReportJson.get("emailDetails").getAsJsonObject();
+			}
 			JsonElement startDateJsonObject = assessmentReportJson.get("startdate");
 			if (startDateJsonObject.isJsonNull()) {
 				epochStartDate = 0;
@@ -485,7 +584,7 @@ public class AssesmentReportServiceImpl {
 					epochEndDate = InsightsUtils.getEpochTime(endDateJsonObject.getAsString()) / 1000;
 					epochEndDate = InsightsUtils.getStartOfTheDay(epochEndDate) - 1;
 				}
-				if(epochStartDate > epochEndDate) {
+				if (epochStartDate > epochEndDate) {
 					throw new InsightsCustomException("Start Date cannot be greater than End date");
 				}
 			} else {
@@ -497,22 +596,20 @@ public class AssesmentReportServiceImpl {
 					+ InsightsUtils.getCurrentTimeInSeconds();
 			InsightsAssessmentConfiguration assessmentConfig = new InsightsAssessmentConfiguration();
 			InsightsWorkflowConfiguration workflowConfig = workflowService.saveWorkflowConfig(workflowId, isActive,
-					reoccurence, schedule, reportStatus, workflowType, taskList, epochStartDate, epochEndDate);
-
+					reoccurence, schedule, reportStatus, workflowType, taskList, epochStartDate, emailDetails,
+					runImmediate);
 			// Entity Setters
 			assessmentConfig.setActive(isActive);
-			assessmentConfig.setEmails(emailList);
 			assessmentConfig.setInputDatasource(datasource);
 			assessmentConfig.setAsseementreportname(reportName);
+			assessmentConfig.setEmails(emailList);
 			assessmentConfig.setStartDate(epochStartDate);
 			assessmentConfig.setEndDate(epochEndDate);
 			assessmentConfig.setReportTemplateEntity(reportTemplate);
 			assessmentConfig.setWorkflowConfig(workflowConfig);
+			assessmentConfig.setAsseementReportDisplayName(asseementreportdisplayname);
 			workflowConfig.setAssessmentConfig(assessmentConfig);
 			return assessmentConfig;
-		} catch (NullPointerException e) {
-			log.error(e);
-			throw new InsightsCustomException(" assessment report does not have some mandatory field ");
 		} catch (NoResultException e) {
 			log.error(e);
 			throw new InsightsCustomException("Report Template not found for report id : " + reportId);
@@ -522,9 +619,14 @@ public class AssesmentReportServiceImpl {
 		}
 	}
 
+	/**
+	 * Method to get Schedule
+	 * 
+	 * @return List<String>
+	 */
 	public List<String> getSchedule() {
 		List<String> listOfSchedule = new ArrayList<>();
-		WorkflowTaskEnum.WorkflowSchedule jobSchedules[] = WorkflowTaskEnum.WorkflowSchedule.values();
+		WorkflowTaskEnum.WorkflowSchedule[] jobSchedules = WorkflowTaskEnum.WorkflowSchedule.values();
 		for (WorkflowTaskEnum.WorkflowSchedule jobSchedule : jobSchedules) {
 			listOfSchedule.add(jobSchedule.toString().toUpperCase());
 		}
@@ -543,56 +645,13 @@ public class AssesmentReportServiceImpl {
 	public int saveTemplateReport(JsonObject templateReportJson) throws InsightsCustomException {
 		int reportId = -1;
 		try {
-			List<Integer> kpiIds = new ArrayList<>();
-
-			Set<InsightsReportsKPIConfig> reportsKPIConfigSet = new HashSet<>();
-
 			reportId = templateReportJson.get("reportId").getAsInt();
 			InsightsAssessmentReportTemplate reportEntity = (InsightsAssessmentReportTemplate) reportConfigDAL
 					.getActiveReportTemplateByReportId(reportId);
 
 			if (reportEntity == null) {
-				String reportName = templateReportJson.get("reportName").getAsString();
-				boolean isActive = templateReportJson.get("isActive").getAsBoolean();
-				String description = templateReportJson.get("description").getAsString();
-                String file = templateReportJson.get("file").getAsString();
 				reportEntity = new InsightsAssessmentReportTemplate();
-				reportEntity.setReportId(reportId);
-				reportEntity.setActive(isActive);
-				reportEntity.setDescription(description);
-				reportEntity.setTemplateName(reportName);
-				reportEntity.setFile(file);
-
-				if (!templateReportJson.has("kpiConfigs")) {
-					throw new InsightsCustomException(" no KPI config provided for report : " + reportId);
-				}
-
-				JsonArray kpiConfigArray = templateReportJson.get("kpiConfigs").getAsJsonArray();
-
-				for (JsonElement eachKpiConfig : kpiConfigArray) {
-					JsonObject KpiObject = eachKpiConfig.getAsJsonObject();
-					int kpiId = KpiObject.get("kpiId").getAsInt();
-					if (kpiIds.contains(kpiId)) {
-						log.debug(" Kpi id already exists with the reportId " + reportId);
-					} else {
-						InsightsKPIConfig kpiConfig = reportConfigDAL.getKPIConfig(kpiId);
-						if(kpiConfig == null) {
-							throw new NoResultException("kpi Id does not exist in dB");
-						}
-						kpiIds.add(kpiId);
-						String vConfig =(KpiObject.get("visualizationConfigs").getAsJsonArray()).toString();
-						InsightsReportsKPIConfig reportsKPIConfig = new InsightsReportsKPIConfig();
-						reportsKPIConfig.setKpiConfig(kpiConfig);
-						reportsKPIConfig.setvConfig(vConfig);
-						reportsKPIConfig.setReportTemplateEntity(reportEntity);
-						reportsKPIConfigSet.add(reportsKPIConfig);
-					}
-
-				}
-
-				reportEntity.setReportsKPIConfig(reportsKPIConfigSet);
-				reportConfigDAL.saveReportConfig(reportEntity);
-
+				saveReportConfig(templateReportJson, reportEntity, reportId);
 			} else {
 				throw new InsightsCustomException(" report template already exists in database " + reportId);
 			}
@@ -611,6 +670,60 @@ public class AssesmentReportServiceImpl {
 	}
 
 	/**
+	 * Method to save Report Template Configuration
+	 * 
+	 * @param templateReportJson
+	 * @param reportEntity
+	 * @param reportId
+	 * @throws InsightsCustomException
+	 */
+	public void saveReportConfig(JsonObject templateReportJson, InsightsAssessmentReportTemplate reportEntity,
+			int reportId) throws InsightsCustomException {
+		List<Integer> kpiIds = new ArrayList<>();
+		Set<InsightsReportsKPIConfig> reportsKPIConfigSet = new HashSet<>();
+		String reportName = templateReportJson.get("reportName").getAsString();
+		boolean isActive = templateReportJson.get("isActive").getAsBoolean();
+		String description = templateReportJson.get("description").getAsString();
+		String file = templateReportJson.get("file").getAsString();
+		String visualizationutil = templateReportJson.get("visualizationutil").getAsString();
+		reportEntity.setReportId(reportId);
+		reportEntity.setActive(isActive);
+		reportEntity.setDescription(description);
+		reportEntity.setTemplateName(reportName);
+		reportEntity.setFile(file);
+		reportEntity.setVisualizationutil(visualizationutil);
+
+		if (!templateReportJson.has("kpiConfigs")) {
+			throw new InsightsCustomException(" no KPI config provided for report : " + reportId);
+		}
+
+		JsonArray kpiConfigArray = templateReportJson.get("kpiConfigs").getAsJsonArray();
+
+		for (JsonElement eachKpiConfig : kpiConfigArray) {
+			JsonObject kpiObject = eachKpiConfig.getAsJsonObject();
+			int kpiId = kpiObject.get("kpiId").getAsInt();
+			if (kpiIds.contains(kpiId)) {
+				log.debug(" Kpi id already exists with the reportId {} ", reportId);
+			} else {
+				InsightsKPIConfig kpiConfig = reportConfigDAL.getKPIConfig(kpiId);
+				if (kpiConfig == null) {
+					throw new NoResultException("kpi Id does not exist in dB");
+				}
+				kpiIds.add(kpiId);
+				String vConfig = (kpiObject.get("visualizationConfigs").getAsJsonArray()).toString();
+				InsightsReportsKPIConfig reportsKPIConfig = new InsightsReportsKPIConfig();
+				reportsKPIConfig.setKpiConfig(kpiConfig);
+				reportsKPIConfig.setvConfig(vConfig);
+				reportsKPIConfig.setReportTemplateEntity(reportEntity);
+				reportsKPIConfigSet.add(reportsKPIConfig);
+			}
+		}
+		reportEntity.setReportsKPIConfig(reportsKPIConfigSet);
+		reportConfigDAL.saveReportConfig(reportEntity);
+
+	}
+
+	/**
 	 * Fetch all the report templates from ASSESSEMENT_REPORT_TEMPLATE table.
 	 * 
 	 * @return
@@ -620,7 +733,7 @@ public class AssesmentReportServiceImpl {
 		try {
 			return reportConfigDAL.getAllReportTemplates();
 		} catch (Exception e) {
-			log.error("Error getting all report template.. {}", e);
+			log.error("Error getting all report template..", e);
 			throw new InsightsCustomException(e.toString());
 		}
 
@@ -648,7 +761,38 @@ public class AssesmentReportServiceImpl {
 			return jsonarray;
 
 		} catch (Exception e) {
-			log.error("Error while deleting assesment report.{}", e);
+			log.error("Error while deleting assesment report.", e);
+			throw new InsightsCustomException(e.toString());
+		}
+	}
+
+	/**
+	 * Set the status to RETRY
+	 * 
+	 * @param configId
+	 * @return
+	 * @throws InsightsCustomException
+	 */
+	public String setReportStatus(JsonObject reportConfigJson) throws InsightsCustomException {
+		try {
+			int assessmentReportId = reportConfigJson.get("configId").getAsInt();
+			InsightsAssessmentConfiguration assessmentConfig = reportConfigDAL
+					.getAssessmentByConfigId(assessmentReportId);
+			InsightsWorkflowConfiguration workFlowObject = assessmentConfig.getWorkflowConfig();
+			if (reportConfigJson.has("status")) {
+				String status = reportConfigJson.get("status").getAsString();
+				workFlowObject.setStatus(status);
+			} else if (reportConfigJson.has("runimmediate")) {
+				boolean runImmediate = reportConfigJson.get("runimmediate").getAsBoolean();
+				workFlowObject.setRunImmediate(runImmediate);
+				assessmentConfig.setActive(true);
+				workFlowObject.setActive(true);
+			}
+			assessmentConfig.setWorkflowConfig(workFlowObject);
+			reportConfigDAL.updateAssessmentReportConfiguration(assessmentConfig, assessmentReportId);
+			return PlatformServiceConstants.SUCCESS;
+		} catch (Exception e) {
+			log.error("Error while updating report status.", e);
 			throw new InsightsCustomException(e.toString());
 		}
 	}

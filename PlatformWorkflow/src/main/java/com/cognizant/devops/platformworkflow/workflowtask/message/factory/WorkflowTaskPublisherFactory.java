@@ -29,50 +29,32 @@ import com.rabbitmq.client.ConnectionFactory;
 
 public class WorkflowTaskPublisherFactory {
 	private static Logger LOG = LogManager.getLogger(WorkflowTaskPublisherFactory.class);
-	private static ConnectionFactory factory;
-	private static Connection connection;
 
-	static {
-		try {
-			initilizeMq();
-		} catch (Exception e) {
-		}
-	}
-
-	/**
-	 * Used to initilize publisher message factory for Mq connetion
-	 * 
-	 * @throws Exception
-	 */
-	public static void initilizeMq() throws Exception {
-		LOG.debug("Worlflow Detail ==== initilizeMq in MessagePublisherFactory");
-		try {
-			factory = new ConnectionFactory();
-			MessageQueueDataModel messageQueueConfig = ApplicationConfigProvider.getInstance().getMessageQueue();
-			factory.setHost(messageQueueConfig.getHost());
-			factory.setUsername(messageQueueConfig.getUser());
-			factory.setPassword(messageQueueConfig.getPassword());
-			connection = factory.newConnection();
-		} catch (Exception e) {
-			throw e;
-		}
-	}
-	
 	/**
 	 * used to publish message based on request json and routing key
 	 * 
 	 * @param routingKey
 	 * @param data
-	 * @throws IOException
+	 * @throws Exception
 	 */
-	public static void publish(String routingKey, String data) throws IOException {
-        Channel channel = connection.createChannel();
-		String queueName = routingKey.replace(".", "_");
-		channel.exchangeDeclare(MQMessageConstants.EXCHANGE_NAME, MQMessageConstants.EXCHANGE_TYPE, true);
-		channel.queueDeclare(queueName, true, false, false, null);
-		channel.queueBind(queueName, MQMessageConstants.EXCHANGE_NAME, routingKey);
-		channel.basicPublish(MQMessageConstants.EXCHANGE_NAME, routingKey, null, data.getBytes());
-		LOG.debug("Worlflow Detail ==== data published time in queue {} ", routingKey);
+	public static void publish(String routingKey, String data) throws Exception {
+		try {
+			ConnectionFactory factory = new ConnectionFactory();
+			MessageQueueDataModel messageQueueConfig = ApplicationConfigProvider.getInstance().getMessageQueue();
+			factory.setHost(messageQueueConfig.getHost());
+			factory.setUsername(messageQueueConfig.getUser());
+			factory.setPassword(messageQueueConfig.getPassword());
+			Connection connection = factory.newConnection();
+	        Channel channel = connection.createChannel();
+			String queueName = routingKey.replace(".", "_");
+			channel.exchangeDeclare(MQMessageConstants.EXCHANGE_NAME, MQMessageConstants.EXCHANGE_TYPE, true);
+			channel.queueDeclare(queueName, true, false, false, null);
+			channel.queueBind(queueName, MQMessageConstants.EXCHANGE_NAME, routingKey);
+			channel.basicPublish(MQMessageConstants.EXCHANGE_NAME, routingKey, null, data.getBytes());
+			LOG.debug("Worlflow Detail ==== data published time in queue {} ", routingKey);
+		} catch (Exception e) {
+			throw e;
+		}
 	}
 }
 

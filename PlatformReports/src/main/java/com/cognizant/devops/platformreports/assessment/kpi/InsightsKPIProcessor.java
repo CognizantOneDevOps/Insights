@@ -83,11 +83,12 @@ public class InsightsKPIProcessor {
 
 			if (kpiDefinition.getCategory().equals(ContentCategory.THRESHOLD.name())
 					|| kpiDefinition.getCategory().equals(ContentCategory.THRESHOLD_RANGE.name())
-					|| kpiDefinition.getCategory().equals(ContentCategory.MINMAX.name())) {
+					|| kpiDefinition.getCategory().equals(ContentCategory.MINMAX.name())
+					|| kpiDefinition.getCategory().equals(ContentCategory.TREND.name())) {
 				getQueryBySchedule(startDate, kpiDefinition.getSchedule(), noOfDays, graphQuery, endDate,
 						queryModelList);
 			} else {
-				getQueryWithScheduleDates(kpiDefinition.getNextRunTime(), kpiDefinition.getSchedule(), graphQuery, 0,
+				getQueryWithScheduleDates(startDate, kpiDefinition.getSchedule(), graphQuery, endDate,
 						queryModelList);
 			}
 
@@ -106,10 +107,10 @@ public class InsightsKPIProcessor {
 			if (!listOfResultJson.isEmpty()) {
 				kPIResultDataHandler.saveData(listOfResultJson);
 			} else {
-				log.error("Worlflow Detail ====  No result to store in neo4j for job : {} ", kpiConfigDTO.getKpiId());
+				log.error("Worlflow Detail ====  No result to store in database(neo4j or ES) for job : {} ",
+						kpiConfigDTO.getKpiId());
 				return ReportEngineEnum.StatusCode.NO_DATA.getValue();
 			}
-
 		} catch (Exception e) {
 			log.error("Worlflow Detail ==== Some calculation job failed for kpiID - " + kpiDefinition.getKpiId(), e);
 			throw new InsightsJobFailedException("Something went wrong with KPI query execution " + e.getMessage());
@@ -123,7 +124,7 @@ public class InsightsKPIProcessor {
 		Map<String, Long> dateReplaceMap = new HashMap<>();
 		long fromDate = InsightsUtils.getStartFromTime(nextRuntime, schedule.name()) - 1;
 		long toDate;
-		if (oneTimeEndDate != 0) {
+		if (schedule.name().equalsIgnoreCase(WorkflowTaskEnum.WorkflowSchedule.ONETIME.name())) {
 			toDate = oneTimeEndDate;
 		} else {
 			toDate = nextRuntime - 2; // minus 2 sec to get time 23:59:59

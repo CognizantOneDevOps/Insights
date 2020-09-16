@@ -45,6 +45,7 @@ public class ReportEngineUtils {
 	public static final String CONTENT_CONFIG_FILE = System.getenv().get(INSIGHTS_HOME) + File.separator + CONFIG_DIR
 			+ File.separator + CONFIG_FILE;
 	public static final String STANDARD_MESSAGE_KEY = "contentMessage";
+	public static final String NEUTRAL_MESSAGE_KEY = "neutralMessage";
 	public static final String COLUMN_PROPERTY = "columnProperty";
 	public static final String START_TIME_FIELD = "startTime";
 	public static final String END_TIME_FIELD = "endTime";

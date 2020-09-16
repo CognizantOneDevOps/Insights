@@ -1,0 +1,179 @@
+/* /*******************************************************************************
+ * Copyright 2020 Cognizant Technology Solutions
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License.  You may obtain a copy
+ * of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ ******************************************************************************/
+
+* {
+    box-sizing: border-box;
+}
+
+.container {
+    overflow-y: auto;
+    flex: 1;
+    cursor: move;
+    cursor: grab;
+    cursor: -moz-grab;
+    cursor: -webkit-grab;
+    cursor: grabbing;
+    cursor: -moz-grabbing;
+    cursor: -webkit-grabbing;
+}
+
+
+
+.showDialogHeadingCss {
+    font-family: inherit;
+    font-size: 20px;
+    color: white;
+    margin-top: 14px;
+    margin-left: 44%;
+    margin-bottom: 10px;
+}
+
+
+.closeIconCss {
+    padding-right: 30px;
+    color: white;
+    margin-top: auto;
+    margin-bottom: auto;
+    vertical-align: middle;
+}
+
+.closeicon {
+    height: 30px;
+    width: 30px;
+    text-align: right;
+    color: white;
+    margin-left: 65%;
+}
+
+.infoHeaderText {
+    font-size: 11px;
+    color: black;
+    padding-right: 58px;
+    background-color: white !important;
+    text-align: right;
+    height: 1.2em;
+}
+
+.mat-table {
+    font-family: inherit !important;
+}
+
+.mat-table tbody {
+    background: unset !important;
+}
+
+.form-control {
+    display: block;
+    width: 80%;
+    padding: 6px 12px;
+    font-size: 14px;
+    line-height: 1.42857143;
+    color: #000000;
+    background-color: #ffffff !important;
+    background-image: none;
+    border: 1px solid #ccc;
+    margin-left: 10px;
+}
+
+.frmTxtarea {
+    height: 140px;
+    font-size: 14px;
+    padding-left: 10px;
+    border: 1px !important;
+    border-style: solid !important;
+    border-color: #9e9a9a !important;
+    border-bottom-color: #9e9a9a !important;
+    margin-left: 10px;
+    margin-top: 5px;
+    width: 80%;
+    resize: none;
+}
+
+.tbody tr {
+    height: 60px;
+    width: 100%;
+    background-color: white !important;
+    margin-bottom: 5px !important;
+}
+
+.mat-cell {
+    font-size: 14px;
+    height: 40px;
+    text-align: left;
+    font-family: inherit
+}
+
+tr.mat-footer-row, tr.mat-row-webhook {
+    height: 45px !important;
+    text-align: left !important;
+    vertical-align: middle;
+    padding-right: 65px !important;
+    padding-left: 65px !important;
+}
+
+.mat-row-webhook:nth-child(even) {
+    background-color: #e1e3e7;
+}
+
+.mat-row-webhook:nth-child(odd) {
+    background-color: #FFFFFF;
+}
+
+.infoText {
+    font-size: 13px;
+    color: #FF8F1C;
+    padding-left: 0px;
+}
+
+.mainText {
+    font-size: 14px;
+    color: #000000;
+    font-weight: bold;
+}
+
+/* td.mat-cell:first-of-type {
+    padding-left: 10px !important;
+}
+
+td.mat-cell:last-of-type {
+    padding-right: 10px !important;
+} */
+
+td.mat-cell {
+    border-bottom-width: 0px;
+    border-bottom-style: none;
+}
+
+.columnName {
+    width: 15%;
+    padding: 0px 0px 0px 75px;
+}
+
+.extraColCss {
+    width: 10%;
+}
+
+.columnComponent {
+    width: 40%;
+}
+
+tr:last-child td:first-child {
+     border-radius: 0 0 0 0 !important; 
+}
+
+tr:last-child td:last-child {
+    border-radius: 0 0 0 0 !important; 
+}

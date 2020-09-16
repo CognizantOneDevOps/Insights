@@ -372,4 +372,40 @@ export class RestCallHandlerService {
   public getJSONUsingObservable(url): Observable<any> {
     return this.http.get(url)
   }
+
+  public postWithPDFData(url: string, data: String, requestParams?: Object, additionalheaders?: Object, responseType?: Object): Observable<any> {
+    var isSessionExpired = this.dataShare.validateSession();
+    if (!isSessionExpired) {
+      var restCallUrl = this.restAPIUrlService.getRestCallUrl(url);
+      var dataresponse;
+      let headers;
+      var authToken = this.dataShare.getAuthorizationToken();
+      var webAuthToken = this.dataShare.getWebAuthToken();
+      let responseTypeValue = responseType['responseType'];
+      let params = new HttpParams();
+      for (var key in requestParams) {
+        if (requestParams.hasOwnProperty(key)) {
+          params = params.set(key, requestParams[key]);
+        }
+      }
+
+      headers = new HttpHeaders();
+      headers = headers.set(RequestHeader.AUTH_TOKEN, authToken);
+      headers = headers.set(RequestHeader.WEBAUTHUSER, webAuthToken);
+      for (var key in additionalheaders) {
+        if (headers.hasOwnProperty(key)) {
+          headers = headers.set(key, additionalheaders[key]);
+        }
+      }
+      var httpOptions = {
+        headers: headers,
+        params: params,
+        responseType: responseTypeValue
+      }
+      dataresponse = this.http.post(restCallUrl, data, httpOptions);
+      return dataresponse;
+    } else {
+      console.log("Session Expire")
+    }
+  }
 }

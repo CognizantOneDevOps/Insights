@@ -4,6 +4,7 @@
    "description":"Kpis for sonar only",
    "isActive":true,
    "file":"REPORT_SONAR",
+   "visualizationutil":"Fusion",
    "kpiConfigs":[
       {
          "kpiId":100131,

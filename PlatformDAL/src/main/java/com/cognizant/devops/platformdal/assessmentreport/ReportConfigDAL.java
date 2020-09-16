@@ -18,8 +18,6 @@ package com.cognizant.devops.platformdal.assessmentreport;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.hibernate.query.Query;
 
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
@@ -27,7 +25,6 @@ import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformdal.core.BaseDAL;
 
 public class ReportConfigDAL extends BaseDAL {
-	private static final Logger log = LogManager.getLogger(ReportConfigDAL.class);
 
 	/**
 	 * Method to update InsightsKPIConfig record
@@ -124,7 +121,6 @@ public class ReportConfigDAL extends BaseDAL {
 		return result;
 	}
 
-
 	/**
 	 * Method to get Active Content Config using KpiId
 	 * 
@@ -153,14 +149,12 @@ public class ReportConfigDAL extends BaseDAL {
 	 */
 	public int updateAssessmentReportConfiguration(InsightsAssessmentConfiguration assessmentReportConfiguration,
 			int id) throws InsightsCustomException {
-		// int id = assessmentReportConfiguration.getId();
 		Query<InsightsAssessmentConfiguration> createQuery = getSession().createQuery(
 				"FROM InsightsAssessmentConfiguration IC WHERE IC.id = :id", InsightsAssessmentConfiguration.class);
 		createQuery.setParameter("id", id);
 		InsightsAssessmentConfiguration parentConfigList = createQuery.getSingleResult();
 		terminateSession();
 		if (parentConfigList != null) {
-			// parentConfigList.setEmails(assessmentReportConfiguration.getEmails());
 			getSession().beginTransaction();
 			getSession().saveOrUpdate(assessmentReportConfiguration);
 			getSession().getTransaction().commit();
@@ -327,14 +321,18 @@ public class ReportConfigDAL extends BaseDAL {
 	 * @return InsightsAssessmentConfiguration object
 	 */
 	public InsightsAssessmentConfiguration getAssessmentByAssessmentName(String assessmentName) {
-		Query<InsightsAssessmentConfiguration> createQuery = getSession().createQuery(
-				"FROM InsightsAssessmentConfiguration RE WHERE RE.asseementreportname = :assessmentName",
-				InsightsAssessmentConfiguration.class);
-		createQuery.setParameter("assessmentName", assessmentName);
-		InsightsAssessmentConfiguration report = createQuery.getSingleResult();
-		terminateSession();
-		terminateSessionFactory();
-		return report;
+		try {
+			Query<InsightsAssessmentConfiguration> createQuery = getSession().createQuery(
+					"FROM InsightsAssessmentConfiguration RE WHERE RE.asseementreportname = :assessmentName",
+					InsightsAssessmentConfiguration.class);
+			createQuery.setParameter("assessmentName", assessmentName);
+			return createQuery.getSingleResult();
+		} catch (Exception e) {
+			return null;
+		} finally {
+			terminateSession();
+			terminateSessionFactory();
+		}
 	}
 
 	/**

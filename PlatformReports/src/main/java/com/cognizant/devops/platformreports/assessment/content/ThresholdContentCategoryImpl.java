@@ -45,18 +45,20 @@ public class ThresholdContentCategoryImpl extends BaseContentCategoryImpl {
 	public void generateContent() {
 
 		List<InsightsKPIResultDetails> inferenceResults = getKPIExecutionResult();
-
+		InsightsContentDetail contentResult = null;
 		if (!inferenceResults.isEmpty()) {
-			InsightsContentDetail contentResult = getContentFromResult(inferenceResults);
-			log.debug(" contentResultList  + {} ", contentResult);
-			if (contentResult != null) {
-				saveContentResult(contentResult);
-			}
-
+			contentResult = getContentFromResult(inferenceResults);
 		} else {
-			log.debug(" No inference result found ");
+			contentResult = setNeutralContentDetail();
+			log.debug("Worlflow Detail ====   No kpi result found for kpi Id {} ContentId {} ",
+					contentConfigDefinition.getKpiId(), contentConfigDefinition.getContentId());
 		}
-
+		if (contentResult != null) {
+			log.debug("Worlflow Detail ====  contentid {}  kpi {} contentResultText  + {} ",
+					contentConfigDefinition.getCategory(), contentConfigDefinition.getKpiId(),
+					contentResult.getInferenceText());
+			saveContentResult(contentResult);
+		}
 	}
 
 	/**
@@ -91,7 +93,6 @@ public class ThresholdContentCategoryImpl extends BaseContentCategoryImpl {
 		try {
 			String result = "";
 			String inferenceText = "";
-			ReportEngineEnum.KPISentiment sentiment = ReportEngineEnum.KPISentiment.NEUTRAL;
 			InsightsKPIResultDetails resultFirstData = inferenceResults.get(0);
 			String actaulDirection = "Neutral";
 			addTimeValueinResult(resultValuesMap, contentConfigDefinition.getSchedule());
@@ -129,19 +130,25 @@ public class ThresholdContentCategoryImpl extends BaseContentCategoryImpl {
 				resultValuesMap.put("actualdirection", actaulDirection);
 			}
 
-			sentiment = getContentConfig().getDirectionOfThreshold().name().equalsIgnoreCase(actaulDirection)
+			ReportEngineEnum.KPISentiment sentiment = getContentConfig().getDirectionOfThreshold().name()
+					.equalsIgnoreCase(actaulDirection)
 					? ReportEngineEnum.KPISentiment.POSITIVE
 					: ReportEngineEnum.KPISentiment.NEGATIVE;
 
 			resultValuesMap.put("result", result);
 
-			inferenceText = getContentText(ReportEngineUtils.STANDARD_MESSAGE_KEY, resultValuesMap);
+			if (result.equalsIgnoreCase("0.0") || result.equalsIgnoreCase("0")) {
+				inferenceText = getContentText(ReportEngineUtils.NEUTRAL_MESSAGE_KEY, resultValuesMap);
+			} else {
+				inferenceText = getContentText(ReportEngineUtils.STANDARD_MESSAGE_KEY, resultValuesMap);
+			}
 
 			if (inferenceText != null) {
 				inferenceContentResult = setContentDetail(resultFirstData, resultValuesMap, sentiment, "",
 						inferenceText);
 			} else {
-				log.debug(" inference text is null in threshold KPIId {} contentId {} result {} ",
+				log.debug(
+						"Worlflow Detail ====   inference text is null for count and percentage threshold KPIId {} contentId {} result {} ",
 						getContentConfig().getKpiId(), getContentConfig().getContentId(), resultFirstData);
 			}
 		} catch (Exception e) {
@@ -166,39 +173,47 @@ public class ThresholdContentCategoryImpl extends BaseContentCategoryImpl {
 		InsightsContentDetail inferenceContentResult = null;
 		String comparisonField = getResultFieldFromContentDefination();
 		InsightsKPIResultDetails resultDetailObj = inferenceResults.get(0);
-
-		ReportEngineEnum.KPISentiment sentiment = ReportEngineEnum.KPISentiment.NEUTRAL;
-		String actaulDirection = "Neutral";
-		Double avgValue = inferenceResults.stream()
-				.mapToDouble((result -> (Double) result.getResults().get(comparisonField))).average().getAsDouble();
-		if (getContentConfig().getDirectionOfThreshold() == ReportEngineEnum.DirectionOfThreshold.BELOW) {
-			actaulDirection = (avgValue < getContentConfig().getThreshold()) ? "Below" : "Above";
-
-		} else {
-			actaulDirection = (avgValue > getContentConfig().getThreshold()) ? "Above" : "Below";
-		}
-
-		sentiment = getContentConfig().getDirectionOfThreshold().name().equalsIgnoreCase(actaulDirection)
-				? ReportEngineEnum.KPISentiment.POSITIVE
-				: ReportEngineEnum.KPISentiment.NEGATIVE;
-    	resultValuesMap.put("actualdirection", actaulDirection);
-		resultValuesMap.put("result", avgValue);
-
-		addTimeValueinResult(resultValuesMap, contentConfigDefinition.getSchedule());
 		try {
-
-			String inferenceText = getContentText(ReportEngineUtils.STANDARD_MESSAGE_KEY, resultValuesMap);
-
-			if (inferenceText != "") {
-				inferenceContentResult = setContentDetail(resultDetailObj, resultValuesMap, sentiment, "",
-						inferenceText);
+			ReportEngineEnum.KPISentiment sentiment = ReportEngineEnum.KPISentiment.NEUTRAL;
+			String actaulDirection = "Neutral";
+			Double avgValue = inferenceResults.stream()
+					.mapToDouble((result -> (Double) result.getResults().get(comparisonField))).average().getAsDouble();
+			if (getContentConfig().getDirectionOfThreshold() == ReportEngineEnum.DirectionOfThreshold.BELOW) {
+				actaulDirection = (avgValue < getContentConfig().getThreshold()) ? "Below" : "Above";
 
 			} else {
-				log.debug(" inference text is null in threshold KPIId {} contentId {} result {} ",
+				actaulDirection = (avgValue > getContentConfig().getThreshold()) ? "Above" : "Below";
+			}
+
+			sentiment = getContentConfig().getDirectionOfThreshold().name().equalsIgnoreCase(actaulDirection)
+					? ReportEngineEnum.KPISentiment.POSITIVE
+					: ReportEngineEnum.KPISentiment.NEGATIVE;
+			resultValuesMap.put("actualdirection", actaulDirection);
+			resultValuesMap.put("result", avgValue);
+
+			addTimeValueinResult(resultValuesMap, contentConfigDefinition.getSchedule());
+
+			String inferenceText = null;
+			if (avgValue == 0.0) {
+				inferenceText = getContentText(ReportEngineUtils.NEUTRAL_MESSAGE_KEY, resultValuesMap);
+			} else {
+				inferenceText = getContentText(ReportEngineUtils.STANDARD_MESSAGE_KEY, resultValuesMap);
+			}
+
+			if (inferenceText != null) {
+				inferenceContentResult = setContentDetail(resultDetailObj, resultValuesMap, sentiment, "",
+						inferenceText);
+			} else {
+				log.debug(
+						"Worlflow Detail ====   inference text is null for average threshold KPIId {} contentId {} result {} ",
 						getContentConfig().getKpiId(), getContentConfig().getContentId(), resultDetailObj);
 			}
 
 		} catch (Exception e) {
+			log.error(e);
+			log.error(" Errro while content processing for average threshold KPIId {} contentId {} ",
+					getContentConfig().getKpiId(), getContentConfig().getContentId());
+			throw new InsightsJobFailedException("Exception while running neo4j operation {} " + e.getMessage());
 		}
 
 		return inferenceContentResult;

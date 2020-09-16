@@ -56,6 +56,8 @@ public class InsightsAssessmentReportTemplate implements Serializable {
 	@Column(name = "file")
 	private String file;	
 	
+	@Column(name = "visualizationutil")
+	private String visualizationutil;
 	
 	@OneToMany(cascade=CascadeType.ALL ,mappedBy="reportTemplateEntity", fetch=FetchType.EAGER)
 	private Set<InsightsReportsKPIConfig> reportsKPIConfig = new HashSet<>();
@@ -108,6 +110,14 @@ public class InsightsAssessmentReportTemplate implements Serializable {
 
 	public void setFile(String file) {
 		this.file = file;
+	}
+
+	public String getVisualizationutil() {
+		return visualizationutil;
+	}
+
+	public void setVisualizationutil(String visualizationutil) {
+		this.visualizationutil = visualizationutil;
 	}
 
 	public Set<InsightsReportsKPIConfig> getReportsKPIConfig() {

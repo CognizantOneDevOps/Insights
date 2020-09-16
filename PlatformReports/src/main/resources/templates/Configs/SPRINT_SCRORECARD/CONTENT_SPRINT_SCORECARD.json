@@ -9,7 +9,8 @@
       "threshold":0,
       "resultField":"Failure",  
       "message":{
-         "contentMessage":"There were {Failure} failed deployments captured in the sprint."
+         "contentMessage":"There were {Failure} failed deployments captured in the sprint.",
+		 "neutralMessage":"No failed deployments captured in the sprint."
       },
       "isActive":"TRUE"
    },
@@ -22,7 +23,8 @@
       "threshold":0,
       "resultField":"Success",  
       "message":{
-         "contentMessage":"There were {Success} successful deployments captured in last sprint"
+         "contentMessage":"There were {Success} successful deployments captured in last sprint",
+		 "neutralMessage":"No successful deployments captured in the sprint"
       },
       "isActive":"TRUE"
    },
@@ -36,7 +38,8 @@
 	   "resultField":"Deployment",
       "threshold":0,
       "message":{
-         "contentMessage":"There were {Deployment} total deployments captured in the last run."
+         "contentMessage":"There were {Deployment} total deployments captured in the last run.",
+		 "neutralMessage":"No deployments captured in last sprint"
       },
       "isActive":"TRUE"
    },
@@ -51,7 +54,8 @@
       "threshold":0,     
       
       "message":{
-         "contentMessage":"Average successful deployment time in seconds was {Time}s in the last sprint."
+         "contentMessage":"Average successful deployment time in seconds was {Time}s in the last sprint.",
+		 "neutralMessage":"No Successful Deployment Time captured in last sprint."
       }
    },
   {
@@ -63,7 +67,8 @@
       "threshold":0,
 	  "resultField":"Time",
       "message":{
-         "contentMessage":"Maximum successful deployment time captured in the last sprint was {Time}s ."
+         "contentMessage":"Maximum successful deployment time captured in the last sprint was {Time}s .",
+		 "neutralMessage":"No Successful Deployment Time captured in last sprint."
       },
       "isActive":"TRUE"
    },
@@ -78,7 +83,8 @@
       "noOfResult":2,
       "threshold":0,
       "message":{
-         "contentMessage":"Total defects captured for the last run were {Issues} "
+         "contentMessage":"Total defects captured for the last run were {Issues} ",
+		 "neutralMessage":"No defects captured in last sprint."
       },
       "isActive":"TRUE"
    },
@@ -93,7 +99,8 @@
       "threshold":0,      
       "directionOfThreshold":"BELOW",
       "message":{
-         "contentMessage":"Total number of defects captured in the last run were {Issues}"
+         "contentMessage":"Total number of defects captured in the last run were {Issues}",
+		 "neutralMessage":"No defects captured in last sprint."
       }
    }
    ,
@@ -106,7 +113,8 @@
       "noOfResult":2,
       "threshold":0,
       "message":{
-         "contentMessage":"Maximum successful build time captured in the last sprint was {Time}s  ."
+         "contentMessage":"Maximum successful build time captured in the last sprint was {Time}s  .",
+		 "neutralMessage":"No successful build captured in the last sprint."
       },
       "isActive":"TRUE"
    },  
@@ -121,7 +129,8 @@
 	  "resultField":"Failure",
       "threshold":0,	  
       "message":{
-         "contentMessage":"Failed builds captured in the last sprint were {Failure} ."
+         "contentMessage":"Failed builds captured in the last sprint were {Failure} .",
+		 "neutralMessage":"No failed builds captured in the last sprint"
       },
       "isActive":"TRUE"
    },
@@ -134,7 +143,8 @@
       "threshold":0,
       "resultField":"Success",  
       "message":{
-         "contentMessage":"Successful builds captured in the last sprint were {Success}." 
+         "contentMessage":"Successful builds captured in the last sprint were {Success}." ,
+		 "neutralMessage":"No Successful builds captured in the last sprint"
       },
       "isActive":"TRUE"
    },
@@ -143,11 +153,12 @@
       "expectedTrend":"UPWARDS",
       "contentName":"Total Number of Builds",
       "kpiId":"1111",
-	   "resultField":"Builds",
+	  "resultField":"Builds",
       "noOfResult":2,
       "threshold":0,
       "message":{
-         "contentMessage":"There were total {Builds} build(s) captured in the last sprint."
+         "contentMessage":"There were total {Builds} build(s) captured in the last sprint.",
+		 "neutralMessage":"No Build captured in the last sprint."
       },
       "isActive":"TRUE"
    },
@@ -161,7 +172,8 @@
       "threshold":0,
 	  "resultField":"Time",
       "message":{
-         "contentMessage":" Average sucessful build time captured in the last sprint was  {Time}s ."
+         "contentMessage":" Average sucessful build time captured in the last sprint was  {Time}s .",
+		 "neutralMessage":""
       },
       "isActive":"TRUE"
    },
@@ -174,7 +186,8 @@
       "noOfResult":2,
       "threshold":0,
       "message":{
-         "contentMessage":"Total number of defetcts captured in the last sprint were {Defects}."
+         "contentMessage":"Total number of defetcts captured in the last sprint were {Defects}.",
+		 "neutralMessage":""
       },
       "isActive":"TRUE"
    },
@@ -187,12 +200,10 @@
       "noOfResult":2,
       "threshold":0,
       "message":{
-         "contentMessage":"Total stories captured in the last run were {Stories}."
+         "contentMessage":"Total stories captured in the last run were {Stories}.",
+		 "neutralMessage":""
       },
       "isActive":"TRUE"
    }
-   
-   
-   
   
 ]

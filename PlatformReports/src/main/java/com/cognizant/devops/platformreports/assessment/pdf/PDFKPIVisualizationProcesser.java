@@ -77,18 +77,16 @@ public class PDFKPIVisualizationProcesser implements Callable<JsonObject> {
 			vQuery = addFieldInVQuery(vQuery, kpiId);
 			vResultObject.addProperty("vType", vType);
 			JsonArray kpiResultArray = dataProcessor.fetchAndFormatKPIResult(vQuery);
-			if (kpiResultArray.size() > 0) {
-				vResultObject.add("KpiResult", kpiResultArray);
-				eachKPIVisualizationResult.add(vResultObject);
-			}else {
-				log.debug(" No able to fetch record for kpi {} ====== query {} ", kpiId, vQuery);
+			vResultObject.add("KpiResult", kpiResultArray);
+			if (kpiResultArray.size() == 0) {
+				log.debug("Worlflow Detail ====  No able to fetch record for kpi {} ====== query {} ", kpiId, vQuery);
 			}
+			eachKPIVisualizationResult.add(vResultObject);
 		}
 		eachKPIObject.add("visualizationresult", eachKPIVisualizationResult);
 		JsonArray contentResultArray = dataProcessor.fetchAndFormatContentResult(assessmentReportDTO.getExecutionId(),
 				kpiId);
-		if(contentResultArray.size()>0)
-		{
+		if (contentResultArray.size() > 0) {
 			eachKPIObject.add("contentResult", contentResultArray);
 		}
 		log.debug("Worlflow Detail ==== prepared Visualization responce for kpi {} ",

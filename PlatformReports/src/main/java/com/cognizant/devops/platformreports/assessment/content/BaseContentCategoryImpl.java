@@ -15,6 +15,7 @@
  ******************************************************************************/
 package com.cognizant.devops.platformreports.assessment.content;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -60,7 +61,7 @@ public abstract class BaseContentCategoryImpl {
 		this.contentConfigDefinition = inferenceContentConfigDefinition;
 	}
 
-	public abstract void generateContent() throws InsightsJobFailedException;
+	public abstract void generateContent();
 
 	public ContentConfigDefinition getContentConfig() {
 		return this.contentConfigDefinition;
@@ -79,6 +80,8 @@ public abstract class BaseContentCategoryImpl {
 				contentConfigDefinition.getCategory(), contentConfigDefinition.getKpiId(),
 				contentConfigDefinition.getContentId());
 		inferenceDetailList = datasourceDataHandler.fetchKPIResultData(contentConfigDefinition);
+		log.debug("Worlflow Detail ==== In Content, kpi result return for kpi {} is {}",
+				contentConfigDefinition.getKpiId(), inferenceDetailList.size());
 		return inferenceDetailList;
 	}
 
@@ -98,7 +101,8 @@ public abstract class BaseContentCategoryImpl {
 						.parse(oMapper.writeValueAsString(contentResult.getResultValuesMap())).getAsJsonObject();
 				contentDataJson = ReportEngineUtils.mergeTwoJson(contentDataJson, resultValueJson);
 			} else {
-				log.error(" no result foundg {} and data json is null {} ", contentResult.getResultValuesMap(),
+				log.error("Worlflow Detail ==== In Content, no result foundg {} and data json is null {} ",
+						contentResult.getResultValuesMap(),
 						contentDataJson);
 			}
 			datasourceDataHandler.saveContentResult(contentDataJson);
@@ -149,6 +153,48 @@ public abstract class BaseContentCategoryImpl {
 	}
 
 	/**
+	 * Method is convert content model to entity model, further this entity model
+	 * store in database
+	 * 
+	 * @param inferenceResult
+	 * @param resultValuesMap
+	 * @param sentiment
+	 * @param actualTrend
+	 * @param inferenceText
+	 * @return
+	 */
+	public InsightsContentDetail setNeutralContentDetail() {
+		InsightsContentDetail detail = new InsightsContentDetail();
+		try {
+			Map<String, Object> resultValuesMap = new HashMap<>();
+			String inferenceContentText = getContentText(ReportEngineUtils.NEUTRAL_MESSAGE_KEY, resultValuesMap);
+			detail.setCategory(contentConfigDefinition.getCategory());
+			detail.setActualTrend(ReportEngineEnum.KPITrends.NORESULT.getValue());
+			detail.setExpectedTrend(contentConfigDefinition.getExpectedTrend());
+			detail.setContentId(contentConfigDefinition.getContentId());
+			detail.setInferenceText(inferenceContentText);
+			detail.setKpiId(contentConfigDefinition.getKpiId().longValue());
+			//detail.setKpiName(inferenceResult.getKpiName());
+			detail.setNoOfResult(contentConfigDefinition.getNoOfResult());
+			detail.setRanking(null);//ranking
+			detail.setResultField(contentConfigDefinition.getResultField());
+			//detail.setResultTime(inferenceResult.getResultTime());
+			//detail.setResultTimeX(inferenceResult.getResultTimeX());
+			detail.setResultValuesMap(resultValuesMap);
+			//detail.setSchedule(inferenceResult.getSchedule());
+			detail.setSentiment(ReportEngineEnum.KPISentiment.NEUTRAL);
+			detail.setThreshold(contentConfigDefinition.getThreshold());
+			//detail.setToolName(inferenceResult.getToolname());
+			detail.setTrendline(null);//trendline
+			//detail.setGroup(inferenceResult.getGroupName());
+			detail.setExecutionId(contentConfigDefinition.getExecutionId());
+		} catch (Exception e) {//InsightsCustom
+			log.error(" Error while setNeutralContentDetail {} ", e);
+		}
+		return detail;
+	}
+
+	/**
 	 * Prepare content text based on kpi result property
 	 * 
 	 * @param key
@@ -156,9 +202,10 @@ public abstract class BaseContentCategoryImpl {
 	 * @return
 	 * @throws InsightsCustomException
 	 */
-	public String getContentText(String key, Map<String, Object> resultValuesMap) throws InsightsCustomException {
-		String inferenceText = null;
+	public String getContentText(String key, Map<String, Object> resultValuesMap) {
+		String contentText = null;
 		try {
+			String messageConfigText = "";
 			resultValuesMap = resultValuesMap.entrySet().stream()
 					.collect(Collectors.toMap(Map.Entry::getKey, e -> getResultValueForDisplay(e.getValue())));
 			StringSubstitutor sub = new StringSubstitutor(resultValuesMap, "{", "}");
@@ -167,15 +214,20 @@ public abstract class BaseContentCategoryImpl {
 					.getAsJsonObject();
 			JsonElement messageInference = valueMessageObject.get(key);
 			if (messageInference != null) {
-				inferenceText = sub.replace(messageInference.getAsString());
+				messageConfigText = messageInference.getAsString();
+			} else if (key.equalsIgnoreCase(ReportEngineUtils.NEUTRAL_MESSAGE_KEY)) {
+				log.error("Worlflow Detail ==== In Content,No data found for content - {} ",
+						contentConfigDefinition.getContentName());
+				messageConfigText = "No data found for content  - " + contentConfigDefinition.getContentName();
 			} else {
-				log.error(" Error while getting message text for key {} ", key);
-				throw new InsightsCustomException(" Content message not configured ");
+				log.error("Worlflow Detail ==== In Content, Error while getting message text for key {} ", key);
+				messageConfigText = "No message found for content  - " + contentConfigDefinition.getContentName();
 			}
+			contentText = sub.replace(messageConfigText);
 		} catch (Exception e) {
-			log.error(" Error while getting contentText {} ", e);
+			log.error("Worlflow Detail ==== In Content, Error while getting contentText {} ", e);
 		}
-		return inferenceText;
+		return contentText;
 
 	}
 	
@@ -215,7 +267,8 @@ public abstract class BaseContentCategoryImpl {
 			}
 			//log.debug("returnValue   {} ", returnValue);
 		} catch (Exception e) {
-			log.error(" Exception in getResultValueForDisplay for content {} === value === {}  ",
+			log.error(
+					"Worlflow Detail ==== In Content, Exception in getResultValueForDisplay for content {} === value === {}  ",
 					contentConfigDefinition.getContentId(), value);
 			returnValue = String.valueOf(value);
 		}

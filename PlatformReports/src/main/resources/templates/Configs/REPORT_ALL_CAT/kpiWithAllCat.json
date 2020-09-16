@@ -87,5 +87,16 @@
       "datasource":"NEO4J",
       "isActive":true,
       "resultField":"Issues"
+   },
+   {
+   "kpiId":2109,
+      "name":"Jenkins Build Failures V/S Success Trend",
+      "group":"BUILD",
+      "category":"TREND",
+      "toolName":"JENKINS",
+      "DBQuery":"MATCH (n:JENKINS:DATA) WHERE  n.SPKstartTime > {startTime}  and n.SPKstartTime < {endTime} and n.SPKvector = 'BUILD' with n , case when n.SPKstatus='Failure'then count(n.SPKduration) end as Failure ,case when n.SPKstatus='Success'then count(n.SPKduration) end as Success RETURN  count(Failure) as Failure , count (Success) as Success",
+      "datasource":"NEO4J",
+      "isActive":true,
+      "resultField":"Success"
    }
 ]

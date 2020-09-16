@@ -15,8 +15,9 @@
  ******************************************************************************/
 import { Injectable } from '@angular/core';
 import { RestCallHandlerService } from '@insights/common/rest-call-handler.service';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient} from '@angular/common/http';
 import { DataSharedService } from '@insights/common/data-shared-service';
+
 @Injectable()
 export class ReportManagementService {
 
@@ -65,8 +66,16 @@ export class ReportManagementService {
         return this.restCallHandlerService.postWithData("GET_WORKFLOW_EXECUTION_RECORDS", configIdJson, "", { 'Content-Type': 'application/json' }).toPromise();
     }
 
-    setRetryStatus(configId: string) {
-        return this.restCallHandlerService.postWithParameter("SET_RETRY_COUNT", { 'configId': configId }, { 'Content-Type': 'application/x-www-form-urlencoded' }).toPromise();
+    setRetryStatus(configStatusMapping: string) {
+        return this.restCallHandlerService.postWithData("SET_REPORT_STATUS", configStatusMapping, { 'Content-Type': 'application/json' }).toPromise();
+    }
+
+    downloadPDF(PDFRequestJson: string) {
+        return this.restCallHandlerService.postWithPDFData("DOWNLOAD_REPORT_PDF", PDFRequestJson,"",{ 'Content-Type': 'application/json' },{'responseType':'blob'}).toPromise();
+    }
+
+    getPDFExecutionId(configIdJson:string){
+        return this.restCallHandlerService.postWithData("GET_PDF_EXECUTIONID", configIdJson, "", { 'Content-Type': 'application/json' }).toPromise();
     }
 
 }

@@ -1,0 +1,21 @@
+{
+   "reportId":"1000800",
+   "reportName":"AUDIT_CYPHER_REPORT",
+   "description":"Testing",
+   "isActive":true,
+   "file":"",
+   "visualizationutil":"OpenPDF",
+   "kpiConfigs":[
+      
+      {
+         "kpiId":1000014,
+         "visualizationConfigs":[
+            {
+               "vType":"table_1000014",
+               "vQuery":"MATCH (n:KPI:RESULTS) where n.assessmentId = {assessmentId} and n.executionId = {executionId} and n.kpiId={kpiId} with MAX(n.executionId) as latestExecutionId MATCH (n:KPI:RESULTS) where n.executionId=latestExecutionId and n.kpiId={kpiId} RETURN  n.`ISSUE API` as `ISSUE API`, n.`TOOL NAME` as `TOOL NAME`, n.`STATUS` as `STATUS`, n.`Key` as `Key`"
+            }
+         ]
+      }
+	  
+   ]
+}

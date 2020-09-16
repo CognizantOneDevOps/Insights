@@ -42,7 +42,7 @@ public class ReportEngineEnum {
 
 	public enum KPITrends {
 
-		UPWARDS("UPWARDS"), DOWNWARDS("DOWNWARDS"), NOCHANGE("NOCHANGE");
+		UPWARDS("UPWARDS"), DOWNWARDS("DOWNWARDS"), NOCHANGE("NOCHANGE"), NORESULT("NORESULT");
 
 		private String value;
 

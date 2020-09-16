@@ -465,5 +465,140 @@
          "contentMessage":"Maximum Build time captured in the last run was {MaxBuildTime}s"
       },
       "isActive":"TRUE"
+   },{
+      "contentId":21122111,
+      "isActive":"TRUE",
+      "expectedTrend":"UPWARDS",
+      "contentName":"Total Successful builds w.r.t zone ",
+      "kpiId":102109,
+      "noOfResult":15,
+      "resultField":"Success",
+      "action":"COUNT",
+      "message":{
+         "contentMessage":"Total Successful builds were {result} in last {day} days",
+		 "neutralMessage":"No Successful builds in last {day} days "
+      }
+   },{
+      "contentId":21122112,
+      "isActive":"TRUE",
+      "expectedTrend":"DOWNWARDS",
+      "contentName":"Total Failure w.r.t zone ",
+      "kpiId":102109,
+      "noOfResult":15,
+      "resultField":"Failure",
+      "action":"COUNT",
+      "message":{
+         "contentMessage":"Total Failure builds were {result} in last {day} days",
+		 "neutralMessage":"No Failure builds in last {day} days "
+      }
+   },{
+      "contentId":21122101,
+      "isActive":"TRUE",
+      "expectedTrend":"BELOW",
+      "resultField":"Issues",
+      "contentName":" Defects Count",
+      "kpiId":112101,
+      "noOfResult":2,
+      "threshold":0,
+      "directionOfThreshold":"BELOW",
+      "message":{
+         "contentMessage":"Total number of defects captured in the last sprint were {Count}",
+		 "neutralMessage":"No defects captured in the last sprint"
+      }
+   },
+   {
+      "contentId":21122102,
+      "isActive":"TRUE",
+      "expectedTrend":"BELOW",
+      "contentName":"Average hours spent on projects in a Sprint ",
+      "kpiId":112102,
+      "noOfResult":15,
+      "threshold":5,
+      "action":"AVERAGE",
+      "directionOfThreshold":"BELOW",
+      "message":{
+         "contentMessage":"Average hours spent on projects is {actualdirection} the defined threshold in the last sprint.",
+		 "neutralMessage":"No average time spent on projects. "
+      },
+      "resultField":"Duration"
+   },
+   {
+      "contentId":21122103,
+      "isActive":"TRUE",
+      "expectedTrend":"UPWARDS",
+      "contentName":"Maximum Employee Productivity",
+      "kpiId":112103,
+      "noOfResult":15,
+      "action":"MAX",
+      "resultField":"Productivity",
+      "message":{
+         "contentMessage":"Employee productivity was maximum on {maxDate} day in last {week} week(s) and was {result}",
+		 "neutralMessage":"No detail found on Employee productivity"
+      }
+   },
+   {
+      "contentId":21122104,
+      "expectedTrend":"DOWNWARDS",
+      "contentName":"Total Code Smell in Deployment",
+      "kpiId":112104,
+      "noOfResult":2,
+      "threshold":0,
+      "resultField":"CodeSmell",
+      "message":{
+         "positive":"Total Code Smell has decreased to {current:CodeSmell} from {previous:CodeSmell} ",
+         "negative":"Total Code Smell has increased to {current:CodeSmell} from {previous:CodeSmell} ",
+         "neutral":"Total Code Smell has remained constant to {CodeSmell}"
+      },
+      "isActive":"TRUE"
+   },
+   {
+      "contentId":21122108,
+      "expectedTrend":"DOWNWARDS",
+      "contentName":"Total Code Bugs in Deployment",
+      "kpiId":112104,
+      "noOfResult":2,
+      "threshold":0,
+      "resultField":"Bugs",
+      "message":{
+         "positive":"Total Code Bugs has decreased to {current:Bugs} from {previous:Bugs} ",
+         "negative":"Total Code Bugs has increased to {current:Bugs} from {previous:Bugs} ",
+         "neutral":"Total Code Bugs has remained constant to {Bugs}"
+      },
+      "isActive":"TRUE"
+   },
+   {
+      "contentId":21122109,
+      "expectedTrend":"DOWNWARDS",
+      "contentName":"Total Code Vulnerablilities in Deployment",
+      "kpiId":112104,
+      "noOfResult":2,
+      "threshold":0,
+      "resultField":"Vulnerablilities",
+      "message":{
+         "positive":"Total Code Vulnerablilities has decreased to {current:Vulnerablilities} from {previous:Vulnerablilities} ",
+         "negative":"Total Code Vulnerablilities has increased to {current:Vulnerablilities} from {previous:Vulnerablilities} ",
+         "neutral":"Total Code Vulnerablilities has remained constant to {Vulnerablilities}"
+      },
+      "isActive":"TRUE"
+   },
+   {
+      "contentId":21122105,
+      "isActive":"TRUE",
+      "expectedTrend":"DOWNWARDS",
+      "contentName":"Total Failure w.r.t zone ",
+      "kpiId":112105,
+      "noOfResult":15,
+      "resultField":"Failure",
+      "thresholds":{
+         "red":8,
+         "amber":6,
+         "green":4
+      },
+      "action":"COUNT",
+      "directionOfThreshold":"BELOW",
+      "message":{
+         "contentMessage":"Total Failure builds w.r.t zones are red {red}, amber {amber} , green {green}",
+		 "neutralMessage":"No total Failure builds found"
+      }
    }
 ]

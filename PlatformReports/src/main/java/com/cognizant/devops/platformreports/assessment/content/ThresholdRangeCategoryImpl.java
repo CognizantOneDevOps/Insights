@@ -46,15 +46,19 @@ public class ThresholdRangeCategoryImpl extends BaseContentCategoryImpl {
 	public void generateContent() {
 		
 		List<InsightsKPIResultDetails> inferenceResults = getKPIExecutionResult();
-
+		InsightsContentDetail contentResult = null;
 		if (!inferenceResults.isEmpty()) {
-			InsightsContentDetail contentResult = getContentFromResult(inferenceResults);
-			log.debug(" contentResultList  + {} ", contentResult);
-			if (contentResult != null) {
-				saveContentResult(contentResult);
-			}
+			contentResult = getContentFromResult(inferenceResults);
 		} else {
-			log.debug(" No inference result found ");
+			contentResult = setNeutralContentDetail();
+			log.debug("Worlflow Detail ====   No kpi result found for kpi Id {} ContentId {} ",
+					contentConfigDefinition.getKpiId(), contentConfigDefinition.getContentId());
+		}
+		if (contentResult != null) {
+			log.debug("Worlflow Detail ====  contentid {}  kpi {} contentResultText  + {} ",
+					contentConfigDefinition.getCategory(), contentConfigDefinition.getKpiId(),
+					contentResult.getInferenceText());
+			saveContentResult(contentResult);
 		}
 	}
 
@@ -116,17 +120,17 @@ public class ThresholdRangeCategoryImpl extends BaseContentCategoryImpl {
 				}
 				String inferenceText = getContentText(ReportEngineUtils.STANDARD_MESSAGE_KEY, resultValuesMap);
 				if (inferenceText != null) {
-
 					inferenceContentResult = setContentDetail(resultDetailObj, resultValuesMap, sentiment, "",
 							inferenceText);
-
 				} else {
-					log.debug(" inference text is null in threshold-range KPIId {} contentId {} result {} ",
+					log.debug(
+							" inference text is null for count And Percentage threshold-range KPIId {} contentId {} result {} ",
 							getContentConfig().getKpiId(), getContentConfig().getContentId(), resultDetailObj);
 				}
 			} catch (Exception e) {
 				log.error(e);
-				log.error(" Errro while content processing for threshold-range KPIId {} contentId {}",
+				log.error(
+						" Errro while content processing for threshold-range countAndPercentageInferenceResult KPIId {} contentId {}",
 						getContentConfig().getKpiId(), getContentConfig().getContentId());
 				throw new InsightsJobFailedException(" Errro while content processing for threshold-range KPIId {} contentId {}" + e.getMessage());
 			}
@@ -175,14 +179,9 @@ public class ThresholdRangeCategoryImpl extends BaseContentCategoryImpl {
 			zonesMap.put("red",redZone);			
 			zone=  Collections.min(zonesMap.keySet());
 
-			if (greenZone < (amberZone + redZone)) {
-				sentiment = ReportEngineEnum.KPISentiment.POSITIVE;
-			} else {
-				sentiment = ReportEngineEnum.KPISentiment.NEGATIVE;
-			}		
-		       
-		}
-		  else {
+			sentiment = getThresholdRangeSentiment(redZone, amberZone, greenZone,
+					contentConfigDefinition.getDirectionOfThreshold());
+		}else {
 			for (InsightsKPIResultDetails resultObj : inferenceResults) {
 				double val = (double) resultObj.getResults().get(comparisonField);
 				if (val >= greenThreshold) {
@@ -197,25 +196,48 @@ public class ThresholdRangeCategoryImpl extends BaseContentCategoryImpl {
 			zonesMap.put("amber",amberZone);
 			zonesMap.put("red",redZone);			
 			zone=  Collections.max(zonesMap.keySet()); 
-
-			if (greenZone > (amberZone + redZone)) {
-
-				sentiment = ReportEngineEnum.KPISentiment.POSITIVE;
-			} else {
-				sentiment = ReportEngineEnum.KPISentiment.NEGATIVE;
-			}
+			sentiment = getThresholdRangeSentiment(redZone, amberZone, greenZone,
+					contentConfigDefinition.getDirectionOfThreshold());
 		}
 
 		Map<String, Object> zoneWiseCount = new HashMap<>();
-		zoneWiseCount.put("greenZone", greenZone);
-		zoneWiseCount.put("amberZone", amberZone);
-		zoneWiseCount.put("redZone", redZone);
+		zoneWiseCount.put("greenZone", zonesMap.get("green"));
+		zoneWiseCount.put("amberZone", zonesMap.get("amber"));
+		zoneWiseCount.put("redZone", zonesMap.get("red"));
 		zoneWiseCount.put("sentiment", sentiment);
 		zoneWiseCount.put("zone", zone);
 		zoneWiseCount.put("result", getZoneResultValue(zone));
 
 		return zoneWiseCount;
 
+	}
+
+	/**
+	 * method use to get get Threshold Range Sentiment
+	 * 
+	 * @param redZone
+	 * @param amberZone
+	 * @param greenZone
+	 * @param contentThresholdValue
+	 * @return
+	 */
+	private ReportEngineEnum.KPISentiment getThresholdRangeSentiment(int redZone, int amberZone, int greenZone,
+			ReportEngineEnum.DirectionOfThreshold contentThresholdValue) {
+		ReportEngineEnum.KPISentiment sentiment;
+		if (contentThresholdValue == ReportEngineEnum.DirectionOfThreshold.BELOW) {
+			if (greenZone < (amberZone + redZone)) {
+				sentiment = ReportEngineEnum.KPISentiment.POSITIVE;
+			} else {
+				sentiment = ReportEngineEnum.KPISentiment.NEGATIVE;
+			}
+		} else {
+			if (greenZone > (amberZone + redZone)) {
+				sentiment = ReportEngineEnum.KPISentiment.POSITIVE;
+			} else {
+				sentiment = ReportEngineEnum.KPISentiment.NEGATIVE;
+			}
+		}
+		return sentiment;
 	}
 	
 	/**

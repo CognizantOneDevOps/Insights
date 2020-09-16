@@ -25,7 +25,6 @@ import org.apache.logging.log4j.Logger;
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.core.enums.WorkflowTaskEnum;
 import com.cognizant.devops.platformworkflow.workflowtask.core.WorkflowDataHandler;
-import com.cognizant.devops.platformworkflow.workflowtask.exception.WorkflowFailedTaskException;
 import com.cognizant.devops.platformworkflow.workflowtask.exception.WorkflowTaskInitializationException;
 import com.cognizant.devops.platformworkflow.workflowtask.utils.MQMessageConstants;
 import com.cognizant.devops.platformworkflow.workflowtask.utils.WorkflowUtils;
@@ -73,7 +72,7 @@ public abstract class WorkflowTaskSubscriberHandler {
 				public void handleDelivery(String consumerTag, Envelope envelope, AMQP.BasicProperties properties,
 						byte[] body) throws IOException {
 					int exectionHistoryId = -1;
-
+					setStatusLog("{}");
 					try {
 
 						log.debug("Worlflow Detail ==== before  workflowTaskPreProcesser ");
@@ -86,7 +85,7 @@ public abstract class WorkflowTaskSubscriberHandler {
 						workflowTaskPostProcesser(body, exectionHistoryId,
 								WorkflowTaskEnum.WorkflowStatus.COMPLETED.toString());
 					} catch (Exception e) {
-						log.error("Worlflow Detail ==== Error in handle delivery : {}", e);
+						log.error("Worlflow Detail ==== Error in handle delivery :", e);
 						workflowTaskErrorHandler(body, exectionHistoryId);
 
 					} finally {
@@ -124,7 +123,7 @@ public abstract class WorkflowTaskSubscriberHandler {
 	 * @param body
 	 * @return
 	 */
-	synchronized private int workflowTaskPreProcesser(byte[] body) {
+	private synchronized int workflowTaskPreProcesser(byte[] body) {
 		int exectionHistoryId = -1;
 		try {
 			String message = new String(body, MQMessageConstants.MESSAGE_ENCODING);
@@ -178,7 +177,7 @@ public abstract class WorkflowTaskSubscriberHandler {
 			}
 			// Mq ack message
 		} catch (WorkflowTaskInitializationException wtie) {
-			log.error("Worlflow Detail ==== failed in workflow task post processer due to {}", wtie);
+			log.error("Worlflow Detail ==== failed in workflow task post processer due to ", wtie);
 			workflowStateProcess.updateWorkflowDetails(workflowId,
 					WorkflowTaskEnum.WorkflowStatus.TASK_INITIALIZE_ERROR.toString(), false);
 		} catch (Exception e) {
@@ -205,7 +204,7 @@ public abstract class WorkflowTaskSubscriberHandler {
 			workflowStateProcess.updateWorkflowDetails(workflowId, WorkflowTaskEnum.WorkflowTaskStatus.ERROR.toString(),
 					false);
 		} catch (Exception e) {
-			log.error("Worlflow Detail ====  unable to update history and workflow config {}", e);
+			log.error("Worlflow Detail ====  unable to update history and workflow config", e);
 		}
 
 	}

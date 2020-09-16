@@ -48,18 +48,20 @@ public class MinMaxCategoryImpl extends BaseContentCategoryImpl {
 	public void generateContent() {
 
 		List<InsightsKPIResultDetails> inferenceResults = getKPIExecutionResult();
-
+		InsightsContentDetail contentResult = null;
 		if (!inferenceResults.isEmpty()) {
-			InsightsContentDetail contentResult = getContentFromResult(inferenceResults);
-			log.debug(" contentResultList  + {} ", contentResult);
-			if (contentResult != null) {
-				saveContentResult(contentResult);
-			}
-
+			contentResult = getContentFromResult(inferenceResults);
 		} else {
-			log.debug(" No inference result found ");
+			contentResult = setNeutralContentDetail();
+			log.debug("Worlflow Detail ====   No kpi result found for kpi Id {} ContentId {} ",
+					contentConfigDefinition.getKpiId(), contentConfigDefinition.getContentId());
 		}
-
+		if (contentResult != null) {
+			log.debug("Worlflow Detail ====  contentid {}  kpi {} contentResultText  + {} ",
+					contentConfigDefinition.getCategory(), contentConfigDefinition.getKpiId(),
+					contentResult.getInferenceText());
+			saveContentResult(contentResult);
+		}
 	}
 
 	/**
@@ -101,17 +103,22 @@ public class MinMaxCategoryImpl extends BaseContentCategoryImpl {
 			ReportEngineEnum.KPISentiment sentiment = ReportEngineEnum.KPISentiment.NEUTRAL;
 			InsightsKPIResultDetails resultFirstData = inferenceResults.get(0);
 			addTimeValueinResult(resultValuesMap, contentConfigDefinition.getSchedule());
-			resultValuesMap.put("result", getResultValueForDisplay(minResultObject.getResults().get(comparisonField)));
+			String result = getResultValueForDisplay(minResultObject.getResults().get(comparisonField));
+			resultValuesMap.put("result", result);
 			resultValuesMap.put("minDate", dateOfMinValue);
 
-			inferenceText = getContentText(ReportEngineUtils.STANDARD_MESSAGE_KEY, resultValuesMap);
+			if (result.equalsIgnoreCase("0.0") || result.equalsIgnoreCase("0")) {
+				inferenceText = getContentText(ReportEngineUtils.NEUTRAL_MESSAGE_KEY, resultValuesMap);
+			} else {
+				inferenceText = getContentText(ReportEngineUtils.STANDARD_MESSAGE_KEY, resultValuesMap);
+			}
 
 			if (inferenceText != null) {
 				inferenceContentResult = setContentDetail(resultFirstData, resultValuesMap, sentiment, "",
 						inferenceText);
 
 			} else {
-				log.debug(" inference text is null in category Min-Max KPIId {} contentId {} result {} ",
+				log.debug(" inference text is null in category Min KPIId {} contentId {} result {} ",
 						getContentConfig().getKpiId(), getContentConfig().getContentId(), resultFirstData);
 			}
 		} catch (Exception e) {
@@ -148,17 +155,22 @@ public class MinMaxCategoryImpl extends BaseContentCategoryImpl {
 			ReportEngineEnum.KPISentiment sentiment = ReportEngineEnum.KPISentiment.NEUTRAL;
 			InsightsKPIResultDetails resultFirstData = inferenceResults.get(0);
 			addTimeValueinResult(resultValuesMap, contentConfigDefinition.getSchedule());
-			resultValuesMap.put("result", getResultValueForDisplay(maxResultObject.getResults().get(comparisonField)));
+			String result = getResultValueForDisplay(maxResultObject.getResults().get(comparisonField));
+			resultValuesMap.put("result", result);
 			resultValuesMap.put("maxDate", dateOfMaxValue);
 
-			inferenceText = getContentText(ReportEngineUtils.STANDARD_MESSAGE_KEY, resultValuesMap);
+			if (result.equalsIgnoreCase("0.0") || result.equalsIgnoreCase("0")) {
+				inferenceText = getContentText(ReportEngineUtils.NEUTRAL_MESSAGE_KEY, resultValuesMap);
+			} else {
+				inferenceText = getContentText(ReportEngineUtils.STANDARD_MESSAGE_KEY, resultValuesMap);
+			}
 
 			if (inferenceText != null) {
 				inferenceContentResult = setContentDetail(resultFirstData, resultValuesMap, sentiment, "",
 						inferenceText);
 
 			} else {
-				log.debug(" inference text is null in category Min-Max KPIId {} contentId {} result {} ",
+				log.debug(" inference text is null in category Max KPIId {} contentId {} result {} ",
 						getContentConfig().getKpiId(), getContentConfig().getContentId(), resultFirstData);
 			}
 		} catch (Exception e) {

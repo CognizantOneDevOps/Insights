@@ -34,7 +34,6 @@ public class AssessmentReportContentProcesser {
 	 */
 	public void executeContentData(ContentConfigDefinition inferenceContentConfigDefinition) {
 		try {
-			log.debug(" inferenceContentConfigDefinition {} ", inferenceContentConfigDefinition);
 			BaseContentCategoryImpl baseContentAction;
 			if (inferenceContentConfigDefinition.getCategory() == ReportEngineEnum.ContentCategory.COMPARISON
 					|| inferenceContentConfigDefinition.getCategory() == ReportEngineEnum.ContentCategory.STANDARD) {
@@ -46,6 +45,8 @@ public class AssessmentReportContentProcesser {
 				baseContentAction = new ThresholdRangeCategoryImpl(inferenceContentConfigDefinition);
 			} else if (inferenceContentConfigDefinition.getCategory() == ReportEngineEnum.ContentCategory.MINMAX) {
 				baseContentAction = new MinMaxCategoryImpl(inferenceContentConfigDefinition);
+			} else if (inferenceContentConfigDefinition.getCategory() == ReportEngineEnum.ContentCategory.TREND) {
+				baseContentAction = new TrendCategoryImpl(inferenceContentConfigDefinition);
 			} else {
 				log.error("Worlflow Detail ====  No content category executer defined for contentId {} ",
 						inferenceContentConfigDefinition.getContentId());

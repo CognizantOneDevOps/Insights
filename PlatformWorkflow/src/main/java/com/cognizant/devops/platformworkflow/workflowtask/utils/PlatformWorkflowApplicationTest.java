@@ -27,6 +27,7 @@ import org.quartz.impl.StdSchedulerFactory;
 import com.cognizant.devops.platformcommons.config.ApplicationConfigCache;
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformworkflow.workflowtask.core.WorkflowExecutor;
+import com.cognizant.devops.platformworkflow.workflowtask.core.WorkflowImmediateJobExecutor;
 import com.cognizant.devops.platformworkflow.workflowtask.core.WorkflowRetryExecutor;
 import com.cognizant.devops.platformworkflow.workflowtask.core.WorkflowTaskInitializer;
 import com.cognizant.devops.platformworkflow.workflowthread.core.WorkflowThreadPool;
@@ -75,9 +76,17 @@ public class PlatformWorkflowApplicationTest {
 			Trigger triggeWorkflowRetry = TriggerBuilder.newTrigger()
 					.withIdentity("WorkflowRetryExecutortrigger", "Workflow").startNow().build();
 
+			JobDetail jobImmediateWorkflow = JobBuilder.newJob(WorkflowImmediateJobExecutor.class)
+					.withIdentity("WorkflowImmediateJobExecutorTest", "Workflow").build();
+
+			Trigger triggeImmediateWorkflow = TriggerBuilder.newTrigger()
+					.withIdentity("WorkflowImmediateJobExecutortriggerTEst", "Workflow").startNow()
+					.build();
+
 			scheduler.start();
 			scheduler.scheduleJob(jobWorkflow, triggerWorkflow);
 			scheduler.scheduleJob(jobWorkflowRetry, triggeWorkflowRetry);
+			scheduler.scheduleJob(jobImmediateWorkflow, triggeImmediateWorkflow);
 
 		} catch (Exception e) {
 			log.error("Exception in TriggerBuilder ", e);

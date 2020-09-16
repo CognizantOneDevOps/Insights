@@ -4,6 +4,7 @@
    "description":"Testing",
    "isActive":true,
    "file":"REPORT_DEMO",
+   "visualizationutil":"Fusion",
    "kpiConfigs":[
       {
          "kpiId":901,

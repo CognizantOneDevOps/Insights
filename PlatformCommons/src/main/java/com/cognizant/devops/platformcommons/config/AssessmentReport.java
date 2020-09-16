@@ -28,7 +28,6 @@ public class AssessmentReport implements Serializable{
 	
 	private String outputDatasource = "NEO4J";
 	private int maxWorkflowRetries = 5;
-	private String chartVendor="Fusion";
 	private String fusionExportAPIUrl = "http://localhost:1337/api/v2.0/export";
 
 	public String getOutputDatasource() {
@@ -45,14 +44,6 @@ public class AssessmentReport implements Serializable{
 
 	public void setMaxWorkflowRetries(int maxWorkflowRetries) {
 		this.maxWorkflowRetries = maxWorkflowRetries;
-	}
-
-	public String getChartVendor() {
-		return chartVendor;
-	}
-
-	public void setChartVendor(String chartVendor) {
-		this.chartVendor = chartVendor;
 	}
 
 	public String getFusionExportAPIUrl() {

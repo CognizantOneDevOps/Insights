@@ -4,6 +4,7 @@
    "description":"KPIs related to Jenkins.",
    "isActive":true,
    "file":"REPORT_JENKINS",
+   "visualizationutil":"Fusion",
    "kpiConfigs":[
       {
          "kpiId":112,

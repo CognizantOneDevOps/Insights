@@ -52,9 +52,22 @@
                     delete
                 </mat-icon>
             </button>
+
+            <button mat-icon-button (click)="startImmediate()" [disabled]="disableStartImmediate">
+                <mat-icon title="Activate report and run immediately" class="mat-icon material-icons ">
+                    play_circle_filled
+                </mat-icon>
+            </button>
+
             <button mat-icon-button (click)="retry()" [disabled]="disableRetry">
                 <mat-icon title="Restart" class="mat-icon material-icons">
                     refresh
+                </mat-icon>
+            </button>
+
+            <button mat-icon-button (click)="validationForPDF()" [disabled]="disableDownload">
+                <mat-icon title="Download PDF" class="mat-icon material-icons">
+                    get_app
                 </mat-icon>
             </button>
 
@@ -70,13 +83,17 @@
                 <table mat-table [dataSource]="userDataSource" multiTemplateDataRows matSort>
                     <!-- Radio Button Column -->
                     <ng-container matColumnDef="select">
-                        <th mat-header-cell *matHeaderCellDef class="tableHeaderCss" style="width:7% !important;padding-left: 14px !important"></th>
-                        <td mat-cell *matCellDef="let element;let i = dataIndex" style="margin-left:5%;width:7% !important">
-                            <mat-radio-button style="margin-left: 5px" [value]="element" color="primary" (change)="radioChange($event,i);"></mat-radio-button>
+                        <th mat-header-cell *matHeaderCellDef class="tableHeaderCss"
+                            style="width:7% !important;padding-left: 14px !important"></th>
+                        <td mat-cell *matCellDef="let element;let i = dataIndex"
+                            style="margin-left:5%;width:7% !important">
+                            <mat-radio-button style="margin-left: 5px" [value]="element" color="primary"
+                                (change)="radioChange($event,i);"></mat-radio-button>
                         </td>
                     </ng-container>
                     <ng-container matColumnDef="reportName">
-                        <th mat-header-cell *matHeaderCellDef class="tableHeaderCss" style="width:20% !important;">Report
+                        <th mat-header-cell *matHeaderCellDef class="tableHeaderCss" style="width:20% !important;">
+                            Report
                             Name</th>
 
                         <td mat-cell *matCellDef="let element" style="width:20% !important"> {{element.reportName}}
@@ -85,7 +102,8 @@
 
 
                     <ng-container matColumnDef="schedule">
-                        <th mat-header-cell *matHeaderCellDef class="tableHeaderCss" style="width:13% !important;padding-left:15px">Schedule</th>
+                        <th mat-header-cell *matHeaderCellDef class="tableHeaderCss"
+                            style="width:13% !important;padding-left:15px">Schedule</th>
 
                         <td mat-cell *matCellDef="let element" style="width:13% !important;padding-left:15px">
                             {{element.schedule}} </td>
@@ -95,38 +113,47 @@
 
 
                     <ng-container matColumnDef="lastRun">
-                        <th mat-header-cell *matHeaderCellDef class="tableHeaderCss" style="padding-left: 24px !important;width:20% !important;">Last
+                        <th mat-header-cell *matHeaderCellDef class="tableHeaderCss"
+                            style="padding-left: 24px !important;width:20% !important;">Last
                             Run
                             ({{timeZone}})</th>
 
-                        <td mat-cell *matCellDef="let element" style="width:20% !important;margin-left: 50%;text-align: center">
+                        <td mat-cell *matCellDef="let element"
+                            style="width:20% !important;margin-left: 50%;text-align: center">
                             {{element.lastRun}} </td>
                     </ng-container>
 
                     <ng-container matColumnDef="nextRun">
-                        <th mat-header-cell *matHeaderCellDef class="tableHeaderCss" style="padding-left: 24px !important;width:20% !important;">Next
+                        <th mat-header-cell *matHeaderCellDef class="tableHeaderCss"
+                            style="padding-left: 24px !important;width:20% !important;">Next
                             Run
                             ({{timeZone}})</th>
 
-                        <td mat-cell *matCellDef="let element" style="width:20% !important;margin-left: 50%;text-align: center">
+                        <td mat-cell *matCellDef="let element"
+                            style="width:20% !important;margin-left: 50%;text-align: center">
                             {{element.nextRun}} </td>
                     </ng-container>
 
 
                     <ng-container matColumnDef="status">
-                        <th mat-header-cell *matHeaderCellDef class="tableHeaderCss" style="padding-left: 8px !important;width:13% !important">Status</th>
+                        <th mat-header-cell *matHeaderCellDef class="tableHeaderCss"
+                            style="padding-left: 8px !important;width:13% !important">Status</th>
 
-                        <td mat-cell *matCellDef="let element" style="padding-left: 8px !important;width:13% !important">
+                        <td mat-cell *matCellDef="let element"
+                            style="padding-left: 8px !important;width:13% !important">
                             {{element.status}} </td>
                     </ng-container>
 
 
                     <ng-container matColumnDef="active">
-                        <th mat-header-cell *matHeaderCellDef class="tableHeaderCss" style="padding-left: 12px !important;">Active</th>
+                        <th mat-header-cell *matHeaderCellDef class="tableHeaderCss"
+                            style="padding-left: 12px !important;">Active</th>
 
-                        <td mat-cell *matCellDef="let element;let i=dataIndex" style="width:12% !important;padding-left: 12px !important;">
-                            <mat-slide-toggle (change)="updateStatus($event,element.configId,element)" [(ngModel)]="element.isActive"
-                                [checked]="isActive" [disabled]="clicked[i]" [matTooltip]="element.isActive?'Active':'Inactive'">
+                        <td mat-cell *matCellDef="let element;let i=dataIndex"
+                            style="width:12% !important;padding-left: 12px !important;">
+                            <mat-slide-toggle (change)="updateStatus($event,element.configId,element)"
+                                [(ngModel)]="element.isActive" [checked]="isActive" [disabled]="clicked[i]"
+                                [matTooltip]="element.isActive?'Active':'Inactive'">
                             </mat-slide-toggle>
                         </td>
                     </ng-container>
@@ -136,7 +163,8 @@
 
                         <td mat-cell *matCellDef="let element" style="width:15% !important;text-align: center">
                             <a (click)="showWorkflowHistoryDetailsDialog(element.reportName,element.configId)">
-                                <mat-icon svgIcon="healthcheck_show_details" [ngStyle]="{color:'#5C068C', height: '20px', width: '20px'}">
+                                <mat-icon svgIcon="healthcheck_show_details"
+                                    [ngStyle]="{color:'#5C068C', height: '20px', width: '20px'}">
                                 </mat-icon>
                             </a>
                         </td>
@@ -148,6 +176,6 @@
             </mat-radio-group>
         </div>
     </div>
-    <mat-paginator [style.height.%]="4" #paginator pageSize="10" *ngIf="showPagination" showFirstLastButtons class="paginationStyle"
-        (click)="Refresh()">
+    <mat-paginator [style.height.%]="4" #paginator pageSize="10" *ngIf="showPagination" showFirstLastButtons
+        class="paginationStyle" (click)="Refresh()">
     </mat-paginator>

@@ -4,6 +4,7 @@
    "description":"KPIS only for Productivity",
    "isActive":true,
    "file":"REPORT_PRODUCTIVITY",
+   "visualizationutil":"Fusion",
    "kpiConfigs":[
       {
          "kpiId":252,

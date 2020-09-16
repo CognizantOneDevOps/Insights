@@ -4,6 +4,7 @@
    "description":"Report template having all categories",
    "isActive":true,
    "file":"REPORT_ALL_CAT",
+   "visualizationutil":"Fusion",
    "kpiConfigs":[
       {
          "kpiId":2101,
@@ -37,7 +38,7 @@
          "visualizationConfigs":[
             {
                "vType":"mscolumn2d_2104",
-               "vQuery":"MATCH (n:KPI:RESULTS) where n.assessmentId = {assessmentId} and n.kpiId={kpiId} RETURN  apoc.date.format( n.recordDate ,'s','MM/dd','IST') as Date , n.Bugs as Bugs,n.Vulnerablilities as Vulnerablilities,n.CodeSmell as CodeSmell ORDER BY n.executionId DESC limit 2"
+               "vQuery":"MATCH (n:KPI:RESULTS) where n.assessmentId = {assessmentId} and n.executionId = {executionId} and n.kpiId={kpiId} RETURN  apoc.date.format( n.recordDate ,'s','MM/dd','IST') as Date , n.Bugs as Bugs,n.Vulnerablilities as Vulnerablilities,n.CodeSmell as CodeSmell ORDER BY n.executionId ASC limit 2"
             }
          ]
       },
@@ -46,7 +47,16 @@
          "visualizationConfigs":[
             {
                "vType":"msline_2105",
-               "vQuery":"MATCH (n:KPI:RESULTS) where n.assessmentId = {assessmentId} and n.executionId = {executionId} and n.kpiId={kpiId} RETURN   apoc.date.format( n.recordDate ,'s','MM/dd','IST') as Date , n.Failure as Failure, n.Success as Success ORDER BY Date DESC"
+               "vQuery":"MATCH (n:KPI:RESULTS) where n.assessmentId = {assessmentId} and n.executionId = {executionId} and n.kpiId={kpiId} RETURN   apoc.date.format( n.recordDate ,'s','MM/dd','IST') as Date , n.Failure as Failure, n.Success as Success ORDER BY Date ASC"
+            }
+         ]
+      },
+	  {
+         "kpiId":2109,
+         "visualizationConfigs":[
+            {
+               "vType":"msbar2d_2109",
+               "vQuery":"MATCH (n:KPI:RESULTS) where n.assessmentId = {assessmentId} and n.executionId = {executionId} and n.kpiId={kpiId} RETURN   apoc.date.format( n.recordDate ,'s','MM/dd','IST') as Date , n.Failure as Failure, n.Success as Success ORDER BY Date ASC"
             }
          ]
       },

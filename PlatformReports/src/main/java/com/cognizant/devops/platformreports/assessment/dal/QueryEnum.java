@@ -32,7 +32,7 @@ public enum QueryEnum {
 			+ ReportEngineUtils.NEO4J_RESULT_LABEL
 			+ ") where s.executionId <> latestexecutionId with max(s.executionId) as secondlastexecutionId,latestexecutionId "
 			+ "Match (b:" + ReportEngineUtils.NEO4J_RESULT_LABEL
-					+ ") where b.executionId in [latestexecutionId,secondlastexecutionId] and b.kpiId =:kpiId and b.assessmentId =:assessmentId "
+					+ ") where b.executionId in [latestexecutionId,secondlastexecutionId] and b.kpiId =:kpiId "
 			+ " return b order by b.executionId desc"),
 	NEO4J_THRESHOLD(
 			"Match (b:" + ReportEngineUtils.NEO4J_RESULT_LABEL
@@ -44,21 +44,33 @@ public enum QueryEnum {
 			"Match (b:" + ReportEngineUtils.NEO4J_RESULT_LABEL
 					+ ") Where b.kpiId= :kpiId and b.executionId = :executionId and b.assessmentId =:assessmentId  RETURN b order by b.executionId desc "),
 	
-	//return b.text 
+	NEO4J_TREND(
+			"Match (b:" + ReportEngineUtils.NEO4J_RESULT_LABEL
+					+ ") Where b.kpiId=:kpiId and b.executionId = :executionId and b.assessmentId =:assessmentId RETURN b order by b.executionId desc "),
+
 	NEO4J_VCONTENTQUERY("Match (b:" + ReportEngineUtils.NEO4J_CONTENT_RESULT_LABEL
 					+ ") Where b.kpiId= :kpiId and b.executionId = :executionId RETURN b.inferenceText as Text ,b.contentId as contentId"),
+
 	ES_STANDARD(
 			" {\"size\": 400,\"sort\": [{ \"executionId\": \"desc\" }],\"query\": {\"bool\":{ \"must\":[{ \"match\":{ \"kpiId\":%kpiId% } },{ \"match\":{ \"executionId\":%executionId% } } ]}}}"),
+
 	ES_COMPARISON(
 			"{\"size\": 2,\"sort\": [{ \"executionId\": \"desc\" }],\"query\": {\"bool\":{ \"must\":[{ \"match\":{ \"kpiId\":%kpiId% } } ]}}}"),
+
 	ES_THRESHOLD(
 			" {\"size\": 400,\"sort\": [{ \"executionId\": \"desc\" }],\"query\": {\"bool\":{ \"must\":[{ \"match\":{ \"kpiId\":%kpiId% } },{ \"match\":{ \"executionId\":%executionId% } } ]}}}"),
+
 	ES_THRESHOLD_RANGE(
 			" {\"size\": 400,\"sort\": [{ \"executionId\": \"desc\" }],\"query\": {\"bool\":{ \"must\":[{ \"match\":{ \"kpiId\":%kpiId% } },{ \"match\":{ \"executionId\":%executionId% } } ]}}}"),
+
 	ES_MINMAX(
 			" {\"size\": 400,\"sort\": [{ \"executionId\": \"desc\" }],\"query\": {\"bool\":{ \"must\":[{ \"match\":{ \"kpiId\":%kpiId% } },{ \"match\":{ \"executionId\":%executionId% } } ]}}}"),
 	
-	ES_VCONTENTQUERY("{\"size\": 400,\"sort\": [{ \"executionId\": \"desc\" }],\"query\": {\"bool\":{ \"must\":[{ \"match\":{ \"kpiId\":%kpiId% } },{ \"match\":{ \"executionId\":%executionId% } } ]}}}");
+	ES_VCONTENTQUERY(
+			"{\"size\": 400,\"sort\": [{ \"executionId\": \"desc\" }],\"query\": {\"bool\":{ \"must\":[{ \"match\":{ \"kpiId\":%kpiId% } },{ \"match\":{ \"executionId\":%executionId% } } ]}}}"),
+
+	ES_TREND(
+			" {\"size\": 400,\"sort\": [{ \"executionId\": \"desc\" }],\"query\": {\"bool\":{ \"must\":[{ \"match\":{ \"kpiId\":%kpiId% } },{ \"match\":{ \"executionId\":%executionId% } } ]}}}");
 	
 	private String value;
 

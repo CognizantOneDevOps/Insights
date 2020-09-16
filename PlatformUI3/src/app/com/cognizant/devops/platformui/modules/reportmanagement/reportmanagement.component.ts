@@ -29,6 +29,7 @@ import { Router, NavigationExtras } from '@angular/router';
 import { DataSharedService } from '@insights/common/data-shared-service';
 import { ReportManagementService } from '@insights/app/modules/reportmanagement/reportmanagement.service';
 import { WorkflowHistoryDetailsDialog } from '@insights/app/modules/reportmanagement/workflow-history-details/workflow-history-details-dialog';
+import { saveAs as importedSaveAs } from "file-saver";
 
 @Component({
   selector: 'app-reportmanagement',
@@ -39,6 +40,7 @@ export class ReportManagementComponent implements OnInit {
   timeZone: string = '';
   enableRefresh: boolean = true;
   disableRetry: boolean = true;
+  disableStartImmediate: boolean = true;
   configParams: string;
   selectedReport: any;
   CheckboxVar: boolean;
@@ -60,8 +62,11 @@ export class ReportManagementComponent implements OnInit {
   clicked = new Array();
   disableDelete: boolean = true;
   disableEdit: boolean = true;
+  disableDownload: boolean = true;
+  executionRecords: any;
   previousActiveIndex = -1;
   pageRefreshed: boolean = false;
+  reportdisplayName
 
   constructor(
     private dialog: MatDialog,
@@ -102,11 +107,7 @@ export class ReportManagementComponent implements OnInit {
           } else {
             obj['lastRun'] = obj['lastRun'] * 1000;
             this.dateObj = new Date(obj['lastRun']);
-            this.dateObjFormatted = this.datePipe.transform(
-              this.dateObj,
-              'yyyy-MM-dd HH:mm:ss'
-            );
-            obj['lastRun'] = this.dateObjFormatted;
+            obj['lastRun'] = this.dataShare.convertDateToSpecificDateFormat(this.dateObj, "yyyy-MM-dd HH:mm:ss");
           }
         }
         if (typeof obj['nextRun'] !== 'undefined') {
@@ -115,11 +116,7 @@ export class ReportManagementComponent implements OnInit {
           } else {
             obj['nextRun'] = obj['nextRun'] * 1000;
             this.dateObj = new Date(obj['nextRun']);
-            this.dateObjFormatted = this.datePipe.transform(
-              this.dateObj,
-              'yyyy-MM-dd HH:mm:ss'
-            );
-            obj['nextRun'] = this.dateObjFormatted;
+            obj['nextRun'] = this.dataShare.convertDateToSpecificDateFormat(this.dateObj, "yyyy-MM-dd HH:mm:ss");
           }
         }
         this.detailedRecords.push(obj);
@@ -157,7 +154,7 @@ export class ReportManagementComponent implements OnInit {
         setStatusRequestJson['isActive'] = event.checked;
         this.reportmanagementService
           .setActiveStatus(JSON.stringify(setStatusRequestJson))
-          .then(function(data) {
+          .then(function (data) {
             if (data.status == 'success') {
               console.log('status changed');
             } else {
@@ -182,6 +179,8 @@ export class ReportManagementComponent implements OnInit {
     this.pageRefreshed = true;
     this.disableDelete = true;
     this.disableEdit = true;
+    this.disableStartImmediate = true;
+    this.list()
   }
 
   ngOnInit() {
@@ -240,15 +239,14 @@ export class ReportManagementComponent implements OnInit {
       if (result == 'yes') {
         self.reportmanagementService
           .deleteAssesmentReport(self.selectedReport.configId)
-          .then(function(data) {
+          .then(function (data) {
             if (data.status == 'success') {
               self.messageDialog.showApplicationsMessage(
                 '<b>' +
-                  self.selectedReport.reportName +
-                  '</b> deleted successfully.',
+                self.selectedReport.reportName +
+                '</b> deleted successfully.',
                 'SUCCESS'
               );
-              self.list();
               self.Refresh();
             } else if (data.message == 'Executions found in history') {
               self.messageDialog.showApplicationsMessage(
@@ -262,7 +260,7 @@ export class ReportManagementComponent implements OnInit {
               );
             }
           })
-          .catch(function(data) {});
+          .catch(function (data) { });
       }
     });
   }
@@ -302,6 +300,7 @@ export class ReportManagementComponent implements OnInit {
   radioChange(event: MatRadioChange, index) {
     this.disableDelete = false;
     this.disableEdit = false;
+    this.disableStartImmediate = false;
     if (this.previousActiveIndex == -1) {
       this.clicked[index] = false;
       this.previousActiveIndex = index;
@@ -318,25 +317,126 @@ export class ReportManagementComponent implements OnInit {
     } else {
       this.disableRetry = true;
     }
+    if (event.value.status == 'NOT_STARTED' || event.value.status == 'RESTART') {
+      this.disableStartImmediate = false;
+    } else {
+      this.disableStartImmediate = true;
+    }
+    if (event.value.status == 'NOT_STARTED') {
+      this.disableDownload = true;
+    } else {
+      this.disableDownload = false;
+    }
   }
 
   retry() {
+    var statusRequestJson = {};
+    statusRequestJson['configId'] = this.selectedReport.configId;
+    statusRequestJson['status'] = "RESTART";
+    var message = 'Status has been updated to RESTART.';
+    this.updateReportStatus(statusRequestJson, message);
+  }
+
+  startImmediate() {
+    var statusRequestJson = {};
+    console.log("runimmediate for " + this.selectedReport.reportName + "   " + this.selectedReport.runimmediate)
+    if (!this.selectedReport.runimmediate) {
+      statusRequestJson['configId'] = this.selectedReport.configId;
+      //statusRequestJson['status'] = this.selectedReport.status;
+      statusRequestJson['runimmediate'] = true;
+      var message = 'Report has been scheduled successfully. Execution will be started within 5 min.'; //to
+      var title = 'Start Report Execution';
+      var dialogmessage = 'Do you want to execute <b>' + this.selectedReport.reportName + '</b> immediately ? ';
+      const dialogRefStatus = this.messageDialog.showConfirmationMessage(
+        title, dialogmessage, this.selectedReport.reportName, 'ALERT', '40%'
+      );
+      dialogRefStatus.afterClosed().subscribe(result => {
+        if (result == 'yes') {
+          this.updateReportStatus(statusRequestJson, message);
+        }
+      });
+    } else {
+      this.messageDialog.showApplicationsMessage(
+        'Report already scheduled to run immediately',
+        'WARN'
+      );
+    }
+
+  }
+
+  private updateReportStatus(statusRequestJson: {}, message: string) {
     var self = this;
-    this.reportmanagementService
-      .setRetryStatus(this.selectedReport.configId)
-      .then(function(data) {
+    this.reportmanagementService.setRetryStatus(JSON.stringify(statusRequestJson))
+      .then(function (data) {
         if (data.status == 'success') {
-          self.messageDialog.showApplicationsMessage(
-            'Status has been updated to RESTART.',
-            'SUCCESS'
-          );
+          self.messageDialog.showApplicationsMessage(message, 'SUCCESS');
           self.list();
-        } else {
-          self.messageDialog.showApplicationsMessage(
-            'Failed to update the state.Please check logs for more details.',
-            'ERROR'
-          );
+        }
+        else {
+          self.messageDialog.showApplicationsMessage('Failed to update the report state.Please check logs for more details String.', 'ERROR');
         }
       });
   }
+
+  async validationForPDF() {
+    var self = this;
+    var configIdJson = {};
+    configIdJson["configid"] = self.selectedReport.configId;
+    self.executionRecords = await self.reportmanagementService.getPDFExecutionId(
+      JSON.stringify(configIdJson)
+    );
+    if (self.executionRecords != null && self.executionRecords.status == "success") {
+      let executionRecordsData = self.executionRecords.data;
+      if (executionRecordsData.length == 0) {
+      } else {
+        let status = executionRecordsData.status;
+        let executionid = executionRecordsData.executionId;
+        let workflowid = executionRecordsData.workflowId;
+        if (!status) {
+          if (executionid == -1) {
+            self.messageDialog.showApplicationsMessage('No PDF found.', 'ERROR');
+          } else {
+            var title = 'Download PDF';
+            var dialogmessage =
+              'Current report generation is in <b>'+ this.selectedReport.status+'</b> state. Do you want to download last generated report?';
+            const dialogRef = self.messageDialog.showConfirmationMessage(
+              title,
+              dialogmessage,
+              this.selectedReport.reportName,
+              'ALERT',
+              '30%'
+            );
+            dialogRef.afterClosed().subscribe(result => {
+              if (result == 'yes') {
+                self.downloadPDF(executionid, workflowid);
+              } else {
+
+              }
+            });
+          }
+        }
+        else {
+          self.downloadPDF(executionid, workflowid);
+        }
+      }
+    }
+
+  }
+
+  downloadPDF(executionid, workflowid) {
+    var PDFRequestJson = {};
+    var pdfFileName = this.selectedReport.reportName + '.pdf';
+    PDFRequestJson['pdfName'] = this.selectedReport.reportName;
+    PDFRequestJson['executionId'] = executionid;
+    PDFRequestJson['workflowId'] = workflowid;
+    this.reportmanagementService.downloadPDF(JSON.stringify(PDFRequestJson))
+      .then(function (data) {
+        importedSaveAs(data, pdfFileName);
+      });
+
+  }
+
+
 }
+
+

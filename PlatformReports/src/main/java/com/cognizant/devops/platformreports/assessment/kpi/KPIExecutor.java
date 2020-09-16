@@ -49,45 +49,41 @@ public class KPIExecutor implements Callable<JsonObject> {
 	public JsonObject call() throws Exception {
 		JsonObject response = new JsonObject();
 		JsonArray failedjobs = new JsonArray();
-		int kpiId =ReportEngineEnum.StatusCode.ERROR.getValue();
-		
+		int kpiId = ReportEngineEnum.StatusCode.ERROR.getValue();
+
 		try {
 			kpiId = executeKPIJob(_kpiConfigDTO);
-			} catch (InsightsJobFailedException e) {
-			response.addProperty("Status", "Failure");			
+		} catch (InsightsJobFailedException e) {
+			response.addProperty("Status", "Failure");
 			failedjobs.add(_kpiConfigDTO.getKpiId());
 			response.add("kpiArray", failedjobs);
 		}
-		if(kpiId ==ReportEngineEnum.StatusCode.NO_DATA.getValue())
-		{
-			response.addProperty("Status", "Failure");			
+		/*if (kpiId == ReportEngineEnum.StatusCode.NO_DATA.getValue()) {
+			response.addProperty("Status", "Failure");
 			failedjobs.add(_kpiConfigDTO.getKpiId());
 			response.add("kpiArray", failedjobs);
-			
+		
 			return response;
-			
-		}else if (kpiId !=ReportEngineEnum.StatusCode.ERROR.getValue()) {			
+		
+		} else*/ if (kpiId != ReportEngineEnum.StatusCode.ERROR.getValue()) {
 			ReportConfigDAL reportConfigAL = new ReportConfigDAL();
 			List<InsightsContentConfig> contentConfigList = reportConfigAL
 					.getActiveContentConfigByKPIId(_kpiConfigDTO.getKpiId());
 			if (!contentConfigList.isEmpty()) {
 				/* Execute content on the same thread */
 				failedjobs = ContentExecutor.executeContentJob(contentConfigList, _kpiConfigDTO);
-				
-				
+
 			}
 			/* If none of the kpi or content is failed then simply return Status as success */
 			if (failedjobs.size() > 0) {
 				response.addProperty("Status", "Failure");
 				response.add("contentArray", failedjobs);
+			} else {
+				response.addProperty("Status", "Success");
 			}
-			else
-			{
-			response.addProperty("Status", "Success");
-			}
-			
+
 		}
-		
+
 		return response;
 	}
 

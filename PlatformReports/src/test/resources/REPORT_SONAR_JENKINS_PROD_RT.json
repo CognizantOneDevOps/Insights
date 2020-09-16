@@ -4,6 +4,7 @@
    "description":"Testing",
    "isActive":true,
    "file":"REPORT_SONAR_JENKINS_PROD",
+   "visualizationutil":"Fusion",
    "kpiConfigs":[
       {
          "kpiId":100252,
@@ -56,6 +57,60 @@
             {
                "vType":"pie2d_100903",
                "vQuery":"MATCH (n:KPI:RESULTS) where n.assessmentId = {assessmentId} and n.executionId = {executionId} and n.kpiId={kpiId} with MAX(n.executionId) as latestExecutionId MATCH (n:KPI:RESULTS) where n.executionId=latestExecutionId and n.kpiId=100903 and n.StoryTypes in ['PaymentServices','MobileServices','ClaimFinder','AgentLocator'] with n return distinct n.StoryTypes as StoryTypes ,toInt(ROUND(Avg(n.Duration))) as Duration"
+            }
+         ]
+      },
+	  {
+         "kpiId":102109,
+         "visualizationConfigs":[
+            {
+               "vType":"msbar2d_102109",
+               "vQuery":"MATCH (n:KPI:RESULTS) where n.assessmentId = {assessmentId} and n.executionId = {executionId} and n.kpiId={kpiId} RETURN   apoc.date.format( n.recordDate ,'s','MM/dd','IST') as Date , n.Failure as Failure, n.Success as Success ORDER BY Date DESC"
+            }
+         ]
+      },
+      {
+         "kpiId":112101,
+         "visualizationConfigs":[
+            {
+               "vType":"table_2101",
+               "vQuery":"MATCH (n:KPI:RESULTS)  where n.assessmentId = {assessmentId} and n.executionId = {executionId} and n.kpiId={kpiId} RETURN  n.Type as `Type`, sum(n.Count) as Count"
+            }
+         ]
+      },
+      {
+         "kpiId":112102,
+         "visualizationConfigs":[
+            {
+               "vType":"pie2d_2102",
+               "vQuery":"MATCH (n:KPI:RESULTS)  where n.assessmentId = {assessmentId} and n.executionId = {executionId} and n.kpiId={kpiId}  RETURN distinct n.StoryTypes as StoryTypes ,toInt(ROUND(Avg(n.Duration))) as Duration"
+            }
+         ]
+      },
+      {
+         "kpiId":112103,
+         "visualizationConfigs":[
+            {
+               "vType":"mscolumn2d_2103",
+               "vQuery":"MATCH (n:KPI:RESULTS)  where n.assessmentId = {assessmentId} and n.executionId = {executionId} and n.kpiId={kpiId}  RETURN  apoc.date.format( n.recordDate ,'s','MM/dd','IST') as Date, n.Productivity as Productivity ORDER BY Date DESC"
+            }
+         ]
+      },
+      {
+         "kpiId":112104,
+         "visualizationConfigs":[
+            {
+               "vType":"mscolumn2d_2104",
+               "vQuery":"MATCH (n:KPI:RESULTS) where n.assessmentId = {assessmentId} and n.executionId = {executionId} and n.kpiId={kpiId} RETURN  apoc.date.format( n.recordDate ,'s','MM/dd','IST') as Date , n.Bugs as Bugs,n.Vulnerablilities as Vulnerablilities,n.CodeSmell as CodeSmell ORDER BY n.executionId ASC limit 2"
+            }
+         ]
+      },
+      {
+         "kpiId":112105,
+         "visualizationConfigs":[
+            {
+               "vType":"msline_2105",
+               "vQuery":"MATCH (n:KPI:RESULTS) where n.assessmentId = {assessmentId} and n.executionId = {executionId} and n.kpiId={kpiId} RETURN   apoc.date.format( n.recordDate ,'s','MM/dd','IST') as Date , n.Failure as Failure, n.Success as Success ORDER BY Date ASC"
             }
          ]
       }

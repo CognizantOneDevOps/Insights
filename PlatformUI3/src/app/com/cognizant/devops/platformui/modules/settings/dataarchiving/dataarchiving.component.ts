@@ -170,20 +170,14 @@ export class DataArchivingComponent implements OnInit {
           this.dateObj = new Date(
             this.archivalDatasource.data[this.count].expiryDate * 1000
           );
-          this.dateObjFormatted = this.datepipe.transform(
-            this.dateObj,
-            'yyyy-MM-dd HH:mm:ss'
-          );
+          this.dateObjFormatted = this.dataShare.convertDateToSpecificDateFormat(this.dateObj, "yyyy-MM-dd HH:mm:ss");
           this.archivalDatasource.data[
             this.count
           ].expiryDate = this.dateObjFormatted;
           this.dateObj = new Date(
             this.archivalDatasource.data[this.count].createdOn * 1000
           );
-          this.dateObjFormatted = this.datepipe.transform(
-            this.dateObj,
-            'yyyy-MM-dd HH:mm:ss'
-          );
+          this.dateObjFormatted = this.dataShare.convertDateToSpecificDateFormat(this.dateObj, "yyyy-MM-dd HH:mm:ss");
           this.archivalDatasource.data[
             this.count
           ].createdOn = this.dateObjFormatted;
@@ -282,12 +276,12 @@ export class DataArchivingComponent implements OnInit {
         if (result == 'yes') {
           this.dataArchivingService
             .saveArchivalRecord(JSON.stringify(archiveAPIRequestJson))
-            .then(function(response) {
+            .then(function (response) {
               if (response.status == 'success') {
                 self.messageDialog.showApplicationsMessage(
                   '<b>' +
-                    self.archivalName +
-                    '</b> saved successfully. Data is being provisoned, Please revist this screen after sometime.',
+                  self.archivalName +
+                  '</b> saved successfully. Data is being provisioned, Please revisit this screen after sometime.',
                   'SUCCESS'
                 );
                 self.getExistingArchivedData();
@@ -296,8 +290,8 @@ export class DataArchivingComponent implements OnInit {
               } else if (response.message === 'Archival Name already exists.') {
                 self.messageDialog.showApplicationsMessage(
                   '<b>' +
-                    self.archivalName +
-                    '</b> already exists. Please try again with a new name.',
+                  self.archivalName +
+                  '</b> already exists. Please try again with a new name.',
                   'ERROR'
                 );
               } else if (response.message === 'Data Archival agent not present.') {
@@ -343,19 +337,19 @@ export class DataArchivingComponent implements OnInit {
         if (result == 'yes') {
           this.dataArchivingService
             .deleteArchivedData(self.selectedArchivedData.archivalName)
-            .then(function(data) {
+            .then(function (data) {
               if (data.status == 'success') {
                 self.messageDialog.showApplicationsMessage(
                   '<b>' +
-                    self.selectedArchivedData.archivalName +
-                    '</b> deleted successfully.',
+                  self.selectedArchivedData.archivalName +
+                  '</b> deleted successfully.',
                   'SUCCESS'
                 );
                 self.getExistingArchivedData();
                 self.refresh();
               }
             })
-            .catch(function(data) {
+            .catch(function (data) {
               self.showConfirmMessage = 'service_error';
               self.getExistingArchivedData();
             });
@@ -388,18 +382,12 @@ export class DataArchivingComponent implements OnInit {
 
   getstartDate(type: string, event: MatDatepickerInputEvent<Date>) {
     this.startDateInput = new Date(event.value);
-    this.startDate = this.datepipe.transform(
-      this.startDateInput,
-      "yyyy-MM-dd'T'HH:mm:ss'Z'"
-    );
+    this.startDate = this.dataShare.convertDateToSpecificDateFormat(this.startDateInput, "yyyy-MM-dd'T'HH:mm:ss'Z'");
   }
 
   getendDate(type: string, event: MatDatepickerInputEvent<Date>) {
     this.endDateInput = new Date(event.value);
-    this.endDate = this.datepipe.transform(
-      this.endDateInput,
-      "yyyy-MM-dd'T'HH:mm:ss'Z'"
-    );
+    this.endDate = this.dataShare.convertDateToSpecificDateFormat(this.endDateInput, "yyyy-MM-dd'T'HH:mm:ss'Z'");
   }
 
   updateStatus(event: MatSlideToggleChange, selectedArchivedData) {
@@ -422,7 +410,7 @@ export class DataArchivingComponent implements OnInit {
         if (result == 'yes') {
           this.dataArchivingService
             .activateArchivedData(selectedArchivedData.archivalName)
-            .then(function(data) {
+            .then(function (data) {
               if (data.status == 'success') {
                 self.messageDialog.showApplicationsMessage(
                   'Container activated successfully.',
@@ -460,7 +448,7 @@ export class DataArchivingComponent implements OnInit {
         if (result == 'yes') {
           this.dataArchivingService
             .inactivateArchivedData(selectedArchivedData.archivalName)
-            .then(function(data) {
+            .then(function (data) {
               if (data.status == 'success') {
                 self.messageDialog.showApplicationsMessage(
                   'Container inactivated successfully.',
