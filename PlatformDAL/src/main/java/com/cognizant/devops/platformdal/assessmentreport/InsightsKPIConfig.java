@@ -41,7 +41,7 @@ public class InsightsKPIConfig implements Serializable{
 	private int id;
 
 	@Column(name = "kpiId", unique = true, nullable = false)
-	private int kpiId;
+	private Integer kpiId;
 	
 	@Column(name = "name")
 	private String kpiName;
@@ -65,7 +65,7 @@ public class InsightsKPIConfig implements Serializable{
 	private String resultField;
 			
 	@Column(name = "isActive")
-	private boolean isActive;
+	private Boolean isActive=false;
 	
 	public static long getSerialversionuid() {
 		return serialVersionUID;
@@ -79,11 +79,11 @@ public class InsightsKPIConfig implements Serializable{
 		this.id = id;
 	}
 
-	public int getKpiId() {
+	public Integer getKpiId() {
 		return kpiId;
 	}
 
-	public void setKpiId(int kpiId) {
+	public void setKpiId(Integer kpiId) {
 		this.kpiId = kpiId;
 	}
 
@@ -95,11 +95,11 @@ public class InsightsKPIConfig implements Serializable{
 		this.kpiName = kpiName;
 	}
 
-	public boolean isActive() {
+	public Boolean isActive() {
 		return isActive;
 	}
 
-	public void setActive(boolean isActive) {
+	public void setActive(Boolean isActive) {
 		this.isActive = isActive;
 	}
 

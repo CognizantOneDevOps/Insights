@@ -40,7 +40,7 @@ public class InsightsContentConfig implements Serializable {
 
 	
 	@Column(name = "contentId", unique = true, nullable = false)
-	private int contentId;
+	private Integer contentId;
 
 	@Column(name = "contentName")
 	private String contentName;
@@ -52,7 +52,7 @@ public class InsightsContentConfig implements Serializable {
 	private String contentJson;
 
 	@Column(name = "isActive")
-	private boolean isActive;	
+	private Boolean isActive=false;
 	
 	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "kpiId", referencedColumnName = "kpiId")
@@ -69,12 +69,12 @@ public class InsightsContentConfig implements Serializable {
 	}
 
 
-	public int getContentId() {
+	public Integer getContentId() {		
 		return contentId;
 	}
 
 
-	public void setContentId(int contentId) {
+	public void setContentId(Integer contentId) {
 		this.contentId = contentId;
 	}
 
@@ -109,12 +109,12 @@ public class InsightsContentConfig implements Serializable {
 	}
 
 
-	public boolean isActive() {
+	public Boolean isActive() {
 		return isActive;
 	}
 
 
-	public void setActive(boolean isActive) {
+	public void setActive(Boolean isActive) {
 		this.isActive = isActive;
 	}
 

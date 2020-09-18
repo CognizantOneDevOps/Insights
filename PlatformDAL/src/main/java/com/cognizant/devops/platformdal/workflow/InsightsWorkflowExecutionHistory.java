@@ -28,46 +28,46 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 @Entity
-@Table(name="\"INSIGHTS_WORKFLOW_EXECUTION_HISTORY\"")
+@Table(name = "\"INSIGHTS_WORKFLOW_EXECUTION_HISTORY\"")
 public class InsightsWorkflowExecutionHistory implements Serializable {
 
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = -9069315770588008786L;
-	
+
 	@Id
-	@GeneratedValue(strategy=GenerationType.AUTO)
-	@Column(name="id")
-	private int id;		
-	
-	@Column(name="executionId", nullable=false)
-    private long executionId;
-	
-	@Column(name="currentTask")
-	private int currenttask;
-	
-	@Column(name="startTime")
-	private long startTime;
-	
-	@Column(name="endTime")
-	private long endTime;
-	
-	@Column(name="statusLog" , length=5000)
-	private String statusLog;	
-	
-	@Column(name="taskStatus")
+	@GeneratedValue(strategy = GenerationType.AUTO)
+	@Column(name = "id")
+	private int id;
+
+	@Column(name = "executionId", nullable = false)
+	private Long executionId;
+
+	@Column(name = "currentTask")
+	private Integer currenttask;
+
+	@Column(name = "startTime")
+	private Long startTime = 0L;
+
+	@Column(name = "endTime")
+	private Long endTime = 0L;
+
+	@Column(name = "statusLog", length = 5000)
+	private String statusLog;
+
+	@Column(name = "taskStatus")
 	private String taskStatus;
-	
-	@Column(name="requestMessage")
+
+	@Column(name = "requestMessage")
 	private String requestMessage;
-	
-	@Column(name="retryCount")
-	private int retryCount;
-	
-	@ManyToOne(fetch=FetchType.EAGER)
-	@JoinColumn(name="workflowId" ,referencedColumnName="workflowId")
-	private InsightsWorkflowConfiguration workflowConfig ;
+
+	@Column(name = "retryCount")
+	private Integer retryCount = 0;
+
+	@ManyToOne(fetch = FetchType.EAGER)
+	@JoinColumn(name = "workflowId", referencedColumnName = "workflowId")
+	private InsightsWorkflowConfiguration workflowConfig;
 
 	public int getId() {
 		return id;
@@ -77,35 +77,35 @@ public class InsightsWorkflowExecutionHistory implements Serializable {
 		this.id = id;
 	}
 
-	public long getExecutionId() {
+	public Long getExecutionId() {
 		return executionId;
 	}
 
-	public void setExecutionId(long executionId) {
+	public void setExecutionId(Long executionId) {
 		this.executionId = executionId;
 	}
 
-	public int getCurrenttask() {
+	public Integer getCurrenttask() {
 		return currenttask;
 	}
 
-	public void setCurrenttask(int currenttask) {
+	public void setCurrenttask(Integer currenttask) {
 		this.currenttask = currenttask;
 	}
 
-	public long getStartTime() {
-		return startTime;
+	public Long getStartTime() {
+		return this.startTime == null ? 0L : this.startTime;
 	}
 
-	public void setStartTime(long startTime) {
+	public void setStartTime(Long startTime) {
 		this.startTime = startTime;
 	}
 
-	public long getEndTime() {
-		return endTime;
+	public Long getEndTime() {
+		return this.endTime == null ? 0L : this.endTime;
 	}
 
-	public void setEndTime(long endTime) {
+	public void setEndTime(Long endTime) {
 		this.endTime = endTime;
 	}
 
@@ -133,11 +133,11 @@ public class InsightsWorkflowExecutionHistory implements Serializable {
 		this.requestMessage = requestMessage;
 	}
 
-	public int getRetryCount() {
-		return retryCount;
+	public Integer getRetryCount() {
+		return this.retryCount == null ? 0 : this.retryCount;
 	}
 
-	public void setRetryCount(int retryCount) {
+	public void setRetryCount(Integer retryCount) {
 		this.retryCount = retryCount;
 	}
 
@@ -148,7 +148,5 @@ public class InsightsWorkflowExecutionHistory implements Serializable {
 	public void setWorkflowConfig(InsightsWorkflowConfiguration workflowConfig) {
 		this.workflowConfig = workflowConfig;
 	}
-
-		
 
 }

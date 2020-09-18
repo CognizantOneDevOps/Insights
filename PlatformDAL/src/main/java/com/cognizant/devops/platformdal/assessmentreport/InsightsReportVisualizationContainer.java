@@ -35,13 +35,13 @@ public class InsightsReportVisualizationContainer implements Serializable {
 	int id;
 
 	@Column(name = "mailId")
-	private int mailId;
+	private Integer mailId = 0;
 
 	@Column(name = "executiontime")
-	private long executionTime;
+	private Long executionTime = 0L;
 
 	@Column(name = "executionid", unique = true)
-	private long executionId;
+	private Long executionId = 0L;
 
 	@Column(name = "subject")
 	private String subject;
@@ -78,27 +78,29 @@ public class InsightsReportVisualizationContainer implements Serializable {
 		this.id = id;
 	}
 
-	public long getMailId() {
+	public Integer getMailId() {
 		return mailId;
 	}
 
-	public void setMailId(int mailId) {
+	public void setMailId(Integer mailId) {
 		this.mailId = mailId;
 	}
 
-	public long getExecutionTime() {
-		return executionTime;
+	public Long getExecutionTime() {
+		return this.executionTime == null ? 0L : this.executionTime;
+		
 	}
 
-	public void setExecutionTime(long executionTime) {
+	public void setExecutionTime(Long executionTime) {
 		this.executionTime = executionTime;
 	}
 
-	public long getExecutionId() {
-		return executionId;
+	public Long getExecutionId() {
+		return this.executionId == null ? 0L : this.executionId;
+
 	}
 
-	public void setExecutionId(long executionId) {
+	public void setExecutionId(Long executionId) {
 		this.executionId = executionId;
 	}
 

@@ -26,7 +26,6 @@ import java.util.Set;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.testng.SkipException;
 
 import com.cognizant.devops.platformcommons.core.enums.WorkflowTaskEnum;
 import com.cognizant.devops.platformcommons.core.util.InsightsUtils;
@@ -56,7 +55,6 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import com.google.gson.JsonSyntaxException;
 
 public class AssessmentReportsTestData {
 	private static Logger log = LogManager.getLogger(AssessmentReportsTestData.class.getName());
@@ -75,17 +73,19 @@ public class AssessmentReportsTestData {
 	JsonObject reportTemplateJson = new JsonParser().parse(reportTemplatekpi).getAsJsonObject();
 	JsonObject reportTemplateKpisJson = new JsonParser().parse(reportTemplatekpis).getAsJsonObject();
 
-	String assessmentReport = "{\"reportName\":\"report_test100021547\",\"reportTemplate\":300600,\"emailList\":\"abc@abc.com\",\"schedule\":\"BI_WEEKLY_SPRINT\",\"startdate\":\"2020-05-12T00:00:00Z\",\"isReoccuring\":true,\"datasource\":\"\",\"emailDetails\": {\"senderEmailAddress\":\"abc@abc.com\",\"receiverEmailAddress\":\"abcd@abcd.com\",\"mailSubject\":\"Sub_mail\",\"mailBodyTemplate\":\"sending a mail for report\"},\"asseementreportdisplayname\":\"Report_test\"}";
+	String assessmentReportWithEmail = "{\"reportName\":\"report_Email_test10002154\",\"reportTemplate\":300600,\"emailList\":\"abc@abc.com\",\"schedule\":\"BI_WEEKLY_SPRINT\",\"startdate\":\"2020-05-12T00:00:00Z\",\"isReoccuring\":true,\"datasource\":\"\",\"emailDetails\": {\"senderEmailAddress\":\"abc@abc.com\",\"receiverEmailAddress\":\"abcd@abcd.com\",\"receiverCCEmailAddress\":\"sb@sb.com\",\"receiverBCCEmailAddress\":\"sb@sb.com\",\"mailSubject\":\"Sub_mail\",\"mailBodyTemplate\":\"sending a mail for report\"},\"asseementreportdisplayname\":\"Report_test\"}";
 	String assessmentReportWithoutEmail = "{\"reportName\":\"report_test100021548\",\"reportTemplate\":300600,\"emailList\":\"abc@abc.com\",\"schedule\":\"BI_WEEKLY_SPRINT\",\"startdate\":\"2020-05-12T00:00:00Z\",\"isReoccuring\":true,\"datasource\":\"\",\"asseementreportdisplayname\":\"Report_test\",\"emailDetails\":null}";
-	String assessmentReportFail = "{\"reportName\":\"report_test_Sonar100064032\",\"asseementreportdisplayname\":\"ReportWeek\",\"reportTemplate\":300603,\"emailList\":\"abc@abc.com\",\"schedule\":\"QUARTERLY\",\"startdate\":null,\"isReoccuring\":true,\"datasource\":\"\",\"emailDetails\":{\"senderEmailAddress\":\"mail@gmail.com\",\"receiverEmailAddress\":\"mail@cognizant.com\",\"mailSubject\":\"Report test Weekly\",\"mailBodyTemplate\":\"Report test Weekly\"}}";
-	String assessmentReportWrongkpi = "{\"reportName\":\"report_test_10083556935\",\"asseementreportdisplayname\":\"ReportWeek\",\"reportTemplate\":111605,\"emailList\":\"abc@abc.com\",\"schedule\":\"MONTHLY\",\"startdate\":null,\"isReoccuring\":true,\"datasource\":\"\"}";
-	String assessmentReportWrongkpis = "{\"reportName\":\"report_test_10083563542\",\"asseementreportdisplayname\":\"ReportWeek\",\"reportTemplate\":111606,\"emailList\":\"abc@abc.com\",\"schedule\":\"MONTHLY\",\"startdate\":null,\"isReoccuring\":true,\"datasource\":\"\"}";
+	String assessmentReportFail = "{\"reportName\":\"report_test_Sonar100064032\",\"asseementreportdisplayname\":\"ReportWeek\",\"reportTemplate\":300603,\"emailList\":\"abc@abc.com\",\"schedule\":\"QUARTERLY\",\"startdate\":null,\"isReoccuring\":true,\"datasource\":\"\",\"asseementreportdisplayname\":\"Report_test\",\"emailDetails\":null}";
+	String assessmentReportWrongkpi = "{\"reportName\":\"report_test_10083556935\",\"asseementreportdisplayname\":\"ReportWeek\",\"reportTemplate\":111605,\"emailList\":\"abc@abc.com\",\"schedule\":\"MONTHLY\",\"startdate\":null,\"isReoccuring\":true,\"datasource\":\"\",\"asseementreportdisplayname\":\"Report_test\",\"emailDetails\":null}";
+	String assessmentReportWrongkpis = "{\"reportName\":\"report_test_10083563542\",\"asseementreportdisplayname\":\"ReportWeek\",\"reportTemplate\":111606,\"emailList\":\"abc@abc.com\",\"schedule\":\"MONTHLY\",\"startdate\":null,\"isReoccuring\":true,\"datasource\":\"\",\"asseementreportdisplayname\":\"Report_test\",\"emailDetails\":null}";
+	String assessmentReport = "{\"reportName\":\"report_test100021547\",\"reportTemplate\":300600,\"emailList\":\"abc@abc.com\",\"schedule\":\"BI_WEEKLY_SPRINT\",\"startdate\":\"2020-05-12T00:00:00Z\",\"isReoccuring\":true,\"datasource\":\"\",\"emailDetails\":null,\"asseementreportdisplayname\":\"Report_test\"}";
 
 	String mqChannelKpiExecution = "TEST.WORKFLOW.TASK.KPI.EXCECUTION";
 	String mqChannelPDFExecution = "TEST.WORKFLOW.TASK.PDF.EXCECUTION";
 	String mqChannelEmailExecution = "TEST.WORKFLOW.TASK.EMAIL.EXCECUTION";
 
 	public static String workflowIdProd = WorkflowTaskEnum.WorkflowType.REPORT.getValue() + "_" + "10000567276";
+	public static String workflowIdWithEmail = WorkflowTaskEnum.WorkflowType.REPORT.getValue() + "_" + "10000567999";
 	public static String workflowIdWithoutEmail = WorkflowTaskEnum.WorkflowType.REPORT.getValue() + "_" + "10000568296";
 	public static String workflowIdFail = WorkflowTaskEnum.WorkflowType.REPORT.getValue() + "_" + "10000640327";
 	public static String workflowIdWrongkpi = WorkflowTaskEnum.WorkflowType.REPORT.getValue() + "_" + "10000835535";
@@ -364,7 +364,7 @@ public class AssessmentReportsTestData {
 		workflowConfig.setActive(isActive);
 		try {
 			if (schedule.equals(WorkflowTaskEnum.WorkflowSchedule.ONETIME.toString())) {
-				workflowConfig.setNextRun(0);
+				workflowConfig.setNextRun(0L);
 			} else if (schedule.equals(WorkflowTaskEnum.WorkflowSchedule.BI_WEEKLY_SPRINT.toString())
 					|| schedule.equals(WorkflowTaskEnum.WorkflowSchedule.TRI_WEEKLY_SPRINT.toString())) {
 				nextRunBiWeekly = InsightsUtils.getNextRunTime(startdate, schedule, true);
@@ -374,7 +374,7 @@ public class AssessmentReportsTestData {
 				workflowConfig.setNextRun(nextRunDaily);
 			}
 			// workflowConfig.setNextRun(nextRun);
-			workflowConfig.setLastRun(0);
+			workflowConfig.setLastRun(0L);
 			workflowConfig.setReoccurence(reoccurence);
 			workflowConfig.setScheduleType(schedule);
 			workflowConfig.setStatus(reportStatus);
@@ -383,22 +383,43 @@ public class AssessmentReportsTestData {
 			Set<InsightsWorkflowTaskSequence> sequneceEntitySet = setSequence(taskList, workflowConfig);
 			workflowConfig.setTaskSequenceEntity(sequneceEntitySet);
 			if (emailDetails != null) {
-				String mailBody = emailDetails.get("mailBodyTemplate").getAsString();
-				mailBody = mailBody.replace("#", "<").replace("%", ">");
-				InsightsEmailTemplates emailTemplateConfig = new InsightsEmailTemplates();
-				emailTemplateConfig.setMailFrom(emailDetails.get("senderEmailAddress").getAsString());
-				emailTemplateConfig.setMailTo(emailDetails.get("receiverEmailAddress").getAsString());
-				emailTemplateConfig.setSubject(emailDetails.get("mailSubject").getAsString());
-				emailTemplateConfig.setMailBody(mailBody);
-				emailTemplateConfig.setWorkflowConfig(workflowConfig);
+				InsightsEmailTemplates emailTemplateConfig = createEmailTemplateObject(emailDetails, workflowConfig);
 				workflowConfig.setEmailConfig(emailTemplateConfig);
-			} else {
-				workflowConfig.setEmailConfig(null);
 			}
 		} catch (InsightsCustomException e) {
 			log.error(e);
 		}
 		return workflowConfig;
+	}
+
+	public InsightsEmailTemplates createEmailTemplateObject(JsonObject emailDetails,
+			InsightsWorkflowConfiguration workflowConfig) {
+		InsightsEmailTemplates emailTemplateConfig = workflowConfig.getEmailConfig();
+		if (emailTemplateConfig == null) {
+			emailTemplateConfig = new InsightsEmailTemplates();
+		}
+		String mailBody = emailDetails.get("mailBodyTemplate").getAsString();
+		mailBody = mailBody.replace("#", "<").replace("~", ">");
+		emailTemplateConfig.setMailFrom(emailDetails.get("senderEmailAddress").getAsString());
+		if (!emailDetails.get("receiverEmailAddress").getAsString().isEmpty()) {
+			emailTemplateConfig.setMailTo(emailDetails.get("receiverEmailAddress").getAsString());
+		} else {
+			emailTemplateConfig.setMailTo(null);
+		}
+		if (!emailDetails.get("receiverCCEmailAddress").getAsString().isEmpty()) {
+			emailTemplateConfig.setMailCC(emailDetails.get("receiverCCEmailAddress").getAsString());
+		} else {
+			emailTemplateConfig.setMailCC(null);
+		}
+		if (!emailDetails.get("receiverBCCEmailAddress").getAsString().isEmpty()) {
+			emailTemplateConfig.setMailBCC(emailDetails.get("receiverBCCEmailAddress").getAsString());
+		} else {
+			emailTemplateConfig.setMailBCC(null);
+		}
+		emailTemplateConfig.setSubject(emailDetails.get("mailSubject").getAsString());
+		emailTemplateConfig.setMailBody(mailBody);
+		emailTemplateConfig.setWorkflowConfig(workflowConfig);
+		return emailTemplateConfig;
 	}
 
 	public Set<InsightsWorkflowTaskSequence> setSequence(JsonArray taskList,
