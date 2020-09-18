@@ -25,6 +25,7 @@
 		"responseType": "JSON"
 	},
 	"dynamicTemplate": {
+		"versionUrl" :"https://<JIRA_HOST>/rest/api/2/serverInfo",
 		"timeFieldMapping": {
 			"creationDate": "%Y-%m-%dT%H:%M:%S",
 			"changeDate": "%Y-%m-%dT%H:%M:%S",
