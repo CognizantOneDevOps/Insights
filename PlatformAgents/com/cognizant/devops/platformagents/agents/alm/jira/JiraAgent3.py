@@ -25,12 +25,8 @@ import re
 import logging.handlers
 from dateutil import parser
 
+#from com.cognizant.devops.platformagents.core.BaseAgent3 import BaseAgent
 from ....core.BaseAgent3 import BaseAgent
-
-from datetime import datetime as dateTime2
-import datetime 
-
-
 
 class JiraAgent(BaseAgent):
     changedFields = set()
@@ -290,17 +286,24 @@ class JiraAgent(BaseAgent):
             if sprintDetails:
                 try:
                     sprints = []
-                    boards = []                
+                    boards = []
                     for sprint in sprintDetails:
-                        sprintData = {}
-                        sprintDetail = sprint.split("[")[1][:-1]
-                        sprintPropertieTokens = sprintDetail.split(",")
-                        for propertyToken in sprintPropertieTokens:
-                            propertyKeyValToken = propertyToken.split("=")
-                            if len(propertyKeyValToken) > 1:
-                                sprintData[propertyKeyValToken[0]] = propertyKeyValToken[1]
-                        boardId = sprintData.get('rapidViewId')
-                        sprintId = sprintData.get('id')
+                        Version =self.config.get('dynamicTemplate', {}).get('versionUrl','')
+                        VersionUrl = self.getResponse(Version, 'GET', self.userid, self.passwd, None)
+                        deploymentType =VersionUrl.get('deploymentType','')
+                        if (deploymentType) == 'Server':
+                            sprintData = {}
+                            sprintDetail = sprint.split("[")[1][:-1]
+                            sprintPropertieTokens = sprintDetail.split(",")
+                            for propertyToken in sprintPropertieTokens:
+                                propertyKeyValToken = propertyToken.split("=")
+                                if len(propertyKeyValToken) > 1:
+                                    sprintData[propertyKeyValToken[0]] = propertyKeyValToken[1]
+                            boardId = sprintData.get('rapidViewId')
+                            sprintId = sprintData.get('id')
+                        else:
+                            boardId = sprint.get('boardId')
+                            sprintId = sprint.get('id')
                         boardTracking = boardsTracking.get(boardId, None)
                         if boardTracking is None:
                             boardTracking = {}
@@ -317,7 +320,7 @@ class JiraAgent(BaseAgent):
                             sprints.append(sprintId)
                 except Exception as ex:
                     parsedIssue[0]['error'] = str(ex)
-                    
+
                 parsedIssue[0]['sprints'] = sprints
                 parsedIssue[0]['boards'] = boards
                 #if len(boards) > 1 :
