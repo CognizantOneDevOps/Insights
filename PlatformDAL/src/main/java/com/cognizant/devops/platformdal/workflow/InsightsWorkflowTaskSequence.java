@@ -39,7 +39,7 @@ public class InsightsWorkflowTaskSequence implements Serializable {
 	private int id;
 	
 	@Column(name = "sequence")
-	private int sequence;
+	private Integer sequence=1;
 
 	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "workflowId", referencedColumnName = "workflowId")
@@ -50,7 +50,7 @@ public class InsightsWorkflowTaskSequence implements Serializable {
 	private InsightsWorkflowTask workflowTaskEntity ;
 	
 	@Column(name="nextTask")
-	private int nextTask;
+	private Integer nextTask=-1;
 	
 	public int getId() {
 		return id;
@@ -68,19 +68,19 @@ public class InsightsWorkflowTaskSequence implements Serializable {
 		this.workflowTaskEntity = workflowTaskEntity;
 	}
 
-	public int getNextTask() {
+	public Integer getNextTask() {
 		return nextTask;
 	}
 
-	public void setNextTask(int nextTask) {
+	public void setNextTask(Integer nextTask) {
 		this.nextTask = nextTask;
 	}
 
-	public int getSequence() {
+	public Integer getSequence() {
 		return sequence;
 	}
 
-	public void setSequence(int sequence) {
+	public void setSequence(Integer sequence) {
 		this.sequence = sequence;
 	}
 

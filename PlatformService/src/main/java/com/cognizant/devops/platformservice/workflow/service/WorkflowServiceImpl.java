@@ -112,7 +112,7 @@ public class WorkflowServiceImpl {
 		workflowConfig.setWorkflowId(workflowId);
 		workflowConfig.setActive(isActive);
 		if (schedule.equals(WorkflowTaskEnum.WorkflowSchedule.ONETIME.toString())) {
-			workflowConfig.setNextRun(0);
+			workflowConfig.setNextRun(0L);
 		} else if (schedule.equals(WorkflowTaskEnum.WorkflowSchedule.BI_WEEKLY_SPRINT.toString())
 				|| schedule.equals(WorkflowTaskEnum.WorkflowSchedule.TRI_WEEKLY_SPRINT.toString())) {
 			workflowConfig.setNextRun(InsightsUtils.getNextRunTime(startdate, schedule, true));
@@ -120,7 +120,7 @@ public class WorkflowServiceImpl {
 			workflowConfig
 					.setNextRun(InsightsUtils.getNextRunTime(InsightsUtils.getCurrentTimeInSeconds(), schedule, true));
 		}
-		workflowConfig.setLastRun(0);
+		workflowConfig.setLastRun(0L);
 		workflowConfig.setReoccurence(reoccurence);
 		workflowConfig.setScheduleType(schedule);
 		workflowConfig.setStatus(reportStatus);

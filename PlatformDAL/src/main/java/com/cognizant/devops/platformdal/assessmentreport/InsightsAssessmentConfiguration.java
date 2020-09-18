@@ -55,16 +55,16 @@ public class InsightsAssessmentConfiguration implements Serializable {
 	private String emails;
 
 	@Column(name = "startDate")
-	private long startDate;
+	private Long startDate = 0L;
 
 	@Column(name = "endDate")
-	private long endDate;
+	private Long endDate = 0L;
 
 	@Column(name = "inputDatasource")
 	private String inputDatasource;
 
 	@Column(name = "isActive")
-	private boolean isActive;
+	private Boolean isActive = false;
 
 	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "reportId", referencedColumnName = "reportId")
@@ -98,19 +98,19 @@ public class InsightsAssessmentConfiguration implements Serializable {
 		this.asseementReportDisplayName = asseementReportDisplayName;
 	}
 
-	public long getStartDate() {
-		return startDate;
+	public Long getStartDate() {
+		return this.startDate == null ? 0L : this.startDate;	
 	}
 
-	public void setStartDate(long startDate) {
+	public void setStartDate(Long startDate) {
 		this.startDate = startDate;
 	}
 
-	public long getEndDate() {
-		return endDate;
+	public Long getEndDate() {
+		return this.endDate == null ? 0L : this.endDate;	
 	}
 
-	public void setEndDate(long endDate) {
+	public void setEndDate(Long endDate) {
 		this.endDate = endDate;
 	}
 
@@ -122,11 +122,11 @@ public class InsightsAssessmentConfiguration implements Serializable {
 		this.inputDatasource = inputDatasource;
 	}
 
-	public boolean isActive() {
-		return isActive;
+	public Boolean isActive() {
+		return this.isActive == null ? Boolean.FALSE : this.isActive;	
 	}
 
-	public void setActive(boolean isActive) {
+	public void setActive(Boolean isActive) {
 		this.isActive = isActive;
 	}
 

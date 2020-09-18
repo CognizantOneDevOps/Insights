@@ -189,7 +189,7 @@ public class Neo4jDBImpl implements DatabaseService {
 		resultMap.put(KPIJobResultAttributes.NAME.toString(), inferenceConfigDefinition.getName());
 		resultMap.put(KPIJobResultAttributes.EXPECTEDTREND.toString(), inferenceConfigDefinition.getExpectedTrend());
 		resultMap.put(KPIJobResultAttributes.ISGROUPBY.toString(), inferenceConfigDefinition.isGroupBy());
-		resultMap.put(KPIJobResultAttributes.RESULT.toString(), result);
+		resultMap.put("result", result);
 		resultMap.put(KPIJobResultAttributes.VECTOR.toString(), inferenceConfigDefinition.getVector());
 		resultMap.put(KPIJobResultAttributes.TOOLNAME.toString(), inferenceConfigDefinition.getToolName());
 		resultMap.put(KPIJobResultAttributes.SCHEDULE.toString(), inferenceConfigDefinition.getSchedule().name());
@@ -249,7 +249,7 @@ public class Neo4jDBImpl implements DatabaseService {
 		neo4jDef.setName(node.getPropertyMap().get(KPIJobResultAttributes.NAME.toString()));
 		neo4jDef.setNeo4jLabel(node.getPropertyMap().get(KPIJobResultAttributes.NEO4JLABEL.toString()));
 		neo4jDef.setNeo4jQuery(node.getPropertyMap().get(KPIJobResultAttributes.NEO4JQUERY.toString()));
-		neo4jDef.setNextRun(node.getPropertyMap().get(KPIJobResultAttributes.NEXTRUN.toString()));
+		neo4jDef.setNextRun(node.getPropertyMap().get("nextRunTime"));
 		neo4jDef.setResultOutPutType(node.getPropertyMap().get(KPIJobResultAttributes.RESULTOUTPUTTYPE.toString()));
 		neo4jDef.setSchedule(
 				JobSchedule.valueOf(node.getPropertyMap().get(KPIJobResultAttributes.SCHEDULE.toString())));

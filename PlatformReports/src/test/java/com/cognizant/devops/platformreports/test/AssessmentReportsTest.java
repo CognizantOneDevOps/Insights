@@ -48,33 +48,34 @@ public class AssessmentReportsTest extends AssessmentReportsTestData {
 
 		ApplicationConfigCache.loadConfigCache();
 
-		//save multiple Kpi definition in db
+		// save multiple Kpi definition in db
 		readKpiFileAndSave("KPIDefination.json");
 
-		//save multiple content definition in db
+		// save multiple content definition in db
 		readContentFileAndSave("ContentsConfiguration.json");
 
-		//save report template in db
+		// save report template in db
 		readReportTempFileAndSave("REPORT_SONAR_JENKINS_PROD_RT.json");
 		readReportTempFileAndSave("REPORT_SONAR_RT.json");
 		saveReportTemplate(reportTemplatekpi);
 		saveReportTemplate(reportTemplatekpis);
 
-		//save workflow task in db
+		// save workflow task in db
 		saveWorkflowTask(taskKpiExecution);
 		saveWorkflowTask(taskPDFExecution);
 		saveWorkflowTask(taskEmailExecution);
 
-		//save assessment report
-		saveAssessmentReport(workflowIdProd, assessmentReport, 3);
-		saveAssessmentReport(workflowIdFail, assessmentReportFail, 1);
-		saveAssessmentReport(workflowIdWithoutEmail, assessmentReportWithoutEmail, 3);
+		// save assessment report
+		saveAssessmentReport(workflowIdProd, assessmentReport, 2);
+		saveAssessmentReport(workflowIdWithEmail, assessmentReportWithEmail, 3);
+		saveAssessmentReport(workflowIdWithoutEmail, assessmentReportWithoutEmail, 2);
 		saveAssessmentReport(workflowIdWrongkpi, assessmentReportWrongkpi, 2);
 		saveAssessmentReport(workflowIdWrongkpis, assessmentReportWrongkpis, 2);
+		saveAssessmentReport(workflowIdFail, assessmentReportFail, 1);
 
 		initializeTask();
 
-		//run workflow executor 
+		// run workflow executor
 		WorkflowExecutor executor = new WorkflowExecutor();
 		executor.executeWorkflow();
 		Thread.sleep(40000);
@@ -110,156 +111,205 @@ public class AssessmentReportsTest extends AssessmentReportsTestData {
 
 	@Test(priority = 3)
 	public void testKpiResultProd() {
-		List<InsightsWorkflowExecutionHistory> executionHistory = workflowDAL
-				.getWorkflowExecutionHistoryRecordsByWorkflowId(workflowIdProd);
-		long executionId = 0;
-		if (executionHistory.size() > 0) {
-			for (InsightsWorkflowExecutionHistory eachExecutionRecord : executionHistory) {
-				executionId = eachExecutionRecord.getExecutionId();
+		try {
+			List<InsightsWorkflowExecutionHistory> executionHistory = workflowDAL
+					.getWorkflowExecutionHistoryRecordsByWorkflowId(workflowIdProd);
+			long executionId = 0;
+			if (executionHistory.size() > 0) {
+				for (InsightsWorkflowExecutionHistory eachExecutionRecord : executionHistory) {
+					executionId = eachExecutionRecord.getExecutionId();
+				}
 			}
-		}
-		String query = "MATCH (n:KPI:RESULTS) with distinct max(n.executionId) as latestexecutionId "
-				+ "Match (b:KPI:RESULTS) where b.executionId = " + executionId
-				+ " and b.kpiId in [100252, 100253, 100254, 100112, 100901, 100903]  return latestexecutionId,b  LIMIT 25";
+			String query = "MATCH (n:KPI:RESULTS) with distinct max(n.executionId) as latestexecutionId "
+					+ "Match (b:KPI:RESULTS) where b.executionId = " + executionId
+					+ " and b.kpiId in [100252, 100253, 100254, 100112, 100901, 100903]  return latestexecutionId,b  LIMIT 25";
 
-		Assert.assertNotNull(readNeo4jData(query));
+			Assert.assertNotNull(readNeo4jData(query));
+		} catch (AssertionError e) {
+			Assert.fail(e.getMessage());
+		}
 	}
 
 	@Test(priority = 4)
 	public void testContentResultProd() {
-		List<InsightsWorkflowExecutionHistory> executionHistory = workflowDAL
-				.getWorkflowExecutionHistoryRecordsByWorkflowId(workflowIdProd);
-		long executionId = 0;
-		if (executionHistory.size() > 0) {
-			for (InsightsWorkflowExecutionHistory eachExecutionRecord : executionHistory) {
-				executionId = eachExecutionRecord.getExecutionId();
+		try {
+			List<InsightsWorkflowExecutionHistory> executionHistory = workflowDAL
+					.getWorkflowExecutionHistoryRecordsByWorkflowId(workflowIdProd);
+			long executionId = 0;
+			if (executionHistory.size() > 0) {
+				for (InsightsWorkflowExecutionHistory eachExecutionRecord : executionHistory) {
+					executionId = eachExecutionRecord.getExecutionId();
+				}
 			}
+			String query = "MATCH (n:KPI:CONTENT_RESULT) with distinct max(n.executionId) as latestexecutionId "
+					+ "Match (b:KPI:CONTENT_RESULT) where b.executionId = " + executionId
+					+ " and b.kpiId in [100252, 100253, 100254, 100112, 100901, 100903]  return latestexecutionId,b  LIMIT 25";
+			Assert.assertNotNull(readNeo4jData(query));
+		} catch (AssertionError e) {
+			Assert.fail(e.getMessage());
 		}
-		String query = "MATCH (n:KPI:CONTENT_RESULT) with distinct max(n.executionId) as latestexecutionId "
-				+ "Match (b:KPI:CONTENT_RESULT) where b.executionId = " + executionId
-				+ " and b.kpiId in [100252, 100253, 100254, 100112, 100901, 100903]  return latestexecutionId,b  LIMIT 25";
-		Assert.assertNotNull(readNeo4jData(query));
 	}
 
 	@Test(priority = 5)
 	public void testValidateFailStatusUpdate() {
-		InsightsWorkflowConfiguration workflowConfig = workflowDAL.getWorkflowConfigByWorkflowId(workflowIdFail);
-		Assert.assertEquals(workflowConfig.getStatus(), WorkflowTaskEnum.WorkflowStatus.ERROR.toString());
-		Assert.assertTrue(workflowConfig.getNextRun() == nextRunDaily);
+		try {
+			InsightsWorkflowConfiguration workflowConfig = workflowDAL.getWorkflowConfigByWorkflowId(workflowIdFail);
+			Assert.assertEquals(workflowConfig.getStatus(), WorkflowTaskEnum.WorkflowStatus.ERROR.toString());
+			Assert.assertTrue(workflowConfig.getNextRun() == nextRunDaily);
+		} catch (AssertionError e) {
+			Assert.fail(e.getMessage());
+		}
 	}
 
 	@Test(priority = 6)
 	public void testFailExecutionHistoryUpdate() throws InterruptedException {
-		List<InsightsWorkflowExecutionHistory> executionHistory = workflowDAL
-				.getWorkflowExecutionHistoryRecordsByWorkflowId(workflowIdFail);
-		if (executionHistory.size() > 0) {
-			for (InsightsWorkflowExecutionHistory eachExecutionRecord : executionHistory) {
-				Assert.assertEquals(eachExecutionRecord.getTaskStatus(),
-						WorkflowTaskEnum.WorkflowStatus.ERROR.toString());
+		try {
+			List<InsightsWorkflowExecutionHistory> executionHistory = workflowDAL
+					.getWorkflowExecutionHistoryRecordsByWorkflowId(workflowIdFail);
+			if (executionHistory.size() > 0) {
+				for (InsightsWorkflowExecutionHistory eachExecutionRecord : executionHistory) {
+					Assert.assertEquals(eachExecutionRecord.getTaskStatus(),
+							WorkflowTaskEnum.WorkflowStatus.ERROR.toString());
+				}
 			}
+		} catch (AssertionError e) {
+			Assert.fail(e.getMessage());
 		}
 	}
 
 	@Test(priority = 7)
 	public void testRetryKpiExecute() throws InterruptedException {
-		InsightsKPIConfig existingConfig = reportConfigDAL.getKPIConfig(100331);
-		existingConfig.setCategory("COMPARISON");
-		existingConfig.setdBQuery(querySonar);
-		reportConfigDAL.updateKpiConfig(existingConfig);
-		WorkflowRetryExecutor executorRetry = new WorkflowRetryExecutor();
-		executorRetry.retryWorkflowWithFailedTask();
-		Thread.sleep(20000);
+		try {
+			InsightsKPIConfig existingConfig = reportConfigDAL.getKPIConfig(100331);
+			existingConfig.setCategory("COMPARISON");
+			existingConfig.setdBQuery(querySonar);
+			reportConfigDAL.updateKpiConfig(existingConfig);
+			WorkflowRetryExecutor executorRetry = new WorkflowRetryExecutor();
+			executorRetry.retryWorkflowWithFailedTask();
+			Thread.sleep(20000);
+		} catch (AssertionError e) {
+			Assert.fail(e.getMessage());
+		}
 	}
 
 	@Test(priority = 8)
 	public void testRetryContentExecute() throws InterruptedException {
-		InsightsContentConfig existingContentConfig = reportConfigDAL.getContentConfig(20013131);
-		existingContentConfig.setCategory("COMPARISON");
-		reportConfigDAL.updateContentConfig(existingContentConfig);
-		WorkflowRetryExecutor executorRetry = new WorkflowRetryExecutor();
-		executorRetry.retryWorkflowWithFailedTask();
-		Thread.sleep(20000);
+		try {
+			InsightsContentConfig existingContentConfig = reportConfigDAL.getContentConfig(20013131);
+			existingContentConfig.setCategory("COMPARISON");
+			reportConfigDAL.updateContentConfig(existingContentConfig);
+			WorkflowRetryExecutor executorRetry = new WorkflowRetryExecutor();
+			executorRetry.retryWorkflowWithFailedTask();
+			Thread.sleep(20000);
+		} catch (AssertionError e) {
+			Assert.fail(e.getMessage());
+		}
 	}
 
 	@Test(priority = 9)
 	public void testValidateStatusUpdateAfterRetry() throws InterruptedException {
-		InsightsWorkflowConfiguration workflowConfig = workflowDAL.getWorkflowConfigByWorkflowId(workflowIdFail);
-		Assert.assertEquals(workflowConfig.getStatus(), WorkflowTaskEnum.WorkflowStatus.COMPLETED.toString());
-		Assert.assertTrue(workflowConfig.getNextRun() > nextRunDaily);
+		try {
+			InsightsWorkflowConfiguration workflowConfig = workflowDAL.getWorkflowConfigByWorkflowId(workflowIdFail);
+			Assert.assertEquals(workflowConfig.getStatus(), WorkflowTaskEnum.WorkflowStatus.COMPLETED.toString());
+			Assert.assertTrue(workflowConfig.getNextRun() > nextRunDaily);
+		} catch (AssertionError e) {
+			Assert.fail(e.getMessage());
+		}
 
 	}
 
-	//Kpi execution exception case when kpi queries are not appropriate
+	// Kpi execution exception case when kpi queries are not appropriate
 	@Test(priority = 10)
 	public void testWithWrongKpiQueries() throws InterruptedException, InsightsCustomException {
-
-		WorkflowExecutor executor = new WorkflowExecutor();
-		executor.executeWorkflow();
-		Thread.sleep(8000);
-		InsightsWorkflowConfiguration workflowConfigWrongkpi = workflowDAL
-				.getWorkflowConfigByWorkflowId(workflowIdWrongkpi);
-		InsightsWorkflowConfiguration workflowConfigWrongkpis = workflowDAL
-				.getWorkflowConfigByWorkflowId(workflowIdWrongkpi);
-		Assert.assertEquals(workflowConfigWrongkpi.getStatus(), WorkflowTaskEnum.WorkflowStatus.ERROR.toString());
-		Assert.assertEquals(workflowConfigWrongkpis.getStatus(), WorkflowTaskEnum.WorkflowStatus.ERROR.toString());
-
+		try {
+			WorkflowExecutor executor = new WorkflowExecutor();
+			executor.executeWorkflow();
+			Thread.sleep(8000);
+			InsightsWorkflowConfiguration workflowConfigWrongkpi = workflowDAL
+					.getWorkflowConfigByWorkflowId(workflowIdWrongkpi);
+			InsightsWorkflowConfiguration workflowConfigWrongkpis = workflowDAL
+					.getWorkflowConfigByWorkflowId(workflowIdWrongkpi);
+			Assert.assertEquals(workflowConfigWrongkpi.getStatus(), WorkflowTaskEnum.WorkflowStatus.ERROR.toString());
+			Assert.assertEquals(workflowConfigWrongkpis.getStatus(), WorkflowTaskEnum.WorkflowStatus.ERROR.toString());
+		} catch (AssertionError e) {
+			Assert.fail(e.getMessage());
+		}
 	}
 
-	//correct kpi queries updation
+	// correct kpi queries updation
 	@Test(priority = 11)
 	public void testRetryWrongKpiQueries() throws InterruptedException {
-		updateCorrectKpiQuery(100127, queryJenkins);
-		updateCorrectKpiQuery(100161, queryJira);
-		updateCorrectKpiQuery(100153, queryJiraAvg);
-		WorkflowRetryExecutor executorRetry = new WorkflowRetryExecutor();
-		executorRetry.retryWorkflowWithFailedTask();
-		Thread.sleep(50000);
+		try {
+			updateCorrectKpiQuery(100127, queryJenkins);
+			updateCorrectKpiQuery(100161, queryJira);
+			updateCorrectKpiQuery(100153, queryJiraAvg);
+			WorkflowRetryExecutor executorRetry = new WorkflowRetryExecutor();
+			executorRetry.retryWorkflowWithFailedTask();
+			Thread.sleep(50000);
+		} catch (AssertionError e) {
+			Assert.fail(e.getMessage());
+		}
 	}
 
-	//PDF execution exception case when visualizationConfigs or charts details are not appropriate
+	// PDF execution exception case when visualizationConfigs or charts details are
+	// not appropriate
 	@Test(priority = 12)
 	public void testWrongKpiQueriesStatus() throws InterruptedException, InsightsCustomException {
-
-		InsightsWorkflowConfiguration workflowConfigWrongkpi = workflowDAL
-				.getWorkflowConfigByWorkflowId(workflowIdWrongkpi);
-		InsightsWorkflowConfiguration workflowConfigWrongkpis = workflowDAL
-				.getWorkflowConfigByWorkflowId(workflowIdWrongkpis);
-		Assert.assertEquals(workflowConfigWrongkpis.getStatus(), WorkflowTaskEnum.WorkflowStatus.ERROR.toString());
-		Assert.assertEquals(workflowConfigWrongkpi.getStatus(), WorkflowTaskEnum.WorkflowStatus.ERROR.toString());
-
+		try {
+			InsightsWorkflowConfiguration workflowConfigWrongkpi = workflowDAL
+					.getWorkflowConfigByWorkflowId(workflowIdWrongkpi);
+			InsightsWorkflowConfiguration workflowConfigWrongkpis = workflowDAL
+					.getWorkflowConfigByWorkflowId(workflowIdWrongkpis);
+			Assert.assertEquals(workflowConfigWrongkpis.getStatus(), WorkflowTaskEnum.WorkflowStatus.ERROR.toString());
+			Assert.assertEquals(workflowConfigWrongkpi.getStatus(), WorkflowTaskEnum.WorkflowStatus.ERROR.toString());
+		} catch (AssertionError e) {
+			Assert.fail(e.getMessage());
+		}
 	}
 
 	@Test(priority = 12)
 	public void testSaveInsightsEmailExecutionHistory() throws InterruptedException, InsightsCustomException {
-		InsightsWorkflowConfiguration workflowConfig = workflowDAL.getWorkflowConfigByWorkflowId(workflowIdProd);
-		InsightsReportVisualizationContainer emailHistory = workflowDAL
-				.getEmailExecutionHistoryByWorkflowId(workflowConfig.getWorkflowId());
-		Assert.assertNotNull(emailHistory);
-		Assert.assertEquals(emailHistory.getStatus(), WorkflowTaskEnum.EmailStatus.ERROR.toString());
+		try {
+			InsightsWorkflowConfiguration workflowConfig = workflowDAL
+					.getWorkflowConfigByWorkflowId(workflowIdWithEmail);
+			InsightsReportVisualizationContainer emailHistory = workflowDAL
+					.getEmailExecutionHistoryByWorkflowId(workflowConfig.getWorkflowId());
+			Assert.assertNotNull(emailHistory);
+			Assert.assertEquals(emailHistory.getStatus(), WorkflowTaskEnum.EmailStatus.ERROR.toString());
+		} catch (AssertionError e) {
+			Assert.fail(e.getMessage());
+		}
 	}
 
 	@Test(priority = 13)
-	public void testEmptyInsightsEmailExecutionHistory() throws InterruptedException, InsightsCustomException {
-		InsightsWorkflowConfiguration workflowConfig = workflowDAL
-				.getWorkflowConfigByWorkflowId(workflowIdWithoutEmail);
-		InsightsReportVisualizationContainer emailHistory = workflowDAL
-				.getEmailExecutionHistoryByWorkflowId(workflowConfig.getWorkflowId());
-		Assert.assertNull(emailHistory);
+	public void testPDFRecordInEmailExecutionHistory() throws InterruptedException, InsightsCustomException {
+		try {
+			InsightsWorkflowConfiguration workflowConfig = workflowDAL
+					.getWorkflowConfigByWorkflowId(workflowIdWithoutEmail);
+			InsightsReportVisualizationContainer emailHistory = workflowDAL
+					.getEmailExecutionHistoryByWorkflowId(workflowConfig.getWorkflowId());
+			Assert.assertNotNull(emailHistory);
+			Assert.assertEquals(emailHistory.getStatus(), WorkflowTaskEnum.WorkflowStatus.COMPLETED.name());
+		} catch (AssertionError e) {
+			Assert.fail(e.getMessage());
+		}
 	}
 
-	//delete dummy data
+	// delete dummy data
 	@AfterTest
 	public void cleanUp() throws InsightsCustomException {
 
-		//cleaning Postgres
+		// cleaning Postgres
 		workflowDAL.deleteEmailExecutionHistoryByWorkflowId(workflowIdWithoutEmail);
+		workflowDAL.deleteEmailExecutionHistoryByWorkflowId(workflowIdWithEmail);
 		delete(workflowIdProd);
 		delete(workflowIdWithoutEmail);
+		delete(workflowIdWithEmail);
 		delete(workflowIdFail);
 		delete(workflowIdWrongkpi);
 		delete(workflowIdWrongkpis);
 
-		//delete workflow Task
+		// delete workflow Task
 		for (int element : taskidList) {
 			try {
 				workflowDAL.deleteTask(element);
@@ -268,7 +318,7 @@ public class AssessmentReportsTest extends AssessmentReportsTestData {
 			}
 		}
 
-		//delete report template
+		// delete report template
 		for (int element : reportIdList) {
 			try {
 				reportConfigDAL.deleteReportTemplatebyReportID(element);
@@ -278,12 +328,16 @@ public class AssessmentReportsTest extends AssessmentReportsTestData {
 		}
 		try {
 			reportConfigDAL.deleteReportTemplatebyReportID(reportTemplateJson.get("reportId").getAsInt());
+		} catch (Exception e) {
+			log.error(e);
+		}
+		try {
 			reportConfigDAL.deleteReportTemplatebyReportID(reportTemplateKpisJson.get("reportId").getAsInt());
 		} catch (Exception e) {
 			log.error(e);
 		}
 
-		//delete content Config
+		// delete content Config
 		for (int element : contentIdList) {
 			try {
 				reportConfigDAL.deleteContentbyContentID(element);
@@ -292,7 +346,7 @@ public class AssessmentReportsTest extends AssessmentReportsTestData {
 			}
 		}
 
-		//delete kpi definition
+		// delete kpi definition
 		for (int element : kpiIdList) {
 			try {
 				reportConfigDAL.deleteKPIbyKpiID(element);

@@ -51,22 +51,22 @@ public class InsightsWorkflowConfiguration implements Serializable {
 	private String scheduleType;
 
 	@Column(name = "reoccurence")
-	private boolean reoccurence;
+	private Boolean reoccurence = false;
 
 	@Column(name = "lastRun")
-	private long lastRun;
+	private Long lastRun = 0L;
 
 	@Column(name = "nextRun")
-	private long nextRun;
+	private Long nextRun = 0L;
 
 	@Column(name = "runImmediate")
-	private boolean runImmediate;
+	private Boolean runImmediate = false;
 
 	@Column(name = "status")
 	private String status;
 
 	@Column(name = "isActive")
-	private boolean isActive;
+	private Boolean isActive = false;
 
 	@OneToOne(mappedBy = "workflowConfig", fetch = FetchType.EAGER)
 	private InsightsAssessmentConfiguration assessmentConfig;
@@ -101,19 +101,19 @@ public class InsightsWorkflowConfiguration implements Serializable {
 		this.scheduleType = scheduleType;
 	}
 
-	public boolean isReoccurence() {
-		return reoccurence;
+	public Boolean isReoccurence() {
+		return this.reoccurence == null ? Boolean.FALSE  : this.reoccurence;			
 	}
 
-	public void setReoccurence(boolean reoccurence) {
+	public void setReoccurence(Boolean reoccurence) {
 		this.reoccurence = reoccurence;
 	}
 
-	public long getLastRun() {
-		return lastRun;
+	public Long getLastRun() {
+		return this.lastRun == null ? 0L : this.lastRun;		
 	}
 
-	public void setLastRun(long lastRun) {
+	public void setLastRun(Long lastRun) {
 		this.lastRun = lastRun;
 	}
 
@@ -125,11 +125,11 @@ public class InsightsWorkflowConfiguration implements Serializable {
 		this.status = status;
 	}
 
-	public boolean isActive() {
-		return isActive;
+	public Boolean isActive() {
+		return this.isActive == null ? Boolean.FALSE  : this.isActive;		
 	}
 
-	public void setActive(boolean isActive) {
+	public void setActive(Boolean isActive) {
 		this.isActive = isActive;
 	}
 
@@ -149,19 +149,19 @@ public class InsightsWorkflowConfiguration implements Serializable {
 		this.taskSequenceEntity = taskSequenceEntity;
 	}
 
-	public long getNextRun() {
-		return nextRun;
+	public Long getNextRun() {
+		return this.nextRun == null ? 0L : this.nextRun;		
 	}
 
-	public void setNextRun(long nextRun) {
+	public void setNextRun(Long nextRun) {
 		this.nextRun = nextRun;
 	}
 
-	public boolean isRunImmediate() {
-		return runImmediate;
+	public Boolean isRunImmediate() {
+		return this.runImmediate == null ? Boolean.FALSE : this.runImmediate;			
 	}
 
-	public void setRunImmediate(boolean runImmediate) {
+	public void setRunImmediate(Boolean runImmediate) {
 		this.runImmediate = runImmediate;
 	}
 

@@ -404,7 +404,7 @@ public class InsightsInferenceServiceImpl implements InsightsInferenceService {
 		neo4jDef.setName(node.getPropertyMap().get(KPIJobResultAttributes.NAME.toString()));
 		neo4jDef.setVector(node.getPropertyMap().get(KPIJobResultAttributes.VECTOR.toString()));
 		neo4jDef.setExpectedTrend(node.getPropertyMap().get(KPIJobResultAttributes.EXPECTEDTREND.toString()));
-		neo4jDef.setResult(Long.parseLong(node.getPropertyMap().get(KPIJobResultAttributes.RESULTS.toString())));
+		neo4jDef.setResult(Long.parseLong(node.getPropertyMap().get("result")));
 		neo4jDef.setSchedule(node.getPropertyMap().get(KPIJobResultAttributes.SCHEDULE.toString()));
 		neo4jDef.setAction(node.getPropertyMap().get(KPIJobResultAttributes.ACTION.toString()));
 		neo4jDef.setResultTime(Long.parseLong(node.getPropertyMap().get(KPIJobResultAttributes.RESULTTIME.toString())));
