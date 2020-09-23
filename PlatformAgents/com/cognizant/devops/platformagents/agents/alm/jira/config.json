@@ -232,9 +232,9 @@
 			},
 			"releaseDetails": {
 				"insightsTimeXFieldMapping": {
-					"timefield": "sprintCompleteDate",
+					"timefield": "releaseDate",
 					"isEpoch": false,
-					"timeformat": "%Y-%m-%dT%H:%M:%S"
+					"timeformat": "%Y-%m-%d"
 				},
 				"runSchedule": 720,
 				"jiraProjectApiUrl": "https://<JIRA_HOST>/rest/api/2/project",
