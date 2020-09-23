@@ -109,7 +109,7 @@ class JiraAgent(BaseAgent):
                  self.publishToolsData(data, jiraKeyMetadata)
                  #self.publishToolsData(data)
                  if len(workLogData) > 0:
-                     insighstTimeXFieldMapping = self.config.get('dynamicTemplate', {}).get('extensions', {}).get('releaseDetails', {}).get('insightsTimeXFieldMapping',None)
+                     insighstTimeXFieldMapping = self.config.get('changeLog', {}).get('insightsTimeXFieldMapping',None)
                      timeStampField=insighstTimeXFieldMapping.get('timefield',None)
                      timeStampFormat=insighstTimeXFieldMapping.get('timeformat',None)
                      isEpoch=insighstTimeXFieldMapping.get('isEpoch',None); 
@@ -334,12 +334,12 @@ class JiraAgent(BaseAgent):
  
     def retrieveSprintDetails (self):
         sprintDetails = self.config.get('dynamicTemplate', {}).get('extensions', {}).get('sprints', None)
-		
+        
         insighstTimeXFieldMapping = self.config.get('dynamicTemplate', {}).get('extensions', {}).get('sprints', {}).get('insightsTimeXFieldMapping',None)
         timeStampField=insighstTimeXFieldMapping.get('timefield',None)
         timeStampFormat=insighstTimeXFieldMapping.get('timeformat',None)
         isEpoch=insighstTimeXFieldMapping.get('isEpoch',None);
-		
+        
         boardApiUrl = sprintDetails.get('boardApiUrl')
         boards = self.tracking.get('boards', None)
         if sprintDetails and boards:
@@ -366,7 +366,7 @@ class JiraAgent(BaseAgent):
                         except Exception:
                             pass;
                     if len(data) > 0 : 
-                        self.publishToolsData(data, sprintMetadata)
+                        self.publishToolsData(data, sprintMetadata,timeStampField,timeStampFormat,isEpoch,True) 
                     continue
                 sprintsUrl = boardRestUrl + '/sprint?startAt='
                 startAt = 0
@@ -386,7 +386,7 @@ class JiraAgent(BaseAgent):
                         if str(parsedSprint.get('boardId')) == str(boardId):
                             data.append(parsedSprint)
                 if len(data) > 0 : 
-                    self.publishToolsData(data, sprintMetadata)
+                    self.publishToolsData(data, sprintMetadata,timeStampField,timeStampFormat,isEpoch,True)
     
     def retrieveBacklogDetails(self):
         backlogDetails = self.config.get('dynamicTemplate', {}).get('extensions', {}).get('backlog', None)
@@ -513,10 +513,9 @@ class JiraAgent(BaseAgent):
                 issue['projectKey'] = issueKey.split('-')[0]
         return parsedIssues
      
-    def retrieveReleaseDetails(self):
+    def retrieveReleaseDetails(self): 
         releaseDetails = self.config.get('dynamicTemplate', {}).get('extensions', {}).get('releaseDetails', None)
-
-        insighstTimeXFieldMapping = self.config.get('dynamicTemplate', {}).get('extensions', {}).get('sprints', {}).get('insightsTimeXFieldMapping',None)
+        insighstTimeXFieldMapping = self.config.get('dynamicTemplate', {}).get('extensions', {}).get('releaseDetails', {}).get('insightsTimeXFieldMapping',None)
         timeStampField=insighstTimeXFieldMapping.get('timefield',None)
         timeStampFormat=insighstTimeXFieldMapping.get('timeformat',None)
         isEpoch=insighstTimeXFieldMapping.get('isEpoch',None);
@@ -534,7 +533,8 @@ class JiraAgent(BaseAgent):
                     releaseApiUrl = jiraProjectApiUrl + '/' + projectKey + '/versions'
                     releaseVersionsResponse = self.getResponse(releaseApiUrl, 'GET', self.userid, self.passwd, None)
                     parsedReleaseVersions = self.parseResponse(jiraReleaseResponseTemplate, releaseVersionsResponse,parsedJiraProject)
-                    self.publishToolsData(parsedReleaseVersions, releaseVersionsMetadata)
+                    self.publishToolsData(parsedReleaseVersions, releaseVersionsMetadata,timeStampField,timeStampFormat,isEpoch,True)
+
 
     def sprintDeletionIdentifier(self):
         deletedSprintsData = list()
