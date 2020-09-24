@@ -61,6 +61,8 @@ import be.quodlibet.boxable.VerticalAlignment;
 import be.quodlibet.boxable.utils.FontUtils;
 import be.quodlibet.boxable.utils.ImageUtils;
 import be.quodlibet.boxable.utils.PDStreamUtils;
+
+import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.constants.ConfigOptions;
 import org.owasp.esapi.ESAPI;
 import org.owasp.esapi.errors.IntrusionException;
@@ -74,10 +76,10 @@ public class PdfTableUtil {
 
 	private static final Logger log = LogManager.getLogger(PdfTableUtil.class.getName());
 	
-	// Owner password (to open the file with all permissions) is "12345"
-	private static final String OWNER_PWD = "12345";
-	// User password (to open the file but with restricted permissions, is empty here)
-	private static final String USER_PWD = "12345";
+	// Owner key (to open the file with all permissions)
+	private static final String OWNER_KEY = ApplicationConfigProvider.getInstance().getPdfkey();
+	// User key (to open the file but with restricted permissions, is empty here)
+	private static final String USER_KEY = ApplicationConfigProvider.getInstance().getPdfkey();
 	private static final boolean ALLOW_PRINTING = false;
 	private static final String PDF_PATH = System.getenv().get("INSIGHTS_HOME") + File.separator + ConfigOptions.CONFIG_DIR + File.separator + "Pdf" + File.separator;
 
@@ -375,7 +377,7 @@ public class PdfTableUtil {
 		AccessPermission ap = new AccessPermission();
 		// disable printing, everything else is allowed
 		ap.setCanPrint(ALLOW_PRINTING);
-		StandardProtectionPolicy spp = new StandardProtectionPolicy(PdfTableUtil.OWNER_PWD, PdfTableUtil.USER_PWD, ap);
+		StandardProtectionPolicy spp = new StandardProtectionPolicy(PdfTableUtil.OWNER_KEY, PdfTableUtil.USER_KEY, ap);
 		spp.setEncryptionKeyLength(keyLength);
 		spp.setPermissions(ap);
 		doc.protect(spp);

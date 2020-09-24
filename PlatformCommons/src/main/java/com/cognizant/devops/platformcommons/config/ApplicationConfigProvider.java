@@ -63,6 +63,8 @@ public class ApplicationConfigProvider implements Serializable {
 	private AssessmentReport assessmentReport = new AssessmentReport();	
 	private WorkflowDetails workflowDetails = new WorkflowDetails();
     private WebhookEngine webhookEngine= new WebhookEngine();
+    private String pdfkey;
+    
 	private ApplicationConfigProvider() {
 		this.refreshTime = new Date(new Date().getTime() - 86400000);
 	}
@@ -335,6 +337,14 @@ public class ApplicationConfigProvider implements Serializable {
 
 	public void setEnableDataArchivalEngine(boolean enableDataArchivalEngine) {
 		this.enableDataArchivalEngine = enableDataArchivalEngine;
+	}
+
+	public String getPdfkey() {
+		return pdfkey;
+	}
+
+	public void setPdfkey(String pdfkey) {
+		this.pdfkey = pdfkey;
 	}
 	
 	

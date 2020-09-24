@@ -18,11 +18,7 @@ package com.cognizant.devops.platformworkflow.workflowtask.utils;
 public interface MQMessageConstants {
 	
 	String EXCHANGE_NAME = "iWorkflow";
-	String EXCHANGE_TYPE = "topic";
-	String MESSAGE_Q_ENDPOINT = "localhost";
-	String MESSAGE_Q_USER = "iSight";
-	String MESSAGE_Q_PASSWORD = "iSight";
-	String ROUTING_KEY_SEPERATOR = "\\.";
+	String EXCHANGE_TYPE = "topic";	
 	String MESSAGE_ENCODING = "UTF-8";
 
 }
