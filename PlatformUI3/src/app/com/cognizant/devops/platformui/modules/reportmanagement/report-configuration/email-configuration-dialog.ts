@@ -113,9 +113,9 @@ export class EmailConfigurationDialog {
             isValidated = false;
             messageDialogText = "Mail body templates cannot have script tags.";
         }
-        this.mailBodyTemplate = this.mailBodyTemplate.replace(/</g, "#").replace(/>/g, "~");
         console.log("The mail body template: ", this.mailBodyTemplate);
         if (isValidated) {
+            this.mailBodyTemplate = this.mailBodyTemplate.replace(/</g, "#").replace(/>/g, "~");
             let emailDetailsJson = { 'senderEmailAddress': self.senderEmailAddress, 'receiverEmailAddress': self.receiverEmailAddress, 'mailSubject': self.mailSubject, 'mailBodyTemplate': self.mailBodyTemplate, 'receiverCCEmailAddress': self.receiverCCEmailAddress, 'receiverBCCEmailAddress': self.receiverBCCEmailAddress }
             this.dialogRef.close(emailDetailsJson);
         } else {
