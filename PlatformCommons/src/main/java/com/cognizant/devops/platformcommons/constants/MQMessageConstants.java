@@ -18,9 +18,6 @@ package com.cognizant.devops.platformcommons.constants;
 public interface MQMessageConstants  {
 	String EXCHANGE_NAME = "iSight";
 	String EXCHANGE_TYPE = "topic";
-	String MESSAGE_Q_ENDPOINT = "localhost";
-	String MESSAGE_Q_USER = "iSight";
-	String MESSAGE_Q_PASSWORD = "iSight";
 	String ROUTING_KEY_FOR_DATA = "DATA";
 	String ROUTING_KEY_FOR_HEALTH = "HEALTH";
 	String ROUTING_KEY_SEPERATOR = "\\.";
