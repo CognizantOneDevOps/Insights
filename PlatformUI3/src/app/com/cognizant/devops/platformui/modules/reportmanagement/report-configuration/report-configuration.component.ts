@@ -14,7 +14,6 @@
  * the License.
  ******************************************************************************/
 import { Component, OnInit } from "@angular/core";
-import { DatePipe } from "@angular/common";
 import { MatDatepickerInputEvent } from "@angular/material/datepicker";
 import { MessageDialogService } from "@insights/app/modules/application-dialog/message-dialog-service";
 import { Router, NavigationExtras, ActivatedRoute } from "@angular/router";
@@ -40,6 +39,7 @@ export class ReportConfigComponent implements OnInit {
   disableRefresh: boolean = false;
   reportName: string = "";
   datasource: string = "";
+  today = new Date();
   reportdisplayName: string = "";
   selectedReport: any = { reportId: 0, description: "" };
   disableInputFields: boolean = false;
@@ -67,8 +67,6 @@ export class ReportConfigComponent implements OnInit {
   frequencyPlaceholder: string = "Select frequency";
   inputDataSourcePlaceholder: string = "Select datasource";
   emailDetails: any = null;
-  emailAdded: boolean = false;
-  emailUpdate: boolean = false;
   enableEmailDetails: boolean = false;
   emailReg = "email";
 
@@ -76,7 +74,6 @@ export class ReportConfigComponent implements OnInit {
     private route: ActivatedRoute,
     private dataShare: DataSharedService,
     private dialog: MatDialog,
-    private datepipe: DatePipe,
     public messageDialog: MessageDialogService,
     public router: Router,
     public reportmanagementservice: ReportManagementService,
@@ -117,8 +114,6 @@ export class ReportConfigComponent implements OnInit {
       this.enableadd = false;
       this.disableInputFields = true;
       this.isUpdate = true;
-      this.emailUpdate = true;
-      this.emailAdded = false;
       this.isReoccuring = this.receivedParam.data.isReoccuring;
       this.reportName = this.receivedParam.data.reportName;
       if (this.receivedParam.data.asseementreportdisplayname == "") {
@@ -157,7 +152,6 @@ export class ReportConfigComponent implements OnInit {
       }
     } else {
       this.isUpdate = false;
-      this.emailUpdate = false;
       this.disableRefresh = false;
       this.addReport();
     }
@@ -168,8 +162,6 @@ export class ReportConfigComponent implements OnInit {
       this.isReoccuring = false;
       this.deleteTasks();
       this.disableRefresh = false;
-      this.emailAdded = false;
-      this.emailUpdate = true;
     } else {
       this.reportName = "";
       this.reportdisplayName = "";
@@ -181,8 +173,8 @@ export class ReportConfigComponent implements OnInit {
       this.datasource = "";
       this.deleteTasks();
       this.disableRefresh = false;
-      this.emailAdded = false;
-      this.emailUpdate = false;
+      this.enableEmailDetails = null;
+      this.viewListDisabled = true;
     }
   }
 
@@ -229,10 +221,10 @@ export class ReportConfigComponent implements OnInit {
           this.taskListTobeSaved = [];
           this.taskListTobeSaved = result;
           this.taskListTobeSaved;
-          let enableEmailFlag=false;
+          let enableEmailFlag = false;
           if (this.taskListTobeSaved.length == 0) {
             this.enableadd = true;
-            this.enablecanel = true;
+            this.enablecanel = false;
           } else {
             this.enableadd = false;
             this.enablecanel = true;
@@ -246,14 +238,12 @@ export class ReportConfigComponent implements OnInit {
               enableEmailFlag = true;
             }
           }
-          if(enableEmailFlag){
+          if (enableEmailFlag) {
             this.enableEmailDetails = true;
-          }else{
+          } else {
             this.enableEmailDetails = false;
-            this.emailDetails=null;
-            this.emailAdded=false;
+            this.emailDetails = null;
           }
-         
         }
       });
     }
@@ -265,8 +255,7 @@ export class ReportConfigComponent implements OnInit {
     this.enablecanel = false;
     this.taskidInOrder = [];
     this.enableEmailDetails = false;
-    this.emailAdded=false;
-    this.emailDetails=null;
+    this.emailDetails = null;
   }
 
   getTemplateName() {
@@ -350,9 +339,9 @@ export class ReportConfigComponent implements OnInit {
         }
       }
     }
-    if(this.enableEmailDetails && !this.emailAdded){
-        isValidated = false;
-        messageDialogText = "Please add Mailing Details";
+    if (this.enableEmailDetails && this.emailDetails == null) {
+      isValidated = false;
+      messageDialogText = "Please add Mailing Details";
     }
     if (isValidated) {
       this.editSaveData();
@@ -383,11 +372,7 @@ export class ReportConfigComponent implements OnInit {
       reportAPIRequestJson["isReoccuring"] = this.isReoccuring;
       reportAPIRequestJson["datasource"] = this.datasource;
       reportAPIRequestJson["tasklist"] = this.taskidInOrder;
-      if(this.enableEmailDetails && this.emailAdded){
-        reportAPIRequestJson["emailDetails"] = this.emailDetails;
-      }else{
-        reportAPIRequestJson["emailDetails"] = null;
-      }
+      reportAPIRequestJson["emailDetails"] = this.emailDetails;
       reportAPIRequestJson["emailList"] = "abcd@abcd.com";
       var dialogmessage =
         " You have created a new Report <b>" +
@@ -442,11 +427,7 @@ export class ReportConfigComponent implements OnInit {
     }
     if (this.receivedParam.type == "edit") {
       reportAPIRequestJson["isReoccuring"] = this.isReoccuring;
-      if(this.enableEmailDetails && this.emailAdded){
-        reportAPIRequestJson["emailDetails"] = this.emailDetails;
-      }else{
-        reportAPIRequestJson["emailDetails"] = null;
-      }
+      reportAPIRequestJson["emailDetails"] = this.emailDetails;
       reportAPIRequestJson["id"] = this.receivedParam.data.configId;
       reportAPIRequestJson["tasklist"] = this.taskidInOrder;
       reportAPIRequestJson["emailList"] = "abcd@abcd.com";
@@ -511,7 +492,7 @@ export class ReportConfigComponent implements OnInit {
     var type = '';
     var isSessionExpired = self.dataShare.validateSession();
     if (!isSessionExpired) {
-      if (this.emailAdded || this.receivedParam.type == "edit") {
+      if (self.emailDetails || this.receivedParam.type == "edit") {
         details = self.emailDetails;
         type = 'edit';
       }
@@ -532,7 +513,6 @@ export class ReportConfigComponent implements OnInit {
       dialogRef.afterClosed().subscribe(result => {
         if (result) {
           self.emailDetails = result;
-          self.emailAdded = true;
         }
       });
     }

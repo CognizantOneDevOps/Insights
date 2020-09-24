@@ -61,8 +61,7 @@
                 </mat-icon>
             </button>
             <button mat-icon-button (click)="redirectToLandingPage()">
-                <mat-icon svgIcon="redirect_icon" title="Redirect To Landing Page" style="margin-bottom: 12%;"
-                    class="mat-icon material-icons">
+                <mat-icon svgIcon="redirect_icon" title="Redirect To Landing Page" style="margin-bottom: 12%;" class="mat-icon material-icons">
 
                     refresh </mat-icon>
             </button>
@@ -135,19 +134,16 @@
 
                     <td class="columnComponent">
                         <mat-select [disabled]="disableInputFields" [(ngModel)]="selectedReport.reportId"
-                            (ngModelChange)="getTemplateName()" class="form-control" required
-                            placeholder="Select report template" color="primary">
-                            <mat-option *ngFor="let report of listOfReports" [value]="report.reportId"
-                                style="color:#0033A0">
+                            (ngModelChange)="getTemplateName()" class="form-control" required placeholder="Select report template"
+                            color="primary">
+                            <mat-option *ngFor="let report of listOfReports" [value]="report.reportId" style="color:#0033A0">
                                 {{report.templateName}} </mat-option>
                         </mat-select>
                     </td>
 
                     <td class="extraColCss">
-                        <button mat-icon-button [disabled]="viewListDisabled"
-                            (click)="viewListOfKPISofSelectedReport()">
-                            <mat-icon svgIcon="view" title="View "
-                                style="margin-bottom: 30%; margin-right: 100% !important;margin-left: -89px;"
+                        <button mat-icon-button [disabled]="viewListDisabled" (click)="viewListOfKPISofSelectedReport()">
+                            <mat-icon svgIcon="view" title="View " style="margin-bottom: 30%; margin-right: 100% !important;margin-left: -89px;"
                                 class="mat-icon material-icons">
                                 view </mat-icon>
                         </button>
@@ -156,31 +152,14 @@
                         <span class="infoText">Select a report template to be configured. </span>
                     </td>
                 </tr>
-
-                <!-- <tr class="mat-row-webhook">
-                    <td class="mat-cell" class="columnName">
-                        <span class="mainText">Subscribers</span>
-                        <span style="color:#ff0000;">*</span>
-                    </td>
-                    <td class="columnComponent">
-                        <textarea [(ngModel)]="emailAddress" name="emailAddress" class="frmTxtarea" required style="margin-left: 10px; margin-top: 5px;width: 85%;resize: none;"></textarea>
-                    </td>
-                    <td class="extraColCss">
-
-                    </td>
-                    <td>
-                        <span class="infoText">Enter the email address(es) separated by (,). </span>
-                    </td>
-                </tr> -->
                 <tr class="mat-row-webhook">
                     <td class="mat-cell" class="columnName">
                         <span class="mainText">Frequency</span>
                         <span class="asteriskText">*</span>
                     </td>
                     <td class="columnComponent">
-                        <mat-select [(ngModel)]="schedule" (ngModelChange)="checkSchedule()"
-                            [disabled]="disableInputFields" required name="schedule" class="form-control"
-                            [placeholder]="frequencyPlaceholder" color="primary">
+                        <mat-select [(ngModel)]="schedule" (ngModelChange)="checkSchedule()" [disabled]="disableInputFields"
+                            required name="schedule" class="form-control" [placeholder]="frequencyPlaceholder" color="primary">
                             <mat-option *ngFor="let schedule of listOfSchedule" [value]="schedule">
                                 {{schedule}}
                             </mat-option>
@@ -200,8 +179,8 @@
                         <span class="mainText">Reoccurrence</span>
                     </td>
                     <td class="columnComponent">
-                        <mat-slide-toggle [disabled]="customeScheduleSelected" [(ngModel)]="isReoccuring"
-                            [checked]="isReoccuring" style="margin-right: 15%;margin-left: 9%;">
+                        <mat-slide-toggle [disabled]="customeScheduleSelected" [(ngModel)]="isReoccuring" [checked]="isReoccuring"
+                            style="margin-right: 15%;margin-left: 9%;">
                         </mat-slide-toggle>
                     </td>
                     <td class="extraColCss">
@@ -219,8 +198,7 @@
                     <td class="columnComponent">
                         <mat-form-field style="padding-left:10px;" appearance="standard" required>
                             <input matInput #startDateMatInput [matDatepicker]="startDatePicker" required [max]="today"
-                                placeholder="Choose a date" [(ngModel)]="startDateInput" disabled
-                                (dateChange)="getstartDate('change', $event)">
+                                placeholder="Choose a date" [(ngModel)]="startDateInput" disabled (dateChange)="getstartDate('change', $event)">
                             <mat-datepicker-toggle matSuffix [for]="startDatePicker"></mat-datepicker-toggle>
                             <mat-datepicker #startDatePicker [disabled]="disableInputFields"></mat-datepicker>
                         </mat-form-field>
@@ -240,8 +218,7 @@
                     <td class="columnComponent">
                         <mat-form-field style="padding-left:10px;" appearance="standard" required>
                             <input matInput #endDateMatInput [matDatepicker]="endDatePicker" required [max]="today"
-                                placeholder="Choose a date" [(ngModel)]="endDateInput" disabled
-                                (dateChange)="getendDate('change', $event)">
+                                placeholder="Choose a date" [(ngModel)]="endDateInput" disabled (dateChange)="getendDate('change', $event)">
                             <mat-datepicker-toggle matSuffix [for]="endDatePicker"></mat-datepicker-toggle>
                             <mat-datepicker #endDatePicker [disabled]="disableInputFields"></mat-datepicker>
 
@@ -299,16 +276,14 @@
                     </td>
                     <td class="extraColCss">
                         <button *ngIf="enablecanel" mat-icon-button (click)="addTasks()">
-                            <mat-icon title="Add Tasks"
-                                style="color: #0033a0;margin-bottom: 30%; margin-right: 100% !important;margin-left: -89px;"
+                            <mat-icon title="Add Tasks" style="color: #0033a0;margin-bottom: 30%; margin-right: 100% !important;margin-left: -89px;"
                                 class="mat-icon material-icons">
 
                                 add_circle
                             </mat-icon>
                         </button>
                         <button *ngIf="enablecanel" mat-icon-button (click)="deleteTasks()">
-                            <mat-icon
-                                style="color: #0033a0;margin-bottom: 30%; margin-right: 100% !important;margin-left: -89px;"
+                            <mat-icon style="color: #0033a0;margin-bottom: 30%; margin-right: 100% !important;margin-left: -89px;"
                                 title="Remove All Tasks" class="mat-icon material-icons">
                                 remove_circle
                             </mat-icon>
@@ -324,20 +299,10 @@
                     </td>
                     <td class="columnComponent">
                         <button mat-icon-button (click)="addEmailConfig()">
-                            <mat-icon *ngIf="!emailAdded && !emailUpdate" title="Add Email"
-                                class="mat-icon material-icons">
+                            <mat-icon *ngIf="!emailDetails" title="Add Email" class="mat-icon material-icons">
                                 add_circle
                             </mat-icon>
-                            <mat-icon *ngIf="emailAdded && !emailUpdate" title="Email added"
-                                class="mat-icon material-icons">
-                                check_circle
-                            </mat-icon>
-                            <mat-icon *ngIf="emailAdded && emailUpdate" title="Email added"
-                                class="mat-icon material-icons">
-                                check_circle
-                            </mat-icon>
-                            <mat-icon *ngIf="!emailAdded && emailUpdate" title="Edit email"
-                                class="mat-icon material-icons">
+                            <mat-icon *ngIf="emailDetails" title="Edit email" class="mat-icon material-icons">
                                 edit
                             </mat-icon>
                         </button>
