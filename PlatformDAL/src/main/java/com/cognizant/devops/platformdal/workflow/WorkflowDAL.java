@@ -670,8 +670,7 @@ public class WorkflowDAL extends BaseDAL {
 			terminateSession();
 			terminateSessionFactory();
 			return PlatformServiceConstants.SUCCESS;
-		} catch (Exception e) {
-			e.printStackTrace();
+		} catch (Exception e) {		
 			return null;
 		} finally {
 			terminateSession();

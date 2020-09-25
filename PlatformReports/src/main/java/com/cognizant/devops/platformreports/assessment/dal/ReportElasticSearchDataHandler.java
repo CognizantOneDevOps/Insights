@@ -150,7 +150,7 @@ public class ReportElasticSearchDataHandler implements ReportDataHandler {
 	}
 
 	@Override
-	public JsonArray fetchVisualizationResults(long executionId, int kpiId) {
+	public JsonArray fetchVisualizationResults(long executionId, int kpiId, int assessmentId) {
 		String vQuery = "";
 		vQuery = QueryEnum.valueOf(QueryEnum.ES_VCONTENTQUERY.name()).toString();
 		vQuery = vQuery.replaceAll("%kpiId%", String.valueOf(kpiId))

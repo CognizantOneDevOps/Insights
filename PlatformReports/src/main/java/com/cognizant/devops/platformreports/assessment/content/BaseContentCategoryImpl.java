@@ -149,6 +149,8 @@ public abstract class BaseContentCategoryImpl {
 		detail.setTrendline(null);//trendline
 		detail.setGroup(inferenceResult.getGroupName());
 		detail.setExecutionId(contentConfigDefinition.getExecutionId());
+		detail.setReportId(contentConfigDefinition.getReportId());
+		detail.setAssessmentId(contentConfigDefinition.getAssessmentId());
 		return detail;
 	}
 
@@ -188,6 +190,8 @@ public abstract class BaseContentCategoryImpl {
 			detail.setTrendline(null);//trendline
 			//detail.setGroup(inferenceResult.getGroupName());
 			detail.setExecutionId(contentConfigDefinition.getExecutionId());
+			detail.setReportId(contentConfigDefinition.getReportId());
+			detail.setAssessmentId(contentConfigDefinition.getAssessmentId());
 		} catch (Exception e) {//InsightsCustom
 			log.error(" Error while setNeutralContentDetail {} ", e);
 		}

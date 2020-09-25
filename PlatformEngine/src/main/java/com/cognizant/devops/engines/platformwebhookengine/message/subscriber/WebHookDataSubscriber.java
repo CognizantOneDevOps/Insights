@@ -61,7 +61,8 @@ public class WebHookDataSubscriber extends EngineSubscriberResponseHandler {
 				List<JsonObject> toolData = webHookParser.parseToolData(this.webhookConfig, message);
 				// Insert into Neo4j
 				if (!toolData.isEmpty()) {
-					if (webhookConfig.isEventProcessing()) {
+					Boolean b=webhookConfig.isEventProcessing();
+					if (Boolean.TRUE.equals(b)) {
 						WebhookEventProcessing wep = new WebhookEventProcessing(toolData, webhookConfig,false);
 						boolean status = wep.doEvent();
 						if (status) {

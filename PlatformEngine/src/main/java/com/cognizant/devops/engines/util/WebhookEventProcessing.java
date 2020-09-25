@@ -36,9 +36,8 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
 
-
 /**
- * Gereric class for all webhook event processing. * 
+ * Gereric class for all webhook event processing. *
  * 
  * 
  */
@@ -71,8 +70,20 @@ public class WebhookEventProcessing {
 	public boolean doEvent() {
 		// Check if it has webhook event
 		List<Boolean> status = new ArrayList<>();
+		if (!eventPayload.get(0).has("webhookEvent")) {
+			log.error(
+					"Webhook event processing ===== webhookEvent property not present in webhook response for webhook {}",
+					webhookConfig.getWebHookName());
+			return true;
+		}
 		String event = eventPayload.get(0).get("webhookEvent").getAsString();
 		JsonObject eventJson = eventConfigMap.get(event);
+		if (eventJson == null) {
+			log.error(
+					"Webhook event processing ===== webhookEvent or query property not present in event processing config json {}",
+					 eventConfigMap);
+			return true;
+		}
 		Map<String, String> keyValuesMap = getKeyValues();
 		StringSubstitutor substitutor = new StringSubstitutor(keyValuesMap, "{", "}");
 		JsonArray queryArray = eventJson.get("query").getAsJsonArray();
@@ -148,13 +159,22 @@ public class WebhookEventProcessing {
 		try {
 			JsonElement json = new JsonParser().parse(eventConfig);
 			JsonObject eachConfig = json.getAsJsonObject();
-			JsonArray array = eachConfig.get("config").getAsJsonArray();
-			array.forEach(element -> {
-				JsonObject obj = element.getAsJsonObject();
-				String eventName = obj.get("event").getAsString();
-				config.put(eventName, obj);
-			});
-			log.debug("Webhook event processing ==== eventConfig map prepared successfully {}", config);
+			if (eachConfig.has("config")) {
+				JsonArray array = eachConfig.get("config").getAsJsonArray();
+				array.forEach(element -> {
+					JsonObject obj = element.getAsJsonObject();
+					if (obj.has("event") && obj.has("query")) {
+						String eventName = obj.get("event").getAsString();
+						config.put(eventName, obj);
+					}
+				});
+				log.debug("Webhook event processing ==== eventConfig map prepared successfully {}", config);
+			} else {
+				log.debug(
+						"Webhook event processing ==== unable to prepare eventConfig map as config property is missing in event config  {}",
+						config);
+			}
+
 		} catch (Exception e) {
 			log.error("Webhook event processing ==== enable to process event config map {}", e.getMessage());
 		}

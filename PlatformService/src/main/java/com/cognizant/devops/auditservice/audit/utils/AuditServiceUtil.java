@@ -82,7 +82,6 @@ public class AuditServiceUtil {
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
         }
 
         return formattedresponse;
@@ -126,10 +125,9 @@ public class AuditServiceUtil {
                             String valB = new String();
 
                             try {
-                                valA = (String) o1.getAsJsonPrimitive(KEY_NAME).getAsString();
-                                valB = (String) o2.getAsJsonPrimitive(KEY_NAME).getAsString();
+                                valA = o1.getAsJsonPrimitive(KEY_NAME).getAsString();
+                                valB = o2.getAsJsonPrimitive(KEY_NAME).getAsString();
                             } catch (Exception e) {
-                                e.printStackTrace();
                             }
 
                             return -valA.compareTo(valB);
@@ -150,7 +148,6 @@ public class AuditServiceUtil {
                 formattedresponse.add("data", new JsonPrimitive("No assets found"));
             }
         } catch (Exception e) {
-            e.printStackTrace();
         }
         return formattedresponse;
     }

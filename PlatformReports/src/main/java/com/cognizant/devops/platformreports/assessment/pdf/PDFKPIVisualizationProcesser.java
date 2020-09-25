@@ -85,7 +85,7 @@ public class PDFKPIVisualizationProcesser implements Callable<JsonObject> {
 		}
 		eachKPIObject.add("visualizationresult", eachKPIVisualizationResult);
 		JsonArray contentResultArray = dataProcessor.fetchAndFormatContentResult(assessmentReportDTO.getExecutionId(),
-				kpiId);
+				kpiId, assessmentReportDTO.getConfigId());
 		if (contentResultArray.size() > 0) {
 			eachKPIObject.add("contentResult", contentResultArray);
 		}

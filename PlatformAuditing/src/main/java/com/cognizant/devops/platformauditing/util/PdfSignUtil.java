@@ -416,7 +416,7 @@ public class PdfSignUtil extends PdfCreateSignatureBase
 				log.info("PDF name is not valid for Regex -- "+PDF_NAME_VALIDATOR);
 			}
 		}catch(Exception e){
-			e.printStackTrace();
+			log.error(e);
 		}
 		return signdoc;
 	}

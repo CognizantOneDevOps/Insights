@@ -277,10 +277,12 @@ public class ReportGraphDataHandler implements ReportDataHandler {
 	}
 
 	@Override
-	public JsonArray fetchVisualizationResults(long executionId, int kpiId) {
+	public JsonArray fetchVisualizationResults(long executionId, int kpiId, int assessmentId) {
 		String vQuery = "";
 		vQuery = QueryEnum.valueOf(QueryEnum.NEO4J_VCONTENTQUERY.name()).toString();
-		vQuery = vQuery.replace(":kpiId", String.valueOf(kpiId)).replace(":executionId", String.valueOf(executionId));
+		vQuery = vQuery.replace(":kpiId", String.valueOf(kpiId)).replace(":executionId", String.valueOf(executionId))
+				.replace(":assessmentId", String.valueOf(assessmentId));
+		log.debug("Worlflow Detail ==== content Visualization query {}   ", vQuery);
 		return fetchVisualizationResults(vQuery);
 	}
 

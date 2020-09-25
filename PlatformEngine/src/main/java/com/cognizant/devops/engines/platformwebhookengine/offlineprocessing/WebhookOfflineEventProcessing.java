@@ -34,7 +34,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
 /**
- * Class for Webhook Offline Event Processing 
+ * Class for Webhook Offline Event Processing
  * 
  * Responsible for processing failed webhook events.
  *
@@ -54,27 +54,33 @@ public class WebhookOfflineEventProcessing extends TimerTask {
 
 	public void execute(List<WebHookConfig> webhookEventConfigs) {
 
-		webhookEventConfigs.forEach(webhookEventConfig -> {
-			WebhookEventProcessing webhookEventProcessing = null;
-			String neo4jLabel = webhookEventConfig.getLabelName();
-			List<JsonObject> eventNodes = getNeo4JEventNodes(neo4jLabel);
-			for (JsonObject eventNode : eventNodes) {
-				String uuid = eventNode.get("uuid").getAsString();
-				// check max processing time
-				if (webhookEventProcessing == null) {
-					webhookEventProcessing = new WebhookEventProcessing(Arrays.asList(eventNode), webhookEventConfig,
-							true);
-				} else {
-					webhookEventProcessing.setEventPayload(Arrays.asList(eventNode));
+		for (WebHookConfig webhookEventConfig : webhookEventConfigs) {
+			try {
+				WebhookEventProcessing webhookEventProcessing = null;
+				String neo4jLabel = webhookEventConfig.getLabelName();
+				List<JsonObject> eventNodes = getNeo4JEventNodes(neo4jLabel);
+				for (JsonObject eventNode : eventNodes) {
+					String uuid = eventNode.get("uuid").getAsString();
+					// check max processing time
+					if (webhookEventProcessing == null) {
+						webhookEventProcessing = new WebhookEventProcessing(Arrays.asList(eventNode),
+								webhookEventConfig, true);
+					} else {
+						webhookEventProcessing.setEventPayload(Arrays.asList(eventNode));
+					}
+					if (checkDueMaxEventProcessTime(eventNode.get("eventTimestamp").getAsLong())
+							|| webhookEventProcessing.doEvent()) {
+						updateNeo4jNode(webhookEventConfig.getLabelName(), uuid);
+						log.debug(
+								"Webhook Offline Event Processing ====== Event processed successfully for payloads {}",
+								eventNode);
+					}
 				}
-				if (checkDueMaxEventProcessTime(eventNode.get("eventTimestamp").getAsLong())
-						|| webhookEventProcessing.doEvent()) {
-					updateNeo4jNode(webhookEventConfig.getLabelName(), uuid);
-					log.debug("Webhook Offline Event Processing ====== Event processed successfully for payloads {}",
-							eventNode);
-				}
+			} catch (Exception e) {
+				log.error("Webhook Offline Event Processing ====== something went wrong while offline processing {}");
 			}
-		});
+		}
+
 	}
 
 	private List<JsonObject> getNeo4JEventNodes(String neo4jLabel) {
