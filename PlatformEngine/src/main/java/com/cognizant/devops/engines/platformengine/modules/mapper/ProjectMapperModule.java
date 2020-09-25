@@ -23,7 +23,7 @@ import org.apache.logging.log4j.Logger;
 
 import com.cognizant.devops.engines.platformengine.message.core.EngineStatusLogger;
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
-import com.cognizant.devops.platformcommons.dal.neo4j.Neo4jDBHandler;
+import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBHandler;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformdal.mapping.projects.ProjectMapping;
 import com.cognizant.devops.platformdal.mapping.projects.ProjectMappingDAL;
@@ -40,7 +40,7 @@ public class ProjectMapperModule extends TimerTask {
 		ProjectMappingDAL projectMappingDAL = new ProjectMappingDAL();
 		List<ProjectMapping> projectMappingList = projectMappingDAL.fetchAllProjectMapping();
 		if(projectMappingList != null){
-			Neo4jDBHandler graphDBHandler = new Neo4jDBHandler();
+			GraphDBHandler graphDBHandler = new GraphDBHandler();
 			for(ProjectMapping projectMapping : projectMappingList){
 				try {
 					graphDBHandler.executeCypherQuery(projectMapping.getCypherQuery());

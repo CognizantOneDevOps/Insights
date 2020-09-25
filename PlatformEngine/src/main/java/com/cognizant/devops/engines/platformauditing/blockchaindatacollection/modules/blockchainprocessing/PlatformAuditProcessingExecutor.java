@@ -23,7 +23,7 @@ import org.apache.logging.log4j.Logger;
 
 import com.cognizant.devops.platformauditing.api.InsightsAuditImpl;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphResponse;
-import com.cognizant.devops.platformcommons.dal.neo4j.Neo4jDBHandler;
+import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBHandler;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -49,7 +49,7 @@ public class PlatformAuditProcessingExecutor extends TimerTask {
     }
 
     private void orphanNodeExtraction() {
-        Neo4jDBHandler dbHandler = new Neo4jDBHandler();
+        GraphDBHandler dbHandler = new GraphDBHandler();
         StringBuffer cypher = new StringBuffer();
         cypher.append("MATCH (n:DATA) WHERE ");
         cypher.append("NOT \"JIRA\" IN labels(n) AND ");

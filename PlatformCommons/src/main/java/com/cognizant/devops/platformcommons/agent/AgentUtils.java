@@ -18,7 +18,7 @@ package com.cognizant.devops.platformcommons.agent;
 import java.util.Map;
 
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphResponse;
-import com.cognizant.devops.platformcommons.dal.neo4j.Neo4jDBHandler;
+import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBHandler;
 import com.cognizant.devops.platformcommons.dal.neo4j.NodeData;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.google.gson.JsonObject;
@@ -33,7 +33,7 @@ public class AgentUtils {
 		StringBuffer cypher = new StringBuffer();
 		cypher.append("MATCH (n:AGENT:").append(category).append(":").append(tool).append(") return n");
 		
-		Neo4jDBHandler dbHandler = new Neo4jDBHandler();
+		GraphDBHandler dbHandler = new GraphDBHandler();
 		GraphResponse response = dbHandler.executeCypherQuery(cypher.toString());
 		if(response.getNodes().size() > 0){
 			JsonObject config = buildAgentConfigFromNodeData(response.getNodes().get(0));

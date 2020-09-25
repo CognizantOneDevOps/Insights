@@ -24,7 +24,7 @@ import org.apache.logging.log4j.Logger;
 
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.dal.RestApiHandler;
-import com.cognizant.devops.platformcommons.dal.neo4j.Neo4jDBHandler;
+import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBHandler;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
@@ -39,7 +39,7 @@ public class SystemStatus {
 
 	public static JsonObject addSystemInformationInNeo4j(String version, List<JsonObject> dataList,
 			List<String> labels) {
-		Neo4jDBHandler graphDBHandler = new Neo4jDBHandler();
+		GraphDBHandler graphDBHandler = new GraphDBHandler();
 		JsonObject response = null;
 		try {
 			String queryLabel = "";

@@ -27,7 +27,7 @@ import com.cognizant.devops.engines.platformengine.message.core.EngineStatusLogg
 import com.cognizant.devops.engines.platformengine.message.factory.EngineSubscriberResponseHandler;
 import com.cognizant.devops.platformcommons.constants.MQMessageConstants;
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
-import com.cognizant.devops.platformcommons.dal.neo4j.Neo4jDBHandler;
+import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBHandler;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -37,7 +37,7 @@ import com.rabbitmq.client.Envelope;
 
 public class DataArchivalHealthSubscriber extends EngineSubscriberResponseHandler {
 	private static Logger log = LogManager.getLogger(DataArchivalHealthSubscriber.class.getName());
-	Neo4jDBHandler dbHandler = new Neo4jDBHandler();
+	GraphDBHandler dbHandler = new GraphDBHandler();
 
 	public DataArchivalHealthSubscriber(String routingKey) throws Exception {
 		super(routingKey);

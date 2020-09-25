@@ -34,7 +34,7 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphResponse;
-import com.cognizant.devops.platformcommons.dal.neo4j.Neo4jDBHandler;
+import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBHandler;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformservice.rest.datatagging.constants.DatataggingConstants;
 import com.google.gson.JsonArray;
@@ -66,7 +66,7 @@ public class DataProcessorUtil {
 		CSVFormat format = CSVFormat.newFormat(',').withHeader();
 		try (Reader reader = new FileReader(csvfile); CSVParser csvParser = new CSVParser(reader, format);) {
 
-			Neo4jDBHandler dbHandler = new Neo4jDBHandler();
+			GraphDBHandler dbHandler = new GraphDBHandler();
 			Map<String, Integer> headerMap = csvParser.getHeaderMap();
 			dbHandler.executeCypherQuery("CREATE CONSTRAINT ON (n:METADATA) ASSERT n.metadata_id  IS UNIQUE");
 			String query = "UNWIND {props} AS properties " + "CREATE (n:METADATA:DATATAGGING) " + "SET n = properties";
@@ -86,7 +86,7 @@ public class DataProcessorUtil {
 
 	}
 
-	private boolean parseCsvRecords(boolean status, CSVParser csvParser, Neo4jDBHandler dbHandler,
+	private boolean parseCsvRecords(boolean status, CSVParser csvParser, GraphDBHandler dbHandler,
 			Map<String, Integer> headerMap, String query)
 			throws IOException,InsightsCustomException {
 		List<JsonObject> nodeProperties = new ArrayList<>();
@@ -112,7 +112,7 @@ public class DataProcessorUtil {
 	}
 
 	public boolean updateHiearchyProperty(MultipartFile file) {
-		Neo4jDBHandler dbHandler = new Neo4jDBHandler();
+		GraphDBHandler dbHandler = new GraphDBHandler();
 		File csvfile = null;
 		boolean status = false;
 		try {
@@ -158,7 +158,7 @@ public class DataProcessorUtil {
 		return status;
 	}
 
-	private boolean deleteMedataNodes(Neo4jDBHandler dbHandler, boolean status, String label,
+	private boolean deleteMedataNodes(GraphDBHandler dbHandler, boolean status, String label,
 			List<JsonObject> deleteList) {
 		String cypherQuery;
 		cypherQuery = " UNWIND {props} AS properties MATCH (n :" + label + "{metadata_id:properties.metadata_id})   "
@@ -176,7 +176,7 @@ public class DataProcessorUtil {
 		return status;
 	}
 
-	private boolean updateMedataNodes(Neo4jDBHandler dbHandler, boolean status, String label,
+	private boolean updateMedataNodes(GraphDBHandler dbHandler, boolean status, String label,
 			List<JsonObject> editList) {
 		String cypherQuery;
 		cypherQuery = " UNWIND {props} AS properties MATCH (n :" + label + "{metadata_id:properties.metadata_id}) "
@@ -209,7 +209,7 @@ public class DataProcessorUtil {
 		return json;
 	}
 
-	private void getCurrentRecords(List<String> combo, Neo4jDBHandler dbHandler) throws InsightsCustomException {
+	private void getCurrentRecords(List<String> combo, GraphDBHandler dbHandler) throws InsightsCustomException {
 		String cypherQuery = " MATCH (n :METADATA:DATATAGGING)  RETURN n";
 		GraphResponse graphResponse = dbHandler.executeCypherQuery(cypherQuery);
 		JsonArray rows = graphResponse.getJson().get("results").getAsJsonArray().get(0).getAsJsonObject().get("data")

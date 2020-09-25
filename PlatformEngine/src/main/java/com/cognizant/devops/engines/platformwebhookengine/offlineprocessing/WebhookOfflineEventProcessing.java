@@ -26,7 +26,7 @@ import org.apache.logging.log4j.Logger;
 import com.cognizant.devops.engines.util.WebhookEventProcessing;
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.core.util.InsightsUtils;
-import com.cognizant.devops.platformcommons.dal.neo4j.Neo4jDBHandler;
+import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBHandler;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformdal.webhookConfig.WebHookConfig;
 import com.cognizant.devops.platformdal.webhookConfig.WebHookConfigDAL;
@@ -41,7 +41,7 @@ import com.google.gson.JsonObject;
  */
 public class WebhookOfflineEventProcessing extends TimerTask {
 	WebHookConfigDAL dal = new WebHookConfigDAL();
-	private Neo4jDBHandler dbHandler = new Neo4jDBHandler();
+	private GraphDBHandler dbHandler = new GraphDBHandler();
 	private static Logger log = LogManager.getLogger(WebhookOfflineEventProcessing.class);
 
 	@Override

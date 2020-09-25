@@ -46,36 +46,11 @@ public class SubscriberTest {
 	/*
 	public final void testHandleDeliveryStringEnvelopeBasicPropertiesByteArray() {
 		ApplicationConfigCache.loadConfigCache();
-		Neo4jDBHandler neo4jDBHandler = new Neo4jDBHandler();
 		try {
-			neo4jDBHandler.executeCypherQuery("Match (n:CONFIG:TEST) delete n");
-			EngineAggregatorModule engineAggregatorModule = new EngineAggregatorModule();
-			engineAggregatorModule.execute(null);
-			neo4jDBHandler.executeCypherQuery("create (n:CONFIG:SCM:GIT:TEST { functionalBlock: 'SCM', toolName: 'GIT', routingKeys: '[\"TEST_SCM.TEST_GIT.DATA\",\"TEST_SCM.TEST_GIT.HEALTH\"]'}) return n");
-			engineAggregatorModule.execute(null);
-			
-			JsonArray dataArray = new JsonArray();
-			JsonObject data = new JsonObject();
-			dataArray.add(data);
-			data.addProperty("testDataKey", "testDataValue");
-			MessagePublisherFactory.publish("TEST_SCM.TEST_GIT.DATA", dataArray);
-			Thread.sleep(5000);
-			List<NodeData> result = neo4jDBHandler.executeCypherQuery("Match (n:TEST_SCM:TEST_GIT) return n").getNodes();
-			assertEquals("Incorrect Data inserted by subscriber", 1, result.size());
-			neo4jDBHandler.executeCypherQuery("Match (n:CONFIG:TEST) delete n");
-			neo4jDBHandler.executeCypherQuery("Match (n:TEST_SCM:TEST_GIT) delete n");
-			
-			engineAggregatorModule.deregisterAggregator("TEST_SCM.TEST_GIT.DATA");
-			MessagePublisherFactory.publish("TEST_SCM.TEST_GIT.DATA", dataArray);
-			Thread.sleep(5000);
-			result = neo4jDBHandler.executeCypherQuery("Match (n:TEST_SCM:TEST_GIT) return n").getNodes();
-			assertEquals("Publisher is not removed properly", 0, result.size());
-			
-			neo4jDBHandler.executeCypherQuery("Match (n:CONFIG:TEST) delete n");
-			neo4jDBHandler.executeCypherQuery("Match (n:TEST_SCM:TEST_GIT) delete n");			
+				
 		} catch (GraphDBException e) {
 		} catch (Exception e) {
 		}
 	}
-*/
+	*/
 }

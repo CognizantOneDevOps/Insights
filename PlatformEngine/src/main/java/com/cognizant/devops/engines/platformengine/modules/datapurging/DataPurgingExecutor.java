@@ -40,7 +40,7 @@ import com.cognizant.devops.platformcommons.core.util.DataPurgingUtils;
 import com.cognizant.devops.platformcommons.core.util.InsightsUtils;
 import com.cognizant.devops.platformcommons.dal.elasticsearch.ElasticSearchDBHandler;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphResponse;
-import com.cognizant.devops.platformcommons.dal.neo4j.Neo4jDBHandler;
+import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBHandler;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformdal.settingsconfig.SettingsConfigurationDAL;
 import com.google.gson.Gson;
@@ -91,7 +91,7 @@ public class DataPurgingExecutor extends TimerTask {
 		// Converts into epoch time in seconds as data inside inSightsTime property is
 		// stored in epoch seconds
 		long epochTime = InsightsUtils.getTimeBeforeDaysInSeconds(backupDurationInDays);
-		Neo4jDBHandler dbHandler = new Neo4jDBHandler();
+		GraphDBHandler dbHandler = new GraphDBHandler();
 		try {
 			responseList = getAllOrphanNodesInfo(responseList, rowLimit, epochTime, dbHandler);
 			responseList = getNodesRelationshipsInfo(responseList, rowLimit, epochTime, dbHandler);
@@ -186,7 +186,7 @@ public class DataPurgingExecutor extends TimerTask {
 	 * @throws InsightsCustomException
 	 */
 	private List<GraphResponse> getAllOrphanNodesInfo(List<GraphResponse> resultList, String rowLimit, long epochTime,
-			Neo4jDBHandler dbHandler) throws InsightsCustomException {
+			GraphDBHandler dbHandler) throws InsightsCustomException {
 		GraphResponse response = null;
 		int splitlength = 0;
 		try {
@@ -217,7 +217,7 @@ public class DataPurgingExecutor extends TimerTask {
 	 * @throws InsightsCustomException
 	 */
 	private List<GraphResponse> getNodesRelationshipsInfo(List<GraphResponse> resultList, String rowLimit,
-			long epochTime, Neo4jDBHandler dbHandler) throws InsightsCustomException {
+			long epochTime, GraphDBHandler dbHandler) throws InsightsCustomException {
 		GraphResponse response = null;
 		int splitlength = 0;
 		try {
@@ -237,14 +237,14 @@ public class DataPurgingExecutor extends TimerTask {
 		return resultList;
 	}
 
-	private int getOrphanNodeCount(Neo4jDBHandler dbHandler, long epochTime) throws InsightsCustomException {
+	private int getOrphanNodeCount(GraphDBHandler dbHandler, long epochTime) throws InsightsCustomException {
 		String cntQry = "MATCH (n:DATA) WHERE not (n)-[]-() and n.inSightsTime<" + epochTime + " return count(*)";
 		GraphResponse cntResponse = dbHandler.executeCypherQuery(cntQry);
 		return cntResponse.getJson().get("results").getAsJsonArray().get(0).getAsJsonObject().get("data")
 				.getAsJsonArray().get(0).getAsJsonObject().get("row").getAsInt();
 	}
 
-	private int getNodesWithRelationshipsCount(Neo4jDBHandler dbHandler, long epochTime) throws InsightsCustomException {
+	private int getNodesWithRelationshipsCount(GraphDBHandler dbHandler, long epochTime) throws InsightsCustomException {
 		String cntQry = "MATCH (n:DATA)-[r]->(m:DATA) where n.inSightsTime<" + epochTime + " return count(*)";
 		GraphResponse cntResponse = dbHandler.executeCypherQuery(cntQry);
 		return cntResponse.getJson().get("results").getAsJsonArray().get(0).getAsJsonObject().get("data")
@@ -252,7 +252,7 @@ public class DataPurgingExecutor extends TimerTask {
 	}
 
 	private GraphResponse getOrphanNodesInfo(String limit, int splitlength, long epochTime) throws InsightsCustomException {
-		Neo4jDBHandler dbHandler = new Neo4jDBHandler();
+		GraphDBHandler dbHandler = new GraphDBHandler();
 		String query = "MATCH (n:DATA) WHERE not(n)-[]-() and n.inSightsTime<" + epochTime + " return n skip "
 				+ splitlength + " limit " + limit;
 		return dbHandler.executeCypherQuery(query);
@@ -260,7 +260,7 @@ public class DataPurgingExecutor extends TimerTask {
 
 	private GraphResponse getNodesWithRelationshipInfo(String limit, int splitlength, long epochTime)
 			throws InsightsCustomException {
-		Neo4jDBHandler dbHandler = new Neo4jDBHandler();
+		GraphDBHandler dbHandler = new GraphDBHandler();
 		String query = "MATCH (n:DATA)-[r]->(m:DATA) where n.inSightsTime<" + epochTime + " return distinct n,r,m skip "
 				+ splitlength + " limit " + limit;
 		return dbHandler.executeCypherQuery(query);

@@ -22,7 +22,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import com.cognizant.devops.platformcommons.core.enums.JobSchedule;
 import com.cognizant.devops.platformcommons.core.util.InsightsUtils;
-import com.cognizant.devops.platformcommons.dal.neo4j.Neo4jDBHandler;
+import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBHandler;
 import com.cognizant.devops.platforminsights.dal.Neo4jDBImpl;
 import com.cognizant.devops.platforminsights.datamodel.InferenceConfigDefinition;
 import com.cognizant.devops.platforminsights.exception.InsightsJobFailedException;
@@ -34,7 +34,7 @@ public abstract class BaseActionImpl {
 	private static Logger log = LogManager.getLogger(BaseActionImpl.class);
 
 	protected InferenceConfigDefinition kpiDefinition;
-	Neo4jDBHandler dbHandler = new Neo4jDBHandler();
+	GraphDBHandler dbHandler = new GraphDBHandler();
 	Gson gson = new Gson();
 	JsonParser jsonParser = new JsonParser();
 

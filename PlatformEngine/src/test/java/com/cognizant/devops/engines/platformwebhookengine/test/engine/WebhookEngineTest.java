@@ -31,7 +31,7 @@ import org.testng.annotations.Test;
 
 import com.cognizant.devops.engines.platformwebhookengine.modules.aggregator.WebHookEngineAggregatorModule;
 import com.cognizant.devops.platformcommons.config.ApplicationConfigCache;
-import com.cognizant.devops.platformcommons.dal.neo4j.Neo4jDBHandler;
+import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBHandler;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformdal.webhookConfig.WebHookConfig;
 import com.cognizant.devops.platformdal.webhookConfig.WebHookConfigDAL;
@@ -194,7 +194,7 @@ public class WebhookEngineTest {
 		webhookConfigDAL.deleteWebhookConfigurations(p.getProperty("webhookName"));
 		//webhookConfigDAL.deleteWebhookConfigurations(webhookEngineTestData.webhookNameException);
 		// Cleaning Neo4J 
-		Neo4jDBHandler dbHandler = new Neo4jDBHandler();
+		GraphDBHandler dbHandler = new GraphDBHandler();
 		String query = "MATCH (p:" + webhookEngineTestData.labelName + ") where p.webhookName="
 				+ webhookEngineTestData.webhookName + " delete p";
 		String queryDeleteHeathData = "MATCH (p:" + webhookEngineTestData.WEBHOOK_SUBSCRIBER_HEALTH_ROUTING_KEY

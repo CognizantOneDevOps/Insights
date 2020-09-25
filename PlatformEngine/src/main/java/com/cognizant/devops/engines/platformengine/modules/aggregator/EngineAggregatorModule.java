@@ -29,7 +29,7 @@ import org.apache.logging.log4j.Logger;
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphResponse;
-import com.cognizant.devops.platformcommons.dal.neo4j.Neo4jDBHandler;
+import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBHandler;
 import com.cognizant.devops.platformcommons.dal.neo4j.NodeData;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformdal.agentConfig.AgentConfig;
@@ -57,7 +57,7 @@ public class EngineAggregatorModule extends TimerTask {
 	public void run() {
 		log.debug(" EngineAggregatorModule start ====");
 		ApplicationConfigProvider.performSystemCheck();
-		Neo4jDBHandler graphDBHandler = new Neo4jDBHandler();
+		GraphDBHandler graphDBHandler = new GraphDBHandler();
 		AgentConfigDAL agentConfigDal = new AgentConfigDAL();
 		List<AgentConfig> allAgentConfigurations = agentConfigDal.getAllEngineAggregatorAgentConfigurations();
 		boolean enableOnlineDatatagging = ApplicationConfigProvider.getInstance().isEnableOnlineDatatagging();
@@ -76,7 +76,7 @@ public class EngineAggregatorModule extends TimerTask {
 		log.debug(" EngineAggregatorModule Completed ====");
 	}
 
-	private void registerAggragators(AgentConfig agentConfig, Neo4jDBHandler graphDBHandler, String toolName,
+	private void registerAggragators(AgentConfig agentConfig, GraphDBHandler graphDBHandler, String toolName,
 			List<BusinessMappingData> businessMappingList) {
 			Boolean isEnrichmentRequired= false;
 		String targetProperty="";
@@ -152,7 +152,7 @@ public class EngineAggregatorModule extends TimerTask {
 	 * catch (TimeoutException e) { log.error(e); } } return false; }
 	 */
 
-	private Map<String, List<BusinessMappingData>> getMetaData(Neo4jDBHandler dbHandler) {
+	private Map<String, List<BusinessMappingData>> getMetaData(GraphDBHandler dbHandler) {
 		List<NodeData> nodes = null;
 		Map<String, List<BusinessMappingData>> businessMappinMap = new HashMap<String, List<BusinessMappingData>>(0);
 		Gson gson = new Gson();

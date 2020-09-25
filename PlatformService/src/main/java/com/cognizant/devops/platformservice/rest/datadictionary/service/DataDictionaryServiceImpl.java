@@ -26,7 +26,7 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Service;
 
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphResponse;
-import com.cognizant.devops.platformcommons.dal.neo4j.Neo4jDBHandler;
+import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBHandler;
 import com.cognizant.devops.platformdal.agentConfig.AgentConfig;
 import com.cognizant.devops.platformdal.agentConfig.AgentConfigDAL;
 import com.cognizant.devops.platformdal.webhookConfig.WebHookConfig;
@@ -38,7 +38,7 @@ import com.google.gson.JsonObject;
 
 @Service("dataDictionaryService")
 public class DataDictionaryServiceImpl implements DataDictionaryService {
-	Neo4jDBHandler neo4jDBHandler = new Neo4jDBHandler();
+	GraphDBHandler GraphDBHandler = new GraphDBHandler();
 	private static Logger log = LogManager.getLogger(DataDictionaryServiceImpl.class);
 
 	@Override
@@ -91,7 +91,7 @@ public class DataDictionaryServiceImpl implements DataDictionaryService {
 		JsonArray keysArrayJson = new JsonArray();
 		try {
 			String toolPropertiesQuery = DataDictionaryConstants.GET_TOOL_PROPERTIES_QUERY;
-			GraphResponse graphResponse = neo4jDBHandler.executeCypherQuery(
+			GraphResponse graphResponse = GraphDBHandler.executeCypherQuery(
 					toolPropertiesQuery.replace("__labelName__", labelName).replace("__CategoryName__", categoryName));
 			JsonObject jsonResponse = graphResponse.getJson();
 			Iterator<JsonElement> iterator = jsonResponse.get("results").getAsJsonArray().iterator().next()
@@ -121,7 +121,7 @@ public class DataDictionaryServiceImpl implements DataDictionaryService {
 		JsonArray toolsRealtionJson = new JsonArray();
 		try {
 			String toolsRelationshipQuery = DataDictionaryConstants.GET_TOOLS_RELATIONSHIP_QUERY;
-			GraphResponse graphResponse = neo4jDBHandler.executeCypherQuery(toolsRelationshipQuery
+			GraphResponse graphResponse = GraphDBHandler.executeCypherQuery(toolsRelationshipQuery
 					.replace("__StartToolCategory__", startToolCategory).replace("__StartLabelName__", startLabelName)
 					.replace("__EndToolCategory__", endToolCatergory).replace("__EndLabelName__", endLabelName));
 			JsonObject jsonResponse = graphResponse.getJson();

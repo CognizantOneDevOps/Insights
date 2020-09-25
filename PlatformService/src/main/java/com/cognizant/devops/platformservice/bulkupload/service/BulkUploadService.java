@@ -44,7 +44,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.cognizant.devops.platformcommons.constants.ConfigOptions;
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
 import com.cognizant.devops.platformcommons.core.util.InsightsUtils;
-import com.cognizant.devops.platformcommons.dal.neo4j.Neo4jDBHandler;
+import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBHandler;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformservice.rest.datatagging.constants.DatataggingConstants;
 import com.google.gson.JsonObject;
@@ -162,7 +162,7 @@ public class BulkUploadService implements IBulkUpload {
 	 * @throws InsightsCustomException
 	 */
 	private void insertDataInDatabase(List<JsonObject> dataList, String cypherQuery) throws InsightsCustomException {
-		Neo4jDBHandler dbHandler = new Neo4jDBHandler();
+		GraphDBHandler dbHandler = new GraphDBHandler();
 		try {
 			List<List<JsonObject>> partitionList = partitionList(dataList, 1000);
 			for (List<JsonObject> chunk : partitionList) {

@@ -41,7 +41,7 @@ import com.cognizant.devops.platformcommons.constants.ConfigOptions;
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
 import com.cognizant.devops.platformcommons.core.util.InsightsUtils;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphResponse;
-import com.cognizant.devops.platformcommons.dal.neo4j.Neo4jDBHandler;
+import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBHandler;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -184,7 +184,7 @@ public class OfflineDataProcessingExecutor extends TimerTask {
 	 * @param jsonObject
 	 */
 	public Boolean executeCypherQuery(String cypherQuery, DataEnrichmentModel dataEnrichmentModel) {
-		Neo4jDBHandler dbHandler = new Neo4jDBHandler();
+		GraphDBHandler dbHandler = new GraphDBHandler();
 		int processedRecords = 1;
 		int recordCount = 0;
 		long queryExecutionStartTime = System.currentTimeMillis();

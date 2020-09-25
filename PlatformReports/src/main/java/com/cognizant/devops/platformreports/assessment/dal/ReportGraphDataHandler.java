@@ -27,7 +27,7 @@ import org.apache.logging.log4j.Logger;
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
 import com.cognizant.devops.platformcommons.core.enums.KPIJobResultAttributes;
 import com.cognizant.devops.platformcommons.core.util.InsightsUtils;
-import com.cognizant.devops.platformcommons.dal.neo4j.Neo4jDBHandler;
+import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBHandler;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformdal.assessmentreport.ReportConfigDAL;
 import com.cognizant.devops.platformreports.assessment.datamodel.ContentConfigDefinition;
@@ -46,7 +46,7 @@ public class ReportGraphDataHandler implements ReportDataHandler {
 
 	private static Logger log = LogManager.getLogger(ReportGraphDataHandler.class);
 
-	Neo4jDBHandler graphDBHandler = new Neo4jDBHandler();
+	GraphDBHandler graphDBHandler = new GraphDBHandler();
 	ReportConfigDAL reportConfigDAL = new ReportConfigDAL();
 
 	Gson gson = new Gson();
@@ -91,7 +91,7 @@ public class ReportGraphDataHandler implements ReportDataHandler {
 			log.debug("Worlflow Detail ==== graphQuery with date for KPI {} ==== is === {} ", kpiDefinition.getKpiId(),
 					graphQuery);
 			if (!kpiDefinition.getInputDatasource().isEmpty()) {
-				graphDBHandler = new Neo4jDBHandler(kpiDefinition.getInputDatasource());
+				graphDBHandler = new GraphDBHandler(kpiDefinition.getInputDatasource());
 			}
 			List<JsonObject> graphResp = fetchData(graphQuery);
 			JsonArray graphJsonResult = graphResp.get(0).getAsJsonArray("results");

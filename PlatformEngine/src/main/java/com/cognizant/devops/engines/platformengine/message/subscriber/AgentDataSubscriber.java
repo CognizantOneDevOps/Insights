@@ -38,7 +38,7 @@ import com.cognizant.devops.engines.util.DataEnrichUtils;
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.constants.MQMessageConstants;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphResponse;
-import com.cognizant.devops.platformcommons.dal.neo4j.Neo4jDBHandler;
+import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBHandler;
 import com.cognizant.devops.platformcommons.dal.neo4j.NodeData;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.google.gson.Gson;
@@ -51,7 +51,7 @@ import com.rabbitmq.client.Envelope;
 
 public class AgentDataSubscriber extends EngineSubscriberResponseHandler {
 	private static Logger log = LogManager.getLogger(AgentDataSubscriber.class.getName());
-	Neo4jDBHandler dbHandler = new Neo4jDBHandler();
+	GraphDBHandler dbHandler = new GraphDBHandler();
 
 	public AgentDataSubscriber(String routingKey) throws Exception {
 		super(routingKey);
@@ -272,7 +272,7 @@ public class AgentDataSubscriber extends EngineSubscriberResponseHandler {
 		return asJsonObject;
 	}
 
-	private Map<String, Map<String, NodeData>> getMetaData(Neo4jDBHandler dbHandler) {
+	private Map<String, Map<String, NodeData>> getMetaData(GraphDBHandler dbHandler) {
 		List<NodeData> nodes = null;
 		Map<String, NodeData> nodepropertyMap = null;
 		Map<String, Map<String, NodeData>> metaDataMap = new HashMap<String, Map<String, NodeData>>();

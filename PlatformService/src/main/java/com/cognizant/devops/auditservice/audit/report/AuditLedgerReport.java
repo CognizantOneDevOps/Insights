@@ -37,7 +37,7 @@ import com.cognizant.devops.platformauditing.util.RestructureDataUtil;
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.core.util.SystemStatus;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphResponse;
-import com.cognizant.devops.platformcommons.dal.neo4j.Neo4jDBHandler;
+import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBHandler;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
@@ -69,7 +69,7 @@ public class AuditLedgerReport extends AuditReportStrategy{
 	public boolean executeQuery(String fileContents, String pdfName, String subscribers) {
 		log.info("---Invoking Neo and ledger DB!---");
 
-		Neo4jDBHandler dbHandler = new Neo4jDBHandler();
+		GraphDBHandler dbHandler = new GraphDBHandler();
 		try {
 
 			JsonParser jsonParser = new JsonParser(); 

@@ -29,7 +29,7 @@ import com.cognizant.devops.platformcommons.constants.ServiceStatusConstants;
 import com.cognizant.devops.platformcommons.core.util.SystemStatus;
 import com.cognizant.devops.platformcommons.dal.elasticsearch.ElasticSearchDBHandler;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphResponse;
-import com.cognizant.devops.platformcommons.dal.neo4j.Neo4jDBHandler;
+import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBHandler;
 import com.cognizant.devops.platformcommons.dal.neo4j.NodeData;
 import com.cognizant.devops.platformdal.agentConfig.AgentConfig;
 import com.cognizant.devops.platformdal.agentConfig.AgentConfigDAL;
@@ -343,7 +343,7 @@ public class HealthStatusServiceImpl implements HealthStatusService {
 		log.info("query  ====== {} ", query);
 		GraphResponse graphResponse = null;
 		try {
-			Neo4jDBHandler dbHandler = new Neo4jDBHandler();
+			GraphDBHandler dbHandler = new GraphDBHandler();
 			graphResponse = dbHandler.executeCypherQuery(query);
 		} catch (Exception e) {
 			log.error(e.getMessage());
@@ -482,7 +482,7 @@ public class HealthStatusServiceImpl implements HealthStatusService {
 					+ "' RETURN n order by n.inSightsTime DESC LIMIT " + limitOfRow;
 		}
 		try {
-			Neo4jDBHandler dbHandler = new Neo4jDBHandler();
+			GraphDBHandler dbHandler = new GraphDBHandler();
 			GraphResponse response = dbHandler.executeCypherQuery(query);
 			return PlatformServiceUtil.buildSuccessResponseWithData(response);
 		} catch (Exception e) {

@@ -28,7 +28,7 @@ import org.springframework.stereotype.Service;
 import com.cognizant.devops.platformcommons.core.util.InsightsUtils;
 import com.cognizant.devops.platformcommons.dal.elasticsearch.ElasticSearchDBHandler;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphResponse;
-import com.cognizant.devops.platformcommons.dal.neo4j.Neo4jDBHandler;
+import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBHandler;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -71,7 +71,7 @@ public class QueryCachingServiceImpl implements QueryCachingService {
 
 	private JsonObject getNeo4jDatasourceResults(String queryjson) throws InsightsCustomException {
 
-		Neo4jDBHandler Neo4jDbHandler = new Neo4jDBHandler();
+		GraphDBHandler GraphDBHandler = new GraphDBHandler();
 		GraphResponse response = null;
 		JsonParser parser = new JsonParser();
 		JsonObject json = parser.parse(queryjson).getAsJsonObject();
@@ -90,7 +90,7 @@ public class QueryCachingServiceImpl implements QueryCachingService {
 				}*/
 			}
 			String[] queriesArray = stringBuilder.toString().split(QueryCachingConstants.NEW_STATEMENT);
-			response = Neo4jDbHandler.executeCypherQueryMultiple(queriesArray);
+			response = GraphDBHandler.executeCypherQueryMultiple(queriesArray);
 		} catch (InsightsCustomException e) {
 			log.error("\n\nException in neo4j query execution", e);
 			throw new InsightsCustomException(e.getMessage());

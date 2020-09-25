@@ -23,7 +23,7 @@ import org.apache.logging.log4j.Logger;
 
 import com.cognizant.devops.platformauditing.api.InsightsAuditImpl;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphResponse;
-import com.cognizant.devops.platformcommons.dal.neo4j.Neo4jDBHandler;
+import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBHandler;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -50,7 +50,7 @@ public class JiraProcessingExecutor extends TimerTask {
 	}
 
 	private void JiraNodeExtraction() {
-		Neo4jDBHandler dbHandler = new Neo4jDBHandler();
+		GraphDBHandler dbHandler = new GraphDBHandler();
 		StringBuffer cypher = new StringBuffer();
 		cypher.append("MATCH (n:DATA) WHERE ");
 		cypher.append("\"JIRA\" IN labels(n) AND ");
@@ -101,7 +101,7 @@ public class JiraProcessingExecutor extends TimerTask {
 	}
 
 	private boolean insertJiraNodes(JsonElement dataElem, boolean successfulWriteFlag) {
-		Neo4jDBHandler dbHandler = new Neo4jDBHandler();
+		GraphDBHandler dbHandler = new GraphDBHandler();
 		try {
 			if (dataElem.getAsJsonObject().get("row").getAsJsonArray().get(0).getAsJsonObject().has("changeId")) {
 				lastTimestamp = dataElem.getAsJsonObject().get("row").getAsJsonArray().get(0).getAsJsonObject()

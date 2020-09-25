@@ -41,7 +41,6 @@ public class VaultHandler {
 	 * Stores userid/pwd/token and aws credentials in vault engine as per vaultId.
 	 * 
 	 * @param dataMap
-	 *            {eg: {"data":{"passwd":"password","userid":"userid"}}}
 	 * @param vaultId
 	 * @return response
 	 * @throws InsightsCustomException

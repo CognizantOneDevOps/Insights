@@ -29,7 +29,7 @@ import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.config.MessageQueueDataModel;
 import com.cognizant.devops.platformcommons.constants.MQMessageConstants;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphResponse;
-import com.cognizant.devops.platformcommons.dal.neo4j.Neo4jDBHandler;
+import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBHandler;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformdal.correlationConfig.CorrelationConfiguration;
 import com.google.gson.Gson;
@@ -123,7 +123,7 @@ public class EngineTestData {
 	public static Map readNeo4JData(String nodeName , String compareFlag)
 	{
 		Map map=null;
-		Neo4jDBHandler dbHandler = new Neo4jDBHandler();
+		GraphDBHandler dbHandler = new GraphDBHandler();
 		String query = "MATCH (n:"+nodeName+") where n."+compareFlag+"='CM-7569369619' return n";
 		log.debug(" query  {} ", query);
 		GraphResponse neo4jResponse;

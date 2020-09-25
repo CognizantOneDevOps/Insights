@@ -32,7 +32,7 @@ import com.cognizant.devops.platformcommons.constants.ServiceStatusConstants;
 import com.cognizant.devops.platformcommons.core.util.SystemStatus;
 import com.cognizant.devops.platformcommons.dal.elasticsearch.ElasticSearchDBHandler;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphResponse;
-import com.cognizant.devops.platformcommons.dal.neo4j.Neo4jDBHandler;
+import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBHandler;
 import com.cognizant.devops.platformdal.dal.PostgresMetadataHandler;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -254,7 +254,7 @@ public class ServicesHealthStatus {
 		String query = "MATCH (n:"+label+") where n.inSightsTime IS NOT NULL RETURN n order by n.inSightsTime DESC LIMIT 1";
 		GraphResponse response =null;
 		try { 
-			Neo4jDBHandler dbHandler = new Neo4jDBHandler();
+			GraphDBHandler dbHandler = new GraphDBHandler();
 			response= dbHandler.executeCypherQuery(query);
 		} catch (Exception e) {
 			log.error(e);

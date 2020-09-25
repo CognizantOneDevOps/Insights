@@ -49,7 +49,7 @@ import org.springframework.stereotype.Service;
 
 import com.cognizant.devops.platformcommons.core.util.InsightsUtils;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphResponse;
-import com.cognizant.devops.platformcommons.dal.neo4j.Neo4jDBHandler;
+import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBHandler;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformservice.traceabilitydashboard.constants.TraceabilityConstants;
 import com.cognizant.devops.platformservice.traceabilitydashboard.util.TraceabilitySummaryUtil;
@@ -253,7 +253,7 @@ public class TraceabilityDashboardServiceImpl implements TraceabilityDashboardSe
 	}
 
 	public JsonObject executeCypherQuery(String query) throws  InsightsCustomException {
-		Neo4jDBHandler dbHandler = new Neo4jDBHandler();
+		GraphDBHandler dbHandler = new GraphDBHandler();
 		GraphResponse neo4jResponse = dbHandler.executeCypherQuery(query);
 		LOG.debug("Response received from neo4j");
 		return neo4jResponse.getJson();
@@ -599,7 +599,7 @@ public class TraceabilityDashboardServiceImpl implements TraceabilityDashboardSe
 	public List<String> getAvailableTools() throws InsightsCustomException {
 		GraphResponse neo4jResponse = new GraphResponse();
 		try {
-			Neo4jDBHandler dbHandler = new Neo4jDBHandler();
+			GraphDBHandler dbHandler = new GraphDBHandler();
 			neo4jResponse = dbHandler.executeCypherQuery("match(n:DATA) return collect(distinct n.toolName)");
 		} catch (InsightsCustomException e) {
 			LOG.error("Exception in neo4j");

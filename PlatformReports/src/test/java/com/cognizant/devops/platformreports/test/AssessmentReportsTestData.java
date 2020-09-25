@@ -30,7 +30,7 @@ import org.apache.logging.log4j.Logger;
 import com.cognizant.devops.platformcommons.core.enums.WorkflowTaskEnum;
 import com.cognizant.devops.platformcommons.core.util.InsightsUtils;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphResponse;
-import com.cognizant.devops.platformcommons.dal.neo4j.Neo4jDBHandler;
+import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBHandler;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformdal.assessmentreport.InsightsAssessmentConfiguration;
 import com.cognizant.devops.platformdal.assessmentreport.InsightsAssessmentReportTemplate;
@@ -146,7 +146,7 @@ public class AssessmentReportsTestData {
 
 	public String readNeo4jData(String query) {
 		log.debug(" query executed for Assessment report {} ", query);
-		Neo4jDBHandler dbHandler = new Neo4jDBHandler();
+		GraphDBHandler dbHandler = new GraphDBHandler();
 		GraphResponse neo4jResponse;
 		String finalJson = null;
 		try {

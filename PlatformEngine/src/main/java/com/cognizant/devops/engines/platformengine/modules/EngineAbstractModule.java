@@ -15,8 +15,8 @@
  ******************************************************************************/
 package com.cognizant.devops.engines.platformengine.modules;
 
-import com.cognizant.devops.platformcommons.dal.neo4j.Neo4jDBHandler;
+import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBHandler;
 
 public abstract class EngineAbstractModule {
-	protected Neo4jDBHandler graphDBHandler = new Neo4jDBHandler();
+	protected GraphDBHandler graphDBHandler = new GraphDBHandler();
 }

@@ -26,7 +26,7 @@ import com.cognizant.devops.engines.platformwebhookengine.parser.InsightsWebhook
 import com.cognizant.devops.engines.platformwebhookengine.parser.InsightsWebhookParserInterface;
 import com.cognizant.devops.engines.util.WebhookEventProcessing;
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
-import com.cognizant.devops.platformcommons.dal.neo4j.Neo4jDBHandler;
+import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBHandler;
 import com.cognizant.devops.platformdal.webhookConfig.WebHookConfig;
 import com.google.gson.JsonObject;
 import com.rabbitmq.client.AMQP.BasicProperties;
@@ -35,7 +35,7 @@ import com.rabbitmq.client.Envelope;
 public class WebHookDataSubscriber extends EngineSubscriberResponseHandler {
 
 	private static Logger log = LogManager.getLogger(WebHookDataSubscriber.class);
-	private Neo4jDBHandler dbHandler = new Neo4jDBHandler();
+	private GraphDBHandler dbHandler = new GraphDBHandler();
 	private WebHookConfig webhookConfig;
 
 

@@ -15,10 +15,10 @@
  ******************************************************************************/
 package com.cognizant.devops.platformdal.dal;
 
-import com.cognizant.devops.platformcommons.dal.neo4j.Neo4jDBHandler;
+import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBHandler;
 
 public interface InsightsDaoFactoryInterface {
 	
-	public Neo4jDBHandler getNeo4jRESTDBHandler();
+	public GraphDBHandler getNeo4jRESTDBHandler();
 	public BaseGraphDBHandler getNeo4jBoltDBHandler();
 }

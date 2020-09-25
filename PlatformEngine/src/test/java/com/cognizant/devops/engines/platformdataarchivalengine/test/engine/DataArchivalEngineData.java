@@ -32,7 +32,7 @@ import com.cognizant.devops.platformcommons.constants.MQMessageConstants;
 import com.cognizant.devops.platformcommons.core.enums.DataArchivalStatus;
 import com.cognizant.devops.platformcommons.core.util.InsightsUtils;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphResponse;
-import com.cognizant.devops.platformcommons.dal.neo4j.Neo4jDBHandler;
+import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBHandler;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -113,7 +113,7 @@ public class DataArchivalEngineData {
 
 	public int readNeo4JData(String nodeName, String value) {
 		int countOfRecords = 0;
-		Neo4jDBHandler dbHandler = new Neo4jDBHandler();
+		GraphDBHandler dbHandler = new GraphDBHandler();
 		String query = "MATCH (n:" + nodeName + ") where n.execId='" + value + "' return n";
 		log.debug(" query  {} ", query);
 		GraphResponse neo4jResponse;

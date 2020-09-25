@@ -42,7 +42,7 @@ import com.cognizant.devops.platformcommons.core.enums.ResultOutputType;
 import com.cognizant.devops.platformcommons.core.util.InsightsUtils;
 import com.cognizant.devops.platformcommons.dal.elasticsearch.ElasticSearchDBHandler;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphResponse;
-import com.cognizant.devops.platformcommons.dal.neo4j.Neo4jDBHandler;
+import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBHandler;
 import com.cognizant.devops.platformcommons.dal.neo4j.NodeData;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.google.gson.Gson;
@@ -345,7 +345,7 @@ public class InsightsInferenceServiceImpl implements InsightsInferenceService {
 
 	private List<InferenceResult> getInferenceDataFromNeo4j(String inputSchedule, String vectorType) throws Exception {
 		List<InferenceResult> inferenceResults = null;
-		Neo4jDBHandler graphDBHandler = new Neo4jDBHandler();
+		GraphDBHandler graphDBHandler = new GraphDBHandler();
 		try {
 			String graphQuery = getNeo4jQueryWithDates(inputSchedule, vectorType, 5);
 			log.debug(" graphQuery  " + graphQuery);

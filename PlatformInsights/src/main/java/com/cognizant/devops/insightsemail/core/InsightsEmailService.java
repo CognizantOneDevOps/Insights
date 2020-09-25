@@ -144,22 +144,7 @@ public class InsightsEmailService {
 		    return restTemplate;
 		 }*/
 	
-	public static void main(String[] args)
-	{	
-		/*ApplicationConfigCache.loadConfigCache();
-		InsightsEmailService services=new InsightsEmailService();
-		Mail mail=new Mail();
-		mail.setMailTo("");
-		mail.setMailFrom("");
-		mail.setSubject("insights");
-		try {
-			services.sendEmail(mail);
-		} catch (UnsupportedEncodingException e) {
-			System.out.println(e.toString());
-		} catch (MessagingException e) {
-		}
-	   */
-	}
+
 
 
 }
