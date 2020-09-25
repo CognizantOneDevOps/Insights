@@ -33,6 +33,7 @@ public class InsightsKPIResultDetails {
 	private String resultTimeX;
 	private long executionId;
 	private long recordDate;
+
 	public Long getKpiId() {
 		return kpiId;
 	}

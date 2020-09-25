@@ -187,7 +187,7 @@ public class PdfTableUtil {
 		statictable.removeAllBorders(true);
 		statictable.draw();
 		}catch(Exception e){
-			e.printStackTrace();
+			log.error(e);
 		}
 	}
 
@@ -243,7 +243,7 @@ public class PdfTableUtil {
 					date1 = format.parse(dateString1);
 					date2 = format.parse(dateString2);
 				} catch (ParseException e) {
-					e.printStackTrace();
+					log.error(e);
 					return 0;
 				}
 
@@ -422,7 +422,7 @@ public class PdfTableUtil {
 				//i++;
 			}
 		}catch(Exception e){
-			e.printStackTrace();
+			log.error(e);
 		}
 		return doc;
 	}
@@ -613,7 +613,7 @@ public class PdfTableUtil {
 			response = pdfSignUtil.digitalSign(doc, pdfName);
 			log.info("Signed successfully!!--");
 		}catch(Exception e){
-			e.printStackTrace();
+			log.error(e);
 		}
 		
 		return response;
@@ -691,7 +691,7 @@ public class PdfTableUtil {
 			response = pdfSignUtil.digitalSign(doc, pdfName);
 			log.info("Signed successfully!!--");
 		}catch(Exception e){
-			e.printStackTrace();
+			log.error(e);
 		}
 		
 		return response;

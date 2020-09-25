@@ -49,8 +49,11 @@ public class InsightsContentDetail implements Serializable{
 	private Long resultTime;
 	private String resultTimeX;
 	private long executionId;
+	private int reportId;
+	private int assessmentId;
+
 	@JsonIgnore
-	Map<String, Object> resultValuesMap;
+	private transient Map<String, Object> resultValuesMap;
 	
 	public Long getKpiId() {
 		return kpiId;
@@ -208,6 +211,22 @@ public class InsightsContentDetail implements Serializable{
 		this.executionId = executionId;
 	}
 
+	public int getReportId() {
+		return reportId;
+	}
+
+	public void setReportId(int reportId) {
+		this.reportId = reportId;
+	}
+
+	public int getAssessmentId() {
+		return assessmentId;
+	}
+
+	public void setAssessmentId(int assessmentId) {
+		this.assessmentId = assessmentId;
+	}
+
 	public Map<String, Object> getResultValuesMap() {
 		return resultValuesMap;
 	}
@@ -222,13 +241,13 @@ public class InsightsContentDetail implements Serializable{
 
 	@Override
 	public String toString() {
-		return "InsightsInferenceDetail [kpiId=" + kpiId + ", contentId=" + contentId + ", kpiName=" + kpiName
-				+ ", threshold=" + threshold + ", schedule=" + schedule + ", group=" + group + ", toolName="
-				+ toolName + ", sentiment=" + sentiment + ", trendline=" + trendline + ", category=" + category
-				+ ", noOfResult=" + noOfResult + ", inferenceText=" + inferenceText + ", ranking=" + ranking
-				+ ", expectedTrend=" + expectedTrend + ", actualTrend=" + actualTrend + ", resultField=" + resultField
-				+ ", resultTime=" + resultTime + ", resultTimeX=" + resultTimeX + ", executionId=" + executionId
-				+ ", resultValuesMap=" + resultValuesMap + "]";
+		return "InsightsContentDetail [kpiId=" + kpiId + ", contentId=" + contentId + ", kpiName=" + kpiName
+				+ ", threshold=" + threshold + ", schedule=" + schedule + ", group=" + group + ", toolName=" + toolName
+				+ ", sentiment=" + sentiment + ", trendline=" + trendline + ", category=" + category + ", noOfResult="
+				+ noOfResult + ", inferenceText=" + inferenceText + ", ranking=" + ranking + ", expectedTrend="
+				+ expectedTrend + ", actualTrend=" + actualTrend + ", resultField=" + resultField + ", resultTime="
+				+ resultTime + ", resultTimeX=" + resultTimeX + ", executionId=" + executionId + ", reportId="
+				+ reportId + ", assessmentId=" + assessmentId + ", resultValuesMap=" + resultValuesMap + "]";
 	}
 
 }

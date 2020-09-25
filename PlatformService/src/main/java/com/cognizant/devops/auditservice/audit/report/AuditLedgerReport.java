@@ -136,7 +136,7 @@ public class AuditLedgerReport extends AuditReportStrategy{
 				log.info("Aborting query from execute as it contains invalid keywords !!" + cypherQuery );
 			}
 		} catch (InsightsCustomException e) {
-			e.printStackTrace();
+			log.error(e);
 			log.info("graph exception");
 			log.error(" - query processing failed"+ e);
 			return Boolean.FALSE;
@@ -189,14 +189,14 @@ public class AuditLedgerReport extends AuditReportStrategy{
 			EmailUtil emailutil = new EmailUtil();
 			emailutil.sendEmailWithAttachment(response, pdfName, subscribers);
 		}catch(Exception e){
-			e.printStackTrace();
+			log.error(e);
 			log.error(" -sendReport failed"+ e.getMessage());
 		}finally {
 			if(response!=null) {
 				try {
 					response.close();
 				} catch (IOException e) {
-					e.printStackTrace();
+					log.error(e);
 				}
 			}
 		}

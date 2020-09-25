@@ -42,8 +42,7 @@ public class AboutServiceTest {
 		try {
 			properties = new GetPropertyValues().getPropValues();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			log.error(e);
 		}
 		Enumeration e = properties.propertyNames();
 

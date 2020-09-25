@@ -43,7 +43,7 @@ public interface ReportDataHandler {
 	
 	public JsonArray fetchVisualizationResults(String query);
 	
-	public JsonArray fetchVisualizationResults(long executionId, int kpiId);
+	public JsonArray fetchVisualizationResults(long executionId, int kpiId, int assessmentId);
 	
 
 }

@@ -101,8 +101,7 @@ public class AuditReportScheduler {
 				log.info("Unable to Fetch queries from DB!");
 			}
 		}catch(Exception e){
-			e.printStackTrace();
-			log.error("Error  -",e.getMessage());
+			log.error("Error  - {} ", e.getMessage());
 		}
 	}
 	
@@ -123,7 +122,6 @@ public class AuditReportScheduler {
 				log.info("Unable to Fetch queries from DB!");
 			}
 		}catch(Exception e){
-			e.printStackTrace();
 			log.error("Error  -"+e.getMessage());
 		}
 	}

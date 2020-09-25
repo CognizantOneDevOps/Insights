@@ -208,7 +208,7 @@ public class AuditController {
 			AuditReportScheduler auditReportScheduler = new AuditReportScheduler();
 			auditReportScheduler.testReports(reportName, frequency);
 		} catch (Exception e) {
-			e.printStackTrace();
+			Log.error(e);
 		}
 	}
 
