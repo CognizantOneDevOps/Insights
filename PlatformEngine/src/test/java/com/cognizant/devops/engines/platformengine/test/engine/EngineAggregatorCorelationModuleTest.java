@@ -33,7 +33,7 @@ import com.cognizant.devops.engines.platformengine.modules.correlation.EngineCor
 import com.cognizant.devops.platformcommons.config.ApplicationConfigCache;
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphResponse;
-import com.cognizant.devops.platformcommons.dal.neo4j.Neo4jDBHandler;
+import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBHandler;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformdal.agentConfig.AgentConfigDAL;
 import com.cognizant.devops.platformdal.correlationConfig.CorrelationConfigDAL;
@@ -159,7 +159,7 @@ public class EngineAggregatorCorelationModuleTest {
 	@Test(priority = 3)
 	public void testCorrelation() {
 
-		Neo4jDBHandler dbHandler = new Neo4jDBHandler();
+		GraphDBHandler dbHandler = new GraphDBHandler();
 		String query = "MATCH (a)<-[r:TEST_FROM_GIT_TO_JENKINS]-(b) where a.scmcommitId=\"CM-7569369619\" and b.commitId='CM-7569369619' return count(a) as Total";
 		GraphResponse neo4jResponse;
 		try {
@@ -200,7 +200,7 @@ public class EngineAggregatorCorelationModuleTest {
 
 		/* Cleaning Neo4J */
 
-		Neo4jDBHandler dbHandler = new Neo4jDBHandler();
+		GraphDBHandler dbHandler = new GraphDBHandler();
 		String query = "MATCH p=()-[r:TEST_FROM_GIT_TO_JENKINS]->() delete p";
 		try {
 

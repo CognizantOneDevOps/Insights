@@ -22,7 +22,7 @@ import org.apache.logging.log4j.Logger;
 import org.neo4j.driver.v1.StatementResult;
 
 import com.cognizant.devops.platformcommons.config.ApplicationConfigCache;
-import com.cognizant.devops.platformcommons.dal.neo4j.Neo4jDBHandler;
+import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBHandler;
 
 public class InsightsDaoFactory implements InsightsDaoFactoryInterface {
 	private static final InsightsDaoFactoryInterface insightsDaoFactory = new InsightsDaoFactory();
@@ -35,8 +35,8 @@ public class InsightsDaoFactory implements InsightsDaoFactoryInterface {
 	}
 	
 	@Override
-	public Neo4jDBHandler getNeo4jRESTDBHandler() {
-		return new Neo4jDBHandler();
+	public GraphDBHandler getNeo4jRESTDBHandler() {
+		return new GraphDBHandler();
 	}
 
 	@Override

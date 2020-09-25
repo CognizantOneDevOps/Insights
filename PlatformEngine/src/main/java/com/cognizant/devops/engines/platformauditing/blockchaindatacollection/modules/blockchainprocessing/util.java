@@ -28,7 +28,7 @@ import org.apache.logging.log4j.Logger;
 
 import com.cognizant.devops.platformauditing.api.InsightsAuditImpl;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphResponse;
-import com.cognizant.devops.platformcommons.dal.neo4j.Neo4jDBHandler;
+import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBHandler;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -75,7 +75,7 @@ public class util {
 
     public boolean updateFlagToNeo4j(boolean flag, JsonObject data) throws InsightsCustomException {
         String blockchainProcessedFlag = "blockchainProcessedFlag";
-        Neo4jDBHandler dbHandler = new Neo4jDBHandler();
+        GraphDBHandler dbHandler = new GraphDBHandler();
         if (flag == true ) {
             StringBuffer writeBackCypher = new StringBuffer();
             writeBackCypher.append("MATCH (n:DATA) WHERE ID(n) = ").append(data.get("meta").getAsJsonArray().get(0).getAsJsonObject().getAsJsonPrimitive("id")).append(" ");

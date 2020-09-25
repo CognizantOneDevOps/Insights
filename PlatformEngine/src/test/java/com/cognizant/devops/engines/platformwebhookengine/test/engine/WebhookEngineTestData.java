@@ -31,7 +31,7 @@ import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.config.MessageQueueDataModel;
 import com.cognizant.devops.platformcommons.constants.MQMessageConstants;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphResponse;
-import com.cognizant.devops.platformcommons.dal.neo4j.Neo4jDBHandler;
+import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBHandler;
 import com.cognizant.devops.platformdal.webhookConfig.WebhookDerivedConfig;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
@@ -170,7 +170,7 @@ public class WebhookEngineTestData {
 	
 		Map map=null;
 		ObjectMapper mapper = new ObjectMapper();
-		Neo4jDBHandler dbHandler = new Neo4jDBHandler();
+		GraphDBHandler dbHandler = new GraphDBHandler();
 		String query = "MATCH (n:" + nodeName + ") where n." + compareFlag
 				+ "='8ea6c42b96d5c0ffdaf3622720450e2d5def75e6' return n";
 		GraphResponse neo4jResponse;

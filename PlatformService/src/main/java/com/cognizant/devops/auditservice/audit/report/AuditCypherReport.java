@@ -32,7 +32,7 @@ import org.springframework.http.MediaType;
 import com.cognizant.devops.auditservice.audit.utils.EmailUtil;
 import com.cognizant.devops.platformauditing.util.PdfTableUtil;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphResponse;
-import com.cognizant.devops.platformcommons.dal.neo4j.Neo4jDBHandler;
+import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBHandler;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -70,7 +70,7 @@ public class AuditCypherReport extends AuditReportStrategy{
 		log.info("--Invoking Neo DB!---");
 		log.info("FileContents = " + fileContents);
 
-		Neo4jDBHandler dbHandler = new Neo4jDBHandler();
+		GraphDBHandler dbHandler = new GraphDBHandler();
 		long queryExecutionStartTime = System.currentTimeMillis();
 		HashMap<String,Integer> columnMap = new HashMap<String,Integer>();
 		Set<String> headerList = new LinkedHashSet<String>();

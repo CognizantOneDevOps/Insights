@@ -26,7 +26,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.cognizant.devops.platformcommons.core.util.InsightsUtils;
-import com.cognizant.devops.platformcommons.dal.neo4j.Neo4jDBHandler;
+import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBHandler;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformdal.webhookConfig.WebHookConfig;
 import com.google.gson.Gson;
@@ -48,7 +48,7 @@ public class WebhookEventProcessing {
 	private static Logger log = LogManager.getLogger(WebhookEventProcessing.class);
 	private List<JsonObject> eventPayload = new ArrayList<>();
 	private Map<String, JsonObject> eventConfigMap = new HashMap<>();
-	private Neo4jDBHandler dbHandler = new Neo4jDBHandler();
+	private GraphDBHandler dbHandler = new GraphDBHandler();
 	private WebHookConfig webhookConfig;
 	private boolean isOfflineProcessing = false;
 

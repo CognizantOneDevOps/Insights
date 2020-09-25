@@ -31,7 +31,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.cognizant.devops.platformcommons.constants.ErrorMessage;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphResponse;
-import com.cognizant.devops.platformcommons.dal.neo4j.Neo4jDBHandler;
+import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBHandler;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformdal.hierarchy.details.HierarchyDetailsDAL;
 import com.cognizant.devops.platformservice.rest.datatagging.constants.DatataggingConstants;
@@ -82,7 +82,7 @@ public class HierarchyDetailsService {
 
 	@RequestMapping(value = "/getAllHierarchyDetails", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 	public JsonObject getAllHierarchyDetails() {
-		Neo4jDBHandler dbHandler = new Neo4jDBHandler();
+		GraphDBHandler dbHandler = new GraphDBHandler();
 		String query = "MATCH (n:METADATA:DATATAGGING) return n";
 		GraphResponse response;
 		JsonArray parentArray = new JsonArray();
@@ -184,7 +184,7 @@ public class HierarchyDetailsService {
 	@RequestMapping(value = "/getHierarchyProperties", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 	public JsonObject getHierarchyProperties(@RequestParam String level1, @RequestParam String level2,
 			@RequestParam String level3, @RequestParam String level4) throws InsightsCustomException {
-		Neo4jDBHandler dbHandler = new Neo4jDBHandler();
+		GraphDBHandler dbHandler = new GraphDBHandler();
 		String queryLabels = ":METADATA:DATATAGGING";
 		StringBuilder sb = new StringBuilder();
 		if (null != level1 && !level1.isEmpty()) {
@@ -220,7 +220,7 @@ public class HierarchyDetailsService {
 
 	@RequestMapping(value = "/getMetaData", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 	public @ResponseBody JsonObject getMetaData() {
-		Neo4jDBHandler dbHandler = new Neo4jDBHandler();
+		GraphDBHandler dbHandler = new GraphDBHandler();
 		String query = "MATCH (n:METADATA:DATATAGGING) return n";
 		GraphResponse response;
 		try {

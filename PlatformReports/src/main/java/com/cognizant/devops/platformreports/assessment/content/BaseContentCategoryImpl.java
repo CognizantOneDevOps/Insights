@@ -25,7 +25,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
-import com.cognizant.devops.platformcommons.dal.neo4j.Neo4jDBHandler;
+import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBHandler;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformreports.assessment.dal.ReportDataHandler;
 import com.cognizant.devops.platformreports.assessment.dal.ReportDataHandlerFactory;
@@ -46,7 +46,7 @@ public abstract class BaseContentCategoryImpl {
 	private static Logger log = LogManager.getLogger(BaseContentCategoryImpl.class);
 
 	protected ContentConfigDefinition contentConfigDefinition;
-	Neo4jDBHandler dbHandler = new Neo4jDBHandler();
+	GraphDBHandler dbHandler = new GraphDBHandler();
 	JsonParser jsonParser = new JsonParser();
 	String datasource = ApplicationConfigProvider.getInstance().getAssessmentReport().getOutputDatasource();
 	ReportDataHandler datasourceDataHandler = ReportDataHandlerFactory.getDataSource(datasource);

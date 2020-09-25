@@ -23,7 +23,7 @@ import java.util.regex.Pattern;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphResponse;
-import com.cognizant.devops.platformcommons.dal.neo4j.Neo4jDBHandler;
+import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBHandler;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -50,7 +50,7 @@ public class CustomCorrelations {
 	}
 	
 	private void enrichJiraData() {
-		Neo4jDBHandler dbHandler = new Neo4jDBHandler();
+		GraphDBHandler dbHandler = new GraphDBHandler();
 		try {
 			String jiraProjectCypher = "match (n:JIRA:DATA) where not exists(n._PORTFOLIO_) WITH distinct n.projectKey as projectKey, count(n) as count " + 
 						"OPTIONAL MATCH(m:JIRA:METADATA) where m.pkey=projectKey "
@@ -98,7 +98,7 @@ public class CustomCorrelations {
 	}
 	
 	private void updateGitNodesWithJiraKey() {
-		Neo4jDBHandler dbHandler = new Neo4jDBHandler();
+		GraphDBHandler dbHandler = new GraphDBHandler();
 		try {
 			String paginationCypher = "MATCH (n:GIT:RAW) where not exists(n.jiraKeys) return count(n) as count";
 			GraphResponse paginationResponse = dbHandler.executeCypherQuery(paginationCypher);
@@ -166,7 +166,7 @@ public class CustomCorrelations {
 	}
 	
 	private void correlateGitAndJira() {
-		Neo4jDBHandler dbHandler = new Neo4jDBHandler();
+		GraphDBHandler dbHandler = new GraphDBHandler();
 		try {
 			//int dataBatchSize = 10;
 			String paginationCypher = "MATCH (source:GIT:RAW) where exists(source.jiraKeys) return count(source) as count";
@@ -205,7 +205,7 @@ public class CustomCorrelations {
 	}
 	
 	private void updateJenkinsDataWihoutCommits() {
-		Neo4jDBHandler dbHandler = new Neo4jDBHandler();
+		GraphDBHandler dbHandler = new GraphDBHandler();
 		try {
 			boolean processJenkinsNodes = true;
 			while(processJenkinsNodes) {
@@ -233,7 +233,7 @@ public class CustomCorrelations {
 	}
 	
 	private void correlateGitAndJenkins() {
-		Neo4jDBHandler dbHandler = new Neo4jDBHandler();
+		GraphDBHandler dbHandler = new GraphDBHandler();
 		try {
 			String paginationCypher = "MATCH (source:RAW:JENKINS:DATA) where not exists(source.correlationTime) OR "
 					+ "( source.correlationTime <= "+maxPreviousCorrelationTime+" AND source.correlationTime >= "+minPreviousCorrelationTime+") "

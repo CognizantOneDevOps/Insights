@@ -27,7 +27,7 @@ import org.springframework.stereotype.Service;
 import com.cognizant.devops.platformcommons.constants.ErrorMessage;
 import com.cognizant.devops.platformcommons.core.util.ValidationUtils;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphResponse;
-import com.cognizant.devops.platformcommons.dal.neo4j.Neo4jDBHandler;
+import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBHandler;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformservice.businessmapping.constants.BusinessMappingConstants;
 import com.cognizant.devops.platformservice.businessmapping.model.Node;
@@ -45,7 +45,7 @@ public class BusinessMappingServiceImpl implements BusinessMappingService {
 
 	@Override
 	public JsonObject getAllHierarchyDetails() {
-		Neo4jDBHandler dbHandler = new Neo4jDBHandler();
+		GraphDBHandler dbHandler = new GraphDBHandler();
 		String query = "MATCH (n:METADATA:DATATAGGING) return n";
 		GraphResponse response;
 		JsonArray parentArray = new JsonArray();
@@ -162,7 +162,7 @@ public class BusinessMappingServiceImpl implements BusinessMappingService {
 	@Override
 	public JsonObject getHierarchyProperties(String level1, String level2, String level3, String level4)
 			throws InsightsCustomException {
-		Neo4jDBHandler dbHandler = new Neo4jDBHandler();
+		GraphDBHandler dbHandler = new GraphDBHandler();
 		String queryLabels = ":METADATA:DATATAGGING";
 		StringBuilder sb = new StringBuilder();
 		if (null != level1 && !level1.isEmpty()) {
@@ -201,7 +201,7 @@ public class BusinessMappingServiceImpl implements BusinessMappingService {
 		List<JsonObject> nodeProperties = new ArrayList<>();
 		try {
 			String validatedResponse = ValidationUtils.validateRequestBody(agentMappingJson);
-			Neo4jDBHandler dbHandler = new Neo4jDBHandler();
+			GraphDBHandler dbHandler = new GraphDBHandler();
 			dbHandler.executeCypherQuery("CREATE CONSTRAINT ON (n:METADATA) ASSERT n.metadata_id  IS UNIQUE");
 			String query = "UNWIND {props} AS properties " + "CREATE (n:METADATA:BUSINESSMAPPING) "
 					+ "SET n = properties"; // DATATAGGING
@@ -224,7 +224,7 @@ public class BusinessMappingServiceImpl implements BusinessMappingService {
 
 	@Override
 	public JsonObject getToolsMappingLabel(String agentName) {
-		Neo4jDBHandler dbHandler = new Neo4jDBHandler();
+		GraphDBHandler dbHandler = new GraphDBHandler();
 		String query = "MATCH (n:METADATA:BUSINESSMAPPING) where n.toolName ='" + agentName
 				+ "' return n order by n.inSightsTime desc"; // 'GIT'
 		GraphResponse response;
@@ -248,7 +248,7 @@ public class BusinessMappingServiceImpl implements BusinessMappingService {
 		List<JsonObject> nodeProperties = new ArrayList<>();
 		try {
 			String validatedResponse = ValidationUtils.validateRequestBody(agentMappingJson);
-			Neo4jDBHandler dbHandler = new Neo4jDBHandler();
+			GraphDBHandler dbHandler = new GraphDBHandler();
 			JsonParser parser = new JsonParser();
 			JsonObject json = (JsonObject) parser.parse(validatedResponse);
 			String uuid = json.get("uuid").getAsString();
@@ -268,7 +268,7 @@ public class BusinessMappingServiceImpl implements BusinessMappingService {
 		return PlatformServiceUtil.buildSuccessResponse();
 	}
 
-	private JsonArray getCurrentRecords(String uuid, Neo4jDBHandler dbHandler) throws InsightsCustomException {
+	private JsonArray getCurrentRecords(String uuid, GraphDBHandler dbHandler) throws InsightsCustomException {
 		String cypherQuery = " MATCH (n :METADATA:BUSINESSMAPPING) WHERE n.uuid='" + uuid + "'  RETURN n";
 		GraphResponse graphResponse = dbHandler.executeCypherQuery(cypherQuery);
 		JsonArray rows = graphResponse.getJson().get("results").getAsJsonArray().get(0).getAsJsonObject().get("data")
@@ -279,7 +279,7 @@ public class BusinessMappingServiceImpl implements BusinessMappingService {
 
 	@Override
 	public JsonObject deleteToolsMappingLabel(String uuid) {
-		Neo4jDBHandler dbHandler = new Neo4jDBHandler();
+		GraphDBHandler dbHandler = new GraphDBHandler();
 		GraphResponse graphresponce = new GraphResponse();
 		try {
 

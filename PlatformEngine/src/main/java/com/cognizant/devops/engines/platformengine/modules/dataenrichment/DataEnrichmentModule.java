@@ -28,7 +28,7 @@ import org.apache.logging.log4j.Logger;
 
 import com.cognizant.devops.platformcommons.constants.ConfigOptions;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphResponse;
-import com.cognizant.devops.platformcommons.dal.neo4j.Neo4jDBHandler;
+import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBHandler;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
@@ -52,7 +52,7 @@ public class DataEnrichmentModule extends TimerTask {
 		if(dataEnrichmentCypherQueryMap == null) {
 			return;
 		}
-		Neo4jDBHandler dbHandler = new Neo4jDBHandler();
+		GraphDBHandler dbHandler = new GraphDBHandler();
 		for(Map.Entry<String, String> entry: dataEnrichmentCypherQueryMap.entrySet()) {
 			try {
 				int processedRecords = 1;

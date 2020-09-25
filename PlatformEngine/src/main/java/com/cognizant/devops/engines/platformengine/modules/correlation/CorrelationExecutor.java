@@ -36,7 +36,7 @@ import com.cognizant.devops.platformcommons.config.CorrelationConfig;
 import com.cognizant.devops.platformcommons.constants.ConfigOptions;
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphResponse;
-import com.cognizant.devops.platformcommons.dal.neo4j.Neo4jDBHandler;
+import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBHandler;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformdal.correlationConfig.CorrelationConfigDAL;
 import com.cognizant.devops.platformdal.correlationConfig.CorrelationConfiguration;
@@ -119,7 +119,7 @@ public class CorrelationExecutor {
 		cypher.append("set destination.maxCorrelationTime=").append(maxCorrelationTime)
 				.append(" , destination.correlationTime=").append(maxCorrelationTime).append(" ");
 		cypher.append("return count(distinct destination) as count");
-		Neo4jDBHandler dbHandler = new Neo4jDBHandler();
+		GraphDBHandler dbHandler = new GraphDBHandler();
 		try {
 			int processedRecords = 1;
 			while (processedRecords > 0) {
@@ -182,7 +182,7 @@ public class CorrelationExecutor {
 				"WITH distinct uuid, collect(distinct value) as values WITH { uuid : uuid, values : values} as data ");
 		cypher.append("RETURN collect(data) as data");
 		log.debug("DestinationData    " + cypher);
-		Neo4jDBHandler dbHandler = new Neo4jDBHandler();
+		GraphDBHandler dbHandler = new GraphDBHandler();
 		try {
 			GraphResponse response = dbHandler.executeCypherQuery(cypher.toString());
 			JsonArray rows = response.getJson().get("results").getAsJsonArray().get(0).getAsJsonObject().get("data")
@@ -229,7 +229,7 @@ public class CorrelationExecutor {
 		}
 		correlationCypher.append("RETURN count(distinct destination) as count");
 		log.debug("CorrelationExecution Started   " + correlationCypher);
-		Neo4jDBHandler dbHandler = new Neo4jDBHandler();
+		GraphDBHandler dbHandler = new GraphDBHandler();
 		JsonObject correlationExecutionResponse;
 		int processedRecords = 0;
 		try {
@@ -288,7 +288,7 @@ public class CorrelationExecutor {
 		correlationCypher
 				.append("remove destination.maxCorrelationTime, destination.correlationTime, destination:RAW ");
 		correlationCypher.append("return count(distinct destination) ");
-		Neo4jDBHandler dbHandler = new Neo4jDBHandler();
+		GraphDBHandler dbHandler = new GraphDBHandler();
 		JsonObject correlationExecutionResponse;
 		int processedRecords = 1;
 		try {

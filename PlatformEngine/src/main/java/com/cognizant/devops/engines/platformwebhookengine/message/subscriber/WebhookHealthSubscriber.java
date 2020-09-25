@@ -26,7 +26,7 @@ import com.cognizant.devops.engines.platformengine.message.core.EngineStatusLogg
 import com.cognizant.devops.engines.platformwebhookengine.message.factory.EngineSubscriberResponseHandler;
 import com.cognizant.devops.platformcommons.constants.MQMessageConstants;
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
-import com.cognizant.devops.platformcommons.dal.neo4j.Neo4jDBHandler;
+import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBHandler;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -44,7 +44,7 @@ public class WebhookHealthSubscriber extends EngineSubscriberResponseHandler {
 	@Override
 	public void handleDelivery(String consumerTag, Envelope envelope, BasicProperties properties, byte[] body)
 			throws IOException {
-		Neo4jDBHandler dbHandler = new Neo4jDBHandler();
+		GraphDBHandler dbHandler = new GraphDBHandler();
 		String message = new String(body, MQMessageConstants.MESSAGE_ENCODING);
 		String routingKey = envelope.getRoutingKey();
 		log.debug(" {}  Received  {} : {}", consumerTag, routingKey, message);
@@ -80,7 +80,7 @@ public class WebhookHealthSubscriber extends EngineSubscriberResponseHandler {
 	 * @param dataList
 	 * @param nodeLabels
 	 */
-	private boolean createHealthNodes(Neo4jDBHandler dbHandler, List<JsonObject> dataList, String nodeLabels)
+	private boolean createHealthNodes(GraphDBHandler dbHandler, List<JsonObject> dataList, String nodeLabels)
 			throws InsightsCustomException {
 		String cypherhealthQuery;
 		boolean isRecordUpdate = Boolean.TRUE;

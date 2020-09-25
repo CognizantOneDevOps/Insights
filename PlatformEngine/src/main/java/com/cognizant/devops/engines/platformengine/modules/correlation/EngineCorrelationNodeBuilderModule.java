@@ -27,7 +27,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.cognizant.devops.platformcommons.constants.ConfigOptions;
-import com.cognizant.devops.platformcommons.dal.neo4j.Neo4jDBHandler;
+import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBHandler;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -50,7 +50,7 @@ public class EngineCorrelationNodeBuilderModule {
 			JsonElement correlationJson = new JsonParser().parse(reader);
 			// reader.close();
 			JsonArray correlations = correlationJson.getAsJsonObject().get("correlations").getAsJsonArray();
-			Neo4jDBHandler graphDBHandler = new Neo4jDBHandler();
+			GraphDBHandler graphDBHandler = new GraphDBHandler();
 			for (JsonElement correlation : correlations) {
 				graphDBHandler.executeCypherQuery(
 						"MERGE (n:CORRELATION { query : '" + correlation.getAsString() + "' } ) return n");

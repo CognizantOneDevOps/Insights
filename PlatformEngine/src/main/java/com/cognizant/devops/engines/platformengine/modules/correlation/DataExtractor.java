@@ -36,7 +36,7 @@ import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.config.CorrelationConfig;
 import com.cognizant.devops.platformcommons.constants.ConfigOptions;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphResponse;
-import com.cognizant.devops.platformcommons.dal.neo4j.Neo4jDBHandler;
+import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBHandler;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
@@ -89,7 +89,7 @@ public class DataExtractor {
 
 	private void updateSCMNodesWithAlmKey(String divider, String sourceTool, String almKeyProcessedIndex,
 			String almKeysIndex) {
-		Neo4jDBHandler dbHandler = new Neo4jDBHandler();
+		GraphDBHandler dbHandler = new GraphDBHandler();
 		try {
 			String paginationCypher = "MATCH (n:SCM:DATA:RAW) where not exists(n." + almKeyProcessedIndex
 					+ ") and exists(n.commitId) return count(n) as count";
@@ -165,7 +165,7 @@ public class DataExtractor {
 	}
 
 	private void cleanSCMNodes(String sourceTool, String almKeyProcessedIndex, String almKeysIndex) {
-		Neo4jDBHandler dbHandler = new Neo4jDBHandler();
+		GraphDBHandler dbHandler = new GraphDBHandler();
 		try {
 			int processedRecords = 1;
 			while (processedRecords > 0) {
@@ -186,7 +186,7 @@ public class DataExtractor {
 	}
 
 	private void enrichAlmData(String sourceTool) {
-		Neo4jDBHandler dbHandler = new Neo4jDBHandler();
+		GraphDBHandler dbHandler = new GraphDBHandler();
 		try {
 			String almProjectCypher = "match (n:" + sourceTool
 					+ ":DATA) where not exists(n._PORTFOLIO_) WITH distinct n.projectKey as projectKey, count(n) as count "

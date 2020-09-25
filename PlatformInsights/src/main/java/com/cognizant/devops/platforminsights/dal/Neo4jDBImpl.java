@@ -30,7 +30,7 @@ import com.cognizant.devops.platformcommons.core.enums.JobSchedule;
 import com.cognizant.devops.platformcommons.core.enums.KPIJobResultAttributes;
 import com.cognizant.devops.platformcommons.core.util.InsightsUtils;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphResponse;
-import com.cognizant.devops.platformcommons.dal.neo4j.Neo4jDBHandler;
+import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBHandler;
 import com.cognizant.devops.platformcommons.dal.neo4j.NodeData;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platforminsights.datamodel.InferenceConfigDefinition;
@@ -42,7 +42,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
 public class Neo4jDBImpl implements DatabaseService {
-	Neo4jDBHandler graphDBHandler = new Neo4jDBHandler();
+	GraphDBHandler graphDBHandler = new GraphDBHandler();
 	protected InferenceConfigDefinition inferenceConfigDefinition;
 	private final String TIMEZONE = "GMT";
 	Gson gson = new Gson();
