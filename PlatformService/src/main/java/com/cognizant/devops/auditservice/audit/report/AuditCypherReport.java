@@ -168,7 +168,6 @@ public class AuditCypherReport extends AuditReportStrategy{
 				log.info("Aborting query from execute as it contains invalid keywords !!" + cypherQuery );
 			}
 		} catch (InsightsCustomException e) {
-			log.error(e);
 			log.error( " - query processing failed", e);
 			return Boolean.FALSE;
 		}

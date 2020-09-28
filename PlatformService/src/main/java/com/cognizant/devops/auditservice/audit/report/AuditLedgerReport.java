@@ -26,8 +26,9 @@ import java.util.Map;
 import javax.mail.MessagingException;
 import javax.mail.internet.AddressException;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 
@@ -36,8 +37,8 @@ import com.cognizant.devops.platformauditing.util.PdfTableUtil;
 import com.cognizant.devops.platformauditing.util.RestructureDataUtil;
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.core.util.SystemStatus;
-import com.cognizant.devops.platformcommons.dal.neo4j.GraphResponse;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBHandler;
+import com.cognizant.devops.platformcommons.dal.neo4j.GraphResponse;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
@@ -53,7 +54,8 @@ import com.google.gson.JsonParser;
  */
 public class AuditLedgerReport extends AuditReportStrategy{
 
-	private static final Logger log = LoggerFactory.getLogger(AuditLedgerReport.class.getName());
+
+	private static Logger log = LogManager.getLogger(AuditLedgerReport.class);
 
 	private static final AuditLedgerReport auditLedgerReport = new AuditLedgerReport();
 
@@ -189,7 +191,6 @@ public class AuditLedgerReport extends AuditReportStrategy{
 			EmailUtil emailutil = new EmailUtil();
 			emailutil.sendEmailWithAttachment(response, pdfName, subscribers);
 		}catch(Exception e){
-			log.error(e);
 			log.error(" -sendReport failed"+ e.getMessage());
 		}finally {
 			if(response!=null) {
