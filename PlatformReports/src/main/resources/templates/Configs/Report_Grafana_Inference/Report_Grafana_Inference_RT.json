@@ -1,0 +1,98 @@
+{
+	"reportId": "5200",
+	"reportName": "Report_Grafana_Inference",
+	"description": "Template to create Inference Panel",
+	"isActive": true,
+	"file": "Report_Grafana_Inference",
+	"visualizationutil": "Fusion",
+	"kpiConfigs": [
+		{
+			"kpiId": 111,
+			"visualizationConfigs": []
+		},
+		{
+			"kpiId": 231,
+			"visualizationConfigs": []
+		},
+		{
+			"kpiId": 122,
+			"visualizationConfigs": []
+		},
+		{
+			"kpiId": 124,
+			"visualizationConfigs": []
+		},
+		{
+			"kpiId": 126,
+			"visualizationConfigs": []
+		},
+		{
+			"kpiId": 128,
+			"visualizationConfigs": []
+		},
+		{
+			"kpiId": 233,
+			"visualizationConfigs": []
+		},
+		{
+			"kpiId": 140,
+			"visualizationConfigs": []
+		},
+		{
+			"kpiId": 243,
+			"visualizationConfigs": []
+		},
+		{
+			"kpiId": 142,
+			"visualizationConfigs": []
+		},
+		{
+			"kpiId": 144,
+			"visualizationConfigs": []
+		},
+		{
+			"kpiId": 331,
+			"visualizationConfigs": []
+		},
+		{
+			"kpiId": 131,
+			"visualizationConfigs": []
+		},
+		{
+			"kpiId": 101,
+			"visualizationConfigs": []
+		},
+		{
+			"kpiId": 133,
+			"visualizationConfigs": []
+		},
+		{
+			"kpiId": 236,
+			"visualizationConfigs": []
+		},
+		{
+			"kpiId": 135,
+			"visualizationConfigs": []
+		},
+		{
+			"kpiId": 137,
+			"visualizationConfigs": []
+		},
+		{
+			"kpiId": 149,
+			"visualizationConfigs": []
+		},
+		{
+			"kpiId": 161,
+			"visualizationConfigs": []
+		},
+		{
+			"kpiId": 151,
+			"visualizationConfigs": []
+		},
+		{
+			"kpiId": 153,
+			"visualizationConfigs": []
+		}
+	]
+}

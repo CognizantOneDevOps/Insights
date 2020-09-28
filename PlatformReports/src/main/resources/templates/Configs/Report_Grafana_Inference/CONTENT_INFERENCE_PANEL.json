@@ -1,0 +1,332 @@
+[
+	{
+		"contentId": 2111,
+		"expectedTrend": "DOWNWARDS",
+		"contentName": "Average Build Time",
+		"kpiId": "111",
+		"noOfResult": 2,
+		"threshold": 0,
+		"resultField": "avgOutput",
+		"message": {
+			"positive": "Average Build Time has decreased to {current:avgOutput}s from {previous:avgOutput}s ",
+			"negative": "Average Build Time has increased to {current:avgOutput}s from {previous:avgOutput}s ",
+			"neutral": "Average Build Time has remained constant to {avgOutput}s"
+		},
+		"isActive": "TRUE"
+	},
+	{
+		"contentId": 3121,
+		"expectedTrend": "UPWARDS",
+		"contentName": "Total Number of builds",
+		"kpiId": "231",
+		"noOfResult": 2,
+		"threshold": 0,
+		"resultField": "TotalNumberBuild",
+		"message": {
+			"positive": "Total Number of builds has increased to {current:TotalNumberBuild} from {previous:TotalNumberBuild} ",
+			"negative": "Total Number of builds has decreased to {current:TotalNumberBuild} from {previous:TotalNumberBuild} ",
+			"neutral": " Total Number of builds has remained constant to {TotalNumberBuild}"
+		},
+		"isActive": "TRUE"
+	},
+	{
+		"contentId": 4122,
+		"expectedTrend": "UPWARDS",
+		"contentName": "Number of successful builds",
+		"kpiId": "122",
+		"noOfResult": 2,
+		"threshold": 0,
+		"resultField": "TotalNumberBuild",
+		"message": {
+			"positive": "Number of successful builds has increased to {current:TotalNumberBuild} from {previous:TotalNumberBuild}",
+			"negative": "Number of successful builds has decreased to {current:TotalNumberBuild} from {previous:TotalNumberBuild}",
+			"neutral": " Number of successful builds has remain same to {TotalNumberBuild}"
+		},
+		"isActive": "TRUE"
+	},
+	{
+		"contentId": 5125,
+		"expectedTrend": "DOWNWARDS",
+		"contentName": "Number of failed builds",
+		"kpiId": "124",
+		"noOfResult": 2,
+		"threshold": 0,
+		"resultField": "TotalNumberBuild",
+		"message": {
+			"positive": "Number of failed builds has decreased to {current:TotalNumberBuild} from {previous:TotalNumberBuild}",
+			"negative": "Number of failed builds has increased to {current:TotalNumberBuild} from {previous:TotalNumberBuild}",
+			"neutral": " Number of failed builds has remain same to {TotalNumberBuild}"
+		},
+		"isActive": "TRUE"
+	},
+	{
+		"contentId": 6126,
+		"expectedTrend": "DOWNWARDS",
+		"contentName": "Maximum Build Time",
+		"kpiId": "126",
+		"noOfResult": 2,
+		"threshold": 0,
+		"resultField": "MaxBuildTime",
+		"message": {
+			"positive": "Maximum Build time has decreased to {current:MaxBuildTime}s from {previous:MaxBuildTime}s",
+			"negative": "Maximum Build time has increased to {current:MaxBuildTime}s from {previous:MaxBuildTime}s",
+			"neutral": "Maximum Build time has remain same to {MaxBuildTime}s"
+		},
+		"isActive": "TRUE"
+	},
+	{
+		"contentId": 7127,
+		"expectedTrend": "DOWNWARDS",
+		"contentName": "Minimum Build Time",
+		"kpiId": "128",
+		"noOfResult": 2,
+		"threshold": 0,
+		"resultField": "MinBuildTime",
+		"message": {
+			"positive": "Minimum Build time has decreased to {current:MinBuildTime}s from {previous:MinBuildTime}s",
+			"negative": "Minimum Build time has increased to {current:MinBuildTime}s from {previous:MinBuildTime}s",
+			"neutral": "Minimum Build time has remain same to {MinBuildTime}s"
+		},
+		"isActive": "TRUE"
+	},
+	{
+		"contentId": 8140,
+		"expectedTrend": "DOWNWARDS",
+		"contentName": "Average Duration of Succesful Deployments",
+		"kpiId": "233",
+		"noOfResult": 2,
+		"threshold": 0,
+		"resultField": "averageDeploymentDuration",
+		"message": {
+			"positive": "Average Duration of successful Deployments has decreased to {current:averageDeploymentDuration}s from {previous:averageDeploymentDuration}s",
+			"negative": " Average Duration of successful Deployments has increased to {current:averageDeploymentDuration}s from {previous:averageDeploymentDuration}s",
+			"neutral": "Minimum Build time has remain same to {averageDeploymentDuration}s"
+		},
+		"isActive": "TRUE"
+	},
+	{
+		"contentId": 9141,
+		"expectedTrend": "DOWNWARDS",
+		"contentName": "Total failed Deployments",
+		"kpiId": "140",
+		"noOfResult": 2,
+		"threshold": 0,
+		"resultField": "totalDeploymentCount",
+		"message": {
+			"positive": "Total failed Deployments has decreased to {current:totalDeploymentCount} from {previous:totalDeploymentCount}",
+			"negative": "Total failed Deployments has increased to {current:totalDeploymentCount}  from {previous:totalDeploymentCount}",
+			"neutral": "Total failed Deployments has remain same to {totalDeploymentCount}"
+		},
+		"isActive": "TRUE"
+	},
+	{
+		"contentId": 11143,
+		"expectedTrend": "DOWNWARDS",
+		"contentName": "Maximum Deployment Time",
+		"kpiId": "243",
+		"noOfResult": 2,
+		"threshold": 0,
+		"resultField": "MaxDeploymentTime",
+		"message": {
+			"positive": " Maximum Deployment Time has decreased to {current:MaxDeploymentTime}s from {previous:MaxDeploymentTime}s",
+			"negative": " Maximum Deployment Time has increased to {current:MaxDeploymentTime}s  from {previous:MaxDeploymentTime}s",
+			"neutral": " Maximum Deployment Time has remain same to {MaxDeploymentTime}s"
+		},
+		"isActive": "TRUE"
+	},
+	{
+		"contentId": 10142,
+		"expectedTrend": "UPWARDS",
+		"contentName": "Total successful Deployments",
+		"kpiId": "142",
+		"noOfResult": 2,
+		"threshold": 0,
+		"resultField": "totalDeploymentCount",
+		"message": {
+			"positive": "Total successful Deployments has increased to {current:totalDeploymentCount} from {previous:totalDeploymentCount}",
+			"negative": "Total successful Deployments has decreased to {current:totalDeploymentCount}  from {previous:totalDeploymentCount}",
+			"neutral": " Total successful Deployments has remain same to {totalDeploymentCount}"
+		},
+		"isActive": "TRUE"
+	},
+	{
+		"contentId": 12144,
+		"expectedTrend": "DOWNWARDS",
+		"contentName": "Minimum Deployment Time",
+		"kpiId": "144",
+		"noOfResult": 2,
+		"threshold": 0,
+		"resultField": "MinDeploymentTime",
+		"message": {
+			"positive": " Minimum Deployment Time has decreased to {current:MinDeploymentTime} from {previous:MinDeploymentTime}",
+			"negative": " Minimum Deployment Time has increased to {current:MinDeploymentTime}  from {previous:MinDeploymentTime}",
+			"neutral": " Minimum Deployment Time has remain same to {MinDeploymentTime}"
+		},
+		"isActive": "TRUE"
+	},
+	{
+		"contentId": 13131,
+		"expectedTrend": "DOWNWARDS",
+		"contentName": "Average Complexity",
+		"kpiId": "331",
+		"noOfResult": 2,
+		"threshold": 0,
+		"resultField": "AvgComplexityCoverage",
+		"message": {
+			"positive": "Average Code Complexity has decreased to {current:AvgComplexityCoverage} from {previous:AvgComplexityCoverage}",
+			"negative": "Average Code Complexity has increased to {current:AvgComplexityCoverage}  from {previous:AvgComplexityCoverage}",
+			"neutral": " Average Code Complexity has remain same to {AvgComplexityCoverage}"
+		},
+		"isActive": "TRUE"
+	},
+	{
+		"contentId": 14132,
+		"expectedTrend": "DOWNWARDS",
+		"contentName": "Average Duplicated Blocks",
+		"kpiId": "131",
+		"noOfResult": 2,
+		"threshold": 0,
+		"resultField": "AvgDuplicateBlocksCoverage",
+		"message": {
+			"positive": "Average duplicated blocks has decreased to {current:AvgDuplicateBlocksCoverage} from {previous:AvgDuplicateBlocksCoverage}",
+			"negative": "Average duplicated blocks has increased to {current:AvgDuplicateBlocksCoverage}  from {previous:AvgDuplicateBlocksCoverage}",
+			"neutral": "Average duplicated blocks has remain same to {AvgDuplicateBlocksCoverage}"
+		},
+		"isActive": "TRUE"
+	},
+	{
+		"contentId": 15133,
+		"expectedTrend": "UPWARDS",
+		"contentName": "Number of Quality Passed Blocks",
+		"kpiId": "101",
+		"noOfResult": 2,
+		"threshold": 0,
+		"resultField": "NumberOfQualityBlocks",
+		"message": {
+			"positive": "Number of Quality Passed Blocks has increased to {current:NumberOfQualityBlocks} from {previous:NumberOfQualityBlocks}",
+			"negative": "Number of Quality Passed Blocks has decreased to {current:NumberOfQualityBlocks}  from {previous:NumberOfQualityBlocks}",
+			"neutral": "Number of Quality Passed Blocks has remain same  to {NumberOfQualityBlocks}"
+		},
+		"isActive": "TRUE"
+	},
+	{
+		"contentId": 16134,
+		"expectedTrend": "DOWNWARDS",
+		"contentName": "Number of Quality failed Blocks",
+		"kpiId": "133",
+		"noOfResult": 2,
+		"threshold": 0,
+		"resultField": "NumberOfQualityBlocks",
+		"message": {
+			"positive": "Number of Quality failed Blocks has decreased to {current:NumberOfQualityBlocks} from {previous:NumberOfQualityBlocks}",
+			"negative": "Number of Quality failed Blocks has increased to {current:NumberOfQualityBlocks}  from {previous:NumberOfQualityBlocks}",
+			"neutral": "Number of Quality failed Blocks has remain same  to {NumberOfQualityBlocks}"
+		},
+		"isActive": "TRUE"
+	},
+	{
+		"contentId": 17135,
+		"expectedTrend": "UPWARDS",
+		"contentName": "Average Code Coverage",
+		"kpiId": "236",
+		"noOfResult": 2,
+		"threshold": 0,
+		"resultField": "AvgCodeCoverage",
+		"message": {
+			"positive": "Average Code Coverage has increased {current:AvgCodeCoverage} from {previous:AvgCodeCoverage}",
+			"negative": "Average Code Coverage has decreaed to {current:AvgCodeCoverage}  from {previous:AvgCodeCoverage}",
+			"neutral": "Average Code Coverage has remain same  to {AvgCodeCoverage}"
+		},
+		"isActive": "TRUE"
+	},
+	{
+		"contentId": 18136,
+		"expectedTrend": "UPWARDS",
+		"contentName": "Number of successful Sonar Executions",
+		"kpiId": "135",
+		"noOfResult": 2,
+		"threshold": 0,
+		"resultField": "NumberOfSonarExecutions",
+		"message": {
+			"positive": "Number of successful Sonar Executions has increased {current:NumberOfSonarExecutions} from {previous:NumberOfSonarExecutions}",
+			"negative": "Number of successful Sonar Executions has decreaed to {current:NumberOfSonarExecutions}  from {previous:NumberOfSonarExecutions}",
+			"neutral": "Number of successful Sonar Executions has remain same  to {NumberOfSonarExecutions}"
+		},
+		"isActive": "TRUE"
+	},
+	{
+		"contentId": 19137,
+		"expectedTrend": "DOWNWARDS",
+		"contentName": "Number of failed Sonar Executions",
+		"kpiId": "137",
+		"noOfResult": 2,
+		"threshold": 0,
+		"resultField": "NumberOfSonarExecutions",
+		"message": {
+			"positive": "Number of failed Sonar Executions has decreased to {current:NumberOfSonarExecutions} from {previous:NumberOfSonarExecutions}",
+			"negative": "Number of failed Sonar Executions has increased to {current:NumberOfSonarExecutions}  from {previous:NumberOfSonarExecutions}",
+			"neutral": "Number of failed Sonar Executions has remain same  to {NumberOfSonarExecutions}"
+		},
+		"isActive": "TRUE"
+	},
+	{
+		"contentId": 20150,
+		"expectedTrend": "DOWNWARDS",
+		"contentName": "Number of Defects",
+		"kpiId": "149",
+		"noOfResult": 2,
+		"threshold": 0,
+		"resultField": "totalDefect",
+		"message": {
+			"positive": " Total Number of Defects has decreased to {current:totalDefect} from {previous:totalDefect}",
+			"negative": " Total Number of Defects has increased to {current:totalDefect}  from {previous:totalDefect}",
+			"neutral": " Total Number of Defects has remain same  to {totalDefect}"
+		},
+		"isActive": "TRUE"
+	},
+	{
+		"contentId": 21151,
+		"expectedTrend": "UPWARDS",
+		"contentName": "Number of Closed Defects",
+		"kpiId": "161",
+		"noOfResult": 2,
+		"threshold": 0,
+		"resultField": "ClosedDefect",
+		"message": {
+			"positive": " Total Number of Closed Defects has increased to {current:ClosedDefect} from {previous:ClosedDefect}",
+			"negative": " Total Number of Closed Defects has decreased to {current:ClosedDefect}  from {previous:ClosedDefect}",
+			"neutral": " Total Number of Closed Defects has remain same  to {ClosedDefect}"
+		},
+		"isActive": "TRUE"
+	},
+	{
+		"contentId": 22152,
+		"expectedTrend": "DOWNWARDS",
+		"contentName": "Number of Open Defects",
+		"kpiId": "151",
+		"noOfResult": 2,
+		"threshold": 0,
+		"resultField": "OpenDefect",
+		"message": {
+			"positive": " Total Number of Open Defects has decreased  to {current:OpenDefect} from {previous:OpenDefect}",
+			"negative": " Total Number of Open Defects has increased to {current:OpenDefect}  from {previous:OpenDefect}",
+			"neutral": " Total Number of Open Defects has remain same  to {OpenDefect}"
+		},
+		"isActive": "TRUE"
+	},
+	{
+		"contentId": 23153,
+		"expectedTrend": "DOWNWARDS",
+		"contentName": "Average Defect Duration",
+		"kpiId": "153",
+		"noOfResult": 2,
+		"threshold": 0,
+		"resultField": "AvgDefectCompletionTime",
+		"message": {
+			"positive": " Average Defect Duration has decreased to {current:AvgDefectCompletionTime} from {previous:AvgDefectCompletionTime}",
+			"negative": "Average Defect Duration has increased to {current:AvgDefectCompletionTime}  from {previous:AvgDefectCompletionTime}",
+			"neutral": "Average Defect Duration has remain same  to {AvgDefectCompletionTime}"
+		},
+		"isActive": "TRUE"
+	}
+]

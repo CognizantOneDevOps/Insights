@@ -25,7 +25,6 @@ public class InsightsInferenceDetail implements Serializable {
 	 */
 	private static final long serialVersionUID = -4922026359338156088L;
 
-
 	private Long kpiId;
 	private Long contentId;
 	private String kpiName;
@@ -44,15 +43,20 @@ public class InsightsInferenceDetail implements Serializable {
 	private Long resultTime;
 	private String resultTimeX;
 	private long executionId;
+	private String inferenceText;
+	private String resultField;
 	private List<ResultSetModel> resultSet = new ArrayList<>(0);
-	
+
 	public void setKpiId(Long kpiId) {
 		this.kpiId = kpiId;
 	}
+	public Long getKpiId() {
+		return kpiId;
+	}
+
 	public Long getContentId() {
 		return contentId;
 	}
-
 
 	public void setContentId(Long contentId) {
 		this.contentId = contentId;
@@ -66,6 +70,7 @@ public class InsightsInferenceDetail implements Serializable {
 		this.kpiName = kpiName;
 
 	}
+
 	public Double getThreshold() {
 		return threshold;
 	}
@@ -77,6 +82,7 @@ public class InsightsInferenceDetail implements Serializable {
 	public void setGroup(String group) {
 		this.group = group;
 	}
+
 	public void setSchedule(String schedule) {
 		this.schedule = schedule;
 	}
@@ -84,21 +90,27 @@ public class InsightsInferenceDetail implements Serializable {
 	public void setThreshold(Double threshold) {
 		this.threshold = threshold;
 	}
+
 	public String getSchedule() {
 		return schedule;
 	}
+
 	public void setVector(String vector) {
 		this.group = vector;
 	}
+
 	public String getToolName() {
 		return toolName;
 	}
+
 	public void setToolName(String toolName) {
 		this.toolName = toolName;
 	}
+
 	public String getSentiment() {
 		return sentiment;
 	}
+
 	public void setSentiment(String sentiment) {
 		this.sentiment = sentiment;
 	}
@@ -110,15 +122,19 @@ public class InsightsInferenceDetail implements Serializable {
 	public void setTrendline(String trendline) {
 		this.trendline = trendline;
 	}
+
 	public String getAction() {
 		return action;
 	}
+
 	public void setAction(String action) {
 		this.action = action;
 	}
+
 	public Integer getNoOfResult() {
 		return noOfResult;
 	}
+
 	public void setNoOfResult(Integer noOfResult) {
 		this.noOfResult = noOfResult;
 	}
@@ -191,14 +207,31 @@ public class InsightsInferenceDetail implements Serializable {
 		return serialVersionUID;
 	}
 
+	public String getInferenceText() {
+		return inferenceText;
+	}
+
+	public void setInferenceText(String inferenceText) {
+		this.inferenceText = inferenceText;
+	}
+
+	public String getResultField() {
+		return resultField;
+	}
+
+	public void setResultField(String resultField) {
+		this.resultField = resultField;
+	}
+
 	@Override
 	public String toString() {
 		return "InsightsInferenceDetail [kpiId=" + kpiId + ", contentId=" + contentId + ", kpiName=" + kpiName
-				+ ", threshold=" + threshold + ", schedule=" + schedule + ", group=" + group + ", toolName="
-				+ toolName + ", sentiment=" + sentiment + ", trendline=" + trendline + ", action=" + action
-				+ ", noOfResult=" + noOfResult + ", inference=" + inference + ", ranking=" + ranking
-				+ ", expectedTrend=" + expectedTrend + ", actualTrend=" + actualTrend 
-				+ ", resultTime=" + resultTime + ", resultTimeX=" + resultTimeX + ", executionId=" + executionId
+				+ ", threshold=" + threshold + ", schedule=" + schedule + ", group=" + group + ", toolName=" + toolName
+				+ ", sentiment=" + sentiment + ", trendline=" + trendline + ", action=" + action + ", noOfResult="
+				+ noOfResult + ", inference=" + inference + ", ranking=" + ranking + ", expectedTrend=" + expectedTrend
+				+ ", actualTrend=" + actualTrend + ", resultTime=" + resultTime + ", resultTimeX=" + resultTimeX
+				+ ", executionId=" + executionId + ", inferenceText=" + inferenceText + ", resultField=" + resultField
 				+ ", resultSet=" + resultSet + "]";
 	}
+
 }
