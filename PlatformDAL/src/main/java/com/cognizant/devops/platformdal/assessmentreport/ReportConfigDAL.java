@@ -241,7 +241,29 @@ public class ReportConfigDAL extends BaseDAL {
 			terminateSession();
 			terminateSessionFactory();
 		}
+	}
 
+	/**
+	 * Method to get Active Report template using kpi Id
+	 * 
+	 * @param reportId
+	 * @return Object
+	 */
+	public List<InsightsReportsKPIConfig> getActiveReportTemplateByKPIId(int kpiId) {
+		List<InsightsReportsKPIConfig> reportList = new ArrayList<>();
+		try {
+			Query<InsightsReportsKPIConfig> createQuery = getSession().createQuery(
+					"FROM InsightsReportsKPIConfig REK WHERE REK.kpiConfig.kpiId = :kpiId",
+					InsightsReportsKPIConfig.class);
+			createQuery.setParameter("kpiId", kpiId);
+			reportList = createQuery.getResultList();
+			return reportList;
+		} catch (Exception e) {
+			return reportList;
+		} finally {
+			terminateSession();
+			terminateSessionFactory();
+		}
 	}
 
 	/**
@@ -406,6 +428,27 @@ public class ReportConfigDAL extends BaseDAL {
 	}
 
 	/**
+	 * Method to delete Content using KPIId
+	 * 
+	 * @param contentID
+	 * @return String
+	 */
+	public String deleteContentbyKPIID(int kpiId) {
+		getSession().beginTransaction();
+		Query<InsightsContentConfig> createQuery = getSession()
+				.createQuery("FROM InsightsContentConfig a WHERE a.kpiConfig.kpiId= :id", InsightsContentConfig.class);
+		createQuery.setParameter("id", kpiId);
+		List<InsightsContentConfig> executionRecord = createQuery.getResultList();
+		for (InsightsContentConfig insightsContentConfig : executionRecord) {
+			getSession().delete(insightsContentConfig);
+		}
+		getSession().getTransaction().commit();
+		terminateSession();
+		terminateSessionFactory();
+		return PlatformServiceConstants.SUCCESS;
+	}
+
+	/**
 	 * Method to delete Report Template using reportId
 	 * 
 	 * @param reportID
@@ -473,4 +516,32 @@ public class ReportConfigDAL extends BaseDAL {
 		return 0;
 	}
 
+	/**
+	 * Method used to get all active kpiConfig list
+	 * 
+	 * @return
+	 */
+	public List<InsightsKPIConfig> getAllActiveKpiConfig() {
+		Query<InsightsKPIConfig> createQuery = getSession().createQuery(
+				"FROM InsightsKPIConfig IK WHERE IK.isActive = TRUE ORDER BY IK.kpiId desc ", InsightsKPIConfig.class);
+		List<InsightsKPIConfig> configEntity = createQuery.getResultList();
+		terminateSession();
+		terminateSessionFactory();
+		return configEntity;
+	}
+
+	/**
+	 * Method used to get all active content config list
+	 * 
+	 * @return
+	 */
+	public List<InsightsContentConfig> getAllActiveContentList() {
+		Query<InsightsContentConfig> createQuery = getSession().createQuery(
+				"FROM InsightsContentConfig IC WHERE IC.isActive = TRUE ORDER BY IC.contentId desc ",
+				InsightsContentConfig.class);
+		List<InsightsContentConfig> configEntity = createQuery.getResultList();
+		terminateSession();
+		terminateSessionFactory();
+		return configEntity;
+	}
 }

@@ -165,6 +165,15 @@ export class RestAPIurlService implements IRestAPIUrlService {
         this.addEndPoint("ACTIVE_ARCHIVED_DATA_LIST", '/PlatformService/admin/dataarchival/getActiveArchivalRecord');
         this.addEndPoint("UPDATE_DATASOURCE_URL", '/PlatformService/admin/dataarchival/updateArchivalSourceUrl');
 
+         //kpi
+         this.addEndPoint("KPI_CATEGORY",'/PlatformService/insights/report/getKpiCategory');
+         this.addEndPoint("KPI_DATASOURCE",'/PlatformService/insights/report/getKpiDataSource');
+         this.addEndPoint("SAVE_DATA_KPI", '/PlatformService/insights/report/saveKpiDefinition');
+         this.addEndPoint("UPDATE_KPI", '/PlatformService/insights/report/updateKpiDefinition');
+         this.addEndPoint("LIST_KPI", '/PlatformService/insights/report/getAllActiveKpiList'); 
+         this.addEndPoint("DELETE_KPI",'/PlatformService/insights/report/deleteKpiDefinition')
+         this.addEndPoint("UPLOAD_BULK_KPI",'/PlatformService/insights/report/saveBulkKpiDefinition')
+ 
     }
 
     public addEndPoint(name: String, url: String) {

@@ -123,7 +123,7 @@ public class AssessmentReportServiceTest extends AssessmentReportServiceData {
 			FileInputStream input = new FileInputStream(kpiFile);
 			MultipartFile multipartFile = new MockMultipartFile("file", kpiFile.getName(), "text/plain",
 					IOUtils.toByteArray(input));
-			String response = assessmentService.uploadKPIInDatabase(multipartFile);
+			JsonArray response = assessmentService.uploadKPIInDatabase(multipartFile);
 			readFileAndgetKpiIdList(kpiFile.getName());
 			Assert.assertNotNull(response);
 		} catch (AssertionError e) {
@@ -137,7 +137,7 @@ public class AssessmentReportServiceTest extends AssessmentReportServiceData {
 			FileInputStream input = new FileInputStream(configFile);
 			MultipartFile multipartFile = new MockMultipartFile("file", configFile.getName(), "text/plain",
 					IOUtils.toByteArray(input));
-			String response = assessmentService.uploadContentInDatabase(multipartFile);
+			JsonArray response = assessmentService.uploadContentInDatabase(multipartFile);
 			readFileAndgetContentIdList(configFile.getName());
 			Assert.assertNotNull(response);
 		} catch (AssertionError e) {
@@ -151,7 +151,7 @@ public class AssessmentReportServiceTest extends AssessmentReportServiceData {
 		FileInputStream input = new FileInputStream(configFileTxt);
 		MultipartFile multipartFile = new MockMultipartFile("file", configFileTxt.getName(), "text/plain",
 				IOUtils.toByteArray(input));
-		String response = assessmentService.uploadContentInDatabase(multipartFile);
+		JsonArray response = assessmentService.uploadContentInDatabase(multipartFile);
 	}
 
 	@Test(priority = 11, expectedExceptions = InsightsCustomException.class)
@@ -159,7 +159,7 @@ public class AssessmentReportServiceTest extends AssessmentReportServiceData {
 		FileInputStream input = new FileInputStream(kpiFileTxt);
 		MultipartFile multipartFile = new MockMultipartFile("file", kpiFileTxt.getName(), "text/plain",
 				IOUtils.toByteArray(input));
-		String response = assessmentService.uploadKPIInDatabase(multipartFile);
+		JsonArray response = assessmentService.uploadKPIInDatabase(multipartFile);
 	}
 
 	@Test(priority = 12, expectedExceptions = InsightsCustomException.class)
@@ -167,7 +167,7 @@ public class AssessmentReportServiceTest extends AssessmentReportServiceData {
 		FileInputStream input = new FileInputStream(emptyFile);
 		MultipartFile multipartFile = new MockMultipartFile("file", emptyFile.getName(), "text/plain",
 				IOUtils.toByteArray(input));
-		String response = assessmentService.uploadKPIInDatabase(multipartFile);
+		JsonArray response = assessmentService.uploadKPIInDatabase(multipartFile);
 	}
 
 	@Test(priority = 13, expectedExceptions = InsightsCustomException.class)
@@ -175,7 +175,7 @@ public class AssessmentReportServiceTest extends AssessmentReportServiceData {
 		FileInputStream input = new FileInputStream(emptyFile);
 		MultipartFile multipartFile = new MockMultipartFile("file", emptyFile.getName(), "text/plain",
 				IOUtils.toByteArray(input));
-		String response = assessmentService.uploadContentInDatabase(multipartFile);
+		JsonArray response = assessmentService.uploadContentInDatabase(multipartFile);
 	}
 
 	@Test(priority = 14)

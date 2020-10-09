@@ -21,18 +21,21 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.cognizant.devops.platformcommons.constants.AssessmentReportAndWorkflowConstants;
+import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
 import com.cognizant.devops.platformcommons.core.util.ValidationUtils;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformdal.assessmentreport.InsightsAssessmentReportTemplate;
+import com.cognizant.devops.platformdal.assessmentreport.InsightsKPIConfig;
 import com.cognizant.devops.platformservice.assessmentreport.service.AssesmentReportServiceImpl;
 import com.cognizant.devops.platformservice.rest.util.PlatformServiceUtil;
 import com.google.gson.JsonArray;
@@ -50,14 +53,15 @@ public class InsightsAssessmentReportController {
 
 	@PostMapping(value = "/saveKpiDefinition", produces = MediaType.APPLICATION_JSON_VALUE)
 	public @ResponseBody JsonObject saveKpiDefinition(@RequestBody String registerkpiJson) {
-
 		try {
+			JsonObject kpiResponse = new JsonObject();
 			registerkpiJson = registerkpiJson.replace("\n", "").replace("\r", "");
 			String validatedResponse = ValidationUtils.validateRequestBody(registerkpiJson);
 			JsonParser parser = new JsonParser();
 			JsonObject registerKpijson = (JsonObject) parser.parse(validatedResponse);
 			int resultKpiId = assessmentReportService.saveKpiDefinition(registerKpijson);
-			return PlatformServiceUtil.buildSuccessResponseWithData(" Kpi created with Id " + resultKpiId);
+			kpiResponse.addProperty(PlatformServiceConstants.MESSAGE, "Kpi created with Id " + resultKpiId);
+			return PlatformServiceUtil.buildSuccessResponseWithData(kpiResponse);
 		} catch (InsightsCustomException e) {
 			log.error(e);
 			return PlatformServiceUtil.buildFailureResponse(e.getMessage());
@@ -69,14 +73,15 @@ public class InsightsAssessmentReportController {
 
 	@PostMapping(value = "/saveContentDefinition", produces = MediaType.APPLICATION_JSON_VALUE)
 	public @ResponseBody JsonObject saveContentDefinition(@RequestBody String registerContentJson) {
-
 		try {
+			JsonObject contentResponse = new JsonObject();
 			registerContentJson = registerContentJson.replace("\n", "").replace("\r", "");
 			String validatedResponse = ValidationUtils.validateRequestBody(registerContentJson);
 			JsonParser parser = new JsonParser();
 			JsonObject registerContentKPIJson = (JsonObject) parser.parse(validatedResponse);
 			int contentId = assessmentReportService.saveContentDefinition(registerContentKPIJson);
-			return PlatformServiceUtil.buildSuccessResponseWithData(" Content Id created " + contentId);
+			contentResponse.addProperty(PlatformServiceConstants.MESSAGE, " Content Id created " + contentId);
+			return PlatformServiceUtil.buildSuccessResponseWithData(contentResponse);
 		} catch (InsightsCustomException e) {
 			log.error(e);
 			return PlatformServiceUtil.buildFailureResponse(e.getMessage());
@@ -89,8 +94,8 @@ public class InsightsAssessmentReportController {
 	@PostMapping(value = "/saveBulkKpiDefinition", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	public @ResponseBody JsonObject saveBulkKpiDefinition(@RequestParam("file") MultipartFile file) {
 		try {
-			String resultKpiIdResponse = assessmentReportService.uploadKPIInDatabase(file);
-			return PlatformServiceUtil.buildSuccessResponseWithData(" Kpis details are  " + resultKpiIdResponse);
+			JsonArray kpiResponseArray = assessmentReportService.uploadKPIInDatabase(file);
+			return PlatformServiceUtil.buildSuccessResponseWithData(kpiResponseArray);
 		} catch (InsightsCustomException e) {
 			log.error(e);
 			return PlatformServiceUtil.buildFailureResponse(e.getMessage());
@@ -103,8 +108,8 @@ public class InsightsAssessmentReportController {
 	@PostMapping(value = "/saveBulkContentDefinition", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	public @ResponseBody JsonObject saveBulkContentDefinition(@RequestParam("file") MultipartFile file) {
 		try {
-			String resultContentResponse = assessmentReportService.uploadContentInDatabase(file);
-			return PlatformServiceUtil.buildSuccessResponseWithData(" Contents details are " + resultContentResponse);
+			JsonArray resultContentResponseArray = assessmentReportService.uploadContentInDatabase(file);
+			return PlatformServiceUtil.buildSuccessResponseWithData(resultContentResponseArray);
 		} catch (InsightsCustomException e) {
 			log.error(e);
 			return PlatformServiceUtil.buildFailureResponse(e.getMessage());
@@ -115,7 +120,7 @@ public class InsightsAssessmentReportController {
 	}
 
 	/* Assessment Report Controller Methods */
-	@RequestMapping(value = "/getSchedule", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@GetMapping(value = "/getSchedule", produces = MediaType.APPLICATION_JSON_VALUE)
 	public @ResponseBody JsonObject getScheduleList() {
 		List<String> scheduleList;
 		try {
@@ -165,7 +170,7 @@ public class InsightsAssessmentReportController {
 		}
 	}
 
-	@RequestMapping(value = "/loadAssessmentReport", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@GetMapping(value = "/loadAssessmentReport", produces = MediaType.APPLICATION_JSON_VALUE)
 	public @ResponseBody JsonObject getAssessmentReport() {
 		JsonArray jsonarray = new JsonArray();
 		try {
@@ -177,7 +182,7 @@ public class InsightsAssessmentReportController {
 
 	}
 
-	@RequestMapping(value = "/deleteAssessmentReport", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	@PostMapping(value = "/deleteAssessmentReport", produces = MediaType.APPLICATION_JSON_VALUE)
 	public @ResponseBody JsonObject deleteReport(@RequestParam String configId) {
 		String message = null;
 		try {
@@ -189,7 +194,7 @@ public class InsightsAssessmentReportController {
 
 	}
 
-	@RequestMapping(value = "/updateAssessmentReportState", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	@PostMapping(value = "/updateAssessmentReportState", produces = MediaType.APPLICATION_JSON_VALUE)
 	public @ResponseBody JsonObject updateWebhookStatus(@RequestBody String updateReportStateJson) {
 		String message = null;
 		try {
@@ -197,7 +202,11 @@ public class InsightsAssessmentReportController {
 			JsonParser parser = new JsonParser();
 			JsonObject updateReportStateJsonValidated = (JsonObject) parser.parse(validatedResponse);
 			message = assessmentReportService.updateAssessmentReportState(updateReportStateJsonValidated);
-			return PlatformServiceUtil.buildSuccessResponse();
+			if (message.equalsIgnoreCase(PlatformServiceConstants.SUCCESS)) {
+				return PlatformServiceUtil.buildSuccessResponse();
+			} else {
+				return PlatformServiceUtil.buildFailureResponse("Unable to update assessment report");
+			}
 		} catch (InsightsCustomException e) {
 			return PlatformServiceUtil.buildFailureResponse(e.getMessage());
 		}
@@ -205,7 +214,7 @@ public class InsightsAssessmentReportController {
 
 	// CONTROLLER FOR REPORT TEMPLATE CONFIG TABLE
 
-	@RequestMapping(value = "/saveReportTemplate", produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.POST)
+	@PostMapping(value = "/saveReportTemplate", produces = MediaType.APPLICATION_JSON_VALUE)
 	public @ResponseBody JsonObject saveReportTemplate(@RequestBody String reportTemplate) {
 		try {
 			reportTemplate = reportTemplate.replace("\n", "").replace("\r", "");
@@ -223,7 +232,7 @@ public class InsightsAssessmentReportController {
 		}
 	}
 
-	@RequestMapping(value = "/getReportTemplate", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@GetMapping(value = "/getReportTemplate", produces = MediaType.APPLICATION_JSON_VALUE)
 	public @ResponseBody JsonObject getReportTemplateList() {
 		List<InsightsAssessmentReportTemplate> reportTemplateList;
 		JsonArray jsonarray = new JsonArray();
@@ -242,7 +251,7 @@ public class InsightsAssessmentReportController {
 
 	}
 
-	@RequestMapping(value = "/getKPIlistOfReportTemplate", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	@PostMapping(value = "/getKPIlistOfReportTemplate", produces = MediaType.APPLICATION_JSON_VALUE)
 	public @ResponseBody JsonObject getKPIlist(@RequestParam String reportId) {
 		JsonArray data = null;
 		try {
@@ -254,7 +263,7 @@ public class InsightsAssessmentReportController {
 
 	}
 
-	@RequestMapping(value = "/setReportStatus", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	@PostMapping(value = "/setReportStatus", produces = MediaType.APPLICATION_JSON_VALUE)
 	public @ResponseBody JsonObject setWorkflowStatus(@RequestBody String reportConfigJsonString) {
 		String message = null;
 		try {
@@ -265,6 +274,160 @@ public class InsightsAssessmentReportController {
 			return PlatformServiceUtil.buildSuccessResponseWithData(message);
 		} catch (InsightsCustomException e) {
 			return PlatformServiceUtil.buildFailureResponse(e.getMessage());
+		}
+	}
+
+	@GetMapping(value = "/getKpiCategory", produces = MediaType.APPLICATION_JSON_VALUE)
+	public @ResponseBody JsonObject getKpiCategorylist() {
+		List<String> categoryList;
+		try {
+			categoryList = assessmentReportService.getKpiCategory();
+			return PlatformServiceUtil.buildSuccessResponseWithData(categoryList);
+		} catch (Exception e) {
+			return PlatformServiceUtil.buildFailureResponse(e.getMessage());
+		}
+
+	}
+
+	@GetMapping(value = "/getKpiDataSource", produces = MediaType.APPLICATION_JSON_VALUE)
+	public @ResponseBody JsonObject getKpiDataSourcelist() {
+		List<String> dataSourceList;
+		try {
+			dataSourceList = assessmentReportService.getKpiDataSource();
+			return PlatformServiceUtil.buildSuccessResponseWithData(dataSourceList);
+		} catch (Exception e) {
+			return PlatformServiceUtil.buildFailureResponse(e.getMessage());
+		}
+	}
+
+	@GetMapping(value = "/getAllActiveKpiList", produces = MediaType.APPLICATION_JSON_VALUE)
+	public @ResponseBody JsonObject getAllActiveKpiList() {
+		try {
+			List<InsightsKPIConfig> activeKPIList = assessmentReportService.getActiveKpiList();
+			return PlatformServiceUtil.buildSuccessResponseWithHtmlData(activeKPIList);
+		} catch (Exception e) {
+			return PlatformServiceUtil.buildFailureResponse(e.getMessage());
+		}
+	}
+
+	@PostMapping(value = "/updateKpiDefinition", produces = MediaType.APPLICATION_JSON_VALUE)
+	public @ResponseBody JsonObject updateKpiDefinition(@RequestBody String updatekpiRequest) {
+		try {
+			JsonObject kpiResponse = new JsonObject();
+			updatekpiRequest = updatekpiRequest.replace("\n", "").replace("\r", "");
+			String validatedEditResponse = ValidationUtils.validateRequestBody(updatekpiRequest);
+			JsonParser parser = new JsonParser();
+			JsonObject updateKpijson = (JsonObject) parser.parse(validatedEditResponse);
+			int resultKpiId = assessmentReportService.updateKpiDefinition(updateKpijson);
+			kpiResponse.addProperty(PlatformServiceConstants.MESSAGE,
+					"Kpi definition updated for KpiId " + resultKpiId);
+			return PlatformServiceUtil.buildSuccessResponseWithData(kpiResponse);
+		} catch (InsightsCustomException e) {
+			log.error(e);
+			return PlatformServiceUtil.buildFailureResponse(e.getMessage());
+		} catch (Exception e) {
+			log.error(e);
+			return PlatformServiceUtil.buildFailureResponse("Unable to update KPI Setting Configuration");
+		}
+	}
+
+	@PostMapping(value = "/deleteKpiDefinition", produces = MediaType.APPLICATION_JSON_VALUE)
+	public @ResponseBody JsonObject deleteKpiDefinition(@RequestBody String deletekpiRequest) {
+		try {
+			JsonObject kpiResponse = new JsonObject();
+			deletekpiRequest = deletekpiRequest.replace("\n", "").replace("\r", "");
+			String validatedEditResponse = ValidationUtils.validateRequestBody(deletekpiRequest);
+			JsonParser parser = new JsonParser();
+			JsonObject updateKpijson = (JsonObject) parser.parse(validatedEditResponse);
+			boolean isRecordDeleted = assessmentReportService.deleteKpiDefinition(updateKpijson);
+			if (isRecordDeleted) {
+				kpiResponse.addProperty(PlatformServiceConstants.MESSAGE,
+						"Kpi definition deleted for KpiId "
+								+ updateKpijson.get(AssessmentReportAndWorkflowConstants.KPIID));
+				return PlatformServiceUtil.buildSuccessResponseWithData(kpiResponse);
+			} else {
+				kpiResponse.addProperty(PlatformServiceConstants.MESSAGE,
+						"Kpi definition not deleted for KpiId "
+								+ updateKpijson.get(AssessmentReportAndWorkflowConstants.KPIID));
+				return PlatformServiceUtil.buildFailureResponse(kpiResponse.getAsString());
+			}
+		} catch (InsightsCustomException e) {
+			log.error(e);
+			return PlatformServiceUtil.buildFailureResponse(e.getMessage());
+		} catch (Exception e) {
+			log.error(e);
+			return PlatformServiceUtil.buildFailureResponse("Unable to delete KPI Setting Configuration");
+		}
+	}
+
+	@PostMapping(value = "/updateContentDefinition", produces = MediaType.APPLICATION_JSON_VALUE)
+	public @ResponseBody JsonObject updateContentDefinition(@RequestBody String updateContentRequest) {
+		try {
+			JsonObject kpiResponse = new JsonObject();
+			updateContentRequest = updateContentRequest.replace("\n", "").replace("\r", "");
+			String validatedEditResponse = ValidationUtils.validateRequestBody(updateContentRequest);
+			JsonParser parser = new JsonParser();
+			JsonObject updateKpijson = (JsonObject) parser.parse(validatedEditResponse);
+			int resultKpiId = assessmentReportService.updateContentDefinition(updateKpijson);
+			kpiResponse.addProperty(PlatformServiceConstants.MESSAGE,
+					"Content definition updated for KpiId " + resultKpiId);
+			return PlatformServiceUtil.buildSuccessResponseWithData(kpiResponse);
+		} catch (InsightsCustomException e) {
+			log.error(e);
+			return PlatformServiceUtil.buildFailureResponse(e.getMessage());
+		} catch (Exception e) {
+			log.error(e);
+			return PlatformServiceUtil.buildFailureResponse("Unable to update KPI Setting Configuration");
+		}
+	}
+
+	@GetMapping(value = "/getContentAction", produces = MediaType.APPLICATION_JSON_VALUE)
+	public @ResponseBody JsonObject getContentAction() {
+		List<String> categoryList;
+		try {
+			categoryList = assessmentReportService.getContentAction();
+			return PlatformServiceUtil.buildSuccessResponseWithData(categoryList);
+		} catch (Exception e) {
+			return PlatformServiceUtil.buildFailureResponse(e.getMessage());
+		}
+	}
+
+	@GetMapping(value = "/getAllActiveContentList", produces = MediaType.APPLICATION_JSON_VALUE)
+	public @ResponseBody JsonObject getAllActiveContentList() {
+		try {
+			List<JsonObject> activeContentList = assessmentReportService.getAllActiveContentList();
+			return PlatformServiceUtil.buildSuccessResponseWithHtmlData(activeContentList);
+		} catch (Exception e) {
+			return PlatformServiceUtil.buildFailureResponse(e.getMessage());
+		}
+	}
+
+	@PostMapping(value = "/deleteContentDefinition", produces = MediaType.APPLICATION_JSON_VALUE)
+	public @ResponseBody JsonObject deleteContentDefinition(@RequestBody String deleteContentRequest) {
+		try {
+			JsonObject kpiResponse = new JsonObject();
+			deleteContentRequest = deleteContentRequest.replace("\n", "").replace("\r", "");
+			String validatedEditResponse = ValidationUtils.validateRequestBody(deleteContentRequest);
+			JsonParser parser = new JsonParser();
+			JsonObject updateKpijson = (JsonObject) parser.parse(validatedEditResponse);
+			boolean isRecordDeleted = assessmentReportService.deleteContentDefinition(updateKpijson);
+			if (isRecordDeleted) {
+				kpiResponse.addProperty(PlatformServiceConstants.MESSAGE,
+						"Content definition deleted for ContentId "
+								+ updateKpijson.get(AssessmentReportAndWorkflowConstants.CONTENTID));
+				return PlatformServiceUtil.buildSuccessResponseWithData(kpiResponse);
+			} else {
+				kpiResponse.addProperty(PlatformServiceConstants.MESSAGE,
+						"Content definition not deleted for ContentId "
+								+ updateKpijson.get(AssessmentReportAndWorkflowConstants.CONTENTID));
+				return PlatformServiceUtil.buildFailureResponse(kpiResponse.getAsString());
+			}
+		} catch (InsightsCustomException e) {
+			log.error(e);
+			return PlatformServiceUtil.buildFailureResponse(e.getMessage());
+		} catch (Exception e) {
+			log.error(e);
+			return PlatformServiceUtil.buildFailureResponse("Unable to delete KPI Setting Configuration");
 		}
 	}
 
