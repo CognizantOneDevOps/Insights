@@ -47,8 +47,9 @@ public class DataArchivalDataSubscriber extends EngineSubscriberResponseHandler 
 	@Override
 	public void handleDelivery(String consumerTag, Envelope envelope, BasicProperties properties, byte[] body)
 			throws IOException {
+		String message=null;
 		try {
-			String message = new String(body, MQMessageConstants.MESSAGE_ENCODING);
+			message = new String(body, MQMessageConstants.MESSAGE_ENCODING);
 			JsonArray messageJson = parser.parse(message).getAsJsonObject().get("data").getAsJsonArray();
 			JsonObject updateURLJson = messageJson.get(0).getAsJsonObject();
 			if (PlatformServiceConstants.SUCCESS.equalsIgnoreCase(updateURLJson.get("status").getAsString())) {
@@ -67,8 +68,9 @@ public class DataArchivalDataSubscriber extends EngineSubscriberResponseHandler 
 				throw new InsightsCustomException("Failed status in Data archival message received from MQ.");
 			}
 		} catch (NoResultException e) {
-			log.error("NoResultException occured ", e);
-			//getChannel().basicNack(envelope.getDeliveryTag(), false, true);
+			log.error("No Record found occured ", e);
+			log.error(" data message : ",message);
+			getChannel().basicAck(envelope.getDeliveryTag(), false);
 		} catch (Exception e) {
 			log.error("Exception occured ", e);
 		}

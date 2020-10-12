@@ -27,8 +27,10 @@ import com.cognizant.devops.engines.platformengine.message.core.EngineStatusLogg
 import com.cognizant.devops.engines.platformengine.message.factory.EngineSubscriberResponseHandler;
 import com.cognizant.devops.platformcommons.constants.MQMessageConstants;
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
+import com.cognizant.devops.platformcommons.core.enums.DataArchivalStatus;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBHandler;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
+import com.cognizant.devops.platformdal.dataArchivalConfig.DataArchivalConfigDal;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -38,6 +40,7 @@ import com.rabbitmq.client.Envelope;
 public class DataArchivalHealthSubscriber extends EngineSubscriberResponseHandler {
 	private static Logger log = LogManager.getLogger(DataArchivalHealthSubscriber.class.getName());
 	GraphDBHandler dbHandler = new GraphDBHandler();
+	DataArchivalConfigDal dataArchivalConfigDal = new DataArchivalConfigDal();
 
 	public DataArchivalHealthSubscriber(String routingKey) throws Exception {
 		super(routingKey);
@@ -77,14 +80,29 @@ public class DataArchivalHealthSubscriber extends EngineSubscriberResponseHandle
 				failureLabels = failureLabels.replace("HEALTH", "HEALTH_FAILURE");
 				String healthFailureLabels = ":LATEST_FAILURE:" + failureLabels;
 				createHealthNodes(failedDataList, agentId, healthFailureLabels, 20, "LATEST_FAILURE");
+				updateErrorStateInArchivalRecord(messageJson);
 			}
 			getChannel().basicAck(envelope.getDeliveryTag(), false);
 		} catch (InsightsCustomException e) {
-			log.error(e);
+			log.error("Error occured in Data Archival Health Subscriber",e);
+			log.error("Health message: ",message);
+			getChannel().basicAck(envelope.getDeliveryTag(), false);
 		}
 
 	}
-
+	
+	private void updateErrorStateInArchivalRecord(JsonObject messageJson) {
+		if (messageJson.has("archivalName")) {
+			if (!messageJson.get("archivalName").getAsString().isEmpty()) {
+				dataArchivalConfigDal.updateArchivalStatus(messageJson.get("archivalName").getAsString(),
+						DataArchivalStatus.ERROR.toString());
+			} else {
+				log.error("Archival name not provided");
+			}
+		} else {
+			log.error("Archival name property not present in message");
+		}
+	}
 	private void createHealthNodes(List<JsonObject> dataList, String agentId, String nodeLabels, int nodeCount,
 			String latestLabel) throws InsightsCustomException {
 		String healthQuery;

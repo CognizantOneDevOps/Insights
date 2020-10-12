@@ -62,7 +62,7 @@ public class DataArchivalConfigDal extends BaseDAL {
 		Query<InsightsDataArchivalConfig> createQuery = getSession().createQuery("FROM InsightsDataArchivalConfig DA WHERE "
 				+ "DA.archivalName = :archivalName ",InsightsDataArchivalConfig.class);
 		createQuery.setParameter("archivalName", archivalName);
-		InsightsDataArchivalConfig result = createQuery.getSingleResult();
+		InsightsDataArchivalConfig result = createQuery.uniqueResult();
 		terminateSession();
 		terminateSessionFactory();
 		return result;

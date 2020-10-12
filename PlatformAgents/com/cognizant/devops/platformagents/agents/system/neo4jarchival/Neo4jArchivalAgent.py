@@ -24,7 +24,7 @@ neo4jnodeid+insightstime = record id in es
 resumes push and pull operation on exception  in next cycle
 '''
 
-from ....core.BaseAgent3 import BaseAgent
+from ....core.BaseAgent import BaseAgent
 from datetime import datetime
 from neo4j import GraphDatabase, string
 import json
@@ -77,6 +77,8 @@ class Neo4jArchivalAgent(BaseAgent):
                     self.migrate_nodes(_es, list_lables[i],neo4j_query_limit)
                     self.migrate_forward_relationship(_es, list_lables[i],neo4j_query_limit)
                     self.migrate_backward_relationship(_es, list_lables[i],neo4j_query_limit)
+                    self.process_node_datatype(_es, list_lables[i])
+                    self.process_rel_datatype(_es, list_lables[i])
                     if (neo4j_data_delete):
                         print("deletion starts")
                         self.delete_batchof_relationships(_es, list_lables[i], neo4j_query_limit)
@@ -184,8 +186,8 @@ class Neo4jArchivalAgent(BaseAgent):
     Function: resume_migrate_nodes
     Description: get node details add labels as seperated values seperated by  ^ which are incomplete in previous transaction
     Parameter: _es = holds elasticsearch obejct (object), label = neo4j labels (string),
-                neo4j_query_limit = limit passed to query while pulling data (integer)                
-        
+                neo4j_query_limit = limit passed to query while pulling data (integer)
+
     """
     def resume_migrate_nodes(self, _es, label,neo4j_query_limit):
         try:
@@ -234,7 +236,7 @@ class Neo4jArchivalAgent(BaseAgent):
         Function: resume_migrate_forward_relationship
         Description: get relationship detials, add rel name and push to es which are incomplete in previous transaction
         Parameter: _es = holds elasticsearch obejct (object), label = neo4j labels (string),
-                    neo4j_query_limit = limit passed to query while pulling data (integer)                
+                    neo4j_query_limit = limit passed to query while pulling data (integer)
 
         """
 
@@ -282,7 +284,7 @@ class Neo4jArchivalAgent(BaseAgent):
             Function: resume_migrate_backward_relationship
             Description: get relationship detials, add rel name and push to es whichare incomplete in previous transaction
             Parameter: _es = holds elasticsearch obejct (object), label = neo4j labels (string),
-                        neo4j_query_limit = limit passed to query while pulling data (integer)                
+                        neo4j_query_limit = limit passed to query while pulling data (integer)
 
     """
 
@@ -331,9 +333,9 @@ class Neo4jArchivalAgent(BaseAgent):
 
     """
                 Function: migrate_nodes
-                Description: get node details add labels as seperated values seperated by  ^  
+                Description: get node details add labels as seperated values seperated by  ^
                 Parameter: _es = holds elasticsearch obejct (object), label = neo4j labels (string),
-                            neo4j_query_limit = limit passed to query while pulling data (integer)                
+                            neo4j_query_limit = limit passed to query while pulling data (integer)
 
     """
     def migrate_nodes(self, _es, label, neo4j_query_limit):
@@ -382,7 +384,7 @@ class Neo4jArchivalAgent(BaseAgent):
          Function: migrate_forward_relationship
          Description: get relationship detials, add rel name and push to es
          Parameter: _es = holds elasticsearch obejct (object), label = neo4j labels (string),
-                     neo4j_query_limit = limit passed to query while pulling data (integer)                
+                     neo4j_query_limit = limit passed to query while pulling data (integer)
 
      """
     def migrate_forward_relationship(self,_es, label,neo4j_query_limit):
@@ -428,7 +430,7 @@ class Neo4jArchivalAgent(BaseAgent):
             Function: migrate_backward_relationship
             Description: get relationship detials, add rel name and push to es
             Parameter: _es = holds elasticsearch obejct (object), label = neo4j labels (string),
-                       neo4j_query_limit = limit passed to query while pulling data (integer)                
+                       neo4j_query_limit = limit passed to query while pulling data (integer)
 
     """
 
@@ -476,7 +478,7 @@ class Neo4jArchivalAgent(BaseAgent):
             Function: copy_schema_data_to_es
             Description: all the schema of nodes and relationship are stored as seperate index.
             Parameter: _es = holds elasticsearch obejct (object), indexName = index name named after neo4j label  (string),
-                                nodeId = nodeid of neo4j created as id for es(integer)   , dctNode : dictionary of schema data             
+                                nodeId = nodeid of neo4j created as id for es(integer)   , dctNode : dictionary of schema data
 
         """
 
@@ -486,7 +488,8 @@ class Neo4jArchivalAgent(BaseAgent):
                 jsonNode = json.dumps(dctNode)
                 if (json.loads(jsonNode)):
                     jsonNode = json.loads(jsonNode)
-                    indexName = string.lower(indexName)
+                    #indexName = string.lower(indexName)
+                    indexName = indexName.lower()
                     doc_type = "_doc"
                     response = _es.index(index=indexName, doc_type=doc_type, id=indexName, body=jsonNode)
                     print("Nodes schema dumped to Elastic search successfully")
@@ -509,7 +512,7 @@ class Neo4jArchivalAgent(BaseAgent):
         Function: copy_node_data_to_es
         Description: esID = nodeID+insightstime , all labels stored in seperate index
         Parameter: _es = holds elasticsearch obejct (object), indexName = index name named after neo4j label  (string),
-                            nodeId = nodeid of neo4j created as id for es(integer)   , dctNode : dictionary of node data             
+                            nodeId = nodeid of neo4j created as id for es(integer)   , dctNode : dictionary of node data
 
     """
     def copy_node_data_to_es(self, _es, nodeId, dctNode, indexName):
@@ -517,7 +520,8 @@ class Neo4jArchivalAgent(BaseAgent):
             jsonNode = json.dumps(dctNode)
             if (json.loads(jsonNode)):
                 jsonNode = json.loads(jsonNode)
-                indexName = string.lower(indexName)
+                #indexName = string.lower(indexName)
+                indexName = indexName.lower()
                 doc_type = "_doc"
                 response = _es.index(index=indexName, doc_type=doc_type, id=nodeId, body=jsonNode)
                 print("Nodes dumped to Elastic search successfully")
@@ -536,9 +540,9 @@ class Neo4jArchivalAgent(BaseAgent):
             return False
     """
         Function: copy_relationship_data_to_es
-        Description: all the forward and backward indexes are stored as seperate indexes in es elasticsearchID= neo4jrelationshipID+startNodeInsightsTIme 
+        Description: all the forward and backward indexes are stored as seperate indexes in es elasticsearchID= neo4jrelationshipID+startNodeInsightsTIme
         Parameter: _es = holds elasticsearch obejct (object),
-                            result : dictionary of relationship data             
+                            result : dictionary of relationship data
 
     """
 
@@ -548,7 +552,8 @@ class Neo4jArchivalAgent(BaseAgent):
             if (json.loads(jsonNode)):
                 jsonNode = json.loads(jsonNode)
                 relationshipName = result['relationshipName']
-                relationshipName = string.lower(relationshipName)
+                #relationshipName = string.lower(relationshipName)
+                relationshipName = relationshipName.lower()
                 relationshipID = result['relationshipID']
                 time_node_start = int(result['time_node_start'])
                 elasticsearchID = str(relationshipID) + str(time_node_start)
@@ -573,7 +578,7 @@ class Neo4jArchivalAgent(BaseAgent):
     """
            Function: obtain_epoch_date
            Description: converts the timeperiod in days to epoch date from the current date
-           Parameter:              
+           Parameter:
 
     """
     def obtain_epoch_date(self):
@@ -683,7 +688,7 @@ class Neo4jArchivalAgent(BaseAgent):
     def total_unmigrated_forward_realtionship_count_unack(self, tx, timeperiod, label1):
         try:
             result = tx.run("MATCH (n:{label}:DATA)-[r]->(b)"
-                            "WHERE toInt(n.inSightsTime) < $timeperiod and r.copy_to_ES = false and exists(b.inSightsTime) "   
+                            "WHERE toInt(n.inSightsTime) < $timeperiod and r.copy_to_ES = false and exists(b.inSightsTime) "
                             "RETURN count(r) as Count ".format(label=label1), timeperiod=timeperiod).data()
             print("count of Relationships to left************")
             print(result)
@@ -933,3 +938,4 @@ class Neo4jArchivalAgent(BaseAgent):
 
 if __name__ == "__main__":
     Neo4jArchivalAgent()
+

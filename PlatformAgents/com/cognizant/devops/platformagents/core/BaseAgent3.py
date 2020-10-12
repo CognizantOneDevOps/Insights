@@ -344,13 +344,19 @@ class BaseAgent(object):
     def getResponseTemplate(self):
         return self.config.get('dynamicTemplate', {}).get('responseTemplate',None)
     
-    def generateHealthData(self, ex=None, systemFailure=False,note=None):
+    def generateHealthData(self, ex=None, systemFailure=False,note=None, additionalProperties=None):
         data = []
         currentTime = self.getRemoteDateTime(datetime.utcnow())
         tokens = self.dataRoutingKey.split('.')
         self.categoryName = tokens[0]
         self.toolName = tokens[1]
-        health = { 'toolName' : self.config.get('toolName', tokens[1]), 'categoryName' : self.config.get('toolCategory', tokens[0]), 'agentId' : self.config.get('agentId'), 'inSightsTimeX' : currentTime['time'], 'inSightsTime' : currentTime['epochTime'], 'executionTime' : int((datetime.now() - self.executionStartTime).total_seconds() * 1000)}
+        health_basic = { 'toolName' : self.config.get('toolName', tokens[1]), 'categoryName' : self.config.get('toolCategory', tokens[0]), 'agentId' : self.config.get('agentId'), 'inSightsTimeX' : currentTime['time'], 'inSightsTime' : currentTime['epochTime'], 'executionTime' : int((datetime.now() - self.executionStartTime).total_seconds() * 1000)}
+        if additionalProperties != None:
+            data_json = {key: value for (key, value) in (health_basic.items() + additionalProperties.items())}
+            health_basic_str = json.dumps(data_json)
+            health = json.loads(health_basic_str)
+        else:
+            health = health_basic 
         if systemFailure:
             health['status'] = 'failure'
             health['message'] = 'Agent is shutting down'
@@ -363,6 +369,7 @@ class BaseAgent(object):
             if note != None:
                 health['message'] = note
         data.append(health)
+        logging.debug(data)
         return data
     
     def scheduleAgent(self):

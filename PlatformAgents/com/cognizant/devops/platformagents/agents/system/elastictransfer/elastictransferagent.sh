@@ -33,10 +33,10 @@ detectPythonVersion()
 {
      if echo "$1" | grep -q "Python 2"; then
       echo "Detected python 2 version";
-      python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.system.ElasticTransfer.ElasticTransferAgent import ElasticTransferAgent; ElasticTransferAgent()" &
+      python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.system.elastictransfer.ElasticTransferAgent import ElasticTransferAgent; ElasticTransferAgent()" &
      elif echo "$1" | grep -q "Python 3"; then
       echo "Detected python 3 version";
-      python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.system.ElasticTransfer.ElasticTransferAgent3 import ElasticTransferAgent; ElasticTransferAgent()" &
+      python -c "from __AGENT_KEY__.com.cognizant.devops.platformagents.agents.system.elastictransfer.ElasticTransferAgent3 import ElasticTransferAgent; ElasticTransferAgent()" &
      else
       echo "python version not supported"
 	  exit 1;
@@ -50,7 +50,7 @@ case "$1" in
      echo "__AGENT_KEY__ already running"
     else
      echo "Starting __AGENT_KEY__"
-     cd $INSIGHTS_AGENT_HOME/PlatformAgents/system
+     cd $INSIGHTS_AGENT_HOME/PlatformAgents/elastictransfer
 	 echo $python_version
      detectPythonVersion "$python_version"
     fi
@@ -80,14 +80,14 @@ case "$1" in
      sudo kill -9 $(ps aux | grep '__PS_KEY__' | awk '{print $2}')
      echo "__AGENT_KEY__ stopped"
      echo "__AGENT_KEY__ starting"
-     cd $INSIGHTS_AGENT_HOME/PlatformAgents/system
+     cd $INSIGHTS_AGENT_HOME/PlatformAgents/elastictransfer
 	 echo $python_version
      detectPythonVersion "$python_version"
      echo "__AGENT_KEY__ started"
     else
      echo "__AGENT_KEY__ already in stopped state"
      echo "__AGENT_KEY__ starting"
-     cd $INSIGHTS_AGENT_HOME/PlatformAgents/system
+     cd $INSIGHTS_AGENT_HOME/PlatformAgents/elastictransfer
 	 echo $python_version
      detectPythonVersion "$python_version"
      echo "__AGENT_KEY__ started"
