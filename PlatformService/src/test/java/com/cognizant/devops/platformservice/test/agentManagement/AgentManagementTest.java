@@ -62,7 +62,7 @@ public class AgentManagementTest extends AgentManagementTestData{
 		AgentManagementServiceImpl agentServiceImpl = new AgentManagementServiceImpl();
 		try {
 			ApplicationConfigProvider.getInstance().getAgentDetails().setOnlineRegistration(true);
-			Map<String, ArrayList<String>> availableAgents = agentServiceImpl.getSystemAvailableAgentList();
+			Map<String, ArrayList<String>> availableAgents = agentServiceImpl.getDocrootAvailableAgentList();
 			Assert.assertNotNull(availableAgents);
 			Assert.assertTrue(availableAgents.size() > 0);
 			Assert.assertTrue(availableAgents.containsKey("v5.0"));
@@ -89,7 +89,7 @@ public class AgentManagementTest extends AgentManagementTestData{
 
 		AgentManagementServiceImpl agentServiceImpl = new AgentManagementServiceImpl();
 		ApplicationConfigProvider.getInstance().getAgentDetails().setOnlineRegistration(false);
-		Map<String, ArrayList<String>> availableAgents = agentServiceImpl.getSystemAvailableAgentList();
+		Map<String, ArrayList<String>> availableAgents = agentServiceImpl.getOfflineSystemAvailableAgentList();
 		
 		Assert.assertNotNull(availableAgents);
 		Assert.assertTrue(availableAgents.size() > 0);

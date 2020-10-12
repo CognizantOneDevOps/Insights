@@ -13,13 +13,13 @@
 	<parent>
 		<artifactId>PlatformParent</artifactId>
 		<groupId>com.cognizant.devops</groupId>
-		<version>7.0-SNAPSHOT</version>
+		<version>7.0</version>
 	</parent>
 
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.cognizant.devops</groupId>
 	<artifactId>PlatformInsights</artifactId>
-	<version>7.0-SNAPSHOT</version>
+	<version>7.0</version>
 	<name>PlatformInsights</name>
 	<description>PlatformInsights</description>
 	<dependencies>
@@ -69,7 +69,7 @@
 		<dependency>
 			<groupId>com.cognizant.devops</groupId>
 			<artifactId>PlatformCommons</artifactId>
-			<version>7.0-SNAPSHOT</version>
+			<version>7.0</version>
 		</dependency>
 	</dependencies>
 	<build>

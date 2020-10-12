@@ -29,6 +29,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
+import com.cognizant.devops.platformcommons.constants.ConfigOptions;
 import com.cognizant.devops.platformcommons.core.util.ValidationUtils;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformservice.agentmanagement.service.AgentConfigTO;
@@ -77,7 +79,7 @@ public class InsightsAgentConfiguration {
 		} catch (InsightsCustomException e) {
 			return PlatformServiceUtil.buildFailureResponse(e.getMessage());
 		}
-		
+
 	}
 
 	@RequestMapping(value = "/uninstallAgent", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
@@ -117,7 +119,8 @@ public class InsightsAgentConfiguration {
 			String osversion = updateAgentJson.get("osversion").getAsString();
 			String configDetails = updateAgentJson.get("configJson").getAsString();
 			boolean vault = updateAgentJson.get("vault").getAsBoolean();
-			message = agentManagementService.updateAgent(agentId, configDetails, toolName, agentVersion, osversion, vault);
+			message = agentManagementService.updateAgent(agentId, configDetails, toolName, agentVersion, osversion,
+					vault);
 		} catch (InsightsCustomException e) {
 			return PlatformServiceUtil.buildFailureResponse(e.toString());
 		}
@@ -125,7 +128,8 @@ public class InsightsAgentConfiguration {
 	}
 
 	@RequestMapping(value = "/startStopAgent", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public @ResponseBody JsonObject startStopAgent(@RequestParam String agentId, @RequestParam String toolName, @RequestParam String osversion, @RequestParam String action) {
+	public @ResponseBody JsonObject startStopAgent(@RequestParam String agentId, @RequestParam String toolName,
+			@RequestParam String osversion, @RequestParam String action) {
 		String message = null;
 		try {
 			message = agentManagementService.startStopAgent(agentId, toolName, osversion, action);
@@ -139,7 +143,14 @@ public class InsightsAgentConfiguration {
 	public @ResponseBody JsonObject getSystemAvailableAgentList() {
 		Map<String, ArrayList<String>> agentDetails;
 		try {
-			agentDetails = agentManagementService.getSystemAvailableAgentList();
+			if (!ApplicationConfigProvider.getInstance().getAgentDetails().isOnlineRegistration()) {
+				agentDetails = agentManagementService.getOfflineSystemAvailableAgentList();
+			} else if (ApplicationConfigProvider.getInstance().getAgentDetails().getOnlineRegistrationMode()
+					.equalsIgnoreCase(ConfigOptions.ONLINE_REGISTRATION_MODE_NEXUS)) {
+				agentDetails = agentManagementService.getRepoAvailableAgentList();
+			} else {
+				agentDetails = agentManagementService.getDocrootAvailableAgentList();
+			}
 		} catch (InsightsCustomException e) {
 			return PlatformServiceUtil.buildFailureResponse(e.toString());
 		}
@@ -155,7 +166,6 @@ public class InsightsAgentConfiguration {
 			return PlatformServiceUtil.buildFailureResponse(e.toString());
 		}
 		return PlatformServiceUtil.buildSuccessResponseWithHtmlData(details);
-
 	}
 
 	@RequestMapping(value = "/getRegisteredAgents", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)

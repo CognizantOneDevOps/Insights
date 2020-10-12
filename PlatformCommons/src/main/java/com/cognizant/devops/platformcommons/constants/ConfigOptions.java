@@ -16,7 +16,6 @@
 package com.cognizant.devops.platformcommons.constants;
 
 import java.io.File;
-import java.time.Instant;
 
 public interface ConfigOptions {
 	String CONFIG_DIR = ".InSights";
@@ -68,5 +67,6 @@ public interface ConfigOptions {
 	String QUERY_DATA_PROCESSING_FOLDER = "Audit-report";
 	String OFFLINE_DATA_PROCESSING_RESOLVED_PATH = System.getenv().get(INSIGHTS_HOME) + FILE_SEPERATOR + ConfigOptions.CONFIG_DIR + FILE_SEPERATOR + ConfigOptions.OFFLINE_DATA_PROCESSING_FOLDER;
 	String QUERY_DATA_PROCESSING_RESOLVED_PATH = System.getenv().get(INSIGHTS_HOME) + FILE_SEPERATOR + ConfigOptions.CONFIG_DIR + FILE_SEPERATOR + ConfigOptions.QUERY_DATA_PROCESSING_FOLDER;
-
+	String ONLINE_REGISTRATION_MODE_DOCROOT = "docroot";
+	String ONLINE_REGISTRATION_MODE_NEXUS = "nexus";
 }

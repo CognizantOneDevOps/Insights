@@ -29,14 +29,23 @@ public interface AgentManagementService {
 
 	public String uninstallAgent(String agentId, String toolName, String osversion) throws InsightsCustomException;
 
-	public String startStopAgent(String agentId, String toolName, String osversion, String action) throws InsightsCustomException;
+	public String startStopAgent(String agentId, String toolName, String osversion, String action)
+			throws InsightsCustomException;
 
 	public String updateAgent(String agentId, String configDetails, String toolName, String agentVersion,
 			String osversion, boolean vault) throws InsightsCustomException;
 
 	// This is used during Agent registration, provide list of Agents, with version
-	// from docroot.
-	public Map<String, ArrayList<String>> getSystemAvailableAgentList() throws InsightsCustomException;
+	// for offline processing
+	public Map<String, ArrayList<String>> getOfflineSystemAvailableAgentList() throws InsightsCustomException;
+
+	// This is used during Agent registration, provide list of Agents, with version
+	// for online processing,for docroot
+	public Map<String, ArrayList<String>> getDocrootAvailableAgentList() throws InsightsCustomException;
+
+	// This is used during Agent registration, provide list of Agents, with version
+	// for online processing,for nexus
+	public Map<String, ArrayList<String>> getRepoAvailableAgentList() throws InsightsCustomException;
 
 	// For agent registration, gives you RAW config.json from docroot
 	public String getToolRawConfigFile(String version, String tool) throws InsightsCustomException;

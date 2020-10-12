@@ -185,7 +185,7 @@ public class Neo4jDBImpl implements DatabaseService {
 
 	protected Map<String, Object> getResultMapNeo4j(Long result, String groupByValue) {
 		Map<String, Object> resultMap = new HashMap<>();
-		resultMap.put(KPIJobResultAttributes.KPIID.toString(), inferenceConfigDefinition.getKpiID());
+		resultMap.put("kpiID", inferenceConfigDefinition.getKpiID());
 		resultMap.put(KPIJobResultAttributes.NAME.toString(), inferenceConfigDefinition.getName());
 		resultMap.put(KPIJobResultAttributes.EXPECTEDTREND.toString(), inferenceConfigDefinition.getExpectedTrend());
 		resultMap.put(KPIJobResultAttributes.ISGROUPBY.toString(), inferenceConfigDefinition.isGroupBy());
@@ -231,7 +231,7 @@ public class Neo4jDBImpl implements DatabaseService {
 
 	private InferenceConfigDefinition mapNodeDataToInferenceConfigDefinition(NodeData node) {
 		InferenceConfigDefinition neo4jDef = new InferenceConfigDefinition();
-		neo4jDef.setKpiID(Integer.parseInt(node.getPropertyMap().get(KPIJobResultAttributes.KPIID.toString())));
+		neo4jDef.setKpiID(Integer.parseInt(node.getPropertyMap().get("kpiID")));
 		neo4jDef.setAction(
 				ExecutionActions.valueOf(node.getPropertyMap().get(KPIJobResultAttributes.ACTION.toString())));
 		neo4jDef.setActive(Boolean.parseBoolean(node.getPropertyMap().get(KPIJobResultAttributes.ISACTIVE.toString())));
