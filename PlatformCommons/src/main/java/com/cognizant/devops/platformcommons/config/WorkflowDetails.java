@@ -30,6 +30,8 @@ public class WorkflowDetails implements Serializable {
 	private int waitingQueueSize=60;
 	private String workflowExecutorCron = "1 0 0 * * ?";
 	private String workflowRetryExecutorCron = "0 0 */4 ? * *";
+	private String workflowAutoCorrectionSchedular="0 0 */4 ? * *";
+	
 	
 	public int getCorePoolSize() {
 		return corePoolSize;
@@ -70,6 +72,12 @@ public class WorkflowDetails implements Serializable {
 
 	public void setWorkflowRetryExecutorCron(String workflowRetryExecutorCron) {
 		this.workflowRetryExecutorCron = workflowRetryExecutorCron;
+	}
+	public String getWorkflowAutoCorrectionSchedular() {
+		return workflowAutoCorrectionSchedular;
+	}
+	public void setWorkflowAutoCorrectionSchedular(String workflowAutoCorrectionSchedular) {
+		this.workflowAutoCorrectionSchedular = workflowAutoCorrectionSchedular;
 	}
 	
 }

@@ -121,8 +121,10 @@ export class ReportManagementComponent implements OnInit {
         }
         this.detailedRecords.push(obj);
       });
+      this.userDataSource.data = [];
       this.userDataSource.data = this.detailedRecords;
       this.userDataSource.paginator = this.paginator;
+      this.detailedRecords = [];
     }
     this.userDataSource.data.forEach(element => {
       this.clicked.push(true);

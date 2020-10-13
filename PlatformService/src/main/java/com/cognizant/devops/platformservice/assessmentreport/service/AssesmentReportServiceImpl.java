@@ -688,7 +688,7 @@ public class AssesmentReportServiceImpl {
 				emailDetails = assessmentReportJson.get(AssessmentReportAndWorkflowConstants.EMAILDETAILS)
 						.getAsJsonObject();
 			}
-			JsonElement startDateJsonObject = assessmentReportJson.get(AssessmentReportAndWorkflowConstants.REPORTNAME);
+			JsonElement startDateJsonObject = assessmentReportJson.get(AssessmentReportAndWorkflowConstants.STARTDATE);
 			if (startDateJsonObject.isJsonNull()) {
 				epochStartDate = 0;
 			} else {

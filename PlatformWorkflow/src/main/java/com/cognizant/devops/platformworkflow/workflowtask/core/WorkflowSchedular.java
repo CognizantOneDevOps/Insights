@@ -73,11 +73,23 @@ public class WorkflowSchedular {
 					.withIdentity("WorkflowImmediateJobExecutortrigger", "WorkflowImmediateJobExecutor")
 					.withSchedule(CronScheduleBuilder.cronSchedule("0 */5 * ? * *"))
 					.build();
+			
+			JobDetail jobAutoWorkflowCorrection = JobBuilder.newJob(WorkflowAutoCorrectionExecutor.class)
+					.withIdentity("WorkflowAutoCorrectionExecutor", "WorkflowAutoCorrectionExecutor").build();
+
+			log.debug("Worlflow Detail ====  Workflow WorkflowAutoCorrectionExecutor Executor corn created ==== {} ",
+					ApplicationConfigProvider.getInstance().getWorkflowDetails().getWorkflowAutoCorrectionSchedular());
+
+			CronTrigger triggeAutoWorkflowCorrection = TriggerBuilder.newTrigger()
+					.withIdentity("WorkflowAutoCorrectionExecutor", "WorkflowAutoCorrectionExecutor")
+					.withSchedule(CronScheduleBuilder.cronSchedule(ApplicationConfigProvider.getInstance().getWorkflowDetails().getWorkflowAutoCorrectionSchedular()))
+					.build();
 
 			scheduler.start();
 			scheduler.scheduleJob(jobWorkflow, triggerWorkflow);
 			scheduler.scheduleJob(jobWorkflowRetry, triggeWorkflowRetry);
 			scheduler.scheduleJob(jobImmediateWorkflow, triggeImmediateWorkflow);
+			scheduler.scheduleJob(jobAutoWorkflowCorrection, triggeAutoWorkflowCorrection);
 
 		} catch (SchedulerException e) {
 			log.error(e);

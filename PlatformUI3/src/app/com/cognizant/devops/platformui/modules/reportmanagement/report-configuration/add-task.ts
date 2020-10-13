@@ -125,6 +125,11 @@ export class AddTasksDialog {
     }
 
     savetasks() {
-        this.dialogRef.close(this.taskListTobeSaved);
+        if(this.taskListTobeSaved.length > 0) {
+            this.dialogRef.close(this.taskListTobeSaved);
+        } else {
+            this.dialogRef.close(this.targetTasks);
+        }
+        
     }
 }
