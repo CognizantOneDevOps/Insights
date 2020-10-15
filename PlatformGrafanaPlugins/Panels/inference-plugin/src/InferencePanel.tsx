@@ -32,11 +32,15 @@ export class InferencePanel extends React.Component<Props>{
         //console.log('google--',google);
         google.charts.load('46', {'packages':['corechart','charteditor','gantt']});
         google.charts.setOnLoadCallback(this.googleChart);
-        const inferenceLists = data[0].data.map(link => {
+        let inferenceLists;
+        if(data.length == 0){
+            inferenceLists = "No Records found!";
+        }else{
+           inferenceLists = data[0].data.map(link => {
             return link.color === 'green' ? <div onMouseEnter={() => { this.getInference(link,options) }}><img src="public/img/satisfied.png" />{link.inference}</div> :
                 <div onMouseEnter={() => { this.getInference(link,options) }}><img src="public/img/dissatisfied.png" />{link.inference}</div>
+         });
         }
-        );
         return (
             <div style={{ height: '100%',width:'100%' }} className={cx(`position:relative`, css`width: ${this.props.width}px;height: ${this.props.height}px;`)}>
                 <div className="row">

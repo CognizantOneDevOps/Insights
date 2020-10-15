@@ -1,4 +1,4 @@
-export function formatMultiSeriesChartType(props: any): { categories: any, dataset: any } {
+export function formatMultiSeriesChartType(props: any,options:any,config:any): { categories: any, dataset: any } {
     let categories: any = new Array();
     let dataset: any = new Array();
     let category: any = new Array();
