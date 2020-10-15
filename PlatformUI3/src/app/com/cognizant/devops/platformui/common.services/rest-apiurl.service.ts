@@ -174,6 +174,14 @@ export class RestAPIurlService implements IRestAPIUrlService {
          this.addEndPoint("DELETE_KPI",'/PlatformService/insights/report/deleteKpiDefinition')
          this.addEndPoint("UPLOAD_BULK_KPI",'/PlatformService/insights/report/saveBulkKpiDefinition')
  
+         //content
+         this.addEndPoint("LIST_CONTENT",'/PlatformService/insights/report/getAllActiveContentList');
+         this.addEndPoint("SAVE_DATA_CONTENT", '/PlatformService/insights/report/saveContentDefinition');
+         this.addEndPoint("DELETE_CONTENT",'/PlatformService/insights/report/deleteContentDefinition');
+         this.addEndPoint("GET_ACTIONS",'/PlatformService/insights/report/getContentAction');
+         this.addEndPoint("UPDATE_CONTENT",'/PlatformService/insights/report/updateContentDefinition');
+         this.addEndPoint("UPLOAD_BULK_CONTENT",'/PlatformService/insights/report/saveBulkContentDefinition')
+
     }
 
     public addEndPoint(name: String, url: String) {

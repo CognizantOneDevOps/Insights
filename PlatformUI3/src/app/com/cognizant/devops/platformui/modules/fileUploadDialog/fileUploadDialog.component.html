@@ -2,7 +2,7 @@
   <div class="arrange-horizontally-fileDialog">
     <div class="gridHeader">
       <div class="dialogHeader">Upload JSON File
-        <a style="text-align: right;padding-left: 210px;">
+        <a style="text-align: right;padding-left: 238px;">
           <mat-icon (click)="closeDialog()" svgIcon="close_dialog" [ngStyle]="{'width': '30px', 'height': '30px'}">
           </mat-icon>
         </a>
@@ -12,7 +12,7 @@
   <div style="display:inline-block;padding-top: 6%;padding-left: 6%;">
     <input class="form-class" id="file" type="file" accept=".json" (change)="onFileChanged($event)" />
     <div class="btnStyle">
-      <button mat-icon-button (click)="uploadFile()">
+      <button mat-icon-button (click)="upload()">
         <mat-icon style="font-size: 40px;" title="Upload Image " class="mat-icon material-icons">
           cloud_upload
         </mat-icon>

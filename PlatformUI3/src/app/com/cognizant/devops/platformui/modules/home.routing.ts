@@ -41,6 +41,8 @@ import { ReportConfigComponent } from '@insights/app/modules/reportmanagement/re
 import { ReportManagementComponent } from './reportmanagement/reportmanagement.component';
 import { KpiCreationComponent} from '@insights/app/modules/kpi-creation/kpi-creation.component';
 import { KpiAdditionComponent} from '@insights/app/modules/kpi-addition/kpi-addition.component';
+import { ContentConfigComponent } from '@insights/app/modules/content-config-list/content-config-list.component';
+import { ContentConfigAddition } from './content-config-add/content-config-add.component';
 
 
 const homeRoutes: Routes = [
@@ -70,7 +72,9 @@ const homeRoutes: Routes = [
       { path: 'report-configuration', component: ReportConfigComponent },
       { path: 'traceability', component: TraceabilityDashboardCompenent },
       { path: 'kpicreation', component: KpiCreationComponent },
-      { path: 'kpiaddition', component: KpiAdditionComponent }
+      { path: 'kpiaddition', component: KpiAdditionComponent },
+      { path:'contentConfig',component: ContentConfigComponent },
+      {path:'contentConfigAdd',component:ContentConfigAddition}
 
     ],
     canActivate: [AuthGuard]

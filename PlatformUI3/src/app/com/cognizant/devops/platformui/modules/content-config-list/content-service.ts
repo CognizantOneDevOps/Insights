@@ -19,34 +19,29 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, BehaviorSubject } from 'rxjs';
 
 @Injectable()
-export class KpiService {
+export class ContentService {
     type: any;
-    kpiArr=[];
-    public fileUploadSubject=new BehaviorSubject<any>('');
-    public setKpiSubject=new BehaviorSubject<any>([]);
-    kpi: any;
+    fileType: any;
 
     constructor(private restCallHandlerService: RestCallHandlerService) {
     }
-    loadKpiCategory(): Promise<any> {
-        return this.restCallHandlerService.get("KPI_CATEGORY");
+    
+    saveDataforContent(contentAPIRequestJson: string): Promise<any> {
+        return this.restCallHandlerService.postWithData("SAVE_DATA_CONTENT", contentAPIRequestJson, "", { 'Content-Type': 'application/x-www-form-urlencoded' }).toPromise();
+    }
+    updateDataforContent(contentAPIRequestJson: string): Promise<any> {
+        return this.restCallHandlerService.postWithData("UPDATE_CONTENT", contentAPIRequestJson, "", { 'Content-Type': 'application/x-www-form-urlencoded' }).toPromise();
+    }
+
+    loadActions(): Promise<any> {
+        return this.restCallHandlerService.get("GET_ACTIONS");
       }
-    loadKpiDataSource():Promise<any>{
-        return this.restCallHandlerService.get("KPI_DATASOURCE");
-    }
-    saveDataforKpi(kpiAPIRequestJson: string): Promise<any> {
-        return this.restCallHandlerService.postWithData("SAVE_DATA_KPI", kpiAPIRequestJson, "", { 'Content-Type': 'application/x-www-form-urlencoded' }).toPromise();
-    }
-    updateDataforKpi(kpiAPIRequestJson: string): Promise<any> {
-        return this.restCallHandlerService.postWithData("UPDATE_KPI", kpiAPIRequestJson, "", { 'Content-Type': 'application/x-www-form-urlencoded' }).toPromise();
+    loadContentList(): Promise<any> {
+        return this.restCallHandlerService.get("LIST_CONTENT");
     }
 
-    loadKpiList(): Promise<any> {
-        return this.restCallHandlerService.get("LIST_KPI");
-    }
-
-    kpiUninstall(kpiId: string): Promise<any> {
-        return this.restCallHandlerService.postWithData("DELETE_KPI",  kpiId ,"", { 'Content-Type': 'application/x-www-form-urlencoded' }).toPromise();
+    contentUninstall(kpiId: string): Promise<any> {
+        return this.restCallHandlerService.postWithData("DELETE_CONTENT",  kpiId ,"", { 'Content-Type': 'application/x-www-form-urlencoded' }).toPromise();
     }
     uploadFile(formData): Promise<any> {
         return this.restCallHandlerService.postFormData("UPLOAD_BULK_KPI", formData).toPromise();
@@ -57,16 +52,10 @@ export class KpiService {
     getType(){
         return this.type;
     }
-    setKpiIdArr(arr){
-     this.kpiArr=arr;
+    setFileType(fileType){
+    this.fileType=fileType;
     }
-    getKpiIdArr(){
-        return this.kpiArr;
-    }
-    setSelectedKpi(kpi){
-        this.kpi=kpi;
-    }
-    getSelectedKpi(){
-        return this.kpi;
+    getFileType(){
+        return this.fileType;
     }
 }

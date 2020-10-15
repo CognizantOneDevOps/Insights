@@ -95,6 +95,10 @@ import { KpiCreationComponent} from '@insights/app/modules/kpi-creation/kpi-crea
 import { KpiAdditionComponent} from '@insights/app/modules/kpi-addition/kpi-addition.component';
 import { FileUploadDialog } from './fileUploadDialog/fileUploadDialog.component';
 import { KpiService } from './kpi-addition/kpi-service';
+import { ContentConfigComponent } from '@insights/app/modules/content-config-list/content-config-list.component';
+import { ContentConfigAddition } from '@insights/app/modules/content-config-add/content-config-add.component';
+import { KpiListDialog } from './kpiList-Dialog/kpiList-Dialog.component';
+import { ContentService } from './content-config-list/content-service';
 
 
 @NgModule({
@@ -142,7 +146,10 @@ import { KpiService } from './kpi-addition/kpi-service';
     EmailConfigurationDialog,
     KpiCreationComponent,
     KpiAdditionComponent,
-    FileUploadDialog
+    FileUploadDialog,
+    KpiListDialog,
+    ContentConfigComponent,
+    ContentConfigAddition
   ],
   imports: [
     HomeRouting,
@@ -174,7 +181,8 @@ import { KpiService } from './kpi-addition/kpi-service';
     DataArchiveDetailsDialog,
     DataArchiveConfigureURLDialog,
     EmailConfigurationDialog,
-    FileUploadDialog
+    FileUploadDialog,
+    KpiListDialog
   ],
 
   providers: [
@@ -200,7 +208,8 @@ import { KpiService } from './kpi-addition/kpi-service';
     ReportManagementService,
     LandingPageService,
     TraceabiltyService,
-    KpiService
+    KpiService,
+    ContentService
   ]
 })
 export class HomeModules { }

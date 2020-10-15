@@ -45,7 +45,7 @@
             </td>
             <td class="columnComponent">
               <input maxlength="7" type="number" id="kpiId" [disabled]="onEdit" class="form-control" [(ngModel)]="kpiId"
-                name="kpiId" style="width: 84%;">
+                name="kpiId" style="width: 84%;" (keypress)=defaultStop($event)>
             </td>
             <td>
               <span class="infoText">Please input a unique KpiId</span>

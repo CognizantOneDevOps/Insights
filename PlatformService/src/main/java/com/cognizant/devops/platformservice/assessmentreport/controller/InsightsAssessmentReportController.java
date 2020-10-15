@@ -94,8 +94,8 @@ public class InsightsAssessmentReportController {
 	@PostMapping(value = "/saveBulkKpiDefinition", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	public @ResponseBody JsonObject saveBulkKpiDefinition(@RequestParam("file") MultipartFile file) {
 		try {
-			JsonArray kpiResponseArray = assessmentReportService.uploadKPIInDatabase(file);
-			return PlatformServiceUtil.buildSuccessResponseWithData(kpiResponseArray);
+			String returnMessage = assessmentReportService.uploadKPIInDatabase(file);
+			return PlatformServiceUtil.buildSuccessResponseWithData(returnMessage);
 		} catch (InsightsCustomException e) {
 			log.error(e);
 			return PlatformServiceUtil.buildFailureResponse(e.getMessage());
@@ -108,8 +108,8 @@ public class InsightsAssessmentReportController {
 	@PostMapping(value = "/saveBulkContentDefinition", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	public @ResponseBody JsonObject saveBulkContentDefinition(@RequestParam("file") MultipartFile file) {
 		try {
-			JsonArray resultContentResponseArray = assessmentReportService.uploadContentInDatabase(file);
-			return PlatformServiceUtil.buildSuccessResponseWithData(resultContentResponseArray);
+			String returnMessage = assessmentReportService.uploadContentInDatabase(file);
+			return PlatformServiceUtil.buildSuccessResponseWithData(returnMessage);
 		} catch (InsightsCustomException e) {
 			log.error(e);
 			return PlatformServiceUtil.buildFailureResponse(e.getMessage());

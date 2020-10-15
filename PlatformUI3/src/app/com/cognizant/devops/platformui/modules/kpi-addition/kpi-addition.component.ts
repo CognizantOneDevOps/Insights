@@ -150,6 +150,12 @@ export class KpiAdditionComponent implements OnInit {
       }
     });
   }
+  defaultStop(event) {
+    if (event.which != 8 && event.which != 0 && event.which < 48 || event.which > 57) {
+      event.preventDefault();
+    }
+  }
+
   saveKpiData() {
     var self = this;
     var dialogmessage = " You have created a new KPI <b>" + this.kpiId + "</b> .Do you want continue? "

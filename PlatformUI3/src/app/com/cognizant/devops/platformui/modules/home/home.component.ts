@@ -412,16 +412,35 @@ export class HomeComponent implements OnInit {
             showMenu: true,
             title: "Data Archival",
             isAdminMenu: true
-          },
-          {
-            displayName: 'Kpi Creation',
+          },{
+            displayName: 'Report Configuration',
             iconName: 'feature',
-            route: 'InSights/Home/kpicreation',
             isToolbarDisplay: InsightsInitService.enableInsightsToolbar,
             showMenu: true,
-            title: "Kpi Creation",
-            isAdminMenu: false
-          }
+            title: "Report Configuration",
+            isAdminMenu: false,
+            children:[
+              {
+                displayName: 'Kpi Creation',
+                iconName: 'feature',
+                route: 'InSights/Home/kpicreation',
+                isToolbarDisplay: InsightsInitService.enableInsightsToolbar,
+                showMenu: true,
+                title: "Kpi Creation",
+                isAdminMenu: false
+              },
+              {
+                displayName: 'Content Configuration',
+                iconName: 'feature',
+                route: 'InSights/Home/contentConfig',
+                isToolbarDisplay: InsightsInitService.enableInsightsToolbar,
+                showMenu: true,
+                title: "Content Configuration",
+                isAdminMenu: false
+              }
+            ]
+          },
+          
         ]
       }
     ];

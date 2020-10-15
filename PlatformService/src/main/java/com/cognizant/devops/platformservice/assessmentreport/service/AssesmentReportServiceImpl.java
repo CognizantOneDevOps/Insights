@@ -274,9 +274,8 @@ public class AssesmentReportServiceImpl {
 	 * @return
 	 * @throws InsightsCustomException
 	 */
-	public JsonArray uploadKPIInDatabase(MultipartFile file) throws InsightsCustomException {
-		StringBuilder kpiResultList = new StringBuilder();
-		JsonArray kpiResponseArray = new JsonArray();
+	public String uploadKPIInDatabase(MultipartFile file) throws InsightsCustomException {
+		String returnMessage = "";
 		String originalFilename = file.getOriginalFilename();
 		JsonParser jsonParser = new JsonParser();
 		String fileExt = FilenameUtils.getExtension(originalFilename);
@@ -284,19 +283,16 @@ public class AssesmentReportServiceImpl {
 			if (fileExt.equalsIgnoreCase("json")) {
 				String kpiJson = readFileAndCreateJson(file);
 				JsonArray kpiJsonArray = jsonParser.parse(kpiJson).getAsJsonArray();
-				for (JsonElement jsonElement : kpiJsonArray) {
-					saveBulkKpiDefinition(jsonElement, kpiResponseArray);
-				}
+				returnMessage = saveBulkKpiDefinition(kpiJsonArray);
 			} else {
-				log.error(" KPI Detail {} ", kpiResultList);
+				log.error("Invalid file format. ");
 				throw new InsightsCustomException("Invalid file format.");
 			}
 		} catch (Exception ex) {
-			log.error(" KPI Detail {} ", kpiResultList);
 			log.error("Error in uploading KPI file {} ", ex.getMessage());
 			throw new InsightsCustomException(ex.getMessage());
 		}
-		return kpiResponseArray;
+		return returnMessage;
 	}
 
 	/**
@@ -306,15 +302,35 @@ public class AssesmentReportServiceImpl {
 	 * @param kpiResultList
 	 * @return
 	 */
-	public void saveBulkKpiDefinition(JsonElement jsonElement, JsonArray kpiResponseArray) {
-		int kpiId = jsonElement.getAsJsonObject().get(AssessmentReportAndWorkflowConstants.KPIID).getAsInt();
-		try {
-			kpiId = saveKpiDefinition(jsonElement.getAsJsonObject());
-			kpiResponseArray.add("Success : KPI Id(" + kpiId + ") created.");
-		} catch (Exception e) {
-			log.error("Error : KPI Id {} not created, with Exception {}", kpiId, e.getMessage());
-			kpiResponseArray.add("Error : KPI Id (" + kpiId + ") not created");
+	public String saveBulkKpiDefinition(JsonArray kpiJsonArray) {
+		String returnMessage;
+		int totalKpiRecord = kpiJsonArray.size();
+		JsonArray successMessageArray = new JsonArray();
+		JsonArray errorMessageArray = new JsonArray();
+		if (totalKpiRecord > 0) {
+			for (JsonElement jsonElement : kpiJsonArray) {
+				int kpiId = jsonElement.getAsJsonObject().get(AssessmentReportAndWorkflowConstants.KPIID).getAsInt();
+				try {
+					kpiId = saveKpiDefinition(jsonElement.getAsJsonObject());
+					successMessageArray.add(kpiId);
+				} catch (Exception e) {
+					log.error("Error : KPI Id {} not created, with Exception {}", kpiId, e.getMessage());
+					errorMessageArray.add(kpiId);
+				}
+			}
+			if (successMessageArray.size() == totalKpiRecord) {
+				returnMessage = "All KPI records are inserted successfully. ";
+			} else if (errorMessageArray.size() == totalKpiRecord) {
+				returnMessage = "All KPI records are not inserted, Please check Platform Service log for more detail. ";
+			} else {
+				returnMessage = "Number of KPI inserted successfully are " + successMessageArray.size()
+						+ " and not inserted are " + errorMessageArray.size()
+						+ ", Please check Platform Service log for more detail.";
+			}
+		} else {
+			returnMessage = "No KPI defination found in request json";
 		}
+		return returnMessage;
 	}
 
 	/**
@@ -324,27 +340,25 @@ public class AssesmentReportServiceImpl {
 	 * @return
 	 * @throws InsightsCustomException
 	 */
-	public JsonArray uploadContentInDatabase(MultipartFile file) throws InsightsCustomException {
+	public String uploadContentInDatabase(MultipartFile file) throws InsightsCustomException {
+		String returnMessage = "";
 		String originalFilename = file.getOriginalFilename();
 		JsonParser jsonParser = new JsonParser();
 		String fileExt = FilenameUtils.getExtension(originalFilename);
-		JsonArray contentResultArrayList = new JsonArray();
 		try {
 			if (fileExt.equalsIgnoreCase("json")) {
 				String contentJson = readFileAndCreateJson(file);
 				JsonArray contentJsonArray = jsonParser.parse(contentJson).getAsJsonArray();
-				for (JsonElement jsonElement : contentJsonArray) {
-					saveBulkContentDefinition(jsonElement, contentResultArrayList);
-				}
+				returnMessage = saveBulkContentDefinition(contentJsonArray);
 			} else {
-				log.error(" Content Detail {} ", contentResultArrayList);
+				log.error("Invalid file format.");
 				throw new InsightsCustomException("Invalid file format.");
 			}
 		} catch (Exception ex) {
 			log.error("Error in uploading Content file {} ", ex.getMessage());
 			throw new InsightsCustomException(ex.getMessage());
 		}
-		return contentResultArrayList;
+		return returnMessage;
 	}
 
 	/**
@@ -354,14 +368,36 @@ public class AssesmentReportServiceImpl {
 	 * @param contentResultList
 	 * @return StringBuilder
 	 */
-	public void saveBulkContentDefinition(JsonElement jsonElement, JsonArray contentResultArrayList) {
-		int contentId = jsonElement.getAsJsonObject().get(AssessmentReportAndWorkflowConstants.CONTENTID).getAsInt();
-		try {
-			contentId = saveContentDefinition(jsonElement.getAsJsonObject());
-			contentResultArrayList.add("Success : Content Id(" + contentId + ") created.");
-		} catch (Exception e) {
-			contentResultArrayList.add("Error : Content Id (" + contentId + ") not created");
+	public String saveBulkContentDefinition(JsonArray contentJsonArray) {
+		String returnMessage;
+		int totalContentRecord = contentJsonArray.size();
+		JsonArray successMessageArray = new JsonArray();
+		JsonArray errorMessageArray = new JsonArray();
+		if (totalContentRecord > 0) {
+			for (JsonElement jsonElement : contentJsonArray) {
+				int contentId = jsonElement.getAsJsonObject().get(AssessmentReportAndWorkflowConstants.CONTENTID)
+						.getAsInt();
+				try {
+					contentId = saveContentDefinition(jsonElement.getAsJsonObject());
+					successMessageArray.add(contentId);
+				} catch (Exception e) {
+					log.error("Error : Content Id {} not created, with Exception {}", contentId, e.getMessage());
+					errorMessageArray.add(contentId);
+				}
+			}
+			if (successMessageArray.size() == totalContentRecord) {
+				returnMessage = "All Content records are inserted successfully.";
+			} else if (errorMessageArray.size() == totalContentRecord) {
+				returnMessage = "All Content records are not inserted, Please check Platform Service log for more detail.";
+			} else {
+				returnMessage = "Number of Content inserted successfully are " + successMessageArray.size()
+						+ " and not inserted are " + errorMessageArray.size()
+						+ ", Please check Platform Service log for more detail.";
+			}
+		} else {
+			returnMessage = "No Content defination found in request json";
 		}
+		return returnMessage;
 	}
 
 	/**
@@ -994,7 +1030,8 @@ public class AssesmentReportServiceImpl {
 				contentData.addProperty("kpiName", contentDBData.getKpiConfig().getKpiName());
 				contentData.addProperty("contentId", contentDBData.getContentId());
 				contentData.addProperty("contentName", contentDBData.getContentName());
-				contentData.addProperty("kpiId", contentDBData.getKpiConfig().getId());
+				contentData.addProperty("kpiId", contentDBData.getKpiConfig().getKpiId());
+				contentData.addProperty("category", contentDBData.getKpiConfig().getCategory());
 
 				contentCustomList.add(contentData);
 			});

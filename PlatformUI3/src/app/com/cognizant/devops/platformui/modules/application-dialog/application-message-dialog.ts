@@ -48,6 +48,10 @@ export class ApplicationMessageDialog implements OnInit {
             this.colorCode = "#000000";
             this.dialogTitle = "Error";
             this.svgCustomIcon = "error";
+        }else  if (data.type == 'INFO') {
+            this.colorCode = "#000000";
+            this.dialogTitle = "Info";
+            this.svgCustomIcon = "success";
         }
     }
 

@@ -5,6 +5,7 @@ import { FileUploadDialog } from '../fileUploadDialog/fileUploadDialog.component
 import { MatTableDataSource, MatPaginator } from '@angular/material';
 import { KpiService } from '../kpi-addition/kpi-service';
 import { MessageDialogService } from '../application-dialog/message-dialog-service';
+import { ContentService } from '../content-config-list/content-service';
 
 @Component({
   selector: 'app-kpi-creation',
@@ -30,10 +31,11 @@ export class KpiCreationComponent implements OnInit {
   type: string;
   enableRefresh: boolean = false;
   MAX_ROWS_PER_TABLE = 10;
-  
+
 
   constructor(public messageDialog: MessageDialogService,
-    public router: Router, public dialog: MatDialog, public kpiService: KpiService) {
+    public router: Router, public dialog: MatDialog,
+    public kpiService: KpiService, public contentService: ContentService) {
   }
 
   ngOnInit() {
@@ -54,6 +56,7 @@ export class KpiCreationComponent implements OnInit {
     this.router.navigateByUrl('InSights/Home/kpiaddition');
   }
   uploadFile() {
+    this.contentService.setFileType('KPI');
     this.dialog.open(FileUploadDialog, {
       panelClass: 'DialogBox',
       width: '32%',
@@ -120,7 +123,7 @@ export class KpiCreationComponent implements OnInit {
       "Do you want to delete a Kpi <b>" +
       self.selectedKpi.kpiId +
       "</b>? <br><br> <b> Please note: </b> The action of deleting a Kpi " +
-      "<b>"+
+      "<b>" +
       "</b> CANNOT be UNDONE. Do you want to continue? ";
     const dialogRef = self.messageDialog.showConfirmationMessage(
       title,
