@@ -485,9 +485,23 @@ class ElasticTransferAgent(BaseAgent):
 
 
     def configUpdateSubscriber(self):
-        routingKey = self.config.get('subscribe').get('dataArchivalQueue')
-        self.messageFactory.subscribe(routingKey, self.callback)
-        print("INFO: Connected to RabitMQ..")
+        try: 
+
+            # Create "dataArchivalQueue" when queue doen't exist.
+            credentials = pika.PlainCredentials(self.config.get('mqConfig').get('user'), self.config.get('mqConfig').get('password'))
+            connection = pika.BlockingConnection(pika.ConnectionParameters(credentials=credentials,host=self.config.get('mqConfig').get('host')))
+            channel = connection.channel()
+            queue=self.config.get('subscribe').get('dataArchivalQueue')
+            channel.queue_declare(queue=queue,durable=True,)
+
+            # Consume "dataArchivalQueue"
+            routingKey = self.config.get('subscribe').get('dataArchivalQueue')
+            self.messageFactory.subscribe(routingKey, self.callback)
+            print("INFO: Connected to RabitMQ..")
+
+        except Exception as ex:
+            logging.error(ex)
+            self.logIndicator(self.SETUP_ERROR, self.config.get('isDebugAllowed', False))
 
 
     def subscriberForAgentControl(self):
