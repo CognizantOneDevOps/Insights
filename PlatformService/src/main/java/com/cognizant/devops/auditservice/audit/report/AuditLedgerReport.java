@@ -52,6 +52,7 @@ import com.google.gson.JsonParser;
  * Report generation by fetching records from NEO4J and HYPHERLEDGER.
  *
  */
+@Deprecated
 public class AuditLedgerReport extends AuditReportStrategy{
 
 
@@ -90,7 +91,7 @@ public class AuditLedgerReport extends AuditReportStrategy{
 
 					if(dataArray.size()>0){
 						log.info("Total Assets  = "+dataArray.size());
-						List<Map> ledgerList = new ArrayList<Map>();
+						List<JsonObject> ledgerList = new ArrayList<JsonObject>();
 						for(int i=0;i<dataArray.size();i++) {
 							JsonArray rowArray = dataArray.get(i).getAsJsonObject()
 									.get("row").getAsJsonArray();
@@ -147,7 +148,7 @@ public class AuditLedgerReport extends AuditReportStrategy{
 
 	}
 
-	private void generateReport(String pdfName, String subscribers, List<Map> ledgerList)
+	private void generateReport(String pdfName, String subscribers, List<JsonObject> ledgerList)
 			throws AddressException, MessagingException, IOException {
 		log.info("LedgerList---"+ledgerList.size());
 		
@@ -210,7 +211,7 @@ public class AuditLedgerReport extends AuditReportStrategy{
 	 * @param assetId
 	 * @return ledgerresponse
 	 */
-	private Map formatAssetId(String ledgerresponse, String parentAsset) {
+	private JsonObject formatAssetId(String ledgerresponse, String parentAsset) {
 		JsonParser jsonParser = new JsonParser(); 
 		JsonElement jsonElements = jsonParser.parse(ledgerresponse);
 		JsonObject jsonObject = jsonElements.getAsJsonObject();
@@ -237,9 +238,9 @@ public class AuditLedgerReport extends AuditReportStrategy{
 		}else{
 			log.info("Invalid Ledger response");
 		}
-		
+		return jsonObject;
 		//Map<String, Object> map = new Gson().fromJson(jsonObject.toString(), HashMap.class);
-		return map.fromJson(jsonObject.toString(), HashMap.class);
+		//return map.fromJson(jsonObject.toString(), HashMap.class);
 	}
 
 

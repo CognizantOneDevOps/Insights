@@ -283,15 +283,6 @@ export class HomeComponent implements OnInit {
             showMenu: InsightsInitService.showAuditReporting,
             title: "Search Assets",
             isAdminMenu: true
-          },
-          {
-            displayName: 'Query Builder',
-            iconName: 'feature',
-            route: 'InSights/Home/querybuilder',
-            isToolbarDisplay: InsightsInitService.enableInsightsToolbar,
-            showMenu: InsightsInitService.showAuditReporting,
-            title: "Query Builder",
-            isAdminMenu: true
           }
 
         ]

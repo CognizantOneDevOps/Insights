@@ -44,6 +44,7 @@ import com.google.gson.JsonParser;
  * Report generation by fetching records from NEO4J based on table_structure in Json file.
  *
  */
+@Deprecated
 public class AuditCypherReport extends AuditReportStrategy{
 
 	private static final Logger log = LoggerFactory.getLogger(AuditCypherReport.class.getName());

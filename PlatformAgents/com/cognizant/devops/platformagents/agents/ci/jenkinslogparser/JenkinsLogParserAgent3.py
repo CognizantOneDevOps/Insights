@@ -33,7 +33,51 @@ class JenkinsLogParserAgent(JenkinsAgent):
         for build in buildDetails:
             buildAdded = False
             buildUrl = build['buildUrl']
-            stageUrl = buildUrl + 'wfapi/describe'
+            stageUrl = buildUrl + 'wfapi/describe' 
+            logUrl = buildUrl + "consoleText"
+            logResponse = self.getBuildLog(logUrl)
+            if logResponse.find('Uploaded to nexus: ')!=-1:
+                print("into find nexus")
+                build["resourcekey"]=logResponse.split('Uploaded to nexus: ')[1].split('\n')[0]
+                print("Build #1")
+                print( build["resourcekey"])
+                build["resourcekey"]=build["resourcekey"][build["resourcekey"].find('repository/'):build["resourcekey"].rfind('/')] + build["resourcekey"][build["resourcekey"].rfind('.'):build["resourcekey"].rfind(' (')]
+                print("Build #2")
+                print( build["resourcekey"])
+                build["resourcekey"]=build["resourcekey"][build["resourcekey"].index('/',build["resourcekey"].index('/') + 1) + 1:build["resourcekey"].rfind('/')]+build["resourcekey"][build["resourcekey"].rfind('.'):]
+                print("Build 3 #")
+                print( build["resourcekey"])
+                build["resourcekey"]=build["resourcekey"][::-1].replace('/','-',2)[::-1]
+                print("Build 4 #")
+                print( build["resourcekey"])
+            else:
+                #print("into else 1")
+                build["resourcekey"]='Not Found'
+            if logResponse.find('Starting deployment process ')!=-1:
+                #print("into find Starting deployment process")
+                deploymentDetails = logResponse.split('Starting deployment process ')[1].split('\n')[0]
+                #print(deploymentDetails)
+                build["deploymentProcess"] = deploymentDetails.split(" ")[0].replace("'","")
+                #print(build["deploymentProcess"])
+                build["deploymentApplication"] = deploymentDetails.split("of application ")[1].split(' ')[0].replace("'","")
+                build["deploymentEnv"] = deploymentDetails.split("in environment ")[1].split('\n')[0].replace("'","")
+                #print(build["deploymentEnv"])
+            else:
+                #print("into else 2")
+                build["deploymentProcess"] = 'Not Found'
+                build["deploymentApplication"] = 'Not Found'
+                build["deploymentEnv"] = 'Not Found'
+            if logResponse.find('Deployment request id is: ')!=-1:
+                #print("into find Deployment request id")
+                build["deploymentId"] = logResponse.split('Deployment request id is: ')[1].split('\n')[0].replace("'","")
+            else:
+                #print("into else 3")
+                build["deploymentId"] = 'Not Found'
+            if logResponse.find('The deployment result is ')!=-1:
+                build["deploymentStatus"] = logResponse.split('The deployment result is ')[1].split('.')[0].replace("'","")
+            else:
+                #print("into else 4") 
+                build["deploymentStatus"] = 'Not Found'
             if retrieveAllStages:
                 try:
                     stageResponse = self.getResponse(stageUrl, 'GET', self.userid, self.passwd, None)
@@ -112,7 +156,7 @@ class JenkinsLogParserAgent(JenkinsAgent):
     def getBuildLog(self, url):
         auth = HTTPBasicAuth(self.userid, self.passwd)
         response = requests.get(url, auth=auth)
-        return response.content
+        return response.content.decode('utf8')
 
 
 if __name__ == "__main__":

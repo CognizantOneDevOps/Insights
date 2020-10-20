@@ -26,7 +26,7 @@ public interface ConfigOptions {
 	String NEO4J_TEMPLATE = "neo4jdata.json";
 	String CORRELATION = "correlation"+System.currentTimeMillis() +".json";
 	String DATA_ENRICHMENT_TEMPLATE = "data-enrichment.json";
-	String BLOCKCHAIN_CONFIG_FILE = "blockchainConfig.json";
+	String BLOCKCHAIN_CONFIG_FILE = "connections-tls.json";
 	String ENDPOINT_DATA = "endpointData";
 	String USER_DATA = "userData";
 	String PROPERTY_USER_HOME = "user.home";

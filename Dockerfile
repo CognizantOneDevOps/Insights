@@ -32,7 +32,7 @@ VOLUME [/usr/INSIGHTS_HOME]
 # Installing Java with Env Variable
 
 WORKDIR /opt
-RUN wget http://platform.cogdevops.com/insights_install/installationScripts/latest/RHEL/java/jdklinux.tar.gz && \
+RUN wget https://infra.cogdevops.com:8443/repository/docroot/insights_install/installationScripts/latest/RHEL/java/jdklinux.tar.gz && \
     tar xzf jdklinux.tar.gz && rm -rf jdklinux.tar.gz && \
     export JAVA_HOME=/opt/jdklinux && \
     echo JAVA_HOME=/opt/jdklinux  | tee -a /etc/environment && \
@@ -59,7 +59,7 @@ WORKDIR /opt/python
 RUN yum install -y gcc openssl-devel bzip2-devel make && wget https://www.python.org/ftp/python/2.7.16/Python-2.7.16.tgz && \
     tar xzf Python-2.7.16.tgz && cd Python-2.7.16 && ./configure --enable-optimizations && make altinstall && \
     shopt -s expand_aliases && echo "alias python='/usr/local/bin/python2.7'" >> ~/.bashrc && \
-    wget https://platform.cogdevops.com/insights_install/installationScripts/latest/RHEL/python/get-pip.py && \
+    wget https://infra.cogdevops.com:8443/repository/docroot/insights_install/installationScripts/latest/RHEL/python/get-pip.py && \
     python get-pip.py && pip install pika requests apscheduler python-dateutil xmltodict pytz requests_ntlm boto3
 
 #installing Postgres Client
@@ -74,7 +74,7 @@ RUN export INSIGHTS_AGENT_HOME=`pwd` && echo INSIGHTS_AGENT_HOME=`pwd` | tee -a 
     echo "export" INSIGHTS_AGENT_HOME=`pwd` | tee -a /etc/profile && source /etc/environment && source /etc/profile && \
     chmod -R 755 AgentDaemon && chmod -R 755 PlatformAgents
 WORKDIR /opt/insightsagents/AgentDaemon
-RUN wget https://platform.cogdevops.com/insights_install/release/latest/agentdaemon.zip -O agentdaemon.zip && \
+RUN wget https://infra.cogdevops.com:8443/repository/docroot/insights_install/release/latest/agentdaemon.zip -O agentdaemon.zip && \
     unzip agentdaemon.zip && rm -rf agentdaemon.zip && chmod +x installdaemonagent.sh && yum install sudo -y && \
     sed -i -e "s|extractionpath|/opt/insightsagents/PlatformAgents|g" /opt/insightsagents/AgentDaemon/com/cognizant/devops/platformagents/agents/agentdaemon/config.json && \
     sudo sed -i -e "s|\$INSIGHTS_AGENT_HOME|/opt/insightsagents|g" /opt/insightsagents/AgentDaemon/InSightsDaemonAgent.sh && \
@@ -84,12 +84,12 @@ VOLUME [/opt/insightsagents/PlatformAgents]
 # installing Grafana
 
 WORKDIR /opt/grafana
-RUN chmod -R 766 /opt/grafana && wget https://platform.cogdevops.com/insights_install/installationScripts/latest/RHEL/grafana/Grafana-6.1.6/grafana.tar.gz && \
+RUN chmod -R 766 /opt/grafana && wget https://infra.cogdevops.com:8443/repository/docroot/insights_install/installationScripts/latest/RHEL/grafana/Grafana-6.1.6/grafana.tar.gz && \
     tar -zxvf grafana.tar.gz && export GRAFANA_HOME=`pwd` && echo GRAFANA_HOME=`pwd` | sudo tee -a /etc/environment && echo "export" GRAFANA_HOME=`pwd` | sudo tee -a /etc/profile && \
-    wget https://platform.cogdevops.com/insights_install/installationScripts/latest/RHEL/grafana/Grafana-6.1.6/ldap.toml && cp ldap.toml ./conf/ldap.toml && \
-    wget https://platform.cogdevops.com/insights_install/installationScripts/latest/RHEL/grafana/Grafana-6.1.6/defaults.ini && cp defaults.ini ./conf/defaults.ini && \
-    wget https://platform.cogdevops.com/insights_install/installationScripts/latest/RHEL/grafana/Grafana-6.1.6/custom.ini && cp custom.ini ./conf/custom.ini && \
-    wget https://platform.cogdevops.com/insights_install/installationScripts/latest/RHEL/initscripts/Grafana.sh && cp Grafana.sh /etc/init.d/Grafana && \
+    wget https://infra.cogdevops.com:8443/repository/docroot/insights_install/installationScripts/latest/RHEL/grafana/Grafana-6.1.6/ldap.toml && cp ldap.toml ./conf/ldap.toml && \
+    wget https://infra.cogdevops.com:8443/repository/docroot/insights_install/installationScripts/latest/RHEL/grafana/Grafana-6.1.6/defaults.ini && cp defaults.ini ./conf/defaults.ini && \
+    wget https://infra.cogdevops.com:8443/repository/docroot/insights_install/installationScripts/latest/RHEL/grafana/Grafana-6.1.6/custom.ini && cp custom.ini ./conf/custom.ini && \
+    wget https://infra.cogdevops.com:8443/repository/docroot/insights_install/installationScripts/latest/RHEL/initscripts/Grafana.sh && cp Grafana.sh /etc/init.d/Grafana && \
     chmod 755 /etc/init.d/Grafana && chkconfig Grafana on
 VOLUME [/opt/grafana]
 EXPOSE 3000/tcp 5432/tcp 7474/tcp
@@ -100,7 +100,7 @@ COPY PlatformService/target/*.war /opt/PlatformService.war
 COPY PlatformUI3/target/*.zip /opt/PlatformUI3.zip
 WORKDIR /opt/
 RUN unzip PlatformUI3.zip && rm -rf PlatformUI3.zip && \
-    wget https://platform.cogdevops.com/insights_install/installationScripts/latest/RHEL/tomcat/apache-tomcat.tar.gz && \
+    wget https://infra.cogdevops.com:8443/repository/docroot/insights_install/installationScripts/latest/RHEL/tomcat/apache-tomcat.tar.gz && \
     tar -zxvf apache-tomcat.tar.gz && rm -rf apache-tomcat.tar.gz
 WORKDIR /opt/apache-tomcat
 RUN cp -r /opt/app /opt/apache-tomcat/webapps/ && cp /opt/PlatformService.war /opt/apache-tomcat/webapps/ && \
@@ -121,9 +121,9 @@ RUN chmod -R 755 /opt/insightsWebhook/
 #installing Apache httpd
 RUN yum install httpd -y
 WORKDIR /etc/httpd/conf
-RUN rm -f httpd.conf && wget http://platform.cogdevops.com/insights_install/installationScripts/latest/RHEL/httpd/RHEL/http/httpd.conf
+RUN rm -f httpd.conf && wget https://infra.cogdevops.com:8443/repository/docroot/insights_install/installationScripts/latest/RHEL/httpd/RHEL/http/httpd.conf
 WORKDIR /etc/httpd/conf.d
-RUN rm -f httpd-vhosts.conf && wget http://platform.cogdevops.com/insights_install/installationScripts/latest/RHEL/httpd/RHEL/http/httpd-vhosts.conf
+RUN rm -f httpd-vhosts.conf && wget https://infra.cogdevops.com:8443/repository/docroot/insights_install/installationScripts/latest/RHEL/httpd/RHEL/http/httpd-vhosts.conf
 EXPOSE 80/tcp
 
 # Running entry script

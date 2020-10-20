@@ -1,0 +1,18 @@
+{
+   "reportId":"1000761",
+   "reportName":"LEDGER_REPORT",
+   "description":"Testing",
+   "isActive":true,
+   "file":"",
+   "visualizationutil":"LedgerPDF",
+   "kpiConfigs":[
+      {
+         "kpiId":1000089,
+         "visualizationConfigs":[]
+      },
+      {
+          "kpiId":1010089,
+          "visualizationConfigs":[]
+      }
+   ]
+}

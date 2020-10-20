@@ -1,0 +1,11 @@
+{
+      "kpiId":1010089,
+      "name":"Test_GIT",
+      "group":"SCM",
+      "toolName":"GIT",
+      "category":"",
+      "DBQuery":"",
+      "datasource":"HYPERLEDGER",
+      "isActive":true,
+      "resultField":""
+}

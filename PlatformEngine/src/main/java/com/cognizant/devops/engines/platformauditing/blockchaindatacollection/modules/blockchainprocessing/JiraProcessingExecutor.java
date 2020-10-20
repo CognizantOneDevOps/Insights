@@ -22,22 +22,32 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.cognizant.devops.platformauditing.api.InsightsAuditImpl;
+import com.cognizant.devops.platformauditing.util.LoadFile;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphResponse;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBHandler;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
+import com.google.common.hash.HashCode;
+import com.google.common.hash.Hashing;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
+import javax.crypto.Cipher;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.security.KeyFactory;
+import java.security.PrivateKey;
+import java.security.spec.InvalidKeySpecException;
+import java.security.spec.PKCS8EncodedKeySpec;
+import java.util.*;
+
 public class JiraProcessingExecutor extends TimerTask {
 	private static Logger LOG = LogManager.getLogger(JiraProcessingExecutor.class);
-
-	private long lastBlockChainPickupTime;
 
 	private long lastTimestamp;
 	private String blockchainProcessedFlag = "blockchainProcessedFlag";
 
-	private int dataBatchSize = 100;
 	private int nextBatchSize = 0;
 	private final InsightsAuditImpl insightAuditImpl = util.getAuditObject();
 	private static util utilObj = new util();
@@ -59,6 +69,7 @@ public class JiraProcessingExecutor extends TimerTask {
 		cypher.append("OR n.").append(blockchainProcessedFlag).append(" = false) ");
 
 		try {
+			JsonObject config = LoadFile.getConfig();
 			boolean nextBatchQuery = true;
 			while (nextBatchQuery) {
 				Boolean successfulWriteFlag = true;
@@ -67,13 +78,38 @@ public class JiraProcessingExecutor extends TimerTask {
 				cypherPickUpTime.append("RETURN distinct(n) ORDER BY n.inSightsTime,n.changeDateEpoch");
 				StringBuffer cypherSkip = new StringBuffer();
 				cypherSkip.append(" skip ").append(nextBatchSize);
-				cypherSkip.append(" limit ").append(dataBatchSize);
+				cypherSkip.append(" limit ").append(config.get("dataBatchSize").getAsInt());
 				GraphResponse response = dbHandler
 						.executeCypherQuery(cypher.toString() + cypherPickUpTime.toString() + cypherSkip.toString());
 				JsonArray rows = response.getJson().get("results").getAsJsonArray().get(0).getAsJsonObject().get("data")
 						.getAsJsonArray();
 				for (JsonElement dataElem : rows) {
-					successfulWriteFlag = insertJiraNodes(dataElem, successfulWriteFlag);
+					
+					if(dataElem.getAsJsonObject().get("row").getAsJsonArray().get(0).getAsJsonObject().has("digitalSignature")) {
+						String digitalSign = dataElem.getAsJsonObject().get("row").getAsJsonArray().get(0).getAsJsonObject().getAsJsonPrimitive("digitalSignature").getAsString();
+						LOG.debug("--------------------------------jira executer-----------------");
+						String hc = getHash(dataElem.getAsJsonObject().get("row").getAsJsonArray());
+						LOG.debug(hc);
+						//decrypt digitalSign
+						byte[] byteArray = Base64.getDecoder().decode(digitalSign.getBytes());
+						JsonObject bcConfig = LoadFile.getConfig();
+						String keyStr = new String(Files.readAllBytes(Paths.get(bcConfig.get("ENGINE_PRIVATE_KEY").getAsString())));
+						keyStr = keyStr.replaceAll("\\n", "").replace("-----BEGIN PRIVATE KEY-----", "").replace("-----END PRIVATE KEY-----", "");
+						KeyFactory key = KeyFactory.getInstance(config.get("keyAlgorithm").getAsString());
+						PKCS8EncodedKeySpec spec = new PKCS8EncodedKeySpec(Base64.getDecoder().decode(keyStr));
+						PrivateKey k = key.generatePrivate(spec);
+						Cipher cipher = Cipher.getInstance(config.get("decryptionAlgorithm").getAsString());
+						cipher.init(Cipher.DECRYPT_MODE, k);
+
+						byte[] decryptedBytes = cipher.doFinal(byteArray);
+						if(hc.equals(new String(decryptedBytes)))
+							successfulWriteFlag = insertJiraNodes(dataElem, successfulWriteFlag);
+						else
+							LOG.debug("Hash values do not match.. skipping uuid: {}" ,
+									dataElem.getAsJsonObject().get("row").getAsJsonArray().get(0).getAsJsonObject().getAsJsonPrimitive("uuid"));
+					}else
+						LOG.debug("DigitalSignature not found for uuid: {}",
+							dataElem.getAsJsonObject().get("row").getAsJsonArray().get(0).getAsJsonObject().getAsJsonPrimitive("uuid")+"\nNode skipped...");
 				}
 
 				// check for success for updating tracking
@@ -84,7 +120,7 @@ public class JiraProcessingExecutor extends TimerTask {
 					utilObj.writeTracking(tracking);
 				}
 				int processedRecords = rows.size();
-				nextBatchSize += dataBatchSize;
+				nextBatchSize += config.get("dataBatchSize").getAsInt();
 				if (processedRecords == 0) {
 					nextBatchSize = 0;
 					nextBatchQuery = false;
@@ -99,10 +135,53 @@ public class JiraProcessingExecutor extends TimerTask {
 		}
 
 	}
+	
+	private String getHash(JsonArray row) {
+        String dataString = "";
+        HashCode sb = null;
+        if(row.get(0).getAsJsonObject().has("changeId")){
+            if(!row.get(0).getAsJsonObject().has("from"))
+                row.get(0).getAsJsonObject().addProperty("from","None");
+            if(!row.get(0).getAsJsonObject().has("fromString"))
+                row.get(0).getAsJsonObject().addProperty("fromString","None");
+        }
+        for (JsonElement dt : row) {
+            //put dataObject into treemap to get sorted
+        	//LOG.debug(dt);
+            TreeMap t = new TreeMap<String, String>();
+            dt.getAsJsonObject().entrySet().parallelStream().forEach(entry -> {
+                if (!entry.getKey().equals("uuid") && !entry.getKey().equals("digitalSignature")) {
+                    if (entry.getKey().equals("inSightsTime") || entry.getKey().equals("createdTimeEpoch") || entry.getKey().equals("changeDateEpoch") || entry.getKey().equals("creationDateEpoch")) {
+                    	LOG.debug("has epoch time");
+                        t.put(entry.getKey(), String.valueOf(entry.getValue().getAsLong()) + ".0");
+                    }
+                    else {
+                    	LOG.debug(t);
+                        t.put(entry.getKey(), entry.getValue().getAsString());
+                    }
+                }
+            });
+            Set data = t.entrySet();
+            Iterator i = data.iterator();
+            while (i.hasNext()) {
+                Map.Entry m = (Map.Entry) i.next();
+                dataString += m.getValue();
+            }
+            //LOG.debug(dataString);
+            
+            sb = Hashing.sha256().hashString(dataString, StandardCharsets.UTF_8);
+            //LOG.debug(sb_encode.toString());
+            //LOG.debug(sb.toString());
+        }
+        return sb.toString();
+    }
 
 	private boolean insertJiraNodes(JsonElement dataElem, boolean successfulWriteFlag) {
 		GraphDBHandler dbHandler = new GraphDBHandler();
 		try {
+			if (dataElem.getAsJsonObject().get("row").getAsJsonArray().get(0).getAsJsonObject().has("digitalSignature"))
+                dataElem.getAsJsonObject().get("row").getAsJsonArray().get(0).getAsJsonObject().remove("digitalSignature");
+			
 			if (dataElem.getAsJsonObject().get("row").getAsJsonArray().get(0).getAsJsonObject().has("changeId")) {
 				lastTimestamp = dataElem.getAsJsonObject().get("row").getAsJsonArray().get(0).getAsJsonObject()
 						.getAsJsonPrimitive("changeDateEpoch").getAsLong();

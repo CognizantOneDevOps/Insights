@@ -24,7 +24,6 @@ import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
 import java.text.DateFormat;
-import java.text.Normalizer;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -34,7 +33,6 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import javax.xml.bind.JAXBContext;
@@ -53,6 +51,11 @@ import org.apache.pdfbox.pdmodel.encryption.AccessPermission;
 import org.apache.pdfbox.pdmodel.encryption.StandardProtectionPolicy;
 import org.apache.pdfbox.pdmodel.font.PDType1Font;
 
+import com.cognizant.devops.platformcommons.constants.ConfigOptions;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+
 import be.quodlibet.boxable.BaseTable;
 import be.quodlibet.boxable.Cell;
 import be.quodlibet.boxable.HorizontalAlignment;
@@ -61,12 +64,6 @@ import be.quodlibet.boxable.VerticalAlignment;
 import be.quodlibet.boxable.utils.FontUtils;
 import be.quodlibet.boxable.utils.ImageUtils;
 import be.quodlibet.boxable.utils.PDStreamUtils;
-
-import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
-import com.cognizant.devops.platformcommons.constants.ConfigOptions;
-import org.owasp.esapi.ESAPI;
-import org.owasp.esapi.errors.IntrusionException;
-import org.owasp.esapi.errors.ValidationException;
 /**
  * Pdf Table creation with Boxable API.
  * Function consists to write , protect and digitally sign the Doc.
@@ -76,10 +73,6 @@ public class PdfTableUtil {
 
 	private static final Logger log = LogManager.getLogger(PdfTableUtil.class.getName());
 	
-	// Owner key (to open the file with all permissions)
-	private static final String OWNER_KEY = ApplicationConfigProvider.getInstance().getPdfkey();
-	// User key (to open the file but with restricted permissions, is empty here)
-	private static final String USER_KEY = ApplicationConfigProvider.getInstance().getPdfkey();
 	private static final boolean ALLOW_PRINTING = false;
 	private static final String PDF_PATH = System.getenv().get("INSIGHTS_HOME") + File.separator + ConfigOptions.CONFIG_DIR + File.separator + "Pdf" + File.separator;
 
@@ -97,7 +90,7 @@ public class PdfTableUtil {
 	 * @throws UnrecoverableKeyException 
 	 * @throws URISyntaxException 
 	 */
-	public byte[] generateTableContent(List<Map> assetList, String pdfName) throws IOException, JAXBException, UnrecoverableKeyException, KeyStoreException, NoSuchAlgorithmException, CertificateException{
+	public byte[] generateTableContent(JsonArray assetList, String pdfName) throws IOException, JAXBException, UnrecoverableKeyException, KeyStoreException, NoSuchAlgorithmException, CertificateException{
 		System.setProperty("sun.java2d.cmm", "sun.java2d.cmm.kcms.KcmsServiceProvider");
 
 		PdfTableUtil pdfTableUtil = new PdfTableUtil();
@@ -108,10 +101,9 @@ public class PdfTableUtil {
 		// Set margins
 		float margin = 10;
 		// Initialize Document
-		//PDDocument doc = new PDDocument();
 		PDPage page = addNewPage(doc);
 		float yStartNewPage = page.getMediaBox().getHeight() - (2 * margin);
-		log.info("Start of new Page - "+yStartNewPage);
+		log.debug("Start of new Page === {} ",yStartNewPage);
 		// Initialize table
 		float tableWidth = page.getMediaBox().getWidth() - (2 * margin);
 		boolean drawContent = true;
@@ -139,18 +131,12 @@ public class PdfTableUtil {
 		PdfSignUtil pdfSignUtil = new PdfSignUtil();
 		return pdfSignUtil.digitalSign(doc, pdfName);
 
-		//doc.save(file);
-		//doc.close();
-
-
 	}
 
 	private void generatePageStaticContent(PDDocument doc, float margin, PDPage page, float yStartNewPage,
 			float tableWidth, boolean drawContent, float ystaticStart, float bottomMargin) throws IOException, JAXBException {
 		try{
-		//ClassLoader classLoader = getClass().getClassLoader();
-		//System.out.println("classLoader"+classLoader);
-		//File staticFile = new File(classLoader.getResource("static/static.xml").getFile());
+		
 		File staticFile = new File(PDF_PATH+"static/static.xml").getAbsoluteFile();
 		JAXBContext jaxbContext = JAXBContext.newInstance(PdfStaticContent.class);
 		Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
@@ -196,31 +182,12 @@ public class PdfTableUtil {
 	 * @param assetList
 	 * @return
 	 */
-	private List<String[]> formatAsset(List<Map> assetList) {
-		List<String[]> assetResults = new ArrayList<String[]>();
-		//for(Map asset:assetList){
-		CharSequence cs = String.valueOf(assetList.size());
-		int rp1 =  Integer.parseInt(Normalizer.normalize(cs, Normalizer.Form.NFKC));
-		int rp;
+	private List<String[]> formatAsset(JsonArray assetList) {
+		List<String[]> assetResults = new ArrayList<>();
 		try {
-			rp = ESAPI.validator().getValidInteger("RequestParameter", Integer.toString(assetList.size()), 0,rp1,true);
-			log.info("Normalized Asset size --"+rp);
-			for(int i=0;i<rp;i++){
-				String[] assetArray = new String[10];
-				//assetArray[0] = String.valueOf(i+1);
-				assetArray[0] = checkEmpty(String.valueOf(assetList.get(i).get("assetID")));
-				assetArray[1] = checkEmpty(String.valueOf(assetList.get(i).get("toolName")));
-				assetArray[2] = checkEmpty(String.valueOf(assetList.get(i).get("author")));
-				assetArray[3] = checkEmpty(String.valueOf(assetList.get(i).get("phase")));
-				assetArray[4] = checkEmpty(String.valueOf(assetList.get(i).get("toolstatus")));
-				assetArray[5] = checkEmpty(String.valueOf(assetList.get(i).get("timestamp")));
-				assetArray[6] = checkEmpty(String.valueOf(assetList.get(i).get("environment")));
-				assetArray[7] = checkEmpty(String.valueOf(assetList.get(i).get("author")));
-				assetArray[8] = checkEmpty(String.valueOf(assetList.get(i).get("lastUpdatedTime")));
-				assetArray[9] = checkEmpty(String.valueOf(assetList.get(i).get("evidence")));
-				assetResults.add(assetArray);
-			}
-		} catch (IntrusionException | ValidationException e1) {
+			log.debug("Normalized AssetList --{} ",assetList);
+			constructReportData(assetList, assetResults);
+		} catch (Exception e1) {
 			e1.printStackTrace();
 		}
 		Collections.sort(assetResults, new Comparator<String[]>() {
@@ -251,8 +218,38 @@ public class PdfTableUtil {
 				return date2.compareTo(date1);
 			}
 		});
-		//assetResults.sort(Comparator.comparing((String[] o) -> o[5]).reversed());
 		return assetResults;
+	}
+
+	/**
+	 * @param assetList
+	 * @param assetResults
+	 * @param rp
+	 */
+	private void constructReportData(JsonArray assetList, List<String[]> assetResults) {
+		for(int i=0;i<assetList.size();i++){
+			
+			String[] assetArray = new String[10];
+			assetArray[0] = getData(assetList.get(i).getAsJsonObject().get("assetID"));
+			assetArray[1] = getData(assetList.get(i).getAsJsonObject().get("toolName"));
+			assetArray[2] = getData(assetList.get(i).getAsJsonObject().get("author"));
+			assetArray[3] = getData(assetList.get(i).getAsJsonObject().get("phase"));
+			assetArray[4] = getData(assetList.get(i).getAsJsonObject().get("toolstatus"));
+			assetArray[5] = getData(assetList.get(i).getAsJsonObject().get("timestamp"));
+			assetArray[6] = getData(assetList.get(i).getAsJsonObject().get("environment"));
+			assetArray[7] = getData(assetList.get(i).getAsJsonObject().get("author"));
+			assetArray[8] = getData(assetList.get(i).getAsJsonObject().get("lastUpdatedTime"));
+			assetArray[9] = getData(assetList.get(i).getAsJsonObject().get("evidence"));
+			assetResults.add(assetArray);
+		}
+	}
+	
+	/**
+	 * @param value
+	 * @return
+	 */
+	private String getData(JsonElement value) {
+		return value == null? "NA":value.getAsString();
 	}
 
 
@@ -285,10 +282,6 @@ public class PdfTableUtil {
 		cellProps(cell);
 		cell = headerRow.createCell((100 / 11f), "Evidence");
 		cellProps(cell);
-		/*cell = headerRow.createCell((100 / 11f), "Ledger Transaction Id");
-		cellProps(cell);
-		cell = headerRow.createCell((100 / 11f), "Blocks");
-		cellProps(cell);*/
 
 		table.addHeaderRow(headerRow);
 
@@ -372,17 +365,15 @@ public class PdfTableUtil {
 	 * @throws IOException
 	 */
 	public void protectPdf(PDDocument doc, String pdfName) throws IOException {
-		//PDDocument doc = PDDocument.load(new File(pdfName==null ? TARGET_PDF : pdfName));
 		int keyLength = 128;
+		JsonObject config = LoadFile.getConfig();
 		AccessPermission ap = new AccessPermission();
 		// disable printing, everything else is allowed
 		ap.setCanPrint(ALLOW_PRINTING);
-		StandardProtectionPolicy spp = new StandardProtectionPolicy(PdfTableUtil.OWNER_KEY, PdfTableUtil.USER_KEY, ap);
+		StandardProtectionPolicy spp = new StandardProtectionPolicy(config.get("OWNER_KEY").getAsString(), config.get("USER_KEY").getAsString(), ap);
 		spp.setEncryptionKeyLength(keyLength);
 		spp.setPermissions(ap);
 		doc.protect(spp);
-		//doc.save(new File(pdfName == null ? TARGET_PDF : pdfName));
-		//doc.close();
 	}
 
 	/**
@@ -393,16 +384,10 @@ public class PdfTableUtil {
 	 * @throws IOException
 	 */
 	private PDDocument footer(PDDocument doc, String pdfName) throws IOException {
-		//File file = null;
 		try{
-			//file = new File(pdfName == null ? TARGET_PDF : pdfName);
-			//System.out.println("Sample file saved at : " + file.getAbsolutePath());
-			//Files.createParentDirs(file);
 			PDPageTree pages = doc.getPages();
-			//int i=1;
 			for(PDPage p : pages){
 				PDPageContentStream contentStream = new PDPageContentStream(doc, p, AppendMode.APPEND, false);
-				//String text = FOOTER_TEXT;
 				contentStream.beginText();
 				contentStream.newLineAtOffset(200, 780);
 				contentStream.setFont(PDType1Font.HELVETICA, 7);
@@ -419,7 +404,6 @@ public class PdfTableUtil {
 				contentStream.showText("PROPRIETARY & CONFIDENTIAL");
 				contentStream.endText();
 				contentStream.close();
-				//i++;
 			}
 		}catch(Exception e){
 			log.error(e);
@@ -453,11 +437,7 @@ public class PdfTableUtil {
 		pdd.setSubject("Audit records"); 
 		//Setting the created date of the document 
 		Calendar date = new GregorianCalendar();
-		//date.set(2015, 11, 5); 
 		pdd.setCreationDate(date);
-		//Setting the modified date of the document 
-		//date.set(2016, 6, 5); 
-		//pdd.setModificationDate(date); 
 
 		//Setting keywords for the document 
 		pdd.setKeywords("Audit, Report, HL");
@@ -471,14 +451,12 @@ public class PdfTableUtil {
 		float yStart = yStartNewPage;
 		float bottomMargin = 70;
 
-		//ClassLoader classLoader = getClass().getClassLoader();
-		//File staticFile = new File(classLoader.getResource("static/static.xml").getFile());
 		File staticFile = new File(PDF_PATH+"static/static.xml").getAbsoluteFile();
 		JAXBContext jaxbContext = JAXBContext.newInstance(PdfStaticContent.class);
 
 		Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
 		PdfStaticContent pdfStaticContent = (PdfStaticContent) jaxbUnmarshaller.unmarshal(staticFile);
-		log.info("PdfStaticContent - "+pdfStaticContent);
+		log.debug("PdfStaticContent == {}",pdfStaticContent);
 		yStart = yStart -100;
 		// draw page title
 		PDPageContentStream cos = new PDPageContentStream(doc, page);
@@ -497,7 +475,7 @@ public class PdfTableUtil {
 		Date caldate=cal.getTime();
 		DateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
 		String formattedDate=dateFormat.format(caldate);
-		log.info("Current time of the day using Calendar - 24 hour format: "+ formattedDate);
+		log.debug("Current time of the day using Calendar === 24 hour format: {}", formattedDate);
 
 
 		Row<PDPage> titlerow = table.createRow(50f);
@@ -516,7 +494,6 @@ public class PdfTableUtil {
 		versioncell = versionrow.createCell(40f,"");
 		versioncell.setFont(PDType1Font.HELVETICA_BOLD);
 		versioncell.setFontSize(80);
-		//table.createRow(15f);
 
 		Row<PDPage> daterow = table.createRow(20f);
 		Cell<PDPage> datecell = daterow.createCell(35f,"");
@@ -524,7 +501,6 @@ public class PdfTableUtil {
 		datecell = daterow.createCell(30f,"");
 		datecell.setFont(PDType1Font.HELVETICA_BOLD);
 		datecell.setFontSize(80);
-		//table.createRow(15f);
 
 		Row<PDPage> timerow = table.createRow(20f);
 		Cell<PDPage> timecell = timerow.createCell(40f,"");
@@ -541,12 +517,6 @@ public class PdfTableUtil {
 		table.removeAllBorders(true);
 		table.draw();
 
-		// Save the document
-		//File file = new File(STATIC_PDF);
-		//System.out.println("Sample file saved at : " + file.getAbsolutePath());
-		//Files.createParentDirs(file);
-		//doc.save(file);
-		//doc.close();
 		return doc;
 	}
 
@@ -557,7 +527,7 @@ public class PdfTableUtil {
 	 * @return 
 	 */
 	public byte[] generateCypherReport(Set<String> headerList, List<String> rowValueList,String pdfName) {
-		log.info("--generateCypherReport for -- " + pdfName);
+		log.debug("--generateCypherReport for == {} " , pdfName);
 		byte[] response = null;
 		try{
 			PdfTableUtil pdfTableUtil = new PdfTableUtil();
@@ -565,7 +535,7 @@ public class PdfTableUtil {
 			float margin = 10;
 			PDPage page = addNewPage(doc);
 			float yStartNewPage = page.getMediaBox().getHeight() - (2 * margin);
-			log.info("Start of new Page - "+yStartNewPage);
+			log.debug("Start of new Page - {} ",yStartNewPage);
 			float tableWidth = page.getMediaBox().getWidth() - (2 * margin);
 			boolean drawContent = true;
 			float yStart = yStartNewPage-120;
@@ -575,12 +545,6 @@ public class PdfTableUtil {
 			pdfTableUtil.generatePageStaticContent(doc, margin, page, yStartNewPage, tableWidth, 
 					drawContent, ystaticStart, bottomMargin);
 			
-			/*List<List> data = new ArrayList();
-			data.add(new ArrayList<>(headerList));
-			for (int i = 0; i < rowValueList.size(); i++) {
-				data.add(new ArrayList<>(
-						Arrays.asList(rowValueList.get(i).split(","))));
-			}*/
 			
 			BaseTable dataTable = new BaseTable(yStart,
 					yStartNewPage, bottomMargin, tableWidth, margin, doc, page, true, drawContent);
@@ -593,25 +557,18 @@ public class PdfTableUtil {
 				log.info(value);
 				rowList.add(row);
 			}
-			log.info("Total Rows -- "+rowList.size());
+			log.debug("Total Rows -- {}",rowList.size());
 
 			//Table rows
 			generateDynamicRows(rowList, headerRow, dataTable, page, null);
-			/*dataTable.draw();
-			DataTable t = new DataTable(dataTable, page);
-			t.addListToTable(data, DataTable.HASHEADER);
-			dataTable.draw();*/
-			//doc.addPage(new PDPage());//For Signature purpose
-			log.info("Rows creation successfull--");
+			log.debug("Rows creation successfull--");
 			addNewPage(doc);
 			footer(doc, pdfName);
 			protectPdf(doc, pdfName);
-			log.info("Footer and protection is done!!--");
-			//ByteArrayOutputStream baos = new ByteArrayOutputStream();
-			//doc.save(baos);
+			log.debug("Footer and protection is done!!--");
 			PdfSignUtil pdfSignUtil = new PdfSignUtil();
 			response = pdfSignUtil.digitalSign(doc, pdfName);
-			log.info("Signed successfully!!--");
+			log.debug("Signed successfully!!--");
 		}catch(Exception e){
 			log.error(e);
 		}
@@ -631,8 +588,8 @@ public class PdfTableUtil {
 		return headerRow;
 	}
 
-	public byte[] generateLedgerReport(List<Map> ledgerMap, String pdfName) {
-		log.info("--generateLedgerReport for -- " + pdfName);
+	public byte[] generateLedgerReport(List<JsonObject> ledgerMap, String pdfName) {
+		log.debug("--generateLedgerReport for -- {}" , pdfName);
 		byte[] response = null;
 		try{
 			PdfTableUtil pdfTableUtil = new PdfTableUtil();
@@ -640,7 +597,7 @@ public class PdfTableUtil {
 			float margin = 10;
 			PDPage page = addNewPage(doc);
 			float yStartNewPage = page.getMediaBox().getHeight() - (2 * margin);
-			log.info("Start of new page - "+yStartNewPage);
+			log.debug("Start of new page - {}",yStartNewPage);
 			float tableWidth = page.getMediaBox().getWidth() - (2 * margin);
 			boolean drawContent = true;
 			float ystaticStart = yStartNewPage-30;
@@ -649,8 +606,8 @@ public class PdfTableUtil {
 			pdfTableUtil.generatePageStaticContent(doc, margin, page, yStartNewPage, tableWidth, 
 					drawContent, ystaticStart, bottomMargin);
 			
-			log.info("ledgerMap ---"+ledgerMap);
-			log.info("size of map ---"+ledgerMap.size());
+			log.debug("ledgerMap --- {}",ledgerMap);
+			log.debug("size of map ---{}",ledgerMap.size());
 			String parentAsset = "NA";
 			for(int i=0;i<ledgerMap.size();i++){
 				
@@ -658,22 +615,21 @@ public class PdfTableUtil {
 					PDPage page1 = addNewPage(doc);
 					BaseTable dataTable = new BaseTable(page1.getMediaBox().getHeight() - (4 * margin),
 									yStartNewPage, bottomMargin, tableWidth, margin, doc, page1, true, drawContent);
-					List<Map> assetList = (List<Map>) ledgerMap.get(i).get("data");
-					if(assetList.size()>0){
-						parentAsset = checkEmpty(String.valueOf(assetList.get(0).get("parentAsset")));
-						log.info("parentAsset--"+parentAsset);
+					JsonArray assetList= ledgerMap.get(i) == null ? null : ledgerMap.get(i).get("data").getAsJsonArray();
+					if(assetList !=null && assetList.size()>0){
+						JsonElement parentID = assetList.get(0).getAsJsonObject().get("parentAsset");
+						parentAsset = parentID == null?"NA":parentID.getAsString();
 					}
 					addText(ystaticStart, parentAsset, dataTable);
 					List<String[]> assetResults = formatAsset(assetList);
 					Row<PDPage> headerRow = generateHeader(dataTable);
 					generateDynamicRows(assetResults, headerRow, dataTable, page1, parentAsset);
-				}else{
+				}else {
 					BaseTable dataTable = new BaseTable(page.getMediaBox().getHeight() - (4 * margin)-120,
 									yStartNewPage, bottomMargin, tableWidth, margin, doc, page, true, drawContent);
-					List<Map> assetList = (List<Map>) ledgerMap.get(i).get("data");
-					if(assetList.size()>0){
-						parentAsset = checkEmpty(String.valueOf(assetList.get(0).get("parentAsset")));
-						log.info("parentAsset--"+parentAsset);
+					JsonArray assetList = ledgerMap.get(i) == null ? null : ledgerMap.get(i).get("data").getAsJsonArray();
+					if(assetList !=null && assetList.size()>0){
+						parentAsset = checkEmpty(String.valueOf(assetList.get(0).getAsJsonObject().get("parentAsset")));
 					}
 					addText(ystaticStart, parentAsset, dataTable);
 					List<String[]> assetResults = formatAsset(assetList);
@@ -682,14 +638,14 @@ public class PdfTableUtil {
 				}
 				
 			}
-			log.info("Rows creation successfull--");
+			log.debug("Rows creation successfull--");
 			addNewPage(doc);
 			footer(doc, pdfName);
 			protectPdf(doc, pdfName);
-			log.info("Footer and protection is done!!--");
+			log.debug("Footer and protection is done!!--");
 			PdfSignUtil pdfSignUtil = new PdfSignUtil();
 			response = pdfSignUtil.digitalSign(doc, pdfName);
-			log.info("Signed successfully!!--");
+			log.debug("Signed successfully!!--");
 		}catch(Exception e){
 			log.error(e);
 		}

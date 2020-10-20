@@ -20,14 +20,13 @@ import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
-import java.util.List;
-import java.util.Map;
 
 import javax.xml.bind.JAXBException;
 
 import org.springframework.stereotype.Service;
 
 import com.cognizant.devops.platformauditing.util.PdfTableUtil;
+import com.google.gson.JsonArray;
 
 /**
  *	All pdf write operations are customized here.
@@ -36,22 +35,9 @@ import com.cognizant.devops.platformauditing.util.PdfTableUtil;
 public class PdfWriterImpl implements PdfWriter{
 	
 	@Override
-	public byte[] generatePdf(List<Map> assetList, String pdfName) throws UnrecoverableKeyException, KeyStoreException, NoSuchAlgorithmException, CertificateException, IOException, JAXBException{
+	public byte[] generatePdf(JsonArray assetList, String pdfName) throws UnrecoverableKeyException, KeyStoreException, NoSuchAlgorithmException, CertificateException, IOException, JAXBException{
 		PdfTableUtil pdfTableUtil = new PdfTableUtil();
 		return pdfTableUtil.generateTableContent(assetList, pdfName);		
 	}
-	
-//	@Override
-//	public void signPdf(String pdfName) throws KeyStoreException, NoSuchAlgorithmException, CertificateException, FileNotFoundException, IOException, UnrecoverableKeyException {
-//		PdfSignUtil pdfSignUtil =new PdfSignUtil();
-//		pdfSignUtil.digitalSign(pdfName);
-//	}
-//
-//	@Override
-//	public void protectPdf(String pdfName) throws IOException {
-//		PdfTableUtil pdfTableUtil = new PdfTableUtil();
-//		pdfTableUtil.protectPdf(pdfName);
-//	}
-
 
 }

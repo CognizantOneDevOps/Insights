@@ -233,7 +233,7 @@ class BaseAgent(object):
             uniqeKey: String --> comma separated node properties
         }
     '''
-    def publishToolsData(self, data, metadata=None, timeStampField=None, timeStampFormat=None, isEpochTime=False,isExtension=False):
+    def publishToolsData(self, data, metadata=None, auditing=False, timeStampField=None, timeStampFormat=None, isEpochTime=False,isExtension=False):
         if metadata:
             metadataType = type(metadata)
             if metadataType is not dict:
@@ -245,6 +245,8 @@ class BaseAgent(object):
             self.addExecutionId(data, self.executionId)
             self.addTimeStampField(data, timeStampField, timeStampFormat, isEpochTime,isExtension)
             logging.info(data)
+            if auditing:
+                self.addDigitalSign(data)
             self.messageFactory.publish(self.dataRoutingKey, data, self.config.get('dataBatchSize', 100), metadata)
             self.logIndicator(self.PUBLISH_START, self.config.get('isDebugAllowed', False))
             
@@ -326,6 +328,48 @@ class BaseAgent(object):
     def addExecutionId(self, data, executionId):
         for d in data:
             d['execId'] = executionId
+			
+    def addDigitalSign(self, data):
+        dataString = ''
+        for d in data:
+            for key in sorted(d.keys()):
+                if(key !="digitalSignature" and d[key]!= None):
+                    #print(key,"--->",d[key])
+                    if type(d[key])== str:
+                        dataString += d[key]
+                    elif type(d[key])==list:
+                        for each in d[key]:
+                            dataString += str(each)
+                    elif type(d[key]) == bool:
+                        dataString += str(d[key]).lower()
+                    else:
+                        dataString += str(d[key])
+            #print("dataString")
+            #print(dataString)
+            hex = hashlib.sha256(dataString.encode('utf-8')).hexdigest()
+            #print(hex)
+            hex_signature = self.rsaEncrypt(hex)
+			
+            d['digitalSignature'] = hex_signature.decode('utf-8')
+            #print(d['digitalSignature'])
+            dataString = ''
+    
+    def rsaEncrypt(self, hexdigest):
+        #print("+++++++++++++++++++++++++++++++++hexdigest")
+        #print(hexdigest)
+        with open(self.config.get('publicKeyPath'), 'rb') as key_file:
+            public_key = serialization.load_pem_public_key(
+            key_file.read(),
+            backend=default_backend()
+        )
+        encrypted = public_key.encrypt(
+        hexdigest.encode('utf-8'),
+        padding.OAEP(
+            mgf=padding.MGF1(algorithm=hashes.SHA1()),
+            algorithm=hashes.SHA256(),
+            label=None
+        ))
+        return b64encode(encrypted)
     
     def updateTrackingJson(self, data):
         #Update the tracking json file and cache.

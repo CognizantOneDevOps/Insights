@@ -28,7 +28,7 @@ import json
 class SonarAgent(BaseAgent):
     def process(self):
         baseUrl = self.config.get("baseUrl", '')
-        projectsUrl = baseUrl+"api/projects/index?format=json"
+        projectsUrl = baseUrl+"api/components/search?qualifiers=TRK&format=json"
         startFrom = self.config.get("startFrom", '')
         startFrom = parser.parse(startFrom)
         timeStampFormat = self.config.get('timeStampFormat')
@@ -37,16 +37,25 @@ class SonarAgent(BaseAgent):
         password = self.getCredential("passwd")
         timeMachineapi = self.config.get("timeMachineapi", '')
         sonarProjects = self.getResponse(projectsUrl, 'GET', userId, password, None)
+        print(sonarProjects)
+        activityUrl = baseUrl+"api/ce/activity"
+        print("activity url"+activityUrl)
+        activity = self.getResponse(activityUrl, 'GET', userId, password, None)
+        print("activity")
+        print(activity)
+        activityTasks = activity["tasks"]
+        print("activity tasks")
+        print(activityTasks)
         metrics = self.config.get('dynamicTemplate', {}).get("metrics", '')
         metricsParam = ''
         if len(metrics) > 0:
             for metric in metrics:
                 metricsParam += metric + ','
         
-        for project in sonarProjects:
+        for project in sonarProjects["components"]:
             data = []
-            projectKey = project["k"]
-            projectName = project["nm"]
+            projectKey = project["key"]
+            projectName = project["name"]
             timestamp = self.tracking.get(projectKey, startFrom)
             lastUpdatedDate = None
             if timeMachineapi == "yes":
@@ -87,10 +96,12 @@ class SonarAgent(BaseAgent):
                         totalPages =  (totalRecords/pageSize)
                     
                     analysisArray = projectAnalysis["analyses"]
+                    analysisId = {}
                     for analysis in analysisArray:
                         date = analysis["date"]
                         category = analysis["events"][0]["category"]
                         version = analysis["events"][0]["name"]
+                        analysisId[date] = analysis["key"]
                         if category == "VERSION" and version:    
                             # remove appname from Version if present
                             version1 = version.replace(projectName+"-","")
@@ -120,8 +131,16 @@ class SonarAgent(BaseAgent):
                         executionData["projectName"] = projectName
                         executionData['metricdate'] = analysisDate
                         executionData['buildVersion'] = buildVersion
+                        executionData['analysisId'] = analysisId.get(analysisDate)
+                        for task in activityTasks:
+                            if task["analysisId"] == analysisId.get(analysisDate):
+                                executionData["executionId"] = task["id"]
                         for i_metric_length in range(0,len(sonarExecutions['measures'])):                    
-                            if 'value' in sonarExecutions['measures'][i_metric_length]['history'][historydata]:
+                            if len(sonarExecutions['measures'][i_metric_length]['history'])>0:	
+                               print ("=====LENGTH=======")
+                               #print historydata
+                               #print len(sonarExecutions['measures'][i_metric_length]['history'])								
+                               if len(sonarExecutions['measures'][i_metric_length]['history'])>historydata and 'value' in sonarExecutions['measures'][i_metric_length]['history'][historydata]:
                                 executionData[sonarExecutions['measures'][i_metric_length]['metric']]=sonarExecutions['measures'][i_metric_length]['history'][historydata]['value']                                     
                         data.append(executionData)            
                         lastUpdatedDate = executionData['metricdate']
