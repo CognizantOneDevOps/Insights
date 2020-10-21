@@ -19,9 +19,11 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.logging.log4j.LogManager;
@@ -501,13 +503,15 @@ public class AssessmentReportsTestData {
 
 	public void initializeTask() {
 		try {
+			Map<Integer, WorkflowTaskSubscriberHandler> registry = new HashMap<>(0);
 			WorkflowTaskSubscriberHandler testKpisubscriberobject = new ReportKPISubscriber(mqChannelKpiExecution);
-			WorkflowDataHandler.registry.put(getTaskId(mqChannelKpiExecution), testKpisubscriberobject);
+			registry.put(getTaskId(mqChannelKpiExecution), testKpisubscriberobject);
 			WorkflowTaskSubscriberHandler testPDFsubscriberobject = new PDFExecutionSubscriber(mqChannelPDFExecution);
-			WorkflowDataHandler.registry.put(getTaskId(mqChannelPDFExecution), testPDFsubscriberobject);
+			registry.put(getTaskId(mqChannelPDFExecution), testPDFsubscriberobject);
 			WorkflowTaskSubscriberHandler testEmailsubscriberobject = new ReportEmailSubscriber(
 					mqChannelEmailExecution);
-			WorkflowDataHandler.registry.put(getTaskId(mqChannelEmailExecution), testEmailsubscriberobject);
+			registry.put(getTaskId(mqChannelEmailExecution), testEmailsubscriberobject);
+			WorkflowDataHandler.setRegistry(registry);
 
 			Thread.sleep(1000);
 		} catch (Exception e) {

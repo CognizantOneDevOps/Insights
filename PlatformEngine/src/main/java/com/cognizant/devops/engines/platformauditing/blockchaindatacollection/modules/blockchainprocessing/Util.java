@@ -19,6 +19,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
 import org.apache.commons.io.FileUtils;
@@ -34,12 +35,11 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
-public class util {
+public class Util {
 
-    private static InputStream is = null;
-    private static JsonObject tracking = new JsonObject();
+    
     private static File f = new File("tracking.json");
-    private static Logger LOG = LogManager.getLogger(PlatformAuditProcessingExecutor.class);
+    private static Logger log = LogManager.getLogger(Util.class);
     private static InsightsAuditImpl insightAuditImpl = null;
 
     public  static InsightsAuditImpl getAuditObject() {
@@ -48,15 +48,19 @@ public class util {
         return insightAuditImpl;
     }
 
-    public JsonObject readTracking() throws IOException {
+    public JsonObject readTracking() throws IOException, InsightsCustomException {
+    	JsonObject tracking = new JsonObject();
+    	InputStream is = null;
         JsonParser parser = new JsonParser();
         if(f.exists()) {
             is = new FileInputStream(f);
-            String jsonTxt = IOUtils.toString(is, "UTF-8");
+            String jsonTxt = IOUtils.toString(is, StandardCharsets.UTF_8.name());
             tracking = (JsonObject) parser.parse(jsonTxt);
         }
         else{
-            f.createNewFile();
+            if(!f.createNewFile()){
+            	throw new InsightsCustomException("File to be created already exists");
+            }
             tracking.addProperty("insightsTime", 0);
             tracking.addProperty("jiraTimestamp", 0);
             FileUtils.writeStringToFile(f,String.valueOf(tracking));
@@ -64,7 +68,7 @@ public class util {
         return tracking;
     }
 
-    public void writeTracking(JsonObject input) throws IOException {
+    public void writeTracking(JsonObject input) throws IOException, InsightsCustomException {
 
         JsonObject tracking = readTracking();
         for(Map.Entry<String, JsonElement> element:input.entrySet()){
@@ -76,7 +80,7 @@ public class util {
     public boolean updateFlagToNeo4j(boolean flag, JsonObject data) throws InsightsCustomException {
         String blockchainProcessedFlag = "blockchainProcessedFlag";
         GraphDBHandler dbHandler = new GraphDBHandler();
-        if (flag == true ) {
+        if (flag) {
             StringBuffer writeBackCypher = new StringBuffer();
             writeBackCypher.append("MATCH (n:DATA) WHERE ID(n) = ").append(data.get("meta").getAsJsonArray().get(0).getAsJsonObject().getAsJsonPrimitive("id")).append(" ");
             writeBackCypher.append("SET n.").append(blockchainProcessedFlag).append(" = true");

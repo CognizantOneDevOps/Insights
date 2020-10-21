@@ -43,7 +43,7 @@ import com.google.gson.JsonParser;
 @WebServlet(urlPatterns = "/insightsDevOpsWebHook/*", loadOnStartup = 1)
 public class WebHookHandlerServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-	private static Logger LOG = LogManager.getLogger(WebHookHandlerServlet.class);
+	private static Logger log = LogManager.getLogger(WebHookHandlerServlet.class);
 
 	public WebHookHandlerServlet() {
 	}
@@ -55,15 +55,20 @@ public class WebHookHandlerServlet extends HttpServlet {
 	@Override
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-		LOG.debug(" In only doGet not in post  ");
+		log.debug(" In only doGet not in post  ");
 		try {
 			processRequest(request);
 		} catch (Exception e) {
-			LOG.error("Error while adding data in Mq in doget method " + e.getMessage());
+			log.error("Error while adding data in Mq in doget method " + e.getMessage());
 			setResponseMessage(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
+		} finally {
+			try {
+				response.getWriter().append("Served at: ").append(request.getContextPath())
+						.append(" with Instance Name " + AppProperties.instanceName);
+			} catch (Exception e) {
+				log.error("Error while appending at response in doGet method: ",e);
+			}
 		}
-		response.getWriter().append("Served at: ").append(request.getContextPath())
-				.append(" with Instance Name " + AppProperties.instanceName);
 	}
 
 	/**
@@ -74,13 +79,13 @@ public class WebHookHandlerServlet extends HttpServlet {
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		try {
-			LOG.debug("In do post ");
+			log.debug("In do post ");
 			processRequest(request);
 		} catch (TimeoutException e) {
 			setResponseMessage(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
-			LOG.error(e.getMessage());
+			log.error(e.getMessage());
 		} catch (Exception e) {
-			LOG.error("Error while adding data in Mq in doPost method " + e);
+			log.error("Error while adding data in Mq in doPost method " + e);
 			setResponseMessage(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
 		}
 	}
@@ -93,16 +98,14 @@ public class WebHookHandlerServlet extends HttpServlet {
 	 */
 	private void processRequest(HttpServletRequest request) throws Exception {
 		JsonObject dataWithReqParam = getBody(request);
-		//LOG.debug(" request body in post " + dataWithReqParam);
 		if (dataWithReqParam != null) {
 			String webHookMqChannelName = WebHookConstants.MQ_CHANNEL_PREFIX
 					.concat(dataWithReqParam.get(WebHookConstants.REQUEST_PARAM_KEY_WEBHOOKNAME).getAsString());
 			String res = dataWithReqParam.toString();
-			//LOG.debug(" Final Json after adding parameter " + res);
 			WebHookMessagePublisher.getInstance().publishEventAction(res.getBytes(), webHookMqChannelName);
-			LOG.debug(" Data successfully published in webhook name as " + webHookMqChannelName);
+			log.debug(" Data successfully published in webhook name as ",webHookMqChannelName);
 		} else {
-			LOG.debug(" Request body is empty ");
+			log.debug(" Request body is empty ");
 		}
 	}
 
@@ -136,7 +139,7 @@ public class WebHookHandlerServlet extends HttpServlet {
 				responceJson.addProperty("iswebhookdata", Boolean.TRUE);
 			}
 		} catch (Exception e) {
-			LOG.error("unable to read data from request body from the http request ==== ", e);
+			log.error("unable to read data from request body from the http request ==== ", e);
 			return null;
 		}
 
@@ -162,7 +165,7 @@ public class WebHookHandlerServlet extends HttpServlet {
 		try {
 			response.setStatus(statusCode);
 		} catch (Exception e) {
-			LOG.error("Error in setUnauthorizedResponse ", e);
+			log.error("Error in setUnauthorizedResponse ", e);
 		}
 	}
 

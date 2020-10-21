@@ -50,8 +50,8 @@ public class PlatformAuditProcessingExecutor extends TimerTask {
     private String blockchainProcessedFlag = "blockchainProcessedFlag";
     private int dataBatchSize = 100;
     private int nextBatchSize = 0;
-    private final InsightsAuditImpl insightAuditImpl = util.getAuditObject();
-	private static util utilObj = new util();
+    private final InsightsAuditImpl insightAuditImpl = Util.getAuditObject();
+	private static Util utilObj = new Util();
 	private String decryptionAlgorithm = "RSA/ECB/OAEPWITHSHA-256ANDMGF1PADDING";
     private String keyAlgorithm = "RSA";
 

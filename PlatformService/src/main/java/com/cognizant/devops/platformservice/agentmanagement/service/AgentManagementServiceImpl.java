@@ -239,7 +239,7 @@ public class AgentManagementServiceImpl implements AgentManagementService {
 			agentList = new ArrayList<>(agentConfigList.size());
 			for (AgentConfig agentConfig : agentConfigList) {
 				AgentConfigTO to = new AgentConfigTO();
-				BeanUtils.copyProperties(agentConfig, to, new String[] { "agentJson", "updatedDate", "vault" });
+				BeanUtils.copyProperties(agentConfig, to, "agentJson", "updatedDate", "vault");
 				agentList.add(to);
 			}
 		} catch (Exception e) {
@@ -572,7 +572,7 @@ public class AgentManagementServiceImpl implements AgentManagementService {
 		}
 		try {
 			if (trackingFile.exists()) {
-				trackingFile.delete();
+				Files.delete(trackingFile.toPath());
 			}
 		} catch (NullPointerException e) {
 			log.error("No tracking json file found!", e);

@@ -49,8 +49,8 @@ public class JiraProcessingExecutor extends TimerTask {
 	private String blockchainProcessedFlag = "blockchainProcessedFlag";
 
 	private int nextBatchSize = 0;
-	private final InsightsAuditImpl insightAuditImpl = util.getAuditObject();
-	private static util utilObj = new util();
+	private final InsightsAuditImpl insightAuditImpl = Util.getAuditObject();
+	private static Util utilObj = new Util();
 
 	@Override
 	public void run() {

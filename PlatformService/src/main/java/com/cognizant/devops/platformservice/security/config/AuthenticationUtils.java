@@ -21,6 +21,7 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -41,7 +42,7 @@ import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 
 @Component("authenticationUtils")
 public class AuthenticationUtils {
-	private static Logger Log = LogManager.getLogger(AuthenticationUtils.class);
+	private static Logger log = LogManager.getLogger(AuthenticationUtils.class);
 
 	public static final int TOKEN_EXPIRE_CODE = 810;
 	public static final int SECURITY_CONTEXT_CODE = 811;
@@ -76,21 +77,21 @@ public class AuthenticationUtils {
 			.equalsIgnoreCase(ApplicationConfigProvider.getInstance().getAutheticationProtocol());
 
 	public static final String CSRF_COOKIE_NAME = "XSRF-TOKEN";
-	public static final String[] CSRF_IGNORE = { "/login/**", "/user/insightsso/authenticateSSO/**",
-			"/user/authenticate/**", "/user/insightsso/**", "/saml/**" };
+	public static final List<String> CSRF_IGNORE = Collections.unmodifiableList(Arrays.asList("/login/**", "/user/insightsso/authenticateSSO/**",
+			"/user/authenticate/**", "/user/insightsso/**", "/saml/**"));
 
-	public static final String[] SET_VALUES = new String[] { "grafanaOrg", "grafana_user", "grafanaRole",
+	public static final List<String> SET_VALUES = Collections.unmodifiableList(Arrays.asList("grafanaOrg", "grafana_user", "grafanaRole",
 			"grafana_remember", "grafana_sess", "XSRF-TOKEN", "JSESSIONID", "grafana_session", "insights-sso-token",
-			"username", "insights-sso-givenname" };
-	public static final Set<String> MASTER_COOKIES_KEY_LIST = new HashSet<String>(Arrays.asList(SET_VALUES));
+			"username", "insights-sso-givenname"));
+	public static final Set<String> MASTER_COOKIES_KEY_LIST = Collections.unmodifiableSet(new HashSet<String>(SET_VALUES));
 
 	public static final String JSON_FILE_VALIDATOR = "^([a-zA-Z0-9_.\\s-])+(.json)$";
 	public static final String LOG_FILE_VALIDATOR = "^([a-zA-Z0-9_.\\s-])+(.log)$";
 
-	public static final String[] SUPPORTED_TYPE = { "SAML", "Kerberos", "NativeGrafana", "JWT" };
-	public static final Set<String> AUTHENTICATION_PROTOCOL_LIST = new HashSet<String>(Arrays.asList(SUPPORTED_TYPE));
+	public static final List<String> SUPPORTED_TYPE = Collections.unmodifiableList(Arrays.asList("SAML", "Kerberos", "NativeGrafana", "JWT" ));
+	public static final Set<String> AUTHENTICATION_PROTOCOL_LIST = Collections.unmodifiableSet(new HashSet<String>(SUPPORTED_TYPE));
 
-	public static List<SecurityFilterChain> securityFilterchains = new ArrayList<>();
+	protected static List<SecurityFilterChain> securityFilterchains = new ArrayList<>();
 
 
 	public static void setResponseMessage(HttpServletResponse response, int statusCode, String message) {
@@ -102,7 +103,7 @@ public class AuthenticationUtils {
 			response.getWriter().close();
 
 		} catch (IOException e) {
-			Log.error("Error in setUnauthorizedResponse ", e);
+			log.error("Error in setUnauthorizedResponse ", e);
 		}
 	}
 
@@ -130,11 +131,11 @@ public class AuthenticationUtils {
 					hostInfo = url.getHost();
 				}
 			}
-			Log.debug("host information {} ", hostInfo);
+			log.debug("host information {} ", hostInfo);
 			return hostInfo;
 		} catch (MalformedURLException e) {
-			Log.error("Unable to retrive host information ");
-			Log.error(e);
+			log.error("Unable to retrive host information ");
+			log.error(e);
 			return null;
 		}
 	}
@@ -149,10 +150,10 @@ public class AuthenticationUtils {
 					ApplicationConfigProvider.getInstance().getSingleSignOnConfig().getPostLogoutURL(), "UTF-8");
 			String returnLogoutStr = String.format("%s/#/logout/%s?logout_url=%s&message=%s",
 					ApplicationConfigProvider.getInstance().getInsightsServiceURL(), logoutCode, url, message);
-			Log.debug("Logout URL ++++ {} ", returnLogoutStr);
+			log.debug("Logout URL ++++ {} ", returnLogoutStr);
 			return returnLogoutStr;
 		} catch (Exception e) {
-			Log.error("Unable to retrive logout information ");
+			log.error("Unable to retrive logout information ");
 			return null;
 		}
 
@@ -176,7 +177,7 @@ public class AuthenticationUtils {
 		try {
 			return SpringAuthority.valueOf(grafanaCurrentOrgRole.replaceAll("\\s", "_"));
 		} catch (Exception e) {
-			Log.error("Unable to find grafana role in Spring Authority. {}", e.getMessage());
+			log.error("Unable to find grafana role in Spring Authority. {}", e.getMessage());
 		}
 		return SpringAuthority.valueOf("Viewer");
 	}
