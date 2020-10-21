@@ -57,7 +57,7 @@ export class ContentConfigComponent implements OnInit {
     this.contentService.setFileType('CONTENT');
     this.dialog.open(FileUploadDialog, {
       panelClass: 'DialogBox',
-      width: '30%',
+      width: '34%',
       height: '25%',
       disableClose: false,
     });

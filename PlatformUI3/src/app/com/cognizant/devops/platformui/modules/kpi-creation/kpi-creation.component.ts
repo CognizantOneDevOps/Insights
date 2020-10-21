@@ -59,7 +59,7 @@ export class KpiCreationComponent implements OnInit {
     this.contentService.setFileType('KPI');
     this.dialog.open(FileUploadDialog, {
       panelClass: 'DialogBox',
-      width: '32%',
+      width: '34%',
       height: '25%',
       disableClose: false,
     });

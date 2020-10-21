@@ -16,11 +16,8 @@
     margin-left: 90px;
 }
 .closeIconCss {
-    padding-right: 30px;
     color: white;
-    margin-top: auto;
-    margin-bottom: auto;
-    vertical-align: middle;
+    margin:2%
 }
 .dialogtableHeaderCss {
     background-color: grey;
