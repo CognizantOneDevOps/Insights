@@ -14,12 +14,12 @@
 # License for the specific language governing permissions and limitations under
 # the License.
 #-------------------------------------------------------------------------------
-echo "#################### Installing Tomcat8 ####################"
+echo "#################### Installing Tomcat ####################"
 cd /opt
-sudo wget https://platform.cogdevops.com/insights_install/release/latest/PlatformUI3.zip -O PlatformUI3.zip
+sudo wget https://infra.cogdevops.com:8443/repository/docroot/insights_install/release/latest/PlatformUI3.zip -O PlatformUI3.zip
 sudo unzip PlatformUI3.zip && sudo rm -rf PlatformUI3.zip
-sudo wget https://platform.cogdevops.com/insights_install/release/latest/PlatformService.war -O PlatformService.war
-sudo wget https://platform.cogdevops.com/insights_install/installationScripts/latest/Ubuntu/packages/tomcat/apache-tomcat.tar.gz
+sudo wget https://infra.cogdevops.com:8443/repository/docroot/insights_install/release/latest/PlatformService.war -O PlatformService.war
+sudo wget https://infra.cogdevops.com:8443/repository/docroot/insights_install/installationScripts/latest/Ubuntu/packages/tomcat/apache-tomcat.tar.gz
 sudo tar -zxvf apache-tomcat.tar.gz
 sudo cp -R ./app /opt/apache-tomcat/webapps
 sudo cp PlatformService.war /opt/apache-tomcat/webapps
@@ -27,6 +27,6 @@ sudo rm -rf PlatformService.war
 cd apache-tomcat
 sudo chmod -R 777 /opt/apache-tomcat
 cd /etc/systemd/system
-sudo wget https://platform.cogdevops.com/insights_install/installationScripts/latest/Ubuntu/scripts/Tomcat.service
+sudo wget https://infra.cogdevops.com:8443/repository/docroot/insights_install/installationScripts/latest/Ubuntu/packages/tomcat/Tomcat.service
 sudo systemctl enable Tomcat.service
 sudo systemctl start Tomcat

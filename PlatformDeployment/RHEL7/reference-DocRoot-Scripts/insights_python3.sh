@@ -18,7 +18,7 @@
 #sudo unzip python_dependencies.zip && cd python_dependencies
 #sudo rpm -Uvh *.rpm
 cd /opt
-sudo wget https://platform.cogdevops.com/insights_install/installationScripts/latest/RHEL/python/Python.tar.gz
+sudo wget https://infra.cogdevops.com:8443/repository/docroot/insights_install/installationScripts/latest/RHEL/python/Python.tar.gz
 sudo tar -zxf Python.tar.gz
 cd Python
 sudo yum install gcc -y

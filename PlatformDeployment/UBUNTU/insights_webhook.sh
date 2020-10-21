@@ -24,10 +24,10 @@ sudo echo "export" INSIGHTS_WEBHOOK=`pwd` | sudo tee -a /etc/profile
 . /etc/environment
 . /etc/profile
 cd /opt/insightsWebHook
-sudo wget https://platform.cogdevops.com/insights_install/release/latest/PlatformInsightsWebHook.jar -O PlatformInsightsWebHook.jar
+sudo wget https://infra.cogdevops.com:8443/repository/docroot/insights_install/release/latest/PlatformInsightsWebHook.jar -O PlatformInsightsWebHook.jar
 sleep 2
 sudo nohup java -jar PlatformInsightsWebHook.jar &
 sleep 10
-sudo wget https://platform.cogdevops.com/insights_install/release/latest/PlatformWebhookEngine.jar -O PlatformWebhookEngine.jar
-sleep 2
-sudo nohup java -jar PlatformWebhookEngine.jar &
+#sudo wget https://platform.cogdevops.com/insights_install/release/latest/PlatformWebhookEngine.jar -O PlatformWebhookEngine.jar
+#sleep 2
+#sudo nohup java -jar PlatformWebhookEngine.jar &

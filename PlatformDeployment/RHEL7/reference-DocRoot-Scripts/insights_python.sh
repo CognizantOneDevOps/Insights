@@ -15,13 +15,13 @@
 #-------------------------------------------------------------------------------
 # Python 2.7.11
 echo "#################### Installing Python 2.7.11 with Virtual Env ####################"
-#sudo wget https://platform.cogdevops.com/insights_install/installationScripts/latest/RHEL/python/python_dependencies.zip
+#sudo wget https://infra.cogdevops.com:8443/repository/docroot/insights_install/installationScripts/latest/RHEL/python/python_dependencies.zip
 #sudo unzip python_dependencies.zip && cd python_dependencies
 #sudo rpm -Uvh *.rpm
 cd /opt
-sudo mkdir python && cd python && sudo wget https://platform.cogdevops.com/insights_install/installationScripts/latest/RHEL/python/Python-2.7.11.tgz
+sudo mkdir python && cd python && sudo wget https://infra.cogdevops.com:8443/repository/docroot/insights_install/installationScripts/latest/RHEL/python/Python-2.7.11.tgz
 sudo tar -zxf Python-2.7.11.tgz && cd Python-2.7.11 && sudo yum install gcc -y && sudo ./configure --prefix=/opt/
-sudo make install && cd .. && sudo wget https://platform.cogdevops.com/insights_install/installationScripts/latest/RHEL/python/get-pip.py
+sudo make install && cd .. && sudo wget https://infra.cogdevops.com:8443/repository/docroot/insights_install/installationScripts/latest/RHEL/python/get-pip.py
 python --version
 sudo python get-pip.py
 sudo pip install pika==1.1.0

@@ -22,11 +22,11 @@ sudo echo INSIGHTS_WORKFLOW=`pwd` | sudo tee -a /etc/environment
 sudo echo "export" INSIGHTS_WORKFLOW=`pwd` | sudo tee -a /etc/profile
 source /etc/environment
 source /etc/profile
-sudo wget https://platform.cogdevops.com/insights_install/release/latest/PlatformWorkflow.jar -O PlatformWorkflow.jar
+sudo wget https://infra.cogdevops.com:8443/repository/docroot/insights_install/release/latest/PlatformWorkflow.jar -O PlatformWorkflow.jar
 sleep 5
 sudo chmod -R 777 /opt/insightsworkflow
 cd /etc/init.d/
-sudo wget http://platform.cogdevops.com/insights_install/installationScripts/latest/RHEL/initscripts/InSightsWorkflow.sh
+sudo wget https://infra.cogdevops.com:8443/repository/docroot/insights_install/installationScripts/latest/RHEL/initscripts/InSightsWebHook.sh
 sudo mv InSightsWorkflow.sh InSightsWorkflow
 sudo chmod +x InSightsWorkflow
 sudo chkconfig InSightsWorkflow on

@@ -29,7 +29,7 @@
 # Install Java
 echo "#################### Installing Java with Env Variable ####################"
 cd /opt
-sudo wget  https://platform.cogdevops.com/insights_install/installationScripts/latest/RHEL/java/jdklinux.tar.gz
+sudo wget https://infra.cogdevops.com:8443/repository/docroot/insights_install/installationScripts/latest/RHEL/java/jdklinux.tar.gz
 sudo tar xzf jdklinux.tar.gz
 export JAVA_HOME=/opt/jdklinux
 echo JAVA_HOME=/opt/jdklinux  | sudo tee -a /etc/environment

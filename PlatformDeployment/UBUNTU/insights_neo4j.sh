@@ -22,7 +22,7 @@ sudo sed  -i '$ a root   hard    nofile  40000' /etc/security/limits.conf
 cd /opt
 sudo mkdir NEO4J_HOME
 cd NEO4J_HOME
-sudo wget https://platform.cogdevops.com/insights_install/installationScripts/latest/Ubuntu/packages/neo4j/neo4j-Insights.tar.gz
+sudo wget https://infra.cogdevops.com:8443/repository/docroot/insights_install/installationScripts/latest/Ubuntu/packages/neo4j/neo4j-Insights.tar.gz
 sudo tar -xzf neo4j-Insights.tar.gz
 sudo chmod -R 755 neo4j-Insights
 cd neo4j-Insights

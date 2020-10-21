@@ -18,30 +18,25 @@ echo "#################### Installing Grafana (running as BG process) ##########
 cd /opt
 sudo mkdir grafana
 cd grafana
-sudo wget https://platform.cogdevops.com/insights_install/installationScripts/latest/RHEL/grafana/latest/grafana.tar.gz
+sudo wget https://infra.cogdevops.com:8443/repository/docroot/insights_install/installationScripts/latest/RHEL/grafana/Grafana-6.1.6/grafana.tar.gz
 sudo tar -zxvf grafana.tar.gz
 export GRAFANA_HOME=`pwd`
 sudo echo GRAFANA_HOME=`pwd` | sudo tee -a /etc/environment
 sudo echo "export" GRAFANA_HOME=`pwd` | sudo tee -a /etc/profile
 source /etc/environment
 source /etc/profile
-sudo wget https://platform.cogdevops.com/insights_install/installationScripts/latest/RHEL/grafana/ldap.toml
+sudo wget https://infra.cogdevops.com:8443/repository/docroot/insights_install/installationScripts/latest/RHEL/grafana/Grafana-6.1.6/ldap.toml
 sudo cp ldap.toml $GRAFANA_HOME/conf/ldap.toml
-sudo wget https://platform.cogdevops.com/insights_install/installationScripts/latest/RHEL/grafana/defaults.ini
+sudo wget https://infra.cogdevops.com:8443/repository/docroot/insights_install/installationScripts/latest/RHEL/grafana/Grafana-6.1.6/defaults.ini
 sudo cp defaults.ini $GRAFANA_HOME/conf/defaults.ini
 sudo nohup ./bin/grafana-server &
 sudo echo $! > grafana-pid.txt
-sleep 10
-curl -X POST -u admin:admin -H "Content-Type: application/json" -d '{"name":"PowerUser","email":"PowerUser@PowerUser.com","login":"PowerUser","password":"C0gnizant@1"}' http://localhost:3000/api/admin/users
-sleep 10
 sudo chmod -R 777 /opt/grafana
 cd /etc/init.d/
-sudo wget https://platform.cogdevops.com/insights_install/installationScripts/latest/RHEL/initscripts/Grafana.sh
+sudo wget https://infra.cogdevops.com:8443/repository/docroot/insights_install/installationScripts/latest/RHEL/initscripts/Grafana.sh
 sudo mv Grafana.sh Grafana
 sudo chmod +x Grafana
 sudo chkconfig Grafana on
 sleep 10
 sudo service Grafana stop
 sudo service Grafana start
-
-
