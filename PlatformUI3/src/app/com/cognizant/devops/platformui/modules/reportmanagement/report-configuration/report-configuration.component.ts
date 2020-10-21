@@ -69,6 +69,10 @@ export class ReportConfigComponent implements OnInit {
   emailDetails: any = null;
   enableEmailDetails: boolean = false;
   emailReg = "email";
+  receivedReportTemplates = [];
+  receivedScheduleList = [];
+
+
 
   constructor(
     private route: ActivatedRoute,
@@ -79,35 +83,23 @@ export class ReportConfigComponent implements OnInit {
     public reportmanagementservice: ReportManagementService,
     private dataArchivingService: DataArchivingService
   ) {
-    this.showThrobber = true;
-    this.loadScheduleAndReportTempalte();
+    
   }
 
   ngOnInit() {
     this.route.queryParams.subscribe(params => {
       this.receivedParam = JSON.parse(params["reportparam"]);
       console.log(this.receivedParam);
+      this.receivedReportTemplates = JSON.parse(params["reportTemplates"]);
+      this.receivedScheduleList = JSON.parse(params["scheduleList"]);
+      console.log(this.receivedParam, this.receivedReportTemplates);
     });
+    this.initializeVariable();
   }
 
   ngAfterViewInit() { }
-  public async loadScheduleAndReportTempalte() {
-    this.reponseForReportTemplate = await this.reportmanagementservice.getReportTemplate();
-    this.listOfReports = this.reponseForReportTemplate.data;
-    if (this.listOfReports.length > 0) {
-      this.initializeVariable();
-    } else {
-      this.messageDialog.showApplicationsMessage(
-        "Failed to load the report templates.Please check logs for more details.",
-        "ERROR"
-      );
-      this.list();
-      this.showThrobber = false;
-    }
-    this.showThrobber = false;
-  }
 
-  initializeVariable() {
+  async initializeVariable() {
     if (this.receivedParam.type == "edit") {
       this.disableRefresh = false;
       this.enablecanel = true;
@@ -121,6 +113,7 @@ export class ReportConfigComponent implements OnInit {
       } else {
         this.reportdisplayName = this.receivedParam.data.asseementreportdisplayname;
       }
+      this.listOfReports.push(this.receivedParam.data.template);
       this.schedule = this.receivedParam.data.schedule;
       this.frequencyPlaceholder = this.receivedParam.data.schedule;
       this.datasource = this.receivedParam.data.inputDatasource;
@@ -151,6 +144,7 @@ export class ReportConfigComponent implements OnInit {
         }
       }
     } else {
+      this.listOfReports = this.receivedReportTemplates;
       this.isUpdate = false;
       this.disableRefresh = false;
       this.addReport();
@@ -180,26 +174,16 @@ export class ReportConfigComponent implements OnInit {
 
   async addReport() {
     this.selectedReport = { reportId: 0, templateName: "" };
-    this.reponseForschdeule = await this.reportmanagementservice.getSchedule();
-    this.listOfSchedule = this.reponseForschdeule.data;
-    if (this.listOfSchedule.length < 0) {
-      this.messageDialog.showApplicationsMessage(
-        "Failed to load the schedules.Please check logs for more details.",
-        "ERROR"
-      );
-      this.list();
-      this.showThrobber = false;
-    } else {
-      this.activeDataArchivalRecordsResponse = await this.dataArchivingService.listActiveArchivedRecord();
-      this.activeDataArchivalRecords = this.activeDataArchivalRecordsResponse.data;
-      for (var record of this.activeDataArchivalRecords) {
-        if (record.sourceUrl) {
-          this.dataSourceList.push(record.sourceUrl);
-        }
+    this.listOfSchedule = this.receivedScheduleList;
+    this.activeDataArchivalRecordsResponse = await this.dataArchivingService.listActiveArchivedRecord();
+    this.activeDataArchivalRecords = this.activeDataArchivalRecordsResponse.data;
+    for (var record of this.activeDataArchivalRecords) {
+      if (record.sourceUrl) {
+        this.dataSourceList.push(record.sourceUrl);
       }
     }
   }
-
+  
   addTasks() {
     var isSessionExpired = this.dataShare.validateSession();
     if (!isSessionExpired) {

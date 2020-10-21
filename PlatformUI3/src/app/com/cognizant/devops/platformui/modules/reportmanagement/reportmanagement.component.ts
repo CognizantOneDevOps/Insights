@@ -67,6 +67,10 @@ export class ReportManagementComponent implements OnInit {
   previousActiveIndex = -1;
   pageRefreshed: boolean = false;
   reportdisplayName
+  reponseForReportTemplate: any;
+  templatesList = [];
+  reponseForschedule: any;
+  scheduleList = [];
 
   constructor(
     private dialog: MatDialog,
@@ -87,9 +91,37 @@ export class ReportManagementComponent implements OnInit {
       'active',
       'details'
     ];
+    this.loadReportTemplate();
     this.getAssesmentReport();
     this.userDataSource.paginator = this.paginator;
   }
+
+  async loadReportTemplate() {
+    this.reponseForReportTemplate = await this.reportmanagementService.getReportTemplate();
+    if (this.reponseForReportTemplate.data != null && this.reponseForReportTemplate.status == 'success') {
+      this.templatesList = this.reponseForReportTemplate.data;
+      console.log(this.templatesList);
+    } else {
+      this.messageDialog.showApplicationsMessage(
+        "Failed to load the report templates.Please check logs for more details.",
+        "ERROR"
+      );
+    }
+    this.loadSchedule();
+  }
+
+  async loadSchedule() {
+    this.reponseForschedule = await this.reportmanagementService.getSchedule();
+    if(this.reponseForschedule != null &&  this.reponseForschedule.status == 'success') {
+      this.scheduleList = this.reponseForschedule.data;
+    } else {
+      this.messageDialog.showApplicationsMessage(
+        "Failed to load the schedules.Please check logs for more details.",
+        "ERROR"
+      );
+    }
+  }
+
 
   async getAssesmentReport() {
     this.detailedRecords = [];
@@ -121,7 +153,6 @@ export class ReportManagementComponent implements OnInit {
         }
         this.detailedRecords.push(obj);
       });
-      this.userDataSource.data = [];
       this.userDataSource.data = this.detailedRecords;
       this.userDataSource.paginator = this.paginator;
       this.detailedRecords = [];
@@ -275,7 +306,9 @@ export class ReportManagementComponent implements OnInit {
     let navigationExtras: NavigationExtras = {
       skipLocationChange: true,
       queryParams: {
-        reportparam: this.configParams
+        reportparam: this.configParams,
+        reportTemplates: JSON.stringify(this.templatesList),
+        scheduleList: JSON.stringify(this.scheduleList)
       }
     };
     this.router.navigate(
