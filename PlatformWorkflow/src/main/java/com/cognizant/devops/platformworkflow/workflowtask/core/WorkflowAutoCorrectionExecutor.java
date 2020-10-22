@@ -132,6 +132,7 @@ public class WorkflowAutoCorrectionExecutor implements Job {
 				try {
 					log.debug(LOGMESSAGE, eachWorkflow.getWorkflowId(), eachWorkflow.getScheduleType(), nextRunTime,
 							adjustedNextRunTime);
+					adjustedNextRunTime=0;
 					workflowDAL.updateWorkflowConfig(eachWorkflow);
 					log.debug("WorkflowAutoCorrection executor === correction performed on workflow : {} ",
 							eachWorkflow.getWorkflowId());
