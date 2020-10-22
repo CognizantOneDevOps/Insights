@@ -32,6 +32,7 @@ import com.cognizant.devops.platformauditing.api.InsightsAuditImpl;
 import com.cognizant.devops.platformauditing.util.AuditServiceUtil;
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
 import com.cognizant.devops.platformcommons.core.enums.WorkflowTaskEnum;
+import com.cognizant.devops.platformcommons.core.util.InsightsUtils;
 import com.cognizant.devops.platformcommons.core.util.ValidationUtils;
 import com.cognizant.devops.platformdal.assessmentreport.InsightsReportsKPIConfig;
 import com.cognizant.devops.platformdal.workflow.InsightsWorkflowConfiguration;
@@ -75,21 +76,21 @@ public class HyperLedgerExecutionSubscriber extends WorkflowTaskSubscriberHandle
 			workflowConfig = workflowDAL.getWorkflowConfigByWorkflowId(workflowId);
 			log.debug("Worlflow Detail ==== scheduleType {} ", workflowConfig.getScheduleType());
 
-			long startDate;
-			long endDate;
+			long startDate = 0;
+			long endDate = 0;
+			long startDateEpoch = 0;
 			if (workflowConfig.getScheduleType().equals(WorkflowTaskEnum.WorkflowSchedule.ONETIME.name())) {
 				startDate = workflowConfig.getAssessmentConfig().getStartDate();
 				endDate = workflowConfig.getAssessmentConfig().getEndDate();
 			} else {
-				startDate = workflowConfig.getNextRun();
-				endDate = workflowConfig.getLastRun();
+				startDateEpoch = workflowConfig.getNextRun();
+				startDate = InsightsUtils.getStartFromTime(startDateEpoch, workflowConfig.getScheduleType()) - 1;
+				endDate = startDateEpoch;
 			}
-			log.debug("Worlflow Detail ==== startDate & endDate in Epoch {} ", startDate);
-			log.debug("Worlflow Detail ==== endDate in Epoch {} ", endDate);
+			log.debug("Worlflow Detail ==== startDate & endDate in Epoch {} {}", startDate, endDate);
 			String ledgerStartDate = epochToLedgerDate(startDate);
-			log.debug("Worlflow Detail ==== ledgerStartDate {} ", ledgerStartDate);
 			String ledgerEndDate = epochToLedgerDate(endDate);
-			log.debug("Worlflow Detail ==== ledgerEndDate {} ", ledgerEndDate);
+			log.debug("Worlflow Detail ==== ledgerStartDate & ledgerEndDate {} {}", ledgerStartDate, ledgerEndDate);
 			prepareAssestmentDTO(incomingTaskMessageJson);
 			List<JsonObject> ledgerList = fetchLedgerRecords(ledgerStartDate, ledgerEndDate);
 			assessmentReportDTO.setLedgerRecords(ledgerList);

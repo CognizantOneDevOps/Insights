@@ -31,6 +31,12 @@ from datetime import datetime
 from pytz import timezone
 import logging.handlers
 import time
+import hashlib
+from cryptography.hazmat.primitives import hashes
+from cryptography.hazmat.primitives.asymmetric import padding
+from cryptography.hazmat.backends import default_backend
+from cryptography.hazmat.primitives import serialization
+from base64 import b64encode, b64decode
 
 class BaseAgent(object):
        
