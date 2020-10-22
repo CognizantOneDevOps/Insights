@@ -239,7 +239,7 @@ class BaseAgent(object):
             uniqeKey: String --> comma separated node properties
         }
     '''
-    def publishToolsData(self, data, metadata=None, auditing=False, timeStampField=None, timeStampFormat=None, isEpochTime=False,isExtension=False):
+    def publishToolsData(self, data, metadata=None,  timeStampField=None, timeStampFormat=None, isEpochTime=False,isExtension=False):
         if metadata:
             metadataType = type(metadata)
             if metadataType is not dict:
@@ -251,6 +251,7 @@ class BaseAgent(object):
             self.addExecutionId(data, self.executionId)
             self.addTimeStampField(data, timeStampField, timeStampFormat, isEpochTime,isExtension)
             logging.info(data)
+            auditing=self.config.get('auditing',False)
             if auditing:
                 self.addDigitalSign(data)
             self.messageFactory.publish(self.dataRoutingKey, data, self.config.get('dataBatchSize', 100), metadata)
