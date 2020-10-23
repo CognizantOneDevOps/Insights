@@ -167,7 +167,7 @@
    "agentId":"",
    "toolCategory":"ALM",
    "proxy":"proxy.companyname.com:8080/",
-   "accesstoken":"token",
+   "accesstoken":"",
    "runSchedule":30,
    "userid":"userid",
    "passwd":"passwd",

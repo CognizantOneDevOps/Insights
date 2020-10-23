@@ -9,8 +9,8 @@
     <session-factory>
         <property name="hibernate.dialect">org.hibernate.dialect.PostgreSQLDialect</property>
         <property name="hibernate.connection.driver_class">org.postgresql.Driver</property>
-        <property name="hibernate.connection.username">grafana</property>
-        <property name="hibernate.connection.password">C0gnizant@1</property>
+        <property name="hibernate.connection.username"></property>
+        <property name="hibernate.connection.password"></property>
         <property name="hibernate.connection.url">jdbc:postgresql://127.0.0.1:5432/insight</property>
 
         <property name="connection_pool_size">1</property>
