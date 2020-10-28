@@ -18,6 +18,7 @@ import { Component, OnInit, Inject, ViewChild } from '@angular/core';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA, MatPaginator, MatTableDataSource } from '@angular/material';
 import { RestCallHandlerService } from '@insights/common/rest-call-handler.service';
 import { DataSharedService } from '@insights/common/data-shared-service';
+import { InsightsInitService } from '@insights/common/insights-initservice';
 
 
 
@@ -31,11 +32,14 @@ aboutPageURL = "https://github.com/CognizantOneDevOps/Insights/releases";
 aboutGitLicenseURL = "https://github.com/CognizantOneDevOps/Insights/blob/master/LICENSE";
 /*aboutGitURL= "https://github.com/CognizantOneDevOps/Insights.git";*/
 year: any;
+version:any;
+
   constructor(public dialogRef: MatDialogRef<AboutDialog>,private dataShare: DataSharedService,
     @Inject(MAT_DIALOG_DATA) public data: any) {
   }
 
   ngOnInit() {
+    this.version=InsightsInitService.version;
     this.year = this.dataShare.getCurrentYear();
   }
 

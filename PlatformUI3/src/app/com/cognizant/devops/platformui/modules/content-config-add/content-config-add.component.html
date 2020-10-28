@@ -45,7 +45,7 @@
             </td>
             <td class="columnComponent">
               <input maxlength="7" type="number" id="contentId" [disabled]="type==='EDIT'" class="form-control"
-                [(ngModel)]="contentId" name="contentId" style="width: 84%;" (keypress)="defaultStop($event)">
+               oninput="this.value.length > 7? this.value = this.value.slice(0, this.maxLength):' ';"  [(ngModel)]="contentId" name="contentId" style="width: 84%;" (keypress)="defaultStop($event)">
             </td>
             <td>
               <span class="infoText">Please input a unique Content Id</span>
@@ -73,7 +73,7 @@
             <div>
               <td class="columnComponent">
                 <input maxlength="40" type="text" class="form-control" [(ngModel)]="kpiId" name="kpiId"
-                  style="width: 84%;" disabled placeholder="Search for a Kpi Id">
+                  style="width: 84%;background-color:#e1e3e7;" disabled placeholder="Search for a Kpi Id">
 
               </td>
             </div>
@@ -82,7 +82,7 @@
                 <mat-icon svgIcon="search_icon" [ngStyle]="{color:'#5C068C', height: '20px', width: '20px'}">
                 </mat-icon>
               </a>
-              <span class="infoText" style="padding-left:45px ;">Please enter a Kpi Id </span>
+              <span class="infoText" style="padding-left:45px;">Please enter a Kpi Id </span>
             </td>
           </tr>
           <tr class="mat-row-kpi">

@@ -59,6 +59,7 @@ export class LoginComponent implements OnInit, ILoginComponent, AfterViewInit {
   displayLoginPage: boolean = true;
   year: any;
   eventData: string;
+  version: any;
 
   constructor(private loginService: LoginService, private restAPIUrlService: RestAPIurlService,
     private restCallHandlerService: RestCallHandlerService, private cookieService: CookieService,
@@ -72,7 +73,7 @@ export class LoginComponent implements OnInit, ILoginComponent, AfterViewInit {
 
   ngOnInit() {
     var self = this
-
+    this.version=InsightsInitService.version;
     console.log("autheticationProtocol " + InsightsInitService.autheticationProtocol)
     if (InsightsInitService.autheticationProtocol == AutheticationProtocol.SAML.toString() || InsightsInitService.autheticationProtocol == AutheticationProtocol.Kerberos.toString()) {
       console.log(" SSO is enable calling saml login");

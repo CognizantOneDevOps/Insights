@@ -51,14 +51,14 @@ export class ContentConfigComponent implements OnInit {
 
   addnewContent() {
     this.contentService.setType("ADD");
-    this.router.navigateByUrl('InSights/Home/contentConfigAdd');
+    this.router.navigate(['InSights/Home/contentConfigAdd'],{skipLocationChange:true});
   }
   uploadFile() {
     this.contentService.setFileType('CONTENT');
     this.dialog.open(FileUploadDialog, {
       panelClass: 'DialogBox',
       width: '34%',
-      height: '25%',
+      height: '27%',
       disableClose: false,
     });
   }

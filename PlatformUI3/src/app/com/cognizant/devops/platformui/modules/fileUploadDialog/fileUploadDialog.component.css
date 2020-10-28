@@ -45,9 +45,9 @@
     font-size: 18px;
 }
 .btnStyle{
-    padding: 6px;
-    margin-left: 303px;
-    margin-top: 15px;
+    margin-top: 6%;
+    float: right;
+    margin-right: 6%;
 }
 
 

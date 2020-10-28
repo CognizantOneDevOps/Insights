@@ -40,6 +40,7 @@ export class InsightsInitService {
     static enableInsightsToolbar = true;
     static isDebugModeEnable = false;
     static enableLogoutButton = true;
+    static version;
 
     constructor(location: Location, private http: HttpClient,
         private imageHandler: ImageHandlerService, private logger: LogService) {
@@ -58,12 +59,14 @@ export class InsightsInitService {
         InsightsInitService.configDesc = gentConfigResponse.desriptions;
 
     }
-
     private async loadUiServiceLocation() {
-        var self = this;
+        var self = this; 
+        var versionJsonUrl = "config/version.json"
+        let versionJsonResponse = await this.getJSONUsingObservable(versionJsonUrl).toPromise();
+        InsightsInitService.version=versionJsonResponse.uiVersion;
+
         var uiConfigJsonUrl = "config/uiConfig.json"
         let UIConfigResponse = await this.getJSONUsingObservable(uiConfigJsonUrl).toPromise();
-
         if (UIConfigResponse.serviceHost == undefined && InsightsInitService.serviceHost == undefined) {
             InsightsInitService.serviceHost = window.location.protocol + "//" + window.location.hostname + ":" + window.location.port;
         } else {
@@ -100,7 +103,6 @@ export class InsightsInitService {
         this.imageHandler.initializeImageIcons();
         this.imageHandler.addPathIconRegistry();
     }
-
     public static getServiceHost(): String {
         return InsightsInitService.serviceHost;
     }

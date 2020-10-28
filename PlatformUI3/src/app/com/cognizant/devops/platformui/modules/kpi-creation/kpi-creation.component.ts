@@ -53,14 +53,14 @@ export class KpiCreationComponent implements OnInit {
 
   addnewKpi() {
     this.kpiService.setType("ADD");
-    this.router.navigateByUrl('InSights/Home/kpiaddition');
+    this.router.navigate(['InSights/Home/kpiaddition'],{skipLocationChange:true});
   }
   uploadFile() {
     this.contentService.setFileType('KPI');
     this.dialog.open(FileUploadDialog, {
       panelClass: 'DialogBox',
       width: '34%',
-      height: '25%',
+      height: '27%',
       disableClose: false,
     });
   }

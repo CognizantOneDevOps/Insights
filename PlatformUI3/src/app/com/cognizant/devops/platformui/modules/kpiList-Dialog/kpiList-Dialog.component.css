@@ -15,9 +15,10 @@
     color: white;
     margin-left: 90px;
 }
-.closeIconCss {
+.kpicloseIconCss {
     color: white;
-    margin:2%
+    margin:2%;
+    padding-left: 77px;
 }
 .dialogtableHeaderCss {
     background-color: grey;

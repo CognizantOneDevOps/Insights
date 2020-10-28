@@ -277,7 +277,7 @@ export class ContentConfigAddition implements OnInit {
 
   saveContentData() {
     var self = this;
-    var dialogmessage = " You have created a new Content <b>" + this.kpiId + "</b> .Do you want continue? "
+    var dialogmessage = " You have created a new Content <b>" + this.contentId + "</b> .Do you want continue? "
     var title = "Save Content ";
     const dialogRef = this.messageDialog.showConfirmationMessage(title, dialogmessage, "", "ALERT", "40%");
     dialogRef.afterClosed().subscribe(result => {
@@ -286,15 +286,12 @@ export class ContentConfigAddition implements OnInit {
           .then(function (response) {
             let res = response;
             if (response.status == "success") {
-              setTimeout(() => { self.messageDialog.showApplicationsMessage("<b>" + "Kpi with id " + self.kpiId + "</b> created successfully.", "SUCCESS") }, 500);
+              setTimeout(() => { self.messageDialog.showApplicationsMessage("<b>" + "Content with id " + self.contentId + "</b> created successfully.", "SUCCESS") }, 500);
               self.router.navigateByUrl('InSights/Home/contentConfig');
               self.type = "EDIT";
-            } else if (response.message === "KPI already exists") {
-              self.messageDialog.showApplicationsMessage("<b>" + "Kpi Id" + self.kpiId + "</b> already exists. Please try again with a new Id.", "ERROR");
-            } else if (response.message === "kpi Definition does not have some mandatory field") {
-              self.messageDialog.showApplicationsMessage("Kpi Definition does not have some mandatory field.", "ERROR");
-            } else {
-              self.messageDialog.showApplicationsMessage("Failed to save the Kpi.Please check logs.", "ERROR");
+            } else{
+              debugger;
+              self.messageDialog.showApplicationsMessage("<b>" + response.message, "ERROR");
             }
           })
       }

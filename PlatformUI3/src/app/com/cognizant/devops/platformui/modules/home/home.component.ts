@@ -342,15 +342,6 @@ export class HomeComponent implements OnInit {
             isAdminMenu: true
           },
           {
-            displayName: 'Bulk Upload',
-            iconName: 'feature',
-            route: 'InSights/Home/bulkupload',
-            isToolbarDisplay: InsightsInitService.enableInsightsToolbar,
-            showMenu: true,
-            title: "Bulk Upload",
-            isAdminMenu: true
-          },
-          {
             displayName: 'Webhook Configuration',
             iconName: 'feature',
             route: 'InSights/Home/webhook',
@@ -360,12 +351,12 @@ export class HomeComponent implements OnInit {
             isAdminMenu: true
           },
           {
-            displayName: 'Business Mapping',
+            displayName: 'Bulk Upload',
             iconName: 'feature',
-            route: 'InSights/Home/businessmapping',
+            route: 'InSights/Home/bulkupload',
             isToolbarDisplay: InsightsInitService.enableInsightsToolbar,
-            showMenu: InsightsInitService.showBusinessMapping,
-            title: "Business Mapping",
+            showMenu: true,
+            title: "Bulk Upload",
             isAdminMenu: true
           },
           {
@@ -387,23 +378,15 @@ export class HomeComponent implements OnInit {
             isAdminMenu: true
           },
           {
-            displayName: 'Logo Setting',
+            displayName: 'Business Mapping',
             iconName: 'feature',
-            route: 'InSights/Home/logoSetting',
+            route: 'InSights/Home/businessmapping',
             isToolbarDisplay: InsightsInitService.enableInsightsToolbar,
-            showMenu: true,
-            title: "Logo Setting",
+            showMenu: InsightsInitService.showBusinessMapping,
+            title: "Business Mapping",
             isAdminMenu: true
           },
           {
-            displayName: 'Data Archival',
-            iconName: 'feature',
-            route: 'InSights/Home/dataarchiving',
-            isToolbarDisplay: InsightsInitService.enableInsightsToolbar,
-            showMenu: true,
-            title: "Data Archival",
-            isAdminMenu: true
-          },{
             displayName: 'Report Configuration',
             iconName: 'feature',
             isToolbarDisplay: InsightsInitService.enableInsightsToolbar,
@@ -428,10 +411,36 @@ export class HomeComponent implements OnInit {
                 showMenu: true,
                 title: "Content Configuration",
                 isAdminMenu: false
+              },
+              {
+                displayName: 'Report Template',
+                iconName: 'feature',
+                route: 'InSights/Home',
+                isToolbarDisplay: InsightsInitService.enableInsightsToolbar,
+                showMenu: true,
+                title: "Report Template",
+                isAdminMenu: false
               }
             ]
           },
-          
+          {
+            displayName: 'Logo Setting',
+            iconName: 'feature',
+            route: 'InSights/Home/logoSetting',
+            isToolbarDisplay: InsightsInitService.enableInsightsToolbar,
+            showMenu: true,
+            title: "Logo Setting",
+            isAdminMenu: true
+          },
+          {
+            displayName: 'Data Archival',
+            iconName: 'feature',
+            route: 'InSights/Home/dataarchiving',
+            isToolbarDisplay: InsightsInitService.enableInsightsToolbar,
+            showMenu: true,
+            title: "Data Archival",
+            isAdminMenu: true
+          },         
         ]
       }
     ];
