@@ -19,10 +19,11 @@ import com.cognizant.devops.platformauditing.api.InsightsAudit;
 import com.cognizant.devops.platformauditing.api.InsightsAuditImpl;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.google.gson.JsonObject;
-import org.springframework.stereotype.Service;
 
-import static com.cognizant.devops.auditservice.audit.utils.AuditServiceUtil.parseHistory;
-import static com.cognizant.devops.auditservice.audit.utils.AuditServiceUtil.parseOutput;
+import static com.cognizant.devops.platformauditing.util.AuditServiceUtil.parseHistory;
+import static com.cognizant.devops.platformauditing.util.AuditServiceUtil.parseOutput;
+
+import org.springframework.stereotype.Service;
 
 @Service("auditService")
 public class AuditServiceImpl implements  AuditService{

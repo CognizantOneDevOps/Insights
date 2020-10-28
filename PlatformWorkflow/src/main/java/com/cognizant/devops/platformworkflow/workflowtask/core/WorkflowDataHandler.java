@@ -42,7 +42,7 @@ public class WorkflowDataHandler {
 
 	private static final Logger log = LogManager.getLogger(WorkflowDataHandler.class);
 
-	public static Map<Integer, WorkflowTaskSubscriberHandler> registry = new HashMap<>(0);
+	protected static Map<Integer, WorkflowTaskSubscriberHandler> registry = new HashMap<>(0);
 
 	WorkflowDAL workflowDAL = new WorkflowDAL();
 
@@ -226,7 +226,6 @@ public class WorkflowDataHandler {
 	 * @return
 	 */
 	public int saveWorkflowExecutionHistory(Map<String, Object> requestMessage) {
-		//log.debug(" Worlflow Detail ==== saveWorkflowExecutionHistory started ");
 
 		String workflowId = String.valueOf(requestMessage.get("workflowId"));
 		InsightsWorkflowConfiguration workflowConfig = workflowDAL
@@ -255,7 +254,6 @@ public class WorkflowDataHandler {
 	 * @param statusLog
 	 */
 	public void updateWorkflowExecutionHistory(int historyId, String status, String statusLog) {
-		//log.debug(" Worlflow Detail ==== updateWorkflowExecutionHistory start ");
 
 		InsightsWorkflowExecutionHistory historyConfig = workflowDAL.getWorkflowExecutionHistoryByHistoryId(historyId);
 		historyConfig.setEndTime(System.currentTimeMillis());
@@ -279,7 +277,6 @@ public class WorkflowDataHandler {
 			String workflowId = String.valueOf(requestMessage.get("workflowId"));
 			InsightsWorkflowTask insightsWorkflowTaskEntity = workflowDAL
 					.getTaskByTaskId((int) requestMessage.get("nextTaskId"));
-			//log.debug("Worlflow Detail ==== workflowId {}  ", workflowId);
 			InsightsWorkflowTaskSequence currentTaskSequence = workflowDAL
 					.getWorkflowTaskSequenceByWorkflowAndTaskId(workflowId, (int) requestMessage.get("currentTaskId"));
 			InsightsWorkflowTaskSequence nextTaskSequence = workflowDAL
@@ -316,7 +313,6 @@ public class WorkflowDataHandler {
 	 */
 	public void updateWorkflowDetails(String workflowId, String status, boolean isUpdateLastRunTime) {
 
-		//log.debug(" Worlflow Detail ==== updateWorkflowStatus  started ");
 		InsightsWorkflowConfiguration workflowConfig = workflowDAL.getWorkflowConfigByWorkflowId(workflowId);
 		boolean runImmediate = workflowConfig.isRunImmediate();
 		workflowConfig.setRunImmediate(Boolean.FALSE);
@@ -348,7 +344,6 @@ public class WorkflowDataHandler {
 	 * @param statusLog
 	 */
 	public void updateRetryWorkflowExecutionHistory(int historyId, String workflowId, String status, String statusLog) {
-		//log.debug(" Worlflow Detail ==== updateWorkflowExecutionHistory start ");
 
 		InsightsWorkflowExecutionHistory historyConfig = workflowDAL.getWorkflowExecutionHistoryByHistoryId(historyId);
 		if (status.equalsIgnoreCase(WorkflowTaskEnum.WorkflowStatus.IN_PROGRESS.toString())) {
@@ -373,13 +368,23 @@ public class WorkflowDataHandler {
 	 * @param sequence
 	 * @param mqRequestJson
 	 */
-	public void createTaskRequestJson(long executionId, String WorkflowId, int currentTaskId, int nextTaskId,
+	public void createTaskRequestJson(long executionId, String workflowId, int currentTaskId, int nextTaskId,
 			int sequence, JsonObject mqRequestJson) {
 		mqRequestJson.addProperty("executionId", executionId);
-		mqRequestJson.addProperty("workflowId", WorkflowId);
+		mqRequestJson.addProperty("workflowId", workflowId);
 		mqRequestJson.addProperty("currentTaskId", currentTaskId);
 		mqRequestJson.addProperty("nextTaskId", nextTaskId);
 		mqRequestJson.addProperty("sequence", sequence);
 		mqRequestJson.addProperty(WorkflowUtils.RETRY_JSON_PROPERTY, false);
 	}
+
+	public static Map<Integer, WorkflowTaskSubscriberHandler> getRegistry() {
+		return registry;
+	}
+
+	public static void setRegistry(Map<Integer, WorkflowTaskSubscriberHandler> registry) {
+		WorkflowDataHandler.registry = registry;
+	}
+	
+	
 }

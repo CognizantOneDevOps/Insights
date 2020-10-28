@@ -104,7 +104,7 @@ public class InsightsSecurityConfigurationAdapterKerberos extends WebSecurityCon
 			LOG.debug("message Inside SAMLAuthConfig, check http security **** ");
 
 			http.cors();
-			http.csrf().ignoringAntMatchers(AuthenticationUtils.CSRF_IGNORE)
+			http.csrf().ignoringAntMatchers(AuthenticationUtils.CSRF_IGNORE.toArray(new String[0]))
 					.csrfTokenRepository(authenticationUtils.csrfTokenRepository())
 					.and().addFilterAfter(new InsightsCustomCsrfFilter(), CsrfFilter.class);
 

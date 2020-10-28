@@ -19,8 +19,6 @@ package com.cognizant.devops.auditservice.audit.controller;
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.List;
-import java.util.Map;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -39,13 +37,10 @@ import org.springframework.web.bind.annotation.RestController;
 import com.cognizant.devops.auditservice.audit.report.AuditReportScheduler;
 import com.cognizant.devops.auditservice.audit.service.AuditService;
 import com.cognizant.devops.auditservice.audit.service.PdfWriter;
-import com.cognizant.devops.platformservice.querybuilder.controller.QueryBuilderController;
 import com.cognizant.devops.platformservice.rest.util.PlatformServiceUtil;
-import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 
 @RestController
 @RequestMapping("traceability")
@@ -111,15 +106,11 @@ public class AuditController {
 	 */
 	@RequestMapping(value = "/getAuditReport", method = RequestMethod.POST)
 	@ResponseBody
-	public ResponseEntity<byte[]> getAuditReport(@RequestBody Map assetsResults,@RequestParam String pdfName) {
+	public ResponseEntity<byte[]> getAuditReport(@RequestBody JsonObject assetsResults,@RequestParam String pdfName) {
 		ResponseEntity<byte[]>  response = null;
 		try {
 			boolean validInput = false;
-	        String jsonStr =  new Gson().toJson(assetsResults);
-	        JsonParser jsonParser = new JsonParser(); 
-			JsonElement jsonElements = jsonParser.parse(jsonStr);
-			JsonObject jsonObject = jsonElements.getAsJsonObject();
-			JsonArray jsonarray = jsonObject.get("data").getAsJsonArray();
+			JsonArray jsonarray = assetsResults.get("data").getAsJsonArray();
 			for(JsonElement jsonelement: jsonarray) {
 				JsonObject element = jsonelement.getAsJsonObject();
 				if(element.has("timestamp") && element.get("timestamp")!=null &&
@@ -128,8 +119,7 @@ public class AuditController {
 				}
 			}
 			if(validInput) {
-				List<Map> assetList = (List<Map>) assetsResults.get("data");
-				byte[] fileContent = pdfWriterImpl.generatePdf(assetList, pdfName);
+				byte[] fileContent = pdfWriterImpl.generatePdf(jsonarray, pdfName);
 				HttpHeaders headers = new HttpHeaders();
 				headers.setContentType(MediaType.parseMediaType("application/pdf"));
 				headers.add("Access-Control-Allow-Methods", "POST");
@@ -143,7 +133,7 @@ public class AuditController {
 				throw new Exception("Invalid Response from Ledger , No timestamp found!");
 			}
 		} catch (Exception e) {
-			Log.error("Error, Failed to download pdf -- " + pdfName, e.getMessage());
+			Log.error("Error, Failed to download pdf -- {} " , pdfName, e.getMessage());
 		}
 		return response;
 	}

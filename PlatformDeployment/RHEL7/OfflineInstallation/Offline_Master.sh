@@ -120,7 +120,7 @@ if [ -d "$DIRECTORY" ]; then
 				chkconfig Neo4j on
 				service Neo4j start
 				sleep 20
-				curl -X POST -u neo4j:neo4j -H "Content-Type: application/json" -d '{"password":"C0gnizant@1"}' http://localhost:7474/user/neo4j/password
+				
                                 sleep 10
 		}
 		installPostgres()

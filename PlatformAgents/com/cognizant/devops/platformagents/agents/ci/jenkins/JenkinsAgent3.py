@@ -82,16 +82,6 @@ class JenkinsAgent(BaseAgent):
                             self.getJobDetails(url, lastBuildNumber, jobName)
                 else:
                     self.processFolder(url)
-            #for projects in range(len(jenkinsProjects["jobs"])):
-            #   if "buildable" in jenkinsProjects["jobs"][projects]:
-            #        jobUrl = jenkinsProjects["jobs"][projects]["url"]
-            #        if "lastBuild" in jenkinsProjects["jobs"][projects] and jenkinsProjects["jobs"][projects]["lastBuild"] is not None:
-            #            lastBuild = jenkinsProjects["jobs"][projects]["lastBuild"]["number"]
-            #            jobName = jenkinsProjects["jobs"][projects].get('name', None)
-            #            self.getJobDetails(jobUrl, lastBuild, jobName)
-            #    else:
-            #        folderUrl = jenkinsProjects["jobs"][projects]["url"]
-            #        self.processFolder(folderUrl)
         else:
             restUrl = url + 'api/json?tree=lastBuild[number],url,name'
             jenkinsProjects = self.getResponse(restUrl, 'GET', self.userid, self.passwd, None)
@@ -115,7 +105,7 @@ class JenkinsAgent(BaseAgent):
         injectData['jobName'] = jobName
         if self.tracking.get(self.currentJenkinsMaster, {}).get(url,None):
             trackingNum = self.tracking.get(self.currentJenkinsMaster).get(url)
-            tillJobCount = lastBuild - trackingNum
+            tillJobCount = lastBuild - int(trackingNum)
         else:
             while not buildsIdentified:
                 restUrl = url+'api/json?tree='+self.buildsApiName+'[number,timestamp,duration]{'+str(nextBatch)+','+str(nextBatch+100)+'},name'
@@ -159,11 +149,13 @@ class JenkinsAgent(BaseAgent):
                 buildDetails = self.processLogParsing(buildDetails)
                 self.publishToolsData(buildDetails)
                 if not trackingUpdated:
-                    self.updateTrackingDetails(url, completedBuilds[0]["number"])
+                    if "id" in completedBuilds[0]:
+
+                        self.updateTrackingDetails(url, completedBuilds[0]["number"])
                     trackingUpdated = True
             start = start + 100
     
-    def processLogParsing(self, buildDetails):
+    def processLogParsing(self, buildDetails):            
         return buildDetails
     
     def updateTrackingDetails(self, buildUrl, buildNumber):
@@ -213,7 +205,10 @@ class JenkinsAgent(BaseAgent):
             if element is not None:
                 injectData[key] = element.text
         return injectData
-
+    def getBuildLog(self,url):
+        auth = HTTPBasicAuth(self.userid, self.passwd)
+        response = requests.get(url, auth=auth)
+        return response.content.decode('utf-8')
 
 if __name__ == "__main__":
     JenkinsAgent()

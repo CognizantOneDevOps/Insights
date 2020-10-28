@@ -24,19 +24,16 @@ sudo echo GRAFANA_HOME=`pwd` | sudo tee -a /etc/environment
 sudo echo "export" GRAFANA_HOME=`pwd` | sudo tee -a /etc/profile
 source /etc/environment
 source /etc/profile
-sudo wget https://platform.cogdevops.com/insights_install/installationScripts/latest/RHEL/grafana/grafana-5.2.2.tar.gz
+sudo wget https://infra.cogdevops.com:8443/repository/docroot/insights_install/installationScripts/latest/Ubuntu/packages/grafana/grafana.tar.gz
 sudo tar -zxvf grafana-5.2.2.tar.gz
 GRAFANA_DIR=$GRAFANA_HOME/grafana-5.2.2
 echo $GRAFANA_DIR
-sudo wget https://platform.cogdevops.com/insights_install/installationScripts/latest/RHEL/grafana/ldap.toml
+sudo wget https://infra.cogdevops.com:8443/repository/docroot/insights_install/installationScripts/latest/Ubuntu/packages/grafana/ldap.toml
 sudo cp ldap.toml $GRAFANA_DIR/conf/ldap.toml
-sudo wget https://platform.cogdevops.com/insights_install/installationScripts/latest/RHEL/grafana/defaults.ini
+sudo wget https://infra.cogdevops.com:8443/repository/docroot/insights_install/installationScripts/latest/Ubuntu/packages/grafana/defaults.ini
 sudo cp defaults.ini $GRAFANA_DIR/conf/defaults.ini
 cd $GRAFANA_DIR
 echo 'pwd'
 sudo nohup ./bin/grafana-server &
 echo $! > grafana-pid.txt
-sleep 10
-curl -X POST -u admin:admin -H "Content-Type: application/json" -d '{"name":"PowerUser","email":"PowerUser@PowerUser.com","login":"PowerUser","password":"C0gnizant@1"}' http://localhost:3000/api/admin/users
-sleep 10
 cd ..

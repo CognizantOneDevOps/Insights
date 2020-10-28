@@ -16,9 +16,11 @@
 package com.cognizant.devops.platformworkflow.test;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Map;
 import java.util.Set;
 
 import javax.mail.internet.AddressException;
@@ -46,6 +48,8 @@ import com.cognizant.devops.platformdal.workflow.WorkflowDAL;
 import com.cognizant.devops.platformworkflow.workflowtask.core.WorkflowDataHandler;
 import com.cognizant.devops.platformworkflow.workflowtask.email.MailReport;
 import com.cognizant.devops.platformworkflow.workflowtask.message.factory.WorkflowTaskSubscriberHandler;
+import com.cognizant.devops.platformworkflow.test.WorkflowTestFailTaskSubscriber;
+import com.cognizant.devops.platformworkflow.test.WorkflowTestTaskSubscriber;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -429,10 +433,12 @@ public class WorkflowTestData {
 
 	public void initializeTask() {
 		try {
+			Map<Integer, WorkflowTaskSubscriberHandler> registry = new HashMap<>();
 			WorkflowTaskSubscriberHandler testsubscriberobject = new WorkflowTestTaskSubscriber(mqChannel);
-			WorkflowDataHandler.registry.put(getTaskId(mqChannel), testsubscriberobject);
+			registry.put(getTaskId(mqChannel), testsubscriberobject);
 			WorkflowTaskSubscriberHandler testFailsubscriberobject = new WorkflowTestFailTaskSubscriber(mqChannelFail);
-			WorkflowDataHandler.registry.put(getTaskId(mqChannelFail), testFailsubscriberobject);
+			registry.put(getTaskId(mqChannelFail), testFailsubscriberobject);
+			WorkflowDataHandler.setRegistry(registry);
 
 			Thread.sleep(1000);
 		} catch (Exception e) {

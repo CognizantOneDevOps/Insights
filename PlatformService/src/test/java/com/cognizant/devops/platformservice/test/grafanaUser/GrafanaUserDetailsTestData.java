@@ -19,17 +19,17 @@ import javax.servlet.http.Cookie;
 
 public class GrafanaUserDetailsTestData {
 
-	Cookie[] cookies = { new Cookie("JSESSIONID", "=token"), new Cookie("grafanaOrg", "1"),
-			new Cookie("grafanaRole", "Admin"), new Cookie("XSRF-TOKEN", "token") };
+	Cookie[] cookies = { new Cookie("JSESSIONID", ""), new Cookie("grafanaOrg", "1"),
+			new Cookie("grafanaRole", "Admin"), new Cookie("XSRF-TOKEN", "") };
 
 	String accept = "application/json, text/plain, */*";
-	String authorization = "token";
+	String authorization = "";
 	String origin = "http://localhost:8181";
 	String referer = "http://localhost:8181/app";
 	String contentType = "application/json";
-	String XSRFTOKEN = "token";
+	String XSRFTOKEN = "";
 
-	String authorizationException = "token";
+	String authorizationException = "";
 	String host = "insights.cogdevops.com";
 	String contentTypeException = "application/json";
 }

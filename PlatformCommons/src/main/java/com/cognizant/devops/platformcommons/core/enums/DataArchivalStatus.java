@@ -19,7 +19,8 @@ public enum DataArchivalStatus {
 	
 	ACTIVE("ACTIVE"),
 	INACTIVE("INACTIVE"),
-	INPROGRESS("INPROGRESS");
+	INPROGRESS("INPROGRESS"),
+	ERROR("ERROR");
 	
 	private String value;
 	

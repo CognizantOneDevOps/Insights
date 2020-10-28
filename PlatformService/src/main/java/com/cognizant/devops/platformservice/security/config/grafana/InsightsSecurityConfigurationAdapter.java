@@ -37,6 +37,7 @@ import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.ldap.DefaultSpringSecurityContextSource;
 import org.springframework.security.web.DefaultSecurityFilterChain;
 import org.springframework.security.web.FilterChainProxy;
@@ -57,7 +58,7 @@ import com.cognizant.devops.platformservice.security.config.InsightsResponseHead
 @Conditional(InsightsNativeBeanInitializationCondition.class)
 public class InsightsSecurityConfigurationAdapter extends WebSecurityConfigurerAdapter {
 
-	private static Logger LOG = LogManager.getLogger(InsightsSecurityConfigurationAdapter.class);
+	private static Logger log = LogManager.getLogger(InsightsSecurityConfigurationAdapter.class);
 
 	@Autowired
 	private SpringAccessDeniedHandler springAccessDeniedHandler;
@@ -70,25 +71,25 @@ public class InsightsSecurityConfigurationAdapter extends WebSecurityConfigurerA
 
 	DefaultSpringSecurityContextSource contextSource;
 
-	String AUTH_TYPE = "NativeGrafana";
+	private static final String AUTH_TYPE = "NativeGrafana";
 
 	@Override
 	protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-		LOG.debug("message Inside InsightsSecurityConfigurationAdapter, AuthenticationManagerBuilder **** {} ",
+		log.debug("message Inside InsightsSecurityConfigurationAdapter, AuthenticationManagerBuilder **** {} ",
 				ApplicationConfigProvider.getInstance().getAutheticationProtocol());
 		if (AUTH_TYPE.equalsIgnoreCase(ApplicationConfigProvider.getInstance().getAutheticationProtocol())) {
-			LOG.debug("message Inside InsightsSecurityConfigurationAdapter, check authentication provider **** ");
+			log.debug("message Inside InsightsSecurityConfigurationAdapter, check authentication provider **** ");
 			ApplicationConfigProvider.performSystemCheck();
-			auth.userDetailsService(userDetailsService);
+			auth.userDetailsService(userDetailsService).passwordEncoder(new BCryptPasswordEncoder());
 		}
 	}
 
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
-		LOG.debug("message Inside InsightsSecurityConfigurationAdapter ,HttpSecurity **** {} ",
+		log.debug("message Inside InsightsSecurityConfigurationAdapter ,HttpSecurity **** {} ",
 				ApplicationConfigProvider.getInstance().getAutheticationProtocol());
 		if (AUTH_TYPE.equalsIgnoreCase(ApplicationConfigProvider.getInstance().getAutheticationProtocol())) {
-			LOG.debug("message Inside InsightsSecurityConfigurationAdapter,HttpSecurity check **** ");
+			log.debug("message Inside InsightsSecurityConfigurationAdapter,HttpSecurity check **** ");
 
 			http.cors().and().authorizeRequests().antMatchers("/datasources/**").permitAll().antMatchers("/admin/**")
 					.access("hasAuthority('Admin')").antMatchers("/traceability/**").access("hasAuthority('Admin')")
@@ -96,7 +97,7 @@ public class InsightsSecurityConfigurationAdapter extends WebSecurityConfigurerA
 					.and().exceptionHandling().accessDeniedHandler(springAccessDeniedHandler).and().httpBasic()
 					.disable()
 
-					.csrf().ignoringAntMatchers(AuthenticationUtils.CSRF_IGNORE)
+					.csrf().ignoringAntMatchers(AuthenticationUtils.CSRF_IGNORE.toArray(new String[0]))
 					.csrfTokenRepository(authenticationUtils.csrfTokenRepository()).and()
 					.addFilterBefore(insightsFilter(), BasicAuthenticationFilter.class)
 
@@ -123,7 +124,7 @@ public class InsightsSecurityConfigurationAdapter extends WebSecurityConfigurerA
 	@Bean
 	@Conditional(InsightsNativeBeanInitializationCondition.class)
 	public FilterChainProxy insightsFilter() throws Exception {
-		LOG.debug("message Inside FilterChainProxy, initial bean InsightsSecurityConfigurationAdapter **** ");
+		log.debug("message Inside FilterChainProxy, initial bean InsightsSecurityConfigurationAdapter **** ");
 
 		List<Filter> filters = new ArrayList<>();
 		filters.add(0, new InsightsCustomCsrfFilter());
@@ -144,8 +145,7 @@ public class InsightsSecurityConfigurationAdapter extends WebSecurityConfigurerA
 	 * @throws Exception
 	 */
 	public InsightsAuthenticationFilter insightsProcessingFilter() throws Exception {
-		InsightsAuthenticationFilter filter = new InsightsAuthenticationFilter("/**", authenticationManager());
-		return filter;
+		return new InsightsAuthenticationFilter("/**", authenticationManager());
 	}
 
 	/**

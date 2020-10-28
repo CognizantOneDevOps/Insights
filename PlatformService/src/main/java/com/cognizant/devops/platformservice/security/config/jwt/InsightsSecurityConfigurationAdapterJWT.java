@@ -94,7 +94,7 @@ public class InsightsSecurityConfigurationAdapterJWT extends WebSecurityConfigur
 					.and().exceptionHandling().accessDeniedHandler(springAccessDeniedHandler).and().httpBasic()
 					.disable()
 
-					.csrf().ignoringAntMatchers(AuthenticationUtils.CSRF_IGNORE)
+					.csrf().ignoringAntMatchers(AuthenticationUtils.CSRF_IGNORE.toArray(new String[0]))
 					.csrfTokenRepository(authenticationUtils.csrfTokenRepository()).and()
 					.addFilterBefore(insightsFilter(), BasicAuthenticationFilter.class)
 

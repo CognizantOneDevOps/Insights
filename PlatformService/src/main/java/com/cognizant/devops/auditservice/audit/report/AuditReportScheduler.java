@@ -46,6 +46,7 @@ import com.google.gson.JsonParser;
  * Runs everyday Midnight to Fetch Query_builder table records .
  * 
  */
+@Deprecated
 @Component
 @Configuration
 @EnableScheduling

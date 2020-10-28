@@ -22,7 +22,7 @@ source /etc/environment
 cd /opt
 sudo mkdir NEO4J_HOME
 cd NEO4J_HOME
-sudo wget https://platform.cogdevops.com/insights_install/installationScripts/latest/RHEL/neo4j/neo4j-Insights.tar.gz
+sudo wget https://infra.cogdevops.com:8443/repository/docroot/insights_install/installationScripts/latest/RHEL/neo4j/neo4j-Insights.tar.gz
 sudo tar -xzf neo4j-Insights.tar.gz
 sudo chmod -R 755 neo4j-Insights
 cd neo4j-Insights
@@ -40,7 +40,7 @@ source /etc/profile
 sleep 10
 sudo chmod -R 777 /opt/NEO4J_HOME
 cd /etc/init.d/
-sudo wget https://platform.cogdevops.com/insights_install/installationScripts/latest/RHEL/initscripts/Neo4j.sh
+sudo wget https://infra.cogdevops.com:8443/repository/docroot/insights_install/installationScripts/latest/RHEL/initscripts/Neo4j.sh
 sudo mv Neo4j.sh Neo4j
 sudo chmod +x Neo4j
 sudo chkconfig Neo4j on

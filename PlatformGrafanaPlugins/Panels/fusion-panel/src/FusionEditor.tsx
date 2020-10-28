@@ -1,55 +1,199 @@
 import React, { PureComponent } from 'react';
 import { PanelEditorProps } from '@grafana/data';
 import { ChartOptions } from './ChartOptions';
-import { Select, InlineFormLabel, LegacyForms, ColorPicker } from '@grafana/ui';
+import { Select, InlineFormLabel, LegacyForms, ColorPicker, Button, Drawer, JSONFormatter, TabsBar, TabContent, Tab, Spinner } from '@grafana/ui';
+import ClipboardJS from 'clipboard';
+import { CopyToClipboard } from 'react-copy-to-clipboard';
+//import classNames from 'classnames';
 
 import OptionsGroup from './OptionsGroup';
+//import { ResponsiveButton } from './ResponsiveButton';
+import { UseState } from './UseState';
+
 
 import { chartTypes, fontFamily, FontSizes, captionAlignment, axisPositions, themes, rotateValues, labels, pieAndDoughnutCharts, multiSeries, valuePositions, multiSeriesChats, combinationCharts, combinationWithLine, widgetCharts } from 'types';
-import { onTextChange, onClick, onChartTypeChanged, onValueChanged, onChanged, onSwitched } from './SingleSeriesEditorUtils';
-import { onGraphModeChanged } from 'MultiSeriesEditorUtils';
-import { onCombinationTypeChanged } from 'CombinationSeriesEditorUtils';
-import { onPropsTextChange, onPropsApplyClick, onWidgetTypeChanged } from 'WidgetEditorUtils';
-import { onAddRemoveChange, onNodeClick} from 'AddRemoveEditorUtils';
+import { onTextChange, onClick, onChartTypeChanged, onValueChanged, onChanged, onSwitched, onDrillChange, onLevel2ChartTypeChanged, onLevel3ChartTypeChanged, onLevel3DrillChange, onLevel2ChartPropertiesChange, onLevel3ChartPropertiesChange } from './SingleSeriesEditorUtils';
+import { onGraphModeChanged, onLevel2GraphModeChanged, onLevel3GraphModeChanged } from 'MultiSeriesEditorUtils';
+import { onCombinationTypeChanged, onLevel2CombinationTypeChanged, onLevel3CombinationTypeChanged } from 'CombinationSeriesEditorUtils';
+import { onPropsTextChange, onWidgetTypeChanged } from 'WidgetEditorUtils';
+import { onAddRemoveChange } from 'AddRemoveEditorUtils';
+import { getTemplateSrv, getBackendSrv } from '@grafana/runtime';
+import { addTimestampToQuery, convertResponseToDataFramesTable } from 'DrillDownUtil';
 
-export class FusionEditor extends PureComponent<PanelEditorProps<ChartOptions>> {
+
+interface State {
+    close: boolean;
+    copied: boolean;
+    loader: boolean;
+}
+export class FusionEditor extends PureComponent<PanelEditorProps<ChartOptions>, State> {
+    clipboardjs?: ClipboardJS;
+
+    constructor(props: any) {
+        super(props);
+        this.state = {
+            close: false,
+            copied: false,
+            loader: false,
+        }
+    }
+
 
     render() {
         const { FormField, Switch } = LegacyForms;
         const { options } = this.props;
+        const tabs = [
+            { label: 'Level-2', key: 'first', active: true },
+            { label: 'Level-3', key: 'second', active: false }
+        ];
+        const drillLabels = fetchDrillDownLabels(this.props);
+        //console.log('drillLabels--', drillLabels);
+
         return (<>
-            
 
-            {/*Advance View*/}
-            <OptionsGroup title="Advanced view" key="Advanced view" defaultToClosed={true}>
-                <div className="gf-form-inline">
-                    <div className="gf-form gf-form--grow">
-                        <textarea rows={11} className="gf-form-input width-100 max-height-400px"
-                            onChange={(e) => onTextChange(e, this.props)}
-                            placeholder="{'caption':'Test Caption'}" value={options.atext} required />
-                    </div>
-                </div>
-                <button className="btn btn-success" onClick={(e) => onClick(e, this.props)} type="submit" disabled={options.btnEnabled}> Apply</button>
-            </OptionsGroup>
+            {/*DrillDown*/}
+            <OptionsGroup title="Drill down" key="Drill down" defaultToClosed={true}>
 
-            <OptionsGroup title="Static Properties" key="Static Properties" defaultToClosed={true}>
-                <div className="gf-form-inline">
-                    <div className="gf-form gf-form--grow">
-                        <textarea rows={11} className="gf-form-input width-100 max-height-400px"
-                            onChange={(e) => onPropsTextChange(e, this.props)}
-                            value={options.staticProps} required
-                        />
-                    </div>
-                </div>
-                <button className="btn btn-success" onClick={(e) => onPropsApplyClick(e, this.props)} type="submit" disabled={options.SbtnEnabled}>Apply</button>
+                <Switch label="Enable DrillDown" labelClass="width-8" checked={options.enableDrillDown} onChange={(e) => onSwitched('enableDrillDown', e, this.props)} />
+                
+                {this.props.options.enableDrillDown && <div>
+                    <Switch label="Enable Level3" labelClass="width-8" checked={options.enableLevel3} onChange={(e) => onSwitched('enableLevel3', e, this.props)} />
+                    {this.state.close &&
+                        <Drawer title="Neo4j Response" subtitle="Raw response from neo4j database." onClose={() => { this.openResult() }}>
+                            <CopyToClipboard onCopy={() => this.setState({ copied: true })} text={JSON.stringify(options.drillDownResponse)}>
+                                <Button icon="copy" variant="secondary">Copy to clipboard</Button>
+                            </CopyToClipboard>
+                            {this.state.copied ? <span style={{ color: 'green', paddingLeft: '15px', fontSize: '15px', fontWeight: 'bolder' }}>Response Copied.</span> : null}
+                            {!this.state.loader && <div style={{ border: '1px solid gray', borderRadius: '4px', paddingLeft: '5%', paddingTop: '5%' }}><JSONFormatter json={options.drillDownResponse} /></div>}
+                            {this.state.loader && <div style={{ border: '0px solid gray', borderRadius: '4px', padding: '20%', paddingLeft: '50%' }}><Spinner /></div>}
+                        </Drawer>
+                    }
+                    <UseState initialState={tabs}>
+                        {(state, updateState) => {
+                            return (
+                                <div>
+                                    <TabsBar>
+                                        {state.map((tab, index) => {
+                                            return (
+                                                <Tab
+                                                    key={index}
+                                                    label={tab.label}
+                                                    active={tab.active}
+                                                    onChangeTab={() => updateState(state.map((tab, idx) => ({ ...tab, active: idx === index })))}
+                                                //counter={index}
+                                                />
+                                            );
+                                        })}
+                                    </TabsBar>
+                                    <TabContent>
+                                        {state[0].active && <div>
+                                            <div className="form-field">
+                                                <InlineFormLabel width={12}>Single Series Chart Type</InlineFormLabel>
+                                                <Select width={25} options={chartTypes} defaultValue={chartTypes[0]}
+                                                    onChange={(e) => onLevel2ChartTypeChanged(e, this.props)}
+                                                    value={chartTypes.find(item => item.value === options.level2ChartType)}></Select>
+                                            </div>
+                                            <div className="form-field">
+                                                <InlineFormLabel width={12}>MultiSeries Chart Type</InlineFormLabel>
+                                                <Select width={25} options={multiSeries}
+                                                    onChange={(e) => onLevel2GraphModeChanged(e, this.props)}
+                                                    value={multiSeries.find(item => item.value === options.level2ChartType)}></Select>
+
+                                            </div>
+                                            <div className="form-field">
+                                                <InlineFormLabel width={12}>Combination Series Chart Type</InlineFormLabel>
+                                                <Select width={40} options={combinationCharts}
+                                                    onChange={(e) => onLevel2CombinationTypeChanged(e, this.props)}
+                                                    value={combinationCharts.find(item => item.value === options.level2ChartType)}></Select>
+                                            </div>
+                                            <div className="form-field">
+                                                <InlineFormLabel width={10}>Level2 Chart Properties</InlineFormLabel>
+                                                <textarea rows={11} className="gf-form-input width-100 max-height-400px"
+                                                    onChange={(e) => onLevel2ChartPropertiesChange(e, this.props)}
+                                                    value={options.level2ChartProperties}
+                                                />
+                                            </div>
+
+
+                                            {drillLabels && drillLabels.map((name: any, index: any) => (
+
+                                                <div className="gf-form-inline">
+                                                    <div className="gf-form gf-form--grow">
+                                                        <InlineFormLabel width={10}>{name}</InlineFormLabel>
+                                                        <Button id={"button" + index} icon="sync" onClick={(e => this.testQuery(e, index, this.props, name))}>Test Query</Button>
+                                                        <textarea rows={11} className="gf-form-input width-100 max-height-400px"
+                                                            onChange={(e) => onDrillChange(e, this.props, index, name)}
+                                                            value={options.drillObj[name]}
+                                                        />
+                                                        {/*<div style={{ border: '1px solid green', borderRadius: '4px', padding: '10px', cursor: 'pointer' }}
+                                                                onClick={() => this.openResult()}> Neo4j Response </div>*/}
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>}
+                                        
+                                        {state[1].active && this.props.options.enableLevel3 && <div>
+                                            <div className="form-field">
+                                                <InlineFormLabel width={12}>Single Series Chart Type</InlineFormLabel>
+                                                <Select width={25} options={chartTypes} defaultValue={chartTypes[0]}
+                                                    onChange={(e) => onLevel3ChartTypeChanged(e, this.props)}
+                                                    value={chartTypes.find(item => item.value === options.level3ChartType)}></Select>
+                                            </div>
+                                            <div className="form-field">
+                                                <InlineFormLabel width={12}>MultiSeries Chart Type</InlineFormLabel>
+                                                <Select width={25} options={multiSeries}
+                                                    onChange={(e) => onLevel3GraphModeChanged(e, this.props)}
+                                                    value={multiSeries.find(item => item.value === options.level3ChartType)}></Select>
+
+                                            </div>
+                                            <div className="form-field">
+                                                <InlineFormLabel width={12}>Combination Series Chart Type</InlineFormLabel>
+                                                <Select width={40} options={combinationCharts}
+                                                    onChange={(e) => onLevel3CombinationTypeChanged(e, this.props)}
+                                                    value={combinationCharts.find(item => item.value === options.level3ChartType)}></Select>
+                                            </div>
+
+                                            <div className="form-field">
+                                                <InlineFormLabel width={10}>Level3 Chart Properties</InlineFormLabel>
+                                                <textarea rows={10} className="gf-form-input width-100 max-height-400px"
+                                                    onChange={(e) => onLevel3ChartPropertiesChange(e, this.props)}
+                                                    value={options.level3ChartProperties}
+                                                />
+                                            </div>
+                                            {this.props.options.level0 && this.props.options.level0.map((name: any, index: any) => (
+
+                                                <div className="gf-form-inline">
+                                                    <div className="gf-form gf-form--grow">
+                                                        <InlineFormLabel width={10}>{name}</InlineFormLabel>
+                                                        <Button id={"button" + index} icon="sync" onClick={(e => this.testQuery(e, index, this.props, name))}>Test Query</Button>
+
+                                                        <textarea id={"query" + index} rows={11} className="gf-form-input width-100 max-height-400px"
+                                                            onChange={(e) => onLevel3DrillChange(e, this.props, index, name)}
+                                                            required value={this.props.options.level3drillObj[name]}
+                                                        />
+
+                                                        {/*<div style={{ border: '1px solid green', borderRadius: '4px', padding: '10px', cursor: 'pointer' }}
+                                                     onClick={() => this.openResult()}> Neo4j Response </div>*/}
+                                                    </div>
+                                                </div>
+                                            ))}
+
+                                        </div>}
+                                        {/* {state[2].active && <div>Third tab content</div>}*/}
+                                    </TabContent>
+                                </div>
+                            );
+                        }}
+                    </UseState>
+                </div>}
             </OptionsGroup>
 
             {/*Chart attributes*/}
             <OptionsGroup title="Chart Attributes" key="Chart Attributes" defaultToClosed={true}>
-            <div className="form-field" >Default chart Type - Single Series column 2d</div>
-                <div className="form-field">---------------------------------------</div>
+                <div className="form-field" >Default chart Type - Single Series column 2d</div>
+                <div className="form-field">------------------------------------------------------------------------------</div>
                 <div className="form-field">Chart Selected - {options.charttype}</div>
-                <div className="form-field">---------------------------------------</div>
+                <div className="form-field">------------------------------------------------------------------------------</div>
                 <div className="form-field">
                     <InlineFormLabel width={12}>Single Series Chart Type</InlineFormLabel>
                     <Select width={25} options={chartTypes} defaultValue={chartTypes[0]}
@@ -76,7 +220,7 @@ export class FusionEditor extends PureComponent<PanelEditorProps<ChartOptions>> 
                         value={widgetCharts.find(item => item.value === options.charttype)}></Select>
                 </div>
                 {options.isGauge &&
-                    <div className="form-field">
+                    <div>
 
                         <FormField label="Major TM Number" labelWidth={12} inputWidth={11} type="text" onChange={(e) => onChanged('majorTMNumber', e, this.props)} value={options.majorTMNumber || ''} />
                         <FormField label="Minor TM Number" labelWidth={12} inputWidth={11} type="text" onChange={(e) => onChanged('minorTMNumber', e, this.props)} value={options.minorTMNumber || ''} />
@@ -243,6 +387,18 @@ export class FusionEditor extends PureComponent<PanelEditorProps<ChartOptions>> 
                     </div>
                 }
 
+            </OptionsGroup>
+
+            {/*Advance View*/}
+            <OptionsGroup title="Advanced view" key="Advanced view" defaultToClosed={true}>
+                <div className="gf-form-inline">
+                    <div className="gf-form gf-form--grow">
+                        <textarea rows={11} className="gf-form-input width-100 max-height-400px"
+                            onChange={(e) => onTextChange(e, this.props)}
+                            placeholder="{'caption':'Test Caption'}" value={options.atext} required />
+                    </div>
+                </div>
+                <button className="btn btn-success" onClick={(e) => onClick(e, this.props)} type="submit" disabled={options.btnEnabled}> Apply</button>
             </OptionsGroup>
 
             {/*Caption * subcaption*/}
@@ -627,20 +783,123 @@ export class FusionEditor extends PureComponent<PanelEditorProps<ChartOptions>> 
 
             {/*Add Remove Node*/}
             <OptionsGroup title="Add & Remove" key="Add & Remove" defaultToClosed={true}>
-            <div>
+                <div>
                     <div className="gf-form-inline">
                         <div className="gf-form gf-form--grow">
-                            <textarea rows={20} className="gf-form-input width-100" onChange={(e) => onAddRemoveChange(e,this.props)}
+                            <textarea rows={20} className="gf-form-input width-100" onChange={(e) => onAddRemoveChange(e, this.props)}
                                 placeholder="Please refer help section for boilerplate code." value={options.addRemove} required />
                         </div>
 
                     </div>
-                    <div className="gf-form gf-form--v-stretch">
-                        <button className="btn btn-success" onClick={(e) => onNodeClick(e,this.props)} type="submit" disabled={options.btnEnabled}>Apply </button>
+                   {/* <div className="gf-form gf-form--v-stretch">
+                        <button className="btn btn-success" onClick={(e) => onNodeClick(e, this.props)} type="submit" disabled={options.btnEnabled}>Apply </button>
+                    </div>*/}
+                </div>
+            </OptionsGroup>
+
+            <OptionsGroup title="Gauge Properties" key="Gauge Properties" defaultToClosed={true}>
+                <div className="gf-form-inline">
+                    <div className="gf-form gf-form--grow">
+                        <textarea rows={11} className="gf-form-input width-100 max-height-400px"
+                            onChange={(e) => onPropsTextChange(e, this.props)}
+                            value={options.staticProps} required
+                        />
                     </div>
                 </div>
+               {/* <button className="btn btn-success" onClick={(e) => onPropsApplyClick(e, this.props)} type="submit" disabled={options.SbtnEnabled}>Apply</button>*/}
             </OptionsGroup>
         </>);
     }
+    testQuery(e: any, index: any, props: any, name: any) {
+        this.setState({ loader: !this.state.loader });
+        this.setState({ close: !this.state.close });
+        //console.log('p--', props.options[index]);
+        getBackendSrv().datasourceRequest({ url: 'api/datasources/name/' + props.options.datasource, method: 'GET' }).then((res: any) => {
+            let data = res.data;
+            if (res.status === 200) {
+                props.options.datasourceId = data.id;
+                this.fetchDrillDownData(props, true, index, name);
+            }
+            else {
+                return { status: 'error', message: res.error };
+            }
+            return res;
+        }).catch((err: any) => {
+            console.log(err);
+        });
+
+    }
+
+    applyTemplateVariables(value: any, variable: any, formatValue: any) {
+        if (typeof value === 'string') {
+            let values = [] as any;
+            values.push(value);
+            value = values;
+        }
+        return JSON.stringify(value);
+    }
+
+
+    fetchDrillDownData(props: any, drilldown: any, index: any, name: any) {
+        let queryText = props.options.drillObj[name] ? props.options.drillObj[name] : props.options.level3drillObj[name];
+        let dquery = getTemplateSrv().replace(queryText, {}, this.applyTemplateVariables);
+        dquery = addTimestampToQuery(dquery, props.timeRange);
+        //console.log('dquery--', dquery);
+        const queryJson = {
+            "statements": [
+                {
+                    "statement": dquery,
+                    "includeStats": true,
+                    "resultDataContents": ["row", "graph"]
+                }
+            ],
+            "metadata": [{
+                "testDB": true
+            }]
+        };
+        let testQuery = JSON.stringify(queryJson);
+        return getBackendSrv().datasourceRequest({ url: 'api/datasources/proxy/' + this.props.options.datasourceId, method: 'POST', data: testQuery }).then((res: any) => {
+            let data = res.data;
+            if (drilldown) {
+                props.options.drillDownResponse = data;
+                this.setState({ loader: !this.state.loader });
+                // this.openResult();
+                return data;
+            }
+            if (res.status === 200) {
+                return convertResponseToDataFramesTable(res, props, '');
+            }
+            else {
+                return { status: 'error', message: res.error };
+            }
+        }).catch((err: any) => {
+            console.log(err);
+            if (err.data && err.data.message) {
+                return { status: 'error', message: err.data.message };
+            }
+            else {
+                return { status: 'error', message: err.status };
+            }
+        });
+
+    }
+    copyToClipboard() {
+        this.setState({ copied: true });
+    }
+
+    openResult(): void {
+        this.setState({ close: !this.state.close });
+    }
+
 
 };
+
+
+function fetchDrillDownLabels(props: any) {
+    if (props.data) {
+        if (props.data.state === 'Done') {
+            return props.data.series[0].fields[0].values.buffer;
+        }
+    }
+
+}

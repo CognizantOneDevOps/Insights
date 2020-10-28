@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
+import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.HashMap;
 import java.util.Map;
@@ -51,41 +52,59 @@ import com.cognizant.devops.platformcommons.exception.RestAPI404Exception;
 import com.google.gson.JsonObject;
 
 public class RestApiHandler {
+	
+	private static Logger log = LogManager.getLogger(RestApiHandler.class);
+	
 	static Client client ;
 	static Client multipartClient;
 	static {
 		try {
 			initializeClient();
 		} catch (Exception e) {
-			
+			log.error(e);
 		}
 	}
 
 	/** Used to initialize Rest client for communication 
+	 * @throws NoSuchAlgorithmException 
+	 * @throws KeyManagementException 
+	 * @throws InsightsCustomException 
 	 * @throws Exception 
 	 * 
 	 */
-	private static void initializeClient() throws Exception {
+	private static void initializeClient() throws NoSuchAlgorithmException, KeyManagementException, InsightsCustomException {
 		SSLContext sslContext = null;
 		try {
 			TrustManager[] trustManager = new X509TrustManager[] { new X509TrustManager() {
 
 			    @Override
 			    public X509Certificate[] getAcceptedIssuers() {
-			        return null;
+			        return new X509Certificate[0] ;
 			    }
 
 			    @Override
-			    public void checkClientTrusted(X509Certificate[] certs, String authType) {
-
+			    public void checkClientTrusted(X509Certificate[] certs, String authType) throws CertificateException {
+						try {
+							for (X509Certificate cert : certs) {
+								cert.checkValidity();
+							}
+						} catch (Exception e) {
+							throw new CertificateException("Certificate not valid or trusted.");
+						}
 			    }
 
 			    @Override
-			    public void checkServerTrusted(X509Certificate[] certs, String authType) {
-
+			    public void checkServerTrusted(X509Certificate[] certs, String authType) throws CertificateException {
+						try {
+							for (X509Certificate cert : certs) {
+								cert.checkValidity();
+							}
+						} catch (Exception e) {
+							throw new CertificateException("Certificate not valid or trusted.");
+						}
 			    }
 			}};
-			sslContext = SSLContext.getInstance("SSL");
+			sslContext = SSLContext.getInstance("TLS");
 			sslContext.init(null, trustManager, null);
 			client = ClientBuilder.newBuilder().sslContext(sslContext).build();
 			multipartClient = ClientBuilder.newBuilder().sslContext(sslContext).register(MultiPartFeature.class)
@@ -94,7 +113,6 @@ public class RestApiHandler {
 				throw new InsightsCustomException("unable to initilize client");
 			}
 			client.property(ClientProperties.CONNECT_TIMEOUT, 5001);
-			//client.property(ClientProperties.READ_TIMEOUT, 100001);
 		} catch (NoSuchAlgorithmException e) {
 			log.error("NoSuchAlgorithmException occured {} ", e);
 			throw new NoSuchAlgorithmException(e.getMessage());
@@ -105,7 +123,6 @@ public class RestApiHandler {
 			throw new InsightsCustomException(e.getMessage());
 		}
 	}
-	private static Logger log = LogManager.getLogger(RestApiHandler.class);
 
 	private RestApiHandler() {
 
@@ -295,8 +312,6 @@ public class RestApiHandler {
 
 			formDataMultiPart.bodyPart(filePart);
 
-			//FormDataMultiPart multipart = (FormDataMultiPart) formDataMultiPart;
-
 			webTarget = multipartClient.target(url);
 			invocationBuilder = webTarget.request().accept(returnMediaType);
 
@@ -326,7 +341,6 @@ public class RestApiHandler {
 				} catch (IOException e) {
 					throw new InsightsCustomException(e.getMessage());
 				}
-			//multipart.close();
 			}
 		}
 		return retunInputStream;

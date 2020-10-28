@@ -17,9 +17,9 @@
 echo "#################### Installing Eleastic Search with configs ####################"
 sudo mkdir elasticsearch
 cd elasticsearch
-sudo wget https://platform.cogdevops.com/insights_install/installationScripts/latest/RHEL/es/elasticsearch.rpm
+sudo wget https://infra.cogdevops.com:8443/repository/docroot/insights_install/installationScripts/latest/RHEL/es/elasticsearch.rpm
 sudo rpm -Uvh elasticsearch.rpm
-sudo wget https://platform.cogdevops.com/insights_install/installationScripts/latest/RHEL/es/ElasticSearch.zip
+sudo wget https://infra.cogdevops.com:8443/repository/docroot/insights_install/installationScripts/latest/RHEL/es/ElasticSearch.zip
 sudo unzip ElasticSearch.zip
 sudo cp ElasticSearch/elasticsearch.yml /etc/elasticsearch/elasticsearch.yml
 sudo cp ElasticSearch/log4j2.properties /etc/elasticsearch/log4j2.properties

@@ -50,12 +50,6 @@ public class EmailUtil {
 	private static final Logger log = LoggerFactory.getLogger(EmailUtil.class.getName());
 
 	//Load Mail Server Details
-//	static final String SMTP_USERNAME = "AKIAWDJ2RTAOEFGYVLWT";
-//	static final String SMTP_PASSWORD = "BO2M6T3uoofBlPwy41JTBuIqoSnQnPWfpLU8YDy8AZaF";
-//	static final String HOST = "email-smtp.us-east-1.amazonaws.com";
-//	static final int PORT = 587;
-//	static final String FROM = "kmvijayraghunath@gmail.com";
-//	static final String SUBJECT = "Insights Query Builder Report.";
 	
 	EmailConfiguration emailConfiguration = ApplicationConfigProvider.getInstance().getEmailConfiguration();
 

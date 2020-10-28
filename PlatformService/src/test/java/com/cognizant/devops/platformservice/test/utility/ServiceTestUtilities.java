@@ -47,11 +47,9 @@ public class ServiceTestUtilities {
 		/*if (null != response) {
 			if (response.getStatusInfo().getStatusCode() == 200) {
 				String jsonResp = response.getEntity(String.class);
-				System.out.println(jsonResp);
 				JsonParser jsonParser = new JsonParser();
 				jsonObj = (JsonObject) jsonParser.parse(jsonResp);
 			} else {
-			System.out.println(response.getStatus()+response.getStatusInfo().getReasonPhrase());
 				jsonObj.addProperty("status","failure");
 				jsonObj.add("statusInfo", new Gson().toJsonTree(response.getStatusInfo()));
 			}
@@ -59,7 +57,6 @@ public class ServiceTestUtilities {
 		
 		if( null != response ){
     		String jsonResp = response;
-			//System.out.println(jsonResp);
     		JsonParser jsonParser = new JsonParser();
     		jsonObj = (JsonObject)jsonParser.parse(jsonResp);
     	} else {

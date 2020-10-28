@@ -84,23 +84,29 @@ public class DataArchivalServiceImpl implements DataArchivalService {
 			if (!agentDetails.isEmpty()) {
 				JsonObject agentJson = new JsonParser().parse(agentDetails.get(0).getAgentJson()).getAsJsonObject();
 				String routingKey = agentJson.get("subscribe").getAsJsonObject().get("dataArchivalQueue").getAsString();
-				JsonObject publishDataJson = new JsonObject();
-				publishDataJson.addProperty("archivalName", archivalName);
-				publishDataJson.addProperty("startDate", startDate);
-				publishDataJson.addProperty("endDate", endDate);
-				publishDataJson.addProperty("daysToRetain", daysToRetain);
-				publishDataArchivalDetails(routingKey, publishDataJson.toString());
+				InsightsDataArchivalConfig dataArchivalRecord = dataArchivalConfigdal
+						.getSpecificArchivalRecord(archivalName);
+				if (dataArchivalRecord == null) {
+					JsonObject publishDataJson = new JsonObject();
+					publishDataJson.addProperty("archivalName", archivalName);
+					publishDataJson.addProperty("startDate", startDate);
+					publishDataJson.addProperty("endDate", endDate);
+					publishDataJson.addProperty("daysToRetain", daysToRetain);
+					publishDataArchivalDetails(routingKey, publishDataJson.toString());
 
-				InsightsDataArchivalConfig dataArchivalConfig = new InsightsDataArchivalConfig();
-				dataArchivalConfig.setArchivalName(archivalName);
-				dataArchivalConfig.setStartDate(epochStartDate);
-				dataArchivalConfig.setEndDate(epochEndDate);
-				dataArchivalConfig.setAuthor(author);
-				dataArchivalConfig.setStatus(status);
-				dataArchivalConfig.setExpiryDate(expiryDate);
-				dataArchivalConfig.setDaysToRetain(daysToRetain);
-				dataArchivalConfig.setCreatedOn(createdOn);
-				dataArchivalConfigdal.saveDataArchivalConfiguration(dataArchivalConfig);
+					InsightsDataArchivalConfig dataArchivalConfig = new InsightsDataArchivalConfig();
+					dataArchivalConfig.setArchivalName(archivalName);
+					dataArchivalConfig.setStartDate(epochStartDate);
+					dataArchivalConfig.setEndDate(epochEndDate);
+					dataArchivalConfig.setAuthor(author);
+					dataArchivalConfig.setStatus(status);
+					dataArchivalConfig.setExpiryDate(expiryDate);
+					dataArchivalConfig.setDaysToRetain(daysToRetain);
+					dataArchivalConfig.setCreatedOn(createdOn);
+					dataArchivalConfigdal.saveDataArchivalConfiguration(dataArchivalConfig);
+				} else {
+					throw new InsightsCustomException("Archival Name already exists.");
+				}
 			} else {
 				throw new InsightsCustomException("Data Archival agent not present.");
 			}

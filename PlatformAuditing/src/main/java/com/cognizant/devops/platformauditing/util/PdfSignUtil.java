@@ -67,20 +67,17 @@ import org.bouncycastle.asn1.x500.style.BCStyle;
 import org.bouncycastle.asn1.x500.style.IETFUtils;
 
 import com.cognizant.devops.platformcommons.constants.ConfigOptions;
+import com.google.gson.JsonObject;
 
 public class PdfSignUtil extends PdfCreateSignatureBase
 {
 	private static final Logger log = LogManager.getLogger(PdfSignUtil.class.getName());
 	
-	private static final String DIGI_IMG = "sign/Insights.png";
-	private static final String PIN_PROTECT = "123456";
-	private static final String KEYSTORE_P12 = "keystore/keystore.p12";
-	private SignatureOptions signatureOptions;
 	private boolean lateExternalSigning = false;
 	private File imageFile;
 	private static final String PDF_PATH = System.getenv().get("INSIGHTS_HOME") + File.separator + ConfigOptions.CONFIG_DIR + File.separator + "Pdf" + File.separator;
 	private static final String TARGET_PDF = "target/Traceability_report.pdf";
-	private final String PDF_NAME_VALIDATOR = "^([a-zA-Z0-9_.\\s-])+(.pdf)$";
+	private static final String PDF_NAME_VALIDATOR = "^([a-zA-Z0-9_.\\s-])+(.pdf)$";
 	
 	public PdfSignUtil(KeyStore keystore, char[] pin)
 			throws KeyStoreException, UnrecoverableKeyException, NoSuchAlgorithmException, IOException, CertificateException
@@ -126,19 +123,12 @@ public class PdfSignUtil extends PdfCreateSignatureBase
 
 		setTimeStampUrl(tsaUrl);
 
-		// creating output document and prepare the IO streams.
-
-		//FileOutputStream fos = new FileOutputStream(signedFile);
-		//PDDocument doc = PDDocument.load(protectDoc, "12345");
-		//doc.setAllSecurityToBeRemoved(true);
-
 		ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
 		protectDoc.save(byteArrayOutputStream);
 		PDDocument doc = PDDocument.load(byteArrayOutputStream.toByteArray(),"12345");
 		int accessPermissions = SignatureUtils.getMDPPermission(doc);
 		if (accessPermissions == 1)
 		{
-			//fos.close();
 			throw new IllegalStateException("No changes to the document are permitted due to DocMDP transform parameters dictionary");
 		}
 
@@ -188,11 +178,10 @@ public class PdfSignUtil extends PdfCreateSignatureBase
 		signature.setReason("Asset Audit Report");
 		signature.setSignDate(Calendar.getInstance());
 		SignatureInterface signatureInterface = isExternalSigning() ? null : this;
-		signatureOptions = new SignatureOptions();
+		SignatureOptions signatureOptions = new SignatureOptions();
 		signatureOptions.setVisualSignature(createVisualSignatureTemplate(doc, doc.getNumberOfPages()-1, rect, signature));
 		signatureOptions.setPage(doc.getNumberOfPages()-1);
 		doc.addSignature(signature, signatureInterface, signatureOptions);
-		//doc.saveIncremental(fos);
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		doc.saveIncremental(baos);
 		IOUtils.closeQuietly(signatureOptions);
@@ -321,11 +310,11 @@ public class PdfSignUtil extends PdfCreateSignatureBase
 		X500Name x500Name = new X500Name(cert.getSubjectX500Principal().getName());
 		RDN cn = x500Name.getRDNs(BCStyle.CN)[0];
 		String name = IETFUtils.valueToString(cn.getFirst().getValue());
-		log.info("Digitally Signed by -  "+name);
+		log.info("Digitally Signed by -  {}",name);
 		String date = signature.getSignDate().getTime().toString();
-		log.info("Date - "+date);
+		log.info("Date - {}",date);
 		String reason = signature.getReason();
-		log.info("Reason - "+reason);
+		log.info("Reason - {}",reason);
 		cs.showText("Digitally Signed by "+name);
 		cs.newLine();
 		cs.showText("Reason:"+reason);
@@ -381,39 +370,35 @@ public class PdfSignUtil extends PdfCreateSignatureBase
 	 * @throws UnrecoverableKeyException
 	 */
 	public byte[] digitalSign(PDDocument doc, String pdfName) throws KeyStoreException, IOException, NoSuchAlgorithmException,
-	CertificateException, FileNotFoundException, UnrecoverableKeyException {
+	CertificateException, UnrecoverableKeyException {
 		byte[] signdoc = null;
 		try{
-			log.info("Pdf Name in sign--"+pdfName);
+			log.info("Pdf Name in sign == {} ",pdfName);
 			String tsaUrl = null;
 			boolean externalSig = false;
-			//File ksFile =  new File(KEYSTORE_P12);
-			//ClassLoader classLoader = getClass().getClassLoader();
-			//File ksFile = new File(classLoader.getResource(KEYSTORE_P12).getFile());
-			File ksFile = new File(PDF_PATH+KEYSTORE_P12).getAbsoluteFile();
+			JsonObject config = LoadFile.getConfig();
+			File ksFile = new File(PDF_PATH+config.get("KEYSTORE_P12").getAsString()).getAbsoluteFile();
 			KeyStore keystore = KeyStore.getInstance("PKCS12");
-			char[] pin = PIN_PROTECT.toCharArray();
+			char[] pin = config.get("PIN_PROTECT").getAsString().toCharArray();
 			keystore.load(new FileInputStream(ksFile), pin);
 			boolean valid = checkValidFile(pdfName);
 			if(valid){
 				File documentFile = new File(pdfName==null ? TARGET_PDF : pdfName);
-				log.info("documentFile name sign--"+documentFile.getName());
-				log.info("documentFile path sign--"+documentFile.getAbsolutePath());
+				log.info("documentFile name sign--{}",documentFile.getName());
 				PdfSignUtil signing = new PdfSignUtil(keystore, pin.clone());
-				signing.setImageFile(new File(PDF_PATH+DIGI_IMG).getAbsoluteFile());
+				signing.setImageFile(new File(PDF_PATH+config.get("DIGI_IMG").getAsString()).getAbsoluteFile());
 				File signedDocumentFile;
-				//String name = documentFile.getName();
 				String name = pdfName;
 				String substring = name.substring(0, name.lastIndexOf('.'));
 				signedDocumentFile = new File(documentFile.getParent(), substring + "_signed.pdf");
-				log.info("signedDocumentFile sign--"+signedDocumentFile.getName());
+				log.info("signedDocumentFile sign-- {}",signedDocumentFile.getName());
 				signing.setExternalSigning(externalSig);
 
 				Rectangle2D humanRect = new Rectangle2D.Float(100, 200, 150, 50);
 				log.info("--Signining PDF---");
 				signdoc = signing.signPDF(doc, signedDocumentFile, humanRect, tsaUrl, "Signature1");
 			}else{
-				log.info("PDF name is not valid for Regex -- "+PDF_NAME_VALIDATOR);
+				log.info("PDF name is not valid for Regex -- {}",PDF_NAME_VALIDATOR);
 			}
 		}catch(Exception e){
 			log.error(e);
@@ -456,39 +441,6 @@ public class PdfSignUtil extends PdfCreateSignatureBase
 	public void setLateExternalSigning(boolean lateExternalSigning)
 	{
 		this.lateExternalSigning = lateExternalSigning;
-	}
-
-	/**
-	 * Arguments are
-	 * [0] key store
-	 * [1] pin
-	 * [2] document that will be signed
-	 * [3] image of visible signature
-	 *
-	 * @param args
-	 * @throws java.security.KeyStoreException
-	 * @throws java.security.cert.CertificateException
-	 * @throws java.io.IOException
-	 * @throws java.security.NoSuchAlgorithmException
-	 * @throws java.security.UnrecoverableKeyException
-	 */
-	public static void main(String[] args) throws KeyStoreException, CertificateException,
-	IOException, NoSuchAlgorithmException, UnrecoverableKeyException
-	{
-		//PdfSignUtil ps = new PdfSignUtil();
-		//ps.digitalSign("test.pdf");
-	}
-	/**
-	 * This will print the usage for this program.
-	 */
-	@SuppressWarnings("unused")
-	private static void usage()
-	{
-		System.err.println("Usage: java " + PdfSignUtil.class.getName()
-				+ " <pkcs12-keystore-file> <pin> <input-pdf> <sign-image>\n" + "" +
-				"options:\n" +
-				"  -tsa <url>    sign timestamp using the given TSA server\n"+
-				"  -e            sign using external signature creation scenario");
 	}
 
 }

@@ -14,14 +14,14 @@
 	<groupId>com.cognizant.devops</groupId>
 	<artifactId>PlatformParent</artifactId>
 	<packaging>pom</packaging>
-	<version>7.0</version>
+	<version>7.1</version>
 	<name>PlatformParent</name>
 
 	<dependencies>
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
-			<version>3.8.1</version>
+			<version>4.13.1</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
@@ -41,6 +41,17 @@
 			<version>2.5</version>
 		</dependency>
 	</dependencies>
+
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>com.google.guava</groupId>
+				<artifactId>guava</artifactId>
+				<version>29.0-jre</version>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+
 	<modules>
 		<module>PlatformCommons</module>
 		<module>PlatformDAL</module>
@@ -57,16 +68,7 @@
 		<module>PlatformRegressionTest</module>
 
 	</modules>
-	<build>
-		<pluginManagement>
-			<plugins>
-				<plugin>
-					<groupId>com.soebes.maven.plugins</groupId>
-					<artifactId>doxygen-maven-plugin</artifactId>
-					<version>1.1.0</version>
-				</plugin>
-			</plugins>
-		</pluginManagement>
+	<build>		
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -91,57 +93,9 @@
 				<configuration>
 					<autoVersionSubmodules>true</autoVersionSubmodules>
 				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>com.soebes.maven.plugins</groupId>
-				<artifactId>doxygen-maven-plugin</artifactId>
-				<configuration>
-					<projectName>"Insights Code Documentation"</projectName>
-					<projectNumber>${project.version}</projectNumber>
-					<optimizeOutputJava>true</optimizeOutputJava>
-					<javadocAutobrief>true</javadocAutobrief>
-					<extractAll>true</extractAll>
-					<extractStatic>true</extractStatic>
-					<recursive>true</recursive>
-					<exclude>.git</exclude>
-					<excludePatterns>auditservice</excludePatterns>
-					<recursive>true</recursive>
-					<haveGraph>true</haveGraph>
-					<generateLatex>false</generateLatex>
-					<generateHtml>true</generateHtml>
-					<input>${project.basedir}/PlatformAgents
-						${project.basedir}/PlatformCommons ${project.basedir}/PlatformDAL
-						${project.basedir}/PlatformDeployment
-						${project.basedir}/PlatformEngine
-						${project.basedir}/PlatformGrafanaPlugins
-						${project.basedir}/PlatformWorkflow
-						${project.basedir}/PlatformReports
-						${project.basedir}/PlatformInsightsWebHook
-						${project.basedir}/PlatformMockServer
-						${project.basedir}/PlatformService ${project.basedir}/PlatformUI3
-						${project.basedir}/PlatformWebhookEngine
-						${project.basedir}/PlatformRegressionTest</input>
-					<outputDirectory>${basedir}/DoxygenReport</outputDirectory>
-					<inlineSources>true</inlineSources>
-					<haveDot>true</haveDot>
-					<callGraph>true</callGraph>
-					<callerGraph>true</callerGraph>
-					<searchengine>true</searchengine>
-				</configuration>
-				<version>1.1.0</version>
-			</plugin>
+			</plugin>			
 		</plugins>
 	</build>
-	<reporting>
-		<plugins>
-			<plugin>
-				<groupId>com.soebes.maven.plugins</groupId>
-				<artifactId>doxygen-maven-plugin</artifactId>
-				<version>1.1.0</version>
-			</plugin>
-		</plugins>
-	</reporting>
-	
 
 	<profiles>
 		<profile>

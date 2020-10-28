@@ -1,0 +1,18 @@
+{
+	"name": "tool_chaincode",
+	"version": "1.0.0",
+	"description": "chaincode implemented in node.js",
+	"engines": {
+		"node": ">=8.4.0",
+		"npm": ">=5.3.0"
+	},
+	"scripts": {
+		"start": "node tool_chaincode.js"
+	},
+	"engine-strict": true,
+	"license": "Apache-2.0",
+	"dependencies": {
+		"date-and-time": "^0.14.1",
+		"fabric-shim": "^2.2.0"
+	}
+}

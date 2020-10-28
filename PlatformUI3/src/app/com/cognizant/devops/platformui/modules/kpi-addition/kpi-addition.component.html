@@ -1,0 +1,158 @@
+<div class="pageCss">
+  <div layout layout-align="left" class="titleStyle">
+    <div>Configuration |
+      <a class="greenTitleTxt">KPI Configuration </a>
+    </div>
+  </div>
+  <div class="orangeStripCss"></div>
+  <div layout layout-align="left" class="sectionHeadingStyle">
+    <div layout>&nbsp; KPI Configuration
+      <span class="sectionSubHeading"> (Configure a KPI)
+      </span>
+    </div>
+  </div>
+
+  <div class="alignMain">
+    <div class="btnAlign">
+      <button mat-icon-button (click)="validateKpiData()">
+        <mat-icon title="Save" style="margin-top: 0%;" class="mat-icon material-icons">
+          save
+        </mat-icon>
+      </button>
+      <button mat-icon-button (click)="refreshData()" [disabled]="onEdit">
+        <mat-icon title="Refresh" style="margin-top: 10%;" class="mat-icon material-icons">
+          cancel
+        </mat-icon>
+      </button>
+    </div>
+    <div>
+      <table class="mat-elevation-z8 mat-table">
+        <thead>
+          <tr class="mat-header-row" layout-align="start start">
+            <th colspan="3" class="tableHeaderCss mat-header-cell" style=" border-radius: 10px 10px 0 0;">
+              <span class="mainHeaderText">Add details to Configure a KPI</span>
+              <span class="infoHeaderText">(Please provide accurate details to Configure a KPI.
+                Fields marked "<span style="color:#ff0000;">*</span>" are mandatory)
+              </span>
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="mat-row-kpi">
+            <td class="mat-cell" class="columnName">
+              <span class="mainText"> KpiId</span>
+              <span style="color:#ff0000;">*</span>
+            </td>
+            <td class="columnComponent">
+              <input maxlength="7" type="number" id="kpiId" [disabled]="onEdit" class="form-control" [(ngModel)]="kpiId"
+                name="kpiId" style="width: 84%;" (keypress)=defaultStop($event)>
+            </td>
+            <td>
+              <span class="infoText">Please input a unique KpiId</span>
+            </td>
+          </tr>
+          <tr class="mat-row-kpi">
+            <td class="mat-cell" class="columnName">
+              <span class="mainText"> Name</span>
+              <span style="color:#ff0000;">*</span>
+            </td>
+            <td class="columnComponent">
+              <input maxlength="40" type="text" class="form-control" [(ngModel)]="kpiName" name="kpiName"
+                style="width: 84%;">
+            </td>
+            <td>
+              <span class="infoText">Please input a logical Name to make it simplier to
+                identify</span>
+            </td>
+          </tr>
+          <tr class="mat-row-kpi">
+            <td class="mat-cell" class="columnName">
+              <span class="mainText">Select Tool</span>
+              <span class="asteriskText">*</span>
+            </td>
+            <td class="columnComponent">
+              <mat-select required [(ngModel)]="selectedTool" name="selectedTool" class="form-control"
+                placeholder="Select Tool" color="primary">
+                <mat-option *ngFor=" let tool of toolsArr" value="{{tool}}">
+                  {{tool}}</mat-option>
+              </mat-select>
+            </td>
+            <td>
+              <span class="infoText">Please select a Tool to Configure a KPI </span>
+            </td>
+          </tr>
+
+          <tr class="mat-row-kpi">
+            <td class="mat-cell" class="columnName">
+              <span class="mainText">Category</span>
+              <span class="asteriskText">*</span>
+            </td>
+            <td class="columnComponent">
+              <mat-select required [(ngModel)]="category" name="category" class="form-control"
+                placeholder="Select Data Format" color="primary">
+                <mat-option *ngFor=" let catDtl of categoryDetail" value="{{catDtl}}">
+                  {{catDtl}}
+                </mat-option>
+              </mat-select>
+            </td>
+            <td>
+              <span class="infoText">Please select a Category</span>
+            </td>
+          </tr>
+          <tr class="mat-row-kpi">
+            <td class="mat-cell" class="columnName">
+              <span class="mainText">Group Name</span>
+              <span class="asteriskText">*</span>
+            </td>
+            <td class="columnComponent">
+              <input maxlength="40" type="text" class="form-control" [(ngModel)]="groupName" name="groupName"
+                style="width: 84%;">
+            </td>
+            <td>
+              <span class="infoText">Please select a GroupName </span>
+            </td>
+          </tr>
+          <tr class="mat-row-kpi">
+            <td class="mat-cell" class="columnName">
+              <span class="mainText">Datasource</span>
+              <span class="asteriskText">*</span>
+            </td>
+            <td class="columnComponent">
+              <mat-select required [(ngModel)]="dataSource" name="dataSource" class="form-control"
+                placeholder="Select DataSource" color="primary">
+                <mat-option *ngFor=" let data of dataSourceDetail" value="{{data}}">
+                  {{data}} </mat-option>
+              </mat-select>
+            </td>
+            <td>
+              <span class="infoText">Please select a DataSource </span>
+            </td>
+          </tr>
+
+          <tr class="mat-row-kpi">
+            <td class="mat-cell" class="columnName">
+              <span class="mainText">DB Query</span>
+              <span class="asteriskText">*</span>
+            </td>
+            <td class="columnComponent">
+              <textarea [(ngModel)]="dbQuery" class="form-control" name="dbQuery" class="frmTxtarea" required
+                style="width: 85%;resize: none;"></textarea>
+            </td>
+            <td>
+              <span class="infoText">Please add a DB Query </span>
+            </td>
+          </tr>
+          <tr class="mat-row-kpi">
+            <td class="mat-cell" class="columnName">
+              <span class="mainText">Is Active?</span>
+              <span class="asteriskText">*</span>
+            </td>
+            <td class="columnComponent">
+              <mat-slide-toggle [(ngModel)]="isActive">
+              </mat-slide-toggle>
+            </td>
+          </tr>
+      </table>
+    </div>
+  </div>
+</div>

@@ -31,6 +31,12 @@ from datetime import datetime
 from pytz import timezone
 import logging.handlers
 import time
+import hashlib
+from cryptography.hazmat.primitives import hashes
+from cryptography.hazmat.primitives.asymmetric import padding
+from cryptography.hazmat.backends import default_backend
+from cryptography.hazmat.primitives import serialization
+from base64 import b64encode, b64decode
 
 class BaseAgent(object):
        
@@ -233,7 +239,7 @@ class BaseAgent(object):
             uniqeKey: String --> comma separated node properties
         }
     '''
-    def publishToolsData(self, data, metadata=None, timeStampField=None, timeStampFormat=None, isEpochTime=False,isExtension=False):
+    def publishToolsData(self, data, metadata=None,  timeStampField=None, timeStampFormat=None, isEpochTime=False,isExtension=False):
         if metadata:
             metadataType = type(metadata)
             if metadataType is not dict:
@@ -245,6 +251,9 @@ class BaseAgent(object):
             self.addExecutionId(data, self.executionId)
             self.addTimeStampField(data, timeStampField, timeStampFormat, isEpochTime,isExtension)
             logging.info(data)
+            auditing=self.config.get('auditing',False)
+            if auditing:
+                self.addDigitalSign(data)
             self.messageFactory.publish(self.dataRoutingKey, data, self.config.get('dataBatchSize', 100), metadata)
             self.logIndicator(self.PUBLISH_START, self.config.get('isDebugAllowed', False))
             
@@ -326,6 +335,48 @@ class BaseAgent(object):
     def addExecutionId(self, data, executionId):
         for d in data:
             d['execId'] = executionId
+			
+    def addDigitalSign(self, data):
+        dataString = ''
+        for d in data:
+            for key in sorted(d.keys()):
+                if(key !="digitalSignature" and d[key]!= None):
+                    #print(key,"--->",d[key])
+                    if type(d[key])== str:
+                        dataString += d[key]
+                    elif type(d[key])==list:
+                        for each in d[key]:
+                            dataString += str(each)
+                    elif type(d[key]) == bool:
+                        dataString += str(d[key]).lower()
+                    else:
+                        dataString += str(d[key])
+            #print("dataString")
+            #print(dataString)
+            hex = hashlib.sha256(dataString.encode('utf-8')).hexdigest()
+            #print(hex)
+            hex_signature = self.rsaEncrypt(hex)
+			
+            d['digitalSignature'] = hex_signature.decode('utf-8')
+            #print(d['digitalSignature'])
+            dataString = ''
+    
+    def rsaEncrypt(self, hexdigest):
+        #print("+++++++++++++++++++++++++++++++++hexdigest")
+        #print(hexdigest)
+        with open(self.config.get('publicKeyPath'), 'rb') as key_file:
+            public_key = serialization.load_pem_public_key(
+            key_file.read(),
+            backend=default_backend()
+        )
+        encrypted = public_key.encrypt(
+        hexdigest.encode('utf-8'),
+        padding.OAEP(
+            mgf=padding.MGF1(algorithm=hashes.SHA1()),
+            algorithm=hashes.SHA256(),
+            label=None
+        ))
+        return b64encode(encrypted)
     
     def updateTrackingJson(self, data):
         #Update the tracking json file and cache.
@@ -344,13 +395,19 @@ class BaseAgent(object):
     def getResponseTemplate(self):
         return self.config.get('dynamicTemplate', {}).get('responseTemplate',None)
     
-    def generateHealthData(self, ex=None, systemFailure=False,note=None):
+    def generateHealthData(self, ex=None, systemFailure=False,note=None, additionalProperties=None):
         data = []
         currentTime = self.getRemoteDateTime(datetime.utcnow())
         tokens = self.dataRoutingKey.split('.')
         self.categoryName = tokens[0]
         self.toolName = tokens[1]
-        health = { 'toolName' : self.config.get('toolName', tokens[1]), 'categoryName' : self.config.get('toolCategory', tokens[0]), 'agentId' : self.config.get('agentId'), 'inSightsTimeX' : currentTime['time'], 'inSightsTime' : currentTime['epochTime'], 'executionTime' : int((datetime.now() - self.executionStartTime).total_seconds() * 1000)}
+        health_basic = { 'toolName' : self.config.get('toolName', tokens[1]), 'categoryName' : self.config.get('toolCategory', tokens[0]), 'agentId' : self.config.get('agentId'), 'inSightsTimeX' : currentTime['time'], 'inSightsTime' : currentTime['epochTime'], 'executionTime' : int((datetime.now() - self.executionStartTime).total_seconds() * 1000)}
+        if additionalProperties != None:
+            data_json = {key: value for (key, value) in (health_basic.items() + additionalProperties.items())}
+            health_basic_str = json.dumps(data_json)
+            health = json.loads(health_basic_str)
+        else:
+            health = health_basic 
         if systemFailure:
             health['status'] = 'failure'
             health['message'] = 'Agent is shutting down'
@@ -363,6 +420,7 @@ class BaseAgent(object):
             if note != None:
                 health['message'] = note
         data.append(health)
+        logging.debug(data)
         return data
     
     def scheduleAgent(self):

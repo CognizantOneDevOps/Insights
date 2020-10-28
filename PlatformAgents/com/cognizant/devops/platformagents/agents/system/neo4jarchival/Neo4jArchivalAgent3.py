@@ -77,6 +77,8 @@ class Neo4jArchivalAgent(BaseAgent):
                     self.migrate_nodes(_es, list_lables[i],neo4j_query_limit)
                     self.migrate_forward_relationship(_es, list_lables[i],neo4j_query_limit)
                     self.migrate_backward_relationship(_es, list_lables[i],neo4j_query_limit)
+                    self.process_node_datatype(_es, list_lables[i])
+                    self.process_rel_datatype(_es, list_lables[i])
                     if (neo4j_data_delete):
                         print("deletion starts")
                         self.delete_batchof_relationships(_es, list_lables[i], neo4j_query_limit)

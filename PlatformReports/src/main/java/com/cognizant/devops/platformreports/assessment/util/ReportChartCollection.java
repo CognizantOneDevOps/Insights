@@ -17,6 +17,7 @@ package com.cognizant.devops.platformreports.assessment.util;
 
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 public class ReportChartCollection {
@@ -24,16 +25,16 @@ public class ReportChartCollection {
 	private ReportChartCollection() {}
 
 	
-	public static final List<String> SINGLE_SERIES_CHARTS = 
-			     Arrays.asList("pie2d","pie3d","doughnut2d","doughnut3d","pareto2d","pareto3d");
+	public static final List<String> SINGLE_SERIES_CHARTS = Collections.unmodifiableList(
+			     Arrays.asList("pie2d","pie3d","doughnut2d","doughnut3d","pareto2d","pareto3d"));
 	
 	
-	public static final List<String> COMMON_CHARTS = 
+	public static final List<String> COMMON_CHARTS = Collections.unmodifiableList(
 		     Arrays.asList("mscolumn2d","mscolumn3d","msline","msbar2d","msbar3d","overlappedcolumn2d",
 		    		       "overlappedbar2d","msarea","stackedcolumn2d","stackedcolumn3d","stackedbar2d","stackedbar3d",
-		    		       "stackedarea2d");
-	public static final List<String> SINGLE_VALUE_CHARTS = 
-		     Arrays.asList("angulargauge");
+		    		       "stackedarea2d"));
+	public static final List<String> SINGLE_VALUE_CHARTS = Collections.unmodifiableList(
+		     Arrays.asList("angulargauge"));
 	
 	
 }

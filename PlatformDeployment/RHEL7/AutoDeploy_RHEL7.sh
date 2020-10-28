@@ -47,29 +47,27 @@ read input
 for package in ${input[@]}
 do
 case $package in
-   "insights_first") sudo wget https://platform.cogdevops.com/insights_install/installationScripts/latest/RHEL/scripts/insights_first.sh -O insights_first.sh  && sh insights_first.sh
+   "insights_first") sudo wget https://infra.cogdevops.com:8443/repository/docroot/insights_install/installationScripts/latest/RHEL/scripts/insights_first.sh -O insights_first.sh  && sh insights_first.sh
    ;;
-   "insights_java") sudo wget https://platform.cogdevops.com/insights_install/installationScripts/latest/RHEL/scripts/insights_java.sh -O insights_java.sh && sh insights_java.sh
+   "insights_java") sudo wget https://infra.cogdevops.com:8443/repository/docroot/insights_install/installationScripts/latest/RHEL/scripts/insights_java.sh -O insights_java.sh && sh insights_java.sh
    ;;
-   "insights_es") sudo wget https://platform.cogdevops.com/insights_install/installationScripts/latest/RHEL/scripts/insights_es.sh -O insights_es.sh  && sh insights_es.sh
+   "insights_es") sudo wget https://infra.cogdevops.com:8443/repository/docroot/insights_install/installationScripts/latest/RHEL/scripts/insights_es.sh -O insights_es.sh  && sh insights_es.sh
    ;;
-   "insights_neo4j") sudo wget https://platform.cogdevops.com/insights_install/installationScripts/latest/RHEL/scripts/insights_neo4j.sh -O insights_neo4j.sh && sh insights_neo4j.sh
+   "insights_neo4j") sudo wget https://infra.cogdevops.com:8443/repository/docroot/insights_install/installationScripts/latest/RHEL/scripts/insights_neo4j.sh -O insights_neo4j.sh && sh insights_neo4j.sh
    ;;
-   "insights_postgres") sudo wget https://platform.cogdevops.com/insights_install/installationScripts/latest/RHEL/scripts/insights_postgres.sh -O insights_postgres.sh && sh insights_postgres.sh
+   "insights_postgres") sudo wget https://infra.cogdevops.com:8443/repository/docroot/insights_install/installationScripts/latest/RHEL/scripts/insights_postgres.sh -O insights_postgres.sh && sh insights_postgres.sh
    ;;
-   "insights_grafana") sudo wget https://platform.cogdevops.com/insights_install/installationScripts/latest/RHEL/scripts/insights_grafana.sh -O insights_grafana.sh && sh insights_grafana.sh
+   "insights_grafana") sudo wget https://infra.cogdevops.com:8443/repository/docroot/insights_install/installationScripts/latest/RHEL/scripts/insights_grafana.sh -O insights_grafana.sh && sh insights_grafana.sh
    ;;
-   "insights_python") sudo wget https://platform.cogdevops.com/insights_install/installationScripts/latest/RHEL/scripts/insights_python.sh -O insights_python.sh && sh insights_python.sh
+   "insights_python") sudo wget https://infra.cogdevops.com:8443/repository/docroot/insights_install/installationScripts/latest/RHEL/scripts/insights_python.sh -O insights_python.sh && sh insights_python.sh
    ;;
-   "insights_rabbitmq") sudo wget https://platform.cogdevops.com/insights_install/installationScripts/latest/RHEL/scripts/insights_rabbitmq.sh -O insights_rabbitmq.sh && sh insights_rabbitmq.sh
+   "insights_rabbitmq") sudo wget https://infra.cogdevops.com:8443/repository/docroot/insights_install/installationScripts/latest/RHEL/scripts/insights_rabbitmq.sh -O insights_rabbitmq.sh && sh insights_rabbitmq.sh
    ;;
-   "insights_tomcat") sudo wget https://platform.cogdevops.com/insights_install/installationScripts/latest/RHEL/scripts/insights_tomcat.sh -O insights_tomcat.sh && sh insights_tomcat.sh
+   "insights_tomcat") sudo wget https://infra.cogdevops.com:8443/repository/docroot/insights_install/installationScripts/latest/RHEL/scripts/insights_tomcat.sh -O insights_tomcat.sh && sh insights_tomcat.sh
    ;;
-   "insights_enginejar") sudo wget https://platform.cogdevops.com/insights_install/installationScripts/latest/RHEL/scripts/insights_enginejar.sh -O insights_enginejar.sh && sh insights_enginejar.sh
+   "insights_enginejar") sudo wget https://infra.cogdevops.com:8443/repository/docroot/insights_install/installationScripts/latest/RHEL/scripts/insights_enginejar.sh -O insights_enginejar.sh && sh insights_enginejar.sh
    ;;
-   #"insights_initscripts") sudo wget https://platform.cogdevops.com/insights_install/installationScripts/latest/RHEL/scripts/insights_initscripts.sh -O insights_initscripts.sh && sh insights_initscripts.sh
-   #;;   
-   "insights_all") sudo wget https://platform.cogdevops.com/insights_install/installationScripts/latest/RHEL/scripts/insights_all.sh -O insights_all.sh && sh insights_all.sh
+   "insights_all") sudo wget https://infra.cogdevops.com:8443/repository/docroot/insights_install/installationScripts/latest/RHEL/scripts/insights_all.sh -O insights_all.sh && sh insights_all.sh
    ;;
    *) echo "$package Not present"
 esac

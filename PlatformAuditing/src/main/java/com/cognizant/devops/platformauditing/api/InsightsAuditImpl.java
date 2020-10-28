@@ -15,7 +15,7 @@
  ******************************************************************************/
 package com.cognizant.devops.platformauditing.api;
 
-import com.cognizant.devops.platformauditing.hyperledger.accesslayer.BCNetworkClient;
+import com.cognizant.devops.platformauditing.hyperledger.accesslayer.BCNetworkGatewayClient;
 import com.cognizant.devops.platformauditing.util.LoadFile;
 import com.cognizant.devops.platformauditing.util.RestructureDataUtil;
 import com.google.gson.JsonArray;
@@ -38,7 +38,7 @@ public class InsightsAuditImpl implements InsightsAudit {
         String[] queryArgs = {assetID};
         try {
 
-            BCNetworkClient bcClient = BCNetworkClient.getInstance();
+        	BCNetworkGatewayClient bcClient = new BCNetworkGatewayClient();
             return bcClient.getAssetHistory(queryArgs);
 
         } catch (Exception e) {
@@ -55,7 +55,7 @@ public class InsightsAuditImpl implements InsightsAudit {
         try {
             String[] queryArgs = {startDate, endDate, toolName};
 
-            BCNetworkClient bcClient = BCNetworkClient.getInstance();
+            BCNetworkGatewayClient bcClient = new BCNetworkGatewayClient();
             return bcClient.getAllAssetsByDates(queryArgs);
 
         } catch (Exception e) {
@@ -73,7 +73,7 @@ public class InsightsAuditImpl implements InsightsAudit {
         try {
             String[] queryArgs = {assetId};
 
-            BCNetworkClient bcClient = BCNetworkClient.getInstance();
+            BCNetworkGatewayClient bcClient = new BCNetworkGatewayClient();
             return bcClient.getAssetDetails(queryArgs);
 
         } catch (Exception e) {
@@ -88,9 +88,9 @@ public class InsightsAuditImpl implements InsightsAudit {
             JsonObject data = utilMethods.masssageData(input);
             Boolean insertFlag = utilMethods.getInsertionFlag(data);
             if (insertFlag) {
-                BCNetworkClient bcNetworkClient = BCNetworkClient.getInstance();
+            	BCNetworkGatewayClient bcClient = new BCNetworkGatewayClient();
                 LOG.info("Inserting Data:\n" + data);
-                return insertNode(data, bcNetworkClient);
+                return insertNode(data, bcClient);
                 //return true;
             } else {
                 LOG.info("Insertion is not required according to process rules:\n" + data);
@@ -114,7 +114,7 @@ public class InsightsAuditImpl implements InsightsAudit {
                         changelogData = utilMethods.constructJiraFromChangelog(ledgerCopy.getAsJsonObject("msg"), changelogData);
                         Boolean insertFlag = utilMethods.getInsertionFlag(changelogData);
                         if (insertFlag) {
-                            BCNetworkClient bcNetworkClient = BCNetworkClient.getInstance();
+                            BCNetworkGatewayClient bcNetworkClient = new BCNetworkGatewayClient();
                             LOG.info("Inserting Data:\n" + changelogData);
                             return insertNode(changelogData, bcNetworkClient);
                             //return true;
@@ -148,7 +148,7 @@ public class InsightsAuditImpl implements InsightsAudit {
             LOG.info("POST MASSAGING:\n" + data);
             Boolean insertFlag = utilMethods.getInsertionFlag(data);
             if (insertFlag) {
-                BCNetworkClient bcNetworkClient = BCNetworkClient.getInstance();
+            	BCNetworkGatewayClient bcNetworkClient = new BCNetworkGatewayClient();
                 if(changelogArray.size() == 0){
                     return insertNode(data, bcNetworkClient);
                 }
@@ -170,7 +170,7 @@ public class InsightsAuditImpl implements InsightsAudit {
 
 
     //common method for insertion
-    private boolean insertNode(JsonObject arg, BCNetworkClient bcNetworkClient) throws Exception {
+    private boolean insertNode(JsonObject arg, BCNetworkGatewayClient bcNetworkClient) throws Exception {
         String[] nodeData = {arg.toString()};
         JsonObject insertionResult = bcNetworkClient.createBCNode(nodeData);
         LOG.debug(insertionResult);

@@ -52,6 +52,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
+import com.cognizant.devops.platformcommons.constants.ConfigOptions;
 import com.cognizant.devops.platformcommons.constants.MQMessageConstants;
 import com.cognizant.devops.platformcommons.core.enums.AGENTACTION;
 import com.cognizant.devops.platformcommons.core.util.ValidationUtils;
@@ -69,7 +70,6 @@ import com.rabbitmq.client.AMQP.BasicProperties;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
-
 
 @Service("agentManagementService")
 public class AgentManagementServiceImpl implements AgentManagementService {
@@ -102,7 +102,7 @@ public class AgentManagementServiceImpl implements AgentManagementService {
 			if (ValidationUtils.checkAgentIdString(agentId)) {
 				throw new InsightsCustomException("Agent Id has to be Alpha numeric with '_' as special character");
 			}
-			if(agentId.equalsIgnoreCase(toolName)) {
+			if (agentId.equalsIgnoreCase(toolName)) {
 				throw new InsightsCustomException("Agent Id and Tool name cannot be the same.");
 			}
 			// Condition to check whether the agent ID is existing already in database or
@@ -239,7 +239,7 @@ public class AgentManagementServiceImpl implements AgentManagementService {
 			agentList = new ArrayList<>(agentConfigList.size());
 			for (AgentConfig agentConfig : agentConfigList) {
 				AgentConfigTO to = new AgentConfigTO();
-				BeanUtils.copyProperties(agentConfig, to, new String[] { "agentJson", "updatedDate", "vault" });
+				BeanUtils.copyProperties(agentConfig, to, "agentJson", "updatedDate", "vault");
 				agentList.add(to);
 			}
 		} catch (Exception e) {
@@ -263,27 +263,46 @@ public class AgentManagementServiceImpl implements AgentManagementService {
 	}
 
 	@Override
-	public Map<String, ArrayList<String>> getSystemAvailableAgentList() throws InsightsCustomException {
+	public Map<String, ArrayList<String>> getDocrootAvailableAgentList() throws InsightsCustomException {
 		Map<String, ArrayList<String>> agentDetails = new TreeMap<>();
-		if (!ApplicationConfigProvider.getInstance().getAgentDetails().isOnlineRegistration()) {
-			agentDetails = getOfflineSystemAvailableAgentList();
-		} else {
-			String url = ApplicationConfigProvider.getInstance().getAgentDetails().getDocrootUrl();
-			Document doc;
-			try {
-				doc = Jsoup.connect(url).get();
-				Elements rows = doc.getElementsByTag("a");
-				for (Element element : rows) {
-					if (null != element.text() && element.text().startsWith("v")) {
-						String version = StringUtils.stripEnd(element.text(), "/");
-						ArrayList<String> toolJson = getAgents(version);
-						agentDetails.put(version, toolJson);
-					}
+		String url = ApplicationConfigProvider.getInstance().getAgentDetails().getDocrootUrl();
+		Document doc;
+		try {
+			doc = Jsoup.connect(url).get();
+			Elements rows = doc.getElementsByTag("a");
+			for (Element element : rows) {
+				if (null != element.text() && element.text().startsWith("v")) {
+					String version = StringUtils.stripEnd(element.text(), "/");
+					ArrayList<String> toolJson = getAgentsFromDocroot(version);
+					agentDetails.put(version, toolJson);
 				}
-			} catch (IOException e) {
-				log.error("Error while getting system agent list ", e);
-				throw new InsightsCustomException(e.toString());
 			}
+		} catch (IOException e) {
+			log.error("Error while getting system agent list from docroot ", e);
+			throw new InsightsCustomException(e.toString());
+		}
+		return agentDetails;
+	}
+
+	@Override
+	public Map<String, ArrayList<String>> getRepoAvailableAgentList() throws InsightsCustomException {
+		Map<String, ArrayList<String>> agentDetails = new TreeMap<>();
+		log.debug("Inside getRepoAvailableAgentList for nexus repo ");
+		String url = ApplicationConfigProvider.getInstance().getAgentDetails().getBrowseRepoUrl();
+		Document doc;
+		try {
+			doc = Jsoup.connect(url).get();
+			Elements rows = doc.getElementsByTag("a");
+			for (Element element : rows) {
+				if (null != element.text() && element.text().startsWith("v")) {
+					String version = element.text();
+					ArrayList<String> toolJson = getAgentsForRepo(version);
+					agentDetails.put(version, toolJson);
+				}
+			}
+		} catch (IOException e) {
+			log.error("Error while getting system agent list ", e);
+			throw new InsightsCustomException(e.toString());
 		}
 		return agentDetails;
 	}
@@ -291,17 +310,25 @@ public class AgentManagementServiceImpl implements AgentManagementService {
 	@Override
 	public String getToolRawConfigFile(String version, String tool) throws InsightsCustomException {
 		String configJson = null;
+		String toolPath = null;
 		if (!ApplicationConfigProvider.getInstance().getAgentDetails().isOnlineRegistration()) {
 			configJson = getOfflineToolRawConfigFile(version, tool);
 		} else {
 			try {
-				String docrootToolPath = ApplicationConfigProvider.getInstance().getAgentDetails().getDocrootUrl() + "/"
-						+ version + "/agents/" + tool;
-				docrootToolPath = docrootToolPath.trim() + "/" + tool.trim() + ZIPEXTENSION;
+				if (ApplicationConfigProvider.getInstance().getAgentDetails()
+						.getOnlineRegistrationMode().equalsIgnoreCase(ConfigOptions.ONLINE_REGISTRATION_MODE_DOCROOT)) {
+					toolPath = ApplicationConfigProvider.getInstance().getAgentDetails().getDocrootUrl() + "/" + version
+							+ "/agents/" + tool;
+					toolPath = toolPath.trim() + "/" + tool.trim() + ZIPEXTENSION;
+				} else {
+					toolPath = ApplicationConfigProvider.getInstance().getAgentDetails().getDownloadRepoUrl() + "/"
+							+ version + "/agents/" + tool;
+					toolPath = toolPath.trim() + "/" + tool.trim() + ZIPEXTENSION;
+				}
 				String targetDir = ApplicationConfigProvider.getInstance().getAgentDetails().getUnzipPath()
 						+ File.separator + tool;
 				configJson = AgentManagementUtil.getInstance()
-						.getAgentConfigfile(new URL(docrootToolPath), new File(targetDir)).toString();
+						.getAgentConfigfile(new URL(toolPath), new File(targetDir)).toString();
 			} catch (IOException e) {
 				log.error("Error in getting raw config file ", e);
 				throw new InsightsCustomException(e.toString());
@@ -311,7 +338,26 @@ public class AgentManagementServiceImpl implements AgentManagementService {
 		return configJson;
 	}
 
-	private ArrayList<String> getAgents(String version) {
+	private ArrayList<String> getAgentsForRepo(String version) {
+		Document doc;
+		String url = ApplicationConfigProvider.getInstance().getAgentDetails().getBrowseRepoUrl() + "/" + version
+				+ "/agents/";
+		ArrayList<String> tools = new ArrayList<>();
+		try {
+			doc = Jsoup.connect(url).get();
+			Elements rows = doc.getElementsByTag("a");
+			for (Element element : rows) {
+				if (null != element.text() && !(element.text().startsWith("Parent"))) {
+					tools.add(element.text());
+				}
+			}
+		} catch (IOException e) {
+			log.error("Error while fetching agents", e);
+		}
+		return tools;
+	}
+
+	private ArrayList<String> getAgentsFromDocroot(String version) {
 		Document doc;
 		String url = ApplicationConfigProvider.getInstance().getAgentDetails().getDocrootUrl() + "/" + version
 				+ "/agents/";
@@ -330,7 +376,7 @@ public class AgentManagementServiceImpl implements AgentManagementService {
 		return tools;
 	}
 
-	private Map<String, ArrayList<String>> getOfflineSystemAvailableAgentList() throws InsightsCustomException {
+	public Map<String, ArrayList<String>> getOfflineSystemAvailableAgentList() throws InsightsCustomException {
 		String offlinePath = ApplicationConfigProvider.getInstance().getAgentDetails().getOfflineAgentPath();
 		if (offlinePath == null || offlinePath.isEmpty()) {
 			log.error("Offline folder path not available");
@@ -526,7 +572,7 @@ public class AgentManagementServiceImpl implements AgentManagementService {
 		}
 		try {
 			if (trackingFile.exists()) {
-				trackingFile.delete();
+				Files.delete(trackingFile.toPath());
 			}
 		} catch (NullPointerException e) {
 			log.error("No tracking json file found!", e);
@@ -609,13 +655,15 @@ public class AgentManagementServiceImpl implements AgentManagementService {
 			String labelData = json.get("publish").getAsJsonObject().get("data").getAsString().toUpperCase();
 			String labelHealth = json.get("publish").getAsJsonObject().get("health").getAsString().toUpperCase();
 			if (ValidationUtils.checkLabelNameString(labelData)) {
-				throw new InsightsCustomException("Invalid data label Name, it should contain only alphanumeric character,underscore & dot");
-			} 
-			if(ValidationUtils.checkLabelNameString(labelHealth)) {
-				throw new InsightsCustomException("Invalid health label Name, it should contain only alphanumeric character,underscore & dot");
+				throw new InsightsCustomException(
+						"Invalid data label Name, it should contain only alphanumeric character,underscore & dot");
+			}
+			if (ValidationUtils.checkLabelNameString(labelHealth)) {
+				throw new InsightsCustomException(
+						"Invalid health label Name, it should contain only alphanumeric character,underscore & dot");
 			}
 			labelDataValue = Arrays.asList(labelData.split(MQMessageConstants.ROUTING_KEY_SEPERATOR));
-			
+
 		} catch (Exception e) {
 			log.error("Invalid label Name {} ", e);
 			throw new InsightsCustomException(e.getMessage());
@@ -623,7 +671,6 @@ public class AgentManagementServiceImpl implements AgentManagementService {
 		return labelDataValue.get(1);
 
 	}
-
 
 	/**
 	 * Prepare vault based structure and store in vault.
@@ -654,8 +701,7 @@ public class AgentManagementServiceImpl implements AgentManagementService {
 	 * @return dataMap
 	 * @throws IOException
 	 */
-	private Map<String, String> getToolbasedSecret(JsonObject json, String agentId)
-			throws IOException {
+	private Map<String, String> getToolbasedSecret(JsonObject json, String agentId) throws IOException {
 		HashMap<String, String> secretMap = new HashMap<>();
 		String configFilePath = filePath + File.separator + agentId;
 		File configFile = null;
@@ -688,7 +734,6 @@ public class AgentManagementServiceImpl implements AgentManagementService {
 		return secretMap;
 	}
 
-
 	/**
 	 * Compare vault secret with UI value and update the vault with new secrets
 	 * 
@@ -696,7 +741,7 @@ public class AgentManagementServiceImpl implements AgentManagementService {
 	 * @param secretMap
 	 * @param json
 	 * @throws InsightsCustomException
-	 * @throws IOException 
+	 * @throws IOException
 	 */
 	private void updateSecrets(String agentId, Map<String, String> updatedDataMap, JsonObject json)
 			throws InsightsCustomException, IOException {
@@ -716,15 +761,15 @@ public class AgentManagementServiceImpl implements AgentManagementService {
 		if (!updatedDataMap.isEmpty()) {
 			vaultSecret(agentId, vaultData, updatedDataMap);
 		}
-		
+
 	}
-	
-	
+
 	private Map<String, String> vaultSecret(String agentId, JsonObject vaultData, Map<String, String> updatedDataMap)
 			throws InsightsCustomException {
 		Gson gson = new Gson();
 		JsonObject updatedDataJson = gson.toJsonTree(updatedDataMap).getAsJsonObject();
-		// In registeragent case existing vaultData is null and in updateAgent case it has exising valut value
+		// In registeragent case existing vaultData is null and in updateAgent case it
+		// has exising valut value
 		if ((vaultData == null && !updatedDataMap.isEmpty())
 				|| (vaultData != null && vaultData.entrySet().size() > 0 && !updatedDataJson.equals(vaultData))) {
 			vaultHandler.storeToVault(updatedDataJson, agentId);
@@ -732,5 +777,5 @@ public class AgentManagementServiceImpl implements AgentManagementService {
 		return updatedDataMap;
 
 	}
-	
+
 }

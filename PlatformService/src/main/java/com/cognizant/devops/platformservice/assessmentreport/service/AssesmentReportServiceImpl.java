@@ -34,7 +34,10 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.cognizant.devops.platformcommons.constants.AssessmentReportAndWorkflowConstants;
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
+import com.cognizant.devops.platformcommons.core.enums.ContentConfigEnum;
+import com.cognizant.devops.platformcommons.core.enums.KpiConfigEnum;
 import com.cognizant.devops.platformcommons.core.enums.WorkflowTaskEnum;
 import com.cognizant.devops.platformcommons.core.util.InsightsUtils;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
@@ -76,19 +79,20 @@ public class AssesmentReportServiceImpl {
 		int kpiId = -1;
 		try {
 			InsightsKPIConfig kpiConfig = new InsightsKPIConfig();
-			kpiId = registerkpiJson.get("kpiId").getAsInt();
+			kpiId = registerkpiJson.get(AssessmentReportAndWorkflowConstants.KPIID).getAsInt();
 			InsightsKPIConfig kpiExistingConfig = reportConfigDAL.getKPIConfig(kpiId);
 			if (kpiExistingConfig != null) {
 				throw new InsightsCustomException("KPI already exists");
 			}
-			boolean isActive = registerkpiJson.get("isActive").getAsBoolean();
+			boolean isActive = registerkpiJson.get(AssessmentReportAndWorkflowConstants.ISACTIVE).getAsBoolean();
 			String kpiName = registerkpiJson.get("name").getAsString();
 			String dBQuery = registerkpiJson.get("DBQuery").getAsString();
 			String resultField = registerkpiJson.get("resultField").getAsString();
 			String group = registerkpiJson.get("group").getAsString();
 			String toolName = registerkpiJson.get("toolName").getAsString();
-			String dataSource = registerkpiJson.get("datasource").getAsString();
+			String dataSource = registerkpiJson.get(AssessmentReportAndWorkflowConstants.DATASOURCE).getAsString();
 			String category = registerkpiJson.get("category").getAsString();
+			dBQuery = dBQuery.replace("#", "<").replace("~", ">");
 			kpiConfig.setKpiId(kpiId);
 			kpiConfig.setActive(isActive);
 			kpiConfig.setKpiName(kpiName);
@@ -99,15 +103,86 @@ public class AssesmentReportServiceImpl {
 			kpiConfig.setDatasource(dataSource);
 			kpiConfig.setCategory(category);
 			reportConfigDAL.saveKpiConfig(kpiConfig);
-		} catch (NullPointerException e) {
-			log.error(e);
-			throw new InsightsCustomException("kpi Definition does not have some mandatory field");
 		} catch (Exception e) {
 			log.error(e);
 			throw new InsightsCustomException(e.getMessage());
 		}
 		return kpiId;
 
+	}
+
+	/**
+	 * Used to update individual KPI definition
+	 * 
+	 * @param registerkpiJson
+	 * @return
+	 * @throws InsightsCustomException
+	 */
+	public int updateKpiDefinition(JsonObject updatekpiJson) throws InsightsCustomException {
+		int kpiId = -1;
+		try {
+			kpiId = updatekpiJson.get(AssessmentReportAndWorkflowConstants.KPIID).getAsInt();
+			InsightsKPIConfig kpiExistingConfig = reportConfigDAL.getKPIConfig(kpiId);
+			if (kpiExistingConfig == null) {
+				throw new InsightsCustomException("While update, KPI definition not exists");
+			} else {
+				boolean isActive = updatekpiJson.get(AssessmentReportAndWorkflowConstants.ISACTIVE).getAsBoolean();
+				String kpiName = updatekpiJson.get("name").getAsString();
+				String dBQuery = updatekpiJson.get("DBQuery").getAsString();
+				String resultField = updatekpiJson.get("resultField").getAsString();
+				String group = updatekpiJson.get("group").getAsString();
+				String toolName = updatekpiJson.get("toolName").getAsString();
+				String dataSource = updatekpiJson.get(AssessmentReportAndWorkflowConstants.DATASOURCE).getAsString();
+				String category = updatekpiJson.get("category").getAsString();
+				dBQuery = dBQuery.replace("#", "<").replace("~", ">");
+				kpiExistingConfig.setKpiId(kpiId);
+				kpiExistingConfig.setActive(isActive);
+				kpiExistingConfig.setKpiName(kpiName);
+				kpiExistingConfig.setdBQuery(dBQuery);
+				kpiExistingConfig.setResultField(resultField);
+				kpiExistingConfig.setToolname(toolName);
+				kpiExistingConfig.setGroupName(group);
+				kpiExistingConfig.setDatasource(dataSource);
+				kpiExistingConfig.setCategory(category);
+				reportConfigDAL.updateKpiConfig(kpiExistingConfig);
+			}
+		} catch (Exception e) {
+			log.error(e);
+			throw new InsightsCustomException(e.getMessage());
+		}
+		return kpiId;
+	}
+
+	/**
+	 * Used to delete individual KPI definition
+	 * 
+	 * @param registerkpiJson
+	 * @return
+	 * @throws InsightsCustomException
+	 */
+	public boolean deleteKpiDefinition(JsonObject deletekpiJson) throws InsightsCustomException {
+		int kpiId = -1;
+		boolean isRecordDeleted = Boolean.FALSE;
+		try {
+			kpiId = deletekpiJson.get(AssessmentReportAndWorkflowConstants.KPIID).getAsInt();
+			InsightsKPIConfig kpiExistingConfig = reportConfigDAL.getKPIConfig(kpiId);
+			if (kpiExistingConfig == null) {
+				throw new InsightsCustomException("KPI definition not exists");
+			} else {
+				List<InsightsReportsKPIConfig> reportKPIList = reportConfigDAL.getActiveReportTemplateByKPIId(kpiId);
+				if (reportKPIList.isEmpty()) {
+					reportConfigDAL.deleteContentbyKPIID(kpiId);
+					reportConfigDAL.deleteKPIbyKpiID(kpiId);
+					isRecordDeleted = Boolean.TRUE;
+				} else {
+					throw new InsightsCustomException("KPI definition attached to report template");
+				}
+			}
+		} catch (Exception e) {
+			log.error(e);
+			throw new InsightsCustomException(e.getMessage());
+		}
+		return isRecordDeleted;
 	}
 
 	/**
@@ -122,9 +197,9 @@ public class AssesmentReportServiceImpl {
 		Gson gson = new Gson();
 		try {
 			InsightsContentConfig contentConfig = new InsightsContentConfig();
-			int kpiId = registerContentJson.get("kpiId").getAsInt();
-			contentId = registerContentJson.get("contentId").getAsInt();
-			boolean isActive = registerContentJson.get("isActive").getAsBoolean();
+			int kpiId = registerContentJson.get(AssessmentReportAndWorkflowConstants.KPIID).getAsInt();
+			contentId = registerContentJson.get(AssessmentReportAndWorkflowConstants.CONTENTID).getAsInt();
+			boolean isActive = registerContentJson.get(AssessmentReportAndWorkflowConstants.ISACTIVE).getAsBoolean();
 			String contentName = registerContentJson.get("contentName").getAsString();
 
 			String contentString = gson.toJson(registerContentJson);
@@ -144,9 +219,47 @@ public class AssesmentReportServiceImpl {
 			contentConfig.setContentName(contentName);
 			contentConfig.setCategory(category);
 			reportConfigDAL.saveContentConfig(contentConfig);
-		} catch (NullPointerException e) {
+		} catch (Exception e) {
 			log.error(e);
-			throw new InsightsCustomException("Content Definition does not have some mandatory field");
+			throw new InsightsCustomException(e.getMessage());
+		}
+		return contentId;
+	}
+
+	/**
+	 * Used to store update content definition
+	 * 
+	 * @param registerContentJson
+	 * @return
+	 * @throws InsightsCustomException
+	 */
+	public int updateContentDefinition(JsonObject updateContentJson) throws InsightsCustomException {
+		int contentId = -1;
+		Gson gson = new Gson();
+		try {
+			InsightsContentConfig contentConfig = new InsightsContentConfig();
+			int kpiId = updateContentJson.get(AssessmentReportAndWorkflowConstants.KPIID).getAsInt();
+			contentId = updateContentJson.get(AssessmentReportAndWorkflowConstants.CONTENTID).getAsInt();
+			boolean isActive = updateContentJson.get(AssessmentReportAndWorkflowConstants.ISACTIVE).getAsBoolean();
+			String contentName = updateContentJson.get("contentName").getAsString();
+			String contentString = gson.toJson(updateContentJson);
+			contentConfig.setContentId(contentId);
+			InsightsKPIConfig kpiConfig = reportConfigDAL.getKPIConfig(kpiId);
+			if (kpiConfig == null) {
+				throw new InsightsCustomException("KPI defination not exists");
+			}
+			InsightsContentConfig contentDBConfig = reportConfigDAL.getContentConfig(contentId);
+			if (contentDBConfig == null) {
+				throw new InsightsCustomException("Content Definition does not  exists");
+			} else {
+				String category = kpiConfig.getCategory();
+				contentDBConfig.setKpiConfig(kpiConfig);
+				contentDBConfig.setActive(isActive);
+				contentDBConfig.setContentJson(contentString);
+				contentDBConfig.setContentName(contentName);
+				contentDBConfig.setCategory(category);
+				reportConfigDAL.updateContentConfig(contentDBConfig);
+			}
 		} catch (Exception e) {
 			log.error(e);
 			throw new InsightsCustomException(e.getMessage());
@@ -162,7 +275,7 @@ public class AssesmentReportServiceImpl {
 	 * @throws InsightsCustomException
 	 */
 	public String uploadKPIInDatabase(MultipartFile file) throws InsightsCustomException {
-		StringBuilder kpiResultList = new StringBuilder();
+		String returnMessage = "";
 		String originalFilename = file.getOriginalFilename();
 		JsonParser jsonParser = new JsonParser();
 		String fileExt = FilenameUtils.getExtension(originalFilename);
@@ -170,19 +283,16 @@ public class AssesmentReportServiceImpl {
 			if (fileExt.equalsIgnoreCase("json")) {
 				String kpiJson = readFileAndCreateJson(file);
 				JsonArray kpiJsonArray = jsonParser.parse(kpiJson).getAsJsonArray();
-				for (JsonElement jsonElement : kpiJsonArray) {
-					kpiResultList = saveBulkKpiDefinition(jsonElement, kpiResultList);
-				}
+				returnMessage = saveBulkKpiDefinition(kpiJsonArray);
 			} else {
-				log.error(" KPI Detail {} ", kpiResultList);
+				log.error("Invalid file format. ");
 				throw new InsightsCustomException("Invalid file format.");
 			}
 		} catch (Exception ex) {
-			log.error(" KPI Detail {} ", kpiResultList);
 			log.error("Error in uploading KPI file {} ", ex.getMessage());
 			throw new InsightsCustomException(ex.getMessage());
 		}
-		return kpiResultList.toString();
+		return returnMessage;
 	}
 
 	/**
@@ -192,15 +302,35 @@ public class AssesmentReportServiceImpl {
 	 * @param kpiResultList
 	 * @return
 	 */
-	public StringBuilder saveBulkKpiDefinition(JsonElement jsonElement, StringBuilder kpiResultList) {
-		int kpiId = jsonElement.getAsJsonObject().get("kpiId").getAsInt();
-		try {
-			kpiId = saveKpiDefinition(jsonElement.getAsJsonObject());
-			kpiResultList.append("==== Success:KPI Id(" + kpiId + ") created.");
-		} catch (Exception e) {
-			kpiResultList.append(" ==== Error : KPI Id (" + kpiId + ") not created, with Exception " + e.getMessage());
+	public String saveBulkKpiDefinition(JsonArray kpiJsonArray) {
+		String returnMessage;
+		int totalKpiRecord = kpiJsonArray.size();
+		JsonArray successMessageArray = new JsonArray();
+		JsonArray errorMessageArray = new JsonArray();
+		if (totalKpiRecord > 0) {
+			for (JsonElement jsonElement : kpiJsonArray) {
+				int kpiId = jsonElement.getAsJsonObject().get(AssessmentReportAndWorkflowConstants.KPIID).getAsInt();
+				try {
+					kpiId = saveKpiDefinition(jsonElement.getAsJsonObject());
+					successMessageArray.add(kpiId);
+				} catch (Exception e) {
+					log.error("Error : KPI Id {} not created, with Exception {}", kpiId, e.getMessage());
+					errorMessageArray.add(kpiId);
+				}
+			}
+			if (successMessageArray.size() == totalKpiRecord) {
+				returnMessage = "All KPI records are inserted successfully. ";
+			} else if (errorMessageArray.size() == totalKpiRecord) {
+				returnMessage = "All KPI records are not inserted, Please check Platform Service log for more detail. ";
+			} else {
+				returnMessage = "Number of KPI inserted successfully are " + successMessageArray.size()
+						+ " and not inserted are " + errorMessageArray.size()
+						+ ", Please check Platform Service log for more detail.";
+			}
+		} else {
+			returnMessage = "No KPI defination found in request json";
 		}
-		return kpiResultList;
+		return returnMessage;
 	}
 
 	/**
@@ -211,7 +341,7 @@ public class AssesmentReportServiceImpl {
 	 * @throws InsightsCustomException
 	 */
 	public String uploadContentInDatabase(MultipartFile file) throws InsightsCustomException {
-		StringBuilder contentResultList = new StringBuilder();
+		String returnMessage = "";
 		String originalFilename = file.getOriginalFilename();
 		JsonParser jsonParser = new JsonParser();
 		String fileExt = FilenameUtils.getExtension(originalFilename);
@@ -219,19 +349,16 @@ public class AssesmentReportServiceImpl {
 			if (fileExt.equalsIgnoreCase("json")) {
 				String contentJson = readFileAndCreateJson(file);
 				JsonArray contentJsonArray = jsonParser.parse(contentJson).getAsJsonArray();
-				for (JsonElement jsonElement : contentJsonArray) {
-					contentResultList = saveBulkContentDefinition(jsonElement, contentResultList);
-				}
+				returnMessage = saveBulkContentDefinition(contentJsonArray);
 			} else {
-				log.error(" Content Detail {} ", contentResultList);
+				log.error("Invalid file format.");
 				throw new InsightsCustomException("Invalid file format.");
 			}
 		} catch (Exception ex) {
-			log.error(" Content  Detail {} ", contentResultList);
 			log.error("Error in uploading Content file {} ", ex.getMessage());
 			throw new InsightsCustomException(ex.getMessage());
 		}
-		return contentResultList.toString();
+		return returnMessage;
 	}
 
 	/**
@@ -241,16 +368,36 @@ public class AssesmentReportServiceImpl {
 	 * @param contentResultList
 	 * @return StringBuilder
 	 */
-	public StringBuilder saveBulkContentDefinition(JsonElement jsonElement, StringBuilder contentResultList) {
-		int contentId = jsonElement.getAsJsonObject().get("contentId").getAsInt();
-		try {
-			contentId = saveContentDefinition(jsonElement.getAsJsonObject());
-			contentResultList.append(" ====  Suceess : Content Id(" + contentId + ") created. ");
-		} catch (Exception e) {
-			contentResultList.append(
-					" ==== Error : Content Id (" + contentId + ") not created, with Exception " + e.getMessage());
+	public String saveBulkContentDefinition(JsonArray contentJsonArray) {
+		String returnMessage;
+		int totalContentRecord = contentJsonArray.size();
+		JsonArray successMessageArray = new JsonArray();
+		JsonArray errorMessageArray = new JsonArray();
+		if (totalContentRecord > 0) {
+			for (JsonElement jsonElement : contentJsonArray) {
+				int contentId = jsonElement.getAsJsonObject().get(AssessmentReportAndWorkflowConstants.CONTENTID)
+						.getAsInt();
+				try {
+					contentId = saveContentDefinition(jsonElement.getAsJsonObject());
+					successMessageArray.add(contentId);
+				} catch (Exception e) {
+					log.error("Error : Content Id {} not created, with Exception {}", contentId, e.getMessage());
+					errorMessageArray.add(contentId);
+				}
+			}
+			if (successMessageArray.size() == totalContentRecord) {
+				returnMessage = "All Content records are inserted successfully.";
+			} else if (errorMessageArray.size() == totalContentRecord) {
+				returnMessage = "All Content records are not inserted, Please check Platform Service log for more detail.";
+			} else {
+				returnMessage = "Number of Content inserted successfully are " + successMessageArray.size()
+						+ " and not inserted are " + errorMessageArray.size()
+						+ ", Please check Platform Service log for more detail.";
+			}
+		} else {
+			returnMessage = "No Content defination found in request json";
 		}
-		return contentResultList;
+		return returnMessage;
 	}
 
 	/**
@@ -324,7 +471,7 @@ public class AssesmentReportServiceImpl {
 	public String updateAssessmentReportState(JsonObject updateReportJsonValidated) throws InsightsCustomException {
 		try {
 			int assessmentReportId = updateReportJsonValidated.get("id").getAsInt();
-			Boolean state = updateReportJsonValidated.get("isActive").getAsBoolean();
+			Boolean state = updateReportJsonValidated.get(AssessmentReportAndWorkflowConstants.ISACTIVE).getAsBoolean();
 			InsightsAssessmentConfiguration assessmentConfig = reportConfigDAL
 					.getAssessmentByConfigId(assessmentReportId);
 			InsightsWorkflowConfiguration workFlowObject = assessmentConfig.getWorkflowConfig();
@@ -354,14 +501,16 @@ public class AssesmentReportServiceImpl {
 					.getAssessmentByConfigId(assessmentReportId);
 			WorkflowServiceImpl workfowserice = new WorkflowServiceImpl();
 			InsightsWorkflowConfiguration workFlowObject = assessmentConfig.getWorkflowConfig();
-			workFlowObject.setReoccurence(assessmentReportJson.get("isReoccuring").getAsBoolean());
+			workFlowObject.setReoccurence(
+					assessmentReportJson.get(AssessmentReportAndWorkflowConstants.ISREOCCURING).getAsBoolean());
 			JsonArray taskArray = assessmentReportJson.get("tasklist").getAsJsonArray();
 			Set<InsightsWorkflowTaskSequence> taskSequenceSet = assessmentConfig.getWorkflowConfig()
 					.getTaskSequenceEntity();
 			taskSequenceSet = workfowserice.setSequence(taskArray, workFlowObject);
 			workFlowObject.setTaskSequenceEntity(taskSequenceSet);
-			if (!assessmentReportJson.get("emailDetails").isJsonNull()) {
-				emailDetails = assessmentReportJson.get("emailDetails").getAsJsonObject();
+			if (!assessmentReportJson.get(AssessmentReportAndWorkflowConstants.EMAILDETAILS).isJsonNull()) {
+				emailDetails = assessmentReportJson.get(AssessmentReportAndWorkflowConstants.EMAILDETAILS)
+						.getAsJsonObject();
 				InsightsEmailTemplates emailTemplateConfig = workflowService.createEmailTemplateObject(emailDetails,
 						workFlowObject);
 				workFlowObject.setEmailConfig(emailTemplateConfig);
@@ -408,11 +557,13 @@ public class AssesmentReportServiceImpl {
 	public JsonObject createAssessmentReportJsonForUI(InsightsAssessmentConfiguration assessmentReport) {
 		JsonObject jsonobject = new JsonObject();
 		jsonobject.addProperty("configId", assessmentReport.getId());
-		jsonobject.addProperty("reportName", assessmentReport.getAsseementreportname());
+		jsonobject.addProperty(AssessmentReportAndWorkflowConstants.REPORTNAME,
+				assessmentReport.getAsseementreportname());
 		jsonobject.addProperty("asseementreportdisplayname", assessmentReport.getAsseementReportDisplayName());
-		jsonobject.addProperty("isActive", assessmentReport.isActive());
+		jsonobject.addProperty(AssessmentReportAndWorkflowConstants.ISACTIVE, assessmentReport.isActive());
 		jsonobject.addProperty("inputDatasource", assessmentReport.getInputDatasource());
-		jsonobject.addProperty("isReoccuring", assessmentReport.getWorkflowConfig().isReoccurence());
+		jsonobject.addProperty(AssessmentReportAndWorkflowConstants.ISREOCCURING,
+				assessmentReport.getWorkflowConfig().isReoccurence());
 
 		InsightsAssessmentReportTemplate reporttemplate = assessmentReport.getReportTemplateEntity();
 		JsonObject reportTemplateJsonObject = new JsonObject();
@@ -435,19 +586,19 @@ public class AssesmentReportServiceImpl {
 			jsonobject.addProperty("nextRun", nextRun);
 		}
 		jsonobject.addProperty("schedule", workflowConfig.getScheduleType());
-		jsonobject.addProperty("status", status);
+		jsonobject.addProperty(AssessmentReportAndWorkflowConstants.STATUS, status);
 		long startdate = assessmentReport.getStartDate();
 		String startDate = InsightsUtils.specficTimeFormat(startdate, "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
-		jsonobject.addProperty("startdate", startDate);
+		jsonobject.addProperty(AssessmentReportAndWorkflowConstants.STARTDATE, startDate);
 		if (workflowConfig.getScheduleType().equals(WorkflowTaskEnum.WorkflowSchedule.ONETIME.toString())) {
 			String endDate = InsightsUtils.specficTimeFormat(assessmentReport.getEndDate(),
 					"yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
 			jsonobject.addProperty("enddate", endDate);
 		}
-		jsonobject.addProperty("startdate", startDate);
+		jsonobject.addProperty(AssessmentReportAndWorkflowConstants.STARTDATE, startDate);
 		String workflowId = workflowConfig.getWorkflowId();
 		jsonobject.addProperty("workflowId", workflowId);
-		jsonobject.addProperty("runimmediate", workflowConfig.isRunImmediate());
+		jsonobject.addProperty(AssessmentReportAndWorkflowConstants.RUNIMMEDIATE, workflowConfig.isRunImmediate());
 		JsonArray detailTask = new JsonArray();
 		List<InsightsWorkflowTaskSequence> taskList = workflowConfigDAL
 				.getAllWorkflowTaskSequenceByWorkflowId(workflowId);
@@ -460,7 +611,7 @@ public class AssesmentReportServiceImpl {
 		jsonobject.add("taskDesc", detailTask);
 		InsightsEmailTemplates emailConfig = workflowConfig.getEmailConfig();
 		JsonObject emailDetails = loadEmailDetailsForUI(emailConfig);
-		jsonobject.add("emailDetails", emailDetails);
+		jsonobject.add(AssessmentReportAndWorkflowConstants.EMAILDETAILS, emailDetails);
 		return jsonobject;
 	}
 
@@ -477,27 +628,30 @@ public class AssesmentReportServiceImpl {
 			mailBody = mailBody.replace("<", "#").replace(">", "~");
 			emailDetails.addProperty("senderEmailAddress", emailConfig.getMailFrom());
 			if (emailConfig.getMailTo() != null) {
-				emailDetails.addProperty("receiverEmailAddress", emailConfig.getMailTo());
+				emailDetails.addProperty(AssessmentReportAndWorkflowConstants.RECEIVEREMAILADDRESS,
+						emailConfig.getMailTo());
 			} else {
-				emailDetails.addProperty("receiverEmailAddress", "");
+				emailDetails.addProperty(AssessmentReportAndWorkflowConstants.RECEIVEREMAILADDRESS, "");
 			}
 			if (emailConfig.getMailCC() != null) {
-				emailDetails.addProperty("receiverCCEmailAddress", emailConfig.getMailCC());
+				emailDetails.addProperty(AssessmentReportAndWorkflowConstants.RECEIVERCCEMAILADDRESS,
+						emailConfig.getMailCC());
 			} else {
-				emailDetails.addProperty("receiverCCEmailAddress", "");
+				emailDetails.addProperty(AssessmentReportAndWorkflowConstants.RECEIVERCCEMAILADDRESS, "");
 			}
 			if (emailConfig.getMailBCC() != null) {
-				emailDetails.addProperty("receiverBCCEmailAddress", emailConfig.getMailBCC());
+				emailDetails.addProperty(AssessmentReportAndWorkflowConstants.RECEIVERBCCEMAILADDRESS,
+						emailConfig.getMailBCC());
 			} else {
-				emailDetails.addProperty("receiverBCCEmailAddress", "");
+				emailDetails.addProperty(AssessmentReportAndWorkflowConstants.RECEIVERBCCEMAILADDRESS, "");
 			}
 			emailDetails.addProperty("mailSubject", emailConfig.getSubject());
 			emailDetails.addProperty("mailBodyTemplate", mailBody);
 		} else {
 			emailDetails.addProperty("senderEmailAddress", "");
-			emailDetails.addProperty("receiverEmailAddress", "");
-			emailDetails.addProperty("receiverCCEmailAddress", "");
-			emailDetails.addProperty("receiverBCCEmailAddress", "");
+			emailDetails.addProperty(AssessmentReportAndWorkflowConstants.RECEIVEREMAILADDRESS, "");
+			emailDetails.addProperty(AssessmentReportAndWorkflowConstants.RECEIVERCCEMAILADDRESS, "");
+			emailDetails.addProperty(AssessmentReportAndWorkflowConstants.RECEIVERBCCEMAILADDRESS, "");
 			emailDetails.addProperty("mailSubject", "");
 			emailDetails.addProperty("mailBodyTemplate", "");
 		}
@@ -552,7 +706,7 @@ public class AssesmentReportServiceImpl {
 			String workflowType = WorkflowTaskEnum.WorkflowType.REPORT.getValue();
 			long epochStartDate;
 			long epochEndDate;
-			String reportName = assessmentReportJson.get("reportName").getAsString();
+			String reportName = assessmentReportJson.get(AssessmentReportAndWorkflowConstants.REPORTNAME).getAsString();
 			InsightsAssessmentConfiguration assessmentReport = reportConfigDAL
 					.getAssessmentByAssessmentName(reportName);
 			if (assessmentReport != null) {
@@ -561,14 +715,16 @@ public class AssesmentReportServiceImpl {
 			String emailList = assessmentReportJson.get("emailList").getAsString();
 			boolean isActive = false;
 			String schedule = assessmentReportJson.get("schedule").getAsString();
-			String datasource = assessmentReportJson.get("datasource").getAsString();
-			boolean reoccurence = assessmentReportJson.get("isReoccuring").getAsBoolean();
+			String datasource = assessmentReportJson.get(AssessmentReportAndWorkflowConstants.DATASOURCE).getAsString();
+			boolean reoccurence = assessmentReportJson.get(AssessmentReportAndWorkflowConstants.ISREOCCURING)
+					.getAsBoolean();
 			boolean runImmediate = false;
 			String asseementreportdisplayname = assessmentReportJson.get("asseementreportdisplayname").getAsString();
-			if (!assessmentReportJson.get("emailDetails").isJsonNull()) {
-				emailDetails = assessmentReportJson.get("emailDetails").getAsJsonObject();
+			if (!assessmentReportJson.get(AssessmentReportAndWorkflowConstants.EMAILDETAILS).isJsonNull()) {
+				emailDetails = assessmentReportJson.get(AssessmentReportAndWorkflowConstants.EMAILDETAILS)
+						.getAsJsonObject();
 			}
-			JsonElement startDateJsonObject = assessmentReportJson.get("startdate");
+			JsonElement startDateJsonObject = assessmentReportJson.get(AssessmentReportAndWorkflowConstants.STARTDATE);
 			if (startDateJsonObject.isJsonNull()) {
 				epochStartDate = 0;
 			} else {
@@ -681,8 +837,8 @@ public class AssesmentReportServiceImpl {
 			int reportId) throws InsightsCustomException {
 		List<Integer> kpiIds = new ArrayList<>();
 		Set<InsightsReportsKPIConfig> reportsKPIConfigSet = new HashSet<>();
-		String reportName = templateReportJson.get("reportName").getAsString();
-		boolean isActive = templateReportJson.get("isActive").getAsBoolean();
+		String reportName = templateReportJson.get(AssessmentReportAndWorkflowConstants.REPORTNAME).getAsString();
+		boolean isActive = templateReportJson.get(AssessmentReportAndWorkflowConstants.ISACTIVE).getAsBoolean();
 		String description = templateReportJson.get("description").getAsString();
 		String file = templateReportJson.get("file").getAsString();
 		String visualizationutil = templateReportJson.get("visualizationutil").getAsString();
@@ -701,7 +857,7 @@ public class AssesmentReportServiceImpl {
 
 		for (JsonElement eachKpiConfig : kpiConfigArray) {
 			JsonObject kpiObject = eachKpiConfig.getAsJsonObject();
-			int kpiId = kpiObject.get("kpiId").getAsInt();
+			int kpiId = kpiObject.get(AssessmentReportAndWorkflowConstants.KPIID).getAsInt();
 			if (kpiIds.contains(kpiId)) {
 				log.debug(" Kpi id already exists with the reportId {} ", reportId);
 			} else {
@@ -754,7 +910,7 @@ public class AssesmentReportServiceImpl {
 			JsonArray jsonarray = new JsonArray();
 			for (InsightsKPIConfig kpiDetail : listofkpis) {
 				JsonObject jsonobject = new JsonObject();
-				jsonobject.addProperty("kpiId", kpiDetail.getKpiId());
+				jsonobject.addProperty(AssessmentReportAndWorkflowConstants.KPIID, kpiDetail.getKpiId());
 				jsonobject.addProperty("kpiName", kpiDetail.getKpiName());
 				jsonarray.add(jsonobject);
 			}
@@ -779,11 +935,12 @@ public class AssesmentReportServiceImpl {
 			InsightsAssessmentConfiguration assessmentConfig = reportConfigDAL
 					.getAssessmentByConfigId(assessmentReportId);
 			InsightsWorkflowConfiguration workFlowObject = assessmentConfig.getWorkflowConfig();
-			if (reportConfigJson.has("status")) {
-				String status = reportConfigJson.get("status").getAsString();
+			if (reportConfigJson.has(AssessmentReportAndWorkflowConstants.STATUS)) {
+				String status = reportConfigJson.get(AssessmentReportAndWorkflowConstants.STATUS).getAsString();
 				workFlowObject.setStatus(status);
-			} else if (reportConfigJson.has("runimmediate")) {
-				boolean runImmediate = reportConfigJson.get("runimmediate").getAsBoolean();
+			} else if (reportConfigJson.has(AssessmentReportAndWorkflowConstants.RUNIMMEDIATE)) {
+				boolean runImmediate = reportConfigJson.get(AssessmentReportAndWorkflowConstants.RUNIMMEDIATE)
+						.getAsBoolean();
 				workFlowObject.setRunImmediate(runImmediate);
 				assessmentConfig.setActive(true);
 				workFlowObject.setActive(true);
@@ -797,4 +954,125 @@ public class AssesmentReportServiceImpl {
 		}
 	}
 
+	/**
+	 * Method use to return KPI category
+	 * 
+	 * @return
+	 */
+	public List<String> getKpiCategory() {
+		List<String> listOfCategory = new ArrayList<>();
+		KpiConfigEnum.KpiCategory[] categories = KpiConfigEnum.KpiCategory.values();
+		for (KpiConfigEnum.KpiCategory category : categories) {
+			listOfCategory.add(category.toString().toUpperCase());
+		}
+		return listOfCategory;
+	}
+
+	/**
+	 * Method use to return KPI datasource
+	 * 
+	 * @return
+	 */
+	public List<String> getKpiDataSource() {
+		List<String> listOfDatasource = new ArrayList<>();
+		KpiConfigEnum.KpiDatasourse[] datasources = KpiConfigEnum.KpiDatasourse.values();
+		for (KpiConfigEnum.KpiDatasourse kpidatasource : datasources) {
+			listOfDatasource.add(kpidatasource.toString().toUpperCase());
+		}
+		return listOfDatasource;
+	}
+
+	/**
+	 * API use to return all active KPI list
+	 * 
+	 * @return
+	 * @throws InsightsCustomException
+	 */
+	public List<InsightsKPIConfig> getActiveKpiList() throws InsightsCustomException {
+		List<InsightsKPIConfig> kpiconfigList = new ArrayList<>();
+		try {
+			kpiconfigList = reportConfigDAL.getAllActiveKpiConfig();
+			return kpiconfigList;
+		} catch (Exception e) {
+			log.error("Error getting all kpiList...", e);
+			throw new InsightsCustomException(e.toString());
+		}
+	}
+
+	/**
+	 * Method use to return Content Action
+	 * 
+	 * @return
+	 */
+	public List<String> getContentAction() {
+		List<String> listOfCategory = new ArrayList<>();
+		ContentConfigEnum.ExecutionActions[] categories = ContentConfigEnum.ExecutionActions.values();
+		for (ContentConfigEnum.ExecutionActions category : categories) {
+			listOfCategory.add(category.toString().toUpperCase());
+		}
+		return listOfCategory;
+	}
+
+	/**
+	 * API use to return all active Content list
+	 * 
+	 * @return
+	 * @throws InsightsCustomException
+	 */
+	public List<JsonObject> getAllActiveContentList() throws InsightsCustomException {
+		List<InsightsContentConfig> kpiconfigList = new ArrayList<>();
+		List<JsonObject> contentCustomList = new ArrayList<>();
+		JsonParser jsonParser = new JsonParser();
+		try {
+			kpiconfigList = reportConfigDAL.getAllActiveContentList();
+			kpiconfigList.stream().forEach(contentDBData -> {
+				JsonObject contentData = jsonParser.parse(contentDBData.getContentJson()).getAsJsonObject();
+				contentData.addProperty("kpiName", contentDBData.getKpiConfig().getKpiName());
+				contentData.addProperty("contentId", contentDBData.getContentId());
+				contentData.addProperty("contentName", contentDBData.getContentName());
+				contentData.addProperty("kpiId", contentDBData.getKpiConfig().getKpiId());
+				contentData.addProperty("category", contentDBData.getKpiConfig().getCategory());
+
+				contentCustomList.add(contentData);
+			});
+			return contentCustomList;
+		} catch (Exception e) {
+			log.error("Error getting all kpiList...", e);
+			throw new InsightsCustomException(e.toString());
+		}
+	}
+
+	/**
+	 * Used to delete individual Content definition
+	 * 
+	 * @param registerkpiJson
+	 * @return
+	 * @throws InsightsCustomException
+	 */
+	public boolean deleteContentDefinition(JsonObject deleteContentJson) throws InsightsCustomException {
+		int ContentId = -1;
+		boolean isRecordDeleted = Boolean.FALSE;
+		try {
+			ContentId = deleteContentJson.get(AssessmentReportAndWorkflowConstants.CONTENTID).getAsInt();
+			InsightsContentConfig contentExistingConfig = reportConfigDAL.getContentConfig(ContentId);
+			if (contentExistingConfig == null) {
+				throw new InsightsCustomException("Content definition not exists");
+			} else {
+				List<InsightsReportsKPIConfig> reportKPIList = reportConfigDAL
+						.getActiveReportTemplateByKPIId(contentExistingConfig.getKpiConfig().getId());
+				if (reportKPIList.isEmpty()) {
+					reportConfigDAL.deleteContentbyContentID(ContentId);
+					isRecordDeleted = Boolean.TRUE;
+				} else {
+					throw new InsightsCustomException("Content definition attached to report template");
+				}
+
+				isRecordDeleted = Boolean.TRUE;
+			}
+		} catch (Exception e) {
+			log.error(e);
+			throw new InsightsCustomException(e.getMessage());
+		}
+		return isRecordDeleted;
+	}
 }

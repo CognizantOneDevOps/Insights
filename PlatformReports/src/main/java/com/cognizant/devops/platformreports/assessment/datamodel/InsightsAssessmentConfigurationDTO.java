@@ -15,10 +15,13 @@
  ******************************************************************************/
 package com.cognizant.devops.platformreports.assessment.datamodel;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 
 public class InsightsAssessmentConfigurationDTO {
 
@@ -37,6 +40,8 @@ public class InsightsAssessmentConfigurationDTO {
 	Map<String, String> contentMap = new HashMap<>();
 	JsonArray visualizationResult = new JsonArray();
 	private String asseementreportdisplayname;
+	private List<JsonObject> ledgerRecords = new ArrayList<>();
+	private String incomingTaskMessageJson;
 
 	public int getReportId() {
 		return reportId;
@@ -156,6 +161,22 @@ public class InsightsAssessmentConfigurationDTO {
 
 	public void setVisualizationutil(String visualizationutil) {
 		this.visualizationutil = visualizationutil;
+	}
+	
+	public List<JsonObject> getLedgerRecords() {
+		return ledgerRecords;
+	}
+
+	public void setLedgerRecords(List<JsonObject> ledgerRecords) {
+		this.ledgerRecords = ledgerRecords;
+	}
+
+	public String getIncomingTaskMessageJson() {
+		return incomingTaskMessageJson;
+	}
+
+	public void setIncomingTaskMessageJson(String incomingTaskMessageJson) {
+		this.incomingTaskMessageJson = incomingTaskMessageJson;
 	}
 
 	@Override

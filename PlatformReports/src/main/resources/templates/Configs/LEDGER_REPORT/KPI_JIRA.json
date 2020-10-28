@@ -1,0 +1,11 @@
+{
+      "kpiId":1000089,
+      "name":"Test_JIRA",
+      "group":"ALM",
+      "toolName":"JIRA",
+      "category":"",
+      "DBQuery":"",
+      "datasource":"HYPERLEDGER",
+      "isActive":true,
+      "resultField":""
+}

@@ -17,6 +17,7 @@ package com.cognizant.devops.platformservice.config;
 
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
+import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 
 import javax.net.ssl.HostnameVerifier;
@@ -69,37 +70,44 @@ public class PlatformServiceInitializer implements WebApplicationInitializer {
 	        TrustManager[] trustAllCerts = new TrustManager[] {new X509TrustManager() {
 	            @Override
 				public java.security.cert.X509Certificate[] getAcceptedIssuers() {
-	                return null;
+	                return new X509Certificate[0];
 	            }
 	            @Override
-				public void checkClientTrusted(X509Certificate[] certs, String authType) {
+				public void checkClientTrusted(X509Certificate[] certs, String authType) throws CertificateException{
+						try {
+							for (X509Certificate cert : certs) {
+								cert.checkValidity();
+							}
+						} catch (Exception e) {
+							throw new CertificateException("Certificate not valid or trusted.");
+						}
 	            }
 	            @Override
-				public void checkServerTrusted(X509Certificate[] certs, String authType) {
+				public void checkServerTrusted(X509Certificate[] certs, String authType) throws CertificateException{
+						try {
+							for (X509Certificate cert : certs) {
+								cert.checkValidity();
+							}
+						} catch (Exception e) {
+							throw new CertificateException("Certificate not valid or trusted.");
+						}
 	            }
 	        }
 	        };
 
 	        // Install the all-trusting trust manager
-	        SSLContext sc = SSLContext.getInstance("SSL");
+	        SSLContext sc = SSLContext.getInstance("TLS");
 	        sc.init(null, trustAllCerts, new java.security.SecureRandom());
 	        HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
 
 	        // Create all-trusting host name verifier
-	        HostnameVerifier allHostsValid = new HostnameVerifier() {
-	            @Override
-				public boolean verify(String hostname, SSLSession session) {
-	                return true;
-	            }
-	        };
-
+	        HostnameVerifier allHostsValid = (hostname,session) -> hostname.equalsIgnoreCase(session.getPeerHost());
+	        
 	        // Install the all-trusting host verifier
 	        HttpsURLConnection.setDefaultHostnameVerifier(allHostsValid);
-	    } catch (NoSuchAlgorithmException e) {
+	    } catch (NoSuchAlgorithmException | KeyManagementException e) {
 	        log.error(e);
-	    } catch (KeyManagementException e) {
-	    	log.error(e);
-	    }
+	    } 
 	}
 
 }

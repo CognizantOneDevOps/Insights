@@ -1,0 +1,99 @@
+{
+  "vault": {
+    "getFromVault": false,
+    "secretEngine": "insights-kv",
+    "readToken": "vault_secret_token",
+    "vaultUrl": "http://Vault_Host:port/v1/"
+  },
+  "mqConfig": {
+    "user": "iSight",
+    "password": "iSight",
+    "host": "127.0.0.1",
+    "exchange": "iSight",
+    "agentControlXchg": "iAgent"
+  },
+  "enrichData": {
+    "isEnrichmentRequired": true,
+    "sourceProperty": "message",
+    "keyPattern": "-",
+    "targetProperty": "key"
+  },
+  "subscribe": {
+    "config": "SYSTEM.ELASTICTRANSFER.CONFIG",
+    "dataArchivalQueue": "SYSTEM.ELASTICTRANSFER.DATAARCHIVAL"
+  },
+  "publish": {
+    "data": "SYSTEM.ELASTICTRANSFER.DATA",
+    "health": "SYSTEM.ELASTICTRANSFER.HEALTH"
+  },
+  "communication": {
+    "type": "REST",
+    "sslVerify": false,
+    "responseType": "JSON"
+  },
+  "dockerImageName": "infra.cogdevops.com:8090/onedevopsinsights",
+  "dockerImageTag": "neo4j-1.0",
+  "dockerHost": "",
+  "dockerPort":2375,
+  "hostAddress": "",
+  "dynamicTemplate": {
+      "responseTemplate": {
+          "sourceUrl": "sourceUrl",
+          "archivalName": "archivalName",
+          "status": "status"
+      },
+      "hostPort": [
+                        7575,
+      7001,
+      7576,
+      7002,
+      7577,
+      7003,
+      7578,
+      7004,
+      7579,
+      7005
+
+                ],
+                "bindPort": [
+                        7474,
+                        7687
+                ],
+                "hostVolume": [
+                        "data",
+                        "import",
+                        "logs",
+                        "conf"
+                ],
+                "mountVolume": [
+                        "/opt/NEO4J_HOME/neo4j-Insights/data",
+                        "/opt/NEO4J_HOME/neo4j-Insights/import",
+                        "/opt/NEO4J_HOME/neo4j-Insights/logs",
+                        "/opt/NEO4J_HOME/neo4j-Insights/conf"
+                ]
+  },
+  "agentId": "",
+  "agentVersion": "v6.5",
+  "toolName": "elastictransfer",
+  "labelName": "ELASTICTRANSFER",
+  "no_of_processes": 8,
+  "elasticsearch_hostname_uri": "",
+  "fetch_all_data":1,
+  "time_format": "%Y-%m-%d %H:%M:%S",
+  "es_indexes": {
+    "*":"*"
+  },
+  "toolCategory": "SYSTEM",
+  "toolsTimeZone": "GMT",
+  "insightsTimeZone": "Asia/Kolkata",
+  "runSchedule": 30,
+  "timeStampField": "start_time",
+  "timeStampFormat": "%Y-%m-%dT%H:%M:%SZ",
+  "isEpochTimeFormat": false,
+  "isDebugAllowed": false,
+  "loggingSetting": {
+    "logLevel": "WARN",
+    "maxBytes": 5000000,
+    "backupCount": 1000
+  }
+}

@@ -1,82 +1,75 @@
 
 export function processData(props) {
-  let jsonArrtoStr;
-  if (props.data.state == 'Done') {
-    if (props.data.series.length > 0) {
-      jsonArrtoStr = props.data.series[0].source
-    } else {
-      console.log('No record found');
-      throw new Error('No Data found');
-    }
-  }
-  let googleChartData = {};
-  let uiResponseArr = [] as any;
-  if (jsonArrtoStr.length > 0) {
-    for (let i = 0; i < jsonArrtoStr.length; i++) {
-      let arr = [] as any;
-      let vectorMap = {} as any;
-      vectorMap["vectorName"] = jsonArrtoStr[i]["heading"];
-      let jsonObjtoStr = jsonArrtoStr[i];
-      for (var vector in jsonObjtoStr["inferenceDetails"]) {
-        let resultArray = [] as any;
-        let data = jsonObjtoStr["inferenceDetails"][vector];
-        let vectorProperty = {};
-        googleChartData[data["kpiId"]] = data["resultSet"];
-        vectorProperty["kpi"] = data["kpi"];
-        vectorProperty["sentiment"] = data["sentiment"];
-        vectorProperty["kpiId"] = data["kpiId"];
-        vectorProperty["schedule"] = data["schedule"];
-        vectorProperty["trendline"] = data["trendline"];
-        vectorProperty["inference"] = data["inference"];
-        vectorMap["lastRun"] = data["lastRun"];
-        vectorMap["schedule"] = data["schedule"];
-
-        if (data["resultSet"].length != undefined) {
-          data.resultSet.forEach((x: any) => {
-            if (x.resultDate != undefined) {
-              var nowDate = new Date(x.resultDate);
-              var dateFormat = nowDate.getDate() + '-' + (nowDate.getMonth() + 1) + '-' + nowDate.getFullYear();
-              return resultArray.push({ 'label': dateFormat, 'value': x.value });
-            }
-          });
-        }
-        vectorProperty["resultSet"] = resultArray;
-        if (data["sentiment"] == "POSITIVE" && data["trendline"] == "High to Low") {
-          vectorProperty["color"] = "green";
-          vectorProperty["type"] = "increased";
-          googleChartData[data["kpiId"]].push("green");
-        }
-        else if (data["sentiment"] == "POSITIVE" && data["trendline"] == "Low to High") {
-          vectorProperty["color"] = "green";
-          vectorProperty["type"] = "increased";
-
-          googleChartData[data["kpiId"]].push("green");
-        }
-        else if (data["sentiment"] == "NEGATIVE" && data["trendline"] == "Low to High") {
-          vectorProperty["color"] = "red";
-          vectorProperty["type"] = "increased";
-
-          googleChartData[data["kpiId"]].push("red");
-        }
-        else if (data["sentiment"] == "NEGATIVE" && data["trendline"] == "High to Low") {
-          vectorProperty["color"] = "red";
-          vectorProperty["type"] = "decreased";
-
-          googleChartData[data["kpiId"]].push("red");
-        }
-        else if (data["sentiment"] == "NEUTRAL") {
-          vectorProperty["color"] = "green";
-          vectorProperty["type"] = "same";
-
-          googleChartData[data["kpiId"]].push("green");
-        }
-        arr.push(vectorProperty);
+    let jsonArrtoStr= [] as any;
+    if(props.data.state == 'Done'){
+      if (props.data.series.length > 0) {
+        jsonArrtoStr = props.data.series[0].source;
       }
-      vectorMap["data"] = arr;
-      uiResponseArr.push(vectorMap);
     }
-  }
-  return uiResponseArr;
+    let googleChartData = {} as any;
+    let uiResponseArr = [] as any;
+    if (jsonArrtoStr.length > 0) {
+        for (let i = 0; i < jsonArrtoStr.length; i++) {
+            let arr = [] as any;
+            let vectorMap = {} as any;
+            vectorMap["vectorName"] = jsonArrtoStr[i]["heading"];
+            let jsonObjtoStr = jsonArrtoStr[i];
+            for (var vector in jsonObjtoStr["inferenceDetails"]) {
+                let resultArray = [] as any;
+                let data = jsonObjtoStr["inferenceDetails"][vector];
+                let vectorProperty = {};
+                googleChartData[data["kpiId"]] = data["resultSet"];
+                vectorProperty["kpi"] = data["kpi"];
+                vectorProperty["sentiment"] = data["sentiment"];
+                vectorProperty["kpiId"] = data["kpiId"];
+                vectorProperty["schedule"] = data["schedule"];
+                vectorProperty["trendline"] = data["trendline"];
+                vectorProperty["inference"] = data["inference"];
+                vectorMap["lastRun"] = data["lastRun"];
+                vectorMap["schedule"] = data["schedule"];
+               
+                if(data["resultSet"].length != undefined){
+                    data.resultSet.forEach((x:any)=>{
+                        return resultArray.push({ 'label': x.resultDate, 'value': x.value });
+                    });
+                }
+                vectorProperty["resultSet"] = resultArray;
+                if (data["sentiment"] == "POSITIVE" && data["trendline"] == "High to Low") {
+                    vectorProperty["color"] = "green";
+                    vectorProperty["type"] = "increased";
+                    googleChartData[data["kpiId"]].push("green");
+                }
+                else if (data["sentiment"] == "POSITIVE" && data["trendline"] == "Low to High") {
+                    vectorProperty["color"] = "green";
+                    vectorProperty["type"] = "increased";
+
+                    googleChartData[data["kpiId"]].push("green");
+                }
+                else if (data["sentiment"] == "NEGATIVE" && data["trendline"] == "Low to High") {
+                    vectorProperty["color"] = "red";
+                    vectorProperty["type"] = "increased";
+
+                    googleChartData[data["kpiId"]].push("red");
+                }
+                else if (data["sentiment"] == "NEGATIVE" && data["trendline"] == "High to Low") {
+                    vectorProperty["color"] = "red";
+                    vectorProperty["type"] = "decreased";
+
+                    googleChartData[data["kpiId"]].push("red");
+                }
+                else if (data["sentiment"] == "NEUTRAL") {
+                    vectorProperty["color"] = "green";
+                    vectorProperty["type"] = "same";
+
+                    googleChartData[data["kpiId"]].push("green");
+                }
+                arr.push(vectorProperty);
+            }
+            vectorMap["data"] = arr;
+            uiResponseArr.push(vectorMap);
+        }
+    }
+    return uiResponseArr;
 }
 
 //Sample data to test inference without datasource

@@ -21,7 +21,7 @@ import { MatIconRegistry } from '@angular/material/icon';
 import { APP_INITIALIZER } from '@angular/core';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MaterialModule } from '@insights/app/material.module';
-import { MatDialog, MatDialogRef, MAT_DIALOG_DATA, MatDialogModule } from '@angular/material';
+import { MatDialog, MatDialogRef, MAT_DIALOG_DATA, MatDialogModule, MatSortModule } from '@angular/material';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { HomeRouting } from '@insights/app/modules/home.routing';
 import { SharedServices } from '@insights/app/shared.services';
@@ -91,6 +91,14 @@ import { ReportConfigComponent } from '@insights/app/modules/reportmanagement/re
 import { DataArchiveDetailsDialog } from '@insights/app/modules/settings/dataarchiving/data-archive-details/data-archive-details-dialog';
 import { DataArchiveConfigureURLDialog } from '@insights/app/modules/settings/dataarchiving/data-archive-configureurl/data-archive-configureurl-dialog';
 import { EmailConfigurationDialog } from '@insights/app/modules/reportmanagement/report-configuration/email-configuration-dialog'; 
+import { KpiCreationComponent} from '@insights/app/modules/kpi-creation/kpi-creation.component';
+import { KpiAdditionComponent} from '@insights/app/modules/kpi-addition/kpi-addition.component';
+import { FileUploadDialog } from './fileUploadDialog/fileUploadDialog.component';
+import { KpiService } from './kpi-addition/kpi-service';
+import { ContentConfigComponent } from '@insights/app/modules/content-config-list/content-config-list.component';
+import { ContentConfigAddition } from '@insights/app/modules/content-config-add/content-config-add.component';
+import { KpiListDialog } from './kpiList-Dialog/kpiList-Dialog.component';
+import { ContentService } from './content-config-list/content-service';
 
 
 @NgModule({
@@ -135,7 +143,13 @@ import { EmailConfigurationDialog } from '@insights/app/modules/reportmanagement
     AddTasksDialog,
     ViewKPIDialog,
     WorkflowHistoryDetailsDialog,
-    EmailConfigurationDialog
+    EmailConfigurationDialog,
+    KpiCreationComponent,
+    KpiAdditionComponent,
+    FileUploadDialog,
+    KpiListDialog,
+    ContentConfigComponent,
+    ContentConfigAddition
   ],
   imports: [
     HomeRouting,
@@ -150,6 +164,7 @@ import { EmailConfigurationDialog } from '@insights/app/modules/reportmanagement
     StorageServiceModule,
     DragulaModule
   ],
+  exports:[MatSortModule],
   entryComponents: [
     ShowDetailsDialog,
     ShowTraceabiltyDetailsDialog,
@@ -165,7 +180,9 @@ import { EmailConfigurationDialog } from '@insights/app/modules/reportmanagement
     WorkflowHistoryDetailsDialog,
     DataArchiveDetailsDialog,
     DataArchiveConfigureURLDialog,
-    EmailConfigurationDialog
+    EmailConfigurationDialog,
+    FileUploadDialog,
+    KpiListDialog
   ],
 
   providers: [
@@ -190,7 +207,9 @@ import { EmailConfigurationDialog } from '@insights/app/modules/reportmanagement
     WebHookService,
     ReportManagementService,
     LandingPageService,
-    TraceabiltyService
+    TraceabiltyService,
+    KpiService,
+    ContentService
   ]
 })
 export class HomeModules { }

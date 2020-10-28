@@ -1,0 +1,208 @@
+<div class="pageCss">
+  <div layout layout-align="left" class="titleStyle">
+    <div>Configuration |
+      <a class="greenTitleTxt">Content Configuration </a>
+    </div>
+  </div>
+  <div class="orangeStripCss"></div>
+  <div layout layout-align="left" class="sectionHeadingStyle">
+    <div layout>&nbsp; Content Configuration
+      <span class="sectionSubHeading"> (Configure a Content)
+      </span>
+    </div>
+  </div>
+
+  <div class="alignMain">
+    <div class="btnAlign">
+      <button mat-icon-button (click)="validateKpiData()">
+        <mat-icon title="Save" style="margin-top: 0%;" class="mat-icon material-icons">
+          save
+        </mat-icon>
+      </button>
+      <button mat-icon-button (click)="refreshData()" [disabled]="onEdit">
+        <mat-icon title="Refresh" style="margin-top: 10%;" class="mat-icon material-icons">
+          cancel
+        </mat-icon>
+      </button>
+    </div>
+    <div>
+      <table class="mat-elevation-z8 mat-table">
+        <thead>
+          <tr class="mat-header-row" layout-align="start start">
+            <th colspan="3" class="tableHeaderCss mat-header-cell" style=" border-radius: 10px 10px 0 0;">
+              <span class="mainHeaderText">Add details to Configure a Content</span>
+              <span class="infoHeaderText">(Please provide accurate details to Configure a Content.
+                Fields marked "<span style="color:#ff0000;">*</span>" are mandatory)
+              </span>
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="mat-row-kpi">
+            <td class="mat-cell" class="columnName">
+              <span class="mainText">Content Id</span>
+              <span style="color:#ff0000;">*</span>
+            </td>
+            <td class="columnComponent">
+              <input maxlength="7" type="number" id="contentId" [disabled]="type==='EDIT'" class="form-control"
+                [(ngModel)]="contentId" name="contentId" style="width: 84%;" (keypress)="defaultStop($event)">
+            </td>
+            <td>
+              <span class="infoText">Please input a unique Content Id</span>
+            </td>
+          </tr>
+          <tr class="mat-row-kpi">
+            <td class="mat-cell" class="columnName">
+              <span class="mainText">Content Name</span>
+              <span style="color:#ff0000;">*</span>
+            </td>
+            <td class="columnComponent">
+              <input maxlength="40" type="text" class="form-control" [(ngModel)]="contentName" name="contentName"
+                style="width: 84%;">
+            </td>
+            <td>
+              <span class="infoText">Please input a logical Name to make it simplier to
+                identify</span>
+            </td>
+          </tr>
+          <tr class="mat-row-kpi">
+            <td class="mat-cell" class="columnName">
+              <span class="mainText">Kpi Id</span>
+              <span class="asteriskText">*</span>
+            </td>
+            <div>
+              <td class="columnComponent">
+                <input maxlength="40" type="text" class="form-control" [(ngModel)]="kpiId" name="kpiId"
+                  style="width: 84%;" disabled placeholder="Search for a Kpi Id">
+
+              </td>
+            </div>
+            <td>
+              <a (click)="openKpiDialog()" style="margin-left:-63px;">
+                <mat-icon svgIcon="search_icon" [ngStyle]="{color:'#5C068C', height: '20px', width: '20px'}">
+                </mat-icon>
+              </a>
+              <span class="infoText" style="padding-left:45px ;">Please enter a Kpi Id </span>
+            </td>
+          </tr>
+          <tr class="mat-row-kpi">
+            <td class="mat-cell" class="columnName">
+              <span class="mainText">Expected Trend</span>
+              <span class="asteriskText">*</span>
+            </td>
+            <td class="columnComponent">
+              <mat-select required [(ngModel)]="expectedTrend" name="expectedTrend" class="form-control"
+                placeholder="Select Trend" color="primary">
+                <mat-option *ngFor="let data of trend" value="{{data}}">
+                  {{data}}</mat-option>
+              </mat-select>
+            </td>
+            <td>
+              <span class="infoText">Please select a Trend</span>
+            </td>
+          </tr>
+          <tr class="mat-row-kpi" *ngIf="category === 'THRESHOLD' || category === 'THRESHOLD_RANGE'">
+            <td class="mat-cell" class="columnName">
+              <span class="mainText">Direction of Threshold</span>
+              <span class="asteriskText">*</span>
+            </td>
+            <td class="columnComponent">
+              <mat-select required [(ngModel)]="directionThreshold" name="directionThreshold" class="form-control"
+                placeholder="Select threshold direction" color="primary">
+                <mat-option *ngFor="let data of thresholdDir" value="{{data}}">
+                  {{data}}
+                </mat-option>
+              </mat-select>
+            </td>
+            <td>
+              <span class="infoText">Please select threshold direction</span>
+            </td>
+          </tr>
+
+          <tr class="mat-row-kpi">
+            <td class="mat-cell" class="columnName">
+              <span class="mainText">Result Field</span>
+              <span class="asteriskText">*</span>
+            </td>
+            <td class="columnComponent">
+              <input maxlength="40" type="text" class="form-control" [(ngModel)]="resultField" name="resultField"
+                style="width: 85%;">
+            </td>
+            <td>
+              <span class="infoText">Please select a ResultField </span>
+            </td>
+          </tr>
+          <tr class="mat-row-kpi"
+            *ngIf="category === 'THRESHOLD' || category === 'THRESHOLD_RANGE' || category === 'MINMAX'|| category === 'TREND'">
+            <td class="mat-cell" class="columnName">
+              <span class="mainText">Action</span>
+              <span class="asteriskText">*</span>
+            </td>
+            <td class="columnComponent">
+              <mat-select required [(ngModel)]="action" name="action" class="form-control" placeholder="Select Action"
+                color="primary">
+                <mat-option *ngFor=" let data of actionDetail" value="{{data}}">
+                  {{data}} </mat-option>
+              </mat-select>
+            </td>
+            <td>
+              <span class="infoText">Please select a Action </span>
+            </td>
+          </tr>
+          <tr class="mat-row-kpi">
+            <td class="mat-cell" class="columnName">
+              <span class="mainText">Is Active?</span>
+              <span class="asteriskText">*</span>
+            </td>
+            <td class="columnComponent">
+              <mat-slide-toggle [(ngModel)]="isActive">
+              </mat-slide-toggle>
+            </td>
+            <td>
+              <span class="infoText"></span>
+            </td>
+          </tr>
+
+          <tr class="mat-row-kpi">
+            <td class="mat-cell" class="columnName">
+              <span class="mainText">Message</span>
+              <span class="asteriskText">*</span>
+            </td>
+            <td class="columnComponent">
+              <textarea [(ngModel)]="message" class="form-control" name="message" class="frmTxtarea" required
+                style="width: 85%;resize: none;"></textarea>
+            </td>
+            <td>
+              <span class="infoText">Please add a Message </span>
+            </td>
+          </tr>
+          <tr class="mat-row-kpi" *ngIf="category === 'THRESHOLD'">
+            <td class="mat-cell" class="columnName">
+              <span class="mainText">Threshold</span>
+              <span class="asteriskText">*</span>
+            </td>
+            <td class="columnComponent">
+              <textarea [(ngModel)]="threshold" class="form-control" name="threshold" class="frmTxtarea" required
+                style="width: 85%;resize: none;"></textarea>
+            </td>
+            <td>
+              <span class="infoText">Please add a Threshold </span>
+            </td>
+          </tr>
+          <tr class="mat-row-kpi" *ngIf="category === 'THRESHOLD_RANGE'">
+            <td class="mat-cell" class="columnName">
+              <span class="mainText">Thresholds</span>
+              <span class="asteriskText">*</span>
+            </td>
+            <td class="columnComponent">
+              <textarea [(ngModel)]="thresholds" class="form-control" name="thresholds" class="frmTxtarea" required
+                style="width: 85%;resize: none;"></textarea>
+            </td>
+            <td>
+              <span class="infoText">Please add Thresholds </span>
+            </td>
+          </tr>
+      </table>
+    </div>
+  </div>
+</div>

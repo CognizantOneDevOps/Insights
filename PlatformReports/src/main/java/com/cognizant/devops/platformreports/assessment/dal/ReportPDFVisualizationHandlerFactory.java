@@ -18,6 +18,7 @@ package com.cognizant.devops.platformreports.assessment.dal;
 import com.cognizant.devops.platformreports.assessment.pdf.BasePDFProcessor;
 import com.cognizant.devops.platformreports.assessment.pdf.D3ChartHandler;
 import com.cognizant.devops.platformreports.assessment.pdf.FusionChartHandler;
+import com.cognizant.devops.platformreports.assessment.pdf.LedgerPDFChartHandler;
 import com.cognizant.devops.platformreports.assessment.pdf.OpenPDFChartHandler;
 
 public class ReportPDFVisualizationHandlerFactory {
@@ -38,6 +39,8 @@ public class ReportPDFVisualizationHandlerFactory {
 
 		} else if (vender.equalsIgnoreCase("OpenPDF")) {
 			return new OpenPDFChartHandler();
+		} else if (vender.equalsIgnoreCase("LedgerPDF")) {
+			return new LedgerPDFChartHandler();
 		}
 		return null;
 	}

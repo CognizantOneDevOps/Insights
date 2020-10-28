@@ -24,6 +24,7 @@ import java.time.Year;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.time.temporal.IsoFields;
 import java.time.temporal.TemporalAdjusters;
 import java.util.Date;
@@ -226,6 +227,29 @@ public class InsightsUtils {
 		}
 		return time;
 
+	}
+	public static long addTimeInCurrentTime(long currentTimeInSeconds, String frequency, long value)
+	{
+		long time = 0l;
+		ZonedDateTime currentTime = ZonedDateTime.ofInstant(Instant.ofEpochSecond(currentTimeInSeconds), zoneId);
+		if (frequency.equalsIgnoreCase("DAYS")) {
+
+			time = currentTime.plusDays(value).toEpochSecond();
+		}
+		else if (frequency.equalsIgnoreCase("WEEKS")) {
+
+			time = currentTime.plusWeeks(value).toEpochSecond();
+		}
+		else if (frequency.equalsIgnoreCase("MONTHS")) {
+
+			time = currentTime.plusMonths(value).toEpochSecond();
+		}
+		else if (frequency.equalsIgnoreCase("YEARS")) {
+
+			time = currentTime.plusYears(value).toEpochSecond();
+		}
+
+		return time;
 	}
 
 	public static long getDataFromTime(String schedule, Integer since) {
@@ -550,6 +574,13 @@ public class InsightsUtils {
 		Duration d = Duration.between(fromInput, now);
 		return d.toDays();
 	}
+	
+	public static Long getDurationInDays(Long inputEpocSeconds) {
+		ZonedDateTime now = ZonedDateTime.now(zoneId);
+		ZonedDateTime fromInput = ZonedDateTime.ofInstant(Instant.ofEpochSecond(inputEpocSeconds), zoneId);
+		Duration d = Duration.between(fromInput, now);
+		return d.toDays();
+	}
 		
 	public static Long getDurationBetweenDates(long startTime, long endTime) {		
 		ZonedDateTime fromInput = ZonedDateTime.ofInstant(Instant.ofEpochSecond(startTime), zoneId);
@@ -557,7 +588,21 @@ public class InsightsUtils {
 		Duration d = Duration.between(fromInput, toInput);
 		return d.toDays();
 	}
-
+	public static long getScheduleWiseDuration(long startEpochInSeconds,long endEpochInSeconds,String schedule) {
+		LocalDateTime startDate = LocalDateTime.ofInstant(Instant.ofEpochSecond(getStartOfTheDay(startEpochInSeconds)),
+				zoneId);
+		LocalDateTime endDate = LocalDateTime.ofInstant(Instant.ofEpochSecond(getStartOfTheDay(endEpochInSeconds)),
+				zoneId);
+		if (schedule.equalsIgnoreCase("WEEKLY") || schedule.equalsIgnoreCase("TRI_WEEKLY_SPRINT")
+				|| schedule.equalsIgnoreCase("BI_WEEKLY_SPRINT")) {
+			return ChronoUnit.WEEKS.between(startDate, endDate);
+		} else if (schedule.equalsIgnoreCase("MONTHLY") || schedule.equalsIgnoreCase("QUARTERLY")) {
+			return ChronoUnit.MONTHS.between(startDate, endDate);
+		} else if (schedule.equalsIgnoreCase("YEARLY")) {
+			return ChronoUnit.YEARS.between(startDate, endDate);
+		}
+		return 0l;
+	}
 	public static Long getDurationBetweenDatesInDaysByRunTimeInSec(Long inputEpochMillis) {
 		ZonedDateTime now = ZonedDateTime.now(zoneId);
 		ZonedDateTime fromInput = ZonedDateTime.ofInstant(Instant.ofEpochSecond(inputEpochMillis), zoneId);
@@ -569,6 +614,23 @@ public class InsightsUtils {
 		ZonedDateTime fromInput = ZonedDateTime.ofInstant(Instant.ofEpochSecond(time), zoneId);
 		return fromInput.toLocalDate().lengthOfMonth();
 	}
+	public static long getTimeInCurrentTimezone(long time)
+	{
+		ZonedDateTime fromInput = ZonedDateTime.ofInstant(Instant.ofEpochSecond(time), zoneId);		
+		return fromInput.toEpochSecond();
+	}
+	
+	public static long getDaysInQuarter(long time)
+	{
+		ZonedDateTime fromInput = ZonedDateTime.ofInstant(Instant.ofEpochSecond(time), zoneId).with(TemporalAdjusters.firstDayOfMonth()).toLocalDate()
+				.atStartOfDay(zoneId);
+		int currentQuarterMonth = fromInput.getMonth().firstMonthOfQuarter().getValue();
+		ZonedDateTime firstDayOfTheCurrentQuarter = Year.now().atMonth(currentQuarterMonth).atDay(1)
+						.atStartOfDay().atZone(zoneId);
+		ZonedDateTime firstDayOfTheNextQuarter = firstDayOfTheCurrentQuarter.plusMonths(3);
+		Duration d = Duration.between(firstDayOfTheCurrentQuarter, firstDayOfTheNextQuarter);
+		return d.toDays(); 
+	}
 	public static int getCurrentMonthDays() {
 		ZonedDateTime now = ZonedDateTime.now(zoneId);
 		return now.toLocalDate().lengthOfMonth();
@@ -577,6 +639,11 @@ public class InsightsUtils {
 	public static int getCurrentYearDays() {
 		ZonedDateTime now = ZonedDateTime.now(zoneId);
 		return now.toLocalDate().lengthOfYear();
+	}
+	
+	public static int getLengthOfYear(long time) {
+		ZonedDateTime fromInput = ZonedDateTime.ofInstant(Instant.ofEpochSecond(time), zoneId);
+		return fromInput.toLocalDate().lengthOfYear();
 	}
 
 	public static Long addTimeInHours(long inputTime, long hours) {

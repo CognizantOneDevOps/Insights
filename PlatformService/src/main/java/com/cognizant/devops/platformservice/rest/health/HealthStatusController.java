@@ -66,12 +66,6 @@ public class HealthStatusController {
 					hostEndPoint, ServiceStatusConstants.Service);
 			servicesHealthStatus.add(ServiceStatusConstants.PlatformService, platformServStatus);
 			log.debug("After Platform Service================");
-			/* Insights Inference health check */
-			hostEndPoint = ServiceStatusConstants.INSIGHTS_INFERENCE_MASTER_HOST;
-			apiUrl = hostEndPoint;
-			JsonObject inferenceServStatus = healthStatusService.getComponentStatus("PlatformInsight", "");
-			servicesHealthStatus.add(ServiceStatusConstants.InsightsInference, inferenceServStatus);
-			log.debug("After inferance engine================");
 			/* Neo4j health check */
 			hostEndPoint = ServiceStatusConstants.NEO4J_HOST;
 			apiUrl = hostEndPoint + "/db/data/";

@@ -1,0 +1,117 @@
+<!--
+*******************************************************************************
+ * Copyright 2019 Cognizant Technology Solutions
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License.  You may obtain a copy
+ * of the License at
+ * 
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ ****************************************************************************** -->
+
+<div class="pageCss">
+
+    <div layout layout-align="left" class="titleStyle">
+        <div>Configuration |
+            <a class="greenTitleTxt">Content Configuration </a>
+        </div>
+    </div>
+    <div class="orangeStripCss"></div>
+
+    <div layout layout-align="left" class="sectionHeadingStyle">
+        <div layout>&nbsp; Content Configuration
+            <span class="sectionSubHeading"> (Configure a Content)
+            </span>
+        </div>
+    </div>
+
+    <div>
+        <div class="btnAlign">
+            <button mat-icon-button (click)="addnewContent()">
+                <mat-icon title="Add New KPI" style="margin-top: 10%;" class="mat-icon material-icons">
+                    add_circle
+                </mat-icon>
+            </button>
+            <button mat-icon-button *ngIf="onRadioBtnSelect" (click)="edit()">
+                <mat-icon title="Edit" class="mat-icon material-icons">
+                    edit
+                </mat-icon>
+            </button>
+            <button mat-icon-button>
+                <mat-icon title="Upload JSON" class="mat-icon material-icons" (click)="uploadFile()">
+                    cloud_upload
+                </mat-icon>
+            </button>
+
+            <button mat-icon-button *ngIf="onRadioBtnSelect" (click)="uninstallContent()">
+                <mat-icon title="Delete" style="margin-bottom: -10%;" class="mat-icon material-icons">
+                    delete
+                </mat-icon>
+            </button>
+            <button mat-icon-button (click)="refresh()" [disabled]="!onRadioBtnSelect">
+                <mat-icon title="Refresh" style="margin-top: 10%;" class="mat-icon material-icons">
+                    cancel
+                </mat-icon>
+            </button>
+        </div>
+        <div class="filterGroupCSS">
+            <input matInput (keyup)="applyFilter($event.target.value)" placeholder="Search" class="form-control">
+        </div>
+        <div>
+            <mat-radio-group [(ngModel)]="selCont">
+                <table mat-table [dataSource]="contentDatasource" class="mat-elevation-z8"
+                    style="margin-top:2% !important">
+                    <!-- Radio Button Column -->
+                    <ng-container matColumnDef="radio">
+                        <th mat-header-cell *matHeaderCellDef class="tableHeaderCss"></th>
+                        <td mat-cell *matCellDef="let element " style="width:5% !important">
+                            <mat-radio-button [value]="element" [checked]="refreshRadio" color="primary"
+                                (change)="enableButtons(element)"></mat-radio-button>
+                        </td>
+                    </ng-container>
+                    <ng-container matColumnDef="ContentId">
+                        <th mat-header-cell *matHeaderCellDef class="tableHeaderCss">Content Id</th>
+                        <td mat-cell *matCellDef="let element" style="width:10% !important">
+                            {{element.contentId}}
+                        </td>
+                    </ng-container>
+                    <ng-container matColumnDef="ContentName">
+                        <th mat-header-cell *matHeaderCellDef class="tableHeaderCss">Content Name</th>
+                        <td mat-cell *matCellDef="let element" style="width:30% !important">
+                            {{element.contentName}}
+                        </td>
+                    </ng-container>
+                    <ng-container matColumnDef="KpiId">
+                        <th mat-header-cell *matHeaderCellDef class="tableHeaderCss">Kpi Id</th>
+                        <td mat-cell *matCellDef="let element" style="width:10% !important">
+                            {{element.kpiId}}
+                        </td>
+                    </ng-container>
+                    <ng-container matColumnDef="ExpectedTrend">
+                        <th mat-header-cell *matHeaderCellDef class="tableHeaderCss">Expected Trend</th>
+                        <td mat-cell *matCellDef="let element" style="width:15% !important">
+                            {{element.expectedTrend}}
+                        </td>
+                    </ng-container>
+                    <ng-container matColumnDef="ResultField">
+                        <th mat-header-cell *matHeaderCellDef class="tableHeaderCss">Result Field</th>
+                        <td mat-cell *matCellDef="let element" style="width:15% !important">
+                            {{element.resultField}}
+                        </td>
+                    </ng-container>
+
+                    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                    <tr mat-row *matRowDef="let row; columns: displayedColumns;"> </tr>
+                </table>
+            </mat-radio-group>
+            <div>
+                <mat-paginator #paginator [pageSize]="MAX_ROWS_PER_TABLE" showFirstLastButtons class="paginationStyle">
+                </mat-paginator>
+            </div>
+        </div>

@@ -647,7 +647,7 @@ user-authentication	CUP	develop-0.3.1	2103000c695a00539f301c2d3f50bfce7be229a7	p
 user-authentication	CUP	release/0.2.1	2103000c695a00539f301c2d3f50bfce7be229a7	prakac	CMAE-3756	Care Bears -PI-5.1	Prakash.C@caremore.com	1.55E+12
 user-authentication	CUP	release/0.3.1	2103000c695a00539f301c2d3f50bfce7be229a7	prakac	CMAE-3756	Care Bears -PI-5.1	Prakash.C@caremore.com	1.55E+12
 user-authentication	CUP	develop-0.2.1	2103000c695a00539f301c2d3f50bfce7be229a7	prakac	CMAE-3756	Care Bears -PI-5.1	Prakash.C@caremore.com	1.55E+12
-user-authentication	CUP	feature/CMAE-1234_refresh_token_fix	2103000c695a00539f301c2d3f50bfce7be229a7	prakac	CMAE-3756	Care Bears -PI-5.1	Prakash.C@caremore.com	1.55E+12
+user-authentication	CUP	feature/CMAE-1234_refresh_fix	2103000c695a00539f301c2d3f50bfce7be229a7	prakac	CMAE-3756	Care Bears -PI-5.1	Prakash.C@caremore.com	1.55E+12
 user-authentication	CUP	release/0.5.0	04d48f5ba14041b9a26527fc9ef86f1bf87399e3	prakac	CMAE-3756	Care Bears -PI-5.1	Prakash.C@caremore.com	1.55E+12
 user-authentication	CUP	develop-0.5.0	04d48f5ba14041b9a26527fc9ef86f1bf87399e3	prakac	CMAE-3756	Care Bears -PI-5.1	Prakash.C@caremore.com	1.55E+12
 user-authentication	CUP	develop	04d48f5ba14041b9a26527fc9ef86f1bf87399e3	prakac	CMAE-3756	Care Bears -PI-5.1	Prakash.C@caremore.com	1.55E+12
@@ -657,7 +657,7 @@ user-authentication	CUP	release/0.4.0	04d48f5ba14041b9a26527fc9ef86f1bf87399e3	p
 user-authentication	CUP	develop-0.3.1	04d48f5ba14041b9a26527fc9ef86f1bf87399e3	prakac	CMAE-3756	Care Bears -PI-5.1	Prakash.C@caremore.com	1.55E+12
 user-authentication	CUP	release/0.2.1	04d48f5ba14041b9a26527fc9ef86f1bf87399e3	prakac	CMAE-3756	Care Bears -PI-5.1	Prakash.C@caremore.com	1.55E+12
 user-authentication	CUP	release/0.3.1	04d48f5ba14041b9a26527fc9ef86f1bf87399e3	prakac	CMAE-3756	Care Bears -PI-5.1	Prakash.C@caremore.com	1.55E+12
-user-authentication	CUP	feature/CMAE-1234_refresh_token_fix	04d48f5ba14041b9a26527fc9ef86f1bf87399e3	prakac	CMAE-3756	Care Bears -PI-5.1	Prakash.C@caremore.com	1.55E+12
+user-authentication	CUP	feature/CMAE-1234_refresh_fix	04d48f5ba14041b9a26527fc9ef86f1bf87399e3	prakac	CMAE-3756	Care Bears -PI-5.1	Prakash.C@caremore.com	1.55E+12
 user-authentication	CUP	develop-0.2.1	04d48f5ba14041b9a26527fc9ef86f1bf87399e3	prakac	CMAE-3756	Care Bears -PI-5.1	Prakash.C@caremore.com	1.55E+12
 commons	CUP	feature/CMAE-it5.2_Auth_Audit_Extract	de36b2089f41ae7740781d27a525f46440fe66d5	sdeivasiga	CMAE-3298	Care Bears -PI-5.1	saranya.deivasigamani@anthem.com	1.55E+12
 commons	CUP	feature/CMAE-it5.2_Member_Search_Fields_Changes	de36b2089f41ae7740781d27a525f46440fe66d5	sdeivasiga	CMAE-3298	Care Bears -PI-5.1	saranya.deivasigamani@anthem.com	1.55E+12
@@ -902,7 +902,7 @@ user-authentication	CUP	release/0.4.0	0126d02a81306db5b888516c582007d380944234	p
 user-authentication	CUP	develop-0.3.1	0126d02a81306db5b888516c582007d380944234	prakac	CMAE-3756	Care Bears -PI-5.1	Prakash.C@caremore.com	1.55E+12
 user-authentication	CUP	release/0.2.1	0126d02a81306db5b888516c582007d380944234	prakac	CMAE-3756	Care Bears -PI-5.1	Prakash.C@caremore.com	1.55E+12
 user-authentication	CUP	release/0.3.1	0126d02a81306db5b888516c582007d380944234	prakac	CMAE-3756	Care Bears -PI-5.1	Prakash.C@caremore.com	1.55E+12
-user-authentication	CUP	feature/CMAE-1234_refresh_token_fix	0126d02a81306db5b888516c582007d380944234	prakac	CMAE-3756	Care Bears -PI-5.1	Prakash.C@caremore.com	1.55E+12
+user-authentication	CUP	feature/CMAE-1234_refresh_fix	0126d02a81306db5b888516c582007d380944234	prakac	CMAE-3756	Care Bears -PI-5.1	Prakash.C@caremore.com	1.55E+12
 user-authentication	CUP	develop-0.2.1	0126d02a81306db5b888516c582007d380944234	prakac	CMAE-3756	Care Bears -PI-5.1	Prakash.C@caremore.com	1.55E+12
 user-authorization	CUP	develop-0.5.0	aea26896cf6c298575fe4db762b5913dace51334	prakac	CMAE-3756	Care Bears -PI-5.1	Prakash.C@caremore.com	1.55E+12
 user-authorization	CUP	release/0.5.0	aea26896cf6c298575fe4db762b5913dace51334	prakac	CMAE-3756	Care Bears -PI-5.1	Prakash.C@caremore.com	1.55E+12

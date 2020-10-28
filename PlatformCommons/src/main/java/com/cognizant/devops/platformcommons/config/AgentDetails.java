@@ -29,6 +29,28 @@ public class AgentDetails implements Serializable {
 	private String agentExchange;
 	private String agentPkgQueue;
 	private boolean isOnlineRegistration =  true;
+	private String onlineRegistrationMode;
+	private String downloadRepoUrl;
+	private String browseRepoUrl;
+	
+	public String getOnlineRegistrationMode() {
+		return onlineRegistrationMode;
+	}
+	public void setOnlineRegistrationMode(String onlineRegistrationMode) {
+		this.onlineRegistrationMode = onlineRegistrationMode;
+	}
+	public String getDownloadRepoUrl() {
+		return downloadRepoUrl;
+	}
+	public void setDownloadRepoUrl(String downloadRepoUrl) {
+		this.downloadRepoUrl = downloadRepoUrl;
+	}
+	public String getBrowseRepoUrl() {
+		return browseRepoUrl;
+	}
+	public void setBrowseRepoUrl(String browseRepoUrl) {
+		this.browseRepoUrl = browseRepoUrl;
+	}
 	private String offlineAgentPath;
 	
 	public String getDocrootUrl() {

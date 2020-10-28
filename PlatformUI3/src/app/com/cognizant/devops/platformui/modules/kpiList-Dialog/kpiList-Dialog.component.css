@@ -1,0 +1,35 @@
+.gridheadercenter {
+    font-weight: bold;
+    font-size: 18px;
+    text-decoration: none;
+    color: white;
+    width: 120%;
+    text-align: center;
+    padding-top: 8px;
+    margin-right: -10px;
+}
+
+.showDialogHeadingCss {
+    font-family: inherit;
+    font-size: 18px;
+    color: white;
+    margin-left: 90px;
+}
+.closeIconCss {
+    color: white;
+    margin:2%
+}
+.dialogtableHeaderCss {
+    background-color: grey;
+    color: white;
+    font-size: 14px;
+    height: 30px;
+    margin: 0px;
+    flex: 0 0 10px;
+    text-align: left;
+}
+.filterGroup{
+    float: left;
+    width: 50%;
+    margin: 2%
+ }

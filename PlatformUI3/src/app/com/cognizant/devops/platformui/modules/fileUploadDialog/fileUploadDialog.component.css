@@ -1,0 +1,53 @@
+.pageCss_logo{
+    margin-left: 16px;
+    margin-right: 16px;
+}
+.mainDivContainer{
+    margin-left: 16px;
+    margin-right: 16px;
+    height:90vh;
+    overflow: hidden;
+}
+.arrange-horizontally-fileDialog {
+	-webkit-box-orient: horizontal;
+	-webkit-box-direction: normal;
+	-webkit-flex-direction: row;
+	flex-direction: row;
+	box-sizing: border-box;
+	display: -webkit-box;
+	display: -webkit-flex;
+	width: 100%;
+}
+.gridHeader{
+    font-weight: bold;
+    font-size: 1.5vmax;
+    text-decoration: none;
+    color: white;
+    width: 100%;
+    margin-top: auto;
+    margin-bottom: auto;
+    vertical-align: middle;
+}
+.showDialogHeadingCss {
+    font-family: inherit;
+    font-size: 18px;
+    color: white;
+    margin-left: 7px;
+    margin-top: 5px;
+    margin-bottom: 5px;
+
+}
+
+.dialogHeader{
+	background: #5C068C;
+    height: 40px;
+    padding: 10px;
+    font-size: 18px;
+}
+.btnStyle{
+    padding: 6px;
+    margin-left: 303px;
+    margin-top: 15px;
+}
+
+

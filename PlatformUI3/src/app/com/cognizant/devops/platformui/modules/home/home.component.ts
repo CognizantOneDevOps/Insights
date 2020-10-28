@@ -283,15 +283,6 @@ export class HomeComponent implements OnInit {
             showMenu: InsightsInitService.showAuditReporting,
             title: "Search Assets",
             isAdminMenu: true
-          },
-          {
-            displayName: 'Query Builder',
-            iconName: 'feature',
-            route: 'InSights/Home/querybuilder',
-            isToolbarDisplay: InsightsInitService.enableInsightsToolbar,
-            showMenu: InsightsInitService.showAuditReporting,
-            title: "Query Builder",
-            isAdminMenu: true
           }
 
         ]
@@ -412,7 +403,35 @@ export class HomeComponent implements OnInit {
             showMenu: true,
             title: "Data Archival",
             isAdminMenu: true
-          }
+          },{
+            displayName: 'Report Configuration',
+            iconName: 'feature',
+            isToolbarDisplay: InsightsInitService.enableInsightsToolbar,
+            showMenu: true,
+            title: "Report Configuration",
+            isAdminMenu: false,
+            children:[
+              {
+                displayName: 'Kpi Creation',
+                iconName: 'feature',
+                route: 'InSights/Home/kpicreation',
+                isToolbarDisplay: InsightsInitService.enableInsightsToolbar,
+                showMenu: true,
+                title: "Kpi Creation",
+                isAdminMenu: false
+              },
+              {
+                displayName: 'Content Configuration',
+                iconName: 'feature',
+                route: 'InSights/Home/contentConfig',
+                isToolbarDisplay: InsightsInitService.enableInsightsToolbar,
+                showMenu: true,
+                title: "Content Configuration",
+                isAdminMenu: false
+              }
+            ]
+          },
+          
         ]
       }
     ];
