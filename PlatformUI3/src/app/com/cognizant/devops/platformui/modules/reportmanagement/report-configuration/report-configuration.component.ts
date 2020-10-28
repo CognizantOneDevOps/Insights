@@ -89,7 +89,9 @@ export class ReportConfigComponent implements OnInit {
   ngOnInit() {
     this.route.queryParams.subscribe(params => {
       this.receivedParam = JSON.parse(params["reportparam"]);
-      console.log(this.receivedParam);
+      this.receivedReportTemplates = JSON.parse(params["reportTemplates"]);
+      this.receivedScheduleList = JSON.parse(params["scheduleList"]);
+      console.log(this.receivedParam, this.receivedReportTemplates);
       this.receivedReportTemplates = JSON.parse(params["reportTemplates"]);
       this.receivedScheduleList = JSON.parse(params["scheduleList"]);
       console.log(this.receivedParam, this.receivedReportTemplates);
@@ -181,7 +183,7 @@ export class ReportConfigComponent implements OnInit {
       if (record.sourceUrl) {
         this.dataSourceList.push(record.sourceUrl);
       }
-    }
+    }  
   }
   
   addTasks() {

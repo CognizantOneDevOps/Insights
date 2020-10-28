@@ -15,6 +15,8 @@
  ******************************************************************************/
 package com.cognizant.devops.platformworkflow.workflowtask.core;
 
+import java.util.TimeZone;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.quartz.CronScheduleBuilder;
@@ -47,7 +49,7 @@ public class WorkflowSchedular {
 			CronTrigger triggerWorkflow = TriggerBuilder.newTrigger()
 					.withIdentity("WorkflowExecutortrigger", "WorkflowExecutor")
 					.withSchedule(CronScheduleBuilder.cronSchedule(
-							ApplicationConfigProvider.getInstance().getWorkflowDetails().getWorkflowExecutorCron()))
+							ApplicationConfigProvider.getInstance().getWorkflowDetails().getWorkflowExecutorCron()).inTimeZone(TimeZone.getTimeZone("UTC")))
 					.build();
 
 			JobDetail jobWorkflowRetry = JobBuilder.newJob(WorkflowRetryExecutor.class)
@@ -60,7 +62,7 @@ public class WorkflowSchedular {
 			CronTrigger triggeWorkflowRetry = TriggerBuilder.newTrigger()
 					.withIdentity("WorkflowRetryExecutortrigger", "WorkflowRetryExecutor")
 					.withSchedule(CronScheduleBuilder.cronSchedule(ApplicationConfigProvider.getInstance()
-							.getWorkflowDetails().getWorkflowRetryExecutorCron()))
+							.getWorkflowDetails().getWorkflowRetryExecutorCron()).inTimeZone(TimeZone.getTimeZone("UTC")))
 					.build();
 
 			JobDetail jobImmediateWorkflow = JobBuilder.newJob(WorkflowImmediateJobExecutor.class)
@@ -71,7 +73,7 @@ public class WorkflowSchedular {
 
 			CronTrigger triggeImmediateWorkflow = TriggerBuilder.newTrigger()
 					.withIdentity("WorkflowImmediateJobExecutortrigger", "WorkflowImmediateJobExecutor")
-					.withSchedule(CronScheduleBuilder.cronSchedule("0 */5 * ? * *"))
+					.withSchedule(CronScheduleBuilder.cronSchedule("0 */5 * ? * *").inTimeZone(TimeZone.getTimeZone("UTC")))
 					.build();
 			
 			JobDetail jobAutoWorkflowCorrection = JobBuilder.newJob(WorkflowAutoCorrectionExecutor.class)
@@ -82,7 +84,7 @@ public class WorkflowSchedular {
 
 			CronTrigger triggeAutoWorkflowCorrection = TriggerBuilder.newTrigger()
 					.withIdentity("WorkflowAutoCorrectionExecutor", "WorkflowAutoCorrectionExecutor")
-					.withSchedule(CronScheduleBuilder.cronSchedule(ApplicationConfigProvider.getInstance().getWorkflowDetails().getWorkflowAutoCorrectionSchedular()))
+					.withSchedule(CronScheduleBuilder.cronSchedule(ApplicationConfigProvider.getInstance().getWorkflowDetails().getWorkflowAutoCorrectionSchedular()).inTimeZone(TimeZone.getTimeZone("UTC")))
 					.build();
 
 			scheduler.start();

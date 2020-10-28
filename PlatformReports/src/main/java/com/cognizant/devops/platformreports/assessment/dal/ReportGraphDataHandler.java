@@ -193,12 +193,13 @@ public class ReportGraphDataHandler implements ReportDataHandler {
 			}
 			//String resultValue = String.valueOf(dataJson.get(kpiDefinition.getResultField()));
 			if (!dataJson.entrySet().isEmpty()) { //&& validateJson(dataJson)
-				dataJson.addProperty(KPIJobResultAttributes.RESULTTIME.getValue(), InsightsUtils.getTodayTime());
+				long currentDateTime=InsightsUtils.getTodayTime();
+				dataJson.addProperty(KPIJobResultAttributes.RESULTTIME.getValue(), currentDateTime);
 				dataJson.addProperty(KPIJobResultAttributes.RESULTTIMEX.getValue(),
-						InsightsUtils.getUtcTime(ReportEngineUtils.TIMEZONE));
+						InsightsUtils.insightsTimeXFormat(currentDateTime));
 				dataJson.add(ReportEngineUtils.COLUMN_PROPERTY, columns);
 				dataJson.addProperty("recordDate", model.getRecordDate());
-				dataJson.addProperty("recordDateX", InsightsUtils.insightsTimeXFormat(model.getRecordDate()));
+				dataJson.addProperty("recordDateX", InsightsUtils.insightsTimeXFormat(model.getRecordDate()*1000));
 
 				// merge two json, merge result column with column value and inference Config
 				// Property Json

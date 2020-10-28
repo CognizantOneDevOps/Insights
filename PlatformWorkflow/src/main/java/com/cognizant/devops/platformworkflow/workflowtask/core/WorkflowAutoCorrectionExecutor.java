@@ -136,6 +136,7 @@ public class WorkflowAutoCorrectionExecutor implements Job {
 					workflowDAL.updateWorkflowConfig(eachWorkflow);
 					log.debug("WorkflowAutoCorrection executor === correction performed on workflow : {} ",
 							eachWorkflow.getWorkflowId());
+					adjustedNextRunTime=0;
 				} catch (Exception e) {
 					log.error(
 							"WorkflowAutoCorrection executor === correction failed to update on workflow : {} due to {}",

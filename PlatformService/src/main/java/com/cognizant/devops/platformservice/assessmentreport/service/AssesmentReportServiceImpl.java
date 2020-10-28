@@ -588,11 +588,16 @@ public class AssesmentReportServiceImpl {
 		jsonobject.addProperty("schedule", workflowConfig.getScheduleType());
 		jsonobject.addProperty(AssessmentReportAndWorkflowConstants.STATUS, status);
 		long startdate = assessmentReport.getStartDate();
-		String startDate = InsightsUtils.specficTimeFormat(startdate, "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+		//String startDate = InsightsUtils.specficTimeFormat(startdate, "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+		String startDate = InsightsUtils.insightsTimeXFormat(startdate*1000);
 		jsonobject.addProperty(AssessmentReportAndWorkflowConstants.STARTDATE, startDate);
 		if (workflowConfig.getScheduleType().equals(WorkflowTaskEnum.WorkflowSchedule.ONETIME.toString())) {
-			String endDate = InsightsUtils.specficTimeFormat(assessmentReport.getEndDate(),
-					"yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+			/*
+			 * String endDate =
+			 * InsightsUtils.specficTimeFormat(assessmentReport.getEndDate(),
+			 * "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+			 */
+			String endDate = InsightsUtils.insightsTimeXFormat(assessmentReport.getEndDate()*1000);
 			jsonobject.addProperty("enddate", endDate);
 		}
 		jsonobject.addProperty(AssessmentReportAndWorkflowConstants.STARTDATE, startDate);
