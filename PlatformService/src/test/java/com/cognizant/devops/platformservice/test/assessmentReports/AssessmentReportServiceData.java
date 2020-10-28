@@ -1,11 +1,11 @@
 /*******************************************************************************
- * Copyright 20L17 Cognizant Technology Solutions
+ * Copyright 2017 Cognizant Technology Solutions
  * 
- * Licensed under the Apache License, Version 2.0L (the "License"); you may not
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy
  * of the License at
  * 
- * http://www.apache.org/licenses/LICENSE-2.0L
+ * http://www.apache.org/licenses/LICENSE-2.0
  * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
@@ -47,9 +47,9 @@ public class AssessmentReportServiceData {
 	File kpiFileTxt = new File(classLoader.getResource("KPIDefination.txt").getFile());
 	File configFileTxt = new File(classLoader.getResource("ContentsConfiguration.txt").getFile());
 	File emptyFile = new File(classLoader.getResource("EmptyFile.json").getFile());
-	// JsonObject workflowTaskJson = null;
+
 	InsightsWorkflowTask tasks = null;
-	// int taskID =0L;
+
 	JsonObject incorrectregisterkpiJson = null;
 	JsonObject registerContentJson = null;
 	JsonObject incorrectregisterContentJson = null;
@@ -133,8 +133,8 @@ public class AssessmentReportServiceData {
 	JsonObject dailyRestartAssessmentReport = null;
 	JsonObject dailyRunImmediateAssessmentReport = null;
 
-	String deleteAssessmentReportWrongConfigId = "0L";
-	String reportIdForList = "610L";
+	String deleteAssessmentReportWrongConfigId = "0";
+	String reportIdForList = "610";
 
 	public static List<Integer> contentIdList = new ArrayList<Integer>();
 	public static List<Integer> kpiIdList = new ArrayList<Integer>();
@@ -176,160 +176,160 @@ public class AssessmentReportServiceData {
 			log.error("Error preparing AssessmentReportServiceData Email task ", e);
 		}
 
-		String registerkpi = "{\"kpiId\":10L0L20L1,\"name\":\"Total Successful Deployments\",\"group\":\"DEPLOYMENT\",\"toolName\":\"RUNDECK\",\"category\":\"STANDARD\",\"DBQuery\":\"MATCH (n:RUNDECK:DATA) WHERE n.SPKstartTime > {startTime} and n.SPKstartTime < {endTime} and  n.SPKvector = 'DEPLOYMENT' and n.SPKstatus='Success' RETURN count(n.SPKstatus) as totalDeploymentCount\",\"datasource\":\"NEO4J\",\"isActive\":true,\"resultField\":\"totalDeploymentCount\"}";
+		String registerkpi = "{\"kpiId\":100201,\"name\":\"Total Successful Deployments\",\"group\":\"DEPLOYMENT\",\"toolName\":\"RUNDECK\",\"category\":\"STANDARD\",\"DBQuery\":\"MATCH (n:RUNDECK:DATA) WHERE n.SPKstartTime > {startTime} and n.SPKstartTime < {endTime} and  n.SPKvector = 'DEPLOYMENT' and n.SPKstatus='Success' RETURN count(n.SPKstatus) as totalDeploymentCount\",\"datasource\":\"NEO4J\",\"isActive\":true,\"resultField\":\"totalDeploymentCount\"}";
 		registerkpiJson = convertStringIntoJson(registerkpi);
 
-		String incorrectRegisterkpi = "{\"kpiId\":10L0L1,\"name\":\"Avg all employee productivity for threshold \",\"schedule\":\"DAILY\",\"toolName\":\"PRODUCTIVITY\",\"group\":\"PRODUCTIVITY\",\"lastRunTime\":\"1586284260L0L0L0L\",\"neo4jQuery\":\"MATCH (n:PRODUCTIVITY) where n.completionDateEpochTime > {startTime} AND n.completionDateEpochTime < {endTime} WITH  avg(n.storyPoints*8) as StoryPoint, avg(n.authorTimeSpent) as authorTimeSpent  return   StoryPoint, authorTimeSpent, round((toFloat(StoryPoint)/authorTimeSpent)*10L0L) as Productivity\",\"resultField\":\"Productivity\"}";
+		String incorrectRegisterkpi = "{\"kpiId\":1001,\"name\":\"Avg all employee productivity for threshold \",\"schedule\":\"DAILY\",\"toolName\":\"PRODUCTIVITY\",\"group\":\"PRODUCTIVITY\",\"lastRunTime\":\"1586284260000\",\"neo4jQuery\":\"MATCH (n:PRODUCTIVITY) where n.completionDateEpochTime > {startTime} AND n.completionDateEpochTime < {endTime} WITH  avg(n.storyPoints*8) as StoryPoint, avg(n.authorTimeSpent) as authorTimeSpent  return   StoryPoint, authorTimeSpent, round((toFloat(StoryPoint)/authorTimeSpent)*100) as Productivity\",\"resultField\":\"Productivity\"}";
 		incorrectregisterkpiJson = convertStringIntoJson(incorrectRegisterkpi);
 
-		String registerContent = "{\"contentId\":10L541,\"expectedTrend\":\"UPWARDS\",\"contentName\":\"Total successful Deployments\",\"kpiId\":\"10L0L20L1\",\"noOfResult\":2,\"threshold\":0L,\"message\":{\"contentMessage\":\"Successful Deployments captured in last run were {totalDeploymentCount}\"},\"isActive\":\"TRUE\"}";
+		String registerContent = "{\"contentId\":10541,\"expectedTrend\":\"UPWARDS\",\"contentName\":\"Total successful Deployments\",\"kpiId\":\"100201\",\"noOfResult\":2,\"threshold\":0,\"message\":{\"contentMessage\":\"Successful Deployments captured in last run were {totalDeploymentCount}\"},\"isActive\":\"TRUE\"}";
 		registerContentJson = convertStringIntoJson(registerContent);
 
-		String incorrectContent = "{\"expectedTrend\":\"DOWNWARDS\",\"contentName\":\"Average Build Time\",\"kpiId\":\"1110L\",\"noOfResult\":2,\"threshold\":0L,\"message\":{\"positive\":\"Average Build Time has decreased to {current:avgOutput}s from {previous:avgOutput}s \",\"negative\":\"Average Build Time has increased to {current:avgOutput}s from {previous:avgOutput}s \",\"neutral\":\"Average Build Time has remained constant to {avgOutput}s\"},\"isActive\":\"TRUE\"}";
+		String incorrectContent = "{\"expectedTrend\":\"DOWNWARDS\",\"contentName\":\"Average Build Time\",\"kpiId\":\"1110\",\"noOfResult\":2,\"threshold\":0,\"message\":{\"positive\":\"Average Build Time has decreased to {current:avgOutput}s from {previous:avgOutput}s \",\"negative\":\"Average Build Time has increased to {current:avgOutput}s from {previous:avgOutput}s \",\"neutral\":\"Average Build Time has remained constant to {avgOutput}s\"},\"isActive\":\"TRUE\"}";
 		incorrectregisterContentJson = convertStringIntoJson(incorrectContent);
 
-		String contentWithoutKpi = "{\"contentId\":10L,\"expectedTrend\":\"DOWNWARDS\",\"contentName\":\"Average Build Time\",\"category\":\"COMPARISON\",\"kpiId\":\"11\",\"noOfResult\":2,\"threshold\":0L,\"message\":{\"positive\":\"Average Build Time has decreased to {current:avgOutput}s from {previous:avgOutput}s \",\"negative\":\"Average Build Time has increased to {current:avgOutput}s from {previous:avgOutput}s \",\"neutral\":\"Average Build Time has remained constant to {avgOutput}s\"},\"isActive\":\"TRUE\"}";
+		String contentWithoutKpi = "{\"contentId\":10,\"expectedTrend\":\"DOWNWARDS\",\"contentName\":\"Average Build Time\",\"category\":\"COMPARISON\",\"kpiId\":\"11\",\"noOfResult\":2,\"threshold\":0,\"message\":{\"positive\":\"Average Build Time has decreased to {current:avgOutput}s from {previous:avgOutput}s \",\"negative\":\"Average Build Time has increased to {current:avgOutput}s from {previous:avgOutput}s \",\"neutral\":\"Average Build Time has remained constant to {avgOutput}s\"},\"isActive\":\"TRUE\"}";
 		contentWithoutKpiJson = convertStringIntoJson(contentWithoutKpi);
 
-		String reportTemplate = "{\"reportId\":\"610L\",\"reportName\":\"Fail Report_test\",\"description\":\"Testing\",\"isActive\":true,\"file\":\"File.json\",\"visualizationutil\":\"Fusion\",\"kpiConfigs\":[{\"kpiId\":10L0L20L1,\"visualizationConfigs\":[{\"vId\":\"10L0L\",\"vQuery\":\"Query\"}]}]}";
+		String reportTemplate = "{\"reportId\":\"610\",\"reportName\":\"Fail Report_test\",\"description\":\"Testing\",\"isActive\":true,\"file\":\"File.json\",\"visualizationutil\":\"Fusion\",\"kpiConfigs\":[{\"kpiId\":100201,\"visualizationConfigs\":[{\"vId\":\"100\",\"vQuery\":\"Query\"}]}]}";
 		reportTemplateJson = convertStringIntoJson(reportTemplate);
 
-		String reportTemplateWithoutKPIDs = "{\"reportId\":\"60L0L20L\",\"reportName\":\"Productivity_test\",\"description\":\"Backend Team\",\"file\": \"File1.json\",\"visualizationutil\":\"Fusion\",\"isActive\":true}";
+		String reportTemplateWithoutKPIDs = "{\"reportId\":\"60020\",\"reportName\":\"Productivity_test\",\"description\":\"Backend Team\",\"file\": \"File1.json\",\"visualizationutil\":\"Fusion\",\"isActive\":true}";
 		reportTemplateWithoutKPIsJson = convertStringIntoJson(reportTemplateWithoutKPIDs);
 
-		String reportTemplateWithoutExistingKPIDs = "{\"reportId\":\"60L0L330L\",\"reportName\":\"Productivity_test\",\"description\":\"Backend Team\",\"file\": \"File1.json\",\"isActive\":true,\"visualizationutil\":\"Fusion\",\"kpiConfigs\":[{\"kpiId\":1,\"visualizationConfigs\":[{\"vId\":\"10L0L\",\"vQuery\":\"\"}]}]}";
+		String reportTemplateWithoutExistingKPIDs = "{\"reportId\":\"600330\",\"reportName\":\"Productivity_test\",\"description\":\"Backend Team\",\"file\": \"File1.json\",\"isActive\":true,\"visualizationutil\":\"Fusion\",\"kpiConfigs\":[{\"kpiId\":1,\"visualizationConfigs\":[{\"vId\":\"100\",\"vQuery\":\"\"}]}]}";
 		reportTemplateWithoutExistingKPIDsJson = convertStringIntoJson(reportTemplateWithoutExistingKPIDs);
 
-		String incorrectReportTemplate = "{\"reportId\":\"60L0L40L\",\"reportName\":\"Productivity_test\",\"description\":\"Backend Team\",\"file\": \"File1.json\",\"isActive\":true,\"visualizationutil\":\"Fusion\"}";
+		String incorrectReportTemplate = "{\"reportId\":\"60040\",\"reportName\":\"Productivity_test\",\"description\":\"Backend Team\",\"file\": \"File1.json\",\"isActive\":true,\"visualizationutil\":\"Fusion\"}";
 		incorrectReportTemplateJson = convertStringIntoJson(incorrectReportTemplate);
 
-		String dailyAssessmentReport = "{\"reportName\":\"Daily_Deployment_test\",\"reportTemplate\":610L,\"emailList\":\"fdfsfsdfs\",\"schedule\":\"DAILY\",\"startdate\":null,\"isReoccuring\":true,\"datasource\":\"\",\"tasklist\":[{\"taskId\":"
-				+ taskID + ",\"sequence\":0L}],\"asseementreportdisplayname\":\"Report_test\",\"emailDetails\":null}";
+		String dailyAssessmentReport = "{\"reportName\":\"Daily_Deployment_test\",\"reportTemplate\":610,\"emailList\":\"fdfsfsdfs\",\"schedule\":\"DAILY\",\"startdate\":null,\"isReoccuring\":true,\"datasource\":\"\",\"tasklist\":[{\"taskId\":"
+				+ taskID + ",\"sequence\":0}],\"asseementreportdisplayname\":\"Report_test\",\"emailDetails\":null}";
 		dailyExpectedAssessmentStartDate = 0L;
 		dailyExpectedAssessmentEndDate = 0L;
 		dailyExpectedNextRun = getNextRunTime(InsightsUtils.getCurrentTimeInSeconds(), "DAILY");
 		dailyAssessmentReportJson = convertStringIntoJson(dailyAssessmentReport);
 
-		String weeklyAssessmentReport = "{\"reportName\":\"Weekly_Deployment_test\",\"reportTemplate\":610L,\"emailList\":\"fdfsfsdfs\",\"schedule\":\"WEEKLY\",\"startdate\":null,\"isReoccuring\":true,\"datasource\":\"\",\"tasklist\":[{\"taskId\":"
-				+ taskID + ",\"sequence\":0L}],\"asseementreportdisplayname\":\"Report_test\",\"emailDetails\":null}";
+		String weeklyAssessmentReport = "{\"reportName\":\"Weekly_Deployment_test\",\"reportTemplate\":610,\"emailList\":\"fdfsfsdfs\",\"schedule\":\"WEEKLY\",\"startdate\":null,\"isReoccuring\":true,\"datasource\":\"\",\"tasklist\":[{\"taskId\":"
+				+ taskID + ",\"sequence\":0}],\"asseementreportdisplayname\":\"Report_test\",\"emailDetails\":null}";
 		weeklyExpectedAssessmentStartDate = 0L;
 		weeklyExpectedAssessmentEndDate = 0L;
 		weeklyExpectedNextRun = getNextRunTime(InsightsUtils.getCurrentTimeInSeconds(), "WEEKLY");
 		weeklyAssessmentReportJson = convertStringIntoJson(weeklyAssessmentReport);
 
-		String monthlyAssessmentReport = "{\"reportName\":\"Monthly_Deployment_test\",\"reportTemplate\":610L,\"emailList\":\"fdfsfsdfs\",\"schedule\":\"MONTHLY\",\"startdate\":null,\"isReoccuring\":true,\"datasource\":\"\",\"tasklist\":[{\"taskId\":"
-				+ taskID + ",\"sequence\":0L}],\"asseementreportdisplayname\":\"Report_test\",\"emailDetails\":null}";
-		monthlyExpectedAssessmentStartDate = 0L;
+		String monthlyAssessmentReport = "{\"reportName\":\"Monthly_Deployment_test\",\"reportTemplate\":610,\"emailList\":\"fdfsfsdfs\",\"schedule\":\"MONTHLY\",\"startdate\":null,\"isReoccuring\":true,\"datasource\":\"\",\"tasklist\":[{\"taskId\":"
+				+ taskID + ",\"sequence\":0}],\"asseementreportdisplayname\":\"Report_test\",\"emailDetails\":null}";
+		monthlyExpectedAssessmentStartDate =0L;
 		monthlyExpectedAssessmentEndDate = 0L;
 		monthlyExpectedNextRun = getNextRunTime(InsightsUtils.getCurrentTimeInSeconds(), "MONTHLY");
 		monthlyAssessmentReportJson = convertStringIntoJson(monthlyAssessmentReport);
 
-		String quarterlyAssessmentReport = "{\"reportName\":\"Quarterly_Deployment_test\",\"reportTemplate\":610L,\"emailList\":\"fdfsfsdfs\",\"schedule\":\"QUARTERLY\",\"startdate\":null,\"isReoccuring\":true,\"datasource\":\"\",\"tasklist\":[{\"taskId\":"
-				+ taskID + ",\"sequence\":0L}],\"asseementreportdisplayname\":\"Report_test\",\"emailDetails\":null}";
+		String quarterlyAssessmentReport = "{\"reportName\":\"Quarterly_Deployment_test\",\"reportTemplate\":610,\"emailList\":\"fdfsfsdfs\",\"schedule\":\"QUARTERLY\",\"startdate\":null,\"isReoccuring\":true,\"datasource\":\"\",\"tasklist\":[{\"taskId\":"
+				+ taskID + ",\"sequence\":0}],\"asseementreportdisplayname\":\"Report_test\",\"emailDetails\":null}";
 		quarterlyExpectedAssessmentStartDate = 0L;
 		quarterlyExpectedAssessmentEndDate = 0L;
 		quarterlyExpectedNextRun = getNextRunTime(InsightsUtils.getCurrentTimeInSeconds(), "QUARTERLY");
 		quarterlyAssessmentReportJson = convertStringIntoJson(quarterlyAssessmentReport);
 
-		String yearlyAssessmentReport = "{\"reportName\":\"Yearly_Deployment_test\",\"reportTemplate\":610L,\"emailList\":\"fdfsfsdfs\",\"schedule\":\"YEARLY\",\"startdate\":null,\"isReoccuring\":true,\"datasource\":\"\",\"tasklist\":[{\"taskId\":"
-				+ taskID + ",\"sequence\":0L}],\"asseementreportdisplayname\":\"Report_test\",\"emailDetails\":null}";
+		String yearlyAssessmentReport = "{\"reportName\":\"Yearly_Deployment_test\",\"reportTemplate\":610,\"emailList\":\"fdfsfsdfs\",\"schedule\":\"YEARLY\",\"startdate\":null,\"isReoccuring\":true,\"datasource\":\"\",\"tasklist\":[{\"taskId\":"
+				+ taskID + ",\"sequence\":0}],\"asseementreportdisplayname\":\"Report_test\",\"emailDetails\":null}";
 		yearlyExpectedAssessmentStartDate = 0L;
 		yearlyExpectedAssessmentEndDate = 0L;
 		yearlyExpectedNextRun = getNextRunTime(InsightsUtils.getCurrentTimeInSeconds(), "YEARLY");
 		yearlyAssessmentReportJson = convertStringIntoJson(yearlyAssessmentReport);
 
-		String oneTimeAssessmentReport = "{\"reportName\":\"OneTime_deployment_test\",\"reportTemplate\":610L,\"emailList\":\"hi@gmail.com\",\"schedule\":\"ONETIME\",\"startdate\":\"20L20L-0L7-0L1T0L0L:0L0L:0L0LZ\",\"enddate\":\"20L20L-0L7-0L3T0L0L:0L0L:0L0LZ\",\"isReoccuring\":false,\"datasource\":\"\",\"tasklist\":[{\"taskId\":"
-				+ taskID + ",\"sequence\":0L}],\"asseementreportdisplayname\":\"Report_test\",\"emailDetails\":null}";
-		oneTimeExpectedAssessmentStartDate = getStartDate("20L20L-0L7-0L1T0L0L:0L0L:0L0LZ");
-		oneTimeExpectedAssessmentEndDate = getEndDate("20L20L-0L7-0L3T0L0L:0L0L:0L0LZ");
+		String oneTimeAssessmentReport = "{\"reportName\":\"OneTime_deployment_test\",\"reportTemplate\":610,\"emailList\":\"hi@gmail.com\",\"schedule\":\"ONETIME\",\"startdate\":\"2020-07-01T00:00:00Z\",\"enddate\":\"2020-07-03T00:00:00Z\",\"isReoccuring\":false,\"datasource\":\"\",\"tasklist\":[{\"taskId\":"
+				+ taskID + ",\"sequence\":0}],\"asseementreportdisplayname\":\"Report_test\",\"emailDetails\":null}";
+		oneTimeExpectedAssessmentStartDate = getStartDate("2020-07-01T00:00:00Z");
+		oneTimeExpectedAssessmentEndDate = getEndDate("2020-07-03T00:00:00Z");
 		oneTimeExpectedNextRun = 0L;
 		oneTimeAssessmentReportJson = convertStringIntoJson(oneTimeAssessmentReport);
 
-		String biWeeklyAssessmentReport = "{\"reportName\":\"BiWeekly_deployment_test\",\"reportTemplate\":610L,\"emailList\":\"dib@dib.com\",\"schedule\":\"BI_WEEKLY_SPRINT\",\"startdate\":\"20L20L-0L7-0L1T0L0L:0L0L:0L0LZ\",\"isReoccuring\":true,\"datasource\":\"\",\"tasklist\":[{\"taskId\":"
-				+ taskID + ",\"sequence\":0L}],\"asseementreportdisplayname\":\"Report_test\",\"emailDetails\":null}";
-		biWeeklyExpectedAssessmentStartDate = getStartDate("20L20L-0L7-0L1T0L0L:0L0L:0L0LZ");
+		String biWeeklyAssessmentReport = "{\"reportName\":\"BiWeekly_deployment_test\",\"reportTemplate\":610,\"emailList\":\"dib@dib.com\",\"schedule\":\"BI_WEEKLY_SPRINT\",\"startdate\":\"2020-07-01T00:00:00Z\",\"isReoccuring\":true,\"datasource\":\"\",\"tasklist\":[{\"taskId\":"
+				+ taskID + ",\"sequence\":0}],\"asseementreportdisplayname\":\"Report_test\",\"emailDetails\":null}";
+		biWeeklyExpectedAssessmentStartDate = getStartDate("2020-07-01T00:00:00Z");
 		biWeeklyExpectedAssessmentEndDate = 0L;
 		biWeeklyExpectedNextRun = getNextRunTime(biWeeklyExpectedAssessmentStartDate, "BI_WEEKLY_SPRINT");
 		biWeeklyAssessmentReportJson = convertStringIntoJson(biWeeklyAssessmentReport);
 
-		String triWeeklyAssessmentReport = "{\"reportName\":\"Triweekly_report_deployment_test\",\"reportTemplate\":610L,\"emailList\":\"dib@dib.com\",\"schedule\":\"TRI_WEEKLY_SPRINT\",\"startdate\":\"20L20L-0L6-0L2T0L0L:0L0L:0L0LZ\",\"isReoccuring\":false,\"datasource\":\"\",\"tasklist\":[{\"taskId\":"
-				+ taskID + ",\"sequence\":0L}],\"asseementreportdisplayname\":\"Report_test\",\"emailDetails\":null}";
-		triWeeklyExpectedAssessmentStartDate = getStartDate("20L20L-0L6-0L2T0L0L:0L0L:0L0LZ");
+		String triWeeklyAssessmentReport = "{\"reportName\":\"Triweekly_report_deployment_test\",\"reportTemplate\":610,\"emailList\":\"dib@dib.com\",\"schedule\":\"TRI_WEEKLY_SPRINT\",\"startdate\":\"2020-06-02T00:00:00Z\",\"isReoccuring\":false,\"datasource\":\"\",\"tasklist\":[{\"taskId\":"
+				+ taskID + ",\"sequence\":0}],\"asseementreportdisplayname\":\"Report_test\",\"emailDetails\":null}";
+		triWeeklyExpectedAssessmentStartDate = getStartDate("2020-06-02T00:00:00Z");
 		triWeeklyExpectedAssessmentEndDate = 0L;
 		triWeeklyExpectedNextRun = getNextRunTime(triWeeklyExpectedAssessmentStartDate, "TRI_WEEKLY_SPRINT");
 		triWeeklyAssessmentReportJson = convertStringIntoJson(triWeeklyAssessmentReport);
 
-		String triWeeklyAssessmentReportWithDataSource = "{\"reportName\":\"Triweekly_report_dep_data_test\",\"reportTemplate\":610L,\"emailList\":\"dib@dib.com\",\"schedule\":\"TRI_WEEKLY_SPRINT\",\"startdate\":\"20L20L-0L6-0L2T0L0L:0L0L:0L0LZ\",\"isReoccuring\":false,\"datasource\":\"\",\"tasklist\":[{\"taskId\":"
-				+ taskID + ",\"sequence\":0L}],\"asseementreportdisplayname\":\"Report_test\",\"emailDetails\":null}";
-		triWeeklyExpectedAssessmentStartDateWithDataSource = getStartDate("20L20L-0L6-0L2T0L0L:0L0L:0L0LZ");
+		String triWeeklyAssessmentReportWithDataSource = "{\"reportName\":\"Triweekly_report_dep_data_test\",\"reportTemplate\":610,\"emailList\":\"dib@dib.com\",\"schedule\":\"TRI_WEEKLY_SPRINT\",\"startdate\":\"2020-06-02T00:00:00Z\",\"isReoccuring\":false,\"datasource\":\"\",\"tasklist\":[{\"taskId\":"
+				+ taskID + ",\"sequence\":0}],\"asseementreportdisplayname\":\"Report_test\",\"emailDetails\":null}";
+		triWeeklyExpectedAssessmentStartDateWithDataSource = getStartDate("2020-06-02T00:00:00Z");
 		triWeeklyExpectedAssessmentEndDateWithDataSource = 0L;
 		triWeeklyExpectedNextRunWithDataSource = getNextRunTime(triWeeklyExpectedAssessmentStartDate,
 				"TRI_WEEKLY_SPRINT");
 		triWeeklyAssessmentWithDataSourceReportJson = convertStringIntoJson(triWeeklyAssessmentReportWithDataSource);
 
 		String incorrectAssessmentReport = "{\"reportName\":\"Incorrect_Deployment_test\",\"emailList\":\"fdfsfsdfs\",\"schedule\":\"DAILY\",\"startdate\":null,\"isReoccuring\":true,\"datasource\":\"\",\"tasklist\":[{\"taskId\":"
-				+ taskID + ",\"sequence\":0L}],\"asseementreportdisplayname\":\"Report_test\",\"emailDetails\":null}";
+				+ taskID + ",\"sequence\":0}],\"asseementreportdisplayname\":\"Report_test\",\"emailDetails\":null}";
 		incorrectAssessmentReportJson = convertStringIntoJson(incorrectAssessmentReport);
 
 		String updateIncorrectAssessmentReport = "{\"isReoccuring\":true,\"emailList\":\"dasdsd\",\"id\":896}";
 		updateAssessmentReportIncorrectJson = convertStringIntoJson(updateIncorrectAssessmentReport);
 
-		String oneTimeAssessmentReportWithStartDateGreaterThanEndDate = "{\"reportName\":\"OneTime_deployment_StartDate_test\",\"reportTemplate\":610L,\"emailList\":\"hi@gmail.com\",\"schedule\":\"ONETIME\",\"startdate\":\"20L20L-0L7-10LT0L0L:0L0L:0L0LZ\",\"enddate\":\"20L20L-0L7-0L3T0L0L:0L0L:0L0LZ\",\"isReoccuring\":false,\"datasource\":\"\",\"tasklist\":[{\"taskId\":"
-				+ taskID + ",\"sequence\":0L}]}";
+		String oneTimeAssessmentReportWithStartDateGreaterThanEndDate = "{\"reportName\":\"OneTime_deployment_StartDate_test\",\"reportTemplate\":610,\"emailList\":\"hi@gmail.com\",\"schedule\":\"ONETIME\",\"startdate\":\"2020-07-10T00:00:00Z\",\"enddate\":\"2020-07-03T00:00:00Z\",\"isReoccuring\":false,\"datasource\":\"\",\"tasklist\":[{\"taskId\":"
+				+ taskID + ",\"sequence\":0}]}";
 		oneTimeAssessmentReportWithStartDateGreaterThanEndDateJson = convertStringIntoJson(
 				oneTimeAssessmentReportWithStartDateGreaterThanEndDate);
 
-		String dailyEmailAssessmentReport = "{\"reportName\":\"Report_send_email_service_test\",\"asseementreportdisplayname\":\"Report email\",\"reportTemplate\":610L,\"schedule\":\"DAILY\",\"startdate\":null,\"isReoccuring\":false,\"datasource\":\"\",\"tasklist\":[{\"taskId\":"
-				+ taskID + ",\"sequence\":0L},{\"taskId\":" + pdftaskID + ",\"sequence\":1},{\"taskId\":" + emailtaskID
+		String dailyEmailAssessmentReport = "{\"reportName\":\"Report_send_email_service_test\",\"asseementreportdisplayname\":\"Report email\",\"reportTemplate\":610,\"schedule\":\"DAILY\",\"startdate\":null,\"isReoccuring\":false,\"datasource\":\"\",\"tasklist\":[{\"taskId\":"
+				+ taskID + ",\"sequence\":0},{\"taskId\":" + pdftaskID + ",\"sequence\":1},{\"taskId\":" + emailtaskID
 				+ ",\"sequence\":2}],\"emailDetails\":{\"senderEmailAddress\":\"onedevops@cogdevops.com\",\"receiverEmailAddress\":\"dibakor.barua@cognizant.com\",\"receiverCCEmailAddress\":\"\",\"receiverBCCEmailAddress\":\"\",\"mailSubject\":\"{ReportDisplayName} - {TimeOfReportGeneration}\",\"mailBodyTemplate\":\"Dear User,\\nPlease find attached Assessment Report  {ReportDisplayName}\\ngenerated on {TimeOfReportGeneration}.\\n\\nRegards,\\nOneDevops Team.\\n** This is an Auto Generated Mail by Insights scheduler. Please Do not reply to this mail**\"},\"emailList\":\"abcd@abcd.com\"}";
 		dailyEmailExpectedAssessmentStartDate = 0L;
 		dailyEmailExpectedAssessmentEndDate = 0L;
 		dailyEmailExpectedNextRun = getNextRunTime(InsightsUtils.getCurrentTimeInSeconds(), "DAILY");
 		dailyEmailAssessmentReportJson = convertStringIntoJson(dailyEmailAssessmentReport);
 
-		String dailyRestartAssessmentReportStr = "{\"reportName\":\"Report_restart_service_test\",\"asseementreportdisplayname\":\"Report restart\",\"reportTemplate\":610L,\"schedule\":\"DAILY\",\"startdate\":null,\"isReoccuring\":false,\"datasource\":\"\",\"tasklist\":[{\"taskId\":"
-				+ taskID + ",\"sequence\":0L},{\"taskId\":" + pdftaskID + ",\"sequence\":1},{\"taskId\":" + emailtaskID
+		String dailyRestartAssessmentReportStr = "{\"reportName\":\"Report_restart_service_test\",\"asseementreportdisplayname\":\"Report restart\",\"reportTemplate\":610,\"schedule\":\"DAILY\",\"startdate\":null,\"isReoccuring\":false,\"datasource\":\"\",\"tasklist\":[{\"taskId\":"
+				+ taskID + ",\"sequence\":0},{\"taskId\":" + pdftaskID + ",\"sequence\":1},{\"taskId\":" + emailtaskID
 				+ ",\"sequence\":2}],\"emailDetails\":{\"senderEmailAddress\":\"onedevops@cogdevops.com\",\"receiverEmailAddress\":\"dibakor.barua@cognizant.com\",\"receiverCCEmailAddress\":\"\",\"receiverBCCEmailAddress\":\"\",\"mailSubject\":\"{ReportDisplayName} - {TimeOfReportGeneration}\",\"mailBodyTemplate\":\"Dear User,\\nPlease find attached Assessment Report  {ReportDisplayName}\\ngenerated on {TimeOfReportGeneration}.\\n\\nRegards,\\nOneDevops Team.\\n** This is an Auto Generated Mail by Insights scheduler. Please Do not reply to this mail**\"},\"emailList\":\"abcd@abcd.com\"}";
 		dailyRestartAssessmentReport = convertStringIntoJson(dailyRestartAssessmentReportStr);
 
-		String dailyRunImmediateAssessmentReportStr = "{\"reportName\":\"Report_RunImmediate_service_test\",\"asseementreportdisplayname\":\"Report RunImmediate\",\"reportTemplate\":610L,\"schedule\":\"DAILY\",\"startdate\":null,\"isReoccuring\":false,\"datasource\":\"\",\"tasklist\":[{\"taskId\":"
-				+ taskID + ",\"sequence\":0L},{\"taskId\":" + pdftaskID + ",\"sequence\":1},{\"taskId\":" + emailtaskID
+		String dailyRunImmediateAssessmentReportStr = "{\"reportName\":\"Report_RunImmediate_service_test\",\"asseementreportdisplayname\":\"Report RunImmediate\",\"reportTemplate\":610,\"schedule\":\"DAILY\",\"startdate\":null,\"isReoccuring\":false,\"datasource\":\"\",\"tasklist\":[{\"taskId\":"
+				+ taskID + ",\"sequence\":0},{\"taskId\":" + pdftaskID + ",\"sequence\":1},{\"taskId\":" + emailtaskID
 				+ ",\"sequence\":2}],\"emailDetails\":{\"senderEmailAddress\":\"onedevops@cogdevops.com\",\"receiverEmailAddress\":\"dibakor.barua@cognizant.com\",\"receiverCCEmailAddress\":\"\",\"receiverBCCEmailAddress\":\"\",\"mailSubject\":\"{ReportDisplayName} - {TimeOfReportGeneration}\",\"mailBodyTemplate\":\"Dear User,\\nPlease find attached Assessment Report  {ReportDisplayName}\\ngenerated on {TimeOfReportGeneration}.\\n\\nRegards,\\nOneDevops Team.\\n** This is an Auto Generated Mail by Insights scheduler. Please Do not reply to this mail**\"},\"emailList\":\"abcd@abcd.com\"}";
 		/*
-		 * dailyEmailExpectedAssessmentStartDate = 0L;
-		 * dailyEmailExpectedAssessmentEndDate = 0L; dailyEmailExpectedNextRun =
+		 * dailyEmailExpectedAssessmentStartDate = 0;
+		 * dailyEmailExpectedAssessmentEndDate = 0; dailyEmailExpectedNextRun =
 		 * getNextRunTime(InsightsUtils.getCurrentTimeInSeconds(), "DAILY");
 		 */
 		dailyRunImmediateAssessmentReport = convertStringIntoJson(dailyRunImmediateAssessmentReportStr);
 
-		String dailywithoutEmailAssessmentReport = "{\"reportName\":\"Email_without_details_service_test\",\"asseementreportdisplayname\":\"Report_test\",\"reportTemplate\":610L,\"schedule\":\"DAILY\",\"startdate\":null,\"isReoccuring\":false,\"datasource\":\"\",\"tasklist\":[{\"taskId\":"
-				+ taskID + ",\"sequence\":0L},{\"taskId\":" + pdftaskID
+		String dailywithoutEmailAssessmentReport = "{\"reportName\":\"Email_without_details_service_test\",\"asseementreportdisplayname\":\"Report_test\",\"reportTemplate\":610,\"schedule\":\"DAILY\",\"startdate\":null,\"isReoccuring\":false,\"datasource\":\"\",\"tasklist\":[{\"taskId\":"
+				+ taskID + ",\"sequence\":0},{\"taskId\":" + pdftaskID
 				+ ",\"sequence\":1}],\"emailDetails\":null,\"emailList\":\"abcd@abcd.com\"}";
 		dailywithoutEmailExpectedAssessmentStartDate = 0L;
 		dailywithoutEmailExpectedAssessmentEndDate = 0L;
 		dailywithoutEmailExpectedNextRun = getNextRunTime(InsightsUtils.getCurrentTimeInSeconds(), "DAILY");
 		dailywithoutEmailAssessmentReportJson = convertStringIntoJson(dailywithoutEmailAssessmentReport);
 
-		String dailywithoutEmaildetailsAssessmentReport = "{\"reportName\":\"Email_without_email_details_service_test\",\"asseementreportdisplayname\":\"Email details not present\",\"reportTemplate\":610L,\"schedule\":\"DAILY\",\"startdate\":null,\"isReoccuring\":false,\"datasource\":\"\",\"tasklist\":[{\"taskId\":"
-				+ taskID + ",\"sequence\":0L},{\"taskId\":" + pdftaskID + ",\"sequence\":1},{\"taskId\":" + emailtaskID
+		String dailywithoutEmaildetailsAssessmentReport = "{\"reportName\":\"Email_without_email_details_service_test\",\"asseementreportdisplayname\":\"Email details not present\",\"reportTemplate\":610,\"schedule\":\"DAILY\",\"startdate\":null,\"isReoccuring\":false,\"datasource\":\"\",\"tasklist\":[{\"taskId\":"
+				+ taskID + ",\"sequence\":0},{\"taskId\":" + pdftaskID + ",\"sequence\":1},{\"taskId\":" + emailtaskID
 				+ ",\"sequence\":2}],\"emailDetails\":null,\"emailList\":\"abcd@abcd.com\"}";
 		dailywithoutEmaildetailsAssessmentReportJson = convertStringIntoJson(dailywithoutEmaildetailsAssessmentReport);
 
-		String dailywithoutEmailtaskAssessmentReport = "{\"reportName\":\"Report_without_email_task_service_test\",\"asseementreportdisplayname\":\"Report email task not present\",\"reportTemplate\":610L,\"schedule\":\"DAILY\",\"startdate\":null,\"isReoccuring\":false,\"datasource\":\"\",\"tasklist\":[{\"taskId\":"
-				+ taskID + ",\"sequence\":0L},{\"taskId\":" + pdftaskID
+		String dailywithoutEmailtaskAssessmentReport = "{\"reportName\":\"Report_without_email_task_service_test\",\"asseementreportdisplayname\":\"Report email task not present\",\"reportTemplate\":610,\"schedule\":\"DAILY\",\"startdate\":null,\"isReoccuring\":false,\"datasource\":\"\",\"tasklist\":[{\"taskId\":"
+				+ taskID + ",\"sequence\":0},{\"taskId\":" + pdftaskID
 				+ ",\"sequence\":1}],\"emailDetails\":{\"senderEmailAddress\":\"onedevops@cogdevops.com\",\"receiverEmailAddress\":\"dibakor.barua@cognizant.com\",\"mailSubject\":\"{ReportDisplayName} - {TimeOfReportGeneration}\",\"mailBodyTemplate\":\"Dear User,\\nPlease find attached Assessment Report  {ReportDisplayName}\\ngenerated on {TimeOfReportGeneration}.\\n\\nRegards,\\nOneDevops Team.\\n** This is an Auto Generated Mail by Insights scheduler. Please Do not reply to this mail**\"},\"emailList\":\"abcd@abcd.com\"}";
 		dailywithoutEmailtaskAssessmentReportJson = convertStringIntoJson(dailywithoutEmailtaskAssessmentReport);
 
-		String dailyEmailCcAssessmentReport = "{\"reportName\":\"Report_send_email_CC_service_test\",\"asseementreportdisplayname\":\"Report email\",\"reportTemplate\":610L,\"schedule\":\"DAILY\",\"startdate\":null,\"isReoccuring\":false,\"datasource\":\"\",\"tasklist\":[{\"taskId\":"
-				+ taskID + ",\"sequence\":0L},{\"taskId\":" + pdftaskID + ",\"sequence\":1},{\"taskId\":" + emailtaskID
+		String dailyEmailCcAssessmentReport = "{\"reportName\":\"Report_send_email_CC_service_test\",\"asseementreportdisplayname\":\"Report email\",\"reportTemplate\":610,\"schedule\":\"DAILY\",\"startdate\":null,\"isReoccuring\":false,\"datasource\":\"\",\"tasklist\":[{\"taskId\":"
+				+ taskID + ",\"sequence\":0},{\"taskId\":" + pdftaskID + ",\"sequence\":1},{\"taskId\":" + emailtaskID
 				+ ",\"sequence\":2}],\"emailDetails\":{\"senderEmailAddress\":\"onedevops@cogdevops.com\",\"receiverEmailAddress\":\"\",\"receiverCCEmailAddress\":\"dibakor.barua@cognizant.com\",\"receiverBCCEmailAddress\":\"\",\"mailSubject\":\"{ReportDisplayName} - {TimeOfReportGeneration}\",\"mailBodyTemplate\":\"Dear User,\\nPlease find attached Assessment Report  {ReportDisplayName}\\ngenerated on {TimeOfReportGeneration}.\\n\\nRegards,\\nOneDevops Team.\\n** This is an Auto Generated Mail by Insights scheduler. Please Do not reply to this mail**\"},\"emailList\":\"abcd@abcd.com\"}";
 		dailyEmailCCExpectedAssessmentStartDate = 0L;
 		dailyEmailCCExpectedAssessmentEndDate = 0L;
 		dailyEmailCCExpectedNextRun = getNextRunTime(InsightsUtils.getCurrentTimeInSeconds(), "DAILY");
 		dailyEmailCCAssessmentReportJson = convertStringIntoJson(dailyEmailCcAssessmentReport);
 
-		String dailyEmailBCCAssessmentReport = "{\"reportName\":\"Report_send_email_CC_service_test\",\"asseementreportdisplayname\":\"Report email\",\"reportTemplate\":610L,\"schedule\":\"DAILY\",\"startdate\":null,\"isReoccuring\":false,\"datasource\":\"\",\"tasklist\":[{\"taskId\":"
-				+ taskID + ",\"sequence\":0L},{\"taskId\":" + pdftaskID + ",\"sequence\":1},{\"taskId\":" + emailtaskID
+		String dailyEmailBCCAssessmentReport = "{\"reportName\":\"Report_send_email_CC_service_test\",\"asseementreportdisplayname\":\"Report email\",\"reportTemplate\":610,\"schedule\":\"DAILY\",\"startdate\":null,\"isReoccuring\":false,\"datasource\":\"\",\"tasklist\":[{\"taskId\":"
+				+ taskID + ",\"sequence\":0},{\"taskId\":" + pdftaskID + ",\"sequence\":1},{\"taskId\":" + emailtaskID
 				+ ",\"sequence\":2}],\"emailDetails\":{\"senderEmailAddress\":\"onedevops@cogdevops.com\",\"receiverEmailAddress\":\"\",\"receiverCCEmailAddress\":\"\",\"receiverBCCEmailAddress\":\"dibakor.barua@cognizant.com\",\"mailSubject\":\"{ReportDisplayName} - {TimeOfReportGeneration}\",\"mailBodyTemplate\":\"Dear User,\\nPlease find attached Assessment Report  {ReportDisplayName}\\ngenerated on {TimeOfReportGeneration}.\\n\\nRegards,\\nOneDevops Team.\\n** This is an Auto Generated Mail by Insights scheduler. Please Do not reply to this mail**\"},\"emailList\":\"abcd@abcd.com\"}";
 		dailyEmailBCCExpectedAssessmentStartDate = 0L;
 		dailyEmailBCCExpectedAssessmentEndDate = 0L;
