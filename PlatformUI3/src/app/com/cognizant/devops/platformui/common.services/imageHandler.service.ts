@@ -84,7 +84,8 @@ export class ImageHandlerService implements IImageHandlerService {
         this.addImage('webhookCopyClipboard', "icons/svg/webhook/CopyClipboard.svg");
         this.addImage('dashboard', "icons/svg/dashboard.svg");
         this.addImage('view', "icons/svg/view.svg");
-        this.addImage('homeButton', "icons/svg/home.svg")
+        this.addImage('homeButton', "icons/svg/home.svg");
+        this.addImage('predict', "icons/svg/prediction/predict.svg")
     }
 
 

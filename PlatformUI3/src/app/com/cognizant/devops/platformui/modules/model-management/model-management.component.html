@@ -1,0 +1,145 @@
+<!--
+*******************************************************************************
+ * Copyright 2019 Cognizant Technology Solutions
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License.  You may obtain a copy
+ * of the License at
+ * 
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ ****************************************************************************** -->
+ <div class="pageCss">
+  
+    <div layout layout-align="left" class="titleStyle">
+      <a>Configuration | <a class="greenTitleTxt">Forecasting</a></a>
+    </div>
+    <div class="orangeStripCss"></div>
+    <div layout layout-align="left" class="sectionHeadingStyle">
+      <div layout>&nbsp; Model Management
+      </div>
+    </div>
+
+    <div class="btnAlign">
+      <button mat-icon-button (click)="add()">
+        <mat-icon title="Add" style="margin-top: 10%;" class="mat-icon material-icons">
+          add_circle
+        </mat-icon>
+      </button>
+
+      <button mat-icon-button  [disabled]="!enableRetry">
+        <mat-icon title="Restart" style="margin-bottom: -10%;" class="mat-icon material-icons">
+            refresh
+        </mat-icon>
+      </button>
+
+      <button mat-icon-button [disabled]="!enableLeaderboard"  (click)="navigateToLeaderboard()">
+        <mat-icon title="Leaderboard" style="margin-bottom: -10%;" class="mat-icon material-icons">
+            assessment
+        </mat-icon>
+      </button>
+
+      <button mat-icon-button [disabled]="!enableDelete" (click)="onDelete()">
+        <mat-icon title="Delete" style="margin-bottom: -10%;" class="mat-icon material-icons">
+            delete
+        </mat-icon>
+      </button>
+
+      <button mat-icon-button >
+        <mat-icon title="Refresh" style="margin-bottom: -10%;" class="mat-icon material-icons" (click)="refresh()">
+            restore
+        </mat-icon>
+      </button>
+      
+    </div>
+
+   <div>
+    <mat-radio-group [(ngModel)]="selectedUsecase">
+    <table mat-table [dataSource]="UsecaseListDatasource" class="mat-elevation-z8" style="margin-top:2% !important">
+      <ng-container matColumnDef="radio">
+        <th mat-header-cell *matHeaderCellDef class="tableHeaderCss" 
+        style="width:5% !important;padding-left: 2px !important"></th>
+        <td mat-cell *matCellDef="let element " style="margin-left:5%;width:5% !important">
+          <mat-radio-button style="margin-left: 5px" [value]="element" color="primary" (click)="onSelect(element)"></mat-radio-button>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="UsecaseName">
+        <th mat-header-cell *matHeaderCellDef class="tableHeaderCss" style="width:15%;padding-left: 4px">Usecase</th>
+        <td mat-cell *matCellDef="let element"  style="width:15%;padding-left: 4px"> 
+          {{element.usecaseName}} </td>
+      </ng-container>
+
+      <ng-container matColumnDef="PredictionColumn">
+        <th mat-header-cell *matHeaderCellDef class="tableHeaderCss" style="width:20%;padding-left:6px;">Prediction Column</th>
+        <td mat-cell *matCellDef="let element" style="padding-left:6px;width:20%;"> {{element.predictionColumn}} </td>
+      </ng-container>
+
+      <ng-container matColumnDef="ModelName">
+        <th mat-header-cell *matHeaderCellDef class="tableHeaderCss" style="width:20%;text-align: center;padding-right: 10px;">Model Name</th>
+        <td mat-cell *matCellDef="let element" style="width:20%;text-align: center;padding-right: 10px;" [matTooltip]="element.modelName"> 
+          {{(element.modelName.length>1)? element.modelName.slice(0,25)+'...':(element.modelName)}} </td>
+      </ng-container>
+
+      <ng-container matColumnDef="SplitRatio">
+        <th mat-header-cell *matHeaderCellDef class="tableHeaderCss" style="padding-left:6px;width:10%;text-align: center">Split Ratio Training/Testing</th>
+        <td mat-cell *matCellDef="let element" style="padding-left:6px;width:10%;text-align: center"> {{element.splitRatio}} </td>
+      </ng-container>
+
+      <ng-container matColumnDef="Created">
+        <th mat-header-cell *matHeaderCellDef class="tableHeaderCss" 
+        style="padding-left: 6px !important;width:10% !important;text-align: center">Created ({{timeZone}})</th>
+        <td mat-cell *matCellDef="let element" style="padding-left: 6px !important;width:10% !important;text-align: center"> {{element.createdAt}} </td>
+      </ng-container>
+
+      <!-- <ng-container matColumnDef="Updated">
+        <th mat-header-cell *matHeaderCellDef class="tableHeaderCss" 
+        style="padding-left: 6px !important;width:15% !important;text-align: center">Updated ({{timeZone}})</th>
+        <td mat-cell *matCellDef="let element" style="padding-left: 6px !important;width:15% !important;text-align: center"> {{element.updatedAt}} </td>
+      </ng-container> -->
+
+      <!-- <ng-container matColumnDef="LastModified">
+        <th mat-header-cell *matHeaderCellDef class="tableHeaderCss" style="padding-left:13px">Last Modified</th>
+        <td mat-cell *matCellDef="let element" style="width:20% !important"> {{element.updatedDate}} </td>
+      </ng-container> -->
+
+      <!-- <ng-container matColumnDef="RecommendedAction">
+        <th mat-header-cell *matHeaderCellDef class="tableHeaderCss" style="padding-left:13px">Recommended Action</th>
+        <td mat-cell *matCellDef="let element" style="width:30% !important"> {{element.recommendedAction}} </td>
+      </ng-container> -->
+      <ng-container matColumnDef="Status" class="btnAlign">
+        <th mat-header-cell *matHeaderCellDef class="tableHeaderCss" style="padding-left: 6px;text-align: center"> Status</th>
+        <td mat-cell *matCellDef="let element" style="width:15% !important;padding-left: 6px;text-align: center">{{element.status}}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="details">
+        <th mat-header-cell *matHeaderCellDef class="tableDetailsHeaderCss" style="text-align: center"> Details
+        </th>
+
+        <td mat-cell *matCellDef="let element" style="width:5% !important;text-align: center">
+            <a (click)="showWorkflowHistoryDetailsDialog(element.usecaseName, element.workflowId)">
+                <mat-icon svgIcon="healthcheck_show_details"
+                    [ngStyle]="{color:'#5C068C', height: '20px', width: '20px'}">
+                </mat-icon>
+            </a>
+        </td>
+    </ng-container>
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;"> </tr>
+    </table>
+  </mat-radio-group>
+    </div>
+    <div>
+      <mat-paginator #paginator [pageSize]="MAX_ROWS" showFirstLastButtons class="paginationStyle" (click)="refresh()">
+      </mat-paginator>
+    </div>
+    <!-- <div style="margin-left: 3vh; padding: 2vh;"><button mat-raised-button style="background-color: #CC3300"
+      class="btnAlign" (click)="onDelete()">Delete</button>
+     </div> -->
+   
+</div>

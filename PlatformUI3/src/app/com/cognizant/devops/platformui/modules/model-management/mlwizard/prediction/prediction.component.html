@@ -1,0 +1,160 @@
+<!--
+*******************************************************************************
+ * Copyright 2019 Cognizant Technology Solutions
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License.  You may obtain a copy
+ * of the License at
+ * 
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ ****************************************************************************** -->
+ <div class="pageCss">
+    <div layout layout-align="left" class="titleStyle">
+      <a>Configuration | <a class="greenTitleTxt">Forecasting</a></a>
+    </div>
+    <div class="orangeStripCss"></div>
+    <div layout layout-align="left" class="sectionHeadingStyle">
+      <div layout>&nbsp; Welcome To LeaderBoard - {{usecaseid}}
+        <span class="sectionSubHeading"> (Select a model name for prediction) </span>
+      </div>
+    </div>
+
+    <div class="btnAlign">
+      <button mat-icon-button (click)="onInfoClick()">
+        <mat-icon title="MSE : Mean Squared Error metric measures the average of the squares of the errors or deviations. 
+
+RMSE: Root Mean Squared Error metric evaluates how well a model can predict a continuous value.
+                
+RMSLE: Root Mean Squared Logarithmic Error metric measures the ratio between actual values and predicted values and takes the log of the predictions and actual values.
+                
+MAE: Mean Absolute Error is an average of the absolute errors. 
+                
+Mean Residual Deviance:  Mean Residual Deviance measures the goodness of the models’ fit: the smaller the deviance, the better the fit." style="margin-bottom: -10%;" class="mat-icon material-icons">
+            info
+        </mat-icon>
+      </button>
+
+      <button mat-icon-button [disabled]="!enablePredict" (click)="onPrediction()">
+        <mat-icon svgIcon="predict" title="Predict" style="margin-bottom: 15%;" class="mat-icon material-icons">
+          
+        </mat-icon>
+      </button>
+
+      <button mat-icon-button  [disabled]="!enableSaveMOJO" (click)="onSaveMOJO()">
+        <mat-icon title="Save MOJO" style="margin-top: 12%;" class="mat-icon material-icons" >
+          get_app
+        </mat-icon>
+      </button>
+
+      <button mat-icon-button (click)="navigateToPrevious()" >
+        <mat-icon title="Back" style="margin-bottom: -10%;" class="mat-icon material-icons">
+          keyboard_return
+        </mat-icon>
+      </button>
+      
+    </div>
+
+    <div class="loading-indicator">
+      <mat-progress-spinner [diameter]="100" *ngIf="showThrobber" color="primary" mode="indeterminate">
+      </mat-progress-spinner>
+  </div>
+
+    <!-- <div class="searchBoxStyle">
+      <div layout layout-align="left" class="searchTitleTxt">
+        Select a model name for prediction
+      </div> -->
+      <div>
+      <mat-radio-group [(ngModel)]="selectedModel">
+      <table mat-table [dataSource]="LeaderboardDataSrc" class="mat-elevation-z8">
+        <ng-container matColumnDef="radio">
+          <th mat-header-cell *matHeaderCellDef class="tableHeaderCss" style="width:5% !important"></th>
+          <td mat-cell *matCellDef="let element " style="width:5% !important">
+            <mat-radio-button [value]="element" color="primary" (change)="selectML(element)"></mat-radio-button>
+          </td>
+        </ng-container>
+  
+        <ng-container matColumnDef="model_id">
+          <th mat-header-cell *matHeaderCellDef class="tableHeaderCss">Algorithm Name</th>
+          <td mat-cell *matCellDef="let element" style="width:45% !important"> {{element.model_id}} </td>
+        </ng-container>
+
+        <ng-container matColumnDef="mean_residual_deviance">
+          <th mat-header-cell *matHeaderCellDef class="tableHeaderCss" style="padding-left: 8px;">Mean Residual Deviance</th>
+          <td mat-cell *matCellDef="let element" style="width:15%;padding-left: 8px;"> {{element.mean_residual_deviance.slice(0,6)}} </td>
+        </ng-container>
+  
+        <ng-container matColumnDef="rmse">
+          <th mat-header-cell *matHeaderCellDef class="tableHeaderCss">RMSE</th>
+          <td mat-cell *matCellDef="let element" style="width:10%"> {{element.rmse.slice(0,5)}} </td>
+        </ng-container>
+  
+        <ng-container matColumnDef="mse">
+          <th mat-header-cell *matHeaderCellDef class="tableHeaderCss">MSE</th>
+          <td mat-cell *matCellDef="let element" style="width:10%"> {{element.mse.slice(0,6)}} </td>
+        </ng-container>
+
+        <ng-container matColumnDef="mae">
+          <th mat-header-cell *matHeaderCellDef class="tableHeaderCss">MAE</th>
+          <td mat-cell *matCellDef="let element" style="width:8%"> {{element.mae.slice(0,5)}} </td>
+        </ng-container>
+
+        <ng-container matColumnDef="rmsle">
+          <th mat-header-cell *matHeaderCellDef class="tableHeaderCss">RMSLE</th>
+          <td mat-cell *matCellDef="let element" style="width:5%"> {{element.rmsle.slice(0,5)}} </td>
+        </ng-container>
+  
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;"> </tr>
+      </table> 
+    </mat-radio-group>
+    </div>
+    
+      <!-- <table id="leaderboardTable">
+        <mat-radio-group aria-label="Select an option" (change)="selectML($event)">
+        <tr style="height: 5vh">
+          <th>Select</th><th>Algorithm Name</th><th>MSE</th><th>RMSE</th><th>MAE</th><th>RMSLE</th><th>Mean Residual Deviance</th>
+        </tr>
+        <tr *ngFor="let ld of leaders; let i = index">
+        <td >
+          <mat-radio-button value={{ld}} color="primary" style="width: 5%;"></mat-radio-button>
+        </td>
+        <td style="width: 26%;">{{ld}}</td>
+        <td style="width: 12%;">{{ mse[i] | slice:0:6 }}</td>
+        <td style="width: 12%;">{{ rmse[i] | slice:0:5 }}</td>
+        <td style="width: 12%;">{{ mae[i] | slice:0:5 }}</td>
+        <td style="width: 12%;">{{ rmsle[i] | slice:0:5 }}</td>
+        <td style="width: 21%;">{{ mean_residual_deviance[i] | slice:0:6 }}</td>
+        
+        </tr>
+        </mat-radio-group>
+      </table>
+      </div>
+      <div style="margin-top: 5%;">
+      <!-- <div style="margin-left: 3vh; padding: 1vh;"><button mat-raised-button style="background-color: #0033A0"
+        (click)="onPrediction()">Predict</button>
+        <button mat-raised-button style="background-color: #0033A0; margin-left: 2vh;" (click)="onSaveMOJO()"
+        >Save MOJO</button></div><br> -->
+        <!-- <table [hidden]="!showOutput" id="leaderboardTable">
+          <tr style="height: 5vh"><th *ngFor = "let fd of fields">{{fd}}</th></tr>
+          <tr *ngFor = "let res of resultData | keyvalue | paginate: { itemsPerPage: 10, currentPage: p }">
+           <td class="limitText" *ngFor="let row of res.value | keyvalue">{{row.value}}
+           </td>
+          </tr>
+        </table>
+      <!-- </div> -->
+      <!-- <div class="dateRowStyle">
+        <pagination-controls [hidden]="!showOutput" class="paginationStyle" responsive="true"
+          (pageChange)="p = $event">
+        </pagination-controls>
+      </div> -->
+    
+    <!-- <button mat-icon-button (click)="navigateToPrevious()"><mat-icon style="font-size: 35px;">
+      chevron_left</mat-icon></button> -->
+   
+</div>

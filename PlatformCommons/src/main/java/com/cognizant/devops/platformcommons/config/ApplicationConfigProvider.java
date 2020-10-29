@@ -62,6 +62,8 @@ public class ApplicationConfigProvider implements Serializable {
 	private SingleSignOnConfig singleSignOnConfig = new SingleSignOnConfig();
 	private AssessmentReport assessmentReport = new AssessmentReport();	
 	private WorkflowDetails workflowDetails = new WorkflowDetails();
+	private MlConfiguration mlConfiguration = new MlConfiguration();
+
     private WebhookEngine webhookEngine= new WebhookEngine();
     private String pdfkey;
     
@@ -345,6 +347,14 @@ public class ApplicationConfigProvider implements Serializable {
 
 	public void setPdfkey(String pdfkey) {
 		this.pdfkey = pdfkey;
+	}
+	
+	public MlConfiguration getMlConfiguration() {
+		return mlConfiguration;
+	}
+
+	public void setMlConfiguration(MlConfiguration mlConfiguration) {
+		this.mlConfiguration = mlConfiguration;
 	}
 	
 	

@@ -1,0 +1,82 @@
+/* *******************************************************************************
+ * Copyright 2019 Cognizant Technology Solutions
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License.  You may obtain a copy
+ * of the License at
+ * 
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ ****************************************************************************** */
+
+.rows td {
+  padding: 2vh;
+}
+
+.pagination > .active > span {
+  background-color: #0033A0;
+  color: white;
+}
+
+#leaderboardTable{
+  border-collapse: collapse;
+  table-layout: fixed;
+  width: 1052px;
+  padding: 6px;
+  border-radius:6px;
+  -moz-border-radius:6px;
+}
+
+#leaderboardTable td {
+  border: 1px solid #ddd;
+  padding: 7px;
+  word-break: break-all;
+}
+
+#leaderboardTable tr:nth-child(even){
+  background-color: #FFFFFF;
+}
+
+#leaderboardTable tr:last-child {
+  box-shadow: 0 5px 5px -3px rgba(0,0,0,.2), 0 8px 10px 1px rgba(0,0,0,.14), 0 3px 14px 2px rgba(0,0,0,.12);
+  border-radius: 0 0 10px 10px;
+} 
+
+#leaderboardTable tr:nth-child(odd){
+  background-color: #e1e3e7;
+}
+
+#leaderboardTable th{
+  text-align: left;
+  background-color: #00B140;
+  color: white;
+  padding: 8px;
+  word-break: break-all;
+  height: 44px;
+}
+
+.limitText {
+  white-space: nowrap;
+  overflow: hidden;
+  max-width: 40px;
+  /* height: 30px; */
+  text-overflow: ellipsis;
+}
+
+.loading-indicator {
+    position: fixed;
+    z-index: 999;
+    height: 2em;
+    width: 2em;
+    overflow: visible;
+    margin: auto;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+}

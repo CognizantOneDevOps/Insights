@@ -18,12 +18,15 @@ package com.cognizant.devops.platformcommons.dal;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URLEncoder;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
@@ -49,6 +52,7 @@ import org.glassfish.jersey.media.multipart.file.FileDataBodyPart;
 
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformcommons.exception.RestAPI404Exception;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 public class RestApiHandler {
@@ -59,6 +63,8 @@ public class RestApiHandler {
 	static Client multipartClient;
 	static {
 		try {
+			
+		
 			initializeClient();
 		} catch (Exception e) {
 			log.error(e);
@@ -235,6 +241,63 @@ public class RestApiHandler {
 		return data;
 	}
 
+	
+	public static String httpQueryParamRequest(String url, JsonObject queryParams, Map<String, String> headers,String action) throws InsightsCustomException {
+		String data = null;
+		Builder invocationBuilder = null;
+		Response response = null;
+		WebTarget webTarget = null;
+		try {
+			webTarget = client.target(url);
+			if (queryParams != null && !queryParams.entrySet().isEmpty()) {
+				Set<Entry<String, JsonElement>> entitySet = queryParams.entrySet();
+				for (Entry<String, JsonElement> entity : entitySet) {
+					String key = entity.getKey();
+					webTarget=webTarget.queryParam(key, queryParams.get(key).getAsString());
+				}
+			}
+			invocationBuilder = webTarget.request();
+			if (headers != null && !headers.isEmpty()) {
+				for (Map.Entry<String, String> entry : headers.entrySet()) {
+					invocationBuilder = invocationBuilder.header(entry.getKey(), entry.getValue());
+				}
+			}
+			if (HttpMethod.POST.equalsIgnoreCase(action)) {
+				response = invocationBuilder.post(null, Response.class);
+			} else if (HttpMethod.GET.equalsIgnoreCase(action)) {
+				response = invocationBuilder.get(Response.class);
+			}
+			if (response != null) {
+				data = response.readEntity(String.class);
+				if (response.getStatus() == 404) {
+					log.debug("HTTP error code for 404 : {} message {} ", response.getStatus(), data);
+					JsonObject errorResponse = new JsonObject();
+					errorResponse.addProperty("status", response.getStatus());
+					errorResponse.addProperty("data", data);
+					throw new RestAPI404Exception(errorResponse.toString());
+				} else if (!(response.getStatus() == 200 || response.getStatus() == 204)) {
+					throw new InsightsCustomException(
+							"Failed : HTTP error code : " + response.getStatus() + " message " + data);
+				}
+			}
+		} catch (ProcessingException e) {
+			log.error("ProcessingException occured {} ", e);
+			throw e;
+		} catch (RestAPI404Exception e) {
+			log.error("Error while connecting to server RestAPI404Exception -- {}", e);
+			throw new RestAPI404Exception(e.getMessage());
+		} catch (Exception e) {
+			log.error("Error while connecting to server -- {}", e);
+			throw new InsightsCustomException(e.getMessage());
+		} finally {
+			if (response != null) {
+				response.close();
+			}
+		}
+		return data;
+	}
+	
+	
 	/**
 	 * @param url
 	 * @param requestJson
@@ -346,4 +409,111 @@ public class RestApiHandler {
 		return retunInputStream;
 	}
 
+	/**
+	 * This method used to upload multipart file using API
+	 * 
+	 * @param url
+	 * @param requestJson
+	 * @param headers
+	 * @return
+	 * @throws InsightsCustomException
+	 */
+	public static InputStream downloadMultipartFile(String url, Map<String, String> headers)
+			throws InsightsCustomException {
+		InputStream retunInputStream = null;
+		Builder invocationBuilder = null;
+		Response response = null;
+		WebTarget webTarget = null;	
+		try {
+			webTarget = multipartClient.target(url);
+			invocationBuilder = webTarget.request();
+			if (headers != null && headers.size() > 0) {
+				for (Map.Entry<String, String> entry : headers.entrySet()) {
+					invocationBuilder = invocationBuilder.header(entry.getKey(), entry.getValue());
+				}
+			}
+			response =invocationBuilder.get();
+			if (response.getStatus() != 200) {
+				throw new InsightsCustomException(
+						"Failed : HTTP error code : " + response.getStatus() + " response message are " + response);
+			} else {
+				response.bufferEntity();
+				retunInputStream = response.readEntity(InputStream.class);
+			}
+
+		} catch (Exception e) {
+			log.error("Error while connecting to server -- {}", e);
+			throw new InsightsCustomException(e.getMessage());
+		} finally {
+			
+			}
+		
+		return retunInputStream;
+	}
+
+	
+	
+	public static String uploadMultipartFileWithData(String url, Map<String, String> multipartFiles,
+			Map<String, String> multipartFileData,
+			Map<String, String> headers, String returnMediaType)
+			throws InsightsCustomException {
+		String returnData = null;
+		Builder invocationBuilder = null;
+		Response response = null;
+		WebTarget webTarget = null;
+		FileDataBodyPart filePart = null;
+		FormDataMultiPart formDataMultiPart = new FormDataMultiPart();
+		try {
+
+			if (multipartFiles != null && multipartFiles.size() > 0) {
+				for (Map.Entry<String, String> entry : multipartFiles.entrySet()) {
+					filePart = new FileDataBodyPart(entry.getKey(), new File(entry.getValue()));
+					formDataMultiPart.bodyPart(filePart);
+				}
+			}
+
+
+			if (multipartFileData != null && multipartFileData.size() > 0) {
+				for (Map.Entry<String, String> entry : multipartFileData.entrySet()) {
+					formDataMultiPart = formDataMultiPart.field(entry.getKey(), entry.getValue());
+				}
+			}		
+			formDataMultiPart.setMediaType(MediaType.MULTIPART_FORM_DATA_TYPE);
+			//FormDataMultiPart multipart = (FormDataMultiPart) formDataMultiPart;
+
+			webTarget = multipartClient.target(url);
+			invocationBuilder = webTarget.request().accept(returnMediaType);
+
+			if (headers != null && headers.size() > 0) {
+				for (Map.Entry<String, String> entry : headers.entrySet()) {
+					invocationBuilder = invocationBuilder.header(entry.getKey(), entry.getValue());
+				}
+			}
+
+			response = invocationBuilder.post(Entity.entity(formDataMultiPart, formDataMultiPart.getMediaType()));
+
+			if (response.getStatus() != 200) {
+				throw new InsightsCustomException(
+						"Failed : HTTP error code : " + response.getStatus() + " response message are " + response);
+			} else {
+				returnData = response.readEntity(String.class);
+			}
+
+		} catch (Exception e) {
+			log.error("Error while connecting to server -- {}", e);
+			throw new InsightsCustomException(e.getMessage());
+		} finally {
+			if (formDataMultiPart != null) {
+				try {
+					formDataMultiPart.close();
+				} catch (IOException e) {
+					throw new InsightsCustomException(e.getMessage());
+				}
+			//multipart.close();
+			}
+		}
+		return returnData;
+	}
+
+	
 }

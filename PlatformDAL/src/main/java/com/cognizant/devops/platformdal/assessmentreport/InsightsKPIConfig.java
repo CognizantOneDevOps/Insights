@@ -65,7 +65,8 @@ public class InsightsKPIConfig implements Serializable{
 	private String resultField;
 			
 	@Column(name = "isActive")
-	private Boolean isActive=false;
+	private Boolean isActive=false;	
+	
 	
 	public static long getSerialversionuid() {
 		return serialVersionUID;
@@ -150,5 +151,6 @@ public class InsightsKPIConfig implements Serializable{
 	public void setCategory(String category) {
 		this.category = category;
 	}
-
+	
+	
 }

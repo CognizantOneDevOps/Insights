@@ -147,7 +147,7 @@ public class WorkflowServiceImpl {
 	public JsonArray getTaskList(String workflowType) throws InsightsCustomException {
 		try {
 
-			List<InsightsWorkflowTask> listofTasks = workflowConfigDAL.getTaskLists();
+			List<InsightsWorkflowTask> listofTasks = workflowConfigDAL.getTaskLists(workflowType);
 			JsonArray jsonarray = new JsonArray();
 			for (InsightsWorkflowTask taskDetail : listofTasks) {
 				JsonObject jsonobject = new JsonObject();
@@ -232,6 +232,43 @@ public class WorkflowServiceImpl {
 			int assessmentConfigId = configIdJson.get("configid").getAsInt();
 			List<Object[]> records = workflowConfigDAL
 					.getWorkflowExecutionRecordsbyAssessmentConfigID(assessmentConfigId);
+			JsonArray recordData = new JsonArray();
+			records.stream().forEach(record -> {
+				JsonObject rec = new JsonObject();
+				rec.addProperty("executionid", (long) record[0]);
+				rec.addProperty("startTime", (long) record[1]);
+				if (((long) record[2]) == 0) {
+					rec.addProperty("endTime", 0);
+				} else {
+					rec.addProperty("endTime", (long) record[2]);
+				}
+				rec.addProperty("retryCount", (int) record[3]);
+				rec.addProperty("statusLog", String.valueOf(record[4]));
+				rec.addProperty("taskStatus", String.valueOf(record[5]));
+				rec.addProperty("currentTask", String.valueOf(record[6]));
+				recordData.add(rec);
+			});
+			JsonObject responseJson = new JsonObject();
+			responseJson.add("records", recordData);
+			return responseJson;
+		} catch (Exception e) {
+			log.error("Error while fetching Workflow Execution History records.", e);
+			throw new InsightsCustomException("Error while fetching Workflow Execution History records");
+		}
+	}
+
+	/**
+	 * Method used to get Workflow Execution History records by Workflow Id
+	 * 
+	 * @param configIdJson
+	 * @return
+	 * @throws InsightsCustomException
+	 */
+	public JsonObject getWorkFlowExecutionRecordsByWorkflowId(JsonObject workflowIdJson)
+			throws InsightsCustomException {
+		try {
+			String workflowId = workflowIdJson.get("workflowId").getAsString();
+			List<Object[]> records = workflowConfigDAL.getWorkflowExecutionRecordsByworkflowID(workflowId);
 			JsonArray recordData = new JsonArray();
 			records.stream().forEach(record -> {
 				JsonObject rec = new JsonObject();

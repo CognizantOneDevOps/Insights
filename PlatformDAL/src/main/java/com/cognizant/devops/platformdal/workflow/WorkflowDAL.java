@@ -356,10 +356,11 @@ public class WorkflowDAL extends BaseDAL {
 	 * 
 	 * @return List<InsightsWorkflowTask>
 	 */
-	public List<InsightsWorkflowTask> getTaskLists() {
+	public List<InsightsWorkflowTask> getTaskLists(String workflowType) {
 		List<InsightsWorkflowTask> tasks = new ArrayList<>();
-		Query<InsightsWorkflowTask> createQuery = getSession().createQuery("FROM InsightsWorkflowTask RE",
+		Query<InsightsWorkflowTask> createQuery = getSession().createQuery("FROM InsightsWorkflowTask RE WHERE RE.workflowType.workflowType = :workflowType",
 				InsightsWorkflowTask.class);
+		createQuery.setParameter("workflowType", workflowType);
 		tasks = createQuery.getResultList();
 		terminateSession();
 		terminateSessionFactory();
@@ -403,6 +404,32 @@ public class WorkflowDAL extends BaseDAL {
 				.addScalar("retryCount", StandardBasicTypes.INTEGER).addScalar("statusLog", StandardBasicTypes.STRING)
 				.addScalar("taskStatus", StandardBasicTypes.STRING).addScalar("currentTask", StandardBasicTypes.STRING)
 				.setParameter("configId", assessmentConfigId);
+		List<Object[]> records = createQuery.getResultList();
+		terminateSession();
+		terminateSessionFactory();
+		return records;
+	}
+
+	/**
+	 * Method to get Workflow Execution History records using workflowID
+	 * from the database
+	 * 
+	 * @param assessmentConfigId
+	 * @return List<Object[]>
+	 */
+	public List<Object[]> getWorkflowExecutionRecordsByworkflowID(String workflowId) {
+		String query = "SELECT IWHU.executionid as executionid,IWHU.starttime as startTime,IWHU.endtime as endTime,IWHU.retrycount as retryCount,IWHU.statuslog as statusLog,    \r\n"
+				+ "	 IWHU.taskstatus as taskStatus,IWT.description as currentTask \r\n"
+				+ "	 FROM         \"INSIGHTS_WORKFLOW_EXECUTION_HISTORY\"         IWHU \r\n"
+				+ "	 inner join         \"INSIGHTS_WORKFLOW_TASK\"  IWT ON IWHU.currenttask=IWT.taskid WHERE executionid IN     \r\n"
+				+ "	 (  SELECT DISTINCT(executionid) \r\n"
+				+ "		FROM  \"INSIGHTS_WORKFLOW_EXECUTION_HISTORY\" IWH where IWH.workflowid = :workflowID ORDER BY executionid DESC limit 5 )    \r\n"
+				+ "	 order by IWHU.executionid desc,IWHU.starttime";
+		Query createQuery = getSession().createSQLQuery(query).addScalar("executionid", StandardBasicTypes.LONG)
+				.addScalar("startTime", StandardBasicTypes.LONG).addScalar("endTime", StandardBasicTypes.LONG)
+				.addScalar("retryCount", StandardBasicTypes.INTEGER).addScalar("statusLog", StandardBasicTypes.STRING)
+				.addScalar("taskStatus", StandardBasicTypes.STRING).addScalar("currentTask", StandardBasicTypes.STRING)
+				.setParameter("workflowID", workflowId);
 		List<Object[]> records = createQuery.getResultList();
 		terminateSession();
 		terminateSessionFactory();
@@ -516,6 +543,16 @@ public class WorkflowDAL extends BaseDAL {
 		terminateSession();
 		terminateSessionFactory();
 		return workflowTask.getTaskId();
+	}
+	
+	public String deleteExecutionHistory(InsightsWorkflowExecutionHistory history) {
+		
+		getSession().beginTransaction();
+		getSession().delete(history);
+		getSession().getTransaction().commit();
+		terminateSession();
+		terminateSessionFactory();
+		return PlatformServiceConstants.SUCCESS;
 	}
 
 	/**

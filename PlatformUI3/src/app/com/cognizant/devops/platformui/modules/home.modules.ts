@@ -90,6 +90,15 @@ import { WorkflowHistoryDetailsDialog } from '@insights/app/modules/reportmanage
 import { ReportConfigComponent } from '@insights/app/modules/reportmanagement/report-configuration/report-configuration.component';
 import { DataArchiveDetailsDialog } from '@insights/app/modules/settings/dataarchiving/data-archive-details/data-archive-details-dialog';
 import { DataArchiveConfigureURLDialog } from '@insights/app/modules/settings/dataarchiving/data-archive-configureurl/data-archive-configureurl-dialog';
+import {MatSliderModule} from '@angular/material/slider';
+import { NgxPaginationModule } from 'ngx-pagination';
+import { MLWizardComponent } from '@insights/app/modules/model-management/mlwizard/mlwizard.component';
+import { MLWizardService } from '@insights/app/modules/model-management/mlwizard/mlwizard.service';
+import { AutomlComponent } from '@insights/app/modules/model-management/mlwizard/automl/automl.component';
+import { PredictionComponent } from '@insights/app/modules/model-management/mlwizard/prediction/prediction.component';
+import { ModelManagementComponent } from '@insights/app/modules/model-management/model-management.component';
+import { ModelManagementService } from '@insights/app/modules/model-management/model-management.service';
+import { PredictionShowDetailsDialog } from '@insights/app/modules/model-management/mlwizard/prediction/prediction-show-detail/prediction-show-details-dialog';
 import { EmailConfigurationDialog } from '@insights/app/modules/reportmanagement/report-configuration/email-configuration-dialog'; 
 import { KpiCreationComponent} from '@insights/app/modules/kpi-creation/kpi-creation.component';
 import { KpiAdditionComponent} from '@insights/app/modules/kpi-addition/kpi-addition.component';
@@ -143,6 +152,13 @@ import { ContentService } from './content-config-list/content-service';
     AddTasksDialog,
     ViewKPIDialog,
     WorkflowHistoryDetailsDialog,
+    MLWizardComponent,
+    AutomlComponent,
+    PredictionComponent,
+    ModelManagementComponent,
+    WorkflowHistoryDetailsDialog,
+    EmailConfigurationDialog,
+    PredictionShowDetailsDialog,
     EmailConfigurationDialog,
     KpiCreationComponent,
     KpiAdditionComponent,
@@ -162,7 +178,9 @@ import { ContentService } from './content-config-list/content-service';
     SharedServices,
     MatDatepickerModule,
     StorageServiceModule,
-    DragulaModule
+    DragulaModule,
+    MatSliderModule,
+    NgxPaginationModule
   ],
   exports:[MatSortModule],
   entryComponents: [
@@ -181,6 +199,7 @@ import { ContentService } from './content-config-list/content-service';
     DataArchiveDetailsDialog,
     DataArchiveConfigureURLDialog,
     EmailConfigurationDialog,
+    PredictionShowDetailsDialog,  
     FileUploadDialog,
     KpiListDialog
   ],
@@ -208,6 +227,8 @@ import { ContentService } from './content-config-list/content-service';
     ReportManagementService,
     LandingPageService,
     TraceabiltyService,
+    MLWizardService,
+    ModelManagementService,
     KpiService,
     ContentService
   ]

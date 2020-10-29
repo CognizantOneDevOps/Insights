@@ -39,6 +39,10 @@ import { AuthGuardService as AuthGuard } from '@insights/common/auth-guard.servi
 import { TraceabilityDashboardCompenent } from '@insights/app/modules/traceability/traceability-builder.component';
 import { ReportConfigComponent } from '@insights/app/modules/reportmanagement/report-configuration/report-configuration.component';
 import { ReportManagementComponent } from './reportmanagement/reportmanagement.component';
+import { MLWizardComponent} from '@insights/app/modules/model-management/mlwizard/mlwizard.component';
+import { AutomlComponent } from '@insights/app/modules/model-management/mlwizard/automl/automl.component';
+import { PredictionComponent } from '@insights/app/modules/model-management/mlwizard/prediction/prediction.component';
+import { ModelManagementComponent } from '@insights/app/modules/model-management/model-management.component';
 import { KpiCreationComponent} from '@insights/app/modules/kpi-creation/kpi-creation.component';
 import { KpiAdditionComponent} from '@insights/app/modules/kpi-addition/kpi-addition.component';
 import { ContentConfigComponent } from '@insights/app/modules/content-config-list/content-config-list.component';
@@ -71,6 +75,10 @@ const homeRoutes: Routes = [
       { path: 'reportmanagement', component: ReportManagementComponent },
       { path: 'report-configuration', component: ReportConfigComponent },
       { path: 'traceability', component: TraceabilityDashboardCompenent },
+      { path: 'mlwizard' ,component: MLWizardComponent},
+      { path: 'automl', component: AutomlComponent},
+      { path: 'prediction', component: PredictionComponent},
+      { path: 'modelmanagement', component: ModelManagementComponent},
       { path: 'kpicreation', component: KpiCreationComponent },
       { path: 'kpiaddition', component: KpiAdditionComponent },
       { path:'contentConfig',component: ContentConfigComponent },

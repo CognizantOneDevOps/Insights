@@ -90,6 +90,21 @@ public class InsightsWorkflowController {
 		return PlatformServiceUtil.buildSuccessResponseWithData(records);
 	}
 
+	@PostMapping(value = "/workFlowExecutionRecordsByWorkflowId", produces = MediaType.APPLICATION_JSON_VALUE)
+	public @ResponseBody JsonObject getWorkflowExecutionRecordsByWorkflowId(@RequestBody String workflowIdJson) {
+		JsonObject records = null;
+		try {
+			workflowIdJson = workflowIdJson.replace("\n", "").replace("\r", "");
+			String validatedRequestJson = ValidationUtils.validateRequestBody(workflowIdJson);
+			JsonParser parser = new JsonParser();
+			JsonObject validatedConfigIdJson = parser.parse(validatedRequestJson).getAsJsonObject();
+			records = workflowService.getWorkFlowExecutionRecordsByWorkflowId(validatedConfigIdJson);
+		} catch (InsightsCustomException e) {
+			return PlatformServiceUtil.buildFailureResponse(e.getMessage());
+		}
+		return PlatformServiceUtil.buildSuccessResponseWithData(records);
+	}
+
 	@PostMapping(value = "/maxExecutionIDs", produces = MediaType.APPLICATION_JSON_VALUE)
 	public @ResponseBody JsonObject getMaximumExecutionIds(@RequestBody String configIdJson) {
 		JsonObject records = null;

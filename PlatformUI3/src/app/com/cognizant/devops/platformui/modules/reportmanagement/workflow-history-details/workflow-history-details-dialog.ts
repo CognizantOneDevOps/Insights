@@ -96,7 +96,8 @@ export class WorkflowHistoryDetailsDialog implements OnInit {
     this.showContent = !this.showThrobber;
     this.checkResponseData = true;
     var configIdJson = {};
-    configIdJson["configid"] = this.data.configId;
+    //configIdJson["configid"] = this.data.configId;
+    configIdJson["workflowId"] = this.data.workflowId;
     this.recordList = await this.reportManagementService.getWorkflowExecutionRecords(
       JSON.stringify(configIdJson)
     );

@@ -97,6 +97,16 @@
 			<artifactId>commons-text</artifactId>
 			<version>1.8</version>
 		</dependency>
+		<dependency>
+		    <groupId>ai.h2o</groupId>
+		    <artifactId>h2o-genmodel-ext-xgboost</artifactId>
+		    <version>3.30.0.6</version>
+		</dependency>
+		<dependency>
+		    <groupId>ai.h2o</groupId>
+		    <artifactId>h2o-genmodel</artifactId>
+		    <version>3.30.0.6</version>
+		</dependency>
 	</dependencies>
 	<build>
 		<finalName>PlatformReports</finalName>

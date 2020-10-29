@@ -248,6 +248,7 @@ export class ReportManagementComponent implements OnInit {
 
   addReport() {
     this.configParams = JSON.stringify({ type: 'save' });
+    console.log(" config param", this.configParams)
     this.naivagate();
   }
 
@@ -317,7 +318,7 @@ export class ReportManagementComponent implements OnInit {
     );
   }
 
-  showWorkflowHistoryDetailsDialog(reportName: String, configId: String) {
+  showWorkflowHistoryDetailsDialog(reportName: String, workflowId: String) {
     var isSessionExpired = this.dataShare.validateSession();
     if (!isSessionExpired) {
       this.dialog.open(WorkflowHistoryDetailsDialog, {
@@ -325,7 +326,7 @@ export class ReportManagementComponent implements OnInit {
         disableClose: true,
         data: {
           reportName: reportName,
-          configId: configId,
+          workflowId: workflowId,
           timeZone: this.timeZone
         }
       });

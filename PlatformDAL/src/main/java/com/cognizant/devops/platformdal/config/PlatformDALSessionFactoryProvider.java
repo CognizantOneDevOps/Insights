@@ -30,6 +30,7 @@ import com.cognizant.devops.platformdal.assessmentreport.InsightsKPIConfig;
 import com.cognizant.devops.platformdal.assessmentreport.InsightsReportVisualizationContainer;
 import com.cognizant.devops.platformdal.assessmentreport.InsightsReportsKPIConfig;
 import com.cognizant.devops.platformdal.assessmentreport.InsightsVisualizationConfig;
+import com.cognizant.devops.platformdal.autoML.AutoMLConfig;
 import com.cognizant.devops.platformdal.correlationConfig.CorrelationConfiguration;
 import com.cognizant.devops.platformdal.dashboards.CustomDashboard;
 import com.cognizant.devops.platformdal.dataArchivalConfig.InsightsDataArchivalConfig;
@@ -97,6 +98,7 @@ public class PlatformDALSessionFactoryProvider {
 		    configuration.addAnnotatedClass(InsightsDataArchivalConfig.class);
 		    configuration.addAnnotatedClass(InsightsEmailTemplates.class);
 		    configuration.addAnnotatedClass(InsightsReportVisualizationContainer.class);
+		    configuration.addAnnotatedClass(AutoMLConfig.class);
 			PostgreData postgre = ApplicationConfigProvider.getInstance().getPostgre();
 			if(postgre != null){
 				configuration.setProperty("hibernate.connection.username", postgre.getUserName());

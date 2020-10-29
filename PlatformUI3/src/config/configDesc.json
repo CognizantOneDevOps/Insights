@@ -6,5 +6,13 @@
       "communication": "Communication",
       "loggingSetting": "Logging Setting",
       "enrichData": "Enrich Data"
-   }
+   },
+   "mlDataTypes": {
+		"Numeric": "Numeric",
+		"Enum": "Enum",
+		"String": "String",
+		"Time": "Time",
+		"UUID": "UUID",
+		"Unknown": "Unknown"
+	}
 }

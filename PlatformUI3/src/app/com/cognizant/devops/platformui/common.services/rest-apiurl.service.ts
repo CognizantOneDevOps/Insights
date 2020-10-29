@@ -56,7 +56,8 @@ export class RestAPIurlService implements IRestAPIUrlService {
         this.addEndPoint("UPDATE_REPORT", '/PlatformService/insights/report/updateAssessmentReport');
         this.addEndPoint("GET_KPI_LIST", '/PlatformService/insights/report/getKPIlistOfReportTemplate');
         this.addEndPoint("GET_TASK_LIST", '/PlatformService/insights/workflow/getTaskList');
-        this.addEndPoint("GET_WORKFLOW_EXECUTION_RECORDS", '/PlatformService/insights/workflow/workFlowExecutionRecords');
+        //this.addEndPoint("GET_WORKFLOW_EXECUTION_RECORDS", '/PlatformService/insights/workflow/workFlowExecutionRecords');
+        this.addEndPoint("GET_WORKFLOW_EXECUTION_RECORDS", '/PlatformService/insights/workflow/workFlowExecutionRecordsByWorkflowId');
         this.addEndPoint("SET_REPORT_STATUS", '/PlatformService/insights/report/setReportStatus');
         this.addEndPoint("DOWNLOAD_REPORT_PDF", '/PlatformService/insights/workflow/downloadReportPDF');
         this.addEndPoint("GET_PDF_EXECUTIONID", '/PlatformService/insights/workflow/maxExecutionIDs');
@@ -164,6 +165,17 @@ export class RestAPIurlService implements IRestAPIUrlService {
         this.addEndPoint("ACTIVATE_RECORD", '/PlatformService/admin/dataarchival/activateArchivalRecord');
         this.addEndPoint("ACTIVE_ARCHIVED_DATA_LIST", '/PlatformService/admin/dataarchival/getActiveArchivalRecord');
         this.addEndPoint("UPDATE_DATASOURCE_URL", '/PlatformService/admin/dataarchival/updateArchivalSourceUrl');
+
+        //ML WIZARD
+        this.addEndPoint("VALIDATE_USECASEID", '/PlatformService/admin/trainmodels/validateUsecaseName');
+        this.addEndPoint("UPLOAD_CSV", '/PlatformService/admin/trainmodels/saveUsecase');
+        this.addEndPoint("GET_USECASES", '/PlatformService/admin/trainmodels/getUsecases');
+        this.addEndPoint("DELETE_USECASE", '/PlatformService/admin/trainmodels/deleteusecase');
+        this.addEndPoint("SPLIT_N_TRAIN","/PlatformService/admin/trainmodels/splitAndTrain");
+        this.addEndPoint("POLL_STATUS", '/PlatformService/admin/trainmodels/getAutoMLProgress');
+        this.addEndPoint("GET_LEADERBOARD", '/PlatformService/admin/trainmodels/getLeaderboard');
+        this.addEndPoint("PREDICT", '/PlatformService/admin/trainmodels/getPrediction');
+        this.addEndPoint("DOWNLOAD_MOJO", '/PlatformService/admin/trainmodels/downloadMojo');
 
          //kpi
          this.addEndPoint("KPI_CATEGORY",'/PlatformService/insights/report/getKpiCategory');

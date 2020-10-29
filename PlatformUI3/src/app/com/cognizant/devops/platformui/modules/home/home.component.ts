@@ -386,6 +386,15 @@ export class HomeComponent implements OnInit {
             title: "Business Mapping",
             isAdminMenu: true
           },
+		  {
+		    displayName: 'Data Archival',
+            iconName: 'feature',
+            route: 'InSights/Home/dataarchiving',
+            isToolbarDisplay: InsightsInitService.enableInsightsToolbar,
+            showMenu: true,
+            title: "Data Archival",
+            isAdminMenu: true
+          },
           {
             displayName: 'Report Configuration',
             iconName: 'feature',
@@ -411,16 +420,17 @@ export class HomeComponent implements OnInit {
                 showMenu: true,
                 title: "Content Configuration",
                 isAdminMenu: false
-              },
-              {
-                displayName: 'Report Template',
-                iconName: 'feature',
-                route: 'InSights/Home',
-                isToolbarDisplay: InsightsInitService.enableInsightsToolbar,
-                showMenu: true,
-                title: "Report Template",
-                isAdminMenu: false
               }
+              // ,
+              // {
+              //   displayName: 'Report Template',
+              //   iconName: 'feature',
+              //   route: 'InSights/Home',
+              //   isToolbarDisplay: InsightsInitService.enableInsightsToolbar,
+              //   showMenu: true,
+              //   title: "Report Template",
+              //   isAdminMenu: false
+              // }
             ]
           },
           {
@@ -431,16 +441,17 @@ export class HomeComponent implements OnInit {
             showMenu: true,
             title: "Logo Setting",
             isAdminMenu: true
-          },
-          {
-            displayName: 'Data Archival',
-            iconName: 'feature',
-            route: 'InSights/Home/dataarchiving',
-            isToolbarDisplay: InsightsInitService.enableInsightsToolbar,
-            showMenu: true,
-            title: "Data Archival",
-            isAdminMenu: true
-          },         
+          }
+          // ,
+          // {
+          //   displayName: 'Forecasting',
+          //   iconName: 'feature',
+          //   route: 'InSights/Home/modelmanagement',
+          //   isToolbarDisplay: InsightsInitService.enableInsightsToolbar,
+          //   showMenu: true,
+          //   title: "Forecasting",
+          //   isAdminMenu: false
+          // }        
         ]
       }
     ];

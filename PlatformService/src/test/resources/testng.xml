@@ -30,7 +30,9 @@
 			<class
 				name="com.cognizant.devops.platformservice.test.workflow.WorkflowServiceTest" /> 
 			<class
-				name="com.cognizant.devops.platformservice.test.dataArchival.DataArchivalServiceTest" />	
+				name="com.cognizant.devops.platformservice.test.dataArchival.DataArchivalServiceTest" />
+			<class
+				name="com.cognizant.devops.platformservice.test.automl.TrainModelsServiceTest" />	
 		</classes>
 	</test>
 </suite>

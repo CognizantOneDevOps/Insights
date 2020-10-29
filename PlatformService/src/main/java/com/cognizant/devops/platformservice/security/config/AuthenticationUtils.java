@@ -87,6 +87,7 @@ public class AuthenticationUtils {
 
 	public static final String JSON_FILE_VALIDATOR = "^([a-zA-Z0-9_.\\s-])+(.json)$";
 	public static final String LOG_FILE_VALIDATOR = "^([a-zA-Z0-9_.\\s-])+(.log)$";
+	public static final String CSV_FILE_VALIDATOR = "^([a-zA-Z0-9_.\\s-])+(.csv)$";
 
 	public static final List<String> SUPPORTED_TYPE = Collections.unmodifiableList(Arrays.asList("SAML", "Kerberos", "NativeGrafana", "JWT" ));
 	public static final Set<String> AUTHENTICATION_PROTOCOL_LIST = Collections.unmodifiableSet(new HashSet<String>(SUPPORTED_TYPE));

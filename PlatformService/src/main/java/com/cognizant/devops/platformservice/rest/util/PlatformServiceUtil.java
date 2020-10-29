@@ -31,6 +31,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.NewCookie;
 
+import org.apache.commons.io.FilenameUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -187,21 +188,25 @@ public class PlatformServiceUtil {
 	}
 
 	public static boolean validateFile(String filename) {
-		final Pattern pattern;
+		Pattern pattern = null;
 		try {
-			if (filename.contains(".json")) {
+			String fileExt = FilenameUtils.getExtension(filename);
+			if (fileExt.equalsIgnoreCase(".json")) {
 				pattern = Pattern.compile(AuthenticationUtils.JSON_FILE_VALIDATOR);
-			} else {
+			} else if (fileExt.equalsIgnoreCase("log")) {
 				pattern = Pattern.compile(AuthenticationUtils.LOG_FILE_VALIDATOR);
+			} else if (fileExt.equalsIgnoreCase("csv")) {
+				pattern = Pattern.compile(AuthenticationUtils.CSV_FILE_VALIDATOR);
 			}
-			final Matcher matcher = pattern.matcher(filename);
-
-			if (matcher.find()) {
-				log.debug("File name is Valid for regex -- {}", filename);
-				return true;
+			if (pattern != null) {
+				final Matcher matcher = pattern.matcher(filename);
+				if (matcher.find()) {
+					log.debug("File name is Valid for regex -- {}", filename);
+					return true;
+				}
 			}
 		} catch (Exception e) {
-			log.error("Not a valid path -- {}", e.getStackTrace());
+			log.error("Not a valid path --", e);
 		}
 		return false;
 	}

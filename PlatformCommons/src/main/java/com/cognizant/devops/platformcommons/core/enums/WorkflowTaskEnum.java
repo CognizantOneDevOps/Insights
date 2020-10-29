@@ -25,7 +25,8 @@ public class WorkflowTaskEnum {
 	}
 
 	public enum WorkflowType {
-		REPORT("Report");
+		REPORT("Report"),
+		AUTOML("AUTOML");
 
 		private String value;
 
