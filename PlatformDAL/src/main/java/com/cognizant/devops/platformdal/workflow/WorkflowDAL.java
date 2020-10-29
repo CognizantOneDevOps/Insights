@@ -358,7 +358,8 @@ public class WorkflowDAL extends BaseDAL {
 	 */
 	public List<InsightsWorkflowTask> getTaskLists(String workflowType) {
 		List<InsightsWorkflowTask> tasks = new ArrayList<>();
-		Query<InsightsWorkflowTask> createQuery = getSession().createQuery("FROM InsightsWorkflowTask RE WHERE RE.workflowType.workflowType = :workflowType",
+		Query<InsightsWorkflowTask> createQuery = getSession().createQuery(
+				"FROM InsightsWorkflowTask RE WHERE RE.workflowType.workflowType = :workflowType",
 				InsightsWorkflowTask.class);
 		createQuery.setParameter("workflowType", workflowType);
 		tasks = createQuery.getResultList();
@@ -378,7 +379,7 @@ public class WorkflowDAL extends BaseDAL {
 				"FROM InsightsWorkflowConfiguration WC WHERE WC.workflowId = :workflowId",
 				InsightsWorkflowConfiguration.class);
 		createQuery.setParameter("workflowId", workflowId);
-		InsightsWorkflowConfiguration wconfig = createQuery.getSingleResult();
+		InsightsWorkflowConfiguration wconfig = createQuery.uniqueResult();
 		terminateSession();
 		terminateSessionFactory();
 		return wconfig;
@@ -411,20 +412,20 @@ public class WorkflowDAL extends BaseDAL {
 	}
 
 	/**
-	 * Method to get Workflow Execution History records using workflowID
-	 * from the database
+	 * Method to get Workflow Execution History records using workflowID from the
+	 * database
 	 * 
 	 * @param assessmentConfigId
 	 * @return List<Object[]>
 	 */
 	public List<Object[]> getWorkflowExecutionRecordsByworkflowID(String workflowId) {
-		String query = "SELECT IWHU.executionid as executionid,IWHU.starttime as startTime,IWHU.endtime as endTime,IWHU.retrycount as retryCount,IWHU.statuslog as statusLog,    \r\n"
-				+ "	 IWHU.taskstatus as taskStatus,IWT.description as currentTask \r\n"
-				+ "	 FROM         \"INSIGHTS_WORKFLOW_EXECUTION_HISTORY\"         IWHU \r\n"
-				+ "	 inner join         \"INSIGHTS_WORKFLOW_TASK\"  IWT ON IWHU.currenttask=IWT.taskid WHERE executionid IN     \r\n"
-				+ "	 (  SELECT DISTINCT(executionid) \r\n"
-				+ "		FROM  \"INSIGHTS_WORKFLOW_EXECUTION_HISTORY\" IWH where IWH.workflowid = :workflowID ORDER BY executionid DESC limit 5 )    \r\n"
-				+ "	 order by IWHU.executionid desc,IWHU.starttime";
+		String query = "SELECT IWHU.executionid as executionid,IWHU.starttime as startTime,IWHU.endtime as endTime,IWHU.retrycount as retryCount,IWHU.statuslog as statusLog,"
+				+ "IWHU.taskstatus as taskStatus,IWT.description as currentTask "
+				+ "FROM \"INSIGHTS_WORKFLOW_EXECUTION_HISTORY\" IWHU "
+				+ "inner join \"INSIGHTS_WORKFLOW_TASK\" IWT ON IWHU.currenttask=IWT.taskid WHERE executionid IN "
+				+ "(SELECT DISTINCT(executionid) "
+				+ "FROM  \"INSIGHTS_WORKFLOW_EXECUTION_HISTORY\" IWH where IWH.workflowid = :workflowID ORDER BY executionid DESC limit 5 ) "
+				+ "order by IWHU.executionid desc,IWHU.starttime";
 		Query createQuery = getSession().createSQLQuery(query).addScalar("executionid", StandardBasicTypes.LONG)
 				.addScalar("startTime", StandardBasicTypes.LONG).addScalar("endTime", StandardBasicTypes.LONG)
 				.addScalar("retryCount", StandardBasicTypes.INTEGER).addScalar("statusLog", StandardBasicTypes.STRING)
@@ -544,9 +545,25 @@ public class WorkflowDAL extends BaseDAL {
 		terminateSessionFactory();
 		return workflowTask.getTaskId();
 	}
-	
+
+	/**
+	 * Method to get Task using MqChannel
+	 * 
+	 * @param mqChannel
+	 * @return InsightsWorkflowTask
+	 */
+	public InsightsWorkflowTask getTaskByChannel(String mqChannel) {
+		Query<InsightsWorkflowTask> createQuery = getSession().createQuery("FROM InsightsWorkflowTask IWT WHERE IWT.mqChannel = :mqChannel",
+				InsightsWorkflowTask.class);
+		createQuery.setParameter("mqChannel", mqChannel);
+		InsightsWorkflowTask workflowTask = createQuery.uniqueResult();
+		terminateSession();
+		terminateSessionFactory();
+		return workflowTask;
+	}
+
 	public String deleteExecutionHistory(InsightsWorkflowExecutionHistory history) {
-		
+
 		getSession().beginTransaction();
 		getSession().delete(history);
 		getSession().getTransaction().commit();
@@ -611,6 +628,11 @@ public class WorkflowDAL extends BaseDAL {
 		return PlatformServiceConstants.SUCCESS;
 	}
 
+	/**
+	 * Method to save Email Execution History
+	 * 
+	 * @param emailHistoryConfig
+	 */
 	public void saveEmailExecutionHistory(InsightsReportVisualizationContainer emailHistoryConfig) {
 		getSession().beginTransaction();
 		int historyId = (int) getSession().save(emailHistoryConfig);
@@ -619,6 +641,12 @@ public class WorkflowDAL extends BaseDAL {
 		terminateSessionFactory();
 	}
 
+	/**
+	 * Method to fetch Email Template using workflowId
+	 * 
+	 * @param workflowId
+	 * @return InsightsEmailTemplates
+	 */
 	public InsightsEmailTemplates getEmailTemplateByWorkflowId(String workflowId) {
 		try {
 			Query<InsightsEmailTemplates> createQuery = getSession().createQuery(
@@ -634,6 +662,11 @@ public class WorkflowDAL extends BaseDAL {
 		}
 	}
 
+	/**
+	 * Method to update Email Execution History
+	 * 
+	 * @param emailHistoryConfig
+	 */
 	public void updateEmailExecutionHistory(InsightsReportVisualizationContainer emailHistoryConfig) {
 		getSession().beginTransaction();
 		getSession().update(emailHistoryConfig);
@@ -642,6 +675,12 @@ public class WorkflowDAL extends BaseDAL {
 		terminateSessionFactory();
 	}
 
+	/**
+	 * Method to fetch Email Execution History using ExecutionId
+	 * 
+	 * @param executionId
+	 * @return InsightsReportVisualizationContainer
+	 */
 	public InsightsReportVisualizationContainer getEmailExecutionHistoryByExecutionId(long executionId) {
 		try {
 			Query<InsightsReportVisualizationContainer> createQuery = getSession().createQuery(
@@ -657,6 +696,12 @@ public class WorkflowDAL extends BaseDAL {
 		}
 	}
 
+	/**
+	 * Method to fetch Email Execution History using WorkflowId
+	 * 
+	 * @param workflowId
+	 * @return InsightsReportVisualizationContainer
+	 */
 	public InsightsReportVisualizationContainer getEmailExecutionHistoryByWorkflowId(String workflowId) {
 		try {
 			Query<InsightsReportVisualizationContainer> createQuery = getSession().createQuery(
@@ -673,6 +718,13 @@ public class WorkflowDAL extends BaseDAL {
 		}
 	}
 
+	/**
+	 * Method to fetch Email Execution History using WorkflowId and ExecutionId
+	 * 
+	 * @param workflowId
+	 * @param executionId
+	 * @return InsightsReportVisualizationContainer
+	 */
 	public InsightsReportVisualizationContainer getReportVisualizationContainerByWorkflowAndExecutionId(
 			String workflowId, long executionId) {
 		try {
@@ -691,6 +743,12 @@ public class WorkflowDAL extends BaseDAL {
 		}
 	}
 
+	/**
+	 * Method to delete Email Execution History using WorkflowId
+	 * 
+	 * @param workflowId
+	 * @return String
+	 */
 	public String deleteEmailExecutionHistoryByWorkflowId(String workflowId) {
 		try {
 			getSession().beginTransaction();
@@ -707,7 +765,7 @@ public class WorkflowDAL extends BaseDAL {
 			terminateSession();
 			terminateSessionFactory();
 			return PlatformServiceConstants.SUCCESS;
-		} catch (Exception e) {		
+		} catch (Exception e) {
 			return null;
 		} finally {
 			terminateSession();
@@ -715,6 +773,12 @@ public class WorkflowDAL extends BaseDAL {
 		}
 	}
 
+	/**
+	 * Method to delete Email template record using WorkflowId
+	 * 
+	 * @param workflowId
+	 * @return String
+	 */
 	public String deleteEmailTemplateByWorkflowId(String workflowId) {
 		try {
 			getSession().beginTransaction();
@@ -738,6 +802,13 @@ public class WorkflowDAL extends BaseDAL {
 		}
 	}
 
+	/**
+	 * Method to fetch Largest ExecutionId from Workflow Execution and Email History
+	 * tables
+	 * 
+	 * @param workflowId
+	 * @return List<Object[]>
+	 */
 	public List<Object[]> getMaxExecutionIDsFromWorkflowExecutionAndReportVisualization(String workflowId) {
 		List<Object[]> records = null;
 		try {
@@ -753,6 +824,75 @@ public class WorkflowDAL extends BaseDAL {
 			log.error(e);
 		}
 		return records;
+	}
+
+	/**
+	 * Method to save Workflow Config record
+	 * 
+	 * @param config
+	 * @return String
+	 */
+	public String saveInsightsWorkflowConfig(InsightsWorkflowConfiguration config) {
+
+		getSession().beginTransaction();
+		String workflowId = (String) getSession().save(config);
+		getSession().getTransaction().commit();
+		terminateSession();
+		terminateSessionFactory();
+		return workflowId;
+	}
+
+	/**
+	 * Method to save Workflow type record
+	 * 
+	 * @param type
+	 * @return int
+	 */
+	public int saveWorkflowType(InsightsWorkflowType type) {
+		getSession().beginTransaction();
+		int workflowTypeId = (int) getSession().save(type);
+		getSession().getTransaction().commit();
+		terminateSession();
+		terminateSessionFactory();
+		return workflowTypeId;
+	}
+
+	/**
+	 * Method to fetch WorkflowType object
+	 * 
+	 * @param workflowType
+	 * @return InsightsWorkflowType
+	 */
+	public InsightsWorkflowType getWorkflowType(String workflowType) {
+		Query<InsightsWorkflowType> createQuery = getSession().createQuery(
+				"FROM InsightsWorkflowType IWT WHERE IWT.workflowType = :workflowType", InsightsWorkflowType.class);
+		createQuery.setParameter("workflowType", workflowType);
+		InsightsWorkflowType type = createQuery.uniqueResult();
+		terminateSession();
+		terminateSessionFactory();
+		return type;
+	}
+
+	/**
+	 * Method to update WorkflowConfig Active state
+	 * 
+	 * @param workflowId
+	 * @param status
+	 * @return Boolean
+	 */
+	public Boolean updateWorkflowConfigActive(String workflowId, Boolean status) {
+		Query<InsightsWorkflowConfiguration> createQuery = getSession().createQuery(
+				"FROM InsightsWorkflowConfiguration WC WHERE WC.workflowId = :workflowId ",
+				InsightsWorkflowConfiguration.class);
+		createQuery.setParameter("workflowId", workflowId);
+		InsightsWorkflowConfiguration updateStatus = createQuery.uniqueResult();
+		updateStatus.setActive(status);
+		getSession().beginTransaction();
+		getSession().update(updateStatus);
+		getSession().getTransaction().commit();
+		terminateSession();
+		terminateSessionFactory();
+		return Boolean.TRUE;
 	}
 
 }

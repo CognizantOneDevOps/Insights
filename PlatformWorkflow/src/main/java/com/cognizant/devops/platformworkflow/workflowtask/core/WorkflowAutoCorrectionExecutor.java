@@ -23,6 +23,7 @@ import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 
+import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
 import com.cognizant.devops.platformcommons.core.enums.WorkflowTaskEnum;
 import com.cognizant.devops.platformcommons.core.util.InsightsUtils;
 import com.cognizant.devops.platformdal.workflow.InsightsWorkflowConfiguration;
@@ -41,7 +42,9 @@ public class WorkflowAutoCorrectionExecutor implements Job {
 
 	@Override
 	public void execute(JobExecutionContext context) throws JobExecutionException {
-
+		
+		InsightsStatusProvider.getInstance().createInsightStatusNode("Started WorkflowAutoCorrectionExecutor",
+				PlatformServiceConstants.SUCCESS);
 		List<InsightsWorkflowConfiguration> activeWorkflowList = workflowDAL.getAllActiveWorkflowConfiguration();
 
 		for (InsightsWorkflowConfiguration eachWorkflow : activeWorkflowList) {
@@ -141,12 +144,18 @@ public class WorkflowAutoCorrectionExecutor implements Job {
 					log.error(
 							"WorkflowAutoCorrection executor === correction failed to update on workflow : {} due to {}",
 							eachWorkflow.getWorkflowId(), e.getMessage());
+					InsightsStatusProvider.getInstance().createInsightStatusNode(
+							"In WorkflowAutoCorrectionExecutor,correction failed to update on workflow: "
+									+ eachWorkflow.getWorkflowId() + "due to " + e.getMessage(),
+							PlatformServiceConstants.FAILURE);
 				}
 			} else {
 				log.debug("WorkflowAutoCorrection executor === no workflows found for correction");
 			}
 
 		}
+		InsightsStatusProvider.getInstance().createInsightStatusNode("Completed WorkflowAutoCorrectionExecutor",
+				PlatformServiceConstants.SUCCESS);
 
 	}
 

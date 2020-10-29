@@ -16,9 +16,10 @@
 import { Component, OnInit, Inject, ViewEncapsulation } from '@angular/core';
 import { InsightsInitService } from '@insights/common/insights-initservice';
 import { HealthCheckService } from '@insights/app/modules/healthcheck/healthcheck.service';
-import { MatTableDataSource, MatSort, MatPaginator, MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
+import { MatTableDataSource, MatSort, MatPaginator, MatDialog, MatDialogRef, MAT_DIALOG_DATA, MatSlideToggleChange } from '@angular/material';
 import { ShowDetailsDialog } from '@insights/app/modules/healthcheck/healthcheck-show-details-dialog';
 import { CommonModule, DatePipe } from '@angular/common';
+import { WorkflowHistoryDetailsDialog } from '@insights/app/modules/reportmanagement/workflow-history-details/workflow-history-details-dialog';
 import { DataSharedService } from '@insights/common/data-shared-service';
 import { QueryBuilderService } from '../blockchain/custom-report/custom-report-service';
 import { MessageDialogService } from '../application-dialog/message-dialog-service';
@@ -58,11 +59,14 @@ export class HealthCheckComponent implements OnInit {
   reportLogsColumns: string[];
   reportLogsDataSource = new MatTableDataSource<any>();
   showReportLog = false;
+  isActive:boolean = false;
+  workflowId:string="";
   constructor(private healthCheckService: HealthCheckService, private dialog: MatDialog,
     public dataShare: DataSharedService, private queryBuilderService: QueryBuilderService,
     private messageDialog: MessageDialogService, private config: InsightsInitService, ) {
     this.loadAgentCheckInfo();
     this.loadOtherHealthCheckInfo();
+    this.loadHealthNotificationStatus();
     if (InsightsInitService.showAuditReporting) {
       this.loadReportsLogs();
     }
@@ -74,6 +78,17 @@ export class HealthCheckComponent implements OnInit {
     this.timeZone = this.dataShare.getTimeZone()
   }
 
+  async loadHealthNotificationStatus(){
+    var response = await this.healthCheckService.getNotificationStatus();
+    if(response !=null){
+      var statusResponse = response.data;
+      if(statusResponse !=null){
+          this.isActive = statusResponse.isActive;
+          this.workflowId = statusResponse.workflowId;
+      }
+    }
+  }
+  
   async loadAgentCheckInfo() {
     try {
       this.showThrobberAgent = true;
@@ -256,6 +271,62 @@ export class HealthCheckComponent implements OnInit {
     }, error => {
       console.log(error);
     });
+  }
+
+  enableEmailNotification(event: MatSlideToggleChange) {
+    console.log(event.checked);
+    var self = this;
+    var title = 'Enable Notification';
+    var state = event.checked ? 'enable' : 'disable';
+    var dialogmessage =
+      'Are you sure you want to ' + state + ' Notification ?';
+    const dialogRef = self.messageDialog.showConfirmationMessage(
+      title,
+      dialogmessage,
+      '',
+      'ALERT',
+      '30%'
+    );
+    dialogRef.afterClosed().subscribe(result => {
+      if (result == 'yes') {
+        var setStatusRequestJson = {};
+        setStatusRequestJson['status'] = event.checked;
+        self.healthCheckService
+          .updateNotification(JSON.stringify(setStatusRequestJson))
+          .then(function (data) {
+            if (data.status == 'success') {
+              self.messageDialog.showApplicationsMessage(
+                'Notification '+state+'d',
+                'SUCCESS'
+              );
+              self.isActive = event.checked;
+            } else {
+              this.messageDialog.showApplicationsMessage(
+                'Failed to enable notification.Please check logs for more details.',
+                'ERROR'
+              );
+            }
+          });
+      } else {
+        self.isActive = !event.checked;
+      }
+    });
+
+  }
+
+  showHealthNotificationHistoryDialog() {
+    var isSessionExpired = this.dataShare.validateSession();
+    if (!isSessionExpired) {
+      this.dialog.open(WorkflowHistoryDetailsDialog, {
+        panelClass: 'workflow-history-details-dialog-container',
+        disableClose: true,
+        data: {
+          reportName: "Health Notification",
+          workflowId: this.workflowId,
+          timeZone: this.timeZone
+        }
+      });
+    }
   }
 
 }

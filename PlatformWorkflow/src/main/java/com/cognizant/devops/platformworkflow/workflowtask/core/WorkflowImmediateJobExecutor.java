@@ -24,6 +24,7 @@ import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
+import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
 import com.cognizant.devops.platformcommons.core.enums.WorkflowTaskEnum;
 import com.cognizant.devops.platformdal.workflow.InsightsWorkflowConfiguration;
 import com.cognizant.devops.platformdal.workflow.InsightsWorkflowTaskSequence;
@@ -56,6 +57,8 @@ public class WorkflowImmediateJobExecutor implements Job {
 	 */
 	public void executeImmediateWorkflow() {
 		log.debug(" Worlflow Detail ====  Schedular Inside executeImmediateWorkflow  ");
+		InsightsStatusProvider.getInstance().createInsightStatusNode("WorkflowEmmediateJobExecutor started. ",
+				PlatformServiceConstants.SUCCESS);
 		List<InsightsWorkflowConfiguration> readyToRunWorkflow = workflowProcessing.getImmediateWorkFlowConfigs();
 
 		if (!readyToRunWorkflow.isEmpty()) {
@@ -75,10 +78,15 @@ public class WorkflowImmediateJobExecutor implements Job {
 				} catch (WorkflowTaskInitializationException e) {
 					log.debug(" Worlflow Detail ====  workflow failed to execute due to MQ exception {}  ",
 							workflowConfig.getWorkflowId());
+					InsightsStatusProvider.getInstance()
+							.createInsightStatusNode("WorkflowEmmediateJobExecutorfailed to execute due to exception "
+									+ workflowConfig.getWorkflowId(), PlatformServiceConstants.FAILURE);
 					workflowProcessing.updateWorkflowDetails(workflowConfig.getWorkflowId(),
 							WorkflowTaskEnum.WorkflowStatus.TASK_INITIALIZE_ERROR.toString(), false);
 				}
 			}
+			InsightsStatusProvider.getInstance().createInsightStatusNode("WorkflowImmediateJobExecutor completed. ",
+					PlatformServiceConstants.SUCCESS);
 		} else {
 			log.debug("Worlflow Detail ==== WorkflowImmediateJobExecutor No reports are currently on due to run ");
 			

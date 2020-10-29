@@ -28,6 +28,7 @@ import java.util.concurrent.RejectedExecutionException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
 import com.cognizant.devops.platformcommons.core.enums.WorkflowTaskEnum;
 import com.cognizant.devops.platformdal.assessmentreport.InsightsContentConfig;
 import com.cognizant.devops.platformdal.assessmentreport.InsightsKPIConfig;
@@ -42,6 +43,7 @@ import com.cognizant.devops.platformreports.assessment.datamodel.ContentConfigDe
 import com.cognizant.devops.platformreports.assessment.datamodel.InsightsKPIConfigDTO;
 import com.cognizant.devops.platformreports.assessment.kpi.KPIExecutor;
 import com.cognizant.devops.platformreports.exception.InsightsJobFailedException;
+import com.cognizant.devops.platformworkflow.workflowtask.core.InsightsStatusProvider;
 import com.cognizant.devops.platformworkflow.workflowtask.message.factory.WorkflowTaskSubscriberHandler;
 import com.cognizant.devops.platformworkflow.workflowtask.utils.MQMessageConstants;
 import com.cognizant.devops.platformworkflow.workflowtask.utils.WorkflowUtils;
@@ -104,17 +106,25 @@ public class ReportKPISubscriber extends WorkflowTaskSubscriberHandler {
 
 		} catch (InsightsJobFailedException e) {
 			log.error("Worlflow Detail ==== InsightsJobFailedException ==== {} ", e);
+			InsightsStatusProvider.getInstance().createInsightStatusNode("ReportKPI subscriber exception "+e.getMessage(),
+					PlatformServiceConstants.FAILURE);
 			throw new InsightsJobFailedException("some of the Kpi's or Contents failed to execute " + e.getMessage());
 		} catch (RejectedExecutionException e) {
 			log.error("Worlflow Detail ==== RejectedExecutionException ==== {} ", e);
+			InsightsStatusProvider.getInstance().createInsightStatusNode("ReportKPI subscriber exception "+e.getMessage(),
+					PlatformServiceConstants.FAILURE);
 			throw new InsightsJobFailedException(
 					"some of the Kpi's or Contents failed to execute RejectedExecutionException " + e.getMessage());
 		} catch (Exception e) {
 			log.error("Worlflow Detail ==== handleTaskExecution ==== {} ", e);
+			InsightsStatusProvider.getInstance().createInsightStatusNode("ReportKPI subscriber exception "+e.getMessage(),
+					PlatformServiceConstants.FAILURE);
 			throw new InsightsJobFailedException(
 					"some of the Kpi's or Contents failed to execute Exception " + e.getMessage());
 		}
 		log.debug("Worlflow Detail ==== ReportKPISubscriber completed ");
+		InsightsStatusProvider.getInstance().createInsightStatusNode("ReportKPISubscriber completed",
+				PlatformServiceConstants.SUCCESS);
 	}
 
 	private void extractKPIAndContentRetryList(JsonObject incomingTaskMessage, List<InsightsKPIConfig> kpiConfigList,

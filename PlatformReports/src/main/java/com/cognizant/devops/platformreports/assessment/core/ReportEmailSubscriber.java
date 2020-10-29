@@ -31,6 +31,7 @@ import org.apache.commons.text.StringSubstitutor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
 import com.cognizant.devops.platformcommons.core.enums.WorkflowTaskEnum;
 import com.cognizant.devops.platformcommons.core.util.InsightsUtils;
 import com.cognizant.devops.platformdal.assessmentreport.InsightsEmailTemplates;
@@ -38,6 +39,7 @@ import com.cognizant.devops.platformdal.assessmentreport.InsightsReportVisualiza
 import com.cognizant.devops.platformdal.workflow.InsightsWorkflowConfiguration;
 import com.cognizant.devops.platformdal.workflow.WorkflowDAL;
 import com.cognizant.devops.platformreports.exception.InsightsJobFailedException;
+import com.cognizant.devops.platformworkflow.workflowtask.core.InsightsStatusProvider;
 import com.cognizant.devops.platformworkflow.workflowtask.email.EmailProcesser;
 import com.cognizant.devops.platformworkflow.workflowtask.email.MailReport;
 import com.cognizant.devops.platformworkflow.workflowtask.message.factory.WorkflowTaskSubscriberHandler;
@@ -85,6 +87,8 @@ public class ReportEmailSubscriber extends WorkflowTaskSubscriberHandler {
 				if (!successJobs.isEmpty()) {
 					updateEmailHistoryWithStatus(incomingTaskMessage.get("executionId").getAsLong(),
 							WorkflowTaskEnum.EmailStatus.COMPLETED.name());
+					InsightsStatusProvider.getInstance().createInsightStatusNode("ReportEmailSubscriberEmail Completed ",
+							PlatformServiceConstants.SUCCESS);
 				}
 				if (!failedJobs.isEmpty()) {
 					statusObject = updateFailedTaskStatusLog(failedJobs);
@@ -97,6 +101,8 @@ public class ReportEmailSubscriber extends WorkflowTaskSubscriberHandler {
 			log.error("Workflow Detail ==== ReportEmailSubscriberEmail Send failed to execute Exception ===== ", e);
 			updateEmailHistoryWithStatus(incomingTaskMessage.get("executionId").getAsLong(),
 					WorkflowTaskEnum.EmailStatus.ERROR.name());
+			InsightsStatusProvider.getInstance().createInsightStatusNode("ReportEmailSubscriberEmail Completed with error "+e.getMessage(),
+					PlatformServiceConstants.FAILURE);
 			if (statusObject != null) {
 				setStatusLog(new Gson().toJson(statusObject));
 			} else {
@@ -105,6 +111,8 @@ public class ReportEmailSubscriber extends WorkflowTaskSubscriberHandler {
 			throw new InsightsJobFailedException("Failed to send email in ReportEmailSubscriber");
 		} catch (Exception e) {
 			log.error("Workflow Detail ==== ReportEmailSubscriberEmail Send failed to execute Exception ===== ", e);
+			InsightsStatusProvider.getInstance().createInsightStatusNode("ReportEmailSubscriberEmail Completed with error "+e.getMessage(),
+					PlatformServiceConstants.FAILURE);
 		}
 
 	}

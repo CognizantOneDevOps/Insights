@@ -45,13 +45,15 @@ public class PlatformWorkflowApplication {
 		ApplicationConfigProvider.performSystemCheck();
 
 		try {
+			InsightsStatusProvider.getInstance().createInsightStatusNode("Platform Workflow Application started. ",
+					PlatformServiceConstants.SUCCESS);
 			PlatformWorkflowApplication applicationWorkflow = new PlatformWorkflowApplication();
 			applicationWorkflow.initilizeWorkflowTasks();
 
 			WorkflowSchedular schedular = new WorkflowSchedular();
 			schedular.executor();
 
-			InsightsStatusProvider.getInstance().createInsightStatusNode("Platform Workflow Application started ",
+			InsightsStatusProvider.getInstance().createInsightStatusNode("Platform Workflow Application completed. ",
 					PlatformServiceConstants.SUCCESS);
 		} catch (Exception e) {
 			log.error("Exception in  Workflow Application ", e);

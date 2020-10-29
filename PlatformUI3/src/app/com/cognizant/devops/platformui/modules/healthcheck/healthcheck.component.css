@@ -34,6 +34,18 @@ table {
     margin-left: 7px;
     margin-bottom: 20px;
 }
+
+.arrange-notification-horizontally {
+    -webkit-box-orient: horizontal;
+    -webkit-box-direction: normal;
+    -webkit-flex-direction: row;
+    flex-direction: row-reverse;
+    box-sizing: border-box;
+    display: -webkit-box;
+    display: -webkit-flex;
+    height: 40px;
+    margin-right:6px;
+}
 .labelInfo{
     font-size:13px;
     padding-left: 10px;

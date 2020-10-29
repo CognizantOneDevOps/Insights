@@ -38,6 +38,7 @@ public class EmailConfiguration implements Serializable {
 	private String logo;
 	private String line;
 	private String footerLogo;
+	private String systemNotificationSubscriber;
 	
 	
 	public Boolean getSendEmailEnabled() {
@@ -124,5 +125,12 @@ public class EmailConfiguration implements Serializable {
 	public void setFooterLogo(String footerLogo) {
 		this.footerLogo = footerLogo;
 	}
+	public String getSystemNotificationSubscriber() {
+		return systemNotificationSubscriber;
+	}
+	public void setSystemNotificationSubscriber(String systemNotificationSubscriber) {
+		this.systemNotificationSubscriber = systemNotificationSubscriber;
+	}
+	
 
 }

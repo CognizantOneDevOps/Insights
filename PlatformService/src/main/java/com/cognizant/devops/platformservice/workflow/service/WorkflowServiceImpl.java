@@ -28,6 +28,9 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Service;
 
+import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
+import com.cognizant.devops.platformcommons.config.EmailConfiguration;
+import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
 import com.cognizant.devops.platformcommons.core.enums.WorkflowTaskEnum;
 import com.cognizant.devops.platformcommons.core.util.InsightsUtils;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
@@ -42,12 +45,15 @@ import com.cognizant.devops.platformdal.workflow.InsightsWorkflowType;
 import com.cognizant.devops.platformdal.workflow.WorkflowDAL;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 
 @Service("workflowService")
 public class WorkflowServiceImpl {
 	private static final Logger log = LogManager.getLogger(WorkflowServiceImpl.class);
 	WorkflowDAL workflowConfigDAL = new WorkflowDAL();
 	ReportConfigDAL reportConfigDAL = new ReportConfigDAL();
+	JsonParser parser = new JsonParser();
+	String healthNotificationWorkflowId = WorkflowTaskEnum.WorkflowType.SYSTEM.getValue() + "_" + "HealthNotification";
 
 	/**
 	 * Adding tasks to the workflow task table *
@@ -294,6 +300,13 @@ public class WorkflowServiceImpl {
 		}
 	}
 
+	/**
+	 * Method to create Email Template Object
+	 * 
+	 * @param emailDetails
+	 * @param workflowConfig
+	 * @return InsightsEmailTemplates
+	 */
 	public InsightsEmailTemplates createEmailTemplateObject(JsonObject emailDetails,
 			InsightsWorkflowConfiguration workflowConfig) {
 		InsightsEmailTemplates emailTemplateConfig = workflowConfig.getEmailConfig();
@@ -324,6 +337,14 @@ public class WorkflowServiceImpl {
 		return emailTemplateConfig;
 	}
 
+	/**
+	 * Method to get latest Execution Ids from WorkflowHistory and Report
+	 * Visualization
+	 * 
+	 * @param configIdJson
+	 * @return JsonObject
+	 * @throws InsightsCustomException
+	 */
 	public JsonObject getMaximumExecutionIDs(JsonObject configIdJson) throws InsightsCustomException {
 		try {
 			long workflowExecutionId = -1;
@@ -364,6 +385,13 @@ public class WorkflowServiceImpl {
 		}
 	}
 
+	/**
+	 * Method to get Report PDF
+	 * 
+	 * @param pdfDetailsJson
+	 * @return byte[]
+	 * @throws InsightsCustomException
+	 */
 	public byte[] getReportPDF(JsonObject pdfDetailsJson) throws InsightsCustomException {
 		byte[] pdfContent = null;
 		try {
@@ -383,4 +411,134 @@ public class WorkflowServiceImpl {
 		}
 		return pdfContent;
 	}
+
+	/**
+	 * Method to update Health Notification
+	 * 
+	 * @param statusJson
+	 * @return String
+	 * @throws InsightsCustomException
+	 */
+	public String updateHealthNotification(JsonObject statusJson) throws InsightsCustomException {
+		try {
+			int systemTask = 0;
+			int emailTask = 0;
+			String schedule = WorkflowTaskEnum.WorkflowSchedule.DAILY.toString();
+			boolean reoccurence = true;
+			boolean runImmediate = true;
+			String reportStatus = WorkflowTaskEnum.WorkflowStatus.NOT_STARTED.toString();
+			String workflowType = WorkflowTaskEnum.WorkflowType.SYSTEM.toString();
+			Long epochStartDate = 0L;
+			boolean isActive = statusJson.get("status").getAsBoolean();
+			InsightsWorkflowConfiguration workflowConfig = workflowConfigDAL
+					.getWorkflowConfigByWorkflowId(healthNotificationWorkflowId);
+			if (workflowConfig == null) {
+				InsightsWorkflowType workflowTypeObj = workflowConfigDAL
+						.getWorkflowType(WorkflowTaskEnum.WorkflowType.SYSTEM.getValue());
+				if (workflowTypeObj == null) {
+					InsightsWorkflowType type = new InsightsWorkflowType();
+					type.setWorkflowType(WorkflowTaskEnum.WorkflowType.SYSTEM.getValue());
+					workflowConfigDAL.saveWorkflowType(type);
+				}
+				InsightsWorkflowTask systemNotificationTask = workflowConfigDAL
+						.getTaskByChannel("WORKFLOW.SYSTEMNOTIFICATION.EXECUTION");
+				if (systemNotificationTask == null) {
+					String workflowTaskData = "{\"description\": \"SystemNotification_Execute\",\"mqChannel\": \"WORKFLOW.TASK.SYSTEMNOTIFICATION.EXECUTION\",\"componentName\": \"com.cognizant.devops.platformreports.assessment.core.SystemNotificationDetailSubscriber\",\"dependency\": \"100\",\"workflowType\": \"SYSTEM\"}";
+					JsonObject workflowTaskJson = convertStringIntoJson(workflowTaskData);
+					systemTask = saveWorkflowTask(workflowTaskJson);
+				} else {
+					systemTask = systemNotificationTask.getTaskId();
+				}
+				InsightsWorkflowTask emailNotificationTask = workflowConfigDAL
+						.getTaskByChannel("WORKFLOW.TASK.EMAIL.EXCECUTION");
+				if (emailNotificationTask == null) {
+					String workflowTaskData = "{\"description\": \"Email_Execute\",\"mqChannel\": \"WORKFLOW.TASK.EMAIL.EXCECUTION\",\"componentName\": \"com.cognizant.devops.platformreports.assessment.core.ReportEmailSubscriber\",\"dependency\": \"101\",\"workflowType\": \"SYSTEM\"}";
+					JsonObject workflowTaskJson = convertStringIntoJson(workflowTaskData);
+					emailTask = saveWorkflowTask(workflowTaskJson);
+				} else {
+					emailTask = emailNotificationTask.getTaskId();
+				}
+				JsonArray taskList = new JsonArray();
+				taskList.add(createTaskJson(systemTask, 0));
+				taskList.add(createTaskJson(emailTask, 1));
+				JsonObject emailDetails = getEmailDetails();
+				InsightsWorkflowConfiguration saveWorkflowConfig = saveWorkflowConfig(healthNotificationWorkflowId,
+						isActive, reoccurence, schedule, reportStatus, workflowType, taskList, epochStartDate,
+						emailDetails, runImmediate);
+				workflowConfigDAL.saveInsightsWorkflowConfig(saveWorkflowConfig);
+			} else {
+				workflowConfigDAL.updateWorkflowConfigActive(healthNotificationWorkflowId, isActive);
+			}
+		} catch (Exception e) {
+			log.error("Error while setting System Notification.", e);
+			throw new InsightsCustomException(e.toString());
+		}
+		return PlatformServiceConstants.SUCCESS;
+	}
+
+	/**
+	 * Method to get Health Notification status
+	 * 
+	 * @return JsonObject
+	 * @throws InsightsCustomException
+	 */
+	public JsonObject getHealthNotificationStatus() throws InsightsCustomException {
+		JsonObject response = new JsonObject();
+		try {
+			InsightsWorkflowConfiguration workflowConfig = workflowConfigDAL
+					.getWorkflowByWorkflowId(healthNotificationWorkflowId);
+			if (workflowConfig != null) {
+				response.addProperty("workflowId", workflowConfig.getWorkflowId());
+				response.addProperty("isActive", workflowConfig.isActive());
+			}
+		} catch (Exception e) {
+			log.error("Error while setting System Notification.", e);
+			throw new InsightsCustomException(e.toString());
+		}
+		return response;
+	}
+
+	/**
+	 * Method to convert String to Json
+	 * 
+	 * @param convertregisterkpi
+	 * @return JsonObject
+	 */
+	public JsonObject convertStringIntoJson(String convertregisterkpi) {
+		JsonObject objectJson = new JsonObject();
+		objectJson = parser.parse(convertregisterkpi).getAsJsonObject();
+		return objectJson;
+	}
+
+	/**
+	 * Method to create Task Json object
+	 * 
+	 * @param taskId
+	 * @param sequence
+	 * @return JsonObject
+	 */
+	public JsonObject createTaskJson(int taskId, int sequence) {
+		JsonObject taskJson = new JsonObject();
+		taskJson.addProperty("taskId", taskId);
+		taskJson.addProperty("sequence", sequence);
+		return taskJson;
+	}
+
+	/**
+	 * Method to get Email Details from server-config
+	 * 
+	 * @return JsonObject
+	 */
+	public JsonObject getEmailDetails() {
+		EmailConfiguration emailConfig = ApplicationConfigProvider.getInstance().getEmailConfiguration();
+		JsonObject emailDetailsJson = new JsonObject();
+		emailDetailsJson.addProperty("senderEmailAddress", emailConfig.getMailFrom());
+		emailDetailsJson.addProperty("receiverEmailAddress", emailConfig.getSystemNotificationSubscriber());
+		emailDetailsJson.addProperty("mailSubject", emailConfig.getSubject());
+		emailDetailsJson.addProperty("mailBodyTemplate", "");
+		emailDetailsJson.addProperty("receiverCCEmailAddress", "");
+		emailDetailsJson.addProperty("receiverBCCEmailAddress", "");
+		return emailDetailsJson;
+	}
+
 }

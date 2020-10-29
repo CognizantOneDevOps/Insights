@@ -40,4 +40,5 @@ public interface ServiceStatusConstants {
 	String PlatformDataArchivalEngine="Platform DataArchivalEngine";
 	String RabbitMq="RabbitMQ";
 	String Agents="Agents";
+	String PlatformWorkflow = "Platform Workflow";
 }

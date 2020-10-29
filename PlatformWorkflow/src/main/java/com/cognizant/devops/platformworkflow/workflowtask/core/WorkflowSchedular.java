@@ -29,6 +29,7 @@ import org.quartz.TriggerBuilder;
 import org.quartz.impl.StdSchedulerFactory;
 
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
+import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
 
 public class WorkflowSchedular {
 	private static final Logger log = LogManager.getLogger(WorkflowSchedular.class);
@@ -95,6 +96,8 @@ public class WorkflowSchedular {
 
 		} catch (SchedulerException e) {
 			log.error(e);
+			InsightsStatusProvider.getInstance().createInsightStatusNode("Error creating scheduler "+e.getMessage(),
+					PlatformServiceConstants.FAILURE);
 		}
 
 	}

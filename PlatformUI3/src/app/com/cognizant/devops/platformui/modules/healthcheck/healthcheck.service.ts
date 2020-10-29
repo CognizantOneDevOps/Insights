@@ -58,9 +58,17 @@ export class HealthCheckService implements IHealthCheckService {
         return this.httpClient.get("/PlatformService/traceability/getReportLog", { headers: headers_object, responseType: 'blob', params });
     }
 
-       getAgentFailureDetails(toolName: string, toolCategory: string, agentId: String): Promise<any> {
+    getAgentFailureDetails(toolName: string, toolCategory: string, agentId: String): Promise<any> {
         var restHandler = this.restCallHandlerService;
         return restHandler.get("AGENTS_FAILURE_DETAILS", { 'tool': toolName, 'category': toolCategory, 'agentId': agentId });
+    }
+
+    updateNotification(setStatusRequestJson: string) {
+        return this.restCallHandlerService.postWithData("UPDATE_NOTIFICATION_STATUS", setStatusRequestJson, { 'Content-Type': 'application/json' }).toPromise();
+    }
+
+    getNotificationStatus() {
+        return this.restCallHandlerService.get("GET_HEALTH_NOTIFICATION_STATUS");
     }
 
 }

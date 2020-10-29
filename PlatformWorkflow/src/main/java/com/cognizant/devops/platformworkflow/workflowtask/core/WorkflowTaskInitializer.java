@@ -24,6 +24,7 @@ import java.util.List;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
 import com.cognizant.devops.platformdal.workflow.InsightsWorkflowTask;
 import com.cognizant.devops.platformdal.workflow.WorkflowDAL;
 import com.cognizant.devops.platformworkflow.workflowtask.message.factory.WorkflowTaskSubscriberHandler;
@@ -42,6 +43,8 @@ public class WorkflowTaskInitializer {
 	public void registerTaskSubscriber() {
 		URLClassLoader urlClassLoader = null;
 		try {
+			InsightsStatusProvider.getInstance().createInsightStatusNode("Workflow Task Initializer started.",
+					PlatformServiceConstants.SUCCESS);
 			log.debug("Worlflow Detail ====  WORKFLOW_RESOLVED_PATH {}  ", WorkflowUtils.WORKFLOW_RESOLVED_PATH);
 			// Getting the jar URL which contains target class
 			URL[] classLoaderUrls = new URL[] { new URL(
@@ -63,13 +66,21 @@ public class WorkflowTaskInitializer {
 					WorkflowDataHandler.registry.put(insightsWorkflowTaskEntity.getTaskId(), subscriberobject);
 					log.debug("Worlflow Detail ==== Task Detail {}  with path {} registered successfully ",
 							insightsWorkflowTaskEntity.getMqChannel(), insightsWorkflowTaskEntity.getCompnentName());
+					InsightsStatusProvider.getInstance().createInsightStatusNode(" Task Subscribed "+insightsWorkflowTaskEntity.getMqChannel()+" with path "+insightsWorkflowTaskEntity.getCompnentName()+" registered successfully",
+							PlatformServiceConstants.SUCCESS);
 				} else {
 					log.debug("Worlflow Detail ==== Task is already subscribed  ==== Task Detail {} ",
 							insightsWorkflowTaskEntity);
+					InsightsStatusProvider.getInstance().createInsightStatusNode(" Task is already subscribed "+insightsWorkflowTaskEntity.getMqChannel()+" with path "+insightsWorkflowTaskEntity.getCompnentName(),
+							PlatformServiceConstants.SUCCESS);
 				}
 			}
+			InsightsStatusProvider.getInstance().createInsightStatusNode("Workflow Task Initializer completed.",
+					PlatformServiceConstants.SUCCESS);
 		} catch (Exception e) {
 			log.error(" Worlflow Detail ==== Error while registering Task {} ", e);
+			InsightsStatusProvider.getInstance().createInsightStatusNode(" Error while registering Task "+e.getMessage(),
+					PlatformServiceConstants.FAILURE);
 		}finally {
 			if(urlClassLoader!=null) {
 				try {

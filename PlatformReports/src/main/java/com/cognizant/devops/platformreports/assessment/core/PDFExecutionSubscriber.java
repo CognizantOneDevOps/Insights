@@ -26,6 +26,7 @@ import java.util.concurrent.Future;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
 import com.cognizant.devops.platformcommons.core.enums.WorkflowTaskEnum;
 import com.cognizant.devops.platformcommons.core.util.InsightsUtils;
 import com.cognizant.devops.platformdal.assessmentreport.InsightsReportVisualizationContainer;
@@ -37,6 +38,7 @@ import com.cognizant.devops.platformreports.assessment.datamodel.InsightsAssessm
 import com.cognizant.devops.platformreports.assessment.pdf.BasePDFProcessor;
 import com.cognizant.devops.platformreports.assessment.pdf.PDFKPIVisualizationProcesser;
 import com.cognizant.devops.platformreports.exception.InsightsJobFailedException;
+import com.cognizant.devops.platformworkflow.workflowtask.core.InsightsStatusProvider;
 import com.cognizant.devops.platformworkflow.workflowtask.message.factory.WorkflowTaskSubscriberHandler;
 import com.cognizant.devops.platformworkflow.workflowtask.utils.MQMessageConstants;
 import com.cognizant.devops.platformworkflow.workflowthread.core.WorkflowThreadPool;
@@ -68,12 +70,18 @@ public class PDFExecutionSubscriber extends WorkflowTaskSubscriberHandler {
 			processVisualizationJson();
 			setPDFDetailsInEmailHistory(incomingTaskMessageJson);
 			log.debug("Worlflow Detail ==== PDFExecutionSubscriber Completed  {} ", incomingTaskMessage);
+			InsightsStatusProvider.getInstance().createInsightStatusNode("PDFExecutionSubscriber completed",
+					PlatformServiceConstants.SUCCESS);
 		} catch (InsightsJobFailedException ijfe) {
 			log.error("Worlflow Detail ==== PDFExecutionSubscriber Completed with error ", ijfe);
+			InsightsStatusProvider.getInstance().createInsightStatusNode("PDFExecutionSubscriber Completed with error "+ijfe.getMessage(),
+					PlatformServiceConstants.FAILURE);
 			statusLog = ijfe.getMessage();
 			throw ijfe;
 		} catch (Exception e) {
 			log.error("Worlflow Detail ==== PDFExecutionSubscriber Completed with error ", e);
+			InsightsStatusProvider.getInstance().createInsightStatusNode("PDFExecutionSubscriber Completed with error "+e.getMessage(),
+					PlatformServiceConstants.FAILURE);
 			throw new InsightsJobFailedException(e.getMessage());
 		}
 	}

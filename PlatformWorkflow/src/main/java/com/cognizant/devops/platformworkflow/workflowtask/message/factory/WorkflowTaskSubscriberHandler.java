@@ -23,7 +23,9 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
+import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
 import com.cognizant.devops.platformcommons.core.enums.WorkflowTaskEnum;
+import com.cognizant.devops.platformworkflow.workflowtask.core.InsightsStatusProvider;
 import com.cognizant.devops.platformworkflow.workflowtask.core.WorkflowDataHandler;
 import com.cognizant.devops.platformworkflow.workflowtask.exception.WorkflowTaskInitializationException;
 import com.cognizant.devops.platformworkflow.workflowtask.utils.MQMessageConstants;
@@ -99,6 +101,8 @@ public abstract class WorkflowTaskSubscriberHandler {
 			channel.basicConsume(queueName, false, routingKey, consumer);
 		} catch (IOException e) {
 			log.error("Unable to registerSubscriber for routingKey {} error {} ", routingKey, e);
+			InsightsStatusProvider.getInstance().createInsightStatusNode("In WorkflowTaskSubscriberHandler,Unable to registerSubscriber for routingKey "+routingKey+" error "+e.getMessage(),
+					PlatformServiceConstants.FAILURE);
 		}
 	}
 

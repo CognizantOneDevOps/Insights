@@ -25,6 +25,7 @@ import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
+import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
 import com.cognizant.devops.platformcommons.core.enums.WorkflowTaskEnum;
 import com.cognizant.devops.platformdal.workflow.InsightsWorkflowConfiguration;
 import com.cognizant.devops.platformdal.workflow.InsightsWorkflowExecutionHistory;
@@ -56,10 +57,13 @@ public class WorkflowRetryExecutor implements Job {
 	
 	
 	public void retryWorkflows() {
-		
+		InsightsStatusProvider.getInstance().createInsightStatusNode("Started  WorkflowRetryExecutor: ",
+				PlatformServiceConstants.SUCCESS);
 		retryWorkflowWithFailedTask();
 		retryWorkflowWithCompletedTask();
 		retryWorkflowWithoutHistory();
+		InsightsStatusProvider.getInstance().createInsightStatusNode("Completed  WorkflowRetryExecutor: ",
+				PlatformServiceConstants.SUCCESS);
 	}
 
 	/**
@@ -85,6 +89,8 @@ public class WorkflowRetryExecutor implements Job {
 				} catch (WorkflowTaskInitializationException e) {
 					log.debug(" Worlflow Detail ====  workflow failed to execute due to MQ exception {}  ",
 							workflowHistory.getWorkflowConfig().getWorkflowId());
+					InsightsStatusProvider.getInstance().createInsightStatusNode("In WorkflowRetryExecutor,retryWorkflowWithFailedTask failed due to exception. WorkflowId: "+workflowHistory.getWorkflowConfig().getWorkflowId(),
+							PlatformServiceConstants.FAILURE);
 				}
 			} else {
 				log.debug(" Worlflow Detail  ==== Retry flow max retries overflow  workflowHistory {}  ",
@@ -119,6 +125,8 @@ public class WorkflowRetryExecutor implements Job {
 				log.debug(
 						" Worlflow Detail  ====  workflow failed to retry and will be picked up in next retry schedule  {} ",
 						lastCompletedTaskExecution);
+				InsightsStatusProvider.getInstance().createInsightStatusNode("In WorkflowRetryExecutor,retryWorkflowWithCompletedTask failed due to exception. Last completed execution: "+lastCompletedTaskExecution,
+						PlatformServiceConstants.FAILURE);
 			}
 		}
 
@@ -153,6 +161,8 @@ public class WorkflowRetryExecutor implements Job {
 					log.debug(
 							" Worlflow Detail ==== retryWorkflowWithoutHistory workflow failed to execute due to MQ exception {}  ",
 							workflowConfig.getWorkflowId());
+					InsightsStatusProvider.getInstance().createInsightStatusNode("In WorkflowRetryExecutor,retryWorkflowWithoutHistory failed due to exception. WorkflowId: "+workflowConfig.getWorkflowId(),
+							PlatformServiceConstants.FAILURE);
 				}
 			}
 		} else {

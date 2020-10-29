@@ -61,6 +61,8 @@ export class RestAPIurlService implements IRestAPIUrlService {
         this.addEndPoint("SET_REPORT_STATUS", '/PlatformService/insights/report/setReportStatus');
         this.addEndPoint("DOWNLOAD_REPORT_PDF", '/PlatformService/insights/workflow/downloadReportPDF');
         this.addEndPoint("GET_PDF_EXECUTIONID", '/PlatformService/insights/workflow/maxExecutionIDs');
+        this.addEndPoint("UPDATE_NOTIFICATION_STATUS", '/PlatformService/insights/workflow/updateHealthNotification');
+        this.addEndPoint("GET_HEALTH_NOTIFICATION_STATUS",'/PlatformService/insights/workflow/getHealthNotificationStatus');
 
         //Grafana Data Collection
         //this.addEndPoint("ACCESS_GROUP_MANAGEMENT_GET_ORGS", '/PlatformService/accessGrpMgmt/getOrgs');

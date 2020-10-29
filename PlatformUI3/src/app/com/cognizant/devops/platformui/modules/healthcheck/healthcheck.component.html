@@ -20,7 +20,19 @@
   </div>
 
   <div class="orangeStripCss"></div>
-
+  <div class="arrange-notification-horizontally">
+    <ng-container *ngIf="isActive">
+      <a style="margin-left:5px;padding-top: 5px" (click)="showHealthNotificationHistoryDialog()">
+          <mat-icon svgIcon="healthcheck_show_details" [ngStyle]="{color:'#5C068C', height: '20px', width: '20px'}">
+          </mat-icon>
+        </a>
+      <label class="mainText" style="width:14%;margin-left:10px;">Notification History </label>
+    </ng-container>
+      <mat-slide-toggle style="padding-top: 5px" (change)="enableEmailNotification($event)"
+      [(ngModel)]="isActive" [checked]="isActive">
+        </mat-slide-toggle>
+    <label class="mainText" > Notification </label>
+  </div>
   <mat-tab-group color="primary" class="healthcheck-tab-style">
     <mat-tab label="Agents">
       <div layout layout-align="left" class="sectionHeadingStyleWithoutButton">
