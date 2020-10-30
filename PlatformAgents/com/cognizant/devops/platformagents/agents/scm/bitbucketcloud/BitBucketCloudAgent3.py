@@ -1,106 +1,273 @@
 #-------------------------------------------------------------------------------
 # Copyright 2017 Cognizant Technology Solutions
-# 
+#   
 # Licensed under the Apache License, Version 2.0 (the "License"); you may not
 # use this file except in compliance with the License.  You may obtain a copy
-# of the License at
-# 
-#   http://www.apache.org/licenses/LICENSE-2.0
-# 
+#     of the License at
+#   
+#     http://www.apache.org/licenses/LICENSE-2.0
+#   
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
 # License for the specific language governing permissions and limitations under
 # the License.
 #-------------------------------------------------------------------------------
-'''
-Created on Jun 28, 2016
+# Licensed under the Apache License, Version 2.0 (the "License"); you may not
+# use this file except in compliance with the License.  You may obtain a copy
+# of the License at
+#
+#   http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+# WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+# License for the specific language governing permissions and limitations under
+# the License.
+#-------------------------------------------------------------------------------
 
-@author: 463188
 '''
-#from time import mktime
+Created on Dec 28, 2017
+@author: 666973 and 716660
+'''
+from time import mktime
 from dateutil import parser
 from ....core.BaseAgent3 import BaseAgent
-
-import json
+import logging.handlers
 
 class BitBucketCloudAgent(BaseAgent):
     def process(self):
-        BaseEndPoint = self.config.get("baseEndPoint", '')
-        UserId = self.getCredential("userid")
-        Passwd = self.getCredential("passwd")
-        startFrom = self.config.get("startFrom", '')
-        startFromLen = len(startFrom)
-        startFrom = parser.parse(startFrom)
-        getProjectsUrl = BaseEndPoint + '?fields=values.slug'
-        pagelen = 100
-        bitBucketRepos = self.getResponse(getProjectsUrl, 'GET', UserId, Passwd, None)
-        responseTemplate = self.getResponseTemplate()
+        self.baseEndPoint = self.config.get("baseEndPoint", '')
+        self.userId = self.getCredential("userid")
+        self.passwd = self.getCredential("passwd")
+        self.scanAllBranches = self.config.get("scanAllBranches", False)
+        self.scanPullRequests = self.config.get("scanPullRequests", False)
+        self.scanReleaseBranches = self.config.get("scanReleaseBranches", False)
+        self.startFrom = self.config.get("startFrom", '')
+        self.responseTemplate = self.getResponseTemplate()
+        self.metadata = self.config.get("metadata","")
+        self.slugvaluesList = self.config.get('dynamicTemplate', {}).get('repositoryList', [])
+        # This block is used to fetch all repo list  
+        if len(self.slugvaluesList) == 0:
+            limit = 100
+            repoStart = 0
+            fetchNextPage = True
+            while fetchNextPage: 
+                nexturl=self.baseEndPoint+'/'+'?pagelen=100&fields=values.slug'+'&limit='+str(limit)+'&page='+str(repoStart+1)
+                logging.info('nexturl to fetch repository ==== '+nexturl)
+                bitBucketRepos ={}          
+                bitBucketRepos = self.getResponse(nexturl,'GET', self.userId, self.passwd, None,None)
+                logging.info(bitBucketRepos['values'])
+                numOfRepos = len(bitBucketRepos["values"])
+                if numOfRepos == 0:
+                    logging.info(' nexturl is empty '+str(numOfRepos));
+                    fetchNextPage = False
+                    break;
+                logging.info('Number of Repo return '+str(numOfRepos))
+                for i in range (0, numOfRepos):
+                    logging.info('slugvalue numOfRepos scanAllBranches '+str(repoStart)+' ===== '+bitBucketRepos["values"][i].get('slug'))
+                    self.slugvaluesList.append(bitBucketRepos["values"][i].get('slug'))
+                    nestPageExists=bitBucketRepos.get("next", None)
+                    
+                logging.info(' nestPageExists ' +str(nestPageExists))
+                repoStart=repoStart +1 
+                 
+        logging.info('All repository list ==== '+str(len(self.slugvaluesList)))    
+             
+        for i in range(0, len(self.slugvaluesList)):
+            slugrepovalue = str(self.slugvaluesList[i])
+            logging.info('slugvalue  ===== '+slugrepovalue)
+            trackingRepo = self.tracking.get(slugrepovalue,None)
+            limit = 20
+            if trackingRepo is None:
+                trackingRepo = {'Commits':{},
+                                'PullRequest':{}}
+                self.tracking[slugrepovalue] = trackingRepo 
+            trackingRepoCommits = trackingRepo.get('Commits',None)    
+            if self.scanAllBranches or self.scanReleaseBranches:                          
+                bitBicketBranchessUrl = self.baseEndPoint+'/'+slugrepovalue+"/refs/branches"                           
+                branchStart = 0
+                fetchNextBranchPage = True
+                
+                while fetchNextBranchPage:
+                    #ogging.info('bitBicketBranchessUrl  ==== '+bitBicketBranchessUrl)
+                    bitBicketBranches = self.getResponse(bitBicketBranchessUrl+'?limit='+str(limit)+'&page='+str(branchStart+1), 'GET', self.userId, self.passwd, None)
+                    numBranches = len(bitBicketBranches["values"])
+                    if numBranches == 0:
+                        fetchNextBranchPage = False
+                        break;
+                    for branches in range(numBranches):
+                        branchName = bitBicketBranches["values"][branches]["name"]
+                        if self.scanReleaseBranches and (branchName == "master" or branchName.startswith("release") ):
+                            self.processAllCommitsForBranch(slugrepovalue, branchName, trackingRepoCommits) 
+                        else:
+                            self.processAllCommitsForBranch(slugrepovalue, branchName, trackingRepoCommits)
+                    nestPageExists=bitBicketBranches.get("next", None)
+                    if nestPageExists is None:
+                        logging.info(' Collected all data for repository '+slugrepovalue)
+                        fetchNextBranchPage = False
+                        break;
+                    branchStart=bitBicketBranches.get("page", None) 
+            '''else:
+                branchName = "master"
+                self.processAllCommitsForBranch(slugrepovalue, branchName, trackingRepo)  '''      
+            
+            # process pull requests for this repo
+            if self.scanPullRequests : 
+                trackingRepoPullRequest = trackingRepo.get('PullRequest',None)
+                self.processPullRequestsForRepo(slugrepovalue, trackingRepoPullRequest)    
+
+    def processAllCommitsForBranch(self,repoName, branchName, repoTracking):
         data = []
-        slugValues = bitBucketRepos["values"];
-        for slugValue in slugValues:
-            slug = slugValue["slug"]
-            injectData = { 'repoKey' : slug }
-            trackedCommit = self.tracking.get(slug, None)
-            lastFetchedCommit = None
-            fetchMoreCommits = True
-            commitsUrl = None
-            if trackedCommit is not None:
-                commitsUrl = BaseEndPoint+'/'+slug+'/commits/'+trackedCommit+'?pagelen='+str(pagelen)
+        injectData = {}
+        injectData['branchName'] = branchName
+        injectData['repoName'] = repoName 
+               
+        # get all commits under a branch
+        limit=30
+        commitStart = 0     
+        fetchNextComitPage = True
+        isTrackingUpdated = False
+        branchTracking = repoTracking.get(branchName, None)
+        bitBucketCommitsUrl = '';
+        bitBucketCommits = {} 
+        lastCommitId = '';
+        lastCommitTime = '';
+        
+        while fetchNextComitPage:
+            if bitBucketCommitsUrl =='':
+                bitBucketCommitsUrl = self.baseEndPoint+'/'+repoName+'/commits/'+branchName+'?&pagelen='+str(limit)+'&page='+str(commitStart+1)
+                
+            if branchTracking != None:
+                #bitBucketCommitsUrl += '&since='+branchTracking.get('lastCommitId',None)
+                lastCommitTime = branchTracking.get('lastCommitTime',None)
             else:
-                commitsUrl = BaseEndPoint+'/'+slug+"/commits?pagelen="+str(pagelen)
-            commitsUrl = BaseEndPoint+'/'+slug+"/commits?pagelen="+str(pagelen)
-            latestCommitId = None
-            skipFirst = False
-            while fetchMoreCommits :
-                bitBucketCommitsResponse = self.getResponse(commitsUrl, 'GET', UserId, Passwd, None)
-                bitBucketCommits = bitBucketCommitsResponse["values"]
-                if len(bitBucketCommits) > 0:
-                    if latestCommitId is None:
-                        latestCommitId = bitBucketCommits[0]['hash']
-                    if trackedCommit is None:
-                        lastFetchedCommit = self.firstTimeFetch(data, responseTemplate, injectData, bitBucketCommits, startFrom, startFromLen, skipFirst)
+                lastCommitTime=self.startFrom
+                
+            lastCommitTimeEpoch = parser.parse(lastCommitTime)
+            lastCommitTimeEpoch = mktime(lastCommitTimeEpoch.timetuple()) + lastCommitTimeEpoch.microsecond/1000000.0
+            lastCommitTimeEpoch = int(lastCommitTimeEpoch * 1000)
+            #logging.info('bitBucketCommitsUrl debug === '+bitBucketCommitsUrl)
+            try:
+                bitBucketCommits = self.getResponse(bitBucketCommitsUrl, 'GET', self.userId, self.passwd, None)
+                i = 0
+                for commits in (bitBucketCommits["values"]):
+                    authortimestamp = bitBucketCommits["values"][i]["date"]
+                    #logging.info('lastCommitTimeEpoch ==== '+lastCommitTime+'   authortimestamp === '+authortimestamp +' commitId '+bitBucketCommits["values"][i]["hash"])
+                    authortimestampEpoch = parser.parse(authortimestamp)
+                    authortimestampEpoch = mktime(authortimestampEpoch.timetuple()) + authortimestampEpoch.microsecond/1000000.0
+                    authortimestampEpoch = int(authortimestampEpoch * 1000)
+                    if  authortimestampEpoch > lastCommitTimeEpoch:
+                        data += self.parseResponse(self.responseTemplate, commits, injectData)
+                        if not isTrackingUpdated:
+                            updatetracking = {'lastCommitId' :bitBucketCommits["values"][0]["hash"] ,
+                                               'lastCommitTime':bitBucketCommits["values"][0]["date"] }
+                            repoTracking[branchName] = updatetracking
+                            isTrackingUpdated = True
+                    else :
+                        logging.info(' No commit found for repo Name '+repoName +'  branch name '+branchName+' time check lastCommitTime ==== '+lastCommitTime+'   commit_timestamp === '+authortimestamp +' commitId '+bitBucketCommits["values"][i]["hash"])
+                        fetchNextComitPage= False;
+                        break;
+                    i = i + 1
+                    
+            except Exception as ex:
+                print(ex)
+                logging.error(ex)
+                break
+            isNextPage=bitBucketCommits.get("next", None)
+            if isNextPage is None:
+                fetchNextCommitPage = False
+                break;
+            else:
+                bitBucketCommitsUrl = isNextPage;
+                commitStart=commitStart+1; 
+        logging.info('branchName  '+branchName +' repoName '+repoName+'  len(data) '+str(len(data)))                  
+        # Update data once its processed for each branch
+        if len(data) > 0:
+            self.publishToolsData(data)
+            self.updateTrackingJson(self.tracking)
+
+
+    def processPullRequestsForRepo(self,repoName, repoTracking):
+        pullRequestTemplate = self.responseTemplate.get("pullRequests",None)
+        data = []
+        injectData = {}
+        injectData['type'] = "pullRequest"
+        injectData['repoName'] = repoName
+        # get all commits under a branch
+        limit = 40
+        prStart = 0
+        fetchNextPRPage = True
+        isTrackingUpdated = False
+        pullRequests = {} 
+        # initialize, in case of any exception
+        # Logic :Fetch pull requests in the order to newest first. In the first fetch we would need to get all pull requests for the repoTracking and compare it with start from date. 
+        #As these pull request arrange by descending order, we will stop where update on time is less that start from date, also update recent update on time tracking.json, 
+        #We are maintaining pull request status in tracking.json as well .
+        #In subsequent request we use tracking json file lastCommitTime to compare API response update on time. Also compare if pull request status has change 
+        
+        if len(repoTracking) > 0 :
+            lastUpdatedOnTime = repoTracking.get('lastUpdatedOnTime',None)
+        else:
+            lastUpdatedOnTime=self.startFrom
+        
+        lastUpdatedOnEpoch = parser.parse(lastUpdatedOnTime)
+        lastUpdatedOnEpoch = mktime(lastUpdatedOnEpoch.timetuple()) + lastUpdatedOnEpoch.microsecond/1000000.0
+        lastUpdatedOnEpoch = int(lastUpdatedOnEpoch * 1000)
+        lastUpdatedPRId = None
+        while fetchNextPRPage:
+            pullRequestUrl = self.baseEndPoint+"/"+repoName+"/pullrequests?state=All&order=NEWEST&pagelen="+str(limit)+'&page='+str(prStart+1)
+            try:
+                #logging.info("pullRequestUrl ===== "+pullRequestUrl)
+                pullRequests = self.getResponse(pullRequestUrl, 'GET', self.userId, self.passwd, None)
+                i = 0
+                numOfPullRequest = len(pullRequests["values"])
+                logging.info("repoName ===== "+repoName+" for page number "+str(prStart+1) +" numOfPullRequest ==== "+str(numOfPullRequest))
+                updatetrackingList = {};
+                for pullReq in (pullRequests["values"]):
+                    prId = pullRequests["values"][i]["id"]
+                    state_PR = pullRequests["values"][i]["state"]
+                    updatedOnDate = pullRequests["values"][i]["updated_on"]
+                    createdOnDate = pullRequests["values"][i]["created_on"]
+                    updatedOnDateEpoch = parser.parse(updatedOnDate)
+                    updatedOnDateEpoch = mktime(updatedOnDateEpoch.timetuple()) + updatedOnDateEpoch.microsecond/1000000.0
+                    updatedOnDateEpoch = int(updatedOnDateEpoch * 1000)
+                    
+                    if updatedOnDateEpoch > lastUpdatedOnEpoch:
+                        lastUpdatedPRIdStatus = repoTracking.get(str(prId), None)
+                        if lastUpdatedPRIdStatus != None and state_PR == lastUpdatedPRIdStatus :
+                            logging.info(" No change in state of  prId ===== "+str(prId) +" state_PR ===== "+state_PR )
+                            i = i + 1
+                            continue;
+                        data += self.parseResponse(pullRequestTemplate, pullReq, injectData)
+                        repoTracking[str(prId)] = state_PR
                     else:
-                        lastFetchedCommit = self.incrementalFetch(data, responseTemplate, injectData, bitBucketCommits, trackedCommit, skipFirst)
-                if lastFetchedCommit and len(bitBucketCommits) == pagelen:
-                    commitsUrl = BaseEndPoint+'/'+slug+'/commits/'+str(lastFetchedCommit)+'?pagelen='+str(pagelen)
-                else:
-                    fetchMoreCommits = False
-                    break
-                skipFirst = True  
-            if latestCommitId is not None:
-                self.tracking[slug] = latestCommitId 
-        self.publishToolsData(data)
-        self.updateTrackingJson(self.tracking)
-    
-    def incrementalFetch(self, data, responseTemplate, injectData, bitBucketCommits, trackingCommitId, skipFirst):
-        lastFetchedCommit = None
-        if len(bitBucketCommits) > 0:
-            if skipFirst:
-                bitBucketCommits = bitBucketCommits[1: len(bitBucketCommits)-1]
-            for commits in bitBucketCommits:
-                if trackingCommitId != commits['hash']:
-                    data += self.parseResponse(responseTemplate, commits, injectData)
-                    lastFetchedCommit = commits['hash']
-                else:
-                    lastFetchedCommit = None
-                    break;
-        return lastFetchedCommit
-    
-    def firstTimeFetch(self, data, responseTemplate, injectData, bitBucketCommits, trackingDate, startFromLen, skipFirst):
-        lastFetchedCommit = None
-        if len(bitBucketCommits) > 0:
-            if skipFirst:
-                bitBucketCommits = bitBucketCommits[1: len(bitBucketCommits)-1]
-            for commits in bitBucketCommits:
-                commitDate = parser.parse(commits['date'][:startFromLen])
-                if commitDate >= trackingDate:
-                    data += self.parseResponse(responseTemplate, commits, injectData)
-                    lastFetchedCommit = commits['hash']
-                else:
-                    lastFetchedCommit = None
-                    break;
-        return lastFetchedCommit
+                        logging.info("No pull request found in date prId ===== "+str(prId) +" updatedOnDate ==== "+updatedOnDate+" state_PR ===== "+state_PR +" lastUpdatedOnTime ==== "+lastUpdatedOnTime)
+                        fetchNextPRPage = False
+                        break;
+                    i = i + 1
+                if not isTrackingUpdated :
+                    if numOfPullRequest > 0:
+                        repoTracking['lastUpdatedOnTime'] = pullRequests["values"][0]["updated_on"]
+                        isTrackingUpdated = True
+            except Exception as ex:
+                print(ex)
+                logging.error(ex)
+                break
+            self.updateTrackingJson(self.tracking)
+            isNextPage=pullRequests.get("next", None)
+            if isNextPage is None:
+                fetchNextPRPage = False
+                break;
+            prStart = pullRequests.get("page",None);
+        logging.info(' repoName '+repoName+'  len(data) '+str(len(data))) 
+        # Update data once its processed for each repository
+        if len(data) > 0:
+            insighstTimeXFieldMapping = self.config.get('dynamicTemplate', {}).get('insightsTimeXfieldsPullRequest',None)
+            timeStampField=insighstTimeXFieldMapping.get('timefield',None)
+            timeStampFormat=insighstTimeXFieldMapping.get('timeformat',None)
+            isEpoch=insighstTimeXFieldMapping.get('isEpoch',None);
+            self.publishToolsData(data,self.metadata,timeStampField,timeStampFormat,isEpoch,True)
         
 if __name__ == "__main__":
-    BitBucketCloudAgent()        
+    BitBucketCloudAgent()

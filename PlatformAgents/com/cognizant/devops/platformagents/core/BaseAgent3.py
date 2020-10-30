@@ -250,7 +250,7 @@ class BaseAgent(object):
                 data = self.validateData(data)
             self.addExecutionId(data, self.executionId)
             self.addTimeStampField(data, timeStampField, timeStampFormat, isEpochTime,isExtension)
-            logging.info(data)
+            #logging.info(data)
             auditing=self.config.get('auditing',False)
             if auditing:
                 self.addDigitalSign(data)

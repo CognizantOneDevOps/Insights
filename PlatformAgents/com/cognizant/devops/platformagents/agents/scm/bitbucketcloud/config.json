@@ -1,103 +1,124 @@
 {
-  "vault": {
-	"getFromVault": false,
-	"secretEngine":"insights-kv",
-	"readToken":"vault_secret_token",
-	"vaultUrl":"http://Vault_Host:port/v1/"
-  },
-  "mqConfig": {
-    "user": "iSight",
-    "password": "iSight",
-    "host": "127.0.0.1",
-    "exchange": "iSight",
-    "agentControlXchg":"iAgent"
-  },
-  "subscribe": {
-    "config": "SCM.BITBUCKET.config"
-  },
-  "publish": {
-    "data": "SCM.BITBUCKET.DATA",
-    "health": "SCM.BITBUCKET.HEALTH"
-  },
-   "enrichData":{ 
-      "isEnrichmentRequired":false,
-      "sourceProperty":"message",
-      "keyPattern":"-",
-      "targetProperty":"key"
-   },
-  "communication": {
-    "type": "REST",
-    "sslVerify": true,
-    "responseType": "JSON"
-  },
- "dynamicTemplate": {
-  	  "timeFieldMapping" : {
-			"startDate" : "%Y-%m-%d"
-  	  },
-	  "responseTemplate": {
-		  "hash": "commitId",
-		  "author": {
-		    "user": {
-		      "username": "authorName"
-		    }
-		  },
-		  "date": "commitTime",
-		  "message": "commitMessage",
-		  "properties": {
-		    "jira-key": [
-		      "jiraKey"
-		    ]
-		  }
-	  }, 
-	  "userInputBranches" : {
-		  "TES": {
-		    "OnlineBanking": [
-		      "master",
-		      "OnlineBankingBranch1"
-		    ]
-		  },
-		  "DD": {
-		    "devopsdigitalsolution": [
-		      "master",
-		      "sonar",
-		      "DockerJenkins"
-		    ]
-		  },
-		   "DOC": {
-		    "dockerfile-generator": [
-		      "master"
-		    ]
-		  },
-		   "DEV": {
-		    "PCF": [
-		      "ElasticSearch0.5",
-		      "ElasticSearch0.4"
-		    ],
-		    "SCALR" : ["master"]
-		  }
-	    }
+	"vault": {
+		"getFromVault": false,
+		"secretEngine": "insights-kv",
+		"readToken": "vault_secret_token",
+		"vaultUrl": "http://Vault_Host:port/v1/"
 	},
-  "agentId": "",
-  "toolCategory" : "SCM",
-  "auth": "base64",
-  "runSchedule": 5,
-  "toolsTimeZone" : "Asia/Kolkata",
-  "insightsTimeZone" : "Asia/Kolkata",
-  "startFrom" : "2019-03-01 15:46:33",
-  "enableDataValidation": true,
-  "useResponseTemplate" : true,
-  "userid": "userID",
-  "passwd": "passwd",
-  "timeStampField":"commitTime",
-  "timeStampFormat": "%Y-%m-%dT%H:%M:%S",
-  "isEpochTimeFormat" : false,
-  "agentSecretDetails": ["userid","passwd"],
-  "enableValueArray": false,
-  "baseEndPoint": "https://api.bitbucket.org/2.0/repositories/repoid",
-  "isDebugAllowed" : false,
-  "loggingSetting" : {
-  		"logLevel" : "WARN",
-		"maxBytes" : 5000000,
-		"backupCount" : 1000
-   }
+	"mqConfig": {
+		"user": "",
+		"password": "",
+		"host": "127.0.0.1",
+		"exchange": "iSight",
+		"agentControlXchg": "iAgent"
+	},
+	"subscribe": {
+		"config": "SCM.BITBUCKET.config",
+		"agentCtrlQueue": "insights_bitbucket"
+	},
+	"publish": {
+		"data": "SCM.BITBUCKET.DATA",
+		"health": "SCM.BITBUCKET.HEALTH"
+	},
+	"enrichData": {
+		"isEnrichmentRequired": true,
+		"sourceProperty": "commitMessage",
+		"keyPattern": "-",
+		"targetProperty": "JIRAKey"
+	},
+	"communication": {
+		"type": "REST",
+		"sslVerify": true,
+		"responseType": "JSON"
+	},
+	"dynamicTemplate": {
+		"repositoryList":[],
+		"timeFieldMapping": {
+			"startDate": "%Y-%m-%d"
+		},
+		"insightsTimeXfieldsPullRequest": {
+			"timefield": "updatedTime",
+			"timeformat": "%Y-%m-%dT%H:%M:%S",
+			"isEpoch": false
+		},
+		"responseTemplate": {
+			"hash": "commitId",
+			"author": {
+				"raw":"rawAuthorName",
+				"user": {
+					"display_name": "authorName"
+				}
+			},
+			"date": "commitTime",
+			"message": "commitMessage",
+			"properties": {
+				"jira-key": [
+					"jiraKey"
+				]
+			},
+			"pullRequests": {
+				"id": "pullReqId",
+				"title": "title",
+				"state": "pullReqState",
+				"created_on": "createdTime",
+				"updated_on": "updatedTime",
+				"closedDate": "closedTime",
+				"source": {
+					"branch": {
+						"name": "fromBranch"
+					}
+				},
+				"destination": {
+					"branch": {
+						"name": "toBranch"
+					}
+				},
+				"author": {
+					"display_name": "username"
+				}
+			}
+		}
+	},
+	"metadata": {
+		"labels": [
+			"BITBUCKET_PR"
+		],
+		"dataUpdateSupported": true,
+		"uniqueKey": [
+			"type",
+			"pullReqId",
+			"repoName",
+			"pullReqState"			
+		]
+	},
+	"agentId": "",
+	"toolCategory": "SCM",
+	"auth": "base64",
+	"runSchedule": 10,
+	"toolsTimeZone": "Asia/Kolkata",
+	"insightsTimeZone": "Asia/Kolkata",
+	"startFrom": "2020-07-15 00:00:00",
+	"enableDataValidation": true,
+	"useResponseTemplate": true,
+	"userid": "",
+	"passwd": "",
+	"timeStampField": "commitTime",
+	"scanAllBranches": true,
+	"scanReleaseBranches": true,
+	"scanPullRequests": true ,
+	"timeStampFormat": "%Y-%m-%dT%H:%M:%S",
+	"isEpochTimeFormat": false,
+	"agentSecretDetails": [
+		"userid",
+		"passwd"
+	],
+	"enableValueArray": false,
+	"baseEndPoint": "",
+	"isDebugAllowed": false,
+	"loggingSetting": {
+		"logLevel": "WARN",
+		"maxBytes": 5000000,
+		"backupCount": 1000
+	}
+	
 }

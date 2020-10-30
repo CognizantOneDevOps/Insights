@@ -24,16 +24,14 @@ import copy
 import re 
 import logging.handlers
 from dateutil import parser
-
-#from com.cognizant.devops.platformagents.core.BaseAgent3 import BaseAgent
 from ....core.BaseAgent3 import BaseAgent
 
 class JiraAgent(BaseAgent):
     changedFields = set()
 
     def process(self):
-         self.userid=self.config.get("userid",'')
-         self.passwd=self.config.get("passwd",'')
+         self.userid=self.getCredential("userid")
+         self.passwd=self.getCredential("passwd")
          baseUrl=self.config.get("baseUrl",'')
          startFrom = self.config.get("startFrom",'')
          lastUpdated = self.tracking.get("lastupdated",startFrom)
@@ -307,13 +305,13 @@ class JiraAgent(BaseAgent):
                         boardTracking = boardsTracking.get(boardId, None)
                         if boardTracking is None:
                             boardTracking = {}
-                            boardsTracking[boardId] = boardTracking
+                            boardsTracking[str(boardId)] = boardTracking
                         sprintTracking = boardTracking.get('sprints', None)
                         if sprintTracking is None:
                             sprintTracking = {}
                             boardTracking['sprints'] = sprintTracking
                         if sprintTracking.get(sprintId, None) is None:
-                            sprintTracking[sprintId] = {}
+                            sprintTracking[str(sprintId)] = {}
                         if boardId not in boards:
                             boards.append(boardId)
                         if sprintId not in sprints:
