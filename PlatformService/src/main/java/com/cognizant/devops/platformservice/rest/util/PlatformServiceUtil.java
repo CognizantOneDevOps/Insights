@@ -191,8 +191,10 @@ public class PlatformServiceUtil {
 		Pattern pattern = null;
 		try {
 			String fileExt = FilenameUtils.getExtension(filename);
-			if (fileExt.equalsIgnoreCase(".json")) {
+			if (fileExt.equalsIgnoreCase("json")) {
 				pattern = Pattern.compile(AuthenticationUtils.JSON_FILE_VALIDATOR);
+			} else if (filename.contains(".html")) {
+				pattern = Pattern.compile(AuthenticationUtils.HTML_FILE_VALIDATOR);
 			} else if (fileExt.equalsIgnoreCase("log")) {
 				pattern = Pattern.compile(AuthenticationUtils.LOG_FILE_VALIDATOR);
 			} else if (fileExt.equalsIgnoreCase("csv")) {

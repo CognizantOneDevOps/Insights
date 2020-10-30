@@ -10,10 +10,13 @@
     </div>
   </div>
   <div style="display:inline-block;padding-top: 6%;padding-left: 6%;">
-    <input class="form-class" id="file" type="file" accept=".json" (change)="onFileChanged($event)" />
+    <input *ngIf="multipleFileAllowed" class="form-class" id="file" type="file" multiple="multiple"
+      (change)="onFileChanged($event)" />
+    <input *ngIf="!multipleFileAllowed" class="form-class" id="file" accept=".json" type="file"
+      (change)="onFileChanged($event)" />
     <div class="btnStyle">
       <button mat-icon-button (click)="upload()">
-        <mat-icon style="font-size: 40px;" title="Upload Image " class="mat-icon material-icons">
+        <mat-icon style="font-size: 40px;" title="Upload " class="mat-icon material-icons">
           cloud_upload
         </mat-icon>
       </button>

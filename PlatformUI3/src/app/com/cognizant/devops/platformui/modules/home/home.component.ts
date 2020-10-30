@@ -404,7 +404,7 @@ export class HomeComponent implements OnInit {
             isAdminMenu: false,
             children:[
               {
-                displayName: 'Kpi Creation',
+                displayName: 'Kpi Configuration',
                 iconName: 'feature',
                 route: 'InSights/Home/kpicreation',
                 isToolbarDisplay: InsightsInitService.enableInsightsToolbar,
@@ -420,17 +420,16 @@ export class HomeComponent implements OnInit {
                 showMenu: true,
                 title: "Content Configuration",
                 isAdminMenu: false
+              },
+              {
+                displayName: 'Report Template Configuration',
+                iconName: 'feature',
+                route: 'InSights/Home/reportTemplate',
+                isToolbarDisplay: InsightsInitService.enableInsightsToolbar,
+                showMenu: true,
+                title: "Report Template Configuration",
+                isAdminMenu: false
               }
-              // ,
-              // {
-              //   displayName: 'Report Template',
-              //   iconName: 'feature',
-              //   route: 'InSights/Home',
-              //   isToolbarDisplay: InsightsInitService.enableInsightsToolbar,
-              //   showMenu: true,
-              //   title: "Report Template",
-              //   isAdminMenu: false
-              // }
             ]
           },
           {
@@ -442,16 +441,16 @@ export class HomeComponent implements OnInit {
             title: "Logo Setting",
             isAdminMenu: true
           }
-          // ,
-          // {
-          //   displayName: 'Forecasting',
-          //   iconName: 'feature',
-          //   route: 'InSights/Home/modelmanagement',
-          //   isToolbarDisplay: InsightsInitService.enableInsightsToolbar,
-          //   showMenu: true,
-          //   title: "Forecasting",
-          //   isAdminMenu: false
-          // }        
+           /* ,
+           {
+             displayName: 'Forecasting',
+             iconName: 'feature',
+             route: 'InSights/Home/modelmanagement',
+             isToolbarDisplay: InsightsInitService.enableInsightsToolbar,
+             showMenu: true,
+             title: "Forecasting",
+             isAdminMenu: false
+           }  */       
         ]
       }
     ];

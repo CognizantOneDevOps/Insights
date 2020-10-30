@@ -5,7 +5,7 @@
 		"group": "BUILD",
 		"category": "COMPARISON",
 		"toolName": "JENKINS",
-		"DBQuery": "MATCH (n:JENKINS:DATA)  WHERE n.SPKstartTime > {startTime} and n.SPKstartTime < {endTime} and n.SPKvector = 'BUILD' and n.SPKstatus='Success' RETURN COALESCE(Avg(toInt(n.SPKduration)),0) as avgOutput",
+		"DBQuery": "MATCH (n:JENKINS:DATA)  WHERE n.SPKstartTime >= {startTime} and n.SPKstartTime <= {endTime} and n.SPKvector = 'BUILD' and n.SPKstatus='Success' RETURN COALESCE(Avg(toInt(n.SPKduration)),0) as avgOutput",
 		"datasource": "NEO4J",
 		"isActive": true,
 		"resultField": "avgOutput"
@@ -16,7 +16,7 @@
 		"group": "BUILD",
 		"category": "COMPARISON",
 		"toolName": "JENKINS",
-		"DBQuery": "MATCH (n:JENKINS:DATA)WHERE n.SPKstartTime > {startTime} and n.SPKstartTime < {endTime} RETURN count(n) as TotalNumberBuild",
+		"DBQuery": "MATCH (n:JENKINS:DATA)WHERE n.SPKstartTime >= {startTime} and n.SPKstartTime <= {endTime} RETURN count(n) as TotalNumberBuild",
 		"datasource": "NEO4J",
 		"isActive": true,
 		"resultField": "TotalNumberBuild"
@@ -27,7 +27,7 @@
 		"group": "BUILD",
 		"category": "COMPARISON",
 		"toolName": "JENKINS",
-		"DBQuery": "MATCH (n:JENKINS:DATA) WHERE n.SPKstartTime > {startTime} and n.SPKstartTime < {endTime} and n.SPKstatus='Success' RETURN  count(n) as TotalNumberBuild",
+		"DBQuery": "MATCH (n:JENKINS:DATA) WHERE n.SPKstartTime >= {startTime} and n.SPKstartTime <= {endTime} and n.SPKstatus='Success' RETURN  count(n) as TotalNumberBuild",
 		"datasource": "NEO4J",
 		"isActive": true,
 		"resultField": "TotalNumberBuild"
@@ -38,7 +38,7 @@
 		"group": "BUILD",
 		"category": "COMPARISON",
 		"toolName": "JENKINS",
-		"DBQuery": "MATCH (n:JENKINS:DATA) WHERE n.SPKstartTime > {startTime} and n.SPKstartTime < {endTime} and n.SPKstatus='Failure' RETURN count(n) as TotalNumberBuild",
+		"DBQuery": "MATCH (n:JENKINS:DATA) WHERE n.SPKstartTime >= {startTime} and n.SPKstartTime <= {endTime} and n.SPKstatus='Failure' RETURN count(n) as TotalNumberBuild",
 		"datasource": "NEO4J",
 		"isActive": true,
 		"resultField": "TotalNumberBuild"
@@ -49,7 +49,7 @@
 		"group": "BUILD",
 		"category": "COMPARISON",
 		"toolName": "JENKINS",
-		"DBQuery": "MATCH (n:JENKINS:DATA) WHERE n.SPKstartTime > {startTime} and n.SPKstartTime < {endTime} and n.SPKvector = 'BUILD' and n.SPKstatus='Success' RETURN COALESCE(Max(toInt(n.SPKduration)),0) as MaxBuildTime",
+		"DBQuery": "MATCH (n:JENKINS:DATA) WHERE n.SPKstartTime >= {startTime} and n.SPKstartTime <= {endTime} and n.SPKvector = 'BUILD' and n.SPKstatus='Success' RETURN COALESCE(Max(toInt(n.SPKduration)),0) as MaxBuildTime",
 		"datasource": "NEO4J",
 		"isActive": true,
 		"resultField": "MaxBuildTime"
@@ -60,7 +60,7 @@
 		"group": "BUILD",
 		"category": "COMPARISON",
 		"toolName": "JENKINS",
-		"DBQuery": "MATCH (n:JENKINS:DATA) WHERE  n.SPKstartTime > {startTime} and n.SPKstartTime < {endTime} and n.SPKvector = 'BUILD' and n.SPKstatus='Success' RETURN  COALESCE(Min(toInt(n.SPKduration)),0) as MinBuildTime",
+		"DBQuery": "MATCH (n:JENKINS:DATA) WHERE  n.SPKstartTime >= {startTime} and n.SPKstartTime <= {endTime} and n.SPKvector = 'BUILD' and n.SPKstatus='Success' RETURN  COALESCE(Min(toInt(n.SPKduration)),0) as MinBuildTime",
 		"datasource": "NEO4J",
 		"isActive": true,
 		"resultField": "MinBuildTime"
@@ -71,7 +71,7 @@
 		"group": "DEPLOYMENT",
 		"toolName": "RUNDECK",
 		"category": "COMPARISON",
-		"DBQuery": "MATCH (n:RUNDECK:DATA) WHERE n.SPKstartTime > {startTime} and n.SPKstartTime < {endTime} and n.SPKvector = 'DEPLOYMENT' and n.SPKstatus='Success' RETURN COALESCE(Avg(toInt(n.SPKduration)),0) as averageDeploymentDuration",
+		"DBQuery": "MATCH (n:RUNDECK:DATA) WHERE n.SPKstartTime >= {startTime} and n.SPKstartTime <= {endTime} and n.SPKvector = 'DEPLOYMENT' and n.SPKstatus='Success' RETURN COALESCE(round(Avg(toInt(n.SPKduration))),0) as averageDeploymentDuration",
 		"datasource": "NEO4J",
 		"isActive": true,
 		"resultField": "averageDeploymentDuration"
@@ -82,7 +82,7 @@
 		"group": "DEPLOYMENT",
 		"toolName": "RUNDECK",
 		"category": "COMPARISON",
-		"DBQuery": "MATCH (n:RUNDECK:DATA) WHERE  n.SPKstartTime > {startTime} and n.SPKstartTime < {endTime} and n.SPKvector = 'DEPLOYMENT' AND n.SPKstatus='Failure' RETURN count(n.SPKstatus) as totalDeploymentCount",
+		"DBQuery": "MATCH (n:RUNDECK:DATA) WHERE  n.SPKstartTime >= {startTime} and n.SPKstartTime <= {endTime} and n.SPKvector = 'DEPLOYMENT' AND n.SPKstatus='Failure' RETURN count(n.SPKstatus) as totalDeploymentCount",
 		"datasource": "NEO4J",
 		"isActive": true,
 		"resultField": "totalDeploymentCount"
@@ -93,7 +93,7 @@
 		"group": "DEPLOYMENT",
 		"category": "COMPARISON",
 		"toolName": "RUNDECK",
-		"DBQuery": "MATCH (n:RUNDECK:DATA) WHERE n.SPKstartTime > {startTime} and n.SPKstartTime < {endTime} and  n.SPKvector = 'DEPLOYMENT' and n.SPKstatus='Success' RETURN COALESCE(Max(toInt(n.SPKduration)),0) as MaxDeploymentTime",
+		"DBQuery": "MATCH (n:RUNDECK:DATA) WHERE n.SPKstartTime >= {startTime} and n.SPKstartTime <= {endTime} and  n.SPKvector = 'DEPLOYMENT' and n.SPKstatus='Success' RETURN COALESCE(Max(toInt(n.SPKduration)),0) as MaxDeploymentTime",
 		"datasource": "NEO4J",
 		"isActive": true,
 		"resultField": "MaxDeploymentTime"
@@ -104,7 +104,7 @@
 		"group": "DEPLOYMENT",
 		"toolName": "RUNDECK",
 		"category": "COMPARISON",
-		"DBQuery": "MATCH (n:RUNDECK:DATA) WHERE n.SPKstartTime > {startTime} and n.SPKstartTime < {endTime} and  n.SPKvector = 'DEPLOYMENT' and n.SPKstatus='Success' RETURN count(n.SPKstatus) as totalDeploymentCount",
+		"DBQuery": "MATCH (n:RUNDECK:DATA) WHERE n.SPKstartTime >= {startTime} and n.SPKstartTime <= {endTime} and  n.SPKvector = 'DEPLOYMENT' and n.SPKstatus='Success' RETURN count(n.SPKstatus) as totalDeploymentCount",
 		"datasource": "NEO4J",
 		"isActive": true,
 		"resultField": "totalDeploymentCount"
@@ -115,7 +115,7 @@
 		"group": "DEPLOYMENT",
 		"category": "COMPARISON",
 		"toolName": "RUNDECK",
-		"DBQuery": "MATCH (n:RUNDECK:DATA) WHERE  n.SPKstartTime > {startTime} and n.SPKstartTime < {endTime} and n.SPKvector = 'DEPLOYMENT' and n.SPKstatus='Success' RETURN COALESCE(Min(toInt(n.SPKduration)),0) as MinDeploymentTime",
+		"DBQuery": "MATCH (n:RUNDECK:DATA) WHERE  n.SPKstartTime >= {startTime} and n.SPKstartTime <= {endTime} and n.SPKvector = 'DEPLOYMENT' and n.SPKstatus='Success' RETURN COALESCE(Min(toInt(n.SPKduration)),0) as MinDeploymentTime",
 		"datasource": "NEO4J",
 		"isActive": true,
 		"resultField": "MinDeploymentTime"
@@ -126,7 +126,7 @@
 		"group": "CODEQUALITY",
 		"category": "COMPARISON",
 		"toolName": "SONAR",
-		"DBQuery": "MATCH (n:SONAR:DATA) where n.SPKstartTime > {startTime} and n.SPKstartTime < {endTime} and n.SPKstatus='Success' RETURN  COALESCE(Avg(toInt(n.SPKcomplexity)),0) as AvgComplexityCoverage",
+		"DBQuery": "MATCH (n:SONAR:DATA) where n.SPKstartTime >= {startTime} and n.SPKstartTime <= {endTime} and n.SPKstatus='Success' RETURN  COALESCE(round(Avg(toInt(n.SPKcomplexity))),0) as AvgComplexityCoverage",
 		"datasource": "NEO4J",
 		"isActive": true,
 		"resultField": "AvgComplexityCoverage"
@@ -137,7 +137,7 @@
 		"group": "CODEQUALITY",
 		"category": "COMPARISON",
 		"toolName": "SONAR",
-		"DBQuery": "MATCH (n:SONAR:DATA) where n.SPKstartTime > {startTime} and n.SPKstartTime < {endTime} and n.SPKstatus='Success' RETURN  COALESCE(Avg(toInt(n.SPKduplication)),0) as AvgDuplicateBlocksCoverage",
+		"DBQuery": "MATCH (n:SONAR:DATA) where n.SPKstartTime >= {startTime} and n.SPKstartTime <= {endTime} and n.SPKstatus='Success' RETURN  COALESCE(Avg(toInt(n.SPKduplication)),0) as AvgDuplicateBlocksCoverage",
 		"datasource": "NEO4J",
 		"isActive": true,
 		"resultField": "AvgDuplicateBlocksCoverage"
@@ -148,7 +148,7 @@
 		"group": "CODEQUALITY",
 		"toolName": "SONAR",
 		"category": "COMPARISON",
-		"DBQuery": "MATCH (n:SONAR:DATA) where n.SPKstartTime > {startTime} and n.SPKstartTime < {endTime} and n.SPKqualityGate='pass' RETURN count(n) as NumberOfQualityBlocks",
+		"DBQuery": "MATCH (n:SONAR:DATA) where n.SPKstartTime >= {startTime} and n.SPKstartTime <= {endTime} and n.SPKqualityGate='pass' RETURN count(n) as NumberOfQualityBlocks",
 		"datasource": "NEO4J",
 		"isActive": true,
 		"resultField": "NumberOfQualityBlocks"
@@ -159,7 +159,7 @@
 		"group": "CODEQUALITY",
 		"toolName": "SONAR",
 		"category": "COMPARISON",
-		"DBQuery": "MATCH (n:SONAR:DATA) where n.SPKstartTime > {startTime} and n.SPKstartTime < {endTime} and n.SPKqualityGate='fail' RETURN count(n) as NumberOfQualityBlocks",
+		"DBQuery": "MATCH (n:SONAR:DATA) where n.SPKstartTime >= {startTime} and n.SPKstartTime <= {endTime} and n.SPKqualityGate='fail' RETURN count(n) as NumberOfQualityBlocks",
 		"datasource": "NEO4J",
 		"isActive": true,
 		"resultField": "NumberOfQualityBlocks"
@@ -170,7 +170,7 @@
 		"group": "CODEQUALITY",
 		"toolName": "SONAR",
 		"category": "COMPARISON",
-		"DBQuery": "MATCH (n:SONAR:DATA) where n.SPKstartTime > {startTime} and n.SPKstartTime < {endTime} and n.SPKstatus='Success' RETURN  COALESCE(Avg(toInt(n.SPKcoverage)),0) as AvgCodeCoverage",
+		"DBQuery": "MATCH (n:SONAR:DATA) where n.SPKstartTime >= {startTime} and n.SPKstartTime <= {endTime} and n.SPKstatus='Success' RETURN  COALESCE(Avg(toInt(n.SPKcoverage)),0) as AvgCodeCoverage",
 		"datasource": "NEO4J",
 		"isActive": true,
 		"resultField": "AvgCodeCoverage"
@@ -181,7 +181,7 @@
 		"group": "CODEQUALITY",
 		"toolName": "SONAR",
 		"category": "COMPARISON",
-		"DBQuery": "MATCH (n:SONAR:DATA) where n.SPKstartTime > {startTime} and n.SPKstartTime < {endTime} and n.SPKstatus='Success' RETURN count(n) as NumberOfSonarExecutions",
+		"DBQuery": "MATCH (n:SONAR:DATA) where n.SPKstartTime >= {startTime} and n.SPKstartTime <= {endTime} and n.SPKstatus='Success' RETURN count(n) as NumberOfSonarExecutions",
 		"datasource": "NEO4J",
 		"isActive": true,
 		"resultField": "NumberOfSonarExecutions"
@@ -192,7 +192,7 @@
 		"group": "CODEQUALITY",
 		"toolName": "SONAR",
 		"category": "COMPARISON",
-		"DBQuery": "MATCH (n:SONAR:DATA) where n.SPKstartTime > {startTime} and n.SPKstartTime < {endTime} and n.SPKstatus='Failure' RETURN count(n) as NumberOfSonarExecutions",
+		"DBQuery": "MATCH (n:SONAR:DATA) where n.SPKstartTime >= {startTime} and n.SPKstartTime <= {endTime} and n.SPKstatus='Failure' RETURN count(n) as NumberOfSonarExecutions",
 		"datasource": "NEO4J",
 		"isActive": true,
 		"resultField": "NumberOfSonarExecutions"
@@ -203,7 +203,7 @@
 		"category": "COMPARISON",
 		"group": "DEFECTS",
 		"toolName": "JIRA",
-		"DBQuery": "MATCH (n:JIRA:DATA) WHERE n.SPKstartTime > {startTime} and n.SPKstartTime < {endTime} and n.SPKissueType='Bug' RETURN count(n) as totalDefect",
+		"DBQuery": "MATCH (n:JIRA:DATA) WHERE n.SPKstartTime >= {startTime} and n.SPKstartTime <= {endTime} and n.SPKissueType='Bug' RETURN count(n) as totalDefect",
 		"datasource": "NEO4J",
 		"isActive": true,
 		"resultField": "totalDefect"
@@ -215,7 +215,7 @@
 		"group": "DEFECTS",
 		"toolName": "JIRA",
 		"category": "COMPARISON",
-		"DBQuery": "MATCH (n:JIRA:DATA) WHERE n.SPKstartTime > {startTime} and n.SPKstartTime < {endTime} and n.SPKissueType='Bug' and n.SPKstatus='Closed'  RETURN count(n) as ClosedDefect",
+		"DBQuery": "MATCH (n:JIRA:DATA) WHERE n.SPKstartTime >= {startTime} and n.SPKstartTime <= {endTime} and n.SPKissueType='Bug' and n.SPKstatus='Closed'  RETURN count(n) as ClosedDefect",
 		"datasource": "NEO4J",
 		"isActive": true,
 		"resultField": "ClosedDefect"
@@ -226,7 +226,7 @@
 		"category": "COMPARISON",
 		"group": "DEFECTS",
 		"toolName": "JIRA",
-		"DBQuery": "MATCH (n:JIRA:DATA) WHERE n.SPKstartTime > {startTime} and n.SPKstartTime < {endTime} and n.SPKissueType='Bug' and n.SPKstatus='Open'  RETURN count(n) as OpenDefect",
+		"DBQuery": "MATCH (n:JIRA:DATA) WHERE n.SPKstartTime >= {startTime} and n.SPKstartTime <= {endTime} and n.SPKissueType='Bug' and n.SPKstatus='Open'  RETURN count(n) as OpenDefect",
 		"datasource": "NEO4J",
 		"isActive": true,
 		"resultField": "OpenDefect"
@@ -237,7 +237,7 @@
 		"group": "DEFECTS",
 		"toolName": "JIRA",
 		"category": "COMPARISON",
-		"DBQuery": "MATCH (n:JIRA:DATA) WHERE n.SPKstartTime > {startTime} and n.SPKstartTime < {endTime} and n.SPKissueType='Bug' and n.SPKstatus='Closed'  RETURN COALESCE(Avg(toInt(n.SPKduration)),0) as AvgDefectCompletionTime",
+		"DBQuery": "MATCH (n:JIRA:DATA) WHERE n.SPKstartTime >= {startTime} and n.SPKstartTime <= {endTime} and n.SPKissueType='Bug' and n.SPKstatus='Closed'  RETURN COALESCE(Avg(toInt(n.SPKduration)),0) as AvgDefectCompletionTime",
 		"datasource": "NEO4J",
 		"isActive": true,
 		"resultField": "AvgDefectCompletionTime"

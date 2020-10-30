@@ -39,11 +39,6 @@ export class ContentConfigComponent implements OnInit {
   ngOnInit() {
     this.getAllActiveContent();
     this.displayedColumns = ['radio', 'ContentId', 'ContentName', 'KpiId', 'ExpectedTrend', 'ResultField'];
-    this.kpiService.fileUploadSubject.subscribe(res => {
-      if (res === 'REFRESH') {
-        this.getAllActiveContent();
-      }
-    })
   }
   ngAfterViewInit() {
     this.contentDatasource.paginator = this.paginator;
@@ -51,16 +46,25 @@ export class ContentConfigComponent implements OnInit {
 
   addnewContent() {
     this.contentService.setType("ADD");
-    this.router.navigate(['InSights/Home/contentConfigAdd'],{skipLocationChange:true});
+    this.router.navigate(['InSights/Home/contentConfigAdd'], { skipLocationChange: true });
   }
   uploadFile() {
-    this.contentService.setFileType('CONTENT');
-    this.dialog.open(FileUploadDialog, {
+    //this.contentService.setFileType('CONTENT');
+    const dialogRef = this.dialog.open(FileUploadDialog, {
       panelClass: 'DialogBox',
       width: '34%',
       height: '27%',
       disableClose: false,
+      data: {
+        type: 'CONTENT',
+        multipleFileAllowed: false
+      }
     });
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.getAllActiveContent();
+      }
+    })
   }
   edit() {
     this.contentService.setType("EDIT");

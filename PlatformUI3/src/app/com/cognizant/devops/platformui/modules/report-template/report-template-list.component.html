@@ -1,0 +1,138 @@
+<!--
+*******************************************************************************
+ * Copyright 2019 Cognizant Technology Solutions
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License.  You may obtain a copy
+ * of the License at
+ * 
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ ****************************************************************************** -->
+
+<div class="pageCss">
+
+    <div layout layout-align="left" class="titleStyle">
+        <div>Configuration |
+            <a class="greenTitleTxt">Report Template Configuration </a>
+        </div>
+    </div>
+    <div class="orangeStripCss"></div>
+
+    <div layout layout-align="left" class="sectionHeadingStyle">
+        <div layout>&nbsp; Report Template Configuration
+            <span class="sectionSubHeading"> (Configure a Report Template)
+            </span>
+        </div>
+    </div>
+
+    <div class="loading-indicator">
+        <mat-progress-spinner [diameter]="100" *ngIf="showThrobber" color="primary" mode="indeterminate">
+        </mat-progress-spinner>
+    </div>
+
+    <div class="btnAlign">
+        <button mat-icon-button (click)="add()">
+            <mat-icon title="Add" style="margin-top: 10%;" class="mat-icon material-icons">
+                add_circle
+            </mat-icon>
+        </button>
+
+        <button mat-icon-button (click)="uploadTemplateJson()">
+            <mat-icon title="Upload JSON" class="mat-icon material-icons">
+                cloud_upload
+            </mat-icon>
+        </button>
+
+        <button mat-icon-button [disabled]="!enableAttachFile" (click)="attachFiles()">
+            <mat-icon title="attach files" class="mat-icon material-icons">
+                attach_file
+            </mat-icon>
+        </button>
+
+        <button mat-icon-button [disabled]="!enableEdit" (click)="editTemplate()">
+            <mat-icon title="Edit" style="margin-bottom: -10%;" class="mat-icon material-icons">
+                edit
+            </mat-icon>
+        </button>
+
+        <button mat-icon-button [disabled]="!enableDelete" (click)="delete()">
+            <mat-icon title="Delete" style="margin-bottom: -10%;" class="mat-icon material-icons">
+                delete
+            </mat-icon>
+        </button>
+
+        <button mat-icon-button (click)="refresh()">
+            <mat-icon title="Refresh" style="margin-bottom: -10%;" class="mat-icon material-icons">
+                restore
+            </mat-icon>
+        </button>
+    </div>
+
+    <div>
+        <mat-radio-group [(ngModel)]="selectedTemplate">
+            <table mat-table [dataSource]="templateDatasource" class="mat-elevation-z8"
+                style="margin-top:2% !important">
+                <!-- Radio Button Column -->
+                <ng-container matColumnDef="radio">
+                    <th mat-header-cell *matHeaderCellDef class="tableHeaderCss"></th>
+                    <td mat-cell *matCellDef="let element;let i = index " style="width:5% !important">
+                        <mat-radio-button [value]="element" color="primary" (change)="radioChange($event,i);">
+                        </mat-radio-button>
+                    </td>
+                </ng-container>
+                <ng-container matColumnDef="reportTemplateName">
+                    <th mat-header-cell *matHeaderCellDef class="tableHeaderCss">Name</th>
+                    <td mat-cell *matCellDef="let element" style="width:25% !important">
+                        {{element.templateName}}
+                    </td>
+                </ng-container>
+                <ng-container matColumnDef="reportTemplateDescription">
+                    <th mat-header-cell *matHeaderCellDef class="tableHeaderCss">Description</th>
+                    <td mat-cell *matCellDef="let element" style="width:30% !important">
+                        {{element.description}}
+                    </td>
+                </ng-container>
+                <ng-container matColumnDef="visualizationutil">
+                    <th mat-header-cell *matHeaderCellDef class="tableHeaderCss">Visualizationutil</th>
+                    <td mat-cell *matCellDef="let element" style="width:20% !important">
+                        {{element.visualizationutil}}
+                    </td>
+                </ng-container>
+                <ng-container matColumnDef="active">
+                    <th mat-header-cell *matHeaderCellDef class="tableHeaderCss">Active</th>
+                    <td mat-cell *matCellDef="let element;let i = index" style="width:10% !important">
+                        <mat-slide-toggle (change)="updateTemplateStatus($event,element.reportId,element)"
+                        [checked]="element.isActive" [(ngModel)]="element.isActive" >
+                        </mat-slide-toggle>
+                    </td>
+                </ng-container>
+                <ng-container matColumnDef="details">
+                    <th mat-header-cell *matHeaderCellDef class="tableHeaderCss"> Kpi Details
+                    </th>
+
+                    <td mat-cell *matCellDef="let element" style="width:15%;">
+                        <a (click)="showKpiDetailsDialog(element.reportId, element.templateName)">
+                            <mat-icon svgIcon="healthcheck_show_details"
+                                [ngStyle]="{color:'#5C068C', height: '20px', width: '20px'}">
+                            </mat-icon>
+                        </a>
+                    </td>
+                </ng-container>
+
+                <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                <tr mat-row *matRowDef="let row; columns: displayedColumns;"> </tr>
+            </table>
+        </mat-radio-group>
+        <div>
+            <mat-paginator #paginator [pageSize]="MAX_ROWS_PER_TABLE" showFirstLastButtons class="paginationStyle">
+            </mat-paginator>
+        </div>
+    </div>
+
+    <div>

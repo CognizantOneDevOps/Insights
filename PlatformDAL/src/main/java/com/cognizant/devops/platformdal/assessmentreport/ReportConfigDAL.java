@@ -17,15 +17,19 @@ package com.cognizant.devops.platformdal.assessmentreport;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.hibernate.query.Query;
 
+import com.cognizant.devops.platformcommons.constants.AssessmentReportAndWorkflowConstants;
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformdal.core.BaseDAL;
 
 public class ReportConfigDAL extends BaseDAL {
-
+	private static Logger log = LogManager.getLogger(ReportConfigDAL.class);
 	/**
 	 * Method to update InsightsKPIConfig record
 	 * 
@@ -98,7 +102,7 @@ public class ReportConfigDAL extends BaseDAL {
 	public InsightsKPIConfig getKPIConfig(int kpiId) {
 		Query<InsightsKPIConfig> createQuery = getSession()
 				.createQuery("FROM InsightsKPIConfig KC WHERE KC.kpiId = :kpiId ", InsightsKPIConfig.class);
-		createQuery.setParameter("kpiId", kpiId);
+		createQuery.setParameter(AssessmentReportAndWorkflowConstants.KPIID, kpiId);
 		InsightsKPIConfig result = createQuery.uniqueResult();
 		terminateSession();
 		terminateSessionFactory();
@@ -170,7 +174,7 @@ public class ReportConfigDAL extends BaseDAL {
 	}
 
 	/**
-	 * Method to get all Report Templates
+	 * Method to get all active Report Templates
 	 * 
 	 * @return List<InsightsAssessmentReportTemplate>
 	 */
@@ -215,7 +219,7 @@ public class ReportConfigDAL extends BaseDAL {
 		Query<InsightsAssessmentConfiguration> createQuery = getSession().createQuery(
 				"FROM InsightsAssessmentConfiguration CE WHERE CE.id = :reportId ",
 				InsightsAssessmentConfiguration.class);
-		createQuery.setParameter("reportId", reportId);
+		createQuery.setParameter(AssessmentReportAndWorkflowConstants.REPORTID, reportId);
 		InsightsAssessmentConfiguration result = createQuery.getSingleResult();
 		terminateSession();
 		terminateSessionFactory();
@@ -233,7 +237,7 @@ public class ReportConfigDAL extends BaseDAL {
 			Query<InsightsAssessmentReportTemplate> createQuery = getSession().createQuery(
 					"FROM InsightsAssessmentReportTemplate RE WHERE RE.isActive = TRUE AND RE.reportId = :reportId",
 					InsightsAssessmentReportTemplate.class);
-			createQuery.setParameter("reportId", reportId);
+			createQuery.setParameter(AssessmentReportAndWorkflowConstants.REPORTID, reportId);
 			return createQuery.getSingleResult();
 		} catch (Exception e) {
 			return null;
@@ -277,7 +281,7 @@ public class ReportConfigDAL extends BaseDAL {
 			Query<InsightsAssessmentReportTemplate> createQuery = getSession().createQuery(
 					"FROM InsightsAssessmentReportTemplate RE WHERE RE.reportId = :reportId",
 					InsightsAssessmentReportTemplate.class);
-			createQuery.setParameter("reportId", reportId);
+			createQuery.setParameter(AssessmentReportAndWorkflowConstants.REPORTID, reportId);
 			return createQuery.getSingleResult();
 		} catch (Exception e) {
 			return null;
@@ -320,6 +324,60 @@ public class ReportConfigDAL extends BaseDAL {
 		terminateSession();
 		terminateSessionFactory();
 		return reportId;
+	}
+
+	/**
+	 * This Methos is used to update report Template
+	 * 
+	 * @param webhookConfiguration
+	 * @return
+	 * @throws InsightsCustomException
+	 */
+	public Boolean updateReportTemplate(InsightsAssessmentReportTemplate reportTemplateEntity)
+			throws InsightsCustomException {
+		Query<InsightsAssessmentReportTemplate> createQuery = getSession().createQuery(
+				"FROM InsightsAssessmentReportTemplate a WHERE a.reportId= :id",
+				InsightsAssessmentReportTemplate.class);
+		createQuery.setParameter("id", reportTemplateEntity.getReportId());
+		InsightsAssessmentReportTemplate reportDBConfigList = createQuery.getSingleResult();
+		terminateSession();
+		if (reportDBConfigList != null) {
+			Set<InsightsReportsKPIConfig> kpiDataFromUI = reportTemplateEntity.getReportsKPIConfig();
+			reportDBConfigList.setReportId(reportTemplateEntity.getReportId());
+			reportDBConfigList.setActive(reportTemplateEntity.isActive());
+			reportDBConfigList.setDescription(reportTemplateEntity.getDescription());
+			reportDBConfigList.setTemplateName(reportTemplateEntity.getTemplateName());
+			reportDBConfigList.setFile(reportTemplateEntity.getFile());
+			reportDBConfigList.setVisualizationutil(reportTemplateEntity.getVisualizationutil());
+			Set<InsightsReportsKPIConfig> kpiDataFromTable = reportDBConfigList.getReportsKPIConfig();
+			kpiDataFromTable.clear();
+			kpiDataFromTable.addAll(kpiDataFromUI);
+			reportDBConfigList.setReportsKPIConfig(kpiDataFromTable);
+			getSession().beginTransaction();
+			getSession().saveOrUpdate(reportDBConfigList);
+			getSession().getTransaction().commit();
+			terminateSession();
+			terminateSessionFactory();
+			return Boolean.TRUE;
+		} else {
+			throw new InsightsCustomException(
+					" Report template not exists in database for edit template " + reportTemplateEntity.getReportId());
+		}
+
+	}
+
+	/**
+	 * Method to update InsightsAssessmentReportTemplate record
+	 * 
+	 * @param reportConfig
+	 * @return int
+	 */
+	public void updateReportConfig(InsightsAssessmentReportTemplate reportConfig) {
+		getSession().beginTransaction();
+		getSession().saveOrUpdate(reportConfig);
+		getSession().getTransaction().commit();
+		terminateSession();
+		terminateSessionFactory();
 	}
 
 	/**
@@ -453,26 +511,56 @@ public class ReportConfigDAL extends BaseDAL {
 	 * 
 	 * @param reportID
 	 * @return String
+	 * @throws InsightsCustomException
 	 */
-	public String deleteReportTemplatebyReportID(int reportID) {
-		Query<InsightsAssessmentReportTemplate> createQuery = getSession().createQuery(
-				"FROM InsightsAssessmentReportTemplate a WHERE a.reportId= :id",
-				InsightsAssessmentReportTemplate.class);
-		createQuery.setParameter("id", reportID);
-		InsightsAssessmentReportTemplate executionRecord = createQuery.getSingleResult();
-		executionRecord.setReportsKPIConfig(null);
-		String status = deleteReportKPIConfigRecordByReportID(executionRecord.getReportId());
-		getSession().beginTransaction();
-		if (PlatformServiceConstants.SUCCESS.equals(status)) {
-			getSession().delete(executionRecord);
-			getSession().getTransaction().commit();
-		} else {
-			return PlatformServiceConstants.FAILURE;
+	public String deleteReportTemplatebyReportID(int reportID) throws InsightsCustomException {
+		try {
+			Query<InsightsAssessmentReportTemplate> createQuery = getSession().createQuery(
+					"FROM InsightsAssessmentReportTemplate a WHERE a.reportId= :id",
+					InsightsAssessmentReportTemplate.class);
+			createQuery.setParameter("id", reportID);
+			InsightsAssessmentReportTemplate executionRecord = createQuery.uniqueResult();
+			if (executionRecord != null) {
+				List<InsightsAssessmentConfiguration> resultList = getAssessmentConfigListByReportTemplateId(
+						executionRecord.getReportId());
+				if (resultList.isEmpty()) {
+					getSession().beginTransaction();
+					getSession().delete(executionRecord);
+					getSession().getTransaction().commit();
+				} else {
+					throw new InsightsCustomException(
+							"Report Template should not be deleted as it is attached to Assessment Report.");
+				}
+			} else {
+				throw new InsightsCustomException("Report Template record not found");
+			}
+		} catch (InsightsCustomException e) {
+			throw new InsightsCustomException(e.getMessage());
+		} catch (Exception e) {
+			throw new InsightsCustomException("Error while deleting report template, Please check log for detail  ");
+		} finally {
+			terminateSession();
+			terminateSessionFactory();
 		}
-		terminateSession();
-		terminateSessionFactory();
 		return PlatformServiceConstants.SUCCESS;
 
+	}
+
+	/**
+	 * Method to get Assessment Configuration List using Report Template Id
+	 * 
+	 * @param reportId
+	 * @return InsightsAssessmentConfiguration object
+	 */
+	public List<InsightsAssessmentConfiguration> getAssessmentConfigListByReportTemplateId(int reportTemplateId) {
+		Query<InsightsAssessmentConfiguration> createQuery = getSession().createQuery(
+				"FROM InsightsAssessmentConfiguration CE WHERE CE.reportTemplateEntity.reportId = :reportId ",
+				InsightsAssessmentConfiguration.class);
+		createQuery.setParameter(AssessmentReportAndWorkflowConstants.REPORTID, reportTemplateId);
+		List<InsightsAssessmentConfiguration> result = createQuery.getResultList();
+		terminateSession();
+		terminateSessionFactory();
+		return result;
 	}
 
 	/**
@@ -544,4 +632,62 @@ public class ReportConfigDAL extends BaseDAL {
 		terminateSessionFactory();
 		return configEntity;
 	}
+	
+	/**
+	 * Method to get all Report Templates
+	 * 
+	 * @return List<InsightsAssessmentReportTemplate>
+	 */
+	public List<InsightsAssessmentReportTemplate> getAllReportTemplatesList() {
+		Query<InsightsAssessmentReportTemplate> query = getSession().createQuery(
+				"FROM InsightsAssessmentReportTemplate RE", InsightsAssessmentReportTemplate.class);
+		List<InsightsAssessmentReportTemplate> reportEntityResult = query.getResultList();
+		terminateSession();
+		terminateSessionFactory();
+		return reportEntityResult;
+
+	}
+
+	/**
+	 * Method to get KPI details using reportId
+	 * 
+	 * @param reportId
+	 * @return List<InsightsReportsKPIConfig>
+	 */
+	public List<InsightsReportsKPIConfig> getTemplateKpiDetailsByReportId(int reportId) {
+		Query<InsightsReportsKPIConfig> createQuery = getSession().createQuery(
+				"FROM InsightsReportsKPIConfig a WHERE a.reportTemplateEntity.reportId= :reportId",
+				InsightsReportsKPIConfig.class);
+		createQuery.setParameter("reportId", reportId);
+		List<InsightsReportsKPIConfig> entityResult = createQuery.getResultList();
+		terminateSession();
+		terminateSessionFactory();
+		return entityResult;
+
+	}
+
+	/**
+	 * Method to get Active Report template using Report Id
+	 * 
+	 * @param reportId
+	 * @return Object
+	 */
+	public Object getActiveReportTemplateByName(String reportTemplateName) {
+		InsightsAssessmentReportTemplate templateEntiry = null;
+		try {
+			Query<InsightsAssessmentReportTemplate> createQuery = getSession().createQuery(
+					"FROM InsightsAssessmentReportTemplate RE where RE.templateName = :reportTemplateName",
+					InsightsAssessmentReportTemplate.class);
+			createQuery.setParameter("reportTemplateName", reportTemplateName);
+			templateEntiry = createQuery.uniqueResult();
+			return templateEntiry;
+		} catch (Exception e) {
+			log.error(e);
+		} finally {
+			terminateSession();
+			terminateSessionFactory();
+		}
+		return templateEntiry;
+	}
+
 }

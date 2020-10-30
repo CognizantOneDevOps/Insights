@@ -59,7 +59,7 @@ public class InsightsAssessmentReportTemplate implements Serializable {
 	@Column(name = "visualizationutil")
 	private String visualizationutil;
 	
-	@OneToMany(cascade=CascadeType.ALL ,mappedBy="reportTemplateEntity", fetch=FetchType.EAGER)
+	@OneToMany(cascade = CascadeType.ALL, mappedBy = "reportTemplateEntity", fetch = FetchType.EAGER, orphanRemoval = true)
 	private Set<InsightsReportsKPIConfig> reportsKPIConfig = new HashSet<>();
 	
 

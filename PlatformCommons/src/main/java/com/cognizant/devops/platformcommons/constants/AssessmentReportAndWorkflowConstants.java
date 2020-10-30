@@ -15,19 +15,33 @@
  ******************************************************************************/
 package com.cognizant.devops.platformcommons.constants;
 
+import java.io.File;
+
 public interface AssessmentReportAndWorkflowConstants {
 
-	String KPIID = "kpiId";
-	String ISACTIVE = "isActive";
-	String DATASOURCE = "datasource";
-	String REPORTNAME="reportName";
-	String STATUS="status";
-	String STARTDATE = "startdate";
-	String RUNIMMEDIATE = "runimmediate";
-	String RECEIVEREMAILADDRESS = "receiverEmailAddress";
-	String RECEIVERCCEMAILADDRESS = "receiverCCEmailAddress";
-	String RECEIVERBCCEMAILADDRESS = "receiverBCCEmailAddress";
-	String CONTENTID = "contentId";
-	String ISREOCCURING = "isReoccuring";
-	String EMAILDETAILS = "emailDetails";
+	static final String KPIID = "kpiId";
+	static final String ISACTIVE = "isActive";
+	static final String DATASOURCE = "datasource";
+	static final String REPORTNAME = "reportName";
+	static final String STATUS = "status";
+	static final String STARTDATE = "startdate";
+	static final String RUNIMMEDIATE = "runimmediate";
+	static final String RECEIVEREMAILADDRESS = "receiverEmailAddress";
+	static final String RECEIVERCCEMAILADDRESS = "receiverCCEmailAddress";
+	static final String RECEIVERBCCEMAILADDRESS = "receiverBCCEmailAddress";
+	static final String CONTENTID = "contentId";
+	static final String ISREOCCURING = "isReoccuring";
+	static final String EMAILDETAILS = "emailDetails";
+	static final String REPORTID = "reportId";
+	static final String REPORT_CONFIG_DIR = "assessmentReportPdfTemplate";
+	static final String REPORT_CONFIG_TEMPLATE_DIR = "reportTemplates";
+	static final String REPORT_PDF_RESOLVED_PATH = System.getenv().get(ConfigOptions.INSIGHTS_HOME) + File.separator
+	+ REPORT_CONFIG_DIR + File.separator;
+	static final String REPORT_PDF_EXECUTION_RESOLVED_PATH = System.getenv().get(ConfigOptions.INSIGHTS_HOME)
+			+ File.separator
+	+ REPORT_CONFIG_DIR + File.separator + "executionsDetail" + File.separator;
+	static final String KPICONFIGS = "kpiConfigs";
+	static final String CATEGORY = "category";
+	static final String CONTENT_NAME = "contentName";
+	static final String TASK_DESCRIPTION = "description";
 }

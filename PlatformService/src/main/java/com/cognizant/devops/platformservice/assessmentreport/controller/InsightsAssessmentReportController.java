@@ -217,7 +217,6 @@ public class InsightsAssessmentReportController {
 	@PostMapping(value = "/saveReportTemplate", produces = MediaType.APPLICATION_JSON_VALUE)
 	public @ResponseBody JsonObject saveReportTemplate(@RequestBody String reportTemplate) {
 		try {
-			reportTemplate = reportTemplate.replace("\n", "").replace("\r", "");
 			String validatedResponse = ValidationUtils.validateRequestBody(reportTemplate);
 			JsonParser parser = new JsonParser();
 			JsonObject reportTemplateJson = (JsonObject) parser.parse(validatedResponse);
@@ -230,6 +229,39 @@ public class InsightsAssessmentReportController {
 			log.error(e);
 			return PlatformServiceUtil.buildFailureResponse("Unable to save template report due to exception");
 		}
+	}
+
+	@PostMapping(value = "/setReportTemplateStatus", produces = MediaType.APPLICATION_JSON_VALUE)
+	public @ResponseBody JsonObject setReportTemplateStatus(@RequestBody String reportTemplate) {
+		try {
+			String validatedResponse = ValidationUtils.validateRequestBody(reportTemplate);
+			JsonParser parser = new JsonParser();
+			JsonObject reportTemplateJson = (JsonObject) parser.parse(validatedResponse);
+			String message= assessmentReportService.setReportTemplateStatus(reportTemplateJson);
+			return PlatformServiceUtil.buildSuccessResponseWithData(message);
+		} catch (InsightsCustomException e) {
+			log.error(e);
+			return PlatformServiceUtil.buildFailureResponse(e.getMessage());
+		} catch (Exception e) {
+			log.error(e);
+			return PlatformServiceUtil
+					.buildFailureResponse("Unable to set report template status  report due to exception");
+		}
+	}
+
+	@PostMapping(value = "/deleteReportTemplate", produces = MediaType.APPLICATION_JSON_VALUE)
+	public @ResponseBody JsonObject deleteReportTemplate(@RequestBody String deleteReportTemplateJson) {
+		String message = null;
+		try {
+			String validatedResponse = ValidationUtils.validateRequestBody(deleteReportTemplateJson);
+			JsonParser parser = new JsonParser();
+			JsonObject deleteReportTemplateJsonParsed = (JsonObject) parser.parse(validatedResponse);
+			message = assessmentReportService.deleteReportTemplate(deleteReportTemplateJsonParsed);
+			return PlatformServiceUtil.buildSuccessResponseWithData(message);
+		} catch (InsightsCustomException e) {
+			return PlatformServiceUtil.buildFailureResponse(e.getMessage());
+		}
+
 	}
 
 	@GetMapping(value = "/getReportTemplate", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -248,7 +280,6 @@ public class InsightsAssessmentReportController {
 		} catch (Exception e) {
 			return PlatformServiceUtil.buildFailureResponse(e.getMessage());
 		}
-
 	}
 
 	@PostMapping(value = "/getKPIlistOfReportTemplate", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -262,6 +293,56 @@ public class InsightsAssessmentReportController {
 		}
 
 	}
+
+	@PostMapping(value = "/editReportTemplate", produces = MediaType.APPLICATION_JSON_VALUE)
+	public @ResponseBody JsonObject editReportTemplate(@RequestBody String reportTemplate) {
+		try {
+			reportTemplate = reportTemplate.replace("\n", "").replace("\r", "");
+			String validatedResponse = ValidationUtils.validateRequestBody(reportTemplate);
+			JsonParser parser = new JsonParser();
+			JsonObject reportTemplateJson = (JsonObject) parser.parse(validatedResponse);
+			int templateReportId = assessmentReportService.editReportTemplate(reportTemplateJson);
+			return PlatformServiceUtil
+					.buildSuccessResponseWithData("Report Template Id updated successfully  " + templateReportId);
+		} catch (InsightsCustomException e) {
+			log.error(e);
+			return PlatformServiceUtil.buildFailureResponse(e.getMessage());
+		} catch (Exception e) {
+			log.error(e);
+			return PlatformServiceUtil.buildFailureResponse("Unable to edit template report due to exception");
+		}
+	}
+
+	@PostMapping(value = "/uploadReportTemplate", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+	public @ResponseBody JsonObject uploadReportTemplate(@RequestParam("file") MultipartFile file) {
+		try {
+			String returnMessage = assessmentReportService.uploadReportTemplate(file);
+			return PlatformServiceUtil.buildSuccessResponseWithData(returnMessage);
+		} catch (InsightsCustomException e) {
+			log.error(e);
+			return PlatformServiceUtil.buildFailureResponse(e.getMessage());
+		} catch (Exception e) {
+			log.error(e);
+			return PlatformServiceUtil.buildFailureResponse("Unable to upload Report Template ");
+		}
+	}
+
+	@PostMapping(value = "/uploadReportTemplateDesignFiles", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+	public @ResponseBody JsonObject uploadReportTemplateDesignFiles(@RequestParam("files") MultipartFile[] files,
+			@RequestParam int reportId) {
+		String returnMessage = "";
+		try {
+			returnMessage = assessmentReportService.uploadReportTemplateDesignFiles(files, reportId);
+			return PlatformServiceUtil.buildSuccessResponseWithData(returnMessage);
+		} catch (InsightsCustomException e) {
+			log.error(e);
+			return PlatformServiceUtil.buildFailureResponse(e.getMessage());
+		} catch (Exception e) {
+			log.error(e);
+			return PlatformServiceUtil.buildFailureResponse("Unable to upload Report Template Design Files ");
+		}
+	}
+
 
 	@PostMapping(value = "/setReportStatus", produces = MediaType.APPLICATION_JSON_VALUE)
 	public @ResponseBody JsonObject setWorkflowStatus(@RequestBody String reportConfigJsonString) {
@@ -429,6 +510,65 @@ public class InsightsAssessmentReportController {
 			log.error(e);
 			return PlatformServiceUtil.buildFailureResponse("Unable to delete KPI Setting Configuration");
 		}
+	}
+	
+	@GetMapping(value = "/getAllReportTemplate", produces = MediaType.APPLICATION_JSON_VALUE)
+	public @ResponseBody JsonObject getAllReportTemplateList() {
+		List<InsightsAssessmentReportTemplate> reportTemplateList;
+		JsonArray jsonarray = new JsonArray();
+		try {
+			reportTemplateList = assessmentReportService.getAllReportTemplate();
+			for (InsightsAssessmentReportTemplate eachTemplate : reportTemplateList) {
+				JsonObject jsonobject = new JsonObject();
+				jsonobject.addProperty("reportId", eachTemplate.getReportId());
+				jsonobject.addProperty("templateName", eachTemplate.getTemplateName());
+				jsonobject.addProperty("description", eachTemplate.getDescription());
+				jsonobject.addProperty("isActive", eachTemplate.isActive());
+				jsonobject.addProperty("visualizationutil", eachTemplate.getVisualizationutil());
+				jsonarray.add(jsonobject);
+			}
+			return PlatformServiceUtil.buildSuccessResponseWithData(jsonarray);
+		} catch (Exception e) {
+			return PlatformServiceUtil.buildFailureResponse(e.getMessage());
+		}
+	}
+
+	@PostMapping(value = "/getReportTemplateKpiDetails", produces = MediaType.APPLICATION_JSON_VALUE)
+	public @ResponseBody JsonObject getReportTemplateKpiDetails(String reportId) {
+		JsonArray kpiDetailsArray = new JsonArray();
+		try {
+			int reportID = Integer.parseInt(reportId);
+			kpiDetailsArray = assessmentReportService.getReportTemplateKpidetails(reportID);
+
+			return PlatformServiceUtil.buildSuccessResponseWithData(kpiDetailsArray);
+		} catch (Exception e) {
+			return PlatformServiceUtil.buildFailureResponse(e.getMessage());
+		}	
+
+	}
+
+	@GetMapping(value = "/getChartType", produces = MediaType.APPLICATION_JSON_VALUE)
+	public @ResponseBody JsonObject getChartType() {
+		List<String> vTypeList;
+		try {
+			vTypeList = assessmentReportService.getAllChartType();
+			return PlatformServiceUtil.buildSuccessResponseWithData(vTypeList);
+		} catch (Exception e) {
+			return PlatformServiceUtil.buildFailureResponse(e.getMessage());
+		}
+
+	}
+
+	@GetMapping(value = "/getVisualizationUtil", produces = MediaType.APPLICATION_JSON_VALUE)
+	public @ResponseBody JsonObject getVisualizationUtil() {
+		List<String> chartHandlerList;
+		try {
+			chartHandlerList = assessmentReportService.getVisualizationUtil();
+			return PlatformServiceUtil.buildSuccessResponseWithData(chartHandlerList);
+		} catch (Exception e) {
+			return PlatformServiceUtil.buildFailureResponse(e.getMessage());
+		}
+
 	}
 
 }

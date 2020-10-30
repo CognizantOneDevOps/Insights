@@ -62,6 +62,10 @@ export class KpiCreationComponent implements OnInit {
       width: '34%',
       height: '27%',
       disableClose: false,
+      data: {
+        type: 'KPI',
+        multipleFileAllowed: false
+      }
     });
   }
   edit() {

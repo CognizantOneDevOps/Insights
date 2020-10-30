@@ -173,28 +173,40 @@ export class RestAPIurlService implements IRestAPIUrlService {
         this.addEndPoint("UPLOAD_CSV", '/PlatformService/admin/trainmodels/saveUsecase');
         this.addEndPoint("GET_USECASES", '/PlatformService/admin/trainmodels/getUsecases');
         this.addEndPoint("DELETE_USECASE", '/PlatformService/admin/trainmodels/deleteusecase');
-        this.addEndPoint("SPLIT_N_TRAIN","/PlatformService/admin/trainmodels/splitAndTrain");
+        this.addEndPoint("SPLIT_N_TRAIN", "/PlatformService/admin/trainmodels/splitAndTrain");
         this.addEndPoint("POLL_STATUS", '/PlatformService/admin/trainmodels/getAutoMLProgress');
         this.addEndPoint("GET_LEADERBOARD", '/PlatformService/admin/trainmodels/getLeaderboard');
         this.addEndPoint("PREDICT", '/PlatformService/admin/trainmodels/getPrediction');
         this.addEndPoint("DOWNLOAD_MOJO", '/PlatformService/admin/trainmodels/downloadMojo');
 
-         //kpi
-         this.addEndPoint("KPI_CATEGORY",'/PlatformService/insights/report/getKpiCategory');
-         this.addEndPoint("KPI_DATASOURCE",'/PlatformService/insights/report/getKpiDataSource');
-         this.addEndPoint("SAVE_DATA_KPI", '/PlatformService/insights/report/saveKpiDefinition');
-         this.addEndPoint("UPDATE_KPI", '/PlatformService/insights/report/updateKpiDefinition');
-         this.addEndPoint("LIST_KPI", '/PlatformService/insights/report/getAllActiveKpiList'); 
-         this.addEndPoint("DELETE_KPI",'/PlatformService/insights/report/deleteKpiDefinition')
-         this.addEndPoint("UPLOAD_BULK_KPI",'/PlatformService/insights/report/saveBulkKpiDefinition')
- 
-         //content
-         this.addEndPoint("LIST_CONTENT",'/PlatformService/insights/report/getAllActiveContentList');
-         this.addEndPoint("SAVE_DATA_CONTENT", '/PlatformService/insights/report/saveContentDefinition');
-         this.addEndPoint("DELETE_CONTENT",'/PlatformService/insights/report/deleteContentDefinition');
-         this.addEndPoint("GET_ACTIONS",'/PlatformService/insights/report/getContentAction');
-         this.addEndPoint("UPDATE_CONTENT",'/PlatformService/insights/report/updateContentDefinition');
-         this.addEndPoint("UPLOAD_BULK_CONTENT",'/PlatformService/insights/report/saveBulkContentDefinition')
+        //kpi
+        this.addEndPoint("KPI_CATEGORY", '/PlatformService/insights/report/getKpiCategory');
+        this.addEndPoint("KPI_DATASOURCE", '/PlatformService/insights/report/getKpiDataSource');
+        this.addEndPoint("SAVE_DATA_KPI", '/PlatformService/insights/report/saveKpiDefinition');
+        this.addEndPoint("UPDATE_KPI", '/PlatformService/insights/report/updateKpiDefinition');
+        this.addEndPoint("LIST_KPI", '/PlatformService/insights/report/getAllActiveKpiList');
+        this.addEndPoint("DELETE_KPI", '/PlatformService/insights/report/deleteKpiDefinition')
+        this.addEndPoint("UPLOAD_BULK_KPI", '/PlatformService/insights/report/saveBulkKpiDefinition')
+
+        //content
+        this.addEndPoint("LIST_CONTENT", '/PlatformService/insights/report/getAllActiveContentList');
+        this.addEndPoint("SAVE_DATA_CONTENT", '/PlatformService/insights/report/saveContentDefinition');
+        this.addEndPoint("DELETE_CONTENT", '/PlatformService/insights/report/deleteContentDefinition');
+        this.addEndPoint("GET_ACTIONS", '/PlatformService/insights/report/getContentAction');
+        this.addEndPoint("UPDATE_CONTENT", '/PlatformService/insights/report/updateContentDefinition');
+        this.addEndPoint("UPLOAD_BULK_CONTENT", '/PlatformService/insights/report/saveBulkContentDefinition')
+
+        //reportTemplate
+        this.addEndPoint("LIST_REPORT_TEMPLATE", '/PlatformService/insights/report/getAllReportTemplate');
+        this.addEndPoint("LIST_TEMPLATE_KPI", '/PlatformService/insights/report/getReportTemplateKpiDetails');
+        this.addEndPoint("GET_VISUALIZATION_UTIL", '/PlatformService/insights/report/getVisualizationUtil');
+        this.addEndPoint("GET_VTYPE_LIST", '/PlatformService/insights/report/getChartType');
+        this.addEndPoint("SAVE_REPORT_TEMPLATE", '/PlatformService/insights/report/saveReportTemplate');
+        this.addEndPoint("DELETE_REPORT_TEMPLATE", '/PlatformService/insights/report/deleteReportTemplate');
+        this.addEndPoint("SET_REPORT_TEMPLATE_STATUS", '/PlatformService/insights/report/setReportTemplateStatus');
+        this.addEndPoint("EDIT_REPORT_TEMPLATE", '/PlatformService/insights/report/editReportTemplate');
+        this.addEndPoint("UPLOAD_REPORT_TEMPLATE", '/PlatformService/insights/report/uploadReportTemplate');
+        this.addEndPoint("UPLOAD_REPORT_DESIGN_TEMPLATE", '/PlatformService/insights/report/uploadReportTemplateDesignFiles');
 
     }
 
@@ -202,13 +214,13 @@ export class RestAPIurlService implements IRestAPIUrlService {
         if (!this.apiMap.has(name)) {
             this.apiMap.set(name, url);
         } else {
-            throw new Error('Url with same name already exists');
+            throw new Error('Url with same name already exists == ' + name);
         }
     }
 
     public getRestCallUrl(moduleUrlKey: String) {
         if (!this.apiMap.has(moduleUrlKey)) {
-            console.error("Url Mapping doesnt exist "+moduleUrlKey);
+            console.error("Url Mapping doesnt exist " + moduleUrlKey);
             throw new Error("Url Mapping doesnt exist");
         }
         return InsightsInitService.serviceHost.toString().concat(this.apiMap.get(moduleUrlKey).toString());

@@ -101,10 +101,10 @@ public class AssessmentReportsTestData {
 	String queryJenkins = "MATCH (n:JENKINS:DATA) WHERE n.SPKstartTime > 1593561600 and n.SPKstartTime < 1596239999 and n.SPKvector = 'BUILD' and n.SPKstatus='Success' RETURN COALESCE(Max(toInt(n.SPKduration)),0) as MaxBuildTime";
 	String queryJiraAvg = "MATCH (n:JIRA:DATA) WHERE n.SPKstartTime > 1593561600 and n.SPKstartTime < 1596239999 and n.SPKissueType='Bug' and n.SPKstatus='Closed'  RETURN COALESCE(Avg(toInt(n.SPKduration)),0) as AvgDefectCompletionTime";
 
-	public static List<Integer> reportIdList = new ArrayList<Integer>();
-	public static List<Integer> taskidList = new ArrayList<Integer>();
-	public static List<Integer> contentIdList = new ArrayList<Integer>();
-	public static List<Integer> kpiIdList = new ArrayList<Integer>();
+	public static List<Integer> reportIdList = new ArrayList<>();
+	public static List<Integer> taskidList = new ArrayList<>();
+	public static List<Integer> contentIdList = new ArrayList<>();
+	public static List<Integer> kpiIdList = new ArrayList<>();
 
 	public void readKpiFileAndSave(String fileName) throws Exception {
 		try {

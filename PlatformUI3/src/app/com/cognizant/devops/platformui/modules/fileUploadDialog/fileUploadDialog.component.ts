@@ -1,5 +1,5 @@
-import { Component, OnInit, ElementRef, ViewChild } from '@angular/core';
-import { MatDialog, MatDialogRef } from '@angular/material';
+import { Component, OnInit, ElementRef, ViewChild, Inject } from '@angular/core';
+import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 import { RestCallHandlerService } from '@insights/common/rest-call-handler.service';
 import { MessageDialogService } from '../application-dialog/message-dialog-service';
 import { Router } from '@angular/router';
@@ -17,23 +17,56 @@ export class FileUploadDialog implements OnInit {
   selectedFile: File = null;
   jsonError: any;
   valid: boolean;
+  fileUploadType = '';
+  formDataFiles = new FormData();
+  multipleFileAllowed = false;
+  receivedData: any;
 
 
-  constructor(public router: Router, public dialogRef: MatDialogRef<FileUploadDialog>, private restCallHandlerService: RestCallHandlerService,
-    public dialog: MatDialog, public messageDialog: MessageDialogService, public kpiService: KpiService, public contentService: ContentService) { }
+  constructor(public router: Router, public dialogRef: MatDialogRef<FileUploadDialog>,
+    private restCallHandlerService: RestCallHandlerService, public dialog: MatDialog,
+    public messageDialog: MessageDialogService, public kpiService: KpiService,
+    public contentService: ContentService, @Inject(MAT_DIALOG_DATA) public data: any) {
+    this.receivedData = data;
+    if (data.type != null && data.type != undefined) {
+      this.fileUploadType = data.type;
+    }
+    if (data.multipleFileAllowed != undefined) {
+      this.multipleFileAllowed = data.multipleFileAllowed;
+    }
+    console.log(this.fileUploadType);
+    console.log(" multipleFileAllowed " + this.multipleFileAllowed);
+  }
 
   ngOnInit() {
   }
 
   onFileChanged(event) {
-    
-    let fileReader = new FileReader();
-    this.selectedFile = <File>event.target.files[0];
-    fileReader.onload = () => {
-      this.valid = this.validateJson(fileReader.result.toString());
-    };
-    fileReader.readAsText(event.target.files[0]);
+    this.formDataFiles = new FormData();
+    console.log(event.target.files.length);
+    if (this.multipleFileAllowed) {
+      for (let i = 0; i < event.target.files.length; i++) {
+        console.log(event.target.files[i].name)
+        this.formDataFiles.append('files', <File>event.target.files[i], event.target.files[i].name);
+        if (event.target.files[i].type == 'application/json') {
+          var reader = new FileReader();
+          reader.onload = () => {
+            this.valid = this.validateJson(reader.result.toString());
+          }
+          reader.readAsText(event.target.files[i]);
+        }
+      }
+      //this.valid = true;
+    } else {
+      let fileReader = new FileReader();
+      this.formDataFiles.append('file', <File>event.target.files[0], event.target.files[0].name);
+      fileReader.onload = () => {
+        this.valid = this.validateJson(fileReader.result.toString());
+      };
+      fileReader.readAsText(event.target.files[0]);
+    }
   }
+
   validateJson(message) {
     try {
       JSON.parse(message);
@@ -43,61 +76,93 @@ export class FileUploadDialog implements OnInit {
     }
     return true;
   }
+
   upload() {
     if (this.valid === false) {
-      this.messageDialog.showApplicationsMessage("File is not a valid JSON <br><br>" + this.jsonError, 'ERROR');
+      this.messageDialog.showApplicationsMessage("File is not a valid JSON. " + this.jsonError, 'ERROR');
     } else {
-      if (this.contentService.getFileType() === 'CONTENT') {
+      if (this.fileUploadType === 'CONTENT') {
         this.uploadFileContent();
-      }
-      else {
+      } else if (this.fileUploadType === 'KPI') {
         this.uploadFileKpi();
+      } else if (this.fileUploadType === "ATTACH_FILES") {
+        this.uploadTemplateDesighFile();
+      } else if (this.fileUploadType === "REPORT_TEMPLATE") {
+        this.uploadReportTemplate();
       }
     }
   }
   uploadFileKpi() {
     var self = this;
-    if (this.selectedFile) {
-      var uploadedFile = this.selectedFile;
-      console.log(uploadedFile);
-      let fd = new FormData();
-      fd.append('file', uploadedFile, uploadedFile.name);
-      this.restCallHandlerService.postFormData('UPLOAD_BULK_KPI', fd).toPromise().then(function (response) {
+    if (this.formDataFiles.has('file')) {
+      this.restCallHandlerService.postFormData('UPLOAD_BULK_KPI', this.formDataFiles).toPromise().then(function (response) {
         if (response.status === "success") {
-          self.messageDialog.showApplicationsMessage("<b>" + response.data, "INFO");
+          self.messageDialog.showApplicationsMessage(response.data, "SUCCESS");
           self.dialogRef.close();
           self.kpiService.fileUploadSubject.next('REFRESH');
-        }
-        else {
-          self.messageDialog.showApplicationsMessage("<b>" + "Error Creating KPI", "ERROR");
+        } else {
+          self.messageDialog.showApplicationsMessage("Error Creating KPI", "ERROR");
         }
 
       })
     }
     else {
-      self.messageDialog.showApplicationsMessage("<b>" + "Please upload a file!", "WARN");
+      self.messageDialog.showApplicationsMessage("Please choose a valid JSON file to upload.", "WARN");
     }
   }
   uploadFileContent() {
     var self = this;
-    if (this.selectedFile) {
-      var uploadedFile = this.selectedFile;
-      console.log(uploadedFile);
-      let fd = new FormData();
-      var displayMsg = '<ul>';
-      fd.append('file', uploadedFile, uploadedFile.name);
-      this.restCallHandlerService.postFormData('UPLOAD_BULK_CONTENT', fd).toPromise().then(function (response) {
+    if (this.formDataFiles.has('file')) {
+      this.restCallHandlerService.postFormData('UPLOAD_BULK_CONTENT', this.formDataFiles).toPromise().then(function (response) {
         if (response.status === "success") {
-          self.messageDialog.showApplicationsMessage("<b>" + response.data, "INFO");
-          self.dialogRef.close();
-          self.kpiService.fileUploadSubject.next('REFRESH');
+          self.messageDialog.showApplicationsMessage(response.data, "SUCCESS");
+          self.dialogRef.close(true);
         }
         else {
-          self.messageDialog.showApplicationsMessage("<b>" + "Error Creating Content.Please check logs", "ERROR");
+          self.messageDialog.showApplicationsMessage("Error Creating Content.Please check logs", "ERROR");
         }
       })
     } else {
-      self.messageDialog.showApplicationsMessage("<b>" + "Please upload a file!", "WARN");
+      self.messageDialog.showApplicationsMessage("Please choose a valid JSON file to upload.", "WARN");
+    }
+  }
+
+  uploadTemplateDesighFile() {
+    var self = this;
+    if (this.formDataFiles.has('files')) {
+      console.log(this.formDataFiles);
+      this.restCallHandlerService.postFormDataWithParameter('UPLOAD_REPORT_DESIGN_TEMPLATE', this.formDataFiles, {
+        reportId: this.receivedData.reportId
+      }).toPromise().then(function (response) {
+        if (response.status === "success") {
+          self.messageDialog.showApplicationsMessage(response.data, "SUCCESS");
+          self.dialogRef.close(true);
+        }
+        else {
+          self.messageDialog.showApplicationsMessage("Error uploading Report Template files", "ERROR");
+        }
+      })
+    }
+    else {
+      self.messageDialog.showApplicationsMessage("Please choose a file to upload.", "WARN");
+    }
+  }
+
+  uploadReportTemplate() {
+    var self = this;
+    if (this.formDataFiles.has('file')) {
+      console.log(this.formDataFiles)
+      this.restCallHandlerService.postFormData('UPLOAD_REPORT_TEMPLATE', this.formDataFiles).toPromise().then(function (response) {
+        if (response.status === "success") {
+          self.messageDialog.showApplicationsMessage(response.data, "SUCCESS");
+          self.dialogRef.close(true);
+        }
+        else {
+          self.messageDialog.showApplicationsMessage("Failed to save report template. Please check logs for more details.", "ERROR");
+        }
+      })
+    } else {
+      self.messageDialog.showApplicationsMessage("Please choose a valid JSON file to upload.", "WARN");
     }
   }
 
@@ -114,6 +179,8 @@ export class FileUploadDialog implements OnInit {
   cancelFileUpload() {
     var dummy = (<HTMLInputElement>document.getElementById("file"))
     dummy.value = "";
+    this.formDataFiles = new FormData();
+    this.valid = true;
   }
   closeDialog() {
     this.dialogRef.close();

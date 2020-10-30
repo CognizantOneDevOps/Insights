@@ -22,12 +22,15 @@ import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
 import javax.persistence.NoResultException;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -36,8 +39,10 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.cognizant.devops.platformcommons.constants.AssessmentReportAndWorkflowConstants;
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
+import com.cognizant.devops.platformcommons.constants.ReportChartCollection;
 import com.cognizant.devops.platformcommons.core.enums.ContentConfigEnum;
 import com.cognizant.devops.platformcommons.core.enums.KpiConfigEnum;
+import com.cognizant.devops.platformcommons.core.enums.VisualizationUtilEnum;
 import com.cognizant.devops.platformcommons.core.enums.WorkflowTaskEnum;
 import com.cognizant.devops.platformcommons.core.util.InsightsUtils;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
@@ -52,6 +57,7 @@ import com.cognizant.devops.platformdal.workflow.InsightsWorkflowConfiguration;
 import com.cognizant.devops.platformdal.workflow.InsightsWorkflowExecutionHistory;
 import com.cognizant.devops.platformdal.workflow.InsightsWorkflowTaskSequence;
 import com.cognizant.devops.platformdal.workflow.WorkflowDAL;
+import com.cognizant.devops.platformservice.rest.util.PlatformServiceUtil;
 import com.cognizant.devops.platformservice.workflow.service.WorkflowServiceImpl;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
@@ -91,7 +97,7 @@ public class AssesmentReportServiceImpl {
 			String group = registerkpiJson.get("group").getAsString();
 			String toolName = registerkpiJson.get("toolName").getAsString();
 			String dataSource = registerkpiJson.get(AssessmentReportAndWorkflowConstants.DATASOURCE).getAsString();
-			String category = registerkpiJson.get("category").getAsString();
+			String category = registerkpiJson.get(AssessmentReportAndWorkflowConstants.CATEGORY).getAsString();
 			dBQuery = dBQuery.replace("#", "<").replace("~", ">");
 			kpiConfig.setKpiId(kpiId);
 			kpiConfig.setActive(isActive);
@@ -200,7 +206,8 @@ public class AssesmentReportServiceImpl {
 			int kpiId = registerContentJson.get(AssessmentReportAndWorkflowConstants.KPIID).getAsInt();
 			contentId = registerContentJson.get(AssessmentReportAndWorkflowConstants.CONTENTID).getAsInt();
 			boolean isActive = registerContentJson.get(AssessmentReportAndWorkflowConstants.ISACTIVE).getAsBoolean();
-			String contentName = registerContentJson.get("contentName").getAsString();
+			String contentName = registerContentJson.get(AssessmentReportAndWorkflowConstants.CONTENT_NAME)
+					.getAsString();
 
 			String contentString = gson.toJson(registerContentJson);
 			contentConfig.setContentId(contentId);
@@ -286,7 +293,7 @@ public class AssesmentReportServiceImpl {
 				returnMessage = saveBulkKpiDefinition(kpiJsonArray);
 			} else {
 				log.error("Invalid file format. ");
-				throw new InsightsCustomException("Invalid file format.");
+				throw new InsightsCustomException("Invalid kpi file format.");
 			}
 		} catch (Exception ex) {
 			log.error("Error in uploading KPI file {} ", ex.getMessage());
@@ -504,9 +511,7 @@ public class AssesmentReportServiceImpl {
 			workFlowObject.setReoccurence(
 					assessmentReportJson.get(AssessmentReportAndWorkflowConstants.ISREOCCURING).getAsBoolean());
 			JsonArray taskArray = assessmentReportJson.get("tasklist").getAsJsonArray();
-			Set<InsightsWorkflowTaskSequence> taskSequenceSet = assessmentConfig.getWorkflowConfig()
-					.getTaskSequenceEntity();
-			taskSequenceSet = workfowserice.setSequence(taskArray, workFlowObject);
+			Set<InsightsWorkflowTaskSequence> taskSequenceSet = workfowserice.setSequence(taskArray, workFlowObject);
 			workFlowObject.setTaskSequenceEntity(taskSequenceSet);
 			if (!assessmentReportJson.get(AssessmentReportAndWorkflowConstants.EMAILDETAILS).isJsonNull()) {
 				emailDetails = assessmentReportJson.get(AssessmentReportAndWorkflowConstants.EMAILDETAILS)
@@ -543,7 +548,7 @@ public class AssesmentReportServiceImpl {
 			}
 			return jsonarray;
 		} catch (Exception e) {
-			log.error("Error getting all report template..", e);
+			log.error("Error getting all assessment report template list ..", e);
 			throw new InsightsCustomException(e.toString());
 		}
 	}
@@ -610,7 +615,8 @@ public class AssesmentReportServiceImpl {
 		for (InsightsWorkflowTaskSequence eachTask : taskList) {
 			JsonObject detailTaskJson = new JsonObject();
 			detailTaskJson.addProperty("taskId", eachTask.getWorkflowTaskEntity().getTaskId());
-			detailTaskJson.addProperty("description", eachTask.getWorkflowTaskEntity().getDescription());
+			detailTaskJson.addProperty(AssessmentReportAndWorkflowConstants.TASK_DESCRIPTION,
+					eachTask.getWorkflowTaskEntity().getDescription());
 			detailTask.add(detailTaskJson);
 		}
 		jsonobject.add("taskDesc", detailTask);
@@ -797,7 +803,7 @@ public class AssesmentReportServiceImpl {
 	// REPORT TEMPLATE TABLE RELATED METHODS FOR SERVICE
 
 	/**
-	 * Save report template details in ASSESSEMENT_REPORT_TEMPLATE table.
+	 * Save report template details in database table.
 	 * 
 	 * @param templateReportJson
 	 * @return
@@ -806,28 +812,173 @@ public class AssesmentReportServiceImpl {
 	public int saveTemplateReport(JsonObject templateReportJson) throws InsightsCustomException {
 		int reportId = -1;
 		try {
-			reportId = templateReportJson.get("reportId").getAsInt();
+			reportId = (int) (System.currentTimeMillis() / 1000);
+			String reportName = templateReportJson.get(AssessmentReportAndWorkflowConstants.REPORTNAME).getAsString();
 			InsightsAssessmentReportTemplate reportEntity = (InsightsAssessmentReportTemplate) reportConfigDAL
-					.getActiveReportTemplateByReportId(reportId);
+					.getActiveReportTemplateByName(reportName);
 
 			if (reportEntity == null) {
 				reportEntity = new InsightsAssessmentReportTemplate();
 				saveReportConfig(templateReportJson, reportEntity, reportId);
 			} else {
-				throw new InsightsCustomException(" report template already exists in database " + reportId);
+				throw new InsightsCustomException(
+						" Report template already exists in database " + reportEntity.getReportId());
 			}
-
-		} catch (NullPointerException e) {
-			log.error(e);
-			throw new InsightsCustomException(" report tempplate does not have some mandatory field ");
-		} catch (NoResultException e) {
-			log.error(e);
-			throw new InsightsCustomException("Kpi id not found for attachning report : ");
 		} catch (Exception e) {
 			log.error(e);
 			throw new InsightsCustomException(e.getMessage());
 		}
 		return reportId;
+	}
+
+	/**
+	 * Edit report template details in database table.
+	 * 
+	 * @param templateReportJson
+	 * @return
+	 * @throws InsightsCustomException
+	 */
+	public int editReportTemplate(JsonObject templateReportJson) throws InsightsCustomException {
+		int reportId = -1;
+		try {
+
+			reportId=editReportConfig(templateReportJson);
+		} catch (NoResultException e) {
+			log.error(e);
+			throw new InsightsCustomException("Report template not found ");
+		} catch (Exception e) {
+			log.error(e);
+			throw new InsightsCustomException(e.getMessage());
+		}
+		return reportId;
+	}
+
+	/**
+	 * This files used to upload Report template in DB
+	 * 
+	 * @param file
+	 * @return
+	 * @throws InsightsCustomException
+	 */
+	public String uploadReportTemplate(MultipartFile file) throws InsightsCustomException {
+		String returnMessage = "";
+		String originalFilename = file.getOriginalFilename();
+		JsonParser jsonParser = new JsonParser();
+		String fileExt = FilenameUtils.getExtension(originalFilename);
+		try {
+			if (fileExt.equalsIgnoreCase("json")) {
+				String reportTemplateStr = readFileAndCreateJson(file);
+				JsonObject reportTemplateJson = jsonParser.parse(reportTemplateStr).getAsJsonObject();
+				int reportId = saveTemplateReport(reportTemplateJson);
+				returnMessage = "Report Template Id created " + reportId;
+			} else {
+				log.error("Invalid Report Template file format. ");
+				throw new InsightsCustomException("Invalid Report Template file format.");
+			}
+		} catch (Exception ex) {
+			log.error("Error in Report Template file {} ", ex.getMessage());
+			throw new InsightsCustomException(ex.getMessage());
+		}
+		return returnMessage;
+	}
+
+	/**
+	 * Upload uploadReport Template Design Files
+	 * 
+	 * @param file
+	 * @return
+	 * @throws InsightsCustomException
+	 */
+	public String uploadReportTemplateDesignFiles(MultipartFile[] files, int reportId) throws InsightsCustomException {
+		String returnMessage = "";
+			try {
+				InsightsAssessmentReportTemplate reportEntity = (InsightsAssessmentReportTemplate) reportConfigDAL
+					.getReportTemplateByReportId(reportId);
+				if (reportEntity == null) {
+					throw new InsightsCustomException(" Report template not exists in database " + reportId);
+				} else {
+				String reportTemplateFolderPath = AssessmentReportAndWorkflowConstants.REPORT_PDF_RESOLVED_PATH
+						+ AssessmentReportAndWorkflowConstants.REPORT_CONFIG_TEMPLATE_DIR + File.separator
+						+ reportEntity.getFile() + File.separator;
+
+				for (MultipartFile file : Arrays.asList(files)) {
+					String fileExt = FilenameUtils.getExtension(file.getOriginalFilename());
+					String finalFileName = reportTemplateFolderPath + reportEntity.getFile() + "." + fileExt;
+					log.debug("  original fileName   ======= {}  final File name {} file extention {} ",
+							file.getOriginalFilename(), finalFileName, fileExt);
+
+					boolean fileCheck = PlatformServiceUtil.validateFile(file.getOriginalFilename());
+					if (fileCheck) {
+						FileUtils.copyFileToDirectory(convertToFile(file), new File(reportTemplateFolderPath),
+								Boolean.FALSE);
+						File sourceTemplateFolderPath = new File(finalFileName);
+						log.debug(" File created {} ", sourceTemplateFolderPath.getAbsolutePath());
+					} else {
+						log.error("File validation failed {}",file.getOriginalFilename() );
+					}
+				}
+				returnMessage = "File uploaded in " + reportTemplateFolderPath;
+			}
+		} catch (Exception ex) {
+			log.error("Error in Report Template files upload {} ", ex.getMessage());
+			throw new InsightsCustomException(ex.getMessage());
+		}
+		return returnMessage;
+	}
+
+	/**
+	 * This method used to make template active or inactive
+	 * 
+	 * @param reportTemplateJson
+	 * @return
+	 * @throws InsightsCustomException
+	 */
+	public String setReportTemplateStatus(JsonObject reportTemplateJson) throws InsightsCustomException {
+		String message = "";
+		try {
+			int reportId = reportTemplateJson.get(AssessmentReportAndWorkflowConstants.REPORTID).getAsInt();
+			InsightsAssessmentReportTemplate reportEntity = (InsightsAssessmentReportTemplate) reportConfigDAL
+					.getReportTemplateByReportId(reportId);
+			if (reportEntity == null) {
+				throw new InsightsCustomException(" Report template not exists in database " + reportId);
+			} else {
+				Boolean state = reportTemplateJson.get(AssessmentReportAndWorkflowConstants.ISACTIVE).getAsBoolean();
+				reportEntity.setActive(state);
+				reportConfigDAL.updateReportConfig(reportEntity);
+				message = "Report Template Id " + reportId + " status changed successfully ";
+			}
+		} catch (NoResultException e) {
+			log.error(e);
+			throw new InsightsCustomException("Report template not found ");
+		} catch (Exception e) {
+			log.error(e);
+			throw new InsightsCustomException(e.getMessage());
+		}
+		return message;
+	}
+	
+	/**
+	 * Delete the report template.
+	 * 
+	 * @param configId
+	 * @return
+	 * @throws InsightsCustomException
+	 */
+	public String deleteReportTemplate(JsonObject deleteReportTemplateJson) throws InsightsCustomException {
+		String message = "";
+		try {
+			int reportId = deleteReportTemplateJson.get(AssessmentReportAndWorkflowConstants.REPORTID).getAsInt();
+			reportConfigDAL.deleteReportTemplatebyReportID(reportId);
+			message = "Template Report Id  " + reportId + " deleted successfully ";
+
+		} catch (NoResultException e) {
+			log.error(e);
+			throw new InsightsCustomException("Report template not exists");
+		} catch (Exception e) {
+			log.error(e);
+			throw new InsightsCustomException(e.getMessage());
+		}
+		return message;
 	}
 
 	/**
@@ -845,13 +996,70 @@ public class AssesmentReportServiceImpl {
 		String reportName = templateReportJson.get(AssessmentReportAndWorkflowConstants.REPORTNAME).getAsString();
 		boolean isActive = templateReportJson.get(AssessmentReportAndWorkflowConstants.ISACTIVE).getAsBoolean();
 		String description = templateReportJson.get("description").getAsString();
-		String file = templateReportJson.get("file").getAsString();
+		//String file = templateReportJson.get("file").getAsString();
 		String visualizationutil = templateReportJson.get("visualizationutil").getAsString();
 		reportEntity.setReportId(reportId);
 		reportEntity.setActive(isActive);
 		reportEntity.setDescription(description);
 		reportEntity.setTemplateName(reportName);
-		reportEntity.setFile(file);
+		reportEntity.setFile(reportName);
+		reportEntity.setVisualizationutil(visualizationutil);
+
+		if (!templateReportJson.has(AssessmentReportAndWorkflowConstants.KPICONFIGS)) {
+			throw new InsightsCustomException(" no KPI config provided for report : " + reportId);
+		}
+
+		JsonArray kpiConfigArray = templateReportJson.get(AssessmentReportAndWorkflowConstants.KPICONFIGS)
+				.getAsJsonArray();
+
+		for (JsonElement eachKpiConfig : kpiConfigArray) {
+			JsonObject kpiObject = eachKpiConfig.getAsJsonObject();
+			int kpiId = kpiObject.get(AssessmentReportAndWorkflowConstants.KPIID).getAsInt();
+			if (kpiIds.contains(kpiId)) {
+				log.debug(" Kpi id already exists with the reportId {} ", reportId);
+			} else {
+				InsightsKPIConfig kpiConfig = reportConfigDAL.getKPIConfig(kpiId);
+				if (kpiConfig == null) {
+					throw new NoResultException("kpi Id does not exist in dB");
+				}
+				kpiIds.add(kpiId);
+				String vConfig = (kpiObject.get("visualizationConfigs").getAsJsonArray()).toString();
+				InsightsReportsKPIConfig reportsKPIConfig = new InsightsReportsKPIConfig();
+				reportsKPIConfig.setKpiConfig(kpiConfig);
+				reportsKPIConfig.setvConfig(vConfig);
+				reportsKPIConfig.setReportTemplateEntity(reportEntity);
+				reportsKPIConfigSet.add(reportsKPIConfig);
+			}
+		}
+		reportEntity.setReportsKPIConfig(reportsKPIConfigSet);
+		reportConfigDAL.saveReportConfig(reportEntity);
+
+	}
+
+	/**
+	 * Method to edit Report Template Configuration
+	 * 
+	 * @param templateReportJson
+	 * @param reportEntity
+	 * @param reportId
+	 * @throws InsightsCustomException
+	 */
+	public int editReportConfig(JsonObject templateReportJson) throws InsightsCustomException {
+		
+		InsightsAssessmentReportTemplate reportEntity = new InsightsAssessmentReportTemplate();
+		List<Integer> kpiIds = new ArrayList<>();
+		Set<InsightsReportsKPIConfig> reportsKPIConfigSet = new HashSet<>();
+		int reportId = templateReportJson.get(AssessmentReportAndWorkflowConstants.REPORTID).getAsInt();
+		String reportName = templateReportJson.get(AssessmentReportAndWorkflowConstants.REPORTNAME).getAsString();
+		boolean isActive = templateReportJson.get(AssessmentReportAndWorkflowConstants.ISACTIVE).getAsBoolean();
+		String description = templateReportJson.get("description").getAsString();
+		//String file = templateReportJson.get("file").getAsString();
+		String visualizationutil = templateReportJson.get("visualizationutil").getAsString();
+		reportEntity.setReportId(reportId);
+		reportEntity.setActive(isActive);
+		reportEntity.setDescription(description);
+		reportEntity.setTemplateName(reportName);
+		reportEntity.setFile(reportName);
 		reportEntity.setVisualizationutil(visualizationutil);
 
 		if (!templateReportJson.has("kpiConfigs")) {
@@ -880,8 +1088,8 @@ public class AssesmentReportServiceImpl {
 			}
 		}
 		reportEntity.setReportsKPIConfig(reportsKPIConfigSet);
-		reportConfigDAL.saveReportConfig(reportEntity);
-
+		reportConfigDAL.updateReportTemplate(reportEntity);
+		return reportId;
 	}
 
 	/**
@@ -1071,13 +1279,89 @@ public class AssesmentReportServiceImpl {
 				} else {
 					throw new InsightsCustomException("Content definition attached to report template");
 				}
-
-				isRecordDeleted = Boolean.TRUE;
 			}
 		} catch (Exception e) {
 			log.error(e);
 			throw new InsightsCustomException(e.getMessage());
 		}
 		return isRecordDeleted;
+	}
+	
+	/**
+	 * method to fetch all report templates from ASSESSEMENT_REPORT_TEMPLATE table.
+	 * 
+	 * @return
+	 * @throws InsightsCustomException
+	 */
+	public List<InsightsAssessmentReportTemplate> getAllReportTemplate() throws InsightsCustomException {
+		try {
+			return reportConfigDAL.getAllReportTemplatesList();
+		} catch (Exception e) {
+			log.error("Error getting all report template..", e);
+			throw new InsightsCustomException(e.toString());
+		}
+
+	}
+
+	/**
+	 * method use to fetch KPI details of report template 
+	 * 
+	 * @param
+	 * @return
+	 * @throws InsightsCustomException
+	 */
+	public JsonArray getReportTemplateKpidetails(int reportId) throws InsightsCustomException {
+		List<InsightsReportsKPIConfig> kpiDetailsList = new ArrayList<>();
+        JsonArray jsonArray = new JsonArray();
+		try {
+			kpiDetailsList = reportConfigDAL.getTemplateKpiDetailsByReportId(reportId);
+			if (!kpiDetailsList.isEmpty()) {
+				for(InsightsReportsKPIConfig eachRecord: kpiDetailsList) {
+					JsonObject eachObject = new JsonObject();
+	        		eachObject.addProperty("kpiId", eachRecord.getKpiConfig().getKpiId());
+	        		JsonArray vConfigobj = new JsonParser().parse(eachRecord.getvConfig()).getAsJsonArray();
+	        		eachObject.addProperty("vType", vConfigobj.get(0).getAsJsonObject().get("vType").getAsString());
+	        		eachObject.addProperty("vQuery", vConfigobj.get(0).getAsJsonObject().get("vQuery").getAsString());
+	        		jsonArray.add(eachObject);
+				}
+			}
+			return jsonArray;
+		} catch (Exception e) {
+			log.error("Error while getting kpi details of report template ...", e);
+			throw new InsightsCustomException(e.toString());
+		}
+	}
+
+	/**
+	 * Method to get Visualization types
+	 * 
+	 * @return List<String>
+	 * @throws InsightsCustomException 
+	 */
+	public List<String> getAllChartType() throws InsightsCustomException {
+		try {
+			List<String> vTypeList = new LinkedList<>(ReportChartCollection.getSingleSeriesCharts());
+			vTypeList.addAll(ReportChartCollection.getCommonCharts());
+			vTypeList.addAll(ReportChartCollection.getSingleValueCharts());
+			vTypeList.add("table");
+			return vTypeList;
+		} catch (Exception e) {
+			log.error("Error while getting chart types ...", e);
+			throw new InsightsCustomException(e.toString());
+		}
+	}
+
+	/**
+	 * Method to get Visualization util
+	 * 
+	 * @return List<String>
+	 */
+	public List<String> getVisualizationUtil() {
+		List<String> chartHandlerList = new ArrayList<>();
+		VisualizationUtilEnum.VisualizationUtil[] visualizationUtil = VisualizationUtilEnum.VisualizationUtil.values();
+		for (VisualizationUtilEnum.VisualizationUtil eachHandler : visualizationUtil) {
+			chartHandlerList.add(eachHandler.toString().toUpperCase());
+		}
+		return chartHandlerList;
 	}
 }

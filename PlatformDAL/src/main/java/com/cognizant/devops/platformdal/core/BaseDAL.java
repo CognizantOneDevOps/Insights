@@ -22,7 +22,6 @@ import org.apache.logging.log4j.Logger;
 import com.cognizant.devops.platformdal.config.PlatformDALSessionFactoryProvider;
 
 public class BaseDAL {
-	//private static Logger logger = LogManager.getLogger(BaseDAL.class);
 	private static Logger logger = LogManager.getLogger(BaseDAL.class);
 	private Session session;
 

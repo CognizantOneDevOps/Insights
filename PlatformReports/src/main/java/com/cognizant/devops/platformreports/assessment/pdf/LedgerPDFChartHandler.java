@@ -22,6 +22,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.cognizant.devops.platformauditing.util.PdfTableUtil;
+import com.cognizant.devops.platformcommons.constants.AssessmentReportAndWorkflowConstants;
 import com.cognizant.devops.platformcommons.core.enums.WorkflowTaskEnum;
 import com.cognizant.devops.platformcommons.core.util.InsightsUtils;
 import com.cognizant.devops.platformdal.assessmentreport.InsightsReportVisualizationContainer;
@@ -62,7 +63,7 @@ public class LedgerPDFChartHandler implements BasePDFProcessor {
 			String folderName = assessmentReportDTO.getAsseementreportname() + "_"
 					+ assessmentReportDTO.getExecutionId();
 			assessmentReportDTO.setPdfReportFolderName(folderName);
-			String reportExecutionFile = ReportEngineUtils.REPORT_PDF_EXECUTION_RESOLVED_PATH + folderName;
+			String reportExecutionFile = AssessmentReportAndWorkflowConstants.REPORT_PDF_EXECUTION_RESOLVED_PATH + folderName;
 			assessmentReportDTO.setPdfReportDirPath(reportExecutionFile);
 			File reportExecutionFolder = new File(reportExecutionFile);
 			reportExecutionFolder.mkdir();

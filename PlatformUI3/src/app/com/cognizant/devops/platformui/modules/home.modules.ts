@@ -108,6 +108,10 @@ import { ContentConfigComponent } from '@insights/app/modules/content-config-lis
 import { ContentConfigAddition } from '@insights/app/modules/content-config-add/content-config-add.component';
 import { KpiListDialog } from './kpiList-Dialog/kpiList-Dialog.component';
 import { ContentService } from './content-config-list/content-service';
+import { ReportTemplateComponent } from './report-template/report-template-list.component';
+import { ReportTemplateService } from './report-template/report-template-service';
+import { KpiReportListDialog } from './report-template/report-template-kpi-list/kpi-report-List-Dialog.component';
+import { ReportTemplateConfig } from './report-template/template-configuration/template-configuration.component';
 
 
 @NgModule({
@@ -165,7 +169,10 @@ import { ContentService } from './content-config-list/content-service';
     FileUploadDialog,
     KpiListDialog,
     ContentConfigComponent,
-    ContentConfigAddition
+    ContentConfigAddition,
+    ReportTemplateComponent,
+    KpiReportListDialog,
+    ReportTemplateConfig
   ],
   imports: [
     HomeRouting,
@@ -201,7 +208,8 @@ import { ContentService } from './content-config-list/content-service';
     EmailConfigurationDialog,
     PredictionShowDetailsDialog,  
     FileUploadDialog,
-    KpiListDialog
+    KpiListDialog,
+    KpiReportListDialog
   ],
 
   providers: [
@@ -230,7 +238,8 @@ import { ContentService } from './content-config-list/content-service';
     MLWizardService,
     ModelManagementService,
     KpiService,
-    ContentService
+    ContentService,
+    ReportTemplateService
   ]
 })
 export class HomeModules { }

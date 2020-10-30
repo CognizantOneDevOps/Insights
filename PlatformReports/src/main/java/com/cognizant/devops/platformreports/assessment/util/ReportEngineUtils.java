@@ -56,13 +56,6 @@ public class ReportEngineUtils {
 
 	public static final String ES_CONTENT_RESULT_SORT_COLUMN = "executionId";
 
-	public static final String REPORT_CONFIG_DIR = "assessmentReportPdfTemplate";
-	public static final String REPORT_CONFIG_TEMPLATE_DIR = "reportTemplates";
-	public static final String REPORT_PDF_RESOLVED_PATH = System.getenv().get(INSIGHTS_HOME) + File.separator
-			+ REPORT_CONFIG_DIR + File.separator;
-	public static final String REPORT_PDF_EXECUTION_RESOLVED_PATH = System.getenv().get(INSIGHTS_HOME) + File.separator
-			+ REPORT_CONFIG_DIR + File.separator + "executionsDetail" + File.separator;
-
 	public static final String REPORT_TYPE = "pdf";
 
 	public static final String REPORT_MEDIA_TYPE = "application/pdf";

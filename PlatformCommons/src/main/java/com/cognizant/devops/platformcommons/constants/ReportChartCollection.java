@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  ******************************************************************************/
-package com.cognizant.devops.platformreports.assessment.util;
+package com.cognizant.devops.platformcommons.constants;
 
 
 import java.util.Arrays;
@@ -35,6 +35,18 @@ public class ReportChartCollection {
 		    		       "stackedarea2d"));
 	public static final List<String> SINGLE_VALUE_CHARTS = Collections.unmodifiableList(
 		     Arrays.asList("angulargauge"));
+	
+	public static List<String> getSingleSeriesCharts() {
+		return SINGLE_SERIES_CHARTS;
+	}
+
+	public static List<String> getCommonCharts() {
+		return COMMON_CHARTS;
+	}
+
+	public static List<String> getSingleValueCharts() {
+		return SINGLE_VALUE_CHARTS;
+	}
 	
 	
 }

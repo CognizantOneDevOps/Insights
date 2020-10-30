@@ -1,9 +1,7 @@
 {
-   "reportId":"2100",
-   "reportName":"REPORT_ALL_CAT",
+   "reportName":"REPORT_ALL_CAT_Demo",
    "description":"Report template having all categories",
    "isActive":true,
-   "file":"REPORT_ALL_CAT",
    "visualizationutil":"Fusion",
    "kpiConfigs":[
       {
