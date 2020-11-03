@@ -1,9 +1,7 @@
 {
-   "reportId":"300600",
    "reportName":"REPORT_SONAR_JENKINS_PROD",
    "description":"Testing",
    "isActive":true,
-   "file":"REPORT_SONAR_JENKINS_PROD",
    "visualizationutil":"Fusion",
    "kpiConfigs":[
       {

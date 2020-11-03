@@ -181,11 +181,11 @@ public class AssessmentReportServiceTest extends AssessmentReportServiceData {
 	@Test(priority = 14)
 	public void testSaveReportTemplate() throws InsightsCustomException {
 		try {
-			int reportId = assessmentService.saveTemplateReport(reportTemplateJson);
+			reportIdForList = assessmentService.saveTemplateReport(reportTemplateJson);
 			InsightsAssessmentReportTemplate report = (InsightsAssessmentReportTemplate) reportConfigDAL
-					.getReportTemplateByReportId(reportTemplateJson.get("reportId").getAsInt());
+					.getReportTemplateByReportId(reportIdForList);
+			assessmentReportDataInit();
 			Assert.assertNotNull(report);
-			Assert.assertEquals(reportId, reportTemplateJson.get("reportId").getAsInt());
 			Assert.assertTrue(report.getReportsKPIConfig().size() > 0);
 		} catch (AssertionError e) {
 			Assert.fail(e.getMessage());
@@ -206,7 +206,7 @@ public class AssessmentReportServiceTest extends AssessmentReportServiceData {
 	@Test(priority = 16)
 	public void testGetKPIlistOfReportTemplate() throws InsightsCustomException {
 		try {
-			JsonArray kpiList = assessmentService.getKPIlistOfReportTemplate(reportIdForList);
+			JsonArray kpiList = assessmentService.getKPIlistOfReportTemplate(Integer.toString(reportIdForList));
 			Assert.assertNotNull(kpiList);
 			Assert.assertTrue(kpiList.size() > 0);
 		} catch (AssertionError e) {
@@ -793,7 +793,7 @@ public class AssessmentReportServiceTest extends AssessmentReportServiceData {
 
 		// Delete Report Templates
 		try {
-			reportConfigDAL.deleteReportTemplatebyReportID(reportTemplateJson.get("reportId").getAsInt());
+			reportConfigDAL.deleteReportTemplatebyReportID(reportIdForList);
 		} catch (Exception e) {
 			log.error("Error cleaning up at AssessmentReportsServiceTest Report template", e);
 		}

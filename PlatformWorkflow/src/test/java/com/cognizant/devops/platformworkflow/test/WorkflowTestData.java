@@ -62,6 +62,8 @@ public class WorkflowTestData {
 	WorkflowDAL workflowDAL = new WorkflowDAL();
 	ReportConfigDAL reportConfigDAL = new ReportConfigDAL();
 
+	int reportId = 0;
+	
 	String kpiDefinition = "{\"kpiId\":1111265,\"name\":\"Avg all employee productivity for threshold \",\"toolName\":\"PRODUCTIVITY\",\"category\":\"THRESHOLD_RANGE\",\"group\":\"PRODUCTIVITY\",\"isActive\":true,\"DBQuery\":\"MATCH (n:PRODUCTIVITY) where n.completionDateEpochTime {startTime} AND n.completionDateEpochTime {endTime} WITH  avg(n.storyPoints*8) as StoryPoint, avg(n.authorTimeSpent) as authorTimeSpent  return   StoryPoint, authorTimeSpent, round((toFloat(StoryPoint)authorTimeSpent)*100) as Productivity\",\"resultField\":\"Productivity\",\"datasource\":\"NEO4J\"}";
 	JsonObject kpiDefinitionJson = new JsonParser().parse(kpiDefinition).getAsJsonObject();
 
@@ -72,15 +74,15 @@ public class WorkflowTestData {
 	String failWorkflowTask = "{\"description\":\"TEST_FAIL_TASK_Execute\",\"mqChannel\":\"WORKFLOW.TEST.FAIL.TASK.EXCECUTION\",\"componentName\":\"com.cognizant.devops.platformworkflow.test.WorkflowTestFailTaskSubscriber\",\"dependency\":2,\"workflowType\":\"Report\"}";
 	String wrongWorkflowTask = "{\"description\":\"WRONG_TEST_TASK\",\"mqChannel\":\"WORKFLOW.TEST.WRONG.TASK\",\"componentName\":\"com.cognizant.devops.platformworkflow.test\",\"dependency\":3,\"workflowType\":\"Report\"}";
 
-	String reportTemplate = "{\"reportId\":\"111600\",\"reportName\":\"Productivity\",\"description\":\"Backend Team\",\"isActive\":true,\"file\":\"\",\"visualizationutil\":\"Fusion\",\"kpiConfigs\":[{\"kpiId\":1111265,\"visualizationConfigs\":[{\"vType\":\"1111265_line\",\"vQuery\":\"\"}]}]}";
+	String reportTemplate = "{\"reportName\":\"Productivity\",\"description\":\"Backend Team\",\"isActive\":true,\"visualizationutil\":\"FUSION\",\"kpiConfigs\":[{\"kpiId\":1111265,\"visualizationConfigs\":[{\"vType\":\"1111265_line\",\"vQuery\":\"\"}]}]}";
 	JsonObject reportTemplateJson = new JsonParser().parse(reportTemplate).getAsJsonObject();
 
-	String assessmentReport = "{\"reportName\":\"workflow_test\",\"reportTemplate\":111600,\"emailList\":\"xyz@xyz.com\",\"schedule\":\"DAILY\",\"startdate\":null,\"isReoccuring\":true,\"datasource\":\"\",\"asseementreportdisplayname\":\"Report_test\",\"emailDetails\":null}";
-	String assessmentReportFail = "{\"reportName\":\"workflow_fail_test\",\"reportTemplate\":111600,\"emailList\":\"xyz@xyz.com\",\"schedule\":\"DAILY\",\"startdate\":null,\"isReoccuring\":false,\"datasource\":\"\",\"asseementreportdisplayname\":\"Report_test\",\"emailDetails\":null}";
-	String assessmentReportWith2Task = "{\"reportName\":\"workflow_test_with2Task\",\"reportTemplate\":111600,\"emailList\":\"xyz@xyz.com\",\"schedule\":\"DAILY\",\"startdate\":null,\"isReoccuring\":true,\"datasource\":\"\",\"asseementreportdisplayname\":\"Report_test\",\"emailDetails\":null}";
-	String reportWithWrongTask = "{\"reportName\":\"workflow_test_wrongTask\",\"reportTemplate\":111600,\"emailList\":\"xyz@xyz.com\",\"schedule\":\"DAILY\",\"startdate\":null,\"isReoccuring\":false,\"datasource\":\"\",\"asseementreportdisplayname\":\"Report_test\",\"emailDetails\":null}";
-	String assessmentReportTest = "{\"reportName\":\"workflow_testing\",\"reportTemplate\":111600,\"emailList\":\"xyz@xyz.com\",\"schedule\":\"DAILY\",\"startdate\":null,\"isReoccuring\":true,\"datasource\":\"\",\"asseementreportdisplayname\":\"Report_test\",\"emailDetails\":null}";
-	String assessmentReportImmediate = "{\"reportName\":\"workflow_immmediate_test\",\"asseementreportdisplayname\":\"Report_immmediate_test\",\"reportTemplate\":111600,\"emailList\":\"xyz@xyz.com\",\"schedule\":\"DAILY\",\"startdate\":null,\"isReoccuring\":true,\"datasource\":\"\",\"emailDetails\":null}";
+	String assessmentReport = "{\"reportName\":\"workflow_test\",\"reportTemplate\":" + reportId + ",\"emailList\":\"xyz@xyz.com\",\"schedule\":\"DAILY\",\"startdate\":null,\"isReoccuring\":true,\"datasource\":\"\",\"asseementreportdisplayname\":\"Report_test\",\"emailDetails\":null}";
+	String assessmentReportFail = "{\"reportName\":\"workflow_fail_test\",\"reportTemplate\":" + reportId + ",\"emailList\":\"xyz@xyz.com\",\"schedule\":\"DAILY\",\"startdate\":null,\"isReoccuring\":false,\"datasource\":\"\",\"asseementreportdisplayname\":\"Report_test\",\"emailDetails\":null}";
+	String assessmentReportWith2Task = "{\"reportName\":\"workflow_test_with2Task\",\"reportTemplate\":" + reportId + ",\"emailList\":\"xyz@xyz.com\",\"schedule\":\"DAILY\",\"startdate\":null,\"isReoccuring\":true,\"datasource\":\"\",\"asseementreportdisplayname\":\"Report_test\",\"emailDetails\":null}";
+	String reportWithWrongTask = "{\"reportName\":\"workflow_test_wrongTask\",\"reportTemplate\":" + reportId + ",\"emailList\":\"xyz@xyz.com\",\"schedule\":\"DAILY\",\"startdate\":null,\"isReoccuring\":false,\"datasource\":\"\",\"asseementreportdisplayname\":\"Report_test\",\"emailDetails\":null}";
+	String assessmentReportTest = "{\"reportName\":\"workflow_testing\",\"reportTemplate\":" + reportId + ",\"emailList\":\"xyz@xyz.com\",\"schedule\":\"DAILY\",\"startdate\":null,\"isReoccuring\":true,\"datasource\":\"\",\"asseementreportdisplayname\":\"Report_test\",\"emailDetails\":null}";
+	String assessmentReportImmediate = "{\"reportName\":\"workflow_immmediate_test\",\"asseementreportdisplayname\":\"Report_immmediate_test\",\"reportTemplate\":" + reportId + ",\"emailList\":\"xyz@xyz.com\",\"schedule\":\"DAILY\",\"startdate\":null,\"isReoccuring\":true,\"datasource\":\"\",\"emailDetails\":null}";
 
 	public static String workflowId = WorkflowTaskEnum.WorkflowType.REPORT.getValue() + "_" + "1234567";
 	public static String failWorkflowId = WorkflowTaskEnum.WorkflowType.REPORT.getValue() + "_" + "123456789";

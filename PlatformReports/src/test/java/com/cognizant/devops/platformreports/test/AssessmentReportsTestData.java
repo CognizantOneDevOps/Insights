@@ -64,23 +64,28 @@ public class AssessmentReportsTestData {
 	ClassLoader classLoader = ClassLoader.getSystemClassLoader();
 	ReportConfigDAL reportConfigDAL = new ReportConfigDAL();
 	WorkflowDAL workflowDAL = new WorkflowDAL();
+	
+	int reportIdProdRT = 300600;
+	int reportIdSonarRT = 300601;
+	int reportIdkpiRT = 300602;
+	int reportIdkpisRT = 300603;
 
 	String taskKpiExecution = "{\"description\":\"TEST.REPORT_KPI_Execute\",\"mqChannel\":\"TEST.WORKFLOW.TASK.KPI.EXCECUTION\",\"componentName\":\"com.cognizant.devops.platformreports.assessment.core.ReportKPISubscriber\",\"dependency\":1,\"workflowType\":\"Report\"}";
 	String taskPDFExecution = "{\"description\":\"TEST.REPORT_PDF_Execute\",\"mqChannel\":\"TEST.WORKFLOW.TASK.PDF.EXCECUTION\",\"componentName\":\"com.cognizant.devops.platformreports.assessment.core.PDFExecutionSubscriber\",\"dependency\":2,\"workflowType\":\"Report\"}";
 	String taskEmailExecution = "{\"description\":\"TEST.REPORT_EMAIL_Execute\",\"mqChannel\":\"TEST.WORKFLOW.TASK.EMAIL.EXCECUTION\",\"componentName\":\"com.cognizant.devops.platformreports.assessment.core.ReportEmailSubscriber\",\"dependency\":3,\"workflowType\":\"Report\"}";
 
-	String reportTemplatekpi = "{\"reportId\":\"111605\",\"reportName\":\"Testing_fail\",\"description\":\"Testing\",\"isActive\":true,\"file\":\"REPORT_JENKINS_TEST\",\"visualizationutil\":\"Fusion\",\"kpiConfigs\":[{\"kpiId\":100127,\"visualizationConfigs\":[{\"vType\":\"mscolumn2d_100127\",\"vQuery\":\"MATCH (n:KPI:RESULTS) where n.reportId = 602 and n.kpiId=127 RETURN n.SPKendTime as SPKendTime , n.MaxBuildTime as MaxBuildTime LIMIT 5\"}]}]}";
-	String reportTemplatekpis = "{\"reportId\":\"111606\",\"reportName\":\"Testing_fail_queries\",\"description\":\"Testing_queries\",\"isActive\":true,\"file\":\"\",\"visualizationutil\":\"Fusion\",\"kpiConfigs\":[{\"kpiId\":100161,\"visualizationConfigs\":[{\"vType\":\"100161_line\",\"vQuery\":\"\"}]},{\"kpiId\":100153,\"visualizationConfigs\":[{\"vType\":\"100153_line\",\"vQuery\":\"\"}]}]}";
+	String reportTemplatekpi = "{\"reportName\":\"Testing_fail\",\"description\":\"Testing\",\"isActive\":true,\"visualizationutil\":\"FUSION\",\"kpiConfigs\":[{\"kpiId\":100127,\"visualizationConfigs\":[{\"vType\":\"mscolumn2d_100127\",\"vQuery\":\"MATCH (n:KPI:RESULTS) where n.reportId = 602 and n.kpiId=127 RETURN n.SPKendTime as SPKendTime , n.MaxBuildTime as MaxBuildTime LIMIT 5\"}]}]}";
+	String reportTemplatekpis = "{\"reportName\":\"Testing_fail_queries\",\"description\":\"Testing_queries\",\"isActive\":true,\"visualizationutil\":\"FUSION\",\"kpiConfigs\":[{\"kpiId\":100161,\"visualizationConfigs\":[{\"vType\":\"100161_line\",\"vQuery\":\"\"}]},{\"kpiId\":100153,\"visualizationConfigs\":[{\"vType\":\"100153_line\",\"vQuery\":\"\"}]}]}";
 
 	JsonObject reportTemplateJson = new JsonParser().parse(reportTemplatekpi).getAsJsonObject();
 	JsonObject reportTemplateKpisJson = new JsonParser().parse(reportTemplatekpis).getAsJsonObject();
 
-	String assessmentReportWithEmail = "{\"reportName\":\"report_Email_test10002154\",\"reportTemplate\":300600,\"emailList\":\"abc@abc.com\",\"schedule\":\"BI_WEEKLY_SPRINT\",\"startdate\":\"2020-05-12T00:00:00Z\",\"isReoccuring\":true,\"datasource\":\"\",\"emailDetails\": {\"senderEmailAddress\":\"abc@abc.com\",\"receiverEmailAddress\":\"abcd@abcd.com\",\"receiverCCEmailAddress\":\"sb@sb.com\",\"receiverBCCEmailAddress\":\"sb@sb.com\",\"mailSubject\":\"Sub_mail\",\"mailBodyTemplate\":\"sending a mail for report\"},\"asseementreportdisplayname\":\"Report_test\"}";
-	String assessmentReportWithoutEmail = "{\"reportName\":\"report_test100021548\",\"reportTemplate\":300600,\"emailList\":\"abc@abc.com\",\"schedule\":\"BI_WEEKLY_SPRINT\",\"startdate\":\"2020-05-12T00:00:00Z\",\"isReoccuring\":true,\"datasource\":\"\",\"asseementreportdisplayname\":\"Report_test\",\"emailDetails\":null}";
-	String assessmentReportFail = "{\"reportName\":\"report_test_Sonar100064032\",\"asseementreportdisplayname\":\"ReportWeek\",\"reportTemplate\":300603,\"emailList\":\"abc@abc.com\",\"schedule\":\"QUARTERLY\",\"startdate\":null,\"isReoccuring\":true,\"datasource\":\"\",\"asseementreportdisplayname\":\"Report_test\",\"emailDetails\":null}";
-	String assessmentReportWrongkpi = "{\"reportName\":\"report_test_10083556935\",\"asseementreportdisplayname\":\"ReportWeek\",\"reportTemplate\":111605,\"emailList\":\"abc@abc.com\",\"schedule\":\"MONTHLY\",\"startdate\":null,\"isReoccuring\":true,\"datasource\":\"\",\"asseementreportdisplayname\":\"Report_test\",\"emailDetails\":null}";
-	String assessmentReportWrongkpis = "{\"reportName\":\"report_test_10083563542\",\"asseementreportdisplayname\":\"ReportWeek\",\"reportTemplate\":111606,\"emailList\":\"abc@abc.com\",\"schedule\":\"MONTHLY\",\"startdate\":null,\"isReoccuring\":true,\"datasource\":\"\",\"asseementreportdisplayname\":\"Report_test\",\"emailDetails\":null}";
-	String assessmentReport = "{\"reportName\":\"report_test100021547\",\"reportTemplate\":300600,\"emailList\":\"abc@abc.com\",\"schedule\":\"BI_WEEKLY_SPRINT\",\"startdate\":\"2020-05-12T00:00:00Z\",\"isReoccuring\":true,\"datasource\":\"\",\"emailDetails\":null,\"asseementreportdisplayname\":\"Report_test\"}";
+	String assessmentReportWithEmail = "{\"reportName\":\"report_Email_test10002154\",\"reportTemplate\":" + reportIdProdRT + ",\"emailList\":\"abc@abc.com\",\"schedule\":\"BI_WEEKLY_SPRINT\",\"startdate\":\"2020-05-12T00:00:00Z\",\"isReoccuring\":true,\"datasource\":\"\",\"emailDetails\": {\"senderEmailAddress\":\"abc@abc.com\",\"receiverEmailAddress\":\"abcd@abcd.com\",\"receiverCCEmailAddress\":\"sb@sb.com\",\"receiverBCCEmailAddress\":\"sb@sb.com\",\"mailSubject\":\"Sub_mail\",\"mailBodyTemplate\":\"sending a mail for report\"},\"asseementreportdisplayname\":\"Report_test\"}";
+	String assessmentReportWithoutEmail = "{\"reportName\":\"report_test100021548\",\"reportTemplate\":" + reportIdProdRT + ",\"emailList\":\"abc@abc.com\",\"schedule\":\"BI_WEEKLY_SPRINT\",\"startdate\":\"2020-05-12T00:00:00Z\",\"isReoccuring\":true,\"datasource\":\"\",\"asseementreportdisplayname\":\"Report_test\",\"emailDetails\":null}";
+	String assessmentReportFail = "{\"reportName\":\"report_test_Sonar100064032\",\"asseementreportdisplayname\":\"ReportWeek\",\"reportTemplate\":" + reportIdSonarRT + ",\"emailList\":\"abc@abc.com\",\"schedule\":\"QUARTERLY\",\"startdate\":null,\"isReoccuring\":true,\"datasource\":\"\",\"asseementreportdisplayname\":\"Report_test\",\"emailDetails\":null}";
+	String assessmentReportWrongkpi = "{\"reportName\":\"report_test_10083556935\",\"asseementreportdisplayname\":\"ReportWeek\",\"reportTemplate\":" + reportIdkpiRT + ",\"emailList\":\"abc@abc.com\",\"schedule\":\"MONTHLY\",\"startdate\":null,\"isReoccuring\":true,\"datasource\":\"\",\"asseementreportdisplayname\":\"Report_test\",\"emailDetails\":null}";
+	String assessmentReportWrongkpis = "{\"reportName\":\"report_test_10083563542\",\"asseementreportdisplayname\":\"ReportWeek\",\"reportTemplate\":" + reportIdkpisRT + ",\"emailList\":\"abc@abc.com\",\"schedule\":\"MONTHLY\",\"startdate\":null,\"isReoccuring\":true,\"datasource\":\"\",\"asseementreportdisplayname\":\"Report_test\",\"emailDetails\":null}";
+	String assessmentReport = "{\"reportName\":\"report_test100021547\",\"reportTemplate\":" + reportIdProdRT + ",\"emailList\":\"abc@abc.com\",\"schedule\":\"BI_WEEKLY_SPRINT\",\"startdate\":\"2020-05-12T00:00:00Z\",\"isReoccuring\":true,\"datasource\":\"\",\"emailDetails\":null,\"asseementreportdisplayname\":\"Report_test\"}";
 
 	String mqChannelKpiExecution = "TEST.WORKFLOW.TASK.KPI.EXCECUTION";
 	String mqChannelPDFExecution = "TEST.WORKFLOW.TASK.PDF.EXCECUTION";
@@ -135,15 +140,17 @@ public class AssessmentReportsTestData {
 		}
 	}
 
-	public void readReportTempFileAndSave(String fileName) throws IOException {
+	public int readReportTempFileAndSave(String fileName, int reportID) throws IOException {
+		int reportId = 0;
 		try {
 			File reportTempFile = new File(classLoader.getResource(fileName).getFile());
 			String reportTempJson = new String(Files.readAllBytes(reportTempFile.toPath()));
-			int reportId = saveReportTemplate(reportTempJson);
+			reportId = saveReportTemplate(reportTempJson, reportID);
 			reportIdList.add(reportId);
 		} catch (IOException e) {
 			log.error(e);
 		}
+		return reportId;
 	}
 
 	public String readNeo4jData(String query) {
@@ -257,25 +264,26 @@ public class AssessmentReportsTestData {
 		return taskId;
 	}
 
-	public int saveReportTemplate(String reportTemplate) {
+	public int saveReportTemplate(String reportTemplate, int reportID) {
+		int reportId = 0;
 		JsonObject reportJson = new JsonParser().parse(reportTemplate).getAsJsonObject();
 		Set<InsightsReportsKPIConfig> reportsKPIConfigSet = new HashSet<>();
-		int reportId = reportJson.get("reportId").getAsInt();
 		try {
+			//reportId = (int) (System.currentTimeMillis() / 1000);
+			reportId = reportID;
+			String reportName = reportJson.get("reportName").getAsString();
 			InsightsAssessmentReportTemplate reportEntity = (InsightsAssessmentReportTemplate) reportConfigDAL
-					.getActiveReportTemplateByReportId(reportId);
+					.getActiveReportTemplateByName(reportName);
 			if (reportEntity == null) {
-				String reportName = reportJson.get("reportName").getAsString();
 				boolean isActive = reportJson.get("isActive").getAsBoolean();
 				String description = reportJson.get("description").getAsString();
-				String file = reportJson.get("file").getAsString();
 				String visualizationutil = reportJson.get("visualizationutil").getAsString();
 				reportEntity = new InsightsAssessmentReportTemplate();
 				reportEntity.setReportId(reportId);
 				reportEntity.setActive(isActive);
 				reportEntity.setDescription(description);
 				reportEntity.setTemplateName(reportName);
-				reportEntity.setFile(file);
+				reportEntity.setFile(reportName);
 				reportEntity.setVisualizationutil(visualizationutil);
 				JsonArray kpiConfigArray = reportJson.get("kpiConfigs").getAsJsonArray();
 				for (JsonElement eachKpiConfig : kpiConfigArray) {

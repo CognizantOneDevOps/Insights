@@ -66,7 +66,7 @@ public class WorkflowTest extends WorkflowTestData {
 		saveWorkflowTask(wrongWorkflowTask);
 
 		// save report template in db
-		saveReportTemplate(reportTemplate);
+		reportId = saveReportTemplate(reportTemplate);
 
 		// save assessment reports in db
 		saveAssessmentReport(workflowId, mqChannel, assessmentReport, null);
@@ -267,7 +267,7 @@ public class WorkflowTest extends WorkflowTestData {
 
 		// delete report template
 		try {
-			reportConfigDAL.deleteReportTemplatebyReportID(reportTemplateJson.get("reportId").getAsInt());
+			reportConfigDAL.deleteReportTemplatebyReportID(reportId);
 		} catch (Exception e) {
 			log.error(e);
 		}

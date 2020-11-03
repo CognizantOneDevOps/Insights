@@ -1,9 +1,7 @@
 {
-   "reportId":"300603",
    "reportName":"Report_SONAR",
    "description":"Kpis for sonar only",
    "isActive":true,
-   "file":"REPORT_SONAR",
    "visualizationutil":"Fusion",
    "kpiConfigs":[
       {

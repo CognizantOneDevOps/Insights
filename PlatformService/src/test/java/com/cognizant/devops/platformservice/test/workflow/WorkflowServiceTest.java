@@ -27,6 +27,7 @@ import org.testng.annotations.AfterTest;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 
+import com.cognizant.devops.platformcommons.config.ApplicationConfigCache;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformdal.assessmentreport.InsightsAssessmentConfiguration;
 import com.cognizant.devops.platformdal.assessmentreport.ReportConfigDAL;
@@ -52,6 +53,7 @@ public class WorkflowServiceTest extends WorkflowServiceTestData {
 
 	@BeforeTest
 	public void prepareData() throws InsightsCustomException {
+		ApplicationConfigCache.loadConfigCache();
 		// save kpi
 		try {
 			int response = assessmentService.saveKpiDefinition(registerkpiWorkflowJson);
@@ -60,7 +62,7 @@ public class WorkflowServiceTest extends WorkflowServiceTestData {
 		}
 
 		try {
-			int reportId = assessmentService.saveTemplateReport(reportTemplateWorkflowJson);
+			reportId = assessmentService.saveTemplateReport(reportTemplateWorkflowJson);
 		} catch (Exception e) {
 			log.error("Error preparing data at WorkflowServiceTest Report template record ", e);
 		}
@@ -78,7 +80,7 @@ public class WorkflowServiceTest extends WorkflowServiceTestData {
 			Assert.assertNotNull(emailtask);
 			taskID = task.getTaskId();
 			emailTaskID = emailtask.getTaskId();
-			String dailyAssessmentReportWorkflow = "{\"reportName\":\"Daily_Deployment_Workflow\",\"reportTemplate\":123456,\"emailList\":\"fdfsfsdfs\",\"schedule\":\"DAILY\",\"startdate\":null,\"isReoccuring\":true,\"datasource\":\"\",\"tasklist\":[{\"taskId\":"
+			String dailyAssessmentReportWorkflow = "{\"reportName\":\"Daily_Deployment_Workflow\",\"reportTemplate\":" + reportId + ",\"emailList\":\"fdfsfsdfs\",\"schedule\":\"DAILY\",\"startdate\":null,\"isReoccuring\":true,\"datasource\":\"\",\"tasklist\":[{\"taskId\":"
 					+ taskID
 					+ ",\"sequence\":0}],\"asseementreportdisplayname\":\"Report_test\",\"emailDetails\":null}";
 			dailyAssessmentReportWorkflowJson = convertStringIntoJson(dailyAssessmentReportWorkflow);
@@ -192,7 +194,7 @@ public class WorkflowServiceTest extends WorkflowServiceTestData {
 
 		// Delete Report Templates
 		try {
-			reportConfigDAL.deleteReportTemplatebyReportID(reportTemplateWorkflowJson.get("reportId").getAsInt());
+			reportConfigDAL.deleteReportTemplatebyReportID(reportId);
 		} catch (Exception e) {
 			log.error("Error cleaning data up at WorkflowServiceTest Report template ", e);
 		}

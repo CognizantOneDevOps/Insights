@@ -27,6 +27,7 @@ import org.hibernate.query.Query;
 import org.hibernate.type.StandardBasicTypes;
 
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
+import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformdal.assessmentreport.InsightsEmailTemplates;
 import com.cognizant.devops.platformdal.assessmentreport.InsightsReportVisualizationContainer;
 import com.cognizant.devops.platformdal.core.BaseDAL;
@@ -778,8 +779,9 @@ public class WorkflowDAL extends BaseDAL {
 	 * 
 	 * @param workflowId
 	 * @return String
+	 * @throws InsightsCustomException 
 	 */
-	public String deleteEmailTemplateByWorkflowId(String workflowId) {
+	public String deleteEmailTemplateByWorkflowId(String workflowId) throws InsightsCustomException {
 		try {
 			getSession().beginTransaction();
 			Query<InsightsEmailTemplates> createQuery = getSession().createQuery(
@@ -789,13 +791,14 @@ public class WorkflowDAL extends BaseDAL {
 			List<InsightsEmailTemplates> executionRecords = createQuery.getResultList();
 			for (InsightsEmailTemplates insightsEmailTemplates : executionRecords) {
 				getSession().delete(insightsEmailTemplates);
-				getSession().getTransaction().commit();
+				//getSession().getTransaction().commit();
 			}
+			getSession().getTransaction().commit();
 			terminateSession();
 			terminateSessionFactory();
 			return PlatformServiceConstants.SUCCESS;
 		} catch (Exception e) {
-			return null;
+			throw new InsightsCustomException("Error while deleting email template, Please check log for detail  ");
 		} finally {
 			terminateSession();
 			terminateSessionFactory();

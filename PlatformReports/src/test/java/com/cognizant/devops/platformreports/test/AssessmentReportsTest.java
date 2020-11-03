@@ -55,10 +55,10 @@ public class AssessmentReportsTest extends AssessmentReportsTestData {
 		readContentFileAndSave("ContentsConfiguration.json");
 
 		// save report template in db
-		readReportTempFileAndSave("REPORT_SONAR_JENKINS_PROD_RT.json");
-		readReportTempFileAndSave("REPORT_SONAR_RT.json");
-		saveReportTemplate(reportTemplatekpi);
-		saveReportTemplate(reportTemplatekpis);
+		readReportTempFileAndSave("REPORT_SONAR_JENKINS_PROD_RT.json", reportIdProdRT);
+		readReportTempFileAndSave("REPORT_SONAR_RT.json", reportIdSonarRT);
+		saveReportTemplate(reportTemplatekpi, reportIdkpiRT);
+		saveReportTemplate(reportTemplatekpis, reportIdkpisRT);
 
 		// save workflow task in db
 		saveWorkflowTask(taskKpiExecution);
@@ -267,7 +267,7 @@ public class AssessmentReportsTest extends AssessmentReportsTestData {
 		}
 	}
 
-	@Test(priority = 12)
+	@Test(priority = 13)
 	public void testSaveInsightsEmailExecutionHistory() throws InterruptedException, InsightsCustomException {
 		try {
 			InsightsWorkflowConfiguration workflowConfig = workflowDAL
@@ -281,7 +281,7 @@ public class AssessmentReportsTest extends AssessmentReportsTestData {
 		}
 	}
 
-	@Test(priority = 13)
+	@Test(priority = 14)
 	public void testPDFRecordInEmailExecutionHistory() throws InterruptedException, InsightsCustomException {
 		try {
 			InsightsWorkflowConfiguration workflowConfig = workflowDAL
@@ -327,12 +327,12 @@ public class AssessmentReportsTest extends AssessmentReportsTestData {
 			}
 		}
 		try {
-			reportConfigDAL.deleteReportTemplatebyReportID(reportTemplateJson.get("reportId").getAsInt());
+			reportConfigDAL.deleteReportTemplatebyReportID(reportIdkpiRT);
 		} catch (Exception e) {
 			log.error(e);
 		}
 		try {
-			reportConfigDAL.deleteReportTemplatebyReportID(reportTemplateKpisJson.get("reportId").getAsInt());
+			reportConfigDAL.deleteReportTemplatebyReportID(reportIdkpisRT);
 		} catch (Exception e) {
 			log.error(e);
 		}
