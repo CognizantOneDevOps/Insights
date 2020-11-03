@@ -607,4 +607,14 @@ public class InsightsUtils {
 		}
 		return duration;
 	}
+	
+	/**
+	 * Converts Epoch date in seconds to required format.
+	 * @param date
+	 * @return 
+	 */
+	public static String epochToDateFormat(long date, String format) {
+		LocalDateTime utcTime=ZonedDateTime.ofInstant(Instant.ofEpochSecond(date), zoneIdUTC).toLocalDateTime();
+		return utcTime.format(DateTimeFormatter.ofPattern(format));
+	}
 }

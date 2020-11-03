@@ -19,7 +19,6 @@ package com.cognizant.devops.platformreports.assessment.core;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -30,10 +29,14 @@ import org.apache.logging.log4j.Logger;
 
 import com.cognizant.devops.platformauditing.api.InsightsAuditImpl;
 import com.cognizant.devops.platformauditing.util.AuditServiceUtil;
+import com.cognizant.devops.platformauditing.util.RestructureDataUtil;
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
 import com.cognizant.devops.platformcommons.core.enums.WorkflowTaskEnum;
 import com.cognizant.devops.platformcommons.core.util.InsightsUtils;
 import com.cognizant.devops.platformcommons.core.util.ValidationUtils;
+import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBHandler;
+import com.cognizant.devops.platformcommons.dal.neo4j.GraphResponse;
+import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformdal.assessmentreport.InsightsReportsKPIConfig;
 import com.cognizant.devops.platformdal.workflow.InsightsWorkflowConfiguration;
 import com.cognizant.devops.platformdal.workflow.WorkflowDAL;
@@ -53,6 +56,8 @@ import com.google.gson.JsonSyntaxException;
 public class HyperLedgerExecutionSubscriber extends WorkflowTaskSubscriberHandler{
 
 	private static Logger log = LogManager.getLogger(HyperLedgerExecutionSubscriber.class.getName());
+	
+	private static final String ASSET_ID = "AssetID";
 	
 	private WorkflowDAL workflowDAL = new WorkflowDAL();
 	private InsightsWorkflowConfiguration workflowConfig = new InsightsWorkflowConfiguration();
@@ -88,8 +93,8 @@ public class HyperLedgerExecutionSubscriber extends WorkflowTaskSubscriberHandle
 				endDate = startDateEpoch;
 			}
 			log.debug("Worlflow Detail ==== startDate & endDate in Epoch {} {}", startDate, endDate);
-			String ledgerStartDate = epochToLedgerDate(startDate);
-			String ledgerEndDate = epochToLedgerDate(endDate);
+			String ledgerStartDate = InsightsUtils.epochToDateFormat(startDate, "yyyy-MM-dd");
+			String ledgerEndDate = InsightsUtils.epochToDateFormat(endDate, "yyyy-MM-dd");
 			log.debug("Worlflow Detail ==== ledgerStartDate & ledgerEndDate {} {}", ledgerStartDate, ledgerEndDate);
 			prepareAssestmentDTO(incomingTaskMessageJson);
 			List<JsonObject> ledgerList = fetchLedgerRecords(ledgerStartDate, ledgerEndDate);
@@ -115,25 +120,70 @@ public class HyperLedgerExecutionSubscriber extends WorkflowTaskSubscriberHandle
 	 * @param ledgerStartDate
 	 * @param ledgerEndDate
 	 * @return
+	 * @throws InsightsCustomException 
 	 * @throws JsonSyntaxException
 	 */
-	private List<JsonObject> fetchLedgerRecords(String ledgerStartDate,String ledgerEndDate){
+	private List<JsonObject> fetchLedgerRecords(String ledgerStartDate,String ledgerEndDate) throws InsightsCustomException{
 		String toolName;
+		String dbQuery;
+		String assets = null;
 		List<JsonObject> ledgerList = new ArrayList<>();
 		
 		Set<InsightsReportsKPIConfig> kpiconfig = workflowConfig.getAssessmentConfig().getReportTemplateEntity().getReportsKPIConfig();
 		for (InsightsReportsKPIConfig insightsReportsKPIConfig : kpiconfig) {
 			toolName = insightsReportsKPIConfig.getKpiConfig().getToolname();
-			String assets = insightsAuditImpl.getAllAssets(ledgerStartDate,ledgerEndDate, toolName);
-			log.debug("Worlflow Detail ==== result {} ", assets);
-			JsonParser jsonParser = new JsonParser();
-			JsonElement msgData = jsonParser.parse(assets);
-			JsonArray msgArray = msgData.getAsJsonObject().get("msg").getAsJsonArray();
-			
-			fetchAssetHistory(msgArray, ledgerList);
-			
+			dbQuery = insightsReportsKPIConfig.getKpiConfig().getdBQuery();
+			if(dbQuery.isEmpty()) {
+				assets = insightsAuditImpl.getAllAssets(ledgerStartDate,ledgerEndDate, toolName);
+				log.debug("Worlflow Detail ==== result {} ", assets);
+				JsonParser jsonParser = new JsonParser();
+				JsonElement msgData = jsonParser.parse(assets);
+				JsonArray msgArray = msgData.getAsJsonObject().get("msg").getAsJsonArray();
+				fetchAssetHistory(msgArray, ledgerList, false);
+				
+			}else {
+				getLedgerRecordsByAssetID(dbQuery, ledgerList);
+			}
 		}
 		return ledgerList;
+	}
+
+	/**
+	 * If KPi Contains dbQuery fetch records from neo4j then get asset history for each records returned by neo4j.
+	 * @param dbQuery
+	 * @param ledgerList 
+	 * @throws InsightsCustomException
+	 */
+	private void getLedgerRecordsByAssetID(String dbQuery, List<JsonObject> ledgerList) throws InsightsCustomException {
+		GraphDBHandler dbHandler = new GraphDBHandler();
+		GraphResponse cypherResponse = dbHandler.executeCypherQuery(dbQuery);
+		JsonArray dataArray = cypherResponse.getJson()
+				.get("results").getAsJsonArray().get(0).getAsJsonObject()
+				.get("data").getAsJsonArray();
+		for(int i=0;i<dataArray.size();i++) {
+			JsonArray rowArray = dataArray.get(i).getAsJsonObject()
+					.get("row").getAsJsonArray();
+
+			for(JsonElement element : rowArray) {
+				log.debug("Fetching Massage data for == {} ",element.getAsJsonObject());
+				RestructureDataUtil restructureDataUtil = new RestructureDataUtil();
+				JsonObject msgData = restructureDataUtil.masssageData(element.getAsJsonObject());
+				log.debug("Massaged Data  === {}",msgData);
+
+				for (Map.Entry<String, JsonElement> property : msgData.entrySet()) {
+					if(property.getKey().contains(ASSET_ID)){
+						String assetId = msgData.get(property.getKey()).getAsString();
+						log.debug("AssetID === {} ",assetId);
+						String ledgerresponse = insightsAuditImpl.getAssetHistory(assetId);
+						log.debug("Ledgerresponse from couch === {} ",ledgerresponse);
+						JsonParser jsonParser = new JsonParser();
+						JsonElement data = jsonParser.parse(ledgerresponse);
+						JsonArray msgArray = data.getAsJsonObject().get("msg").getAsJsonArray();
+						fetchAssetHistory(msgArray, ledgerList, true);
+					}
+				}
+			}
+		}
 	}
 	
 	private void prepareAssestmentDTO(JsonObject incomingTaskMessage)
@@ -161,13 +211,14 @@ public class HyperLedgerExecutionSubscriber extends WorkflowTaskSubscriberHandle
 	 * Fetch AssetHistory for each assetId.
 	 * @param msgArray
 	 * @param ledgerList
+	 * @param byTool 
 	 */
-	private void fetchAssetHistory(JsonArray msgArray, List<JsonObject> ledgerList) {
+	private void fetchAssetHistory(JsonArray msgArray, List<JsonObject> ledgerList, boolean byTool) {
 		log.debug("Worlflow Detail ==== fetchAssetHistory ledgerList {} ",ledgerList);
 		for(JsonElement element : msgArray) {
-			JsonObject assetObj = element.getAsJsonObject();
+			JsonObject assetObj = byTool ? element.getAsJsonObject().get("Value").getAsJsonObject():element.getAsJsonObject();
 			for (Map.Entry<String, JsonElement> property : assetObj.entrySet()) {
-				if(property.getKey().contains("AssetID")){
+				if(property.getKey().contains(ASSET_ID)){
 					String assetId = assetObj.get(property.getKey()).getAsString();
 					log.debug("Worlflow Detail ==== fetchAssetHistory assetId {} ",assetId);
 					String assetHistory = insightsAuditImpl.getAssetHistory(assetId);
@@ -205,14 +256,6 @@ public class HyperLedgerExecutionSubscriber extends WorkflowTaskSubscriberHandle
 		}
 	}
 
-	/**
-	 * Converts Epoch date to Ledger(yyyy-MM-dd) required format.
-	 * @param date
-	 * @return 
-	 */
-	private String epochToLedgerDate(long date) {
-		return new SimpleDateFormat("yyyy-MM-dd").format(date * 1000);
-	}
 	
 	/* Addition of assetId key for pdf report.
 	 * @param ledgerresponse
@@ -230,7 +273,7 @@ public class HyperLedgerExecutionSubscriber extends WorkflowTaskSubscriberHandle
 			for(int i=0;i<dataArray.size();i++) {
 				JsonObject rowObject = jsonObject.getAsJsonArray("data").get(i).getAsJsonObject();
 				for (Map.Entry<String, JsonElement> property : rowObject.entrySet()) {
-					if(property.getKey().contains("AssetID")){
+					if(property.getKey().contains(ASSET_ID)){
 						assetId = rowObject.get(property.getKey()).getAsString();
 					}
 				}
