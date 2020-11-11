@@ -40,7 +40,7 @@ export class KpiCreationComponent implements OnInit {
 
   ngOnInit() {
     this.getAllActiveKpi();
-    this.displayedColumns = ['radio', 'KpiId', 'KpiName', 'ToolName', 'GroupName', 'Category'];
+    this.displayedColumns = ['radio', 'KpiId', 'KpiName', 'ToolName', 'GroupName', 'Category', 'ResultField'];
     this.kpiService.fileUploadSubject.subscribe(res => {
       if (res === 'REFRESH') {
         this.getAllActiveKpi();
@@ -81,6 +81,9 @@ export class KpiCreationComponent implements OnInit {
         "dataSource": this.selectedKpi.datasource,
         "dbQuery": this.selectedKpi.dBQuery,
         "isActive": this.selectedKpi.isActive,
+        "resultField": this.selectedKpi.resultField,
+        "outputDatasource": this.selectedKpi.outputDatasource,
+        "usecase": this.selectedKpi.usecase
       }
     };
 

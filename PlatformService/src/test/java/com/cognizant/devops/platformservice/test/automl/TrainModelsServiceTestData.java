@@ -94,7 +94,7 @@ public class TrainModelsServiceTestData {
 		File useCasecsvFile = new File(usecaseCSVFilePath);
 		JsonObject extractedData = getHeaders(useCasecsvFile, usecase);
 		uploadData(extractedData.getAsJsonArray("Contents"), usecase, autoMlConfig.getConfigJson());
-		String splitFrameResponse = h2oApiCommunicator.splitFrameNew(usecase, 0.8);
+		String splitFrameResponse = h2oApiCommunicator.splitFrame(usecase, 0.8);
 		JsonObject responseJson = new JsonParser().parse(splitFrameResponse).getAsJsonObject();
 		JsonArray destinationFrames = responseJson.get("destination_frames").getAsJsonArray();
 		String trainingFrame = destinationFrames.get(0).getAsJsonObject().get("name").getAsString();

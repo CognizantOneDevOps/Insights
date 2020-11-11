@@ -47,6 +47,8 @@ public class InsightsKPIConfigDTO implements Serializable {
 	private String datasource;
 	private String inputDatasource;
 	private String outputDatasource;
+	private String usecaseName;
+	private String mojoPath;
 	private long lastRunTime;
 	private long nextRunTime;
 	private long oneTimeReportStartTime;
@@ -220,5 +222,22 @@ public class InsightsKPIConfigDTO implements Serializable {
 	public void setOneTimeReportEndDate(long oneTimeReportEndDate) {
 		this.oneTimeReportEndDate = oneTimeReportEndDate;
 	}
+
+	public String getUsecaseName() {
+		return usecaseName;
+	}
+
+	public void setUsecaseName(String usecaseName) {
+		this.usecaseName = usecaseName;
+	}
+
+	public String getMojoPath() {
+		return mojoPath;
+	}
+
+	public void setMojoPath(String mojoPath) {
+		this.mojoPath = mojoPath;
+	}
+	
 	
 }

@@ -8,7 +8,9 @@
 		"DBQuery": "MATCH (n:JENKINS:DATA)  WHERE n.SPKstartTime >= {startTime} and n.SPKstartTime <= {endTime} and n.SPKvector = 'BUILD' and n.SPKstatus='Success' RETURN COALESCE(Avg(toInt(n.SPKduration)),0) as avgOutput",
 		"datasource": "NEO4J",
 		"isActive": true,
-		"resultField": "avgOutput"
+		"resultField": "avgOutput",
+		"usecase":"",
+		"outputDatasource":"NEO4J"
 	},
 	{
 		"kpiId": 231,
@@ -19,7 +21,9 @@
 		"DBQuery": "MATCH (n:JENKINS:DATA)WHERE n.SPKstartTime >= {startTime} and n.SPKstartTime <= {endTime} RETURN count(n) as TotalNumberBuild",
 		"datasource": "NEO4J",
 		"isActive": true,
-		"resultField": "TotalNumberBuild"
+		"resultField": "TotalNumberBuild",
+		"usecase":"",
+		"outputDatasource":"NEO4J"
 	},
 	{
 		"kpiId": 122,
@@ -30,7 +34,9 @@
 		"DBQuery": "MATCH (n:JENKINS:DATA) WHERE n.SPKstartTime >= {startTime} and n.SPKstartTime <= {endTime} and n.SPKstatus='Success' RETURN  count(n) as TotalNumberBuild",
 		"datasource": "NEO4J",
 		"isActive": true,
-		"resultField": "TotalNumberBuild"
+		"resultField": "TotalNumberBuild",
+		"usecase":"",
+		"outputDatasource":"NEO4J"
 	},
 	{
 		"kpiId": 124,
@@ -41,7 +47,9 @@
 		"DBQuery": "MATCH (n:JENKINS:DATA) WHERE n.SPKstartTime >= {startTime} and n.SPKstartTime <= {endTime} and n.SPKstatus='Failure' RETURN count(n) as TotalNumberBuild",
 		"datasource": "NEO4J",
 		"isActive": true,
-		"resultField": "TotalNumberBuild"
+		"resultField": "TotalNumberBuild",
+		"usecase":"",
+		"outputDatasource":"NEO4J"
 	},
 	{
 		"kpiId": 126,
@@ -52,7 +60,9 @@
 		"DBQuery": "MATCH (n:JENKINS:DATA) WHERE n.SPKstartTime >= {startTime} and n.SPKstartTime <= {endTime} and n.SPKvector = 'BUILD' and n.SPKstatus='Success' RETURN COALESCE(Max(toInt(n.SPKduration)),0) as MaxBuildTime",
 		"datasource": "NEO4J",
 		"isActive": true,
-		"resultField": "MaxBuildTime"
+		"resultField": "MaxBuildTime",
+		"usecase":"",
+		"outputDatasource":"NEO4J"
 	},
 	{
 		"kpiId": 128,
@@ -63,7 +73,9 @@
 		"DBQuery": "MATCH (n:JENKINS:DATA) WHERE  n.SPKstartTime >= {startTime} and n.SPKstartTime <= {endTime} and n.SPKvector = 'BUILD' and n.SPKstatus='Success' RETURN  COALESCE(Min(toInt(n.SPKduration)),0) as MinBuildTime",
 		"datasource": "NEO4J",
 		"isActive": true,
-		"resultField": "MinBuildTime"
+		"resultField": "MinBuildTime",
+		"usecase":"",
+		"outputDatasource":"NEO4J"
 	},
 	{
 		"kpiId": 233,
@@ -74,7 +86,9 @@
 		"DBQuery": "MATCH (n:RUNDECK:DATA) WHERE n.SPKstartTime >= {startTime} and n.SPKstartTime <= {endTime} and n.SPKvector = 'DEPLOYMENT' and n.SPKstatus='Success' RETURN COALESCE(round(Avg(toInt(n.SPKduration))),0) as averageDeploymentDuration",
 		"datasource": "NEO4J",
 		"isActive": true,
-		"resultField": "averageDeploymentDuration"
+		"resultField": "averageDeploymentDuration",
+		"usecase":"",
+		"outputDatasource":"NEO4J"
 	},
 	{
 		"kpiId": 140,
@@ -85,7 +99,9 @@
 		"DBQuery": "MATCH (n:RUNDECK:DATA) WHERE  n.SPKstartTime >= {startTime} and n.SPKstartTime <= {endTime} and n.SPKvector = 'DEPLOYMENT' AND n.SPKstatus='Failure' RETURN count(n.SPKstatus) as totalDeploymentCount",
 		"datasource": "NEO4J",
 		"isActive": true,
-		"resultField": "totalDeploymentCount"
+		"resultField": "totalDeploymentCount",
+		"usecase":"",
+		"outputDatasource":"NEO4J"
 	},
 	{
 		"kpiId": 243,
@@ -96,7 +112,9 @@
 		"DBQuery": "MATCH (n:RUNDECK:DATA) WHERE n.SPKstartTime >= {startTime} and n.SPKstartTime <= {endTime} and  n.SPKvector = 'DEPLOYMENT' and n.SPKstatus='Success' RETURN COALESCE(Max(toInt(n.SPKduration)),0) as MaxDeploymentTime",
 		"datasource": "NEO4J",
 		"isActive": true,
-		"resultField": "MaxDeploymentTime"
+		"resultField": "MaxDeploymentTime",
+		"usecase":"",
+		"outputDatasource":"NEO4J"
 	},
 	{
 		"kpiId": 142,
@@ -107,7 +125,9 @@
 		"DBQuery": "MATCH (n:RUNDECK:DATA) WHERE n.SPKstartTime >= {startTime} and n.SPKstartTime <= {endTime} and  n.SPKvector = 'DEPLOYMENT' and n.SPKstatus='Success' RETURN count(n.SPKstatus) as totalDeploymentCount",
 		"datasource": "NEO4J",
 		"isActive": true,
-		"resultField": "totalDeploymentCount"
+		"resultField": "totalDeploymentCount",
+		"usecase":"",
+		"outputDatasource":"NEO4J"
 	},
 	{
 		"kpiId": 144,
@@ -118,7 +138,9 @@
 		"DBQuery": "MATCH (n:RUNDECK:DATA) WHERE  n.SPKstartTime >= {startTime} and n.SPKstartTime <= {endTime} and n.SPKvector = 'DEPLOYMENT' and n.SPKstatus='Success' RETURN COALESCE(Min(toInt(n.SPKduration)),0) as MinDeploymentTime",
 		"datasource": "NEO4J",
 		"isActive": true,
-		"resultField": "MinDeploymentTime"
+		"resultField": "MinDeploymentTime",
+		"usecase":"",
+		"outputDatasource":"NEO4J"
 	},
 	{
 		"kpiId": 331,
@@ -129,7 +151,9 @@
 		"DBQuery": "MATCH (n:SONAR:DATA) where n.SPKstartTime >= {startTime} and n.SPKstartTime <= {endTime} and n.SPKstatus='Success' RETURN  COALESCE(round(Avg(toInt(n.SPKcomplexity))),0) as AvgComplexityCoverage",
 		"datasource": "NEO4J",
 		"isActive": true,
-		"resultField": "AvgComplexityCoverage"
+		"resultField": "AvgComplexityCoverage",
+		"usecase":"",
+		"outputDatasource":"NEO4J"
 	},
 	{
 		"kpiId": 131,
@@ -140,7 +164,9 @@
 		"DBQuery": "MATCH (n:SONAR:DATA) where n.SPKstartTime >= {startTime} and n.SPKstartTime <= {endTime} and n.SPKstatus='Success' RETURN  COALESCE(Avg(toInt(n.SPKduplication)),0) as AvgDuplicateBlocksCoverage",
 		"datasource": "NEO4J",
 		"isActive": true,
-		"resultField": "AvgDuplicateBlocksCoverage"
+		"resultField": "AvgDuplicateBlocksCoverage",
+		"usecase":"",
+		"outputDatasource":"NEO4J"
 	},
 	{
 		"kpiId": 101,
@@ -151,7 +177,9 @@
 		"DBQuery": "MATCH (n:SONAR:DATA) where n.SPKstartTime >= {startTime} and n.SPKstartTime <= {endTime} and n.SPKqualityGate='pass' RETURN count(n) as NumberOfQualityBlocks",
 		"datasource": "NEO4J",
 		"isActive": true,
-		"resultField": "NumberOfQualityBlocks"
+		"resultField": "NumberOfQualityBlocks",
+		"usecase":"",
+		"outputDatasource":"NEO4J"
 	},
 	{
 		"kpiId": 133,
@@ -162,7 +190,9 @@
 		"DBQuery": "MATCH (n:SONAR:DATA) where n.SPKstartTime >= {startTime} and n.SPKstartTime <= {endTime} and n.SPKqualityGate='fail' RETURN count(n) as NumberOfQualityBlocks",
 		"datasource": "NEO4J",
 		"isActive": true,
-		"resultField": "NumberOfQualityBlocks"
+		"resultField": "NumberOfQualityBlocks",
+		"usecase":"",
+		"outputDatasource":"NEO4J"
 	},
 	{
 		"kpiId": 236,
@@ -173,7 +203,8 @@
 		"DBQuery": "MATCH (n:SONAR:DATA) where n.SPKstartTime >= {startTime} and n.SPKstartTime <= {endTime} and n.SPKstatus='Success' RETURN  COALESCE(Avg(toInt(n.SPKcoverage)),0) as AvgCodeCoverage",
 		"datasource": "NEO4J",
 		"isActive": true,
-		"resultField": "AvgCodeCoverage"
+		"resultField": "AvgCodeCoverage","usecase":"",
+		"outputDatasource":"NEO4J"
 	},
 	{
 		"kpiId": 135,
@@ -184,7 +215,9 @@
 		"DBQuery": "MATCH (n:SONAR:DATA) where n.SPKstartTime >= {startTime} and n.SPKstartTime <= {endTime} and n.SPKstatus='Success' RETURN count(n) as NumberOfSonarExecutions",
 		"datasource": "NEO4J",
 		"isActive": true,
-		"resultField": "NumberOfSonarExecutions"
+		"resultField": "NumberOfSonarExecutions",
+		"usecase":"",
+		"outputDatasource":"NEO4J"
 	},
 	{
 		"kpiId": 137,
@@ -195,7 +228,9 @@
 		"DBQuery": "MATCH (n:SONAR:DATA) where n.SPKstartTime >= {startTime} and n.SPKstartTime <= {endTime} and n.SPKstatus='Failure' RETURN count(n) as NumberOfSonarExecutions",
 		"datasource": "NEO4J",
 		"isActive": true,
-		"resultField": "NumberOfSonarExecutions"
+		"resultField": "NumberOfSonarExecutions",
+		"usecase":"",
+		"outputDatasource":"NEO4J"
 	},
 	{
 		"kpiId": 149,
@@ -206,7 +241,9 @@
 		"DBQuery": "MATCH (n:JIRA:DATA) WHERE n.SPKstartTime >= {startTime} and n.SPKstartTime <= {endTime} and n.SPKissueType='Bug' RETURN count(n) as totalDefect",
 		"datasource": "NEO4J",
 		"isActive": true,
-		"resultField": "totalDefect"
+		"resultField": "totalDefect",
+		"usecase":"",
+		"outputDatasource":"NEO4J"
 	},
 	{
 		"kpiId": 161,
@@ -218,7 +255,9 @@
 		"DBQuery": "MATCH (n:JIRA:DATA) WHERE n.SPKstartTime >= {startTime} and n.SPKstartTime <= {endTime} and n.SPKissueType='Bug' and n.SPKstatus='Closed'  RETURN count(n) as ClosedDefect",
 		"datasource": "NEO4J",
 		"isActive": true,
-		"resultField": "ClosedDefect"
+		"resultField": "ClosedDefect",
+		"usecase":"",
+		"outputDatasource":"NEO4J"
 	},
 	{
 		"kpiId": 151,
@@ -229,7 +268,9 @@
 		"DBQuery": "MATCH (n:JIRA:DATA) WHERE n.SPKstartTime >= {startTime} and n.SPKstartTime <= {endTime} and n.SPKissueType='Bug' and n.SPKstatus='Open'  RETURN count(n) as OpenDefect",
 		"datasource": "NEO4J",
 		"isActive": true,
-		"resultField": "OpenDefect"
+		"resultField": "OpenDefect",
+		"usecase":"",
+		"outputDatasource":"NEO4J"
 	},
 	{
 		"kpiId": 153,
@@ -240,6 +281,8 @@
 		"DBQuery": "MATCH (n:JIRA:DATA) WHERE n.SPKstartTime >= {startTime} and n.SPKstartTime <= {endTime} and n.SPKissueType='Bug' and n.SPKstatus='Closed'  RETURN COALESCE(Avg(toInt(n.SPKduration)),0) as AvgDefectCompletionTime",
 		"datasource": "NEO4J",
 		"isActive": true,
-		"resultField": "AvgDefectCompletionTime"
+		"resultField": "AvgDefectCompletionTime",
+		"usecase":"",
+		"outputDatasource":"NEO4J"
 	}
 ]

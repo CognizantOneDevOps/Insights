@@ -4,6 +4,8 @@ import { BulkUploadService } from '../bulkupload/bulkupload.service';
 import { MessageDialogService } from '../application-dialog/message-dialog-service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { THIS_EXPR } from '@angular/compiler/src/output/output_ast';
+import { ModelManagementService } from '@insights/app/modules/model-management/model-management.service';
+
 
 @Component({
   selector: 'app-kpi-addition',
@@ -28,8 +30,18 @@ export class KpiAdditionComponent implements OnInit {
   type: string;
   kpiList: any;
   onEdit: boolean = false;
+  enableUsecase: boolean = false;
+  selectedUsecase: string = '';
+  usecaseDetails = [];
+  usecaseList = [];
+  usecaseResponse: any;
+  resultField: any;
+  isForecast: boolean = false;
+  outputDatasource = [];
+  dataSourceOutput: any;
 
-  constructor(public router: Router, public route: ActivatedRoute, public kpiService: KpiService, public messageDialog: MessageDialogService, private bulkuploadService: BulkUploadService) {
+  constructor(public router: Router, public route: ActivatedRoute, public kpiService: KpiService, public messageDialog: MessageDialogService, 
+    private bulkuploadService: BulkUploadService, public modelManagementService: ModelManagementService) {
   }
 
   ngOnInit() {
@@ -48,11 +60,23 @@ export class KpiAdditionComponent implements OnInit {
         this.dataSource = params.dataSource;
         this.dbQuery = params.dbQuery;
         this.isActive = params.isActive;
+        this.resultField = params.resultField;
+        this.dataSourceOutput = params.outputDatasource;
+        this.selectedUsecase = params.usecase; 
+        if(params.usecase == undefined) {
+          this.selectedUsecase = "";
+        }
+        if(this.category == 'PREDICTION') {
+          this.isForecast = true;
+          this.enableUsecase = true;
+        }
+        console.log(this.selectedUsecase);
       }
     });
     this.getLabelTools();
     this.getKpiCategory();
     this.getKpiDataSource();
+    this.loadForecastUsecase();
   }
   async getKpiCategory() {
     var self = this;
@@ -72,6 +96,12 @@ export class KpiAdditionComponent implements OnInit {
     let dataSourceRes = await this.kpiService.loadKpiDataSource();
     if (dataSourceRes.status == "success") {
       this.dataSourceDetail = dataSourceRes.data;
+      this.dataSourceDetail.forEach(element => {
+        if(element != 'HYPERLEDGER') {
+          this.outputDatasource.push(element);
+        }
+      });
+      console.log(this.outputDatasource, this.dataSourceDetail);
     }
   }
   async getLabelTools() {
@@ -94,17 +124,34 @@ export class KpiAdditionComponent implements OnInit {
       console.log(error);
     }
   }
+
+  async loadForecastUsecase() {
+    this.usecaseResponse = await this.modelManagementService.loadForecastUsecase();
+    console.log(this.usecaseResponse);
+    if (this.usecaseResponse.status == "success") {
+      this.usecaseDetails = this.usecaseResponse.data;
+      this.usecaseDetails.forEach(element => {
+        this.usecaseList.push(element.usecaseName);
+      });
+      console.log(this.usecaseList);
+    }
+  }
+
   validateKpiData() {
     var isValidated = true;
     if ((this.kpiId === "" || this.kpiId === undefined) || (this.kpiName === "" || this.kpiName === undefined) || (this.selectedTool === "" || this.selectedTool === undefined) ||
       (this.category === "" || this.category === undefined) || (this.groupName === "" || this.groupName === undefined) || (this.dataSource === "" || this.dataSource === undefined) ||
-      (this.dbQuery === "" || this.dbQuery === undefined) || (this.isActive === "" || this.isActive === undefined)) {
+      (this.dbQuery === "" || this.dbQuery === undefined) || (this.isActive === "" || this.isActive === undefined)
+      || (this.resultField === "" || this.resultField === undefined)) {
+      isValidated = false;
+      this.messageDialog.showApplicationsMessage("Please fill mandatory fields", "ERROR");
+    }
+    else if(this.category == 'PREDICTION' && (this.selectedUsecase === "" || this.selectedUsecase === undefined)) {
+      this.messageDialog.showApplicationsMessage("Please select usecase for prediction.", "ERROR");
       isValidated = false;
     }
     if (isValidated) {
       this.onClickSave();
-    } else {
-      this.messageDialog.showApplicationsMessage("Please fill mandatory fields", "ERROR");
     }
   }
   constructData() {
@@ -118,10 +165,13 @@ export class KpiAdditionComponent implements OnInit {
     kpiAPIRequestJson['DBQuery'] = this.dbQuery;
     kpiAPIRequestJson['datasource'] = this.dataSource;
     kpiAPIRequestJson['isActive'] = this.isActive
-    kpiAPIRequestJson['resultField'] = "Count";
+    kpiAPIRequestJson['resultField'] = this.resultField;
+    kpiAPIRequestJson['usecase'] = this.selectedUsecase;
+    kpiAPIRequestJson['outputDatasource'] = "";
     return kpiAPIRequestJson;
   }
   onClickSave() {
+    console.log(this.constructData());
     if (this.type === "EDIT") {
       this.updateKpiData();
     } else {
@@ -193,5 +243,29 @@ export class KpiAdditionComponent implements OnInit {
     this.dataSource = '';;
     this.dbQuery = '';;
     this.isActive = '';;
+    this.selectedUsecase = "";
+    this.resultField = "";
+    this.isForecast = false;
   }
+
+  categorySelected(selected: string) {
+    if(selected == 'PREDICTION' && this.usecaseList.length == 0) {
+      this.messageDialog.showApplicationsMessage("No Mojo_deployed usecase found for prediction.", "ERROR");
+      this.category = "";
+      this.enableUsecase = false;
+    } else if(selected == 'PREDICTION') {
+      this.enableUsecase = true;
+    } else {
+      this.selectedUsecase = "";
+      this.enableUsecase = false;
+      this.isForecast = false;
+    }
+  }
+
+  usecaseSelected(selected: string) {
+    this.isForecast = true;
+    var usecase = this.usecaseDetails.find(({usecaseName}) => usecaseName === selected);
+    this.resultField = usecase.predictionColumn;
+  }
+
 }

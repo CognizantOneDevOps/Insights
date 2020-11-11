@@ -34,6 +34,7 @@ public class AutoMLExecutor implements Callable<JsonObject> {
 	private TrainModelsUtils trainUtils = new TrainModelsUtils();
 	private AutoMLConfigDAL autoMlDAL = new AutoMLConfigDAL();
 	private AutoMLConfig autoMlConfig;
+	private String usecaseCSVFilePath;
 
 	public AutoMLExecutor(AutoMLConfig autoMlConfig) {
 		super();
@@ -45,11 +46,9 @@ public class AutoMLExecutor implements Callable<JsonObject> {
 
 		JsonObject response = new JsonObject();
 		try {
-			String usecaseCSVFilePath = ConfigOptions.ML_DATA_STORAGE_RESOLVED_PATH + ConfigOptions.FILE_SEPERATOR
+			usecaseCSVFilePath = ConfigOptions.ML_DATA_STORAGE_RESOLVED_PATH + ConfigOptions.FILE_SEPERATOR
 					+ autoMlConfig.getUseCaseName() + ConfigOptions.FILE_SEPERATOR + autoMlConfig.getUseCaseFile();
-			
-		//	trainUtils.importFile(usecaseCSVFilePath);
-			
+					
 			File useCasecsvFile = new File(usecaseCSVFilePath);
 			JsonObject extractedCSVData = extractCSVData(useCasecsvFile);
 			if (!extractedCSVData.keySet().isEmpty()) {
@@ -98,7 +97,7 @@ public class AutoMLExecutor implements Callable<JsonObject> {
 	 * @throws InsightsCustomException
 	 */
 	private void parseAndUploadDataToH2o(JsonArray csvContents) throws InsightsCustomException {
-		trainUtils.uploadData(csvContents, autoMlConfig.getUseCaseName(), autoMlConfig.getConfigJson());
+		trainUtils.uploadData(csvContents, autoMlConfig.getUseCaseName(), autoMlConfig.getConfigJson(),usecaseCSVFilePath);
 	}
 
 	/**

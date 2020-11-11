@@ -19,6 +19,7 @@ public class H2ORestApiUrls {
 	
 	private H2ORestApiUrls() {}
 	public static final  String POST_FILE="/3/PostFile";
+	public static final String IMPORT_FILE="/3/ImportFiles";
 	public static final  String PARSE_DATA="/3/Parse";
 	public static final String SPLIT_FRAME="/3/SplitFrame";
 	public static final String BUILD_AUTOML="/99/AutoMLBuilder";

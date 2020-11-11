@@ -29,6 +29,7 @@ import javax.mail.internet.InternetAddress;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import com.cognizant.devops.platformcommons.constants.AssessmentReportAndWorkflowConstants;
 import com.cognizant.devops.platformcommons.core.enums.WorkflowTaskEnum;
 import com.cognizant.devops.platformcommons.core.util.InsightsUtils;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
@@ -64,7 +65,7 @@ public class WorkflowTestData {
 
 	int reportId = 0;
 	
-	String kpiDefinition = "{\"kpiId\":1111265,\"name\":\"Avg all employee productivity for threshold \",\"toolName\":\"PRODUCTIVITY\",\"category\":\"THRESHOLD_RANGE\",\"group\":\"PRODUCTIVITY\",\"isActive\":true,\"DBQuery\":\"MATCH (n:PRODUCTIVITY) where n.completionDateEpochTime {startTime} AND n.completionDateEpochTime {endTime} WITH  avg(n.storyPoints*8) as StoryPoint, avg(n.authorTimeSpent) as authorTimeSpent  return   StoryPoint, authorTimeSpent, round((toFloat(StoryPoint)authorTimeSpent)*100) as Productivity\",\"resultField\":\"Productivity\",\"datasource\":\"NEO4J\"}";
+	String kpiDefinition = "{\"kpiId\":1111265,\"name\":\"Avg all employee productivity for threshold \",\"toolName\":\"PRODUCTIVITY\",\"category\":\"THRESHOLD_RANGE\",\"group\":\"PRODUCTIVITY\",\"isActive\":true,\"DBQuery\":\"MATCH (n:PRODUCTIVITY) where n.completionDateEpochTime {startTime} AND n.completionDateEpochTime {endTime} WITH  avg(n.storyPoints*8) as StoryPoint, avg(n.authorTimeSpent) as authorTimeSpent  return   StoryPoint, authorTimeSpent, round((toFloat(StoryPoint)authorTimeSpent)*100) as Productivity\",\"resultField\":\"Productivity\",\"datasource\":\"NEO4J\",\"outputDatasource\":\"NEO4J\",\"usecase\":\"\"}";
 	JsonObject kpiDefinitionJson = new JsonParser().parse(kpiDefinition).getAsJsonObject();
 
 	String contentDefinition = "{\"contentId\":1111204,\"isActive\":\"TRUE\",\"expectedTrend\":\"UPWARDS\",\"contentName\":\"Avg Employee Productivity in percentage w.r.t different zones \",\"kpiId\":1111265,\"noOfResult\":15,\"thresholds\":{\"red\":44,\"amber\":50,\"green\":55},\"action\":\"PERCENTAGE\",\"directionOfThreshold\":\"ABOVE\",\"message\":{\"contentMessage\":\"Employees as per productivity percentage w.r.t zones are red {red}%, amber {amber}% , green {green}%\"}}";
@@ -115,6 +116,8 @@ public class WorkflowTestData {
 				String toolName = kpiJson.get("toolName").getAsString();
 				String dataSource = kpiJson.get("datasource").getAsString();
 				String category = kpiJson.get("category").getAsString();
+				String usecase = kpiJson.get("usecase").getAsString();
+				String outputDatasource = kpiJson.get("outputDatasource").getAsString();
 				kpiConfig.setKpiId(kpiId);
 				kpiConfig.setActive(isActive);
 				kpiConfig.setKpiName(kpiName);
@@ -124,6 +127,8 @@ public class WorkflowTestData {
 				kpiConfig.setGroupName(group);
 				kpiConfig.setDatasource(dataSource);
 				kpiConfig.setCategory(category);
+				kpiConfig.setOutputDatasource(outputDatasource);
+				kpiConfig.setUsecase(usecase);
 				reportConfigDAL.saveKpiConfig(kpiConfig);
 			}
 		} catch (Exception e) {

@@ -83,6 +83,8 @@ public class AssesmentReportServiceImpl {
 	 */
 	public int saveKpiDefinition(JsonObject registerkpiJson) throws InsightsCustomException {
 		int kpiId = -1;
+		String usecase="";
+		String outputDatasource="";
 		try {
 			InsightsKPIConfig kpiConfig = new InsightsKPIConfig();
 			kpiId = registerkpiJson.get(AssessmentReportAndWorkflowConstants.KPIID).getAsInt();
@@ -98,6 +100,13 @@ public class AssesmentReportServiceImpl {
 			String toolName = registerkpiJson.get("toolName").getAsString();
 			String dataSource = registerkpiJson.get(AssessmentReportAndWorkflowConstants.DATASOURCE).getAsString();
 			String category = registerkpiJson.get(AssessmentReportAndWorkflowConstants.CATEGORY).getAsString();
+			if (registerkpiJson.has("usecase")) {
+				usecase = registerkpiJson.get("usecase").getAsString();
+			}
+			if (registerkpiJson.has(AssessmentReportAndWorkflowConstants.OUTPUTDATASOURCE)) {
+				outputDatasource = registerkpiJson.get(AssessmentReportAndWorkflowConstants.OUTPUTDATASOURCE)
+						.getAsString();
+			}
 			dBQuery = dBQuery.replace("#", "<").replace("~", ">");
 			kpiConfig.setKpiId(kpiId);
 			kpiConfig.setActive(isActive);
@@ -108,6 +117,8 @@ public class AssesmentReportServiceImpl {
 			kpiConfig.setGroupName(group);
 			kpiConfig.setDatasource(dataSource);
 			kpiConfig.setCategory(category);
+			kpiConfig.setUsecase(usecase);
+			kpiConfig.setOutputDatasource(outputDatasource);
 			reportConfigDAL.saveKpiConfig(kpiConfig);
 		} catch (Exception e) {
 			log.error(e);
@@ -140,6 +151,8 @@ public class AssesmentReportServiceImpl {
 				String toolName = updatekpiJson.get("toolName").getAsString();
 				String dataSource = updatekpiJson.get(AssessmentReportAndWorkflowConstants.DATASOURCE).getAsString();
 				String category = updatekpiJson.get("category").getAsString();
+				String usecase = updatekpiJson.get("usecase").getAsString();
+				String outputDatasource = updatekpiJson.get(AssessmentReportAndWorkflowConstants.OUTPUTDATASOURCE).getAsString();
 				dBQuery = dBQuery.replace("#", "<").replace("~", ">");
 				kpiExistingConfig.setKpiId(kpiId);
 				kpiExistingConfig.setActive(isActive);
@@ -150,6 +163,8 @@ public class AssesmentReportServiceImpl {
 				kpiExistingConfig.setGroupName(group);
 				kpiExistingConfig.setDatasource(dataSource);
 				kpiExistingConfig.setCategory(category);
+				kpiExistingConfig.setUsecase(usecase);
+				kpiExistingConfig.setOutputDatasource(outputDatasource);
 				reportConfigDAL.updateKpiConfig(kpiExistingConfig);
 			}
 		} catch (Exception e) {

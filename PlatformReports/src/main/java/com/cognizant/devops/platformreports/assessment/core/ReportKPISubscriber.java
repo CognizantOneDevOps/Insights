@@ -176,6 +176,8 @@ public class ReportKPISubscriber extends WorkflowTaskSubscriberHandler {
 				kpiConfigDTO.setOneTimeReportStartTime(workflowConfig.getAssessmentConfig().getStartDate());
 				kpiConfigDTO.setOneTimeReportEndDate(workflowConfig.getAssessmentConfig().getEndDate());
 				kpiConfigDTO.setInputDatasource(assessmentInputDataSource);
+				kpiConfigDTO.setUsecaseName(kpiConfig.getUsecase());
+				kpiConfigDTO.setOutputDatasource(kpiConfig.getOutputDatasource());
 
 				KPIExecutor kpirun = new KPIExecutor(kpiConfigDTO);
 				kpiListToExecute.add(kpirun);

@@ -386,7 +386,7 @@ export class HomeComponent implements OnInit {
             title: "Business Mapping",
             isAdminMenu: true
           },
-          {
+		  {
             displayName: 'Report Configuration',
             iconName: 'feature',
             isToolbarDisplay: InsightsInitService.enableInsightsToolbar,
@@ -432,7 +432,7 @@ export class HomeComponent implements OnInit {
             title: "Logo Setting",
             isAdminMenu: true
           },
-          {
+		  {
             displayName: 'Data Archival',
             iconName: 'feature',
             route: 'InSights/Home/dataarchiving',
@@ -440,8 +440,7 @@ export class HomeComponent implements OnInit {
             showMenu: true,
             title: "Data Archival",
             isAdminMenu: true
-          }
-           /* ,
+          },
            {
              displayName: 'Forecasting',
              iconName: 'feature',
@@ -450,7 +449,7 @@ export class HomeComponent implements OnInit {
              showMenu: true,
              title: "Forecasting",
              isAdminMenu: false
-           }  */       
+           }        
         ]
       }
     ];

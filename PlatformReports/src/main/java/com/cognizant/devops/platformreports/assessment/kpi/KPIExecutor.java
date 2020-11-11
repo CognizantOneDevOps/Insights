@@ -58,14 +58,7 @@ public class KPIExecutor implements Callable<JsonObject> {
 			failedjobs.add(_kpiConfigDTO.getKpiId());
 			response.add("kpiArray", failedjobs);
 		}
-		/*if (kpiId == ReportEngineEnum.StatusCode.NO_DATA.getValue()) {
-			response.addProperty("Status", "Failure");
-			failedjobs.add(_kpiConfigDTO.getKpiId());
-			response.add("kpiArray", failedjobs);
-		
-			return response;
-		
-		} else*/ if (kpiId != ReportEngineEnum.StatusCode.ERROR.getValue()) {
+		if (kpiId != ReportEngineEnum.StatusCode.ERROR.getValue()) {
 			ReportConfigDAL reportConfigAL = new ReportConfigDAL();
 			List<InsightsContentConfig> contentConfigList = reportConfigAL
 					.getActiveContentConfigByKPIId(_kpiConfigDTO.getKpiId());

@@ -22,6 +22,7 @@ public interface AssessmentReportAndWorkflowConstants {
 	static final String KPIID = "kpiId";
 	static final String ISACTIVE = "isActive";
 	static final String DATASOURCE = "datasource";
+	static final String OUTPUTDATASOURCE = "outputDatasource";
 	static final String REPORTNAME = "reportName";
 	static final String STATUS = "status";
 	static final String STARTDATE = "startdate";

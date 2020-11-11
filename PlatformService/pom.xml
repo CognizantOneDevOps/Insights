@@ -120,11 +120,6 @@
 			</exclusions>
 		</dependency>
 		<!-- Added to resolve Kerberos client security vulnerability issue -->
-		<dependency>
-			<groupId>org.apache.httpcomponents</groupId>
-			<artifactId>httpclient</artifactId>
-			<version>4.5.3</version>
-		</dependency>
 		<!-- https://mvnrepository.com/artifact/org.opensaml/opensaml -->
 		<dependency>
 			<groupId>org.opensaml</groupId>

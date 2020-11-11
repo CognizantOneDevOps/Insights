@@ -178,6 +178,8 @@ export class RestAPIurlService implements IRestAPIUrlService {
         this.addEndPoint("GET_LEADERBOARD", '/PlatformService/admin/trainmodels/getLeaderboard');
         this.addEndPoint("PREDICT", '/PlatformService/admin/trainmodels/getPrediction');
         this.addEndPoint("DOWNLOAD_MOJO", '/PlatformService/admin/trainmodels/downloadMojo');
+        this.addEndPoint("GET_PREDICTION_USECASE", '/PlatformService/admin/trainmodels/getMojoDeployedUsecases');
+        this.addEndPoint("UPDATE_USECASE_STATE", '/PlatformService/admin/trainmodels/updateUsecaseState');
 
         //kpi
         this.addEndPoint("KPI_CATEGORY", '/PlatformService/insights/report/getKpiCategory');
@@ -185,8 +187,8 @@ export class RestAPIurlService implements IRestAPIUrlService {
         this.addEndPoint("SAVE_DATA_KPI", '/PlatformService/insights/report/saveKpiDefinition');
         this.addEndPoint("UPDATE_KPI", '/PlatformService/insights/report/updateKpiDefinition');
         this.addEndPoint("LIST_KPI", '/PlatformService/insights/report/getAllActiveKpiList');
-        this.addEndPoint("DELETE_KPI", '/PlatformService/insights/report/deleteKpiDefinition')
-        this.addEndPoint("UPLOAD_BULK_KPI", '/PlatformService/insights/report/saveBulkKpiDefinition')
+        this.addEndPoint("DELETE_KPI", '/PlatformService/insights/report/deleteKpiDefinition');
+        this.addEndPoint("UPLOAD_BULK_KPI", '/PlatformService/insights/report/saveBulkKpiDefinition');
 
         //content
         this.addEndPoint("LIST_CONTENT", '/PlatformService/insights/report/getAllActiveContentList');

@@ -67,6 +67,12 @@ public class InsightsKPIConfig implements Serializable{
 	@Column(name = "isActive")
 	private Boolean isActive=false;	
 	
+	@Column(name="usecase")
+	private String usecase;
+	
+	@Column(name="outputDatasource")
+	private String outputDatasource;
+	
 	
 	public static long getSerialversionuid() {
 		return serialVersionUID;
@@ -150,6 +156,22 @@ public class InsightsKPIConfig implements Serializable{
 
 	public void setCategory(String category) {
 		this.category = category;
+	}
+
+	public String getUsecase() {
+		return usecase;
+	}
+
+	public void setUsecase(String usecase) {
+		this.usecase = usecase;
+	}
+
+	public String getOutputDatasource() {
+		return outputDatasource;
+	}
+
+	public void setOutputDatasource(String outputDatasource) {
+		this.outputDatasource = outputDatasource;
 	}
 	
 	

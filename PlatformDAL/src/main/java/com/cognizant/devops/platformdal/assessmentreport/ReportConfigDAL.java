@@ -689,5 +689,21 @@ public class ReportConfigDAL extends BaseDAL {
 		}
 		return templateEntiry;
 	}
+	
+	/**
+	 * Method to get KPI Config using usecase name
+	 * 
+	 * @param usecase
+	 * @return InsightsKPIConfig
+	 */
+	public List<InsightsKPIConfig> getKpiConfigByUsecase(String usecase) {
+		Query<InsightsKPIConfig> createQuery = getSession().createQuery(
+				"FROM InsightsKPIConfig RE WHERE RE.usecase = :usecase", InsightsKPIConfig.class);
+		createQuery.setParameter("usecase", usecase);
+		List<InsightsKPIConfig> result = createQuery.getResultList();
+		terminateSession();
+		terminateSessionFactory();
+		return result;
+	}
 
 }

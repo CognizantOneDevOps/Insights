@@ -36,4 +36,12 @@ export class ModelManagementService implements IModelManagementService {
     var restHandler = this.restCallHandlerService;
     return restHandler.postWithParameter("DELETE_USECASE", { usecase: usecase });
   }
+
+  loadForecastUsecase(): Promise<any> {
+    return this.restCallHandlerService.get("GET_PREDICTION_USECASE");
+  }
+
+  usecaseStateUpdate(usecaseConfig: string) {
+    return this.restCallHandlerService.postWithData("UPDATE_USECASE_STATE", usecaseConfig, { 'Content-Type': 'application/json' }).toPromise();
+}
 }

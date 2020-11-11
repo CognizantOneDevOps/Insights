@@ -14,7 +14,7 @@
  * the License.
  ******************************************************************************/
 import { Component, OnInit, ViewChild, ChangeDetectorRef } from '@angular/core';
-import { MatTableDataSource, MatPaginator, MatDialog } from '@angular/material';
+import { MatTableDataSource, MatPaginator, MatDialog, MatSlideToggleChange } from '@angular/material';
 import { MessageDialogService } from '@insights/app/modules/application-dialog/message-dialog-service';
 import { ModelManagementService } from '@insights/app/modules/model-management/model-management.service';
 import {Router,NavigationExtras } from '@angular/router';
@@ -57,7 +57,7 @@ rowData = [
 
   constructor(public messageDialog: MessageDialogService, public modelManagementService: ModelManagementService,private dataShare: DataSharedService,
     private changeDetectorRefs: ChangeDetectorRef,public router:Router, private dialog: MatDialog) { 
-    this.displayedColumns = [ "radio", "UsecaseName", "PredictionColumn", "ModelName", "SplitRatio", "Created","Status", "details" ];
+    this.displayedColumns = [ "radio", "UsecaseName", "PredictionColumn", "ModelName", "SplitRatio", "Created","Status","active", "details" ];
     this.getModelDetails();
     this.table = document.getElementsByTagName("table")[0];
     this.tbody = this.table.getElementsByTagName("tbody")[0];
@@ -166,8 +166,7 @@ rowData = [
   }
 
   onDelete() {
-    this.enableDelete = false;
-    var dialog = null;
+    var dialog;
     const dialogRef = this.messageDialog.showConfirmationMessage("Delete","This action will delete the usecase <b>"+this.selectedUsecase.usecaseName+"</b> along with all related files (MOJOs, csv etc.) and cannot be reverted. Would you like to continue?",this.toDelete,"ALERT","40%");
     dialogRef.afterClosed().subscribe(result => {
       if(result == 'yes') {
@@ -177,8 +176,10 @@ rowData = [
           if(event.status == 'success' && event.data.statusCode == 1 ){
             dialog = this.messageDialog.showApplicationsMessage("The usecase <b>"+this.selectedUsecase.usecaseName+"</b> and uploaded csv file both has been deleted succesfully.","SUCCESS");
             
-          } else if( event.data.statusCode == 0) {
+          } else if(event.status == 'success' && event.data.statusCode == 0) {
             dialog = this.messageDialog.showApplicationsMessage("The usecase <b>"+this.selectedUsecase.usecaseName+"</b> has been deleted succesfully but failed to delete uploaded csv file","SUCCESS");
+          } else if(event.status == 'failure' && event.StatusCode == 409 ) {
+            this.messageDialog.showApplicationsMessage(event.message,"ERROR");
           }
           else {
            this.messageDialog.showApplicationsMessage(event.message+". Please try again","ERROR");
@@ -198,15 +199,11 @@ rowData = [
   }
 
   onSelect(selected) {
-    if(selected.status == 'NOT_STARTED' || selected.status == 'ERROR') {
-      this.enableDelete = true;
-    }
-    else if(selected.status == 'LEADERBOARD_READY') {
+    this.enableDelete = true;
+    if(selected.status == 'LEADERBOARD_READY') {
       this.enableLeaderboard = true;
-      this.enableDelete = false;
     } else {
       this.enableLeaderboard = false;
-      this.enableDelete = false;
     }
   }
 
@@ -236,6 +233,44 @@ rowData = [
     }
   }
 
+  updateUsecaseState(event: MatSlideToggleChange, name, element) {
+    var self = this;
+    var dialog;
+    var statusUpdateJson = {};
+    var title = 'Update Active/Inactive State';
+    var state = element.isActive ? 'Active' : 'Inactive';
+    var dialogmessage =
+      'Are you sure you want to make <b>' + element.usecaseName + '</b> state to <b>' + state + '</b> ?';
+    const dialogRef = self.messageDialog.showConfirmationMessage(
+      title, dialogmessage, element.usecaseName, 'ALERT', '40%');
+    dialogRef.afterClosed().subscribe(result => {
+      if (result == 'yes') {
+        statusUpdateJson["usecaseName"] = name;
+        statusUpdateJson["isActive"] = event.checked;
+        console.log(statusUpdateJson);
+        self.modelManagementService.usecaseStateUpdate(JSON.stringify(statusUpdateJson))
+          .then(function (response) {
+            if (response.status == 'success') {
+              dialog = self.messageDialog.showApplicationsMessage('Status updated successfully.', 'SUCCESS');
+            } else if (response.status == 'failure' && 
+              response.message == "Usecase does not exists in database.") {
+              dialog = self.messageDialog.showApplicationsMessage("Usecase <b>" + name + "</b> does not exists in database.", 'ERROR');
+            } else if (response.status == 'failure' && 
+              response.message == "Usecase cannot be deactivated as it is attached to kpi.") {
+              dialog = self.messageDialog.showApplicationsMessage(response.message , 'ERROR');
+            } else {
+              dialog = self.messageDialog.showApplicationsMessage(
+                'Failed to update state. Please check logs for more details.', 'ERROR');
+            }
+            dialog.afterClosed().subscribe(result => {
+            self.refresh();
+          })
+          })
+      } else {
+        element.isActive = !event.checked;
+      }
+    });
+  }
   
 
 }

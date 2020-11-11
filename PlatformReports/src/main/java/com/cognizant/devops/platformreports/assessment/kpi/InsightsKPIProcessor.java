@@ -24,6 +24,7 @@ import org.apache.commons.text.StringSubstitutor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import com.cognizant.devops.automl.task.util.AutoMLPrediction;
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.core.enums.WorkflowTaskEnum;
 import com.cognizant.devops.platformcommons.core.util.InsightsUtils;
@@ -96,9 +97,15 @@ public class InsightsKPIProcessor {
 					kpiDefinition.getKpiId(), kpiDefinition.getCategory(), queryModelList.size());
 
 			for (QueryModel model : queryModelList) {
-				listOfResultJson.addAll(kPIQueryDataHandler.fetchKPIData(model.getQuery(), kpiDefinition, model));
+				if (kpiDefinition.getCategory().equalsIgnoreCase(ReportEngineUtils.PREDICTION)) {
+					List<JsonObject> result = kPIQueryDataHandler.fetchKPIData(model.getQuery(), kpiDefinition, model);					
+					listOfResultJson.addAll(AutoMLPrediction.predictRegression(result,
+							result.get(0).get("columnProperty").getAsJsonArray(), kpiDefinition.getUsecaseName()));
+				} else {
+					listOfResultJson.addAll(kPIQueryDataHandler.fetchKPIData(model.getQuery(), kpiDefinition, model));
+				}
 			}
-
+			
 			ReportDataHandler kPIResultDataHandler = ReportDataHandlerFactory
 					.getDataSource(ApplicationConfigProvider.getInstance().getAssessmentReport().getOutputDatasource());
 

@@ -25,18 +25,19 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
-
 import com.cognizant.devops.automl.service.TrainModelsServiceImpl;
 import com.cognizant.devops.platformcommons.core.util.ValidationUtils;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformservice.rest.util.PlatformServiceUtil;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 
 @RestController
 @RequestMapping("/admin/trainmodels")
@@ -52,7 +53,7 @@ public class InsightsTrainModelController {
 	 * @param usecase
 	 * @return
 	 */
-	@RequestMapping(value = "/validateUsecaseName", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+	@GetMapping(value = "/validateUsecaseName", produces = MediaType.APPLICATION_JSON_VALUE)
 	public @ResponseBody JsonObject validateUsecaseName(@RequestParam String usecase) {
 		JsonObject response = null;
 		try {
@@ -64,52 +65,7 @@ public class InsightsTrainModelController {
 		return PlatformServiceUtil.buildSuccessResponseWithData(response);
 	}
 
-	/**
-	 * <<Not used>> entry point to upload Training Data and return headers and
-	 * contents of csv
-	 *
-	 * @param file
-	 * @return JsonObject
-	 */
-	@RequestMapping(value = "/getHeaders", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public @ResponseBody JsonObject getHeaders(@RequestParam("file") MultipartFile file, @RequestParam String usecase) {
-		JsonObject response = null;
-		try {
-			response = trainModelsService.getHeaders(file, usecase);
-		} catch (InsightsCustomException e) {
-			log.error(e.getMessage());
-			return PlatformServiceUtil.buildFailureResponse(e.getMessage());
-		}
-		return PlatformServiceUtil.buildSuccessResponseWithData(response);
-	}
 
-	/**
-	 * entry point to upload Training Data
-	 *
-	 * @param contents
-	 * @return JsonObject
-	 */
-	/*
-	 * @RequestMapping(value = "/uploadData", method = RequestMethod.POST, produces
-	 * = MediaType.APPLICATION_JSON_UTF8_VALUE, consumes =
-	 * MediaType.MULTIPART_FORM_DATA_VALUE) public @ResponseBody
-	 * DeferredResult<JsonObject> uploadData(@RequestParam("contents") String
-	 * contents, @RequestParam("usecase") String
-	 * usecase, @RequestParam("configuration") String configuration) { JsonObject
-	 * response = new JsonObject(); DeferredResult<JsonObject> output = new
-	 * DeferredResult<>(); try {
-	 */
-	/*
-	 * status = bulkUploadService.getHeaders(file, toolName, label,
-	 * insightsTimeField, insightsTimeFormat);
-	 *//*
-		 * response = trainModelsService.uploadData(contents, usecase, configuration);
-		 * if (!response.isJsonNull()) output.setResult(response); return output; }
-		 * catch (Exception e
-		 *//* , InsightsCustomException e *//*
-											 * ) { log.error(e.getMessage()); return output; //return
-											 * PlatformServiceUtil.buildFailureResponse(e.getMessage()); } }
-											 */
 
 	/**
 	 * Upload csv data and configuration to run NLP and upload the frame into H2o
@@ -149,113 +105,8 @@ public class InsightsTrainModelController {
 
 	}
 
-/*	@PostMapping(value = "/saveUsecase", produces = MediaType.APPLICATION_JSON_VALUE) 
-	public @ResponseBody ResponseEntity < JsonObject > uploadData(@RequestParam("file") MultipartFile file, @RequestParam String usecase,
-		    @RequestParam String configuration, @RequestParam String splitRatio, @RequestParam String predictionColumn,
-		    @RequestParam String numOfModels, @RequestParam String taskDetails) throws
-		    IOException {
-		    Map < String, Object > map = new HashMap < > ();
-		    JsonObject response
-		        = null;
-		    JsonObject resp = null;
-		    int id = -1;
-		    DeferredResult < JsonObject > output = new DeferredResult < > ();
-		    try {
-		        boolean checkValidFile =
-		            PlatformServiceUtil.validateFile(file.getOriginalFilename());
-		        log.debug("checkValidFile: {} ", checkValidFile); // boolean isValid =
-		        PlatformServiceUtil.checkFileForHTML(new
-		            if (checkValidFile) { // && isValid
-		                // Store it in table id= trainModelsService.saveAutoMLConfig(file, usecase,
-		                configuration,
-		                splitRatio,
-		                predictionColumn,
-		                numOfModels,
-		                taskDetails); 
-		        JsonObject parsedCsv = trainModelsService.getHeaders(file, usecase); 
-		        response = trainModelsService.uploadData(parsedCsv.getAsJsonArray("Contents"), usecase, configuration);
-		            if (!response.isJsonNull())
-		                output.setResult(PlatformServiceUtil.buildSuccessResponseWithData(response));
-		        }
-		        else {
-		            output.setResult(PlatformServiceUtil.buildFailureResponse("Invalid file content. "));
-		        }
-		        if (trainModelsService.splitData(usecase, splitRatio) == 200) { // run automl
-		            resp = trainModelsService.runAutoML(usecase, predictionColumn, numOfModels);
-		        } else {
-		            resp.addProperty("ResponseCode", 300);
-		            resp.addProperty("Message",
-		                "Failed to split and run AutoML");
-		        }
-		    } catch (InsightsCustomException e) {
-		        log.error(e.getMessage());
-		        return map.put("exeception",
-		            output.setResult(PlatformServiceUtil.buildFailureResponse(e.getMessage())));
 
-		    } catch (IOException e) {
-		        log.error(e.getMessage());
-		        return
-		        map.put("execption",
-		            output.setResult(PlatformServiceUtil.buildFailureResponse(e.getMessage())));
-		    }
 
-		    map.put("updateData", output);
-		    map.put("splitData",
-		        PlatformServiceUtil.buildSuccessResponseWithData(resp));
-
-		    map.put("response", output.setResult(PlatformServiceUtil.buildSuccessResponseWithData(" ML config saved with Id " + id))); // split
-		   // and get train and test data sets
-
-		    return map;
-		}*/
-	/**
-	 * Split the training frame and start AutoML build using the training data. Save
-	 * the prediction column name in postgres. Returns an url to check for the
-	 * progress of AutoML build.
-	 *
-	 * @param usecase
-	 * @param splitRatio
-	 * @param predictionColumn
-	 * @return
-	 */
-	@RequestMapping(value = "/splitAndTrain", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public @ResponseBody JsonObject splitAndTrain(@RequestParam String usecase, @RequestParam String splitRatio,
-			@RequestParam String predictionColumn, @RequestParam String numOfModels) {
-		JsonObject response = null;
-		// split and get train and test data sets
-		try {
-			if (trainModelsService.splitData(usecase, splitRatio) == 200) {
-				// run automl
-				response = trainModelsService.runAutoML(usecase, predictionColumn, numOfModels);
-			} else {
-				response.addProperty("ResponseCode", 300);
-				response.addProperty("Message", "Failed to split and run AutoML");
-			}
-		} catch (InsightsCustomException e) {
-			log.error(e.getMessage());
-			return PlatformServiceUtil.buildFailureResponse(e.getMessage());
-		}
-		return PlatformServiceUtil.buildSuccessResponseWithData(response);
-	}
-
-	/**
-	 * Get the progress % and status of AutoML build
-	 *
-	 * @param usecase
-	 * @param url
-	 * @return
-	 */
-	@RequestMapping(value = "/getAutoMLProgress", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public @ResponseBody JsonObject getAutoMLProgress(@RequestParam String usecase, @RequestParam String url) {
-		JsonObject response = null;
-		try {
-			response = trainModelsService.getAutoMLProgress(usecase, url);
-		} catch (InsightsCustomException e) {
-			log.error(e.getMessage());
-			return PlatformServiceUtil.buildFailureResponse(e.getMessage());
-		}
-		return PlatformServiceUtil.buildSuccessResponseWithData(response);
-	}
 
 	/**
 	 * Get the leaderboard result of a successful AutoML build
@@ -329,7 +180,11 @@ public class InsightsTrainModelController {
 			response = trainModelsService.deleteUsecase(validatedResponse);
 		} catch (InsightsCustomException e) {
 			log.error(e.getMessage());
-			return new ResponseEntity<>(PlatformServiceUtil.buildFailureResponseWithStatusCode("Infrastructure Error", "500"),HttpStatus.OK);
+			if (e.getMessage().equals("Usecase cannot be deleted as it is attached to kpi.")){
+				return new ResponseEntity<>(PlatformServiceUtil.buildFailureResponseWithStatusCode(e.getMessage(), "409"),HttpStatus.OK);
+			} else {
+				return new ResponseEntity<>(PlatformServiceUtil.buildFailureResponseWithStatusCode("Infrastructure Error", "500"),HttpStatus.OK);
+			}
 		}
 		return new ResponseEntity<>(PlatformServiceUtil.buildSuccessResponseWithData(response), HttpStatus.OK);
 	}
@@ -353,5 +208,46 @@ public class InsightsTrainModelController {
 			return new ResponseEntity<>(PlatformServiceUtil.buildFailureResponseWithStatusCode("Infrastructure Error", "500"),HttpStatus.OK);
 		}
 
+	}
+	
+	/**
+	 * Fetch all active and mojo_deployed usecase list from Postgres.
+	 *
+	 * @return
+	 */
+	@GetMapping(value = "/getMojoDeployedUsecases", produces = MediaType.APPLICATION_JSON_VALUE)
+	public @ResponseBody JsonObject getMojoDeployedUsecases() {
+		JsonArray response = null;
+		try {
+			response = trainModelsService.getMojoDeployedUsecases();
+			return PlatformServiceUtil.buildSuccessResponseWithData(response);
+		} catch (InsightsCustomException e) {
+			log.error(e.getMessage());
+			return PlatformServiceUtil.buildFailureResponse(e.getMessage());
+		}
+
+	}
+	
+	/**
+	 * change usecase state to active or inactive
+	 *
+	 * @return
+	 */
+	@PostMapping(value = "/updateUsecaseState", produces = MediaType.APPLICATION_JSON_VALUE)
+	public @ResponseBody JsonObject updateUsecaseState(@RequestBody String usecaseConfig) {
+		try {
+			String validatedResponse = ValidationUtils.validateRequestBody(usecaseConfig);
+			JsonParser parser = new JsonParser();
+			JsonObject usecaseJson = (JsonObject) parser.parse(validatedResponse);
+			String message= trainModelsService.updateUsecaseState(usecaseJson);
+			return PlatformServiceUtil.buildSuccessResponseWithData(message);
+		} catch (InsightsCustomException e) {
+			log.error(e);
+			return PlatformServiceUtil.buildFailureResponse(e.getMessage());
+		} catch (Exception e) {
+			log.error(e);
+			return PlatformServiceUtil
+					.buildFailureResponse("Unable to update usecase state. Please check log for details.");
+		}
 	}
 }

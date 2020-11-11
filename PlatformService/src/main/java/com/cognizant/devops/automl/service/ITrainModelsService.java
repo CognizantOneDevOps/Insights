@@ -15,26 +15,15 @@
  ******************************************************************************/
 package com.cognizant.devops.automl.service;
 
+import org.springframework.web.multipart.MultipartFile;
+
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.multipart.MultipartFile;
-
 public interface ITrainModelsService {
     public JsonObject validateUsecaseName(String usecase) throws InsightsCustomException;
-
-    public JsonObject getHeaders(MultipartFile file, String usecase) throws InsightsCustomException;
-
-    public JsonObject uploadData(JsonArray contents, String usecase, String config) throws InsightsCustomException;
-
-    public int splitData(String usecase, String splitRatio) throws InsightsCustomException;
-
-    public JsonObject runAutoML(String usecase, String predictionColumn, String numOfModels) throws InsightsCustomException;
-
-    public JsonObject getAutoMLProgress(String usecase, String url) throws InsightsCustomException;
-
+       
     public JsonObject getLeaderBoard(String usecase) throws InsightsCustomException;
 
     public JsonObject getPrediction(String usecase, String modelName) throws InsightsCustomException;
@@ -45,7 +34,11 @@ public interface ITrainModelsService {
 
     public JsonObject getUsecases() throws InsightsCustomException;
     
+    public JsonArray getMojoDeployedUsecases() throws InsightsCustomException;
+    
     public int saveAutoMLConfig(MultipartFile file,String usecase,
 			 String configuration, Integer trainingPerc,  String predictionColumn,
 			 String numOfModels,String taskDetails) throws InsightsCustomException;
+
+	public String updateUsecaseState(JsonObject usecaseJson) throws InsightsCustomException;
 }

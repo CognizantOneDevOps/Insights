@@ -190,6 +190,8 @@ public class AssessmentReportsTestData {
 				String toolName = kpiJson.get("toolName").getAsString();
 				String dataSource = kpiJson.get("datasource").getAsString();
 				String category = kpiJson.get("category").getAsString();
+				String usecase = kpiJson.get("usecase").getAsString();
+				String outputDatasource = kpiJson.get("outputDatasource").getAsString();
 				kpiConfig.setKpiId(kpiId);
 				kpiConfig.setActive(isActive);
 				kpiConfig.setKpiName(kpiName);
@@ -199,6 +201,8 @@ public class AssessmentReportsTestData {
 				kpiConfig.setGroupName(group);
 				kpiConfig.setDatasource(dataSource);
 				kpiConfig.setCategory(category);
+				kpiConfig.setOutputDatasource(outputDatasource);
+				kpiConfig.setUsecase(usecase);
 				reportConfigDAL.saveKpiConfig(kpiConfig);
 			}
 		} catch (Exception e) {

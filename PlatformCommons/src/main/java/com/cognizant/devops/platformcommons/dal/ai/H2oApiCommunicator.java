@@ -16,25 +16,13 @@
 package com.cognizant.devops.platformcommons.dal.ai;
 
 import java.io.File;
-import java.io.IOException;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.ContentType;
-import org.apache.http.entity.mime.MultipartEntityBuilder;
-import org.apache.http.entity.mime.content.StringBody;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.util.EntityUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -56,41 +44,18 @@ public class H2oApiCommunicator {
 		h2oEndpoint = ApplicationConfigProvider.getInstance().getMlConfiguration().getH2oEndpoint();
 	}
 
-	/**
-	 * Upload csv data into H2o
-	 *
+	
+	/** upload file to h2o
 	 * @param data
 	 * @param name
 	 * @return
+	 * @throws InsightsCustomException
 	 */
-	public int uploadToH2O(String data, String name) throws InsightsCustomException {
-		try {
-			
-			String url =h2oEndpoint + "/3/PostFile";
-			
-			
-			log.debug("Uploading data into H2O: {} ", name);
-			HttpPost httpPost = new HttpPost(h2oEndpoint + "/3/PostFile?destination_frame=" + name);
-			StringBody postData = new StringBody(data, ContentType.MULTIPART_FORM_DATA);			
-			HttpEntity reqEntity = MultipartEntityBuilder.create().addPart("filename", postData).build();
-			httpPost.setEntity(reqEntity);
-			CloseableHttpClient httpClient = HttpClients.createDefault();			
-			HttpResponse response = httpClient.execute(httpPost);
-			log.debug("Upload: {} Response code: {} ", name, response.getStatusLine().getStatusCode());
-			return response.getStatusLine().getStatusCode();
-		} catch (IOException e) {
-			log.error(e.getMessage());
-			throw new InsightsCustomException(e.getMessage());
-		}		
-	}
-
-	
 	public String uploadH2o(String data, String name) throws InsightsCustomException {
 		try {
 			String response=null;			
 			String url =h2oEndpoint + H2ORestApiUrls.POST_FILE;			
-			log.debug("Uploading data into H2O: {} ", name);
-			FileUtils.writeStringToFile(new File("C:\\MLWork\\data.txt"), data);
+			log.debug("Uploading data into H2O: {} ", name);			
 			HashMap<String,String> map=new HashMap<>();
 			map.put("filename", data);
 			map.put("destination_frame", name);			
@@ -104,37 +69,7 @@ public class H2oApiCommunicator {
 	}
 
 	
-	/**
-	 * Parse the uploaded data. All parameters are required for proper parsing.
-	 *
-	 * @param source
-	 * @param destination
-	 * @param numColumns
-	 * @param columnTypes
-	 * @param columnNames
-	 * @param separator
-	 * @param checkHeader
-	 * @return
-	 */
-	public int parseData(String source, String destination, int numColumns, String columnTypes, String columnNames,
-			String separator, int checkHeader) throws InsightsCustomException {
-		try {
-			log.debug("Parsing data frame: {} ", source);
-			HttpPost httpPost = new HttpPost(/*h2oEndpoint*/"http://localhost:54321" + "/3/Parse?source_frames=" + source + "&destination_frame="
-					+ destination + "&number_columns=" + numColumns + "&parse_type=csv&check_header=" + checkHeader
-					+ "&delete_on_done=true&separator=" + separator + "&column_types=%5B" + columnTypes
-					+ "%5D&column_names=%5B" + columnNames + "%5D");
-			CloseableHttpClient httpClient = HttpClients.createDefault();
-			HttpResponse response = httpClient.execute(httpPost);
-			if (response.getStatusLine().getStatusCode() == 200)
-				return pollRequest(EntityUtils.toString(response.getEntity()));
-		
-			return response.getStatusLine().getStatusCode();
-		} catch (IOException e) {
-			log.error(e.getMessage());
-			throw new InsightsCustomException(e.getMessage());
-		}
-	}
+	
 	
 	public int postparsedCSVData(String source, String destination, int numColumns, String columnTypes, String columnNames,
 			String separator, int checkHeader) throws InsightsCustomException
@@ -150,7 +85,8 @@ public class H2oApiCommunicator {
 		queryParams.addProperty("column_names",Arrays.toString(columnNames.split(",")));	
 		queryParams.addProperty("column_types",Arrays.toString(columnTypes.split(",")));	
 		queryParams.addProperty("check_header", checkHeader);	
-		queryParams.addProperty("delete_on_done","true");		
+		queryParams.addProperty("delete_on_done","true");
+		queryParams.addProperty("chunk_size","50455");	
 		String httpResponse=RestApiHandler.httpQueryParamRequest(url, queryParams, null,"Post");
 		 JsonObject response=  new JsonParser().parse(httpResponse).getAsJsonObject();
          String pollingURL= response.get("job").getAsJsonObject().get("key")
@@ -162,74 +98,13 @@ public class H2oApiCommunicator {
 	
 	public String importFiles(String filePath) throws InsightsCustomException
 	{			
-		String url="http://localhost:54321/3/ImportFiles";			
+		String url=h2oEndpoint+H2ORestApiUrls.IMPORT_FILE;			
 		JsonObject queryParams= new JsonObject();
 		queryParams.addProperty("path", filePath);			
-		return RestApiHandler.httpQueryParamRequest(url, queryParams, null,"Get");			
-		
+		return RestApiHandler.httpQueryParamRequest(url, queryParams, null,"Get");		
 	}
 	
-	public int uploadFileToH2O(String filePath) throws InsightsCustomException  {
-		
-		/*	
-			String url="http://localhost:54321/3/ImportFiles";			
-			JsonObject queryParams= new JsonObject();
-			queryParams.addProperty("path", filePath);			
-			RestApiHandler.httpQueryParamRequest(url, queryParams, null,"Get");
-			*/
-			
-		String url="http://localhost:54321/3/Parse";	
-		
-		String [] _sourceFrames= {"nfs:\\C:\\InSights_Windows\\Server2\\INSIGHTS_HOME\\MLData\\newTest3\\GitAuthorDataNew.txt.csv"};
-		String destination_frame="GitAuthorDataNew.hex";
-		String parse_type ="CSV";
-		String separator="44";
-		String number_columns="5";
-		String single_quotes="false";
-		String [] column_names= {"Date","AuthorName","Experience","RepoName","Commits"};
-		String [] column_types= {"Time","Enum","Numeric","Numeric","Numeric"};
-		String check_header="1";
-		String delete_on_done="true";
-		String chunk_size="4096";
-		
-		
-		JsonObject queryParams= new JsonObject();
-		queryParams.addProperty("source_frames", Arrays.toString(_sourceFrames));	
-		queryParams.addProperty("destination_frame", destination_frame);	
-		queryParams.addProperty("parse_type", parse_type);	
-		queryParams.addProperty("separator", separator);	
-		queryParams.addProperty("source_frames", Arrays.toString(_sourceFrames));	
-		queryParams.addProperty("number_columns",number_columns);	
-		queryParams.addProperty("single_quotes", single_quotes);
-		queryParams.addProperty("column_names", Arrays.toString(column_names));	
-		queryParams.addProperty("column_types",Arrays.toString(column_types));	
-		queryParams.addProperty("check_header", check_header);	
-		queryParams.addProperty("delete_on_done",delete_on_done);	
-		queryParams.addProperty("chunk_size", chunk_size);	
-		String response=RestApiHandler.httpQueryParamRequest(url, queryParams, null,"Post");
-		int i=pollRequest(response);	
-			log.debug("Uploading data into H2O: {} ", i);
-			/*HttpPost httpPost = new HttpPost(h2oEndpoint"http://localhost:54321" + "/3/ImportFiles");
-			 List<NameValuePair> params = new ArrayList<NameValuePair>();
-			    params.add(new BasicNameValuePair("path", filePath));			   
-			    httpPost.setEntity(new UrlEncodedFormEntity(params));
-			*/
-		/*	//	StringBody postData = new StringBody(data, ContentType.MULTIPART_FORM_DATA);
-		//	HttpEntity reqEntity = MultipartEntityBuilder.create().addPart("filename", postData).build();
-		//	httpPost.setEntity(reqEntity);
-			CloseableHttpClient httpClient = HttpClients.createDefault();			
-		//	HttpResponse response = httpClient.execute(httpPost);
-			log.debug("Upload: {} Response code: {} ", filePath, response.getStatusLine().getStatusCode());
-			return response.getStatusLine().getStatusCode();*/
-		/*} catch (IOException e) {
-			log.error(e.getMessage());
-			throw new InsightsCustomException(e.getMessage());
-		}	*/	
-			
-			return 0;
-	}
-
-
+	
 	/**
 	 * Train a Word2Vec algorithm using the training frame which needs to be already
 	 * uploaded and parsed The training frame must be a single column data frame of
@@ -273,7 +148,7 @@ public class H2oApiCommunicator {
 			String url=h2oEndpoint+H2ORestApiUrls.TRANSFORM_WORD2VEC;			
 			JsonObject queryParams= new JsonObject();
 			queryParams.addProperty("model", model);	
-			queryParams.addProperty("words_frame", inputFrame);	
+			queryParams.addProperty("words_frame", inputFrame+".hex");	
 			queryParams.addProperty("aggregate_method", "AVERAGE");	
 			String response=RestApiHandler.httpQueryParamRequest(url, queryParams, null,"Get");
 			
@@ -294,30 +169,15 @@ public class H2oApiCommunicator {
 		}
 	}
 
-	/**
-	 * Split an already uploaded and parsed frame into 2 based on the ratio
-	 * provided. The resultant frames are named to be: inputFrameName_part0 and
-	 * inputFrameName_part1
-	 *
+	
+	
+	/** split frame into training and test frame with specified splitRatio
 	 * @param inputFrame
 	 * @param splitRatio
 	 * @return
+	 * @throws InsightsCustomException
 	 */
-	public int splitFrame(String inputFrame, double splitRatio) throws InsightsCustomException {
-		try {
-			log.debug("Splitting frame: {} ", inputFrame);
-			HttpPost httpPost = new HttpPost(
-					h2oEndpoint + "/3/SplitFrame?dataset=" + inputFrame + "&ratios=" + String.valueOf(splitRatio));
-			CloseableHttpClient httpClient = HttpClients.createDefault();
-			HttpResponse response = httpClient.execute(httpPost);
-			return response.getStatusLine().getStatusCode();
-		} catch (IOException e) {
-			log.error(e.getMessage());
-			throw new InsightsCustomException(e.getMessage());
-		}
-	}
-	
-	public String splitFrameNew(String inputFrame, double splitRatio) throws InsightsCustomException {
+	public String splitFrame(String inputFrame, double splitRatio) throws InsightsCustomException {
 		try {
 			String url = h2oEndpoint+H2ORestApiUrls.SPLIT_FRAME;
 			JsonObject queryParams= new JsonObject();
@@ -382,41 +242,7 @@ public class H2oApiCommunicator {
 		}
 	}
 
-	/**
-	 * Get the progress/status of the AutoML build using the job url.
-	 *
-	 * @param url
-	 * @return
-	 */
-	public JsonObject getAutoMLProgress(String url) throws InsightsCustomException {
-		try {
-			JsonObject response = new JsonObject();
-			log.debug("Get progress of AutoML: {} ", url);
-			HttpGet httpGet = new HttpGet(h2oEndpoint + url);
-			CloseableHttpClient httpClient = HttpClients.createDefault();
-			HttpResponse pollingResponse = httpClient.execute(httpGet);
-			response.addProperty("ResponseCode", pollingResponse.getStatusLine().getStatusCode());
-			if (pollingResponse.getStatusLine().getStatusCode() == 200) {
-				JsonObject parsedjson = new Gson().fromJson(EntityUtils.toString(pollingResponse.getEntity()),
-						JsonObject.class);
-				JsonArray jobs = parsedjson.get("jobs").getAsJsonArray();
-				JsonObject job = jobs.get(0).getAsJsonObject();
-				String status = job.get("status").getAsString();
-				double progress = Math.floor((job.get("progress").getAsDouble()) * 100);
-				response.addProperty("Progress", progress);
-				response.addProperty("Status", status);
-				return response;
-			} else {
-				response.addProperty("Message", "Error in polling progress");
-				log.error(EntityUtils.toString(pollingResponse.getEntity()));
-				return response;
-			}
-		} catch (IOException e) {
-			log.error(e.getMessage());
-			throw new InsightsCustomException(e.getMessage());
-		}
-	}
-
+	
 	public int pollRequestStatus(String url) throws InsightsCustomException {
 		JsonObject response = new JsonObject();
 		try {
@@ -429,7 +255,6 @@ public class H2oApiCommunicator {
 				JsonArray jobs = response.get("jobs").getAsJsonArray();
 				JsonObject job = jobs.get(0).getAsJsonObject();
 				status = job.get("status").getAsString();
-				// double progress = Math.floor((job.get("progress").getAsDouble()) * 100);
 				Thread.sleep(3000);
 			} while (status.equals("RUNNING"));
 			if (status.equals("DONE")) {
@@ -443,39 +268,13 @@ public class H2oApiCommunicator {
 			throw new InsightsCustomException(e.getMessage());
 		}
 
-	}
+	}	
 	
-	/**
-	 * Get the Leaderboard for the AutoML run. It also contains the metrics for each
-	 * model.
-	 *
+	/** Get the leaderboard from modelId
 	 * @param modelId
-	 * @param responseColumn
 	 * @return
+	 * @throws InsightsCustomException
 	 */
-	/*public JsonObject getLeaderBoard(String modelName, String responseColumn) throws InsightsCustomException {
-		try {
-			log.debug("Get Leaderboard: {} ", modelName);
-			HttpGet httpGet = new HttpGet(h2oEndpoint + "/99/AutoML/" + modelName + "@@" + responseColumn);
-			CloseableHttpClient httpClient = HttpClients.createDefault();
-			HttpResponse Response = httpClient.execute(httpGet);
-			JsonObject jsonResponse = new Gson().fromJson(EntityUtils.toString(Response.getEntity()), JsonObject.class);
-			JsonObject leaderboardTable = new Gson().fromJson(jsonResponse.get("leaderboard_table"), JsonObject.class);
-			JsonArray columns = new Gson().fromJson(leaderboardTable.get("columns"), JsonArray.class);
-			JsonArray data = new Gson().fromJson(leaderboardTable.get("data"), JsonArray.class);
-			JsonObject leaderboard = new JsonObject();
-			for (int i = 1; i < columns.size(); i++) {
-				JsonObject colmn = new Gson().fromJson(columns.get(i), JsonObject.class);
-				leaderboard.add(colmn.get("name").getAsString(), data.get(i));
-			}
-			return leaderboard;
-		} catch (IOException e) {
-			log.error(e.getMessage());
-			throw new InsightsCustomException(e.getMessage());
-		}
-	}
-	*/
-	
 	public JsonObject getLeaderBoard(String modelId) throws InsightsCustomException {
 		try {
 			log.debug("Get Leaderboard: {} ", modelId);			
@@ -519,26 +318,22 @@ public class H2oApiCommunicator {
 	 */
 	public JsonObject predict(String modelName, String testFrame) throws InsightsCustomException {
 		try {
-			
-			String url = h2oEndpoint + H2ORestApiUrls.PREDICTION_URL+modelName+"/frames/"+testFrame;			
-			
+
+			String url = h2oEndpoint + H2ORestApiUrls.PREDICTION_URL + modelName + "/frames/" + testFrame;
 			log.debug("Predicting for : {}", modelName);
-			
 			JsonObject emptyObject = new JsonObject();
-			
 			String httpResponse = RestApiHandler.doPost(url, emptyObject, null);
 			JsonObject predictionData = new JsonObject();
-			
-				JsonObject responseObject = new Gson().fromJson(httpResponse,
-						JsonObject.class);
-				JsonObject model = responseObject.getAsJsonArray("model_metrics").get(0).getAsJsonObject();
-				JsonArray data = model.getAsJsonObject("predictions").getAsJsonArray("columns");
-				for (JsonElement e : data) {
-					predictionData.add(e.getAsJsonObject().get("label").getAsString(),
-							e.getAsJsonObject().getAsJsonArray("data"));
-				}
-				return predictionData;
-			
+
+			JsonObject responseObject = new Gson().fromJson(httpResponse, JsonObject.class);
+			JsonObject model = responseObject.getAsJsonArray("model_metrics").get(0).getAsJsonObject();
+			JsonArray data = model.getAsJsonObject("predictions").getAsJsonArray("columns");
+			for (JsonElement e : data) {
+				predictionData.add(e.getAsJsonObject().get("label").getAsString(),
+						e.getAsJsonObject().getAsJsonArray("data"));
+			}
+			return predictionData;
+
 		} catch (Exception e) {
 			log.error(e.getMessage());
 			throw new InsightsCustomException(e.getMessage());
@@ -632,69 +427,7 @@ public class H2oApiCommunicator {
 			response.addProperty("Status", "500");
 			return response;
 		}
-	}
-
-	/**
-	 * Poll a running request until DONE or ERROR
-	 *
-	 * @param response
-	 * @return
-	 */
-	/*private int pollRequest(String response) {
-		try {
-			JsonObject parsedjson = new Gson().fromJson(response, JsonObject.class);
-			JsonObject job = parsedjson.get("job").getAsJsonObject();
-			JsonObject key = job.get("key").getAsJsonObject();
-			String url = key.get("URL").getAsString();
-			HttpGet request = new HttpGet(h2oEndpoint + url);
-			String status = "RUNNING";
-			do {
-				CloseableHttpClient httpClient = HttpClients.createDefault();
-				HttpResponse pollingResponse = httpClient.execute(request);
-				if (pollingResponse.getStatusLine().getStatusCode() == 200) {
-					parsedjson = new Gson().fromJson(EntityUtils.toString(pollingResponse.getEntity()),
-							JsonObject.class);
-					JsonArray jobs = parsedjson.get("jobs").getAsJsonArray();
-					job = jobs.get(0).getAsJsonObject();
-					status = job.get("status").getAsString();
-				if (status.equals("DONE"))
-						return pollingResponse.getStatusLine().getStatusCode();
-				} else {
-					return pollingResponse.getStatusLine().getStatusCode();
-				}
-				TimeUnit.SECONDS.sleep(10);
-			} while (status.equals("RUNNING"));
-		} catch (Exception e) {
-			log.error(e.getMessage());
-		} 
-		return 0;
-	}
-	*/
-	
-	private int pollRequest(String response) {
-		try {
-			JsonObject parsedJson = new Gson().fromJson(response, JsonObject.class);
-			JsonObject job = parsedJson.get("job").getAsJsonObject();
-			JsonObject key = job.get("key").getAsJsonObject();
-			String url = key.get("URL").getAsString();
-			String httpURL=h2oEndpoint + url;
-			String status = "RUNNING";
-			do {
-				
-				String httpResponse=RestApiHandler.doGet(httpURL, null);
-				
-				/*	JsonArray jobs = parsedjson.get("jobs").getAsJsonArray();
-					job = jobs.get(0).getAsJsonObject();
-					status = job.get("status").getAsString();*/
-				
-				TimeUnit.SECONDS.sleep(10);
-			} while (status.equals("RUNNING"));
-		} catch (Exception e) {
-			log.error(e.getMessage());
-		} 
-		return 0;
-	}
-	
+	}	
 
 	/**
 	 * Get the vectors from transformed frame

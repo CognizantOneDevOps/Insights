@@ -8,7 +8,9 @@
       "isActive":true,
       "DBQuery":"MATCH (n:PRODUCTIVITY) where n.completionDateEpochTime > 1593561600 AND n.completionDateEpochTime < 1596239999 WITH n.completionDateEpochTime as completionDateEpochTime, avg(n.storyPoints*8) as StoryPoint, avg(n.authorTimeSpent) as authorTimeSpent  return   completionDateEpochTime, StoryPoint, authorTimeSpent, round((toFloat(StoryPoint)/authorTimeSpent)*100) as Productivity LIMIT 1",
       "resultField":"Productivity",
-      "datasource":"NEO4J"
+      "datasource":"NEO4J",
+      "outputDatasource": "NEO4J",
+   	  "usecase": ""
    },
    {
       "kpiId":100253,
@@ -19,7 +21,9 @@
       "isActive":true,
       "DBQuery":"MATCH (n:PRODUCTIVITY) where n.completionDateEpochTime > 1593561600 AND n.completionDateEpochTime < 1596239999 WITH n.completionDateEpochTime as completionDateEpochTime, avg(n.storyPoints*8) as StoryPoint, avg(n.authorTimeSpent) as authorTimeSpent  return   completionDateEpochTime, StoryPoint, authorTimeSpent, round((toFloat(StoryPoint)/authorTimeSpent)*100) as Productivity LIMIT 1",
       "resultField":"Productivity",
-      "datasource":"NEO4J"
+      "datasource":"NEO4J",
+      "outputDatasource": "NEO4J",
+   	  "usecase": ""
    },
    {
       "kpiId":100254,
@@ -30,7 +34,9 @@
       "isActive":true,
       "DBQuery":"MATCH (n:PRODUCTIVITY) where n.completionDateEpochTime > 1593561600 AND n.completionDateEpochTime < 1596239999 WITH n.completionDateEpochTime as completionDateEpochTime, avg(n.storyPoints*8) as StoryPoint, avg(n.authorTimeSpent) as authorTimeSpent  return   completionDateEpochTime, StoryPoint, authorTimeSpent, round((toFloat(StoryPoint)/authorTimeSpent)*100) as Productivity LIMIT 1",
       "resultField":"Productivity",
-      "datasource":"NEO4J"
+      "datasource":"NEO4J",
+      "outputDatasource": "NEO4J",
+   	  "usecase": ""
    },
    {
       "kpiId":100111,
@@ -41,7 +47,9 @@
       "DBQuery":"MATCH (n:JENKINS:DATA)  WHERE n.SPKstartTime > 1593561600 and n.SPKstartTime < 1596239999 and n.SPKvector = 'BUILD' and n.SPKstatus='Success' RETURN COALESCE(Avg(toInt(n.SPKduration)),0) as avgOutput LIMIT 2",
       "datasource":"NEO4J",
       "isActive":true,
-      "resultField":"avgOutput"
+      "resultField":"avgOutput",
+      "outputDatasource": "NEO4J",
+   	  "usecase": ""
    },
    {
       "kpiId":100112,
@@ -52,7 +60,9 @@
       "DBQuery":"MATCH (n:JENKINS:DATA)  WHERE n.SPKstartTime > 1593561600 and n.SPKstartTime < 1596239999 and n.SPKvector = 'BUILD' and n.SPKstatus='Success' RETURN COALESCE(Avg(toInt(n.SPKduration)),0) as avgOutput LIMIT 2",
       "datasource":"NEO4J",
       "isActive":true,
-      "resultField":"avgOutput"
+      "resultField":"avgOutput",
+      "outputDatasource": "NEO4J",
+   	  "usecase": ""
    },
    {
       "kpiId":100331,
@@ -63,7 +73,9 @@
       "DBQuery":"",
       "datasource":"NEO4J",
       "isActive":true,
-      "resultField":"AvgComplexityCoverage"
+      "resultField":"AvgComplexityCoverage",
+      "outputDatasource": "NEO4J",
+   	  "usecase": ""
    },
    {
       "kpiId":100332,
@@ -74,7 +86,9 @@
       "DBQuery":"MATCH (n:SONAR:DATA) where n.SPKstartTime > 1593561600 and n.SPKstartTime < 1596239999 and n.SPKstatus='Success' RETURN  COALESCE(Avg(toInt(n.SPKcomplexity)),0) as AvgComplexityCoverage LIMIT 2",
       "datasource":"NEO4J",
       "isActive":true,
-      "resultField":"AvgComplexityCoverage"
+      "resultField":"AvgComplexityCoverage",
+      "outputDatasource": "NEO4J",
+   	  "usecase": ""
    },
    {
       "kpiId":100131,
@@ -85,7 +99,9 @@
       "DBQuery":"MATCH (n:SONAR:DATA) where n.SPKstartTime > 1593561600 and n.SPKstartTime < 1596239999 and n.SPKstatus='Success' RETURN  COALESCE(Avg(toInt(n.SPKduplication)),0) as AvgDuplicateBlocksCoverage LIMIT 2",
       "datasource":"NEO4J",
       "isActive":true,
-      "resultField":"AvgDuplicateBlocksCoverage"
+      "resultField":"AvgDuplicateBlocksCoverage",
+      "outputDatasource": "NEO4J",
+   	  "usecase": ""
    },
    {
       "kpiId":100132,
@@ -96,7 +112,9 @@
       "DBQuery":"MATCH (n:SONAR:DATA) where n.SPKstartTime > 1593561600 and n.SPKstartTime < 1596239999 and n.SPKstatus='Success' RETURN   COALESCE(Avg(toInt(n.SPKduplication)),0) as AvgDuplicateBlocksCoverage LIMIT 2",
       "datasource":"NEO4J",
       "isActive":true,
-      "resultField":"AvgDuplicateBlocksCoverage"
+      "resultField":"AvgDuplicateBlocksCoverage",
+      "outputDatasource": "NEO4J",
+   	  "usecase": ""
    },
    {
       "kpiId":100101,
@@ -107,7 +125,9 @@
       "DBQuery":"MATCH (n:SONAR:DATA) where n.SPKstartTime > 1593561600 and n.SPKstartTime < 1596239999 and n.SPKqualityGate='pass' RETURN count(n) as NumberOfQualityBlocks LIMIT 2",
       "datasource":"NEO4J",
       "isActive":true,
-      "resultField":"NumberOfQualityBlocks"
+      "resultField":"NumberOfQualityBlocks",
+      "outputDatasource": "NEO4J",
+   	  "usecase": ""
    },
    {
       "kpiId":100102,
@@ -118,7 +138,9 @@
       "DBQuery":"MATCH (n:SONAR:DATA) where n.SPKstartTime > 1593561600 and n.SPKstartTime < 1596239999 and n.SPKqualityGates='pass' RETURN  count(n) as NumberOfQualityBlocks LIMIT 2",
       "datasource":"NEO4J",
       "isActive":true,
-      "resultField":"NumberOfQualityBlocks"
+      "resultField":"NumberOfQualityBlocks",
+      "outputDatasource": "NEO4J",
+   	  "usecase": ""
    },
    {
       "kpiId":100133,
@@ -140,7 +162,9 @@
       "DBQuery":"MATCH (n:SONAR:DATA) where n.SPKstartTime > 1593561600 and n.SPKstartTime < 1596239999 and n.SPKqualityGate='fail' RETURN count(n) as NumberOfQualityBlocks LIMIT 2",
       "datasource":"NEO4J",
       "isActive":true,
-      "resultField":"NumberOfQualityBlocks"
+      "resultField":"NumberOfQualityBlocks",
+      "outputDatasource": "NEO4J",
+   	  "usecase": ""
    },
    {
       "kpiId":100235,
@@ -162,7 +186,9 @@
       "DBQuery":"MATCH (n:SONAR:DATA) where n.SPKstartTime > 1593561600 and n.SPKstartTime < 1596239999 and n.SPKstatus='Success' RETURN  COALESCE(Avg(toInt(n.SPKcoverage)),0) as AvgCodeCoverage LIMIT 2",
       "datasource":"NEO4J",
       "isActive":true,
-      "resultField":"AvgCodeCoverage"
+      "resultField":"AvgCodeCoverage",
+      "outputDatasource": "NEO4J",
+   	  "usecase": ""
    },
    {
       "kpiId":100237,
@@ -173,7 +199,9 @@
       "DBQuery":"MATCH (n:SONAR:DATA) where n.SPKstartTime > 1593561600 and n.SPKstartTime < 1596239999 and n.SPKstatus='Success' RETURN  n.SPKendTime as SPKendTime,COALESCE(Avg(toInt(n.SPKcoverage)),0) as AvgCodeCoverage LIMIT 2",
       "datasource":"NEO4J",
       "isActive":true,
-      "resultField":"AvgCodeCoverage"
+      "resultField":"AvgCodeCoverage",
+      "outputDatasource": "NEO4J",
+   	  "usecase": ""
    },
    {
       "kpiId":100238,
@@ -184,7 +212,9 @@
       "DBQuery":"MATCH (n:SONAR:DATA) where n.SPKstartTime > 1593561600 and n.SPKstartTime < 1596239999 and n.SPKstatus='Success' RETURN COALESCE(Avg(toInt(n.SPKcoverage)),0) as AvgCodeCoverage LIMIT 2",
       "datasource":"NEO4J",
       "isActive":true,
-      "resultField":"AvgCodeCoverage"
+      "resultField":"AvgCodeCoverage",
+      "outputDatasource": "NEO4J",
+   	  "usecase": ""
    },
    {
       "kpiId":100135,
@@ -195,7 +225,9 @@
       "DBQuery":"MATCH (n:SONAR:DATA) where n.SPKstartTime > 1593561600 and n.SPKstartTime < 1596239999 and n.SPKstatus='Success' RETURN count(n) as NumberOfSonarExecutions LIMIT 2",
       "datasource":"NEO4J",
       "isActive":true,
-      "resultField":"NumberOfSonarExecutions"
+      "resultField":"NumberOfSonarExecutions",
+      "outputDatasource": "NEO4J",
+   	  "usecase": ""
    },
    {
       "kpiId":100136,
@@ -206,7 +238,9 @@
       "DBQuery":"MATCH (n:SONAR:DATA) where n.SPKstartTime > 1593561600 and n.SPKstartTime < 1596239999 and n.SPKstatus='Success' RETURN count(n) as NumberOfSonarExecutions LIMIT 2",
       "datasource":"NEO4J",
       "isActive":true,
-      "resultField":"NumberOfSonarExecutions"
+      "resultField":"NumberOfSonarExecutions",
+      "outputDatasource": "NEO4J",
+   	  "usecase": ""
    },
    {
       "kpiId":100137,
@@ -217,7 +251,9 @@
       "DBQuery":"MATCH (n:SONAR:DATA) where n.SPKstartTime > 1593561600 and n.SPKstartTime < 1596239999 and n.SPKstatus='Failure' RETURN count(n) as NumberOfSonarExecutions LIMIT 2",
       "datasource":"NEO4J",
       "isActive":true,
-      "resultField":"NumberOfSonarExecutions"
+      "resultField":"NumberOfSonarExecutions",
+      "outputDatasource": "NEO4J",
+   	  "usecase": ""
    },
    {
       "kpiId":100138,
@@ -228,7 +264,9 @@
       "DBQuery":"MATCH (n:SONAR:DATA) where n.SPKstartTime > 1593561600 and n.SPKstartTime < 1596239999 and n.SPKstatus='Failure' RETURN count(n) as NumberOfSonarExecutions LIMIT 2",
       "datasource":"NEO4J",
       "isActive":true,
-      "resultField":"NumberOfSonarExecutions"
+      "resultField":"NumberOfSonarExecutions",
+      "outputDatasource": "NEO4J",
+   	  "usecase": ""
    },
    {
       "kpiId":100901,
@@ -239,7 +277,9 @@
       "DBQuery":"MATCH (n:SONAR:DATA) WHERE  n.SPKstartTime > 1593561600 and n.SPKstartTime < 1596239999 and n.SPKvector = 'CODEQUALITY' with n where n.SPKstatus='Success'  RETURN  toInt(ROUND(Avg(n.SPKbugs))) as Bugs , toInt(ROUND(Avg(n.SPKcodeSmellsStr))) as CodeSmell, toInt(ROUND(Avg(n.SPKVulnerabilitiesStr))) as Vulnerablilities LIMIT 2",
       "datasource":"NEO4J",
       "isActive":true,
-      "resultField":"CodeSmell"
+      "resultField":"CodeSmell",
+      "outputDatasource": "NEO4J",
+   	  "usecase": ""
    },
    {
       "kpiId":100903,
@@ -250,7 +290,9 @@
       "DBQuery":"MATCH (n:JIRA) where n.SPKprojectName in ['PaymentServices','MobileServices','ClaimFinder','AgentLocator'] and  n.SPKstartTime > 1593561600 and n.SPKstartTime < 1596239999 with n return distinct n.SPKprojectName as StoryTypes , sum(n.SPKduration)/3600 as Duration LIMIT 2",
       "datasource":"NEO4J",
       "isActive":true,
-      "resultField":"Duration"
+      "resultField":"Duration",
+      "outputDatasource": "NEO4J",
+   	  "usecase": ""
    },
    {
       "kpiId":100127,
@@ -261,7 +303,9 @@
       "DBQuery":"MATCH (n:JENKINS:DATA) WHERE n.SPKstartTime > 1593561600 and n.SPKstartTime < 1596239999 and n.SPKvectors = 'BUILD' and n.SPKstatus='Success' RETURN COALESCE(Max(toInt(n.SPKduration)),0) as MaxBuildTime",
       "datasource":"NEO4J",
       "isActive":true,
-      "resultField":"MaxBuildTime"
+      "resultField":"MaxBuildTime",
+      "outputDatasource": "NEO4J",
+   	  "usecase": ""
    },
    {
       "kpiId":100161,
@@ -273,7 +317,9 @@
       "DBQuery":"MATCH (n:JIRA:DATA) WHERE n.SPKstartTime > 1593561600 and n.SPKstartTime < 1596239999 and n.SPKissueTypes='Bug' and n.SPKstatus='Closed'  RETURN n",
       "datasource":"NEO4J",
       "isActive":true,
-      "resultField":"ClosedDefect"
+      "resultField":"ClosedDefect",
+      "outputDatasource": "NEO4J",
+   	  "usecase": ""
    },
    {
       "kpiId":100153,
@@ -284,7 +330,9 @@
       "DBQuery":"MATCH (n:JIRA:DATA) WHERE SPKstartTime > 1593561600 and n.SPKstartTime < 1596239999 and n.SPKissueType='Bug' and n.SPKstatus='Closed'  RETURN COALESCE(Avg(toInt(n.SPKduration)),0) as AvgDefectCompletionTime",
       "datasource":"NEO4J",
       "isActive":true,
-      "resultField":"AvgDefectCompletionTime"
+      "resultField":"AvgDefectCompletionTime",
+      "outputDatasource": "NEO4J",
+   	  "usecase": ""
    },
    {
    	  "kpiId":102109,
@@ -295,8 +343,11 @@
       "DBQuery":"MATCH (n:JENKINS:DATA) WHERE  n.SPKstartTime > 1593561600 and n.SPKstartTime < 1596239999 and n.SPKvector = 'BUILD' with n , case when n.SPKstatus='Failure'then count(n.SPKduration) end as Failure ,case when n.SPKstatus='Success'then count(n.SPKduration) end as Success RETURN  count(Failure) as Failure , count (Success) as Success",
       "datasource":"NEO4J",
       "isActive":true,
-      "resultField":"Failure"
-   },    {
+      "resultField":"Failure",
+      "outputDatasource": "NEO4J",
+   	  "usecase": ""
+   },    
+   {
       "kpiId":112101,
       "name":"Defects Type Count",
       "group":"ALM",
@@ -327,7 +378,9 @@
       "isActive":true,
       "DBQuery":"MATCH (n:PRODUCTIVITY) where n.completionDateEpochTime > 1535760000 AND n.completionDateEpochTime < 1538351999 WITH n.completionDateEpochTime as completionDateEpochTime, avg(n.storyPoints*8) as StoryPoint, avg(n.authorTimeSpent) as authorTimeSpent  return   completionDateEpochTime, StoryPoint, authorTimeSpent, round((toFloat(StoryPoint)/authorTimeSpent)*100) as Productivity",
       "resultField":"Productivity",
-      "datasource":"NEO4J"
+      "datasource":"NEO4J",
+      "outputDatasource": "NEO4J",
+   	  "usecase": ""
    },
   {
       "kpiId":112104,
@@ -338,7 +391,9 @@
       "DBQuery":"MATCH (n:SONAR:DATA) WHERE  n.SPKstartTime > 1535760000 and n.SPKstartTime < 1538351999 and n.SPKvector = 'CODEQUALITY' with n where n.SPKstatus='Success'  RETURN  toInt(ROUND(SUM(n.SPKbugs))) as Bugs , toInt(ROUND(SUM(n.SPKcodeSmellsStr))) as CodeSmell, toInt(ROUND(SUM(n.SPKVulnerabilitiesStr))) as Vulnerablilities",
       "datasource":"NEO4J",
       "isActive":true,
-      "resultField":"CodeSmell"
+      "resultField":"CodeSmell",
+      "outputDatasource": "NEO4J",
+   	  "usecase": ""
    },
     {
    "kpiId":112105,
@@ -349,6 +404,8 @@
       "DBQuery":"MATCH (n:JENKINS:DATA) WHERE  n.SPKstartTime > 1535760000  and n.SPKstartTime < 1538351999 and n.SPKvector = 'BUILD' with n , case when n.SPKstatus='Failure'then count(n.SPKduration) end as Failure ,case when n.SPKstatus='Success'then count(n.SPKduration) end as Success RETURN  count(Failure) as Failure , count (Success) as Success",
       "datasource":"NEO4J",
       "isActive":true,
-      "resultField":"Failure"
+      "resultField":"Failure",
+      "outputDatasource": "NEO4J",
+   	  "usecase": ""
    }
 ]

@@ -87,8 +87,8 @@
       </ng-container>
 
       <ng-container matColumnDef="SplitRatio">
-        <th mat-header-cell *matHeaderCellDef class="tableHeaderCss" style="padding-left:6px;width:10%;text-align: center">Split Ratio Training/Testing</th>
-        <td mat-cell *matCellDef="let element" style="padding-left:6px;width:10%;text-align: center"> {{element.splitRatio}} </td>
+        <th mat-header-cell *matHeaderCellDef class="tableHeaderCss" style="width:10%;text-align: center">Split Ratio Training/Testing</th>
+        <td mat-cell *matCellDef="let element" style="width:10%;text-align: center"> {{element.splitRatio}} </td>
       </ng-container>
 
       <ng-container matColumnDef="Created">
@@ -112,10 +112,19 @@
         <th mat-header-cell *matHeaderCellDef class="tableHeaderCss" style="padding-left:13px">Recommended Action</th>
         <td mat-cell *matCellDef="let element" style="width:30% !important"> {{element.recommendedAction}} </td>
       </ng-container> -->
-      <ng-container matColumnDef="Status" class="btnAlign">
+      <ng-container matColumnDef="Status">
         <th mat-header-cell *matHeaderCellDef class="tableHeaderCss" style="padding-left: 6px;text-align: center"> Status</th>
         <td mat-cell *matCellDef="let element" style="width:15% !important;padding-left: 6px;text-align: center">{{element.status}}</td>
       </ng-container>
+
+      <ng-container matColumnDef="active">
+        <th mat-header-cell *matHeaderCellDef class="tableHeaderCss">Active</th>
+        <td mat-cell *matCellDef="let element;let i = index" style="width:5% !important">
+            <mat-slide-toggle (change)="updateUsecaseState($event,element.usecaseName,element)"
+            [checked]="element.isActive" [(ngModel)]="element.isActive" >
+            </mat-slide-toggle>
+        </td>
+    </ng-container>
 
       <ng-container matColumnDef="details">
         <th mat-header-cell *matHeaderCellDef class="tableDetailsHeaderCss" style="text-align: center"> Details

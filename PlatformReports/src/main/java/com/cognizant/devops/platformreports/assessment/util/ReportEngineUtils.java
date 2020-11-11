@@ -35,6 +35,9 @@ public class ReportEngineUtils {
 
 	private static final Logger log = LogManager.getLogger(ReportEngineUtils.class);
 	public static final String TIMEZONE = "GMT";
+	public static final String ASSESSMENT_ID="assessmentId";
+	public static final String PREDICTION="PREDICTION";
+	public static final String REPORT_ID="reportId";
 	public static final String NEO4J_RESULT_LABEL = "KPI:RESULTS";
 	public static final String NEO4J_CONFIG_LABEL = "KPI:CONFIG";
 	public static final String NEO4J_CONTENT_CONFIG_LABEL = "KPI:CONTENT_CONFIG";

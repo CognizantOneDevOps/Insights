@@ -156,7 +156,7 @@ public class AutoMLConfigDAL extends BaseDAL {
     public boolean deleteUsecase(String usecase) {
 
 		Query<AutoMLConfig> createQuery = getSession().createQuery(
-				"FROM AutoMLConfig a WHERE a.useCaseName = :usecase and a.status='NOT_STARTED' OR a.status='ERROR'",
+				"FROM AutoMLConfig a WHERE a.useCaseName = :usecase",
 				AutoMLConfig.class);
 		createQuery.setParameter("usecase", usecase);
 		AutoMLConfig autoMLConfig = createQuery.uniqueResult();
@@ -209,5 +209,20 @@ public class AutoMLConfigDAL extends BaseDAL {
 		terminateSessionFactory();
 		return result;
 	}
+	
+	/**
+     * Get all active and mojo_deployed usecases list
+     *
+     * @return
+     */
+	public List<AutoMLConfig> getActiveUsecaseList() {
+        Query<AutoMLConfig> createQuery = getSession().createQuery(
+        		"FROM AutoMLConfig AMLC WHERE AMLC.isActive = true AND AMLC.status = 'MOJO_DEPLOYED'",
+        		AutoMLConfig.class);
+        List<AutoMLConfig> result = createQuery.getResultList();
+        terminateSession();
+        terminateSessionFactory();
+        return result;
+    }
 
 }
