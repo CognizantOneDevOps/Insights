@@ -449,9 +449,9 @@ public class InsightsAssessmentReportController {
 			String validatedEditResponse = ValidationUtils.validateRequestBody(updateContentRequest);
 			JsonParser parser = new JsonParser();
 			JsonObject updateKpijson = (JsonObject) parser.parse(validatedEditResponse);
-			int resultKpiId = assessmentReportService.updateContentDefinition(updateKpijson);
+			int resultContentId = assessmentReportService.updateContentDefinition(updateKpijson);
 			kpiResponse.addProperty(PlatformServiceConstants.MESSAGE,
-					"Content definition updated for KpiId " + resultKpiId);
+					"Content definition updated for ContentId " + resultContentId);
 			return PlatformServiceUtil.buildSuccessResponseWithData(kpiResponse);
 		} catch (InsightsCustomException e) {
 			log.error(e);

@@ -339,3 +339,12 @@ td.mat-cell {
     bottom: 0;
     right: 0;
 }
+
+::ng-deep.mat-dialog-content {
+    margin-top: 10px;
+    overflow-wrap: break-word;
+}
+
+::ng-deep .mat-tooltip {
+    max-width: 100% !important;
+} 

@@ -40,8 +40,8 @@
         </button>
   
         <button mat-icon-button >
-          <mat-icon title="Refresh" (click)="refresh()" style="margin-bottom: -10%;" class="mat-icon material-icons">
-              restore
+          <mat-icon svgIcon="redirect_icon" title="Redirect To Landing Page" (click)="refresh()" style="margin-bottom: 15%;" class="mat-icon material-icons">
+              refresh
           </mat-icon>
         </button>
     </div>
@@ -68,7 +68,6 @@
                     [ngClass]="{'input-disabled' : disableInputFields ,  'form-control': !disableInputFields}" type="text" autocomplete="off" placeholder="Enter template name">
                 </td>
                 <div class="infoText">
-                    <!-- <span class="infoText">Enter a valid report template name.</span> -->
                     <td class="mat-cell" class="columnName">
                         <span class="mainText">Visualization Util</span>
                         <span style="color:#ff0000;">*</span>
@@ -96,24 +95,6 @@
                     <!-- <span class="infoText">Add description for report template</span> -->
                 </td>
             </tr>
-            
-            <!-- <tr class="mat-row-webhook">
-                <td class="mat-cell" class="columnName">
-                    <span class="mainText">Visualization Util</span>
-                    <span style="color:#ff0000;">*</span>
-                </td>
-                <td class="columnComponent">
-                    <mat-select  class="form-control" required placeholder="Select visualization util"
-                            color="primary" [(ngModel)]="visualizationUtil">
-                            <mat-option *ngFor="let vUtil of visualizationUtilList" value="{{vUtil}}" style="color:#0033A0">
-                                 {{vUtil}}</mat-option>
-                    </mat-select>
-                </td>
-                <td>
-                    <span class="infoText">Select visualization util for report template.</span>
-                </td>
-            </tr> -->
-           
         </tbody>
     </table>
 
@@ -132,12 +113,8 @@
                         <span style="color:#ff0000;">*</span>
                     </td>
                     <td class="columnComponent">
-                        <!-- <mat-select  class="form-control" [disabled]="disableId" [(ngModel)]="kpiId" required placeholder="Select KPI Id"
-                        color="primary">
-                        <mat-option *ngFor="let id of kpiIdList" value="{{id}}" style="color:#0033A0">
-                        {{id}} </mat-option> </mat-select> -->
                         <input matinput maxlength="10" [(ngModel)]="kpiId" type="text"
-                        disabled placeholder="Select KPI Id" [ngClass]="{'input-disabled' : isEdit ,  'form-control': !isEdit}">
+                        disabled placeholder="Search for a KPI Id" class="input-disabled">
                     </td>
                     <td class="extraColCss">
                         <button mat-icon-button [disabled]="isEdit" (click)="kpiSelectDialog()" style="margin-left:-45px;">

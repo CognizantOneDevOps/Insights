@@ -141,7 +141,7 @@ export class KpiAdditionComponent implements OnInit {
             let res = response;
             if (response.status == "success") {
               self.messageDialog.showApplicationsMessage("<b>" + "Kpi defination updated for KpiId " + self.kpiId, "SUCCESS");
-              self.router.navigateByUrl('InSights/Home/kpicreation');
+              self.router.navigateByUrl('InSights/Home/kpicreation',{skipLocationChange:true});
               self.type = "EDIT";
             } else {
               self.messageDialog.showApplicationsMessage("<b>" + response.message, "ERROR");
@@ -168,7 +168,7 @@ export class KpiAdditionComponent implements OnInit {
             let res = response;
             if (response.status == "success") {
               setTimeout(() => { self.messageDialog.showApplicationsMessage("<b>" + "Kpi with id " + self.kpiId + "</b> created successfully.", "SUCCESS") }, 500);
-              self.router.navigateByUrl('InSights/Home/kpicreation');
+              self.router.navigateByUrl('InSights/Home/kpicreation',{skipLocationChange:true});
               self.type = "EDIT";
             } else if (response.message === "KPI already exists") {
               self.messageDialog.showApplicationsMessage("<b>" + "Kpi Id" + self.kpiId + "</b> already exists. Please try again with a new Id.", "ERROR");

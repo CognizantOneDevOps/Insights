@@ -227,8 +227,9 @@ export class ReportTemplateConfig implements OnInit {
     }
 
     reset() {
-        this.reportId = '';
-        this.templateName = '';
+        if(this.receivedParam.type == "save") {
+            this.templateName = '';
+        }
         this.description = '';
         this.visualizationUtil = '';
         this.kpiId = '';

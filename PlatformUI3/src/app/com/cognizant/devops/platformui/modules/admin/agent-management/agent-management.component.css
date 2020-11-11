@@ -184,7 +184,7 @@ tr.mat-footer-row, tr.mat-row-dynamic{
 .btnAlign{
     /* margin-right: 1px;  */
     float: right;
-    margin-left: 210px;
+    margin-left: auto;
 }
 
 .mat-icon-message{
@@ -240,6 +240,7 @@ tr.mat-footer-row, tr.mat-row-dynamic{
     display: -webkit-flex;
     margin-top: 10px;
     height: 40px;
+    justify-content: flex-start;
 }
 
 .button-row{

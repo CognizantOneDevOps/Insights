@@ -265,7 +265,7 @@ export class ContentConfigAddition implements OnInit {
             let res = response;
             if (response.status == "success") {
               self.messageDialog.showApplicationsMessage("<b>" + response.data.message, "SUCCESS");
-              self.router.navigateByUrl('InSights/Home/contentConfig');
+              self.router.navigateByUrl('InSights/Home/contentConfig',{skipLocationChange:true});
               self.type = "EDIT";
             } else {
               self.messageDialog.showApplicationsMessage("<b>" + response.data.message, "ERROR");
@@ -287,7 +287,7 @@ export class ContentConfigAddition implements OnInit {
             let res = response;
             if (response.status == "success") {
               setTimeout(() => { self.messageDialog.showApplicationsMessage("<b>" + "Content with id " + self.contentId + "</b> created successfully.", "SUCCESS") }, 500);
-              self.router.navigateByUrl('InSights/Home/contentConfig');
+              self.router.navigateByUrl('InSights/Home/contentConfig',{skipLocationChange:true});
               self.type = "EDIT";
             } else{
               debugger;

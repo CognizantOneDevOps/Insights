@@ -899,11 +899,11 @@ public class AssesmentReportServiceImpl {
 				} else {
 				String reportTemplateFolderPath = AssessmentReportAndWorkflowConstants.REPORT_PDF_RESOLVED_PATH
 						+ AssessmentReportAndWorkflowConstants.REPORT_CONFIG_TEMPLATE_DIR + File.separator
-						+ reportEntity.getFile() + File.separator;
+						+ reportEntity.getFile();
 
 				for (MultipartFile file : Arrays.asList(files)) {
 					String fileExt = FilenameUtils.getExtension(file.getOriginalFilename());
-					String finalFileName = reportTemplateFolderPath + reportEntity.getFile() + "." + fileExt;
+					String finalFileName = reportTemplateFolderPath  + File.separator + reportEntity.getFile() + "." + fileExt;
 					log.debug("  original fileName   ======= {}  final File name {} file extention {} ",
 							file.getOriginalFilename(), finalFileName, fileExt);
 

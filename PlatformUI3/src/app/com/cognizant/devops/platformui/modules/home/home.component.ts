@@ -386,15 +386,6 @@ export class HomeComponent implements OnInit {
             title: "Business Mapping",
             isAdminMenu: true
           },
-		  {
-		    displayName: 'Data Archival',
-            iconName: 'feature',
-            route: 'InSights/Home/dataarchiving',
-            isToolbarDisplay: InsightsInitService.enableInsightsToolbar,
-            showMenu: true,
-            title: "Data Archival",
-            isAdminMenu: true
-          },
           {
             displayName: 'Report Configuration',
             iconName: 'feature',
@@ -439,6 +430,15 @@ export class HomeComponent implements OnInit {
             isToolbarDisplay: InsightsInitService.enableInsightsToolbar,
             showMenu: true,
             title: "Logo Setting",
+            isAdminMenu: true
+          },
+          {
+            displayName: 'Data Archival',
+            iconName: 'feature',
+            route: 'InSights/Home/dataarchiving',
+            isToolbarDisplay: InsightsInitService.enableInsightsToolbar,
+            showMenu: true,
+            title: "Data Archival",
             isAdminMenu: true
           }
            /* ,

@@ -39,15 +39,7 @@
                     add_circle
                 </mat-icon>
             </button>
-            <button [disabled] *ngIf="!enableWebhookicon" mat-icon-button>
-                <mat-icon svgIcon="webhookDeactive" title="List Existing Webhooks" style="margin-bottom: 20%;" class="mat-icon material-icons">
-
-                </mat-icon>
-            </button>
-            <button *ngIf="enableWebhookicon" mat-icon-button (click)="list()">
-                <mat-icon svgIcon="webhook" title="List Existing WebHooks" style="margin-bottom: 20%;" class="mat-icon material-icons">
-                </mat-icon>
-            </button>
+    
             <button [disabled]="!enablesubscribe" mat-icon-button (click)="actionSubscribeOrUnsubscribe( true)">
                 <mat-icon title="Subscribe" style="margin-top: 12%;" class="mat-icon material-icons">
                     rss_feed
@@ -91,6 +83,11 @@
             <button mat-icon-button (click)="Refresh()" [disabled]="!enableRefresh">
                 <mat-icon title="Refresh" style="margin-top: 10%;" class="mat-icon material-icons">
                     cancel
+                </mat-icon>
+            </button>
+
+            <button *ngIf="enableWebhookicon" mat-icon-button (click)="list()">
+                <mat-icon svgIcon="redirect_icon" title="Redirect To Landing Page" style="margin-bottom: 20%;" class="mat-icon material-icons">
                 </mat-icon>
             </button>
         </div>

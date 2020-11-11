@@ -50,7 +50,7 @@
         </button>
 
         <button mat-icon-button [disabled]="!enableAttachFile" (click)="attachFiles()">
-            <mat-icon title="attach files" class="mat-icon material-icons">
+            <mat-icon title="Attach Files" class="mat-icon material-icons">
                 attach_file
             </mat-icon>
         </button>
@@ -94,8 +94,8 @@
                 </ng-container>
                 <ng-container matColumnDef="reportTemplateDescription">
                     <th mat-header-cell *matHeaderCellDef class="tableHeaderCss">Description</th>
-                    <td mat-cell *matCellDef="let element" style="width:30% !important">
-                        {{element.description}}
+                    <td mat-cell *matCellDef="let element" style="width:30% !important" [matTooltip]="element.description">
+                        {{(element.description.length>38)? element.description.slice(0,35)+'...':(element.description)}}
                     </td>
                 </ng-container>
                 <ng-container matColumnDef="visualizationutil">
