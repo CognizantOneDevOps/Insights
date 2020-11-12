@@ -20,7 +20,6 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
-import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.constants.ErrorMessage;
 import com.cognizant.devops.platformcommons.constants.ServiceStatusConstants;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBHandler;
@@ -45,87 +44,9 @@ public class HealthStatusServiceImpl {
 	public JsonObject getHealthStatus() throws InsightsCustomException {
 		JsonObject servicesHealthStatus = new JsonObject();
 		try {
-			String username = null;
-			String password = null;
-			String authToken = null;
-			String hostEndPoint = "";
-			String apiUrl = "";
-			hostEndPoint = ServiceStatusConstants.POSTGRESQL_HOST;
-			apiUrl = hostEndPoint;
-			JsonObject postgreStatus = healthUtil.getClientResponse(hostEndPoint, apiUrl, ServiceStatusConstants.DB,
-					ServiceStatusConstants.PgSQL, Boolean.FALSE, username, password, authToken);
-			servicesHealthStatus.add(ServiceStatusConstants.PgSQL, postgreStatus);
-			log.debug("After Postgres================");
-			/* PlatformService health check */
-			hostEndPoint = ServiceStatusConstants.PLATFORM_SERVICE_HOST;
-			JsonObject platformServStatus = getVersionDetails(hostEndPoint, ServiceStatusConstants.Service);
-			servicesHealthStatus.add(ServiceStatusConstants.PlatformService, platformServStatus);
-			log.debug("After Platform Service================");
-			/* Neo4j health check */
-			hostEndPoint = ServiceStatusConstants.NEO4J_HOST;
-			apiUrl = hostEndPoint + "/db/data/";
-			authToken = ApplicationConfigProvider.getInstance().getGraph().getAuthToken();
-			JsonObject neo4jStatus = healthUtil.getClientResponse(hostEndPoint, apiUrl, ServiceStatusConstants.DB,
-					ServiceStatusConstants.Neo4j, Boolean.TRUE, username, password, authToken);
-			servicesHealthStatus.add(ServiceStatusConstants.Neo4j, neo4jStatus);
-			log.debug("After Neo4j================");
-			/* Elastic Search health check */
-			hostEndPoint = ServiceStatusConstants.ES_HOST;
-			apiUrl = hostEndPoint;
-			JsonObject esStatus = healthUtil.getClientResponse(hostEndPoint, apiUrl, ServiceStatusConstants.DB,
-					ServiceStatusConstants.ES, Boolean.FALSE, username, password, authToken);
-			servicesHealthStatus.add(ServiceStatusConstants.ES, esStatus);
-			log.debug("After ElasticSearch================");
-			/* Rabbit Mq health check */
-			hostEndPoint = ServiceStatusConstants.RABBIT_MQ;
-			apiUrl = hostEndPoint + "/api/overview";
-			authToken = null;
-			username = ApplicationConfigProvider.getInstance().getMessageQueue().getUser();
-			password = ApplicationConfigProvider.getInstance().getMessageQueue().getPassword();
-			JsonObject rabbitMq = healthUtil.getClientResponse(hostEndPoint, apiUrl, ServiceStatusConstants.DB,
-					ServiceStatusConstants.RabbitMq, Boolean.TRUE, username, password, authToken);
-			servicesHealthStatus.add(ServiceStatusConstants.RabbitMq, rabbitMq);
-			log.debug("After Rabbit Mq================");
-			/* Platform Engine Health Check */
-			hostEndPoint = ServiceStatusConstants.PlatformEngine;
-			apiUrl = hostEndPoint;
-			JsonObject jsonPlatformEngineStatus = healthUtil.getComponentStatus("PlatformEngine");
-			servicesHealthStatus.add(ServiceStatusConstants.PlatformEngine, jsonPlatformEngineStatus);
-			log.debug("After Platform Engine================");
-			hostEndPoint = ServiceStatusConstants.PlatformWorkflow;
-			apiUrl = hostEndPoint;
-			JsonObject jsonPlatformWorkflowStatus = healthUtil.getComponentStatus("PlatformWorkflow");
-			servicesHealthStatus.add(ServiceStatusConstants.PlatformWorkflow, jsonPlatformWorkflowStatus);
-			log.debug("After Platform Workflow================");
-
-			if (ApplicationConfigProvider.getInstance().isEnableWebHookEngine()) {
-				hostEndPoint = ServiceStatusConstants.PlatformWebhookEngine;
-				apiUrl = hostEndPoint;
-				JsonObject jsonPlatformWebhookEngineStatus = healthUtil.getComponentStatus("PlatformWebhookEngine");
-				servicesHealthStatus.add(ServiceStatusConstants.PlatformWebhookEngine, jsonPlatformWebhookEngineStatus);
-
-				hostEndPoint = ServiceStatusConstants.PlatformWebhookSubscriber;
-				apiUrl = hostEndPoint;
-				JsonObject jsonPlatformWebhookSubscriberStatus = healthUtil
-						.getComponentStatus("PlatformWebhookSubscriber");
-				servicesHealthStatus.add(ServiceStatusConstants.PlatformWebhookSubscriber,
-						jsonPlatformWebhookSubscriberStatus);
-			}
-
-			if (ApplicationConfigProvider.getInstance().isEnableAuditEngine()) {
-				hostEndPoint = ServiceStatusConstants.PlatformAuditEngine;
-				apiUrl = hostEndPoint;
-				JsonObject jsonPlatformAuditEngineStatus = healthUtil.getComponentStatus("PlatformAuditEngine");
-				servicesHealthStatus.add(ServiceStatusConstants.PlatformAuditEngine, jsonPlatformAuditEngineStatus);
-			}
-			if (ApplicationConfigProvider.getInstance().isEnableDataArchivalEngine()) {
-				hostEndPoint = ServiceStatusConstants.PlatformDataArchivalEngine;
-				apiUrl = hostEndPoint;
-				JsonObject jsonPlatformDataArchivalEngineStatus = healthUtil
-						.getComponentStatus("PlatformDataArchivalEngine");
-				servicesHealthStatus.add(ServiceStatusConstants.PlatformDataArchivalEngine,
-						jsonPlatformDataArchivalEngineStatus);
-			}
+			JsonObject dataComponentJson = healthUtil.getDataComponentStatus();
+			JsonObject serviceJson = healthUtil.getServiceStatus();
+			servicesHealthStatus = mergeJson(dataComponentJson, serviceJson);
 		} catch (Exception e) {
 			log.error("Error occured while fetching health status {}", e.getMessage());
 			throw new InsightsCustomException(e.getMessage());
@@ -144,7 +65,7 @@ public class HealthStatusServiceImpl {
 	public JsonObject getAgentsHealthStatus() throws InsightsCustomException {
 		JsonObject servicesAgentsHealthStatus = new JsonObject();
 		try {
-			JsonObject jsonAgentStatus = healthUtil.getComponentStatus("Agents");
+			JsonObject jsonAgentStatus = healthUtil.getAgentsStatus();
 			servicesAgentsHealthStatus.add(ServiceStatusConstants.Agents, jsonAgentStatus);
 		} catch (Exception e) {
 			log.error("Error occured while fetching agent health status {}", e.getMessage());
@@ -167,7 +88,9 @@ public class HealthStatusServiceImpl {
 			final int MAX_RECORD = 10;
 			log.debug(" message tool name {}  {}  {} ", category, tool, agentId);
 			StringBuilder label = new StringBuilder("HEALTH");
-			if (category.equalsIgnoreCase(ServiceStatusConstants.PlatformEngine)) {
+			if (category.equalsIgnoreCase(ServiceStatusConstants.PlatformService)) {
+				label.append(":").append("INSIGHTS_PLATFORMSERVICE");
+			} else if (category.equalsIgnoreCase(ServiceStatusConstants.PlatformEngine)) {
 				label.append(":").append("ENGINE");
 			} else if (category.equalsIgnoreCase(ServiceStatusConstants.PlatformWebhookEngine)) {
 				label.append(":").append("WEBHOOKENGINE");
@@ -276,6 +199,24 @@ public class HealthStatusServiceImpl {
 			log.error("Error occured while fetching version details {}", e.getMessage());
 			throw new InsightsCustomException(e.getMessage());
 		}
+	}
+	
+	/**
+	 * Method to merge JsonObjects
+	 * 
+	 * @param dataComponentJson
+	 * @param serviceJson
+	 * @return JsonObject
+	 */
+	private JsonObject mergeJson(JsonObject dataComponentJson,JsonObject serviceJson) {
+		JsonObject mergedJson = new JsonObject();
+		for(String component:dataComponentJson.keySet()) {
+			mergedJson.add(component, dataComponentJson.get(component).getAsJsonObject());
+		}
+		for(String service:serviceJson.keySet()) {
+			mergedJson.add(service, serviceJson.get(service).getAsJsonObject());
+		}
+		return mergedJson;
 	}
 
 }

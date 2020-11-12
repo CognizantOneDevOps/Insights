@@ -33,6 +33,7 @@ import com.cognizant.devops.platformdal.workflow.InsightsWorkflowTask;
 import com.cognizant.devops.platformdal.workflow.InsightsWorkflowTaskSequence;
 import com.cognizant.devops.platformworkflow.workflowtask.exception.WorkflowTaskInitializationException;
 import com.cognizant.devops.platformworkflow.workflowtask.utils.WorkflowUtils;
+import com.cognizant.devops.platformworkflow.workflowthread.core.WorkflowThreadPool;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -51,6 +52,7 @@ public class WorkflowRetryExecutor implements Job {
 	@Override
 	public void execute(JobExecutionContext context) throws JobExecutionException {
 		log.debug(" Worlflow Detail ====  Schedular Inside WorkflowRetryExecutor ");
+		initilizeWorkflowTasks();
 		retryWorkflows();	
 	}
 	
@@ -75,7 +77,8 @@ public class WorkflowRetryExecutor implements Job {
 		log.debug(" Worlflow Detail ====  Inside WorkflowRetryExecutor retryWorkflowWithFailedTask");
 		List<InsightsWorkflowExecutionHistory> readyToRunWorkflowHistory = workflowProcessing.getFailedTasksForRetry();
 		for (InsightsWorkflowExecutionHistory workflowHistory : readyToRunWorkflowHistory) {
-			if (workflowHistory.getRetryCount() < maxWorkflowsRetries) {
+			if (workflowHistory.getRetryCount() < maxWorkflowsRetries || workflowHistory.getWorkflowConfig().getWorkflowType()
+					.equalsIgnoreCase(WorkflowTaskEnum.WorkflowType.SYSTEM.name())) {
 				InsightsWorkflowTask firstworkflowTask = workflowProcessing
 						.getWorkflowTaskByTaskId(workflowHistory.getCurrenttask());
 				JsonObject mqRetryJsonObject = parser.parse(workflowHistory.getRequestMessage()).getAsJsonObject();
@@ -93,11 +96,11 @@ public class WorkflowRetryExecutor implements Job {
 							PlatformServiceConstants.FAILURE);
 				}
 			} else {
-				log.debug(" Worlflow Detail  ==== Retry flow max retries overflow  workflowHistory {}  ",
-						workflowHistory);
-				workflowProcessing.updateRetryWorkflowExecutionHistory(workflowHistory.getId(),
-						workflowHistory.getWorkflowConfig().getWorkflowId(),
-						WorkflowTaskEnum.WorkflowStatus.ABORTED.toString(), "");
+					log.debug(" Worlflow Detail  ==== Retry flow max retries overflow  workflowHistory {}  ",
+							workflowHistory);
+					workflowProcessing.updateRetryWorkflowExecutionHistory(workflowHistory.getId(),
+							workflowHistory.getWorkflowConfig().getWorkflowId(),
+							WorkflowTaskEnum.WorkflowStatus.ABORTED.toString(), "");
 			}
 		}
 	}
@@ -167,6 +170,15 @@ public class WorkflowRetryExecutor implements Job {
 			}
 		} else {
 			log.debug("Worlflow Detail ====  WorkflowRetryExecutor No retry workflows are currently on due to run");
+		}
+	}
+	
+	private void initilizeWorkflowTasks() {
+		WorkflowTaskInitializer taskSubscriber = new WorkflowTaskInitializer();
+		try {
+			taskSubscriber.registerTaskSubscriber();
+		} catch (Exception e) {
+			log.error(e);
 		}
 	}
 }

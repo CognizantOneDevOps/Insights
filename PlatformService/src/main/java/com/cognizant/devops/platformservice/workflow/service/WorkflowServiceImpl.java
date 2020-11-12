@@ -91,6 +91,35 @@ public class WorkflowServiceImpl {
 		}
 		return id;
 	}
+	
+	/**
+	 * Adding tasks to the workflow task table *
+	 * 
+	 * @param workflowTaskJson
+	 * @return
+	 * @throws InsightsCustomException
+	 */
+	public int populateAndSaveWorkflowTask(String description,String mqChannel,String componentName,int dependency,String workflowType) throws InsightsCustomException {
+		int id = -1;
+		try {
+			InsightsWorkflowTask taskConfig = new InsightsWorkflowTask();
+			taskConfig.setDescription(description);
+			taskConfig.setMqChannel(mqChannel);
+			taskConfig.setCompnentName(componentName);
+			taskConfig.setDependency(dependency);
+			InsightsWorkflowType workflowTypeEntity = new InsightsWorkflowType();
+			workflowTypeEntity.setWorkflowType(workflowType);
+			taskConfig.setWorkflowType(workflowTypeEntity);
+			id = workflowConfigDAL.saveInsightsWorkflowTaskConfig(taskConfig);
+		} catch (NullPointerException e) {
+			log.error(e);
+			throw new InsightsCustomException(" assessment task does not have some mandatory field ");
+		} catch (Exception e) {
+			log.error(e);
+			throw new InsightsCustomException(e.getMessage());
+		}
+		return id;
+	}
 
 	/**
 	 * @param workflowId
@@ -102,7 +131,7 @@ public class WorkflowServiceImpl {
 	 * @param taskList
 	 * @param startdate
 	 * @param enddate
-	 * @return
+	 * @return InsightsWorkflowConfiguration
 	 * @throws InsightsCustomException
 	 */
 	public InsightsWorkflowConfiguration saveWorkflowConfig(String workflowId, boolean isActive, boolean reoccurence,
@@ -441,20 +470,24 @@ public class WorkflowServiceImpl {
 					workflowConfigDAL.saveWorkflowType(type);
 				}
 				InsightsWorkflowTask systemNotificationTask = workflowConfigDAL
-						.getTaskByChannel("WORKFLOW.SYSTEMNOTIFICATION.EXECUTION");
+						.getTaskByChannel("WORKFLOW.SYSTEM_TASK.SYSTEMNOTIFICATION.EXECUTION");
 				if (systemNotificationTask == null) {
-					String workflowTaskData = "{\"description\": \"SystemNotification_Execute\",\"mqChannel\": \"WORKFLOW.TASK.SYSTEMNOTIFICATION.EXECUTION\",\"componentName\": \"com.cognizant.devops.platformreports.assessment.core.SystemNotificationDetailSubscriber\",\"dependency\": \"100\",\"workflowType\": \"SYSTEM\"}";
-					JsonObject workflowTaskJson = convertStringIntoJson(workflowTaskData);
-					systemTask = saveWorkflowTask(workflowTaskJson);
+					String description= "SystemNotification_Execute";
+					String mqChannel="WORKFLOW.SYSTEM_TASK.SYSTEMNOTIFICATION.EXECUTION";
+					String componentName="com.cognizant.devops.platformreports.assessment.core.SystemNotificationDetailSubscriber";
+					int dependency=100;
+					systemTask = populateAndSaveWorkflowTask(description,mqChannel,componentName,dependency,workflowType);
 				} else {
 					systemTask = systemNotificationTask.getTaskId();
 				}
 				InsightsWorkflowTask emailNotificationTask = workflowConfigDAL
-						.getTaskByChannel("WORKFLOW.TASK.EMAIL.EXCECUTION");
+						.getTaskByChannel("WORKFLOW.SYSTEM_TASK.EMAIL.EXCECUTION");
 				if (emailNotificationTask == null) {
-					String workflowTaskData = "{\"description\": \"Email_Execute\",\"mqChannel\": \"WORKFLOW.TASK.EMAIL.EXCECUTION\",\"componentName\": \"com.cognizant.devops.platformreports.assessment.core.ReportEmailSubscriber\",\"dependency\": \"101\",\"workflowType\": \"SYSTEM\"}";
-					JsonObject workflowTaskJson = convertStringIntoJson(workflowTaskData);
-					emailTask = saveWorkflowTask(workflowTaskJson);
+					String description= "Email_Execute";
+					String mqChannel="WORKFLOW.SYSTEM_TASK.EMAIL.EXCECUTION";
+					String componentName="com.cognizant.devops.platformreports.assessment.core.ReportEmailSubscriber";
+					int dependency=101;
+					emailTask = populateAndSaveWorkflowTask(description,mqChannel,componentName,dependency,workflowType);
 				} else {
 					emailTask = emailNotificationTask.getTaskId();
 				}

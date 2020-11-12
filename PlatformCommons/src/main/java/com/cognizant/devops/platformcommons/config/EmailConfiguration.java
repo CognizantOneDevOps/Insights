@@ -32,13 +32,13 @@ public class EmailConfiguration implements Serializable {
 	private Boolean isAuthRequired;
 	private Boolean smtpStarttlsEnable;
 	private String emailVelocityTemplate;
-	private String mailFrom;
+	private String mailFrom="";
 	private String mailTo;
-	private String subject;
+	private String subject="";
 	private String logo;
 	private String line;
 	private String footerLogo;
-	private String systemNotificationSubscriber;
+	private String systemNotificationSubscriber="";
 	
 	
 	public Boolean getSendEmailEnabled() {

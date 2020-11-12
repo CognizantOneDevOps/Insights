@@ -144,7 +144,9 @@ public class ReportEmailSubscriber extends WorkflowTaskSubscriberHandler {
 			executionId = incomingTaskMessage.get("executionId").getAsLong();
 			mailReportDTO.setTimeOfReportGeneration(InsightsUtils.insightsTimeXFormat(executionId));
 			workflowConfig = workflowDAL.getWorkflowConfigByWorkflowId(workflowId);
+			if(workflowConfig.getAssessmentConfig()!=null) {
 			mailReportDTO.setAsseementreportname(workflowConfig.getAssessmentConfig().getAsseementReportDisplayName());
+			}
 			mailReportDTO.setReportFilePath(emailHistory.getAttachmentPath());
 			if (emailHistory.getMailTo() != null) {
 				String[] recipientList = emailHistory.getMailTo().split(",");
@@ -201,9 +203,11 @@ public class ReportEmailSubscriber extends WorkflowTaskSubscriberHandler {
 	private void updateEmailHistoryWithStatus(long executionId, String status) {
 		InsightsReportVisualizationContainer emailHistoryConfig = workflowDAL
 				.getEmailExecutionHistoryByExecutionId(executionId);
-		emailHistoryConfig.setStatus(status);
-		emailHistoryConfig.setExecutionTime(InsightsUtils.getCurrentTimeInEpochMilliSeconds());
-		workflowDAL.updateEmailExecutionHistory(emailHistoryConfig);
+		if (emailHistoryConfig != null) {
+			emailHistoryConfig.setStatus(status);
+			emailHistoryConfig.setExecutionTime(InsightsUtils.getCurrentTimeInEpochMilliSeconds());
+			workflowDAL.updateEmailExecutionHistory(emailHistoryConfig);
+		}
 	}
 
 	/**
@@ -220,22 +224,33 @@ public class ReportEmailSubscriber extends WorkflowTaskSubscriberHandler {
 			executionId = incomingTaskMessage.get("executionId").getAsLong();
 			InsightsWorkflowConfiguration workflowConfig = workflowDAL.getWorkflowConfigByWorkflowId(workflowId);
 			Map<String, String> valuesMap = new HashMap<>();
-			valuesMap.put("ReportDisplayName", workflowConfig.getAssessmentConfig().getAsseementReportDisplayName());
+			if (workflowConfig.getAssessmentConfig() != null) {
+				valuesMap.put("ReportDisplayName",
+						workflowConfig.getAssessmentConfig().getAsseementReportDisplayName());
+			}
 			valuesMap.put("TimeOfReportGeneration", InsightsUtils.specficTimeFormat(executionId, "yyyy-MM-dd"));
 			valuesMap.put("Schedule", workflowConfig.getScheduleType());
 			StringSubstitutor sub = new StringSubstitutor(valuesMap, "{", "}");
 			InsightsReportVisualizationContainer emailHistoryConfig = workflowDAL
 					.getEmailExecutionHistoryByExecutionId(incomingTaskMessage.get("executionId").getAsLong());
-			emailHistoryConfig.setMailFrom(emailTemplate.getMailFrom());
-			emailHistoryConfig.setMailTo(emailTemplate.getMailTo());
-			emailHistoryConfig.setMailCC(emailTemplate.getMailCC());
-			emailHistoryConfig.setMailBCC(emailTemplate.getMailBCC());
-			emailHistoryConfig.setMailBody(sub.replace(emailTemplate.getMailBody()));
-			emailHistoryConfig.setSubject(sub.replace(emailTemplate.getSubject()));
-			emailHistoryConfig.setStatus(WorkflowTaskEnum.EmailStatus.IN_PROGRESS.toString());
-			emailHistoryConfig.setMailId(emailTemplate.getId());
-			workflowDAL.updateEmailExecutionHistory(emailHistoryConfig);
-			return collectInfoFromDataBase(incomingTaskMessage, emailHistoryConfig);
+			if (emailHistoryConfig != null) {
+				emailHistoryConfig.setMailFrom(emailTemplate.getMailFrom());
+				emailHistoryConfig.setMailTo(emailTemplate.getMailTo());
+				emailHistoryConfig.setMailCC(emailTemplate.getMailCC());
+				emailHistoryConfig.setMailBCC(emailTemplate.getMailBCC());
+				if (emailHistoryConfig.getMailBody() == null) {
+					emailHistoryConfig.setMailBody(sub.replace(emailTemplate.getMailBody()));
+				}
+				emailHistoryConfig.setSubject(sub.replace(emailTemplate.getSubject()));
+				emailHistoryConfig.setStatus(WorkflowTaskEnum.EmailStatus.IN_PROGRESS.toString());
+				emailHistoryConfig.setMailId(emailTemplate.getId());
+				workflowDAL.updateEmailExecutionHistory(emailHistoryConfig);
+				return collectInfoFromDataBase(incomingTaskMessage, emailHistoryConfig);
+			} else {
+				throw new InsightsJobFailedException("No record found in Email History table");
+			}
+		} catch (InsightsJobFailedException e) {
+			throw new InsightsJobFailedException(e.getMessage());
 		} catch (Exception e) {
 			log.error("Workflow Detail ==== ReportEmailSubscriber Incorrect email format found ===== ", e);
 			throw new InsightsJobFailedException("Error while updating values to Email History ");

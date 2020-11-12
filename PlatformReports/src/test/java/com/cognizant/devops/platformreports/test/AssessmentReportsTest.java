@@ -35,6 +35,7 @@ import com.cognizant.devops.platformdal.workflow.InsightsWorkflowConfiguration;
 import com.cognizant.devops.platformdal.workflow.InsightsWorkflowExecutionHistory;
 import com.cognizant.devops.platformdal.workflow.WorkflowDAL;
 import com.cognizant.devops.platformworkflow.workflowtask.core.WorkflowExecutor;
+import com.cognizant.devops.platformworkflow.workflowtask.core.WorkflowImmediateJobExecutor;
 import com.cognizant.devops.platformworkflow.workflowtask.core.WorkflowRetryExecutor;
 
 @Test
@@ -42,6 +43,7 @@ public class AssessmentReportsTest extends AssessmentReportsTestData {
 	private static Logger log = LogManager.getLogger(AssessmentReportsTest.class);
 	ReportConfigDAL reportConfigDAL = new ReportConfigDAL();
 	WorkflowDAL workflowDAL = new WorkflowDAL();
+	int typeId=0;
 
 	@BeforeTest
 	public void onInit() throws Exception {
@@ -60,10 +62,13 @@ public class AssessmentReportsTest extends AssessmentReportsTestData {
 		saveReportTemplate(reportTemplatekpi, reportIdkpiRT);
 		saveReportTemplate(reportTemplatekpis, reportIdkpisRT);
 
+		typeId=saveWorkflowType("SYSTEM");
 		// save workflow task in db
 		saveWorkflowTask(taskKpiExecution);
 		saveWorkflowTask(taskPDFExecution);
 		saveWorkflowTask(taskEmailExecution);
+		saveWorkflowTask(taskSystemHealthNotificationExecution);
+		saveWorkflowTask(taskSystemEmailNotificationExecution);
 
 		// save assessment report
 		saveAssessmentReport(workflowIdProd, assessmentReport, 2);
@@ -72,12 +77,18 @@ public class AssessmentReportsTest extends AssessmentReportsTestData {
 		saveAssessmentReport(workflowIdWrongkpi, assessmentReportWrongkpi, 2);
 		saveAssessmentReport(workflowIdWrongkpis, assessmentReportWrongkpis, 2);
 		saveAssessmentReport(workflowIdFail, assessmentReportFail, 1);
+		
+		saveHealthNotificationWorkflowConfig();
 
 		initializeTask();
 
 		// run workflow executor
 		WorkflowExecutor executor = new WorkflowExecutor();
 		executor.executeWorkflow();
+		Thread.sleep(40000);
+		
+		WorkflowImmediateJobExecutor immediateJobExecutor = new  WorkflowImmediateJobExecutor();
+		immediateJobExecutor.executeImmediateWorkflow();
 		Thread.sleep(40000);
 
 	}
@@ -294,6 +305,20 @@ public class AssessmentReportsTest extends AssessmentReportsTestData {
 			Assert.fail(e.getMessage());
 		}
 	}
+	
+	@Test(priority = 15)
+	public void testAgentHealthRecordInEmailExecutionHistory() throws InterruptedException, InsightsCustomException {
+		try {
+			InsightsWorkflowConfiguration workflowConfig = workflowDAL
+					.getWorkflowConfigByWorkflowId(healthNotificationWorkflowId);
+			InsightsReportVisualizationContainer emailHistory = workflowDAL
+					.getEmailExecutionHistoryByWorkflowId(workflowConfig.getWorkflowId());
+			Assert.assertNotNull(emailHistory);
+			Assert.assertEquals(emailHistory.getStatus(), WorkflowTaskEnum.WorkflowStatus.COMPLETED.name());
+		} catch (AssertionError e) {
+			Assert.fail(e.getMessage());
+		}
+	}
 
 	// delete dummy data
 	@AfterTest
@@ -308,6 +333,13 @@ public class AssessmentReportsTest extends AssessmentReportsTestData {
 		delete(workflowIdFail);
 		delete(workflowIdWrongkpi);
 		delete(workflowIdWrongkpis);
+		deleteWorkflowConfig(healthNotificationWorkflowId);
+		
+		try {
+			workflowDAL.deleteWorkflowType(typeId);
+		}catch(Exception e) {
+			log.error(e);
+		}
 
 		// delete workflow Task
 		for (int element : taskidList) {

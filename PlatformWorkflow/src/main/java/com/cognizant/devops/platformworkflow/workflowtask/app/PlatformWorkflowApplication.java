@@ -48,7 +48,7 @@ public class PlatformWorkflowApplication {
 			InsightsStatusProvider.getInstance().createInsightStatusNode("Platform Workflow Application started. ",
 					PlatformServiceConstants.SUCCESS);
 			PlatformWorkflowApplication applicationWorkflow = new PlatformWorkflowApplication();
-			applicationWorkflow.initilizeWorkflowTasks();
+			applicationWorkflow.initializeWorkflowThreadPool();
 
 			WorkflowSchedular schedular = new WorkflowSchedular();
 			schedular.executor();
@@ -61,16 +61,13 @@ public class PlatformWorkflowApplication {
 					PlatformServiceConstants.FAILURE);
 		}
 	}
-
-	private void initilizeWorkflowTasks() {
-		WorkflowTaskInitializer taskSubscriber = new WorkflowTaskInitializer();
+	
+	private void initializeWorkflowThreadPool() {
 		try {
-			taskSubscriber.registerTaskSubscriber();
-
 			WorkflowThreadPool.getInstance();
-
 		} catch (Exception e) {
 			log.error(e);
 		}
 	}
+
 }

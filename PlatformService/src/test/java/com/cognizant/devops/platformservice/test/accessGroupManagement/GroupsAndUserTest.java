@@ -72,20 +72,20 @@ public class GroupsAndUserTest extends AbstractTestNGSpringContextTests {
 
 	@BeforeTest
 	public void onInit() throws InterruptedException, IOException, InsightsCustomException {
-		ApplicationConfigCache.loadConfigCache();
-		httpRequest.addHeader("Authorization", groupsAndUserTestData.authorization);
-		Map<String, String> cookiesMap = PlatformServiceUtil.getGrafanaCookies(httpRequest);
-
-		cookiesString = cookiesMap.entrySet().stream().map(e -> e.getKey() + "=" + e.getValue())
-				.collect(Collectors.joining(";"));
-		log.debug(" cookiesString " + cookiesString);
-		for (Map.Entry<String, String> entry : cookiesMap.entrySet()) {
-			Cookie cookie = new Cookie(entry.getKey(), entry.getValue());
-			cookie.setHttpOnly(true);
-			cookie.setMaxAge(60 * 30);
-			cookie.setPath("/");
-			httpRequest.setCookies(cookie);
-		}
+//		ApplicationConfigCache.loadConfigCache();
+//		httpRequest.addHeader("Authorization", groupsAndUserTestData.authorization);
+//		Map<String, String> cookiesMap = PlatformServiceUtil.getGrafanaCookies(httpRequest);
+//
+//		cookiesString = cookiesMap.entrySet().stream().map(e -> e.getKey() + "=" + e.getValue())
+//				.collect(Collectors.joining(";"));
+//		log.debug(" cookiesString " + cookiesString);
+//		for (Map.Entry<String, String> entry : cookiesMap.entrySet()) {
+//			Cookie cookie = new Cookie(entry.getKey(), entry.getValue());
+//			cookie.setHttpOnly(true);
+//			cookie.setMaxAge(60 * 30);
+//			cookie.setPath("/");
+//			httpRequest.setCookies(cookie);
+//		}
 	}
 
 	private MockHttpServletRequestBuilder mockHttpServletRequestBuilderPost(String url, String content) {
@@ -108,7 +108,7 @@ public class GroupsAndUserTest extends AbstractTestNGSpringContextTests {
 				.header("Authorization", groupsAndUserTestData.authorization).header("Cookie", cookiesString);
 	}
 
-	@Test(priority = 1)
+	//@Test(priority = 1)
 	public void testGetOrgUsers() throws InsightsCustomException {
 		try {
 			this.mockMvc = getMacMvc();
@@ -123,7 +123,7 @@ public class GroupsAndUserTest extends AbstractTestNGSpringContextTests {
 		log.debug("Test case getOrgUsers pass successfully ");
 	}
 
-	@Test(priority = 2)
+	//@Test(priority = 2)
 	public void testCreateOrg() throws InsightsCustomException {
 		try {
 			this.mockMvc = getMacMvc();
@@ -137,7 +137,7 @@ public class GroupsAndUserTest extends AbstractTestNGSpringContextTests {
 		log.debug("Test case createOrg pass successfully ");
 	}
 
-	@Test(priority = 3)
+	//@Test(priority = 3)
 	public void testAddUser() throws InsightsCustomException {
 	
 		try {
@@ -153,7 +153,7 @@ public class GroupsAndUserTest extends AbstractTestNGSpringContextTests {
 		log.debug("Test case addUserInOrg pass successfully ");
 	}
 	
-	@Test(priority = 4)
+	//@Test(priority = 4)
 	public void testSearchUser() throws InsightsCustomException {
 		try {
 			this.mockMvc = getMacMvc();
@@ -169,7 +169,7 @@ public class GroupsAndUserTest extends AbstractTestNGSpringContextTests {
 	
 	}
 	
-	@Test(priority = 5)
+	//@Test(priority = 5)
 	public void testassignUser() throws InsightsCustomException {
 	
 		try {
@@ -186,7 +186,7 @@ public class GroupsAndUserTest extends AbstractTestNGSpringContextTests {
 	
 	}
 	
-	@Test(priority = 6)
+	//@Test(priority = 6)
 	public void testAddUserEditor() throws InsightsCustomException {
 	
 		try {
@@ -202,7 +202,7 @@ public class GroupsAndUserTest extends AbstractTestNGSpringContextTests {
 	
 	}
 	
-	@Test(priority = 7)
+	//@Test(priority = 7)
 	public void testAddUserViewer() throws InsightsCustomException {
 	
 		try {
@@ -218,7 +218,7 @@ public class GroupsAndUserTest extends AbstractTestNGSpringContextTests {
 		log.debug("Test case pass successfully ");
 	}
 	
-	@Test(priority = 8)
+	//@Test(priority = 8)
 	public void testEditOrganizationUser() throws InsightsCustomException {
 	
 		try {
@@ -236,7 +236,7 @@ public class GroupsAndUserTest extends AbstractTestNGSpringContextTests {
 	
 	}
 	
-	@Test(priority = 9)
+	//@Test(priority = 9)
 	public void testDeleteOrganizationUser() throws InsightsCustomException {
 	
 		try {

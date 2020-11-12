@@ -116,10 +116,12 @@ public class EmailProcesser implements Callable<JsonObject> {
 			String htmlText = mail.getMailBody();
 			Multipart multipart = new MimeMultipart();
 			// Create the attachment part
+			if(!mail.getReportFilePath().isEmpty()) {
 			log.debug("Workflow Detail ==== Attaching file from {} ", mail.getReportFilePath());
 			BodyPart messageBodyPart = new MimeBodyPart();
 			((MimeBodyPart) messageBodyPart).attachFile(mail.getReportFilePath());
 			multipart.addBodyPart(messageBodyPart);//
+			}
 			// Create the HTML Part
 			BodyPart htmlBodyPart = new MimeBodyPart();
 			htmlBodyPart.setContent(htmlText, "text/html");

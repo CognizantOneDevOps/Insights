@@ -29,6 +29,8 @@ import java.util.Set;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
+import com.cognizant.devops.platformcommons.config.EmailConfiguration;
 import com.cognizant.devops.platformcommons.core.enums.WorkflowTaskEnum;
 import com.cognizant.devops.platformcommons.core.util.InsightsUtils;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphResponse;
@@ -50,6 +52,7 @@ import com.cognizant.devops.platformdal.workflow.WorkflowDAL;
 import com.cognizant.devops.platformreports.assessment.core.PDFExecutionSubscriber;
 import com.cognizant.devops.platformreports.assessment.core.ReportEmailSubscriber;
 import com.cognizant.devops.platformreports.assessment.core.ReportKPISubscriber;
+import com.cognizant.devops.platformreports.assessment.core.SystemNotificationDetailSubscriber;
 import com.cognizant.devops.platformworkflow.workflowtask.core.WorkflowDataHandler;
 import com.cognizant.devops.platformworkflow.workflowtask.message.factory.WorkflowTaskSubscriberHandler;
 import com.google.gson.Gson;
@@ -73,7 +76,9 @@ public class AssessmentReportsTestData {
 	String taskKpiExecution = "{\"description\":\"TEST.REPORT_KPI_Execute\",\"mqChannel\":\"TEST.WORKFLOW.TASK.KPI.EXCECUTION\",\"componentName\":\"com.cognizant.devops.platformreports.assessment.core.ReportKPISubscriber\",\"dependency\":1,\"workflowType\":\"Report\"}";
 	String taskPDFExecution = "{\"description\":\"TEST.REPORT_PDF_Execute\",\"mqChannel\":\"TEST.WORKFLOW.TASK.PDF.EXCECUTION\",\"componentName\":\"com.cognizant.devops.platformreports.assessment.core.PDFExecutionSubscriber\",\"dependency\":2,\"workflowType\":\"Report\"}";
 	String taskEmailExecution = "{\"description\":\"TEST.REPORT_EMAIL_Execute\",\"mqChannel\":\"TEST.WORKFLOW.TASK.EMAIL.EXCECUTION\",\"componentName\":\"com.cognizant.devops.platformreports.assessment.core.ReportEmailSubscriber\",\"dependency\":3,\"workflowType\":\"Report\"}";
-
+	String taskSystemHealthNotificationExecution = "{\"description\":\"TEST.SystemNotification_Execute\",\"mqChannel\":\"TEST.WORKFLOW.SYSTEM_TASK.SYSTEMNOTIFICATION.EXECUTION\",\"componentName\":\"com.cognizant.devops.platformreports.assessment.core.SystemNotificationDetailSubscriber\",\"dependency\":100,\"workflowType\":\"SYSTEM\"}";
+	String taskSystemEmailNotificationExecution = "{\"description\":\"TEST.Email_Execute\",\"mqChannel\":\"TEST.WORKFLOW.SYSTEM_TASK.EMAIL.EXECUTION\",\"componentName\":\"com.cognizant.devops.platformreports.assessment.core.ReportEmailSubscriber\",\"dependency\":101,\"workflowType\":\"SYSTEM\"}";
+	
 	String reportTemplatekpi = "{\"reportName\":\"Testing_fail\",\"description\":\"Testing\",\"isActive\":true,\"visualizationutil\":\"FUSION\",\"kpiConfigs\":[{\"kpiId\":100127,\"visualizationConfigs\":[{\"vType\":\"mscolumn2d_100127\",\"vQuery\":\"MATCH (n:KPI:RESULTS) where n.reportId = 602 and n.kpiId=127 RETURN n.SPKendTime as SPKendTime , n.MaxBuildTime as MaxBuildTime LIMIT 5\"}]}]}";
 	String reportTemplatekpis = "{\"reportName\":\"Testing_fail_queries\",\"description\":\"Testing_queries\",\"isActive\":true,\"visualizationutil\":\"FUSION\",\"kpiConfigs\":[{\"kpiId\":100161,\"visualizationConfigs\":[{\"vType\":\"100161_line\",\"vQuery\":\"\"}]},{\"kpiId\":100153,\"visualizationConfigs\":[{\"vType\":\"100153_line\",\"vQuery\":\"\"}]}]}";
 
@@ -90,14 +95,16 @@ public class AssessmentReportsTestData {
 	String mqChannelKpiExecution = "TEST.WORKFLOW.TASK.KPI.EXCECUTION";
 	String mqChannelPDFExecution = "TEST.WORKFLOW.TASK.PDF.EXCECUTION";
 	String mqChannelEmailExecution = "TEST.WORKFLOW.TASK.EMAIL.EXCECUTION";
-
+	String mqChannelSystemHealthNotificationExecution = "TEST.WORKFLOW.SYSTEM_TASK.SYSTEMNOTIFICATION.EXECUTION";
+	String mqChannelSystemEmailExecution = "TEST.WORKFLOW.SYSTEM_TASK.EMAIL.EXECUTION";
+	
 	public static String workflowIdProd = WorkflowTaskEnum.WorkflowType.REPORT.getValue() + "_" + "10000567276";
 	public static String workflowIdWithEmail = WorkflowTaskEnum.WorkflowType.REPORT.getValue() + "_" + "10000567999";
 	public static String workflowIdWithoutEmail = WorkflowTaskEnum.WorkflowType.REPORT.getValue() + "_" + "10000568296";
 	public static String workflowIdFail = WorkflowTaskEnum.WorkflowType.REPORT.getValue() + "_" + "10000640327";
 	public static String workflowIdWrongkpi = WorkflowTaskEnum.WorkflowType.REPORT.getValue() + "_" + "10000835535";
 	public static String workflowIdWrongkpis = WorkflowTaskEnum.WorkflowType.REPORT.getValue() + "_" + "1000083563542";
-
+    public static String healthNotificationWorkflowId = WorkflowTaskEnum.WorkflowType.SYSTEM.getValue() + "_" + "HealthNotificationTest";
 	public static long nextRunDaily;
 	public static long nextRunBiWeekly;
 
@@ -351,7 +358,7 @@ public class AssessmentReportsTestData {
 
 			InsightsAssessmentConfiguration assessmentConfig = new InsightsAssessmentConfiguration();
 			InsightsWorkflowConfiguration workflowConfig = saveWorkflowConfig(workflowid, isActive, reoccurence,
-					schedule, reportStatus, workflowType, taskList, epochStartDate, epochEndDate, emailDetails,
+					schedule, reportStatus, workflowType, taskList, epochStartDate, emailDetails,
 					runImmediate);
 			assessmentConfig.setActive(isActive);
 			assessmentConfig.setEmails(emailList);
@@ -371,7 +378,7 @@ public class AssessmentReportsTestData {
 	}
 
 	public InsightsWorkflowConfiguration saveWorkflowConfig(String workflowId, boolean isActive, boolean reoccurence,
-			String schedule, String reportStatus, String workflowType, JsonArray taskList, long startdate, long enddate,
+			String schedule, String reportStatus, String workflowType, JsonArray taskList, long startdate,
 			JsonObject emailDetails, boolean runImmediate) throws InsightsCustomException {
 		InsightsWorkflowConfiguration workflowConfig = new InsightsWorkflowConfiguration();
 		workflowConfig.setWorkflowId(workflowId);
@@ -523,6 +530,12 @@ public class AssessmentReportsTestData {
 			WorkflowTaskSubscriberHandler testEmailsubscriberobject = new ReportEmailSubscriber(
 					mqChannelEmailExecution);
 			registry.put(getTaskId(mqChannelEmailExecution), testEmailsubscriberobject);
+			WorkflowTaskSubscriberHandler testSystemHealthNotificationsubscriberobject = new SystemNotificationDetailSubscriber(
+					mqChannelSystemHealthNotificationExecution);
+			registry.put(getTaskId(mqChannelSystemHealthNotificationExecution), testSystemHealthNotificationsubscriberobject);
+			WorkflowTaskSubscriberHandler testSystemEmailsubscriberobject = new SystemNotificationDetailSubscriber(
+					mqChannelSystemEmailExecution);
+			registry.put(getTaskId(mqChannelSystemEmailExecution), testSystemEmailsubscriberobject);
 			WorkflowDataHandler.setRegistry(registry);
 
 			Thread.sleep(1000);
@@ -549,9 +562,22 @@ public class AssessmentReportsTestData {
 			InsightsWorkflowConfiguration workflowConfig = workflowDAL.getWorkflowConfigByWorkflowId(workflowId);
 			int id = workflowConfig.getAssessmentConfig().getId();
 			workflowDAL.deleteEmailExecutionHistoryByWorkflowId(workflowConfig.getWorkflowId());
-			workflowDAL.deleteEmailTemplateByWorkflowId(workflowConfig.getWorkflowId());
 			workflowDAL.deleteWorkflowTaskSequence(workflowConfig.getWorkflowId());
 			reportConfigDAL.deleteAssessmentReport(id);
+			workflowDAL.deleteEmailTemplateByWorkflowId(workflowConfig.getWorkflowId());
+		} catch (Exception e) {
+			log.error(e);
+		}
+	}
+	
+	public void deleteWorkflowConfig(String workflowId) {
+		try {
+			deleteExecutionHistory(workflowId);
+			InsightsWorkflowConfiguration workflowConfig = workflowDAL.getWorkflowConfigByWorkflowId(workflowId);
+			workflowDAL.deleteEmailExecutionHistoryByWorkflowId(workflowConfig.getWorkflowId());
+			workflowDAL.deleteWorkflowTaskSequence(workflowConfig.getWorkflowId());
+			workflowDAL.deleteEmailTemplateByWorkflowId(workflowConfig.getWorkflowId());
+			workflowDAL.deleteWorkflowConfig(workflowId);
 		} catch (Exception e) {
 			log.error(e);
 		}
@@ -565,5 +591,64 @@ public class AssessmentReportsTestData {
 		} catch (Exception e) {
 			log.error(e);
 		}
+	}
+	
+	public int saveWorkflowType(String workflowtype) {
+		int typeId = 0;
+		try {
+			InsightsWorkflowType workflowTypeObj = workflowDAL
+					.getWorkflowType(workflowtype);
+			if (workflowTypeObj == null) {
+				InsightsWorkflowType type = new InsightsWorkflowType();
+				type.setWorkflowType(workflowtype);
+				typeId = workflowDAL.saveWorkflowType(type);
+			} else {
+				typeId = workflowTypeObj.getId();
+			}
+		} catch (Exception e) {
+			log.error(e);
+		}
+		return typeId;
+	}
+	
+	public void saveHealthNotificationWorkflowConfig() {
+		try {
+			Long epochStartDate = 0L;
+			boolean isActive = true;
+			String schedule = WorkflowTaskEnum.WorkflowSchedule.DAILY.toString();
+			boolean reoccurence = true;
+			boolean runImmediate = true;
+			String reportStatus = WorkflowTaskEnum.WorkflowStatus.NOT_STARTED.toString();
+			String workflowType = WorkflowTaskEnum.WorkflowType.SYSTEM.toString();
+			JsonArray taskList = new JsonArray();
+			taskList.add(createTaskJson(getTaskId(mqChannelSystemHealthNotificationExecution), 0));
+			taskList.add(createTaskJson(getTaskId(mqChannelSystemEmailExecution), 1));
+			JsonObject emailDetails = getEmailDetails();
+			InsightsWorkflowConfiguration saveWorkflowConfig = saveWorkflowConfig(healthNotificationWorkflowId,
+					isActive, reoccurence, schedule, reportStatus, workflowType, taskList, epochStartDate, emailDetails,
+					runImmediate);
+			workflowDAL.saveInsightsWorkflowConfig(saveWorkflowConfig);
+		} catch (Exception e) {
+			log.error(e);
+		}
+	}
+	
+	public JsonObject createTaskJson(int taskId, int sequence) {
+		JsonObject taskJson = new JsonObject();
+		taskJson.addProperty("taskId", taskId);
+		taskJson.addProperty("sequence", sequence);
+		return taskJson;
+	}
+
+	public JsonObject getEmailDetails() {
+		EmailConfiguration emailConfig = ApplicationConfigProvider.getInstance().getEmailConfiguration();
+		JsonObject emailDetailsJson = new JsonObject();
+		emailDetailsJson.addProperty("senderEmailAddress", emailConfig.getMailFrom());
+		emailDetailsJson.addProperty("receiverEmailAddress", emailConfig.getSystemNotificationSubscriber());
+		emailDetailsJson.addProperty("mailSubject", emailConfig.getSubject());
+		emailDetailsJson.addProperty("mailBodyTemplate", "");
+		emailDetailsJson.addProperty("receiverCCEmailAddress", "");
+		emailDetailsJson.addProperty("receiverBCCEmailAddress", "");
+		return emailDetailsJson;
 	}
 }

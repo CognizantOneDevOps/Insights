@@ -23,7 +23,6 @@ import java.security.cert.X509Certificate;
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLSession;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 import javax.servlet.ServletContext;
@@ -36,6 +35,7 @@ import org.springframework.web.WebApplicationInitializer;
 
 import com.cognizant.devops.platformcommons.config.ApplicationConfigCache;
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
+import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
 import com.cognizant.devops.platformservice.security.config.AuthenticationUtils;
 import com.cognizant.devops.platformservice.security.config.InsightsResponseHeaderWriterFilter;
 /**
@@ -48,11 +48,19 @@ public class PlatformServiceInitializer implements WebApplicationInitializer {
 
 	@Override
 	public void onStartup(ServletContext servletContext) throws ServletException {
-		ApplicationConfigCache.loadConfigCache();
-		disableSslVerification();
-		validateAutheticationProtocol();
-		servletContext.addFilter("InsightsResponseHeaderWriter", InsightsResponseHeaderWriterFilter.class)
-				.addMappingForUrlPatterns(null, false, "/*");
+		try {
+			ApplicationConfigCache.loadConfigCache();
+			disableSslVerification();
+			validateAutheticationProtocol();
+			servletContext.addFilter("InsightsResponseHeaderWriter", InsightsResponseHeaderWriterFilter.class)
+					.addMappingForUrlPatterns(null, false, "/*");
+			PlatformServiceStatusProvider.getInstance().createPlatformServiceStatusNode(
+					"PlatformService Started Successfully", PlatformServiceConstants.SUCCESS);
+		} catch (Exception e) {
+			PlatformServiceStatusProvider.getInstance().createPlatformServiceStatusNode(
+					"Error in starting PlatformService", PlatformServiceConstants.FAILURE);
+		}
+		
 	}
 
 	private void validateAutheticationProtocol() {

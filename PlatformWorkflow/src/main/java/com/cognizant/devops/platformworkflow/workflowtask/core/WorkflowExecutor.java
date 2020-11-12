@@ -29,6 +29,7 @@ import com.cognizant.devops.platformcommons.core.enums.WorkflowTaskEnum;
 import com.cognizant.devops.platformdal.workflow.InsightsWorkflowConfiguration;
 import com.cognizant.devops.platformdal.workflow.InsightsWorkflowTaskSequence;
 import com.cognizant.devops.platformworkflow.workflowtask.exception.WorkflowTaskInitializationException;
+import com.cognizant.devops.platformworkflow.workflowthread.core.WorkflowThreadPool;
 import com.google.gson.JsonObject;
 
 public class WorkflowExecutor implements Job {
@@ -46,6 +47,7 @@ public class WorkflowExecutor implements Job {
 	public void execute(JobExecutionContext context)
 			throws JobExecutionException {
 		log.debug(" Worlflow Detail ====  Schedular Inside WorkflowExecutor ");
+		initilizeWorkflowTasks();
 		executeWorkflow();
  
 	}
@@ -93,5 +95,14 @@ public class WorkflowExecutor implements Job {
 		}
 
 
+	}
+	
+	private void initilizeWorkflowTasks() {
+		WorkflowTaskInitializer taskSubscriber = new WorkflowTaskInitializer();
+		try {
+			taskSubscriber.registerTaskSubscriber();
+		} catch (Exception e) {
+			log.error(e);
+		}
 	}
 }

@@ -300,6 +300,7 @@ export class HealthCheckComponent implements OnInit {
                 'SUCCESS'
               );
               self.isActive = event.checked;
+              self.loadHealthNotificationStatus();
             } else {
               this.messageDialog.showApplicationsMessage(
                 'Failed to enable notification.Please check logs for more details.',

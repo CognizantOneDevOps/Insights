@@ -20,6 +20,7 @@ import java.util.Iterator;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
 import com.cognizant.devops.platformcommons.constants.ServiceStatusConstants;
 import com.cognizant.devops.platformcommons.core.util.SystemStatus;
@@ -72,7 +73,7 @@ public class HealthUtil {
 
 			if (serviceResponse != null && !("").equalsIgnoreCase(serviceResponse)) {
 				strResponse = "Response successfully recieved from " + apiUrl;
-				log.info("response: ",serviceResponse);
+				log.info("response: {} ",serviceResponse);
 				if (serviceType.equalsIgnoreCase(ServiceStatusConstants.Neo4j)) {
 					json = (JsonObject) jsonParser.parse(serviceResponse);
 					version = json.get("neo4j_version").getAsString();
@@ -101,7 +102,7 @@ public class HealthUtil {
 				returnResponse = buildFailureResponse(strResponse, hostEndPoint, displayType, version);
 			}
 		} catch (Exception e) {
-			log.error("Error while capturing health check at " + apiUrl, e);
+			log.error("Error while capturing health check at {} {} ",apiUrl, e);
 			log.error(e.getMessage());
 			strResponse = "Error while capturing health check at " + apiUrl;
 			returnResponse = buildFailureResponse(strResponse, hostEndPoint, displayType, version);
@@ -156,10 +157,7 @@ public class HealthUtil {
 	 * @return JsonObject
 	 */
 	public JsonObject getComponentStatus(String serviceType) {
-		String successResponse = "";
-		String status = "";
 		JsonObject returnObject = null;
-		GraphResponse graphResponse;
 		try {
 			if (serviceType.equalsIgnoreCase("PlatformEngine")) {
 				returnObject = getServiceResponse("HEALTH:ENGINE", 1);
@@ -173,21 +171,10 @@ public class HealthUtil {
 				returnObject = getServiceResponse("HEALTH:DATAARCHIVALENGINE", 1);
 			} else if (serviceType.equalsIgnoreCase("PlatformWorkflow")) {
 				returnObject = getServiceResponse("HEALTH:INSIGHTS_WORKFLOW", 1);
-			} else if (serviceType.equalsIgnoreCase("Agents")) {
-				graphResponse = loadHealthData("HEALTH:LATEST", "", 100);
-				if (graphResponse != null) {
-					if (!graphResponse.getNodes().isEmpty()) {
-						status = PlatformServiceConstants.SUCCESS;
-					} else {
-						successResponse = "Node list is empty in response not received from Neo4j";
-						status = PlatformServiceConstants.FAILURE;
-					}
-				} else {
-					successResponse = "Response not received from Neo4j";
-					status = PlatformServiceConstants.FAILURE;
-				}
-				log.debug("message ",successResponse);
-				returnObject = buildAgentResponse(status, successResponse, graphResponse);
+			} else if (serviceType.equalsIgnoreCase("PlatformService")) {
+				returnObject = getServiceResponse("HEALTH:INSIGHTS_PLATFORMSERVICE", 1);
+			}else if (serviceType.equalsIgnoreCase("Agents")) {
+				returnObject = getAgentResponse("HEALTH:LATEST",100);
 			}
 		} catch (Exception e) {
 			log.error(e.getMessage());
@@ -307,7 +294,7 @@ public class HealthUtil {
 					+ "/db/manage/server/jmx/domain/org.neo4j/instance%3Dkernel%230%2Cname%3DStore+sizes";
 			String serviceNeo4jResponse = SystemStatus.jerseyGetClientWithAuthentication(apiUrlForSize, username,
 					password, authToken);
-			log.debug("serviceNeo4jResponse ======  ",serviceNeo4jResponse);
+			log.debug("serviceNeo4jResponse ====== {}  ",serviceNeo4jResponse);
 
 			JsonElement object = new JsonParser().parse(serviceNeo4jResponse);
 			if (object.isJsonArray()) {
@@ -322,7 +309,7 @@ public class HealthUtil {
 					}
 				}
 			}
-			log.debug(" info totalStoreSize  ==== ",totalStoreSize);
+			log.debug(" info totalStoreSize  ==== {}",totalStoreSize);
 			if (totalStoreSize > 0) {
 				returnSize = humanReadableByteCount(totalStoreSize, Boolean.FALSE);
 			}
@@ -405,6 +392,125 @@ public class HealthUtil {
 					version);
 		}
 		return returnObject;
+	}
+	
+	/**
+	 * Method to fetch response of Agents
+	 * 
+	 * @param labels
+	 * @param noOfRows
+	 * @return JsonObject
+	 */
+	private JsonObject getAgentResponse(String labels, int noOfRows) {
+		String successResponse = "";
+		String status = "";
+		GraphResponse graphResponse = loadHealthData(labels, "", noOfRows);
+		if (graphResponse != null) {
+			if (!graphResponse.getNodes().isEmpty()) {
+				status = PlatformServiceConstants.SUCCESS;
+			} else {
+				successResponse = "Node list is empty in response not received from Neo4j";
+				status = PlatformServiceConstants.FAILURE;
+			}
+		} else {
+			successResponse = "Response not received from Neo4j";
+			status = PlatformServiceConstants.FAILURE;
+		}
+		log.debug("message {} ", successResponse);
+		return buildAgentResponse(status, successResponse, graphResponse);
+	}
+	
+	/**
+	 * Method to fetch data component HTML
+	 * 
+	 * @return String
+	 */
+	public JsonObject getDataComponentStatus() {
+		JsonObject dataComponentStatus = new JsonObject();
+		try {
+			String username = null;
+			String password = null;
+			String authToken = null;
+			String hostEndPoint = "";
+			String apiUrl = "";
+			hostEndPoint = ServiceStatusConstants.POSTGRESQL_HOST;
+			apiUrl = hostEndPoint;
+			JsonObject postgreStatus = getClientResponse(hostEndPoint, apiUrl, ServiceStatusConstants.DB,
+					ServiceStatusConstants.PgSQL, Boolean.FALSE, username, password, authToken);
+			dataComponentStatus.add(ServiceStatusConstants.PgSQL, postgreStatus);
+			hostEndPoint = ServiceStatusConstants.NEO4J_HOST;
+			apiUrl = hostEndPoint + "/db/data/";
+			authToken = ApplicationConfigProvider.getInstance().getGraph().getAuthToken();
+			JsonObject neo4jStatus = getClientResponse(hostEndPoint, apiUrl, ServiceStatusConstants.DB,
+					ServiceStatusConstants.Neo4j, Boolean.TRUE, username, password, authToken);
+			dataComponentStatus.add(ServiceStatusConstants.Neo4j, neo4jStatus);
+			hostEndPoint = ServiceStatusConstants.ES_HOST;
+			apiUrl = hostEndPoint;
+			JsonObject esStatus = getClientResponse(hostEndPoint, apiUrl, ServiceStatusConstants.DB,
+					ServiceStatusConstants.ES, Boolean.FALSE, username, password, authToken);
+			dataComponentStatus.add(ServiceStatusConstants.ES, esStatus);
+			hostEndPoint = ServiceStatusConstants.RABBIT_MQ;
+			apiUrl = hostEndPoint + "/api/overview";
+			authToken = null;
+			username = ApplicationConfigProvider.getInstance().getMessageQueue().getUser();
+			password = ApplicationConfigProvider.getInstance().getMessageQueue().getPassword();
+			JsonObject rabbitMq = getClientResponse(hostEndPoint, apiUrl, ServiceStatusConstants.DB,
+					ServiceStatusConstants.RabbitMq, Boolean.TRUE, username, password, authToken);
+			dataComponentStatus.add(ServiceStatusConstants.RabbitMq, rabbitMq);
+		} catch (Exception e) {
+			log.error("Worlflow Detail ==== Error creating HTML body for data components");
+		}
+		return dataComponentStatus;
+
+	}
+
+	/**
+	 * Method to fetch Service HTML
+	 * 
+	 * @return String
+	 */
+	public JsonObject getServiceStatus() {
+		JsonObject serviceStatus = new JsonObject();
+		try {
+
+			JsonObject jsonPlatformServiceStatus = getComponentStatus("PlatformService");
+			serviceStatus.add(ServiceStatusConstants.PlatformService, jsonPlatformServiceStatus);
+			JsonObject jsonPlatformEngineStatus = getComponentStatus("PlatformEngine");
+			serviceStatus.add(ServiceStatusConstants.PlatformEngine, jsonPlatformEngineStatus);
+			JsonObject jsonPlatformWorkflowStatus = getComponentStatus("PlatformWorkflow");
+			serviceStatus.add(ServiceStatusConstants.PlatformWorkflow, jsonPlatformWorkflowStatus);
+
+			if (ApplicationConfigProvider.getInstance().isEnableWebHookEngine()) {
+				JsonObject jsonPlatformWebhookEngineStatus = getComponentStatus("PlatformWebhookEngine");
+				serviceStatus.add(ServiceStatusConstants.PlatformWebhookEngine, jsonPlatformWebhookEngineStatus);
+				JsonObject jsonPlatformWebhookSubscriberStatus = getComponentStatus("PlatformWebhookSubscriber");
+				serviceStatus.add(ServiceStatusConstants.PlatformWebhookSubscriber,
+						jsonPlatformWebhookSubscriberStatus);
+			}
+
+			if (ApplicationConfigProvider.getInstance().isEnableAuditEngine()) {
+				JsonObject jsonPlatformAuditEngineStatus = getComponentStatus("PlatformAuditEngine");
+				serviceStatus.add(ServiceStatusConstants.PlatformAuditEngine, jsonPlatformAuditEngineStatus);
+			}
+			if (ApplicationConfigProvider.getInstance().isEnableDataArchivalEngine()) {
+				JsonObject jsonPlatformDataArchivalEngineStatus = getComponentStatus("PlatformDataArchivalEngine");
+				serviceStatus.add(ServiceStatusConstants.PlatformDataArchivalEngine,
+						jsonPlatformDataArchivalEngineStatus);
+			}
+		} catch (Exception e) {
+			log.error("Worlflow Detail ==== Error creating HTML body for services");
+		}
+		return serviceStatus;
+
+	}
+	
+	/**
+	 * Method to get health status of all agents
+	 * 
+	 * @return JsonObject
+	 */
+	public JsonObject getAgentsStatus() {
+		return getComponentStatus("Agents");
 	}
 
 }

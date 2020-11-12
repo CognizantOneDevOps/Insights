@@ -783,17 +783,24 @@ public class WorkflowDAL extends BaseDAL {
 	 */
 	public String deleteEmailTemplateByWorkflowId(String workflowId) throws InsightsCustomException {
 		try {
-			getSession().beginTransaction();
 			Query<InsightsEmailTemplates> createQuery = getSession().createQuery(
 					"FROM InsightsEmailTemplates a WHERE a.workflowConfig.workflowId= :workflowId",
 					InsightsEmailTemplates.class);
 			createQuery.setParameter("workflowId", workflowId);
 			List<InsightsEmailTemplates> executionRecords = createQuery.getResultList();
 			for (InsightsEmailTemplates insightsEmailTemplates : executionRecords) {
-				getSession().delete(insightsEmailTemplates);
-				//getSession().getTransaction().commit();
+				getSession().beginTransaction();
+				insightsEmailTemplates.setWorkflowConfig(null);
+				getSession().save(insightsEmailTemplates);
+				getSession().getTransaction().commit();
 			}
-			getSession().getTransaction().commit();
+			terminateSession();
+			terminateSessionFactory();
+			for (InsightsEmailTemplates insightsEmailTemplates : executionRecords) {
+				getSession().beginTransaction();
+				getSession().delete(insightsEmailTemplates);
+				getSession().getTransaction().commit();
+			}
 			terminateSession();
 			terminateSessionFactory();
 			return PlatformServiceConstants.SUCCESS;
@@ -896,6 +903,47 @@ public class WorkflowDAL extends BaseDAL {
 		terminateSession();
 		terminateSessionFactory();
 		return Boolean.TRUE;
+	}
+	
+	/**
+	 * Method to delete WorkflowType 
+	 * 
+	 * @param typeId
+	 * @return String
+	 */
+	public String deleteWorkflowType(int typeId) {
+		Query<InsightsWorkflowType> createQuery = getSession()
+				.createQuery("FROM InsightsWorkflowType a WHERE a.id= :id", InsightsWorkflowType.class);
+		createQuery.setParameter("id", typeId);
+		InsightsWorkflowType executionRecord = createQuery.getSingleResult();
+		getSession().beginTransaction();
+		getSession().delete(executionRecord);
+		getSession().getTransaction().commit();
+		terminateSession();
+		terminateSessionFactory();
+		return PlatformServiceConstants.SUCCESS;
+	}
+	
+	/**
+	 * Method to delete WorkflowConfiguration  record
+	 * 
+	 * @param workflowId
+	 * @return String
+	 */
+	public String deleteWorkflowConfig(String workflowId) {
+		Query<InsightsWorkflowConfiguration> createQuery = getSession()
+				.createQuery("FROM InsightsWorkflowConfiguration a WHERE a.workflowId= :workflowId", InsightsWorkflowConfiguration.class);
+		createQuery.setParameter("workflowId", workflowId);
+		InsightsWorkflowConfiguration executionRecord = createQuery.getSingleResult();
+		executionRecord.setEmailConfig(null);
+		executionRecord.setTaskSequenceEntity(null);
+		executionRecord.setAssessmentConfig(null);
+		getSession().beginTransaction();
+		getSession().delete(executionRecord);
+		getSession().getTransaction().commit();
+		terminateSession();
+		terminateSessionFactory();
+		return PlatformServiceConstants.SUCCESS;
 	}
 
 }
