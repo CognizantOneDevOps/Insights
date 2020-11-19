@@ -62,6 +62,13 @@ public class ReportEngineUtils {
 	public static final String REPORT_TYPE = "pdf";
 
 	public static final String REPORT_MEDIA_TYPE = "application/pdf";
+	
+	public static final String RGB_PATTERN = "rgb *\\( *([0-9]+), *([0-9]+), *([0-9]+) *\\)";
+	public static final String STYLE_CSS = "style.css";
+	public static final String COLOR = "color";
+	public static final String FONT_FAMILY = "font-family";
+	public static final String BACKGROUND_COLOR = "background-color";
+	public static final String FONT_SIZE = "font-size";
 
 	private ReportEngineUtils() {
 	}

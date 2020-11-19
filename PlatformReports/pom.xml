@@ -98,14 +98,19 @@
 			<version>1.8</version>
 		</dependency>
 		<dependency>
-		    <groupId>ai.h2o</groupId>
-		    <artifactId>h2o-genmodel-ext-xgboost</artifactId>
-		    <version>3.30.0.6</version>
+			<groupId>ai.h2o</groupId>
+			<artifactId>h2o-genmodel-ext-xgboost</artifactId>
+			<version>3.30.0.6</version>
 		</dependency>
 		<dependency>
-		    <groupId>ai.h2o</groupId>
-		    <artifactId>h2o-genmodel</artifactId>
-		    <version>3.30.0.6</version>
+			<groupId>ai.h2o</groupId>
+			<artifactId>h2o-genmodel</artifactId>
+			<version>3.30.0.6</version>
+		</dependency>
+		<dependency>
+			<groupId>net.sourceforge.cssparser</groupId>
+			<artifactId>cssparser</artifactId>
+			<version>0.9.29</version>
 		</dependency>
 	</dependencies>
 	<build>

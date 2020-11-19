@@ -24,7 +24,25 @@ img{
 	margin-top: 500px;
 }
 
+.table th{
+	color: #0000ff;
+	background-color: #00FF00;
+	font-size: 24;
+	font-family: arial;
+}
 
+.table td{
+	font-size: 24;
+}
+
+
+.table .observations .li{
+	font-size: 30;
+}
+
+.table .observations {
+	font-size: 30;
+}
 
 .singlestatCSS {
     width: 250px;

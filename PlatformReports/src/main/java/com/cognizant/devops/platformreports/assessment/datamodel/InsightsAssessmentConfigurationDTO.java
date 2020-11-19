@@ -42,6 +42,7 @@ public class InsightsAssessmentConfigurationDTO {
 	private String asseementreportdisplayname;
 	private List<JsonObject> ledgerRecords = new ArrayList<>();
 	private String incomingTaskMessageJson;
+	Map<String, List<String>> kpiContentMap = new HashMap<>();
 
 	public int getReportId() {
 		return reportId;
@@ -177,6 +178,14 @@ public class InsightsAssessmentConfigurationDTO {
 
 	public void setIncomingTaskMessageJson(String incomingTaskMessageJson) {
 		this.incomingTaskMessageJson = incomingTaskMessageJson;
+	}
+
+	public Map<String, List<String>> getKpiContentMap() {
+		return kpiContentMap;
+	}
+
+	public void setKpiContentMap(Map<String, List<String>> kpiContentMap) {
+		this.kpiContentMap = kpiContentMap;
 	}
 
 	@Override
