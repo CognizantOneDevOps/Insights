@@ -139,16 +139,29 @@ export class KpiAdditionComponent implements OnInit {
 
   validateKpiData() {
     var isValidated = true;
-    if ((this.kpiId === "" || this.kpiId === undefined) || (this.kpiName === "" || this.kpiName === undefined) || (this.selectedTool === "" || this.selectedTool === undefined) ||
-      (this.category === "" || this.category === undefined) || (this.groupName === "" || this.groupName === undefined) || (this.dataSource === "" || this.dataSource === undefined) ||
-      (this.dbQuery === "" || this.dbQuery === undefined) || (this.isActive === "" || this.isActive === undefined)
-      || (this.resultField === "" || this.resultField === undefined)) {
-      isValidated = false;
-      this.messageDialog.showApplicationsMessage("Please fill mandatory fields", "ERROR");
+    if (this.dataSource !== 'HYPERLEDGER') {
+      if ((this.kpiId === "" || this.kpiId === undefined) || (this.kpiName === "" || this.kpiName === undefined) || (this.selectedTool === "" || this.selectedTool === undefined) ||
+        (this.category === "" || this.category === undefined) || (this.groupName === "" || this.groupName === undefined) || (this.dataSource === "" || this.dataSource === undefined)||
+        (this.dbQuery === "" || this.dbQuery === undefined)  ||(this.isActive === "" || this.isActive === undefined)|| (this.resultField === "" || this.resultField === undefined)) {
+        isValidated = false;
+        this.messageDialog.showApplicationsMessage("Please fill mandatory fields", "ERROR");
+      }
+      else if (this.category == 'PREDICTION' && (this.selectedUsecase === "" || this.selectedUsecase === undefined)) {
+        this.messageDialog.showApplicationsMessage("Please select usecase for prediction.", "ERROR");
+        isValidated = false;
+      }
     }
-    else if(this.category == 'PREDICTION' && (this.selectedUsecase === "" || this.selectedUsecase === undefined)) {
-      this.messageDialog.showApplicationsMessage("Please select usecase for prediction.", "ERROR");
-      isValidated = false;
+    else {
+      if ((this.kpiId === "" || this.kpiId === undefined) || (this.kpiName === "" || this.kpiName === undefined) || (this.selectedTool === "" || this.selectedTool === undefined) ||
+        (this.category === "" || this.category === undefined) || (this.groupName === "" || this.groupName === undefined) || (this.dataSource === "" || this.dataSource === undefined) || (this.isActive === "" || this.isActive === undefined)
+        || (this.resultField === "" || this.resultField === undefined)) {
+        isValidated = false;
+        this.messageDialog.showApplicationsMessage("Please fill mandatory fields", "ERROR");
+      }
+      else if (this.category == 'PREDICTION' && (this.selectedUsecase === "" || this.selectedUsecase === undefined)) {
+        this.messageDialog.showApplicationsMessage("Please select usecase for prediction.", "ERROR");
+        isValidated = false;
+      }
     }
     if (isValidated) {
       this.onClickSave();
@@ -162,7 +175,7 @@ export class KpiAdditionComponent implements OnInit {
     kpiAPIRequestJson['group'] = this.groupName;
     kpiAPIRequestJson['category'] = this.category;
     kpiAPIRequestJson['toolName'] = this.selectedTool;
-    kpiAPIRequestJson['DBQuery'] = this.dbQuery;
+    kpiAPIRequestJson['DBQuery'] = this.dbQuery === undefined ? "":this.dbQuery;
     kpiAPIRequestJson['datasource'] = this.dataSource;
     kpiAPIRequestJson['isActive'] = this.isActive
     kpiAPIRequestJson['resultField'] = this.resultField;

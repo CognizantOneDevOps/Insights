@@ -72,30 +72,47 @@ export class ReportTemplateConfig implements OnInit {
     ngAfterViewInit() {
         this.kpiListDatasource.paginator = this.paginator;
     }
-
-    addKpi() {
-        if (this.kpiId == undefined || this.vType == undefined || this.vQuery == undefined ||
-            this.vType == '' || this.kpiId == '' || this.vQuery == '') {
-            this.messageDialog.showApplicationsMessage('Please fill mandatory fields.', 'ERROR');
-        }
-        else if (this.kpiDetailItems.find(({ kpiId }) => kpiId === this.kpiId && !this.isEdit)) {
-            this.messageDialog.showApplicationsMessage('Kpi Id already exists. Please select unique Kpi Id.', 'ERROR');
-        }
-        else {
-            if (this.isEdit) {
-                var index = this.kpiDetailItems.findIndex(({ kpiId }) => kpiId === this.kpiId);
-                if (index >= 0) {
-                    this.kpiDetailItems.splice(index, 1);
-                }
+    isEditKpi() {
+        if (this.isEdit) {
+            var index = this.kpiDetailItems.findIndex(({ kpiId }) => kpiId === this.kpiId);
+            if (index >= 0) {
+                this.kpiDetailItems.splice(index, 1);
             }
-            let kpiDetailConfig = new KpiDetailItem();
-            kpiDetailConfig.setData(this.kpiId, this.vType + '_' + this.kpiId, this.vQuery);
-            this.kpiDetailItems.push(kpiDetailConfig);
-            this.kpiListDatasource.data = this.kpiDetailItems;
-            this.kpiListDatasource.paginator = this.paginator;
-            this.showKpiList = true;
-            this.resetKpiDetails();
-            console.log('Add', this.kpiDetailItems);
+        }
+        let kpiDetailConfig = new KpiDetailItem();
+        kpiDetailConfig.setData(this.kpiId, this.vType + '_' + this.kpiId, this.vQuery);
+        this.kpiDetailItems.push(kpiDetailConfig);
+        this.kpiListDatasource.data = this.kpiDetailItems;
+        this.kpiListDatasource.paginator = this.paginator;
+        this.showKpiList = true;
+        this.resetKpiDetails();
+        console.log('Add', this.kpiDetailItems);
+
+    }
+    addKpi() {
+        if (this.visualizationUtil !== 'LEDGERPDF') {
+            if (this.kpiId == undefined || this.vType == undefined || this.vQuery == undefined ||
+                this.vType == '' || this.kpiId == '' || this.vQuery == '') {
+                this.messageDialog.showApplicationsMessage('Please fill mandatory fields.', 'ERROR');
+
+            }
+            else if (this.kpiDetailItems.find(({ kpiId }) => kpiId === this.kpiId && !this.isEdit)) {
+                this.messageDialog.showApplicationsMessage('Kpi Id already exists. Please select unique Kpi Id.', 'ERROR');
+            }
+            else {
+                this.isEditKpi();
+            }
+        } else {
+            if (this.kpiId == undefined || this.kpiId == '') {
+                this.messageDialog.showApplicationsMessage('Please fill mandatory fields.', 'ERROR');
+
+            }
+            else if (this.kpiDetailItems.find(({ kpiId }) => kpiId === this.kpiId && !this.isEdit)) {
+                this.messageDialog.showApplicationsMessage('Kpi Id already exists. Please select unique Kpi Id.', 'ERROR');
+            }
+            else {
+                this.isEditKpi();
+            }
         }
     }
 

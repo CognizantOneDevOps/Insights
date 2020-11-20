@@ -182,7 +182,7 @@
           <tr class="mat-row-kpi">
             <td class="mat-cell" class="columnName">
               <span class="mainText">DB Query</span>
-              <span class="asteriskText">*</span>
+              <span class="asteriskText" *ngIf="dataSource!=='HYPERLEDGER'">*</span>
             </td>
             <td class="columnComponent">
               <textarea [(ngModel)]="dbQuery" class="form-control" name="dbQuery" class="frmTxtarea" required

@@ -126,7 +126,7 @@
                 <tr class="mat-row-webhook" style="height: 16% !important">
                     <td class="mat-cell" class="columnName">
                         <span class="mainText">VType</span>
-                        <span style="color:#ff0000;">*</span>
+                        <span style="color:#ff0000;" *ngIf="visualizationUtil !== 'LEDGERPDF'">*</span>
                     </td>
                     <td class="columnComponent">
                         <mat-select  class="form-control" [(ngModel)]="vType" required placeholder="Select VType"
@@ -139,7 +139,7 @@
                 <tr class="mat-row-webhook" style="height: 68% !important">
                     <td class="mat-cell" class="columnName">
                         <span class="mainText">VQuery</span>
-                        <span style="color:#ff0000;">*</span>
+                        <span style="color:#ff0000;" *ngIf="visualizationUtil !== 'LEDGERPDF'">*</span>
                     </td>
                     <td class="columnComponent">
                         <textarea class="frmTxtarea" [(ngModel)]="vQuery"
