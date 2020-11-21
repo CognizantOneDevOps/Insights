@@ -44,16 +44,20 @@ class JenkinsAgent(BaseAgent):
         self.treeApiParams = self.buildApiParameters('', self.responseTemplate)
         self.validateAndCorrectTrackingFormat()
         jenkinsMasters = self.config.get("jenkinsMasters", None)
+        jenkinsMasterFlag = False
         if jenkinsMasters:
             for jenkinsMaster in jenkinsMasters:
-                self.currentJenkinsMaster = jenkinsMaster
-                self.processFolder(jenkinsMasters[jenkinsMaster])
-        else:
+                self.currentJenkinsMaster = jenkinsMaster                
+                if jenkinsMasters[jenkinsMaster] is not None:
+                    self.processFolder(jenkinsMasters[jenkinsMaster])
+                    #To avoid multiple call for each master value to baseUrl scenario
+                    if len(jenkinsMasters) > 0 :
+                        jenkinsMasterFlag = True
+        #baseUrl as url if no jenkinsMaster configured. baseUrl will be ignored even if  jenkinsMasters configured
+        if (not (jenkinsMasterFlag)) and (self.BaseUrl):
             self.currentJenkinsMaster = 'master'
-            self.processFolder(self.BaseUrl)
-        #self.publishToolsData(self.data)
-        self.updateTrackingJson(self.tracking)
-
+            self.processFolder(self.BaseUrl)        
+       
     def validateAndCorrectTrackingFormat(self):
         tracking = self.tracking
         correctionRequired = False
@@ -146,16 +150,55 @@ class JenkinsAgent(BaseAgent):
             completedBuilds = builds[startIndex:len(builds)]
             if len(completedBuilds)>0:
                 buildDetails = self.parseResponse(self.responseTemplate, completedBuilds, injectData)
-                buildDetails = self.processLogParsing(buildDetails)
+                auditing=self.config.get('auditing',False)
+                if auditing:
+                    buildDetails = self.processLogParsing(buildDetails)                
                 self.publishToolsData(buildDetails)
                 if not trackingUpdated:
                     if "id" in completedBuilds[0]:
 
-                        self.updateTrackingDetails(url, completedBuilds[0]["number"])
+                        self.updateTrackingDetails(url, completedBuilds[0]["id"])
                     trackingUpdated = True
             start = start + 100
     
-    def processLogParsing(self, buildDetails):            
+    def processLogParsing(self, buildDetails): 
+        for build in buildDetails:
+            buildUrl = build['buildUrl']
+            logUrl = buildUrl + "consoleText"
+            logResponse = self.getBuildLog(logUrl)
+            if logResponse.find('Uploaded: ')!=-1:                
+                build["resourcekey"]=logResponse.split('Uploaded: ')[1].split('\n')[0]
+                build["resourcekey"]=build["resourcekey"][build["resourcekey"].find('repository/'):build["resourcekey"].rfind('/')] + build["resourcekey"][build["resourcekey"].rfind('.'):build["resourcekey"].rfind(' (')]                
+                build["resourcekey"]=build["resourcekey"][build["resourcekey"].index('/',build["resourcekey"].index('/') + 1) + 1:build["resourcekey"].rfind('/')]+build["resourcekey"][build["resourcekey"].rfind('.'):]                
+                build["resourcekey"]=build["resourcekey"][::-1].replace('/','-',2)[::-1]
+            elif logResponse.find('Uploaded to nexus: ')!=-1:
+                build["resourcekey"]=logResponse.split('Uploaded to nexus: ')[1].split('\n')[0]
+                build["resourcekey"]=build["resourcekey"][build["resourcekey"].find('repository/'):build["resourcekey"].rfind('/')] + build["resourcekey"][build["resourcekey"].rfind('.'):build["resourcekey"].rfind(' (')]
+                build["resourcekey"]=build["resourcekey"][build["resourcekey"].index('/',build["resourcekey"].index('/') + 1) + 1:build["resourcekey"].rfind('/')]+build["resourcekey"][build["resourcekey"].rfind('.'):]
+                build["resourcekey"]=build["resourcekey"][::-1].replace('/','-',2)[::-1]
+            else:                
+                build["resourcekey"]='Not Found'
+            if logResponse.find('Starting deployment process ')!=-1:                
+                deploymentDetails = logResponse.split('Starting deployment process ')[1].split('\n')[0]                
+                build["deploymentProcess"] = deploymentDetails.split(" ")[0].replace("'","")                
+                build["deploymentApplication"] = deploymentDetails.split("of application ")[1].split(' ')[0].replace("'","")
+                build["deploymentEnv"] = deploymentDetails.split("in environment ")[1].split('\n')[0].replace("'","").rstrip()                
+            else:                
+                build["deploymentProcess"] = 'Not Found'
+                build["deploymentApplication"] = 'Not Found'
+                build["deploymentEnv"] = 'Not Found'
+            if logResponse.find('Deployment request id is: ')!=-1:                
+                build["deploymentId"] = logResponse.split('Deployment request id is: ')[1].split('\n')[0].replace("'","")
+            elif logResponse.find('Deployment request created with id: ')!=-1:
+                build["deploymentId"] = logResponse.split('Deployment request created with id: ')[1].split('\n')[0].replace("'","").rstrip()
+            else:                
+                build["deploymentId"] = 'Not Found'
+            if logResponse.find('The deployment result is ')!=-1:
+                build["deploymentStatus"] = logResponse.split('The deployment result is ')[1].split('.')[0].replace("'","")
+            elif logResponse.find('The deployment ')!=-1:
+                build["deploymentStatus"] = logResponse.split('The deployment ')[1].split('.')[0].replace("'","")
+            else:                
+                build["deploymentStatus"] = 'Not Found'    
         return buildDetails
     
     def updateTrackingDetails(self, buildUrl, buildNumber):
@@ -189,7 +232,12 @@ class JenkinsAgent(BaseAgent):
         if len(jobDetails) == 0:
             return injectData
         configXmlUrl = url+"config.xml"
-        xmlResponse = self.getResponse(configXmlUrl, 'GET', self.userid, self.passwd, None)
+        if self.userid == None and self.passwd ==  None:
+            auth = None
+        else:
+            auth =HTTPBasicAuth(self.userid,self.passwd)
+        sslVerify = self.config.get("communication", '').get("sslVerify")
+        xmlResponse = requests.get(configXmlUrl, auth=auth, verify=False)
         root = ET.fromstring(xmlResponse.text.encode('UTF-8').strip())
         rootTag = root.tag
         rootTagLen = len(rootTag) + 1
@@ -208,7 +256,11 @@ class JenkinsAgent(BaseAgent):
     def getBuildLog(self,url):
         auth = HTTPBasicAuth(self.userid, self.passwd)
         response = requests.get(url, auth=auth)
-        return response.content.decode('utf-8')
+        osversion = self.config.get('osversion', None)
+        if osversion.lower() == 'windows':
+            return response.content.decode('cp1252')
+        else:
+            return response.content.decode('utf-8')
 
 if __name__ == "__main__":
     JenkinsAgent()

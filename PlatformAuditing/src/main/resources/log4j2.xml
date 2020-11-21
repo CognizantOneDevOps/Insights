@@ -18,14 +18,27 @@
 	</Appenders>
 	<Loggers>
 		<Logger name="com.cognizant" level="debug">
-				<AppenderRef ref="RollingFile" />
+			<AppenderRef ref="RollingFile" />
 		</Logger>
 		<Logger name="org.hibernate" level="error" additivity="false">
-            <AppenderRef ref="RollingFile" />
-			<AppenderRef ref="Console" />
-        </Logger>
+                	<AppenderRef ref="RollingFile" />
+	        	<AppenderRef ref="Console" />
+                </Logger>
 		<Logger name="org" level="error">
-				<AppenderRef ref="RollingFile" />
+			<AppenderRef ref="RollingFile" />
 		</Logger>
+		
+	    	<!-- NettyClientHandler -->
+            	<Logger name="io.grpc.netty" level="error">
+                        <AppenderRef ref="RollingFile" />
+            	</Logger>
+            	<!-- SslHandler -->
+            	<Logger name="io.netty" level="error">
+                        <AppenderRef ref="RollingFile" />
+            	</Logger>
+            	<!-- Hyperledger network events polling -->
+            	<Logger name="org.hyperledger" level="error">
+                        <AppenderRef ref="RollingFile" />
+            	</Logger>
 	</Loggers>
 </Configuration>

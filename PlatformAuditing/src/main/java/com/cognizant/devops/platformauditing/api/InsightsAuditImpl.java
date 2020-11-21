@@ -85,7 +85,8 @@ public class InsightsAuditImpl implements InsightsAudit {
     @Override
     public boolean insertToolData(JsonObject input) {
         try {
-            JsonObject data = utilMethods.masssageData(input);
+            JsonObject data = utilMethods.massageData(input);
+            if(!data.isJsonNull()) {
             Boolean insertFlag = utilMethods.getInsertionFlag(data);
             if (insertFlag) {
             	BCNetworkGatewayClient bcClient = new BCNetworkGatewayClient();
@@ -96,8 +97,13 @@ public class InsightsAuditImpl implements InsightsAudit {
                 LOG.info("Insertion is not required according to process rules:\n" + data);
                 return true;
             }
+            }
+            else {
+                LOG.info("Flag can not be inserted due to invalid/empty data post massage data:\n" + data);
+                return true;
+            }
         } catch (Exception e) {
-			LOG.error(e);
+			LOG.error(e);			
             return false;
         }
     }
@@ -144,7 +150,7 @@ public class InsightsAuditImpl implements InsightsAudit {
     @Override
     public boolean insertJiraNode(JsonObject input, JsonArray changelogArray) {
         try {
-            JsonObject data = utilMethods.masssageData(input);
+            JsonObject data = utilMethods.massageData(input);
             LOG.info("POST MASSAGING:\n" + data);
             Boolean insertFlag = utilMethods.getInsertionFlag(data);
             if (insertFlag) {
@@ -186,6 +192,6 @@ public class InsightsAuditImpl implements InsightsAudit {
     }
 
     public JsonObject getProcessFlow(){
-        return LoadFile.getProcessModel();
+        return LoadFile.getInstance().getProcessModel();
     }
 }

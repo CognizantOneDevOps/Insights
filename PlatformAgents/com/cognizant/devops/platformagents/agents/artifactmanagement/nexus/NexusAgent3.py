@@ -20,16 +20,18 @@ Created on Jun 28, 2016
 '''
 import urllib.request, urllib.error, urllib.parse
 import xmltodict
+import json
+import base64
 from ....core.BaseAgent3 import BaseAgent
 
 class NexusAgent(BaseAgent):
     def process(self):
-        UserID = self.getCredential("userid")
-        Passwd = self.getCredential("passwd")
+        self.userid = self.getCredential("userid")
+        self.passwd = self.getCredential("passwd")
         BaseUrl = self.config.get("baseUrl", '')
         FirstEndPoint = self.config.get("firstEndPoint", '')
-        nexIDs = self.getResponse(FirstEndPoint, 'GET', UserID, Passwd, None)
-        data = []
+        nexIDs = self.getResponse(FirstEndPoint, 'GET', self.userid, self.passwd, None)
+        previousname = nexIDs["items"][0]["repository"]
         for artifacts in range(len(nexIDs["items"])):
             if nexIDs["items"][artifacts]["repository"] == previousname and artifacts != 0:
                 continue
@@ -38,7 +40,9 @@ class NexusAgent(BaseAgent):
                 artifactid = nexIDs["items"][artifacts]["name"]
                 previousname = repoid
                 groupid = nexIDs["items"][artifacts]["group"].replace(".", "/", 3)
-                mavenmetafile = urllib.request.urlopen(self.config.get("baseUrl", '')+"repository/"+repoid+"/"+groupid+"/"+nexIDs["items"][artifacts]["name"]+"/maven-metadata.xml")#reading base mavenmetadata file to fetch main version
+                request = urllib.request.Request(self.config.get("baseUrl", '')+"repository/"+repoid+"/"+groupid+"/"+nexIDs["items"][artifacts]["name"]+"/maven-metadata.xml")
+                request.add_header('Authorization', 'Basic %s' % self.getBase64Value(self.userid,self.passwd))
+                mavenmetafile = urllib.request.urlopen(request)#reading base mavenmetadata file to fetch main version
                 #mavenmetafile = urllib2.urlopen(self.config.get("baseUrl", '')+"repository/"+repoid+"/"+groupid+"/"+nexIDs["items"][artifacts]["name"]+"/maven-metadata.xml")#reading base mavenmetadata file to fetch main version
                 mavenmetadata = xmltodict.parse(mavenmetafile.read())
                 mavenmetafile.close()
@@ -50,7 +54,9 @@ class NexusAgent(BaseAgent):
         repoid = nexIDs["repository"]
         artifactid = nexIDs["name"]
         groupid = nexIDs["group"].replace(".", "/", 3)
-        mavenmetafile = urllib.request.urlopen(self.config.get("baseUrl", '')+"repository/"+repoid+"/"+groupid+"/"+nexIDs["name"]+"/maven-metadata.xml")#reading base mavenmetadata file to fetch main version
+        request = urllib.request.Request(self.config.get("baseUrl", '')+"repository/"+repoid+"/"+groupid+"/"+nexIDs["name"]+"/maven-metadata.xml")
+        request.add_header('Authorization', 'Basic %s' % self.getBase64Value(self.userid,self.passwd))
+        mavenmetafile = urllib.request.urlopen(request)#reading base mavenmetadata file to fetch main version
         mavenmetadata = xmltodict.parse(mavenmetafile.read())
         mavenmetafile.close()
         lastupdated = mavenmetadata["metadata"]["versioning"]["lastUpdated"]
@@ -68,23 +74,32 @@ class NexusAgent(BaseAgent):
 
     def publishdata(self, repoid, groupid, nexIDs, version, artifactid, lastupdated):
         data = []
-        mainmavenxml = urllib.request.urlopen(self.config.get("baseUrl", '')+"repository/"+repoid+"/"+groupid+"/"+nexIDs["name"]+"/"+version+"/"+nexIDs["name"]+"-"+version+".pom")#reading mavenmetadata file inside main version folder
+        print(self.config.get("baseUrl", '')+"repository/"+repoid+"/"+groupid+"/"+nexIDs["name"]+"/"+version+"/"+nexIDs["name"]+"-"+version+".pom")
+        request = urllib.request.Request(self.config.get("baseUrl", '')+"repository/"+repoid+"/"+groupid+"/"+nexIDs["name"]+"/"+version+"/"+nexIDs["name"]+"-"+version+".pom")
+        request.add_header('Authorization', 'Basic %s' % self.getBase64Value(self.userid,self.passwd))
+        mainmavenxml = urllib.request.urlopen(request)#reading mavenmetadata file inside main version folder
+        #mainmavenxml = urllib.request.urlopen(self.config.get("baseUrl", '')+"repository/"+repoid+"/"+groupid+"/"+nexIDs["name"]+"/"+version+"/"+nexIDs["name"]+"-"+version+".pom")#reading mavenmetadata file inside main version folder
         mainmavendata = mainmavenxml.read()
         mainmavenxml.close()
         artifactfullname = artifactid + "-" + version + "." + xmltodict.parse(mainmavendata)["project"]["packaging"]
         injectData = {}
         injectData["timestamp"] = lastupdated
-        injectData["Phase"] = version
+        injectData["version"] = version
         injectData["currentID"] = groupid+ "-" + artifactfullname
         injectData["resourceKey"] = nexIDs["group"] + ':' + nexIDs["name"]
         injectData["Status"] = "Archive"
-        injectData["Author"] = self.config.get("userID")
+        injectData["Author"] = self.userid
         data.append(injectData)
         self.publishToolsData(data)
 
     def nexus(self, logResponse):
         #print (logResponse)
         return
+        
+    def getBase64Value(self,userid,passwd):
+        userpass = '%s:%s' % (userid,passwd)
+        base64string = base64.standard_b64encode(userpass.encode('utf-8'))
+        return base64string.decode('utf-8')
 
     def trackingUpdation(self, repoid, lastupdated):
         self.loadTrackingConfig()
@@ -100,4 +115,4 @@ class NexusAgent(BaseAgent):
             else:
                 return 0
 if __name__ == "__main__":
-    NexusAgent()        
+    NexusAgent()

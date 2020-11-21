@@ -73,7 +73,7 @@ class BaseAgent(object):
             if "errors" in self.vaultJson:
                 self.publishHealthData(self.generateHealthData(systemFailure=True,note="BaseAgent: unable to fetchCredentials from vault"))
                 raise ValueError('BaseAgent: unable to fetchCredentials from vault')
-    
+            
     def getCredential(self,key):
         if self.vaultFlag:
             return self.vaultJson["data"]["data"][key]
@@ -364,7 +364,9 @@ class BaseAgent(object):
     def rsaEncrypt(self, hexdigest):
         #print("+++++++++++++++++++++++++++++++++hexdigest")
         #print(hexdigest)
-        with open(self.config.get('publicKeyPath'), 'rb') as key_file:
+        if "INSIGHTS_HOME" in os.environ:
+            publicKeyPath = os.environ['INSIGHTS_HOME']+'/.InSights/BlockChainCerts/public_key.pem'
+        with open(publicKeyPath, 'rb') as key_file:
             public_key = serialization.load_pem_public_key(
             key_file.read(),
             backend=default_backend()

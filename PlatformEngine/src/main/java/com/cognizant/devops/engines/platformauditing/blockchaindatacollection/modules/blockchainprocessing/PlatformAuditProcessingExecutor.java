@@ -16,45 +16,44 @@
 package com.cognizant.devops.engines.platformauditing.blockchaindatacollection.modules.blockchainprocessing;
 
 import java.io.IOException;
-import java.util.TimerTask;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
-import com.cognizant.devops.platformauditing.api.InsightsAuditImpl;
-import com.cognizant.devops.platformauditing.util.LoadFile;
-import com.cognizant.devops.platformcommons.dal.neo4j.GraphResponse;
-import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBHandler;
-import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-
-import javax.crypto.Cipher;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.security.KeyFactory;
 import java.security.PrivateKey;
 import java.security.spec.PKCS8EncodedKeySpec;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Base64;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
+import java.util.TimerTask;
+import java.util.TreeMap;
+
+import javax.crypto.Cipher;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import com.cognizant.devops.platformauditing.api.InsightsAuditImpl;
+import com.cognizant.devops.platformauditing.util.LoadFile;
+import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBHandler;
+import com.cognizant.devops.platformcommons.dal.neo4j.GraphResponse;
+import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.google.common.hash.HashCode;
 import com.google.common.hash.Hashing;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 
 
 public class PlatformAuditProcessingExecutor extends TimerTask {
     private static Logger LOG = LogManager.getLogger(PlatformAuditProcessingExecutor.class);
-
-
-    private long lastTimestamp;
-    private String blockchainProcessedFlag = "blockchainProcessedFlag";
-    private int dataBatchSize = 100;
-    private int nextBatchSize = 0;
     private final InsightsAuditImpl insightAuditImpl = Util.getAuditObject();
 	private static Util utilObj = new Util();
-	private String decryptionAlgorithm = "RSA/ECB/OAEPWITHSHA-256ANDMGF1PADDING";
-    private String keyAlgorithm = "RSA";
-
+	private long lastTimestamp;
 
     @Override
 	public void run() {
@@ -62,7 +61,14 @@ public class PlatformAuditProcessingExecutor extends TimerTask {
         orphanNodeExtraction();
     }
 
-    private void orphanNodeExtraction() {
+    private void orphanNodeExtraction() {    	
+    	String blockchainProcessedFlag = "blockchainProcessedFlag";
+    	JsonObject config = LoadFile.getInstance().getConfig();
+    	int dataBatchSize = config.get("dataBatchSize").getAsInt();
+    	int nextBatchSize = 0;
+    	String decryptionAlgorithm = config.get("decryptionAlgorithm").getAsString();
+        String keyAlgorithm = config.get("keyAlgorithm").getAsString();
+        
         GraphDBHandler dbHandler = new GraphDBHandler();
         StringBuffer cypher = new StringBuffer();
         cypher.append("MATCH (n:DATA) WHERE ");
@@ -71,6 +77,13 @@ public class PlatformAuditProcessingExecutor extends TimerTask {
         cypher.append("OR n.").append(blockchainProcessedFlag).append("=false) ");
 
         try {
+        	JsonObject datamodel = LoadFile.getInstance().getDataModel();
+    		Set<Entry<String, JsonElement>> e = datamodel.entrySet();
+    		List<String> uniqueKeyList = new ArrayList<>();
+    		e.forEach(x-> {
+    			Set<Entry<String, JsonElement>> tool = x.getValue().getAsJsonObject().entrySet();
+    			uniqueKeyList.add(tool.iterator().next().getValue().getAsString());
+    		});
             boolean nextBatchQuery = true;
             while (nextBatchQuery) {
                 Boolean successfulWriteFlag = true;
@@ -84,16 +97,15 @@ public class PlatformAuditProcessingExecutor extends TimerTask {
                         .get("results").getAsJsonArray().get(0).getAsJsonObject()
                         .get("data").getAsJsonArray();
                 for (JsonElement dataElem : rows) {
-                    
-                	if(dataElem.getAsJsonObject().get("row").getAsJsonArray().get(0).getAsJsonObject().has("digitalSignature")) {
+                	boolean isUniquePresent = checkUniquekeys(uniqueKeyList,dataElem);
+                	if(dataElem.getAsJsonObject().get("row").getAsJsonArray().get(0).getAsJsonObject().has("digitalSignature") && isUniquePresent) {
                         String digitalSign = dataElem.getAsJsonObject().get("row").getAsJsonArray().get(0).getAsJsonObject().getAsJsonPrimitive("digitalSignature").getAsString();
-                        LOG.debug("--------------------------process executer------------------------");
+                        LOG.debug("--------------------------process executor------------------------");
                         String hc = getHash(dataElem.getAsJsonObject().get("row").getAsJsonArray());
                         LOG.debug(hc);
                         //decrypt digitalSign
-                        byte[] byteArray = Base64.getDecoder().decode(digitalSign.getBytes());
-                        JsonObject bcConfig = LoadFile.getConfig();
-                        String keyStr = new String(Files.readAllBytes(Paths.get(bcConfig.get("ENGINE_PRIVATE_KEY").getAsString())));
+                        byte[] byteArray = Base64.getDecoder().decode(digitalSign.getBytes());                        
+                        String keyStr = new String(Files.readAllBytes(Paths.get(config.get("ENGINE_PRIVATE_KEY").getAsString())));
                         keyStr = keyStr.replaceAll("\\n", "").replace("-----BEGIN PRIVATE KEY-----", "").replace("-----END PRIVATE KEY-----", "");
                         KeyFactory key = KeyFactory.getInstance(keyAlgorithm);
                         PKCS8EncodedKeySpec spec = new PKCS8EncodedKeySpec(Base64.getDecoder().decode(keyStr));
@@ -104,13 +116,13 @@ public class PlatformAuditProcessingExecutor extends TimerTask {
                         byte[] decryptedBytes = cipher.doFinal(byteArray);
                         LOG.debug("decryptedBytes");
                         LOG.debug(new String(decryptedBytes));
-                        if (hc.equals(new String(decryptedBytes)))
+                        if (hc.equals(new String(decryptedBytes)))                        	
                             successfulWriteFlag = insertNode(dataElem, successfulWriteFlag);
                         else
                             LOG.debug("Hash values do not match.. skipping uuid: " +
 								dataElem.getAsJsonObject().get("row").getAsJsonArray().get(0).getAsJsonObject().getAsJsonPrimitive("uuid"));
                     }else
-                        LOG.debug("DigitalSignature not found for uuid: "+
+                        LOG.debug("INVALID ASSET OR DigitalSignature not found for uuid: "+
 							dataElem.getAsJsonObject().get("row").getAsJsonArray().get(0).getAsJsonObject().getAsJsonPrimitive("uuid")+"\nNode skipped...");
                     //successfulWriteFlag = insertNode(dataElem, successfulWriteFlag);
                 }
@@ -138,18 +150,19 @@ public class PlatformAuditProcessingExecutor extends TimerTask {
         }
 
     }
-	
-	private String getHash(JsonArray row) {
+    
+    private String getHash(JsonArray row) {
         String dataString = "";
         HashCode sb = null;
         for (JsonElement dt : row) {
             //put dataObject into treemap to get sorted
-            TreeMap t = new TreeMap<String, String>();
+            TreeMap<String, String> t = new TreeMap<String, String>();
             dt.getAsJsonObject().entrySet().parallelStream().forEach(entry -> {
-                if (!entry.getKey().equals("uuid") && !entry.getKey().equals("digitalSignature") && !entry.getKey().equals("jiraKeyProcessed") && !entry.getKey().equals("correlationTime") && !entry.getKey().equals("maxCorrelationTime") && !entry.getKey().equals("jiraKeys")) {
-                    if (entry.getKey().equals("inSightsTime") || entry.getKey().equals("createdTimeEpoch") || entry.getKey().equals("changeDateEpoch"))
+                if (!entry.getKey().equals("uuid") && !entry.getKey().equals("digitalSignature") &&  !entry.getKey().equals("correlationTime") && !entry.getKey().equals("maxCorrelationTime") ) {
+                    if (entry.getKey().equals("inSightsTime") ||entry.getKey().endsWith("Epoch"))
                         t.put(entry.getKey(), String.valueOf(entry.getValue().getAsLong()) + ".0");
                     else {
+                    	LOG.debug("jsonarray*****"+Boolean.toString(entry.getValue().isJsonArray()));
                         if(entry.getValue().isJsonArray()) {
                             for (JsonElement e: entry.getValue().getAsJsonArray()) {
                                 if(t.containsKey(entry.getKey())) {
@@ -160,14 +173,17 @@ public class PlatformAuditProcessingExecutor extends TimerTask {
                                     t.put(entry.getKey(), e.getAsString());
                             }
                         }
-                        else
+                        else {
+                        	//LOG.debug(entry.getValue().getClass().getName());
+                        	LOG.debug(entry.getKey()+"-->"+entry.getValue());
                             t.put(entry.getKey(), entry.getValue().getAsString());
-                        LOG.debug(entry.getValue().getAsString());
+                        }
+                        //LOG.debug(entry.getValue().getAsString());
                     }
                 }
             });
-            Set data = t.entrySet();
-            Iterator i = data.iterator();
+            Set<?> data = t.entrySet();
+            Iterator<?> i = data.iterator();
             while (i.hasNext()) {
                 Map.Entry m = (Map.Entry) i.next();
                 dataString += m.getValue();
@@ -180,9 +196,8 @@ public class PlatformAuditProcessingExecutor extends TimerTask {
 
     private boolean insertNode(JsonElement dataElem, boolean successfulWriteFlag) {
         try {
-			if (dataElem.getAsJsonObject().get("row").getAsJsonArray().get(0).getAsJsonObject().has("digitalSignature"))
+        	if (dataElem.getAsJsonObject().get("row").getAsJsonArray().get(0).getAsJsonObject().has("digitalSignature"))
                 dataElem.getAsJsonObject().get("row").getAsJsonArray().get(0).getAsJsonObject().remove("digitalSignature");
-            
             lastTimestamp = dataElem.getAsJsonObject().get("row").getAsJsonArray().get(0).getAsJsonObject().getAsJsonPrimitive("inSightsTime").getAsLong();
 			boolean result;
 			synchronized(insightAuditImpl){
@@ -196,4 +211,19 @@ public class PlatformAuditProcessingExecutor extends TimerTask {
         }
         return successfulWriteFlag;
     }
+    
+    /**
+     * Check if the response json contains the unique key required for each tool
+     * @param uniqueKeyList
+     * @param dataElem
+     * @return isUniquePresent
+     */
+    private Boolean checkUniquekeys(List<String> uniqueKeyList, JsonElement dataElem) {
+    	for (String uniqueKey : uniqueKeyList) {
+    		if(dataElem.getAsJsonObject().get("row").getAsJsonArray().get(0).getAsJsonObject().has(uniqueKey)) {
+    			return Boolean.TRUE;
+    		}
+		}
+		return Boolean.FALSE;
+	}
 }

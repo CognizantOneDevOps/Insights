@@ -6,11 +6,11 @@
     "vaultUrl":"http://Vault_Host:port/v1/"
   },
   "mqConfig": {
-    "user": "iSight",
-    "password": "iSight",
+    "user": "username for RabbitMq",
+    "password": "password for RabbitMq",
     "host": "127.0.0.1",
     "exchange": "iSight",
-    "agentControlXchg":"iAgent"
+    "agentControlXchg":"iAgent" 
   },
   "subscribe": {
     "config": "ARTIFACTMANAGEMENT.NEXUS.config"
@@ -32,26 +32,31 @@
   	  }
   },
   "agentId" : "" ,
-  "toolCategory" : "ARTIFACTMANAGEMENT",
+  "toolCategory" : "ARTIFACTMANAGEMENT",  
   "enableValueArray": false,
   "enableDataValidation": true,
   "auth": "base64",
   "runSchedule": 5,
-  "userid": "userid",
-  "passwd": "passwd",
-  "baseUrl": "http://127.0.0.1:9005/nexus/",
-  "timeStampField":"nex_lastupdated",
+  "userid": "username for Nexus",
+  "passwd": "password for Nexus",
+  "baseUrl": "http://localhost:8082/",
+  "timeStampField":"timestamp",
   "timeStampFormat":"%Y%m%d%H%M%S",
   "useResponseTemplate": false,
-   "toolsTimeZone" : "Asia/Kolkata",
+  "toolsTimeZone" : "Asia/Kolkata",
   "insightsTimeZone" : "Asia/Kolkata",
   "isEpochTimeFormat" : false,
   "agentSecretDetails": ["userid","passwd"],
   "isDebugAllowed" : false,
-  "firstEndPoint": "http://127.0.0.1:9005/nexus/service/local/lucene/search?g=com*",
-    	"loggingSetting" : {
+  "firstEndPoint": "http://localhost:8082/service/rest/v1/search?group=com*",
+  "loggingSetting" : {
 		"logLevel" : "WARN",
 		"maxBytes" : 5000000,
 		"backupCount" : 1000
-	}
+	},
+  "osversion": "windows",
+  "agentVersion": "v7.2",
+  "labelName": "NEXUS",
+  "toolName" : "NEXUS",
+  "auditing": false  
 }

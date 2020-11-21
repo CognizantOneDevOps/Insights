@@ -6,8 +6,8 @@
 		"vaultUrl": "http://Vault_Host:port/v1/"
 	},
 	"mqConfig": {
-		"user": "iSight",
-		"password": "iSight",
+		"user": "username for RabbitMq",
+		"password": "Password for RabbitMq",
 		"host": "127.0.0.1",
 		"exchange": "iSight",
 		"agentControlXchg": "iAgent"
@@ -133,7 +133,7 @@
 	"enablePullReqCommitAPIDataRetrieval" : true,
 	"enableBrancheDeletion": false,
 	"enableDataValidation": true,
-	"toolCategory": "SCM",
+	"toolCategory": "SCM",	
 	"toolsTimeZone": "GMT",
 	"insightsTimeZone": "Asia/Kolkata",
 	"enableValueArray": false,
@@ -145,7 +145,7 @@
 	"isEpochTimeFormat": false,
 	"agentSecretDetails": ["accessToken"],
 	"startFrom": "2020-01-01 15:46:33",
-	"accessToken": "accessToken",
+	"accessToken": "accessToken for git",
 	"getRepos": "https://api.github.com/users/<USER_NAME>/repos",
 	"commitsBaseEndPoint": "https://api.github.com/repos/<REPO_NAME>/",
 	"isDebugAllowed": false,
@@ -155,6 +155,8 @@
 		"backupCount": 1000
 	},
 	"osversion": "windows",
-	"agentVersion": "v6.3",
-	"toolName": "GIT"
+	"agentVersion": "v7.2",
+	"labelName": "GIT",	
+	"toolName": "GIT",
+	"auditing": false
 }

@@ -7,7 +7,7 @@
   }, 
   "mqConfig": {
     "user": "username for RabbitMq",
-    "password": "Password for RabbitMq",
+    "password": "password for RabbitMq",
     "host": "127.0.0.1",
     "exchange": "iSight",
     "agentControlXchg":"iAgent"    
@@ -34,9 +34,11 @@
 	    {
 	      "causes": [
 	        {
-	          "shortDescription": "shortDescription"
+	          "shortDescription": "shortDescription",
+			  "userName": "userName"
 	        }
-	      ]
+	      ],
+		  "ceTaskId": "sonarTaskID"
 	    },
 	    {
 	      "remoteUrls": [
@@ -64,6 +66,7 @@
 	  "number": "number",
 	  "result": "result",
 	  "timestamp": "buildTimestamp",
+	  "fullDisplayName": "fullDisplayName",
 	  "url": "buildUrl"
 	 }
   },
@@ -81,9 +84,9 @@
 "useResponseTemplate" : true,
 "useAllBuildsApi" : true,
 "isDebugAllowed" : false,
-"enableValueArray": false,
-"userid": "username",
-"passwd": "password",
+"enableValueArray": true,
+"userid": "username for Jenkins",
+"passwd": "password for Jenkins",
 "runSchedule": 30,
 "baseUrl": "http://127.0.0.1:8080/",
 "jenkinsMasters" : {
@@ -99,5 +102,10 @@
 	"logLevel" : "WARN",
 	"maxBytes" : 5000000,
 	"backupCount" : 1000
-}
+},
+"osversion": "windows",
+"agentVersion": "v7.2",
+"labelName": "JENKINS",
+"toolName" : "JENKINS",
+"auditing": false
 }

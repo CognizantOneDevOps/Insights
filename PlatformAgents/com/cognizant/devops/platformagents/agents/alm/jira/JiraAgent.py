@@ -167,10 +167,13 @@ class JiraAgent(BaseAgent):
                         if item['field'] in workLogFields:
                             dataCopy = copy.deepcopy(data)
                             dataCopy['changedfield'] = item['field']
-                            dataCopy['fromString'] = item['fromString']
-                            dataCopy['toString'] = item['toString']
-                            dataCopy['from'] = item['from']
-                            dataCopy['to'] = item['to']
+                            dataCopy['fromString'] = item.get('fromString',None)
+                            dataCopy['toString'] = item.get('toString',None)
+                            dataCopy['from'] = item.get('from',None)
+                            dataCopy['to'] = item.get('to',None)
+                            for key in dataCopy.keys():
+                                if dataCopy[key] is None:
+                                   dataCopy[key] = "None"
                             workLogData.append(dataCopy)
                             if dataCopy.get('changeField', None) == 'RemoteIssueLink':
                                 objectLinkId = dataCopy.get('to', None)

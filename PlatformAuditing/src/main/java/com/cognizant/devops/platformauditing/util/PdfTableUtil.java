@@ -358,7 +358,7 @@ public class PdfTableUtil {
 	/**
 	 * Defines the length of the encryption key.
 	 * Possible values are 40, 128 or 256.
-	 * 256-bit AES encryption requires a JDK with â€œunlimited strengthâ€� cryptography, which requires extra files to be installed.
+	 * 256-bit AES encryption requires a JDK with unlimited strength cryptography, which requires extra files to be installed.
 	 * @param doc 
 	 * @param doc
 	 * @return 
@@ -366,7 +366,7 @@ public class PdfTableUtil {
 	 */
 	public void protectPdf(PDDocument doc, String pdfName) throws IOException {
 		int keyLength = 128;
-		JsonObject config = LoadFile.getConfig();
+		JsonObject config = LoadFile.getInstance().getConfig();
 		AccessPermission ap = new AccessPermission();
 		// disable printing, everything else is allowed
 		ap.setCanPrint(ALLOW_PRINTING);
@@ -391,7 +391,7 @@ public class PdfTableUtil {
 				contentStream.beginText();
 				contentStream.newLineAtOffset(200, 780);
 				contentStream.setFont(PDType1Font.HELVETICA, 7);
-				contentStream.showText("OneDevOps Insights – Software Traceability Report");
+				contentStream.showText("OneDevOps Insights â€“ Software Traceability Report");
 				contentStream.endText();
 				contentStream.beginText();
 				contentStream.newLineAtOffset(120, 15);

@@ -16,7 +16,6 @@
 package com.cognizant.devops.engines.platformauditing.blockchaindatacollection.modules.blockchainprocessing;
 
 import java.io.IOException;
-import java.util.TimerTask;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -42,15 +41,18 @@ import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.util.*;
 
+
 public class JiraProcessingExecutor extends TimerTask {
 	private static Logger LOG = LogManager.getLogger(JiraProcessingExecutor.class);
-
-	private long lastTimestamp;
 	private String blockchainProcessedFlag = "blockchainProcessedFlag";
-
+	private long lastTimestamp;
+	private JsonObject config = LoadFile.getInstance().getConfig();
+	private int dataBatchSize = config.get("dataBatchSize").getAsInt();
 	private int nextBatchSize = 0;
 	private final InsightsAuditImpl insightAuditImpl = Util.getAuditObject();
 	private static Util utilObj = new Util();
+    private String decryptionAlgorithm = config.get("decryptionAlgorithm").getAsString();
+    private String keyAlgorithm = config.get("keyAlgorithm").getAsString();
 
 	@Override
 	public void run() {
@@ -60,6 +62,7 @@ public class JiraProcessingExecutor extends TimerTask {
 	}
 
 	private void JiraNodeExtraction() {
+		LOG.debug("into jira node extract");		
 		GraphDBHandler dbHandler = new GraphDBHandler();
 		StringBuffer cypher = new StringBuffer();
 		cypher.append("MATCH (n:DATA) WHERE ");
@@ -69,7 +72,7 @@ public class JiraProcessingExecutor extends TimerTask {
 		cypher.append("OR n.").append(blockchainProcessedFlag).append(" = false) ");
 
 		try {
-			JsonObject config = LoadFile.getConfig();
+			LOG.debug("into try block");
 			boolean nextBatchQuery = true;
 			while (nextBatchQuery) {
 				Boolean successfulWriteFlag = true;
@@ -78,38 +81,40 @@ public class JiraProcessingExecutor extends TimerTask {
 				cypherPickUpTime.append("RETURN distinct(n) ORDER BY n.inSightsTime,n.changeDateEpoch");
 				StringBuffer cypherSkip = new StringBuffer();
 				cypherSkip.append(" skip ").append(nextBatchSize);
-				cypherSkip.append(" limit ").append(config.get("dataBatchSize").getAsInt());
+				cypherSkip.append(" limit ").append(dataBatchSize);
 				GraphResponse response = dbHandler
 						.executeCypherQuery(cypher.toString() + cypherPickUpTime.toString() + cypherSkip.toString());
 				JsonArray rows = response.getJson().get("results").getAsJsonArray().get(0).getAsJsonObject().get("data")
 						.getAsJsonArray();
+				LOG.debug(rows);
 				for (JsonElement dataElem : rows) {
-					
-					if(dataElem.getAsJsonObject().get("row").getAsJsonArray().get(0).getAsJsonObject().has("digitalSignature")) {
+					if(dataElem.getAsJsonObject().get("row").getAsJsonArray().get(0).getAsJsonObject().has("digitalSignature") && (dataElem.getAsJsonObject().get("row").getAsJsonArray().get(0).getAsJsonObject().has("key") || dataElem.getAsJsonObject().get("row").getAsJsonArray().get(0).getAsJsonObject().has("issueKey"))) {
 						String digitalSign = dataElem.getAsJsonObject().get("row").getAsJsonArray().get(0).getAsJsonObject().getAsJsonPrimitive("digitalSignature").getAsString();
 						LOG.debug("--------------------------------jira executer-----------------");
 						String hc = getHash(dataElem.getAsJsonObject().get("row").getAsJsonArray());
 						LOG.debug(hc);
 						//decrypt digitalSign
-						byte[] byteArray = Base64.getDecoder().decode(digitalSign.getBytes());
-						JsonObject bcConfig = LoadFile.getConfig();
-						String keyStr = new String(Files.readAllBytes(Paths.get(bcConfig.get("ENGINE_PRIVATE_KEY").getAsString())));
+						byte[] byteArray = Base64.getDecoder().decode(digitalSign.getBytes());						
+						String keyStr = new String(Files.readAllBytes(Paths.get(config.get("ENGINE_PRIVATE_KEY").getAsString())));
 						keyStr = keyStr.replaceAll("\\n", "").replace("-----BEGIN PRIVATE KEY-----", "").replace("-----END PRIVATE KEY-----", "");
-						KeyFactory key = KeyFactory.getInstance(config.get("keyAlgorithm").getAsString());
+						KeyFactory key = KeyFactory.getInstance(keyAlgorithm);
 						PKCS8EncodedKeySpec spec = new PKCS8EncodedKeySpec(Base64.getDecoder().decode(keyStr));
 						PrivateKey k = key.generatePrivate(spec);
-						Cipher cipher = Cipher.getInstance(config.get("decryptionAlgorithm").getAsString());
+						Cipher cipher = Cipher.getInstance(decryptionAlgorithm);
 						cipher.init(Cipher.DECRYPT_MODE, k);
 
 						byte[] decryptedBytes = cipher.doFinal(byteArray);
+						LOG.debug("decryptedBytes");
+						LOG.debug(new String(decryptedBytes));
 						if(hc.equals(new String(decryptedBytes)))
 							successfulWriteFlag = insertJiraNodes(dataElem, successfulWriteFlag);
 						else
-							LOG.debug("Hash values do not match.. skipping uuid: {}" ,
+							LOG.debug("Hash values do not match.. skipping uuid: " +
 									dataElem.getAsJsonObject().get("row").getAsJsonArray().get(0).getAsJsonObject().getAsJsonPrimitive("uuid"));
 					}else
-						LOG.debug("DigitalSignature not found for uuid: {}",
+						LOG.debug("INVALID ASSET OR DigitalSignature not found for uuid: "+
 							dataElem.getAsJsonObject().get("row").getAsJsonArray().get(0).getAsJsonObject().getAsJsonPrimitive("uuid")+"\nNode skipped...");
+                    //successfulWriteFlag = insertJiraNodes(dataElem, successfulWriteFlag);
 				}
 
 				// check for success for updating tracking
@@ -117,10 +122,11 @@ public class JiraProcessingExecutor extends TimerTask {
 				if (successfulWriteFlag && lastTimestamp != 0) {
 					JsonObject tracking = new JsonObject();
 					tracking.addProperty("jiraTimestamp", lastTimestamp);
+					
 					utilObj.writeTracking(tracking);
 				}
 				int processedRecords = rows.size();
-				nextBatchSize += config.get("dataBatchSize").getAsInt();
+				nextBatchSize += dataBatchSize;
 				if (processedRecords == 0) {
 					nextBatchSize = 0;
 					nextBatchQuery = false;
@@ -130,15 +136,15 @@ public class JiraProcessingExecutor extends TimerTask {
 			}
 		} catch (InsightsCustomException | IOException e) {
 			LOG.error("Error occured while loading the destination data ", e);
-		} catch (Exception e) {
+		} catch (Exception e) {			
 			LOG.error(e);
 		}
 
 	}
 	
-	private String getHash(JsonArray row) {
+    private String getHash(JsonArray row) {
         String dataString = "";
-        HashCode sb = null;
+        HashCode sb = null;        
         if(row.get(0).getAsJsonObject().has("changeId")){
             if(!row.get(0).getAsJsonObject().has("from"))
                 row.get(0).getAsJsonObject().addProperty("from","None");
@@ -148,17 +154,38 @@ public class JiraProcessingExecutor extends TimerTask {
         for (JsonElement dt : row) {
             //put dataObject into treemap to get sorted
         	//LOG.debug(dt);
-            TreeMap t = new TreeMap<String, String>();
+            TreeMap<String, String> t = new TreeMap<String, String>();
             dt.getAsJsonObject().entrySet().parallelStream().forEach(entry -> {
                 if (!entry.getKey().equals("uuid") && !entry.getKey().equals("digitalSignature")) {
-                    if (entry.getKey().equals("inSightsTime") || entry.getKey().equals("createdTimeEpoch") || entry.getKey().equals("changeDateEpoch") || entry.getKey().equals("creationDateEpoch")) {
+                    if (entry.getKey().equals("inSightsTime") || entry.getKey().endsWith("Epoch")) {
                     	LOG.debug("has epoch time");
                         t.put(entry.getKey(), String.valueOf(entry.getValue().getAsLong()) + ".0");
                     }
-                    else {
-                    	LOG.debug(t);
-                        t.put(entry.getKey(), entry.getValue().getAsString());
+					else {
+                    	LOG.debug("jsonarray*****"+Boolean.toString(entry.getValue().isJsonArray()));
+                        if(entry.getValue().isJsonArray()) {
+                            for (JsonElement e: entry.getValue().getAsJsonArray()) {
+                                if(t.containsKey(entry.getKey())) {
+                                    LOG.debug("t.get(entry.getKey()).toString()");
+                                    LOG.debug(t.get(entry.getKey()).toString());
+                                    t.put(entry.getKey(), t.get(entry.getKey()).toString().concat(e.getAsString()));
+                                }else
+                                    t.put(entry.getKey(), e.getAsString());
+                            }
+                        }
+                        else {
+                        	//LOG.debug(entry.getValue().getClass().getName());
+                        	LOG.debug(entry.getKey()+"-->"+entry.getValue());
+                            t.put(entry.getKey(), entry.getValue().getAsString());
+                        }
+                        //LOG.debug(entry.getValue().getAsString());
                     }
+                    /*else {
+                    	//LOG.debug(t);
+                    	LOG.debug(entry.getValue().getClass().getName());
+                    	LOG.debug(entry.getKey()+"-->"+entry.getValue().getClass().getName());
+                        t.put(entry.getKey(), entry.getValue().getAsString());
+                    }*/
                 }
             });
             Set data = t.entrySet();
@@ -167,11 +194,9 @@ public class JiraProcessingExecutor extends TimerTask {
                 Map.Entry m = (Map.Entry) i.next();
                 dataString += m.getValue();
             }
-            //LOG.debug(dataString);
-            
+            LOG.debug(dataString);
             sb = Hashing.sha256().hashString(dataString, StandardCharsets.UTF_8);
-            //LOG.debug(sb_encode.toString());
-            //LOG.debug(sb.toString());
+            LOG.debug(sb.toString());            
         }
         return sb.toString();
     }
@@ -181,7 +206,6 @@ public class JiraProcessingExecutor extends TimerTask {
 		try {
 			if (dataElem.getAsJsonObject().get("row").getAsJsonArray().get(0).getAsJsonObject().has("digitalSignature"))
                 dataElem.getAsJsonObject().get("row").getAsJsonArray().get(0).getAsJsonObject().remove("digitalSignature");
-			
 			if (dataElem.getAsJsonObject().get("row").getAsJsonArray().get(0).getAsJsonObject().has("changeId")) {
 				lastTimestamp = dataElem.getAsJsonObject().get("row").getAsJsonArray().get(0).getAsJsonObject()
 						.getAsJsonPrimitive("changeDateEpoch").getAsLong();

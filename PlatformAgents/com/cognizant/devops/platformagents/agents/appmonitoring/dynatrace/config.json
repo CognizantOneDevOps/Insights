@@ -1,0 +1,87 @@
+{
+  "vault": {
+	"getFromVault": false,
+	"secretEngine":"insights-kv",
+    "readToken":"vault_secret_token",
+    "vaultUrl":"http://Vault_Host:port/v1/"
+  },
+  "mqConfig": {
+    "user": "iSight",
+    "password": "iSight",
+    "host": "localhost",
+    "exchange": "iSight",
+    "agentControlXchg": "iAgent"
+  },
+  "subscribe": {
+    "config": "APPMONITORING.DYNATRACE.config"
+  },
+  "publish": {
+    "data": "APPMONITORING.DYNATRACE.DATA",
+    "health": "APPMONITORING.DYNATRACE.HEALTH"
+  },
+  "communication": {
+    "type": "REST",
+    "sslVerify": false,
+    "responseType": "JSON"
+  },
+  "dynamicTemplate" : {
+  		"responseTemplate" : {
+  			"Host": {
+  				"hostListURL" : "https://dynatrace_hostname/api/v1/entity/infrastructure/hosts",
+  				"relevantHostFields" : {
+  					"entityId" : "entityId",
+  					"displayName":"displayName",
+  					"customizedName": "customizedName",
+  					"osVersion": "osVersion"
+  				}
+  			},
+  			"Event": {
+  				"eventListURL" : "https://dynatrace_hostname/api/v1/events",
+  				"relevantEventFields" : {
+  					"eventId" : "eventId",
+  					"entityId" : "entityId",
+  					"entityName":"entityName",
+  					"severityLevel": "severityLevel",
+				    "impactLevel": "impactLevel",
+				    "eventType": "eventType",
+				    "eventStatus": "eventStatus"
+  				}
+  			},
+  			"Problem": {
+  				"hostListURL" : "https://dynatrace_hostname/api/v1/problem/feed",
+  				"relevantHostFields" : {
+  					"entityId" : "entityId",
+  					"displayName":"displayName",
+  					"customizedName": "customizedName",
+  					"osType": "osType",
+					"osArchitecture": "osArchitecture",
+					"osVersion": "osVersion",
+					"hypervisorType": "hypervisorType"
+  				}
+  			}
+  		}
+   },	
+  "agentId" : "" ,
+  "toolCategory": "APPMONITORING",
+  "enableDataValidation": true,
+  "toolsTimeZone": "GMT",
+  "insightsTimeZone": "Asia/Kolkata",
+  "useResponseTemplate": true,
+  "auth": "base64",
+  "runSchedule": 20,
+  "timeStampField": "launchTime",
+  "timeStampFormat": "epoch",
+  "isEpochTimeFormat" : true,
+  "agentSecretDetails": ["apiToken"],
+  "pattern": "%Y-%m-%dT%H:%M:%S.%fZ",
+  "apiToken": "APIToken",
+  "startFrom" : "2018-10-02 15:46:33",
+  "isDebugAllowed": false,
+  "enableValueArray": false,
+  "loggingSetting": {
+    "logLevel": "WARN",
+	"maxBytes" : 5000000,
+	"backupCount" : 1000
+  },
+  "auditing": false
+}

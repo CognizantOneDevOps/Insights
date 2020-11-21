@@ -52,7 +52,7 @@
 	    		{
 	    			"id": "environmentId",
 	    			"releaseId": "environmentReleaseId",
-	    			"name": "environmentName"
+	    			"name": "environmentName",
 	    			"status": "environmentStatus",
 	    			"environmentOptions": {
 	    				"emailNotificationType": "environmentEmailNotificationType",
@@ -88,5 +88,6 @@
 		"logLevel" : "WARN",
 		"maxBytes" : 5000000,
 		"backupCount" : 1000
- 	} 
+ 	},
+ 	"auditing": false
 }

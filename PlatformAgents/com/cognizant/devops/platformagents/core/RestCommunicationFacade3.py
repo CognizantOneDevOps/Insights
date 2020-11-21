@@ -152,6 +152,8 @@ class RestCommunicationFacade(object):
                         if self.enableValueArray:
                             if prevValue and secData[secKey] not in prevValue:
                                 prevValue.append(secData[secKey])
+                            elif type(secData[secKey]) is list:
+                                data[secKey] = " , ".join(secData[secKey])
                             else:
                                 data[secKey] = [secData[secKey]]
                         else:

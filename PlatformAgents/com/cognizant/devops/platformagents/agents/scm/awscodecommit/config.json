@@ -61,5 +61,6 @@
     "backupCount": 1000
   },
   "osversion": "linux",
-  "agentVersion": "v4.7"
+  "agentVersion": "v4.7",
+  "auditing": false
 }

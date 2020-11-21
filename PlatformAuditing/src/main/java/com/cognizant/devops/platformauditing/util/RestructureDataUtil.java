@@ -15,55 +15,74 @@
  ******************************************************************************/
 package com.cognizant.devops.platformauditing.util;
 
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
+import java.util.TimeZone;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import com.cognizant.devops.platformauditing.api.InsightsAuditImpl;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Map;
-import java.util.TimeZone;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class RestructureDataUtil {
     private static final Logger LOG = LogManager.getLogger(InsightsAuditImpl.class.getName());
 
     //convert data from neo4j to the format for ledger based on datamodel.json
-    public JsonObject masssageData(JsonObject input) {
-        JsonObject output = new JsonObject();
-        //Read datamodel
-        JsonObject datamodel = LoadFile.getDataModel();
-        datamodel = datamodel.getAsJsonObject(input.getAsJsonPrimitive("toolName").getAsString().toUpperCase());
-        for (Map.Entry<String, JsonElement> property : datamodel.entrySet()) {
-            if (!property.getKey().equals("uplink") && !property.getKey().equals("downlink")) {
-                if (property.getKey().equals("jiraKeys")) {
-                    //regex matching particularly for extracting jira Keys from git commit message
-                    JsonArray ExtractedData = extractJiraKeysFromCommitMessage(input, property.getValue().getAsString());
-                    output.add("jiraKeys", ExtractedData);
-                } else if (property.getValue().isJsonObject()) {
-                    output.addProperty(property.getKey(), property.getValue().getAsJsonObject().getAsJsonPrimitive(property.getKey()).getAsString());
-                } else if (property.getValue().isJsonArray()) {
-                    if (input.has(property.getValue().getAsJsonArray().get(0).getAsString())) {
-                        JsonArray inputValue = input.getAsJsonArray(property.getValue().getAsJsonArray().get(0).getAsString());
-                        output.add(property.getKey(), inputValue);
-                    } else
-                        output.addProperty(property.getKey(), "N/A");
-                } else {
-                    if (input.has(property.getValue().getAsString()))
-                        output.add(property.getKey(), input.getAsJsonPrimitive(property.getValue().getAsString()));
-                    else
-                        output.addProperty(property.getKey(), "N/A");
-                }
-            }
-        }
-        output.add("date", humanDateFromTimestamp(output.get("timestamp").getAsLong()));
-        output = addLinks(output, datamodel);
-        return output;
+    public JsonObject massageData(JsonObject input) {
+    	boolean isUnique = Boolean.FALSE;
+    	JsonObject output = new JsonObject();
+    	JsonObject datamodel = LoadFile.getInstance().getDataModel();
+    	Set<Entry<String, JsonElement>> e = datamodel.entrySet();
+    	List<String> uniqueKeyList = new ArrayList<>();
+    	//Below line to handle primary key assetID should not be null before insert into ledger
+    	e.forEach(x-> {
+    		//Fetch Set 
+    		Set<Entry<String, JsonElement>> tool = x.getValue().getAsJsonObject().entrySet();
+
+    		uniqueKeyList.add(tool.iterator().next().getValue().getAsString());
+    	});
+    	for (String toolUniqueKey : uniqueKeyList) {
+    		if(input.has(toolUniqueKey)) {
+    			isUnique = Boolean.TRUE;
+    			//Below line to handle primary key assetID should not be null before insert into ledger    	
+
+    			//Read datamodel        
+    			datamodel = datamodel.getAsJsonObject(input.getAsJsonPrimitive("toolName").getAsString().toUpperCase());
+    			for (Map.Entry<String, JsonElement> property : datamodel.entrySet()) {
+    				if (!property.getKey().equals("uplink") && !property.getKey().equals("downlink")) {
+    					if (property.getValue().isJsonObject()) {
+    						output.addProperty(property.getKey(), property.getValue().getAsJsonObject().getAsJsonPrimitive(property.getKey()).getAsString());
+    					} else if (property.getValue().isJsonArray()) {
+    						if (input.has(property.getValue().getAsJsonArray().get(0).getAsString())) {
+    							JsonArray inputValue = input.getAsJsonArray(property.getValue().getAsJsonArray().get(0).getAsString());
+    							output.add(property.getKey(), inputValue);
+    						} else                     	
+    							output.addProperty(property.getKey(), "N/A");
+    					} else {
+    						if (input.has(property.getValue().getAsString()))
+    							output.add(property.getKey(), input.getAsJsonPrimitive(property.getValue().getAsString()));
+    						else
+    							output.addProperty(property.getKey(), "N/A");
+    					}
+    				}
+    			}
+    			output.add("date", humanDateFromTimestamp(output.get("timestamp").getAsLong()));
+    			output = addLinks(output, datamodel);        
+    		}
+    	}
+    	if(!isUnique) {
+    		LOG.info("Neo4j input fields has NO assetId for the tool before insert into ledger"+ input);
+    	}
+    	return output;
     }
 
     //convert the epoch timestamp to human date for consumption by chaincode
@@ -76,8 +95,8 @@ public class RestructureDataUtil {
 
     //get the insertion flag from process.json
     public boolean getInsertionFlag(JsonObject input) {
-        try {
-            JsonObject processModel = LoadFile.getProcessModel();
+        try {        
+            JsonObject processModel = LoadFile.getInstance().getProcessModel();
             JsonArray process = processModel.getAsJsonArray("Steps");
             for (JsonElement tool : process) {
                 if (input.getAsJsonPrimitive("toolName").getAsString().equals(tool.getAsJsonObject().getAsJsonPrimitive("Tool").getAsString().toUpperCase())) {
@@ -109,30 +128,15 @@ public class RestructureDataUtil {
                         return tool.getAsJsonObject().getAsJsonPrimitive("insertIntoLedger").getAsBoolean();
                     }
                 }
-            }
+            }       	        	
 
         } catch (Exception e) {
-            LOG.error(e);
+            LOG.error(e);            
         }
         LOG.error("No process rules defined for the given input:\n" + input);
         return false;
     }
 
-    //extract hyphenated words in commitmessage as jiraKeys
-    private JsonArray extractJiraKeysFromCommitMessage(JsonObject input, String property) {
-        final String regex = "([a-zA-Z0-9]*[\\-][a-zA-Z0-9]*)";
-        final Pattern pattern = Pattern.compile(regex, Pattern.MULTILINE);
-
-        JsonObject extractedData = new JsonObject();
-        String inputString = input.getAsJsonPrimitive(property).getAsString();
-        final Matcher matcher = pattern.matcher(inputString);
-        JsonArray jiraKeys = new JsonArray();
-        while (matcher.find()) {
-            jiraKeys.add(matcher.group(0));
-        }
-        extractedData.add("Value", jiraKeys);
-        return jiraKeys;
-    }
 
     //add the uplink and downlink fields
     public JsonObject addLinks(JsonObject input, JsonObject datamodel) {
@@ -165,12 +169,12 @@ public class RestructureDataUtil {
         JsonObject output = new JsonObject();
         boolean fieldnamesetFlag = false;
         //Read datamodel
-        JsonObject datamodel = LoadFile.getDataModel().getAsJsonObject("CHANGELOG");
+        JsonObject datamodel = LoadFile.getInstance().getDataModel().getAsJsonObject("CHANGELOG");
         for (Map.Entry<String, JsonElement> property : datamodel.entrySet()) {
             if (input.has(property.getValue().getAsString())) {
                 if (property.getKey().equals("fieldName")) {
                     fieldnamesetFlag = false;
-                    JsonObject jiraDataModel = LoadFile.getDataModel().getAsJsonObject("JIRA");
+                    JsonObject jiraDataModel = LoadFile.getInstance().getDataModel().getAsJsonObject("JIRA");
                     for (Map.Entry<String, JsonElement> jiraProperty : jiraDataModel.entrySet()) {
                         if (jiraProperty.getValue().isJsonArray() ? jiraProperty.getValue().getAsJsonArray().get(0).equals(input.getAsJsonPrimitive(property.getValue().getAsString())) : jiraProperty.getValue().equals(input.getAsJsonPrimitive(property.getValue().getAsString()))) {
                             output.addProperty(property.getKey(), jiraProperty.getKey());

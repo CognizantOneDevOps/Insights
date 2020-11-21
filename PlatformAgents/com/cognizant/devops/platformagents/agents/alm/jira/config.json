@@ -6,8 +6,8 @@
 		"vaultUrl": "http://Vault_Host:port/v1/"
 	},
 	"mqConfig": {
-		"user": "iSight",
-		"password": "iSight",
+		"user": "username for RabbitMq",
+		"password": "Password for RabbitMq",
 		"host": "127.0.0.1",
 		"exchange": "iSight",
 		"agentControlXchg": "iAgent"
@@ -42,6 +42,7 @@
 		},
 		"responseTemplate": {
 			"key": "key",
+			"self": "issueAPI",
 			"fields": {
 				"issuetype": {
 					"name": "issueType"
@@ -50,7 +51,7 @@
 				"timespent": "timespent",
 				"project": {
 					"key": "projectKey",
-					"name": "issueType"
+					"name": "projectName"
 				},
 				"fixVersions": [{
 					"id": "fixVersions"
@@ -93,6 +94,12 @@
 				"status": {
 					"name": "status"
 				},
+				"attachment": [{
+					"content": "Attachment"
+				}],
+				"customfield_10020": [{
+					"name": "SprintName"
+				}],
 				"summary": "summary",
 				"creator": {
 					"name": "creatorName",
@@ -345,10 +352,10 @@
 		}
 	},
 	"agentId": "",
-	"toolCategory": "ALM",
+	"toolCategory": "ALM",	
 	"enableSprintReport": false,
 	"enableDataValidation": true,
-	"sprintField": "",
+	"sprintField": "customfield_10021",
 	"enableValueArray": true,
 	"isDebugAllowed": false,
 	"runSchedule": 30,
@@ -357,10 +364,10 @@
 	"enableReSyncTrigger": true,
 	"sprintRetrivalSchedule": 360,
 	"dataFetchCount": 30,
-	"userid": "userid",
-	"passwd": "passwd",
+	"userid": "username for Jira",
+	"passwd": "api token for Jira",
 	"baseUrl": "https://127.0.0.1/rest/api/2/search",
-	"startFrom": "startFrom",
+	"startFrom": "2019-01-01 05:00",
 	"toolsTimeZone": "Asia/Kolkata",
 	"insightsTimeZone": "Asia/Kolkata",
 	"useResponseTemplate": true,
@@ -376,7 +383,9 @@
 		"maxBytes": 5000000,
 		"backupCount": 1000
 	},
-	"osversion": "Ubuntu",
-	"agentVersion": "v6.3",
-	"toolName": "JIRA"
+	"osversion": "windows",
+	"agentVersion": "v7.2",
+	"labelName": "JIRA",
+	"toolName": "JIRA",
+	"auditing": false
 }

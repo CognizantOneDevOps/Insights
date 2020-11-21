@@ -99,7 +99,7 @@ public class AuditLedgerReport extends AuditReportStrategy{
 							for(JsonElement element : rowArray) {
 								log.info("Fetching Massage data for -- "+element.getAsJsonObject());
 								RestructureDataUtil restructureDataUtil = new RestructureDataUtil();
-								JsonObject msgData = restructureDataUtil.masssageData(element.getAsJsonObject());
+								JsonObject msgData = restructureDataUtil.massageData(element.getAsJsonObject());
 								log.info("Massage Data  ---"+msgData);
 
 								for (Map.Entry<String, JsonElement> property : msgData.entrySet()) {

@@ -47,16 +47,20 @@ public class LoadFile {
             LOG.error(e);
         }
     }
-
-    public static JsonObject getDataModel(){
+    
+    public static LoadFile getInstance(){
+    	return loadDataModelObj;
+    }
+    
+    public JsonObject getDataModel(){
         return dataModel;
     }
 
-    public static JsonObject getProcessModel() {
+    public JsonObject getProcessModel() {
         return processModel;
     }
 
-    public static JsonObject getConfig() {
+    public JsonObject getConfig() {
         return Config;
     }
 

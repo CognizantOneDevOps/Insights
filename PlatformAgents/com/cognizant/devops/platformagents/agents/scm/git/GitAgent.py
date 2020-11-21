@@ -313,7 +313,7 @@ class GitAgent(BaseAgent):
                                                     injectData['jiraKeys'] = jiraKeys
                                                 else:
                                                     injectData.pop('jiraKeys','')
-                                                injectData['jiraJeyProcessed'] =True
+                                                injectData['jiraKeyProcessed'] =True
                                                 injectData['consumptionTime'] = timeStampNow()
                                                 data += self.parseResponse(responseTemplate, commit, injectData)
                                                 commitDict[commitId] = False

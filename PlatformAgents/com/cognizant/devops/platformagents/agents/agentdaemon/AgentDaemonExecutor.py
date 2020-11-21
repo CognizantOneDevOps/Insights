@@ -195,7 +195,7 @@ class AgentDaemonExecutor:
             #self.channel.close(0, 'File Received')
         
         print('Inside subscribe method')
-        self.channel.basic_consume(routingKey,callback)
+        self.channel.basic_consume(routingKey,callback,auto_ack=False)
         self.publishDaemonHealthData(self.generateHealthData(note="Agent Demon is in START mode"))
         self.channel.start_consuming()
         self.connection.close() 

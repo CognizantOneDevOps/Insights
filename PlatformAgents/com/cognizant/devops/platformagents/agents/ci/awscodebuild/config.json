@@ -53,5 +53,6 @@
     "logLevel": "WARN",
     "maxBytes": 5000000,
     "backupCount": 1000
-  }
+  },
+  "auditing": false
 }

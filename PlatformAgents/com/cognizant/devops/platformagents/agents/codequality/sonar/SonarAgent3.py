@@ -33,14 +33,14 @@ class SonarAgent(BaseAgent):
         startFrom = parser.parse(startFrom)
         timeStampFormat = self.config.get('timeStampFormat')
         startFrom = startFrom.strftime(timeStampFormat)
-        userId = self.getCredential("userid")
-        password = self.getCredential("passwd")
+        userid = self.getCredential("userid")
+        passwd = self.getCredential("passwd")
         timeMachineapi = self.config.get("timeMachineapi", '')
-        sonarProjects = self.getResponse(projectsUrl, 'GET', userId, password, None)
+        sonarProjects = self.getResponse(projectsUrl, 'GET', userid, passwd, None)
         print(sonarProjects)
         activityUrl = baseUrl+"api/ce/activity"
         print("activity url"+activityUrl)
-        activity = self.getResponse(activityUrl, 'GET', userId, password, None)
+        activity = self.getResponse(activityUrl, 'GET', userid, passwd, None)
         print("activity")
         print(activity)
         activityTasks = activity["tasks"]
@@ -60,7 +60,7 @@ class SonarAgent(BaseAgent):
             lastUpdatedDate = None
             if timeMachineapi == "yes":
                 sonarExecutionsUrl = baseUrl+"api/timemachine/index?metrics="+metricsParam+"&resource="+projectKey+"&fromDateTime="+timestamp+"-0000&format=json"
-                sonarExecutions = self.getResponse(sonarExecutionsUrl, 'GET', userId, password, None)
+                sonarExecutions = self.getResponse(sonarExecutionsUrl, 'GET', userid, passwd, None)
                 for sonarExecution in sonarExecutions:
                     metricsColumns = []
                     cols = sonarExecution['cols']
@@ -89,7 +89,7 @@ class SonarAgent(BaseAgent):
                 projectDateVersionMap = {} # store map with data as key and project version as value
                 while pageIndex <= totalPages:
                     sonarProjectAnalysisUrl = baseUrl+"api/project_analyses/search?category=VERSION&project="+projectKey+"&from="+timestamp+"-0000&format=json&ps="+str(pageSize)+"&p="+str(pageIndex)
-                    projectAnalysis = self.getResponse(sonarProjectAnalysisUrl, 'GET', userId, password, None)
+                    projectAnalysis = self.getResponse(sonarProjectAnalysisUrl, 'GET', userid, passwd, None)
                     totalRecords = projectAnalysis["paging"]["total"]
                     totalPages =  (totalRecords/pageSize) + 1
                     if (totalRecords%pageSize) == 0:
@@ -117,7 +117,7 @@ class SonarAgent(BaseAgent):
                 totalRecords = 0
                 while pageIndex <= totalPages:
                     sonarExecutionsUrl = baseUrl+"api/measures/search_history?metrics="+metricsParam+"&component="+projectKey+"&from="+timestamp+"-0000&format=json&ps="+str(pageSize)+"&p="+str(pageIndex)
-                    sonarExecutions = self.getResponse(sonarExecutionsUrl, 'GET', userId, password, None)
+                    sonarExecutions = self.getResponse(sonarExecutionsUrl, 'GET', userid, passwd, None)
                     totalRecords = sonarExecutions["paging"]["total"]
                     totalPages =  (totalRecords/pageSize) + 1
                     if (totalRecords%pageSize) == 0:
@@ -137,9 +137,7 @@ class SonarAgent(BaseAgent):
                                 executionData["executionId"] = task["id"]
                         for i_metric_length in range(0,len(sonarExecutions['measures'])):                    
                             if len(sonarExecutions['measures'][i_metric_length]['history'])>0:	
-                               print ("=====LENGTH=======")
-                               #print historydata
-                               #print len(sonarExecutions['measures'][i_metric_length]['history'])								
+                               print ("=====LENGTH=======")								
                                if len(sonarExecutions['measures'][i_metric_length]['history'])>historydata and 'value' in sonarExecutions['measures'][i_metric_length]['history'][historydata]:
                                 executionData[sonarExecutions['measures'][i_metric_length]['metric']]=sonarExecutions['measures'][i_metric_length]['history'][historydata]['value']                                     
                         data.append(executionData)            
@@ -158,6 +156,3 @@ class SonarAgent(BaseAgent):
             self.updateTrackingJson(self.tracking)
 if __name__ == "__main__":
     SonarAgent()
-
-            
-            

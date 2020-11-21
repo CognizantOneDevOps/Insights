@@ -27,7 +27,15 @@ import os.path
 import sys
 import time
 import uuid
-
+from pytz import timezone
+import logging.handlers
+import time
+import hashlib
+from cryptography.hazmat.primitives import hashes
+from cryptography.hazmat.primitives.asymmetric import padding
+from cryptography.hazmat.backends import default_backend
+from cryptography.hazmat.primitives import serialization
+from base64 import b64encode, b64decode
 from apscheduler.schedulers.blocking import BlockingScheduler
 from pytz import timezone
 
@@ -242,7 +250,10 @@ class BaseAgent(object):
                 data = self.validateData(data)
             self.addExecutionId(data, self.executionId)
             self.addTimeStampField(data, timeStampField, timeStampFormat, isEpochTime,isExtension)
-            logging.info(data)
+            #logging.info(data)
+            auditing=self.config.get('auditing',False)
+            if auditing:
+                self.addDigitalSign(data)
             self.messageFactory.publish(self.dataRoutingKey, data, self.config.get('dataBatchSize', 100), metadata)
             self.logIndicator(self.PUBLISH_START, self.config.get('isDebugAllowed', False))
             
@@ -324,6 +335,49 @@ class BaseAgent(object):
     def addExecutionId(self, data, executionId):
         for d in data:
             d['execId'] = executionId
+    def addDigitalSign(self, data):
+        dataString = ''
+        for d in data:
+            for key in sorted(d.keys()):
+                if(key !="digitalSignature" and d[key]!= None):
+                    #print(key,"--->",d[key])
+                    if type(d[key])== str:
+                        dataString += d[key]
+                    elif type(d[key])==list:
+                        for each in d[key]:
+                            dataString += str(each)
+                    elif type(d[key]) == bool:
+                        dataString += str(d[key]).lower()
+                    else:
+                        dataString += str(d[key])
+            #print("dataString")
+            #print(dataString)
+            hex = hashlib.sha256(dataString.encode('utf-8')).hexdigest()
+            #print(hex)
+            hex_signature = self.rsaEncrypt(hex)
+			
+            d['digitalSignature'] = hex_signature.decode('utf-8')
+            #print(d['digitalSignature'])
+            dataString = ''
+    
+    def rsaEncrypt(self, hexdigest):
+        #print("+++++++++++++++++++++++++++++++++hexdigest")
+        #print(hexdigest)
+        if "INSIGHTS_HOME" in os.environ:
+            publicKeyPath = os.environ['INSIGHTS_HOME']+'/.InSights/BlockChainCerts/public_key.pem'
+        with open(publicKeyPath, 'rb') as key_file:
+            public_key = serialization.load_pem_public_key(
+            key_file.read(),
+            backend=default_backend()
+        )
+        encrypted = public_key.encrypt(
+        hexdigest.encode('utf-8'),
+        padding.OAEP(
+            mgf=padding.MGF1(algorithm=hashes.SHA1()),
+            algorithm=hashes.SHA256(),
+            label=None
+        ))
+        return b64encode(encrypted)
     
     def updateTrackingJson(self, data):
         #Update the tracking json file and cache.

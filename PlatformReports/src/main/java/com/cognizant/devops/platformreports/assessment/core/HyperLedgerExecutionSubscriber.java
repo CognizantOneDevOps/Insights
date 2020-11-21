@@ -167,7 +167,7 @@ public class HyperLedgerExecutionSubscriber extends WorkflowTaskSubscriberHandle
 			for(JsonElement element : rowArray) {
 				log.debug("Fetching Massage data for == {} ",element.getAsJsonObject());
 				RestructureDataUtil restructureDataUtil = new RestructureDataUtil();
-				JsonObject msgData = restructureDataUtil.masssageData(element.getAsJsonObject());
+				JsonObject msgData = restructureDataUtil.massageData(element.getAsJsonObject());
 				log.debug("Massaged Data  === {}",msgData);
 
 				for (Map.Entry<String, JsonElement> property : msgData.entrySet()) {

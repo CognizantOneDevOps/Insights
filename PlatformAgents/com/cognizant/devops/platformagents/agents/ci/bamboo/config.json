@@ -57,8 +57,9 @@
 	"isEpochTimeFormat" : true,
 	"agentSecretDetails": ["userid","passwd"],
 	"startFrom" : "2016-12-07 15:46:33",
-		"loggingSetting" : {
-			"logLevel" : "WARN"
-		},
-		"isDebugAllowed" : true
+	"loggingSetting" : {
+		"logLevel" : "WARN"
+	},
+	"isDebugAllowed" : true,
+	"auditing": false
 }

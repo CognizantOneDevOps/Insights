@@ -287,6 +287,7 @@ class GitAgent(BaseAgent):
                                 injectData['default'] = False
                             try:
                                 parseBranch = urllib.parse.quote_plus(branch.encode('utf-8'))
+                                injectData['branchName'] = parseBranch
                             except Exception as er:
                                 logging.error(er)
                             fetchNextCommitsPage = True
@@ -313,7 +314,7 @@ class GitAgent(BaseAgent):
                                                     injectData['jiraKeys'] = jiraKeys
                                                 else:
                                                     injectData.pop('jiraKeys','')
-                                                injectData['jiraJeyProcessed'] =True
+                                                injectData['jiraKeyProcessed'] =True
                                                 injectData['consumptionTime'] = timeStampNow()
                                                 data += self.parseResponse(responseTemplate, commit, injectData)
                                                 commitDict[commitId] = False

@@ -6,11 +6,11 @@
     "vaultUrl":"http://Vault_Host:port/v1/"
   },
  "mqConfig": {
-    "exchange": "iSight",
+    "user": "username for RabbitMq",
+    "password": "password for RabbitMq",
     "host": "127.0.0.1",
-    "password": "iSight",
-    "user": "iSight",
-	"agentControlXchg":"iAgent"
+    "exchange": "iSight",
+    "agentControlXchg":"iAgent" 
   },
   "publish": {
     "data": "CODEQUALITY.SONAR.DATA",
@@ -31,13 +31,12 @@
   		"metrics" : ["alert_status", "complexity", "coverage", "new_coverage"]
   },
   "agentId" : "",
-  "toolCategory" : "CODEQUALITY",
-  "toolName": "SONAR",
+  "toolCategory" : "CODEQUALITY",  
   "runSchedule": 30,
   "enableDataValidation": true,
   "timeStampField": "metricdate",
-  "userid":"admin",
-  "passwd":"admin",
+  "userid":"username for Sonar",
+  "passwd":"password for Sonar",
   "timeMachineapi": "no",
   "timeStampFormat": "%Y-%m-%dT%H:%M:%S",
   "startFrom": "2019-01-01T00:01:01",
@@ -52,5 +51,10 @@
     	"logLevel": "WARN",
 		"maxBytes" : 5000000,
 		"backupCount" : 1000
-  }
+  },
+  "osversion": "windows",
+  "agentVersion": "v7.2",
+  "labelName": "SONAR",
+  "toolName": "SONAR",
+  "auditing": false
 }

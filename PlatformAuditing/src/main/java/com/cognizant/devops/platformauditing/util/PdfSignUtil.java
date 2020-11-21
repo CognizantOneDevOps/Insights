@@ -376,7 +376,7 @@ public class PdfSignUtil extends PdfCreateSignatureBase
 			log.info("Pdf Name in sign == {} ",pdfName);
 			String tsaUrl = null;
 			boolean externalSig = false;
-			JsonObject config = LoadFile.getConfig();
+			JsonObject config = LoadFile.getInstance().getConfig();
 			File ksFile = new File(PDF_PATH+config.get("KEYSTORE_P12").getAsString()).getAbsoluteFile();
 			KeyStore keystore = KeyStore.getInstance("PKCS12");
 			char[] pin = config.get("PIN_PROTECT").getAsString().toCharArray();

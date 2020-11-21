@@ -47,11 +47,11 @@ public class BCNetworkGatewayClient {
 
 	public Contract gatewayContract() throws IOException, CertificateException, InvalidKeyException {
 
-		JsonObject Config = LoadFile.getConfig();
+		JsonObject config = LoadFile.getInstance().getConfig();
 		// peer0.org1 user, signcert and keystore
-		final String certUser = Config.get("peer0_org1_user").getAsString();
+		final String certUser = config.get("peer0_org1_user").getAsString();
 		// fetch peer0.org1 org
-		final JsonElement orgElement = Config.get("organizations");
+		final JsonElement orgElement = config.get("organizations");
 		final JsonElement org = orgElement.getAsJsonObject().get("Org1");
 		// fetch peer0.org1 signedCertPEM
 		final JsonElement signedCertPEM = org.getAsJsonObject().get("signedCertPEM");
@@ -65,11 +65,11 @@ public class BCNetworkGatewayClient {
 		final String x509CertificatePem = readLineByLine(signedCertPEMPath);
 		final String pkcs8PrivateKeyPem = readLineByLine(adminPrivateKeyPEMPath);
 		// fetch channel name
-		final JsonElement channelElement = Config.get("channels");
+		final JsonElement channelElement = config.get("channels");
 		final JsonElement channelname = channelElement.getAsJsonObject().get("channelname");
 		final String channel = channelname.getAsJsonObject().get("channel").getAsString();
 		// fetch chaincode
-		final String contractName = Config.get("contractname").getAsString();
+		final String contractName = config.get("contractname").getAsString();
 
 		GatewayImpl.Builder builder = (GatewayImpl.Builder) Gateway.createBuilder();
 		Wallet wallet = Wallets.newInMemoryWallet();
@@ -102,8 +102,7 @@ public class BCNetworkGatewayClient {
 
 		try (Stream<String> stream = Files.lines(Paths.get(filePath), StandardCharsets.UTF_8)) {
 			stream.forEach(s -> contentBuilder.append(s).append("\n"));
-		} catch (IOException e) {
-			e.printStackTrace();
+		} catch (IOException e) {						
 		}
 
 		return contentBuilder.toString();
