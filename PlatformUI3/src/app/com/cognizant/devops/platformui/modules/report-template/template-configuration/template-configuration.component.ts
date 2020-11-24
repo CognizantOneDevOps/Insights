@@ -80,6 +80,8 @@ export class ReportTemplateConfig implements OnInit {
             }
         }
         let kpiDetailConfig = new KpiDetailItem();
+        this.vType === undefined ? this.vType = " ":this.vType;
+        this.vQuery === undefined ? this.vQuery = " ":this.vQuery;
         kpiDetailConfig.setData(this.kpiId, this.vType + '_' + this.kpiId, this.vQuery);
         this.kpiDetailItems.push(kpiDetailConfig);
         this.kpiListDatasource.data = this.kpiDetailItems;
