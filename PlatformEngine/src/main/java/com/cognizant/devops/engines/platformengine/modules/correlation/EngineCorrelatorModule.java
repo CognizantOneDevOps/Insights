@@ -47,7 +47,7 @@ public class EngineCorrelatorModule extends TimerTask {
 			EngineStatusLogger.getInstance().createEngineStatusNode("Correlation Execution Completed",
 					PlatformServiceConstants.SUCCESS);
 		} catch (Exception e) {
-			log.error("Error in correlation module {} ", e);
+			log.error("Error in correlation module ", e);
 			EngineStatusLogger.getInstance().createEngineStatusNode("Correlation Execution has some issue  ",
 					PlatformServiceConstants.FAILURE);
 		}

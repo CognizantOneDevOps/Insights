@@ -24,4 +24,7 @@ public interface DataDictionaryConstants {
 			+ "(m:__EndToolCategory__:__EndLabelName__) return distinct type(r)";
 	String UUID = "uuid";
 	String EXEC_ID = "execId";
+	String TOOLNAME="toolName";
+	String CATEGORYNAME= "categoryName";
+	String LABELNAME ="labelName";
 }

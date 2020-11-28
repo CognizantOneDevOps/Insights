@@ -20,14 +20,11 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.util.Base64;
 
-import javax.servlet.http.HttpServletRequest;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -44,13 +41,8 @@ public class CustomAppSettings {
 
 	private static Logger LOG = LogManager.getLogger(CustomAppSettings.class);
 
-	/*@Autowired
-	private HttpServletRequest request;*/
-
-	
-	
     @CrossOrigin
-	@RequestMapping(value = "/getLogoImage", method = RequestMethod.GET )
+	@GetMapping(value = "/getLogoImage")
 	public @ResponseBody JsonObject getImageWithMediaType() throws IOException {
 		/**String base64 = "";
 		String fileExt = "";

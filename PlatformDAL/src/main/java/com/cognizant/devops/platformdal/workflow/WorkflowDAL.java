@@ -26,6 +26,7 @@ import org.apache.logging.log4j.Logger;
 import org.hibernate.query.Query;
 import org.hibernate.type.StandardBasicTypes;
 
+import com.cognizant.devops.platformcommons.constants.AssessmentReportAndWorkflowConstants;
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformdal.assessmentreport.InsightsEmailTemplates;
@@ -33,7 +34,6 @@ import com.cognizant.devops.platformdal.assessmentreport.InsightsReportVisualiza
 import com.cognizant.devops.platformdal.core.BaseDAL;
 
 public class WorkflowDAL extends BaseDAL {
-
 	private static final Logger log = LogManager.getLogger(WorkflowDAL.class);
 
 	/**
@@ -47,7 +47,7 @@ public class WorkflowDAL extends BaseDAL {
 		Query<InsightsWorkflowTaskSequence> createQuery = getSession().createQuery(
 				"FROM InsightsWorkflowTaskSequence a WHERE a.workflowConfig.workflowId= :workflowId",
 				InsightsWorkflowTaskSequence.class);
-		createQuery.setParameter("workflowId", workflowId);
+		createQuery.setParameter(AssessmentReportAndWorkflowConstants.WORKFLOW_ID, workflowId);
 		List<InsightsWorkflowTaskSequence> asssessmentList = createQuery.getResultList();
 		List<Integer> listofPrimaryKey = new ArrayList<>();
 		for (InsightsWorkflowTaskSequence asssessment : asssessmentList) {
@@ -128,7 +128,7 @@ public class WorkflowDAL extends BaseDAL {
 		Query<InsightsWorkflowConfiguration> createQuery = getSession().createQuery(
 				"FROM InsightsWorkflowConfiguration WC WHERE WC.workflowId = :workflowId ",
 				InsightsWorkflowConfiguration.class);
-		createQuery.setParameter("workflowId", workflowId);
+		createQuery.setParameter(AssessmentReportAndWorkflowConstants.WORKFLOW_ID, workflowId);
 		InsightsWorkflowConfiguration result = createQuery.uniqueResult();
 		terminateSession();
 		terminateSessionFactory();
@@ -145,7 +145,7 @@ public class WorkflowDAL extends BaseDAL {
 		Query<Long> executionIDscreateQuery = getSession().createQuery(
 				"select distinct executionId FROM InsightsWorkflowExecutionHistory EH WHERE EH.workflowConfig.workflowId = :workflowId ORDER BY executionId DESC",
 				Long.class);
-		executionIDscreateQuery.setParameter("workflowId", workflowId);
+		executionIDscreateQuery.setParameter(AssessmentReportAndWorkflowConstants.WORKFLOW_ID, workflowId);
 		executionIDscreateQuery.setMaxResults(5);
 		List<Long> executionIds = executionIDscreateQuery.getResultList();
 		Query<InsightsWorkflowExecutionHistory> resultQuery = getSession().createQuery(
@@ -185,7 +185,7 @@ public class WorkflowDAL extends BaseDAL {
 		Query<InsightsWorkflowExecutionHistory> createQuery = getSession().createQuery(
 				"FROM InsightsWorkflowExecutionHistory EH WHERE EH.workflowConfig.workflowId = :workflowId ",
 				InsightsWorkflowExecutionHistory.class);
-		createQuery.setParameter("workflowId", workflowId);
+		createQuery.setParameter(AssessmentReportAndWorkflowConstants.WORKFLOW_ID, workflowId);
 		List<InsightsWorkflowExecutionHistory> result = createQuery.getResultList();
 		terminateSession();
 		terminateSessionFactory();
@@ -201,7 +201,7 @@ public class WorkflowDAL extends BaseDAL {
 	public InsightsWorkflowTask getTaskByTaskId(int taskId) {
 		Query<InsightsWorkflowTask> createQuery = getSession()
 				.createQuery("FROM InsightsWorkflowTask TE WHERE TE.taskId = :taskId ", InsightsWorkflowTask.class);
-		createQuery.setParameter("taskId", taskId);
+		createQuery.setParameter(AssessmentReportAndWorkflowConstants.TASK_ID, taskId);
 		InsightsWorkflowTask result = createQuery.uniqueResult();
 		terminateSession();
 		terminateSessionFactory();
@@ -217,7 +217,7 @@ public class WorkflowDAL extends BaseDAL {
 	public InsightsWorkflowTask getTaskByTaskIdList(Integer taskId) {
 		Query<InsightsWorkflowTask> createQuery = getSession()
 				.createQuery("FROM InsightsWorkflowTask TE WHERE TE.taskId = :taskId ", InsightsWorkflowTask.class);
-		createQuery.setParameter("taskId", taskId);
+		createQuery.setParameter(AssessmentReportAndWorkflowConstants.TASK_ID, taskId);
 		InsightsWorkflowTask result = createQuery.uniqueResult();
 		terminateSession();
 		terminateSessionFactory();
@@ -293,7 +293,7 @@ public class WorkflowDAL extends BaseDAL {
 		Query<InsightsWorkflowTaskSequence> createQuery = getSession().createQuery(
 				"FROM InsightsWorkflowTaskSequence WTS WHERE WTS.workflowConfig.workflowId = :workflowId and WTS.sequence=1 ",
 				InsightsWorkflowTaskSequence.class);
-		createQuery.setParameter("workflowId", workflowId);
+		createQuery.setParameter(AssessmentReportAndWorkflowConstants.WORKFLOW_ID, workflowId);
 		InsightsWorkflowTaskSequence result = createQuery.uniqueResult();
 		terminateSession();
 		terminateSessionFactory();
@@ -310,7 +310,7 @@ public class WorkflowDAL extends BaseDAL {
 		Query<InsightsWorkflowTaskSequence> createQuery = getSession().createQuery(
 				"FROM InsightsWorkflowTaskSequence WTS WHERE WTS.workflowConfig.workflowId = :workflowId ORDER BY sequence ASC ",
 				InsightsWorkflowTaskSequence.class);
-		createQuery.setParameter("workflowId", workflowId);
+		createQuery.setParameter(AssessmentReportAndWorkflowConstants.WORKFLOW_ID, workflowId);
 		List<InsightsWorkflowTaskSequence> result = createQuery.getResultList();
 		terminateSession();
 		terminateSessionFactory();
@@ -328,8 +328,8 @@ public class WorkflowDAL extends BaseDAL {
 		Query<InsightsWorkflowTaskSequence> createQuery = getSession().createQuery(
 				"FROM InsightsWorkflowTaskSequence WTS WHERE WTS.workflowConfig.workflowId = :workflowId and WTS.workflowTaskEntity.taskId=:taskId ",
 				InsightsWorkflowTaskSequence.class);
-		createQuery.setParameter("workflowId", workflowId);
-		createQuery.setParameter("taskId", taskId);
+		createQuery.setParameter(AssessmentReportAndWorkflowConstants.WORKFLOW_ID, workflowId);
+		createQuery.setParameter(AssessmentReportAndWorkflowConstants.TASK_ID, taskId);
 		InsightsWorkflowTaskSequence result = createQuery.uniqueResult();
 		terminateSession();
 		terminateSessionFactory();
@@ -379,7 +379,7 @@ public class WorkflowDAL extends BaseDAL {
 		Query<InsightsWorkflowConfiguration> createQuery = getSession().createQuery(
 				"FROM InsightsWorkflowConfiguration WC WHERE WC.workflowId = :workflowId",
 				InsightsWorkflowConfiguration.class);
-		createQuery.setParameter("workflowId", workflowId);
+		createQuery.setParameter(AssessmentReportAndWorkflowConstants.WORKFLOW_ID, workflowId);
 		InsightsWorkflowConfiguration wconfig = createQuery.uniqueResult();
 		terminateSession();
 		terminateSessionFactory();
@@ -479,7 +479,7 @@ public class WorkflowDAL extends BaseDAL {
 		Query<InsightsWorkflowExecutionHistory> createQuery = getSession().createQuery(
 				"FROM InsightsWorkflowExecutionHistory EH WHERE EH.workflowConfig.isActive = true and EH.workflowConfig.workflowId=:workflowId and EH.executionId=:latestExecutionId order by EH.endTime desc",
 				InsightsWorkflowExecutionHistory.class);
-		createQuery.setParameter("workflowId", workflowId);
+		createQuery.setParameter(AssessmentReportAndWorkflowConstants.WORKFLOW_ID, workflowId);
 		createQuery.setParameter("latestExecutionId", latestExecutionId);
 		List<InsightsWorkflowExecutionHistory> nextTasks = createQuery.getResultList();
 		terminateSession();
@@ -502,7 +502,7 @@ public class WorkflowDAL extends BaseDAL {
 		Query<InsightsWorkflowExecutionHistory> createQuery = getSession().createQuery(
 				"FROM InsightsWorkflowExecutionHistory EH WHERE EH.workflowConfig.isActive = true and EH.workflowConfig.workflowId=:workflowId order by EH.executionId desc",
 				InsightsWorkflowExecutionHistory.class);
-		createQuery.setParameter("workflowId", workflowId);
+		createQuery.setParameter(AssessmentReportAndWorkflowConstants.WORKFLOW_ID, workflowId);
 		createQuery.setMaxResults(1);
 		try {
 			InsightsWorkflowExecutionHistory nextTasks = createQuery.getSingleResult();
@@ -653,7 +653,7 @@ public class WorkflowDAL extends BaseDAL {
 			Query<InsightsEmailTemplates> createQuery = getSession().createQuery(
 					"FROM InsightsEmailTemplates EH WHERE EH.workflowConfig.workflowId = :workflowId ",
 					InsightsEmailTemplates.class);
-			createQuery.setParameter("workflowId", workflowId);
+			createQuery.setParameter(AssessmentReportAndWorkflowConstants.WORKFLOW_ID, workflowId);
 			return createQuery.getSingleResult();
 		} catch (Exception e) {
 			return null;
@@ -708,7 +708,7 @@ public class WorkflowDAL extends BaseDAL {
 			Query<InsightsReportVisualizationContainer> createQuery = getSession().createQuery(
 					"FROM InsightsReportVisualizationContainer EH WHERE EH.workflowId = :workflowId order by EH.executionId desc",
 					InsightsReportVisualizationContainer.class);
-			createQuery.setParameter("workflowId", workflowId);
+			createQuery.setParameter(AssessmentReportAndWorkflowConstants.WORKFLOW_ID, workflowId);
 			createQuery.setMaxResults(1);
 			return createQuery.getSingleResult();
 		} catch (Exception e) {
@@ -732,7 +732,7 @@ public class WorkflowDAL extends BaseDAL {
 			Query<InsightsReportVisualizationContainer> createQuery = getSession().createQuery(
 					"FROM InsightsReportVisualizationContainer EH WHERE EH.workflowId = :workflowId AND EH.executionId=:executionId",
 					InsightsReportVisualizationContainer.class);
-			createQuery.setParameter("workflowId", workflowId);
+			createQuery.setParameter(AssessmentReportAndWorkflowConstants.WORKFLOW_ID, workflowId);
 			createQuery.setParameter("executionId", executionId);
 			createQuery.setMaxResults(1);
 			return createQuery.getSingleResult();
@@ -756,7 +756,7 @@ public class WorkflowDAL extends BaseDAL {
 			Query<InsightsReportVisualizationContainer> createQuery = getSession().createQuery(
 					"FROM InsightsReportVisualizationContainer a WHERE a.workflowId= :workflowId",
 					InsightsReportVisualizationContainer.class);
-			createQuery.setParameter("workflowId", workflowId);
+			createQuery.setParameter(AssessmentReportAndWorkflowConstants.WORKFLOW_ID, workflowId);
 			List<InsightsReportVisualizationContainer> executionRecords = createQuery.getResultList();
 			for (InsightsReportVisualizationContainer insightsReportVisualizationContainer : executionRecords) {
 				getSession().delete(insightsReportVisualizationContainer);
@@ -786,7 +786,7 @@ public class WorkflowDAL extends BaseDAL {
 			Query<InsightsEmailTemplates> createQuery = getSession().createQuery(
 					"FROM InsightsEmailTemplates a WHERE a.workflowConfig.workflowId= :workflowId",
 					InsightsEmailTemplates.class);
-			createQuery.setParameter("workflowId", workflowId);
+			createQuery.setParameter(AssessmentReportAndWorkflowConstants.WORKFLOW_ID, workflowId);
 			List<InsightsEmailTemplates> executionRecords = createQuery.getResultList();
 			for (InsightsEmailTemplates insightsEmailTemplates : executionRecords) {
 				getSession().beginTransaction();
@@ -826,7 +826,7 @@ public class WorkflowDAL extends BaseDAL {
 					+ "  FROM \"INSIGHTS_REPORT_VISUALIZATION_CONTAINER\" IRCV inner join \"INSIGHTS_WORKFLOW_EXECUTION_HISTORY\" IWEH on IRCV.workflowid=IWEH.workflowid where IWEH.workflowid=:workflowId";
 			Query createQuery = getSession().createSQLQuery(query)
 					.addScalar("emailexecutionid", StandardBasicTypes.LONG)
-					.addScalar("workflowexecutionid", StandardBasicTypes.LONG).setParameter("workflowId", workflowId);
+					.addScalar("workflowexecutionid", StandardBasicTypes.LONG).setParameter(AssessmentReportAndWorkflowConstants.WORKFLOW_ID, workflowId);
 			records = createQuery.getResultList();
 			terminateSession();
 			terminateSessionFactory();
@@ -894,7 +894,7 @@ public class WorkflowDAL extends BaseDAL {
 		Query<InsightsWorkflowConfiguration> createQuery = getSession().createQuery(
 				"FROM InsightsWorkflowConfiguration WC WHERE WC.workflowId = :workflowId ",
 				InsightsWorkflowConfiguration.class);
-		createQuery.setParameter("workflowId", workflowId);
+		createQuery.setParameter(AssessmentReportAndWorkflowConstants.WORKFLOW_ID, workflowId);
 		InsightsWorkflowConfiguration updateStatus = createQuery.uniqueResult();
 		updateStatus.setActive(status);
 		getSession().beginTransaction();
@@ -933,7 +933,7 @@ public class WorkflowDAL extends BaseDAL {
 	public String deleteWorkflowConfig(String workflowId) {
 		Query<InsightsWorkflowConfiguration> createQuery = getSession()
 				.createQuery("FROM InsightsWorkflowConfiguration a WHERE a.workflowId= :workflowId", InsightsWorkflowConfiguration.class);
-		createQuery.setParameter("workflowId", workflowId);
+		createQuery.setParameter(AssessmentReportAndWorkflowConstants.WORKFLOW_ID, workflowId);
 		InsightsWorkflowConfiguration executionRecord = createQuery.getSingleResult();
 		executionRecord.setEmailConfig(null);
 		executionRecord.setTaskSequenceEntity(null);

@@ -48,9 +48,9 @@ public class MessageSubscriberFactory {
 		factory.setPassword(messageQueueConfig.getPassword());
 		try {
 			connection = factory.newConnection();
-			Channel channel = connection.createChannel();
-			channel.exchangeDeclare(MQMessageConstants.EXCHANGE_NAME, MQMessageConstants.EXCHANGE_TYPE, true);
-			channel.close();
+			try (Channel channel = connection.createChannel()) {
+				channel.exchangeDeclare(MQMessageConstants.EXCHANGE_NAME, MQMessageConstants.EXCHANGE_TYPE, true);
+			}
 		} catch (IOException e) {
 			log.error("Unable to create MQ connection", e);
 			EngineStatusLogger.getInstance().createEngineStatusNode(
@@ -74,14 +74,14 @@ public class MessageSubscriberFactory {
 	}
 
 	public void registerSubscriber(String routingKey, final EngineSubscriberResponseHandler responseHandler)
-			throws Exception {
+			throws IOException {
 		Channel channel = connection.createChannel();
 		String queueName = routingKey.replace(".", "_");
 		channel.queueDeclare(queueName, true, false, false, null);
 		channel.queueBind(queueName, MQMessageConstants.EXCHANGE_NAME, routingKey);
 		channel.basicQos(ApplicationConfigProvider.getInstance().getMessageQueue().getPrefetchCount());
 		responseHandler.setChannel(channel);
-		log.debug("prefetchCount " + ApplicationConfigProvider.getInstance().getMessageQueue().getPrefetchCount());
+		log.debug("prefetchCount {}", ApplicationConfigProvider.getInstance().getMessageQueue().getPrefetchCount());
 		Consumer consumer = new DefaultConsumer(channel) {
 			@Override
 			public void handleDelivery(String consumerTag, Envelope envelope, AMQP.BasicProperties properties,
@@ -89,7 +89,7 @@ public class MessageSubscriberFactory {
 				try {
 					responseHandler.handleDelivery(consumerTag, envelope, properties, body);
 				} catch (Exception e) {
-					log.error("Error : {}", e);
+					log.error("Error : ", e);
 				}
 			}
 		};

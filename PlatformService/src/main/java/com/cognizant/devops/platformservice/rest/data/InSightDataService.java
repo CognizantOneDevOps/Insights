@@ -26,6 +26,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -40,12 +41,12 @@ import com.google.gson.JsonObject;
 @RestController
 @RequestMapping("/admin/data")
 public class InSightDataService {
-	static Logger log = LogManager.getLogger(GraphDBService.class.getName());
+	static Logger log = LogManager.getLogger(InSightDataService.class.getName());
 
 	@Autowired
 	private HttpServletRequest request;
 
-	@RequestMapping(value = "/db/graph", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+	@PostMapping(value = "/db/graph", produces = MediaType.APPLICATION_JSON_VALUE)
 	public JsonObject addProjectMapping(@RequestParam String cypher) {
 		if (cypher == null || !cypher.contains(":PROJECT_TEMPLATE")) {
 			return PlatformServiceUtil.buildFailureResponse("Project template is not specified");

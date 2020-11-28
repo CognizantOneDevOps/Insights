@@ -16,6 +16,7 @@
 package com.cognizant.devops.platformworkflow.workflowtask.message.factory;
 
 import java.io.IOException;
+import java.util.concurrent.TimeoutException;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -30,6 +31,10 @@ import com.rabbitmq.client.ConnectionFactory;
 public class WorkflowTaskPublisherFactory {
 	private static Logger LOG = LogManager.getLogger(WorkflowTaskPublisherFactory.class);
 
+	private WorkflowTaskPublisherFactory() {
+		super();
+	}
+
 	/**
 	 * used to publish message based on request json and routing key
 	 * 
@@ -37,25 +42,23 @@ public class WorkflowTaskPublisherFactory {
 	 * @param data
 	 * @throws Exception
 	 */
-	public static void publish(String routingKey, String data) throws Exception {
+	public static void publish(String routingKey, String data) throws IOException, TimeoutException {
 		try {
 			ConnectionFactory factory = new ConnectionFactory();
 			MessageQueueDataModel messageQueueConfig = ApplicationConfigProvider.getInstance().getMessageQueue();
 			factory.setHost(messageQueueConfig.getHost());
 			factory.setUsername(messageQueueConfig.getUser());
 			factory.setPassword(messageQueueConfig.getPassword());
-			Connection connection = factory.newConnection();
-	        Channel channel = connection.createChannel();
-			String queueName = routingKey.replace(".", "_");
-			channel.exchangeDeclare(MQMessageConstants.EXCHANGE_NAME, MQMessageConstants.EXCHANGE_TYPE, true);
-			channel.queueDeclare(queueName, true, false, false, null);
-			channel.queueBind(queueName, MQMessageConstants.EXCHANGE_NAME, routingKey);
-			channel.basicPublish(MQMessageConstants.EXCHANGE_NAME, routingKey, null, data.getBytes());
-			LOG.debug("Worlflow Detail ==== data published time in queue {} ", routingKey);
-		} catch (Exception e) {
-			throw e;
+			try (Connection connection = factory.newConnection(); Channel channel = connection.createChannel()) {
+				String queueName = routingKey.replace(".", "_");
+				channel.exchangeDeclare(MQMessageConstants.EXCHANGE_NAME, MQMessageConstants.EXCHANGE_TYPE, true);
+				channel.queueDeclare(queueName, true, false, false, null);
+				channel.queueBind(queueName, MQMessageConstants.EXCHANGE_NAME, routingKey);
+				channel.basicPublish(MQMessageConstants.EXCHANGE_NAME, routingKey, null, data.getBytes());
+				LOG.debug("Worlflow Detail ==== data published time in queue {}", routingKey);
+			}
+		} catch (IOException | TimeoutException e) {
+			LOG.debug("data not publish in queue");
 		}
 	}
 }
-
-

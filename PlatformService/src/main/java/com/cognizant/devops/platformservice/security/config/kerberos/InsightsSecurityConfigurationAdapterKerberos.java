@@ -71,17 +71,18 @@ public class InsightsSecurityConfigurationAdapterKerberos extends WebSecurityCon
 	private SingleSignOnConfig singleSignOnConfig = ApplicationConfigProvider.getInstance().getSingleSignOnConfig();
 
 	DefaultSpringSecurityContextSource contextSource;
-	
+
 	@Autowired
 	ResourceLoaderService resourceLoaderService;
 
-	final String AUTH_TYPE = "Kerberos";
+	static final String AUTH_TYPE = "Kerberos";
 
 	@Autowired
 	private AuthenticationUtils authenticationUtils;
 
 	/**
-	 * This method is used to configure spring security using AuthenticationManagerBuilder
+	 * This method is used to configure spring security using
+	 * AuthenticationManagerBuilder
 	 */
 	@Override
 	protected void configure(AuthenticationManagerBuilder auth) throws Exception {
@@ -92,7 +93,7 @@ public class InsightsSecurityConfigurationAdapterKerberos extends WebSecurityCon
 					.authenticationProvider(kerberosServiceAuthenticationProvider());
 		}
 	}
-	
+
 	/**
 	 * This method is used to configure spring security using http
 	 */
@@ -105,16 +106,14 @@ public class InsightsSecurityConfigurationAdapterKerberos extends WebSecurityCon
 
 			http.cors();
 			http.csrf().ignoringAntMatchers(AuthenticationUtils.CSRF_IGNORE.toArray(new String[0]))
-					.csrfTokenRepository(authenticationUtils.csrfTokenRepository())
-					.and().addFilterAfter(new InsightsCustomCsrfFilter(), CsrfFilter.class);
+					.csrfTokenRepository(authenticationUtils.csrfTokenRepository()).and()
+					.addFilterAfter(new InsightsCustomCsrfFilter(), CsrfFilter.class);
 
 			http.exceptionHandling().authenticationEntryPoint(spnegoEntryPoint());
-			http.addFilterAfter(kerberosFilter(),
-					BasicAuthenticationFilter.class);
-			
+			http.addFilterAfter(kerberosFilter(), BasicAuthenticationFilter.class);
+
 			http.anonymous().disable().authorizeRequests().antMatchers("/error").permitAll().antMatchers("/admin/**")
-					.access("hasAuthority('Admin')")
-					.anyRequest().authenticated();
+					.access("hasAuthority('Admin')").anyRequest().authenticated();
 
 			http.logout().logoutSuccessUrl("/");
 		}
@@ -130,7 +129,7 @@ public class InsightsSecurityConfigurationAdapterKerberos extends WebSecurityCon
 	@Conditional(InsightsKerberosBeanInitializationCondition.class)
 	public FilterChainProxy kerberosFilter() throws Exception {
 		LOG.debug("message Inside InsightsSecurityConfigurationAdapterKerberos FilterChainProxy, initial bean **** ");
-		
+
 		List<Filter> filters = new ArrayList<>();
 		filters.add(0, new InsightsCustomCsrfFilter());
 		filters.add(1, new InsightsCrossScriptingFilter());
@@ -144,11 +143,11 @@ public class InsightsSecurityConfigurationAdapterKerberos extends WebSecurityCon
 				.listIterator();
 		while (securityFilters.hasNext()) {
 			SecurityFilterChain as = securityFilters.next();
-			LOG.debug("message Inside FilterChainProxy, initial bean name {} **** ",
+			LOG.debug("message Inside FilterChainProxy{}, initial bean name ****",
 					Arrays.toString(as.getFilters().toArray()));
 		}
 
-		return new FilterChainProxy(AuthenticationUtils.getSecurityFilterchains());//chains
+		return new FilterChainProxy(AuthenticationUtils.getSecurityFilterchains());// chains
 	}
 
 	/**
@@ -206,11 +205,11 @@ public class InsightsSecurityConfigurationAdapterKerberos extends WebSecurityCon
 	@Bean
 	@Conditional(InsightsKerberosBeanInitializationCondition.class)
 	public InsightsSpnegoEntryPoint spnegoEntryPoint() {
-		InsightsSpnegoEntryPoint spnegoEntryPoint = new InsightsSpnegoEntryPoint("/user/insightsso/getKerberosUserDetail");//"/klogin"
-		
+		InsightsSpnegoEntryPoint spnegoEntryPoint = new InsightsSpnegoEntryPoint(
+				"/user/insightsso/getKerberosUserDetail");// "/klogin"
+
 		return spnegoEntryPoint;
-	} 
-	
+	}
 
 	/**
 	 * Used to handle logout senerio if unautheticated
@@ -226,6 +225,7 @@ public class InsightsSecurityConfigurationAdapterKerberos extends WebSecurityCon
 
 	/**
 	 * used to set default authentication filter
+	 * 
 	 * @param authenticationManager
 	 * @return
 	 */

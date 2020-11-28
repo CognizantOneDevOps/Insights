@@ -77,15 +77,15 @@ public class InsightsSAMLAuthenticationProviderImpl extends SAMLAuthenticationPr
                 throw new SAMLException("Unsupported profile encountered in the context " + context.getCommunicationProfileId());
             }
         } catch (SAMLRuntimeException e) {
-			log.debug("Error validating SAML message {}", e);
+			log.debug("Error validating SAML message ", e);
             samlLogger.log(SAMLConstants.AUTH_N_RESPONSE, SAMLConstants.FAILURE, context, e);
-            throw new AuthenticationServiceException("Error validating SAML message", e);
+            throw new AuthenticationServiceException("Error validating SAML message.", e);
         } catch (SAMLException e) {
-			log.debug("Error validating SAML message {}", e);
+			log.debug("Error validating SAML message ", e);
             samlLogger.log(SAMLConstants.AUTH_N_RESPONSE, SAMLConstants.FAILURE, context, e);
-            throw new AuthenticationServiceException("Error validating SAML message", e);
+            throw new AuthenticationServiceException("Error validating SAML message..", e);
         } catch (ValidationException e) {
-			log.debug("Error validating signature {}", e);
+			log.debug("Error validating signature ", e);
             samlLogger.log(SAMLConstants.AUTH_N_RESPONSE, SAMLConstants.FAILURE, context, e);
             throw new AuthenticationServiceException("Error validating SAML message signature", e);
         } catch (org.opensaml.xml.security.SecurityException e) {

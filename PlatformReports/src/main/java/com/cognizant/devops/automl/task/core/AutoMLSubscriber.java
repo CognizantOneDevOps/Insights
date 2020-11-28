@@ -77,7 +77,7 @@ public class AutoMLSubscriber extends WorkflowTaskSubscriberHandler {
 				}
 			}
 		} catch (InsightsJobFailedException e) {
-			log.error("Worlflow Detail ==== InsightsJobFailedException ==== {} ", e);
+			log.error("Worlflow Detail ==== InsightsJobFailedException ====  ", e);
 			throw new InsightsJobFailedException("Auto ML task failed to execute " + e.getMessage());
 		} catch (Exception e) {
 			throw new InsightsJobFailedException("AutoML task failed to execute Exception " + e.getMessage());

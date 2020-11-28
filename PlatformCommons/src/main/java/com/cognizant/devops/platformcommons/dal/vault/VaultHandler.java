@@ -29,7 +29,7 @@ import com.google.gson.JsonObject;
 
 
 public class VaultHandler {
-	
+	public static final String X_VAULT_TOKEN="X-Vault-Token";
 	private static Logger log = LogManager.getLogger(VaultHandler.class);
 	private static final String VAULT_TOKEN = ApplicationConfigProvider.getInstance().getVault().getVaultToken();
 	private static final String VAULT_URL = ApplicationConfigProvider.getInstance().getVault().getVaultEndPoint() 
@@ -50,15 +50,15 @@ public class VaultHandler {
 		Map<String, String> headers = new HashMap<>();
 
 		try {
-			headers.put("X-Vault-Token", VAULT_TOKEN);
+			headers.put(X_VAULT_TOKEN, VAULT_TOKEN);
 			JsonObject requestJson = new JsonObject();
 			requestJson.add("data", dataJson);
-			log.debug("Request body for vault {} -- ", requestJson);
+			log.debug("Request body for vault {}", requestJson);
 			String url = VAULT_URL + vaultId;
 			response = RestApiHandler.doPost(url, requestJson, headers);
 
 		} catch (Exception e) {
-			log.error("Error while Storing to vault agent {} ", e);
+			log.error("Error while Storing to vault agent ", e);
 			throw new InsightsCustomException(e.getMessage());
 		}
 		return response;
@@ -76,11 +76,11 @@ public class VaultHandler {
 		Map<String, String> headers = new HashMap<>();
 		
 		try {
-			headers.put("X-Vault-Token", VAULT_TOKEN);
+			headers.put(X_VAULT_TOKEN, VAULT_TOKEN);
 			String url = VAULT_URL + vaultId;
 			data = RestApiHandler.doGet(url, headers);
 		} catch (Exception e) {
-			log.error("Error while fetching secret from vault {}-- ", e);
+			log.error("Error while fetching secret from vault ", e);
 			throw new InsightsCustomException(e.getMessage());
 		}
 		return data;
@@ -91,14 +91,14 @@ public class VaultHandler {
 		Map<String, String> headers = new HashMap<>();
 
 		try {
-			headers.put("X-Vault-Token", VAULT_TOKEN);
+			headers.put(X_VAULT_TOKEN, VAULT_TOKEN);
 			JsonObject requestJson = new JsonObject();
 			requestJson.add("data", dataJson);
-			log.debug("Request body for vault {} -- ", requestJson);
+			log.debug("Request body for vault {} ", requestJson);
 			response = RestApiHandler.doPost(url, requestJson, headers);
 
 		} catch (Exception e) {
-			log.error("Error while Storing to vault agent {} ", e);
+			log.error("Error while Storing to vault agent", e);
 			throw new InsightsCustomException(e.getMessage());
 		}
 		return response;

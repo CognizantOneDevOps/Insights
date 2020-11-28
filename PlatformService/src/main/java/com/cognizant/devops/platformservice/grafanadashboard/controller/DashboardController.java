@@ -22,8 +22,8 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -39,13 +39,13 @@ public class DashboardController {
 	@Autowired
 	DashboardService dashboardServiceImpl;
 
-	@RequestMapping(value = "/getGrafanaReport", method = RequestMethod.GET)
+	@GetMapping(value = "/getGrafanaReport")
 	@ResponseBody
 	public ResponseEntity<byte[]> generatePdf(@RequestParam String dashUrl, @RequestParam String title, @RequestParam String variables) {
 		ResponseEntity<byte[]>  response = null;
-		Log.debug("DashUrl -- " + dashUrl);
-		Log.debug("Title -- " + title);
-		Log.debug("Variables -- " + variables);
+		Log.debug("DashUrl -- {} ",dashUrl);
+		Log.debug("Title -- {}" ,title);
+		Log.debug("Variables{} -- " , variables);
 		try {
 			byte[] fileContent = dashboardServiceImpl.downloadPanel(dashUrl, title, variables);
 			HttpHeaders headers = new HttpHeaders();
@@ -59,7 +59,7 @@ public class DashboardController {
 			response = new ResponseEntity<byte[]>(fileContent, headers, HttpStatus.OK);
 			Log.info("PDf generation completed !!");
 		} catch (Exception e) {
-			Log.error("Error, Failed to download Dashboard .. ", e.getMessage());
+			Log.error("Error {}, Failed to download Dashboard .. ", e.getMessage());
 		}
 		return response;
 	}

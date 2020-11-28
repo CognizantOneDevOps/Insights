@@ -14,7 +14,6 @@
  * the License.
  ******************************************************************************/
 package com.cognizant.devops.platformauditing.util;
-
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -22,7 +21,7 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.Map;
 import java.util.TimeZone;
-
+import com.cognizant.devops.platformcommons.constants.InsightsAuditConstants;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -32,7 +31,8 @@ import com.google.gson.JsonPrimitive;
 
 public class AuditServiceUtil {
 
-
+private AuditServiceUtil() {
+}
     //GetAssetDetails and QueryByDate: Convert the output from ledger into format suitable for UI
     public static JsonObject parseOutput(String message) {
 
@@ -40,48 +40,47 @@ public class AuditServiceUtil {
         JsonObject inputMessage = (JsonObject) parser.parse(message);
         JsonObject formattedresponse = new JsonObject();
         try {
-            formattedresponse.addProperty("statusCode", inputMessage.getAsJsonPrimitive("statusCode").getAsString());
-            if (!inputMessage.getAsJsonPrimitive("statusCode").getAsString().equals("200")) {
-                formattedresponse.addProperty("data", inputMessage.getAsJsonPrimitive("msg").getAsString());
+            formattedresponse.addProperty(InsightsAuditConstants.STATUS_CODE, inputMessage.getAsJsonPrimitive(InsightsAuditConstants.STATUS_CODE).getAsString());
+            if (!inputMessage.getAsJsonPrimitive(InsightsAuditConstants.STATUS_CODE).getAsString().equals("200")) {
+                formattedresponse.addProperty(InsightsAuditConstants.DATA, inputMessage.getAsJsonPrimitive(InsightsAuditConstants.MSG).getAsString());
             } else {
-                if (inputMessage.get("msg").isJsonArray()) {
+                if (inputMessage.get(InsightsAuditConstants.MSG).isJsonArray()) {
                     JsonArray array = new JsonArray();
-                    JsonArray mainMsg = inputMessage.getAsJsonArray("msg");
+                    JsonArray mainMsg = inputMessage.getAsJsonArray(InsightsAuditConstants.MSG);
                     for (JsonElement messageEntry : mainMsg) {
                         JsonObject msg = messageEntry.getAsJsonObject();
-                        msg.remove("uplink");
-                        msg.remove("downlink");
-                        String formattedDate = epochToHumanDate(msg.get("timestamp").getAsString());
-                        msg.remove("timestamp");
-                        msg.addProperty("timestamp", formattedDate);
-                        if (msg != null)
+                        msg.remove(InsightsAuditConstants.UPLINK);
+                        msg.remove(InsightsAuditConstants.DOWNLINK);
+                        String formattedDate = epochToHumanDate(msg.get(InsightsAuditConstants.TIMESTAMP).getAsString());
+                        msg.remove(InsightsAuditConstants.TIMESTAMP);
+                        msg.addProperty(InsightsAuditConstants.TIMESTAMP, formattedDate);
                             array.add(msg);
                     }
                     if (array.size() > 0)
-                        formattedresponse.add("data", array);
+                        formattedresponse.add(InsightsAuditConstants.DATA, array);
                     else {
-                        formattedresponse.addProperty("statusCode", "104");
-                        formattedresponse.add("data", new JsonPrimitive("No assets found within the selected date range"));
+                        formattedresponse.addProperty(InsightsAuditConstants.STATUS_CODE, "104");
+                        formattedresponse.add(InsightsAuditConstants.DATA, new JsonPrimitive("No assets found within the selected date range"));
                     }
                 } else {
                     JsonArray array = new JsonArray();
-                    JsonObject msg = inputMessage.getAsJsonObject("msg");
-                    msg.remove("uplink");
-                    msg.remove("downlink");
-                    String formattedDate = epochToHumanDate(msg.get("timestamp").getAsString());
-                    msg.remove("timestamp");
-                    msg.addProperty("timestamp", formattedDate);
-                    if (msg != null)
+                    JsonObject msg = inputMessage.getAsJsonObject(InsightsAuditConstants.MSG);
+                    msg.remove(InsightsAuditConstants.UPLINK);
+                    msg.remove(InsightsAuditConstants.DOWNLINK);
+                    String formattedDate = epochToHumanDate(msg.get(InsightsAuditConstants.TIMESTAMP).getAsString());
+                    msg.remove(InsightsAuditConstants.TIMESTAMP);
+                    msg.addProperty(InsightsAuditConstants.TIMESTAMP, formattedDate);
                         array.add(msg);
                     if (array.size() > 0)
-                        formattedresponse.add("data", array);
+                        formattedresponse.add(InsightsAuditConstants.DATA, array);
                     else {
-                        formattedresponse.addProperty("statusCode", "104");
-                        formattedresponse.add("data", new JsonPrimitive("No assets found"));
+                        formattedresponse.addProperty(InsightsAuditConstants.STATUS_CODE, "104");
+                        formattedresponse.add(InsightsAuditConstants.DATA, new JsonPrimitive("No assets found."));
                     }
                 }
             }
         } catch (Exception e) {
+        	//No code
         }
 
         return formattedresponse;
@@ -94,22 +93,23 @@ public class AuditServiceUtil {
         JsonObject formattedresponse = new JsonObject();
         JsonArray array = new JsonArray();
         try {
-            formattedresponse.addProperty("statusCode", inputMessage.getAsJsonPrimitive("statusCode").getAsString());
-            if (inputMessage.get("msg").isJsonArray()) {
-                for (JsonElement entry : inputMessage.getAsJsonArray("msg")) {
+            formattedresponse.addProperty(InsightsAuditConstants.STATUS_CODE, inputMessage.getAsJsonPrimitive(InsightsAuditConstants.STATUS_CODE).getAsString());
+            if (inputMessage.get(InsightsAuditConstants.MSG).isJsonArray()) {
+                for (JsonElement entry : inputMessage.getAsJsonArray(InsightsAuditConstants.MSG)) {
                     JsonObject newMessage = new JsonObject();
                     newMessage.addProperty("TxID", entry.getAsJsonObject().getAsJsonPrimitive("TxId").getAsString());
                     for (Map.Entry<String, JsonElement> entrySet : entry.getAsJsonObject().getAsJsonObject("Value").entrySet()) {
                         if (entrySet.getKey().toLowerCase().contains("time")) {
                             String formattedDate = epochToHumanDate(entrySet.getValue().getAsString());
                             newMessage.addProperty(entrySet.getKey(), formattedDate);
-                        } else if (entrySet.getKey().equals("uplink") || entrySet.getKey().equals("downlink"))
+                        } else if (entrySet.getKey().equals(InsightsAuditConstants.UPLINK) || entrySet.getKey().equals(InsightsAuditConstants.DOWNLINK))
                             continue;
                         else
                             newMessage.add(entrySet.getKey(), entrySet.getValue());
                     }
-                    if (newMessage != null)
+                            if (newMessage != null) {
                         array.add(newMessage);
+                            }
                 }
 
                 if (array.size() > 0) {
@@ -120,14 +120,15 @@ public class AuditServiceUtil {
                     aL.sort(new Comparator<JsonObject>() {
                         @Override
                         public int compare(JsonObject o1, JsonObject o2) {
-                            final String KEY_NAME = "timestamp";
-                            String valA = new String();
-                            String valB = new String();
+                            final String KEY_NAME = InsightsAuditConstants.TIMESTAMP;
+                            String valA="";
+                            String valB ="";
 
                             try {
                                 valA = o1.getAsJsonPrimitive(KEY_NAME).getAsString();
                                 valB = o2.getAsJsonPrimitive(KEY_NAME).getAsString();
                             } catch (Exception e) {
+                            	//No code
                             }
 
                             return -valA.compareTo(valB);
@@ -138,16 +139,18 @@ public class AuditServiceUtil {
                         sortedArray.add((JsonObject) entry);
                     }
 
-                    formattedresponse.add("data", sortedArray);
+                    formattedresponse.add(InsightsAuditConstants.DATA, sortedArray);
                 } else {
-                    formattedresponse.addProperty("statusCode", "104");
-                    formattedresponse.add("data", new JsonPrimitive("No assets found"));
+                    formattedresponse.addProperty(InsightsAuditConstants.STATUS_CODE, "104");
+                    formattedresponse.add(InsightsAuditConstants.DATA, new JsonPrimitive("No assets found.."));
                 }
 
             } else {
-                formattedresponse.add("data", new JsonPrimitive("No assets found"));
+                formattedresponse.add(InsightsAuditConstants.DATA, new JsonPrimitive("No assets found..."));
             }
         } catch (Exception e) {
+        	//No code
+        
         }
         return formattedresponse;
     }

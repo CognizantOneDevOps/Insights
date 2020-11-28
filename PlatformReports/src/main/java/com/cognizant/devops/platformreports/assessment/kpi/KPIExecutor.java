@@ -31,9 +31,8 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
 public class KPIExecutor implements Callable<JsonObject> {
-
 	private static final Logger log = LogManager.getLogger(KPIExecutor.class);
-
+	private static final String STATUS= "Status";
 	private static final long serialVersionUID = -4343203101560318074L;
 
 	private InsightsKPIConfigDTO _kpiConfigDTO;
@@ -54,7 +53,7 @@ public class KPIExecutor implements Callable<JsonObject> {
 		try {
 			kpiId = executeKPIJob(_kpiConfigDTO);
 		} catch (InsightsJobFailedException e) {
-			response.addProperty("Status", "Failure");
+			response.addProperty(STATUS, "Failure");
 			failedjobs.add(_kpiConfigDTO.getKpiId());
 			response.add("kpiArray", failedjobs);
 		}
@@ -69,10 +68,10 @@ public class KPIExecutor implements Callable<JsonObject> {
 			}
 			/* If none of the kpi or content is failed then simply return Status as success */
 			if (failedjobs.size() > 0) {
-				response.addProperty("Status", "Failure");
+				response.addProperty(STATUS, "Failure");
 				response.add("contentArray", failedjobs);
 			} else {
-				response.addProperty("Status", "Success");
+				response.addProperty(STATUS, "Success");
 			}
 
 		}

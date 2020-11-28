@@ -25,12 +25,11 @@ import org.springframework.stereotype.Service;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformdal.queryBuilder.QueryBuilderConfig;
 import com.cognizant.devops.platformdal.queryBuilder.QueryBuilderConfigDAL;
-import com.cognizant.devops.platformservice.agentmanagement.service.AgentManagementServiceImpl;
 
 @Service("queryBuilderService")
 public class QueryBuilderServiceImpl implements QueryBuilderService{
 
-	private static Logger Log = LogManager.getLogger(AgentManagementServiceImpl.class);
+	private static Logger Log = LogManager.getLogger(QueryBuilderServiceImpl.class);
 	private static final String SUCCESS = "SUCCESS";
 
 	@Override
@@ -40,11 +39,11 @@ public class QueryBuilderServiceImpl implements QueryBuilderService{
 			QueryBuilderConfigDAL queryBuilderConfigDAL = new QueryBuilderConfigDAL();
 			boolean status = queryBuilderConfigDAL.saveOrUpdateQuery(reportName, frequency, subscribers, fileName, queryType, user);
 			if(status){
-				Log.info("Successfully inserted/updated the query for "+ reportName);
+				Log.info("Successfully inserted/updated {} the query for ", reportName);
 				result = SUCCESS;
 			}
 		}catch(Exception e){
-			Log.error("Error while inserting new query " + reportName, e);
+			Log.error("Error while inserting new query {} " , reportName, e);
 			throw new InsightsCustomException(e.toString());
 		}
 		return result;
@@ -57,11 +56,11 @@ public class QueryBuilderServiceImpl implements QueryBuilderService{
 			QueryBuilderConfigDAL queryBuilderConfigDAL = new QueryBuilderConfigDAL();
 			boolean status = queryBuilderConfigDAL.deleteQuery(reportName);
 			if(status){
-				Log.info("Successfully deleted the query for "+ reportName);
+				Log.info("Successfully deleted {} the query for ", reportName);
 				result = SUCCESS;
 			}
 		}catch(Exception e){
-			Log.error("Error while deleting query " + reportName, e);
+			Log.error("Error while deleting query {} ",reportName, e);
 			throw new InsightsCustomException(e.toString());
 		}
 		return result;

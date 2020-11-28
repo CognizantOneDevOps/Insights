@@ -20,6 +20,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -36,16 +37,16 @@ public class DataDictionaryController {
 	@Autowired
 	DataDictionaryService dataDictionaryService;
 
-	@RequestMapping(value = "/getToolsAndCategories", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+	@GetMapping(value = "/getToolsAndCategories", produces = MediaType.APPLICATION_JSON_VALUE)
 	public JsonObject getToolsAndCategories() {
 		return dataDictionaryService.getToolsAndCategories();
 	}
 
-	@RequestMapping(value = "/getToolProperties", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+	@GetMapping(value = "/getToolProperties", produces = MediaType.APPLICATION_JSON_VALUE)
 	public JsonObject getToolProperties(@RequestParam String labelName, @RequestParam String categoryName) {
 		return dataDictionaryService.getToolProperties(labelName, categoryName);
 	}
-	@RequestMapping(value = "/getToolsRelationshipAndProperties", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+	@GetMapping(value = "/getToolsRelationshipAndProperties",produces = MediaType.APPLICATION_JSON_VALUE)
 	public JsonObject getToolsRelationshipAndProperties(@RequestParam String startLabelName,
 			@RequestParam String startToolCategory, @RequestParam String endLabelName,
 			@RequestParam String endToolCatergory) {

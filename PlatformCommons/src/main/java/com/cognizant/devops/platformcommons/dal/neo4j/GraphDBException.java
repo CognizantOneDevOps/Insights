@@ -15,24 +15,12 @@
  ******************************************************************************/
 package com.cognizant.devops.platformcommons.dal.neo4j;
 
-import org.glassfish.jersey.client.ClientResponse;
-
 public class GraphDBException extends Exception {
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -3386029032712491921L;
-	private ClientResponse obj;
-	
-	public GraphDBException(ClientResponse obj){
-		this.obj = obj;
-	}
-	
+
+	private static final long serialVersionUID = -1867068590515063223L;
+
 	public GraphDBException(String message) {
 		super(message);
 	}
 
-	public ClientResponse getExceptionDetails(){
-		return obj;
-	}
 }

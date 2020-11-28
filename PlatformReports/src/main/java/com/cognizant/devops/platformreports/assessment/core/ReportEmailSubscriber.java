@@ -31,6 +31,7 @@ import org.apache.commons.text.StringSubstitutor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import com.cognizant.devops.platformcommons.constants.AssessmentReportAndWorkflowConstants;
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
 import com.cognizant.devops.platformcommons.core.enums.WorkflowTaskEnum;
 import com.cognizant.devops.platformcommons.core.util.InsightsUtils;
@@ -69,10 +70,10 @@ public class ReportEmailSubscriber extends WorkflowTaskSubscriberHandler {
 		JsonObject statusObject = null;
 		JsonObject incomingTaskMessage = new JsonParser().parse(message).getAsJsonObject();
 		try {
-			log.debug("Workflow Detail ==== ReportEmailSubscriber routing key message handleDelivery ===== {} ",
+			log.debug("Workflow Detail ==== ReportEmailSubscriber routing key message handleDelivery {} ===== ",
 					message);
 			InsightsEmailTemplates emailTemplate = workflowDAL
-					.getEmailTemplateByWorkflowId(incomingTaskMessage.get("workflowId").getAsString());
+					.getEmailTemplateByWorkflowId(incomingTaskMessage.get(AssessmentReportAndWorkflowConstants.WORKFLOW_ID).getAsString());
 			if (emailTemplate != null) {
 				mailReportDTO = updateEmailHistoryWithEmailTemplateValues(incomingTaskMessage, emailTemplate);
 				List<JsonObject> failedJobs = new ArrayList<>();
@@ -85,7 +86,7 @@ public class ReportEmailSubscriber extends WorkflowTaskSubscriberHandler {
 				/* submit each chunk to threadpool in a loop */
 				executeEmailChunks(emailChunkList, failedJobs, successJobs);
 				if (!successJobs.isEmpty()) {
-					updateEmailHistoryWithStatus(incomingTaskMessage.get("executionId").getAsLong(),
+					updateEmailHistoryWithStatus(incomingTaskMessage.get(AssessmentReportAndWorkflowConstants.EXECUTIONID).getAsLong(),
 							WorkflowTaskEnum.EmailStatus.COMPLETED.name());
 					InsightsStatusProvider.getInstance().createInsightStatusNode("ReportEmailSubscriberEmail Completed ",
 							PlatformServiceConstants.SUCCESS);
@@ -99,7 +100,7 @@ public class ReportEmailSubscriber extends WorkflowTaskSubscriberHandler {
 			}
 		} catch (InsightsJobFailedException e) {
 			log.error("Workflow Detail ==== ReportEmailSubscriberEmail Send failed to execute Exception ===== ", e);
-			updateEmailHistoryWithStatus(incomingTaskMessage.get("executionId").getAsLong(),
+			updateEmailHistoryWithStatus(incomingTaskMessage.get(AssessmentReportAndWorkflowConstants.EXECUTIONID).getAsLong(),
 					WorkflowTaskEnum.EmailStatus.ERROR.name());
 			InsightsStatusProvider.getInstance().createInsightStatusNode("ReportEmailSubscriberEmail Completed with error "+e.getMessage(),
 					PlatformServiceConstants.FAILURE);
@@ -140,8 +141,8 @@ public class ReportEmailSubscriber extends WorkflowTaskSubscriberHandler {
 			List<InternetAddress> recipientBCCAddress = null;
 			List<InternetAddress> recipientAddress = null;
 			InsightsWorkflowConfiguration workflowConfig;
-			workflowId = incomingTaskMessage.get("workflowId").getAsString();
-			executionId = incomingTaskMessage.get("executionId").getAsLong();
+			workflowId = incomingTaskMessage.get(AssessmentReportAndWorkflowConstants.WORKFLOW_ID).getAsString();
+			executionId = incomingTaskMessage.get(AssessmentReportAndWorkflowConstants.EXECUTIONID).getAsLong();
 			mailReportDTO.setTimeOfReportGeneration(InsightsUtils.insightsTimeXFormat(executionId));
 			workflowConfig = workflowDAL.getWorkflowConfigByWorkflowId(workflowId);
 			if(workflowConfig.getAssessmentConfig()!=null) {
@@ -185,8 +186,8 @@ public class ReportEmailSubscriber extends WorkflowTaskSubscriberHandler {
 		for (JsonObject failedJob : failedJobs) {
 			logArray.add(failedJob);
 		}
-		statusObject.addProperty("executionId", executionId);
-		statusObject.addProperty("workflowId", workflowId);
+		statusObject.addProperty(AssessmentReportAndWorkflowConstants.EXECUTIONID, executionId);
+		statusObject.addProperty(AssessmentReportAndWorkflowConstants.WORKFLOW_ID, workflowId);
 		statusObject.add("log", logArray);
 		// statusLog set here which is class variable of WorkflowTaskSubscriberHandler
 		log.error("Workflow Detail ==== unable to send an email statusLog {}  ", statusLog);
@@ -220,8 +221,8 @@ public class ReportEmailSubscriber extends WorkflowTaskSubscriberHandler {
 	private MailReport updateEmailHistoryWithEmailTemplateValues(JsonObject incomingTaskMessage,
 			InsightsEmailTemplates emailTemplate) {
 		try {
-			workflowId = incomingTaskMessage.get("workflowId").getAsString();
-			executionId = incomingTaskMessage.get("executionId").getAsLong();
+			workflowId = incomingTaskMessage.get(AssessmentReportAndWorkflowConstants.WORKFLOW_ID).getAsString();
+			executionId = incomingTaskMessage.get(AssessmentReportAndWorkflowConstants.EXECUTIONID).getAsLong();
 			InsightsWorkflowConfiguration workflowConfig = workflowDAL.getWorkflowConfigByWorkflowId(workflowId);
 			Map<String, String> valuesMap = new HashMap<>();
 			if (workflowConfig.getAssessmentConfig() != null) {
@@ -232,7 +233,7 @@ public class ReportEmailSubscriber extends WorkflowTaskSubscriberHandler {
 			valuesMap.put("Schedule", workflowConfig.getScheduleType());
 			StringSubstitutor sub = new StringSubstitutor(valuesMap, "{", "}");
 			InsightsReportVisualizationContainer emailHistoryConfig = workflowDAL
-					.getEmailExecutionHistoryByExecutionId(incomingTaskMessage.get("executionId").getAsLong());
+					.getEmailExecutionHistoryByExecutionId(incomingTaskMessage.get(AssessmentReportAndWorkflowConstants.EXECUTIONID).getAsLong());
 			if (emailHistoryConfig != null) {
 				emailHistoryConfig.setMailFrom(emailTemplate.getMailFrom());
 				emailHistoryConfig.setMailTo(emailTemplate.getMailTo());

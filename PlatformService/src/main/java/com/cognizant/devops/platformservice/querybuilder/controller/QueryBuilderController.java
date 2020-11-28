@@ -33,9 +33,10 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -57,7 +58,7 @@ public class QueryBuilderController {
 	@Autowired
 	QueryBuilderService queryBuilderService;
 	
-	@RequestMapping(value = "/fetchQueries", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+	@GetMapping(value = "/fetchQueries", produces = MediaType.APPLICATION_JSON_VALUE)
 	public @ResponseBody JsonObject fetchQueries(){
 		List<QueryBuilderConfig> result = null;
 		try{
@@ -68,10 +69,10 @@ public class QueryBuilderController {
 		return PlatformServiceUtil.buildSuccessResponseWithData(result);
 	}
 	
-	@RequestMapping(value = "/createQuery", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+	@PostMapping(value = "/createQuery", produces = MediaType.APPLICATION_JSON_VALUE)
 	public @ResponseBody JsonObject saveOrUpdateQuery(@RequestBody Map<String,String> queryObj){
 		String message = null;
-		Log.debug("object is --"+queryObj);
+		Log.debug("object is {} --",queryObj);
 		try{
 			for (Map.Entry<String, String> reqParamQuery : queryObj.entrySet()) {
 				ValidationUtils.cleanXSS(reqParamQuery.getValue());
@@ -84,7 +85,7 @@ public class QueryBuilderController {
 		return PlatformServiceUtil.buildSuccessResponseWithData(message);
 	}
 	
-	@RequestMapping(value = "/deleteQuery", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+	@PostMapping(value = "/deleteQuery", produces = MediaType.APPLICATION_JSON_VALUE)
 	public @ResponseBody JsonObject deleteQuery(@RequestBody String reportName){
 		String message = null;
 		try{
@@ -96,7 +97,7 @@ public class QueryBuilderController {
 		return PlatformServiceUtil.buildSuccessResponseWithData(message);
 	}
 	
-	@RequestMapping(value = "/uploadFile", method = RequestMethod.POST)
+	@PostMapping(value = "/uploadFile")
 	@ResponseBody
 	public JsonObject uploadFile(@RequestBody MultipartFile file) {
 		String message = "";
@@ -105,7 +106,7 @@ public class QueryBuilderController {
 			boolean isValid = PlatformServiceUtil.checkFileForHTML(new String(file.getBytes()));
 			if(checkValidFile && isValid){
 				Path rootLocation = Paths.get(ConfigOptions.QUERY_DATA_PROCESSING_RESOLVED_PATH);
-				Log.debug("File Obj -- "+file);
+				Log.debug("File Obj {} -- ",file);
 				String fileName = file.getOriginalFilename();
 				String extension = FilenameUtils.getExtension(fileName);
 				if (fileName != null && !fileName.isEmpty() && "json".equalsIgnoreCase(extension)) {
@@ -122,18 +123,18 @@ public class QueryBuilderController {
 			message = "FAIL to upload " + file.getOriginalFilename() + "!";
 			return PlatformServiceUtil.buildFailureResponse(message);
 		}
-		Log.debug("Result -- "+message);
+		Log.debug("Result {} -- ",message);
 		return PlatformServiceUtil.buildSuccessResponseWithData(message);
 	}
 	
-	@RequestMapping(value = "/getFileContents", method = RequestMethod.GET)
+	@GetMapping(value = "/getFileContents")
 	@ResponseBody
 	public ResponseEntity<byte[]> getFileContents(@RequestParam("path") String path) {
 		ResponseEntity<byte[]>  response = null;
 		try {
 			boolean validPath = PlatformServiceUtil.checkValidPath(path);
 			if(validPath){
-				Log.debug("Path to download -- "+path);
+				Log.debug("Path to download {} -- ",path);
 				byte[] fileContent = Files.readAllBytes(Paths.get(new File(path).getCanonicalPath()));
 				boolean isValid = PlatformServiceUtil.checkFileForHTML(new String(fileContent));
 				if(isValid) {
@@ -153,7 +154,7 @@ public class QueryBuilderController {
 				throw new Exception("Invalid path -- "+path);
 			}
 		} catch (Exception e) {
-			Log.error("Error, Failed to download from " + path, e.getMessage());
+			Log.error("Error {}, Failed to download from {} ", path, e.getMessage());
 		}
 		return response;
 	}

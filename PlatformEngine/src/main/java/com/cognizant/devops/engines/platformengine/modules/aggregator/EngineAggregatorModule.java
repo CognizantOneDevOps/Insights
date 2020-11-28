@@ -96,7 +96,7 @@ public class EngineAggregatorModule extends TimerTask {
 				keyPattern = enrichTool.get("keyPattern").getAsString();
 				sourceProperty = enrichTool.get("sourceProperty").getAsString();
 			}
-			log.debug(" dataRoutingKey " + dataRoutingKey + "  Tool Info " + toolName);
+			log.debug(" dataRoutingKey {0} " + dataRoutingKey + "  Tool Info{1} " + toolName);
 
 			if (dataRoutingKey != null && !registry.containsKey(dataRoutingKey)) {
 				try {
@@ -104,7 +104,7 @@ public class EngineAggregatorModule extends TimerTask {
 							agentConfig.getToolCategory(), agentConfig.getLabelName(), toolName, businessMappingList,isEnrichmentRequired, targetProperty,
 							keyPattern,sourceProperty));
 				} catch (Exception e) {
-					log.error("Unable to add subscriber for routing key: " + dataRoutingKey, e);
+					log.error("Unable to add subscriber for routing key:-  {}", dataRoutingKey, e);
 					EngineStatusLogger.getInstance().createEngineStatusNode(
 							" Error occured while executing aggragator for data queue subscriber " + e.getMessage(),
 							PlatformServiceConstants.FAILURE);
@@ -125,7 +125,7 @@ public class EngineAggregatorModule extends TimerTask {
 					graphDBHandler.executeCypherQuery("MERGE (n" + nodeLabels + ") return n");
 					registry.put(healthRoutingKey, new AgentHealthSubscriber(healthRoutingKey));
 				} catch (Exception e) {
-					log.error("Unable to add subscriber for routing key: " + healthRoutingKey, e);
+					log.error("Unable to add subscriber for routing key: {}", healthRoutingKey, e);
 					EngineStatusLogger.getInstance().createEngineStatusNode(
 							" Error occured while executing aggragator for health queue subscriber  " + e.getMessage(),
 							PlatformServiceConstants.FAILURE);
@@ -136,7 +136,7 @@ public class EngineAggregatorModule extends TimerTask {
 			}
 
 		} catch (Exception e) {
-			log.error("Unable to add subscriber for routing key: " + agentConfig.getAgentKey(), e);
+			log.error("Unable to add subscriber for routing key:. {}", agentConfig.getAgentKey(), e);
 			EngineStatusLogger.getInstance().createEngineStatusNode(
 					" Error occured while executing aggragator  " + agentConfig.getAgentKey() + e.getMessage(),
 					PlatformServiceConstants.FAILURE);
@@ -195,7 +195,7 @@ public class EngineAggregatorModule extends TimerTask {
 					toolData.setPropertyMap(propertyMap);
 					toolDataList.add(toolData);
 				}
-				log.debug("arg0 toolDataList  " + toolDataList);
+				log.debug("arg0 toolDataList {} ", toolDataList);
 				businessMappinMap.put(toolName, toolDataList);
 			}
 		} catch (InsightsCustomException e) {

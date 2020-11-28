@@ -26,7 +26,7 @@ import com.cognizant.devops.platformdal.workflow.InsightsWorkflowExecutionHistor
 import com.cognizant.devops.platformdal.workflow.WorkflowDAL;
 
 public class AutoMLConfigDAL extends BaseDAL {
-
+ public static final String USECASE="usecase";
     private static Logger log = LogManager.getLogger(AutoMLConfigDAL.class.getName());
 
     /**
@@ -40,7 +40,7 @@ public class AutoMLConfigDAL extends BaseDAL {
     public boolean isUsecaseExisting(String usecase) {
         Query<AutoMLConfig> createQuery = getSession().createQuery("FROM AutoMLConfig a WHERE a.useCaseName = :usecase ",
                 AutoMLConfig.class);
-        createQuery.setParameter("usecase", usecase);
+        createQuery.setParameter(USECASE, usecase);
         log.debug("QUERY: {}", createQuery);
         if (createQuery.getResultList().isEmpty()) {
             return Boolean.FALSE;
@@ -63,7 +63,7 @@ public class AutoMLConfigDAL extends BaseDAL {
         Query<AutoMLConfig> createQuery = getSession().createQuery(
                 "FROM AutoMLConfig a WHERE a.usecase = :usecase",
                 AutoMLConfig.class);
-        createQuery.setParameter("usecase", usecase);
+        createQuery.setParameter(USECASE, usecase);
         List<AutoMLConfig> resultList = createQuery.getResultList();
         AutoMLConfig autoMLConfig = null;
         Long updatedDate =System.currentTimeMillis();
@@ -130,7 +130,7 @@ public class AutoMLConfigDAL extends BaseDAL {
     public String getPredictionColumn(String usecase) {
         Query<AutoMLConfig> createQuery = getSession().createQuery("FROM AutoMLConfig AC WHERE AC.usecase = :usecase",
                 AutoMLConfig.class);
-        createQuery.setParameter("usecase", usecase);
+        createQuery.setParameter(USECASE, usecase);
         AutoMLConfig result = createQuery.getSingleResult();
         terminateSession();
         terminateSessionFactory();
@@ -140,7 +140,7 @@ public class AutoMLConfigDAL extends BaseDAL {
     public AutoMLConfig getMLConfigByUsecase(String usecase) {
         Query<AutoMLConfig> createQuery = getSession().createQuery("FROM AutoMLConfig AC WHERE AC.useCaseName = :usecase",
                 AutoMLConfig.class);
-        createQuery.setParameter("usecase", usecase);
+        createQuery.setParameter(USECASE, usecase);
         AutoMLConfig result = createQuery.getSingleResult();
         terminateSession();
         terminateSessionFactory();
@@ -158,7 +158,7 @@ public class AutoMLConfigDAL extends BaseDAL {
 		Query<AutoMLConfig> createQuery = getSession().createQuery(
 				"FROM AutoMLConfig a WHERE a.useCaseName = :usecase",
 				AutoMLConfig.class);
-		createQuery.setParameter("usecase", usecase);
+		createQuery.setParameter(USECASE, usecase);
 		AutoMLConfig autoMLConfig = createQuery.uniqueResult();
 		if (autoMLConfig != null) {
 			List<InsightsWorkflowExecutionHistory> executionHistory = workflowDal

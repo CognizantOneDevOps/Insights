@@ -70,7 +70,7 @@ public class LedgerPDFChartHandler implements BasePDFProcessor {
 		} catch (Exception e) {
 			log.error(e);
 			throw new InsightsJobFailedException(
-					"Unable to create pdf execution directory, message == " + e.getMessage());
+					"Unable to create pdf execution directory, message == {} " + e.getMessage());
 		}
 	}
 
@@ -86,7 +86,7 @@ public class LedgerPDFChartHandler implements BasePDFProcessor {
 			savePDFFile(extractedPdfFile, pdfResponse);
 			saveToVisualizationContaner(assessmentReportDTO);
 		} catch (Exception e) {
-			log.error("Workflow Detail ==== error while processing pdf data {}", e);
+			log.error("Workflow Detail ==== error while processing pdf data ", e);
 			throw new InsightsJobFailedException(" unable to prepare pdf data " + e);
 		}
 		

@@ -27,15 +27,14 @@ import java.util.List;
  *
  */
 public class ApplicationConfigProvider implements Serializable {
+
 	private static ApplicationConfigProvider instance = new ApplicationConfigProvider();
 	private EndpointData endpointData = new EndpointData();
 	private SparkConfigurations sparkConfigurations = new SparkConfigurations();
-	// private LDAPConfiguration ldapConfiguration = new LDAPConfiguration();
 	private GraphData graph = new GraphData();
 	private GrafanaData grafana = new GrafanaData();
 	private MessageQueueDataModel messageQueue = new MessageQueueDataModel();
 	private String insightsServiceURL;
-	// private boolean disableAuth = false;
 	private String insightsTimeZone = "US/Central";
 	private PostgreData postgre;
 	private String userId;
@@ -43,10 +42,10 @@ public class ApplicationConfigProvider implements Serializable {
 	private String proxyHost;
 	private int proxyPort;
 	private Date refreshTime;
-	private List<String> trustedHosts = new ArrayList<String>(3);
+	private List<String> trustedHosts = new ArrayList<>(3);
 	private boolean enableOnlineDatatagging = false;
 	private EmailConfiguration emailConfiguration = new EmailConfiguration();
-	private CorrelationConfig correlations;
+	private CorrelationConfig correlations = new CorrelationConfig();
 	private boolean enableFieldIndex;
 	private boolean enableOnlineBackup = false;
 	private AgentDetails agentDetails = new AgentDetails();
@@ -64,7 +63,7 @@ public class ApplicationConfigProvider implements Serializable {
 	private WorkflowDetails workflowDetails = new WorkflowDetails();
 	private MlConfiguration mlConfiguration = new MlConfiguration();
 
-    private WebhookEngine webhookEngine= new WebhookEngine();
+	private WebhookEngine webhookEngine= new WebhookEngine();
     private String pdfkey;
     
 	private ApplicationConfigProvider() {

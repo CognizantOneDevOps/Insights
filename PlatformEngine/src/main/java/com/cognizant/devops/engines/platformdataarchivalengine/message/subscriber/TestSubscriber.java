@@ -40,17 +40,18 @@ public class TestSubscriber {
 		factory.setUsername(messageQueueConfig.getUser());
 		factory.setPassword(messageQueueConfig.getPassword());
 		Connection connection = factory.newConnection();
-		Channel channel = connection.createChannel();
-		String queueName = routingKey.replace(".", "_");
-		channel.exchangeDeclare(MQMessageConstants.EXCHANGE_NAME, MQMessageConstants.EXCHANGE_TYPE, true);
-		channel.queueDeclare(queueName, true, false, false, null);
-		channel.queueBind(queueName, MQMessageConstants.EXCHANGE_NAME, routingKey);
-		channel.basicPublish(MQMessageConstants.EXCHANGE_NAME, routingKey, null, publishDataJson.getBytes());
-		channel.close();
-		connection.close();
+		try (Channel channel = connection.createChannel();){
+						String queueName = routingKey.replace(".", "_");
+						channel.exchangeDeclare(MQMessageConstants.EXCHANGE_NAME, MQMessageConstants.EXCHANGE_TYPE, true);
+						channel.queueDeclare(queueName, true, false, false, null);
+						channel.queueBind(queueName, MQMessageConstants.EXCHANGE_NAME, routingKey);
+						channel.basicPublish(MQMessageConstants.EXCHANGE_NAME, routingKey, null, publishDataJson.getBytes());
+					} finally {
+					connection.close();
+				}		
 
 	}
-	static public JsonObject convertStringIntoJson(String convertregisterkpi) {
+	public static JsonObject convertStringIntoJson(String convertregisterkpi) {
 		JsonObject objectJson = new JsonObject();
 		JsonParser parser = new JsonParser();
 		objectJson = parser.parse(convertregisterkpi).getAsJsonObject();

@@ -45,7 +45,7 @@ public class WebHookServiceImpl implements IWebHook {
 			WebHookConfig webHookConfig = populateWebHookConfiguration(registerWebhookjson);
 			return webhookConfigurationDAL.saveWebHookConfiguration(webHookConfig);
 		} catch (InsightsCustomException e) {
-			log.error("Error while saving the webhook .. {}", e.getMessage());
+			log.error("Error while saving the webhook .. {} ", e.getMessage());
 			throw new InsightsCustomException(e.getMessage());
 		}
 	}
@@ -57,7 +57,7 @@ public class WebHookServiceImpl implements IWebHook {
 			List<WebHookConfig> webhookConfigList = webhookConfigurationDAL.getAllWebHookConfigurations();
 			return webhookConfigList;
 		} catch (Exception e) {
-			log.error("Error getting all webhook config.. {}", e);
+			log.error("Error getting all webhook config.. ", e);
 			throw new InsightsCustomException(e.toString());
 		}
 
@@ -163,7 +163,7 @@ public class WebHookServiceImpl implements IWebHook {
 			webhookConfigurationDAL.deleteWebhookConfigurations(webhookname);
 			return PlatformServiceConstants.SUCCESS;
 		} catch (Exception e) {
-			log.error("Error while un-installing webhook..{}", e);
+			log.error("Error while un-installing webhook..", e);
 			throw new InsightsCustomException(e.toString());
 		}
 	}
@@ -175,7 +175,7 @@ public class WebHookServiceImpl implements IWebHook {
 			WebHookConfig webHookConfig = populateWebHookConfiguration(registerWebhookjson);
 			status = webhookConfigurationDAL.updateWebHookConfiguration(webHookConfig);
 		} catch (Exception e) {
-			log.error("Error in updating the webhook.. {}", e);
+			log.error("Error in updating the webhook.. ", e);
 			throw new InsightsCustomException(e.toString());
 		}
 		return status;
@@ -188,7 +188,7 @@ public class WebHookServiceImpl implements IWebHook {
 			webhookConfigurationDAL.updateWebhookStatus(webhookName, statussubscribe);
 			return PlatformServiceConstants.SUCCESS;
 		} catch (Exception e) {
-			log.error("Error while updating webhook status..{}", e);
+			log.error("Error while updating webhook status..", e);
 			throw new InsightsCustomException(e.toString());
 		}
 	}

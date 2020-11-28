@@ -21,20 +21,25 @@ import java.util.regex.Pattern;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import com.cognizant.devops.platformcommons.constants.ConfigOptions;
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 
 public class ValidationUtils {
+	
+	private ValidationUtils() {
+		super();
+	}
+
 	private static final Logger log = LogManager.getLogger(ValidationUtils.class);
 	private static Pattern agentNamePattern = Pattern.compile("[^A-Za-z]", Pattern.CASE_INSENSITIVE);
-	private static Pattern CRLF = Pattern.compile("(\r\n|\r|\n|\n\r)");
 	private static Pattern agentIdPattern = Pattern.compile("[^A-Za-z0-9\\_]", Pattern.CASE_INSENSITIVE);
 	private static Pattern LabelPattern = Pattern.compile("[^A-Za-z0-9\\_\\.]", Pattern.CASE_INSENSITIVE);
 
 	public static String checkHTTPResponseSplitting(String value, boolean isReplace) {
-		Pattern CRLF = Pattern.compile("(\r\n|\r|\n|\n\r)");
+		Pattern CRLF = Pattern.compile(ConfigOptions.CRLF_PATTERN);
 		Matcher valueMatcher = CRLF.matcher(value);
 		if (valueMatcher.find()) {
 			if (isReplace) {
@@ -57,6 +62,7 @@ public class ValidationUtils {
 	}
 
 	public static boolean checkNewLineCarriage(String value) {
+		Pattern CRLF = Pattern.compile(ConfigOptions.CRLF_PATTERN);
 		boolean returnBoolean = false;
 		Matcher m = CRLF.matcher(value);
 		if (m.find()) {
@@ -98,17 +104,15 @@ public class ValidationUtils {
 		String jsonString = "";
 		JsonObject json = null;
 
-		// log.debug(" validateStringForHTMLContent string before " + data);
-
 		if (data instanceof JsonObject) {
 			jsonString = data.toString();
 			// log.debug(" validateStringForHTMLContent after assigment " + jsonString);
 			if (jsonString != null) {
 				jsonString = jsonString.replaceAll(strRegEx, "");
 				// replace &nbsp; with space
-				jsonString = jsonString.replace("&nbsp;", " ");
+				jsonString = jsonString.replace(ConfigOptions.NBSP, " ");
 				// replace &amp; with &
-				jsonString = jsonString.replace("&amp;", "&");
+				jsonString = jsonString.replace(ConfigOptions.AMP, "&");
 			}
 			if (!jsonString.equalsIgnoreCase(data.toString())) {
 				log.error(" Invilid response data ");
@@ -116,7 +120,6 @@ public class ValidationUtils {
 			} else {
 				json = new Gson().fromJson(jsonString, JsonObject.class);
 			}
-			// log.debug(" validateStringForHTMLContent after " + jsonString);
 		}
 		return json;
 	}
@@ -134,9 +137,9 @@ public class ValidationUtils {
 			if (modifiedString != null) {
 				modifiedString = modifiedString.replaceAll(strRegEx, "");
 				// replace &nbsp; with space
-				modifiedString = modifiedString.replace("&nbsp;", " ");
+				modifiedString = modifiedString.replace(ConfigOptions.NBSP, " ");
 				// replace &amp; with &
-				modifiedString = modifiedString.replace("&amp;", "&");
+				modifiedString = modifiedString.replace(ConfigOptions.AMP, "&");
 			}
 			if (!modifiedString.equalsIgnoreCase(data.toString())) {
 				log.error(" Invilid response data ");
@@ -144,7 +147,6 @@ public class ValidationUtils {
 				hasHTML = Boolean.TRUE;
 				//throw new RuntimeException(PlatformServiceConstants.INVALID_REQUEST);
 			}
-			// log.debug(" validateStringForHTMLContent after " + jsonString);
 		}
 		return hasHTML;
 	}
@@ -166,7 +168,7 @@ public class ValidationUtils {
 			Pattern.compile("javascript:", Pattern.CASE_INSENSITIVE),
 			Pattern.compile("vbscript:", Pattern.CASE_INSENSITIVE),
 			Pattern.compile("onload(.*?)=", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE | Pattern.DOTALL),
-			Pattern.compile("(\r\n|\r|\n|\n\r)") };
+			Pattern.compile(ConfigOptions.CRLF_PATTERN) };
 
 	/**
 	 * Strips any potential XSS threats out of the value
@@ -178,7 +180,6 @@ public class ValidationUtils {
 	public static String cleanXSS(String value) {
 		Boolean isXSSPattern = Boolean.FALSE;
 		String valueWithXSSPattern = "";
-		//log.debug("In cleanXSS RequestWrapper ............... {} ", value);
 		if (value != null || !("").equals(value)) {
 			try {
 				boolean hasHTML = validateStringForHTMLContent(value);
@@ -230,7 +231,6 @@ public class ValidationUtils {
 					}
 				}
 				if (isXSSPattern) {
-					//log.error("Invalid pattern found in data value ==== " + valueWithXSSPattern);
 					throw new RuntimeException(PlatformServiceConstants.INVALID_REQUEST);
 				}
 			} catch (RuntimeException e) {
@@ -253,7 +253,6 @@ public class ValidationUtils {
 			} else {
 				log.error(" Invalid token start with basic ");
 				authTokenDecrypt=authHeaderToken;
-				//throw new RuntimeException(PlatformServiceConstants.INVALID_TOKEN);
 			}
 		} catch (Exception e) {
 			log.error(" InsightsCustomException Invalid Autharization Token {} ", e.getMessage());

@@ -52,6 +52,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
+import com.cognizant.devops.platformcommons.constants.AgentCommonConstant;
 import com.cognizant.devops.platformcommons.constants.ConfigOptions;
 import com.cognizant.devops.platformcommons.constants.MQMessageConstants;
 import com.cognizant.devops.platformcommons.core.enums.AGENTACTION;
@@ -73,10 +74,9 @@ import com.rabbitmq.client.ConnectionFactory;
 
 @Service("agentManagementService")
 public class AgentManagementServiceImpl implements AgentManagementService {
+
 	private static Logger log = LogManager.getLogger(AgentManagementServiceImpl.class);
-	private static final String ZIPEXTENSION = ".zip";
-	private static final String SUCCESS = "SUCCESS";
-	private static final String CONFIG = "config.json";
+
 	AgentConfigDAL agentConfigDAL = new AgentConfigDAL();
 	VaultHandler vaultHandler = new VaultHandler();
 	String filePath = ApplicationConfigProvider.getInstance().getAgentDetails().getUnzipPath();
@@ -94,10 +94,10 @@ public class AgentManagementServiceImpl implements AgentManagementService {
 			json.addProperty("toolName", toolName.toUpperCase());
 			String labelName = getLabelName(configDetails);
 			json.addProperty("labelName", labelName);
-			if (json.get("agentId") == null || json.get("agentId").getAsString().isEmpty()) {
+			if (json.get(AgentCommonConstant.AGENTID ) == null || json.get(AgentCommonConstant.AGENTID ).getAsString().isEmpty()) {
 				agentId = getAgentkey(toolName);
 			} else {
-				agentId = json.get("agentId").getAsString();
+				agentId = json.get(AgentCommonConstant.AGENTID ).getAsString();
 			}
 			if (ValidationUtils.checkAgentIdString(agentId)) {
 				throw new InsightsCustomException("Agent Id has to be Alpha numeric with '_' as special character");
@@ -136,7 +136,7 @@ public class AgentManagementServiceImpl implements AgentManagementService {
 			// Zipping back the agent folder
 			Path agentZipPath = updateAgentConfig(toolName, json, agentId);
 			byte[] data = Files.readAllBytes(agentZipPath);
-			String fileName = agentId + ZIPEXTENSION;
+			String fileName = agentId + AgentCommonConstant.ZIPEXTENSION;
 			// Sending the packet in Rabbit MQ
 			sendAgentPackage(data, AGENTACTION.REGISTER.name(), fileName, agentId, toolName, osversion);
 			performAgentAction(agentId, toolName, osversion, AGENTACTION.START.name(), agentId);
@@ -147,9 +147,9 @@ public class AgentManagementServiceImpl implements AgentManagementService {
 			// register agent in DB
 			agentConfigDAL.saveAgentConfigFromUI(agentId, json.get("toolCategory").getAsString(), labelName, toolName,
 					json, agentVersion, osversion, updateDate, vault);
-			return SUCCESS;
+			return AgentCommonConstant.SUCCESS;
 		} catch (Exception e) {
-			log.error("Error while registering agent {} ", toolName, e);
+			log.error("Error while registering agent {}", toolName, e);
 			throw new InsightsCustomException(e.getMessage());
 		}
 	}
@@ -160,10 +160,10 @@ public class AgentManagementServiceImpl implements AgentManagementService {
 			uninstallAgent(AGENTACTION.UNINSTALL.name(), agentId, toolName, osversion);
 			agentConfigDAL.deleteAgentConfigurations(agentId);
 		} catch (Exception e) {
-			log.error("Error while un-installing agent..", e);
+			log.error("Error while un-installing agent.. ", e);
 			throw new InsightsCustomException(e.getMessage());
 		}
-		return SUCCESS;
+		return AgentCommonConstant.SUCCESS;
 	}
 
 	@Override
@@ -184,7 +184,7 @@ public class AgentManagementServiceImpl implements AgentManagementService {
 			log.error("Error while agent {} ", action, e);
 			throw new InsightsCustomException(e.toString());
 		}
-		return SUCCESS;
+		return AgentCommonConstant.SUCCESS;
 	}
 
 	@Override
@@ -200,7 +200,7 @@ public class AgentManagementServiceImpl implements AgentManagementService {
 			setupAgentInstanceCreation(toolName, osversion, agentId);
 			AgentConfigTO agentConfig = getAgentDetails(agentId);
 			String oldVersion = agentConfig.getAgentVersion();
-			log.debug("Previous Agent version {} ---", agentConfig.getAgentVersion());
+			log.debug("Previous Agent version {}", agentConfig.getAgentVersion());
 			if (!oldVersion.equals(agentVersion)) {
 				// Get latest agent code
 				getToolRawConfigFile(agentVersion, toolName);
@@ -219,14 +219,14 @@ public class AgentManagementServiceImpl implements AgentManagementService {
 			}
 			Path agentZipPath = updateAgentConfig(toolName, json, agentId);
 			byte[] data = Files.readAllBytes(agentZipPath);
-			String fileName = agentId + ZIPEXTENSION;
+			String fileName = agentId + AgentCommonConstant.ZIPEXTENSION;
 			sendAgentPackage(data, AGENTACTION.UPDATE.name(), fileName, agentId, toolName, osversion);
 			labelName = this.getLabelName(configDetails);
 			agentConfigDAL.updateAgentConfigFromUI(agentId, json.get("toolCategory").getAsString(), labelName, toolName,
 					json, agentVersion, osversion, updateDate, vault);
-			return SUCCESS;
+			return AgentCommonConstant.SUCCESS;
 		} catch (Exception e) {
-			log.error("Error while updating agent", e);
+			log.error("Error while updating agent ", e);
 			throw new InsightsCustomException(e.getMessage());
 		}
 	}
@@ -243,7 +243,7 @@ public class AgentManagementServiceImpl implements AgentManagementService {
 				agentList.add(to);
 			}
 		} catch (Exception e) {
-			log.error("Error getting all agent config", e);
+			log.error("Error getting all agent config ", e);
 			throw new InsightsCustomException(e.toString());
 		}
 		return agentList;
@@ -318,12 +318,12 @@ public class AgentManagementServiceImpl implements AgentManagementService {
 				if (ApplicationConfigProvider.getInstance().getAgentDetails()
 						.getOnlineRegistrationMode().equalsIgnoreCase(ConfigOptions.ONLINE_REGISTRATION_MODE_DOCROOT)) {
 					toolPath = ApplicationConfigProvider.getInstance().getAgentDetails().getDocrootUrl() + "/" + version
-							+ "/agents/" + tool;
-					toolPath = toolPath.trim() + "/" + tool.trim() + ZIPEXTENSION;
+							+ AgentCommonConstant.AGENTS + tool;
+					toolPath = toolPath.trim() + "/" + tool.trim() + AgentCommonConstant.ZIPEXTENSION;
 				} else {
 					toolPath = ApplicationConfigProvider.getInstance().getAgentDetails().getDownloadRepoUrl() + "/"
-							+ version + "/agents/" + tool;
-					toolPath = toolPath.trim() + "/" + tool.trim() + ZIPEXTENSION;
+							+ version + AgentCommonConstant.AGENTS + tool;
+					toolPath = toolPath.trim() + "/" + tool.trim() + AgentCommonConstant.ZIPEXTENSION;
 				}
 				String targetDir = ApplicationConfigProvider.getInstance().getAgentDetails().getUnzipPath()
 						+ File.separator + tool;
@@ -341,7 +341,7 @@ public class AgentManagementServiceImpl implements AgentManagementService {
 	private ArrayList<String> getAgentsForRepo(String version) {
 		Document doc;
 		String url = ApplicationConfigProvider.getInstance().getAgentDetails().getBrowseRepoUrl() + "/" + version
-				+ "/agents/";
+				+ AgentCommonConstant.AGENTS;
 		ArrayList<String> tools = new ArrayList<>();
 		try {
 			doc = Jsoup.connect(url).get();
@@ -360,7 +360,7 @@ public class AgentManagementServiceImpl implements AgentManagementService {
 	private ArrayList<String> getAgentsFromDocroot(String version) {
 		Document doc;
 		String url = ApplicationConfigProvider.getInstance().getAgentDetails().getDocrootUrl() + "/" + version
-				+ "/agents/";
+				+ AgentCommonConstant.AGENTS;
 		ArrayList<String> tools = new ArrayList<>();
 		try {
 			doc = Jsoup.connect(url).get();
@@ -409,7 +409,7 @@ public class AgentManagementServiceImpl implements AgentManagementService {
 		Path dir = Paths.get(agentPath);
 		String config = null;
 		try (Stream<Path> paths = Files.find(dir, Integer.MAX_VALUE,
-				(path, attrs) -> attrs.isRegularFile() && path.toString().endsWith(CONFIG));
+				(path, attrs) -> attrs.isRegularFile() && path.toString().endsWith(AgentCommonConstant.CONFIG));
 				FileReader reader = new FileReader(paths.limit(1).findFirst().get().toFile())) {
 			JsonParser parser = new JsonParser();
 			Object obj = parser.parse(reader);
@@ -479,7 +479,7 @@ public class AgentManagementServiceImpl implements AgentManagementService {
 
 	private void addAgentKeyToServiceFile(Path destinationFile, String agentId) throws IOException {
 		try (Stream<String> lines = Files.lines(destinationFile)) {
-			List<String> replaced = lines.map(line -> line.replaceAll("__AGENT_KEY__", agentId))
+			List<String> replaced = lines.map(line -> line.replace("__AGENT_KEY__", agentId))
 					.collect(Collectors.toList());
 			Files.write(destinationFile, replaced);
 		}
@@ -488,7 +488,7 @@ public class AgentManagementServiceImpl implements AgentManagementService {
 	private void addProcessKeyToServiceFile(Path destinationFile, String agentId) throws IOException {
 		String psKey = getPSKey(agentId);
 		try (Stream<String> lines = Files.lines(destinationFile)) {
-			List<String> replaced = lines.map(line -> line.replaceAll("__PS_KEY__", psKey))
+			List<String> replaced = lines.map(line -> line.replace("__PS_KEY__", psKey))
 					.collect(Collectors.toList());
 			Files.write(destinationFile, replaced);
 		}
@@ -506,7 +506,7 @@ public class AgentManagementServiceImpl implements AgentManagementService {
 		// Writing json to file
 		Path dir = Paths.get(configFilePath);
 		try (Stream<Path> paths = Files.find(dir, Integer.MAX_VALUE,
-				(path, attrs) -> attrs.isRegularFile() && path.toString().endsWith(CONFIG))) {
+				(path, attrs) -> attrs.isRegularFile() && path.toString().endsWith(AgentCommonConstant.CONFIG))) {
 
 			configFile = paths.limit(1).findFirst().get().toFile();
 		}
@@ -521,7 +521,7 @@ public class AgentManagementServiceImpl implements AgentManagementService {
 		Path sourceFolderPath = Paths.get(ApplicationConfigProvider.getInstance().getAgentDetails().getUnzipPath(),
 				agentId);
 		Path zipPath = Paths.get(ApplicationConfigProvider.getInstance().getAgentDetails().getUnzipPath(),
-				agentId + ZIPEXTENSION);
+				agentId + AgentCommonConstant.ZIPEXTENSION);
 		Path agentZipPath = null;
 		try {
 			agentZipPath = AgentManagementUtil.getInstance().getAgentZipFolder(sourceFolderPath, zipPath);
@@ -540,7 +540,7 @@ public class AgentManagementServiceImpl implements AgentManagementService {
 		// Writing json to file
 		Path dir = Paths.get(trackingFilePath);
 		try (Stream<Path> paths = Files.find(dir, Integer.MAX_VALUE,
-				(path, attrs) -> attrs.isRegularFile() && path.toString().endsWith(CONFIG))) {
+				(path, attrs) -> attrs.isRegularFile() && path.toString().endsWith(AgentCommonConstant.CONFIG))) {
 			trackingFile = paths.limit(1).findFirst().get().toFile();
 			trackingFile = trackingFile.getParentFile();
 			dir = Paths.get(trackingFile.toString() + File.separator + "tracking.json");
@@ -553,7 +553,7 @@ public class AgentManagementServiceImpl implements AgentManagementService {
 			log.error("Error writing tracking json file", e);
 			throw new InsightsCustomException(e.getMessage());
 		}
-		return SUCCESS;
+		return AgentCommonConstant.SUCCESS;
 
 	}
 
@@ -563,7 +563,7 @@ public class AgentManagementServiceImpl implements AgentManagementService {
 		// Writing json to file
 		Path dir = Paths.get(trackingFilePath);
 		try (Stream<Path> paths = Files.find(dir, Integer.MAX_VALUE,
-				(path, attrs) -> attrs.isRegularFile() && path.toString().endsWith(CONFIG))) {
+				(path, attrs) -> attrs.isRegularFile() && path.toString().endsWith(AgentCommonConstant.CONFIG))) {
 
 			trackingFile = paths.limit(1).findFirst().get().toFile();
 			trackingFile = trackingFile.getParentFile();
@@ -579,7 +579,7 @@ public class AgentManagementServiceImpl implements AgentManagementService {
 			throw new InsightsCustomException(e.getMessage());
 		}
 
-		return SUCCESS;
+		return AgentCommonConstant.SUCCESS;
 
 	}
 
@@ -587,10 +587,10 @@ public class AgentManagementServiceImpl implements AgentManagementService {
 			String osversion) throws IOException, TimeoutException {
 		Map<String, Object> headers = new HashMap<>();
 		headers.put("fileName", fileName);
-		headers.put("osType", osversion);
-		headers.put("agentToolName", toolName);
-		headers.put("agentId", agentId);
-		headers.put("action", action);
+		headers.put(AgentCommonConstant.OSTYPE, osversion);
+		headers.put(AgentCommonConstant.AGENT_TOOL_NAME, toolName);
+		headers.put(AgentCommonConstant.AGENTID, agentId);
+		headers.put(AgentCommonConstant.ACTION, action);
 		BasicProperties props = getBasicProperties(headers);
 		String agentDaemonQueueName = ApplicationConfigProvider.getInstance().getAgentDetails().getAgentPkgQueue();
 		publishAgentAction(agentDaemonQueueName, data, props);
@@ -599,10 +599,10 @@ public class AgentManagementServiceImpl implements AgentManagementService {
 	private void uninstallAgent(String action, String agentId, String toolName, String osversion)
 			throws IOException, TimeoutException {
 		Map<String, Object> headers = new HashMap<>();
-		headers.put("osType", osversion);
-		headers.put("agentToolName", toolName);
-		headers.put("agentId", agentId);
-		headers.put("action", action);
+		headers.put(AgentCommonConstant.OSTYPE, osversion);
+		headers.put(AgentCommonConstant.AGENT_TOOL_NAME, toolName);
+		headers.put(AgentCommonConstant.AGENTID, agentId);
+		headers.put(AgentCommonConstant.ACTION, action);
 		BasicProperties props = getBasicProperties(headers);
 		String agentDaemonQueueName = ApplicationConfigProvider.getInstance().getAgentDetails().getAgentPkgQueue();
 		publishAgentAction(agentDaemonQueueName, action.getBytes(), props);
@@ -611,10 +611,10 @@ public class AgentManagementServiceImpl implements AgentManagementService {
 	private void performAgentAction(String agentId, String toolName, String osversion, String action, String queueName)
 			throws TimeoutException, IOException {
 		Map<String, Object> headers = new HashMap<>();
-		headers.put("osType", osversion);
-		headers.put("agentToolName", toolName);
-		headers.put("agentId", agentId);
-		headers.put("action", action);
+		headers.put(AgentCommonConstant.OSTYPE, osversion);
+		headers.put(AgentCommonConstant.AGENT_TOOL_NAME, toolName);
+		headers.put(AgentCommonConstant.AGENTID, agentId);
+		headers.put(AgentCommonConstant.ACTION, action);
 		BasicProperties props = getBasicProperties(headers);
 		publishAgentAction(queueName, action.getBytes(), props);
 	}
@@ -626,16 +626,14 @@ public class AgentManagementServiceImpl implements AgentManagementService {
 		factory.setHost(ApplicationConfigProvider.getInstance().getMessageQueue().getHost());
 		factory.setUsername(ApplicationConfigProvider.getInstance().getMessageQueue().getUser());
 		factory.setPassword(ApplicationConfigProvider.getInstance().getMessageQueue().getPassword());
-		Connection connection = factory.newConnection();
-		Channel channel = connection.createChannel();
-		channel.exchangeDeclare(exchangeName, MQMessageConstants.EXCHANGE_TYPE, true);
-		channel.queueDeclare(routingKey, true, false, false, null);
-		channel.queueBind(routingKey, exchangeName, routingKey);
-		channel.basicPublish(exchangeName, routingKey, props, data);
-		channel.close();
-		connection.close();
+		try(Connection connection = factory.newConnection();
+								Channel channel = connection.createChannel()) {
+							channel.exchangeDeclare(exchangeName, MQMessageConstants.EXCHANGE_TYPE, true);
+							channel.queueDeclare(routingKey, true, false, false, null);
+							channel.queueBind(routingKey, exchangeName, routingKey);
+							channel.basicPublish(exchangeName, routingKey, props, data);
+						} 
 	}
-
 	private BasicProperties getBasicProperties(Map<String, Object> headers) {
 		BasicProperties.Builder propertiesBuilder = new BasicProperties.Builder();
 		propertiesBuilder.headers(headers);
@@ -665,7 +663,7 @@ public class AgentManagementServiceImpl implements AgentManagementService {
 			labelDataValue = Arrays.asList(labelData.split(MQMessageConstants.ROUTING_KEY_SEPERATOR));
 
 		} catch (Exception e) {
-			log.error("Invalid label Name {} ", e);
+			log.error("Invalid label Name ", e);
 			throw new InsightsCustomException(e.getMessage());
 		}
 		return labelDataValue.get(1);
@@ -707,7 +705,7 @@ public class AgentManagementServiceImpl implements AgentManagementService {
 		File configFile = null;
 		Path dir = Paths.get(configFilePath);
 		try (Stream<Path> paths = Files.find(dir, Integer.MAX_VALUE,
-				(path, attrs) -> attrs.isRegularFile() && path.toString().endsWith(CONFIG))) {
+				(path, attrs) -> attrs.isRegularFile() && path.toString().endsWith(AgentCommonConstant.CONFIG))) {
 			configFile = paths.limit(1).findFirst().get().toFile();
 		}
 		JsonObject configObject = AgentManagementUtil.getInstance().convertFileToJSON(configFile);
@@ -744,7 +742,7 @@ public class AgentManagementServiceImpl implements AgentManagementService {
 	 * @throws IOException
 	 */
 	private void updateSecrets(String agentId, Map<String, String> updatedDataMap, JsonObject json)
-			throws InsightsCustomException, IOException {
+			throws InsightsCustomException{
 		String vaultresponse = vaultHandler.fetchFromVault(agentId);
 		JsonObject vaultObject = new JsonParser().parse(vaultresponse).getAsJsonObject();
 		JsonObject vaultData = vaultObject.get("data").getAsJsonObject().get("data").getAsJsonObject();

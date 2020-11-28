@@ -34,37 +34,28 @@ public class MultipartDataHandler {
 
 	public boolean uploadMultipartFile(String url, Map<String, String> multipartFiles,
 			Map<String, String> multipartFileData, Map<String, String> headers, String returnMediaType,
-			String exportedFile)
-			throws InsightsCustomException {
+			String exportedFile) throws InsightsCustomException {
 		boolean status = Boolean.FALSE;
-		OutputStream outStream = null;
-		try {
-			InputStream initialStream = RestApiHandler.uploadMultipartFile(url, multipartFiles, multipartFileData,
-					headers, returnMediaType);
+
+		try (InputStream initialStream = RestApiHandler.uploadMultipartFile(url, multipartFiles, multipartFileData,
+				headers, returnMediaType)) {
 
 			byte[] buffer = new byte[initialStream.available()];
 			int readByte = initialStream.read(buffer);
 			log.debug("exportedFile  {} ", exportedFile);
+
 			if (readByte > 0) {
 				File extractedPdfFile = new File(exportedFile);
-				outStream = new FileOutputStream(extractedPdfFile);
-				outStream.write(buffer);
-				status = Boolean.TRUE;
-				log.debug("extractedPdfFile status {} and  path   {} ", status, extractedPdfFile.getAbsoluteFile());
-
+				try (OutputStream outStream = new FileOutputStream(extractedPdfFile)) {
+					outStream.write(buffer);
+					status = Boolean.TRUE;
+					log.debug("extractedPdfFile status {} and  path   {} ", status, extractedPdfFile.getAbsoluteFile());
+				}
 			} else {
 				log.debug("Unable to read Input stream ");
 			}
 		} catch (Exception e) {
 			log.error(e);
-		} finally {
-			if (outStream != null) {
-				try {
-					outStream.close();
-				} catch (IOException e) {
-					log.error(e);
-				}
-			}
 		}
 		return status;
 

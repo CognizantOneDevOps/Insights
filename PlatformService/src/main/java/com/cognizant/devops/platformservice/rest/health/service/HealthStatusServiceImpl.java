@@ -31,7 +31,7 @@ import com.cognizant.devops.platformservice.rest.util.PlatformServiceUtil;
 import com.google.gson.JsonObject;
 
 @Service("healthStatusService")
-public class HealthStatusServiceImpl {
+public class HealthStatusServiceImpl  {
 	static Logger log = LogManager.getLogger(HealthStatusServiceImpl.class);
 	HealthUtil healthUtil = new HealthUtil();
 

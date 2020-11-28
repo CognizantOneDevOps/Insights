@@ -20,6 +20,7 @@ import java.util.List;
 
 import org.hibernate.query.Query;
 
+import com.cognizant.devops.platformcommons.constants.AgentCommonConstant;
 import com.cognizant.devops.platformcommons.constants.DataArchivalConstants;
 import com.cognizant.devops.platformcommons.core.enums.AGENTACTION;
 import com.cognizant.devops.platformdal.core.BaseDAL;
@@ -44,7 +45,7 @@ public class AgentConfigDAL extends BaseDAL {
 			JsonObject agentJson, String agentVersion, String osversion, Date updateDate, boolean vault) {
 		Query<AgentConfig> createQuery = getSession().createQuery("FROM AgentConfig a WHERE a.agentKey = :agentId ",
 				AgentConfig.class);
-		createQuery.setParameter("agentId", agentId);
+		createQuery.setParameter(AgentCommonConstant.AGENTID, agentId);
 		AgentConfig agentConfig = createQuery.uniqueResult();
 		if (agentConfig != null) {
 			getSession().beginTransaction();
@@ -69,7 +70,7 @@ public class AgentConfigDAL extends BaseDAL {
 	public boolean isAgentIdExisting(String agentId) {
 		Query<AgentConfig> createQuery = getSession().createQuery("FROM AgentConfig a WHERE a.agentKey = :agentId ",
 				AgentConfig.class);
-		createQuery.setParameter("agentId", agentId);
+		createQuery.setParameter(AgentCommonConstant.AGENTID, agentId);
 		if (createQuery.getResultList().isEmpty()) {
 			return Boolean.FALSE;
 		} else {
@@ -131,8 +132,8 @@ public class AgentConfigDAL extends BaseDAL {
 		Query<AgentConfig> createQuery = getSession().createQuery(
 				"FROM AgentConfig AC WHERE AC.toolName = :toolName AND AC.toolCategory = :toolCategory",
 				AgentConfig.class);
-		createQuery.setParameter("toolName", toolName);
-		createQuery.setParameter("toolCategory", toolCategory);
+		createQuery.setParameter(AgentCommonConstant.TOOLNAME, toolName);
+		createQuery.setParameter(AgentCommonConstant.TOOLCATEGORY, toolCategory);
 		List<AgentConfig> result = createQuery.getResultList();
 		terminateSession();
 		terminateSessionFactory();
@@ -142,7 +143,7 @@ public class AgentConfigDAL extends BaseDAL {
 	public AgentConfig updateAgentRunningStatus(String agentId, AGENTACTION action) {
 		Query<AgentConfig> createQuery = getSession().createQuery("FROM AgentConfig AC WHERE AC.agentKey = :agentKey",
 				AgentConfig.class);
-		createQuery.setParameter("agentKey", agentId);
+		createQuery.setParameter(AgentCommonConstant.AGENTKEY, agentId);
 		AgentConfig agentConfig = createQuery.getSingleResult();
 		getSession().beginTransaction();
 		if (agentConfig != null) {
@@ -158,7 +159,7 @@ public class AgentConfigDAL extends BaseDAL {
 	public List<AgentConfig> deleteAgentConfigurations(String agentKey) {
 		Query<AgentConfig> createQuery = getSession().createQuery("FROM AgentConfig a WHERE a.agentKey = :agentKey",
 				AgentConfig.class);
-		createQuery.setParameter("agentKey", agentKey);
+		createQuery.setParameter(AgentCommonConstant.AGENTKEY, agentKey);
 		AgentConfig agentConfig = createQuery.getSingleResult();
 		getSession().beginTransaction();
 		getSession().delete(agentConfig);
@@ -171,7 +172,7 @@ public class AgentConfigDAL extends BaseDAL {
 	public AgentConfig getAgentConfigurations(String agentId) {
 		Query<AgentConfig> createQuery = getSession().createQuery("FROM AgentConfig AC WHERE AC.agentKey = :agentKey",
 				AgentConfig.class);
-		createQuery.setParameter("agentKey", agentId);
+		createQuery.setParameter(AgentCommonConstant.AGENTKEY, agentId);
 		AgentConfig result = createQuery.getSingleResult();
 		terminateSession();
 		terminateSessionFactory();
@@ -229,9 +230,9 @@ public class AgentConfigDAL extends BaseDAL {
 		Query<AgentConfig> createQuery = getSession().createQuery(
 				"FROM AgentConfig a WHERE a.toolName = :toolName AND a.toolCategory = :toolCategory AND a.agentId = :agentId",
 				AgentConfig.class);
-		createQuery.setParameter("toolName", toolName);
-		createQuery.setParameter("toolCategory", toolCategory);
-		createQuery.setParameter("agentId", agentId);
+		createQuery.setParameter(AgentCommonConstant.TOOLNAME, toolName);
+		createQuery.setParameter(AgentCommonConstant.TOOLCATEGORY, toolCategory);
+		createQuery.setParameter(AgentCommonConstant.AGENTID, agentId);
 		AgentConfig agentConfig = createQuery.getSingleResult();
 		getSession().beginTransaction();
 		getSession().delete(agentConfig);
@@ -245,9 +246,9 @@ public class AgentConfigDAL extends BaseDAL {
 		Query<AgentConfig> createQuery = getSession().createQuery(
 				"FROM AgentConfig a WHERE a.toolName = :toolName AND a.toolCategory = :toolCategory AND a.agentId = :agentId",
 				AgentConfig.class);
-		createQuery.setParameter("toolName", toolName);
-		createQuery.setParameter("toolCategory", toolCategory);
-		createQuery.setParameter("agentId", agentId);
+		createQuery.setParameter(AgentCommonConstant.TOOLNAME, toolName);
+		createQuery.setParameter(AgentCommonConstant.TOOLCATEGORY, toolCategory);
+		createQuery.setParameter(AgentCommonConstant.AGENTID, agentId);
 		AgentConfig result = createQuery.getSingleResult();
 		terminateSession();
 		terminateSessionFactory();

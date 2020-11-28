@@ -119,7 +119,7 @@ public class InsightsKPIProcessor {
 				return ReportEngineEnum.StatusCode.NO_DATA.getValue();
 			}
 		} catch (Exception e) {
-			log.error("Worlflow Detail ==== Some calculation job failed for kpiID - " + kpiDefinition.getKpiId(), e);
+			log.error("Worlflow Detail ==== Some calculation job failed for kpiID -{} " , kpiDefinition.getKpiId(), e);
 			throw new InsightsJobFailedException("Something went wrong with KPI query execution " + e.getMessage());
 		}
 		return ReportEngineEnum.StatusCode.SUCCESS.getValue();

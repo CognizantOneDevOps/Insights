@@ -15,8 +15,11 @@
  ******************************************************************************/
 package com.cognizant.devops.platformcommons.config;
 
-public class SchedulerConfigData {
+import java.io.Serializable;
 
+public class SchedulerConfigData implements Serializable {
+
+	private static final long serialVersionUID = -3717741106149569981L;
 	private int auditEngineInterval = 60;
 	private int webhookEngineInterval = 10;
 	private int engineAggregatorModuleInterval = 10;

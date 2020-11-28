@@ -23,17 +23,18 @@ public class SparkConfigurations implements Serializable {
 	 * 
 	 */
 	private static final long serialVersionUID = 4137658777393986499L;
-	private String appName, master, sparkExecutorMemory, sparkElasticSearchHost,
-	sparkElasticSearchPort, sparkElasticSearchConfigIndex, sparkElasticSearchResultIndex, kpiSize, 
-	sparkMasterExecutionEndPoint;
+	private String appName;
+	private String master;
+	private String sparkExecutorMemory;
+	private String sparkElasticSearchHost;
+	private String 	sparkElasticSearchPort;
+	private String sparkElasticSearchConfigIndex;
+	private String sparkElasticSearchResultIndex;
+	private String kpiSize;
+	private String sparkMasterExecutionEndPoint;
 	
 	private Long sparkResultSince;
 	
-	public SparkConfigurations()
-	{
-		
-	}
-
 	public String getAppName() {
 		return appName;
 	}

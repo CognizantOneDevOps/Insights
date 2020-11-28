@@ -26,6 +26,7 @@ import java.util.concurrent.Future;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import com.cognizant.devops.platformcommons.constants.AssessmentReportAndWorkflowConstants;
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
 import com.cognizant.devops.platformcommons.core.enums.WorkflowTaskEnum;
 import com.cognizant.devops.platformcommons.core.util.InsightsUtils;
@@ -48,6 +49,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
 public class PDFExecutionSubscriber extends WorkflowTaskSubscriberHandler {
+	
 	private static Logger log = LogManager.getLogger(PDFExecutionSubscriber.class.getName());
 
 	private WorkflowDAL workflowDAL = new WorkflowDAL();
@@ -90,7 +92,7 @@ public class PDFExecutionSubscriber extends WorkflowTaskSubscriberHandler {
 			throws InterruptedException, ExecutionException {
 
 		InsightsWorkflowConfiguration workflowConfig;
-		String workflowId = incomingTaskMessage.get("workflowId").getAsString();
+		String workflowId = incomingTaskMessage.get(AssessmentReportAndWorkflowConstants.WORKFLOW_ID).getAsString();
 		long executionId = incomingTaskMessage.get("executionId").getAsLong();
 		workflowConfig = workflowDAL.getWorkflowConfigByWorkflowId(workflowId);
 
@@ -157,7 +159,7 @@ public class PDFExecutionSubscriber extends WorkflowTaskSubscriberHandler {
 		if (failedKpiList.size() > 0) {
 			JsonObject kpiObject = new JsonObject();
 			kpiObject.addProperty("status", "failure");
-			kpiObject.add("kpiArray", failedKpiList);
+			kpiObject.add(AssessmentReportAndWorkflowConstants.KEYARRAY, failedKpiList);
 			failedJobs.add(kpiObject);
 		}
 
@@ -169,12 +171,12 @@ public class PDFExecutionSubscriber extends WorkflowTaskSubscriberHandler {
 		JsonArray kpiArray = new JsonArray();
 
 		for (JsonObject failedJob : failedJobs) {
-			if (failedJob.has("kpiArray")) {
-				failedJob.get("kpiArray").getAsJsonArray().forEach(id -> kpiArray.add(id));
+			if (failedJob.has(AssessmentReportAndWorkflowConstants.KEYARRAY)) {
+				failedJob.get(AssessmentReportAndWorkflowConstants.KEYARRAY).getAsJsonArray().forEach(id -> kpiArray.add(id));
 			}
 		}
 		statusObject.addProperty("executionId", assessmentReportDTO.getExecutionId());
-		statusObject.addProperty("workflowId", assessmentReportDTO.getWorkflowId());
+		statusObject.addProperty(AssessmentReportAndWorkflowConstants.WORKFLOW_ID, assessmentReportDTO.getWorkflowId());
 		statusObject.add("kpiList", kpiArray);
 		// statusLog set here which is class variable of WorkflowTaskSubscriberHandler
 		statusLog = new Gson().toJson(statusObject);
@@ -191,7 +193,7 @@ public class PDFExecutionSubscriber extends WorkflowTaskSubscriberHandler {
 
 	private void setPDFDetailsInEmailHistory(JsonObject incomingTaskMessageJson) {
 		try {
-			String workflowId = incomingTaskMessageJson.get("workflowId").getAsString();
+			String workflowId = incomingTaskMessageJson.get(AssessmentReportAndWorkflowConstants.WORKFLOW_ID).getAsString();
 			InsightsReportVisualizationContainer emailHistoryConfig = new InsightsReportVisualizationContainer();
 			emailHistoryConfig.setAttachmentPath(assessmentReportDTO.getPdfExportedFilePath());
 			emailHistoryConfig.setExecutionId(assessmentReportDTO.getExecutionId());

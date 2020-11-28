@@ -57,7 +57,7 @@ public class InsightsGeneralParser implements InsightsWebhookParserInterface {
 				responseTemplateJson = processResponseTemplate(webhookConfig, message);
 			}
 			// dynamic template is not empty
-			List<JsonObject> responseDynamicTemplateList = new ArrayList(0);
+			List<JsonObject> responseDynamicTemplateList = new ArrayList<>(0);
 			if (webhookConfig.getDynamicTemplate() != null
 					&& !webhookConfig.getDynamicTemplate().equalsIgnoreCase("{}")) {
 				responseDynamicTemplateList = parseDynamicTemplate(webhookConfig, message);
@@ -67,8 +67,7 @@ public class InsightsGeneralParser implements InsightsWebhookParserInterface {
 			if (!responseDynamicTemplateList.isEmpty()) {
 				mergeData(responseDynamicTemplateList, responseTemplateJson, retrunJsonList);
 			} else if (!responseTemplateJson.entrySet().isEmpty()) {
-				LOG.debug(" dynamic template data is empty or No valid dynamic template found... for webhook {}  ",
-						webhookConfig.getWebHookName());
+				LOG.debug(" dynamic template data is empty or No valid dynamic template found... for webhook {} " ,webhookConfig.getWebHookName());
 				retrunJsonList.add(responseTemplateJson);
 			}
 
@@ -81,7 +80,7 @@ public class InsightsGeneralParser implements InsightsWebhookParserInterface {
 				jsonObject.addProperty("labelName", webhookConfig.getLabelName());
 				applyWebhookDerivedConfigs(webhookConfig.getWebhookDerivedConfig(), jsonObject);
 			}
-			LOG.debug(" retrunJsonList {}  ", retrunJsonList);
+			LOG.debug(" retrunJsonList {} ", retrunJsonList);
 			return retrunJsonList;
 		} catch (Exception e) {
 			LOG.error(e);
@@ -104,7 +103,7 @@ public class InsightsGeneralParser implements InsightsWebhookParserInterface {
 		JsonElement json = parser.parse(message);
 		Map<String, Object> rabbitMqflattenedJsonMap = JsonFlattener.flattenAsMap(json.toString());
 		Map<String, String> responseTemplateMap = getResponseTemplateMap(webhookConfig.getResponseTemplate());
-		Map<String, Object> extractedMap = new HashMap(0);
+		Map<String, Object> extractedMap = new HashMap<>(0);
 		for (Map.Entry<String, String> entry : responseTemplateMap.entrySet()) {
 			keyMqInitial = entry.getKey();
 			Object toolValue = rabbitMqflattenedJsonMap.get(keyMqInitial);
@@ -177,7 +176,7 @@ public class InsightsGeneralParser implements InsightsWebhookParserInterface {
 					processDataEnrichment(operationFieldsList, responseTemplateJson);
 				}
 			} catch (Exception e) {
-				LOG.error("Error while Webhook derived operation {} and configuration {} Error is {}",
+				LOG.error("Error while Webhook derived operation {} and configuration  Error is {}",
 						webhookDerivedConfig.getOperationName(), webhookDerivedConfig.getOperationFields(), e);
 				throw new InsightsCustomException(e.getMessage());
 			}
@@ -193,14 +192,14 @@ public class InsightsGeneralParser implements InsightsWebhookParserInterface {
 	private List<JsonObject> parseDynamicTemplate(WebHookConfig webhookConfig, String message) {
 		InsightsDynamicJsonParser dynamicParser = new InsightsDynamicJsonParser();
 		ObjectMapper mapper = new ObjectMapper();
-		List<JsonObject> responceDynamicTemplateFinalDataList = new ArrayList(0);
+		List<JsonObject> responceDynamicTemplateFinalDataList = new ArrayList<>(0);
 		try {
 			JsonNode nodePayloadData = mapper.readTree(message);
 			JsonNode nodeResponseTemplate = mapper.readTree(webhookConfig.getDynamicTemplate());
 			responceDynamicTemplateFinalDataList = dynamicParser.parserResponseTemplate(nodeResponseTemplate,
 					nodePayloadData);
 		} catch (Exception e) {
-			LOG.error(" Error while parseDynamicTemplate {} ", e);
+			LOG.error(" Error while parseDynamicTemplate ", e);
 		}
 		return responceDynamicTemplateFinalDataList;
 	}
@@ -244,7 +243,7 @@ public class InsightsGeneralParser implements InsightsWebhookParserInterface {
 				return null;
 			}
 		} catch (Exception e) {
-			LOG.error("Failed to fetch the value of the field {}", e);
+			LOG.error("Failed to fetch the value of the field ", e);
 			throw e;
 		}
 	}
@@ -270,7 +269,7 @@ public class InsightsGeneralParser implements InsightsWebhookParserInterface {
 				LOG.error(" Data Enrichment source property not found in extracted data json ");
 			}
 		} catch (Exception e) {
-			LOG.error(" Error while processDataEnrichment {} ", e);
+			LOG.error(" Error while processDataEnrichment ", e);
 			throw e;
 		}
 	}

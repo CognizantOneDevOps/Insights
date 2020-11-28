@@ -28,14 +28,15 @@ import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformdal.core.BaseDAL;
 
 public class SettingsConfigurationDAL extends BaseDAL {
-	
+	public static final String SETTINGCONFIGURATIONQUERY= "FROM SettingsConfiguration SC WHERE SC.settingsType = :settingsType";
+	public static final String SETTINGSTYPE="settingsType";
 	private static Logger log = LogManager.getLogger(SettingsConfigurationDAL.class.getName());
 
 	public Boolean saveSettingsConfiguration(SettingsConfiguration settingsConfiguration) {
 		Query<SettingsConfiguration> createQuery = getSession().createQuery(
-				"FROM SettingsConfiguration SC WHERE SC.settingsType = :settingsType",
+				SETTINGCONFIGURATIONQUERY,
 				SettingsConfiguration.class);
-		createQuery.setParameter("settingsType", settingsConfiguration.getSettingsType());
+		createQuery.setParameter(SETTINGSTYPE, settingsConfiguration.getSettingsType());
 		List<SettingsConfiguration> resultList = createQuery.getResultList();
 		SettingsConfiguration settingsConfig = null;
 		if(resultList != null && !resultList.isEmpty()){
@@ -60,8 +61,8 @@ public class SettingsConfigurationDAL extends BaseDAL {
 	}
 
 	public SettingsConfiguration loadSettingsConfiguration(String settingsType) {
-		Query<SettingsConfiguration> loadQuery = getSession().createQuery("FROM SettingsConfiguration SC WHERE SC.settingsType = :settingsType", SettingsConfiguration.class);
-		loadQuery.setParameter("settingsType", settingsType);
+		Query<SettingsConfiguration> loadQuery = getSession().createQuery(SETTINGCONFIGURATIONQUERY, SettingsConfiguration.class);
+		loadQuery.setParameter(SETTINGSTYPE, settingsType);
 		List<SettingsConfiguration> results = loadQuery.getResultList();
 		SettingsConfiguration settingsConfiguration = null;
 		if (results != null && !results.isEmpty()) {
@@ -74,9 +75,9 @@ public class SettingsConfigurationDAL extends BaseDAL {
 	
 	public String getSettingsJsonObject(String settingsType) {
 		Query<SettingsConfiguration> createQuery = getSession().createQuery(
-				"FROM SettingsConfiguration SC WHERE SC.settingsType = :settingsType",
+				SETTINGCONFIGURATIONQUERY,
 				SettingsConfiguration.class);
-		createQuery.setParameter("settingsType",settingsType );
+		createQuery.setParameter(SETTINGSTYPE,settingsType );
 		List<SettingsConfiguration> results = createQuery.getResultList();
 		SettingsConfiguration settingsConfiguration = null;
 		if (results != null && !results.isEmpty()) {

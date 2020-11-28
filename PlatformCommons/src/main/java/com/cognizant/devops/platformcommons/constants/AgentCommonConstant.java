@@ -13,15 +13,19 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  ******************************************************************************/
-package com.cognizant.devops.platformreports.assessment.pdf;
+package com.cognizant.devops.platformcommons.constants;
 
-import com.cognizant.devops.platformreports.assessment.datamodel.InsightsAssessmentConfigurationDTO;
-
-public class D3ChartHandler implements BasePDFProcessor{
-
-	@Override
-	public void generatePDF(InsightsAssessmentConfigurationDTO assessmentReportDTO) {
-		throw new UnsupportedOperationException();
-	}
-
+public interface AgentCommonConstant {
+	String ACTION = "action";
+	String AGENT_TOOL_NAME = "agentToolName";
+	String OSTYPE = "osType";
+	String AGENTID = "agentId";
+	String ZIPEXTENSION = ".zip";
+	String SUCCESS = "SUCCESS";
+	String CONFIG = "config.json";
+	String AGENTS = "/agents/";
+	String AGENTKEY = "agentKey";
+	String TOOLCATEGORY = "toolCategory";
+	String TOOLNAME = "toolName";
+	String CATEGORY= "category";
 }

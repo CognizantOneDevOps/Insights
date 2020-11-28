@@ -83,7 +83,7 @@ public class JWTAuthenticationProvider implements AuthenticationProvider {
 			Log.debug(" isTokenVarified  jwtClaimsSet are ==== {} ", jwtClaimsSet);
 		} catch (InsightsCustomException e) {
 			Log.error(e);
-			Log.error(" Exception while varifing token " + e.getMessage(), e);
+			Log.error(" Exception while varifing token {}", e.getMessage(), e);
 			throw new InsightsAuthenticationException(e.getMessage());
 		} catch (AuthenticationCredentialsNotFoundException e) {
 			Log.error(e);

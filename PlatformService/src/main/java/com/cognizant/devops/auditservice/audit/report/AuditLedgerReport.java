@@ -28,7 +28,6 @@ import javax.mail.internet.AddressException;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 
@@ -46,15 +45,14 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
-
 /**
  * 
  * Report generation by fetching records from NEO4J and HYPHERLEDGER.
  *
+ * @deprecated
  */
 @Deprecated
-public class AuditLedgerReport extends AuditReportStrategy{
-
+public class AuditLedgerReport extends AuditReportStrategy {
 
 	private static Logger log = LogManager.getLogger(AuditLedgerReport.class);
 
@@ -67,7 +65,7 @@ public class AuditLedgerReport extends AuditReportStrategy{
 	public static AuditLedgerReport getInstance() {
 		return auditLedgerReport;
 	}
-
+	
 	@Override
 	public boolean executeQuery(String fileContents, String pdfName, String subscribers) {
 		log.info("---Invoking Neo and ledger DB!---");
@@ -75,48 +73,48 @@ public class AuditLedgerReport extends AuditReportStrategy{
 		GraphDBHandler dbHandler = new GraphDBHandler();
 		try {
 
-			JsonParser jsonParser = new JsonParser(); 
+			JsonParser jsonParser = new JsonParser();
 			JsonElement jsonElements = jsonParser.parse(fileContents);
 			JsonObject jsonObject = jsonElements.getAsJsonObject();
 			String cypherQuery = jsonObject.get("queryname").getAsString();
-			log.info("Cypher query from File = "+cypherQuery);
-			if(!keywordCheck(cypherQuery)){
+			log.info("Cypher query from File = {} ", cypherQuery);
+			if (!keywordCheck(cypherQuery)) {
 				GraphResponse cypherResponse = dbHandler.executeCypherQuery(cypherQuery);
 				JsonObject cypherResponseJson = cypherResponse.getJson();
-				log.info("cypherResponseJson = "+cypherResponseJson);
+				log.info("cypherResponseJson = {} ",cypherResponseJson);
 				try {
-					JsonArray dataArray = cypherResponse.getJson()
-							.get("results").getAsJsonArray().get(0).getAsJsonObject()
-							.get("data").getAsJsonArray();
+					JsonArray dataArray = cypherResponse.getJson().get("results").getAsJsonArray().get(0)
+							.getAsJsonObject().get("data").getAsJsonArray();
 
-					if(dataArray.size()>0){
-						log.info("Total Assets  = "+dataArray.size());
-						List<JsonObject> ledgerList = new ArrayList<JsonObject>();
-						for(int i=0;i<dataArray.size();i++) {
-							JsonArray rowArray = dataArray.get(i).getAsJsonObject()
-									.get("row").getAsJsonArray();
+					if (dataArray.size() > 0) {
+						log.info("Total Assets  = %n", dataArray.size());
+						List<JsonObject> ledgerList = new ArrayList<>();
+						for (int i = 0; i < dataArray.size(); i++) {
+							JsonArray rowArray = dataArray.get(i).getAsJsonObject().get("row").getAsJsonArray();
 
-							for(JsonElement element : rowArray) {
-								log.info("Fetching Massage data for -- "+element.getAsJsonObject());
+							for (JsonElement element : rowArray) {
+								log.info("Fetching Massage data for -- {}  ", element.getAsJsonObject());
 								RestructureDataUtil restructureDataUtil = new RestructureDataUtil();
 								JsonObject msgData = restructureDataUtil.massageData(element.getAsJsonObject());
-								log.info("Massage Data  ---"+msgData);
-
+								log.info("Massage Data  ---{}",msgData);
 								for (Map.Entry<String, JsonElement> property : msgData.entrySet()) {
-									if(property.getKey().contains("AssetID")){
-										log.info("AssetID from json = "+property.getKey());
+									if (property.getKey().contains("AssetID")) {
+										log.info("AssetID from json = %n", property.getKey());
 										String assetId = msgData.get(property.getKey()).getAsString();
-										log.info("AssetID = "+assetId);
-										String url = ApplicationConfigProvider.getInstance().getInsightsServiceURL()+"/PlatformService/traceability/getAssetHistory?assetId="+assetId;
-										String ledgerresponse = SystemStatus.jerseyGetClientWithAuthentication(url, ApplicationConfigProvider.getInstance().getUserId(), ApplicationConfigProvider.getInstance().getPassword(), null);
-										log.info("Ledgerresponse from couch = "+ledgerresponse);
-										JsonObject jp = new JsonParser().parse(ledgerresponse).getAsJsonObject(); 
-										if("success".equalsIgnoreCase(jp.get("status").getAsString())){
-											
+										log.info("AssetID %n= ", assetId);
+										String url = ApplicationConfigProvider.getInstance().getInsightsServiceURL()
+												+ "/PlatformService/traceability/getAssetHistory?assetId=" + assetId;
+										String ledgerresponse = SystemStatus.jerseyGetClientWithAuthentication(url,
+												ApplicationConfigProvider.getInstance().getUserId(),
+												ApplicationConfigProvider.getInstance().getPassword(), null);
+										log.info("Ledgerresponse from couch = %n ", ledgerresponse);
+										JsonObject jp = new JsonParser().parse(ledgerresponse).getAsJsonObject();
+										if ("success".equalsIgnoreCase(jp.get("status").getAsString())) {
+
 											ledgerList.add(formatAssetId(ledgerresponse, assetId));
-											
-										}else{
-											log.info("Issue for asssetId -- "+assetId);
+
+										} else {
+											log.info("Issue for asssetId -- %n ", assetId);
 											log.info("-------------------------------------------------");
 										}
 									}
@@ -124,24 +122,24 @@ public class AuditLedgerReport extends AuditReportStrategy{
 							}
 						}
 						generateReport(pdfName, subscribers, ledgerList);
-						
-					}else{
-						log.info("-- No Records found !!" + cypherQuery );
+
+					} else {
+						log.info("-- No Records found !! {}", cypherQuery);
 					}
 				} catch (Exception ex) {
 					ex.printStackTrace();
 					log.info("exception");
-					log.error(cypherQuery + "  - Exception in getting ledger reponse -"+ ex);
-					return Boolean.FALSE; 
+					log.error(cypherQuery + "  - Exception in getting ledger reponse -", ex);
+					return Boolean.FALSE;
 				}
 
-			}else{
-				log.info("Aborting query from execute as it contains invalid keywords !!" + cypherQuery );
+			} else {
+				log.info("Aborting query from execute as it contains invalid keywords !! {}", cypherQuery);
 			}
 		} catch (InsightsCustomException e) {
 			log.error(e);
 			log.info("graph exception");
-			log.error(" - query processing failed"+ e);
+			log.error(" - query processing failed ", e);
 			return Boolean.FALSE;
 		}
 		return Boolean.TRUE;
@@ -150,51 +148,54 @@ public class AuditLedgerReport extends AuditReportStrategy{
 
 	private void generateReport(String pdfName, String subscribers, List<JsonObject> ledgerList)
 			throws AddressException, MessagingException, IOException {
-		log.info("LedgerList---"+ledgerList.size());
-		
-		if(ledgerList.size()>0){
+		log.info("LedgerList--- %n", ledgerList.size());
+
+		if (ledgerList.size() > 0) {
 			PdfTableUtil pdfTableUtil = new PdfTableUtil();
 			byte[] pdfResponse = pdfTableUtil.generateLedgerReport(ledgerList, pdfName);
 			HttpHeaders headers = new HttpHeaders();
 			headers.setContentType(MediaType.parseMediaType("application/pdf"));
 			headers.add("Access-Control-Allow-Methods", "POST");
 			headers.add("Access-Control-Allow-Headers", "Content-Type");
-			headers.add("Content-Disposition", "attachment; filename="+pdfName);
+			headers.add("Content-Disposition", "attachment; filename=" + pdfName);
 			headers.add("Cache-Control", "no-cache, no-store, must-revalidate,post-check=0, pre-check=0");
 			headers.add("Pragma", "no-cache");
 			headers.add("Expires", "0");
 			InputStream inputStream = new ByteArrayInputStream(pdfResponse);
 			sendReport(pdfName, inputStream, subscribers);
 			log.info("-------------------------------------------------");
-		}else{
+		} else {
 			log.info("No Records found!");
 		}
-		/*if(ledgerList.size()>0){
-			InputStream response = doPost(ApplicationConfigProvider.getInstance().getInsightsServiceURL()+"/PlatformAuditService/traceability/getAuditReport?pdfName="+pdfName,
-					"admin", "admin", null,ledgerList);
-			//log.info("pdfResponse = "+response);
-			sendReport(pdfName, response, subscribers);
-			log.info("-------------------------------------------------");
-		}*/
+		
+		/*
+		 * if(ledgerList.size()>0){ InputStream response =
+		 * doPost(ApplicationConfigProvider.getInstance().getInsightsServiceURL()+
+		 * "/PlatformAuditService/traceability/getAuditReport?pdfName="+pdfName,
+		 * "admin", "admin", null,ledgerList); //log.info("pdfResponse = "+response);
+		 * sendReport(pdfName, response, subscribers);
+		 * log.info("-------------------------------------------------"); }
+		 */
 	}
 
 	/**
 	 * Send Email .
+	 * 
 	 * @param pdfName
 	 * @param response
-	 * @throws IOException 
-	 * @throws MessagingException 
-	 * @throws AddressException 
+	 * @throws IOException
+	 * @throws MessagingException
+	 * @throws AddressException
 	 */
-	private void sendReport(String pdfName, InputStream response, String subscribers) throws AddressException, MessagingException, IOException
-	{
-		try{
+	private void sendReport(String pdfName, InputStream response, String subscribers)
+			throws AddressException, MessagingException, IOException {
+		try {
 			EmailUtil emailutil = new EmailUtil();
 			emailutil.sendEmailWithAttachment(response, pdfName, subscribers);
-		}catch(Exception e){
-			log.error(" -sendReport failed"+ e.getMessage());
-		}finally {
-			if(response!=null) {
+		} catch (Exception e) {
+			log.error(" -sendReport failed {}",e.getMessage());
+		} finally {
+			if (response != null) {
 				try {
 					response.close();
 				} catch (IOException e) {
@@ -206,44 +207,40 @@ public class AuditLedgerReport extends AuditReportStrategy{
 
 	/**
 	 * Addition of assetId key for pdf report.
+	 * 
 	 * @param ledgerresponse
-	 * @param parentAsset 
+	 * @param parentAsset
 	 * @param assetId
 	 * @return ledgerresponse
 	 */
 	private JsonObject formatAssetId(String ledgerresponse, String parentAsset) {
-		JsonParser jsonParser = new JsonParser(); 
+		JsonParser jsonParser = new JsonParser();
 		JsonElement jsonElements = jsonParser.parse(ledgerresponse);
 		JsonObject jsonObject = jsonElements.getAsJsonObject();
-		
+
 		Gson map = new Gson();
-		if("success".equalsIgnoreCase(jsonObject.get("status").getAsString())){
+		if ("success".equalsIgnoreCase(jsonObject.get("status").getAsString())) {
 			String assetId = "NA";
 			JsonArray dataArray = jsonObject.getAsJsonArray("data");
-			log.info("No of nodes = "+dataArray.size());
-			for(int i=0;i<dataArray.size();i++) {
+			log.info("No of nodes = %n", dataArray.size());
+			for (int i = 0; i < dataArray.size(); i++) {
 				JsonObject rowObject = jsonObject.getAsJsonArray("data").get(i).getAsJsonObject();
 				for (Map.Entry<String, JsonElement> property : rowObject.entrySet()) {
-					if(property.getKey().contains("AssetID")){
-						log.info("AssetID from json = "+property.getKey());
-						//log.info("rowObject.get(property.getKey()) = "+jsonObject.get(property.getKey()));
+					if (property.getKey().contains("AssetID")) {
+						log.info("AssetID from json = %n", property.getKey());
+						// log.info("rowObject.get(property.getKey()) =
 						assetId = rowObject.get(property.getKey()).getAsString();
-						log.info("AssetID = "+assetId);
+						log.info("AssetID = %n ", assetId);
 					}
 				}
 				rowObject.addProperty("assetID", assetId);
 				rowObject.addProperty("parentAsset", parentAsset);
 			}
-			log.info("Formatted Inputt for pdf = "+jsonObject);
-		}else{
+			log.info("Formatted Inputt for pdf = {} ", jsonObject);
+		} else {
 			log.info("Invalid Ledger response");
 		}
 		return jsonObject;
-		//Map<String, Object> map = new Gson().fromJson(jsonObject.toString(), HashMap.class);
-		//return map.fromJson(jsonObject.toString(), HashMap.class);
 	}
-
-
-
 
 }

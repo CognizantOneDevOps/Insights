@@ -85,7 +85,7 @@ public class WebHookDataSubscriber extends EngineSubscriberResponseHandler {
 							PlatformServiceConstants.FAILURE);
 				}
 			} else {
-				log.error(" No valid payload found for webhook {}  message {} ", this.webhookConfig.getWebHookName(),
+				log.error(" No valid payload found for webhook  message{} {} ", this.webhookConfig.getWebHookName(),
 						message);
 			}
 			log.debug(" {} webhook data processed successfully ", this.webhookConfig.getWebHookName());
@@ -119,7 +119,7 @@ public class WebHookDataSubscriber extends EngineSubscriberResponseHandler {
 				}
 			}
 		} catch (Exception e) {
-			log.error(" Error while featching DB record {} ", e);
+			log.error(" Error while featching DB record  ", e);
 		}
 	}
 

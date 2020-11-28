@@ -17,17 +17,17 @@ package com.cognizant.devops.platformdal.correlationConfig;
 
 import java.util.List;
 import org.hibernate.query.Query;
-
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformdal.core.BaseDAL;
 
 public class CorrelationConfigDAL extends BaseDAL {
-
+	 public static final String CORRELATION_CONFIGURATION_QUERY="FROM CorrelationConfiguration CC WHERE CC.relationName = :relationName";
+	public static final String RELATIONNAME="relationName";
 	public Boolean saveCorrelationConfig(CorrelationConfiguration saveCorrelationJson) throws InsightsCustomException {
 		Query<CorrelationConfiguration> createQuery = getSession().createQuery(
-				"FROM CorrelationConfiguration CC WHERE CC.relationName = :relationName",
+CORRELATION_CONFIGURATION_QUERY,
 				CorrelationConfiguration.class);
-		createQuery.setParameter("relationName", saveCorrelationJson.getRelationName());
+		createQuery.setParameter(RELATIONNAME, saveCorrelationJson.getRelationName());
 		List<CorrelationConfiguration> resultList = createQuery.getResultList();
 		if (!resultList.isEmpty()) {
 			throw new InsightsCustomException("Relation Name already exists.");
@@ -43,9 +43,9 @@ public class CorrelationConfigDAL extends BaseDAL {
 
 	public Boolean updateCorrelationConfig(String relationName, Boolean flag) throws InsightsCustomException {
 		Query<CorrelationConfiguration> createQuery = getSession().createQuery(
-				"FROM CorrelationConfiguration CC WHERE CC.relationName = :relationName",
+				CORRELATION_CONFIGURATION_QUERY,
 				CorrelationConfiguration.class);
-		createQuery.setParameter("relationName", relationName);
+		createQuery.setParameter(RELATIONNAME, relationName);
 		List<CorrelationConfiguration> resultList = createQuery.getResultList();
 		if (resultList.isEmpty()) {
 			throw new InsightsCustomException("Unable to update correlation.");
@@ -63,9 +63,9 @@ public class CorrelationConfigDAL extends BaseDAL {
 
 	public Boolean deleteCorrelationConfig(String relationName) throws InsightsCustomException{
 		Query<CorrelationConfiguration> createQuery = getSession().createQuery(
-				"FROM CorrelationConfiguration CC WHERE CC.relationName = :relationName",
+				CORRELATION_CONFIGURATION_QUERY,
 				CorrelationConfiguration.class);
-		createQuery.setParameter("relationName", relationName);
+		createQuery.setParameter(RELATIONNAME, relationName);
 		List<CorrelationConfiguration> resultList = createQuery.getResultList();
 		if (resultList.isEmpty()) {
 			throw new InsightsCustomException("Unable to update correlation.");

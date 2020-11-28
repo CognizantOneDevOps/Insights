@@ -35,6 +35,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
+import com.cognizant.devops.platformcommons.constants.InsightsAuditConstants;
 import com.cognizant.devops.platformcommons.core.util.SystemStatus;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -46,19 +47,13 @@ import com.google.gson.JsonParser;
  * Runs everyday Midnight to Fetch Query_builder table records .
  * 
  */
-@Deprecated
 @Component
 @Configuration
 @EnableScheduling
 public class AuditReportScheduler {
 
 	private static final Logger log = LoggerFactory.getLogger(AuditReportScheduler.class.getName());
-	
-	private static final String QUERY_BUILDER_FETCH_QUERIES = "/PlatformService/blockchain/queryBuilder/fetchQueries";
 	private static final SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
-	private static final String CYPHER = "CYPHER";
-	private static final String LEDGER = "LEDGER";
-
 	/**
 	 * <second> <minute> <hour> <day-of-month> <month> <day-of-week> <year>
 	 */
@@ -142,7 +137,7 @@ public class AuditReportScheduler {
 			if(element.getAsJsonObject().get("frequency").getAsString().equals(frequency)){
 
 				String reportname = element.getAsJsonObject().get("reportName").getAsString();
-				MDC.put("logFileName", reportname);
+				MDC.put(InsightsAuditConstants.LOGFILENAME, reportname);
 
 				log.info("-----------------------------------------------------------");
 				log.info("ReportData -- "+element);
@@ -154,17 +149,17 @@ public class AuditReportScheduler {
 				if(file.exists() && file.isFile()){
 					log.info("Query File is present!");
 					String fileContent = new String(Files.readAllBytes(Paths.get(file.getAbsolutePath())));
-					if(LEDGER.equals(querytype)){
+					if(InsightsAuditConstants.LEDGER.equals(querytype)){
 
 						AuditReportStrategy ledger = AuditLedgerReport.getInstance();
 						result = ledger.executeQuery(fileContent,URLEncoder.encode(reportname+".pdf","UTF-8"),subscribers);
-						reportStatus(result,LEDGER);
+						reportStatus(result,InsightsAuditConstants.LEDGER);
 
-					}else if(CYPHER.equals(querytype)){
+					}else if(InsightsAuditConstants.CYPHER.equals(querytype)){
 
 						AuditReportStrategy cypher = AuditCypherReport.getInstance();
 						result = cypher.executeQuery(fileContent,URLEncoder.encode(reportname+".pdf","UTF-8"),subscribers);
-						reportStatus(result,CYPHER);
+						reportStatus(result,InsightsAuditConstants.CYPHER);
 
 					}else{
 						log.error("No Such query type exists");
@@ -199,7 +194,7 @@ public class AuditReportScheduler {
 			String pwd = new String(password);
 			Arrays.fill(password, ' ');
 			String url = ApplicationConfigProvider.getInstance().getInsightsServiceURL()
-					+QUERY_BUILDER_FETCH_QUERIES;
+					+InsightsAuditConstants.QUERY_BUILDER_FETCH_QUERIES;
 			log.info("Report API - "+url);
 			String reports = SystemStatus.jerseyGetClientWithAuthentication(url, 
 					username == null ? "admin" : username, password== null ? "admin" : pwd, null);
@@ -241,17 +236,17 @@ public class AuditReportScheduler {
 				if(file.exists() && file.isFile()){
 					log.info("FIle Exists - "+file.exists());
 					String fileContent = new String(Files.readAllBytes(Paths.get(file.getAbsolutePath())));
-					if(LEDGER.equals(querytype)){
+					if(InsightsAuditConstants.LEDGER.equals(querytype)){
 
 						AuditReportStrategy ledger = AuditLedgerReport.getInstance();
 						result = ledger.executeQuery(fileContent,URLEncoder.encode(reportname+".pdf","UTF-8"),subscribers);
-						reportStatus(result,LEDGER);
+						reportStatus(result,InsightsAuditConstants.LEDGER);
 
-					}else if(CYPHER.equals(querytype)){
+					}else if(InsightsAuditConstants.CYPHER.equals(querytype)){
 
 						AuditReportStrategy cypher = AuditCypherReport.getInstance();
 						result = cypher.executeQuery(fileContent,URLEncoder.encode(reportname+".pdf","UTF-8"),subscribers);
-						reportStatus(result,CYPHER);
+						reportStatus(result,InsightsAuditConstants.CYPHER);
 
 					}else{
 						log.error("No Such query type exists");

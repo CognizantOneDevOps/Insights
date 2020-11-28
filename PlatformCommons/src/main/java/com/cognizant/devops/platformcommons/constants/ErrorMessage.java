@@ -16,10 +16,10 @@
 package com.cognizant.devops.platformcommons.constants;
 
 public interface ErrorMessage {
-	String CATEGORY_AND_TOOL_NAME_NOT_SPECIFIED = "Category name and tool name is not specified";
-	String DB_INSERTION_FAILED = "Failed to insert record in Databse";
-	String UNEXPECTED_ERROR = "Unexpected error occured";
-	String USERNAME_MISSING = "Missing Username";
-	String ROLES_MISSING = "Missing Roles";
-	String LAYOUT_SETTINGS_MISSING = "Layout settins are not specified";
+	 String CATEGORY_AND_TOOL_NAME_NOT_SPECIFIED = "Category name and tool name is not specified";
+	 String DB_INSERTION_FAILED = "Failed to insert record in Databse";
+	 String UNEXPECTED_ERROR = "Unexpected error occured";
+	 String USERNAME_MISSING = "Missing Username";
+	 String ROLES_MISSING = "Missing Roles";
+	 String LAYOUT_SETTINGS_MISSING = "Layout settings are not specified";
 }

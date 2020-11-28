@@ -37,7 +37,7 @@ public class InsightsKerberosServiceRequestToken extends AbstractAuthenticationT
 
 	private final byte[] token;
 
-	private final Object principal;
+	private final transient Object principal;
 
 	private final transient KerberosTicketValidation ticketValidation;
 

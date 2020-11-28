@@ -22,15 +22,17 @@ import com.cognizant.devops.platformregressiontest.test.common.ConfigOptionsTest
 import com.cognizant.devops.platformregressiontest.test.common.XLUtils;
 
 public class AgentTestData {
-
+	public static final String AGENT_REGISTRATION = "AgentRegistration";
+	public static final String  DELETE_AGENT= "DeleteAgent";
+	public static final String UPDATE_AGENT = "UpdateAgent";
 	@DataProvider(name = "agentdataprovider")
 	String[][] getAgentData() throws IOException {
 
 		String path = System.getenv().get(ConfigOptionsTest.INSIGHTS_HOME) + File.separator
 				+ ConfigOptionsTest.AUTO_DIR + File.separator + ConfigOptionsTest.TESTDATA_FILE;
 
-		int rowNum = XLUtils.getRowCount(path, "AgentRegistration");
-		int colNum = XLUtils.getCellCount(path, "AgentRegistration", 1);
+		int rowNum = XLUtils.getRowCount(path,  AGENT_REGISTRATION);
+		int colNum = XLUtils.getCellCount(path, AGENT_REGISTRATION, 1);
 
 		String agentData[][] = new String[rowNum][colNum];
 
@@ -38,7 +40,7 @@ public class AgentTestData {
 
 			for (int j = 0; j < colNum; j++) {
 
-				agentData[i - 1][j] = XLUtils.getCellData(path, "AgentRegistration", i, j);
+				agentData[i - 1][j] = XLUtils.getCellData(path, AGENT_REGISTRATION, i, j);
 
 			}
 		}
@@ -53,8 +55,8 @@ public class AgentTestData {
 		String path = System.getenv().get(ConfigOptionsTest.INSIGHTS_HOME) + File.separator
 				+ ConfigOptionsTest.AUTO_DIR + File.separator + ConfigOptionsTest.TESTDATA_FILE;
 
-		int rowNum = XLUtils.getRowCount(path, "UpdateAgent");
-		int colNum = XLUtils.getCellCount(path, "UpdateAgent", 1);
+		int rowNum = XLUtils.getRowCount(path, UPDATE_AGENT);
+		int colNum = XLUtils.getCellCount(path, UPDATE_AGENT, 1);
 
 		String updateAgentData[][] = new String[rowNum][colNum];
 
@@ -62,7 +64,7 @@ public class AgentTestData {
 
 			for (int j = 0; j < colNum; j++) {
 
-				updateAgentData[i - 1][j] = XLUtils.getCellData(path, "UpdateAgent", i, j);
+				updateAgentData[i - 1][j] = XLUtils.getCellData(path, UPDATE_AGENT, i, j);
 
 			}
 		}
@@ -77,8 +79,8 @@ public class AgentTestData {
 		String path = System.getenv().get(ConfigOptionsTest.INSIGHTS_HOME) + File.separator
 				+ ConfigOptionsTest.AUTO_DIR + File.separator + ConfigOptionsTest.TESTDATA_FILE;
 
-		int rowNum = XLUtils.getRowCount(path, "DeleteAgent");
-		int colNum = XLUtils.getCellCount(path, "DeleteAgent", 1);
+		int rowNum = XLUtils.getRowCount(path, DELETE_AGENT);
+		int colNum = XLUtils.getCellCount(path, DELETE_AGENT, 1);
 
 		String agentDeleteData[][] = new String[rowNum][colNum];
 
@@ -86,7 +88,7 @@ public class AgentTestData {
 
 			for (int j = 0; j < colNum; j++) {
 
-				agentDeleteData[i - 1][j] = XLUtils.getCellData(path, "DeleteAgent", i, j);
+				agentDeleteData[i - 1][j] = XLUtils.getCellData(path, DELETE_AGENT, i, j);
 
 			}
 		}

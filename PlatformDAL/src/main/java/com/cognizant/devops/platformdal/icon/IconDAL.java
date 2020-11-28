@@ -23,12 +23,14 @@ import com.cognizant.devops.platformdal.agentConfig.AgentConfig;
 import com.cognizant.devops.platformdal.core.BaseDAL;
 
 public class IconDAL extends BaseDAL {
+private static final String ICON_QUERY= "FROM Icon IC WHERE IC.iconId = :iconId";
+private static final String ICONID = "iconId";
 
 	public boolean addEntityData(Icon icon) {
 		Query<Icon> createQuery = getSession().createQuery(
-				"FROM Icon IC WHERE IC.iconId = :iconId",
+				ICON_QUERY,
 				Icon.class);
-		createQuery.setParameter("iconId", icon.getIconId());
+		createQuery.setParameter(ICONID, icon.getIconId());
 		List<Icon> resultList = createQuery.getResultList();
 		Icon iconImg = null;
 		if(resultList.size()>0){
@@ -51,8 +53,8 @@ public class IconDAL extends BaseDAL {
 	}
 
 	public Icon fetchEntityData(String iconId) {
-		Query<Icon> createQuery = getSession().createQuery("FROM Icon IC WHERE IC.iconId = :iconId", Icon.class);
-		createQuery.setParameter("iconId", iconId);
+		Query<Icon> createQuery = getSession().createQuery(ICON_QUERY, Icon.class);
+		createQuery.setParameter(ICONID, iconId);
 		Icon result = new Icon();
 		try {
 			List<Icon> resultList = createQuery.getResultList();
@@ -70,9 +72,9 @@ public class IconDAL extends BaseDAL {
 	
 	public boolean deleteEntityData(String iconId) {
 		Query<Icon> createQuery = getSession().createQuery(
-				"FROM Icon IC WHERE IC.iconId = :iconId",
+				ICON_QUERY,
 				Icon.class);
-		createQuery.setParameter("iconId", iconId);
+		createQuery.setParameter(ICONID, iconId);
 		Icon result = createQuery.getSingleResult();
 		getSession().beginTransaction();
 		getSession().delete(result);

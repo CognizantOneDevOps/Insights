@@ -28,6 +28,7 @@ import java.util.concurrent.RejectedExecutionException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import com.cognizant.devops.platformcommons.constants.AssessmentReportAndWorkflowConstants;
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
 import com.cognizant.devops.platformcommons.core.enums.WorkflowTaskEnum;
 import com.cognizant.devops.platformdal.assessmentreport.InsightsContentConfig;
@@ -55,6 +56,7 @@ import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
 
 public class ReportKPISubscriber extends WorkflowTaskSubscriberHandler {
+	
 	private static Logger log = LogManager.getLogger(ReportKPISubscriber.class.getName());
 
 	private WorkflowDAL workflowDAL = new WorkflowDAL();
@@ -97,7 +99,7 @@ public class ReportKPISubscriber extends WorkflowTaskSubscriberHandler {
 				reportsKPIConfigSet.forEach(reportKpi -> kpiConfigList.add(reportKpi.getKpiConfig()));
 			}
 			/* Execute Kpi */
-			log.debug("Worlflow Detail ==== ReportKPISubscriber before executeKPI {} ", kpiConfigList.size());
+			log.debug("Worlflow Detail ==== ReportKPISubscriber before executeKPI  ", kpiConfigList.size());
 			executeKPI(kpiConfigList, failedJobs);
 
 			if (!failedJobs.isEmpty()) {
@@ -105,18 +107,18 @@ public class ReportKPISubscriber extends WorkflowTaskSubscriberHandler {
 			}
 
 		} catch (InsightsJobFailedException e) {
-			log.error("Worlflow Detail ==== InsightsJobFailedException ==== {} ", e);
-			InsightsStatusProvider.getInstance().createInsightStatusNode("ReportKPI subscriber exception "+e.getMessage(),
+			log.error("Worlflow Detail ==== InsightsJobFailedException ==== ", e);
+			InsightsStatusProvider.getInstance().createInsightStatusNode("ReportKPI subscriber exception... "+e.getMessage(),
 					PlatformServiceConstants.FAILURE);
 			throw new InsightsJobFailedException("some of the Kpi's or Contents failed to execute " + e.getMessage());
 		} catch (RejectedExecutionException e) {
-			log.error("Worlflow Detail ==== RejectedExecutionException ==== {} ", e);
+			log.error("Worlflow Detail ==== RejectedExecutionException ====  ", e);
 			InsightsStatusProvider.getInstance().createInsightStatusNode("ReportKPI subscriber exception "+e.getMessage(),
 					PlatformServiceConstants.FAILURE);
 			throw new InsightsJobFailedException(
 					"some of the Kpi's or Contents failed to execute RejectedExecutionException " + e.getMessage());
 		} catch (Exception e) {
-			log.error("Worlflow Detail ==== handleTaskExecution ==== {} ", e);
+			log.error("Worlflow Detail ==== handleTaskExecution ==== ", e);
 			InsightsStatusProvider.getInstance().createInsightStatusNode("ReportKPI subscriber exception "+e.getMessage(),
 					PlatformServiceConstants.FAILURE);
 			throw new InsightsJobFailedException(
@@ -133,7 +135,7 @@ public class ReportKPISubscriber extends WorkflowTaskSubscriberHandler {
 		InsightsWorkflowExecutionHistory historyConfig = workflowDAL
 				.getWorkflowExecutionHistoryByHistoryId(incomingTaskMessage.get("exectionHistoryId").getAsInt());
 		JsonObject statusLog = new Gson().fromJson(historyConfig.getStatusLog(), JsonObject.class);
-		log.debug(" Worlflow Detail ====  extractKPIAndContentRetryList statusLog {} ", statusLog);
+		log.debug(" Worlflow Detail ====  extractKPIAndContentRetryList statusLog ", statusLog);
 		if (statusLog != null) {
 			Type type = new TypeToken<List<Integer>>() {
 			}.getType();
@@ -142,9 +144,9 @@ public class ReportKPISubscriber extends WorkflowTaskSubscriberHandler {
 			if (!kpiList.isEmpty()) {
 				kpiConfigList.addAll(reportConfigDAL.getActiveKPIConfigurationsBasedOnKPIId(kpiList));
 			}
-			contentList.addAll(gson.fromJson(statusLog.get("contentArray"), type));
+			contentList.addAll(gson.fromJson(statusLog.get(AssessmentReportAndWorkflowConstants.CONTENT_ARRAY), type));
 		} else {
-			log.error("Worlflow Detail ==== ReportKPISubscriber unable to parse retry message {} ", statusLog);
+			log.error("Worlflow Detail ==== ReportKPISubscriber unable to parse retry message ", statusLog);
 		}
 	}
 
@@ -203,11 +205,9 @@ public class ReportKPISubscriber extends WorkflowTaskSubscriberHandler {
 
 		for (List<Callable<JsonObject>> chunk : chunkList) {
 			List<Future<JsonObject>> chunkResponse = WorkflowThreadPool.getInstance().invokeAll(chunk);
-			//log.debug("Worlflow Detail ==== ReportKPISubscriber  chunk submmited to thread ");
 			for (Future<JsonObject> singleChunkResponse : chunkResponse) {
 				if (!singleChunkResponse.isCancelled()
 						&& !singleChunkResponse.get().get("Status").getAsString().equalsIgnoreCase("Success")) {
-					//log.debug("Worlflow Detail ==== ReportKPISubscriber chunk response thread ");
 					failedJobs.add(singleChunkResponse.get());
 				}
 
@@ -267,7 +267,7 @@ public class ReportKPISubscriber extends WorkflowTaskSubscriberHandler {
 		if (failedContentList.size() > 0) {
 			JsonObject contentObject = new JsonObject();
 			contentObject.addProperty("Status", "Failure");
-			contentObject.add("contentArray", failedContentList);
+			contentObject.add(AssessmentReportAndWorkflowConstants.CONTENT_ARRAY, failedContentList);
 			failedJobs.add(contentObject);
 		}
 
@@ -284,8 +284,8 @@ public class ReportKPISubscriber extends WorkflowTaskSubscriberHandler {
 			if (failedJob.has("kpiArray")) {
 				failedJob.get("kpiArray").getAsJsonArray().forEach(id -> kpiArray.add(id));
 
-			} else if (failedJob.has("contentArray")) {
-				failedJob.get("contentArray").getAsJsonArray().forEach(id -> contentArray.add(id));
+			} else if (failedJob.has(AssessmentReportAndWorkflowConstants.CONTENT_ARRAY)) {
+				failedJob.get(AssessmentReportAndWorkflowConstants.CONTENT_ARRAY).getAsJsonArray().forEach(id -> contentArray.add(id));
 
 			}
 		}
@@ -293,7 +293,7 @@ public class ReportKPISubscriber extends WorkflowTaskSubscriberHandler {
 		statusObject.addProperty("executionId", executionId);
 		statusObject.addProperty("workflowId", workflowConfig.getWorkflowId());
 		statusObject.add("kpiList", kpiArray);
-		statusObject.add("contentArray", contentArray);
+		statusObject.add(AssessmentReportAndWorkflowConstants.CONTENT_ARRAY, contentArray);
 		// statusLog set here which is class variable of WorkflowTaskSubscriberHandler
 		statusLog = new Gson().toJson(statusObject);
 		throw new InsightsJobFailedException("some of the Kpi's or Contents failed to execute");

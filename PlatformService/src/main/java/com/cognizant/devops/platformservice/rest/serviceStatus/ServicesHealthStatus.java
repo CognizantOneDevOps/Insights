@@ -22,7 +22,6 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -46,7 +45,7 @@ public class ServicesHealthStatus {
 	private static final String PLATFORM_SERVICE_VERSION_FILE = "version.properties";
 
 	static Logger log = LogManager.getLogger(ServicesHealthStatus.class.getName());
-	@GetMapping(value = "/getStatus", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+	@GetMapping(value = "/getStatus", produces = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
 	public JsonObject getHealthStatus() throws IOException{
 		JsonObject servicesHealthStatus = new JsonObject();
@@ -100,7 +99,7 @@ public class ServicesHealthStatus {
 		JsonObject jsonPlatformEngineStatus = getComponentStatus("PlatformEngine","");
 		servicesHealthStatus.add(ServiceStatusConstants.PlatformEngine, jsonPlatformEngineStatus);
 		
-		log.debug(" servicesHealthStatus "+servicesHealthStatus.toString());
+		log.debug(" servicesHealthStatus {}",servicesHealthStatus.toString());
 		return servicesHealthStatus;		
 	}
 	
@@ -122,7 +121,7 @@ public class ServicesHealthStatus {
 				
 				if( serviceResponse !=null && !("").equalsIgnoreCase(serviceResponse)){
 					strResponse = "Response successfully recieved from "+apiUrl;
-					log.info("response: "+serviceResponse);
+					log.info("response:{} ",serviceResponse);
 					
 					if(serviceType.equalsIgnoreCase(ServiceStatusConstants.Neo4j)) {
 						json=(JsonObject) jsonParser.parse(serviceResponse);
@@ -132,7 +131,7 @@ public class ServicesHealthStatus {
 						version="RabbitMq version "+json.get("rabbitmq_version").getAsString() + "\n Erlang version "+ json.get("erlang_version").getAsString();
 					}else if(serviceType.equalsIgnoreCase(ServiceStatusConstants.ES)) { //0
 						json=(JsonObject) jsonParser.parse(serviceResponse);
-						JsonObject versionElasticsearch=(JsonObject) json.get("version");
+						JsonObject versionElasticsearch=(JsonObject) json.get(VERSION);
 						if(versionElasticsearch!=null) {
 							version=versionElasticsearch.get("number").getAsString();
 						}
@@ -146,7 +145,7 @@ public class ServicesHealthStatus {
 					returnResponse= buildFailureResponse(strResponse, hostEndPoint, displayType,version);
 				}
 			} catch (Exception e) {
-				  log.error("Error while capturing health check at "+apiUrl,e);
+				  log.error("Error while capturing health check at {}",apiUrl,e);
 				  strResponse = "Error while capturing health check at "+apiUrl;
 				  returnResponse= buildFailureResponse(strResponse, hostEndPoint, displayType,version);
 			}
@@ -159,7 +158,7 @@ public class ServicesHealthStatus {
 		String strResponse  = "";
 		if(version.equalsIgnoreCase("") ) {
 			version=ServicesHealthStatus.class.getPackage().getSpecificationVersion();
-			log.info("message version =================== "+version);
+			log.info("message version {} =================== ",version);
 			strResponse = "Version captured as "+version;
 			return buildSuccessResponse(strResponse, hostEndPoint, type,version);	
 		}else {
@@ -199,11 +198,11 @@ public class ServicesHealthStatus {
 		try {
 			if(serviceType.equalsIgnoreCase("PlatformEngine")) {
 				graphResponse = loadHealthData("HEALTH:ENGINE");
-				log.debug(" graphResponse message arg 0  "+graphResponse);
+				log.debug(" graphResponse message arg 0 {} ",graphResponse);
 				if(graphResponse !=null ) {
 					if(graphResponse.getNodes().size() > 0 ) {
 						 successResponse=graphResponse.getNodes().get(0).getPropertyMap().get("message");;
-						 version=graphResponse.getNodes().get(0).getPropertyMap().get("version");
+						 version=graphResponse.getNodes().get(0).getPropertyMap().get(VERSION);
 						 status=graphResponse.getNodes().get(0).getPropertyMap().get("status");
 						if(status.equalsIgnoreCase(PlatformServiceConstants.SUCCESS)) {
 							returnObject=buildSuccessResponse(successResponse.toString(), "-", ServiceStatusConstants.Service,version);
@@ -220,13 +219,13 @@ public class ServicesHealthStatus {
 				}
 			}else if(serviceType.equalsIgnoreCase("PlatformInsightSpark")) {
 				serviceResponse=apiCallElasticsearch.search(apiUrl);
-				log.info(" PlatformInsightSpark service response "+serviceResponse);
+				log.info(" PlatformInsightSpark service response {}",serviceResponse);
 				graphResponse = loadHealthData("HEALTH:INSIGHTS");
-				log.debug(" graphResponse message arg 0  "+graphResponse);
+				log.debug(" graphResponse message arg 0 {} ",graphResponse);
 				if(graphResponse !=null ) {
 					if(graphResponse.getNodes().size() > 0 ) {
 						 successResponse=graphResponse.getNodes().get(0).getPropertyMap().get("message");;
-						 version=graphResponse.getNodes().get(0).getPropertyMap().get("version");
+						 version=graphResponse.getNodes().get(0).getPropertyMap().get(VERSION);
 						 status=graphResponse.getNodes().get(0).getPropertyMap().get("status");
 					}else {
 						successResponse="Node list is empty in response not received from Neo4j";
@@ -245,7 +244,7 @@ public class ServicesHealthStatus {
 				
 			}
 		} catch (Exception e) {
-			log.error("Error while getting component status "+e.getMessage());
+			log.error("Error while getting component status {}",e.getMessage());
 		}
 		return returnObject;
 	}

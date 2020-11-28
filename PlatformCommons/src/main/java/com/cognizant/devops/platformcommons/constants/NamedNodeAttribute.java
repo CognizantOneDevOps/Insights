@@ -16,6 +16,6 @@
 package com.cognizant.devops.platformcommons.constants;
 
 public interface NamedNodeAttribute {
-	String USER_INPUT = "userInput";
+	 String USER_INPUT = "userInput";
 
 }

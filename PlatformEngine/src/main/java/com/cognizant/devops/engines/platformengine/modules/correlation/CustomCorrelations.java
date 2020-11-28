@@ -168,7 +168,6 @@ public class CustomCorrelations {
 	private void correlateGitAndJira() {
 		GraphDBHandler dbHandler = new GraphDBHandler();
 		try {
-			//int dataBatchSize = 10;
 			String paginationCypher = "MATCH (source:GIT:RAW) where exists(source.jiraKeys) return count(source) as count";
 			GraphResponse paginationResponse = dbHandler.executeCypherQuery(paginationCypher);
 			int resultCount = paginationResponse.getJson().get("results").getAsJsonArray().get(0).getAsJsonObject().get("data")
@@ -285,4 +284,3 @@ public class CustomCorrelations {
 		}
 	}
 }
- 

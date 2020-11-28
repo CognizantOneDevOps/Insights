@@ -42,6 +42,7 @@ import com.google.gson.JsonParser;
 @RestController
 @RequestMapping("/admin/trainmodels")
 public class InsightsTrainModelController {
+	public static final String INFRASTRUCTURE_ERROR = "Infrastructure Error";
 	static Logger log = LogManager.getLogger(InsightsTrainModelController.class.getName());
 
 	@Autowired
@@ -99,7 +100,7 @@ public class InsightsTrainModelController {
 		} catch (Exception e) {
 			log.error(e.getMessage());
 			return new ResponseEntity<>(
-					PlatformServiceUtil.buildFailureResponseWithStatusCode("Infrastructure Error", "500"),
+					PlatformServiceUtil.buildFailureResponseWithStatusCode(INFRASTRUCTURE_ERROR, "500"),
 					HttpStatus.OK);
 		}
 
@@ -183,7 +184,7 @@ public class InsightsTrainModelController {
 			if (e.getMessage().equals("Usecase cannot be deleted as it is attached to kpi.")){
 				return new ResponseEntity<>(PlatformServiceUtil.buildFailureResponseWithStatusCode(e.getMessage(), "409"),HttpStatus.OK);
 			} else {
-				return new ResponseEntity<>(PlatformServiceUtil.buildFailureResponseWithStatusCode("Infrastructure Error", "500"),HttpStatus.OK);
+				return new ResponseEntity<>(PlatformServiceUtil.buildFailureResponseWithStatusCode(INFRASTRUCTURE_ERROR, "500"),HttpStatus.OK);
 			}
 		}
 		return new ResponseEntity<>(PlatformServiceUtil.buildSuccessResponseWithData(response), HttpStatus.OK);
@@ -205,7 +206,7 @@ public class InsightsTrainModelController {
 			return new ResponseEntity<>(PlatformServiceUtil.buildSuccessResponseWithData(response), HttpStatus.OK);
 		} catch (InsightsCustomException e) {
 			log.error(e.getMessage());
-			return new ResponseEntity<>(PlatformServiceUtil.buildFailureResponseWithStatusCode("Infrastructure Error", "500"),HttpStatus.OK);
+			return new ResponseEntity<>(PlatformServiceUtil.buildFailureResponseWithStatusCode(INFRASTRUCTURE_ERROR, "500"),HttpStatus.OK);
 		}
 
 	}

@@ -19,17 +19,17 @@ import java.util.List;
 
 import org.hibernate.query.Query;
 
+import com.cognizant.devops.platformcommons.constants.AgentCommonConstant;
 import com.cognizant.devops.platformdal.core.BaseDAL;
 import com.google.gson.JsonObject;
 
 public class ToolsLayoutDAL extends BaseDAL{
-	
 	public boolean saveToolLayout(String toolName, String toolCategory, JsonObject toolLayoutSettingJson) {
 		Query<ToolsLayout> createQuery = getSession().createQuery(
 				"FROM ToolsLayout a WHERE a.toolName = :toolName AND a.toolCategory = :toolCategory",
 				ToolsLayout.class);
-		createQuery.setParameter("toolName", toolName);
-		createQuery.setParameter("toolCategory", toolCategory);
+		createQuery.setParameter(AgentCommonConstant.TOOLNAME, toolName);
+		createQuery.setParameter(AgentCommonConstant.TOOLCATEGORY, toolCategory);
 		List<ToolsLayout> resultList = createQuery.getResultList();
 		ToolsLayout toolLayout = null;
 		if(resultList.size()>0){
@@ -56,8 +56,8 @@ public class ToolsLayoutDAL extends BaseDAL{
 		Query<ToolsLayout> createQuery = getSession().createQuery(
 				"FROM ToolsLayout TL WHERE TL.toolName = :toolName AND TL.toolCategory = :toolCategory",
 				ToolsLayout.class);
-		createQuery.setParameter("toolName", toolName);
-		createQuery.setParameter("toolCategory", toolCategory);
+		createQuery.setParameter(AgentCommonConstant.TOOLNAME, toolName);
+		createQuery.setParameter(AgentCommonConstant.TOOLCATEGORY, toolCategory);
 		ToolsLayout toolLayout = null;
 		try{
 			toolLayout = createQuery.getSingleResult();
@@ -83,8 +83,8 @@ public class ToolsLayoutDAL extends BaseDAL{
 		Query<ToolsLayout> createQuery = getSession().createQuery(
 				"FROM ToolsLayout TL WHERE TL.toolName = :toolName AND TL.toolCategory = :toolCategory",
 				ToolsLayout.class);
-		createQuery.setParameter("toolName", toolName);
-		createQuery.setParameter("toolCategory", toolCategory);
+		createQuery.setParameter(AgentCommonConstant.TOOLNAME, toolName);
+		createQuery.setParameter(AgentCommonConstant.TOOLCATEGORY, toolCategory);
 		ToolsLayout toolLayout = createQuery.getSingleResult();
 		getSession().beginTransaction();
 		getSession().delete(toolLayout);

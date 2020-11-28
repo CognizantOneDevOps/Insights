@@ -207,13 +207,12 @@ public class BusinessMappingServiceImpl implements BusinessMappingService {
 					+ "SET n = properties"; // DATATAGGING
 			JsonParser parser = new JsonParser();
 			JsonObject json = (JsonObject) parser.parse(validatedResponse);
-			log.debug("arg0  " + json);
+			log.debug("arg0 {} ", json);
 			nodeProperties.add(json);
 			JsonObject graphResponse = dbHandler.bulkCreateNodes(nodeProperties, null, query);
 			if (graphResponse.get(DatataggingConstants.RESPONSE).getAsJsonObject().get(DatataggingConstants.ERRORS)
 					.getAsJsonArray().size() > 0) {
 				log.error(graphResponse);
-				// return "success";
 			}
 		} catch (InsightsCustomException e) {
 			log.error(e);
@@ -232,7 +231,7 @@ public class BusinessMappingServiceImpl implements BusinessMappingService {
 		try {
 			response = dbHandler.executeCypherQuery(query);
 			int size = response.getNodes().size();
-			log.debug("arg0  size " + size);
+			log.debug("arg0 size {}", size);
 			for (int i = 0; i < size; i++) {
 				propertyList.add(response.getNodes().get(i).getPropertyMap());
 			}
@@ -252,13 +251,13 @@ public class BusinessMappingServiceImpl implements BusinessMappingService {
 			JsonParser parser = new JsonParser();
 			JsonObject json = (JsonObject) parser.parse(validatedResponse);
 			String uuid = json.get("uuid").getAsString();
-			log.debug("arg0 uuid  " + uuid);
+			log.debug("arg0 {} uuid  ", uuid);
 			JsonArray asJsonArray = getCurrentRecords(uuid, dbHandler);
-			log.debug("arg0  " + asJsonArray);
+			log.debug("arg0 {} ", asJsonArray);
 			String replaceString = agentMappingJson.replaceAll("\\\"(\\w+)\\\"\\:", "$1:");
 			String updateCypherQuery = " MATCH (n :METADATA:BUSINESSMAPPING {uuid:'" + uuid + "'})SET n ="
 					+ replaceString + " RETURN n";
-			log.debug("to replace" + updateCypherQuery);
+			log.debug("to {} replace", updateCypherQuery);
 			GraphResponse updateGraphResponse = dbHandler.executeCypherQuery(updateCypherQuery);
 			log.debug(updateGraphResponse);
 		} catch (Exception e) {

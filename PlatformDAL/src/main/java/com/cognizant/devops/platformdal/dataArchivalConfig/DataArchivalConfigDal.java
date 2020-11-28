@@ -27,7 +27,9 @@ import com.cognizant.devops.platformdal.core.BaseDAL;
 
 
 public class DataArchivalConfigDal extends BaseDAL {
-	
+	private static final String INSIGHTSDATAARCHIVALCONFIG_QUERY ="FROM InsightsDataArchivalConfig DA WHERE ";
+		private static final String ARCHIVALNAME ="archivalName";
+		private static final String DA_ARCHIVALNAME="DA.archivalName = :archivalName";
 	/**
 	 * Method to save Data archival record
 	 * 
@@ -36,9 +38,9 @@ public class DataArchivalConfigDal extends BaseDAL {
 	 * @throws InsightsCustomException
 	 */
 	public Boolean saveDataArchivalConfiguration(InsightsDataArchivalConfig dataArchivalConfig) throws InsightsCustomException {
-		Query<InsightsDataArchivalConfig> createQuery = getSession().createQuery("FROM InsightsDataArchivalConfig DA WHERE "
-				+ "DA.archivalName = :archivalName ",InsightsDataArchivalConfig.class);
-		createQuery.setParameter("archivalName", dataArchivalConfig.getArchivalName());
+		Query<InsightsDataArchivalConfig> createQuery = getSession().createQuery(INSIGHTSDATAARCHIVALCONFIG_QUERY
+				+ DA_ARCHIVALNAME,InsightsDataArchivalConfig.class);
+		createQuery.setParameter(ARCHIVALNAME, dataArchivalConfig.getArchivalName());
 		List<InsightsDataArchivalConfig> resultList = createQuery.getResultList();
 		if (!resultList.isEmpty()) {
 			throw new InsightsCustomException("Archival Name already exists.");
@@ -59,9 +61,9 @@ public class DataArchivalConfigDal extends BaseDAL {
 	 * @return InsightsDataArchivalConfig object
 	 */
 	public InsightsDataArchivalConfig getSpecificArchivalRecord(String archivalName) {
-		Query<InsightsDataArchivalConfig> createQuery = getSession().createQuery("FROM InsightsDataArchivalConfig DA WHERE "
-				+ "DA.archivalName = :archivalName ",InsightsDataArchivalConfig.class);
-		createQuery.setParameter("archivalName", archivalName);
+		Query<InsightsDataArchivalConfig> createQuery = getSession().createQuery(INSIGHTSDATAARCHIVALCONFIG_QUERY
+				+ DA_ARCHIVALNAME,InsightsDataArchivalConfig.class);
+		createQuery.setParameter(ARCHIVALNAME, archivalName);
 		InsightsDataArchivalConfig result = createQuery.uniqueResult();
 		terminateSession();
 		terminateSessionFactory();
@@ -104,9 +106,9 @@ public class DataArchivalConfigDal extends BaseDAL {
 	 * @return Boolean
 	 */
 	public Boolean deleteArchivalRecord(String archivalName) {
-		Query<InsightsDataArchivalConfig> createQuery = getSession().createQuery("FROM InsightsDataArchivalConfig DA WHERE "
-				+ "DA.archivalName = :archivalName",InsightsDataArchivalConfig.class);
-		createQuery.setParameter("archivalName", archivalName);
+		Query<InsightsDataArchivalConfig> createQuery = getSession().createQuery(INSIGHTSDATAARCHIVALCONFIG_QUERY
+				+ DA_ARCHIVALNAME,InsightsDataArchivalConfig.class);
+		createQuery.setParameter(ARCHIVALNAME, archivalName);
 		InsightsDataArchivalConfig dataArchivalConfig = createQuery.getSingleResult();
 		getSession().beginTransaction();
 		getSession().delete(dataArchivalConfig);
@@ -124,9 +126,9 @@ public class DataArchivalConfigDal extends BaseDAL {
 	 * @return Boolean
 	 */
 	public Boolean updateArchivalStatus(String archivalName, String status) {
-		Query<InsightsDataArchivalConfig> createQuery = getSession().createQuery("FROM InsightsDataArchivalConfig DA WHERE "
-				+ "DA.archivalName = :archivalName",InsightsDataArchivalConfig.class);
-		createQuery.setParameter("archivalName", archivalName);
+		Query<InsightsDataArchivalConfig> createQuery = getSession().createQuery(INSIGHTSDATAARCHIVALCONFIG_QUERY
+				+ DA_ARCHIVALNAME,InsightsDataArchivalConfig.class);
+		createQuery.setParameter(ARCHIVALNAME, archivalName);
 		InsightsDataArchivalConfig updateStatus = createQuery.getSingleResult();
 		updateStatus.setStatus(status);
 		getSession().beginTransaction();
@@ -145,9 +147,9 @@ public class DataArchivalConfigDal extends BaseDAL {
 	 * @return Boolean 
 	 */
 	public Boolean updateArchivalSourceUrl(String archivalName, String sourceUrl) {
-		Query<InsightsDataArchivalConfig> createQuery = getSession().createQuery("FROM InsightsDataArchivalConfig DA WHERE "
-				+ "DA.archivalName = :archivalName",InsightsDataArchivalConfig.class);
-		createQuery.setParameter("archivalName", archivalName);
+		Query<InsightsDataArchivalConfig> createQuery = getSession().createQuery(INSIGHTSDATAARCHIVALCONFIG_QUERY
+				+ DA_ARCHIVALNAME,InsightsDataArchivalConfig.class);
+		createQuery.setParameter(ARCHIVALNAME, archivalName);
 		InsightsDataArchivalConfig updateSourceUrl = createQuery.uniqueResult();
 		if (updateSourceUrl != null) {
 			updateSourceUrl.setSourceUrl(sourceUrl);

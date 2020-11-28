@@ -18,58 +18,56 @@ package com.cognizant.devops.platformservice.rest.datatagging.model;
 import java.util.ArrayList;
 import java.util.List;
 
-@Deprecated
 public class Node implements Comparable<Node> {
 
-    private Node parent = null;
+	private Node parent = null;
 
-    private List<Node> children;
+	private List<Node> children;
 
-    private String name;
+	private String name;
 
-    private int id = -1;
+	private int id = -1;
 
-    public Node(Node parent, int id, String name) {
-        this.parent = parent;
-        this.children = new ArrayList<>();
-        this.name = name;
-        this.id = id;
-    }
+	public Node(Node parent, int id, String name) {
+		this.parent = parent;
+		this.children = new ArrayList<>();
+		this.name = name;
+		this.id = id;
+	}
 
-    public int getId() {
-        return this.id;
-    }
+	public int getId() {
+		return this.id;
+	}
 
-    public String getName() {
-        return this.name;
-    }
+	public String getName() {
+		return this.name;
+	}
 
-    public void addChild(Node child) {
-        children.add(child);
-    }
+	public void addChild(Node child) {
+		children.add(child);
+	}
 
-    public List<Node> getChildren() {
-        return children;
-    }
+	public List<Node> getChildren() {
+		return children;
+	}
 
-    public boolean isRoot() {
-        return (this.parent == null);
-    }
+	public boolean isRoot() {
+		return (this.parent == null);
+	}
 
-    @Override
-    public String toString() {
-        return  name;
-    }
+	@Override
+	public String toString() {
+		return name;
+	}
 
-	
-    public Node getChild(Node childNode) {
+	public Node getChild(Node childNode) {
 		for (Node node : children) {
-			if (node.compareTo(childNode)== 0) {
+			if (node.compareTo(childNode) == 0) {
 				return node;
 			}
 		}
 		return null;
-    }
+	}
 
 	@Override
 	public int compareTo(Node node) {
@@ -116,6 +114,4 @@ public class Node implements Comparable<Node> {
 		return true;
 	}
 
-	
 }
-

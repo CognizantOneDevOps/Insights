@@ -15,29 +15,17 @@
  ******************************************************************************/
 package com.cognizant.devops.platformservice.correlationbuilder.service;
 
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Stream;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Service;
-import com.cognizant.devops.platformcommons.constants.ConfigOptions;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformdal.correlationConfig.CorrelationConfigDAL;
 import com.cognizant.devops.platformdal.correlationConfig.CorrelationConfiguration;
 import com.google.gson.Gson;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonIOException;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import com.google.gson.JsonSyntaxException;
 
 @Service("correlationBuilderService")
 public class CorrelationBuilderServiceImpl implements CorrelationBuilderService {
@@ -50,7 +38,7 @@ public class CorrelationBuilderServiceImpl implements CorrelationBuilderService 
 		try {
 			correlationList = correlationConfigDAL.getAllCorrelations();
 		} catch (Exception e) {
-			log.error("Error getting all relationShips", e.getMessage());
+			log.error("Error getting all relationShips {}", e.getMessage());
 			throw new InsightsCustomException(e.getMessage());
 		}
 		return correlationList;

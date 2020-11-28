@@ -45,7 +45,7 @@ public class InsightsInferenceDetail implements Serializable {
 	private long executionId;
 	private String inferenceText;
 	private String resultField;
-	private List<ResultSetModel> resultSet = new ArrayList<>(0);
+	private transient  List<ResultSetModel> resultSet = new ArrayList<>(0);
 
 	public void setKpiId(Long kpiId) {
 		this.kpiId = kpiId;

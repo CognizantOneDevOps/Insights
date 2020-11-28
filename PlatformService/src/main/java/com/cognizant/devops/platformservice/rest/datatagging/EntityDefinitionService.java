@@ -20,9 +20,8 @@ import java.util.List;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -37,7 +36,7 @@ import com.google.gson.JsonObject;
 public class EntityDefinitionService {
 	static Logger log = LogManager.getLogger(GraphDBService.class.getName());
 
-	@RequestMapping(value = "/fetchAllEntityDefinition", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+	@GetMapping(value = "/fetchAllEntityDefinition", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 	public @ResponseBody JsonObject fetchAllEntityDefinition() {
 		EntityDefinitionDAL entityDefinitionDAL = new EntityDefinitionDAL();
 		List<EntityDefinition> results = entityDefinitionDAL.fetchAllEntityDefination();

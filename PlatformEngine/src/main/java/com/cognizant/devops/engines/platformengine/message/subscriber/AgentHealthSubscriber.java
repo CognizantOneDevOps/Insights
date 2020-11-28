@@ -25,6 +25,7 @@ import org.apache.logging.log4j.Logger;
 
 import com.cognizant.devops.engines.platformengine.message.core.EngineStatusLogger;
 import com.cognizant.devops.engines.platformengine.message.factory.EngineSubscriberResponseHandler;
+import com.cognizant.devops.platformcommons.constants.AgentCommonConstant;
 import com.cognizant.devops.platformcommons.constants.MQMessageConstants;
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBHandler;
@@ -37,6 +38,7 @@ import com.rabbitmq.client.AMQP.BasicProperties;
 import com.rabbitmq.client.Envelope;
 
 public class AgentHealthSubscriber extends EngineSubscriberResponseHandler {
+	public static final String CREATE = " CREATE (new";
 	private static Logger log = LogManager.getLogger(AgentHealthSubscriber.class.getName());
 	GraphDBHandler dbHandler = new GraphDBHandler();
 
@@ -66,9 +68,9 @@ public class AgentHealthSubscriber extends EngineSubscriberResponseHandler {
 						if (jsonObject.has("agentId")) {
 							agentId = jsonObject.get("agentId").getAsString();
 						}
-						if (jsonObject.has("toolName")) {
-							toolName = jsonObject.get("toolName").getAsString();
-							jsonObject.addProperty("toolName", toolName);
+						if (jsonObject.has(AgentCommonConstant.TOOLNAME)) {
+							toolName = jsonObject.get(AgentCommonConstant.TOOLNAME).getAsString();
+							jsonObject.addProperty(AgentCommonConstant.TOOLNAME, toolName);
 							categoryName = jsonObject.get("categoryName").getAsString();
 							jsonObject.addProperty("category", categoryName);
 						}
@@ -76,7 +78,7 @@ public class AgentHealthSubscriber extends EngineSubscriberResponseHandler {
 						else {
 							if (labels.size() > 1) {
 								jsonObject.addProperty("category", labels.get(0));
-								jsonObject.addProperty("toolName", labels.get(1));
+								jsonObject.addProperty(AgentCommonConstant.TOOLNAME, labels.get(1));
 							}
 						}
 						/**
@@ -131,7 +133,7 @@ public class AgentHealthSubscriber extends EngineSubscriberResponseHandler {
 			healthQuery = healthQuery + " where old.agentId='" + agentId + "' or old.agentId is null";
 			healthQuery = healthQuery + " OPTIONAL MATCH (old) <-[:UPDATED_TO*" + nodeCount
 					+ "]-(purge)  where old.agentId='" + agentId + "'";
-			healthQuery = healthQuery + " CREATE (new" + nodeLabels + " {props}) ";
+			healthQuery = healthQuery + CREATE + nodeLabels + " {props}) ";
 			healthQuery = healthQuery + " MERGE  (new)<-[r:UPDATED_TO]-(old)";
 			healthQuery = healthQuery + " REMOVE old:" + latestLabel;
 			healthQuery = healthQuery + " detach delete purge ";
@@ -142,7 +144,7 @@ public class AgentHealthSubscriber extends EngineSubscriberResponseHandler {
 		else {
 			healthQuery = "Match (old" + nodeLabels + ")";
 			healthQuery = healthQuery + " OPTIONAL MATCH (old) <-[:UPDATED_TO*" + nodeCount + "]-(purge) ";
-			healthQuery = healthQuery + " CREATE (new" + nodeLabels + " {props})";
+			healthQuery = healthQuery + CREATE + nodeLabels + " {props})";
 			healthQuery = healthQuery + " MERGE  (new)<-[r:UPDATED_TO]-(old)";
 			healthQuery = healthQuery + " REMOVE old:" + latestLabel;
 			healthQuery = healthQuery + " detach delete purge ";
@@ -153,11 +155,11 @@ public class AgentHealthSubscriber extends EngineSubscriberResponseHandler {
 		if (graphResponse.get("response").getAsJsonObject().get("results").getAsJsonArray().get(0).getAsJsonObject()
 				.get("data").getAsJsonArray().size() == 0) {
 			healthQuery = "";
-			healthQuery = healthQuery + " CREATE (new" + nodeLabels + " {props})";
+			healthQuery = healthQuery + CREATE + nodeLabels + " {props})";
 			JsonObject graphResponse1 = dbHandler.executeQueryWithData(healthQuery, dataList);
 		}
 		if (graphResponse.get("response").getAsJsonObject().get("errors").getAsJsonArray().size() > 0) {
-			log.error("Unable to insert health nodes for routing key: " + routingKey + ", error occured: "
+			log.error("Unable to insert health nodes for routing key: " + routingKey + ", error occured:  "
 					+ graphResponse);
 			log.error(dataList);
 			EngineStatusLogger.getInstance().createEngineStatusNode(

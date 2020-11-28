@@ -24,6 +24,10 @@ public final class TraceabilityConstants {
 	public static final String DATAMODEL_FILE_NAME ="datamodel.json";
 	public static final String DATAMODEL_FOLDER_NAME=".InSights";
 	public static final String ENV_VAR_NAME="INSIGHTS_HOME";
+	public static final String RESULTS = "results";
+	public static final String ORDER = "order";
+	public static final String MESSAGES = "messages";
+	public static final String MESSAGE= "Message";
 	
 
 }

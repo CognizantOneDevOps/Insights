@@ -22,6 +22,8 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -46,7 +48,7 @@ public class InsightsAgentConfiguration {
 	@Autowired
 	AgentManagementService agentManagementService;
 
-	@RequestMapping(value = "/registerAgent", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+	@PostMapping(value = "/registerAgent",produces = MediaType.APPLICATION_JSON_VALUE)
 	public @ResponseBody JsonObject registerAgent(@RequestParam String toolName, @RequestParam String agentVersion,
 			@RequestParam String osversion, @RequestParam String configDetails, @RequestParam String trackingDetails) {
 		String message = null;
@@ -59,7 +61,7 @@ public class InsightsAgentConfiguration {
 		return PlatformServiceUtil.buildSuccessResponseWithData(message);
 	}
 
-	@RequestMapping(value = "/2.0/registerAgent", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+	@PostMapping(value = "/2.0/registerAgent",produces = MediaType.APPLICATION_JSON_VALUE)
 	public @ResponseBody JsonObject registerAgentV2(@RequestBody String registerAgentJson) {
 		String message = null;
 
@@ -82,7 +84,7 @@ public class InsightsAgentConfiguration {
 
 	}
 
-	@RequestMapping(value = "/uninstallAgent", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+	@PostMapping(value = "/uninstallAgent",produces = MediaType.APPLICATION_JSON_VALUE)
 	public @ResponseBody JsonObject uninstallAgent(@RequestParam String agentId, @RequestParam String toolName,
 			@RequestParam String osversion) {
 		String message = null;
@@ -94,7 +96,7 @@ public class InsightsAgentConfiguration {
 		return PlatformServiceUtil.buildSuccessResponseWithData(message);
 	}
 
-	@RequestMapping(value = "/updateAgent", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+	@PostMapping(value = "/updateAgent",produces = MediaType.APPLICATION_JSON_VALUE)
 	public @ResponseBody JsonObject updateAgent(@RequestParam String agentId, @RequestParam String configJson,
 			@RequestParam String toolName, @RequestParam String agentVersion, @RequestParam String osversion) {
 		String message = null;
@@ -106,7 +108,7 @@ public class InsightsAgentConfiguration {
 		return PlatformServiceUtil.buildSuccessResponseWithData(message);
 	}
 
-	@RequestMapping(value = "/2.0/updateAgent", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+	@PostMapping(value = "/2.0/updateAgent",produces = MediaType.APPLICATION_JSON_VALUE)
 	public @ResponseBody JsonObject updateAgent(@RequestBody String updateAgentJsonRequest) {
 		String message = null;
 		try {
@@ -127,7 +129,7 @@ public class InsightsAgentConfiguration {
 		return PlatformServiceUtil.buildSuccessResponseWithData(message);
 	}
 
-	@RequestMapping(value = "/startStopAgent", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+	@PostMapping(value = "/startStopAgent",produces = MediaType.APPLICATION_JSON_VALUE)
 	public @ResponseBody JsonObject startStopAgent(@RequestParam String agentId, @RequestParam String toolName,
 			@RequestParam String osversion, @RequestParam String action) {
 		String message = null;
@@ -139,7 +141,7 @@ public class InsightsAgentConfiguration {
 		return PlatformServiceUtil.buildSuccessResponseWithData(message);
 	}
 
-	@RequestMapping(value = "/getSystemAvailableAgentList", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+	@GetMapping(value = "/getSystemAvailableAgentList",produces = MediaType.APPLICATION_JSON_VALUE)
 	public @ResponseBody JsonObject getSystemAvailableAgentList() {
 		Map<String, ArrayList<String>> agentDetails;
 		try {
@@ -157,7 +159,7 @@ public class InsightsAgentConfiguration {
 		return PlatformServiceUtil.buildSuccessResponseWithData(agentDetails);
 	}
 
-	@RequestMapping(value = "/getToolRawConfigFile", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+	@GetMapping(value = "/getToolRawConfigFile",produces = MediaType.APPLICATION_JSON_VALUE)
 	public @ResponseBody JsonObject getToolRawConfigFile(@RequestParam String version, @RequestParam String tool) {
 		String details = null;
 		try {
@@ -168,7 +170,7 @@ public class InsightsAgentConfiguration {
 		return PlatformServiceUtil.buildSuccessResponseWithHtmlData(details);
 	}
 
-	@RequestMapping(value = "/getRegisteredAgents", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+	@GetMapping(value = "/getRegisteredAgents",produces = MediaType.APPLICATION_JSON_VALUE)
 	public @ResponseBody JsonObject getRegisteredAgents() {
 		List<AgentConfigTO> agentList;
 		try {
@@ -179,7 +181,7 @@ public class InsightsAgentConfiguration {
 		return PlatformServiceUtil.buildSuccessResponseWithData(agentList);
 	}
 
-	@RequestMapping(value = "/getRegisteredAgentDetail", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+	@GetMapping(value = "/getRegisteredAgentDetail",produces = MediaType.APPLICATION_JSON_VALUE)
 	public @ResponseBody JsonObject getAgentDetails(@RequestParam String agentId) {
 		AgentConfigTO agentDetails;
 		try {

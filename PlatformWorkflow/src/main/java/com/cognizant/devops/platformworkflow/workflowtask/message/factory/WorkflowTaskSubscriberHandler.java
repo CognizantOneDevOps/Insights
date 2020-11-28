@@ -23,6 +23,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
+import com.cognizant.devops.platformcommons.constants.AssessmentReportAndWorkflowConstants;
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
 import com.cognizant.devops.platformcommons.core.enums.WorkflowTaskEnum;
 import com.cognizant.devops.platformworkflow.workflowtask.core.InsightsStatusProvider;
@@ -43,7 +44,7 @@ public abstract class WorkflowTaskSubscriberHandler {
 	protected String statusLog = "{}";
 	WorkflowDataHandler workflowStateProcess;
 
-	public WorkflowTaskSubscriberHandler(String routingKey) throws Exception {
+	public WorkflowTaskSubscriberHandler(String routingKey) throws IOException {
 		engineSubscriberResponseHandler = this;
 		this.workflowStateProcess = new WorkflowDataHandler();
 		registerSubscriber(routingKey);
@@ -57,10 +58,11 @@ public abstract class WorkflowTaskSubscriberHandler {
 	 * @param routingKey
 	 * @throws Exception
 	 */
-	public void registerSubscriber(String routingKey) throws Exception {
-		try {
-			Channel channel = WorkflowTaskSubscriberFactory.getInstance().getConnection().createChannel();
-			String queueName = routingKey.replace(".", "_");
+	public void registerSubscriber(String routingKey) throws IOException {
+		
+			 channel = WorkflowTaskSubscriberFactory.getInstance().getConnection().createChannel();
+			try {
+				String queueName = routingKey.replace(".", "_");
 			channel.queueDeclare(queueName, true, false, false, null);
 			channel.queueBind(queueName, MQMessageConstants.EXCHANGE_NAME, routingKey);
 			channel.basicQos(ApplicationConfigProvider.getInstance().getMessageQueue().getPrefetchCount());
@@ -87,7 +89,7 @@ public abstract class WorkflowTaskSubscriberHandler {
 						workflowTaskPostProcesser(body, exectionHistoryId,
 								WorkflowTaskEnum.WorkflowStatus.COMPLETED.toString());
 					} catch (Exception e) {
-						log.error("Worlflow Detail ==== Error in handle delivery :", e);
+						log.error("Worlflow Detail ==== Error in handle delivery  ", e);
 						workflowTaskErrorHandler(body, exectionHistoryId);
 
 					} finally {
@@ -100,7 +102,7 @@ public abstract class WorkflowTaskSubscriberHandler {
 
 			channel.basicConsume(queueName, false, routingKey, consumer);
 		} catch (IOException e) {
-			log.error("Unable to registerSubscriber for routingKey {} error {} ", routingKey, e);
+			log.error("Unable to registerSubscriber for routingKey {} error ", routingKey, e);
 			InsightsStatusProvider.getInstance().createInsightStatusNode("In WorkflowTaskSubscriberHandler,Unable to registerSubscriber for routingKey "+routingKey+" error "+e.getMessage(),
 					PlatformServiceConstants.FAILURE);
 		}
@@ -169,7 +171,7 @@ public abstract class WorkflowTaskSubscriberHandler {
 			log.debug("Worlflow Detail ==== workflowTaskPostProcesser message handleDelivery ===== {} ", message);
 			Map<String, Object> requestMessage = WorkflowUtils.convertJsonObjectToMap(message);
 
-			workflowId = (String) requestMessage.get("workflowId");
+			workflowId = (String) requestMessage.get(AssessmentReportAndWorkflowConstants.WORKFLOW_ID);
 			// update complete time in INSIGHTS_WORKFLOW_EXECUTION_ENTITY
 			workflowStateProcess.updateWorkflowExecutionHistory(exectionHistoryId, status, statusLog);
 			// send message to next task
@@ -202,13 +204,13 @@ public abstract class WorkflowTaskSubscriberHandler {
 			String message = new String(body, MQMessageConstants.MESSAGE_ENCODING);
 			log.debug("Worlflow Detail ==== Error Handler  ===== {} ", message);
 			Map<String, Object> requestMessage = WorkflowUtils.convertJsonObjectToMap(message);
-			String workflowId = String.valueOf(requestMessage.get("workflowId"));
+			String workflowId = String.valueOf(requestMessage.get(AssessmentReportAndWorkflowConstants.WORKFLOW_ID));
 			workflowStateProcess.updateWorkflowExecutionHistory(exectionHistoryId,
 					WorkflowTaskEnum.WorkflowStatus.ERROR.toString(), statusLog);
 			workflowStateProcess.updateWorkflowDetails(workflowId, WorkflowTaskEnum.WorkflowTaskStatus.ERROR.toString(),
 					false);
 		} catch (Exception e) {
-			log.error("Worlflow Detail ====  unable to update history and workflow config", e);
+			log.error("Worlflow Detail ====  unable to update history and workflow config ", e);
 		}
 
 	}

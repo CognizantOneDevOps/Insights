@@ -24,6 +24,7 @@ import org.springframework.context.annotation.PropertySource;
 
 import com.cognizant.devops.platforminsightswebhook.config.WebHookConstants;
 
+
 @Configuration
 @ConfigurationProperties(prefix = "app")
 @PropertySource("file:${properties.basedir}/" + WebHookConstants.WEBHOOK_PROPERTY_FILE_NAME)

@@ -96,14 +96,13 @@ public class EmailUtil {
 			log.info("Sending Mail...");
 			// Connect to Mail server using the SMTP username and password specified .
 			transport.connect(emailConfiguration.getSmtpHostServer(), emailConfiguration.getSmtpUserName(), emailConfiguration.getSmtpPassword());
-			//transport.connect(HOST, SMTP_USERNAME, SMTP_PASSWORD);
 			// Send the email.
 			transport.sendMessage(msg, msg.getAllRecipients());
 			log.info("Email sent!");
 		}
 		catch (Exception ex) {
 			ex.printStackTrace();
-			log.error("Error message: " + ex.getMessage());
+			log.error("Error message: {}", ex.getMessage());
 		}
 		finally
 		{
@@ -135,7 +134,6 @@ public class EmailUtil {
 		MimeBodyPart bodyMessagePart = new MimeBodyPart();
 		bodyMessagePart.setContent(BODY, "text/html");
 		mp.addBodyPart(bodyMessagePart);
-		//msg.setContent(mp);
 	}
 
 	/**
@@ -150,13 +148,11 @@ public class EmailUtil {
 	 */
 	private MimeMessage messageInfo(Session session, String subscribers, String subject)
 			throws MessagingException, UnsupportedEncodingException, AddressException {
-		log.info("List of subscribers are = "+subscribers);
+		log.info("List of subscribers are {} = ",subscribers);
 		MimeMessage msg = new MimeMessage(session);
 		msg.setFrom(new InternetAddress(emailConfiguration.getMailFrom()));
-		//msg.setRecipient(Message.RecipientType.TO, new InternetAddress(subscribers));
 		msg.addRecipients(Message.RecipientType.TO, InternetAddress.parse(subscribers));
 		msg.setSubject(subject.substring(0,subject.indexOf(".")));
-		//msg.setContent(BODY,"text/html");
 		return msg;
 	}
 

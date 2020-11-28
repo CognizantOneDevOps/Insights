@@ -50,6 +50,7 @@ import com.rabbitmq.client.AMQP.BasicProperties;
 import com.rabbitmq.client.Envelope;
 
 public class AgentDataSubscriber extends EngineSubscriberResponseHandler {
+
 	private static Logger log = LogManager.getLogger(AgentDataSubscriber.class.getName());
 	GraphDBHandler dbHandler = new GraphDBHandler();
 
@@ -96,7 +97,7 @@ public class AgentDataSubscriber extends EngineSubscriberResponseHandler {
 		boolean enableOnlineDatatagging = ApplicationConfigProvider.getInstance().isEnableOnlineDatatagging();
 		String message = new String(body, MQMessageConstants.MESSAGE_ENCODING);
 		String routingKey = envelope.getRoutingKey();
-		log.debug("Routing key in data " + routingKey);
+		log.debug("Routing key in data {}", routingKey);
 		List<String> labels = new ArrayList<String>();
 		labels.add("RAW");
 		if (this.labelName == null) {
@@ -118,8 +119,8 @@ public class AgentDataSubscriber extends EngineSubscriberResponseHandler {
 			json = messageObject.get("data");
 			if (messageObject.has("metadata")) {
 				JsonObject metadata = messageObject.get("metadata").getAsJsonObject();
-				if (metadata.has("labels")) {
-					JsonArray additionalLabels = metadata.get("labels").getAsJsonArray();
+				if (metadata.has(AgentDataConstants.LABELS)) {
+					JsonArray additionalLabels = metadata.get(AgentDataConstants.LABELS).getAsJsonArray();
 					for (JsonElement additionalLabel : additionalLabels) {
 						String label = additionalLabel.getAsString();
 						if (!labels.contains(label)) {
@@ -194,18 +195,18 @@ public class AgentDataSubscriber extends EngineSubscriberResponseHandler {
 				for (List<JsonObject> chunk : partitionList) {
 					JsonObject graphResponse = dbHandler.bulkCreateNodes(chunk, labels, cypherQuery);
 					if (graphResponse.get("response").getAsJsonObject().get("errors").getAsJsonArray().size() > 0) {
-						log.error("Unable to insert nodes for routing key: " + routingKey + ", error occured: "
+						log.error("Unable to insert nodes for routing key: {} " + routingKey + ", error occured: "
 								+ graphResponse);
 					}
 				}
 				getChannel().basicAck(envelope.getDeliveryTag(), false);
 			} catch (ProcessingException e) {
-				log.error("ProcessingException occured {} ", e);
+				log.error("ProcessingException occured  ", e);
 				getChannel().basicNack(envelope.getDeliveryTag(), false, true);
 			} catch (InsightsCustomException e) {
-				log.error("InsightsCustomException occured {} ", e);
+				log.error("InsightsCustomException occured  ", e);
 			} catch (Exception e) {
-				log.error("Exception occured {} ", e);
+				log.error("Exception occured  ", e);
 			}
 		}
 	}
@@ -374,8 +375,8 @@ public class AgentDataSubscriber extends EngineSubscriberResponseHandler {
 		String relationName = relationMetadata.get("name").getAsString();
 		StringBuffer cypherQuery = new StringBuffer();
 		cypherQuery.append("UNWIND {props} AS properties MERGE (source").append(labels);
-		if (source.has("labels")) {
-			JsonArray sourceLabels = source.getAsJsonArray("labels");
+		if (source.has(AgentDataConstants.LABELS)) {
+			JsonArray sourceLabels = source.getAsJsonArray(AgentDataConstants.LABELS);
 			for (JsonElement sourceLabel : sourceLabels) {
 				String label = sourceLabel.getAsString();
 				if (label != null && !labels.contains(label)) {
@@ -388,8 +389,8 @@ public class AgentDataSubscriber extends EngineSubscriberResponseHandler {
 		buildNodePropertiesQueryPart(source, "source", cypherQuery);
 		cypherQuery.append(" WITH source, properties ");
 		cypherQuery.append("MERGE (destination").append(labels);
-		if (destination.has("labels")) {
-			JsonArray destinationLabels = destination.getAsJsonArray("labels");
+		if (destination.has(AgentDataConstants.LABELS)) {
+			JsonArray destinationLabels = destination.getAsJsonArray(AgentDataConstants.LABELS);
 			for (JsonElement destinationLabel : destinationLabels) {
 				String label = destinationLabel.getAsString();
 				if (label != null && !labels.contains(label)) {
@@ -401,9 +402,9 @@ public class AgentDataSubscriber extends EngineSubscriberResponseHandler {
 		cypherQuery.append(") ");
 		buildNodePropertiesQueryPart(destination, "destination", cypherQuery);
 		cypherQuery.append(" MERGE (source)-[r:").append(relationName).append("]->(destination) ");
-		if (relationMetadata.has("properties")) {
+		if (relationMetadata.has(AgentDataConstants.PROPERTIES)) {
 			cypherQuery.append(" set ");
-			JsonArray properties = relationMetadata.getAsJsonArray("properties");
+			JsonArray properties = relationMetadata.getAsJsonArray(AgentDataConstants.PROPERTIES);
 			for (JsonElement property : properties) {
 				cypherQuery.append("r.").append(property.getAsString()).append(" = properties.")
 						.append(property.getAsString()).append(",");
@@ -415,7 +416,7 @@ public class AgentDataSubscriber extends EngineSubscriberResponseHandler {
 	}
 
 	private void buildNodePropertiesQueryPart(JsonObject node, String nodeName, StringBuffer cypherQuery) {
-		if (node.has("properties")) {
+		if (node.has(AgentDataConstants.PROPERTIES)) {
 			cypherQuery.append(" set ").append(nodeName).append("+=properties ");
 		}
 	}

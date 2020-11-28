@@ -42,11 +42,11 @@ public class InsightsStatusProvider extends ComponentHealthLogger {
 	try {
 			String version = "";
 			version = InsightsStatusProvider.class.getPackage().getImplementationVersion();
-			log.debug( " Insights version " +  version    );
+			log.debug( " Insights version{} " ,  version    );
 			Map<String,String> extraParameter= new HashMap<String,String>(0);
 			createComponentStatusNode("HEALTH:INSIGHTS",version,message,status,extraParameter);
 		} catch (Exception e) {
-			log.error(" Unable to create node " + e.getMessage());
+			log.error(" Unable to create node {} " , e.getMessage());
 		}
 			return Boolean.TRUE;
 	}

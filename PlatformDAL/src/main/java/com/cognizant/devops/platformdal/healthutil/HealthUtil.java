@@ -21,6 +21,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
+import com.cognizant.devops.platformcommons.constants.AgentCommonConstant;
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
 import com.cognizant.devops.platformcommons.constants.ServiceStatusConstants;
 import com.cognizant.devops.platformcommons.core.util.SystemStatus;
@@ -73,7 +74,7 @@ public class HealthUtil {
 
 			if (serviceResponse != null && !("").equalsIgnoreCase(serviceResponse)) {
 				strResponse = "Response successfully recieved from " + apiUrl;
-				log.info("response: {} ",serviceResponse);
+				log.info("response:",serviceResponse);
 				if (serviceType.equalsIgnoreCase(ServiceStatusConstants.Neo4j)) {
 					json = (JsonObject) jsonParser.parse(serviceResponse);
 					version = json.get("neo4j_version").getAsString();
@@ -87,7 +88,7 @@ public class HealthUtil {
 					returnResponse = buildSuccessResponse(strResponse, hostEndPoint, displayType, version);
 				} else if (serviceType.equalsIgnoreCase(ServiceStatusConstants.ES)) {
 					json = (JsonObject) jsonParser.parse(serviceResponse);
-					JsonObject versionElasticsearch = (JsonObject) json.get("version");
+					JsonObject versionElasticsearch = (JsonObject) json.get(VERSION);
 					if (versionElasticsearch != null) {
 						version = versionElasticsearch.get("number").getAsString();
 					}
@@ -102,7 +103,7 @@ public class HealthUtil {
 				returnResponse = buildFailureResponse(strResponse, hostEndPoint, displayType, version);
 			}
 		} catch (Exception e) {
-			log.error("Error while capturing health check at {} {} ",apiUrl, e);
+			log.error("Error while capturing health check at {} ",apiUrl, e);
 			log.error(e.getMessage());
 			strResponse = "Error while capturing health check at " + apiUrl;
 			returnResponse = buildFailureResponse(strResponse, hostEndPoint, displayType, version);
@@ -242,34 +243,34 @@ public class HealthUtil {
 			Iterator<NodeData> agentnodeIterator = graphResponse.getNodes().iterator();
 			while (agentnodeIterator.hasNext()) {
 				NodeData node = agentnodeIterator.next();
-				insightTimeX = node.getPropertyMap().get("inSightsTimeX");
+				insightTimeX = node.getPropertyMap().get(PlatformServiceConstants.INSIGHTSTIMEX);
 				message = node.getPropertyMap().get("message");
-				toolcategory = node.getPropertyMap().get("category");
-				toolName = node.getPropertyMap().get("toolName");
-				if (node.getPropertyMap().containsKey("agentId")) {
-					agentId = node.getPropertyMap().get("agentId");
+				toolcategory = node.getPropertyMap().get(AgentCommonConstant.CATEGORY);
+				toolName = node.getPropertyMap().get(AgentCommonConstant.TOOLNAME);
+				if (node.getPropertyMap().containsKey(AgentCommonConstant.AGENTID)) {
+					agentId = node.getPropertyMap().get(AgentCommonConstant.AGENTID);
 				} else {
 					agentId = "";
 				}
 				agentstatus = node.getPropertyMap().get("status");
-				insightTimeX = node.getPropertyMap().get("inSightsTimeX");
+				insightTimeX = node.getPropertyMap().get(PlatformServiceConstants.INSIGHTSTIMEX);
 				JsonObject jsonResponse2 = new JsonObject();
-				jsonResponse2.addProperty("inSightsTimeX", insightTimeX);
-				jsonResponse2.addProperty("toolName", toolName);
-				jsonResponse2.addProperty("agentId", agentId);
-				jsonResponse2.addProperty("inSightsTimeX", insightTimeX);
+				jsonResponse2.addProperty(PlatformServiceConstants.INSIGHTSTIMEX, insightTimeX);
+				jsonResponse2.addProperty(AgentCommonConstant.TOOLNAME, toolName);
+				jsonResponse2.addProperty(AgentCommonConstant.AGENTID, agentId);
+				jsonResponse2.addProperty(PlatformServiceConstants.INSIGHTSTIMEX, insightTimeX);
 				jsonResponse2.addProperty(PlatformServiceConstants.STATUS, agentstatus);
-				jsonResponse2.addProperty("category", toolcategory);
+				jsonResponse2.addProperty(AgentCommonConstant.CATEGORY, toolcategory);
 				agentNode.add(jsonResponse2);
 			}
 			jsonResponse.add("agentNodes", agentNode);
 		} else {
 			jsonResponse.addProperty(PlatformServiceConstants.STATUS, PlatformServiceConstants.FAILURE);
 			jsonResponse.addProperty(PlatformServiceConstants.MESSAGE, message);
-			jsonResponse.addProperty("category", toolcategory);
+			jsonResponse.addProperty(AgentCommonConstant.CATEGORY, toolcategory);
 			jsonResponse.addProperty(ServiceStatusConstants.type, ServiceStatusConstants.Agents);
-			jsonResponse.addProperty("toolName", toolName);
-			jsonResponse.addProperty("inSightsTimeX", insightTimeX);
+			jsonResponse.addProperty(AgentCommonConstant.TOOLNAME, toolName);
+			jsonResponse.addProperty(PlatformServiceConstants.INSIGHTSTIMEX, insightTimeX);
 			jsonResponse.addProperty(VERSION, "");
 			jsonResponse.add("agentNodes", agentNode);
 		}
@@ -294,7 +295,7 @@ public class HealthUtil {
 					+ "/db/manage/server/jmx/domain/org.neo4j/instance%3Dkernel%230%2Cname%3DStore+sizes";
 			String serviceNeo4jResponse = SystemStatus.jerseyGetClientWithAuthentication(apiUrlForSize, username,
 					password, authToken);
-			log.debug("serviceNeo4jResponse ====== {}  ",serviceNeo4jResponse);
+			log.debug("serviceNeo4jResponse ====== {} ",serviceNeo4jResponse);
 
 			JsonElement object = new JsonParser().parse(serviceNeo4jResponse);
 			if (object.isJsonArray()) {
@@ -351,7 +352,7 @@ public class HealthUtil {
 			JsonObject json = config.get("publish").getAsJsonObject();
 			healthRoutingKey = json.get("health").getAsString().replace(".", ":");
 		} catch (Exception e) {
-			log.error(" No DB record found for agentId {}", agentId);
+			log.error(" No DB record found for agentId {} ", agentId);
 		}
 		return healthRoutingKey;
 	}
@@ -372,7 +373,7 @@ public class HealthUtil {
 		if (graphResponse != null) {
 			if (!graphResponse.getNodes().isEmpty()) {
 				successResponse = graphResponse.getNodes().get(0).getPropertyMap().get("message");
-				version = graphResponse.getNodes().get(0).getPropertyMap().get("version");
+				version = graphResponse.getNodes().get(0).getPropertyMap().get(VERSION);
 				status = graphResponse.getNodes().get(0).getPropertyMap().get("status");
 				if (status.equalsIgnoreCase(PlatformServiceConstants.SUCCESS)) {
 					returnObject = buildSuccessResponse(successResponse, "-",

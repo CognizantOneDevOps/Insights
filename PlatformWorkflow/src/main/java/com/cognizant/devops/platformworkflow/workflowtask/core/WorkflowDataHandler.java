@@ -23,6 +23,7 @@ import java.util.Map;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import com.cognizant.devops.platformcommons.constants.AssessmentReportAndWorkflowConstants;
 import com.cognizant.devops.platformcommons.core.enums.WorkflowTaskEnum;
 import com.cognizant.devops.platformcommons.core.util.InsightsUtils;
 import com.cognizant.devops.platformdal.workflow.InsightsWorkflowConfiguration;
@@ -39,11 +40,9 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 
 public class WorkflowDataHandler {
-
 	private static final Logger log = LogManager.getLogger(WorkflowDataHandler.class);
 
 	protected static Map<Integer, WorkflowTaskSubscriberHandler> registry = new HashMap<>(0);
-
 	WorkflowDAL workflowDAL = new WorkflowDAL();
 
 	/**
@@ -62,8 +61,7 @@ public class WorkflowDataHandler {
 					.getAllScheduledAndActiveWorkflowConfiguration();
 			for (InsightsWorkflowConfiguration worflowConfig : workflowConfigs) {
 
-				if (worflowConfig.getStatus().equalsIgnoreCase(WorkflowTaskEnum.WorkflowStatus.COMPLETED.name())
-						&& worflowConfig.isReoccurence()) {
+				if (worflowConfig.getStatus().equalsIgnoreCase(WorkflowTaskEnum.WorkflowStatus.COMPLETED.name())&& worflowConfig.isReoccurence()) {
 					if (isWorkflowScheduledToRun(worflowConfig.getNextRun())) {
 						readyToRunReports.add(worflowConfig);
 					}
@@ -75,7 +73,7 @@ public class WorkflowDataHandler {
 				}
 			}
 		} catch (Exception e) {
-			log.error("Error while preparing workflows for execution {}", e);
+			log.error("Error while preparing workflows for execution ", e);
 		}
 		return readyToRunReports;
 	}
@@ -102,7 +100,7 @@ public class WorkflowDataHandler {
 				}
 			}
 		} catch (Exception e) {
-			log.error("Error while preparing getImmediateWorkFlowConfigs for execution {}", e);
+			log.error("Error while preparing getImmediateWorkFlowConfigs for execution ", e);
 		}
 		return readyToRunReports;
 	}
@@ -118,7 +116,7 @@ public class WorkflowDataHandler {
 		try {
 			workflowHistoryIds = workflowDAL.getErrorExecutionHistoryBasedOnWorflow();
 		} catch (Exception e) {
-			log.error("Error while executing workflow retry {} ", e);
+			log.error("Error while executing workflow retry  ", e);
 		}
 		return workflowHistoryIds;
 	}
@@ -157,7 +155,7 @@ public class WorkflowDataHandler {
 			}
 
 		} catch (Exception e) {
-			log.error("Error while executing workflow retry {} ", e);
+			log.error("Error while executing workflow retry ", e);
 		}
 		return workflowHistoryIds;
 	}
@@ -205,14 +203,14 @@ public class WorkflowDataHandler {
 	public void publishMessageInMQ(String routingKey, JsonObject mqRequestJson)
 			throws WorkflowTaskInitializationException {
 		try {
-			int subscribedTaskId = mqRequestJson.get("currentTaskId").getAsInt();
+			int subscribedTaskId = mqRequestJson.get(AssessmentReportAndWorkflowConstants.CURRENTTASKID).getAsInt();
 			if (registry.containsKey(subscribedTaskId)) {
 				WorkflowTaskPublisherFactory.publish(routingKey, mqRequestJson.toString());
 			} else {
 				throw new WorkflowTaskInitializationException("Worlflow Detail ====  Queue is not subscribed yet");
 			}
 		} catch (Exception e) {
-			log.error(" Error while publishing message in  routingKey {} queue {} ", routingKey, e);
+			log.error(" Error while publishing message in  routingKey {} queue ", routingKey, e);
 			throw new WorkflowTaskInitializationException("Worlflow Detail ====  Queue is not subscribed yet");
 		}
 	}
@@ -227,15 +225,15 @@ public class WorkflowDataHandler {
 	 */
 	public int saveWorkflowExecutionHistory(Map<String, Object> requestMessage) {
 
-		String workflowId = String.valueOf(requestMessage.get("workflowId"));
+		String workflowId = String.valueOf(requestMessage.get(AssessmentReportAndWorkflowConstants.WORKFLOW_ID));
 		InsightsWorkflowConfiguration workflowConfig = workflowDAL
-				.getWorkflowConfigByWorkflowId(String.valueOf(requestMessage.get("workflowId")));
+				.getWorkflowConfigByWorkflowId(String.valueOf(requestMessage.get(AssessmentReportAndWorkflowConstants.WORKFLOW_ID)));
 		Gson gsonObj = new Gson();
 		InsightsWorkflowExecutionHistory historyConfig = new InsightsWorkflowExecutionHistory();
-		historyConfig.setExecutionId((long) requestMessage.get("executionId"));
+		historyConfig.setExecutionId((long) requestMessage.get(AssessmentReportAndWorkflowConstants.EXECUTIONID));
 		historyConfig.setWorkflowConfig(workflowConfig);
 		historyConfig.setStartTime(System.currentTimeMillis());
-		historyConfig.setCurrenttask((int) requestMessage.get("currentTaskId"));
+		historyConfig.setCurrenttask((int) requestMessage.get(AssessmentReportAndWorkflowConstants.CURRENTTASKID));
 		historyConfig.setRequestMessage(gsonObj.toJson(requestMessage));
 		historyConfig.setTaskStatus(WorkflowTaskEnum.WorkflowTaskStatus.IN_PROGRESS.toString());
 		int historyId = workflowDAL.saveTaskworkflowExecutionHistory(historyConfig);
@@ -272,15 +270,15 @@ public class WorkflowDataHandler {
 	public void publishMessageToNextInMQ(Map<String, Object> requestMessage)
 			throws WorkflowTaskInitializationException {
 		try {
-			log.debug(" Worlflow Detail ==== publishMessageToNextInMQ start  {} ", requestMessage);
+			log.debug(" Worlflow Detail ==== publishMessageToNextInMQ start {}", requestMessage);
 
-			String workflowId = String.valueOf(requestMessage.get("workflowId"));
+			String workflowId = String.valueOf(requestMessage.get(AssessmentReportAndWorkflowConstants.WORKFLOW_ID));
 			InsightsWorkflowTask insightsWorkflowTaskEntity = workflowDAL
-					.getTaskByTaskId((int) requestMessage.get("nextTaskId"));
+					.getTaskByTaskId((int) requestMessage.get(AssessmentReportAndWorkflowConstants.NEXT_TASK_ID));
 			InsightsWorkflowTaskSequence currentTaskSequence = workflowDAL
-					.getWorkflowTaskSequenceByWorkflowAndTaskId(workflowId, (int) requestMessage.get("currentTaskId"));
+					.getWorkflowTaskSequenceByWorkflowAndTaskId(workflowId, (int) requestMessage.get(AssessmentReportAndWorkflowConstants.CURRENTTASKID));
 			InsightsWorkflowTaskSequence nextTaskSequence = workflowDAL
-					.getWorkflowTaskSequenceByWorkflowAndTaskId(workflowId, (int) requestMessage.get("nextTaskId"));
+					.getWorkflowTaskSequenceByWorkflowAndTaskId(workflowId, (int) requestMessage.get(AssessmentReportAndWorkflowConstants.NEXT_TASK_ID));
 
 			if (currentTaskSequence.getNextTask() == -1) {
 				log.debug("Worlflow Detail ==== This is last task update workflow config ");
@@ -290,16 +288,16 @@ public class WorkflowDataHandler {
 				createTaskRequestJson((long) requestMessage.get("executionId"), workflowId,
 						(int) requestMessage.get("nextTaskId"), nextTaskSequence.getNextTask(),
 						nextTaskSequence.getSequence(), mqRequestJson);
-				log.debug(" Worlflow Detail ====  publish message for nexttask {} ", mqRequestJson);
+				log.debug(" Worlflow Detail ====  publish message for nexttask  {}", mqRequestJson);
 				publishMessageInMQ(insightsWorkflowTaskEntity.getMqChannel(), mqRequestJson);
 			}
 			log.debug(" Worlflow Detail ====  publishMessageToNextInMQ completed ");
 		} catch (WorkflowTaskInitializationException we) {
-			log.error("Worlflow Detail ==== Error while publishMessageToNextInMQ {} ", we);
+			log.error("Worlflow Detail ==== Error while publishMessageToNextInMQ  ", we);
 			throw new WorkflowTaskInitializationException(
 					"Worlflow Detail ====  unable to next task publish message in MQ");
 		} catch (Exception e) {
-			log.error("Worlflow Detail ==== Error while publishMessageToNextInMQ {} ", e);
+			log.error("Worlflow Detail ==== Error while publishMessageToNextInMQ  ", e);
 			throw new WorkflowTaskInitializationException("Worlflow Detail ====  unable to publish message in MQ");
 		}
 	}
@@ -370,10 +368,10 @@ public class WorkflowDataHandler {
 	 */
 	public void createTaskRequestJson(long executionId, String workflowId, int currentTaskId, int nextTaskId,
 			int sequence, JsonObject mqRequestJson) {
-		mqRequestJson.addProperty("executionId", executionId);
-		mqRequestJson.addProperty("workflowId", workflowId);
-		mqRequestJson.addProperty("currentTaskId", currentTaskId);
-		mqRequestJson.addProperty("nextTaskId", nextTaskId);
+		mqRequestJson.addProperty(AssessmentReportAndWorkflowConstants.EXECUTIONID, executionId);
+		mqRequestJson.addProperty(AssessmentReportAndWorkflowConstants.WORKFLOW_ID, workflowId);
+		mqRequestJson.addProperty(AssessmentReportAndWorkflowConstants.CURRENTTASKID, currentTaskId);
+		mqRequestJson.addProperty(AssessmentReportAndWorkflowConstants.NEXT_TASK_ID, nextTaskId);
 		mqRequestJson.addProperty("sequence", sequence);
 		mqRequestJson.addProperty(WorkflowUtils.RETRY_JSON_PROPERTY, false);
 	}

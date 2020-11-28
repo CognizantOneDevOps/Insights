@@ -17,7 +17,7 @@
 package com.cognizant.devops.engines.platformengine.message.core;
 
 public interface AgentDataConstants {
-	
+
 	String PROPERTY_1 = "toolProperty1";
 	String PROPERTY_2 = "toolProperty2";
 	String PROPERTY_3 = "toolProperty3";
@@ -27,5 +27,7 @@ public interface AgentDataConstants {
 	String PROPERTYVALUE_3 = "propertyValue3";
 	String PROPERTYVALUE_4 = "propertyValue4";
 	String COLON = ":";
+	String LABELS="labels";
+	String PROPERTIES ="properties";
 
 }

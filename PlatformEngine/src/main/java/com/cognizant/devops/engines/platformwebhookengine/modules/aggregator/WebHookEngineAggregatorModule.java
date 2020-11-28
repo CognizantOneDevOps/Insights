@@ -69,7 +69,7 @@ public class WebHookEngineAggregatorModule extends TimerTask {
 			EngineStatusLogger.getInstance().createWebhookEngineStatusNode("Unable to subscribed Webhook "
 					+ webhookConfig.getWebHookName() + " Error Detail :" + e.getMessage(),
 					PlatformServiceConstants.FAILURE);
-			log.error("Unable to add subscriber for routing key: {} ", e);
+			log.error("Unable to add subscriber for routing key: ", e);
 		}
 	}
 
@@ -77,7 +77,7 @@ public class WebHookEngineAggregatorModule extends TimerTask {
 		try {
 			if (healthRoutingKey != null && !registry.containsKey(healthRoutingKey)) {
 				registry.put(healthRoutingKey, new WebhookHealthSubscriber(healthRoutingKey));
-				log.debug("Webhook Hea2lth Queue {} subscribed successfully ", healthRoutingKey);
+				log.debug("Webhook Hea2lth Queue subscribed successfully{} ", healthRoutingKey);
 				EngineStatusLogger.getInstance().createWebhookEngineStatusNode(
 						"Webhook  Health Queue " + healthRoutingKey + " subscribed successfully ",
 						PlatformServiceConstants.SUCCESS);
@@ -85,7 +85,7 @@ public class WebHookEngineAggregatorModule extends TimerTask {
 		} catch (Exception e) {
 			EngineStatusLogger.getInstance().createWebhookEngineStatusNode("Unable to subscribed Webhook Health Queue "
 					+ healthRoutingKey + " Error Detail :" + e.getMessage(), PlatformServiceConstants.FAILURE);
-			log.error("Unable to add health subscriber for routing key: {} ", e);
+			log.error("Unable to add health subscriber for routing key: ", e);
 
 		}
 	}

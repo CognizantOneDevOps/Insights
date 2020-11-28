@@ -20,6 +20,10 @@ import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+/**
+ * @deprecated
+ *
+ */
 @Deprecated
 public abstract class AuditReportStrategy {
 
@@ -33,7 +37,7 @@ public abstract class AuditReportStrategy {
 	 * @return boolean
 	 */
 	public boolean keywordCheck(String cypherQuery){
-		log.info("keywordCheck for --   -"+cypherQuery);
+		log.info("keywordCheck for --- {}",cypherQuery);
 		List<String> myList = Arrays.asList("create", "merge", "delete", "remove", "detach", "drop", "set");
 		return myList.stream()
 				.filter(keywords -> cypherQuery.toUpperCase().contains(keywords.toUpperCase()))

@@ -22,9 +22,10 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import com.cognizant.devops.platformcommons.core.util.ValidationUtils;
@@ -33,7 +34,6 @@ import com.cognizant.devops.platformdal.correlationConfig.CorrelationConfigurati
 import com.cognizant.devops.platformservice.correlationbuilder.service.CorrelationBuilderService;
 import com.cognizant.devops.platformservice.rest.util.PlatformServiceUtil;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 
 @RestController
 @RequestMapping("/admin/correlationbuilder")
@@ -42,7 +42,7 @@ public class InsightsCorrelationBuilder {
 	@Autowired
 	CorrelationBuilderService correlationBuilderService;
 
-	@RequestMapping(value = "/getCorrelationJson", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+	@GetMapping(value = "/getCorrelationJson",produces = MediaType.APPLICATION_JSON_VALUE)
 	public @ResponseBody JsonObject getCorrelationJson() {
 		List<CorrelationConfiguration> details = new ArrayList<>();
 		try {
@@ -55,7 +55,7 @@ public class InsightsCorrelationBuilder {
 	}
 
 	
-	@RequestMapping(value = "/saveConfig", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+	@PostMapping(value = "/saveConfig",produces = MediaType.APPLICATION_JSON_VALUE)
 	public @ResponseBody JsonObject saveConfig(@RequestBody String configDetails) {
 
 		try {
@@ -71,7 +71,7 @@ public class InsightsCorrelationBuilder {
 
 	}
 
-	@RequestMapping(value = "/updateCorrelation", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+@PostMapping(value = "/updateCorrelation",produces = MediaType.APPLICATION_JSON_VALUE)
 	public @ResponseBody JsonObject updateCorrelation(@RequestBody String flagDeatils) {
 
 		try {
@@ -87,12 +87,13 @@ public class InsightsCorrelationBuilder {
 
 	}
 
-	@RequestMapping(value = "/deleteCorrelation", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+	@PostMapping(value = "/deleteCorrelation",produces = MediaType.APPLICATION_JSON_VALUE)
 	public @ResponseBody JsonObject deleteCorrelation(@RequestBody String relationName) {
 
 		try {
 			String relationNameValidate = ValidationUtils.validateRequestBody(relationName);
 			if (correlationBuilderService.deleteCorrelation(relationNameValidate)) {
+				//no code
 			} else {
 				return PlatformServiceUtil.buildFailureResponse("Unable to delete Correlation");
 			}

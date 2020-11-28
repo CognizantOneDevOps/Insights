@@ -52,7 +52,6 @@ import com.google.gson.JsonObject;
  */
 public class DataExtractor {
 	private static Logger log = LogManager.getLogger(DataExtractor.class);
-
 	private static boolean isDataExtractionInProgress = false;
 	private static Pattern p = Pattern.compile("((?<!([A-Z]{1,10})-?)(#|)+[A-Z]+(-|.)\\d+)");
 	private static String sourceTool = null;
@@ -94,7 +93,7 @@ public class DataExtractor {
 			String paginationCypher = "MATCH (n:SCM:DATA:RAW) where not exists(n." + almKeyProcessedIndex
 					+ ") and exists(n.commitId) return count(n) as count";
 			GraphResponse paginationResponse = dbHandler.executeCypherQuery(paginationCypher);
-			int resultCount = paginationResponse.getJson().get("results").getAsJsonArray().get(0).getAsJsonObject()
+			int resultCount = paginationResponse.getJson().get(ConfigOptions.RESULTS).getAsJsonArray().get(0).getAsJsonObject()
 					.get("data").getAsJsonArray().get(0).getAsJsonObject().get("row").getAsJsonArray().get(0)
 					.getAsInt();
 			while (resultCount > 0) {
@@ -104,7 +103,7 @@ public class DataExtractor {
 						+ "WITH { uuid: source.uuid, commitId: source.commitId, message: source.message} "
 						+ "as data limit " + dataBatchSize + " return collect(data)";
 				GraphResponse response = dbHandler.executeCypherQuery(scmDataFetchCypher);
-				JsonArray rows = response.getJson().get("results").getAsJsonArray().get(0).getAsJsonObject().get("data")
+				JsonArray rows = response.getJson().get(ConfigOptions.RESULTS).getAsJsonArray().get(0).getAsJsonObject().get("data")
 						.getAsJsonArray().get(0).getAsJsonObject().get("row").getAsJsonArray();
 				if (rows.isJsonNull() || rows.size() == 0) {
 					log.info("DataExtractor - updateSCMNodesWithAlmKey returns 0 rows.");
@@ -174,7 +173,7 @@ public class DataExtractor {
 						+ ") " + "WITH distinct n limit " + dataBatchSize + " remove n." + almKeyProcessedIndex
 						+ " return count(n)";
 				GraphResponse response = dbHandler.executeCypherQuery(scmCleanUpCypher);
-				processedRecords = response.getJson().get("results").getAsJsonArray().get(0).getAsJsonObject()
+				processedRecords = response.getJson().get(ConfigOptions.RESULTS).getAsJsonArray().get(0).getAsJsonObject()
 						.get("data").getAsJsonArray().get(0).getAsJsonObject().get("row").getAsJsonArray().get(0)
 						.getAsInt();
 				log.debug("Processed " + processedRecords + " SCM records, time taken: "
@@ -194,7 +193,7 @@ public class DataExtractor {
 					+ "WITH {projectKey: projectKey , count: count, portfolio: m.PORTFOLIO, product: m.PRODUCT} as data "
 					+ "return collect(data) as data";
 			GraphResponse paginationResponse = dbHandler.executeCypherQuery(almProjectCypher);
-			JsonArray data = paginationResponse.getJson().get("results").getAsJsonArray().get(0).getAsJsonObject()
+			JsonArray data = paginationResponse.getJson().get(ConfigOptions.RESULTS).getAsJsonArray().get(0).getAsJsonObject()
 					.get("data").getAsJsonArray().get(0).getAsJsonObject().get("row").getAsJsonArray().get(0)
 					.getAsJsonArray();
 			String almDataEnrichmentCypher = "UNWIND {props} as properties MATCH(n:" + sourceTool

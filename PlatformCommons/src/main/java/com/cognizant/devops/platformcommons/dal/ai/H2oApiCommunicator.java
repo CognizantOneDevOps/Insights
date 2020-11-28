@@ -37,6 +37,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
 public class H2oApiCommunicator {
+	public static final String COLUMNS="columns";
 	private static final Logger log = LogManager.getLogger(H2oApiCommunicator.class);
 	String h2oEndpoint;
 
@@ -55,12 +56,12 @@ public class H2oApiCommunicator {
 		try {
 			String response=null;			
 			String url =h2oEndpoint + H2ORestApiUrls.POST_FILE;			
-			log.debug("Uploading data into H2O: {} ", name);			
+			log.debug("Uploading data into H2O:{}", name);			
 			HashMap<String,String> map=new HashMap<>();
 			map.put("filename", data);
 			map.put("destination_frame", name);			
 			response=RestApiHandler.uploadMultipartFileWithData(url, null, map, null, "multipart/form-data");
-			log.debug("Upload: {} Response code: {} ", name, response);
+			log.debug("Upload:{} Response code:{} ", name, response);
 			return response;
 		} catch (Exception e) {
 			log.error(e.getMessage());
@@ -206,7 +207,7 @@ public class H2oApiCommunicator {
 	public String runAutoML(String modelName, String trainingFrame, String validationFrame, String responseColumn,
 			String numOfModels) throws InsightsCustomException {
 		try {
-			log.debug("Building AutoML: {} ", modelName);
+			log.debug("Building AutoML:{} ", modelName);
 			String url = h2oEndpoint + H2ORestApiUrls.BUILD_AUTOML;
 
 			JsonObject buildControl = new JsonObject();
@@ -246,7 +247,7 @@ public class H2oApiCommunicator {
 	public int pollRequestStatus(String url) throws InsightsCustomException {
 		JsonObject response = new JsonObject();
 		try {
-			log.debug("Get progress of AutoML: {} ", url);
+			log.debug("Get progress of AutoML: {}", url);
 			String h20url = h2oEndpoint + url;
 			String status = "RUNNING";
 			do {
@@ -277,12 +278,12 @@ public class H2oApiCommunicator {
 	 */
 	public JsonObject getLeaderBoard(String modelId) throws InsightsCustomException {
 		try {
-			log.debug("Get Leaderboard: {} ", modelId);			
+			log.debug("Get Leaderboard: {}", modelId);			
 			String url = h2oEndpoint+H2ORestApiUrls.LEADERBOARD_URL+modelId;			
 			String response = RestApiHandler.doGet(url, null);
 			JsonObject jsonResponse = new Gson().fromJson(response, JsonObject.class);
 			JsonObject leaderboardTable = new Gson().fromJson(jsonResponse.get("leaderboard_table"), JsonObject.class);
-			JsonArray columns = new Gson().fromJson(leaderboardTable.get("columns"), JsonArray.class);
+			JsonArray columns = new Gson().fromJson(leaderboardTable.get(COLUMNS), JsonArray.class);
 			columns.remove(0);			
 			JsonArray data = new Gson().fromJson(leaderboardTable.get("data"), JsonArray.class);
 			data.remove(0);
@@ -327,7 +328,7 @@ public class H2oApiCommunicator {
 
 			JsonObject responseObject = new Gson().fromJson(httpResponse, JsonObject.class);
 			JsonObject model = responseObject.getAsJsonArray("model_metrics").get(0).getAsJsonObject();
-			JsonArray data = model.getAsJsonObject("predictions").getAsJsonArray("columns");
+			JsonArray data = model.getAsJsonObject("predictions").getAsJsonArray(COLUMNS);
 			for (JsonElement e : data) {
 				predictionData.add(e.getAsJsonObject().get("label").getAsString(),
 						e.getAsJsonObject().getAsJsonArray("data"));
@@ -356,7 +357,7 @@ public class H2oApiCommunicator {
 			JsonObject jsonResponse = new Gson().fromJson(httpResponse, JsonObject.class);
 			JsonObject frame = jsonResponse.getAsJsonArray("frames").get(0).getAsJsonObject();
 			int rowCount = frame.get("row_count").getAsInt();
-			JsonArray columns = frame.getAsJsonArray("columns");
+			JsonArray columns = frame.getAsJsonArray(COLUMNS);
 			for (int i = 0; i < rowCount; i++) {
 				JsonObject row = new JsonObject();
 				for (JsonElement c : columns) {
@@ -412,7 +413,7 @@ public class H2oApiCommunicator {
 	public JsonObject downloadMojo(String usecase, String modelId) {
 		JsonObject response = new JsonObject();
 		try {
-			log.debug(" Downloading MOJO: {} ", modelId);
+			log.debug(" Downloading MOJO:{} ", modelId);
 			String url = h2oEndpoint + H2ORestApiUrls.DOWNLOAD_MOJO + modelId + "/mojo";
 			InputStream httpResponse = RestApiHandler.downloadMultipartFile(url, null);
 			String filePath = ConfigOptions.ML_DATA_STORAGE_RESOLVED_PATH + File.separator + usecase + File.separator
@@ -439,7 +440,7 @@ public class H2oApiCommunicator {
 		JsonObject parsedjson = new Gson().fromJson(input, JsonObject.class);
 		JsonArray frames = parsedjson.get("frames").getAsJsonArray();
 		JsonObject frame = frames.get(0).getAsJsonObject();
-		return frame.get("columns").getAsJsonArray();
+		return frame.get(COLUMNS).getAsJsonArray();
 	}
 
 }

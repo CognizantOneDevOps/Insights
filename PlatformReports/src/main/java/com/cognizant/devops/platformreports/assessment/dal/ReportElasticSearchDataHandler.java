@@ -67,7 +67,7 @@ public class ReportElasticSearchDataHandler implements ReportDataHandler {
 
 		} catch (Exception e) {
 			log.error("Error while saving saving KPI record {}", e.getMessage());
-			throw new InsightsJobFailedException("Error while saving neo4j record {} " + e.getMessage());
+			throw new InsightsJobFailedException("Error while saving neo4j record  " + e.getMessage());
 		}
 	}
 
@@ -83,16 +83,16 @@ public class ReportElasticSearchDataHandler implements ReportDataHandler {
 		try {
 			String query_type = "ES_" + contentConfigDefinition.getCategory().toString();
 			String esQuery = QueryEnum.valueOf(query_type).toString();
-			esQuery = esQuery.replaceAll("%kpiId%", String.valueOf(contentConfigDefinition.getKpiId()))
-					.replaceAll("%executionId%", String.valueOf(contentConfigDefinition.getExecutionId()));
+			esQuery = esQuery.replace("%kpiId%", String.valueOf(contentConfigDefinition.getKpiId()))
+					.replace("%executionId%", String.valueOf(contentConfigDefinition.getExecutionId()));
 			log.debug("Worlflow Detail ==== In ES, esQuery {} ", esQuery);
 
 			kpiResponce = deoES.getESResult(esQuery, ReportEngineUtils.ES_KPI_RESULT_INDEX);
 			creatingResultDetailFromESResponce(kpiResultDetailList, contentConfigDefinition, kpiResponce);
-			log.debug("Worlflow Detail ==== In ES, Number of KPI result record return  {} ",
+			log.debug("Worlflow Detail ==== In ES, Number of KPI result record return {} ",
 					kpiResultDetailList.size());
 		} catch (Exception e) {
-			log.error(" Error while parsing and fetchKPIResultData for ES {} ", e);
+			log.error(" Error while parsing and fetchKPIResultData for ES  ", e);
 		}
 		return kpiResultDetailList;
 	}
@@ -115,7 +115,7 @@ public class ReportElasticSearchDataHandler implements ReportDataHandler {
 	public void creatingResultDetailFromESResponce(List<InsightsKPIResultDetails> kpiResultDetailList,
 			ContentConfigDefinition contentConfigDefinition, List<JsonObject> kpiResponce) {
 
-		log.debug("Worlflow Detail ==== In ES, KPI Id {} number of record return by kpi query ==== {} ",
+		log.debug("Worlflow Detail ==== In ES, KPI Id {} number of record return by kpi query {} ====  ",
 				contentConfigDefinition.getKpiId(), kpiResponce.size());
 
 		for (JsonObject jsonObject : kpiResponce) {
@@ -135,8 +135,7 @@ public class ReportElasticSearchDataHandler implements ReportDataHandler {
 				resultMapping.setResults(results);
 				kpiResultDetailList.add(resultMapping);
 			} catch (Exception e) {
-				log.error(" Error while parsing inference result for ES {} ", e);
-				//throw new InsightsJobFailedException(" Error while parsing inference result {} " + e);
+				log.error(" Error while parsing inference result for ES ", e);
 			}
 		}
 
@@ -153,8 +152,8 @@ public class ReportElasticSearchDataHandler implements ReportDataHandler {
 	public JsonArray fetchVisualizationResults(long executionId, int kpiId, int assessmentId) {
 		String vQuery = "";
 		vQuery = QueryEnum.valueOf(QueryEnum.ES_VCONTENTQUERY.name()).toString();
-		vQuery = vQuery.replaceAll("%kpiId%", String.valueOf(kpiId))
-				.replaceAll("%executionId%", String.valueOf(executionId));
+		vQuery = vQuery.replace("%kpiId%", String.valueOf(kpiId))
+				.replace("%executionId%", String.valueOf(executionId));
 		vQuery = vQuery.replace(":kpiId", String.valueOf(kpiId)).replace(":executionId", String.valueOf(executionId));
 		List<JsonObject> queryResponce = deoES.getESResult(vQuery, ReportEngineUtils.ES_CONTENT_RESULT_INDEX);
 		return creatingVisualizationJsontFromGraphResponce(queryResponce);

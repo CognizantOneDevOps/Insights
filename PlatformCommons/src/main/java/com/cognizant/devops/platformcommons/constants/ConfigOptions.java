@@ -22,9 +22,8 @@ public interface ConfigOptions {
 	String CONFIG_FILE = "server-config.json";
 	String TOOLS_CONFIG_FILE = "toolsConfig.json";
 	String CORRELATION_TEMPLATE = "correlation.json";
-	String TOOLDETAIL_TEMPLATE ="toolDetail.json";
-	String NEO4J_TEMPLATE = "neo4jdata.json";
-	String CORRELATION = "correlation"+System.currentTimeMillis() +".json";
+	String TOOLDETAIL_TEMPLATE = "toolDetail.json";
+	String CORRELATION = "correlation" + System.currentTimeMillis() + ".json";
 	String DATA_ENRICHMENT_TEMPLATE = "data-enrichment.json";
 	String BLOCKCHAIN_CONFIG_FILE = "connections-tls.json";
 	String ENDPOINT_DATA = "endpointData";
@@ -35,12 +34,19 @@ public interface ConfigOptions {
 	String SP = PlatformServiceConstants.SP_DECODED;
 	String RSA = PlatformServiceConstants.RSA_DECODED;
 	String FILE_SEPERATOR = File.separator;
-	//String CONFIG_FILE_RESOLVED_PATH = System.getProperty(ConfigOptions.PROPERTY_USER_HOME) + "\\" + ConfigOptions.CONFIG_DIR + "\\" + ConfigOptions.CONFIG_FILE;
-	String CONFIG_FILE_RESOLVED_PATH = System.getenv().get(INSIGHTS_HOME) + FILE_SEPERATOR + ConfigOptions.CONFIG_DIR + FILE_SEPERATOR + ConfigOptions.CONFIG_FILE;
-	String BLOCKCHAIN_CONFIG_FILE_RESOLVED_PATH = System.getenv().get(INSIGHTS_HOME) + FILE_SEPERATOR + ConfigOptions.CONFIG_DIR + FILE_SEPERATOR + ConfigOptions.BLOCKCHAIN_CONFIG_FILE;
-	String CORRELATION_FILE_RESOLVED_PATH = System.getenv().get(INSIGHTS_HOME) + FILE_SEPERATOR + ConfigOptions.CONFIG_DIR + FILE_SEPERATOR + ConfigOptions.CORRELATION_TEMPLATE;
-	String TOOLS_CONFIG_FILE_RESOLVED_PATH = System.getProperty(ConfigOptions.PROPERTY_USER_HOME) + FILE_SEPERATOR + ConfigOptions.CONFIG_DIR + FILE_SEPERATOR + ConfigOptions.TOOLS_CONFIG_FILE;
-	String DATA_ENRICHMENT_FILE_RESOLVED_PATH = System.getenv().get(INSIGHTS_HOME) + FILE_SEPERATOR + ConfigOptions.CONFIG_DIR + FILE_SEPERATOR + ConfigOptions.DATA_ENRICHMENT_TEMPLATE;
+	// String CONFIG_FILE_RESOLVED_PATH =
+	// System.getProperty(ConfigOptions.PROPERTY_USER_HOME) + "\\" +
+	// ConfigOptions.CONFIG_DIR + "\\" + ConfigOptions.CONFIG_FILE;
+	String CONFIG_FILE_RESOLVED_PATH = System.getenv().get(INSIGHTS_HOME) + FILE_SEPERATOR + ConfigOptions.CONFIG_DIR
+			+ FILE_SEPERATOR + ConfigOptions.CONFIG_FILE;
+	String BLOCKCHAIN_CONFIG_FILE_RESOLVED_PATH = System.getenv().get(INSIGHTS_HOME) + FILE_SEPERATOR
+			+ ConfigOptions.CONFIG_DIR + FILE_SEPERATOR + ConfigOptions.BLOCKCHAIN_CONFIG_FILE;
+	String CORRELATION_FILE_RESOLVED_PATH = System.getenv().get(INSIGHTS_HOME) + FILE_SEPERATOR
+			+ ConfigOptions.CONFIG_DIR + FILE_SEPERATOR + ConfigOptions.CORRELATION_TEMPLATE;
+	String TOOLS_CONFIG_FILE_RESOLVED_PATH = System.getProperty(ConfigOptions.PROPERTY_USER_HOME) + FILE_SEPERATOR
+			+ ConfigOptions.CONFIG_DIR + FILE_SEPERATOR + ConfigOptions.TOOLS_CONFIG_FILE;
+	String DATA_ENRICHMENT_FILE_RESOLVED_PATH = System.getenv().get(INSIGHTS_HOME) + FILE_SEPERATOR
+			+ ConfigOptions.CONFIG_DIR + FILE_SEPERATOR + ConfigOptions.DATA_ENRICHMENT_TEMPLATE;
 	String FAILURE_RESPONSE = "FAILURE";
 	String SUCCESS_RESPONSE = "SUCCESS";
 	String CONFIG_FILE_DIR = System.getenv().get(INSIGHTS_HOME) + FILE_SEPERATOR + ConfigOptions.CONFIG_DIR;
@@ -65,11 +71,25 @@ public interface ConfigOptions {
 	String JSON_FORMAT = "JSON";
 	String OFFLINE_DATA_PROCESSING_FOLDER = "data-enrichment";
 	String QUERY_DATA_PROCESSING_FOLDER = "Audit-report";
-	String OFFLINE_DATA_PROCESSING_RESOLVED_PATH = System.getenv().get(INSIGHTS_HOME) + FILE_SEPERATOR + ConfigOptions.CONFIG_DIR + FILE_SEPERATOR + ConfigOptions.OFFLINE_DATA_PROCESSING_FOLDER;
-	String QUERY_DATA_PROCESSING_RESOLVED_PATH = System.getenv().get(INSIGHTS_HOME) + FILE_SEPERATOR + ConfigOptions.CONFIG_DIR + FILE_SEPERATOR + ConfigOptions.QUERY_DATA_PROCESSING_FOLDER;
+	String OFFLINE_DATA_PROCESSING_RESOLVED_PATH = System.getenv().get(INSIGHTS_HOME) + FILE_SEPERATOR
+			+ ConfigOptions.CONFIG_DIR + FILE_SEPERATOR + ConfigOptions.OFFLINE_DATA_PROCESSING_FOLDER;
+	String QUERY_DATA_PROCESSING_RESOLVED_PATH = System.getenv().get(INSIGHTS_HOME) + FILE_SEPERATOR
+			+ ConfigOptions.CONFIG_DIR + FILE_SEPERATOR + ConfigOptions.QUERY_DATA_PROCESSING_FOLDER;
 	String ML_DIRECTORY = "MLData";
 	String ML_DATA_STORAGE_RESOLVED_PATH = System.getenv().get(INSIGHTS_HOME) + FILE_SEPERATOR + ML_DIRECTORY;
 
 	String ONLINE_REGISTRATION_MODE_DOCROOT = "docroot";
 	String ONLINE_REGISTRATION_MODE_NEXUS = "nexus";
+	String GRAPH = "graph";
+	String AUTHORIZATION = "Authorization";
+	String RESULTDATACONTENTS = "resultDataContents";
+	String STATEMENT = "statement";
+	String STATEMENTS = "statements";
+	String RESULTS= "results";
+	String NODES="nodes";
+	String RELATIONSHIPS= "relationships";
+
+	String CRLF_PATTERN = "(\r\n|\r|\n|\n\r)";
+	String NBSP = "&nbsp;";
+	String AMP = "&amp;";
 }

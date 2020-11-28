@@ -18,7 +18,6 @@ package com.cognizant.devops.platformcommons.dal;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URLEncoder;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
@@ -120,10 +119,10 @@ public class RestApiHandler {
 			}
 			client.property(ClientProperties.CONNECT_TIMEOUT, 5001);
 		} catch (NoSuchAlgorithmException e) {
-			log.error("NoSuchAlgorithmException occured {} ", e);
+			log.error("NoSuchAlgorithmException occured", e);
 			throw new NoSuchAlgorithmException(e.getMessage());
 		} catch (KeyManagementException e) {
-			log.error("KeyManagementException occured {} ", e);
+			log.error("KeyManagementException occured ", e);
 			throw new KeyManagementException(e.getMessage());
 		} catch (Exception e) {
 			throw new InsightsCustomException(e.getMessage());
@@ -221,17 +220,17 @@ public class RestApiHandler {
 					throw new RestAPI404Exception(errorResponse.toString());
 				} else if (!(response.getStatus() == 200 || response.getStatus() == 204)) {
 					throw new InsightsCustomException(
-							"Failed : HTTP error code : " + response.getStatus() + " message " + data);
+							"Failed : HTTP error code. : " + response.getStatus() + " message " + data);
 				}
 			}
 		} catch (ProcessingException e) {
-			log.error("ProcessingException occured {} ", e);
+			log.error("ProcessingException occured  ", e);
 			throw e;
 		} catch (RestAPI404Exception e) {
-			log.error("Error while connecting to server RestAPI404Exception -- {}", e);
+			log.error("Error while connecting to server RestAPI404Exception ", e);
 			throw new RestAPI404Exception(e.getMessage());
 		} catch (Exception e) {
-			log.error("Error while connecting to server -- {}", e);
+			log.error("Error while connecting to server --", e);
 			throw new InsightsCustomException(e.getMessage());
 		} finally {
 			if (response != null) {
@@ -277,17 +276,17 @@ public class RestApiHandler {
 					throw new RestAPI404Exception(errorResponse.toString());
 				} else if (!(response.getStatus() == 200 || response.getStatus() == 204)) {
 					throw new InsightsCustomException(
-							"Failed : HTTP error code : " + response.getStatus() + " message " + data);
+							"Failed : HTTP error code.. : " + response.getStatus() + " message " + data);
 				}
 			}
 		} catch (ProcessingException e) {
-			log.error("ProcessingException occured {} ", e);
+			log.error("ProcessingException occured  ", e);
 			throw e;
 		} catch (RestAPI404Exception e) {
-			log.error("Error while connecting to server RestAPI404Exception -- {}", e);
+			log.error("Error while connecting to server RestAPI404Exception ", e);
 			throw new RestAPI404Exception(e.getMessage());
 		} catch (Exception e) {
-			log.error("Error while connecting to server -- {}", e);
+			log.error("Error while connecting to server. ", e);
 			throw new InsightsCustomException(e.getMessage());
 		} finally {
 			if (response != null) {
@@ -324,12 +323,12 @@ public class RestApiHandler {
 
 			if (response.getStatus() != 200) {
 				throw new InsightsCustomException(
-						"Failed : HTTP error code : " + response.getStatus() + " response message are " + response);
+						"Failed : HTTP error code... : " + response.getStatus() + " response message are_ " + response);
 			} else {
 				cookies = response.getCookies();
 			}
 		} catch (Exception e) {
-			log.error("Error while connecting to server -- {}", e);
+			log.error("Error while connecting to server. ", e);
 			throw new InsightsCustomException(e.getMessage());
 		} finally {
 			if (response != null) {
@@ -388,21 +387,21 @@ public class RestApiHandler {
 
 			if (response.getStatus() != 200) {
 				throw new InsightsCustomException(
-						"Failed : HTTP error code : " + response.getStatus() + " response message are " + response);
+						"Failed : HTTP error code.... : " + response.getStatus() + " response message are__ " + response);
 			} else {
 				response.bufferEntity();
 				retunInputStream = response.readEntity(InputStream.class);
 			}
 
 		} catch (Exception e) {
-			log.error("Error while connecting to server -- {}", e);
+			log.error("Error while connecting to server..", e);
 			throw new InsightsCustomException(e.getMessage());
 		} finally {
 			if (formDataMultiPart != null) {
 				try {
 					formDataMultiPart.close();
 				} catch (IOException e) {
-					throw new InsightsCustomException(e.getMessage());
+					log.error("Issue closing formdatamultipart ",e);
 				}
 			}
 		}
@@ -435,14 +434,14 @@ public class RestApiHandler {
 			response =invocationBuilder.get();
 			if (response.getStatus() != 200) {
 				throw new InsightsCustomException(
-						"Failed : HTTP error code : " + response.getStatus() + " response message are " + response);
+						"Failed : HTTP error code- : " + response.getStatus() + " response message are:-- " + response);
 			} else {
 				response.bufferEntity();
 				retunInputStream = response.readEntity(InputStream.class);
 			}
 
 		} catch (Exception e) {
-			log.error("Error while connecting to server -- {}", e);
+			log.error("Error while connecting to server- ", e);
 			throw new InsightsCustomException(e.getMessage());
 		} finally {
 			
@@ -479,8 +478,6 @@ public class RestApiHandler {
 				}
 			}		
 			formDataMultiPart.setMediaType(MediaType.MULTIPART_FORM_DATA_TYPE);
-			//FormDataMultiPart multipart = (FormDataMultiPart) formDataMultiPart;
-
 			webTarget = multipartClient.target(url);
 			invocationBuilder = webTarget.request().accept(returnMediaType);
 
@@ -494,13 +491,13 @@ public class RestApiHandler {
 
 			if (response.getStatus() != 200) {
 				throw new InsightsCustomException(
-						"Failed : HTTP error code : " + response.getStatus() + " response message are " + response);
+						"Failed : HTTP error code : " + response.getStatus() + " response message are:- " + response);
 			} else {
 				returnData = response.readEntity(String.class);
 			}
 
 		} catch (Exception e) {
-			log.error("Error while connecting to server -- {}", e);
+			log.error("Error while connecting to server : ", e);
 			throw new InsightsCustomException(e.getMessage());
 		} finally {
 			if (formDataMultiPart != null) {
@@ -509,7 +506,6 @@ public class RestApiHandler {
 				} catch (IOException e) {
 					throw new InsightsCustomException(e.getMessage());
 				}
-			//multipart.close();
 			}
 		}
 		return returnData;

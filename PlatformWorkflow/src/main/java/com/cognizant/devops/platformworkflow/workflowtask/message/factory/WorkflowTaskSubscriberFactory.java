@@ -30,7 +30,6 @@ import com.rabbitmq.client.ConnectionFactory;
 
 public class WorkflowTaskSubscriberFactory {
 	private static final Logger log = LogManager.getLogger(WorkflowTaskSubscriberFactory.class);
-	private ConnectionFactory factory;
 	private Connection connection;
 	private static WorkflowTaskSubscriberFactory instance = null;
 
@@ -39,19 +38,18 @@ public class WorkflowTaskSubscriberFactory {
 	 */
 	private void initConnectionFactory() {
 		MessageQueueDataModel messageQueueConfig = ApplicationConfigProvider.getInstance().getMessageQueue();
-		factory = new ConnectionFactory();
-		factory.setHost(messageQueueConfig.getHost());
-		factory.setUsername(messageQueueConfig.getUser());
-		factory.setPassword(messageQueueConfig.getPassword());
 		try {
+			ConnectionFactory factory = new ConnectionFactory();
+			factory.setHost(messageQueueConfig.getHost());
+			factory.setUsername(messageQueueConfig.getUser());
+			factory.setPassword(messageQueueConfig.getPassword());
 			connection = factory.newConnection();
-			Channel channel = connection.createChannel();
-			channel.exchangeDeclare(MQMessageConstants.EXCHANGE_NAME, MQMessageConstants.EXCHANGE_TYPE, true);
-			channel.close();
-			//instance = new WorkflowTaskSubscriberFactory();
+			try (Channel channel = connection.createChannel()) {
+				channel.exchangeDeclare(MQMessageConstants.EXCHANGE_NAME, MQMessageConstants.EXCHANGE_TYPE, true);
+			}
 		} catch (IOException e) {
 			log.error("Unable to create MQ connection", e);
-		
+
 		} catch (TimeoutException e) {
 			log.error("Unable to create MQ connection within specified time.", e);
 		}

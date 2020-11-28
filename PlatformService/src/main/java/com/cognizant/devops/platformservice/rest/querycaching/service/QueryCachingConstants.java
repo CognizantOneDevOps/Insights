@@ -19,7 +19,7 @@ import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 
 public interface QueryCachingConstants {
 
-	String ES_HOST = ApplicationConfigProvider.getInstance().getEndpointData().getElasticSearchEndpoint();
+    String ES_HOST = ApplicationConfigProvider.getInstance().getEndpointData().getElasticSearchEndpoint();
 	String ES_CACHE_INDEX = ApplicationConfigProvider.getInstance().getQueryCache().getEsCacheIndex();
 	String DEFAULT_ES_CACHE_INDEX = "neo4j-cached-results/querycacheresult";
 	String METADATA = "metadata";

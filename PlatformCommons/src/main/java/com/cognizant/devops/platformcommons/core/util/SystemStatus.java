@@ -54,7 +54,7 @@ public class SystemStatus {
 			response = graphDBHandler.executeQueryWithData(cypherQuery, dataList);
 
 		} catch (Exception e) {
-			log.error(" Neo4j Node not created " + e.getMessage());
+			log.error(" Neo4j Node not created{} " , e.getMessage());
 		}
 
 		return response;

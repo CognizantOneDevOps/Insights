@@ -32,16 +32,17 @@ import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBHandler;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+
 /**
  * 
  * @author Vishal Ganjare (vganjare)
  * 
- * Entry point for data enrichment module.
+ *         Entry point for data enrichment module.
  *
  */
 public class DataEnrichmentModule extends TimerTask {
 	private static Logger log = LogManager.getLogger(DataEnrichmentModule.class);
-	
+
 	@Override
 	public void run() {
 		handleDataCleaning();
@@ -49,30 +50,27 @@ public class DataEnrichmentModule extends TimerTask {
 
 	private void handleDataCleaning() {
 		Map<String, String> dataEnrichmentCypherQueryMap = loadDataEnrichmentJson();
-		if(dataEnrichmentCypherQueryMap == null) {
+		if (dataEnrichmentCypherQueryMap == null) {
 			return;
 		}
 		GraphDBHandler dbHandler = new GraphDBHandler();
-		for(Map.Entry<String, String> entry: dataEnrichmentCypherQueryMap.entrySet()) {
+		for (Map.Entry<String, String> entry : dataEnrichmentCypherQueryMap.entrySet()) {
 			try {
 				int processedRecords = 1;
-				while(processedRecords > 0) {
+				while (processedRecords > 0) {
 					GraphResponse sprintResponse = dbHandler.executeCypherQuery(entry.getValue());
 					JsonObject sprintResponseJson = sprintResponse.getJson();
 					processedRecords = sprintResponseJson.getAsJsonArray("results").get(0).getAsJsonObject()
-							.getAsJsonArray("data").get(0).getAsJsonObject()
-							.getAsJsonArray("row").get(0).getAsInt();
-					log.debug(entry.getKey()+" Processed "+processedRecords);
+							.getAsJsonArray("data").get(0).getAsJsonObject().getAsJsonArray("row").get(0).getAsInt();
+					log.debug(entry.getKey() , "{} Processed {}", processedRecords);
 				}
 
 			} catch (InsightsCustomException e) {
-				log.error(entry.getKey() + " Processing Failed", e);
-			} catch (Exception e) {
-				log.error(entry.getKey() + " Processing Failed", e);
+				log.error(entry.getKey() ,"{}  Processing Failed {}", e);
 			}
 		}
 	}
-	
+
 	private Map<String, String> loadDataEnrichmentJson() {
 		BufferedReader reader = null;
 		Map<String, String> dataEnrichmentMap = null;
@@ -81,7 +79,7 @@ public class DataEnrichmentModule extends TimerTask {
 			if (correlationTemplate.exists()) {
 				reader = new BufferedReader(new FileReader(correlationTemplate));
 				dataEnrichmentMap = new Gson().fromJson(reader, Map.class);
-			} 
+			}
 		} catch (FileNotFoundException e) {
 			log.error("data-enrichment.json file not found.", e);
 		} finally {

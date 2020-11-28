@@ -40,4 +40,15 @@ public interface PlatformServiceConstants {
 	String WEBHOOK_NAME = "Webhook name already exists";
 	String INSIGHTSTIME = "inSightsTime";
 	String INSIGHTSTIMEX = "inSightsTimeX";
+	String API_ADMIN_USERS = "/api/admin/users/";
+	String JTOKEN = "jtoken";
+	// AccessGroupManagement
+	String ORGID = "orgId";
+	String USERS = "/users";
+	String LOGIN_OR_EMAIL = "loginOrEmail";
+	String EMAIL = "email";
+	String TITLE = "title";
+	String API_ORGS = "/api/orgs/";
+	String API_USER = "/api/user";
+	String API_USER_ORGS = "/api/user/orgs";
 }

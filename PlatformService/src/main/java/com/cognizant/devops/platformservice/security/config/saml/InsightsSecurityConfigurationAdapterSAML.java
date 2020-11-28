@@ -15,6 +15,7 @@
  ******************************************************************************/
 package com.cognizant.devops.platformservice.security.config.saml;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -373,8 +374,7 @@ public class InsightsSecurityConfigurationAdapterSAML extends WebSecurityConfigu
 	@Bean
 	@Conditional(InsightsSAMLBeanInitializationCondition.class)
 	public InsightsAuthenticationFilter insightsServiceProcessingFilter() throws Exception {
-		InsightsAuthenticationFilter filter = new InsightsAuthenticationFilter("/**", authenticationManager());
-		return filter;
+		return  new InsightsAuthenticationFilter("/**", authenticationManager());
 	}
 
 	/**
@@ -385,9 +385,8 @@ public class InsightsSecurityConfigurationAdapterSAML extends WebSecurityConfigu
 	 */
 	@Bean
 	@Conditional(InsightsSAMLBeanInitializationCondition.class)
-	public InsightsSAMLAuthenticationFilter insightsSSOProcessingFilter() throws Exception {
-		InsightsSAMLAuthenticationFilter filter = new InsightsSAMLAuthenticationFilter();
-		return filter;
+	public InsightsSAMLAuthenticationFilter insightsSSOProcessingFilter() throws IOException {
+		 return new InsightsSAMLAuthenticationFilter();
 	}
 
 	/**

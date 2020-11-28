@@ -44,7 +44,7 @@ import com.google.gson.JsonParser;
  * Report generation by fetching records from NEO4J based on table_structure in Json file.
  *
  */
-@Deprecated
+
 public class AuditCypherReport extends AuditReportStrategy{
 
 	private static final Logger log = LoggerFactory.getLogger(AuditCypherReport.class.getName());
@@ -69,7 +69,7 @@ public class AuditCypherReport extends AuditReportStrategy{
 	public boolean executeQuery(String fileContents,String reportName, String subscribers) {
 		
 		log.info("--Invoking Neo DB!---");
-		log.info("FileContents = " + fileContents);
+		log.info("FileContents {}= ", fileContents);
 
 		GraphDBHandler dbHandler = new GraphDBHandler();
 		long queryExecutionStartTime = System.currentTimeMillis();
@@ -80,21 +80,21 @@ public class AuditCypherReport extends AuditReportStrategy{
 			JsonElement jsonElements = jsonParser.parse(fileContents);
 			JsonObject jsonObject = jsonElements.getAsJsonObject();
 			String cypherQuery = jsonObject.get("queryname").getAsString();
-			log.info("Cypher query from File = "+cypherQuery);
+			log.info("Cypher query from File {}= ",cypherQuery);
 			if(!keywordCheck(cypherQuery)){
 				JsonObject tableStructure = jsonObject.get("table_structure").getAsJsonObject();
-				log.info("TableStructure from File = "+tableStructure);
+				log.info("TableStructure from File = {}",tableStructure);
 
 				GraphResponse cypherResponse = dbHandler.executeCypherQuery(cypherQuery);
 				//GraphResponse cypherResponse = dbHandler.executeCypherQuery("MATCH (git:SCM)--(jira:ALM) RETURN git,jira LIMIT 2");
 				JsonObject cyphertResponseJson = cypherResponse.getJson();
-				log.info("CyphertResponseJson = "+cyphertResponseJson);
+				log.info("CyphertResponseJson = {}",cyphertResponseJson);
 				try {
 					JsonArray dataArray = cyphertResponseJson.get("results").getAsJsonArray().get(0).getAsJsonObject().get("data").getAsJsonArray();
 					JsonArray columnArray = cyphertResponseJson.get("results").getAsJsonArray().get(0).getAsJsonObject().get("columns").getAsJsonArray();
 
 					for(int y=0;y<columnArray.size();y++){
-						log.info("Column = ",columnArray.get(y).getAsString());
+						log.info("Column = {} ",columnArray.get(y).getAsString());
 						columnMap.put(columnArray.get(y).getAsString(), y);
 					}
 
@@ -103,38 +103,31 @@ public class AuditCypherReport extends AuditReportStrategy{
 						for(int j=0;j<dataArray.size();j++){
 							StringBuffer propVal = new StringBuffer();
 							for(Entry<String, JsonElement> fileentry : tableStructure.entrySet()){
-								//headerList.add(fileentry.getKey().toUpperCase());
 								String tablerow = fileentry.getValue().getAsString();
 								String property =  tablerow.substring(tablerow.indexOf(".")+1,tablerow.length());
 								String node = tablerow.substring(0, tablerow.indexOf("."));
 
 								int index = columnMap.get(node);
-								//log.info("index = "+index);
 
 								JsonArray rowArray = dataArray.get(j).getAsJsonObject().get("row").getAsJsonArray();
 
 								if(rowArray.get(index).getAsJsonObject().get(property)!= null){
 									//log.info("Row = ",rowArray
-									//.get(index).getAsJsonObject().get(property).getAsString());
 									propVal.append(rowArray.get(index).getAsJsonObject().get(property).getAsString()).append(",");
 								}else{
 									propVal.append("NA").append(",");
 								}
 							}
 							rowValueList.add(propVal.toString().substring(0, propVal.toString().length()-1));
-							//log.info("propVal = ",propVal);
 
 						}
 
-						log.info("rowValueList = "+rowValueList);
+						log.info("rowValueList {} = ",rowValueList);
 						headerList.add("SNo");
 						for(Entry<String, JsonElement> fileentry : tableStructure.entrySet()){
 							headerList.add(fileentry.getKey().toUpperCase());
 						}
-						log.info("headerList = "+headerList);
-						/*for(String a : rowValueList){
-						log.info(a);
-					}*/
+						log.info("headerList  = {} ",headerList);
 						if(rowValueList.size()>0){
 							PdfTableUtil pdfTableUtil = new PdfTableUtil();
 							byte[] pdfResponse = pdfTableUtil.generateCypherReport(headerList, rowValueList, reportName);
@@ -162,11 +155,11 @@ public class AuditCypherReport extends AuditReportStrategy{
 					return Boolean.FALSE; 
 				}
 				long queryExecutionEndTime = System.currentTimeMillis();
-				log.info("queryExecutionEndTime---"+queryExecutionEndTime);
+				log.info("queryExecutionEndTime--- {}",queryExecutionEndTime);
 				long queryProcessingTime = (queryExecutionEndTime - queryExecutionStartTime);
-				log.info("queryProcessingTime---"+queryProcessingTime);
+				log.info("queryProcessingTime--- {}", queryProcessingTime);
 			}else{
-				log.info("Aborting query from execute as it contains invalid keywords !!" + cypherQuery );
+				log.info("Aborting query from execute as it contains invalid keywords {}!!" , cypherQuery );
 			}
 		} catch (InsightsCustomException e) {
 			log.error( " - query processing failed", e);

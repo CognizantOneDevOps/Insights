@@ -76,7 +76,7 @@ public class DataArchivalAggregatorModule extends TimerTask {
 						" Data archival data queue " + dataRoutingKey + " subscribed successfully ",
 						PlatformServiceConstants.SUCCESS);
 			} catch (Exception e) {
-				log.error("Unable to add subscriber for routing key: " + dataRoutingKey, e);
+				log.error("Unable to add subscriber for routing key:{} ", dataRoutingKey, e);
 				EngineStatusLogger.getInstance().createDataArchivalStatusNode(
 						" Error occured while executing aggragator for data queue subscriber " + e.getMessage(),
 						PlatformServiceConstants.FAILURE);
@@ -93,7 +93,7 @@ public class DataArchivalAggregatorModule extends TimerTask {
 						" Data Archival Agent health queue " + healthRoutingKey + " subscribed successfully ",
 						PlatformServiceConstants.SUCCESS);
 			} catch (Exception e) {
-				log.error("Unable to add subscriber for routing key: " + healthRoutingKey, e);
+				log.error("Unable to add subscriber for routing key:{}" ,healthRoutingKey, e);
 				EngineStatusLogger.getInstance().createDataArchivalStatusNode(
 						" Error occured while executing aggregator for Data archival health queue subscriber  "
 								+ e.getMessage(),
