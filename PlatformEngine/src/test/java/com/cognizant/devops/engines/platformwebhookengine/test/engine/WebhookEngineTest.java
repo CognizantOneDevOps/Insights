@@ -45,7 +45,7 @@ public class WebhookEngineTest {
 	private Properties p = null;
 
 	@BeforeTest
-	public void onInit() throws IOException {
+	public void onInit() throws IOException, InsightsCustomException {
 		ApplicationConfigCache.loadConfigCache();
 
 		reader = new FileReader("src/test/resources/Properties.prop");

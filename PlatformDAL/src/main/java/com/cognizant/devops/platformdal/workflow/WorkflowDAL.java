@@ -23,6 +23,7 @@ import javax.persistence.NoResultException;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.hibernate.Session;
 import org.hibernate.query.Query;
 import org.hibernate.type.StandardBasicTypes;
 
@@ -43,33 +44,31 @@ public class WorkflowDAL extends BaseDAL {
 	 * @return String
 	 */
 	public String deleteWorkflowTaskSequence(String workflowId) {
-
-		Query<InsightsWorkflowTaskSequence> createQuery = getSession().createQuery(
-				"FROM InsightsWorkflowTaskSequence a WHERE a.workflowConfig.workflowId= :workflowId",
-				InsightsWorkflowTaskSequence.class);
-		createQuery.setParameter(AssessmentReportAndWorkflowConstants.WORKFLOW_ID, workflowId);
-		List<InsightsWorkflowTaskSequence> asssessmentList = createQuery.getResultList();
-		List<Integer> listofPrimaryKey = new ArrayList<>();
-		for (InsightsWorkflowTaskSequence asssessment : asssessmentList) {
-			getSession().beginTransaction();
-			asssessment.setWorkflowConfig(null);
-			asssessment.setWorkflowTaskEntity(null);
-			listofPrimaryKey.add(asssessment.getId());
-			getSession().save(asssessment);
-			getSession().getTransaction().commit();
+		try (Session session = getSessionObj(); Session deleteSession = getSessionObj()) {
+			Query<InsightsWorkflowTaskSequence> createQuery = session.createQuery(
+					"FROM InsightsWorkflowTaskSequence a WHERE a.workflowConfig.workflowId= :workflowId",
+					InsightsWorkflowTaskSequence.class);
+			createQuery.setParameter(AssessmentReportAndWorkflowConstants.WORKFLOW_ID, workflowId);
+			List<InsightsWorkflowTaskSequence> asssessmentList = createQuery.getResultList();
+			List<Integer> listofPrimaryKey = new ArrayList<>();
+			for (InsightsWorkflowTaskSequence asssessment : asssessmentList) {
+				session.beginTransaction();
+				asssessment.setWorkflowConfig(null);
+				asssessment.setWorkflowTaskEntity(null);
+				listofPrimaryKey.add(asssessment.getId());
+				session.save(asssessment);
+				session.getTransaction().commit();
+			}
+			for (InsightsWorkflowTaskSequence asssessment : asssessmentList) {
+				deleteSession.beginTransaction();
+				deleteSession.delete(asssessment);
+				deleteSession.getTransaction().commit();
+			}
+			return PlatformServiceConstants.SUCCESS;
+		} catch (Exception e) {
+			log.error(e);
+			throw e;
 		}
-
-		terminateSession();
-		terminateSessionFactory();
-		for (InsightsWorkflowTaskSequence asssessment : asssessmentList) {
-			getSession().beginTransaction();
-			getSession().delete(asssessment);
-			getSession().getTransaction().commit();
-		}
-
-		terminateSession();
-		terminateSessionFactory();
-		return PlatformServiceConstants.SUCCESS;
 	}
 
 	/**
@@ -79,12 +78,15 @@ public class WorkflowDAL extends BaseDAL {
 	 * @return historyID
 	 */
 	public int saveTaskworkflowExecutionHistory(InsightsWorkflowExecutionHistory historyConfig) {
-		getSession().beginTransaction();
-		int historyId = (int) getSession().save(historyConfig);
-		getSession().getTransaction().commit();
-		terminateSession();
-		terminateSessionFactory();
-		return historyId;
+		try (Session session = getSessionObj()) {
+			session.beginTransaction();
+			int historyId = (int) session.save(historyConfig);
+			session.getTransaction().commit();
+			return historyId;
+		} catch (Exception e) {
+			log.error(e);
+			throw e;
+		}
 	}
 
 	/**
@@ -94,13 +96,15 @@ public class WorkflowDAL extends BaseDAL {
 	 * @return int
 	 */
 	public int updateTaskworkflowExecutionHistory(InsightsWorkflowExecutionHistory config) {
-
-		getSession().beginTransaction();
-		getSession().update(config);
-		getSession().getTransaction().commit();
-		terminateSession();
-		terminateSessionFactory();
-		return 0;
+		try (Session session = getSessionObj()) {
+			session.beginTransaction();
+			session.update(config);
+			session.getTransaction().commit();
+			return 0;
+		} catch (Exception e) {
+			log.error(e);
+			throw e;
+		}
 	}
 
 	/**
@@ -110,12 +114,15 @@ public class WorkflowDAL extends BaseDAL {
 	 * @return int
 	 */
 	public int updateWorkflowConfig(InsightsWorkflowConfiguration workflowConfig) {
-		getSession().beginTransaction();
-		getSession().update(workflowConfig);
-		getSession().getTransaction().commit();
-		terminateSession();
-		terminateSessionFactory();
-		return 0;
+		try (Session session = getSessionObj()) {
+			session.beginTransaction();
+			session.update(workflowConfig);
+			session.getTransaction().commit();
+			return 0;
+		} catch (Exception e) {
+			log.error(e);
+			throw e;
+		}
 	}
 
 	/**
@@ -125,14 +132,16 @@ public class WorkflowDAL extends BaseDAL {
 	 * @return InsightsWorkflowConfiguration object
 	 */
 	public InsightsWorkflowConfiguration getWorkflowByWorkflowId(String workflowId) {
-		Query<InsightsWorkflowConfiguration> createQuery = getSession().createQuery(
-				"FROM InsightsWorkflowConfiguration WC WHERE WC.workflowId = :workflowId ",
-				InsightsWorkflowConfiguration.class);
-		createQuery.setParameter(AssessmentReportAndWorkflowConstants.WORKFLOW_ID, workflowId);
-		InsightsWorkflowConfiguration result = createQuery.uniqueResult();
-		terminateSession();
-		terminateSessionFactory();
-		return result;
+		try (Session session = getSessionObj()) {
+			Query<InsightsWorkflowConfiguration> createQuery = session.createQuery(
+					"FROM InsightsWorkflowConfiguration WC WHERE WC.workflowId = :workflowId ",
+					InsightsWorkflowConfiguration.class);
+			createQuery.setParameter(AssessmentReportAndWorkflowConstants.WORKFLOW_ID, workflowId);
+			return createQuery.uniqueResult();
+		} catch (Exception e) {
+			log.error(e);
+			throw e;
+		}
 	}
 
 	/**
@@ -142,20 +151,22 @@ public class WorkflowDAL extends BaseDAL {
 	 * @return List<InsightsWorkflowExecutionHistory>
 	 */
 	public List<InsightsWorkflowExecutionHistory> getWorkflowExecutionHistoryRecordsByWorkflowId(String workflowId) {
-		Query<Long> executionIDscreateQuery = getSession().createQuery(
-				"select distinct executionId FROM InsightsWorkflowExecutionHistory EH WHERE EH.workflowConfig.workflowId = :workflowId ORDER BY executionId DESC",
-				Long.class);
-		executionIDscreateQuery.setParameter(AssessmentReportAndWorkflowConstants.WORKFLOW_ID, workflowId);
-		executionIDscreateQuery.setMaxResults(5);
-		List<Long> executionIds = executionIDscreateQuery.getResultList();
-		Query<InsightsWorkflowExecutionHistory> resultQuery = getSession().createQuery(
-				"FROM InsightsWorkflowExecutionHistory EH WHERE EH.executionId IN (:executionIDs) ORDER BY executionId DESC",
-				InsightsWorkflowExecutionHistory.class);
-		resultQuery.setParameterList("executionIDs", executionIds);
-		List<InsightsWorkflowExecutionHistory> result = resultQuery.getResultList();
-		terminateSession();
-		terminateSessionFactory();
-		return result;
+		try (Session session = getSessionObj()) {
+			Query<Long> executionIDscreateQuery = session.createQuery(
+					"select distinct executionId FROM InsightsWorkflowExecutionHistory EH WHERE EH.workflowConfig.workflowId = :workflowId ORDER BY executionId DESC",
+					Long.class);
+			executionIDscreateQuery.setParameter("workflowId", workflowId);
+			executionIDscreateQuery.setMaxResults(5);
+			List<Long> executionIds = executionIDscreateQuery.getResultList();
+			Query<InsightsWorkflowExecutionHistory> resultQuery = session.createQuery(
+					"FROM InsightsWorkflowExecutionHistory EH WHERE EH.executionId IN (:executionIDs) ORDER BY executionId DESC",
+					InsightsWorkflowExecutionHistory.class);
+			resultQuery.setParameterList("executionIDs", executionIds);
+			return resultQuery.getResultList();
+		} catch (Exception e) {
+			log.error(e);
+			throw e;
+		}
 	}
 
 	/**
@@ -165,14 +176,16 @@ public class WorkflowDAL extends BaseDAL {
 	 * @return InsightsWorkflowExecutionHistory object
 	 */
 	public InsightsWorkflowExecutionHistory getWorkflowExecutionHistoryByHistoryId(int historyId) {
-		Query<InsightsWorkflowExecutionHistory> createQuery = getSession().createQuery(
-				"FROM InsightsWorkflowExecutionHistory EH WHERE EH.id = :historyId ",
-				InsightsWorkflowExecutionHistory.class);
-		createQuery.setParameter("historyId", historyId);
-		InsightsWorkflowExecutionHistory result = createQuery.uniqueResult();
-		terminateSession();
-		terminateSessionFactory();
-		return result;
+		try (Session session = getSessionObj()) {
+			Query<InsightsWorkflowExecutionHistory> createQuery = session.createQuery(
+					"FROM InsightsWorkflowExecutionHistory EH WHERE EH.id = :historyId ",
+					InsightsWorkflowExecutionHistory.class);
+			createQuery.setParameter("historyId", historyId);
+			return createQuery.uniqueResult();
+		} catch (Exception e) {
+			log.error(e);
+			throw e;
+		}
 	}
 
 	/**
@@ -182,14 +195,16 @@ public class WorkflowDAL extends BaseDAL {
 	 * @return List<InsightsWorkflowExecutionHistory>
 	 */
 	public List<InsightsWorkflowExecutionHistory> getWorkflowExecutionHistoryByWorkflowId(String workflowId) {
-		Query<InsightsWorkflowExecutionHistory> createQuery = getSession().createQuery(
-				"FROM InsightsWorkflowExecutionHistory EH WHERE EH.workflowConfig.workflowId = :workflowId ",
-				InsightsWorkflowExecutionHistory.class);
-		createQuery.setParameter(AssessmentReportAndWorkflowConstants.WORKFLOW_ID, workflowId);
-		List<InsightsWorkflowExecutionHistory> result = createQuery.getResultList();
-		terminateSession();
-		terminateSessionFactory();
-		return result;
+		try (Session session = getSessionObj()) {
+			Query<InsightsWorkflowExecutionHistory> createQuery = session.createQuery(
+					"FROM InsightsWorkflowExecutionHistory EH WHERE EH.workflowConfig.workflowId = :workflowId ",
+					InsightsWorkflowExecutionHistory.class);
+			createQuery.setParameter(AssessmentReportAndWorkflowConstants.WORKFLOW_ID, workflowId);
+			return createQuery.getResultList();
+		} catch (Exception e) {
+			log.error(e);
+			throw e;
+		}
 	}
 
 	/**
@@ -199,13 +214,15 @@ public class WorkflowDAL extends BaseDAL {
 	 * @return InsightsWorkflowTask object
 	 */
 	public InsightsWorkflowTask getTaskByTaskId(int taskId) {
-		Query<InsightsWorkflowTask> createQuery = getSession()
-				.createQuery("FROM InsightsWorkflowTask TE WHERE TE.taskId = :taskId ", InsightsWorkflowTask.class);
-		createQuery.setParameter(AssessmentReportAndWorkflowConstants.TASK_ID, taskId);
-		InsightsWorkflowTask result = createQuery.uniqueResult();
-		terminateSession();
-		terminateSessionFactory();
-		return result;
+		try (Session session = getSessionObj()) {
+			Query<InsightsWorkflowTask> createQuery = session
+					.createQuery("FROM InsightsWorkflowTask TE WHERE TE.taskId = :taskId ", InsightsWorkflowTask.class);
+			createQuery.setParameter(AssessmentReportAndWorkflowConstants.TASK_ID, taskId);
+			return createQuery.uniqueResult();
+		} catch (Exception e) {
+			log.error(e);
+			throw e;
+		}
 	}
 
 	/**
@@ -215,13 +232,15 @@ public class WorkflowDAL extends BaseDAL {
 	 * @return InsightsWorkflowTask object
 	 */
 	public InsightsWorkflowTask getTaskByTaskIdList(Integer taskId) {
-		Query<InsightsWorkflowTask> createQuery = getSession()
-				.createQuery("FROM InsightsWorkflowTask TE WHERE TE.taskId = :taskId ", InsightsWorkflowTask.class);
-		createQuery.setParameter(AssessmentReportAndWorkflowConstants.TASK_ID, taskId);
-		InsightsWorkflowTask result = createQuery.uniqueResult();
-		terminateSession();
-		terminateSessionFactory();
-		return result;
+		try (Session session = getSessionObj()) {
+			Query<InsightsWorkflowTask> createQuery = session
+					.createQuery("FROM InsightsWorkflowTask TE WHERE TE.taskId = :taskId ", InsightsWorkflowTask.class);
+			createQuery.setParameter(AssessmentReportAndWorkflowConstants.TASK_ID, taskId);
+			return createQuery.uniqueResult();
+		} catch (Exception e) {
+			log.error(e);
+			throw e;
+		}
 	}
 
 	/**
@@ -230,12 +249,14 @@ public class WorkflowDAL extends BaseDAL {
 	 * @return List<InsightsWorkflowTask>
 	 */
 	public List<InsightsWorkflowTask> getAllWorkflowTask() {
-		Query<InsightsWorkflowTask> createQuery = getSession().createQuery("FROM InsightsWorkflowTask TE ",
-				InsightsWorkflowTask.class);
-		List<InsightsWorkflowTask> result = createQuery.getResultList();
-		terminateSession();
-		terminateSessionFactory();
-		return result;
+		try (Session session = getSessionObj()) {
+			Query<InsightsWorkflowTask> createQuery = session.createQuery("FROM InsightsWorkflowTask TE ",
+					InsightsWorkflowTask.class);
+			return createQuery.getResultList();
+		} catch (Exception e) {
+			log.error(e);
+			throw e;
+		}
 	}
 
 	/**
@@ -244,12 +265,15 @@ public class WorkflowDAL extends BaseDAL {
 	 * @return List<InsightsWorkflowConfiguration>
 	 */
 	public List<InsightsWorkflowConfiguration> getAllActiveWorkflowConfiguration() {
-		Query<InsightsWorkflowConfiguration> createQuery = getSession().createQuery(
-				"FROM InsightsWorkflowConfiguration WC WHERE WC.isActive = true ", InsightsWorkflowConfiguration.class);
-		List<InsightsWorkflowConfiguration> configList = createQuery.getResultList();
-		terminateSession();
-		terminateSessionFactory();
-		return configList;
+		try (Session session = getSessionObj()) {
+			Query<InsightsWorkflowConfiguration> createQuery = session.createQuery(
+					"FROM InsightsWorkflowConfiguration WC WHERE WC.isActive = true ",
+					InsightsWorkflowConfiguration.class);
+			return createQuery.getResultList();
+		} catch (Exception e) {
+			log.error(e);
+			throw e;
+		}
 	}
 
 	/**
@@ -259,13 +283,15 @@ public class WorkflowDAL extends BaseDAL {
 	 * @return List<InsightsWorkflowConfiguration>
 	 */
 	public List<InsightsWorkflowConfiguration> getAllScheduledAndActiveWorkflowConfiguration() {
-		Query<InsightsWorkflowConfiguration> createQuery = getSession().createQuery(
-				"FROM InsightsWorkflowConfiguration WC WHERE WC.isActive = true and WC.runImmediate = false  ",
-				InsightsWorkflowConfiguration.class);
-		List<InsightsWorkflowConfiguration> configList = createQuery.getResultList();
-		terminateSession();
-		terminateSessionFactory();
-		return configList;
+		try (Session session = getSessionObj()) {
+			Query<InsightsWorkflowConfiguration> createQuery = session.createQuery(
+					"FROM InsightsWorkflowConfiguration WC WHERE WC.isActive = true and WC.runImmediate = false  ",
+					InsightsWorkflowConfiguration.class);
+			return createQuery.getResultList();
+		} catch (Exception e) {
+			log.error(e);
+			throw e;
+		}
 	}
 
 	/**
@@ -274,13 +300,15 @@ public class WorkflowDAL extends BaseDAL {
 	 * @return List<InsightsWorkflowConfiguration>
 	 */
 	public List<InsightsWorkflowConfiguration> getImmediateWorkflowConfiguration() {
-		Query<InsightsWorkflowConfiguration> createQuery = getSession().createQuery(
-				"FROM InsightsWorkflowConfiguration WC WHERE WC.isActive = true and WC.runImmediate = true ",
-				InsightsWorkflowConfiguration.class);
-		List<InsightsWorkflowConfiguration> configList = createQuery.getResultList();
-		terminateSession();
-		terminateSessionFactory();
-		return configList;
+		try (Session session = getSessionObj()) {
+			Query<InsightsWorkflowConfiguration> createQuery = session.createQuery(
+					"FROM InsightsWorkflowConfiguration WC WHERE WC.isActive = true and WC.runImmediate = true ",
+					InsightsWorkflowConfiguration.class);
+			return createQuery.getResultList();
+		} catch (Exception e) {
+			log.error(e);
+			throw e;
+		}
 	}
 
 	/**
@@ -290,14 +318,16 @@ public class WorkflowDAL extends BaseDAL {
 	 * @return InsightsWorkflowTaskSequence object
 	 */
 	public InsightsWorkflowTaskSequence getWorkflowTaskSequenceByWorkflowId(String workflowId) {
-		Query<InsightsWorkflowTaskSequence> createQuery = getSession().createQuery(
-				"FROM InsightsWorkflowTaskSequence WTS WHERE WTS.workflowConfig.workflowId = :workflowId and WTS.sequence=1 ",
-				InsightsWorkflowTaskSequence.class);
-		createQuery.setParameter(AssessmentReportAndWorkflowConstants.WORKFLOW_ID, workflowId);
-		InsightsWorkflowTaskSequence result = createQuery.uniqueResult();
-		terminateSession();
-		terminateSessionFactory();
-		return result;
+		try (Session session = getSessionObj()) {
+			Query<InsightsWorkflowTaskSequence> createQuery = session.createQuery(
+					"FROM InsightsWorkflowTaskSequence WTS WHERE WTS.workflowConfig.workflowId = :workflowId and WTS.sequence=1 ",
+					InsightsWorkflowTaskSequence.class);
+			createQuery.setParameter(AssessmentReportAndWorkflowConstants.WORKFLOW_ID, workflowId);
+			return createQuery.uniqueResult();
+		} catch (Exception e) {
+			log.error(e);
+			throw e;
+		}
 	}
 
 	/**
@@ -307,14 +337,16 @@ public class WorkflowDAL extends BaseDAL {
 	 * @return List<InsightsWorkflowTaskSequence>
 	 */
 	public List<InsightsWorkflowTaskSequence> getAllWorkflowTaskSequenceByWorkflowId(String workflowId) {
-		Query<InsightsWorkflowTaskSequence> createQuery = getSession().createQuery(
-				"FROM InsightsWorkflowTaskSequence WTS WHERE WTS.workflowConfig.workflowId = :workflowId ORDER BY sequence ASC ",
-				InsightsWorkflowTaskSequence.class);
-		createQuery.setParameter(AssessmentReportAndWorkflowConstants.WORKFLOW_ID, workflowId);
-		List<InsightsWorkflowTaskSequence> result = createQuery.getResultList();
-		terminateSession();
-		terminateSessionFactory();
-		return result;
+		try (Session session = getSessionObj()) {
+			Query<InsightsWorkflowTaskSequence> createQuery = session.createQuery(
+					"FROM InsightsWorkflowTaskSequence WTS WHERE WTS.workflowConfig.workflowId = :workflowId ORDER BY sequence ASC ",
+					InsightsWorkflowTaskSequence.class);
+			createQuery.setParameter(AssessmentReportAndWorkflowConstants.WORKFLOW_ID, workflowId);
+			return createQuery.getResultList();
+		} catch (Exception e) {
+			log.error(e);
+			throw e;
+		}
 	}
 
 	/**
@@ -325,15 +357,17 @@ public class WorkflowDAL extends BaseDAL {
 	 * @return InsightsWorkflowTaskSequence object
 	 */
 	public InsightsWorkflowTaskSequence getWorkflowTaskSequenceByWorkflowAndTaskId(String workflowId, int taskId) {
-		Query<InsightsWorkflowTaskSequence> createQuery = getSession().createQuery(
-				"FROM InsightsWorkflowTaskSequence WTS WHERE WTS.workflowConfig.workflowId = :workflowId and WTS.workflowTaskEntity.taskId=:taskId ",
-				InsightsWorkflowTaskSequence.class);
-		createQuery.setParameter(AssessmentReportAndWorkflowConstants.WORKFLOW_ID, workflowId);
-		createQuery.setParameter(AssessmentReportAndWorkflowConstants.TASK_ID, taskId);
-		InsightsWorkflowTaskSequence result = createQuery.uniqueResult();
-		terminateSession();
-		terminateSessionFactory();
-		return result;
+		try (Session session = getSessionObj()) {
+			Query<InsightsWorkflowTaskSequence> createQuery = session.createQuery(
+					"FROM InsightsWorkflowTaskSequence WTS WHERE WTS.workflowConfig.workflowId = :workflowId and WTS.workflowTaskEntity.taskId=:taskId ",
+					InsightsWorkflowTaskSequence.class);
+			createQuery.setParameter(AssessmentReportAndWorkflowConstants.WORKFLOW_ID, workflowId);
+			createQuery.setParameter(AssessmentReportAndWorkflowConstants.TASK_ID, taskId);
+			return createQuery.uniqueResult();
+		} catch (Exception e) {
+			log.error(e);
+			throw e;
+		}
 	}
 
 	/**
@@ -343,12 +377,15 @@ public class WorkflowDAL extends BaseDAL {
 	 * @return taskId
 	 */
 	public int saveInsightsWorkflowTaskConfig(InsightsWorkflowTask config) {
-		getSession().beginTransaction();
-		int taskId = (int) getSession().save(config);
-		getSession().getTransaction().commit();
-		terminateSession();
-		terminateSessionFactory();
-		return taskId;
+		try (Session session = getSessionObj()) {
+			session.beginTransaction();
+			int taskId = (int) session.save(config);
+			session.getTransaction().commit();
+			return taskId;
+		} catch (Exception e) {
+			log.error(e);
+			throw e;
+		}
 
 	}
 
@@ -358,15 +395,17 @@ public class WorkflowDAL extends BaseDAL {
 	 * @return List<InsightsWorkflowTask>
 	 */
 	public List<InsightsWorkflowTask> getTaskLists(String workflowType) {
-		List<InsightsWorkflowTask> tasks = new ArrayList<>();
-		Query<InsightsWorkflowTask> createQuery = getSession().createQuery(
-				"FROM InsightsWorkflowTask RE WHERE RE.workflowType.workflowType = :workflowType",
-				InsightsWorkflowTask.class);
-		createQuery.setParameter("workflowType", workflowType);
-		tasks = createQuery.getResultList();
-		terminateSession();
-		terminateSessionFactory();
-		return tasks;
+		try (Session session = getSessionObj()) {
+			List<InsightsWorkflowTask> tasks = new ArrayList<>();
+			Query<InsightsWorkflowTask> createQuery = session.createQuery(
+					"FROM InsightsWorkflowTask RE WHERE RE.workflowType.workflowType = :workflowType",
+					InsightsWorkflowTask.class);
+			createQuery.setParameter("workflowType", workflowType);
+			return createQuery.getResultList();
+		} catch (Exception e) {
+			log.error(e);
+			throw e;
+		}
 	}
 
 	/**
@@ -376,14 +415,16 @@ public class WorkflowDAL extends BaseDAL {
 	 * @return InsightsWorkflowConfiguration object
 	 */
 	public InsightsWorkflowConfiguration getWorkflowConfigByWorkflowId(String workflowId) {
-		Query<InsightsWorkflowConfiguration> createQuery = getSession().createQuery(
-				"FROM InsightsWorkflowConfiguration WC WHERE WC.workflowId = :workflowId",
-				InsightsWorkflowConfiguration.class);
-		createQuery.setParameter(AssessmentReportAndWorkflowConstants.WORKFLOW_ID, workflowId);
-		InsightsWorkflowConfiguration wconfig = createQuery.uniqueResult();
-		terminateSession();
-		terminateSessionFactory();
-		return wconfig;
+		try (Session session = getSessionObj()) {
+			Query<InsightsWorkflowConfiguration> createQuery = session.createQuery(
+					"FROM InsightsWorkflowConfiguration WC WHERE WC.workflowId = :workflowId",
+					InsightsWorkflowConfiguration.class);
+			createQuery.setParameter(AssessmentReportAndWorkflowConstants.WORKFLOW_ID, workflowId);
+			return createQuery.uniqueResult();
+		} catch (Exception e) {
+			log.error(e);
+			throw e;
+		}
 	}
 
 	/**
@@ -394,22 +435,25 @@ public class WorkflowDAL extends BaseDAL {
 	 * @return List<Object[]>
 	 */
 	public List<Object[]> getWorkflowExecutionRecordsbyAssessmentConfigID(int assessmentConfigId) {
-		String query = "SELECT IWHU.executionid as executionid,IWHU.starttime as startTime,IWHU.endtime as endTime,IWHU.retrycount as retryCount,IWHU.statuslog as statusLog,"
-				+ "IWHU.taskstatus as taskStatus,IWT.description as currentTask FROM \"INSIGHTS_WORKFLOW_EXECUTION_HISTORY\" IWHU inner join \"INSIGHTS_WORKFLOW_TASK\" IWT ON IWHU.currenttask=IWT.taskid WHERE executionid IN "
-				+ "(SELECT DISTINCT(executionid) FROM \"INSIGHTS_WORKFLOW_EXECUTION_HISTORY\" IWH where IWH.workflowid IN"
-				+ "(SELECT IWG.workflowid FROM \"INSIGHTS_ASSESSMENT_CONFIGURATION\" ISC "
-				+ "inner join \"INSIGHTS_WORKFLOW_CONFIG\" IWG ON ISC.workflowid = IWG.workflowid "
-				+ "where ISC.configid=:configId ) ORDER BY executionid DESC limit 5 )"
-				+ "order by IWHU.executionid desc,IWHU.starttime";
-		Query createQuery = getSession().createSQLQuery(query).addScalar("executionid", StandardBasicTypes.LONG)
-				.addScalar("startTime", StandardBasicTypes.LONG).addScalar("endTime", StandardBasicTypes.LONG)
-				.addScalar("retryCount", StandardBasicTypes.INTEGER).addScalar("statusLog", StandardBasicTypes.STRING)
-				.addScalar("taskStatus", StandardBasicTypes.STRING).addScalar("currentTask", StandardBasicTypes.STRING)
-				.setParameter("configId", assessmentConfigId);
-		List<Object[]> records = createQuery.getResultList();
-		terminateSession();
-		terminateSessionFactory();
-		return records;
+		try (Session session = getSessionObj()) {
+			String query = "SELECT IWHU.executionid as executionid,IWHU.starttime as startTime,IWHU.endtime as endTime,IWHU.retrycount as retryCount,IWHU.statuslog as statusLog,"
+					+ "IWHU.taskstatus as taskStatus,IWT.description as currentTask FROM \"INSIGHTS_WORKFLOW_EXECUTION_HISTORY\" IWHU inner join \"INSIGHTS_WORKFLOW_TASK\" IWT ON IWHU.currenttask=IWT.taskid WHERE executionid IN "
+					+ "(SELECT DISTINCT(executionid) FROM \"INSIGHTS_WORKFLOW_EXECUTION_HISTORY\" IWH where IWH.workflowid IN"
+					+ "(SELECT IWG.workflowid FROM \"INSIGHTS_ASSESSMENT_CONFIGURATION\" ISC "
+					+ "inner join \"INSIGHTS_WORKFLOW_CONFIG\" IWG ON ISC.workflowid = IWG.workflowid "
+					+ "where ISC.configid=:configId ) ORDER BY executionid DESC limit 5 )"
+					+ "order by IWHU.executionid desc,IWHU.starttime";
+			Query createQuery = session.createSQLQuery(query).addScalar("executionid", StandardBasicTypes.LONG)
+					.addScalar("startTime", StandardBasicTypes.LONG).addScalar("endTime", StandardBasicTypes.LONG)
+					.addScalar("retryCount", StandardBasicTypes.INTEGER)
+					.addScalar("statusLog", StandardBasicTypes.STRING)
+					.addScalar("taskStatus", StandardBasicTypes.STRING)
+					.addScalar("currentTask", StandardBasicTypes.STRING).setParameter("configId", assessmentConfigId);
+			return createQuery.getResultList();
+		} catch (Exception e) {
+			log.error(e);
+			throw e;
+		}
 	}
 
 	/**
@@ -420,22 +464,25 @@ public class WorkflowDAL extends BaseDAL {
 	 * @return List<Object[]>
 	 */
 	public List<Object[]> getWorkflowExecutionRecordsByworkflowID(String workflowId) {
-		String query = "SELECT IWHU.executionid as executionid,IWHU.starttime as startTime,IWHU.endtime as endTime,IWHU.retrycount as retryCount,IWHU.statuslog as statusLog,"
-				+ "IWHU.taskstatus as taskStatus,IWT.description as currentTask "
-				+ "FROM \"INSIGHTS_WORKFLOW_EXECUTION_HISTORY\" IWHU "
-				+ "inner join \"INSIGHTS_WORKFLOW_TASK\" IWT ON IWHU.currenttask=IWT.taskid WHERE executionid IN "
-				+ "(SELECT DISTINCT(executionid) "
-				+ "FROM  \"INSIGHTS_WORKFLOW_EXECUTION_HISTORY\" IWH where IWH.workflowid = :workflowID ORDER BY executionid DESC limit 5 ) "
-				+ "order by IWHU.executionid desc,IWHU.starttime";
-		Query createQuery = getSession().createSQLQuery(query).addScalar("executionid", StandardBasicTypes.LONG)
-				.addScalar("startTime", StandardBasicTypes.LONG).addScalar("endTime", StandardBasicTypes.LONG)
-				.addScalar("retryCount", StandardBasicTypes.INTEGER).addScalar("statusLog", StandardBasicTypes.STRING)
-				.addScalar("taskStatus", StandardBasicTypes.STRING).addScalar("currentTask", StandardBasicTypes.STRING)
-				.setParameter("workflowID", workflowId);
-		List<Object[]> records = createQuery.getResultList();
-		terminateSession();
-		terminateSessionFactory();
-		return records;
+		try (Session session = getSessionObj()) {
+			String query = "SELECT IWHU.executionid as executionid,IWHU.starttime as startTime,IWHU.endtime as endTime,IWHU.retrycount as retryCount,IWHU.statuslog as statusLog,"
+					+ "IWHU.taskstatus as taskStatus,IWT.description as currentTask "
+					+ "FROM \"INSIGHTS_WORKFLOW_EXECUTION_HISTORY\" IWHU "
+					+ "inner join \"INSIGHTS_WORKFLOW_TASK\" IWT ON IWHU.currenttask=IWT.taskid WHERE executionid IN "
+					+ "(SELECT DISTINCT(executionid) "
+					+ "FROM  \"INSIGHTS_WORKFLOW_EXECUTION_HISTORY\" IWH where IWH.workflowid = :workflowID ORDER BY executionid DESC limit 5 ) "
+					+ "order by IWHU.executionid desc,IWHU.starttime";
+			Query createQuery = session.createSQLQuery(query).addScalar("executionid", StandardBasicTypes.LONG)
+					.addScalar("startTime", StandardBasicTypes.LONG).addScalar("endTime", StandardBasicTypes.LONG)
+					.addScalar("retryCount", StandardBasicTypes.INTEGER)
+					.addScalar("statusLog", StandardBasicTypes.STRING)
+					.addScalar("taskStatus", StandardBasicTypes.STRING)
+					.addScalar("currentTask", StandardBasicTypes.STRING).setParameter("workflowID", workflowId);
+			return createQuery.getResultList();
+		} catch (Exception e) {
+			log.error(e);
+			throw e;
+		}
 	}
 
 	/**
@@ -444,28 +491,32 @@ public class WorkflowDAL extends BaseDAL {
 	 * @return List<InsightsWorkflowExecutionHistory>
 	 */
 	public List<InsightsWorkflowExecutionHistory> getErrorExecutionHistoryBasedOnWorflow() {
-		Query<InsightsWorkflowExecutionHistory> createQuery = getSession().createQuery(
-				"FROM InsightsWorkflowExecutionHistory EH WHERE EH.taskStatus='ERROR' and EH.workflowConfig.isActive = true order by EH.executionId desc",
-				InsightsWorkflowExecutionHistory.class);
-		List<InsightsWorkflowExecutionHistory> failedTasks = createQuery.getResultList();
-		terminateSession();
-		terminateSessionFactory();
-		return failedTasks;
+		try (Session session = getSessionObj()) {
+			Query<InsightsWorkflowExecutionHistory> createQuery = session.createQuery(
+					"FROM InsightsWorkflowExecutionHistory EH WHERE EH.taskStatus='ERROR' and EH.workflowConfig.isActive = true order by EH.executionId desc",
+					InsightsWorkflowExecutionHistory.class);
+			return createQuery.getResultList();
+		} catch (Exception e) {
+			log.error(e);
+			throw e;
+		}
 	}
 
 	/**
 	 * Method to get Error Workflow records
 	 * 
-	 * @return List<InsightsWorkflowConfiguration>
+	 * @return List<InsightsWorkflowConfiguration> @
 	 */
 	public List<InsightsWorkflowConfiguration> getCompletedTaskRetryWorkflows() {
-		Query<InsightsWorkflowConfiguration> createQuery = getSession().createQuery(
-				"FROM InsightsWorkflowConfiguration WC WHERE WC.status='TASK_INITIALIZE_ERROR' and WC.isActive = true",
-				InsightsWorkflowConfiguration.class);
-		List<InsightsWorkflowConfiguration> failedWorkflows = createQuery.getResultList();
-		terminateSession();
-		terminateSessionFactory();
-		return failedWorkflows;
+		try (Session session = getSessionObj()) {
+			Query<InsightsWorkflowConfiguration> createQuery = session.createQuery(
+					"FROM InsightsWorkflowConfiguration WC WHERE WC.status='TASK_INITIALIZE_ERROR' and WC.isActive = true",
+					InsightsWorkflowConfiguration.class);
+			return createQuery.getResultList();
+		} catch (Exception e) {
+			log.error(e);
+			throw e;
+		}
 	}
 
 	/**
@@ -476,20 +527,24 @@ public class WorkflowDAL extends BaseDAL {
 	 * @return InsightsWorkflowExecutionHistory object
 	 */
 	public InsightsWorkflowExecutionHistory getLastestTaskByEndTime(String workflowId, long latestExecutionId) {
-		Query<InsightsWorkflowExecutionHistory> createQuery = getSession().createQuery(
-				"FROM InsightsWorkflowExecutionHistory EH WHERE EH.workflowConfig.isActive = true and EH.workflowConfig.workflowId=:workflowId and EH.executionId=:latestExecutionId order by EH.endTime desc",
-				InsightsWorkflowExecutionHistory.class);
-		createQuery.setParameter(AssessmentReportAndWorkflowConstants.WORKFLOW_ID, workflowId);
-		createQuery.setParameter("latestExecutionId", latestExecutionId);
-		List<InsightsWorkflowExecutionHistory> nextTasks = createQuery.getResultList();
-		terminateSession();
-		terminateSessionFactory();
-		List<String> errorStatusList = Arrays.asList("ERROR", "ABORTED", "RETRY_EXCEEDED", "IN_PROGRESS");
-		if (nextTasks.stream().noneMatch(anyFailedTask -> errorStatusList.contains(anyFailedTask.getTaskStatus()))) {
-			return nextTasks.get(0);
+		try (Session session = getSessionObj()) {
+			Query<InsightsWorkflowExecutionHistory> createQuery = session.createQuery(
+					"FROM InsightsWorkflowExecutionHistory EH WHERE EH.workflowConfig.isActive = true and EH.workflowConfig.workflowId=:workflowId and EH.executionId=:latestExecutionId order by EH.endTime desc",
+					InsightsWorkflowExecutionHistory.class);
+			createQuery.setParameter(AssessmentReportAndWorkflowConstants.WORKFLOW_ID, workflowId);
+			createQuery.setParameter("latestExecutionId", latestExecutionId);
+			List<InsightsWorkflowExecutionHistory> nextTasks = createQuery.getResultList();
+			List<String> errorStatusList = Arrays.asList("ERROR", "ABORTED", "RETRY_EXCEEDED", "IN_PROGRESS");
+			if (nextTasks.stream()
+					.noneMatch(anyFailedTask -> errorStatusList.contains(anyFailedTask.getTaskStatus()))) {
+				return nextTasks.get(0);
+			}
+			return null;
+		} catch (Exception e) {
+			log.error(e);
+			throw e;
 		}
 
-		return null;
 	}
 
 	/**
@@ -499,19 +554,19 @@ public class WorkflowDAL extends BaseDAL {
 	 * @return long
 	 */
 	public long getLastestExecutionIdForFailedWorkflow(String workflowId) {
-		Query<InsightsWorkflowExecutionHistory> createQuery = getSession().createQuery(
-				"FROM InsightsWorkflowExecutionHistory EH WHERE EH.workflowConfig.isActive = true and EH.workflowConfig.workflowId=:workflowId order by EH.executionId desc",
-				InsightsWorkflowExecutionHistory.class);
-		createQuery.setParameter(AssessmentReportAndWorkflowConstants.WORKFLOW_ID, workflowId);
-		createQuery.setMaxResults(1);
-		try {
+		try (Session session = getSessionObj()) {
+			Query<InsightsWorkflowExecutionHistory> createQuery = session.createQuery(
+					"FROM InsightsWorkflowExecutionHistory EH WHERE EH.workflowConfig.isActive = true and EH.workflowConfig.workflowId=:workflowId order by EH.executionId desc",
+					InsightsWorkflowExecutionHistory.class);
+			createQuery.setParameter(AssessmentReportAndWorkflowConstants.WORKFLOW_ID, workflowId);
+			createQuery.setMaxResults(1);
 			InsightsWorkflowExecutionHistory nextTasks = createQuery.getSingleResult();
 			return nextTasks.getExecutionId();
 		} catch (NoResultException ne) {
 			return 0;
-		} finally {
-			terminateSession();
-			terminateSessionFactory();
+		} catch (Exception e) {
+			log.error(e);
+			throw e;
 		}
 
 	}
@@ -522,13 +577,15 @@ public class WorkflowDAL extends BaseDAL {
 	 * @return List<InsightsWorkflowConfiguration>
 	 */
 	public List<InsightsWorkflowConfiguration> getAllRestartWorkflows() {
-		Query<InsightsWorkflowConfiguration> createQuery = getSession().createQuery(
-				"FROM InsightsWorkflowConfiguration WC WHERE WC.isActive = true and WC.status='TASK_INITIALIZE_ERROR' ",
-				InsightsWorkflowConfiguration.class);
-		List<InsightsWorkflowConfiguration> resultList = createQuery.getResultList();
-		terminateSession();
-		terminateSessionFactory();
-		return resultList;
+		try (Session session = getSessionObj()) {
+			Query<InsightsWorkflowConfiguration> createQuery = session.createQuery(
+					"FROM InsightsWorkflowConfiguration WC WHERE WC.isActive = true and WC.status='TASK_INITIALIZE_ERROR' ",
+					InsightsWorkflowConfiguration.class);
+			return createQuery.getResultList();
+		} catch (Exception e) {
+			log.error(e);
+			throw e;
+		}
 	}
 
 	/**
@@ -538,13 +595,16 @@ public class WorkflowDAL extends BaseDAL {
 	 * @return int
 	 */
 	public int getTaskId(String mqChannel) {
-		Query createQuery = getSession().createQuery("FROM InsightsWorkflowTask IWT WHERE IWT.mqChannel = :mqChannel",
-				InsightsWorkflowTask.class);
-		createQuery.setParameter("mqChannel", mqChannel);
-		InsightsWorkflowTask workflowTask = (InsightsWorkflowTask) createQuery.uniqueResult();
-		terminateSession();
-		terminateSessionFactory();
-		return workflowTask.getTaskId();
+		try (Session session = getSessionObj()) {
+			Query createQuery = session.createQuery("FROM InsightsWorkflowTask IWT WHERE IWT.mqChannel = :mqChannel",
+					InsightsWorkflowTask.class);
+			createQuery.setParameter("mqChannel", mqChannel);
+			InsightsWorkflowTask workflowTask = (InsightsWorkflowTask) createQuery.uniqueResult();
+			return workflowTask.getTaskId();
+		} catch (Exception e) {
+			log.error(e);
+			throw e;
+		}
 	}
 
 	/**
@@ -554,23 +614,33 @@ public class WorkflowDAL extends BaseDAL {
 	 * @return InsightsWorkflowTask
 	 */
 	public InsightsWorkflowTask getTaskByChannel(String mqChannel) {
-		Query<InsightsWorkflowTask> createQuery = getSession().createQuery("FROM InsightsWorkflowTask IWT WHERE IWT.mqChannel = :mqChannel",
-				InsightsWorkflowTask.class);
-		createQuery.setParameter("mqChannel", mqChannel);
-		InsightsWorkflowTask workflowTask = createQuery.uniqueResult();
-		terminateSession();
-		terminateSessionFactory();
-		return workflowTask;
+		try (Session session = getSessionObj()) {
+			Query<InsightsWorkflowTask> createQuery = session.createQuery(
+					"FROM InsightsWorkflowTask IWT WHERE IWT.mqChannel = :mqChannel", InsightsWorkflowTask.class);
+			createQuery.setParameter("mqChannel", mqChannel);
+			return createQuery.uniqueResult();
+		} catch (Exception e) {
+			log.error(e);
+			throw e;
+		}
 	}
 
+	/**
+	 * Method to delete Workflow Execution History record
+	 * 
+	 * @param history
+	 * @return String
+	 */
 	public String deleteExecutionHistory(InsightsWorkflowExecutionHistory history) {
-
-		getSession().beginTransaction();
-		getSession().delete(history);
-		getSession().getTransaction().commit();
-		terminateSession();
-		terminateSessionFactory();
-		return PlatformServiceConstants.SUCCESS;
+		try (Session session = getSessionObj()) {
+			session.beginTransaction();
+			session.delete(history);
+			session.getTransaction().commit();
+			return PlatformServiceConstants.SUCCESS;
+		} catch (Exception e) {
+			log.error(e);
+			throw e;
+		}
 	}
 
 	/**
@@ -580,17 +650,21 @@ public class WorkflowDAL extends BaseDAL {
 	 * @return String
 	 */
 	public String deleteExecutionHistory(int id) {
-		getSession().beginTransaction();
-		Query<InsightsWorkflowExecutionHistory> createQuery = getSession().createQuery(
-				"FROM InsightsWorkflowExecutionHistory a WHERE a.id= :id", InsightsWorkflowExecutionHistory.class);
-		createQuery.setParameter("id", id);
-		InsightsWorkflowExecutionHistory executionRecord = createQuery.getSingleResult();
-		executionRecord.setWorkflowConfig(null);
-		getSession().delete(executionRecord);
-		getSession().getTransaction().commit();
-		terminateSession();
-		terminateSessionFactory();
-		return PlatformServiceConstants.SUCCESS;
+		try (Session session = getSessionObj()) {
+			session.beginTransaction();
+			Query<InsightsWorkflowExecutionHistory> createQuery = session.createQuery(
+					"FROM InsightsWorkflowExecutionHistory a WHERE a.id= :id", InsightsWorkflowExecutionHistory.class);
+			createQuery.setParameter("id", id);
+			InsightsWorkflowExecutionHistory executionRecord = createQuery.getSingleResult();
+			executionRecord.setWorkflowConfig(null);
+			session.delete(executionRecord);
+			session.getTransaction().commit();
+			return PlatformServiceConstants.SUCCESS;
+		} catch (Exception e) {
+			log.error(e);
+			throw e;
+		}
+
 	}
 
 	/**
@@ -600,13 +674,15 @@ public class WorkflowDAL extends BaseDAL {
 	 * @return InsightsWorkflowTask object
 	 */
 	public InsightsWorkflowTask getTaskbyTaskDescription(String description) {
-		Query<InsightsWorkflowTask> createQuery = getSession().createQuery(
-				"FROM InsightsWorkflowTask RE WHERE RE.description = :description", InsightsWorkflowTask.class);
-		createQuery.setParameter("description", description);
-		InsightsWorkflowTask task = createQuery.uniqueResult();
-		terminateSession();
-		terminateSessionFactory();
-		return task;
+		try (Session session = getSessionObj()) {
+			Query<InsightsWorkflowTask> createQuery = session.createQuery(
+					"FROM InsightsWorkflowTask RE WHERE RE.description = :description", InsightsWorkflowTask.class);
+			createQuery.setParameter("description", description);
+			return createQuery.uniqueResult();
+		} catch (Exception e) {
+			log.error(e);
+			throw e;
+		}
 	}
 
 	/**
@@ -616,17 +692,20 @@ public class WorkflowDAL extends BaseDAL {
 	 * @return String
 	 */
 	public String deleteTask(int taskId) {
-		Query<InsightsWorkflowTask> createQuery = getSession()
-				.createQuery("FROM InsightsWorkflowTask a WHERE a.taskId= :id", InsightsWorkflowTask.class);
-		createQuery.setParameter("id", taskId);
-		InsightsWorkflowTask executionRecord = createQuery.getSingleResult();
-		executionRecord.setWorkflowType(null);
-		getSession().beginTransaction();
-		getSession().delete(executionRecord);
-		getSession().getTransaction().commit();
-		terminateSession();
-		terminateSessionFactory();
-		return PlatformServiceConstants.SUCCESS;
+		try (Session session = getSessionObj()) {
+			Query<InsightsWorkflowTask> createQuery = session
+					.createQuery("FROM InsightsWorkflowTask a WHERE a.taskId= :id", InsightsWorkflowTask.class);
+			createQuery.setParameter("id", taskId);
+			InsightsWorkflowTask executionRecord = createQuery.getSingleResult();
+			executionRecord.setWorkflowType(null);
+			session.beginTransaction();
+			session.delete(executionRecord);
+			session.getTransaction().commit();
+			return PlatformServiceConstants.SUCCESS;
+		} catch (Exception e) {
+			log.error(e);
+			throw e;
+		}
 	}
 
 	/**
@@ -635,11 +714,14 @@ public class WorkflowDAL extends BaseDAL {
 	 * @param emailHistoryConfig
 	 */
 	public void saveEmailExecutionHistory(InsightsReportVisualizationContainer emailHistoryConfig) {
-		getSession().beginTransaction();
-		int historyId = (int) getSession().save(emailHistoryConfig);
-		getSession().getTransaction().commit();
-		terminateSession();
-		terminateSessionFactory();
+		try (Session session = getSessionObj()) {
+			session.beginTransaction();
+			int historyId = (int) session.save(emailHistoryConfig);
+			session.getTransaction().commit();
+		} catch (Exception e) {
+			log.error(e);
+			throw e;
+		}
 	}
 
 	/**
@@ -649,17 +731,15 @@ public class WorkflowDAL extends BaseDAL {
 	 * @return InsightsEmailTemplates
 	 */
 	public InsightsEmailTemplates getEmailTemplateByWorkflowId(String workflowId) {
-		try {
-			Query<InsightsEmailTemplates> createQuery = getSession().createQuery(
+		try (Session session = getSessionObj()) {
+			Query<InsightsEmailTemplates> createQuery = session.createQuery(
 					"FROM InsightsEmailTemplates EH WHERE EH.workflowConfig.workflowId = :workflowId ",
 					InsightsEmailTemplates.class);
 			createQuery.setParameter(AssessmentReportAndWorkflowConstants.WORKFLOW_ID, workflowId);
-			return createQuery.getSingleResult();
+			return createQuery.uniqueResult();
 		} catch (Exception e) {
-			return null;
-		} finally {
-			terminateSession();
-			terminateSessionFactory();
+			log.error(e);
+			throw e;
 		}
 	}
 
@@ -669,11 +749,14 @@ public class WorkflowDAL extends BaseDAL {
 	 * @param emailHistoryConfig
 	 */
 	public void updateEmailExecutionHistory(InsightsReportVisualizationContainer emailHistoryConfig) {
-		getSession().beginTransaction();
-		getSession().update(emailHistoryConfig);
-		getSession().getTransaction().commit();
-		terminateSession();
-		terminateSessionFactory();
+		try (Session session = getSessionObj()) {
+			session.beginTransaction();
+			session.update(emailHistoryConfig);
+			session.getTransaction().commit();
+		} catch (Exception e) {
+			log.error(e);
+			throw e;
+		}
 	}
 
 	/**
@@ -683,17 +766,15 @@ public class WorkflowDAL extends BaseDAL {
 	 * @return InsightsReportVisualizationContainer
 	 */
 	public InsightsReportVisualizationContainer getEmailExecutionHistoryByExecutionId(long executionId) {
-		try {
-			Query<InsightsReportVisualizationContainer> createQuery = getSession().createQuery(
+		try (Session session = getSessionObj()) {
+			Query<InsightsReportVisualizationContainer> createQuery = session.createQuery(
 					"FROM InsightsReportVisualizationContainer EH WHERE EH.executionId = :executionId ",
 					InsightsReportVisualizationContainer.class);
 			createQuery.setParameter("executionId", executionId);
-			return createQuery.getSingleResult();
+			return createQuery.uniqueResult();
 		} catch (Exception e) {
-			return null;
-		} finally {
-			terminateSession();
-			terminateSessionFactory();
+			log.error(e);
+			throw e;
 		}
 	}
 
@@ -704,18 +785,16 @@ public class WorkflowDAL extends BaseDAL {
 	 * @return InsightsReportVisualizationContainer
 	 */
 	public InsightsReportVisualizationContainer getEmailExecutionHistoryByWorkflowId(String workflowId) {
-		try {
-			Query<InsightsReportVisualizationContainer> createQuery = getSession().createQuery(
+		try (Session session = getSessionObj()) {
+			Query<InsightsReportVisualizationContainer> createQuery = session.createQuery(
 					"FROM InsightsReportVisualizationContainer EH WHERE EH.workflowId = :workflowId order by EH.executionId desc",
 					InsightsReportVisualizationContainer.class);
 			createQuery.setParameter(AssessmentReportAndWorkflowConstants.WORKFLOW_ID, workflowId);
 			createQuery.setMaxResults(1);
-			return createQuery.getSingleResult();
+			return createQuery.uniqueResult();
 		} catch (Exception e) {
-			return null;
-		} finally {
-			terminateSession();
-			terminateSessionFactory();
+			log.error(e);
+			throw e;
 		}
 	}
 
@@ -728,19 +807,17 @@ public class WorkflowDAL extends BaseDAL {
 	 */
 	public InsightsReportVisualizationContainer getReportVisualizationContainerByWorkflowAndExecutionId(
 			String workflowId, long executionId) {
-		try {
-			Query<InsightsReportVisualizationContainer> createQuery = getSession().createQuery(
+		try (Session session = getSessionObj()) {
+			Query<InsightsReportVisualizationContainer> createQuery = session.createQuery(
 					"FROM InsightsReportVisualizationContainer EH WHERE EH.workflowId = :workflowId AND EH.executionId=:executionId",
 					InsightsReportVisualizationContainer.class);
 			createQuery.setParameter(AssessmentReportAndWorkflowConstants.WORKFLOW_ID, workflowId);
 			createQuery.setParameter("executionId", executionId);
 			createQuery.setMaxResults(1);
-			return createQuery.getSingleResult();
+			return createQuery.uniqueResult();
 		} catch (Exception e) {
-			return null;
-		} finally {
-			terminateSession();
-			terminateSessionFactory();
+			log.error(e);
+			throw e;
 		}
 	}
 
@@ -751,26 +828,22 @@ public class WorkflowDAL extends BaseDAL {
 	 * @return String
 	 */
 	public String deleteEmailExecutionHistoryByWorkflowId(String workflowId) {
-		try {
-			getSession().beginTransaction();
-			Query<InsightsReportVisualizationContainer> createQuery = getSession().createQuery(
+		try (Session session = getSessionObj()) {
+			session.beginTransaction();
+			Query<InsightsReportVisualizationContainer> createQuery = session.createQuery(
 					"FROM InsightsReportVisualizationContainer a WHERE a.workflowId= :workflowId",
 					InsightsReportVisualizationContainer.class);
 			createQuery.setParameter(AssessmentReportAndWorkflowConstants.WORKFLOW_ID, workflowId);
 			List<InsightsReportVisualizationContainer> executionRecords = createQuery.getResultList();
 			for (InsightsReportVisualizationContainer insightsReportVisualizationContainer : executionRecords) {
-				getSession().delete(insightsReportVisualizationContainer);
+				session.delete(insightsReportVisualizationContainer);
 
 			}
-			getSession().getTransaction().commit();
-			terminateSession();
-			terminateSessionFactory();
+			session.getTransaction().commit();
 			return PlatformServiceConstants.SUCCESS;
 		} catch (Exception e) {
-			return null;
-		} finally {
-			terminateSession();
-			terminateSessionFactory();
+			log.error(e);
+			throw e;
 		}
 	}
 
@@ -779,36 +852,30 @@ public class WorkflowDAL extends BaseDAL {
 	 * 
 	 * @param workflowId
 	 * @return String
-	 * @throws InsightsCustomException 
+	 * @throws InsightsCustomException
 	 */
 	public String deleteEmailTemplateByWorkflowId(String workflowId) throws InsightsCustomException {
-		try {
-			Query<InsightsEmailTemplates> createQuery = getSession().createQuery(
+		try (Session session = getSessionObj(); Session deleteSession = getSessionObj()) {
+			Query<InsightsEmailTemplates> createQuery = session.createQuery(
 					"FROM InsightsEmailTemplates a WHERE a.workflowConfig.workflowId= :workflowId",
 					InsightsEmailTemplates.class);
 			createQuery.setParameter(AssessmentReportAndWorkflowConstants.WORKFLOW_ID, workflowId);
 			List<InsightsEmailTemplates> executionRecords = createQuery.getResultList();
 			for (InsightsEmailTemplates insightsEmailTemplates : executionRecords) {
-				getSession().beginTransaction();
+				session.beginTransaction();
 				insightsEmailTemplates.setWorkflowConfig(null);
-				getSession().save(insightsEmailTemplates);
-				getSession().getTransaction().commit();
+				session.save(insightsEmailTemplates);
+				session.getTransaction().commit();
 			}
-			terminateSession();
-			terminateSessionFactory();
 			for (InsightsEmailTemplates insightsEmailTemplates : executionRecords) {
-				getSession().beginTransaction();
-				getSession().delete(insightsEmailTemplates);
-				getSession().getTransaction().commit();
+				deleteSession.beginTransaction();
+				deleteSession.delete(insightsEmailTemplates);
+				deleteSession.getTransaction().commit();
 			}
-			terminateSession();
-			terminateSessionFactory();
 			return PlatformServiceConstants.SUCCESS;
 		} catch (Exception e) {
+			log.error(e);
 			throw new InsightsCustomException("Error while deleting email template, Please check log for detail  ");
-		} finally {
-			terminateSession();
-			terminateSessionFactory();
 		}
 	}
 
@@ -820,20 +887,16 @@ public class WorkflowDAL extends BaseDAL {
 	 * @return List<Object[]>
 	 */
 	public List<Object[]> getMaxExecutionIDsFromWorkflowExecutionAndReportVisualization(String workflowId) {
-		List<Object[]> records = null;
-		try {
+		try (Session session = getSessionObj()) {
 			String query = "SELECT max(IRCV.executionid) as emailexecutionid,max(IWEH.executionid) as workflowexecutionid"
 					+ "  FROM \"INSIGHTS_REPORT_VISUALIZATION_CONTAINER\" IRCV inner join \"INSIGHTS_WORKFLOW_EXECUTION_HISTORY\" IWEH on IRCV.workflowid=IWEH.workflowid where IWEH.workflowid=:workflowId";
-			Query createQuery = getSession().createSQLQuery(query)
-					.addScalar("emailexecutionid", StandardBasicTypes.LONG)
+			Query createQuery = session.createSQLQuery(query).addScalar("emailexecutionid", StandardBasicTypes.LONG)
 					.addScalar("workflowexecutionid", StandardBasicTypes.LONG).setParameter(AssessmentReportAndWorkflowConstants.WORKFLOW_ID, workflowId);
-			records = createQuery.getResultList();
-			terminateSession();
-			terminateSessionFactory();
+			return createQuery.getResultList();
 		} catch (Exception e) {
 			log.error(e);
+			throw e;
 		}
-		return records;
 	}
 
 	/**
@@ -843,13 +906,15 @@ public class WorkflowDAL extends BaseDAL {
 	 * @return String
 	 */
 	public String saveInsightsWorkflowConfig(InsightsWorkflowConfiguration config) {
-
-		getSession().beginTransaction();
-		String workflowId = (String) getSession().save(config);
-		getSession().getTransaction().commit();
-		terminateSession();
-		terminateSessionFactory();
-		return workflowId;
+		try (Session session = getSessionObj()) {
+			session.beginTransaction();
+			String workflowId = (String) session.save(config);
+			session.getTransaction().commit();
+			return workflowId;
+		} catch (Exception e) {
+			log.error(e);
+			throw e;
+		}
 	}
 
 	/**
@@ -859,12 +924,15 @@ public class WorkflowDAL extends BaseDAL {
 	 * @return int
 	 */
 	public int saveWorkflowType(InsightsWorkflowType type) {
-		getSession().beginTransaction();
-		int workflowTypeId = (int) getSession().save(type);
-		getSession().getTransaction().commit();
-		terminateSession();
-		terminateSessionFactory();
-		return workflowTypeId;
+		try (Session session = getSessionObj()) {
+			session.beginTransaction();
+			int workflowTypeId = (int) session.save(type);
+			session.getTransaction().commit();
+			return workflowTypeId;
+		} catch (Exception e) {
+			log.error(e);
+			throw e;
+		}
 	}
 
 	/**
@@ -874,13 +942,15 @@ public class WorkflowDAL extends BaseDAL {
 	 * @return InsightsWorkflowType
 	 */
 	public InsightsWorkflowType getWorkflowType(String workflowType) {
-		Query<InsightsWorkflowType> createQuery = getSession().createQuery(
-				"FROM InsightsWorkflowType IWT WHERE IWT.workflowType = :workflowType", InsightsWorkflowType.class);
-		createQuery.setParameter("workflowType", workflowType);
-		InsightsWorkflowType type = createQuery.uniqueResult();
-		terminateSession();
-		terminateSessionFactory();
-		return type;
+		try (Session session = getSessionObj()) {
+			Query<InsightsWorkflowType> createQuery = session.createQuery(
+					"FROM InsightsWorkflowType IWT WHERE IWT.workflowType = :workflowType", InsightsWorkflowType.class);
+			createQuery.setParameter("workflowType", workflowType);
+			return createQuery.uniqueResult();
+		} catch (Exception e) {
+			log.error(e);
+			throw e;
+		}
 	}
 
 	/**
@@ -891,59 +961,69 @@ public class WorkflowDAL extends BaseDAL {
 	 * @return Boolean
 	 */
 	public Boolean updateWorkflowConfigActive(String workflowId, Boolean status) {
-		Query<InsightsWorkflowConfiguration> createQuery = getSession().createQuery(
-				"FROM InsightsWorkflowConfiguration WC WHERE WC.workflowId = :workflowId ",
-				InsightsWorkflowConfiguration.class);
-		createQuery.setParameter(AssessmentReportAndWorkflowConstants.WORKFLOW_ID, workflowId);
-		InsightsWorkflowConfiguration updateStatus = createQuery.uniqueResult();
-		updateStatus.setActive(status);
-		getSession().beginTransaction();
-		getSession().update(updateStatus);
-		getSession().getTransaction().commit();
-		terminateSession();
-		terminateSessionFactory();
-		return Boolean.TRUE;
+		try (Session session = getSessionObj()) {
+			Query<InsightsWorkflowConfiguration> createQuery = session.createQuery(
+					"FROM InsightsWorkflowConfiguration WC WHERE WC.workflowId = :workflowId ",
+					InsightsWorkflowConfiguration.class);
+			createQuery.setParameter(AssessmentReportAndWorkflowConstants.WORKFLOW_ID, workflowId);
+			InsightsWorkflowConfiguration updateStatus = createQuery.uniqueResult();
+			updateStatus.setActive(status);
+			session.beginTransaction();
+			session.update(updateStatus);
+			session.getTransaction().commit();
+			return Boolean.TRUE;
+		} catch (Exception e) {
+			log.error(e);
+			throw e;
+		}
 	}
-	
+
 	/**
-	 * Method to delete WorkflowType 
+	 * Method to delete WorkflowType
 	 * 
 	 * @param typeId
 	 * @return String
 	 */
 	public String deleteWorkflowType(int typeId) {
-		Query<InsightsWorkflowType> createQuery = getSession()
-				.createQuery("FROM InsightsWorkflowType a WHERE a.id= :id", InsightsWorkflowType.class);
-		createQuery.setParameter("id", typeId);
-		InsightsWorkflowType executionRecord = createQuery.getSingleResult();
-		getSession().beginTransaction();
-		getSession().delete(executionRecord);
-		getSession().getTransaction().commit();
-		terminateSession();
-		terminateSessionFactory();
-		return PlatformServiceConstants.SUCCESS;
+		try (Session session = getSessionObj()) {
+			Query<InsightsWorkflowType> createQuery = session.createQuery("FROM InsightsWorkflowType a WHERE a.id= :id",
+					InsightsWorkflowType.class);
+			createQuery.setParameter("id", typeId);
+			InsightsWorkflowType executionRecord = createQuery.getSingleResult();
+			session.beginTransaction();
+			session.delete(executionRecord);
+			session.getTransaction().commit();
+			return PlatformServiceConstants.SUCCESS;
+		} catch (Exception e) {
+			log.error(e);
+			throw e;
+		}
 	}
-	
+
 	/**
-	 * Method to delete WorkflowConfiguration  record
+	 * Method to delete WorkflowConfiguration record
 	 * 
 	 * @param workflowId
 	 * @return String
 	 */
 	public String deleteWorkflowConfig(String workflowId) {
-		Query<InsightsWorkflowConfiguration> createQuery = getSession()
-				.createQuery("FROM InsightsWorkflowConfiguration a WHERE a.workflowId= :workflowId", InsightsWorkflowConfiguration.class);
-		createQuery.setParameter(AssessmentReportAndWorkflowConstants.WORKFLOW_ID, workflowId);
-		InsightsWorkflowConfiguration executionRecord = createQuery.getSingleResult();
-		executionRecord.setEmailConfig(null);
-		executionRecord.setTaskSequenceEntity(null);
-		executionRecord.setAssessmentConfig(null);
-		getSession().beginTransaction();
-		getSession().delete(executionRecord);
-		getSession().getTransaction().commit();
-		terminateSession();
-		terminateSessionFactory();
-		return PlatformServiceConstants.SUCCESS;
+		try (Session session = getSessionObj()) {
+			Query<InsightsWorkflowConfiguration> createQuery = session.createQuery(
+					"FROM InsightsWorkflowConfiguration a WHERE a.workflowId= :workflowId",
+					InsightsWorkflowConfiguration.class);
+			createQuery.setParameter("workflowId", workflowId);
+			InsightsWorkflowConfiguration executionRecord = createQuery.getSingleResult();
+			executionRecord.setEmailConfig(null);
+			executionRecord.setTaskSequenceEntity(null);
+			executionRecord.setAssessmentConfig(null);
+			session.beginTransaction();
+			session.delete(executionRecord);
+			session.getTransaction().commit();
+			return PlatformServiceConstants.SUCCESS;
+		} catch (Exception e) {
+			log.error(e);
+			throw e;
+		}
 	}
 
 }

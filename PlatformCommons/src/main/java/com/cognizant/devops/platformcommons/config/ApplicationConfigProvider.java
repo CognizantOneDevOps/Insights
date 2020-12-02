@@ -20,6 +20,10 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
+
 /**
  * 
  * @author 146414 This class will hold all the config options required for
@@ -27,16 +31,19 @@ import java.util.List;
  *
  */
 public class ApplicationConfigProvider implements Serializable {
-
 	private static ApplicationConfigProvider instance = new ApplicationConfigProvider();
 	private EndpointData endpointData = new EndpointData();
 	private SparkConfigurations sparkConfigurations = new SparkConfigurations();
+	@Valid
 	private GraphData graph = new GraphData();
+	@Valid
 	private GrafanaData grafana = new GrafanaData();
+	@Valid
 	private MessageQueueDataModel messageQueue = new MessageQueueDataModel();
 	private String insightsServiceURL;
-	private String insightsTimeZone = "US/Central";
-	private PostgreData postgre;
+	private String insightsTimeZone = "UTC";
+	@Valid
+	private PostgreData postgre = new PostgreData();
 	private String userId;
 	private String password;
 	private String proxyHost;
@@ -57,13 +64,14 @@ public class ApplicationConfigProvider implements Serializable {
 	private String driverLocation;
 
 	private Vault vault = new Vault();
+	@NotEmpty @NotBlank
 	private String autheticationProtocol = "NativeGrafana";
 	private SingleSignOnConfig singleSignOnConfig = new SingleSignOnConfig();
 	private AssessmentReport assessmentReport = new AssessmentReport();	
 	private WorkflowDetails workflowDetails = new WorkflowDetails();
 	private MlConfiguration mlConfiguration = new MlConfiguration();
 
-	private WebhookEngine webhookEngine= new WebhookEngine();
+    private WebhookEngine webhookEngine= new WebhookEngine();
     private String pdfkey;
     
 	private ApplicationConfigProvider() {

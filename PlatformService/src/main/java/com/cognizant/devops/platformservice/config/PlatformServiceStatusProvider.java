@@ -21,6 +21,7 @@ import java.util.Map;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.core.util.ComponentHealthLogger;
 
 public class PlatformServiceStatusProvider extends ComponentHealthLogger {
@@ -44,7 +45,10 @@ public class PlatformServiceStatusProvider extends ComponentHealthLogger {
 			version = PlatformServiceInitializer.class.getPackage().getSpecificationVersion();
 			log.debug(" Insights version {} ", version);
 			Map<String, String> extraParameter = new HashMap<>(0);
-			createComponentStatusNode("HEALTH:INSIGHTS_PLATFORMSERVICE", version, message, status, extraParameter);
+			if(ApplicationConfigProvider.getInstance().getGraph().getAuthToken()!=null && 
+					!ApplicationConfigProvider.getInstance().getGraph().getAuthToken().equals("")) {
+				createComponentStatusNode("HEALTH:INSIGHTS_PLATFORMSERVICE", version, message, status, extraParameter);
+			}
 		} catch (Exception e) {
 			log.error(" Unable to create node {} ", e.getMessage());
 		}

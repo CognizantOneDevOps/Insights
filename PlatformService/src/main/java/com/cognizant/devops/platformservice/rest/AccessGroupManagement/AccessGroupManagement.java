@@ -42,7 +42,6 @@ import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
 import com.cognizant.devops.platformcommons.core.util.ValidationUtils;
 import com.cognizant.devops.platformcommons.dal.grafana.GrafanaHandler;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
-import com.cognizant.devops.platformservice.rest.es.models.DashboardModel;
 import com.cognizant.devops.platformservice.rest.es.models.DashboardResponse;
 import com.cognizant.devops.platformservice.rest.util.PlatformServiceUtil;
 import com.cognizant.devops.platformservice.security.config.AuthenticationUtils;
@@ -62,6 +61,8 @@ public class AccessGroupManagement {
 	private HttpServletRequest httpRequest;
 
 	GrafanaHandler grafanaHandler = new GrafanaHandler();
+	AccessGroupManagementServiceImpl accessGrpMgmtServiceImpl = new AccessGroupManagementServiceImpl();
+	
 	private static final String PATH = "/api/users/lookup?loginOrEmail=";
 	private static final String USERDETAIL = "/api/users/search?&query=";
 
@@ -438,7 +439,7 @@ public class AccessGroupManagement {
 			}
 			String grafanaUrl = grafanaBaseUrl + "/dashboard/";
 			String grafanaIframeUrl = grafanaBaseUrl + "/dashboard/script/iSight_ui3.js?url=";
-			String grafanaDomainUrl = grafanaUrl(grafanaBaseUrl);
+			String grafanaDomainUrl = accessGrpMgmtServiceImpl.grafanaUrl(grafanaBaseUrl);
 			String grafanaVersion = ApplicationConfigProvider.getInstance().getGrafana().getGrafanaVersion();
 			if (grafanaVersion == null) {
 				grafanaVersion = "7.0.3";
@@ -493,59 +494,7 @@ public class AccessGroupManagement {
 
 	@GetMapping(value = "/dashboards", produces = MediaType.APPLICATION_JSON_VALUE)
 	public String loadDashboardData() {
-		DashboardResponse dashboardResponse = new DashboardResponse();
-		try {
-
-			Map<String, String> headers = PlatformServiceUtil.prepareGrafanaHeader(httpRequest);
-
-			String grafanaResponse = grafanaHandler.grafanaGet("/api/search", headers);
-			JsonElement response = new JsonParser().parse(grafanaResponse);
-			JsonArray dashboardsJsonArray = response.getAsJsonArray();
-			String grafanaBaseUrl = ApplicationConfigProvider.getInstance().getGrafana().getGrafanaExternalEndPoint();
-			if (grafanaBaseUrl == null) {
-				grafanaBaseUrl = ApplicationConfigProvider.getInstance().getGrafana().getGrafanaEndpoint();
-			}
-			String grafanaUrl = grafanaBaseUrl + "/dashboard/";
-			String grafanaIframeUrl = grafanaBaseUrl + "/dashboard/script/iSight.js?url=";
-			String grafanaDomainUrl = grafanaUrl(grafanaBaseUrl);
-			String grafanaVersion = ApplicationConfigProvider.getInstance().getGrafana().getGrafanaVersion();
-			if (grafanaVersion == null) {
-				grafanaVersion = "4.6.2";
-			}
-			for (JsonElement data : dashboardsJsonArray) {
-				JsonObject dashboardData = data.getAsJsonObject();
-				DashboardModel model = new DashboardModel();
-				model.setId(dashboardData.get(PlatformServiceConstants.TITLE).getAsString());
-				model.setTitle(dashboardData.get(PlatformServiceConstants.TITLE).getAsString());
-				if (dashboardData.has("type")) {
-					if ("dash-db".equals(dashboardData.get("type").getAsString())) {
-						if (grafanaVersion.contains("5.")) {
-							model.setUrl(grafanaIframeUrl + grafanaDomainUrl + dashboardData.get("url").getAsString());
-						} else {
-							model.setUrl(grafanaIframeUrl + grafanaUrl + dashboardData.get("uri").getAsString());
-						}
-						dashboardResponse.addDashboard(model);
-					}
-				}
-			}
-
-		} catch (Exception e) {
-			log.error(e);
-		}
+		DashboardResponse dashboardResponse = accessGrpMgmtServiceImpl.loadGrafanaDashboardData();
 		return new GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create().toJson(dashboardResponse);
-	}
-
-	private String grafanaUrl(String baseUrl) {
-		String parsedUrl = null;
-		try {
-			URL uri = new URL(baseUrl);
-			parsedUrl = uri.getProtocol() + "://" + uri.getHost();
-			if (uri.getPort() > -1) {
-				parsedUrl = parsedUrl + ":" + uri.getPort();
-			}
-		} catch (MalformedURLException e) {
-			log.error("Error in Parsing Grafana URL", e);
-		}
-		return parsedUrl;
 	}
 }

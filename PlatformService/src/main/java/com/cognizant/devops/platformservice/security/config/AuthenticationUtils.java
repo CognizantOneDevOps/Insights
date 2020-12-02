@@ -136,7 +136,7 @@ public class AuthenticationUtils {
 			log.debug("host information {} ", hostInfo);
 			return hostInfo;
 		} catch (MalformedURLException e) {
-			log.error("Unable to retrive host information ");
+			log.error("Unable to retrive host information ",e);
 			log.error(e);
 			return null;
 		}
@@ -150,7 +150,7 @@ public class AuthenticationUtils {
 		try {
 			String url = URLEncoder.encode(
 					ApplicationConfigProvider.getInstance().getSingleSignOnConfig().getPostLogoutURL(), "UTF-8");
-			String returnLogoutStr = String.format("{}/#/logout/{}?logout_url={}&message={}",
+			String returnLogoutStr = String.format("%s/#/logout/%s?logout_url=%s&message=%s",
 					ApplicationConfigProvider.getInstance().getInsightsServiceURL(), logoutCode, url, message);
 			log.debug("Logout URL ++++ {} ", returnLogoutStr);
 			return returnLogoutStr;

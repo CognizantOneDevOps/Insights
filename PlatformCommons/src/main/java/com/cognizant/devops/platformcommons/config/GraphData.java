@@ -17,9 +17,18 @@ package com.cognizant.devops.platformcommons.config;
 
 import java.io.Serializable;
 
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Pattern;
+
 public class GraphData implements Serializable{
+
+	 @NotBlank
 	private String endpoint;
+
+	 @Pattern(regexp = "^(?!\\s*$).+", message = "Neo4j  authToken must not be blank")
 	private String authToken;
+	 
+	 @NotBlank
 	private String boltEndPoint;
 	private Integer connectionExpiryTimeOut;
 	private Integer maxIdleConnections;

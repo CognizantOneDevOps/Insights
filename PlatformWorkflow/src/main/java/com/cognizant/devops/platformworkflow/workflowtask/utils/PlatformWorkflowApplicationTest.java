@@ -27,6 +27,7 @@ import org.quartz.impl.StdSchedulerFactory;
 import com.cognizant.devops.platformcommons.config.ApplicationConfigCache;
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.constants.AssessmentReportAndWorkflowConstants;
+import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformworkflow.workflowtask.core.WorkflowExecutor;
 import com.cognizant.devops.platformworkflow.workflowtask.core.WorkflowImmediateJobExecutor;
 import com.cognizant.devops.platformworkflow.workflowtask.core.WorkflowRetryExecutor;
@@ -51,13 +52,13 @@ public class PlatformWorkflowApplicationTest implements AssessmentReportAndWorkf
 		testWorkflowExecutor();
 	}
 
-	public static void testWorkflowExecutor() {
-		// Load isight config
-		ApplicationConfigCache.loadConfigCache();
-		// Create Default users
-		ApplicationConfigProvider.performSystemCheck();
-
+	public static void testWorkflowExecutor()  {
 		try {
+			
+			// Load isight config
+			ApplicationConfigCache.loadConfigCache();
+			// Create Default users
+			ApplicationConfigProvider.performSystemCheck();
 
 			log.debug(" Worlflow Detail ==== Inside PlatformWorkflowApplicationTest   ");
 

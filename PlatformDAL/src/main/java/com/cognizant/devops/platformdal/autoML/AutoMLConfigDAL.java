@@ -19,6 +19,7 @@ import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.hibernate.Session;
 import org.hibernate.query.Query;
 
 import com.cognizant.devops.platformdal.core.BaseDAL;
@@ -38,15 +39,20 @@ public class AutoMLConfigDAL extends BaseDAL {
     private WorkflowDAL workflowDal = new WorkflowDAL(); 
 
     public boolean isUsecaseExisting(String usecase) {
-        Query<AutoMLConfig> createQuery = getSession().createQuery("FROM AutoMLConfig a WHERE a.useCaseName = :usecase ",
-                AutoMLConfig.class);
-        createQuery.setParameter(USECASE, usecase);
-        log.debug("QUERY: {}", createQuery);
-        if (createQuery.getResultList().isEmpty()) {
-            return Boolean.FALSE;
-        } else {
-            return Boolean.TRUE;
-        }
+		try (Session session = getSessionObj()) {
+			Query<AutoMLConfig> createQuery = session.createQuery("FROM AutoMLConfig a WHERE a.useCaseName = :usecase ",
+					AutoMLConfig.class);
+			createQuery.setParameter(USECASE, usecase);
+			log.debug("QUERY: {}", createQuery);
+			if (createQuery.getResultList().isEmpty()) {
+				return Boolean.FALSE;
+			} else {
+				return Boolean.TRUE;
+			}
+		} catch (Exception e) {
+			log.error(e.getMessage());
+			throw e;
+		}
     }
 
 
@@ -60,7 +66,10 @@ public class AutoMLConfigDAL extends BaseDAL {
      * @return
      */
     public boolean createOrUpdate(String usecase, String config, String prediction, String Mojo) {
-        Query<AutoMLConfig> createQuery = getSession().createQuery(
+      
+    	try (Session session = getSessionObj()) {
+    	
+    	Query<AutoMLConfig> createQuery = session.createQuery(
                 "FROM AutoMLConfig a WHERE a.usecase = :usecase",
                 AutoMLConfig.class);
         createQuery.setParameter(USECASE, usecase);
@@ -70,55 +79,56 @@ public class AutoMLConfigDAL extends BaseDAL {
         if (!resultList.isEmpty()) {
             autoMLConfig = resultList.get(0);
         }
-        getSession().beginTransaction();
+        session.beginTransaction();
         if (autoMLConfig != null) {
             if (Mojo != null)
                 autoMLConfig.setMojoDeployed(Mojo);
             if (prediction != null)
                 autoMLConfig.setPredictionColumn(prediction);
             autoMLConfig.setUpdatedDate(updatedDate);
-            getSession().update(autoMLConfig);
+            session.update(autoMLConfig);
         } else {
             autoMLConfig = new AutoMLConfig();
 			autoMLConfig.setUseCaseName(usecase);
             autoMLConfig.setConfigJson(config);
             autoMLConfig.setCreatedDate(updatedDate);
             autoMLConfig.setUpdatedDate(updatedDate);
-            getSession().save(autoMLConfig);
+            session.save(autoMLConfig);
         }
-        getSession().getTransaction().commit();
-        terminateSession();
-        terminateSessionFactory();
+        session.getTransaction().commit();
         return true;
+    	}catch (Exception e) {
+			log.error(e.getMessage());
+			throw e;
+		}
     }
     
     
     public int updateMLConfig(AutoMLConfig config)
     {
-    	int id=-1;
-    	try {
-    	getSession().beginTransaction();
-		getSession().update(config);
-		getSession().getTransaction().commit();
-		terminateSession();
-		terminateSessionFactory();
-		return 1;
-    	}
-    	catch(Exception e) {return id;}
+    	
+		int id = -1;
+		try (Session session = getSessionObj()) {
+			session.beginTransaction();
+			session.update(config);
+			session.getTransaction().commit();
+			return 1;
+		} catch (Exception e) {
+			return id;
+		}
     }
     
     public int saveMLConfig(AutoMLConfig config)
     { 
-    	int id=-1;
-    	try {
-    	getSession().beginTransaction();
-		id = (int) getSession().save(config);
-		getSession().getTransaction().commit();
-		terminateSession();
-		terminateSessionFactory();
-		return id;
-    	}
-    	catch(Exception e) {return id;}
+		int id = -1;
+		try (Session session = getSessionObj()) {
+			session.beginTransaction();
+			id = (int) session.save(config);
+			session.getTransaction().commit();
+			return id;
+		} catch (Exception e) {
+			return id;
+		}
     }
 
     /**
@@ -128,23 +138,33 @@ public class AutoMLConfigDAL extends BaseDAL {
      * @return
      */
     public String getPredictionColumn(String usecase) {
-        Query<AutoMLConfig> createQuery = getSession().createQuery("FROM AutoMLConfig AC WHERE AC.usecase = :usecase",
-                AutoMLConfig.class);
-        createQuery.setParameter(USECASE, usecase);
-        AutoMLConfig result = createQuery.getSingleResult();
-        terminateSession();
-        terminateSessionFactory();
-        return result.getPredictionColumn();
+      
+		try (Session session = getSessionObj()) {
+
+			Query<AutoMLConfig> createQuery = session.createQuery("FROM AutoMLConfig AC WHERE AC.usecase = :usecase",
+					AutoMLConfig.class);
+			createQuery.setParameter(USECASE, usecase);
+			AutoMLConfig result = createQuery.getSingleResult();
+			return result.getPredictionColumn();
+		} catch (Exception e) {
+			log.error(e.getMessage());
+			throw e;
+		}
+        
     }
     
     public AutoMLConfig getMLConfigByUsecase(String usecase) {
-        Query<AutoMLConfig> createQuery = getSession().createQuery("FROM AutoMLConfig AC WHERE AC.useCaseName = :usecase",
-                AutoMLConfig.class);
-        createQuery.setParameter(USECASE, usecase);
-        AutoMLConfig result = createQuery.getSingleResult();
-        terminateSession();
-        terminateSessionFactory();
-        return result;
+       
+		try (Session session = getSessionObj()) {
+			Query<AutoMLConfig> createQuery = session
+					.createQuery("FROM AutoMLConfig AC WHERE AC.useCaseName = :usecase", AutoMLConfig.class);
+			createQuery.setParameter(USECASE, usecase);
+			AutoMLConfig result = createQuery.getSingleResult();
+			return result;
+		} catch (Exception e) {
+			log.error(e.getMessage());
+			throw e;
+		}
     }
 
     /**
@@ -155,28 +175,30 @@ public class AutoMLConfigDAL extends BaseDAL {
      */
     public boolean deleteUsecase(String usecase) {
 
-		Query<AutoMLConfig> createQuery = getSession().createQuery(
-				"FROM AutoMLConfig a WHERE a.useCaseName = :usecase",
-				AutoMLConfig.class);
-		createQuery.setParameter(USECASE, usecase);
-		AutoMLConfig autoMLConfig = createQuery.uniqueResult();
-		if (autoMLConfig != null) {
-			List<InsightsWorkflowExecutionHistory> executionHistory = workflowDal
-					.getWorkflowExecutionHistoryByWorkflowId(autoMLConfig.getWorkflowConfig().getWorkflowId());
-			if (!executionHistory.isEmpty()) {
-				executionHistory.forEach(eachExecution -> {
-					workflowDal.deleteExecutionHistory(eachExecution);
-				});
+		try (Session session = getSessionObj()) {
+			Query<AutoMLConfig> createQuery = session.createQuery("FROM AutoMLConfig a WHERE a.useCaseName = :usecase",
+					AutoMLConfig.class);
+			createQuery.setParameter(USECASE, usecase);
+			AutoMLConfig autoMLConfig = createQuery.uniqueResult();
+			if (autoMLConfig != null) {
+				List<InsightsWorkflowExecutionHistory> executionHistory = workflowDal
+						.getWorkflowExecutionHistoryByWorkflowId(autoMLConfig.getWorkflowConfig().getWorkflowId());
+				if (!executionHistory.isEmpty()) {
+					executionHistory.forEach(eachExecution -> {
+						workflowDal.deleteExecutionHistory(eachExecution);
+					});
+				}
+				session.beginTransaction();
+				session.delete(autoMLConfig);
+				session.getTransaction().commit();
+			} else {
+				return false;
 			}
-			getSession().beginTransaction();
-			getSession().delete(autoMLConfig);
-			getSession().getTransaction().commit();
-		} else {
-			return false;
+			return true;
+		} catch (Exception e) {
+			log.error(e.getMessage());
+			throw e;
 		}
-		terminateSession();
-		terminateSessionFactory();
-		return true;
     }
 
     /**
@@ -185,12 +207,14 @@ public class AutoMLConfigDAL extends BaseDAL {
      * @return
      */
     public List<AutoMLConfig> fetchUsecases() {
-        Query<AutoMLConfig> createQuery = getSession().createQuery("FROM AutoMLConfig",
-                AutoMLConfig.class);
-        List<AutoMLConfig> result = createQuery.getResultList();
-        terminateSession();
-        terminateSessionFactory();
-        return result;
+		try (Session session = getSessionObj()) {
+			Query<AutoMLConfig> createQuery = session.createQuery("FROM AutoMLConfig", AutoMLConfig.class);
+			List<AutoMLConfig> result = createQuery.getResultList();
+			return result;
+		} catch (Exception e) {
+			log.error(e.getMessage());
+			throw e;
+		}
     }
     
     
@@ -201,13 +225,16 @@ public class AutoMLConfigDAL extends BaseDAL {
 	 * @return
 	 */
 	public AutoMLConfig fetchUseCasesByWorkflowId(String workflowId) {
-		Query<AutoMLConfig> createQuery = getSession().createQuery(
-				"FROM AutoMLConfig AMLC where AMLC.workflowConfig.workflowId = :workflowId", AutoMLConfig.class);
-		createQuery.setParameter("workflowId", workflowId);
-		AutoMLConfig result = createQuery.uniqueResult();
-		terminateSession();
-		terminateSessionFactory();
-		return result;
+		try (Session session = getSessionObj()) {
+			Query<AutoMLConfig> createQuery = session.createQuery(
+					"FROM AutoMLConfig AMLC where AMLC.workflowConfig.workflowId = :workflowId", AutoMLConfig.class);
+			createQuery.setParameter("workflowId", workflowId);
+			AutoMLConfig result = createQuery.uniqueResult();
+			return result;
+		} catch (Exception e) {
+			log.error(e.getMessage());
+			throw e;
+		}
 	}
 	
 	/**
@@ -216,13 +243,17 @@ public class AutoMLConfigDAL extends BaseDAL {
      * @return
      */
 	public List<AutoMLConfig> getActiveUsecaseList() {
-        Query<AutoMLConfig> createQuery = getSession().createQuery(
-        		"FROM AutoMLConfig AMLC WHERE AMLC.isActive = true AND AMLC.status = 'MOJO_DEPLOYED'",
-        		AutoMLConfig.class);
-        List<AutoMLConfig> result = createQuery.getResultList();
-        terminateSession();
-        terminateSessionFactory();
-        return result;
+        
+		try (Session session = getSessionObj()) {
+			Query<AutoMLConfig> createQuery = session.createQuery(
+					"FROM AutoMLConfig AMLC WHERE AMLC.isActive = true AND AMLC.status = 'MOJO_DEPLOYED'",
+					AutoMLConfig.class);
+			List<AutoMLConfig> result = createQuery.getResultList();
+			return result;
+		} catch (Exception e) {
+			log.error(e.getMessage());
+			throw e;
+		}
     }
 
 }

@@ -210,6 +210,11 @@ export class RestAPIurlService implements IRestAPIUrlService {
         this.addEndPoint("UPLOAD_REPORT_TEMPLATE", '/PlatformService/insights/report/uploadReportTemplate');
         this.addEndPoint("UPLOAD_REPORT_DESIGN_TEMPLATE", '/PlatformService/insights/report/uploadReportTemplateDesignFiles');
 
+        //server config changes
+        this.addEndPoint("SERVER_CONFIG_TEMPLATE", '/PlatformService/configMgmt/getServerConfigDetail');
+        this.addEndPoint("SAVE_SERVER_CONFIG", '/PlatformService/configMgmt/saveServerConfigDetail');
+        this.addEndPoint("GET_SERVER_CONFIG_STATUS", '/PlatformService/configMgmt/getServerConfigStatus');
+
     }
 
     public addEndPoint(name: String, url: String) {

@@ -17,70 +17,90 @@ package com.cognizant.devops.platformdal.data.tagging;
 
 import java.util.List;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.hibernate.Session;
 import org.hibernate.query.Query;
 
 import com.cognizant.devops.platformdal.core.BaseDAL;
 
 public class DataTaggingDAL extends BaseDAL {
 
+	private static Logger log = LogManager.getLogger(DataTaggingDAL.class);
+	
+	
 	public boolean addEntityData(DataTagging dataTagging) {
-		getSession().beginTransaction();
-		getSession().save(dataTagging);
-		getSession().getTransaction().commit();
-		terminateSession();
-		terminateSessionFactory();
-		return true;
+		try (Session session = getSessionObj()) {
+			session.beginTransaction();
+			session.save(dataTagging);
+			session.getTransaction().commit();
+			return true;
+		} catch (Exception e) {
+			log.error(e.getMessage());
+			throw e;
+		}
 	}
 
 	public List<DataTagging> fetchEntityData(String hierarchyName) {
-		Query<DataTagging> createQuery = getSession().createQuery(
-				"FROM DataTagging DT WHERE DT.hierarchyName = :hierarchyName",
-				DataTagging.class);
-		createQuery.setParameter("hierarchyName", hierarchyName);
-		List<DataTagging> resultList = createQuery.getResultList();
-		terminateSession();
-		terminateSessionFactory();
-		return resultList;
+		try (Session session = getSessionObj()) {
+			Query<DataTagging> createQuery = session
+					.createQuery("FROM DataTagging DT WHERE DT.hierarchyName = :hierarchyName", DataTagging.class);
+			createQuery.setParameter("hierarchyName", hierarchyName);
+			return createQuery.getResultList();
+		} catch (Exception e) {
+			log.error(e.getMessage());
+			throw e;
+		}
+		
 	}
 	
 	public List<DataTagging> fetchEntityDataByLevelName(String levelName) {
-		/*Query<DataTagging> createQuery = getSession().createQuery(
-				"FROM DataTagging DT WHERE DT.levelName = :levelName",
-				DataTagging.class);*/
-		Query<DataTagging> createQuery = getSession().createQuery("SELECT DT.levelName = :levelName from DataTagging DT",DataTagging.class);
-		List<DataTagging> resultList = createQuery.getResultList();
-		terminateSession();
-		terminateSessionFactory();
-		return resultList;
+
+		try (Session session = getSessionObj()) {
+		Query<DataTagging> createQuery = session.createQuery("SELECT DT.levelName = :levelName from DataTagging DT",DataTagging.class);
+		return createQuery.getResultList();	
+		}catch (Exception e) {
+			log.error(e.getMessage());
+			throw e;
+		}
 	}
 	
 	public List<String> fetchEntityHierarchyName() {
-		Query<String> createQuery = getSession().createQuery("SELECT DISTINCT DT.hierarchyName FROM DataTagging DT",String.class);
-		List<String> resultList = createQuery.getResultList();
-		terminateSession();
-		terminateSessionFactory();
-		return resultList;
+		try (Session session = getSessionObj()) {
+			Query<String> createQuery = session.createQuery("SELECT DISTINCT DT.hierarchyName FROM DataTagging DT",
+					String.class);
+			List<String> resultList = createQuery.getResultList();
+			return resultList;
+		} catch (Exception e) {
+			log.error(e.getMessage());
+			throw e;
+		}
 	}
 
 	public List<DataTagging> fetchAllEntityData() {
-		Query<DataTagging> createQuery = getSession().createQuery("FROM DataTagging DT", DataTagging.class);
-		List<DataTagging> resultList = createQuery.getResultList();
-		terminateSession();
-		terminateSessionFactory();
-		return resultList;
+		try (Session session = getSessionObj()) {
+		Query<DataTagging> createQuery = session.createQuery("FROM DataTagging DT", DataTagging.class);
+		return createQuery.getResultList();	
+		}catch (Exception e) {
+			log.error(e.getMessage());
+			throw e;
+		}
 	}
 
 	public boolean deleteEntityData(String hierarchyName) {
-		Query<DataTagging> createQuery = getSession().createQuery(
+		try (Session session = getSessionObj()) {
+		Query<DataTagging> createQuery = session.createQuery(
 				"FROM DataTagging DT WHERE DT.hierarchyName = :hierarchyName",
 				DataTagging.class);
 		createQuery.setParameter("hierarchyName", hierarchyName);
 		DataTagging dataTagging = createQuery.getSingleResult();
-		getSession().beginTransaction();
-		getSession().delete(dataTagging);
-		getSession().getTransaction().commit();
-		terminateSession();
-		terminateSessionFactory();
+		session.beginTransaction();
+		session.delete(dataTagging);
+		session.getTransaction().commit();
 		return true;
+		}catch (Exception e) {
+			log.error(e.getMessage());
+			throw e;
+		}
 	}
 }

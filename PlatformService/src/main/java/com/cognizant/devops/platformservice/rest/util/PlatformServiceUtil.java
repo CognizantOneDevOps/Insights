@@ -104,7 +104,7 @@ public class PlatformServiceUtil {
 			// log.debug("Request Cookies length " + request_cookies.length);
 			for (int i = 0; i < request_cookies.length; i++) {
 				cookie = request_cookies[i];
-				log.debug(" cookie " + cookie.getName() + " " + cookie.getValue());
+				log.debug(" cookie {} {} ", cookie.getName(), cookie.getValue());
 				if (AuthenticationUtils.MASTER_COOKIES_KEY_LIST.contains(cookie.getName())) {
 					cookie.setMaxAge(30 * 60);
 					cookie.setHttpOnly(true);
@@ -180,7 +180,7 @@ public class PlatformServiceUtil {
 				log.debug("canonical path check failed- {}",  path);
 			}
 		} catch (Exception e) {
-			log.error("Not a valid path -- ", e.getStackTrace());
+			log.error("Not a valid path -- ", e);
 		}
 		return valid;
 	}

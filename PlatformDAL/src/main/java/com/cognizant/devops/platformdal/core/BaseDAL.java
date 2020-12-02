@@ -32,6 +32,10 @@ public class BaseDAL {
 		return session;
 	}
 	
+	protected Session getSessionObj() {
+		return PlatformDALSessionFactoryProvider.getSessionFactory().openSession();
+	}
+	
 	protected void terminateSession(){
 		if(session != null){
 			session.close();

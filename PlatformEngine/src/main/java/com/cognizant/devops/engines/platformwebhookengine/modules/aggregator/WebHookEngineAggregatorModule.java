@@ -27,12 +27,13 @@ import com.cognizant.devops.engines.platformengine.message.core.EngineStatusLogg
 import com.cognizant.devops.engines.platformwebhookengine.message.factory.EngineSubscriberResponseHandler;
 import com.cognizant.devops.engines.platformwebhookengine.message.subscriber.WebHookDataSubscriber;
 import com.cognizant.devops.engines.platformwebhookengine.message.subscriber.WebhookHealthSubscriber;
+import com.cognizant.devops.platformcommons.config.ApplicationConfigInterface;
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
 import com.cognizant.devops.platformdal.webhookConfig.WebHookConfig;
 import com.cognizant.devops.platformdal.webhookConfig.WebHookConfigDAL;
 
-public class WebHookEngineAggregatorModule extends TimerTask {
+public class WebHookEngineAggregatorModule extends TimerTask  implements ApplicationConfigInterface{
 	private static Logger log = LogManager.getLogger(WebHookEngineAggregatorModule.class.getName());
 	
 	private static Map<String, EngineSubscriberResponseHandler> registry = new HashMap<>();
@@ -41,13 +42,21 @@ public class WebHookEngineAggregatorModule extends TimerTask {
 	@Override
 	public void run() {
 		log.debug(" Webhook Engine started ==== ");
-		ApplicationConfigProvider.performSystemCheck();
-		WebHookConfigDAL webhookConfigDal = new WebHookConfigDAL();
-		List<WebHookConfig> allWebhookConfigurations = webhookConfigDal.getAllActiveWebHookConfigurations();
-		for (WebHookConfig webhookConfig : allWebhookConfigurations) {
-			registerAggragators(webhookConfig);
+		try {
+			ApplicationConfigInterface.super.loadConfiguration();
+			ApplicationConfigProvider.performSystemCheck();
+			WebHookConfigDAL webhookConfigDal = new WebHookConfigDAL();
+			List<WebHookConfig> allWebhookConfigurations = webhookConfigDal.getAllActiveWebHookConfigurations();
+			for (WebHookConfig webhookConfig : allWebhookConfigurations) {
+				registerAggragators(webhookConfig);
+			}
+			registerWebhookHealthAggragators(WEBHOOK_HEALTH_ROUTING_KEY);
+		} catch (Exception e) {
+			log.error(e);
+			EngineStatusLogger.getInstance().createEngineStatusNode(
+					" Error occured while initializing webhook Aggregator Module   " + e.getMessage(),
+					PlatformServiceConstants.FAILURE);
 		}
-		registerWebhookHealthAggragators(WEBHOOK_HEALTH_ROUTING_KEY);
 		log.debug(" Webhook Engine completed ==== ");
 	}
 

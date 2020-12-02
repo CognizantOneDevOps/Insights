@@ -23,16 +23,18 @@ import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 
+import com.cognizant.devops.platformcommons.config.ApplicationConfigInterface;
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
 import com.cognizant.devops.platformcommons.core.enums.WorkflowTaskEnum;
+import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformdal.workflow.InsightsWorkflowConfiguration;
 import com.cognizant.devops.platformdal.workflow.InsightsWorkflowTaskSequence;
 import com.cognizant.devops.platformworkflow.workflowtask.exception.WorkflowTaskInitializationException;
 import com.cognizant.devops.platformworkflow.workflowthread.core.WorkflowThreadPool;
 import com.google.gson.JsonObject;
 
-public class WorkflowExecutor implements Job {
+public class WorkflowExecutor implements Job , ApplicationConfigInterface{
 	/**
 	 * 
 	 */
@@ -47,9 +49,13 @@ public class WorkflowExecutor implements Job {
 	public void execute(JobExecutionContext context)
 			throws JobExecutionException {
 		log.debug(" Worlflow Detail ====  Schedular Inside WorkflowExecutor ");
-		initilizeWorkflowTasks();
-		executeWorkflow();
- 
+		try {
+			ApplicationConfigInterface.super.loadConfiguration();
+			initilizeWorkflowTasks();
+			executeWorkflow();
+		} catch (InsightsCustomException e) {
+			log.error(e);
+		}
 	}
 
 	/**
@@ -91,6 +97,8 @@ public class WorkflowExecutor implements Job {
 
 		} else {
 			log.debug("Worlflow Detail ==== WorkflowExecutor No reports are currently on due to run");
+			InsightsStatusProvider.getInstance().createInsightStatusNode(
+					" Error occured while initializing executeWorkflow  ", PlatformServiceConstants.FAILURE);
 			
 		}
 

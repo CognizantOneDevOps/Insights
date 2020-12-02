@@ -34,20 +34,25 @@ import com.google.gson.JsonParser;
  *         This class will handle all the interactions with graph database.
  */
 public class GraphDBHandler{
+	String COMMIT_URL = "/db/data/transaction/commit";
+	String SCHEMAURL = "/db/data/schema/index/";
 	String SCHEMA_INDEX_URL = ApplicationConfigProvider.getInstance().getGraph().getEndpoint()
-			+ "/db/data/schema/index/";
+			+ SCHEMAURL;
 	String TRANSACTION_COMMIT_URL = ApplicationConfigProvider.getInstance().getGraph().getEndpoint()
-			+ "/db/data/transaction/commit";
+			+ COMMIT_URL;
 	DocumentParser parser;
 
 	public GraphDBHandler() {
 		parser = new DocumentParser();
+		SCHEMA_INDEX_URL = ApplicationConfigProvider.getInstance().getGraph().getEndpoint() + SCHEMAURL;
+		TRANSACTION_COMMIT_URL = ApplicationConfigProvider.getInstance().getGraph().getEndpoint()
+				+ COMMIT_URL;
 	}
 
 	public GraphDBHandler(String inputDataSource) {
-		SCHEMA_INDEX_URL = inputDataSource + "/db/data/schema/index/";
-		TRANSACTION_COMMIT_URL = inputDataSource + "/db/data/transaction/commit";
 		parser = new DocumentParser();
+		SCHEMA_INDEX_URL = inputDataSource + SCHEMAURL;
+		TRANSACTION_COMMIT_URL = inputDataSource + COMMIT_URL;
 	}
 
 	/**

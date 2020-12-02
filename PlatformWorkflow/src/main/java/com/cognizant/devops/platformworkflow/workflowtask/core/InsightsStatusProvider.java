@@ -21,6 +21,7 @@ import java.util.Map;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.core.util.ComponentHealthLogger;
 
 public class InsightsStatusProvider extends ComponentHealthLogger {
@@ -51,7 +52,10 @@ public class InsightsStatusProvider extends ComponentHealthLogger {
 			version = InsightsStatusProvider.class.getPackage().getImplementationVersion();
 			log.debug(" Insights version {} ", version);
 			Map<String, String> extraParameter = new HashMap<>(0);
-			createComponentStatusNode("HEALTH:INSIGHTS_WORKFLOW", version, message, status, extraParameter);
+			if (ApplicationConfigProvider.getInstance().getGraph().getAuthToken() != null
+					&& !ApplicationConfigProvider.getInstance().getGraph().getAuthToken().equals("")) {
+				createComponentStatusNode("HEALTH:INSIGHTS_WORKFLOW", version, message, status, extraParameter);
+			}
 		} catch (Exception e) {
 			log.error(" Unable to create node {} ", e.getMessage());
 		}

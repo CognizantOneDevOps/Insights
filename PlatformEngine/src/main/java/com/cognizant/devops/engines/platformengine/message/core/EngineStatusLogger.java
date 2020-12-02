@@ -21,6 +21,7 @@ import java.util.Map;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.core.util.ComponentHealthLogger;
 
 public class EngineStatusLogger extends ComponentHealthLogger {
@@ -44,7 +45,10 @@ public class EngineStatusLogger extends ComponentHealthLogger {
 			version = EngineStatusLogger.class.getPackage().getImplementationVersion();
 			log.debug(" Engine version for createEngineStatusNode {} ", version);
 			Map<String, String> extraParameter = new HashMap<>(0);
-			createComponentStatusNode("HEALTH:ENGINE", version, message, status, extraParameter);
+			if (ApplicationConfigProvider.getInstance().getGraph().getAuthToken() != null
+					&& !ApplicationConfigProvider.getInstance().getGraph().getAuthToken().equals("")) {
+				createComponentStatusNode("HEALTH:ENGINE", version, message, status, extraParameter);
+			}
 		} catch (Exception e) {
 			log.error(" Unable to create node {} ", e.getMessage());
 		}
@@ -57,7 +61,10 @@ public class EngineStatusLogger extends ComponentHealthLogger {
 			version = EngineStatusLogger.class.getPackage().getImplementationVersion();
 			log.debug(" Engine version for createDataArchivalStatusNode {} ", version);
 			Map<String, String> extraParameter = new HashMap<>(0);
-			createComponentStatusNode("HEALTH:DATAARCHIVALENGINE", version, message, status, extraParameter);
+			if (ApplicationConfigProvider.getInstance().getGraph().getAuthToken() != null
+					&& !ApplicationConfigProvider.getInstance().getGraph().getAuthToken().equals("")) {
+				createComponentStatusNode("HEALTH:DATAARCHIVALENGINE", version, message, status, extraParameter);
+			}
 		} catch (Exception e) {
 			log.error(" Unable to create node {}", e.getMessage());
 		}
@@ -70,7 +77,10 @@ public class EngineStatusLogger extends ComponentHealthLogger {
 			version = EngineStatusLogger.class.getPackage().getImplementationVersion();
 			log.debug(" Engine version createWebhookEngineStatusNode {}", version);
 			Map<String, String> extraParameter = new HashMap<>(0);
-			createComponentStatusNode("HEALTH:WEBHOOKENGINE", version, message, status, extraParameter);
+			if (ApplicationConfigProvider.getInstance().getGraph().getAuthToken() != null
+					&& !ApplicationConfigProvider.getInstance().getGraph().getAuthToken().equals("")) {
+				createComponentStatusNode("HEALTH:WEBHOOKENGINE", version, message, status, extraParameter);
+			}
 		} catch (Exception e) {
 			log.error(" Unable to create node {}", e.getMessage());
 		}
@@ -83,7 +93,10 @@ public class EngineStatusLogger extends ComponentHealthLogger {
 			version = EngineStatusLogger.class.getPackage().getImplementationVersion();
 			log.debug(" Engine version createAuditStatusNode {} ", version);
 			Map<String, String> extraParameter = new HashMap<>(0);
-			createComponentStatusNode("HEALTH:AUDITENGINE", version, message, status, extraParameter);
+			if (ApplicationConfigProvider.getInstance().getGraph().getAuthToken() != null
+					&& !ApplicationConfigProvider.getInstance().getGraph().getAuthToken().equals("")) {
+				createComponentStatusNode("HEALTH:AUDITENGINE", version, message, status, extraParameter);
+			}
 		} catch (Exception e) {
 			log.error(" Unable to create node {} ", e.getMessage());
 		}

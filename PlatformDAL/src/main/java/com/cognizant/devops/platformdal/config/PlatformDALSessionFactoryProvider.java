@@ -17,6 +17,7 @@ package com.cognizant.devops.platformdal.config;
 
 import org.hibernate.SessionFactory;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
+import org.hibernate.cfg.AvailableSettings;
 import org.hibernate.cfg.Configuration;
 
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
@@ -68,7 +69,7 @@ public class PlatformDALSessionFactoryProvider {
 	}
 	private synchronized static void initInSightsDAL(){
 		if(sessionFactory == null){
-			Configuration configuration = new Configuration().configure();
+			Configuration configuration = new Configuration();
 			configuration.addAnnotatedClass(UserPortfolio.class);
 			configuration.addAnnotatedClass(CustomDashboard.class);
 			configuration.addAnnotatedClass(ProjectMapping.class);
@@ -100,11 +101,26 @@ public class PlatformDALSessionFactoryProvider {
 		    configuration.addAnnotatedClass(InsightsReportVisualizationContainer.class);
 		    configuration.addAnnotatedClass(AutoMLConfig.class);
 			PostgreData postgre = ApplicationConfigProvider.getInstance().getPostgre();
-			if(postgre != null){
-				configuration.setProperty("hibernate.connection.username", postgre.getUserName());
-				configuration.setProperty("hibernate.connection.password", postgre.getPassword());
-				configuration.setProperty("hibernate.connection.url", postgre.getInsightsDBUrl());
-			}
+			if(postgre != null){				
+				configuration.setProperty(AvailableSettings.USER, postgre.getUserName());
+				configuration.setProperty(AvailableSettings.PASS, postgre.getPassword());
+				configuration.setProperty(AvailableSettings.URL, postgre.getInsightsDBUrl());
+				configuration.setProperty(AvailableSettings.DRIVER, "org.postgresql.Driver");
+				configuration.setProperty(AvailableSettings.DIALECT, "org.hibernate.dialect.PostgreSQLDialect");
+				configuration.setProperty(AvailableSettings.SHOW_SQL, "false");
+				configuration.setProperty(AvailableSettings.USE_SQL_COMMENTS, "false");
+				configuration.setProperty(AvailableSettings.FORMAT_SQL, "false");
+				configuration.setProperty(AvailableSettings.GENERATE_STATISTICS,"false");	
+				
+				/* c3p configuration setting */
+				configuration.setProperty(AvailableSettings.C3P0_MIN_SIZE,postgre.getC3pMinSize());
+				configuration.setProperty(AvailableSettings.C3P0_MAX_SIZE, postgre.getC3pMaxSize());
+				configuration.setProperty(AvailableSettings.C3P0_MAX_STATEMENTS,postgre.getC3pMaxStatements());
+				configuration.setProperty(AvailableSettings.C3P0_TIMEOUT, postgre.getC3pTimout());
+				configuration.setProperty(AvailableSettings.C3P0_ACQUIRE_INCREMENT, "1");
+				
+				
+			}		
 			StandardServiceRegistryBuilder builder = new StandardServiceRegistryBuilder().applySettings(configuration.getProperties());
 			sessionFactory = configuration.buildSessionFactory(builder.build());
 		}
@@ -112,14 +128,14 @@ public class PlatformDALSessionFactoryProvider {
 	
 	private static void initGrafanaDAL() {
 		if(grafanaSessionFactory == null){
-			Configuration configuration = new Configuration().configure();
+			Configuration configuration = new Configuration();
 			configuration.addAnnotatedClass(User.class);
 			PostgreData postgre = ApplicationConfigProvider.getInstance().getPostgre();
 			if(postgre != null){
-				configuration.setProperty("hibernate.connection.username", postgre.getUserName());
-				configuration.setProperty("hibernate.connection.password", postgre.getPassword());
-				configuration.setProperty("hibernate.connection.url", postgre.getGrafanaDBUrl());
-				configuration.setProperty("hbm2ddl.auto", "validate");
+				configuration.setProperty(AvailableSettings.USER, postgre.getUserName());
+				configuration.setProperty(AvailableSettings.PASS, postgre.getPassword());
+				configuration.setProperty(AvailableSettings.URL, postgre.getGrafanaDBUrl());
+				configuration.setProperty(AvailableSettings.HBM2DDL_AUTO, "validate");
 			}
 			StandardServiceRegistryBuilder builder = new StandardServiceRegistryBuilder().applySettings(configuration.getProperties());
 			grafanaSessionFactory = configuration.buildSessionFactory(builder.build());

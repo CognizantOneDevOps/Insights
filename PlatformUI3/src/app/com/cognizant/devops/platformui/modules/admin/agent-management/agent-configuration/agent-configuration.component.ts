@@ -78,6 +78,7 @@ export class AgentConfigurationComponent implements OnInit {
 	oldLabelHealth: string = "";
   color = 'accent';
   vault = false;
+  validSecretDetails = true;
 
   constructor(public config: InsightsInitService, public agentService: AgentService,
     private router: Router, private route: ActivatedRoute,
@@ -352,13 +353,23 @@ export class AgentConfigurationComponent implements OnInit {
       }
       else if (this.labelData != this.oldLabelData) {
         this.validateLabel(this.labelData, "DATA");
-       }
-       else if (this.labelHealth != this.oldLabelHealth) {
+      }
+      else if (this.labelHealth != this.oldLabelHealth) {
         this.validateLabel(this.labelHealth, "HEALTH");
-       }
+      }
+      else if (!this.vault) {
+        self.validSecretDetails = true;
+        var secretDetails = self.updatedConfigParamdata['agentSecretDetails'];
+        secretDetails.forEach(element => {
+          if(this.updatedConfigParamdata[element] == "*****") {
+            var dialog = self.messageDialog.showApplicationsMessage("You have disabled vault, please enter correct <b>"+element+"</b>.", "ERROR");
+            self.validSecretDetails = false;
+          }
+        });
+      }
     }
 
-    if (this.updatedConfigParamdata && agentId != undefined && this.labelData != undefined && this.labelHealth != undefined) {
+    if (this.updatedConfigParamdata && agentId != undefined && this.labelData != undefined && this.labelHealth != undefined && this.validSecretDetails) {
 
 
       self.configData = "";

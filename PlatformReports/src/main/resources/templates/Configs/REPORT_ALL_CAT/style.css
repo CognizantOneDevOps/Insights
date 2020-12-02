@@ -16,13 +16,33 @@
 	color:#434456;
        
 }
-
+img{
+	visibility:hidden !important
+}
 .pagebreak
 {
-	margin-top: 50%;
+	margin-top: 500px;
+}
+
+.table th{
+	color: #0000ff;
+	background-color: #00FF00;
+	font-size: 24;
+	font-family: arial;
+}
+
+.table td{
+	font-size: 24;
 }
 
 
+.table .observations .li{
+	font-size: 30;
+}
+
+.table .observations {
+	font-size: 30;
+}
 
 .singlestatCSS {
     width: 250px;
@@ -66,10 +86,6 @@
     font-size: 16px;
 }
 
-.topAllignment{
-	margin-top:5%
-}
-
 .table th {
     border: black solid 1px !important;
     text-align: center;
@@ -82,13 +98,12 @@
 }
 
 h4 {
-    margin-top: 1.5%;    
-	 margin-left: 10.5% !important;
+    margin-top: 1.5%;
+    text-decoration: underline;
     font-weight: bold;
     font-family: 'Source Sans Pro', sans-serif;
     color: blue;
     font-size: 16px;
-	text-align:left;
 }
 
 ul {

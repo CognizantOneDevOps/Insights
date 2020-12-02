@@ -21,6 +21,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.cognizant.devops.engines.platformengine.message.core.EngineStatusLogger;
+import com.cognizant.devops.platformcommons.config.ApplicationConfigInterface;
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
 
 /**
@@ -30,14 +31,15 @@ import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
  *         Entry point for correlation executor.
  *
  */
-public class EngineCorrelatorModule extends TimerTask {
-	private static boolean isCorrelationExecutionInProgress = false;
+public class EngineCorrelatorModule extends TimerTask implements ApplicationConfigInterface{
+	private boolean isCorrelationExecutionInProgress = false;
 	private static Logger log = LogManager.getLogger(EngineCorrelatorModule.class.getName());
 
 	@Override
 	public void run() {
 		log.debug(" EngineCorrelatorModule start  ====");
 		try {
+			ApplicationConfigInterface.super.loadConfiguration();
 			if (!isCorrelationExecutionInProgress) {
 				isCorrelationExecutionInProgress = true;
 				CorrelationExecutor correlationsExecutor = new CorrelationExecutor();

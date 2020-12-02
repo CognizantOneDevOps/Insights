@@ -17,71 +17,85 @@ package com.cognizant.devops.platformdal.icon;
 
 import java.util.List;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.hibernate.Session;
 import org.hibernate.query.Query;
 
-import com.cognizant.devops.platformdal.agentConfig.AgentConfig;
 import com.cognizant.devops.platformdal.core.BaseDAL;
 
 public class IconDAL extends BaseDAL {
 private static final String ICON_QUERY= "FROM Icon IC WHERE IC.iconId = :iconId";
 private static final String ICONID = "iconId";
 
+	private static Logger log = LogManager.getLogger(IconDAL.class);
+	
 	public boolean addEntityData(Icon icon) {
-		Query<Icon> createQuery = getSession().createQuery(
-				ICON_QUERY,
-				Icon.class);
-		createQuery.setParameter(ICONID, icon.getIconId());
-		List<Icon> resultList = createQuery.getResultList();
-		Icon iconImg = null;
-		if(resultList.size()>0){
-			iconImg = resultList.get(0);
+		try (Session session = getSessionObj()) {
+			Query<Icon> createQuery = session.createQuery(ICON_QUERY, Icon.class);
+			createQuery.setParameter(ICONID, icon.getIconId());
+			List<Icon> resultList = createQuery.getResultList();
+			Icon iconImg = null;
+			if (!resultList.isEmpty()) {
+				iconImg = resultList.get(0);
+				session.beginTransaction();
+				if (iconImg != null) {
+					iconImg.setIconId(icon.getIconId());
+					iconImg.setFileName(icon.getFileName());
+					iconImg.setImage(icon.getImage());
+					iconImg.setImageType(icon.getImageType());
+					session.update(iconImg);
+				} else {
+					session.save(icon);
+				}
+				session.getTransaction().commit();
+			}
+			return true;
+		} catch (Exception e) {
+			log.error(e.getMessage());
+			throw e;
 		}
-		getSession().beginTransaction();
-		if (iconImg != null) {
-			iconImg.setIconId(icon.getIconId());
-			iconImg.setFileName(icon.getFileName());
-			iconImg.setImage(icon.getImage());
-			iconImg.setImageType(icon.getImageType());
-			getSession().update(iconImg);
-		} else {
-			getSession().save(icon);
-		}
-		getSession().getTransaction().commit();
-		terminateSession();
-		terminateSessionFactory();
-		return true;
 	}
 
 	public Icon fetchEntityData(String iconId) {
-		Query<Icon> createQuery = getSession().createQuery(ICON_QUERY, Icon.class);
-		createQuery.setParameter(ICONID, iconId);
-		Icon result = new Icon();
-		try {
-			List<Icon> resultList = createQuery.getResultList();
-			if(resultList.size()>0){
-				result = resultList.get(0);
+		
+		try (Session session = getSessionObj()) {
+			Query<Icon> createQuery = session.createQuery(ICON_QUERY, Icon.class);
+			createQuery.setParameter(ICONID, iconId);
+			Icon result = new Icon();
+			try {
+				List<Icon> resultList = createQuery.getResultList();
+				if (resultList.size() > 0) {
+					result = resultList.get(0);
+				}
+
+			} catch (Exception e) {
+				throw new RuntimeException("Exception while retrieving data" + e);
 			}
-			
+
+			return result;
 		} catch (Exception e) {
-			throw new RuntimeException("Exception while retrieving data" + e);
+			log.error(e.getMessage());
+			throw e;
 		}
-		terminateSession();
-		terminateSessionFactory();
-		return result;
 	}
 	
 	public boolean deleteEntityData(String iconId) {
-		Query<Icon> createQuery = getSession().createQuery(
+		
+		try (Session session = getSessionObj()) {
+		Query<Icon> createQuery =session.createQuery(
 				ICON_QUERY,
 				Icon.class);
 		createQuery.setParameter(ICONID, iconId);
 		Icon result = createQuery.getSingleResult();
-		getSession().beginTransaction();
-		getSession().delete(result);
-		getSession().getTransaction().commit();
-		terminateSession();
-		terminateSessionFactory();
+		session.beginTransaction();
+		session.delete(result);
+		session.getTransaction().commit();		
 		return true;
+		}catch (Exception e) {
+			log.error(e.getMessage());
+			throw e;
+		}
 	}
 	
 }

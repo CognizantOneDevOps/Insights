@@ -34,6 +34,11 @@
             <AppenderRef ref="RollingFile" />
 			<AppenderRef ref="Console" />
         </Logger>
+	<Logger name="com.mchange.v2" level="error"
+		additivity="false">
+		<AppenderRef ref="Console" />
+		<AppenderRef ref="RollingFile" />
+	</Logger>
 		<!-- NettyClientHandler -->
             	<Logger name="io.grpc.netty" level="error">
                         <AppenderRef ref="RollingFile" />

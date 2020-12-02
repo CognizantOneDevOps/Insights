@@ -37,9 +37,12 @@ import javax.crypto.Cipher;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import com.cognizant.devops.engines.platformengine.message.core.EngineStatusLogger;
 import com.cognizant.devops.platformauditing.api.InsightsAuditImpl;
 import com.cognizant.devops.platformauditing.util.LoadFile;
 import com.cognizant.devops.platformcommons.constants.InsightsAuditConstants;
+import com.cognizant.devops.platformcommons.config.ApplicationConfigInterface;
+import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBHandler;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphResponse;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
@@ -49,7 +52,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
-public class PlatformAuditProcessingExecutor extends TimerTask {
+public class PlatformAuditProcessingExecutor extends TimerTask implements ApplicationConfigInterface{
     private static Logger LOG = LogManager.getLogger(PlatformAuditProcessingExecutor.class);
     private final InsightsAuditImpl insightAuditImpl = Util.getAuditObject();
 	private static Util utilObj = new Util();
@@ -58,7 +61,16 @@ public class PlatformAuditProcessingExecutor extends TimerTask {
     @Override
 	public void run() {
         LOG.info("Blockchain Processing Executer module is getting executed");
-        orphanNodeExtraction();
+        try {
+			ApplicationConfigInterface.super.loadConfiguration();
+			orphanNodeExtraction();
+		} catch (InsightsCustomException e) {
+			LOG.error(e);
+			EngineStatusLogger.getInstance().createEngineStatusNode(
+					" Error occured while initializing Audit Engine processing  " + e.getMessage(),
+					PlatformServiceConstants.FAILURE);
+		}
+        
     }
 
     private void orphanNodeExtraction() {    	

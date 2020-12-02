@@ -55,12 +55,14 @@ import com.nimbusds.jwt.SignedJWT;
 @Repository
 public class TokenProviderUtility {
 	private static Logger log = LogManager.getLogger(TokenProviderUtility.class);
-	private final String signingKey = ApplicationConfigProvider.getInstance().getSingleSignOnConfig()
+	private String signingKey = ApplicationConfigProvider.getInstance().getSingleSignOnConfig()
 			.getTokenSigningKey();
 	public static CacheManager cacheManager = null;
 	public static Cache<String, String> tokenCache = null;
 
 	public TokenProviderUtility() {
+		signingKey = ApplicationConfigProvider.getInstance().getSingleSignOnConfig()
+				.getTokenSigningKey();
 		if (TokenProviderUtility.cacheManager == null) {
 			log.debug("Inside TokenProviderUtility constructer initilizeTokenCache ");
 			initilizeTokenCache();

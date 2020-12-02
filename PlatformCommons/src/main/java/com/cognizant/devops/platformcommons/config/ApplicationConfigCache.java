@@ -21,19 +21,26 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.net.URL;
+import java.util.Set;
+
+import javax.validation.ConstraintViolation;
+import javax.validation.Validation;
+import javax.validation.Validator;
+import javax.validation.ValidatorFactory;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.cognizant.devops.platformcommons.constants.ConfigOptions;
+import com.cognizant.devops.platformcommons.dal.vault.VaultHandler;
+import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonIOException;
+import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import com.google.gson.JsonSyntaxException;
 import com.google.gson.stream.JsonWriter;
 
 public class ApplicationConfigCache {
@@ -43,13 +50,16 @@ public class ApplicationConfigCache {
 		
 	}
 	
+	/** update config file 
+	 * @return
+	 */
 	public static boolean updateConfigCahe(){
 		File configFile = new File(ConfigOptions.CONFIG_FILE_RESOLVED_PATH);
 		if(!configFile.exists()){
 			configFile.getParentFile().mkdirs();
-			log.warn("iSight config file created at : "+configFile.getAbsolutePath());
+			log.warn("iSight config folder and file created at : {} ",configFile.getAbsolutePath());
 		}else{
-			log.warn("iSight config file found at : "+configFile.getAbsolutePath());
+			log.warn("iSight config file found at : {} ",configFile.getAbsolutePath());
 		}
 		try (JsonWriter writer = new JsonWriter(new FileWriter(configFile))) {
 			writer.setIndent("  ");
@@ -61,88 +71,214 @@ public class ApplicationConfigCache {
 	}
 	
 	
-	public static boolean loadConfigCache() {
-		if(System.getenv().get(ConfigOptions.INSIGHTS_HOME) == null){
+	/**Initialize server config 
+	 * @return true if all property of ApplicationConfigProvider initialize correctly 
+	 * @throws Exception 
+	 */
+	public static boolean loadConfigCache() throws InsightsCustomException {
+
+		JsonObject serverConfigJsonfromStorage = new JsonObject();
+		JsonObject serverConfigJsonfromVault = new JsonObject();
+		Gson gson = new Gson();
+		try {
+			VaultHandler vaultHandler = new VaultHandler();
+			serverConfigJsonfromStorage = ApplicationConfigCache.loadServerConfigFromFile();
+			ApplicationConfigProvider config = gson.fromJson(serverConfigJsonfromStorage, ApplicationConfigProvider.class);
+			if (config.getVault().isVaultEnable()) {
+					serverConfigJsonfromVault = vaultHandler.fetchServerConfigFromVault("local",
+							config.getVault().getVaultEndPoint(),
+							config.getVault().getSecretEngine(),
+							config.getVault().getVaultToken());
+			}
+			if (!serverConfigJsonfromVault.entrySet().isEmpty()) {
+				ApplicationConfigCache.initializeUsingJson(serverConfigJsonfromVault);
+			}else {
+				ApplicationConfigCache.initializeUsingJson(serverConfigJsonfromStorage);
+			}
+		}  catch (InsightsCustomException e) {
+			log.error(e);
+			throw e;
+		}  catch (Exception e) {
+			log.error("Execption while loding config ",e);
+			throw e;
+		}
+		return true;
+	}
+	
+	/** Initialize server config, loadInitialConfigCache 
+	 *  this method will not throw exception allow to load default server config  
+	 * @return true if all property of ApplicationConfigProvider initialize correctly 
+	 * @throws Exception 
+	 */
+	public static boolean loadInitialConfigCache() throws InsightsCustomException {
+
+		JsonObject serverConfigJsonfromStorage = new JsonObject();
+		JsonObject serverConfigJsonfromVault = new JsonObject();
+		Gson gson = new Gson();
+		try {
+			VaultHandler vaultHandler = new VaultHandler();
+			serverConfigJsonfromStorage = ApplicationConfigCache.loadServerConfigFromFile();
+			ApplicationConfigProvider config = gson.fromJson(serverConfigJsonfromStorage, ApplicationConfigProvider.class);
+			if (config.getVault().isVaultEnable()) {
+					try {
+						serverConfigJsonfromVault = vaultHandler.fetchServerConfigFromVault("local",
+								config.getVault().getVaultEndPoint(),
+								config.getVault().getSecretEngine(),
+								config.getVault().getVaultToken());
+					} catch (Exception e) {
+						log.error(e);
+					}
+			}
+			if (!serverConfigJsonfromVault.entrySet().isEmpty()) {
+				ApplicationConfigCache.initializeUsingJson(serverConfigJsonfromVault);
+			}else {
+				ApplicationConfigCache.initializeUsingJson(serverConfigJsonfromStorage);
+			}
+		}  catch (Exception e) {
+			log.error("Execption while loding config ",e);
+			throw e;
+		}
+		return true;
+	}
+
+	public static JsonObject loadServerConfigFromFile() {
+		JsonObject serverConfig = new JsonObject();
+		if (System.getenv().get(ConfigOptions.INSIGHTS_HOME) == null) {
 			log.error("INSIGHTS_HOME environment variable is not set.");
-			// System.exit(0);
 		}
 		File configFile = new File(ConfigOptions.CONFIG_FILE_RESOLVED_PATH);
-		StringBuffer json = new StringBuffer();
-		if(configFile.exists()){
-			try(BufferedReader reader = new BufferedReader(new FileReader(configFile), 1024)) {
+		StringBuilder json = new StringBuilder();
+
+		if (configFile.exists()) {
+			try (BufferedReader reader = new BufferedReader(new FileReader(configFile), 1024)) {
 				String line;
 				while ((line = reader.readLine()) != null) {
 					json.append(line);
 				}
+				String payload = json.toString().replaceAll("\\t", "");
+				
+				serverConfig = new JsonParser().parse(payload).getAsJsonObject();
 			} catch (FileNotFoundException e) {
 				log.error("Config file not found", e);
-			} catch (IOException e) {
+			} catch (Exception e) {
 				log.error("Unable to read the file", e);
 			}
-		}else{
-			try(BufferedReader reader = new BufferedReader(
-					new InputStreamReader(
-							ApplicationConfigCache.class.getResourceAsStream("/"+ConfigOptions.CONFIG_FILE)), 1024)){
-				String line;
-				while ((line = reader.readLine()) != null) {
-					json.append(line);
-				}
-			} catch (IOException e) {
-				log.error("Unable to read the file", e);
-			}
+		} else {
+			log.error("Unable to load server config from the file");
 		}
-		return initialize(json.toString());
+
+		return serverConfig;
 	}
 
 	public static boolean initConfigCacheFromResources() {
 		URL resource = ApplicationConfigCache.class.getClassLoader().getResource(ConfigOptions.CONFIG_FILE);
 		File configFile = new File(resource.getFile());
-		StringBuffer json = new StringBuffer();
+		StringBuilder json = new StringBuilder();
 		try(BufferedReader reader = new BufferedReader(new FileReader(configFile), 1024)) {
 			String line;
 			while ((line = reader.readLine()) != null) {
 				json.append(line);
 			}
-		} catch (FileNotFoundException e) {
-			log.error(e);
-		} catch (IOException e) {
+		} catch (Exception e) {
 			log.error(e);
 		}
 		return initialize(json.toString());
 	}
 
-	private static boolean initialize(String json) {
+	/** Initialize server config from string object 
+	 * @param json
+	 * @return true if all property of ApplicationConfigProvider initialize correctly/successfully 
+	 */
+	public static boolean initialize(String json) {
 		try {
 			Gson gson = new Gson();
 			JsonParser parser = new JsonParser();
-			JsonElement parsedJson = parser.parse(json);
-			JsonElement jsonElement = new JsonParser().parse(json);
+			JsonElement jsonElement = parser.parse(json);
 			if(jsonElement != null && jsonElement.isJsonObject()){
 				ApplicationConfigProvider config = gson.fromJson(jsonElement.getAsJsonObject(), ApplicationConfigProvider.class);
 				ApplicationConfigProvider.updateConfig(config);
 			}
 		} catch (JsonIOException e) {
-			log.error(ConfigOptions.CONFIG_FILE + " is not formatted,Json parsing issue in file " + e);
-		} catch (JsonSyntaxException e) {
-			log.error(ConfigOptions.CONFIG_FILE + " is not formatted,Json parsing issue in file " + e);
+			log.error(" {} file is not found  ", ConfigOptions.CONFIG_FILE, e);
+		} catch (Exception e) {
+			log.error(" {} file is has Execption  ", ConfigOptions.CONFIG_FILE, e);
 		}
 		return false;
 	}
 	
+	/** Initialize ApplicationConfigProvider from json object 
+	 * @param json
+	 * @return true if all ApplicationConfigProvider property initialize correctly 
+	 */
+	public static boolean initializeUsingJson(JsonObject json) {
+		try {
+			Gson gson = new Gson();
+			if (json != null) {
+				ApplicationConfigProvider config = gson.fromJson(json,
+						ApplicationConfigProvider.class);
+				ApplicationConfigProvider.updateConfig(config);
+			}
+		} catch (JsonIOException e) {
+			log.error(" {} file is not found  ", ConfigOptions.CONFIG_FILE, e);
+		} catch (Exception e) {
+			log.error("  issue in file {} ", ConfigOptions.CONFIG_FILE, e);
+		}
+		return false;
+	}
+
+	/** Read server config from file system 
+	 * @return 
+	 */
 	public static String readConfigFile(){
 		File configFile = new File(ConfigOptions.CONFIG_FILE_RESOLVED_PATH);
 		try (BufferedReader reader = new BufferedReader(new FileReader(configFile), 1024)){
 			String s = null;
-			StringBuffer sb = new StringBuffer();
+			StringBuilder sb = new StringBuilder();
 			while( (s = reader.readLine()) != null){
 				sb.append(s);
 			}
 			return sb.toString();
-		} catch (FileNotFoundException e) {
-			log.error(e);
-		} catch (IOException e) {
+		} catch (Exception e) {
 			log.error(e);
 		}
 		return "";
+	}
+	
+	/** Save servre config file on file system and Initialize ApplicationConfigProvider object 
+	 * @param serverConfigFile
+	 * @return true if ApplicationConfigProvider object initialize successfully 
+	 * @throws InsightsCustomException
+	 */
+	public static boolean saveConfigFile(JsonObject serverConfigFile ) throws InsightsCustomException {
+		File configFile = new File(ConfigOptions.CONFIG_FILE_RESOLVED_PATH);
+		try (FileWriter file = new FileWriter(configFile)) {
+ 			file.write(serverConfigFile.toString());
+ 			file.flush();
+ 		} catch (Exception e) {
+ 			log.error("Error writing modified json file", e);
+ 			throw new InsightsCustomException("Error writing modified json file "+ e.getMessage());
+ 		}
+		return initializeUsingJson(serverConfigFile);
+	}
+
+	/** Validate server config detail file 
+	 * @return true id validation successfully completed
+	 */
+	public static boolean validateServerConfig() {
+		boolean isValidate=Boolean.FALSE;
+		try {
+			ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+			Validator validator = factory.getValidator();
+			Set<ConstraintViolation<ApplicationConfigProvider>> violations = validator.validate(ApplicationConfigProvider.getInstance());
+			violations.forEach(g -> 
+				log.error("Error while validating server config json === {} ===== {}  ", g.getMessage(),g)
+			);
+			if(violations.isEmpty()) {
+				isValidate = Boolean.TRUE;
+			}
+		} catch (Exception e) {
+			log.error("  issue in file {} ", ConfigOptions.CONFIG_FILE, e);
+		}
+		return isValidate;
 	}
 }

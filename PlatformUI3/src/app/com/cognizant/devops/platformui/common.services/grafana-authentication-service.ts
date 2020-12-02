@@ -20,6 +20,7 @@ import { Location, LocationStrategy, PathLocationStrategy } from '@angular/commo
 import { Router, ActivatedRoute } from '@angular/router';
 import { DataSharedService } from '@insights/common/data-shared-service';
 import { RestAPIurlService } from '@insights/common/rest-apiurl.service'
+import { BehaviorSubject } from 'rxjs';
 
 export interface IAuthenticationService {
     getCurrentUserOrgs(): Promise<any>;
@@ -30,6 +31,7 @@ export interface IAuthenticationService {
 
 @Injectable()
 export class GrafanaAuthenticationService implements IAuthenticationService {
+    public serverConfigSubject = new BehaviorSubject<any>('');
     response: any;
     location: Location;
     constructor(location: Location, private router: Router,

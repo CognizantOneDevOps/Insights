@@ -16,6 +16,10 @@
 package com.cognizant.devops.platformdal.correlationConfig;
 
 import java.util.List;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.hibernate.Session;
 import org.hibernate.query.Query;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformdal.core.BaseDAL;
@@ -23,80 +27,100 @@ import com.cognizant.devops.platformdal.core.BaseDAL;
 public class CorrelationConfigDAL extends BaseDAL {
 	 public static final String CORRELATION_CONFIGURATION_QUERY="FROM CorrelationConfiguration CC WHERE CC.relationName = :relationName";
 	public static final String RELATIONNAME="relationName";
+	private static Logger log = LogManager.getLogger(CorrelationConfigDAL.class);
+	
 	public Boolean saveCorrelationConfig(CorrelationConfiguration saveCorrelationJson) throws InsightsCustomException {
-		Query<CorrelationConfiguration> createQuery = getSession().createQuery(
-CORRELATION_CONFIGURATION_QUERY,
-				CorrelationConfiguration.class);
-		createQuery.setParameter(RELATIONNAME, saveCorrelationJson.getRelationName());
-		List<CorrelationConfiguration> resultList = createQuery.getResultList();
-		if (!resultList.isEmpty()) {
-			throw new InsightsCustomException("Relation Name already exists.");
-		} else {
-			getSession().beginTransaction();
-			getSession().save(saveCorrelationJson);
-			getSession().getTransaction().commit();
-			terminateSession();
-			terminateSessionFactory();
-			return Boolean.TRUE;
+		
+		try (Session session = getSessionObj()) {
+			Query<CorrelationConfiguration> createQuery = session.createQuery(
+					CORRELATION_CONFIGURATION_QUERY,
+					CorrelationConfiguration.class);
+			createQuery.setParameter(RELATIONNAME, saveCorrelationJson.getRelationName());
+			List<CorrelationConfiguration> resultList = createQuery.getResultList();
+			if (!resultList.isEmpty()) {
+				throw new InsightsCustomException("Relation Name already exists.");
+			} else {
+				session.beginTransaction();
+				session.save(saveCorrelationJson);
+				session.getTransaction().commit();
+				return Boolean.TRUE;
+			}
+		} catch (Exception e) {
+			log.error(e.getMessage());
+			throw e;
 		}
 	}
 
 	public Boolean updateCorrelationConfig(String relationName, Boolean flag) throws InsightsCustomException {
-		Query<CorrelationConfiguration> createQuery = getSession().createQuery(
-				CORRELATION_CONFIGURATION_QUERY,
-				CorrelationConfiguration.class);
-		createQuery.setParameter(RELATIONNAME, relationName);
-		List<CorrelationConfiguration> resultList = createQuery.getResultList();
-		if (resultList.isEmpty()) {
-			throw new InsightsCustomException("Unable to update correlation.");
-		} else {
-			CorrelationConfiguration correlationConfig = resultList.get(0);
-			getSession().beginTransaction();
-			correlationConfig.setEnableCorrelation(flag);
-			getSession().update(correlationConfig);
-			getSession().getTransaction().commit();
-			terminateSession();
-			terminateSessionFactory();
-			return Boolean.TRUE;
+		
+		try (Session session = getSessionObj()) {
+			Query<CorrelationConfiguration> createQuery = session.createQuery(
+					CORRELATION_CONFIGURATION_QUERY,
+					CorrelationConfiguration.class);
+			createQuery.setParameter(RELATIONNAME, relationName);
+			List<CorrelationConfiguration> resultList = createQuery.getResultList();
+			if (resultList.isEmpty()) {
+				throw new InsightsCustomException("Unable to update correlation.");
+			} else {
+				CorrelationConfiguration correlationConfig = resultList.get(0);
+				session.beginTransaction();
+				correlationConfig.setEnableCorrelation(flag);
+				session.update(correlationConfig);
+				session.getTransaction().commit();				
+				return Boolean.TRUE;
+			}
+		} catch (Exception e) {
+			log.error(e.getMessage());
+			throw e;
 		}
 	}
 
 	public Boolean deleteCorrelationConfig(String relationName) throws InsightsCustomException{
-		Query<CorrelationConfiguration> createQuery = getSession().createQuery(
-				CORRELATION_CONFIGURATION_QUERY,
-				CorrelationConfiguration.class);
-		createQuery.setParameter(RELATIONNAME, relationName);
-		List<CorrelationConfiguration> resultList = createQuery.getResultList();
-		if (resultList.isEmpty()) {
-			throw new InsightsCustomException("Unable to update correlation.");
-		}
-		else {
-		CorrelationConfiguration correlationConfig = resultList.get(0);
-		getSession().beginTransaction();
-		getSession().delete(correlationConfig);
-		getSession().getTransaction().commit();
-		terminateSession();
-		terminateSessionFactory();
-		return Boolean.TRUE;
+
+		try (Session session = getSessionObj()) {
+			Query<CorrelationConfiguration> createQuery = session.createQuery(
+					CORRELATION_CONFIGURATION_QUERY,
+					CorrelationConfiguration.class);
+			createQuery.setParameter(RELATIONNAME, relationName);
+			List<CorrelationConfiguration> resultList = createQuery.getResultList();
+			if (resultList.isEmpty()) {
+				throw new InsightsCustomException("Unable to update correlation.");
+			} else {
+				CorrelationConfiguration correlationConfig = resultList.get(0);
+				session.beginTransaction();
+				session.delete(correlationConfig);
+				session.getTransaction().commit();
+				return Boolean.TRUE;
+			}
+		} catch (Exception e) {
+			log.error(e.getMessage());
+			throw e;
 		}
 	}
 
 	public List<CorrelationConfiguration> getActiveCorrelations() {
-		Query<CorrelationConfiguration> createQuery = getSession().createQuery(
-				"FROM CorrelationConfiguration CC WHERE CC.enableCorrelation = true ", CorrelationConfiguration.class);
-		List<CorrelationConfiguration> result = createQuery.getResultList();
-		terminateSession();
-		terminateSessionFactory();
-		return result;
+		try (Session session = getSessionObj()) {
+			Query<CorrelationConfiguration> createQuery = session.createQuery(
+					"FROM CorrelationConfiguration CC WHERE CC.enableCorrelation = true ",
+					CorrelationConfiguration.class);
+			List<CorrelationConfiguration> result = createQuery.getResultList();
+			return result;
+		} catch (Exception e) {
+			log.error(e.getMessage());
+			throw e;
+		}
 	}
 
 	public List<CorrelationConfiguration> getAllCorrelations() {
-		Query<CorrelationConfiguration> createQuery = getSession().createQuery("FROM CorrelationConfiguration CC ",
-				CorrelationConfiguration.class);
-		List<CorrelationConfiguration> result = createQuery.getResultList();
-		terminateSession();
-		terminateSessionFactory();
-		return result;
+		try (Session session = getSessionObj()) {
+			Query<CorrelationConfiguration> createQuery = session.createQuery("FROM CorrelationConfiguration CC ",
+					CorrelationConfiguration.class);
+			List<CorrelationConfiguration> result = createQuery.getResultList();
+			return result;
+		} catch (Exception e) {
+			log.error(e.getMessage());
+			throw e;
+		}
 	}
 
 }

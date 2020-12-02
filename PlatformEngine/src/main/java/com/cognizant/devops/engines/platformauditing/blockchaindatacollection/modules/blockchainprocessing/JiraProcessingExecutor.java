@@ -20,9 +20,12 @@ import java.io.IOException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import com.cognizant.devops.engines.platformengine.message.core.EngineStatusLogger;
 import com.cognizant.devops.platformauditing.api.InsightsAuditImpl;
 import com.cognizant.devops.platformauditing.util.LoadFile;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphResponse;
+import com.cognizant.devops.platformcommons.config.ApplicationConfigInterface;
+import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
 import com.cognizant.devops.platformcommons.constants.InsightsAuditConstants;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBHandler;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
@@ -43,7 +46,7 @@ import java.security.spec.PKCS8EncodedKeySpec;
 import java.util.*;
 
 
-public class JiraProcessingExecutor extends TimerTask {
+public class JiraProcessingExecutor extends TimerTask implements ApplicationConfigInterface {
 	private static Logger LOG = LogManager.getLogger(JiraProcessingExecutor.class);
 	private String blockchainProcessedFlag = "blockchainProcessedFlag";
 	private long lastTimestamp;
@@ -58,8 +61,16 @@ public class JiraProcessingExecutor extends TimerTask {
 	@Override
 	public void run() {
 		LOG.info("Blockchain Processing Executer jira module is getting executed");
-
-		JiraNodeExtraction();
+		try {
+			ApplicationConfigInterface.super.loadConfiguration();
+			JiraNodeExtraction();
+		} catch (InsightsCustomException e) {
+			LOG.error(e);
+			EngineStatusLogger.getInstance().createEngineStatusNode(
+					" Error occured while initializing Audit Engine JIRA processing   " + e.getMessage(),
+					PlatformServiceConstants.FAILURE);
+		}
+		
 	}
 
 	private void JiraNodeExtraction() {

@@ -39,12 +39,11 @@ public class PlatformWorkflowApplication {
 	}
 
 	public static void workflowExecutor() {
-		// Load isight config
-		ApplicationConfigCache.loadConfigCache();
-		// Create Default users
-		ApplicationConfigProvider.performSystemCheck();
-
-		try {
+	try {
+			// Load isight config
+			ApplicationConfigCache.loadConfigCache();
+			// Create Default users
+			ApplicationConfigProvider.performSystemCheck();
 			InsightsStatusProvider.getInstance().createInsightStatusNode("Platform Workflow Application started. ",
 					PlatformServiceConstants.SUCCESS);
 			PlatformWorkflowApplication applicationWorkflow = new PlatformWorkflowApplication();

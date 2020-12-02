@@ -254,6 +254,13 @@ export class DataSharedService {
     return encryptedValue.toString();
   }
 
+  public decryptedData(keys, value): string {
+    const bytes = CryptoJS.AES.decrypt(value, keys);
+      if (bytes.toString()) {
+        return JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
+      }
+  }
+
   public getCurrentYear() {
     var Year = new Date().getFullYear();
     return Year;

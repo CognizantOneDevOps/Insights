@@ -20,6 +20,9 @@ import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.hibernate.Session;
 import org.hibernate.query.Query;
 
 import com.cognizant.devops.platformcommons.constants.ConfigOptions;
@@ -28,67 +31,79 @@ import com.cognizant.devops.platformdal.core.BaseDAL;
 
 public class QueryBuilderConfigDAL extends BaseDAL {
 
-
+	private static Logger log = LogManager.getLogger(QueryBuilderConfigDAL.class);
+	
 	public boolean saveOrUpdateQuery(String reportName, String frequency, String subscribers, String fileName, String queryType, String user) {
 
-		Query<QueryBuilderConfig> createQuery = getSession().createQuery(
-				"FROM QueryBuilderConfig a WHERE a.reportName = :reportName",
-				QueryBuilderConfig.class);
-		createQuery.setParameter("reportName", reportName);
-		List<QueryBuilderConfig> resultList = createQuery.getResultList();
-		QueryBuilderConfig queryBuilderConfig = null;
-		if(!resultList.isEmpty()){
-			queryBuilderConfig = resultList.get(0);
+		try (Session session = getSessionObj()) {
+			Query<QueryBuilderConfig> createQuery = session.createQuery(
+					"FROM QueryBuilderConfig a WHERE a.reportName = :reportName", QueryBuilderConfig.class);
+			createQuery.setParameter("reportName", reportName);
+			List<QueryBuilderConfig> resultList = createQuery.getResultList();
+			QueryBuilderConfig queryBuilderConfig = null;
+			if (!resultList.isEmpty()) {
+				queryBuilderConfig = resultList.get(0);
+			}
+			session.beginTransaction();
+			if (queryBuilderConfig != null) {
+				queryBuilderConfig.setReportName(reportName);
+				queryBuilderConfig.setFrequency(frequency);
+				queryBuilderConfig.setSubscribers(subscribers);
+				queryBuilderConfig
+						.setQuerypath(ConfigOptions.QUERY_DATA_PROCESSING_RESOLVED_PATH + File.separator + fileName);
+				queryBuilderConfig.setQuerytype(queryType);
+				queryBuilderConfig.setLastModifiedDate(Timestamp.valueOf(LocalDateTime.now()));
+				queryBuilderConfig.setLastUpdatedByUser(user);
+				session.update(queryBuilderConfig);
+			} else {
+				queryBuilderConfig = new QueryBuilderConfig();
+				queryBuilderConfig.setReportName(reportName);
+				queryBuilderConfig.setFrequency(frequency);
+				queryBuilderConfig.setSubscribers(subscribers);
+				queryBuilderConfig
+						.setQuerypath(ConfigOptions.QUERY_DATA_PROCESSING_RESOLVED_PATH + File.separator + fileName);
+				queryBuilderConfig.setQuerytype(queryType);
+				queryBuilderConfig.setCreatedDate(Timestamp.valueOf(LocalDateTime.now()));
+				queryBuilderConfig.setLastUpdatedByUser(user);
+				session.save(queryBuilderConfig);
+			}
+			session.getTransaction().commit();
+			return true;
+		} catch (Exception e) {
+			log.error(e.getMessage());
+			throw e;
 		}
-		getSession().beginTransaction();
-		if (queryBuilderConfig != null) {
-			queryBuilderConfig.setReportName(reportName);
-			queryBuilderConfig.setFrequency(frequency);
-			queryBuilderConfig.setSubscribers(subscribers);
-			queryBuilderConfig.setQuerypath(ConfigOptions.QUERY_DATA_PROCESSING_RESOLVED_PATH+File.separator+fileName);
-			queryBuilderConfig.setQuerytype(queryType);
-			queryBuilderConfig.setLastModifiedDate(Timestamp.valueOf(LocalDateTime.now()));
-			queryBuilderConfig.setLastUpdatedByUser(user);
-			getSession().update(queryBuilderConfig);
-		} else {
-			queryBuilderConfig = new QueryBuilderConfig();
-			queryBuilderConfig.setReportName(reportName);
-			queryBuilderConfig.setFrequency(frequency);
-			queryBuilderConfig.setSubscribers(subscribers);
-			queryBuilderConfig.setQuerypath(ConfigOptions.QUERY_DATA_PROCESSING_RESOLVED_PATH+File.separator+fileName);
-			queryBuilderConfig.setQuerytype(queryType);
-			queryBuilderConfig.setCreatedDate(Timestamp.valueOf(LocalDateTime.now()));
-			queryBuilderConfig.setLastUpdatedByUser(user);
-			getSession().save(queryBuilderConfig);
-		}
-		getSession().getTransaction().commit();
-		terminateSession();
-		terminateSessionFactory();
-		return true;
 	}
 	
 	public boolean deleteQuery(String reportName) {
-		Query<QueryBuilderConfig> createQuery = getSession().createQuery(
+		
+		try (Session session = getSessionObj()) {
+		Query<QueryBuilderConfig> createQuery = session.createQuery(
 				"FROM QueryBuilderConfig a WHERE a.reportName = :reportName",
 				QueryBuilderConfig.class);
 		createQuery.setParameter("reportName", reportName);
 		QueryBuilderConfig queryBuilderConfig = createQuery.getSingleResult();
-		getSession().beginTransaction();
-		getSession().delete(queryBuilderConfig);
-		getSession().getTransaction().commit();
-		terminateSession();
-		terminateSessionFactory();
+		session.beginTransaction();
+		session.delete(queryBuilderConfig);
+		session.getTransaction().commit();	
 		return true;
+		}catch (Exception e) {
+			log.error(e.getMessage());
+			throw e;
+		}
 	}
 
 
 	public List<QueryBuilderConfig> fetchQueries() {
-		Query<QueryBuilderConfig> createQuery = getSession().createQuery("FROM QueryBuilderConfig",
+		try (Session session = getSessionObj()) {
+		Query<QueryBuilderConfig> createQuery = session.createQuery("FROM QueryBuilderConfig",
 				QueryBuilderConfig.class);
-		List<QueryBuilderConfig> result = createQuery.getResultList();
-		terminateSession();
-		terminateSessionFactory();
-		return result;
+		return createQuery.getResultList();
+		}catch (Exception e) {
+			log.error(e.getMessage());
+			throw e;
+		}
+	
 	}
 
 }

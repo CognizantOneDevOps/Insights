@@ -51,6 +51,7 @@ import { BusinessMappingComponent } from '@insights/app/modules/admin/businessma
 import { DataArchivingService } from '@insights/app/modules/settings/dataarchiving/dataarchiving-service';
 import { AgentConfigurationComponent } from '@insights/app/modules/admin/agent-management/agent-configuration/agent-configuration.component';
 
+
 import { UserOnboardingComponent } from '@insights/app/modules/user-onboarding/user-onboarding.component';
 import { LandingPageComponent } from '@insights/app/modules/landing-page/landing-page.component';
 import { ConfirmationMessageDialog } from '@insights/app/modules/application-dialog/confirmation-message-dialog';
@@ -90,7 +91,7 @@ import { WorkflowHistoryDetailsDialog } from '@insights/app/modules/reportmanage
 import { ReportConfigComponent } from '@insights/app/modules/reportmanagement/report-configuration/report-configuration.component';
 import { DataArchiveDetailsDialog } from '@insights/app/modules/settings/dataarchiving/data-archive-details/data-archive-details-dialog';
 import { DataArchiveConfigureURLDialog } from '@insights/app/modules/settings/dataarchiving/data-archive-configureurl/data-archive-configureurl-dialog';
-import {MatSliderModule} from '@angular/material/slider';
+import { MatSliderModule } from '@angular/material/slider';
 import { NgxPaginationModule } from 'ngx-pagination';
 import { MLWizardComponent } from '@insights/app/modules/model-management/mlwizard/mlwizard.component';
 import { MLWizardService } from '@insights/app/modules/model-management/mlwizard/mlwizard.service';
@@ -99,9 +100,9 @@ import { PredictionComponent } from '@insights/app/modules/model-management/mlwi
 import { ModelManagementComponent } from '@insights/app/modules/model-management/model-management.component';
 import { ModelManagementService } from '@insights/app/modules/model-management/model-management.service';
 import { PredictionShowDetailsDialog } from '@insights/app/modules/model-management/mlwizard/prediction/prediction-show-detail/prediction-show-details-dialog';
-import { EmailConfigurationDialog } from '@insights/app/modules/reportmanagement/report-configuration/email-configuration-dialog'; 
-import { KpiCreationComponent} from '@insights/app/modules/kpi-creation/kpi-creation.component';
-import { KpiAdditionComponent} from '@insights/app/modules/kpi-addition/kpi-addition.component';
+import { EmailConfigurationDialog } from '@insights/app/modules/reportmanagement/report-configuration/email-configuration-dialog';
+import { KpiCreationComponent } from '@insights/app/modules/kpi-creation/kpi-creation.component';
+import { KpiAdditionComponent } from '@insights/app/modules/kpi-addition/kpi-addition.component';
 import { FileUploadDialog } from './fileUploadDialog/fileUploadDialog.component';
 import { KpiService } from './kpi-addition/kpi-service';
 import { ContentConfigComponent } from '@insights/app/modules/content-config-list/content-config-list.component';
@@ -112,7 +113,8 @@ import { ReportTemplateComponent } from './report-template/report-template-list.
 import { ReportTemplateService } from './report-template/report-template-service';
 import { KpiReportListDialog } from './report-template/report-template-kpi-list/kpi-report-List-Dialog.component';
 import { ReportTemplateConfig } from './report-template/template-configuration/template-configuration.component';
-
+import { ServerConfigurationComponent } from '@insights/app/modules/server-configuration/server-configuration.component';
+import { ServerConfigurationService } from '@insights/app/modules/server-configuration/server-configuration-service';
 
 @NgModule({
   declarations: [
@@ -172,7 +174,8 @@ import { ReportTemplateConfig } from './report-template/template-configuration/t
     ContentConfigAddition,
     ReportTemplateComponent,
     KpiReportListDialog,
-    ReportTemplateConfig
+    ReportTemplateConfig,
+    ServerConfigurationComponent
   ],
   imports: [
     HomeRouting,
@@ -189,7 +192,7 @@ import { ReportTemplateConfig } from './report-template/template-configuration/t
     MatSliderModule,
     NgxPaginationModule
   ],
-  exports:[MatSortModule],
+  exports: [MatSortModule],
   entryComponents: [
     ShowDetailsDialog,
     ShowTraceabiltyDetailsDialog,
@@ -206,7 +209,7 @@ import { ReportTemplateConfig } from './report-template/template-configuration/t
     DataArchiveDetailsDialog,
     DataArchiveConfigureURLDialog,
     EmailConfigurationDialog,
-    PredictionShowDetailsDialog,  
+    PredictionShowDetailsDialog,
     FileUploadDialog,
     KpiListDialog,
     KpiReportListDialog
@@ -219,7 +222,7 @@ import { ReportTemplateConfig } from './report-template/template-configuration/t
     HealthCheckService,
     DataDictionaryService,
     BusinessMappingService,
-   
+
     DataArchivingService,
     UserOnboardingService,
     MessageDialogService,
@@ -239,7 +242,8 @@ import { ReportTemplateConfig } from './report-template/template-configuration/t
     ModelManagementService,
     KpiService,
     ContentService,
-    ReportTemplateService
+    ReportTemplateService,
+    ServerConfigurationService
   ]
 })
 export class HomeModules { }

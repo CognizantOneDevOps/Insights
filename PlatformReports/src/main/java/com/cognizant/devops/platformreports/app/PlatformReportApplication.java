@@ -38,11 +38,11 @@ public class PlatformReportApplication {
 	}
 	
 	public static void main(String[] args) {
-		// Load isight config
-		ApplicationConfigCache.loadConfigCache();
-		// Create Default users
-		ApplicationConfigProvider.performSystemCheck();
 		try {
+			// Load isight config
+			ApplicationConfigCache.loadConfigCache();
+			// Create Default users
+			ApplicationConfigProvider.performSystemCheck();
 	
 			PlatformWorkflowApplicationTest.testWorkflowExecutor();
 	

@@ -28,11 +28,15 @@
 			<class
 				name="com.cognizant.devops.platformservice.test.assessmentReports.AssessmentReportServiceTest" />
 			<class
+				name="com.cognizant.devops.platformservice.test.assessmentReports.ReportTemplateKPIContentServiceTest" />
+			<class
 				name="com.cognizant.devops.platformservice.test.workflow.WorkflowServiceTest" /> 
 			<class
 				name="com.cognizant.devops.platformservice.test.dataArchival.DataArchivalServiceTest" />
 			<class
-				name="com.cognizant.devops.platformservice.test.automl.TrainModelsServiceTest" />	
+				name="com.cognizant.devops.platformservice.test.automl.TrainModelsServiceTest" />
+			<class
+				name="com.cognizant.devops.platformservice.test.serverConfig.ServerConfigServiceTest" />	
 		</classes>
 	</test>
 </suite>

@@ -26,19 +26,19 @@ import java.util.TimerTask;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
-import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
-import com.cognizant.devops.platformcommons.dal.neo4j.GraphResponse;
-import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBHandler;
-import com.cognizant.devops.platformcommons.dal.neo4j.NodeData;
-import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
-import com.cognizant.devops.platformdal.agentConfig.AgentConfig;
-import com.cognizant.devops.platformdal.agentConfig.AgentConfigDAL;
 import com.cognizant.devops.engines.platformengine.message.core.EngineStatusLogger;
 import com.cognizant.devops.engines.platformengine.message.factory.EngineSubscriberResponseHandler;
 import com.cognizant.devops.engines.platformengine.message.subscriber.AgentDataSubscriber;
 import com.cognizant.devops.engines.platformengine.message.subscriber.AgentHealthSubscriber;
-import com.google.gson.Gson;
+import com.cognizant.devops.platformcommons.config.ApplicationConfigInterface;
+import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
+import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
+import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBHandler;
+import com.cognizant.devops.platformcommons.dal.neo4j.GraphResponse;
+import com.cognizant.devops.platformcommons.dal.neo4j.NodeData;
+import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
+import com.cognizant.devops.platformdal.agentConfig.AgentConfig;
+import com.cognizant.devops.platformdal.agentConfig.AgentConfigDAL;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -49,29 +49,37 @@ import com.google.gson.JsonParser;
  * @author 146414 This module will pull the data from Graph and accordingly
  *         subscribe for the incoming data
  */
-public class EngineAggregatorModule extends TimerTask {
+public class EngineAggregatorModule extends TimerTask implements ApplicationConfigInterface {
 	private static Logger log = LogManager.getLogger(EngineAggregatorModule.class.getName());
-	private static Map<String, EngineSubscriberResponseHandler> registry = new HashMap<String, EngineSubscriberResponseHandler>();
+	private static Map<String, EngineSubscriberResponseHandler> registry = new HashMap<>();
 
 	@Override
 	public void run() {
 		log.debug(" EngineAggregatorModule start ====");
-		ApplicationConfigProvider.performSystemCheck();
-		GraphDBHandler graphDBHandler = new GraphDBHandler();
-		AgentConfigDAL agentConfigDal = new AgentConfigDAL();
-		List<AgentConfig> allAgentConfigurations = agentConfigDal.getAllEngineAggregatorAgentConfigurations();
-		boolean enableOnlineDatatagging = ApplicationConfigProvider.getInstance().isEnableOnlineDatatagging();
-		Map<String, List<BusinessMappingData>> businessMappinMap = new HashMap<String, List<BusinessMappingData>>(0);
-		if (enableOnlineDatatagging) {
-			businessMappinMap = getMetaData(graphDBHandler);
-		}
-		for (AgentConfig agentConfig : allAgentConfigurations) {
-			String toolName = agentConfig.getToolName().toUpperCase();
-			List<BusinessMappingData> businessMappingList = businessMappinMap.get(toolName);
-			if (businessMappingList == null) {
-				businessMappingList = new ArrayList<BusinessMappingData>(0);
+		try {
+			ApplicationConfigInterface.super.loadConfiguration();
+			ApplicationConfigProvider.performSystemCheck();
+			GraphDBHandler graphDBHandler = new GraphDBHandler();
+			AgentConfigDAL agentConfigDal = new AgentConfigDAL();
+			List<AgentConfig> allAgentConfigurations = agentConfigDal.getAllEngineAggregatorAgentConfigurations();
+			boolean enableOnlineDatatagging = ApplicationConfigProvider.getInstance().isEnableOnlineDatatagging();
+			Map<String, List<BusinessMappingData>> businessMappinMap = new HashMap<>(0);
+			if (enableOnlineDatatagging) {
+				businessMappinMap = getMetaData(graphDBHandler);
 			}
-			registerAggragators(agentConfig, graphDBHandler, toolName, businessMappingList);
+			for (AgentConfig agentConfig : allAgentConfigurations) {
+				String toolName = agentConfig.getToolName().toUpperCase();
+				List<BusinessMappingData> businessMappingList = businessMappinMap.get(toolName);
+				if (businessMappingList == null) {
+					businessMappingList = new ArrayList<>(0);
+				}
+				registerAggragators(agentConfig, graphDBHandler, toolName, businessMappingList);
+			}
+		}catch(InsightsCustomException e ) {
+			log.error("Error while loading Engine Aggregator Module ",e);
+			EngineStatusLogger.getInstance().createEngineStatusNode(
+					" Error occured while initializing Engine Aggregator Module  " + e.getMessage(),
+					PlatformServiceConstants.FAILURE);
 		}
 		log.debug(" EngineAggregatorModule Completed ====");
 	}
@@ -86,7 +94,7 @@ public class EngineAggregatorModule extends TimerTask {
 			JsonObject config = (JsonObject) new JsonParser().parse(agentConfig.getAgentJson());
 			JsonObject json = config.get("publish").getAsJsonObject();
 			String dataRoutingKey = json.get("data").getAsString();
-			Boolean hasenrichTool = config.has("enrichData");
+			boolean hasenrichTool = config.has("enrichData");
 			
 			
 			if (hasenrichTool) {
@@ -96,7 +104,7 @@ public class EngineAggregatorModule extends TimerTask {
 				keyPattern = enrichTool.get("keyPattern").getAsString();
 				sourceProperty = enrichTool.get("sourceProperty").getAsString();
 			}
-			log.debug(" dataRoutingKey {0} " + dataRoutingKey + "  Tool Info{1} " + toolName);
+			log.debug(" dataRoutingKey {} Tool Info {}" ,dataRoutingKey , toolName);
 
 			if (dataRoutingKey != null && !registry.containsKey(dataRoutingKey)) {
 				try {
@@ -104,7 +112,7 @@ public class EngineAggregatorModule extends TimerTask {
 							agentConfig.getToolCategory(), agentConfig.getLabelName(), toolName, businessMappingList,isEnrichmentRequired, targetProperty,
 							keyPattern,sourceProperty));
 				} catch (Exception e) {
-					log.error("Unable to add subscriber for routing key:-  {}", dataRoutingKey, e);
+					log.error("Unable to add data subscriber for routing key: {} " , dataRoutingKey, e);
 					EngineStatusLogger.getInstance().createEngineStatusNode(
 							" Error occured while executing aggragator for data queue subscriber " + e.getMessage(),
 							PlatformServiceConstants.FAILURE);
@@ -143,19 +151,10 @@ public class EngineAggregatorModule extends TimerTask {
 		}
 	}
 
-	/*
-	 * public boolean deregisterAggregator(String key){
-	 * EngineSubscriberResponseHandler engineSubscriberResponseHandler =
-	 * registry.get(key); if(engineSubscriberResponseHandler != null){ try {
-	 * MessageSubscriberFactory.getInstance().unregisterSubscriber(key,
-	 * engineSubscriberResponseHandler); } catch (IOException e) { log.error(e); }
-	 * catch (TimeoutException e) { log.error(e); } } return false; }
-	 */
 
 	private Map<String, List<BusinessMappingData>> getMetaData(GraphDBHandler dbHandler) {
 		List<NodeData> nodes = null;
-		Map<String, List<BusinessMappingData>> businessMappinMap = new HashMap<String, List<BusinessMappingData>>(0);
-		Gson gson = new Gson();
+		Map<String, List<BusinessMappingData>> businessMappinMap = new HashMap<>(0);
 		Set<String> additionalProperties = new HashSet<>();
 		additionalProperties.add("adminuser");
 		additionalProperties.add("inSightsTime");
@@ -182,11 +181,10 @@ public class EngineAggregatorModule extends TimerTask {
 						.executeCypherQuery("MATCH (n:METADATA:BUSINESSMAPPING) where n.toolName='" + toolName
 								+ "' return n order by n.inSightsTime desc");
 				nodes = response.getNodes();
-				List<BusinessMappingData> toolDataList = new ArrayList<BusinessMappingData>(0);
+				List<BusinessMappingData> toolDataList = new ArrayList<>(0);
 				for (NodeData node : nodes) {
 
 					BusinessMappingData toolData = new BusinessMappingData();
-					String jsonString = gson.toJson(node);
 					String businessMappingLabel = node.getPropertyMap().get("businessmappinglabel");
 					toolData.setToolName(toolName);
 					toolData.setBusinessMappingLabel(businessMappingLabel);
@@ -195,7 +193,7 @@ public class EngineAggregatorModule extends TimerTask {
 					toolData.setPropertyMap(propertyMap);
 					toolDataList.add(toolData);
 				}
-				log.debug("arg0 toolDataList {} ", toolDataList);
+				log.debug("arg0 toolDataList {} ",  toolDataList);
 				businessMappinMap.put(toolName, toolDataList);
 			}
 		} catch (InsightsCustomException e) {

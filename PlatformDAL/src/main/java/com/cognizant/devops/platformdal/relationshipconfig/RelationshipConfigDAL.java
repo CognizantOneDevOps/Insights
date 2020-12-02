@@ -16,45 +16,64 @@
 package com.cognizant.devops.platformdal.relationshipconfig;
 
 import java.util.List;
+
 import javax.persistence.criteria.CriteriaQuery;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.hibernate.Session;
 import org.hibernate.query.Query;
+
 import com.cognizant.devops.platformdal.core.BaseDAL;
 import com.cognizant.devops.platformdal.correlationConfig.CorrelationConfiguration;
 
 public class RelationshipConfigDAL extends BaseDAL {
 	
+	private static Logger log = LogManager.getLogger(RelationshipConfigDAL.class);
 	
 	public List<RelationshipConfiguration> getRelationshipConfig(String releationshipName)
 	{
-		getSession().beginTransaction();		
-		Query<RelationshipConfiguration> createQuery = getSession().createQuery("FROM RelationshipConfiguration RC where RC.relationname=:relationname ",
-				RelationshipConfiguration.class);
-		createQuery.setParameter("relationname", releationshipName);		
-		List<RelationshipConfiguration> result = createQuery.getResultList();
-		terminateSession();
-		terminateSessionFactory();
-		return result;
+		try (Session session = getSessionObj()) {
+			session.beginTransaction();
+			Query<RelationshipConfiguration> createQuery = session.createQuery(
+					"FROM RelationshipConfiguration RC where RC.relationname=:relationname ",
+					RelationshipConfiguration.class);
+			createQuery.setParameter("relationname", releationshipName);
+			return createQuery.getResultList();
+		} catch (Exception e) {
+			log.error(e.getMessage());
+			throw e;
+		}
 	
 	}
 	
 	public List<RelationshipConfiguration> loadRelationshipsFromDatabase()
 	{
-		getSession().beginTransaction();
-		CriteriaQuery<RelationshipConfiguration> cq=getSession().getCriteriaBuilder().createQuery(RelationshipConfiguration.class);
-		cq.from(RelationshipConfiguration.class);
-		List<RelationshipConfiguration> configList =getSession().createQuery(cq).getResultList();     
-       	terminateSession();
-		terminateSessionFactory();
-		return configList;
+		try (Session session = getSessionObj()) {
+			session.beginTransaction();
+			CriteriaQuery<RelationshipConfiguration> cq = session.getCriteriaBuilder()
+					.createQuery(RelationshipConfiguration.class);
+			cq.from(RelationshipConfiguration.class);
+			return session.createQuery(cq).getResultList();
+		} catch (Exception e) {
+			log.error(e.getMessage());
+			throw e;
+		}
+       
+		
 	}
 	
     public void saveRelationshipConfig(CorrelationConfiguration config)
     {
-    	getSession().beginTransaction();
-    	getSession().save(config);
-    	getSession().getTransaction().commit();
-    	terminateSession();
-		terminateSessionFactory();
+		try (Session session = getSessionObj()) {
+			session.beginTransaction();
+			session.save(config);
+			session.getTransaction().commit();
+		} catch (Exception e) {
+			log.error(e.getMessage());
+			throw e;
+		}
+    
     }
     
 }

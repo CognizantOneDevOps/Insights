@@ -37,6 +37,7 @@ import org.apache.logging.log4j.core.util.CronExpression;
 
 import com.cognizant.devops.engines.platformengine.message.core.EngineStatusLogger;
 import com.cognizant.devops.engines.platformengine.modules.offlinedataprocessing.model.DataEnrichmentModel;
+import com.cognizant.devops.platformcommons.config.ApplicationConfigInterface;
 import com.cognizant.devops.platformcommons.constants.ConfigOptions;
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
 import com.cognizant.devops.platformcommons.core.util.InsightsUtils;
@@ -64,7 +65,7 @@ import com.google.gson.stream.JsonWriter;
  * @author 368419
  *
  */
-public class OfflineDataProcessingExecutor extends TimerTask {
+public class OfflineDataProcessingExecutor extends TimerTask implements ApplicationConfigInterface {
 	private static Logger log = LogManager.getLogger(OfflineDataProcessingExecutor.class);
 	private static final String DATE_TIME_FORMAT = "yyyy/MM/dd hh:mm a";
 	private static final String JSON_FILE_EXTENSION = "json";
@@ -73,9 +74,11 @@ public class OfflineDataProcessingExecutor extends TimerTask {
 	@Override
 	public void run() {
 		try {
+			ApplicationConfigInterface.super.loadConfiguration();
 			executeOfflineProcessing();
 			EngineStatusLogger.getInstance().createEngineStatusNode("Offline Data Procesing completed",PlatformServiceConstants.SUCCESS);
 		} catch (Exception e) {
+			log.error(e);
 			EngineStatusLogger.getInstance().createEngineStatusNode("Offline Data Procesing has some issue",
 					PlatformServiceConstants.FAILURE);
 		}

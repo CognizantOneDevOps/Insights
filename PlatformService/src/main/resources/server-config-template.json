@@ -1,0 +1,137 @@
+{
+    "vault":{
+    	"isVaultEnable":false,
+        "vaultEndPoint":"http://localhost:8200/v1",
+        "secretEngine":"",
+        "vaultToken":""
+    },
+	"grafana":{
+        "grafanaEndpoint":"http://localhost:3000",
+        "grafanaDBEndpoint":"jdbc:postgresql://localhost:5432/grafana",
+        "adminUserName":"",
+        "adminUserPassword":""
+    },
+	"trustedHosts":[
+        "localhost"
+    ],
+    "graph":{
+        "endpoint":"http://localhost:7474",
+        "authToken":"",
+        "boltEndPoint":"bolt://localhost:7687",
+        "maxIdleConnections":25
+    },
+    "postgre":{
+        "userName":"",
+        "password":"",
+        "insightsDBUrl":"jdbc:postgresql://localhost:5432/insight",
+        "grafanaDBUrl":"jdbc:postgresql://localhost:5432/grafana",
+        "c3pMinSize":"9",
+        "c3pMaxSize":"25",
+        "c3pTimout":"1800",
+        "c3pMaxStatements":"300"
+    },
+    "messageQueue":{
+        "host":"localhost",
+        "user":"",
+        "password":"",
+        "prefetchCount":5
+    },
+    "agentDetails":{
+        "isOnlineRegistration":true,
+        "onlineRegistrationMode":"nexus",
+        "browseRepoUrl":"https://infra.cogdevops.com:8443/service/rest/repository/browse/docroot/insights_install/release",
+        "downloadRepoUrl":"https://infra.cogdevops.com:8443/repository/docroot/insights_install/release",
+        "nexusUserName":"",
+        "nexusPassword":"",
+        "docrootUrl":"https://platform.cogdevops.com//insights_install/release",
+        "offlineAgentPath":"C:\\InSights_Windows\\Agents\\offlineAgent",
+        "unzipPath":"C:\\InSights_Windows\\Agents\\PlatformAgents\\unzip",
+        "agentExchange":"iAgent",
+        "agentPkgQueue":"INSIGHTS.AGENTS.PACKAGE"
+    },
+
+    "endpointData":{
+        "elasticSearchEndpoint":"http://localhost:9200"
+    },
+    "queryCache":{
+        "esCacheIndex":"neo4j-cached-results/querycacheresult"
+    },
+    "assessmentReport":{
+        "outputDatasource":"NEO4J",
+        "maxWorkflowRetries":3,
+        "fusionExportAPIUrl":"http://localhost:1337/api/v2.0/export"
+    },
+    "workflowDetails":{
+        "corePoolSize":8,
+        "maximumPoolSize":20,
+        "keepAliveTime":20,
+        "waitingQueueSize":10,
+        "workflowExecutorCron":"1 0 0 * * ?",
+        "workflowRetryExecutorCron":"0 0 */4 ? * *"
+    },
+    "emailConfiguration":{
+        "sendEmailEnabled":false,
+        "smtpHostServer": "",
+		"smtpPort": "",
+		"smtpUserName": "",
+		"smtpPassword": "",
+		"isAuthRequired": true,
+		"smtpStarttlsEnable": true,
+		"mailFrom": "onedevops@cogdevops.com",
+		"mailTo": "",
+		"subject": "Health Status - {TimeOfReportGeneration}",
+		"emailBody": "Hi Team, Attaching the report File",
+		"systemNotificationSubscriber":""
+    },
+    "correlations":{
+        "correlationWindow":48,
+        "correlationFrequency":3,
+        "batchSize":2000
+    },
+    "schedulerConfigInMin":{
+        "auditEngineInterval":60,
+        "webhookEngineInterval":10,
+        "engineAggregatorModuleInterval":10,
+        "engineCorrelatorModuleInterval":60,
+        "projectMapperModuleInterval":10,
+        "dataPurgingExecutorInterval":300,
+        "offlineDataProcessingExecutorInterval":10,
+        "inferenceJobExecutor":20,
+        "dataArchivalEngineInterval":240
+    },
+    "singleSignOnConfig":{
+        "entityId":"",
+        "appId":"",
+        "metadataUrl":"",
+        "metdataFilePath":"",
+        "keyStoreFilePath":"C:\\InSights_Windows\\Server2\\INSIGHTS_HOME\\.InSights\\saml-keystore.jks",
+        "keyAlias":"mykeyalias",
+        "keyPass":"mykeypass",
+        "keyStorePass":"samlstorepass",
+        "appBaseUrl":"baseURL",
+        "relayStateUrl":"relayStateUrl",
+        "defaultTargetUrl":"defaultTargetUrl",
+        "postLogoutURL":"logoutURL",
+        "tokenSigningKey":"insights_IDP_CogDevops_SSO_Token_string",
+        "servicePrincipalKerberos":"",
+        "keyTabLocationKerberos":"C:\\InSights_Windows\\Server2\\INSIGHTS_HOME\\.InSights\\kerberos_keytab_file.keytab"
+    },
+    "mlConfiguration":{
+		"h2oEndpoint":""
+	},
+	"webhookEngine": {
+		"enableWebHookEngine": false,
+      	"eventProcessingWindowInMin":60
+	},
+    "insightsServiceURL":"http://localhost:8080",
+    "insightsTimeZone":"UTC",
+    "userId":"",
+    "password":"",
+    "refreshTime":"Jan 22, 2017 5:04:25 PM",
+    "enableOnlineDatatagging":true,
+    "enableAuditEngine":false,
+    "enableDataArchivalEngine":false,
+    "enableOnlineBackup":false,
+    "autheticationProtocol":"NativeGrafana",
+    "pdfkey":""
+}
