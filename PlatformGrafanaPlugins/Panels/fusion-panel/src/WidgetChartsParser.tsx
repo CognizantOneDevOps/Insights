@@ -1,7 +1,7 @@
 export function formatAnguarGuage(props: any) {
     let dials: any = new Object();
     let dial: any = new Array();
-    if (props.data.state === 'Done') {
+    if (props.data.state === 'Done' && props.data.series.length > 0) {
       let array = props.data.series[0].fields;
       let labels = array[0].values.buffer;
       let index = 0;

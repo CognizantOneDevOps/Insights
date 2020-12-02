@@ -3,7 +3,7 @@ export function formatMultiSeriesChartType(props: any,options:any,config:any): {
     let dataset: any = new Array();
     let category: any = new Array();
     let data: any = new Array();
-    if (props.data.state === 'Done') {
+    if (props.data.state === 'Done' && props.data.series.length > 0) {
         let labelFlag: boolean = false;
         let array = props.data.series[0].fields;
         array.forEach((obj: any) => {
@@ -33,7 +33,7 @@ export function formatZoomlineTypeChart(props: any): { categories: any, dataset:
     // this.state = { categories: [], dataset: [] };
     let categories: any = new Array();
     let dataset: any = new Array();
-    if (props.data.state === 'Done') {
+    if (props.data.state === 'Done' && props.data.series.length > 0) {
         let labelFlag: boolean = false;
         let array = props.data.series[0].fields;
         let data: any = ''

@@ -32,15 +32,19 @@ export function fetchDrillDownData(props: any, categoryLabel: any, drilldown: an
 
 
     let queryText;
-    //console.log(queryText);
-    if(level == 'level2'){
+    if(level == 'level2wise'){
+        queryText = props.options.level2LevelWiseQuery;
+    }else if(level == 'level3wise'){
+        queryText = props.options.level3LevelWiseQuery;
+    }else if(level == 'level2'){
         queryText = props.options.drillObj[categoryLabel];
     }else if(level == 'level3'){
         queryText = props.options.level3drillObj[categoryLabel];
     }
+   // console.log(queryText);
     let dquery = getTemplateSrv().replace(queryText, {}, applyTemplateVariables);
-    dquery = addTimestampToQuery(dquery, props.timeRange);
-    //console.log('dquery--', dquery);
+    dquery = addTimestampToQuery(dquery, props, categoryLabel);
+    console.log('dquery--', dquery);
     const queryJson = {
         "statements": [
             {
@@ -430,9 +434,12 @@ export function applyTemplateVariables(value: any, variable: any, formatValue: a
     return JSON.stringify(value);
 }
 
-export function addTimestampToQuery(query: any, options: any) {
+export function addTimestampToQuery(query: any, options: any, categoryLabel: any) {
     if (query && options) {
-        let range = options.range;
+        if (query.indexOf('?CATEGORY?') > -1) {
+            query = query.replace(/\?CATEGORY\?/g, categoryLabel);
+        }
+        let range = options.timeRange;
         if (range === undefined) {
             return query;
         }

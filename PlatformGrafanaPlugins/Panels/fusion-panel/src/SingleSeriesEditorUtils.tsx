@@ -103,6 +103,15 @@ export function onLevel2ChartPropertiesChange(event: ChangeEvent<HTMLTextAreaEle
     }
 }
 
+export function onLevel2TrendLineChange(event: ChangeEvent<HTMLTextAreaElement>, props: any) {
+    if (event.target.value == "") {
+        props.onOptionsChange({ ...props.options, 'level2TrendLines': event.target.value });
+    }
+    else {
+        props.onOptionsChange({ ...props.options, 'level2TrendLines': event.target.value });
+    }
+}
+
 export function onLevel3ChartPropertiesChange(event: ChangeEvent<HTMLTextAreaElement>, props: any) {
     if (event.target.value == "") {
         props.onOptionsChange({ ...props.options, 'level3ChartProperties': event.target.value });
@@ -110,6 +119,26 @@ export function onLevel3ChartPropertiesChange(event: ChangeEvent<HTMLTextAreaEle
     else {
         props.onOptionsChange({ ...props.options, 'level3ChartProperties': event.target.value });
     }
+}
+
+export function onLevel3TrendLineChange(event: ChangeEvent<HTMLTextAreaElement>, props: any) {
+    if (event.target.value == "") {
+        props.onOptionsChange({ ...props.options, 'level3TrendLines': event.target.value });
+    }
+    else {
+        props.onOptionsChange({ ...props.options, 'level3TrendLines': event.target.value });
+    }
+}
+
+
+export function onLevel2WiseDrillChange(event: ChangeEvent<HTMLTextAreaElement>, props: any) {
+    props.options.level2LevelWiseQuery = event.target.value;
+    props.onOptionsChange({ ...props.options, 'level2LevelWiseQuery': event.target.value })
+}
+
+export function onLevel3WiseDrillChange(event: ChangeEvent<HTMLTextAreaElement>, props: any) {
+    props.options.level3LevelWiseQuery = event.target.value;
+    props.onOptionsChange({ ...props.options, 'level3LevelWiseQuery': event.target.value })
 }
 
 export function onDrillChange(event: ChangeEvent<HTMLTextAreaElement>, props: any, index: any, name: any) {

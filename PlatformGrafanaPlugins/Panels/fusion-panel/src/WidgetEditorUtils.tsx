@@ -23,3 +23,12 @@ export function onPropsApplyClick(event: MouseEvent<HTMLButtonElement>, props: a
     let staticChartOptions = JSON.parse(props.options.statiProps)
     props.onOptionsChange({ ...props.options, 'staticProps': staticChartOptions, 'SbtnEnabled': false })
 }
+
+export function onTrendChange(event: ChangeEvent<HTMLTextAreaElement>, props: any) {
+  if (event.target.value == "") {
+      props.onOptionsChange({ ...props.options, 'trendline': event.target.value })
+  }
+  else {
+      props.onOptionsChange({ ...props.options, 'trendline': event.target.value })
+  }
+}

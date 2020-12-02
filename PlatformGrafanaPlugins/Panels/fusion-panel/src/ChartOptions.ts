@@ -68,6 +68,15 @@ export interface ChartOptions extends Settings {
   staticProps: any;
   SbtnEnabled: any;
 
+  trendline:any;
+  level2TrendLines:any,
+  level3TrendLines:any,
+
+  isLevel2LevelWiseQuery:any,
+  level2LevelWiseQuery:any,
+  isLevel3LevelWiseQuery:any,
+  level3LevelWiseQuery:any,
+
   charttype: any;
   connectorThickness: any;
   connectorAlpha: any;
@@ -250,6 +259,15 @@ export const defaults: ChartOptions = {
   data: JSON.stringify(colorObj),
   staticProps: '',
   SbtnEnabled: 1,
+
+  trendline: '',
+  level2TrendLines: '',
+  level3TrendLines: '',
+
+  isLevel2LevelWiseQuery: true,
+  level2LevelWiseQuery: '',
+  isLevel3LevelWiseQuery: true,
+  level3LevelWiseQuery: '',
 
   /**Single series props */
   charttype: 'column2d',

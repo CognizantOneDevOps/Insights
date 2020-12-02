@@ -6,7 +6,7 @@
     let lineset: any = new Array();
     let category: any = new Array();
     let data: any = new Array();
-    if (props.data.state === 'Done') {
+    if (props.data.state === 'Done' && props.data.series.length > 0) {
       let labelFlag: boolean = false;
       let array = props.data.series[0].fields;
       let counter = 0;
@@ -47,7 +47,7 @@
     let category: any = new Array();
     let data: any = new Array();
     let lineset: any = new Array();
-    if (props.data.state === 'Done') {
+    if (props.data.state === 'Done' && props.data.series.length > 0) {
       let labelFlag: boolean = false;
       let array = props.data.series[0].fields;
       let counter = 0;
@@ -95,7 +95,7 @@
     let category: any = new Array();
     let data: any = new Array();
     let lineset: any = new Array();
-    if (props.data.state === 'Done') {
+    if (props.data.state === 'Done' && props.data.series.length > 0) {
       let labelFlag: boolean = false;
       let array = props.data.series[0].fields;
       let counter = 0;
@@ -137,7 +137,7 @@
     let category: any = new Array();
     let lineset: any = new Array();
     let data: any = new Array();
-    if (props.data.state === 'Done') {
+    if (props.data.state === 'Done' && props.data.series.length > 0) {
       let labelFlag: boolean = false;
       let array = props.data.series[0].fields;
       let counter = 0;
