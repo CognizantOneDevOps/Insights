@@ -24,15 +24,15 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 
 import com.cognizant.devops.auditservice.audit.utils.EmailUtil;
 import com.cognizant.devops.platformauditing.util.PdfTableUtil;
-import com.cognizant.devops.platformcommons.dal.neo4j.GraphResponse;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBHandler;
+import com.cognizant.devops.platformcommons.dal.neo4j.GraphResponse;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -47,7 +47,7 @@ import com.google.gson.JsonParser;
 
 public class AuditCypherReport extends AuditReportStrategy{
 
-	private static final Logger log = LoggerFactory.getLogger(AuditCypherReport.class.getName());
+	private static Logger log = LogManager.getLogger(AuditCypherReport.class.getName());
 	
 	private static final AuditCypherReport auditCypherReport = new AuditCypherReport();
 
@@ -150,7 +150,6 @@ public class AuditCypherReport extends AuditReportStrategy{
 						log.error("Cypher query is empty.");
 					}
 				} catch (Exception ex) {
-					ex.printStackTrace();
 					log.error(cypherResponse + "  ---- Processing failed  ----", ex);
 					return Boolean.FALSE; 
 				}

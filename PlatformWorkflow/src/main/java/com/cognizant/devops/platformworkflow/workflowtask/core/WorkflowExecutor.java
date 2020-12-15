@@ -25,6 +25,7 @@ import org.quartz.JobExecutionException;
 
 import com.cognizant.devops.platformcommons.config.ApplicationConfigInterface;
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
+import com.cognizant.devops.platformcommons.constants.LogLevelConstants;
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
 import com.cognizant.devops.platformcommons.core.enums.WorkflowTaskEnum;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
@@ -50,7 +51,7 @@ public class WorkflowExecutor implements Job , ApplicationConfigInterface{
 			throws JobExecutionException {
 		log.debug(" Worlflow Detail ====  Schedular Inside WorkflowExecutor ");
 		try {
-			ApplicationConfigInterface.super.loadConfiguration();
+			ApplicationConfigInterface.loadConfiguration();
 			initilizeWorkflowTasks();
 			executeWorkflow();
 		} catch (InsightsCustomException e) {

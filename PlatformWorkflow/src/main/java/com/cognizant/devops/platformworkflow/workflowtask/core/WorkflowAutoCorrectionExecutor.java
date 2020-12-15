@@ -48,7 +48,7 @@ public class WorkflowAutoCorrectionExecutor implements Job, ApplicationConfigInt
 		InsightsStatusProvider.getInstance().createInsightStatusNode("Started WorkflowAutoCorrectionExecutor",
 				PlatformServiceConstants.SUCCESS);
 		try {
-			ApplicationConfigInterface.super.loadConfiguration();
+			ApplicationConfigInterface.loadConfiguration();
 			List<InsightsWorkflowConfiguration> activeWorkflowList = workflowDAL.getAllActiveWorkflowConfiguration();
 
 			for (InsightsWorkflowConfiguration eachWorkflow : activeWorkflowList) {

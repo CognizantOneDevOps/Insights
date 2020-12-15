@@ -81,7 +81,6 @@ public class AccessGroupManagement {
 		Map<String, String> headers = PlatformServiceUtil.prepareGrafanaHeader(httpRequest);
 		String response = grafanaHandler.grafanaPost("/api/user/using/" + orgId, json, headers);
 		log.debug("Headers: {}", headers);
-
 		/*
 		 * Since Access group has changed, need to check and update user role to new
 		 * Access group Update cookies and SpringAuthorities accordingly

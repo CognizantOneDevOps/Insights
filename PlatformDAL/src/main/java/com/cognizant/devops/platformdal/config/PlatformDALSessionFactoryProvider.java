@@ -110,7 +110,8 @@ public class PlatformDALSessionFactoryProvider {
 				configuration.setProperty(AvailableSettings.SHOW_SQL, "false");
 				configuration.setProperty(AvailableSettings.USE_SQL_COMMENTS, "false");
 				configuration.setProperty(AvailableSettings.FORMAT_SQL, "false");
-				configuration.setProperty(AvailableSettings.GENERATE_STATISTICS,"false");	
+				configuration.setProperty(AvailableSettings.GENERATE_STATISTICS, "false");
+				configuration.setProperty(AvailableSettings.HBM2DDL_AUTO, "update");
 				
 				/* c3p configuration setting */
 				configuration.setProperty(AvailableSettings.C3P0_MIN_SIZE,postgre.getC3pMinSize());

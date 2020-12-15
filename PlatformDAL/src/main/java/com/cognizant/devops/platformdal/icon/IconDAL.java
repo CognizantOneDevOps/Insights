@@ -38,18 +38,19 @@ private static final String ICONID = "iconId";
 			Icon iconImg = null;
 			if (!resultList.isEmpty()) {
 				iconImg = resultList.get(0);
-				session.beginTransaction();
-				if (iconImg != null) {
-					iconImg.setIconId(icon.getIconId());
-					iconImg.setFileName(icon.getFileName());
-					iconImg.setImage(icon.getImage());
-					iconImg.setImageType(icon.getImageType());
-					session.update(iconImg);
-				} else {
-					session.save(icon);
-				}
-				session.getTransaction().commit();
 			}
+			session.beginTransaction();
+			if (iconImg != null) {
+				iconImg.setIconId(icon.getIconId());
+				iconImg.setFileName(icon.getFileName());
+				iconImg.setImage(icon.getImage());
+				iconImg.setImageType(icon.getImageType());
+				session.update(iconImg);
+			} else {
+				session.save(icon);
+			}
+			session.getTransaction().commit();
+
 			return true;
 		} catch (Exception e) {
 			log.error(e.getMessage());

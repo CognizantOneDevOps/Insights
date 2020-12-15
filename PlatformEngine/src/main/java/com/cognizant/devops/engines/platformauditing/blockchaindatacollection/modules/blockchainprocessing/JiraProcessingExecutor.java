@@ -27,6 +27,7 @@ import com.cognizant.devops.platformcommons.dal.neo4j.GraphResponse;
 import com.cognizant.devops.platformcommons.config.ApplicationConfigInterface;
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
 import com.cognizant.devops.platformcommons.constants.InsightsAuditConstants;
+import com.cognizant.devops.platformcommons.constants.LogLevelConstants;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBHandler;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.google.common.hash.HashCode;
@@ -62,7 +63,7 @@ public class JiraProcessingExecutor extends TimerTask implements ApplicationConf
 	public void run() {
 		LOG.info("Blockchain Processing Executer jira module is getting executed");
 		try {
-			ApplicationConfigInterface.super.loadConfiguration();
+			ApplicationConfigInterface.loadConfiguration();
 			JiraNodeExtraction();
 		} catch (InsightsCustomException e) {
 			LOG.error(e);

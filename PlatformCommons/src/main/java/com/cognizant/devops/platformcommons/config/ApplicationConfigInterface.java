@@ -19,8 +19,9 @@ import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 
 public interface ApplicationConfigInterface {
 	
-	default void loadConfiguration() throws InsightsCustomException {
+	static void loadConfiguration() throws InsightsCustomException {
 		ApplicationConfigCache.loadConfigCache();
+		ApplicationConfigProvider.performSystemCheck();
 	}
 
 }

@@ -50,7 +50,7 @@ import com.google.gson.JsonObject;
  * @author Vishal Ganjare (vganjare)
  */
 public class CorrelationExecutor {
-	public static final String RESULT= "result";
+	public static final String RESULT = "results";
 	private static final Logger log = LogManager.getLogger(CorrelationExecutor.class);
 	private long maxCorrelationTime;
 	private long lastCorrelationTime;

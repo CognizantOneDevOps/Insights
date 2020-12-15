@@ -27,6 +27,7 @@ import com.cognizant.devops.engines.platformengine.message.core.EngineStatusLogg
 import com.cognizant.devops.engines.util.WebhookEventProcessing;
 import com.cognizant.devops.platformcommons.config.ApplicationConfigInterface;
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
+import com.cognizant.devops.platformcommons.constants.LogLevelConstants;
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
 import com.cognizant.devops.platformcommons.core.util.InsightsUtils;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBHandler;
@@ -51,7 +52,7 @@ public class WebhookOfflineEventProcessing extends TimerTask implements Applicat
 	public void run() {
 		log.debug("Webhook Offline Event Processing Started ======");
 		try {
-			ApplicationConfigInterface.super.loadConfiguration();
+			ApplicationConfigInterface.loadConfiguration();
 			List<WebHookConfig> webhookEventConfigs = dal.getAllEventWebHookConfigurations();
 			log.debug("Webhook events for processing ====== {}", webhookEventConfigs);
 			execute(webhookEventConfigs);

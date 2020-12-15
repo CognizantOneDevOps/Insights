@@ -29,6 +29,7 @@ import com.cognizant.devops.engines.platformwebhookengine.message.subscriber.Web
 import com.cognizant.devops.engines.platformwebhookengine.message.subscriber.WebhookHealthSubscriber;
 import com.cognizant.devops.platformcommons.config.ApplicationConfigInterface;
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
+import com.cognizant.devops.platformcommons.constants.LogLevelConstants;
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
 import com.cognizant.devops.platformdal.webhookConfig.WebHookConfig;
 import com.cognizant.devops.platformdal.webhookConfig.WebHookConfigDAL;
@@ -43,7 +44,7 @@ public class WebHookEngineAggregatorModule extends TimerTask  implements Applica
 	public void run() {
 		log.debug(" Webhook Engine started ==== ");
 		try {
-			ApplicationConfigInterface.super.loadConfiguration();
+			ApplicationConfigInterface.loadConfiguration();
 			ApplicationConfigProvider.performSystemCheck();
 			WebHookConfigDAL webhookConfigDal = new WebHookConfigDAL();
 			List<WebHookConfig> allWebhookConfigurations = webhookConfigDal.getAllActiveWebHookConfigurations();

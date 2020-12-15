@@ -34,8 +34,8 @@ import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 import javax.mail.util.ByteArrayDataSource;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.config.EmailConfiguration;
@@ -47,7 +47,7 @@ import com.cognizant.devops.platformcommons.config.EmailConfiguration;
  */
 public class EmailUtil {
 
-	private static final Logger log = LoggerFactory.getLogger(EmailUtil.class.getName());
+	private static Logger log = LogManager.getLogger(EmailUtil.class.getName());
 
 	//Load Mail Server Details
 	

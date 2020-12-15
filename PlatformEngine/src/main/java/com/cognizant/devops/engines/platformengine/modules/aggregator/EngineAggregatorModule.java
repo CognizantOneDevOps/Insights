@@ -32,6 +32,7 @@ import com.cognizant.devops.engines.platformengine.message.subscriber.AgentDataS
 import com.cognizant.devops.engines.platformengine.message.subscriber.AgentHealthSubscriber;
 import com.cognizant.devops.platformcommons.config.ApplicationConfigInterface;
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
+import com.cognizant.devops.platformcommons.constants.LogLevelConstants;
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBHandler;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphResponse;
@@ -57,7 +58,7 @@ public class EngineAggregatorModule extends TimerTask implements ApplicationConf
 	public void run() {
 		log.debug(" EngineAggregatorModule start ====");
 		try {
-			ApplicationConfigInterface.super.loadConfiguration();
+			ApplicationConfigInterface.loadConfiguration();
 			ApplicationConfigProvider.performSystemCheck();
 			GraphDBHandler graphDBHandler = new GraphDBHandler();
 			AgentConfigDAL agentConfigDal = new AgentConfigDAL();

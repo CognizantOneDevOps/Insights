@@ -45,8 +45,7 @@ public class EngineStatusLogger extends ComponentHealthLogger {
 			version = EngineStatusLogger.class.getPackage().getImplementationVersion();
 			log.debug(" Engine version for createEngineStatusNode {} ", version);
 			Map<String, String> extraParameter = new HashMap<>(0);
-			if (ApplicationConfigProvider.getInstance().getGraph().getAuthToken() != null
-					&& !ApplicationConfigProvider.getInstance().getGraph().getAuthToken().equals("")) {
+			if (isDBUpdateSafe()) {
 				createComponentStatusNode("HEALTH:ENGINE", version, message, status, extraParameter);
 			}
 		} catch (Exception e) {
@@ -61,8 +60,7 @@ public class EngineStatusLogger extends ComponentHealthLogger {
 			version = EngineStatusLogger.class.getPackage().getImplementationVersion();
 			log.debug(" Engine version for createDataArchivalStatusNode {} ", version);
 			Map<String, String> extraParameter = new HashMap<>(0);
-			if (ApplicationConfigProvider.getInstance().getGraph().getAuthToken() != null
-					&& !ApplicationConfigProvider.getInstance().getGraph().getAuthToken().equals("")) {
+			if (isDBUpdateSafe()) {
 				createComponentStatusNode("HEALTH:DATAARCHIVALENGINE", version, message, status, extraParameter);
 			}
 		} catch (Exception e) {
@@ -77,8 +75,7 @@ public class EngineStatusLogger extends ComponentHealthLogger {
 			version = EngineStatusLogger.class.getPackage().getImplementationVersion();
 			log.debug(" Engine version createWebhookEngineStatusNode {}", version);
 			Map<String, String> extraParameter = new HashMap<>(0);
-			if (ApplicationConfigProvider.getInstance().getGraph().getAuthToken() != null
-					&& !ApplicationConfigProvider.getInstance().getGraph().getAuthToken().equals("")) {
+			if (isDBUpdateSafe()) {
 				createComponentStatusNode("HEALTH:WEBHOOKENGINE", version, message, status, extraParameter);
 			}
 		} catch (Exception e) {
@@ -93,13 +90,17 @@ public class EngineStatusLogger extends ComponentHealthLogger {
 			version = EngineStatusLogger.class.getPackage().getImplementationVersion();
 			log.debug(" Engine version createAuditStatusNode {} ", version);
 			Map<String, String> extraParameter = new HashMap<>(0);
-			if (ApplicationConfigProvider.getInstance().getGraph().getAuthToken() != null
-					&& !ApplicationConfigProvider.getInstance().getGraph().getAuthToken().equals("")) {
+			if (isDBUpdateSafe()) {
 				createComponentStatusNode("HEALTH:AUDITENGINE", version, message, status, extraParameter);
 			}
 		} catch (Exception e) {
 			log.error(" Unable to create node {} ", e.getMessage());
 		}
 		return Boolean.TRUE;
+	}
+
+	private boolean isDBUpdateSafe() {
+		return ApplicationConfigProvider.getInstance().getGraph().getAuthToken() != null
+				&& !ApplicationConfigProvider.getInstance().getGraph().getAuthToken().equals("");
 	}
 }

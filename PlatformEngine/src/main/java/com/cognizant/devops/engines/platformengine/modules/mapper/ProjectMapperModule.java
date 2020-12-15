@@ -23,6 +23,7 @@ import org.apache.logging.log4j.Logger;
 
 import com.cognizant.devops.engines.platformengine.message.core.EngineStatusLogger;
 import com.cognizant.devops.platformcommons.config.ApplicationConfigInterface;
+import com.cognizant.devops.platformcommons.constants.LogLevelConstants;
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBHandler;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
@@ -39,7 +40,7 @@ public class ProjectMapperModule extends TimerTask implements ApplicationConfigI
 
 	private void executeProjectMapping() {
 		try {
-			ApplicationConfigInterface.super.loadConfiguration();
+			ApplicationConfigInterface.loadConfiguration();
 			ProjectMappingDAL projectMappingDAL = new ProjectMappingDAL();
 			List<ProjectMapping> projectMappingList = projectMappingDAL.fetchAllProjectMapping();
 			if(projectMappingList != null){

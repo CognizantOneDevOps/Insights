@@ -20,6 +20,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import com.google.gson.JsonObject;
+
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
@@ -73,6 +75,7 @@ public class ApplicationConfigProvider implements Serializable {
 
     private WebhookEngine webhookEngine= new WebhookEngine();
     private String pdfkey;
+	private ApplicationLogLevel applicationLogLevel = new ApplicationLogLevel();
     
 	private ApplicationConfigProvider() {
 		this.refreshTime = new Date(new Date().getTime() - 86400000);
@@ -363,6 +366,12 @@ public class ApplicationConfigProvider implements Serializable {
 	public void setMlConfiguration(MlConfiguration mlConfiguration) {
 		this.mlConfiguration = mlConfiguration;
 	}
-	
-	
+
+	public ApplicationLogLevel getApplicationLogLevel() {
+		return applicationLogLevel;
+	}
+
+	public void setApplicationLogLevel(ApplicationLogLevel applicationLogLevel) {
+		this.applicationLogLevel = applicationLogLevel;
+	}
 }

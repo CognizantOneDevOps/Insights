@@ -31,6 +31,7 @@ import com.cognizant.devops.engines.platformengine.message.factory.EngineSubscri
 import com.cognizant.devops.platformcommons.config.ApplicationConfigInterface;
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.constants.DataArchivalConstants;
+import com.cognizant.devops.platformcommons.constants.LogLevelConstants;
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformdal.agentConfig.AgentConfig;
@@ -47,7 +48,7 @@ public class DataArchivalAggregatorModule extends TimerTask implements Applicati
 	public void run() {
 		log.debug("Data Archival Aggregator Module start");
 		try {
-			ApplicationConfigInterface.super.loadConfiguration();
+			ApplicationConfigInterface.loadConfiguration();
 			ApplicationConfigProvider.performSystemCheck();
 			List<AgentConfig> agentConfig = agentConfigDAL.getAgentConfigurations(DataArchivalConstants.TOOLNAME,
 					DataArchivalConstants.TOOLCATEGORY);

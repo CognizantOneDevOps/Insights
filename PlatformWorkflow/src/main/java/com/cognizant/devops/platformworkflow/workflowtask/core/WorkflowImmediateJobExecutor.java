@@ -30,7 +30,6 @@ import com.cognizant.devops.platformcommons.core.enums.WorkflowTaskEnum;
 import com.cognizant.devops.platformdal.workflow.InsightsWorkflowConfiguration;
 import com.cognizant.devops.platformdal.workflow.InsightsWorkflowTaskSequence;
 import com.cognizant.devops.platformworkflow.workflowtask.exception.WorkflowTaskInitializationException;
-import com.cognizant.devops.platformworkflow.workflowthread.core.WorkflowThreadPool;
 import com.google.gson.JsonObject;
 
 public class WorkflowImmediateJobExecutor implements Job, ApplicationConfigInterface {
@@ -49,7 +48,7 @@ public class WorkflowImmediateJobExecutor implements Job, ApplicationConfigInter
 			throws JobExecutionException {
 		log.debug(" Worlflow Detail ====  Schedular Inside WorkflowImmediateJobExecutor ");
 		try {
-			ApplicationConfigInterface.super.loadConfiguration();
+			ApplicationConfigInterface.loadConfiguration();
 			initilizeWorkflowTasks();
 			executeImmediateWorkflow();
 		} catch (Exception e) {

@@ -18,22 +18,32 @@ package com.cognizant.devops.platformregressiontest.test.common;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.testng.TestNG;
 
+import com.cognizant.devops.platformcommons.config.ApplicationConfigCache;
+import com.cognizant.devops.platformcommons.constants.LogLevelConstants;
+
 public class PlatformRegressionMain {
+	static Logger log = LogManager.getLogger(PlatformRegressionMain.class.getName());
 
 	public static void main(String[] args) {
 
-		List<String> file = new ArrayList<String>();
+		ApplicationConfigCache.updateLogLevel(LogLevelConstants.PlatformRegressionTest);
+
+		List<String> file = new ArrayList<>();
 
 		String path = System.getenv().get(ConfigOptionsTest.INSIGHTS_HOME) + File.separator + ConfigOptionsTest.AUTO_DIR
 				+ File.separator + ConfigOptionsTest.TESTNG_FILE;
 
 		file.add(path);
+		File testngFile = new File(path);
+		log.debug(" Testng file path for PlatformRegressionTest {} ", testngFile.getAbsolutePath());
 		TestNG testNG = new TestNG();
 		testNG.setTestSuites(file);
 		testNG.run();
-
 	}
 
 }

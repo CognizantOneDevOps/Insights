@@ -41,6 +41,7 @@ import com.cognizant.devops.engines.platformengine.message.core.EngineStatusLogg
 import com.cognizant.devops.platformauditing.api.InsightsAuditImpl;
 import com.cognizant.devops.platformauditing.util.LoadFile;
 import com.cognizant.devops.platformcommons.constants.InsightsAuditConstants;
+import com.cognizant.devops.platformcommons.constants.LogLevelConstants;
 import com.cognizant.devops.platformcommons.config.ApplicationConfigInterface;
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBHandler;
@@ -62,7 +63,7 @@ public class PlatformAuditProcessingExecutor extends TimerTask implements Applic
 	public void run() {
         LOG.info("Blockchain Processing Executer module is getting executed");
         try {
-			ApplicationConfigInterface.super.loadConfiguration();
+			ApplicationConfigInterface.loadConfiguration();
 			orphanNodeExtraction();
 		} catch (InsightsCustomException e) {
 			LOG.error(e);

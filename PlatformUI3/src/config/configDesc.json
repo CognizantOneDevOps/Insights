@@ -1,13 +1,13 @@
-{ 
-   "desriptions":{ 
-      "mqConfig": "Message Queue Config",
-      "subscribe": "Subscribe",
-      "publish": "Publish",
-      "communication": "Communication",
-      "loggingSetting": "Logging Setting",
-      "enrichData": "Enrich Data"
-   },
-   "mlDataTypes": {
+{
+	"desriptions": {
+		"mqConfig": "Message Queue Config",
+		"subscribe": "Subscribe",
+		"publish": "Publish",
+		"communication": "Communication",
+		"loggingSetting": "Logging Setting",
+		"enrichData": "Enrich Data"
+	},
+	"mlDataTypes": {
 		"Numeric": "Numeric",
 		"Enum": "Enum",
 		"String": "String",
@@ -15,14 +15,14 @@
 		"UUID": "UUID",
 		"Unknown": "Unknown"
 	},
-   "serverConfig":{
-		"vault": "Vault", 
-		"graph": "Neo4j", 
+	"serverConfig": {
+		"vault": "Vault",
+		"graph": "Neo4j",
 		"grafana": "Grafana",
 		"postgre": "Postgre",
 		"messageQueue": "Message Queue Config",
-		"agentDetails":"Agent Configuration",
-		"trustedHosts": "Trusted Hosts", 
+		"agentDetails": "Agent Configuration",
+		"trustedHosts": "Trusted Hosts",
 		"endpointData": "Elastic Search Config",
 		"queryCache": "Query Cache",
 		"emailConfiguration": "Email Configuration",
@@ -33,6 +33,7 @@
 		"workflowDetails": "Workflow Details",
 		"mlConfiguration": "Forecasting Configuration",
 		"ldapConfiguration": "Ldap Configuration",
-		"webhookEngine": "Webhook Engine"
-   }
+		"webhookEngine": "Webhook Engine",
+		"applicationLogLevel": "Application Log Level"
+	}
 }

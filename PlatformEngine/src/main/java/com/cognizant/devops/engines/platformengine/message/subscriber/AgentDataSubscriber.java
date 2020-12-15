@@ -97,7 +97,7 @@ public class AgentDataSubscriber extends EngineSubscriberResponseHandler {
 		boolean enableOnlineDatatagging = ApplicationConfigProvider.getInstance().isEnableOnlineDatatagging();
 		String message = new String(body, MQMessageConstants.MESSAGE_ENCODING);
 		String routingKey = envelope.getRoutingKey();
-		log.debug("Routing key in data {}", routingKey);
+		log.debug("Routing key in data {} received data size {} ", routingKey, message.length());
 		List<String> labels = new ArrayList<String>();
 		labels.add("RAW");
 		if (this.labelName == null) {

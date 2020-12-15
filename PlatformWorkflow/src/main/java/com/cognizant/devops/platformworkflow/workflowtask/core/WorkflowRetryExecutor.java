@@ -34,7 +34,6 @@ import com.cognizant.devops.platformdal.workflow.InsightsWorkflowTask;
 import com.cognizant.devops.platformdal.workflow.InsightsWorkflowTaskSequence;
 import com.cognizant.devops.platformworkflow.workflowtask.exception.WorkflowTaskInitializationException;
 import com.cognizant.devops.platformworkflow.workflowtask.utils.WorkflowUtils;
-import com.cognizant.devops.platformworkflow.workflowthread.core.WorkflowThreadPool;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -54,7 +53,7 @@ public class WorkflowRetryExecutor implements Job, ApplicationConfigInterface {
 	public void execute(JobExecutionContext context) throws JobExecutionException {
 		log.debug(" Worlflow Detail ====  Schedular Inside WorkflowRetryExecutor ");
 		try {
-			ApplicationConfigInterface.super.loadConfiguration();
+			ApplicationConfigInterface.loadConfiguration();
 			initilizeWorkflowTasks();
 			retryWorkflows();
 		} catch (Exception e) {

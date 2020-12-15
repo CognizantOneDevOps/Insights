@@ -111,6 +111,5 @@ public class InsightsKerberosAuthenticationProvider implements AuthenticationPro
 	 */
 	protected void additionalAuthenticationChecks(UserDetails userDetails, KerberosServiceRequestToken authentication)
 			throws AuthenticationException {
-		throw new UnsupportedOperationException();
 	}
 }

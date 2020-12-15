@@ -48,7 +48,7 @@ public class DocumentParser {
 	private void processGraphDBJson(JsonElement jsonElement, List<NodeData> nodeDataList, NodeData nodeData,
 			String property) {
 		if(jsonElement.isJsonNull()){
-			log.error("Json Element is null");
+			return;
 		}else if(jsonElement.isJsonArray()){
 			JsonArray jsonArray = jsonElement.getAsJsonArray();
 			for (JsonElement jsonArrayElement : jsonArray) {
@@ -62,7 +62,8 @@ public class DocumentParser {
 					nodeDataList.add(nodeData);
 					boolean graph = jsonObject.has(ConfigOptions.GRAPH);
 					if (graph) {
-						JsonArray graphNodes = jsonObject.get(ConfigOptions.GRAPH).getAsJsonObject().get("nodes").getAsJsonArray();
+						JsonArray graphNodes = jsonObject.get(ConfigOptions.GRAPH).getAsJsonObject().get("nodes")
+								.getAsJsonArray();
 						if (graphNodes.size() > 0) {
 							JsonArray labels = graphNodes.get(0).getAsJsonObject().get("labels").getAsJsonArray();
 							for (JsonElement label : labels) {

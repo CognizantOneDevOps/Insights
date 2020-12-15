@@ -31,20 +31,21 @@
 
   <div class="btnAlign">
     <button mat-icon-button (click)="saveData(frmserverconfig.value)" [disabled]="!isConfigAvailable">
-        <mat-icon title="Save" style="margin-bottom: -10%;" class="mat-icon material-icons">
-            save
-        </mat-icon>
+      <mat-icon title="Save" style="margin-bottom: -10%;" class="mat-icon material-icons">
+        save
+      </mat-icon>
     </button>
 
     <button mat-icon-button (click)="redirectToLandingPage()" [disabled]="frmserverconfig.invalid">
-        <mat-icon svgIcon="redirect_icon" title="Redirect To Landing Page" style="margin-bottom: 15%;" class="mat-icon material-icons">
-            refresh
-        </mat-icon>
+      <mat-icon svgIcon="redirect_icon" title="Redirect To Landing Page" style="margin-bottom: 15%;"
+        class="mat-icon material-icons">
+        refresh
+      </mat-icon>
     </button>
-</div>
+  </div>
 
   <form #frmserverconfig="ngForm" class="form" style="margin-top: 40px;">
-     
+
     <div style="display: flex; justify-content: center; align-items: center">
       <div class="loading-indicator">
         <mat-progress-spinner [diameter]="100" *ngIf="showThrobber" color="primary" mode="indeterminate">
@@ -72,7 +73,8 @@
               <span style="color:#ff0000;" *ngIf="configDataChild.isRequired"> *</span>
             </td>
             <td class="mat-cell-value" title="{{configDataChild.value}}">
-              <input type={{configDataChild.inputType}} class="inputBoxCont" [(ngModel)]="configDataChild.value" name="{{configData.key+'_'+configDataChild.key}}" id="{{configDataChild.id}}">
+              <input type={{configDataChild.inputType}} class="inputBoxCont" [(ngModel)]="configDataChild.value"
+                name="{{configData.key+'_'+configDataChild.key}}" id="{{configDataChild.id}}">
             </td>
           </tr>
         </tbody>
@@ -96,28 +98,30 @@
               <span style="color:#ff0000;" *ngIf="configData.isRequired"> *</span>
             </td>
             <td class="mat-cell-value" title="{{configData.value}}">
-              <input type={{configData.inputType}} class="inputBoxCont" [(ngModel)]="configData.value" name="{{configData.key}}" id="{{configData.id}}">
+              <input type={{configData.inputType}} class="inputBoxCont" [(ngModel)]="configData.value"
+                name="{{configData.key}}" id="{{configData.id}}">
             </td>
           </tr>
         </tbody>
       </table>
     </div>
 
-    <div class="others" layout layout-align="start center" *ngIf="isConfigAvailable">
+    <div class="others" layout layout-align="start center" *ngFor="let configData of getServerConfigItems('textArea')">
       <table class="mat-elevation-z8 mat-table dynamic-table">
         <thead>
           <tr class="mat-header-row" layout-align="start start">
-            <th colspan="3" class="dynamicTableHeaderCss mat-header-cell" style="height:40px;border-radius: 10px 10px 0 0;">
-              <span class="mainHeaderText">Trusted Hosts</span>
+            <th colspan="3" class="dynamicTableHeaderCss mat-header-cell"
+              style="height:40px;border-radius: 10px 10px 0 0;">
+              <span class="mainHeaderText">{{configAbbr[configData.key]}}</span>
               <span style="color:#ff0000;"> *</span>
             </th>
           </tr>
         </thead>
         <tbody style="width: inherit;">
-          <tr flex="30" layout layout-align="start start" class="mat-row-dynamic-data" style="display: inline-table;" 
-          *ngFor="let configData of getServerConfigItems('trustedHosts')">
+          <tr flex="30" layout layout-align="start start" class="mat-row-dynamic-data" style="display: inline-table;">
             <td class="mat-cell-value-dynamic-data">
-              <textarea [(ngModel)]="configData.value" name="trustedHosts" rows="5" class="frmTxtarea"></textarea>
+              <textarea [(ngModel)]="configData.value" name="{{configData.key}}" rows="10"
+                class="frmTxtarea"></textarea>
             </td>
           </tr>
         </tbody>
