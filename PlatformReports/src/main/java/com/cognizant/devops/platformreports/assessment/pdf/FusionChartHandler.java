@@ -18,7 +18,9 @@ package com.cognizant.devops.platformreports.assessment.pdf;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
@@ -32,6 +34,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
+
 import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -42,6 +45,7 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.constants.AssessmentReportAndWorkflowConstants;
 import com.cognizant.devops.platformcommons.constants.ReportChartCollection;
@@ -49,8 +53,8 @@ import com.cognizant.devops.platformcommons.dal.multipart.MultipartDataHandler;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformreports.assessment.datamodel.InsightsAssessmentConfigurationDTO;
 import com.cognizant.devops.platformreports.assessment.datamodel.InsightsReportPdfTableConfig;
-import com.cognizant.devops.platformreports.assessment.util.ReportEngineUtils;
 import com.cognizant.devops.platformreports.assessment.util.PdfReportTableUtil;
+import com.cognizant.devops.platformreports.assessment.util.ReportEngineUtils;
 import com.cognizant.devops.platformreports.exception.InsightsJobFailedException;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
@@ -73,8 +77,11 @@ public class FusionChartHandler implements BasePDFProcessor {
 
 			JsonArray finalTemplateJson = generateChartsConfig(assessmentReportDTO);
 
-			InsightsReportPdfTableConfig insightsReportPdfTableConfig = modifyHtmlTemplate(assessmentReportDTO);
-
+			modifyHtmlTemplate(assessmentReportDTO);
+			
+			InsightsReportPdfTableConfig insightsReportPdfTableConfig = processHtmlTableWithOpenPDF(
+					assessmentReportDTO);
+			
 			exportPDFFile(finalTemplateJson, assessmentReportDTO, insightsReportPdfTableConfig);
 
 		} catch (Exception e) {
@@ -134,6 +141,7 @@ public class FusionChartHandler implements BasePDFProcessor {
 			Map<String, JsonArray> tableJsonObjMap = new HashMap<>();
 			JsonArray kpiResultArray = assessmentReportDTO.getVisualizationResult();
 			for (JsonElement element : kpiResultArray) {
+				boolean isTable = false;
 				JsonObject eachKpiResult = element.getAsJsonObject();
 				String kpiId = eachKpiResult.get("kpiId").getAsString();
 				JsonArray kpiVisualizationArray = eachKpiResult.get("visualizationresult").getAsJsonArray();
@@ -150,6 +158,7 @@ public class FusionChartHandler implements BasePDFProcessor {
 								visualizationObjectFromTemplateJson);
 						finalTemplateJson.add(toObject);
 					} else if (vType.startsWith("table") && fromkpiResultArray.size() > 0) {
+						isTable=true;
 						String caption = "";
 						if (templateJsonObjMap.containsKey(vType)) {
 							caption = templateJsonObjMap.get(vType).getAsJsonObject().get(AssessmentReportAndWorkflowConstants.CAPTION).getAsString();
@@ -163,7 +172,7 @@ public class FusionChartHandler implements BasePDFProcessor {
 								kpiId, vType, fromkpiResultArray.size());
 					}
 				}
-				extractContentDataFromVisualizationResponse(contentMap, eachKpiResult, kpiId, kpiContentMap);
+				extractContentDataFromVisualizationResponse(contentMap, eachKpiResult, kpiId, kpiContentMap,isTable);
 			}
 			assessmentReportDTO.setTableJsonObjMap(tableJsonObjMap);
 			assessmentReportDTO.setContentMap(contentMap);
@@ -187,7 +196,7 @@ public class FusionChartHandler implements BasePDFProcessor {
 	 * @param kpiId
 	 */
 	private void extractContentDataFromVisualizationResponse(Map<String, String> contentMap, JsonObject eachKpiResult,
-			String kpiId, Map<String, List<String>> kpiContentMap) {
+			String kpiId, Map<String, List<String>> kpiContentMap,boolean isTable) {
 		if (eachKpiResult.has("contentResult")) {
 			JsonArray kpiContentArray = eachKpiResult.get("contentResult").getAsJsonArray();
 			log.debug("Worlflow Detail ==== generateChartsConfig for kpi {} kpiContentArray  {} ", kpiId,
@@ -204,7 +213,9 @@ public class FusionChartHandler implements BasePDFProcessor {
 						String contentText = eachRowArray.get(0).getAsString();
 						// Assuming Second Array Item as content Id
 						String contentId = eachRowArray.get(1).getAsString();
+						if (!isTable) {
 						contentMap.put(contentId, contentText);
+						}
 						observationList.add(contentText);
 					} else {
 						log.debug(
@@ -218,15 +229,21 @@ public class FusionChartHandler implements BasePDFProcessor {
 		}
 	}
 
-	private InsightsReportPdfTableConfig modifyHtmlTemplate(InsightsAssessmentConfigurationDTO assessmentReportDTO) {
+	private void modifyHtmlTemplate(InsightsAssessmentConfigurationDTO assessmentReportDTO) {
 		String templateHtmlPath = assessmentReportDTO.getPdfReportDirPath() + File.separator
 				+ assessmentReportDTO.getReportFilePath() + AssessmentReportAndWorkflowConstants.HTMLEXTENSION;
 		log.debug("Worlflow Detail ==== templateHtmlPath {} ", templateHtmlPath);
 		try {
 			File render = new File(templateHtmlPath);
 			Document document = Jsoup.parse(render, "UTF-8");
+			String originalHTml = document.toString();
 			processHtmlContent(assessmentReportDTO, document);
-			return processHtmlTable(assessmentReportDTO, document);
+			String modifiedHtml = document.toString();
+			if (!originalHTml.equalsIgnoreCase(modifiedHtml)) {
+				try(PrintWriter printWriter = new PrintWriter(new FileWriter(templateHtmlPath))) {
+					printWriter.print(modifiedHtml);
+				}
+			}
 			
 
 		} catch (FileNotFoundException e) {
@@ -241,43 +258,55 @@ public class FusionChartHandler implements BasePDFProcessor {
 
 	}
 
-	private InsightsReportPdfTableConfig processHtmlTable(InsightsAssessmentConfigurationDTO assessmentReportDTO, Document document) {
-		String reportDirPath = assessmentReportDTO.getPdfReportDirPath() + File.separator ;
-		PdfReportTableUtil pdfReportTableUtil = new PdfReportTableUtil();
+	private InsightsReportPdfTableConfig processHtmlTableWithOpenPDF(
+			InsightsAssessmentConfigurationDTO assessmentReportDTO) {
 		InsightsReportPdfTableConfig insightsReportPdfTableConfig = new InsightsReportPdfTableConfig();
-		PDDocument doc = new PDDocument();
-		PDPage page = pdfReportTableUtil.addNewPage(doc);
-		pdfReportTableUtil.fetchPdfConfig(reportDirPath, insightsReportPdfTableConfig);
-		
-		Elements allTableDiv = document.getElementsByAttributeValueMatching("id", "table_*");
-		if (!allTableDiv.isEmpty()) {
-			Map<String, JsonArray> tableJsonObjMap = assessmentReportDTO.getTableJsonObjMap();
-			int tableIndex = 0;
-			for (Element elmTableDiv : allTableDiv) {
-				String divId = elmTableDiv.attr("id");
-				if (tableJsonObjMap.containsKey(divId)) {
-					commonTableResponse(elmTableDiv, tableJsonObjMap.get(divId), assessmentReportDTO, tableIndex, doc, page, insightsReportPdfTableConfig );
-					tableIndex++;
+		try {
+			String templateHtmlPath = assessmentReportDTO.getPdfReportDirPath() + File.separator
+					+ assessmentReportDTO.getReportFilePath() + AssessmentReportAndWorkflowConstants.HTMLEXTENSION;
+			File render = new File(templateHtmlPath);
+			Document document;
+			document = Jsoup.parse(render, "UTF-8");
+			String reportDirPath = assessmentReportDTO.getPdfReportDirPath() + File.separator;
+			PdfReportTableUtil pdfReportTableUtil = new PdfReportTableUtil();
+			PDDocument doc = new PDDocument();
+			PDPage page = pdfReportTableUtil.addNewPage(doc);
+			pdfReportTableUtil.fetchPdfConfig(reportDirPath, insightsReportPdfTableConfig);
+
+			Elements allTableDiv = document.getElementsByAttributeValueMatching("id", "table_*");
+			if (!allTableDiv.isEmpty()) {
+				Map<String, JsonArray> tableJsonObjMap = assessmentReportDTO.getTableJsonObjMap();
+				int tableIndex = 0;
+				for (Element elmTableDiv : allTableDiv) {
+					String divId = elmTableDiv.attr("id");
+					if (tableJsonObjMap.containsKey(divId)) {
+						commonTableResponse(elmTableDiv, tableJsonObjMap.get(divId), assessmentReportDTO, tableIndex,
+								doc, page, insightsReportPdfTableConfig);
+						tableIndex++;
+					}
 				}
-			}
-			try {
-				if(tableIndex > 0) {
-					doc.save(assessmentReportDTO.getPdfReportDirPath() + File.separator
-						+ assessmentReportDTO.getAsseementreportname() + "_Open." + ReportEngineUtils.REPORT_TYPE);
-				}
-			} catch (IOException e) {
-				log.error("Worlflow Detail ==== unable to save open pdf with tables ", e);
-			} finally {
 				try {
-					doc.close();
+					if (tableIndex > 0) {
+						doc.save(assessmentReportDTO.getPdfReportDirPath() + File.separator
+								+ assessmentReportDTO.getAsseementreportname() + "_Open."
+								+ ReportEngineUtils.REPORT_TYPE);
+					}
 				} catch (IOException e) {
-					log.error("Worlflow Detail ==== unable to close open pdf with tables ", e);
+					log.error("Worlflow Detail ==== unable to save open pdf with tables ", e);
+				} finally {
+					try {
+						doc.close();
+					} catch (IOException e) {
+						log.error("Worlflow Detail ==== unable to close open pdf with tables ", e);
+					}
 				}
 			}
+		} catch (IOException e1) {
+			log.error(e1);
 		}
-		
+
 		return insightsReportPdfTableConfig;
-		
+
 	}
 	
 
@@ -313,7 +342,6 @@ public class FusionChartHandler implements BasePDFProcessor {
 			assessmentReportDTO.setPdfExportedFilePath(exportedFilePath);
 			String fusionFilePath = assessmentReportDTO.getPdfReportDirPath() + File.separator
 					+ assessmentReportDTO.getAsseementreportname() + "_Fusion." + ReportEngineUtils.REPORT_TYPE;
-			assessmentReportDTO.setPdfExportedFilePath(fusionFilePath);
 
 			String templateFilePathInZip = assessmentReportDTO.getReportFilePath() + AssessmentReportAndWorkflowConstants.HTMLEXTENSION;
 			String dashboardLogoPathInzip = "image.webp";

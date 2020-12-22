@@ -57,7 +57,8 @@ export class ContentConfigComponent implements OnInit {
       disableClose: false,
       data: {
         type: 'CONTENT',
-        multipleFileAllowed: false
+        multipleFileAllowed: false,
+        header:'Upload Json File'
       }
     });
     dialogRef.afterClosed().subscribe(result => {

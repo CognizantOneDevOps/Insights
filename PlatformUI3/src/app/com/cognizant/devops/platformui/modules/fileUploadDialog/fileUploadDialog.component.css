@@ -43,6 +43,10 @@
     height: 40px;
     padding: 10px;
     font-size: 18px;
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
 }
 .btnStyle{
     margin-top: 6%;

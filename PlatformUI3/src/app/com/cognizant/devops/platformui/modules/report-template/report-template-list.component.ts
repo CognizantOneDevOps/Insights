@@ -187,7 +187,8 @@ export class ReportTemplateComponent implements OnInit {
       data: {
         type: 'ATTACH_FILES',
         multipleFileAllowed: true,
-        reportId: this.selectedTemplate.reportId
+        reportId: this.selectedTemplate.reportId,
+        header:'Attach Files'
       }
     });
     dialogRef.afterClosed().subscribe(result => {
@@ -236,7 +237,8 @@ export class ReportTemplateComponent implements OnInit {
       disableClose: false,
       data: {
         type: 'REPORT_TEMPLATE',
-        multipleFileAllowed: false
+        multipleFileAllowed: false,
+        header:'Upload Json File'
       }
     });
     dialogRef.afterClosed().subscribe(result => {
