@@ -27,11 +27,18 @@ import { InsightsInitService } from '@insights/common/insights-initservice';
 export class PlaylistComponent implements OnInit {
   playListUrl: SafeResourceUrl;
   framesize: any;
+  offset: number;
+  enableToolbar: boolean;
   constructor(private restCallHandlerService: RestCallHandlerService, private sanitizer: DomSanitizer) {
     var self = this;
+    this.enableToolbar = InsightsInitService.enableInsightsToolbar;
     self.setScrollBarPosition();
-    var offset = 1; // 5 5px is app-grafana-dashboard height
-    this.framesize = window.frames.innerHeight; //- offset
+    if (this.enableToolbar) {
+      this.offset = 55; // 5px is app-grafana-dashboard height true 5
+    } else {
+      this.offset = 0;
+    }
+    this.framesize = window.frames.innerHeight - this.offset; //- offset
 
     var receiveMessage = function (evt) {
       var height = parseInt(evt.data);

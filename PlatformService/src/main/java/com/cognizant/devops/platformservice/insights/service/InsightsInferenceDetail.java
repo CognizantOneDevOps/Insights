@@ -16,7 +16,6 @@
 package com.cognizant.devops.platformservice.insights.service;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.List;
 
 public class InsightsInferenceDetail implements Serializable {
@@ -45,7 +44,7 @@ public class InsightsInferenceDetail implements Serializable {
 	private long executionId;
 	private String inferenceText;
 	private String resultField;
-	private transient  List<ResultSetModel> resultSet = new ArrayList<>(0);
+	private List<ResultSetModel> resultSet;
 
 	public void setKpiId(Long kpiId) {
 		this.kpiId = kpiId;

@@ -15,10 +15,15 @@
  ******************************************************************************/
 package com.cognizant.devops.platformservice.insights.service;
 
+import java.io.Serializable;
 import java.util.Date;
 
-public class ResultSetModel {
+public class ResultSetModel implements Serializable {
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1195545484384220056L;
 	private Long value;
 	private Date resultDate;
 	public Long getValue() {
@@ -32,6 +37,9 @@ public class ResultSetModel {
 	}
 	public void setResultDate(Date resultDate) {
 		this.resultDate = resultDate;
+	}
+	public static long getSerialversionuid() {
+		return serialVersionUID;
 	}
 
 }

@@ -332,7 +332,7 @@ export class HomeComponent implements OnInit {
           displayName: 'Playlist',
           iconName: 'feature',
           route: 'InSights/Home/playlist',
-          isToolbarDisplay: false,
+          isToolbarDisplay: InsightsInitService.enableInsightsToolbar,
           showMenu: true,
           title: "Playlist",
           isAdminMenu: false

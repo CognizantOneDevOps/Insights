@@ -46,10 +46,12 @@ export class GrafanaDashboardComponent implements OnInit {
     selectedDashboardUrl: string = '';
     selectedDashboard: GrafanaDashboardMode;
     dashboards = [];
+    enableToolbar: boolean;
     constructor(private route: ActivatedRoute, private router: Router,
         private sanitizer: DomSanitizer, private grafanadashboardservice: GrafanaDashboardService, private cookieService: CookieService) {
         var self = this;
-        if(InsightsInitService.enableInsightsToolbar) {
+        this.enableToolbar = InsightsInitService.enableInsightsToolbar;
+        if(this.enableToolbar) {
             this.offset = 55; // 5px is app-grafana-dashboard height true 5
         } else {
             this.offset = 0;
