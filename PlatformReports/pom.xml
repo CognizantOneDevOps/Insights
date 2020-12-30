@@ -13,13 +13,13 @@
 	<parent>
 		<artifactId>PlatformParent</artifactId>
 		<groupId>com.cognizant.devops</groupId>
-		<version>7.3-SNAPSHOT</version>
+		<version>7.3</version>
 	</parent>
 
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.cognizant.devops</groupId>
 	<artifactId>PlatformReports</artifactId>
-	<version>7.3-SNAPSHOT</version>
+	<version>7.3</version>
 	<name>PlatformReports</name>
 	<description>PlatformReports</description>
 
@@ -60,22 +60,22 @@
 		<dependency>
 			<groupId>com.cognizant.devops</groupId>
 			<artifactId>PlatformCommons</artifactId>
-			<version>7.3-SNAPSHOT</version>
+			<version>7.3</version>
 		</dependency>
 		<dependency>
 			<groupId>com.cognizant.devops</groupId>
 			<artifactId>PlatformDAL</artifactId>
-			<version>7.3-SNAPSHOT</version>
+			<version>7.3</version>
 		</dependency>
 		<dependency>
 			<groupId>com.cognizant.devops</groupId>
 			<artifactId>PlatformWorkflow</artifactId>
-			<version>7.3-SNAPSHOT</version>
+			<version>7.3</version>
 		</dependency>
 		<dependency>
 			<groupId>com.cognizant.devops</groupId>
 			<artifactId>PlatformAuditing</artifactId>
-			<version>7.3-SNAPSHOT</version>
+			<version>7.3</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.commons</groupId>
