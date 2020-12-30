@@ -80,9 +80,9 @@ public class AuthenticationUtils {
 	public static final List<String> CSRF_IGNORE = Collections.unmodifiableList(Arrays.asList("/login/**", "/user/insightsso/authenticateSSO/**",
 			"/user/authenticate/**", "/user/insightsso/**", "/saml/**"));
 
-	public static final List<String> SET_VALUES = Collections.unmodifiableList(Arrays.asList("grafanaOrg", "grafana_user", "grafanaRole",
-			"grafana_remember", "grafana_sess", "XSRF-TOKEN", "JSESSIONID", "grafana_session", "insights-sso-token",
-			"username", "insights-sso-givenname"));
+	public static final List<String> SET_VALUES = Collections.unmodifiableList(Arrays.asList(GRAFANA_COOKIES_ORG, "grafana_user", GRAFANA_ROLE_KEY,
+			"grafana_remember", "grafana_sess", CSRF_COOKIE_NAME , "JSESSIONID",  GRAFANA_SESSION_KEY, GRAFANA_WEBAUTH_HTTP_REQUEST_HEADER,
+			GRAFANA_WEBAUTH_USERKEY_NAME, SSO_USER_HEADER_KEY ));
 	public static final Set<String> MASTER_COOKIES_KEY_LIST = Collections.unmodifiableSet(new HashSet<String>(SET_VALUES));
 
 	public static final String JSON_FILE_VALIDATOR = "^([a-zA-Z0-9_.\\s-])+(.json)$";
@@ -90,7 +90,7 @@ public class AuthenticationUtils {
 	public static final String HTML_FILE_VALIDATOR = "^([a-zA-Z0-9_.\\s-])+(.html)$";
 	public static final String CSV_FILE_VALIDATOR = "^([a-zA-Z0-9_.\\s-])+(.csv)$";
 
-	public static final List<String> SUPPORTED_TYPE = Collections.unmodifiableList(Arrays.asList("SAML", "Kerberos", "NativeGrafana", "JWT" ));
+	public static final List<String> SUPPORTED_TYPE = Collections.unmodifiableList(Arrays.asList("SAML", "Kerberos", NATIVE_AUTH_PROTOCOL, "JWT" ));
 	public static final Set<String> AUTHENTICATION_PROTOCOL_LIST = Collections.unmodifiableSet(new HashSet<String>(SUPPORTED_TYPE));
 
 	protected static List<SecurityFilterChain> securityFilterchains = new ArrayList<>();
@@ -136,7 +136,7 @@ public class AuthenticationUtils {
 			log.debug("host information {} ", hostInfo);
 			return hostInfo;
 		} catch (MalformedURLException e) {
-			log.error("Unable to retrive host information ");
+			log.error("Unable to retrive host information ",e);
 			log.error(e);
 			return null;
 		}

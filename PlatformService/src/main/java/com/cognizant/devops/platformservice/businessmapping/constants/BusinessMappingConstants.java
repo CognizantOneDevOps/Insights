@@ -17,6 +17,9 @@ package com.cognizant.devops.platformservice.businessmapping.constants;
 
 public final class BusinessMappingConstants {
 
+	private BusinessMappingConstants() {
+		super();
+	}
 	public static final String VALUE = "value";
 	public static final String EXCEL_FILE="data/data.csv";
 	public static final String COLON=":";

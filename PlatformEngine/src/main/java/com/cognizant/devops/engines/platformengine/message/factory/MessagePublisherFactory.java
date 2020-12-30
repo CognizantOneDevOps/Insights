@@ -15,9 +15,11 @@
  ******************************************************************************/
 package com.cognizant.devops.engines.platformengine.message.factory;
 
+import java.io.IOException;
+import java.util.concurrent.TimeoutException;
+
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.config.MessageQueueDataModel;
-/*import com.cognizant.devops.platformcommons.constants.MessageConstants;*/
 import com.cognizant.devops.platformcommons.constants.MQMessageConstants;
 import com.google.gson.GsonBuilder;
 import com.rabbitmq.client.Channel;
@@ -29,19 +31,18 @@ public class MessagePublisherFactory {
 		
 	}
 	
-	public static void publish(String routingKey, Object data) throws Exception{
+	public static void publish(String routingKey, Object data) throws IOException, TimeoutException {
 		ConnectionFactory factory = new ConnectionFactory();
         MessageQueueDataModel messageQueueConfig = ApplicationConfigProvider.getInstance().getMessageQueue();
 		factory.setHost(messageQueueConfig.getHost());
         factory.setUsername(messageQueueConfig.getUser());
 		factory.setPassword(messageQueueConfig.getPassword());
-        Connection connection = factory.newConnection();
-        Channel channel = connection.createChannel();
-        channel.exchangeDeclare(MQMessageConstants.EXCHANGE_NAME, MQMessageConstants.EXCHANGE_TYPE);
-        
-        String message = new GsonBuilder().disableHtmlEscaping().create().toJson(data);
-        channel.basicPublish(MQMessageConstants.EXCHANGE_NAME, routingKey, null, message.getBytes());
-        connection.close();
+        try (Connection connection = factory.newConnection();
+        						Channel channel = connection.createChannel()){
+        					channel.exchangeDeclare(MQMessageConstants.EXCHANGE_NAME, MQMessageConstants.EXCHANGE_TYPE);
+        					String message = new GsonBuilder().disableHtmlEscaping().create().toJson(data);
+        					channel.basicPublish(MQMessageConstants.EXCHANGE_NAME, routingKey, null, message.getBytes());
+        				} 
 	}
 }
 

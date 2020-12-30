@@ -64,7 +64,8 @@ export class KpiCreationComponent implements OnInit {
       disableClose: false,
       data: {
         type: 'KPI',
-        multipleFileAllowed: false
+        multipleFileAllowed: false,
+        header:'Upload Json File'
       }
     });
   }

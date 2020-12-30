@@ -49,9 +49,11 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.springframework.beans.BeanUtils;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
+import com.cognizant.devops.platformcommons.constants.AgentCommonConstant;
 import com.cognizant.devops.platformcommons.constants.ConfigOptions;
 import com.cognizant.devops.platformcommons.constants.MQMessageConstants;
 import com.cognizant.devops.platformcommons.core.enums.AGENTACTION;
@@ -70,16 +72,20 @@ import com.rabbitmq.client.AMQP.BasicProperties;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
+import org.springframework.context.annotation.ScopedProxyMode;
 
 @Service("agentManagementService")
+@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
 public class AgentManagementServiceImpl implements AgentManagementService {
+
 	private static Logger log = LogManager.getLogger(AgentManagementServiceImpl.class);
-	private static final String ZIPEXTENSION = ".zip";
-	private static final String SUCCESS = "SUCCESS";
-	private static final String CONFIG = "config.json";
+
 	AgentConfigDAL agentConfigDAL = new AgentConfigDAL();
 	VaultHandler vaultHandler = new VaultHandler();
 	String filePath = ApplicationConfigProvider.getInstance().getAgentDetails().getUnzipPath();
+	
+	String vaultURL ="/sys/raw/"+ ApplicationConfigProvider.getInstance().getVault().getSecretEngine() + "/local/agent/";
+	 
 
 	@Override
 	public String registerAgent(String toolName, String agentVersion, String osversion, String configDetails,
@@ -94,10 +100,10 @@ public class AgentManagementServiceImpl implements AgentManagementService {
 			json.addProperty("toolName", toolName.toUpperCase());
 			String labelName = getLabelName(configDetails);
 			json.addProperty("labelName", labelName);
-			if (json.get("agentId") == null || json.get("agentId").getAsString().isEmpty()) {
+			if (json.get(AgentCommonConstant.AGENTID ) == null || json.get(AgentCommonConstant.AGENTID ).getAsString().isEmpty()) {
 				agentId = getAgentkey(toolName);
 			} else {
-				agentId = json.get("agentId").getAsString();
+				agentId = json.get(AgentCommonConstant.AGENTID ).getAsString();
 			}
 			if (ValidationUtils.checkAgentIdString(agentId)) {
 				throw new InsightsCustomException("Agent Id has to be Alpha numeric with '_' as special character");
@@ -128,15 +134,18 @@ public class AgentManagementServiceImpl implements AgentManagementService {
 				updateTrackingJson(toolName, trackingDetailsJson, agentId);
 			}
 			// Store secrets to vault based on agentsSecretDetails in config.json
-			if (vault) {
+			if (vault && ApplicationConfigProvider.getInstance().getVault().isVaultEnable()) {
 				log.debug("-- Store secrets to vault for Agent {} --", agentId);
-				prepareSecret(agentId, json);
+				Map<String, String> dataMap = getToolbasedSecret(json, agentId);
+				prepareSecret(agentId, dataMap);
+			} else if (vault && !ApplicationConfigProvider.getInstance().getVault().isVaultEnable()) {
+				throw new InsightsCustomException("Please enable vault on servre side.");
 			}
 			// Create zip/tar file with updated config.json
 			// Zipping back the agent folder
 			Path agentZipPath = updateAgentConfig(toolName, json, agentId);
 			byte[] data = Files.readAllBytes(agentZipPath);
-			String fileName = agentId + ZIPEXTENSION;
+			String fileName = agentId + AgentCommonConstant.ZIPEXTENSION;
 			// Sending the packet in Rabbit MQ
 			sendAgentPackage(data, AGENTACTION.REGISTER.name(), fileName, agentId, toolName, osversion);
 			performAgentAction(agentId, toolName, osversion, AGENTACTION.START.name(), agentId);
@@ -147,9 +156,9 @@ public class AgentManagementServiceImpl implements AgentManagementService {
 			// register agent in DB
 			agentConfigDAL.saveAgentConfigFromUI(agentId, json.get("toolCategory").getAsString(), labelName, toolName,
 					json, agentVersion, osversion, updateDate, vault);
-			return SUCCESS;
+			return AgentCommonConstant.SUCCESS;
 		} catch (Exception e) {
-			log.error("Error while registering agent {} ", toolName, e);
+			log.error("Error while registering agent {}", toolName, e);
 			throw new InsightsCustomException(e.getMessage());
 		}
 	}
@@ -160,10 +169,10 @@ public class AgentManagementServiceImpl implements AgentManagementService {
 			uninstallAgent(AGENTACTION.UNINSTALL.name(), agentId, toolName, osversion);
 			agentConfigDAL.deleteAgentConfigurations(agentId);
 		} catch (Exception e) {
-			log.error("Error while un-installing agent..", e);
+			log.error("Error while un-installing agent.. ", e);
 			throw new InsightsCustomException(e.getMessage());
 		}
-		return SUCCESS;
+		return AgentCommonConstant.SUCCESS;
 	}
 
 	@Override
@@ -184,7 +193,7 @@ public class AgentManagementServiceImpl implements AgentManagementService {
 			log.error("Error while agent {} ", action, e);
 			throw new InsightsCustomException(e.toString());
 		}
-		return SUCCESS;
+		return AgentCommonConstant.SUCCESS;
 	}
 
 	@Override
@@ -200,7 +209,7 @@ public class AgentManagementServiceImpl implements AgentManagementService {
 			setupAgentInstanceCreation(toolName, osversion, agentId);
 			AgentConfigTO agentConfig = getAgentDetails(agentId);
 			String oldVersion = agentConfig.getAgentVersion();
-			log.debug("Previous Agent version {} ---", agentConfig.getAgentVersion());
+			log.debug("Previous Agent version {}", agentConfig.getAgentVersion());
 			if (!oldVersion.equals(agentVersion)) {
 				// Get latest agent code
 				getToolRawConfigFile(agentVersion, toolName);
@@ -212,21 +221,23 @@ public class AgentManagementServiceImpl implements AgentManagementService {
 			json.addProperty("osversion", osversion);
 			json.addProperty("agentVersion", agentVersion);
 			Date updateDate = Timestamp.valueOf(LocalDateTime.now());
-			if (vault) {
+			if (vault && ApplicationConfigProvider.getInstance().getVault().isVaultEnable()) {
 				log.debug("--update Store secrets to vault --");
 				Map<String, String> dataMap = getToolbasedSecret(json, agentId);
 				updateSecrets(agentId, dataMap, json);
+			} else if (vault && !ApplicationConfigProvider.getInstance().getVault().isVaultEnable()) {
+				throw new InsightsCustomException("Please enable vault on servre side.");
 			}
 			Path agentZipPath = updateAgentConfig(toolName, json, agentId);
 			byte[] data = Files.readAllBytes(agentZipPath);
-			String fileName = agentId + ZIPEXTENSION;
+			String fileName = agentId + AgentCommonConstant.ZIPEXTENSION;
 			sendAgentPackage(data, AGENTACTION.UPDATE.name(), fileName, agentId, toolName, osversion);
 			labelName = this.getLabelName(configDetails);
 			agentConfigDAL.updateAgentConfigFromUI(agentId, json.get("toolCategory").getAsString(), labelName, toolName,
 					json, agentVersion, osversion, updateDate, vault);
-			return SUCCESS;
+			return AgentCommonConstant.SUCCESS;
 		} catch (Exception e) {
-			log.error("Error while updating agent", e);
+			log.error("Error while updating agent ", e);
 			throw new InsightsCustomException(e.getMessage());
 		}
 	}
@@ -243,7 +254,7 @@ public class AgentManagementServiceImpl implements AgentManagementService {
 				agentList.add(to);
 			}
 		} catch (Exception e) {
-			log.error("Error getting all agent config", e);
+			log.error("Error getting all agent config ", e);
 			throw new InsightsCustomException(e.toString());
 		}
 		return agentList;
@@ -318,12 +329,12 @@ public class AgentManagementServiceImpl implements AgentManagementService {
 				if (ApplicationConfigProvider.getInstance().getAgentDetails()
 						.getOnlineRegistrationMode().equalsIgnoreCase(ConfigOptions.ONLINE_REGISTRATION_MODE_DOCROOT)) {
 					toolPath = ApplicationConfigProvider.getInstance().getAgentDetails().getDocrootUrl() + "/" + version
-							+ "/agents/" + tool;
-					toolPath = toolPath.trim() + "/" + tool.trim() + ZIPEXTENSION;
+							+ AgentCommonConstant.AGENTS + tool;
+					toolPath = toolPath.trim() + "/" + tool.trim() + AgentCommonConstant.ZIPEXTENSION;
 				} else {
 					toolPath = ApplicationConfigProvider.getInstance().getAgentDetails().getDownloadRepoUrl() + "/"
-							+ version + "/agents/" + tool;
-					toolPath = toolPath.trim() + "/" + tool.trim() + ZIPEXTENSION;
+							+ version + AgentCommonConstant.AGENTS + tool;
+					toolPath = toolPath.trim() + "/" + tool.trim() + AgentCommonConstant.ZIPEXTENSION;
 				}
 				String targetDir = ApplicationConfigProvider.getInstance().getAgentDetails().getUnzipPath()
 						+ File.separator + tool;
@@ -341,7 +352,7 @@ public class AgentManagementServiceImpl implements AgentManagementService {
 	private ArrayList<String> getAgentsForRepo(String version) {
 		Document doc;
 		String url = ApplicationConfigProvider.getInstance().getAgentDetails().getBrowseRepoUrl() + "/" + version
-				+ "/agents/";
+				+ AgentCommonConstant.AGENTS;
 		ArrayList<String> tools = new ArrayList<>();
 		try {
 			doc = Jsoup.connect(url).get();
@@ -360,7 +371,7 @@ public class AgentManagementServiceImpl implements AgentManagementService {
 	private ArrayList<String> getAgentsFromDocroot(String version) {
 		Document doc;
 		String url = ApplicationConfigProvider.getInstance().getAgentDetails().getDocrootUrl() + "/" + version
-				+ "/agents/";
+				+ AgentCommonConstant.AGENTS;
 		ArrayList<String> tools = new ArrayList<>();
 		try {
 			doc = Jsoup.connect(url).get();
@@ -376,6 +387,7 @@ public class AgentManagementServiceImpl implements AgentManagementService {
 		return tools;
 	}
 
+	@Override
 	public Map<String, ArrayList<String>> getOfflineSystemAvailableAgentList() throws InsightsCustomException {
 		String offlinePath = ApplicationConfigProvider.getInstance().getAgentDetails().getOfflineAgentPath();
 		if (offlinePath == null || offlinePath.isEmpty()) {
@@ -409,7 +421,7 @@ public class AgentManagementServiceImpl implements AgentManagementService {
 		Path dir = Paths.get(agentPath);
 		String config = null;
 		try (Stream<Path> paths = Files.find(dir, Integer.MAX_VALUE,
-				(path, attrs) -> attrs.isRegularFile() && path.toString().endsWith(CONFIG));
+				(path, attrs) -> attrs.isRegularFile() && path.toString().endsWith(AgentCommonConstant.CONFIG));
 				FileReader reader = new FileReader(paths.limit(1).findFirst().get().toFile())) {
 			JsonParser parser = new JsonParser();
 			Object obj = parser.parse(reader);
@@ -479,7 +491,7 @@ public class AgentManagementServiceImpl implements AgentManagementService {
 
 	private void addAgentKeyToServiceFile(Path destinationFile, String agentId) throws IOException {
 		try (Stream<String> lines = Files.lines(destinationFile)) {
-			List<String> replaced = lines.map(line -> line.replaceAll("__AGENT_KEY__", agentId))
+			List<String> replaced = lines.map(line -> line.replace("__AGENT_KEY__", agentId))
 					.collect(Collectors.toList());
 			Files.write(destinationFile, replaced);
 		}
@@ -488,7 +500,7 @@ public class AgentManagementServiceImpl implements AgentManagementService {
 	private void addProcessKeyToServiceFile(Path destinationFile, String agentId) throws IOException {
 		String psKey = getPSKey(agentId);
 		try (Stream<String> lines = Files.lines(destinationFile)) {
-			List<String> replaced = lines.map(line -> line.replaceAll("__PS_KEY__", psKey))
+			List<String> replaced = lines.map(line -> line.replace("__PS_KEY__", psKey))
 					.collect(Collectors.toList());
 			Files.write(destinationFile, replaced);
 		}
@@ -506,7 +518,7 @@ public class AgentManagementServiceImpl implements AgentManagementService {
 		// Writing json to file
 		Path dir = Paths.get(configFilePath);
 		try (Stream<Path> paths = Files.find(dir, Integer.MAX_VALUE,
-				(path, attrs) -> attrs.isRegularFile() && path.toString().endsWith(CONFIG))) {
+				(path, attrs) -> attrs.isRegularFile() && path.toString().endsWith(AgentCommonConstant.CONFIG))) {
 
 			configFile = paths.limit(1).findFirst().get().toFile();
 		}
@@ -521,7 +533,7 @@ public class AgentManagementServiceImpl implements AgentManagementService {
 		Path sourceFolderPath = Paths.get(ApplicationConfigProvider.getInstance().getAgentDetails().getUnzipPath(),
 				agentId);
 		Path zipPath = Paths.get(ApplicationConfigProvider.getInstance().getAgentDetails().getUnzipPath(),
-				agentId + ZIPEXTENSION);
+				agentId + AgentCommonConstant.ZIPEXTENSION);
 		Path agentZipPath = null;
 		try {
 			agentZipPath = AgentManagementUtil.getInstance().getAgentZipFolder(sourceFolderPath, zipPath);
@@ -540,7 +552,7 @@ public class AgentManagementServiceImpl implements AgentManagementService {
 		// Writing json to file
 		Path dir = Paths.get(trackingFilePath);
 		try (Stream<Path> paths = Files.find(dir, Integer.MAX_VALUE,
-				(path, attrs) -> attrs.isRegularFile() && path.toString().endsWith(CONFIG))) {
+				(path, attrs) -> attrs.isRegularFile() && path.toString().endsWith(AgentCommonConstant.CONFIG))) {
 			trackingFile = paths.limit(1).findFirst().get().toFile();
 			trackingFile = trackingFile.getParentFile();
 			dir = Paths.get(trackingFile.toString() + File.separator + "tracking.json");
@@ -553,7 +565,7 @@ public class AgentManagementServiceImpl implements AgentManagementService {
 			log.error("Error writing tracking json file", e);
 			throw new InsightsCustomException(e.getMessage());
 		}
-		return SUCCESS;
+		return AgentCommonConstant.SUCCESS;
 
 	}
 
@@ -563,7 +575,7 @@ public class AgentManagementServiceImpl implements AgentManagementService {
 		// Writing json to file
 		Path dir = Paths.get(trackingFilePath);
 		try (Stream<Path> paths = Files.find(dir, Integer.MAX_VALUE,
-				(path, attrs) -> attrs.isRegularFile() && path.toString().endsWith(CONFIG))) {
+				(path, attrs) -> attrs.isRegularFile() && path.toString().endsWith(AgentCommonConstant.CONFIG))) {
 
 			trackingFile = paths.limit(1).findFirst().get().toFile();
 			trackingFile = trackingFile.getParentFile();
@@ -579,7 +591,7 @@ public class AgentManagementServiceImpl implements AgentManagementService {
 			throw new InsightsCustomException(e.getMessage());
 		}
 
-		return SUCCESS;
+		return AgentCommonConstant.SUCCESS;
 
 	}
 
@@ -587,10 +599,10 @@ public class AgentManagementServiceImpl implements AgentManagementService {
 			String osversion) throws IOException, TimeoutException {
 		Map<String, Object> headers = new HashMap<>();
 		headers.put("fileName", fileName);
-		headers.put("osType", osversion);
-		headers.put("agentToolName", toolName);
-		headers.put("agentId", agentId);
-		headers.put("action", action);
+		headers.put(AgentCommonConstant.OSTYPE, osversion);
+		headers.put(AgentCommonConstant.AGENT_TOOL_NAME, toolName);
+		headers.put(AgentCommonConstant.AGENTID, agentId);
+		headers.put(AgentCommonConstant.ACTION, action);
 		BasicProperties props = getBasicProperties(headers);
 		String agentDaemonQueueName = ApplicationConfigProvider.getInstance().getAgentDetails().getAgentPkgQueue();
 		publishAgentAction(agentDaemonQueueName, data, props);
@@ -599,10 +611,10 @@ public class AgentManagementServiceImpl implements AgentManagementService {
 	private void uninstallAgent(String action, String agentId, String toolName, String osversion)
 			throws IOException, TimeoutException {
 		Map<String, Object> headers = new HashMap<>();
-		headers.put("osType", osversion);
-		headers.put("agentToolName", toolName);
-		headers.put("agentId", agentId);
-		headers.put("action", action);
+		headers.put(AgentCommonConstant.OSTYPE, osversion);
+		headers.put(AgentCommonConstant.AGENT_TOOL_NAME, toolName);
+		headers.put(AgentCommonConstant.AGENTID, agentId);
+		headers.put(AgentCommonConstant.ACTION, action);
 		BasicProperties props = getBasicProperties(headers);
 		String agentDaemonQueueName = ApplicationConfigProvider.getInstance().getAgentDetails().getAgentPkgQueue();
 		publishAgentAction(agentDaemonQueueName, action.getBytes(), props);
@@ -611,10 +623,10 @@ public class AgentManagementServiceImpl implements AgentManagementService {
 	private void performAgentAction(String agentId, String toolName, String osversion, String action, String queueName)
 			throws TimeoutException, IOException {
 		Map<String, Object> headers = new HashMap<>();
-		headers.put("osType", osversion);
-		headers.put("agentToolName", toolName);
-		headers.put("agentId", agentId);
-		headers.put("action", action);
+		headers.put(AgentCommonConstant.OSTYPE, osversion);
+		headers.put(AgentCommonConstant.AGENT_TOOL_NAME, toolName);
+		headers.put(AgentCommonConstant.AGENTID, agentId);
+		headers.put(AgentCommonConstant.ACTION, action);
 		BasicProperties props = getBasicProperties(headers);
 		publishAgentAction(queueName, action.getBytes(), props);
 	}
@@ -626,16 +638,14 @@ public class AgentManagementServiceImpl implements AgentManagementService {
 		factory.setHost(ApplicationConfigProvider.getInstance().getMessageQueue().getHost());
 		factory.setUsername(ApplicationConfigProvider.getInstance().getMessageQueue().getUser());
 		factory.setPassword(ApplicationConfigProvider.getInstance().getMessageQueue().getPassword());
-		Connection connection = factory.newConnection();
-		Channel channel = connection.createChannel();
-		channel.exchangeDeclare(exchangeName, MQMessageConstants.EXCHANGE_TYPE, true);
-		channel.queueDeclare(routingKey, true, false, false, null);
-		channel.queueBind(routingKey, exchangeName, routingKey);
-		channel.basicPublish(exchangeName, routingKey, props, data);
-		channel.close();
-		connection.close();
+		try(Connection connection = factory.newConnection();
+								Channel channel = connection.createChannel()) {
+							channel.exchangeDeclare(exchangeName, MQMessageConstants.EXCHANGE_TYPE, true);
+							channel.queueDeclare(routingKey, true, false, false, null);
+							channel.queueBind(routingKey, exchangeName, routingKey);
+							channel.basicPublish(exchangeName, routingKey, props, data);
+						} 
 	}
-
 	private BasicProperties getBasicProperties(Map<String, Object> headers) {
 		BasicProperties.Builder propertiesBuilder = new BasicProperties.Builder();
 		propertiesBuilder.headers(headers);
@@ -665,7 +675,7 @@ public class AgentManagementServiceImpl implements AgentManagementService {
 			labelDataValue = Arrays.asList(labelData.split(MQMessageConstants.ROUTING_KEY_SEPERATOR));
 
 		} catch (Exception e) {
-			log.error("Invalid label Name {} ", e);
+			log.error("Invalid label Name ", e);
 			throw new InsightsCustomException(e.getMessage());
 		}
 		return labelDataValue.get(1);
@@ -684,8 +694,7 @@ public class AgentManagementServiceImpl implements AgentManagementService {
 	 * @throws UniformInterfaceException
 	 * @throws IOException
 	 */
-	private void prepareSecret(String agentId, JsonObject json) throws InsightsCustomException, IOException {
-		Map<String, String> dataMap = getToolbasedSecret(json, agentId);
+	private void prepareSecret(String agentId, Map<String, String> dataMap) throws InsightsCustomException, IOException {
 		if (!dataMap.isEmpty()) {
 			vaultSecret(agentId, null, dataMap);
 		}
@@ -707,7 +716,7 @@ public class AgentManagementServiceImpl implements AgentManagementService {
 		File configFile = null;
 		Path dir = Paths.get(configFilePath);
 		try (Stream<Path> paths = Files.find(dir, Integer.MAX_VALUE,
-				(path, attrs) -> attrs.isRegularFile() && path.toString().endsWith(CONFIG))) {
+				(path, attrs) -> attrs.isRegularFile() && path.toString().endsWith(AgentCommonConstant.CONFIG))) {
 			configFile = paths.limit(1).findFirst().get().toFile();
 		}
 		JsonObject configObject = AgentManagementUtil.getInstance().convertFileToJSON(configFile);
@@ -725,10 +734,10 @@ public class AgentManagementServiceImpl implements AgentManagementService {
 		json.add("agentSecretDetails", agentSecrets);
 		// Add Vault creds to be used when running pyhton agents
 		JsonObject vaultObj = new JsonObject();
-		vaultObj.addProperty("getFromVault", true);
+		vaultObj.addProperty("getFromVault", ApplicationConfigProvider.getInstance().getVault().isVaultEnable());
 		vaultObj.addProperty("secretEngine", ApplicationConfigProvider.getInstance().getVault().getSecretEngine());
 		vaultObj.addProperty("readToken", ApplicationConfigProvider.getInstance().getVault().getVaultToken());
-		vaultObj.addProperty("vaultUrl", ApplicationConfigProvider.getInstance().getVault().getVaultEndPoint());
+		vaultObj.addProperty("vaultUrl", ApplicationConfigProvider.getInstance().getVault().getVaultEndPoint()+ vaultURL + agentId);
 		json.add("vault", vaultObj);
 		log.debug("Updated Json {} without creds --", json);
 		return secretMap;
@@ -745,21 +754,36 @@ public class AgentManagementServiceImpl implements AgentManagementService {
 	 */
 	private void updateSecrets(String agentId, Map<String, String> updatedDataMap, JsonObject json)
 			throws InsightsCustomException, IOException {
-		String vaultresponse = vaultHandler.fetchFromVault(agentId);
-		JsonObject vaultObject = new JsonParser().parse(vaultresponse).getAsJsonObject();
-		JsonObject vaultData = vaultObject.get("data").getAsJsonObject().get("data").getAsJsonObject();
-		// update secrets based on vault values
-		for (Entry<String, String> field : updatedDataMap.entrySet()) {
-			if (vaultData.has(field.getKey()) && !field.getValue().contains("***")) {
-				updatedDataMap.put(field.getKey(), field.getValue());
-			} else if (vaultData.has(field.getKey())) {
-				updatedDataMap.put(field.getKey(), vaultData.get(field.getKey()).getAsString());
-			} else {
-				updatedDataMap.put(field.getKey(), field.getValue());
-			}
+		String url =  ApplicationConfigProvider.getInstance().getVault().getVaultEndPoint()+
+				vaultURL+agentId;
+		String vaultresponse = null;
+		try {
+			vaultresponse = vaultHandler.fetchFromVaultDB(url,
+					ApplicationConfigProvider.getInstance().getVault().getVaultToken());
+		} catch (InsightsCustomException e) {
+			log.error(e);
 		}
-		if (!updatedDataMap.isEmpty()) {
-			vaultSecret(agentId, vaultData, updatedDataMap);
+		log.debug("updateSecrets: vault response {} ", vaultresponse);
+		if(vaultresponse !=null) {
+			JsonObject vaultObject = new JsonParser().parse(vaultresponse).getAsJsonObject();
+			String vaultData = vaultObject.get("data").getAsJsonObject().get("value").getAsString();
+			JsonObject vaultDataJson = new JsonParser().parse(vaultData).getAsJsonObject();
+			// update secrets based on vault values
+			for (Entry<String, String> field : updatedDataMap.entrySet()) {
+				if (vaultDataJson.has(field.getKey()) && !field.getValue().contains("***")) {
+					updatedDataMap.put(field.getKey(), field.getValue());
+				} else if (vaultDataJson.has(field.getKey())) {
+					updatedDataMap.put(field.getKey(), vaultDataJson.get(field.getKey()).getAsString());
+				} else {
+					updatedDataMap.put(field.getKey(), field.getValue());
+				}
+			}
+			if (!updatedDataMap.isEmpty()) {
+				vaultSecret(agentId, vaultDataJson, updatedDataMap);
+			}
+		}else {
+			log.debug("updateSecrets:vault does not have data need to add it now ");
+			prepareSecret(agentId, updatedDataMap);
 		}
 
 	}
@@ -770,9 +794,13 @@ public class AgentManagementServiceImpl implements AgentManagementService {
 		JsonObject updatedDataJson = gson.toJsonTree(updatedDataMap).getAsJsonObject();
 		// In registeragent case existing vaultData is null and in updateAgent case it
 		// has exising valut value
+		String vaultURLDetail =  vaultURL+agentId;
 		if ((vaultData == null && !updatedDataMap.isEmpty())
-				|| (vaultData != null && vaultData.entrySet().size() > 0 && !updatedDataJson.equals(vaultData))) {
-			vaultHandler.storeToVault(updatedDataJson, agentId);
+				|| (vaultData != null && !vaultData.entrySet().isEmpty() && !updatedDataJson.equals(vaultData))) {
+			vaultHandler.storeToVaultJsonInDB(updatedDataJson, 
+					ApplicationConfigProvider.getInstance().getVault().getVaultEndPoint(),
+					vaultURLDetail,
+					ApplicationConfigProvider.getInstance().getVault().getVaultToken());
 		}
 		return updatedDataMap;
 

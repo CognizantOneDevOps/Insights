@@ -27,12 +27,14 @@ import com.cognizant.devops.engines.platformengine.message.core.EngineStatusLogg
 import com.cognizant.devops.engines.platformwebhookengine.message.factory.EngineSubscriberResponseHandler;
 import com.cognizant.devops.engines.platformwebhookengine.message.subscriber.WebHookDataSubscriber;
 import com.cognizant.devops.engines.platformwebhookengine.message.subscriber.WebhookHealthSubscriber;
+import com.cognizant.devops.platformcommons.config.ApplicationConfigInterface;
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
+import com.cognizant.devops.platformcommons.constants.LogLevelConstants;
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
 import com.cognizant.devops.platformdal.webhookConfig.WebHookConfig;
 import com.cognizant.devops.platformdal.webhookConfig.WebHookConfigDAL;
 
-public class WebHookEngineAggregatorModule extends TimerTask {
+public class WebHookEngineAggregatorModule extends TimerTask  implements ApplicationConfigInterface{
 	private static Logger log = LogManager.getLogger(WebHookEngineAggregatorModule.class.getName());
 	
 	private static Map<String, EngineSubscriberResponseHandler> registry = new HashMap<>();
@@ -41,13 +43,21 @@ public class WebHookEngineAggregatorModule extends TimerTask {
 	@Override
 	public void run() {
 		log.debug(" Webhook Engine started ==== ");
-		ApplicationConfigProvider.performSystemCheck();
-		WebHookConfigDAL webhookConfigDal = new WebHookConfigDAL();
-		List<WebHookConfig> allWebhookConfigurations = webhookConfigDal.getAllActiveWebHookConfigurations();
-		for (WebHookConfig webhookConfig : allWebhookConfigurations) {
-			registerAggragators(webhookConfig);
+		try {
+			ApplicationConfigInterface.loadConfiguration();
+			ApplicationConfigProvider.performSystemCheck();
+			WebHookConfigDAL webhookConfigDal = new WebHookConfigDAL();
+			List<WebHookConfig> allWebhookConfigurations = webhookConfigDal.getAllActiveWebHookConfigurations();
+			for (WebHookConfig webhookConfig : allWebhookConfigurations) {
+				registerAggragators(webhookConfig);
+			}
+			registerWebhookHealthAggragators(WEBHOOK_HEALTH_ROUTING_KEY);
+		} catch (Exception e) {
+			log.error(e);
+			EngineStatusLogger.getInstance().createEngineStatusNode(
+					" Error occured while initializing webhook Aggregator Module   " + e.getMessage(),
+					PlatformServiceConstants.FAILURE);
 		}
-		registerWebhookHealthAggragators(WEBHOOK_HEALTH_ROUTING_KEY);
 		log.debug(" Webhook Engine completed ==== ");
 	}
 
@@ -69,7 +79,7 @@ public class WebHookEngineAggregatorModule extends TimerTask {
 			EngineStatusLogger.getInstance().createWebhookEngineStatusNode("Unable to subscribed Webhook "
 					+ webhookConfig.getWebHookName() + " Error Detail :" + e.getMessage(),
 					PlatformServiceConstants.FAILURE);
-			log.error("Unable to add subscriber for routing key: {} ", e);
+			log.error("Unable to add subscriber for routing key: ", e);
 		}
 	}
 
@@ -77,7 +87,7 @@ public class WebHookEngineAggregatorModule extends TimerTask {
 		try {
 			if (healthRoutingKey != null && !registry.containsKey(healthRoutingKey)) {
 				registry.put(healthRoutingKey, new WebhookHealthSubscriber(healthRoutingKey));
-				log.debug("Webhook Hea2lth Queue {} subscribed successfully ", healthRoutingKey);
+				log.debug("Webhook Hea2lth Queue subscribed successfully{} ", healthRoutingKey);
 				EngineStatusLogger.getInstance().createWebhookEngineStatusNode(
 						"Webhook  Health Queue " + healthRoutingKey + " subscribed successfully ",
 						PlatformServiceConstants.SUCCESS);
@@ -85,7 +95,7 @@ public class WebHookEngineAggregatorModule extends TimerTask {
 		} catch (Exception e) {
 			EngineStatusLogger.getInstance().createWebhookEngineStatusNode("Unable to subscribed Webhook Health Queue "
 					+ healthRoutingKey + " Error Detail :" + e.getMessage(), PlatformServiceConstants.FAILURE);
-			log.error("Unable to add health subscriber for routing key: {} ", e);
+			log.error("Unable to add health subscriber for routing key: ", e);
 
 		}
 	}

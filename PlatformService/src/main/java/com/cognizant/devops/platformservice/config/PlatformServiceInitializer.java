@@ -20,6 +20,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 
+import javax.annotation.PostConstruct;
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
@@ -30,12 +31,21 @@ import javax.servlet.ServletException;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.core.LoggerContext;
+import org.apache.logging.log4j.core.appender.RollingFileAppender;
+import org.apache.logging.log4j.core.appender.rolling.DefaultRolloverStrategy;
+import org.apache.logging.log4j.core.appender.rolling.SizeBasedTriggeringPolicy;
+import org.apache.logging.log4j.core.appender.rolling.TriggeringPolicy;
+import org.apache.logging.log4j.core.layout.PatternLayout;
 import org.springframework.util.Assert;
 import org.springframework.web.WebApplicationInitializer;
 
 import com.cognizant.devops.platformcommons.config.ApplicationConfigCache;
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
+import com.cognizant.devops.platformcommons.constants.ConfigOptions;
+import com.cognizant.devops.platformcommons.constants.LogLevelConstants;
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
+import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformservice.security.config.AuthenticationUtils;
 import com.cognizant.devops.platformservice.security.config.InsightsResponseHeaderWriterFilter;
 /**
@@ -49,7 +59,9 @@ public class PlatformServiceInitializer implements WebApplicationInitializer {
 	@Override
 	public void onStartup(ServletContext servletContext) throws ServletException {
 		try {
-			ApplicationConfigCache.loadConfigCache();
+			log.debug("Inside PlatformServiceInitializer onStartup ============================ ");
+			loadServerConfig();
+			ApplicationConfigCache.updateLogLevel(LogLevelConstants.PlatformService);
 			disableSslVerification();
 			validateAutheticationProtocol();
 			servletContext.addFilter("InsightsResponseHeaderWriter", InsightsResponseHeaderWriterFilter.class)
@@ -59,8 +71,19 @@ public class PlatformServiceInitializer implements WebApplicationInitializer {
 		} catch (Exception e) {
 			PlatformServiceStatusProvider.getInstance().createPlatformServiceStatusNode(
 					"Error in starting PlatformService", PlatformServiceConstants.FAILURE);
+			Assert.isTrue(Boolean.FALSE,
+					"Error in starting PlatformService "
+						+ e.getMessage());
 		}
 		
+	}
+
+	private void loadServerConfig() {
+		try {
+			ApplicationConfigCache.loadInitialConfigCache();
+		} catch (InsightsCustomException e) {
+			log.error(e);
+		}
 	}
 
 	private void validateAutheticationProtocol() {
@@ -117,5 +140,8 @@ public class PlatformServiceInitializer implements WebApplicationInitializer {
 	        log.error(e);
 	    } 
 	}
+	
+	
+	
 
 }

@@ -50,7 +50,7 @@ public abstract class ComponentHealthLogger {
 			dataList.add(jsonObj);
 			response = SystemStatus.addSystemInformationInNeo4j(version, dataList, labels);
 		} catch (Exception e) {
-			log.error("Unable to create Node "+e.getMessage());
+			log.error("Unable to create Node{} ",e.getMessage());
 		}
 		if (response!=null) {
 			return Boolean.TRUE;

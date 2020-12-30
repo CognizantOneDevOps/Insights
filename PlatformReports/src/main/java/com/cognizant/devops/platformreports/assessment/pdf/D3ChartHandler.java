@@ -21,7 +21,7 @@ public class D3ChartHandler implements BasePDFProcessor{
 
 	@Override
 	public void generatePDF(InsightsAssessmentConfigurationDTO assessmentReportDTO) {
-		
+		throw new UnsupportedOperationException();
 	}
 
 }

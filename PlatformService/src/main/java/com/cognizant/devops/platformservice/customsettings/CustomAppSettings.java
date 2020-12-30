@@ -20,17 +20,16 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.util.Base64;
 
-import javax.servlet.http.HttpServletRequest;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.cognizant.devops.platformcommons.config.ApplicationConfigCache;
+import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformdal.icon.Icon;
 import com.cognizant.devops.platformdal.icon.IconDAL;
 import com.cognizant.devops.platformservice.rest.util.PlatformServiceUtil;
@@ -44,47 +43,36 @@ public class CustomAppSettings {
 
 	private static Logger LOG = LogManager.getLogger(CustomAppSettings.class);
 
-	/*@Autowired
-	private HttpServletRequest request;*/
-
-	
-	
     @CrossOrigin
-	@RequestMapping(value = "/getLogoImage", method = RequestMethod.GET )
-	public @ResponseBody JsonObject getImageWithMediaType() throws IOException {
-		/**String base64 = "";
-		String fileExt = "";
-		File[] dirFiles = getFilesinDir();
-        if(dirFiles.length > 0){
-	        String imageFileName = dirFiles[0].getName();
-	        fileExt = FilenameUtils.getExtension(imageFileName);
-			InputStream in = new  FileInputStream(System.getenv().get(INSIGHTS_HOME) + File.separator + imageFileName);
-			byte[] imageBytes = IOUtils.toByteArray(in);
-			base64 = Base64.getEncoder().encodeToString(imageBytes);
-        }**/
-		Icon image = new IconDAL().fetchEntityData("logo");
-		ImageResponse imgResp = new ImageResponse();
-		String base64 = "";
+	@GetMapping(value = "/getLogoImage" )
+	public @ResponseBody JsonObject getImageWithMediaType() {
+    	String base64 = "";
 		String imageType = "";
-		if (null != image.getImageType()) {
-			imageType = image.getImageType();
-		}
-		if (null != image.getImage()) {
-			byte[] imageBytes = image.getImage();
-			base64 = Base64.getEncoder().encodeToString(imageBytes);
+		ImageResponse imgResp = new ImageResponse();
+		if(ApplicationConfigProvider.getInstance().getPostgre().getUserName()!=null 
+				&& !ApplicationConfigProvider.getInstance().getPostgre().getUserName().equals("")) {
+	    	Icon image = new IconDAL().fetchEntityData("logo");
+			if (null != image.getImageType()) {
+				imageType = image.getImageType();
+			}
+			if (null != image.getImage()) {
+				byte[] imageBytes = image.getImage();
+				base64 = Base64.getEncoder().encodeToString(imageBytes);
+			}
 		}
 		imgResp.setEncodedString(base64);
 		imgResp.setImageType(imageType);
 		return PlatformServiceUtil.buildSuccessResponseWithData(imgResp);
 	}
 
-	private File[] getFilesinDir() {
+	/* private File[] getFilesinDir() {
 		File dir = new File(System.getenv().get(INSIGHTS_HOME));
         File[] dirFiles = dir.listFiles(new FilenameFilter() { 
-                 public boolean accept(File dir, String filename)
+                 @Override
+				public boolean accept(File dir, String filename)
                       { return filename.endsWith(".png") || filename.endsWith(".jpeg") || filename.endsWith(".jpg") || filename.endsWith(".svg"); }
         } );
 		return dirFiles;
-	}
+	}*/
 	
 }

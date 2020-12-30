@@ -48,11 +48,12 @@ import com.google.gson.JsonObject;
 
 @Test
 @ContextConfiguration(locations = { "classpath:spring-test-config.xml" })
+@SuppressWarnings("unused")
 public class AssessmentReportServiceTest extends AssessmentReportServiceData {
 	private static final Logger log = LogManager.getLogger(AssessmentReportServiceTest.class);
 
 	@BeforeTest
-	public void prepareData() {
+	public void prepareData() throws InsightsCustomException {
 		ApplicationConfigCache.loadConfigCache();
 		try {
 			prepareAssessmentData();

@@ -81,8 +81,12 @@ public class BulkUploadService implements IBulkUpload {
 				if (file.getSize() < filesizeMaxValue) {
 					csvfile = convertToFile(file);
 					CSVFormat format = CSVFormat.newFormat(',').withHeader();
-					reader = new FileReader(csvfile);
-					csvParser = new CSVParser(reader, format);
+					try {
+						reader = new FileReader(csvfile);
+						csvParser = new CSVParser(reader, format);
+					} catch (IOException e) {
+						log.debug("Not able to read file");
+					}
 					status = parseCsvRecords(csvParser, label, insightsTimeField, insightsTimeFormat);
 					log.debug("Final Status is: {}", status);
 				} else {

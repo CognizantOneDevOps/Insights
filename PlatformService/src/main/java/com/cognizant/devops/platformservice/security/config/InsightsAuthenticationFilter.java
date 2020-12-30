@@ -92,7 +92,7 @@ public class InsightsAuthenticationFilter extends AbstractAuthenticationProcessi
 	@Override
 	protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response,
 			AuthenticationException authException) throws IOException, ServletException {
-		Log.error("unsuccessfulAuthentication ==== {}  ", authException);
+		Log.error("unsuccessfulAuthentication ====", authException);
 		Throwable exceptionClass = authException.getCause();
 		if (exceptionClass != null && exceptionClass.getClass().getName().contains("AccountExpiredException")) {
 			AuthenticationUtils.setResponseMessage(response, AuthenticationUtils.TOKEN_EXPIRE_CODE, "Token Expire ");

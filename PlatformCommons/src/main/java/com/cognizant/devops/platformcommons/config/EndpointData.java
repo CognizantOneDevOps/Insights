@@ -21,9 +21,12 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement
 public class EndpointData implements Serializable{
+
+	private static final long serialVersionUID = 5450251387447525878L;
 	private String elasticSearchEndpoint;
 
 	public EndpointData() {
+		super();
 	}
 
 	public String getElasticSearchEndpoint() {

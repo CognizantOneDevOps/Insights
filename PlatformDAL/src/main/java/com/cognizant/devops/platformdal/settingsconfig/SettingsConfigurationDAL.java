@@ -21,6 +21,7 @@ import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.hibernate.Session;
 import org.hibernate.query.Query;
 
 import com.cognizant.devops.platformcommons.constants.ConfigOptions;
@@ -28,77 +29,88 @@ import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformdal.core.BaseDAL;
 
 public class SettingsConfigurationDAL extends BaseDAL {
-	
+	public static final String SETTINGCONFIGURATIONQUERY= "FROM SettingsConfiguration SC WHERE SC.settingsType = :settingsType";
+	public static final String SETTINGSTYPE="settingsType";
 	private static Logger log = LogManager.getLogger(SettingsConfigurationDAL.class.getName());
 
 	public Boolean saveSettingsConfiguration(SettingsConfiguration settingsConfiguration) {
-		Query<SettingsConfiguration> createQuery = getSession().createQuery(
-				"FROM SettingsConfiguration SC WHERE SC.settingsType = :settingsType",
-				SettingsConfiguration.class);
-		createQuery.setParameter("settingsType", settingsConfiguration.getSettingsType());
-		List<SettingsConfiguration> resultList = createQuery.getResultList();
-		SettingsConfiguration settingsConfig = null;
-		if(resultList != null && !resultList.isEmpty()){
-			settingsConfig = resultList.get(0);
+		
+		try (Session session = getSessionObj()) {
+
+			Query<SettingsConfiguration> createQuery = session.createQuery(
+					SETTINGCONFIGURATIONQUERY, SettingsConfiguration.class);
+			createQuery.setParameter(SETTINGSTYPE, settingsConfiguration.getSettingsType());
+			List<SettingsConfiguration> resultList = createQuery.getResultList();
+			SettingsConfiguration settingsConfig = null;
+			if (resultList != null && !resultList.isEmpty()) {
+				settingsConfig = resultList.get(0);
+			}
+			session.beginTransaction();
+			if (settingsConfig != null) {
+				settingsConfig.setSettingsJson(settingsConfiguration.getSettingsJson());
+				settingsConfig.setSettingsType(settingsConfiguration.getSettingsType());
+				settingsConfig.setActiveFlag(settingsConfiguration.getActiveFlag());
+				settingsConfig.setLastModifiedDate(Timestamp.valueOf(LocalDateTime.now()));
+				settingsConfig.setLastModifiedByUser(settingsConfiguration.getLastModifiedByUser());
+				session.update(settingsConfig);
+			} else {
+				settingsConfiguration.setCreatedDate(Timestamp.valueOf(LocalDateTime.now()));
+				session.save(settingsConfiguration);
+			}
+			session.getTransaction().commit();
+			return Boolean.TRUE;
+		} catch (Exception e) {
+			log.error(e.getMessage());
+			throw e;
 		}
-		getSession().beginTransaction();
-		if (settingsConfig != null) {
-			settingsConfig.setSettingsJson(settingsConfiguration.getSettingsJson());
-			settingsConfig.setSettingsType(settingsConfiguration.getSettingsType());
-			settingsConfig.setActiveFlag(settingsConfiguration.getActiveFlag());
-			settingsConfig.setLastModifiedDate(Timestamp.valueOf(LocalDateTime.now()));
-			settingsConfig.setLastModifiedByUser(settingsConfiguration.getLastModifiedByUser());
-			getSession().update(settingsConfig);
-		} else {
-			settingsConfiguration.setCreatedDate(Timestamp.valueOf(LocalDateTime.now()));
-			getSession().save(settingsConfiguration);
-		}
-		getSession().getTransaction().commit();
-		terminateSession();
-		terminateSessionFactory();
-		return Boolean.TRUE;
 	}
 
 	public SettingsConfiguration loadSettingsConfiguration(String settingsType) {
-		Query<SettingsConfiguration> loadQuery = getSession().createQuery("FROM SettingsConfiguration SC WHERE SC.settingsType = :settingsType", SettingsConfiguration.class);
-		loadQuery.setParameter("settingsType", settingsType);
-		List<SettingsConfiguration> results = loadQuery.getResultList();
-		SettingsConfiguration settingsConfiguration = null;
-		if (results != null && !results.isEmpty()) {
-			settingsConfiguration = results.get(0);
+		try (Session session = getSessionObj()) {
+			Query<SettingsConfiguration> loadQuery = session.createQuery(
+					"FROM SettingsConfiguration SC WHERE SC.settingsType = :settingsType", SettingsConfiguration.class);
+			loadQuery.setParameter(SETTINGSTYPE, settingsType);
+			List<SettingsConfiguration> results = loadQuery.getResultList();
+			SettingsConfiguration settingsConfiguration = null;
+			if (results != null && !results.isEmpty()) {
+				settingsConfiguration = results.get(0);
+			}
+			return settingsConfiguration;
+		} catch (Exception e) {
+			log.error(e.getMessage());
+			throw e;
 		}
-		terminateSession();
-		terminateSessionFactory();
-		return settingsConfiguration;
 	}
 	
 	public String getSettingsJsonObject(String settingsType) {
-		Query<SettingsConfiguration> createQuery = getSession().createQuery(
-				"FROM SettingsConfiguration SC WHERE SC.settingsType = :settingsType",
-				SettingsConfiguration.class);
-		createQuery.setParameter("settingsType",settingsType );
-		List<SettingsConfiguration> results = createQuery.getResultList();
-		SettingsConfiguration settingsConfiguration = null;
-		if (results != null && !results.isEmpty()) {
-			settingsConfiguration = results.get(0);
-			if (settingsConfiguration != null) {
-				return settingsConfiguration.getSettingsJson();				
+		try (Session session = getSessionObj()) {
+			Query<SettingsConfiguration> createQuery = session.createQuery(
+					SETTINGCONFIGURATIONQUERY, SettingsConfiguration.class);
+			createQuery.setParameter(SETTINGSTYPE, settingsType);
+			List<SettingsConfiguration> results = createQuery.getResultList();
+			SettingsConfiguration settingsConfiguration = null;
+			if (results != null && !results.isEmpty()) {
+				settingsConfiguration = results.get(0);
+				if (settingsConfiguration != null) {
+					return settingsConfiguration.getSettingsJson();
+				}
 			}
-		}		
-		return null;
+			return null;
+		} catch (Exception e) {
+			log.error(e.getMessage());
+			throw e;
+		}
 	}
 	
 	public void updateSettingJson(String modifiedSettingJson)throws InsightsCustomException {
-		try {
+		try (Session session = getSessionObj()) {
 			SettingsConfiguration settingsConfiguration = loadSettingsConfiguration(ConfigOptions.DATAPURGING_SETTINGS_TYPE);
-			getSession().beginTransaction();
+			session.beginTransaction();
 			if (settingsConfiguration != null) {
 				settingsConfiguration.setSettingsJson(modifiedSettingJson);
-				getSession().update(settingsConfiguration);
+				session.update(settingsConfiguration);
 			}
-			getSession().getTransaction().commit();
-			terminateSession();
-			terminateSessionFactory();
+			session.getTransaction().commit();
 		}		
 		catch(Exception e){
 			log.error("Error in updating setting_json column of settings_configuration table", e);

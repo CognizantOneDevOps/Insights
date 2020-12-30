@@ -69,7 +69,7 @@ public class DataArchivalDataSubscriber extends EngineSubscriberResponseHandler 
 			}
 		} catch (NoResultException e) {
 			log.error("No Record found occured ", e);
-			log.error(" data message : ",message);
+			log.error(" data message :{} ",message);
 			getChannel().basicAck(envelope.getDeliveryTag(), false);
 		} catch (Exception e) {
 			log.error("Exception occured ", e);

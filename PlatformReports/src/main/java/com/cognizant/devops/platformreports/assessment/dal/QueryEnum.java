@@ -20,11 +20,8 @@ import com.cognizant.devops.platformreports.assessment.util.ReportEngineUtils;
 public enum QueryEnum {
 	
 	
-	
-	
 	NEO4J_STANDARD(
-			"Match (b:"
-			+ ReportEngineUtils.NEO4J_RESULT_LABEL + ") Where b.kpiId= :kpiId "
+			"Match (b:"+ ReportEngineUtils.NEO4J_RESULT_LABEL + ") Where b.kpiId= :kpiId "
 					+ " and b.executionId=:executionId and b.assessmentId =:assessmentId RETURN b "),
 	NEO4J_COMPARISON(
 			"MATCH (n:" + ReportEngineUtils.NEO4J_RESULT_LABEL + ") "

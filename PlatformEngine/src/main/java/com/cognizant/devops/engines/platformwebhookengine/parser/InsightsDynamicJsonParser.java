@@ -50,7 +50,7 @@ public class InsightsDynamicJsonParser {
 		List<JsonObject> responceFinalDataList = new ArrayList(0);
 		JsonObject responceData = new JsonObject();
 		try {
-			// LOG.debug(" inside parser Respons eTemplate Object {} ", nodeOriginalData);
+			// LOG.debug(" inside parser Respons eTemplate Object", nodeOriginalData);
 			for (Iterator<Map.Entry<String, JsonNode>> it = nodeResponseTemplate.fields(); it.hasNext();) {
 				Map.Entry<String, JsonNode> field = it.next();
 				String key = field.getKey();
@@ -88,7 +88,7 @@ public class InsightsDynamicJsonParser {
 				responceFinalDataList.add(responceData);
 			}
 		} catch (Exception e) {
-			LOG.error(" Error while parsing dynamic response template {} ", e);
+			LOG.error(" Error while parsing dynamic response template", e);
 		}
 		// LOG.debug(" responceFinalDataList {} ", responceFinalDataList);
 		return responceFinalDataList;

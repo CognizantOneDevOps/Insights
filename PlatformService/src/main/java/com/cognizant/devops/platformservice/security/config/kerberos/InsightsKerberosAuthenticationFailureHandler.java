@@ -38,7 +38,7 @@ public class InsightsKerberosAuthenticationFailureHandler extends SimpleUrlAuthe
 	public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response,
 			AuthenticationException exception) throws IOException, ServletException {
 
-		Log.error("Invalid request in InsightsAuthenticationException for kerberos  {} ", exception);
+		Log.error("Invalid request in InsightsAuthenticationException for kerberos ", exception);
 		AuthenticationUtils.setResponseMessage(response, AuthenticationUtils.SECURITY_CONTEXT_CODE,
 				"Authentication not successful ,Please relogin ");
 

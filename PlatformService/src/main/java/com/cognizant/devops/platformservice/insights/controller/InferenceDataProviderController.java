@@ -42,7 +42,8 @@ import com.google.gson.JsonParser;
 @RestController
 @RequestMapping("/datasource/inference")
 public class InferenceDataProviderController {
-
+	public static final String VECTORSCHEDULE ="vectorSchedule";
+	public static final String VECTORTYPE= "vectorType";
 	private static Logger LOG = LogManager.getLogger(InferenceDataProviderController.class);
 
 	@Autowired
@@ -65,8 +66,8 @@ public class InferenceDataProviderController {
 		JsonArray result = new JsonArray();
 		JsonArray inferenceInputFromPanel = new JsonParser().parse(input).getAsJsonArray();
 		for (JsonElement jsonElemFromDS : inferenceInputFromPanel.getAsJsonArray()) {
-			String schedule = jsonElemFromDS.getAsJsonObject().get("vectorSchedule").getAsString();
-			String vectorType = jsonElemFromDS.getAsJsonObject().get("vectorType").getAsString();
+			String schedule = jsonElemFromDS.getAsJsonObject().get(VECTORSCHEDULE).getAsString();
+			String vectorType = jsonElemFromDS.getAsJsonObject().get(VECTORTYPE).getAsString();
 			LOG.debug(" for vector type {} ", vectorType);
 			if (vectorType == null || "".equalsIgnoreCase(vectorType)) {
 				inferences = insightsInferenceService.getInferenceDetails(schedule);
@@ -76,7 +77,7 @@ public class InferenceDataProviderController {
 			JsonObject responseOutputFromES = PlatformServiceUtil.buildSuccessResponseWithData(inferences);
 			for (JsonElement jsonElemES : responseOutputFromES.get("data").getAsJsonArray()) {
 				if (((JsonObject) jsonElemES).get("heading").getAsString()
-						.equals(jsonElemFromDS.getAsJsonObject().get("vectorType").getAsString())) {
+						.equals(jsonElemFromDS.getAsJsonObject().get(VECTORTYPE).getAsString())) {
 					result.add(jsonElemES.getAsJsonObject());
 					break;
 				}
@@ -107,8 +108,8 @@ public class InferenceDataProviderController {
 		JsonArray result = new JsonArray();
 		JsonArray inferenceInputFromPanel = new JsonParser().parse(input).getAsJsonArray();
 		for (JsonElement jsonElemFromDS : inferenceInputFromPanel.getAsJsonArray()) {
-			String schedule = jsonElemFromDS.getAsJsonObject().get("vectorSchedule").getAsString();
-			String vectorType = jsonElemFromDS.getAsJsonObject().get("vectorType").getAsString();
+			String schedule = jsonElemFromDS.getAsJsonObject().get(VECTORSCHEDULE).getAsString();
+			String vectorType = jsonElemFromDS.getAsJsonObject().get(VECTORTYPE).getAsString();
 			LOG.debug(" for vector type {} ", vectorType);
 			if (vectorType == null || "".equalsIgnoreCase(vectorType)) {
 				inferences = insightsInferenceService.getInferenceDetails(schedule);
@@ -118,7 +119,7 @@ public class InferenceDataProviderController {
 			JsonObject responseOutputFromES = PlatformServiceUtil.buildSuccessResponseWithData(inferences);
 			for (JsonElement jsonElemES : responseOutputFromES.get("data").getAsJsonArray()) {
 				if (((JsonObject) jsonElemES).get("heading").getAsString()
-						.equals(jsonElemFromDS.getAsJsonObject().get("vectorType").getAsString())) {
+						.equals(jsonElemFromDS.getAsJsonObject().get(VECTORTYPE).getAsString())) {
 					JsonArray ja = new JsonArray();
 					ja.add(jsonElemES.getAsJsonObject());
 					result.add(ja);
@@ -141,8 +142,8 @@ public class InferenceDataProviderController {
 			input = request.getReader().lines().collect(Collectors.joining(System.lineSeparator()));
 			JsonArray inferenceInputFromPanel = new JsonParser().parse(input).getAsJsonArray();
 			JsonObject jsonInputFromPanel = inferenceInputFromPanel.get(0).getAsJsonObject();
-			String schedule = jsonInputFromPanel.get("vectorSchedule").getAsString();
-			String vectorType = jsonInputFromPanel.get("vectorType").getAsString();
+			String schedule = jsonInputFromPanel.get(VECTORSCHEDULE).getAsString();
+			String vectorType = jsonInputFromPanel.get(VECTORTYPE).getAsString();
 			LOG.debug(" get getInferenceReportData for group {} ", vectorType);
 			inferences = insightsInferenceReportService.getInferenceDetailsVectorWise(schedule, vectorType);
 			if (!inferences.isEmpty()) {

@@ -23,6 +23,7 @@ import org.apache.commons.text.StringSubstitutor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import com.cognizant.devops.platformcommons.constants.AssessmentReportAndWorkflowConstants;
 import com.cognizant.devops.platformdal.assessmentreport.InsightsReportsKPIConfig;
 import com.cognizant.devops.platformreports.assessment.dal.PDFDataProcessor;
 import com.cognizant.devops.platformreports.assessment.datamodel.InsightsAssessmentConfigurationDTO;
@@ -50,12 +51,12 @@ public class PDFKPIVisualizationProcesser implements Callable<JsonObject> {
 		JsonObject returnMessage = new JsonObject();
 		try {
 			JsonObject visualizationData = genrateVisualizationResposeFromKPI();
-			returnMessage.addProperty("status", "success");
+			returnMessage.addProperty(AssessmentReportAndWorkflowConstants.STATUS, "success");
 			returnMessage.add("data", visualizationData);
 		} catch (Exception e) {
 			log.error(e);
-			returnMessage.addProperty("status", "failure");
-			returnMessage.addProperty("kpiId", reportKpiConfig.getKpiConfig().getKpiId());
+			returnMessage.addProperty(AssessmentReportAndWorkflowConstants.STATUS, "failure");
+			returnMessage.addProperty(AssessmentReportAndWorkflowConstants.KPIID, reportKpiConfig.getKpiConfig().getKpiId());
 
 		}
 		return returnMessage;
@@ -66,7 +67,7 @@ public class PDFKPIVisualizationProcesser implements Callable<JsonObject> {
 		JsonObject eachKPIObject = new JsonObject();
 		JsonArray eachKPIVisualizationResult = new JsonArray();
 		int kpiId = reportKpiConfig.getKpiConfig().getKpiId();
-		eachKPIObject.addProperty("kpiId", kpiId);
+		eachKPIObject.addProperty(AssessmentReportAndWorkflowConstants.KPIID, kpiId);
 		JsonArray vConfig = new JsonParser().parse(reportKpiConfig.getvConfig()).getAsJsonArray();
 		PDFDataProcessor dataProcessor = new PDFDataProcessor();
 		for (JsonElement eachConfig : vConfig) {
@@ -98,7 +99,7 @@ public class PDFKPIVisualizationProcesser implements Callable<JsonObject> {
 		Map<String, Long> dateReplaceMap = new HashMap<>();
 		dateReplaceMap.put("assessmentId", Long.parseLong(String.valueOf(assessmentReportDTO.getConfigId())));
 		dateReplaceMap.put("executionId",assessmentReportDTO.getExecutionId());
-		dateReplaceMap.put("kpiId", Long.parseLong(String.valueOf(kpiId)));
+		dateReplaceMap.put(AssessmentReportAndWorkflowConstants.KPIID, Long.parseLong(String.valueOf(kpiId)));
 		StringSubstitutor sub = new StringSubstitutor(dateReplaceMap, "{", "}");
 		return sub.replace(vQuery);
 	}

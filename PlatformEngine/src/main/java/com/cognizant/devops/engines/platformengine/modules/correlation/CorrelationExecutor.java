@@ -50,6 +50,7 @@ import com.google.gson.JsonObject;
  * @author Vishal Ganjare (vganjare)
  */
 public class CorrelationExecutor {
+	public static final String RESULT = "results";
 	private static final Logger log = LogManager.getLogger(CorrelationExecutor.class);
 	private long maxCorrelationTime;
 	private long lastCorrelationTime;
@@ -73,7 +74,7 @@ public class CorrelationExecutor {
 				return;
 			}
 			for (CorrelationConfiguration correlation : correlations) {
-				log.debug(" Correlation started for " + correlation.getRelationName());
+				log.debug(" Correlation started for {}", correlation.getRelationName());
 				if (correlation.isSelfRelation()) {
 					continue;
 				}
@@ -85,11 +86,11 @@ public class CorrelationExecutor {
 					if (!sourceDataList.isEmpty()) {
 						executeCorrelations(correlation, sourceDataList);
 					} else {
-						log.debug("No record found for Correlation of " + correlation.getRelationName());
+						log.debug("No record found for Correlation of {}" , correlation.getRelationName());
 					}
 				}
 				removeRawLabel(correlation);
-				log.debug(" Correlation end for " + correlation.getRelationName());
+				log.debug(" Correlation end for{}", correlation.getRelationName());
 			}
 		} else {
 			log.error("Correlation configuration is not provided in server-config.json.");
@@ -125,7 +126,7 @@ public class CorrelationExecutor {
 			while (processedRecords > 0) {
 				long st = System.currentTimeMillis();
 				GraphResponse response = dbHandler.executeCypherQuery(cypher.toString());
-				processedRecords = response.getJson().get("results").getAsJsonArray().get(0).getAsJsonObject()
+				processedRecords = response.getJson().get(RESULT).getAsJsonArray().get(0).getAsJsonObject()
 						.get("data").getAsJsonArray().get(0).getAsJsonObject().get("row").getAsInt();
 				log.debug("Pre Processed " + correlation.getDestinationToolName() + " " + destinationLabelName
 						+ " records: " + processedRecords + " in: " + (System.currentTimeMillis() - st) + " ms");
@@ -181,11 +182,11 @@ public class CorrelationExecutor {
 		cypher.append(
 				"WITH distinct uuid, collect(distinct value) as values WITH { uuid : uuid, values : values} as data ");
 		cypher.append("RETURN collect(data) as data");
-		log.debug("DestinationData    " + cypher);
+		log.debug("DestinationData {} ", cypher);
 		GraphDBHandler dbHandler = new GraphDBHandler();
 		try {
 			GraphResponse response = dbHandler.executeCypherQuery(cypher.toString());
-			JsonArray rows = response.getJson().get("results").getAsJsonArray().get(0).getAsJsonObject().get("data")
+			JsonArray rows = response.getJson().get(RESULT).getAsJsonArray().get(0).getAsJsonObject().get("data")
 					.getAsJsonArray().get(0).getAsJsonObject().get("row").getAsJsonArray();
 			destinationDataList = new ArrayList<>();
 			if (rows.isJsonNull() || rows.size() == 0 || rows.get(0).getAsJsonArray().size() == 0) {
@@ -228,7 +229,7 @@ public class CorrelationExecutor {
 			correlationCypher.append("set ").append(propertyVal).append(" ");
 		}
 		correlationCypher.append("RETURN count(distinct destination) as count");
-		log.debug("CorrelationExecution Started   " + correlationCypher);
+		log.debug("CorrelationExecution Started  {} ", correlationCypher);
 		GraphDBHandler dbHandler = new GraphDBHandler();
 		JsonObject correlationExecutionResponse;
 		int processedRecords = 0;
@@ -236,7 +237,7 @@ public class CorrelationExecutor {
 			long st = System.currentTimeMillis();
 			correlationExecutionResponse = dbHandler.bulkCreateNodes(dataList, null, correlationCypher.toString());
 			log.debug(correlationExecutionResponse);
-			processedRecords = correlationExecutionResponse.get("response").getAsJsonObject().get("results")
+			processedRecords = correlationExecutionResponse.get("response").getAsJsonObject().get(RESULT)
 					.getAsJsonArray().get(0).getAsJsonObject().get("data").getAsJsonArray().get(0).getAsJsonObject()
 					.get("row").getAsInt();
 			log.debug("Correlated " + correlation.getDestinationToolName() + " " + correlation.getDestinationLabelName()
@@ -296,7 +297,7 @@ public class CorrelationExecutor {
 				long st = System.currentTimeMillis();
 				correlationExecutionResponse = dbHandler.executeCypherQuery(correlationCypher.toString()).getJson();
 				log.debug(correlationExecutionResponse);
-				processedRecords = correlationExecutionResponse.get("results").getAsJsonArray().get(0).getAsJsonObject()
+				processedRecords = correlationExecutionResponse.get(RESULT).getAsJsonArray().get(0).getAsJsonObject()
 						.get("data").getAsJsonArray().get(0).getAsJsonObject().get("row").getAsInt();
 				log.debug("Processed " + processedRecords + " records in " + (System.currentTimeMillis() - st) + " ms");
 			}

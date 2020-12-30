@@ -17,6 +17,7 @@ package com.cognizant.devops.platformworkflow.workflowtask.core;
 
 import java.io.IOException;
 import java.lang.reflect.Constructor;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.List;
@@ -42,30 +43,32 @@ public class WorkflowTaskInitializer {
 	 */
 	public void registerTaskSubscriber() {
 		URLClassLoader urlClassLoader = null;
-		try {
 			InsightsStatusProvider.getInstance().createInsightStatusNode("Workflow Task Initializer started.",
 					PlatformServiceConstants.SUCCESS);
 			log.debug("Worlflow Detail ====  WORKFLOW_RESOLVED_PATH {}  ", WorkflowUtils.WORKFLOW_RESOLVED_PATH);
 			// Getting the jar URL which contains target class
+			try {
 			URL[] classLoaderUrls = new URL[] { new URL(
 					"file://" + WorkflowUtils.WORKFLOW_RESOLVED_PATH) };
-
+			
 			// Create a new URLClassLoader 
 			urlClassLoader = new URLClassLoader(classLoaderUrls);
-
+			}catch(MalformedURLException e) {
+			log.debug("unable to create URLClassLoader");
+			}
 			WorkflowDAL workflowDAL = new WorkflowDAL();
 			List<InsightsWorkflowTask> registerTaskList = workflowDAL.getAllWorkflowTask();
-			for (InsightsWorkflowTask insightsWorkflowTaskEntity : registerTaskList) {
+			try {
+				for (InsightsWorkflowTask insightsWorkflowTaskEntity : registerTaskList) {
 				if (!WorkflowDataHandler.registry.containsKey(insightsWorkflowTaskEntity.getTaskId())) {
-					log.debug("Worlflow Detail ==== Task Detail {} ", insightsWorkflowTaskEntity);
+					log.debug("Worlflow Detail ==== Task Detail {}", insightsWorkflowTaskEntity);
 					Class<?> classDetail = Class.forName(insightsWorkflowTaskEntity.getCompnentName(), true,
 							urlClassLoader);
 					Constructor<?> construct = classDetail.getConstructor(String.class);
 					WorkflowTaskSubscriberHandler subscriberobject = (WorkflowTaskSubscriberHandler) construct
 							.newInstance(insightsWorkflowTaskEntity.getMqChannel());
 					WorkflowDataHandler.registry.put(insightsWorkflowTaskEntity.getTaskId(), subscriberobject);
-					log.debug("Worlflow Detail ==== Task Detail {}  with path {} registered successfully ",
-							insightsWorkflowTaskEntity.getMqChannel(), insightsWorkflowTaskEntity.getCompnentName());
+					log.debug("Worlflow Detail ==== Task Detail {}  with path {} registered successfully ",insightsWorkflowTaskEntity.getMqChannel(), insightsWorkflowTaskEntity.getCompnentName());
 					InsightsStatusProvider.getInstance().createInsightStatusNode(" Task Subscribed "+insightsWorkflowTaskEntity.getMqChannel()+" with path "+insightsWorkflowTaskEntity.getCompnentName()+" registered successfully",
 							PlatformServiceConstants.SUCCESS);
 				} else {
@@ -78,7 +81,7 @@ public class WorkflowTaskInitializer {
 			InsightsStatusProvider.getInstance().createInsightStatusNode("Workflow Task Initializer completed.",
 					PlatformServiceConstants.SUCCESS);
 		} catch (Exception e) {
-			log.error(" Worlflow Detail ==== Error while registering Task {} ", e);
+			log.error(" Worlflow Detail ==== Error while registering Task ", e);
 			InsightsStatusProvider.getInstance().createInsightStatusNode(" Error while registering Task "+e.getMessage(),
 					PlatformServiceConstants.FAILURE);
 		}finally {
@@ -86,7 +89,7 @@ public class WorkflowTaskInitializer {
 				try {
 					urlClassLoader.close();
 				} catch (IOException e) {
-					log.error(" Error while closing urlClassLoader {} ", e);
+					log.error(" Error while closing urlClassLoader ", e);
 				}
 			}
 		}

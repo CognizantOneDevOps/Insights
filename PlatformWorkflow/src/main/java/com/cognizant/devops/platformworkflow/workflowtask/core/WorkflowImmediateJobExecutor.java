@@ -23,16 +23,16 @@ import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 
+import com.cognizant.devops.platformcommons.config.ApplicationConfigInterface;
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
 import com.cognizant.devops.platformcommons.core.enums.WorkflowTaskEnum;
 import com.cognizant.devops.platformdal.workflow.InsightsWorkflowConfiguration;
 import com.cognizant.devops.platformdal.workflow.InsightsWorkflowTaskSequence;
 import com.cognizant.devops.platformworkflow.workflowtask.exception.WorkflowTaskInitializationException;
-import com.cognizant.devops.platformworkflow.workflowthread.core.WorkflowThreadPool;
 import com.google.gson.JsonObject;
 
-public class WorkflowImmediateJobExecutor implements Job {
+public class WorkflowImmediateJobExecutor implements Job, ApplicationConfigInterface {
 	/**
 	 * 
 	 */
@@ -47,8 +47,13 @@ public class WorkflowImmediateJobExecutor implements Job {
 	public void execute(JobExecutionContext context)
 			throws JobExecutionException {
 		log.debug(" Worlflow Detail ====  Schedular Inside WorkflowImmediateJobExecutor ");
-		initilizeWorkflowTasks();
-		executeImmediateWorkflow();
+		try {
+			ApplicationConfigInterface.loadConfiguration();
+			initilizeWorkflowTasks();
+			executeImmediateWorkflow();
+		} catch (Exception e) {
+			log.error(e);
+		}
  
 	}
 

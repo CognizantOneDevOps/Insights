@@ -115,15 +115,15 @@ public class QueryCachingServiceImpl implements QueryCachingService {
 				else
 					esCacheIndex = esCacheIndex + "/querycacheresults";
 				String sourceESCacheUrl = QueryCachingConstants.ES_HOST + "/" + esCacheIndex;
-				log.debug("\n\nQuery Caching Index Found As: " + sourceESCacheUrl);
+				log.debug("\n\nQuery Caching Index Found As: {}", sourceESCacheUrl);
 				String cachingType = requestJson.get(QueryCachingConstants.METADATA).getAsJsonArray()
 						.get(QueryCachingConstants.ZEROTH_INDEX).getAsJsonObject()
 						.get(QueryCachingConstants.CACHING_TYPE).getAsString();
-				log.debug("Selected Caching Type Found As: " + cachingType);
+				log.debug("Selected Caching Type Found As:{} ", cachingType);
 				int cachingValue = requestJson.get(QueryCachingConstants.METADATA).getAsJsonArray()
 						.get(QueryCachingConstants.ZEROTH_INDEX).getAsJsonObject()
 						.get(QueryCachingConstants.CACHING_VALUE).getAsInt();
-				log.debug("Selected Caching Value Found As: " + cachingValue);
+				log.debug("Selected Caching Value Found As:{} ", cachingValue);
 				String startTimeStr = requestJson.get(QueryCachingConstants.METADATA).getAsJsonArray()
 						.get(QueryCachingConstants.ZEROTH_INDEX).getAsJsonObject().get(QueryCachingConstants.START_TIME)
 						.getAsString();
@@ -171,12 +171,12 @@ public class QueryCachingServiceImpl implements QueryCachingService {
 				JsonArray esResponseArray = new JsonArray();
 
 				if (esResponse.has("status") && esResponse.get("status").getAsInt() == 404)
-					log.debug("\n\nNo such elasticsearch index is found. Creating a new index - " + sourceESCacheUrl);
+					log.debug("\n\nNo such elasticsearch index is found. Creating a new index {} - ", sourceESCacheUrl);
 				else
 					esResponseArray = esResponse.get("hits").getAsJsonObject().get("hits").getAsJsonArray();
 
 				if (esResponseArray.size() != 0) {
-					log.debug("\n\nQuery Caching Response Found At Index: " + sourceESCacheUrl);
+					log.debug("\n\nQuery Caching Response Found At Index:{} ", sourceESCacheUrl);
 					esResponse = esResponseArray.get(0).getAsJsonObject().get("_source").getAsJsonObject();
 				} else {
 					log.debug(
@@ -277,7 +277,7 @@ public class QueryCachingServiceImpl implements QueryCachingService {
 				BufferedReader reader = new BufferedReader(new InputStreamReader(in));) {
 			return org.apache.commons.io.IOUtils.toString(reader);
 		} catch (Exception e) {
-			log.error("\n\nError in reading file!" + e);
+			log.error("\n\nError in reading file!", e);
 		}
 		return null;
 	}
@@ -296,7 +296,7 @@ public class QueryCachingServiceImpl implements QueryCachingService {
 				}
 			}
 		} catch (Exception e) {
-			log.error("Exception caught in validateModifierKeywords method. " + e);
+			log.error("Exception caught in validateModifierKeywords method. ", e);
 		}
 		return isModifier;
 	}

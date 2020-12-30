@@ -32,17 +32,18 @@ import com.cognizant.devops.platforminsightswebhook.message.core.SubscriberStatu
 @EnableConfigurationProperties(AppProperties.class)
 public class WebHookAppStarter {
 	private static Logger LOG = LogManager.getLogger(WebHookAppStarter.class);
+	public static final String PROPERTIES_BASEDIR="properties.basedir";
     public static void main(String[] args) {
 		LOG.debug(" Inside Webhook Message Publisher ... ");
-		System.setProperty("properties.basedir", ".");
+		System.setProperty(PROPERTIES_BASEDIR, ".");
 		for (String argCommandLine : args) {
 			LOG.debug(argCommandLine);
 			if (argCommandLine.contains("config.file.location")) {
 				String[] argArray = argCommandLine.split("=");
-				System.setProperty("properties.basedir", argArray[1]);
+				System.setProperty(PROPERTIES_BASEDIR, argArray[1]);
 			}
 		}
-		LOG.debug(" Spring properties location  " + System.getProperty("properties.basedir"));
+		LOG.debug(" Spring properties location  " + System.getProperty(PROPERTIES_BASEDIR));
 		ApplicationContext applicationContext = SpringApplication.run(WebHookAppStarter.class, args);
 		LOG.debug(" message Application Name " + applicationContext.getApplicationName() + " instance name "
 				+ AppProperties.instanceName);

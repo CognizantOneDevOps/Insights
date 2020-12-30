@@ -22,7 +22,7 @@ import org.hibernate.query.Query;
 import com.cognizant.devops.platformdal.core.BaseDAL;
 
 public class HierarchyMappingDAL extends BaseDAL {
-
+	private static final String HIERARCHYNAME="hierarchyName";
 	public List<HierarchyMapping> fetchAllHierarchyMapping() {
 		Query<HierarchyMapping> createQuery = getSession().createQuery("FROM HierarchyMapping HM",
 				HierarchyMapping.class);
@@ -36,7 +36,7 @@ public class HierarchyMappingDAL extends BaseDAL {
 		Query<HierarchyMapping> createQuery = getSession().createQuery(
 				"FROM HierarchyMapping a WHERE a.hierarchyName = :hierarchyName AND a.orgName = :orgName AND a.rowId = :rowId AND a.orgId = :orgId",
 				HierarchyMapping.class);
-		createQuery.setParameter("hierarchyName", hierarchyName);
+		createQuery.setParameter(HIERARCHYNAME, hierarchyName);
 		createQuery.setParameter("orgName", orgName);
 		createQuery.setParameter("rowId", rowId);
 		createQuery.setParameter("orgId", orgId);
@@ -67,7 +67,7 @@ public class HierarchyMappingDAL extends BaseDAL {
 				HierarchyMapping.class);*/
 		Query<String> createQuery = getSession().createQuery(
 				"SELECT HM.orgName FROM HierarchyMapping HM WHERE HM.hierarchyName = :hierarchyName",String.class);
-		createQuery.setParameter("hierarchyName", hierarchyName);
+		createQuery.setParameter(HIERARCHYNAME, hierarchyName);
 		List<String> resultList = createQuery.getResultList();
 		terminateSession();
 		terminateSessionFactory();
@@ -78,7 +78,7 @@ public class HierarchyMappingDAL extends BaseDAL {
 		Query<HierarchyMapping> createQuery = getSession().createQuery(
 				"FROM HierarchyMapping a WHERE a.hierarchyName = :hierarchyName AND a.orgName = :orgName",
 				HierarchyMapping.class);
-		createQuery.setParameter("hierarchyName", hierarchyName);
+		createQuery.setParameter(HIERARCHYNAME, hierarchyName);
 		createQuery.setParameter("orgName", orgName);
 		HierarchyMapping hierarchyMapping = createQuery.getSingleResult();
 		getSession().beginTransaction();

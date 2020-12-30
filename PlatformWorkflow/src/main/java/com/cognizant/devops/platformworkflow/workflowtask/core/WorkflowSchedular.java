@@ -29,6 +29,7 @@ import org.quartz.TriggerBuilder;
 import org.quartz.impl.StdSchedulerFactory;
 
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
+import com.cognizant.devops.platformcommons.constants.AssessmentReportAndWorkflowConstants;
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
 
 public class WorkflowSchedular {
@@ -42,49 +43,49 @@ public class WorkflowSchedular {
 		try {
 			Scheduler scheduler = new StdSchedulerFactory().getScheduler();
 			JobDetail jobWorkflow = JobBuilder.newJob(WorkflowExecutor.class)
-					.withIdentity("WorkflowExecutor", "WorkflowExecutor").build();
+			.withIdentity(AssessmentReportAndWorkflowConstants.WORKFLOW_EXECUTOR,AssessmentReportAndWorkflowConstants. WORKFLOW_EXECUTOR).build();
 
 			log.debug("Worlflow Detail ====  Workflow Executor corn created ==== {} ",
 					ApplicationConfigProvider.getInstance().getWorkflowDetails().getWorkflowExecutorCron());
 
 			CronTrigger triggerWorkflow = TriggerBuilder.newTrigger()
-					.withIdentity("WorkflowExecutortrigger", "WorkflowExecutor")
+					.withIdentity("WorkflowExecutortrigger", AssessmentReportAndWorkflowConstants.WORKFLOW_EXECUTOR)
 					.withSchedule(CronScheduleBuilder.cronSchedule(
 							ApplicationConfigProvider.getInstance().getWorkflowDetails().getWorkflowExecutorCron()).inTimeZone(TimeZone.getTimeZone("UTC")))
 					.build();
 
 			JobDetail jobWorkflowRetry = JobBuilder.newJob(WorkflowRetryExecutor.class)
-					.withIdentity("WorkflowRetryExecutor", "WorkflowRetryExecutor")
+					.withIdentity(AssessmentReportAndWorkflowConstants.WORKFLOW_RETRY_EXECUTOR,AssessmentReportAndWorkflowConstants.WORKFLOW_RETRY_EXECUTOR)
 					.build();
 
 			log.debug("Worlflow Detail ====  Workflow Retry Executor corn created ==== {} ",
 					ApplicationConfigProvider.getInstance().getWorkflowDetails().getWorkflowRetryExecutorCron());
 
 			CronTrigger triggeWorkflowRetry = TriggerBuilder.newTrigger()
-					.withIdentity("WorkflowRetryExecutortrigger", "WorkflowRetryExecutor")
+					.withIdentity("WorkflowRetryExecutortrigger", AssessmentReportAndWorkflowConstants.WORKFLOW_RETRY_EXECUTOR)
 					.withSchedule(CronScheduleBuilder.cronSchedule(ApplicationConfigProvider.getInstance()
 							.getWorkflowDetails().getWorkflowRetryExecutorCron()).inTimeZone(TimeZone.getTimeZone("UTC")))
 					.build();
 
 			JobDetail jobImmediateWorkflow = JobBuilder.newJob(WorkflowImmediateJobExecutor.class)
-					.withIdentity("WorkflowImmediateJobExecutor", "WorkflowImmediateJobExecutor").build();
+					.withIdentity(AssessmentReportAndWorkflowConstants.WORKFLOW_IMMEDIATE_JOB_EXECUTOR, AssessmentReportAndWorkflowConstants.WORKFLOW_IMMEDIATE_JOB_EXECUTOR).build();
 
 			log.debug("Worlflow Detail ====  Workflow WorkflowImmediateJobExecutor Executor corn created ==== {} ",
 					"0 */5 * ? * *");
 
 			CronTrigger triggeImmediateWorkflow = TriggerBuilder.newTrigger()
-					.withIdentity("WorkflowImmediateJobExecutortrigger", "WorkflowImmediateJobExecutor")
+					.withIdentity(AssessmentReportAndWorkflowConstants.WORKFLOW_IMMEDIATE_JOB_EXECUTOR, AssessmentReportAndWorkflowConstants.WORKFLOW_IMMEDIATE_JOB_EXECUTOR)
 					.withSchedule(CronScheduleBuilder.cronSchedule("0 */5 * ? * *").inTimeZone(TimeZone.getTimeZone("UTC")))
 					.build();
 			
 			JobDetail jobAutoWorkflowCorrection = JobBuilder.newJob(WorkflowAutoCorrectionExecutor.class)
-					.withIdentity("WorkflowAutoCorrectionExecutor", "WorkflowAutoCorrectionExecutor").build();
+					.withIdentity(AssessmentReportAndWorkflowConstants.WORKFLOW_AUTOCORRECTION_EXECUTOR , AssessmentReportAndWorkflowConstants.WORKFLOW_AUTOCORRECTION_EXECUTOR).build();
 
 			log.debug("Worlflow Detail ====  Workflow WorkflowAutoCorrectionExecutor Executor corn created ==== {} ",
 					ApplicationConfigProvider.getInstance().getWorkflowDetails().getWorkflowAutoCorrectionSchedular());
 
 			CronTrigger triggeAutoWorkflowCorrection = TriggerBuilder.newTrigger()
-					.withIdentity("WorkflowAutoCorrectionExecutor", "WorkflowAutoCorrectionExecutor")
+					.withIdentity(AssessmentReportAndWorkflowConstants.WORKFLOW_AUTOCORRECTION_EXECUTOR, AssessmentReportAndWorkflowConstants.WORKFLOW_AUTOCORRECTION_EXECUTOR)
 					.withSchedule(CronScheduleBuilder.cronSchedule(ApplicationConfigProvider.getInstance().getWorkflowDetails().getWorkflowAutoCorrectionSchedular()).inTimeZone(TimeZone.getTimeZone("UTC")))
 					.build();
 

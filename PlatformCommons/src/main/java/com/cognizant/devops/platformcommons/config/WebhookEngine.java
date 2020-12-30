@@ -15,8 +15,11 @@
  ******************************************************************************/
 package com.cognizant.devops.platformcommons.config;
 
-public class WebhookEngine {
+import java.io.Serializable;
+
+public class WebhookEngine implements Serializable {
 	
+	private static final long serialVersionUID = -7072354850339839787L;
 	private boolean enableWebHookEngine =false;
 	private int eventProcessingWindowInMin =15;
 	public boolean isEnableWebHookEngine() {

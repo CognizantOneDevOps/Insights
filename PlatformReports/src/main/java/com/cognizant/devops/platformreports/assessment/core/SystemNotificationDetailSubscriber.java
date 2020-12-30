@@ -74,7 +74,7 @@ public class SystemNotificationDetailSubscriber extends WorkflowTaskSubscriberHa
 			StringSubstitutor sub = new StringSubstitutor(valuesMap, "{", "}");
 			mailHTML=sub.replace(mailHTML);
 			setDetailsInEmailHistory(incomingTaskMessageJson, mailHTML);
-			InsightsStatusProvider.getInstance().createInsightStatusNode("PDFExecutionSubscriber completed",
+			InsightsStatusProvider.getInstance().createInsightStatusNode("SystemNotificationDetailSubscriber completed",
 					PlatformServiceConstants.SUCCESS);
 		} catch (InsightsJobFailedException ijfe) {
 			log.error("Worlflow Detail ==== SystemNotificationDetail Subscriber Completed with error ", ijfe);

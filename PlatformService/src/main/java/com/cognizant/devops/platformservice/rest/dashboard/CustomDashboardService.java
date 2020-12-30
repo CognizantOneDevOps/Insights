@@ -16,8 +16,9 @@
 package com.cognizant.devops.platformservice.rest.dashboard;
 
 import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -31,13 +32,13 @@ import com.google.gson.JsonObject;
 @RequestMapping("/dashboard")
 public class CustomDashboardService {
 	
-	@RequestMapping(value = "/getCustomDashboard", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+	@GetMapping(value = "/getCustomDashboard",  produces = MediaType.APPLICATION_JSON_VALUE)
 	public @ResponseBody JsonObject getCustomDashboard(@RequestParam String portfolio){
 		CustomDashboardDAL customDashboardDAL = new CustomDashboardDAL();
 		return PlatformServiceUtil.buildSuccessResponseWithData(customDashboardDAL.getCustomDashboard(UserPortfolioEnum.valueOf(portfolio)));
 	}
 	
-	@RequestMapping(value = "/addCustomDashboard", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+	@PostMapping(value = "/addCustomDashboard", produces = MediaType.APPLICATION_JSON_VALUE)
 	public @ResponseBody JsonObject addCustomDashboard(@RequestParam String dashboardName, @RequestParam String dashboardJson, @RequestParam String portfolio){
 		CustomDashboardDAL customDashboardDAL = new CustomDashboardDAL();
 		boolean result = customDashboardDAL.addCustomDashboard(dashboardName, dashboardJson, UserPortfolioEnum.valueOf(portfolio));

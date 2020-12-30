@@ -72,8 +72,6 @@ public class InsightsInferenceServiceImpl implements InsightsInferenceService {
 		List<InferenceResult> results = new ArrayList<>();
 		try {
 			results = getInferenceDataFromNeo4j(schedule.toUpperCase(), vectorType);
-			//results = getInferenceData(schedule);
-
 		} catch (Exception e) {
 			log.error("Problem getting results", e);
 			return inferences;
@@ -128,11 +126,9 @@ public class InsightsInferenceServiceImpl implements InsightsInferenceService {
 			}
 			Long kpiID = resultFirstData.getKpiID();
 			String inferenceName = resultFirstData.getName();
-			//String action = resultFirstData.getAction();
 			String jobSchedule = resultFirstData.getSchedule();
 			String resultOutputType = resultFirstData.getResultOutPutType();
 			boolean isComparison = resultFirstData.getIsComparisionKpi();
-			//Date lastRunDate = new Date(resultFirstData.getResultTime());
 			String vector = resultFirstData.getVector();
 
 			String inferenceText = getInferenceText(vector, kpiID, sentiment, schedule, values,
@@ -154,7 +150,6 @@ public class InsightsInferenceServiceImpl implements InsightsInferenceService {
 			Collections.reverse(resultValues);
 			List<InsightsInferenceDetail> detailsList = getInferenceDetails(inferenceName, sentiment, trend,
 					inferenceText, jobSchedule, resultValues, kpiID);
-			//log.debug(" inference detail for kpi {} detailsList  {} ", kpiID, detailsList);
 			if (tempMap.containsKey(vector)) {
 				tempMap.get(vector).addAll(detailsList);
 			} else {
@@ -174,11 +169,9 @@ public class InsightsInferenceServiceImpl implements InsightsInferenceService {
 		InsightsInferenceDetail detail = new InsightsInferenceDetail();
 		detail.setKpiName(name);
 		detail.setSentiment(sentiment.toString().toUpperCase());
-	//	detail.setAction(ExecutionActions.valueOf(action));
 		detail.setTrendline(trend);
 		detail.setInference(inferenceLine);
 		detail.setSchedule(jobSchedule);
-	//	detail.setLastRun(lastRunDate);
 		detail.setResultSet(result);
 		detail.setKpiId(kpiID);
 		details.add(detail);
@@ -222,7 +215,7 @@ public class InsightsInferenceServiceImpl implements InsightsInferenceService {
 				} else if ((Long) values[0] > 0 && (Long) values[1] >= 0) {
 					if (resultOutputType.toLowerCase().contains(ResultOutputType.TIMERESULTOUTPUT.toString())) {
 						Long result = (Long) values[0];
-						Long secVal = TimeUnit.MILLISECONDS.toSeconds(result.longValue());//(Long) values[i] / 1000.0f;
+						Long secVal = TimeUnit.MILLISECONDS.toSeconds(result.longValue());
 						values[0] = secVal;
 
 						result = (Long) values[1];

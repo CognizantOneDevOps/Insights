@@ -32,6 +32,11 @@ import com.google.gson.JsonObject;
  */
 public final class JsonToObjectConverter {
 	
+	
+	private JsonToObjectConverter() {
+		super();
+	}
+
 	public static List<InferenceResult> getInferenceResult(JsonObject jsonObj){
 		
 		List<InferenceResult> results = new LinkedList<>();

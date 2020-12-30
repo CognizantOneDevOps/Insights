@@ -20,9 +20,10 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -38,38 +39,38 @@ public class InsightsBusinessMapping {
 	@Autowired
 	BusinessMappingService businessMappingService;
 
-	@RequestMapping(value = "/getAllHierarchyDetails", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+	@GetMapping(value = "/getAllHierarchyDetails",produces = MediaType.APPLICATION_JSON_VALUE)
 	public JsonObject getAllHierarchyDetails() {
 		return businessMappingService.getAllHierarchyDetails();
 	}
 
-	@RequestMapping(value = "/getHierarchyProperties", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+	@GetMapping(value = "/getHierarchyProperties",produces = MediaType.APPLICATION_JSON_VALUE)
 	public JsonObject getHierarchyProperties(@RequestParam String level1, @RequestParam String level2,
 			@RequestParam String level3, @RequestParam String level4) throws InsightsCustomException {
 		return businessMappingService.getHierarchyProperties(level1, level2, level3, level4);
 	}
 	
-	@RequestMapping(value = "/saveToolsMapping", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+	@PostMapping(value = "/saveToolsMapping",produces = MediaType.APPLICATION_JSON_VALUE)
 	public JsonObject saveToolsMappingLabel(@RequestBody String agentMappingJson) {
-		log.debug(" info mapping agent JOSN "+agentMappingJson);
+		log.debug(" info mapping agent JOSN {}",agentMappingJson);
 		return businessMappingService.saveToolsMappingLabel(agentMappingJson);
 	}
 	
-	@RequestMapping(value = "/getToolsMapping", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+	@GetMapping(value = "/getToolsMapping",produces = MediaType.APPLICATION_JSON_VALUE)
 	public JsonObject getToolsMappingLabel(@RequestParam String agentName) {
-		log.debug(" Tool Name "+agentName);
+		log.debug(" Tool Name{} ",agentName);
 		return businessMappingService.getToolsMappingLabel(agentName);
 	}
 	
-	@RequestMapping(value = "/editToolsMapping", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+	@PostMapping(value = "/editToolsMapping",produces = MediaType.APPLICATION_JSON_VALUE)
 	public JsonObject editToolsMappingLabel(@RequestBody String agentMappingJson){
-		log.debug(" Edit info mapping agent JOSN "+agentMappingJson);
+		log.debug(" Edit info mapping agent JOSN {}",agentMappingJson);
 		return businessMappingService.editToolsMappingLabel(agentMappingJson);
 	}
 	
-	@RequestMapping(value = "/deleteToolsMapping", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+	@PostMapping(value = "/deleteToolsMapping",produces = MediaType.APPLICATION_JSON_VALUE)
 	public JsonObject deleteToolsMappingLabel(@RequestParam String uuid) {
-		log.debug(" delete info mapping agent JOSN "+uuid);
+		log.debug(" delete info mapping agent JOSN {}",uuid);
 		return businessMappingService.deleteToolsMappingLabel(uuid);
 	}
 

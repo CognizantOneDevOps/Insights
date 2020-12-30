@@ -48,13 +48,13 @@ public class AssessmentReportContentProcesser {
 			} else if (inferenceContentConfigDefinition.getCategory() == ReportEngineEnum.ContentCategory.TREND) {
 				baseContentAction = new TrendCategoryImpl(inferenceContentConfigDefinition);
 			} else {
-				log.error("Worlflow Detail ====  No content category executer defined for contentId {} ",
+				log.error("Worlflow Detail ====  No content category executer defined for contentId {}",
 						inferenceContentConfigDefinition.getContentId());
 				throw new InsightsJobFailedException("Worlflow Detail ====  No content category executer defined");
 			}
 			baseContentAction.generateContent();
 		} catch (InsightsJobFailedException e) {
-			log.error("Worlflow Detail ====  Exception while execution content Id {} KPI Id {} exception {} ",
+			log.error("Worlflow Detail ====  Exception while execution content Id %d KPI Id {} exception {} ",
 					inferenceContentConfigDefinition.getContentId(), inferenceContentConfigDefinition.getKpiId(), e);
 			throw new InsightsJobFailedException("Exception while execution content Id");
 		}

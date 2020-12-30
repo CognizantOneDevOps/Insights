@@ -272,7 +272,7 @@ class DummyDataAgent(BaseAgent):
                     #    jira_sprintArr.append(randonSprintStringId)
                 except Exception as ex:
                     self.printLog(ex,True)
-            jiraMetadata = {"labels" : ["JIRA"]}
+            jiraMetadata = {"labels" : ["JIRA","DATA"]}
             total_record_count =total_record_count + len(jira_data)
             self.publishToolsData(jira_data, jiraMetadata)
             publish_message_count_loop=publish_message_count_loop+' Jira Data='+str(len(jira_data))
@@ -318,7 +318,7 @@ class DummyDataAgent(BaseAgent):
                    #print(gitSample)
                    git_CommitArr.append(gitSample)                 
                    git_data.append(gitSample)
-            gitMetadata = {"labels" : ["GIT"]}
+            gitMetadata = {"labels" : ["GIT","DATA"]}
             #print(len(git_data))
             total_record_count =total_record_count + len(git_data)
             self.publishToolsData(git_data, gitMetadata)
@@ -370,7 +370,7 @@ class DummyDataAgent(BaseAgent):
                     jenkins_data.append(jenkinsSample)
                 except Exception as ex:
                     self.printLog(ex,True)
-            jenkinsMetadata = {"labels" : ["JENKINS"]}
+            jenkinsMetadata = {"labels" : ["JENKINS","DATA"]}
             #self.printLog(len(jenkins_data), False)
             total_record_count =total_record_count + len(jenkins_data)
             self.publishToolsData(jenkins_data, jenkinsMetadata)
@@ -416,7 +416,7 @@ class DummyDataAgent(BaseAgent):
                 except Exception as ex:
                     self.printLog(ex,True)
                 #print(sonarSample)
-            sonarMetadata = {"labels" : ["SONAR"]}
+            sonarMetadata = {"labels" : ["SONAR","DATA"]}
             #print(len(sonar_data))
             total_record_count =total_record_count + len(sonar_data)
             self.publishToolsData(sonar_data, sonarMetadata)
@@ -451,7 +451,7 @@ class DummyDataAgent(BaseAgent):
                     #print(rundeckSample)
                 except Exception as ex:
                     self.printLog(ex,True)
-            RundeckMetadata = {"labels" : ["RUNDECK"]}
+            RundeckMetadata = {"labels" : ["RUNDECK","DATA"]}
             #print(len(rundeck_data))
             total_record_count =total_record_count + len(rundeck_data)
             self.publishToolsData(rundeck_data, RundeckMetadata)

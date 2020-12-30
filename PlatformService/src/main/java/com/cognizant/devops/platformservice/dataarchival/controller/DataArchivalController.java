@@ -21,9 +21,10 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -45,7 +46,7 @@ public class DataArchivalController {
 	@Autowired
 	DataArchivalServiceImpl dataArchivalService = new DataArchivalServiceImpl();
 	
-	@RequestMapping(value = "/saveDataArchivalDetails", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	@PostMapping(value = "/saveDataArchivalDetails", produces = MediaType.APPLICATION_JSON_VALUE)
 	public @ResponseBody JsonObject saveDataArchivalDetails(@RequestBody String archivalDetails) {
 		String message = null;
 		try {
@@ -61,7 +62,7 @@ public class DataArchivalController {
 		return PlatformServiceUtil.buildSuccessResponseWithData(message);
 	}
 	
-	@RequestMapping(value = "/getAllArchivalRecord", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@GetMapping(value = "/getAllArchivalRecord", produces = MediaType.APPLICATION_JSON_VALUE)
 	public @ResponseBody JsonObject getAllArchivalRecord() {
 		List<InsightsDataArchivalConfig> archivedDataList;
 		try {
@@ -73,7 +74,7 @@ public class DataArchivalController {
 		return PlatformServiceUtil.buildSuccessResponseWithData(archivedDataList);
 	}
 	
-	@RequestMapping(value = "/getActiveArchivalRecord", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@GetMapping(value = "/getActiveArchivalRecord",  produces = MediaType.APPLICATION_JSON_VALUE)
 	public @ResponseBody JsonObject getRegisteredWebHooks() {
 		List<InsightsDataArchivalConfig> activeList;
 		try {
@@ -85,7 +86,7 @@ public class DataArchivalController {
 		return PlatformServiceUtil.buildSuccessResponseWithData(activeList);
 	}
 	
-	@RequestMapping(value = "/inactivateArchivalRecord", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	@PostMapping(value = "/inactivateArchivalRecord", produces = MediaType.APPLICATION_JSON_VALUE)
 	public @ResponseBody JsonObject inactivateArchivalRecord(@RequestParam String archivalName) {
 		Boolean result = false;
 		try {
@@ -96,7 +97,7 @@ public class DataArchivalController {
 		return PlatformServiceUtil.buildSuccessResponseWithData(result);
 	}
 	
-	@RequestMapping(value = "/activateArchivalRecord", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	@PostMapping(value = "/activateArchivalRecord",  produces = MediaType.APPLICATION_JSON_VALUE)
 	public @ResponseBody JsonObject activateArchivalRecord(@RequestParam String archivalName) {
 		Boolean result = false;
 		try {
@@ -107,7 +108,7 @@ public class DataArchivalController {
 		return PlatformServiceUtil.buildSuccessResponseWithData(result);
 	}
 	
-	@RequestMapping(value = "/deleteArchivedRecord", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	@PostMapping(value = "/deleteArchivedRecord", produces = MediaType.APPLICATION_JSON_VALUE)
 	public @ResponseBody JsonObject deleteArchivalRecord(@RequestParam String archivalName) {
 		Boolean result = false;
 		try {
@@ -118,7 +119,7 @@ public class DataArchivalController {
 		return PlatformServiceUtil.buildSuccessResponseWithData(result);
 	}
 
-	@RequestMapping(value = "/updateArchivalSourceUrl", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	@PostMapping(value = "/updateArchivalSourceUrl", produces = MediaType.APPLICATION_JSON_VALUE)
 	public @ResponseBody JsonObject updateArchivalSourceUrl(@RequestBody String archivalURLDetailsJson) {
 		Boolean result = false;
 		try {

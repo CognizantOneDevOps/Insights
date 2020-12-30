@@ -202,11 +202,11 @@ public class TraceabilityDashboardServiceImpl implements TraceabilityDashboardSe
 	public Map<String, List<String>> format(JsonObject resp, List<String> sourceTool) {
 		Map<String, List<String>> mapOfToolAndUUIDS = new HashMap<>();
 		JsonElement val = null;
-		int dataArraySize = resp.getAsJsonArray("results").getAsJsonArray().get(0).getAsJsonObject().get("data")
+		int dataArraySize = resp.getAsJsonArray(TraceabilityConstants.RESULTS).getAsJsonArray().get(0).getAsJsonObject().get("data")
 				.getAsJsonArray().size();
 		for (int i = 0; i < dataArraySize; i++) {
 			List<String> uuidList = new ArrayList<>();
-			JsonArray rowArray = resp.getAsJsonArray("results").getAsJsonArray().get(0).getAsJsonObject().get("data")
+			JsonArray rowArray = resp.getAsJsonArray(TraceabilityConstants.RESULTS).getAsJsonArray().get(0).getAsJsonObject().get("data")
 					.getAsJsonArray().get(i).getAsJsonObject().get("row").getAsJsonArray();
 
 			if (rowArray.get(1).isJsonArray()) {
@@ -231,7 +231,7 @@ public class TraceabilityDashboardServiceImpl implements TraceabilityDashboardSe
 
 	public Map<String, String> formatNeo4jResponse(JsonObject resp, int hopCount) {
 		Map<String, String> map = new HashMap<>();
-		JsonArray jsonDataRespArray = resp.getAsJsonArray("results").getAsJsonArray().get(0).getAsJsonObject()
+		JsonArray jsonDataRespArray = resp.getAsJsonArray(TraceabilityConstants.RESULTS).getAsJsonArray().get(0).getAsJsonObject()
 				.get("data").getAsJsonArray();
 		if (jsonDataRespArray.size() > 0) {
 			if (hopCount == 1) {
@@ -318,7 +318,7 @@ public class TraceabilityDashboardServiceImpl implements TraceabilityDashboardSe
 		// Master Map contains toolname as string and list of toolpayload .
 		HashMap<String, List<JsonObject>> masterMap = new HashMap<>();
 		LinkedHashMap<String, List<JsonObject>> sortedmasterMap = new LinkedHashMap<>();
-		JsonArray responseArray = response.getAsJsonArray("results").getAsJsonArray().get(0).getAsJsonObject()
+		JsonArray responseArray = response.getAsJsonArray(TraceabilityConstants.RESULTS).getAsJsonArray().get(0).getAsJsonObject()
 				.get("data").getAsJsonArray();
 		int count = responseArray.size();
 		for (int j = 0; j < count; j++) {
@@ -337,7 +337,7 @@ public class TraceabilityDashboardServiceImpl implements TraceabilityDashboardSe
 					for (Map.Entry<String, JsonElement> toolKeyValueSetFromDataModel : keyset) {
 						// Every tool is JsonArray so loop it if it has more than one element get
 						// extract the value of the each key
-						if (toolKeyValueSetFromDataModel.getKey().equals("order"))
+						if (toolKeyValueSetFromDataModel.getKey().equals(TraceabilityConstants.ORDER))
 							formattedJsonObject.addProperty(toolKeyValueSetFromDataModel.getKey(),
 									toolKeyValueSetFromDataModel.getValue().toString());
 						JsonElement propertyValFromNeo4j = toolsArray.get(1).getAsJsonArray().get(i).getAsJsonObject()
@@ -372,10 +372,10 @@ public class TraceabilityDashboardServiceImpl implements TraceabilityDashboardSe
 		List<Map.Entry<String, List<JsonObject>>> list = new LinkedList<>(masterMap.entrySet());
 		Collections.sort(list, new Comparator<Map.Entry<String, List<JsonObject>>>() {
 			public int compare(Map.Entry<String, List<JsonObject>> o1, Map.Entry<String, List<JsonObject>> o2) {
-				if(o1.getValue().get(0).has("order"))
+				if(o1.getValue().get(0).has(TraceabilityConstants.ORDER))
 				{
-				return (Integer.valueOf(o1.getValue().get(0).get("order").getAsInt())
-						.compareTo((Integer.valueOf(o2.getValue().get(0).get("order").getAsInt()))));
+				return (Integer.valueOf(o1.getValue().get(0).get(TraceabilityConstants.ORDER).getAsInt())
+						.compareTo((Integer.valueOf(o2.getValue().get(0).get(TraceabilityConstants.ORDER).getAsInt()))));
 				}
 				else
 				{
@@ -405,17 +405,17 @@ public class TraceabilityDashboardServiceImpl implements TraceabilityDashboardSe
 				List<JsonObject> payload = entry.getValue();
 				JsonObject summary = new JsonObject();
 				JsonObject toolObjectFromDataModel = dataModel.get(toolName).getAsJsonObject();
-				if (toolObjectFromDataModel.has("messages")) // check the toolname has message
+				if (toolObjectFromDataModel.has(TraceabilityConstants.MESSAGES)) // check the toolname has message
 				{
-					int messageSize = toolObjectFromDataModel.get("messages").getAsJsonArray().size();
+					int messageSize = toolObjectFromDataModel.get(TraceabilityConstants.MESSAGES).getAsJsonArray().size();
 					for (int i = 0; i < messageSize; i++) {
-						JsonObject messageClause = toolObjectFromDataModel.get("messages").getAsJsonArray().get(i)
+						JsonObject messageClause = toolObjectFromDataModel.get(TraceabilityConstants.MESSAGES).getAsJsonArray().get(i)
 								.getAsJsonObject();
 						String operationName = messageClause.get("Operation").getAsString();
 						if (operationName.equals("SUM")) {
 							String operandName = messageClause.get(OPERAND_NAME).getAsString();
 							String operandValue = messageClause.get(OPERAND_VALUE).getAsString();
-							String message = messageClause.get("Message").getAsString();
+							String message = messageClause.get(TraceabilityConstants.MESSAGE).getAsString();
 							String resp = TraceabilitySummaryUtil.calSUM(operandName, operandValue, payload, message);
 							if (!resp.equals("")) {
 								summary.addProperty(String.valueOf(i), resp);
@@ -425,7 +425,7 @@ public class TraceabilityDashboardServiceImpl implements TraceabilityDashboardSe
 						if (operationName.equals("PERCENTAGE")) {
 							String operandName = messageClause.get(OPERAND_NAME).getAsString();
 							String operandValue = messageClause.get(OPERAND_VALUE).getAsString();
-							String message = messageClause.get("Message").getAsString();
+							String message = messageClause.get(TraceabilityConstants.MESSAGE).getAsString();
 							String resp = TraceabilitySummaryUtil.calPercentage(operandName, operandValue, payload,
 									message);
 							if (!resp.equals("")) {
@@ -435,7 +435,7 @@ public class TraceabilityDashboardServiceImpl implements TraceabilityDashboardSe
 						}
 						if (operationName.equals("TIMEDIFF")) {
 							String operandName = messageClause.get(OPERAND_NAME).getAsString();
-							String message = messageClause.get("Message").getAsString();
+							String message = messageClause.get(TraceabilityConstants.MESSAGE).getAsString();
 							String resp;
 							resp = TraceabilitySummaryUtil.calTimeDiffrence(operandName, payload, message);
 							if (!resp.equals("")) {
@@ -448,7 +448,7 @@ public class TraceabilityDashboardServiceImpl implements TraceabilityDashboardSe
 				}
 			} catch (Exception e) {
 				LOG.error(e.getMessage());
-				throw new InsightsCustomException("Traceability matrix not configured properly.");
+				throw new InsightsCustomException("Traceability matrix not configured properly...");
 			}
 		}
 		return summaryObject;
@@ -605,7 +605,7 @@ public class TraceabilityDashboardServiceImpl implements TraceabilityDashboardSe
 			LOG.error("Exception in neo4j");
 			throw new InsightsCustomException(e.getMessage());
 		}
-		return Arrays.asList(neo4jResponse.getJson().getAsJsonArray("results").getAsJsonArray().get(0).getAsJsonObject()
+		return Arrays.asList(neo4jResponse.getJson().getAsJsonArray(TraceabilityConstants.RESULTS).getAsJsonArray().get(0).getAsJsonObject()
 				.get("data").getAsJsonArray().get(0).getAsJsonObject().get("row").toString().replaceAll(PATTERN, "")
 				.split(","));
 	}

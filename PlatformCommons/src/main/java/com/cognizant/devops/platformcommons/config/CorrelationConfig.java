@@ -15,7 +15,11 @@
  ******************************************************************************/
 package com.cognizant.devops.platformcommons.config;
 
-public class CorrelationConfig {
+import java.io.Serializable;
+
+public class CorrelationConfig implements Serializable {
+
+	private static final long serialVersionUID = -9222292318762382698L;
 	private int correlationWindow = 48;
 	private int correlationFrequency = 4;
 	private int batchSize = 2000;

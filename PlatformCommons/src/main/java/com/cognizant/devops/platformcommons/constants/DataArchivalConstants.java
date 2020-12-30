@@ -16,6 +16,7 @@
 package com.cognizant.devops.platformcommons.constants;
 
 public interface DataArchivalConstants {
-	String TOOLNAME = "elastictransfer";
-	String TOOLCATEGORY = "SYSTEM";
+	 String TOOLNAME = "elastictransfer";
+	 String TOOLCATEGORY = "SYSTEM";
+	 String ARCHIVALNAME= "archivalName";
 }

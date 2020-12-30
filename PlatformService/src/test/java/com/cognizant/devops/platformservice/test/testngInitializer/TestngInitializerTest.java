@@ -31,6 +31,7 @@ import org.testng.annotations.BeforeSuite;
 import org.testng.annotations.Test;
 
 import com.cognizant.devops.platformcommons.config.ApplicationConfigCache;
+import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 
 @Test
 @ContextConfiguration(locations = { "classpath:spring-test-config.xml" })
@@ -48,14 +49,22 @@ public class TestngInitializerTest extends AbstractTestNGSpringContextTests{
 	private FilterChainProxy springSecurityFilterChain;
 
 	static {
-		ApplicationConfigCache.loadConfigCache();
+		try {
+			ApplicationConfigCache.loadConfigCache();
+		} catch (InsightsCustomException e) {
+			log.error(e);
+		}
 		log.debug("Testng initializer class to load Config Cache .... static");
 
 	}
 
 	@BeforeSuite
 	public void testOnStartup() throws ServletException {
-		ApplicationConfigCache.loadConfigCache();
+		try {
+			ApplicationConfigCache.loadConfigCache();
+		} catch (InsightsCustomException e) {
+			log.error(e);
+		}
 		log.debug("Testng initializer class to load Config Cache");
 	}
 }

@@ -21,6 +21,7 @@ export class FileUploadDialog implements OnInit {
   formDataFiles = new FormData();
   multipleFileAllowed = false;
   receivedData: any;
+  dialogHeader: string;
 
 
   constructor(public router: Router, public dialogRef: MatDialogRef<FileUploadDialog>,
@@ -28,6 +29,7 @@ export class FileUploadDialog implements OnInit {
     public messageDialog: MessageDialogService, public kpiService: KpiService,
     public contentService: ContentService, @Inject(MAT_DIALOG_DATA) public data: any) {
     this.receivedData = data;
+    this.dialogHeader = data.header;
     if (data.type != null && data.type != undefined) {
       this.fileUploadType = data.type;
     }

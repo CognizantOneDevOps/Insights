@@ -11,11 +11,14 @@ import OptionsGroup from './OptionsGroup';
 import { UseState } from './UseState';
 
 
-import { chartTypes, fontFamily, FontSizes, captionAlignment, axisPositions, themes, rotateValues, labels, pieAndDoughnutCharts, multiSeries, valuePositions, multiSeriesChats, combinationCharts, combinationWithLine, widgetCharts } from 'types';
-import { onTextChange, onClick, onChartTypeChanged, onValueChanged, onChanged, onSwitched, onDrillChange, onLevel2ChartTypeChanged, onLevel3ChartTypeChanged, onLevel3DrillChange, onLevel2ChartPropertiesChange, onLevel3ChartPropertiesChange } from './SingleSeriesEditorUtils';
+import { chartTypes, fontFamily, FontSizes, captionAlignment, axisPositions, themes, rotateValues, labels, pieAndDoughnutCharts, multiSeries, valuePositions, multiSeriesChats, 
+    combinationCharts, combinationWithLine, widgetCharts } from 'types';
+import { onTextChange, onClick, onChartTypeChanged, onValueChanged, onChanged, onSwitched, onDrillChange, onLevel2ChartTypeChanged, onLevel3ChartTypeChanged,
+     onLevel3DrillChange, onLevel2ChartPropertiesChange, 
+    onLevel3ChartPropertiesChange, onLevel2TrendLineChange, onLevel3TrendLineChange, onLevel2WiseDrillChange, onLevel3WiseDrillChange } from './SingleSeriesEditorUtils';
 import { onGraphModeChanged, onLevel2GraphModeChanged, onLevel3GraphModeChanged } from 'MultiSeriesEditorUtils';
 import { onCombinationTypeChanged, onLevel2CombinationTypeChanged, onLevel3CombinationTypeChanged } from 'CombinationSeriesEditorUtils';
-import { onPropsTextChange, onWidgetTypeChanged } from 'WidgetEditorUtils';
+import { onPropsTextChange, onTrendChange, onWidgetTypeChanged } from 'WidgetEditorUtils';
 import { onAddRemoveChange } from 'AddRemoveEditorUtils';
 import { getTemplateSrv, getBackendSrv } from '@grafana/runtime';
 import { addTimestampToQuery, convertResponseToDataFramesTable } from 'DrillDownUtil';
@@ -46,7 +49,10 @@ export class FusionEditor extends PureComponent<PanelEditorProps<ChartOptions>, 
             { label: 'Level-2', key: 'first', active: true },
             { label: 'Level-3', key: 'second', active: false }
         ];
-        const drillLabels = fetchDrillDownLabels(this.props);
+        let drillLabels;
+        if(this.props.options.enableDrillDown){
+            drillLabels = fetchDrillDownLabels(this.props);
+        }
         //console.log('drillLabels--', drillLabels);
 
         return (<>
@@ -87,6 +93,7 @@ export class FusionEditor extends PureComponent<PanelEditorProps<ChartOptions>, 
                                     </TabsBar>
                                     <TabContent>
                                         {state[0].active && <div>
+                                            
                                             <div className="form-field">
                                                 <InlineFormLabel width={12}>Single Series Chart Type</InlineFormLabel>
                                                 <Select width={25} options={chartTypes} defaultValue={chartTypes[0]}
@@ -113,9 +120,16 @@ export class FusionEditor extends PureComponent<PanelEditorProps<ChartOptions>, 
                                                     value={options.level2ChartProperties}
                                                 />
                                             </div>
+                                            <div className="form-field">
+                                                <InlineFormLabel width={10}>Level2 Trend Lines</InlineFormLabel>
+                                                <textarea rows={11} className="gf-form-input width-100 max-height-400px"
+                                                    onChange={(e) => onLevel2TrendLineChange(e, this.props)}
+                                                    value={options.level2TrendLines}
+                                                />
+                                            </div>
 
-
-                                            {drillLabels && drillLabels.map((name: any, index: any) => (
+                                            <Switch label="LevelWiseQuery" labelClass="width-8" checked={options.isLevel2LevelWiseQuery} onChange={(e) => onSwitched('isLevel2LevelWiseQuery', e, this.props)} />
+                                            {drillLabels && !this.props.options.isLevel2LevelWiseQuery && drillLabels.map((name: any, index: any) => (
 
                                                 <div className="gf-form-inline">
                                                     <div className="gf-form gf-form--grow">
@@ -130,6 +144,21 @@ export class FusionEditor extends PureComponent<PanelEditorProps<ChartOptions>, 
                                                     </div>
                                                 </div>
                                             ))}
+
+                                            {this.props.options.isLevel2LevelWiseQuery &&
+
+                                                <div className="gf-form-inline">
+                                                    <div className="gf-form gf-form--grow">
+                                                        <InlineFormLabel width={10}>Level Query</InlineFormLabel>
+                                                        <Button id="levelbutton" icon="sync" onClick={(e => this.testQuery(e, 'level', this.props, ''))}>Test Query</Button>
+
+                                                        <textarea id="levelquery" rows={11} className="gf-form-input width-100 max-height-400px"
+                                                            onChange={(e) => onLevel2WiseDrillChange(e, this.props)}
+                                                            required value={this.props.options.level2LevelWiseQuery}
+                                                        />
+                                                    </div>
+                                                </div>
+                                            }
                                         </div>}
                                         
                                         {state[1].active && this.props.options.enableLevel3 && <div>
@@ -160,7 +189,16 @@ export class FusionEditor extends PureComponent<PanelEditorProps<ChartOptions>, 
                                                     value={options.level3ChartProperties}
                                                 />
                                             </div>
-                                            {this.props.options.level0 && this.props.options.level0.map((name: any, index: any) => (
+
+                                            <div className="form-field">
+                                                <InlineFormLabel width={10}>Level3 Trend Lines</InlineFormLabel>
+                                                <textarea rows={11} className="gf-form-input width-100 max-height-400px"
+                                                    onChange={(e) => onLevel3TrendLineChange(e, this.props)}
+                                                    value={options.level3TrendLines}
+                                                />
+                                            </div>
+                                            <Switch label="LevelWiseQuery" labelClass="width-8" checked={options.isLevel3LevelWiseQuery} onChange={(e) => onSwitched('isLevel3LevelWiseQuery', e, this.props)} />
+                                            {this.props.options.level0 && !this.props.options.isLevel3LevelWiseQuery && this.props.options.level0.map((name: any, index: any) => (
 
                                                 <div className="gf-form-inline">
                                                     <div className="gf-form gf-form--grow">
@@ -177,6 +215,23 @@ export class FusionEditor extends PureComponent<PanelEditorProps<ChartOptions>, 
                                                     </div>
                                                 </div>
                                             ))}
+
+                                            {this.props.options.level0 && this.props.options.isLevel3LevelWiseQuery &&
+
+                                                <div className="gf-form-inline">
+                                                    <div className="gf-form gf-form--grow">
+                                                        <InlineFormLabel width={10}>Level Query</InlineFormLabel>
+                                                        <Button id="levelbutton" icon="sync" onClick={(e => this.testQuery(e, 'level', this.props, ''))}>Test Query</Button>
+
+                                                        <textarea id="levelquery" rows={11} className="gf-form-input width-100 max-height-400px"
+                                                            onChange={(e) => onLevel3WiseDrillChange(e, this.props)}
+                                                            required value={this.props.options.level3LevelWiseQuery}
+                                                        />
+                                                    </div>
+                                                </div>
+                                            }
+
+                                            
 
                                         </div>}
                                         {/* {state[2].active && <div>Third tab content</div>}*/}
@@ -387,6 +442,19 @@ export class FusionEditor extends PureComponent<PanelEditorProps<ChartOptions>, 
                     </div>
                 }
 
+            </OptionsGroup>
+
+            {/*Trend Lines*/}
+            <OptionsGroup title="Trend Lines" key="Trend Lines" defaultToClosed={true}>
+                <div className="gf-form-inline">
+                    <div className="gf-form gf-form--grow">
+                        <textarea rows={11} className="gf-form-input width-100 max-height-400px"
+                            onChange={(e) => onTrendChange(e, this.props)}
+                            value={options.trendline} required
+                        />
+                    </div>
+                </div>
+               {/* <button className="btn btn-success" onClick={(e) => onPropsApplyClick(e, this.props)} type="submit" disabled={options.SbtnEnabled}>Apply</button>*/}
             </OptionsGroup>
 
             {/*Advance View*/}
@@ -810,7 +878,7 @@ export class FusionEditor extends PureComponent<PanelEditorProps<ChartOptions>, 
             </OptionsGroup>
         </>);
     }
-    testQuery(e: any, index: any, props: any, name: any) {
+    testQuery(e: any, type: any, props: any, name: any) {
         this.setState({ loader: !this.state.loader });
         this.setState({ close: !this.state.close });
         //console.log('p--', props.options[index]);
@@ -818,7 +886,7 @@ export class FusionEditor extends PureComponent<PanelEditorProps<ChartOptions>, 
             let data = res.data;
             if (res.status === 200) {
                 props.options.datasourceId = data.id;
-                this.fetchDrillDownData(props, true, index, name);
+                this.fetchDrillDownData(props, true, type, name);
             }
             else {
                 return { status: 'error', message: res.error };
@@ -840,10 +908,16 @@ export class FusionEditor extends PureComponent<PanelEditorProps<ChartOptions>, 
     }
 
 
-    fetchDrillDownData(props: any, drilldown: any, index: any, name: any) {
-        let queryText = props.options.drillObj[name] ? props.options.drillObj[name] : props.options.level3drillObj[name];
+    fetchDrillDownData(props: any, drilldown: any, type: any, name: any) {
+        let queryText;
+        if(type == 'level'){
+            queryText = props.options.level2LevelWiseQuery;
+        }else{
+            queryText = props.options.drillObj[name] ? props.options.drillObj[name] : props.options.level3drillObj[name];
+        }
+        
         let dquery = getTemplateSrv().replace(queryText, {}, this.applyTemplateVariables);
-        dquery = addTimestampToQuery(dquery, props.timeRange);
+        dquery = addTimestampToQuery(dquery, props.data, "");
         //console.log('dquery--', dquery);
         const queryJson = {
             "statements": [

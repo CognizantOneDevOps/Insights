@@ -24,6 +24,7 @@ import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 
+import com.cognizant.devops.platformcommons.config.ApplicationConfigInterface;
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
 import com.cognizant.devops.platformcommons.core.enums.WorkflowTaskEnum;
@@ -33,7 +34,6 @@ import com.cognizant.devops.platformdal.workflow.InsightsWorkflowTask;
 import com.cognizant.devops.platformdal.workflow.InsightsWorkflowTaskSequence;
 import com.cognizant.devops.platformworkflow.workflowtask.exception.WorkflowTaskInitializationException;
 import com.cognizant.devops.platformworkflow.workflowtask.utils.WorkflowUtils;
-import com.cognizant.devops.platformworkflow.workflowthread.core.WorkflowThreadPool;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -41,7 +41,7 @@ import com.google.gson.JsonParser;
 /**
  * This class mainly used to handle all retry workflow scenario
  */
-public class WorkflowRetryExecutor implements Job {
+public class WorkflowRetryExecutor implements Job, ApplicationConfigInterface {
 
 	private static final Logger log = LogManager.getLogger(WorkflowRetryExecutor.class);
 	private static final long serialVersionUID = -282836461086726715L;
@@ -52,8 +52,13 @@ public class WorkflowRetryExecutor implements Job {
 	@Override
 	public void execute(JobExecutionContext context) throws JobExecutionException {
 		log.debug(" Worlflow Detail ====  Schedular Inside WorkflowRetryExecutor ");
-		initilizeWorkflowTasks();
-		retryWorkflows();	
+		try {
+			ApplicationConfigInterface.loadConfiguration();
+			initilizeWorkflowTasks();
+			retryWorkflows();
+		} catch (Exception e) {
+			log.error(e);
+		}	
 	}
 	
 	

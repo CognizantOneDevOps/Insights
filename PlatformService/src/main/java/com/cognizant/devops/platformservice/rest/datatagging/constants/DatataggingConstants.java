@@ -18,6 +18,9 @@ package com.cognizant.devops.platformservice.rest.datatagging.constants;
 
 public final class DatataggingConstants {
 
+	private DatataggingConstants() {
+		super();
+	}
 	public static final String VALUE = "value";
 	public static final String EXCEL_FILE="data/data.csv";
 	public static final String COLON=":";

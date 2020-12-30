@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="DEBUG">
+
+	<Appenders>
+		<Console name="Console" target="SYSTEM_OUT">
+			<PatternLayout
+				pattern="%d{yyyy-MM-dd HH:mm:ss} %p [%t]:%c{1}.%M()%L :: %m%n" />
+		</Console>
+
+
+
+		<RollingFile name="PlatformService"
+			filename="${env:INSIGHTS_HOME}/logs/PlatformService/platformService.log"
+			filepattern="${env:INSIGHTS_HOME}/logs/PlatformService/platformService-%i.log">
+			<PatternLayout
+				pattern="%d{dd-MM-yyyy HH:mm:ss,SSS} %p %c{1}.%M()%L :: %m%n" />
+			<Policies>
+				<SizeBasedTriggeringPolicy size="10 MB" />
+			</Policies>
+			<DefaultRolloverStrategy max="20" />
+		</RollingFile>
+
+		<RollingFile name="PlatformEngine"
+			filename="${env:INSIGHTS_HOME}/logs/PlatformEngine/platformEngine.log"
+			filepattern="${env:INSIGHTS_HOME}/logs/PlatformEngine/platformEngine-%i.log">
+			<PatternLayout
+				pattern="%d{yyyy-MM-dd HH:mm:ss} %p [%t]:%c{3}.%M()%L %-5p:: %m%n" />
+			<Policies>
+				<SizeBasedTriggeringPolicy size="10 MB" />
+			</Policies>
+			<DefaultRolloverStrategy max="20" />
+		</RollingFile>
+
+		<RollingFile name="PlatformReport"
+			filename="${env:INSIGHTS_HOME}/logs/PlatformWorkflow/platformWorkflow.log"
+			filepattern="${env:INSIGHTS_HOME}/logs/PlatformWorkflow/platformWorkflow-%i.log">
+			<PatternLayout
+				pattern="%d{yyyy-MM-dd HH:mm:ss} %p [%thread]:%c{1}.%M()%L :: %m%n" />
+			<Policies>
+				<SizeBasedTriggeringPolicy size="10 MB" />
+			</Policies>
+			<DefaultRolloverStrategy max="20" />
+		</RollingFile>
+
+		<RollingFile name="PlatformRegressionTest"
+			filename="${env:INSIGHTS_HOME}/logs/PlatformRegressionTest/platformRegressionTest.log"
+			filepattern="${env:INSIGHTS_HOME}/logs/PlatformRegressionTest/platformRegressionTest-%i.log">
+			<PatternLayout
+				pattern="%d{yyyy-MM-dd HH:mm:ss} %p [%t]:%c{3}.%M()%L %-5p:: %m%n" />
+			<Policies>
+				<SizeBasedTriggeringPolicy size="10 MB" />
+			</Policies>
+			<DefaultRolloverStrategy max="20" />
+		</RollingFile>
+		
+		<RollingFile name="ApplicationModuleStartupLog"
+			filename="${env:INSIGHTS_HOME}/logs/ApplicationModuleStartupLog.log"
+			filepattern="${env:INSIGHTS_HOME}/logs/ApplicationModuleStartupLog-%i.log">
+			<PatternLayout
+				pattern="%d{yyyy-MM-dd HH:mm:ss} %p [%t]:%c{3}.%M()%L %-5p:: %m%n" />
+			<Policies>
+				<SizeBasedTriggeringPolicy size="10 MB" />
+			</Policies>
+			<DefaultRolloverStrategy max="20" />
+		</RollingFile>
+
+	</Appenders>
+
+	<Loggers>
+		<Logger name="org.hibernate" level="error" additivity="false">
+			<AppenderRef ref="Console" />
+		</Logger>
+
+		<Logger name="org" level="error" additivity="false">
+			<AppenderRef ref="Console" />
+		</Logger>
+
+		<Logger name="com.cognizant" level="debug" additivity="false">
+			<AppenderRef ref="Console" />
+			<AppenderRef ref="ApplicationModuleStartupLog" />
+		</Logger>
+
+		<!-- NettyClientHandler -->
+		<Logger name="io.grpc.netty" level="error">
+			<AppenderRef ref="Console" />
+		</Logger>
+
+		<!-- SslHandler -->
+		<Logger name="io.netty" level="error">
+			<AppenderRef ref="Console" />
+		</Logger>
+
+		<!-- Hyperledger network events polling -->
+		<Logger name="org.hyperledger" level="error">
+			<AppenderRef ref="Console" />
+		</Logger>
+
+		<Logger name="org.ehcache" level="error" additivity="false">
+			<AppenderRef ref="Console" />
+		</Logger>
+
+		<Logger name="com.mchange.v2" level="error" additivity="false">
+			<AppenderRef ref="Console" />
+		</Logger>
+
+		<Root name="root" level="debug" additivity="false">
+			<AppenderRef ref="Console" />
+			<AppenderRef ref="ApplicationModuleStartupLog" />
+		</Root>
+	</Loggers>
+</Configuration>

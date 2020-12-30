@@ -50,7 +50,7 @@ public class EngineAggregatorCorelationModuleTest {
 	private Properties p = null;
 
 	@BeforeTest
-	public void onInit() throws InterruptedException, IOException {
+	public void onInit() throws InterruptedException, IOException, InsightsCustomException {
 
 		ApplicationConfigCache.loadConfigCache();
 

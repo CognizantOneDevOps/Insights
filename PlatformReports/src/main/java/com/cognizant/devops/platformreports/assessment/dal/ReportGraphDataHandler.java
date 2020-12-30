@@ -24,6 +24,7 @@ import java.util.Map.Entry;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import com.cognizant.devops.platformcommons.constants.AssessmentReportAndWorkflowConstants;
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
 import com.cognizant.devops.platformcommons.core.enums.KPIJobResultAttributes;
 import com.cognizant.devops.platformcommons.core.util.InsightsUtils;
@@ -76,10 +77,10 @@ public class ReportGraphDataHandler implements ReportDataHandler {
 			parseGraphResponseForError(graphResponse);
 		} catch (InsightsCustomException e) {
 			log.error("Error while saving neo4j record {} ", e.getMessage());
-			throw new InsightsJobFailedException("Error while saving neo4j record {} " + e.getMessage());
+			throw new InsightsJobFailedException("Error while saving neo4j record  " + e.getMessage());
 		} catch (Exception e) {
-			log.error("Error while saving neo4j record {}", e.getMessage());
-			throw new InsightsJobFailedException("Error while saving neo4j record {} " + e.getMessage());
+			log.error("Error while saving neo4j record {} ", e.getMessage());
+			throw new InsightsJobFailedException("Error while saving neo4j record " + e.getMessage());
 		}
 	}
 
@@ -94,24 +95,26 @@ public class ReportGraphDataHandler implements ReportDataHandler {
 				graphDBHandler = new GraphDBHandler(kpiDefinition.getInputDatasource());
 			}
 			List<JsonObject> graphResp = fetchData(graphQuery);
-			JsonArray graphJsonResult = graphResp.get(0).getAsJsonArray("results");
+			JsonArray graphJsonResult = graphResp.get(0).getAsJsonArray(AssessmentReportAndWorkflowConstants.RESULTS);
 
 			JsonArray data = graphJsonResult.get(0).getAsJsonObject().getAsJsonArray("data");
-			JsonArray columns = graphJsonResult.get(0).getAsJsonObject().getAsJsonArray("columns");
-			log.debug(" Worlflow Detail ==== KPI Id {}  record return by query ==== {} ", kpiDefinition.getKpiId(),
+			JsonArray columns = graphJsonResult.get(0).getAsJsonObject().getAsJsonArray(AssessmentReportAndWorkflowConstants.COLUMNS);
+			log.debug(" Worlflow Detail ==== KPI Id {0}  record return by query ==== {1} ", kpiDefinition.getKpiId(),
 					data.size());
 			if (data.size() > 0) {
 				listOfResultJson.addAll(creatingResulJsontFromGraphResponce(data, columns, kpiDefinition, model));
 			} else {
 				log.error("Worlflow Detail ==== No Result Neo4j query returned invalid result for the KPIID {} ",
 						kpiDefinition.getKpiId());
-				/*InsightsStatusProvider.getInstance().createInsightStatusNode(
-						"Neo4j query returned invalid result for the KPIID " + kpiDefinition.getKpiId(),
-						PlatformServiceConstants.FAILURE);*/
+				/*
+				 * InsightsStatusProvider.getInstance().createInsightStatusNode(
+				 * "Neo4j query returned invalid result for the KPIID " +
+				 * kpiDefinition.getKpiId(), PlatformServiceConstants.FAILURE);
+				 */
 			}
 		} catch (Exception e) {
-			log.error("Exception while running neo4j operation {} ", e);
-			throw new InsightsJobFailedException("Exception while running neo4j operation {} " + e.getMessage());
+			log.error("Exception while running neo4j operation  ", e);
+			throw new InsightsJobFailedException("Exception while running neo4j operation  " + e.getMessage());
 		}
 		return listOfResultJson;
 	}
@@ -122,10 +125,10 @@ public class ReportGraphDataHandler implements ReportDataHandler {
 		ReportGraphDataHandler neo4jExecutor = new ReportGraphDataHandler();
 		String query_type = "NEO4J_" + contentConfigDefinition.getCategory().toString();
 		String graphQuery = QueryEnum.valueOf(query_type).toString();
-		graphQuery = graphQuery.replaceAll(":kpiId", String.valueOf(contentConfigDefinition.getKpiId()))
-				.replaceAll(":executionId", String.valueOf(contentConfigDefinition.getExecutionId()))
-				.replaceAll(":assessmentId", String.valueOf(contentConfigDefinition.getAssessmentId()));
-		log.debug("Worlflow Detail ====  for kpi {} contentId {} graphQuery   {} ", contentConfigDefinition.getKpiId(),
+		graphQuery = graphQuery.replace(":kpiId", String.valueOf(contentConfigDefinition.getKpiId()))
+				.replace(":executionId", String.valueOf(contentConfigDefinition.getExecutionId()))
+				.replace(":assessmentId", String.valueOf(contentConfigDefinition.getAssessmentId()));
+		log.debug("Worlflow Detail ====  for kpi {0} contentId {1} graphQuery   {2} ", contentConfigDefinition.getKpiId(),
 				contentConfigDefinition.getContentId(), graphQuery);
 		List<JsonObject> graphResponse = neo4jExecutor.fetchData(graphQuery);
 		creatingResultDetailFromGraphResponce(kpiDetailList, contentConfigDefinition, graphResponse.get(0));
@@ -144,11 +147,11 @@ public class ReportGraphDataHandler implements ReportDataHandler {
 			log.error(e);
 			log.error("Error while saving neo4j content result  record {} ", e.getMessage());
 			throw new InsightsJobFailedException(
-					"Error while saving neo4j content result  record {} " + e.getMessage());
+					"Error while saving neo4j content result  record  " + e.getMessage());
 		} catch (Exception e) {
 			log.error(e);
 			log.error("Error while saving neo4j content result record {} ", e.getMessage());
-			throw new InsightsJobFailedException("Error while saving neo4j content result record {} " + e.getMessage());
+			throw new InsightsJobFailedException("Error while saving neo4j content result record  " + e.getMessage());
 		}
 	}
 
@@ -186,7 +189,7 @@ public class ReportGraphDataHandler implements ReportDataHandler {
 				if (!rowData.get(rowDataIndex).isJsonNull() && !columns.get(rowDataIndex).isJsonNull()) {
 					dataJson.add(columns.get(rowDataIndex).getAsString(), rowData.get(rowDataIndex));
 				} else {
-					log.error("Either row or column data of graph response is not available for the KPI ID {} ",
+					log.error("Either row or column data of graph response is not available for the KPI ID {}",
 							kpiDefinition.getKpiId());
 
 				}
@@ -207,7 +210,7 @@ public class ReportGraphDataHandler implements ReportDataHandler {
 				listOfResultJson.add(dataJson);
 			} else {
 				log.error(
-						" No result calculated  or  ResultField row value field is null or zero for the KPI ID {}....",
+						" No result calculated  or  ResultField row value field is null or zero for the KPI ID {} ....",
 						kpiDefinition.getKpiId());
 
 			}
@@ -234,8 +237,8 @@ public class ReportGraphDataHandler implements ReportDataHandler {
 
 	public void creatingResultDetailFromGraphResponce(List<InsightsKPIResultDetails> kpiDetailList,
 			ContentConfigDefinition contentConfigDefinition, JsonObject graphResp) {
-		JsonArray graphJsonResult = graphResp.getAsJsonArray("results");
-		log.debug("Worlflow Detail ====  KPI Id {}  record return by key query ==== {} ",
+		JsonArray graphJsonResult = graphResp.getAsJsonArray(AssessmentReportAndWorkflowConstants.RESULTS);
+		log.debug("Worlflow Detail ====  KPI Id {}  record return by key query ==== {}",
 				contentConfigDefinition.getKpiId(),
 				graphResp.getAsJsonArray("results").size());
 		JsonArray data = graphJsonResult.get(0).getAsJsonObject().getAsJsonArray("data");
@@ -259,8 +262,8 @@ public class ReportGraphDataHandler implements ReportDataHandler {
 					resultMapping.setResults(results);
 					kpiDetailList.add(resultMapping);
 				} catch (Exception e) {
-					log.error(" Error while parsing kpi result {} ", e);
-					throw new InsightsJobFailedException(" Error while parsing kpi result {} " + e.getMessage());
+					log.error(" Error while parsing kpi result  ", e);
+					throw new InsightsJobFailedException(" Error while parsing kpi result  " + e.getMessage());
 				}
 			}
 		}
@@ -270,9 +273,9 @@ public class ReportGraphDataHandler implements ReportDataHandler {
 	public JsonArray fetchVisualizationResults(String query) {
 
 		List<JsonObject> graphResponse = fetchData(query);
-		JsonArray graphJsonResult = graphResponse.get(0).getAsJsonArray("results");
+		JsonArray graphJsonResult = graphResponse.get(0).getAsJsonArray(AssessmentReportAndWorkflowConstants.RESULTS);
 		JsonArray data = graphJsonResult.get(0).getAsJsonObject().getAsJsonArray("data");
-		JsonArray columns = graphJsonResult.get(0).getAsJsonObject().getAsJsonArray("columns");
+		JsonArray columns = graphJsonResult.get(0).getAsJsonObject().getAsJsonArray(AssessmentReportAndWorkflowConstants.COLUMNS);
 		return creatingVisualizationJsontFromGraphResponce(data, columns);
 
 	}
@@ -283,7 +286,7 @@ public class ReportGraphDataHandler implements ReportDataHandler {
 		vQuery = QueryEnum.valueOf(QueryEnum.NEO4J_VCONTENTQUERY.name()).toString();
 		vQuery = vQuery.replace(":kpiId", String.valueOf(kpiId)).replace(":executionId", String.valueOf(executionId))
 				.replace(":assessmentId", String.valueOf(assessmentId));
-		log.debug("Worlflow Detail ==== content Visualization query {}   ", vQuery);
+		log.debug("Worlflow Detail ==== content Visualization query{}  ", vQuery);
 		return fetchVisualizationResults(vQuery);
 	}
 
@@ -299,7 +302,7 @@ public class ReportGraphDataHandler implements ReportDataHandler {
 		}
 		if (resultArray.size() > 0) {
 			JsonObject kpiResultObject = new JsonObject();
-			kpiResultObject.add("columns", columns);
+			kpiResultObject.add(AssessmentReportAndWorkflowConstants.COLUMNS, columns);
 			kpiResultObject.add("data", resultArray);
 			listOfResultJson.add(kpiResultObject);
 		}

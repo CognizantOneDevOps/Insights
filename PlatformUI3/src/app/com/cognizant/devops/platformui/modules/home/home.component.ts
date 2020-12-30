@@ -26,6 +26,7 @@ import { AboutDialog } from '@insights/app/modules/about/about-show-popup';
 import { MatDialog } from '@angular/material';
 import { ImageHandlerService } from '@insights/common/imageHandler.service';
 import { MessageDialogService } from '@insights/app/modules/application-dialog/message-dialog-service';
+import { ServerConfigurationService } from '@insights/app/modules/server-configuration/server-configuration-service';
 
 @Component({
   selector: 'app-home',
@@ -86,13 +87,14 @@ export class HomeComponent implements OnInit {
   year: any;
   aboutPageURL = "https://onedevops.atlassian.net/wiki/spaces/OI/pages/218936/Release+Notes";
   helpPageURL = "https://onedevops.atlassian.net/wiki/spaces/OI/overview";
+  isServerConfigAvailable: boolean = false;
 
 
   constructor(private grafanaService: GrafanaAuthenticationService,
     private cookieService: CookieService, private config: InsightsInitService,
     public router: Router, private dataShare: DataSharedService,
     private dialog: MatDialog, private imageHandeler: ImageHandlerService,
-    public messageDialog: MessageDialogService) {
+    public messageDialog: MessageDialogService, public serverconfigService: ServerConfigurationService) {
     console.log("Home page constructer ");
     if (this.depth === undefined) {
       this.depth = 0;
@@ -114,6 +116,7 @@ export class HomeComponent implements OnInit {
     window.addEventListener('message', receiveMessage, false);
     this.showLogoutButton = this.dataShare.getlogoutDisplay();
     console.log(" showLogoutButton " + this.showLogoutButton)
+   
     this.getInformationFromGrafana();
   }
 
@@ -123,6 +126,11 @@ export class HomeComponent implements OnInit {
     var rightNow = this.dataShare.getTimeZone();
     this.timeZone = rightNow.split(/\s/).reduce((response, word) => response += word.slice(0, 1), '')
     this.year = this.dataShare.getCurrentYear();
+    this.grafanaService.serverConfigSubject.subscribe(res => {
+      if (res === 'RELOAD_MENU') {
+        this.getServerConfigInfo();
+      }
+    })
   }
 
   onMenuClick() {
@@ -163,6 +171,8 @@ export class HomeComponent implements OnInit {
     }
   }
 
+ 
+
   public async getInformationFromGrafana() {
     let currentUserResponce: any;
     let self = this;
@@ -183,7 +193,7 @@ export class HomeComponent implements OnInit {
       this.dataShare.setOrgAndRole(self.selectedOrg, self.userCurrentOrg, self.userRole);
       this.cookieService.set('grafanaRole', self.userRole.toString());
       this.cookieService.set('grafanaOrg', self.userCurrentOrg);
-      self.router.navigateByUrl('/InSights/Home/landingPage/' + self.dataShare.getOrgId(), { skipLocationChange: true, replaceUrl: true });
+      
       this.loadorganizations();
     } else {
       console.log(" user and user organization data is not valid  ")
@@ -193,7 +203,24 @@ export class HomeComponent implements OnInit {
     } else {
       this.showAdminTab = false;
     }
-    this.loadMenuItem();
+
+    this.getServerConfigInfo();
+    
+  }
+
+   getServerConfigInfo() {
+    var self = this;
+     this.serverconfigService.getServerConfigStatus().then( function (serverConfigResponse) {
+      console.log(serverConfigResponse);
+      self.isServerConfigAvailable = serverConfigResponse.data.isServerConfigAvailable;
+      self.loadMenuItem();
+      if(self.isServerConfigAvailable){
+        self.loadCustomerLogo();
+        self.router.navigateByUrl('/InSights/Home/landingPage/' + self.dataShare.getOrgId(), { skipLocationChange: true, replaceUrl: true });
+      }else{
+        self.router.navigateByUrl('/InSights/Home/server-configuration' , { skipLocationChange: true, replaceUrl: true });
+      }
+    });
   }
 
 
@@ -257,202 +284,226 @@ export class HomeComponent implements OnInit {
   }
 
   public loadMenuItem() {
-    this.navItems = [
-      {
-        displayName: 'Dashboard Groups',
-        iconName: 'feature',
-        isAdminMenu: false,
-        showMenu: true,
-        title: "Click on Organization to see various Org's Dashboards",
-        isToolbarDisplay: InsightsInitService.enableInsightsToolbar,
-        children: this.navOrgList
-      },
-      {
-        displayName: 'Audit Reporting',
-        iconName: 'feature',
-        isAdminMenu: true,
-        showMenu: InsightsInitService.showAuditReporting,
-        title: "Audit Report and search assets",
-        isToolbarDisplay: InsightsInitService.enableInsightsToolbar,
-        children: [
-          {
-            displayName: 'Search Assets',
-            iconName: 'feature',
-            route: 'InSights/Home/blockchain',
-            isToolbarDisplay: InsightsInitService.enableInsightsToolbar,
-            showMenu: InsightsInitService.showAuditReporting,
-            title: "Search Assets",
-            isAdminMenu: true
-          }
-
-        ]
-      },
-      {
-        displayName: 'Playlist',
-        iconName: 'feature',
-        route: 'InSights/Home/playlist',
-        isToolbarDisplay: false,
-        showMenu: true,
-        title: "Playlist",
-        isAdminMenu: false
-      },
-      {
-        displayName: 'Report Management',
-        iconName: 'feature',
-        route: 'InSights/Home/reportmanagement',
-        isToolbarDisplay: InsightsInitService.enableInsightsToolbar,
-        showMenu: true,
-        title: "Report Management",
-        isAdminMenu: false
-      },
-      {
-        displayName: 'Data Dictionary',
-        iconName: 'datadictionary',
-        route: 'InSights/Home/datadictionary',
-        isToolbarDisplay: InsightsInitService.enableInsightsToolbar,
-        showMenu: true,
-        title: "Data Dictionary",
-        isAdminMenu: false
-      },
-      {
-        displayName: 'Health Check',
-        iconName: 'feature',
-        route: 'InSights/Home/healthcheck',
-        isToolbarDisplay: InsightsInitService.enableInsightsToolbar,
-        showMenu: true,
-        title: "Health Check",
-        isAdminMenu: true
-      },
-
-      {
-        displayName: 'Configuration',
-        iconName: 'admin',
-        isToolbarDisplay: InsightsInitService.enableInsightsToolbar,
-        isAdminMenu: true,
-        title: "Configuration",
-        showMenu: true,
-        children: [
-          {
-            displayName: 'Agent Management',
-            iconName: 'feature',
-            route: 'InSights/Home/agentmanagement',
-            isToolbarDisplay: InsightsInitService.enableInsightsToolbar,
-            showMenu: true,
-            title: "Agent Management",
-            isAdminMenu: true
-          },
-          {
-            displayName: 'Webhook Configuration',
-            iconName: 'feature',
-            route: 'InSights/Home/webhook',
-            isToolbarDisplay: InsightsInitService.enableInsightsToolbar,
-            showMenu: InsightsInitService.showWebhookConfiguration,
-            title: "WebHook",
-            isAdminMenu: true
-          },
-          {
-            displayName: 'Bulk Upload',
-            iconName: 'feature',
-            route: 'InSights/Home/bulkupload',
-            isToolbarDisplay: InsightsInitService.enableInsightsToolbar,
-            showMenu: true,
-            title: "Bulk Upload",
-            isAdminMenu: true
-          },
-          {
-            displayName: 'Group & Users',
-            iconName: 'feature',
-            route: 'InSights/Home/accessGroupManagement',
-            isToolbarDisplay: InsightsInitService.enableInsightsToolbar,
-            showMenu: true,
-            title: "Group & Users",
-            isAdminMenu: true
-          },
-          {
-            displayName: 'Co-Relation Builder',
-            iconName: 'feature',
-            route: 'InSights/Home/relationship-builder',
-            isToolbarDisplay: InsightsInitService.enableInsightsToolbar,
-            showMenu: true,
-            title: "Relationship-Builder",
-            isAdminMenu: true
-          },
-          {
-            displayName: 'Business Mapping',
-            iconName: 'feature',
-            route: 'InSights/Home/businessmapping',
-            isToolbarDisplay: InsightsInitService.enableInsightsToolbar,
-            showMenu: InsightsInitService.showBusinessMapping,
-            title: "Business Mapping",
-            isAdminMenu: true
-          },
-		  {
-            displayName: 'Report Configuration',
-            iconName: 'feature',
-            isToolbarDisplay: InsightsInitService.enableInsightsToolbar,
-            showMenu: true,
-            title: "Report Configuration",
-            isAdminMenu: false,
-            children:[
-              {
-                displayName: 'Kpi Configuration',
-                iconName: 'feature',
-                route: 'InSights/Home/kpicreation',
-                isToolbarDisplay: InsightsInitService.enableInsightsToolbar,
-                showMenu: true,
-                title: "Kpi Creation",
-                isAdminMenu: false
-              },
-              {
-                displayName: 'Content Configuration',
-                iconName: 'feature',
-                route: 'InSights/Home/contentConfig',
-                isToolbarDisplay: InsightsInitService.enableInsightsToolbar,
-                showMenu: true,
-                title: "Content Configuration",
-                isAdminMenu: false
-              },
-              {
-                displayName: 'Report Template Configuration',
-                iconName: 'feature',
-                route: 'InSights/Home/reportTemplate',
-                isToolbarDisplay: InsightsInitService.enableInsightsToolbar,
-                showMenu: true,
-                title: "Report Template Configuration",
-                isAdminMenu: false
-              }
-            ]
-          },
-          {
-            displayName: 'Logo Setting',
-            iconName: 'feature',
-            route: 'InSights/Home/logoSetting',
-            isToolbarDisplay: InsightsInitService.enableInsightsToolbar,
-            showMenu: true,
-            title: "Logo Setting",
-            isAdminMenu: true
-          },
-		  {
-            displayName: 'Data Archival',
-            iconName: 'feature',
-            route: 'InSights/Home/dataarchiving',
-            isToolbarDisplay: InsightsInitService.enableInsightsToolbar,
-            showMenu: true,
-            title: "Data Archival",
-            isAdminMenu: true
-          },
-           {
-             displayName: 'Forecasting',
-             iconName: 'feature',
-             route: 'InSights/Home/modelmanagement',
-             isToolbarDisplay: InsightsInitService.enableInsightsToolbar,
-             showMenu: true,
-             title: "Forecasting",
-             isAdminMenu: false
-           }        
-        ]
-      }
-    ];
+    console.log( " this.isServerConfigAvailable "+this.isServerConfigAvailable)
+    if(!this.isServerConfigAvailable){
+      this.navItems =[
+        {
+          displayName: 'Server Configuration',
+          iconName: 'feature',
+          route: 'InSights/Home/server-configuration',
+          isToolbarDisplay: InsightsInitService.enableInsightsToolbar,
+          showMenu: true,
+          title: "Server Configuration",
+          isAdminMenu: true
+        }
+      ];
+    }else{
+      this.navItems = [
+        {
+          displayName: 'Dashboard Groups',
+          iconName: 'feature',
+          isAdminMenu: false,
+          showMenu: true,
+          title: "Click on Organization to see various Org's Dashboards",
+          isToolbarDisplay: InsightsInitService.enableInsightsToolbar,
+          children: this.navOrgList
+        },
+        {
+          displayName: 'Audit Reporting',
+          iconName: 'feature',
+          isAdminMenu: true,
+          showMenu: InsightsInitService.showAuditReporting,
+          title: "Audit Report and search assets",
+          isToolbarDisplay: InsightsInitService.enableInsightsToolbar,
+          children: [
+            {
+              displayName: 'Search Assets',
+              iconName: 'feature',
+              route: 'InSights/Home/blockchain',
+              isToolbarDisplay: InsightsInitService.enableInsightsToolbar,
+              showMenu: InsightsInitService.showAuditReporting,
+              title: "Search Assets",
+              isAdminMenu: true
+            }
+  
+          ]
+        },
+        {
+          displayName: 'Playlist',
+          iconName: 'feature',
+          route: 'InSights/Home/playlist',
+          isToolbarDisplay: InsightsInitService.enableInsightsToolbar,
+          showMenu: true,
+          title: "Playlist",
+          isAdminMenu: false
+        },
+        {
+          displayName: 'Report Management',
+          iconName: 'feature',
+          route: 'InSights/Home/reportmanagement',
+          isToolbarDisplay: InsightsInitService.enableInsightsToolbar,
+          showMenu: true,
+          title: "Report Management",
+          isAdminMenu: false
+        },
+        {
+          displayName: 'Data Dictionary',
+          iconName: 'datadictionary',
+          route: 'InSights/Home/datadictionary',
+          isToolbarDisplay: InsightsInitService.enableInsightsToolbar,
+          showMenu: true,
+          title: "Data Dictionary",
+          isAdminMenu: false
+        },
+        {
+          displayName: 'Health Check',
+          iconName: 'feature',
+          route: 'InSights/Home/healthcheck',
+          isToolbarDisplay: InsightsInitService.enableInsightsToolbar,
+          showMenu: true,
+          title: "Health Check",
+          isAdminMenu: true
+        },
+  
+        {
+          displayName: 'Configuration',
+          iconName: 'admin',
+          isToolbarDisplay: InsightsInitService.enableInsightsToolbar,
+          isAdminMenu: true,
+          title: "Configuration",
+          showMenu: true,
+          children: [
+            {
+              displayName: 'Agent Management',
+              iconName: 'feature',
+              route: 'InSights/Home/agentmanagement',
+              isToolbarDisplay: InsightsInitService.enableInsightsToolbar,
+              showMenu: true,
+              title: "Agent Management",
+              isAdminMenu: true
+            },
+            {
+              displayName: 'Webhook Configuration',
+              iconName: 'feature',
+              route: 'InSights/Home/webhook',
+              isToolbarDisplay: InsightsInitService.enableInsightsToolbar,
+              showMenu: InsightsInitService.showWebhookConfiguration,
+              title: "WebHook",
+              isAdminMenu: true
+            },
+            {
+              displayName: 'Bulk Upload',
+              iconName: 'feature',
+              route: 'InSights/Home/bulkupload',
+              isToolbarDisplay: InsightsInitService.enableInsightsToolbar,
+              showMenu: true,
+              title: "Bulk Upload",
+              isAdminMenu: true
+            },
+            {
+              displayName: 'Server Configuration',
+              iconName: 'feature',
+              route: 'InSights/Home/server-configuration',
+              isToolbarDisplay: InsightsInitService.enableInsightsToolbar,
+              showMenu: true,
+              title: "Server Configuration",
+              isAdminMenu: true
+            },
+            {
+              displayName: 'Group & Users',
+              iconName: 'feature',
+              route: 'InSights/Home/accessGroupManagement',
+              isToolbarDisplay: InsightsInitService.enableInsightsToolbar,
+              showMenu: true,
+              title: "Group & Users",
+              isAdminMenu: true
+            },
+            {
+              displayName: 'Co-Relation Builder',
+              iconName: 'feature',
+              route: 'InSights/Home/relationship-builder',
+              isToolbarDisplay: InsightsInitService.enableInsightsToolbar,
+              showMenu: true,
+              title: "Relationship-Builder",
+              isAdminMenu: true
+            },
+            {
+              displayName: 'Business Mapping',
+              iconName: 'feature',
+              route: 'InSights/Home/businessmapping',
+              isToolbarDisplay: InsightsInitService.enableInsightsToolbar,
+              showMenu: InsightsInitService.showBusinessMapping,
+              title: "Business Mapping",
+              isAdminMenu: true
+            },
+        {
+              displayName: 'Report Configuration',
+              iconName: 'feature',
+              isToolbarDisplay: InsightsInitService.enableInsightsToolbar,
+              showMenu: true,
+              title: "Report Configuration",
+              isAdminMenu: false,
+              children:[
+                {
+                  displayName: 'Kpi Configuration',
+                  iconName: 'feature',
+                  route: 'InSights/Home/kpicreation',
+                  isToolbarDisplay: InsightsInitService.enableInsightsToolbar,
+                  showMenu: true,
+                  title: "Kpi Creation",
+                  isAdminMenu: false
+                },
+                {
+                  displayName: 'Content Configuration',
+                  iconName: 'feature',
+                  route: 'InSights/Home/contentConfig',
+                  isToolbarDisplay: InsightsInitService.enableInsightsToolbar,
+                  showMenu: true,
+                  title: "Content Configuration",
+                  isAdminMenu: false
+                },
+                {
+                  displayName: 'Report Template Configuration',
+                  iconName: 'feature',
+                  route: 'InSights/Home/reportTemplate',
+                  isToolbarDisplay: InsightsInitService.enableInsightsToolbar,
+                  showMenu: true,
+                  title: "Report Template Configuration",
+                  isAdminMenu: false
+                }
+              ]
+            },
+            {
+              displayName: 'Logo Setting',
+              iconName: 'feature',
+              route: 'InSights/Home/logoSetting',
+              isToolbarDisplay: InsightsInitService.enableInsightsToolbar,
+              showMenu: true,
+              title: "Logo Setting",
+              isAdminMenu: true
+            },
+        {
+              displayName: 'Data Archival',
+              iconName: 'feature',
+              route: 'InSights/Home/dataarchiving',
+              isToolbarDisplay: InsightsInitService.enableInsightsToolbar,
+              showMenu: true,
+              title: "Data Archival",
+              isAdminMenu: true
+            },
+             {
+               displayName: 'Forecasting',
+               iconName: 'feature',
+               route: 'InSights/Home/modelmanagement',
+               isToolbarDisplay: InsightsInitService.enableInsightsToolbar,
+               showMenu: true,
+               title: "Forecasting",
+               isAdminMenu: false
+             }        
+          ]
+        }
+      ];
+  }
     //console.log(this.navItems);
   }
 

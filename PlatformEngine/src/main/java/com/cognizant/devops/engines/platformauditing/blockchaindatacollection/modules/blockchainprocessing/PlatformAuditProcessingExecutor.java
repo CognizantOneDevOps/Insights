@@ -37,8 +37,13 @@ import javax.crypto.Cipher;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import com.cognizant.devops.engines.platformengine.message.core.EngineStatusLogger;
 import com.cognizant.devops.platformauditing.api.InsightsAuditImpl;
 import com.cognizant.devops.platformauditing.util.LoadFile;
+import com.cognizant.devops.platformcommons.constants.InsightsAuditConstants;
+import com.cognizant.devops.platformcommons.constants.LogLevelConstants;
+import com.cognizant.devops.platformcommons.config.ApplicationConfigInterface;
+import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBHandler;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphResponse;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
@@ -48,8 +53,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
-
-public class PlatformAuditProcessingExecutor extends TimerTask {
+public class PlatformAuditProcessingExecutor extends TimerTask implements ApplicationConfigInterface{
     private static Logger LOG = LogManager.getLogger(PlatformAuditProcessingExecutor.class);
     private final InsightsAuditImpl insightAuditImpl = Util.getAuditObject();
 	private static Util utilObj = new Util();
@@ -58,7 +62,16 @@ public class PlatformAuditProcessingExecutor extends TimerTask {
     @Override
 	public void run() {
         LOG.info("Blockchain Processing Executer module is getting executed");
-        orphanNodeExtraction();
+        try {
+			ApplicationConfigInterface.loadConfiguration();
+			orphanNodeExtraction();
+		} catch (InsightsCustomException e) {
+			LOG.error(e);
+			EngineStatusLogger.getInstance().createEngineStatusNode(
+					" Error occured while initializing Audit Engine processing  " + e.getMessage(),
+					PlatformServiceConstants.FAILURE);
+		}
+        
     }
 
     private void orphanNodeExtraction() {    	
@@ -98,8 +111,8 @@ public class PlatformAuditProcessingExecutor extends TimerTask {
                         .get("data").getAsJsonArray();
                 for (JsonElement dataElem : rows) {
                 	boolean isUniquePresent = checkUniquekeys(uniqueKeyList,dataElem);
-                	if(dataElem.getAsJsonObject().get("row").getAsJsonArray().get(0).getAsJsonObject().has("digitalSignature") && isUniquePresent) {
-                        String digitalSign = dataElem.getAsJsonObject().get("row").getAsJsonArray().get(0).getAsJsonObject().getAsJsonPrimitive("digitalSignature").getAsString();
+                	if(dataElem.getAsJsonObject().get("row").getAsJsonArray().get(0).getAsJsonObject().has(InsightsAuditConstants.DIGITALSIGNATURE) && isUniquePresent) {
+                        String digitalSign = dataElem.getAsJsonObject().get("row").getAsJsonArray().get(0).getAsJsonObject().getAsJsonPrimitive(InsightsAuditConstants.DIGITALSIGNATURE).getAsString();
                         LOG.debug("--------------------------process executor------------------------");
                         String hc = getHash(dataElem.getAsJsonObject().get("row").getAsJsonArray());
                         LOG.debug(hc);
@@ -119,10 +132,10 @@ public class PlatformAuditProcessingExecutor extends TimerTask {
                         if (hc.equals(new String(decryptedBytes)))                        	
                             successfulWriteFlag = insertNode(dataElem, successfulWriteFlag);
                         else
-                            LOG.debug("Hash values do not match.. skipping uuid: " +
+                            LOG.debug("Hash values do not match.. skipping uuid: {}",
 								dataElem.getAsJsonObject().get("row").getAsJsonArray().get(0).getAsJsonObject().getAsJsonPrimitive("uuid"));
                     }else
-                        LOG.debug("INVALID ASSET OR DigitalSignature not found for uuid: "+
+                        LOG.debug("INVALID ASSET OR DigitalSignature not found for uuid:{} ",
 							dataElem.getAsJsonObject().get("row").getAsJsonArray().get(0).getAsJsonObject().getAsJsonPrimitive("uuid")+"\nNode skipped...");
                     //successfulWriteFlag = insertNode(dataElem, successfulWriteFlag);
                 }
@@ -158,11 +171,11 @@ public class PlatformAuditProcessingExecutor extends TimerTask {
             //put dataObject into treemap to get sorted
             TreeMap<String, String> t = new TreeMap<String, String>();
             dt.getAsJsonObject().entrySet().parallelStream().forEach(entry -> {
-                if (!entry.getKey().equals("uuid") && !entry.getKey().equals("digitalSignature") &&  !entry.getKey().equals("correlationTime") && !entry.getKey().equals("maxCorrelationTime") ) {
+                if (!entry.getKey().equals("uuid") && !entry.getKey().equals(InsightsAuditConstants.DIGITALSIGNATURE) &&  !entry.getKey().equals("correlationTime") && !entry.getKey().equals("maxCorrelationTime") ) {
                     if (entry.getKey().equals("inSightsTime") ||entry.getKey().endsWith("Epoch"))
                         t.put(entry.getKey(), String.valueOf(entry.getValue().getAsLong()) + ".0");
                     else {
-                    	LOG.debug("jsonarray*****"+Boolean.toString(entry.getValue().isJsonArray()));
+                    	LOG.debug("{} jsonarray*****",Boolean.toString(entry.getValue().isJsonArray()));
                         if(entry.getValue().isJsonArray()) {
                             for (JsonElement e: entry.getValue().getAsJsonArray()) {
                                 if(t.containsKey(entry.getKey())) {
@@ -175,7 +188,7 @@ public class PlatformAuditProcessingExecutor extends TimerTask {
                         }
                         else {
                         	//LOG.debug(entry.getValue().getClass().getName());
-                        	LOG.debug(entry.getKey()+"-->"+entry.getValue());
+                        	LOG.debug(entry.getKey(),"-->",entry.getValue());
                             t.put(entry.getKey(), entry.getValue().getAsString());
                         }
                         //LOG.debug(entry.getValue().getAsString());
@@ -196,8 +209,8 @@ public class PlatformAuditProcessingExecutor extends TimerTask {
 
     private boolean insertNode(JsonElement dataElem, boolean successfulWriteFlag) {
         try {
-        	if (dataElem.getAsJsonObject().get("row").getAsJsonArray().get(0).getAsJsonObject().has("digitalSignature"))
-                dataElem.getAsJsonObject().get("row").getAsJsonArray().get(0).getAsJsonObject().remove("digitalSignature");
+        	if (dataElem.getAsJsonObject().get("row").getAsJsonArray().get(0).getAsJsonObject().has(InsightsAuditConstants.DIGITALSIGNATURE))
+                dataElem.getAsJsonObject().get("row").getAsJsonArray().get(0).getAsJsonObject().remove(InsightsAuditConstants.DIGITALSIGNATURE);
             lastTimestamp = dataElem.getAsJsonObject().get("row").getAsJsonArray().get(0).getAsJsonObject().getAsJsonPrimitive("inSightsTime").getAsLong();
 			boolean result;
 			synchronized(insightAuditImpl){

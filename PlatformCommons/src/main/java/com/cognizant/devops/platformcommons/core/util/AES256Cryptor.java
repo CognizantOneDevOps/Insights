@@ -32,6 +32,11 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 public class AES256Cryptor {
+	
+	private AES256Cryptor() {
+		super();
+	}
+
 	private static final Logger log = LogManager.getLogger(AES256Cryptor.class);
 	/**
 	 * Encrypt
@@ -55,12 +60,12 @@ public class AES256Cryptor {
 			byte[] saltBytes = generateSalt(8);
 
 			// Derive key and iv from passphrase and salt
-			EvpKDF(passphrase.getBytes("UTF-8"), keySize, ivSize, saltBytes, key, iv);
+			EvpKDF(passphrase.getBytes(StandardCharsets.UTF_8), keySize, ivSize, saltBytes, key, iv);
 
 			// Actual encrypt
 			Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
 			cipher.init(Cipher.ENCRYPT_MODE, new SecretKeySpec(key, "AES"), new IvParameterSpec(iv));
-			byte[] cipherBytes = cipher.doFinal(plaintext.getBytes("UTF-8"));
+			byte[] cipherBytes = cipher.doFinal(plaintext.getBytes(StandardCharsets.UTF_8));
 
 			/**
 			 * Create CryptoJS-like encrypted string from encrypted data
@@ -71,7 +76,7 @@ public class AES256Cryptor {
 			 * 4. Concatenate encrypted data to b
 			 * 5. Encode b using Base64
 			 */
-			byte[] sBytes = "Salted__".getBytes("UTF-8");
+			byte[] sBytes = "Salted__".getBytes(StandardCharsets.UTF_8);
 			byte[] b = new byte[sBytes.length + saltBytes.length + cipherBytes.length];
 			System.arraycopy(sBytes, 0, b, 0, sBytes.length);
 			System.arraycopy(saltBytes, 0, b, sBytes.length, saltBytes.length);
@@ -81,6 +86,7 @@ public class AES256Cryptor {
 
 			return new String(base64b);
 		} catch (Exception e) {
+			//no code
 		}
 
 		return null;
@@ -101,7 +107,7 @@ public class AES256Cryptor {
 			final int ivSize = 128;
 
 			// Decode from base64 text
-			byte[] ctBytes = Base64.getDecoder().decode(ciphertext.getBytes("UTF-8"));
+			byte[] ctBytes = Base64.getDecoder().decode(ciphertext.getBytes(StandardCharsets.UTF_8));
 
 			// Get salt
 			byte[] saltBytes = Arrays.copyOfRange(ctBytes, 8, 16);
@@ -112,7 +118,7 @@ public class AES256Cryptor {
 			// Get key and iv from passphrase and salt
 			byte[] key = new byte[keySize / 8];
 			byte[] iv = new byte[ivSize / 8];
-			EvpKDF(passphrase.getBytes("UTF-8"), keySize, ivSize, saltBytes, key, iv);
+			EvpKDF(passphrase.getBytes(StandardCharsets.UTF_8), keySize, ivSize, saltBytes, key, iv);
 
 			// Actual decrypt
 			Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
@@ -121,7 +127,7 @@ public class AES256Cryptor {
 
 			return new String(recoveredPlaintextBytes);
 		} catch (Exception e) {
-			log.error(" Error while extracting token "+e.getMessage());
+			log.error(" Error while extracting token {}", e.getMessage());
 		}
 
 		return null;

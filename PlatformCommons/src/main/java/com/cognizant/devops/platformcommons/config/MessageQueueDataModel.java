@@ -17,9 +17,17 @@ package com.cognizant.devops.platformcommons.config;
 
 import java.io.Serializable;
 
+import javax.validation.constraints.Pattern;
+
 public class MessageQueueDataModel implements Serializable {
+
+	@Pattern(regexp = "^(?!\\s*$).+", message = "MessageQueueDataModel host must not be blank")
 	private String host;
+
+	@Pattern(regexp = "^(?!\\s*$).+", message = "MessageQueueDataModel user authToken must not be blank")
 	private String user;
+
+	@Pattern(regexp = "^(?!\\s*$).+", message = "MessageQueueDataModel password authToken must not be blank")
 	private String password;
 	private int prefetchCount = 10;
 

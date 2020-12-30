@@ -36,6 +36,11 @@ import io.restassured.specification.RequestSpecification;
 public class CommonUtils {
 
 	private static final Logger log = LogManager.getLogger(CommonUtils.class);
+	
+
+	private CommonUtils() {
+		super();
+	}
 
 	public static Properties props = null;
 

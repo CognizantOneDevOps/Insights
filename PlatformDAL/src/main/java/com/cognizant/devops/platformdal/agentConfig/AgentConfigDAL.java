@@ -18,8 +18,12 @@ package com.cognizant.devops.platformdal.agentConfig;
 import java.util.Date;
 import java.util.List;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.hibernate.Session;
 import org.hibernate.query.Query;
 
+import com.cognizant.devops.platformcommons.constants.AgentCommonConstant;
 import com.cognizant.devops.platformcommons.constants.DataArchivalConstants;
 import com.cognizant.devops.platformcommons.core.enums.AGENTACTION;
 import com.cognizant.devops.platformdal.core.BaseDAL;
@@ -27,6 +31,7 @@ import com.google.gson.JsonObject;
 
 public class AgentConfigDAL extends BaseDAL {
 
+	private static Logger log = LogManager.getLogger(AgentConfigDAL.class);
 	/**
 	 * New method for updating the existing agent info in database.
 	 * 
@@ -42,21 +47,27 @@ public class AgentConfigDAL extends BaseDAL {
 	 */
 	public boolean updateAgentConfigFromUI(String agentId, String toolCategory, String labelName, String toolName,
 			JsonObject agentJson, String agentVersion, String osversion, Date updateDate, boolean vault) {
-		Query<AgentConfig> createQuery = getSession().createQuery("FROM AgentConfig a WHERE a.agentKey = :agentId ",
-				AgentConfig.class);
-		createQuery.setParameter("agentId", agentId);
-		AgentConfig agentConfig = createQuery.uniqueResult();
-		if (agentConfig != null) {
-			getSession().beginTransaction();
-			setAgentConfigValues(agentConfig, toolCategory, labelName, agentId, toolName, agentJson, agentVersion,
-					osversion, updateDate, vault);
-			getSession().update(agentConfig);
-			getSession().getTransaction().commit();
-			terminateSession();
-			terminateSessionFactory();
-			return Boolean.TRUE;
-		} else {
-			return Boolean.FALSE;
+		
+		
+		try (Session session = getSessionObj()) {
+
+			Query<AgentConfig> createQuery = session.createQuery("FROM AgentConfig a WHERE a.agentKey = :agentId ",
+					AgentConfig.class);
+			createQuery.setParameter(AgentCommonConstant.AGENTID, agentId);
+			AgentConfig agentConfig = createQuery.uniqueResult();
+			if (agentConfig != null) {
+				session.beginTransaction();
+				setAgentConfigValues(agentConfig, toolCategory, labelName, agentId, toolName, agentJson, agentVersion,
+						osversion, updateDate, vault);
+				session.update(agentConfig);
+				session.getTransaction().commit();
+				return Boolean.TRUE;
+			} else {
+				return Boolean.FALSE;
+			}
+		} catch (Exception e) {
+			log.error(e.getMessage());
+			throw e;
 		}
 	}
 
@@ -67,13 +78,18 @@ public class AgentConfigDAL extends BaseDAL {
 	 * @return
 	 */
 	public boolean isAgentIdExisting(String agentId) {
-		Query<AgentConfig> createQuery = getSession().createQuery("FROM AgentConfig a WHERE a.agentKey = :agentId ",
-				AgentConfig.class);
-		createQuery.setParameter("agentId", agentId);
-		if (createQuery.getResultList().isEmpty()) {
-			return Boolean.FALSE;
-		} else {
-			return Boolean.TRUE;
+		try (Session session = getSessionObj()) {
+			Query<AgentConfig> createQuery = session.createQuery("FROM AgentConfig a WHERE a.agentKey = :agentId ",
+					AgentConfig.class);
+			createQuery.setParameter(AgentCommonConstant.AGENTID, agentId);
+			if (createQuery.getResultList().isEmpty()) {
+				return Boolean.FALSE;
+			} else {
+				return Boolean.TRUE;
+			}
+		} catch (Exception e) {
+			log.error(e.getMessage());
+			throw e;
 		}
 	}
 
@@ -92,15 +108,18 @@ public class AgentConfigDAL extends BaseDAL {
 	 * @return
 	 */
 	public boolean saveAgentConfigFromUI(String agentId, String toolCategory, String labelName, String toolName,
-			JsonObject agentJson, String agentVersion, String osversion, Date updateDate, boolean vault) {
+		JsonObject agentJson, String agentVersion, String osversion, Date updateDate, boolean vault) {
 		AgentConfig agentConfig = new AgentConfig();
-		getSession().beginTransaction();
+		try (Session session = getSessionObj()) {
+		session.beginTransaction();
 		setAgentConfigValues(agentConfig, toolCategory, labelName, agentId, toolName, agentJson, agentVersion,
 				osversion, updateDate, vault);
-		getSession().save(agentConfig);
-		getSession().getTransaction().commit();
-		terminateSession();
-		terminateSessionFactory();
+		session.save(agentConfig);
+		session.getTransaction().commit();
+		}catch(Exception e) {
+			log.error(e.getMessage());
+			throw e;
+		}
 		return Boolean.TRUE;
 	}
 
@@ -128,93 +147,122 @@ public class AgentConfigDAL extends BaseDAL {
 	 * @return
 	 */
 	public List<AgentConfig> getAgentConfigurations(String toolName, String toolCategory) {
-		Query<AgentConfig> createQuery = getSession().createQuery(
-				"FROM AgentConfig AC WHERE AC.toolName = :toolName AND AC.toolCategory = :toolCategory",
-				AgentConfig.class);
-		createQuery.setParameter("toolName", toolName);
-		createQuery.setParameter("toolCategory", toolCategory);
-		List<AgentConfig> result = createQuery.getResultList();
-		terminateSession();
-		terminateSessionFactory();
-		return result;
+		
+		try (Session session = getSessionObj()) {
+			Query<AgentConfig> createQuery = session.createQuery(
+					"FROM AgentConfig AC WHERE AC.toolName = :toolName AND AC.toolCategory = :toolCategory",
+					AgentConfig.class);
+			createQuery.setParameter(AgentCommonConstant.TOOLNAME, toolName);
+			createQuery.setParameter(AgentCommonConstant.TOOLCATEGORY, toolCategory);
+			return createQuery.getResultList();
+		} catch (Exception e) {
+			log.error(e.getMessage());
+			throw e;
+		}
+		
 	}
 
 	public AgentConfig updateAgentRunningStatus(String agentId, AGENTACTION action) {
-		Query<AgentConfig> createQuery = getSession().createQuery("FROM AgentConfig AC WHERE AC.agentKey = :agentKey",
-				AgentConfig.class);
-		createQuery.setParameter("agentKey", agentId);
-		AgentConfig agentConfig = createQuery.getSingleResult();
-		getSession().beginTransaction();
-		if (agentConfig != null) {
-			agentConfig.setAgentStatus(action.name());
-			getSession().update(agentConfig);
+		try (Session session = getSessionObj()) {
+			Query<AgentConfig> createQuery = session.createQuery("FROM AgentConfig AC WHERE AC.agentKey = :agentKey",
+					AgentConfig.class);
+			createQuery.setParameter(AgentCommonConstant.AGENTKEY, agentId);
+			AgentConfig agentConfig = createQuery.getSingleResult();
+			session.beginTransaction();
+			if (agentConfig != null) {
+				agentConfig.setAgentStatus(action.name());
+				session.update(agentConfig);
+			}
+			session.getTransaction().commit();
+
+			return agentConfig;
+		} catch (Exception e) {
+			log.error(e.getMessage());
+			throw e;
 		}
-		getSession().getTransaction().commit();
-		terminateSession();
-		terminateSessionFactory();
-		return agentConfig;
 	}
 
 	public List<AgentConfig> deleteAgentConfigurations(String agentKey) {
-		Query<AgentConfig> createQuery = getSession().createQuery("FROM AgentConfig a WHERE a.agentKey = :agentKey",
-				AgentConfig.class);
-		createQuery.setParameter("agentKey", agentKey);
-		AgentConfig agentConfig = createQuery.getSingleResult();
-		getSession().beginTransaction();
-		getSession().delete(agentConfig);
-		getSession().getTransaction().commit();
-		terminateSession();
-		terminateSessionFactory();
-		return getAllDataAgentConfigurations();
+		
+		try (Session session = getSessionObj()) {
+			Query<AgentConfig> createQuery = session.createQuery("FROM AgentConfig a WHERE a.agentKey = :agentKey",
+					AgentConfig.class);
+			createQuery.setParameter(AgentCommonConstant.AGENTKEY, agentKey);
+			AgentConfig agentConfig = createQuery.getSingleResult();
+			session.beginTransaction();
+			session.delete(agentConfig);
+			session.getTransaction().commit();
+			return getAllDataAgentConfigurations();
+		} catch (Exception e) {
+			log.error(e.getMessage());
+			throw e;
+		}
 	}
 
 	public AgentConfig getAgentConfigurations(String agentId) {
-		Query<AgentConfig> createQuery = getSession().createQuery("FROM AgentConfig AC WHERE AC.agentKey = :agentKey",
-				AgentConfig.class);
-		createQuery.setParameter("agentKey", agentId);
-		AgentConfig result = createQuery.getSingleResult();
-		terminateSession();
-		terminateSessionFactory();
-		return result;
+		
+		try (Session session = getSessionObj()) {
+
+			Query<AgentConfig> createQuery = session.createQuery("FROM AgentConfig AC WHERE AC.agentKey = :agentKey",
+					AgentConfig.class);
+			createQuery.setParameter(AgentCommonConstant.AGENTKEY, agentId);
+			AgentConfig result = createQuery.getSingleResult();
+			return result;
+		} catch (Exception e) {
+			log.error(e.getMessage());
+			throw e;
+		}
 	}
 
 	public List<AgentConfig> getAllAgentConfigurations() {
-		Query<AgentConfig> createQuery = getSession().createQuery("FROM AgentConfig AC", AgentConfig.class);
-		List<AgentConfig> result = createQuery.getResultList();
-		terminateSession();
-		terminateSessionFactory();
-		return result;
+		try (Session session = getSessionObj()) {
+			Query<AgentConfig> createQuery = session.createQuery("FROM AgentConfig AC", AgentConfig.class);
+			return createQuery.getResultList();
+			
+		} catch (Exception e) {
+			log.error(e.getMessage());
+			throw e;
+		}
 	}
 
 	public List<AgentConfig> getAllEngineAggregatorAgentConfigurations() {
-		Query<AgentConfig> createQuery = getSession().createQuery("FROM AgentConfig AC WHERE AC.toolCategory != '"
-				+ DataArchivalConstants.TOOLCATEGORY + "'",
-				AgentConfig.class);
-		List<AgentConfig> result = createQuery.getResultList();
-		terminateSession();
-		terminateSessionFactory();
-		return result;
+		try (Session session = getSessionObj()) {
+			Query<AgentConfig> createQuery = session.createQuery(
+					"FROM AgentConfig AC WHERE AC.toolCategory != '" + DataArchivalConstants.TOOLCATEGORY + "'",
+					AgentConfig.class);
+			return createQuery.getResultList();
+
+		} catch (Exception e) {
+			log.error(e.getMessage());
+			throw e;
+		}
 	}
 
 	public List<AgentConfig> getAllDataAgentConfigurations() {
-		Query<AgentConfig> createQuery = getSession().createQuery(
-				"FROM AgentConfig AC WHERE AC.toolCategory != 'DAEMONAGENT' AND AC.toolName != 'AGENTDAEMON'",
-				AgentConfig.class);
-		List<AgentConfig> result = createQuery.getResultList();
-		terminateSession();
-		terminateSessionFactory();
-		return result;
+		try (Session session = getSessionObj()) {
+			Query<AgentConfig> createQuery = session.createQuery(
+					"FROM AgentConfig AC WHERE AC.toolCategory != 'DAEMONAGENT' AND AC.toolName != 'AGENTDAEMON'",
+					AgentConfig.class);
+			return createQuery.getResultList();
+
+		} catch (Exception e) {
+			log.error(e.getMessage());
+			throw e;
+		}
 	}
 
 	public boolean updateAgentSubscriberConfigurations(List<AgentConfig> agentConfigs) {
-		getSession().beginTransaction();
-		for (AgentConfig agentConfig : agentConfigs) {
-			getSession().update(agentConfig);
+		try (Session session = getSessionObj()) {
+			session.beginTransaction();
+			for (AgentConfig agentConfig : agentConfigs) {
+				session.update(agentConfig);
+			}
+			session.getTransaction().commit();
+			return true;
+		} catch (Exception e) {
+			log.error(e.getMessage());
+			throw e;
 		}
-		getSession().getTransaction().commit();
-		terminateSession();
-		terminateSessionFactory();
-		return true;
 	}
 
 	/**
@@ -226,32 +274,38 @@ public class AgentConfigDAL extends BaseDAL {
 	 * @return
 	 */
 	public boolean deleteAgentConfigurations(String toolName, String toolCategory, int agentId) {
-		Query<AgentConfig> createQuery = getSession().createQuery(
-				"FROM AgentConfig a WHERE a.toolName = :toolName AND a.toolCategory = :toolCategory AND a.agentId = :agentId",
-				AgentConfig.class);
-		createQuery.setParameter("toolName", toolName);
-		createQuery.setParameter("toolCategory", toolCategory);
-		createQuery.setParameter("agentId", agentId);
-		AgentConfig agentConfig = createQuery.getSingleResult();
-		getSession().beginTransaction();
-		getSession().delete(agentConfig);
-		getSession().getTransaction().commit();
-		terminateSession();
-		terminateSessionFactory();
-		return true;
+		try (Session session = getSessionObj()) {
+			Query<AgentConfig> createQuery = session.createQuery(
+					"FROM AgentConfig a WHERE a.toolName = :toolName AND a.toolCategory = :toolCategory AND a.agentId = :agentId",
+					AgentConfig.class);
+			createQuery.setParameter("toolName", toolName);
+			createQuery.setParameter("toolCategory", toolCategory);
+			createQuery.setParameter("agentId", agentId);
+			AgentConfig agentConfig = createQuery.getSingleResult();
+			session.beginTransaction();
+			session.delete(agentConfig);
+			session.getTransaction().commit();
+			return true;
+		} catch (Exception e) {
+			log.error(e.getMessage());
+			throw e;
+		}
 	}
 
 	public AgentConfig downloadAgentConfigurations(String toolName, String toolCategory, int agentId) {
-		Query<AgentConfig> createQuery = getSession().createQuery(
-				"FROM AgentConfig a WHERE a.toolName = :toolName AND a.toolCategory = :toolCategory AND a.agentId = :agentId",
-				AgentConfig.class);
-		createQuery.setParameter("toolName", toolName);
-		createQuery.setParameter("toolCategory", toolCategory);
-		createQuery.setParameter("agentId", agentId);
-		AgentConfig result = createQuery.getSingleResult();
-		terminateSession();
-		terminateSessionFactory();
-		return result;
+		try (Session session = getSessionObj()) {
+			Query<AgentConfig> createQuery = session.createQuery(
+					"FROM AgentConfig a WHERE a.toolName = :toolName AND a.toolCategory = :toolCategory AND a.agentId = :agentId",
+					AgentConfig.class);
+			createQuery.setParameter("toolName", toolName);
+			createQuery.setParameter("toolCategory", toolCategory);
+			createQuery.setParameter("agentId", agentId);
+			return createQuery.getSingleResult();
+
+		} catch (Exception e) {
+			log.error(e.getMessage());
+			throw e;
+		}
 	}
 
 }

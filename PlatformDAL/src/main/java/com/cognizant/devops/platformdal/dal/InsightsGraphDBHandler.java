@@ -38,6 +38,7 @@ public class InsightsGraphDBHandler implements BaseGraphDBHandler {
 
 
 	public InsightsGraphDBHandler() {
+		super();
 	}
 	
 	@Override
@@ -49,7 +50,6 @@ public class InsightsGraphDBHandler implements BaseGraphDBHandler {
 
 	@Override
 	public List<InsightsGraphNode> getNodeWithRelationship(String query) throws DataDeleteException {
-		// TODO Auto-generated method stub
 		return null;
 	}
 	
@@ -210,7 +210,7 @@ public class InsightsGraphDBHandler implements BaseGraphDBHandler {
 							.stream(nodeLabel.spliterator(), false)
 							.collect(Collectors.toList());
 					
-					log.debug(" labelList ==== "+labelList.toString()); 				
+					log.debug(" labelList ==== {}",labelList.toString()); 				
 					graphNode.setLabels(labelList);
 					graphNode.setPropertyMap(node.asMap());
 					

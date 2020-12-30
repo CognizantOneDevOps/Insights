@@ -55,19 +55,19 @@ import com.nimbusds.jwt.SignedJWT;
 @Repository
 public class TokenProviderUtility {
 	private static Logger log = LogManager.getLogger(TokenProviderUtility.class);
-	private final String signingKey = ApplicationConfigProvider.getInstance().getSingleSignOnConfig()
+	private String signingKey = ApplicationConfigProvider.getInstance().getSingleSignOnConfig()
 			.getTokenSigningKey();
 	public static CacheManager cacheManager = null;
 	public static Cache<String, String> tokenCache = null;
 
 	public TokenProviderUtility() {
+		signingKey = ApplicationConfigProvider.getInstance().getSingleSignOnConfig()
+				.getTokenSigningKey();
 		if (TokenProviderUtility.cacheManager == null) {
 			log.debug("Inside TokenProviderUtility constructer initilizeTokenCache ");
 			initilizeTokenCache();
 		}
 	}
-
-
 
 	/**
 	 * used to initilize cache
@@ -153,7 +153,7 @@ public class TokenProviderUtility {
 		boolean isVerify = Boolean.FALSE;
 		boolean isTokenExistsInCache = Boolean.FALSE;
 		boolean validateTokenDate = Boolean.FALSE;
-		//log.debug(" In verifyToken ");
+		// log.debug(" In verifyToken ");
 		try {
 			String authToken = ValidationUtils.cleanXSS(token);
 			if (authToken == null || authToken.isEmpty()) {
@@ -177,18 +177,19 @@ public class TokenProviderUtility {
 			if (tokenValueFromCache == null) {
 				log.debug("No token found in cache");
 			} else if (tokenValueFromCache.equalsIgnoreCase(authToken)) {
-				//log.debug("Token value matched in cache === ");
+				// log.debug("Token value matched in cache === ");
 				isTokenExistsInCache = Boolean.TRUE;
 			} else {
 				log.error("Token value not matched in cache=== ");
 			}
 
-			//log.debug("alice  after " + signedJWT.getJWTClaimsSet().getSubject());
-			//log.debug("cognizant.com  " + signedJWT.getJWTClaimsSet().getIssuer());
-			//log.debug("Exceperation Time after  " + signedJWT.getJWTClaimsSet().getExpirationTime());
+			// log.debug("alice after " + signedJWT.getJWTClaimsSet().getSubject());
+			// log.debug("cognizant.com " + signedJWT.getJWTClaimsSet().getIssuer());
+			// log.debug("Exceperation Time after " +
+			// signedJWT.getJWTClaimsSet().getExpirationTime());
 			log.debug("Check date of token with current date {} ",
-					new Date().before(signedJWT.getJWTClaimsSet().getExpirationTime()));//after
-			validateTokenDate = new Date().before(signedJWT.getJWTClaimsSet().getExpirationTime());//after
+					new Date().before(signedJWT.getJWTClaimsSet().getExpirationTime()));// after
+			validateTokenDate = new Date().before(signedJWT.getJWTClaimsSet().getExpirationTime());// after
 
 		} catch (Exception e) {
 			log.error(e);
@@ -248,11 +249,11 @@ public class TokenProviderUtility {
 			claims = signedJWT.getJWTClaimsSet();
 
 			log.debug("alice  after  username  {} ", signedJWT.getJWTClaimsSet().getSubject());
-			log.debug(" domain {} ", signedJWT.getJWTClaimsSet().getIssuer()); //cognizant.com
+			log.debug(" domain {} ", signedJWT.getJWTClaimsSet().getIssuer()); // cognizant.com
 			log.debug("Exceperation Time after  {}", signedJWT.getJWTClaimsSet().getExpirationTime());
 			log.debug("Check date of token with current date {} ",
-					new Date().before(signedJWT.getJWTClaimsSet().getExpirationTime()));//after
-			validateTokenDate = new Date().before(signedJWT.getJWTClaimsSet().getExpirationTime());//after
+					new Date().before(signedJWT.getJWTClaimsSet().getExpirationTime()));// after
+			validateTokenDate = new Date().before(signedJWT.getJWTClaimsSet().getExpirationTime());// after
 
 			if (!isVerify) {
 				log.debug("Token signuture not match ");

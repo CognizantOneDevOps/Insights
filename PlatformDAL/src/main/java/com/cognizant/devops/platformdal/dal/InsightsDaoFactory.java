@@ -45,19 +45,6 @@ public class InsightsDaoFactory implements InsightsDaoFactoryInterface {
 	}
 	
 	public static void main(String [] args) {
-		ApplicationConfigCache.loadConfigCache();
-		//System.out.println("Testing start....");
-		try (GraphDBConnection connection = GraphDBConnection.getInstance()){
-			BaseGraphDBHandler dbHandler = getInstance().getNeo4jBoltDBHandler();
-			//dbHandler.write("CREATE (n:NEWDALTEST) return n");
-			StatementResult st =  dbHandler.read("MATCH (n:GIT:DATA) return n LIMIT 10");
-			List<InsightsGraphNode> node =  dbHandler.getNodes("MATCH (n:GIT:DATA) return n LIMIT 10");
-			//System.out.println("Testing end....");
-			//dbHandler.write("MATCH (n:NEWDALTEST) delete n");
-			//dbHandler.close();
-		} catch (DataDeleteException e) {
-		}catch (Exception e1) {
-		}
 		/*
 		List<String> queries = new ArrayList<>();
 		

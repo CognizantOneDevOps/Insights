@@ -50,6 +50,9 @@ import com.google.gson.JsonParser;
 import au.com.bytecode.opencsv.CSVReader;
 
 public class TrainModelsUtils {
+	public static final String ENABLE_NLP ="EnableNLP";
+	public static final String FIELDNAME ="FieldName";
+	public static final String PARSEDTOKENS="ParsedTokens";
 	private static final Logger log = LogManager.getLogger(TrainModelsUtils.class);
 	AutoMLConfigDAL autoMLConfigDAL;	
 	H2oApiCommunicator h2oApiCommunicator = new H2oApiCommunicator();	
@@ -270,7 +273,7 @@ public class TrainModelsUtils {
 		int number = config.size();
 		for (JsonElement e : config) {
 			JsonObject elem = e.getAsJsonObject();
-			if (elem.get("EnableNLP").getAsBoolean()) {
+			if (elem.get(ENABLE_NLP).getAsBoolean()) {
 				number += 100;
 				break;
 			}
@@ -294,7 +297,7 @@ public class TrainModelsUtils {
 		}
 		for (JsonElement e : config) {
 			JsonObject elem = e.getAsJsonObject();
-			if (elem.get("EnableNLP").getAsBoolean()) {
+			if (elem.get(ENABLE_NLP).getAsBoolean()) {
 				for (int i = 0; i < 100; i++)
 					sb.append("Numeric").append(",");
 				break;
@@ -315,7 +318,7 @@ public class TrainModelsUtils {
 		JsonArray ja = new JsonArray();
 		for (JsonElement e : config) {
 			JsonObject elem = e.getAsJsonObject();
-			ja.add(elem.get("FieldName").getAsString());
+			ja.add(elem.get(FIELDNAME).getAsString());
 		}
 		return ja;
 	}
@@ -352,8 +355,8 @@ public class TrainModelsUtils {
 		List<String> nlpColumns = new ArrayList<>();		
 		for (JsonElement e : config) {
 			JsonObject elem = e.getAsJsonObject();
-			if (elem.get("EnableNLP").getAsBoolean()) {
-				nlpColumns.add(elem.get("FieldName").getAsString());
+			if (elem.get(ENABLE_NLP).getAsBoolean()) {
+				nlpColumns.add(elem.get(FIELDNAME).getAsString());
 				nlpFlag=true;
 			}
 		}
@@ -376,12 +379,12 @@ public class TrainModelsUtils {
 				JsonObject payload = new Gson().fromJson(res, JsonObject.class);
 				String sourceFrame = payload.get("destination_frame").getAsString();
 				log.debug("Upload Success");
-				if (h2oApiCommunicator.postparsedCSVData(sourceFrame, usecase + "ParsedTokens", 1, "String",
-						usecase + "ParsedTokens", "000", 0) == 200) {
+				if (h2oApiCommunicator.postparsedCSVData(sourceFrame, usecase + PARSEDTOKENS, 1, "String",
+						usecase + PARSEDTOKENS, "000", 0) == 200) {
 					log.debug("Parsing Success");
 					if (h2oApiCommunicator.trainWord2Vec(usecase + "ParsedTokens.hex", usecase + "W2V") ==200) {
 						log.debug("Word2VecModel Trained successfully!");
-						vectors =h2oApiCommunicator.transformWord2Vec(usecase + "ParsedTokens", usecase + "W2V",
+						vectors =h2oApiCommunicator.transformWord2Vec(usecase + PARSEDTOKENS, usecase + "W2V",
 								contents.size());
 					}
 				}
@@ -408,7 +411,7 @@ public class TrainModelsUtils {
 		StringBuilder formattedData = new StringBuilder();
 		// Append headers
 		for (JsonElement e : config) {
-			formattedData.append(e.getAsJsonObject().get("FieldName").getAsString()).append(",");
+			formattedData.append(e.getAsJsonObject().get(FIELDNAME).getAsString()).append(",");
 		}
 		for (JsonElement e : vectors) {
 			JsonObject vector = e.getAsJsonObject();
@@ -421,7 +424,7 @@ public class TrainModelsUtils {
 		for (int i = 0; i < contents.size(); i++) {
 			JsonObject jo = contents.get(i).getAsJsonObject();
 			for (JsonElement e : config) {				
-				formattedData.append(jo.get(e.getAsJsonObject().get("FieldName").getAsString().replace(",", " "))).append(",");
+				formattedData.append(jo.get(e.getAsJsonObject().get(FIELDNAME).getAsString().replace(",", " "))).append(",");
 			}
 			for (JsonElement e : vectors) {
 				JsonObject vector = e.getAsJsonObject();

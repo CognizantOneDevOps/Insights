@@ -19,26 +19,31 @@ import java.io.Serializable;
 
 import com.cognizant.devops.platformcommons.constants.ConfigOptions;
 
-public class ServiceResponse implements Serializable{
+public class ServiceResponse implements Serializable {
 	private String status = ConfigOptions.FAILURE_RESPONSE;
-	private Object data;
-	private Object error;
-	
+	 private transient Object data;
+	 private transient  Object error;
+
 	public String getStatus() {
 		return status;
 	}
+
 	public void setStatus(String status) {
 		this.status = status;
 	}
+
 	public Object getData() {
 		return data;
 	}
+
 	public void setData(Object data) {
 		this.data = data;
 	}
+
 	public Object getError() {
 		return error;
 	}
+
 	public void setError(Object error) {
 		this.error = error;
 	}

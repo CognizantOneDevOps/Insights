@@ -21,8 +21,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -41,7 +41,7 @@ public class ElasticSearchService {
 	@Autowired
 	private HttpServletRequest context;
 
-	@RequestMapping(value = "/data", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+	@GetMapping(value = "/data", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 	public String searchData(@RequestParam String query, @RequestParam(required = false, defaultValue = "0") int from,
 			@RequestParam(required = false, defaultValue = "100") int size) throws JsonSyntaxException, InsightsCustomException {
 		ElasticSearchDBHandler dbHandler = new ElasticSearchDBHandler();

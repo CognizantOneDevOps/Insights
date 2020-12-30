@@ -42,7 +42,7 @@ public class InsightsUtils {
 
 	private InsightsUtils() {
 	}
-
+	private static final String DAYS= " Days ";
 	private static String sparkTimezone = ApplicationConfigProvider.getInstance().getInsightsTimeZone();
 	public static ZoneId zoneId = ZoneId.of(sparkTimezone);
 	public static final ZoneId zoneIdUTC = ZoneId.of("UTC");
@@ -593,17 +593,17 @@ public class InsightsUtils {
 				month = days / 30;
 				days = days - (month * 30);
 			}
-			duration = yrs + " Yrs " + month + "Month(s) " + days + " Days ";
+			duration = yrs + " Yrs " + month + "Month(s) " + days + DAYS;
 		} else if (days >= 30 && days < 365) // Calculate month
 		{
 			month = days / 30;
 			days = days - (month * 30);
-			duration = month + "Month(s) " + days + " Days ";
+			duration = month + "Month(s) " + days + DAYS;
 
 		} else if (days <= 1) {
 			duration = "1 Day ";
 		} else {
-			duration = days + " Days ";
+			duration = days + DAYS;
 		}
 		return duration;
 	}

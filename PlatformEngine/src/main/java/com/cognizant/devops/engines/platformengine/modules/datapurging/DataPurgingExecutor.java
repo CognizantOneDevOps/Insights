@@ -51,6 +51,7 @@ import com.google.gson.JsonObject;
 public class DataPurgingExecutor extends TimerTask {
 
 	private static Logger log = LogManager.getLogger(DataPurgingExecutor.class.getName());
+	
 	private static final String DATE_TIME_FORMAT = "yyyy/MM/dd hh:mm a";
 	private static final double MAXIMUM_BACKUP_FILE_SIZE = 5.0000d;
 
@@ -101,10 +102,10 @@ public class DataPurgingExecutor extends TimerTask {
 			writeToJsonFile(responseList, fileLocation);
 
 		} catch (InsightsCustomException e) {
-			log.error("Exception occured while selecting matching records for a specific data rentention period:" + e);
+			log.error("Exception occured while selecting matching records for a specific data rentention period:", e);
 			deleteFlag = false;
 		} catch (IOException e) {
-			log.error("Exception occured while taking backup of data in DataPurgingExecutor Job: " + e);
+			log.error("Exception occured while taking backup of data in DataPurgingExecutor Job: ",e);
 			EngineStatusLogger.getInstance().createEngineStatusNode(
 					" Error occured while executing DataPurgingExecutor " + e.getMessage(),
 					PlatformServiceConstants.FAILURE);
@@ -119,8 +120,8 @@ public class DataPurgingExecutor extends TimerTask {
 
 			} catch (InsightsCustomException e) {
 				log.error(
-						"Exception occured while deleting DATA nodes of Neo4j database inside DataPurgingExecutor Job: "
-								+ e);
+						"Exception occured while deleting DATA nodes of Neo4j database inside DataPurgingExecutor Job: ",
+								 e);
 				EngineStatusLogger.getInstance().createEngineStatusNode(
 						" Error occured while executing DataPurgingExecutor " + e.getMessage(),
 						PlatformServiceConstants.FAILURE);
@@ -132,7 +133,7 @@ public class DataPurgingExecutor extends TimerTask {
 			// dataArchivalFrequency
 			updateRunTimeIntoDatabase();
 		} catch (InsightsCustomException e) {
-			log.error("Exception occured while updating lastRunTime and nextRunTime in DataPurgingExecutor Job: " + e);
+			log.error("Exception occured while updating lastRunTime and nextRunTime in DataPurgingExecutor Job: ", e);
 			EngineStatusLogger.getInstance().createEngineStatusNode(
 					" Error occured while executing DataPurgingExecutor " + e.getMessage(),
 					PlatformServiceConstants.FAILURE);
@@ -155,9 +156,9 @@ public class DataPurgingExecutor extends TimerTask {
 					.getElasticSearchEndpoint() + "/" + esCacheIndex + "/_delete_by_query";
 			query = replaceTimeInEsQuery(query, time);
 			JsonObject data = esDbHandler.queryES(sourceESCacheUrl, query);
-			log.debug("Number of Query Cache results deleted: " + data.get("deleted").getAsString());
+			log.debug("Number of Query Cache results deleted:{} ", data.get("deleted").getAsString());
 		} catch (Exception e) {
-			log.error("Exception occured while clearing Query Cache data from Elasticsearch: " + e);
+			log.error("Exception occured while clearing Query Cache data from Elasticsearch:  ", e);
 			EngineStatusLogger.getInstance().createEngineStatusNode(
 					"Query Cache - Error occured while executing ES purging " + e.getMessage(),
 					PlatformServiceConstants.FAILURE);
@@ -200,7 +201,7 @@ public class DataPurgingExecutor extends TimerTask {
 		} catch (InsightsCustomException e) {
 			log.error(
 					"Exception occured while getting information of all orphan data nodes in DataPurgingExecutor Job: "
-							+ e);
+							, e);
 		}
 		return resultList;
 	}
@@ -231,7 +232,7 @@ public class DataPurgingExecutor extends TimerTask {
 		} catch (InsightsCustomException e) {
 			log.error(
 					"Exception occured while getting information of all nodes with relationships in DataPurgingExecutor Job:"
-							+ e);
+							,e);
 			throw new InsightsCustomException(e.getMessage());
 		}
 		return resultList;
@@ -240,14 +241,14 @@ public class DataPurgingExecutor extends TimerTask {
 	private int getOrphanNodeCount(GraphDBHandler dbHandler, long epochTime) throws InsightsCustomException {
 		String cntQry = "MATCH (n:DATA) WHERE not (n)-[]-() and n.inSightsTime<" + epochTime + " return count(*)";
 		GraphResponse cntResponse = dbHandler.executeCypherQuery(cntQry);
-		return cntResponse.getJson().get("results").getAsJsonArray().get(0).getAsJsonObject().get("data")
+		return cntResponse.getJson().get(ConfigOptions.RESULTS).getAsJsonArray().get(0).getAsJsonObject().get("data")
 				.getAsJsonArray().get(0).getAsJsonObject().get("row").getAsInt();
 	}
 
 	private int getNodesWithRelationshipsCount(GraphDBHandler dbHandler, long epochTime) throws InsightsCustomException {
 		String cntQry = "MATCH (n:DATA)-[r]->(m:DATA) where n.inSightsTime<" + epochTime + " return count(*)";
 		GraphResponse cntResponse = dbHandler.executeCypherQuery(cntQry);
-		return cntResponse.getJson().get("results").getAsJsonArray().get(0).getAsJsonObject().get("data")
+		return cntResponse.getJson().get(ConfigOptions.RESULTS).getAsJsonArray().get(0).getAsJsonObject().get("data")
 				.getAsJsonArray().get(0).getAsJsonObject().get("row").getAsInt();
 	}
 
@@ -282,21 +283,21 @@ public class DataPurgingExecutor extends TimerTask {
 		JsonArray relArray = new JsonArray();
 
 		JsonObject resultObj = new JsonObject();
-		resultObj.add("graph", graphObj);
-		graphObj.add("nodes", nodeArray);
-		graphObj.add("relationships", relArray);
+		resultObj.add(ConfigOptions.GRAPH, graphObj);
+		graphObj.add(ConfigOptions.NODES, nodeArray);
+		graphObj.add(ConfigOptions.RELATIONSHIPS, relArray);
 		int noOfFiles = 1;
 		StringBuilder sb = new StringBuilder();
 		for (GraphResponse response : responseList) {
-			JsonArray array = response.getJson().get("results").getAsJsonArray().get(0).getAsJsonObject().get("data")
+			JsonArray array = response.getJson().get(ConfigOptions.RESULTS).getAsJsonArray().get(0).getAsJsonObject().get("data")
 					.getAsJsonArray();
 			for (JsonElement element : array) {
-				JsonObject jsonObject = element.getAsJsonObject().get("graph").getAsJsonObject();
-				JsonArray nodes = jsonObject.get("nodes").getAsJsonArray();
+				JsonObject jsonObject = element.getAsJsonObject().get(ConfigOptions.GRAPH).getAsJsonObject();
+				JsonArray nodes = jsonObject.get(ConfigOptions.NODES).getAsJsonArray();
 				for (JsonElement node : nodes) {
 					nodeArray.add(node);
 				}
-				JsonArray rel = jsonObject.get("relationships").getAsJsonArray();
+				JsonArray rel = jsonObject.get(ConfigOptions.RELATIONSHIPS).getAsJsonArray();
 				if (rel.size() > 0) {
 					relArray.add(rel.get(0));
 				}
@@ -311,7 +312,7 @@ public class DataPurgingExecutor extends TimerTask {
 					fileWriter.write(outputString);
 					fileWriter.flush();
 				} catch (IOException e) {
-					log.error("Error in writeToJsonFile method" + e);
+					log.error("Error in writeToJsonFile method " , e);
 					throw e;
 				}
 				noOfFiles++;
@@ -319,9 +320,9 @@ public class DataPurgingExecutor extends TimerTask {
 				nodeArray = new JsonArray();
 				relArray = new JsonArray();
 				resultObj = new JsonObject();
-				resultObj.add("graph", graphObj);
-				graphObj.add("nodes", nodeArray);
-				graphObj.add("relationships", relArray);
+				resultObj.add(ConfigOptions.GRAPH, graphObj);
+				graphObj.add(ConfigOptions.NODES, nodeArray);
+				graphObj.add(ConfigOptions.RELATIONSHIPS, relArray);
 			}
 		}
 		String outputString = sb.toString();
@@ -332,7 +333,7 @@ public class DataPurgingExecutor extends TimerTask {
 				fileWriter.write(outputString);
 				fileWriter.flush();
 			} catch (IOException e) {
-				log.error("Error in writeToJsonFile method" + e);
+				log.error("Error in writeToJsonFile method ",  e);
 				throw e;
 			}
 		}
@@ -360,7 +361,7 @@ public class DataPurgingExecutor extends TimerTask {
 	@SuppressWarnings("unused")
 	private void writeToCSVFile(GraphResponse response, String location) throws IOException {
 		String csvFileLocation = location + ".csv";
-		JsonArray array = response.getJson().get("results").getAsJsonArray().get(0).getAsJsonObject().get("data")
+		JsonArray array = response.getJson().get(ConfigOptions.RESULTS).getAsJsonArray().get(0).getAsJsonObject().get("data")
 				.getAsJsonArray();
 		Map<String, Integer> headerMap = new HashMap<>();
 		List<ArrayList<String>> valueStore = new ArrayList<>();
@@ -412,7 +413,7 @@ public class DataPurgingExecutor extends TimerTask {
 				csvPrinter.printRecord(values);
 			}
 		} catch (IOException e) {
-			log.error("Error in writeToCSV method" + e);
+			log.error("Error in writeToCSV method ", e);
 			throw e;
 		}
 	}

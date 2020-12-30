@@ -41,7 +41,8 @@ export class InsightsInitService {
     static isDebugModeEnable = false;
     static enableLogoutButton = true;
     static mlDataTypes = {};
-	static version;
+    static version;
+    static serverConfig = {};
     
 
     constructor(location: Location, private http: HttpClient,
@@ -60,6 +61,7 @@ export class InsightsInitService {
         let gentConfigResponse = await this.getJSONUsingObservable(agentConfigJsonUrl).toPromise();
         InsightsInitService.configDesc = gentConfigResponse.desriptions;
         InsightsInitService.mlDataTypes = gentConfigResponse.mlDataTypes;
+        InsightsInitService.serverConfig = gentConfigResponse.serverConfig;
 
     }
     private async loadUiServiceLocation() {
@@ -133,5 +135,9 @@ export class InsightsInitService {
 
     public getMLDataTypes(): any {
         return InsightsInitService.mlDataTypes;
+    }
+
+    public getServerConfig(): any {
+        return InsightsInitService.serverConfig;
     }
 }

@@ -27,9 +27,10 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -37,6 +38,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.cognizant.devops.auditservice.audit.report.AuditReportScheduler;
 import com.cognizant.devops.auditservice.audit.service.AuditService;
 import com.cognizant.devops.auditservice.audit.service.PdfWriter;
+import com.cognizant.devops.platformcommons.constants.InsightsAuditConstants;
 import com.cognizant.devops.platformservice.rest.util.PlatformServiceUtil;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -45,7 +47,6 @@ import com.google.gson.JsonObject;
 @RestController
 @RequestMapping("traceability")
 public class AuditController {
-	
 	private static Logger Log = LogManager.getLogger(AuditController.class);
 
     @Autowired
@@ -54,13 +55,13 @@ public class AuditController {
     @Autowired
 	PdfWriter pdfWriterImpl;
 
-    @RequestMapping(value = "/getAssetInfo", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @GetMapping(value = "/getAssetInfo",produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     public JsonObject searchAuditLogByAsset(@RequestParam String assetId) {
         JsonObject response;
         try {
             response = auditServiceImpl.searchAuditLogByAsset(assetId);
-            if (response.getAsJsonPrimitive("statusCode").getAsString().equals("200"))
+            if (response.getAsJsonPrimitive(InsightsAuditConstants.STATUS_CODE).getAsString().equals("200"))
                 return PlatformServiceUtil.buildSuccessResponseWithData(response.getAsJsonArray("data"));
             else
                 return PlatformServiceUtil.buildFailureResponse(response.getAsJsonPrimitive("data").getAsString());
@@ -69,13 +70,13 @@ public class AuditController {
         }
     }
 
-    @RequestMapping(value = "/getAllAssets", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @GetMapping(value = "/getAllAssets",produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     public JsonObject searchAuditLogByDate(@RequestParam String startDate, @RequestParam String endDate, @RequestParam String toolName) {
         JsonObject response;
         try {
             response = auditServiceImpl.searchAuditLogByDate(startDate, endDate, toolName);
-            if (response.getAsJsonPrimitive("statusCode").getAsString().equals("200"))
+            if (response.getAsJsonPrimitive(InsightsAuditConstants.STATUS_CODE).getAsString().equals("200"))
                 return PlatformServiceUtil.buildSuccessResponseWithData(response.getAsJsonArray("data"));
             else
                 return PlatformServiceUtil.buildFailureResponse(response.getAsJsonPrimitive("data").getAsString());
@@ -84,13 +85,13 @@ public class AuditController {
         }
     }
 
-    @RequestMapping(value = "/getAssetHistory", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @GetMapping(value = "/getAssetHistory",produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     public JsonObject getAssetHistory(@RequestParam String assetId) {
         JsonObject response = new JsonObject();
         try {
             response = auditServiceImpl.getAssetHistory(assetId);
-            if (response.getAsJsonPrimitive("statusCode").getAsString().equals("200"))
+            if (response.getAsJsonPrimitive(InsightsAuditConstants.STATUS_CODE).getAsString().equals("200"))
                 return PlatformServiceUtil.buildSuccessResponseWithData(response.getAsJsonArray("data"));
             else
                 return PlatformServiceUtil.buildFailureResponse(response.getAsJsonPrimitive("data").getAsString());
@@ -104,7 +105,7 @@ public class AuditController {
 	 * @param assetsResults - Dynamic table content
 	 * 
 	 */
-	@RequestMapping(value = "/getAuditReport", method = RequestMethod.POST)
+	@PostMapping(value = "/getAuditReport")
 	@ResponseBody
 	public ResponseEntity<byte[]> getAuditReport(@RequestBody JsonObject assetsResults,@RequestParam String pdfName) {
 		ResponseEntity<byte[]>  response = null;
@@ -113,8 +114,8 @@ public class AuditController {
 			JsonArray jsonarray = assetsResults.get("data").getAsJsonArray();
 			for(JsonElement jsonelement: jsonarray) {
 				JsonObject element = jsonelement.getAsJsonObject();
-				if(element.has("timestamp") && element.get("timestamp")!=null &&
-						element.get("timestamp").getAsString()!="") {
+				if(element.has(InsightsAuditConstants.TIMESTAMP) && element.get(InsightsAuditConstants.TIMESTAMP)!=null &&
+						!element.get(InsightsAuditConstants.TIMESTAMP).getAsString().isEmpty()) {
 					validInput = true;
 				}
 			}
@@ -133,13 +134,13 @@ public class AuditController {
 				throw new Exception("Invalid Response from Ledger , No timestamp found!");
 			}
 		} catch (Exception e) {
-			Log.error("Error, Failed to download pdf -- {} " , pdfName, e.getMessage());
+			Log.error("Error, Failed to download pdf -- {} {}" , pdfName, e.getMessage());
 		}
 		return response;
 	}
 
 	//Get the process json for UI pipeline
-    @RequestMapping(value = "/getProcessFlow", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @GetMapping(value = "/getProcessFlow",produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     public JsonObject getProcessFlow() {
         JsonObject response = new JsonObject();
@@ -156,15 +157,12 @@ public class AuditController {
      * @param logFileName
      * @return
      */
-	@RequestMapping(value = "/getReportLog", method = RequestMethod.GET)
+	@GetMapping(value = "/getReportLog")
 	@ResponseBody
 	public ResponseEntity<byte[]> getReportLog(@RequestParam("logFileName") String logFileName) {
 		ResponseEntity<byte[]>  response = null;
 		try {
 			String path = System.getenv().get("INSIGHTS_HOME") + File.separator + "logs" + File.separator + "PlatformAuditService" + File.separator + "Reports"+ File.separator + logFileName;
-			//String path = ConfigOptions.REPORT_LOGS_PATH + ConfigOptions.FILE_SEPERATOR + logFileName;
-			//System.out.println("Report log path -- "+path);
-			//System.out.println("Log File Name -- "+Paths.get(new File(path).getAbsolutePath()).getFileName());
 			boolean checkValidFile = PlatformServiceUtil.validateFile(logFileName);
 			if(checkValidFile) {
 				byte[] fileContent = Files.readAllBytes(Paths.get(new File(path).getAbsolutePath()));
@@ -183,7 +181,7 @@ public class AuditController {
 				}
 			}
 		} catch (Exception e) {
-			Log.error("Error, Failed to download Log file -- " + logFileName, e.getMessage());
+			Log.error("Error, Failed to download Log file --%s %s", logFileName, e.getMessage());
 		}
 		return response;
 	}
@@ -191,7 +189,7 @@ public class AuditController {
 	/**
 	 * Only for testing purpose . Will be removed later.
 	 */
-	@RequestMapping(value = "/testQuery", method = RequestMethod.GET)
+	@GetMapping(value = "/testQuery")
 	@ResponseBody
 	public void createReport(@RequestParam String reportName, @RequestParam String frequency) {
 		try {

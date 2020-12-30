@@ -17,11 +17,28 @@ package com.cognizant.devops.platformcommons.config;
 
 import java.io.Serializable;
 
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
+
 public class PostgreData implements Serializable{
+	
+	@NotEmpty 
+	@Pattern(regexp = "^(?!\\s*$).+", message = "postgres username must not be blank")
 	private String userName;
+	
+	@NotNull 
+	@NotBlank
+	@Pattern(regexp = "^(?!\\s*$).+", message = "postgres password must not be blank")
 	private String password;
+	
 	private String insightsDBUrl;
 	private String grafanaDBUrl;
+	private String c3pMinSize="9";
+	private String c3pMaxSize="25";
+	private String c3pTimout="2000";
+	private String c3pMaxStatements="300";
 	public String getUserName() {
 		return userName;
 	}
@@ -46,4 +63,32 @@ public class PostgreData implements Serializable{
 	public void setGrafanaDBUrl(String grafanaDBUrl) {
 		this.grafanaDBUrl = grafanaDBUrl;
 	}
+	public String getC3pMinSize() {
+		return c3pMinSize;
+	}
+	public void setC3pMinSize(String c3pMinSize) {
+		this.c3pMinSize = c3pMinSize;
+	}
+	public String getC3pMaxSize() {
+		return c3pMaxSize;
+	}
+	public void setC3pMaxSize(String c3pMaxSize) {
+		this.c3pMaxSize = c3pMaxSize;
+	}
+	public String getC3pTimout() {
+		return c3pTimout;
+	}
+	public void setC3pTimout(String c3pTimout) {
+		this.c3pTimout = c3pTimout;
+	}
+	public String getC3pMaxStatements() {
+		return c3pMaxStatements;
+	}
+	public void setC3pMaxStatements(String c3pMaxStatements) {
+		this.c3pMaxStatements = c3pMaxStatements;
+	}
+	
+	
 }
+
+

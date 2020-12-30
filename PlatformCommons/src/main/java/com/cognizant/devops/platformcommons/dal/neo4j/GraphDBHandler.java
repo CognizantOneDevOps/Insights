@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
+import com.cognizant.devops.platformcommons.constants.ConfigOptions;
 import com.cognizant.devops.platformcommons.dal.RestApiHandler;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.google.gson.JsonArray;
@@ -32,21 +33,26 @@ import com.google.gson.JsonParser;
  * @author 146414
  *         This class will handle all the interactions with graph database.
  */
-public class GraphDBHandler {
+public class GraphDBHandler{
+	String COMMIT_URL = "/db/data/transaction/commit";
+	String SCHEMAURL = "/db/data/schema/index/";
 	String SCHEMA_INDEX_URL = ApplicationConfigProvider.getInstance().getGraph().getEndpoint()
-			+ "/db/data/schema/index/";
+			+ SCHEMAURL;
 	String TRANSACTION_COMMIT_URL = ApplicationConfigProvider.getInstance().getGraph().getEndpoint()
-			+ "/db/data/transaction/commit";
+			+ COMMIT_URL;
 	DocumentParser parser;
 
 	public GraphDBHandler() {
 		parser = new DocumentParser();
+		SCHEMA_INDEX_URL = ApplicationConfigProvider.getInstance().getGraph().getEndpoint() + SCHEMAURL;
+		TRANSACTION_COMMIT_URL = ApplicationConfigProvider.getInstance().getGraph().getEndpoint()
+				+ COMMIT_URL;
 	}
 
 	public GraphDBHandler(String inputDataSource) {
-		SCHEMA_INDEX_URL = inputDataSource + "/db/data/schema/index/";
-		TRANSACTION_COMMIT_URL = inputDataSource + "/db/data/transaction/commit";
 		parser = new DocumentParser();
+		SCHEMA_INDEX_URL = inputDataSource + SCHEMAURL;
+		TRANSACTION_COMMIT_URL = inputDataSource + COMMIT_URL;
 	}
 
 	/**
@@ -69,7 +75,7 @@ public class GraphDBHandler {
 		JsonObject requestJson = new JsonObject();
 		JsonArray statementArray = new JsonArray();
 		statementArray.add(statement);
-		requestJson.add("statements", statementArray);
+		requestJson.add(ConfigOptions.STATEMENTS , statementArray);
 		String response = neo4jCommunication(requestJson);
 		return buildResponseJsonFromString(response);
 	}
@@ -89,7 +95,7 @@ public class GraphDBHandler {
 		JsonObject requestJson = new JsonObject();
 		JsonArray statementArray = new JsonArray();
 		statementArray.add(statement);
-		requestJson.add("statements", statementArray);
+		requestJson.add(ConfigOptions.STATEMENTS , statementArray);
 		String response = neo4jCommunication(requestJson);
 		return buildResponseJsonFromString(response);
 	}
@@ -119,14 +125,14 @@ public class GraphDBHandler {
 		JsonObject requestJson = new JsonObject();
 		JsonArray statementArray = new JsonArray();
 		JsonObject statement = new JsonObject();
-		statement.addProperty("statement", query);
+		statement.addProperty(ConfigOptions.STATEMENT, query);
 		statementArray.add(statement);
 		JsonArray resultDataContents = new JsonArray();
 		resultDataContents.add("row");
-		resultDataContents.add("graph");
-		statement.add("resultDataContents", resultDataContents);
+		resultDataContents.add(ConfigOptions.GRAPH);
+		statement.add(ConfigOptions.RESULTDATACONTENTS, resultDataContents);
 
-		requestJson.add("statements", statementArray);
+		requestJson.add(ConfigOptions.STATEMENTS , statementArray);
 		String response = neo4jCommunication(requestJson);
 		return parser.processGraphDBNode(response);
 	}
@@ -142,14 +148,14 @@ public class GraphDBHandler {
 		JsonObject requestJson = new JsonObject();
 		JsonArray statementArray = new JsonArray();
 		JsonObject statement = new JsonObject();
-		statement.addProperty("statement", query);
+		statement.addProperty(ConfigOptions.STATEMENT, query);
 		statementArray.add(statement);
 		JsonArray resultDataContents = new JsonArray();
 		resultDataContents.add("row");
-		resultDataContents.add("graph");
-		statement.add("resultDataContents", resultDataContents);
+		resultDataContents.add(ConfigOptions.GRAPH);
+		statement.add(ConfigOptions.RESULTDATACONTENTS, resultDataContents);
 
-		requestJson.add("statements", statementArray);
+		requestJson.add(ConfigOptions.STATEMENTS , statementArray);
 		String response = neo4jCommunication(requestJson);
 		return new JsonParser().parse(response).getAsJsonObject();
 	}
@@ -179,14 +185,14 @@ public class GraphDBHandler {
 		for (int i = 0; i < count; i++) {
 			String query = queriesArray[i];
 			statement = new JsonObject();
-			statement.addProperty("statement", query);
+			statement.addProperty(ConfigOptions.STATEMENT, query);
 			resultDataContents = new JsonArray();
 			resultDataContents.add("row");
-			resultDataContents.add("graph");
-			statement.add("resultDataContents", resultDataContents);
+			resultDataContents.add(ConfigOptions.GRAPH);
+			statement.add(ConfigOptions.RESULTDATACONTENTS, resultDataContents);
 			statementArray.add(statement);
 		}
-		requestJson.add("statements", statementArray);
+		requestJson.add(ConfigOptions.STATEMENTS , statementArray);
 		String response = neo4jCommunication(requestJson);
 		return parser.processGraphDBNode(response);
 	}
@@ -220,7 +226,7 @@ public class GraphDBHandler {
 				JsonObject statement = getCreateCypherQueryStatement(data, cypherQuery);
 				statementArray.add(statement);
 			}
-			requestJson.add("statements", statementArray);
+			requestJson.add(ConfigOptions.STATEMENTS , statementArray);
 			return requestJson;
 		} catch (Exception e) {
 			throw new InsightsCustomException(e.getMessage());
@@ -236,7 +242,7 @@ public class GraphDBHandler {
 	private String neo4jCommunication(JsonObject requestJson) throws InsightsCustomException {
 		String returnResponse = null;
 		Map<String, String> headers = new HashMap<>();
-		headers.put("Authorization", ApplicationConfigProvider.getInstance().getGraph().getAuthToken());
+		headers.put(ConfigOptions.AUTHORIZATION, ApplicationConfigProvider.getInstance().getGraph().getAuthToken());
 		returnResponse = RestApiHandler.doPost(TRANSACTION_COMMIT_URL, requestJson, headers);
 		return returnResponse;
 	}
@@ -249,7 +255,7 @@ public class GraphDBHandler {
 	 */
 	public JsonArray loadFieldIndices() throws InsightsCustomException {
 		Map<String, String> headers = new HashMap<>();
-		headers.put("Authorization", ApplicationConfigProvider.getInstance().getGraph().getAuthToken());
+		headers.put(ConfigOptions.AUTHORIZATION, ApplicationConfigProvider.getInstance().getGraph().getAuthToken());
 		String response = RestApiHandler.doGet(SCHEMA_INDEX_URL, headers);
 		return new JsonParser().parse(response).getAsJsonArray();
 	}
@@ -268,7 +274,7 @@ public class GraphDBHandler {
 		properties.add(field);
 		requestJson.add("property_keys", properties);
 		Map<String, String> headers = new HashMap<>();
-		headers.put("Authorization", ApplicationConfigProvider.getInstance().getGraph().getAuthToken());
+		headers.put(ConfigOptions.AUTHORIZATION, ApplicationConfigProvider.getInstance().getGraph().getAuthToken());
 		String url = SCHEMA_INDEX_URL + label;
 		String response = RestApiHandler.doPost(url, requestJson, headers);
 		return new JsonParser().parse(response).getAsJsonObject();
@@ -281,7 +287,7 @@ public class GraphDBHandler {
 	 */
 	private JsonObject getCreateCypherQueryStatement(JsonElement data, String cypherQuery) {
 		JsonObject statement = new JsonObject();
-		statement.addProperty("statement", cypherQuery);
+		statement.addProperty(ConfigOptions.STATEMENT, cypherQuery);
 		JsonObject props = new JsonObject();
 		props.add("props", data);
 		statement.add("parameters", props);

@@ -20,9 +20,14 @@ import java.io.IOException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import com.cognizant.devops.engines.platformengine.message.core.EngineStatusLogger;
 import com.cognizant.devops.platformauditing.api.InsightsAuditImpl;
 import com.cognizant.devops.platformauditing.util.LoadFile;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphResponse;
+import com.cognizant.devops.platformcommons.config.ApplicationConfigInterface;
+import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
+import com.cognizant.devops.platformcommons.constants.InsightsAuditConstants;
+import com.cognizant.devops.platformcommons.constants.LogLevelConstants;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBHandler;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.google.common.hash.HashCode;
@@ -42,7 +47,7 @@ import java.security.spec.PKCS8EncodedKeySpec;
 import java.util.*;
 
 
-public class JiraProcessingExecutor extends TimerTask {
+public class JiraProcessingExecutor extends TimerTask implements ApplicationConfigInterface {
 	private static Logger LOG = LogManager.getLogger(JiraProcessingExecutor.class);
 	private String blockchainProcessedFlag = "blockchainProcessedFlag";
 	private long lastTimestamp;
@@ -57,8 +62,16 @@ public class JiraProcessingExecutor extends TimerTask {
 	@Override
 	public void run() {
 		LOG.info("Blockchain Processing Executer jira module is getting executed");
-
-		JiraNodeExtraction();
+		try {
+			ApplicationConfigInterface.loadConfiguration();
+			JiraNodeExtraction();
+		} catch (InsightsCustomException e) {
+			LOG.error(e);
+			EngineStatusLogger.getInstance().createEngineStatusNode(
+					" Error occured while initializing Audit Engine JIRA processing   " + e.getMessage(),
+					PlatformServiceConstants.FAILURE);
+		}
+		
 	}
 
 	private void JiraNodeExtraction() {
@@ -84,12 +97,12 @@ public class JiraProcessingExecutor extends TimerTask {
 				cypherSkip.append(" limit ").append(dataBatchSize);
 				GraphResponse response = dbHandler
 						.executeCypherQuery(cypher.toString() + cypherPickUpTime.toString() + cypherSkip.toString());
-				JsonArray rows = response.getJson().get("results").getAsJsonArray().get(0).getAsJsonObject().get("data")
+				JsonArray rows = response.getJson().get(InsightsAuditConstants.RESULTS).getAsJsonArray().get(0).getAsJsonObject().get("data")
 						.getAsJsonArray();
 				LOG.debug(rows);
 				for (JsonElement dataElem : rows) {
-					if(dataElem.getAsJsonObject().get("row").getAsJsonArray().get(0).getAsJsonObject().has("digitalSignature") && (dataElem.getAsJsonObject().get("row").getAsJsonArray().get(0).getAsJsonObject().has("key") || dataElem.getAsJsonObject().get("row").getAsJsonArray().get(0).getAsJsonObject().has("issueKey"))) {
-						String digitalSign = dataElem.getAsJsonObject().get("row").getAsJsonArray().get(0).getAsJsonObject().getAsJsonPrimitive("digitalSignature").getAsString();
+					if(dataElem.getAsJsonObject().get("row").getAsJsonArray().get(0).getAsJsonObject().has(InsightsAuditConstants.DIGITALSIGNATURE) && (dataElem.getAsJsonObject().get("row").getAsJsonArray().get(0).getAsJsonObject().has("key") || dataElem.getAsJsonObject().get("row").getAsJsonArray().get(0).getAsJsonObject().has("issueKey"))) {
+						String digitalSign = dataElem.getAsJsonObject().get("row").getAsJsonArray().get(0).getAsJsonObject().getAsJsonPrimitive(InsightsAuditConstants.DIGITALSIGNATURE).getAsString();
 						LOG.debug("--------------------------------jira executer-----------------");
 						String hc = getHash(dataElem.getAsJsonObject().get("row").getAsJsonArray());
 						LOG.debug(hc);
@@ -156,7 +169,7 @@ public class JiraProcessingExecutor extends TimerTask {
         	//LOG.debug(dt);
             TreeMap<String, String> t = new TreeMap<String, String>();
             dt.getAsJsonObject().entrySet().parallelStream().forEach(entry -> {
-                if (!entry.getKey().equals("uuid") && !entry.getKey().equals("digitalSignature")) {
+                if (!entry.getKey().equals("uuid") && !entry.getKey().equals(InsightsAuditConstants.DIGITALSIGNATURE)) {
                     if (entry.getKey().equals("inSightsTime") || entry.getKey().endsWith("Epoch")) {
                     	LOG.debug("has epoch time");
                         t.put(entry.getKey(), String.valueOf(entry.getValue().getAsLong()) + ".0");
@@ -204,8 +217,8 @@ public class JiraProcessingExecutor extends TimerTask {
 	private boolean insertJiraNodes(JsonElement dataElem, boolean successfulWriteFlag) {
 		GraphDBHandler dbHandler = new GraphDBHandler();
 		try {
-			if (dataElem.getAsJsonObject().get("row").getAsJsonArray().get(0).getAsJsonObject().has("digitalSignature"))
-                dataElem.getAsJsonObject().get("row").getAsJsonArray().get(0).getAsJsonObject().remove("digitalSignature");
+			if (dataElem.getAsJsonObject().get("row").getAsJsonArray().get(0).getAsJsonObject().has(InsightsAuditConstants.DIGITALSIGNATURE))
+                dataElem.getAsJsonObject().get("row").getAsJsonArray().get(0).getAsJsonObject().remove(InsightsAuditConstants.DIGITALSIGNATURE);
 			if (dataElem.getAsJsonObject().get("row").getAsJsonArray().get(0).getAsJsonObject().has("changeId")) {
 				lastTimestamp = dataElem.getAsJsonObject().get("row").getAsJsonArray().get(0).getAsJsonObject()
 						.getAsJsonPrimitive("changeDateEpoch").getAsLong();
@@ -228,8 +241,8 @@ public class JiraProcessingExecutor extends TimerTask {
 						.append("\"");
 				changelogCypher.append(" RETURN distinct(c) order by c.changeDateEpoch DESC");
 				GraphResponse response = dbHandler.executeCypherQuery(changelogCypher.toString());
-				if (response.getJson().getAsJsonArray("results").size() > 0) {
-					JsonArray rows = response.getJson().get("results").getAsJsonArray().get(0).getAsJsonObject()
+				if (response.getJson().getAsJsonArray(InsightsAuditConstants.RESULTS).size() > 0) {
+					JsonArray rows = response.getJson().get(InsightsAuditConstants.RESULTS).getAsJsonArray().get(0).getAsJsonObject()
 							.get("data").getAsJsonArray();
 
 					for (JsonElement changeLog : rows) {

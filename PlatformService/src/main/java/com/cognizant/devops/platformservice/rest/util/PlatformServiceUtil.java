@@ -17,6 +17,7 @@ package com.cognizant.devops.platformservice.rest.util;
 
 import java.io.File;
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.HashMap;
@@ -25,16 +26,13 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.NewCookie;
-
 import org.apache.commons.io.FilenameUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
 import com.cognizant.devops.platformcommons.core.util.ValidationUtils;
@@ -106,7 +104,7 @@ public class PlatformServiceUtil {
 			// log.debug("Request Cookies length " + request_cookies.length);
 			for (int i = 0; i < request_cookies.length; i++) {
 				cookie = request_cookies[i];
-				log.debug(" cookie " + cookie.getName() + " " + cookie.getValue());
+				log.debug(" cookie {} {} ", cookie.getName(), cookie.getValue());
 				if (AuthenticationUtils.MASTER_COOKIES_KEY_LIST.contains(cookie.getName())) {
 					cookie.setMaxAge(30 * 60);
 					cookie.setHttpOnly(true);
@@ -115,7 +113,7 @@ public class PlatformServiceUtil {
 					cookiesList.add(cookie);
 					cookiesArrayLength = cookiesArrayLength + 1;
 				} else {
-					log.debug("Cookie Name Not found in master cookies list name as " + cookie.getName());
+					log.debug("Cookie Name Not found in master cookies list name as {}", cookie.getName());
 				}
 			}
 			cookiesArray = new Cookie[cookiesArrayLength];
@@ -143,7 +141,7 @@ public class PlatformServiceUtil {
 					cookie.setValue(ValidationUtils.cleanXSS(cookie.getValue()));
 					cookieMap.put(cookie.getName(), cookie.getValue());
 				} else {
-					log.debug("Cookie Name Not found in master cookies list name as " + cookie.getName());
+					log.debug("Cookie Name Not found in master cookies list name as {} ", cookie.getName());
 				}
 			}
 		}
@@ -159,12 +157,12 @@ public class PlatformServiceUtil {
 	public static boolean checkValidPath(String path) {
 		boolean valid = false;
 		try {
-			log.debug("path " + path);
-			log.debug("canonical path " + new File(path).getCanonicalPath());
+			log.debug("path {}", path);
+			log.debug("canonical path {}",new File(path).getCanonicalPath());
 			//check for canonical path
 			if (path.equals(new File(path).getCanonicalPath())) {
 				//check directory
-				log.debug("canonical path check done--" + path);
+				log.debug("canonical path check done- {} ", path);
 				String parts[] = path.split(Pattern.quote(File.separator));
 				for (int i = 0; i < parts.length; i++) {
 					if (i == 0 && parts[0].equals("")) {
@@ -179,10 +177,10 @@ public class PlatformServiceUtil {
 					}
 				}
 			} else {
-				log.debug("canonical path check failed--" + path);
+				log.debug("canonical path check failed- {}",  path);
 			}
 		} catch (Exception e) {
-			log.error("Not a valid path -- " + e.getStackTrace());
+			log.error("Not a valid path -- ", e);
 		}
 		return valid;
 	}
@@ -208,7 +206,7 @@ public class PlatformServiceUtil {
 				}
 			}
 		} catch (Exception e) {
-			log.error("Not a valid path --", e);
+			log.error("Not a valid path -- ", e);
 		}
 		return false;
 	}
@@ -238,7 +236,7 @@ public class PlatformServiceUtil {
 		if (!AuthenticationUtils.IS_NATIVE_AUTHENTICATION) {
 			String webAuthHeaderKey = ValidationUtils
 					.cleanXSS(httpRequest.getHeader(AuthenticationUtils.GRAFANA_WEBAUTH_HEADER_KEY));
-			log.debug(" x-webauth-user ==== {} ", webAuthHeaderKey);
+			log.debug(" x-webauth-user {} ==== ", webAuthHeaderKey);
 			headers.put(AuthenticationUtils.GRAFANA_WEBAUTH_USERKEY, webAuthHeaderKey);
 			headers.put(AuthenticationUtils.GRAFANA_WEBAUTH_USERKEY_NAME, webAuthHeaderKey);
 		}
@@ -260,13 +258,13 @@ public class PlatformServiceUtil {
 				try {
 					requestCookies = getGrafanaCookies(httpRequest);
 				} catch (UnsupportedEncodingException e) {
-					log.error("Unable to get grafana session. Error is {} ", e);
+					log.error("Unable to get grafana session. Error is ", e);
 				}
 			}
 		}
 		String grafanaCookies = requestCookies.entrySet().stream().map(e -> e.getKey() + "=" + e.getValue())
 				.collect(Collectors.joining(";"));
-		log.debug(" grafanaCookies ==== {} ", grafanaCookies);
+		log.debug(" grafanaCookies ==== {}", grafanaCookies);
 		return grafanaCookies;
 	}
 
@@ -276,7 +274,7 @@ public class PlatformServiceUtil {
 		Map<String, String> requestCookies = new HashMap<>(0);
 		String authHeader = ValidationUtils
 				.decryptAutharizationToken(httpRequest.getHeader(AuthenticationUtils.AUTH_HEADER_KEY));
-		String decodedAuthHeader = new String(Base64.getDecoder().decode(authHeader.split(" ")[1]), "UTF-8");
+		String decodedAuthHeader = new String(Base64.getDecoder().decode(authHeader.split(" ")[1]), StandardCharsets.UTF_8);
 		String[] authTokens = decodedAuthHeader.split(":");
 		JsonObject loginRequestParams = new JsonObject();
 		loginRequestParams.addProperty("user", authTokens[0]);

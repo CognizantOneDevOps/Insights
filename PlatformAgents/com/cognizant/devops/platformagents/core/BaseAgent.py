@@ -80,7 +80,8 @@ class BaseAgent(object):
 
     def getCredential(self,key):
         if self.vaultFlag:
-            return self.vaultJson["data"]["data"][key]
+            vaultData=json.loads(self.vaultJson["data"]["value"])
+            return vaultData[key]
         else:
             return self.config.get(key, None)
 
@@ -90,7 +91,7 @@ class BaseAgent(object):
         secretEngine=self.config.get("vault").get("secretEngine", '')
         vaultUrl=self.config.get("vault").get("vaultUrl", '')
         reqHeaders = {'Accept':'application/json','X-Vault-Token':readTokenValue}
-        agentCredential = requests.get(vaultUrl+secretEngine+"/data/"+agentId, auth=None, headers=reqHeaders, data=None,proxies=None, verify=None)
+        agentCredential = requests.get(vaultUrl, auth=None, headers=reqHeaders, data=None,proxies=None, verify=None)
         # agentCredential=os.popen("curl -X GET -H 'X-Vault-Token: "+readTokenValue+"\'"+" -s "+vaultUrl+secretEngine+"/data/"+agentId).read()
         if "errors" in agentCredential:
             raise ValueError('BaseAgent: unable to load Vault Credentials')

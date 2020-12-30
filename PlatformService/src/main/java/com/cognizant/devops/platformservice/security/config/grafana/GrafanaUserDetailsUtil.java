@@ -46,8 +46,6 @@ import com.google.gson.JsonParser;
 
 public class GrafanaUserDetailsUtil {
 	private static final Logger log = LogManager.getLogger(GrafanaUserDetailsUtil.class);
-	
-	
 
 	/**
 	 * used to validate grafana user detail and add grafana cookies in request

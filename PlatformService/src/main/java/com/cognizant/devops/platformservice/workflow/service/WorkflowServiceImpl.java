@@ -30,6 +30,7 @@ import org.springframework.stereotype.Service;
 
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.config.EmailConfiguration;
+import com.cognizant.devops.platformcommons.constants.AssessmentReportAndWorkflowConstants;
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
 import com.cognizant.devops.platformcommons.core.enums.WorkflowTaskEnum;
 import com.cognizant.devops.platformcommons.core.util.InsightsUtils;
@@ -186,7 +187,7 @@ public class WorkflowServiceImpl {
 			JsonArray jsonarray = new JsonArray();
 			for (InsightsWorkflowTask taskDetail : listofTasks) {
 				JsonObject jsonobject = new JsonObject();
-				jsonobject.addProperty("taskId", taskDetail.getTaskId());
+				jsonobject.addProperty(AssessmentReportAndWorkflowConstants.TASK_ID, taskDetail.getTaskId());
 				jsonobject.addProperty("description", taskDetail.getDescription());
 				jsonarray.add(jsonobject);
 			}
@@ -215,7 +216,7 @@ public class WorkflowServiceImpl {
 				workflowConfigDAL.deleteWorkflowTaskSequence(workflowConfig.getWorkflowId());
 			}
 			ArrayList<Integer> sortedTask = new ArrayList<>();
-			taskList.forEach(taskObj -> sortedTask.add(taskObj.getAsJsonObject().get("taskId").getAsInt()));
+			taskList.forEach(taskObj -> sortedTask.add(taskObj.getAsJsonObject().get(AssessmentReportAndWorkflowConstants.TASK_ID).getAsInt()));
 			@SuppressWarnings("unchecked")
 
 			/*
@@ -273,9 +274,9 @@ public class WorkflowServiceImpl {
 				rec.addProperty("executionid", (long) record[0]);
 				rec.addProperty("startTime", (long) record[1]);
 				if (((long) record[2]) == 0) {
-					rec.addProperty("endTime", 0);
+					rec.addProperty(AssessmentReportAndWorkflowConstants.ENDTIME, 0);
 				} else {
-					rec.addProperty("endTime", (long) record[2]);
+					rec.addProperty(AssessmentReportAndWorkflowConstants.ENDTIME, (long) record[2]);
 				}
 				rec.addProperty("retryCount", (int) record[3]);
 				rec.addProperty("statusLog", String.valueOf(record[4]));
@@ -302,7 +303,7 @@ public class WorkflowServiceImpl {
 	public JsonObject getWorkFlowExecutionRecordsByWorkflowId(JsonObject workflowIdJson)
 			throws InsightsCustomException {
 		try {
-			String workflowId = workflowIdJson.get("workflowId").getAsString();
+			String workflowId = workflowIdJson.get(AssessmentReportAndWorkflowConstants.WORKFLOW_ID).getAsString();
 			List<Object[]> records = workflowConfigDAL.getWorkflowExecutionRecordsByworkflowID(workflowId);
 			JsonArray recordData = new JsonArray();
 			records.stream().forEach(record -> {
@@ -310,9 +311,9 @@ public class WorkflowServiceImpl {
 				rec.addProperty("executionid", (long) record[0]);
 				rec.addProperty("startTime", (long) record[1]);
 				if (((long) record[2]) == 0) {
-					rec.addProperty("endTime", 0);
+					rec.addProperty(AssessmentReportAndWorkflowConstants.ENDTIME, 0);
 				} else {
-					rec.addProperty("endTime", (long) record[2]);
+					rec.addProperty(AssessmentReportAndWorkflowConstants.ENDTIME, (long) record[2]);
 				}
 				rec.addProperty("retryCount", (int) record[3]);
 				rec.addProperty("statusLog", String.valueOf(record[4]));
@@ -345,18 +346,18 @@ public class WorkflowServiceImpl {
 		String mailBody = emailDetails.get("mailBodyTemplate").getAsString();
 		mailBody = mailBody.replace("#", "<").replace("~", ">");
 		emailTemplateConfig.setMailFrom(emailDetails.get("senderEmailAddress").getAsString());
-		if (!emailDetails.get("receiverEmailAddress").getAsString().isEmpty()) {
-			emailTemplateConfig.setMailTo(emailDetails.get("receiverEmailAddress").getAsString());
+		if (!emailDetails.get(AssessmentReportAndWorkflowConstants.RECEIVEREMAILADDRESS).getAsString().isEmpty()) {
+			emailTemplateConfig.setMailTo(emailDetails.get(AssessmentReportAndWorkflowConstants.RECEIVEREMAILADDRESS).getAsString());
 		} else {
 			emailTemplateConfig.setMailTo(null);
 		}
-		if (!emailDetails.get("receiverCCEmailAddress").getAsString().isEmpty()) {
-			emailTemplateConfig.setMailCC(emailDetails.get("receiverCCEmailAddress").getAsString());
+		if (!emailDetails.get(AssessmentReportAndWorkflowConstants.RECEIVERCCEMAILADDRESS).getAsString().isEmpty()) {
+			emailTemplateConfig.setMailCC(emailDetails.get(AssessmentReportAndWorkflowConstants.RECEIVERCCEMAILADDRESS).getAsString());
 		} else {
 			emailTemplateConfig.setMailCC(null);
 		}
-		if (!emailDetails.get("receiverBCCEmailAddress").getAsString().isEmpty()) {
-			emailTemplateConfig.setMailBCC(emailDetails.get("receiverBCCEmailAddress").getAsString());
+		if (!emailDetails.get(AssessmentReportAndWorkflowConstants.RECEIVERBCCEMAILADDRESS).getAsString().isEmpty()) {
+			emailTemplateConfig.setMailBCC(emailDetails.get(AssessmentReportAndWorkflowConstants.RECEIVERBCCEMAILADDRESS).getAsString());
 		} else {
 			emailTemplateConfig.setMailBCC(null);
 		}
@@ -406,7 +407,7 @@ public class WorkflowServiceImpl {
 			JsonObject responseJson = new JsonObject();
 			responseJson.addProperty("status", status);
 			responseJson.addProperty("executionId", executionId);
-			responseJson.addProperty("workflowId", workflowId);
+			responseJson.addProperty(AssessmentReportAndWorkflowConstants.WORKFLOW_ID, workflowId);
 			return responseJson;
 		} catch (Exception e) {
 			log.error("Error while fetching execution ids", e);
@@ -424,7 +425,7 @@ public class WorkflowServiceImpl {
 	public byte[] getReportPDF(JsonObject pdfDetailsJson) throws InsightsCustomException {
 		byte[] pdfContent = null;
 		try {
-			String workflowId = pdfDetailsJson.get("workflowId").getAsString();
+			String workflowId = pdfDetailsJson.get(AssessmentReportAndWorkflowConstants.WORKFLOW_ID).getAsString();
 			long executionId = pdfDetailsJson.get("executionId").getAsLong();
 			InsightsReportVisualizationContainer reportVisObject = workflowConfigDAL
 					.getReportVisualizationContainerByWorkflowAndExecutionId(workflowId, executionId);
@@ -521,7 +522,7 @@ public class WorkflowServiceImpl {
 			InsightsWorkflowConfiguration workflowConfig = workflowConfigDAL
 					.getWorkflowByWorkflowId(healthNotificationWorkflowId);
 			if (workflowConfig != null) {
-				response.addProperty("workflowId", workflowConfig.getWorkflowId());
+				response.addProperty(AssessmentReportAndWorkflowConstants.WORKFLOW_ID, workflowConfig.getWorkflowId());
 				response.addProperty("isActive", workflowConfig.isActive());
 			}
 		} catch (Exception e) {
@@ -552,7 +553,7 @@ public class WorkflowServiceImpl {
 	 */
 	public JsonObject createTaskJson(int taskId, int sequence) {
 		JsonObject taskJson = new JsonObject();
-		taskJson.addProperty("taskId", taskId);
+		taskJson.addProperty(AssessmentReportAndWorkflowConstants.TASK_ID, taskId);
 		taskJson.addProperty("sequence", sequence);
 		return taskJson;
 	}

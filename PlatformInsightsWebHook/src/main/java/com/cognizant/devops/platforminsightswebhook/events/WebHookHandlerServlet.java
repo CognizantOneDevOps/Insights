@@ -46,6 +46,7 @@ public class WebHookHandlerServlet extends HttpServlet {
 	private static Logger log = LogManager.getLogger(WebHookHandlerServlet.class);
 
 	public WebHookHandlerServlet() {
+		super();
 	}
 
 	/**
@@ -59,7 +60,7 @@ public class WebHookHandlerServlet extends HttpServlet {
 		try {
 			processRequest(request);
 		} catch (Exception e) {
-			log.error("Error while adding data in Mq in doget method " + e.getMessage());
+			log.error("Error while adding data in Mq in doget method {} ", e.getMessage());
 			setResponseMessage(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
 		} finally {
 			try {
@@ -85,7 +86,7 @@ public class WebHookHandlerServlet extends HttpServlet {
 			setResponseMessage(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
 			log.error(e.getMessage());
 		} catch (Exception e) {
-			log.error("Error while adding data in Mq in doPost method " + e);
+			log.error("Error while adding data in Mq in doPost method ", e);
 			setResponseMessage(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
 		}
 	}

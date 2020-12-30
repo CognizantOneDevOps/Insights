@@ -17,14 +17,23 @@ package com.cognizant.devops.platformcommons.config;
 
 import java.io.Serializable;
 
+import javax.validation.constraints.Pattern;
+
 public class GrafanaData implements Serializable {
+	
+	
+	@Pattern(regexp = "^(?!\\s*$).+", message = "grafanaEndpoint must not be blank")
 	private String grafanaEndpoint;
 	private String grafanaExternalEndPoint;
+
+	@Pattern(regexp = "^(?!\\s*$).+", message = "grafanaDBEndpoint must not be blank")
 	private String grafanaDBEndpoint;
+
+	@Pattern(regexp = "^(?!\\s*$).+", message = "Grafana admin user  must not be blank")
 	private String adminUserName;
+
+	@Pattern(regexp = "^(?!\\s*$).+", message = "Grafana admin user password must not be blank")
 	private String adminUserPassword;
-	private String dbUserName;
-	private String dbPassword;
 	private String grafanaVersion;
 
 	public String getGrafanaEndpoint() {
@@ -57,22 +66,6 @@ public class GrafanaData implements Serializable {
 
 	public void setAdminUserPassword(String adminUserPassword) {
 		this.adminUserPassword = adminUserPassword;
-	}
-
-	public String getDbUserName() {
-		return dbUserName;
-	}
-
-	public void setDbUserName(String dbUserName) {
-		this.dbUserName = dbUserName;
-	}
-
-	public String getDbPassword() {
-		return dbPassword;
-	}
-
-	public void setDbPassword(String dbPassword) {
-		this.dbPassword = dbPassword;
 	}
 
 	public String getGrafanaExternalEndPoint() {

@@ -38,6 +38,7 @@ import com.google.gson.JsonObject;
 
 @Service("dataDictionaryService")
 public class DataDictionaryServiceImpl implements DataDictionaryService {
+	
 	GraphDBHandler GraphDBHandler = new GraphDBHandler();
 	private static Logger log = LogManager.getLogger(DataDictionaryServiceImpl.class);
 
@@ -56,22 +57,22 @@ public class DataDictionaryServiceImpl implements DataDictionaryService {
 			while (iteratorAgent.hasNext()) {
 				AgentConfig configDetails = iteratorAgent.next();
 				JsonObject toolsDetailJson = new JsonObject();
-				toolsDetailJson.addProperty("toolName", configDetails.getToolName().toUpperCase());
-				toolsDetailJson.addProperty("categoryName", configDetails.getToolCategory().toUpperCase());
-				toolsDetailJson.addProperty("labelName", configDetails.getLabelName());
+				toolsDetailJson.addProperty(DataDictionaryConstants.TOOLNAME, configDetails.getToolName().toUpperCase());
+				toolsDetailJson.addProperty(DataDictionaryConstants.CATEGORYNAME, configDetails.getToolCategory().toUpperCase());
+				toolsDetailJson.addProperty(DataDictionaryConstants.LABELNAME, configDetails.getLabelName());
 				uniquetoolDetailSet.add(toolsDetailJson);
 			}
 			while (iteratorWebhook.hasNext()) {
 				WebHookConfig configDetails = iteratorWebhook.next();
 				JsonObject webhookDetailJson = new JsonObject();
-				webhookDetailJson.addProperty("toolName", configDetails.getToolName().toUpperCase());
+				webhookDetailJson.addProperty(DataDictionaryConstants.TOOLNAME, configDetails.getToolName().toUpperCase());
 				
 				if (configDetails.getLabelName().split(":").length == 0 ||  configDetails.getLabelName().split(":").length == 1) {
-					webhookDetailJson.addProperty("categoryName", configDetails.getLabelName());
-					webhookDetailJson.addProperty("labelName", configDetails.getLabelName());
+					webhookDetailJson.addProperty(DataDictionaryConstants.CATEGORYNAME, configDetails.getLabelName());
+					webhookDetailJson.addProperty(DataDictionaryConstants.LABELNAME, configDetails.getLabelName());
 				} else {
-					webhookDetailJson.addProperty("categoryName", configDetails.getLabelName().split(":", 0)[0]);
-					webhookDetailJson.addProperty("labelName", configDetails.getLabelName().split(":", 0)[1]);
+					webhookDetailJson.addProperty(DataDictionaryConstants.CATEGORYNAME, configDetails.getLabelName().split(":", 0)[0]);
+					webhookDetailJson.addProperty(DataDictionaryConstants.LABELNAME, configDetails.getLabelName().split(":", 0)[1]);
 				}
 				uniquetoolDetailSet.add(webhookDetailJson);
 

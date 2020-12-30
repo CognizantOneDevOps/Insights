@@ -81,12 +81,12 @@ public class DashboardUtil {
 			//document.save(title); - Saving a physical for debug purpose 
 			document.save(baos);
 		}catch (InterruptedException | IOException | AWTException e) {
-			Log.error("Error, Failed to download Dashboard .. ", e.getMessage());
+			Log.error("Error {}, Failed to download Dashboard .. ", e.getMessage());
 		}finally {
 			try {
 				document.close();
 			} catch (IOException e) {
-				Log.error("Error, Document failed to load .. ", e.getMessage());
+				Log.error("Error {}, Document failed to load .. ", e.getMessage());
 			}
 			DriverFactory.getInstance().removeDriver();
 		}
@@ -165,10 +165,10 @@ public class DashboardUtil {
 			} 
 		});
 		List<WebElement> eleq = driver.findElements(By.cssSelector(".react-grid-item.react-draggable.react-resizable"));
-		Log.info("Total panels - "+eleq.size());
+		Log.info("Total panels  {} - ",eleq.size());
 		JavascriptExecutor js = ((JavascriptExecutor) driver);
 		for(WebElement e: eleq){
-			Log.info("Panel --"+e);
+			Log.info("Panel {} --",e);
 			js.executeScript("arguments[0].scrollIntoView(true);", e);
 			Actions builder = new Actions(driver);
 			Action seriesOfActions = builder
@@ -189,13 +189,13 @@ public class DashboardUtil {
 			});
 			js.executeScript("arguments[0].scrollIntoView(true);", container);
 			Point point = container.getLocation();
-			Log.info("point--"+point);
-			Log.info("point.getX()--"+point.getX());
-			Log.info("point.getY()--"+point.getY());
+			Log.info("{} point--", point);
+			Log.info("{} point.getX()--", point.getX());
+			Log.info(" {} point.getY()--", point.getY());
 			int eleWidth = container.getSize().getWidth();
-			Log.info("eleWidth--"+eleWidth);
+			Log.info("eleWidth {} --",eleWidth);
 			int eleHeight = container.getSize().getHeight();
-			Log.info("eleHeight--"+eleHeight);
+			Log.info("eleHeight {} --",eleHeight);
 			/** Allows to save panel screenshot - enable it to debug **/
 			//FileUtils.copyFile(screenshot, new File(d.toString().replace(":", "_")+".png"));
 			BufferedImage eleScreenshot= fullImg.getSubimage(point.getX(), point.getY(),
@@ -243,14 +243,14 @@ public class DashboardUtil {
 				contentStream.close();
 			}
 		}catch(Exception e){
-			Log.error("Error, Failed in Footer.. ", e.getMessage());
+			Log.error("Error {} , Failed in Footer.. ", e.getMessage());
 		}
 		return doc;
 	}
 
 	private void generateImage(List<BufferedImage> imageList, PDDocument document) throws IOException {
 		if(imageList != null) {
-			Log.info("size---"+imageList.size());
+			Log.info("size--- {} ", imageList.size());
 			PDPageContentStream contentStream = null;
 			for(int i=0;i<imageList.size();i++){
 				if(i%2 ==0){

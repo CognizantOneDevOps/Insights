@@ -28,8 +28,10 @@ import com.cognizant.devops.engines.platformdataarchivalengine.message.subscribe
 import com.cognizant.devops.engines.platformdataarchivalengine.message.subscriber.DataArchivalHealthSubscriber;
 import com.cognizant.devops.engines.platformengine.message.core.EngineStatusLogger;
 import com.cognizant.devops.engines.platformengine.message.factory.EngineSubscriberResponseHandler;
+import com.cognizant.devops.platformcommons.config.ApplicationConfigInterface;
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.constants.DataArchivalConstants;
+import com.cognizant.devops.platformcommons.constants.LogLevelConstants;
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformdal.agentConfig.AgentConfig;
@@ -37,7 +39,7 @@ import com.cognizant.devops.platformdal.agentConfig.AgentConfigDAL;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
-public class DataArchivalAggregatorModule extends TimerTask {
+public class DataArchivalAggregatorModule extends TimerTask implements ApplicationConfigInterface{
 	private static Logger log = LogManager.getLogger(DataArchivalAggregatorModule.class);
 	private static Map<String, EngineSubscriberResponseHandler> registry = new HashMap<>();
 	AgentConfigDAL agentConfigDAL = new AgentConfigDAL();
@@ -45,8 +47,9 @@ public class DataArchivalAggregatorModule extends TimerTask {
 	@Override
 	public void run() {
 		log.debug("Data Archival Aggregator Module start");
-		ApplicationConfigProvider.performSystemCheck();
 		try {
+			ApplicationConfigInterface.loadConfiguration();
+			ApplicationConfigProvider.performSystemCheck();
 			List<AgentConfig> agentConfig = agentConfigDAL.getAgentConfigurations(DataArchivalConstants.TOOLNAME,
 					DataArchivalConstants.TOOLCATEGORY);
 			if (!agentConfig.isEmpty()) {
@@ -62,7 +65,7 @@ public class DataArchivalAggregatorModule extends TimerTask {
 		} catch (Exception e) {
 			log.error("Unable to add subscriber ", e);
 			EngineStatusLogger.getInstance().createDataArchivalStatusNode(
-					" Error occured while executing aggregator  " + e.getMessage(), PlatformServiceConstants.FAILURE);
+					" Error occured while executing data archival aggregator  " + e.getMessage(), PlatformServiceConstants.FAILURE);
 		}
 
 	}
@@ -76,7 +79,7 @@ public class DataArchivalAggregatorModule extends TimerTask {
 						" Data archival data queue " + dataRoutingKey + " subscribed successfully ",
 						PlatformServiceConstants.SUCCESS);
 			} catch (Exception e) {
-				log.error("Unable to add subscriber for routing key: " + dataRoutingKey, e);
+				log.error("Unable to add subscriber for routing key:{} ", dataRoutingKey, e);
 				EngineStatusLogger.getInstance().createDataArchivalStatusNode(
 						" Error occured while executing aggragator for data queue subscriber " + e.getMessage(),
 						PlatformServiceConstants.FAILURE);
@@ -93,7 +96,7 @@ public class DataArchivalAggregatorModule extends TimerTask {
 						" Data Archival Agent health queue " + healthRoutingKey + " subscribed successfully ",
 						PlatformServiceConstants.SUCCESS);
 			} catch (Exception e) {
-				log.error("Unable to add subscriber for routing key: " + healthRoutingKey, e);
+				log.error("Unable to add subscriber for routing key:{}" ,healthRoutingKey, e);
 				EngineStatusLogger.getInstance().createDataArchivalStatusNode(
 						" Error occured while executing aggregator for Data archival health queue subscriber  "
 								+ e.getMessage(),

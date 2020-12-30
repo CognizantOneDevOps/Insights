@@ -20,6 +20,12 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import com.google.gson.JsonObject;
+
+import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
+
 /**
  * 
  * @author 146414 This class will hold all the config options required for
@@ -30,23 +36,25 @@ public class ApplicationConfigProvider implements Serializable {
 	private static ApplicationConfigProvider instance = new ApplicationConfigProvider();
 	private EndpointData endpointData = new EndpointData();
 	private SparkConfigurations sparkConfigurations = new SparkConfigurations();
-	// private LDAPConfiguration ldapConfiguration = new LDAPConfiguration();
+	@Valid
 	private GraphData graph = new GraphData();
+	@Valid
 	private GrafanaData grafana = new GrafanaData();
+	@Valid
 	private MessageQueueDataModel messageQueue = new MessageQueueDataModel();
 	private String insightsServiceURL;
-	// private boolean disableAuth = false;
-	private String insightsTimeZone = "US/Central";
-	private PostgreData postgre;
+	private String insightsTimeZone = "UTC";
+	@Valid
+	private PostgreData postgre = new PostgreData();
 	private String userId;
 	private String password;
 	private String proxyHost;
 	private int proxyPort;
 	private Date refreshTime;
-	private List<String> trustedHosts = new ArrayList<String>(3);
+	private List<String> trustedHosts = new ArrayList<>(3);
 	private boolean enableOnlineDatatagging = false;
 	private EmailConfiguration emailConfiguration = new EmailConfiguration();
-	private CorrelationConfig correlations;
+	private CorrelationConfig correlations = new CorrelationConfig();
 	private boolean enableFieldIndex;
 	private boolean enableOnlineBackup = false;
 	private AgentDetails agentDetails = new AgentDetails();
@@ -58,6 +66,7 @@ public class ApplicationConfigProvider implements Serializable {
 	private String driverLocation;
 
 	private Vault vault = new Vault();
+	@NotEmpty @NotBlank
 	private String autheticationProtocol = "NativeGrafana";
 	private SingleSignOnConfig singleSignOnConfig = new SingleSignOnConfig();
 	private AssessmentReport assessmentReport = new AssessmentReport();	
@@ -66,6 +75,7 @@ public class ApplicationConfigProvider implements Serializable {
 
     private WebhookEngine webhookEngine= new WebhookEngine();
     private String pdfkey;
+	private ApplicationLogLevel applicationLogLevel = new ApplicationLogLevel();
     
 	private ApplicationConfigProvider() {
 		this.refreshTime = new Date(new Date().getTime() - 86400000);
@@ -356,6 +366,12 @@ public class ApplicationConfigProvider implements Serializable {
 	public void setMlConfiguration(MlConfiguration mlConfiguration) {
 		this.mlConfiguration = mlConfiguration;
 	}
-	
-	
+
+	public ApplicationLogLevel getApplicationLogLevel() {
+		return applicationLogLevel;
+	}
+
+	public void setApplicationLogLevel(ApplicationLogLevel applicationLogLevel) {
+		this.applicationLogLevel = applicationLogLevel;
+	}
 }

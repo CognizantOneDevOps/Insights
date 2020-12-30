@@ -34,7 +34,11 @@ import com.google.gson.JsonParser;
 
 public class GrafanaHandler {
 	
-	private static final String GRAFANA_END_POINT = ApplicationConfigProvider.getInstance().getGrafana().getGrafanaEndpoint();
+	private String GRAFANA_END_POINT = ApplicationConfigProvider.getInstance().getGrafana().getGrafanaEndpoint();
+
+	public GrafanaHandler() {
+		GRAFANA_END_POINT = ApplicationConfigProvider.getInstance().getGrafana().getGrafanaEndpoint();
+	}
 	
 	
 	/**

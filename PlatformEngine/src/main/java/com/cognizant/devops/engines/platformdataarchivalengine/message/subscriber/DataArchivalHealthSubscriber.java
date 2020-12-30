@@ -25,6 +25,7 @@ import org.apache.logging.log4j.Logger;
 
 import com.cognizant.devops.engines.platformengine.message.core.EngineStatusLogger;
 import com.cognizant.devops.engines.platformengine.message.factory.EngineSubscriberResponseHandler;
+import com.cognizant.devops.platformcommons.constants.DataArchivalConstants;
 import com.cognizant.devops.platformcommons.constants.MQMessageConstants;
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
 import com.cognizant.devops.platformcommons.core.enums.DataArchivalStatus;
@@ -51,7 +52,7 @@ public class DataArchivalHealthSubscriber extends EngineSubscriberResponseHandle
 			throws IOException {
 		String message = new String(body, MQMessageConstants.MESSAGE_ENCODING);
 		String routingKey = envelope.getRoutingKey();
-		log.debug(" {}  Received  {} : {}", consumerTag, routingKey, message);
+		log.debug(" Received :{} {} {}", consumerTag, routingKey, message);
 		List<JsonObject> dataList = new ArrayList<>();
 		List<JsonObject> failedDataList = new ArrayList<>();
 		Boolean isFailure = false;
@@ -85,16 +86,16 @@ public class DataArchivalHealthSubscriber extends EngineSubscriberResponseHandle
 			getChannel().basicAck(envelope.getDeliveryTag(), false);
 		} catch (InsightsCustomException e) {
 			log.error("Error occured in Data Archival Health Subscriber",e);
-			log.error("Health message: ",message);
+			log.error("Health message: {} ",message);
 			getChannel().basicAck(envelope.getDeliveryTag(), false);
 		}
 
 	}
 	
 	private void updateErrorStateInArchivalRecord(JsonObject messageJson) {
-		if (messageJson.has("archivalName")) {
-			if (!messageJson.get("archivalName").getAsString().isEmpty()) {
-				dataArchivalConfigDal.updateArchivalStatus(messageJson.get("archivalName").getAsString(),
+		if (messageJson.has(DataArchivalConstants.ARCHIVALNAME)) {
+			if (!messageJson.get(DataArchivalConstants.ARCHIVALNAME).getAsString().isEmpty()) {
+				dataArchivalConfigDal.updateArchivalStatus(messageJson.get(DataArchivalConstants.ARCHIVALNAME).getAsString(),
 						DataArchivalStatus.ERROR.toString());
 			} else {
 				log.error("Archival name not provided");

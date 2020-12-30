@@ -17,12 +17,13 @@ package com.cognizant.devops.platformworkflow.workflowtask.app;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
 import com.cognizant.devops.platformcommons.config.ApplicationConfigCache;
-import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
+import com.cognizant.devops.platformcommons.config.ApplicationConfigInterface;
+import com.cognizant.devops.platformcommons.constants.LogLevelConstants;
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
 import com.cognizant.devops.platformworkflow.workflowtask.core.InsightsStatusProvider;
 import com.cognizant.devops.platformworkflow.workflowtask.core.WorkflowSchedular;
-import com.cognizant.devops.platformworkflow.workflowtask.core.WorkflowTaskInitializer;
 import com.cognizant.devops.platformworkflow.workflowthread.core.WorkflowThreadPool;
 
 /**
@@ -31,7 +32,7 @@ import com.cognizant.devops.platformworkflow.workflowthread.core.WorkflowThreadP
  * Initialize Platform Workflow Module. 4. Log Platform Insight Health data in
  * DB
  */
-public class PlatformWorkflowApplication {
+public class PlatformWorkflowApplication implements ApplicationConfigInterface {
 	private static Logger log = LogManager.getLogger(PlatformWorkflowApplication.class);
 
 	public static void main(String[] args) {
@@ -39,12 +40,11 @@ public class PlatformWorkflowApplication {
 	}
 
 	public static void workflowExecutor() {
-		// Load isight config
-		ApplicationConfigCache.loadConfigCache();
-		// Create Default users
-		ApplicationConfigProvider.performSystemCheck();
+	try {
+			ApplicationConfigInterface.loadConfiguration();
+			
+			ApplicationConfigCache.updateLogLevel(LogLevelConstants.PlatformReport);
 
-		try {
 			InsightsStatusProvider.getInstance().createInsightStatusNode("Platform Workflow Application started. ",
 					PlatformServiceConstants.SUCCESS);
 			PlatformWorkflowApplication applicationWorkflow = new PlatformWorkflowApplication();

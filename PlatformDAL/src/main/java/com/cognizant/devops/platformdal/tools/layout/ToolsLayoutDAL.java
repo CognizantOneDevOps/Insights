@@ -17,91 +17,111 @@ package com.cognizant.devops.platformdal.tools.layout;
 
 import java.util.List;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.hibernate.Session;
 import org.hibernate.query.Query;
 
+import com.cognizant.devops.platformcommons.constants.AgentCommonConstant;
 import com.cognizant.devops.platformdal.core.BaseDAL;
 import com.google.gson.JsonObject;
 
 public class ToolsLayoutDAL extends BaseDAL{
+
+	private static Logger log = LogManager.getLogger(ToolsLayoutDAL.class);
 	
 	public boolean saveToolLayout(String toolName, String toolCategory, JsonObject toolLayoutSettingJson) {
-		Query<ToolsLayout> createQuery = getSession().createQuery(
-				"FROM ToolsLayout a WHERE a.toolName = :toolName AND a.toolCategory = :toolCategory",
-				ToolsLayout.class);
-		createQuery.setParameter("toolName", toolName);
-		createQuery.setParameter("toolCategory", toolCategory);
-		List<ToolsLayout> resultList = createQuery.getResultList();
-		ToolsLayout toolLayout = null;
-		if(resultList.size()>0){
-			toolLayout = resultList.get(0);
+		try (Session session = getSessionObj()) {
+			Query<ToolsLayout> createQuery = session.createQuery(
+					"FROM ToolsLayout a WHERE a.toolName = :toolName AND a.toolCategory = :toolCategory",
+					ToolsLayout.class);
+			createQuery.setParameter(AgentCommonConstant.TOOLNAME, toolName);
+			createQuery.setParameter(AgentCommonConstant.TOOLCATEGORY, toolCategory);
+			List<ToolsLayout> resultList = createQuery.getResultList();
+			ToolsLayout toolLayout = null;
+			if (resultList.size() > 0) {
+				toolLayout = resultList.get(0);
+			}
+			session.beginTransaction();
+			if (toolLayout != null) {
+				toolLayout.setSettingsJson(toolLayoutSettingJson.toString());
+				session.update(toolLayout);
+			} else {
+				toolLayout = new ToolsLayout();
+				toolLayout.setToolName(toolName);
+				toolLayout.setToolCategory(toolCategory);
+				toolLayout.setSettingsJson(toolLayoutSettingJson.toString());
+				session.save(toolLayout);
+			}
+			session.getTransaction().commit();
+			return true;
+		} catch (Exception e) {
+			log.error(e.getMessage());
+			throw e;
 		}
-		getSession().beginTransaction();
-		if (toolLayout != null) {
-			toolLayout.setSettingsJson(toolLayoutSettingJson.toString());
-			getSession().update(toolLayout);
-		} else {
-			toolLayout = new ToolsLayout();
-			toolLayout.setToolName(toolName);
-			toolLayout.setToolCategory(toolCategory);
-			toolLayout.setSettingsJson(toolLayoutSettingJson.toString());
-			getSession().save(toolLayout);
-		}
-		getSession().getTransaction().commit();
-		terminateSession();
-		terminateSessionFactory();
-		return true;
 	}
 
 	public ToolsLayout getToolLayout(String toolName, String toolCategory) {
-		Query<ToolsLayout> createQuery = getSession().createQuery(
+		
+		try (Session session = getSessionObj()) {
+		Query<ToolsLayout> createQuery = session.createQuery(
 				"FROM ToolsLayout TL WHERE TL.toolName = :toolName AND TL.toolCategory = :toolCategory",
 				ToolsLayout.class);
-		createQuery.setParameter("toolName", toolName);
-		createQuery.setParameter("toolCategory", toolCategory);
+		createQuery.setParameter(AgentCommonConstant.TOOLNAME, toolName);
+		createQuery.setParameter(AgentCommonConstant.TOOLCATEGORY, toolCategory);
 		ToolsLayout toolLayout = null;
 		try{
 			toolLayout = createQuery.getSingleResult();
 		}catch(Exception e){
 			throw new RuntimeException("Exception while retrieving data"+e);
 		}
-		terminateSession();
-		terminateSessionFactory();
 		return toolLayout;
+		}
+		 catch (Exception e) {
+				log.error(e.getMessage());
+				throw e;
+			}
 	}
 	
 	public List<ToolsLayout> getAllToolLayouts() {
-		Query<ToolsLayout> createQuery = getSession().createQuery(
-				"FROM ToolsLayout",
-				ToolsLayout.class);
-		List<ToolsLayout> resultList = createQuery.getResultList();
-		terminateSession();
-		terminateSessionFactory();
-		return resultList;
+		
+		try (Session session = getSessionObj()) {
+			Query<ToolsLayout> createQuery = session.createQuery("FROM ToolsLayout", ToolsLayout.class);
+			return createQuery.getResultList();
+		} catch (Exception e) {
+			log.error(e.getMessage());
+			throw e;
+		}
 	}
 
 	public boolean deleteToolLayout(String toolName, String toolCategory, int agentId) {
-		Query<ToolsLayout> createQuery = getSession().createQuery(
-				"FROM ToolsLayout TL WHERE TL.toolName = :toolName AND TL.toolCategory = :toolCategory",
-				ToolsLayout.class);
-		createQuery.setParameter("toolName", toolName);
-		createQuery.setParameter("toolCategory", toolCategory);
-		ToolsLayout toolLayout = createQuery.getSingleResult();
-		getSession().beginTransaction();
-		getSession().delete(toolLayout);
-		getSession().getTransaction().commit();
-		terminateSession();
-		terminateSessionFactory();
-		return true;
+		
+		try (Session session = getSessionObj()) {
+			Query<ToolsLayout> createQuery = session.createQuery(
+					"FROM ToolsLayout TL WHERE TL.toolName = :toolName AND TL.toolCategory = :toolCategory",
+					ToolsLayout.class);
+			createQuery.setParameter(AgentCommonConstant.TOOLNAME, toolName);
+			createQuery.setParameter(AgentCommonConstant.TOOLCATEGORY, toolCategory);
+			ToolsLayout toolLayout = createQuery.getSingleResult();
+			session.beginTransaction();
+			session.delete(toolLayout);
+			session.getTransaction().commit();
+			return true;
+		} catch (Exception e) {
+			log.error(e.getMessage());
+			throw e;
+		}
 	}
 	
 	public List<String> getDistinctToolNames() {
-		Query<String> createQuery = getSession().createQuery(
-				"SELECT DISTINCT TL.toolName FROM ToolsLayout TL",
-				String.class);
-		List<String> resultList = createQuery.getResultList();
-		terminateSession();
-		terminateSessionFactory();
-		return resultList;
+		try (Session session = getSessionObj()) {
+			Query<String> createQuery = session.createQuery("SELECT DISTINCT TL.toolName FROM ToolsLayout TL",
+					String.class);
+			return createQuery.getResultList();
+		} catch (Exception e) {
+			log.error(e.getMessage());
+			throw e;
+		}
 	}
 	
 	

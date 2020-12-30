@@ -29,8 +29,11 @@ import com.cognizant.devops.engines.platformengine.modules.mapper.ProjectMapperM
 import com.cognizant.devops.engines.platformengine.modules.offlinedataprocessing.OfflineDataProcessingExecutor;
 import com.cognizant.devops.engines.platformwebhookengine.offlineprocessing.WebhookOfflineEventProcessing;
 import com.cognizant.devops.platformcommons.config.ApplicationConfigCache;
+import com.cognizant.devops.platformcommons.config.ApplicationConfigInterface;
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
+import com.cognizant.devops.platformcommons.constants.LogLevelConstants;
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
+import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 
 /**
  * Engine execution will start from Application. 1. Load the iSight config 2.
@@ -39,20 +42,23 @@ import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
  * Initialize DataPurgingExecutor Module 6. Initialize
  * OfflineDataProcessingExecutor Module 7. Log Engine Health data in DB
  */
-public class Application {
+public class Application implements ApplicationConfigInterface {
 
 	private static Logger log = LogManager.getLogger(Application.class.getName());
 
 	private Application() {
+
+		// Load insight configuration
+
 	}
 
 	public static void main(String[] args) {
 
 		try {
-			// Load insight configuration
-			ApplicationConfigCache.loadConfigCache();
 
-			ApplicationConfigProvider.performSystemCheck();
+			ApplicationConfigInterface.loadConfiguration();
+
+			ApplicationConfigCache.updateLogLevel(LogLevelConstants.PlatformEngine);
 
 			// Subscribe for desired events. This used to consume data from tool queue.
 			Timer timerEngineAggregator = new Timer("EngineAggregatorModule");
@@ -97,7 +103,7 @@ public class Application {
 
 				// Schedule the BlockChainExecuter job
 				Timer timerBlockChainProcessing = new Timer("BlockChainProcessingExecutor");
-				Class blockChainProcessingTrigger = Class.forName(
+				Class<?> blockChainProcessingTrigger = Class.forName(
 						"com.cognizant.devops.engines.platformauditing.blockchaindatacollection.modules.blockchainprocessing.PlatformAuditProcessingExecutor");
 				TimerTask blockChainTimer = (TimerTask) blockChainProcessingTrigger.newInstance();
 				timerBlockChainProcessing.schedule(blockChainTimer, 0,
@@ -105,7 +111,7 @@ public class Application {
 								* 1000);
 				// Schedule the jira executor job
 				Timer timerJiraProcessing = new Timer("JiraProcessingExecutor");
-				Class jiraProcessingTrigger = Class.forName(
+				Class<?> jiraProcessingTrigger = Class.forName(
 						"com.cognizant.devops.engines.platformauditing.blockchaindatacollection.modules.blockchainprocessing.JiraProcessingExecutor");
 				TimerTask jiraProcessingTimer = (TimerTask) jiraProcessingTrigger.newInstance();
 				timerJiraProcessing.schedule(jiraProcessingTimer, 0,
@@ -130,7 +136,7 @@ public class Application {
 			try {
 				// Scheduling Webhook Engine job.
 				Timer timerWebhookEngineJobExecutorModule = new Timer("WebhookEngineJobExecutorModule");
-				Class webhookAggregatorTrigger = Class.forName(
+				Class<?> webhookAggregatorTrigger = Class.forName(
 						"com.cognizant.devops.engines.platformwebhookengine.modules.aggregator.WebHookEngineAggregatorModule");
 				TimerTask webHookTimer = (TimerTask) webhookAggregatorTrigger.newInstance();
 				timerWebhookEngineJobExecutorModule.schedule(webHookTimer, 0,

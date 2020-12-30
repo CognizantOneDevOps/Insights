@@ -26,6 +26,8 @@ import org.quartz.impl.StdSchedulerFactory;
 
 import com.cognizant.devops.platformcommons.config.ApplicationConfigCache;
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
+import com.cognizant.devops.platformcommons.constants.AssessmentReportAndWorkflowConstants;
+import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformworkflow.workflowtask.core.WorkflowExecutor;
 import com.cognizant.devops.platformworkflow.workflowtask.core.WorkflowImmediateJobExecutor;
 import com.cognizant.devops.platformworkflow.workflowtask.core.WorkflowRetryExecutor;
@@ -37,11 +39,12 @@ import com.cognizant.devops.platformworkflow.workflowthread.core.WorkflowThreadP
  * Initialize Inference Module. 3. Log Platform Insight Health data in DB
  */
 
-public class PlatformWorkflowApplicationTest {
+public class PlatformWorkflowApplicationTest implements AssessmentReportAndWorkflowConstants {
 	private static Logger log = LogManager.getLogger(PlatformWorkflowApplicationTest.class);
+	
 
 	public PlatformWorkflowApplicationTest() {
-
+// no code
 	}
 
 	public static void main(String[] args) {
@@ -49,13 +52,13 @@ public class PlatformWorkflowApplicationTest {
 		testWorkflowExecutor();
 	}
 
-	public static void testWorkflowExecutor() {
-		// Load isight config
-		ApplicationConfigCache.loadConfigCache();
-		// Create Default users
-		ApplicationConfigProvider.performSystemCheck();
-
+	public static void testWorkflowExecutor()  {
 		try {
+			
+			// Load isight config
+			ApplicationConfigCache.loadConfigCache();
+			// Create Default users
+			ApplicationConfigProvider.performSystemCheck();
 
 			log.debug(" Worlflow Detail ==== Inside PlatformWorkflowApplicationTest   ");
 
@@ -64,24 +67,23 @@ public class PlatformWorkflowApplicationTest {
 
 			Scheduler scheduler = new StdSchedulerFactory().getScheduler();
 			scheduler.start();
-			JobDetail jobWorkflow = JobBuilder.newJob(WorkflowExecutor.class)
-					.withIdentity("WorkflowExecutor", "Workflow").build();
+			JobDetail jobWorkflow = JobBuilder.newJob(WorkflowExecutor.class).withIdentity("WorkflowExecutor", WORKFLOW)
+					.build();
 
-			Trigger triggerWorkflow = TriggerBuilder.newTrigger().withIdentity("WorkflowExecutortrigger", "Workflow")
+			Trigger triggerWorkflow = TriggerBuilder.newTrigger().withIdentity("WorkflowExecutortrigger", WORKFLOW)
 					.startNow().build();
 
 			JobDetail jobWorkflowRetry = JobBuilder.newJob(WorkflowRetryExecutor.class)
-					.withIdentity("WorkflowRetryExecutor", "Workflow").build();
+					.withIdentity("WorkflowRetryExecutor", WORKFLOW).build();
 
 			Trigger triggeWorkflowRetry = TriggerBuilder.newTrigger()
-					.withIdentity("WorkflowRetryExecutortrigger", "Workflow").startNow().build();
+					.withIdentity("WorkflowRetryExecutortrigger", WORKFLOW).startNow().build();
 
 			JobDetail jobImmediateWorkflow = JobBuilder.newJob(WorkflowImmediateJobExecutor.class)
-					.withIdentity("WorkflowImmediateJobExecutorTest", "Workflow").build();
+					.withIdentity("WorkflowImmediateJobExecutorTest", WORKFLOW).build();
 
 			Trigger triggeImmediateWorkflow = TriggerBuilder.newTrigger()
-					.withIdentity("WorkflowImmediateJobExecutortriggerTEst", "Workflow").startNow()
-					.build();
+					.withIdentity("WorkflowImmediateJobExecutortriggerTEst", WORKFLOW).startNow().build();
 
 			scheduler.start();
 			scheduler.scheduleJob(jobWorkflow, triggerWorkflow);

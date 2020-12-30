@@ -67,7 +67,6 @@ public abstract class BaseContentCategoryImpl {
 		return this.contentConfigDefinition;
 	}
 
-
 	/**
 	 * Fetch KPI result for content execution and convert DB record into
 	 * InsightsKPIResultDetails model
@@ -85,7 +84,6 @@ public abstract class BaseContentCategoryImpl {
 		return inferenceDetailList;
 	}
 
-
 	/**
 	 * Merge content json and result JSON. Prepare content json object and store it
 	 * in Graph or ES DB
@@ -101,15 +99,14 @@ public abstract class BaseContentCategoryImpl {
 						.parse(oMapper.writeValueAsString(contentResult.getResultValuesMap())).getAsJsonObject();
 				contentDataJson = ReportEngineUtils.mergeTwoJson(contentDataJson, resultValueJson);
 			} else {
-				log.error("Worlflow Detail ==== In Content, no result foundg {} and data json is null {} ",
-						contentResult.getResultValuesMap(),
-						contentDataJson);
+				log.error("Worlflow Detail {}==== In Content, no result foundg and data json is null {} ",
+						contentResult.getResultValuesMap(), contentDataJson);
 			}
 			datasourceDataHandler.saveContentResult(contentDataJson);
 		} catch (Exception e) {
-			log.error(" Error while saveContentResult {} ", e);
+			log.error(" Error while saveContentResult ", e);
 			throw new InsightsJobFailedException(
-					" Error while saveContentResult for content Id {} " + contentResult.getContentId());
+					" Error while saveContentResult for content Id " + contentResult.getContentId());
 		}
 	}
 
@@ -132,12 +129,12 @@ public abstract class BaseContentCategoryImpl {
 		detail.setCategory(contentConfigDefinition.getCategory());
 		detail.setActualTrend(actualTrend);
 		detail.setExpectedTrend(contentConfigDefinition.getExpectedTrend());
-		detail.setContentId(contentConfigDefinition.getContentId());		
+		detail.setContentId(contentConfigDefinition.getContentId());
 		detail.setInferenceText(inferenceText);
 		detail.setKpiId(inferenceResult.getKpiId());
 		detail.setKpiName(inferenceResult.getKpiName());
 		detail.setNoOfResult(contentConfigDefinition.getNoOfResult());
-		detail.setRanking(null);//ranking
+		detail.setRanking(null);// ranking
 		detail.setResultField(contentConfigDefinition.getResultField());
 		detail.setResultTime(inferenceResult.getResultTime());
 		detail.setResultTimeX(inferenceResult.getResultTimeX());
@@ -146,7 +143,7 @@ public abstract class BaseContentCategoryImpl {
 		detail.setSentiment(sentiment);
 		detail.setThreshold(contentConfigDefinition.getThreshold());
 		detail.setToolName(inferenceResult.getToolname());
-		detail.setTrendline(null);//trendline
+		detail.setTrendline(null);// trendline
 		detail.setGroup(inferenceResult.getGroupName());
 		detail.setExecutionId(contentConfigDefinition.getExecutionId());
 		detail.setReportId(contentConfigDefinition.getReportId());
@@ -176,24 +173,18 @@ public abstract class BaseContentCategoryImpl {
 			detail.setContentId(contentConfigDefinition.getContentId());
 			detail.setInferenceText(inferenceContentText);
 			detail.setKpiId(contentConfigDefinition.getKpiId().longValue());
-			//detail.setKpiName(inferenceResult.getKpiName());
 			detail.setNoOfResult(contentConfigDefinition.getNoOfResult());
-			detail.setRanking(null);//ranking
+			detail.setRanking(null);// ranking
 			detail.setResultField(contentConfigDefinition.getResultField());
-			//detail.setResultTime(inferenceResult.getResultTime());
-			//detail.setResultTimeX(inferenceResult.getResultTimeX());
 			detail.setResultValuesMap(resultValuesMap);
-			//detail.setSchedule(inferenceResult.getSchedule());
 			detail.setSentiment(ReportEngineEnum.KPISentiment.NEUTRAL);
 			detail.setThreshold(contentConfigDefinition.getThreshold());
-			//detail.setToolName(inferenceResult.getToolname());
-			detail.setTrendline(null);//trendline
-			//detail.setGroup(inferenceResult.getGroupName());
+			detail.setTrendline(null);// trendline
 			detail.setExecutionId(contentConfigDefinition.getExecutionId());
 			detail.setReportId(contentConfigDefinition.getReportId());
 			detail.setAssessmentId(contentConfigDefinition.getAssessmentId());
-		} catch (Exception e) {//InsightsCustom
-			log.error(" Error while setNeutralContentDetail {} ", e);
+		} catch (Exception e) {
+			log.error(" Error while setNeutralContentDetail  ", e);
 		}
 		return detail;
 	}
@@ -213,34 +204,34 @@ public abstract class BaseContentCategoryImpl {
 			resultValuesMap = resultValuesMap.entrySet().stream()
 					.collect(Collectors.toMap(Map.Entry::getKey, e -> getResultValueForDisplay(e.getValue())));
 			StringSubstitutor sub = new StringSubstitutor(resultValuesMap, "{", "}");
-			JsonObject valueMessageObject = jsonParser
-					.parse(String.valueOf(contentConfigDefinition.getMessage()))
+			JsonObject valueMessageObject = jsonParser.parse(String.valueOf(contentConfigDefinition.getMessage()))
 					.getAsJsonObject();
 			JsonElement messageInference = valueMessageObject.get(key);
 			if (messageInference != null) {
 				messageConfigText = messageInference.getAsString();
 			} else if (key.equalsIgnoreCase(ReportEngineUtils.NEUTRAL_MESSAGE_KEY)) {
-				log.error("Worlflow Detail ==== In Content,No data found for content - {} ",
+				log.error("Worlflow Detail ==== In Content,No data found for content {} ",
 						contentConfigDefinition.getContentName());
 				messageConfigText = "No data found for content  - " + contentConfigDefinition.getContentName();
 			} else {
-				log.error("Worlflow Detail ==== In Content, Error while getting message text for key {} ", key);
+				log.error("Worlflow Detail ==== In Content, Error while getting message text for key{}] ", key);
 				messageConfigText = "No message found for content  - " + contentConfigDefinition.getContentName();
 			}
 			contentText = sub.replace(messageConfigText);
 		} catch (Exception e) {
-			log.error("Worlflow Detail ==== In Content, Error while getting contentText {} ", e);
+			log.error("Worlflow Detail ==== In Content, Error while getting contentText  ", e);
 		}
 		return contentText;
 
 	}
-	
+
 	public String getResultFieldFromContentDefination() {
 		return contentConfigDefinition.getResultField();
 	}
 
 	boolean isInteger(double number) {
-		return number % 1 == 0;// if the modulus(remainder of the division) of the argument(number) with 1 is 0 then return true otherwise false.
+		return number % 1 == 0;// if the modulus(remainder of the division) of the argument(number) with 1 is 0
+								// then return true otherwise false.
 	}
 
 	public boolean isNumeric(String strNum) {
@@ -255,12 +246,11 @@ public abstract class BaseContentCategoryImpl {
 		return true;
 	}
 
-	public String getResultValueForDisplay(Object value){
+	public String getResultValueForDisplay(Object value) {
 		String returnValue;
 		try {
-			//log.debug("value   {} ", value);
 			if (!isNumeric(String.valueOf(value))) {
-				returnValue= String.valueOf(value);
+				returnValue = String.valueOf(value);
 			} else {
 				Double newData = new Double(String.valueOf(value));
 				if (isInteger(newData.doubleValue())) {
@@ -269,10 +259,9 @@ public abstract class BaseContentCategoryImpl {
 					returnValue = String.valueOf(newData.doubleValue());
 				}
 			}
-			//log.debug("returnValue   {} ", returnValue);
 		} catch (Exception e) {
 			log.error(
-					"Worlflow Detail ==== In Content, Exception in getResultValueForDisplay for content {} === value === {}  ",
+					"Worlflow Detail ==== In Content, Exception in getResultValueForDisplay for content {} === value ==={}   ",
 					contentConfigDefinition.getContentId(), value);
 			returnValue = String.valueOf(value);
 		}

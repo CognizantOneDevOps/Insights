@@ -186,7 +186,7 @@ export class HealthCheckComponent implements OnInit {
       }
       else {
         var rtoolName = toolName.charAt(0).toUpperCase() + toolName.slice(1).toLowerCase();
-        var filePath = "${INSIGHTS_HOME}/logs/PlatformAgent/log_" + agentId + "Agent.log";
+        var filePath = "${INSIGHTS_HOME}/logs/PlatformAgent/log_" + agentId + ".log";
         var detailType = rtoolName;
       }
       let showDetailsDialog = this.dialog.open(ShowDetailsDialog, {

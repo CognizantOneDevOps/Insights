@@ -44,7 +44,6 @@ import com.rabbitmq.client.ConnectionFactory;
 
 @Service("dataArchivalService")
 public class DataArchivalServiceImpl implements DataArchivalService {
-
 	static Logger log = LogManager.getLogger(DataArchivalServiceImpl.class);
 	DataArchivalConfigDal dataArchivalConfigdal = new DataArchivalConfigDal();
 	AgentConfigDAL agentConfigDAL = new AgentConfigDAL();
@@ -60,7 +59,7 @@ public class DataArchivalServiceImpl implements DataArchivalService {
 	@Override
 	public String saveDataArchivalDetails(JsonObject archivalDetailsJson) throws InsightsCustomException {
 		try {
-			String archivalName = archivalDetailsJson.get("archivalName").getAsString();
+			String archivalName = archivalDetailsJson.get(DataArchivalConstants.ARCHIVALNAME).getAsString();
 			String startDate = archivalDetailsJson.get("startDate").getAsString();
 			long epochStartDate = InsightsUtils.getEpochTime(startDate) / 1000;
 			String endDate = archivalDetailsJson.get("endDate").getAsString();
@@ -88,7 +87,7 @@ public class DataArchivalServiceImpl implements DataArchivalService {
 						.getSpecificArchivalRecord(archivalName);
 				if (dataArchivalRecord == null) {
 					JsonObject publishDataJson = new JsonObject();
-					publishDataJson.addProperty("archivalName", archivalName);
+					publishDataJson.addProperty(DataArchivalConstants.ARCHIVALNAME , archivalName);
 					publishDataJson.addProperty("startDate", startDate);
 					publishDataJson.addProperty("endDate", endDate);
 					publishDataJson.addProperty("daysToRetain", daysToRetain);
@@ -235,7 +234,7 @@ public class DataArchivalServiceImpl implements DataArchivalService {
 	@Override
 	public Boolean updateArchivalSourceUrl(JsonObject archivalURLDetailsJson) throws InsightsCustomException {
 		try {
-			String archivalName = archivalURLDetailsJson.get("archivalName").getAsString();
+			String archivalName = archivalURLDetailsJson.get(DataArchivalConstants.ARCHIVALNAME).getAsString();
 			String sourceURL = archivalURLDetailsJson.get("sourceUrl").getAsString();
 			dataArchivalConfigdal.updateArchivalSourceUrl(archivalName, sourceURL);
 		} catch (Exception e) {
@@ -268,22 +267,27 @@ public class DataArchivalServiceImpl implements DataArchivalService {
 	 */
 	public void publishDataArchivalDetails(String routingKey, String publishDataJson)
 			throws IOException, TimeoutException {
-
-		ConnectionFactory factory = new ConnectionFactory();
-		MessageQueueDataModel messageQueueConfig = ApplicationConfigProvider.getInstance().getMessageQueue();
-		factory.setHost(messageQueueConfig.getHost());
-		factory.setUsername(messageQueueConfig.getUser());
-		factory.setPassword(messageQueueConfig.getPassword());
-		Connection connection = factory.newConnection();
-		Channel channel = connection.createChannel();
-		String queueName = routingKey.replace(".", "_");
-		channel.exchangeDeclare(MQMessageConstants.EXCHANGE_NAME, MQMessageConstants.EXCHANGE_TYPE, true);
-		channel.queueDeclare(queueName, true, false, false, null);
-		channel.queueBind(queueName, MQMessageConstants.EXCHANGE_NAME, routingKey);
-		channel.basicPublish(MQMessageConstants.EXCHANGE_NAME, routingKey, null, publishDataJson.getBytes());
-		channel.close();
-		connection.close();
-
-	}
+		try {
+						ConnectionFactory factory = new ConnectionFactory();
+						MessageQueueDataModel messageQueueConfig = ApplicationConfigProvider.getInstance().getMessageQueue();
+						factory.setHost(messageQueueConfig.getHost());
+						factory.setUsername(messageQueueConfig.getUser());
+						factory.setPassword(messageQueueConfig.getPassword());
+						Connection connection = factory.newConnection();
+						try{
+							Channel channel = connection.createChannel();
+							String queueName = routingKey.replace(".", "_");
+						channel.exchangeDeclare(MQMessageConstants.EXCHANGE_NAME, MQMessageConstants.EXCHANGE_TYPE, true);
+						channel.queueDeclare(queueName, true, false, false, null);
+						channel.queueBind(queueName, MQMessageConstants.EXCHANGE_NAME, routingKey);
+						channel.basicPublish(MQMessageConstants.EXCHANGE_NAME, routingKey, null, publishDataJson.getBytes());
+						channel.close();
+						}finally {
+						connection.close();
+					}} catch (IOException |TimeoutException e) {
+						//no code
+					}
+			 
+			}
 
 }

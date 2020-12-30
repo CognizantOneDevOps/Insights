@@ -23,6 +23,7 @@ import java.util.Map;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import com.cognizant.devops.platformcommons.constants.AssessmentReportAndWorkflowConstants;
 import com.cognizant.devops.platformcommons.core.enums.WorkflowTaskEnum.WorkflowSchedule;
 import com.cognizant.devops.platformreports.assessment.datamodel.ContentConfigDefinition;
 import com.cognizant.devops.platformreports.assessment.datamodel.InsightsContentDetail;
@@ -32,6 +33,7 @@ import com.cognizant.devops.platformreports.assessment.util.ReportEngineUtils;
 import com.cognizant.devops.platformreports.exception.InsightsJobFailedException;
 
 public class ThresholdContentCategoryImpl extends BaseContentCategoryImpl {
+
 	private static Logger log = LogManager.getLogger(ThresholdContentCategoryImpl.class);
 
 	public ThresholdContentCategoryImpl(ContentConfigDefinition inferenceContentConfigDefinition) {
@@ -111,29 +113,32 @@ public class ThresholdContentCategoryImpl extends BaseContentCategoryImpl {
 
 			if (getContentConfig().getDirectionOfThreshold() == ReportEngineEnum.DirectionOfThreshold.BELOW) {
 				result = String.valueOf(listBelow.size());
-				actaulDirection = listBelow.size() > listAbove.size() ? "Below" : "Above";
+				actaulDirection = listBelow.size() > listAbove.size() ? AssessmentReportAndWorkflowConstants.BELOW
+						: AssessmentReportAndWorkflowConstants.ABOVE;
 				if (getContentConfig().getAction() == ReportEngineEnum.ExecutionActions.PERCENTAGE) {
 					result = String.valueOf(listBelow.size() * 100 / inferenceResults.size());
 					actaulDirection = (listBelow.size() * 100 / inferenceResults.size() > (listAbove.size() * 100)
-							/ inferenceResults.size()) ? "Below" : "Above";
+							/ inferenceResults.size()) ? AssessmentReportAndWorkflowConstants.BELOW
+									: AssessmentReportAndWorkflowConstants.ABOVE;
 				}
-				resultValuesMap.put("actualdirection", actaulDirection);
+				resultValuesMap.put(AssessmentReportAndWorkflowConstants.ACTUALDIRECTION, actaulDirection);
 
 			} else if (getContentConfig().getDirectionOfThreshold() == ReportEngineEnum.DirectionOfThreshold.ABOVE) {
 				result = String.valueOf(listAbove.size());
-				actaulDirection = listAbove.size() > listBelow.size() ? "Above" : "Below";
+				actaulDirection = listAbove.size() > listBelow.size() ? AssessmentReportAndWorkflowConstants.ABOVE
+						: AssessmentReportAndWorkflowConstants.BELOW;
 				if (getContentConfig().getAction() == ReportEngineEnum.ExecutionActions.PERCENTAGE) {
 					result = String.valueOf((listAbove.size() * 100) / inferenceResults.size());
 					actaulDirection = ((listAbove.size() * 100) / inferenceResults.size() > (listBelow.size() * 100)
-							/ inferenceResults.size()) ? "Above" : "Below";
+							/ inferenceResults.size()) ? AssessmentReportAndWorkflowConstants.ABOVE
+									: AssessmentReportAndWorkflowConstants.BELOW;
 				}
-				resultValuesMap.put("actualdirection", actaulDirection);
+				resultValuesMap.put(AssessmentReportAndWorkflowConstants.ACTUALDIRECTION, actaulDirection);
 			}
 
 			ReportEngineEnum.KPISentiment sentiment = getContentConfig().getDirectionOfThreshold().name()
-					.equalsIgnoreCase(actaulDirection)
-					? ReportEngineEnum.KPISentiment.POSITIVE
-					: ReportEngineEnum.KPISentiment.NEGATIVE;
+					.equalsIgnoreCase(actaulDirection) ? ReportEngineEnum.KPISentiment.POSITIVE
+							: ReportEngineEnum.KPISentiment.NEGATIVE;
 
 			resultValuesMap.put("result", result);
 
@@ -179,16 +184,20 @@ public class ThresholdContentCategoryImpl extends BaseContentCategoryImpl {
 			Double avgValue = inferenceResults.stream()
 					.mapToDouble((result -> (Double) result.getResults().get(comparisonField))).average().getAsDouble();
 			if (getContentConfig().getDirectionOfThreshold() == ReportEngineEnum.DirectionOfThreshold.BELOW) {
-				actaulDirection = (avgValue < getContentConfig().getThreshold()) ? "Below" : "Above";
+				actaulDirection = (avgValue < getContentConfig().getThreshold())
+						? AssessmentReportAndWorkflowConstants.BELOW
+						: AssessmentReportAndWorkflowConstants.ABOVE;
 
 			} else {
-				actaulDirection = (avgValue > getContentConfig().getThreshold()) ? "Above" : "Below";
+				actaulDirection = (avgValue > getContentConfig().getThreshold())
+						? AssessmentReportAndWorkflowConstants.ABOVE
+						: AssessmentReportAndWorkflowConstants.BELOW;
 			}
 
 			sentiment = getContentConfig().getDirectionOfThreshold().name().equalsIgnoreCase(actaulDirection)
 					? ReportEngineEnum.KPISentiment.POSITIVE
 					: ReportEngineEnum.KPISentiment.NEGATIVE;
-			resultValuesMap.put("actualdirection", actaulDirection);
+			resultValuesMap.put(AssessmentReportAndWorkflowConstants.ACTUALDIRECTION, actaulDirection);
 			resultValuesMap.put("result", avgValue);
 
 			addTimeValueinResult(resultValuesMap, contentConfigDefinition.getSchedule());

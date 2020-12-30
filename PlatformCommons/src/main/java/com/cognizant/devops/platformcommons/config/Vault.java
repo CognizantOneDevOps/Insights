@@ -24,10 +24,17 @@ public class Vault implements Serializable{
 	 */
 	private static final long serialVersionUID = 1L;
 	
+	private boolean isVaultEnable=Boolean.FALSE;
 	private String vaultEndPoint;
 	private String secretEngine;
 	private String vaultToken;
 	
+	public boolean isVaultEnable() {
+		return isVaultEnable;
+	}
+	public void setVaultEnable(boolean isVaultEnable) {
+		this.isVaultEnable = isVaultEnable;
+	}	
 	
 	public String getVaultEndPoint() {
 		return vaultEndPoint;
@@ -35,12 +42,14 @@ public class Vault implements Serializable{
 	public void setVaultEndPoint(String vaultEndPoint) {
 		this.vaultEndPoint = vaultEndPoint;
 	}
+	
 	public String getSecretEngine() {
 		return secretEngine;
 	}
 	public void setSecretEngine(String secretEngine) {
 		this.secretEngine = secretEngine;
 	}
+	
 	public String getVaultToken() {
 		return vaultToken;
 	}

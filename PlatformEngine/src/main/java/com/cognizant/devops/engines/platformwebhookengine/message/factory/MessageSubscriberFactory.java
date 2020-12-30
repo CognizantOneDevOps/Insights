@@ -79,7 +79,7 @@ public class MessageSubscriberFactory {
 		channel.queueBind(queueName, MQMessageConstants.EXCHANGE_NAME, routingKey);
 		channel.basicQos(ApplicationConfigProvider.getInstance().getMessageQueue().getPrefetchCount());
 		responseHandler.setChannel(channel);
-		log.debug("prefetchCount "+ApplicationConfigProvider.getInstance().getMessageQueue().getPrefetchCount() );
+		log.debug("prefetchCount {}",ApplicationConfigProvider.getInstance().getMessageQueue().getPrefetchCount() );
 		Consumer consumer = new DefaultConsumer(channel) {
 			@Override
 			public void handleDelivery(String consumerTag, Envelope envelope, AMQP.BasicProperties properties,

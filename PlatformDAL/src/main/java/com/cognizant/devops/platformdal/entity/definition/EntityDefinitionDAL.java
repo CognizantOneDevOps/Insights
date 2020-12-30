@@ -17,19 +17,26 @@ package com.cognizant.devops.platformdal.entity.definition;
 
 import java.util.List;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.hibernate.Session;
 import org.hibernate.query.Query;
 
 import com.cognizant.devops.platformdal.core.BaseDAL;
 
 public class EntityDefinitionDAL extends BaseDAL {
 
+	private static Logger log = LogManager.getLogger(EntityDefinitionDAL.class);	
+	
 	public List<EntityDefinition> fetchAllEntityDefination() {
-		Query<EntityDefinition> createQuery = getSession().createQuery("FROM EntityDefinition PM ORDER BY PM.levelName",
-				EntityDefinition.class);
-		List<EntityDefinition> resultList = createQuery.getResultList();
-		terminateSession();
-		terminateSessionFactory();
-		return resultList;
+		try (Session session = getSessionObj()) {
+			Query<EntityDefinition> createQuery = session
+					.createQuery("FROM EntityDefinition PM ORDER BY PM.levelName", EntityDefinition.class);
+			return createQuery.getResultList();
+		} catch (Exception e) {
+			log.error(e.getMessage());
+			throw e;
+		}
 	}
 
 

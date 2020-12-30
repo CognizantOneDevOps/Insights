@@ -114,8 +114,10 @@ function parentChartRenderer(FusionCharts: any, options: ChartOptions, rootID: a
       renderAt: rootID,
       dataFormat: 'json',
       containerBackgroundOpacity: '0',
-      dataEmptyMessage: 'Please wait, chart is loading the data....',
+      loadMessage: "Loading chart. Please wait.",
+      dataEmptyMessage: options.enableDrillDown? "Please wait, chart is loading the data....":"No data to display",
       dataLoadStartMessage: "Please wait, chart is loading the data....",
+      dataLoadErrorMessage: "Error in loading data.",
       baseChartMessageFont: "Arial",
       baseChartMessageFontSize: "18",
       baseChartMessageColor: "#FC0000",
@@ -143,7 +145,7 @@ function fetchLevel2Charrt(props: any, dataprops: any, options: ChartOptions, Fu
     let data = res.data;
     if (res.status === 200) {
       props.options.datasourceId = data.id;
-      fetchDrillDownData(props, dataprops.categoryLabel, false, chartType,'level2').then(x => {
+      fetchDrillDownData(props, dataprops.categoryLabel, false, chartType,props.options.isLevel2LevelWiseQuery?'level2wise':'level2').then(x => {
         childDrillDown(x, props, options, FusionCharts, rootID, chart, chartType);
       });
     }
@@ -167,8 +169,10 @@ function childDrillDown(x: any, props: any, options: any, FusionCharts: any, roo
     renderAt: rootID,
     dataFormat: 'json',
     containerBackgroundOpacity: '0',
-    dataEmptyMessage: 'Please wait, chart is loading the data....',
+    loadMessage: "Loading chart. Please wait.",
+    dataEmptyMessage: options.enableDrillDown? "Please wait, chart is loading the data....":"No data to display",
     dataLoadStartMessage: "Please wait, chart is loading the data....",
+    dataLoadErrorMessage: "Error in loading data.",
     baseChartMessageFont: "Arial",
     baseChartMessageFontSize: "18",
     baseChartMessageColor: "#FC0000",
@@ -200,7 +204,7 @@ function fetchLevel3Chart(props: any, dataprops: any, options: any, FusionCharts
     let data = res.data;
     if (res.status === 200) {
       props.options.datasourceId = data.id;
-      fetchDrillDownData(props, dataprops.categoryLabel, false, chartType,'level3').then(x => {
+      fetchDrillDownData(props, dataprops.categoryLabel, false, chartType,props.options.isLevel3LevelWiseQuery?'level3wise':'level3').then(x => {
         secondChildDrillDown(x, props, options, FusionCharts, rootID, chart, chartType);
       });
     }
@@ -224,8 +228,10 @@ function secondChildDrillDown(x: any, props: any, options: any, FusionCharts: an
     renderAt: rootID,
     dataFormat: 'json',
     containerBackgroundOpacity: '0',
-    dataEmptyMessage: 'Please wait, chart is loading the data....',
+    loadMessage: "Loading chart. Please wait.",
+    dataEmptyMessage: options.enableDrillDown? "Please wait, chart is loading the data....":"No data to display",
     dataLoadStartMessage: "Please wait, chart is loading the data....",
+    dataLoadErrorMessage: "Error in loading data.",
     dataLoadStartMessageFontSize: "20",
     dataSource: secondChildDataSource(chart, data, dataset, categories, lineset, chartType),
     events: {
@@ -253,7 +259,8 @@ function childDataSource(chart: any, data: any, dataset: any, categories: any, l
     return {
       "chart": customProps,
       "data": data,
-      "annotations": annotations
+      "annotations": annotations,
+      "trendlines": chart.level2TrendLines === '' ? '': JSON.parse(chart.level2TrendLines)
     }
   } else if (chartType == 'msstackedcolumn2dlinedy') {
     return {
@@ -261,7 +268,8 @@ function childDataSource(chart: any, data: any, dataset: any, categories: any, l
       "dataset": dataset,
       "categories": categories,
       "lineset": lineset,
-      "annotations": annotations
+      "annotations": annotations,
+      "trendlines": chart.level2TrendLines === '' ? '': JSON.parse(chart.level2TrendLines)
     }
   }
   return {
@@ -270,7 +278,8 @@ function childDataSource(chart: any, data: any, dataset: any, categories: any, l
     "dataset": dataset,
     "categories": categories,
     "lineset": lineset,
-    "annotations": annotations
+    "annotations": annotations,
+    "trendlines": chart.level2TrendLines === '' ? '': JSON.parse(chart.level2TrendLines)
   };
 }
 
@@ -284,7 +293,8 @@ function secondChildDataSource(chart: any, data: any, dataset: any, categories: 
     return {
       "chart": customProps,
       "data": data,
-      "annotations": annotations
+      "annotations": annotations,
+      "trendlines": chart.level3TrendLines === '' ? '': JSON.parse(chart.level3TrendLines)
     }
   } else if (chartType == 'msstackedcolumn2dlinedy') {
     return {
@@ -292,7 +302,8 @@ function secondChildDataSource(chart: any, data: any, dataset: any, categories: 
       "dataset": dataset,
       "categories": categories,
       "lineset": lineset,
-      "annotations": annotations
+      "annotations": annotations,
+      "trendlines": chart.level3TrendLines === '' ? '': JSON.parse(chart.level3TrendLines)
     }
   }
   return {
@@ -301,7 +312,8 @@ function secondChildDataSource(chart: any, data: any, dataset: any, categories: 
     "dataset": dataset,
     "categories": categories,
     "lineset": lineset,
-    "annotations": annotations
+    "annotations": annotations,
+    "trendlines": chart.level3TrendLines === '' ? '': JSON.parse(chart.level3TrendLines)
   };
 }
 
@@ -310,7 +322,8 @@ function parentDataSource(chart: any, data: any, options: ChartOptions) {
   if (options.charttype == 'bar2d' || options.charttype == 'bar3d') {
     return {
       "chart": chart,
-      "data": data.data
+      "data": data.data,
+      "trendlines": options.trendline === '' ? '': JSON.parse(options.trendline)
     }
   } else if (options.charttype == 'msstackedcolumn2dlinedy') {
     return {
@@ -318,6 +331,7 @@ function parentDataSource(chart: any, data: any, options: ChartOptions) {
       "dataset": data.dataset,
       "categories": data.categories,
       "lineset": data.lineset,
+      "trendlines": options.trendline === '' ? '': JSON.parse(options.trendline)
     }
   }else if(options.charttype == 'dragnode'){
       return data;
@@ -335,6 +349,7 @@ function parentDataSource(chart: any, data: any, options: ChartOptions) {
     "dataset": data.dataset,
     "categories": data.categories,
     "lineset": data.lineset,
+    "trendlines": options.trendline === '' ? '': JSON.parse(options.trendline)
   };
 }
 
@@ -345,7 +360,7 @@ function parentDataSource(chart: any, data: any, options: ChartOptions) {
 export function formatNonScrollCharts(props: any, options: any, config: any) {
   //console.log(props);
   let data: any = new Array();
-  if (props.data.state === 'Done') {
+  if (props.data.state === 'Done' && props.data.series.length > 0) {
     let array = props.data.series[0].fields;
     let labels = array[0].values.buffer;
     let index = 0;
@@ -367,7 +382,7 @@ export function formatScrollCharts(props: any) {
   let dataset: any = new Array();
   let category: any = new Array();
   let data: any = undefined;
-  if (props.data.state === 'Done') {
+  if (props.data.state === 'Done' && props.data.series.length > 0) {
     let labelFlag: boolean = false;
     let array = props.data.series[0].fields;
     array.forEach((obj: any) => {

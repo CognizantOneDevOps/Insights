@@ -67,6 +67,7 @@ import com.google.gson.JsonParser;
 
 @Service("assessmentReportService")
 public class AssesmentReportServiceImpl {
+	
 	private static final Logger log = LogManager.getLogger(AssesmentReportServiceImpl.class);
 	ReportConfigDAL reportConfigDAL = new ReportConfigDAL();
 	WorkflowDAL workflowConfigDAL = new WorkflowDAL();
@@ -100,8 +101,8 @@ public class AssesmentReportServiceImpl {
 			String toolName = registerkpiJson.get("toolName").getAsString();
 			String dataSource = registerkpiJson.get(AssessmentReportAndWorkflowConstants.DATASOURCE).getAsString();
 			String category = registerkpiJson.get(AssessmentReportAndWorkflowConstants.CATEGORY).getAsString();
-			if (registerkpiJson.has("usecase")) {
-				usecase = registerkpiJson.get("usecase").getAsString();
+			if (registerkpiJson.has(AssessmentReportAndWorkflowConstants.USECASE)) {
+				usecase = registerkpiJson.get(AssessmentReportAndWorkflowConstants.USECASE).getAsString();
 			}
 			if (registerkpiJson.has(AssessmentReportAndWorkflowConstants.OUTPUTDATASOURCE)) {
 				outputDatasource = registerkpiJson.get(AssessmentReportAndWorkflowConstants.OUTPUTDATASOURCE)
@@ -150,7 +151,7 @@ public class AssesmentReportServiceImpl {
 				String group = updatekpiJson.get("group").getAsString();
 				String toolName = updatekpiJson.get("toolName").getAsString();
 				String dataSource = updatekpiJson.get(AssessmentReportAndWorkflowConstants.DATASOURCE).getAsString();
-				String category = updatekpiJson.get("category").getAsString();
+				String category = updatekpiJson.get(AssessmentReportAndWorkflowConstants.CATEGORY).getAsString();
 				String usecase = updatekpiJson.get("usecase").getAsString();
 				String outputDatasource = updatekpiJson.get(AssessmentReportAndWorkflowConstants.OUTPUTDATASOURCE).getAsString();
 				dBQuery = dBQuery.replace("#", "<").replace("~", ">");
@@ -263,7 +264,7 @@ public class AssesmentReportServiceImpl {
 			int kpiId = updateContentJson.get(AssessmentReportAndWorkflowConstants.KPIID).getAsInt();
 			contentId = updateContentJson.get(AssessmentReportAndWorkflowConstants.CONTENTID).getAsInt();
 			boolean isActive = updateContentJson.get(AssessmentReportAndWorkflowConstants.ISACTIVE).getAsBoolean();
-			String contentName = updateContentJson.get("contentName").getAsString();
+			String contentName = updateContentJson.get(AssessmentReportAndWorkflowConstants.CONTENT_NAME).getAsString();
 			String contentString = gson.toJson(updateContentJson);
 			contentConfig.setContentId(contentId);
 			InsightsKPIConfig kpiConfig = reportConfigDAL.getKPIConfig(kpiId);
@@ -608,7 +609,6 @@ public class AssesmentReportServiceImpl {
 		jsonobject.addProperty("schedule", workflowConfig.getScheduleType());
 		jsonobject.addProperty(AssessmentReportAndWorkflowConstants.STATUS, status);
 		long startdate = assessmentReport.getStartDate();
-		//String startDate = InsightsUtils.specficTimeFormat(startdate, "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
 		String startDate = InsightsUtils.insightsTimeXFormat(startdate*1000);
 		jsonobject.addProperty(AssessmentReportAndWorkflowConstants.STARTDATE, startDate);
 		if (workflowConfig.getScheduleType().equals(WorkflowTaskEnum.WorkflowSchedule.ONETIME.toString())) {
@@ -1011,7 +1011,6 @@ public class AssesmentReportServiceImpl {
 		String reportName = templateReportJson.get(AssessmentReportAndWorkflowConstants.REPORTNAME).getAsString();
 		boolean isActive = templateReportJson.get(AssessmentReportAndWorkflowConstants.ISACTIVE).getAsBoolean();
 		String description = templateReportJson.get("description").getAsString();
-		//String file = templateReportJson.get("file").getAsString();
 		String visualizationutil = templateReportJson.get("visualizationutil").getAsString();
 		reportEntity.setReportId(reportId);
 		reportEntity.setActive(isActive);
@@ -1068,7 +1067,6 @@ public class AssesmentReportServiceImpl {
 		String reportName = templateReportJson.get(AssessmentReportAndWorkflowConstants.REPORTNAME).getAsString();
 		boolean isActive = templateReportJson.get(AssessmentReportAndWorkflowConstants.ISACTIVE).getAsBoolean();
 		String description = templateReportJson.get("description").getAsString();
-		//String file = templateReportJson.get("file").getAsString();
 		String visualizationutil = templateReportJson.get("visualizationutil").getAsString();
 		reportEntity.setReportId(reportId);
 		reportEntity.setActive(isActive);
@@ -1361,7 +1359,7 @@ public class AssesmentReportServiceImpl {
 			vTypeList.add("table");
 			return vTypeList;
 		} catch (Exception e) {
-			log.error("Error while getting chart types ...", e);
+			log.error("Error while getting chart types ... ", e);
 			throw new InsightsCustomException(e.toString());
 		}
 	}

@@ -18,12 +18,16 @@ package com.cognizant.devops.auditservice.audit.report;
 import java.util.Arrays;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+/**
+ * @deprecated
+ *
+ */
 @Deprecated
 public abstract class AuditReportStrategy {
 
-	private static final Logger log = LoggerFactory.getLogger(AuditReportStrategy.class.getName());
+	private static Logger log = LogManager.getLogger(AuditReportStrategy.class.getName());
 
 	public abstract boolean executeQuery(String content, String reportname, String subscribers);
 
@@ -33,7 +37,7 @@ public abstract class AuditReportStrategy {
 	 * @return boolean
 	 */
 	public boolean keywordCheck(String cypherQuery){
-		log.info("keywordCheck for --   -"+cypherQuery);
+		log.info("keywordCheck for --- {}",cypherQuery);
 		List<String> myList = Arrays.asList("create", "merge", "delete", "remove", "detach", "drop", "set");
 		return myList.stream()
 				.filter(keywords -> cypherQuery.toUpperCase().contains(keywords.toUpperCase()))

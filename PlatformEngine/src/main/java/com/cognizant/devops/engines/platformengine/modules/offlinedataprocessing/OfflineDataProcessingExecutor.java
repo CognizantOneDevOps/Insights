@@ -37,7 +37,9 @@ import org.apache.logging.log4j.core.util.CronExpression;
 
 import com.cognizant.devops.engines.platformengine.message.core.EngineStatusLogger;
 import com.cognizant.devops.engines.platformengine.modules.offlinedataprocessing.model.DataEnrichmentModel;
+import com.cognizant.devops.platformcommons.config.ApplicationConfigInterface;
 import com.cognizant.devops.platformcommons.constants.ConfigOptions;
+import com.cognizant.devops.platformcommons.constants.LogLevelConstants;
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
 import com.cognizant.devops.platformcommons.core.util.InsightsUtils;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphResponse;
@@ -64,7 +66,7 @@ import com.google.gson.stream.JsonWriter;
  * @author 368419
  *
  */
-public class OfflineDataProcessingExecutor extends TimerTask {
+public class OfflineDataProcessingExecutor extends TimerTask implements ApplicationConfigInterface {
 	private static Logger log = LogManager.getLogger(OfflineDataProcessingExecutor.class);
 	private static final String DATE_TIME_FORMAT = "yyyy/MM/dd hh:mm a";
 	private static final String JSON_FILE_EXTENSION = "json";
@@ -73,9 +75,11 @@ public class OfflineDataProcessingExecutor extends TimerTask {
 	@Override
 	public void run() {
 		try {
+			ApplicationConfigInterface.loadConfiguration();
 			executeOfflineProcessing();
 			EngineStatusLogger.getInstance().createEngineStatusNode("Offline Data Procesing completed",PlatformServiceConstants.SUCCESS);
 		} catch (Exception e) {
+			log.error(e);
 			EngineStatusLogger.getInstance().createEngineStatusNode("Offline Data Procesing has some issue",
 					PlatformServiceConstants.FAILURE);
 		}
@@ -131,7 +135,7 @@ public class OfflineDataProcessingExecutor extends TimerTask {
 					String cypherQuery = dataEnrichmentModel.getCypherQuery();
 					Long runSchedule = dataEnrichmentModel.getRunSchedule();
 					if (cypherQuery == null || cypherQuery.isEmpty() || runSchedule == null )  {
-						log.error(dataEnrichmentModel.getQueryName() + " doesn't have either cypherQuery or runSchedule attribute.");
+						log.error(dataEnrichmentModel.getQueryName() , "{} doesn't have either cypherQuery or runSchedule attribute.");
 						continue;
 					}
 					if (isQueryScheduledToRun(dataEnrichmentModel.getRunSchedule(),
@@ -157,7 +161,7 @@ public class OfflineDataProcessingExecutor extends TimerTask {
 				log.error("Unable to read offline configuration file.", e);
 			}
 		} catch (IllegalStateException | JsonSyntaxException ex) {
-			log.error(jsonFile.getName() + " file is not as per expected format", ex);
+			log.error(jsonFile.getName(), "{} file is not as per expected format ", ex);
 			return Boolean.FALSE;
 		}
 		return Boolean.TRUE;
@@ -196,10 +200,10 @@ public class OfflineDataProcessingExecutor extends TimerTask {
 					processedRecords = sprintResponseJson.getAsJsonArray("results").get(0).getAsJsonObject()
 							.getAsJsonArray("data").get(0).getAsJsonObject().getAsJsonArray("row").get(0).getAsInt();
 				} catch (UnsupportedOperationException | IllegalStateException | IndexOutOfBoundsException ex) {
-					log.error(cypherQuery + "  - query processing failed", ex);
+					log.error(cypherQuery , " {} - query processing failed", ex);
 					return Boolean.FALSE; 
 				}
-				log.debug(" Processed " + processedRecords);
+				log.debug(" Processed {}",  processedRecords);
 				recordCount = recordCount + processedRecords;
 			}
 			long queryExecutionEndTime = System.currentTimeMillis();
@@ -209,7 +213,7 @@ public class OfflineDataProcessingExecutor extends TimerTask {
 				dataEnrichmentModel.setQueryProcessingTime(queryProcessingTime);
 			}
 		} catch (InsightsCustomException e) {
-			log.error(cypherQuery + " - query processing failed", e);
+			log.error(cypherQuery , "{} - query processing failed", e);
 			return Boolean.FALSE;
 		}
 		return Boolean.TRUE;
@@ -248,7 +252,7 @@ public class OfflineDataProcessingExecutor extends TimerTask {
 					return Boolean.TRUE;
 				}
 			} catch (Exception e) {
-				log.error("Unable to parse the CRON expression: "+cronSchedule, e);
+				log.error("Unable to parse the CRON expression:{} ",cronSchedule, e);
 			}
 		}else {
 			if (dateTime != null && now != null) {

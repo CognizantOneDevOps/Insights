@@ -36,18 +36,18 @@ class GitAgent(BaseAgent):
 
     def process(self):
         timeStampNow = lambda: dateTime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")
-        getRepos = self.config.get("getRepos", '')
+        getReposUrl = self.config.get("getRepos", '')
         accessToken = self.getCredential("accessToken")
+        headers = {"Authorization":accessToken}
         commitsBaseEndPoint = self.config.get("commitsBaseEndPoint", '')
         startFromStr = self.config.get("startFrom", '')
         startFrom = parser.parse(startFromStr, ignoretz=True)
-        getReposUrl = getRepos+"?access_token="+accessToken
         enableBranches = self.config.get("enableBranches", False)
         isOptimalDataCollect = self.config.get("enableOptimizedDataRetrieval", False)
         isPullReqCommitAPIDataRetrieval = self.config.get("enablePullReqCommitAPIDataRetrieval", False)
         enableBrancheDeletion = self.config.get("enableBrancheDeletion", False)
         self.TrackingCachePathSetup('trackingCache')
-        repos = self.getResponse(getReposUrl+'&per_page=100&sort=created&page=1', 'GET', None, None, None)
+        repos = self.getResponse(getReposUrl+'?per_page=100&sort=created&page=1', 'GET', None, None, None, reqHeaders=headers)
         responseTemplate = self.getResponseTemplate()
         dynamicTemplate = self.config.get('dynamicTemplate', {})
         metaData = dynamicTemplate.get('metaData', {})
@@ -105,9 +105,9 @@ class GitAgent(BaseAgent):
                     if repoName != None:
                         if enableBranches:
                             if isOptimalDataCollect:
-                                self.PullRequest(commitsBaseEndPoint, repoName, repoDefaultBranch, accessToken,
+                                self.PullRequest(commitsBaseEndPoint, repoName, repoDefaultBranch,
                                                          trackingDetails, repoTrackingCache, startFromStr, pullReqMetaData,
-                                                         pullReqResponseTemplate, commitsMetaData, responseTemplate, orphanCommitsMetaData, orphanCommitResTemplate)
+                                                         pullReqResponseTemplate, commitsMetaData, responseTemplate, orphanCommitsMetaData, orphanCommitResTemplate, headers)
 
 
                                 if 'commitDict' in repoTrackingCache:
@@ -117,8 +117,8 @@ class GitAgent(BaseAgent):
                             branchPage = 1
                             fetchNextBranchPage = True
                             while fetchNextBranchPage:
-                                getBranchesRestUrl = commitsBaseEndPoint+repoName+'/branches?access_token='+accessToken+'&page='+str(branchPage)
-                                branchDetails = self.getResponse(getBranchesRestUrl, 'GET', None, None, None)
+                                getBranchesRestUrl = commitsBaseEndPoint+repoName+'/branches?page='+str(branchPage)
+                                branchDetails = self.getResponse(getBranchesRestUrl, 'GET', None, None, None, reqHeaders=headers)
                                 for branch in branchDetails:
                                     branchName = branch['name']
                                     branchTrackingDetails = trackingDetails.get(branchName, {})
@@ -139,10 +139,10 @@ class GitAgent(BaseAgent):
                                 'consumptionTime' : timeStampNow()
                             }
                             #topics API
-                            getTopicsUrl = commitsBaseEndPoint + repoName + '/topics?access_token=' + accessToken
+                            getTopicsUrl = commitsBaseEndPoint + repoName + '/topics?'
                             topicsList = list()
                             try:
-                                topicsAPIHeaders = {'Accept': 'application/vnd.github.mercy-preview+json'}
+                                topicsAPIHeaders = {'Accept': 'application/vnd.github.mercy-preview+json',"Authorization":accessToken}
                                 topicsResp = self.getResponse(getTopicsUrl, 'GET',None, None, None, reqHeaders=topicsAPIHeaders)
                                 topicsList = topicsResp.get('names', list())
                             except Exception as err:
@@ -217,7 +217,7 @@ class GitAgent(BaseAgent):
                                             if not since:
                                                 since = startFrom.strftime("%Y-%m-%dT%H:%M:%SZ")
                                             fetchNextBranchPage = True
-                                            getCommitDetailsUrl = commitsBaseEndPoint + repoName + '/commits?sha' + branchSHA+ 'access_token=' +accessToken + '&per+page=100'
+                                            getCommitDetailsUrl = commitsBaseEndPoint + repoName + '/commits?sha' + branchSHA+ 'per+page=100'
                                             getCommitDetailsUrl += '&since=' + since + '&until=' + until
                                             commitsPageNum = 1
                                             isOrphanCommit = not pullReq.get('isMerged',True) and not pullReq.get('isForked', True)
@@ -231,7 +231,7 @@ class GitAgent(BaseAgent):
                                                     orphanCommitInjectData.pop('branchJiraKeys','')
                                             while fetchNextCommitsPage:
                                                 try:
-                                                    commits =self.getResponse(getCommitDetailsUrl + '&page=' +str(commitsPageNum),'GET', None, None,None)
+                                                    commits =self.getResponse(getCommitDetailsUrl + '&page=' +str(commitsPageNum),'GET', None, None,None, reqHeaders=headers)
                                                     for commit in commits:
                                                         commitId = commit.get('sha', None)
                                                         commitMessage= commit.get('commit',dict()).get('message','')
@@ -290,7 +290,7 @@ class GitAgent(BaseAgent):
                             except Exception as er:
                                 logging.error(er)
                             fetchNextCommitsPage = True
-                            getCommitDetailsUrl = commitsBaseEndPoint + repoName +'/commits?sha=' + parseBranch + '&access_token=' + accessToken+'&per_page=100'
+                            getCommitDetailsUrl = commitsBaseEndPoint + repoName +'/commits?sha=' + parseBranch +'&per_page=100'
                             branchTrackingDetails = branchesTrackingDetails.get(branch,{})
                             since = branchTrackingDetails.get('latestCommitDate', None)
                             if since != None:
@@ -299,7 +299,7 @@ class GitAgent(BaseAgent):
                             latestCommit = None
                             while fetchNextCommitsPage:
                                 try :
-                                    commits = self.getResponse(getCommitDetailsUrl + '&page=' +str(commitsPageNum), 'GET', None,None, None)
+                                    commits = self.getResponse(getCommitDetailsUrl + '&page=' +str(commitsPageNum), 'GET', None,None, None, reqHeaders=headers)
                                     if latestCommit is None and len(commits)> 0:
                                         latestCommit = commits[0]
                                     for commit in commits:
@@ -353,11 +353,11 @@ class GitAgent(BaseAgent):
                             self.UpdateTrackingCache(repoName, repoTrackingCache)
                     self.updateTrackingJson(self.tracking)
                 repoPageNum = repoPageNum + 1
-                repos = self.getResponse(getReposUrl + '&per_page=100&sort=created&page=' + str(repoPageNum), 'GET', None, None, None)
+                repos = self.getResponse(getReposUrl + '?per_page=100&sort=created&page=' + str(repoPageNum), 'GET', None, None, None, reqHeaders=headers)
 
-    def PullRequest(self, repoEndPoint, repoName, defaultBranch, accessToken, trackingDetails, trackingCache,
+    def PullRequest(self, repoEndPoint, repoName, defaultBranch, trackingDetails, trackingCache,
                             startFrom, metaData, responseTemplate, commitMetaData, commitsResponseTemplate,
-                            orphanCommitMetaData, orphanCommitResTemplate):
+                            orphanCommitMetaData, orphanCommitResTemplate, headers):
         timeStampNow = lambda: dateTime.now().strftime("%Y-%m-%dT%H:%M:%SZ")
         injectData = dict()
         pullReqData = list()
@@ -372,7 +372,7 @@ class GitAgent(BaseAgent):
             'gitType': 'orphanCommit',
             'fromPullReq' :True
         }
-        defaultParams = 'access_token=%s' % accessToken + '&per_page=100&page=%s'
+        defaultParams = 'per_page=100&page=%s'
         pullReqUrl = repoEndPoint + repoName + '/pulls?state=all&sort=updated&direction=desc&'
         pullReqUrl += defaultParams
         lastTrackedTimeStr = trackingDetails.get('pullReqModificationTime', startFrom)
@@ -395,7 +395,7 @@ class GitAgent(BaseAgent):
         while nextPullReqPage:
             pullReqDetails = list()
             try:
-                pullReqDetails = self.getResponse(pullReqUrl % pullReqPage, 'GET', None, None, None)
+                pullReqDetails = self.getResponse(pullReqUrl % pullReqPage, 'GET', None, None, None, reqHeaders=headers)
                 if pullReqDetails and not isLatestPullReqDateSet:
                     pullReqLatestModifiedTime = pullReqDetails[0].get('updated_at', None)
                     isLatestPullReqDateSet = True
@@ -441,7 +441,7 @@ class GitAgent(BaseAgent):
                     getPullReqCommitUrl = basePullReqCommitUrl % commitPage
                     commitDetails = list()
                     try:
-                        commitDetails = self.getResponse(getPullReqCommitUrl, 'GET', None, None, None)
+                        commitDetails = self.getResponse(getPullReqCommitUrl, 'GET', None, None, None, reqHeaders=headers)
                         if commitDetails:
                             latestCommit = commitDetails[-1]
                     except Exception as err:

@@ -15,6 +15,7 @@
  ******************************************************************************/
 package com.cognizant.devops.platformauditing.util;
 
+
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -27,14 +28,14 @@ import java.util.TimeZone;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import com.cognizant.devops.platformauditing.api.InsightsAuditImpl;
+import com.cognizant.devops.platformcommons.constants.InsightsAuditConstants;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 
 public class RestructureDataUtil {
-    private static final Logger LOG = LogManager.getLogger(InsightsAuditImpl.class.getName());
+    private static final Logger LOG = LogManager.getLogger(RestructureDataUtil.class.getName());
 
     //convert data from neo4j to the format for ledger based on datamodel.json
     public JsonObject massageData(JsonObject input) {
@@ -58,7 +59,7 @@ public class RestructureDataUtil {
     			//Read datamodel        
     			datamodel = datamodel.getAsJsonObject(input.getAsJsonPrimitive("toolName").getAsString().toUpperCase());
     			for (Map.Entry<String, JsonElement> property : datamodel.entrySet()) {
-    				if (!property.getKey().equals("uplink") && !property.getKey().equals("downlink")) {
+    				if (!property.getKey().equals(InsightsAuditConstants.UPLINK) && !property.getKey().equals(InsightsAuditConstants.DOWNLINK)) {
     					if (property.getValue().isJsonObject()) {
     						output.addProperty(property.getKey(), property.getValue().getAsJsonObject().getAsJsonPrimitive(property.getKey()).getAsString());
     					} else if (property.getValue().isJsonArray()) {
@@ -75,12 +76,12 @@ public class RestructureDataUtil {
     					}
     				}
     			}
-    			output.add("date", humanDateFromTimestamp(output.get("timestamp").getAsLong()));
+    			output.add("date", humanDateFromTimestamp(output.get(InsightsAuditConstants.TIMESTAMP).getAsLong()));
     			output = addLinks(output, datamodel);        
     		}
     	}
     	if(!isUnique) {
-    		LOG.info("Neo4j input fields has NO assetId for the tool before insert into ledger"+ input);
+    		LOG.info("Neo4j input fields has NO assetId for the tool before insert into ledger:--{}", input);
     	}
     	return output;
     }
@@ -97,35 +98,35 @@ public class RestructureDataUtil {
     public boolean getInsertionFlag(JsonObject input) {
         try {        
             JsonObject processModel = LoadFile.getInstance().getProcessModel();
-            JsonArray process = processModel.getAsJsonArray("Steps");
+            JsonArray process = processModel.getAsJsonArray(InsightsAuditConstants.STEPS);
             for (JsonElement tool : process) {
-                if (input.getAsJsonPrimitive("toolName").getAsString().equals(tool.getAsJsonObject().getAsJsonPrimitive("Tool").getAsString().toUpperCase())) {
-                    if (tool.getAsJsonObject().get("Types").isJsonArray()) {
-                        for (JsonElement type : tool.getAsJsonObject().get("Types").getAsJsonArray()) {
-                            for (Map.Entry<String, JsonElement> property : type.getAsJsonObject().getAsJsonObject("Entity").entrySet()) {
+                if (input.getAsJsonPrimitive(InsightsAuditConstants.TOOLNAME).getAsString().equalsIgnoreCase(tool.getAsJsonObject().getAsJsonPrimitive("Tool").getAsString())) {
+                    if (tool.getAsJsonObject().get(InsightsAuditConstants.TYPES).isJsonArray()) {
+                        for (JsonElement type : tool.getAsJsonObject().get(InsightsAuditConstants.TYPES).getAsJsonArray()) {
+                            for (Map.Entry<String, JsonElement> property : type.getAsJsonObject().getAsJsonObject(InsightsAuditConstants.ENTITY).entrySet()) {
                                 if (input.getAsJsonPrimitive(property.getKey()).equals(property.getValue())) {
                                     if (type.getAsJsonObject().getAsJsonPrimitive("SubworkflowFlag").getAsBoolean()) {
-                                        String inputEntity = input.getAsJsonPrimitive(type.getAsJsonObject().getAsJsonObject("Subworkflow").getAsJsonPrimitive("Entity").getAsString()).getAsString();
-                                        for (JsonElement step : type.getAsJsonObject().getAsJsonObject("Subworkflow").getAsJsonArray("Steps")) {
-                                            if (inputEntity.equals(step.getAsJsonObject().getAsJsonPrimitive("Entity").getAsString())) {
-                                                return step.getAsJsonObject().getAsJsonPrimitive("insertIntoLedger").getAsBoolean();
+                                        String inputEntity = input.getAsJsonPrimitive(type.getAsJsonObject().getAsJsonObject(InsightsAuditConstants.SUBWORKFLOW).getAsJsonPrimitive(InsightsAuditConstants.ENTITY).getAsString()).getAsString();
+                                        for (JsonElement step : type.getAsJsonObject().getAsJsonObject(InsightsAuditConstants.SUBWORKFLOW).getAsJsonArray("Steps")) {
+                                            if (inputEntity.equals(step.getAsJsonObject().getAsJsonPrimitive(InsightsAuditConstants.ENTITY).getAsString())) {
+                                                return step.getAsJsonObject().getAsJsonPrimitive(InsightsAuditConstants.INSERTINTOLEDGER).getAsBoolean();
                                             }
                                         }
                                     } else {
-                                        return type.getAsJsonObject().getAsJsonPrimitive("insertIntoLedger").getAsBoolean();
+                                        return type.getAsJsonObject().getAsJsonPrimitive(InsightsAuditConstants.INSERTINTOLEDGER).getAsBoolean();
                                     }
                                 }
                             }
                         }
                     } else if (tool.getAsJsonObject().getAsJsonPrimitive("SubworkflowFlag").getAsBoolean()) {
-                        String inputEntity = input.getAsJsonPrimitive(tool.getAsJsonObject().getAsJsonObject("Subworkflow").getAsJsonPrimitive("Entity").getAsString()).getAsString();
-                        for (JsonElement step : tool.getAsJsonObject().getAsJsonObject("Subworkflow").getAsJsonArray("Steps")) {
-                            if (inputEntity.equals(step.getAsJsonObject().getAsJsonPrimitive("Entity").getAsString())) {
-                                return step.getAsJsonObject().getAsJsonPrimitive("insertIntoLedger").getAsBoolean();
+                        String inputEntity = input.getAsJsonPrimitive(tool.getAsJsonObject().getAsJsonObject(InsightsAuditConstants.SUBWORKFLOW).getAsJsonPrimitive(InsightsAuditConstants.ENTITY).getAsString()).getAsString();
+                        for (JsonElement step : tool.getAsJsonObject().getAsJsonObject(InsightsAuditConstants.SUBWORKFLOW).getAsJsonArray("Steps")) {
+                            if (inputEntity.equals(step.getAsJsonObject().getAsJsonPrimitive(InsightsAuditConstants.ENTITY).getAsString())) {
+                                return step.getAsJsonObject().getAsJsonPrimitive(InsightsAuditConstants.INSERTINTOLEDGER).getAsBoolean();
                             }
                         }
                     } else {
-                        return tool.getAsJsonObject().getAsJsonPrimitive("insertIntoLedger").getAsBoolean();
+                        return tool.getAsJsonObject().getAsJsonPrimitive(InsightsAuditConstants.INSERTINTOLEDGER).getAsBoolean();
                     }
                 }
             }       	        	
@@ -133,32 +134,32 @@ public class RestructureDataUtil {
         } catch (Exception e) {
             LOG.error(e);            
         }
-        LOG.error("No process rules defined for the given input:\n" + input);
+        LOG.error("No process rules defined for the given input:-%n", input);
         return false;
     }
 
 
     //add the uplink and downlink fields
     public JsonObject addLinks(JsonObject input, JsonObject datamodel) {
-        if (!datamodel.get("uplink").isJsonObject()) {
-            input.addProperty("uplink", "null");
+        if (!datamodel.get(InsightsAuditConstants.UPLINK).isJsonObject()) {
+            input.addProperty(InsightsAuditConstants.UPLINK, "null");
         } else {
             JsonObject uplinkObject = new JsonObject();
-            for (Map.Entry<String, JsonElement> uplink : datamodel.getAsJsonObject("uplink").entrySet()) {
+            for (Map.Entry<String, JsonElement> uplink : datamodel.getAsJsonObject(InsightsAuditConstants.UPLINK).entrySet()) {
                 JsonElement value = input.get(uplink.getValue().getAsString());
                 uplinkObject.add(uplink.getKey(), value);
             }
-            input.add("uplink", uplinkObject);
+            input.add(InsightsAuditConstants.UPLINK, uplinkObject);
         }
-        if (!datamodel.get("downlink").isJsonObject()) {
-            input.addProperty("downlink", "null");
+        if (!datamodel.get(InsightsAuditConstants.DOWNLINK).isJsonObject()) {
+            input.addProperty(InsightsAuditConstants.DOWNLINK, "null");
         } else {
             JsonObject downlinkObject = new JsonObject();
-            for (Map.Entry<String, JsonElement> downlink : datamodel.getAsJsonObject("downlink").entrySet()) {
-                JsonElement value = input.get(downlink.getValue().getAsString());
+            for (Map.Entry<String, JsonElement> downlink : datamodel.getAsJsonObject(InsightsAuditConstants.DOWNLINK).entrySet()) {
+            	JsonElement value = input.get(downlink.getValue().getAsString());
                 downlinkObject.add(downlink.getKey(), value);
             }
-            input.add("downlink", downlinkObject);
+            input.add(InsightsAuditConstants.DOWNLINK, downlinkObject);
         }
 
         return input;
@@ -172,7 +173,7 @@ public class RestructureDataUtil {
         JsonObject datamodel = LoadFile.getInstance().getDataModel().getAsJsonObject("CHANGELOG");
         for (Map.Entry<String, JsonElement> property : datamodel.entrySet()) {
             if (input.has(property.getValue().getAsString())) {
-                if (property.getKey().equals("fieldName")) {
+                if (property.getKey().equals(InsightsAuditConstants.FIELDNAME)) {
                     fieldnamesetFlag = false;
                     JsonObject jiraDataModel = LoadFile.getInstance().getDataModel().getAsJsonObject("JIRA");
                     for (Map.Entry<String, JsonElement> jiraProperty : jiraDataModel.entrySet()) {
@@ -194,23 +195,23 @@ public class RestructureDataUtil {
 
     //Construct a new jira node using the old jira node read from ledger and the changes obtained from neo4j
     public JsonObject constructJiraFromChangelog(JsonObject jiraNode, JsonObject changelog) {
-        jiraNode.remove("timestamp");
-        jiraNode.add("timestamp", changelog.getAsJsonPrimitive("timestamp"));
-        if (changelog.has("fieldName")) {
-            if (changelog.get("fieldName").getAsString().equals("attachments") && !changelog.get("toString").getAsString().equals("N/A")) {
+        jiraNode.remove(InsightsAuditConstants.TIMESTAMP);
+        jiraNode.add(InsightsAuditConstants.TIMESTAMP, changelog.getAsJsonPrimitive(InsightsAuditConstants.TIMESTAMP));
+        if (changelog.has(InsightsAuditConstants.FIELDNAME)) {
+            if (changelog.get(InsightsAuditConstants.FIELDNAME).getAsString().equals(InsightsAuditConstants.ATTACHMENTS) && !changelog.get(InsightsAuditConstants.TO_STRING).getAsString().equals("N/A")) {
                 String baseUrl = jiraNode.get("issueAPI").getAsString().split("atlassian.net\\/")[0];
-                StringBuffer attachmentUrl = new StringBuffer();
-                attachmentUrl.append(baseUrl).append("atlassian.net/").append("secure/attachment/").append(changelog.get("to").getAsString()).append("/").append(changelog.get("toString").getAsString());
-                jiraNode.remove(changelog.get("fieldName").getAsString());
-                jiraNode.addProperty(changelog.get("fieldName").getAsString(), attachmentUrl.toString());
-            } else if (changelog.get("fieldName").getAsString().equals("attachments") && changelog.get("toString").getAsString().equals("N/A")) {
-                StringBuffer attachment = new StringBuffer();
-                attachment.append(changelog.get("fromString")).append(" has been deleted");
-                jiraNode.remove(changelog.get("fieldName").getAsString());
-                jiraNode.addProperty(changelog.get("fieldName").getAsString(), attachment.toString());
+                StringBuilder attachmentUrl = new StringBuilder();
+                attachmentUrl.append(baseUrl).append("atlassian.net/").append("secure/attachment/").append(changelog.get("to").getAsString()).append("/").append(changelog.get(InsightsAuditConstants.TO_STRING).getAsString());
+                jiraNode.remove(changelog.get(InsightsAuditConstants.FIELDNAME).getAsString());
+                jiraNode.addProperty(changelog.get(InsightsAuditConstants.FIELDNAME).getAsString(), attachmentUrl.toString());
+            } else if (changelog.get(InsightsAuditConstants.FIELDNAME).getAsString().equals(InsightsAuditConstants.ATTACHMENTS) && changelog.get(InsightsAuditConstants.TO_STRING).getAsString().equals("N/A")) {
+            	StringBuilder attachment = new StringBuilder();
+                attachment.append(changelog.get(InsightsAuditConstants.FROM_STRING)).append(" has been deleted");
+                jiraNode.remove(changelog.get(InsightsAuditConstants.FIELDNAME).getAsString());
+                jiraNode.addProperty(changelog.get(InsightsAuditConstants.FIELDNAME).getAsString(), attachment.toString());
             } else {
-                jiraNode.remove(changelog.get("fieldName").getAsString());
-                jiraNode.add(changelog.get("fieldName").getAsString(), changelog.get("toString"));
+                jiraNode.remove(changelog.get(InsightsAuditConstants.FIELDNAME).getAsString());
+                jiraNode.add(changelog.get(InsightsAuditConstants.FIELDNAME).getAsString(), changelog.get(InsightsAuditConstants.TO_STRING));
             }
             jiraNode.add("date", humanDateFromTimestamp(jiraNode.get("createdTime").getAsLong()));
             return jiraNode;
@@ -221,8 +222,8 @@ public class RestructureDataUtil {
 
     //check if the changelog and jira nodes are in same context or not
     public boolean validateChangelog(JsonObject jiraNode, JsonObject changelog) {
-        if (jiraNode.get("timestamp").getAsString().equals(changelog.get("timestamp").getAsString())) {
-            if (jiraNode.get(changelog.get("fieldName").getAsString()).getAsString().equals(changelog.get("toString").getAsString())) {
+        if (jiraNode.get(InsightsAuditConstants.TIMESTAMP).getAsString().equals(changelog.get(InsightsAuditConstants.TIMESTAMP).getAsString())) {
+            if (jiraNode.get(changelog.get(InsightsAuditConstants.FIELDNAME).getAsString()).getAsString().equals(changelog.get("toString").getAsString())) {
                 return false;
             } else
                 return true;
@@ -235,23 +236,23 @@ public class RestructureDataUtil {
         for (int i = 0; i < changelogArray.size(); i++) {
             JsonObject massagedChangelog = massageChangeLog(changelogArray.get(i).getAsJsonObject());
             if (massagedChangelog != null) {
-                    if (massagedChangelog.has("fieldName")) {
-                        if (massagedChangelog.get("fieldName").getAsString().equals("attachments") && !massagedChangelog.get("fromString").getAsString().equals("N/A")) {
+                    if (massagedChangelog.has(InsightsAuditConstants.FIELDNAME)) {
+                        if (massagedChangelog.get(InsightsAuditConstants.FIELDNAME).getAsString().equals(InsightsAuditConstants.ATTACHMENTS) && !massagedChangelog.get(InsightsAuditConstants.FROM_STRING).getAsString().equals("N/A")) {
                             String baseUrl = jiraNode.get("issueAPI").getAsString().split("atlassian.net\\/")[0];
-                            StringBuffer attachmentUrl = new StringBuffer();
-                            attachmentUrl.append(baseUrl).append("atlassian.net/").append("secure/attachment/").append(massagedChangelog.get("from").getAsString()).append("/").append(massagedChangelog.get("fromString").getAsString());
-                            jiraNode.remove(massagedChangelog.get("fieldName").getAsString());
-                            jiraNode.addProperty(massagedChangelog.get("fieldName").getAsString(), attachmentUrl.toString());
+                            StringBuilder attachmentUrl = new StringBuilder();
+                            attachmentUrl.append(baseUrl).append("atlassian.net/").append("secure/attachment/").append(massagedChangelog.get("from").getAsString()).append("/").append(massagedChangelog.get(InsightsAuditConstants.FROM_STRING).getAsString());
+                            jiraNode.remove(massagedChangelog.get(InsightsAuditConstants.FIELDNAME).getAsString());
+                            jiraNode.addProperty(massagedChangelog.get(InsightsAuditConstants.FIELDNAME).getAsString(), attachmentUrl.toString());
                         } else {
-                            jiraNode.remove(massagedChangelog.get("fieldName").getAsString());
-                            jiraNode.add(massagedChangelog.get("fieldName").getAsString(), massagedChangelog.get("fromString"));
+                            jiraNode.remove(massagedChangelog.get(InsightsAuditConstants.FIELDNAME).getAsString());
+                            jiraNode.add(massagedChangelog.get(InsightsAuditConstants.FIELDNAME).getAsString(), massagedChangelog.get(InsightsAuditConstants.FROM_STRING));
                         }
                     } else
                         continue;
             }
         }
-        jiraNode.remove("timestamp");
-        jiraNode.add("timestamp", jiraNode.get("createdTime"));
+        jiraNode.remove(InsightsAuditConstants.TIMESTAMP);
+        jiraNode.add(InsightsAuditConstants.TIMESTAMP, jiraNode.get("createdTime"));
         return jiraNode;
     }
 

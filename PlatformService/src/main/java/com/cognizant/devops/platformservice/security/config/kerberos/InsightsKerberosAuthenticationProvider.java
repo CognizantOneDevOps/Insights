@@ -55,7 +55,7 @@ public class InsightsKerberosAuthenticationProvider implements AuthenticationPro
 					userDetails.getAuthorities(), token);
 			responseAuth.setDetails(authentication.getDetails());
 		} catch (Exception e) {
-			LOG.error("Exception while validation of kerberos token  {} ",e);
+			LOG.error("Exception while validation of kerberos token  ",e);
 			throw new InsightsAuthenticationException(e.getMessage(), e);
 		}
 		return responseAuth;

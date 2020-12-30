@@ -46,6 +46,7 @@ import com.google.gson.JsonParser;
 @Service("trainModelsService")
 public class TrainModelsServiceImpl implements ITrainModelsService {
     private static final Logger log = LogManager.getLogger(TrainModelsServiceImpl.class);
+    public static final String USECASE_NAME = "usecaseName";
     String FILE_SEPERATOR = File.separator;
     AutoMLConfigDAL autoMLConfigDAL;
     H2oApiCommunicator h2oApiCommunicator;
@@ -230,7 +231,7 @@ public class TrainModelsServiceImpl implements ITrainModelsService {
             	results.forEach(eachMLConfig->{
             		JsonObject eachObject = new JsonObject();
 					eachObject.addProperty("workflowId", eachMLConfig.getWorkflowConfig().getWorkflowId());
-            		eachObject.addProperty("usecaseName",eachMLConfig.getUseCaseName());
+            		eachObject.addProperty(USECASE_NAME,eachMLConfig.getUseCaseName());
             		eachObject.addProperty("predictionColumn", eachMLConfig.getPredictionColumn());
             		eachObject.addProperty("splitRatio",eachMLConfig.getTrainingPerc()+"/"+(100-eachMLConfig.getTrainingPerc()));
             		eachObject.addProperty("modelName", eachMLConfig.getMojoDeployed());
@@ -327,7 +328,7 @@ public class TrainModelsServiceImpl implements ITrainModelsService {
             if (!results.isEmpty()) {
             	for(AutoMLConfig eachMLConfig: results){
             		JsonObject eachObject = new JsonObject();
-            		eachObject.addProperty("usecaseName",eachMLConfig.getUseCaseName());
+            		eachObject.addProperty(USECASE_NAME,eachMLConfig.getUseCaseName());
             		eachObject.addProperty("predictionColumn", eachMLConfig.getPredictionColumn());
             		responseArray.add(eachObject);
             	}
@@ -351,7 +352,7 @@ public class TrainModelsServiceImpl implements ITrainModelsService {
 	public String updateUsecaseState(JsonObject usecaseJson) throws InsightsCustomException {
 		String message = "";
 		try {
-			String usecase = usecaseJson.get("usecaseName").getAsString();
+			String usecase = usecaseJson.get(USECASE_NAME).getAsString();
 			Boolean state = usecaseJson.get("isActive").getAsBoolean();
 			AutoMLConfig mlConfig = autoMLConfigDAL.getMLConfigByUsecase(usecase);
 			if (mlConfig == null) {

@@ -56,6 +56,7 @@ import com.google.gson.JsonParser;
 
 public class ElasticSearchNativeHandler {
 	private static Logger log = LogManager.getLogger(ElasticSearchNativeHandler.class.getName());
+	private static final String STATUS ="status";
 	//private RestHighLevelClient esClient;
 
 	/* public ElasticSearchNativeHandler() {
@@ -296,7 +297,7 @@ public class ElasticSearchNativeHandler {
 
 			JsonObject esResponse = esDbHandler.queryES(sourceESCacheUrl + "/_search", esQuery);
 
-			if (esResponse.has("status") && esResponse.get("status").getAsInt() == 404) {
+			if (esResponse.has(STATUS) && esResponse.get(STATUS).getAsInt() == 404) {
 				log.debug("Worlflow Detail ====  Elastic Serach data not retirved . Message is {} ", esResponse);
 			} else {
 				JsonArray esResponseArray = esResponse.get("hits").getAsJsonObject().get("hits").getAsJsonArray();
@@ -309,7 +310,7 @@ public class ElasticSearchNativeHandler {
 					recordlist.add(recordKPI);
 				}
 			}
-			log.debug(" esResponse API response {} ", esResponse);
+			log.debug(" esResponse API response ", esResponse);
 		} catch (InsightsCustomException e) {
 
 		}
@@ -334,7 +335,7 @@ public class ElasticSearchNativeHandler {
 			log.debug(" bulk Item Json {} ", bulkESJsons);
 			JsonObject esResponse = esDbHandler.queryES(sourceESCacheUrl, bulkESJsons.toString());
 
-			if (esResponse.has("status") && esResponse.get("status").getAsInt() == 404) {
+			if (esResponse.has(STATUS) && esResponse.get(STATUS).getAsInt() == 404) {
 				log.debug("Worlflow Detail ====  Elastic Serach data not retirved . Message is {} ", esResponse);
 			} else {
 				JsonArray esResponseArray = esResponse.get("hits").getAsJsonObject().get("hits").getAsJsonArray();

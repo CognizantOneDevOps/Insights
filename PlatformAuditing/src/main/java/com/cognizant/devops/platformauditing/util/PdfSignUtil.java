@@ -15,7 +15,6 @@
  ******************************************************************************/
 package com.cognizant.devops.platformauditing.util;
 
-
 import java.awt.Color;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
@@ -69,19 +68,18 @@ import org.bouncycastle.asn1.x500.style.IETFUtils;
 import com.cognizant.devops.platformcommons.constants.ConfigOptions;
 import com.google.gson.JsonObject;
 
-public class PdfSignUtil extends PdfCreateSignatureBase
-{
+public class PdfSignUtil extends PdfCreateSignatureBase {
 	private static final Logger log = LogManager.getLogger(PdfSignUtil.class.getName());
-	
+
 	private boolean lateExternalSigning = false;
 	private File imageFile;
-	private static final String PDF_PATH = System.getenv().get("INSIGHTS_HOME") + File.separator + ConfigOptions.CONFIG_DIR + File.separator + "Pdf" + File.separator;
+	private static final String PDF_PATH = System.getenv().get("INSIGHTS_HOME") + File.separator
+			+ ConfigOptions.CONFIG_DIR + File.separator + "Pdf" + File.separator;
 	private static final String TARGET_PDF = "target/Traceability_report.pdf";
 	private static final String PDF_NAME_VALIDATOR = "^([a-zA-Z0-9_.\\s-])+(.pdf)$";
-	
-	public PdfSignUtil(KeyStore keystore, char[] pin)
-			throws KeyStoreException, UnrecoverableKeyException, NoSuchAlgorithmException, IOException, CertificateException
-	{
+
+	public PdfSignUtil(KeyStore keystore, char[] pin) throws KeyStoreException, UnrecoverableKeyException,
+			NoSuchAlgorithmException, IOException, CertificateException {
 		super(keystore, pin);
 	}
 
@@ -92,32 +90,34 @@ public class PdfSignUtil extends PdfCreateSignatureBase
 	/**
 	 * Sign pdf file and create new file that ends with "_signed.pdf".
 	 *
-	 * @param inputFile The source pdf document file.
+	 * @param inputFile  The source pdf document file.
 	 * @param signedFile The file to be signed.
-	 * @param humanRect rectangle from a human viewpoint (coordinates start at top left)
-	 * @param tsaUrl optional TSA url
+	 * @param humanRect  rectangle from a human viewpoint (coordinates start at top
+	 *                   left)
+	 * @param tsaUrl     optional TSA url
 	 * @throws IOException
 	 */
-	public void signPDF(PDDocument protectDoc, File signedFile, Rectangle2D humanRect, String tsaUrl) throws IOException
-	{
+	public void signPDF(PDDocument protectDoc, File signedFile, Rectangle2D humanRect, String tsaUrl)
+			throws IOException {
 		this.signPDF(protectDoc, signedFile, humanRect, tsaUrl, null);
 	}
 
 	/**
 	 * Sign pdf file and create new file that ends with "_signed.pdf".
 	 *
-	 * @param protectDoc The source pdf document file.
-	 * @param signedFile The file to be signed.
-	 * @param humanRect rectangle from a human viewpoint (coordinates start at top left)
-	 * @param tsaUrl optional TSA url
-	 * @param signatureFieldName optional name of an existing (unsigned) signature field
+	 * @param protectDoc         The source pdf document file.
+	 * @param signedFile         The file to be signed.
+	 * @param humanRect          rectangle from a human viewpoint (coordinates start
+	 *                           at top left)
+	 * @param tsaUrl             optional TSA url
+	 * @param signatureFieldName optional name of an existing (unsigned) signature
+	 *                           field
 	 * @throws IOException
 	 */
-	public byte[] signPDF(PDDocument protectDoc, File signedFile, Rectangle2D humanRect, String tsaUrl, String signatureFieldName) throws IOException
-	{
-		if (protectDoc == null)
-		{
-			log.info("Input file in sigining - "+protectDoc);
+	public byte[] signPDF(PDDocument protectDoc, File signedFile, Rectangle2D humanRect, String tsaUrl,
+			String signatureFieldName) throws IOException {
+		if (protectDoc == null) {
+			log.info("Input file in sigining - {}", protectDoc);
 			throw new IOException("Document for signing does not exist");
 		}
 
@@ -125,49 +125,40 @@ public class PdfSignUtil extends PdfCreateSignatureBase
 
 		ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
 		protectDoc.save(byteArrayOutputStream);
-		PDDocument doc = PDDocument.load(byteArrayOutputStream.toByteArray(),"12345");
+		PDDocument doc = PDDocument.load(byteArrayOutputStream.toByteArray(), "12345");
 		int accessPermissions = SignatureUtils.getMDPPermission(doc);
-		if (accessPermissions == 1)
-		{
-			throw new IllegalStateException("No changes to the document are permitted due to DocMDP transform parameters dictionary");
+		if (accessPermissions == 1) {
+			throw new IllegalStateException(
+					"No changes to the document are permitted due to DocMDP transform parameters dictionary");
 		}
 
 		PDSignature signature = null;
 		PDAcroForm acroForm = doc.getDocumentCatalog().getAcroForm();
 		PDRectangle rect = null;
 
-		if (acroForm != null)
-		{
+		if (acroForm != null) {
 			signature = findExistingSignature(acroForm, signatureFieldName);
-			if (signature != null)
-			{
+			if (signature != null) {
 				rect = acroForm.getField(signatureFieldName).getWidgets().get(0).getRectangle();
 			}
 		}
 
-		if (signature == null)
-		{
+		if (signature == null) {
 			signature = new PDSignature();
 		}
 
-		if (rect == null)
-		{
+		if (rect == null) {
 			rect = createSignatureRectangle(doc, humanRect);
 		}
 
-		if (doc.getVersion() >= 1.5f && accessPermissions == 0)
-		{
+		if (doc.getVersion() >= 1.5f && accessPermissions == 0) {
 			SignatureUtils.setMDPPermission(doc, signature, 2);
 		}
 
-		if (acroForm != null && acroForm.getNeedAppearances())
-		{
-			if (acroForm.getFields().isEmpty())
-			{
+		if (acroForm != null && acroForm.getNeedAppearances()) {
+			if (acroForm.getFields().isEmpty()) {
 				acroForm.getCOSObject().removeItem(COSName.NEED_APPEARANCES);
-			}
-			else
-			{
+			} else {
 				log.info("/NeedAppearances is set, signature may be ignored by Adobe Reader");
 			}
 		}
@@ -179,8 +170,9 @@ public class PdfSignUtil extends PdfCreateSignatureBase
 		signature.setSignDate(Calendar.getInstance());
 		SignatureInterface signatureInterface = isExternalSigning() ? null : this;
 		SignatureOptions signatureOptions = new SignatureOptions();
-		signatureOptions.setVisualSignature(createVisualSignatureTemplate(doc, doc.getNumberOfPages()-1, rect, signature));
-		signatureOptions.setPage(doc.getNumberOfPages()-1);
+		signatureOptions
+				.setVisualSignature(createVisualSignatureTemplate(doc, doc.getNumberOfPages() - 1, rect, signature));
+		signatureOptions.setPage(doc.getNumberOfPages() - 1);
 		doc.addSignature(signature, signatureInterface, signatureOptions);
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		doc.saveIncremental(baos);
@@ -190,17 +182,15 @@ public class PdfSignUtil extends PdfCreateSignatureBase
 		return baos.toByteArray();
 	}
 
-	private PDRectangle createSignatureRectangle(PDDocument doc, Rectangle2D humanRect)
-	{
+	private PDRectangle createSignatureRectangle(PDDocument doc, Rectangle2D humanRect) {
 		float x = (float) humanRect.getX();
 		float y = (float) humanRect.getY();
 		float width = (float) humanRect.getWidth();
 		float height = (float) humanRect.getHeight();
-		PDPage page = doc.getPage(doc.getNumberOfPages()-1);
+		PDPage page = doc.getPage(doc.getNumberOfPages() - 1);
 		PDRectangle pageRect = page.getCropBox();
 		PDRectangle rect = new PDRectangle();
-		switch (page.getRotation())
-		{
+		switch (page.getRotation()) {
 		case 90:
 			rect.setLowerLeftY(x);
 			rect.setUpperRightY(x + width);
@@ -230,8 +220,8 @@ public class PdfSignUtil extends PdfCreateSignatureBase
 		return rect;
 	}
 
-	private InputStream createVisualSignatureTemplate(PDDocument srcDoc, int pageNum, PDRectangle rect, PDSignature signature) throws IOException
-	{
+	private InputStream createVisualSignatureTemplate(PDDocument srcDoc, int pageNum, PDRectangle rect,
+			PDSignature signature) throws IOException {
 		PDDocument doc = new PDDocument();
 		PDPage page = new PDPage(srcDoc.getPage(pageNum).getMediaBox());
 		doc.addPage(page);
@@ -255,19 +245,20 @@ public class PdfSignUtil extends PdfCreateSignatureBase
 		PDRectangle bbox = new PDRectangle(rect.getWidth(), rect.getHeight());
 		float height = bbox.getHeight();
 		Matrix initialScale = null;
-		switch (srcDoc.getPage(pageNum).getRotation())
-		{
+		switch (srcDoc.getPage(pageNum).getRotation()) {
 		case 90:
 			form.setMatrix(AffineTransform.getQuadrantRotateInstance(1));
-			initialScale = Matrix.getScaleInstance(bbox.getWidth() / bbox.getHeight(), bbox.getHeight() / bbox.getWidth());
+			initialScale = Matrix.getScaleInstance(bbox.getWidth() / bbox.getHeight(),
+					bbox.getHeight() / bbox.getWidth());
 			height = bbox.getWidth();
 			break;
 		case 180:
-			form.setMatrix(AffineTransform.getQuadrantRotateInstance(2)); 
+			form.setMatrix(AffineTransform.getQuadrantRotateInstance(2));
 			break;
 		case 270:
 			form.setMatrix(AffineTransform.getQuadrantRotateInstance(3));
-			initialScale = Matrix.getScaleInstance(bbox.getWidth() / bbox.getHeight(), bbox.getHeight() / bbox.getWidth());
+			initialScale = Matrix.getScaleInstance(bbox.getWidth() / bbox.getHeight(),
+					bbox.getHeight() / bbox.getWidth());
 			height = bbox.getWidth();
 			break;
 		case 0:
@@ -284,8 +275,7 @@ public class PdfSignUtil extends PdfCreateSignatureBase
 		widget.setAppearance(appearance);
 
 		PDPageContentStream cs = new PDPageContentStream(doc, appearanceStream);
-		if (initialScale != null)
-		{
+		if (initialScale != null) {
 			cs.transform(initialScale);
 		}
 
@@ -310,16 +300,16 @@ public class PdfSignUtil extends PdfCreateSignatureBase
 		X500Name x500Name = new X500Name(cert.getSubjectX500Principal().getName());
 		RDN cn = x500Name.getRDNs(BCStyle.CN)[0];
 		String name = IETFUtils.valueToString(cn.getFirst().getValue());
-		log.info("Digitally Signed by -  {}",name);
+		log.info("Digitally Signed by -  {}", name);
 		String date = signature.getSignDate().getTime().toString();
-		log.info("Date - {}",date);
+		log.info("Date - {}", date);
 		String reason = signature.getReason();
-		log.info("Reason - {}",reason);
-		cs.showText("Digitally Signed by "+name);
+		log.info("Reason - {}", reason);
+		cs.showText("Digitally Signed by " + name);
 		cs.newLine();
-		cs.showText("Reason:"+reason);
+		cs.showText("Reason:" + reason);
 		cs.newLine();
-		cs.showText("Date :"+date);
+		cs.showText("Date :" + date);
 		cs.endText();
 
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -328,23 +318,17 @@ public class PdfSignUtil extends PdfCreateSignatureBase
 		return new ByteArrayInputStream(baos.toByteArray());
 	}
 
-	private PDSignature findExistingSignature(PDAcroForm acroForm, String sigFieldName)
-	{
+	private PDSignature findExistingSignature(PDAcroForm acroForm, String sigFieldName) {
 		PDSignature signature = null;
 		PDSignatureField signatureField;
-		if (acroForm != null)
-		{
+		if (acroForm != null) {
 			signatureField = (PDSignatureField) acroForm.getField(sigFieldName);
-			if (signatureField != null)
-			{
+			if (signatureField != null) {
 				signature = signatureField.getSignature();
-				if (signature == null)
-				{
+				if (signature == null) {
 					signature = new PDSignature();
 					signatureField.getCOSObject().setItem(COSName.V, signature);
-				}
-				else
-				{
+				} else {
 					throw new IllegalStateException("The signature field " + sigFieldName + " is already signed.");
 				}
 			}
@@ -352,16 +336,12 @@ public class PdfSignUtil extends PdfCreateSignatureBase
 		return signature;
 	}
 
-
 	/**
-	 * Arguments are
-	 * [0] key store
-	 * [1] pin
-	 * [2] document that will be signed
-	 * [3] image of visible signature
-	 * generate with
-	 * 				keytool -storepass 123456 -storetype PKCS12 -keystore file.p12 -genkey -alias client -keyalg RSA
-	 * @param doc 
+	 * Arguments are [0] key store [1] pin [2] document that will be signed [3]
+	 * image of visible signature generate with keytool -storepass 123456 -storetype
+	 * PKCS12 -keystore file.p12 -genkey -alias client -keyalg RSA
+	 * 
+	 * @param doc
 	 * @throws KeyStoreException
 	 * @throws IOException
 	 * @throws NoSuchAlgorithmException
@@ -369,11 +349,11 @@ public class PdfSignUtil extends PdfCreateSignatureBase
 	 * @throws FileNotFoundException
 	 * @throws UnrecoverableKeyException
 	 */
-	public byte[] digitalSign(PDDocument doc, String pdfName) throws KeyStoreException, IOException, NoSuchAlgorithmException,
-	CertificateException, UnrecoverableKeyException {
+	public byte[] digitalSign(PDDocument doc, String pdfName) throws KeyStoreException, IOException,
+			NoSuchAlgorithmException, CertificateException, UnrecoverableKeyException {
 		byte[] signdoc = null;
-		try{
-			log.info("Pdf Name in sign == {} ",pdfName);
+		try {
+			log.info("Pdf Name in sign == {} ", pdfName);
 			String tsaUrl = null;
 			boolean externalSig = false;
 			JsonObject config = LoadFile.getInstance().getConfig();
@@ -382,32 +362,33 @@ public class PdfSignUtil extends PdfCreateSignatureBase
 			char[] pin = config.get("PIN_PROTECT").getAsString().toCharArray();
 			keystore.load(new FileInputStream(ksFile), pin);
 			boolean valid = checkValidFile(pdfName);
-			if(valid){
-				File documentFile = new File(pdfName==null ? TARGET_PDF : pdfName);
-				log.info("documentFile name sign--{}",documentFile.getName());
+			if (valid) {
+				File documentFile = new File(pdfName == null ? TARGET_PDF : pdfName);
+				log.info("documentFile name sign---{}", documentFile.getName());
 				PdfSignUtil signing = new PdfSignUtil(keystore, pin.clone());
-				signing.setImageFile(new File(PDF_PATH+config.get("DIGI_IMG").getAsString()).getAbsoluteFile());
+				signing.setImageFile(new File(PDF_PATH + config.get("DIGI_IMG").getAsString()).getAbsoluteFile());
 				File signedDocumentFile;
 				String name = pdfName;
 				String substring = name.substring(0, name.lastIndexOf('.'));
 				signedDocumentFile = new File(documentFile.getParent(), substring + "_signed.pdf");
-				log.info("signedDocumentFile sign-- {}",signedDocumentFile.getName());
+				log.info("signedDocumentFile sign-- {} ", signedDocumentFile.getName());
 				signing.setExternalSigning(externalSig);
 
 				Rectangle2D humanRect = new Rectangle2D.Float(100, 200, 150, 50);
 				log.info("--Signining PDF---");
 				signdoc = signing.signPDF(doc, signedDocumentFile, humanRect, tsaUrl, "Signature1");
-			}else{
-				log.info("PDF name is not valid for Regex -- {}",PDF_NAME_VALIDATOR);
+			} else {
+				log.info("PDF name is not valid for Regex -- {}", PDF_NAME_VALIDATOR);
 			}
-		}catch(Exception e){
+		} catch (Exception e) {
 			log.error(e);
 		}
 		return signdoc;
 	}
-	
+
 	/**
 	 * Checks for pdf name
+	 * 
 	 * @param pdfName
 	 * @return validname
 	 */
@@ -415,31 +396,27 @@ public class PdfSignUtil extends PdfCreateSignatureBase
 		final Pattern pattern = Pattern.compile(PDF_NAME_VALIDATOR, Pattern.MULTILINE);
 		final Matcher matcher = pattern.matcher(pdfName);
 
-		if(matcher.find()) {
-		    log.debug("File name is Valid for regex -- "+PDF_NAME_VALIDATOR);
-		    return true;
-		} 
-		
+		if (matcher.find()) {
+			log.debug("File name is Valid for regex -- ",PDF_NAME_VALIDATOR);
+			return true;
+		}
+
 		return false;
 	}
-	
-	public File getImageFile()
-	{
+
+	public File getImageFile() {
 		return imageFile;
 	}
 
-	public void setImageFile(File imageFile)
-	{
+	public void setImageFile(File imageFile) {
 		this.imageFile = imageFile;
 	}
 
-	public boolean isLateExternalSigning()
-	{
+	public boolean isLateExternalSigning() {
 		return lateExternalSigning;
 	}
 
-	public void setLateExternalSigning(boolean lateExternalSigning)
-	{
+	public void setLateExternalSigning(boolean lateExternalSigning) {
 		this.lateExternalSigning = lateExternalSigning;
 	}
 

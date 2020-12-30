@@ -18,25 +18,38 @@ package com.cognizant.devops.platformcommons.dal.vault;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.ws.rs.ProcessingException;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
+import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
 import com.cognizant.devops.platformcommons.dal.RestApiHandler;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
+import com.cognizant.devops.platformcommons.exception.RestAPI404Exception;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
+import com.google.gson.JsonParser;
 
 
 
 public class VaultHandler {
 	
 	private static Logger log = LogManager.getLogger(VaultHandler.class);
-	private static final String VAULT_TOKEN = ApplicationConfigProvider.getInstance().getVault().getVaultToken();
-	private static final String VAULT_URL = ApplicationConfigProvider.getInstance().getVault().getVaultEndPoint() 
+	private String VAULT_TOKEN = ApplicationConfigProvider.getInstance().getVault().getVaultToken();
+	private String VAULT_URL = ApplicationConfigProvider.getInstance().getVault().getVaultEndPoint()
 			+ ApplicationConfigProvider.getInstance().getVault().getSecretEngine() +"/data/";
 
 	
 	
+	public VaultHandler() {
+		VAULT_TOKEN = ApplicationConfigProvider.getInstance().getVault().getVaultToken();
+		VAULT_URL = ApplicationConfigProvider.getInstance().getVault().getVaultEndPoint()
+				+ ApplicationConfigProvider.getInstance().getVault().getSecretEngine() + "/data/";
+	}
+
 	/**
 	 * Stores userid/pwd/token and aws credentials in vault engine as per vaultId.
 	 * 
@@ -50,19 +63,138 @@ public class VaultHandler {
 		Map<String, String> headers = new HashMap<>();
 
 		try {
-			headers.put("X-Vault-Token", VAULT_TOKEN);
+			headers.put(PlatformServiceConstants.VAULT_TOKEN, VAULT_TOKEN);
 			JsonObject requestJson = new JsonObject();
 			requestJson.add("data", dataJson);
-			log.debug("Request body for vault {} -- ", requestJson);
+			log.debug("return Request body for vault  {} -- ", requestJson);
 			String url = VAULT_URL + vaultId;
 			response = RestApiHandler.doPost(url, requestJson, headers);
 
 		} catch (Exception e) {
-			log.error("Error while Storing to vault agent {} ", e);
+			log.error("Error while Storing data to vault  {} ", e);
 			throw new InsightsCustomException(e.getMessage());
 		}
 		return response;
 	}
+
+	public String storeToVaultDB(String dataJson, String url) throws InsightsCustomException {
+		String response = null;
+		Map<String, String> headers = new HashMap<>();
+
+		try {
+			headers.put(PlatformServiceConstants.VAULT_TOKEN, VAULT_TOKEN);
+			JsonObject requestJson = new JsonObject();
+			requestJson.addProperty(PlatformServiceConstants.VAULT_DATA_VALUE, dataJson);
+			log.debug("url  {} ", url);
+			//log.debug("Request body for vault {} -- ", requestJson);
+			response = RestApiHandler.doPost(url, requestJson, headers);
+
+		} catch (Exception e) {
+			log.error("Error while Storing date to vault with database  {} ", e);
+			throw new InsightsCustomException(e.getMessage());
+		}
+		return response;
+	}
+	
+	public String storeToVaultJsonInDB(JsonObject dataJson, String vaultEndPoint, String vaultUrlDetail, String vaultToken) throws InsightsCustomException {
+		String response = null;
+		Map<String, String> headers = new HashMap<>();
+		try {
+			boolean vaultStatus = getVaultStatus(vaultEndPoint,vaultToken);
+			if(vaultStatus) {
+				String vaultServerConfigURL =vaultEndPoint +vaultUrlDetail;
+				headers.put(PlatformServiceConstants.VAULT_TOKEN, vaultToken);
+				JsonObject requestJson = new JsonObject();
+				requestJson.addProperty(PlatformServiceConstants.VAULT_DATA_VALUE, String.valueOf(dataJson));
+				log.debug("url  {} ", vaultServerConfigURL);
+				//log.debug("Request body for vault {} -- ", requestJson);
+				response = RestApiHandler.doPost(vaultServerConfigURL, requestJson, headers);
+			}else {
+				throw new InsightsCustomException("Vault_sealed : Vault is not ready, make sure vault is unsealed ");
+			}
+		} catch (Exception e) {
+			log.error("Error while Storing date to vault with database  {} ", e);
+			throw new InsightsCustomException(e.getMessage());
+		}
+		return response;
+	}
+
+	public JsonObject fetchServerConfigFromVault(String clientId,String vaultUrl, String vaultSecretEngine, String vaultToken) throws InsightsCustomException {
+		JsonObject serverConfig = new JsonObject();
+		JsonParser parser = new JsonParser();
+		try {
+			boolean vaultStatus = getVaultStatus(vaultUrl,vaultToken);
+			if(vaultStatus) {
+				String vaultServerConfigURL = vaultUrl
+						+ "/sys/raw/" + vaultSecretEngine+ "/"
+						+ clientId + "/serverConfig";
+				log.debug(" vaultServerConfigURL {} ", vaultServerConfigURL);
+				String dataFromVault = fetchFromVaultDB(vaultServerConfigURL,vaultToken);
+				if(dataFromVault !=null) {
+					JsonElement parsedJson = parser.parse(dataFromVault);
+					if (parsedJson.getAsJsonObject().has("data")
+							&& parsedJson.getAsJsonObject().get("data").getAsJsonObject().has(PlatformServiceConstants.VAULT_DATA_VALUE)) {
+						JsonElement serverConfigelement = parser
+								.parse(parsedJson.getAsJsonObject().get("data").getAsJsonObject().get(PlatformServiceConstants.VAULT_DATA_VALUE).toString());
+						serverConfig = parser.parse(serverConfigelement.getAsString()).getAsJsonObject(); 
+					} else {
+						log.error("Reading server config from Vault is not proper format {} ", parsedJson);
+					}
+				}else {
+					log.debug("No Data found in vault ");
+				}
+			}else {
+				throw new InsightsCustomException("Vault is not ready, make sure vault is unsealed ");
+			}
+			//log.debug(" serverConfig   ======== {} ", serverConfig);
+		} catch (InsightsCustomException e) {
+			log.error(" Error while reading server config from Vault ", e);
+			throw new InsightsCustomException(e.getMessage());
+		} catch (JsonParseException e) {
+			log.error(" Error while reading server config from Vault, Json parsing exception ", e);
+			throw new InsightsCustomException(e.getMessage());
+		}
+		return serverConfig;
+	}
+
+	public String fetchFromVaultDB(String url,String vaultToken) throws InsightsCustomException {
+		String data = null;
+		Map<String, String> headers = new HashMap<>();
+		try {
+			headers.put(PlatformServiceConstants.VAULT_TOKEN, vaultToken);
+			data = RestApiHandler.doGet(url, headers);
+		} catch (RestAPI404Exception e) {
+			log.error(" Data not present in vault {}-- ", e);
+			throw new InsightsCustomException("Data not present in vault");
+		}catch (Exception e) {
+			log.error("Error while fetching secret from vault -- ", e);
+			throw new InsightsCustomException(e.getMessage());
+		}
+		return data;
+	}
+	
+	public boolean getVaultStatus(String vaultBaseUrl,String vaultToken) throws InsightsCustomException {
+		boolean vaultStatusRet = Boolean.FALSE;
+		Map<String, String> headers = new HashMap<>();
+		try {
+			String vaultStatusURL = vaultBaseUrl
+					+ "/sys/seal-status";
+			headers.put(PlatformServiceConstants.VAULT_TOKEN, vaultToken);
+			String data = RestApiHandler.doGet(vaultStatusURL, headers);
+			JsonObject vaultStatus = new JsonParser().parse(data).getAsJsonObject();
+			if(vaultStatus.has("sealed") && vaultStatus.get("sealed").getAsBoolean()) {
+				throw new InsightsCustomException("Vault_sealed");
+			}
+			vaultStatusRet = Boolean.TRUE;
+		} catch (RestAPI404Exception e) {
+			log.error(" Data not present in vault {}-- ", e);
+		}catch (ProcessingException |InsightsCustomException e) {
+			log.error("Error while fetching secret from vault {}-- ", e);
+			throw e;
+		}
+		return vaultStatusRet;
+	}
+
 
 	/**
 	 * fetches userid/pwd/token and aws credentials in vault engine as per vaultID.
@@ -74,9 +206,8 @@ public class VaultHandler {
 	public String fetchFromVault(String vaultId) throws InsightsCustomException {
 		String data = null;
 		Map<String, String> headers = new HashMap<>();
-		
 		try {
-			headers.put("X-Vault-Token", VAULT_TOKEN);
+			headers.put(PlatformServiceConstants.VAULT_TOKEN, VAULT_TOKEN);
 			String url = VAULT_URL + vaultId;
 			data = RestApiHandler.doGet(url, headers);
 		} catch (Exception e) {
@@ -91,17 +222,14 @@ public class VaultHandler {
 		Map<String, String> headers = new HashMap<>();
 
 		try {
-			headers.put("X-Vault-Token", VAULT_TOKEN);
+			headers.put(PlatformServiceConstants.VAULT_TOKEN, VAULT_TOKEN);
 			JsonObject requestJson = new JsonObject();
 			requestJson.add("data", dataJson);
-			log.debug("Request body for vault {} -- ", requestJson);
 			response = RestApiHandler.doPost(url, requestJson, headers);
-
 		} catch (Exception e) {
 			log.error("Error while Storing to vault agent {} ", e);
 			throw new InsightsCustomException(e.getMessage());
 		}
 		return response;
 	}
-
 }

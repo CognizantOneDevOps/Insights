@@ -59,7 +59,7 @@ public class WebhookHealthSubscriber extends EngineSubscriberResponseHandler {
 			if (!dataList.isEmpty()) {
 				String healthLabels = ":" + routingKey.replace(".", ":");
 				boolean isRecordUpdate = createHealthNodes(dbHandler, dataList, healthLabels);
-				log.debug("Webhook Health Record update status ==== " + isRecordUpdate);
+				log.debug("Webhook Health Record update status {} ==== " , isRecordUpdate);
 				if (isRecordUpdate) {
 					getChannel().basicAck(envelope.getDeliveryTag(), false);
 				}

@@ -67,7 +67,7 @@ public class OpenPDFChartHandler implements BasePDFProcessor {
 		} catch (Exception e) {
 			log.error(e);
 			throw new InsightsJobFailedException(
-					"Unable to create pdf execution directory, message == " + e.getMessage());
+					"Unable to create pdf execution directory, message == {} " + e.getMessage());
 		}
 	}
 
@@ -99,7 +99,7 @@ public class OpenPDFChartHandler implements BasePDFProcessor {
 			
 
 		} catch (Exception e) {
-			log.error("Workflow Detail ==== error while processing pdf data {}", e);
+			log.error("Workflow Detail ==== error while processing pdf data  ", e);
 			throw new InsightsJobFailedException(" unable to prepare pdf data " + e);
 		}
 		
@@ -118,7 +118,7 @@ public class OpenPDFChartHandler implements BasePDFProcessor {
 
             log.debug("Workflow Detail ==== pdf File Saved {} ", exportedFilePath);
 		} catch (Exception e) {
-			log.error("Workflow Detail ==== Error while exporting pdf ", e);
+			log.error("Workflow Detail ==== Error while exporting pdf  ", e);
 			throw new InsightsJobFailedException(e.getMessage());
 		} 
 	
@@ -128,7 +128,7 @@ public class OpenPDFChartHandler implements BasePDFProcessor {
 		try(FileOutputStream outStream = new FileOutputStream(extractedPdfFile)) {
 			 outStream.write(pdfResponse);
 		} catch (Exception e) {
-			log.error("Workflow Detail ==== Error while saving pdf ", e);
+			log.error("Workflow Detail ==== Error while saving pdf  ", e);
 			throw new InsightsJobFailedException(e.getMessage());
 		}
 	}

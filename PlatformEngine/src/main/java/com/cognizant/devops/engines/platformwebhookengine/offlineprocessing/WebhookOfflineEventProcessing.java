@@ -23,8 +23,12 @@ import java.util.TimerTask;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import com.cognizant.devops.engines.platformengine.message.core.EngineStatusLogger;
 import com.cognizant.devops.engines.util.WebhookEventProcessing;
+import com.cognizant.devops.platformcommons.config.ApplicationConfigInterface;
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
+import com.cognizant.devops.platformcommons.constants.LogLevelConstants;
+import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
 import com.cognizant.devops.platformcommons.core.util.InsightsUtils;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBHandler;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
@@ -39,7 +43,7 @@ import com.google.gson.JsonObject;
  * Responsible for processing failed webhook events.
  *
  */
-public class WebhookOfflineEventProcessing extends TimerTask {
+public class WebhookOfflineEventProcessing extends TimerTask implements ApplicationConfigInterface{
 	WebHookConfigDAL dal = new WebHookConfigDAL();
 	private GraphDBHandler dbHandler = new GraphDBHandler();
 	private static Logger log = LogManager.getLogger(WebhookOfflineEventProcessing.class);
@@ -47,16 +51,24 @@ public class WebhookOfflineEventProcessing extends TimerTask {
 	@Override
 	public void run() {
 		log.debug("Webhook Offline Event Processing Started ======");
-		List<WebHookConfig> webhookEventConfigs = dal.getAllEventWebHookConfigurations();
-		log.debug("Webhook events for processing ====== {}", webhookEventConfigs);
-		execute(webhookEventConfigs);
+		try {
+			ApplicationConfigInterface.loadConfiguration();
+			List<WebHookConfig> webhookEventConfigs = dal.getAllEventWebHookConfigurations();
+			log.debug("Webhook events for processing ====== {}", webhookEventConfigs);
+			execute(webhookEventConfigs);
+		} catch (Exception e) {
+			log.error(e);
+			EngineStatusLogger.getInstance().createEngineStatusNode(
+					" Error occured while initializing WebhookOfflineEventProcessing  " + e.getMessage(),
+					PlatformServiceConstants.FAILURE);
+		}
 	}
 
 	public void execute(List<WebHookConfig> webhookEventConfigs) {
 
 		for (WebHookConfig webhookEventConfig : webhookEventConfigs) {
 			try {
-				WebhookEventProcessing webhookEventProcessing = null;
+/*				WebhookEventProcessing webhookEventProcessing = null;
 				String neo4jLabel = webhookEventConfig.getLabelName();
 				List<JsonObject> eventNodes = getNeo4JEventNodes(neo4jLabel);
 				for (JsonObject eventNode : eventNodes) {
@@ -73,15 +85,29 @@ public class WebhookOfflineEventProcessing extends TimerTask {
 						updateNeo4jNode(webhookEventConfig.getLabelName(), uuid);
 						log.debug(
 								"Webhook Offline Event Processing ====== Event processed successfully for payloads {}",
-								eventNode);
-					}
+								eventNode);*/
+				WebhookEventProcessing webhookEventProcessing = null;
+							String neo4jLabel = webhookEventConfig.getLabelName();
+						List<JsonObject> eventNodes = getNeo4JEventNodes(neo4jLabel);
+						for (JsonObject eventNode : eventNodes) {
+								String uuid = eventNode.get("uuid").getAsString();
+								// check max processing time
+								if (webhookEventProcessing == null) {
+									webhookEventProcessing = new WebhookEventProcessing(Arrays.asList(eventNode), webhookEventConfig,
+											true);
+								} else {
+									webhookEventProcessing.setEventPayload(Arrays.asList(eventNode));
 				}
-			} catch (Exception e) {
-				log.error("Webhook Offline Event Processing ====== something went wrong while offline processing {}");
-			}
+			if (checkDueMaxEventProcessTime(eventNode.get("eventTimestamp").getAsLong())
+										|| webhookEventProcessing.doEvent()) {
+									updateNeo4jNode(webhookEventConfig.getLabelName(), uuid);
+									log.debug("Webhook Offline Event Processing ==== Event processed successfully for payloads {}",eventNode);
+			}}
+						}catch (Exception e) {
+							log.error("Webhook Offline Event Processing ====== something went wrong while offline processing");
+						}
 		}
-
-	}
+		}
 
 	private List<JsonObject> getNeo4JEventNodes(String neo4jLabel) {
 		List<JsonObject> eventNodes = new ArrayList<>();

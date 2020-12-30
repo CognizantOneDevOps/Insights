@@ -13,17 +13,18 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  ******************************************************************************/
- package com.cognizant.devops.platformcommons.constants;
+package com.cognizant.devops.platformcommons.constants;
 
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 
 public interface ServiceStatusConstants {
 	String POSTGRESQL_HOST = ApplicationConfigProvider.getInstance().getGrafana().getGrafanaEndpoint();
 	String PLATFORM_SERVICE_HOST = ApplicationConfigProvider.getInstance().getInsightsServiceURL();
-	String INSIGHTS_INFERENCE_MASTER_HOST = ApplicationConfigProvider.getInstance().getSparkConfigurations().getSparkMasterExecutionEndPoint();
+	String INSIGHTS_INFERENCE_MASTER_HOST = ApplicationConfigProvider.getInstance().getSparkConfigurations()
+			.getSparkMasterExecutionEndPoint();
 	String NEO4J_HOST = ApplicationConfigProvider.getInstance().getGraph().getEndpoint();
 	String ES_HOST = ApplicationConfigProvider.getInstance().getEndpointData().getElasticSearchEndpoint();
-	String RABBIT_MQ="http://"+ApplicationConfigProvider.getInstance().getMessageQueue().getHost()+":15672";
+	String RABBIT_MQ = "http://" + ApplicationConfigProvider.getInstance().getMessageQueue().getHost() + ":15672";
 	String Neo4j = "Neo4j";
 	String PgSQL = "PostgreSQL";
 	String PlatformService = "Platform Service";
@@ -32,13 +33,13 @@ public interface ServiceStatusConstants {
 	String type = "type";
 	String DB = "Database";
 	String Service = "Service";
-	String DemonAgent="Demon Agent";
-	String PlatformWebhookSubscriber="Platform WebhookSubscriber";
-	String PlatformWebhookEngine="Platform WebhookEngine";
-	String PlatformAuditEngine="Platform AuditEngine";
-	String PlatformEngine="Platform Engine";
-	String PlatformDataArchivalEngine="Platform DataArchivalEngine";
-	String RabbitMq="RabbitMQ";
-	String Agents="Agents";
+	String DemonAgent = "Demon Agent";
+	String PlatformWebhookSubscriber = "Platform WebhookSubscriber";
+	String PlatformWebhookEngine = "Platform WebhookEngine";
+	String PlatformAuditEngine = "Platform AuditEngine";
+	String PlatformEngine = "Platform Engine";
+	String PlatformDataArchivalEngine = "Platform DataArchivalEngine";
+	String RabbitMq = "RabbitMQ";
+	String Agents = "Agents";
 	String PlatformWorkflow = "Platform Workflow";
 }

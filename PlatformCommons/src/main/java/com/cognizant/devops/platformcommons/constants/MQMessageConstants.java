@@ -16,10 +16,10 @@
 package com.cognizant.devops.platformcommons.constants;
 
 public interface MQMessageConstants  {
-	String EXCHANGE_NAME = "iSight";
-	String EXCHANGE_TYPE = "topic";
-	String ROUTING_KEY_FOR_DATA = "DATA";
-	String ROUTING_KEY_FOR_HEALTH = "HEALTH";
-	String ROUTING_KEY_SEPERATOR = "\\.";
-	String MESSAGE_ENCODING = "UTF-8";
+	 String EXCHANGE_NAME = "iSight";
+	 String EXCHANGE_TYPE = "topic";
+	 String ROUTING_KEY_FOR_DATA = "DATA";
+	 String ROUTING_KEY_FOR_HEALTH = "HEALTH";
+	 String ROUTING_KEY_SEPERATOR = "\\.";
+	 String MESSAGE_ENCODING = "UTF-8";
 }

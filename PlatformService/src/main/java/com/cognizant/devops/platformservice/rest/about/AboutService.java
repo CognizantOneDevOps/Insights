@@ -23,8 +23,8 @@ import java.io.InputStreamReader;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -39,11 +39,11 @@ import com.google.gson.JsonSyntaxException;
 public class AboutService {
 private static final String VERSION = "version";
 private static final String PLATFORM_SERVICE_VERSION_JSON = "PlatformServiceVersion.json";
-private static final String PLATFORM_ENGINE_VERSION_JSON = "PlatformEngineVersion."
+ static final String PLATFORM_ENGINE_VERSION_JSON = "PlatformEngineVersion."
 		+ "json";
 static Logger log = LogManager.getLogger(AboutService.class.getName());
 	
-	@RequestMapping(value = "/read", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+	@GetMapping(value = "/read", produces = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
 	public JsonObject loadProperties() throws JsonSyntaxException, IOException{
 		JsonObject jsonObj = new JsonObject();
@@ -52,28 +52,18 @@ static Logger log = LogManager.getLogger(AboutService.class.getName());
 	    jsonObj.addProperty("InSights UI", getVersionDetails(PLATFORM_SERVICE_VERSION_JSON));
 	    return jsonObj;
 	}
-	
+
 	private static String getVersionDetails(String fileName) {
-		BufferedReader reader = null;
-		try {
-			InputStream in = AboutService.class.getClassLoader().getResourceAsStream(fileName); 
-			reader = new BufferedReader(new InputStreamReader(in));
+		try (InputStream in = AboutService.class.getClassLoader().getResourceAsStream(fileName);
+				BufferedReader reader = new BufferedReader(new InputStreamReader(in))) {
 			JsonElement jsonElement = new JsonParser().parse(reader);
 			if (jsonElement != null && jsonElement.isJsonObject()) {
 				return jsonElement.getAsJsonObject().get(VERSION).getAsString();
 			}
-		}finally {
-			try {
-				if( null != reader ){
-				   reader.close();
-				}
-			} catch (IOException e) {
-				log.error("error while getting version",e);
-			}
+		} catch (Exception e) {
+			log.error("error while getting version", e);
 		}
-		
-		
 		return "";
 	}
-	
 }
+	

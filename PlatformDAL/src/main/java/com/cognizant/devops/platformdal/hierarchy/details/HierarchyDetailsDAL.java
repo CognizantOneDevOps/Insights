@@ -15,62 +15,80 @@
  ******************************************************************************/
 package com.cognizant.devops.platformdal.hierarchy.details;
 
-import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.List;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.hibernate.Session;
 import org.hibernate.query.Query;
 
 import com.cognizant.devops.platformdal.core.BaseDAL;
 
 public class HierarchyDetailsDAL extends BaseDAL {
 
+	private static Logger log = LogManager.getLogger(HierarchyDetailsDAL.class);
 	public boolean addHierarchyDetails(HierarchyDetails hierarchyDetails) {
-		getSession().beginTransaction();
-		getSession().save(hierarchyDetails);
-		getSession().getTransaction().commit();
-		terminateSession();
-		terminateSessionFactory();
-		return true;
+		try (Session session = getSessionObj()) {
+			session.beginTransaction();
+			session.save(hierarchyDetails);
+			session.getTransaction().commit();
+			return true;
+		} catch (Exception e) {
+			log.error(e.getMessage());
+			throw e;
+		}
 	}
 
 	public List<String> fetchDistinctHierarchyName() {
-		Query<String> createQuery = getSession().createQuery("SELECT DISTINCT HD.hierarchyName FROM HierarchyDetails HD",String.class);
-		List<String> resultList = createQuery.getResultList();
-		terminateSession();
-		terminateSessionFactory();
-		return resultList;
+		try (Session session = getSessionObj()) {
+			Query<String> createQuery = session.createQuery("SELECT DISTINCT HD.hierarchyName FROM HierarchyDetails HD",
+					String.class);
+			return createQuery.getResultList();
+		} catch (Exception e) {
+			log.error(e.getMessage());
+			throw e;
+		}
 	}
 
 	public List<HierarchyDetails> fetchAllEntityData() {
-		Query<HierarchyDetails> createQuery = getSession().createQuery("FROM HierarchyDetails HD", HierarchyDetails.class);
-		List<HierarchyDetails> resultList = createQuery.getResultList();
-		terminateSession();
-		terminateSessionFactory();
-		return resultList;
+		try (Session session = getSessionObj()) {
+		Query<HierarchyDetails> createQuery = session.createQuery("FROM HierarchyDetails HD", HierarchyDetails.class);
+		return createQuery.getResultList();	
+		}
+		catch (Exception e) {
+			log.error(e.getMessage());
+			throw e;
+		}
 	}
 
 	public boolean deleteHierarchyDetails(String hierarchyName) {
-		Query<HierarchyDetails> createQuery = getSession().createQuery(
-				"FROM HierarchyDetails HD WHERE HD.hierarchyName = :hierarchyName",
-				HierarchyDetails.class);
-		createQuery.setParameter("hierarchyName", hierarchyName);
-		HierarchyDetails hierarchyDetails = createQuery.getSingleResult();
-		getSession().beginTransaction();
-		getSession().delete(hierarchyDetails);
-		getSession().getTransaction().commit();
-		terminateSession();
-		terminateSessionFactory();
-		return true;
+		try (Session session = getSessionObj()) {
+			Query<HierarchyDetails> createQuery = session.createQuery(
+					"FROM HierarchyDetails HD WHERE HD.hierarchyName = :hierarchyName", HierarchyDetails.class);
+			createQuery.setParameter("hierarchyName", hierarchyName);
+			HierarchyDetails hierarchyDetails = createQuery.getSingleResult();
+			session.beginTransaction();
+			session.delete(hierarchyDetails);
+			session.getTransaction().commit();
+			return true;
+		} catch (Exception e) {
+			log.error(e.getMessage());
+			throw e;
+		}
 	}
 	
 	public boolean addHierarchyDetailsList(List<HierarchyDetails> hiearchyList) {
-		getSession().beginTransaction();
-		for(HierarchyDetails details:hiearchyList){
-			getSession().save(details);
+	
+		try (Session session = getSessionObj()) {
+			session.beginTransaction();
+			for (HierarchyDetails details : hiearchyList) {
+				session.save(details);
+			}
+			session.getTransaction().commit();
+			return true;
+		} catch (Exception e) {
+			log.error(e.getMessage());
+			throw e;
 		}
-		getSession().getTransaction().commit();
-		terminateSession();
-		terminateSessionFactory();
-		return true;
 	}
 }

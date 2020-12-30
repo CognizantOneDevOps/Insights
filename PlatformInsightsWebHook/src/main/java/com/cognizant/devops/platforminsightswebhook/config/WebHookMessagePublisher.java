@@ -36,11 +36,12 @@ public class WebHookMessagePublisher {
 	private static Logger LOG = LogManager.getLogger(WebHookMessagePublisher.class);
 	private ConnectionFactory factory;
 	private Connection connection;
+	Channel channel;
 	String exchangeName;
 	String routingKey;
 	Map<String, Channel> mqMappingMap = new HashMap<String, Channel>(0);
 
-	public static WebHookMessagePublisher webhookmessagepublisher;
+ static WebHookMessagePublisher webhookmessagepublisher;
 
 	public static WebHookMessagePublisher getInstance() {
 		if (webhookmessagepublisher == null) {
@@ -53,7 +54,7 @@ public class WebHookMessagePublisher {
 
 	}
 
-	public void initilizeMq() throws Exception {
+	public void initilizeMq() throws TimeoutException, IOException {
 		LOG.debug(" In initilizeMq ======== host = {} user = {} passcode = {} exchangeName= {} ", AppProperties.mqHost,
 				AppProperties.mqUser, AppProperties.mqPassword, AppProperties.mqExchangeName);
 		try {
@@ -70,7 +71,7 @@ public class WebHookMessagePublisher {
 							+ " : Connection with Rabbit Mq for host "
 							+ AppProperties.mqHost + " established successfully. ", WebHookConstants.SUCCESS);
 		} catch (Exception e) {
-			LOG.error("Error while initilize mq " + e);
+			LOG.error("Error while initilize mq ", e);
 			SubscriberStatusLogger.getInstance().createSubsriberStatusNode(
 					"Platform Webhook Subscriber : problem in connection with Rabbit Mq host " + AppProperties.mqHost,
 					WebHookConstants.FAILURE);
@@ -80,30 +81,29 @@ public class WebHookMessagePublisher {
 
 	}
 
-	public void publishEventAction(byte[] data, String webHookMqChannelName) throws Exception {
-		LOG.debug(" Inside publishEventAction ==== " + connection);
+	public void publishEventAction(byte[] data, String webHookMqChannelName) throws IOException, TimeoutException {
+		LOG.debug(" Inside publishEventAction ==== {}", connection);
 		try {
 
 			if (!connection.isOpen()) {
-				LOG.debug(" Connection is not open " + " connection " + connection.isOpen());
+				LOG.debug(" Connection is not open " + " connection{} " , connection.isOpen());
 				initilizeMq();
 			}
-			Channel channel;
 			if (mqMappingMap.containsKey(webHookMqChannelName)) {
 				channel = mqMappingMap.get(webHookMqChannelName);
 				channel.basicPublish(exchangeName, webHookMqChannelName, null, data);
-				LOG.debug(" data published in queue " + webHookMqChannelName);
+				LOG.debug(" data published in queue {}" ,webHookMqChannelName);
 			} else {
 				channel = connection.createChannel();
 				channel.exchangeDeclare(exchangeName, WebHookConstants.EXCHANGE_TYPE, true);
 				channel.queueDeclare(webHookMqChannelName, true, false, false, null);
 				channel.queueBind(webHookMqChannelName, exchangeName, webHookMqChannelName);
 				channel.basicPublish(exchangeName, webHookMqChannelName, null, data);
-				LOG.debug(" data published first time in queue " + webHookMqChannelName);
+				LOG.debug(" data published first time in queue  {}", webHookMqChannelName);
 				mqMappingMap.put(webHookMqChannelName, channel);
 			}
 		} catch (Exception e) {
-			LOG.error("Error while publishEventAction " + e);
+			LOG.error("Error while publishEventAction " , e);
 			throw e;
 		}
 	}
@@ -111,18 +111,20 @@ public class WebHookMessagePublisher {
 	public void publishHealthData(byte[] data, String webHookHealthqueueName, String webHookHealthRoutingKey)
 			throws TimeoutException, IOException {
 		LOG.debug(" Inside publishHealthData ==== ");
+		channel = connection.createChannel();
 		try {
-			Channel channel;
 			channel = connection.createChannel();
 			channel.exchangeDeclare(exchangeName, WebHookConstants.EXCHANGE_TYPE, true);
 			channel.queueDeclare(webHookHealthqueueName, true, false, false, null);
 			channel.queueBind(webHookHealthqueueName, exchangeName, webHookHealthRoutingKey);
 			channel.basicPublish(exchangeName, webHookHealthRoutingKey, null, data);
-			LOG.debug(" Health data published first time in queue " + webHookHealthRoutingKey);
+			LOG.debug(" Health data published first time in queue {}" , webHookHealthRoutingKey);
 		} catch (Exception e) {
-			LOG.error("Error while publishEventAction " + e);
-		}
+			LOG.error("Error while publishEventAction ", e);
+		}finally {
+						channel.close();
 	}
+	}	
 
 	public void releaseMqConnetion() {
 		try {
@@ -136,22 +138,17 @@ public class WebHookMessagePublisher {
 			if (connection != null) {
 				connection.close();
 			}
-		} catch (IOException e) {
-			LOG.error(e.getMessage());
-		} catch (TimeoutException e) {
-			LOG.error(e.getMessage());
-		} catch (Exception e) {
+		} catch (IOException |TimeoutException e) {
 			LOG.error(e.getMessage());
 		}
 	}
 
 	public void purgeQueue(String queueName) {
 		try {
-			Channel channel;
 			channel = connection.createChannel();
 			channel.queuePurge(queueName);
 		} catch (Exception e) {
-			LOG.error("Error while purgeQueue " + e);
+			LOG.error("Error while purgeQueue ",e);
 		}
 	}
 }

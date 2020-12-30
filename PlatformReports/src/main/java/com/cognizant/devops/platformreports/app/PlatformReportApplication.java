@@ -20,6 +20,7 @@ import org.apache.logging.log4j.Logger;
 
 import com.cognizant.devops.platformcommons.config.ApplicationConfigCache;
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
+import com.cognizant.devops.platformcommons.constants.LogLevelConstants;
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
 import com.cognizant.devops.platformworkflow.workflowtask.core.InsightsStatusProvider;
 import com.cognizant.devops.platformworkflow.workflowtask.utils.PlatformWorkflowApplicationTest;
@@ -38,11 +39,14 @@ public class PlatformReportApplication {
 	}
 	
 	public static void main(String[] args) {
-		// Load isight config
-		ApplicationConfigCache.loadConfigCache();
-		// Create Default users
-		ApplicationConfigProvider.performSystemCheck();
+
 		try {
+			// Load isight config
+			ApplicationConfigCache.loadConfigCache();
+			// Create Default users
+			ApplicationConfigProvider.performSystemCheck();
+
+			ApplicationConfigCache.updateLogLevel(LogLevelConstants.PlatformReport);
 	
 			PlatformWorkflowApplicationTest.testWorkflowExecutor();
 	
