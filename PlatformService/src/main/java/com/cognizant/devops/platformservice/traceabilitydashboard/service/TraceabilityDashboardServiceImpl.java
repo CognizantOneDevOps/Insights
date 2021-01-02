@@ -18,6 +18,7 @@ package com.cognizant.devops.platformservice.traceabilitydashboard.service;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.nio.charset.StandardCharsets;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.time.Duration;
@@ -47,10 +48,15 @@ import org.ehcache.config.units.EntryUnit;
 import org.ehcache.config.units.MemoryUnit;
 import org.springframework.stereotype.Service;
 
+import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
+import com.cognizant.devops.platformcommons.core.enums.FileDetailsEnum;
 import com.cognizant.devops.platformcommons.core.util.InsightsUtils;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphResponse;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBHandler;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
+import com.cognizant.devops.platformdal.filemanagement.InsightsConfigFiles;
+import com.cognizant.devops.platformdal.filemanagement.InsightsConfigFilesDAL;
+import com.cognizant.devops.platformservice.config.PlatformServiceStatusProvider;
 import com.cognizant.devops.platformservice.traceabilitydashboard.constants.TraceabilityConstants;
 import com.cognizant.devops.platformservice.traceabilitydashboard.util.TraceabilitySummaryUtil;
 import com.google.gson.Gson;
@@ -76,6 +82,7 @@ public class TraceabilityDashboardServiceImpl implements TraceabilityDashboardSe
 	static final String DATA_MODEL_FILE_RESOLVED_PATH = System.getenv().get(TraceabilityConstants.ENV_VAR_NAME)
 			+ File.separator + TraceabilityConstants.DATAMODEL_FOLDER_NAME + File.separator
 			+ TraceabilityConstants.DATAMODEL_FILE_NAME;
+	InsightsConfigFilesDAL configFilesDAL = new InsightsConfigFilesDAL();
 
 	HashMap<String, String> handOverTimeMap = new HashMap<>();
 
@@ -103,15 +110,26 @@ public class TraceabilityDashboardServiceImpl implements TraceabilityDashboardSe
 
 	}
 
-	private void loadDatamodel() throws InsightsCustomException {
+	private void loadTraceabilityJson() throws InsightsCustomException {
 		try {
-			dataModel = (JsonObject) new JsonParser().parse(new FileReader(DATA_MODEL_FILE_RESOLVED_PATH));
-			LOG.debug("Datamodel.json is present and loaded properly");
-		} catch (FileNotFoundException e) {
-			LOG.error("datamodel.json not present in Insights home directory");
-			throw new InsightsCustomException("datamodel.json not present in Insights home directory");
+			List<InsightsConfigFiles> configFile = configFilesDAL
+					.getAllConfigurationFilesForModule(FileDetailsEnum.FileModule.TRACEABILITY.name());
+			String configFileData = new String(configFile.get(0).getFileData(), StandardCharsets.UTF_8);
+			dataModel = (JsonObject) new JsonParser().parse(configFileData);
+			LOG.debug("Traceability.json is present and loaded properly");
+			PlatformServiceStatusProvider.getInstance().createPlatformServiceStatusNode(
+					"Traceability.json is successfully loaded.", PlatformServiceConstants.SUCCESS);
 		} catch (JsonSyntaxException e) {
-			throw new InsightsCustomException("datamodel.json is not formatted");
+			LOG.error("Traceability.json is not formatted");
+			PlatformServiceStatusProvider.getInstance().createPlatformServiceStatusNode(
+					"Traceability.json is not formatted", PlatformServiceConstants.FAILURE);
+			throw new InsightsCustomException("Traceability.json is not formatted");
+			
+		} catch (Exception e) {
+			PlatformServiceStatusProvider.getInstance().createPlatformServiceStatusNode(
+					"Error while loading Traceability.json", PlatformServiceConstants.FAILURE);
+			LOG.error("Error while loading Traceability.json");
+			throw new InsightsCustomException("Error while loading Traceability.json");
 		}
 	}
 
@@ -505,7 +523,7 @@ public class TraceabilityDashboardServiceImpl implements TraceabilityDashboardSe
 
 	@Override
 	public JsonObject getPipeline(String toolName, String fieldName, String fieldValue) throws InsightsCustomException {
-		loadDatamodel();
+		loadTraceabilityJson();
 		this.toolName = toolName;
 		this.fieldName = fieldName;
 		this.fieldValue = fieldValue;
@@ -612,7 +630,7 @@ public class TraceabilityDashboardServiceImpl implements TraceabilityDashboardSe
 
 	@Override
 	public List<String> getToolKeyset(String toolName) throws InsightsCustomException {
-		loadDatamodel();
+		loadTraceabilityJson();
 		final String FILTER = "uifilter";
 		List<String> tools = new ArrayList<>();
 		JsonObject toolObject = dataModel.getAsJsonObject(toolName);

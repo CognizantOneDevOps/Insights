@@ -26,6 +26,8 @@ import java.util.ListIterator;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -33,14 +35,15 @@ import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.config.EmailConfiguration;
 import com.cognizant.devops.platformcommons.core.enums.WorkflowTaskEnum;
 import com.cognizant.devops.platformcommons.core.util.InsightsUtils;
-import com.cognizant.devops.platformcommons.dal.neo4j.GraphResponse;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBHandler;
+import com.cognizant.devops.platformcommons.dal.neo4j.GraphResponse;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformdal.assessmentreport.InsightsAssessmentConfiguration;
 import com.cognizant.devops.platformdal.assessmentreport.InsightsAssessmentReportTemplate;
 import com.cognizant.devops.platformdal.assessmentreport.InsightsContentConfig;
 import com.cognizant.devops.platformdal.assessmentreport.InsightsEmailTemplates;
 import com.cognizant.devops.platformdal.assessmentreport.InsightsKPIConfig;
+import com.cognizant.devops.platformdal.assessmentreport.InsightsReportTemplateConfigFiles;
 import com.cognizant.devops.platformdal.assessmentreport.InsightsReportsKPIConfig;
 import com.cognizant.devops.platformdal.assessmentreport.ReportConfigDAL;
 import com.cognizant.devops.platformdal.workflow.InsightsWorkflowConfiguration;
@@ -117,6 +120,8 @@ public class AssessmentReportsTestData {
 	public static List<Integer> taskidList = new ArrayList<>();
 	public static List<Integer> contentIdList = new ArrayList<>();
 	public static List<Integer> kpiIdList = new ArrayList<>();
+	
+	String[] templateDesignFilesArray = {"Report_SONAR_JENKINS_PROD.json", "REPORT_SONAR_JENKINS_PROD.html", "style.css", "image.webp"};
 
 	public void readKpiFileAndSave(String fileName) throws Exception {
 		try {
@@ -651,4 +656,42 @@ public class AssessmentReportsTestData {
 		emailDetailsJson.addProperty("receiverBCCEmailAddress", "");
 		return emailDetailsJson;
 	}
+	
+	public String uploadReportTemplateDesignFiles(int reportId) throws InsightsCustomException {
+		String returnMessage = "";
+		try {
+			InsightsAssessmentReportTemplate reportEntity = (InsightsAssessmentReportTemplate) reportConfigDAL
+					.getReportTemplateByReportId(reportId);
+			if (reportEntity == null) {
+				throw new InsightsCustomException(" Report template not exists in database " + reportId);
+			} else {
+
+				for (String eachFile : templateDesignFilesArray) {
+					String fileType = FilenameUtils.getExtension(eachFile).toUpperCase();
+					File file = new File(classLoader.getResource("Report_SONAR_JENKINS_PROD/"+eachFile).getFile());
+					InsightsReportTemplateConfigFiles templateFile = reportConfigDAL.getReportTemplateConfigFileByFileNameAndReportId(file.getName(),reportId);
+					if(templateFile==null) {
+					InsightsReportTemplateConfigFiles record = new InsightsReportTemplateConfigFiles();
+					record.setFileName(file.getName());
+					record.setFileData(FileUtils.readFileToByteArray(file));
+					record.setFileType(fileType);
+					record.setReportId(reportId);
+					reportConfigDAL.saveReportTemplateConfigFiles(record);
+					}
+					else {
+						templateFile.setFileData(FileUtils.readFileToByteArray(file));
+						reportConfigDAL.updateReportTemplateConfigFiles(templateFile);						
+					}
+					
+				}
+				returnMessage = "File uploaded";
+			}
+		} catch (Exception ex) {
+			log.error("Error in Report Template files upload {} ", ex.getMessage());
+			throw new InsightsCustomException(ex.getMessage());
+		} 
+		return returnMessage;
+	}
+	
+	
 }

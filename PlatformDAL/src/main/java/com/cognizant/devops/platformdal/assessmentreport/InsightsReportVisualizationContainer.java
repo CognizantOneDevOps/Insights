@@ -57,6 +57,9 @@ public class InsightsReportVisualizationContainer implements Serializable {
 
 	@Column(name = "attachmentpath")
 	private String attachmentPath;
+	
+	@Column(name = "attachmentData")
+	private byte[] attachmentData;
 
 	@Column(name = "status")
 	private String status;
@@ -175,5 +178,15 @@ public class InsightsReportVisualizationContainer implements Serializable {
 	public void setMailBCC(String mailBCC) {
 		this.mailBCC = mailBCC;
 	}
+
+	public byte[] getAttachmentData() {
+		return attachmentData;
+	}
+
+	public void setAttachmentData(byte[] attachmentData) {
+		this.attachmentData = attachmentData;
+	}
+	
+	
 
 }

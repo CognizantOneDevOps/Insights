@@ -16,16 +16,23 @@
 package com.cognizant.devops.platformservice.test.assessmentReports;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.compress.utils.IOUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.cognizant.devops.platformcommons.core.util.InsightsUtils;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
+import com.cognizant.devops.platformdal.assessmentreport.InsightsReportTemplateConfigFiles;
 import com.cognizant.devops.platformdal.assessmentreport.ReportConfigDAL;
 import com.cognizant.devops.platformdal.workflow.InsightsWorkflowTask;
 import com.cognizant.devops.platformdal.workflow.WorkflowDAL;
@@ -47,6 +54,7 @@ public class AssessmentReportServiceData {
 	File kpiFileTxt = new File(classLoader.getResource("KPIDefination.txt").getFile());
 	File configFileTxt = new File(classLoader.getResource("ContentsConfiguration.txt").getFile());
 	File emptyFile = new File(classLoader.getResource("EmptyFile.json").getFile());
+	File templateJsonFile = new File(classLoader.getResource("report_template_upload_test.json").getFile());
 
 	InsightsWorkflowTask tasks = null;
 
@@ -390,6 +398,22 @@ public class AssessmentReportServiceData {
 			contentIdList.add(kpiId);
 		}
 
+	}
+	
+	public MultipartFile[] readReportTemplateDesignFiles() throws IOException {
+		MultipartFile[] files = new MultipartFile[4];
+		String[] templateDesignFilesArray = {"report_template_save.json", "report_template_save.html", "style.css", "image.webp"};
+		int i = 0;
+		for (String eachFile : templateDesignFilesArray) {
+			File file = new File(classLoader.getResource("report_template_save/"+eachFile).getFile());
+			FileInputStream input = new FileInputStream(file);
+			MultipartFile multipartFile = new MockMultipartFile("file", file.getName(), "text/plain",
+					IOUtils.toByteArray(input));
+			files[i] = multipartFile;
+			i++;
+		}
+		return files;
+			
 	}
 
 }

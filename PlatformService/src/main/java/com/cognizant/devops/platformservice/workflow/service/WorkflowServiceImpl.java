@@ -15,9 +15,6 @@
  ******************************************************************************/
 package com.cognizant.devops.platformservice.workflow.service;
 
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -430,8 +427,7 @@ public class WorkflowServiceImpl {
 			InsightsReportVisualizationContainer reportVisObject = workflowConfigDAL
 					.getReportVisualizationContainerByWorkflowAndExecutionId(workflowId, executionId);
 			if (reportVisObject != null) {
-				Path pdfPath = Paths.get(reportVisObject.getAttachmentPath());
-				pdfContent = Files.readAllBytes(pdfPath);
+				pdfContent = reportVisObject.getAttachmentData();
 			} else {
 				throw new InsightsCustomException("PDF not generated");
 			}

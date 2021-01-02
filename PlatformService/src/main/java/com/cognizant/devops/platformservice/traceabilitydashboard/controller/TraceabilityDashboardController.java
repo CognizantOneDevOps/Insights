@@ -65,7 +65,7 @@ public class TraceabilityDashboardController {
 			return PlatformServiceUtil
 					.buildSuccessResponseWithData(traceabilityDashboardServiceImpl.getToolKeyset(toolName));
 		} catch (InsightsCustomException e) {
-			return PlatformServiceUtil.buildFailureResponse(e.toString());
+			return PlatformServiceUtil.buildFailureResponse(e.getMessage());
 		}
 
 	}

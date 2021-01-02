@@ -16,12 +16,14 @@ export class FileUploadDialog implements OnInit {
   fileUploadErrorMessage: string;
   selectedFile: File = null;
   jsonError: any;
-  valid: boolean;
   fileUploadType = '';
   formDataFiles = new FormData();
   multipleFileAllowed = false;
   receivedData: any;
   dialogHeader: string;
+  scriptReg: string = "<script>";
+  validJson: boolean = true;
+  validHtml: boolean = true;
 
 
   constructor(public router: Router, public dialogRef: MatDialogRef<FileUploadDialog>,
@@ -50,20 +52,22 @@ export class FileUploadDialog implements OnInit {
       for (let i = 0; i < event.target.files.length; i++) {
         console.log(event.target.files[i].name)
         this.formDataFiles.append('files', <File>event.target.files[i], event.target.files[i].name);
-        if (event.target.files[i].type == 'application/json') {
-          var reader = new FileReader();
-          reader.onload = () => {
-            this.valid = this.validateJson(reader.result.toString());
+        let reader = new FileReader();
+        reader.onload = () => {
+          if (event.target.files[i].type == 'application/json') {
+            this.validateJson(reader.result.toString());
+          } 
+          else if (event.target.files[i].type == 'text/html') {
+            this.validateHtml(reader.result.toString());
           }
-          reader.readAsText(event.target.files[i]);
         }
+        reader.readAsText(event.target.files[i]);
       }
-      //this.valid = true;
     } else {
       let fileReader = new FileReader();
       this.formDataFiles.append('file', <File>event.target.files[0], event.target.files[0].name);
       fileReader.onload = () => {
-        this.valid = this.validateJson(fileReader.result.toString());
+        this.validateJson(fileReader.result.toString());
       };
       fileReader.readAsText(event.target.files[0]);
     }
@@ -74,14 +78,24 @@ export class FileUploadDialog implements OnInit {
       JSON.parse(message);
     } catch (e) {
       this.jsonError = e;
+      this.validJson = false;
       return false;
     }
     return true;
   }
 
+  validateHtml(message: string) {
+    if (message.search(this.scriptReg) != -1) {
+      this.validHtml = false;
+      return false;
+    }
+  }
+
   upload() {
-    if (this.valid === false) {
-      this.messageDialog.showApplicationsMessage("File is not a valid JSON. " + this.jsonError, 'ERROR');
+    if (this.validJson === false) {
+      this.messageDialog.showApplicationsMessage("Uploaded file is not a valid JSON. " + this.jsonError, 'ERROR');
+    } else if (this.validHtml === false) {
+      this.messageDialog.showApplicationsMessage("Attached HTML file contains script tag.", 'ERROR');
     } else {
       if (this.fileUploadType === 'CONTENT') {
         this.uploadFileContent();
@@ -182,7 +196,8 @@ export class FileUploadDialog implements OnInit {
     var dummy = (<HTMLInputElement>document.getElementById("file"))
     dummy.value = "";
     this.formDataFiles = new FormData();
-    this.valid = true;
+    this.validJson = true;
+    this.validHtml = true;
   }
   closeDialog() {
     this.dialogRef.close();

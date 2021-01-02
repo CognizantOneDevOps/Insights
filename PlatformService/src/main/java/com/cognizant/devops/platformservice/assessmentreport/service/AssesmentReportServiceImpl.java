@@ -18,7 +18,6 @@ package com.cognizant.devops.platformservice.assessmentreport.service;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -51,6 +50,7 @@ import com.cognizant.devops.platformdal.assessmentreport.InsightsAssessmentRepor
 import com.cognizant.devops.platformdal.assessmentreport.InsightsContentConfig;
 import com.cognizant.devops.platformdal.assessmentreport.InsightsEmailTemplates;
 import com.cognizant.devops.platformdal.assessmentreport.InsightsKPIConfig;
+import com.cognizant.devops.platformdal.assessmentreport.InsightsReportTemplateConfigFiles;
 import com.cognizant.devops.platformdal.assessmentreport.InsightsReportsKPIConfig;
 import com.cognizant.devops.platformdal.assessmentreport.ReportConfigDAL;
 import com.cognizant.devops.platformdal.workflow.InsightsWorkflowConfiguration;
@@ -431,7 +431,7 @@ public class AssesmentReportServiceImpl {
 	 * @throws IOException
 	 */
 	private String readFileAndCreateJson(MultipartFile file) throws IOException {
-		File configFile = convertToFile(file);
+		File configFile = PlatformServiceUtil.convertToFile(file);
 		StringBuilder json = new StringBuilder();
 		if (configFile.exists()) {
 			try (BufferedReader reader = new BufferedReader(new FileReader(configFile), 1024)) {
@@ -448,20 +448,7 @@ public class AssesmentReportServiceImpl {
 		return json.toString();
 	}
 
-	/**
-	 * convert multipart to file
-	 * 
-	 * @param multipartFile
-	 * @return
-	 * @throws IOException
-	 */
-	private File convertToFile(MultipartFile multipartFile) throws IOException {
-		File file = new File(multipartFile.getOriginalFilename());
-		try (FileOutputStream fos = new FileOutputStream(file)) {
-			fos.write(multipartFile.getBytes());
-		}
-		return file;
-	}
+
 
 	/**
 	 * Method to save the details in ASSESSMENT_CONFIGURATION table.
@@ -906,40 +893,69 @@ public class AssesmentReportServiceImpl {
 	 */
 	public String uploadReportTemplateDesignFiles(MultipartFile[] files, int reportId) throws InsightsCustomException {
 		String returnMessage = "";
-			try {
-				InsightsAssessmentReportTemplate reportEntity = (InsightsAssessmentReportTemplate) reportConfigDAL
+		try {
+			InsightsAssessmentReportTemplate reportEntity = (InsightsAssessmentReportTemplate) reportConfigDAL
 					.getReportTemplateByReportId(reportId);
-				if (reportEntity == null) {
-					throw new InsightsCustomException(" Report template not exists in database " + reportId);
-				} else {
-				String reportTemplateFolderPath = AssessmentReportAndWorkflowConstants.REPORT_PDF_RESOLVED_PATH
-						+ AssessmentReportAndWorkflowConstants.REPORT_CONFIG_TEMPLATE_DIR + File.separator
-						+ reportEntity.getFile();
+			if (reportEntity == null) {
+				throw new InsightsCustomException(" Report template not exists in database " + reportId);
+			} else {
 
-				for (MultipartFile file : Arrays.asList(files)) {
-					String fileExt = FilenameUtils.getExtension(file.getOriginalFilename());
-					String finalFileName = reportTemplateFolderPath  + File.separator + reportEntity.getFile() + "." + fileExt;
-					log.debug("  original fileName   ======= {}  final File name {} file extention {} ",
-							file.getOriginalFilename(), finalFileName, fileExt);
-
-					boolean fileCheck = PlatformServiceUtil.validateFile(file.getOriginalFilename());
-					if (fileCheck) {
-						FileUtils.copyFileToDirectory(convertToFile(file), new File(reportTemplateFolderPath),
-								Boolean.FALSE);
-						File sourceTemplateFolderPath = new File(finalFileName);
-						log.debug(" File created {} ", sourceTemplateFolderPath.getAbsolutePath());
+				for (MultipartFile multipartfile : Arrays.asList(files)) {
+					String fileName = multipartfile.getOriginalFilename();
+					String fileExt = FilenameUtils.getExtension(fileName);
+					if (AssessmentReportAndWorkflowConstants.validReportTemplateFileExtention.contains(fileExt.toLowerCase())) {
+						boolean fileCheck = PlatformServiceUtil.validateFile(fileName);
+						if (fileCheck) {
+							String fileType = PlatformServiceUtil.getFileType(multipartfile.getOriginalFilename());
+							File file = PlatformServiceUtil.convertToFile(multipartfile);
+							uploadReportTemplateFile(reportId, reportEntity, fileType, file);
+						} else {
+							log.error("File validation failed {}", multipartfile.getOriginalFilename());
+							throw new InsightsCustomException(
+									"File validation failed " + multipartfile.getOriginalFilename());
+						}
 					} else {
-						log.error("File validation failed {}",file.getOriginalFilename() );
+						log.error("Wrong file format for {}", multipartfile.getOriginalFilename());
+						throw new InsightsCustomException(
+								"Wrong file format for" + multipartfile.getOriginalFilename());
 					}
 				}
-				returnMessage = "File uploaded in " + reportTemplateFolderPath;
+				returnMessage = "File uploaded";
 			}
 		} catch (Exception ex) {
 			log.error("Error in Report Template files upload {} ", ex.getMessage());
 			throw new InsightsCustomException(ex.getMessage());
-		}
+		} 
 		return returnMessage;
 	}
+
+	/**
+	 * Method to upload Report Template file
+	 * 
+	 * @param reportId
+	 * @param reportEntity
+	 * @param fileType
+	 * @param file
+	 * @throws IOException
+	 */
+	private void uploadReportTemplateFile(int reportId, InsightsAssessmentReportTemplate reportEntity, String fileType,
+			File file) throws IOException {
+		InsightsReportTemplateConfigFiles templateFile = reportConfigDAL
+				.getReportTemplateConfigFileByFileNameAndReportId(file.getName(),
+						reportEntity.getReportId());
+		if (templateFile == null) {
+			InsightsReportTemplateConfigFiles record = new InsightsReportTemplateConfigFiles();
+			record.setFileName(file.getName());
+			record.setFileData(FileUtils.readFileToByteArray(file));
+			record.setFileType(fileType);
+			record.setReportId(reportId);
+			reportConfigDAL.saveReportTemplateConfigFiles(record);
+		} else {
+			templateFile.setFileData(FileUtils.readFileToByteArray(file));
+			reportConfigDAL.updateReportTemplateConfigFiles(templateFile);
+		}
+	}
+	
 
 	/**
 	 * This method used to make template active or inactive

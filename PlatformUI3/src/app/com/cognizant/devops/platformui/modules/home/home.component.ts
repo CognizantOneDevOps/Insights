@@ -410,6 +410,15 @@ export class HomeComponent implements OnInit {
               isAdminMenu: true
             },
             {
+              displayName: 'Configuration File Management',
+              iconName: 'feature',
+              route: 'InSights/Home/filesystem',
+              isToolbarDisplay: InsightsInitService.enableInsightsToolbar,
+              showMenu: true,
+              title: "Configuration File Management",
+              isAdminMenu: false
+            },
+            {
               displayName: 'Group & Users',
               iconName: 'feature',
               route: 'InSights/Home/accessGroupManagement',
@@ -482,7 +491,7 @@ export class HomeComponent implements OnInit {
               title: "Logo Setting",
               isAdminMenu: true
             },
-        {
+            {
               displayName: 'Data Archival',
               iconName: 'feature',
               route: 'InSights/Home/dataarchiving',
@@ -491,7 +500,7 @@ export class HomeComponent implements OnInit {
               title: "Data Archival",
               isAdminMenu: true
             },
-             {
+            {
                displayName: 'Forecasting',
                iconName: 'feature',
                route: 'InSights/Home/modelmanagement',
@@ -499,7 +508,7 @@ export class HomeComponent implements OnInit {
                showMenu: true,
                title: "Forecasting",
                isAdminMenu: false
-             }        
+            }       
           ]
         }
       ];

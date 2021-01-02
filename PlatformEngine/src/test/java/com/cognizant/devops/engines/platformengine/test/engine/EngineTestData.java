@@ -32,6 +32,7 @@ import com.cognizant.devops.platformcommons.dal.neo4j.GraphResponse;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBHandler;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformdal.correlationConfig.CorrelationConfiguration;
+import com.cognizant.devops.platformdal.filemanagement.InsightsConfigFiles;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
@@ -64,7 +65,8 @@ public class EngineTestData {
 	public static String gitLabelName = "GIT_UNTEST";
 	public static String jenkinLabelName = "JENKINS_UNTEST";
 	public static String saveDataConfig = "{\"destination\":{\"toolName\":\"JENKINS\",\"toolCategory\":\"CI\",\"labelName\":\"JENKINS_UNTEST\",\"fields\":[\"scmcommitId\"]},\"source\":{\"toolName\":\"GIT\",\"toolCategory\":\"SCM\",\"labelName\":\"GIT_UNTEST\",\"fields\":[\"commitId\"]},\"relationName\":\"TEST_FROM_GIT_TO_JENKINS\",\"relationship_properties\":[],\"isSelfRelation\":false}";
-
+	public static String saveEnrichmentData = "[{\"queryName\":\"Add test to GIT_UNTEST\",\"cypherQuery\":\"match(n:GIT_UNTEST) where not exists (n.test) set n.test=\\\"completed\\\" return count(n)\",\"runSchedule\":10,\"lastExecutionTime\":\"2020/12/16 11:48 AM\",\"recordsProcessed\":0,\"queryProcessingTime\":1598}]";
+	
 	public static JsonObject getJsonObject(String jsonString) {
 		Gson gson = new Gson();
 		JsonElement jelement = gson.fromJson(jsonString.trim(), JsonElement.class);
@@ -183,6 +185,15 @@ public class EngineTestData {
 		correlationConfig.setSelfRelation(correlation.isSelfRelation());
 
 		return correlationConfig;
+	}
+	
+	public static InsightsConfigFiles createDataEnrichmentData() {
+		InsightsConfigFiles configFile = new InsightsConfigFiles();
+		configFile.setFileName("DataEnrichmentTest");
+		configFile.setFileType("JSON");
+		configFile.setFileModule("DATAENRICHMENT");
+		configFile.setFileData(saveEnrichmentData.getBytes());
+		return configFile;
 	}
 
 }

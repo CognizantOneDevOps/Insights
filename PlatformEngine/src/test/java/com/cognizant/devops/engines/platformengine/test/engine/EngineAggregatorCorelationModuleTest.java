@@ -30,20 +30,23 @@ import org.testng.annotations.Test;
 
 import com.cognizant.devops.engines.platformengine.modules.aggregator.EngineAggregatorModule;
 import com.cognizant.devops.engines.platformengine.modules.correlation.EngineCorrelatorModule;
+import com.cognizant.devops.engines.platformengine.modules.offlinedataprocessing.OfflineDataProcessingExecutor;
 import com.cognizant.devops.platformcommons.config.ApplicationConfigCache;
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
-import com.cognizant.devops.platformcommons.dal.neo4j.GraphResponse;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBHandler;
+import com.cognizant.devops.platformcommons.dal.neo4j.GraphResponse;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformdal.agentConfig.AgentConfigDAL;
 import com.cognizant.devops.platformdal.correlationConfig.CorrelationConfigDAL;
 import com.cognizant.devops.platformdal.correlationConfig.CorrelationConfiguration;
+import com.cognizant.devops.platformdal.filemanagement.InsightsConfigFilesDAL;
 
 public class EngineAggregatorCorelationModuleTest {
 	private static Logger log = LogManager.getLogger(EngineAggregatorCorelationModuleTest.class.getName());
 
 	private AgentConfigDAL agentConfigDAL = new AgentConfigDAL();
 	CorrelationConfigDAL correlationConfigDAL = new CorrelationConfigDAL();
+	InsightsConfigFilesDAL configFilesDAL = new InsightsConfigFilesDAL();
 
 	private FileReader reader = null;
 
@@ -55,6 +58,8 @@ public class EngineAggregatorCorelationModuleTest {
 		ApplicationConfigCache.loadConfigCache();
 
 		reader = new FileReader("src/test/resources/Properties.prop");
+		
+
 
 		p = new Properties();
 
@@ -80,6 +85,9 @@ public class EngineAggregatorCorelationModuleTest {
 					.loadCorrelation(EngineTestData.saveDataConfig);
 
 			correlationConfigDAL.saveCorrelationConfig(saveCorrelationJson);
+			
+			//for saving data enrichment record
+			configFilesDAL.saveConfigurationFile(EngineTestData.createDataEnrichmentData());
 		} catch (InsightsCustomException e) {
 			log.error(e);
 		}
@@ -103,6 +111,11 @@ public class EngineAggregatorCorelationModuleTest {
 		EngineAggregatorModule em = new EngineAggregatorModule();
 		em.run();
 		Thread.sleep(1000);
+		
+		
+		OfflineDataProcessingExecutor oc = new OfflineDataProcessingExecutor();
+		oc.run();
+		
 
 		/* Start Engine for Correlation **/
 
@@ -180,6 +193,31 @@ public class EngineAggregatorCorelationModuleTest {
 			log.error("InsightsCustomException : or AssertionError " + e);
 		}
 	}
+	
+	@Test(priority = 4)
+	public void testDataEnrichment() {
+
+		GraphDBHandler dbHandler = new GraphDBHandler();
+		String query = "MATCH (n:GIT_UNTEST) where exists(n.test) return count(n) as Total";
+		GraphResponse neo4jResponse;
+		try {
+
+			neo4jResponse = dbHandler.executeCypherQuery(query);
+
+			String finalJson = neo4jResponse.getJson().get("results").getAsJsonArray().get(0).getAsJsonObject()
+					.get("data").getAsJsonArray().get(0).getAsJsonObject().get("row").toString().replace("[", "")
+					.replace("]", "");
+
+			/* Assert on Node Relationship */
+			log.debug("finalJson  {} ", finalJson);
+
+			Assert.assertTrue(Integer.parseInt(finalJson) > 0); //"true"
+
+		} catch (InsightsCustomException | AssertionError e) {
+
+			log.error("InsightsCustomException : or AssertionError " + e);
+		}
+	}
 
    @AfterTest
 	public void cleanUp() {
@@ -190,6 +228,7 @@ public class EngineAggregatorCorelationModuleTest {
 			agentConfigDAL.deleteAgentConfigurations("JENKINSTEST8800");
 			agentConfigDAL.deleteAgentConfigurations("GITTEST8800");
 			correlationConfigDAL.deleteCorrelationConfig("TEST_FROM_GIT_TO_JENKINS");
+			configFilesDAL.deleteConfigurationFile("DataEnrichmentTest");
 		} catch (InsightsCustomException e1) {
 			log.error(e1);
 		}

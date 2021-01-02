@@ -115,12 +115,18 @@ export class BulkUploadComponent implements OnInit {
       let toollabelresponse = await this.bulkuploadService.loadUiServiceLocation();
       if (toollabelresponse.status == "success") {
         this.toolsDetail = toollabelresponse.data;
-      }
       for (var element of this.toolsDetail) {
         var toolName = element.toolName;
         var labelName = element.label;
         this.toolsArr.push(toolName);
       }
+    }
+    else{
+      this.messageDialog.showApplicationsMessage(
+        toollabelresponse.message,
+        "ERROR"
+      );
+    }
     } catch (error) {
       //  console.log(error);
     }

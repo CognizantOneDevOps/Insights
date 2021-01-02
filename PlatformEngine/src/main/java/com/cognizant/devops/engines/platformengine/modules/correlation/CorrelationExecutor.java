@@ -15,13 +15,7 @@
  ******************************************************************************/
 package com.cognizant.devops.engines.platformengine.modules.correlation;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -33,18 +27,21 @@ import com.cognizant.devops.engines.platformengine.message.core.EngineStatusLogg
 import com.cognizant.devops.engines.platformengine.modules.correlation.model.Correlation;
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.config.CorrelationConfig;
-import com.cognizant.devops.platformcommons.constants.ConfigOptions;
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
-import com.cognizant.devops.platformcommons.dal.neo4j.GraphResponse;
+import com.cognizant.devops.platformcommons.core.enums.FileDetailsEnum;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBHandler;
+import com.cognizant.devops.platformcommons.dal.neo4j.GraphResponse;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformdal.correlationConfig.CorrelationConfigDAL;
 import com.cognizant.devops.platformdal.correlationConfig.CorrelationConfiguration;
+import com.cognizant.devops.platformdal.filemanagement.InsightsConfigFiles;
+import com.cognizant.devops.platformdal.filemanagement.InsightsConfigFilesDAL;
 import com.cognizant.devops.platformdal.relationshipconfig.RelationshipConfiguration;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonSyntaxException;
 
 /**
  * @author Vishal Ganjare (vganjare)
@@ -56,6 +53,7 @@ public class CorrelationExecutor {
 	private long lastCorrelationTime;
 	private long currentCorrelationTime;
 	private int dataBatchSize;
+	InsightsConfigFilesDAL configFilesDAL = new InsightsConfigFilesDAL();
 	/**
 	 * Correlation execution starting point.
 	 */
@@ -128,8 +126,7 @@ public class CorrelationExecutor {
 				GraphResponse response = dbHandler.executeCypherQuery(cypher.toString());
 				processedRecords = response.getJson().get(RESULT).getAsJsonArray().get(0).getAsJsonObject()
 						.get("data").getAsJsonArray().get(0).getAsJsonObject().get("row").getAsInt();
-				log.debug("Pre Processed " + correlation.getDestinationToolName() + " " + destinationLabelName
-						+ " records: " + processedRecords + " in: " + (System.currentTimeMillis() - st) + " ms");
+				log.debug("Pre Processed {} {}  records: {} in: {} ms",correlation.getDestinationToolName(), destinationLabelName,processedRecords,(System.currentTimeMillis() - st));
 			}
 		} catch (InsightsCustomException e) {
 			log.error("Error occured while loading the destination data for correlations.", e);
@@ -145,8 +142,7 @@ public class CorrelationExecutor {
 	 * @return
 	 */
 	private List<JsonObject> loadDestinationData(CorrelationConfiguration correlation) {
-		log.debug(" In loadDestinationData, lastCorrelationTime " + lastCorrelationTime + " maxCorrelationTime  "
-				+ maxCorrelationTime + " currentCorrelationTime " + currentCorrelationTime);
+		log.debug(" In loadDestinationData, lastCorrelationTime {} maxCorrelationTime  {} currentCorrelationTime {}",lastCorrelationTime,maxCorrelationTime,currentCorrelationTime);
 		List<JsonObject> destinationDataList = new ArrayList<>();
 		String destinationLabelName = correlation.getDestinationLabelName();
 		List<String> destinationFields = Arrays.asList(correlation.getDestinationFields().split("\\s*,\\s*"));
@@ -166,17 +162,17 @@ public class CorrelationExecutor {
 		cypher.append("WITH destination, []  ");
 		for (String field : destinationFields) {
 			cypher.append(" + CASE ");
-			cypher.append(" 	WHEN exists(destination.").append(field).append(") THEN destination.").append(field)
+			cypher.append(" WHEN exists(destination.").append(field).append(") THEN destination.").append(field)
 					.append(" ");
-			cypher.append(" 	ELSE [] ");
+			cypher.append(" ELSE [] ");
 			cypher.append(" END ");
 		}
 		cypher.append("as values WITH destination.uuid as uuid, values UNWIND values as value WITH uuid, ");
 		cypher.append(" CASE ");
-		cypher.append(" 	WHEN (toString(value) contains \",\") THEN split(value, \",\") ");// If the value contains
+		cypher.append(" WHEN (toString(value) contains \",\") THEN split(value, \",\") ");// If the value contains
 		// comma, the split the
 		// value
-		cypher.append(" 	ELSE value ");
+		cypher.append(" ELSE value ");
 		cypher.append(" END as values ");
 		cypher.append("UNWIND values as value WITH uuid, value where value <> \"\" ");
 		cypher.append(
@@ -240,8 +236,7 @@ public class CorrelationExecutor {
 			processedRecords = correlationExecutionResponse.get("response").getAsJsonObject().get(RESULT)
 					.getAsJsonArray().get(0).getAsJsonObject().get("data").getAsJsonArray().get(0).getAsJsonObject()
 					.get("row").getAsInt();
-			log.debug("Correlated " + correlation.getDestinationToolName() + " " + correlation.getDestinationLabelName()
-					+ " records: " + processedRecords + " in: " + (System.currentTimeMillis() - st) + " ms");
+			log.debug("Correlated {}  {} records: {} in: {} ms",correlation.getDestinationToolName(),correlation.getDestinationLabelName(),processedRecords,(System.currentTimeMillis() - st));
 		} catch (InsightsCustomException e) {
 			log.error("Error occured while executing correlations for relation " + correlation.getRelationName() + ".",
 					e);
@@ -299,7 +294,7 @@ public class CorrelationExecutor {
 				log.debug(correlationExecutionResponse);
 				processedRecords = correlationExecutionResponse.get(RESULT).getAsJsonArray().get(0).getAsJsonObject()
 						.get("data").getAsJsonArray().get(0).getAsJsonObject().get("row").getAsInt();
-				log.debug("Processed " + processedRecords + " records in " + (System.currentTimeMillis() - st) + " ms");
+				log.debug("Processed {} records in {} ms",processedRecords,(System.currentTimeMillis() - st));
 			}
 		} catch (InsightsCustomException e) {
 			log.error(
@@ -315,32 +310,29 @@ public class CorrelationExecutor {
 	 * @return
 	 */
 	private List<Correlation> loadCorrelationsFromFile() {
-		BufferedReader reader = null;
-		InputStream in = null;
 		List<Correlation> correlations = null;
-		File correlationTemplate = new File(ConfigOptions.CORRELATION_FILE_RESOLVED_PATH);
 		try {
-			if (correlationTemplate.exists()) {
-				reader = new BufferedReader(new FileReader(correlationTemplate));
+			List<InsightsConfigFiles> configFile = configFilesDAL
+					.getAllConfigurationFilesForModule(FileDetailsEnum.FileModule.CORRELATION.name());
+			if (configFile != null) {
+				String configFileData = new String(configFile.get(0).getFileData(), StandardCharsets.UTF_8);
+				Correlation[] correlationArray = new Gson().fromJson(configFileData, Correlation[].class);
+				correlations = Arrays.asList(correlationArray);
+				EngineStatusLogger.getInstance().createEngineStatusNode("Correlation.json is successfully loaded.",
+						PlatformServiceConstants.SUCCESS);
 			} else {
-				in = getClass().getResourceAsStream("/" + ConfigOptions.CORRELATION_TEMPLATE);
-				reader = new BufferedReader(new InputStreamReader(in));
+				log.error("Correlation.json not found in DB.");
+				EngineStatusLogger.getInstance().createEngineStatusNode("Correlation.json not found in DB.",
+						PlatformServiceConstants.FAILURE);
 			}
-			Correlation[] correlationArray = new Gson().fromJson(reader, Correlation[].class);
-			correlations = Arrays.asList(correlationArray);
-		} catch (FileNotFoundException e) {
-			log.error("Correlations.json file not found.", e);
-		} finally {
-			try {
-				if (in != null) {
-					in.close();
-				}
-				if (reader != null) {
-					reader.close();
-				}
-			} catch (IOException e) {
-				log.error("Unable to read the correlation.json file.", e);
-			}
+		} catch (JsonSyntaxException e) {
+			EngineStatusLogger.getInstance().createEngineStatusNode("Correlation.json is not formatted.",
+					PlatformServiceConstants.FAILURE);
+			log.error("Correlation.json is not formatted");
+		} catch (Exception e) {
+			EngineStatusLogger.getInstance().createEngineStatusNode("Error while loading Correlation.json.",
+					PlatformServiceConstants.FAILURE);
+			log.error("Exception while loading Correlation.json");
 		}
 		return correlations;
 	}

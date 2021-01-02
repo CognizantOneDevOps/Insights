@@ -215,6 +215,13 @@ export class RestAPIurlService implements IRestAPIUrlService {
         this.addEndPoint("SAVE_SERVER_CONFIG", '/PlatformService/configMgmt/saveServerConfigDetail');
         this.addEndPoint("GET_SERVER_CONFIG_STATUS", '/PlatformService/configMgmt/getServerConfigStatus');
 
+        //File Management
+        this.addEndPoint("GET_FILE_TYPE", '/PlatformService/filemanagement/getFileTypes');
+        this.addEndPoint("GET_FILE_MODULE", '/PlatformService/filemanagement/getModules');
+        this.addEndPoint("UPLOAD_CONFIG_FILE", '/PlatformService/filemanagement/uploadConfigurationFile');
+        this.addEndPoint("GET_CONFIG_FILES", '/PlatformService/filemanagement/getConfigurationFiles');
+        this.addEndPoint("DELETE_CONFIG_FILE", '/PlatformService/filemanagement/deleteConfigFile');
+        this.addEndPoint("DOWNLOAD_CONFIG_FILE", '/PlatformService/filemanagement/downloadConfigFile');
     }
 
     public addEndPoint(name: String, url: String) {

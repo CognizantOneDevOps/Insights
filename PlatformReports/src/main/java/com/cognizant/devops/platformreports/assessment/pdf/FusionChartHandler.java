@@ -51,6 +51,8 @@ import com.cognizant.devops.platformcommons.constants.AssessmentReportAndWorkflo
 import com.cognizant.devops.platformcommons.constants.ReportChartCollection;
 import com.cognizant.devops.platformcommons.dal.multipart.MultipartDataHandler;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
+import com.cognizant.devops.platformdal.assessmentreport.InsightsReportTemplateConfigFiles;
+import com.cognizant.devops.platformdal.assessmentreport.ReportConfigDAL;
 import com.cognizant.devops.platformreports.assessment.datamodel.InsightsAssessmentConfigurationDTO;
 import com.cognizant.devops.platformreports.assessment.datamodel.InsightsReportPdfTableConfig;
 import com.cognizant.devops.platformreports.assessment.util.PdfReportTableUtil;
@@ -67,6 +69,7 @@ public class FusionChartHandler implements BasePDFProcessor {
 	private static Logger log = LogManager.getLogger(FusionChartHandler.class);
 	MultipartDataHandler multiPartHandler = new MultipartDataHandler();
 	private float yStart = 1f;
+	ReportConfigDAL reportConfigDAL = new ReportConfigDAL();
 	
 	@Override
 	public void generatePDF(InsightsAssessmentConfigurationDTO assessmentReportDTO) {
@@ -96,21 +99,10 @@ public class FusionChartHandler implements BasePDFProcessor {
 			String folderName = assessmentReportDTO.getAsseementreportname() + "_"
 					+ assessmentReportDTO.getExecutionId();
 			assessmentReportDTO.setPdfReportFolderName(folderName);
-			String reportExecutionFile = AssessmentReportAndWorkflowConstants.REPORT_PDF_EXECUTION_RESOLVED_PATH + folderName;
+			String reportExecutionFile = AssessmentReportAndWorkflowConstants.REPORT_PDF_EXECUTION_RESOLVED_PATH
+					+ folderName;
 			assessmentReportDTO.setPdfReportDirPath(reportExecutionFile);
-			String templatePath = AssessmentReportAndWorkflowConstants.REPORT_PDF_RESOLVED_PATH
-					+ AssessmentReportAndWorkflowConstants.REPORT_CONFIG_TEMPLATE_DIR + File.separator
-					+ assessmentReportDTO.getReportFilePath();
-			log.debug("Worlflow Detail ==== path sourceTemplateFolderPath {} reportExecutionFile {}  ", templatePath,
-					reportExecutionFile);
-
-			File sourceTemplateFolderPath = new File(templatePath);
-			File reportExecutionFolder = new File(reportExecutionFile);
-			if (sourceTemplateFolderPath.exists()) {
-				getReportExecutionFolder(sourceTemplateFolderPath, reportExecutionFolder);
-			} else {
-				throw new InsightsJobFailedException("PDF report template directory not exists ");
-			}
+			setReportExecutionFolder(assessmentReportDTO);
 		} catch (Exception e) {
 			log.error(e);
 			throw new InsightsJobFailedException(
@@ -118,14 +110,17 @@ public class FusionChartHandler implements BasePDFProcessor {
 		}
 	}
 
-	public String getReportExecutionFolder(File sourceFolderPath, File reportExecutionFolder) throws IOException {
+	public void setReportExecutionFolder(InsightsAssessmentConfigurationDTO assessmentReportDTO) throws IOException {
 
-		for (File srcFile : sourceFolderPath.listFiles()) {
-			if (!srcFile.isDirectory()) {
-				FileUtils.copyFileToDirectory(srcFile, reportExecutionFolder);
+		List<InsightsReportTemplateConfigFiles> records = reportConfigDAL
+				.getReportTemplateConfigFileByReportId(assessmentReportDTO.getReportId());
+		for (InsightsReportTemplateConfigFiles record : records) {
+			String filePath = assessmentReportDTO.getPdfReportDirPath() + File.separator + record.getFileName();
+			File file = new File(filePath);
+			if (!file.exists()) {
+				FileUtils.writeByteArrayToFile(file, record.getFileData());
 			}
 		}
-		return reportExecutionFolder.getAbsolutePath();
 	}
 
 	private JsonArray generateChartsConfig(InsightsAssessmentConfigurationDTO assessmentReportDTO) throws IOException {
@@ -214,7 +209,7 @@ public class FusionChartHandler implements BasePDFProcessor {
 						// Assuming Second Array Item as content Id
 						String contentId = eachRowArray.get(1).getAsString();
 						if (!isTable) {
-						contentMap.put(contentId, contentText);
+							contentMap.put(contentId, contentText);
 						}
 						observationList.add(contentText);
 					} else {
@@ -233,7 +228,7 @@ public class FusionChartHandler implements BasePDFProcessor {
 		String templateHtmlPath = assessmentReportDTO.getPdfReportDirPath() + File.separator
 				+ assessmentReportDTO.getReportFilePath() + AssessmentReportAndWorkflowConstants.HTMLEXTENSION;
 		log.debug("Worlflow Detail ==== templateHtmlPath {} ", templateHtmlPath);
-		try {
+		try {		
 			File render = new File(templateHtmlPath);
 			Document document = Jsoup.parse(render, "UTF-8");
 			String originalHTml = document.toString();
@@ -244,8 +239,6 @@ public class FusionChartHandler implements BasePDFProcessor {
 					printWriter.print(modifiedHtml);
 				}
 			}
-			
-
 		} catch (FileNotFoundException e) {
 			log.error("Worlflow Detail ==== Unable to update html template , report template html file not found", e);
 			throw new InsightsJobFailedException("Unable to update html template, report template html file not found "
@@ -254,8 +247,6 @@ public class FusionChartHandler implements BasePDFProcessor {
 			log.error("Worlflow Detail ==== unable to modify html and content data  ", e);
 			throw new InsightsJobFailedException("unable to modify html and content data " + e);
 		} 
-		
-
 	}
 
 	private InsightsReportPdfTableConfig processHtmlTableWithOpenPDF(
@@ -272,7 +263,6 @@ public class FusionChartHandler implements BasePDFProcessor {
 			PDDocument doc = new PDDocument();
 			PDPage page = pdfReportTableUtil.addNewPage(doc);
 			pdfReportTableUtil.fetchPdfConfig(reportDirPath, insightsReportPdfTableConfig);
-
 			Elements allTableDiv = document.getElementsByAttributeValueMatching("id", "table_*");
 			if (!allTableDiv.isEmpty()) {
 				Map<String, JsonArray> tableJsonObjMap = assessmentReportDTO.getTableJsonObjMap();

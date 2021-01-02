@@ -89,6 +89,8 @@ public class AuthenticationUtils {
 	public static final String LOG_FILE_VALIDATOR = "^([a-zA-Z0-9_.\\s-])+(.log)$";
 	public static final String HTML_FILE_VALIDATOR = "^([a-zA-Z0-9_.\\s-])+(.html)$";
 	public static final String CSV_FILE_VALIDATOR = "^([a-zA-Z0-9_.\\s-])+(.csv)$";
+	public static final String CSS_FILE_VALIDATOR = "^([a-zA-Z0-9_.\\s-])+(.css)$";
+	public static final String WEBP_FILE_VALIDATOR = "^([a-zA-Z0-9_.\\s-])+(.webp)$";
 
 	public static final List<String> SUPPORTED_TYPE = Collections.unmodifiableList(Arrays.asList("SAML", "Kerberos", NATIVE_AUTH_PROTOCOL, "JWT" ));
 	public static final Set<String> AUTHENTICATION_PROTOCOL_LIST = Collections.unmodifiableSet(new HashSet<String>(SUPPORTED_TYPE));

@@ -235,8 +235,15 @@ export class TraceabilityDashboardCompenent implements OnInit {
         this.fieldList = [];
         this.traceablityService.getToolKeyset(this.selectedTool)
             .then((response) => {
-                for (var x of response.data) {
-                    this.fieldList.push(x)
+                if (response.status == 'success') {
+                    for (var x of response.data) {
+                        this.fieldList.push(x)
+                    }
+                } else {
+                    this.messageDialog.showApplicationsMessage(
+                        response.message,
+                        "ERROR"
+                    );
                 }
             });
         var self = this;

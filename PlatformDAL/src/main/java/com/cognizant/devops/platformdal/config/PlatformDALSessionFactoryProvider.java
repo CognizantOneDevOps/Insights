@@ -28,6 +28,7 @@ import com.cognizant.devops.platformdal.assessmentreport.InsightsAssessmentRepor
 import com.cognizant.devops.platformdal.assessmentreport.InsightsContentConfig;
 import com.cognizant.devops.platformdal.assessmentreport.InsightsEmailTemplates;
 import com.cognizant.devops.platformdal.assessmentreport.InsightsKPIConfig;
+import com.cognizant.devops.platformdal.assessmentreport.InsightsReportTemplateConfigFiles;
 import com.cognizant.devops.platformdal.assessmentreport.InsightsReportVisualizationContainer;
 import com.cognizant.devops.platformdal.assessmentreport.InsightsReportsKPIConfig;
 import com.cognizant.devops.platformdal.assessmentreport.InsightsVisualizationConfig;
@@ -36,6 +37,7 @@ import com.cognizant.devops.platformdal.correlationConfig.CorrelationConfigurati
 import com.cognizant.devops.platformdal.dashboards.CustomDashboard;
 import com.cognizant.devops.platformdal.dataArchivalConfig.InsightsDataArchivalConfig;
 import com.cognizant.devops.platformdal.entity.definition.EntityDefinition;
+import com.cognizant.devops.platformdal.filemanagement.InsightsConfigFiles;
 import com.cognizant.devops.platformdal.grafana.user.User;
 import com.cognizant.devops.platformdal.hierarchy.details.HierarchyDetails;
 import com.cognizant.devops.platformdal.icon.Icon;
@@ -99,6 +101,8 @@ public class PlatformDALSessionFactoryProvider {
 		    configuration.addAnnotatedClass(InsightsDataArchivalConfig.class);
 		    configuration.addAnnotatedClass(InsightsEmailTemplates.class);
 		    configuration.addAnnotatedClass(InsightsReportVisualizationContainer.class);
+		    configuration.addAnnotatedClass(InsightsReportTemplateConfigFiles.class);
+		    configuration.addAnnotatedClass(InsightsConfigFiles.class);
 		    configuration.addAnnotatedClass(AutoMLConfig.class);
 			PostgreData postgre = ApplicationConfigProvider.getInstance().getPostgre();
 			if(postgre != null){				
@@ -112,7 +116,6 @@ public class PlatformDALSessionFactoryProvider {
 				configuration.setProperty(AvailableSettings.FORMAT_SQL, "false");
 				configuration.setProperty(AvailableSettings.GENERATE_STATISTICS, "false");
 				configuration.setProperty(AvailableSettings.HBM2DDL_AUTO, "update");
-				
 				/* c3p configuration setting */
 				configuration.setProperty(AvailableSettings.C3P0_MIN_SIZE,postgre.getC3pMinSize());
 				configuration.setProperty(AvailableSettings.C3P0_MAX_SIZE, postgre.getC3pMaxSize());

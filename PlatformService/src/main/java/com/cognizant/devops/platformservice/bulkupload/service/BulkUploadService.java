@@ -22,6 +22,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
 import java.math.BigDecimal;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -43,16 +44,22 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.cognizant.devops.platformcommons.constants.ConfigOptions;
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
+import com.cognizant.devops.platformcommons.core.enums.FileDetailsEnum;
 import com.cognizant.devops.platformcommons.core.util.InsightsUtils;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBHandler;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
+import com.cognizant.devops.platformdal.filemanagement.InsightsConfigFiles;
+import com.cognizant.devops.platformdal.filemanagement.InsightsConfigFilesDAL;
+import com.cognizant.devops.platformservice.config.PlatformServiceStatusProvider;
 import com.cognizant.devops.platformservice.rest.datatagging.constants.DatataggingConstants;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.google.gson.JsonSyntaxException;
 
 @Service("bulkUploadService")
 public class BulkUploadService implements IBulkUpload {
 	private static final Logger log = LogManager.getLogger(BulkUploadService.class);
+	InsightsConfigFilesDAL configFilesDAL = new InsightsConfigFilesDAL();
 
 	/**
 	 * method performs multipart file to File conversion and does CSV file checks
@@ -310,21 +317,26 @@ public class BulkUploadService implements IBulkUpload {
 	 */
 	@Override
 	public Object getToolDetailJson() throws InsightsCustomException {
-		String agentPath = System.getenv().get("INSIGHTS_HOME") + File.separator + ConfigOptions.CONFIG_DIR;
-		Path dir = Paths.get(agentPath);
 		Object config = null;
-		try (Stream<Path> paths = Files.find(dir, Integer.MAX_VALUE,
-				(path, attrs) -> attrs.isRegularFile() && path.toString().endsWith(ConfigOptions.TOOLDETAIL_TEMPLATE));
-				FileReader reader = new FileReader(paths.limit(1).findFirst().get().toFile())) {
+		try {
+			List<InsightsConfigFiles> configFile = configFilesDAL
+					.getAllConfigurationFilesForModule(FileDetailsEnum.FileModule.TOOLDETAIL.name());
+			String configFileData = new String(configFile.get(0).getFileData(), StandardCharsets.UTF_8);
 			JsonParser parser = new JsonParser();
-			Object obj = parser.parse(reader);
+			Object obj = parser.parse(configFileData);
 			config = obj;
-		} catch (IOException ex) {
-			log.error("Offline file reading issue {}", ex.getMessage());
-			throw new InsightsCustomException("Offline file reading issue -" + ex.getMessage());
+			PlatformServiceStatusProvider.getInstance().createPlatformServiceStatusNode(
+					"ToolDetail.json is successfully loaded.", PlatformServiceConstants.SUCCESS);
+		} catch (JsonSyntaxException ex) {
+			log.error("ToolDetail.json is not formatted {}", ex.getMessage());
+			PlatformServiceStatusProvider.getInstance().createPlatformServiceStatusNode(
+					"ToolDetail.json is not formatted.", PlatformServiceConstants.FAILURE);
+			throw new InsightsCustomException("ToolDetail.json is not formatted");
 		} catch (Exception ex) {
-			log.error("Error in reading csv file {}", ex.getMessage());
-			throw new InsightsCustomException("Error in reading csv file");
+			log.error("Error in loading ToolDetail.json {}", ex.getMessage());
+			PlatformServiceStatusProvider.getInstance().createPlatformServiceStatusNode(
+					"Error in loading ToolDetail.json.", PlatformServiceConstants.FAILURE);
+			throw new InsightsCustomException("Error in loading ToolDetail.json");
 		}
 		return config;
 	}

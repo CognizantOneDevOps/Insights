@@ -762,4 +762,106 @@ public class ReportConfigDAL extends BaseDAL {
 		}
 	}
 
+	/**
+	 * Method to save Report Template Config Files
+	 * 
+	 * @param config
+	 * @return int
+	 */
+	public int saveReportTemplateConfigFiles(InsightsReportTemplateConfigFiles config) {
+		try (Session session = getSessionObj()) {
+			session.beginTransaction();
+			int recordId = (int) session.save(config);
+			session.getTransaction().commit();
+			return recordId;
+		} catch (Exception e) {
+			log.error(e);
+			throw e;
+		}
+	}
+
+	/**
+	 * Method to fetch Report Template Config Files using Report ID
+	 * 
+	 * @param reportId
+	 * @return List<InsightsReportTemplateConfigFiles>
+	 */
+	public List<InsightsReportTemplateConfigFiles> getReportTemplateConfigFileByReportId(int reportId) {
+		try (Session session = getSessionObj()) {
+			Query<InsightsReportTemplateConfigFiles> createQuery = session.createQuery(
+					"FROM InsightsReportTemplateConfigFiles RE WHERE RE.reportId = :reportId",
+					InsightsReportTemplateConfigFiles.class);
+			createQuery.setParameter("reportId", reportId);
+			return createQuery.getResultList();
+		} catch (Exception e) {
+			log.error(e);
+			throw e;
+		}
+	}
+
+	
+	/**
+	 * Method to fetch Report Template Config Files using Filename and ReportId
+	 * 
+	 * @param fileName
+	 * @param reportId
+	 * @return InsightsReportTemplateConfigFiles
+	 */
+	public InsightsReportTemplateConfigFiles getReportTemplateConfigFileByFileNameAndReportId(String fileName,int reportId) {
+		try (Session session = getSessionObj()) {
+			Query<InsightsReportTemplateConfigFiles> createQuery = session.createQuery(
+					"FROM InsightsReportTemplateConfigFiles RE WHERE RE.fileName = :fileName and RE.reportId = :reportId",
+					InsightsReportTemplateConfigFiles.class);
+			createQuery.setParameter("fileName", fileName);
+			createQuery.setParameter("reportId", reportId);
+			return createQuery.uniqueResult();
+		} catch (Exception e) {
+			log.error(e);
+			throw e;
+		}
+	}
+
+	/**
+	 * Method to update Report Template Config Files
+	 * 
+	 * @param config
+	 * @return int
+	 */
+	public int updateReportTemplateConfigFiles(InsightsReportTemplateConfigFiles config) {
+		try (Session session = getSessionObj()) {
+			session.beginTransaction();
+			session.update(config);
+			session.getTransaction().commit();
+			return 0;
+		} catch (Exception e) {
+			log.error(e);
+			throw e;
+		}
+	}
+	
+	/**
+	 * Method to delete Report Template Design Files using reportTemplateID
+	 * 
+	 * @param reportTemplateID
+	 * @return String
+	 */
+	public String deleteTemplateDesignFilesByReportTemplateID(int reportTemplateID) {
+		try (Session session = getSessionObj()) {
+			Query<InsightsReportTemplateConfigFiles> createQuery = session.createQuery(
+					"FROM InsightsReportTemplateConfigFiles a WHERE a.reportId= :id",
+					InsightsReportTemplateConfigFiles.class);
+			createQuery.setParameter("id", reportTemplateID);
+			List<InsightsReportTemplateConfigFiles> executionRecord = createQuery.getResultList();
+			for (InsightsReportTemplateConfigFiles record : executionRecord) {
+				session.beginTransaction();
+				session.delete(record);
+				session.getTransaction().commit();
+			}
+			return PlatformServiceConstants.SUCCESS;
+		} catch (Exception e) {
+			log.error(e);
+			throw e;
+		}
+	}
+
 }

@@ -15,12 +15,7 @@
  ******************************************************************************/
 package com.cognizant.devops.engines.platformengine.modules.offlinedataprocessing;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -38,18 +33,17 @@ import org.apache.logging.log4j.core.util.CronExpression;
 import com.cognizant.devops.engines.platformengine.message.core.EngineStatusLogger;
 import com.cognizant.devops.engines.platformengine.modules.offlinedataprocessing.model.DataEnrichmentModel;
 import com.cognizant.devops.platformcommons.config.ApplicationConfigInterface;
-import com.cognizant.devops.platformcommons.constants.ConfigOptions;
-import com.cognizant.devops.platformcommons.constants.LogLevelConstants;
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
+import com.cognizant.devops.platformcommons.core.enums.FileDetailsEnum;
 import com.cognizant.devops.platformcommons.core.util.InsightsUtils;
-import com.cognizant.devops.platformcommons.dal.neo4j.GraphResponse;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBHandler;
+import com.cognizant.devops.platformcommons.dal.neo4j.GraphResponse;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
+import com.cognizant.devops.platformdal.filemanagement.InsightsConfigFiles;
+import com.cognizant.devops.platformdal.filemanagement.InsightsConfigFilesDAL;
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
-import com.google.gson.stream.JsonWriter;
 
 /**
  * This is the executor class for Offline Data Processing. This class has the
@@ -71,7 +65,7 @@ public class OfflineDataProcessingExecutor extends TimerTask implements Applicat
 	private static final String DATE_TIME_FORMAT = "yyyy/MM/dd hh:mm a";
 	private static final String JSON_FILE_EXTENSION = "json";
 	private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DATE_TIME_FORMAT).withZone(InsightsUtils.zoneId);
-
+	InsightsConfigFilesDAL configFilesDAL = new InsightsConfigFilesDAL();
 	@Override
 	public void run() {
 		try {
@@ -86,20 +80,17 @@ public class OfflineDataProcessingExecutor extends TimerTask implements Applicat
 	}
 
 	public int executeOfflineProcessing() {
-		File queryFolderPath = new File(ConfigOptions.OFFLINE_DATA_PROCESSING_RESOLVED_PATH);
-		File[] files = queryFolderPath.listFiles();
+		List<InsightsConfigFiles> configFile = configFilesDAL
+				.getAllConfigurationFilesForModule(FileDetailsEnum.FileModule.DATAENRICHMENT.name());
 		int jsonFileCount = 0;		
-		if (files == null) {
+		if (configFile==null) {
 			return jsonFileCount;
 		}	
-		for (File eachFile : files) {
-			if (eachFile.isFile()) { // this line removes other directories/folders
-				String fileName = eachFile.getName();
-				if (hasJsonFileExtension(fileName)) {
+		for (InsightsConfigFiles eachFile : configFile) {
+				if (eachFile.getFileType().equalsIgnoreCase(FileDetailsEnum.ConfigurationFileType.JSON.name())) {
 					jsonFileCount++;
 					processOfflineConfiguration(eachFile);
 				}
-			}
 		}				
 		return jsonFileCount;
 	}
@@ -110,29 +101,30 @@ public class OfflineDataProcessingExecutor extends TimerTask implements Applicat
 	 * @param fileName
 	 * @return
 	 */
-	public Boolean hasJsonFileExtension(String fileName) {
+	public boolean hasJsonFileExtension(String fileName) {
 		if (fileName != null && !fileName.isEmpty()) {
 			String extension = FilenameUtils.getExtension(fileName);
 			if (JSON_FILE_EXTENSION.equalsIgnoreCase(extension)) {
-				return Boolean.TRUE;
+				return true;
 			}
 		}
-		return Boolean.FALSE;
+		return false;
 	}
 
 	/**
-	 * Processes each offline configuration file
+	 * Processes each  configuration file
 	 * Processes each query block inside each configuration file and executes cypher query
 	 * @param jsonFile
 	 */
-	public Boolean processOfflineConfiguration(File jsonFile) {
+	
+	public boolean processOfflineConfiguration(InsightsConfigFiles jsonFile) {
 		try {
-			try (BufferedReader reader = new BufferedReader(new FileReader(jsonFile))) {
-				DataEnrichmentModel[] dataEnrichmentModelArray = new Gson().fromJson(reader,
-						DataEnrichmentModel[].class);
-				List<DataEnrichmentModel> dataEnrichmentModels = Arrays.asList(dataEnrichmentModelArray);
+				String configFileData = new String(jsonFile.getFileData(), StandardCharsets.UTF_8);
+				List<DataEnrichmentModel> dataEnrichmentModels  = Arrays.asList(new Gson().fromJson(configFileData,
+						DataEnrichmentModel[].class));
 				for (DataEnrichmentModel dataEnrichmentModel : dataEnrichmentModels) {
 					String cypherQuery = dataEnrichmentModel.getCypherQuery();
+					log.debug("Cypher query : {} ",cypherQuery);
 					Long runSchedule = dataEnrichmentModel.getRunSchedule();
 					if (cypherQuery == null || cypherQuery.isEmpty() || runSchedule == null )  {
 						log.error(dataEnrichmentModel.getQueryName() , "{} doesn't have either cypherQuery or runSchedule attribute.");
@@ -140,31 +132,23 @@ public class OfflineDataProcessingExecutor extends TimerTask implements Applicat
 					}
 					if (isQueryScheduledToRun(dataEnrichmentModel.getRunSchedule(),
 							dataEnrichmentModel.getLastExecutionTime(), dataEnrichmentModel.getCronSchedule())) {
-						Boolean successFlag = executeCypherQuery(cypherQuery, dataEnrichmentModel);
+						boolean successFlag = executeCypherQuery(cypherQuery, dataEnrichmentModel);
 						//Checks if query execution fails due to some exception, don't update lastExecutionTime 
 						if (successFlag) {
 							updateLastExecutionTime(dataEnrichmentModel);							
 						}
 					}
 				}
-				// Write into the file
-				try (JsonWriter writer = new JsonWriter(new FileWriter(jsonFile))) {
-					writer.setIndent("  ");
-					new GsonBuilder().disableHtmlEscaping().create().toJson(dataEnrichmentModels.toArray(),
-							DataEnrichmentModel[].class, writer);
-				} catch (IOException e) {
-					log.error("Unable to update offline configuration file.", e);
-				}
-			} catch (FileNotFoundException e) {
-				log.error("offline configuration file not found.", e);
-			} catch (IOException e) {
-				log.error("Unable to read offline configuration file.", e);
-			}
-		} catch (IllegalStateException | JsonSyntaxException ex) {
-			log.error(jsonFile.getName(), "{} file is not as per expected format ", ex);
-			return Boolean.FALSE;
+				jsonFile.setFileData(new Gson().toJson(dataEnrichmentModels).getBytes());
+				configFilesDAL.updateConfigurationFile(jsonFile);
+		} catch (IllegalStateException | JsonSyntaxException  ex) {
+			log.error(jsonFile.getFileName(), "{} file is not as per expected format ", ex);
+			return false;
+		} catch (Exception e) {
+			log.error(jsonFile.getFileName(), "{} error while loading file ", e);
+			return false;
 		}
-		return Boolean.TRUE;
+		return true;
 	}
 
 	/**
@@ -187,7 +171,7 @@ public class OfflineDataProcessingExecutor extends TimerTask implements Applicat
 	 * @param cypherQuery
 	 * @param jsonObject
 	 */
-	public Boolean executeCypherQuery(String cypherQuery, DataEnrichmentModel dataEnrichmentModel) {
+	public boolean executeCypherQuery(String cypherQuery, DataEnrichmentModel dataEnrichmentModel) {
 		GraphDBHandler dbHandler = new GraphDBHandler();
 		int processedRecords = 1;
 		int recordCount = 0;
@@ -196,14 +180,9 @@ public class OfflineDataProcessingExecutor extends TimerTask implements Applicat
 			while (processedRecords > 0) {
 				GraphResponse sprintResponse = dbHandler.executeCypherQuery(cypherQuery);
 				JsonObject sprintResponseJson = sprintResponse.getJson();
-				try {
-					processedRecords = sprintResponseJson.getAsJsonArray("results").get(0).getAsJsonObject()
-							.getAsJsonArray("data").get(0).getAsJsonObject().getAsJsonArray("row").get(0).getAsInt();
-				} catch (UnsupportedOperationException | IllegalStateException | IndexOutOfBoundsException ex) {
-					log.error(cypherQuery , " {} - query processing failed", ex);
-					return Boolean.FALSE; 
-				}
-				log.debug(" Processed {}",  processedRecords);
+				processedRecords = sprintResponseJson.getAsJsonArray("results").get(0).getAsJsonObject()
+						.getAsJsonArray("data").get(0).getAsJsonObject().getAsJsonArray("row").get(0).getAsInt();
+				log.debug(" Processed {}", processedRecords);
 				recordCount = recordCount + processedRecords;
 			}
 			long queryExecutionEndTime = System.currentTimeMillis();
@@ -212,11 +191,11 @@ public class OfflineDataProcessingExecutor extends TimerTask implements Applicat
 				dataEnrichmentModel.setRecordsProcessed(recordCount);
 				dataEnrichmentModel.setQueryProcessingTime(queryProcessingTime);
 			}
-		} catch (InsightsCustomException e) {
-			log.error(cypherQuery , "{} - query processing failed", e);
-			return Boolean.FALSE;
-		}
-		return Boolean.TRUE;
+		} catch (UnsupportedOperationException | IllegalStateException | IndexOutOfBoundsException | InsightsCustomException ex) {
+			log.error(cypherQuery, " {} - query processing failed", ex);
+			return false;
+		} 
+		return true;
 	}
 
 	/**
@@ -228,11 +207,11 @@ public class OfflineDataProcessingExecutor extends TimerTask implements Applicat
 	 * @param lastRunTime
 	 * @return
 	 */
-	public Boolean isQueryScheduledToRun(Long runSchedule, String lastRunTime, String cronSchedule) {
+	public boolean isQueryScheduledToRun(Long runSchedule, String lastRunTime, String cronSchedule) {
 		// if lastExecutionTime property is not added in the json file, we'll
 		// execute the query by default
 		if (lastRunTime == null && (cronSchedule == null || cronSchedule.trim().length() == 0)) {
-			return Boolean.TRUE;
+			return true;
 		}
 		ZonedDateTime dateTime = null;
 		ZonedDateTime now = ZonedDateTime.now(InsightsUtils.zoneId);
@@ -249,7 +228,7 @@ public class OfflineDataProcessingExecutor extends TimerTask implements Applicat
 				}
 				Date cronDate = convert.getNextValidTimeAfter(Date.from(dateTime.toInstant()));
 				if(cronDate.before(new Date())) {
-					return Boolean.TRUE;
+					return true;
 				}
 			} catch (Exception e) {
 				log.error("Unable to parse the CRON expression:{} ",cronSchedule, e);
@@ -260,9 +239,9 @@ public class OfflineDataProcessingExecutor extends TimerTask implements Applicat
 				timeDifferenceInMinutes = d.abs().toMinutes();
 			}
 			if (timeDifferenceInMinutes > runSchedule) {
-				return Boolean.TRUE;
+				return true;
 			}
 		}
-		return Boolean.FALSE;
+		return false;
 	}
 }

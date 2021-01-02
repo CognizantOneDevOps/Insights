@@ -16,6 +16,8 @@
 package com.cognizant.devops.platformservice.rest.util;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -26,15 +28,19 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.NewCookie;
+
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
+import org.springframework.web.multipart.MultipartFile;
+
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
+import com.cognizant.devops.platformcommons.core.enums.FileDetailsEnum;
 import com.cognizant.devops.platformcommons.core.util.ValidationUtils;
 import com.cognizant.devops.platformcommons.dal.grafana.GrafanaHandler;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
@@ -197,6 +203,10 @@ public class PlatformServiceUtil {
 				pattern = Pattern.compile(AuthenticationUtils.LOG_FILE_VALIDATOR);
 			} else if (fileExt.equalsIgnoreCase("csv")) {
 				pattern = Pattern.compile(AuthenticationUtils.CSV_FILE_VALIDATOR);
+			} else if (fileExt.equalsIgnoreCase("css")) {
+				pattern = Pattern.compile(AuthenticationUtils.CSS_FILE_VALIDATOR);
+			} else if (fileExt.equalsIgnoreCase("webp")) {
+				pattern = Pattern.compile(AuthenticationUtils.WEBP_FILE_VALIDATOR);
 			}
 			if (pattern != null) {
 				final Matcher matcher = pattern.matcher(filename);
@@ -290,4 +300,58 @@ public class PlatformServiceUtil {
 	/*public static String getGrafanaURL(String urlPart) {
 		return ApplicationConfigProvider.getInstance().getGrafana().getGrafanaEndpoint() + urlPart;
 	}*/
+	
+	/**
+	 * Method to get FileType
+	 * 
+	 * @param fileName
+	 * @return String
+	 * @throws InsightsCustomException
+	 */
+	public static String getFileType(String fileName) throws InsightsCustomException {
+		String fileExtension = FilenameUtils.getExtension(fileName);
+		if(fileExtension.equalsIgnoreCase(FileDetailsEnum.ReportTemplateFileType.CSS.name())) {
+			return FileDetailsEnum.ReportTemplateFileType.CSS.name();
+		}else if(fileExtension.equalsIgnoreCase(FileDetailsEnum.ReportTemplateFileType.HTML.name())) {
+			return FileDetailsEnum.ReportTemplateFileType.HTML.name();
+		}else if(fileExtension.equalsIgnoreCase(FileDetailsEnum.ReportTemplateFileType.JSON.name())) {
+			return FileDetailsEnum.ReportTemplateFileType.JSON.name();
+		}else if(fileExtension.equalsIgnoreCase(FileDetailsEnum.ReportTemplateFileType.WEBP.name())) {
+			return FileDetailsEnum.ReportTemplateFileType.WEBP.name();
+		}
+		else {
+			throw new InsightsCustomException("FileType not correct.");
+		}
+	}
+	
+	/**
+	 * Method to check for Script tag in file
+	 * 
+	 * @param file
+	 * @return boolean
+	 * @throws IOException
+	 */
+	public static boolean checkScriptTag(File file) throws IOException {
+		String fileData = FileUtils.readFileToString(file);
+		if (fileData.contains("<script>")) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	/**
+	 * convert multipart to file
+	 * 
+	 * @param multipartFile
+	 * @return
+	 * @throws IOException
+	 */
+	public static File convertToFile(MultipartFile multipartFile) throws IOException {
+		File file = new File(multipartFile.getOriginalFilename());
+		try (FileOutputStream fos = new FileOutputStream(file)) {
+			fos.write(multipartFile.getBytes());
+		}
+		return file;
+	}
 }

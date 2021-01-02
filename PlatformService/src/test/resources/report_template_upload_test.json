@@ -1,0 +1,17 @@
+{
+   "reportName":"report_template_upload_test",
+   "description":"Testing",
+   "isActive":true,
+   "visualizationutil":"FUSION",
+   "kpiConfigs":[
+      {
+         "kpiId":100201,
+         "visualizationConfigs":[
+            {
+               "vId":"100",
+               "vQuery":"Query"
+            }
+         ]
+      }
+   ]
+}

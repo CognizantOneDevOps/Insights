@@ -50,6 +50,8 @@ import { ContentConfigAddition } from './content-config-add/content-config-add.c
 import { ReportTemplateComponent } from './report-template/report-template-list.component';
 import { ReportTemplateConfig } from './report-template/template-configuration/template-configuration.component';
 import { ServerConfigurationComponent } from '@insights/app/modules/server-configuration/server-configuration.component';
+import { FileSystemComponent } from './filesystem/file-system.component';
+import { FileSystemConfigComponent } from './filesystem/file-system-configuration/filesystem-config.component';
 
 const homeRoutes: Routes = [
   {
@@ -87,7 +89,9 @@ const homeRoutes: Routes = [
       { path: 'contentConfigAdd', component: ContentConfigAddition },
       { path: 'reportTemplate', component: ReportTemplateComponent },
       { path: 'template-configuration', component: ReportTemplateConfig },
-      { path: 'server-configuration', component: ServerConfigurationComponent }
+      { path: 'server-configuration', component: ServerConfigurationComponent },
+      { path: 'filesystem', component: FileSystemComponent },
+      { path: 'file-system-configuration', component: FileSystemConfigComponent }
 
     ],
     canActivate: [AuthGuard]

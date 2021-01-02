@@ -15,6 +15,7 @@
  ******************************************************************************/
 package com.cognizant.devops.platformreports.assessment.core;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -23,6 +24,7 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -193,10 +195,18 @@ public class PDFExecutionSubscriber extends WorkflowTaskSubscriberHandler {
 
 	private void setPDFDetailsInEmailHistory(JsonObject incomingTaskMessageJson) {
 		try {
-			String workflowId = incomingTaskMessageJson.get(AssessmentReportAndWorkflowConstants.WORKFLOW_ID).getAsString();
+			String workflowId = incomingTaskMessageJson.get(AssessmentReportAndWorkflowConstants.WORKFLOW_ID)
+					.getAsString();
 			InsightsReportVisualizationContainer emailHistoryConfig = new InsightsReportVisualizationContainer();
 			emailHistoryConfig.setAttachmentPath(assessmentReportDTO.getPdfExportedFilePath());
 			emailHistoryConfig.setExecutionId(assessmentReportDTO.getExecutionId());
+			File attachedFile = new File(assessmentReportDTO.getPdfExportedFilePath());
+			if (attachedFile.exists()) {
+				emailHistoryConfig.setAttachmentData(FileUtils.readFileToByteArray(attachedFile));
+			}else {
+				throw new InsightsJobFailedException(
+						"Worlflow Detail ==== Error setting PDF details in Email History table");
+			}
 			if (incomingTaskMessageJson.get("nextTaskId").getAsInt() == -1) {
 				emailHistoryConfig.setStatus(WorkflowTaskEnum.WorkflowStatus.COMPLETED.name());
 				emailHistoryConfig.setExecutionTime(InsightsUtils.getCurrentTimeInEpochMilliSeconds());

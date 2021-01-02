@@ -20,21 +20,43 @@ import java.io.FileInputStream;
 import java.io.IOException;
 
 import org.apache.commons.compress.utils.IOUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.web.multipart.MultipartFile;
 import org.testng.Assert;
+import org.testng.annotations.AfterTest;
+import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformservice.bulkupload.service.BulkUploadService;
+import com.cognizant.devops.platformservice.rest.filemanagement.service.FileManagementServiceImpl;
 
 @ContextConfiguration(locations = { "classpath:spring-test-config.xml" })
 public class BulkUploadTest extends BulkUploadTestData {
 
 	public static final BulkUploadService bulkUploadService = new BulkUploadService();
 	public static final BulkUploadTestData bulkUploadTestData = new BulkUploadTestData();
+	FileManagementServiceImpl fileManagementServiceImpl = new FileManagementServiceImpl();
+	boolean isDeleteFile = false;
+	private static Logger log = LogManager.getLogger(BulkUploadTest.class);
 
+	@BeforeTest
+	public void onInit(){
+		try {
+		FileInputStream input = new FileInputStream(toolDetailsFile);
+		MultipartFile multipartToolDetailsFile = new MockMultipartFile("file", toolDetailsFile.getName(), "text/plain",
+					IOUtils.toByteArray(input));
+		String response = fileManagementServiceImpl.uploadConfigurationFile(multipartToolDetailsFile, toolDetailFileName, "JSON", "TOOLDETAIL");
+		if(response.equals("File uploaded"))
+			isDeleteFile=true;
+		}catch(Exception e) {
+			log.error("File already exists");
+		}
+	}
+	
 	@Test(priority = 1)
 	public void testGetToolDetailJson() throws InsightsCustomException {
 		String response = bulkUploadService.getToolDetailJson().toString();
@@ -211,6 +233,17 @@ public class BulkUploadTest extends BulkUploadTestData {
 				bulkUploadTestData.nullInsightTimeFormat);
 		Assert.assertEquals(response, true);
 		Assert.assertFalse(multipartFile.isEmpty());
+	}
+	
+	@AfterTest
+	public void onDelete(){
+		try {
+			if(isDeleteFile) {
+				fileManagementServiceImpl.deleteConfigurationFile(toolDetailFileName);
+			}
+		}catch(Exception e) {
+			log.error("File already exists");
+		}
 	}
 
 }

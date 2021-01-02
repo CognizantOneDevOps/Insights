@@ -115,6 +115,9 @@ import { KpiReportListDialog } from './report-template/report-template-kpi-list/
 import { ReportTemplateConfig } from './report-template/template-configuration/template-configuration.component';
 import { ServerConfigurationComponent } from '@insights/app/modules/server-configuration/server-configuration.component';
 import { ServerConfigurationService } from '@insights/app/modules/server-configuration/server-configuration-service';
+import { FileSystemComponent } from './filesystem/file-system.component';
+import { FileSystemService } from './filesystem/file-system.service';
+import { FileSystemConfigComponent } from './filesystem/file-system-configuration/filesystem-config.component';
 
 @NgModule({
   declarations: [
@@ -175,7 +178,9 @@ import { ServerConfigurationService } from '@insights/app/modules/server-configu
     ReportTemplateComponent,
     KpiReportListDialog,
     ReportTemplateConfig,
-    ServerConfigurationComponent
+    ServerConfigurationComponent,
+    FileSystemComponent,
+    FileSystemConfigComponent
   ],
   imports: [
     HomeRouting,
@@ -243,7 +248,8 @@ import { ServerConfigurationService } from '@insights/app/modules/server-configu
     KpiService,
     ContentService,
     ReportTemplateService,
-    ServerConfigurationService
+    ServerConfigurationService,
+    FileSystemService
   ]
 })
 export class HomeModules { }

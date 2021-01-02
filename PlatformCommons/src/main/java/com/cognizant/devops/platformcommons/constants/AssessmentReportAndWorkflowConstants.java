@@ -16,6 +16,10 @@
 package com.cognizant.devops.platformcommons.constants;
 
 import java.io.File;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 
 public interface AssessmentReportAndWorkflowConstants {
 
@@ -78,4 +82,7 @@ public interface AssessmentReportAndWorkflowConstants {
 	String TASK_ID= "taskId";
 	String ENDTIME = "endTime";
 	String USECASE= "usecase";
+	
+	Set<String> validReportTemplateFileExtention = Collections
+			.unmodifiableSet(new HashSet<String>(Arrays.asList("html", "json", "css", "webp")));
 }

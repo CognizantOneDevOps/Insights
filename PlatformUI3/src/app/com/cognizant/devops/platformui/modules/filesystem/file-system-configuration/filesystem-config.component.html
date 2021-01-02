@@ -1,0 +1,127 @@
+<!-- /*******************************************************************************
+ * Copyright 2020 Cognizant Technology Solutions
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License.  You may obtain a copy
+ * of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ ******************************************************************************/ -->
+
+ <div class="pageCss">
+    <div layout layout-align="left" class="titleStyle">
+      <a>Configuration | <a class="greenTitleTxt">File Management</a></a>
+    </div>
+    <div class="orangeStripCss"></div>
+
+    <div layout layout-align="left" class="sectionHeadingStyle">
+      <div layout>&nbsp; Upload File 
+        <span class="sectionSubHeading"> </span>
+      </div>
+    </div>
+
+    <div class="btnAlign">
+        <button mat-icon-button (click)="validateAndUpload()">
+            <mat-icon title="Save" style="margin-bottom: -10%;" class="mat-icon material-icons">
+                save
+            </mat-icon>
+          </button>
+    
+          <button mat-icon-button (click)="reset()">
+            <mat-icon title="Reset"  style="margin-bottom: -10%;" class="mat-icon material-icons">
+                cancel
+            </mat-icon>
+          </button>
+    
+          <button mat-icon-button (click)="refresh()">
+            <mat-icon svgIcon="redirect_icon" title="Redirect To Landing Page"  style="margin-bottom: 15%;" class="mat-icon material-icons">
+                refresh
+            </mat-icon>
+          </button>
+    </div>
+
+    <table class="mat-elevation-z8 mat-table" style="margin-top:3% !important">
+        <thead>
+            <tr class="mat-header-row" layout-align="start start">
+                <th colspan="4" class="tableHeaderCss mat-header-cell" style=" border-radius: 10px 10px 0 0;">
+                    <span class="mainHeaderText">Add file details and upload </span>
+                    <span class="infoHeaderText">(Please provide accurate details.
+                      Fields marked "<span style="color:#ff0000;">*</span>" are mandatory)
+                    </span>
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr class="mat-row-webhook">
+                <td class="mat-cell" class="columnName">
+                    <span class="mainText">Name</span>
+                    <span style="color:#ff0000;">*</span>
+                </td>
+                <td class="columnComponent">
+                    <input matinput maxlength="40" [disabled]="disableInputFields" [(ngModel)]="fileName" 
+                    [ngClass]="{'input-disabled' : disableInputFields ,  'form-control': !disableInputFields}" type="text" autocomplete="off" placeholder="Enter file name">
+                </td>
+                <td>
+                    <span class="infoText">Enter valid file name.</span>
+                </td>
+            </tr>
+
+            <tr class="mat-row-webhook">
+                <td class="mat-cell" class="columnName">
+                    <span class="mainText">File Type</span>
+                    <span style="color:#ff0000;">*</span>
+                </td>
+                <td class="columnComponent" style="padding-top: 5px;">
+                    <mat-select  class="form-control" required placeholder="Select file type"
+                            color="primary" [(ngModel)]="fileType" [disabled]="disableInputFields">
+                            <mat-option *ngFor="let type of fileTypeList" value="{{type}}" style="color:#0033A0">
+                                 {{type}}</mat-option>
+                    </mat-select>
+                </td>
+                <td>
+                    <span class="infoText">Select file type.</span>
+                </td>
+            </tr>
+            
+            <tr class="mat-row-webhook">
+                <td class="mat-cell" class="columnName">
+                    <span class="mainText">Module</span>
+                    <span style="color:#ff0000;">*</span>
+                </td>
+                <td class="columnComponent" style="padding-top: 5px;">
+                    <mat-select  class="form-control" required placeholder="Select file module"
+                            color="primary" [(ngModel)]="module" [disabled]="disableInputFields">
+                            <mat-option *ngFor="let module of fileModuleList" value="{{module}}" style="color:#0033A0">
+                                 {{module}}</mat-option>
+                    </mat-select>
+                </td>
+                <td>
+                    <span class="infoText">Select file module.</span>
+                </td>
+            </tr>
+
+            <tr class="mat-row-webhook">
+                <td class="mat-cell" class="columnName">
+                    <span class="mainText">Upload File</span>
+                    <span style="color:#ff0000;">*</span>
+                </td>
+                <td class="columnComponent">
+                  <input  #fileInput id="file" type="file" accept=''
+                  (change)="onFileChanged($event)" class="form-control"/>
+                </td>
+                <td>
+                    <span class="infoText">{{fileUploadMsg}}</span>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    
+
+</div>

@@ -1,0 +1,32 @@
+[
+   {
+      "type":"mscolumn2d",
+      "renderAt":"mscolumn2d_100201",
+      "width":"700",
+      "height":"350",
+      "dataFormat":"json",
+      "dataSource":{
+         "chart":{
+            "bgColor":"black",
+            "caption":" Deployment Count",
+            "subCaption":" Deployment Count",
+            "theme":"fusion"
+         }
+      }
+   },
+    {
+      "type":"mscolumn2d",
+      "renderAt":"mscolumn2d_100144",
+      "width":"700",
+      "height":"350",
+      "dataFormat":"json",
+      "dataSource":{
+         "chart":{
+            "bgColor":"black",
+            "caption":" Deployment Count",
+            "subCaption":" Deployment Count",
+            "theme":"fusion"
+         }
+      }
+   } 
+]

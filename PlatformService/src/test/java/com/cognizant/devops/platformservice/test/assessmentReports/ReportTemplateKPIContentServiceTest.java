@@ -15,11 +15,17 @@
  ******************************************************************************/
 package com.cognizant.devops.platformservice.test.assessmentReports;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.List;
 
+import org.apache.commons.compress.utils.IOUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.web.multipart.MultipartFile;
 import org.testng.Assert;
 import org.testng.annotations.AfterTest;
 import org.testng.annotations.BeforeTest;
@@ -29,6 +35,7 @@ import com.cognizant.devops.platformcommons.config.ApplicationConfigCache;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformdal.assessmentreport.InsightsAssessmentReportTemplate;
 import com.cognizant.devops.platformdal.assessmentreport.InsightsKPIConfig;
+import com.cognizant.devops.platformdal.assessmentreport.InsightsReportTemplateConfigFiles;
 import com.cognizant.devops.platformdal.assessmentreport.ReportConfigDAL;
 import com.cognizant.devops.platformservice.assessmentreport.service.AssesmentReportServiceImpl;
 import com.google.gson.JsonObject;
@@ -40,6 +47,7 @@ public class ReportTemplateKPIContentServiceTest extends AssessmentReportService
 	private static final Logger log = LogManager.getLogger(ReportTemplateKPIContentServiceTest.class);
 
 	int reportId = 0;
+	int uploadedTemplateId = 0;
 	@BeforeTest
 	public void prepareData() throws InsightsCustomException {
 		ApplicationConfigCache.loadConfigCache();
@@ -170,6 +178,18 @@ public class ReportTemplateKPIContentServiceTest extends AssessmentReportService
 	}
 
 	@Test(priority = 11)
+	public void testUploadReportTemplateDesignFiles() throws InsightsCustomException, IOException {
+		try {
+			String response = assessmentService.uploadReportTemplateDesignFiles(readReportTemplateDesignFiles(), reportId);
+			List<InsightsReportTemplateConfigFiles> fileList = reportConfigDAL.getReportTemplateConfigFileByReportId(reportId);
+			Assert.assertEquals(response, "File uploaded");
+			Assert.assertTrue(fileList.size() > 0);
+		} catch (AssertionError e) {
+			Assert.fail(e.getMessage());
+		}
+	}
+	
+	@Test(priority = 12)
 	public void testDeleteReportTemplate() throws InsightsCustomException {
 		try {
 			JsonObject deleteRequest = new JsonObject();
@@ -186,6 +206,60 @@ public class ReportTemplateKPIContentServiceTest extends AssessmentReportService
 			Assert.fail(e.getMessage());
 		}
 	}
+	
+	@Test(priority = 13)
+	public void testUploadReportTemplate() throws InsightsCustomException, IOException {
+		try {
+			FileInputStream input = new FileInputStream(templateJsonFile);
+			MultipartFile multipartFile = new MockMultipartFile("file", configFile.getName(), "text/plain",
+					IOUtils.toByteArray(input));
+			String response = assessmentService.uploadReportTemplate(multipartFile);
+			uploadedTemplateId = Integer.parseInt(response.replaceAll("[^0-9]", ""));
+			InsightsAssessmentReportTemplate report = (InsightsAssessmentReportTemplate) reportConfigDAL
+					.getReportTemplateByReportId(uploadedTemplateId);
+			Assert.assertNotNull(report);
+			Assert.assertTrue(report.getReportsKPIConfig().size() > 0);
+		} catch (AssertionError e) {
+			Assert.fail(e.getMessage());
+		}
+	}
+	
+	@Test(priority = 14)
+	public void testDeleteUploadedReportTemplate() throws InsightsCustomException {
+		try {
+			JsonObject deleteRequest = new JsonObject();
+			deleteRequest.addProperty("reportId", uploadedTemplateId);
+			String response = assessmentService.deleteReportTemplate(deleteRequest);
+			InsightsAssessmentReportTemplate report = null;
+			try {
+				report = (InsightsAssessmentReportTemplate) reportConfigDAL.getReportTemplateByReportId(uploadedTemplateId);
+			} catch (Exception e) {
+				log.error(e);
+			}
+			Assert.assertNull(report);
+		} catch (AssertionError e) {
+			Assert.fail(e.getMessage());
+		}
+	}
+	
+	@Test(priority = 15, expectedExceptions = InsightsCustomException.class)
+	public void testUploadedReportTemplateWithWrongFile() throws InsightsCustomException, IOException {
+		FileInputStream input = new FileInputStream(configFileTxt);
+		MultipartFile multipartFile = new MockMultipartFile("file", configFileTxt.getName(), "text/plain",
+				IOUtils.toByteArray(input));
+		String response = assessmentService.uploadReportTemplate(multipartFile);
+	}
+	
+	@Test(priority = 16, expectedExceptions = InsightsCustomException.class)
+	public void testUploadReportTemplateDesignFilesWithWrongFile() throws InsightsCustomException, IOException {
+		FileInputStream input = new FileInputStream(configFileTxt);
+		MultipartFile multipartFile = new MockMultipartFile("file", configFileTxt.getName(), "text/plain",
+				IOUtils.toByteArray(input));
+		MultipartFile[] files = new MultipartFile[1];
+		files[0] = multipartFile;
+		String response = assessmentService.uploadReportTemplateDesignFiles(files, reportId);
+
+	}
 
 
 	@AfterTest
@@ -198,6 +272,8 @@ public class ReportTemplateKPIContentServiceTest extends AssessmentReportService
 				log.error("Error cleaning up at AssessmentReportsServiceTest Bulk KPI record", e);
 			}
 		}
+		
+		reportConfigDAL.deleteTemplateDesignFilesByReportTemplateID(reportId);
 
 	}
 

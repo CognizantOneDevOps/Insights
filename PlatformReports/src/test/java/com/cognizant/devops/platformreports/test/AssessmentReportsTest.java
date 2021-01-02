@@ -49,7 +49,7 @@ public class AssessmentReportsTest extends AssessmentReportsTestData {
 	public void onInit() throws Exception {
 
 		ApplicationConfigCache.loadConfigCache();
-
+		
 		// save multiple Kpi definition in db
 		readKpiFileAndSave("KPIDefination.json");
 
@@ -61,6 +61,9 @@ public class AssessmentReportsTest extends AssessmentReportsTestData {
 		readReportTempFileAndSave("REPORT_SONAR_RT.json", reportIdSonarRT);
 		saveReportTemplate(reportTemplatekpi, reportIdkpiRT);
 		saveReportTemplate(reportTemplatekpis, reportIdkpisRT);
+		
+		//save report template design files in db
+		uploadReportTemplateDesignFiles(reportIdProdRT);
 
 		typeId=saveWorkflowType("SYSTEM");
 		// save workflow task in db
@@ -334,6 +337,7 @@ public class AssessmentReportsTest extends AssessmentReportsTestData {
 		delete(workflowIdWrongkpi);
 		delete(workflowIdWrongkpis);
 		deleteWorkflowConfig(healthNotificationWorkflowId);
+		reportConfigDAL.deleteTemplateDesignFilesByReportTemplateID(reportIdProdRT);
 		
 		try {
 			workflowDAL.deleteWorkflowType(typeId);
