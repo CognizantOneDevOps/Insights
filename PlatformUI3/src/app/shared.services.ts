@@ -35,7 +35,7 @@ import { AuthGuardService } from '@insights/common/auth-guard.service.ts'
   ]
 })
 export class SharedServices {
-  static forRoot(): ModuleWithProviders {
+  static forRoot(): ModuleWithProviders<SharedServices> {
     return {
       ngModule: SharedServices,
       providers: [

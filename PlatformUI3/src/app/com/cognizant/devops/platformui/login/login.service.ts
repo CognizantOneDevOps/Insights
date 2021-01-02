@@ -17,7 +17,6 @@
 import { Injectable } from '@angular/core';
 import { RestCallHandlerService } from '@insights/common/rest-call-handler.service';
 import { DataSharedService } from '@insights/common/data-shared-service';
-import { Observable } from 'rxjs'
 import { RestAPIurlService } from '@insights/common/rest-apiurl.service'
 import { InsightsInitService } from '@insights/common/insights-initservice';
 import { AutheticationProtocol } from '@insights/common/insights-enum';

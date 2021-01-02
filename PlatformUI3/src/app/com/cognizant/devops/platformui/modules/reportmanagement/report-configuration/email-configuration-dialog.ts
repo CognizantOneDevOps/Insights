@@ -15,7 +15,7 @@
  * the License.
  ******************************************************************************/
 import { Component, Inject } from '@angular/core';
-import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
+import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { MessageDialogService } from "@insights/app/modules/application-dialog/message-dialog-service";
 import { DataSharedService } from '@insights/common/data-shared-service';
 

@@ -22,29 +22,26 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { ClipboardModule } from 'ngx-clipboard';
 
 import { DragulaModule } from 'ng2-dragula';
-import {
-    MatButtonModule,
-    MatMenuModule,
-    MatToolbarModule,
-    MatNativeDateModule,
-    MatTableModule,
-    MatIconModule,
-    MatListModule,
-    MatCardModule,
-    MatInputModule,
-    MatDialogModule,
-    MatProgressSpinnerModule,
-    MatCheckboxModule,
-    MatSidenavModule,
-    MatSelectModule,
-    MatGridListModule,
-    MatRadioModule,
-    MatPaginatorModule,
-    MatSortModule,
-    MatProgressBarModule,
-    MatSlideToggleModule,
-} from '@angular/material';
-import { from } from 'rxjs';
+import { MatButtonModule } from '@angular/material/button';
+import { MatCardModule } from '@angular/material/card';
+import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatNativeDateModule } from '@angular/material/core';
+import { MatDialogModule } from '@angular/material/dialog';
+import { MatGridListModule } from '@angular/material/grid-list';
+import { MatIconModule } from '@angular/material/icon';
+import { MatInputModule } from '@angular/material/input';
+import { MatListModule } from '@angular/material/list';
+import { MatMenuModule } from '@angular/material/menu';
+import { MatPaginatorModule } from '@angular/material/paginator';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatRadioModule } from '@angular/material/radio';
+import { MatSelectModule } from '@angular/material/select';
+import { MatSidenavModule } from '@angular/material/sidenav';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
+import { MatSortModule } from '@angular/material/sort';
+import { MatTableModule } from '@angular/material/table';
+import { MatToolbarModule } from '@angular/material/toolbar';
 @NgModule({
     imports: [],
     exports: [

@@ -1,5 +1,5 @@
 import { Component, OnInit, ElementRef, ViewChild, Inject } from '@angular/core';
-import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
+import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { RestCallHandlerService } from '@insights/common/rest-call-handler.service';
 import { MessageDialogService } from '../application-dialog/message-dialog-service';
 import { Router } from '@angular/router';

@@ -14,18 +14,18 @@
  * the License.
  *******************************************************************************/
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { SelectionModel } from '@angular/cdk/collections';
-import { MatTableDataSource, MatSort, MatPaginator, MatDialog } from '@angular/material';
+import { MatDialog } from '@angular/material/dialog';
+import { MatPaginator } from '@angular/material/paginator';
+import { MatSort } from '@angular/material/sort';
+import { MatTableDataSource } from '@angular/material/table';
 import { MatDatepickerInputEvent } from '@angular/material/datepicker';
 import { BlockChainService } from '@insights/app/modules/blockchain/blockchain.service';
 import { DatePipe } from '@angular/common'
-import { BehaviorSubject } from 'rxjs';
-import { CollectionViewer, DataSource } from "@angular/cdk/collections";
 import { MessageDialogService } from '@insights/app/modules/application-dialog/message-dialog-service';
-import { MatRadioChange, MatInput } from '@angular/material';
+import { MatInput } from '@angular/material/input';
+import { MatRadioChange } from '@angular/material/radio';
 import { AssetDetailsDialog } from '@insights/app/modules/blockchain/bc-asset-details-dialog';
 import { FormControl, Validators } from '@angular/forms';
-import { InsightsInitService } from '../../common.services/insights-initservice';
 
 export interface AssetData {
   assetID: string;
@@ -45,8 +45,8 @@ export interface AssetData {
 export class BlockChainComponent implements OnInit {
   today = new Date();
   maxDateValue: any;
-  @ViewChild(MatSort) sort: MatSort;
-  @ViewChild(MatPaginator) paginator: MatPaginator;
+  @ViewChild(MatSort, { static: true }) sort: MatSort;
+  @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
   displayedColumns: string[] = ['select', 'assetID', 'toolName', 'phase', 'toolstatus', 'timestamp'];
   dataSource = new MatTableDataSource<AssetData>([]);
   MAX_ROWS_PER_TABLE = 10;
@@ -62,9 +62,9 @@ export class BlockChainComponent implements OnInit {
   searchCriteria: string = "";
   searchResultNotFoundMsg: string = "";
   noSearchResultFlag: boolean = false;
-  @ViewChild('startDateMatInput', { read: MatInput }) startDateMatInput: MatInput;
-  @ViewChild('endDateMatInput', { read: MatInput }) endDateMatInput: MatInput;
-  @ViewChild('assetIdInput', { read: MatInput }) assetIdInput: MatInput;
+  @ViewChild('startDateMatInput', { read: MatInput, static: true }) startDateMatInput: MatInput;
+  @ViewChild('endDateMatInput', { read: MatInput, static: true }) endDateMatInput: MatInput;
+  @ViewChild('assetIdInput', { read: MatInput, static: true }) assetIdInput: MatInput;
   selectedBasePrimeID: string = "";
   selectedAssetID: string = "";
   displayProgressBar: boolean = false;

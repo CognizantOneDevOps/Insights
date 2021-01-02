@@ -17,7 +17,7 @@ import { Component, OnInit } from "@angular/core";
 import { MatDatepickerInputEvent } from "@angular/material/datepicker";
 import { MessageDialogService } from "@insights/app/modules/application-dialog/message-dialog-service";
 import { Router, NavigationExtras, ActivatedRoute } from "@angular/router";
-import { MatDialog } from "@angular/material";
+import { MatDialog } from "@angular/material/dialog";
 import { DataSharedService } from "@insights/common/data-shared-service";
 import { ViewKPIDialog } from "@insights/app/modules/reportmanagement/report-configuration/view-kpi-dialog";
 import { AddTasksDialog } from "@insights/app/modules/reportmanagement/report-configuration/add-task";

@@ -16,7 +16,9 @@
 
 import { Component, OnInit, ViewChild } from "@angular/core";
 import { Router, NavigationExtras, ActivatedRoute } from "@angular/router";
-import { MatTableDataSource, MatPaginator, MatDialog } from '@angular/material';
+import { MatDialog } from '@angular/material/dialog';
+import { MatPaginator } from '@angular/material/paginator';
+import { MatTableDataSource } from '@angular/material/table';
 import { KpiDetailItem } from "./kpi-detail-items";
 import { MessageDialogService } from '@insights/app/modules/application-dialog/message-dialog-service';
 import { ReportTemplateService } from '../report-template-service';

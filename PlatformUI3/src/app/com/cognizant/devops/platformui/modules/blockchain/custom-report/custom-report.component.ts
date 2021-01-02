@@ -16,7 +16,10 @@
 
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { MessageDialogService } from '@insights/app/modules/application-dialog/message-dialog-service';
-import { MatTableDataSource, MatSort, MatPaginator, MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
+import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { MatPaginator } from '@angular/material/paginator';
+import { MatSort } from '@angular/material/sort';
+import { MatTableDataSource } from '@angular/material/table';
 import { Router, NavigationExtras, ActivatedRoute } from '@angular/router';
 import { QueryBuilderService } from './custom-report-service';
 
@@ -37,8 +40,8 @@ import { QueryBuilderService } from './custom-report-service';
     showConfirmMessage: string;
     showDetail: boolean = false;
     MAX_ROWS_PER_TABLE = 10;
-    @ViewChild(MatPaginator) paginator: MatPaginator;
-    @ViewChild(MatSort) sort: MatSort;
+    @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
+    @ViewChild(MatSort, { static: true }) sort: MatSort;
     userDataSource = new MatTableDataSource<any>();
     configParams: string;
     receivedParam: any;

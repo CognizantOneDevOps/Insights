@@ -13,16 +13,11 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  ******************************************************************************/
-import { Component, OnInit, ElementRef, ViewChild } from "@angular/core";
-import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from "@angular/material";
-import { RelationLabel } from "@insights/app/modules/relationship-builder/relationship-builder.label";
-import { from } from "rxjs";
+import { Component, OnInit } from "@angular/core";
+import { MatDialog } from "@angular/material/dialog";
 import { Router } from "@angular/router";
-import { ActivatedRoute } from "@angular/router";
 import { MessageDialogService } from "@insights/app/modules/application-dialog/message-dialog-service";
-import { MatTableDataSource } from "@angular/material";
 import { DataSharedService } from "@insights/common/data-shared-service";
-import { count } from "rxjs/operators";
 import {
   FormGroup,
   FormBuilder,
@@ -32,12 +27,7 @@ import {
   NgForm,
 } from "@angular/forms";
 import { BulkUploadService } from "./bulkupload.service";
-import {
-  MatAutocompleteModule,
-  MatInputModule,
-  MatProgressBarModule,
-} from "@angular/material";
-import { element } from "protractor";
+
 @Component({
   selector: "app-bulkupload",
   templateUrl: "./bulkupload.component.html",

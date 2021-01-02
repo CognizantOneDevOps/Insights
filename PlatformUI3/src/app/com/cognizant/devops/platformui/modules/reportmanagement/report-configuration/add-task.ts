@@ -17,7 +17,7 @@
 import { Component, Inject } from '@angular/core';
 import { DragulaService } from 'ng2-dragula';
 import { ReportManagementService } from '@insights/app/modules/reportmanagement/reportmanagement.service';
-import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
+import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Subscription } from 'rxjs';
 
 interface Iitem {

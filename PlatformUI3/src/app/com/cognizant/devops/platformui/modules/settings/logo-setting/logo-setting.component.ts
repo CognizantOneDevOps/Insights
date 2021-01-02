@@ -29,7 +29,7 @@ import { MessageDialogService } from '@insights/app/modules/application-dialog/m
 
 export class LogoSettingComponent implements OnInit {
   trackingUploadedFileContentStr: string = "";
-  @ViewChild('fileInput') myFileDiv: ElementRef;
+  @ViewChild('fileInput', { static: true }) myFileDiv: ElementRef;
   files: any;
   response: any;
   size: boolean = false;

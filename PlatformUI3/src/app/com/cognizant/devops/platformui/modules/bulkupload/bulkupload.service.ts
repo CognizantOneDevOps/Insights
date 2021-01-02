@@ -15,8 +15,6 @@
  ******************************************************************************/
 import { Injectable } from "@angular/core";
 import { RestCallHandlerService } from "@insights/common/rest-call-handler.service";
-import { HttpClient } from "@angular/common/http";
-import { Observable } from "rxjs";
 
 export interface IBulkUploadService {
   getDocRootAgentVersionTools(): Promise<any>;

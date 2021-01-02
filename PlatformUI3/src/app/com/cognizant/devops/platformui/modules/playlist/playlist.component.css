@@ -48,7 +48,7 @@
 }
 
 .embed-responsive-item {
-    height: calc(100% - 55px) !important;
+    height: 100% !important;
 }
 
 .embed-responsive {

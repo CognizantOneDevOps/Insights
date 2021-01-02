@@ -16,7 +16,7 @@
 import { Component, OnInit, Injectable } from '@angular/core';
 import { ApplicationMessageDialog } from '@insights/app/modules/application-dialog/application-message-dialog';
 import { ConfirmationMessageDialog } from '@insights/app/modules/application-dialog/confirmation-message-dialog';
-import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
+import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { DataSharedService } from '@insights/common/data-shared-service';
 
 

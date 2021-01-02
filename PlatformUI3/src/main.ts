@@ -31,12 +31,12 @@ if (environment.production) {
       console.log(" debug mode disable " + InsightsInitService.isDebugModeEnable)
       window.console.log = function () { };
     }
-    window.onbeforeunload = function () { return "Back button is not available!"; window.history.forward(1); };
+    window.onbeforeunload = function () { return "Back button is not available!"; window.history.forward(); };
   }
 }
 
 if (environment) {
-  window.onbeforeunload = function () { return "Back button is not available!"; window.history.forward(1); };
+  window.onbeforeunload = function () { return "Back button is not available!"; window.history.forward(); };
 }
 
 platformBrowserDynamic().bootstrapModule(InsightsAppModule)

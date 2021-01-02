@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { BulkUploadService } from '../bulkupload/bulkupload.service';
 import { MessageDialogService } from '../application-dialog/message-dialog-service';
 import { ActivatedRoute, Router } from '@angular/router';
-import { MatDialog } from '@angular/material';
+import { MatDialog } from '@angular/material/dialog';
 import { KpiListDialog } from '../kpiList-Dialog/kpiList-Dialog.component';
 import { KpiService } from '../kpi-addition/kpi-service';
 import { ContentService } from '../content-config-list/content-service';

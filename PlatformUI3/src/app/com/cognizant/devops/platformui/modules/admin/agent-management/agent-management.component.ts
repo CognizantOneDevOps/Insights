@@ -17,7 +17,9 @@ import { Component, OnInit, ViewChild, ChangeDetectorRef } from '@angular/core';
 import { AgentService } from '@insights/app/modules/admin/agent-management/agent-management-service';
 import { SelectionModel } from '@angular/cdk/collections';
 import { Router, NavigationExtras, ActivatedRoute } from '@angular/router';
-import { MatDialog, MatDialogRef, MAT_DIALOG_DATA, MatTableDataSource, MatPaginator } from '@angular/material';
+import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { MatPaginator } from '@angular/material/paginator';
+import { MatTableDataSource } from '@angular/material/table';
 import { MessageDialogService } from '@insights/app/modules/application-dialog/message-dialog-service';
 import { DataSharedService } from '@insights/common/data-shared-service';
 
@@ -41,7 +43,7 @@ export class AgentManagementComponent implements OnInit {
   runDisableStatus: string = "";
   agentListDatasource = new MatTableDataSource<any>();
   showDetail: boolean = false;
-  @ViewChild(MatPaginator) paginator: MatPaginator;
+  @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
   agentList: any;
   selectedAgent: any;
   selectTool: any;

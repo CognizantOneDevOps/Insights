@@ -18,7 +18,7 @@ import { DataSharedService } from '@insights/common/data-shared-service';
 import { Router, ParamMap, ActivatedRoute } from '@angular/router';
 import { RestCallHandlerService } from '@insights/common/rest-call-handler.service';
 import { LoginService } from '@insights/app/login/login.service';
-import { HttpErrorResponse } from "@angular/common/http/src/response";
+import { HttpErrorResponse } from "@angular/common/http";
 import { RestAPIurlService } from '@insights/common/rest-apiurl.service'
 import { CookieService } from 'ngx-cookie';
 import { MessageDialogService } from '@insights/app/modules/application-dialog/message-dialog-service';

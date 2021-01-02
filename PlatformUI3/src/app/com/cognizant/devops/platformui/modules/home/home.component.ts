@@ -23,7 +23,7 @@ import { NavItem } from '@insights/app/modules/home/nav-item';
 import { animate, state, style, transition, trigger } from '@angular/animations';
 import { DataSharedService } from '@insights/common/data-shared-service';
 import { AboutDialog } from '@insights/app/modules/about/about-show-popup';
-import { MatDialog } from '@angular/material';
+import { MatDialog } from '@angular/material/dialog';
 import { ImageHandlerService } from '@insights/common/imageHandler.service';
 import { MessageDialogService } from '@insights/app/modules/application-dialog/message-dialog-service';
 import { ServerConfigurationService } from '@insights/app/modules/server-configuration/server-configuration-service';
@@ -45,7 +45,7 @@ import { ServerConfigurationService } from '@insights/app/modules/server-configu
 
 export class HomeComponent implements OnInit {
 
-  @ViewChild('sidenav') sidenav: ElementRef;
+  @ViewChild('sidenav', { static: true }) sidenav: ElementRef;
   isExpanded = true;
   element: HTMLElement;
   userName: String = '';
@@ -62,7 +62,7 @@ export class HomeComponent implements OnInit {
   iframeWidth = window.innerWidth - 20;
   iframeHeight = window.innerHeight;
   grafanaResponse: any;
-  expanded: boolean;
+  expanded: boolean = false;
   @HostBinding('attr.aria-expanded') ariaExpanded = this.expanded;
   @Input() item: NavItem;
   @Input() depth: number;

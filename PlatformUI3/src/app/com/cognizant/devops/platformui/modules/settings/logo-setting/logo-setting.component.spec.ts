@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  ******************************************************************************/
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 
 import { LogoSettingComponent } from './logo-setting.component';
 
@@ -21,7 +21,7 @@ describe('LogoSettingComponent', () => {
   let component: LogoSettingComponent;
   let fixture: ComponentFixture<LogoSettingComponent>;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [LogoSettingComponent]
     })

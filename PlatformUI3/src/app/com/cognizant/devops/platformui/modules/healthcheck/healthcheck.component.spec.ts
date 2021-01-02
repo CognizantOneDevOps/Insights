@@ -14,7 +14,7 @@
  * the License.
  *******************************************************************************/
 
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 
 import { HealthcheckComponent } from './healthcheck.component';
 
@@ -22,7 +22,7 @@ describe('HealthcheckComponent', () => {
   let component: HealthcheckComponent;
   let fixture: ComponentFixture<HealthcheckComponent>;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [ HealthcheckComponent ]
     })

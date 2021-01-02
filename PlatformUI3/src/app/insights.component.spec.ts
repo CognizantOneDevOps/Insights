@@ -15,11 +15,11 @@
  * the License.
  *******************************************************************************/
 
-import { TestBed, async } from '@angular/core/testing';
+import { TestBed, waitForAsync } from '@angular/core/testing';
 import { InsightsAppComponent } from './insights.component';
 
 describe('InsightsAppComponent', () => {
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [
         InsightsAppComponent

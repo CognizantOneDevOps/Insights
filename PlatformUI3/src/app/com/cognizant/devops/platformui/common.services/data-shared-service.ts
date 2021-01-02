@@ -20,7 +20,7 @@ import { SESSION_STORAGE, StorageService } from 'ngx-webstorage-service';
 import { DatePipe } from '@angular/common';
 import { CookieService } from 'ngx-cookie-service';
 import { Router } from '@angular/router';
-import { MatDialog, MatDialogRef } from '@angular/material';
+import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { ApplicationMessageDialog } from '@insights/app/modules/application-dialog/application-message-dialog';
 import * as CryptoJS from 'crypto-js';
 import { v4 as uuid } from 'uuid';

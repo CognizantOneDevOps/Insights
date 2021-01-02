@@ -16,7 +16,7 @@
 import { Component, OnInit, Injector } from '@angular/core';
 import { RelationshipBuilderService } from '@insights/app/modules/relationship-builder/relationship-builder.service';
 import { ShowJsonDialog } from '@insights/app/modules/relationship-builder/show-correlationjson';
-import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
+import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { RelationLabel } from '@insights/app/modules/relationship-builder/relationship-builder.label';
 import { Router } from "@angular/router";
 import { MessageDialogService } from '@insights/app/modules/application-dialog/message-dialog-service';

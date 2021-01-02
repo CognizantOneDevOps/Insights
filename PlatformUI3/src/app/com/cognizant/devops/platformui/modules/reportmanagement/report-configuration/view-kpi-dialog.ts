@@ -14,7 +14,9 @@
  * the License.
  ******************************************************************************/
 import { Component, OnInit, Inject, ViewChild } from '@angular/core';
-import { MatDialogRef, MAT_DIALOG_DATA, MatPaginator, MatTableDataSource } from '@angular/material';
+import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { MatPaginator } from '@angular/material/paginator';
+import { MatTableDataSource } from '@angular/material/table';
 import { ReportManagementService } from '@insights/app/modules/reportmanagement/reportmanagement.service';
 
 @Component({

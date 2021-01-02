@@ -1,5 +1,7 @@
 import { Component, OnInit, ElementRef, ViewChild } from '@angular/core';
-import { MatTableDataSource, MatPaginator, MatDialogRef } from '@angular/material';
+import { MatDialogRef } from '@angular/material/dialog';
+import { MatPaginator } from '@angular/material/paginator';
+import { MatTableDataSource } from '@angular/material/table';
 import { KpiService } from '../kpi-addition/kpi-service';
 
 @Component({
@@ -11,7 +13,7 @@ export class KpiListDialog implements OnInit {
   kpiList;
   displayedColumns: string[];
   kpiDatasource = new MatTableDataSource<any>();
-  @ViewChild(MatPaginator) paginator: MatPaginator;
+  @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
   selectedKpi: any;
 
   constructor(public kpiService: KpiService, public dialogRef: MatDialogRef<KpiListDialog>) {

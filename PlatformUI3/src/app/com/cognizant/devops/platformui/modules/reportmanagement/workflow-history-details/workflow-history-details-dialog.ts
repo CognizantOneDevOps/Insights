@@ -16,12 +16,9 @@
 
 import { DatePipe, TitleCasePipe } from "@angular/common";
 import { Component, Inject, OnInit, ViewChild } from "@angular/core";
-import {
-  MatDialogRef,
-  MatTableDataSource,
-  MAT_DIALOG_DATA,
-  MatPaginator
-} from "@angular/material";
+import { MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog";
+import { MatPaginator } from "@angular/material/paginator";
+import { MatTableDataSource } from "@angular/material/table";
 import { MessageDialogService } from "@insights/app/modules/application-dialog/message-dialog-service";
 import { ReportManagementService } from "@insights/app/modules/reportmanagement/reportmanagement.service";
 import { DataSharedService } from "@insights/common/data-shared-service";

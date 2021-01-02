@@ -1,4 +1,4 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 
 import { AutomlComponent } from './automl.component';
 
@@ -6,7 +6,7 @@ describe('AutomlComponent', () => {
   let component: AutomlComponent;
   let fixture: ComponentFixture<AutomlComponent>;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [ AutomlComponent ]
     })

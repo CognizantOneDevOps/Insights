@@ -17,16 +17,14 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { DataArchivingService } from '@insights/app/modules/settings/dataarchiving/dataarchiving-service';
 import { DataSharedService } from '@insights/common/data-shared-service';
-import {
-  MatTableDataSource,
-  MatRadioChange,
-  MatSlideToggleChange,
-  MatPaginator
-} from '@angular/material';
+import { MatPaginator } from '@angular/material/paginator';
+import { MatRadioChange } from '@angular/material/radio';
+import { MatSlideToggleChange } from '@angular/material/slide-toggle';
+import { MatTableDataSource } from '@angular/material/table';
 import { MessageDialogService } from '@insights/app/modules/application-dialog/message-dialog-service';
 import { DatePipe } from '@angular/common';
 import { MatDatepickerInputEvent } from '@angular/material/datepicker';
-import { MatDialog } from '@angular/material';
+import { MatDialog } from '@angular/material/dialog';
 import { DataArchiveDetailsDialog } from '@insights/app/modules/settings/dataarchiving/data-archive-details/data-archive-details-dialog';
 import { DataArchiveConfigureURLDialog } from '@insights/app/modules/settings/dataarchiving/data-archive-configureurl/data-archive-configureurl-dialog';
 
@@ -75,7 +73,7 @@ export class DataArchivingComponent implements OnInit {
   clicked = new Array();
   pageRefreshed: boolean = false;
   archivedRecordDetailData = { data: [] };
-  @ViewChild(MatPaginator) paginator: MatPaginator;
+  @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
 
   constructor(
     private dataArchivingService: DataArchivingService,

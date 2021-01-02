@@ -15,7 +15,10 @@
  ******************************************************************************/
 import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { Router, NavigationExtras, ActivatedRoute } from '@angular/router';
-import { MatRadioChange, MatTableDataSource, MatPaginator, MatDialog  } from '@angular/material';
+import { MatDialog } from '@angular/material/dialog';
+import { MatPaginator } from '@angular/material/paginator';
+import { MatRadioChange } from '@angular/material/radio';
+import { MatTableDataSource } from '@angular/material/table';
 import { MessageDialogService } from '@insights/app/modules/application-dialog/message-dialog-service';
 import { MLWizardService } from '@insights/app/modules/model-management/mlwizard/mlwizard.service';
 import { DataSharedService } from '@insights/common/data-shared-service';

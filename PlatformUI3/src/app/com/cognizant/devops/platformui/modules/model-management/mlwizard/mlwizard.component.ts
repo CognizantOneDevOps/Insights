@@ -15,7 +15,10 @@
  ******************************************************************************/
 import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { Router, NavigationExtras, ActivatedRoute } from '@angular/router';
-import { MatTableDataSource, MatSort, MatPaginator, MatDialog } from '@angular/material';
+import { MatDialog } from '@angular/material/dialog';
+import { MatPaginator } from '@angular/material/paginator';
+import { MatSort } from '@angular/material/sort';
+import { MatTableDataSource } from '@angular/material/table';
 import { MLWizardService } from '@insights/app/modules/model-management/mlwizard/mlwizard.service';
 import { MessageDialogService } from '@insights/app/modules/application-dialog/message-dialog-service';
 import { InsightsInitService } from '@insights/common/insights-initservice';
@@ -36,7 +39,7 @@ export class MLWizardComponent implements OnInit {
 
 
   isNlpDisabled = []
-  @ViewChild('fileInput') csvFileDiv: ElementRef;
+  @ViewChild('fileInput', { static: true }) csvFileDiv: ElementRef;
   disableparsebutton: boolean = false;
   buttonEnabled: boolean = false;
   file: File = null;
@@ -65,7 +68,7 @@ export class MLWizardComponent implements OnInit {
   target: string = null;
   regex = new RegExp('^[a-zA-Z0-9_]*$');
   enablesavebutton: boolean = false;
-  @ViewChild(MatPaginator) paginator: MatPaginator;
+  @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
   constructor(private mlwizardService: MLWizardService, public router: Router, private route: ActivatedRoute,
     public messageDialog: MessageDialogService, public config: InsightsInitService, public reportmanagementService: ReportManagementService) {
       this.getTaskList();

@@ -14,7 +14,7 @@
  * the License.
  ******************************************************************************/
 
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 
 import { BusinessmappingComponent } from './businessmapping.component';
 
@@ -22,7 +22,7 @@ describe('BusinessmappingComponent', () => {
   let component: BusinessmappingComponent;
   let fixture: ComponentFixture<BusinessmappingComponent>;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [ BusinessmappingComponent ]
     })

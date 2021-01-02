@@ -15,16 +15,13 @@
  ******************************************************************************/
 
 import { Component, OnInit } from '@angular/core';
-import { Router, ActivatedRoute, ParamMap } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { Observable } from 'rxjs';
-import { switchMap } from 'rxjs/operators';
-import { DomSanitizer, BrowserModule, SafeUrl, SafeResourceUrl } from '@angular/platform-browser';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { InsightsInitService } from '@insights/common/insights-initservice';
 import { GrafanaDashboardService } from '@insights/app/modules/grafana-dashboard/grafana-dashboard-service';
-import { GrafanaAuthenticationService } from '@insights/common/grafana-authentication-service';
 import { GrafanaDashboardMode } from '@insights/app/modules/grafana-dashboard/grafana-dashboard-model';
 import { CookieService } from 'ngx-cookie-service';
-import { HomeComponent } from '@insights/app/modules/home/home.component';
 
 
 @Component({

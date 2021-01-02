@@ -1,4 +1,4 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 
 import { KpiAdditionComponent } from './kpi-addition.component';
 
@@ -6,7 +6,7 @@ describe('KpiAdditionComponent', () => {
   let component: KpiAdditionComponent;
   let fixture: ComponentFixture<KpiAdditionComponent>;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [KpiAdditionComponent]
     })

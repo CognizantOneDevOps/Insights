@@ -1,8 +1,9 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { Router, NavigationExtras } from '@angular/router';
-import { MatDialog } from '@angular/material';
+import { MatDialog } from '@angular/material/dialog';
 import { FileUploadDialog } from '../fileUploadDialog/fileUploadDialog.component';
-import { MatTableDataSource, MatPaginator } from '@angular/material';
+import { MatPaginator } from '@angular/material/paginator';
+import { MatTableDataSource } from '@angular/material/table';
 import { KpiService } from '../kpi-addition/kpi-service';
 import { MessageDialogService } from '../application-dialog/message-dialog-service';
 import { ContentService } from '../content-config-list/content-service';
@@ -14,7 +15,7 @@ import { ContentService } from '../content-config-list/content-service';
 })
 export class KpiCreationComponent implements OnInit {
   displayedColumns = [];
-  @ViewChild(MatPaginator) paginator: MatPaginator;
+  @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
   kpiDatasource = new MatTableDataSource<any>();
   enableEdit: boolean = false;
   onRadioBtnSelect: boolean = false;

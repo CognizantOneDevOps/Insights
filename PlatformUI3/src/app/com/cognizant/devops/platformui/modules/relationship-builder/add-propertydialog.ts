@@ -14,7 +14,9 @@
  * the License.
  ******************************************************************************/
 import { Component, OnInit, Inject, ViewChild, Injector, EventEmitter, Output } from '@angular/core';
-import { MatDialog, MatDialogRef, MAT_DIALOG_DATA, MatPaginator, MatTableDataSource } from '@angular/material';
+import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { MatPaginator } from '@angular/material/paginator';
+import { MatTableDataSource } from '@angular/material/table';
 import { FormBuilder, FormGroup, FormArray } from '@angular/forms';
 
 

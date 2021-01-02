@@ -28,7 +28,7 @@ const appRoutes: Routes = [
   { path: 'ssologin', component: SSOLoginComponent },
   { path: 'logout/:id', component: LogoutHandlerComponent },
   { path: '**', component: PageNotFoundComponent },
-  { path: 'Insights/Home', loadChildren: '@insights/app/modules/home.modules#HomeModules', canActivate: [AuthGuard]  }
+  { path: 'Insights/Home', loadChildren: () => import('@insights/app/modules/home.modules').then(m => m.HomeModules), canActivate: [AuthGuard]  }
 ];
 
-export const InsightsModuleRouting: ModuleWithProviders = RouterModule.forRoot(appRoutes, { useHash: true });//{ useHash: true  , onSameUrlNavigation: 'reload' , enableTracing: true }
+export const InsightsModuleRouting: ModuleWithProviders<RouterModule> = RouterModule.forRoot(appRoutes, { useHash: true, relativeLinkResolution: 'legacy' });//{ useHash: true  , onSameUrlNavigation: 'reload' , enableTracing: true }

@@ -14,7 +14,9 @@
  * the License. */
 
 import { Component, Inject, OnInit, ViewChild } from "@angular/core";
-import { MatDialogRef, MAT_DIALOG_DATA, MatPaginator, MatTableDataSource } from '@angular/material';
+import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { MatPaginator } from '@angular/material/paginator';
+import { MatTableDataSource } from '@angular/material/table';
 import { MLWizardService } from '@insights/app/modules/model-management/mlwizard/mlwizard.service';
 import { MessageDialogService } from "@insights/app/modules/application-dialog/message-dialog-service";
 import { DataSharedService } from "@insights/common/data-shared-service";

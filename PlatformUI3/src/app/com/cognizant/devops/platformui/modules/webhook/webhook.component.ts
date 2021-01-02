@@ -15,10 +15,11 @@
  ******************************************************************************/
 import { Component, OnInit, ViewChild } from "@angular/core";
 import { WebHookService } from "@insights/app/modules/webhook/webhook.service";
-import { MatDialog } from "@angular/material";
+import { MatDialog } from "@angular/material/dialog";
 import { Router } from "@angular/router";
 import { MessageDialogService } from "@insights/app/modules/application-dialog/message-dialog-service";
-import { MatTableDataSource, MatPaginator } from "@angular/material";
+import { MatPaginator } from "@angular/material/paginator";
+import { MatTableDataSource } from "@angular/material/table";
 import { DataSharedService } from "@insights/common/data-shared-service";
 import { BulkUploadService } from "@insights/app/modules/bulkupload/bulkupload.service";
 import { InsightsInitService } from "@insights/common/insights-initservice";

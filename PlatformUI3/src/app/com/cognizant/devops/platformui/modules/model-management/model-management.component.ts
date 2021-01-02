@@ -14,7 +14,10 @@
  * the License.
  ******************************************************************************/
 import { Component, OnInit, ViewChild, ChangeDetectorRef } from '@angular/core';
-import { MatTableDataSource, MatPaginator, MatDialog, MatSlideToggleChange } from '@angular/material';
+import { MatDialog } from '@angular/material/dialog';
+import { MatPaginator } from '@angular/material/paginator';
+import { MatSlideToggleChange } from '@angular/material/slide-toggle';
+import { MatTableDataSource } from '@angular/material/table';
 import { MessageDialogService } from '@insights/app/modules/application-dialog/message-dialog-service';
 import { ModelManagementService } from '@insights/app/modules/model-management/model-management.service';
 import {Router,NavigationExtras } from '@angular/router';
@@ -30,7 +33,7 @@ export class ModelManagementComponent implements OnInit {
 
   toDelete: string = null;
   UsecaseListDatasource = new MatTableDataSource<any>();
-  @ViewChild(MatPaginator) paginator: MatPaginator;
+  @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
   displayedColumns = [];
   timeZone: string = '';
   usecaseList: any;

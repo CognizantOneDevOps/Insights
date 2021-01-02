@@ -17,7 +17,7 @@ import { Component, OnInit } from '@angular/core';
 import { DataDictionaryService } from '@insights/app/modules/datadictionary/datadictionary.service';
 import { DataSharedService } from '@insights/common/data-shared-service';
 import { ShowJsonDialog } from '@insights/app/modules/relationship-builder/show-correlationjson';
-import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
+import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { RelationshipBuilderService } from '@insights/app/modules/relationship-builder/relationship-builder.service';
 import { RelationLabel } from '@insights/app/modules/relationship-builder/relationship-builder.label';
 

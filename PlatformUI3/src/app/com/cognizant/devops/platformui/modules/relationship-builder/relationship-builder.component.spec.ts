@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  ******************************************************************************/
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 
 import { RelationshipBuilderComponent } from './relationship-builder.component';
 
@@ -21,7 +21,7 @@ describe('RelationshipBuilderComponent', () => {
   let component: RelationshipBuilderComponent;
   let fixture: ComponentFixture<RelationshipBuilderComponent>;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [ RelationshipBuilderComponent ]
     })

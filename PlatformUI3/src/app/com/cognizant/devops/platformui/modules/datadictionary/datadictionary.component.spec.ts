@@ -16,7 +16,7 @@
 
 
 
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 
 import { DatadictionaryComponent } from './datadictionary.component';
 
@@ -24,7 +24,7 @@ describe('DatadictionaryComponent', () => {
   let component: DatadictionaryComponent;
   let fixture: ComponentFixture<DatadictionaryComponent>;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [ DatadictionaryComponent ]
     })

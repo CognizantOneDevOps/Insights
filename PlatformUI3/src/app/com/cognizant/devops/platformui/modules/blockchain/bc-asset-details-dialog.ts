@@ -14,7 +14,10 @@
  * the License.
  *******************************************************************************/
 import { Component, OnInit, Inject, ViewChild, ChangeDetectorRef } from '@angular/core';
-import { MatDialog, MatDialogRef, MAT_DIALOG_DATA, MatPaginator, MatTableDataSource, MatSort } from '@angular/material';
+import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { MatPaginator } from '@angular/material/paginator';
+import { MatSort } from '@angular/material/sort';
+import { MatTableDataSource } from '@angular/material/table';
 import { RestCallHandlerService } from '@insights/common/rest-call-handler.service';
 import { BlockChainService } from '@insights/app/modules/blockchain/blockchain.service';
 import { animate, state, style, transition, trigger } from '@angular/animations';
@@ -50,8 +53,8 @@ export class AssetDetailsDialog implements OnInit {
     assetHistoryDataSource = new MatTableDataSource<AssetHistoryData>([]);
     MAX_ROWS_PER_TABLE = 10;
     assetID: string = "";
-    @ViewChild(MatSort) sort: MatSort;
-    @ViewChild(MatPaginator) paginator: MatPaginator;
+    @ViewChild(MatSort, { static: true }) sort: MatSort;
+    @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
     expandedElement: AssetHistoryData | null;
     headerArrayDisplay = [];
     masterHeader = new Map<String, String>();

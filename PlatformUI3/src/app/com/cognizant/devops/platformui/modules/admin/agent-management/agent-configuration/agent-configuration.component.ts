@@ -54,7 +54,7 @@ export class AgentConfigurationComponent implements OnInit {
   files = [];
   fileUploadSuccessMessage: string = "";
   fileUploadErrorMessage: string = "";
-  trackingUploadedFileContentStr: string = "";
+  trackingUploadedFileContentStr: any = "";
   showTrackingJsonUploadButton: boolean;
   buttonDisableStatus: boolean = true;
   isRegisteredTool: boolean = false;

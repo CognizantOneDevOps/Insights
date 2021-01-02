@@ -15,7 +15,6 @@
  ******************************************************************************/
 import { Injectable } from '@angular/core';
 import { RestCallHandlerService } from '@insights/common/rest-call-handler.service';
-import { Observable, throwError } from 'rxjs';
 
 export interface IAgentService {
     loadGlobalHealthConfigurations(): Promise<any>;

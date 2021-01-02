@@ -15,8 +15,7 @@
  ******************************************************************************/
 import { Injectable } from '@angular/core';
 import { RestCallHandlerService } from '@insights/common/rest-call-handler.service';
-import { HttpClient } from '@angular/common/http';
-import { Observable, BehaviorSubject } from 'rxjs';
+
 
 @Injectable()
 export class ReportTemplateService {

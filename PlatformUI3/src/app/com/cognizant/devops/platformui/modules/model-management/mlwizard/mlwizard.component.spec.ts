@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  ******************************************************************************/
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 
 import { MLWizardComponent } from './mlwizard.component';
 
@@ -21,7 +21,7 @@ describe('AiwizardComponent', () => {
   let component: MLWizardComponent;
   let fixture: ComponentFixture<MLWizardComponent>;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [ MLWizardComponent ]
     })

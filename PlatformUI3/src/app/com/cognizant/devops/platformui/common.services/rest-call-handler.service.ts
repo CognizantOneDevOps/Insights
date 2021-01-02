@@ -1,3 +1,6 @@
+
+import {of as observableOf,  Observable, throwError } from 'rxjs';
+
 /*******************************************************************************
  * Copyright 2019 Cognizant Technology Solutions
  * 
@@ -15,14 +18,13 @@
  ******************************************************************************/
 
 import { Injectable } from '@angular/core';
-import { Observable, throwError } from 'rxjs'
 import { RestAPIurlService } from '@insights/common/rest-apiurl.service'
 import { HttpClient, HttpHeaders, HttpParams, HttpErrorResponse } from '@angular/common/http';
 import { DataSharedService } from '@insights/common/data-shared-service';
-import 'rxjs/Rx';
 import { MessageDialogService } from '@insights/app/modules/application-dialog/message-dialog-service';
 import { Router, NavigationExtras } from '@angular/router';
-import { AutheticationProtocol, RequestHeader } from '@insights/common/insights-enum';
+import { RequestHeader } from '@insights/common/insights-enum';
+import { catchError } from 'rxjs/operators';
 
 @Injectable()
 export class RestCallHandlerService {
@@ -159,7 +161,7 @@ export class RestCallHandlerService {
         headers: headers,
         params: params
       }
-      dataresponse = this.http.post(restCallUrl, {}, httpOptions).catch((e: any) => Observable.throw(this.handleTokenError(e)));
+      dataresponse = this.http.post(restCallUrl, {}, httpOptions).pipe(catchError((e: any) => throwError(this.handleTokenError(e))));
       return dataresponse;
     } else {
       console.log("Session Expire")
@@ -179,7 +181,7 @@ export class RestCallHandlerService {
           'Authorization': authToken,
           'user': webAuthToken
         },
-      }).catch((e: any) => Observable.throw(this.handleTokenError(e)))
+      }).pipe(catchError((e: any) => throwError(this.handleTokenError(e))))
       return dataresponse;
     } else {
       console.log("Session Expire")
@@ -197,7 +199,7 @@ export class RestCallHandlerService {
           'Authorization': authToken,
           'user': webAuthToken
         },
-      }).catch((e: any) => Observable.throw(this.handleTokenError(e)))
+      }).pipe(catchError((e: any) => throwError(this.handleTokenError(e))))
       return dataresponse;
     } else {
       console.log("Session Expire")
@@ -304,11 +306,11 @@ export class RestCallHandlerService {
         headers: headers,
         params: params
       }
-      dataresponse = this.http.post(restCallUrl, data, httpOptions)
-        .catch((e: HttpErrorResponse) => {
+      dataresponse = this.http.post(restCallUrl, data, httpOptions).pipe(
+        catchError((e: HttpErrorResponse) => {
           this.handleTokenError(e)
           throw e.error.message
-        });
+        }));
       return dataresponse;
     } else {
       console.log("Session Expired")
@@ -334,7 +336,7 @@ export class RestCallHandlerService {
 
   private handleError(error: any) {
     console.error('An error occurred', error);
-    return Observable.of(false);
+    return observableOf(false);
   }
   private extend(obj: Object, src: Object) {
     for (var key in src) {

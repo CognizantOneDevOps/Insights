@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
 import { RestCallHandlerService } from '@insights/common/rest-call-handler.service';
-import { Observable } from 'rxjs';
-import { HttpHeaders, HttpClient, HttpParams } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { DataSharedService } from '@insights/common/data-shared-service';
 
 

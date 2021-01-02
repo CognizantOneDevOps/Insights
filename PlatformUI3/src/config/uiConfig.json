@@ -1,6 +1,6 @@
 {
 	"showBusinessMapping": true,
-	"showAuditReporting": false,
+	"showAuditReporting": true,
 	"showWebhookConfiguration": true,
 	"enableInsightsToolbar": true,
 	"enableLogoutButton": true,

@@ -16,7 +16,11 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { Router, NavigationExtras } from '@angular/router';
 import { ReportTemplateService } from './report-template-service';
-import { MatTableDataSource, MatPaginator, MatDialog, MatRadioChange, MatSlideToggleChange } from '@angular/material';
+import { MatDialog } from '@angular/material/dialog';
+import { MatPaginator } from '@angular/material/paginator';
+import { MatRadioChange } from '@angular/material/radio';
+import { MatSlideToggleChange } from '@angular/material/slide-toggle';
+import { MatTableDataSource } from '@angular/material/table';
 import { KpiReportListDialog } from './report-template-kpi-list/kpi-report-List-Dialog.component';
 import { DataSharedService } from '@insights/common/data-shared-service';
 import { MessageDialogService } from '@insights/app/modules/application-dialog/message-dialog-service';
@@ -50,7 +54,7 @@ export class ReportTemplateComponent implements OnInit {
   templateDatasource = new MatTableDataSource<any>();
   formDataFiles = new FormData();
   enableAttachFile: boolean = false;
-  @ViewChild(MatPaginator) paginator: MatPaginator;
+  @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
 
 
   constructor(public reportTemplateService: ReportTemplateService, private dialog: MatDialog,

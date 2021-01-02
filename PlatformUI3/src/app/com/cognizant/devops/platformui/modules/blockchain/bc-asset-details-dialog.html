@@ -133,7 +133,7 @@
 
 <div  class="hide" [class.block]="list?.length > 0 && pipeline">
     <div class="PWGx-PipelineGraph" style="position: relative; overflow: auto;">
-      <svg  [attr.width.px]="(253.75 + ((list.length) * 120))" [attr.height.px]="125 + (pipeheight * 70) + 300">
+      <svg  [attr.width]="(253.75 + ((list.length) * 120))" [attr.height]="125 + (pipeheight * 70) + 300">
     
         <g transform="translate(40,55)" class="PWGx-pipeline-node" *ngIf="list[0]?.child?.length >= 2">
           <circle r="7" class="PWGx-pipeline-node-terminal"></circle>

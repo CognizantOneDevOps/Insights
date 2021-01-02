@@ -21,7 +21,8 @@ import { MatIconRegistry } from '@angular/material/icon';
 import { APP_INITIALIZER } from '@angular/core';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MaterialModule } from '@insights/app/material.module';
-import { MatDialog, MatDialogRef, MAT_DIALOG_DATA, MatDialogModule, MatSortModule } from '@angular/material';
+import { MatDialog, MatDialogRef, MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
+import { MatSortModule } from '@angular/material/sort';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { HomeRouting } from '@insights/app/modules/home.routing';
 import { SharedServices } from '@insights/app/shared.services';
@@ -70,7 +71,6 @@ import { CustomReportComponent } from '@insights/app/modules/blockchain/custom-r
 import { CustomReportConfigComponent } from '@insights/app/modules/blockchain/custom-report/custom-report-configuration/custom-report-configuration.component';
 import { QueryBuilderService } from '@insights/app/modules/blockchain/custom-report/custom-report-service';
 import { ShowJsonDialog } from '@insights/app/modules/relationship-builder/show-correlationjson';
-import { from } from 'rxjs';
 import { RelationshipBuilderComponent } from '@insights/app/modules/relationship-builder/relationship-builder.component';
 import { RelationshipBuilderService } from '@insights/app/modules/relationship-builder/relationship-builder.service';
 import { BulkUploadComponent } from '@insights/app/modules/bulkupload/bulkupload.component';

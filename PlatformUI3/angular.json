@@ -11,6 +11,7 @@
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
+            "aot": true,
             "outputPath": "app",
             "index": "src/index.html",
             "main": "src/main.ts",
@@ -29,14 +30,22 @@
             ],
             "scripts": [
               "node_modules/crypto-js/crypto-js.js"
-            ]
+            ],
+            "allowedCommonJsDependencies": [
+              "crypto.js", "uuid", "rxjs/Rx", "xlsx", "file-saver", "crypto-js", "dragula"
+           ]
           },
           "configurations": {
             "production": {
+              "budgets": [
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "6kb"
+                }
+              ],
               "optimization": true,
               "outputHashing": "all",
               "sourceMap": false,
-              "extractCss": true,
               "namedChunks": false,
               "aot": true,
               "extractLicenses": true,
@@ -132,7 +141,7 @@
   "schematics": {
     "@schematics/angular:component": {
       "prefix": "app",
-      "styleext": "css"
+      "style": "css"
     },
     "@schematics/angular:directive": {
       "prefix": "app"

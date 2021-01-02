@@ -16,7 +16,11 @@
 import { Component, OnInit, Inject, ViewEncapsulation } from '@angular/core';
 import { InsightsInitService } from '@insights/common/insights-initservice';
 import { HealthCheckService } from '@insights/app/modules/healthcheck/healthcheck.service';
-import { MatTableDataSource, MatSort, MatPaginator, MatDialog, MatDialogRef, MAT_DIALOG_DATA, MatSlideToggleChange } from '@angular/material';
+import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { MatPaginator } from '@angular/material/paginator';
+import { MatSlideToggleChange } from '@angular/material/slide-toggle';
+import { MatSort } from '@angular/material/sort';
+import { MatTableDataSource } from '@angular/material/table';
 import { ShowDetailsDialog } from '@insights/app/modules/healthcheck/healthcheck-show-details-dialog';
 import { CommonModule, DatePipe } from '@angular/common';
 import { WorkflowHistoryDetailsDialog } from '@insights/app/modules/reportmanagement/workflow-history-details/workflow-history-details-dialog';

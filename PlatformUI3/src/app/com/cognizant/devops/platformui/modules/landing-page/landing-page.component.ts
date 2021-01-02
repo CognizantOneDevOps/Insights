@@ -15,13 +15,11 @@
  ******************************************************************************/
 import { Component, OnInit, Input } from '@angular/core';
 import { Observable } from 'rxjs';
-import { SafeResourceUrl, DomSanitizer } from '@angular/platform-browser';
+import { SafeResourceUrl } from '@angular/platform-browser';
 import { GrafanaDashboardMode } from '../grafana-dashboard/grafana-dashboard-model';
-import { GrafanaDashboardService } from '../grafana-dashboard/grafana-dashboard-service';
 import { InsightsInitService } from '@insights/common/insights-initservice';
 import { LandingPageService } from './landing-page.service';
-import { RouterLinkWithHref, NavigationExtras, Router, NavigationStart, ActivatedRoute, ParamMap } from '@angular/router';
-import { Event } from '@angular/router';
+import { NavigationExtras, Router, ActivatedRoute, ParamMap } from '@angular/router';
 import { DataSharedService } from '@insights/common/data-shared-service';
 
 @Component({

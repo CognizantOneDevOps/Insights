@@ -15,7 +15,9 @@
  *******************************************************************************/
 
 import { Component, OnInit, Inject, ViewChild } from '@angular/core';
-import { MatDialog, MatDialogRef, MAT_DIALOG_DATA, MatPaginator, MatTableDataSource } from '@angular/material';
+import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { MatPaginator } from '@angular/material/paginator';
+import { MatTableDataSource } from '@angular/material/table';
 import { TraceabiltyService } from './traceablity-builder.service';
 import { DatePipe } from '@angular/common';
 import { DataSharedService } from '@insights/common/data-shared-service';

@@ -17,14 +17,12 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { MessageDialogService } from '@insights/app/modules/application-dialog/message-dialog-service';
-import {
-  MatTableDataSource,
-  MatRadioChange,
-  MatSort,
-  MatPaginator,
-  MatDialog,
-  MatSlideToggleChange
-} from '@angular/material';
+import { MatDialog } from '@angular/material/dialog';
+import { MatPaginator } from '@angular/material/paginator';
+import { MatRadioChange } from '@angular/material/radio';
+import { MatSlideToggleChange } from '@angular/material/slide-toggle';
+import { MatSort } from '@angular/material/sort';
+import { MatTableDataSource } from '@angular/material/table';
 import { Router, NavigationExtras } from '@angular/router';
 import { DataSharedService } from '@insights/common/data-shared-service';
 import { ReportManagementService } from '@insights/app/modules/reportmanagement/reportmanagement.service';

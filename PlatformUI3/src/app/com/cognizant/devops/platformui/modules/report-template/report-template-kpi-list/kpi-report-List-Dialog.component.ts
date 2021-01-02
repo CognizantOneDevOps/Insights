@@ -1,5 +1,7 @@
 import { Component, OnInit, ElementRef, ViewChild, Inject } from '@angular/core';
-import { MatTableDataSource, MatPaginator, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
+import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { MatPaginator } from '@angular/material/paginator';
+import { MatTableDataSource } from '@angular/material/table';
 import { ReportTemplateService } from '../report-template-service';
 
 @Component({
@@ -11,7 +13,7 @@ export class KpiReportListDialog implements OnInit {
   kpiList;
   displayedColumns: string[];
   kpiDatasource = new MatTableDataSource<any>();
-  @ViewChild(MatPaginator) paginator: MatPaginator;
+  @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
   selectedKpi: any;
   templateName: string;
 
