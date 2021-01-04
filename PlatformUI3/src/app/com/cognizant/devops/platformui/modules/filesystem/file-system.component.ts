@@ -15,12 +15,13 @@
  ******************************************************************************/
 
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { Router, NavigationExtras } from '@angular/router';
-import { MatTableDataSource, MatPaginator, MatDialog, MatRadioChange, MatSlideToggleChange } from '@angular/material';
-import { DataSharedService } from '@insights/common/data-shared-service';
+import { MatPaginator } from '@angular/material/paginator';
+import { MatRadioChange } from '@angular/material/radio';
+import { MatTableDataSource } from '@angular/material/table';
+import { NavigationExtras, Router } from '@angular/router';
 import { MessageDialogService } from '@insights/app/modules/application-dialog/message-dialog-service';
-import { FileSystemService } from './file-system.service';
 import { saveAs as importedSaveAs } from "file-saver";
+import { FileSystemService } from './file-system.service';
 
 
 

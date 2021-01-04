@@ -14,14 +14,10 @@
  * the License.
  ******************************************************************************/
 
-import { Component, OnInit, ViewChild } from '@angular/core';
-import { Router, NavigationExtras, ActivatedRoute } from '@angular/router';
-import { MatTableDataSource, MatPaginator, MatDialog, MatRadioChange, MatSlideToggleChange } from '@angular/material';
-import { DataSharedService } from '@insights/common/data-shared-service';
+import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute, NavigationExtras, Router } from '@angular/router';
 import { MessageDialogService } from '@insights/app/modules/application-dialog/message-dialog-service';
 import { FileSystemService } from '../file-system.service';
-
-
 
 @Component({
   selector: 'app-filesystem-config',
