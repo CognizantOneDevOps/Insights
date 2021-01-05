@@ -99,7 +99,7 @@ public class InsightsKPIProcessor {
 			for (QueryModel model : queryModelList) {
 				if (kpiDefinition.getCategory().equalsIgnoreCase(ReportEngineUtils.PREDICTION)) {
 					List<JsonObject> result = kPIQueryDataHandler.fetchKPIData(model.getQuery(), kpiDefinition, model);					
-					listOfResultJson.addAll(AutoMLPrediction.predictRegression(result,
+					listOfResultJson.addAll(AutoMLPrediction.getPrediction(result,
 							result.get(0).get("columnProperty").getAsJsonArray(), kpiDefinition.getUsecaseName()));
 				} else {
 					listOfResultJson.addAll(kPIQueryDataHandler.fetchKPIData(model.getQuery(), kpiDefinition, model));

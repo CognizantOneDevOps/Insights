@@ -46,6 +46,7 @@
       </button>
     </div>
 
+   
     <table class="mat-elevation-z8 mat-table" style="margin-top:3% !important">
       <thead>
           <tr class="mat-header-row" layout-align="start start">
@@ -98,72 +99,70 @@
          
       </tbody>
   </table>
-    <!-- <div class="searchBoxStyle">
-      <div layout layout-align="left" class="searchTitleTxt">
-     Upload Data      </div>
-        <div class="dateRowStyle">
-        <div class="dateElementStyle">
-          <mat-form-field>
-            <a>UseCase Name</a>
-            <a class="redFontStyle">*</a>
-            <input matInput value="{{usecaseid}}" (blur)="verifyId($event.target.value)">
-          </mat-form-field>
-        </div>
-        &nbsp;&nbsp;&nbsp;
-        <div class="dateElementStyle">
-          <a>Upload a csv file</a>
-          <a class="redFontStyle">*</a>
-          <input #fileInput style="margin-top:3vh" id="file" type="file" accept=".csv"
-          (change)="onSelectCsv($event)"/>
-          <button [disabled]="!buttonEnabled" mat-icon-button (click)="uploadCsv()">
-            <mat-icon style="font-size: 40px;margin-top: 2vh;" title="Upload Csv" class="mat-icon material-icons">
-              cloud_upload
-            </mat-icon>
-          </button>
-          <button [disabled]="!buttonEnabled" mat-icon-button (click)="cancelUpload()">
-            <mat-icon style="font-size: 40px;margin-top: 2vh; margin-left: 3vh;" title="Cancel Upload"
-              class="mat-icon material-icons">cancel</mat-icon>
-          </button>
-        </div>
-      </div>
-    </div> -->
+ 
 
-    <!-- Displays Progress spinner until we get server response to display result-->
-  <!-- <div class="progressBarStyle">
-    <mat-progress-bar *ngIf="displayProgressSpinner" color="primary" mode="indeterminate">
-    </mat-progress-bar>
-  </div> -->
+  <div [hidden]="!isSmallTableVisible">
+  <table class="mat-elevation-z8 mat-table" style="margin-top:3% !important">
+    <thead>
+        <tr class="mat-header-row" layout-align="start start">
+            <th colspan="5" class="tableHeaderCss mat-header-cell" style=" border-radius: 10px 10px 0 0;">
+                <span class="mainHeaderText">Enter Split Ratio & Target Column</span>
+                <span class="infoHeaderText">(Please provide accurate details.
+                  Fields marked "<span style="color:#ff0000;">*</span>" are mandatory)
+                </span>
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr class="mat-row-webhook" style>
+            <td class="mat-cell" class="columnName">
+                <span class="mainText">Split Ratio</span>
+                <span style="color:#ff0000;">*</span>
+            </td>
+            <td class="columnComponent" style="width:30% ;padding-top: 3vh">
+              <mat-slider matInput min="10" max="90" step="10" color="primary" style="margin-left: 8px;" thumbLabel tickInterval="1" required
+              placeholder="Split Ratio" [(ngModel)]="splitRatio" ></mat-slider>
+            </td>
+            <td class="columnComponent" style="width:20%;">
+              <span class="mainText">Maximum models to run</span>
+              <span style="color:#ff0000;">*</span>
+          </td>
+            <td class="mat-cell" style="padding-top: 3vh">
+              <mat-slider matInput min="1" max="9" step="1" color="primary" thumbLabel tickInterval="1" required
+              placeholder="Max_models" [(ngModel)]="noOfModels"></mat-slider>
+            </td>           
+        </tr>
 
-  <div [hidden]="!isSmallTableVisible" >
-    <div class="searchBoxStyle">
-      <div layout layout-align="left" style="padding-left:25px;" class="searchTitleTxt">
-        Enter Split Ratio & Target Column
-      </div>
-        <div class="dateRowStyle">
-        <div class="dateElementStyle" style="padding-top: 3vh;margin-left: 15px;">
-          <mat-label>Split Ratio</mat-label>
-          <mat-slider matInput min="10" max="90" step="10" color="primary" style="margin-left: 8px;" thumbLabel tickInterval="1" required
-          placeholder="Split Ratio" [(ngModel)]="splitRatio" ></mat-slider>
-        </div>
-        &nbsp;&nbsp;&nbsp;
-        <div class="dateElementStyle" style="padding-top: 3vh;margin-left: 10px;">
-          <mat-label>Maximum ML Models to run</mat-label>
-          <mat-slider matInput min="1" max="9" step="1" style="margin-left: 8px;" color="primary" thumbLabel tickInterval="1" required
-          placeholder="Max_models" [(ngModel)]="noOfModels"></mat-slider>
-        </div>
-        <div class="dateElementStyle" style="margin-top: 26px;margin-left: 10px;">
-          <label>Response Column</label>
-          <mat-select  style="margin-left: 10px;width: 260px;font-size: 15px;border: 1px solid #ccc;padding: 2px !important;border-radius: 4px;" 
-          required placeholder="Select Target"  [(ngModel)]="target">
-          <mat-option *ngFor="let hd of headers" value="{{hd}}">{{hd}}</mat-option>
-         </mat-select>
-      </div>
-      </div>
-    </div>
-  </div>
-
+        <tr class="mat-row-webhook" >
+          <td class="mat-cell" class="columnName" style="width:20%">
+              <span class="mainText">Response Column</span>
+              <span style="color:#ff0000;">*</span>
+          </td>
+          <td class="columnComponent" style="width:30%">
+            <mat-select  style="margin-left: 10px;width: 260px;font-size: 15px;border: 1px solid #ccc;padding: 2px !important;border-radius: 4px;" 
+            required placeholder="Select Target"  [(ngModel)]="target">
+            <mat-option *ngFor="let hd of headers" value="{{hd}}">{{hd}}</mat-option>
+           </mat-select>
+          </td>
+          <td class="extraColCss">
+          
+              <span class="mainText">Prediction Type</span>
+              <span style="color:#ff0000;">*</span>
+         
+          </td>
+          <td>
+            <mat-select  style="margin-left: 10px;width: 260px;font-size: 15px;border: 1px solid #ccc;padding: 2px !important;border-radius: 4px;" 
+            required placeholder="Select Prediction Type"  [(ngModel)]="ptype">
+            <mat-option *ngFor="let type of predictionTypes" value="{{type}}">{{type}}</mat-option>
+           </mat-select>
+          </td>
+      </tr>
+       
+    </tbody>
+</table>
+</div>
     <div [hidden]="!isSmallTableVisible">
-      <table mat-table [dataSource]="dataSource" matSort>
+      <table mat-table [dataSource]="dataSource" style="margin-top:3% !important" matSort>
 
         <ng-container matColumnDef="colIndex">
           <th mat-header-cell *matHeaderCellDef class="tableHeaderCss" style="width:10% !important;" mat-sort-header> S.No. </th>
@@ -202,16 +201,6 @@
       </table>
       <mat-paginator [style.height.%]="8" #paginator pageSize="10" showFirstLastButtons class="paginationStyle">
       </mat-paginator>
-    </div>
-
-    
-
-    <!-- <div [hidden]="!isSmallTableVisible" style="margin-left:-15px;"><app-automl></app-automl></div> -->
-
-    <!-- <button mat-raised-button [hidden]="!isSmallTableVisible" [disabled]="disableparsebutton"
-     style="float: right; margin-top: 2vh; margin-right: 29vh;"
-    (click)="uploadData()">Parse</button>
-    <button mat-icon-button [hidden]="hideNav" (click)="navigate()"><mat-icon style="font-size: 35px;">
-      chevron_right</mat-icon></button> -->
+    </div>  
   
 </div>

@@ -17,18 +17,25 @@ package com.cognizant.devops.automl.service;
 
 
 import java.io.File;
+import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import javax.persistence.NoResultException;
+
+import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.pdfbox.io.IOUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.util.FileSystemUtils;
 import org.springframework.web.multipart.MultipartFile;
+
 import com.cognizant.devops.platformcommons.constants.ConfigOptions;
-import com.cognizant.devops.platformcommons.core.enums.AutMLEnum;
+import com.cognizant.devops.platformcommons.core.enums.AutoMLEnum;
 import com.cognizant.devops.platformcommons.core.enums.WorkflowTaskEnum;
 import com.cognizant.devops.platformcommons.core.util.InsightsUtils;
 import com.cognizant.devops.platformcommons.dal.ai.H2oApiCommunicator;
@@ -158,24 +165,24 @@ public class TrainModelsServiceImpl implements ITrainModelsService {
     public JsonObject downloadMojo(String usecase, String modelId) throws InsightsCustomException {
 		JsonObject response = new JsonObject();
 		try {
-			response = h2oApiCommunicator.downloadMojo(usecase, modelId);
-			if (response.get("Status").getAsInt() == 200) {
-				String path =response.get("Path").getAsString();
+			InputStream fileStream = h2oApiCommunicator.downloadMojo(usecase, modelId);
+			if (fileStream != null) {
+				byte[] mojoByteArray = IOUtils.toByteArray(fileStream);
 				response = new JsonObject();
-				response.addProperty("Message",
-						"Mojo has been successfully downloaded. Refer path: " +path );
+				response.addProperty("Message", "Mojo has been saved successfully.");
 				AutoMLConfig mlConfig = autoMLConfigDAL.getMLConfigByUsecase(usecase);
 				mlConfig.setMojoDeployed(modelId);
-				mlConfig.setStatus(AutMLEnum.Status.MOJO_DEPLOYED.name());
+				mlConfig.setStatus(AutoMLEnum.Status.MOJO_DEPLOYED.name());
+				mlConfig.setMojoDeployedZip(mojoByteArray);
 				autoMLConfigDAL.updateMLConfig(mlConfig);
 				return response;
 			} else {
 				log.error("Error downloading Mojo:{} ", usecase);
-				throw new InsightsCustomException("Unable to download mojo. Refer logs for more information");			
+				throw new InsightsCustomException("Unable to download mojo. Refer logs for more information");
 			}
 		} catch (Exception e) {
 			log.error("Error updating MOJO details in Postgres:{} due to {} ", usecase, e.getMessage());
-			    throw new InsightsCustomException("Unable to download mojo. Refer logs for more information");		
+			throw new InsightsCustomException("Unable to download mojo. Refer logs for more information");
 		}
     }
 
@@ -239,6 +246,7 @@ public class TrainModelsServiceImpl implements ITrainModelsService {
             		eachObject.addProperty("updatedAt", eachMLConfig.getUpdatedDate());
             		eachObject.addProperty("status", eachMLConfig.getStatus());
             		eachObject.addProperty("isActive", eachMLConfig.getIsActive());
+            		eachObject.addProperty("predictionType", eachMLConfig.getPredictionType());
             		responseArray.add(eachObject);
             	});
                 response.add("usecases", responseArray);
@@ -256,9 +264,10 @@ public class TrainModelsServiceImpl implements ITrainModelsService {
 	 */
 	@Override
 	public int saveAutoMLConfig(MultipartFile file, String usecase, String configuration, Integer trainingPerc,
-			String predictionColumn, String numOfModels ,String taskDetails) throws InsightsCustomException {
+			String predictionColumn, String numOfModels ,String taskDetails, String predictionType) throws InsightsCustomException {
 			
-		int id = -1;		
+		int id = -1;
+		byte[] fileBytes;
 		boolean isExists = autoMLConfigDAL.isUsecaseExisting(usecase);
 		if (isExists) {
 			log.error("AutoMLSerive======= unable to save record as usecase {} already exists", usecase);
@@ -277,6 +286,7 @@ public class TrainModelsServiceImpl implements ITrainModelsService {
 			destfolder = new File(filePath);
 			try {
 				file.transferTo(destfolder);
+				fileBytes= FileUtils.readFileToByteArray(destfolder);
 			} catch (Exception e) {
 				log.debug("AutoML========== Exception while creating folder {}", e.getMessage());
 				throw new InsightsCustomException("Unable to create folder");
@@ -308,6 +318,8 @@ public class TrainModelsServiceImpl implements ITrainModelsService {
 			mlConfig.setUseCaseFile(file.getOriginalFilename());
 			mlConfig.setWorkflowConfig(workflowConfig);
 			mlConfig.setStatus(workflowStatus);
+			mlConfig.setPredictionType(predictionType);
+			mlConfig.setFile(fileBytes);
 			id = autoMLConfigDAL.saveMLConfig(mlConfig);
 			log.debug(id);
 
@@ -380,6 +392,19 @@ public class TrainModelsServiceImpl implements ITrainModelsService {
 			throw new InsightsCustomException(e.getMessage());
 		}
 		return message;
+	}
+	
+	
+	/**
+	 * @return
+	 */
+	public List<String> getPredictionTypes() {
+		List<String> listOfPredictionTypes = new ArrayList<>();
+		AutoMLEnum.PredictionType[] predictionType = AutoMLEnum.PredictionType.values();
+		for (AutoMLEnum.PredictionType type : predictionType) {
+			listOfPredictionTypes.add(type.toString().toUpperCase());
+		}
+		return listOfPredictionTypes;
 	}
 
 }

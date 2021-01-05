@@ -68,7 +68,7 @@ public class TrainModelsServiceTest extends TrainModelsServiceTestData {
 		FileInputStream input = new FileInputStream(file);
 		MultipartFile multipartFile = new MockMultipartFile("file", file.getName(), "text/plain",IOUtils.toByteArray(input));
 		int id = trainModelsServiceImpl.saveAutoMLConfig(multipartFile, usecase, configuration, 
-				trainingPercent, predictionColumn, numOfModels, getTaskList());
+				trainingPercent, predictionColumn, numOfModels, getTaskList(),"Regression");
 		AutoMLConfig automl = autoMLConfigDAL.getMLConfigByUsecase(usecase);
 		InsightsWorkflowConfiguration workflowConfig = workflowConfigDAL.getWorkflowByWorkflowId(automl.getWorkflowConfig()
 				.getWorkflowId());
@@ -86,7 +86,7 @@ public class TrainModelsServiceTest extends TrainModelsServiceTestData {
 		FileInputStream input = new FileInputStream(file);
 		MultipartFile multipartFile = new MockMultipartFile("file", file.getName(), "text/plain",IOUtils.toByteArray(input));
 		int id = trainModelsServiceImpl.saveAutoMLConfig(multipartFile, usecase, configuration, 
-				trainingPercent, predictionColumn, numOfModels, getTaskList());
+				trainingPercent, predictionColumn, numOfModels, getTaskList(),"Regression");
 	}
 	
 	//save with incorrect usecase name
@@ -112,7 +112,7 @@ public class TrainModelsServiceTest extends TrainModelsServiceTestData {
 		FileInputStream input = new FileInputStream(file);
 		MultipartFile multipartFile = new MockMultipartFile("file", file.getName(), "text/plain",IOUtils.toByteArray(input));
 		int id = trainModelsServiceImpl.saveAutoMLConfig(multipartFile, usecase, configuration, 
-				trainingPercent, predictionColumn, numOfModels, getTaskList());
+				trainingPercent, predictionColumn, numOfModels, getTaskList(),"Regression");
 		executeAutomlConfig(usecase);
 		JsonObject leaderboard = trainModelsServiceImpl.getLeaderBoard(usecase);
 		modelName = leaderboard.get("data").getAsJsonArray().get(0).getAsJsonObject().get("model_id").getAsString();

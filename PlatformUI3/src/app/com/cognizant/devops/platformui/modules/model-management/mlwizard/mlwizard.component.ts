@@ -66,9 +66,11 @@ export class MLWizardComponent implements OnInit {
   task: string = null;
   splitRatio: number = null;
   target: string = null;
+  ptype: string=null;
   regex = new RegExp('^[a-zA-Z0-9_]*$');
   enablesavebutton: boolean = false;
-  @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
+  predictionTypes = [];
+  @ViewChild(MatPaginator) paginator: MatPaginator;
   constructor(private mlwizardService: MLWizardService, public router: Router, private route: ActivatedRoute,
     public messageDialog: MessageDialogService, public config: InsightsInitService, public reportmanagementService: ReportManagementService) {
       this.getTaskList();
@@ -98,8 +100,10 @@ export class MLWizardComponent implements OnInit {
         this.dataSource.paginator = this.paginator;
         this.getTaskList();
         console.log(this.sratio);
+      
       }
     })
+    this.getPredictionTypes();
   }
 
   ngAfterViewInit() {
@@ -191,6 +195,22 @@ export class MLWizardComponent implements OnInit {
     }
   }
 
+  async getPredictionTypes() {
+    var self = this;
+    try {
+      self.predictionTypes = [];
+      let predictionTypeList = await this.mlwizardService.getPredictionTypes();
+     
+      if (predictionTypeList.status == "success") {
+        this.predictionTypes = predictionTypeList.data;
+        console.log("Prediction Types=========>"+this.predictionTypes);
+      }
+    }
+    catch (error) {
+      console.log(error);
+    }
+  }
+
 
   async getTaskList() {
     this.responseOfTasklist = await this.reportmanagementService.getTasksList("AUTOML");
@@ -255,7 +275,7 @@ export class MLWizardComponent implements OnInit {
     dialogRef.afterClosed().subscribe(result => {
       if (result == 'yes') {
         this.mlwizardService.uploadDataWithConfig(this.usecaseid, this.file ,this.dataAndType,
-          this.splitRatio,this.target,this.noOfModels.toString(), this.task)
+          this.splitRatio,this.target,this.noOfModels.toString(), this.task, this.ptype)
           .subscribe(response => {
             if (response.status == 'success') {
               this.messageDialog.showApplicationsMessage('<b>' +this.usecaseid +'</b> saved successfully.', "SUCCESS");
@@ -288,7 +308,11 @@ export class MLWizardComponent implements OnInit {
       this.messageDialog.showApplicationsMessage("Please select target column for the AutoML", "ERROR");
     else if(this.noOfModels==null)
       this.messageDialog.showApplicationsMessage("Please select Max number of models for the AutoML", "ERROR");
-    else if(this.task == null) {
+    else if(this.ptype==null)
+    {
+      this.messageDialog.showApplicationsMessage("Please select prediction type for the AutoML", "ERROR");
+    }
+      else if(this.task == null) {
       this.messageDialog.showApplicationsMessage("Please add task for AutoML before saving record", "ERROR");
     } else if(Object.keys(this.dataAndType).length!=this.len) {
       this.displayProgressSpinner = false;

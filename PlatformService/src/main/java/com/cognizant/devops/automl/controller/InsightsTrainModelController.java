@@ -16,6 +16,7 @@
 package com.cognizant.devops.automl.controller;
 
 import java.io.IOException;
+import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -81,13 +82,14 @@ public class InsightsTrainModelController {
 	@PostMapping(value = "/saveUsecase", produces = MediaType.APPLICATION_JSON_VALUE)
 	public @ResponseBody ResponseEntity<JsonObject> saveUsecase(@RequestParam("file") MultipartFile file,
 			@RequestParam String usecase, @RequestParam String configuration, @RequestParam Integer trainingPerc,
-			@RequestParam String predictionColumn, @RequestParam String numOfModels, @RequestParam String taskDetails) {
+			@RequestParam String predictionColumn, @RequestParam String numOfModels, @RequestParam String taskDetails, 
+	        @RequestParam String predictionType) {
 		try {
 			boolean checkValidFile = PlatformServiceUtil.validateFile(file.getOriginalFilename());
 			log.debug("checkValidFile: {} ", checkValidFile);
 			if (checkValidFile) {
 				trainModelsService.saveAutoMLConfig(file, usecase, configuration, trainingPerc, predictionColumn,
-						numOfModels, taskDetails);
+						numOfModels, taskDetails,predictionType);
 				return new ResponseEntity<>(PlatformServiceUtil.buildSuccessResponse(), HttpStatus.OK);
 			} else {
 				return new ResponseEntity<>(
@@ -250,5 +252,17 @@ public class InsightsTrainModelController {
 			return PlatformServiceUtil
 					.buildFailureResponse("Unable to update usecase state. Please check log for details.");
 		}
+	}
+	
+	@GetMapping(value = "/getPredictionTypes", produces = MediaType.APPLICATION_JSON_VALUE)
+	public @ResponseBody JsonObject getPredictionTypeList() {
+		List<String> predictionTypeList;
+		try {
+			predictionTypeList = trainModelsService.getPredictionTypes();
+			return PlatformServiceUtil.buildSuccessResponseWithData(predictionTypeList);
+		} catch (Exception e) {
+			return PlatformServiceUtil.buildFailureResponse(e.getMessage());
+		}
+
 	}
 }

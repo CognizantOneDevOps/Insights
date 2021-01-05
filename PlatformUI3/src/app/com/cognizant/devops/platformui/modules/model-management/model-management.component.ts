@@ -64,21 +64,6 @@ rowData = [
     this.getModelDetails();
     this.table = document.getElementsByTagName("table")[0];
     this.tbody = this.table.getElementsByTagName("tbody")[0];
-// this.tbody.onclick = function (e) {
-//     e = e || window.event;
-//     let data = [];
-//     let target = e.srcElement || e.target;
-//     while (target && target.nodeName !== "TR") {
-//         target = target.parentNode;
-//     }
-//     if (target) {
-//         let cells = target.getElementsByTagName("td");
-//         for (let i = 0; i < cells.length; i++) {
-//             data.push(cells[i].innerHTML);
-//         }
-//     }
-//     alert(data);
-// };
 
   }
 
@@ -93,13 +78,8 @@ rowData = [
     let data =event;
     let navigationExt: NavigationExtras = {
       skipLocationChange: true,
-      queryParams: {
-       // leaderboard: this.leaderboard,
-        usecase: event.usecase,
-        //headers: this.headers,
-        //sratio: this.splitRatio,
-       // target: this.target,
-       // noOfModels: this.noOfModels, hideLeaderboardbtn: this.hideLeaderboardbtn, tableObject: JSON.stringify(this.tableForNav)
+      queryParams: {    
+        usecase: event.usecase,      
       }
     };
     this.router.navigate(['InSights/Home/prediction'], navigationExt);
@@ -215,7 +195,8 @@ rowData = [
       skipLocationChange: true,
       queryParams: {
         usecase: this.selectedUsecase.usecaseName,
-        targetColumn: this.selectedUsecase.predictionColumn
+        targetColumn: this.selectedUsecase.predictionColumn,
+        predictionType:this.selectedUsecase.predictionType
       }
     };
     this.router.navigate(['InSights/Home/prediction'], navigationExt);

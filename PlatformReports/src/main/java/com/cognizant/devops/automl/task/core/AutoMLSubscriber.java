@@ -25,7 +25,7 @@ import java.util.concurrent.Future;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import com.cognizant.devops.automl.task.util.AutoMLExecutor;
-import com.cognizant.devops.platformcommons.core.enums.AutMLEnum;
+import com.cognizant.devops.platformcommons.core.enums.AutoMLEnum;
 import com.cognizant.devops.platformdal.autoML.AutoMLConfig;
 import com.cognizant.devops.platformdal.autoML.AutoMLConfigDAL;
 import com.cognizant.devops.platformdal.workflow.InsightsWorkflowConfiguration;
@@ -61,7 +61,7 @@ public class AutoMLSubscriber extends WorkflowTaskSubscriberHandler {
 			AutoMLConfig autoMlConfig = autoMlDAL.fetchUseCasesByWorkflowId(workflowId);
 			List<JsonObject> failedJobs = new ArrayList<>();
 			if (autoMlConfig != null) {				
-				autoMlConfig.setStatus(AutMLEnum.Status.IN_PROGRESS.name());
+				autoMlConfig.setStatus(AutoMLEnum.Status.IN_PROGRESS.name());
 				autoMlDAL.updateMLConfig(autoMlConfig);				
 				List<Callable<JsonObject>> mlTaskToExecute = new ArrayList<>();
 				AutoMLExecutor autoMLExecutor = new AutoMLExecutor(autoMlConfig);
@@ -71,7 +71,7 @@ public class AutoMLSubscriber extends WorkflowTaskSubscriberHandler {
 				/* submit each chunk to threadpool in a loop */
 				executeAutoMLChunks(kpiChunkList, failedJobs);
 				if (!failedJobs.isEmpty()) {
-					autoMlConfig.setStatus(AutMLEnum.Status.ERROR.name());
+					autoMlConfig.setStatus(AutoMLEnum.Status.ERROR.name());
 					autoMlDAL.updateMLConfig(autoMlConfig);
 					updateFailedTaskStatusLog(failedJobs);
 				}

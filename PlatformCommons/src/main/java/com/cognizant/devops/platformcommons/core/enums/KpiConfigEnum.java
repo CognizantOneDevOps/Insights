@@ -18,7 +18,7 @@ package com.cognizant.devops.platformcommons.core.enums;
 public class KpiConfigEnum {
 
 	public enum KpiCategory {
-		STANDARD, COMPARISON, THRESHOLD, TREND, THRESHOLD_RANGE, MINMAX, PREDICTION
+		STANDARD, COMPARISON, THRESHOLD, TREND, THRESHOLD_RANGE, MINMAX, PREDICTION;
 	}
 
 	public enum KpiDatasourse {

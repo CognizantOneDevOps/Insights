@@ -17,10 +17,12 @@ package com.cognizant.devops.automl.task.util;
 
 import java.io.File;
 import java.util.concurrent.Callable;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
 import com.cognizant.devops.platformcommons.constants.ConfigOptions;
-import com.cognizant.devops.platformcommons.core.enums.AutMLEnum;
+import com.cognizant.devops.platformcommons.core.enums.AutoMLEnum;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformdal.autoML.AutoMLConfig;
 import com.cognizant.devops.platformdal.autoML.AutoMLConfigDAL;
@@ -48,8 +50,7 @@ public class AutoMLExecutor implements Callable<JsonObject> {
 		try {
 			usecaseCSVFilePath = ConfigOptions.ML_DATA_STORAGE_RESOLVED_PATH + ConfigOptions.FILE_SEPERATOR
 					+ autoMlConfig.getUseCaseName() + ConfigOptions.FILE_SEPERATOR + autoMlConfig.getUseCaseFile();
-					
-			File useCasecsvFile = new File(usecaseCSVFilePath);
+			File useCasecsvFile = new File(usecaseCSVFilePath);			
 			JsonObject extractedCSVData = extractCSVData(useCasecsvFile);
 			if (!extractedCSVData.keySet().isEmpty()) {
 				parseAndUploadDataToH2o(extractedCSVData.getAsJsonArray("Contents"));
@@ -129,7 +130,7 @@ public class AutoMLExecutor implements Callable<JsonObject> {
 		int status = mlResponse.get("status").getAsInt();
 		if (status == 200) {
 			String modelId = mlResponse.get("name").getAsString();
-			autoMlConfig.setStatus(AutMLEnum.Status.LEADERBOARD_READY.name());
+			autoMlConfig.setStatus(AutoMLEnum.Status.LEADERBOARD_READY.name());
 			autoMlConfig.setModelId(modelId);
 			autoMlDAL.updateMLConfig(autoMlConfig);
 			log.info(

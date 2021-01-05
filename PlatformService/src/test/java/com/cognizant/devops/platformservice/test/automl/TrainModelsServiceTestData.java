@@ -32,7 +32,7 @@ import org.apache.logging.log4j.Logger;
 import com.cognizant.devops.platformcommons.config.ApplicationConfigCache;
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.constants.ConfigOptions;
-import com.cognizant.devops.platformcommons.core.enums.AutMLEnum;
+import com.cognizant.devops.platformcommons.core.enums.AutoMLEnum;
 import com.cognizant.devops.platformcommons.dal.ai.H2oApiCommunicator;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformdal.autoML.AutoMLConfig;
@@ -103,7 +103,7 @@ public class TrainModelsServiceTestData {
 		int status = mlResponse.get("status").getAsInt();
 		if (status == 200) {
 			String modelId = mlResponse.get("name").getAsString();
-			autoMlConfig.setStatus(AutMLEnum.Status.LEADERBOARD_READY.name());
+			autoMlConfig.setStatus(AutoMLEnum.Status.LEADERBOARD_READY.name());
 			autoMlConfig.setModelId(modelId);
 			autoMLConfigDAL.updateMLConfig(autoMlConfig);
 			

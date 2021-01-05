@@ -180,7 +180,7 @@ export class RestAPIurlService implements IRestAPIUrlService {
         this.addEndPoint("DOWNLOAD_MOJO", '/PlatformService/admin/trainmodels/downloadMojo');
         this.addEndPoint("GET_PREDICTION_USECASE", '/PlatformService/admin/trainmodels/getMojoDeployedUsecases');
         this.addEndPoint("UPDATE_USECASE_STATE", '/PlatformService/admin/trainmodels/updateUsecaseState');
-
+        this.addEndPoint("GET_PREDICTION_TYPES", '/PlatformService/admin/trainmodels/getPredictionTypes');
         //kpi
         this.addEndPoint("KPI_CATEGORY", '/PlatformService/insights/report/getKpiCategory');
         this.addEndPoint("KPI_DATASOURCE", '/PlatformService/insights/report/getKpiDataSource');

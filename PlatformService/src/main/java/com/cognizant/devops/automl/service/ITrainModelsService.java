@@ -38,7 +38,7 @@ public interface ITrainModelsService {
     
     public int saveAutoMLConfig(MultipartFile file,String usecase,
 			 String configuration, Integer trainingPerc,  String predictionColumn,
-			 String numOfModels,String taskDetails) throws InsightsCustomException;
+			 String numOfModels,String taskDetails, String predictionType) throws InsightsCustomException;
 
 	public String updateUsecaseState(JsonObject usecaseJson) throws InsightsCustomException;
 }

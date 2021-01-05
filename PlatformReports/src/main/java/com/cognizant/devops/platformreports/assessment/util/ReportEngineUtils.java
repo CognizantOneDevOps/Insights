@@ -37,6 +37,8 @@ public class ReportEngineUtils {
 	public static final String TIMEZONE = "GMT";
 	public static final String ASSESSMENT_ID="assessmentId";
 	public static final String PREDICTION="PREDICTION";
+	public static final String PREDICTREGRESSION="PREDICTREGRESSION";
+	public static final String PREDICTCLASSIFICATION="PREDICTCLASSIFICATION";
 	public static final String REPORT_ID="reportId";
 	public static final String NEO4J_RESULT_LABEL = "KPI:RESULTS";
 	public static final String NEO4J_CONFIG_LABEL = "KPI:CONFIG";

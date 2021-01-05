@@ -160,6 +160,7 @@ public class FusionChartHandler implements BasePDFProcessor {
 						}
 						fromkpiResultArray.get(0).getAsJsonObject().addProperty(AssessmentReportAndWorkflowConstants.CAPTION, caption);
 						fromkpiResultArray.get(0).getAsJsonObject().addProperty("kpiId", kpiId);
+						fromkpiResultArray.get(0).getAsJsonObject().addProperty("kpiId", kpiId);
 						tableJsonObjMap.put(vType, fromkpiResultArray);
 					} else {
 						log.debug(
@@ -323,7 +324,7 @@ public class FusionChartHandler implements BasePDFProcessor {
 			zipPathVeriable = Paths.get(zipPath);
 			Path zipData = getPDFZipFolder(sourceFolderPath, zipPathVeriable);
 			if (zipData.toFile().exists()) {
-				log.debug("Worlflow Detail ====  Zip file created {} ", zipPath);
+				log.debug("Worlflow Detail ====  Zip file created  {} ", zipPath);
 			} else {
 				throw new InsightsCustomException("Worlflow Detail ==== Zip file not created ");
 			}

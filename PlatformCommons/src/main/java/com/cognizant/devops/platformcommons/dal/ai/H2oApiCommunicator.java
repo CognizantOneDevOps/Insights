@@ -23,6 +23,7 @@ import java.util.Date;
 import java.util.HashMap;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -410,23 +411,16 @@ public class H2oApiCommunicator {
 	 * @param modelId
 	 * @return
 	 */
-	public JsonObject downloadMojo(String usecase, String modelId) {
+	public InputStream downloadMojo(String usecase, String modelId) {
 		JsonObject response = new JsonObject();
 		try {
 			log.debug(" Downloading MOJO:{} ", modelId);
 			String url = h2oEndpoint + H2ORestApiUrls.DOWNLOAD_MOJO + modelId + "/mojo";
-			InputStream httpResponse = RestApiHandler.downloadMultipartFile(url, null);
-			String filePath = ConfigOptions.ML_DATA_STORAGE_RESOLVED_PATH + File.separator + usecase + File.separator
-					+ modelId + ".zip";
-			File destFile = new File(filePath);
-			FileUtils.copyInputStreamToFile(httpResponse, destFile);
-			response.addProperty("Status", "200");
-			response.addProperty("Path", filePath);
-			return response;
+			return RestApiHandler.downloadMultipartFile(url, null);
 		} catch (Exception e) {
 			log.error("unable to donwload mojo {}", e.getMessage());
 			response.addProperty("Status", "500");
-			return response;
+			return null;
 		}
 	}	
 

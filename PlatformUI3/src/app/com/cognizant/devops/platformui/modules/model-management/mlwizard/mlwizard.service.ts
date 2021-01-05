@@ -20,7 +20,7 @@ import { HttpHeaders, HttpClient, HttpParams } from '@angular/common/http';
 import { DataSharedService } from '@insights/common/data-shared-service';
 
 export interface IMLWizardService {
-  uploadDataWithConfig(id: string, csvFile: File, configObj: Object, trainingPerc: number, predictionColumn: string, numOfModels: string, taskDetails: string): Observable<any>;
+  uploadDataWithConfig(id: string, csvFile: File, configObj: Object, trainingPerc: number, predictionColumn: string, numOfModels: string, taskDetails: string, ptype: string): Observable<any>;
   validateUsecaseID(id: string): Observable<any>;
 }
 
@@ -45,13 +45,13 @@ export class MLWizardService implements IMLWizardService {
   }
   
   uploadDataWithConfig(id: string, csvFile: File, configObj: Object, trainingPerc: number, 
-    predictionColumn: string, numOfModels: string, taskDetails: string): Observable<any> {
+    predictionColumn: string, numOfModels: string, taskDetails: string, ptype: string): Observable<any> {
     const fd: FormData = new FormData();
     fd.append('file',csvFile);
     //fd.append('configuration', configObj.toString());
     var restHandler = this.restCallHandlerService;
     return restHandler.postFormDataWithParameter("UPLOAD_CSV", fd, { usecase: id, configuration: JSON.stringify(configObj), 
-      trainingPerc: trainingPerc, predictionColumn: predictionColumn, numOfModels: numOfModels, taskDetails: taskDetails });
+      trainingPerc: trainingPerc, predictionColumn: predictionColumn, numOfModels: numOfModels, taskDetails: taskDetails,predictionType:ptype });
   }
 
   //services for automl component
@@ -82,6 +82,12 @@ export class MLWizardService implements IMLWizardService {
   saveMOJO(usecase: string, modelId: string): Promise<any> {
     var restHandler = this.restCallHandlerService;
     return restHandler.get("DOWNLOAD_MOJO", { usecase: usecase, modelId: modelId});
+  }
+
+  getPredictionTypes(): Promise<any> 
+  {
+    var restHandler = this.restCallHandlerService;
+    return restHandler.get("GET_PREDICTION_TYPES");
   }
 
 }

@@ -31,34 +31,19 @@ import { PredictionShowDetailsDialog } from './prediction-show-detail/prediction
 })
 export class PredictionComponent implements OnInit {
 
-  
-  // leaders = ["DRF_1_AutoML_20200701_163135", "GLM_1_AutoML_20200701_163135"];
-  // mse = [ 56.750536916922705, 61.727453260662394].map(String);
-  // rmse = [ 7.533295223003192, 7.85668207710242].map(String);
-  // mean_residual_deviance = [ 56.750536916922705, 61.727453260662394 ].map(String);
-  // rmsle = [ 0.6783952366191675, "NaN" ].map(String);
-  // mae =[ 3.5014141209008263, 3.793888105971443 ].map(String);
-  // resultData = [{"Date":"2019-06-12 05:30:00","AuthorName":"Karthikeyan Mohan","Experience":12.0,"RepoName":1.0,"Commits":4.0,"predict":"3.293"},
-  // {"Date":"2020-02-17 05:30:00","AuthorName":"madhubalakrishnan","Experience":7.0,"RepoName":4.0,"Commits":1.0,"predict":"1.957"}];
-  // fields = ["Date","AuthorName","Experience","RepoName","Commits","predict"];
-  // leaders = [];
-  // mse = [];
-  // rmse = [];
-  // mean_residual_deviance = [];
-  // rmsle = [];
-  // mae =[];
   targetML: string = null;
   showOutput: boolean = false;
   usecaseid: string = null;
+  predictionType :string =null;
   targetColumn: string = null;
   resultData = [];
   fields = [];
   p: object;
-  pageObj: object = null;
-  //leaderboard: [];
+  pageObj: object = null; 
   selectedModel: any;
   LeaderboardDataSrc = new MatTableDataSource<any>();
-  displayedColumns = [ "radio", "model_id", "mean_residual_deviance", "rmse", "mse", "mae", "rmsle" ];
+  displayedColumnsForRegression = [ "radio", "model_id", "mrd", "rmse", "mse", "mae", "rmsle" ];
+  displayedColumnsForClassification=[ "radio", "model_id","auc","logloss","mpce", "rmse", "mse"];
   enableSaveMOJO: boolean = false;
   enablePredict: boolean = false;
   showThrobber: boolean = false;
@@ -67,44 +52,14 @@ export class PredictionComponent implements OnInit {
 
   constructor(private router: Router, private route: ActivatedRoute, public messageDialog: MessageDialogService,
     private mlwizardService: MLWizardService, private dataShare: DataSharedService, private dialog: MatDialog) { 
-     // this.getLeaderBoard();
-    }
-
-  // ngOnInit() {
-  //   this.route.queryParams.subscribe(params => {
-  //     console.log(params);
-  //     if(params.leaderboard){
-  //     let leaderbrd = JSON.parse(params.leaderboard);
-  //     this.pageObj = { leaderboard: leaderbrd,
-  //       headers: params.headers,
-  //       usecaseid: params.usecase,
-  //       sratio: params.sratio,
-  //       target: params.target,
-  //       noOfModels: params.noOfModels,
-  //       hideLeaderboardbtn: params.hideLeaderboardbtn, tableObject: params.tableObject }
-  //     this.usecaseid = params.usecase;
-  //     //get the leader algorithm names from leaderboard object & assign to leaders array
-  //     this.leaders = leaderbrd.model_id;
-  //     this.mse = leaderbrd.mse.map(String);
-  //     this.rmse = leaderbrd.rmse.map(String);
-  //     this.mae = leaderbrd.mae.map(String);
-  //     this.mean_residual_deviance = leaderbrd.mean_residual_deviance.map(String);
-  //     this.rmsle = leaderbrd.rmsle.map(String);
-  //   }
-  //     else{
-  //       this.route.queryParams.subscribe(params => {
-  //         this.usecaseid = params.usecase;
-  //       });
-  //     }
-  //     //this.LeaderboardDataSrc.data = leaderbrd;
-  //   })
-  // }
-  
+   
+    } 
   ngOnInit() {
     this.route.queryParams.subscribe(params => {
       console.log(params);
       this.usecaseid = params.usecase;
       this.targetColumn = params.targetColumn;
+      this.predictionType=params.predictionType;
     });
     this.getLeaderBoard();
   }
@@ -115,7 +70,7 @@ export class PredictionComponent implements OnInit {
     this.mlwizardService.getLeaderboard(this.usecaseid).then( event => {
       if(event.status == "success"){
         console.log(event);
-        this.LeaderboardDataSrc.data = event.data;
+        this.LeaderboardDataSrc.data = event.data;       
         this.LeaderboardDataSrc.paginator = this.paginator;
       } else if(event.status == "failure") {
         const dialog = this.messageDialog.showApplicationsMessage("Unable to fetch leaderboard data. You may need to re-run the usecase <b>"+this.usecaseid+"</b>.","ERROR");
@@ -131,31 +86,13 @@ export class PredictionComponent implements OnInit {
 
   }
 
-  selectML(selected) {
-    //this.targetML = ml.value;
+  selectML(selected) { 
     this.enablePredict = true;
     this.enableSaveMOJO = true;
 
   }
 
-  // onPrediction() {
-  //   console.log(this.selectedModel.model_id);
-      
-  //    this.mlwizardService.getPredictions(this.usecaseid, this.selectedModel.model_id).then( event => {
-  //     //this.mlwizardService.getPredictions("test", "GLM_1_AutoML_20200707_151411").then( event => {
-  //       if(event.status == "success"){
-  //         console.log(event);
-  //         this.resultData = event.data.Data;
-  //         this.fields = event.data.Fields;
-  //         this.fields.sort();
-  //         this.showOutput = true;
-          
-  //       }else if (event.status == "failure") {
-  //         //handle failure
-  //       }
-  //     });
-    
-  // }
+
 
   onPrediction() {
     var isSessionExpired = this.dataShare.validateSession();

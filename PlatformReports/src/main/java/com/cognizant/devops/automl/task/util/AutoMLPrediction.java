@@ -15,16 +15,18 @@
  ******************************************************************************/
 package com.cognizant.devops.automl.task.util;
 
+import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import com.cognizant.devops.platformcommons.constants.ConfigOptions;
+import com.cognizant.devops.platformcommons.core.enums.AutoMLEnum;
 import com.cognizant.devops.platformdal.autoML.AutoMLConfig;
 import com.cognizant.devops.platformdal.autoML.AutoMLConfigDAL;
 import com.google.common.reflect.TypeToken;
@@ -34,9 +36,11 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 import hex.genmodel.MojoModel;
+import hex.genmodel.TmpMojoReaderBackend;
 import hex.genmodel.easy.EasyPredictModelWrapper;
 import hex.genmodel.easy.RowData;
 import hex.genmodel.easy.exception.PredictException;
+import hex.genmodel.easy.prediction.BinomialModelPrediction;
 import hex.genmodel.easy.prediction.RegressionModelPrediction;
 
 public class AutoMLPrediction {
@@ -58,22 +62,33 @@ public class AutoMLPrediction {
 	 * @throws IOException
 	 * @throws PredictException
 	 */
+	
+	public static List<JsonObject> getPrediction(List<JsonObject> data, JsonArray columnNames, String usecaseName) throws IOException, PredictException
+	{
+		AutoMLConfig autoMLConfig = autoMlDAL.getMLConfigByUsecase(usecaseName);
+		String predictionType = autoMLConfig.getPredictionType();
+		if (predictionType.equalsIgnoreCase(AutoMLEnum.PredictionType.REGRESSION.name())) {
+		  return predictRegression(data, columnNames, usecaseName);
+		} else {
+			return predictClassification(data, columnNames, usecaseName);
+		}
+	}
 	public static List<JsonObject> predictRegression(List<JsonObject> data, JsonArray columnNames, String usecaseName)
 			throws IOException, PredictException {
 		List<JsonObject> predictionData = new ArrayList<>();
 		try {
-		    RegressionModelPrediction p = null;
+		    RegressionModelPrediction p = null;			
 			AutoMLConfig autoMLConfig = autoMlDAL.getMLConfigByUsecase(usecaseName);
 			String deployedMojoName = autoMLConfig.getMojoDeployed();
-			String predectionColumn = autoMLConfig.getPredictionColumn();
-
-			String mojoPath = ConfigOptions.ML_DATA_STORAGE_RESOLVED_PATH + ConfigOptions.FILE_SEPERATOR + usecaseName
-					+ ConfigOptions.FILE_SEPERATOR + deployedMojoName + ".zip";
-
-			EasyPredictModelWrapper model = new EasyPredictModelWrapper(MojoModel.load(mojoPath));
-
-			log.debug("Worlflow Detail ====  Mojo {}  Loaded Successfully",deployedMojoName);
+			String predectionColumn = autoMLConfig.getPredictionColumn();			
 			
+			/* get mojo from database and write to temporary location */
+			String path =FileUtils.getTempDirectoryPath();
+			byte[] mojoData=autoMLConfig.getMojoDeployedZip();
+			File file = new File(path+usecaseName+".zip");
+			FileUtils.writeByteArrayToFile(file, mojoData);			
+			EasyPredictModelWrapper model = new EasyPredictModelWrapper(MojoModel.load(new TmpMojoReaderBackend(file)));			
+			log.debug("Worlflow Detail ====  Mojo {}  Loaded Successfully",deployedMojoName);
 			Gson gson = new Gson();
 			Type type = new TypeToken<Map<String, String>>() {
 
@@ -85,8 +100,8 @@ public class AutoMLPrediction {
 				JsonObject rowObject = new JsonObject();
 				for (JsonElement eachColumn : columnNames) {
 					String column = eachColumn.getAsString();
-					String value = object.get(column).getAsString();
-					if (!value.equals("")) {
+					String value = object.get(column)==null ? "" :object.get(column).getAsString();
+					if (!value.equals("") ) {
 						rowObject.addProperty(column, value);
 					}
 				}
@@ -95,7 +110,7 @@ public class AutoMLPrediction {
 				p = model.predictRegression(row);
 				object.addProperty("predictedColumn",predectionColumn);
 				object.addProperty("predictedValue", String.valueOf(p.value));
-				predictionData.add(object);
+				predictionData.add(object);			
 
 			}
 		} catch (Exception e) {
@@ -103,6 +118,52 @@ public class AutoMLPrediction {
 			return predictionData;
 		}
 
+		return predictionData;
+	}
+	
+	public static List<JsonObject> predictClassification(List<JsonObject> data, JsonArray columnNames, String usecaseName)
+	{
+		List<JsonObject> predictionData = new ArrayList<>();
+		try {
+			BinomialModelPrediction  p = null;
+			AutoMLConfig autoMLConfig = autoMlDAL.getMLConfigByUsecase(usecaseName);
+			String deployedMojoName = autoMLConfig.getMojoDeployed();
+			String predectionColumn = autoMLConfig.getPredictionColumn();
+			/* get mojo from database and write to temporary location */
+			String path =FileUtils.getTempDirectoryPath();
+			byte[] mojoData=autoMLConfig.getMojoDeployedZip();
+			File file = new File(path+usecaseName+".zip");
+			FileUtils.writeByteArrayToFile(file, mojoData);			
+			EasyPredictModelWrapper model = new EasyPredictModelWrapper(MojoModel.load(new TmpMojoReaderBackend(file)));					
+			log.debug("Worlflow Detail ====  Mojo {}  Loaded Successfully",deployedMojoName);
+			Gson gson = new Gson();
+			Type type = new TypeToken<Map<String, String>>() {
+
+			}.getType();
+			for (JsonElement eachObject : data) {
+				
+				JsonObject object = eachObject.getAsJsonObject();
+				RowData row = new RowData();
+				JsonObject rowObject = new JsonObject();
+				for (JsonElement eachColumn : columnNames) {
+					String column = eachColumn.getAsString();
+					String value = object.get(column)==null ? "" :object.get(column).getAsString();
+					if (!value.equals("")) {
+						rowObject.addProperty(column, value);
+					}
+				}
+				Map<String, String> eachRow = gson.fromJson(rowObject, type);
+				row.putAll(eachRow);
+				p = model.predictBinomial(row);
+				object.addProperty("predictedColumn",predectionColumn);
+				object.addProperty("predictedValue", String.valueOf(p.label));
+				predictionData.add(object);
+
+			}
+		} catch (Exception e) {
+			log.debug(e.getMessage());
+			return predictionData;
+		}
 		return predictionData;
 	}
 	

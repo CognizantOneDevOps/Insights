@@ -37,6 +37,25 @@ public class AutoMLConfig {
 
 	@Column(name = "USECASENAME", unique = true, nullable = false)
 	private String useCaseName;
+	
+	@Column(name = "FILE")
+	private byte[] file;
+
+	public byte[] getFile() {
+		return file;
+	}
+
+	public void setFile(byte[] file) {
+		this.file = file;
+	}
+
+	public String getUseCaseFile() {
+		return useCaseFile;
+	}
+
+	public void setUseCaseFile(String useCaseFile) {
+		this.useCaseFile = useCaseFile;
+	}
 
 	@Column(name = "CONFIG_JSON", length = 10000)
 	private String configJson;
@@ -61,6 +80,9 @@ public class AutoMLConfig {
 
 	@Column(name = "MOJO_DEPLOYED")
 	private String mojoDeployed="";
+	
+	@Column(name="MOJO_DEPLOYED_ZIP")
+	private byte[] mojoDeployedZip;
 
 	@Column(name = "STATUS")
 	private String status;
@@ -70,6 +92,9 @@ public class AutoMLConfig {
 
 	@Column(name = "UPDATED_DATE")
 	private Long updatedDate = 0L;
+	
+	@Column(name="PREDICTION_TYPE")
+	private String predictionType;
 
 	@OneToOne(cascade = CascadeType.ALL)
 	@JoinColumn(name = "workflowId", referencedColumnName = "workflowId")
@@ -137,15 +162,7 @@ public class AutoMLConfig {
 
 	public void setModelId(String modelId) {
 		this.modelId = modelId;
-	}
-
-	public String getUseCaseFile() {
-		return useCaseFile;
-	}
-
-	public void setUseCaseFile(String useCaseFile) {
-		this.useCaseFile = useCaseFile;
-	}
+	}	
 
 	public String getMojoDeployed() {
 		return mojoDeployed;
@@ -185,6 +202,22 @@ public class AutoMLConfig {
 
 	public void setWorkflowConfig(InsightsWorkflowConfiguration workflowConfig) {
 		this.workflowConfig = workflowConfig;
+	}
+
+	public byte[] getMojoDeployedZip() {
+		return mojoDeployedZip;
+	}
+
+	public void setMojoDeployedZip(byte[] mojoDeployedZip) {
+		this.mojoDeployedZip = mojoDeployedZip;
+	}
+
+	public String getPredictionType() {
+		return predictionType;
+	}
+
+	public void setPredictionType(String predictionType) {
+		this.predictionType = predictionType;
 	}
 	
 

@@ -15,7 +15,7 @@
  ******************************************************************************/
 package com.cognizant.devops.platformcommons.core.enums;
 
-public class AutMLEnum {
+public class AutoMLEnum {
 
 	public enum Status {
 		
@@ -24,6 +24,25 @@ public class AutMLEnum {
 		private String value;
 
 		Status(final String value) {
+			this.value = value;
+		}
+
+		public String getValue() {
+			return value;
+		}
+
+		@Override
+		public String toString() {
+			return this.getValue();
+		}
+	}
+	
+public enum PredictionType {
+		
+		REGRESSION("Regression"), CLASSIFICATION("Classification");
+		private String value;
+
+	    PredictionType(final String value) {
 			this.value = value;
 		}
 

@@ -64,11 +64,7 @@ Mean Residual Deviance:  Mean Residual Deviance measures the goodness of the mod
       <mat-progress-spinner [diameter]="100" *ngIf="showThrobber" color="primary" mode="indeterminate">
       </mat-progress-spinner>
   </div>
-
-    <!-- <div class="searchBoxStyle">
-      <div layout layout-align="left" class="searchTitleTxt">
-        Select a model name for prediction
-      </div> -->
+      
       <div>
       <mat-radio-group [(ngModel)]="selectedModel">
       <table mat-table [dataSource]="LeaderboardDataSrc" class="mat-elevation-z8">
@@ -78,83 +74,63 @@ Mean Residual Deviance:  Mean Residual Deviance measures the goodness of the mod
             <mat-radio-button [value]="element" color="primary" (change)="selectML(element)"></mat-radio-button>
           </td>
         </ng-container>
-  
+        
         <ng-container matColumnDef="model_id">
           <th mat-header-cell *matHeaderCellDef class="tableHeaderCss">Algorithm Name</th>
           <td mat-cell *matCellDef="let element" style="width:45% !important"> {{element.model_id}} </td>
-        </ng-container>
+        </ng-container> 
 
-        <ng-container matColumnDef="mean_residual_deviance">
-          <th mat-header-cell *matHeaderCellDef class="tableHeaderCss" style="padding-left: 8px;">Mean Residual Deviance</th>
-          <td mat-cell *matCellDef="let element" style="width:15%;padding-left: 8px;"> {{element.mean_residual_deviance.slice(0,6)}} </td>
-        </ng-container>
-  
+   <ng-container *ngIf="predictionType=='REGRESSION'; then regression else classification "></ng-container>
+    <ng-template #regression>
         <ng-container matColumnDef="rmse">
           <th mat-header-cell *matHeaderCellDef class="tableHeaderCss">RMSE</th>
           <td mat-cell *matCellDef="let element" style="width:10%"> {{element.rmse.slice(0,5)}} </td>
-        </ng-container>
-  
+        </ng-container>  
         <ng-container matColumnDef="mse">
           <th mat-header-cell *matHeaderCellDef class="tableHeaderCss">MSE</th>
           <td mat-cell *matCellDef="let element" style="width:10%"> {{element.mse.slice(0,6)}} </td>
         </ng-container>
-
         <ng-container matColumnDef="mae">
           <th mat-header-cell *matHeaderCellDef class="tableHeaderCss">MAE</th>
           <td mat-cell *matCellDef="let element" style="width:8%"> {{element.mae.slice(0,5)}} </td>
         </ng-container>
-
-        <ng-container matColumnDef="rmsle">
+        <ng-container matColumnDef="mrd">
+          <th mat-header-cell *matHeaderCellDef class="tableHeaderCss">MAE</th>
+          <td mat-cell *matCellDef="let element" style="width:8%"> {{element.mean_residual_deviance.slice(0,5)}} </td>
+        </ng-container>
+        <ng-container  matColumnDef="rmsle">
           <th mat-header-cell *matHeaderCellDef class="tableHeaderCss">RMSLE</th>
           <td mat-cell *matCellDef="let element" style="width:5%"> {{element.rmsle.slice(0,5)}} </td>
+        </ng-container> 
+        <tr mat-header-row *matHeaderRowDef="displayedColumnsForRegression"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumnsForRegression;"> </tr>
+    </ng-template>
+      <ng-template #classification>        
+        <ng-container matColumnDef="auc">
+          <th mat-header-cell *matHeaderCellDef class="tableHeaderCss">AUC</th>
+          <td mat-cell *matCellDef="let element" style="width:10%"> {{element.auc}} </td>
         </ng-container>
-  
-        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-        <tr mat-row *matRowDef="let row; columns: displayedColumns;"> </tr>
+        <ng-container matColumnDef="logloss">
+          <th mat-header-cell *matHeaderCellDef class="tableHeaderCss">LogLoss</th>
+          <td mat-cell *matCellDef="let element" style="width:8%"> {{element.logloss.slice(0,5)}} </td>
+        </ng-container>
+        <ng-container  matColumnDef="mpce">
+          <th mat-header-cell *matHeaderCellDef class="tableHeaderCss">MPCE</th>
+          <td mat-cell *matCellDef="let element" style="width:5%"> {{element.mean_per_class_error}} </td>
+        </ng-container>
+        <ng-container matColumnDef="rmse">
+          <th mat-header-cell *matHeaderCellDef class="tableHeaderCss">RMSE</th>
+          <td mat-cell *matCellDef="let element" style="width:10%"> {{element.rmse.slice(0,5)}} </td>
+        </ng-container>  
+        <ng-container matColumnDef="mse">
+          <th mat-header-cell *matHeaderCellDef class="tableHeaderCss">MSE</th>
+          <td mat-cell *matCellDef="let element" style="width:10%"> {{element.mse.slice(0,6)}} </td>
+        </ng-container>
+        <tr mat-header-row *matHeaderRowDef="displayedColumnsForClassification"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumnsForClassification;"> </tr>
+      </ng-template>
       </table> 
     </mat-radio-group>
-    </div>
-    
-      <!-- <table id="leaderboardTable">
-        <mat-radio-group aria-label="Select an option" (change)="selectML($event)">
-        <tr style="height: 5vh">
-          <th>Select</th><th>Algorithm Name</th><th>MSE</th><th>RMSE</th><th>MAE</th><th>RMSLE</th><th>Mean Residual Deviance</th>
-        </tr>
-        <tr *ngFor="let ld of leaders; let i = index">
-        <td >
-          <mat-radio-button value={{ld}} color="primary" style="width: 5%;"></mat-radio-button>
-        </td>
-        <td style="width: 26%;">{{ld}}</td>
-        <td style="width: 12%;">{{ mse[i] | slice:0:6 }}</td>
-        <td style="width: 12%;">{{ rmse[i] | slice:0:5 }}</td>
-        <td style="width: 12%;">{{ mae[i] | slice:0:5 }}</td>
-        <td style="width: 12%;">{{ rmsle[i] | slice:0:5 }}</td>
-        <td style="width: 21%;">{{ mean_residual_deviance[i] | slice:0:6 }}</td>
-        
-        </tr>
-        </mat-radio-group>
-      </table>
-      </div>
-      <div style="margin-top: 5%;">
-      <!-- <div style="margin-left: 3vh; padding: 1vh;"><button mat-raised-button style="background-color: #0033A0"
-        (click)="onPrediction()">Predict</button>
-        <button mat-raised-button style="background-color: #0033A0; margin-left: 2vh;" (click)="onSaveMOJO()"
-        >Save MOJO</button></div><br> -->
-        <!-- <table [hidden]="!showOutput" id="leaderboardTable">
-          <tr style="height: 5vh"><th *ngFor = "let fd of fields">{{fd}}</th></tr>
-          <tr *ngFor = "let res of resultData | keyvalue | paginate: { itemsPerPage: 10, currentPage: p }">
-           <td class="limitText" *ngFor="let row of res.value | keyvalue">{{row.value}}
-           </td>
-          </tr>
-        </table>
-      <!-- </div> -->
-      <!-- <div class="dateRowStyle">
-        <pagination-controls [hidden]="!showOutput" class="paginationStyle" responsive="true"
-          (pageChange)="p = $event">
-        </pagination-controls>
-      </div> -->
-    
-    <!-- <button mat-icon-button (click)="navigateToPrevious()"><mat-icon style="font-size: 35px;">
-      chevron_left</mat-icon></button> -->
+    </div>   
    
 </div>
