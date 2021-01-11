@@ -31,6 +31,8 @@ import org.testng.annotations.BeforeSuite;
 import org.testng.annotations.Test;
 
 import com.cognizant.devops.platformcommons.config.ApplicationConfigCache;
+import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
+import com.cognizant.devops.platformcommons.constants.UnitTestConstant;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 
 @Test
@@ -48,23 +50,32 @@ public class TestngInitializerTest extends AbstractTestNGSpringContextTests{
 	@Resource
 	private FilterChainProxy springSecurityFilterChain;
 
-	static {
-		try {
-			ApplicationConfigCache.loadConfigCache();
-		} catch (InsightsCustomException e) {
-			log.error(e);
-		}
-		log.debug("Testng initializer class to load Config Cache .... static");
-
-	}
+//	static {
+//		try {
+//			ApplicationConfigCache.loadConfigCache();
+//			loadDBDetails();
+//		} catch (InsightsCustomException e) {
+//			log.error(e);
+//		}
+//		log.debug("Testng initializer class to load Config Cache .... static");
+//
+//	}
 
 	@BeforeSuite
 	public void testOnStartup() throws ServletException {
 		try {
 			ApplicationConfigCache.loadConfigCache();
+			loadDBDetails();
 		} catch (InsightsCustomException e) {
 			log.error(e);
 		}
 		log.debug("Testng initializer class to load Config Cache");
+	}
+	
+	public static void loadDBDetails() {
+		ApplicationConfigProvider.getInstance().getPostgre().setInsightsDBUrl(UnitTestConstant.H2_DB_URL);
+		ApplicationConfigProvider.getInstance().getPostgre().setDriver(UnitTestConstant.H2_DRIVER);
+		ApplicationConfigProvider.getInstance().getPostgre().setDialect(UnitTestConstant.H2_DIALECT);
+		ApplicationConfigProvider.updateConfig(ApplicationConfigProvider.getInstance());
 	}
 }

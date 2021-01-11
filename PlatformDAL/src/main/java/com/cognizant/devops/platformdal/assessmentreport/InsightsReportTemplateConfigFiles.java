@@ -34,8 +34,8 @@ public class InsightsReportTemplateConfigFiles implements Serializable {
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	@Column(name = "id")
 	private Integer id;
-
-	@Column(name = "fileData")
+	
+	@Column(name = "fileData", columnDefinition = "BLOB")
 	private byte[] fileData;
 
 	@Column(name = "fileType")
@@ -46,7 +46,7 @@ public class InsightsReportTemplateConfigFiles implements Serializable {
 
 	@Column(name = "reportId")
 	private Integer reportId;
-
+	
 	public byte[] getFileData() {
 		return fileData;
 	}

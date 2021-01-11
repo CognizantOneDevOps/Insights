@@ -75,6 +75,10 @@ public class AssessmentReportsTestData {
 	int reportIdSonarRT = 300601;
 	int reportIdkpiRT = 300602;
 	int reportIdkpisRT = 300603;
+	int workflowTypeId = 0;
+	boolean deleteWorkflowType = false;
+	String fusionExportUrl = null;
+	String smtpHostServer = null;
 
 	String taskKpiExecution = "{\"description\":\"TEST.REPORT_KPI_Execute\",\"mqChannel\":\"TEST.WORKFLOW.TASK.KPI.EXCECUTION\",\"componentName\":\"com.cognizant.devops.platformreports.assessment.core.ReportKPISubscriber\",\"dependency\":1,\"workflowType\":\"Report\"}";
 	String taskPDFExecution = "{\"description\":\"TEST.REPORT_PDF_Execute\",\"mqChannel\":\"TEST.WORKFLOW.TASK.PDF.EXCECUTION\",\"componentName\":\"com.cognizant.devops.platformreports.assessment.core.PDFExecutionSubscriber\",\"dependency\":2,\"workflowType\":\"Report\"}";
@@ -121,7 +125,7 @@ public class AssessmentReportsTestData {
 	public static List<Integer> contentIdList = new ArrayList<>();
 	public static List<Integer> kpiIdList = new ArrayList<>();
 	
-	String[] templateDesignFilesArray = {"Report_SONAR_JENKINS_PROD.json", "REPORT_SONAR_JENKINS_PROD.html", "style.css", "image.webp"};
+	String[] templateDesignFilesArray = {"REPORT_SONAR_JENKINS_PROD.json", "REPORT_SONAR_JENKINS_PROD.html", "style.css", "image.webp"};
 
 	public void readKpiFileAndSave(String fileName) throws Exception {
 		try {

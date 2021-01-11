@@ -461,6 +461,7 @@ public class HealthUtil {
 		} catch (Exception e) {
 			log.error("Worlflow Detail ==== Error creating HTML body for data components");
 		}
+		log.debug(" dataComponentStatus {} ", dataComponentStatus);
 		return dataComponentStatus;
 
 	}
@@ -501,6 +502,7 @@ public class HealthUtil {
 		} catch (Exception e) {
 			log.error("Worlflow Detail ==== Error creating HTML body for services");
 		}
+		log.debug(" serviceStatus {} ", serviceStatus);
 		return serviceStatus;
 
 	}

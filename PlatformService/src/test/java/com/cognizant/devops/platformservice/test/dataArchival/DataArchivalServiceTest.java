@@ -20,11 +20,10 @@ import java.util.List;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
-import org.testng.annotations.AfterTest;
-import org.testng.annotations.BeforeTest;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import com.cognizant.devops.platformcommons.config.ApplicationConfigCache;
 import com.cognizant.devops.platformcommons.core.util.InsightsUtils;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformdal.agentConfig.AgentConfig;
@@ -44,9 +43,8 @@ public class DataArchivalServiceTest extends DataArchivalServiceData {
 	AgentConfigDAL agentConfigDAL = new AgentConfigDAL();
 	String host = null;
 
-	@BeforeTest
+	@BeforeClass
 	public void prepareData() throws InsightsCustomException {
-		ApplicationConfigCache.loadConfigCache();
 		// register agent in DB
 		try {
 			Boolean status = agentConfigDAL.saveAgentConfigFromUI(agentJson.get("agentId").getAsString(),
@@ -248,7 +246,7 @@ public class DataArchivalServiceTest extends DataArchivalServiceData {
 		Boolean status = dataArchivalServiceImpl.deleteArchivalRecord(wrongRecordName);
 	}
 
-	@AfterTest
+	@AfterClass
 	public void cleanUp() throws InsightsCustomException {
 		try {
 			Boolean statusAfterInActivating = dataArchivalServiceImpl

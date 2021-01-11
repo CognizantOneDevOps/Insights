@@ -15,14 +15,19 @@
  *******************************************************************************/
 package com.cognizant.devops.platformservice.test.agentManagement;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.test.context.ContextConfiguration;
 import org.testng.Assert;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
@@ -34,7 +39,6 @@ import com.cognizant.devops.platformservice.agentmanagement.service.AgentManagem
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonSyntaxException;
 
 @Test
 @ContextConfiguration(locations = { "classpath:spring-test-config.xml" })
@@ -53,6 +57,18 @@ public class AgentManagementTest extends AgentManagementTestData{
 		json.addProperty("agentVersion", agentVersion);
 		json.addProperty("toolName", toolName.toUpperCase());
 		return json;
+	}
+	
+	@BeforeClass
+	public void prepareData() throws InsightsCustomException {
+		try {
+			prepareOfflineAgent(version, gitTool);
+			ApplicationConfigProvider.getInstance().getAgentDetails().setOfflineAgentPath(offlineAgentPath);
+			
+		} catch (Exception e) {
+			log.error("message", e);
+		}
+
 	}
 	
 	/*Method to get the available list of agents in the system. */
@@ -93,15 +109,15 @@ public class AgentManagementTest extends AgentManagementTestData{
 		
 		Assert.assertNotNull(availableAgents);
 		Assert.assertTrue(availableAgents.size() > 0);
-		Assert.assertTrue(availableAgents.containsKey("v5.2"));
+		Assert.assertTrue(availableAgents.containsKey(version));
 		
 		for (Map.Entry<String, ArrayList<String>> entry : availableAgents.entrySet()) {
 			
-		    if(entry.getKey().equals("v5.2")){
+		    if(entry.getKey().equals(version)){
 			    ArrayList<String> toolNameList = entry.getValue();
 			    Assert.assertTrue(toolNameList.size()>0);
 			    Assert.assertTrue(toolNameList.contains("git"));
-			    Assert.assertTrue(toolNameList.contains("pivotalTracker"));
+			    //Assert.assertTrue(toolNameList.contains("pivotalTracker"));
 		    }
 		}
 		
@@ -132,17 +148,17 @@ public class AgentManagementTest extends AgentManagementTestData{
 	@Test(priority = 4)
 	public void testGetToolRawConfigFileForOfflineRegistration() throws InsightsCustomException {
 		
-		String version ="v5.2";
-		String tool = "pivotalTracker";
+//		String version ="v5.2";
+//		String tool = "pivotalTracker";
 		ApplicationConfigProvider.getInstance().getAgentDetails().setOnlineRegistration(false);
 		AgentManagementServiceImpl agentServiceImpl = new AgentManagementServiceImpl();
-		String configJson = agentServiceImpl.getToolRawConfigFile(version, tool);
+		String configJson = agentServiceImpl.getToolRawConfigFile(version, toolName);
 
 		Gson gson = new Gson();
 		JsonElement jsonElement = gson.fromJson(configJson.trim(), JsonElement.class);
 		JsonObject json = jsonElement.getAsJsonObject();
 		Assert.assertNotNull(json);
-		Assert.assertEquals(json.get("toolCategory").getAsString(), "ALM");
+		Assert.assertEquals(json.get("toolCategory").getAsString(), "SCM");
 	}
 	
 	@Test(priority = 5) 
@@ -339,4 +355,10 @@ public class AgentManagementTest extends AgentManagementTestData{
 																							agentManagementTestData.osversion);
 		Assert.assertEquals(expectedOutCome, response);
 	}
+	
+	@AfterClass
+	public void cleanUp() throws InsightsCustomException, IOException {
+		FileUtils.deleteDirectory(new File(offlineAgentPath));
+	}
+	
 }

@@ -23,11 +23,10 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.test.context.ContextConfiguration;
 import org.testng.Assert;
-import org.testng.annotations.AfterTest;
-import org.testng.annotations.BeforeTest;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import com.cognizant.devops.platformcommons.config.ApplicationConfigCache;
 import com.cognizant.devops.platformcommons.constants.PlatformServiceConstants;
 import com.cognizant.devops.platformcommons.core.enums.WorkflowTaskEnum;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
@@ -59,9 +58,8 @@ public class WorkflowServiceTest extends WorkflowServiceTestData {
 	String workflowId = null;
 	String system_workflowId = "SYSTEM_HealthNotification";
 
-	@BeforeTest
+	@BeforeClass
 	public void prepareData() throws InsightsCustomException {
-		ApplicationConfigCache.loadConfigCache();
 		// save kpi
 		try {
 			int response = assessmentService.saveKpiDefinition(registerkpiWorkflowJson);
@@ -73,6 +71,14 @@ public class WorkflowServiceTest extends WorkflowServiceTestData {
 			reportId = assessmentService.saveTemplateReport(reportTemplateWorkflowJson);
 		} catch (Exception e) {
 			log.error("Error preparing data at WorkflowServiceTest Report template record ", e);
+		}
+		
+		try {
+			InsightsWorkflowType type = new InsightsWorkflowType();
+			type.setWorkflowType(WorkflowTaskEnum.WorkflowType.REPORT.getValue());
+			workflowConfigDAL.saveWorkflowType(type);
+		} catch (Exception e) {
+			log.error("Error preparing data at WorkflowServiceTest workflowtype record ", e);
 		}
 
 	}
@@ -204,7 +210,7 @@ public class WorkflowServiceTest extends WorkflowServiceTestData {
 		}
 	}
 
-	@AfterTest
+	@AfterClass
 	public void cleanUp() {
 
 		// Delete execution history

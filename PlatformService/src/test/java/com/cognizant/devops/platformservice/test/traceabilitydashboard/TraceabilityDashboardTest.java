@@ -28,12 +28,12 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
 import org.testng.Assert;
 import org.testng.SkipException;
-import org.testng.annotations.AfterTest;
-import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import com.cognizant.devops.platformcommons.config.ApplicationConfigCache;
 import com.cognizant.devops.platformcommons.core.enums.FileDetailsEnum;
+import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBHandler;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformdal.filemanagement.InsightsConfigFiles;
 import com.cognizant.devops.platformdal.filemanagement.InsightsConfigFilesDAL;
@@ -44,7 +44,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
 @Test
-public class TraceabilityDashboardTest {
+public class TraceabilityDashboardTest extends TreceabilityTestData {
 
 	private static final Logger log = LogManager.getLogger(TraceabilityDashboardTest.class);
 	TraceabilityDashboardService service = new TraceabilityDashboardServiceImpl();
@@ -54,9 +54,13 @@ public class TraceabilityDashboardTest {
 	FileManagementServiceImpl fileManagementServiceImpl = new FileManagementServiceImpl();
 	String traceabilityFileName = "TraceabilityTest";
 
-	@BeforeMethod
+	@BeforeClass
 	public void beforeMethod() throws InsightsCustomException {		
-		ApplicationConfigCache.loadConfigCache();
+		graphDBHandler = new GraphDBHandler();
+		
+		insertDataInNeo4j(gitCat, gitLabel, gitAgentData);
+		insertDataInNeo4j(jiraCat, jiralabel, jiraAgentData);
+		
 		try {
 		ClassLoader classLoader = ClassLoader.getSystemClassLoader();
 		File traceabilityFile = new File(classLoader.getResource("TraceabilityTest.json").getFile());
@@ -95,7 +99,7 @@ public class TraceabilityDashboardTest {
 
 	@Test(priority = 3)
 	public void testToolKeySet() throws InsightsCustomException {
-		Assert.assertNotEquals(0, service.getToolKeyset("JIRA").size());
+		Assert.assertNotEquals(0, service.getToolKeyset(TreceabilityTestData.toolName).size());
 	}
 
 	
@@ -141,8 +145,11 @@ public class TraceabilityDashboardTest {
 		Assert.assertEquals(0, resp.get("pipeline").getAsJsonArray().size());
 	}
 	
-	@AfterTest
-	public void onDelete(){
+	@AfterClass
+	public void cleanUp() throws InsightsCustomException {
+		deleteDataFromNeo4j(jiraCat);
+		deleteDataFromNeo4j(gitCat);
+		
 		try {
 			if(isDeleteFile) {
 				fileManagementServiceImpl.deleteConfigurationFile(traceabilityFileName);

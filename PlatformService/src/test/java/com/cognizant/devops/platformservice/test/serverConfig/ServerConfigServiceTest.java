@@ -25,11 +25,10 @@ import javax.validation.ValidatorFactory;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
-import org.testng.annotations.AfterTest;
-import org.testng.annotations.BeforeTest;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import com.cognizant.devops.platformcommons.config.ApplicationConfigCache;
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformservice.rest.serverconfig.ServerConfigController;
@@ -47,10 +46,10 @@ public class ServerConfigServiceTest extends ServerConfigTestData {
 	String host = null;
 	Gson gson = new Gson();
 
-	@BeforeTest
+	@BeforeClass
 	public void prepareData() throws InsightsCustomException {
 		try {
-			ApplicationConfigCache.loadConfigCache();
+//			ApplicationConfigCache.loadConfigCache();
 		} catch (Exception e) {
 			log.error("message", e);
 		}
@@ -120,7 +119,7 @@ public class ServerConfigServiceTest extends ServerConfigTestData {
 		}
 	}
 
-	@AfterTest
+	@AfterClass
 	public void cleanUp() throws InsightsCustomException {
 		
 		

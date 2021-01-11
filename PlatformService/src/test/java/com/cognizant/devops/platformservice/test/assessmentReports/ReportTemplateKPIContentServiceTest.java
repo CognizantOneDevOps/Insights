@@ -16,7 +16,6 @@
 package com.cognizant.devops.platformservice.test.assessmentReports;
 
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.List;
 
@@ -27,11 +26,10 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.web.multipart.MultipartFile;
 import org.testng.Assert;
-import org.testng.annotations.AfterTest;
-import org.testng.annotations.BeforeTest;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import com.cognizant.devops.platformcommons.config.ApplicationConfigCache;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformdal.assessmentreport.InsightsAssessmentReportTemplate;
 import com.cognizant.devops.platformdal.assessmentreport.InsightsKPIConfig;
@@ -48,9 +46,8 @@ public class ReportTemplateKPIContentServiceTest extends AssessmentReportService
 
 	int reportId = 0;
 	int uploadedTemplateId = 0;
-	@BeforeTest
+	@BeforeClass
 	public void prepareData() throws InsightsCustomException {
-		ApplicationConfigCache.loadConfigCache();
 	}
 
 	public static final AssesmentReportServiceImpl assessmentService = new AssesmentReportServiceImpl();
@@ -91,17 +88,6 @@ public class ReportTemplateKPIContentServiceTest extends AssessmentReportService
 	}
 
 	@Test(priority = 4)
-	public void testActiveKpiList() throws InsightsCustomException {
-		try {
-			List<InsightsKPIConfig> kpiconfigList = assessmentService.getActiveKpiList();
-			Assert.assertNotNull(kpiconfigList);
-			Assert.assertFalse(kpiconfigList.isEmpty());
-		} catch (AssertionError e) {
-			Assert.fail(e.getMessage());
-		}
-	}
-
-	@Test(priority = 5)
 	public void testKpiDataSource() throws InsightsCustomException {
 		try {
 			List<String> listOfDatasource = assessmentService.getKpiDataSource();
@@ -112,7 +98,7 @@ public class ReportTemplateKPIContentServiceTest extends AssessmentReportService
 		}
 	}
 
-	@Test(priority = 6)
+	@Test(priority = 5)
 	public void testKpiCategory() throws InsightsCustomException {
 		try {
 			List<String> listOfCategory = assessmentService.getKpiCategory();
@@ -123,7 +109,7 @@ public class ReportTemplateKPIContentServiceTest extends AssessmentReportService
 		}
 	}
 
-	@Test(priority = 7)
+	@Test(priority = 6)
 	public void testjobSchedule() throws InsightsCustomException {
 		try {
 			List<String> listOfSchedule = assessmentService.getSchedule();
@@ -134,7 +120,7 @@ public class ReportTemplateKPIContentServiceTest extends AssessmentReportService
 		}
 	}
 
-	@Test(priority = 8)
+	@Test(priority = 7)
 	public void testSaveReportTemplate() throws InsightsCustomException {
 		try {
 			int response = assessmentService.saveKpiDefinition(convertStringIntoJson(registerkpi));
@@ -144,6 +130,17 @@ public class ReportTemplateKPIContentServiceTest extends AssessmentReportService
 					.getReportTemplateByReportId(reportId);
 			Assert.assertNotNull(report);
 			Assert.assertTrue(report.getReportsKPIConfig().size() > 0);
+		} catch (AssertionError e) {
+			Assert.fail(e.getMessage());
+		}
+	}
+	
+	@Test(priority = 8)
+	public void testActiveKpiList() throws InsightsCustomException {
+		try {
+			List<InsightsKPIConfig> kpiconfigList = assessmentService.getActiveKpiList();
+			Assert.assertNotNull(kpiconfigList);
+			Assert.assertFalse(kpiconfigList.isEmpty());
 		} catch (AssertionError e) {
 			Assert.fail(e.getMessage());
 		}
@@ -262,9 +259,8 @@ public class ReportTemplateKPIContentServiceTest extends AssessmentReportService
 	}
 
 
-	@AfterTest
+	@AfterClass
 	public void cleanUp() {
-
 		for (int element : kpiIdList) {
 			try {
 				reportConfigDAL.deleteKPIbyKpiID(element);

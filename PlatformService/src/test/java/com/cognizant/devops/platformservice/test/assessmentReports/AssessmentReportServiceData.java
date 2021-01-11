@@ -30,11 +30,13 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.cognizant.devops.platformcommons.core.enums.WorkflowTaskEnum;
 import com.cognizant.devops.platformcommons.core.util.InsightsUtils;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformdal.assessmentreport.InsightsReportTemplateConfigFiles;
 import com.cognizant.devops.platformdal.assessmentreport.ReportConfigDAL;
 import com.cognizant.devops.platformdal.workflow.InsightsWorkflowTask;
+import com.cognizant.devops.platformdal.workflow.InsightsWorkflowType;
 import com.cognizant.devops.platformdal.workflow.WorkflowDAL;
 import com.cognizant.devops.platformservice.workflow.service.WorkflowServiceImpl;
 import com.google.gson.JsonArray;
@@ -159,6 +161,14 @@ public class AssessmentReportServiceData {
 	public static List<Integer> kpiIdList = new ArrayList<Integer>();
 
 	void prepareAssessmentData() throws InsightsCustomException {
+		
+		try {
+			InsightsWorkflowType type = new InsightsWorkflowType();
+			type.setWorkflowType(WorkflowTaskEnum.WorkflowType.REPORT.getValue());
+			workflowConfigDAL.saveWorkflowType(type);
+		} catch (Exception e) {
+			log.error("Error preparing data at WorkflowServiceTest workflowtype record ", e);
+		}
 		
 		try {
 			String workflowTaskTest = "{\"description\": \"KPI_Execute_service_test\",\"mqChannel\": \"WORKFLOW.ASSESSMENTSERVICE_TEST.TASK.KPI.EXCECUTION\",\"componentName\": \"com.cognizant.devops.platformreports.assessment.core.ReportKPISubscriber\",\"dependency\": \"1\",\"workflowType\": \"Report\"}";

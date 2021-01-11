@@ -20,45 +20,61 @@ import java.io.IOException;
 import java.util.List;
 
 import org.apache.commons.compress.utils.IOUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.web.multipart.MultipartFile;
 import org.testng.Assert;
-import org.testng.annotations.AfterTest;
-import org.testng.annotations.BeforeTest;
+import org.testng.SkipException;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.cognizant.devops.automl.service.TrainModelsServiceImpl;
-import com.cognizant.devops.platformcommons.config.ApplicationConfigCache;
+import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.core.enums.WorkflowTaskEnum;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformdal.autoML.AutoMLConfig;
 import com.cognizant.devops.platformdal.workflow.InsightsWorkflowConfiguration;
 import com.cognizant.devops.platformdal.workflow.InsightsWorkflowTask;
+import com.cognizant.devops.platformdal.workflow.InsightsWorkflowType;
 import com.cognizant.devops.platformdal.workflow.WorkflowDAL;
 import com.cognizant.devops.platformservice.workflow.service.WorkflowServiceImpl;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
 @ContextConfiguration(locations = { "classpath:spring-test-config.xml" })
 public class TrainModelsServiceTest extends TrainModelsServiceTestData {
+	private static Logger log = LogManager.getLogger(TrainModelsServiceTest.class);
 	
 	TrainModelsServiceImpl trainModelsServiceImpl;
 	WorkflowServiceImpl workflowService = new WorkflowServiceImpl();
 	WorkflowDAL workflowConfigDAL = new WorkflowDAL();
 	
-	@BeforeTest
+	@BeforeClass
 	public void onInit() throws InsightsCustomException, IOException {
 		
-		ApplicationConfigCache.loadConfigCache();
 		trainModelsServiceImpl = new TrainModelsServiceImpl();
-		
+
+		//add workflow type for automl
+		InsightsWorkflowType workflowTypeObj = workflowConfigDAL.getWorkflowType(WorkflowTaskEnum.WorkflowType.AUTOML.getValue());
+		if (workflowTypeObj == null) {
+			InsightsWorkflowType type = new InsightsWorkflowType();
+			type.setWorkflowType(WorkflowTaskEnum.WorkflowType.AUTOML.getValue());
+			workflowConfigDAL.saveWorkflowType(type);
+		} 
+
 		//add workflow task for automl if not present
-		List<InsightsWorkflowTask> listofTasks = workflowConfigDAL.getTaskLists("AUTOML");
+		List<InsightsWorkflowTask> listofTasks = workflowConfigDAL.getTaskLists(WorkflowTaskEnum.WorkflowType.AUTOML.getValue());
 		if(listofTasks.isEmpty()) {
 			workflowService.saveWorkflowTask(workflowTaskJson);
 		} else {
 			isTaskExists = true;
 		}
+		
+		h2oEndpoint = ApplicationConfigProvider.getInstance().getMlConfiguration().getH2oEndpoint();
+		
 		
 	}
 	
@@ -74,7 +90,6 @@ public class TrainModelsServiceTest extends TrainModelsServiceTestData {
 				.getWorkflowId());
 		Assert.assertTrue(workflowConfig.isRunImmediate());
 		Assert.assertEquals(workflowConfig.getStatus(), WorkflowTaskEnum.WorkflowStatus.NOT_STARTED.toString());
-		Assert.assertTrue(workflowConfig.getTaskSequenceEntity().size() > 0);
 		Assert.assertNotNull(automl);
 		Assert.assertNotNull(id);
 		Assert.assertNotEquals(id, -1);
@@ -89,17 +104,16 @@ public class TrainModelsServiceTest extends TrainModelsServiceTestData {
 				trainingPercent, predictionColumn, numOfModels, getTaskList(),"Regression");
 	}
 	
-	//save with incorrect usecase name
-//	@Test(priority = 2, expectedExceptions = InsightsCustomException.class)
-//	public void testSaveAutoMlConfigIncorrectUsecase() throws InsightsCustomException, IOException {
-//		FileInputStream input = new FileInputStream(file);
-//		MultipartFile multipartFile = new MockMultipartFile("file", file.getName(), "text/plain",IOUtils.toByteArray(input));
-//		int id = trainModelsServiceImpl.saveAutoMLConfig(multipartFile, incorrectUsecase, configuration, 
-//				trainingPercent, predictionColumn, numOfModels, getTaskList());
-//	}
-	
-	//get all usecases from postgres
 	@Test(priority = 3)
+	public void validateUsecaseName() throws InsightsCustomException, IOException {
+		JsonObject response = trainModelsServiceImpl.validateUsecaseName(usecase);
+		Assert.assertTrue(response.has("UniqueUsecase"));
+		Assert.assertEquals(response.get("UniqueUsecase").getAsBoolean(), true);
+		
+	}
+	
+	//get all usecases from db
+	@Test(priority = 4)
 	public void testGetUsecase() throws InsightsCustomException {
 		JsonObject automl = trainModelsServiceImpl.getUsecases();
 		Assert.assertNotNull(automl);
@@ -107,50 +121,74 @@ public class TrainModelsServiceTest extends TrainModelsServiceTestData {
 	}
 	
 	
-	@Test(priority = 4)
+	@Test(priority = 5)
 	public void testGetLeaderBoard() throws InsightsCustomException, IOException {
+		if(h2oEndpoint == null || h2oEndpoint.isEmpty()) {
+			throw new SkipException("skipped this test case as H2O server details not found.");
+		}
 		FileInputStream input = new FileInputStream(file);
 		MultipartFile multipartFile = new MockMultipartFile("file", file.getName(), "text/plain",IOUtils.toByteArray(input));
-		int id = trainModelsServiceImpl.saveAutoMLConfig(multipartFile, usecase, configuration, 
-				trainingPercent, predictionColumn, numOfModels, getTaskList(),"Regression");
 		executeAutomlConfig(usecase);
 		JsonObject leaderboard = trainModelsServiceImpl.getLeaderBoard(usecase);
 		modelName = leaderboard.get("data").getAsJsonArray().get(0).getAsJsonObject().get("model_id").getAsString();
 		Assert.assertTrue(leaderboard.has("data"));
 		Assert.assertNotNull(leaderboard);
 		Assert.assertNotNull(modelName);
+
 	}
 	
-	@Test(priority = 5)
+	@Test(priority = 6)
 	public void testGetPrediction() throws InsightsCustomException {
+		if(h2oEndpoint == null || h2oEndpoint.isEmpty()) {
+			throw new SkipException("skipped this test case as H2O server details not found.");
+		}
 		JsonObject predictedData = trainModelsServiceImpl.getPrediction(modelName, usecase);
 		Assert.assertTrue(predictedData.has("Fields"));
 		Assert.assertTrue(predictedData.has("Data"));
 		Assert.assertNotNull(predictedData);
 	}
 	
-	@Test(priority = 6)
+	@Test(priority = 7)
 	public void testDownloadMojo() throws InsightsCustomException {
+		if(h2oEndpoint == null || h2oEndpoint.isEmpty()) {
+			throw new SkipException("skipped this test case as H2O server details not found.");
+		}
 		JsonObject savedMojo = trainModelsServiceImpl.downloadMojo(usecase, modelName);
 		Assert.assertTrue(savedMojo.has("Message"));
 		Assert.assertNotNull(savedMojo);
 	}
 	
-	//delete usecase from postgres along with Csv file
-		@Test(priority = 7)
-		public void testDeleteUsecase() throws InsightsCustomException {
-			JsonObject automl = trainModelsServiceImpl.deleteUsecase(usecase);
-			Assert.assertNotNull(automl);
-			Assert.assertEquals(automl.get("statusCode").getAsInt(), 1);
+	@Test(priority = 8)
+	public void testGetMojoDeployedUsecases() throws InsightsCustomException {
+		if(h2oEndpoint == null || h2oEndpoint.isEmpty()) {
+			throw new SkipException("skipped this test case as H2O server details not found.");
 		}
-		
-//		//delete usecase with incorrect name
-//		@Test(priority = 8, expectedExceptions = InsightsCustomException.class)
-//		public void testDeleteIncorrectUsecase() throws InsightsCustomException {
-//			JsonObject automl = trainModelsServiceImpl.deleteUsecase(incorrectUsecase);
-//			}
+		JsonArray response = trainModelsServiceImpl.getMojoDeployedUsecases();
+		Assert.assertNotNull(response);
+		Assert.assertTrue(response.get(0).getAsJsonObject().has("usecaseName"));
+		Assert.assertTrue(response.get(0).getAsJsonObject().has("predictionColumn"));
+	}
 	
-	@AfterTest
+	@Test(priority = 9)
+	public void testUpdateUsecaseStateToInactive() throws InsightsCustomException {
+		JsonObject usecaseJson = new JsonObject();
+		usecaseJson.addProperty("usecaseName", usecase);
+		usecaseJson.addProperty("isActive", false);
+		String actual = trainModelsServiceImpl.updateUsecaseState(usecaseJson);
+		String expected = usecase + " state updated successfully.";
+		Assert.assertEquals(actual, expected);
+	}
+	
+	
+	//delete usecase from postgres along with Csv file
+	@Test(priority = 10)
+	public void testDeleteUsecase() throws InsightsCustomException {
+		JsonObject automl = trainModelsServiceImpl.deleteUsecase(usecase);
+		Assert.assertNotNull(automl);
+		Assert.assertEquals(automl.get("statusCode").getAsInt(), 1);
+	}
+	
+	@AfterClass
 	public void cleanUp() {
 		
 		//delete workflow task

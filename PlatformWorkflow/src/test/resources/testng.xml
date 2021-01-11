@@ -3,7 +3,8 @@
 <suite name="WorkflowSuite">
   <test name="PlatformWorkflowTestCases">
     <classes>
-      <class name="com.cognizant.devops.platformworkflow.test.WorkflowTest"/>
+    <class name="com.cognizant.devops.platformworkflow.test.testngInitializer.TestngInitializerTest"/>
+    <class name="com.cognizant.devops.platformworkflow.test.WorkflowTest"/>
     </classes>
   </test>
 </suite>

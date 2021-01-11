@@ -24,12 +24,13 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import com.cognizant.devops.platformcommons.config.ApplicationConfigCache;
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
+import com.cognizant.devops.platformcommons.core.enums.WorkflowTaskEnum;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformdal.assessmentreport.ReportConfigDAL;
 import com.cognizant.devops.platformdal.workflow.InsightsWorkflowConfiguration;
 import com.cognizant.devops.platformdal.workflow.InsightsWorkflowExecutionHistory;
+import com.cognizant.devops.platformdal.workflow.InsightsWorkflowType;
 import com.cognizant.devops.platformdal.workflow.WorkflowDAL;
 import com.cognizant.devops.platformworkflow.workflowtask.app.PlatformWorkflowApplication;
 import com.cognizant.devops.platformworkflow.workflowtask.core.WorkflowDataHandler;
@@ -52,13 +53,20 @@ public class WorkflowTest extends WorkflowTestData {
 	@BeforeClass
 	public void onInit() throws InsightsCustomException, InterruptedException {
 
-		ApplicationConfigCache.loadConfigCache();
-
 		// save kpi definition in db
 		saveKpiDefinition(kpiDefinition);
 
 		// save content definition in db
 		saveContentDefinition(contentDefinition);
+		
+		//save workflow type
+		InsightsWorkflowType workflowTypeObj = workflowDAL.getWorkflowType(WorkflowTaskEnum.WorkflowType.REPORT.getValue());
+		if (workflowTypeObj == null) {
+			InsightsWorkflowType type = new InsightsWorkflowType();
+			type.setWorkflowType(WorkflowTaskEnum.WorkflowType.REPORT.getValue());
+			workflowTypeId = workflowDAL.saveWorkflowType(type);
+			deleteWorkflowType = true;
+		} 
 
 		// save workflow tasks in db
 		saveWorkflowTask(workflowTask);
@@ -77,6 +85,8 @@ public class WorkflowTest extends WorkflowTestData {
 		saveAssessmentReport(WorkflowIdTestImmediate, mqChannel, assessmentReportImmediate, null);
 
 		updateRunImmediate(WorkflowIdTestImmediate);
+		
+		ApplicationConfigProvider.getInstance().getAssessmentReport().setMaxWorkflowRetries(3);
 
 		initializeTask();
 
@@ -263,6 +273,11 @@ public class WorkflowTest extends WorkflowTestData {
 			} catch (Exception e) {
 				log.error(e);
 			}
+		}
+		
+		// delete workflow Type
+		if(deleteWorkflowType) {
+			workflowDAL.deleteWorkflowType(workflowTypeId);
 		}
 
 		// delete report template

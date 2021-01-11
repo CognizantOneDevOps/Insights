@@ -24,6 +24,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
+
 @Entity
 @Table(name = "\"INSIGHTS_CONFIG_FILES\"")
 public class InsightsConfigFiles implements Serializable {
@@ -35,7 +36,7 @@ public class InsightsConfigFiles implements Serializable {
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Integer id;
 
-	@Column(name = "fileData")
+	@Column(name = "fileData", columnDefinition = "BLOB")
 	private byte[] fileData;
 
 	@Column(name = "fileModule")

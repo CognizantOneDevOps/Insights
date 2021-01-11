@@ -50,8 +50,8 @@ public class WebhookServiceTest {
 	@Test(priority = 3, expectedExceptions = InsightsCustomException.class)
 	public void testsaveWebHookConfigurationException() throws InsightsCustomException {
 		Boolean webhookcheck = webhookServiceImp.saveWebHookConfiguration(webhookTestData.registeredWebhookJson);
-		String expectedOutcome = "Webhook name already exists";
-		Assert.assertEquals(webhookcheck, expectedOutcome);
+//		String expectedOutcome = "Webhook name already exists";
+//		Assert.assertEquals(webhookcheck, expectedOutcome);
 	}
 
 	@Test(priority = 4)

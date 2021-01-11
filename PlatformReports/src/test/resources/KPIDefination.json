@@ -151,7 +151,9 @@
       "DBQuery":"MATCH (n:SONAR:DATA) where n.SPKstartTime > 1593561600 and n.SPKstartTime < 1596239999 and n.SPKqualityGate='fail' RETURN count(n) as NumberOfQualityBlocks LIMIT 2",
       "datasource":"NEO4J",
       "isActive":true,
-      "resultField":"NumberOfQualityBlocks"
+      "resultField":"NumberOfQualityBlocks",
+      "outputDatasource": "NEO4J",
+   	  "usecase": ""
    },
    {
       "kpiId":100134,
@@ -175,7 +177,9 @@
       "DBQuery":"MATCH (n:SONAR:DATA) where n.SPKstartTime > 1593561600 and n.SPKstartTime < 1596239999 and n.SPKstatus='Success' RETURN  n.SPKendTime as SPKendTime,COALESCE(Avg(toInt(n.SPKcoverage)),0) as AvgCodeCoverage LIMIT 2",
       "datasource":"NEO4J",
       "isActive":true,
-      "resultField":"AvgCodeCoverage"
+      "resultField":"AvgCodeCoverage",
+      "outputDatasource": "NEO4J",
+   	  "usecase": ""
    },
    {
       "kpiId":100236,
@@ -356,7 +360,9 @@
       "DBQuery":"MATCH (n:JIRA) WHERE  n.SPKstartTime > 1535760000 and n.SPKstartTime < 1538351999 RETURN DISTINCT n.SPKdefectDuring as Type, count(n) as Count",
       "datasource":"NEO4J",
       "isActive":true,
-      "resultField":"Count"
+      "resultField":"Count",
+      "outputDatasource": "NEO4J",
+   	  "usecase": ""
    },
    {
       "kpiId":112102,
@@ -367,7 +373,9 @@
       "DBQuery":"MATCH (n:JIRA) where  n.SPKstartTime > 1535760000 and n.SPKstartTime < 1538351999 and n.SPKprojectName in ['PaymentServices','MobileServices','ClaimFinder','AgentLocator'] and  n.SPKstartTime > {startTime} and n.SPKstartTime < {endTime} with n return distinct n.SPKprojectName as StoryTypes , sum(n.SPKduration)/3600 as Duration",
       "datasource":"NEO4J",
       "isActive":true,
-      "resultField":"Duration"
+      "resultField":"Duration",
+      "outputDatasource": "NEO4J",
+   	  "usecase": ""
    },
    {
       "kpiId":112103,

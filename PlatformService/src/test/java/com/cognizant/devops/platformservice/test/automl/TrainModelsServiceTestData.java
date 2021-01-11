@@ -29,8 +29,6 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import com.cognizant.devops.platformcommons.config.ApplicationConfigCache;
-import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.constants.ConfigOptions;
 import com.cognizant.devops.platformcommons.core.enums.AutoMLEnum;
 import com.cognizant.devops.platformcommons.dal.ai.H2oApiCommunicator;
@@ -61,15 +59,12 @@ public class TrainModelsServiceTestData {
 	String numOfModels = "6";
 	File file = new File(classLoader.getResource("GitAuthorData.csv").getFile());
 	String configuration = "[{\"FieldName\":\"Date\",\"DataType\":\"Time\",\"EnableNLP\":false},{\"FieldName\":\"AuthorName\",\"DataType\":\"Enum\",\"EnableNLP\":false},{\"FieldName\":\"Experience\",\"DataType\":\"Numeric\",\"EnableNLP\":false},{\"FieldName\":\"RepoName\",\"DataType\":\"Numeric\",\"EnableNLP\":false},{\"FieldName\":\"Commits\",\"DataType\":\"Numeric\",\"EnableNLP\":false}]";
-	String workflowTask = "{\"description\":\"H2O_AutoML_Execute\",\"mqChannel\":\"WORKFLOW.TASK.AUTOML.EXCECUTION\",\"componentName\":\"com.cognizant.devops.automl.task.core.AutoMLSubscriber\",\"dependency\":-1,\"workflowType\":\"AutoML\"}";
+	String workflowTask = "{\"description\":\"H2O_AutoML_Execute\",\"mqChannel\":\"WORKFLOW.TASK.AUTOML.EXCECUTION\",\"componentName\":\"com.cognizant.devops.automl.task.core.AutoMLSubscriber\",\"dependency\":-1,\"workflowType\":\"AUTOML\"}";
 	JsonObject workflowTaskJson = new JsonParser().parse(workflowTask).getAsJsonObject();
 	boolean isTaskExists = false;
 	String mqChannel = "WORKFLOW.TASK.AUTOML.EXCECUTION";
 	String modelName = null;
-	
-	int numOfColumn = 5;
-	String columnTypes = "Time,Enum,Numeric,Numeric,Numeric";
-	String columnNames = "Date,AuthorName,Experience,RepoName,Commits";
+	String h2oEndpoint = null;
 
 	
 	public String getTaskList() {

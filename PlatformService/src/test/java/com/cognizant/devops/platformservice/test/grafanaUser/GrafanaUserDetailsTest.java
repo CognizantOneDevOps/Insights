@@ -15,20 +15,61 @@
  *******************************************************************************/
 package com.cognizant.devops.platformservice.test.grafanaUser;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.test.context.ContextConfiguration;
+import org.testng.Assert;
+import org.testng.SkipException;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
+import com.cognizant.devops.platformcommons.constants.ConfigOptions;
+import com.cognizant.devops.platformcommons.constants.UnitTestConstant;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformservice.security.config.grafana.GrafanaUserDetailsUtil;
+import com.google.gson.Gson;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonIOException;
+import com.google.gson.JsonParser;
+import com.google.gson.JsonSyntaxException;
 
 @Test
 @ContextConfiguration(locations = { "classpath:spring-test-config.xml" })
 public class GrafanaUserDetailsTest {
+	private static final String AUTHORIZATION = "authorization";
 
 	GrafanaUserDetailsUtil grafanaUser = new GrafanaUserDetailsUtil();
 	GrafanaUserDetailsTestData userDetailsTestData = new GrafanaUserDetailsTestData();
+	
+	Map<String, String> testAuthData = new HashMap<>();
+
+	@DataProvider
+	public void getData() throws FileNotFoundException {
+		String path = System.getenv().get(ConfigOptions.INSIGHTS_HOME) + File.separator + UnitTestConstant.TESTNG_TESTDATA + File.separator
+				+ "grafanaAuth.json";
+		JsonElement jsonData;
+		try {
+			jsonData = new JsonParser().parse(new FileReader(path));
+		} catch (JsonIOException | JsonSyntaxException | FileNotFoundException e) {
+			throw new SkipException("skipped this test case as grafana auth file not found.");
+		}
+		testAuthData = new Gson().fromJson(jsonData, Map.class);
+	}
+
+	@BeforeClass
+	public void onInit() throws InterruptedException, IOException, InsightsCustomException {
+		getData();
+
+	 }
+
 
 	@Test(priority = 1)
 	public void testGetUserDetails() throws Exception {
@@ -37,17 +78,17 @@ public class GrafanaUserDetailsTest {
 
 		request.setCookies(userDetailsTestData.cookies);
 		request.addHeader("Accept", userDetailsTestData.accept);
-		request.addHeader("Authorization", userDetailsTestData.authorization);
+		request.addHeader("Authorization", testAuthData.get(AUTHORIZATION));
 		request.addHeader("Content-Type", userDetailsTestData.contentType);
 		request.addHeader("Origin", userDetailsTestData.origin);
 		request.addHeader("Referer", userDetailsTestData.referer);
-		request.addHeader("XSRF-TOKEN", userDetailsTestData.XSRFTOKEN);
+		request.addHeader("XSRF-TOKEN", testAuthData.get("XSRFTOKEN"));
 
 		UserDetails Actualrespone = GrafanaUserDetailsUtil.getUserDetails(request);
-
+		Assert.assertTrue(Actualrespone.getUsername().equals(testAuthData.get("username")));
 	}
 
-	@Test(priority = 2)
+	@Test(priority = 2, expectedExceptions = RuntimeException.class)
 	public void testGetUserDetailsExceptions() throws InsightsCustomException {
 
 		MockHttpServletRequest request = new MockHttpServletRequest();
@@ -59,6 +100,7 @@ public class GrafanaUserDetailsTest {
 		request.addHeader("Referer", userDetailsTestData.referer);
 
 		UserDetails ActualresponeExceptions = GrafanaUserDetailsUtil.getUserDetails(request);
+		Assert.assertNull(ActualresponeExceptions);
 
 	}
 

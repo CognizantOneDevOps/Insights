@@ -16,7 +16,13 @@
 
 package com.cognizant.devops.platformservice.test.accessGroupManagement;
 
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -40,22 +46,32 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.DefaultMockMvcBuilder;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
-import org.testng.annotations.BeforeTest;
+import org.testng.SkipException;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
-import com.cognizant.devops.platformcommons.config.ApplicationConfigCache;
+import com.cognizant.devops.platformcommons.constants.ConfigOptions;
+import com.cognizant.devops.platformcommons.constants.UnitTestConstant;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformservice.rest.AccessGroupManagement.AccessGroupManagement;
 import com.cognizant.devops.platformservice.rest.util.PlatformServiceUtil;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.*;
+import com.google.gson.Gson;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonIOException;
+import com.google.gson.JsonParser;
+import com.google.gson.JsonSyntaxException;
 
 @Test
 @WebAppConfiguration
 @ContextConfiguration(locations = { "classpath:spring-test-config.xml" })
 public class GroupsAndUserTest extends AbstractTestNGSpringContextTests {
 	private static final Logger log = LogManager.getLogger(GroupsAndUserTest.class);
+	private static final String AUTHORIZATION = "authorization";
 
 	AccessGroupManagement accessGroupManagement = new AccessGroupManagement();
+	
+	Map<String, String> testAuthData = new HashMap<>();
 
 	GroupsAndUserTestData groupsAndUserTestData = new GroupsAndUserTestData();
 	MockHttpServletRequest httpRequest = new MockHttpServletRequest();
@@ -69,29 +85,42 @@ public class GroupsAndUserTest extends AbstractTestNGSpringContextTests {
 
 	@Resource
 	private FilterChainProxy springSecurityFilterChain;
+	
+	@DataProvider
+	public void getData() {
+		String path = System.getenv().get(ConfigOptions.INSIGHTS_HOME) + File.separator + UnitTestConstant.TESTNG_TESTDATA + File.separator
+				+ "grafanaAuth.json";
+		JsonElement jsonData;
+		try {
+			jsonData = new JsonParser().parse(new FileReader(path));
+		} catch (JsonIOException | JsonSyntaxException | FileNotFoundException e) {
+			throw new SkipException("skipped this test case as grafana auth file not found.");
+		}
+		testAuthData = new Gson().fromJson(jsonData, Map.class);
+	}
 
-	@BeforeTest
+	@BeforeClass
 	public void onInit() throws InterruptedException, IOException, InsightsCustomException {
-//		ApplicationConfigCache.loadConfigCache();
-//		httpRequest.addHeader("Authorization", groupsAndUserTestData.authorization);
-//		Map<String, String> cookiesMap = PlatformServiceUtil.getGrafanaCookies(httpRequest);
-//
-//		cookiesString = cookiesMap.entrySet().stream().map(e -> e.getKey() + "=" + e.getValue())
-//				.collect(Collectors.joining(";"));
-//		log.debug(" cookiesString " + cookiesString);
-//		for (Map.Entry<String, String> entry : cookiesMap.entrySet()) {
-//			Cookie cookie = new Cookie(entry.getKey(), entry.getValue());
-//			cookie.setHttpOnly(true);
-//			cookie.setMaxAge(60 * 30);
-//			cookie.setPath("/");
-//			httpRequest.setCookies(cookie);
-//		}
+		getData();
+		httpRequest.addHeader("Authorization", testAuthData.get(AUTHORIZATION));
+		Map<String, String> cookiesMap = PlatformServiceUtil.getGrafanaCookies(httpRequest);
+
+		cookiesString = cookiesMap.entrySet().stream().map(e -> e.getKey() + "=" + e.getValue())
+				.collect(Collectors.joining(";"));
+		log.debug(" cookiesString " + cookiesString);
+		for (Map.Entry<String, String> entry : cookiesMap.entrySet()) {
+			Cookie cookie = new Cookie(entry.getKey(), entry.getValue());
+			cookie.setHttpOnly(true);
+			cookie.setMaxAge(60 * 30);
+			cookie.setPath("/");
+			httpRequest.setCookies(cookie);
+		}
 	}
 
 	private MockHttpServletRequestBuilder mockHttpServletRequestBuilderPost(String url, String content) {
 		log.debug(" cookies " + httpRequest.getCookies());
 		MockHttpServletRequestBuilder builder = MockMvcRequestBuilders.post(url).cookie(httpRequest.getCookies())
-				.header("Authorization", groupsAndUserTestData.authorization).header("Cookie", cookiesString)
+				.header("Authorization", testAuthData.get(AUTHORIZATION)).header("Cookie", cookiesString)
 				.content(content).contentType(MediaType.APPLICATION_JSON_VALUE);
 		return builder;
 	}
@@ -105,10 +134,10 @@ public class GroupsAndUserTest extends AbstractTestNGSpringContextTests {
 			String content) {
 
 		return MockMvcRequestBuilders.post(url).cookie(httpRequest.getCookies())
-				.header("Authorization", groupsAndUserTestData.authorization).header("Cookie", cookiesString);
+				.header("Authorization", testAuthData.get(AUTHORIZATION)).header("Cookie", cookiesString);
 	}
 
-	//@Test(priority = 1)
+	@Test(priority = 1)
 	public void testGetOrgUsers() throws InsightsCustomException {
 		try {
 			this.mockMvc = getMacMvc();
@@ -123,7 +152,7 @@ public class GroupsAndUserTest extends AbstractTestNGSpringContextTests {
 		log.debug("Test case getOrgUsers pass successfully ");
 	}
 
-	//@Test(priority = 2)
+	@Test(priority = 2)
 	public void testCreateOrg() throws InsightsCustomException {
 		try {
 			this.mockMvc = getMacMvc();
@@ -137,7 +166,7 @@ public class GroupsAndUserTest extends AbstractTestNGSpringContextTests {
 		log.debug("Test case createOrg pass successfully ");
 	}
 
-	//@Test(priority = 3)
+	@Test(priority = 3)
 	public void testAddUser() throws InsightsCustomException {
 	
 		try {
@@ -153,7 +182,7 @@ public class GroupsAndUserTest extends AbstractTestNGSpringContextTests {
 		log.debug("Test case addUserInOrg pass successfully ");
 	}
 	
-	//@Test(priority = 4)
+	@Test(priority = 4)
 	public void testSearchUser() throws InsightsCustomException {
 		try {
 			this.mockMvc = getMacMvc();
@@ -186,7 +215,7 @@ public class GroupsAndUserTest extends AbstractTestNGSpringContextTests {
 	
 	}
 	
-	//@Test(priority = 6)
+	@Test(priority = 6)
 	public void testAddUserEditor() throws InsightsCustomException {
 	
 		try {
@@ -202,7 +231,7 @@ public class GroupsAndUserTest extends AbstractTestNGSpringContextTests {
 	
 	}
 	
-	//@Test(priority = 7)
+	@Test(priority = 7)
 	public void testAddUserViewer() throws InsightsCustomException {
 	
 		try {
@@ -236,7 +265,7 @@ public class GroupsAndUserTest extends AbstractTestNGSpringContextTests {
 	
 	}
 	
-	//@Test(priority = 9)
+	@Test(priority = 9)
 	public void testDeleteOrganizationUser() throws InsightsCustomException {
 	
 		try {

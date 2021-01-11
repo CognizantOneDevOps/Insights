@@ -18,18 +18,14 @@ package com.cognizant.devops.engines.platformdataarchivalengine.test.engine;
 import java.io.IOException;
 import java.util.concurrent.TimeoutException;
 
-import javax.persistence.NoResultException;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.testng.Assert;
-import org.testng.annotations.AfterTest;
-import org.testng.annotations.BeforeTest;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.cognizant.devops.engines.platformdataarchivalengine.modules.aggregator.DataArchivalAggregatorModule;
-import com.cognizant.devops.platformcommons.config.ApplicationConfigCache;
-import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
 import com.cognizant.devops.platformcommons.core.enums.DataArchivalStatus;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformdal.agentConfig.AgentConfigDAL;
@@ -42,9 +38,8 @@ public class DataArchivalEngineTest extends DataArchivalEngineData {
 	DataArchivalConfigDal dataArchivalConfigdal = new DataArchivalConfigDal();
 	String host = null;
 
-	@BeforeTest
+	@BeforeClass
 	public void onInit() throws IOException, TimeoutException, InsightsCustomException, InterruptedException {
-		ApplicationConfigCache.loadConfigCache();
 
 		// save data archival agent
 		try {
@@ -157,7 +152,7 @@ public class DataArchivalEngineTest extends DataArchivalEngineData {
 		Assert.assertTrue(countOfRecords > 0);
 	}
 
-	@AfterTest
+	@AfterClass
 	public void cleanUp() {
 
 		agentConfigDAL.deleteAgentConfigurations(agentJson.get("agentId").getAsString());

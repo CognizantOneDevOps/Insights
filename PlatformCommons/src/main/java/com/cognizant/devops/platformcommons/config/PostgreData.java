@@ -35,6 +35,8 @@ public class PostgreData implements Serializable{
 	
 	private String insightsDBUrl;
 	private String grafanaDBUrl;
+	private String driver="org.postgresql.Driver";
+	private String dialect="org.hibernate.dialect.PostgreSQLDialect";
 	private String c3pMinSize="9";
 	private String c3pMaxSize="25";
 	private String c3pTimout="2000";
@@ -86,6 +88,18 @@ public class PostgreData implements Serializable{
 	}
 	public void setC3pMaxStatements(String c3pMaxStatements) {
 		this.c3pMaxStatements = c3pMaxStatements;
+	}
+	public String getDriver() {
+		return driver;
+	}
+	public void setDriver(String driver) {
+		this.driver = driver;
+	}
+	public String getDialect() {
+		return dialect;
+	}
+	public void setDialect(String dialect) {
+		this.dialect = dialect;
 	}
 	
 	

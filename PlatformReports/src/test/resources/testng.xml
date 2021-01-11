@@ -3,6 +3,7 @@
 <suite name="ReportsSuite">
   <test name="PlatformReportsTestCases">
     <classes>
+      <class name="com.cognizant.devops.platformreports.test.testngInitializer.TestngInitializerTest"/>
       <class name="com.cognizant.devops.platformreports.test.AssessmentReportsTest"/>
     </classes>
   </test>

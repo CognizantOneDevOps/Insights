@@ -1,8 +1,8 @@
 {
-  "JIRA": {
+  "JIRA_TRACEABILITY": {
     "uuid" :"uuid",
 	"order" :1,
-    "almAssetID": "jiraKey",
+    "jiraKey": "jiraKey",
     "property": "categoryName",
     "phase": "Plan",
 	"toolName": "toolName",
@@ -11,30 +11,28 @@
     "projectName": "projectName",
     "priority": "jiraPriority",
     "timestamp": "inSightsTime",
-	"inSightsTimeX":"inSightsTimeX",
+	"inSightsTimeX":"inSightsTime",
   	"uptool":["null"],
-	"downtool":["GIT"],
-    "uplink": "null",
-    "downlink": [{"jiraKey": "jiraKey"}],
-	"statusArray":["In-Progress","Done","Accepted"],
-	"timelagParam":["statusArray"],
+	"downtool":["GIT_TRACEABILITY"],
+  	"timelagParam":["statusArray"],
 	"uifilter":["jiraKey","projectName"]
    
   },
-  "GIT": {
+  "GIT_TRACEABILITY": {
     "uuid":"uuid",
 	"order" :2,
 	"inSightsTimeX":"inSightsTimeX",
-    "scmAssetID": "ccommitId",
+    "scmAssetID": "commitId",
     "jiraKeys": "jiraKey",
     "property": "categoryName",
     "phase": {"phase": "Committed"},
     "toolName": "toolName",
     "toolstatus": "Committed",
     "author": "gitAuthorName",
-    "repositoryName": "cgitReponame",
+    "repositoryName": "gitReponame",
     "timestamp": "inSightsTime",
-	"uptool":["JIRA"],
+	"commitId":"commitId",
+	"uptool":["JIRA_TRACEABILITY"],
 	"downtool":["JENKINS"],
     "uplink": {"almAssetID": "jiraKeys"},
     "downlink": [{"commitId": "scmcommitId"}],
@@ -96,7 +94,7 @@
    	"messages" : [
 		{"Message":"Deployment - {0} Successful Deployments  {1} Failed Deployments","Operation":"SUM","OperandName":"toolstatus","OperandValue":"Success"}		
 	],
-	"uifilter":["jenkineBuildNumber"]
+	"uifilter":["buildNumber"]
   },
   
    "TESTING": {
@@ -139,6 +137,7 @@
     "property": "categoryName",
     "phase": "Analysis",
     "toolName": "toolName",
+	"buildNumber": "jenkineBuildNumber",
     "toolstatus": "sonarQualityGateStatus",
     "projectName": "projectname",
     "resourcekey": "resourceKey",
@@ -150,7 +149,7 @@
 	"startTime":"startTime",
 	"endTime":"endTime",
 	"timelagParam":["startTime","endTime"],
-    "uplink": {"sonarTaskID": "codeQualityAssetID"}
+    "uplink": {"buildNumber": "codeQualityAssetID"}
    
   },
   "UCD":{
@@ -181,4 +180,3 @@
     "to":"to"
   }
 }
-

@@ -179,9 +179,13 @@ public class SystemNotificationDetailSubscriber extends WorkflowTaskSubscriberHa
 		for (String component : componentResponseJson.keySet()) {
 			tableList.append("<tr>");
 			tableList.append("<td>").append(component).append("</td>");
-			tableList.append("<td>")
-			.append(componentResponseJson.get(component).getAsJsonObject().get("version").getAsString())
-			.append("</td>");
+			tableList.append("<td>");
+			if(!componentResponseJson.get(component).getAsJsonObject().get("version").isJsonNull()) {
+				tableList.append(componentResponseJson.get(component).getAsJsonObject().get("version").getAsString());
+			}else {
+				tableList.append("-");
+			}
+			tableList.append("</td>");
 			tableList.append("<td>")
 					.append(formatStatus(componentResponseJson.get(component).getAsJsonObject().get("status").getAsString()))
 					.append("</td>");

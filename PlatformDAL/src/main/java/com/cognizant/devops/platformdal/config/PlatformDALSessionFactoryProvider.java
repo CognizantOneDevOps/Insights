@@ -67,7 +67,7 @@ public class PlatformDALSessionFactoryProvider {
 	}
 	static{
 		initInSightsDAL();
-		initGrafanaDAL();
+//		initGrafanaDAL();
 	}
 	private synchronized static void initInSightsDAL(){
 		if(sessionFactory == null){
@@ -109,19 +109,21 @@ public class PlatformDALSessionFactoryProvider {
 				configuration.setProperty(AvailableSettings.USER, postgre.getUserName());
 				configuration.setProperty(AvailableSettings.PASS, postgre.getPassword());
 				configuration.setProperty(AvailableSettings.URL, postgre.getInsightsDBUrl());
-				configuration.setProperty(AvailableSettings.DRIVER, "org.postgresql.Driver");
-				configuration.setProperty(AvailableSettings.DIALECT, "org.hibernate.dialect.PostgreSQLDialect");
+				configuration.setProperty(AvailableSettings.DRIVER, postgre.getDriver());
+				configuration.setProperty(AvailableSettings.DIALECT,postgre.getDialect());
 				configuration.setProperty(AvailableSettings.SHOW_SQL, "false");
 				configuration.setProperty(AvailableSettings.USE_SQL_COMMENTS, "false");
 				configuration.setProperty(AvailableSettings.FORMAT_SQL, "false");
 				configuration.setProperty(AvailableSettings.GENERATE_STATISTICS, "false");
 				configuration.setProperty(AvailableSettings.HBM2DDL_AUTO, "update");
 				/* c3p configuration setting */
-				configuration.setProperty(AvailableSettings.C3P0_MIN_SIZE,postgre.getC3pMinSize());
-				configuration.setProperty(AvailableSettings.C3P0_MAX_SIZE, postgre.getC3pMaxSize());
-				configuration.setProperty(AvailableSettings.C3P0_MAX_STATEMENTS,postgre.getC3pMaxStatements());
-				configuration.setProperty(AvailableSettings.C3P0_TIMEOUT, postgre.getC3pTimout());
-				configuration.setProperty(AvailableSettings.C3P0_ACQUIRE_INCREMENT, "1");
+				if (postgre.getDriver().equals("org.postgresql.Driver")) {
+					configuration.setProperty(AvailableSettings.C3P0_MIN_SIZE, postgre.getC3pMinSize());
+					configuration.setProperty(AvailableSettings.C3P0_MAX_SIZE, postgre.getC3pMaxSize());
+					configuration.setProperty(AvailableSettings.C3P0_MAX_STATEMENTS, postgre.getC3pMaxStatements());
+					configuration.setProperty(AvailableSettings.C3P0_TIMEOUT, postgre.getC3pTimout());
+					configuration.setProperty(AvailableSettings.C3P0_ACQUIRE_INCREMENT, "1");
+				}
 				
 				
 			}		

@@ -58,7 +58,7 @@ public class InsightsReportVisualizationContainer implements Serializable {
 	@Column(name = "attachmentpath")
 	private String attachmentPath;
 	
-	@Column(name = "attachmentData")
+	@Column(name = "attachmentData", columnDefinition = "BLOB")
 	private byte[] attachmentData;
 
 	@Column(name = "status")

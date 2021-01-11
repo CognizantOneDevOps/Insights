@@ -24,10 +24,9 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.web.multipart.MultipartFile;
 import org.testng.Assert;
-import org.testng.annotations.BeforeTest;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import com.cognizant.devops.platformcommons.config.ApplicationConfigCache;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformdal.filemanagement.InsightsConfigFiles;
 import com.cognizant.devops.platformdal.filemanagement.InsightsConfigFilesDAL;
@@ -42,9 +41,8 @@ public class FileManagementTest extends FileManagementTestData {
 	FileManagementTestData fileManagementTestData = new FileManagementTestData();
 	InsightsConfigFilesDAL configFilesDAL = new InsightsConfigFilesDAL();
 	
-	@BeforeTest
+	@BeforeClass
 	public void onInit() throws InsightsCustomException {
-		ApplicationConfigCache.loadConfigCache();
 	
 	}
 	

@@ -25,7 +25,9 @@ import java.util.concurrent.TimeoutException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.testng.Assert;
+import org.testng.annotations.AfterClass;
 import org.testng.annotations.AfterTest;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 
@@ -44,9 +46,8 @@ public class WebhookEngineTest {
 	private FileReader reader = null;
 	private Properties p = null;
 
-	@BeforeTest
+	@BeforeClass
 	public void onInit() throws IOException, InsightsCustomException {
-		ApplicationConfigCache.loadConfigCache();
 
 		reader = new FileReader("src/test/resources/Properties.prop");
 
@@ -187,7 +188,7 @@ public class WebhookEngineTest {
 		em.run();
 	}*/
 
-	@AfterTest
+	@AfterClass
 	public void cleanUp() {
 
 		// Cleaning Postgre 

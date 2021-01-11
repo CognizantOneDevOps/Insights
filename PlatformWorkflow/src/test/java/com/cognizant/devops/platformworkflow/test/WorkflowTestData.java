@@ -64,6 +64,8 @@ public class WorkflowTestData {
 	ReportConfigDAL reportConfigDAL = new ReportConfigDAL();
 
 	int reportId = 0;
+	int workflowTypeId = 0;
+	boolean deleteWorkflowType = false;
 	
 	String kpiDefinition = "{\"kpiId\":1111265,\"name\":\"Avg all employee productivity for threshold \",\"toolName\":\"PRODUCTIVITY\",\"category\":\"THRESHOLD_RANGE\",\"group\":\"PRODUCTIVITY\",\"isActive\":true,\"DBQuery\":\"MATCH (n:PRODUCTIVITY) where n.completionDateEpochTime {startTime} AND n.completionDateEpochTime {endTime} WITH  avg(n.storyPoints*8) as StoryPoint, avg(n.authorTimeSpent) as authorTimeSpent  return   StoryPoint, authorTimeSpent, round((toFloat(StoryPoint)authorTimeSpent)*100) as Productivity\",\"resultField\":\"Productivity\",\"datasource\":\"NEO4J\",\"outputDatasource\":\"NEO4J\",\"usecase\":\"\"}";
 	JsonObject kpiDefinitionJson = new JsonParser().parse(kpiDefinition).getAsJsonObject();

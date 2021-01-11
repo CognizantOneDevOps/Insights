@@ -19,10 +19,12 @@ import java.util.List;
 
 import org.junit.Assert;
 import org.testng.SkipException;
-import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
+import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBHandler;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.cognizant.devops.platformdal.webhookConfig.WebHookConfig;
 import com.cognizant.devops.platformservice.agentmanagement.service.AgentConfigTO;
@@ -31,14 +33,20 @@ import com.cognizant.devops.platformservice.rest.datadictionary.service.DataDict
 import com.cognizant.devops.platformservice.webhook.service.WebHookServiceImpl;
 import com.google.gson.JsonObject;
 
-public class DataDictionaryTest {
+public class DataDictionaryTest extends DataDictionaryTestData {
 	public static final DataDictionaryTestData dataDictionaryTestData = new DataDictionaryTestData();
-	public static final DataDictionaryServiceImpl dataDictionaryImpl = new DataDictionaryServiceImpl();
-
-	@BeforeMethod
+	DataDictionaryServiceImpl dataDictionaryImpl;
+	@BeforeClass
 	public void beforeMethod() throws InsightsCustomException {
 		WebHookServiceImpl webhookServiceImp = new WebHookServiceImpl();
 		AgentManagementServiceImpl agentServiceImpl = new AgentManagementServiceImpl();
+		dataDictionaryImpl = new DataDictionaryServiceImpl();
+		graphDBHandler = new GraphDBHandler();
+		
+		insertAgentDataInNeo4j(destCat, destLabel, gitAgentData);
+		insertAgentDataInNeo4j(sourceCat, sourcelabel, jiraAgentData);
+		graphDBHandler.executeCypherQuery(dataDictionaryTestData.relationQuery);
+		
 		List<WebHookConfig> webhookConfigList = webhookServiceImp.getRegisteredWebHooks();
 		if (webhookConfigList.isEmpty()) {
 			Boolean webhookcheck = webhookServiceImp
@@ -54,6 +62,7 @@ public class DataDictionaryTest {
 					dataDictionaryTestData.configDetails, dataDictionaryTestData.trackingDetails, false);
 
 		}
+		
 	}
 
 	@Test(priority = 1)
@@ -90,6 +99,12 @@ public class DataDictionaryTest {
 		int sizeOfresponse = response.get("data").getAsJsonArray().size();
 		Assert.assertTrue(sizeOfresponse >= 0);
 
+	}
+	
+	@AfterClass
+	public void cleanUp() throws InsightsCustomException {
+		deleteAgentDataFromNeo4j(sourceCat);
+		deleteAgentDataFromNeo4j(destCat);
 	}
 
 }

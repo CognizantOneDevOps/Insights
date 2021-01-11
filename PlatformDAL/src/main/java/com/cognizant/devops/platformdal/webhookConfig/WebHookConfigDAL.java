@@ -96,7 +96,9 @@ public class WebHookConfigDAL extends BaseDAL {
 		session.getTransaction().commit();
 		}catch(Exception e) {
 			log.error(e.getMessage());
-			return Boolean.FALSE;}
+			//return Boolean.FALSE;
+			throw new InsightsCustomException(e.getMessage());
+		}
 		
 		return Boolean.TRUE;
 	}

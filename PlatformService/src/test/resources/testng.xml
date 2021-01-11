@@ -36,7 +36,9 @@
 			<class
 				name="com.cognizant.devops.platformservice.test.automl.TrainModelsServiceTest" />
 			<class
-				name="com.cognizant.devops.platformservice.test.serverConfig.ServerConfigServiceTest" />	
+				name="com.cognizant.devops.platformservice.test.serverConfig.ServerConfigServiceTest" />
+			<class
+				name="com.cognizant.devops.platformservice.test.fileManagement.FileManagementTest" />	
 		</classes>
 	</test>
 </suite>
