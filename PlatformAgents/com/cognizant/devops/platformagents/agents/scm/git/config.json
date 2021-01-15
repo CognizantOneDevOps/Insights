@@ -19,6 +19,12 @@
 		"data": "SCM.GIT.DATA",
 		"health": "SCM.GIT.HEALTH"
 	},
+	"enrichData": {
+		"isEnrichmentRequired": false,
+		"sourceProperty": "message",
+		"keyPattern": "-",
+		"targetProperty": "key"
+	},
 	"communication": {
 		"type": "REST",
 		"sslVerify": false,
@@ -69,27 +75,27 @@
 			"closed_at": "closedAt",
 			"merged_at": "mergedAt"
 		},
-		"branches":{
-         "insightsTimeXFieldMapping":{
-            "timefield":"consumptionTime",
-            "isEpoch":false,
-            "timeformat":"%Y-%m-%dT%H:%M:%SZ"
-         }
-      },
-      "pullRequest":{
-         "insightsTimeXFieldMapping":{
-            "timefield":"updatedAt",
-            "isEpoch":false,
-            "timeformat":"%Y-%m-%dT%H:%M:%SZ"
-         }
-      },
-		"orphanCommitResponseTemplate":{
-		"sha": "commitId",
-		"commit":{
-			"message": "message",
-			"author":{
-				"name":"authorName",
-				"date":"commitTime"
+		"branches": {
+			"insightsTimeXFieldMapping": {
+				"timefield": "consumptionTime",
+				"isEpoch": false,
+				"timeformat": "%Y-%m-%dT%H:%M:%SZ"
+			}
+		},
+		"pullRequest": {
+			"insightsTimeXFieldMapping": {
+				"timefield": "updatedAt",
+				"isEpoch": false,
+				"timeformat": "%Y-%m-%dT%H:%M:%SZ"
+			}
+		},
+		"orphanCommitResponseTemplate": {
+			"sha": "commitId",
+			"commit": {
+				"message": "message",
+				"author": {
+					"name": "authorName",
+					"date": "commitTime"
 				}
 			}
 		},
@@ -117,9 +123,9 @@
 					"gitType"
 				]
 			},
-			"orphanCommits":{
+			"orphanCommits": {
 				"dataUpdateSupported": true,
-				"uniqueKey":[
+				"uniqueKey": [
 					"repoName",
 					"commitId",
 					"gitType"
@@ -130,10 +136,10 @@
 	"agentId": "",
 	"enableBranches": true,
 	"enableOptimizedDataRetrieval": true,
-	"enablePullReqCommitAPIDataRetrieval" : true,
+	"enablePullReqCommitAPIDataRetrieval": true,
 	"enableBrancheDeletion": false,
 	"enableDataValidation": true,
-	"toolCategory": "SCM",	
+	"toolCategory": "SCM",
 	"toolsTimeZone": "GMT",
 	"insightsTimeZone": "Asia/Kolkata",
 	"enableValueArray": false,
@@ -143,7 +149,9 @@
 	"timeStampField": "commitTime",
 	"timeStampFormat": "%Y-%m-%dT%H:%M:%SZ",
 	"isEpochTimeFormat": false,
-	"agentSecretDetails": ["accessToken"],
+	"agentSecretDetails": [
+		"accessToken"
+	],
 	"startFrom": "2020-01-01 15:46:33",
 	"accessToken": "accessToken for git",
 	"getRepos": "https://api.github.com/users/<USER_NAME>/repos",
@@ -156,7 +164,7 @@
 	},
 	"osversion": "windows",
 	"agentVersion": "v7.2",
-	"labelName": "GIT",	
+	"labelName": "GIT",
 	"toolName": "GIT",
 	"auditing": false
 }

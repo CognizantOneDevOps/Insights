@@ -385,6 +385,7 @@ export class MLWizardComponent implements OnInit {
     this.splitRatio = null;
     this.noOfModels = null;
     this.enablesavebutton = false;
+    this.ptype = "";
   }
 
   isUsecaseIdPopulated() {

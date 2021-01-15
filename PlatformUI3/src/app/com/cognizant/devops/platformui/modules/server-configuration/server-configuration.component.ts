@@ -51,7 +51,7 @@ export class ServerConfigurationComponent implements OnInit {
   requiredProperties = ["isVaultEnable", "vaultEndPoint", "secretEngine", "vaultToken", "endpoint", "authToken", "boltEndPoint", "grafanaEndpoint",
     "grafanaDBEndpoint", "userName", "password", "insightsDBUrl", "grafanaDBUrl", "host", "user", "password", "insightsServiceURL", "trustedHosts",
     "autheticationProtocol", "adminUserPassword", "adminUserName"]
-  secretProperties = ["authToken", "password", "adminUserPassword", "smtpPassword"];
+  secretProperties = ["authToken", "password", "adminUserPassword", "smtpPassword", "nexusPassword"];
   constructor(public config: InsightsInitService, public serverconfigService: ServerConfigurationService,
     private router: Router, private route: ActivatedRoute,
     public messageDialog: MessageDialogService, private dataShare: DataSharedService, private grafanaService: GrafanaAuthenticationService) {

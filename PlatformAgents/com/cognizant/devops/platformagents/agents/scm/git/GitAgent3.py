@@ -38,7 +38,7 @@ class GitAgent(BaseAgent):
         timeStampNow = lambda: dateTime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")
         getReposUrl = self.config.get("getRepos", '')
         accessToken = self.getCredential("accessToken")
-        headers = {"Authorization":accessToken}
+        headers = {"Authorization": "token " + accessToken}
         commitsBaseEndPoint = self.config.get("commitsBaseEndPoint", '')
         startFromStr = self.config.get("startFrom", '')
         startFrom = parser.parse(startFromStr, ignoretz=True)
@@ -142,7 +142,7 @@ class GitAgent(BaseAgent):
                             getTopicsUrl = commitsBaseEndPoint + repoName + '/topics?'
                             topicsList = list()
                             try:
-                                topicsAPIHeaders = {'Accept': 'application/vnd.github.mercy-preview+json',"Authorization":accessToken}
+                                topicsAPIHeaders = {'Accept': 'application/vnd.github.mercy-preview+json',"Authorization": "token " + accessToken}
                                 topicsResp = self.getResponse(getTopicsUrl, 'GET',None, None, None, reqHeaders=topicsAPIHeaders)
                                 topicsList = topicsResp.get('names', list())
                             except Exception as err:

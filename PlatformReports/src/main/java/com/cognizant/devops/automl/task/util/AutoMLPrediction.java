@@ -59,8 +59,8 @@ public class AutoMLPrediction {
 	 * @param columnNames
 	 * @param usecaseName
 	 * @return
-	 * @throws IOException
-	 * @throws PredictException
+	 * @throws PredictException 
+	 * @throws IOException 
 	 */
 	
 	public static List<JsonObject> getPrediction(List<JsonObject> data, JsonArray columnNames, String usecaseName) throws IOException, PredictException
@@ -114,14 +114,14 @@ public class AutoMLPrediction {
 
 			}
 		} catch (Exception e) {
-			log.debug(e.getMessage());
-			return predictionData;
+			log.error(e);
+			throw new PredictException("Something went wrong while executing regression prediction for "+ usecaseName + " " + e.getMessage());
 		}
 
 		return predictionData;
 	}
 	
-	public static List<JsonObject> predictClassification(List<JsonObject> data, JsonArray columnNames, String usecaseName)
+	public static List<JsonObject> predictClassification(List<JsonObject> data, JsonArray columnNames, String usecaseName) throws PredictException
 	{
 		List<JsonObject> predictionData = new ArrayList<>();
 		try {
@@ -161,8 +161,8 @@ public class AutoMLPrediction {
 
 			}
 		} catch (Exception e) {
-			log.debug(e.getMessage());
-			return predictionData;
+			log.error(e);
+			throw new PredictException("Something went wrong while executing classification prediction for "+ usecaseName + " " + e.getMessage());
 		}
 		return predictionData;
 	}

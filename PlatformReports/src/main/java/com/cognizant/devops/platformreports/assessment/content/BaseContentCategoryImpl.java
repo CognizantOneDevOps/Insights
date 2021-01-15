@@ -25,8 +25,11 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.cognizant.devops.platformcommons.config.ApplicationConfigProvider;
+import com.cognizant.devops.platformcommons.core.util.InsightsUtils;
 import com.cognizant.devops.platformcommons.dal.neo4j.GraphDBHandler;
 import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
+import com.cognizant.devops.platformdal.assessmentreport.InsightsKPIConfig;
+import com.cognizant.devops.platformdal.assessmentreport.ReportConfigDAL;
 import com.cognizant.devops.platformreports.assessment.dal.ReportDataHandler;
 import com.cognizant.devops.platformreports.assessment.dal.ReportDataHandlerFactory;
 import com.cognizant.devops.platformreports.assessment.datamodel.ContentConfigDefinition;
@@ -52,6 +55,7 @@ public abstract class BaseContentCategoryImpl {
 	ReportDataHandler datasourceDataHandler = ReportDataHandlerFactory.getDataSource(datasource);
 	Gson gson = new Gson();
 	ObjectMapper oMapper = new ObjectMapper();
+	ReportConfigDAL reportConfigDAL = new ReportConfigDAL();
 
 	public BaseContentCategoryImpl() {
 
@@ -167,6 +171,7 @@ public abstract class BaseContentCategoryImpl {
 		try {
 			Map<String, Object> resultValuesMap = new HashMap<>();
 			String inferenceContentText = getContentText(ReportEngineUtils.NEUTRAL_MESSAGE_KEY, resultValuesMap);
+			InsightsKPIConfig kpiConfig = reportConfigDAL.getKPIConfig(contentConfigDefinition.getKpiId());
 			detail.setCategory(contentConfigDefinition.getCategory());
 			detail.setActualTrend(ReportEngineEnum.KPITrends.NORESULT.getValue());
 			detail.setExpectedTrend(contentConfigDefinition.getExpectedTrend());
@@ -183,6 +188,12 @@ public abstract class BaseContentCategoryImpl {
 			detail.setExecutionId(contentConfigDefinition.getExecutionId());
 			detail.setReportId(contentConfigDefinition.getReportId());
 			detail.setAssessmentId(contentConfigDefinition.getAssessmentId());
+			detail.setKpiName(kpiConfig.getKpiName());
+			detail.setToolName(kpiConfig.getToolname());
+			detail.setGroup(kpiConfig.getGroupName());
+			detail.setResultTime(System.currentTimeMillis());
+            detail.setResultTimeX(InsightsUtils.insightsTimeXFormat(System.currentTimeMillis()));
+			
 		} catch (Exception e) {
 			log.error(" Error while setNeutralContentDetail  ", e);
 		}

@@ -62,7 +62,7 @@ public class ApplicationConfigProvider implements Serializable {
 	private boolean enableAuditEngine = false;
 	private boolean enableWebHookEngine = false;
 	private boolean enableDataArchivalEngine = false;
-	private SchedulerConfigData schedulerConfigData = new SchedulerConfigData();
+	private SchedulerConfigData schedulerConfigInMin = new SchedulerConfigData();
 	private String driverLocation;
 
 	private Vault vault = new Vault();
@@ -272,11 +272,11 @@ public class ApplicationConfigProvider implements Serializable {
 	}
 
 	public SchedulerConfigData getSchedulerConfigData() {
-		return schedulerConfigData;
+		return schedulerConfigInMin;
 	}
 
-	public void setSchedulerConfigData(SchedulerConfigData schedulerConfigData) {
-		this.schedulerConfigData = schedulerConfigData;
+	public void setSchedulerConfigData(SchedulerConfigData schedulerConfigInMin) {
+		this.schedulerConfigInMin = schedulerConfigInMin;
 	}
 
 	public boolean isEnableAuditEngine() {

@@ -1,0 +1,131 @@
+[
+   {
+      "contentId":101,
+      "expectedTrend":"DOWNWARDS",
+      "contentName":"Average Successful Build Time",
+      "kpiId":"1",
+      "noOfResult":2,
+      "threshold":0,
+      "resultField":"avgOutput",
+      "message":{
+         "positive":"Average Build Time has decreased to {current:avgOutput}s from {previous:avgOutput}s ",
+         "negative":"Average Build Time has increased to {current:avgOutput}s from {previous:avgOutput}s ",
+         "neutral":"Average Build Time has remained constant to {avgOutput}s"
+      },
+      "isActive":"TRUE"
+   },
+   {
+      "contentId":201,
+      "expectedTrend":"UPWARDS",
+      "contentName":"Total Number of builds",
+      "kpiId":"2",
+      "noOfResult":2,
+      "threshold":0,
+      "resultField":"TotalNumberBuild",
+      "message":{
+         "positive":"Total Number of builds has increased to {current:TotalNumberBuild} from {previous:TotalNumberBuild} ",
+         "negative":"Total Number of builds has decreased to {current:TotalNumberBuild} from {previous:TotalNumberBuild} ",
+         "neutral":" Total Number of builds has remained constant to {TotalNumberBuild}"
+      },
+      "isActive":"TRUE"
+   },
+   {
+      "contentId":301,
+      "expectedTrend":"UPWARDS",
+      "contentName":"Number of successful builds",
+      "kpiId":"3",
+      "noOfResult":2,
+      "threshold":0,
+      "resultField":"TotalNumberBuild",
+      "message":{
+         "positive":"Number of successful builds has increased to {current:TotalNumberBuild} from {previous:TotalNumberBuild}",
+         "negative":"Number of successful builds has decreased to {current:TotalNumberBuild} from {previous:TotalNumberBuild}",
+         "neutral":" Number of successful builds has remain same to {TotalNumberBuild}"
+      },
+      "isActive":"TRUE"
+   },
+   {
+      "contentId":401,
+      "expectedTrend":"DOWNWARDS",
+      "contentName":"Number of failed builds",
+      "kpiId":"4",
+      "noOfResult":2,
+      "threshold":0,
+      "resultField":"TotalNumberBuild",
+      "message":{
+         "positive":"Number of failed builds has decreased to {current:TotalNumberBuild} from {previous:TotalNumberBuild}",
+         "negative":"Number of failed builds has increased to {current:TotalNumberBuild} from {previous:TotalNumberBuild}",
+         "neutral":" Number of failed builds has remain same to {TotalNumberBuild}"
+      },
+      "isActive":"TRUE"
+   },
+   {
+      "contentId":501,
+      "expectedTrend":"DOWNWARDS",
+      "contentName":"Maximum Build Time",
+      "kpiId":"5",
+      "noOfResult":2,
+      "threshold":0,
+      "resultField":"MaxBuildTime",
+      "message":{
+         "positive":"Maximum Build time has decreased to {current:MaxBuildTime}s from {previous:MaxBuildTime}s",
+         "negative":"Maximum Build time has increased to {current:MaxBuildTime}s from {previous:MaxBuildTime}s",
+         "neutral":"Maximum Build time has remain same to {MaxBuildTime}s"
+      },
+      "isActive":"TRUE"
+   },
+   {
+      "contentId":601,
+      "isActive":true,
+      "expectedTrend":"DOWNWARDS",
+      "contentName":"Total Failure w.r.t zone",
+      "kpiId":6,
+      "resultField":"Failure",
+      "noOfResult":15,
+      "action":"COUNT",
+      "directionOfThreshold":"BELOW",
+      "message":{
+         "contentMessage":"Total Failure builds w.r.t zones are red {red}, amber {amber} , green {green}",
+         "neutralMessage":"No total Failure builds found"
+      },
+      "thresholds":{
+         "red":8,
+         "amber":6,
+         "green":4
+      }
+   },
+   {
+      "contentId":602,
+      "isActive":true,
+      "expectedTrend":"UPWARDS",
+      "contentName":"Total Successful builds w.r.t zone ",
+      "kpiId":6,
+      "resultField":"Success",
+      "noOfResult":15,
+      "action":"COUNT",
+      "directionOfThreshold":"ABOVE",
+      "message":{
+         "contentMessage":"Total Successful builds  w.r.t zones are red {red}, amber {amber} , green {green}",
+         "neutralMessage":"No Successful builds found"
+      },
+      "thresholds":{
+         "red":8,
+         "amber":6,
+         "green":4
+      }
+   },{
+      "contentId":701,
+      "expectedTrend":"DOWNWARDS",
+      "contentName":"Minimum Build Time",
+      "kpiId":"7",
+      "noOfResult":2,
+      "threshold":0,
+      "resultField":"MinBuildTime",
+      "message":{
+         "positive":"Minimum Build time has decreased to {current:MinBuildTime}s from {previous:MinBuildTime}s",
+         "negative":"Minimum Build time has increased to {current:MinBuildTime}s from {previous:MinBuildTime}s",
+         "neutral":"Minimum Build time has remain same to {MinBuildTime}s"
+      },
+      "isActive":"TRUE"
+   }
+]

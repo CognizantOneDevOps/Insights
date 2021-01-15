@@ -72,7 +72,7 @@
               <span>{{configDataChild.key.length > 21 ? configDataChild.key.slice(0, 21).concat('..') : configDataChild.key}}</span>
               <span style="color:#ff0000;" *ngIf="configDataChild.isRequired"> *</span>
             </td>
-            <td class="mat-cell-value" title="{{configDataChild.value}}">
+            <td class="mat-cell-value" title="{{configDataChild.inputType == 'text' ? configDataChild.value : '-'}}">
               <input type={{configDataChild.inputType}} class="inputBoxCont" [(ngModel)]="configDataChild.value"
                 name="{{configData.key+'_'+configDataChild.key}}" id="{{configDataChild.id}}">
             </td>
@@ -97,7 +97,7 @@
               <span>{{configData.key.length > 21 ? configData.key.slice(0, 21).concat('..'):configData.key}}</span>
               <span style="color:#ff0000;" *ngIf="configData.isRequired"> *</span>
             </td>
-            <td class="mat-cell-value" title="{{configData.value}}">
+            <td class="mat-cell-value" title="{{configData.inputType == 'text' ? configData.value : '-'}}">
               <input type={{configData.inputType}} class="inputBoxCont" [(ngModel)]="configData.value"
                 name="{{configData.key}}" id="{{configData.id}}">
             </td>

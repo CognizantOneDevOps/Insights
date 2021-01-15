@@ -1,0 +1,66 @@
+{
+	"reportId": "5200",
+	"reportName": "Report_Grafana_Inference",
+	"description": "Template to create Inference Panel",
+	"isActive": true,
+	"file": "Report_Grafana_Inference",
+	"visualizationutil": "Fusion",
+	"kpiConfigs": [
+		{
+			"kpiId": 1,
+			"visualizationConfigs": []
+		},
+		{
+			"kpiId": 2,
+			"visualizationConfigs": []
+		},
+		{
+			"kpiId": 3,
+			"visualizationConfigs": []
+		},
+		{
+			"kpiId": 4,
+			"visualizationConfigs": []
+		},
+		{
+			"kpiId": 5,
+			"visualizationConfigs": []
+		},
+		{
+			"kpiId": 6,
+			"visualizationConfigs": []
+		},
+		{
+			"kpiId": 7,
+			"visualizationConfigs": []
+		},
+		{
+			"kpiId": 8,
+			"visualizationConfigs": []
+		},
+		{
+			"kpiId": 9,
+			"visualizationConfigs": []
+		},
+		{
+			"kpiId": 10,
+			"visualizationConfigs": []
+		},
+		{
+			"kpiId": 11,
+			"visualizationConfigs": []
+		},
+		{
+			"kpiId": 12,
+			"visualizationConfigs": []
+		},
+		{
+			"kpiId": 13,
+			"visualizationConfigs": []
+		},
+		{
+			"kpiId": 14,
+			"visualizationConfigs": []
+		}
+	]
+}
