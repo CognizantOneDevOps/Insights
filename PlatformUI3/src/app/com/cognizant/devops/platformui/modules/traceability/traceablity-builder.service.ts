@@ -17,12 +17,25 @@ export class TraceabiltyService implements ITraceablityService {
 
     getAssetHistory(toolName: string, toolField: string, toolValue: string): Promise<any> {
         var restHandler = this.restCallHandlerService;
-        return restHandler.get("GET_DETAILS", { 'toolName': toolName, 'fieldName': toolField, 'fieldValue': toolValue });
+        return restHandler.get("GET_DETAILS", {'toolName': toolName, 'fieldName': toolField, 'fieldValue': toolValue });
     }
+
+    getEpicIssues(toolName: string, toolField: string, toolValue: string,isEpic:boolean): Promise<any> {
+        var restHandler = this.restCallHandlerService;
+        return restHandler.get("GET_EPIC_ISSUES", {'toolName': toolName, 'fieldName': toolField, 'fieldValue': toolValue,'isEpic':isEpic });
+    }
+
+    getIssuesPipeline(issue:string): Promise<any>{
+        var restHandler = this.restCallHandlerService;
+       // return restHandler.get("GET_ISSUES_PIPELINE", {'issue': issue});
+       return this.restCallHandlerService.postWithData("GET_ISSUES_PIPELINE", issue, { 'Content-Type': 'application/x-www-form-urlencoded' }).toPromise();
+    }
+
+    
 
     getAsssetDetails(toolName: string, cachestring: string) {
         var restHandler = this.restCallHandlerService;
-        return restHandler.get("GET_TOOL_DETAILS", { 'toolName': toolName, 'cacheKey': cachestring });
+        return restHandler.get("GET_TOOL_DETAILS", {'toolName': toolName, 'cacheKey': cachestring });
     }
     getAvailableTools()
     {
@@ -32,6 +45,6 @@ export class TraceabiltyService implements ITraceablityService {
     getToolKeyset(toolName: string)
     {
         var restHandler = this.restCallHandlerService;
-        return restHandler.get("GET_TOOL_KEYSET", { 'toolName': toolName });   
+        return restHandler.get("GET_TOOL_KEYSET", {'toolName': toolName });   
     }
 }

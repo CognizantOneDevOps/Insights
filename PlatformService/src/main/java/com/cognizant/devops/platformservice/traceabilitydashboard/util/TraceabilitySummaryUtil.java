@@ -32,6 +32,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import com.cognizant.devops.platformcommons.core.util.InsightsUtils;
 import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 public class TraceabilitySummaryUtil {
@@ -41,8 +42,12 @@ public class TraceabilitySummaryUtil {
 
 	public static String calTimeDiffrence(String operandName, List<JsonObject> toolRespPayload, String message)
 			throws ParseException {
-		int totalCount = toolRespPayload.size();
-		if (totalCount >= 0 && toolRespPayload.get(0).has(operandName)) {
+ 		int totalCount = toolRespPayload.size();
+		
+		// Check if total node count is greater than 0 and payload has both timestamp and author as mandatory properties
+		
+		if (totalCount >= 0 && toolRespPayload.stream().allMatch(predicate->(predicate.has(operandName) && predicate.has("author"))))
+		{			
 			int numOfUniqueAuthers = (int) toolRespPayload.stream()
 					.filter(distinctByKey(payload -> payload.get("author").getAsString())).count();
 			String firstCommitTime = toolRespPayload.get(0).get(operandName).getAsString();
@@ -60,12 +65,16 @@ public class TraceabilitySummaryUtil {
 
 	}
 
-	public static String calSUM(String operandName, String operandValue, List<JsonObject> toolRespPayload,
+	public static String calSUM(String operandName, JsonArray operandValue, List<JsonObject> toolRespPayload,
 			String message) {
 		int totalCount = toolRespPayload.size();
-		if (totalCount >= 0 && toolRespPayload.get(0).has(operandName)) {			
+		List<String> statusList = new ArrayList<>();
+		for (JsonElement values : operandValue) {
+			statusList.add(values.getAsString());
+		}		
+		if (totalCount >= 0 && toolRespPayload.stream().allMatch(predicate->predicate.has(operandName))) {			
 				int count = (int) toolRespPayload.stream()
-						.filter(payload -> payload.get(operandName).getAsString().equals(operandValue)).count();
+						.filter(payload ->statusList.contains(payload.get(operandName).getAsString())).count();
 				int rem = totalCount - count;
 				MessageFormat mf = new MessageFormat(message);
 				return mf.format(new Object[] { count, rem });
@@ -75,12 +84,16 @@ public class TraceabilitySummaryUtil {
 
 	}
 
-	public static String calPercentage(String operandName, String operandValue, List<JsonObject> toolRespPayload,
+	public static String calPercentage(String operandName, JsonArray operandValue, List<JsonObject> toolRespPayload,
 			String message) {
 		int totalCount = toolRespPayload.size();
+		List<String> statusList = new ArrayList<>();
+		for (JsonElement values : operandValue) {
+			statusList.add(values.getAsString());
+		}
 		if (totalCount >= 0 && toolRespPayload.get(0).has(operandName)) {
 			int count = (int) toolRespPayload.stream()
-					.filter(payload -> payload.get(operandName).getAsString().equals(operandValue)).count();
+					.filter(payload ->statusList.contains(payload.get(operandName).getAsString())).count();
 			int perc = (count * 100) / totalCount;
 			MessageFormat mf = new MessageFormat(message);
 			return mf.format(new Object[] { perc, totalCount });

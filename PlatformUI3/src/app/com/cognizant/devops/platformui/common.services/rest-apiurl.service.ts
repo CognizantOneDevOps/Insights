@@ -120,6 +120,9 @@ export class RestAPIurlService implements IRestAPIUrlService {
         this.addEndPoint("GET_TOOL_DETAILS", '/PlatformService/traceabilitydashboard/getToolSummary');
         this.addEndPoint("GET_TOOL_LIST", '/PlatformService/traceabilitydashboard/getAvailableTools');
         this.addEndPoint("GET_TOOL_KEYSET", '/PlatformService/traceabilitydashboard/getToolKeyset');
+        this.addEndPoint("GET_EPIC_ISSUES", '/PlatformService/traceabilitydashboard/getEpicIssues');
+        this.addEndPoint("GET_ISSUES_PIPELINE", '/PlatformService/traceabilitydashboard/getIssuePipeline');
+
 
         //Audit Reporting
         this.addEndPoint("GET_ALL_ASSETS", '/PlatformService/traceability/getAllAssets');

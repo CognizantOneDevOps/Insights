@@ -21,7 +21,7 @@ import com.cognizant.devops.platformcommons.exception.InsightsCustomException;
 import com.google.gson.JsonObject;
 
 public interface TraceabilityDashboardService {
-	 public JsonObject getPipeline(String toolName,String fieldName,String fieldValue) throws InsightsCustomException;
+	 public JsonObject getPipeline(String toolName,String fieldName,String fieldValue,boolean isEpic) throws InsightsCustomException;
 	 public List<JsonObject> getToolSummary(String toolName, String cacheKey) throws InsightsCustomException;
 	 public List<String> getAvailableTools() throws InsightsCustomException;
 	 public List<String> getToolKeyset(String toolName) throws InsightsCustomException;   

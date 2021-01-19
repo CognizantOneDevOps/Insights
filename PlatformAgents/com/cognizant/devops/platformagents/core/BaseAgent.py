@@ -328,7 +328,7 @@ class BaseAgent(object):
         localDateTime = self.toolsTimeZone.localize(time)
         remoteDateTime = localDateTime.astimezone(self.insightsTimeZone)
         response = {
-                    'epochTime' : (remoteDateTime - self.epochStartDateTime).total_seconds(),
+                    'epochTime' : int((remoteDateTime - self.epochStartDateTime).total_seconds()),
                     'time' : remoteDateTime.strftime('%Y-%m-%dT%H:%M:%SZ')
                     }
         return response;

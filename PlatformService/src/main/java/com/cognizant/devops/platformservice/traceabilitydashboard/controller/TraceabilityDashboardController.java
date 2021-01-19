@@ -18,8 +18,10 @@ package com.cognizant.devops.platformservice.traceabilitydashboard.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -35,7 +37,7 @@ public class TraceabilityDashboardController {
 	@Autowired
 	TraceabilityDashboardServiceImpl traceabilityDashboardServiceImpl;
 
-	@RequestMapping(value = "/getToolSummary", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+	@GetMapping(value = "/getToolSummary", produces = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
 	public JsonObject getToolSummary(@RequestParam String toolName, @RequestParam String cacheKey) {
 		try {
@@ -46,7 +48,7 @@ public class TraceabilityDashboardController {
 		}
 
 	}
-	@RequestMapping(value = "/getAvailableTools", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+	@GetMapping(value = "/getAvailableTools", produces = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
 	public JsonObject getAvailableTools() {
 		try {
@@ -57,8 +59,7 @@ public class TraceabilityDashboardController {
 		}
 
 	}
-
-	@RequestMapping(value = "/getToolKeyset", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+	@GetMapping(value = "/getToolKeyset", produces = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
 	public JsonObject getToolKeyset(@RequestParam String toolName) {
 		try {
@@ -70,15 +71,43 @@ public class TraceabilityDashboardController {
 
 	}
 
-	@RequestMapping(value = "/getPipeline", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+	@GetMapping(value = "/getPipeline", produces = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
 	public JsonObject getPipeline(@RequestParam String toolName, @RequestParam String fieldName,
 			@RequestParam String fieldValue) {
 		try {
-			JsonObject response = traceabilityDashboardServiceImpl.getPipeline(toolName, fieldName, fieldValue);
+			JsonObject response = traceabilityDashboardServiceImpl.getPipeline(toolName, fieldName, fieldValue,false);
 			return PlatformServiceUtil.buildSuccessResponseWithData(response);
 		} catch (InsightsCustomException e) {
 			return PlatformServiceUtil.buildFailureResponse(e.getMessage()); 
+		}
+
+	}
+	
+	@GetMapping(value = "/getEpicIssues", produces = MediaType.APPLICATION_JSON_VALUE)
+	@ResponseBody
+	public JsonObject getEpicIssues(@RequestParam String toolName, @RequestParam String fieldName,
+			@RequestParam String fieldValue,@RequestParam Boolean isEpic) {
+		try {
+			JsonObject response = traceabilityDashboardServiceImpl.getPipeline(toolName, fieldName, fieldValue,isEpic);
+			return PlatformServiceUtil.buildSuccessResponseWithData(response);
+		} catch (InsightsCustomException e) {
+			return PlatformServiceUtil.buildFailureResponse(e.getMessage()); 
+		}
+
+	}
+	
+	@PostMapping(value="/getIssuePipeline", produces=MediaType.APPLICATION_JSON_VALUE)
+	@ResponseBody
+	public JsonObject getIssuePipeline(@RequestBody String issue)
+	{
+		JsonObject response = new JsonObject();
+		try {
+
+			response = traceabilityDashboardServiceImpl.getIssuePipeline(issue);
+			return PlatformServiceUtil.buildSuccessResponseWithData(response);
+		} catch (Exception e) {
+			return PlatformServiceUtil.buildFailureResponse(e.getMessage());
 		}
 
 	}

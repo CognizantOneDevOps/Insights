@@ -37,10 +37,16 @@
 					<mat-option *ngFor="let key of fieldList" value="{{key}}">{{key}}</mat-option>
 				</mat-select>
 			</div>
+			<!-- <div>
+				<mat-select required [(ngModel)]="issueTypeSelected" name="issueTypeSelected" class="form-control"
+					placeholder="Isuse Type" (selectionChange)="issueTypeOnChange($event.value)"style="width:150px;">
+					<mat-option *ngFor="let issue of issueTypes | keyvalue" value="{{issue.value}}">{{issue.value}}</mat-option>
+				</mat-select>
+			</div> -->
 			<div>
 				<input type="text" placeholder="{{fieldPlaceVal}}" class="form-control" [(ngModel)]="fieldValue"
 					name="toolFieldValue">
-			</div>
+			</div>			
 			<div style="margin-left: 30px">
 				<button mat-raised-button (click)="getDetails()"
 					[disabled]="frmagentconfig.invalid || fieldValue == null" class="configureBut"
@@ -100,7 +106,7 @@
 				<g *ngFor="let item of list; let i = index">
 					<!-- top points -->
 					<g [attr.transform]="'translate(' + (144 + (i*120)) + ', 55)'" class="PWGx-pipeline-node"
-						(mouseenter)="eventGet(i)">
+						(click)="onclick(i+'-'+0)" (mouseleave)="onmouseleave(item)">
 						<!--(mouseout)="eventLeave()"-->
 						<a class="second_popup" data-toggle="modal" data-target="#myModal2">
 							<g class="PWGx-svgResultStatusSolid">
@@ -128,7 +134,7 @@
 					<!-- child points -->
 					<g [attr.transform]="'translate(' + (144 + (i*120)) + ',' + (125 + (j * 70)) + ')'"
 						*ngFor="let item of item?.child | slice:1:item?.child?.length; let j = index;"
-						class="PWGx-pipeline-node" (mouseenter)="eventGet(i+'-'+j)">
+						class="PWGx-pipeline-node"  (click)="onclick(i+'-'+(j+1))" > 
 						<!-- (mouseout)="eventLeave()"> -->
 						<g class="PWGx-svgResultStatusSolid" (mouseleave)="eventLeave()">
 							<circle cx="0" cy="0" r="12" class="halo" stroke-width="3.5"></circle>

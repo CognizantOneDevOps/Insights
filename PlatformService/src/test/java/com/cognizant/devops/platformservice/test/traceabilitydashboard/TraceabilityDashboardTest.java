@@ -108,7 +108,7 @@ public class TraceabilityDashboardTest extends TreceabilityTestData {
 		JsonObject resp = new JsonObject();
 		try {
 			  resp = service.getPipeline(TreceabilityTestData.toolName, TreceabilityTestData.fieldName,
-					TreceabilityTestData.fieldVal);
+					TreceabilityTestData.fieldVal,false);
 			  if(resp.get("pipeline").getAsJsonArray().size()==0)
 			  {
 				  throw new InsightsCustomException("data not found");
@@ -126,7 +126,7 @@ public class TraceabilityDashboardTest extends TreceabilityTestData {
 		JsonObject resp = new JsonObject();
 		try {
 			  resp = service.getPipeline(TreceabilityTestData.toolName, TreceabilityTestData.fieldName,
-					TreceabilityTestData.fieldVal);
+					TreceabilityTestData.fieldVal,false);
 			  if(resp.get("summary").getAsJsonArray().size()==0)
 			  {
 				  throw new InsightsCustomException("summary data not found");
@@ -141,7 +141,7 @@ public class TraceabilityDashboardTest extends TreceabilityTestData {
 	@Test(priority = 6)
 	public void testPipelineResponseWithIncorrectData() throws InsightsCustomException {
 		JsonObject resp = service.getPipeline(TreceabilityTestData.toolName, TreceabilityTestData.fieldName,
-				TreceabilityTestData.incorrectFieldVal);
+				TreceabilityTestData.incorrectFieldVal,false);
 		Assert.assertEquals(0, resp.get("pipeline").getAsJsonArray().size());
 	}
 	

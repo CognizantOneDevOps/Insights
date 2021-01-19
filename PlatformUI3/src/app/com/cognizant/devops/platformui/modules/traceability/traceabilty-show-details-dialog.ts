@@ -92,9 +92,7 @@ export class ShowTraceabiltyDetailsDialog implements OnInit {
         this.traceabiltyService.getAsssetDetails(this.data.toolName, this.data.cachestring)
             .then((response) => {
                 for (var x of response.data) {
-                    console.log("Response data to check..", response.data)
                     var obj = x;
-
                     for (let key in x) {
 
                         if (key == 'uuid' || key == 'count' || key == 'toolName') {
